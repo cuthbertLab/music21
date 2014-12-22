@@ -120,28 +120,28 @@ try:
 except ImportError:
     from xml.etree import ElementTree as ETree
 
-from uuid import uuid4
 from collections import defaultdict
+from uuid import uuid4
 
 # music21
-from music21 import exceptions21
-from music21 import note
-from music21 import duration
 from music21 import articulations
-from music21 import pitch
-from music21 import stream
+from music21 import bar
 from music21 import chord
 from music21 import clef
-from music21 import meter
-from music21 import key
+from music21 import duration
+from music21 import environment
+from music21 import exceptions21
 from music21 import instrument
 from music21 import interval
-from music21 import bar
+from music21 import key
+from music21 import metadata
+from music21 import meter
+from music21 import note
+from music21 import pitch
+from music21 import stream
 from music21 import spanner
 from music21 import tie
-from music21 import metadata
 
-from music21 import environment
 _MOD = 'mei.base'
 environLocal = environment.Environment(_MOD)
 

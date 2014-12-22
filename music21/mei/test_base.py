@@ -44,22 +44,22 @@ except ImportError:
 # won't know to mock them, and raises an exception instead.
 from xml.etree import ElementTree as ETree
 
-from fractions import Fraction
 from collections import defaultdict
+from fractions import Fraction
 
-from music21 import pitch
-from music21 import note
-from music21 import duration
 from music21 import articulations
+from music21 import bar
 from music21 import clef
-from music21 import stream
+from music21 import duration
 from music21 import instrument
+from music21 import interval
 from music21 import key
 from music21 import meter
-from music21 import interval
-from music21 import bar
-from music21 import tie
+from music21 import note
+from music21 import pitch
 from music21 import spanner
+from music21 import stream
+from music21 import tie
 
 # six... prefer the system version, if present
 try:
