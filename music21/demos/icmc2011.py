@@ -249,12 +249,21 @@ class Test(unittest.TestCase):
 
         #==== "fig-df06"
         # Non-Hierarchical Object Associations
+        #oldIds = []
+        #for idKey in n1.sites.siteDict:
+        #    print (idKey, n1.sites.siteDict[idKey].isDead)
+        #    oldIds.append(idKey)
+        #print("-------")
 
         # Spanners can be positioned in Parts or Measures
         sp1 = spanner.Slur([n1, n4])
         p1.append(sp1)
         sp2 = spanner.Slur([n5, n6])
         m4.insert(0, sp2)
+
+        #print(id(sp1), id(sp1.spannerStorage), n1.sites.siteDict[id(sp1.spannerStorage)].isDead)
+        #if id(sp1.spannerStorage) in oldIds:
+        #    print ("******!!!!!!!!!*******")
         
         # Elements can report on what Spanner they belong to
         ss1 = n1.getSpannerSites()

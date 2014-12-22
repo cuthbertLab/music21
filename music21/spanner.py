@@ -468,7 +468,7 @@ class Spanner(base.Music21Object):
     def hasSpannedElement(self, spannedElement):  
         '''Return True if this Spanner has the spannedElement.'''
         for c in self.spannerStorage._elements:
-            if id(c) == id(spannedElement):
+            if c is spannedElement:
                 return True
         return False
 
@@ -540,11 +540,9 @@ class Spanner(base.Music21Object):
         False
         >>> sl.isLast(n5)
         True
-
         '''
-        idTarget = id(spannedElement)
         objRef = self.spannerStorage._elements[0]
-        if id(objRef) == idTarget:
+        if objRef is spannedElement:
             return True
         return False
 
@@ -568,10 +566,9 @@ class Spanner(base.Music21Object):
     def isLast(self, spannedElement):
         '''Given a spannedElement, is it last?  Returns True or False
         '''
-        idTarget = id(spannedElement)
         objRef = self.spannerStorage._elements[-1]
 
-        if id(objRef) == idTarget:
+        if spannedElement is objRef:
             return True
         return False
 

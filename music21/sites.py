@@ -371,6 +371,7 @@ class Sites(common.SlottedObject):
             #if obj is not None and id(obj) != idKey:
             #    print("RED ALERT!")
             siteRef = self.siteDict[idKey]
+            siteRef.isDead = False  # in case it used to be a dead site...            
         else:
             siteRef = SiteRef()
             #if id(obj) != idKey and obj is not None:
@@ -1218,8 +1219,8 @@ class Sites(common.SlottedObject):
                 if idKey is None:
                     continue
                 siteRef = self.siteDict[idKey]
-                if siteRef.isDead:
-                    continue  # already marked
+                #if siteRef.isDead:
+                #    continue  # already marked -- do it again, in case it is reused
                 if WEAKREF_ACTIVE:
                     obj = common.unwrapWeakref(
                         siteRef.site)
@@ -1227,6 +1228,8 @@ class Sites(common.SlottedObject):
                     obj = siteRef.site
                 if obj is None: # if None, it no longer exists
                     siteRef.isDead = True
+                else:
+                    siteRef.isDead = False
         # use previously set isDead entry, so as not to
         # unwrap all references
         remove = []
