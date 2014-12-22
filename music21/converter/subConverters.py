@@ -996,6 +996,7 @@ class Test(unittest.TestCase):
         When the file uses UTF-16 encoding rather than UTF-8 (which happens if it was exported from
         the "sibmei" plug-in for Sibelius.
         '''
+        import music21  # to make the pathname later
         try:
             # this works in Python 3.3+
             from unittest import mock  # pylint: disable=no-name-in-module
@@ -1017,6 +1018,7 @@ class Test(unittest.TestCase):
         '''
         For the sake of completeness, this is the same as testImportMei3() but with a UTF-8 file.
         '''
+        import music21  # to make the pathname later
         try:
             # this works in Python 3.3+
             from unittest import mock  # pylint: disable=no-name-in-module
