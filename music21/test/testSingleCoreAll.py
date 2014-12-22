@@ -230,6 +230,8 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False, limit=None):
             environLocal.printDebug('%s cannot load Doctests' % module)
             continue
         
+        allLocals = [getattr(module, x) for x in dir(module)]
+        common.addDocAttrTestsToSuite(s1, allLocals, outerFilename=module.__file__, globs=globs, optionflags=docTestOptions)
     
     common.fixTestsForPy2and3(s1)
     

@@ -4390,7 +4390,6 @@ def mainTest(*testClasses, **kwargs):
     else:
         # create test suite derived from doc tests
         # here we use '__main__' instead of a module
-
         if 'moduleRelative' in testClasses or 'moduleRelative' in sys.argv:
             pass
         else:
@@ -4456,20 +4455,8 @@ def mainTest(*testClasses, **kwargs):
             outerFrameTuple = stacks[0]
         outerFrame = outerFrameTuple[0]
         outerFilename = outerFrameTuple[1]
-        localVariables = outerFrame.f_locals
-        for lvk in list(localVariables.values()):
-            if (inspect.isclass(lvk)):
-                docattr = getattr(lvk, '_DOC_ATTR', None)
-                if docattr is not None:
-                    for dockey in docattr:
-                        documentation = docattr[dockey]
-                        #print(documentation)
-                        dt = doctest.DocTestParser().get_doctest(documentation, globs, dockey, outerFilename, 0)
-                        if len(dt.examples) == 0:
-                            continue
-                        dtc = doctest.DocTestCase(dt, optionflags=optionflags)
-                        #print(dtc)
-                        s1.addTest(dtc)
+        localVariables = list(outerFrame.f_locals.values())
+        common.addDocAttrTestsToSuite(s1, localVariables, outerFilename, globs, optionflags)
 
     if runAllTests is True:
         common.fixTestsForPy2and3(s1)
