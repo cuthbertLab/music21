@@ -22,12 +22,41 @@ Use :class:`MeiToM21Converter` to convert a string to a set of music21 objects. 
 :class:`M21ToMeiConverter` class will convert a set of music21 objects into a string with an MEI
 document.
 
-TODO: make this use an actual file
->> from music21 import *
->> meiString = convert_some_file_to_a_string()
->> conv = mei.MeiToM21Converter(meiString)
->> result = conv.run()
->> type(result)
+>>> meiString = """<?xml version="1.0" encoding="UTF-8"?>
+... <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
+...     <music>
+...     <score>
+...         <scoreDef meter.count="6" meter.unit="8">
+...             <staffGrp>
+...                 <staffDef n="1" clef.shape="F" clef.line="4"/>
+...             </staffGrp>
+...         </scoreDef>
+...         <section>
+...             <scoreDef key.sig="1f" key.mode="major"/>
+...             <measure n="1">
+...                 <staff n="1">
+...                     <layer n="1">
+...                         <beam>
+...                             <note pname="E" oct="3" dur="8" artic="stacc"/>
+...                             <note pname="E" oct="3" dur="8"/>
+...                             <note pname="E" oct="3" dur="8"/>
+...                         </beam>
+...                         <chord dur="4" dots="1">
+...                             <note pname="F" oct="2"/>
+...                             <note pname="A" oct="2" accid="f"/>
+...                         </chord>
+...                     </layer>
+...                 </staff>
+...             </measure>
+...         </section>
+... </score>
+...     </music>
+... </mei>
+... """
+>>> from music21 import *
+>>> conv = mei.MeiToM21Converter(meiString)
+>>> result = conv.run()
+>>> type(result)
 <class 'music21.stream.Score'>
 
 **Terminology**
