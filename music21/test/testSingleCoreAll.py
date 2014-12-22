@@ -229,6 +229,7 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False, limit=None):
         except ValueError:
             environLocal.printDebug('%s cannot load Doctests' % module)
             continue
+        
     
     common.fixTestsForPy2and3(s1)
     

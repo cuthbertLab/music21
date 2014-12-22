@@ -4377,9 +4377,14 @@ def mainTest(*testClasses, **kwargs):
             )
     
     globs = None
-    # start with doc tests, then add unit tests
     if ('noDocTest' in testClasses or 'noDocTest' in sys.argv
         or 'nodoctest' in sys.argv):
+        skipDoctest = True
+    else:
+        skipDoctest = False
+
+    # start with doc tests, then add unit tests
+    if skipDoctest:
         # create a test suite for storage
         s1 = unittest.TestSuite()
     else:
@@ -4442,11 +4447,7 @@ def mainTest(*testClasses, **kwargs):
             s1.addTests(s2)
 
     ### Add _DOC_ATTR tests...
-    if ('noDocTest' in testClasses 
-        or 'noDocTest' in sys.argv
-        or 'nodoctest' in sys.argv):
-        pass
-    else:
+    if not skipDoctest:
         import inspect
         stacks = inspect.stack()
         if len(stacks) > 1:
@@ -4456,8 +4457,7 @@ def mainTest(*testClasses, **kwargs):
         outerFrame = outerFrameTuple[0]
         outerFilename = outerFrameTuple[1]
         localVariables = outerFrame.f_locals
-        for lv in list(localVariables.keys()):
-            lvk = localVariables[lv]
+        for lvk in list(localVariables.values()):
             if (inspect.isclass(lvk)):
                 docattr = getattr(lvk, '_DOC_ATTR', None)
                 if docattr is not None:
