@@ -42,40 +42,38 @@ def makeExampleScore():
     r'''
     Makes example score for use in stream-to-timespan conversion docs.
 
-    ::
-
-        >>> score = stream.timespans.makeExampleScore()
-        >>> score.show('text')
-        {0.0} <music21.stream.Part ...>
-            {0.0} <music21.instrument.Instrument PartA: : >
-            {0.0} <music21.stream.Measure 1 offset=0.0>
-                {0.0} <music21.clef.BassClef>
-                {0.0} <music21.meter.TimeSignature 2/4>
-                {0.0} <music21.note.Note C>
-                {1.0} <music21.note.Note D>
-            {2.0} <music21.stream.Measure 2 offset=2.0>
-                {0.0} <music21.note.Note E>
-                {1.0} <music21.note.Note F>
-            {4.0} <music21.stream.Measure 3 offset=4.0>
-                {0.0} <music21.note.Note G>
-                {1.0} <music21.note.Note A>
-            {6.0} <music21.stream.Measure 4 offset=6.0>
-                {0.0} <music21.note.Note B>
-                {1.0} <music21.note.Note C>
-                {2.0} <music21.bar.Barline style=final>
-        {0.0} <music21.stream.Part ...>
-            {0.0} <music21.instrument.Instrument PartB: : >
-            {0.0} <music21.stream.Measure 1 offset=0.0>
-                {0.0} <music21.clef.BassClef>
-                {0.0} <music21.meter.TimeSignature 2/4>
-                {0.0} <music21.note.Note C>
-            {2.0} <music21.stream.Measure 2 offset=2.0>
-                {0.0} <music21.note.Note G>
-            {4.0} <music21.stream.Measure 3 offset=4.0>
-                {0.0} <music21.note.Note E>
-            {6.0} <music21.stream.Measure 4 offset=6.0>
-                {0.0} <music21.note.Note D>
-                {2.0} <music21.bar.Barline style=final>
+    >>> score = stream.timespans.makeExampleScore()
+    >>> score.show('text')
+    {0.0} <music21.stream.Part ...>
+        {0.0} <music21.instrument.Instrument PartA: : >
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.BassClef>
+            {0.0} <music21.meter.TimeSignature 2/4>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note D>
+        {2.0} <music21.stream.Measure 2 offset=2.0>
+            {0.0} <music21.note.Note E>
+            {1.0} <music21.note.Note F>
+        {4.0} <music21.stream.Measure 3 offset=4.0>
+            {0.0} <music21.note.Note G>
+            {1.0} <music21.note.Note A>
+        {6.0} <music21.stream.Measure 4 offset=6.0>
+            {0.0} <music21.note.Note B>
+            {1.0} <music21.note.Note C>
+            {2.0} <music21.bar.Barline style=final>
+    {0.0} <music21.stream.Part ...>
+        {0.0} <music21.instrument.Instrument PartB: : >
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.BassClef>
+            {0.0} <music21.meter.TimeSignature 2/4>
+            {0.0} <music21.note.Note C>
+        {2.0} <music21.stream.Measure 2 offset=2.0>
+            {0.0} <music21.note.Note G>
+        {4.0} <music21.stream.Measure 3 offset=4.0>
+            {0.0} <music21.note.Note E>
+        {6.0} <music21.stream.Measure 4 offset=6.0>
+            {0.0} <music21.note.Note D>
+            {2.0} <music21.bar.Barline style=final>
 
     '''
     from music21 import converter
@@ -126,7 +124,7 @@ def makeElement(verticality, quarterLength):
     return element
 
 
-def _recurseStreamMulti(
+def listOfTimespanCollectionsByClass(
     inputStream,
     currentParentage=None,
     initialOffset=0,
@@ -138,49 +136,91 @@ def _recurseStreamMulti(
     encountered substream and ElementTimespans for each encountered non-stream
     element.
 
-    `classLists` should be a sequence of valid inputs for `isinstance()`. One
+    `classLists` should be a sequence of valid inputs for `isClassOrSubclass()`. One
     TimespanCollection will be constructed for each element in `classLists`, in
     a single optimized pass through the `inputStream`.
 
     This is used internally by `streamToTimespanCollection`.
+    
+    
+    >>> score = stream.timespans.makeExampleScore()
+    
+    Get everything in the score
+    
+    >>> timespanCollections = stream.timespans.listOfTimespanCollectionsByClass(score)
+    >>> timespanCollections
+    [<TimespanCollection {2} (-inf to inf) <music21.stream.Score ...>>]    
+    >>> for t in timespanCollections[0]:
+    ...     print(t)
+    <TimespanCollection {4} (-inf to inf) <music21.stream.Part ...>>
+        <TimespanCollection {0} (-inf to inf) <music21.stream.Measure 1 offset=0.0>>
+        <TimespanCollection {0} (-inf to inf) <music21.stream.Measure 2 offset=2.0>>
+        <TimespanCollection {0} (-inf to inf) <music21.stream.Measure 3 offset=4.0>>
+        <TimespanCollection {0} (-inf to inf) <music21.stream.Measure 4 offset=6.0>>
+    <TimespanCollection {4} (-inf to inf) <music21.stream.Part ...>>
+        <TimespanCollection {0} (-inf to inf) <music21.stream.Measure 1 offset=0.0>>
+        <TimespanCollection {0} (-inf to inf) <music21.stream.Measure 2 offset=2.0>>
+        <TimespanCollection {0} (-inf to inf) <music21.stream.Measure 3 offset=4.0>>
+        <TimespanCollection {0} (-inf to inf) <music21.stream.Measure 4 offset=6.0>>
+    
+    Now filter the Notes and the Clefs & TimeSignatures of the score (flattened) into a list of two timespans
+    
+    >>> classLists = ['Note', ('Clef', 'TimeSignature')]
+    >>> timespanCollections = stream.timespans.listOfTimespanCollectionsByClass(score, classLists=classLists, flatten=True)
+    >>> timespanCollections
+    [<TimespanCollection {12} (0.0 to 8.0) <music21.stream.Score ...>>, 
+     <TimespanCollection {4} (0.0 to 0.0) <music21.stream.Score ...>>]
+    
+    
     '''
-    from music21 import spanner
-    from music21 import stream
-    from music21 import variant
     if currentParentage is None:
         currentParentage = (inputStream,)
-    results = [
-        TimespanCollection(source=currentParentage[-1]) for _ in classLists
-        ]
+        ## fix non-tuple classLists -- first call only...
+        if classLists:
+            for i in range(len(classLists)):
+                cl = classLists[i]
+                if not common.isIterable(cl):
+                    classLists[i] = (cl,)
+
+            
+    lastParentage = currentParentage[-1]
+    if classLists is None or len(classLists) == 0:
+        outputCollections = [TimespanCollection(source=lastParentage)]
+        classLists = []
+    else:
+        outputCollections = [
+            TimespanCollection(source=lastParentage) for _ in classLists
+            ]
     # do this to avoid munging activeSites
     inputStreamElements = inputStream._elements + inputStream._endElements
     for element in inputStreamElements:
-        startOffset = element.getOffsetBySite(currentParentage[-1])
-        startOffset += initialOffset
+        startOffset = element.getOffsetBySite(lastParentage) + initialOffset
         wasStream = False
-        if isinstance(element, stream.Stream) and \
-            not isinstance(element, spanner.Spanner) and \
-            not isinstance(element, variant.Variant):
+        
+        if element.isStream and \
+                not element.isSpanner and \
+                not element.isVariant:
             localParentage = currentParentage + (element,)
-            subresults = _recurseStreamMulti(
+            containedTimespanCollections = listOfTimespanCollectionsByClass(
                 element,
-                localParentage,
+                currentParentage=localParentage,
                 initialOffset=startOffset,
                 flatten=flatten,
                 classLists=classLists,
                 )
-            for result, subresult in zip(results, subresults):
+            for outputTSC, subTSC in zip(outputCollections, containedTimespanCollections):
                 if flatten is not False: # True or semiFlat
-                    result.insert(subresult[:])
+                    outputTSC.insert(subTSC[:])
                 else:
-                    result.insert(subresult)
+                    outputTSC.insert(subTSC)
             wasStream = True
+            
         if not wasStream or flatten == 'semiFlat':
             parentStartOffset = initialOffset
-            parentStopOffset = initialOffset + \
-                currentParentage[-1].duration.quarterLength
-            stopOffset = startOffset + element.duration.quarterLength
-            for result, classList in zip(results, classLists):
+            parentStopOffset  = initialOffset + lastParentage.duration.quarterLength
+            stopOffset        = startOffset + element.duration.quarterLength
+            
+            for classBasedTSC, classList in zip(outputCollections, classLists):
                 if classList and not element.isClassOrSubclass(classList):
                     continue
                 elementTimespan = ElementTimespan(
@@ -191,75 +231,14 @@ def _recurseStreamMulti(
                     startOffset=startOffset,
                     stopOffset=stopOffset,
                     )
-                result.insert(elementTimespan)
-    return results
-
-
-def _recurseStream(
-    inputStream,
-    currentParentage=None,
-    initialOffset=0,
-    flatten=False,
-    classList=None,
-    ):
-    r'''
-    Recurses through `inputStream`, and constructs TimespanCollections for each
-    encountered substream and ElementTimespans for each encountered non-stream
-    element.
-
-    This is used internally by `streamToTimespanCollection`.
-    '''
-    from music21 import spanner
-    from music21 import stream
-    from music21 import variant
-    if currentParentage is None:
-        currentParentage = (inputStream,)
-    result = TimespanCollection(source=currentParentage[-1])
-    # do this to avoid munging activeSites
-    inputStreamElements = inputStream._elements + inputStream._endElements
-    for element in inputStreamElements:
-        startOffset = element.getOffsetBySite(currentParentage[-1])
-        startOffset += initialOffset
-        wasStream = False
-        if isinstance(element, stream.Stream) and \
-            not isinstance(element, spanner.Spanner) and \
-            not isinstance(element, variant.Variant):
-            localParentage = currentParentage + (element,)
-            subresult = _recurseStream(
-                element,
-                localParentage,
-                initialOffset=startOffset,
-                flatten=flatten,
-                classList=classList,
-                )
-            if flatten is not False: # True or semiFlat
-                result.insert(subresult[:])
-            else:
-                result.insert(subresult)
-            wasStream = True
-        if not wasStream or flatten=='semiFlat':
-            if classList and not element.isClassOrSubclass(classList):
-                continue
-            parentStartOffset = initialOffset
-            parentStopOffset = initialOffset + \
-                currentParentage[-1].duration.quarterLength
-            stopOffset = startOffset + element.duration.quarterLength
-            elementTimespan = ElementTimespan(
-                element=element,
-                parentage=tuple(reversed(currentParentage)),
-                parentStartOffset=parentStartOffset,
-                parentStopOffset=parentStopOffset,
-                startOffset=startOffset,
-                stopOffset=stopOffset,
-                )
-            result.insert(elementTimespan)
-    return result
+                classBasedTSC.insert(elementTimespan)
+    return outputCollections
 
 
 def streamToTimespanCollection(
     inputStream,
-    flatten=True,
-    classList=None,
+    flatten,
+    classList,
     ):
     r'''
     Recurses through a score and constructs a
@@ -267,7 +246,7 @@ def streamToTimespanCollection(
     since that caches the TimespanCollection.
 
     >>> score = corpus.parse('bwv66.6')
-    >>> tree = stream.timespans.streamToTimespanCollection(score)
+    >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
     >>> tree
     <TimespanCollection {165} (0.0 to 36.0) <music21.stream.Score ...>>
     >>> for x in tree[:5]:
@@ -310,14 +289,13 @@ def streamToTimespanCollection(
     True
     '''
     if classList is None:
-        classList = ((note.Note, chord.Chord),)
-    result = _recurseStream(
-        inputStream,
-        initialOffset=0.,
-        flatten=flatten,
-        classList=classList,
-        )
-    return result
+        classList = ((note.Note, chord.Chord), )
+    classLists = [classList]
+    listOfTimespanCollections = listOfTimespanCollectionsByClass(inputStream, 
+                                        initialOffset=0., 
+                                        flatten=flatten, 
+                                        classLists=classLists)
+    return listOfTimespanCollections[0]
 
 
 def timespansToChordifiedStream(timespans, templateStream=None):
@@ -1031,7 +1009,7 @@ class TimespanCollection(object):
     ::
 
         >>> bach = corpus.parse('bwv66.6')
-        >>> tree = stream.timespans.streamToTimespanCollection(bach)
+        >>> tree = stream.timespans.streamToTimespanCollection(bach, flatten=True, classList=(note.Note, chord.Chord))
         >>> print(tree.getVerticalityAt(17.0))
         <Verticality 17.0 {F#3 C#4 A4}>
 
@@ -1579,8 +1557,8 @@ class TimespanCollection(object):
                     nextNode = node.rightChild
                     while nextNode.leftChild:
                         nextNode = nextNode.leftChild
-                    node._startOffset = nextNode._startOffset
-                    node._payload = nextNode._payload
+                    node.startOffset = nextNode.startOffset
+                    node.payload = nextNode.payload
                     node.rightChild = self._remove(
                         node.rightChild, nextNode.startOffset)
                 else:
@@ -1683,22 +1661,22 @@ class TimespanCollection(object):
                     node.leftChild,
                     parentStopIndex=parentStopIndex,
                     )
-                node._nodeStartIndex = node.leftChild.subtreeStopIndex
-                node._subtreeStartIndex = node.leftChild.subtreeStartIndex
+                node.nodeStartIndex = node.leftChild.subtreeStopIndex
+                node.subtreeStartIndex = node.leftChild.subtreeStartIndex
             elif parentStopIndex is None:
-                node._nodeStartIndex = 0
-                node._subtreeStartIndex = 0
+                node.nodeStartIndex = 0
+                node.subtreeStartIndex = 0
             else:
-                node._nodeStartIndex = parentStopIndex
-                node._subtreeStartIndex = parentStopIndex
-            node._nodeStopIndex = node.nodeStartIndex + len(node.payload)
-            node._subtreeStopIndex = node.nodeStopIndex
+                node.nodeStartIndex = parentStopIndex
+                node.subtreeStartIndex = parentStopIndex
+            node.nodeStopIndex = node.nodeStartIndex + len(node.payload)
+            node.subtreeStopIndex = node.nodeStopIndex
             if node.rightChild is not None:
                 recurse(
                     node.rightChild,
                     parentStopIndex=node.nodeStopIndex,
                     )
-                node._subtreeStopIndex = node.rightChild.subtreeStopIndex
+                node.subtreeStopIndex = node.rightChild.subtreeStopIndex
         recurse(node)
 
     def _updateOffsets(
@@ -1733,8 +1711,8 @@ class TimespanCollection(object):
                 stopOffsetLow = rightChild.stopOffsetLow
             if stopOffsetHigh < rightChild.stopOffsetHigh:
                 stopOffsetHigh = rightChild.stopOffsetHigh
-        node._stopOffsetLow = stopOffsetLow
-        node._stopOffsetHigh = stopOffsetHigh
+        node.stopOffsetLow = stopOffsetLow
+        node.stopOffsetHigh = stopOffsetHigh
         return node
 
     def _updateParents(self, oldStartOffset, visitedParents=None):
@@ -2799,13 +2777,11 @@ class TimespanCollection(object):
         In a tree created from a monophonic stream, the minimumOverlap will
         probably be either zero or one.
 
-        ::
-
-            >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.streamToTimespanCollection(
-            ...     score, flatten=False)
-            >>> tree[0].minimumOverlap
-            1
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = stream.timespans.streamToTimespanCollection(
+        ...     score, flatten=False, classList=(note.Note, chord.Chord))
+        >>> tree[0].minimumOverlap
+        1
 
         '''
         overlap = None

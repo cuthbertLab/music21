@@ -5053,8 +5053,8 @@ class Stream(base.Music21Object):
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             hashedTSC = timespans.streamToTimespanCollection(
                 self,
-                classList=classList,
                 flatten=recurse,
+                classList=classList,
                 )
             self._cache[cacheKey] = hashedTSC
         return self._cache[cacheKey]

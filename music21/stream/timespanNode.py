@@ -47,16 +47,17 @@ class TimespanCollectionNode(object):
         '__weakref__',
         'balance',
         'height',
+        'payload',
+        'nodeStartIndex',
+        'nodeStopIndex',
+        'startOffset',
+        'stopOffsetHigh',
+        'stopOffsetLow',
+        'subtreeStartIndex',
+        'subtreeStopIndex',
+
         '_leftChild',
-        '_nodeStartIndex',
-        '_nodeStopIndex',
-        '_payload',
         '_rightChild',
-        '_startOffset',
-        '_stopOffsetHigh',
-        '_stopOffsetLow',
-        '_subtreeStartIndex',
-        '_subtreeStopIndex',
         '_DOC_ATTR'
         )
 
@@ -67,7 +68,7 @@ class TimespanCollectionNode(object):
         This attribute is used to help balance the AVL tree.
 
         >>> score = stream.timespans.makeExampleScore()
-        >>> tree = stream.timespans.streamToTimespanCollection(score)
+        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
         >>> print(tree._debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
             L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
@@ -112,7 +113,7 @@ class TimespanCollectionNode(object):
         This property is used to help balance the AVL tree.
 
         >>> score = stream.timespans.makeExampleScore()
-        >>> tree = stream.timespans.streamToTimespanCollection(score)
+        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
         >>> print(tree._debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
             L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
@@ -135,23 +136,128 @@ class TimespanCollectionNode(object):
         >>> tree._rootNode.rightChild.rightChild.rightChild.height
         0
         ''',
+        
+        'payload': r'''
+        A list of Timespans starting at this node's start offset.
+
+        Timespans are sorted by their _SortTuple, if they contain an element,
+        and otherwise by their stop offset.
+
+        ::
+
+            >>> score = stream.timespans.makeExampleScore()
+            >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+            >>> print(tree._rootNode.debug())
+            <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+                L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+                    L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                    R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+                R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+                    L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+                    R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                        R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+
+        ::
+
+            >>> tree._rootNode.payload
+            [<ElementTimespan (3.0 to 4.0) <music21.note.Note F>>]
+
+        ::
+
+            >>> tree._rootNode.leftChild.payload
+            [<ElementTimespan (1.0 to 2.0) <music21.note.Note D>>]
+
+        ::
+
+            >>> for x in tree._rootNode.leftChild.rightChild.payload:
+            ...     x
+            ...
+            <ElementTimespan (2.0 to 3.0) <music21.note.Note E>>
+            <ElementTimespan (2.0 to 4.0) <music21.note.Note G>>
+
+        ::
+
+            >>> tree._rootNode.rightChild.payload
+            [<ElementTimespan (5.0 to 6.0) <music21.note.Note A>>]
+
+        ''',
+        
+        'nodeStartIndex':         r'''
+        The timespan start index of only those timespans stored in this
+        node.
+        ''',
+        
+        'nodeStopIndex':        r'''
+        The timespan stop index of only those timespans stored in this
+        node.
+        ''',
+        
+        'startOffset':        r'''
+        The start offset of this node.
+
+        >>> score = stream.timespans.makeExampleScore()
+        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> print(tree._rootNode.debug())
+        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+
+        >>> tree._rootNode.startOffset
+        3.0
+
+        >>> tree._rootNode.leftChild.startOffset
+        1.0
+
+        >>> tree._rootNode.rightChild.startOffset
+        5.0
+
+        ''',
+
+        'stopOffsetHigh':        r'''
+        The highest stop offset of any timespan in any node nof the subtree
+        rooted on this node.
+        ''',
+        
+        'stopOffsetLow':        r'''
+        The lowest stop offset of any timespan in any node of the subtree
+        rooted on this node.
+        ''',               
+        
+        'subTreeStartIndex':        r'''
+        The lowest timespan start index of any timespan in any node of the
+        subtree rooted on this node.
+        ''',
+        
+        'subtreeStopIndex':         r'''
+        The highest timespan stop index of any timespan in any node of the
+        subtree rooted on this node.
+        ''',
+
+
     }
+    
     ### INITIALIZER ###
 
     def __init__(self, startOffset):
         self.balance = 0
         self.height = 0
+        self.payload = []
+        self.nodeStartIndex = -1
+        self.nodeStopIndex = -1
+        self.startOffset = startOffset
+        self.stopOffsetHigh = None
+        self.stopOffsetLow = None
+        self.subtreeStartIndex = -1
+        self.subtreeStopIndex = -1
+
         self._leftChild = None
         self._rightChild = None
 
-        self._nodeStartIndex = -1
-        self._nodeStopIndex = -1
-        self._payload = []
-        self._startOffset = startOffset
-        self._stopOffsetHigh = None
-        self._stopOffsetLow = None
-        self._subtreeStartIndex = -1
-        self._subtreeStopIndex = -1
 
     ### SPECIAL METHODS ###
 
@@ -172,7 +278,7 @@ class TimespanCollectionNode(object):
         Get a debug of the Node:
         
         >>> score = stream.timespans.makeExampleScore()
-        >>> tree = stream.timespans.streamToTimespanCollection(score)
+        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
         >>> rn = tree._rootNode
         >>> rn
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
@@ -192,7 +298,7 @@ class TimespanCollectionNode(object):
         r'''
         Return a list of the debugging information of the tree (used for _debug):
         >>> score = stream.timespans.makeExampleScore()
-        >>> tree = stream.timespans.streamToTimespanCollection(score)
+        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
         >>> rn = tree._rootNode
         >>> rn.getDebugPieces()
         ['<Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>', 
@@ -243,7 +349,7 @@ class TimespanCollectionNode(object):
         Setting the left child triggers a node update.
 
         >>> score = stream.timespans.makeExampleScore()
-        >>> tree = stream.timespans.streamToTimespanCollection(score)
+        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
         >>> print(tree._rootNode.debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
             L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
@@ -267,70 +373,6 @@ class TimespanCollectionNode(object):
         self.update()
 
     @property
-    def nodeStartIndex(self):
-        r'''
-        The timespan start index of only those timespans stored in this
-        node.
-        '''
-        return self._nodeStartIndex
-
-    @property
-    def nodeStopIndex(self):
-        r'''
-        The timespan stop index of only those timespans stored in this
-        node.
-        '''
-        return self._nodeStopIndex
-
-    @property
-    def payload(self):
-        r'''
-        A list of Timespans starting at this node's start offset.
-
-        Timespans are sorted by their _SortTuple, if they contain an element,
-        and otherwise by their stop offset.
-
-        ::
-
-            >>> score = stream.timespans.makeExampleScore()
-            >>> tree = stream.timespans.streamToTimespanCollection(score)
-            >>> print(tree._rootNode.debug())
-            <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-                L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                    L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                    R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-                R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                    L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                    R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                        R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
-
-        ::
-
-            >>> tree._rootNode.payload
-            [<ElementTimespan (3.0 to 4.0) <music21.note.Note F>>]
-
-        ::
-
-            >>> tree._rootNode.leftChild.payload
-            [<ElementTimespan (1.0 to 2.0) <music21.note.Note D>>]
-
-        ::
-
-            >>> for x in tree._rootNode.leftChild.rightChild.payload:
-            ...     x
-            ...
-            <ElementTimespan (2.0 to 3.0) <music21.note.Note E>>
-            <ElementTimespan (2.0 to 4.0) <music21.note.Note G>>
-
-        ::
-
-            >>> tree._rootNode.rightChild.payload
-            [<ElementTimespan (5.0 to 6.0) <music21.note.Note A>>]
-
-        '''
-        return self._payload
-
-    @property
     def rightChild(self):
         r'''
         The right child of this node.
@@ -340,7 +382,7 @@ class TimespanCollectionNode(object):
         ::
 
             >>> score = stream.timespans.makeExampleScore()
-            >>> tree = stream.timespans.streamToTimespanCollection(score)
+            >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
             >>> print(tree._rootNode.debug())
             <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
                 L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
@@ -377,76 +419,6 @@ class TimespanCollectionNode(object):
     def rightChild(self, node):
         self._rightChild = node
         self.update()
-
-    @property
-    def startOffset(self):
-        r'''
-        The start offset of this node.
-
-        ::
-
-            >>> score = stream.timespans.makeExampleScore()
-            >>> tree = stream.timespans.streamToTimespanCollection(score)
-            >>> print(tree._rootNode.debug())
-            <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-                L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                    L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                    R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-                R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                    L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                    R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                        R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
-
-        ::
-
-            >>> tree._rootNode.startOffset
-            3.0
-
-        ::
-
-            >>> tree._rootNode.leftChild.startOffset
-            1.0
-
-        ::
-
-            >>> tree._rootNode.rightChild.startOffset
-            5.0
-
-        '''
-        return self._startOffset
-
-    @property
-    def stopOffsetHigh(self):
-        r'''
-        The highest stop offset of any timespan in any node nof the subtree
-        rooted on this node.
-        '''
-        return self._stopOffsetHigh
-
-    @property
-    def stopOffsetLow(self):
-        r'''
-        The lowest stop offset of any timespan in any node of the subtree
-        rooted on this node.
-        '''
-        return self._stopOffsetLow
-
-    @property
-    def subtreeStartIndex(self):
-        r'''
-        The lowest timespan start index of any timespan in any node of the
-        subtree rooted on this node.
-        '''
-        return self._subtreeStartIndex
-
-    @property
-    def subtreeStopIndex(self):
-        r'''
-        The highest timespan stop index of any timespan in any node of the
-        subtree rooted on this node.
-        '''
-        return self._subtreeStopIndex
-
 
 #------------------------------------------------------------------------------
 

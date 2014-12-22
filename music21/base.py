@@ -475,6 +475,9 @@ class Music21Object(object):
         Given a class filter list (a list or tuple must be submitted),
         which may have strings or class objects, determine
         if this class is of the provided classes or a subclasses.
+        
+        NOTE: this is a performance critical operation
+        for performance, only accept lists or tuples
         '''
         # NOTE: this is a performance critical operation
         # for performance, only accept lists or tuples
