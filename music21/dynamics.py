@@ -198,7 +198,7 @@ class Dynamic(base.Music21Object):
             the name of this dynamic in Italian.
             
             
-            >>> d = dynamic.Dynamic('pp')
+            >>> d = dynamics.Dynamic('pp')
             >>> d.longName
             'pianissimo'
             ''',

@@ -174,15 +174,15 @@ class Spanner(base.Music21Object):
     
     The elements that are included in a spanner are stored in a
     Stream subclass called :class:`~music21.stream.SpannerStorage`
-    found as the `.spannedElements` attribute.  That Stream has an
+    found as the `.spannerStorage` attribute.  That Stream has an
     attribute called `spannerParent` which links to the original spanner.
-    Thus, `spannedElements` is smart enough to know where it's stored, but
+    Thus, `spannerStorage` is smart enough to know where it's stored, but
     it makes deleting/garbage-collecting a spanner a tricky operation:
     
     Ex. Prove that the spannedElement Stream is linked to container via 
     `spannerParent`:
     
-    >>> sp1.spannedElements.spannerParent == sp1
+    >>> sp1.spannerStorage.spannerParent is sp1
     True
 
 
@@ -222,11 +222,11 @@ class Spanner(base.Music21Object):
         # create a stream subclass, spanner storage; pass a reference
         # to this spanner for getting this spanner from the SpannerStorage 
         # directly
-        self.spannedElements = stream.SpannerStorage(spannerParent=self)
+        self.spannerStorage = stream.SpannerStorage(spannerParent=self)
         # we do not want to auto sort based on offset or class, as 
         # both are meaningless inside of this Stream (and only have meaning
         # in Stream external to this 
-        self.spannedElements.autoSort = False
+        self.spannerStorage.autoSort = False
 
         # add arguments as a list or single item
         proc = []
@@ -237,9 +237,9 @@ class Spanner(base.Music21Object):
                 proc.append(arg)
         self.addSpannedElements(proc)
 #         if len(arguments) > 1:
-#             self.spannedElements.append(arguments)
+#             self.spannerStorage.append(arguments)
 #         elif len(arguments) == 1: # assume a list is first arg
-#                 self.spannedElements.append(c)
+#                 self.spannerStorage.append(c)
 
         # parameters that spanners need in loading and processing
         # local id is the id for the local area; used by musicxml
@@ -270,7 +270,7 @@ class Spanner(base.Music21Object):
 
         >>> sp1 = spanner.Spanner(n1, n2, c1)
         >>> sp2 = copy.deepcopy(sp1)
-        >>> len(sp2.spannedElements)
+        >>> len(sp2.spannerStorage)
         3
         >>> sp1 is sp2
         False
@@ -301,11 +301,11 @@ class Spanner(base.Music21Object):
                 newValue.containedById = id(new)
                 setattr(new, name, newValue)
 
-            # do not deepcopy spannedElements, as this will copy the 
+            # do not deepcopy spannerStorage, as this will copy the 
             # contained objects
-            elif name == 'spannedElements':
-                for c in old.spannedElements:
-                    new.spannedElements.append(c)
+            elif name == 'spannerStorage':
+                for c in old.spannerStorage:
+                    new.spannerStorage.append(c)
             else: 
                 #environLocal.printDebug(['Spanner.__deepcopy__', name])
                 newValue = copy.deepcopy(part, memo)
@@ -320,20 +320,20 @@ class Spanner(base.Music21Object):
     # this is the same as with Variants
 
     def purgeOrphans(self):
-        self.spannedElements.purgeOrphans()
+        self.spannerStorage.purgeOrphans()
         base.Music21Object.purgeOrphans(self)
 
     def purgeLocations(self, rescanIsDead=False):
         # must override Music21Object to purge locations from the contained
         # Stream
         # base method to perform purge on the Sream
-        self.spannedElements.purgeLocations(rescanIsDead=rescanIsDead)
+        self.spannerStorage.purgeLocations(rescanIsDead=rescanIsDead)
         base.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
 
     def getSpannerStorageId(self):
         '''Return the object id of the SpannerStorage object
         '''
-        return id(self.spannedElements)
+        return id(self.spannerStorage)
 
     #---------------------------------------------------------------------------
     def __getitem__(self, key):
@@ -351,18 +351,18 @@ class Spanner(base.Music21Object):
         True
         '''
         # delegate to Stream subclass
-        return self.spannedElements.__getitem__(key)
+        return self.spannerStorage.__getitem__(key)
 
     def __iter__(self):
-        return common.Iterator(self.spannedElements)
+        return common.Iterator(self.spannerStorage)
 
     def __len__(self):
-        return len(self.spannedElements._elements)
+        return len(self.spannerStorage._elements)
 
 
     def getSpannedElements(self):
         '''
-        Return all the elements of `.spannedElements` for this Spanner 
+        Return all the elements of `.spannerStorage` for this Spanner 
         as a list of Music21Objects.  
 
         
@@ -386,7 +386,7 @@ class Spanner(base.Music21Object):
         # use low-level _elements access for speed; do not need to set
         # active sit or iterator
         # must pass into a new list
-        for c in self.spannedElements._elements:
+        for c in self.spannerStorage._elements:
 #             objRef = c
 #             if objRef is not None:
             post.append(c)
@@ -406,7 +406,7 @@ class Spanner(base.Music21Object):
         True
         '''
         # returns a Stream; pack in a list
-        postStream = self.spannedElements.getElementsByClass(classFilterList)
+        postStream = self.spannerStorage.getElementsByClass(classFilterList)
 #         post = []
 #         for c in postStream:
 #             post.append(objRef)
@@ -418,7 +418,7 @@ class Spanner(base.Music21Object):
         '''Return all id() for all stored objects.
         '''
         if 'spannedElementIds' not in self._cache or self._cache['spannedElementIds'] is None:
-            self._cache['spannedElementIds'] = [id(c) for c in self.spannedElements._elements]
+            self._cache['spannedElementIds'] = [id(c) for c in self.spannerStorage._elements]
         return self._cache['spannedElementIds']
 
 
@@ -454,20 +454,20 @@ class Spanner(base.Music21Object):
             if c is None:
                 continue
             if not self.hasSpannedElement(c): # not already in storage
-                self.spannedElements._appendCore(c)
+                self.spannerStorage._appendCore(c)
             else:
                 pass
                 # it makes sense to not have multiple copies
                 #environLocal.printDebug(['attempting to add an object (%s) that is already found in the SpannerStorage stream of spaner %s; this may not be an error.' % (c, self)])
 
-        self.spannedElements._elementsChanged()
+        self.spannerStorage._elementsChanged()
         # always clear cache
         if len(self._cache) > 0:
             self._cache = {} 
 
     def hasSpannedElement(self, spannedElement):  
         '''Return True if this Spanner has the spannedElement.'''
-        for c in self.spannedElements._elements:
+        for c in self.spannerStorage._elements:
             if id(c) == id(spannedElement):
                 return True
         return False
@@ -496,7 +496,7 @@ class Spanner(base.Music21Object):
             return None # do nothing
         if common.isNum(old):
             # this must be id(obj), not obj.id
-            e = self.spannedElements._getElementByObjectId(old)
+            e = self.spannerStorage._getElementByObjectId(old)
             # e here is the old element that was spanned by this Spanner
             
 
@@ -505,13 +505,13 @@ class Spanner(base.Music21Object):
             if e is not None:
                 #environLocal.printDebug(['Spanner.replaceSpannedElement:', 'old', e, 'new', new])
                 # do not do all Sites: only care about this one
-                self.spannedElements.replace(e, new, allTargetSites=False)
+                self.spannerStorage.replace(e, new, allTargetSites=False)
         else:
             # do not do all Sites: only care about this one
-            self.spannedElements.replace(old, new, allTargetSites=False)
+            self.spannerStorage.replace(old, new, allTargetSites=False)
             #environLocal.printDebug(['Spanner.replaceSpannedElement:', 'old', e, 'new', new])
 
-        # while this Spanner now has proper elements in its spannedElements Stream, the element replaced likely has a site left-over from its previous Spanner
+        # while this Spanner now has proper elements in its spannerStorage Stream, the element replaced likely has a site left-over from its previous Spanner
 
         # always clear cache
         if len(self._cache) > 0:
@@ -543,7 +543,7 @@ class Spanner(base.Music21Object):
 
         '''
         idTarget = id(spannedElement)
-        objRef = self.spannedElements._elements[0]
+        objRef = self.spannerStorage._elements[0]
         if id(objRef) == idTarget:
             return True
         return False
@@ -563,13 +563,13 @@ class Spanner(base.Music21Object):
         >>> sl.getFirst() is n1
         True
         '''
-        return self.spannedElements[0]
+        return self.spannerStorage[0]
 
     def isLast(self, spannedElement):
         '''Given a spannedElement, is it last?  Returns True or False
         '''
         idTarget = id(spannedElement)
-        objRef = self.spannedElements._elements[-1]
+        objRef = self.spannerStorage._elements[-1]
 
         if id(objRef) == idTarget:
             return True
@@ -593,7 +593,7 @@ class Spanner(base.Music21Object):
         True
 
         '''
-        objRef = self.spannedElements.elements[-1]
+        objRef = self.spannerStorage.elements[-1]
         return objRef
 
 
@@ -612,7 +612,7 @@ class Spanner(base.Music21Object):
         '''
         post = []
         idSite = id(site)
-        for c in self.spannedElements._elements:
+        for c in self.spannerStorage._elements:
             # getting site ids is fast, as weakrefs do not have to be unpacked
             if idSite in c.sites.getSiteIds():
                 o = c.getOffsetBySite(site)
@@ -642,12 +642,12 @@ class Spanner(base.Music21Object):
         idSite = id(site)
 
         # special handling for case of a single spannedElement spanner
-        if len(self.spannedElements) == 1:
-            o = self.spannedElements[0].getOffsetBySite(site)
-            return o, o + self.spannedElements[0].duration.quarterLength
+        if len(self.spannerStorage) == 1:
+            o = self.spannerStorage[0].getOffsetBySite(site)
+            return o, o + self.spannerStorage[0].duration.quarterLength
 
         offsetSpannedElement = [] # store pairs
-        for c in self.spannedElements._elements:
+        for c in self.spannerStorage._elements:
         #for c in self.getSpannedElements():
             objRef = c
             if idSite in objRef.sites.getSiteIds():
