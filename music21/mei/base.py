@@ -1966,8 +1966,9 @@ def restFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     '''
     # NOTE: keep this in sync with spaceFromElement()
 
-    theRest = note.Rest(duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
-                                              int(elem.get('dots', 0))))
+    theDuration = _qlDurationFromAttr(elem.get('dur'))
+    theDuration = makeDuration(theDuration, int(elem.get('dots', 0)))
+    theRest = note.Rest(duration=theDuration)
 
     if elem.get(_XMLID) is not None:
         theRest.id = elem.get(_XMLID)
@@ -2010,8 +2011,9 @@ def spaceFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     '''
     # NOTE: keep this in sync with restFromElement()
 
-    theSpace = note.SpacerRest(duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
-                                                     int(elem.get('dots', 0))))
+    theDuration = _qlDurationFromAttr(elem.get('dur'))
+    theDuration = makeDuration(theDuration, int(elem.get('dots', 0)))
+    theSpace = note.SpacerRest(duration=theDuration)
 
     if elem.get(_XMLID) is not None:
         theSpace.id = elem.get(_XMLID)
