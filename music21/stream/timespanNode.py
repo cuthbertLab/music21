@@ -58,7 +58,6 @@ class TimespanCollectionNode(object):
 
         '_leftChild',
         '_rightChild',
-        '_DOC_ATTR'
         )
 
     _DOC_ATTR = {

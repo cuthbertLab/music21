@@ -316,13 +316,13 @@ class Music21Object(object):
 
             >>> ks = key.KeySignature(3)
             >>> ks.classSortOrder
-            1
+            2
 
 
             New classes can define their own default classSortOrder
 
             >>> class ExampleClass(base.Music21Object):
-            ...     classSortOrderDefault = 5
+            ...     classSortOrder = 5
             ...
             >>> ec1 = ExampleClass()
             >>> ec1.classSortOrder
