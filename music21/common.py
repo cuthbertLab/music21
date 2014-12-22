@@ -132,6 +132,7 @@ def subConverterList():
     <class 'music21.converter.subConverters.ConverterHumdrum'>
     <class 'music21.converter.subConverters.ConverterIPython'>
     <class 'music21.converter.subConverters.ConverterLilypond'>
+    <class 'music21.converter.subConverters.ConverterMEI'>
     <class 'music21.converter.subConverters.ConverterMidi'>
     <class 'music21.converter.subConverters.ConverterMuseData'>
     <class 'music21.converter.subConverters.ConverterMusicXML'>
