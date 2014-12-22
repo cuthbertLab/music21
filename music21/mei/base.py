@@ -1652,6 +1652,8 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 
 def dotFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     '''
+    Returns ``1`` no matter what is passed in.
+
     <dot> Dot of augmentation or division.
 
     In MEI 2013: pg.304 (318 in PDF) (MEI.shared module)
