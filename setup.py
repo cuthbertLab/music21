@@ -1,4 +1,5 @@
-##!/usr/local/bin/python
+##!/usr/local/bin/python   
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:          setup.py
 # Purpose:       install

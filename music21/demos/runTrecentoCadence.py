@@ -5,17 +5,14 @@ Python script to find out certain statistics about the trecento cadences
 
 from __future__ import unicode_literals
 
-import random
-import doctest, unittest
-
+import unittest
+from music21 import trecento
 
 def countTimeSig():
     '''
     counts how many time signatures of each type appear
     '''
-    import music21
-
-    ballataObj = music21.trecento.cadencebook.BallataSheet()
+    ballataObj = trecento.cadencebook.BallataSheet()
 
     timeSigCounter = {}
     totalPieces = 0.0
@@ -34,7 +31,7 @@ def countTimeSig():
     for thisKey in sorted(timeSigCounter.keys()):
         print(thisKey, ":", timeSigCounter[thisKey], str(int(timeSigCounter[thisKey]*100/totalPieces)) + "%")
 
-def sortByPMFC(work1, work2):
+def sortByPMFC(work):
     '''
     Sort a work according to which one comes first in PMFC:
 
@@ -55,22 +52,11 @@ def sortByPMFC(work1, work2):
     >>> work3.pmfcVol = 2
     >>> work3.pmfcPageStart = 50
     >>> works = [work1, work2, work3]
-    >>> works.sort(sortByPMFC)
-    >>> print [w.id for w in works]
+    >>> works.sort(key=sortByPMFC)
+    >>> print([w.id for w in works])
     [3, 2, 1]
     '''
-    
-    if work1.pmfcVol > work2.pmfcVol:
-        return 1
-    elif work1.pmfcVol < work2.pmfcVol:
-        return -1
-    else:
-        if work1.pmfcPageStart > work2.pmfcPageStart:
-            return 1
-        elif work1.pmfcPageStart < work2.pmfcPageStart:
-            return -1
-        else:
-            return 0        
+    return (work.pmfcVol, work.pmfcPageStart)
 
 def makePDFfromPieces(start = 1, finish = 2):
     '''
@@ -91,7 +77,7 @@ def makePDFfromPieces(start = 1, finish = 2):
 #            pass #raise Exception("Ugg " + str(i))
 
     opus = stream.Opus()
-    retrievedPieces.sort(sortByPMFC)
+    retrievedPieces.sort(key=sortByPMFC)
     for randomPiece in retrievedPieces:
         #print(randomPiece.title.encode('utf-8'))
         randomOpus = randomPiece.asOpus()
@@ -117,7 +103,7 @@ def makePDFfromPieces(start = 1, finish = 2):
 #    lS = lily.lilyString.LilyString(lilyString)
 #    lS.showPDF()
 #    lStr = lily.LilyString(lilyString)
-#    print lStr.encode('utf-8')
+#    print(lStr.encode('utf-8'))
 #    lStr.writeTemp()
 #    lStr.runThroughLily()
 
@@ -134,7 +120,7 @@ def makePDFfromPiecesWithCapua(start = 2, finish = 3):
             raise Exception("Ugg " + str(i))
     
 #    lilyString = ""
-#    retrievedPieces.sort(sortByPMFC)
+#    retrievedPieces.sort(key=sortByPMFC)
 #    for randomPiece in retrievedPieces:
 #        print(randomPiece.title.encode('utf-8'))
 ## skip skipping skip incipits

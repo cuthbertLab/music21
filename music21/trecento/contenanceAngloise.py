@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 '''
 contenance_angloise.py -- module to run tests on the percentage of sixths etc. to test theories about

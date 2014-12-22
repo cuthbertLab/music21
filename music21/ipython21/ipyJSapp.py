@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ############
 #
 # IPythonNotebook like connections between Javascript and Python, but 

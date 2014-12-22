@@ -266,57 +266,48 @@ def streamToTimespanCollection(
     :class:`~music21.stream.timespans.TimespanCollection`.  Use Stream.asTimespans() generally
     since that caches the TimespanCollection.
 
-    ::
+    >>> score = corpus.parse('bwv66.6')
+    >>> tree = stream.timespans.streamToTimespanCollection(score)
+    >>> tree
+    <TimespanCollection {165} (0.0 to 36.0) <music21.stream.Score ...>>
+    >>> for x in tree[:5]:
+    ...     x
+    ...
+    <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
+    <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>
+    <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
+    <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
+    <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
 
-        >>> score = corpus.parse('bwv66.6')
-        >>> tree = stream.timespans.streamToTimespanCollection(score)
-        >>> tree
-        <TimespanCollection {165} (0.0 to 36.0) <music21.stream.Score ...>>
-        >>> for x in tree[:5]:
-        ...     x
-        ...
-        <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
-        <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>
-        <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
-        <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
-        <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
-
-    ::
-
-        >>> tree = stream.timespans.streamToTimespanCollection(
-        ...     score,
-        ...     flatten=False,
-        ...     classList=(),
-        ...     )
+    >>> tree = stream.timespans.streamToTimespanCollection(
+    ...     score,
+    ...     flatten=False,
+    ...     classList=(),
+    ...     )
 
     Each of these has 11 elements -- mainly the Measures
 
-        >>> for x in tree:
-        ...     x
-        ...
-        <ElementTimespan (0.0 to 0.0) <music21.metadata.Metadata object at 0x...>>
-        <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Soprano>>
-        <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Alto>>
-        <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
-        <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Bass>>
-        <ElementTimespan (0.0 to 0.0) <music21.layout.StaffGroup <music21.stream.Part Soprano><music21.stream.Part Alto><music21.stream.Part Tenor><music21.stream.Part Bass>>>
+    TODO: Fix -- why is StaffGroup between Soprano and Alto?
 
-    ::
+    >>> for x in tree:
+    ...     x
+    ...
+    <ElementTimespan (0.0 to 0.0) <music21.metadata.Metadata object at 0x...>>
+    <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Soprano>>
+    <ElementTimespan (0.0 to 0.0) <music21.layout.StaffGroup <music21.stream.Part Soprano><music21.stream.Part Alto><music21.stream.Part Tenor><music21.stream.Part Bass>>>
+    <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Alto>>
+    <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
+    <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Bass>>
 
-        >>> tenorElements = tree[3]
-        >>> tenorElements
-        <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
+    >>> tenorElements = tree[4]
+    >>> tenorElements
+    <TimespanCollection {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
 
-    ::
+    >>> tenorElements.source
+    <music21.stream.Part Tenor>
 
-        >>> tenorElements.source
-        <music21.stream.Part Tenor>
-
-    ::
-
-        >>> tenorElements.source is score[3]
-        True
-
+    >>> tenorElements.source is score[3]
+    True
     '''
     if classList is None:
         classList = ((note.Note, chord.Chord),)

@@ -21,8 +21,8 @@ pathName = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe(
 
 K525omrFilePath = pathName + os.sep + 'k525OMRMvt1.xml'
 K525groundTruthFilePath = pathName + os.sep + 'k525GTMvt1.xml'
-K525omrShortPath = pathName + os.sep + 'k525OMRShort.xml'
-K525groundTruthShortPath = pathName + os.sep + 'k525GTShort.xml'
+K525omrShortPath = pathName + os.sep + 'k525OMRshort.xml'
+K525groundTruthShortPath = pathName + os.sep + 'k525GTshort.xml'
 
 debug = False
 
@@ -1136,11 +1136,11 @@ class MeasureHash(object):
 if __name__ == '__main__':
     import music21
 #     s = converter.parse(K525omrFilePath)
-    from music21 import *                        # @UnusedImport @UnusedWildImport
-    s = converter.parse('/Users/MC/Work/' +      # @UndefinedVariable
-                 'K525_from_SmartScore.xml')
-    scor = omr.correctors.ScoreCorrector(s)      # @UndefinedVariable
-    s2 = scor.run()
-    s2.show()
+    #from music21 import *                        # @UnusedImport @UnusedWildImport
+    #s = converter.parse('/Users/MC/Work/' +      # @UndefinedVariable
+    #             'K525_from_SmartScore.xml')
+    #scor = omr.correctors.ScoreCorrector(s)      # @UndefinedVariable
+    #s2 = scor.run()
+    #s2.show()
 
     music21.mainTest()

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # index.py
 # A simple script to test file uploading
 # Each function is accessed via /FUNCTION_NAME

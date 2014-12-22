@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from music21 import stream, note, clef
 
 if __name__ == '__main__':

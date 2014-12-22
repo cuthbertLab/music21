@@ -112,7 +112,7 @@ class VoiceLeadingQuartet(base.Music21Object):
             self._findIntervals()
 
     def __repr__(self):
-        return '<music21.voiceLeading.%s v1n1=%s , v1n2=%s, v2n1=%s, v2n2=%s  ' % (self.__class__.__name__, self.v1n1, self.v1n2, self.v2n1, self.v2n2)
+        return '<music21.voiceLeading.%s v1n1=%s , v1n2=%s, v2n1=%s, v2n2=%s  >' % (self.__class__.__name__, self.v1n1, self.v1n2, self.v2n1, self.v2n2)
 
 
     def _getKey(self):
@@ -1022,7 +1022,7 @@ def getVerticalityFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None
     <music21.voiceLeading.Verticality contentDict={0: [<music21.instrument.Instrument P1: Soprano: Instrument 1>, <music21.clef.TrebleClef>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note C#>], 
               1: [<music21.instrument.Instrument P2: Alto: Instrument 2>, <music21.clef.TrebleClef>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note E>],
               2: [<music21.instrument.Instrument P3: Tenor: Instrument 3>, <music21.clef.BassClef>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note A>], 
-              3: [<music21.instrument.Instrument P4: Bass: Instrument 4>, <music21.clef.BassClef>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note A>]}
+              3: [<music21.instrument.Instrument P4: Bass: Instrument 4>, <music21.clef.BassClef>, <music21.key.KeySignature of 3 sharps, mode minor>, <music21.meter.TimeSignature 4/4>, <music21.note.Note A>]} >
 
     for getting things at the beginning of scores, probably better to use a classFilterList:
 
@@ -1030,7 +1030,7 @@ def getVerticalityFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None
     <music21.voiceLeading.Verticality contentDict={0: [<music21.note.Note C#>], 
               1: [<music21.note.Note E>], 
               2: [<music21.note.Note A>], 
-              3: [<music21.note.Note A>]}
+              3: [<music21.note.Note A>]} >
     '''
     offsetOfObject =  music21Obj.getOffsetBySite(scoreObjectIsFrom.flat)
 
@@ -1383,7 +1383,7 @@ class Verticality(base.Music21Object):
         ''')
 
     def __repr__(self):
-        return '<music21.voiceLeading.%s contentDict=%s  ' % (self.__class__.__name__, self.contentDict)
+        return '<music21.voiceLeading.%s contentDict=%s  >' % (self.__class__.__name__, self.contentDict)
 
     def _setColor(self, color):
 
@@ -1421,7 +1421,7 @@ class VerticalityNTuplet(base.Music21Object):
             self.chordList.append(chord.Chord(vs.getObjectsByClass(note.Note)))
 
     def __repr__(self):
-        return '<music21.voiceLeading.%s listofVerticalities=%s ' % (self.__class__.__name__, self.verticalities)
+        return '<music21.voiceLeading.%s listofVerticalities=%s >' % (self.__class__.__name__, self.verticalities)
     def __str__(self):
         return self.__repr__()
 
@@ -1709,7 +1709,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         ''')
 
     def __repr__(self):
-        return '<music21.voiceLeading.%s n1=%s n2=%s n3=%s ' % (self.__class__.__name__, self.n1, self.n2, self.n3)
+        return '<music21.voiceLeading.%s n1=%s n2=%s n3=%s >' % (self.__class__.__name__, self.n1, self.n2, self.n3)
 
     def color(self, color='red', noteList=[2]):
         '''
@@ -1906,7 +1906,7 @@ class NObjectLinearSegment(base.Music21Object):
         self.objectList = objectList
 
     def __repr__(self):
-        return '<music21.voiceLeading.%s objectList=%s  ' % (self.__class__.__name__, self.objectList)
+        return '<music21.voiceLeading.%s objectList=%s  >' % (self.__class__.__name__, self.objectList)
 
 
 class NChordLinearSegment(NObjectLinearSegment):
@@ -1938,7 +1938,7 @@ class NChordLinearSegment(NObjectLinearSegment):
 
         ''')
     def __repr__(self):
-        return '<music21.voiceLeading.%s objectList=%s  ' % (self.__class__.__name__, self.chordList
+        return '<music21.voiceLeading.%s objectList=%s  >' % (self.__class__.__name__, self.chordList
                                                              )
 class TwoChordLinearSegment(NChordLinearSegment):
     def __init__(self, chordList, chord2=None):

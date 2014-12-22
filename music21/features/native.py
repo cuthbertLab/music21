@@ -707,10 +707,9 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
        
     Sample test on Dylan's Blowing In The Wind (not included), showing all motion is 3rds, 6ths, or especially 4ths and 5ths.
     
-    ::
-        s = corpus.parse('demos/BlowinInTheWind') 
-        fe = features.native.ChordBassMotionFeature(s)
-        fe.extract().vector 
+    s = corpus.parse('demos/BlowinInTheWind') 
+    fe = features.native.ChordBassMotionFeature(s)
+    fe.extract().vector 
     
     [0.0, 0.0, 0.0, 0.0416..., 0.0416..., 0.166..., 0.0, 0.54166..., 0.0, 0.0, 0.2083... 0.0]
 
@@ -911,11 +910,12 @@ class LanguageFeature(featuresModule.FeatureExtractor):
     
     Detect that the language of "For unto us a child is born" is English.
 
-    
-    >>> s = corpus.parse('handel/hwv56/movement1-13.md') 
-    >>> fe = features.native.LanguageFeature(s)
-    >>> fe.extract().vector
-    [1]
+    ::
+        s = corpus.parse('handel/hwv56/movement1-13.md') 
+        fe = features.native.LanguageFeature(s)
+        fe.extract().vector
+
+        [1]
     '''
     id = 'TX1'
 

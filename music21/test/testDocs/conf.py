@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         testConf.py
 # Purpose:      A simple configuration used only for testing select doc files. 

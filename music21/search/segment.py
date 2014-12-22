@@ -142,12 +142,12 @@ def indexScoreParts(scoreFile, *args, **kwds):
     Returns list of dictionaries of segment and measure lists
     
     
-    >>> luca = corpus.parse('luca/gloria')
-    >>> scoreList = search.segment.indexScoreParts(luca)
+    >>> bach = corpus.parse('bwv66.6')
+    >>> scoreList = search.segment.indexScoreParts(bach)
     >>> scoreList[1]['segmentList'][0]
-    'AA<<95<ACC@AC<>7A@<<>;<<A<CBCA'
+    '@B@@@@ED@DBDA=BB@?==B@@EBBDBBA'
     >>> scoreList[1]['measureList'][0:3]
-    [1, 9, 17]
+    [0, 4, 8]
     '''
     scoreFileParts = scoreFile.parts
     indexedList = []

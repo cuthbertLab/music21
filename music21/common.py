@@ -1658,19 +1658,25 @@ def stripAddresses(textString, replacement = "ADDRESS"):
 
 
 def sortModules(moduleList):
-    '''Sort a lost of imported module names such that most recently modified is
-    first'''
+    '''
+    Sort a lost of imported module names such that most recently modified is
+    first.  In ties, last accesstime is used then module name
+    
+    Will return a different order each time depending on the last mod time
+    '''
     sort = []
+    modNameToMod = {}    
     for mod in moduleList:
+        modNameToMod[mod.__name__] = mod
         fp = mod.__file__ # returns the pyc file
         stat = os.stat(fp)
         lastmod = time.localtime(stat[8])
         asctime = time.asctime(lastmod)
-        sort.append((lastmod, asctime, mod))
+        sort.append((lastmod, asctime, mod.__name__))
     sort.sort()
     sort.reverse()
     # just return module list
-    return [mod for lastmod, asctime, mod in sort]
+    return [modNameToMod[modName] for lastmod, asctime, modName in sort]
 
 
 def sortFilesRecent(fileList):
@@ -2215,6 +2221,33 @@ def relativepath(path, start='.'):
         return path
     return os.path.relpath(path, start)
 
+
+def fixTestsForPy2and3(s1):
+        #### fix up tests for py2 and py3
+        if six.PY3: # correct "M21Exception" to "...M21Exception"
+            for dtc in s1: # Suite to DocTestCase
+                if hasattr(dtc, '_dt_test'):
+                    dt = dtc._dt_test # DocTest
+                    for example in dt.examples: # fix Traceback exception differences Py2 to Py3
+                        if example.exc_msg is not None and len(example.exc_msg) > 0:
+                            example.exc_msg = "..." + example.exc_msg[1:]
+                        elif (example.want is not None and
+                                example.want.startswith('u\'')):
+                                    # probably a unicode example:
+                                    # simplistic, since (u'hi', u'bye')
+                                    # won't be caught, but saves a lot of anguish
+                                example.want = example.want[1:]
+        elif six.PY2: #
+            for dtc in s1: # Suite to DocTestCase
+                if hasattr(dtc, '_dt_test'):
+                    dt = dtc._dt_test # DocTest
+                    for example in dt.examples: # fix Traceback exception differences Py2 to Py3
+                        if (example.want is not None and
+                                example.want.startswith('b\'')):
+                                    # probably a unicode example:
+                                    # simplistic, since (b'hi', b'bye')
+                                    # won't be caught, but saves a lot of anguish
+                                example.want = example.want[1:]
 
 #-------------------------------------------------------------------------------
 _singletonCounter = {}

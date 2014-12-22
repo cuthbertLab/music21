@@ -15,15 +15,29 @@ Controller to run all module tests in the music21 folders.
 Runs great, but slowly on multiprocessor systems.
 '''
 
-import unittest, doctest
-import os, imp, sys
+import doctest
+import imp
+import os 
+import sys
+import unittest
+import warnings
 
 from music21 import base
 from music21 import common
 from music21 import environment
+from music21.ext import six
+
 _MOD = 'test.py'
 environLocal = environment.Environment(_MOD)
 
+if six.PY2:
+    try:
+        import coverage
+    except ImportError:
+        coverage = None
+else:
+    coverage = None # coverage is extremely slow on Python 3.4 for some reason
+        # in any case we only need to run it once.
 
 #-------------------------------------------------------------------------------
 class ModuleGather(object):
@@ -50,12 +64,13 @@ class ModuleGather(object):
             'testPerformance.py',
             'timeGraphs.py',
             'exceldiff.py', 
-            # not testing translate due to dependency
-            'abj/translate.py', 
             'multiprocessTest.py',
+            'figuredBass' + os.sep + 'examples.py',
+            'trecento' + os.sep + 'tonality.py'
             ]
         # skip any path that contains this string
-        self.pathSkip = ['obsolete', 'xlrd', 'jsonpickle', 'ext', 'webapps/server']
+        self.pathSkip = ['obsolete', 'xlrd', 'jsonpickle', 'ext', 'webapps' + os.sep + 'server', 
+                         'webapps' + os.sep + 'archive']
         # search on init
         self._walk()
 
@@ -132,9 +147,14 @@ class ModuleGather(object):
         if skip:
             return None
         name = self._getName(fp)
+        #print(name, os.path.dirname(fp))
+        #fmFile, fmPathname, fmDescription = imp.find_module(name, os.path.dirname(fp) + os.sep)
         try:
             #environLocal.printDebug(['import:', fp]) 
-            mod = imp.load_source(name, fp)
+            #mod = imp.load_module(name, fmFile, fmPathname, fmDescription)
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore', RuntimeWarning)
+                mod = imp.load_source(name, fp)
         except Exception as excp: # this takes all exceptions!
             environLocal.printDebug(['failed import:', fp, '\n', 
                 '\tEXCEPTION:', str(excp).strip()])
@@ -210,9 +230,29 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False, limit=None):
             environLocal.printDebug('%s cannot load Doctests' % module)
             continue
     
+    common.fixTestsForPy2and3(s1)
+    
     environLocal.printDebug('running Tests...\n')
-    runner = unittest.TextTestRunner(verbosity=verbosity)
-    unused_testResult = runner.run(s1)  
+    
+    if coverage is not None:
+        cov = coverage.coverage()
+        cov.start()
+        
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', RuntimeWarning)  # import modules...
+        runner = unittest.TextTestRunner(verbosity=verbosity)
+        finalTestResults = runner.run(s1)  
+    
+    if coverage is not None:
+        cov.stop()
+        cov.save()
+    
+    if (len(finalTestResults.errors) > 0 or
+        len(finalTestResults.failures) > 0 or
+        len(finalTestResults.unexpectedSuccesses) > 0):
+            exit(1)
+    else:
+        exit(0)
 
     # this should work but requires python 2.7 and the testRunner arg does not
     # seem to work properly
@@ -221,8 +261,11 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False, limit=None):
 
 #-------------------------------------------------------------------------------
 if __name__ == '__main__':
-    reload(sys)
-    sys.setdefaultencoding("UTF-8") # @UndefinedVariable
+    try:
+        reload(sys)
+        sys.setdefaultencoding("UTF-8") # @UndefinedVariable
+    except:
+        pass # no need in Python3
 
     # if optional command line arguments are given, assume they are  
     # test group arguments

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from music21 import corpus
 import unittest
 import re

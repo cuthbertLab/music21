@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 featureInfo = dict()
 featureInfo['m21']=[
 	['P22','Quality','Set to 0 if the key signature indicates that a recording is major, set to 1 if it indicates that it is minor and set to 0 if key signature is unknown. Music21 addition: if no key mode is found in the piece, analyze the piece to discover what mode it is most likely in.','1'],

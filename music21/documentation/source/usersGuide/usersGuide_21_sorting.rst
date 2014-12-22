@@ -243,6 +243,9 @@ usually refer to the area of the composition that precedes the clef:
     (-5, -25, -30)
 
 
+The numbers are actually completely arbitrary (it could be -6.432
+instead of -5), only the order of numbers (-25 is less than -5) matters.
+
 If we put a second TimeSignature into the stream at offset 0 (like some
 pieces do with multiple interpretations for meter), it will have a tie
 for its .offset and .classSortOrder. Which one will come first? It's the

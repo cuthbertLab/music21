@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ngrams = {
     "trecento/Fava_Dicant_nunc_iudei.xml": {
         "chordified": [

@@ -35,10 +35,10 @@ import unittest
 
 import music21
 from music21 import base
+from music21 import common
 from music21 import environment
 _MOD = 'multiprocessTest.py'
 environLocal = environment.Environment(_MOD)
-from music21.ext import six
 
 ModuleResponse = collections.namedtuple('ModuleResponse', 'returnCode fp moduleName success testRunner errors failures testsRun runTime')
 ModuleResponse.__new__.__defaults__ = (None,) * len(ModuleResponse._fields)
@@ -224,31 +224,7 @@ def runOneModuleWithoutImp(args):
             environLocal.printDebug('%s cannot load Doctests' % moduleObject)
             pass        
 
-        #### fix up tests for py2 and py3
-        if six.PY3: # correct "M21Exception" to "...M21Exception"
-            for dtc in s1: # Suite to DocTestCase
-                if hasattr(dtc, '_dt_test'):
-                    dt = dtc._dt_test # DocTest
-                    for example in dt.examples: # fix Traceback exception differences Py2 to Py3
-                        if example.exc_msg is not None and len(example.exc_msg) > 0:
-                            example.exc_msg = "..." + example.exc_msg[1:]
-                        elif (example.want is not None and
-                                example.want.startswith('u\'')):
-                                    # probably a unicode example:
-                                    # simplistic, since (u'hi', u'bye')
-                                    # won't be caught, but saves a lot of anguish
-                                example.want = example.want[1:]
-        elif six.PY2: #
-            for dtc in s1: # Suite to DocTestCase
-                if hasattr(dtc, '_dt_test'):
-                    dt = dtc._dt_test # DocTest
-                    for example in dt.examples: # fix Traceback exception differences Py2 to Py3
-                        if (example.want is not None and
-                                example.want.startswith('b\'')):
-                                    # probably a unicode example:
-                                    # simplistic, since (b'hi', b'bye')
-                                    # won't be caught, but saves a lot of anguish
-                                example.want = example.want[1:]
+        common.fixTestsForPy2and3(s1)
         
         
         environLocal.printDebug('running Tests...\n')
@@ -421,7 +397,6 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
     print(outStr)
     sys.stdout.flush()
     
-    from music21 import common
     import datetime
     with open(os.path.join(common.getSourceFilePath(), 'test', 'lastResults.txt'), 'w') as f:
         f.write(outStr)

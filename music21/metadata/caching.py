@@ -297,7 +297,7 @@ class JobProcessor(object):
 
         >>> from music21 import corpus, metadata
         >>> jobs = []
-        >>> for corpusPath in corpus.getMonteverdiMadrigals()[:5]:
+        >>> for corpusPath in corpus.getMonteverdiMadrigals()[:3]:
         ...     job = metadata.MetadataCachingJob(
         ...         corpusPath,
         ...         useCorpus=True,
@@ -307,8 +307,6 @@ class JobProcessor(object):
         >>> for result in jobGenerator:
         ...     print(result['remainingJobs'])
         ...
-        4
-        3
         2
         1
         0

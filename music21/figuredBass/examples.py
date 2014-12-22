@@ -178,6 +178,7 @@ def exampleB():
 def exampleC():
     '''
     This example was retrieved from page 114 of *The Music Theory Handbook* by Marjorie Merryman.
+    
     >>> from music21.figuredBass import examples
     >>> fbLine = examples.exampleC()
     >>> #_DOCS_SHOW fbLine.generateBassLine().show()
@@ -186,7 +187,6 @@ def exampleC():
         :width: 700
 
     First, fbLine is realized with the default rules set.
-    
     
     >>> fbRealization1 = fbLine.realize()
     >>> fbRealization1.getNumSolutions()
@@ -201,7 +201,6 @@ def exampleC():
     shows one of them. There is a parallel fifth between the bass and 
     alto parts going from the half-diminished 6,5 (B,F#) to the dominant
     seventh (C#,G#) in the second measure.
-    
     
     >>> from music21.figuredBass import rules
     >>> fbRules = rules.Rules()

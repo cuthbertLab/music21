@@ -1831,13 +1831,18 @@ class Music21Object(object):
         '''
         if useSite is False: # False or a Site; since None is a valid site, default is False
             useSite = self.activeSite
+
         if useSite is None:                
             foundOffset = self.offset
         else:
             try:
                 foundOffset = self.sites.siteDict[id(useSite)].offset  # allows for text offsets
             except KeyError:
-                foundOffset = self.getOffsetBySite(useSite)
+                try:
+                    foundOffset = self.getOffsetBySite(useSite)
+                except SitesException:
+                    #environLocal.warn(r)  # activeSite may have vanished! or does not have the element
+                    foundOffset = self.getOffsetBySite(None)
                 
         if foundOffset == 'highestTime':
             offset = 0.0
@@ -4434,30 +4439,7 @@ def mainTest(*testClasses, **kwargs):
 
 
     if runAllTests is True:
-        if six.PY3: # correct "M21Exception" to "...M21Exception"
-            for dtc in s1: # Suite to DocTestCase
-                if hasattr(dtc, '_dt_test'):
-                    dt = dtc._dt_test # DocTest
-                    for example in dt.examples: # fix Traceback exception differences Py2 to Py3
-                        if example.exc_msg is not None and len(example.exc_msg) > 0:
-                            example.exc_msg = "..." + example.exc_msg[1:]
-                        elif (example.want is not None and
-                                example.want.startswith('u\'')):
-                                    # probably a unicode example:
-                                    # simplistic, since (u'hi', u'bye')
-                                    # won't be caught, but saves a lot of anguish
-                                example.want = example.want[1:]
-        elif six.PY2: #
-            for dtc in s1: # Suite to DocTestCase
-                if hasattr(dtc, '_dt_test'):
-                    dt = dtc._dt_test # DocTest
-                    for example in dt.examples: # fix Traceback exception differences Py2 to Py3
-                        if (example.want is not None and
-                                example.want.startswith('b\'')):
-                                    # probably a unicode example:
-                                    # simplistic, since (b'hi', b'bye')
-                                    # won't be caught, but saves a lot of anguish
-                                example.want = example.want[1:]
+        common.fixTestsForPy2and3(s1)
                                     
         runner = unittest.TextTestRunner()
         runner.verbosity = verbosity

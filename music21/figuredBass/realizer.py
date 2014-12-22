@@ -77,6 +77,9 @@ def figuredBassFromStream(streamPart):
     
     >>> s = tinyNotation.TinyNotationStream('4/4 C4 D8_6 E8_6 F4 G4_7 c1')
     >>> fb = figuredBass.realizer.figuredBassFromStream(s)
+    >>> fb
+    <music21.figuredBass.realizer.FiguredBassLine object at 0x...>
+    
     >>> fbRules = figuredBass.rules.Rules()
     >>> fbRules.partMovementLimits = [(1,2),(2,12),(3,12)]
     >>> fbRealization = fb.realize(fbRules)
@@ -130,6 +133,8 @@ def figuredBassFromStream(streamPart):
 def figuredBassFromStreamPart(streamPart):
     '''
     Deprecated. Use :meth:`~music21.figuredBass.realizer.figuredBassFromStream` instead.
+    
+    (Keep because it appears in the Cabel-Ugaz thesis)
     '''
     _environRules = environment.Environment(_MOD)
     _environRules.warn("The method figuredBassFromStreamPart() is deprecated. Use figuredBassFromStream().", DeprecationWarning)
@@ -281,21 +286,23 @@ class FiguredBassLine(object):
         {3.5} <music21.note.Note C>
         '''
         bassLine = stream.Part()
-        bassLine.append(copy.deepcopy(self.inTime))
-        bassLine.append(key.KeySignature(self.inKey.sharps))
         bassLine.append(clef.BassClef())
+        bassLine.append(key.KeySignature(self.inKey.sharps))
+        bassLine.append(copy.deepcopy(self.inTime))
         r = None
         if self._paddingLeft != 0.0:
             r = note.Rest(quarterLength = self._paddingLeft)
             bassLine.append(r)
+
         for (bassNote, unused_notationString) in self._fbList:
             bassLine.append(bassNote)
         
-        bassLine.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
+        bl2 = bassLine.makeNotation(inPlace=False, cautionaryNotImmediateRepeat=False)
         if r is not None:
-            bassLine[0].pop(3)
-            bassLine[0].padAsAnacrusis()
-        return bassLine
+            m0 = bl2.getElementsByClass('Measure')[0]
+            m0.remove(m0.getElementsByClass('Rest')[0])
+            m0.padAsAnacrusis()
+        return bl2
     
     def retrieveSegments(self, fbRules = None, numParts = 4, maxPitch = None):
         '''

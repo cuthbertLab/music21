@@ -433,7 +433,7 @@ class Test(unittest.TestCase):
         part2 = stream.Part()
         durPart1 = [1,1,.5,.5,1]
         durPart2 = [3,1]
-        degrees = range(1,9)
+        degrees = list(range(1,9))
         for unused in range(4):
             random.shuffle(degrees)
             random.shuffle(durPart1)

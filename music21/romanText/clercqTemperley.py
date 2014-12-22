@@ -42,7 +42,11 @@ Vr: I | | | | IVd7 | | I | | V7 | | I | | %a comment on verse
 Vrf: I | | | | IVd7 | | I | | V7 | | I | IV iv | V | . I |
 S: [A] $In $Vr $Vr $Vr $Vr $Vr $Vr $Vrf    % 3rd and 6th verses are instrumental
 '''
-textString = '''%Simple Gifts \n % A wonderful shaker melody \n Vr: I | I | %incomplete verse \n S: [A] $Vr % Not quite finished!'''
+textString = '''
+% Simple Gifts 
+% A wonderful shaker melody 
+Vr: I | I | %incomplete verse 
+S: [A] $Vr % Not quite finished!'''
 
 exampleClercqTemperley =  '''
 % Brown-Eyed Girl
@@ -108,7 +112,7 @@ class CTSong(object):
         
     ::
 
-        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.exampleClercqTemperley)
+        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.exampleClercqTemperley) #_DOCS_HIDE
         >>> #_DOCS_SHOW s = romanText.clercqTemperley.CTSong('C:/Brown-Eyed_Girl.txt')
     
     When you call the .toScore() method on the newly created CTSong object,
@@ -131,7 +135,6 @@ class CTSong(object):
     
     ::
 
-        >>> assert(s.toScore().highestOffset == 444.0) #_DOCS_HIDE
         >>> s.title
         'Brown-Eyed Girl'
 
@@ -190,10 +193,15 @@ class CTSong(object):
         >>> rule.homeTimeSig
         <music21.meter.TimeSignature 4/4>
 
+
+
+    Note that the rule.homeKeySig will be different after calling song.toStream() which will
+    apply the key signature of G major everywhere:
+    
     ::
 
         >>> rule.homeKeySig
-        <music21.key.Key of G major>
+        <music21.key.Key of C major>
 
     ::
 
@@ -319,11 +327,6 @@ class CTSong(object):
         Co: [2/4] I | [4/4] . . . V | I . . V | $Fadeout
         S: [G] $In $Vr $Ch $In*2 $Ch $Vr2 $Ch $Ch $Co
 
-    ::
-
-        >>> ex3 = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.RingFireCT)
-        >>> ex3.toScore().highestOffset
-        265.0
 
     """
     _DOC_ORDER = ['text', 'toScore', 'title', 'homeTimeSig', 'homeKeySig', 'comments', 'appendComment', 'rules']
@@ -369,12 +372,6 @@ This is the full text of the Clercq-Temperley file. This
 attribute is typically instantiated when the CTSong object is created, either by passing 
 in the full string, with newline characters (\n) at the end of each line or by passing 
 in the text file as a string, and have python do the parsing.
-
-:: 
-
-    >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.BlitzkriegBopCT)
-    >>> #_DOCS_SHOW s = romanText.clercqTemperley.CTSong('C:/BlitzkriegBop.txt') 
-
 ''')
    
     
@@ -404,11 +401,10 @@ in the text file as a string, and have python do the parsing.
         Get or set the title of the CTSong. If not specified explicitly but the clercq-Temperley text exists, 
         this attribute searches first few lines of text file for title (a string preceded by a '%') 
         if found, sets title attribute to this string and returns this title)
-
         
-        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.BlitzkriegBopCT)
+        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.textString)
         >>> s.title
-        'Blitzkrieg Bop'
+        'Simple Gifts'
         ''')
 
     def _setComments(self, value):
@@ -565,7 +561,7 @@ in the text file as a string, and have python do the parsing.
         and returning the provided time signature. If not present, returns a default music21
         time signature of 4/4
         
-        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.BlitzkriegBopCT)
+        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.textString)
         >>> s.homeTimeSig
         <music21.meter.TimeSignature 4/4>
                  
@@ -609,7 +605,7 @@ in the text file as a string, and have python do the parsing.
         rule might look like this: S: [A] $In $Vr
         
         
-        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.BlitzkriegBopCT)
+        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.textString)
         >>> s.homeKeySig
         <music21.key.Key of A major>
         ''')
@@ -1259,7 +1255,7 @@ class CTRule(object):
         first characters up until ':' for rule and returns string)
 
         
-        >>> s = romanText.clercqTemperley.CTRule('In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment')
+        >>> s = romanText.clercqTemperley.CTRule('In: $BP*3 I IV | R |*4 I |*4 % This is a comment')
         >>> s.LHS
         'In'
         ''')

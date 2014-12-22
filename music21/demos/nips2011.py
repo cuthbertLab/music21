@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Methods used to create the data in the NIPS2011 paper.
 '''
