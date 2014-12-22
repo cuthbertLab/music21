@@ -332,8 +332,9 @@ def makeDuration(base=0.0, dots=0):
     >>> mei.base.makeDuration(Fraction(1, 3), 1).quarterLength
     0.5
     '''
-    return duration.Duration(base + sum([float(base) / x for x in [2 ** i for i in xrange(1, dots + 1)]]),
-                             dots=dots)
+    returnDuration = duration.Duration(base)
+    returnDuration.dots = dots
+    return returnDuration
 
 
 def allPartsPresent(scoreElem):
