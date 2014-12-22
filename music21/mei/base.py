@@ -2105,11 +2105,18 @@ def chordFromElement(elem, slurBundle=None):
     tagToFunction = {'{http://www.music-encoding.org/ns/mei}note': lambda *x: None,
                      '{http://www.music-encoding.org/ns/mei}artic': articFromElement}
 
-    # pitch and duration... these are what we can set in the constructor
-    theChord = chord.Chord(notes=[noteFromElement(x, slurBundle) for x in elem.iterfind('{}note'.format(_MEINS))])
+    # start with a Chord with a bunch of Notes
+    theChord = []
+    for eachNote in elem.iterfind('{}note'.format(_MEINS)):
+        theChord.append(noteFromElement(eachNote, slurBundle))
+    theChord = chord.Chord(notes=theChord)
 
-    # for a Chord, setting "duration" with a Duration object in __init__() doesn't work
-    theChord.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), int(elem.get('dots', 0)))
+    # set the Chord's duration
+    theDuration = _qlDurationFromAttr(elem.get('dur'))
+    theDuration = makeDuration(theDuration, int(elem.get('dots', 0)))
+    theChord.duration = theDuration
+
+    #theChord.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), int(elem.get('dots', 0)))
 
     # iterate all immediate children
     for subElement in _processEmbeddedElements(elem.findall('*'), tagToFunction, elem.tag, slurBundle):
