@@ -574,12 +574,11 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertEqual(expected, mockNewNote, actual)
         mockSafePitch.assert_called_once_with('D', '#', '2')
         mockMakeDuration.assert_called_once_with(1.0, 1)
-        mockNote.assert_called_once_with(mockSafePitch.return_value,
-                                         duration=mockMakeDuration.return_value)
+        mockNote.assert_called_once_with(mockSafePitch.return_value)
         self.assertEqual(0, mockNewNote.id.call_count)
         self.assertEqual(0, mockNewNote.articulations.extend.call_count)
         self.assertEqual(0, mockNewNote.tie.call_count)
-        self.assertEqual(0, mockNewNote.duration.call_count)
+        self.assertEqual(mockMakeDuration.return_value, mockNewNote.duration)
 
     def testIntegration1a(self):
         '''
@@ -637,8 +636,7 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertIsInstance(mockNewNote.articulations.append.call_args_list[0][0][0],
                               articulations.Staccato)
         self.assertEqual(expMockMakeDur, mockMakeDuration.call_args_list)
-        mockNote.assert_called_once_with(mockSafePitch.return_value,
-                                         duration=mockMakeDuration.return_value)
+        mockNote.assert_called_once_with(mockSafePitch.return_value)
         self.assertEqual(0, mockNewNote.id.call_count)
         self.assertEqual(0, mockNewNote.articulations.extend.call_count)
         self.assertEqual(0, mockNewNote.tie.call_count)
@@ -692,12 +690,11 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertEqual(expected, mockNewNote, actual)
         mockSafePitch.assert_called_once_with('D', '#', '2')
         mockMakeDuration.assert_called_once_with(1.0, 1)
-        mockNote.assert_called_once_with(mockSafePitch.return_value,
-                                         duration=mockMakeDuration.return_value)
+        mockNote.assert_called_once_with(mockSafePitch.return_value)
         self.assertEqual('123', mockNewNote.id)
         mockNewNote.articulations.extend.assert_called_once_with(['staccato!'])
         self.assertEqual('a tie!', mockNewNote.tie)
-        self.assertEqual(0, mockNewNote.duration.call_count)
+        self.assertEqual(mockMakeDuration.return_value, mockNewNote.duration)
         mockSlur.assert_called_once_with(elem, mockNewNote, 'slur bundle')
 
     def testIntegration3(self):
@@ -740,7 +737,8 @@ class TestNoteFromElement(unittest.TestCase):
         mockSafePitch.return_value = 'safePitch() return'
         mockNewNote = mock.MagicMock()
         mockNewNote.beams = mock.MagicMock()
-        mockNewNote.duration.type = 'quarter'
+        mockMakeDuration.return_value = mock.MagicMock()
+        mockMakeDuration.return_value.type = 'quarter'
         mockNote.return_value = mockNewNote
         mockProcEmbEl.return_value = []
         mockTuplet.return_value = 'made the tuplet'
@@ -752,8 +750,7 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertEqual(expected, actual)
         mockSafePitch.assert_called_once_with('D', None, '2')
         mockMakeDuration.assert_called_once_with(1.0, 0)
-        mockNote.assert_called_once_with(mockSafePitch.return_value,
-                                         duration=mockMakeDuration.return_value)
+        mockNote.assert_called_once_with(mockSafePitch.return_value)
         mockTuplet.assert_called_once_with(mockNewNote, elem)
         mockAccid.assert_called_once_with('#')
         self.assertEqual(0, mockNewNote.beams.fill.call_count)
@@ -805,8 +802,7 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertEqual(expected, actual)
         mockSafePitch.assert_called_once_with('D', None, '2')
         mockMakeDuration.assert_called_once_with(0.25, 0)
-        mockNote.assert_called_once_with(mockSafePitch.return_value,
-                                         duration=mockMakeDuration.return_value)
+        mockNote.assert_called_once_with(mockSafePitch.return_value)
         mockNewNote.beams.fill.assert_called_once_with('16th', 'start')
         self.assertEqual(mockGrace.return_value, mockNewNote.duration)
 

@@ -1866,12 +1866,15 @@ def noteFromElement(elem, slurBundle=None):
                      '{http://www.music-encoding.org/ns/mei}artic': articFromElement,
                      '{http://www.music-encoding.org/ns/mei}accid': accidFromElement}
 
-    # pitch and duration... these are what we can set in the constructor
-    theNote = note.Note(safePitch(elem.get('pname', ''),
-                                  _accidentalFromAttr(elem.get('accid')),
-                                  elem.get('oct', '')),
-                        duration=makeDuration(_qlDurationFromAttr(elem.get('dur')),
-                                              int(elem.get('dots', 0))))
+    # start with a Note with Pitch
+    theNote = _accidentalFromAttr(elem.get('accid'))
+    theNote = safePitch(elem.get('pname', ''), theNote, elem.get('oct', ''))
+    theNote = note.Note(theNote)
+
+    # set the Note's duration
+    theDuration = _qlDurationFromAttr(elem.get('dur'))
+    theDuration = makeDuration(theDuration, int(elem.get('dots', 0)))
+    theNote.duration = theDuration
 
     # iterate all immediate children
     dotElements = 0  # count the number of <dot> elements
