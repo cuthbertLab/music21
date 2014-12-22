@@ -4359,6 +4359,21 @@ def mainTest(*testClasses, **kwargs):
 
     runAllTests = True
 
+
+    failFast = bool(kwargs.get('failFast', True))
+    if failFast:
+        optionflags = (
+            doctest.ELLIPSIS |
+            doctest.NORMALIZE_WHITESPACE |
+            doctest.REPORT_ONLY_FIRST_FAILURE
+            )
+    else:
+        optionflags = (
+            doctest.ELLIPSIS |
+            doctest.NORMALIZE_WHITESPACE
+            )
+    
+    globs = None
     # start with doc tests, then add unit tests
     if ('noDocTest' in testClasses or 'noDocTest' in sys.argv
         or 'nodoctest' in sys.argv):
@@ -4367,30 +4382,16 @@ def mainTest(*testClasses, **kwargs):
     else:
         # create test suite derived from doc tests
         # here we use '__main__' instead of a module
-        failFast = bool(kwargs.get('failFast', True))
-        if failFast:
-            optionflags = (
-                doctest.ELLIPSIS |
-                doctest.NORMALIZE_WHITESPACE |
-                doctest.REPORT_ONLY_FIRST_FAILURE
-                )
-        else:
-            optionflags = (
-                doctest.ELLIPSIS |
-                doctest.NORMALIZE_WHITESPACE
-                )
+
         if 'moduleRelative' in testClasses or 'moduleRelative' in sys.argv:
-            s1 = doctest.DocTestSuite(
-                '__main__',
-                optionflags=optionflags,
-                )
+            pass
         else:
             globs = __import__('music21').__dict__.copy()
-            s1 = doctest.DocTestSuite(
-                '__main__',
-                globs=globs,
-                optionflags=optionflags,
-                )
+        s1 = doctest.DocTestSuite(
+            '__main__',
+            globs=globs,
+            optionflags=optionflags,
+            )
 
     verbosity = 1
     if 'verbose' in testClasses or 'verbose' in sys.argv:
@@ -4437,6 +4438,35 @@ def mainTest(*testClasses, **kwargs):
             s2 = unittest.defaultTestLoader.loadTestsFromTestCase(t)
             s1.addTests(s2)
 
+    ### Add _DOC_ATTR tests...
+    if ('noDocTest' in testClasses 
+        or 'noDocTest' in sys.argv
+        or 'nodoctest' in sys.argv):
+        pass
+    else:
+        import inspect
+        stacks = inspect.stack()
+        if len(stacks) > 1:
+            outerFrameTuple = stacks[1]
+        else:
+            outerFrameTuple = stacks[0]
+        outerFrame = outerFrameTuple[0]
+        outerFilename = outerFrameTuple[1]
+        localVariables = outerFrame.f_locals
+        for lv in list(localVariables.keys()):
+            lvk = localVariables[lv]
+            if (inspect.isclass(lvk)):
+                docattr = getattr(lvk, '_DOC_ATTR', None)
+                if docattr is not None:
+                    for dockey in docattr:
+                        documentation = docattr[dockey]
+                        #print(documentation)
+                        dt = doctest.DocTestParser().get_doctest(documentation, globs, dockey, outerFilename, 0)
+                        if len(dt.examples) == 0:
+                            continue
+                        dtc = doctest.DocTestCase(dt, optionflags=optionflags)
+                        #print(dtc)
+                        s1.addTest(dtc)
 
     if runAllTests is True:
         common.fixTestsForPy2and3(s1)

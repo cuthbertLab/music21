@@ -1521,7 +1521,7 @@ class TimespanCollection(object):
 
         '''
         if self._rootNode is not None:
-            return self._rootNode._debug()
+            return self._rootNode.debug()
         return ''
 
     def _insert(self, node, startOffset):
@@ -1534,7 +1534,7 @@ class TimespanCollection(object):
         '''
         from music21.stream import timespanNode
         if node is None:
-            return timespanNode._TimespanCollectionNode(startOffset)
+            return timespanNode.TimespanCollectionNode(startOffset)
         if startOffset < node.startOffset:
             node.leftChild = self._insert(node.leftChild, startOffset)
         elif node.startOffset < startOffset:
