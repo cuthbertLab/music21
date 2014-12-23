@@ -33,7 +33,7 @@ environLocal = environment.Environment(_MOD)
 if six.PY2:
     try:
         import coverage
-        cov = coverage.coverage()
+        cov = coverage.coverage(omit=['*/ext/*'])
         cov.start()
     except ImportError:
         cov = None

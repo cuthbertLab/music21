@@ -558,12 +558,6 @@ class Converter(object):
             message = message.format(autoDownload)
             raise ConverterException(message)
 
-        # If we give the URL to a Wikifonia main page,
-        # redirect to musicxml page:
-        matchedWikifonia = re.search("wikifonia.org/node/(\d+)", url)
-        if matchedWikifonia:
-            url = 'http://static.wikifonia.org/' + matchedWikifonia.group(1) + '/musicxml.xml'
-
         # this format check is here first to see if we can find the format
         # in the url; if forcing a format we do not need this
         # we do need the file extension to construct file path below

@@ -22,7 +22,7 @@ from music21 import meter
 from music21 import scale
 
 from music21 import stream
-from music21.stream import Stream
+#from music21.stream import Stream
 from music21 import voiceLeading
 
 from music21 import environment
@@ -1226,337 +1226,337 @@ class ModalCounterpoint(object):
 class Test(unittest.TestCase):
     pass
 
-    def xtestCounterpoint(self):
-        (n11,n12,n13,n14) = (Note(), Note(), Note(), Note())
-        (n21,n22,n23,n24) = (Note(), Note(), Note(), Note())
-        n11.duration.type = "whole"
-        n12.duration.type = "whole"
-        n13.duration.type = "whole"
-        n14.duration.type = "whole"
-        n21.duration.type = "whole"
-        n22.duration.type = "whole"
-        n23.duration.type = "whole"
-        n24.duration.type = "whole"
-        
-        n11.name = "C4"
-        n12.name = "D4"
-        n13.name = "F4"
-        n14.name = "F4"
-    
-        n21.name = "G4"
-        n22.name = "A4"
-        n23.name = "B4"
-        n24.name = "C5"
-    
-    
-        stream1 = Stream()
-        stream1.append([n11, n12, n13, n14])
-        stream2 = Stream()
-        stream2.append([n21, n22, n23, n24])
-        stream3 = Stream([n11, n13, n14])
-        stream4 = Stream([n21, n23, n24])
-        stream5 = Stream([n11, n23, n24, n21])
-    
-        counterpoint1 = ModalCounterpoint(stream1, stream2)
-    
-        #  GGBC
-        #  CDFF
-        findPar5 = counterpoint1.findParallelFifths(stream1, stream2)
-        print(findPar5)
-        
-        assert findPar5 == 1
-        assert n24.editorial.misc["Parallel Fifth"] == True
-        assert "Parallel Fifth" not in n21.editorial.misc
-        assert "Parallel Fifth" not in n22.editorial.misc
-        assert "Parallel Fifth" not in n23.editorial.misc
-
-        assert n14.editorial.misc["Parallel Fifth"] == True
-        assert "Parallel Fifth" not in n11.editorial.misc
-        assert "Parallel Fifth" not in n12.editorial.misc
-        assert "Parallel Fifth" not in n13.editorial.misc
-    
-        par5 = counterpoint1.isParallelFifth(n11, n12, n21, n22)
-        assert par5 == False
-    
-        par52 = counterpoint1.isParallelFifth(n13, n14, n23, n24)
-        assert par52 == True
-    
-        validHarmony1 = counterpoint1.isValidHarmony(n11, n21)
-        validHarmony2 = counterpoint1.isValidHarmony(n12, n22)
-    
-        assert validHarmony1 == True
-        assert validHarmony2 == False
-    
-        validStep1 = counterpoint1.isValidStep(n11, n23)
-        validStep2 = counterpoint1.isValidStep(n23, n11)
-        validStep3 = counterpoint1.isValidStep(n23, n24)
-    
-        assert validStep1 == False
-        assert validStep2 == False
-        assert validStep3 == True
-    
-        allHarmony = counterpoint1.allValidHarmony(stream1, stream2)
-        assert allHarmony == False
-    
-        allHarmony2 = counterpoint1.allValidHarmony(stream3, stream4)
-        assert allHarmony2 == True
-    
-        melody1 = counterpoint1.isValidMelody(stream1)
-        melody2 = counterpoint1.isValidMelody(stream5)
-    
-        assert melody1 == True
-        assert melody2 == False
-    
-        numBadHarmony = counterpoint1.countBadHarmonies(stream1, stream2)
-        numBadHarmony2 = counterpoint1.countBadHarmonies(stream3, stream4)
-    
-        assert numBadHarmony == 1
-        assert numBadHarmony2 == 0
-    
-        numBadMelody = counterpoint1.countBadSteps(stream1)
-        numBadMelody2 = counterpoint1.countBadSteps(stream5)
-    
-        assert numBadMelody == 0
-        assert numBadMelody2 == 1
-    
-        (n31, n32, n33, n34) = (Note(), Note(), Note(), Note())
-        n31.duration.type = "whole"
-        n32.duration.type = "whole"
-        n33.duration.type = "whole"
-        n34.duration.type = "whole"
-    
-        n31.octave = 5
-        n32.octave = 5
-        n33.octave = 5
-        n34.octave = 5
-    
-        n32.step = "D"
-        n33.step = "E"
-        n34.step = "F"
-    
-        stream6 = Stream([n31, n32, n33, n34])
-    
-        par8 = counterpoint1.findParallelOctaves(stream1, stream6)
-    
-        assert par8 == 3
-        assert "Parallel Octave" not in n31.editorial.misc
-        assert n32.editorial.misc["Parallel Octave"] == True
-        assert n33.editorial.misc["Parallel Octave"] == True
-        assert n34.editorial.misc["Parallel Octave"] == True
-    
-        par82 = counterpoint1.findParallelOctaves(stream1, stream2)
-        assert par82 == 0
-    
-        par83 = counterpoint1.isParallelOctave(n11, n12, n31, n32)
-        par84 = counterpoint1.isParallelOctave(n11, n12, n21, n22)
-    
-        assert par83 == True
-        assert par84 == False
-    
-        intervalList = ["m3", "M3", "P4", "P5", "m3"]
-        consecutive = counterpoint1.thirdCounter(intervalList, 0)
-        assert consecutive == 2
-    
-        list2 = ["m3", "M3", "m3", "m7"]
-        consecutive2 = counterpoint1.thirdCounter(list2, 3)
-        assert consecutive2 == 6
-    
-        list3 = ["m2", "m3"]
-        consecutive3 = counterpoint1.thirdCounter(list3, 0)
-        assert consecutive3 == 0
-    
-        (n41, n42, n43, n44, n45, n46, n47) = (Note(), Note(), Note(), Note(), Note(), Note(), Note())
-        n41.duration.type = "whole"
-        n42.duration.type = "whole"
-        n43.duration.type = "whole"
-        n44.duration.type = "whole"
-        n45.duration.type = "whole"
-        n46.duration.type = "whole"
-        n47.duration.type = "whole"
-    
-        (n51, n52, n53, n54, n55, n56, n57) = (Note(), Note(), Note(), Note(), Note(), Note(), Note())
-        n51.duration.type = "whole"
-        n52.duration.type = "whole"
-        n53.duration.type = "whole"
-        n54.duration.type = "whole"
-        n55.duration.type = "whole"
-        n56.duration.type = "whole"
-        n57.duration.type = "whole"
-    
-        n51.step = "E"
-        n52.step = "E"
-        n53.step = "E"
-        n54.step = "E"
-        n56.step = "E"
-        n57.step = "E"
-    
-        stream7 = Stream([n41, n42, n43, n44, n45, n46, n47])
-        stream8 = Stream([n51, n52, n53, n54, n55, n56, n57])
-    
-        too3 = counterpoint1.tooManyThirds(stream7, stream8, 4)
-        too32 = counterpoint1.tooManyThirds(stream7, stream8, 3)
-    
-        assert too3 == False
-        assert too32 == True
-    
-        (n61, n62, n63, n64, n65, n66, n67) = (Note(), Note(), Note(), Note(), Note(), Note(), Note())
-        n61.duration.type = "whole"
-        n62.duration.type = "whole"
-        n63.duration.type = "whole"
-        n64.duration.type = "whole"
-        n65.duration.type = "whole"
-        n66.duration.type = "whole"
-        n67.duration.type = "whole"
-    
-        n61.step = "E"
-        n62.step = "E"
-        n63.step = "E"
-        n64.step = "E"
-        n66.step = "E"
-        n67.step = "E"
-    
-        n61.octave = 3
-        n62.octave = 3
-        n63.octave = 3
-        n64.octave = 3
-        n66.octave = 3
-        n67.octave = 3
-    
-        stream9 = Stream([n61, n62, n63, n64, n65, n66, n67])
-    
-        too6 = counterpoint1.tooManySixths(stream7, stream9, 4)
-        too62 = counterpoint1.tooManySixths(stream7, stream9, 3)
-    
-        assert too6 == False
-        assert too62 == True
-    
-        (n71, n72, n81, n82) = (Note(), Note(), Note(), Note())
-        n71.duration.type = "whole"
-        n72.duration.type = "whole"
-        n81.duration.type = "whole"
-        n82.duration.type = "whole"
-        
-        n71.octave = 5
-        n72.step = "D"
-        n72.octave = 5
-        n82.step = "G"
-        hiding = counterpoint1.isHiddenFifth(n71, n72, n81, n82)
-        hiding2 = counterpoint1.isHiddenFifth(n71, n72, n82, n81)
-    
-        assert hiding == True
-        assert hiding2 == False
-    
-        (n73, n74, n75, n76) = (Note(), Note(), Note(), Note())
-        n73.duration.type = "whole"
-        n74.duration.type = "whole"
-        n75.duration.type = "whole"
-        n76.duration.type = "whole"
-        
-        n73.step = "D"
-        n73.octave = 5
-        n74.step = "A"
-        n75.step = "D"
-        n75.octave = 5
-        n76.step = "E"
-        n76.octave = 5
-    
-        (n83, n84, n85, n86) = (Note(), Note(), Note(), Note())
-        n83.duration.type = "whole"
-        n84.duration.type = "whole"
-        n85.duration.type = "whole"
-        n86.duration.type = "whole"
-        
-        n83.step = "G"
-        n84.step = "F"
-        n85.step = "G"
-        n86.step = "A"
-    
-        stream10 = Stream([n71, n72, n73, n74, n75, n76])
-        stream11 = Stream([n81, n82, n83, n84, n85, n86])
-    
-        parallel5 = counterpoint1.findParallelFifths(stream10, stream11)
-        hidden5 = counterpoint1.findHiddenFifths(stream10, stream11)
-        assert "Hidden Fifth" not in n71.editorial.misc
-        assert n72.editorial.misc["Hidden Fifth"] == True
-        assert n75.editorial.misc["Hidden Fifth"] == True
-        total5 = counterpoint1.findAllBadFifths(stream10, stream11)
-    
-        assert parallel5 == 2
-        assert hidden5 == 2
-        assert total5 == 4
-    
-        (n91, n92, n93, n94, n95, n96) = (Note(), Note(), Note(), Note(), Note(), Note())
-        (n01, n02, n03, n04, n05, n06) = (Note(), Note(), Note(), Note(), Note(), Note())
-    
-        n91.duration.type = n92.duration.type = n93.duration.type = "whole"
-        n94.duration.type = n95.duration.type = n96.duration.type = "whole"
-        n01.duration.type = n02.duration.type = n03.duration.type = "whole"
-        n04.duration.type = n05.duration.type = n06.duration.type = "whole"
-    
-        n91.step = "A"
-        n92.step = "D"
-        n92.octave = 5
-        n93.step = "E"
-        n93.octave = 5
-        n94.octave = 5
-        n95.step = "A"
-        n96.step = "E"
-        n96.octave = 5
-    
-        n02.step = "D"
-        n03.step = "E"
-        n06.step = "E"
-    
-        stream12 = Stream([n91, n92, n93, n94, n95, n96])
-        stream13 = Stream([n01, n02, n03, n04, n05, n06])
-    
-        parallel8 = counterpoint1.findParallelOctaves(stream12, stream13)
-        hidden8 = counterpoint1.findHiddenOctaves(stream12, stream13)
-        total8 = counterpoint1.findAllBadOctaves(stream12, stream13)
-    
-        assert "Parallel Octave" not in n91.editorial.misc
-        assert "Hidden Octave" not in n91.editorial.misc
-        assert n92.editorial.misc["Hidden Octave"] == True
-        assert "Parallel Octave" not in n92.editorial.misc
-        assert n93.editorial.misc["Parallel Octave"] == True
-        assert "Hidden Octave" not in n93.editorial.misc
-        assert n94.editorial.misc["Parallel Octave"] == True
-        assert n96.editorial.misc["Hidden Octave"] == True
-    
-        assert parallel8 == 2
-        assert hidden8 == 2
-        assert total8 == 4
-    
-        hidden8 = counterpoint1.isHiddenOctave(n91, n92, n01, n02)
-        hidden82 = counterpoint1.isHiddenOctave(n92, n93, n02, n03)
-    
-        assert hidden8 == True
-        assert hidden82 == False
-    
-        (n100, n101, n102, n103, n104, n105, n106, n107) = (Note(), Note(), Note(), Note(), Note(), Note(), Note(), Note())
-        n100.duration.type = "whole"
-        n101.duration.type = "whole"
-        n102.duration.type = "whole"
-        n103.duration.type = "whole"
-        n104.duration.type = "whole"
-        n105.duration.type = "whole"
-        n106.duration.type = "whole"
-        n107.duration.type = "whole"
-    
-        n100.name = "G"
-        n101.name = "A"
-        n102.name = "D"
-        n103.name = "F"
-        n104.name = "G"
-        n105.name = "A"
-        n106.name = "G"
-        n107.name = "F"
-    
-        stream14 = Stream([n100, n101, n102, n103, n104, n105, n106, n107])
-        aMinor = scale.MinorScale(n101)
-        stream15 = counterpoint1.raiseLeadingTone(stream14, aMinor)
-        names15 = [note1.name for note1 in stream15.notes]
-        assert names15 == ["G#", "A", "D", "F#", "G#", "A", "G", "F"]
+#     def xtestCounterpoint(self):
+#         (n11,n12,n13,n14) = (Note(), Note(), Note(), Note())
+#         (n21,n22,n23,n24) = (Note(), Note(), Note(), Note())
+#         n11.duration.type = "whole"
+#         n12.duration.type = "whole"
+#         n13.duration.type = "whole"
+#         n14.duration.type = "whole"
+#         n21.duration.type = "whole"
+#         n22.duration.type = "whole"
+#         n23.duration.type = "whole"
+#         n24.duration.type = "whole"
+#         
+#         n11.name = "C4"
+#         n12.name = "D4"
+#         n13.name = "F4"
+#         n14.name = "F4"
+#     
+#         n21.name = "G4"
+#         n22.name = "A4"
+#         n23.name = "B4"
+#         n24.name = "C5"
+#     
+#     
+#         stream1 = stream.Stream()
+#         stream1.append([n11, n12, n13, n14])
+#         stream2 = stream.Stream()
+#         stream2.append([n21, n22, n23, n24])
+#         stream3 = stream.Stream([n11, n13, n14])
+#         stream4 = stream.Stream([n21, n23, n24])
+#         stream5 = stream.Stream([n11, n23, n24, n21])
+#     
+#         counterpoint1 = ModalCounterpoint(stream1, stream2)
+#     
+#         #  GGBC
+#         #  CDFF
+#         findPar5 = counterpoint1.findParallelFifths(stream1, stream2)
+#         print(findPar5)
+#         
+#         assert findPar5 == 1
+#         assert n24.editorial.misc["Parallel Fifth"] == True
+#         assert "Parallel Fifth" not in n21.editorial.misc
+#         assert "Parallel Fifth" not in n22.editorial.misc
+#         assert "Parallel Fifth" not in n23.editorial.misc
+# 
+#         assert n14.editorial.misc["Parallel Fifth"] == True
+#         assert "Parallel Fifth" not in n11.editorial.misc
+#         assert "Parallel Fifth" not in n12.editorial.misc
+#         assert "Parallel Fifth" not in n13.editorial.misc
+#     
+#         par5 = counterpoint1.isParallelFifth(n11, n12, n21, n22)
+#         assert par5 == False
+#     
+#         par52 = counterpoint1.isParallelFifth(n13, n14, n23, n24)
+#         assert par52 == True
+#     
+#         validHarmony1 = counterpoint1.isValidHarmony(n11, n21)
+#         validHarmony2 = counterpoint1.isValidHarmony(n12, n22)
+#     
+#         assert validHarmony1 == True
+#         assert validHarmony2 == False
+#     
+#         validStep1 = counterpoint1.isValidStep(n11, n23)
+#         validStep2 = counterpoint1.isValidStep(n23, n11)
+#         validStep3 = counterpoint1.isValidStep(n23, n24)
+#     
+#         assert validStep1 == False
+#         assert validStep2 == False
+#         assert validStep3 == True
+#     
+#         allHarmony = counterpoint1.allValidHarmony(stream1, stream2)
+#         assert allHarmony == False
+#     
+#         allHarmony2 = counterpoint1.allValidHarmony(stream3, stream4)
+#         assert allHarmony2 == True
+#     
+#         melody1 = counterpoint1.isValidMelody(stream1)
+#         melody2 = counterpoint1.isValidMelody(stream5)
+#     
+#         assert melody1 == True
+#         assert melody2 == False
+#     
+#         numBadHarmony = counterpoint1.countBadHarmonies(stream1, stream2)
+#         numBadHarmony2 = counterpoint1.countBadHarmonies(stream3, stream4)
+#     
+#         assert numBadHarmony == 1
+#         assert numBadHarmony2 == 0
+#     
+#         numBadMelody = counterpoint1.countBadSteps(stream1)
+#         numBadMelody2 = counterpoint1.countBadSteps(stream5)
+#     
+#         assert numBadMelody == 0
+#         assert numBadMelody2 == 1
+#     
+#         (n31, n32, n33, n34) = (Note(), Note(), Note(), Note())
+#         n31.duration.type = "whole"
+#         n32.duration.type = "whole"
+#         n33.duration.type = "whole"
+#         n34.duration.type = "whole"
+#     
+#         n31.octave = 5
+#         n32.octave = 5
+#         n33.octave = 5
+#         n34.octave = 5
+#     
+#         n32.step = "D"
+#         n33.step = "E"
+#         n34.step = "F"
+#     
+#         stream6 = stream.Stream([n31, n32, n33, n34])
+#     
+#         par8 = counterpoint1.findParallelOctaves(stream1, stream6)
+#     
+#         assert par8 == 3
+#         assert "Parallel Octave" not in n31.editorial.misc
+#         assert n32.editorial.misc["Parallel Octave"] == True
+#         assert n33.editorial.misc["Parallel Octave"] == True
+#         assert n34.editorial.misc["Parallel Octave"] == True
+#     
+#         par82 = counterpoint1.findParallelOctaves(stream1, stream2)
+#         assert par82 == 0
+#     
+#         par83 = counterpoint1.isParallelOctave(n11, n12, n31, n32)
+#         par84 = counterpoint1.isParallelOctave(n11, n12, n21, n22)
+#     
+#         assert par83 == True
+#         assert par84 == False
+#     
+#         intervalList = ["m3", "M3", "P4", "P5", "m3"]
+#         consecutive = counterpoint1.thirdCounter(intervalList, 0)
+#         assert consecutive == 2
+#     
+#         list2 = ["m3", "M3", "m3", "m7"]
+#         consecutive2 = counterpoint1.thirdCounter(list2, 3)
+#         assert consecutive2 == 6
+#     
+#         list3 = ["m2", "m3"]
+#         consecutive3 = counterpoint1.thirdCounter(list3, 0)
+#         assert consecutive3 == 0
+#     
+#         (n41, n42, n43, n44, n45, n46, n47) = (Note(), Note(), Note(), Note(), Note(), Note(), Note())
+#         n41.duration.type = "whole"
+#         n42.duration.type = "whole"
+#         n43.duration.type = "whole"
+#         n44.duration.type = "whole"
+#         n45.duration.type = "whole"
+#         n46.duration.type = "whole"
+#         n47.duration.type = "whole"
+#     
+#         (n51, n52, n53, n54, n55, n56, n57) = (Note(), Note(), Note(), Note(), Note(), Note(), Note())
+#         n51.duration.type = "whole"
+#         n52.duration.type = "whole"
+#         n53.duration.type = "whole"
+#         n54.duration.type = "whole"
+#         n55.duration.type = "whole"
+#         n56.duration.type = "whole"
+#         n57.duration.type = "whole"
+#     
+#         n51.step = "E"
+#         n52.step = "E"
+#         n53.step = "E"
+#         n54.step = "E"
+#         n56.step = "E"
+#         n57.step = "E"
+#     
+#         stream7 = stream.Stream([n41, n42, n43, n44, n45, n46, n47])
+#         stream8 = stream.Stream([n51, n52, n53, n54, n55, n56, n57])
+#     
+#         too3 = counterpoint1.tooManyThirds(stream7, stream8, 4)
+#         too32 = counterpoint1.tooManyThirds(stream7, stream8, 3)
+#     
+#         assert too3 == False
+#         assert too32 == True
+#     
+#         (n61, n62, n63, n64, n65, n66, n67) = (Note(), Note(), Note(), Note(), Note(), Note(), Note())
+#         n61.duration.type = "whole"
+#         n62.duration.type = "whole"
+#         n63.duration.type = "whole"
+#         n64.duration.type = "whole"
+#         n65.duration.type = "whole"
+#         n66.duration.type = "whole"
+#         n67.duration.type = "whole"
+#     
+#         n61.step = "E"
+#         n62.step = "E"
+#         n63.step = "E"
+#         n64.step = "E"
+#         n66.step = "E"
+#         n67.step = "E"
+#     
+#         n61.octave = 3
+#         n62.octave = 3
+#         n63.octave = 3
+#         n64.octave = 3
+#         n66.octave = 3
+#         n67.octave = 3
+#     
+#         stream9 = stream.Stream([n61, n62, n63, n64, n65, n66, n67])
+#     
+#         too6 = counterpoint1.tooManySixths(stream7, stream9, 4)
+#         too62 = counterpoint1.tooManySixths(stream7, stream9, 3)
+#     
+#         assert too6 == False
+#         assert too62 == True
+#     
+#         (n71, n72, n81, n82) = (Note(), Note(), Note(), Note())
+#         n71.duration.type = "whole"
+#         n72.duration.type = "whole"
+#         n81.duration.type = "whole"
+#         n82.duration.type = "whole"
+#         
+#         n71.octave = 5
+#         n72.step = "D"
+#         n72.octave = 5
+#         n82.step = "G"
+#         hiding = counterpoint1.isHiddenFifth(n71, n72, n81, n82)
+#         hiding2 = counterpoint1.isHiddenFifth(n71, n72, n82, n81)
+#     
+#         assert hiding == True
+#         assert hiding2 == False
+#     
+#         (n73, n74, n75, n76) = (Note(), Note(), Note(), Note())
+#         n73.duration.type = "whole"
+#         n74.duration.type = "whole"
+#         n75.duration.type = "whole"
+#         n76.duration.type = "whole"
+#         
+#         n73.step = "D"
+#         n73.octave = 5
+#         n74.step = "A"
+#         n75.step = "D"
+#         n75.octave = 5
+#         n76.step = "E"
+#         n76.octave = 5
+#     
+#         (n83, n84, n85, n86) = (Note(), Note(), Note(), Note())
+#         n83.duration.type = "whole"
+#         n84.duration.type = "whole"
+#         n85.duration.type = "whole"
+#         n86.duration.type = "whole"
+#         
+#         n83.step = "G"
+#         n84.step = "F"
+#         n85.step = "G"
+#         n86.step = "A"
+#     
+#         stream10 = stream.Stream([n71, n72, n73, n74, n75, n76])
+#         stream11 = stream.Stream([n81, n82, n83, n84, n85, n86])
+#     
+#         parallel5 = counterpoint1.findParallelFifths(stream10, stream11)
+#         hidden5 = counterpoint1.findHiddenFifths(stream10, stream11)
+#         assert "Hidden Fifth" not in n71.editorial.misc
+#         assert n72.editorial.misc["Hidden Fifth"] == True
+#         assert n75.editorial.misc["Hidden Fifth"] == True
+#         total5 = counterpoint1.findAllBadFifths(stream10, stream11)
+#     
+#         assert parallel5 == 2
+#         assert hidden5 == 2
+#         assert total5 == 4
+#     
+#         (n91, n92, n93, n94, n95, n96) = (Note(), Note(), Note(), Note(), Note(), Note())
+#         (n01, n02, n03, n04, n05, n06) = (Note(), Note(), Note(), Note(), Note(), Note())
+#     
+#         n91.duration.type = n92.duration.type = n93.duration.type = "whole"
+#         n94.duration.type = n95.duration.type = n96.duration.type = "whole"
+#         n01.duration.type = n02.duration.type = n03.duration.type = "whole"
+#         n04.duration.type = n05.duration.type = n06.duration.type = "whole"
+#     
+#         n91.step = "A"
+#         n92.step = "D"
+#         n92.octave = 5
+#         n93.step = "E"
+#         n93.octave = 5
+#         n94.octave = 5
+#         n95.step = "A"
+#         n96.step = "E"
+#         n96.octave = 5
+#     
+#         n02.step = "D"
+#         n03.step = "E"
+#         n06.step = "E"
+#     
+#         stream12 = stream.Stream([n91, n92, n93, n94, n95, n96])
+#         stream13 = stream.Stream([n01, n02, n03, n04, n05, n06])
+#     
+#         parallel8 = counterpoint1.findParallelOctaves(stream12, stream13)
+#         hidden8 = counterpoint1.findHiddenOctaves(stream12, stream13)
+#         total8 = counterpoint1.findAllBadOctaves(stream12, stream13)
+#     
+#         assert "Parallel Octave" not in n91.editorial.misc
+#         assert "Hidden Octave" not in n91.editorial.misc
+#         assert n92.editorial.misc["Hidden Octave"] == True
+#         assert "Parallel Octave" not in n92.editorial.misc
+#         assert n93.editorial.misc["Parallel Octave"] == True
+#         assert "Hidden Octave" not in n93.editorial.misc
+#         assert n94.editorial.misc["Parallel Octave"] == True
+#         assert n96.editorial.misc["Hidden Octave"] == True
+#     
+#         assert parallel8 == 2
+#         assert hidden8 == 2
+#         assert total8 == 4
+#     
+#         hidden8 = counterpoint1.isHiddenOctave(n91, n92, n01, n02)
+#         hidden82 = counterpoint1.isHiddenOctave(n92, n93, n02, n03)
+#     
+#         assert hidden8 == True
+#         assert hidden82 == False
+#     
+#         (n100, n101, n102, n103, n104, n105, n106, n107) = (Note(), Note(), Note(), Note(), Note(), Note(), Note(), Note())
+#         n100.duration.type = "whole"
+#         n101.duration.type = "whole"
+#         n102.duration.type = "whole"
+#         n103.duration.type = "whole"
+#         n104.duration.type = "whole"
+#         n105.duration.type = "whole"
+#         n106.duration.type = "whole"
+#         n107.duration.type = "whole"
+#     
+#         n100.name = "G"
+#         n101.name = "A"
+#         n102.name = "D"
+#         n103.name = "F"
+#         n104.name = "G"
+#         n105.name = "A"
+#         n106.name = "G"
+#         n107.name = "F"
+#     
+#         stream14 = stream.Stream([n100, n101, n102, n103, n104, n105, n106, n107])
+#         aMinor = scale.MinorScale(n101)
+#         stream15 = counterpoint1.raiseLeadingTone(stream14, aMinor)
+#         names15 = [note1.name for note1 in stream15.notes]
+#         assert names15 == ["G#", "A", "D", "F#", "G#", "A", "G", "F"]
 
 # ADD MORE CANTUS FIRMI HERE; MODIFY LIST CANTUSFIRMI
 
@@ -1655,7 +1655,7 @@ class TestExternal(unittest.TestCase):
     
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test, TestExternal)
+    music21.mainTest(Test)
 
 
 #------------------------------------------------------------------------------

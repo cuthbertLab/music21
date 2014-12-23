@@ -745,6 +745,9 @@ class SpannerBundle(object):
         >>> sb.append(su2)
         >>> len(sb)
         2
+        >>> sb
+        <music21.spanner.SpannerBundle of size 2>
+        
         >>> sb.remove(su2)
         >>> len(sb)
         1

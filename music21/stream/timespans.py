@@ -5,6 +5,7 @@
 #               organized by start and stop offsets
 #
 # Authors:      Josiah Wolf Oberholtzer
+#               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2013-14 Michael Scott Cuthbert and the music21
 #               Project
@@ -104,7 +105,25 @@ def makeElement(verticality, quarterLength):
     r'''
     Makes an element from a verticality and quarterLength.
     
-    TODO: DOCS!
+    >>> score = stream.timespans.makeExampleScore()
+    >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+    >>> verticality = tree.getVerticalityAt(4.0)
+    >>> verticality
+    <Verticality 4.0 {E3 G3}>
+    >>> el = stream.timespans.makeElement(verticality, 2.0)
+    >>> el
+    <music21.chord.Chord E3 G3>
+    >>> el.duration.quarterLength
+    2.0
+    
+    If there is nothing there, then a Rest is created
+    
+    >>> verticality = tree.getVerticalityAt(400.0)
+    >>> verticality
+    <Verticality 400.0 {}>
+    >>> el = stream.timespans.makeElement(verticality, 2.0)
+    >>> el
+    <music21.note.Rest rest>
     '''
     if verticality.pitchSet:
         element = chord.Chord(sorted(verticality.pitchSet))
@@ -170,8 +189,6 @@ def listOfTimespanCollectionsByClass(
     >>> timespanCollections
     [<TimespanCollection {12} (0.0 to 8.0) <music21.stream.Score ...>>, 
      <TimespanCollection {4} (0.0 to 0.0) <music21.stream.Score ...>>]
-    
-    
     '''
     if currentParentage is None:
         currentParentage = (inputStream,)
@@ -306,40 +323,38 @@ def timespansToChordifiedStream(timespans, templateStream=None):
     A "template" score may be used to provide measure and time-signature
     information.
 
-    ::
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> chordifiedScore = stream.timespans.timespansToChordifiedStream(
-        ...     tree, templateStream=score)
-        >>> chordifiedScore.show('text')
-        {0.0} <music21.stream.Measure 0 offset=0.0>
-            {0.0} <music21.clef.TrebleClef>
-            {0.0} <music21.key.KeySignature of 3 sharps, mode minor>
-            {0.0} <music21.meter.TimeSignature 4/4>
-            {0.0} <music21.chord.Chord A3 E4 C#5>
-            {0.5} <music21.chord.Chord G#3 B3 E4 B4>
-        {1.0} <music21.stream.Measure 1 offset=1.0>
-            {0.0} <music21.chord.Chord F#3 C#4 F#4 A4>
-            {1.0} <music21.chord.Chord G#3 B3 E4 B4>
-            {2.0} <music21.chord.Chord A3 E4 C#5>
-            {3.0} <music21.chord.Chord G#3 B3 E4 E5>
-        {5.0} <music21.stream.Measure 2 offset=5.0>
-            {0.0} <music21.chord.Chord A3 E4 C#5>
-            {0.5} <music21.chord.Chord C#3 E4 A4 C#5>
-            {1.0} <music21.chord.Chord E3 E4 G#4 B4>
-            {1.5} <music21.chord.Chord E3 D4 G#4 B4>
-            {2.0} <music21.chord.Chord A2 C#4 E4 A4>
-            {3.0} <music21.chord.Chord E#3 C#4 G#4 C#5>
-        {9.0} <music21.stream.Measure 3 offset=9.0>
-            {0.0} <music21.layout.SystemLayout>
-            {0.0} <music21.chord.Chord F#3 C#4 F#4 A4>
-            {0.5} <music21.chord.Chord B2 D4 G#4 B4>
-            {1.0} <music21.chord.Chord C#3 C#4 E#4 G#4>
-            {1.5} <music21.chord.Chord C#3 B3 E#4 G#4>
-            {2.0} <music21.chord.Chord F#2 A3 C#4 F#4>
-            {3.0} <music21.chord.Chord F#3 C#4 F#4 A4>
-        ...
+    >>> score = corpus.parse('bwv66.6')
+    >>> tree = score.asTimespans()
+    >>> chordifiedScore = stream.timespans.timespansToChordifiedStream(
+    ...     tree, templateStream=score)
+    >>> chordifiedScore.show('text')
+    {0.0} <music21.stream.Measure 0 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.key.KeySignature of 3 sharps, mode minor>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.chord.Chord A3 E4 C#5>
+        {0.5} <music21.chord.Chord G#3 B3 E4 B4>
+    {1.0} <music21.stream.Measure 1 offset=1.0>
+        {0.0} <music21.chord.Chord F#3 C#4 F#4 A4>
+        {1.0} <music21.chord.Chord G#3 B3 E4 B4>
+        {2.0} <music21.chord.Chord A3 E4 C#5>
+        {3.0} <music21.chord.Chord G#3 B3 E4 E5>
+    {5.0} <music21.stream.Measure 2 offset=5.0>
+        {0.0} <music21.chord.Chord A3 E4 C#5>
+        {0.5} <music21.chord.Chord C#3 E4 A4 C#5>
+        {1.0} <music21.chord.Chord E3 E4 G#4 B4>
+        {1.5} <music21.chord.Chord E3 D4 G#4 B4>
+        {2.0} <music21.chord.Chord A2 C#4 E4 A4>
+        {3.0} <music21.chord.Chord E#3 C#4 G#4 C#5>
+    {9.0} <music21.stream.Measure 3 offset=9.0>
+        {0.0} <music21.layout.SystemLayout>
+        {0.0} <music21.chord.Chord F#3 C#4 F#4 A4>
+        {0.5} <music21.chord.Chord B2 D4 G#4 B4>
+        {1.0} <music21.chord.Chord C#3 C#4 E#4 G#4>
+        {1.5} <music21.chord.Chord C#3 B3 E#4 G#4>
+        {2.0} <music21.chord.Chord F#2 A3 C#4 F#4>
+        {3.0} <music21.chord.Chord F#3 C#4 F#4 A4>
+    ...
 
     TODO: Remove assert
     '''
@@ -366,7 +381,8 @@ def timespansToChordifiedStream(timespans, templateStream=None):
                 measureIndex += 1
             verticality = timespans.getVerticalityAt(startOffset)
             quarterLength = stopOffset - startOffset
-            assert 0 < quarterLength, verticality
+            if (quarterLength < 0):
+                raise TimespanException("Something is wrong with the verticality %r, its stopOffset %f is less than its startOffset %f" % (verticality, stopOffset, startOffset))
             element = makeElement(verticality, quarterLength)
             outputStream[measureIndex].append(element)
         return outputStream
@@ -376,7 +392,8 @@ def timespansToChordifiedStream(timespans, templateStream=None):
         for startOffset, stopOffset in zip(allOffsets, allOffsets[1:]):
             verticality = timespans.getVerticalityAt(startOffset)
             quarterLength = stopOffset - startOffset
-            assert 0 < quarterLength, verticality
+            if (quarterLength < 0):
+                raise TimespanException("Something is wrong with the verticality %r, its stopOffset %f is less than its startOffset %f" % (verticality, stopOffset, startOffset))
             element = makeElement(verticality, quarterLength)
             elements.append(element)
         outputStream = stream.Score()

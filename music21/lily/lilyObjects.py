@@ -292,7 +292,7 @@ class LyLilypondTop(LyObject):
         return self.newlineSeparateStringOutputIfNotNone(self.contents)
 
 class LyTopLevelExpression(LyObject):
-    '''
+    r'''
     can contain one of:
     
       lilypondHeader
@@ -303,6 +303,11 @@ class LyTopLevelExpression(LyObject):
       fullMarkup
       fullMarkupList
       outputDef
+      
+    >>> bookBlock = lily.lilyObjects.LyBookBlock()
+    >>> lytle = lily.lilyObjects.LyTopLevelExpression(bookBlock=bookBlock)
+    >>> str(lytle)
+    '\\book  { } '
     '''
     
     
@@ -329,7 +334,13 @@ class LyTopLevelExpression(LyObject):
             return outputObject.stringOutput()
     
 class LyLilypondHeader(LyObject):
+    r'''
+    A header object with a headerbody
     
+    >>> lyh = lily.lilyObjects.LyLilypondHeader()
+    >>> str(lyh)
+    '\\header { } '
+    '''
     def __init__(self, lilypondHeaderBody = None):
         LyObject.__init__(self)        
         self.lilypondHeaderBody = lilypondHeaderBody
@@ -348,6 +359,10 @@ class LyEmbeddedScm(LyObject):
     But a lot of standard lilypond functions are actually embedded scheme.
     For instance, \clef, which as http://lilypond.org/doc/v2.12/input/lsr/lilypond-snippets/Pitches#Tweaking-clef-properties
     shows is a macro to run a lot of \set commands.
+    
+    >>> lyscheme = lily.lilyObjects.LyEmbeddedScm('##t')
+    >>> str(lyscheme)
+    '##t'
     '''
     
     def __init__(self, content = None):

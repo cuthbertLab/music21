@@ -17,7 +17,7 @@
 import os, sys
 
 from music21 import common
-from music21.test import test
+from music21.test import testSingleCoreAll as test
 
 
 # see feature list here:

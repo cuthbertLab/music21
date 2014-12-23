@@ -74,11 +74,23 @@ class RTToken(object):
     A multi-pass parsing procedure is likely necessary, as RomanText permits
     variety of groupings and markings.
 
-    ::
+    >>> rtt = romanText.RTToken('||:')
+    >>> rtt
+    <RTToken '||:'>
     
-        >>> rtt = romanText.RTToken('||:')
-        >>> rtt
-        <RTToken '||:'>
+    A standard RTToken returns `False` for all of the following.
+    
+    >>> rtt.isComposer() or rtt.isTitle() or rtt.isPiece()
+    False
+    >>> rtt.isAnalyst() or rtt.isProofreader()
+    False
+    >>> rtt.isTimeSignature() or rtt.isKeySignature() or rtt.isNote()
+    False
+    >>> rtt.isForm() or rtt.isPedal() or rtt.isMeasure() or rtt.isWork()
+    False
+    >>> rtt.isMovement() or rtt.isAtom()
+    False
+
 
     '''
     def __init__(self, src=u''):
@@ -403,6 +415,9 @@ class RTMeasure(RTToken):
     [15]
     >>> rtm.repeatLetter
     ['a']
+    >>> rtm.isMeasure()
+    True
+    
 
     '''
     def __init__(self, src =u''):
@@ -522,6 +537,10 @@ class RTAtom(RTToken):
 
     >>> chordIV = romanText.RTAtom('IV')
     >>> beat4 = romanText.RTAtom('b4')
+    >>> beat4
+    <RTAtom 'b4'>
+    >>> beat4.isAtom()
+    True
     
     However, see RTChord, RTBeat, etc. which are subclasses of RTAtom
     specifically for storing chords, beats, etc.
@@ -545,6 +564,8 @@ class RTChord(RTAtom):
     the container.
     
     >>> chordIV = romanText.RTChord('IV')
+    >>> chordIV
+    <RTChord 'IV'>
     '''
     
     def __init__(self, src =u'', container=None):
@@ -584,8 +605,9 @@ class RTBeat(RTAtom):
     r'''An RTAtom subclass that defines a beat definition.  Also contains a
     reference to the container.
     
-    
     >>> beatFour = romanText.RTBeat('b4')
+    >>> beatFour
+    <RTBeat 'b4'>
     '''
     def __init__(self, src =u'', container=None):
         RTAtom.__init__(self, src, container)
@@ -630,9 +652,9 @@ class RTBeat(RTAtom):
             # assume not more than 2 decimals are given
             elif len(parts) == 3:
                 if parts[1] == '66' and parts[2] == '5':
-                    add = .833333333333333333333
+                    add = 5./6
                 elif parts[1] == '0' and parts[2] == '5':
-                    add = .16666666666666666666
+                    add = 1./6
                 else: 
                     raise RTTokenException('cannot handle specification: %s' %  self.src)
                 beat = int(parts[0]) + add
@@ -655,8 +677,12 @@ class RTBeat(RTAtom):
 
 
 class RTKeyTypeAtom(RTAtom):
-    '''RTKeyTypeAtoms contain utility functions for all Key-type tokensi, i.e.
+    '''RTKeyTypeAtoms contain utility functions for all Key-type tokens, i.e.
     RTKey, RTAnalyticKey, but not KeySignature.
+
+    >>> gminor = romanText.RTKeyTypeAtom('g;:')
+    >>> gminor
+    <RTKeyTypeAtom 'g;:'>
     '''
 
     def __repr__(self):
@@ -768,6 +794,12 @@ class RTKeySignature(RTAtom):
 
 
 class RTOpenParens(RTAtom):
+    '''
+    A simple open parenthesis Atom with a sensible default
+    
+    >>> romanText.RTOpenParens('(')
+    <RTOpenParens '('>
+    '''
     def __init__(self, src =u'(', container=None):
         RTAtom.__init__(self, src, container)
 
@@ -776,6 +808,12 @@ class RTOpenParens(RTAtom):
 
 
 class RTCloseParens(RTAtom):
+    '''
+    A simple close parenthesis Atom with a sensible default
+    
+    >>> romanText.RTCloseParens(')')
+    <RTCloseParens ')'>
+    '''
     def __init__(self, src =u')', container=None):
         RTAtom.__init__(self, src, container)
 
@@ -846,8 +884,18 @@ class RTOptionalKeyClose(RTAtom):
 
 
 class RTPhraseMarker(RTAtom):
+    '''
+    A Phrase Marker:
+    
+    >>> rtpm = romanText.RTPhraseMarker('')
+    >>> rtpm
+    <RTPhraseMarker ''>
+    '''
     def __init__(self, src=u'', container=None):
         RTAtom.__init__(self, src, container)
+
+    def __repr__(self):
+        return '<RTPhraseMarker %r>' % self.src
         
 
 class RTPhraseBoundary(RTPhraseMarker):
@@ -1073,7 +1121,8 @@ class RTHandler(object):
         return post
 
     def tokenize(self, src):
-        '''Walk the RT string, creating RT objects along the way.
+        '''
+        Walk the RT string, creating RT objects along the way.
         '''
         # break into lines
         lines = src.split('\n')
@@ -1083,7 +1132,8 @@ class RTHandler(object):
         self._tokens += self.tokenizeBody(linesBody)        
 
     def process(self, src):
-        '''Given an entire specification as a single source string, strSrc.
+        '''
+        Given an entire specification as a single source string, strSrc, tokenize it.
         This is usually provided in a file. 
         '''
         self._tokens = []
@@ -1212,7 +1262,8 @@ class RTHandler(object):
 #-------------------------------------------------------------------------------
 
 class RTFile(object):
-    '''Roman Text File access.
+    '''
+    Roman Text File access.
     '''
     
     def __init__(self): 

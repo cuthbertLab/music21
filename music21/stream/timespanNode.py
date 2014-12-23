@@ -4,6 +4,7 @@
 # Purpose:      Internal data structures for timespan collections
 #
 # Authors:      Josiah Wolf Oberholtzer
+#               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2013-14 Michael Scott Cuthbert and the music21
 #               Project

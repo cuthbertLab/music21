@@ -17,11 +17,11 @@ Tools for performing voice-leading analysis with timespans.
 import collections
 import unittest
 
-from music21 import base
-from music21 import common
+#from music21 import base
+#from music21 import common
 from music21 import chord
 from music21 import environment
-from music21 import key
+#from music21 import key
 from music21 import pitch
 
 environLocal = environment.Environment("stream.timespanAnalysis")
@@ -839,111 +839,111 @@ class VerticalitySequence(collections.Sequence):
 #------------------------------------------------------------------------------
 
 
-class VoiceLeadingQuartet(common.SlottedObject):
-
-    ### CLASS VARIABLES ###
-
-    __slots__ = (
-        '_key_signature',
-        '_voiceOneNoteOne',
-        '_voiceOneNoteTwo',
-        '_voiceTwoNoteOne',
-        '_voiceTwoNoteTwo',
-        )
-
-    ### INITIALIZER ###
-
-    def __init__(
-        self,
-        voiceOneNoteOne=None,
-        voiceOneNoteTwo=None,
-        voiceTwoNoteOne=None,
-        voiceTwoNoteTwo=None,
-        key_signature=None,
-        ):
-        base.Music21Object.__init__(self)
-        if key_signature is None:
-            key_signature = key.Key('C')
-        self._key_signature = key.Key(key_signature)
-        self._voiceOneNoteOne = voiceOneNoteOne
-        self._voiceOneNoteTwo = voiceOneNoteTwo
-        self._voiceTwoNoteOne = voiceTwoNoteOne
-        self._voiceTwoNoteTwo = voiceTwoNoteTwo
-
-    ### PUBLIC METHODS ###
-
-    def hasAntiParallelMotion(self):
-        pass
-
-    def hasContraryMotion(self):
-        pass
-
-    def hasHiddenFifth(self):
-        pass
-
-    def hasHiddenInterval(self, expr):
-        pass
-
-    def hasHiddenOctave(self):
-        pass
-
-    def hasImproperResolution(self):
-        pass
-
-    def hasInwardContraryMotion(self):
-        pass
-
-    def hasNoMotion(self):
-        pass
-
-    def hasObliqueMotion(self):
-        pass
-
-    def hasOutwardContraryMotion(self):
-        pass
-
-    def hasParallelFifth(self):
-        pass
-
-    def hasParallelInterval(self, expr):
-        pass
-
-    def hasParallelMotion(self):
-        pass
-
-    def hasParallelOctave(self):
-        pass
-
-    def hasParallelUnison(self):
-        pass
-
-    def hasParallelUnisonOrOctave(self):
-        pass
-
-    def hasSimilarMotion(self):
-        pass
-
-    ### PUBLIC PROPERTIES ###
-
-    @property
-    def key_signature(self):
-        return self._key_signature
-
-    @property
-    def voiceOneNoteOne(self):
-        return self._voiceOneNoteOne
-
-    @property
-    def voiceOneNoteTwo(self):
-        return self._voiceOneNoteTwo
-
-    @property
-    def voiceTwoNoteOne(self):
-        return self._voiceTwoNoteOne
-
-    @property
-    def voiceTwoNoteTwo(self):
-        return self._voiceTwoNoteTwo
+# class VoiceLeadingQuartet(common.SlottedObject):
+# 
+#     ### CLASS VARIABLES ###
+# 
+#     __slots__ = (
+#         '_key_signature',
+#         '_voiceOneNoteOne',
+#         '_voiceOneNoteTwo',
+#         '_voiceTwoNoteOne',
+#         '_voiceTwoNoteTwo',
+#         )
+# 
+#     ### INITIALIZER ###
+# 
+#     def __init__(
+#         self,
+#         voiceOneNoteOne=None,
+#         voiceOneNoteTwo=None,
+#         voiceTwoNoteOne=None,
+#         voiceTwoNoteTwo=None,
+#         key_signature=None,
+#         ):
+#         base.Music21Object.__init__(self)
+#         if key_signature is None:
+#             key_signature = key.Key('C')
+#         self._key_signature = key.Key(key_signature)
+#         self._voiceOneNoteOne = voiceOneNoteOne
+#         self._voiceOneNoteTwo = voiceOneNoteTwo
+#         self._voiceTwoNoteOne = voiceTwoNoteOne
+#         self._voiceTwoNoteTwo = voiceTwoNoteTwo
+# 
+#     ### PUBLIC METHODS ###
+# 
+#     def hasAntiParallelMotion(self):
+#         pass
+# 
+#     def hasContraryMotion(self):
+#         pass
+# 
+#     def hasHiddenFifth(self):
+#         pass
+# 
+#     def hasHiddenInterval(self, expr):
+#         pass
+# 
+#     def hasHiddenOctave(self):
+#         pass
+# 
+#     def hasImproperResolution(self):
+#         pass
+# 
+#     def hasInwardContraryMotion(self):
+#         pass
+# 
+#     def hasNoMotion(self):
+#         pass
+# 
+#     def hasObliqueMotion(self):
+#         pass
+# 
+#     def hasOutwardContraryMotion(self):
+#         pass
+# 
+#     def hasParallelFifth(self):
+#         pass
+# 
+#     def hasParallelInterval(self, expr):
+#         pass
+# 
+#     def hasParallelMotion(self):
+#         pass
+# 
+#     def hasParallelOctave(self):
+#         pass
+# 
+#     def hasParallelUnison(self):
+#         pass
+# 
+#     def hasParallelUnisonOrOctave(self):
+#         pass
+# 
+#     def hasSimilarMotion(self):
+#         pass
+# 
+#     ### PUBLIC PROPERTIES ###
+# 
+#     @property
+#     def key_signature(self):
+#         return self._key_signature
+# 
+#     @property
+#     def voiceOneNoteOne(self):
+#         return self._voiceOneNoteOne
+# 
+#     @property
+#     def voiceOneNoteTwo(self):
+#         return self._voiceOneNoteTwo
+# 
+#     @property
+#     def voiceTwoNoteOne(self):
+#         return self._voiceTwoNoteOne
+# 
+#     @property
+#     def voiceTwoNoteTwo(self):
+#         return self._voiceTwoNoteTwo
 
 
 #------------------------------------------------------------------------------
