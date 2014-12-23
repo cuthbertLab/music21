@@ -9,9 +9,11 @@
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
 '''
+.. codeauthor:: Chistopher Antila <christopher@antila.ca>
+
 These are the public methods for the MEI module.
 
-To convert a string with MEI markup into music21 objects, use :func:`convertFromString`.
+To convert a string with MEI markup into music21 objects, use :meth:`MeiToM21Converter.convertFromString`.
 
 In the future, most of the functions in this module should be moved to a separate, import-only
 module, so that functions for writing music21-to-MEI will fit nicely.
@@ -82,35 +84,70 @@ The following elements are not yet imported, though you might expect they would 
 
 **Where Elements Are Processed**
 
-Many elements are handled in a function called :func:`tagFromElement`, where "tag" is replaced by
-the element's tag name (e.g., :func:`staffDefFromElement` for <staffDef> elements). These public
-functions perform a transformation operation from a Python :class:`~xml.etree.ElementTree.Element`
-object to its corresponding music21 element.
+Most elements are processed in functions called :func:`tagFromElement`, where "tag" is replaced by
+the element's tag name (e.g., :func:`staffDefFromElement` for <staffDef> elements). These functions
+convert from a Python :class:`xml.etree.ElementTree.Element` object to the appropriate music21 object.
 
-However, certain elements are processed primarily in another way, by private functions. Rather than
-transforming an :class:`Element` object into a music21 object, these modify the MEI document tree
-by adding instructions for the :func:`tagFromElement` functions. The elements processed by private
-functions include:
+However, certain elements are processed primarily in another way, by "private" functions that are not
+documented in this API. Rather than converting an :class:`Element` object into a music21 object,
+these functions modify the MEI document tree by adding instructions for the :func:`tagFromElement`
+functions. The elements processed by private functions include:
 
 * <slur>
 * <tie>
 * <beamSpan>
 * <tupletSpan>
 
+Whereas you can expect functions like :func:`clefFromElement` to convert a <clef> into a :class:`Clef`
+with no loss of information. Because we cannot provide a simple one-to-one conversion for  slurs,
+ties, and tuplets, we have kept their conversion functions "private," to emphasize the fact that you
+must use the :class:`MeiToM21Converter` to process them properly.
+
 **Guidelines for Encoders**
 
-While we aim for the best possible compatibility, the MEI specification is large. The following
+While we aim for the best possible compatibility, the MEI specification is very large. The following
 guidelines will help you produce a file that this MEI-to-music21 module will import correctly and
-in the most efficient way, but should not necessarily be considered recommendations when encoding
-for any other context.
+in the most efficient way. These should not necessarily be considered recommendations when using
+MEI in any other context.
 
 * Tuplets indicated only in a @tuplet attribute do not work.
-* For elements that allow @startid, @endid, and @plist attributes, use all three. This is especially
-  important for tuplets.
+* For elements that allow @startid, @endid, and @plist attributes, use all three for faster importing.
+* For a <tupletSpan> that does not specify a @plist attribute, a tuplet spanning more than two
+  measures will always and unavoidably be imported incorrectly.
 * For any tuplet, specify at least @num and @numbase. The module refuses to import a tuplet that
   does not have the @numbase attribute.
-* Retain consistent @n values for the same voice, staff, and instrument throughout the score.
-* Always indicate the duration of an <mRest> element.
+* Retain consistent @n values for the same layer, staff, and instrument throughout the score.
+* Always indicate the duration of <mRest> and <mSpace> elements.
+
+**List of Supported Elements**
+
+Alphabetical list of the elements currently supported by this module:
+
+* :func:`accidFromElement`
+* :func:`articFromElement`
+* :func:`beamFromElement`
+* :func:`chordFromElement`
+* :func:`clefFromElement`
+* :func:`dotFromElement`
+* :func:`instrDefFromElement`
+* :func:`layerFromElement`
+* :func:`measureFromElement`
+* :func:`noteFromElement`
+* :func:`spaceFromElement`
+* :func:`mSpaceFromElement`
+* :func:`restFromElement`
+* :func:`mRestFromElement`
+* :func:`scoreFromElement`
+* :func:`sectionFromElement`
+* :func:`scoreDefFromElement`
+* :func:`staffFromElement`
+* :func:`staffDefFromElement`
+* :func:`staffGrpFromElement`
+* :func:`tupletFromElement`
+
+To know which MEI attributes are known to import correctly, read the documentation for the relevant
+element. For example, to know whether the @color attribute on a <note> element is supported, read
+the "Attributes/Elements Implemented" section of the :func:`noteFromElement` documentation.
 '''
 
 # Determine which ElementTree implementation to use.
@@ -1029,7 +1066,7 @@ def _tieFromAttr(attr):
 
 def addSlurs(elem, obj, slurBundle):
     '''
-    If relevant, add a slur to an ``obj``ect that was created from an ``elem``ent.
+    If relevant, add a slur to an ``obj`` (object) that was created from an ``elem`` (element).
 
     :param elem: The :class:`Element` that caused creation of the ``obj``.
     :type elem: :class:`xml.etree.ElementTree.Element`
@@ -1095,7 +1132,7 @@ def addSlurs(elem, obj, slurBundle):
 
 def beamTogether(someThings):
     '''
-    Beam some things together. The function beams every object that has a :attrib:`beams` attribute,
+    Beam some things together. The function beams every object that has a :attr:`beams` attribute,
     leaving the other objects unmodified.
 
     :param things: An iterable of things to beam together.
@@ -1251,7 +1288,7 @@ def scaleToTuplet(objs, elem):
         or an iterable; the return type corresponds to the input type.
     :type objs: (list of) :class:`~music21.base.Music21Object`
     :param elem: An :class:`Element` with the appropriate attributes (as specified above).
-    :type elem: :class:`xml.etree.ElementTree.Element
+    :type elem: :class:`xml.etree.ElementTree.Element`
     :returns: ``objs`` with scaled durations.
     :rtype: (list of) :class:`~music21.base.Music21Object`
     '''
@@ -1373,7 +1410,7 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     Note that it is the caller's responsibility to determine the right action if there are
     conflicting objects in the returned dictionary.
 
-    For example:::
+    For example:
 
     >>> meiDoc = """<?xml version="1.0" encoding="UTF-8"?>
     ... <scoreDef meter.count="3" meter.unit="4" xmlns="http://www.music-encoding.org/ns/mei">
@@ -3085,7 +3122,29 @@ def scoreFromElement(elem, slurBundle):
 
 
 #------------------------------------------------------------------------------
-_DOC_ORDER = [noteFromElement, restFromElement]
+_DOC_ORDER = [
+    accidFromElement,
+    articFromElement,
+    beamFromElement,
+    chordFromElement,
+    clefFromElement,
+    dotFromElement,
+    instrDefFromElement,
+    layerFromElement,
+    measureFromElement,
+    noteFromElement,
+    spaceFromElement,
+    mSpaceFromElement,
+    restFromElement,
+    mRestFromElement,
+    scoreFromElement,
+    sectionFromElement,
+    scoreDefFromElement,
+    staffFromElement,
+    staffDefFromElement,
+    staffGrpFromElement,
+    tupletFromElement,
+    ]
 
 class Test(unittest.TestCase):
     '''
