@@ -351,7 +351,11 @@ class Sites(common.SlottedObject):
 
         updateNotAdd = False
         if idKey in self.siteDict:
-            updateNotAdd = True
+            tempSiteRef = self.siteDict[idKey]
+            if (tempSiteRef.isDead is False and
+                tempSiteRef.site is not None):
+                updateNotAdd = True
+
             #if idKey is not None:
             #    print "Updating idKey %s for object %s" % (idKey, id(obj))
 
@@ -497,24 +501,28 @@ class Sites(common.SlottedObject):
         This will recursively search the defined contexts of existing defined
         contexts, and return a list of all objects that match the given class.
 
-        ::
+        >>> import music21
+        >>> class Mock(music21.Music21Object):
+        ...    pass
+        ...
+        >>> class Mocker(music21.Music21Object):
+        ...    pass
+        ...
+        >>> aObj = Mock()
+        >>> bObj = Mock()
+        >>> cObj = Mocker()
+        >>> dc = music21.Sites()
+        >>> dc.add(aObj)
+        >>> dc.add(bObj)
+        >>> dc.add(cObj)
+        >>> dc.getAllByClass(Mock) == [aObj, bObj]
+        True
 
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...    pass
-            ...
-            >>> class Mocker(music21.Music21Object):
-            ...    pass
-            ...
-            >>> aObj = Mock()
-            >>> bObj = Mock()
-            >>> cObj = Mocker()
-            >>> dc = music21.Sites()
-            >>> dc.add(aObj)
-            >>> dc.add(bObj)
-            >>> dc.add(cObj)
-            >>> dc.getAllByClass(Mock) == [aObj, bObj]
-            True
+        A string (case insensitive) can also be used:
+        
+        >>> dc.getAllByClass("mock") == [aObj, bObj]
+        True
+
 
         '''
         if memo is None:
@@ -558,32 +566,31 @@ class Sites(common.SlottedObject):
         Given an attribute name, search all objects and find the first that
         matches this attribute name; then return a reference to this attribute.
 
-        ::
+         >>> import music21
+        >>> class Mock(music21.Music21Object):
+        ...     attr1 = 234
+        ...
+        >>> aObj = Mock()
+        >>> aObj.attr1 = 234
+        >>> bObj = Mock()
+        >>> bObj.attr1 = 98
+        >>> aSites = music21.Sites()
+        >>> aSites.add(aObj)
+        >>> len(aSites)
+        1
 
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     attr1 = 234
-            ...
-            >>> aObj = Mock()
-            >>> aObj.attr1 = 234
-            >>> bObj = Mock()
-            >>> bObj.attr1 = 98
-            >>> aSites = music21.Sites()
-            >>> aSites.add(aObj)
-            >>> len(aSites)
-            1
+        >>> aSites.getAttrByName('attr1') == 234
+        True
 
-        ::
+        >>> aSites.remove(aObj)
+        >>> aSites.add(bObj)
+        >>> aSites.getAttrByName('attr1') == 98
+        True
 
-            >>> aSites.getAttrByName('attr1') == 234
-            True
-
-        ::
-
-            >>> aSites.remove(aObj)
-            >>> aSites.add(bObj)
-            >>> aSites.getAttrByName('attr1') == 98
-            True
+        An incorrect attribute name will just give none:
+        
+        >>> aSites.getAttrByName('blah') is None
+        True
 
         '''
         post = None
@@ -618,26 +625,22 @@ class Sites(common.SlottedObject):
         The `getElementMethod` is a string that selects which Stream method is
         used to get elements for searching with getElementsByClass() calls.
 
-        ::
-
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     pass
-            ...
-            >>> import time
-            >>> aObj = Mock()
-            >>> bObj = Mock()
-            >>> aSites = music21.Sites()
-            >>> aSites.add(aObj)
-            >>> aSites.add(bObj)
-            >>> # we get the most recently added object first
-            >>> aSites.getObjByClass('Mock', sortByCreationTime=True) == bObj
-            True
+        >>> import music21
+        >>> class Mock(music21.Music21Object):
+        ...     pass
+        ...
+        >>> import time
+        >>> aObj = Mock()
+        >>> bObj = Mock()
+        >>> aSites = music21.Sites()
+        >>> aSites.add(aObj)
+        >>> aSites.add(bObj)
+        >>> # we get the most recently added object first
+        >>> aSites.getObjByClass('Mock', sortByCreationTime=True) == bObj
+        True
         
-        ::
-
-            >>> aSites.getObjByClass(Mock, sortByCreationTime=True) == bObj
-            True
+        >>> aSites.getObjByClass(Mock, sortByCreationTime=True) == bObj
+        True
 
         OMIT_FROM_DOCS
         TODO: not sure if memo is properly working: need a test case
@@ -719,7 +722,13 @@ class Sites(common.SlottedObject):
     def getById(self, siteId):
         '''
         Return the object specified by an id.
-        Used for testing and debugging.
+        Used for testing and debugging.  Should NOT be used in production code.
+        
+        >>> a = note.Note()
+        >>> s = stream.Stream()
+        >>> s.append(a)
+        >>> a.sites.getById(id(s)) is s
+        True
         '''
         siteRef = self.siteDict[siteId]
         # need to check if these is weakref
@@ -965,6 +974,17 @@ class Sites(common.SlottedObject):
         '''
         Return the number of non-dead sites, excluding the None site.  This does not
         unwrap weakrefs for performance.
+        
+        >>> a = note.Note()
+        >>> a.sites.getSiteCount()
+        0
+        >>> s = stream.Stream()
+        >>> s.append(a)
+        >>> a.sites.getSiteCount()
+        1
+        >>> sf = s.flat
+        >>> a.sites.getSiteCount()
+        2
         '''
         count = 0
         for idKey in self._locationKeys:
@@ -980,20 +1000,17 @@ class Sites(common.SlottedObject):
         '''
         Return a list of all site Ids.
 
-        ::
-
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     pass
-            ...
-            >>> aSite = Mock()
-            >>> bSite = Mock()
-            >>> dc = music21.Sites()
-            >>> dc.add(aSite, 0)
-            >>> dc.add(bSite) # a context
-            >>> dc.getSiteIds() == [id(aSite)]
-            True
-
+        >>> import music21
+        >>> class Mock(music21.Music21Object):
+        ...     pass
+        ...
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> dc = music21.Sites()
+        >>> dc.add(aSite, 0)
+        >>> dc.add(bSite) # a context
+        >>> dc.getSiteIds() == [id(aSite)]
+        True
         '''
         # may want to convert to tuple to avoid user editing?
         return self._locationKeys
@@ -1003,25 +1020,19 @@ class Sites(common.SlottedObject):
         Get all Site objects in .siteDict that are locations. 
         Note that this unwraps all sites from weakrefs and is thus an expensive operation.
 
-        ::
-        
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     pass
-            ...
-            >>> aObj = Mock()
-            >>> bObj = Mock()
-            >>> aSites = music21.Sites()
-            >>> aSites.add(aObj, 234)
-            >>> aSites.add(bObj, 3000)
-            >>> len(aSites._locationKeys) == 2
-            True
-
-        ::
-
-            >>> len(aSites.getSites()) == 2
-            True
-
+        >>> import music21
+        >>> class Mock(music21.Music21Object):
+        ...     pass
+        ...
+        >>> aObj = Mock()
+        >>> bObj = Mock()
+        >>> aSites = music21.Sites()
+        >>> aSites.add(aObj, 234)
+        >>> aSites.add(bObj, 3000)
+        >>> len(aSites.getSites())
+        2
+        >>> len(aSites.getSites(idExclude=[id(aObj)]))
+        1
         '''
 #         if idExclude is None:
 #             idExclude = [] # else, assume a list
