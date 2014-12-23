@@ -117,6 +117,7 @@ class TestMeiToM21Class(unittest.TestCase):
             self.assertEqual(base._WRONG_ROOT_ELEMENT.format('score-partwise'), theError.args[0])
 
 
+#------------------------------------------------------------------------------
 class TestThings(unittest.TestCase):
     '''Tests for utility functions.'''
 
