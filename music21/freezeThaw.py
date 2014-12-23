@@ -295,7 +295,7 @@ class StreamFreezer(StreamFreezeThawBase):
             elif el.isSpanner:
                 # works like a whole new hierarchy... # no need for deepcopy
                 subSF = StreamFreezer(
-                    el.spannedElements,
+                    el.spannerStorage,
                     fastButUnsafe=True,
                     streamIds=self.streamIds,
                     topLevel=False,
@@ -391,7 +391,7 @@ class StreamFreezer(StreamFreezeThawBase):
                 if el.isStream:
                     self.recursiveClearSites(el)
                 if el.isSpanner:
-                    self.recursiveClearSites(el.spannedElements)
+                    self.recursiveClearSites(el.spannerStorage)
                 if el.isVariant:
                     self.recursiveClearSites(el._stream)
                 if hasattr(el, '_derivation'):
@@ -815,8 +815,8 @@ class StreamThawer(StreamFreezeThawBase):
                 #    print el, el.offset, el.sites.siteDict
             elif e.isSpanner:
                 subSF = StreamThawer()
-                subSF.teardownSerializationScaffold(e.spannedElements)
-                e.spannedElements._elementsChanged()
+                subSF.teardownSerializationScaffold(e.spannerStorage)
+                e.spannerStorage._elementsChanged()
                 e._cache = {}
             elif e.isStream: 
                 self.restoreStreamStatusClient(e) # removing seems to create problems for jsonPickle with Spanners

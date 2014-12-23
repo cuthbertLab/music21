@@ -143,6 +143,7 @@ from music21 import corpus
 from music21 import interval
 from music21 import voiceLeading
 from music21 import roman
+from music21 import note
 from music21 import chord
 from music21 import key
 from music21.theoryAnalysis import theoryResult
@@ -324,7 +325,7 @@ def getVLQs(score, partNum1, partNum2):
     2
     '''
     from music21.stream import timespans
-    tsCol = timespans.streamToTimespanCollection(score)
+    tsCol = timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
     allVLQs = []
     defaultKey = None
     

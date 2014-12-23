@@ -151,7 +151,11 @@ class Chord(note.NotRest):
     _DOC_ATTR = {
     'isChord': 'Boolean read-only value describing if this GeneralNote object is a Chord. Is True',
     'isNote': 'Boolean read-only value describing if this GeneralNote object is a Note. Is False',
-    'isRest': 'Boolean read-only value describing if this GeneralNote object is a Rest. Is False',
+    'isRest': r'''Boolean read-only value describing if this GeneralNote object is a Rest. Is False
+        >>> c = chord.Chord()
+        >>> c.isRest
+        False    
+    ''',
     'beams': 'A :class:`music21.beam.Beams` object.',
     }
     # update inherited _DOC_ATTR dictionary
@@ -1398,7 +1402,6 @@ class Chord(note.NotRest):
         >>> a.inversion(1)
         >>> a
         <music21.chord.Chord B4 D5 F5 G5>
-        >>> a.inversion(1)
 
 
         With implicit octaves, D becomes the bass (since octaves start on C):

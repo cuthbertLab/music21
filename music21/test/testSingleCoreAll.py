@@ -33,10 +33,12 @@ environLocal = environment.Environment(_MOD)
 if six.PY2:
     try:
         import coverage
+        cov = coverage.coverage(omit=['*/ext/*'])
+        cov.start()
     except ImportError:
-        coverage = None
+        cov = None
 else:
-    coverage = None # coverage is extremely slow on Python 3.4 for some reason
+    cov = None # coverage is extremely slow on Python 3.4 for some reason
         # in any case we only need to run it once.
 
 #-------------------------------------------------------------------------------
@@ -229,21 +231,20 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False, limit=None):
         except ValueError:
             environLocal.printDebug('%s cannot load Doctests' % module)
             continue
+        
+        allLocals = [getattr(module, x) for x in dir(module)]
+        common.addDocAttrTestsToSuite(s1, allLocals, outerFilename=module.__file__, globs=globs, optionflags=docTestOptions)
     
     common.fixTestsForPy2and3(s1)
     
     environLocal.printDebug('running Tests...\n')
-    
-    if coverage is not None:
-        cov = coverage.coverage()
-        cov.start()
-        
+            
     with warnings.catch_warnings():
         warnings.simplefilter('ignore', RuntimeWarning)  # import modules...
         runner = unittest.TextTestRunner(verbosity=verbosity)
         finalTestResults = runner.run(s1)  
     
-    if coverage is not None:
+    if cov is not None:
         cov.stop()
         cov.save()
     

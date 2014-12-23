@@ -84,7 +84,7 @@ class ChordReducer(object):
         if 'Score' not in inputScore.classes:
             raise ChordReducerException("Must be called on a stream.Score")
 
-        tree = timespans.streamToTimespanCollection(inputScore)
+        tree = timespans.streamToTimespanCollection(inputScore, flatten=True, classList=(note.Note, chord.Chord))
 
         if allowableChords is not None:
             assert all(isinstance(x, chord.Chord) for x in allowableChords)

@@ -316,13 +316,13 @@ class Music21Object(object):
 
             >>> ks = key.KeySignature(3)
             >>> ks.classSortOrder
-            1
+            2
 
 
             New classes can define their own default classSortOrder
 
             >>> class ExampleClass(base.Music21Object):
-            ...     classSortOrderDefault = 5
+            ...     classSortOrder = 5
             ...
             >>> ec1 = ExampleClass()
             >>> ec1.classSortOrder
@@ -475,6 +475,9 @@ class Music21Object(object):
         Given a class filter list (a list or tuple must be submitted),
         which may have strings or class objects, determine
         if this class is of the provided classes or a subclasses.
+        
+        NOTE: this is a performance critical operation
+        for performance, only accept lists or tuples
         '''
         # NOTE: this is a performance critical operation
         # for performance, only accept lists or tuples
@@ -4359,38 +4362,43 @@ def mainTest(*testClasses, **kwargs):
 
     runAllTests = True
 
-    # start with doc tests, then add unit tests
+
+    failFast = bool(kwargs.get('failFast', True))
+    if failFast:
+        optionflags = (
+            doctest.ELLIPSIS |
+            doctest.NORMALIZE_WHITESPACE |
+            doctest.REPORT_ONLY_FIRST_FAILURE
+            )
+    else:
+        optionflags = (
+            doctest.ELLIPSIS |
+            doctest.NORMALIZE_WHITESPACE
+            )
+    
+    globs = None
     if ('noDocTest' in testClasses or 'noDocTest' in sys.argv
         or 'nodoctest' in sys.argv):
+        skipDoctest = True
+    else:
+        skipDoctest = False
+
+    # start with doc tests, then add unit tests
+    if skipDoctest:
         # create a test suite for storage
         s1 = unittest.TestSuite()
     else:
         # create test suite derived from doc tests
         # here we use '__main__' instead of a module
-        failFast = bool(kwargs.get('failFast', True))
-        if failFast:
-            optionflags = (
-                doctest.ELLIPSIS |
-                doctest.NORMALIZE_WHITESPACE |
-                doctest.REPORT_ONLY_FIRST_FAILURE
-                )
-        else:
-            optionflags = (
-                doctest.ELLIPSIS |
-                doctest.NORMALIZE_WHITESPACE
-                )
         if 'moduleRelative' in testClasses or 'moduleRelative' in sys.argv:
-            s1 = doctest.DocTestSuite(
-                '__main__',
-                optionflags=optionflags,
-                )
+            pass
         else:
             globs = __import__('music21').__dict__.copy()
-            s1 = doctest.DocTestSuite(
-                '__main__',
-                globs=globs,
-                optionflags=optionflags,
-                )
+        s1 = doctest.DocTestSuite(
+            '__main__',
+            globs=globs,
+            optionflags=optionflags,
+            )
 
     verbosity = 1
     if 'verbose' in testClasses or 'verbose' in sys.argv:
@@ -4437,6 +4445,18 @@ def mainTest(*testClasses, **kwargs):
             s2 = unittest.defaultTestLoader.loadTestsFromTestCase(t)
             s1.addTests(s2)
 
+    ### Add _DOC_ATTR tests...
+    if not skipDoctest:
+        import inspect
+        stacks = inspect.stack()
+        if len(stacks) > 1:
+            outerFrameTuple = stacks[1]
+        else:
+            outerFrameTuple = stacks[0]
+        outerFrame = outerFrameTuple[0]
+        outerFilename = outerFrameTuple[1]
+        localVariables = list(outerFrame.f_locals.values())
+        common.addDocAttrTestsToSuite(s1, localVariables, outerFilename, globs, optionflags)
 
     if runAllTests is True:
         common.fixTestsForPy2and3(s1)
