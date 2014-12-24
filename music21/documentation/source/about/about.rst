@@ -93,14 +93,9 @@ Their contributions and generosity are greatly appreciated.
   Her website contains all these chorales in additional formats.  Any discoveries we make 
   regarding these chorales are done in her memory.
 
-* `Walter B. Hewlett`_ and The Center for Computer Assisted Research in the Humanities (CCARH) 
-  have kindly given permission for distribution of musedata encoded files.
-
 * `Justin London`_ compiled and maintained the list of Second-Viennese row forms now available in serial.py.
 
 * `Manuel Op de Coul`_ has kindly gave permission to use the Scala scale archive of nearly 4000 scales in music21.
-
-* `Craig Sapp`_ has always been generous in discussions about MIR and has been a great collaborator.
 
 * `Seymour Shlien`_ has kindly given permission to distribute his ABC encodings of the Essen folksong database with music21.
 
@@ -114,8 +109,6 @@ Their contributions and generosity are greatly appreciated.
 .. _Michael Good: http://www.recordare.com
 .. _Margaret Greentree: http://www.jsbchorales.net
 .. _Justin London: http://www.people.carleton.edu/~jlondon/2ndviennese.htm
-.. _Walter B. Hewlett: http://www.ccarh.org
-.. _Craig Sapp: https://ccrma.stanford.edu/~craig/
 .. _Bryen Travis: http://www.bachcentral.com/
 .. _Ewa Dahlig-Turek: http://www.esac-data.org
 .. _Seymour Shlien: http://ifdo.pugmarks.com/~seymour/runabc/esac/esacdatabase.html

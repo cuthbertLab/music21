@@ -300,9 +300,6 @@ def demoGettingWorks():
     # Can parse data stored in MIDI files locally or online:
     s = converter.parse('http://www.jsbchorales.net/down/midi/010306b_.mid') # @UnusedVariable
 
-    # Can parse data stored in Kern files locally or online:
-    s = converter.parse('http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/371chorales&file=chor120.krn') # @UnusedVariable
-
 
 
 def demoBasic():
