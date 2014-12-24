@@ -1631,23 +1631,9 @@ class Test(unittest.TestCase):
 
 
     def testConversionMusedata(self):
-
-        from music21.musedata import testFiles
-
-        cmd = subConverters.ConverterMuseData()
-        cmd.parseData(testFiles.bach_cantata5_mvmt3)
-        unused_s = cmd.stream
-        #s.show()
-
-        # test data id
-        s = parse(testFiles.bach_cantata5_mvmt3)
-        self.assertEqual(s.metadata.title, 'Wo soll ich fliehen hin')
-        self.assertEqual(len(s.parts), 3)
-
-
-        fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
+        fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01')
         s = parse(fp)
-        self.assertEqual(len(s.parts), 4)
+        self.assertEqual(len(s.parts), 5)
         #s.show()
 
 
@@ -1666,17 +1652,17 @@ class Test(unittest.TestCase):
         self.assertEqual(post[:38], '<?xml version="1.0" encoding="UTF-8"?>')
         self.assertEqual(af.getNames(), ['musicXML.xml', 'META-INF/', 'META-INF/container.xml'])
 
-        # test from a file that ends in zip
-        # note: this is a stage1 file!
-        fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
-        af = ArchiveManager(fp)
-        # for now, only support zip
-        self.assertEqual(af.archiveType, 'zip')
-        self.assertEqual(af.isArchive(), True)
-        self.assertEqual(af.getNames(), ['01/', '01/04', '01/02', '01/03', '01/01'] )
-
-        # returns a list of strings
-        self.assertEqual(af.getData(dataFormat='musedata')[0][:30], '378\n1080  1\nBach Gesells\nchaft')
+#         # test from a file that ends in zip
+#         # note: this is a stage1 file!
+#         fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
+#         af = ArchiveManager(fp)
+#         # for now, only support zip
+#         self.assertEqual(af.archiveType, 'zip')
+#         self.assertEqual(af.isArchive(), True)
+#         self.assertEqual(af.getNames(), ['01/', '01/04', '01/02', '01/03', '01/01'] )
+# 
+#         # returns a list of strings
+#         self.assertEqual(af.getData(dataFormat='musedata')[0][:30], '378\n1080  1\nBach Gesells\nchaft')
 
 
         #mdw = musedataModule.MuseDataWork()

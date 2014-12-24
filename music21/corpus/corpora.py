@@ -765,7 +765,7 @@ class CoreCorpus(Corpus):
         >>> coreCorpus = corpus.CoreCorpus()
         >>> corpusFilePaths = coreCorpus.getPaths()
         >>> len(corpusFilePaths)
-        2508
+        2565
 
         >>> kernFilePaths = coreCorpus.getPaths('krn')
         >>> len(kernFilePaths) >= 500
@@ -905,7 +905,7 @@ class CoreCorpus(Corpus):
         Search the core corpus for metadata entries:
 
         >>> corpus.CoreCorpus().search('3/4')
-        <music21.metadata.bundles.MetadataBundle {1857 entries}>
+        <music21.metadata.bundles.MetadataBundle {1871 entries}>
 
         >>> corpus.CoreCorpus().search(
         ...      'bach',

@@ -1271,40 +1271,46 @@ class Test(unittest.TestCase):
 
         from music21 import features
 
-        s = corpus.parse('hwv56/movement3-05.md')
+        s = corpus.parse('corelli/opus3no1/1grave')
         di = features.DataInstance(s)
-        self.assertEqual(len(di['flat']), 57)
-        self.assertEqual(len(di['flat.notes']), 30)
+        self.assertEqual(len(di['flat']), 291)
+        self.assertEqual(len(di['flat.notes']), 238)
 
         #di['chordify'].show('t')
-        self.assertEqual(len(di['chordify']), 6)
-        self.assertEqual(len(di['chordify.getElementsByClass.Chord']), 30)
+        self.assertEqual(len(di['chordify']), 20)
+        self.assertEqual(len(di['chordify.getElementsByClass.Chord']), 144)
 
 
-        self.assertEqual(di['chordifySetClassHistogram'], {'2-2': 3, '2-3': 4, '2-4': 4, '2-5': 6, '1-1': 13})
+        self.assertEqual(di['chordifySetClassHistogram'], {'2-2': 6, '2-3': 12, '2-4': 21, '2-5': 5, 
+                                                           '3-10': 4, '3-11': 33, '3-2': 3, '3-4': 7,
+                                                           '3-6': 7, '3-7': 9, '3-8': 6, '3-9': 16,
+                                                           '1-1': 15})
 
-        self.assertEqual(di['chordifyPitchClassSetHistogram'], {'<8>': 2, '<3A>': 2, '<A>': 4, '<2A>': 2, '<09>': 1, '<03>': 1, '<3>': 2, '<37>': 1, '<79>': 3, '<58>': 1, '<7A>': 1, '<0>': 1, '<59>': 1, '<2>': 1, '<5A>': 4, '<5>': 3})
+        self.maxDiff = None
+        self.assertEqual(di['chordifyTypesHistogram'], {'isMinorTriad': 8, 'isAugmentedTriad': 0, 
+                                                        'isTriad': 37, 'isSeventh': 0, 'isDiminishedTriad': 4, 
+                                                        'isDiminishedSeventh': 0, 'isIncompleteMajorTriad': 21, 
+                                                        'isHalfDiminishedSeventh': 0, 'isMajorTriad': 25, 
+                                                        'isDominantSeventh': 0, 'isIncompleteMinorTriad': 12})
 
-        self.assertEqual(di['chordifyTypesHistogram'], {'isMinorTriad': 0, 'isAugmentedTriad': 0, 'isTriad': 0, 'isSeventh': 0, 'isDiminishedTriad': 0, 'isDiminishedSeventh': 0, 'isIncompleteMajorTriad': 4, 'isHalfDiminishedSeventh': 0, 'isMajorTriad': 0, 'isDominantSeventh': 0, 'isIncompleteMinorTriad': 4})
-
-        self.assertEqual(di['noteQuarterLengthHistogram'], {0.5: 16, 1.0: 5, 2.0: 4, 3.0: 1, 4.0: 2, 0.75: 1, 0.25: 1})
+        self.assertEqual(di['noteQuarterLengthHistogram'], {0.5: 116, 1.0: 39, 1.5: 27, 2.0: 31, 3.0: 2, 4.0: 3, 
+                                                            0.75: 4, 0.25: 16})
 
 
         # can access parts by index
-        self.assertEqual(len(di['parts']), 2)
+        self.assertEqual(len(di['parts']), 3)
         # stored in parts are StreamForms instances, caching their results
-        self.assertEqual(len(di['parts'][0]['flat.notes']), 22)
-        self.assertEqual(len(di['parts'][1]['flat.notes']), 8)
+        self.assertEqual(len(di['parts'][0]['flat.notes']), 71)
+        self.assertEqual(len(di['parts'][1]['flat.notes']), 66)
 
         # getting a measure by part
-        self.assertEqual(len(di['parts'][0]['getElementsByClass.Measure']), 5)
-        self.assertEqual(len(di['parts'][1]['getElementsByClass.Measure']), 5)
+        self.assertEqual(len(di['parts'][0]['getElementsByClass.Measure']), 19)
+        self.assertEqual(len(di['parts'][1]['getElementsByClass.Measure']), 19)
 
-        self.assertEqual(di['parts'][0]['pitchClassHistogram'], [0, 0, 3, 2, 0, 9, 0, 5, 0, 1, 2, 0])
-        self.assertEqual(di['parts'][1]['pitchClassHistogram'], [1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 3, 0])
+        self.assertEqual(di['parts'][0]['pitchClassHistogram'], [9, 1, 11, 0, 9, 13, 0, 11, 0, 12, 5, 0])
         # the sum of the two arrays is the pitch class histogram of the complete
         # work
-        self.assertEqual(di['pitchClassHistogram'], [1, 0, 3, 3, 0, 10, 0, 5, 1, 2, 5, 0])
+        self.assertEqual(di['pitchClassHistogram'], [47, 2, 25, 0, 25, 42, 0, 33, 0, 38, 22, 4])
 
 
     def testStreamFormsB(self):
@@ -1317,12 +1323,12 @@ class Test(unittest.TestCase):
         di = features.DataInstance(s)
         self.assertEqual(di['midiIntervalHistogram'], [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
-        # in most cases will want to get a vector for each part
-        s = corpus.parse('hwv56/movement3-05.md')
-        di = features.DataInstance(s)
-        self.assertEqual(di['parts'][0]['midiIntervalHistogram'], [9, 1, 4, 3, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-
-        self.assertEqual(di['parts'][1]['midiIntervalHistogram'], [0, 1, 3, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+#         # in most cases will want to get a vector for each part
+#         s = corpus.parse('corelli/opus3no1/1grave')
+#         di = features.DataInstance(s)
+#         self.assertEqual(di['parts'][0]['midiIntervalHistogram'], [9, 1, 4, 3, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+# 
+#         self.assertEqual(di['parts'][1]['midiIntervalHistogram'], [0, 1, 3, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 
     def testStreamFormsC(self):
@@ -1387,18 +1393,18 @@ class Test(unittest.TestCase):
         
         # add works, defining the class value 
         ds.addData('bwv66.6', classValue='Bach')
-        ds.addData('hwv56/movement3-05.md', classValue='Handel')
+        ds.addData('corelli/opus3no1/1grave', classValue='Corelli')
         
         ds.process()
 
         # manually create an output format and get output
         of = OutputCSV(ds)
         post = of.getString(lineBreak='//')
-        self.assertEqual(post, 'Identifier,Unique_Note_Quarter_Lengths,Most_Common_Note_Quarter_Length,Range_of_Note_Quarter_Lengths,Composer//bwv66.6,3,1.0,1.5,Bach//hwv56/movement3-05.md,7,0.5,3.75,Handel')
+        self.assertEqual(post, 'Identifier,Unique_Note_Quarter_Lengths,Most_Common_Note_Quarter_Length,Range_of_Note_Quarter_Lengths,Composer//bwv66.6,3,1.0,1.5,Bach//corelli/opus3no1/1grave,8,0.5,3.75,Corelli')
 
         # without id
         post = of.getString(lineBreak='//', includeId=False)
-        self.assertEqual(post, 'Unique_Note_Quarter_Lengths,Most_Common_Note_Quarter_Length,Range_of_Note_Quarter_Lengths,Composer//3,1.0,1.5,Bach//7,0.5,3.75,Handel')
+        self.assertEqual(post, 'Unique_Note_Quarter_Lengths,Most_Common_Note_Quarter_Length,Range_of_Note_Quarter_Lengths,Composer//3,1.0,1.5,Bach//8,0.5,3.75,Corelli')
 
         ds.write(format='tab')
         ds.write(format='csv')
@@ -1448,9 +1454,8 @@ class Test(unittest.TestCase):
         
         #worksBach = corpus.getBachChorales()[100:143] # a middle range
         worksMonteverdi = corpus.getMonteverdiMadrigals()[:43]
-        worksHandel = corpus.getHandelMessiah() # 43 total
         
-#         worksBach = corpus.getBachChorales()[:5] 
+        worksBach = corpus.getBachChorales()[:5] 
 #         worksMonteverdi = corpus.getMonteverdiMadrigals()[:5]
         
         # need to define what the class label will be
@@ -1462,8 +1467,8 @@ class Test(unittest.TestCase):
 #             ds.addData(w, classValue='Bach')
         for w in worksMonteverdi:
             ds.addData(w, classValue='Monteverdi')
-        for w in worksHandel:
-            ds.addData(w, classValue='Handel')
+        for w in worksBach:
+            ds.addData(w, classValue='Bach')
         
         # process with all feature extractors, store all features
         ds.process()
@@ -1707,6 +1712,8 @@ _DOC_ORDER = [FeatureExtractor]
 
 
 if __name__ == "__main__":
+    #import sys
+    #sys.argv.append('StreamFormsA')
     import music21
     music21.mainTest(Test)
     
