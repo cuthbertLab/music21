@@ -66,7 +66,7 @@ def getCorePaths(fileExtensions=None, expandExtensions=True):
     >>> from music21 import corpus
     >>> corpusFilePaths = corpus.getCorePaths()
     >>> len(corpusFilePaths)
-    3044
+    2505
 
     >>> kernFilePaths = corpus.getCorePaths('krn')
     >>> len(kernFilePaths) >= 500
@@ -250,12 +250,8 @@ def getComposer(composerName, fileExtensions=None):
     Note that xml and mxl are treated equivalently.
 
     >>> from music21 import corpus
-    >>> a = corpus.getComposer('beethoven')
-    >>> len(a) > 10
-    True
-
-    >>> a = corpus.getComposer('mozart')
-    >>> len(a) > 10
+    >>> a = corpus.getComposer('schoenberg')
+    >>> len(a) > 1
     True
 
     >>> a = corpus.getComposer('bach', 'krn')
@@ -280,18 +276,9 @@ def getComposerDir(composerName):
 
     >>> import os
     >>> from music21 import corpus
-    >>> a = corpus.getComposerDir('beethoven')
-    >>> a.endswith(os.path.join('corpus', os.sep, 'beethoven'))
-    True
-
     >>> a = corpus.getComposerDir('bach')
     >>> a.endswith(os.path.join('corpus', os.sep, 'bach'))
     True
-
-    >>> a = corpus.getComposerDir('mozart')
-    >>> a.endswith(os.path.join('corpus', os.sep, 'mozart'))
-    True
-
     '''
     return corpora.CoreCorpus().getComposerDirectoryPath(composerName)
 
@@ -319,28 +306,7 @@ def getWorkList(workName, movementNumber=None, fileExtensions=None):
     If no matches are found, an empty list is returned.
 
     >>> from music21 import corpus
-    >>> len(corpus.getWorkList('beethoven/opus18no1'))
-    8
-
-    >>> len(corpus.getWorkList('beethoven/opus18no1', 1))
-    2
-
-    >>> len(corpus.getWorkList('beethoven/opus18no1', 1, '.krn'))
-    1
-
-    >>> len(corpus.getWorkList('beethoven/opus18no1', 1, '.xml'))
-    1
-
-    >>> len(corpus.getWorkList('beethoven/opus18no1', 0, '.xml'))
-    0
-
-    >>> len(corpus.getWorkList('handel/hwv56', '1-02', '.md'))
-    1
-
-    >>> len(corpus.getWorkList('handel/hwv56', (2,1), '.md'))
-    1
-
-    >>> len(corpus.getWorkList('bach/artOfFugue_bwv1080', 2, '.md'))
+    >>> len(corpus.getWorkList('schumann_clara', 3, '.xml'))
     1
 
     Make sure that 'verdi' just gets the single Verdi piece and not the
@@ -520,14 +486,9 @@ def getWork(workName, movementNumber=None, fileExtensions=None):
 
     >>> import os
     >>> from music21 import corpus
-    >>> a = corpus.getWork('opus74no2', 4)
+    >>> a = corpus.getWork('luca/gloria')
     >>> a.endswith(os.path.sep.join([
-    ...     'haydn', 'opus74no2', 'movement4.mxl']))
-    True
-
-    >>> a = corpus.getWork(['haydn', 'opus74no2', 'movement4.xml'])
-    >>> a.endswith(os.path.sep.join([
-    ...     'haydn', 'opus74no2', 'movement4.mxl']))
+    ...     'luca', 'gloria.xml']))
     True
 
     >>> trecentoFiles = corpus.getWork('trecento')
@@ -769,22 +730,6 @@ def getBachChorales(fileExtensions='xml'):
     return cc.getBachChorales(fileExtensions=fileExtensions,)
 
 
-def getHandelMessiah(fileExtensions='md'):
-    '''
-    Return a list of the filenames of all parts of Handel's Messiah.
-
-
-    >>> from music21 import corpus
-    >>> a = corpus.getHandelMessiah()
-    >>> len(a)
-    43
-
-    '''
-    return corpora.CoreCorpus().getHandelMessiah(
-        fileExtensions=fileExtensions,
-        )
-
-
 def getMonteverdiMadrigals(fileExtensions='xml'):
     '''
     Return a list of the filenames of all Monteverdi madrigals.
@@ -798,30 +743,6 @@ def getMonteverdiMadrigals(fileExtensions='xml'):
     return corpora.CoreCorpus().getMonteverdiMadrigals(
         fileExtensions=fileExtensions,
         )
-
-
-def getBeethovenStringQuartets(fileExtensions=None):
-    '''
-    Return a list of all Beethoven String Quartet filenames.
-
-    >>> from music21 import corpus
-    >>> a = corpus.getBeethovenStringQuartets()
-    >>> len(a) > 10
-    True
-
-    >>> a = corpus.getBeethovenStringQuartets('krn')
-    >>> len(a) < 10 and len(a) > 0
-    True
-
-    >>> a = corpus.getBeethovenStringQuartets('xml')
-    >>> len(a) > 400
-    False
-
-    '''
-    return corpora.CoreCorpus().getBeethovenStringQuartets(
-        fileExtensions=fileExtensions,
-        )
-
 
 #------------------------------------------------------------------------------
 

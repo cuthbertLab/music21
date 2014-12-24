@@ -3184,21 +3184,6 @@ class TestExternal(unittest.TestCase):
     def runTest(self):
         pass
 
-#     def testInputDirectory(self, dirPath=None):
-#         if dirPath == None:
-#             from music21 import corpus
-#             fpList = corpus.mozart
-#         else:
-#             fpList = []
-#             for fn in os.listdir(dirPath):
-#                 fpList.append(os.path.join(dirPath, fName))
-# 
-#         for fp in fpList:
-#             if fp.endswith('.xml'):
-#                 print '='*20, fp
-#                 self.testOpen(fp)
-
-
 #     def testCompareDirectory(self, dirPath):
 #         c = Document()
 #         audit = 1
