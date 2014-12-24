@@ -957,16 +957,10 @@ class Test(unittest.TestCase):
         '''
         When the string starts with "mei:"
         '''
-        try:
-            # this works in Python 3.3+
+        if six.PY3:
             from unittest import mock  # pylint: disable=no-name-in-module
-        except ImportError:
-            try:
-                # system library overrides the built-in
-                import mock
-            except ImportError:
-                # last resort
-                from music21.ext import mock
+        else:
+            from music21.ext import mock
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             testConverter = ConverterMEI()
             testConverter.parseData('mei: <?xml><mei><note/></mei>')
@@ -976,16 +970,10 @@ class Test(unittest.TestCase):
         '''
         When the string doesn't start with "mei:"
         '''
-        try:
-            # this works in Python 3.3+
+        if six.PY3:
             from unittest import mock  # pylint: disable=no-name-in-module
-        except ImportError:
-            try:
-                # system library overrides the built-in
-                import mock
-            except ImportError:
-                # last resort
-                from music21.ext import mock
+        else:
+            from music21.ext import mock
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             testConverter = ConverterMEI()
             testConverter.parseData('<?xml><mei><note/></mei>')
@@ -997,16 +985,10 @@ class Test(unittest.TestCase):
         the "sibmei" plug-in for Sibelius.
         '''
         import music21  # to make the pathname later
-        try:
-            # this works in Python 3.3+
+        if six.PY3:
             from unittest import mock  # pylint: disable=no-name-in-module
-        except ImportError:
-            try:
-                # system library overrides the built-in
-                import mock
-            except ImportError:
-                # last resort
-                from music21.ext import mock
+        else:
+            from music21.ext import mock
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             from os import path
             testPath = path.join(music21.__path__[0], 'mei', 'test', 'notes_in_utf16.mei')
@@ -1019,16 +1001,10 @@ class Test(unittest.TestCase):
         For the sake of completeness, this is the same as testImportMei3() but with a UTF-8 file.
         '''
         import music21  # to make the pathname later
-        try:
-            # this works in Python 3.3+
+        if six.PY3:
             from unittest import mock  # pylint: disable=no-name-in-module
-        except ImportError:
-            try:
-                # system library overrides the built-in
-                import mock
-            except ImportError:
-                # last resort
-                from music21.ext import mock
+        else:
+            from music21.ext import mock
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             from os import path
             testPath = path.join(music21.__path__[0], 'mei', 'test', 'notes_in_utf8.mei')

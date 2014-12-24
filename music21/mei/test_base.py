@@ -27,17 +27,15 @@ Tests for :mod:`music21.mei.base`.
 # pylint is bad at guessing types in these tests---reasonably so
 # pylint: disable=maybe-no-member
 
+from music21.ext import six
+from six.moves import xrange  # pylint: disable=redefined-builtin,import-error,unused-import
+from six.moves import range  # pylint: disable=redefined-builtin,import-error,unused-import
+
 import unittest
-try:
-    # this works in Python 3.3+
+if six.PY3:
     from unittest import mock  # pylint: disable=no-name-in-module
-except ImportError:
-    try:
-        # system library overrides the built-in
-        import mock
-    except ImportError:
-        # last resort
-        from music21.ext import mock
+else:
+    from music21.ext import mock
 
 # To have working MagicMock objects, we can't use cElementTree even though it would be faster.
 # The C implementation provides some methods/attributes dynamically (notably "tag"), so MagicMock
@@ -60,10 +58,6 @@ from music21 import pitch
 from music21 import spanner
 from music21 import stream
 from music21 import tie
-
-from music21.ext import six
-from six.moves import xrange  # pylint: disable=redefined-builtin,import-error,unused-import
-from six.moves import range  # pylint: disable=redefined-builtin,import-error,unused-import
 
 # Importing from base.py
 import music21.mei.base as base
