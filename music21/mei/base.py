@@ -372,7 +372,7 @@ def makeDuration(base=0.0, dots=0):
     0.5
     '''
     returnDuration = duration.Duration(base)
-    returnDuration.dots = dots
+    returnDuration.dots = dots  # pylint: disable=assigning-non-slot
     return returnDuration
 
 
@@ -2970,12 +2970,12 @@ def sectionScoreCore(elem, allPartNs, slurBundle, **kwargs):
 
         elif sectionTag == eachElem.tag:
             # NOTE: same as scoreFE() (except the name of "inNextThing")
-            localParsed, activeMeter, nextMeasureLeft, backupMeasureNum = sectionFromElement(eachElem,
-                                                                                             allPartNs,
-                                                                                             activeMeter=activeMeter,
-                                                                                             nextMeasureLeft=nextMeasureLeft,
-                                                                                             backupMeasureNum=backupMeasureNum,
-                                                                                             slurBundle=slurBundle)
+            localParsed, activeMeter, nextMeasureLeft, backupMeasureNum = sectionFromElement(eachElem,  # pylint: disable=line-too-long
+                                                                                             allPartNs,  # pylint: disable=line-too-long
+                                                                                             activeMeter=activeMeter,  # pylint: disable=line-too-long
+                                                                                             nextMeasureLeft=nextMeasureLeft,  # pylint: disable=line-too-long
+                                                                                             backupMeasureNum=backupMeasureNum,  # pylint: disable=line-too-long
+                                                                                             slurBundle=slurBundle)  # pylint: disable=line-too-long
             for eachN, eachList in six.iteritems(localParsed):
                 # first: if there were objects from a previous <scoreDef> or <staffDef>, we need to
                 #        put those into the first Measure object we encounter in this Part
@@ -3176,26 +3176,26 @@ if __name__ == "__main__":
     import music21
     from music21.mei import test_base
     music21.mainTest(
-                     test_base.TestMeiToM21Class,
-                     test_base.TestThings,
-                     test_base.TestAttrTranslators,
-                     test_base.TestNoteFromElement,
-                     test_base.TestRestFromElement,
-                     test_base.TestChordFromElement,
-                     test_base.TestClefFromElement,
-                     test_base.TestLayerFromElement,
-                     test_base.TestStaffFromElement,
-                     test_base.TestStaffDefFromElement,
-                     test_base.TestScoreDefFromElement,
-                     test_base.TestEmbeddedElements,
-                     test_base.TestAddSlurs,
-                     test_base.TestBeams,
-                     test_base.TestPreprocessors,
-                     test_base.TestTuplets,
-                     test_base.TestInstrDef,
-                     test_base.TestMeasureFromElement,
-                     test_base.TestSectionScore,
-                    )
+        test_base.TestMeiToM21Class,
+        test_base.TestThings,
+        test_base.TestAttrTranslators,
+        test_base.TestNoteFromElement,
+        test_base.TestRestFromElement,
+        test_base.TestChordFromElement,
+        test_base.TestClefFromElement,
+        test_base.TestLayerFromElement,
+        test_base.TestStaffFromElement,
+        test_base.TestStaffDefFromElement,
+        test_base.TestScoreDefFromElement,
+        test_base.TestEmbeddedElements,
+        test_base.TestAddSlurs,
+        test_base.TestBeams,
+        test_base.TestPreprocessors,
+        test_base.TestTuplets,
+        test_base.TestInstrDef,
+        test_base.TestMeasureFromElement,
+        test_base.TestSectionScore,
+    )
 
 #------------------------------------------------------------------------------
 # eof

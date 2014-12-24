@@ -1841,10 +1841,10 @@ class TestStaffDefFromElement(unittest.TestCase):
         # NB: differences from testUnit2() are marked with a "D2" comment at the end of the line
         # 1.) prepare
         elem = ETree.Element('{}staffDef'.format(_MEINS),
-                        attrib={'clef.shape': 'F', 'clef.line': '4', 'clef.dis': 'cd',
-                                'clef.dis.place': 'cdp', 'label': 'the label',
-                                'label.abbr': 'the l.', 'n': '1', 'meter.count': '1',
-                                'key.pname': 'G', 'trans.semi': '123'})
+                             attrib={'clef.shape': 'F', 'clef.line': '4', 'clef.dis': 'cd',
+                                     'clef.dis.place': 'cdp', 'label': 'the label',
+                                     'label.abbr': 'the l.', 'n': '1', 'meter.count': '1',
+                                     'key.pname': 'G', 'trans.semi': '123'})
         theMockInstrument = mock.MagicMock('mock instrument')
         mockFromString.side_effect = instrument.InstrumentException  # D2
         mockInstrInit.return_value = theMockInstrument  # D1 & D2
@@ -1913,14 +1913,15 @@ class TestStaffDefFromElement(unittest.TestCase):
     @mock.patch('music21.mei.base._keySigFromAttrs')
     @mock.patch('music21.mei.base.clefFromElement')
     @mock.patch('music21.mei.base._transpositionFromAttrs')
-    def testUnit4(self, mockTrans, mockClef, mockKey, mockTime, mockInstr, mockFromString, mockInstrInit):
+    def testUnit4(self, mockTrans, mockClef, mockKey, mockTime, mockInstr, mockFromString, mockInstrInit):  # pylint: disable=unused-argument
         '''
         staffDefFromElement(): only specifies a meter
         '''
         # 1.) prepare
         elem = ETree.Element('{}staffDef'.format(_MEINS), attrib={'meter.count': '1', 'meter.unit': '3'})
         mockTime.return_value = 'mockTime return'
-        mockFromString.side_effect = instrument.InstrumentException  # otherwise staffDefFromElement() thinks it got a real Instrument
+        # without the excption, staffDefFromElement() thinks it got a real Instrument
+        mockFromString.side_effect = instrument.InstrumentException
         expected = {'meter': mockTime.return_value}
 
         # 2.) run
@@ -2135,13 +2136,13 @@ class TestEmbeddedElements(unittest.TestCase):
         mapping = {'note': mockTranslator}
         callerName = 'ocean'
         expected = ['translator return']
-        exp_err = base._UNPROCESSED_SUBELEMENT.format(elements[1].tag, callerName)
+        expErr = base._UNPROCESSED_SUBELEMENT.format(elements[1].tag, callerName)
 
         actual = base._processEmbeddedElements(elements, mapping, callerName)
 
         self.assertSequenceEqual(expected, actual)
         mockTranslator.assert_called_once_with(elements[0], None)
-        mockEnviron.printDebug.assert_called_once_with(exp_err)
+        mockEnviron.printDebug.assert_called_once_with(expErr)
 
 
 
@@ -3365,7 +3366,7 @@ class TestMeasureFromElement(unittest.TestCase):
         mRestTag = '{}mRest'.format(_MEINS)
         elem = ETree.Element('measure', attrib={'right': 'rptboth'})
         innerStaffs = [ETree.Element(staffTag, attrib={'n': str(n + 1)}) for n in range(3)]
-        for i, eachStaff in enumerate(innerStaffs):
+        for eachStaff in innerStaffs:
             thisLayer = ETree.Element(layerTag, attrib={'n': '1'})
             thisLayer.append(ETree.Element(mRestTag))
             eachStaff.append(thisLayer)
