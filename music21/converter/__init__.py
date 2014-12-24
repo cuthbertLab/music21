@@ -63,7 +63,11 @@ from music21 import environment
 _MOD = 'converter/__init__.py'
 environLocal = environment.Environment(_MOD)
 
-
+# use the faster library if possible (won't be possible on Jython, PyPy, etc.)
+try:
+    import xml.etree.cElementTree as ETree
+except ImportError:
+    import xml.etree.ElementTree as ETree
 
 
 
@@ -511,7 +515,15 @@ class Converter(object):
 
             if useFormat is not None:
                 pass
-            elif dataStrMakeStr.startswith('<?xml') or dataStrMakeStr.lower().startswith('musicxml:'):
+            elif dataStrMakeStr.startswith('<?xml'):
+                # is it MEI or MusicXML?
+                if '<mei' in dataStrMakeStr:
+                    useFormat = 'mei'
+                else:
+                    useFormat = 'musicxml'
+            elif dataStrMakeStr.startswith('mei:') or dataStrMakeStr.lower().startswith('mei:'):
+                useFormat = 'mei'
+            elif dataStrMakeStr.startswith('musicxml:') or dataStrMakeStr.lower().startswith('musicxml:'):
                 useFormat = 'musicxml'
             elif dataStrMakeStr.startswith('MThd') or dataStrMakeStr.lower().startswith('midi:'):
                 useFormat = 'midi'
@@ -653,6 +665,7 @@ class Converter(object):
         <class 'music21.converter.subConverters.ConverterHumdrum'>
         <class 'music21.converter.subConverters.ConverterIPython'>
         <class 'music21.converter.subConverters.ConverterLilypond'>
+        <class 'music21.converter.subConverters.ConverterMEI'>
         <class 'music21.converter.subConverters.ConverterMidi'>
         <class 'music21.converter.subConverters.ConverterMuseData'>
         <class 'music21.converter.subConverters.ConverterMusicXML'>
@@ -690,6 +703,7 @@ class Converter(object):
         ('ipython', <class 'music21.converter.subConverters.ConverterIPython'>)
         ('lily', <class 'music21.converter.subConverters.ConverterLilypond'>)
         ('lilypond', <class 'music21.converter.subConverters.ConverterLilypond'>)
+        ('mei', <class 'music21.converter.subConverters.ConverterMEI'>)
         ('midi', <class 'music21.converter.subConverters.ConverterMidi'>)
         ('musedata', <class 'music21.converter.subConverters.ConverterMuseData'>)
         ('musicxml', <class 'music21.converter.subConverters.ConverterMusicXML'>)
@@ -1681,6 +1695,29 @@ class Test(unittest.TestCase):
                 'testPrimitive', 'test01')
         cmd = subConverters.ConverterMuseData()
         cmd.parseFile(fp)
+
+    def testMEIvsMX(self):
+        '''
+        Ensure Converter.parseData() distinguishes between a string with MEI data and a string with
+        MusicXML data. The "subConverter" module is mocked out because we don't actually need to
+        test the conversion process in this unit test.
+        '''
+        # These strings aren't valid documents, but they are enough to pass the detection we're
+        # testing in parseData(). But it does mean we'll be testing in a strange way.
+        meiString = '<?xml version="1.0" encoding="UTF-8"?><mei><note/></mei>'
+        mxlString = '<?xml version="1.0" encoding="UTF-8"?><score-partwise><note/></score-partwise>'
+
+        # The "mei" module raises an MeiElementError with "meiString," so as long as that's raised,
+        # we know that parseData() chose correctly.
+        from music21.mei.base import MeiElementError
+        testConv = Converter()
+        self.assertRaises(MeiElementError, testConv.parseData, meiString)
+
+        # The ConverterMusicXML raises a SubConverterException with "mxlString," so as long as
+        # that's raised, we know that parseData()... well at least that it didn't choose MEI.
+        from music21.converter.subConverters import SubConverterException
+        testConv = Converter()
+        self.assertRaises(SubConverterException, testConv.parseData, mxlString)
 
 
 #-------------------------------------------------------------------------------

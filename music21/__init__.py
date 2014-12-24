@@ -68,6 +68,7 @@ __all__ = [
     'ipython21',
     'languageExcerpts',
     'lily', 
+    'mei',
     'midi',
     'musedata',
     'musicxml', 

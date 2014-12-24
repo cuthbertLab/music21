@@ -860,6 +860,87 @@ class ConverterMuseData(SubConverter):
 
         musedataTranslate.museDataWorkToStreamScore(mdw, self.stream)
 
+
+class ConverterMEI(SubConverter):
+    '''
+    Converter for MEI. You must use an ".mei" file extension for MEI files because music21 will
+    parse ".xml" files as MusicXML.
+    '''
+
+    registerFormats = ('mei',)
+    registerInputExtensions = ('mei',)
+    # NOTE: we're only working on import for now
+    #registerShowFormats = ('mei',)
+    #registerOutputExtensions = ('mei',)
+
+    def __init__(self):
+        SubConverter.__init__(self)
+
+    def parseData(self, dataString, number=None):
+        '''
+        Convert a string with an MEI document into its corresponding music21 elements.
+
+        :param str dataString: The string with XML to convert.
+        :param NoneType number: Unused in this class. Default is ``None``.
+        :returns: The music21 objects corresponding to the MEI file.
+        :rtype: :class:`~music21.stream.Stream` or subclass
+        '''
+        from music21 import mei
+        if dataString.startswith('mei:'):
+            dataString = dataString[4:]
+
+        self.stream = mei.MeiToM21Converter(dataString).run()
+
+        return self.stream
+
+    def parseFile(self, filePath, number=None):
+        '''
+        Convert a file with an MEI document into its corresponding music21 elements.
+
+        :param str filePath: Full pathname to the file containing MEI data.
+        :param NoneType number: Unused in this calss. Default is ``None``.
+        :return: The music21 objects corresponding to the MEI file.
+        :rtype: :class:`~music21.stream.Stream` or subclass
+        '''
+        if six.PY2:
+            with open(filePath) as f:
+                dataStream = f.read()
+        else:
+            # In Python 3 we try the two most likely encodings to work. (UTF-16 is outputted from
+            # "sibmei", the Sibelius-to-MEI exporter).
+            try:
+                with open(filePath, 'rt', encoding='utf-8') as f:
+                    dataStream = f.read()
+            except UnicodeDecodeError:
+                with open(filePath, 'rt', encoding='utf-16') as f:
+                    dataStream = f.read()
+
+        self.parseData(dataStream, number)
+
+        return self.stream
+
+    def checkShowAbility(self, **keywords):
+        '''
+        MEI export is not yet implemented.
+        '''
+        return False
+
+    def launch(self, filePath, fmt=None, options='', app=None, key=None):
+        raise NotImplementedError('MEI export is not yet implemented.')
+
+    def show(self, obj, fmt, app=None, subformats=None, **keywords):
+        raise NotImplementedError('MEI export is not yet implemented.')
+
+    def getTemporaryFile(self, fmt=None, subformats=None):
+        raise NotImplementedError('MEI export is not yet implemented.')
+
+    def write(self, obj, fmt, fp=None, subformats=None, **keywords):
+        raise NotImplementedError('MEI export is not yet implemented.')
+
+    def writeDataStream(self, fp, dataStr):
+        raise NotImplementedError('MEI export is not yet implemented.')
+
+
 class Test(unittest.TestCase):
     
     def runTest(self):
@@ -871,6 +952,89 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.append(n)
         unused_x = s.show('textLine')
+
+    def testImportMei1(self):
+        '''
+        When the string starts with "mei:"
+        '''
+        try:
+            # this works in Python 3.3+
+            from unittest import mock  # pylint: disable=no-name-in-module
+        except ImportError:
+            try:
+                # system library overrides the built-in
+                import mock
+            except ImportError:
+                # last resort
+                from music21.ext import mock
+        with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
+            testConverter = ConverterMEI()
+            testConverter.parseData('mei: <?xml><mei><note/></mei>')
+            mockConv.assert_called_once_with(' <?xml><mei><note/></mei>')
+
+    def testImportMei2(self):
+        '''
+        When the string doesn't start with "mei:"
+        '''
+        try:
+            # this works in Python 3.3+
+            from unittest import mock  # pylint: disable=no-name-in-module
+        except ImportError:
+            try:
+                # system library overrides the built-in
+                import mock
+            except ImportError:
+                # last resort
+                from music21.ext import mock
+        with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
+            testConverter = ConverterMEI()
+            testConverter.parseData('<?xml><mei><note/></mei>')
+            mockConv.assert_called_once_with('<?xml><mei><note/></mei>')
+
+    def testImportMei3(self):
+        '''
+        When the file uses UTF-16 encoding rather than UTF-8 (which happens if it was exported from
+        the "sibmei" plug-in for Sibelius.
+        '''
+        import music21  # to make the pathname later
+        try:
+            # this works in Python 3.3+
+            from unittest import mock  # pylint: disable=no-name-in-module
+        except ImportError:
+            try:
+                # system library overrides the built-in
+                import mock
+            except ImportError:
+                # last resort
+                from music21.ext import mock
+        with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
+            from os import path
+            testPath = path.join(music21.__path__[0], 'mei', 'test', 'notes_in_utf16.mei')
+            testConverter = ConverterMEI()
+            testConverter.parseFile(testPath)
+            self.assertEqual(1, mockConv.call_count)
+
+    def testImportMei4(self):
+        '''
+        For the sake of completeness, this is the same as testImportMei3() but with a UTF-8 file.
+        '''
+        import music21  # to make the pathname later
+        try:
+            # this works in Python 3.3+
+            from unittest import mock  # pylint: disable=no-name-in-module
+        except ImportError:
+            try:
+                # system library overrides the built-in
+                import mock
+            except ImportError:
+                # last resort
+                from music21.ext import mock
+        with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
+            from os import path
+            testPath = path.join(music21.__path__[0], 'mei', 'test', 'notes_in_utf8.mei')
+            testConverter = ConverterMEI()
+            testConverter.parseFile(testPath)
+            self.assertEqual(1, mockConv.call_count)
 
         
 class TestExternal(unittest.TestCase):
@@ -890,6 +1054,7 @@ class TestExternal(unittest.TestCase):
         s.append(n)
         s.show('lily.png')
         print(s.write('lily.png'))
+
 
 
 if __name__ == '__main__':

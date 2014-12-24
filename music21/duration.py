@@ -100,6 +100,7 @@ typeToDuration = {
     '256th': 0.015625,
     '512th': 0.015625 / 2.0,
     '1024th': 0.015625 / 4.0,
+    '2048th': 0.015625 / 8.0,
     'zero': 0.0,
     }
 
@@ -115,6 +116,7 @@ typeFromNumDict = {
     256.0: '256th',
     512.0: '512th',
     1024.0: '1024th',
+    2048.0: '2048th',
     0.0: 'zero',
     0.5: 'breve',
     0.25: 'longa',
@@ -138,6 +140,7 @@ ordinalTypeFromNum = [
     "256th",
     "512th",
     "1024th",
+    "2048th",
     ]
 
 defaultTupletNumerators = [3, 5, 7, 11, 13]
@@ -221,12 +224,14 @@ def nextSmallerType(durType):
     >>> duration.nextSmallerType("whole")
     'half'
     >>> duration.nextSmallerType("1024th")
+    '2048th'
+    >>> duration.nextSmallerType("2048th")
     'unexpressible'
     '''
     if durType not in ordinalTypeFromNum:
         raise DurationException("cannot get the next smaller of %s" % durType)
     thisOrdinal = ordinalTypeFromNum.index(durType)
-    if thisOrdinal == 14: # TODO: should this raise an exception?
+    if thisOrdinal == 15: # TODO: should this raise an exception?
         return 'unexpressible'
     else:
         return ordinalTypeFromNum[thisOrdinal + 1]

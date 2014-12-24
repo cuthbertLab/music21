@@ -453,6 +453,8 @@ def typeToMusicXMLType(value):
     # MusicXML uses long instead of longa
     if value == 'longa': 
         return 'long'
+    elif value == '2048th':
+        raise ToMxObjectsException('Cannot convert "2048th" duration to MusicXML (too short).')
     else:
         return value
 
@@ -2849,6 +2851,19 @@ class Test(unittest.TestCase):
 
     def testBasic(self):
         pass
+
+    def testDuration2048(self):
+        '''
+        typeToMusicXMLType(): when converting a Duration to a MusicXML duration, 2048th notes will
+            not be exported to MusicXML, for which 1024th is the shortest duration. 2048th notes
+            are valid in MEI, which is how they appeared in music21 in the first place.
+        '''
+        expectedError = 'Cannot convert "2048th" duration to MusicXML (too short).'
+        self.assertRaises(ToMxObjectsException, typeToMusicXMLType, '2048th')
+        try:
+            typeToMusicXMLType('2048th')
+        except ToMxObjectsException as exc:
+            self.assertEqual(expectedError, exc.args[0])
 
 
 #-------------------------------------------------------------------------------
