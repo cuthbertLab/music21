@@ -34,7 +34,7 @@ environLocal = environment.Environment(_MOD)
 from music21.ext import six
 # for implementation
 # see http://www.ccarh.org/publications/books/beyondmidi/online/musedata/
-# http://www.ccarh.org/publications/books/beyondmidi/online/musedata/record-organization/
+# and http://www.ccarh.org/publications/books/beyondmidi/online/musedata/record-organization/
 
 
 

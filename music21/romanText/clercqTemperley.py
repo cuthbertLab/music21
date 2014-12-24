@@ -237,7 +237,7 @@ class CTSong(object):
     
     OMIT_FROM_DOCS
     
-    Another example using a different clercq temperley file
+    Another example using a different Clercq-Temperley file
     
     ::
 

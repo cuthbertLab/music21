@@ -54,21 +54,6 @@ def annotateWithGerman():
         thisNote.addLyric(thisNote.pitch.german)
     bwv295.show()
 
-def countCs():
-    '''
-    count the number of Cs in a piece.
-    
-    Based on a question on the humdrum mailing list
-    '''
-    from music21 import converter
-    wtcf1 = converter.parse('http://kern.ccarh.org/cgi-bin/ksdata?l=ccarh/class/2007/shchon&file=wtc1f01.krn&f=kern')
-    wtcf1 = wtcf1.flat.stripTies()
-    numberOfCs = 0
-    for thisPitch in wtcf1.pitches:
-        if thisPitch.name == 'C':
-            numberOfCs += 1
-    print (numberOfCs)
-    print (wtcf1.analyze('key'))
 
 def bachParallels():
     '''

@@ -2502,11 +2502,6 @@ class TestExternal(unittest.TestCase):
         s.append(p)
         s.show('lily.png')
 
-    def testJosquin(self):
-        from music21 import converter
-        j = converter.parse('http://jrp.ccarh.org/cgi-bin/josquin?a=parallel&f=Jos2308-Ave_maris_stella', format='humdrum')
-        j.show('lilypond')
-
     def testStaffLines(self):
         from music21 import stream
         s = stream.Score()
