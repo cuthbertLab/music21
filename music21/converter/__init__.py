@@ -87,21 +87,21 @@ class ArchiveManager(object):
     archived file collection, such as a .zip or or .mxl file. This will return the 
     data from the archive.
     
-    >>> fnCorpus = corpus.getWork('opus18no1/movement3', fileExtensions=('.xml',))
+    >>> fnCorpus = corpus.getWork('bwv66.6', fileExtensions=('.xml',))
     
     This is likely a unicode string
     
     >>> #_DOCS_SHOW fnCorpus
-    >>> '/Users/cuthbert/Documents/music21/corpus/beethoven/opus18no1/movement3.mxl' #_DOCS_HIDE
-    '/Users/cuthbert/Documents/music21/corpus/beethoven/opus18no1/movement3.mxl'
+    >>> u'/Users/cuthbert/git/music21base/music21/corpus/bach/bwv66.6.mxl' #_DOCS_HIDE
+    u'/Users/cuthbert/git/music21base/music21/corpus/bach/bwv66.6.mxl'
     >>> am = converter.ArchiveManager(fnCorpus)
     >>> am.isArchive()
     True
     >>> am.getNames()
-    ['movement3.xml', 'META-INF/container.xml']
+    ['bwv66.6.xml', 'META-INF/container.xml']
     >>> data = am.getData()
     >>> data[0:70]
-    '<?xml version="1.0" standalone="no"?>\r\n<!DOCTYPE score-partwise PUBLIC'
+    '<?xml version="1.0" encoding="UTF-8"?>\r<!DOCTYPE score-partwise PUBLIC'
     '''
     # for info on mxl files, see
     # http://www.recordare.com/xml/compressed-mxl.html
@@ -1357,29 +1357,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(ts), 4)
 
 
-        a = corpus.parse('mozart/k156/movement4')
-
-        # violin part
-        clefs = a.parts[0].flat.getElementsByClass(clef.Clef)
-        self.assertEqual(len(clefs), 1)
-        self.assertEqual(clefs[0].sign, 'G')
-
-        # viola
-        clefs = a.parts[2].flat.getElementsByClass(clef.Clef)
-        self.assertEqual(len(clefs), 1)
-        self.assertEqual(clefs[0].sign, 'C')
-
-        # violoncello
-        clefs = a.parts[3].flat.getElementsByClass(clef.Clef)
-        self.assertEqual(len(clefs), 1)
-        self.assertEqual(clefs[0].sign, 'F')
-
-        # check time signatures
-        # there are
-        ts = a.parts[0].flat.getElementsByClass(meter.TimeSignature)
-        self.assertEqual(len(ts), 1)
-
-
     def testConversionMXArticulations(self):
         from music21 import note
         from music21.musicxml import testPrimitive
@@ -1475,19 +1452,17 @@ class Test(unittest.TestCase):
 
     def testConversionMXInstrument(self):
         from music21 import corpus
-        s = corpus.parse('beethoven/opus18no1/movement3.xml')
+        s = corpus.parse('schumann_clara/opus17', 3)
         #s.show()
         is1 = s.parts[0].flat.getElementsByClass('Instrument')
         self.assertEqual(len(is1), 1)
+        #self.assertIn('Violin', is1[0].classes)
         is2 = s.parts[1].flat.getElementsByClass('Instrument')
         self.assertEqual(len(is2), 1)
-
+        #self.assertIn('Violoncello', is1[0].classes)
         is3 = s.parts[2].flat.getElementsByClass('Instrument')
         self.assertEqual(len(is3), 1)
-
-        is4 = s.parts[3].flat.getElementsByClass('Instrument')
-        self.assertEqual(len(is4), 1)
-
+        #self.assertIn('Piano', is1[0].classes)
 
 
     def testConversionMidiBasic(self):

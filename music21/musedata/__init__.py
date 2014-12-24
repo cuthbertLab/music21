@@ -6,19 +6,25 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2010 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010, 2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
 '''
+**N.B. in Dec. 2014 MuseData access was removed from music21 because the rights conflicted with
+access computationally from music21.  This module is retained for anyone who has such access,
+however it is completely untested now and errors cannot and will not be fixed.**
+
 Objects and resources for processing MuseData. 
 
-MuseData conversion from a file or URL to a :class:`~music21.stream.Stream` is available through the music21 converter module's :func:`~music21.converter.parse` function. 
+MuseData conversion from a file or URL to a :class:`~music21.stream.Stream` is available through 
+the music21 converter module's :func:`~music21.converter.parse` function. 
 
 >>> #_DOCS_SHOW from music21 import *
 >>> #_DOCS_SHOW abcScore = converter.parse('d:/data/musedata/myScore.stage2')
 
-Low level MuseData conversion is facilitated by the objects in this module and :func:`music21.musedata.translate.museDataToStreamScore`.
+Low level MuseData conversion is facilitated by the objects in this module and 
+:func:`music21.musedata.translate.museDataToStreamScore`.
 '''
 
 import unittest
@@ -64,7 +70,6 @@ class MuseDataRecord(object):
 
     def isRest(self):
         '''Return a boolean if this record is a rest. 
-
         
         >>> mdr = musedata.MuseDataRecord('D4     1        s     d  ]]')
         >>> mdr.isRest()
@@ -840,18 +845,13 @@ class MuseDataPart(object):
 
 
     def getWorkNumber(self):
-        '''
-        
-        >>> from music21.musedata import testFiles
+        '''        
+        >>> import os
+        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getWorkNumber()
-        '5'
-
-        >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bachContrapunctus1_part2)
-        >>> mdw.getParts()[0].getWorkNumber()
-        '1080'
+        '581'
         '''
         if self.stage == 1:
             # seems to be the first half of the second line
@@ -866,17 +866,12 @@ class MuseDataPart(object):
 
     def getMovementNumber(self):
         '''
-        
-        >>> from music21.musedata import testFiles
+        >>> import os
+        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getMovementNumber()
         '3'
-
-        >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bachContrapunctus1_part2)
-        >>> mdw.getParts()[0].getMovementNumber()
-        '1'
         '''
         if self.stage == 1:
             # get the header number: not sure what this is for now
@@ -888,12 +883,12 @@ class MuseDataPart(object):
     def getDirective(self):
         '''The directive field is generally used to store tempo indications.This indication, however, is frequently not provided.
 
-        
-        >>> from music21.musedata import testFiles
+        >>> import os
+        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.hwv56_movement1_17)
-        >>> mdw.getParts()[3].getDirective()
-        'Largo e piano'
+        >>> mdw.addFile(fp1)
+        >>> mdw.getParts()[0].getDirective() is None
+        True
         '''
         if self.stage == 1:
             # nothing seems to be defined in stage 1
@@ -910,17 +905,12 @@ class MuseDataPart(object):
 
     def getSource(self):
         '''
-        
-        >>> from music21.musedata import testFiles
+        >>> import os
+        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getSource()
-        'Bach Gesellschaft i'
-
-        >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bachContrapunctus1_part2)
-        >>> mdw.getParts()[0].getSource()
-        'Bach Gesellschaft xxv,1'
+        'Breitkopf & H...rtel, Vol. 13'
         '''
         if self.stage == 1:
             # get the header number: not sure what this is for now
@@ -935,17 +925,14 @@ class MuseDataPart(object):
 
     def getWorkTitle(self):
         '''
+        For stage 1 just gets the catalogue number
         
-        >>> from music21.musedata import testFiles
+        >>> import os
+        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getWorkTitle()
-        'Wo soll ich fliehen hin'
-
-        >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bachContrapunctus1_part2)
-        >>> mdw.getParts()[0].getWorkTitle()
-        '381'
+        'Clarinet Quintet'
         '''
         if self.stage == 1:
             # this does not seem defined for stage 1, so taking catalog number
@@ -955,12 +942,12 @@ class MuseDataPart(object):
 
     def getMovementTitle(self):
         '''
-        
-        >>> from music21.musedata import testFiles
+        >>> import os
+        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getMovementTitle()
-        'Aria'
+        'Trio II'
         '''
         if self.stage == 1:
             return None
@@ -968,15 +955,13 @@ class MuseDataPart(object):
             return self.src[7]
 
     def getPartName(self):
-        '''
-        
-        >>> from music21.musedata import testFiles
+        '''        
+        >>> import os
+        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getPartName()
-        'Viola Solo'
-        >>> mdw.getParts()[1].getPartName()
-        'TENORE'
+        'Clarinet in A'
         '''
         if self.stage == 1:
             return None
@@ -984,13 +969,13 @@ class MuseDataPart(object):
             return self.src[8].strip()
 
     def getGroupMemberships(self):
-        '''
-        
-        >>> from music21.musedata import testFiles
+        ''' 
+        >>> import os
+        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getGroupMemberships()
-        ['score']
+        ['sound', 'score']
         '''
         if self.stage == 1:
             return []
@@ -1005,17 +990,12 @@ class MuseDataPart(object):
 
     def getGroupMembershipsTotal(self, membership='score'):
         '''
-        
-        >>> from music21.musedata import testFiles
+        >>> import os
+        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getGroupMembershipsTotal()
-        3
-
-        >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bachContrapunctus1_part2)
-        >>> mdw.getParts()[0].getGroupMembershipsTotal()
-        4
+        5
         '''
         if self.stage == 1:
             # first value is total number
@@ -1036,25 +1016,12 @@ class MuseDataPart(object):
 
     def getGroupMembershipNumber(self, membership='score'):
         '''
-        
-        >>> from music21.musedata import testFiles
+        >>> import os
+        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getGroupMembershipNumber()
         1
-        >>> mdw.getParts()[1].getGroupMembershipNumber()
-        2
-        >>> mdw.getParts()[2].getGroupMembershipNumber()
-        3
-
-        >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bachContrapunctus1_part2)
-        >>> mdw.getParts()[0].getGroupMembershipNumber()
-        '2'
-        >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bachContrapunctus1_part1)
-        >>> mdw.getParts()[0].getGroupMembershipNumber()
-        '1'
         '''
         if self.stage == 1:
             # second value is this works part number
@@ -1077,20 +1044,12 @@ class MuseDataPart(object):
         '''The attributes record is not in a fixed position, but is the first line that starts with a $.
 
         
-        >>> from music21.musedata import testFiles
+        >>> import os
+        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0]._getAttributesRecord()
-        '$ K:-3   Q:4   T:3/4   C:13'
-        >>> mdw.getParts()[1]._getAttributesRecord()
-        '$ K:-3   Q:8   T:3/4   C:34'
-        >>> mdw.getParts()[2]._getAttributesRecord()
-        '$ K:-3   Q:4   T:3/4   C:22'
-
-        >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bachContrapunctus1_part1)
-        >>> mdw.getParts()[0]._getAttributesRecord()
-        '78 -1 16 4 2 2 0 0 31'
+        '$  K:0   Q:6   T:3/4   X:-11   C:4'
         '''
         if self.stage == 1:
             # combine the two lines into one, all space separated
@@ -1106,19 +1065,12 @@ class MuseDataPart(object):
 
     def _getKeyParameters(self):
         '''
-        
-        >>> from music21.musedata import testFiles
+        >>> import os
+        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0]._getKeyParameters()
-        -3
-        >>> mdw.getParts()[1]._getKeyParameters()
-        -3
-
-        >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bachContrapunctus1_part1)
-        >>> mdw.getParts()[0]._getKeyParameters()
-        -1
+        0
         '''
         line = self._getAttributesRecord()
         if self.stage == 1:
@@ -1129,36 +1081,24 @@ class MuseDataPart(object):
 
     def getKeySignature(self):
         '''
-        
-        >>> from music21.musedata import testFiles
+        >>> import os
+        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getKeySignature()
-        <music21.key.KeySignature of 3 flats>
-
-        >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bachContrapunctus1_part1)
-        >>> mdw.getParts()[0].getKeySignature()
-        <music21.key.KeySignature of 1 flat>
+        <music21.key.KeySignature of no sharps or flats>
         '''
         from music21 import key
         return key.KeySignature(self._getKeyParameters())
 
     def _getTimeSignatureParameters(self):
         '''
-        
-        >>> from music21.musedata import testFiles
+        >>> import os
+        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0]._getTimeSignatureParameters()
         '3/4'
-        >>> mdw.getParts()[1]._getTimeSignatureParameters()
-        '3/4'
-
-        >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bachContrapunctus1_part1)
-        >>> mdw.getParts()[0]._getTimeSignatureParameters()
-        '2/2'
         '''
         line = self._getAttributesRecord()        
         if self.stage == 1:
@@ -1179,10 +1119,10 @@ class MuseDataPart(object):
 
     def getTimeSignatureObject(self):
         '''     
-        
-        >>> from music21.musedata import testFiles
+        >>> import os
+        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getTimeSignatureObject()
         <music21.meter.TimeSignature 3/4>
         '''
@@ -1191,10 +1131,10 @@ class MuseDataPart(object):
 
     def _getNumberOfStaves(self):
         '''
-        
-        >>> from music21.musedata import testFiles
+        >>> import os
+        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0]._getNumberOfStaves()
         1
         '''
@@ -1213,24 +1153,12 @@ class MuseDataPart(object):
 
     def _getClefParameters(self):
         '''
-        
-        >>> from music21.musedata import testFiles
+        >>> import os
+        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0]._getClefParameters()
-        ['13']
-        >>> mdw.getParts()[1]._getClefParameters()
-        ['34']
-
-        >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bachContrapunctus1_part1)
-        >>> mdw.getParts()[0]._getClefParameters()
-        ['31']
-
-        >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bachContrapunctus1_part2)
-        >>> mdw.getParts()[0]._getClefParameters()
-        ['31']
+        ['4']
         '''
         # clef may be givne as C: or Cn:, where n is the number for 
         # a staff, if multiple staves are included in this parts
@@ -1260,12 +1188,12 @@ class MuseDataPart(object):
     def getClefObject(self, voice=1):
         '''Return a music21 clef object based on a two character clef definition.
 
-        
-        >>> from music21.musedata import testFiles
+        >>> import os
+        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getClefObject().sign
-        'C'
+        'G'
         '''
         if self.stage == 1:
             return None # cannot yet determine
@@ -1360,21 +1288,12 @@ class MuseDataPart(object):
 
     def getDivisionsPerQuarterNote(self):
         '''
-        
-        >>> from music21.musedata import testFiles
+        >>> import os
+        >>> fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.addFile(fp1)
         >>> mdw.getParts()[0].getDivisionsPerQuarterNote()
-        4
-        >>> mdw.getParts()[0].getDivisionsPerQuarterNote()
-        4
-        >>> mdw.getParts()[1].getDivisionsPerQuarterNote()
-        8
-
-        >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bachContrapunctus1_part1)
-        >>> mdw.getParts()[0].getDivisionsPerQuarterNote()
-        4.0
+        6
         '''
         if self._divisionsPerQuarterNote == None:
             # set once the first time this is called
@@ -1602,12 +1521,10 @@ class MuseDataWork(object):
             self.files.append(mdf)
 
     def addString(self, input_str):
-        '''Add a string representation acting like a part file
-
+        r'''Add a string representation acting like a part file
         
-        >>> from music21.musedata import testFiles
         >>> mdw = musedata.MuseDataWork()
-        >>> mdw.addString(testFiles.bach_cantata5_mvmt3)
+        >>> mdw.addString('WK#:581       MV#:3c\nBreitkopf & Hartel, Vol. 13\nClarinet Quintet\nTrio II\n$  K:0   Q:6   T:3/4   X:-11   C:4\nC5     3        e     d  [     (&0p\nE5     3        e     d  ]')
 
         '''
         #environLocal.printDebug(['addString str', str])
@@ -1764,32 +1681,32 @@ class Test(unittest.TestCase):
         pass
 
 
-    def testLoadFromString(self):
-        from music21.musedata import testFiles
-
-        mdw = MuseDataWork()
-        mdw.addString(testFiles.bach_cantata5_mvmt3)
-
-        mdpObjs = mdw.getParts()
-        self.assertEquals(len(mdpObjs), 3)
-        # first line of src strings
-        self.assertEquals(mdpObjs[0].src[1], 'ID: {bach/bg/cant/0005/stage2/03/01} [KHM:1658122244]')
-
-        self.assertEquals(mdpObjs[1].src[1], 'ID: {bach/bg/cant/0005/stage2/03/02} [KHM:1658122244]')
-
-        self.assertEquals(mdpObjs[2].src[1], 'ID: {bach/bg/cant/0005/stage2/03/03} [KHM:1658122244]')
-
-        for i in range(3):
-            self.assertEquals(mdpObjs[i].getWorkNumber(), '5')
-            self.assertEquals(mdpObjs[i].getMovementNumber(), '3')
-            self.assertEquals(mdpObjs[i].getSource(), 'Bach Gesellschaft i')
-            self.assertEquals(mdpObjs[i].getWorkTitle(), 'Wo soll ich fliehen hin')
-            self.assertEquals(mdpObjs[i].getMovementTitle(), 'Aria')
-
-
-        self.assertEquals(mdpObjs[0]._getKeyParameters(), -3)
-        self.assertEquals(mdpObjs[0]._getTimeSignatureParameters(), '3/4')
-        self.assertEquals(mdpObjs[0].getDivisionsPerQuarterNote(), 4)
+#     def testLoadFromString(self):
+#         from music21.musedata import testFiles
+# 
+#         mdw = MuseDataWork()
+#         mdw.addString(testFiles.bach_cantata5_mvmt3)
+# 
+#         mdpObjs = mdw.getParts()
+#         self.assertEquals(len(mdpObjs), 3)
+#         # first line of src strings
+#         self.assertEquals(mdpObjs[0].src[1], 'ID: {bach/bg/cant/0005/stage2/03/01} [KHM:1658122244]')
+# 
+#         self.assertEquals(mdpObjs[1].src[1], 'ID: {bach/bg/cant/0005/stage2/03/02} [KHM:1658122244]')
+# 
+#         self.assertEquals(mdpObjs[2].src[1], 'ID: {bach/bg/cant/0005/stage2/03/03} [KHM:1658122244]')
+# 
+#         for i in range(3):
+#             self.assertEquals(mdpObjs[i].getWorkNumber(), '5')
+#             self.assertEquals(mdpObjs[i].getMovementNumber(), '3')
+#             self.assertEquals(mdpObjs[i].getSource(), 'Bach Gesellschaft i')
+#             self.assertEquals(mdpObjs[i].getWorkTitle(), 'Wo soll ich fliehen hin')
+#             self.assertEquals(mdpObjs[i].getMovementTitle(), 'Aria')
+# 
+# 
+#         self.assertEquals(mdpObjs[0]._getKeyParameters(), -3)
+#         self.assertEquals(mdpObjs[0]._getTimeSignatureParameters(), '3/4')
+#         self.assertEquals(mdpObjs[0].getDivisionsPerQuarterNote(), 4)
 
 
 
@@ -1858,32 +1775,32 @@ class Test(unittest.TestCase):
         self.assertEquals(mdpObjs[0].getDivisionsPerQuarterNote(), 6)
 
 
-    def testIterateMeasuresFromString(self):
-
-        from music21.musedata import testFiles
-
-        mdw = MuseDataWork()
-        mdw.addString(testFiles.bach_cantata5_mvmt3)
-        mdpObjs = mdw.getParts()
-        # can iterate over measures, creating them as iterating
-        for m in mdpObjs[0]:
-            self.assertEquals(isinstance(m, MuseDataMeasure), True)
-
-            # iterate over measures to get notes
-            for n in m:
-                self.assertEquals(isinstance(n, MuseDataRecord), True)
-
-        # cannot access them as in a list, however
-        #self.assertEquals(mdpObjs[0][0], True)
-
-        # try using stored objects
-        measures = mdpObjs[0].getMeasures()
-        self.assertEquals(isinstance(measures[0], MuseDataMeasure), True)
-        self.assertEquals(len(measures), 106)
-
-        records = measures[4].getRecords()
-        self.assertEquals(isinstance(records[0], MuseDataRecord), True)
-        self.assertEquals(len(records), 13)
+#     def testIterateMeasuresFromString(self):
+# 
+#         from music21.musedata import testFiles
+# 
+#         mdw = MuseDataWork()
+#         mdw.addString(testFiles.bach_cantata5_mvmt3)
+#         mdpObjs = mdw.getParts()
+#         # can iterate over measures, creating them as iterating
+#         for m in mdpObjs[0]:
+#             self.assertEquals(isinstance(m, MuseDataMeasure), True)
+# 
+#             # iterate over measures to get notes
+#             for n in m:
+#                 self.assertEquals(isinstance(n, MuseDataRecord), True)
+# 
+#         # cannot access them as in a list, however
+#         #self.assertEquals(mdpObjs[0][0], True)
+# 
+#         # try using stored objects
+#         measures = mdpObjs[0].getMeasures()
+#         self.assertEquals(isinstance(measures[0], MuseDataMeasure), True)
+#         self.assertEquals(len(measures), 106)
+# 
+#         records = measures[4].getRecords()
+#         self.assertEquals(isinstance(records[0], MuseDataRecord), True)
+#         self.assertEquals(len(records), 13)
 
        
 
@@ -1898,30 +1815,30 @@ class Test(unittest.TestCase):
         unused_mdd = MuseDataDirectory(fpDir)
 
         # from archive: note: this is a stage 1 file 
-        fpArchive = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
-        af = converter.ArchiveManager(fpArchive)
-        unused_mdd = MuseDataDirectory(af.getNames())
+        #fpArchive = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
+        #af = converter.ArchiveManager(fpArchive)
+        #unused_mdd = MuseDataDirectory(af.getNames())
 
 
-    def testStage1A(self):
-
-        from music21.musedata import testFiles
-        mdw = MuseDataWork()
-        mdw.addString(testFiles.bachContrapunctus1_part1)
-        mdw.addString(testFiles.bachContrapunctus1_part2)
-        
-        mdpObjs = mdw.getParts()
-
-        # all files have the same metadata
-        for i in range(2):
-            self.assertEquals(mdpObjs[i].getWorkNumber(), '1080')
-            self.assertEquals(mdpObjs[i].getMovementNumber(), '1')
-            self.assertEquals(mdpObjs[i].getSource(), 'Bach Gesellschaft xxv,1')
-            self.assertEquals(mdpObjs[i].getGroupMembershipsTotal(), 4)
-
-        self.assertEquals(mdpObjs[0]._getKeyParameters(), -1)
-        self.assertEquals(mdpObjs[0]._getTimeSignatureParameters(), '2/2')
-        self.assertEquals(mdpObjs[0].getDivisionsPerQuarterNote(), 4.0)
+#     def testStage1A(self):
+# 
+#         from music21.musedata import testFiles
+#         mdw = MuseDataWork()
+#         mdw.addString(testFiles.bachContrapunctus1_part1)
+#         mdw.addString(testFiles.bachContrapunctus1_part2)
+#         
+#         mdpObjs = mdw.getParts()
+# 
+#         # all files have the same metadata
+#         for i in range(2):
+#             self.assertEquals(mdpObjs[i].getWorkNumber(), '1080')
+#             self.assertEquals(mdpObjs[i].getMovementNumber(), '1')
+#             self.assertEquals(mdpObjs[i].getSource(), 'Bach Gesellschaft xxv,1')
+#             self.assertEquals(mdpObjs[i].getGroupMembershipsTotal(), 4)
+# 
+#         self.assertEquals(mdpObjs[0]._getKeyParameters(), -1)
+#         self.assertEquals(mdpObjs[0]._getTimeSignatureParameters(), '2/2')
+#         self.assertEquals(mdpObjs[0].getDivisionsPerQuarterNote(), 4.0)
 
 
 
@@ -1941,18 +1858,18 @@ class Test(unittest.TestCase):
 
 
 
-    def testMeasureNumberImport(self):
-        from music21 import corpus
-        s = corpus.parse('symphony94/02')
-        for p in s.parts:
-            match = []
-            for m in p.getElementsByClass('Measure'):
-                match.append(m.number)
-            self.assertEqual(len(match), 156)
-            # make sure there areno empty string
-            self.assertEqual(match.count(''), 0)
-            
-        self.assertEqual(len(s.parts[-1].flat.notes), 287)
+#     def testMeasureNumberImport(self):
+#         from music21 import corpus
+#         s = corpus.parse('symphony94/02')
+#         for p in s.parts:
+#             match = []
+#             for m in p.getElementsByClass('Measure'):
+#                 match.append(m.number)
+#             self.assertEqual(len(match), 156)
+#             # make sure there areno empty string
+#             self.assertEqual(match.count(''), 0)
+#             
+#         self.assertEqual(len(s.parts[-1].flat.notes), 287)
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

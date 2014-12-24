@@ -2064,17 +2064,16 @@ class PlotStream(object):
     def ticksPitchSpaceUsage(self, pcMin=36, pcMax=72,
             showEnharmonic=False, blankLabelUnused=True, hideUnused=False):
         '''Get ticks and labels for pitch space based on usage. That is, show the most commonly used enharmonic first.
-
         
         >>> s = corpus.parse('bach/bwv324.xml')
         >>> a = graph.PlotStream(s.parts[0])
         >>> [x for x, y in a.ticksPitchSpaceUsage(hideUnused=True)]
         [64, 66, 67, 69, 71, 72]
 
-        >>> s = corpus.parse('schumann/opus41no1/movement2.xml')
+        >>> s = corpus.parse('corelli/op3no1/1grave')
         >>> a = graph.PlotStream(s)
         >>> [x for x, y in a.ticksPitchSpaceUsage(showEnharmonic=True, hideUnused=True)]
-        [36, 38, 40, 41, 43, 44, 45, 47, 48, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72]
+        [36, 41, 43, 45, 46, 47, 48, 49, 50, 52, 53, 55, 57, 58, 60, 62, 64, 65, 67, 69, 70, 71, 72]
 
         OMIT_FROM_DOCS
         TODO: this needs to look at key signature/key to determine defaults
@@ -3112,9 +3111,11 @@ class PlotScatterPitchSpaceDynamicSymbol(PlotScatter):
     '''A graph of dynamics used by pitch space.
 
     
-    >>> s = corpus.parse('schumann/opus41no1', 2) #_DOCS_HIDE
+    >>> s = tinyNotation.TinyNotationStream('4/4 C4 d E f') #_DOCS_HIDE
+    >>> s.insert(0.0, dynamics.Dynamic('pp')) #_DOCS_HIDE
+    >>> s.insert(2.0, dynamics.Dynamic('ff')) #_DOCS_HIDE
     >>> p = graph.PlotScatterPitchSpaceDynamicSymbol(s, doneAction=None) #_DOCS_HIDE
-    >>> #_DOCS_SHOW s = corpus.parse('schumann/opus41no1', 2)
+    >>> #_DOCS_SHOW s = converter.parse('/Desktop/schumann/opus41no1/movement2.xml')
     >>> #_DOCS_SHOW p = graph.PlotScatterPitchSpaceDynamicSymbol(s)
     >>> p.process()
 
@@ -3676,7 +3677,10 @@ class PlotScatterWeightedPitchClassQuarterLength(PlotScatterWeighted):
 class PlotScatterWeightedPitchSpaceDynamicSymbol(PlotScatterWeighted):
     '''A graph of dynamics used by pitch space.
 
-    >>> s = corpus.parse('schumann/opus41no1', 2)
+    >>> #_DOCS_SHOW s = converter.parse('/Desktop/schumann/opus41no1/movement2.xml')
+    >>> s = tinyNotation.TinyNotationStream('4/4 C4 d E f') #_DOCS_HIDE
+    >>> s.insert(0.0, dynamics.Dynamic('pp')) #_DOCS_HIDE
+    >>> s.insert(2.0, dynamics.Dynamic('ff')) #_DOCS_HIDE
     >>> p = graph.PlotScatterWeightedPitchSpaceDynamicSymbol(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW p = graph.PlotScatterWeightedPitchSpaceDynamicSymbol(s)
     >>> p.process() # with defaults and proper configuration, will open graph
@@ -4613,12 +4617,12 @@ class Test(unittest.TestCase):
         
 
     def testPitchDuration(self):
-        a = corpus.parse('schumann/opus41no1', 2)
-        b = PlotScatterPitchSpaceDynamicSymbol(a.parts[0].flat, doneAction=None, title='Schumann (soprano voice)')
+        a = corpus.parse('schoenberg/opus19', 2)
+        b = PlotScatterPitchSpaceDynamicSymbol(a.parts[0].flat, doneAction=None, title='Schoenberg (piano)')
         b.process()
         
 
-        b = PlotScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flat, doneAction=None, title='Schumann (soprano voice)')
+        b = PlotScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flat, doneAction=None, title='Schoenberg (piano)')
         b.process()
         
 
@@ -4997,7 +5001,7 @@ class Test(unittest.TestCase):
         data = [('bar%s' % x, {'a':3,'b':2,'c':1}) for x in range(10)]
         g.setData(data)
         g.process()
-        streamList = ['bach/bwv66.6', 'hwv56/movement3-05.md', 'bach/bwv324.xml']
+        streamList = ['bach/bwv66.6', 'schoenberg/opus19/movement2', 'corelli/op3no1/1grave']
         feList = ['ql1', 'ql2', 'ql3']
 
         p = PlotFeatures(streamList, featureExtractors=feList, doneAction=None)
@@ -5038,11 +5042,11 @@ class Test(unittest.TestCase):
         
 
 
-    def testHorizontalInstrumentationA(self):
-        s = corpus.parse('symphony94/02')
-        unused_g = PlotDolan(s, fillByMeasure=False, segmentByTarget=True, 
-            normalizeByPart = False, title='Haydn, Symphony No. 94 in G major, Movement II',
-            hideYGrid=True, hideXGrid=True, alpha=1, figureSize=[60,4], dpi=300, )
+#     def testHorizontalInstrumentationA(self):
+#         s = corpus.parse('symphony94/02')
+#         unused_g = PlotDolan(s, fillByMeasure=False, segmentByTarget=True, 
+#             normalizeByPart = False, title='Haydn, Symphony No. 94 in G major, Movement II',
+#             hideYGrid=True, hideXGrid=True, alpha=1, figureSize=[60,4], dpi=300, )
 
 
     def testHorizontalInstrumentationB(self):

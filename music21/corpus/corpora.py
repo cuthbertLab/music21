@@ -407,7 +407,7 @@ class Corpus(object):
 
         >>> from music21 import corpus
         >>> corpus.CoreCorpus().metadataBundle
-        <music21.metadata.bundles.MetadataBundle 'core': {149... entries}>
+        <music21.metadata.bundles.MetadataBundle 'core': {144... entries}>
 
         '''
         from music21 import metadata
@@ -436,18 +436,20 @@ class CoreCorpus(Corpus):
     _composers = (
         ('airdsAirs', 'Aird\'s Airs'),
         ('bach', 'Johann Sebastian Bach'),
-        ('beethoven', 'Ludwig van Beethoven'),
+        # ('beethoven', 'Ludwig van Beethoven'),
         ('cpebach', 'C.P.E. Bach'),
         ('ciconia', 'Johannes Ciconia'),
+        ('corelli', 'Arcangelo Corelli'),
         ('essenFolksong', 'Essen Folksong Collection'),
         ('handel', 'George Frideric Handel'),
-        ('haydn', 'Joseph Haydn'),
+        # ('haydn', 'Joseph Haydn'),
         ('josquin', 'Josquin des Prez'),
         ('luca', 'D. Luca'),
         ('miscFolk', "Miscellaneous Folk"),
         ('monteverdi', "Claudio Monteverdi"),
-        ('mozart', 'Wolfgang Amadeus Mozart'),
+        # ('mozart', 'Wolfgang Amadeus Mozart'),
         ('oneills1850', 'Oneill\'s 1850'),
+        ('palestrina', 'Giovanni Palestrina'),
         ('ryansMammoth', 'Ryan\'s Mammoth Collection'),
         ('schoenberg', 'Arnold Schoenberg'),
         ('schumann', 'Robert Schumann'),
@@ -611,56 +613,6 @@ class CoreCorpus(Corpus):
                 results.append(candidate)
         return results
 
-    def getBeethovenStringQuartets(
-        self,
-        fileExtensions=None,
-        ):
-        '''
-        Return a list of all Beethoven String Quartet filenames.
-
-        >>> from music21 import corpus
-        >>> coreCorpus = corpus.CoreCorpus()
-        >>> a = coreCorpus.getBeethovenStringQuartets()
-        >>> len(a) > 10
-        True
-
-        >>> a = coreCorpus.getBeethovenStringQuartets('krn')
-        >>> len(a) < 10 and len(a) > 0
-        True
-
-        >>> a = coreCorpus.getBeethovenStringQuartets('xml')
-        >>> len(a) > 400
-        False
-
-        '''
-        names = (
-            'opus18no1',
-            'opus18no3',
-            'opus18no4',
-            'opus18no5',
-            'opus59no1',
-            'opus59no2',
-            'opus59no3',
-            'opus74',
-            'opus132',
-            'opus133',
-            )
-        candidates = []
-        for name in names:
-            candidates.extend(self.getWorkList(
-                ('beethoven', name),
-                fileExtensions=fileExtensions,
-                ))
-        results = []
-        for candidate in candidates:
-            if not os.path.exists(candidate):
-                environLocal.printDebug([
-                    'corpus missing expected file path',
-                    candidate,
-                    ])
-            else:
-                results.append(candidate)
-        return candidates
 
     def getComposer(
         self,
@@ -677,12 +629,8 @@ class CoreCorpus(Corpus):
 
         >>> from music21 import corpus
         >>> coreCorpus = corpus.CoreCorpus()
-        >>> a = coreCorpus.getComposer('beethoven')
-        >>> len(a) > 10
-        True
-
-        >>> a = coreCorpus.getComposer('mozart')
-        >>> len(a) > 10
+        >>> a = coreCorpus.getComposer('bach')
+        >>> len(a) > 100
         True
 
         >>> a = coreCorpus.getComposer('bach', 'krn')
@@ -692,7 +640,6 @@ class CoreCorpus(Corpus):
         >>> a = coreCorpus.getComposer('bach', 'xml')
         >>> len(a) > 10
         True
-
         '''
         paths = self.getPaths(fileExtensions)
         results = []
@@ -726,16 +673,16 @@ class CoreCorpus(Corpus):
         >>> import os
         >>> from music21 import corpus
         >>> coreCorpus = corpus.CoreCorpus()
-        >>> a = coreCorpus.getComposerDirectoryPath('beethoven')
-        >>> a.endswith(os.path.join('corpus', os.sep, 'beethoven'))
+        >>> a = coreCorpus.getComposerDirectoryPath('ciconia')
+        >>> a.endswith(os.path.join('corpus', os.sep, 'ciconia'))
         True
 
         >>> a = coreCorpus.getComposerDirectoryPath('bach')
         >>> a.endswith(os.path.join('corpus', os.sep, 'bach'))
         True
 
-        >>> a = coreCorpus.getComposerDirectoryPath('mozart')
-        >>> a.endswith(os.path.join('corpus', os.sep, 'mozart'))
+        >>> a = coreCorpus.getComposerDirectoryPath('handel')
+        >>> a.endswith(os.path.join('corpus', os.sep, 'handel'))
         True
 
         '''
@@ -749,54 +696,6 @@ class CoreCorpus(Corpus):
                 match = directory
                 break
         return match
-
-    def getHandelMessiah(
-        self,
-        fileExtensions='md',
-        ):
-        '''
-        Return a list of the filenames of all parts of Handel's Messiah:
-
-        >>> from music21 import corpus
-        >>> coreCorpus = corpus.CoreCorpus()
-        >>> a = coreCorpus.getHandelMessiah()
-        >>> len(a)
-        43
-
-        '''
-        names = (
-            'movement1-01.md', 'movement1-02.md', 'movement1-03.md',
-            'movement1-04.md', 'movement1-05.md', 'movement1-07.md',
-            'movement1-08.md', 'movement1-09.md', 'movement1-10.md',
-            'movement1-11.md', 'movement1-12.md', 'movement1-13.md',
-            'movement1-15.md', 'movement1-17.md', 'movement1-18.md',
-            'movement1-19.md', 'movement1-23.md', 'movement2-01.md',
-            'movement2-03.md', 'movement2-03.md', 'movement2-04.md',
-            'movement2-05.md', 'movement2-06.md', 'movement2-07.md',
-            'movement2-08.md', 'movement2-09.md', 'movement2-10.md',
-            'movement2-11.md', 'movement2-12.md', 'movement2-13.md',
-            'movement2-15.md', 'movement2-18.md', 'movement2-19.md',
-            'movement2-21.md', 'movement3-01.md', 'movement3-02.md',
-            'movement3-03.md', 'movement3-04.md', 'movement3-05.md',
-            'movement3-07.md', 'movement3-08.md', 'movement3-09.md',
-            'movement3-10.md',
-            )
-        composerDirectory = self.getComposerDirectoryPath('handel')
-        results = []
-        if composerDirectory is None:
-            return results
-        paths = self.getPaths(fileExtensions)
-        for filename in names:
-            candidate = os.path.join(composerDirectory, 'hwv56', filename)
-            if candidate not in paths:  # it may not match extensions
-                if not os.path.exists(candidate):  # it does not exist at all
-                    environLocal.printDebug([
-                        'corpus missing expected file path',
-                        candidate,
-                        ])
-            else:
-                results.append(candidate)
-        return results
 
     def getMonteverdiMadrigals(
         self,
@@ -866,7 +765,7 @@ class CoreCorpus(Corpus):
         >>> coreCorpus = corpus.CoreCorpus()
         >>> corpusFilePaths = coreCorpus.getPaths()
         >>> len(corpusFilePaths)
-        3044
+        2507
 
         >>> kernFilePaths = coreCorpus.getPaths('krn')
         >>> len(kernFilePaths) >= 500
@@ -904,30 +803,18 @@ class CoreCorpus(Corpus):
 
         >>> from music21 import corpus
         >>> coreCorpus = corpus.CoreCorpus()
-        >>> len(coreCorpus.getWorkList('beethoven/opus18no1'))
-        8
-
-        >>> len(coreCorpus.getWorkList('beethoven/opus18no1', 1))
-        2
-
-        >>> len(coreCorpus.getWorkList('beethoven/opus18no1', 1, '.krn'))
+        
+        # returns 1 even though there is a '.mus' file, which cannot be read...
+        
+        >>> len(coreCorpus.getWorkList('cpebach/h186'))
+        1
+        >>> len(coreCorpus.getWorkList('cpebach/h186', None, '.xml'))
         1
 
-        >>> len(coreCorpus.getWorkList('beethoven/opus18no1', 1, '.xml'))
+        >>> len(coreCorpus.getWorkList('schumann_clara/opus17', 3))
         1
-
-        >>> len(coreCorpus.getWorkList('beethoven/opus18no1', 0, '.xml'))
+        >>> len(coreCorpus.getWorkList('schumann_clara/opus17', 2))
         0
-
-        >>> len(coreCorpus.getWorkList('handel/hwv56', '1-02', '.md'))
-        1
-
-        >>> len(coreCorpus.getWorkList('handel/hwv56', (2, 1), '.md'))
-        1
-
-        >>> len(coreCorpus.getWorkList(
-        ...     'bach/artOfFugue_bwv1080', 2, '.md'))
-        1
 
         Make sure that 'verdi' just gets the single Verdi piece and not the
         Monteverdi pieces:
@@ -1018,7 +905,7 @@ class CoreCorpus(Corpus):
         Search the core corpus for metadata entries:
 
         >>> corpus.CoreCorpus().search('3/4')
-        <music21.metadata.bundles.MetadataBundle {2012 entries}>
+        <music21.metadata.bundles.MetadataBundle {1857 entries}>
 
         >>> corpus.CoreCorpus().search(
         ...      'bach',

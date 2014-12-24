@@ -25,8 +25,7 @@ def getVoiceLeadingMoments(music21Stream):
     Takes in a :class:`~music21.stream.Stream` and returns a :class:`~music21.stream.Score`
     of the :class:`~music21.stream.Stream` broken up into its voice leading moments.
     
-    >>> from music21 import corpus
-    >>> score = corpus.parse("corelli/op3no1/1grave.zip").measures(1,3)
+    >>> #_DOCS_SHOW score = corpus.parse("corelli/op3no1/1grave").measures(1,3)
     >>> #_DOCS_SHOW score.show()
     
     .. image:: images/figuredBass/corelli_grave.*
@@ -34,6 +33,7 @@ def getVoiceLeadingMoments(music21Stream):
 
 
     >>> from music21.figuredBass import checker
+    >>> score = corpus.parse('bwv66.6') #_DOCS_HIDE
     >>> vlMoments = checker.getVoiceLeadingMoments(score)
     >>> #_DOCS_SHOW vlMoments.show()
 
@@ -70,7 +70,7 @@ def extractHarmonies(music21Stream):
     to the lowest one. 
 
     >>> from music21 import corpus
-    >>> score = corpus.parse("corelli/op3no1/1grave.zip").measures(1,3)
+    >>> score = corpus.parse("corelli/op3no1/1grave").measures(1,3)
     >>> #_DOCS_SHOW score.show()
     
     .. image:: images/figuredBass/corelli_grave.*
@@ -114,7 +114,7 @@ def createOffsetMapping(music21Part):
     
     >>> from music21 import corpus
     >>> from music21.figuredBass import checker
-    >>> score = corpus.parse("corelli/op3no1/1grave.zip").measures(1,3)   
+    >>> score = corpus.parse("corelli/op3no1/1grave").measures(1,3)   
     >>> v0 = score[0]
     >>> offsetMapping = checker.createOffsetMapping(v0)
     >>> for (offsets, notes) in sorted(offsetMapping.items()):
@@ -145,7 +145,7 @@ def correlateHarmonies(currentMapping, music21Part):
     
     >>> from music21 import corpus
     >>> from music21.figuredBass import checker
-    >>> score = corpus.parse("corelli/op3no1/1grave.zip").measures(1,3)   
+    >>> score = corpus.parse("corelli/op3no1/1grave").measures(1,3)   
     >>> v0 = score[0]
     >>> offsetMapping = checker.createOffsetMapping(v0)    
     >>> v1 = score[1]

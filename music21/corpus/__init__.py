@@ -65,8 +65,9 @@ def getCorePaths(fileExtensions=None, expandExtensions=True):
 
     >>> from music21 import corpus
     >>> corpusFilePaths = corpus.getCorePaths()
-    >>> len(corpusFilePaths)
-    2505
+    >>> cpl = len(corpusFilePaths) 
+    >>> 2500 < cpl < 2510
+    True
 
     >>> kernFilePaths = corpus.getCorePaths('krn')
     >>> len(kernFilePaths) >= 500
