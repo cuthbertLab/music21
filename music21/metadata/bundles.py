@@ -756,8 +756,8 @@ class MetadataBundle(object):
         >>> key.endswith('bach_bwv1007_prelude')
         True
 
-        >>> key = mb.corpusPathToKey('corelli/op3no1/1grave.xml')
-        >>> key.endswith('corelli_op3no1_1grave_xml')
+        >>> key = mb.corpusPathToKey('corelli/opus3no1/1grave.xml')
+        >>> key.endswith('corelli_opus3no1_1grave_xml')
         True
         '''
         if 'corpus' in filePath or 'music21' in filePath:

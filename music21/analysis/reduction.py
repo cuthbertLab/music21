@@ -945,7 +945,7 @@ class Test(unittest.TestCase):
     def testExtractionE(self):
         from music21 import analysis, corpus
 
-        src = corpus.parse('corelli/op3no1/1grave')
+        src = corpus.parse('corelli/opus3no1/1grave')
 
         #chords = src.chordify()
 

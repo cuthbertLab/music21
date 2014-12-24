@@ -182,9 +182,9 @@ class TestExternal(unittest.TestCase):
         '''
         from music21 import corpus, converter
         a = converter.parse(corpus.getWork(['mozart', 'k155','movement2.xml']))
-        b = a[3][10:20]
-        c = a[3][20:30]
-        d = a[3][30:40]
+        b = a[8][4:8]
+        c = a[8][8:12]
+        d = a[8][12:16]
 
         s = Stream()
         s.insert(b)
@@ -644,14 +644,14 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.flat.notes), 80)
 
         from music21 import corpus, converter
-        thisWork = corpus.getWork('haydn/opus74no2/movement4.xml')
+        thisWork = corpus.getWork('corelli/opus3no1/1grave')
         a = converter.parse(thisWork)
 
-        b = a[3][10:20]
+        b = a[7][5:10]
         environLocal.printDebug(['b', b, b.sites.getSiteIds()])
-        c = a[3][20:30]
+        c = a[7][10:15]
         environLocal.printDebug(['c', c, c.sites.getSiteIds()])
-        d = a[3][30:40]
+        d = a[7][15:20]
         environLocal.printDebug(['d', d, d.sites.getSiteIds()])
 
         s2 = Stream()
@@ -675,11 +675,10 @@ class Test(unittest.TestCase):
         '''
         import music21.stream # needed to do fully-qualified isinstance name checking
 
-        from music21 import corpus, converter
-        a = converter.parse(corpus.getWork('haydn/opus74no2/movement4.xml'))
-
+        from music21 import corpus
+        a = corpus.parse('corelli/opus3no1/1grave')
         # test basic activeSite relationships
-        b = a[3]
+        b = a[8]
         self.assertEqual(isinstance(b, music21.stream.Part), True)
         self.assertEqual(b.activeSite, a)
 
@@ -732,13 +731,13 @@ class Test(unittest.TestCase):
 
     def testExtractedNoteAssignLyric(self):
         from music21 import converter, corpus, text
-        a = converter.parse(corpus.getWork('opus74no1', 3))
+        a = converter.parse(corpus.getWork('corelli/opus3no1/1grave'))
         b = a.parts[1] 
         c = b.flat
         for thisNote in c.getElementsByClass('Note'):
             thisNote.lyric = thisNote.name
         textStr = text.assembleLyrics(b)
-        self.assertEqual(textStr.startswith('C D E A F E'), 
+        self.assertEqual(textStr.startswith('A A G F E'), 
                          True)
 
 
@@ -749,26 +748,15 @@ class Test(unittest.TestCase):
         from music21 import corpus, converter
 
         # manually set activeSite to associate 
-        a = converter.parse(corpus.getWork(['haydn', 'opus74no2', 
-                                            'movement4.xml']))
+        a = converter.parse(corpus.getWork(['corelli', 'opus3no1', 
+                                            '1grave.xml']))
 
-#         b = a[3][10:20]
-#         # TODO: manually setting the activeSite is still necessary
-#         b.activeSite = a[3] # manually set the activeSite
-
-        b = a.parts[3]
+        b = a.parts[2]
         # by calling the .part property, we create a new stream; thus, the
         # activeSite of b is no longer a
         # self.assertEqual(b.activeSite, None)
         instObj = b.getInstrument()
-        self.assertEqual(instObj.partName, 'Cello')
-
-        p = a.parts[3] # get part
-        # a mesausre within this part has as its activeSite the part
-        #self.assertEqual(p.getElementsByClass('Measure')[10].activeSite, a.parts[3])
-        instObj = p.getInstrument()
-        self.assertEqual(instObj.partName, 'Cello')
-
+        self.assertEqual(instObj.partName, u'Violone e Organo')
 
 
 
@@ -5169,62 +5157,61 @@ class Test(unittest.TestCase):
     def testPartsToVoicesB(self):
         from music21 import corpus
         # this work has five parts: results in e parts
-        s0 = corpus.parse('hwv56', '1-18')
+        s0 = corpus.parse('corelli/opus3no1/1grave')
+        self.assertEqual(len(s0.parts), 3)
         s1 = s0.partsToVoices(2, permitOneVoicePerPart=True)
-        self.assertEqual(len(s1.parts), 3)
+        self.assertEqual(len(s1.parts), 2)
         self.assertEqual(len(s1.parts[0].getElementsByClass(
             'Measure')[0].voices), 2)
         self.assertEqual(len(s1.parts[1].getElementsByClass(
-            'Measure')[0].voices), 2)
-        self.assertEqual(len(s1.parts[2].getElementsByClass(
             'Measure')[0].voices), 1)
 
         #s1.show()
 
-        s0 = corpus.parse('hwv56', '1-05')
-        # can use index values
-        s2 = s0.partsToVoices(([0,1], [2,4], 3), permitOneVoicePerPart=True)   
-        self.assertEqual(len(s2.parts), 3)
-        self.assertEqual(len(s2.parts[0].getElementsByClass(
-            'Measure')[0].voices), 2)
-        self.assertEqual(len(s2.parts[1].getElementsByClass(
-            'Measure')[0].voices), 2)
-        self.assertEqual(len(s2.parts[2].getElementsByClass(
-            'Measure')[0].voices), 1)
-
-        s2 = s0.partsToVoices((['Violino I','Violino II'], ['Viola','Bassi'], ['Basso']), permitOneVoicePerPart=True)
-        self.assertEqual(len(s2.parts), 3)
-        self.assertEqual(len(s2.parts[0].getElementsByClass(
-            'Measure')[0].voices), 2)
-        self.assertEqual(len(s2.parts[1].getElementsByClass(
-            'Measure')[0].voices), 2)
-        self.assertEqual(len(s2.parts[2].getElementsByClass(
-            'Measure')[0].voices), 1)
-
-
-        # this will keep the voice part unaltered
-        s2 = s0.partsToVoices((['Violino I','Violino II'], ['Viola','Bassi'], 'Basso'), permitOneVoicePerPart=False)
-        self.assertEqual(len(s2.parts), 3)
-        self.assertEqual(len(s2.parts[0].getElementsByClass(
-            'Measure')[0].voices), 2)
-        self.assertEqual(len(s2.parts[1].getElementsByClass(
-            'Measure')[0].voices), 2)
-        self.assertEqual(s2.parts[2].getElementsByClass(
-            'Measure')[0].hasVoices(), False)
-
-
-        # mm 16-19 are a good examples
-        s1 = corpus.parse('hwv56', '1-05').measures(16, 19)
-        s2 = s1.partsToVoices((['Violino I','Violino II'], ['Viola','Bassi'], 'Basso'))
-        #s2.show()
-
-        self.assertEqual(len(s2.parts), 3)
-        self.assertEqual(len(s2.parts[0].getElementsByClass(
-            'Measure')[0].voices), 2)
-        self.assertEqual(len(s2.parts[1].getElementsByClass(
-            'Measure')[0].voices), 2)
-        self.assertEqual(s2.parts[2].getElementsByClass(
-            'Measure')[0].hasVoices(), False)
+#         s0 = corpus.parse('hwv56', '1-05')
+#         # can use index values
+#         s2 = s0.partsToVoices(([0,1], [2,4], 3), permitOneVoicePerPart=True)   
+#         self.assertEqual(len(s2.parts), 3)
+#         self.assertEqual(len(s2.parts[0].getElementsByClass(
+#             'Measure')[0].voices), 2)
+#         self.assertEqual(len(s2.parts[1].getElementsByClass(
+#             'Measure')[0].voices), 2)
+#         self.assertEqual(len(s2.parts[2].getElementsByClass(
+#             'Measure')[0].voices), 1)
+# 
+#         s2 = s0.partsToVoices((['Violino I','Violino II'], ['Viola','Bassi'], ['Basso']), permitOneVoicePerPart=True)
+#         self.assertEqual(len(s2.parts), 3)
+#         self.assertEqual(len(s2.parts[0].getElementsByClass(
+#             'Measure')[0].voices), 2)
+#         self.assertEqual(len(s2.parts[1].getElementsByClass(
+#             'Measure')[0].voices), 2)
+#         self.assertEqual(len(s2.parts[2].getElementsByClass(
+#             'Measure')[0].voices), 1)
+# 
+# 
+#         # this will keep the voice part unaltered
+#         s2 = s0.partsToVoices((['Violino I','Violino II'], ['Viola','Bassi'], 'Basso'), permitOneVoicePerPart=False)
+#         self.assertEqual(len(s2.parts), 3)
+#         self.assertEqual(len(s2.parts[0].getElementsByClass(
+#             'Measure')[0].voices), 2)
+#         self.assertEqual(len(s2.parts[1].getElementsByClass(
+#             'Measure')[0].voices), 2)
+#         self.assertEqual(s2.parts[2].getElementsByClass(
+#             'Measure')[0].hasVoices(), False)
+# 
+# 
+#         # mm 16-19 are a good examples
+#         s1 = corpus.parse('hwv56', '1-05').measures(16, 19)
+#         s2 = s1.partsToVoices((['Violino I','Violino II'], ['Viola','Bassi'], 'Basso'))
+#         #s2.show()
+# 
+#         self.assertEqual(len(s2.parts), 3)
+#         self.assertEqual(len(s2.parts[0].getElementsByClass(
+#             'Measure')[0].voices), 2)
+#         self.assertEqual(len(s2.parts[1].getElementsByClass(
+#             'Measure')[0].voices), 2)
+#         self.assertEqual(s2.parts[2].getElementsByClass(
+#             'Measure')[0].hasVoices(), False)
 
 
 
@@ -5792,12 +5779,12 @@ class Test(unittest.TestCase):
     def testSpannerTransferA(self):
         from music21 import corpus
         # test getting spanners after .measures extraction
-        s = corpus.parse('opus74no1', 3)
-        post = s.parts[0].measures(68,81)
+        s = corpus.parse('corelli/opus3no1/1grave')
+        post = s.parts[0].measures(5, 10)
 
         # two per part
-        rbSpanners = post.getElementsByClass('RepeatBracket')
-        self.assertEqual(len(rbSpanners), 2)
+        rbSpanners = post.getElementsByClass('Slur')
+        self.assertEqual(len(rbSpanners), 6)
         #post.parts[0].show()
         unused_firstSpannedElementIds = [id(x) for x in rbSpanners[0].getSpannedElements()]
         unused_secondSpannedElementIds = [id(x) for x in rbSpanners[1].getSpannedElements()]
@@ -5827,7 +5814,7 @@ class Test(unittest.TestCase):
                     # some Measures contain Voices, some do not
                     # do get all notes regardless of Voices, take a flat measure
                     self.assertEqual(len(meas.flat.notesAndRests) != 0, True)
-        piece = corpus.parse('haydn/opus74no2/movement3.xml')
+        piece = corpus.parse('corelli/opus3no1/1grave')
         parseMeasures(piece)        
         piece = corpus.parse('bach/bwv7.7')
         parseMeasures(piece)
@@ -6356,11 +6343,12 @@ class Test(unittest.TestCase):
         mm.number = 30
         self.assertEqual([m.seconds for m in s.getElementsByClass('Measure')], [6.0, 10.0, 4.0])
 
-    def testMetronomeMarkBoundaries(self):
-        from music21 import corpus
-        s = corpus.parse('hwv56/movement2-09.md')
-        mmBoundaries = s.metronomeMarkBoundaries()
-        self.assertEqual(str(mmBoundaries), '[(0.0, 20.0, <music21.tempo.MetronomeMark Largo e piano Quarter=46>)]')
+    # TODO: New piece with Metronome Mark Boundaries
+#     def testMetronomeMarkBoundaries(self):
+#         from music21 import corpus
+#         s = corpus.parse('hwv56/movement2-09.md')
+#         mmBoundaries = s.metronomeMarkBoundaries()
+#         self.assertEqual(str(mmBoundaries), '[(0.0, 20.0, <music21.tempo.MetronomeMark Largo e piano Quarter=46>)]')
 
     def testAccumulatedTimeA(self):
         from music21 import stream, tempo

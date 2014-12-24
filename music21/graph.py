@@ -2070,7 +2070,7 @@ class PlotStream(object):
         >>> [x for x, y in a.ticksPitchSpaceUsage(hideUnused=True)]
         [64, 66, 67, 69, 71, 72]
 
-        >>> s = corpus.parse('corelli/op3no1/1grave')
+        >>> s = corpus.parse('corelli/opus3no1/1grave')
         >>> a = graph.PlotStream(s)
         >>> [x for x, y in a.ticksPitchSpaceUsage(showEnharmonic=True, hideUnused=True)]
         [36, 41, 43, 45, 46, 47, 48, 49, 50, 52, 53, 55, 57, 58, 60, 62, 64, 65, 67, 69, 70, 71, 72]
@@ -5001,7 +5001,7 @@ class Test(unittest.TestCase):
         data = [('bar%s' % x, {'a':3,'b':2,'c':1}) for x in range(10)]
         g.setData(data)
         g.process()
-        streamList = ['bach/bwv66.6', 'schoenberg/opus19/movement2', 'corelli/op3no1/1grave']
+        streamList = ['bach/bwv66.6', 'schoenberg/opus19/movement2', 'corelli/opus3no1/1grave']
         feList = ['ql1', 'ql2', 'ql3']
 
         p = PlotFeatures(streamList, featureExtractors=feList, doneAction=None)

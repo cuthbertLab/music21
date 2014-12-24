@@ -130,7 +130,7 @@ def rhythmicSearch(thisStream, searchStream):
     are being counted here as well as notes)
     
     
-    >>> grave = corpus.parse('corelli/op3no1/1grave')
+    >>> grave = corpus.parse('corelli/opus3no1/1grave')
     >>> term1results = []
     >>> term2results = []
     >>> for p in grave.parts:

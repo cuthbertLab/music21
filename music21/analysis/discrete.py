@@ -1406,7 +1406,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(midDict['M2']), "[<music21.interval.Interval M2>, 2]")
 
         mid = MelodicIntervalDiversity()
-        s = corpus.parse('corelli/op3no1/1grave')
+        s = corpus.parse('corelli/opus3no1/1grave')
         #s.show()
 
         midDict = mid.countMelodicIntervals(s.parts[1])
