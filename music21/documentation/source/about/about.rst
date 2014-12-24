@@ -4,12 +4,13 @@
 Authors, Acknowledgments, Contributing, and Licensing
 =====================================================
 
-Music21 is an open-source toolkit for Computer-aided musicology.  It is licensed under the LGPL (see below).
+Music21 is an open-source toolkit for Computer-aided musicology.  It is licensed under 
+the LGPL or BSD license (see below).
 
 About the Authors
 -----------------------
 
-**Michael Cuthbert**, the creator of music21, is Homer A. Burnell Associate Professor of Music at M.I.T.  
+**Michael Cuthbert**, the creator of `music21`, is Associate Professor of Music at M.I.T.  
 He received his A.B. *summa cum laude*, A.M. and Ph.D. degrees from Harvard University.   
 Cuthbert spent 2004-05 at the American Academy as a Rome Prize winner in Medieval Studies,
 2009-10 as Fellow at Harvard's Villa I Tatti Center for Italian Renaissance Studies 
@@ -23,14 +24,17 @@ on set analysis of Sub-Saharan African Rhythm and the music of John Zorn. In add
 work on music21, Cuthbert is currently writing a book on sacred music in Italy during the 
 age of the Black Death and Great Papal Schism.
 
-**Christopher Ariza** is Former Lead Programmer of music21 and was Visiting Assistant Professor of Music
-at M.I.T. from 2010 to 2013.  Prior to joining the music21 project, Ariza was Assistant Professor of Music
+**Christopher Ariza** is Emeritus Lead Programmer of `music21` and was Visiting Assistant Professor of Music
+at M.I.T. from 2010 to 2013.  Prior to joining the `music21` project, Ariza was Assistant Professor of Music
 Technology at Towson University in Baltimore.  He has published and presented numerous articles 
 and papers on algorithmic composition and generative music systems.  Ariza received his A.B.
 degree from Harvard University and his M.A. and Ph.D. degrees from New York University.
 
-Additional contributions by many MIT students and visitors and the Open Source software community.
+**Benjamin Hogue** is Former Lead Programmer of `music21`.
 
+**Josiah Wolf Oberholtzer** is Former Lead Programmer of `music21`.
+
+Additional contributions by many MIT students and visitors and the Open Source software community.
 
 
 Acknowledgements  
@@ -70,6 +74,10 @@ Contributors
 Additionally, the following individuals have contributed materials or knowledge to this project.  
 Their contributions and generosity are greatly appreciated.
 
+* Thomas Bonte, Nicholas Froment, and Werner Schweer of `MuseScore`_ for their support
+and for their contributions to the open source music notation projects, including the
+Bach Goldberg Variations and the Handel Arias included.
+
 * `Donald Byrd`_, researcher on University of Indiana who created a schema for computer-aided musicology 
   (along with the source of all sorts of examples of how music notation is difficult).
 
@@ -93,7 +101,12 @@ Their contributions and generosity are greatly appreciated.
   Her website contains all these chorales in additional formats.  Any discoveries we make 
   regarding these chorales are done in her memory.
 
+* Walter B. Hewlett and Craig Sapp for support.
+
 * `Justin London`_ compiled and maintained the list of Second-Viennese row forms now available in serial.py.
+
+* `McGill University`_ ELVIS project for including the MEI parser. Special thanks to Julie
+Cumming, Andrew Hankinson, and Christopher Antila for contributing.
 
 * `Manuel Op de Coul`_ has kindly gave permission to use the Scala scale archive of nearly 4000 scales in music21.
 
@@ -108,6 +121,7 @@ Their contributions and generosity are greatly appreciated.
 .. _Laura E. Conrad: http://www.serpentpublications.org/
 .. _Michael Good: http://www.recordare.com
 .. _Margaret Greentree: http://www.jsbchorales.net
+.. _MuseScore: http://www.musescore.com
 .. _Justin London: http://www.people.carleton.edu/~jlondon/2ndviennese.htm
 .. _Bryen Travis: http://www.bachcentral.com/
 .. _Ewa Dahlig-Turek: http://www.esac-data.org
@@ -115,6 +129,7 @@ Their contributions and generosity are greatly appreciated.
 .. _Manuel Op de Coul: http://www.huygens-fokker.org/scala
 .. _John Chambers: http://trillian.mit.edu/~jc/music/book
 .. _Jack Campin: http://www.campin.me.uk/
+.. _McGill University: http://digihum.mcgill.ca/blog/2012/11/30/elvis-digging-into-data-at-mcgill/
 .. _Project Gutenberg: http://www.gutenberg.org/browse/categories/4
 
 
@@ -145,32 +160,15 @@ Licensing and Copyright
 The music21 Toolkit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Music21 is Copyright (c) 2010-13, Michael Scott Cuthbert and the music21 Project.  Music21 code (excluding content encoded in the corpus) is 
-free and open-source software, licensed under the Lesser GNU Public License (LGPL).
-The complete license is included as music21/license.txt and can be found at the following URL:
-
-  http://www.gnu.org/copyleft/lesser.html
-
-While you're legally bound by the rules above, in a nutshell here's what the LGPL means: 
-You can download music21 for free, give a copy of it to your friends, make your great discovery about Buxtehude
-or Beyonce with it and owe us nothing.  (Though [sniff, sniff] I'd think a footnote of thanks to music21 in your 
-eventual publication or on your website would be a pretty nice thing to do, no?  the authors also enjoy a nice scotch,
-if you're feeling really generous).  You can even make money off of music21 by making your own projects that use it.
-
-But there are some responsibilities you have: if you alter music21 itself, you must release it under the LGPL
-license itself (note that we're bound by the same responsibility!) -- meaning your version must also be free and 
-open source.  You can link to music21 in your own proprietary closed-source code,
-so if you want to make money off of a great closed-source software notation package that uses music21, go ahead! But 
-the version of music21 distributed with your software must be editable by users.  So if you use music21 to provide
-sound for a closed-source demonstration, I should be able to hack the version of music21 used by your demo to change 
-the base tuning, etc.  In sum: linking to music21 in closed-source applications = good.  embedding/altering music21 
-itself in closed-source apps = illegal.
-
+Music21 is Copyright (c) 2010-14, Michael Scott Cuthbert and cuthbertLab.  
+Music21 code (excluding content encoded in the corpus) is 
+free and open-source software, licensed under the Lesser GNU Public License (LGPL) or the
+BSD License.
 
 The music21 Corpus
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The LGPL music21 software is distributed with a corpus of encoded compositions which are distributed 
+The LGPL/BSD music21 software is distributed with a corpus of encoded compositions which are distributed 
 with the permission of the encoders (and, where needed, the composers or arrangers) and where permitted 
 under United States copyright law. Some encodings included in the corpus may not be used for commercial uses 
 or have other restrictions: please see the licenses embedded in individual compositions or directories for more details.   

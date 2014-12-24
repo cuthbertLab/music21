@@ -19,7 +19,7 @@ To do a release,
 3. If all tests pass, run `corpus.cacheMetadata(['core'])`, 
 4. run test/testSingleCoreAll.py 
      (normally not necessary,because it's slower and mostly duplicates multiprocessTest, 
-     but should be done before making a release).  Does not yet need to be done via python3
+     but should be done before making a release).  Done automatically by Travis-CI on GitHub commit
 5. then test/testDocumentation
 6. then test/testSerialization
 7. run documentation/make.py clean
@@ -39,7 +39,6 @@ To do a release,
 13. then update PyPI by going to pypi.python.org and logging in and selecting music21 and clicking 
     edit and augment the version number and the download URL. -- The URL will be printed when
     running dist.py -- it's important to cut and paste this, since it has the md5 tag.
-
 
 14. Delete the files in dist...
 

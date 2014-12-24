@@ -556,9 +556,9 @@ class Test(unittest.TestCase):
 
 
     def testScalesPy10(self):
-        # look through s = corpus.parseWork('bwv1080/06')
-        #part = corpus.parseWork('bwv1080/03').measures(24,29).parts[0]
-        #part = corpus.parseWork('bwv1080/03').parts[0]
+        # look through s = corpus.parse('bwv1080/06')
+        #part = corpus.parse('bwv1080/03').measures(24,29).parts[0]
+        #part = corpus.parse('bwv1080/03').parts[0]
 
         #from music21 import corpus, scale, note
         from music21 import analysis
@@ -579,7 +579,7 @@ class Test(unittest.TestCase):
 
 
         # this is applied to all  parts
-#         s = corpus.parseWork('mozart/k80/movement1').measures(1,28)
+#         s = corpus.parse('mozart/k80/movement1').measures(1,28)
 #         for sc in [scGMajor, scDMajor, scAMajor]:
 #             for part in s.parts: 
 #                 post = analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=5,             

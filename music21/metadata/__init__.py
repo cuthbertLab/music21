@@ -10,7 +10,8 @@
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
-'''Classes and functions for creating and processing metadata associated with
+'''
+Classes and functions for creating and processing metadata associated with
 scores, works, and fragments, such as titles, movements, authors, publishers,
 and regions.
 
@@ -205,6 +206,36 @@ class Metadata(base.Music21Object):
                 setattr(self, attr, keywords[attr])
 
     ### SPECIAL METHODS ###
+    def all(self):
+        '''
+        Returns all values (as strings) stored in this metadata as a sorted list of tuples.
+        
+        >>> c = corpus.parse('corelli/opus3no1/1grave')
+        >>> c.metadata.all()
+        [('arranger', 'Michael Scott Cuthbert'), 
+         ('composer', 'Arcangelo Corelli'), 
+         ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)')]
+        '''
+        allOut = []
+        for wid in self._workIds.keys():
+            val = self._workIds[wid]
+            if val is None:
+                continue
+            t = (str(wid), str(val))
+            allOut.append(t)
+        for contri in self._contributors:
+            for n in contri._names:
+                t = (str(contri.role), str(n))
+                allOut.append(t)
+        if self._date is not None:
+            t = ('date', str(self._date))
+            allOut.append(t)
+        if self._copyright is not None:
+            t = ('copyright', str(self._copyright))
+            allOut.append(t)
+            
+        
+        return sorted(allOut)
 
     def __getattr__(self, name):
         r'''

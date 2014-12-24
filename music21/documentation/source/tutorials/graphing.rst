@@ -135,8 +135,8 @@ following classes: :class:`~music21.graph.PlotWindowedKrumhanslSchmuckler`,
 A basic example follows::
 
     >>> from music21 import *
-    >>> haydn = corpus.parse('haydn/symphony94/02')
-    >>> plot = graph.PlotDolan(haydn)
+    >>> haydn = converter.parse('haydn/symphony94/02') # doctest: +SKIP
+    >>> plot = graph.PlotDolan(haydn) # doctest: +SKIP
     >>> plot.process() # doctest: +SKIP
 
 .. image:: images/graphing-06.*

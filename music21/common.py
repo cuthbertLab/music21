@@ -9,7 +9,8 @@
 # Copyright:    Copyright © 2009-2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-'''Utility constants, dictionaries, functions, and objects used throughout music21.
+'''
+Utility constants, dictionaries, functions, and objects used throughout music21.
 '''
 
 # should NOT import music21 or anything like that, except in doctests.
@@ -1896,9 +1897,9 @@ def getCorpusContentDirs():
 
     >>> fp = common.getCorpusContentDirs()
     >>> fp # this test will be fragile, depending on composition of dirs
-    ['airdsAirs', 'bach', 'ciconia', 'corelli', 'cpebach',
-    'demos', 'essenFolksong', 'handel', 'josquin', 'leadSheet',
-    'luca', 'miscFolk', 'monteverdi', 'oneills1850', 'palestrina',
+    ['airdsAirs', 'bach', 'beethoven', 'ciconia', 'corelli', 'cpebach',
+    'demos', 'essenFolksong', 'handel', 'haydn', 'josquin', 'leadSheet',
+    'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'palestrina',
     'ryansMammoth', 'schoenberg', 'schumann', 'schumann_clara',
     'theoryExercises', 'trecento', 'verdi']
     '''

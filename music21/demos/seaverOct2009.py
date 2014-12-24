@@ -15,7 +15,7 @@ def simple1():
     
     for work in ['opus18no1', 'opus59no3']:
         movementNumber = 3
-        score = corpus.parseWork(work, movementNumber, extList=['xml'])
+        score = corpus.parse(work, movementNumber, extList=['xml'])
     
         for part in score:
             instrumentName = part.flat.getElementsByClass(
@@ -152,7 +152,7 @@ def simple4a(show=True):
     #movement = corpus.getWork(work, movementNumber)
     #s = converter.parse(movement)
 
-    s = corpus.parseWork('opus18no1', movementNumber, extList=['xml'])
+    s = corpus.parse('opus18no1', movementNumber, extList=['xml'])
 
     #s[0].show()
 
@@ -180,7 +180,7 @@ def simple4b(show=True):
 
     work = 'opus41no1'
     movementNumber = 2
-    s = corpus.parseWork(work, movementNumber, extList='xml')
+    s = corpus.parse(work, movementNumber, extList='xml')
     countCrescendo = 0
     countDiminuendo = 0
     for part in s.getElementsByClass(stream.Part):
@@ -233,7 +233,7 @@ def simple4d():
 def simple4e(show=True):
     # 250.    Identify the longest note in a score
     qLenMax = 0
-    beethovenQuartet = corpus.parseWork('beethoven/opus18no1/movement4.xml')
+    beethovenQuartet = corpus.parse('beethoven/opus18no1/movement4.xml')
     maxMeasure = 0
     for part in beethovenQuartet.parts:
         partStripped = part.stripTies()
@@ -250,7 +250,7 @@ def simple4f(show=True):
     # question 19: Calculate pitch-class sets for melodic passages segmented by rests.
     work = 'opus18no1'
     movementNumber = 3
-    s = corpus.parseWork(work, movementNumber, extList=['xml'])
+    s = corpus.parse(work, movementNumber, extList=['xml'])
 
     foundSets = []
     candidateSet = []
@@ -350,7 +350,7 @@ def januaryThankYou():
     names += ['opus59no1', 'opus59no2', 'opus59no3']
 
     for workName in names:
-        beethovenScore = corpus.parseWork('beethoven/' + workName, 1)
+        beethovenScore = corpus.parse('beethoven/' + workName, 1)
         for partNum in range(4):
             print(workName, str(partNum))
             thisPart = beethovenScore[partNum]

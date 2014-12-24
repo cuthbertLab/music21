@@ -49,7 +49,8 @@ def annotateWithGerman():
     '''
     annotates a score with the German notes for each note
     '''
-    bwv295 = corpus.parseWork('bach/bwv295')
+    from music21 import corpus
+    bwv295 = corpus.parse('bach/bwv295')
     for thisNote in bwv295.flat.notes:
         thisNote.addLyric(thisNote.pitch.german)
     bwv295.show()
@@ -63,9 +64,10 @@ def bachParallels():
     Proceedings of the fourth Conference on Interdisciplinary Musicology (CIM08)
     Thessaloniki, Greece, 3-6 July 2008, http://web.auth.gr/cim08/
     '''
+    from music21 import corpus
     for fn in corpus.getBachChorales():
         print (fn)
-        c = corpus.parseWork(fn)
+        c = corpus.parse(fn)
         displayMe = False
         for i in range(len(c.parts) - 1):
             iName = c.parts[i].id

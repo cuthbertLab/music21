@@ -45,7 +45,11 @@ class ActivityMatch(object):
 
     Plotting routines to graph the output of dedicated methods in this class are available. 
 
-    :class:`~music21.graph.PlotScatterPitchSpaceDynamicSymbol` and :class:`~music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol` employs the :meth:`~music21.analysis.correlate.ActivityMatch.pitchToDynamic` method. Sample output is as follows:
+    :class:`~music21.graph.PlotScatterPitchSpaceDynamicSymbol` and 
+    :class:`~music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol` 
+    employs the :meth:`~music21.analysis.correlate.ActivityMatch.pitchToDynamic` method. 
+    
+    Sample output is as follows:
 
     .. image:: images/PlotScatterWeightedPitchSpaceDynamicSymbol.*
         :width: 600

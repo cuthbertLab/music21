@@ -45,7 +45,7 @@ def newDots(show=True):
 def altDots(show=True):
     '''This adds a syncopated bass line.
     '''
-    bwv30_6 = corpus.parseWork('bach/bwv30.6.xml')
+    bwv30_6 = corpus.parse('bach/bwv30.6.xml')
     bass = bwv30_6.getElementById('Bass')
     excerpt = bass.measures(1,10)
     music21.analysis.metrical.labelBeatDepth(excerpt)
@@ -158,7 +158,7 @@ def  pitchDensity(show=True):
 
     #from music21 import corpus, graph
     
-    beethovenScore = corpus.parseWork('opus133.xml')
+    beethovenScore = corpus.parse('beethoven/opus133.xml')
     celloPart = beethovenScore.getElementById('Cello')
     
     #First, we take a "flat" view of the Stream, which removes nested containers such as Measures. Second, we combine tied notes into single notes with summed durations.
@@ -235,7 +235,7 @@ def messiaen(show = True):
 
 
 def schumann(show = True):
-    streamObject = corpus.parseWork('schumann/opus41no1', 3)
+    streamObject = corpus.parse('schumann/opus41no1', 3)
     streamObject.plot('pitch')
 
     from music21.humdrum import testFiles as tf
@@ -269,20 +269,20 @@ def schumann(show = True):
 
 
 # minor mode bach chorales
-# >>> s = corpus.parseWork('bwv227.7')
+# >>> s = corpus.parse('bwv227.7')
 
 # this has bad beaming
 # move to relative major
 # ends on major I
 
 
-# >>> s = corpus.parseWork('bwv103.6')
+# >>> s = corpus.parse('bwv103.6')
 # 4/4, good beaming, has pickup
 # b minor, momves to D major, ends on major I
 # 16 measures
 # 4/4
 
-# >>> s = corpus.parseWork('bwv18.5-lz')
+# >>> s = corpus.parse('bwv18.5-lz')
 # a minor, good amount of minor iv, ends on major 1
 # 17 measures
 
@@ -291,8 +291,8 @@ def demoGettingWorks():
     
 
     # Can obtain works from an integrated corpus 
-    s1 = corpus.parseWork('bach/bwv103.6') # @UnusedVariable
-    s2 = corpus.parseWork('bach/bwv18.5-lz') # @UnusedVariable
+    s1 = corpus.parse('bach/bwv103.6') # @UnusedVariable
+    s2 = corpus.parse('bach/bwv18.5-lz') # @UnusedVariable
 
     # Can parse data stored in MusicXML files locally or online:
     s = converter.parse('http://www.musicxml.org/xml/elite.xml') # @UnusedVariable
@@ -305,7 +305,7 @@ def demoGettingWorks():
 def demoBasic():
 
     # A score can be represented as a Stream of Parts and Metadata
-    s1 = corpus.parseWork('bach/bwv103.6')
+    s1 = corpus.parse('bach/bwv103.6')
 
     # We can show() a Stream in a variety of forms
     #s1.show()
@@ -371,7 +371,7 @@ def demoBasic():
 
 
 def beethovenSearch():
-    op133 = corpus.parseWork('beethoven/opus133.xml') 
+    op133 = corpus.parse('beethoven/opus133.xml') 
     violin2 = op133.getElementById('2nd Violin')
     
     # an empty container for later display
@@ -449,8 +449,8 @@ def demoGraphBach():
     dpi = 300
 
     # loping off first measure to avoid pickup
-    s1 = corpus.parseWork('bach/bwv103.6').measures(1,None)
-    s2 = corpus.parseWork('bach/bwv18.5-lz').measures(1,None)
+    s1 = corpus.parse('bach/bwv103.6').measures(1,None)
+    s2 = corpus.parse('bach/bwv18.5-lz').measures(1,None)
 
     s1.plot('key', dpi=dpi, title='Windowed Key Analysis, Bach, BWV 103.6', windowStep='pow2')
     s2.plot('key', dpi=dpi, title='Windowed Key Analysis, Bach, BWV 18.5', windowStep='pow2')
@@ -477,7 +477,7 @@ def demoBeethoven133():
 
     dpi = 300
 
-    sStream = corpus.parseWork('opus133.xml') # load a MusicXML file
+    sStream = corpus.parse('opus133.xml') # load a MusicXML file
     part = sStream['cello'].stripTies()
 
     part.plot('scatter', values=['pitchclass', 'offset'],
@@ -488,8 +488,8 @@ def demoBeethoven133():
 def demoCombineTransform():
     from music21 import interval
 
-    s1 = corpus.parseWork('bach/bwv103.6')
-    s2 = corpus.parseWork('bach/bwv18.5-lz')
+    s1 = corpus.parse('bach/bwv103.6')
+    s2 = corpus.parse('bach/bwv18.5-lz')
 
     keyPitch1 = s1.analyze('key')[0]
     unused_gap1 = interval.Interval(keyPitch1, pitch.Pitch('C'))
