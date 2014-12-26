@@ -61,10 +61,6 @@ from music21 import spanner
 from music21 import stream
 from music21 import tie
 
-from music21.ext import six
-from six.moves import xrange  # pylint: disable=redefined-builtin,import-error,unused-import
-from six.moves import range  # pylint: disable=redefined-builtin,import-error,unused-import
-
 # Importing from base.py
 import music21.mei.base as base
 from music21.mei.base import _XMLID
@@ -167,8 +163,8 @@ class TestThings(unittest.TestCase):
 
     def testAllPartsPresent2(self):
         '''allPartsPresent(): four <staffDef>s'''
-        staffDefs = [mock.MagicMock(spec_set=ETree.Element) for _ in xrange(4)]
-        for i in xrange(4):
+        staffDefs = [mock.MagicMock(spec_set=ETree.Element) for _ in range(4)]
+        for i in range(4):
             staffDefs[i].get = mock.MagicMock(return_value=str(i + 1))
         elem = mock.MagicMock(spec_set=ETree.Element)
         elem.findall = mock.MagicMock(return_value=staffDefs)
@@ -178,8 +174,8 @@ class TestThings(unittest.TestCase):
 
     def testAllPartsPresent3(self):
         '''allPartsPresent(): four unique <staffDef>s, several repeats'''
-        staffDefs = [mock.MagicMock(spec_set=ETree.Element) for _ in xrange(12)]
-        for i in xrange(12):
+        staffDefs = [mock.MagicMock(spec_set=ETree.Element) for _ in range(12)]
+        for i in range(12):
             staffDefs[i].get = mock.MagicMock(return_value=str((i % 4) + 1))
         elem = mock.MagicMock(spec_set=ETree.Element)
         elem.findall = mock.MagicMock(return_value=staffDefs)
@@ -389,7 +385,7 @@ class TestAttrTranslators(unittest.TestCase):
         expected = (articulations.StrongAccent, articulations.Staccato)
         actual = base._articulationFromAttr(attr)
         self.assertEqual(0, mockTrans.call_count)
-        for i in xrange(len(expected)):
+        for i in range(len(expected)):
             self.assertTrue(isinstance(actual[i], expected[i]))
 
     @mock.patch('music21.mei.base._attrTranslator')
@@ -399,7 +395,7 @@ class TestAttrTranslators(unittest.TestCase):
         expected = (articulations.Tenuto, articulations.Staccato)
         actual = base._articulationFromAttr(attr)
         self.assertEqual(0, mockTrans.call_count)
-        for i in xrange(len(expected)):
+        for i in range(len(expected)):
             self.assertTrue(isinstance(actual[i], expected[i]))
 
     @mock.patch('music21.mei.base._attrTranslator')
@@ -1252,7 +1248,7 @@ class TestClefFromElement(unittest.TestCase):
         elem = mock.MagicMock()
         expectedGetOrder = [mock.call('shape'), mock.call('shape'), mock.call('shape'),
                             mock.call('line'), mock.call('dis'), mock.call('dis.place')]
-        expectedGetOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
+        expectedGetOrder.extend([mock.ANY for _ in range(1)])  # additional calls to elem.get(), not part of this test
         elemGetReturns = ['theClefShape', 'theClefShape', 'theClefShape', '2', '8', 'above']
         elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
         mockClefFromString.return_value = mock.MagicMock(name='clefFromString()')
@@ -1275,7 +1271,7 @@ class TestClefFromElement(unittest.TestCase):
         '''
         elem = mock.MagicMock()
         expectedGetOrder = [mock.call('shape')]
-        expectedGetOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
+        expectedGetOrder.extend([mock.ANY for _ in range(1)])  # additional calls to elem.get(), not part of this test
         elemGetReturns = ['perc']
         elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
         mockPercClef.return_value = mock.MagicMock(name='PercussionClef()')
@@ -1298,7 +1294,7 @@ class TestClefFromElement(unittest.TestCase):
         '''
         elem = mock.MagicMock()
         expectedGetOrder = [mock.call('shape'), mock.call('shape')]
-        expectedGetOrder.extend([mock.ANY for _ in xrange(1)])  # additional calls to elem.get(), not part of this test
+        expectedGetOrder.extend([mock.ANY for _ in range(1)])  # additional calls to elem.get(), not part of this test
         elemGetReturns = ['TAB', 'TAB']
         elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
         mockPercClef.return_value = mock.MagicMock(name='PercussionClef()')
@@ -1369,7 +1365,7 @@ class TestClefFromElement(unittest.TestCase):
         '''
         elem = mock.MagicMock()
         expectedGetOrder = [mock.call('shape'), mock.call(_XMLID), mock.call(_XMLID)]
-        expectedGetOrder.extend([mock.ANY for _ in xrange(0)])  # additional calls to elem.get(), not part of this test
+        expectedGetOrder.extend([mock.ANY for _ in range(0)])  # additional calls to elem.get(), not part of this test
         elemGetReturns = ['perc', 'theXMLID', 'theXMLID']
         elem.get.side_effect = lambda *x: elemGetReturns.pop(0) if len(elemGetReturns) > 0 else None
         mockPercClef.return_value = mock.MagicMock(name='PercussionClef()')
@@ -1587,10 +1583,10 @@ class TestStaffFromElement(unittest.TestCase):
         elem.iterfind = mock.MagicMock(return_value=findallReturn)
         # "MLFE" is "mockLayerFromElement"
         expectedMLFEOrder = [mock.call(findallReturn[i], str(i + 1), slurBundle=None)
-                             for i in xrange(len(findallReturn))]
-        mockLFEreturns = ['mockLayerFromElement return %i' for i in xrange(len(findallReturn))]
+                             for i in range(len(findallReturn))]
+        mockLFEreturns = ['mockLayerFromElement return %i' for i in range(len(findallReturn))]
         mockLayerFromElement.side_effect = lambda x, y, slurBundle: mockLFEreturns.pop(0)
-        expected = ['mockLayerFromElement return %i' for i in xrange(len(findallReturn))]
+        expected = ['mockLayerFromElement return %i' for i in range(len(findallReturn))]
 
         actual = base.staffFromElement(elem)
 
@@ -1621,7 +1617,7 @@ class TestStaffFromElement(unittest.TestCase):
 
         self.assertEqual(3, len(actual))
         # common to each part
-        for i in xrange(len(actual)):
+        for i in range(len(actual)):
             self.assertEqual(1, len(actual[i]))
             self.assertEqual(0.0, actual[i][0].offset)
             self.assertEqual(1.0, actual[i][0].quarterLength)
@@ -2105,7 +2101,7 @@ class TestEmbeddedElements(unittest.TestCase):
         _processesEmbeddedElements(): that single m21 objects are handled properly
         '''
         mockTranslator = mock.MagicMock(return_value='translator return')
-        elements = [ETree.Element('note') for _ in xrange(2)]
+        elements = [ETree.Element('note') for _ in range(2)]
         mapping = {'note': mockTranslator}
         expected = ['translator return', 'translator return']
         expectedCalls = [mock.call(elements[0], None), mock.call(elements[1], None)]
@@ -2345,7 +2341,7 @@ class TestBeams(unittest.TestCase):
         beamTogether(): with three mock objects, that their "beams" attributes are set properly
         '''
         someThings = [mock.MagicMock() for _ in range(3)]
-        for i in xrange(len(someThings)):
+        for i in range(len(someThings)):
             someThings[i].beams = mock.MagicMock('thing {} beams'.format(i))
             someThings[i].beams.__len__.return_value = 0
             someThings[i].beams.fill = mock.MagicMock()
@@ -2355,7 +2351,7 @@ class TestBeams(unittest.TestCase):
 
         base.beamTogether(someThings)
 
-        for i in xrange(len(someThings)):
+        for i in range(len(someThings)):
             someThings[i].beams.__len__.assert_called_once_with()
             someThings[i].beams.fill.assert_called_once_with('16th', expectedTypes[i])
         someThings[2].beams.setAll.assert_called_once_with('stop')
@@ -2365,7 +2361,7 @@ class TestBeams(unittest.TestCase):
         beamTogether(): with four mock objects, the middle two of which already have "beams" set
         '''
         someThings = [mock.MagicMock() for _ in range(4)]
-        for i in xrange(len(someThings)):
+        for i in range(len(someThings)):
             someThings[i].beams = mock.MagicMock('thing {} beams'.format(i))
             someThings[i].beams.__len__.return_value = 0
             someThings[i].beams.fill = mock.MagicMock()
@@ -2424,7 +2420,7 @@ class TestPreprocessors(unittest.TestCase):
         mockConverter.documentRoot = mock.MagicMock()
         expectedIterfind = './/{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)
         iterfindReturn = []
-        for i in xrange(3):
+        for i in range(3):
             iterfindReturn.append(ETree.Element('tie', attrib={'startid': 'start {}'.format(i),
                                                                'endid': 'end {}'.format(i)}))
         mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
@@ -2433,7 +2429,7 @@ class TestPreprocessors(unittest.TestCase):
 
         mockConverter.documentRoot.iterfind.assert_called_once_with(expectedIterfind)
         # check all the right values were added to the m21Attr dict
-        for i in xrange(3):
+        for i in range(3):
             self.assertEqual('i', mockConverter.m21Attr['start {}'.format(i)]['tie'])
             self.assertEqual('t', mockConverter.m21Attr['end {}'.format(i)]['tie'])
 
@@ -2470,7 +2466,7 @@ class TestPreprocessors(unittest.TestCase):
         mockConverter.documentRoot = mock.MagicMock()
         expectedIterfind = './/{mei}music//{mei}score//{mei}slur'.format(mei=_MEINS)
         iterfindReturn = []
-        for i in xrange(3):
+        for i in range(3):
             iterfindReturn.append(ETree.Element('slur',
                                                 attrib={'startid': 'start {}'.format(i),
                                                         'endid': 'end {}'.format(i)}))
@@ -2490,7 +2486,7 @@ class TestPreprocessors(unittest.TestCase):
             self.assertEqual(36, len(eachSlur.idLocal))
             expectedIdLocal.append(eachSlur.idLocal)
         # check all the right values were added to the m21Attr dict
-        for i in xrange(3):
+        for i in range(3):
             self.assertTrue(mockConverter.m21Attr['start {}'.format(i)]['m21SlurStart'] in expectedIdLocal)
             self.assertTrue(mockConverter.m21Attr['end {}'.format(i)]['m21SlurEnd'] in expectedIdLocal)
 
@@ -2534,7 +2530,7 @@ class TestPreprocessors(unittest.TestCase):
         mockConverter.documentRoot = mock.MagicMock()
         expectedIterfind = './/{mei}music//{mei}score//{mei}beamSpan'.format(mei=_MEINS)
         iterfindReturn = []
-        for i in xrange(3):
+        for i in range(3):
             iterfindReturn.append(ETree.Element('beamSpan',
                                                 attrib={'startid': 'start-{}'.format(i),
                                                         'endid': 'end-{}'.format(i),
@@ -2545,7 +2541,7 @@ class TestPreprocessors(unittest.TestCase):
 
         mockConverter.documentRoot.iterfind.assert_called_once_with(expectedIterfind)
         # check all the right values were added to the m21Attr dict
-        for i in xrange(3):
+        for i in range(3):
             self.assertEqual('start', mockConverter.m21Attr['start-{}'.format(i)]['m21Beam'])
             self.assertEqual('continue', mockConverter.m21Attr['mid-{}'.format(i)]['m21Beam'])
             self.assertEqual('stop', mockConverter.m21Attr['end-{}'.format(i)]['m21Beam'])
@@ -2563,7 +2559,7 @@ class TestPreprocessors(unittest.TestCase):
         mockConverter.documentRoot = mock.MagicMock()
         expectedIterfind = './/{mei}music//{mei}score//{mei}beamSpan'.format(mei=_MEINS)
         iterfindReturn = []
-        for i in xrange(3):
+        for i in range(3):
             iterfindReturn.append(ETree.Element('beamSpan',
                                                 attrib={'startid': '#start-{}'.format(i),
                                                         'endid': '#end-{}'.format(i)}))
@@ -2573,7 +2569,7 @@ class TestPreprocessors(unittest.TestCase):
 
         mockConverter.documentRoot.iterfind.assert_called_once_with(expectedIterfind)
         # check all the right values were added to the m21Attr dict
-        for i in xrange(3):
+        for i in range(3):
             self.assertEqual('start', mockConverter.m21Attr['start-{}'.format(i)]['m21Beam'])
             self.assertEqual('stop', mockConverter.m21Attr['end-{}'.format(i)]['m21Beam'])
 
@@ -2613,7 +2609,7 @@ class TestPreprocessors(unittest.TestCase):
         theNum = 42
         theNumbase = 900
         iterfindReturn = []
-        for i in xrange(3):
+        for i in range(3):
             iterfindReturn.append(ETree.Element('tupletSpan',
                                                 attrib={'plist': '#start-{j} #mid-{j} #end-{j}'.format(j=i),
                                                         'num': theNum,
@@ -2624,7 +2620,7 @@ class TestPreprocessors(unittest.TestCase):
 
         mockConverter.documentRoot.iterfind.assert_called_once_with(expectedIterfind)
         # check all the right values were added to the m21Attr dict
-        for i in xrange(3):
+        for i in range(3):
             self.assertEqual(theNum, mockConverter.m21Attr['start-{}'.format(i)]['m21TupletNum'])
             self.assertEqual(theNumbase, mockConverter.m21Attr['start-{}'.format(i)]['m21TupletNumbase'])
             self.assertEqual(theNum, mockConverter.m21Attr['mid-{}'.format(i)]['m21TupletNum'])
@@ -2671,7 +2667,7 @@ class TestPreprocessors(unittest.TestCase):
         theNum = 42
         theNumbase = 900
         iterfindReturn = []
-        for i in xrange(3):
+        for i in range(3):
             iterfindReturn.append(ETree.Element('tupletSpan',
                                                 attrib={'startid': '#start-{j}'.format(j=i),
                                                         'endid': '#end-{j}'.format(j=i),
@@ -2927,19 +2923,19 @@ class TestTuplets(unittest.TestCase):
         '''
         _guessTuplets(): given a list of stuff without tuplet-guessing attributes, make no changes
         '''
-        theLayer = [note.Note(quarterLength=1.0) for _ in xrange(5)]
-        expectedDurs = [1.0 for _ in xrange(5)]
+        theLayer = [note.Note(quarterLength=1.0) for _ in range(5)]
+        expectedDurs = [1.0 for _ in range(5)]
 
         actual = base._guessTuplets(theLayer)  # pylint: disable=protected-access
 
-        for i in xrange(len(expectedDurs)):
+        for i in range(len(expectedDurs)):
             self.assertEqual(expectedDurs[i], actual[i].quarterLength)
 
     def testTuplet11a(self):
         '''
         _guessTuplets(): with 5 notes, a triplet at the beginning is done correctly
         '''
-        theLayer = [note.Note(quarterLength=1.0) for _ in xrange(5)]
+        theLayer = [note.Note(quarterLength=1.0) for _ in range(5)]
         theLayer[0].m21TupletSearch = 'start'
         theLayer[0].m21TupletNum = '3'
         theLayer[0].m21TupletNumbase = '2'
@@ -2950,7 +2946,7 @@ class TestTuplets(unittest.TestCase):
 
         actual = base._guessTuplets(theLayer)  # pylint: disable=protected-access
 
-        for i in xrange(len(expectedDurs)):
+        for i in range(len(expectedDurs)):
             self.assertEqual(expectedDurs[i], actual[i].quarterLength)
         for i in [0, 2]:
             self.assertFalse(hasattr(theLayer[i], 'm21TupletSearch'))
@@ -2961,7 +2957,7 @@ class TestTuplets(unittest.TestCase):
         '''
         _guessTuplets(): with 5 notes, a triplet in the middle is done correctly
         '''
-        theLayer = [note.Note(quarterLength=1.0) for _ in xrange(5)]
+        theLayer = [note.Note(quarterLength=1.0) for _ in range(5)]
         theLayer[1].m21TupletSearch = 'start'
         theLayer[1].m21TupletNum = '3'
         theLayer[1].m21TupletNumbase = '2'
@@ -2972,7 +2968,7 @@ class TestTuplets(unittest.TestCase):
 
         actual = base._guessTuplets(theLayer)  # pylint: disable=protected-access
 
-        for i in xrange(len(expectedDurs)):
+        for i in range(len(expectedDurs)):
             self.assertEqual(expectedDurs[i], actual[i].quarterLength)
         for i in [1, 3]:
             self.assertFalse(hasattr(theLayer[i], 'm21TupletSearch'))
@@ -2983,7 +2979,7 @@ class TestTuplets(unittest.TestCase):
         '''
         _guessTuplets(): with 5 notes, a triplet at the end is done correctly
         '''
-        theLayer = [note.Note(quarterLength=1.0) for _ in xrange(5)]
+        theLayer = [note.Note(quarterLength=1.0) for _ in range(5)]
         theLayer[2].m21TupletSearch = 'start'
         theLayer[2].m21TupletNum = '3'
         theLayer[2].m21TupletNumbase = '2'
@@ -2994,7 +2990,7 @@ class TestTuplets(unittest.TestCase):
 
         actual = base._guessTuplets(theLayer)  # pylint: disable=protected-access
 
-        for i in xrange(len(expectedDurs)):
+        for i in range(len(expectedDurs)):
             self.assertEqual(expectedDurs[i], actual[i].quarterLength)
         for i in [2, 4]:
             self.assertFalse(hasattr(theLayer[i], 'm21TupletSearch'))

@@ -184,8 +184,6 @@ _MOD = 'mei.base'
 environLocal = environment.Environment(_MOD)
 
 from music21.ext import six
-from six.moves import xrange  # pylint: disable=redefined-builtin,import-error,unused-import
-from six.moves import range  # pylint: disable=redefined-builtin,import-error,unused-import
 
 
 # Module-Level Constants

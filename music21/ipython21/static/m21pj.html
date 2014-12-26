@@ -234,7 +234,7 @@ require(['notebook/js/main', 'services/kernels/js/kernel', 'notebook/js/notebook
         
         exec_code('from music21 import *; n = note.Note("C#4"); n.ps');
         exec_code('def streamAnalyze(nStr):\n' +
-                  '  s = stream.Stream()\n' +
+                   '  s = stream.Stream()\n' +
                   '  for ns in nStr.split(","):\n' +
                   '     n = note.Note(ns)\n' +
                   '     s.append(n)\n' +
