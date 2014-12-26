@@ -59,6 +59,8 @@ def histogram(data, bins):
     >>> outputData, bins = audioSearch.histogram(data,8)
     >>> print(outputData)
     [3, 0, 0, 1, 1, 1, 0, 5]
+    >>> bins
+    [0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]
     >>> print([int(b) for b in bins])
     [0, 1, 2, 3, 4, 5, 6, 7, 8]
 
@@ -155,9 +157,9 @@ def prepareThresholds(useScale=None):
     will return a 12 element list.  If it's a diatonic scale, it'll have 7 elements.
 
 
-    >>> l, p = audioSearch.prepareThresholds(scale.MajorScale('A3'))
-    >>> for i in range(len(l)):
-    ...    print("%s < %.2f < %s" % (p[i], l[i], p[i+1]))
+    >>> pitchThresholds, pitches = audioSearch.prepareThresholds(scale.MajorScale('A3'))
+    >>> for i in range(len(pitchThresholds)):
+    ...    print("%s < %.2f < %s" % (pitches[i], pitchThresholds[i], pitches[i+1]))
     A3 < 0.86 < B3
     B3 < 0.53 < C#4
     C#4 < 0.16 < D4
@@ -193,10 +195,12 @@ def interpolation(correlation, peak):
 
     Returns the x coordinate of the vertex of that parabola.
 
-
     >>> import numpy
     >>> f = [2, 3, 1, 6, 4, 2, 3, 1]
-    >>> audioSearch.interpolation(f, numpy.argmax(f))
+    >>> peak = numpy.argmax(f)
+    >>> peak  # f[3] is 6, which is the max.
+    3
+    >>> audioSearch.interpolation(f, peak)
     3.21428571...
     '''
     vertex = (correlation[peak - 1] - correlation[peak + 1]) / (correlation[peak - 1] - 2.0 * correlation[peak] + correlation[peak + 1])
@@ -211,10 +215,8 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
     (given by prepareThresholds) and returns a tuple of the normalized frequency and the
     pitch detected (as a :class:`~music21.pitch.Pitch` object)
 
-
     It will convert the frequency to be within the range of the default frequencies
     (usually C4 to C5) but the pitch object will have the correct octave.
-
 
     >>> audioSearch.normalizeInputFrequency(441.72)
     (440.0, <music21.pitch.Pitch A4>)
@@ -263,8 +265,7 @@ def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=None):
     and the second element is a list of the frequencies of those objects that can
     be plotted for matplotlib
 
-    To-do: only return the former.  The latter can be generated in other ways.
-
+    TODO: only return the former.  The latter can be generated in other ways.
 
     >>> import os
 
@@ -337,6 +338,10 @@ def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
     '''
     gets a list of frequencies from a complete audio file.
 
+    Each sample is a window of audiosearch.audioChunkLength long.
+
+    >>> audioSearch.audioChunkLength
+    1024
 
     >>> import os
     >>> readPath = common.getSourceFilePath() + os.path.sep + 'audioSearch' + os.path.sep + 'test_audio.wav'
@@ -442,8 +447,10 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
 
 def detectPitchFrequencies(freqFromAQList, useScale=None):
     '''
-    It detects the pitches of the notes from a list of frequencies, using thresholds which
+    Detects the pitches of the notes from a list of frequencies, using thresholds which
     depend on the useScale option. If useScale is None, the default value is the Major Scale beginning C4.
+
+    Returns the frequency of each pitch after normalizing them.
 
     >>> freqFromAQList=[143.627689055,99.0835452019,211.004784689,4700.31347962,2197.9431119]
     >>> pitchesList = audioSearch.detectPitchFrequencies(freqFromAQList, useScale=scale.MajorScale('C4'))
@@ -469,15 +476,15 @@ def detectPitchFrequencies(freqFromAQList, useScale=None):
 
 def smoothFrequencies(detectedPitchesFreq, smoothLevels=7, inPlace=True):
     '''
-    It smooths the shape of the signal in order to avoid false detections in the fundamental
+    Smooths the shape of the signal in order to avoid false detections in the fundamental
     frequency.
 
+    The second pitch below is obviously too low.  It will be smoothed out...
 
-
-    >>> inputPitches=[440, 440, 440, 440, 442, 443, 441, 470, 440, 441, 440, 442, 440, 440, 440, 397, 440, 440, 440, 442, 443, 441, 440, 440, 440, 440, 440, 442, 443, 441, 440, 440]
+    >>> inputPitches=[440, 220, 440, 440, 442, 443, 441, 470, 440, 441, 440, 442, 440, 440, 440, 397, 440, 440, 440, 442, 443, 441, 440, 440, 440, 440, 440, 442, 443, 441, 440, 440]
     >>> result = audioSearch.smoothFrequencies(inputPitches)
     >>> print(result)
-    [441, 441, 441, 441, 446, 446, 446, 447, 443, 443, 442, 441, 435, 434, 432, 431, 437, 438, 439, 440, 440, 440, 440, 440, 440, 441, 441, 441, 441, 441, 441, 441]
+    [409, 409, 409, 428, 435, 438, 442, 444, 441, 441, 441, 441, 434, 433, 432, 431, 437, 438, 439, 440, 440, 440, 440, 440, 440, 441, 441, 441, 441, 441, 441, 441]
     '''
     dpf = detectedPitchesFreq
     if inPlace == True:
@@ -491,10 +498,8 @@ def smoothFrequencies(detectedPitchesFreq, smoothLevels=7, inPlace=True):
 
     for i in range(smoothLevels):
         beginning = beginning + float(detectedPitchesFreq[i])
-    beginning = beginning / smoothLevels
-
-    for i in range(smoothLevels):
         ends = ends + detectedPitchesFreq[len(detectedPitchesFreq) - 1 - i]
+    beginning = beginning / smoothLevels
     ends = ends / smoothLevels
 
     for i in range(len(detectedPitchesFreq)):
@@ -591,15 +596,11 @@ def quantizeDuration(length):
     '''
     round an approximately transcribed quarterLength to a better one in
     music21.
-
-
+    
     Should be replaced by a full-featured routine in midi or stream.
-
 
     See :meth:`~music21.stream.Stream.quantize` for more information
     on the standard music21 methodology.
-
-
 
     >>> audioSearch.quantizeDuration(1.01)
     1.0
@@ -632,7 +633,6 @@ def quarterLengthEstimation(durationList, mostRepeatedQuarterLength=1.0):
     common note in durationList will be the other note.  See example 2:
 
     Returns a float -- and not an int.
-
 
     >>> durationList = [20, 19, 10, 30, 6, 21]
     >>> audioSearch.quarterLengthEstimation(durationList)
