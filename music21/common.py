@@ -1902,7 +1902,7 @@ def getCorpusContentDirs():
     'demos', 'essenFolksong', 'handel', 'haydn', 'josquin', 'leadSheet',
     'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'palestrina',
     'ryansMammoth', 'schoenberg', 'schumann', 'schumann_clara',
-    'theoryExercises', 'trecento', 'verdi']
+    'theoryExercises', 'trecento', 'verdi', 'weber']
     '''
     directoryName = getCorpusFilePath()
     result = []
