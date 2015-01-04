@@ -15,7 +15,7 @@ __all__ = [
 import sys
 
 if sys.version > '3':
-    from . import testStream
+    from music21.test import testStream
 else:
     import testStream # @Reimport
 

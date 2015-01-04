@@ -10,13 +10,13 @@ __all__ = ['basic',
 import sys
 
 if sys.version > '3':
-    from . import basic
-    from . import examples
-    from . import lookup
-    from . import segment
-    from . import test
-    from . import text
-    from . import translate
+    from music21.braille import basic
+    from music21.braille import examples
+    from music21.braille import lookup
+    from music21.braille import segment
+    from music21.braille import test
+    from music21.braille import text
+    from music21.braille import translate
 else:          
     import basic # @Reimport
     import examples # @Reimport
