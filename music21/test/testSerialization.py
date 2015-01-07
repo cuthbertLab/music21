@@ -217,10 +217,11 @@ class Test(unittest.TestCase):
         from music21 import corpus, converter
         #import time
         #print time.time()  # 8.3 sec from pickle; 10.3 sec for forceSource...
-        s = corpus.parse('beethoven/opus133') #, forceSource = True)
+        #s = corpus.parse('beethoven/opus133') #, forceSource = True)
         #print time.time()  # purePython: 33! sec; cPickle: 25 sec
         #data = converter.freezeStr(s, fmt='pickle')
         #print time.time()  # cPickle: 5.5 sec!
+        s = corpus.parse('corelli/opus3no1/1grave')
         sf = freezeThaw.StreamFreezer(s, fastButUnsafe=True)
         data = sf.writeStr()
                 

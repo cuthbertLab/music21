@@ -123,28 +123,28 @@ def rhythmicSearch(thisStream, searchStream):
     
     Now we can test the search on a real dataset and show the types
     of preparation that are needed to make it most likely a success.
-    We will look through the first movement of Beethoven's string quartet op. 59 no. 2
+    We will look through the first movement of Corelli Trio Sonata op. 3 no. 1 (F major)
     looking to see how much more common the first search term (dotted-quarter, eighth)
     is than the second (eighth, anything, dotted-quarter).  In fact, my hypothesis
     was wrong, and the second term is actually more common than the first! (n.b. rests
     are being counted here as well as notes)
     
     
-    >>> op59_2_1 = corpus.parse('beethoven/opus59no2', 1)
+    >>> grave = corpus.parse('corelli/opus3no1/1grave')
     >>> term1results = []
     >>> term2results = []
-    >>> for p in op59_2_1.parts:
+    >>> for p in grave.parts:
     ...    pf = p.flat.stripTies()  # consider tied notes as one long note
     ...    temp1 = search.rhythmicSearch(pf, searchStream1)
     ...    temp2 = search.rhythmicSearch(pf, searchStream2)
     ...    for found in temp1: term1results.append(found)
     ...    for found in temp2: term2results.append(found)
     >>> term1results
-    [86, 285, 332, 432, 690, 1122, 1166, 1292, 21, 25, 969, 1116, 1151, 1252, 64, 252, 467, 688, 872, 1125, 1328, 1332, 1127]
+    [0, 7, 13, 21, 42, 57, 64, 66, 0, 5, 7, 19, 21, 40, 46, 63, 0, 8, 31, 61, 69, 71, 73, 97]
     >>> term2results
-    [243, 691, 692, 1080, 6, 13, 23, 114, 118, 280, 287, 288, 719, 726, 736, 1000, 1001, 1093, 11, 12, 118, 122, 339, 861, 862, 870, 1326, 1330, 26, 72, 78, 197, 223, 727, 1012, 1013]
+    [5, 29, 95]
     >>> float(len(term1results))/len(term2results)
-    0.6388...
+    8.0
     
     
     OMIT_FROM_DOCS

@@ -158,34 +158,9 @@ containing individual files for each part (stage 1 or stage 2) can be imported
 with the :func:`music21.converter.parse` function on the desired file path or
 URL.
 
-::
-
-    >>> from music21 import *
-    >>> s = converter.parse('http://www.musedata.org/cgi-bin/mddata?composer=corelli&edition=chry&genre=trio/op1&work=op1n08&format=stage2&movement=01') # doctest: +SKIP
-
-If a directory or zipped archive is passed to the
-:func:`music21.converter.parse` function, the contained files will be treated
-as a collection of Musedata parts.
+Note that access restrictions prevent demonstrating Musedata conversion.
 
 ::
-
-    >>> corpus.getWork('bach/artOfFugue_bwv1080/16')  # doctest: +SKIP
-    '/Users/ariza/_x/src/music21/music21/corpus/bach/artOfFugue_bwv1080/16.zip'
-
-::
-
-    >>> s = corpus.parse('bach/artOfFugue_bwv1080/16')
-
-
-Getting Musedata Files
-----------------------
-
-Large collections of Musedata files are available from musedata.org, sponsored
-by the Center for Computer Assisted Research in the Humanities at Stanford
-University.
-
-`<http://www.musedata.org/>`_
-
 
 Parsing MIDI Files
 ------------------

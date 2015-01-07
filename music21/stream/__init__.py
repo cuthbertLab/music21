@@ -12027,6 +12027,7 @@ class Score(Stream):
         The `classFilterList` can be used to specify which objects
         contained in Measures are transferred.
 
+        It also flattens all voices within a part.
 
         >>> s = corpus.parse('bwv66.6')
         >>> len(s.parts)
@@ -12042,7 +12043,7 @@ class Score(Stream):
         post = self.parts[0].measureTemplate(fillWithRests=False)
         for i, m in enumerate(post.getElementsByClass('Measure')):
             for p in self.parts:
-                mNew = copy.deepcopy(p.getElementsByClass('Measure')[i])
+                mNew = copy.deepcopy(p.getElementsByClass('Measure')[i]).flat
                 for e in mNew:
                     match = False
                     for cf in classFilterList:

@@ -45,7 +45,11 @@ class ActivityMatch(object):
 
     Plotting routines to graph the output of dedicated methods in this class are available. 
 
-    :class:`~music21.graph.PlotScatterPitchSpaceDynamicSymbol` and :class:`~music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol` employs the :meth:`~music21.analysis.correlate.ActivityMatch.pitchToDynamic` method. Sample output is as follows:
+    :class:`~music21.graph.PlotScatterPitchSpaceDynamicSymbol` and 
+    :class:`~music21.graph.PlotScatterWeightedPitchSpaceDynamicSymbol` 
+    employs the :meth:`~music21.analysis.correlate.ActivityMatch.pitchToDynamic` method. 
+    
+    Sample output is as follows:
 
     .. image:: images/PlotScatterWeightedPitchSpaceDynamicSymbol.*
         :width: 600
@@ -108,20 +112,24 @@ class ActivityMatch(object):
         If `dataPoints` is True, all data matches between source and destination are returned. 
         If False, 3 point weighted coordinates are created for each unique match. 
 
+        No dynamics here.
+
         >>> s = corpus.parse('bach/bwv8.6.xml')
-        >>> am = analysis.correlate.ActivityMatch(s.parts[0].flat.sorted)
+        >>> am = analysis.correlate.ActivityMatch(s.parts[0].flat)
         >>> am.pitchToDynamic()
         Traceback (most recent call last):
         CorrelateException: cannot create correlation an object that is not found in the 
         Stream: <class 'music21.dynamics.Dynamic'>
 
-        >>> s = corpus.parse('schumann/opus41no1', 2)
-        >>> am = analysis.correlate.ActivityMatch(s.parts[0].flat.sorted)
+        Many dynamics
+
+        >>> s = corpus.parse('schoenberg')
+        >>> am = analysis.correlate.ActivityMatch(s.parts[0].flat)
         >>> data = am.pitchToDynamic()
         >>> len(data)
-        427
+        39
         >>> data[0]
-        [64.0, 5]
+        [83.0, 7]
         '''
         objNameSrc = (note.Note, chord.Chord)
         #objNameSrc = note.Note
@@ -212,16 +220,13 @@ class Test(unittest.TestCase):
     def testActivityMatchPitchToDynamic(self):
         from music21 import corpus
 
-        #a = corpus.parse('bach/bwv8.6.xml')
-        #a = corpus.parse('beethoven/opus18no1', 2)
-        a = corpus.parse('schumann/opus41no1', 2)
+        a = corpus.parse('schoenberg/opus19', 2)
 
-        # just get the soprano part
-        b = ActivityMatch(a.parts[0].flat.sorted)
+        b = ActivityMatch(a.flat)
         dataPairs = b.pitchToDynamic()
         #print dataPairs
         # previous pair count was 401
-        self.assertEqual(len(dataPairs), 427)
+        self.assertEqual(len(dataPairs), 111)
 
 
 #-------------------------------------------------------------------------------

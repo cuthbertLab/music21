@@ -49,26 +49,12 @@ def annotateWithGerman():
     '''
     annotates a score with the German notes for each note
     '''
-    bwv295 = corpus.parseWork('bach/bwv295')
+    from music21 import corpus
+    bwv295 = corpus.parse('bach/bwv295')
     for thisNote in bwv295.flat.notes:
         thisNote.addLyric(thisNote.pitch.german)
     bwv295.show()
 
-def countCs():
-    '''
-    count the number of Cs in a piece.
-    
-    Based on a question on the humdrum mailing list
-    '''
-    from music21 import converter
-    wtcf1 = converter.parse('http://kern.ccarh.org/cgi-bin/ksdata?l=ccarh/class/2007/shchon&file=wtc1f01.krn&f=kern')
-    wtcf1 = wtcf1.flat.stripTies()
-    numberOfCs = 0
-    for thisPitch in wtcf1.pitches:
-        if thisPitch.name == 'C':
-            numberOfCs += 1
-    print (numberOfCs)
-    print (wtcf1.analyze('key'))
 
 def bachParallels():
     '''
@@ -78,9 +64,10 @@ def bachParallels():
     Proceedings of the fourth Conference on Interdisciplinary Musicology (CIM08)
     Thessaloniki, Greece, 3-6 July 2008, http://web.auth.gr/cim08/
     '''
+    from music21 import corpus
     for fn in corpus.getBachChorales():
         print (fn)
-        c = corpus.parseWork(fn)
+        c = corpus.parse(fn)
         displayMe = False
         for i in range(len(c.parts) - 1):
             iName = c.parts[i].id

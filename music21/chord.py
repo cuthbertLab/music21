@@ -2178,12 +2178,36 @@ class Chord(note.NotRest):
 
         Example:
 
-
         >>> cchord = chord.Chord(['C', 'E', 'G'])
         >>> other = chord.Chord(['C', 'G'])
-        >>> cchord.isMajorTriad() # returns True
+        >>> cchord.isMajorTriad()
         True
-        >>> other.isMajorTriad() # returns False
+        >>> other.isMajorTriad()
+        False
+
+        Notice that the proper spelling of notes is crucial
+        
+        >>> chord.Chord(['B-','D','F']).isMajorTriad()
+        True
+        >>> chord.Chord(['A#','D','F']).isMajorTriad()
+        False
+        
+        (See: :meth:`~music21.chord.Chord.forteClassTn` to catch this case; major triads 
+        in the forte system are 3-11B no matter how they are spelled.)
+        
+        >>> chord.Chord(['A#','D','F']).forteClassTn == '3-11B'
+        True
+        
+        
+        OMIT_FROM_DOCS
+        
+        Strange chords like [C,E###,G---] used to return True.  E### = G
+        and G--- = E, so the chord is found to be a major triad, even though it should
+        not be.  This bug is now fixed.
+        
+        >>> chord.Chord(['C','E###','G---']).isMajorTriad()
+        False
+        >>> chord.Chord(['C','E','G','E###','G---']).isMajorTriad()
         False
         '''
         try:
@@ -2194,11 +2218,16 @@ class Chord(note.NotRest):
         if (third is None or fifth is None):
             return False
 
-        ### TODO: rewrite so that [C,E+++,G---] does not return True
-
+        root = self.root()        
         for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(self.root(), thisPitch)
-            if (thisInterval.chromatic.mod12 != 0) and (thisInterval.chromatic.mod12 != 4) and (thisInterval.chromatic.mod12 != 7):
+            thisInterval = interval.notesToInterval(root, thisPitch)
+            if (thisPitch is root) and (thisInterval.chromatic.mod12 != 0):
+                return False
+            if (thisPitch is third) and (thisInterval.chromatic.mod12 != 4):
+                return False
+            if (thisPitch is fifth) and (thisInterval.chromatic.mod12 != 7):
+                return False
+            if (thisPitch.name not in (root.name, third.name, fifth.name)):
                 return False
 
         return True

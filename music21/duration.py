@@ -2312,8 +2312,7 @@ class Duration(DurationCommon):
     def clear(self):
         '''
         Permit all components to be removed.
-        (It is not clear yet if this is needed:
-             yes! for zero duration!)
+        (It is not clear yet if this is needed: YES! for zero duration!)
 
         >>> a = duration.Duration()
         >>> a.quarterLength = 4

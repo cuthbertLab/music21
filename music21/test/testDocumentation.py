@@ -81,4 +81,5 @@ def main(runOne=False):
 
 if __name__ == '__main__':
     main()
-    #main('usersGuide_05_listsOfLists.rst')
+    #main('usersGuide_11_corpusSearching.rst')
+    #main('overviewPostTonal.rst')

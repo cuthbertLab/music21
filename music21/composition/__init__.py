@@ -9,7 +9,7 @@ __all__ = ['phasing']  # leave off aug30 for now
 import sys
 
 if sys.version > '3':
-    from . import phasing
+    from music21.composition import phasing
 else:
     import phasing # @Reimport
 

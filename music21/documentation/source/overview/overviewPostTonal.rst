@@ -25,7 +25,7 @@ containing Pitch, can be expressed as pitch class integers using the
 :attr:`~music21.pitch.Pitch.pitchClass` and
 :attr:`~music21.pitch.Pitch.pitchClassString` properties. 
 
-In the following example, the :func:`~music21.corpus.parseWork` function is
+In the following example, the :func:`~music21.corpus.parse` function is
 used to create a :class:`~music21.stream.Score` object. The
 :attr:`~music21.base.Music21Object.id` attribute of each contained
 :class:`~music21.stream.Part` is presented in a list. 
@@ -33,7 +33,7 @@ used to create a :class:`~music21.stream.Score` object. The
 ::
 
     >>> from music21 import corpus
-    >>> aScore = corpus.parseWork('beethoven/opus59no2', 3)
+    >>> aScore = corpus.parse('beethoven/opus59no2', 3)
     >>> [e.id for e in aScore.parts]
     [u'Violin I.', u'Violin II.', u'Viola.', u'Violoncello.']
 
@@ -74,10 +74,12 @@ Chord objects in music21. The results can be displayed with the show() method.
 
 ::
 
-    >>> for n in mRange.flat.notesAndRests:
-    ...     if not n.isRest:
-    ...             n.lyric = n.pitchClassString
+    >>> for n in mRange.flat.notes:
+    ...     n.lyric = n.pitchClassString
     >>> mRange.show()    # doctest: +SKIP
+
+Here is the image from when we were using a Beethoven Quartet as an example
+
 
 .. image:: images/overviewPostTonal-02.*
     :width: 600

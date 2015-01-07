@@ -64,12 +64,15 @@ class DurationFeature(featuresModule.FeatureExtractor):
 
 class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
     '''
+    A features array with bins corresponding to the values of the melodic interval histogram.
     
-    >>> s = corpus.parse('bwv887')
+    128 dimensions
+    
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MelodicIntervalHistogramFeature(s)
     >>> f = fe.extract()
-    >>> f.vector
-    [0.146..., 0.853..., 1.0, 0.292..., 0.209..., 0.139..., 0.101..., 0.257..., 0.22299..., 0.456..., 0.1289..., 0.0871..., 0.233..., 0.07317..., 0.03832..., 0.031..., 0.0278..., 0.0139..., 0.01742..., 0.00348..., 0.0, 0.017..., 0.003484..., 0.01742..., 0.00348..., 0.0, 0.00348..., 0.0, 0.0174..., 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    >>> f.vector[0:5]
+    [0.39..., 0.60..., 1.0,     0.17..., 0.13...]
     '''
     id = 'M1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -92,11 +95,11 @@ class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
 class AverageMelodicIntervalFeature(featuresModule.FeatureExtractor):
     '''
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.AverageMelodicIntervalFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [2.0714...]
+    [2.44...]
     '''
     id = 'M2'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -123,11 +126,11 @@ class AverageMelodicIntervalFeature(featuresModule.FeatureExtractor):
 class MostCommonMelodicIntervalFeature(featuresModule.FeatureExtractor):
     '''
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MostCommonMelodicIntervalFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [0]
+    [2]
     '''
     id = 'M3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -152,11 +155,11 @@ class DistanceBetweenMostCommonMelodicIntervalsFeature(
     featuresModule.FeatureExtractor):
     '''
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.DistanceBetweenMostCommonMelodicIntervalsFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [2]
+    [1]
     '''
     id = 'M4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -184,12 +187,13 @@ class DistanceBetweenMostCommonMelodicIntervalsFeature(
 class MostCommonMelodicIntervalPrevalenceFeature(
     featuresModule.FeatureExtractor):
     '''
+    Fraction of melodic intervals that belong to the most common interval.
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MostCommonMelodicIntervalPrevalenceFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [0.3214285...]
+    [0.364...]
     '''
     id = 'M5'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -215,11 +219,11 @@ class RelativeStrengthOfMostCommonIntervalsFeature(
     featuresModule.FeatureExtractor):
     '''
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.RelativeStrengthOfMostCommonIntervalsFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [0.77777...]
+    [0.60...]
     '''
     id = 'M6'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -247,12 +251,13 @@ class RelativeStrengthOfMostCommonIntervalsFeature(
   
 class NumberOfCommonMelodicIntervalsFeature(featuresModule.FeatureExtractor):
     '''
+    Number of melodic intervals that represent at least 9% of all melodic intervals.    
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.NumberOfCommonMelodicIntervalsFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [4]
+    [3]
     '''
     id = 'M7'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -277,12 +282,16 @@ class NumberOfCommonMelodicIntervalsFeature(featuresModule.FeatureExtractor):
 
 class AmountOfArpeggiationFeature(featuresModule.FeatureExtractor):
     '''
+    Fraction of horizontal intervals that are repeated notes, minor thirds, major thirds, 
+    perfect fifths, minor sevenths, major sevenths, octaves, minor tenths or major tenths.
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.AmountOfArpeggiationFeature(s)
     >>> f = fe.extract()
     >>> f.name
     'Amount of Arpeggiation'
+    >>> f.vector
+    [0.333...]
     '''
     id = 'M8'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -522,11 +531,11 @@ class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
     Returns the fraction of melodic intervals that are rising rather than falling.  Unisons are omitted
     
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.DirectionOfMotionFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [0.5263...]
+    [0.47...]
     '''
     id = 'm17'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -562,12 +571,13 @@ class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
  
 class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     '''
+    Average number of notes that separate melodic peaks and troughs in any channel.
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.DurationOfMelodicArcsFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [3.1666...]
+    [10.28...]
     '''
     id = 'M18'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -630,12 +640,13 @@ class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
  
 class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     '''
+    Average melodic interval separating the top note of melodic peaks and the bottom note of melodic troughs.
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.SizeOfMelodicArcsFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [8.5]
+    [14.5]
     '''
     id = 'M19'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -687,11 +698,12 @@ class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
 
 class MostCommonPitchPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
+    Fraction of Notes corresponding to the most common pitch.
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MostCommonPitchPrevalenceFeature(s)
-    >>> fe.extract().vector[0] + .0001  # slightly less than .3 on 32-bit systems
-    0.3...
+    >>> fe.extract().vector[0] 
+    0.11...
     '''
     id = 'P1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -717,11 +729,12 @@ class MostCommonPitchPrevalenceFeature(featuresModule.FeatureExtractor):
 
 class MostCommonPitchClassPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
+    Fraction of Notes corresponding to the most common pitch class.
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MostCommonPitchClassPrevalenceFeature(s)
     >>> fe.extract().vector
-    [0.333333333...]
+    [0.19...]
     '''
     id = 'P2'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -748,11 +761,12 @@ class MostCommonPitchClassPrevalenceFeature(featuresModule.FeatureExtractor):
 
 class RelativeStrengthOfTopPitchesFeature(featuresModule.FeatureExtractor):
     '''
+    The frequency of the 2nd most common pitch divided by the frequency of the most common pitch.
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.RelativeStrengthOfTopPitchesFeature(s)
     >>> fe.extract().vector
-    [0.5555555555...]
+    [0.94...]
     '''
     id = 'P3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -784,10 +798,10 @@ class RelativeStrengthOfTopPitchesFeature(featuresModule.FeatureExtractor):
 class RelativeStrengthOfTopPitchClassesFeature(featuresModule.FeatureExtractor):
     '''
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.RelativeStrengthOfTopPitchClassesFeature(s)
     >>> fe.extract().vector
-    [0.5]
+    [0.90...]
     '''
     id = 'P4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -819,11 +833,12 @@ class RelativeStrengthOfTopPitchClassesFeature(featuresModule.FeatureExtractor):
 
 class IntervalBetweenStrongestPitchesFeature(featuresModule.FeatureExtractor):
     '''
+    Absolute value of the difference between the pitches of the two most common MIDI pitches.
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.IntervalBetweenStrongestPitchesFeature(s)
     >>> fe.extract().vector
-    [2]
+    [5]
     '''
     id = 'P5'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -854,10 +869,10 @@ class IntervalBetweenStrongestPitchClassesFeature(
     featuresModule.FeatureExtractor):
     '''
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.IntervalBetweenStrongestPitchClassesFeature(s)
     >>> fe.extract().vector
-    [2]
+    [5]
     '''
     id = 'P6'
 
@@ -888,11 +903,12 @@ class IntervalBetweenStrongestPitchClassesFeature(
 
 class NumberOfCommonPitchesFeature(featuresModule.FeatureExtractor):
     '''
+    Number of pitches that account individually for at least 9% of all notes.
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.NumberOfCommonPitchesFeature(s)
     >>> fe.extract().vector
-    [4]
+    [3]
     '''
     id = 'P7'
 
@@ -919,11 +935,12 @@ class NumberOfCommonPitchesFeature(featuresModule.FeatureExtractor):
  
 class PitchVarietyFeature(featuresModule.FeatureExtractor):
     '''
+    Number of pitches used at least once.
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.PitchVarietyFeature(s)
     >>> fe.extract().vector
-    [12]
+    [24]
     '''
     id = 'P8'
 
@@ -949,11 +966,12 @@ class PitchVarietyFeature(featuresModule.FeatureExtractor):
 
 class PitchClassVarietyFeature(featuresModule.FeatureExtractor):
     '''
+    Number of pitch classes used at least once.
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.PitchClassVarietyFeature(s)
     >>> fe.extract().vector
-    [8]
+    [10]
     '''
     id = 'P9'
 
@@ -979,11 +997,12 @@ class PitchClassVarietyFeature(featuresModule.FeatureExtractor):
  
 class RangeFeature(featuresModule.FeatureExtractor):
     '''
+    Difference between highest and lowest pitches. In semitones
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.RangeFeature(s)
     >>> fe.extract().vector
-    [31]
+    [34]
     '''
     id = 'P10'
 
@@ -1011,11 +1030,12 @@ class RangeFeature(featuresModule.FeatureExtractor):
  
 class MostCommonPitchFeature(featuresModule.FeatureExtractor):
     '''
+    Bin label of the most common pitch divided by the number of possible pitches.
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MostCommonPitchFeature(s)
     >>> fe.extract().vector
-    [0.5078125]
+    [0.47...]
     '''
     id = 'P11'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1038,11 +1058,12 @@ class MostCommonPitchFeature(featuresModule.FeatureExtractor):
 
 class PrimaryRegisterFeature(featuresModule.FeatureExtractor):
     '''
+    Average MIDI pitch.
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.PrimaryRegisterFeature(s)
     >>> fe.extract().vector
-    [54.91666666...]
+    [58.58...]
     '''
     id = 'P12'
 
@@ -1070,11 +1091,12 @@ class PrimaryRegisterFeature(featuresModule.FeatureExtractor):
 
 class ImportanceOfBassRegisterFeature(featuresModule.FeatureExtractor):
     '''
+    Fraction of Notes between MIDI pitches 0 and 54.
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.ImportanceOfBassRegisterFeature(s)
     >>> fe.extract().vector
-    [0.266666...]
+    [0.18...]
     '''
     id = 'P13'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1102,11 +1124,12 @@ class ImportanceOfBassRegisterFeature(featuresModule.FeatureExtractor):
  
 class ImportanceOfMiddleRegisterFeature(featuresModule.FeatureExtractor):
     '''
+    Fraction of Notes between MIDI pitches 55 and 72
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.ImportanceOfMiddleRegisterFeature(s)
     >>> fe.extract().vector
-    [0.73333333...]
+    [0.766...]
     '''
     id = 'P14'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1135,11 +1158,12 @@ class ImportanceOfMiddleRegisterFeature(featuresModule.FeatureExtractor):
  
 class ImportanceOfHighRegisterFeature(featuresModule.FeatureExtractor):
     '''
+    Fraction of Notes between MIDI pitches 73 and 127.
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.ImportanceOfHighRegisterFeature(s)
     >>> fe.extract().vector
-    [0.0]
+    [0.049...]
     '''
     id = 'P15'
 
@@ -1169,11 +1193,12 @@ class ImportanceOfHighRegisterFeature(featuresModule.FeatureExtractor):
 
 class MostCommonPitchClassFeature(featuresModule.FeatureExtractor):
     '''
+    Bin label of the most common pitch class.
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MostCommonPitchClassFeature(s)
     >>> fe.extract().vector
-    [5]
+    [1]
     '''
     id = 'P16'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1289,8 +1314,6 @@ class PitchClassDistributionFeature(featuresModule.FeatureExtractor):
 class FifthsPitchHistogramFeature(featuresModule.FeatureExtractor):
     '''
     A feature array with bins corresponding to the values of the 5ths pitch class histogram.
-
-
     
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.FifthsPitchHistogramFeature(s)
@@ -1329,9 +1352,10 @@ class QualityFeature(featuresModule.FeatureExtractor):
 
     See features.native.QualityFeature for a music21 improvement on this method
 
+    Example: Handel, Rinaldo Aria (musicxml) is explicitly encoded as being in Major:
     
-    >>> mozart155mvmt2 = corpus.parse('mozart/k155', 2)
-    >>> fe = features.jSymbolic.QualityFeature(mozart155mvmt2)
+    >>> s = corpus.parse('handel/rinaldo/lascia_chio_pianga') 
+    >>> fe = features.jSymbolic.QualityFeature(s)
     >>> f = fe.extract()
     >>> f.vector
     [0]
@@ -2110,18 +2134,11 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
 class InitialTempoFeature(featuresModule.FeatureExtractor):
     '''
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.InitialTempoFeature(s)
     >>> f = fe.extract()
     >>> f.vector # a default
     [120.0]
-
-    >>> s = corpus.parse('hwv56/movement2-09.md') # has a tempos
-    >>> fe = features.jSymbolic.InitialTempoFeature(s)
-    >>> f = fe.extract()
-    >>> f.vector
-    [46.0]
-
     '''
     id = 'R30'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2386,11 +2403,11 @@ class AverageNoteToNoteDynamicsChangeFeature(featuresModule.FeatureExtractor):
 class MaximumNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     '''
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('handel/rinaldo/lascia_chio_pianga') 
     >>> fe = features.jSymbolic.MaximumNumberOfIndependentVoicesFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [2]
+    [3]
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MaximumNumberOfIndependentVoicesFeature(s)
@@ -2427,12 +2444,11 @@ class AverageNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     '''
     Average number of different channels in which notes have sounded simultaneously. Rests are not included in this calculation. Here, Parts are treated as voices
     
-    
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('handel/rinaldo/lascia_chio_pianga')  
     >>> fe = features.jSymbolic.AverageNumberOfIndependentVoicesFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [1.6...]
+    [2.1...]
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.AverageNumberOfIndependentVoicesFeature(s)
@@ -2469,11 +2485,11 @@ class VariabilityOfNumberOfIndependentVoicesFeature(
     Standard deviation of number of different channels in which notes have sounded simultaneously. Rests are not included in this calculation.
     
     
-    >>> s = corpus.parse('hwv56/movement3-05.md')
+    >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.VariabilityOfNumberOfIndependentVoicesFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [0.489...]
+    [0.19...]
     '''
     id = 'T3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):

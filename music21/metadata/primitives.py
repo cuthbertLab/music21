@@ -107,7 +107,6 @@ class Date(object):
                 setattr(self, attr, keywords[attr])
 
     ### SPECIAL METHODS ###
-
     def __str__(self):
         r'''
         Return a string representation, including error if defined.

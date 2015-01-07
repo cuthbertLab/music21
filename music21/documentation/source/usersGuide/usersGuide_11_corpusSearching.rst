@@ -49,7 +49,7 @@ practice era, and inumerable folk songs, in a variety of formats:
 
     >>> coreCorpus = corpus.CoreCorpus()
     >>> len(coreCorpus.getPaths())
-    3045
+    2565
 
 
 ..  note::
@@ -172,9 +172,9 @@ known corpora, *core*, *virtual* and even each *local* corpus:
 
     >>> sixEight = corpus.search('6/8')
     >>> sixEight
-    <music21.metadata.bundles.MetadataBundle {2211 entries}> 
+    <music21.metadata.bundles.MetadataBundle {2174 entries}> 
 
-To work with these 2211 pieces, you can parse treat the MetadataBundle
+To work with these 2174 pieces, you can parse treat the MetadataBundle
 like a list and call ``.parse()`` on any element:
 
 ::
@@ -191,7 +191,7 @@ which ignores anything in your local corpus:
 ::
 
     >>> corpus.CoreCorpus().search('6/8')
-    <music21.metadata.bundles.MetadataBundle {2211 entries}> 
+    <music21.metadata.bundles.MetadataBundle {2174 entries}> 
 
 
 Because the result of every metadata search is also a metadata bundle, you can
@@ -300,7 +300,7 @@ corpus:
 
     >>> predicate = lambda x: 400 < x < 500
     >>> corpus.CoreCorpus().search(predicate, 'noteCount')
-    <music21.metadata.bundles.MetadataBundle {60 entries}>
+    <music21.metadata.bundles.MetadataBundle {49 entries}>
 
 You can also pass in compiled regular expressions into the search:
 
@@ -323,7 +323,7 @@ Now let's take a closer look at some search results:
 
     >>> bachBundle = corpus.CoreCorpus().search('bach', 'composer')
     >>> bachBundle[0]
-    <music21.metadata.bundles.MetadataEntry: bach_choraleAnalyses_riemenschneider014_rntxt> 
+    <music21.metadata.bundles.MetadataEntry: bach_choraleAnalyses_riemenschneider001_rntxt> 
 
 Metadata bundles are composed of metadata *entries*. These *entries* allow us
 to associate a given ``RichMetadata`` object with a file name, and as we said earlier 
@@ -332,7 +332,7 @@ also allow us to parse the associated file into a music21 score:
 ::
 
     >>> bachBundle[0].sourcePath
-    u'bach/choraleAnalyses/riemenschneider014.rntxt'
+    u'bach/choraleAnalyses/riemenschneider001.rntxt'
 
 ::
 
@@ -355,14 +355,14 @@ results:
 
 ::
 
-    >>> beethovenBundle = corpus.search('beethoven', field='composer')
-    >>> beethovenBundle
-    <music21.metadata.bundles.MetadataBundle {16 entries}>
+    >>> corelliBundle = corpus.search('corelli', field='composer')
+    >>> corelliBundle
+    <music21.metadata.bundles.MetadataBundle {1 entry}>
 
 ::
 
-    >>> bachBundle.union(beethovenBundle)
-    <music21.metadata.bundles.MetadataBundle {37 entries}>
+    >>> bachBundle.union(corelliBundle)
+    <music21.metadata.bundles.MetadataBundle {22 entries}>
 
 Consult :py:class:`~music21.metadata.bundles.MetadataBundle`'s API for a more
 in depth look at how this works.
@@ -391,7 +391,7 @@ corresponding metadata bundle:
 
     >>> coreCorpus = corpus.CoreCorpus()
     >>> coreCorpus.metadataBundle
-    <music21.metadata.bundles.MetadataBundle 'core': {14958 entries}>
+    <music21.metadata.bundles.MetadataBundle 'core': {14478 entries}>
 
 Music21 also provides a handful of convenience methods for getting metadata
 bundles associated with the *virtual*, *local* or *core* corpora:
@@ -429,7 +429,7 @@ files automatically when they're manually instantiated.
 ::
 
     >>> coreBundle.read()
-    <music21.metadata.bundles.MetadataBundle 'core': {14958 entries}>
+    <music21.metadata.bundles.MetadataBundle 'core': {14478 entries}>
 
 
 
@@ -442,7 +442,7 @@ Metadata bundles can be written to and read from disk.
 
     >>> coreBundle = metadata.MetadataBundle('core')
     >>> coreBundle.read()
-	<music21.metadata.bundles.MetadataBundle 'core': {14958 entries}>
+	<music21.metadata.bundles.MetadataBundle 'core': {14478 entries}>
 
 ::
 

@@ -3,7 +3,7 @@
 import sys
 
 if sys.version > '3':
-    from .library import * 
+    from music21.documentation.library import * 
 else:
     from library import *
 

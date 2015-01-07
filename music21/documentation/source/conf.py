@@ -11,7 +11,6 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
 import music21
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -46,7 +45,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'music21'
-copyright = '2008-2013, Michael Scott Cuthbert and the music21 Project'
+copyright = '2008-2014, Michael Scott Cuthbert and cuthbertLab' # @ReservedAssignment
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -245,7 +244,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'music21', u'music21 Documentation',
-   'Michael Scott Cuthbert and the music21 Project', 'music21', 'One line description of project.',
+   'Michael Scott Cuthbert and cuthbertLab', 'music21', 'One line description of project.',
    'Miscellaneous'),
 ]
 

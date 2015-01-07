@@ -197,6 +197,8 @@ with the :meth:`~music21.base.Music21Object.show` method.
 Basic Counting of and Searching for Musical Elements
 ----------------------------------------------------
 
+Here, we load a file and count the number of G#'s in it.
+
 1. Here, we load a file and count the number of G#'s in it.
 
 ::

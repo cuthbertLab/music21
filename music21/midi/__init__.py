@@ -191,8 +191,6 @@ def getVariableLengthNumber(midiStr):
     '''
     # from http://faydoc.tripod.com/formats/mid.htm
     # This allows the number to be read one byte at a time, and when you see a msb of 0, you know that it was the last (least significant) byte of the number.
-    # additional reference here:
-    # http://253.ccarh.org/handout/vlv/
     summation = 0 
     i = 0 
     if six.PY3 and isinstance(midiStr, str):

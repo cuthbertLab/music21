@@ -1406,25 +1406,27 @@ class Test(unittest.TestCase):
         self.assertEqual(str(midDict['M2']), "[<music21.interval.Interval M2>, 2]")
 
         mid = MelodicIntervalDiversity()
-        s = corpus.parse('hwv56', '1-08')
+        s = corpus.parse('corelli/opus3no1/1grave')
         #s.show()
 
         midDict = mid.countMelodicIntervals(s.parts[1])
-        self.assertEqual(len(midDict), 4)
-        self.assertEqual(str(midDict['P5']), "[<music21.interval.Interval P5>, 1]")
-        self.assertEqual(str(midDict['P4']), "[<music21.interval.Interval P4>, 1]")       
+        self.assertEqual(len(midDict), 9)
+        self.assertEqual(str(midDict['P5']), "[<music21.interval.Interval P5>, 8]")
+        self.assertEqual(str(midDict['P4']), "[<music21.interval.Interval P4>, 7]")       
         self.assertEqual(str(midDict['m3']), "[<music21.interval.Interval m3>, 1]")
-        self.assertEqual(str(midDict['M2']), "[<music21.interval.Interval M2>, 2]")       
+        self.assertEqual(str(midDict['M2']), "[<music21.interval.Interval M2>, 21]")       
        
 
         midDict = mid.countMelodicIntervals(s)
-        self.assertEqual(len(midDict), 6)
-        self.assertEqual(str(midDict['P5']), "[<music21.interval.Interval P5>, 2]")
-        self.assertEqual(str(midDict['P4']), "[<music21.interval.Interval P4>, 5]")       
-        self.assertEqual(str(midDict['M3']), "[<music21.interval.Interval M3>, 1]")
-        self.assertEqual(str(midDict['m3']), "[<music21.interval.Interval m3>, 3]")
-        self.assertEqual(str(midDict['M2']), "[<music21.interval.Interval M2>, 8]")       
-        self.assertEqual(str(midDict['m2']), "[<music21.interval.Interval m2>, 1]")       
+        self.assertEqual(len(midDict), 10)
+        self.assertEqual(str(sorted(list(midDict.keys()))), "['M2', 'M3', 'M6', 'P15', 'P4', 'P5', 'P8', 'd5', 'm2', 'm3']")
+        self.assertEqual(str(midDict['P15']), "[<music21.interval.Interval P15>, 1]")
+        self.assertEqual(str(midDict['P5']), "[<music21.interval.Interval P5>, 16]")
+        self.assertEqual(str(midDict['P4']), "[<music21.interval.Interval P4>, 29]")       
+        self.assertEqual(str(midDict['M3']), "[<music21.interval.Interval M3>, 16]")
+        self.assertEqual(str(midDict['m3']), "[<music21.interval.Interval m3>, 12]")
+        self.assertEqual(str(midDict['M2']), "[<music21.interval.Interval M2>, 79]")       
+        self.assertEqual(str(midDict['m2']), "[<music21.interval.Interval m2>, 43]")       
         
 
     def testKeyAnalysisSpelling(self):

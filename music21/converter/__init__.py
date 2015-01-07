@@ -84,21 +84,21 @@ class ArchiveManager(object):
     archived file collection, such as a .zip or or .mxl file. This will return the 
     data from the archive.
     
-    >>> fnCorpus = corpus.getWork('opus18no1/movement3', fileExtensions=('.xml',))
+    >>> fnCorpus = corpus.getWork('bwv66.6', fileExtensions=('.xml',))
     
     This is likely a unicode string
     
     >>> #_DOCS_SHOW fnCorpus
-    >>> '/Users/cuthbert/Documents/music21/corpus/beethoven/opus18no1/movement3.mxl' #_DOCS_HIDE
-    '/Users/cuthbert/Documents/music21/corpus/beethoven/opus18no1/movement3.mxl'
+    >>> u'/Users/cuthbert/git/music21base/music21/corpus/bach/bwv66.6.mxl' #_DOCS_HIDE
+    u'/Users/cuthbert/git/music21base/music21/corpus/bach/bwv66.6.mxl'
     >>> am = converter.ArchiveManager(fnCorpus)
     >>> am.isArchive()
     True
     >>> am.getNames()
-    ['movement3.xml', 'META-INF/container.xml']
+    ['bwv66.6.xml', 'META-INF/container.xml']
     >>> data = am.getData()
     >>> data[0:70]
-    '<?xml version="1.0" standalone="no"?>\r\n<!DOCTYPE score-partwise PUBLIC'
+    '<?xml version="1.0" encoding="UTF-8"?>\r<!DOCTYPE score-partwise PUBLIC'
     '''
     # for info on mxl files, see
     # http://www.recordare.com/xml/compressed-mxl.html
@@ -1364,29 +1364,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(ts), 4)
 
 
-        a = corpus.parse('mozart/k156/movement4')
-
-        # violin part
-        clefs = a.parts[0].flat.getElementsByClass(clef.Clef)
-        self.assertEqual(len(clefs), 1)
-        self.assertEqual(clefs[0].sign, 'G')
-
-        # viola
-        clefs = a.parts[2].flat.getElementsByClass(clef.Clef)
-        self.assertEqual(len(clefs), 1)
-        self.assertEqual(clefs[0].sign, 'C')
-
-        # violoncello
-        clefs = a.parts[3].flat.getElementsByClass(clef.Clef)
-        self.assertEqual(len(clefs), 1)
-        self.assertEqual(clefs[0].sign, 'F')
-
-        # check time signatures
-        # there are
-        ts = a.parts[0].flat.getElementsByClass(meter.TimeSignature)
-        self.assertEqual(len(ts), 1)
-
-
     def testConversionMXArticulations(self):
         from music21 import note
         from music21.musicxml import testPrimitive
@@ -1482,19 +1459,17 @@ class Test(unittest.TestCase):
 
     def testConversionMXInstrument(self):
         from music21 import corpus
-        s = corpus.parse('beethoven/opus18no1/movement3.xml')
+        s = corpus.parse('schumann_clara/opus17', 3)
         #s.show()
         is1 = s.parts[0].flat.getElementsByClass('Instrument')
         self.assertEqual(len(is1), 1)
+        #self.assertIn('Violin', is1[0].classes)
         is2 = s.parts[1].flat.getElementsByClass('Instrument')
         self.assertEqual(len(is2), 1)
-
+        #self.assertIn('Violoncello', is1[0].classes)
         is3 = s.parts[2].flat.getElementsByClass('Instrument')
         self.assertEqual(len(is3), 1)
-
-        is4 = s.parts[3].flat.getElementsByClass('Instrument')
-        self.assertEqual(len(is4), 1)
-
+        #self.assertIn('Piano', is1[0].classes)
 
 
     def testConversionMidiBasic(self):
@@ -1663,23 +1638,9 @@ class Test(unittest.TestCase):
 
 
     def testConversionMusedata(self):
-
-        from music21.musedata import testFiles
-
-        cmd = subConverters.ConverterMuseData()
-        cmd.parseData(testFiles.bach_cantata5_mvmt3)
-        unused_s = cmd.stream
-        #s.show()
-
-        # test data id
-        s = parse(testFiles.bach_cantata5_mvmt3)
-        self.assertEqual(s.metadata.title, 'Wo soll ich fliehen hin')
-        self.assertEqual(len(s.parts), 3)
-
-
-        fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
+        fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01')
         s = parse(fp)
-        self.assertEqual(len(s.parts), 4)
+        self.assertEqual(len(s.parts), 5)
         #s.show()
 
 
@@ -1698,17 +1659,17 @@ class Test(unittest.TestCase):
         self.assertEqual(post[:38], '<?xml version="1.0" encoding="UTF-8"?>')
         self.assertEqual(af.getNames(), ['musicXML.xml', 'META-INF/', 'META-INF/container.xml'])
 
-        # test from a file that ends in zip
-        # note: this is a stage1 file!
-        fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
-        af = ArchiveManager(fp)
-        # for now, only support zip
-        self.assertEqual(af.archiveType, 'zip')
-        self.assertEqual(af.isArchive(), True)
-        self.assertEqual(af.getNames(), ['01/', '01/04', '01/02', '01/03', '01/01'] )
-
-        # returns a list of strings
-        self.assertEqual(af.getData(dataFormat='musedata')[0][:30], '378\n1080  1\nBach Gesells\nchaft')
+#         # test from a file that ends in zip
+#         # note: this is a stage1 file!
+#         fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
+#         af = ArchiveManager(fp)
+#         # for now, only support zip
+#         self.assertEqual(af.archiveType, 'zip')
+#         self.assertEqual(af.isArchive(), True)
+#         self.assertEqual(af.getNames(), ['01/', '01/04', '01/02', '01/03', '01/01'] )
+# 
+#         # returns a list of strings
+#         self.assertEqual(af.getData(dataFormat='musedata')[0][:30], '378\n1080  1\nBach Gesells\nchaft')
 
 
         #mdw = musedataModule.MuseDataWork()

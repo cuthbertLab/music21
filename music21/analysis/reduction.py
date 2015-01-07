@@ -135,12 +135,13 @@ class ReductiveNote(object):
     def getNoteAndTextExpression(self):
         '''Produce a new note, a deep copy of the supplied note and with the specified modifications.
         '''
+        n = None
         if self._note.isChord:
             # need to permit specification by pitch
             if 'pitch' in self._parameters:
                 p = pitch.Pitch(self._parameters['pitch'])
-                for sub in self._note: # iterate over compoinents
-                    if p.name == sub.pitch.name:
+                for sub in self._note: # iterate over components
+                    if p.name.lower() == sub.pitch.name.lower():
                         # copy the component
                         n = copy.deepcopy(sub)
             else: # get first, or get entire chord?
@@ -149,6 +150,8 @@ class ReductiveNote(object):
         else:
             n = copy.deepcopy(self._note)
         # always clear certain parameters
+        if (n is None):
+            raise ReductiveEventException('Could not find pitch, %r in self._note: %r' % (self._parameters['pitch'], self._note))
         n.lyrics = []
         n.tie = None
         n.expressions = []
@@ -879,17 +882,17 @@ class Test(unittest.TestCase):
         chords.measure(24).notes[0].addLyric('::/p:d/o:5/nf:no/ta:2')
         chords.measure(24).notes[0].addLyric('::/p:g/o:3/nf:no/tb:V')
         
-        chords.measure(31).notes[0].addLyric('::/p:f/o:4/tb:7')
+        chords.measure(30).notes[0].addLyric('::/p:f/o:4/tb:7')
         
-        chords.measure(35).notes[0].addLyric('::/p:c/o:5/nf:no/v:1/ta:1')
-        chords.measure(35).notes[0].addLyric('::/p:g/o:4/nf:no/v:2')
-        chords.measure(35).notes[0].addLyric('::/p:c/o:4/nf:no/v:1/tb:I')
+        chords.measure(34).notes[0].addLyric('::/p:c/o:5/nf:no/v:1/ta:1')
+        chords.measure(34).notes[0].addLyric('::/p:g/o:4/nf:no/v:2')
+        chords.measure(34).notes[0].addLyric('::/p:c/o:4/nf:no/v:1/tb:I')
         
         sr = analysis.reduction.ScoreReduction()
         sr.chordReduction = chords
         #sr.score = src
         unused_post = sr.reduce()
-        #post.show()        
+        #unused_post.show()        
 
 
     def testExtractionD(self):
@@ -942,9 +945,7 @@ class Test(unittest.TestCase):
     def testExtractionE(self):
         from music21 import analysis, corpus
 
-        #src = corpus.parse('opus18no1/movement3.xml').measures(0, 10)
-        #src = corpus.parse('hwv56/movement3-02.md').measures(7,10)
-        src = corpus.parse('opus48no2.xml')
+        src = corpus.parse('corelli/opus3no1/1grave')
 
         #chords = src.chordify()
 

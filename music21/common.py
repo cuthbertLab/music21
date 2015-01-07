@@ -9,7 +9,8 @@
 # Copyright:    Copyright © 2009-2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-'''Utility constants, dictionaries, functions, and objects used throughout music21.
+'''
+Utility constants, dictionaries, functions, and objects used throughout music21.
 '''
 
 # should NOT import music21 or anything like that, except in doctests.
@@ -400,9 +401,9 @@ def findFormatExtURL(url):
     DEPRECATED May 2014 -- moving to converter
 
 
-    >>> urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=xml'
-    >>> urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=kern'
-    >>> urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml'
+    >>> urlA = 'http://somesite.com/?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=xml'
+    >>> urlB = 'http://somesite.com/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=kern'
+    >>> urlC = 'http://somesite.com/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml'
     >>> urlF = 'http://junk'
 
     >>> common.findFormatExtURL(urlA)
@@ -1901,7 +1902,7 @@ def getCorpusContentDirs():
     'demos', 'essenFolksong', 'handel', 'haydn', 'josquin', 'leadSheet',
     'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'palestrina',
     'ryansMammoth', 'schoenberg', 'schumann', 'schumann_clara',
-    'theoryExercises', 'trecento', 'verdi']
+    'theoryExercises', 'trecento', 'verdi', 'weber']
     '''
     directoryName = getCorpusFilePath()
     result = []

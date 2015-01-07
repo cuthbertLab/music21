@@ -96,9 +96,36 @@ def assembleLyrics(streamIn, lineNumber=1):
                 raise Exception('no known Text syllabic setting: %s' % lyricObj.syllabic)
     return ' '.join(words)
         
+def assembleAllLyrics(streamIn, maxLyrics = 10, lyricSeparation='\n'):
+    r'''
+    Concatenate all Lyrics text from a stream. The Stream is automatically flattened. 
+
+    uses assembleLyrics to do the heavy work.
+    
+    maxLyrics just determines how many times we should parse through the score, since it is
+    not easy to determine what the maximum number of lyrics exist in the score.  
+
+    Here is a demo with one note and five lyrics.
+
+    >>> f = corpus.parse('demos/multiple-verses.xml')
+    >>> l = text.assembleAllLyrics(f)
+    >>> l
+    u'\n1. First\n2. Second\n3. Third\n4. Fourth\n5. Fifth'
+    '''
+    lyrics = ''
+    for i in range(1, maxLyrics):
+        l = assembleLyrics(streamIn, i)
+        if l != '':
+            lyrics += lyricSeparation + l
+    return lyrics
+
+
+
 
 def prependArticle(src, language=None):
-    '''Given a text string, if an article is found in a trailing position with a comma, place the article in front and remove the comma. 
+    '''
+    Given a text string, if an article is found in a trailing position with a comma, 
+    place the article in front and remove the comma. 
 
     
     >>> text.prependArticle('Ale is Dear, The')
@@ -791,11 +818,12 @@ class Test(unittest.TestCase):
         self.assertEqual('en', ld.mostLikelyLanguage(u"hello friends, this is a test of the ability of language detector to tell what language I am writing in."))
         self.assertEqual('it', ld.mostLikelyLanguage(u"ciao amici! cosÃ¬ trovo in quale lingua ho scritto questo passaggio. Spero che troverÃ² che Ã¨ stata scritta in italiano"))
 
-        messiahGovernment = corpus.parse('handel/hwv56/movement1-13.md')
-        forUntoUs = assembleLyrics(messiahGovernment)
-        self.assertTrue(forUntoUs.startswith('For unto us a child is born'))
-        forUntoUs = forUntoUs.replace('_', '')
-        self.assertEqual('en', ld.mostLikelyLanguage(forUntoUs))
+        ## TODO: Replace
+        #messiahGovernment = corpus.parse('handel/hwv56/movement1-13.md')
+        #forUntoUs = assembleLyrics(messiahGovernment)
+        #self.assertTrue(forUntoUs.startswith('For unto us a child is born'))
+        #forUntoUs = forUntoUs.replace('_', '')
+        #self.assertEqual('en', ld.mostLikelyLanguage(forUntoUs))
 
 
 #-------------------------------------------------------------------------------

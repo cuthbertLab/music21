@@ -555,31 +555,31 @@ class Test(unittest.TestCase):
 
 
 
-    def testScalesPy10(self):
-        # look through s = corpus.parseWork('bwv1080/06')
-        #part = corpus.parseWork('bwv1080/03').measures(24,29).parts[0]
-        #part = corpus.parseWork('bwv1080/03').parts[0]
-
-        #from music21 import corpus, scale, note
-        from music21 import analysis
-
-        scDMelodicMinor = scale.MelodicMinorScale('d4')
-        scGMelodicMinor = scale.MelodicMinorScale('g4')
-        part = corpus.parse('bwv1080/03').parts[0].measures(46,53)
-        
-        for sc in [scDMelodicMinor, scGMelodicMinor]:
-            groups = analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=4, comparisonAttribute='name')
-            for group in groups:
-                for n in group['stream'].notes:
-                    n.addLyric('%s^%s' % (sc.getTonic().name.lower(), sc.getScaleDegreeFromPitch(n.pitch, group['direction'])))
-        #part.show()
+#     def testScalesPy10(self):
+#         # look through s = corpus.parse('bwv1080/06')
+#         #part = corpus.parse('bwv1080/03').measures(24,29).parts[0]
+#         #part = corpus.parse('bwv1080/03').parts[0]
+# 
+#         #from music21 import corpus, scale, note
+#         from music21 import analysis
+# 
+#         scDMelodicMinor = scale.MelodicMinorScale('d4')
+#         scGMelodicMinor = scale.MelodicMinorScale('g4')
+#         part = corpus.parse('bwv1080/03').parts[0].measures(46,53)
+#         
+#         for sc in [scDMelodicMinor, scGMelodicMinor]:
+#             groups = analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=4, comparisonAttribute='name')
+#             for group in groups:
+#                 for n in group['stream'].notes:
+#                     n.addLyric('%s^%s' % (sc.getTonic().name.lower(), sc.getScaleDegreeFromPitch(n.pitch, group['direction'])))
+#         #part.show()
 
 
 
 
 
         # this is applied to all  parts
-#         s = corpus.parseWork('mozart/k80/movement1').measures(1,28)
+#         s = corpus.parse('mozart/k80/movement1').measures(1,28)
 #         for sc in [scGMajor, scDMajor, scAMajor]:
 #             for part in s.parts: 
 #                 post = analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=5,             
@@ -662,30 +662,30 @@ class Test(unittest.TestCase):
 
 
 
-    def testEx02(self): 
-        # Labeling a vocal part based on scale degrees derived from key signature and from a specified target key.
-
-        s = corpus.parse('hwv56/movement3-03.md')#.measures(1,7)
-        basso = s.parts['basso']
-        s.remove(basso)
-        
-        ksScale = s.flat.getElementsByClass('KeySignature')[0].getScale()
-        targetScale = scale.MajorScale('A')
-        for n in basso.flat.getElementsByClass('Note'):
-            # get the scale degree from this pitch
-            n.addLyric(ksScale.getScaleDegreeFromPitch(n.pitch))
-            n.addLyric(targetScale.getScaleDegreeFromPitch(n.pitch))
-        
-        reduction = s.chordify()
-        for c in reduction.flat.getElementsByClass('Chord'):
-            c.closedPosition(forceOctave=4, inPlace=True)
-            c.removeRedundantPitches(inPlace=True)
-        
-        
-        display = stream.Score()
-        display.insert(0, basso)
-        display.insert(0, reduction)
-        #display.show()
+#     def testEx02(self): 
+#         # Labeling a vocal part based on scale degrees derived from key signature and from a specified target key.
+# 
+#         s = corpus.parse('hwv56/movement3-03.md')#.measures(1,7)
+#         basso = s.parts['basso']
+#         s.remove(basso)
+#         
+#         ksScale = s.flat.getElementsByClass('KeySignature')[0].getScale()
+#         targetScale = scale.MajorScale('A')
+#         for n in basso.flat.getElementsByClass('Note'):
+#             # get the scale degree from this pitch
+#             n.addLyric(ksScale.getScaleDegreeFromPitch(n.pitch))
+#             n.addLyric(targetScale.getScaleDegreeFromPitch(n.pitch))
+#         
+#         reduction = s.chordify()
+#         for c in reduction.flat.getElementsByClass('Chord'):
+#             c.closedPosition(forceOctave=4, inPlace=True)
+#             c.removeRedundantPitches(inPlace=True)
+#         
+#         
+#         display = stream.Score()
+#         display.insert(0, basso)
+#         display.insert(0, reduction)
+#         #display.show()
 
 
 

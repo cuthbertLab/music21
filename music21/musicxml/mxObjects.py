@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         musicxml/base.py
+# Name:         musicxml/mxObjects.py
 # Purpose:      MusicXML objects for conversion to and from music21
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
-This module defines an object representation of MusicXML, used for converting to and from MusicXML and music21.
+This module defines an object representation of MusicXML, used for converting to and from 
+MusicXML and music21.
 '''
 import sys
 
@@ -36,7 +37,7 @@ environLocal = environment.Environment(_MOD)
 # are >= to this value
 # if changes are made here that are not compatible, the m21 version number
 # needs to be increased and this number needs to be set to that value
-VERSION_MINIMUM = (1, 5, 0) 
+VERSION_MINIMUM = (1, 9, 0) 
 
 
 # new objects to add: octave-shift, in direction-type
@@ -3183,21 +3184,6 @@ class TestExternal(unittest.TestCase):
     '''
     def runTest(self):
         pass
-
-#     def testInputDirectory(self, dirPath=None):
-#         if dirPath == None:
-#             from music21 import corpus
-#             fpList = corpus.mozart
-#         else:
-#             fpList = []
-#             for fn in os.listdir(dirPath):
-#                 fpList.append(os.path.join(dirPath, fName))
-# 
-#         for fp in fpList:
-#             if fp.endswith('.xml'):
-#                 print '='*20, fp
-#                 self.testOpen(fp)
-
 
 #     def testCompareDirectory(self, dirPath):
 #         c = Document()
