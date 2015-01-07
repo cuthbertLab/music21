@@ -2926,11 +2926,6 @@ def sectionScoreCore(elem, allPartNs, slurBundle, **kwargs):
                 for eachThing in inNextThing[eachN]:
                     measureResult[eachN].insert(0, eachThing)
                 inNextThing[eachN] = []
-                # if it's the first measure, pad for a possible anacrusis
-                # TODO: this may have to change when @n is better set
-                # TODO: this doesn't actually solve the "pick-up measure" problem
-                if 1 == backupMeasureNum:
-                    measureResult[eachN].padAsAnacrusis()
                 # if we got a left-side barline from the previous measure, use it
                 if nextMeasureLeft is not None:
                     measureResult[eachN].leftBarline = nextMeasureLeft
