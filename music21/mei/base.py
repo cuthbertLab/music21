@@ -2895,17 +2895,15 @@ def sectionScoreCore(elem, allPartNs, slurBundle, **kwargs):
     nextMeasureLeft = kwargs['nextMeasureLeft'] if 'nextMeasureLeft' in kwargs else None
     backupMeasureNum = kwargs['backupMeasureNum'] if 'backupMeasureNum' in kwargs else 0
 
+    # NOTE: "activeMeter" holds the TimeSignature object that's currently active; it's used in the
+    # loop below to help determine the proper duration of a full-measure rest. It must persist
+    # between <section> elements, so it's a parameter for this function.
+
     scoreTag = '{http://www.music-encoding.org/ns/mei}score'
     sectionTag = '{http://www.music-encoding.org/ns/mei}section'
     measureTag = '{http://www.music-encoding.org/ns/mei}measure'
     scoreDefTag = '{http://www.music-encoding.org/ns/mei}scoreDef'
     staffDefTag = '{http://www.music-encoding.org/ns/mei}staffDef'
-
-    # "activeMeter" holds the TimeSignature object that's currently active; it's used in the
-    # loop below to help determine the proper duration of a full-measure rest. It appears here
-    # so it persists between <section> elements, and so to collect the first TimeSignature from
-    # a <staffDef> or <scoreDef>.
-    # --> defined as a parameter above
 
     # hold the music21.stream.Part that we're building
     parsed = {n: [] for n in allPartNs}
@@ -2962,7 +2960,6 @@ def sectionScoreCore(elem, allPartNs, slurBundle, **kwargs):
                 environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<staffDef>', '@n'))
 
         elif sectionTag == eachElem.tag:
-            # NOTE: same as scoreFE() (except the name of "inNextThing")
             localParsed, activeMeter, nextMeasureLeft, backupMeasureNum = sectionFromElement(eachElem,  # pylint: disable=line-too-long
                                                                                              allPartNs,  # pylint: disable=line-too-long
                                                                                              activeMeter=activeMeter,  # pylint: disable=line-too-long
@@ -2996,7 +2993,7 @@ def sectionScoreCore(elem, allPartNs, slurBundle, **kwargs):
             environLocal.printDebug(_UNPROCESSED_SUBELEMENT.format(eachElem.tag, elem.tag))
 
     # TODO: write the <section @label=""> part
-    # TODO: check if there's anything left in "inNextMeasure"
+    # TODO: check if there's anything left in "inNextThing"
 
     return parsed, activeMeter, nextMeasureLeft, backupMeasureNum
 
