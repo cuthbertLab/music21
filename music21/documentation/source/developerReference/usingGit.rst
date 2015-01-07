@@ -32,9 +32,10 @@ Installing Eclipse
 ------------------
 
 Once you have Git installed, download and install Eclipse. You can find the
-most recent version of Eclipse Standard at 
+most recent version of Eclipse for Java EE at 
 `http://www.eclipse.org/downloads/ <http://www.eclipse.org/downloads/>`_, and
-these instructions are written with Eclipse Standard 4.3 (Kepler) in mind.
+these instructions are written with Eclipse for Java EE 4.4 (Luna) in mind though
+some screenshots are from 4.3 (Kepler).
 
 
 Installing for Windows
@@ -113,7 +114,8 @@ Installing PyDev and EGit for Eclipse
     Anti-virus software, such as AVG, can cause Eclipse to hang while
     attempting to fetch packages. 
 
-With Eclipse installed, you next need to install two plugins: PyDev and EGit.
+With Eclipse installed, you may next need to install two plugins: PyDev and EGit.
+The Eclipse for Java EE has some of these installed.
 
 PyDev is a Python IDE for Eclipse, which may be used in Python, Jython, and
 IronPython development. EGit is a plugin that allows Eclipse to work with Git
@@ -371,8 +373,13 @@ Again, in Git, these actions are broken into smaller discrete steps:
 Eclipse with EGit makes all of this simple. You'll probably never have to worry 
 about most of Git's advanced features - branching, rebasing, etc.
 
-Adding changes, committing and pushing in Eclipse
+Adding changes, committing and pushing
 `````````````````````````````````````````````````
+There are two ways to commit changes.  Either download the GitHub application
+for your operating system (recommended) and follow the instructions there, or
+use these instructions to commit directly from Eclipse.  I strongly recommend
+the former.
+
 
 1.  To **add** changes to Git's "staging area", right-click in Eclipse's
     Project Explorer on the music21 project folder and select **Add to Index**

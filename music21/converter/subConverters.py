@@ -11,7 +11,7 @@
 #-------------------------------------------------------------------------------
 '''
 Each subconverter should inherit from the base SubConverter object and have at least a 
-parseData method that sets self.stream
+parseData method that sets self.stream.
 '''
 #-------------------------------------------------------------------------------
 # Converters are associated classes; they are not subclasses, but most define a pareData() method, a parseFile() method, and a .stream attribute or property.
@@ -38,7 +38,7 @@ class SubConverter(object):
     All other Converter types should inherit from this and
     have ways of dealing with various data formats.
     
-    Attributes that should be set: 
+    Attributes that should be set::
     
         readBinary = True or False (default False)
         registerFormats = tuple of formats that can be handled; eg: ('musicxml',)
@@ -49,6 +49,7 @@ class SubConverter(object):
         canBePickled = True or False (default True; does not do anything yet)
         codecWrite = True or False (default False) if codecs need to be used to write
         stringEncoding = string (default 'utf-8') if codecWrite is True, what encoding to use
+
 
     '''
     readBinary = False
