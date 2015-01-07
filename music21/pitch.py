@@ -719,6 +719,31 @@ class Accidental(SlottedObject):
     def __repr__(self):
         return '<accidental %s>' % self.name
 
+    @classmethod
+    def listNames(cls):
+        '''
+        Returns a list of accidental names that have any sort of
+        semantic importance in music21.
+        
+        You may choose a name not from this list (1/7th-sharp) but
+        if it's not on this list don't expect it to do anything for you.
+        
+        This is a class method, so you may call it directly on the class:
+        
+        Listed in alphabetical order. (TODO: maybe from lowest to highest
+        or something implying importance?)
+        
+        >>> pitch.Accidental.listNames()
+         ['double-flat', 'double-sharp', 'flat', 'half-flat', 'half-sharp', 'natural', 'one-and-a-half-flat', 'one-and-a-half-sharp', 'quadruple-flat', 'quadruple-sharp', 'sharp', 'triple-flat', 'triple-sharp']
+        
+        Or call on an instance of an accidental:
+        
+        >>> f = pitch.Accidental('flat')
+        >>> f.listNames()
+         ['double-flat', 'double-sharp', 'flat', 'half-flat', 'half-sharp', 'natural', 'one-and-a-half-flat', 'one-and-a-half-sharp', 'quadruple-flat', 'quadruple-sharp', 'sharp', 'triple-flat', 'triple-sharp']              
+        '''
+        return sorted(accidentalNameToModifier.keys(), key=str.lower)
+
     ### REMOVED METHODS ####
     def show(self, *args, **kws):
         from music21 import note
