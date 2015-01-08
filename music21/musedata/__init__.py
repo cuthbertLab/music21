@@ -154,9 +154,9 @@ class MuseDataRecord(object):
         'F#4'
         '''
         if self.isNote():
-            data = self.src[0:3]
+            data = self.src[0:].split()[0]
         elif self.isCueOrGrace() or self.isChord():
-            data = self.src[1:4]
+            data = self.src[1:].split()[0]
         else:
             raise MuseDataException('cannot get pitch parameters from this kind of record')
 
@@ -242,9 +242,19 @@ class MuseDataRecord(object):
         'F#4'
         >>> p.accidental.displayStatus
         True
+
+
+        Double sharps were giving octave problems.
+
+        >>> mdr = musedata.MuseDataRecord('F##5   2        e x   d')
+        >>> p = mdr.getPitchObject()
+        >>> p.nameWithOctave
+        'F##5'
+
         '''
         from music21 import pitch
-        p = pitch.Pitch(self._getPitchParameters())
+        pp = self._getPitchParameters()
+        p = pitch.Pitch(pp)
 
         if self.stage == 1:
             # no accidental information stored; have to just use pitch given
