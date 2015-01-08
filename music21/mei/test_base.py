@@ -1965,7 +1965,7 @@ class TestStaffDefFromElement(unittest.TestCase):
 
     def testStaffGrpInt1(self):
         '''
-        staffGrpFromElement(): we'll use
+        staffGrpFromElement(): with <staffDef> directly inside this <staffGrp>
         '''
         elem = ETree.Element('staffGrp')
         innerElems = [ETree.Element('{}staffDef'.format(_MEINS),
@@ -1974,6 +1974,28 @@ class TestStaffDefFromElement(unittest.TestCase):
                       for n in range(4)]
         for eachElem in innerElems:
             elem.append(eachElem)
+        expected = {'1': {'key': key.KeySignature(sharps=-1, mode='major')},
+                    '2': {'key': key.KeySignature(sharps=-2, mode='major')},
+                    '3': {'key': key.KeySignature(sharps=-3, mode='major')},
+                    '4': {'key': key.KeySignature(sharps=-4, mode='major')}}
+
+        actual = base.staffGrpFromElement(elem, None)
+
+        self.assertDictEqual(expected, actual)
+
+    def testStaffGrpInt2(self):
+        '''
+        staffGrpFromElement(): with <staffDef> embedded in another <staffGrp>
+        '''
+        elem = ETree.Element('staffGrp')
+        innerElems = [ETree.Element('{}staffDef'.format(_MEINS),
+                                    attrib={'n': str(n + 1), 'key.mode': 'major',
+                                            'key.sig': '{}f'.format(n + 1)})
+                      for n in range(4)]
+        innerGrp = ETree.Element('{}staffGrp'.format(_MEINS))
+        for eachElem in innerElems:
+            innerGrp.append(eachElem)
+        elem.append(innerGrp)
         expected = {'1': {'key': key.KeySignature(sharps=-1, mode='major')},
                     '2': {'key': key.KeySignature(sharps=-2, mode='major')},
                     '3': {'key': key.KeySignature(sharps=-3, mode='major')},

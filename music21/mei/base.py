@@ -1498,9 +1498,10 @@ def staffGrpFromElement(elem, slurBundle=None):
 
     In MEI 2013: pg.448 (462 in PDF) (MEI.shared module)
 
-    For now, this function is merely a container-processor-thing  for <staffDef> elements contained
+    For now, this function is merely a container-processor  for <staffDef> elements contained
     in this <staffGrp> element given as the "elem" argument. That is, the function does not yet
-    create the brackets/braces and labels expected of a staff group.
+    create the brackets/braces and labels expected of a staff group. Note however that all <staffDef>
+    elements will be processed, even if they're contained within several layers of <staffGrp>.
 
     :param elem: The ``<staffGrp>`` element to process.
     :type elem: :class:`~xml.etree.ElementTree.Element`
@@ -1531,9 +1532,8 @@ def staffGrpFromElement(elem, slurBundle=None):
     - MEI.midi: instrDef
     - MEI.shared: grpSym label staffGrp
     '''
-    staffDefTag = '{http://www.music-encoding.org/ns/mei}staffDef'
-    return {sd.get('n'): staffDefFromElement(sd, slurBundle) for sd in elem.iterfind(staffDefTag)}
-    # Check that out, eh? Dictionary comprehensions! Sometimes Python does impress me.
+    queryStr = './/{http://www.music-encoding.org/ns/mei}staffDef'
+    return {sd.get('n'): staffDefFromElement(sd, slurBundle) for sd in elem.iterfind(queryStr)}
 
 
 def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
