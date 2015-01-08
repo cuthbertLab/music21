@@ -3834,10 +3834,14 @@ class TestSectionScore(unittest.TestCase):
         '''
         sectionScoreCore(): everything basic, as called by sectionFromElement()
             - no kwargs
-                - and the <measure> elements have no @n; they should be set automatically
+                - but the <measure> elements do have @n so those values should be used
             - one of most things (<section>, <scoreDef>, and <staffDef>)
             - two of <measure> (one in a <section>)
             - things in a <section> are appended properly (different for <score> and <section>)
+
+        This test is roughly equivalent to testCoreUnit1() but with a <section> instead of a <score>.
+        Note that, because the <measure> *should* be processed here, this test is indeed more
+        complicated.
 
         mocked:
             - measureFromElement()
@@ -3850,7 +3854,7 @@ class TestSectionScore(unittest.TestCase):
         elem = """<section xmlns="http://www.music-encoding.org/ns/mei">
             <scoreDef meter.count="8" meter.unit="8"/>
             <staffDef n="1" clef.shape="G" clef.line="2"/>
-            <measure>
+            <measure n="400">
                 <staff n="1">
                     <layer n="1">
                         <note pname="E" oct="7" dur="1"/>
@@ -3858,7 +3862,7 @@ class TestSectionScore(unittest.TestCase):
                 </staff>
             </measure>
             <section>
-                <measure>
+                <measure n="92">
                     <staff n="1">
                         <layer n="1">
                             <note pname="G" oct="4" dur="1"/>
@@ -3924,7 +3928,7 @@ class TestSectionScore(unittest.TestCase):
         '''
         sectionScoreCore(): everything basic, as called by sectionFromElement()
             - no kwargs
-                - and the <measure> elements have no @n; they should be set automatically
+                - but the <measure> elements do have @n so those values should be used
             - one of most things (<section>, <scoreDef>, and <staffDef>)
             - two of <measure> (one in a <section>)
             - things in a <section> are appended properly (different for <score> and <section>)
@@ -3933,7 +3937,7 @@ class TestSectionScore(unittest.TestCase):
         elem = """<section xmlns="http://www.music-encoding.org/ns/mei">
             <scoreDef meter.count="8" meter.unit="8"/>
             <staffDef n="1" clef.shape="G" clef.line="2"/>
-            <measure>
+            <measure n="400">
                 <staff n="1">
                     <layer n="1">
                         <note pname="E" oct="7" dur="1"/>
@@ -3941,7 +3945,7 @@ class TestSectionScore(unittest.TestCase):
                 </staff>
             </measure>
             <section>
-                <measure>
+                <measure n="92">
                     <staff n="1">
                         <layer n="1">
                             <note pname="G" oct="4" dur="1"/>
@@ -3967,7 +3971,7 @@ class TestSectionScore(unittest.TestCase):
         # check the first Measure
         meas = parsed['1'][0]
         self.assertIsInstance(meas, stream.Measure)
-        self.assertEqual(1, meas.number)
+        self.assertEqual(400, meas.number)
         self.assertEqual(3, len(meas))  # a Voice, a Clef, a TimeSignature
         self.assertIsInstance(meas[0], stream.Voice)  # check out the Voice and its Note
         self.assertEqual(1, len(meas[0]))
@@ -3979,7 +3983,7 @@ class TestSectionScore(unittest.TestCase):
         # check the second Measure
         meas = parsed['1'][1]
         self.assertIsInstance(meas, stream.Measure)
-        self.assertEqual(2, meas.number)
+        self.assertEqual(92, meas.number)
         self.assertEqual(1, len(meas))  # a Voice
         self.assertIsInstance(meas[0], stream.Voice)  # check out the Voice and its Note
         self.assertEqual(1, len(meas[0]))
