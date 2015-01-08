@@ -110,6 +110,37 @@ class TestMeiToM21Class(unittest.TestCase):
         except base.MeiElementError as theError:
             self.assertEqual(base._WRONG_ROOT_ELEMENT.format('score-partwise'), theError.args[0])
 
+    @mock.patch('music21.mei.base._ppSlurs')
+    @mock.patch('music21.mei.base._ppTies')
+    @mock.patch('music21.mei.base._ppBeams')
+    @mock.patch('music21.mei.base._ppTuplets')
+    @mock.patch('music21.mei.base._ppConclude')
+    @mock.patch('music21.mei.base.scoreFromElement')
+    @mock.patch('music21.mei.base.makeMetadata')
+    def testRun1(self, mockMeta, mockScoreFE, mockConclude, mockTuplet, mockBeams, mockTies, mockSlurs):
+        '''
+        MeiToM21Converter.run(): that it works
+        '''
+        # ha... "test run"... get it?
+        testConv = base.MeiToM21Converter()
+        testConv.documentRoot = mock.MagicMock(spec_set=ETree.Element)
+        testConv.documentRoot.find.return_value = 5
+        expScore = mock.MagicMock(spec_set=stream.Stream)
+        mockScoreFE.return_value = expScore
+        expDocRootQuery = './/{mei}music//{mei}score'.format(mei=_MEINS)
+
+        actual = testConv.run()
+
+        self.assertIs(expScore, actual)
+        mockTuplet.assert_called_once_with(testConv)
+        mockBeams.assert_called_once_with(testConv)
+        mockTies.assert_called_once_with(testConv)
+        mockSlurs.assert_called_once_with(testConv)
+        mockConclude.assert_called_once_with(testConv)
+        testConv.documentRoot.find.assert_called_once_with(expDocRootQuery)
+        mockScoreFE.assert_called_once_with(5, testConv.slurBundle)
+        mockMeta.assert_called_once_with(testConv.documentRoot)
+
 
 #------------------------------------------------------------------------------
 class TestThings(unittest.TestCase):
