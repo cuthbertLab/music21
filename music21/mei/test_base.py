@@ -3989,3 +3989,123 @@ class TestSectionScore(unittest.TestCase):
         self.assertEqual(1, len(meas[0]))
         self.assertIsInstance(meas[0][0], note.Note)
         self.assertEqual('G4', meas[0][0].nameWithOctave)
+
+    @mock.patch('music21.mei.base.measureFromElement')
+    @mock.patch('music21.mei.base.sectionFromElement')
+    @mock.patch('music21.mei.base.scoreDefFromElement')
+    @mock.patch('music21.mei.base.staffDefFromElement')
+    def testCoreUnit3(self, mockStaffDFE, mockScoreDFE, mockSectionFE, mockMeasureFE):
+        '''
+        sectionScoreCore(): everything basic, as called by sectionFromElement()
+            - all kwargs
+                - and the <measure> has no @n; it should use the backupNum
+                - activeMeter = a MagicMock (we expect this returned)
+                - nextMeasureLeft = 'next left measure' (expected in the Measure)
+                - backupMeasureNum = 900 (expected in the Measure)
+
+        mocked:
+            - measureFromElement()
+            - sectionFromElement()
+            - scoreDefFromElement()
+            - staffDefFromElement()
+        '''
+        # setup the arguments
+        # NB: there's more MEI here than we need, but it's shared between unit & integration tests
+        elem = """<section xmlns="http://www.music-encoding.org/ns/mei">
+            <measure>
+                <staff n="1">
+                    <layer n="1">
+                        <note pname="G" oct="4" dur="1"/>
+                    </layer>
+                </staff>
+            </measure>
+        </section>"""
+        elem = ETree.fromstring(elem)
+        slurBundle = mock.MagicMock()
+        allPartNs = ['1']
+        activeMeter = mock.MagicMock(spec_set=meter.TimeSignature)
+        nextMeasureLeft = 'next left measure'
+        backupMeasureNum = 900
+        # setup measureFromElement()
+        expMeas1 = mock.MagicMock(spect_set=stream.Stream)
+        mockMeasureFE.return_value = {'1': expMeas1}
+        # prepare the "expected" return
+        expActiveMeter = activeMeter
+        expNMLeft = None
+        expMeasureNum = backupMeasureNum + 1
+        expected = {'1': [expMeas1]}
+        expected = (expected, expActiveMeter, expNMLeft, expMeasureNum)
+
+        actual = base.sectionScoreCore(elem, allPartNs, slurBundle, activeMeter=activeMeter,
+                                       nextMeasureLeft=nextMeasureLeft, backupMeasureNum=backupMeasureNum)
+
+        # ensure expected == actual
+        self.assertEqual(expected, actual)
+        # ensure measureFromElement()
+        mockMeasureFE.assert_called_once_with(mock.ANY,
+                                              backupMeasureNum + 1,
+                                              allPartNs,
+                                              activeMeter=activeMeter,
+                                              slurBundle=slurBundle)
+        # ensure sectionFromElement()
+        self.assertEqual(0, mockSectionFE.call_count)
+        # ensure scoreDefFromElement()
+        self.assertEqual(0, mockScoreDFE.call_count)
+        # ensure staffDefFromElement()
+        self.assertEqual(0, mockStaffDFE.call_count)
+        # ensure the "nextMeasureLeft" was actually put onto the Measure
+        self.assertEqual(nextMeasureLeft, actual[0]['1'][0].leftBarline)
+
+    def testCoreIntegration3(self):
+        '''
+        sectionScoreCore(): everything basic, as called by sectionFromElement()
+            - all kwargs
+                - and the <measure> has no @n; it should use the backupNum
+                - activeMeter = a MagicMock (we expect this returned)
+                - nextMeasureLeft = 'next left measure' (expected in the Measure)
+                - backupMeasureNum = 900 (expected in the Measure)
+        '''
+        # setup the arguments
+        elem = """<section xmlns="http://www.music-encoding.org/ns/mei">
+            <measure>
+                <staff n="1">
+                    <layer n="1">
+                        <note pname="G" oct="4" dur="1"/>
+                    </layer>
+                </staff>
+            </measure>
+        </section>"""
+        elem = ETree.fromstring(elem)
+        slurBundle = spanner.SpannerBundle()
+        allPartNs = ['1']
+        activeMeter = meter.TimeSignature('8/8')
+        nextMeasureLeft = bar.Repeat('start')
+        backupMeasureNum = 900
+
+        parsed, activeMeter, nextMeasureLeft, backupMeasureNum = base.sectionScoreCore(elem,
+                                                                                       allPartNs,
+                                                                                       slurBundle,
+                                                                                       activeMeter=activeMeter,
+                                                                                       nextMeasureLeft=nextMeasureLeft,
+                                                                                       backupMeasureNum=backupMeasureNum)
+
+        # ensure simple returns are okay
+        self.assertEqual('8/8', activeMeter.ratioString)
+        self.assertIsNone(nextMeasureLeft)
+        self.assertEqual(901, backupMeasureNum)
+        # ensure "parsed" is the right format
+        self.assertEqual(1, len(parsed))
+        self.assertTrue('1' in parsed)
+        self.assertEqual(1, len(parsed['1']))  # one <measure>
+        # check the Measure
+        meas = parsed['1'][0]
+        self.assertIsInstance(meas, stream.Measure)
+        self.assertEqual(901, meas.number)
+        self.assertEqual(2, len(meas))  # a Voice, a Repeat
+        self.assertIsInstance(meas[0], stream.Voice)  # check out the Voice and its Note
+        self.assertEqual(1, len(meas[0]))
+        self.assertIsInstance(meas[0][0], note.Note)
+        self.assertEqual('G4', meas[0][0].nameWithOctave)
+        self.assertIsInstance(meas[1], bar.Repeat)  # check the Repeat barline
+        self.assertEqual('start', meas[1].direction)
+        self.assertIs(meas[1], meas.leftBarline)
