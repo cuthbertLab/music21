@@ -225,7 +225,7 @@ class MeiElementError(exceptions21.Music21Exception):
 #------------------------------------------------------------------------------
 _TEST_FAILS = 'MEI module had {} failures and {} errors; run music21/mei/base.py to find out more.'
 _INVALID_XML_DOC = 'MEI document is not valid XML.'
-_WRONG_ROOT_ELEMENT = 'Root element should be <mei>, not <{}>.'
+_WRONG_ROOT_ELEMENT = 'Root element should be <mei> in the MEI namespace, not <{}>.'
 _UNKNOWN_TAG = 'Found unexpected tag while parsing MEI: <{}>.'
 _UNEXPECTED_ATTR_VALUE = 'Unexpected value for "{}" attribute: {}'
 _SEEMINGLY_NO_PARTS = 'There appear to be no <staffDef> tags in this score.'
