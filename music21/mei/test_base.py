@@ -4109,3 +4109,123 @@ class TestSectionScore(unittest.TestCase):
         self.assertIsInstance(meas[1], bar.Repeat)  # check the Repeat barline
         self.assertEqual('start', meas[1].direction)
         self.assertIs(meas[1], meas.leftBarline)
+
+    @mock.patch('music21.mei.base.environLocal')
+    @mock.patch('music21.mei.base.measureFromElement')
+    @mock.patch('music21.mei.base.sectionFromElement')
+    @mock.patch('music21.mei.base.scoreDefFromElement')
+    @mock.patch('music21.mei.base.staffDefFromElement')
+    def testCoreUnit4(self, mockStaffDFE, mockScoreDFE, mockSectionFE, mockMeasureFE, mockEnviron):
+        '''
+        sectionScoreCore(): as called by sectionFromElement()
+            - there's an "rptboth" barline, so we have to return a "nextMeasureLeft"
+            - the <staffDef> gives a TimeSignature, so we have to change "activeMeter" (and return)
+            - there's a <staffDef> without @n attribute, so we have to warn the user about it
+            - there's an unknown element, so we have to debug-warn the user
+
+        mocked:
+            - measureFromElement()
+            - sectionFromElement()
+            - scoreDefFromElement()
+            - staffDefFromElement()
+            - environLocal
+        '''
+        # setup the arguments
+        # NB: there's more MEI here than we need, but it's shared between unit & integration tests
+        elem = """<section xmlns="http://www.music-encoding.org/ns/mei">
+            <bogus>5</bogus>  <!-- this will be ignored -->
+            <staffDef n="1" meter.count="6" meter.unit="8"/>
+            <staffDef key.accid="3s" key.mode="minor"/>  <!-- this will be ignored -->
+            <measure n="42" right="rptboth">
+                <staff n="1"><layer n="1"><note pname="G" oct="4" dur="1"/></layer></staff>
+            </measure>
+        </section>"""
+        elem = ETree.fromstring(elem)
+        slurBundle = mock.MagicMock()
+        allPartNs = ['1']
+        # setup measureFromElement()
+        # return a Mock with the right measure number
+        expMeas1 = mock.MagicMock(spec_set=stream.Stream)
+        expRepeat = mock.MagicMock(spec_set=bar.Repeat)
+        mockMeasureFE.return_value = {'1': expMeas1, 'next @left': expRepeat}
+        # setup staffDefFromElement()
+        expMeter = mock.MagicMock(spec_set=meter.TimeSignature)
+        mockStaffDFE.return_value = {'meter': expMeter}
+        # prepare the "expected" return
+        expActiveMeter = expMeter
+        expNMLeft = expRepeat
+        expMeasureNum = 1
+        expected = {'1': [expMeas1]}
+        expected = (expected, expActiveMeter, expNMLeft, expMeasureNum)
+        # prepare expected environLocal message
+        expPrintDebug = base._UNPROCESSED_SUBELEMENT.format('{}bogus'.format(_MEINS),
+                                                            '{}section'.format(_MEINS))
+        expWarn = base._UNIMPLEMENTED_IMPORT.format('<staffDef>', '@n')
+
+        actual = base.sectionScoreCore(elem, allPartNs, slurBundle)
+
+        # ensure expected == actual
+        self.assertEqual(expected, actual)
+        # ensure environLocal
+        mockEnviron.printDebug.assert_called_once_with(expPrintDebug)
+        mockEnviron.warn.assert_called_once_with(expWarn)
+        # ensure measureFromElement()
+        mockMeasureFE.assert_called_once_with(mock.ANY,
+                                              1,
+                                              allPartNs,
+                                              activeMeter=expActiveMeter,
+                                              slurBundle=slurBundle)
+        # ensure sectionFromElement()
+        self.assertEqual(0, mockSectionFE.call_count)
+        # ensure scoreDefFromElement()
+        self.assertEqual(0, mockScoreDFE.call_count)
+        # ensure staffDefFromElement()
+        mockStaffDFE.assert_called_once_with(mock.ANY, slurBundle)
+
+    def testCoreIntegration4(self):
+        '''
+        sectionScoreCore(): as called by sectionFromElement()
+            - there's an "rptboth" barline, so we have to return a "nextMeasureLeft"
+            - the <staffDef> gives a TimeSignature, so we have to change "activeMeter" (and return)
+            - there's a <staffDef> without @n attribute, so we have to warn the user about it
+            - there's an unknown element, so we have to debug-warn the user
+        '''
+        # setup the arguments
+        elem = """<section xmlns="http://www.music-encoding.org/ns/mei">
+            <bogus>5</bogus>  <!-- this will be ignored -->
+            <staffDef n="1" meter.count="6" meter.unit="8"/>
+            <staffDef key.accid="3s" key.mode="minor"/>  <!-- this will be ignored -->
+            <measure n="42" right="rptboth">
+                <staff n="1"><layer n="1"><note pname="G" oct="4" dur="1"/></layer></staff>
+            </measure>
+        </section>"""
+        elem = ETree.fromstring(elem)
+        slurBundle = spanner.SpannerBundle()
+        allPartNs = ['1']
+
+        parsed, activeMeter, nextMeasureLeft, backupMeasureNum = base.sectionScoreCore(elem,
+                                                                                       allPartNs,
+                                                                                       slurBundle)
+
+        # ensure simple returns are okay
+        self.assertEqual('6/8', activeMeter.ratioString)
+        self.assertIsInstance(nextMeasureLeft, bar.Repeat)
+        self.assertEqual(1, backupMeasureNum)
+        # ensure "parsed" is the right format
+        self.assertEqual(1, len(parsed))
+        self.assertTrue('1' in parsed)
+        self.assertEqual(1, len(parsed['1']))  # one <measure>
+        # check the Measure
+        meas = parsed['1'][0]
+        self.assertIsInstance(meas, stream.Measure)
+        self.assertEqual(42, meas.number)
+        self.assertEqual(3, len(meas))  # a Voice, a TimeSignature, a Repeat
+        self.assertIsInstance(meas[0], stream.Voice)  # check out the Voice and its Note
+        self.assertEqual(1, len(meas[0]))
+        self.assertIsInstance(meas[0][0], note.Note)
+        self.assertEqual('G4', meas[0][0].nameWithOctave)
+        self.assertIsInstance(meas[1], meter.TimeSignature)  # check the TimeSignature
+        self.assertEqual('6/8', meas[1].ratioString)
+        self.assertIsInstance(meas[2], bar.Repeat)  # check the Repeat barline
+        self.assertEqual('end', meas[2].direction)
+        self.assertIs(meas[2], meas.rightBarline)
