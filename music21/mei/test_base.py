@@ -4229,3 +4229,77 @@ class TestSectionScore(unittest.TestCase):
         self.assertIsInstance(meas[2], bar.Repeat)  # check the Repeat barline
         self.assertEqual('end', meas[2].direction)
         self.assertIs(meas[2], meas.rightBarline)
+
+    def testCoreIntegration5(self):
+        '''
+        sectionScoreCore(): as called by scoreFromElement()
+
+        With a preposterously embedded set of <section> elements, we have to ensure that
+        staff-related metadata are cascaded properly into the <measure>
+
+        NOTE there is no unit test corresponding to this integration test---this is really all about
+             the cumulative effect
+        '''
+        # setup the arguments
+        elem = """<score xmlns="http://www.music-encoding.org/ns/mei">
+            <scoreDef key.sig="1f" key.mode="minor">
+                <staffGrp>
+                    <staffDef n="1" clef.line="4" clef.shape="F"/>
+                </staffGrp>
+            </scoreDef>
+            <staffDef n="1" meter.count="6" meter.unit="8"/>
+            <section>
+                <staffDef n="1" label="tuba"/>
+                <section>
+                    <measure n="42">
+                        <staff n="1"><layer n="1"><note pname="C" oct="1" dur="1"/></layer></staff>
+                    </measure>
+                </section>
+            </section>
+            <section>
+                <measure n="402">
+                    <staff n="1"><layer n="1"><note pname="C" oct="2" dur="1"/></layer></staff>
+                </measure>
+            </section>
+        </score>"""
+        elem = ETree.fromstring(elem)
+        slurBundle = spanner.SpannerBundle()
+        allPartNs = ['1']
+
+        parsed, activeMeter, nextMeasureLeft, backupMeasureNum = base.sectionScoreCore(elem,
+                                                                                       allPartNs,
+                                                                                       slurBundle)
+
+        # ensure simple returns are okay
+        self.assertEqual('6/8', activeMeter.ratioString)
+        self.assertIsNone(nextMeasureLeft)
+        self.assertEqual(2, backupMeasureNum)
+        # ensure "parsed" is the right format
+        self.assertEqual(1, len(parsed))
+        self.assertTrue('1' in parsed)
+        self.assertEqual(2, len(parsed['1']))  # two <measure>s, each in a <section>
+        # check the first Measure
+        meas = parsed['1'][0][0]
+        self.assertIsInstance(meas, stream.Measure)
+        self.assertEqual(42, meas.number)
+        self.assertEqual(5, len(meas))  # an Instrument, a Voice, a Clef, a KeySignature, a TimeSignature
+        self.assertIsInstance(meas[0], instrument.Tuba)  # check out the Instrument
+        self.assertIsInstance(meas[1], stream.Voice)  # check out the Voice and its Note
+        self.assertEqual(1, len(meas[1]))
+        self.assertIsInstance(meas[1][0], note.Note)
+        self.assertEqual('C1', meas[1][0].nameWithOctave)
+        self.assertIsInstance(meas[2], clef.BassClef)  # check out the Clef
+        self.assertIsInstance(meas[3], key.KeySignature)  # check out the KeySignature
+        self.assertEqual(-1, meas[3].sharps)
+        self.assertEqual('minor', meas[3].mode)
+        self.assertIsInstance(meas[4], meter.TimeSignature)  # check the TimeSignature
+        self.assertEqual('6/8', meas[4].ratioString)
+        # check the second Measure
+        meas = parsed['1'][1][0]
+        self.assertIsInstance(meas, stream.Measure)
+        self.assertEqual(402, meas.number)
+        self.assertEqual(1, len(meas))  # a Voice
+        self.assertIsInstance(meas[0], stream.Voice)  # check out the Voice and its Note
+        self.assertEqual(1, len(meas[0]))
+        self.assertIsInstance(meas[0][0], note.Note)
+        self.assertEqual('C2', meas[0][0].nameWithOctave)
