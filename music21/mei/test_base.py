@@ -2102,7 +2102,7 @@ class TestScoreDefFromElement(unittest.TestCase):
         elem.append(staffGrp)
         mockTime.return_value = 'mockTime return'
         mockKey.return_value = 'mockKey return'
-        mockStaffGrpFE.return_value = {'1': {'instrument': 'A clarinet'}}  # but is it "any clarinet," or a specific clarinet in A? Ambiguity!
+        mockStaffGrpFE.return_value = {'1': {'instrument': 'A clarinet'}}
         expected = {'all-part objects': [mockTime.return_value, mockKey.return_value],
                     'whole-score objects': [],
                     '1': {'instrument': 'A clarinet'}}

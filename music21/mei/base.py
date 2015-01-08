@@ -826,7 +826,6 @@ def _ppTuplets(theConverter):
             # Ideally (for us) <tupletSpan> elements will have a @plist that enumerates the
             # @xml:id of every affected element. In this case, tupletSpanFromElement() can use the
             # @plist to add our custom @m21TupletNum and @m21TupletNumbase attributes.
-            # TODO: use @startid and @endid, if present, to set the duration.tuplets "type"
             for eachXmlid in eachTuplet.get('plist', '').split(' '):
                 eachXmlid = removeOctothorpe(eachXmlid)
                 if 0 < len(eachXmlid):
@@ -1326,7 +1325,7 @@ def scaleToTuplet(objs, elem):
 
 
 def _guessTuplets(theLayer):
-    # TODO: nested tuplets?
+    # TODO: nested tuplets don't work when they're both specified with <tupletSpan>
     # TODO: adjust this to work with cross-measure tuplets (i.e., where only the "start" or "end"
     #       is found in theLayer)
     '''
@@ -1635,9 +1634,9 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 
     **Contained Elements not Implemented:**
 
-    - MEI.cmn: meterSig meterSigGrp  TODO: these
+    - MEI.cmn: meterSig meterSigGrp
     - MEI.mensural: mensur proport
-    - MEI.shared: clefGrp keySig label layerDef  TODO: these
+    - MEI.shared: clefGrp keySig label layerDef
     '''
     # mapping from tag name to our converter function
     tagToFunction = {'{http://www.music-encoding.org/ns/mei}clef': clefFromElement}
@@ -2248,6 +2247,7 @@ def clefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
 
 
 def instrDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
+    # TODO: robuster handling of <instrDef>, including <instrGrp> and if held in a <staffGrp>
     '''
     <instrDef> (instrument definition)---MIDI instrument declaration.
 
@@ -2476,7 +2476,6 @@ def tupletFromElement(elem, slurBundle=None):
 
 
 def layerFromElement(elem, overrideN=None, slurBundle=None):
-    # TODO: clefs that should appear part-way through a measure don't
     '''
     <layer> An independent stream of events on a staff.
 
@@ -2815,8 +2814,8 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
     # will only work in cases where not all of the parts are resting. However, it avoids a more
     # time-consuming search later.
     if (maxBarDuration == _DUR_ATTR_DICT[None] and
-        activeMeter is not None and
-        maxBarDuration != activeMeter.totalLength):
+            activeMeter is not None and
+            maxBarDuration != activeMeter.totalLength):
         # In this case, all the staves have <mRest> elements without a @dur.
         _correctMRestDurs(staves, activeMeter.totalLength)
     else:
@@ -3105,7 +3104,7 @@ def scoreFromElement(elem, slurBundle):
 
     # put slurs in the Score
     theScore.append(slurBundle.list)
-    # TODO: when all the Slur objects are are at the end, they'll only be outputted properly if the
+    # TODO: when all the Slur objects are at the end, they'll only be outputted properly if the
     #       whole Score is outputted. show()-ing one Part or Measure won't display the slurs.
 
     return theScore
@@ -3136,7 +3135,7 @@ _DOC_ORDER = [
     tupletFromElement,
     ]
 
-class Test(unittest.TestCase):
+class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
     '''
     This class runs the tests from all the TestCase sub-classes in the "test_base" module.
 
