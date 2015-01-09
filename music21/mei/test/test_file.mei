@@ -11,7 +11,12 @@
                         <persName role="encoder">Christopher Antila</persName>
                     </respStmt>
                 </titleStmt>
-                <tempo>Movement title</tempo>
+                <tempo>Allegro moderato</tempo>
+                <history>
+                    <creation>
+                        <date isodate="2014-05-20"/>
+                    </creation>
+                </history>
             </work>
         </fileDesc>
     </meiHead>
