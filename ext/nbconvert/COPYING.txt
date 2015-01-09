@@ -1,3 +1,0 @@
-See COPYING.txt distributed with iPython.
-
-#TODO, give NBCONVERT its own license

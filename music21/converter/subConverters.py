@@ -209,7 +209,7 @@ class ConverterIPython(SubConverter):
              data = ''' + outputCode + ''';       
              var jpc = new music21.jsonPickle.Converter();
              var streamObj = jpc.run(data);
-             streamObj.replaceLastCanvas("#''' + idName + '''");
+             streamObj.replaceCanvas("#''' + idName + '''");
         </script>
         '''
         return HTML(htmlBlock + js)
