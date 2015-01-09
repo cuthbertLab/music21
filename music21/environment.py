@@ -486,7 +486,7 @@ class _EnvironmentCore(object):
         self._ref['musescoreDirectPNGPath'] = None
         self._ref['showFormat'] = 'musicxml'
         self._ref['writeFormat'] = 'musicxml'
-        self._ref['ipythonShowFormat'] = 'ipython.vexflow'
+        self._ref['ipythonShowFormat'] = 'ipython.lilypond.png'
 
         self._ref['autoDownload'] = 'ask'
         self._ref['debug'] = 0
