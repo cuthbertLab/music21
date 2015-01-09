@@ -42,8 +42,8 @@ as close to the relevant code as possible.
 
 If you're going to edit docs you'll need the latest version of Sphinx.  Go to the command line and Type::
 
-  easy_install -U Sphinx
-  easy_install rst2pdf
+  sudo easy_install -U Sphinx
+  sudo easy_install rst2pdf
  
 Sphinx uses special characters to identify formatting of documentation. For example, to write a heading you can write:
 Helpful tips on Sphinx formatting may be found here:  `Sphinx Documentation Formatting <http://sphinx.pocoo.org/rest.html>`_ 

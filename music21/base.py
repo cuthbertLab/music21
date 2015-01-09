@@ -2269,9 +2269,13 @@ class Music21Object(object):
         if fmt is None: # get setting in environment
             if common.runningUnderIPython():
                 try:
+                    # TODO: when everyone has updated, then remove these lines...
+                    environLocal['ipythonShowFormat'] = 'ipython.lilypond.png'
+                    environLocal.write()
+                    # end delete
                     fmt = environLocal['ipythonShowFormat']
                 except environment.EnvironmentException:
-                    fmt = 'ipython.vexflow'
+                    fmt = 'ipython.lilypond.png'
             else:
                 fmt = environLocal['showFormat']
         elif fmt.startswith('.'):

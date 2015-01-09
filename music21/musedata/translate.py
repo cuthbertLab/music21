@@ -368,7 +368,7 @@ class Test(unittest.TestCase):
         from music21 import musedata
         import os
         from music21 import common
-        from music21.musicxml import m21ToString
+        #from music21.musicxml import m21ToString
 
         fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
         mdw = musedata.MuseDataWork()

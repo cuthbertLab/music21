@@ -2,7 +2,6 @@
 User's Guide, Chapter 7: Chords
 ===============================
 
-
 .. code:: python
 
 
@@ -193,7 +192,6 @@ The result of that is ``None`` which we can test like so...
 Displaying Chords
 -----------------
 
-
 We can display the ``Chord`` object just like any
 :class:`~music21.note.Note` (Don't worry if this isn't working for you
 yet...we'll get this set up in Chapter 8)
@@ -203,7 +201,7 @@ yet...we'll get this set up in Chapter 8)
     cMinor.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_12.png
+.. image:: usersGuide_07_chords_files/_fig_13.png
 
 
 .. code:: python
@@ -211,7 +209,7 @@ yet...we'll get this set up in Chapter 8)
     cMajor.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_14.png
+.. image:: usersGuide_07_chords_files/_fig_15.png
 
 
 These chords are a bit "spacey", so let's get ``c`` in
@@ -223,7 +221,7 @@ These chords are a bit "spacey", so let's get ``c`` in
     cClosed.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_16.png
+.. image:: usersGuide_07_chords_files/_fig_17.png
 
 
 Notice that ``c`` is unchanged. The closed position chord is only
@@ -234,7 +232,7 @@ Notice that ``c`` is unchanged. The closed position chord is only
     cMinor.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_18.png
+.. image:: usersGuide_07_chords_files/_fig_19.png
 
 
 If we wanted to change the Chord object itself, we call
@@ -247,7 +245,7 @@ original is altered, we don't need to put ``x = ...`` in front of it
     cMajor.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_20.png
+.. image:: usersGuide_07_chords_files/_fig_21.png
 
 
 There is also a method,
@@ -264,7 +262,7 @@ the most compact form possible:
     c2.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_22.png
+.. image:: usersGuide_07_chords_files/_fig_23.png
 
 
 We can get the :meth:`common name <music21.chord.Chord.commonName>` of
@@ -311,12 +309,11 @@ American composer Elliott Carter liked a lot.
     elliottCarterChord.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_27.png
+.. image:: usersGuide_07_chords_files/_fig_28.png
 
 
 More ways of creating chords; Chords and Streams
 ------------------------------------------------
-
 
 There are other ways of creating a Chord if you'd like. One way is from
 a bunch of already created ``Note`` objects:
@@ -331,7 +328,7 @@ a bunch of already created ``Note`` objects:
     dMajor.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_29.png
+.. image:: usersGuide_07_chords_files/_fig_30.png
 
 
 Or we can pass a string with note names separated by spaces:
@@ -342,7 +339,7 @@ Or we can pass a string with note names separated by spaces:
     e7.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_31.png
+.. image:: usersGuide_07_chords_files/_fig_32.png
 
 
 The octaves are optional, especially if everything is within an octave:
@@ -353,7 +350,7 @@ The octaves are optional, especially if everything is within an octave:
     es.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_33.png
+.. image:: usersGuide_07_chords_files/_fig_34.png
 
 
 But you will definitely want them if a chord crosses the boundary of an
@@ -366,7 +363,7 @@ not what you want:
     fMajor.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_35.png
+.. image:: usersGuide_07_chords_files/_fig_36.png
 
 
 Notice that because C sorts before F and A that the chord is in second
@@ -422,7 +419,7 @@ Like ``Note`` objects, we can put ``Chord`` objects inside a
     stream1.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_40.png
+.. image:: usersGuide_07_chords_files/_fig_41.png
 
 
 We can mix and match ``Notes``, :class:`Rests <music21.note.Rest>`,
@@ -442,12 +439,11 @@ and ``Chords``:
     stream2.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_42.png
+.. image:: usersGuide_07_chords_files/_fig_43.png
 
 
 Post-tonal chords (in brief)
 ----------------------------
-
 
 There are a lot of methods for dealing with post-tonal aspects of
 chords. If you're not interested in twentieth century music, go ahead
@@ -531,7 +527,7 @@ accidental right here...it works fine in MusicXML...)
     otherECChord.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_49.png
+.. image:: usersGuide_07_chords_files/_fig_50.png
 
 
 .. code:: python
@@ -572,7 +568,7 @@ with the pitchClasses:
     oddChord.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_53.png
+.. image:: usersGuide_07_chords_files/_fig_54.png
 
 
 Though if you use pitchClasses above 11, then they are treated as MIDI
@@ -585,7 +581,7 @@ automatically.
     midiChordType.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_55.png
+.. image:: usersGuide_07_chords_files/_fig_56.png
 
 
 Okay, so now you've learned the basics (and more!) of Notes and Chords,
