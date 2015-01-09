@@ -1865,6 +1865,67 @@ def accidFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     return _accidentalFromAttr(elem.get('accid'))
 
 
+def sylFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
+    '''
+    <syl> Individual lyric syllable.
+
+    In MEI 2013: pg.454 (468 in PDF) (MEI.shared module)
+
+    :returns: An appropriately-configured :class:`music21.note.Lyric`.
+
+    **Attributes/Elements Implemented:**
+
+    - @con and @wordpos (from att.syl.log)
+
+    **Attributes/Elements in Testing:** none
+
+    **Attributes not Implemented:**
+
+    - att.common (@label, @n, @xml:base) (att.id (@xml:id))
+    - att.facsimile (@facs)
+    - att.syl.vis (att.typography (@fontfam, @fontname, @fontsize, @fontstyle, @fontweight))
+
+        - (att.visualoffset (att.visualoffset.ho (@ho))
+
+            - (att.visualoffset.to (@to))
+            - (att.visualoffset.vo (@vo)))
+
+        - (att.xy (@x, @y))
+        - (att.horizontalalign (@halign))
+
+    - att.syl.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
+
+        -  (att.alignment (@when)))
+
+    **Contained Elements not Implemented:**
+
+    - MEI.edittrans: (all)
+    - MEI.figtable: fig
+    - MEI.namesdates: corpName geogName periodName persName styleName
+    - MEI.ptrref: ptr ref
+    - MEI.shared: address bibl date identifier lb name num rend repository stack title
+    '''
+    wordpos = elem.get('wordpos')
+    wordposDict = {'i': 'begin', 'm': 'middle', 't': 'end', None: None}
+
+    conDict = {'s': ' ', 'd': '-', 't': '~', 'u': '_', None: '-'}
+    if 'i' == wordpos:
+        text = elem.text + conDict[elem.get('con')]
+    elif 'm' == wordpos:
+        text = conDict[elem.get('con')] + elem.text + conDict[elem.get('con')]
+    elif 't' == wordpos:
+        text = conDict[elem.get('con')] + elem.text
+    else:
+        text = elem.text
+
+    syllabic = wordposDict[wordpos]
+
+    if syllabic:
+        return note.Lyric(text=text, syllabic=syllabic, applyRaw=True)
+    else:
+        return note.Lyric(text=text)
+
+
 def noteFromElement(elem, slurBundle=None):
     # NOTE: this function should stay in sync with chordFromElement() where sensible
     '''
@@ -1889,6 +1950,7 @@ def noteFromElement(elem, slurBundle=None):
     - @slur, (many of "[i|m|t][1-6]")
     - @grace, from att.note.ges.cmn: partial implementation (notes marked as grace, but the
         duration is 0 because we ignore the question of which neighbouring note to borrow time from)
+    - <syl>
 
     **Attributes/Elements in Testing:** none
 
@@ -1938,7 +2000,6 @@ def noteFromElement(elem, slurBundle=None):
     - MEI.critapp: app
     - MEI.edittrans: (all)
     - MEI.lyrics: verse
-    - MEI.shared: syl
     '''
     tagToFunction = {'{http://www.music-encoding.org/ns/mei}dot': dotFromElement,
                      '{http://www.music-encoding.org/ns/mei}artic': articFromElement,
@@ -2000,6 +2061,10 @@ def noteFromElement(elem, slurBundle=None):
     # tuplets
     if elem.get('m21TupletNum') is not None:
         theNote = scaleToTuplet(theNote, elem)
+
+    # lyrics indicated with <syl>
+    if elem.find('./{}syl'.format(_MEINS)) is not None:
+        theNote.lyrics = [sylFromElement(elem.find('./{}syl'.format(_MEINS)))]
 
     return theNote
 
@@ -3211,6 +3276,7 @@ if __name__ == "__main__":
         test_base.TestThings,
         test_base.TestMetadata,
         test_base.TestAttrTranslators,
+        test_base.TestLyrics,
         test_base.TestNoteFromElement,
         test_base.TestRestFromElement,
         test_base.TestChordFromElement,

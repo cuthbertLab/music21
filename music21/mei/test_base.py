@@ -849,6 +849,63 @@ class TestAttrTranslators(unittest.TestCase):
 
 
 #------------------------------------------------------------------------------
+class TestLyrics(unittest.TestCase):
+    '''Tests for sylFromElement() and verseFromElement()'''
+
+    def testSyl1(self):
+        '''
+        sylFromElement() where @con is given and @wordpos="i"
+        '''
+        elem = ETree.Element('syl', attrib={'wordpos': 'i', 'con': 's'})
+        elem.text = 'Chri'
+
+        actual = base.sylFromElement(elem)
+
+        self.assertIsInstance(actual, note.Lyric)
+        self.assertEqual('begin', actual.syllabic)
+        self.assertEqual('Chri ', actual.text)
+
+    def testSyl2(self):
+        '''
+        sylFromElement() where @con is given and @wordpos="m"
+        '''
+        elem = ETree.Element('syl', attrib={'wordpos': 'm', 'con': 't'})
+        elem.text = 'sto'
+
+        actual = base.sylFromElement(elem)
+
+        self.assertIsInstance(actual, note.Lyric)
+        self.assertEqual('middle', actual.syllabic)
+        self.assertEqual('~sto~', actual.text)
+
+    def testSyl3(self):
+        '''
+        sylFromElement() where @con is not given and @wordpos="t"
+        '''
+        elem = ETree.Element('syl', attrib={'wordpos': 't', 'con': 'd'})
+        elem.text = 'pher'
+
+        actual = base.sylFromElement(elem)
+
+        self.assertIsInstance(actual, note.Lyric)
+        self.assertEqual('end', actual.syllabic)
+        self.assertEqual('-pher', actual.text)
+
+    def testSyl4(self):
+        '''
+        sylFromElement() where @wordpos is not specified
+        '''
+        elem = ETree.Element('syl')
+        elem.text = 'shoe'
+
+        actual = base.sylFromElement(elem)
+
+        self.assertIsInstance(actual, note.Lyric)
+        self.assertEqual('single', actual.syllabic)
+        self.assertEqual('shoe', actual.text)
+
+
+#------------------------------------------------------------------------------
 class TestNoteFromElement(unittest.TestCase):
     '''Tests for noteFromElement()'''
     # NOTE: For this TestCase, in the unit tests, if you get...
@@ -1081,19 +1138,23 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertEqual('4', actual.m21TupletNumbase)
         self.assertEqual('start', actual.m21TupletSearch)
 
+    @mock.patch('music21.mei.base.sylFromElement')
     @mock.patch('music21.note.Note')
     @mock.patch('music21.mei.base._processEmbeddedElements')
     @mock.patch('music21.mei.base.safePitch')
     @mock.patch('music21.mei.base.makeDuration')
     @mock.patch('music21.duration.GraceDuration')
-    def testUnit5(self, mockGrace, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
+    def testUnit5(self, mockGrace, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote, mockSylFE):
         '''
-        noteFromElement(): test @grace and @m21Beam where the duration requires adjusting beams
+        noteFromElement(): test @grace and @m21Beam where the duration requires adjusting beams,
+            and contained <syl>
 
         (mostly-unit test)
         '''
         elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '16',
                                              'm21Beam': 'start', 'grace': 'acc'})
+        sylElem = ETree.Element('{}syl'.format(_MEINS))
+        elem.append(sylElem)
         mockSafePitch.return_value = 'safePitch() return'
         mockNewNote = mock.MagicMock()
         mockNewNote.beams = mock.MagicMock()
@@ -1101,6 +1162,7 @@ class TestNoteFromElement(unittest.TestCase):
         mockProcEmbEl.return_value = []
         mockGrace.return_value = mock.MagicMock(spec_set=duration.Duration)
         mockGrace.return_value.type = '16th'
+        mockSylFE.return_value = 'words!'
         expected = mockNewNote
 
         actual = base.noteFromElement(elem, 'slur bundle')
@@ -1111,14 +1173,20 @@ class TestNoteFromElement(unittest.TestCase):
         mockNote.assert_called_once_with(mockSafePitch.return_value)
         mockNewNote.beams.fill.assert_called_once_with('16th', 'start')
         self.assertEqual(mockGrace.return_value, mockNewNote.duration)
+        mockSylFE.assert_called_once_with(sylElem)
+        self.assertEqual(['words!'], mockNewNote.lyrics)
 
     def testIntegration5(self):
         '''
-        noteFromElement(): test @grace and @m21Beam where the duration requires adjusting beams
+        noteFromElement(): test @grace and @m21Beam where the duration requires adjusting beams,
+            and contained <syl>
         (corresponds to testUnit5() with no mocks)
         '''
         elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '16',
                                              'm21Beam': 'start', 'grace': 'acc'})
+        sylElem = ETree.Element('{}syl'.format(_MEINS))
+        sylElem.text = 'words!'
+        elem.append(sylElem)
         slurBundle = spanner.SpannerBundle()
 
         actual = base.noteFromElement(elem, slurBundle)
@@ -1130,6 +1198,8 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertTrue('start', actual.beams.beamsList[0].type)
         self.assertTrue(2, actual.beams.beamsList[1].number)
         self.assertTrue('start', actual.beams.beamsList[1].type)
+        self.assertTrue(1, len(actual.lyrics))
+        self.assertTrue('words!', actual.lyrics[0].text)
 
     # NOTE: consider adding to previous tests rather than making new ones
 
