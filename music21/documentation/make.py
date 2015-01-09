@@ -75,8 +75,8 @@ def _main(target):
     }
     if target in buildDirectories:
         print('WRITING DOCUMENTATION FILES')
-        documentation.ModuleReferenceReSTWriter()()
-        documentation.CorpusReferenceReSTWriter()()
+        #documentation.ModuleReferenceReSTWriter()()
+        #documentation.CorpusReferenceReSTWriter()()
         documentation.IPythonNotebookReSTWriter()()
         sphinxOptions = ['sphinx']
         sphinxOptions.extend(('-b', target))
