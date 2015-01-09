@@ -234,6 +234,7 @@ _CANNOT_FIND_XMLID = 'Could not find the @{} so we could not create the {}.'
 _MISSING_TUPLET_DATA = 'Both @num and @numbase attributes are required on <tuplet> tags.'
 _UNIMPLEMENTED_IMPORT = 'Importing {} without {} is not yet supported.'
 _UNPROCESSED_SUBELEMENT = 'Found an unprocessed <{}> element in a <{}>.'
+_MISSED_DATE = 'Unable to decipher the composition date "{}"'
 
 
 # Module-level Functions
@@ -1176,68 +1177,109 @@ def removeOctothorpe(xmlid):
         return xmlid
 
 
-def makeMetadata(fromThis):
-    # TODO: tests
-    # TODO: break into sub-functions
-    # TODO/NOTE: only returns a single Metadata objects atm
+def makeMetadata(documentRoot):
     '''
     Produce metadata objects for all the metadata stored in the MEI header.
 
-    :param fromThis: The MEI file's root tag.
-    :type fromThis: :class:`~xml.etree.ElementTree.Element`
-    :returns: Metadata objects that hold the metadata stored in the MEI header.
-    :rtype: sequence of :class:`music21.metadata.Metadata` and :class:`~music21.metadata.RichMetadata`.
+    :param documentRoot: The MEI document's root element.
+    :type documentRoot: :class:`~xml.etree.ElementTree.Element`
+    :returns: A :class:`Metadata` object with some of the metadata stored in the MEI document.
+    :rtype: :class:`music21.metadata.Metadata`
     '''
-    fromThis = fromThis.find('.//{}work'.format(_MEINS))
-    if fromThis is None:
-        return []
-
     meta = metadata.Metadata()
-    #richMeta = metadata.RichMetadata()
+    work = documentRoot.find('.//{}work'.format(_MEINS))
+    if work is not None:
+        # title, subtitle, and movement name
+        meta = metaSetTitle(work, meta)
+        # composer
+        meta = metaSetComposer(work, meta)
+        # date
+        meta = metaSetDate(work, meta)
 
-    for eachTag in fromThis.iterfind('*'):
-        if eachTag.tag == '{}titleStmt'.format(_MEINS):
-            for subTag in eachTag.iterfind('*'):
-                if subTag.tag == '{}title'.format(_MEINS):
-                    if subTag.get('type', '') == 'subtitle':
-                        # TODO: this is meaningless because m21's Metadata doesn't do anything with it
-                        meta.subtitle = subTag.text
-                    elif meta.title is None:
-                        meta.title = subTag.text
-                elif subTag.tag == '{}respStmt'.format(_MEINS):
-                    for subSubTag in subTag.iterfind('*'):
-                        if subSubTag.tag == '{}persName'.format(_MEINS):
-                            if subSubTag.get('role') == 'composer':
-                                meta.composer = subSubTag.text
+    return meta
 
-        elif eachTag.tag == '{}history'.format(_MEINS):
-            for subTag in eachTag.iterfind('*'):
-                if subTag.tag == '{}creation'.format(_MEINS):
-                    for subSubTag in subTag.iterfind('*'):
-                        if subSubTag.tag == '{}date'.format(_MEINS):
-                            if subSubTag.text is None:
-                                dateStart, dateEnd = None, None
-                                if subSubTag.get('isodate') is not None:
-                                    meta.date = subSubTag.get('isodate')
-                                elif subSubTag.get('notbefore') is not None:
-                                    dateStart = subSubTag.get('notbefore')
-                                elif subSubTag.get('startdate') is not None:
-                                    dateStart = subSubTag.get('startdate')
 
-                                if subSubTag.get('notafter') is not None:
-                                    dateEnd = subSubTag.get('notafter')
-                                elif subSubTag.get('enddate') is not None:
-                                    dateEnd = subSubTag.get('enddate')
+def metaSetTitle(work, meta):
+    '''
+    From a <work> element, find the title, subtitle, and movement name (<tempo> element) and store
+    the values in a :class:`Metadata` object.
 
-                                if dateStart is not None and dateEnd is not None:
-                                    meta.date = metadata.DateBetween((dateStart, dateEnd))
-                            else:
-                                meta.date = subSubTag.text
+    :param work: A <work> :class:`~xml.etree.ElementTree.Element` with metadata you want to find.
+    :param meta: The :class:`~music21.metadata.Metadata` object in which to store the metadata.
+    :return: The ``meta`` argument, having relevant metadata added.
+    '''
+    # title, subtitle, and movement name
+    for title in work.findall('./{mei}titleStmt/{mei}title'.format(mei=_MEINS)):
+        if title.get('type', '') == 'subtitle':
+            meta.subtitle = title.text
+        elif meta.title is None:
+            meta.title = title.text
 
-        elif eachTag.tag == '{}tempo'.format(_MEINS):
-            # NB: this has to be done after a proper, movement-specific title would have been set
-            if meta.movementName is None:
-                meta.movementName = eachTag.text
+    if hasattr(meta, 'subtitle'):
+        # Since m21.Metadata doesn't actually have a "subtitle" attribute, we'll put the subtitle
+        # in the title
+        meta.title = '{} ({})'.format(meta.title, meta.subtitle)
+        del meta.subtitle
+
+    tempo = work.find('./{}tempo'.format(_MEINS))
+    if tempo is not None:
+        meta.movementName = tempo.text
+
+    return meta
+
+
+def metaSetComposer(work, meta):
+    '''
+    From a <work> element, find the composer(s) and store the values in a :class:`Metadata` object.
+
+    :param work: A <work> :class:`~xml.etree.ElementTree.Element` with metadata you want to find.
+    :param meta: The :class:`~music21.metadata.Metadata` object in which to store the metadata.
+    :return: The ``meta`` argument, having relevant metadata added.
+    '''
+    composers = []
+    for persName in work.findall('./{mei}titleStmt/{mei}respStmt/{mei}persName'.format(mei=_MEINS)):
+        if persName.get('role') == 'composer' and persName.text:
+            composers.append(persName.text)
+    for composer in work.findall('./{mei}titleStmt/{mei}composer'.format(mei=_MEINS)):
+        if composer.text:
+            composers.append(composer.text)
+        else:
+            persName = composer.find('./{}persName'.format(_MEINS))
+            if persName.text:
+                composers.append(persName.text)
+    if 1 == len(composers):
+        meta.composer = composers[0]
+    elif 1 < len(composers):
+        meta.composer = composers
+
+    return meta
+
+
+def metaSetDate(work, meta):
+    '''
+    From a <work> element, find the date (range) of composition and store the values in a
+    :class:`Metadata` object.
+
+    :param work: A <work> :class:`~xml.etree.ElementTree.Element` with metadata you want to find.
+    :param meta: The :class:`~music21.metadata.Metadata` object in which to store the metadata.
+    :return: The ``meta`` argument, having relevant metadata added.
+    '''
+    date = work.find('./{mei}history/{mei}creation/{mei}date'.format(mei=_MEINS))
+    if date is not None:  # must use explicit "is not None" for an Element
+        if date.text or date.get('isodate'):
+            dateStr = date.get('isodate') if date.get('isodate') else date.text
+            theDate = metadata.Date()
+            try:
+                theDate.loadStr(dateStr.replace('-', '/'))
+            except ValueError:
+                environLocal.warn(_MISSED_DATE.format(dateStr))
+            else:
+                meta.date = theDate
+        else:
+            dateStart = date.get('notbefore') if date.get('notbefore') else date.get('startdate')
+            dateEnd = date.get('notafter') if date.get('notafter') else date.get('enddate')
+            if dateStart and dateEnd:
+                meta.date = metadata.DateBetween((dateStart, dateEnd))
 
     return meta
 
@@ -3167,6 +3209,7 @@ if __name__ == "__main__":
     music21.mainTest(
         test_base.TestMeiToM21Class,
         test_base.TestThings,
+        test_base.TestMetadata,
         test_base.TestAttrTranslators,
         test_base.TestNoteFromElement,
         test_base.TestRestFromElement,

@@ -52,6 +52,7 @@ from music21 import duration
 from music21 import instrument
 from music21 import interval
 from music21 import key
+from music21 import metadata
 from music21 import meter
 from music21 import note
 from music21 import pitch
@@ -349,6 +350,285 @@ class TestThings(unittest.TestCase):
         otherVoice.id = 24
         fromThese = [None, firstVoice, stream.Stream(), stream.Part(), otherVoice, 900]
         self.assertRaises(RuntimeError, base.getVoiceId, fromThese)
+
+
+#------------------------------------------------------------------------------
+class TestMetadata(unittest.TestCase):
+    '''Tests for the metadata-fetching functions.'''
+
+    @mock.patch('music21.mei.base.metaSetTitle')
+    @mock.patch('music21.mei.base.metaSetComposer')
+    @mock.patch('music21.mei.base.metaSetDate')
+    def testMakeMeta1(self, mockDate, mockComposer, mockTitle):
+        '''
+        makeMetadata() when there is no <work> element.
+        '''
+        documentRoot = mock.MagicMock(spec_set=ETree.Element)
+        documentRoot.find.return_value = None
+
+        actual = base.makeMetadata(documentRoot)
+
+        self.assertIsInstance(actual, metadata.Metadata)
+        documentRoot.find.assert_called_once_with('.//{}work'.format(_MEINS))
+        self.assertEqual(0, mockDate.call_count)
+        self.assertEqual(0, mockComposer.call_count)
+        self.assertEqual(0, mockTitle.call_count)
+
+    @mock.patch('music21.mei.base.metaSetTitle')
+    @mock.patch('music21.mei.base.metaSetComposer')
+    @mock.patch('music21.mei.base.metaSetDate')
+    def testMakeMeta2(self, mockDate, mockComposer, mockTitle):
+        '''
+        makeMetadata() when there is a <work> element.
+        '''
+        documentRoot = mock.MagicMock(spec_set=ETree.Element)
+        mockWork = mock.MagicMock(spec_set=ETree.Element)
+        documentRoot.find.return_value = mockWork
+        mockDate.side_effect = lambda x, y: y
+        mockComposer.side_effect = lambda x, y: y
+        mockTitle.side_effect = lambda x, y: y
+
+        actual = base.makeMetadata(documentRoot)
+
+        self.assertIsInstance(actual, metadata.Metadata)
+        documentRoot.find.assert_called_once_with('.//{}work'.format(_MEINS))
+        mockDate.assert_called_once_with(mockWork, actual)
+        mockComposer.assert_called_once_with(mockWork, actual)
+        mockTitle.assert_called_once_with(mockWork, actual)
+
+    def testMetaTitle1(self):
+        '''
+        metaSetTitle() with a title and tempo but no subtitle
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+            <titleStmt>
+                <title>Symphony No. 7</title>
+            </titleStmt>
+            <tempo>Adagio</tempo>
+        </work>"""
+        work = ETree.fromstring(work)
+        expTitle = 'Symphony No. 7'
+        expMovementName = 'Adagio'
+        meta = metadata.Metadata()
+
+        actual = base.metaSetTitle(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertFalse(hasattr(meta, 'subtitle'))
+        self.assertEqual(expTitle, actual.title)
+        self.assertEqual(expMovementName, actual.movementName)
+
+    def testMetaTitle2(self):
+        '''
+        metaSetTitle() with a title, subtitle, but no tempo
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+            <titleStmt>
+                <title>Symphony No. 7</title>
+                <title type="subtitle">in one movement</title>
+            </titleStmt>
+        </work>"""
+        work = ETree.fromstring(work)
+        expTitle = 'Symphony No. 7 (in one movement)'
+        meta = metadata.Metadata()
+
+        actual = base.metaSetTitle(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertFalse(hasattr(meta, 'subtitle'))
+        self.assertEqual(expTitle, actual.title)
+        self.assertIsNone(actual.movementName)
+
+    def testMetaComposer1(self):
+        '''
+        metaSetComposer() with no composers
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei"/>"""
+        work = ETree.fromstring(work)
+        meta = metadata.Metadata()
+
+        actual = base.metaSetComposer(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertIsNone(actual.composer)
+
+    def testMetaComposer2(self):
+        '''
+        metaSetComposer() with one composer in <respStmt>
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+            <titleStmt>
+                <respStmt>
+                    <persName role="composer">Jean Sibelius</persName>
+                </respStmt>
+            </titleStmt>
+        </work>"""
+        work = ETree.fromstring(work)
+        expComposer = 'Jean Sibelius'
+        meta = metadata.Metadata()
+
+        actual = base.metaSetComposer(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertEqual(expComposer, actual.composer)
+
+    def testMetaComposer3(self):
+        '''
+        metaSetComposer() with one composer in <composer>
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+            <titleStmt>
+                <composer>Jean Sibelius</composer>
+            </titleStmt>
+        </work>"""
+        work = ETree.fromstring(work)
+        expComposer = 'Jean Sibelius'
+        meta = metadata.Metadata()
+
+        actual = base.metaSetComposer(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertEqual(expComposer, actual.composer)
+
+    def testMetaComposer4(self):
+        '''
+        metaSetComposer() with two composers, one specified each way
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+            <titleStmt>
+                <respStmt>
+                    <persName role="composer">Jean Sibelius</persName>
+                </respStmt>
+                <composer>Sibelius, Jean</composer>
+            </titleStmt>
+        </work>"""
+        work = ETree.fromstring(work)
+        expComposer1 = "['Jean Sibelius', 'Sibelius, Jean']"
+        expComposer2 = "['Sibelius, Jean', 'Jean Sibelius']"
+        meta = metadata.Metadata()
+
+        actual = base.metaSetComposer(work, meta)
+
+        self.assertIs(meta, actual)
+        if expComposer1 != actual.composer and expComposer2 != actual.composer:
+            self.fail('composer names do not match in either order')
+
+    def testMetaDate1(self):
+        '''
+        metaSetDate() with no dates
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei"/>"""
+        work = ETree.fromstring(work)
+        expDate = 'None'  # I don't know why, but that's what it does
+        meta = metadata.Metadata()
+
+        actual = base.metaSetDate(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertEqual(expDate, actual.date)
+
+    def testMetaDate2(self):
+        '''
+        metaSetDate() with @isodate
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+            <history>
+                <creation>
+                    <date isodate="1924-03-02"/>
+                </creation>
+            </history>
+        </work>"""
+        work = ETree.fromstring(work)
+        expDate = '1924/03/02'
+        meta = metadata.Metadata()
+
+        actual = base.metaSetDate(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertEqual(expDate, actual.date)
+
+    def testMetaDate3(self):
+        '''
+        metaSetDate() with text
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+            <history>
+                <creation>
+                    <date>1924-03-02</date>
+                </creation>
+            </history>
+        </work>"""
+        work = ETree.fromstring(work)
+        expDate = '1924/03/02'
+        meta = metadata.Metadata()
+
+        actual = base.metaSetDate(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertEqual(expDate, actual.date)
+
+    @mock.patch('music21.mei.base.environLocal')
+    def testMetaDate4(self, mockEnviron):
+        '''
+        metaSetDate() with text that fails
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+            <history>
+                <creation>
+                    <date>2 March 1924</date>
+                </creation>
+            </history>
+        </work>"""
+        work = ETree.fromstring(work)
+        expDate = 'None'
+        expWarn = base._MISSED_DATE.format('2 March 1924')
+        meta = metadata.Metadata()
+
+        actual = base.metaSetDate(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertEqual(expDate, actual.date)
+        mockEnviron.warn.assert_called_once_with(expWarn)
+
+    def testMetaDate5(self):
+        '''
+        metaSetDate() with @notbefore and @notafter
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+            <history>
+                <creation>
+                    <date notbefore="1915" notafter="1924"/>
+                </creation>
+            </history>
+        </work>"""
+        work = ETree.fromstring(work)
+        expDate = '1915/--/-- to 1924/--/--'
+        meta = metadata.Metadata()
+
+        actual = base.metaSetDate(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertEqual(expDate, actual.date)
+
+    def testMetaDate6(self):
+        '''
+        metaSetDate() with @startdate and @enddate
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+            <history>
+                <creation>
+                    <date startdate="1915" enddate="1924"/>
+                </creation>
+            </history>
+        </work>"""
+        work = ETree.fromstring(work)
+        expDate = '1915/--/-- to 1924/--/--'
+        meta = metadata.Metadata()
+
+        actual = base.metaSetDate(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertEqual(expDate, actual.date)
 
 
 #------------------------------------------------------------------------------
