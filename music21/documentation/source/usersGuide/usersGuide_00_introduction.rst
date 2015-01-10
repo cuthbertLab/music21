@@ -1,4 +1,6 @@
 .. _usersGuide_00_introduction:
+.. _usersGuide_00_introduction:
+.. _usersGuide_00_introduction:
 .. code:: python
 
 
@@ -67,6 +69,8 @@ Print the twelve-tone matrix for a tone row:
 
 
 .. parsed-literal::
+   :class: ipython-result
+   :class: ipython-result
    :class: ipython-result
 
       0 11  7  8  3  1  2 10  6  5  4  9

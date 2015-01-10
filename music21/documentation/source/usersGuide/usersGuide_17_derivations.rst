@@ -13,7 +13,6 @@ this:
 
    Figure 17.1: Score hierarchy
 
-
 What we've seen already is that iterating over the score via,
 ``for n in score: print n`` will only get you the highest level of
 objects, namely the ``Metadata`` object and the two ``Part`` objects.
@@ -28,7 +27,6 @@ remain in the score:
 
    Figure 17.2: Flat Score
 
-
 This should be a review from previous chapters in the User's Guide. This
 section explains the relationship between the original ``stream.Score``
 object, which we will call ``s``, and the ``flat`` representation, which
@@ -40,7 +38,6 @@ visualized as follows:
    :alt: Figure 17.3: Derivation representation
 
    Figure 17.3: Derivation representation
-
 
 .. code:: python
 

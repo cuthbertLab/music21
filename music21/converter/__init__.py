@@ -460,7 +460,7 @@ class Converter(object):
         '''
         from music21 import freezeThaw
         if not os.path.exists(fp):
-            raise ConverterFileException('no such file eists: %s' % fp)
+            raise ConverterFileException('no such file exists: %s' % fp)
         useFormat = format
 
         if useFormat is None:

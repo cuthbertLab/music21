@@ -44,7 +44,7 @@ Currently supported targets include:
     print(usage) 
 
 
-def _main(target):
+def main(target):
     from music21 import documentation # @UnresolvedImport
     documentationDirectoryPath = documentation.__path__[0]
     sourceDirectoryPath = os.path.join(
@@ -122,4 +122,4 @@ if __name__ == '__main__':
         target = sys.argv[1]   # to rebuild everything run "make.py clean"
     else:
         target = 'html'
-    _main(target)
+    main(target)
