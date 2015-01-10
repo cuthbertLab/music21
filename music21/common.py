@@ -2303,7 +2303,10 @@ _singletonCounter = {}
 _singletonCounter['value'] = 0
 
 class SingletonCounter(object):
-    '''A simple counter that can produce unique numbers regardless of how many instances exist.
+    '''
+    A simple counter that can produce unique numbers regardless of how many instances exist.
+    
+    Instantiate and then call it.
     '''
     def __init__(self):
         pass
@@ -2364,7 +2367,25 @@ class Iterator(object):
 
 #-------------------------------------------------------------------------------
 class Timer(object):
-    """An object for timing."""
+    """
+    An object for timing.
+    
+    >>> t = common.Timer()
+    >>> now = t()
+    >>> nownow = t()
+    >>> nownow > now
+    True
+    >>> t.stop()
+    >>> stopTime = t()
+    >>> stopNow = t()
+    >>> stopTime == stopNow
+    True
+    
+    All this had better take less than one second!
+    
+    >>> stopTime < 1
+    True
+    """
 
     def __init__(self):
         # start on init
@@ -2413,7 +2434,8 @@ class Music21CommonException(exceptions21.Music21Exception):
 
 #-------------------------------------------------------------------------------
 class TestMock(object):
-    '''A test object with attributes, methods, and properties
+    '''
+    A test object with attributes, methods, and properties
     '''
     def __init__(self):
         self.attr1 = 1

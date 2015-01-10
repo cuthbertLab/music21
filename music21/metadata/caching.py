@@ -113,7 +113,7 @@ class MetadataCachingJob(object):
         ...     'bach/bwv66.6',
         ...     useCorpus=True,
         ...     )
-        >>> job()
+        >>> job.run()
         ((<music21.metadata.bundles.MetadataEntry: bach_bwv66_6>,), ())
         >>> results = job.getResults()
         >>> errors = job.getErrors()
@@ -129,25 +129,21 @@ class MetadataCachingJob(object):
         self.results = []
         self.useCorpus = bool(useCorpus)
 
-    ### SPECIAL METHODS ###
-
-    def __call__(self):
+    def run(self):
         import gc
         self.results = []
-        parsedObject = self._parseFilePath()
+        parsedObject = self.parseFilePath()
         environLocal.printDebug('Got ParsedObject %r' % parsedObject)
         if parsedObject is not None:
             if 'Opus' in parsedObject.classes:
-                self._parseOpus(parsedObject)
+                self.parseOpus(parsedObject)
             else:
-                self._parseNonOpus(parsedObject)
+                self.parseNonOpus(parsedObject)
         del parsedObject
         gc.collect()
         return self.getResults(), self.getErrors()
 
-    ### PRIVATE METHODS ###
-
-    def _parseFilePath(self):
+    def parseFilePath(self):
         from music21 import converter
         from music21 import corpus
         parsedObject = None
@@ -165,7 +161,7 @@ class MetadataCachingJob(object):
             self.filePathErrors.append(self.filePath)
         return parsedObject
 
-    def _parseNonOpus(self, parsedObject):
+    def parseNonOpus(self, parsedObject):
         from music21 import metadata
         try:
             corpusPath = metadata.MetadataBundle.corpusPathToKey(
@@ -196,14 +192,14 @@ class MetadataCachingJob(object):
             'for {0}, piece ignored'.format(self.filePath))
             environLocal.printDebug(traceback.format_exc())
 
-    def _parseOpus(self, parsedObject):
+    def parseOpus(self, parsedObject):
         from music21 import metadata
         # need to get scores from each opus?
         # problem here is that each sub-work has metadata, but there
         # is only a single source file
         try:
             for scoreNumber, score in enumerate(parsedObject.scores):
-                self._parseOpusScore(score, scoreNumber)
+                self.parseOpusScore(score, scoreNumber)
                 del score  # for memory conservation
         except Exception as exception:
             environLocal.printDebug(
@@ -220,7 +216,7 @@ class MetadataCachingJob(object):
             )
         self.results.append(metadataEntry)
 
-    def _parseOpusScore(self, score, scoreNumber):
+    def parseOpusScore(self, score, scoreNumber):
         # scoreNumber is a zeroIndexed value.
         # score.metadata.number is the retrieval code; which is
         # probably 1 indexed, and might have gaps
@@ -384,7 +380,7 @@ class JobProcessor(object):
         remainingJobs = len(jobs)
         results = []
         for job in jobs:
-            results, errors = job()
+            results, errors = job.run()
             remainingJobs -= 1
             yield {
                 'metadataEntries': results,
@@ -421,7 +417,7 @@ class WorkerProcess(multiprocessing.Process):
                 self.job_queue.task_done()
                 break
             job = pickle.loads(job)
-            job()
+            job.run()
             self.job_queue.task_done()
             self.result_queue.put(pickle.dumps(job, protocol=0))
         return
