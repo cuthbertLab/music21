@@ -335,7 +335,10 @@ class Stream(base.Music21Object):
 
     def __repr__(self):
         if self.id is not None:
-            return '<%s.%s %s>' % (self.__module__, self.__class__.__name__, self.id)
+            if self.id != id(self):
+                return '<%s.%s %s>' % (self.__module__, self.__class__.__name__, self.id)
+            else:
+                return '<%s.%s 0x%x>' % (self.__module__, self.__class__.__name__, self.id)
         else:
             return base.Music21Object.__repr__(self)
 

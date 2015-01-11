@@ -14,9 +14,9 @@ Builds various kinds of music21 distribution files and uploads them to PyPI and 
 
 To do a release, 
 
-1. update the VERSION in _version.py and the single test case in base.py, and in freezeThaw.JSONFreezer.jsonPrint
+1. update the VERSION in _version.py and the single test cases in base.py and freezeThaw.JSONFreezer.jsonPrint
 2. run test/multiprocessTest.py  for Python2 AND Python3
-3. If all tests pass, run `corpus.cacheMetadata(['core'])`, and 'virtual' if changed.
+3. If all tests pass, run `corpus.cacheMetadata(['core', 'virtual'])`.
 4. run test/testSingleCoreAll.py 
      (normally not necessary,because it's slower and mostly duplicates multiprocessTest, 
      but should be done before making a release).  Done automatically by Travis-CI on GitHub commit
@@ -24,10 +24,10 @@ To do a release,
 6. then test/testSerialization
 7. run documentation/make.py clean
 8. run documentation/make.py   [*]
+
+[*] you will need sphinx, IPython (pip or easy_install), markdown, and pandoc (.dmg) installed
+
 9. run documentation/upload [not via eclipse] or upload via ssh.
-
-[*] you will need sphinx, IPython (pip or easy_install) and pandoc (.dmg) installed
-
 10. And finally this file. 
 
 11. COMMIT to Github at this point, then don't change anything until the next step is done.
