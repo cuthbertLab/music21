@@ -16,7 +16,7 @@ To do a release,
 
 1. update the VERSION in _version.py and the single test case in base.py, and in freezeThaw.JSONFreezer.jsonPrint
 2. run test/multiprocessTest.py  for Python2 AND Python3
-3. If all tests pass, run `corpus.cacheMetadata(['core'])`, 
+3. If all tests pass, run `corpus.cacheMetadata(['core'])`, and 'virtual' if changed.
 4. run test/testSingleCoreAll.py 
      (normally not necessary,because it's slower and mostly duplicates multiprocessTest, 
      but should be done before making a release).  Done automatically by Travis-CI on GitHub commit
