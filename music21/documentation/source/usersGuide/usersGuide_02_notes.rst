@@ -54,7 +54,7 @@ If you want to know what else the `note` module contains besides
 the Note and Rest objects you can type "`dir(note)`" to find out:
 
 >>> dir(note)
-[..., 'GeneralNote', ..., 'Lyric', 'LyricException', 'NotRest', 'NotRestException', 'Note', 'NoteException',...]
+['GeneralNote', ..., 'Lyric', 'LyricException', 'NotRest', 'NotRestException', 'Note', 'NoteException',...]
 
 Some of these Objects are just easier ways of making specific kinds of Note objects 
 (half notes, etc.).  Others of them are things that we'll get to later, like

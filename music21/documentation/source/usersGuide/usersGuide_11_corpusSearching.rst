@@ -49,7 +49,7 @@ practice era, and inumerable folk songs, in a variety of formats:
 
     >>> coreCorpus = corpus.CoreCorpus()
     >>> len(coreCorpus.getPaths())
-    2565
+    2567
 
 
 ..  note::

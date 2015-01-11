@@ -42,6 +42,8 @@ To do a release,
 
 14. Delete the files in dist...
 
+15. Announce on the blog and to the list.
+
 DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do.
 '''
 
