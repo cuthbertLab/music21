@@ -2474,7 +2474,7 @@ class Test(unittest.TestCase):
 
     def xtestCountHarmonicMotion(self):
         from music21 import converter
-        s = converter.parse('http://wikifonia.org/node/8859')
+        s = converter.parse('https://github.com/cuthbertLab/music21/raw/master/music21/corpus/leadSheet/fosterBrownHair.mxl')
         harms = s.flat.getElementsByClass('Harmony')
 
         totMotion = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]

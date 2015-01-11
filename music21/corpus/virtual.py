@@ -113,7 +113,7 @@ class ColtraneGiantSteps(VirtualWork):
         self.composer = 'John Coltrane'
         self.title = 'Giant Steps'
         self.corpusPath = 'coltrane/giantSteps'        
-        self.urlList.append('http://static.wikifonia.org/1164/musicxml.mxl')        
+        self.urlList.append('http://impromastering.com/uploads/transcription_file/file/196/Giant_Steps__John_Coltrane_C.xml')        
 
 
 
