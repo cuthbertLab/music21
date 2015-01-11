@@ -1337,55 +1337,6 @@ class Note(NotRest):
 #-------------------------------------------------------------------------------
 # convenience classes
 
-class EighthNote(Note):
-    '''
-    A simple way of creating an eighth note (used in testing and docs mostly)
-    Most eighth notes are not `EighthNote` objects
-
-    DEPRECATED May 2014: use Note(type='eighth') instead
-    '''
-    def __init__(self, *arguments, **keywords):
-        Note.__init__(self, *arguments, **keywords)
-        self.duration.type = "eighth"
-
-class QuarterNote(Note):
-    '''
-    A simple way of creating a quarter note (used in testing and docs mostly)
-    Most quarter notes are not `QuarterNote` objects
-
-    N.B. the default `Note` object is a quarter note, so this is only
-    needed for explicitly stating that a note is a quarter note.
-
-    DEPRECATED May 2014: use Note(type='quarter') instead
-    '''
-    def __init__(self, *arguments, **keywords):
-        Note.__init__(self, *arguments, **keywords)
-        self.duration.type = "quarter"
-
-class HalfNote(Note):
-    '''
-    A simple way of creating a half note (used in testing and docs mostly)
-    Most half notes are not `HalfNote` objects.
-
-    DEPRECATED May 2014: use Note(type='half') instead
-    '''
-    def __init__(self, *arguments, **keywords):
-        Note.__init__(self, *arguments, **keywords)
-        self.duration.type = "half"
-
-class WholeNote(Note):
-    '''
-    A simple way of creating a whole note (used in testing and docs mostly)
-    Most whole notes are not `WholeNote` objects
-
-    DEPRECATED May 2014: use Note(type='whole') instead
-    '''
-    def __init__(self, *arguments, **keywords):
-        Note.__init__(self, *arguments, **keywords)
-        self.duration.type = "whole"
-
-
-
 
 #-------------------------------------------------------------------------------
 class Unpitched(NotRest):

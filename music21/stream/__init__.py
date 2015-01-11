@@ -5438,7 +5438,7 @@ class Stream(base.Music21Object):
 
         >>> n1 = note.Note(type='quarter')
         >>> c1 = clef.AltoClef()
-        >>> n2 = note.HalfNote()
+        >>> n2 = note.Note(type='half')
         >>> s1 = stream.Stream()
         >>> s1.append([n1, c1, n2])
         >>> om = s1.offsetMap
@@ -7412,7 +7412,7 @@ class Stream(base.Music21Object):
         >>> mm1 = tempo.MetronomeMark(number=120)
         >>> n1 = note.Note(type='quarter')
         >>> c1 = clef.AltoClef()
-        >>> n2 = note.HalfNote()
+        >>> n2 = note.Note(type='half')
         >>> s1 = stream.Stream()
         >>> s1.append([mm1, n1, c1, n2])
         >>> om = s1.secondsMap
@@ -8843,7 +8843,7 @@ class Stream(base.Music21Object):
 
 
         >>> a = stream.Stream()
-        >>> a.repeatInsert(note.HalfNote(), [0, 1, 2, 3, 4])
+        >>> a.repeatInsert(note.Note(type='half'), [0, 1, 2, 3, 4])
         >>> a._getDurSpan(a.flat)
         [(0.0, 2.0), (1.0, 3.0), (2.0, 4.0), (3.0, 5.0), (4.0, 6.0)]
         '''
