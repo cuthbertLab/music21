@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -415,9 +415,8 @@ class GeneralNote(base.Music21Object):
         '''
         returns the first Lyric's text
 
-        todo: should return a \\n separated string of lyrics
+        TODO: should return a \\n separated string of lyrics.  See text.assembleAllLyrics
         '''
-
         if len(self.lyrics) > 0:
             return self.lyrics[0].text
         else:
@@ -425,9 +424,6 @@ class GeneralNote(base.Music21Object):
 
     def _setLyric(self, value):
         '''
-        TODO: should check data here
-        should split \\n separated lyrics into different lyrics
-
         presently only creates one lyric, and destroys any existing
         lyrics
         '''
@@ -436,11 +432,11 @@ class GeneralNote(base.Music21Object):
             self.lyrics.append(Lyric(value))
 
     lyric = property(_getLyric, _setLyric,
-        doc = '''The lyric property can
+        doc = '''
+        The lyric property can
         be used to get and set a lyric for this
         Note, Chord, or Rest. This is a simplified version of the more general
         :meth:`~music21.note.GeneralNote.addLyric` method.
-
 
         >>> a = note.Note('A4')
         >>> a.lyrics
@@ -466,9 +462,10 @@ class GeneralNote(base.Music21Object):
         ''')
 
     def addLyric(self, text, lyricNumber = None, applyRaw = False, lyricIdentifier=None):
-        '''Adds a lyric, or an additional lyric, to a Note, Chord, or Rest's lyric list. If `lyricNumber` is not None, a specific line of lyric text can be set. The lyricIdentifier
+        '''
+        Adds a lyric, or an additional lyric, to a Note, Chord, or Rest's lyric list. 
+        If `lyricNumber` is not None, a specific line of lyric text can be set. The lyricIdentifier
         can also be set.
-
 
         >>> n1 = note.Note()
         >>> n1.addLyric("hello")
@@ -751,19 +748,21 @@ class NotRest(GeneralNote):
             value = None # allow setting to none or None
         if value == 'filled':
             value = 'yes'
-        elif value not in ['default', 'yes', 'no']:
+        elif value not in ('default', 'yes', 'no'):
             raise NotRestException('not a valid notehead fill value: %s' % value)
         self._noteheadFill = value
 
     noteheadFill = property(_getNoteheadFill, _setNoteheadFill, doc='''
-        Get or set the note head fill status of this NotRest. Valid note head fill values are yes, no, default, and None.
-
-
+        Get or set the note head fill status of this NotRest. Valid note head fill values are 
+        'yes', 'no', 'default', and None.
 
         >>> n = note.Note()
         >>> n.noteheadFill = 'no'
         >>> n.noteheadFill
         'no'
+        >>> n.noteheadFill = 'filled'
+        >>> n.noteheadFill
+        'yes'
 
         >>> n.noteheadFill = 'junk'
         Traceback (most recent call last):
@@ -775,11 +774,36 @@ class NotRest(GeneralNote):
         return self._noteheadParenthesis
 
     def _setNoteheadParenthesis(self, value):
-        # TODO: check for valid values: yes and no?
+        if value in (True, 'yes', 1):
+            value = True
+        elif value in (False, 'no', 0):
+            value = False
+        else:
+            raise NotRestException('notehead parentheses must be True or False, not %r' % value)       
         self._noteheadParenthesis = value
+        
 
     noteheadParenthesis = property(_getNoteheadParenthesis, _setNoteheadParenthesis, doc='''
         Get or set the note head parentheses for this Note/Unpitched/Chord object.
+
+        >>> n = note.Note()
+        >>> n.noteheadParenthesis
+        False
+        >>> n.noteheadParenthesis = True
+        >>> n.noteheadParenthesis
+        True
+        
+        'yes' or 1 equate to True; 'no' or 0 to False
+        
+        >>> n.noteheadParenthesis = 'no'
+        >>> n.noteheadParenthesis
+        False
+        
+        Anything else raises an exception:
+        
+        >>> n.noteheadParenthesis = 'blah'
+        Traceback (most recent call last):
+        NotRestException: notehead parentheses must be True or False, not 'blah'
         ''')
 
     #---------------------------------------------------------------------------
@@ -887,7 +911,7 @@ class Note(NotRest):
         if len(arguments) > 0:
             if isinstance(arguments[0], pitch.Pitch):
                 self.pitch = arguments[0]
-            else: # assume first arg is pitch
+            else: # assume first argument is pitch
                 self.pitch = pitch.Pitch(arguments[0], **keywords)
         else: # supply a default pitch
             if 'name' in keywords:
@@ -895,7 +919,7 @@ class Note(NotRest):
             self.pitch = pitch.Pitch('C4', **keywords)
 
     #---------------------------------------------------------------------------
-    # operators, representations, and transformatioins
+    # operators, representations, and transformations
 
     def __repr__(self):
         return "<music21.note.Note %s>" % self.name
@@ -1413,9 +1437,6 @@ class Rest(GeneralNote):
     'name': 'returns "rest" always.  It is here so that you can get `x.name` on all `.notesAndRests` objects',
     'lineShift': 'number of lines/spaces to shift the note upwards or downwards for display.',
     }
-
-    # TODO: may need to set a display pitch,
-    # as this is necessary in mxl
 
     def __init__(self, *arguments, **keywords):
         GeneralNote.__init__(self, **keywords)
