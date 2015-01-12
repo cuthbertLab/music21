@@ -1958,8 +1958,7 @@ class Interval(base.Music21Object):
                 halfStepsToFix = halfStepsToFix - 12
                 pitch2.octave = pitch2.octave - 1
 
-            # this will raise an exception if greater than 4            
-            # TODO: possibly set as an option if accidentals permit 
+            # this will raise an exception if greater than 4        
             if (maxAccidental is not None and abs(halfStepsToFix) >   
                 maxAccidental):
                 # just create new pitch, directly setting the pitch space value
