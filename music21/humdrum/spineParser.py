@@ -2614,6 +2614,24 @@ class Test(unittest.TestCase):
         self.assertTrue('spine comment' in comments)
         #s.show('text')
 
+    def testFlavors(self):
+        prevFlavor = flavors['JRP']
+        flavors['JRP'] = False
+        c = HumdrumDataCollection(testFiles.dottedTuplet).stream
+        flavors['JRP'] = True
+        d = HumdrumDataCollection(testFiles.dottedTuplet).stream
+        flavors['JRP'] = prevFlavor
+        cn = c.parts[0].measure(1).notes[1]
+        dn = d.parts[0].measure(1).notes[1]
+        self.assertEqual(cn.duration.fullName, 'Eighth Triplet (1/2 QL)')
+        self.assertEqual(cn.duration.dots, 0)
+        self.assertEqual(repr(cn.duration.tuplets[0].durationNormal), '<music21.duration.DurationUnit 0.75>')
+        self.assertEqual(cn.duration.tuplets[0].durationNormal.dots, 1)
+        self.assertEqual(dn.duration.fullName, 'Dotted Eighth Triplet (1/2 QL)')
+        self.assertEqual(dn.duration.dots, 1)
+        self.assertEqual(repr(dn.duration.tuplets[0].durationNormal), '<music21.duration.DurationUnit 0.5>')
+        self.assertEqual(dn.duration.tuplets[0].durationNormal.dots, 0)
+        
 class TestExternal(unittest.TestCase):
 
     def runTest(self):

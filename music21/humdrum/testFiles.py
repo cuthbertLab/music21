@@ -80,6 +80,25 @@ ojibway =  re.sub("\s\s\s\s+", "\t", \
 '''
 )
 
+# Tests the two kinds of flavors of JRP
+dottedTuplet = re.sub('\s\s\s\s+', '\t', \
+'''
+**kern
+*M2/2
+*d:
+=1
+6e
+12.e
+24d
+12f
+12f
+4g
+4d
+=2
+1d
+*-
+''')
+
 splitSpines =  re.sub("\s\s\s\s+", "\t", \
 '''
 **kern
