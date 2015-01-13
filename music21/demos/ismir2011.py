@@ -17,15 +17,15 @@ from music21 import corpus, features, converter
 from music21 import trecento, figuredBass, tinyNotation
 from music21 import expressions, stream
 
-def example2():
-    handel = corpus.parse('hwv56/movement3-05.md')
-    fe = features.jSymbolic.TripleMeterFeature(handel)
-    print (fe.extract().vector)
-
-    # no longer works...
-    soft = converter.parse("http://static.wikifonia.org/10699/musicxml.xml")
-    fe.setData(soft)
-    print (fe.extract().vector)
+# def example2():
+#     handel = corpus.parse('hwv56/movement3-05.md')
+#     fe = features.jSymbolic.TripleMeterFeature(handel)
+#     print (fe.extract().vector)
+# 
+#     # no longer works...
+#     soft = converter.parse("https://github.com/cuthbertLab/music21/raw/master/music21/corpus/leadSheet/fosterBrownHair.mxl")
+#     fe.setData(soft)
+#     print (fe.extract().vector)
 
 class MusicaFictaFeature(features.FeatureExtractor):
     name = 'Musica Ficta'

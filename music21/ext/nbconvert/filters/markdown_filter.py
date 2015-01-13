@@ -67,6 +67,7 @@ def markdown2rst(source):
     out : string
       Output as returned by pandoc.
     """
+    
     p = subprocess.Popen('pandoc -f markdown -t rst'.split(),
                          stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     

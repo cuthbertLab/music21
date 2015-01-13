@@ -119,21 +119,30 @@ class DocumentException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
-class Tag(object):
-    '''Object to store tags as encountered by SAX. Tags can be open or closed based on the status attribute. Tags can store character data collected between their defined tags. 
+class Tag(common.SlottedObject):
+    '''Object to store tags as encountered by SAX. Tags can be open or closed based on the 
+    status attribute. Tags can store character data collected between their defined tags. 
 
-    These objects are used only for finding and collecting tag attributes and elements. As we do not need character data for all tags, tags have an optional flag to select if the are to collect character data.
+    These objects are used only for finding and collecting tag attributes and elements. 
+    As we do not need character data for all tags, tags have an optional flag to select 
+    if the are to collect character data.
     '''
+    __slots__ = ('tag', 'cdFlag', 'status', 'charData', 'className')
+    
     def __init__(self, tag, cdFlag=False, className=None):
-        '''
-        
-
+        '''        
         >>> t = musicxml.mxObjects.Tag('note')
         >>> t.start()
         >>> t.start() # catch double starts
         Traceback (most recent call last):
         TagException: Tag (note) is already started.
 
+        Calling the tag returns the charData
+
+        >>> t.cdFlag = True # can handle charData
+        >>> t.charData = 'Hello'
+        >>> t()
+        'Hello'
         '''
         self.tag = tag
         self.cdFlag = cdFlag # character data flag
@@ -141,7 +150,7 @@ class Tag(object):
         self.charData = u''
         self.className = className
 
-        self.count = 0 # for statistics; not presentl used
+        #self.count = 0 # for statistics; not presently used
 
     def start(self):
         if self.status: # already open
@@ -176,9 +185,11 @@ class Tag(object):
 
 class TagLib(object):
     '''
-    An object to store all MusicXML tags as :class:`~music21.musicxml.base.Tag` objects. Tag objects are used just to identify tags, store element contents and status in SAX parsing. 
+    An object to store all MusicXML tags as :class:`~music21.musicxml.base.Tag` objects. 
+    Tag objects are used just to identify tags, store element contents and status in SAX parsing. 
 
-    With this design some tags (called simple elements) can be used simply in SAX parsing as structural monitors, but not be instantiated as objects for content 
+    With this design some tags (called simple elements) can be used simply in 
+    SAX parsing as structural monitors, but not be instantiated as objects for content 
     delivery.
     '''
     def __init__(self):

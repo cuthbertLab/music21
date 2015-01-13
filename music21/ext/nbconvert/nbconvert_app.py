@@ -18,6 +18,7 @@ readme.rst for usage information
 
 #Stdlib imports
 from __future__ import print_function
+from __future__ import unicode_literals
 import sys
 import io
 import os
@@ -124,7 +125,6 @@ class NbConvertApp(Application):
             return
         else:
             (output, resources, exporter) = return_value 
-        
         #TODO: Allow user to set output directory and file. 
         destination_filename = None
         destination_directory = None
@@ -166,13 +166,12 @@ class NbConvertApp(Application):
             Directory to write notebook data (i.e. figures) to.  If
             None, figures are not written to the file system.
         """
-        
         if self.stdout:
             print(output.encode('utf-8'))
 
         #Write file output from conversion.
         if not destination_filename is None:
-            with io.open(destination_filename, 'w') as f:
+            with open(destination_filename, 'w') as f:
                 f.write(output)
 
         #Get the key names used by the extract figure transformer

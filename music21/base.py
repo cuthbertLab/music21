@@ -32,7 +32,7 @@ available after importing music21.
 ::
 
     >>> music21.VERSION_STR
-    '2.0.0'
+    '2.0.1'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -290,7 +290,7 @@ class Music21Object(object):
 
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
-        'id': 'A unique identification string (not to be confused with the default `.id()` method.',
+        'id': 'A unique identification string; not to be confused with the default `.id()` method. However, if not set, will return the `id()` number',
         'groups': 'An instance of a :class:`~music21.base.Group` object which describes arbitrary `Groups` that this object belongs to.',
         'isStream': 'Boolean value for quickly identifying :class:`~music21.stream.Stream` objects (False by default).',
         'isSpanner': 'Boolean value for quickly identifying :class:`~music21.spanner.Spanner` objects (False by default).',

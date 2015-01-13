@@ -5,31 +5,28 @@
 #
 # Authors:      Josiah Wolf Oberholtzer
 #
-# Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013-14 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
-import abc
 import os
 import re
-import subprocess
 
 from music21 import common
+from music21 import exceptions21
+
+class DocumentationWritersException(exceptions21.Music21Exception):
+    pass
 
 
 class ReSTWriter(object):
     '''
     Abstract base class for ReST writers.
+    
+    Call .run() on the object to make it work.
     '''
 
-    ### CLASS VARIABLES ###
-
-    __metaclass__ = abc.ABCMeta
-
-    ### SPECIAL METHODS ###
-
-    @abc.abstractmethod
-    def __call__(self):
+    def run(self):
         raise NotImplemented
 
     ### PUBLIC METHODS ###
@@ -58,9 +55,7 @@ class ModuleReferenceReSTWriter(ReSTWriter):
     Writes module reference ReST files, and their index ReST file.
     '''
 
-    ### SPECIAL METHODS ###
-
-    def __call__(self):
+    def run(self):
         from music21 import documentation # @UnresolvedImport
         moduleReferenceDirectoryPath = os.path.join(
             documentation.__path__[0],
@@ -73,7 +68,7 @@ class ModuleReferenceReSTWriter(ReSTWriter):
             if not moduleDocumenter.classDocumenters \
                 and not moduleDocumenter.functionDocumenters:
                 continue
-            rst = '\n'.join(moduleDocumenter())
+            rst = '\n'.join(moduleDocumenter.run())
             referenceName = moduleDocumenter.referenceName
             referenceNames.append(referenceName)
             fileName = '{0}.rst'.format(referenceName)
@@ -109,10 +104,7 @@ class CorpusReferenceReSTWriter(ReSTWriter):
     '''
     Write the corpus reference ReST file.
     '''
-
-    ### SPECIAL METHODS ###
-
-    def __call__(self):
+    def run(self):
         from music21 import documentation # @UnresolvedImport
         systemReferenceDirectoryPath = os.path.join(
             documentation.__path__[0],
@@ -123,7 +115,7 @@ class CorpusReferenceReSTWriter(ReSTWriter):
             systemReferenceDirectoryPath,
             'referenceCorpus.rst',
             )
-        lines = documentation.CorpusDocumenter()()
+        lines = documentation.CorpusDocumenter().run()
         rst = '\n'.join(lines)
         self.write(corpusReferenceFilePath, rst)
 
@@ -136,14 +128,12 @@ class IPythonNotebookReSTWriter(ReSTWriter):
     This class wraps the 3rd-party ``nbconvert`` Python script.
     '''
 
-    ### SPECIAL METHODS ###
-
-    def __call__(self):
+    def run(self):
         from music21 import documentation # @UnresolvedImport
         ipythonNotebookFilePaths = [x for x in
             documentation.IPythonNotebookIterator()]
         for ipythonNotebookFilePath in ipythonNotebookFilePaths:
-            nbConvertReturnCode = self._convertOneNotebook(ipythonNotebookFilePath)
+            nbConvertReturnCode = self.convertOneNotebook(ipythonNotebookFilePath)
             if nbConvertReturnCode is True:
                 self._cleanupNotebookAssets(ipythonNotebookFilePath)
                 print('\tWROTE   {0}'.format(common.relativepath(
@@ -173,7 +163,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
                     )
                 os.remove(filePath)
 
-    def _convertOneNotebook(self, ipythonNotebookFilePath):
+    def convertOneNotebook(self, ipythonNotebookFilePath):
         '''
         converts one .ipynb file to .rst using nbconvert.
 
@@ -185,7 +175,8 @@ class IPythonNotebookReSTWriter(ReSTWriter):
         if '-checkpoint' in ipythonNotebookFilePath:
             return False
         
-        assert os.path.exists(ipythonNotebookFilePath)
+        if not os.path.exists(ipythonNotebookFilePath):
+            raise DocumentationWritersException('No iPythonNotebook with filePath %s' % ipythonNotebookFilePath)
         notebookFileNameWithoutExtension = os.path.splitext(
             os.path.basename(ipythonNotebookFilePath))[0]
         notebookParentDirectoryPath = os.path.abspath(
@@ -203,7 +194,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
             if os.path.getmtime(rstFilePath) > os.path.getmtime(ipythonNotebookFilePath):
                 return False
 
-        self._runNBConvert(ipythonNotebookFilePath)
+        self.runNBConvert(ipythonNotebookFilePath)
         with open(rstFilePath, 'r') as f:
             oldLines = f.read().splitlines()
         ipythonPromptPattern = re.compile('^In\[[\d ]+\]:')
@@ -245,7 +236,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
 
         # Guarantee a blank line after literal blocks.
         lines = [newLines[0]]
-        for i, pair in enumerate(self._iterateSequencePairwise(newLines)):
+        for i, pair in enumerate(self.iterateSequencePairwise(newLines)):
             first, second = pair
             if len(first.strip()) \
                 and first[0].isspace() \
@@ -261,7 +252,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
 
         return True
 
-    def _iterateSequencePairwise(self, sequence):
+    def iterateSequencePairwise(self, sequence):
         prev = None
         for x in sequence:
             cur = x
@@ -269,7 +260,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
                 yield prev, cur
             prev = cur
 
-    def _runNBConvert(self, ipythonNotebookFilePath):
+    def runNBConvert(self, ipythonNotebookFilePath):
 #         import music21
         #runDirectoryPath = common.getBuildDocFilePath()
         from music21.ext.nbconvert import nbconvert_app as nb
@@ -278,7 +269,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
 
 
 ## UNUSED
-#     def _processNotebook(self, ipythonNotebookFilePath):
+#     def processNotebook(self, ipythonNotebookFilePath):
 #         from music21 import documentation # @UnresolvedImport
 #         with open(ipythonNotebookFilePath, 'r') as f:
 #             contents = f.read()

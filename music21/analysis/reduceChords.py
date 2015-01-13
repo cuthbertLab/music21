@@ -70,9 +70,7 @@ class ChordReducer(object):
         self.weightAlgorithm = self.qlbsmpConsonance
         self.maxChords = 3
 
-    ### SPECIAL METHODS ###
-
-    def __call__(
+    def run(
         self,
         inputScore,
         allowableChords=None,
@@ -728,7 +726,7 @@ class TestExternal(unittest.TestCase):
         #score = corpus.parse('monteverdi/madrigal.4.16.xml').measures(1, 8)
 
         chordReducer = ChordReducer()
-        reduction = chordReducer(
+        reduction = chordReducer.run(
             score,
             allowableChords=(
                 chord.Chord("F#4 A4 C5"),
