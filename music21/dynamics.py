@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
@@ -220,7 +220,9 @@ class Dynamic(base.Music21Object):
         # under this dynamic. if this property is set, it will override 
         # use of a default. 
         self._volumeScalar = None
-
+        self.longName = None
+        self.englishName = None
+        self._value = None
 
         if not common.isStr(value):
             # assume it is a number, try to convert
@@ -320,7 +322,7 @@ class Dynamic(base.Music21Object):
         else:
             try:
                 value = float(value)
-            except (ValueError):
+            except ValueError:
                 raise DynamicException('Not a supported size: %s' % value)
             self._positionDefaultY = value
     
@@ -518,12 +520,12 @@ class Test(unittest.TestCase):
 
 
     def testDynamicsPositionA(self):
-        from music21 import stream, note, dynamics
+        from music21 import stream, note
         s = stream.Stream()
         selections = ['pp', 'f', 'mf', 'fff']
         #positions = [-20, 0, 20]
         for i in range(10):
-            d = dynamics.Dynamic(selections[i % len(selections)])
+            d = Dynamic(selections[i % len(selections)])
             #d.positionVertical = positions[i%len(positions)]
             s.append(d)
             s.append(note.Note('c1'))
@@ -531,7 +533,7 @@ class Test(unittest.TestCase):
 
     def testDynamicsPositionB(self):
         import random
-        from music21 import stream, note, layout, dynamics
+        from music21 import stream, note, layout
         s = stream.Stream()
         for i in range(6):
             m = stream.Measure(number=i + 1)
@@ -543,7 +545,7 @@ class Test(unittest.TestCase):
             random.shuffle(offsets)
             offsets = offsets[:4]
             for o in offsets:
-                d = dynamics.Dynamic('mf')
+                d = Dynamic('mf')
                 d.positionVertical = 20
                 m.insert(o, d)
 

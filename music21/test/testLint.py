@@ -65,7 +65,7 @@ def main(fnAccept=None):
 
     # only accept a few file names for now
     if fnAccept in [None, []]:
-        fnAccept = ['note.py']
+        fnAccept = ['dynamics.py']
 
         #fnAccept = ['stream.py', 'note.py', 'chord.py']
 
@@ -77,7 +77,7 @@ def main(fnAccept=None):
                'missing-docstring',    # gets too many well-documented properties
                ]
 
-    cmd = ['/usr/bin/env pylint -f colorized']
+    cmd = ['/usr/bin/env pylint -f colorized --dummy-variables-rgx="_|dummy|unused|i|j|junk"']
     for pyLintId in disable:
         cmd.append('--disable=%s' % pyLintId)
 

@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2012 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2008-2015 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ def getObjectsWithEditorial(
             try:
                 editorialContents = getattr(
                     obj.editorial, editorialStringToFind)
-            except:
+            except AttributeError:
                 editorialContents = obj.editorial.misc[editorialStringToFind]
 
             if listOfValues is not None:
@@ -93,7 +93,7 @@ def getObjectsWithEditorial(
                     listofOBJToReturn.append(obj)
             else:
                 listofOBJToReturn.append(obj)
-        except:
+        except KeyError:
             pass
     return listofOBJToReturn
 
@@ -146,17 +146,17 @@ class NoteEditorial(SlottedObject):
         }
 
     __slots__ = (
-        'ficta',
-        'color',
-        'misc',
-        'harmonicInterval',
-        'harmonicIntervals',
-        'hidden',
-        'melodicInterval',
-        'melodicIntervals',
-        'melodicIntervalOverRests',
-        'melodicIntervalsOverRests',
-        'comment',
+        b'ficta',
+        b'color',
+        b'misc',
+        b'harmonicInterval',
+        b'harmonicIntervals',
+        b'hidden',
+        b'melodicInterval',
+        b'melodicIntervals',
+        b'melodicIntervalOverRests',
+        b'melodicIntervalsOverRests',
+        b'comment',
         )
 
     ### INITIALIZER ###
@@ -257,8 +257,8 @@ class Comment(SlottedObject):
     ### CLASS VARIABLES ###
 
     __slots__ = (
-        'position',
-        'text',
+        b'position',
+        b'text',
         )
 
     ### INITIALIZER ###
