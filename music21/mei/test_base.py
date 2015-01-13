@@ -1281,6 +1281,80 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertTrue(1, len(actual.lyrics))
         self.assertTrue('words!', actual.lyrics[0].text)
 
+    @mock.patch('music21.note.Note')
+    @mock.patch('music21.mei.base._processEmbeddedElements')
+    @mock.patch('music21.mei.base.safePitch')
+    @mock.patch('music21.mei.base.makeDuration')
+    @mock.patch('music21.mei.base.verseFromElement')
+    def testUnit6(self, mockVerseFE, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
+        '''
+        noteFromElement(): test contained <verse>
+
+        (mostly-unit test)
+        '''
+        elem = """<note pname="D" oct="2" dur="16" xmlns="http://www.music-encoding.org/ns/mei">
+            <verse>
+                <syl>au</syl>
+                <syl>luong</syl>
+            </verse>
+            <verse>
+                <syl>sun</syl>
+            </verse>
+        </note>
+        """
+        elem = ETree.fromstring(elem)
+        mockSafePitch.return_value = 'safePitch() return'
+        mockNewNote = mock.MagicMock()
+        mockNewNote.beams = mock.MagicMock()
+        mockNote.return_value = mockNewNote
+        mockProcEmbEl.return_value = []
+        expected = mockNewNote
+        # verseFromElement() return values
+        vfeReturns = [[mock.MagicMock(name='au'), mock.MagicMock(name='luong')],
+                      [mock.MagicMock(name='sun')]]
+        def mockVerseFESideEffect(elem, backupN):
+            "this way we can check it gets called with the right elements"
+            assert '{}verse'.format(_MEINS) == elem.tag
+            return vfeReturns.pop(0)
+        mockVerseFE.side_effect = mockVerseFESideEffect
+        expLyrics = [vfeReturns[0][0], vfeReturns[0][1], vfeReturns[1][0]]
+
+        actual = base.noteFromElement(elem, 'slur bundle')
+
+        self.assertEqual(expected, actual)
+        self.assertEqual(expLyrics, actual.lyrics)
+        self.assertEqual(2, mockVerseFE.call_count)
+        mockVerseFE.assert_any_call(mock.ANY, backupN=1)
+        mockVerseFE.assert_any_call(mock.ANY, backupN=2)
+
+    def testIntegration6(self):
+        '''
+        noteFromElement(): test contained <verse>
+        (corresponds to testUnit6() with no mocks)
+        '''
+        elem = """<note pname="D" oct="2" dur="16" xmlns="http://www.music-encoding.org/ns/mei">
+            <verse>
+                <syl>au</syl>
+                <syl>luong</syl>
+            </verse>
+            <verse>
+                <syl>sun</syl>
+            </verse>
+        </note>
+        """
+        elem = ETree.fromstring(elem)
+        slurBundle = spanner.SpannerBundle()
+
+        actual = base.noteFromElement(elem, slurBundle)
+
+        self.assertEqual(3, len(actual.lyrics))
+        self.assertEqual('au', actual.lyrics[0].text)
+        self.assertEqual('luong', actual.lyrics[1].text)
+        self.assertEqual('sun', actual.lyrics[2].text)
+        self.assertEqual(1, actual.lyrics[0].number)
+        self.assertEqual(1, actual.lyrics[1].number)
+        self.assertEqual(2, actual.lyrics[2].number)
+
     # NOTE: consider adding to previous tests rather than making new ones
 
 
