@@ -1838,35 +1838,6 @@ def getSourceFilePath():
     return fpMusic21
 
 
-def getBuildDocRstFilePath():
-    '''
-    Return the directory that contains the documentation RST files.
-    '''
-    outer = os.path.dirname(getSourceFilePath())
-    post = os.path.join(outer, 'buildDoc', 'rst')
-    if os.path.exists(post):
-        return post
-    raise Exception('no such path exists: %s' % post)
-
-
-def getBuildDocFilePath():
-    '''Return the directory that contains the documentation RST files.
-    '''
-    outer = os.path.dirname(getSourceFilePath())
-    post = os.path.join(outer, 'buildDoc')
-    if os.path.exists(post):
-        return post
-    raise Exception('no such path exists: %s' % post)
-
-
-def getTestDocsFilePath():
-    '''Return the directory that contains the documentation RST files.
-    '''
-    post = os.path.join(getSourceFilePath(), 'test', 'testDocs')
-    if os.path.exists(post):
-        return post
-    raise Exception('no such path exists: %s' % post)
-
 
 def getMetadataCacheFilePath():
     '''Get the stored music21 directory that contains the corpus metadata cache.
@@ -2248,6 +2219,7 @@ def addDocAttrTestsToSuite(suite, moduleVariableLists, outerFilename=None, globs
     >>> t
     isRest ()
     '''
+    dtp = doctest.DocTestParser()
     if globs is False:
         globs = __import__('music21').__dict__.copy()
     for lvk in moduleVariableLists:
@@ -2259,7 +2231,7 @@ def addDocAttrTestsToSuite(suite, moduleVariableLists, outerFilename=None, globs
         for dockey in docattr:
             documentation = docattr[dockey]
             #print(documentation)
-            dt = doctest.DocTestParser().get_doctest(documentation, globs, dockey, outerFilename, 0)
+            dt = dtp.get_doctest(documentation, globs, dockey, outerFilename, 0)
             if len(dt.examples) == 0:
                 continue
             dtc = doctest.DocTestCase(dt, optionflags=optionflags)

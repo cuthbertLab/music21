@@ -2636,6 +2636,20 @@ class Duration(DurationCommon):
             # lengths should be the same as it was before
             self.updateQuarterLength()
 
+    def currentComponents(self):
+        '''
+        Advanced Method:
+        
+        returns the current components WITHOUT running the component updater.
+        
+        Needed by some internal methods.
+        
+        >>> d = duration.Duration()
+        >>> d.currentComponents()
+        []
+        '''
+        return self._components
+
     def splitDotGroups(self):
         '''
         splits a dotGroup-duration (of 1 component) into a new duration of two

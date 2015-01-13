@@ -21,14 +21,14 @@ from music21.test import testSingleCoreAll as test
 
 
 # see feature list here:
-# http://www.logilab.org/card/pylintfeatures
+# http://docs.pylint.org/features.html
 
 # C0301:	Line too long (%s/%s) Used when a line is longer than a given number of characters.
 # 
 # C0302:	Too many lines in module (%s) Used when a module has too much lines, reducing its readibility.
 
 # C0103:	Invalid name "%s" (should match %s) Used when the name doesn't match the regular expression associated to its type (constant, variable, class...).
-# 
+# C0330:    Bad continuation 
 
 # C0324:	Comma not followed by a space Used when a comma (",") is not followed by a space.
 
@@ -69,17 +69,21 @@ def main(fnAccept=None):
 
         #fnAccept = ['stream.py', 'note.py', 'chord.py']
 
-    disable = ['C0301', 'C0302', 'C0103', 'C0324', 'W0621', 'W0511', 
+    disable = ['C0301', 'C0302', 'C0103', 'C0330', 'C0324', 
+               'W0621', 'W0511', 
                'W0404', 'R0201', 'R0904', 'E1101', 'R0914', 'R0903',
-               'R0911', 'R0902', ]
+               'R0911', 'R0902', 
+               'trailing-whitespace',  # should ignore blank lines with tabs
+               'missing-docstring',    # gets too many well-documented properties
+               ]
 
-    cmd = ['pylint -f colorized']
-    for id in disable:
-        cmd.append('--disable=%s' % id)
+    cmd = ['/usr/bin/env pylint -f colorized']
+    for pyLintId in disable:
+        cmd.append('--disable=%s' % pyLintId)
 
     # add entire package
     for fp in mg.modulePaths:
-        dir, fn = os.path.split(fp)
+        unused_dir, fn = os.path.split(fp)
         fnNoExt = fn.replace('.py', '')
         if fn in fnAccept or fnNoExt in fnAccept:
             cmdFile = cmd + [fp]
@@ -89,7 +93,6 @@ def main(fnAccept=None):
 
 
 if __name__ == '__main__':
-    
     main(sys.argv[1:])
 
 
