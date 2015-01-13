@@ -904,6 +904,89 @@ class TestLyrics(unittest.TestCase):
         self.assertEqual('single', actual.syllabic)
         self.assertEqual('shoe', actual.text)
 
+    def testVerse1(self):
+        '''
+        verseFromElement() with one <syl> and @n given
+        '''
+        elem = ETree.Element('verse', attrib={'n': '42'})
+        syl = ETree.Element('{}syl'.format(_MEINS))
+        syl.text = 'Hin-'
+        elem.append(syl)
+
+        actual = base.verseFromElement(elem, backupN=5)
+
+        self.assertEqual(1, len(actual))
+        self.assertIsInstance(actual[0], note.Lyric)
+        self.assertEqual('begin', actual[0].syllabic)
+        self.assertEqual('Hin', actual[0].text)
+        self.assertEqual(42, actual[0].number)
+
+    def testVerse2(self):
+        '''
+        verseFromElement() with three <syl> and @n not given
+        '''
+        elem = ETree.Element('verse')
+        syl = ETree.Element('{}syl'.format(_MEINS))
+        syl.text = 'Hin-'
+        elem.append(syl)
+        syl = ETree.Element('{}syl'.format(_MEINS))
+        syl.text = '-de-'
+        elem.append(syl)
+        syl = ETree.Element('{}syl'.format(_MEINS))
+        syl.text = '-mith'
+        elem.append(syl)
+
+        actual = base.verseFromElement(elem, backupN=5)
+
+        self.assertEqual(3, len(actual))
+        for eachSyl in actual:
+            self.assertIsInstance(eachSyl, note.Lyric)
+            self.assertEqual(5, eachSyl.number)
+        self.assertEqual('begin', actual[0].syllabic)
+        self.assertEqual('Hin', actual[0].text)
+        self.assertEqual('middle', actual[1].syllabic)
+        self.assertEqual('de', actual[1].text)
+        self.assertEqual('end', actual[2].syllabic)
+        self.assertEqual('mith', actual[2].text)
+
+    @mock.patch('music21.mei.base.environLocal')
+    def testVerse3(self, mockEnviron):
+        '''
+        verseFromElement() with one <syl> and invalid @n
+        '''
+        elem = ETree.Element('verse', attrib={'n': 'mistake'})
+        syl = ETree.Element('{}syl'.format(_MEINS))
+        syl.text = 'Hin-'
+        elem.append(syl)
+
+        actual = base.verseFromElement(elem)
+
+        self.assertEqual(1, len(actual))
+        self.assertIsInstance(actual[0], note.Lyric)
+        self.assertEqual('begin', actual[0].syllabic)
+        self.assertEqual('Hin', actual[0].text)
+        self.assertEqual(1, actual[0].number)
+        mockEnviron.warn.assert_called_once_with(base._BAD_VERSE_NUMBER.format('mistake'))
+
+    @mock.patch('music21.mei.base.environLocal')
+    def testVerse4(self, mockEnviron):
+        '''
+        verseFromElement() with one <syl> and no @n
+        '''
+        elem = ETree.Element('verse')
+        syl = ETree.Element('{}syl'.format(_MEINS))
+        syl.text = 'Hin-'
+        elem.append(syl)
+
+        actual = base.verseFromElement(elem)
+
+        self.assertEqual(1, len(actual))
+        self.assertIsInstance(actual[0], note.Lyric)
+        self.assertEqual('begin', actual[0].syllabic)
+        self.assertEqual('Hin', actual[0].text)
+        self.assertEqual(1, actual[0].number)
+        mockEnviron.warn.assert_called_once_with(base._BAD_VERSE_NUMBER.format('None'))
+
 
 #------------------------------------------------------------------------------
 class TestNoteFromElement(unittest.TestCase):

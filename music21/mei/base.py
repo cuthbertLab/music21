@@ -133,17 +133,19 @@ Alphabetical list of the elements currently supported by this module:
 * :func:`layerFromElement`
 * :func:`measureFromElement`
 * :func:`noteFromElement`
-* :func:`spaceFromElement`
-* :func:`mSpaceFromElement`
 * :func:`restFromElement`
 * :func:`mRestFromElement`
+* :func:`spaceFromElement`
+* :func:`mSpaceFromElement`
 * :func:`scoreFromElement`
-* :func:`sectionFromElement`
 * :func:`scoreDefFromElement`
+* :func:`sectionFromElement`
 * :func:`staffFromElement`
 * :func:`staffDefFromElement`
 * :func:`staffGrpFromElement`
+* :func:`sylFromElement`
 * :func:`tupletFromElement`
+* :func:`verseFromElement`
 
 To know which MEI attributes are known to import correctly, read the documentation for the relevant
 element. For example, to know whether the @color attribute on a <note> element is supported, read
@@ -199,6 +201,8 @@ _IGNORE_UNPROCESSED = ('{}sb'.format(_MEINS),  # system break
                        '{}tupletSpan'.format(_MEINS),  # tuplets; handled in convertFromString()
                        '{}beamSpan'.format(_MEINS),  # beams; handled in convertFromString()
                        '{}instrDef'.format(_MEINS),  # instrument; handled separately by staffDefFromElement()
+                       '{}verse'.format(_MEINS),  # verse; handled separately by noteFromElement()
+                       '{}syl'.format(_MEINS),  # syllable; handled separately by noteFromElement()
                       )
 
 
@@ -223,6 +227,8 @@ class MeiElementError(exceptions21.Music21Exception):
 
 # Text Strings for Error Conditions
 #------------------------------------------------------------------------------
+# NOTE: these are all collected handily at the top for two reasons: help you find the easier, and
+#       help you translate them easier
 _TEST_FAILS = 'MEI module had {} failures and {} errors; run music21/mei/base.py to find out more.'
 _INVALID_XML_DOC = 'MEI document is not valid XML.'
 _WRONG_ROOT_ELEMENT = 'Root element should be <mei> in the MEI namespace, not <{}>.'
@@ -235,6 +241,7 @@ _MISSING_TUPLET_DATA = 'Both @num and @numbase attributes are required on <tuple
 _UNIMPLEMENTED_IMPORT = 'Importing {} without {} is not yet supported.'
 _UNPROCESSED_SUBELEMENT = 'Found an unprocessed <{}> element in a <{}>.'
 _MISSED_DATE = 'Unable to decipher the composition date "{}"'
+_BAD_VERSE_NUMBER = 'Verse number must be an int (got "{}")'
 
 
 # Module-level Functions
@@ -1926,6 +1933,52 @@ def sylFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
         return note.Lyric(text=text)
 
 
+def verseFromElement(elem, backupN=None, slurBundle=None):  # pylint: disable=unused-argument
+    '''
+    <verse> Lyric verse.
+
+    In MEI 2013: pg.480 (494 in PDF) (MEI.lyrics module)
+
+    :param int backupN: The backup verse number to use if no @n attribute exists on ``elem``.
+    :returns: The appropriately-configured :class:`Lyric` objects.
+    :rtype: list of :class:`music21.note.Lyric`
+
+    **Attributes/Elements Implemented:**
+
+    - @n and <syl>
+
+    **Attributes/Elements in Testing:** none
+
+    **Attributes not Implemented:**
+
+    - att.common (@label, @n, @xml:base) (att.id (@xml:id))
+    - att.facsimile (@facs)
+    - att.lang (@xml:lang)
+    - att.verse.log (@refrain, @rhythm)
+    - att.verse.vis (att.typography (@fontfam, @fontname, @fontsize, @fontstyle, @fontweight))
+
+        - (att.visualoffset.to (@to))
+        - ((att.visualoffset.vo (@vo))
+
+            - (att.xy (@x, @y))
+
+    - att.verse.anl (att.common.anl (@copyof, @corresp, @next, @prev, @sameas, @synch)
+
+        - (att.alignment (@when)))
+
+    **Contained Elements not Implemented:**
+
+    - MEI.shared: dir dynam lb space tempo
+    '''
+    syls = [sylFromElement(s) for s in elem.findall('./{}syl'.format(_MEINS))]
+    for eachSyl in syls:
+        try:
+            eachSyl.number = int(elem.get('n', backupN))
+        except (TypeError, ValueError):
+            environLocal.warn(_BAD_VERSE_NUMBER.format(elem.get('n', backupN)))
+    return syls
+
+
 def noteFromElement(elem, slurBundle=None):
     # NOTE: this function should stay in sync with chordFromElement() where sensible
     '''
@@ -1935,6 +1988,10 @@ def noteFromElement(elem, slurBundle=None):
 
     .. note:: If set, the @accid.ges attribute is always imported as the music21 :class:`Accidental`
         for this note. We assume it corresponds to the accidental implied by a key signature.
+
+    .. note:: If ``elem`` contains both <syl> and <verse> elements as immediate children, the lyrics
+        indicated with <verse> element(s) will always obliterate those given indicated with <syl>
+        elements.
 
     **Attributes/Elements Implemented:**
 
@@ -1950,7 +2007,7 @@ def noteFromElement(elem, slurBundle=None):
     - @slur, (many of "[i|m|t][1-6]")
     - @grace, from att.note.ges.cmn: partial implementation (notes marked as grace, but the
         duration is 0 because we ignore the question of which neighbouring note to borrow time from)
-    - <syl>
+    - <syl> and <verse>
 
     **Attributes/Elements in Testing:** none
 
@@ -1999,7 +2056,6 @@ def noteFromElement(elem, slurBundle=None):
 
     - MEI.critapp: app
     - MEI.edittrans: (all)
-    - MEI.lyrics: verse
     '''
     tagToFunction = {'{http://www.music-encoding.org/ns/mei}dot': dotFromElement,
                      '{http://www.music-encoding.org/ns/mei}artic': articFromElement,
@@ -2065,6 +2121,13 @@ def noteFromElement(elem, slurBundle=None):
     # lyrics indicated with <syl>
     if elem.find('./{}syl'.format(_MEINS)) is not None:
         theNote.lyrics = [sylFromElement(elem.find('./{}syl'.format(_MEINS)))]
+
+    # lyrics indicated with <verse>
+    if elem.find('./{}verse'.format(_MEINS)) is not None:
+        tempLyrics = []
+        for i, eachVerse in enumerate(elem.findall('./{}verse'.format(_MEINS))):
+            tempLyrics.extend(verseFromElement(eachVerse, backupN=i + 1))
+        theNote.lyrics = tempLyrics
 
     return theNote
 
