@@ -202,7 +202,6 @@ _IGNORE_UNPROCESSED = ('{}sb'.format(_MEINS),  # system break
                        '{}beamSpan'.format(_MEINS),  # beams; handled in convertFromString()
                        '{}instrDef'.format(_MEINS),  # instrument; handled separately by staffDefFromElement()
                        '{}verse'.format(_MEINS),  # verse; handled separately by noteFromElement()
-                       '{}syl'.format(_MEINS),  # syllable; handled separately by noteFromElement()
                       )
 
 
@@ -2059,7 +2058,8 @@ def noteFromElement(elem, slurBundle=None):
     '''
     tagToFunction = {'{http://www.music-encoding.org/ns/mei}dot': dotFromElement,
                      '{http://www.music-encoding.org/ns/mei}artic': articFromElement,
-                     '{http://www.music-encoding.org/ns/mei}accid': accidFromElement}
+                     '{http://www.music-encoding.org/ns/mei}accid': accidFromElement,
+                     '{http://www.music-encoding.org/ns/mei}syl': sylFromElement}
 
     # start with a Note with Pitch
     theNote = _accidentalFromAttr(elem.get('accid'))
@@ -2080,6 +2080,8 @@ def noteFromElement(elem, slurBundle=None):
             theNote.articulations.append(subElement)
         elif isinstance(subElement, six.string_types):
             theNote.pitch.accidental = pitch.Accidental(subElement)
+        elif isinstance(subElement, note.Lyric):
+            theNote.lyrics = [subElement]
 
     # adjust for @accid.ges if present
     if elem.get('accid.ges') is not None:
@@ -2117,10 +2119,6 @@ def noteFromElement(elem, slurBundle=None):
     # tuplets
     if elem.get('m21TupletNum') is not None:
         theNote = scaleToTuplet(theNote, elem)
-
-    # lyrics indicated with <syl>
-    if elem.find('./{}syl'.format(_MEINS)) is not None:
-        theNote.lyrics = [sylFromElement(elem.find('./{}syl'.format(_MEINS)))]
 
     # lyrics indicated with <verse>
     if elem.find('./{}verse'.format(_MEINS)) is not None:

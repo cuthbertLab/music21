@@ -1221,13 +1221,12 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertEqual('4', actual.m21TupletNumbase)
         self.assertEqual('start', actual.m21TupletSearch)
 
-    @mock.patch('music21.mei.base.sylFromElement')
     @mock.patch('music21.note.Note')
     @mock.patch('music21.mei.base._processEmbeddedElements')
     @mock.patch('music21.mei.base.safePitch')
     @mock.patch('music21.mei.base.makeDuration')
     @mock.patch('music21.duration.GraceDuration')
-    def testUnit5(self, mockGrace, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote, mockSylFE):
+    def testUnit5(self, mockGrace, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
         '''
         noteFromElement(): test @grace and @m21Beam where the duration requires adjusting beams,
             and contained <syl>
@@ -1242,10 +1241,9 @@ class TestNoteFromElement(unittest.TestCase):
         mockNewNote = mock.MagicMock()
         mockNewNote.beams = mock.MagicMock()
         mockNote.return_value = mockNewNote
-        mockProcEmbEl.return_value = []
+        mockProcEmbEl.return_value = [mock.MagicMock(spec_set=note.Lyric)]
         mockGrace.return_value = mock.MagicMock(spec_set=duration.Duration)
         mockGrace.return_value.type = '16th'
-        mockSylFE.return_value = 'words!'
         expected = mockNewNote
 
         actual = base.noteFromElement(elem, 'slur bundle')
@@ -1256,8 +1254,7 @@ class TestNoteFromElement(unittest.TestCase):
         mockNote.assert_called_once_with(mockSafePitch.return_value)
         mockNewNote.beams.fill.assert_called_once_with('16th', 'start')
         self.assertEqual(mockGrace.return_value, mockNewNote.duration)
-        mockSylFE.assert_called_once_with(sylElem)
-        self.assertEqual(['words!'], mockNewNote.lyrics)
+        self.assertEqual(mockProcEmbEl.return_value, mockNewNote.lyrics)
 
     def testIntegration5(self):
         '''
