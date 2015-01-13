@@ -314,15 +314,6 @@ class KeyException(exceptions21.Music21Exception):
 
 
 
-#def keyFromString(strKey):
-#    '''Given a string representing a key, return the appropriate Key object. 
-#    '''
-#    #TODO: Write keyFromString
-#    #    return None
-#    #raise KeyException("keyFromString not yet written")
-
-
-
 
 #-------------------------------------------------------------------------------
 class KeySignature(base.Music21Object):

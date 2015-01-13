@@ -139,13 +139,23 @@ def intervalToMXTranspose(intervalObj):
 
 
 def tempoIndicationToMx(ti):
-    '''Given a music21 MetronomeMark or MetricModulation, produce a musicxml Metronome tag wrapped in a <direction> tag.
+    '''
+    Given a music21 MetronomeMark or MetricModulation, produce a musicxml Metronome 
+    tag wrapped in a <direction> tag.
 
     
     >>> mm = tempo.MetronomeMark("slow", 40, note.Note(type='half'))
     >>> mxList = musicxml.toMxObjects.tempoIndicationToMx(mm)
     >>> mxList
-    [<direction <direction-type <metronome parentheses=no <beat-unit charData=half> <per-minute charData=40>>> <sound tempo=80.0>>, <direction <direction-type <words default-y=45.0 font-weight=bold justify=left charData=slow>>>]
+    [<direction 
+          <direction-type 
+               <metronome parentheses=no 
+                     <beat-unit charData=half> 
+                     <per-minute charData=40>>> 
+           <sound tempo=80.0>>, 
+     <direction 
+         <direction-type 
+             <words default-y=45.0 font-weight=bold justify=left charData=slow>>>]
 
     >>> mm = tempo.MetronomeMark("slow", 40, duration.Duration(quarterLength=1.5))
     >>> mxList = musicxml.toMxObjects.tempoIndicationToMx(mm)
@@ -153,12 +163,12 @@ def tempoIndicationToMx(ti):
     [<direction <direction-type <metronome parentheses=no <beat-unit charData=quarter> <beat-unit-dot > <per-minute charData=40>>> <sound tempo=60.0>>, <direction <direction-type <words default-y=45.0 font-weight=bold justify=left charData=slow>>>]
 
     '''
-    # if writing just a sound tag, place an empty words tag in a durection type and then follow with sound declaration
+    # if writing just a sound tag, place an empty words tag in a direction type and then follow with sound declaration
 
-    # storing lists to accomodate metric modulations
+    # storing lists to accommodate metric modulations
     durs = [] # duration objects
     numbers = [] # tempi
-    hideNumericalMetro = False # if numbers implicit, hide metro
+    hideNumericalMetro = False # if numbers implicit, hide metronome numbers
     hideNumber = [] # hide the number after equal, e.g., quarter=120, hide 120
     # store the last value necessary as a sounding tag in bpm
     soundingQuarterBPM = False
@@ -180,7 +190,7 @@ def tempoIndicationToMx(ti):
         # may want to show first number
         hideNumericalMetro = False # must show for metric modulation
         for sub in [ti.oldMetronome, ti.newMetronome]:
-            hideNumber.append(True) # cannot show numbers in a metric mod
+            hideNumber.append(True) # cannot show numbers in a metric modulation
             durs.append(sub.referent)
             numbers.append(sub.number)
         # soundingQuarterBPM should be obtained from the last MetronomeMark

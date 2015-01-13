@@ -15,7 +15,7 @@ from music21 import common
 
 class Cleaner(object):
     '''
-    Abstract base class for documentation cleaning classes.
+    Bass class for documentation cleaning classes.
     '''
 
     ### PUBLIC PROPERTIES ###
@@ -42,10 +42,7 @@ class CorpusReferenceCleaner(Cleaner):
     '''
     Cleans the corpus reference rst file.
     '''
-
-    ### SPECIAL METHODS ###
-
-    def __call__(self):
+    def run(self):
         corpusReferencePath = os.path.join(
             self.documentationSourcePath,
             'systemReference',
@@ -61,7 +58,7 @@ class IPythonNotebookCleaner(Cleaner):
 
     ### SPECIAL METHODS ###
 
-    def __call__(self):
+    def run(self):
         for directoryPath, unused_directoryNames, fileNames in os.walk(
             self.documentationSourcePath):
             for fileName in fileNames:
@@ -82,7 +79,7 @@ class ModuleReferenceCleaner(Cleaner):
 
     ### SPECIAL METHODS ###
 
-    def __call__(self):
+    def run(self):
         moduleReferencePath = os.path.join(
             self.documentationSourcePath,
             'moduleReference',

@@ -1590,7 +1590,7 @@ class Test(unittest.TestCase):
   <preference name="debug" value="0"/>
   <preference name="directoryScratch"/>
   <preference name="graphicsPath" value="/Applications/Preview.app"/>
-  <preference name="ipythonShowFormat" value="ipython.vexflow"/>
+  <preference name="ipythonShowFormat" value="ipython.lilypond.png"/>
   <preference name="lilypondBackend" value="ps"/>
   <preference name="lilypondFormat" value="pdf"/>
   <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond"/>
@@ -1626,7 +1626,7 @@ class Test(unittest.TestCase):
   <preference name="debug" value="0"/>
   <preference name="directoryScratch"/>
   <preference name="graphicsPath" value="/Applications/Preview.app"/>
-  <preference name="ipythonShowFormat" value="ipython.vexflow"/>
+  <preference name="ipythonShowFormat" value="ipython.lilypond.png"/>
   <preference name="lilypondBackend" value="ps"/>
   <preference name="lilypondFormat" value="pdf"/>
   <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond"/>
@@ -1683,7 +1683,7 @@ class Test(unittest.TestCase):
   <preference name="debug" value="0"/>
   <preference name="directoryScratch"/>
   <preference name="graphicsPath" value="/Applications/Preview.app"/>
-  <preference name="ipythonShowFormat" value="ipython.vexflow"/>
+  <preference name="ipythonShowFormat" value="ipython.lilypond.png"/>
   <preference name="lilypondBackend" value="ps"/>
   <preference name="lilypondFormat" value="pdf"/>
   <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond"/>

@@ -77,7 +77,7 @@ class NGramJobHandlerWorker(multiprocessing.Process):
                 break
             #print '{}: {!r}'.format(process_name, job)
             job = pickle.loads(job)
-            job()
+            job.run()
             self.jobQueue.task_done()
             self.resultQueue.put(pickle.dumps(job, protocol=0))
         return
@@ -102,9 +102,7 @@ class NGramJob(common.SlottedObject):
         self.jobTotal = jobTotal
         self.results = {}
 
-    ### SPECIAL METHODS ###
-
-    def __call__(self):
+    def run(self):
         score = corpus.parse(self.filename)
         self.debug('PARSED')
         if 2 < len(score.parts):

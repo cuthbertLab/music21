@@ -744,21 +744,6 @@ class Accidental(SlottedObject):
         '''
         return sorted(accidentalNameToModifier.keys(), key=str.lower)
 
-    ### REMOVED METHODS ####
-    def show(self, *args, **kws):
-        from music21 import note
-        environLocal.warn("as of v.1.9., Pitches are not Music21Objects. Do not call show on them; this method will go away in 2.0")
-        n = note.Note()
-        n.pitch = self
-        n.show(*args, **kws)
-    
-    def write(self, *args, **kws):
-        from music21 import note
-        environLocal.warn("as of v.1.9., Pitches are not Music21Objects. Do not call write on them; this method will go away in 2.0")
-        n = note.Note()
-        n.pitch = self
-        n.write(*args, **kws)
-
     ### PUBLIC METHODS ###
 
     def set(self, name):
@@ -3261,10 +3246,6 @@ class Pitch(object):
         D# becomes E-flat, D-flat becomes C#, G# and A-flat are left
         alone.
 
-        TODO: should be called automatically after ChromaticInterval
-        transpositions.
-
-
         >>> p1 = pitch.Pitch("B#5")
         >>> p1.simplifyEnharmonic().nameWithOctave
         'C6'
@@ -3672,7 +3653,7 @@ class Pitch(object):
     #---------------------------------------------------------------------------
     # utilities for pitch object manipulation
 
-    def transposeBelowTarget(self, target, minimize=False):
+    def transposeBelowTarget(self, target, minimize=False, inPlace=True):
         '''
         Given a source Pitch, shift it down octaves until it is below the
         target. Note: this manipulates src inPlace.
@@ -3680,8 +3661,23 @@ class Pitch(object):
         If `minimize` is True, a pitch below the target will move up to the
         nearest octave.
 
-        >>> pitch.Pitch('g5').transposeBelowTarget(pitch.Pitch('c#4'))
+        >>> p = pitch.Pitch('g5')
+        >>> p.transposeBelowTarget(pitch.Pitch('c#4'), inPlace=True)
         <music21.pitch.Pitch G3>
+        >>> p
+        <music21.pitch.Pitch G3>
+
+
+        Music21 2.0 transition period: inPlace is allowed now. Right now
+        the default is True, but it will become False later.
+
+        >>> p = pitch.Pitch('g5')
+        >>> c = p.transposeBelowTarget(pitch.Pitch('c#4'), inPlace=False)
+        >>> c
+        <music21.pitch.Pitch G3>
+        >>> p
+        <music21.pitch.Pitch G5>
+        
 
         If already below the target, make no change:
 
@@ -3693,8 +3689,13 @@ class Pitch(object):
         >>> pitch.Pitch('g#8').transposeBelowTarget(pitch.Pitch('g#1'))
         <music21.pitch.Pitch G#1>
 
+
+        This does nothing because it is already low enough...
+
         >>> pitch.Pitch('g#2').transposeBelowTarget(pitch.Pitch('f#8'))
         <music21.pitch.Pitch G#2>
+
+        But with minimize=True, it makes a difference...
 
         >>> pitch.Pitch('g#2').transposeBelowTarget(pitch.Pitch('f#8'), minimize=True)
         <music21.pitch.Pitch G#7>
@@ -3703,8 +3704,11 @@ class Pitch(object):
         <music21.pitch.Pitch F#8>
 
         '''
-        # TODO: add inPlace as an option, default is True
-        src = self
+        # TODO: switch inPlace: default is True now, will become False.
+        if inPlace:
+            src = self
+        else:
+            src = copy.deepcopy(self)
         while True:
             # ref 20, min 10, lower ref
             # ref 5, min 10, do not lower
@@ -3721,7 +3725,7 @@ class Pitch(object):
                     src.octave += 1
         return src
 
-    def transposeAboveTarget(self, target, minimize=False):
+    def transposeAboveTarget(self, target, minimize=False, inPlace=True):
         '''
         Given a source Pitch, shift it up octaves until it is above the target.
         Note: this manipulates src inPlace.
@@ -3754,7 +3758,11 @@ class Pitch(object):
         <music21.pitch.Pitch D3>
 
         '''
-        src = self
+        # TODO: switch inPlace: default is True now, will become False.
+        if inPlace:
+            src = self
+        else:
+            src = copy.deepcopy(self)
         # case where self is below target
         while True:
             # ref 20, max 10, do not raise ref
