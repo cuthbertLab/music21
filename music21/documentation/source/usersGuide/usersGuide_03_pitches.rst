@@ -12,7 +12,7 @@
 User's Guide, Chapter 3: Pitches, Durations, and Notes again
 ============================================================
 
-Now that you have made a couple of ``Note`` objects, it's time to dig a
+Now that you've made a couple of ``Note`` objects, it's time to dig a
 little deeper into what makes a ``Note`` really a ``Note``, namely,
 :ref:`modulePitch`, and :ref:`moduleDuration` objects.
 

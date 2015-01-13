@@ -1647,10 +1647,7 @@ def noteheadToMxNotehead(obj, defaultColor=None):
         nhParen = obj.noteheadParenthesis
 
     if nhParen is True:
-        nhParen = 'yes'
-    elif nhParen is False:
-        nhParen = 'no'
-    
+        nhParen = 'yes'    
 
     if nhFill is True:
         nhFill = 'yes'

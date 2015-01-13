@@ -138,16 +138,15 @@ to hit enter twice to see the results.)
     F
 
 | What's happening here? What ``for thisNote in noteList:`` says is that
-  Python should take each note in noteList in order and temporarily call
-  that note "``thisNote``\ " (you could have it called anything you
-  want; ``myNote``, ``n``, ``currentNote`` are all good names, but
-  ``note`` is not because ``note`` is the name of a module). Then the
-  ":" at the end of the line indicates that everything that happens for
-  a bit will apply to every ``Note`` in noteList one at a time. How does
-  Python know when "a bit" is over? Simple: every line that is a part of
-  the loop needs to be indented by putting in some spaces (I usually use
-  four spaces or hit tab. Some people use two spaces.
-
+Python should take each note in noteList in order and temporarily call
+that note "``thisNote``\ " (you could have it called anything you want;
+``myNote``, ``n``, ``currentNote`` are all good names, but ``note`` is
+not because ``note`` is the name of a module). Then the ":" at the end
+of the line indicates that everything that happens for a bit will apply
+to every ``Note`` in noteList one at a time. How does Python know when
+"a bit" is over? Simple: every line that is a part of the loop needs to
+be indented by putting in some spaces (I usually use four spaces or hit
+tab. Some people use two spaces.
 | Just be consistent).
 
 Loops don't save much time here, but imagine if noteList had dozens or
@@ -721,8 +720,7 @@ special name and its own class (:class:`~music21.stream.Score`,
 ``Streams``.
 
 | So how do we find ``note1`` inside ``biggerStream``? That's what the
-  next two chapters are about.
-
+next two chapters are about.
 | Click ``Next`` for Chapter 5. Those with programming experience who
-  have familiarity with lists of lists and defining functions might want
-  to skip to Chapter 6.
+have familiarity with lists of lists and defining functions might want
+to skip to Chapter 6.

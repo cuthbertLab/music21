@@ -591,7 +591,7 @@ spirit</words>
 
         out = fromMusic21Object(n)
         match1 = '<notehead>diamond</notehead>'
-        self.assertEqual(out.find(match1) > 0, True)
+        self.assertEqual(out.find(match1) > 0, True, out)
 
     def testNoteheadSmorgasbord(self):
         # tests the of many different types of noteheads
