@@ -342,7 +342,8 @@ class Beams(SlottedObject):
         else:
             raise BeamException('cannot fill beams for level %s' % level)
         for i in range(1, count+1):
-            if i == 0: raise Exception
+            if i == 0: 
+                raise BeamException('level zero does not exist for this range')
             obj = Beam()
             obj.number = i
             self.beamsList.append(obj)

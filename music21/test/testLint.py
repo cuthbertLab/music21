@@ -46,7 +46,7 @@ def main(fnAccept=None):
     # only accept a few file names for now
     if fnAccept in [None, []]:
         fnAccept = ['dynamics.py']
-
+    fnPathReject = ['/ext/']
         #fnAccept = ['stream.py', 'note.py', 'chord.py']
 
     disable = [
@@ -54,6 +54,8 @@ def main(fnAccept=None):
                 #'W0621', 'W0511', 
                 #'W0404', 'R0201', 'R0904', 'E1101', 'R0914', 'R0903',
                 #'R0911', 'R0902', 
+                'locally-disabled', # hopefully will know what they're doing
+                'arguments-differ', # someday...
                 'abstract-class-instantiated', # this trips on the fractions.Fraction() class.
                 'redefined-builtin', # remove when Eclipse tags are parsed @ReservedAssignment = pylint: disable=W0622
                 'fixme', # known...
@@ -94,6 +96,13 @@ def main(fnAccept=None):
 
     # add entire package
     for fp in mg.modulePaths:
+        rejectIt = False
+        for rejectPath in fnPathReject:
+            if rejectPath in fp:
+                rejectIt = True
+                break
+        if rejectIt:
+            continue
         unused_dir, fn = os.path.split(fp)
         fnNoExt = fn.replace('.py', '')
         if fn in fnAccept or fnNoExt in fnAccept:
