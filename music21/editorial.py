@@ -15,10 +15,6 @@
 Editorial objects store comments and other meta-data associated with specific
 :class:`~music21.note.Note` objects or other music21 objects.
 '''
-
-
-from __future__ import unicode_literals
-
 import unittest
 from music21 import exceptions21
 from music21.common import SlottedObject
@@ -146,17 +142,17 @@ class NoteEditorial(SlottedObject):
         }
 
     __slots__ = (
-        b'ficta',
-        b'color',
-        b'misc',
-        b'harmonicInterval',
-        b'harmonicIntervals',
-        b'hidden',
-        b'melodicInterval',
-        b'melodicIntervals',
-        b'melodicIntervalOverRests',
-        b'melodicIntervalsOverRests',
-        b'comment',
+        'ficta',
+        'color',
+        'misc',
+        'harmonicInterval',
+        'harmonicIntervals',
+        'hidden',
+        'melodicInterval',
+        'melodicIntervals',
+        'melodicIntervalOverRests',
+        'melodicIntervalsOverRests',
+        'comment',
         )
 
     ### INITIALIZER ###
@@ -186,7 +182,7 @@ class NoteEditorial(SlottedObject):
 
             >>> n = note.Note()
             >>> n.editorial.lilyStart()
-            u''
+            ''
 
         ::
 
@@ -250,15 +246,15 @@ class Comment(SlottedObject):
         >>> n.editorial.comment.text = "hello"
         >>> n.editorial.comment.position = "above"
         >>> n.editorial.comment.lily
-        u'^"hello"'
+        '^"hello"'
 
     '''
 
     ### CLASS VARIABLES ###
 
     __slots__ = (
-        b'position',
-        b'text',
+        'position',
+        'text',
         )
 
     ### INITIALIZER ###

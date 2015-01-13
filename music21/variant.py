@@ -565,7 +565,7 @@ def mergeVariantsEqualDuration(streams, variantNames, inPlace = False):
     while len(streams) > len(variantNames): # Adds Blank names if too few
         variantNames.append(None)
     while len(streams) < len(variantNames): # Removes extra names
-        variantNames.pop
+        variantNames.pop()
     
     zipped = list(zip(streams,variantNames))
     
@@ -900,7 +900,7 @@ def refineVariant(s, sVariant, inPlace = False):
     
     '''
     # stream that will be returned
-    if not (sVariant in s.variants):
+    if sVariant not in s.variants:
         raise VariantException('%s not found in stream %s.' % (sVariant, s))
     
     if inPlace is True:
@@ -2337,9 +2337,7 @@ class Test(unittest.TestCase):
         return out
 
     def testBasicA(self):
-        from music21 import variant
-
-        o = variant.Variant()
+        o = Variant()
         o.append(note.Note('G3', quarterLength=2.0))
         o.append(note.Note('f3', quarterLength=2.0))
         
@@ -2356,9 +2354,7 @@ class Test(unittest.TestCase):
         '''
         Testing relaying attributes requests to private Stream with __getattr__
         '''
-        from music21 import variant
-
-        v = variant.Variant()
+        v = Variant()
         v.append(note.Note('G3', quarterLength=2.0))
         v.append(note.Note('f3', quarterLength=2.0))
         # these are Stream attributes
@@ -2378,20 +2374,17 @@ class Test(unittest.TestCase):
     def testVariantGroupA(self):
         '''Variant groups are used to distinguish
         '''
-        from music21 import variant
-        v1 = variant.Variant()
+        v1 = Variant()
         v1.groups.append('alt-a')
 
-        v1 = variant.Variant()
+        v1 = Variant()
         v1.groups.append('alt-b')
         self.assertEqual('alt-b' in v1.groups, True)
 
 
     def testVariantClassA(self):
-        from music21 import variant
-
         m1 = stream.Measure()
-        v1 = variant.Variant()
+        v1 = Variant()
         v1.append(m1)
 
         self.assertEqual(v1.isClassOrSubclass(['Variant']), True)
@@ -2400,14 +2393,12 @@ class Test(unittest.TestCase):
         self.assertEqual(v1.hasElementOfClass('Measure'), True)
 
     def testDeepCopyVariantA(self):
-        from music21 import variant
-    
         s = stream.Stream()
         s.repeatAppend(note.Note('G4'), 8)
         vn1 = note.Note('F#4')
         vn2 = note.Note('A-4')
     
-        v1 = variant.Variant([vn1, vn2])
+        v1 = Variant([vn1, vn2])
         v1Copy = copy.deepcopy(v1)
         # copies stored objects; they point to the different Notes vn1/vn2
         self.assertEqual(v1Copy[0] is v1[0], False)
@@ -2434,13 +2425,11 @@ class Test(unittest.TestCase):
 
 
     def testDeepCopyVariantB(self):
-        from music21 import variant
-    
         s = stream.Stream()
         s.repeatAppend(note.Note('G4'), 8)
         vn1 = note.Note('F#4')
         vn2 = note.Note('A-4')
-        v1 = variant.Variant([vn1, vn2])
+        v1 = Variant([vn1, vn2])
         s.insert(5, v1)
     
         # as we deepcopy the elements in the variants, we have new Notes

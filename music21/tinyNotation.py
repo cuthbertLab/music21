@@ -8,13 +8,6 @@
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-#python3
-try:
-    basestring
-except:
-    basestring = str # @ReservedAssignment
-
-
 '''
 tinyNotation is a simple way of specifying single line melodies
 that uses a notation somewhat similar to Lilypond but with WAY fewer 
@@ -69,6 +62,14 @@ to see how to make TinyNotation useful for your own needs.
 take 0 for the note length.  But expect this to disappear from the
 TinyNotation specification soon, as it's too Trecento specific.)
 '''
+
+#python3
+try:
+    basestring
+except NameError:
+    basestring = str # @ReservedAssignment
+
+
 
 import unittest
 import copy

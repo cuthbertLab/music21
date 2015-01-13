@@ -32,7 +32,7 @@ environLocal = environment.Environment(_MOD)
 
 try:
     basestring
-except:
+except NameError:
     basestring = str # @ReservedAssignment
 
 STEPREF = {
@@ -297,7 +297,7 @@ def _convertCentsToAlterAndCents(shift):
 
 
 def _convertHarmonicToCents(value):
-    '''Given a harmonic number, return the total number shift in cents assuming 12 tone equal temperament.
+    r'''Given a harmonic number, return the total number shift in cents assuming 12 tone equal temperament.
 
     >>> pitch._convertHarmonicToCents(8)
     3600
@@ -1197,16 +1197,17 @@ class Pitch(object):
     such as .classes and .groups, but they don't have Duration or Sites objects
     '''
     # define order to present names in documentation; use strings
-    _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'midi', 'german', 'french', 'spanish', 'italian','dutch']
-    # documentation for all attributes (not properties or methods)
-    _DOC_ATTR = {
-    }
+    _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'midi', 'german', 
+                  'french', 'spanish', 'italian', 'dutch']
+    ## documentation for all attributes (not properties or methods)
+    #_DOC_ATTR = {
+    #}
 
     # constants shared by all classes
     _twelfth_root_of_two = TWELFTH_ROOT_OF_TWO
 
     def __init__(self, name=None, **keywords):
-        self.classes = [x.__name__ for x in self.__class__.mro()] 
+        self.classes = [x.__name__ for x in self.__class__.mro()]  
         self.groups = base.Groups()
 
         if isinstance(name, type(self)):
@@ -4367,7 +4368,7 @@ class Test(unittest.TestCase):
         '''Test updating accidental display.
         '''
 
-        def proc(pList, past=[]):
+        def proc(pList, past):
             for p in pList:
                 p.updateAccidentalDisplay(past)
                 past.append(p)
@@ -4470,7 +4471,7 @@ class Test(unittest.TestCase):
         '''
         from music21 import key
 
-        def proc(pList, past=[], alteredPitches=[]):
+        def proc(pList, past, alteredPitches):
             for p in pList:
                 p.updateAccidentalDisplay(past, alteredPitches=alteredPitches)
                 past.append(p)
@@ -4578,12 +4579,12 @@ class Test(unittest.TestCase):
         test if octave display is working
         '''
 
-        def proc1(pList, past=[]):
+        def proc1(pList, past):
             for p in pList:
                 p.updateAccidentalDisplay(past, cautionaryPitchClass=True, cautionaryNotImmediateRepeat=False)
                 past.append(p)
 
-        def proc2(pList, past=[]):
+        def proc2(pList, past):
             for p in pList:
                 p.updateAccidentalDisplay(past, cautionaryPitchClass=False, cautionaryNotImmediateRepeat=False)
                 past.append(p)
@@ -4825,3 +4826,4 @@ _DOC_ORDER = [Pitch, Accidental, Microtone]
 if __name__ == "__main__":
     import music21
     music21.mainTest(Test)
+    

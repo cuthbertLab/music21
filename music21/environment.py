@@ -10,8 +10,6 @@
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
-from __future__ import print_function
-
 '''
 The environment module describes an object for accessing and setting
 variables related to the user's music21 environment. Such variables include
@@ -22,6 +20,8 @@ and other settings.
 Additional documentation for and examples of using this module are found in
 :ref:`environment`.
 '''
+from __future__ import print_function
+
 import os
 import sys
 import tempfile
@@ -120,10 +120,9 @@ class LocalCorpusSettings(xmlnode.XMLNodeList):
     ### INITIALIZER ###
 
     def __init__(self, name=None):
-        xmlnode.XMLNode.__init__(self)
+        xmlnode.XMLNodeList.__init__(self)
         self._attr['name'] = name
         self._tag = 'localCorpusSettings'  # assumed for now
-        self.componentList = []  # list of LocalCorpusPath objects
 
     ### PRIVATE METHODS ###
 
@@ -165,9 +164,8 @@ class LocalCorporaSettings(xmlnode.XMLNodeList):
     ### INITIALIZER ###
 
     def __init__(self):
-        xmlnode.XMLNode.__init__(self)
+        xmlnode.XMLNodeList.__init__(self)
         self._tag = 'localCorporaSettings'
-        self.componentList = []
 
     ### PRIVATE METHODS ###
 
@@ -221,7 +219,8 @@ class SettingsHandler(xml.sax.ContentHandler):
 
     ### INITIALIZER ###
 
-    def __init__(self, tagLib=None):
+    def __init__(self):
+        xml.sax.ContentHandler.__init__(self)
         self._characters = ''
         self._objectStack = []
         self._settings = None
@@ -775,7 +774,7 @@ class _EnvironmentCore(object):
 
                 webbrowser.open(filePath)
                 return
-            except:
+            except Exception:
                 print('Cannot open webbrowser, sorry. Go to file://{}'.format(
                     filePath))
         if app is not None:
@@ -799,7 +798,7 @@ class _EnvironmentCore(object):
                     with open(filePath, 'r') as f:
                         for line in f:
                             print(line, end="")
-                        print
+                        print("")
                     return                    
                 else:
                     raise EnvironmentException(

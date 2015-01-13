@@ -293,7 +293,7 @@ class TextFormat(object):
         if value is not None:
             try:
                 value = float(value)
-            except (ValueError):
+            except ValueError:
                 raise TextFormatException('Not a supported size: %s' % value)
         self._size = value
 
@@ -316,7 +316,7 @@ class TextFormat(object):
             # convert to number
             try:
                 value = float(value)
-            except (ValueError):
+            except ValueError:
                 raise TextFormatException('Not a supported size: %s' % value)
 
         self._letterSpacing = value
@@ -390,9 +390,10 @@ class TextBox(base.Music21Object, TextFormat):
 
         # the text string to be displayed; not that line breaks
         # are given in the xml with this non-printing character: (#)
+        self._content = None
         self.content = content   # use property
 
-        self._page = 1; # page one is deafault
+        self._page = 1 # page one is deafault
         self._positionDefaultX = x    
         self._positionDefaultY = y
         self._alignVertical = 'top'
@@ -618,9 +619,8 @@ class LanguageDetector(object):
             langCode = self.mostLikelyLanguage(excerpt)
             for i in range(len(self.languageCodes)):
                 if self.languageCodes[i] == langCode:
-                    return i+1
-            else:
-                raise TextException("got a language that was not in the codes; should not happen")
+                    return i+1            
+            raise TextException("got a language that was not in the codes; should not happen")
 
 #-------------------------------------------------------------------------------
 class Trigram(object):
@@ -803,9 +803,7 @@ class Test(unittest.TestCase):
 
 
     def testLanguageDetector(self):
-        from music21 import corpus
         ld = LanguageDetector()
-        ld.trigrams
         #print ld.trigrams['fr'] - ld.trigrams['it'] 
         #print ld.trigrams['fr'] - ld.trigrams['de'] 
         #print ld.trigrams['fr'] - ld.trigrams['cn'] 

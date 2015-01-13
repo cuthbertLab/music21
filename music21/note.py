@@ -1929,7 +1929,6 @@ class Test(unittest.TestCase):
         #s.show()
 
     def testVolumeA(self):
-        from music21 import volume
         v1 = volume.Volume()
 
         n1 = Note()

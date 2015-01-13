@@ -31,7 +31,7 @@ def getDocumentationFiles(runOne=False):
     returns a list of namedtuples for each module that should be run
     
     >>> test.testDocumentation.getDocumentationFiles()
-    [ModTuple(module='index.rst', fullModulePath='/Users/cuthbert/git/music21base/music21/documentation/source/index.rst', moduleNoExtension='index'),
+    [ModTuple(module='index.rst', fullModulePath='...music21/documentation/source/index.rst', moduleNoExtension='index'),
     ...]
     '''
     from music21 import common
