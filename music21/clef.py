@@ -487,7 +487,7 @@ def clefFromString(clefString, octaveShift = 0):
         clefObj.line = lineNum
 
     if octaveShift != 0:
-        clefObj.octaveShift = octaveShift
+        clefObj.octaveChange = octaveShift
     
     return clefObj
 

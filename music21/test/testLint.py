@@ -54,6 +54,7 @@ def main(fnAccept=None):
                 #'W0621', 'W0511', 
                 #'W0404', 'R0201', 'R0904', 'E1101', 'R0914', 'R0903',
                 #'R0911', 'R0902', 
+                'unnecessary-pass', # nice, but not really a problem...
                 'locally-disabled', # hopefully will know what they're doing
                 'arguments-differ', # someday...
                 'abstract-class-instantiated', # this trips on the fractions.Fraction() class.
