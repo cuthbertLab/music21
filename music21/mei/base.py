@@ -150,6 +150,19 @@ Alphabetical list of the elements currently supported by this module:
 To know which MEI attributes are known to import correctly, read the documentation for the relevant
 element. For example, to know whether the @color attribute on a <note> element is supported, read
 the "Attributes/Elements Implemented" section of the :func:`noteFromElement` documentation.
+
+**List of Ignored Elements**
+
+The following elements are (silently) ignored by the MEI-to-music21 converter because they primarily
+affect the layout and typesetting of a musical score. We may choose to implement these elements in
+the future, but they are a lower priority because music21 is not primarily a layout or typesetting
+tool.
+
+* <multiRest>: a multi-measure rest (these will be "converted" to single-measure rests)
+* <pb>: a page break
+* <lb>: a line break
+* <sb>: a system break
+
 '''
 
 # Determine which ElementTree implementation to use.
@@ -196,6 +209,7 @@ _MEINS = '{http://www.music-encoding.org/ns/mei}'
 _IGNORE_UNPROCESSED = ('{}sb'.format(_MEINS),  # system break
                        '{}lb'.format(_MEINS),  # line break
                        '{}pb'.format(_MEINS),  # page break
+                       '{}multiRest'.format(_MEINS),  # multi-measure rest
                        '{}slur'.format(_MEINS),  # slurs; handled in convertFromString()
                        '{}tie'.format(_MEINS),  # ties; handled in convertFromString()
                        '{}tupletSpan'.format(_MEINS),  # tuplets; handled in convertFromString()
