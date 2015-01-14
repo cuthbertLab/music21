@@ -463,10 +463,10 @@ isn't a list, you'll get an error:
 
     Traceback (most recent call last):
 
-      File "<ipython-input-54-d6916f79680c>", line 1, in <module>
+      File "<ipython-input-40-d6916f79680c>", line 1, in <module>
         flatPrint(30)
 
-      File "<ipython-input-53-910b883fde2e>", line 2, in flatPrint
+      File "<ipython-input-39-910b883fde2e>", line 2, in flatPrint
         for thing in myList:            # 2
 
     TypeError: 'int' object is not iterable

@@ -1,13 +1,6 @@
 .. _usersGuide_02_notes:
 .. code:: python
 
-    %load_ext music21.ipython21.ipExtension
-
-
-.. parsed-literal::
-   :class: ipython-result
-
-    Exception reporting mode: Plain
 
 User's Guide, Chapter 2: Notes
 ==============================
@@ -48,8 +41,9 @@ a rest. If we load music21 with the command:
 then you'll now be able to access the ``note`` module just by typing
 ``note`` at any command line.
 
->>> note
+>>> note # doctest: +SKIP
 <module 'music21.note' from 'D:\music21files\music21\note.pyc'>
+
 | If you get something like this you'll have access to the music21
 ``note`` module any time you type ``"note"``. The filename after "from
 'D:\\music21files...'" will differ for you. It will show you where you
@@ -69,23 +63,19 @@ Note and Rest objects you can type "``dir(note)``\ " to find out:
 .. parsed-literal::
    :class: ipython-result
 
-    ['EighthNote',
-     'GeneralNote',
-     'HalfNote',
+    ['GeneralNote',
      'Lyric',
      'LyricException',
      'NotRest',
      'NotRestException',
      'Note',
      'NoteException',
-     'QuarterNote',
      'Rest',
      'SlottedObject',
      'SpacerRest',
      'Test',
      'TestExternal',
      'Unpitched',
-     'WholeNote',
      '_DOC_ORDER',
      '_MOD',
      '__builtins__',
@@ -112,18 +102,17 @@ Note and Rest objects you can type "``dir(note)``\ " to find out:
      'volume']
 
 
-Some of these Objects are just easier ways of making specific kinds of
-Note objects (half notes, etc.). Others of them are things that we'll
-get to later, like :class:`~music21.note.Lyric` objects. (By the way:
-I'm highlighting the names of most objects so they become links to the
-full documentation for the object. You can read it later when you're
-curious, frustrated, or *Mad Men* is a re-run; you certainly don't need
-to click them now).
+Some of the things in this list are classes of notes -- they are
+capitalized. Other classes are things that we'll get to later, like
+:class:`~music21.note.Lyric` objects. (By the way: I'm highlighting
+the names of most objects so they become links to the full documentation
+for the object. You can read it later when you're curious, frustrated,
+or *Mad Men* is a re-run; you certainly don't need to click them now).
 
 **(Advanced digression):**
 
 If you're more of a Python guru and you're afraid of "polluting your
-namespace," instead of typing "``from music21 import \*``\ " you can
+namespace," instead of typing "``from music21 import *``\ " you can
 type:
 
 .. code:: python
@@ -133,15 +122,15 @@ type:
 in which case instead of using the word ``note``, you'll need to call it
 ``music21.note``
 
-    music21.note
-    <module 'music21.note' from 'D:\music21files\music21\note.pyc'>
-
+>>> music21.note # doctest: +SKIP
+<module 'music21.note' from 'D:\music21files\music21\note.pyc'>
+    
 If you are a Python guru, you already knew that. Probably if you didn't
 already know that, but you've heard about "polluting your namespace,"
 you have a Python guru friend who has screamed, "Never use
-``import \*``!" Trust me for now that this tutorial will be easier if
-you ignore your friend for a bit; by the end of it you'll know enough to
-be able to follow whatever advice seems most natural to you.
+``import *``!" Trust me for now that this tutorial will be easier if you
+ignore your friend for a bit; by the end of it you'll know enough to be
+able to follow whatever advice seems most natural to you.
 
 *(Back from the Python digression and especially the digression of the
 digression):*
@@ -354,7 +343,7 @@ dashes aren't allowed in variable names:
 
 ::
 
-      File "<ipython-input-19-d519b3e88921>", line 1
+      File "<ipython-input-17-d519b3e88921>", line 1
         b-flat = note.Note("B-2")
     SyntaxError: can't assign to operator
 
@@ -364,13 +353,6 @@ Since this note has an accidental you can get it by using the
 .. code:: python
 
     bflat.accidental
-
-
-.. parsed-literal::
-   :class: ipython-result
-
-    <accidental flat>
-
 
 Here we have something that isn't a number and doesn't have quotes
 around it. That usually means that what ``.accidental`` returns is
@@ -392,13 +374,6 @@ the first one quite a bit: it shows how many semitones this
 
     acc.alter
 
-
-.. parsed-literal::
-   :class: ipython-result
-
-    -1.0
-
-
 Since this ``Accidental`` is a flat, its ``.alter`` is a negative
 number. Notice that it's also not an integer, but a float. That might
 indicate that music21 supports things like quarter-tones, and in this
@@ -414,23 +389,9 @@ and "chained" the two attributes together in one step:
 
     bflat.accidental.alter
 
-
-.. parsed-literal::
-   :class: ipython-result
-
-    -1.0
-
-
 .. code:: python
 
     acc.displayLocation
-
-
-.. parsed-literal::
-   :class: ipython-result
-
-    'normal'
-
 
 Good to know that we've set a sensible default. If you want to have the
 accidental display above the note, you'll have to set that yourself:
@@ -438,17 +399,7 @@ accidental display above the note, you'll have to set that yourself:
 .. code:: python
 
     acc.displayLocation = 'above'
-
-.. code:: python
-
     acc.displayLocation
-
-
-.. parsed-literal::
-   :class: ipython-result
-
-    'above'
-
 
 Our variable ``"acc"`` is the **exact** accidental that is attached to
 the B-flat Note stored as ``bflat``. It's not a flat that's similar to
@@ -461,13 +412,6 @@ to the silly "above" position:
 
     bflat.accidental.displayLocation
 
-
-.. parsed-literal::
-   :class: ipython-result
-
-    'above'
-
-
 Python is one of those cool computer languages where if an object
 doesn't have a particular attribute but you think it should, you can add
 it to the object (some people find that this makes objects messy, but I
@@ -478,15 +422,6 @@ you try to access it, you'll get an error:
 .. code:: python
 
     bflat.wasWrittenByStockhausen
-
-::
-
-    Traceback (most recent call last):
-
-      File "<ipython-input-28-3e7bfdcb790a>", line 1, in <module>
-        bflat.wasWrittenByStockhausen
-
-    AttributeError: 'Note' object has no attribute 'wasWrittenByStockhausen'
 
 But if you set the value of that weird attribute, you can use it later:
 
@@ -501,12 +436,6 @@ Then you can write an “if” statement to see if this is True or not:
 
     if bflat.wasWrittenByStockhausen == True:
         print("Hope you're enjoying Sirius!")
-
-
-.. parsed-literal::
-   :class: ipython-result
-
-    Hope you're enjoying Sirius!
 
 Just as you don’t type the “>>>” at the beginning of the line, don’t
 type the ”...” either. But you will need to put the spaces before the
@@ -526,7 +455,10 @@ At this point you might be tired of all this programming and just want
 to see or play your damn note! If you’ve installed a MusicXML reader
 such as MuseScore, Finale, Sibelius, or Finale Notepad, you can type:
 
-f.show('musicxml')
+.. code:: python
+
+    #_DOCS_SHOW f.show('musicxml')
+
 and see it. We make the default note length a quarter-note. We'll get to
 other note lengths in a minute. Notice that we put in a sensible clef
 also, since otherwise you won't know that this note really is ``F5``.
@@ -536,7 +468,10 @@ also, since otherwise you won't know that this note really is ``F5``.
 If you want to hear it instead (and you're on Windows or Unix or an
 older-Mac (10.5 or older)) type:
 
-f.show('midi')
+.. code:: python
+
+    #_DOCS_SHOW f.show('midi')
+
 Maddeningly, Apple removed MIDI support in the version of QuickTime
 (QuickTime X) included in OS X 10.6 (Snow Leopard) and above (including
 Mountain Lion), so you'll need to get the older QuickTime 7 from
@@ -560,23 +495,9 @@ by transposing our B-flat up a major-third (“M3”):
     d = bflat.transpose("M3")
     d
 
-
-.. parsed-literal::
-   :class: ipython-result
-
-    <music21.note.Note D>
-
-
 .. code:: python
 
     bflat
-
-
-.. parsed-literal::
-   :class: ipython-result
-
-    <music21.note.Note B->
-
 
 Instead of changing the original note, the ``transpose()`` method
 "returns" (that is, spits out) a new ``note.Note`` object that
@@ -592,13 +513,6 @@ comma. Let's take it up a perfect fourth:
     bflat.transpose("P4", inPlace = True)
     bflat
 
-
-.. parsed-literal::
-   :class: ipython-result
-
-    <music21.note.Note E->
-
-
 Of course now ``bflat`` is a terrible name for our variable! You could
 type "``eflat = bflat``\ " and now you can call the note ``eflat``. But
 you'll probably not need to do this too often. By the way, music21
@@ -611,13 +525,6 @@ even), let's transpose it up a doubly-diminished sixth:
 
     whatNoteIsThis = d.transpose('dd6')
     whatNoteIsThis
-
-
-.. parsed-literal::
-   :class: ipython-result
-
-    <music21.note.Note B--->
-
 
 B-triple-flat! Haven't seen one of those in a while! Let's check that
 note's ``.accidental.alter`` and its ``.accidental.name``:
@@ -636,27 +543,12 @@ If you want to be sure that it is ``None``, you can print the value:
 
     print(d.accidental)
 
-
-.. parsed-literal::
-   :class: ipython-result
-
-    None
-
 Since ``d.accidental`` is ``None`` does this mean that
 ``d.accidental.name`` is ``None`` too?
 
 .. code:: python
 
     d.accidental.name
-
-::
-
-    Traceback (most recent call last):
-
-      File "<ipython-input-38-2b6769f305a4>", line 1, in <module>
-        d.accidental.name
-
-    AttributeError: 'NoneType' object has no attribute 'name'
 
 Nope! In fact it creates an error (which we'll also call "raising an
 Exception" for reasons that will become clear soon). That's because
@@ -703,7 +595,10 @@ One last thing: notice that we never used a variable name called
 something like this (don't type this if you want to continue typing
 along with the user guide):
 
-note = note.Note("C#3")
+.. code:: python
+
+    #_DOCS_SHOW note = note.Note("C#3")
+
 Well now you're in a bind. You've got your ``Note`` object stored as
 ``note``, but we *need* the ``note`` *module* in order to create new
 ``Note`` objects and now you have no way of getting it. (this is the
