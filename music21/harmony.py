@@ -307,7 +307,7 @@ class Harmony(chord.Chord):
     def figure(self, value):
         self._figure = value
         if self._figure is not None:
-            self._parseFigure(self._figure)
+            self._parseFigure()
             self._updatePitches()
 
     @property
@@ -438,7 +438,7 @@ class Harmony(chord.Chord):
         self._writeAsChord = val
         try:
             self._updatePitches()
-        except:
+        except exceptions21.Music21Exception:
             pass
         if val and self.duration.quarterLength == 0:
             self.duration = duration.Duration(1)
@@ -516,31 +516,31 @@ class ChordStepModification(object):
 
     '''
 
-    ''' FROM MUSIC XML DOCUMENTATION - FOR DEVELOPER'S REFERENCE
-    The degree element is used to add, alter, or subtract
-    individual notes in the chord. The degree-value element
-    is a number indicating the degree of the chord (1 for
-    the root, 3 for third, etc). The degree-alter element
-    is like the alter element in notes: 1 for sharp, -1 for
-    flat, etc. The degree-type element can be add, alter, or
-    subtract. If the degree-type is alter or subtract, the
-    degree-alter is relative to the degree already in the
-    chord based on its kind element. If the degree-type is
-    add, the degree-alter is relative to a dominant chord
-    (major and perfect intervals except for a minor
-    seventh). The print-object attribute can be used to
-    keep the degree from printing separately when it has
-    already taken into account in the text attribute of
-    the kind element. The plus-minus attribute is used to
-    indicate if plus and minus symbols should be used
-    instead of sharp and flat symbols to display the degree
-    alteration; it is no by default. The degree-value and
-    degree-type text attributes specify how the value and
-    type of the degree should be displayed.
-
-    A harmony of kind "other" can be spelled explicitly by
-    using a series of degree elements together with a root.
-    '''
+#     FROM MUSIC XML DOCUMENTATION - FOR DEVELOPER'S REFERENCE
+#     The degree element is used to add, alter, or subtract
+#     individual notes in the chord. The degree-value element
+#     is a number indicating the degree of the chord (1 for
+#     the root, 3 for third, etc). The degree-alter element
+#     is like the alter element in notes: 1 for sharp, -1 for
+#     flat, etc. The degree-type element can be add, alter, or
+#     subtract. If the degree-type is alter or subtract, the
+#     degree-alter is relative to the degree already in the
+#     chord based on its kind element. If the degree-type is
+#     add, the degree-alter is relative to a dominant chord
+#     (major and perfect intervals except for a minor
+#     seventh). The print-object attribute can be used to
+#     keep the degree from printing separately when it has
+#     already taken into account in the text attribute of
+#     the kind element. The plus-minus attribute is used to
+#     indicate if plus and minus symbols should be used
+#     instead of sharp and flat symbols to display the degree
+#     alteration; it is no by default. The degree-value and
+#     degree-type text attributes specify how the value and
+#     type of the degree should be displayed.
+# 
+#     A harmony of kind "other" can be spelled explicitly by
+#     using a series of degree elements together with a root.
+    
 
     ### INITIALIZER ###
 
@@ -1214,7 +1214,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
     d4 = inChord.semitonesFromChordStep(4)
     d6 = inChord.semitonesFromChordStep(6)
 
-    def compare(inChordNums, givenChordNums, permitedOmitions=[]):
+    def compare(inChordNums, givenChordNums, permittedOmitions=()):
         '''
         inChord is the chord the user submits to analyze,
         givenChord is the chord type that the method is currently looking at
@@ -1228,22 +1228,22 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
         if m > len(inChordNums):
             return False
         if m >= 1 and inChordNums[0] != givenChordNums[0]:
-            if not (3 in permitedOmitions and givenChordNums[0] == 4) or inChordNums[0] != None:
+            if not (3 in permittedOmitions and givenChordNums[0] == 4) or inChordNums[0] != None:
                 return False
         if m >= 2 and inChordNums[1] != givenChordNums[1]:
-            if not (5 in permitedOmitions and givenChordNums[1] == 7) or inChordNums[1] != None:
+            if not (5 in permittedOmitions and givenChordNums[1] == 7) or inChordNums[1] != None:
                 return False
         if m >= 3 and inChordNums[2] != givenChordNums[2]:
-            if not (7 in permitedOmitions and givenChordNums[2] == 11) or inChordNums[2] != None:
+            if not (7 in permittedOmitions and givenChordNums[2] == 11) or inChordNums[2] != None:
                 return False
         if m >= 4 and inChordNums[3] != givenChordNums[3]:
-            if not (9 in permitedOmitions and givenChordNums[3] == 2) or inChordNums[3] != None:
+            if not (9 in permittedOmitions and givenChordNums[3] == 2) or inChordNums[3] != None:
                 return False
         if m >= 5 and inChordNums[4] != givenChordNums[4]:
-            if not (11 in permitedOmitions and givenChordNums[4] == 5) or inChordNums[4] != None:
+            if not (11 in permittedOmitions and givenChordNums[4] == 5) or inChordNums[4] != None:
                 return False
         if m >= 6 and inChordNums[5] != givenChordNums[5]:
-            if not (13 in permitedOmitions and givenChordNums[5] == 9) or inChordNums[5] != None:
+            if not (13 in permittedOmitions and givenChordNums[5] == 9) or inChordNums[5] != None:
                 return False
 
         return True
@@ -1288,15 +1288,15 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
                     kind = chordKind
                     kindStr = chordKindStr[0]
             elif len(chordDegrees) == 4 and d9 and not d11 and not d13:
-                if compare((d3, d5, d7, d9), chordDegrees, permitedOmitions=[5]):
+                if compare((d3, d5, d7, d9), chordDegrees, permittedOmitions=[5]):
                     kind = chordKind
                     kindStr = chordKindStr[0]
             elif len(chordDegrees) == 5 and d11 and not d13:
-                if compare((d3, d5, d7, d9, d11), chordDegrees, permitedOmitions=[3, 5]):
+                if compare((d3, d5, d7, d9, d11), chordDegrees, permittedOmitions=[3, 5]):
                     kind = chordKind
                     kindStr = chordKindStr[0]
             elif len(chordDegrees) == 6 and d13:
-                if compare((d3, d5, d7, d9, d11, d13), chordDegrees, permitedOmitions=[5, 11, 9]):
+                if compare((d3, d5, d7, d9, d11, d13), chordDegrees, permittedOmitions=[5, 11, 9]):
                     kind = chordKind
                     kindStr = chordKindStr[0]
                     
@@ -1753,46 +1753,43 @@ class ChordSymbol(Harmony):
                             pitches.append(pitchToAppend)
                 else:
                     pitches.append(pitchToAppend)
-                '''
-                # for now I won't worry about the octave of the added note
-                #if self.bass() != None:
-                #    p = sc.pitchFromDegree(hD.degree, self.bass())
-                # else:
-                #     p = sc.pitchFromDegree(hD.degree, self.root())
-                if hD.degree == 7 and self.chordKind != None and self.chordKind != '':
-                    #don't know why anyone would want
-                    #to add a seventh to a dominant chord already...but according to documentation
-                    #added degrees are relative to dominant chords, which have all major degrees
-                    #except for the seventh which is minor, thus the transposition down one half step
-                    p = p.transpose(-1)
-                    self._degreesList.append('-7')
-                    #degreeForList = '-7'
-                else:
-                    self._degreesList.append(hD.degree)
-                    #degreeForList = str(hD.degree)
-                #adjust the added pitch by degree-alter interval
-                if hD.interval:
-                    p = p.transpose(hD.interval)
-                    if hD.degree >= 7:
-                        p.octave = p.octave + 1
-                pitches.append(p)
-                '''
+#                 # for now I won't worry about the octave of the added note
+#                 #if self.bass() != None:
+#                 #    p = sc.pitchFromDegree(hD.degree, self.bass())
+#                 # else:
+#                 #     p = sc.pitchFromDegree(hD.degree, self.root())
+#                 if hD.degree == 7 and self.chordKind != None and self.chordKind != '':
+#                     #don't know why anyone would want
+#                     #to add a seventh to a dominant chord already...but according to documentation
+#                     #added degrees are relative to dominant chords, which have all major degrees
+#                     #except for the seventh which is minor, thus the transposition down one half step
+#                     p = p.transpose(-1)
+#                     self._degreesList.append('-7')
+#                     #degreeForList = '-7'
+#                 else:
+#                     self._degreesList.append(hD.degree)
+#                     #degreeForList = str(hD.degree)
+#                 #adjust the added pitch by degree-alter interval
+#                 if hD.interval:
+#                     p = p.transpose(hD.interval)
+#                     if hD.degree >= 7:
+#                         p.octave = p.octave + 1
+#                 pitches.append(p)
             elif hD.modType == 'subtract':
                 pitchFound = False
                 degrees = self._degreesList
                 if degrees != None:
-                    for pitch, degree in zip(pitches, degrees):
+                    for p, degree in zip(pitches, degrees):
                         degree = degree.replace('-', '')
                         degree = degree.replace('#', '')
                         degree = degree.replace('A', '')#A is for 'Altered'
                         if hD.degree == int(degree):
-                            pitches.remove(pitch)
+                            pitches.remove(p)
                             pitchFound = True
                             
                             for degreeString in self._degreesList:
                                 if str(hD.degree) in degreeString:
                                     self._degreesList.remove(degreeString)
-
                                     break
                             #if hD.degree not in string, 
                             #should we throw an exception???? for now yes, but maybe later we
@@ -1803,23 +1800,21 @@ class ChordSymbol(Harmony):
                 pitchFound = False
                 degrees = self._degreesList
 
-                for pitch, degree in zip(pitches, degrees):
+                for p, degree in zip(pitches, degrees):
                     degree = degree.replace('-', '')
                     degree = degree.replace('#', '')
                     degree = degree.replace('A', '') #A is for 'Altered'
                     if hD.degree == int(degree):
-                        pitch = pitch.transpose(hD.interval) #transpose by semitones (positive for up, negative for down)
+                        p = p.transpose(hD.interval) #transpose by semitones (positive for up, negative for down)
                         pitchFound = True
                         
-                        '''
-                        for degreeString in self._degreesList:
-                            if str(hD.degree) in degreeString:
-                                self._degreesList = self._degreesList.replace(degreeString, ('A' + str(hD.degree)))
-                                #the 'A' stands for altered...
-                                break
-                        #if hD.degree not in string:
-                        #should we throw an exception???? for now yes, but maybe later we should....
-                        '''
+#                         for degreeString in self._degreesList:
+#                             if str(hD.degree) in degreeString:
+#                                 self._degreesList = self._degreesList.replace(degreeString, ('A' + str(hD.degree)))
+#                                 #the 'A' stands for altered...
+#                                 break
+#                         #if hD.degree not in string:
+#                         #should we throw an exception???? for now yes, but maybe later we should....
                 if pitchFound == False:
                     raise ChordStepModificationException('Degree not in specified chord: %s' % hD.degree)
         return tuple(pitches)
@@ -1842,14 +1837,14 @@ class ChordSymbol(Harmony):
         return originalsH
 
     def _hasPitchAboveC4(self, pitches):
-        for pitch in pitches:
-            if pitch.diatonicNoteNum > 30: #if there are pitches above middle C, bump the octave down
+        for p in pitches:
+            if p.diatonicNoteNum > 30: #if there are pitches above middle C, bump the octave down
                 return True
         return False
 
     def _hasPitchBelowA1(self, pitches):
-        for pitch in pitches:
-            if pitch.diatonicNoteNum < 13: #anything below this is just obnoxious
+        for p in pitches:
+            if p.diatonicNoteNum < 13: #anything below this is just obnoxious
                 return True
         return False
 
@@ -2653,37 +2648,35 @@ class TestExternal(unittest.TestCase):
             if x  != 'Chord Symbol Cannot Be Identified':
                 vs.lyric = x.replace('-','b')
             print(x.replace('-','b'))
-        '''
-        Full, unmodified piece:
-        Bb7
-        Ebmaj7/Bb
-        Bb7
-        Chord Symbol Cannot Be Identified
-        Bb7
-        Eb
-        Bb
-        Chord Symbol Cannot Be Identified
-        Bb/D
-        Bb7
-        CmaddD
-        Cm/D
-        Eb+M7/D
-        Cm/Eb
-        F7
-        
-        piece with passing tones and neighbor tones removed:
-        Bb7
-        Bb7
-        Chord Symbol Cannot Be Identified
-        Eb
-        Bb
-        Bb/D
-        Bb7
-        CmaddD
-        Cm/D
-        Cm/Eb
-        F7
-        '''
+#         Full, unmodified piece:
+#         Bb7
+#         Ebmaj7/Bb
+#         Bb7
+#         Chord Symbol Cannot Be Identified
+#         Bb7
+#         Eb
+#         Bb
+#         Chord Symbol Cannot Be Identified
+#         Bb/D
+#         Bb7
+#         CmaddD
+#         Cm/D
+#         Eb+M7/D
+#         Cm/Eb
+#         F7
+#         
+#         piece with passing tones and neighbor tones removed:
+#         Bb7
+#         Bb7
+#         Chord Symbol Cannot Be Identified
+#         Eb
+#         Bb
+#         Bb/D
+#         Bb7
+#         CmaddD
+#         Cm/D
+#         Cm/Eb
+#         F7
         excerpt.show()
 
 
@@ -2694,7 +2687,6 @@ _DOC_ORDER = [Harmony, chordSymbolFigureFromChord, ChordSymbol, ChordStepModific
 
 
 if __name__ == "__main__":
-
     import music21
     music21.mainTest(Test)
 

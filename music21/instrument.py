@@ -198,7 +198,7 @@ class Instrument(base.Music21Object):
         self.instrumentId = idNew
          
 
-    def autoAssignMidiChannel(self, usedChannels=[]):
+    def autoAssignMidiChannel(self, usedChannels=[]): # CORRECT! # pylint: disable=dangerous-default-value
         '''
         Assign an unused midi channel given a list of
         used channels.
@@ -385,6 +385,8 @@ class StringInstrument(Instrument):
 
     def __init__(self):
         Instrument.__init__(self)
+        self._stringPitches = None
+        self._cachedPitches = None
         self.instrumentName = 'StringInstrument'
         self.instrumentAbbreviation = 'Str'
 
@@ -1411,7 +1413,7 @@ class Soprano(Vocalist):
         
 class MezzoSoprano(Soprano):
     def __init__(self):
-        Vocalist.__init__(self)
+        Soprano.__init__(self)
         
         self.instrumentName = 'Mezzo-Soprano'
         self.instrumentAbbreviation = 'Mez'
@@ -1503,7 +1505,6 @@ def instrumentFromMidiProgram(number):
     '''
     return the instrument with "number" as its assigned midi program:
     
-    
     >>> instrument.instrumentFromMidiProgram(0)
     <music21.instrument.Instrument Piano>
     >>> instrument.instrumentFromMidiProgram(21)
@@ -1511,9 +1512,7 @@ def instrumentFromMidiProgram(number):
     >>> instrument.instrumentFromMidiProgram(500)
     Traceback (most recent call last):
         ...
-    InstrumentException: No instrument found with given midi program
-
-    
+    InstrumentException: No instrument found with given midi program    
     '''    
     foundInstrument = False
     for myThing in sys.modules[__name__].__dict__.values():
@@ -1523,7 +1522,7 @@ def instrumentFromMidiProgram(number):
             if mp == number:
                 foundInstrument = True
                 return i
-        except:
+        except (AttributeError, TypeError):
             pass
     if not foundInstrument:
         raise InstrumentException('No instrument found with given midi program')
@@ -1792,7 +1791,7 @@ def fromString(instrumentString):
     for substring in allCombinations:
         try:
             if six.PY2:
-                englishName = instrumentLookup.allToBestName[unicode(substring.lower())]
+                englishName = instrumentLookup.allToBestName[unicode(substring.lower())] # pylint: disable=undefined-variable
             else:
                 englishName = instrumentLookup.allToBestName[substring.lower()]
             className = instrumentLookup.bestNameToInstrumentClass[englishName]
@@ -1824,7 +1823,7 @@ def fromString(instrumentString):
     for substring in allCombinations:
         try:
             if six.PY2:
-                bestPitch = instrumentLookup.pitchFullNameToName[unicode(substring.lower())]
+                bestPitch = instrumentLookup.pitchFullNameToName[unicode(substring.lower())] # pylint: disable=undefined-variable
             else:
                 bestPitch = instrumentLookup.pitchFullNameToName[substring.lower()]
             bestInterval = instrumentLookup.transposition[bestName][bestPitch]
