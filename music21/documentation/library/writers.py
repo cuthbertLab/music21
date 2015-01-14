@@ -262,8 +262,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
 
     def runNBConvert(self, ipythonNotebookFilePath):
 #         import music21
-        #runDirectoryPath = common.getBuildDocFilePath()
-        from music21.ext.nbconvert import nbconvert_app as nb
+        from music21.ext.nbconvert import nbconvert_app as nb # @UnresolvedImport
         app = nb.NbConvertApp.instance()
         app.start(argv=['nbconvert', 'rst', ipythonNotebookFilePath])
 

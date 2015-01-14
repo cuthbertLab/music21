@@ -35,9 +35,8 @@ def fromStream(inputStream):
         incipit = "Benedicamus Domino"
     out = ''
     out += 'name: ' + incipit + ';\n'
-   
-    
     out += "%%\n"
+    return out
  
 class GregorianStream(stream.Stream):
     r'''
@@ -80,16 +79,14 @@ class GregorianStream(stream.Stream):
         if startedSyllable == True:
             outLine += ")\n"
         return outLine
-    def clefToGABC(self, clef):
+    def clefToGABC(self, clefIn):
         '''
-       
-        
         >>> s = chant.GregorianStream()
         >>> c = clef.AltoClef()
         >>> s.clefToGABC(c)
         u'(c3)'  
         '''
-        return "(" + clef.sign.lower() + str(clef.line) + ")"
+        return "(" + clefIn.sign.lower() + str(clefIn.line) + ")"
  
  
 class GregorianNote(note.Note):
@@ -310,6 +307,7 @@ class BaseScoreConverter(object):
         self.environLocal = environLocal
         self.gregorioConverter = '/usr/local/bin/gregorio'
         self.gregorioOptions = ""
+        self.gregorioCommand = None
         
         self.latexConverter = '/usr/texbin/lualatex'
         self.latexOptions = '--interaction=nonstopmode'
@@ -345,7 +343,6 @@ class BaseScoreConverter(object):
         converts a .gabc file to LaTeX using the
         gregorio converter.  Returns the filename with .tex substituted for .gabc
         
-        
         >>> bsc = chant.BaseScoreConverter()
         >>> #_DOCS_SHOW newFp = bsc.launchGregorio('~cuthbert/Library/Gregorio/examples/Populas.gabc')
         >>> #_DOCS_SHOW bsc.gregorioCommand
@@ -355,10 +352,7 @@ class BaseScoreConverter(object):
         
         More often, you'll want to write a textfile from writeFile:
         
-        
         '''
-
-        
         platform = common.getPlatform()
         fpApp = self.gregorioConverter
         options = self.gregorioOptions
@@ -371,17 +365,14 @@ class BaseScoreConverter(object):
             cmd = '%s %s %s' % (fpApp, options, fp)        
         self.gregorioCommand = cmd
         os.system(cmd)
-        newfp = re.sub('\.gabc', '.tex', fp)
+        newfp = re.sub(r'\.gabc', '.tex', fp)
         return newfp
 
     def launchLaTeX(self, fp = None):
         '''
         converts a .tex file to pdf using lulatex
         Returns the filename with .pdf substituted for .tex
-        
         '''
-        
-        
         platform = common.getPlatform()
         fpApp = self.latexConverter
         options = self.latexOptions
@@ -396,7 +387,7 @@ class BaseScoreConverter(object):
             cmd = '%s %s %s' % (fpApp, options, fp)        
         self.gregorioCommand = cmd
         os.system(cmd)
-        newfp = re.sub('\.tex', '.pdf', fp)
+        newfp = re.sub(r'\.tex', '.pdf', fp)
         return newfp
 
 

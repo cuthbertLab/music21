@@ -311,14 +311,14 @@ class XMLNode(object):
 #                 if (attrLocal is None and attrOther is None):
 #                     pass
                 # local is defined
-                if (attrLocal is not None and attrOther is None):
+                if attrLocal is not None and attrOther is None:
                     pass # already set as this is a copy of self
                 # other is defined
-                elif (attrLocal is None and attrOther is not None):
+                elif attrLocal is None and attrOther is not None:
                     new.set(otherAttr[i], attrOther)
                 # other is defined as an empty list
                 # note that this may contain component objects
-                elif (attrLocal == [] and attrOther != []):
+                elif attrLocal == [] and attrOther != []:
                     new.set(otherAttr[i], attrOther)
 
 #                 elif (attrLocal is None and attrOther is None):
@@ -421,12 +421,13 @@ class XMLNode(object):
         candidates = []
         candidates.append(self._convertNameFromXml(name))
         candidates.append(self._convertNameCrossReference(name))
+        candidate = None
         for candidate in candidates:
             if hasattr(self, candidate):
                 match = True
                 return fixBytes(getattr(self, candidate))
         if not match:
-            raise XMLNodeException('this object (%r) does not have a "%s" (or %s) attribute' % (self, name, candidate))
+            raise XMLNodeException('this object (%r) does not have a "%s" (or %r) attribute' % (self, name, candidate))
         
 
     def setDefaults(self):
@@ -446,7 +447,8 @@ class XMLNode(object):
         msg.append(u'<%s ' % fixBytes(self._tag))
         sub = []
         for name, value in sorted(list(self._getAttributes()), key=lambda x: x[0]):
-            if value == None: continue
+            if value == None: 
+                continue
             sub.append(u'%s=%s' % (fixBytes(name), fixBytes(value)))
         if self.charData not in ['', None]:
             sub.append(u'charData=%s' % fixBytes(self.charData))
@@ -454,19 +456,23 @@ class XMLNode(object):
         for component in self._getComponents():
             if type(component) == tuple: # its a simple element
                 name, value = component
-                if value == None: continue
+                if value == None: 
+                    continue
                 # generally we do not need to see False boolean nodes
-                if type(value) == bool and value == False: continue 
+                if type(value) == bool and value == False: 
+                    continue 
                 sub.append(u'%s=%s' % (fixBytes(name), fixBytes(value)))
             else: # its a node subclass
-                if component == None: continue
-                else: sub.append(fixBytes(component.__repr__())) # all __repr__ on sub objects
+                if component == None: 
+                    continue
+                else: 
+                    sub.append(fixBytes(component.__repr__())) # all __repr__ on sub objects
         #print _MOD, sub
         try:
             msg.append(u' '.join(sub))
         except UnicodeDecodeError:
-            return "Unicode Decode Error"
             msg.append(u'unicode decode error!!')
+            return "Unicode Decode Error"
         msg.append(u'>')
 
         if six.PY2:
@@ -498,7 +504,8 @@ class XMLNode(object):
 
         # if attributes are defined, add to tag
         for name, value in self._getAttributes():
-            if value in [None, '']: continue
+            if value in [None, '']: 
+                continue
             node.setAttribute(name, str(value))
 
         # if self.charData is defined, this is a text component of this tag
@@ -511,11 +518,13 @@ class XMLNode(object):
                 node.appendChild(doc.createTextNode(cd))
 
         for component in self._getComponents():
-            if component == None: continue
+            if component == None: 
+                continue
             # its a simple element
             elif isinstance(component, tuple): 
                 tag, content = component
-                if content == None: continue
+                if content == None: 
+                    continue
 
                 # some elements are treated as boolean values; presence 
                 # of element, w/o text, is true
@@ -530,14 +539,14 @@ class XMLNode(object):
                 else:
                     # was the topline; trying to use replace for errors
                     #entry = u"%s" % content
-                    if (isinstance(content, int) or isinstance(content, float)):
+                    if isinstance(content, int) or isinstance(content, float):
                         contentStr = str(content)
                     else:
                         contentStr = content
 
                     if six.PY2:                       
                         try:
-                            entry = unicode(contentStr, errors='replace')
+                            entry = unicode(contentStr, errors='replace') # pylint: disable=undefined-variable
                         except TypeError:
                             entry = u"%s" % contentStr
                             #entry = str(content)

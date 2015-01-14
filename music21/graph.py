@@ -45,16 +45,20 @@ from music21.analysis import reduction
 from music21 import features
 from music21.ext import webcolors
 
+from collections import namedtuple
+
 from music21 import environment
 _MOD = 'graph.py'
 environLocal = environment.Environment(_MOD)    
+
+ExtendedModules = namedtuple('ExtendedModules', 'matplotlib Axes3D collections patches plt networkx')
 
 def _getExtendedModules():
     '''
     this is done inside a def, so that the slow import of matplotlib is not done
     in ``from music21 import *`` unless it's actually needed.
 
-    Returns a tuple: (matplotlib, Axes3D, collections, patches, plt, networkx)
+    Returns a namedtuple: (matplotlib, Axes3D, collections, patches, plt, networkx)
     '''
     if 'matplotlib' in base._missingImport:
         raise GraphException('could not find matplotlib, graphing is not allowed')
@@ -75,7 +79,7 @@ def _getExtendedModules():
     except ImportError:
         networkx = None # use for testing
     
-    return (matplotlib, Axes3D, collections, patches, plt, networkx)
+    return ExtendedModules(matplotlib, Axes3D, collections, patches, plt, networkx)
 
 #-------------------------------------------------------------------------------
 class GraphException(exceptions21.Music21Exception):
@@ -157,9 +161,10 @@ def userValuesToValues(valueList):
 
 def getColor(color):
     '''Convert any specification of a color to a hexadecimal color used by matplotlib. 
-
     
     >>> graph.getColor('red')
+    '#ff0000'
+    >>> graph.getColor('r')
     '#ff0000'
     >>> graph.getColor('Steel Blue')
     '#4682b4'
@@ -183,14 +188,18 @@ def getColor(color):
         color = color.lower().replace(' ', '')
         # check for one character matplotlib colors
         if len(color) == 1:
-            if color == 'b': color = 'blue'
-            elif color == 'g': color = 'green'
-            elif color == 'r': color = 'red'
-            elif color == 'c': color = 'cyan'
-            elif color == 'm': color = 'magenta'
-            elif color == 'y': color = 'yellow'
-            elif color == 'k': color = 'black'
-            elif color == 'w': color = 'white'
+            colorMap = {'b': 'blue',
+                        'g': 'green',
+                        'r': 'red',
+                        'c': 'cyan',
+                        'm': 'magenta',
+                        'y': 'yellow',
+                        'k': 'black',
+                        'w': 'white'}
+            try:
+                color = colorMap[color]
+            except KeyError:
+                raise GraphException('invalid color abbreviation: %s' % color)
         try:
             return webcolors.css3_names_to_hex[color]
         except KeyError: # no color match
@@ -247,8 +256,9 @@ class Graph(object):
         >>> a = graph.Graph(title='a graph of some data to be given soon', tickFontSize = 9)
         >>> a.setData(['some', 'arbitrary', 'data', 14, 9.04, None])
         '''
-        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
+        _getExtendedModules()
         self.data = None
+        self.fig = None
         # define a component dictionary for each axis
         self.axis = {}
         self.axisKeys = ['x', 'y']
@@ -618,8 +628,8 @@ class Graph(object):
         For most matplotlib back ends, this will open 
         a GUI window with the desired graph.
         '''
-        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
-        plt.show()
+        extm = _getExtendedModules() #@UnusedVariable
+        extm.plt.show()
 
     def write(self, fp=None):
         '''
@@ -659,7 +669,7 @@ class GraphNetworxGraph(Graph):
 
     def __init__(self, *args, **keywords):
         Graph.__init__(self, *args, **keywords)
-        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
+        extm = _getExtendedModules() 
         self.axisKeys = ['x', 'y']
         self._axisInit()
 
@@ -671,20 +681,22 @@ class GraphNetworxGraph(Graph):
         self.networkxGraph = None
         if 'networkxGraph' in keywords:
             self.networkxGraph = keywords['networkxGraph']            
-        elif networkx is not None: # if we have this module
+        elif extm.networkx is not None: # if we have this module
             # testing default; temporary
             try:
-                g = networkx.Graph()
+                g = extm.networkx.Graph()
 #             g.add_edge('a','b',weight=1.0)
 #             g.add_edge('b','c',weight=0.6)
 #             g.add_edge('c','d',weight=0.2)
 #             g.add_edge('d','e',weight=0.6)
                 self.networkxGraph = g
-            except NameError: pass # keep as None
+            except NameError: 
+                pass # keep as None
 
     def process(self):
-        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
-
+        extm = _getExtendedModules()
+        plt = extm.plt
+        networkx = extm.networkx
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
         ax = self.fig.add_subplot(1, 1, 1)
@@ -760,7 +772,8 @@ class GraphColorGrid(Graph):
             self.setFigureSize([9, 6])
                 
     def process(self):
-        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
+        extm = _getExtendedModules() 
+        plt = extm.plt
 
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
@@ -865,7 +878,8 @@ class GraphColorGridLegend(Graph):
             self.setTitle('Legend')
                 
     def process(self):
-        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
+        extm = _getExtendedModules()
+        plt = extm.plt
 
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
@@ -975,7 +989,8 @@ class GraphHorizontalBar(Graph):
             self.alpha = .6
 
     def process(self):
-        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
+        extm  = _getExtendedModules()
+        plt = extm.plt
 
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
@@ -1069,7 +1084,8 @@ class GraphHorizontalBarWeighted(Graph):
 #                 ]
 
     def process(self):
-        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
+        extm = _getExtendedModules()
+        plt = extm.plt
 
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
@@ -1202,7 +1218,9 @@ class GraphScatterWeighted(Graph):
         self._rangeDiameter = self._maxDiameter - self._minDiameter
 
     def process(self):
-        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
+        extm = _getExtendedModules()
+        plt = extm.plt
+        patches = extm.patches
 
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
@@ -1312,7 +1330,8 @@ class GraphScatter(Graph):
         '''
         runs the data through the processor and if doneAction == 'show' (default), show the graph
         '''
-        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
+        extm = _getExtendedModules()
+        plt = extm.plt
 
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
@@ -1397,7 +1416,8 @@ class GraphHistogram(Graph):
             self.alpha = 0.8
 
     def process(self):
-        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
+        extm = _getExtendedModules()
+        plt = extm.plt
 
         # figure size can be set w/ figsize=(5,10)
         self.fig = plt.figure()
@@ -1463,7 +1483,9 @@ class GraphGroupedVerticalBar(Graph):
             fontsize=self.tickFontSize, family=self.fontFamily)
 
     def process(self):
-        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
+        extm = _getExtendedModules()
+        plt = extm.plt
+        matplotlib = extm.matplotlib
 
         self.fig = plt.figure()
         self.fig.subplots_adjust(bottom=.3)
@@ -1538,10 +1560,11 @@ class _Graph3DBars(Graph):
         self._axisInit()
 
     def process(self):
-        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
-
+        extm = _getExtendedModules()
+        plt = extm.plt
+        
         self.fig = plt.figure()
-        ax = Axes3D(self.fig)
+        ax = extm.Axes3D(self.fig)
 
         zVals = self.data.keys()
         zVals.sort()
@@ -1627,8 +1650,12 @@ class Graph3DPolygonBars(Graph):
             self.zeroFloor = False
 
     def process(self):
-        (matplotlib, Axes3D, collections, unused_patches, plt, unused_networkx) = _getExtendedModules()
-
+        extm = _getExtendedModules()
+        plt = extm.plt
+        matplotlib = extm.matplotlib
+        Axes3D = extm.Axes3D
+        collections = extm.collections
+        
         cc = lambda arg: matplotlib.colors.colorConverter.to_rgba(getColor(arg),
                                 alpha=self.alpha)
         self.fig = plt.figure()
@@ -2457,6 +2484,7 @@ class PlotWindowedAnalysis(PlotStream):
         
         # store process for getting title
         self.processor = processor
+        self.graphLegend = None
 
         if 'title' not in keywords:
             # pass to Graph instance
@@ -3875,8 +3903,9 @@ class PlotFeatures(PlotMultiStream):
     '''
     format = 'features'
 
-    def __init__(self, streamList, featureExtractors, labelList=[], 
-        *args, **keywords):
+    def __init__(self, streamList, featureExtractors, labelList=None, *args, **keywords):
+        if labelList is None:
+            labelList = []
         PlotMultiStream.__init__(self, streamList, labelList, *args, **keywords)
 
         self.featureExtractors = featureExtractors
@@ -4066,7 +4095,8 @@ def _getPlotsToMake(*args, **keywords):
                 # normally plots need to match all values 
                 match = []
                 for requestedValue in values:
-                    if requestedValue is None: continue
+                    if requestedValue is None: 
+                        continue
                     if (requestedValue.lower() in plotClassNameValues):
                         # do not allow the same value to be requested
                         if requestedValue not in match:
@@ -4679,9 +4709,9 @@ class Test(unittest.TestCase):
 
 
     def testGraphNetworxGraph(self):
-        (matplotlib, Axes3D, collections, patches, plt, networkx) = _getExtendedModules() #@UnusedVariable
+        extm = _getExtendedModules() #@UnusedVariable
 
-        if networkx is not None:
+        if extm.networkx is not None:
             b = GraphNetworxGraph(doneAction=None)
             #b = GraphNetworxGraph()
             b.process()

@@ -79,7 +79,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                  'octave': 'class level reference interval', 'vIntervals': 'list of the two harmonic intervals present, vn1n1 to v2n1 and v1n2 to v2n2',
                  'hIntervals': 'list of the two melodic intervals present, v1n1 to v1n2 and v2n1 to v2n2'}
 
-    def __init__(self, v1n1=None, v1n2=None, v2n1=None, v2n2=None, key=key.Key('C')):
+    def __init__(self, v1n1=None, v1n2=None, v2n1=None, v2n2=None, analyticKey=key.Key('C')):
         base.Music21Object.__init__(self)
         if len(intervalCache) == 0:
             # populate interval cache if not done yet
@@ -105,9 +105,9 @@ class VoiceLeadingQuartet(base.Music21Object):
         self.vIntervals = [] #vertical intervals (harmonic)
         self.hIntervals = [] #horizontal intervals (melodic)
 
-        self._key = key
-        if key is not None:
-            self.key = key
+        self._key = None
+        if analyticKey is not None:
+            self.key = analyticKey
         if v1n1 is not None and v1n2 is not None and v2n1 is not None and v2n2 is not None:
             self._findIntervals()
 
@@ -747,7 +747,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         Return boolean.
         '''
 
-        return (self.parallelOctave() | self.parallelUnison() )
+        return self.parallelOctave() or self.parallelUnison()
 
     def hiddenInterval(self, thisInterval):
         '''N.b. -- this method finds ALL hidden intervals,
@@ -987,7 +987,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl.key = key.Key('g')
         >>> vl.closesIncorrectly()
         True
-        >>> vl = voiceLeading.VoiceLeadingQuartet('C#4', 'D4', 'A2', 'D3', key='D')
+        >>> vl = voiceLeading.VoiceLeadingQuartet('C#4', 'D4', 'A2', 'D3', analyticKey='D')
         >>> vl.closesIncorrectly()
         True
 
@@ -1267,7 +1267,7 @@ class Verticality(base.Music21Object):
                     continue
                 else:
                     if partNums and not part in partNums:
-                            continue
+                        continue
                     retList.append(m21object)
         return retList
 
@@ -1466,14 +1466,13 @@ class VerticalityTriplet(VerticalityNTuplet):
 
         '''
         if partNumToIdentify in self.tnlsDict:
-
             ret = self.tnlsDict[partNumToIdentify].couldBePassingTone()
         else:
             return False
         if unaccentedOnly:
             try:
                 ret = ret and (self.tnlsDict[partNumToIdentify].n2.beatStrength < 0.5)
-            except:
+            except (AttributeError, NameError, base.Music21ObjectException):
                 pass
         return ret and self.chordList[0].isConsonant() and not self.chordList[1].isConsonant() and self.chordList[2].isConsonant()
 
@@ -1505,7 +1504,7 @@ class VerticalityTriplet(VerticalityNTuplet):
         if unaccentedOnly:
             try:
                 ret = ret and (self.tnlsDict[partNumToIdentify].n2.beatStrength < 0.5)
-            except:
+            except (AttributeError, NameError, base.Music21ObjectException):
                 pass
         return ret and not self.chordList[1].isConsonant()
 
@@ -1535,7 +1534,7 @@ class NNoteLinearSegment(base.Music21Object):
                 try:
                     if value.isClassOrSubclass([note.Note, pitch.Pitch]):
                         self._noteList.append(value)
-                except:
+                except (AttributeError, NameError):
                     self._noteList.append(None)
 
     def _getNoteList(self):
@@ -1711,7 +1710,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
     def __repr__(self):
         return '<music21.voiceLeading.%s n1=%s n2=%s n3=%s >' % (self.__class__.__name__, self.n1, self.n2, self.n3)
 
-    def color(self, color='red', noteList=[2]):
+    def color(self, color='red', noteList=(2,)):
         '''
         color all the notes in noteList (1,2,3). Default is to color only the second note red
         '''
@@ -1725,7 +1724,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
     def _isComplete(self):
         #if not (self.n1 and self.n2 and self.n3):
 
-        return (self.n1 is not None and self.n2 is not None and self.n3 is not None) #if any of these are none, it isn't complete
+        return (self.n1 is not None) and (self.n2 is not None) and (self.n3 is not None) #if any of these are none, it isn't complete
 
     def couldBePassingTone(self):
         '''
@@ -1891,10 +1890,8 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
             self.iLeft.isChromaticStep and self.iRight.isChromaticStep and \
             (self.iLeft.direction * self.iRight.direction ==  -1))
 
-'''
-beginnings of an implementation for any object segments, such as two chord linear segments
-currenlty only used by theoryAnalyzer
-'''
+### Below: beginnings of an implementation for any object segments, such as two chord linear segments
+### currently only used by theoryAnalyzer
 
 class NChordLinearSegmentException(exceptions21.Music21Exception):
     pass

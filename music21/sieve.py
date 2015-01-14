@@ -187,7 +187,8 @@ def rabinMiller(n):
             return True # must include 2,3
         return False
     for prime in primes:
-        if n % prime == 0: return 0
+        if n % prime == 0: 
+            return 0
     s, r = n-1, 1
     while not s & 1:
         s >>= 1
@@ -312,8 +313,10 @@ def unitNormEqual(parts):
     [0]
     
     """
-    if parts <= 1: return [0]
-    elif parts == 2: return [0,1]
+    if parts <= 1: 
+        return [0]
+    elif parts == 2: 
+        return [0,1]
     else:
         unit = []
         step = 1.0 / (parts - 1)
@@ -389,10 +392,14 @@ def _gcd(a, b):
     #    a, b = b, a % b
     #return abs(a)
 
-    #if a == 0 and b == 0: return 1
-    #if b == 0: return a
-    #if a == 0: return b
-    #else: return _gcd(b, a%b)
+    #if a == 0 and b == 0: 
+    #    return 1
+    #if b == 0: 
+    #    return a
+    #if a == 0: 
+    #    return b
+    #else: 
+    #    return _gcd(b, a%b)
 
     while b != 0:
         a, b = b, a % b
@@ -454,7 +461,8 @@ def _meziriac(c1, c2):
     else:
         while g < 10000:
             val = (g * c1) % c2
-            if val == 1: break
+            if val == 1: 
+                break
             g = g + 1
     return g
 
@@ -498,8 +506,10 @@ class PrimeSegment(object):
         while 1:              
             if rabinMiller(n):
                 seg.append(n)
-                if len(seg) >= length: break
-            if n == stop: break
+                if len(seg) >= length: 
+                    break
+            if n == stop: 
+                break
             if n > _oddBoundary: # after 5, no even primes
                 if direction == 'up':
                     n = n + 2 # only test odd numbers
@@ -703,19 +713,23 @@ class Residual(object):
 
     def __eq__(self, other):
         "==, compare residual classes in terms of m and shift"
-        if other == None: return 0
+        if other == None: 
+            return 0
         if (self._m == other._m and self._shift == other._shift and 
              self._neg == other._neg):
             return 1
-        else: return 0
+        else: 
+            return 0
 
     def __ne__(self, other):
         "m and shift not equal"
-        if other == None: return 1
+        if other == None: 
+            return 1
         if (self._m != other._m or self._shift != other._shift or
              self._neg != other._neg):
             return 1
-        else: return 0
+        else: 
+            return 0
 
     def __cmp__(self, other):
         """allow comparison based on m and shift; if all equal look at neg"""
@@ -735,8 +749,10 @@ class Residual(object):
                 if self._neg != other._neg:
                     if self._neg == 1: # its negative, then less
                         return -1
-                    else: return 1
-                else: return 0
+                    else: 
+                        return 1
+                else: 
+                    return 0
     
     def __lt__(self, other):
         if self.__cmp__(other) == -1:
@@ -905,13 +921,14 @@ class CompressionSegment(object):
     #---------------------------------------------------------------------------
     def _subset(self, sub, thisSet):
         """true if sub is part of set; assumes no redundancies in each"""
-        common = 0
+        commonNum = 0
         for x in sub:
             if x in thisSet:
-                common = common + 1
-        if common == len(sub):
+                commonNum = commonNum + 1
+        if commonNum == len(sub):
             return 1
-        else: return 0
+        else: 
+            return 0
 
     def _find(self, n, part, whole):
         """given a point, and seiveSegment, find a modulus and shift that
@@ -1223,7 +1240,8 @@ class Sieve(object):
             return {'m':int(usrStr), 'n':0, 'neg':0}
     
         usrStr = usrStr.strip()
-        if len(usrStr) == 0: return None
+        if len(usrStr) == 0: 
+            return None
         if usrStr.find('sub') >= 0:
             usrStr = usrStr.replace('sub', ',')
         if usrStr.find('@') >= 0:
@@ -1246,7 +1264,7 @@ class Sieve(object):
         try: # assume we have either an int (M), or a tuple (M,N)
             # better to remove the eval, but at least there are no globals or locals this way
             # waste of two {} dicts -- could be cached, but not worth it for now...
-            args = eval(usrStr, {'__builtins__': {'set': set}}, {}) 
+            args = eval(usrStr, {'__builtins__': {'set': set}}, {}) # pylint: disable=eval-used
         except (NameError, SyntaxError, TypeError):
             return None
 
@@ -1427,13 +1445,18 @@ class Sieve(object):
         logStr = self._parseLogic(copy.deepcopy(self._usrStr)) # logical string
         i = 0
         while 1:
-            if i == len(logStr): break
+            if i == len(logStr): 
+                break
             char = logStr[i] # current char
 
-            if i == 0: charPrevious = None # first
-            else: charPrevious = logStr[i-1]
-            if i == len(logStr) - 1: charNext = None # last
-            else: charNext = logStr[i+1]
+            if i == 0: 
+                charPrevious = None # first
+            else: 
+                charPrevious = logStr[i-1]
+            if i == len(logStr) - 1: 
+                charNext = None # last
+            else: 
+                charNext = logStr[i+1]
 
 
             # if a boundary symbol ({}&|) symply add to string
@@ -1478,7 +1501,8 @@ class Sieve(object):
                     subLen = subLen + 1
                 while 1:
                     # if at the end of the logical string
-                    if (subStart + subLen) == len(logStr): break
+                    if (subStart + subLen) == len(logStr): 
+                        break
                     subChar = logStr[subStart + subLen]
                     # neg is boundary, as alrady gathered above
                     if subChar in BOUNDS or subChar == NEG:
@@ -1508,7 +1532,8 @@ class Sieve(object):
         # if not a string but a number
         orList = logStr.split(OR)
         for orGroup in orList:
-            if orGroup == '': continue
+            if orGroup == '': 
+                continue
             # need deal with mixed not's in an andGroup
             andList = orGroup.split(AND)
             # do intersections, reduce, and add
@@ -1595,7 +1620,7 @@ class Sieve(object):
         try:
             # better to remove the eval, but at least there are no globals or locals this way
             # waste of two {} dicts -- could be cached, but not worth it for now...
-            seg = eval(evalStr, {'__builtins__': {'set': set}}, {})
+            seg = eval(evalStr, {'__builtins__': {'set': set}}, {}) # pylint: disable=eval-used
         except SyntaxError:
             raise SieveException('badly formed logical string (%s)' % evalStr)
 

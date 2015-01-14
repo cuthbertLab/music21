@@ -136,6 +136,7 @@ class MensuralClef(clef.Clef):
     def __init__(self, sign = 'C'):
         clef.Clef.__init__(self)
         self._line = None
+        self._fontString = None
         
         if sign == 'C':
             self.sign = sign
@@ -427,7 +428,7 @@ class GeneralMensuralNote(base.Music21Object):
             elif index != -1:
                 tempMN = measure[0]
                 self.lenList = tempMN.lenList
-        self._gettingDuraton = False
+        self._gettingDuration = False
         return index
     
     #Using Music21Object.getContextByClass makes _getDuration go into an infinite loop. Thus, the alternative method. 
@@ -567,9 +568,9 @@ class MensuralRest(GeneralMensuralNote, note.Rest):
     
     # scaling?
     def __init__(self, *arguments, **keywords):
-        self._gettingDuration = False
         note.Rest.__init__(self, *arguments, **keywords)
-        
+        GeneralMensuralNote.__init__(self)
+        self._gettingDuration = False
         self._mensuralType = 'brevis'
         
         if len(arguments) > 0:
@@ -638,8 +639,9 @@ class MensuralNote(GeneralMensuralNote, note.Note):
     
     # scaling? 
     def __init__(self, *arguments, **keywords):
-        self._gettingDuration = False        
         note.Note.__init__(self, *arguments, **keywords)
+        GeneralMensuralNote.__init__(self)
+        self._gettingDuration = False        
         self._mensuralType = 'brevis'    
         
         if len(arguments) > 1:
@@ -684,8 +686,7 @@ class MensuralNote(GeneralMensuralNote, note.Note):
         >>> s_2.append(n)
         >>> m == n
         False
-        '''
-        
+        '''        
         eq = GeneralMensuralNote.__eq__(self, other)
         eq  = eq and hasattr(other, 'pitch')
         if eq:
@@ -1008,8 +1009,12 @@ class Ligature(base.Music21Object):
     Note that ligatures cannot be displayed yet. 
     '''
 
-    def __init__(self, pitches = None, color = 'black', filled = 'yes'):
+    def __init__(self, pitches=None, color='black', filled='yes'):
         base.Music21Object.__init__(self)
+        self.noteheadShape = None
+        self.stems = None
+        self.maximaNotes = None
+        self.reversedNotes = None
         self._pitches = []
         
         if pitches is not None:
@@ -1025,10 +1030,10 @@ class Ligature(base.Music21Object):
     
     def _setPitches(self, pitches):
         for p in pitches:
-                if isinstance(p, pitch.Pitch):
-                    self._pitches.append(p)
-                else:
-                    self._pitches.append(pitch.Pitch(p))
+            if isinstance(p, pitch.Pitch):
+                self._pitches.append(p)
+            else:
+                self._pitches.append(pitch.Pitch(p))
         
         self.noteheadShape = dict([(ind, 'square') for ind in range(self._ligatureLength())])
         self.stems = dict([(ind, (None,None)) for ind in range(self._ligatureLength())])
@@ -1173,7 +1178,7 @@ class Ligature(base.Music21Object):
         else:
             return self.filled
     
-    def setFillStatus(self, value, index = None):
+    def setFillStatus(self, value, index=None):
         '''
         Takes two arguments: value, index (optional, default is None).
         
@@ -1207,9 +1212,9 @@ class Ligature(base.Music21Object):
                     n._setNoteheadFill(value)
             elif value in ['no', 'empty']:
                 value = 'no'
-                self.fill = value
-                for note in self.notes:
-                    note._setNoteheadFill(value)
+                self.filled = value
+                for n in self.notes:
+                    n._setNoteheadFill(value)
             else:
                 raise MedRenException('fillStatus %s not supported for ligatures' % value)
                     
@@ -1481,15 +1486,15 @@ class Ligature(base.Music21Object):
                         tempPitchCurrent._setAccidental(None)
                         tempPitchPrev._setAccidental(None)
                         if (not self.isReversed(endIndex-1)) and (self.getStem(endIndex-1)[0] != 'up') and (self.getStem(endIndex) == ('down','left')) and (tempPitchCurrent > tempPitchPrev):
-                                self.reversedNotes[endIndex] = True
+                            self.reversedNotes[endIndex] = True
                         else:                           
                             raise MedRenException('the note at index %d cannot be given reverse value %s' % (endIndex, value))
                     else:
-                        raise MedRenException('no note exists at index %d' % (endIndex-1)) 
+                        raise MedRenException('no note exists at index %d' % (endIndex-1,)) 
             else:
-                raise MedRenException('reverse value %s not supported for ligatures %' % value)
+                raise MedRenException('reverse value %s not supported for ligatures.' % (value,))
         else:
-            raise MedRenException('no note exists at index %d' % endIndex)
+            raise MedRenException('no note exists at index %d' % (endIndex,))
     
     def _expandLigature(self):
         '''
@@ -1704,8 +1709,8 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None, printUpdates
                 newStream.append(e)
             elif ('Mensuration' in e.classes) or ('Divisione' in e.classes):
                 if mOrDInAsNone: #If first case or changed mOrD
-                        mOrD = e
-                        newStream.append(e)
+                    mOrD = e
+                    newStream.append(e)
                 elif mOrD.standardSymbol != e.standardSymbol: #If higher, different mOrD found 
                     raise MedRenException('Mensuration or divisione %s not consistent within hierarchy' % e)
             elif 'Ligature' in e.classes:
@@ -1911,32 +1916,29 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
    
-class TestExternal(unittest.TestCase):
-    
-        
+class TestExternal(unittest.TestCase):   
     def runTest(self):
         pass    
     
     def xtestBarlineConvert(self):
         from music21 import corpus
-        self.testPiece = corpus.parse('luca/gloria')
-        setBarlineStyle(self.testPiece, 'tick')
-        self.testPiece.show()
+        testPiece = corpus.parse('luca/gloria')
+        setBarlineStyle(testPiece, 'tick')
+        testPiece.show()
 
     def xtestScaling(self):
         from music21 import corpus
-        self.testPiece = corpus.parse('luca/gloria')
-        scaleDurations(self.testPiece, .5)
-        self.testPiece.show()
+        testPiece = corpus.parse('luca/gloria')
+        scaleDurations(testPiece, .5)
+        testPiece.show()
 
     def xtestTransferTies(self):
         from music21 import corpus
-        self.testPiece = corpus.parse('luca/gloria')
-        transferTies(self.testPiece)
-        self.testPiece.show()
+        testPiece = corpus.parse('luca/gloria')
+        transferTies(testPiece)
+        testPiece.show()
 
     def xtestUnlinked(self):
-        from music21 import note
         s = stream.Stream()
         m = meter.TimeSignature('4/4')
         s.append(m)

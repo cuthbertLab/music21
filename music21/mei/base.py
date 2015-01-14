@@ -375,7 +375,6 @@ def makeDuration(base=0.0, dots=0):
 
 
 def allPartsPresent(scoreElem):
-    # pylint: disable=line-too-long
     '''
     Find the @n values for all <staffDef> elements in a <score> element. This assumes that every
     MEI <staff> corresponds to a music21 :class:`Part`.

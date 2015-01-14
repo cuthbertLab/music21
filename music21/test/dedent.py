@@ -12,6 +12,21 @@
 
 
 def dedent(string):
+    r'''
+    >>> from music21.test.dedent import dedent
+    >>> msg = '    Hello\n    There\n        My friend\n    Hi!'
+    >>> print(msg)
+        Hello
+        There
+            My friend
+        Hi!
+    >>> out = dedent(msg)
+    >>> print(out)
+    Hello
+    There
+        My friend
+    Hi!
+    '''
     splitLines = string.split('\n')
     if not splitLines[0] or splitLines[0].isspace():
         splitLines.pop(0)
@@ -27,3 +42,7 @@ def dedent(string):
         massagedLines.append(massagedLine)
     massagedString = '\n'.join(massagedLines)
     return massagedString
+
+if __name__ == '__main__':
+    import music21
+    music21.mainTest()

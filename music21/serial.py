@@ -68,8 +68,8 @@ class TwelveToneMatrix(stream.Stream):
         ret = ""
         for rowForm in self.elements:
             msg = []
-            for pitch in rowForm:
-                msg.append(str(pitch.pitchClassString).rjust(3))
+            for p in rowForm:
+                msg.append(str(p.pitchClassString).rjust(3))
             ret += ''.join(msg) + "\n"
         return ret
 
@@ -3471,18 +3471,11 @@ def rowToMatrix(p):
     ret = ""
     for row in matrix:
         msg = []
-        for pitch in row:
-            msg.append(str(pitch).rjust(3))
+        for p in row:
+            msg.append(str(p).rjust(3))
         ret += ''.join(msg) + "\n"
 
     return ret
-
-
-
-
-
-
-
 
 
 #-------------------------------------------------------------------------------
@@ -3507,8 +3500,8 @@ class Test(unittest.TestCase):
         part.append(n4)
         part.makeMeasures(inPlace = True)
         EEF = findMultisets(part, [[5, 4, 4]], 'includeAll', includeChords = False)
-        x = [(seg.activeSegment, seg.startMeasureNumber) for seg in EEF]
-        x
+        unused = [(seg.activeSegment, seg.startMeasureNumber) for seg in EEF]
+        # TODO: Test this?
 
 #    def testRows(self):
 #        from music21 import interval
@@ -3545,8 +3538,7 @@ class Test(unittest.TestCase):
 
 
     def testLabelingA(self):
-
-        from music21 import corpus, pitch
+        from music21 import corpus
         series = {'a':1, 'g-':2, 'g':3, 'a-':4, 
                   'f':5, 'e-':6, 'e':7, 'd':8, 
                   'c':9, 'c#':10, 'b-':11, 'b':12}

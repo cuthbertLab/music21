@@ -1372,17 +1372,22 @@ class Ottava(Spanner):
     def _getShiftMagnitude(self):
         '''Get basic parameters of shift.
         '''
-        if self._type.startswith('8'): return 8
-        elif self._type.startswith('15'): return 15
-        else: raise SpannerException("Cannot get shift magnitude from %s" % self._type)
+        if self._type.startswith('8'): 
+            return 8
+        elif self._type.startswith('15'): 
+            return 15
+        else: 
+            raise SpannerException("Cannot get shift magnitude from %s" % self._type)
 
     def _getShiftDirection(self):
         '''Get basic parameters of shift.
         '''
         # an 8va means that the notes must be shifted down with the mark
-        if self._type.endswith('a'): return 'down'
+        if self._type.endswith('a'): 
+            return 'down'
         # an 8vb means that the notes must be shifted upward with the mark
-        if self._type.endswith('b'): return 'up'
+        if self._type.endswith('b'): 
+            return 'up'
 
     def getStartParameters(self):
         '''

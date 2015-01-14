@@ -82,11 +82,7 @@ from music21 import common
 from music21 import derivation
 from music21 import exceptions21
 
-try:
-    from music21.ext import jsonpickle
-except:
-    pass
-
+from music21.ext import jsonpickle
 from music21.ext import six
 
 from music21 import environment
@@ -216,6 +212,7 @@ class StreamFreezer(StreamFreezeThawBase):
 
     '''
     def __init__(self, streamObj=None, fastButUnsafe=False, topLevel = True, streamIds = None):
+        StreamFreezeThawBase.__init__(self)
         # must make a deepcopy, as we will be altering Sites
         self.stream = None
         # clear all sites only if the top level.
@@ -768,6 +765,7 @@ class StreamThawer(StreamFreezeThawBase):
 #    >>> #s.show('t')
     '''
     def __init__(self):
+        StreamFreezeThawBase.__init__(self)
         self.stream = None
 
     def teardownSerializationScaffold(self, streamObj = None):
@@ -1137,7 +1135,7 @@ class JSONFreezeThawBase(object):
         Traceback (most recent call last):
         JSONFreezerException: Cannot generate a new object from blah.NotAClass
         '''
-        import music21
+        import music21 # pylint: disable=redefined-outer-name
         idStrOrig = idStr
         if idStr.startswith('music21.'):
             idStr = idStr[8:]
@@ -1380,7 +1378,7 @@ class JSONFreezer(JSONFreezeThawBase):
             return True
         if isinstance(possiblyFreezeable, (list, tuple, dict)):
             return False
-        if six.PY2 and isinstance(possiblyFreezeable, (int, str, unicode, float)):
+        if six.PY2 and isinstance(possiblyFreezeable, (int, str, unicode, float)): # pylint: disable=undefined-variable
             return False
         elif six.PY3 and isinstance(possiblyFreezeable, (int, str, bytes, float)):
             return False 

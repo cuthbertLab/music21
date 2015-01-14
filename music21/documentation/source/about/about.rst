@@ -160,7 +160,7 @@ Licensing and Copyright
 The music21 Toolkit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Music21 is Copyright (c) 2010-14, Michael Scott Cuthbert and cuthbertLab.  
+Music21 is Copyright (c) 2006-15, Michael Scott Cuthbert and cuthbertLab.  
 Music21 code (excluding content encoded in the corpus) is 
 free and open-source software, licensed under the Lesser GNU Public License (LGPL) or the
 BSD License.

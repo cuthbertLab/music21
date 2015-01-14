@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2014 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2006-2015 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
@@ -654,7 +654,6 @@ class Music21Object(object):
             except AttributeError:
                 # not sure of passing here is the best action
                 environLocal.printDebug(['findAttributeInHierarchy call raised attribute error for attribute:', attrName])
-                pass
             if found is None:
                 found = self.activeSite.findAttributeInHierarchy(attrName)
         return found
@@ -1398,27 +1397,27 @@ class Music21Object(object):
         if classFilterList is not None:
             if not common.isListLike(classFilterList):
                 classFilterList = [classFilterList]
-        sites = self.sites.getSites(excludeNone=True)
+        selfSites = self.sites.getSites(excludeNone=True)
         match = None
 
         # store ids of of first sites; might need to take flattened version
         firstSites = []
-        for s in sites:
+        for s in selfSites:
             firstSites.append(id(s))
         # this might use get(sortByCreationTime)
-        #environLocal.printDebug(['sites:', sites])
+        #environLocal.printDebug(['sites:', selfSites])
         #siteSites = []
 
         # first, look in sites that are do not req flat presentation
         # these do not need to be flattened b/c we know the self is in these
         # streams
         memo = {}
-        while len(sites) > 0:
+        while len(selfSites) > 0:
             #environLocal.printDebug(['looking at siteSites:', s])
             # check for duplicated sites; may be possible
-            s = sites.pop(0) # take the first off of sites
+            s = selfSites.pop(0) # take the first off of sites
             try:
-                memo[id(s)]
+                unused = memo[id(s)] 
                 continue # if in dict, do not continue
             except KeyError: # if not in dict
                 memo[id(s)] = None # add to dict, value does not matter
@@ -1432,7 +1431,7 @@ class Music21Object(object):
                 else: # do not flatten first sites
                     target = s
                     # add semi flat to sites, as we have not searched it yet
-                    sites.append(s.semiFlat)
+                    selfSites.append(s.semiFlat)
                 firstSites.pop(firstSites.index(id(s))) # remove for efficiency
             # if flat, do not get semiFlat
             # note that semiFlat streams are marked as isFlat=True
@@ -1448,7 +1447,7 @@ class Music21Object(object):
                 return match
             # append new sites to end of queue
             # these are the sites of s, not target
-            sites += s.sites.getSites(excludeNone=True)
+            selfSites += s.sites.getSites(excludeNone=True)
         # if cannot be found, return None
         return None
 
@@ -2420,7 +2419,7 @@ class Music21Object(object):
 
         if hasattr(e, 'expressions'):
             tempExpressions = e.expressions
-            e.expressions = []
+            e.expressions = [] # pylint: disable=attribute-defined-outside-init
             eRemain.expressions = []
             for thisExpression in tempExpressions:
                 if hasattr(thisExpression, 'tieAttach'):
@@ -2473,7 +2472,7 @@ class Music21Object(object):
                     forceEndTieType = 'continue'
                     # keep continue if already set
             else:
-                e.tie = tie.Tie('start') # need a tie object
+                e.tie = tie.Tie('start') # need a tie object # pylint: disable=attribute-defined-outside-init
 
             eRemain.tie = tie.Tie(forceEndTieType)
 
@@ -2798,7 +2797,7 @@ class Music21Object(object):
                 except SitesException:
                     try:
                         offsetLocal = self.offset
-                    except:
+                    except AttributeError:
                         offsetLocal = 0.0
 
             else: # hope that we get the right one
@@ -3612,8 +3611,7 @@ class Test(unittest.TestCase):
         sInner.append(n)
         sOuter.append(sInner)
 
-        tss = sOuter.asTimespans(classList=(sInner.classes[0],), recurse='semiFlat')
-        tss
+        unused_tss = sOuter.asTimespans(classList=(sInner.classes[0],), recurse='semiFlat') # @UnusedVariable
 
         # append clef to outer stream
         sOuter.insert(0, clef.AltoClef())
@@ -4047,7 +4045,8 @@ class Test(unittest.TestCase):
     def testElementWrapperOffsetAccess(self):
         from music21 import stream, meter
         from music21 import base
-        class Mock(object): pass
+        class Mock(object): 
+            pass
 
         s = stream.Stream()
         s.append(meter.TimeSignature('fast 6/8'))
@@ -4070,8 +4069,9 @@ class Test(unittest.TestCase):
     def testGetActiveSiteTimeSignature(self):
         from music21 import base
         from music21 import stream, meter
-        class Wave_read(object): #_DOCS_HIDE
-            def getnchannels(self): return 2 #_DOCS_HIDE
+        class Wave_read(object): 
+            def getnchannels(self): 
+                return 2
 
         s = stream.Stream()
         s.append(meter.TimeSignature('fast 6/8'))

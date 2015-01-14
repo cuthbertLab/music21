@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2012, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
@@ -841,11 +841,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         7
         ''')
 
-
-
     def _getTerminusLowNodes(self):
-        '''
-        '''
         post = []
         # for now, there is only one
         post.append(self._nodes[TERMINUS_LOW])
@@ -1141,9 +1137,11 @@ class BoundIntervalNetwork(IntervalNetwork):
         return p
 
     def _getUnalteredPitch(self, pitchObj, nodeObj, direction=DIRECTION_BI, 
-        alteredDegrees={}):
+        alteredDegrees=None):
         '''Given a node, get the unaltered pitch.
         '''
+        if alteredDegrees is None:
+            alteredDegrees = {}
         if alteredDegrees != {}:
             #TODO: need to take direction into account
             # do reverse transposition
@@ -1156,7 +1154,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
 
     def nextPitch(self, pitchReference, nodeName, pitchOrigin, 
-        direction=DIRECTION_ASCENDING, stepSize=1, alteredDegrees={}, 
+        direction=DIRECTION_ASCENDING, stepSize=1, alteredDegrees=None, 
         getNeighbor=True):
         '''Given a pitchReference, nodeName, and a pitch origin, return the next pitch. 
 
@@ -1180,6 +1178,9 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net.nextPitch('g', 1, 'a-2', 'ascending', alteredDegrees=alteredDegrees)
         <music21.pitch.Pitch B2>
         '''
+        if alteredDegrees is None:
+            alteredDegrees = {}
+
         if pitchOrigin is None:
             raise Exception("No pitch origin for calling next on this pitch!")
         
@@ -1280,7 +1281,7 @@ class BoundIntervalNetwork(IntervalNetwork):
                 minKey, maxKey, includeFirst)
 
     def _realizeAscending(self, pitchReference, nodeId=None, 
-        minPitch=None, maxPitch=None, alteredDegrees={},
+        minPitch=None, maxPitch=None, alteredDegrees=None,
         fillMinMaxIfNone=False):
         '''Given a reference pitch, realize downward to a minimum.
 
@@ -1303,6 +1304,8 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> nodeKeys
         ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh']
         '''
+        if alteredDegrees is None:
+            alteredDegrees = {}
         # get first node if no node is provided
         if isinstance(nodeId, Node):
             nodeObj = nodeId
@@ -1432,7 +1435,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
 
     def _realizeDescending(self, pitchReference, nodeId=None, 
-        minPitch=None, maxPitch=None, alteredDegrees={}, 
+        minPitch=None, maxPitch=None, alteredDegrees=None, 
         includeFirst=False, fillMinMaxIfNone=False, reverse=True):
         '''
         Given a reference pitch, realize downward to a minimum.
@@ -1480,6 +1483,8 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> nodeKeys        
         ['terminusLow', 0, 1, 2, 3, 4, 5]
         '''
+        if alteredDegrees is None:
+            alteredDegrees = {}
 
         # get first node if no node is provided
         if isinstance(nodeId, Node):
@@ -1610,7 +1615,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
 
     def realize(self, pitchReference, nodeId=None, minPitch=None, maxPitch=None, 
-        direction=DIRECTION_ASCENDING, alteredDegrees={}, reverse=False):
+        direction=DIRECTION_ASCENDING, alteredDegrees=None, reverse=False):
         '''
         Realize the nodes of this network based on a pitch assigned to a 
         valid `nodeId`, where `nodeId` can be specified by integer 
@@ -1645,6 +1650,9 @@ class BoundIntervalNetwork(IntervalNetwork):
         ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh', 0, 1, 2, 3, 4, 5, 'terminusHigh']
 
         '''
+        if alteredDegrees is None:
+            alteredDegrees = {}
+
         # get first node if no node is provided
         #environLocal.printDebug(['got pre pitch:', pre])
         #environLocal.printDebug(['got pre node:', preNodeId])
@@ -1791,7 +1799,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
 
     def realizePitch(self, pitchReference, nodeId=None, minPitch=None,
-        maxPitch=None, direction=DIRECTION_ASCENDING, alteredDegrees={}, 
+        maxPitch=None, direction=DIRECTION_ASCENDING, alteredDegrees=None, 
         reverse=False):
         '''
         Realize the native nodes of this network based on a pitch 
@@ -1836,6 +1844,9 @@ class BoundIntervalNetwork(IntervalNetwork):
         ['C2', 'G2', 'D3', 'A3', 'E4', 'B4', 'F#5', 'D-6', 'A-6', 'E-7', 'B-7', 'F8', 'C9']
 
         '''
+        if alteredDegrees is None:
+            alteredDegrees = {}
+
         components = self.realize(pitchReference=pitchReference, 
                             nodeId=nodeId, 
                             minPitch=minPitch, 
@@ -1849,7 +1860,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
 
     def realizeIntervals(self, nodeId=None, minPitch=None,
-        maxPitch=None, direction=DIRECTION_ASCENDING, alteredDegrees={}, 
+        maxPitch=None, direction=DIRECTION_ASCENDING, alteredDegrees=None, 
         reverse=False):
         '''Realize the sequence of intervals between the specified pitches, or the termini. 
 
@@ -1860,6 +1871,8 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net.realizeIntervals()
         [<music21.interval.Interval M2>, <music21.interval.Interval M2>, <music21.interval.Interval m2>, <music21.interval.Interval M2>, <music21.interval.Interval M2>, <music21.interval.Interval M2>, <music21.interval.Interval m2>]
         '''
+        if alteredDegrees is None:
+            alteredDegrees = {}
         # note: there may be a more efficient way to do this, but we still
         # need to realize the intervals due to probabilistic selection
 
@@ -1880,7 +1893,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
 
 
-    def realizeTermini(self, pitchReference, nodeId=None, alteredDegrees={}):
+    def realizeTermini(self, pitchReference, nodeId=None, alteredDegrees=None):
         '''Realize the pitches of the 'natural' terminus of a network. This (presently) must be done by ascending, and assumes only one valid terminus for both extremes. 
 
         This suggests that in practice termini should not be affected by directionality. 
@@ -1894,6 +1907,8 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net.realizeTermini(pitch.Pitch('a6'))
         (<music21.pitch.Pitch A6>, <music21.pitch.Pitch A7>)
         '''
+        if alteredDegrees is None:
+            alteredDegrees = {}
         # must do a non-directed realization with no min/max
         # will go up from reference, then down from refernce, stopping
         # at the termini
@@ -1913,7 +1928,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         #environLocal.printDebug(['realizeTermini()', 'pList', mergedPitches, 'pitchReference', pitchReference, 'nodeId', nodeId])
         return mergedPitches[0], mergedPitches[-1]
 
-    def realizeMinMax(self, pitchReference, nodeId=None, alteredDegrees={}):
+    def realizeMinMax(self, pitchReference, nodeId=None, alteredDegrees=None):
         '''Realize the min and max pitches of the scale, or the min and max values found between two termini. 
 
         This suggests that min and max might be beyond the terminus. 
@@ -1923,6 +1938,8 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net = intervalNetwork.BoundIntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         '''
+        if alteredDegrees is None:
+            alteredDegrees = {}
         # only cache if altered degrees is None
         if len(alteredDegrees) == 0:
             # if pitch reference is a string, take it as it is
@@ -2006,9 +2023,9 @@ class BoundIntervalNetwork(IntervalNetwork):
         return minPitch, maxPitch
 
     def realizePitchByDegree(self, pitchReference, nodeId=None, 
-        nodeDegreeTargets=[1],
+        nodeDegreeTargets=(1,),
         minPitch=None, maxPitch=None, direction=DIRECTION_ASCENDING,
-        alteredDegrees={}):
+        alteredDegrees=None):
         '''
         Realize the native nodes of this network based on 
         a pitch assigned to a valid `nodeId`, where `nodeId` can 
@@ -2051,6 +2068,8 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net.realizePitchByDegree('G', 7, [1], 'c2', 'f2')
         []
         '''
+        if alteredDegrees is None:
+            alteredDegrees = {}
         realizedPitch, realizedNode = self.realize(
             pitchReference=pitchReference, nodeId=nodeId, 
             minPitch=minPitch, maxPitch=maxPitch, 
@@ -2153,7 +2172,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
     def getRelativeNodeId(self, pitchReference, nodeName, pitchTarget, 
         comparisonAttribute='ps', direction=DIRECTION_ASCENDING, 
-        alteredDegrees={}):
+        alteredDegrees=None):
         '''
         Given a reference pitch assigned to node id, determine the 
         relative node id of pitchTarget, even if displaced over multiple octaves
@@ -2185,6 +2204,8 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net.getRelativeNodeId('a', 1, 'b-4') == None
         True
         '''
+        if alteredDegrees is None:
+            alteredDegrees = {}
         # TODO: this always takes the first: need to add weighted selection
         if nodeName == None: # assume first
             nodeId = self._getTerminusLowNodes()[0]
@@ -2240,7 +2261,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
 
     def getNeighborNodeIds(self, pitchReference, nodeName, pitchTarget,
-        direction=DIRECTION_ASCENDING, alteredDegrees={}):
+        direction=DIRECTION_ASCENDING, alteredDegrees=None):
         '''Given a reference pitch assigned to a node id, determine the node ids that neighbor this pitch.
 
         Returns None if an exact match.
@@ -2253,6 +2274,8 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net.getNeighborNodeIds('c4', 1, 'b')
         (5, 'terminusHigh')
         '''
+        if alteredDegrees is None:
+            alteredDegrees = {}
         # TODO: this takes the first, need to add probabilistic selection
         if nodeName == None: # assume first
             nodeId = self._getTerminusLowNodes()[0]
@@ -2294,7 +2317,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
     def getRelativeNodeDegree(self, pitchReference, nodeName, pitchTarget, 
         comparisonAttribute='ps', direction=DIRECTION_ASCENDING, 
-        alteredDegrees={}):
+        alteredDegrees=None):
         '''
         Given a reference pitch assigned to node id, 
         determine the relative node degree of pitchTarget, 
@@ -2393,7 +2416,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
     def getPitchFromNodeDegree(self, pitchReference, nodeName, nodeDegreeTarget, 
         direction=DIRECTION_ASCENDING, minPitch=None, 
-        maxPitch=None, alteredDegrees={}, equateTermini=True):
+        maxPitch=None, alteredDegrees=None, equateTermini=True):
         '''Given a reference pitch assigned to node id, determine the pitch for the target node degree. 
 
         
@@ -2532,7 +2555,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
 
     def match(self, pitchReference, nodeId, pitchTarget, 
-        comparisonAttribute='pitchClass', alteredDegrees={}):
+        comparisonAttribute='pitchClass', alteredDegrees=None):
         '''Given one or more pitches in `pitchTarget`, return a 
         tuple of a list of matched pitches, and a list of unmatched pitches. 
 
@@ -2566,6 +2589,8 @@ class BoundIntervalNetwork(IntervalNetwork):
         [<music21.pitch.Pitch B2>]
 
         '''
+        if alteredDegrees is None:
+            alteredDegrees = {}
         # these return a Node, not a nodeId
         # TODO: just getting first
         if nodeId == None: # assume first
@@ -2603,7 +2628,7 @@ class BoundIntervalNetwork(IntervalNetwork):
     def findMissing(self, pitchReference, nodeId, 
             pitchTarget, comparisonAttribute='pitchClass', 
             minPitch=None, maxPitch=None, 
-            direction=DIRECTION_ASCENDING, alteredDegrees={}):
+            direction=DIRECTION_ASCENDING, alteredDegrees=None):
         '''Find all pitches in the realized scale that are not in the pitch target network based on the comparison attribute. 
 
         
@@ -2614,6 +2639,8 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net.findMissing('g', 1, ['g', 'a', 'b', 'd', 'f#'])
         [<music21.pitch.Pitch C5>, <music21.pitch.Pitch E5>]
         '''
+        if alteredDegrees is None:
+            alteredDegrees = {}
             
         # these return a Node, not a nodeId
         if nodeId == None: # assume first
@@ -2645,7 +2672,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
 
     def find(self, pitchTarget, resultsReturned=4, 
-        comparisonAttribute='pitchClass', alteredDegrees={}):
+        comparisonAttribute='pitchClass', alteredDegrees=None):
         '''Given a collection of pitches, test all transpositions of a realized version of this network, and return the number of matches in each for each pitch assigned to the first node. 
 
         
@@ -2671,6 +2698,8 @@ class BoundIntervalNetwork(IntervalNetwork):
 #                   pitch.Pitch('g#'), pitch.Pitch('a'),
 #                   pitch.Pitch('a#'), pitch.Pitch('b'),
 #                 ]:
+        if alteredDegrees is None:
+            alteredDegrees = {}
 
         for p in [pitch.Pitch('c'), pitch.Pitch('c#'), pitch.Pitch('d-'),
                   pitch.Pitch('d'), pitch.Pitch('d#'), pitch.Pitch('e-'),
@@ -2678,7 +2707,7 @@ class BoundIntervalNetwork(IntervalNetwork):
                   pitch.Pitch('f#'), pitch.Pitch('g'),
                   pitch.Pitch('g#'), pitch.Pitch('a'), pitch.Pitch('b-'),
                   pitch.Pitch('b'), pitch.Pitch('c-'),
-                ]:
+                ]:  # TODO: Study this: can it be sped up with cached Pitch objects?
 
 
             # realize scales from each pitch, and then compare to pitchTarget   
@@ -2700,9 +2729,6 @@ class BoundIntervalNetwork(IntervalNetwork):
         transposes the pitch according to the given interval object and
         uses the simplification of the `pitchSimplification` property
         to simplify it afterwards.
-        
-        
-        
         
         >>> b = intervalNetwork.BoundIntervalNetwork()
         >>> b.pitchSimplification # default
@@ -3104,15 +3130,14 @@ class Test(unittest.TestCase):
         "([D4, E4, F#4, G4, A4, B4, C5, D5, E5, F#5, G5, A5, B5, C6, D6], [3, 4, 5, 'terminusLow', 0, 1, 2, 3, 4, 5, 'terminusLow', 0, 1, 2, 3])"
         )
 
-
         self.assertEqual(self.realizePitchOut(net._realizeAscending('c3', 1)), 
-                         "([C3, D3, E3, F3, G3, A3, B3, C4], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])"), 
+                         "([C3, D3, E3, F3, G3, A3, B3, C4], ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])") 
 
         self.assertEqual(self.realizePitchOut(net._realizeAscending('g#2', 3)), 
-                         "([G#2, A2, B2, C#3, D#3, E3], [1, 2, 3, 4, 5, 'terminusHigh'])"), 
+                         "([G#2, A2, B2, C#3, D#3, E3], [1, 2, 3, 4, 5, 'terminusHigh'])") 
 
         self.assertEqual(self.realizePitchOut(net._realizeAscending('g#2', 3, maxPitch='e4')), 
-                         "([G#2, A2, B2, C#3, D#3, E3, F#3, G#3, A3, B3, C#4, D#4, E4], [1, 2, 3, 4, 5, 'terminusHigh', 0, 1, 2, 3, 4, 5, 'terminusHigh'])"), 
+                         "([G#2, A2, B2, C#3, D#3, E3, F#3, G#3, A3, B3, C#4, D#4, E4], [1, 2, 3, 4, 5, 'terminusHigh', 0, 1, 2, 3, 4, 5, 'terminusHigh'])") 
 
 
 
@@ -3127,27 +3152,31 @@ class Test(unittest.TestCase):
 
         # here, min and max pitches are assumed based on ascending scale
         # otherwise, only a single pitch would be returned (the terminus low)
-        self.assertEqual(self.realizePitchOut(net.realize('g4', 1, 
-        direction=DIRECTION_DESCENDING)), "([G4, A4, B-4, C5, D5, E-5, F5, G5], ['terminusLow', 0, 1, 2, 3, 5, 7, 'terminusLow'])")
+        self.assertEqual(self.realizePitchOut(net.realize('g4', 1, direction=DIRECTION_DESCENDING)), 
+                         "([G4, A4, B-4, C5, D5, E-5, F5, G5], ['terminusLow', 0, 1, 2, 3, 5, 7, 'terminusLow'])")
 
 
         # if explicitly set terminus to high, we get the expected range, 
         # but now the reference pitch is the highest pitch
-        self.assertEqual(self.realizePitchOut(net.realize('g4', 'high', direction=DIRECTION_DESCENDING)), "([G3, A3, B-3, C4, D4, E-4, F4, G4], ['terminusLow', 0, 1, 2, 3, 5, 7, 'terminusHigh'])" )
+        self.assertEqual(self.realizePitchOut(net.realize('g4', 'high', direction=DIRECTION_DESCENDING)), 
+                         "([G3, A3, B-3, C4, D4, E-4, F4, G4], ['terminusLow', 0, 1, 2, 3, 5, 7, 'terminusHigh'])" )
 
         # get nothing from if try to request a descending scale from the 
         # lower terminus
         self.assertEqual(str(net._realizeDescending('g4', 'low', fillMinMaxIfNone=False)), "([], [])" )
 
 
-        self.assertEqual(self.realizePitchOut(net._realizeDescending('g4', 'low', fillMinMaxIfNone=True)), "([G4, A4, B-4, C5, D5, E-5, F5], ['terminusLow', 0, 1, 2, 3, 5, 7])")
+        self.assertEqual(self.realizePitchOut(net._realizeDescending('g4', 'low', fillMinMaxIfNone=True)), 
+                         "([G4, A4, B-4, C5, D5, E-5, F5], ['terminusLow', 0, 1, 2, 3, 5, 7])")
 
         # if we include first, we get all values
-        self.assertEqual(self.realizePitchOut(net._realizeDescending('g4', 'low', includeFirst=True, fillMinMaxIfNone=True)), "([G4, A4, B-4, C5, D5, E-5, F5, G5], ['terminusLow', 0, 1, 2, 3, 5, 7, 'terminusLow'])")
+        self.assertEqual(self.realizePitchOut(net._realizeDescending('g4', 'low', includeFirst=True, fillMinMaxIfNone=True)), 
+                         "([G4, A4, B-4, C5, D5, E-5, F5, G5], ['terminusLow', 0, 1, 2, 3, 5, 7, 'terminusLow'])")
 
         # because this is octave repeating, we can get a range when min 
         # and max are defined
-        self.assertEqual(self.realizePitchOut(net._realizeDescending('g4', 'low', 'g4', 'g5')), "([G4, A4, B-4, C5, D5, E-5, F5], ['terminusLow', 0, 1, 2, 3, 5, 7])"  )
+        self.assertEqual(self.realizePitchOut(net._realizeDescending('g4', 'low', 'g4', 'g5')), 
+                         "([G4, A4, B-4, C5, D5, E-5, F5], ['terminusLow', 0, 1, 2, 3, 5, 7])"  )
 
 
 
