@@ -225,29 +225,29 @@ class ContourFinder(object):
             window = 1
             
                 
-        '''
-        if cType in self._contours:
-            if overwrite is False:
-                if metric is not None:
-                    raise OverwriteException("Attempted to calculate a different value for metric %s but did not specify overwrite=True" % cType)
-                else:
-                    return self._contours[cType] #already calculated!
-            else: #overwrite something we already have cached
-                
-        elif cType in self._metrics:
-            if metric is not None:
-                if overwrite is False:
-                    #trying to overwrite something... raise an exception
-                    raise OverwriteException("Attempted to overwrite metric for %s but did not specify overwrite=True" % cType)
-                else:
-                    self._metrics[cType] = (metric, needsChordify)
-            elif overwrite: #overwrite is true, we are not given a metric, but we have one stored.  
-                pass
-            else:
-                metric, needsChordify = self._metrics[cType]
-        else:
-            self._metrics[cType] = (metric, needsChordify) 
-        '''
+#         
+#         if cType in self._contours:
+#             if overwrite is False:
+#                 if metric is not None:
+#                     raise OverwriteException("Attempted to calculate a different value for metric %s but did not specify overwrite=True" % cType)
+#                 else:
+#                     return self._contours[cType] #already calculated!
+#             else: #overwrite something we already have cached
+#                 
+#         elif cType in self._metrics:
+#             if metric is not None:
+#                 if overwrite is False:
+#                     #trying to overwrite something... raise an exception
+#                     raise OverwriteException("Attempted to overwrite metric for %s but did not specify overwrite=True" % cType)
+#                 else:
+#                     self._metrics[cType] = (metric, needsChordify)
+#             elif overwrite: #overwrite is true, we are not given a metric, but we have one stored.  
+#                 pass
+#             else:
+#                 metric, needsChordify = self._metrics[cType]
+#         else:
+#             self._metrics[cType] = (metric, needsChordify) 
+#         
         contour = self.getContourValuesForMetric(metric, window, slide, needsChordify)
         
         if normalized:
@@ -577,12 +577,12 @@ class AggregateContour(object):
             contour = self.getCombinedContour(cType)
         
         
-        '''
-        elif cType not in self._aggContoursAsList:
-            contour = self.getCombinedContour(cType)
-        else:
-            contour = self._aggContoursAsList[cType]
-        '''
+        
+#         elif cType not in self._aggContoursAsList:
+#             contour = self.getCombinedContour(cType)
+#         else:
+#             contour = self._aggContoursAsList[cType]
+#         
         (plt, numpy) = _getExtendedModules() #@UnusedVariable
 
         x, y = zip(*contour)   
@@ -670,29 +670,29 @@ def _runExperiment():
         
         currentNum +=1
           
-        '''          
-        if chorale == 'bach/bwv277':
-            continue    #this chorale here has an added measure container randomly in the middle which breaks things.  
-        '''
+#         '''          
+#         if chorale == 'bach/bwv277':
+#             continue    #this chorale here has an added measure container randomly in the middle which breaks things.  
+#         '''
         chorale = corpus.parse(chorale)
         
-        '''
-        if len(chorale.parts) is not 4:
-            print("chorale had too many parts")
-            continue
-        '''
+#         '''
+#         if len(chorale.parts) is not 4:
+#             print("chorale had too many parts")
+#             continue
+#         '''
         
         chorale = repeat.RepeatFinder(chorale).simplify()
         
-        '''
-        length = len( chorale.measureOffsetMap() )
-        if length < 10:
-            print("too short")
-            continue
-        elif length > 25:
-            print("too long")
-            continue
-        '''
+#         '''
+#         length = len( chorale.measureOffsetMap() )
+#         if length < 10:
+#             print("too short")
+#             continue
+#         elif length > 25:
+#             print("too long")
+#             continue
+#         '''
         cf= ContourFinder(chorale)
         ac.addPieceToContour(cf, 'dissonance')
         ac.addPieceToContour(cf, 'tonality')
@@ -710,8 +710,7 @@ def _runExperiment():
         totalSuccesses = 0
         totalFailures = 0
         
-        for j in range( len(ac.aggContours[cType])): #                        contDict in ac._aggContours[cType]:
-            
+        for j in range( len(ac.aggContours[cType])): 
             contDict = ac.aggContours[cType][j]
             
             observed = ac.dissimilarityScore(cType, contDict)
@@ -742,7 +741,7 @@ def _plotChoraleContours():
         #cf.plot('dissonance', fileName= chorale + 'dissonance', regression=False)
         try:
             cf.plot('tonality', fileName= chorale + 'tonality', regression=False)
-        except:
+        except exceptions21.Music21Exception:
             print(chorale)
             s.show()
             break

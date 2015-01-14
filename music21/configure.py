@@ -35,6 +35,10 @@ try:
 except ImportError:
     from io import StringIO # python3 (also in python 2.6+)
 
+try:
+    input = raw_input # @ReservedAssignment # pylint: disable=undefined-variable
+except NameError:
+    pass
 
 # assume that we will manually add this dire to sys.path top get access to
 # all modules before installation
@@ -141,7 +145,7 @@ def findInstallations():
             found.append(os.path.join(sitePackages, fn))
     try:
         # see if we can import music21
-        import music21
+        import music21 # pylint: disable=redefined-outer-name
         found.append(music21.__path__[0]) # list, get first item
     except ImportError:
         pass
@@ -175,7 +179,7 @@ def getUserData():
     '''
     post = {}
     try:
-        import music21
+        import music21 # pylint: disable=redefined-outer-name
         post['music21.version'] = music21.VERSION_STR
     except ImportError:
         post['music21.version'] = 'None'
@@ -249,9 +253,6 @@ def findSetup():
                         
     environLocal.printDebug(['found setup.py: %s' % match])
     return match
-
-
-
     
 
 #-------------------------------------------------------------------------------
@@ -354,12 +355,12 @@ class Dialog(object):
         '''Collect from user; return None if an empty response.
         '''
         try:
-            post = raw_input()
+            post = input()
             return post
         except KeyboardInterrupt:
             # store as own class so as a subclass of dialog error
             return KeyInterruptError()
-        except:
+        except Exception: # pylint: disable=broad-except
             return DialogError()
         return NoInput()
 
@@ -572,9 +573,9 @@ class Dialog(object):
 
     def _performAction(self, simulate=False):
         '''
+        does nothing; redefine in subclass
         '''
         pass 
-        # define in subclass
 
     def performAction(self, simulate=False):
         '''After getting a result, the query might require an action to be performed. If result is None, this will use whatever value is found in _result. 
@@ -591,10 +592,10 @@ class Dialog(object):
         else:
             try:
                 self._performAction(simulate=simulate)
-            except DialogError:
+            except DialogError: # pylint: disable=catching-non-exception
                 # in some cases, the action selected requires exciting the 
                 # configuration assistant
-                raise DialogError('perform action raised a dialog exception')
+                raise DialogError('perform action raised a dialog exception') # pylint: disable=raising-non-exception
 
 
 #-------------------------------------------------------------------------------
@@ -773,7 +774,7 @@ class AskOpenInBrowser(YesOrNo):
             try:
                 import webbrowser
                 hasWebbrowser = True
-            except:
+            except ImportError:
                 pass
             
             if hasWebbrowser is True:
@@ -791,8 +792,6 @@ class AskOpenInBrowser(YesOrNo):
 
 class AskInstall(YesOrNo):
     '''Ask the user if they want to enable auto-downloading
-
-    
     '''
     def __init__(self, default=True, tryAgain=True,
         promptHeader=None):
@@ -806,8 +805,6 @@ class AskInstall(YesOrNo):
 
 
     def _performActionNix(self, simulate=False):
-        '''
-        '''
         fp = findSetup()
         if fp is not None:
 
@@ -852,10 +849,13 @@ class AskSendInstallationReport(YesOrNo):
     
     '''
     def __init__(self, default=True, tryAgain=True,
-        promptHeader=None, additionalEntries={}):
+        promptHeader=None, additionalEntries=None):        
         YesOrNo.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
 
+        if additionalEntries is None:
+            additionalEntries = {}
         self._additionalEntries = additionalEntries
+        
         msg = 'Would you like to send a pre-formatted email to music21 regarding your installation? Installation reports help us make music21 work better for you'
         self.appendPromptHeader(msg)
 
@@ -895,7 +895,7 @@ class AskSendInstallationReport(YesOrNo):
             try:
                 import webbrowser
                 hasWebbrowser = True
-            except:
+            except ImportError:
                 pass
 
             if hasWebbrowser is True:
@@ -968,7 +968,7 @@ class SelectFromList(Dialog):
             return False
         else: # must be True or False
             if post not in [True, False]:
-                raise DialogError('_askFillEmptyList(): sub-command returned non True/False value')
+                raise DialogError('_askFillEmptyList(): sub-command returned non True/False value') # pylint: disable=raising-non-exception
             return post
 
     def _preAskUser(self, force=None):
@@ -1064,9 +1064,8 @@ class SelectFromList(Dialog):
 
 
 class AskAutoDownload(SelectFromList):
-    '''General class to select values from a list.
-
-    
+    '''
+    General class to select values from a list.    
     '''
     def __init__(self, default=1, tryAgain=True, promptHeader=None):
         SelectFromList.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
@@ -1117,6 +1116,7 @@ class AskAutoDownload(SelectFromList):
 
     def _performAction(self, simulate=False):
         '''
+        override base.
         '''
         result = self.getResult()
         if result in [1, 2, 3]: 
@@ -1225,25 +1225,31 @@ class SelectMusicXMLReader(SelectFilePath):
         return ['Defining an XML Reader permits automatically opening music21-generated MusicXML in an editor for display and manipulation when calling the show() method. Setting this option is highly recommended.', ' ']
 
     def _getMusicXMLReaderDarwin(self):
-        '''Get all possible finale paths on Darwin
+        '''Get all possible Finale paths on Darwin
         '''
         # order here results in ranks
         def comparisonFinale(name):
             m = reFinaleApp.match(name)
-            if m is not None: return True
-            else: return False
+            if m is not None: 
+                return True
+            else: 
+                return False
         results = self._getDarwinApp(comparisonFinale)
 
         def comparisonMuseScore(name):
             m = reMuseScoreApp.match(name)
-            if m is not None: return True
-            else: return False
+            if m is not None: 
+                return True
+            else: 
+                return False
         results += self._getDarwinApp(comparisonMuseScore)
 
         def comparisonFinaleReader(name):
             m = reFinaleReaderApp.match(name)
-            if m is not None: return True
-            else: return False
+            if m is not None: 
+                return True
+            else: 
+                return False
         results += self._getDarwinApp(comparisonFinaleReader)
 
         return results
@@ -1406,10 +1412,12 @@ class ConfigurationAssistant(object):
         msg.append(' ') # add a space
         writeToUser(msg)
 
-    def run(self, forceList=[]):
+    def run(self, forceList=None):
         '''
         The forceList, if provided, is a list of string arguments passed in order to the included dialogs. Used for testing. 
         '''
+        if forceList is None:
+            forceList = []
         self._hr()
         self._introduction()
 
@@ -1462,7 +1470,7 @@ class ConfigurationAssistant(object):
 # 
 #     def run(self):
 #         self.printPrompt() # print on first call
-#         self.status = raw_input()
+#         self.status = input()
 # 
 # 
 # def getResponseOrTimeout(prompt='provide a value', timeOutTime=16):
@@ -1512,19 +1520,19 @@ class TestExternal(unittest.TestCase):
         pass
 
     def testYesOrNo(self):
-        print
+        print()
         environLocal.printDebug(['starting: YesOrNo()'])
         d = YesOrNo()
         d.askUser()
         environLocal.printDebug(['getResult():', d.getResult()])
 
-        print
+        print()
         environLocal.printDebug(['starting: YesOrNo(default=True)'])
         d = YesOrNo(default=True)
         d.askUser()
         environLocal.printDebug(['getResult():', d.getResult()])
 
-        print
+        print()
         environLocal.printDebug(['starting: YesOrNo(default=False)'])
         d = YesOrNo(default=False)
         d.askUser()
@@ -1532,7 +1540,6 @@ class TestExternal(unittest.TestCase):
 
 
     def testSelectMusicXMLReader(self):
-
         print()
         environLocal.printDebug(['starting: SelectMusicXMLReader()'])
         d = SelectMusicXMLReader()
@@ -1570,18 +1577,18 @@ class TestExternal(unittest.TestCase):
         environLocal.printDebug(['starting: SelectMusicXMLReader()'])
         d = SelectMusicXMLReader()
         # force request to user by returning no valid results
-        def getValidResults(force=None): return []
+        def getValidResults(force=None): 
+            return []
+        
         d._getValidResults = getValidResults
         d.askUser()
         environLocal.printDebug(['getResult():', d.getResult()])
         d.performAction()
 
 
-
     def testConfigurationAssistant(self):
-
-        ca = ConfigurationAssistant(simulate=True)
-        ca.run()
+        configAsst = ConfigurationAssistant(simulate=True)
+        configAsst.run()
 
         
 
@@ -1627,7 +1634,9 @@ class Test(unittest.TestCase):
         from music21 import configure
         d = configure.SelectMusicXMLReader()
         # force request to user by returning no valid results
-        def getValidResults(force=None): return []
+        def getValidResults(force=None): 
+            return []
+        
         d._getValidResults = getValidResults
         d.askUser('n') # reject option to open in a browser
         post = d.getResult()
@@ -1635,7 +1644,6 @@ class Test(unittest.TestCase):
         self.assertEqual(isinstance(post, configure.BadConditions), True)
 
     def testRe(self):
-        
         g = reFinaleApp.match('Finale 2011.app')
         self.assertEqual(g.group(0), 'Finale 2011.app')
 
@@ -1666,7 +1674,6 @@ class Test(unittest.TestCase):
 
         
     def testGetUserData2(self):
-
         unused_d = AskAutoDownload()
 #         d.askUser()
 #         d.getResult()
@@ -1674,7 +1681,6 @@ class Test(unittest.TestCase):
 
 
     def testAnyKey(self):
-
         unused_d = AnyKey()
 #         d.askUser()
 #         d.getResult()

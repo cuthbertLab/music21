@@ -12,6 +12,9 @@
 
 '''This module defines objects for describing tempo and changes in tempo.
 '''
+
+from __future__ import unicode_literals
+
 import unittest
 import copy
 
@@ -452,7 +455,8 @@ class MetronomeMark(TempoIndication):
     text = property(_getText, _setText, doc = 
         '''Get or set a text string for this MetronomeMark. Internally implemented as a :class:`~music21.tempo.TempoText` object, which stores the text in a :class:`~music21.expression.TextExpression` object. 
 
-        >>> from __future__ import unicode_literals        
+        >>> from __future__ import unicode_literals
+        
         >>> mm = tempo.MetronomeMark(number=123)
         >>> mm.text == None 
         True

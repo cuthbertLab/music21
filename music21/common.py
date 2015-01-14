@@ -932,7 +932,7 @@ def isNum(usrData):
         # TODO: this may have unexpected consequences: find
         dummy = usrData + 0
         return True
-    except Exception:
+    except Exception: # pylint: disable=broad-except
         return False
 
 #     if (isinstance(usrData, int) or
@@ -1064,7 +1064,7 @@ def toUnicode(usrStr):
             return usrStr
     else:
         try:
-            usrStr = unicode(usrStr, 'utf-8')
+            usrStr = unicode(usrStr, 'utf-8') # pylint: disable=undefined-variable
         # some documentation may already be in unicode; if so, a TypeException will be raised
         except TypeError: #TypeError: decoding Unicode is not supported
             pass
@@ -1831,8 +1831,8 @@ def getSourceFilePath():
     Get the music21 directory that contains source files. This is not the same as the
     outermost package development directory.
     '''
-    import music21
-    fpMusic21 = music21.__path__[0] # list, get first item
+    import music21 # pylint: disable=redefined-outer-name
+    fpMusic21 = music21.__path__[0] # list, get first item 
     # use corpus as a test case
     if 'stream' not in os.listdir(fpMusic21):
         raise Exception('cannot find expected music21 directory: %s' % fpMusic21)
@@ -1905,7 +1905,7 @@ def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
     If `packageOnly` is true, only directories with __init__.py files are colllected.
     '''
     if fpMusic21 == None:
-        import music21
+        import music21 # pylint: disable=redefined-outer-name
         fpMusic21 = music21.__path__[0] # list, get first item
 
     # a test if this is the correct directory
@@ -2154,7 +2154,7 @@ def normalizeFilename(name):
         name = name[:lenName -4]
 
     if isinstance(name, str) and six.PY2:
-        name = unicode(name)
+        name = unicode(name) # pylint: disable=undefined-variable
 
     name = unicodedata.normalize('NFKD', name)
     if six.PY2:
@@ -2445,9 +2445,9 @@ class TestMock(object):
             setattr(new, name, newValue)
         return new
 
-    def __copy__(self, memo=None):
+    def __copy__(self):
         self.environLocal.printDebug(['copy called'])
-        return copy.copy(self, memo)
+        return copy.copy(self)
 
     property1 = property(_get1, _set1)
     property2 = property(_get1, _set1)

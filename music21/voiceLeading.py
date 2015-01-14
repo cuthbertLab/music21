@@ -1472,7 +1472,7 @@ class VerticalityTriplet(VerticalityNTuplet):
         if unaccentedOnly:
             try:
                 ret = ret and (self.tnlsDict[partNumToIdentify].n2.beatStrength < 0.5)
-            except (AttributeError, NameError):
+            except (AttributeError, NameError, base.Music21ObjectException):
                 pass
         return ret and self.chordList[0].isConsonant() and not self.chordList[1].isConsonant() and self.chordList[2].isConsonant()
 
@@ -1504,7 +1504,7 @@ class VerticalityTriplet(VerticalityNTuplet):
         if unaccentedOnly:
             try:
                 ret = ret and (self.tnlsDict[partNumToIdentify].n2.beatStrength < 0.5)
-            except (AttributeError, NameError):
+            except (AttributeError, NameError, base.Music21ObjectException):
                 pass
         return ret and not self.chordList[1].isConsonant()
 

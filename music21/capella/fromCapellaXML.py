@@ -698,7 +698,7 @@ class CapellaImporter(object):
         'F'
         >>> clefObject.line
         1
-        >>> clefObject.octaveShift
+        >>> clefObject.octaveChange
         1
         '''
         if 'clef' in clefSign._attrs:
