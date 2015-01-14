@@ -304,8 +304,8 @@ _deregisteredSubconverters = [] # default subconverters to skip
 
 def _resetSubconverters():
     '''hidden method to reset state'''
-    global _registeredSubconverters
-    global _deregisteredSubconverters
+    global _registeredSubconverters # pylint: disable=global-statement
+    global _deregisteredSubconverters # pylint: disable=global-statement
     _registeredSubconverters = []
     _deregisteredSubconverters = []
 
@@ -365,8 +365,8 @@ def unregisterSubconverter(removeSubconverter):
     >>> converter._resetSubconverters() #_DOCS_HIDE
 
     '''
-    global _registeredSubconverters
-    global _deregisteredSubconverters
+    global _registeredSubconverters # pylint: disable=global-statement
+    global _deregisteredSubconverters # pylint: disable=global-statement
     if removeSubconverter == 'all':
         _registeredSubconverters = []
         _deregisteredSubconverters = ['all']
@@ -471,7 +471,7 @@ class Converter(object):
             environLocal.printDebug("Loading Pickled version")
             try:
                 self._thawedStream = thaw(fpPickle, zipType='zlib')
-            except:
+            except freezeThaw.FreezeThawException:
                 environLocal.warn("Could not parse pickle, %s ...rewriting" % fpPickle)
                 os.remove(fpPickle)
                 self.parseFileNoPickle(fp, number, format, forceSource)
@@ -629,23 +629,23 @@ class Converter(object):
 
         >>> converter._resetSubconverters() #_DOCS_HIDE
         '''
-        subConverters = []
+        subConverterList = []
         if len(_registeredSubconverters) > 0:
             for reg in _registeredSubconverters:
                 #print reg
-                subConverters.append(reg)
+                subConverterList.append(reg)
 
         if len(_deregisteredSubconverters) > 0 and _deregisteredSubconverters[0] == 'all':
             pass
         else:
-            subConverters.extend(self.defaultSubconverters())
+            subConverterList.extend(self.defaultSubconverters())
             if len(_deregisteredSubconverters) > 0:
                 for unreg in _deregisteredSubconverters:
                     try:
-                        subConverters.remove(unreg)
+                        subConverterList.remove(unreg)
                     except ValueError:
                         pass
-        return subConverters
+        return subConverterList
 
     def defaultSubconverters(self):
         '''
@@ -1479,10 +1479,15 @@ class Test(unittest.TestCase):
 
     def testConversionMidiBasic(self):
         directory = common.getPackageDir(relative=False, remapSep=os.sep)
+        fp = None
         for fp in directory:
             if fp.endswith('midi'):
                 break
-
+        else:
+            raise ConverterException('Could not find a directory with MIDI')
+        if fp is None:
+            raise ConverterException('Could not find a directory with MIDI')
+             
         dirLib = os.path.join(fp, 'testPrimitive')
         # a simple file created in athenacl
         fp = os.path.join(dirLib, 'test01.mid')
