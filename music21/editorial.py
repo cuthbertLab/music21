@@ -18,7 +18,7 @@ Editorial objects store comments and other meta-data associated with specific
 import unittest
 from music21 import exceptions21
 from music21.common import SlottedObject
-
+from music21.ext import six
 
 #------------------------------------------------------------------------------
 
@@ -221,7 +221,10 @@ class NoteEditorial(SlottedObject):
         currently just returns self.comment.lily or "".
         '''
         if self.comment and self.comment.text:
-            return unicode(self.comment.lily)
+            if six.PY2:
+                return unicode(self.comment.lily) # pylint: disable=undefined-variable
+            else:
+                return str(self.comment.lily)
         else:
             return ''
 

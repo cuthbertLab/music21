@@ -774,7 +774,7 @@ class _EnvironmentCore(object):
 
                 webbrowser.open(filePath)
                 return
-            except Exception:
+            except ImportError:
                 print('Cannot open webbrowser, sorry. Go to file://{}'.format(
                     filePath))
         if app is not None:
