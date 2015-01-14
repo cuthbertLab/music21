@@ -2057,13 +2057,13 @@ class Stream(base.Music21Object):
             timeSignatures = sLeft.getTimeSignatures(
                             searchContext=searchContext)
             if len(timeSignatures) > 0:
-                sRight.keySignature = copy.deepcopy(timeSignatures[0])
+                sRight.keySignature = copy.deepcopy(timeSignatures[0]) # pylint: disable=attribute-defined-outside-init
             keySignatures = sLeft.getKeySignatures(searchContext=searchContext)
             if len(keySignatures) > 0:
-                sRight.keySignature = copy.deepcopy(keySignatures[0])
+                sRight.keySignature = copy.deepcopy(keySignatures[0]) # pylint: disable=attribute-defined-outside-init
             endClef = sLeft.getContextByClass('Clef')
             if endClef is not None:
-                sRight.clef = copy.deepcopy(endClef)
+                sRight.clef = copy.deepcopy(endClef) # pylint: disable=attribute-defined-outside-init
 
         if (quarterLength > sLeft.highestTime): # nothing to do
             return sLeft, sRight
@@ -2455,7 +2455,7 @@ class Stream(base.Music21Object):
                 # Copy measure number if measure object...
                 # TODO: other attributes?
                 if ('Measure' in self.classes):
-                    found.number = self.number
+                    found.number = self.number # pylint: disable=attribute-defined-outside-init
             except TypeError:
                 found = Stream()
         elif returnStreamSubClass == 'list':
@@ -9275,7 +9275,7 @@ class Stream(base.Music21Object):
                     try:
                         interval1 = interval.notesToInterval(n, simultNote)
                         n.editorial.harmonicInterval = interval1
-                    except:
+                    except exceptions21.Music21Exception:
                         pass
                     if interval1 is not None:
                         break # inner loop
@@ -9445,47 +9445,47 @@ class Stream(base.Music21Object):
 
         return otherElements
 
-    def trimPlayingWhileSounding(self, el, elStream = None,
-                               requireClass = False, padStream = False):
-        '''
-        Returns a Stream of deepcopies of elements in otherStream that sound at the same time as`el. but
-        with any element that was sounding when el. begins trimmed to begin with el. and any element
-        sounding when el ends trimmed to end with el.
-
-        if padStream is set to true then empty space at the beginning and end is filled with a generic
-        Music21Object, so that no matter what otherStream is the same length as el.
-
-        Otherwise is the same as allPlayingWhileSounding -- but because these elements are deepcopies,
-        the difference might bite you if you're not careful.
-
-        Note that you can make el an empty stream of offset X and duration Y to extract exactly
-        that much information from otherStream.
-
-        OMIT_FROM_DOCS
-        TODO: write: ALL. requireClass, padStream
-
-        always returns a Stream, but might be an empty Stream
-        '''
-        if requireClass is not False:
-            raise StreamException("requireClass is not implemented")
-        if padStream is not False:
-            raise StreamException("padStream is not implemented")
-
-        raise StreamException("Not written yet")
-
-        if elStream is not None: # bit of safety
-            elOffset = el.getOffsetBySite(elStream)
-        else:
-            elOffset = el.offset
-
-        otherElements = self.getElementsByOffset(elOffset, elOffset + el.duration.quarterLength, mustBeginInSpan = False)
-
-        otherElements.offset = elOffset
-        otherElements.quarterLength = el.duration.quarterLength
-        for thisEl in otherElements:
-            thisEl.offset = thisEl.offset - elOffset
-
-        return otherElements
+#     def trimPlayingWhileSounding(self, el, elStream = None,
+#                                requireClass = False, padStream = False):
+#         '''
+#         Returns a Stream of deepcopies of elements in otherStream that sound at the same time as`el. but
+#         with any element that was sounding when el. begins trimmed to begin with el. and any element
+#         sounding when el ends trimmed to end with el.
+# 
+#         if padStream is set to true then empty space at the beginning and end is filled with a generic
+#         Music21Object, so that no matter what otherStream is the same length as el.
+# 
+#         Otherwise is the same as allPlayingWhileSounding -- but because these elements are deepcopies,
+#         the difference might bite you if you're not careful.
+# 
+#         Note that you can make el an empty stream of offset X and duration Y to extract exactly
+#         that much information from otherStream.
+# 
+#         OMIT_FROM_DOCS
+#         TODO: write: ALL. requireClass, padStream
+# 
+#         always returns a Stream, but might be an empty Stream
+#         '''
+#         if requireClass is not False:
+#             raise StreamException("requireClass is not implemented")
+#         if padStream is not False:
+#             raise StreamException("padStream is not implemented")
+# 
+#         raise StreamException("Not written yet")
+# 
+#         if elStream is not None: # bit of safety
+#             elOffset = el.getOffsetBySite(elStream)
+#         else:
+#             elOffset = el.offset
+# 
+#         otherElements = self.getElementsByOffset(elOffset, elOffset + el.duration.quarterLength, mustBeginInSpan = False)
+# 
+#         otherElements.offset = elOffset
+#         otherElements.quarterLength = el.duration.quarterLength
+#         for thisEl in otherElements:
+#             thisEl.offset = thisEl.offset - elOffset
+# 
+#         return otherElements
 
 
     #---------------------------------------------------------------------------
@@ -10561,7 +10561,7 @@ class Stream(base.Music21Object):
             shiftDur = 0.0
             listSorted = sorted(listOffsetDurExemption, key=lambda target: target[0])
             for i,durTuple in enumerate(listSorted):
-                startOffset, duration, exemptObjects = durTuple
+                startOffset, durationAmount, exemptObjects = durTuple
                 if i+1 < len(listSorted):
                     endOffset = listSorted[i+1][0]
                     includeEnd = False
@@ -10569,8 +10569,8 @@ class Stream(base.Music21Object):
                     endOffset = returnObjDuration
                     includeEnd = True
 
-                shiftDur = shiftDur + duration
-                for e in returnObj.getElementsByOffset(startOffset+duration,
+                shiftDur = shiftDur + durationAmount
+                for e in returnObj.getElementsByOffset(startOffset+durationAmount,
                     endOffset,
                     includeEndBoundary = includeEnd,
                     mustFinishInSpan = False,
@@ -10587,7 +10587,7 @@ class Stream(base.Music21Object):
             shiftsDict = {}
             listSorted = sorted(listOffsetDurExemption, key=lambda target: target[0])
             for i, durTuple in enumerate(listSorted):
-                startOffset, duration, exemptObjects = durTuple
+                startOffset, durationAmount, exemptObjects = durTuple
 
                 if i+1 < len(listSorted):
                     endOffset = listSorted[i+1][0]
@@ -10597,7 +10597,7 @@ class Stream(base.Music21Object):
                     includeEnd = True
 
                 exemptShift = shiftDur
-                shiftDur = shiftDur + duration
+                shiftDur = shiftDur + durationAmount
                 shiftsDict[startOffset] = shiftDur, endOffset, includeEnd, exemptObjects, exemptShift
 
             for offset in sorted(shiftsDict.keys(), key=lambda offset: -offset):
@@ -11369,8 +11369,6 @@ class Measure(Stream):
 
     def _getKeySignature(self):
         '''
-
-
         >>> a = stream.Measure()
         >>> a.keySignature = key.KeySignature(0)
         >>> a.keySignature.sharps
@@ -11386,8 +11384,6 @@ class Measure(Stream):
 
     def _setKeySignature(self, keyObj):
         '''
-
-
         >>> a = stream.Measure()
         >>> a.keySignature = key.KeySignature(6)
         >>> a.keySignature.sharps
