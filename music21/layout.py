@@ -1516,7 +1516,7 @@ class Test(unittest.TestCase):
         sl.distance = 40
         s.getElementsByClass('Measure')[2].insert(0, sl)
 
-        sl = music21.layout.SystemLayout()
+        sl = SystemLayout()
         sl.isNew = True
         sl.leftMargin = 220
         s.getElementsByClass('Measure')[4].insert(0, sl)

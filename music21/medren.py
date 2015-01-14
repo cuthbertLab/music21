@@ -1011,18 +1011,18 @@ class Ligature(base.Music21Object):
 
     def __init__(self, pitches=None, color='black', filled='yes'):
         base.Music21Object.__init__(self)
+        self.noteheadShape = None
+        self.stems = None
+        self.maximaNotes = None
+        self.reversedNotes = None
         self._pitches = []
         
         if pitches is not None:
             self.pitches = pitches
         
         self._notes = []
-        self.noteheadShape = None
         self.color = color
         self.filled = filled
-        self.stems = None
-        self.maximaNotes = None
-        self.reversedNotes = None
         
     
     def _getPitches(self):
