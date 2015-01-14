@@ -546,7 +546,7 @@ class XMLNode(object):
 
                     if six.PY2:                       
                         try:
-                            entry = unicode(contentStr, errors='replace')
+                            entry = unicode(contentStr, errors='replace') # pylint: disable=undefined-variable
                         except TypeError:
                             entry = u"%s" % contentStr
                             #entry = str(content)

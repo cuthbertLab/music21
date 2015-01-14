@@ -1791,7 +1791,7 @@ class Variant(base.Music21Object):
         if 'name' in keywords:
             self.groups.append(keywords['name'])
 
-    def __deepcopy__(self, memo):
+    def __deepcopy__(self, memo=None):
         new = self.__class__()
         old = self
         for name in self.__dict__:

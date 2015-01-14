@@ -828,8 +828,6 @@ class AbstractHarmonicMinorScale(AbstractScale):
 
 
     def _buildNetwork(self):
-        '''
-        '''
         intervalList = ['M2', 'm2', 'M2', 'M2', 'm2', 'M2', 'M2'] # a to A
         self.tonicDegree = 1
         self.dominantDegree = 5
@@ -2116,7 +2114,7 @@ class ConcreteScale(Scale):
 
     def findMissing(self, other, comparisonAttribute='pitchClass', 
         minPitch=None, maxPitch=None, direction=DIRECTION_ASCENDING,
-        alteredDegrees={}):
+        alteredDegrees=None):
         '''
         Given another object of the forms that `extractPitches` takes (e.g., a :class:`~music21.stream.Stream`, 
         a :class:`~music21.scale.ConcreteScale`, a list of :class:`~music21.pitch.Pitch` objects), 
@@ -2283,7 +2281,7 @@ class ConcreteScale(Scale):
         return post
     
     
-    def deriveByDegree(self, degree, pitch):
+    def deriveByDegree(self, degree, pitchRef):
         '''
         Given a scale degree and a pitch, return a 
         new :class:`~music21.scale.ConcreteScale` that satisfies 
@@ -2298,7 +2296,7 @@ class ConcreteScale(Scale):
 
         TODO: Does not yet work for directional scales
         '''
-        p = self._abstract.getNewTonicPitch(pitchReference=pitch, 
+        p = self._abstract.getNewTonicPitch(pitchReference=pitchRef, 
             nodeName=degree)
         if p is None:
             raise ScaleException('cannot derive new tonic')
@@ -2800,7 +2798,7 @@ class OctaveRepeatingScale(ConcreteScale):
     2
     '''
 
-    def __init__(self, tonic=None, intervalList=['m2']):
+    def __init__(self, tonic=None, intervalList=('m2',)):
         ConcreteScale.__init__(self, tonic=tonic)
         self._abstract = AbstractOctaveRepeatingScale(mode=intervalList)
         self.type = 'Octave Repeating'
@@ -2824,7 +2822,7 @@ class CyclicalScale(ConcreteScale):
     1
     '''
 
-    def __init__(self, tonic=None, intervalList=['m2']):
+    def __init__(self, tonic=None, intervalList=('m2',)):
         ConcreteScale.__init__(self, tonic=tonic)
         self._abstract = AbstractCyclicalScale(mode=intervalList)
         self.type = 'Cyclical'

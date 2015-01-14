@@ -79,7 +79,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                  'octave': 'class level reference interval', 'vIntervals': 'list of the two harmonic intervals present, vn1n1 to v2n1 and v1n2 to v2n2',
                  'hIntervals': 'list of the two melodic intervals present, v1n1 to v1n2 and v2n1 to v2n2'}
 
-    def __init__(self, v1n1=None, v1n2=None, v2n1=None, v2n2=None, key=key.Key('C')):
+    def __init__(self, v1n1=None, v1n2=None, v2n1=None, v2n2=None, analyticKey=key.Key('C')):
         base.Music21Object.__init__(self)
         if len(intervalCache) == 0:
             # populate interval cache if not done yet
@@ -105,9 +105,9 @@ class VoiceLeadingQuartet(base.Music21Object):
         self.vIntervals = [] #vertical intervals (harmonic)
         self.hIntervals = [] #horizontal intervals (melodic)
 
-        self._key = key
-        if key is not None:
-            self.key = key
+        self._key = None
+        if analyticKey is not None:
+            self.key = analyticKey
         if v1n1 is not None and v1n2 is not None and v2n1 is not None and v2n2 is not None:
             self._findIntervals()
 
@@ -987,7 +987,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl.key = key.Key('g')
         >>> vl.closesIncorrectly()
         True
-        >>> vl = voiceLeading.VoiceLeadingQuartet('C#4', 'D4', 'A2', 'D3', key='D')
+        >>> vl = voiceLeading.VoiceLeadingQuartet('C#4', 'D4', 'A2', 'D3', analyticKey='D')
         >>> vl.closesIncorrectly()
         True
 

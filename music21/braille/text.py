@@ -154,7 +154,7 @@ class BrailleText():
                 self.currentLine.append(noteGrouping, addSpace = addSpace)
         except BrailleTextException:
             if not forceNewline and self.lineLength - self.currentLine.textLocation > self.lineLength / 4 <= len(noteGrouping):
-                    raise BrailleTextException("Split Note Grouping")
+                raise BrailleTextException("Split Note Grouping")
             elif not showLeadingOctave:
                 raise BrailleTextException("Recalculate Note Grouping With Leading Octave")
             else:
@@ -342,6 +342,8 @@ class BrailleKeyboard():
     
 class BrailleTextLine():
     def __init__(self, lineLength):
+        self.isHeading = False
+        self.containsNoteGrouping = False
         self.lineLength = lineLength
         self.allChars = self.lineLength * [symbols['space']]
         self.textLocation = 0

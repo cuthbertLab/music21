@@ -46,7 +46,11 @@ def main(fnAccept=None):
     # only accept a few file names for now
     if fnAccept in [None, []]:
         fnAccept = ['dynamics.py']
-    fnPathReject = ['/ext/']
+    fnPathReject = ['/ext/',
+                    'bar.py',  # crashes pylint...
+                    'repeat.py', # hangs pylint...
+                    'spanner.py', # hangs pylint...
+                    ]
         #fnAccept = ['stream.py', 'note.py', 'chord.py']
 
     disable = [

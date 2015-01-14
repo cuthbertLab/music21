@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -685,7 +685,7 @@ class Trigram(object):
             for line in excerpt:
                 if six.PY2:
                     try:
-                        line = unicode(line, 'utf8') # just in case
+                        line = unicode(line, 'utf8') # just in case # pylint: disable=undefined-variable
                     except (UnicodeDecodeError, NameError): # no unicode in Py3
                         continue # skip this line
                 for letter in line.strip() + u' ':

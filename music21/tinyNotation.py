@@ -165,10 +165,10 @@ class TinyNotationStream(stream.Stream):
         {0.0} <music21.note.Note C>
         {1.0} <music21.bar.Barline style=final>
     '''
-    regularExpressions = {'TRIP': 'trip\{',
-                          'QUAD': 'quad\{',
-                          'ENDBRAC': '\}',
-                          'TIMESIG': '(\d+\/\d+)'}
+    regularExpressions = {'TRIP': r'trip\{',
+                          'QUAD': r'quad\{',
+                          'ENDBRAC': r'\}',
+                          'TIMESIG': r'(\d+\/\d+)'}
     
     def __init__(self, stringRep = "", timeSignature = None):
         stream.Stream.__init__(self)
@@ -365,21 +365,21 @@ class TinyNotationNote(object):
     >>> tcn4 = tinyNotation.TinyNotationNote()
     
     '''
-    regularExpressions = {  'REST'    : 'r',
-                            'OCTAVE2' : '([A-G])+[A-G]',
-                            'OCTAVE3' : '([A-G])',
-                            'OCTAVE5' : '([a-g])(\'+)', 
-                            'OCTAVE4' : '([a-g])',
-                            'EDSHARP' : '\((\#+)\)',
-                            'EDFLAT'  : '\((\-+)\)',
-                            'EDNAT'   : '\(n\)',
-                            'SHARP'   : '^[A-Ga-g]+\'*(\#+)',  # simple notation finds 
-                            'FLAT'    : '^[A-Ga-g]+\'*(\-+)',  # double sharps too
-                            'TYPE'    : '(\d+)',
-                            'TIE'     : '.\~', # not preceding ties
-                            'PRECTIE' : '\~',  # front ties
-                            'ID_EL'   : '\=([A-Za-z0-9]*)',
-                            'LYRIC'   : '\_(.*)',  }
+    regularExpressions = {  'REST'    : r'r',
+                            'OCTAVE2' : r'([A-G])+[A-G]',
+                            'OCTAVE3' : r'([A-G])',
+                            'OCTAVE5' : r'([a-g])(\'+)', 
+                            'OCTAVE4' : r'([a-g])',
+                            'EDSHARP' : r'\((\#+)\)',
+                            'EDFLAT'  : r'\((\-+)\)',
+                            'EDNAT'   : r'\(n\)',
+                            'SHARP'   : r'^[A-Ga-g]+\'*(\#+)',  # simple notation finds 
+                            'FLAT'    : r'^[A-Ga-g]+\'*(\-+)',  # double sharps too
+                            'TYPE'    : r'(\d+)',
+                            'TIE'     : r'.\~', # not preceding ties
+                            'PRECTIE' : r'\~',  # front ties
+                            'ID_EL'   : r'\=([A-Za-z0-9]*)',
+                            'LYRIC'   : r'\_(.*)',  }
     
     def __init__(self, stringRep = None, storedDict = None):
         if storedDict is None:
@@ -556,8 +556,8 @@ class TinyNotationNote(object):
         where double dots are redefined as referring to multiply by
         2.25 (according to a practice used by some Medieval musicologists).
         '''
-        DBLDOT  = '\.\.' 
-        DOT     = '\.'
+        DBLDOT  = r'\.\.' 
+        DOT     = r'\.'
         
         if (re.search(DBLDOT, stringRep)):
             noteObj.duration.dots = 2
@@ -620,7 +620,7 @@ class HarmonyNote(TinyNotationNote):
         
         See the demonstration in the docs for class HarmonyLine.
         '''
-        HARMONY   = '\*(.*)\*'
+        HARMONY   = r'\*(.*)\*'
 
         if re.search(HARMONY, stringRep):
             harmony = re.search(HARMONY, stringRep).group(1)
@@ -638,32 +638,33 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
     
-    def compactNoteInfo(self, note):
+    def compactNoteInfo(self, n):
         '''
         A debugging info tool, returning information about a note
+        
         E- E 4 flat 16th 0.1667 & is a tuplet (in fact STOPS the tuplet)
         '''
         ret = ""
-        if (note.isNote is True):
-            ret += note.name + " " + note.step + " " + str(note.octave)
-            if (note.accidental is not None):
-                ret += " " + note.accidental.name
-        elif (note.isRest is True):
+        if (n.isNote is True):
+            ret += n.name + " " + n.step + " " + str(n.octave)
+            if (n.accidental is not None):
+                ret += " " + n.accidental.name
+        elif (n.isRest is True):
             ret += "rest"
         else:
             ret += "other note type"
-        if (note.tie is not None):
-            ret += " (Tie: " + note.tie.type + ")"
-        ret += " " + note.duration.type
-        ret += " " + common.strTrimFloat(note.duration.quarterLength)
-        if len(note.duration.tuplets) > 0:
+        if (n.tie is not None):
+            ret += " (Tie: " + n.tie.type + ")"
+        ret += " " + n.duration.type
+        ret += " " + common.strTrimFloat(n.duration.quarterLength)
+        if len(n.duration.tuplets) > 0:
             ret += " & is a tuplet"
-            if note.duration.tuplets[0].type == "start":
+            if n.duration.tuplets[0].type == "start":
                 ret += " (in fact STARTS the tuplet)"
-            elif note.duration.tuplets[0].type == "stop":
+            elif n.duration.tuplets[0].type == "stop":
                 ret += " (in fact STOPS the tuplet)"
-        if len(note.expressions) > 0:
-            if (isinstance(note.expressions[0], expressions.Fermata)):
+        if len(n.expressions) > 0:
+            if (isinstance(n.expressions[0], expressions.Fermata)):
                 ret += " has Fermata"
         return ret
     

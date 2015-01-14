@@ -82,7 +82,7 @@ class RepeatExpression(RepeatMark, expressions.Expression):
     '''
     def __init__(self):
         expressions.Expression.__init__(self)
-
+        RepeatMark.__init__(self)
         # store a text version of this expression
         self._textExpression = None
         # store a lost of alternative text representations
@@ -515,107 +515,101 @@ def insertRepeat(s, start, end, inPlace=False):
         return s
 
 def deleteMeasures(s, toDelete, inPlace=False):
-        '''
-        Given a stream s and a list of numbers, toDelete, removes each measure with a number
-        corresponding to a number in toDelete and then renumbers the remaining measures in the stream.
+    '''
+    Given a stream s and a list of numbers, toDelete, removes each measure with a number
+    corresponding to a number in toDelete and then renumbers the remaining measures in the stream.
+            
+    
+    
+    >>> from copy import deepcopy
+    >>> chorale1 = corpus.parse('bwv10.7.mxl')
+    >>> s = deepcopy(chorale1)
+    >>> repeat.deleteMeasures(s, [6, 3, 4], inPlace=True)
+    >>> m2 = search.translateStreamToString( chorale1.parts[1].measure(2).notesAndRests)
+    >>> resm2 = search.translateStreamToString( s.parts[1].measure(2).notesAndRests)
+    >>> m2 == resm2
+    True
+    >>> m5 = search.translateStreamToString( chorale1.parts[1].measure(5).notesAndRests)
+    >>> resm3 = search.translateStreamToString( s.parts[1].measure(3).notesAndRests)
+    >>> m5 == resm3
+    True
+    >>> m7 = search.translateStreamToString( chorale1.parts[1].measure(7).notesAndRests)
+    >>> resm4 = search.translateStreamToString( s.parts[1].measure(4).notesAndRests)
+    >>> m7 == resm4
+    True
+    >>> lenS = len(s.parts[0].getElementsByClass(stream.Measure))
+    >>> lenChorale1 = len(chorale1.parts[0].getElementsByClass(stream.Measure))
+    >>> lenS + 3 == lenChorale1
+    True
+    
+    OMIT_FROM_DOCS
+    >>> chorale2 = corpus.parse('bwv101.7.mxl')
+    >>> s = deepcopy(chorale2)
+    >>> repeat.deleteMeasures(s, [3, 4, 5], True)
+    >>> m2 = search.translateStreamToString( chorale2.parts[0].measure(2).notesAndRests)
+    >>> resm2 = search.translateStreamToString( s.parts[0].measure(2).notesAndRests)
+    >>> m3 = search.translateStreamToString( chorale2.parts[0].measure(3).notesAndRests)
+    >>> m6 = search.translateStreamToString( chorale2.parts[0].measure(6).notesAndRests)
+    >>> resm3 = search.translateStreamToString( s.parts[0].measure(3).notesAndRests)
+    >>> m2 == resm2
+    True
+    >>> resm3 == m3
+    False
+    >>> resm3 == m6
+    True
+    >>> chorale3 = corpus.parse('bwv102.7.mxl')
+    >>> s = repeat.deleteMeasures(chorale3, [2, 3])
+    >>> len(s.parts[2].getElementsByClass(stream.Measure)) == len(chorale3.parts[2].getElementsByClass(stream.Measure)) - 2
+    True
+    >>> s = repeat.deleteMeasures(chorale3, [2, 3])
+    >>> len(s.parts[2].getElementsByClass(stream.Measure)) == len(chorale3.parts[2].getElementsByClass(stream.Measure)) - 2
+    True
+    >>> s = repeat.deleteMeasures(chorale3, [999, 1001001])
+    >>> len(s.parts[2]) == len(chorale3.parts[2])
+    True
+    
+    '''
+    
+    if s is None:
+        return None
+    
+    if not inPlace:
+        s = copy.deepcopy(s)
+    
+    if s.hasMeasures():
+        for mNumber in toDelete:
+            try:
+                removeMe = s.measure(mNumber)
+            except exceptions21.Music21Exception: # More specific?
+                removeMe = None
                 
-        
-        
-        >>> from copy import deepcopy
-        >>> chorale1 = corpus.parse('bwv10.7.mxl')
-        >>> s = deepcopy(chorale1)
-        >>> repeat.deleteMeasures(s, [6, 3, 4], inPlace=True)
-        >>> m2 = search.translateStreamToString( chorale1.parts[1].measure(2).notesAndRests)
-        >>> resm2 = search.translateStreamToString( s.parts[1].measure(2).notesAndRests)
-        >>> m2 == resm2
-        True
-        >>> m5 = search.translateStreamToString( chorale1.parts[1].measure(5).notesAndRests)
-        >>> resm3 = search.translateStreamToString( s.parts[1].measure(3).notesAndRests)
-        >>> m5 == resm3
-        True
-        >>> m7 = search.translateStreamToString( chorale1.parts[1].measure(7).notesAndRests)
-        >>> resm4 = search.translateStreamToString( s.parts[1].measure(4).notesAndRests)
-        >>> m7 == resm4
-        True
-        >>> lenS = len(s.parts[0].getElementsByClass(stream.Measure))
-        >>> lenChorale1 = len(chorale1.parts[0].getElementsByClass(stream.Measure))
-        >>> lenS + 3 == lenChorale1
-        True
-        
-        OMIT_FROM_DOCS
-        >>> chorale2 = corpus.parse('bwv101.7.mxl')
-        >>> s = deepcopy(chorale2)
-        >>> repeat.deleteMeasures(s, [3, 4, 5], True)
-        >>> m2 = search.translateStreamToString( chorale2.parts[0].measure(2).notesAndRests)
-        >>> resm2 = search.translateStreamToString( s.parts[0].measure(2).notesAndRests)
-        >>> m3 = search.translateStreamToString( chorale2.parts[0].measure(3).notesAndRests)
-        >>> m6 = search.translateStreamToString( chorale2.parts[0].measure(6).notesAndRests)
-        >>> resm3 = search.translateStreamToString( s.parts[0].measure(3).notesAndRests)
-        >>> m2 == resm2
-        True
-        >>> resm3 == m3
-        False
-        >>> resm3 == m6
-        True
-        >>> chorale3 = corpus.parse('bwv102.7.mxl')
-        >>> s = repeat.deleteMeasures(chorale3, [2, 3])
-        >>> len(s.parts[2].getElementsByClass(stream.Measure)) == len(chorale3.parts[2].getElementsByClass(stream.Measure)) - 2
-        True
-        >>> s = repeat.deleteMeasures(chorale3, [2, 3])
-        >>> len(s.parts[2].getElementsByClass(stream.Measure)) == len(chorale3.parts[2].getElementsByClass(stream.Measure)) - 2
-        True
-        >>> s = repeat.deleteMeasures(chorale3, [999, 1001001])
-        >>> len(s.parts[2]) == len(chorale3.parts[2])
-        True
-        
-        '''
-        
-        if s is None:
-            return None
-        
-        if not inPlace:
-            s = copy.deepcopy(s)
-        
-        
-            
-            
-        if s.hasMeasures():
-            for mNumber in toDelete:
-                try:
-                    removeMe = s.measure(mNumber)
-                except:
-                    removeMe = None
-                    
-                if removeMe is not None:
-                    s.remove( removeMe )
-        else:
-            for part in s.parts:
-                deleteMeasures(part, toDelete, inPlace=True)
-            if inPlace:
-                return
-            else:
-                return s
-        
-        #correct the measure numbers
-        measures = s.getElementsByClass("Measure")
-        if len(measures) is not 0:
-            i = measures[0].number
-            
-            #if we deleted the first measure...  TODO: test this case
-            if i is not 0 and i is not 1:
-                i = 1   #can simplify to one line with above.
-            
-            for measure in measures:
-                measure.number = i
-                i += 1
-        
+            if removeMe is not None:
+                s.remove( removeMe )
+    else:
+        for part in s.parts:
+            deleteMeasures(part, toDelete, inPlace=True)
         if inPlace:
             return
         else:
-            return s 
-
-
-
+            return s
+    
+    #correct the measure numbers
+    measures = s.getElementsByClass("Measure")
+    if len(measures) is not 0:
+        i = measures[0].number
+        
+        #if we deleted the first measure...  TODO: test this case
+        if i is not 0 and i is not 1:
+            i = 1   #can simplify to one line with above.
+        
+        for measure in measures:
+            measure.number = i
+            i += 1
+    
+    if inPlace:
+        return
+    else:
+        return s 
 
 
 # from musicxml
@@ -656,7 +650,6 @@ class Expander(object):
 
     To use this object directly, call :meth:`~music21.repeat.Expander.process` on the
     score
-    
     
     >>> s = converter.parse('tinynotation: 3/4 A2. C4 D E F2.')
     >>> s.makeMeasures(inPlace = True)
@@ -719,6 +712,7 @@ class Expander(object):
     '''
     def __init__(self, streamObj = None):
         self._src = streamObj
+        self._repeatBrackets = None
         if streamObj is not None:
             self._setup()
     
@@ -2197,370 +2191,370 @@ class RepeatFinder(object):
         return realRes
             
             
-    """       
-    def _createRepeatsFromSimilarMeasureGroups(self, mGroups, threshold = 4, inPlace=False):
-        '''
-        Returns a stream with a repeat inserted on all instances of adjacent similar measure groups
-        which contain at least enough measures to satisfy the threshold (by default 4).  mGroup is the
-        result of calling getSimilarMeasureGroupsFromlist( getMeasureSimilarityList(s)).
-        i.e. if 4+ measures repeat themselves, this function returns a stream with a repeat sign instead
-        of the second iteration of those measures.
-
-        
-        >>> from copy import deepcopy
-        >>> chorale1 = corpus.parse(corpus.getBachChorales()[1])
-        >>> rf = repeat.RepeatFinder(chorale1)
-        >>> s = rf._createRepeatsFromSimilarMeasureGroups( [([1, 2, 3, 4], [5, 6, 7, 8])], 4)
-        >>> len(s.parts)
-        4
-        >>> m4 = search.translateStreamToString( chorale1.parts[1].measure(4).notesAndRests)
-        >>> resm4 = search.translateStreamToString( s.parts[1].measure(4).notesAndRests )
-        >>> m10 = search.translateStreamToString( chorale1.parts[1].measure(10).notesAndRests)
-        >>> resm6 = search.translateStreamToString( s.parts[1].measure(6).notesAndRests)
-        >>> resm10 = search.translateStreamToString( s.parts[1].measure(10).notesAndRests)
-        >>> m4 == resm4
-        True
-        >>> m10 == resm10
-        False
-        >>> m10 == resm6
-        True
-        
-        _OMIT_FROM_DOCS_
-        >>> repeat.RepeatFinder().getMeasureSimilarityList()
-        Traceback (most recent call last):
-        NoInternalStreamException: RepeatFinder must be initialized with a stream
-        
-        >>> s = stream.Stream()
-        >>> n1 = note.Note('C')
-        >>> n2 = note.Note('D')
-        >>> n3 = note.Note('E')
-        >>> n4 = note.Note('F')
-        >>> for i in range(3):
-        ...    m = stream.Measure()
-        ...    s.append(m)
-        ...    m.append(n1)
-        ...    m.append(n2)
-        ...    m.append(n3)
-        ...    m.append(n4)
-        #this isn't finished
-        '''
-         
-         
-        if self.s is None:
-            raise NoInternalStreamException("RepeatFinder must be initialized with a stream")
-           
-        if inPlace:
-            s = self.s
-        else:
-            s = copy.deepcopy(self.s)
-            
-        
-        
-        toRepeat = [] # (measureStart, measureEnd)
-        toDelete = []
-        for mGroup in mGroups:
-            if len( mGroup[0] ) >= threshold and mGroup[0][-1]+1 == mGroup[1][0]:
-                startBar, endBar = mGroup[0][0], mGroup[0][-1]
-                
-                toRepeat.append((startBar, endBar))
-                toDelete.extend(mGroup[1])
-                
-                
-        #think about including this above and scrapping the toRepeat list altogether
-        for startBar, endBar in toRepeat:
-            RepeatFinder(s).insertRepeat(startBar, endBar, True)
-        
-        RepeatFinder(s).deleteMeasures(toDelete, True)
-        
-        if inPlace:
-            return
-        else:
-            return s
-        
-        
-    """
-    
-    """  
-    def insertRepeat(self, barStart, barEnd, inPlace=False):
-        '''
-        Given a stream s, inserts a start-repeat at the beginning of the 
-        bar specified by barStart and inserts an end-repeat at the bar specified
-        by barEnd. Operates on RepeatFinder's internal stream, but only alters this
-        stream if inPlace=True.
-        
-        
-        >>> from copy import deepcopy
-        >>> chorale1 = corpus.parse('bwv10.7.mxl')
-        >>> s = repeat.RepeatFinder(chorale1).insertRepeat(3, 6, inPlace=False)
-        >>> m4 = search.translateStreamToString( chorale1.parts[1].measure(4).notesAndRests)
-        >>> resm4 = search.translateStreamToString( s.parts[1].measure(4).notesAndRests)
-        >>> m6 = search.translateStreamToString( chorale1.parts[1].measure(4).notesAndRests)
-        >>> resm6 = search.translateStreamToString( s.parts[1].measure(4).notesAndRests)
-        >>> m7 = search.translateStreamToString( chorale1.parts[1].measure(4).notesAndRests)
-        >>> resm7 = search.translateStreamToString( s.parts[1].measure(4).notesAndRests)
-        >>> m4 == resm4
-        True
-        >>> m6 == resm6
-        True
-        >>> m7 == resm7
-        True
-        >>> len(s.parts[0].flat.getElementsByClass(bar.Repeat))
-        2
-        >>> len(s.flat.getElementsByClass(bar.Repeat))
-        8
-        >>> s.parts[0].measure(3).leftBarline.direction
-        'start'
-        >>> s.parts[0].measure(6).rightBarline.direction
-        'end'
-        
-        '''
-        
-        if self.s is None:
-            raise NoInternalStreamException("This function only works when RepeatFinder is initialized with a stream")
-        
-        if inPlace:
-            s = self.s
-        else:
-            s = copy.deepcopy(self.s)
-        
-            
-        if s is None:
-            raise NoInternalStreamException("This function only works when RepeatFinder is initialized with a stream")
-        
-        
-        if not s.hasMeasures():
-            for part in s.parts:
-                insertRepeat(part, barStart, barEnd, True)
-            if inPlace:
-                return
-            else:
-                return s
-                
-        s.measure(barEnd).rightBarline = music21.bar.Repeat(direction='end', times=2)
-        
-        #Place a starting repeat, if needed
-        if RepeatFinder(s).getQuarterLengthOfPickupMeasure() != 0 or barStart != 1:
-            s.measure(barStart).leftBarline = music21.bar.Repeat(direction='start')
-            
-        if inPlace:
-            return
-        else:
-            return s
-            
-    
-    
-    def insertRepeatEnding(self, start, end, endingNumber=1, inPlace=False):
-        '''
-        Inserts a repeated ending (i.e. first or second endings) into stream s, where s either contains measures,
-        or contains parts which contain measures.  Start and end are integers corresponding to the first and last measure
-        number of the "repeatNum" ending.  e.g. if start=4, end=6, and repeatNum=2, we have a second ending
-        from measures 4 to 6.
-                
-        
-        
-        >>> c1 = corpus.parse('bwv10.7.mxl')
-        >>> repeat.RepeatFinder(c1).insertRepeatEnding( 4, 6, 1, True)
-        >>> repeat.RepeatFinder(c1).insertRepeatEnding( 11, 13, 2, True)
-        >>> repeatBrackets = c1.flat.getElementsByClass(spanner.RepeatBracket)
-        >>> len(repeatBrackets)
-        8
-        >>> len(c1.parts[0].getElementsByClass(spanner.RepeatBracket))
-        2
-        '''
-        
-        if self.s is None:
-            raise NoInternalStreamException("This function only works when RepeatFinder is initialized with a stream")
-    
-        if inPlace:
-            s = self.s
-        else:
-            s = copy.deepcopy(self.s)
-            
-        if s is None:
-            raise NoInternalStreamException("This function only works when RepeatFinder is initialized with a stream")
-
-        
-        if not s.hasMeasures():
-            for part in s.parts:
-                RepeatFinder(part).insertRepeatEnding(start, end, endingNumber, True)
-            if inPlace:
-                return
-            else:
-                return s
-        
-        
-        measures = [ s.measure(i) for i in range(start, end+1) ]
-        rb = spanner.RepeatBracket(measures, number=endingNumber)
-        rbOffset = measures[0].getOffsetBySite(s)   #adding repeat bracket to stream at beginning of repeated section.  Maybe better at end?
-        s.insert(rbOffset, rb)
-        
-        if inPlace:
-            return
-        else:
-            return s
-
-    """
-    """       
-    def _createFirstAndSecondEndingsFromSimilarMeasureGroups(self, mGroups, threshold=3, inPlace=False):
-        '''
-        Returns a stream with first and second endings with repeats substituted in when appropriate.
-        Does not detect sections that are more than 16 measure apart.
-        
-        mGroup is the result of calling getSimilarMeasureGroupsFromlist( SimilarityList(s)).
-        
-        
-    
-        '''
-        
-        #fix this function for inPlace
-        
-        #There might be a way to break this by trying to put a repeated section into where the second ending should go.
-        #i.e. let's not replace the second ending with a repeat
-        
-        if self.s is None:
-            raise NoInternalStreamException("This function only works when RepeatFinder is initialized with a stream")
-        
-        if inPlace:
-            s = self.s
-        else:
-            s = copy.deepcopy(self.s)
-        
-        
-        toProcess = [] # (measureStart, measureOfFirstEnding, repeatSignMeasure)
-        toDelete = [] 
-        for mGroup in mGroups:
-            distance = mGroup[1][0] - mGroup[0][-1] - 1
-            maxAcceptableDistance = min(16, len(mGroup[0])/2.0 + 1)  #talk about this line more in documentation
-            if len( mGroup[0] ) >= threshold and distance <= maxAcceptableDistance and distance != 0:
-                startingBar = mGroup[0][0]
-                firstEndingBar = mGroup[0][-1]+1
-                repeatSignBar = mGroup[1][0]-1
-                
-                toProcessTuple = (startingBar, firstEndingBar, repeatSignBar)
-                toProcess.append(toProcessTuple)
-                toDelete.extend(mGroup[1])
-                
-             
-        for startingBar, firstEndingBar, repeatSignBar in toProcess:
-            self.insertRepeat(startingBar, repeatSignBar, True)                
-            lengthOfRepeatEnding = repeatSignBar - firstEndingBar + 1
-            lengthOfRepeatedSection = firstEndingBar - startingBar + 1
-            startOfSecondEnding = repeatSignBar + lengthOfRepeatedSection
-            insertRepeatEnding(s, firstEndingBar, repeatSignBar, 1, True)
-            insertRepeatEnding(s, startOfSecondEnding, startOfSecondEnding + lengthOfRepeatEnding, 2, True)
-        
-        self.deleteMeasures(toDelete, True)
-        
-        if inPlace:
-            return
-        else:
-            return s
-        
-            
-    """
-    
-    """
-
-    def deleteMeasures(self, toDelete, inPlace=False):
-        '''
-        Given a stream s and a list of numbers, toDelete, removes each measure with a number
-        corresponding to a number in toDelete.  Renumbers the remaining measures in the stream.
-                
-        
-        
-        >>> from copy import deepcopy
-        >>> chorale1 = corpus.parse('bwv10.7.mxl')
-        >>> s = deepcopy(chorale1)
-        >>> repeat.RepeatFinder(s).deleteMeasures([6, 3, 4], inPlace=True)
-        >>> m2 = search.translateStreamToString( chorale1.parts[1].measure(2).notesAndRests)
-        >>> resm2 = search.translateStreamToString( s.parts[1].measure(2).notesAndRests)
-        >>> m2 == resm2
-        True
-        >>> m5 = search.translateStreamToString( chorale1.parts[1].measure(5).notesAndRests)
-        >>> resm3 = search.translateStreamToString( s.parts[1].measure(3).notesAndRests)
-        >>> m5 == resm3
-        True
-        >>> m7 = search.translateStreamToString( chorale1.parts[1].measure(7).notesAndRests)
-        >>> resm4 = search.translateStreamToString( s.parts[1].measure(4).notesAndRests)
-        >>> m7 == resm4
-        True
-        >>> lenS = len(s.parts[0].getElementsByClass(stream.Measure))
-        >>> lenChorale1 = len(chorale1.parts[0].getElementsByClass(stream.Measure))
-        >>> lenS + 3 == lenChorale1
-        True
-        >>> chorale2 = corpus.parse('bwv101.7.mxl')
-        >>> s = deepcopy(chorale2)
-        >>> repeat.RepeatFinder(s).deleteMeasures([3, 4, 5], True)
-        >>> m2 = search.translateStreamToString( chorale2.parts[0].measure(2).notesAndRests)
-        >>> resm2 = search.translateStreamToString( s.parts[0].measure(2).notesAndRests)
-        >>> m3 = search.translateStreamToString( chorale2.parts[0].measure(3).notesAndRests)
-        >>> m6 = search.translateStreamToString( chorale2.parts[0].measure(6).notesAndRests)
-        >>> resm3 = search.translateStreamToString( s.parts[0].measure(3).notesAndRests)
-        >>> m2 == resm2
-        True
-        >>> resm3 == m3
-        False
-        >>> resm3 == m6
-        True
-        >>> chorale3 = corpus.parse('bwv102.7.mxl')
-        >>> s = repeat.RepeatFinder(chorale3).deleteMeasures([2, 3])
-        >>> len(s.parts[2].getElementsByClass(stream.Measure)) == len(chorale3.parts[2].getElementsByClass(stream.Measure)) - 2
-        True
-        >>> s = repeat.RepeatFinder(chorale3).deleteMeasures([2, 3])
-        >>> len(s.parts[2].getElementsByClass(stream.Measure)) == len(chorale3.parts[2].getElementsByClass(stream.Measure)) - 2
-        True
-        >>> s = repeat.RepeatFinder(chorale3).deleteMeasures([999, 1001001])
-        >>> len(s.parts[2]) == len(chorale3.parts[2])
-        True
-        
-        '''
-        
-        if self.s is None:
-            raise NoInternalStreamException("This function only works when RepeatFinder is initialized with a stream")
-        
-        if inPlace:
-            s = self.s
-        else:
-            s = copy.deepcopy(self.s)
-        
-            
-            
-        if s.hasMeasures():
-            for mNumber in toDelete:
-                try:
-                    removeMe = s.measure(mNumber)
-                except:
-                    removeMe = None
-                    
-                if removeMe is not None:
-                    s.remove( removeMe )
-        else:
-            for part in s.parts:
-                deleteMeasures(part, toDelete, inPlace=True)
-            if inPlace:
-                return
-            else:
-                return s
-        
-        #correct the measure numbers
-        measures = s.getElementsByClass(music21.stream.Measure)
-        if len(measures) is not 0:
-            i = measures[0].number
-            
-            #if we deleted the first measure...  TODO: test this case
-            if i is not 0 and i is not 1:
-                i = 1   #can simplify to one line with above.
-            
-            for measure in measures:
-                measure.number = i
-                i += 1
-        
-        if inPlace:
-            return
-        else:
-            return s 
-        
-    """
+#     """       
+#     def _createRepeatsFromSimilarMeasureGroups(self, mGroups, threshold = 4, inPlace=False):
+#         '''
+#         Returns a stream with a repeat inserted on all instances of adjacent similar measure groups
+#         which contain at least enough measures to satisfy the threshold (by default 4).  mGroup is the
+#         result of calling getSimilarMeasureGroupsFromlist( getMeasureSimilarityList(s)).
+#         i.e. if 4+ measures repeat themselves, this function returns a stream with a repeat sign instead
+#         of the second iteration of those measures.
+# 
+#         
+#         >>> from copy import deepcopy
+#         >>> chorale1 = corpus.parse(corpus.getBachChorales()[1])
+#         >>> rf = repeat.RepeatFinder(chorale1)
+#         >>> s = rf._createRepeatsFromSimilarMeasureGroups( [([1, 2, 3, 4], [5, 6, 7, 8])], 4)
+#         >>> len(s.parts)
+#         4
+#         >>> m4 = search.translateStreamToString( chorale1.parts[1].measure(4).notesAndRests)
+#         >>> resm4 = search.translateStreamToString( s.parts[1].measure(4).notesAndRests )
+#         >>> m10 = search.translateStreamToString( chorale1.parts[1].measure(10).notesAndRests)
+#         >>> resm6 = search.translateStreamToString( s.parts[1].measure(6).notesAndRests)
+#         >>> resm10 = search.translateStreamToString( s.parts[1].measure(10).notesAndRests)
+#         >>> m4 == resm4
+#         True
+#         >>> m10 == resm10
+#         False
+#         >>> m10 == resm6
+#         True
+#         
+#         _OMIT_FROM_DOCS_
+#         >>> repeat.RepeatFinder().getMeasureSimilarityList()
+#         Traceback (most recent call last):
+#         NoInternalStreamException: RepeatFinder must be initialized with a stream
+#         
+#         >>> s = stream.Stream()
+#         >>> n1 = note.Note('C')
+#         >>> n2 = note.Note('D')
+#         >>> n3 = note.Note('E')
+#         >>> n4 = note.Note('F')
+#         >>> for i in range(3):
+#         ...    m = stream.Measure()
+#         ...    s.append(m)
+#         ...    m.append(n1)
+#         ...    m.append(n2)
+#         ...    m.append(n3)
+#         ...    m.append(n4)
+#         #this isn't finished
+#         '''
+#          
+#          
+#         if self.s is None:
+#             raise NoInternalStreamException("RepeatFinder must be initialized with a stream")
+#            
+#         if inPlace:
+#             s = self.s
+#         else:
+#             s = copy.deepcopy(self.s)
+#             
+#         
+#         
+#         toRepeat = [] # (measureStart, measureEnd)
+#         toDelete = []
+#         for mGroup in mGroups:
+#             if len( mGroup[0] ) >= threshold and mGroup[0][-1]+1 == mGroup[1][0]:
+#                 startBar, endBar = mGroup[0][0], mGroup[0][-1]
+#                 
+#                 toRepeat.append((startBar, endBar))
+#                 toDelete.extend(mGroup[1])
+#                 
+#                 
+#         #think about including this above and scrapping the toRepeat list altogether
+#         for startBar, endBar in toRepeat:
+#             RepeatFinder(s).insertRepeat(startBar, endBar, True)
+#         
+#         RepeatFinder(s).deleteMeasures(toDelete, True)
+#         
+#         if inPlace:
+#             return
+#         else:
+#             return s
+#         
+#         
+#     """
+#     
+#     """  
+#     def insertRepeat(self, barStart, barEnd, inPlace=False):
+#         '''
+#         Given a stream s, inserts a start-repeat at the beginning of the 
+#         bar specified by barStart and inserts an end-repeat at the bar specified
+#         by barEnd. Operates on RepeatFinder's internal stream, but only alters this
+#         stream if inPlace=True.
+#         
+#         
+#         >>> from copy import deepcopy
+#         >>> chorale1 = corpus.parse('bwv10.7.mxl')
+#         >>> s = repeat.RepeatFinder(chorale1).insertRepeat(3, 6, inPlace=False)
+#         >>> m4 = search.translateStreamToString( chorale1.parts[1].measure(4).notesAndRests)
+#         >>> resm4 = search.translateStreamToString( s.parts[1].measure(4).notesAndRests)
+#         >>> m6 = search.translateStreamToString( chorale1.parts[1].measure(4).notesAndRests)
+#         >>> resm6 = search.translateStreamToString( s.parts[1].measure(4).notesAndRests)
+#         >>> m7 = search.translateStreamToString( chorale1.parts[1].measure(4).notesAndRests)
+#         >>> resm7 = search.translateStreamToString( s.parts[1].measure(4).notesAndRests)
+#         >>> m4 == resm4
+#         True
+#         >>> m6 == resm6
+#         True
+#         >>> m7 == resm7
+#         True
+#         >>> len(s.parts[0].flat.getElementsByClass(bar.Repeat))
+#         2
+#         >>> len(s.flat.getElementsByClass(bar.Repeat))
+#         8
+#         >>> s.parts[0].measure(3).leftBarline.direction
+#         'start'
+#         >>> s.parts[0].measure(6).rightBarline.direction
+#         'end'
+#         
+#         '''
+#         
+#         if self.s is None:
+#             raise NoInternalStreamException("This function only works when RepeatFinder is initialized with a stream")
+#         
+#         if inPlace:
+#             s = self.s
+#         else:
+#             s = copy.deepcopy(self.s)
+#         
+#             
+#         if s is None:
+#             raise NoInternalStreamException("This function only works when RepeatFinder is initialized with a stream")
+#         
+#         
+#         if not s.hasMeasures():
+#             for part in s.parts:
+#                 insertRepeat(part, barStart, barEnd, True)
+#             if inPlace:
+#                 return
+#             else:
+#                 return s
+#                 
+#         s.measure(barEnd).rightBarline = music21.bar.Repeat(direction='end', times=2)
+#         
+#         #Place a starting repeat, if needed
+#         if RepeatFinder(s).getQuarterLengthOfPickupMeasure() != 0 or barStart != 1:
+#             s.measure(barStart).leftBarline = music21.bar.Repeat(direction='start')
+#             
+#         if inPlace:
+#             return
+#         else:
+#             return s
+#             
+#     
+#     
+#     def insertRepeatEnding(self, start, end, endingNumber=1, inPlace=False):
+#         '''
+#         Inserts a repeated ending (i.e. first or second endings) into stream s, where s either contains measures,
+#         or contains parts which contain measures.  Start and end are integers corresponding to the first and last measure
+#         number of the "repeatNum" ending.  e.g. if start=4, end=6, and repeatNum=2, we have a second ending
+#         from measures 4 to 6.
+#                 
+#         
+#         
+#         >>> c1 = corpus.parse('bwv10.7.mxl')
+#         >>> repeat.RepeatFinder(c1).insertRepeatEnding( 4, 6, 1, True)
+#         >>> repeat.RepeatFinder(c1).insertRepeatEnding( 11, 13, 2, True)
+#         >>> repeatBrackets = c1.flat.getElementsByClass(spanner.RepeatBracket)
+#         >>> len(repeatBrackets)
+#         8
+#         >>> len(c1.parts[0].getElementsByClass(spanner.RepeatBracket))
+#         2
+#         '''
+#         
+#         if self.s is None:
+#             raise NoInternalStreamException("This function only works when RepeatFinder is initialized with a stream")
+#     
+#         if inPlace:
+#             s = self.s
+#         else:
+#             s = copy.deepcopy(self.s)
+#             
+#         if s is None:
+#             raise NoInternalStreamException("This function only works when RepeatFinder is initialized with a stream")
+# 
+#         
+#         if not s.hasMeasures():
+#             for part in s.parts:
+#                 RepeatFinder(part).insertRepeatEnding(start, end, endingNumber, True)
+#             if inPlace:
+#                 return
+#             else:
+#                 return s
+#         
+#         
+#         measures = [ s.measure(i) for i in range(start, end+1) ]
+#         rb = spanner.RepeatBracket(measures, number=endingNumber)
+#         rbOffset = measures[0].getOffsetBySite(s)   #adding repeat bracket to stream at beginning of repeated section.  Maybe better at end?
+#         s.insert(rbOffset, rb)
+#         
+#         if inPlace:
+#             return
+#         else:
+#             return s
+# 
+#     """
+#     """       
+#     def _createFirstAndSecondEndingsFromSimilarMeasureGroups(self, mGroups, threshold=3, inPlace=False):
+#         '''
+#         Returns a stream with first and second endings with repeats substituted in when appropriate.
+#         Does not detect sections that are more than 16 measure apart.
+#         
+#         mGroup is the result of calling getSimilarMeasureGroupsFromlist( SimilarityList(s)).
+#         
+#         
+#     
+#         '''
+#         
+#         #fix this function for inPlace
+#         
+#         #There might be a way to break this by trying to put a repeated section into where the second ending should go.
+#         #i.e. let's not replace the second ending with a repeat
+#         
+#         if self.s is None:
+#             raise NoInternalStreamException("This function only works when RepeatFinder is initialized with a stream")
+#         
+#         if inPlace:
+#             s = self.s
+#         else:
+#             s = copy.deepcopy(self.s)
+#         
+#         
+#         toProcess = [] # (measureStart, measureOfFirstEnding, repeatSignMeasure)
+#         toDelete = [] 
+#         for mGroup in mGroups:
+#             distance = mGroup[1][0] - mGroup[0][-1] - 1
+#             maxAcceptableDistance = min(16, len(mGroup[0])/2.0 + 1)  #talk about this line more in documentation
+#             if len( mGroup[0] ) >= threshold and distance <= maxAcceptableDistance and distance != 0:
+#                 startingBar = mGroup[0][0]
+#                 firstEndingBar = mGroup[0][-1]+1
+#                 repeatSignBar = mGroup[1][0]-1
+#                 
+#                 toProcessTuple = (startingBar, firstEndingBar, repeatSignBar)
+#                 toProcess.append(toProcessTuple)
+#                 toDelete.extend(mGroup[1])
+#                 
+#              
+#         for startingBar, firstEndingBar, repeatSignBar in toProcess:
+#             self.insertRepeat(startingBar, repeatSignBar, True)                
+#             lengthOfRepeatEnding = repeatSignBar - firstEndingBar + 1
+#             lengthOfRepeatedSection = firstEndingBar - startingBar + 1
+#             startOfSecondEnding = repeatSignBar + lengthOfRepeatedSection
+#             insertRepeatEnding(s, firstEndingBar, repeatSignBar, 1, True)
+#             insertRepeatEnding(s, startOfSecondEnding, startOfSecondEnding + lengthOfRepeatEnding, 2, True)
+#         
+#         self.deleteMeasures(toDelete, True)
+#         
+#         if inPlace:
+#             return
+#         else:
+#             return s
+#         
+#             
+#     """
+#     
+#     """
+# 
+#     def deleteMeasures(self, toDelete, inPlace=False):
+#         '''
+#         Given a stream s and a list of numbers, toDelete, removes each measure with a number
+#         corresponding to a number in toDelete.  Renumbers the remaining measures in the stream.
+#                 
+#         
+#         
+#         >>> from copy import deepcopy
+#         >>> chorale1 = corpus.parse('bwv10.7.mxl')
+#         >>> s = deepcopy(chorale1)
+#         >>> repeat.RepeatFinder(s).deleteMeasures([6, 3, 4], inPlace=True)
+#         >>> m2 = search.translateStreamToString( chorale1.parts[1].measure(2).notesAndRests)
+#         >>> resm2 = search.translateStreamToString( s.parts[1].measure(2).notesAndRests)
+#         >>> m2 == resm2
+#         True
+#         >>> m5 = search.translateStreamToString( chorale1.parts[1].measure(5).notesAndRests)
+#         >>> resm3 = search.translateStreamToString( s.parts[1].measure(3).notesAndRests)
+#         >>> m5 == resm3
+#         True
+#         >>> m7 = search.translateStreamToString( chorale1.parts[1].measure(7).notesAndRests)
+#         >>> resm4 = search.translateStreamToString( s.parts[1].measure(4).notesAndRests)
+#         >>> m7 == resm4
+#         True
+#         >>> lenS = len(s.parts[0].getElementsByClass(stream.Measure))
+#         >>> lenChorale1 = len(chorale1.parts[0].getElementsByClass(stream.Measure))
+#         >>> lenS + 3 == lenChorale1
+#         True
+#         >>> chorale2 = corpus.parse('bwv101.7.mxl')
+#         >>> s = deepcopy(chorale2)
+#         >>> repeat.RepeatFinder(s).deleteMeasures([3, 4, 5], True)
+#         >>> m2 = search.translateStreamToString( chorale2.parts[0].measure(2).notesAndRests)
+#         >>> resm2 = search.translateStreamToString( s.parts[0].measure(2).notesAndRests)
+#         >>> m3 = search.translateStreamToString( chorale2.parts[0].measure(3).notesAndRests)
+#         >>> m6 = search.translateStreamToString( chorale2.parts[0].measure(6).notesAndRests)
+#         >>> resm3 = search.translateStreamToString( s.parts[0].measure(3).notesAndRests)
+#         >>> m2 == resm2
+#         True
+#         >>> resm3 == m3
+#         False
+#         >>> resm3 == m6
+#         True
+#         >>> chorale3 = corpus.parse('bwv102.7.mxl')
+#         >>> s = repeat.RepeatFinder(chorale3).deleteMeasures([2, 3])
+#         >>> len(s.parts[2].getElementsByClass(stream.Measure)) == len(chorale3.parts[2].getElementsByClass(stream.Measure)) - 2
+#         True
+#         >>> s = repeat.RepeatFinder(chorale3).deleteMeasures([2, 3])
+#         >>> len(s.parts[2].getElementsByClass(stream.Measure)) == len(chorale3.parts[2].getElementsByClass(stream.Measure)) - 2
+#         True
+#         >>> s = repeat.RepeatFinder(chorale3).deleteMeasures([999, 1001001])
+#         >>> len(s.parts[2]) == len(chorale3.parts[2])
+#         True
+#         
+#         '''
+#         
+#         if self.s is None:
+#             raise NoInternalStreamException("This function only works when RepeatFinder is initialized with a stream")
+#         
+#         if inPlace:
+#             s = self.s
+#         else:
+#             s = copy.deepcopy(self.s)
+#         
+#             
+#             
+#         if s.hasMeasures():
+#             for mNumber in toDelete:
+#                 try:
+#                     removeMe = s.measure(mNumber)
+#                 except:
+#                     removeMe = None
+#                     
+#                 if removeMe is not None:
+#                     s.remove( removeMe )
+#         else:
+#             for part in s.parts:
+#                 deleteMeasures(part, toDelete, inPlace=True)
+#             if inPlace:
+#                 return
+#             else:
+#                 return s
+#         
+#         #correct the measure numbers
+#         measures = s.getElementsByClass(music21.stream.Measure)
+#         if len(measures) is not 0:
+#             i = measures[0].number
+#             
+#             #if we deleted the first measure...  TODO: test this case
+#             if i is not 0 and i is not 1:
+#                 i = 1   #can simplify to one line with above.
+#             
+#             for measure in measures:
+#                 measure.number = i
+#                 i += 1
+#         
+#         if inPlace:
+#             return
+#         else:
+#             return s 
+#         
+#     """
         
         
     def simplify(self, repeatThreshold=4, repeatEndingThreshold=3, inPlace=False):
@@ -2673,13 +2667,13 @@ class RepeatFinder(object):
         
         # Want to give priority first to the longest repeated sections, and then to the repeated sections that happen earlier.  
         # We sort the tuples of mGroups accordingly  
-        def myComp(x,y):
-            if len(x[0]) != len(y[0]):
-                return len(y[0])-len(x[0])
-            elif x[0][0] != y[0][0]:
-                return x[0][0]-y[0][0]
-            else:
-                return x[1][0] - y[1][0]
+#         def myComp(x,y):
+#             if len(x[0]) != len(y[0]):
+#                 return len(y[0])-len(x[0])
+#             elif x[0][0] != y[0][0]:
+#                 return x[0][0]-y[0][0]
+#             else:
+#                 return x[1][0] - y[1][0]
 
         mGroups = sorted(mGroups, key=lambda x: (-1 * len(x[0]), x[0][0], x[1][0]))
             
@@ -2793,13 +2787,13 @@ class RepeatFinder(object):
         mGroups = [x for x in mGroups if len(x[0]) >= threshold]    #only want long enough measure groups
             
         #sort them giving first priority to larger groups, then to groups that occur earlier
-        def aGoodOrder(x,y):
-            if len(x[0]) != len(y[0]):
-                return len(y[0])-len(x[0])
-            elif x[0][0] != y[0][0]:
-                return x[0][0]-y[0][0]
-            else:
-                return x[1][0] - y[1][0]
+#         def aGoodOrder(x,y):
+#             if len(x[0]) != len(y[0]):
+#                 return len(y[0])-len(x[0])
+#             elif x[0][0] != y[0][0]:
+#                 return x[0][0]-y[0][0]
+#             else:
+#                 return x[1][0] - y[1][0]
             
         #mGroups = sorted(mGroups, cmp=aGoodOrder)
         mGroups = sorted(mGroups, key=lambda x: (-1 * len(x[0]), x[0][0], x[1][0]))
