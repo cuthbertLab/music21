@@ -40,12 +40,12 @@ def main(fnAccept=None):
     '''
     `fnAccept` is a list of one or more files to test.
     '''
-
+    sourceFolder = common.getSourceFilePath()
     mg = test.ModuleGather()
 
     # only accept a few file names for now
-    if fnAccept in [None, []]:
-        fnAccept = ['dynamics.py']
+    if fnAccept in (None, []):
+        fnAccept = ['stream']
     fnPathReject = ['/ext/',
                     'bar.py',  # crashes pylint...
                     'repeat.py', # hangs pylint...
@@ -108,9 +108,11 @@ def main(fnAccept=None):
                 break
         if rejectIt:
             continue
-        unused_dir, fn = os.path.split(fp)
+        fpRelative = fp.replace(sourceFolder, '')
+        unused_dir, fn = os.path.split(fpRelative)
         fnNoExt = fn.replace('.py', '')
-        if fn in fnAccept or fnNoExt in fnAccept:
+        fpRelativeNoSlash = fpRelative[1:]
+        if fn in fnAccept or fnNoExt in fnAccept or fpRelative in fnAccept or fpRelativeNoSlash in fnAccept:
             cmdFile = cmd + [fp]
             print(' '.join(cmdFile))
             if common.getPlatform() != 'win':

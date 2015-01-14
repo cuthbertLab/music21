@@ -124,7 +124,7 @@ class StreamIterator(object):
 
     next = __next__ # python2
     
-    def __getitem__(self, key):
+    def __getitem__(self, k):
         '''
         if you are in the iterator, you should still be able to request other items...uses self.srcStream.__getitem__
 
@@ -163,7 +163,7 @@ class StreamIterator(object):
         True
 
         '''
-        return self.srcStream.__getitem__(key)
+        return self.srcStream.__getitem__(k)
 
 
 #------------------------------------------------------------------------------
@@ -382,7 +382,7 @@ class Stream(base.Music21Object):
         return StreamIterator(self)
 
 
-    def __getitem__(self, key):
+    def __getitem__(self, k):
         '''
         Get a Music21Object from the Stream using a variety of keys or indices.
 
@@ -421,24 +421,24 @@ class Stream(base.Music21Object):
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
 
-        if common.isNum(key):
+        if common.isNum(k):
             match = None
             # handle easy and most common case first
-            if key >= 0 and key < len(self._elements):
-                match = self._elements[key]
+            if k >= 0 and k < len(self._elements):
+                match = self._elements[k]
             # if using negative indices, or trying to access end elements,
             # then need to use .elements property
             else:
                 try:
-                    match = self.elements[key]
+                    match = self.elements[k]
                 except IndexError:
                     raise StreamException('attempting to access index %s while elements is of size %s' % 
-                                          (key, len(self.elements)))
+                                          (k, len(self.elements)))
             # setting active site as cautionary measure
             match.activeSite = self
             return match
 
-        elif isinstance(key, slice): # get a slice of index values
+        elif isinstance(k, slice): # get a slice of index values
             # manually inserting elements is critical to setting the element
             # locations
             try:
@@ -446,30 +446,30 @@ class Stream(base.Music21Object):
             except TypeError:
                 raise StreamException("Error in defining class: %r. " + 
                                       "Stream subclasses and Music21Objects cannot have required arguments in __init__" % self.__class__)
-            for e in self.elements[key]:
+            for e in self.elements[k]:
                 found.insert(e.getOffsetBySite(self), e)
             # each insert calls this; does not need to be done here
             #found._elementsChanged()
             return found
 
-        elif common.isStr(key):
+        elif common.isStr(k):
             # first search id, then search groups
-            idMatch = self.getElementById(key)
+            idMatch = self.getElementById(k)
             if idMatch is not None:
                 return idMatch
             else: # search groups, return first element match
-                groupStream = self.getElementsByGroup(key)
+                groupStream = self.getElementsByGroup(k)
                 if len(groupStream) > 0:
                     return groupStream
                 else:
-                    raise KeyError('provided key (%s) does not match any id or group' % key)
-        elif isinstance(key, type(type)):
+                    raise KeyError('provided key (%s) does not match any id or group' % k)
+        elif isinstance(k, type(type)):
             # assume it is a class name
-            classStream = self.getElementsByClass(key)
+            classStream = self.getElementsByClass(k)
             if len(classStream) > 0:
                 return classStream
             else:
-                raise KeyError('provided class (%s) does not match any contained Objects' % key)
+                raise KeyError('provided class (%s) does not match any contained Objects' % k)
 
 
 #    def __del__(self):
@@ -628,7 +628,7 @@ class Stream(base.Music21Object):
 
         ''')
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, k, value):
         '''
         Insert an item at a currently filled index position,
         as represented in the elements list.
@@ -650,11 +650,11 @@ class Stream(base.Music21Object):
         False
         '''
         # remove old value at this position
-        oldValue = self._elements[key]
+        oldValue = self._elements[k]
         oldValue.removeLocationBySite(self)
 
         # assign in new position
-        self._elements[key] = value
+        self._elements[k] = value
         value.activeSite = self
         # must get native offset
         value.sites.add(self, value.offset)
@@ -669,7 +669,7 @@ class Stream(base.Music21Object):
             self._elementsChanged()
 
 
-    def __delitem__(self, key):
+    def __delitem__(self, k):
         '''Delete element at an index position. Index positions are based
         on positions in self.elements.
 
@@ -680,7 +680,7 @@ class Stream(base.Music21Object):
         >>> len(a)
         9
         '''
-        del self._elements[key]
+        del self._elements[k]
         self._elementsChanged()
 
 
@@ -1274,7 +1274,7 @@ class Stream(base.Music21Object):
                     if not isinstance(attrValue, base.Music21Object):
                         # shallow copy then...
                         try:
-                            shallowlyCopiedObject = copy.copy(attrValue, memo)
+                            shallowlyCopiedObject = copy.copy(attrValue)
                             setattr(new, name, shallowlyCopiedObject)
                             environLocal.printDebug('__deepcopy__: Could not deepcopy %s in %s, not a music21Object so making a shallow copy' % (name, self))
                         except TypeError:
@@ -1796,7 +1796,7 @@ class Stream(base.Music21Object):
         else:
             item = itemOrList
         try:
-            item.isStream # will raise attribute error
+            unused = item.isStream # will raise attribute error
             element = item
         except AttributeError: # need to wrap
             #element = music21.ElementWrapper(item)
@@ -3399,12 +3399,18 @@ class Stream(base.Music21Object):
     # _getNotes and _getPitches are found with the interval routines
 
     def measures(self, numberStart, numberEnd,
-        collect=['Clef', 'TimeSignature', 'Instrument', 'KeySignature'], gatherSpanners=True, searchContext=False, ignoreNumbers=False):
-        '''Get a region of Measures based on a start and end Measure number, were the boundary numbers are both included. That is, a request for measures 4 through 10 will return 7 Measures, numbers 4 through 10.
+        collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'), 
+        gatherSpanners=True, searchContext=False, ignoreNumbers=False):
+        '''
+        Get a region of Measures based on a start and end Measure number, 
+        where the boundary numbers are both included. 
+        That is, a request for measures 4 through 10 will return 7 Measures, numbers 4 through 10.
 
-        Additionally, any number of associated classes can be gathered as well. Associated classes are the last found class relevant to this Stream or Part.
+        Additionally, any number of associated classes can be gathered as well. 
+        Associated classes are the last found class relevant to this Stream or Part.
 
-        While all elements in the source are made available in the extracted region, new Measure objects are created and returned.
+        While all elements in the source are made available in the extracted region, 
+        new Measure objects are created and returned.
 
 
         >>> a = corpus.parse('bach/bwv324.xml')
@@ -3412,7 +3418,8 @@ class Stream(base.Music21Object):
         >>> len(b.getElementsByClass('Measure'))
         3
 
-        if ignoreNumbers is True, then it ignores defined measureNumbers and uses 0-indexed measure objects
+        if ignoreNumbers is True, then it ignores defined measureNumbers and 
+        uses 0-indexed measure objects
 
         '''
         returnObj = self.__class__()
@@ -3587,7 +3594,7 @@ class Stream(base.Music21Object):
 
 
     def measure(self, measureNumber,
-        collect=['Clef', 'TimeSignature', 'Instrument', 'KeySignature'],
+        collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
         searchContext=False, ignoreNumbers=False):
         '''
         Given a measure number, return a single
@@ -3897,8 +3904,6 @@ class Stream(base.Music21Object):
 
 
     def _getVoices(self):
-        '''
-        '''
         return self.getElementsByClass('Voice')
 
     voices = property(_getVoices,
@@ -3915,8 +3920,6 @@ class Stream(base.Music21Object):
         ''')
 
     def _getSpanners(self):
-        '''
-        '''
         return self.getElementsByClass('Spanner')
 
     spanners = property(_getSpanners,
@@ -4015,9 +4018,9 @@ class Stream(base.Music21Object):
         else:
             classFilterList = ['Note', 'Chord']
 
-        for key in boundaries:
-            start, end = key
-            i = boundaries[key]
+        for k in boundaries:
+            start, end = k
+            i = boundaries[k]
             focus = returnObj.getElementsByOffset(start, end,
                 includeEndBoundary=False, mustFinishInSpan=False,
                 mustBeginInSpan=True)
@@ -4030,7 +4033,7 @@ class Stream(base.Music21Object):
                 else:
                     focus.transpose(trans, inPlace=True,
                                     classFilterList=classFilterList)
-            #print(key, i.transposition)
+            #print(k, i.transposition)
         return returnObj
 
     def toSoundingPitch(self, inPlace=True):
@@ -4582,7 +4585,7 @@ class Stream(base.Music21Object):
         36.0
         '''
         try:
-            item.isStream
+            unused = item.isStream
             element = item
         #if not isinstance(item, music21.Music21Object):
         except AttributeError:
@@ -4619,7 +4622,7 @@ class Stream(base.Music21Object):
             raise StreamException('must provide a lost of offsets, not %s' % offsets)
 
         try:
-            item.isStream
+            unused = item.isStream
             element = item
         #if not isinstance(item, music21.Music21Object):
         except AttributeError:
@@ -6694,7 +6697,7 @@ class Stream(base.Music21Object):
 
 
     def _yieldElementsDownward(self, streamsOnly=False,
-            restoreActiveSites=True, classFilter=[]):
+            restoreActiveSites=True, classFilter=()):
         '''
         Yield all containers (Stream subclasses), including self,
         and going downward.
@@ -6783,7 +6786,7 @@ class Stream(base.Music21Object):
 
 
     def _yieldElementsUpward(self, memo=None, streamsOnly=False,
-                             skipDuplicates=True, classFilter=[]):
+                             skipDuplicates=True, classFilter=()):
         '''
         Yield all containers (Stream subclasses), including self, and going upward.
 
@@ -6849,7 +6852,7 @@ class Stream(base.Music21Object):
 
     # possible rename recurseList
     def recurse(self, streamsOnly=False,
-        restoreActiveSites=True, skipDuplicates=True, classFilter=[], direction='downward'):
+        restoreActiveSites=True, skipDuplicates=True, classFilter=(), direction='downward'):
         '''
         Iterate over a list of all Music21Objects contained in the Stream,
         starting with self, continuing with self's elements,
@@ -7550,11 +7553,11 @@ class Stream(base.Music21Object):
                         break
                 if not foundPart:
                     raise StreamException("beatAndMeasureFromOffset: couldn't find any parts!")
-                    return False
+                    # was return False
             else:
                 if not myStream.hasMeasures():
                     raise StreamException("beatAndMeasureFromOffset: couldn't find any measures!")
-                    return False
+                    # return False
         #Now we get the measure containing our offset.
         #In most cases this second part of the code does the job.
         myMeas = myStream.getElementAtOrBefore(searchOffset, classList = ['Measure'])
@@ -7605,7 +7608,7 @@ class Stream(base.Music21Object):
     # transformations
 
     def transpose(self, value, inPlace=False,
-        classFilterList=['Note', 'Chord']):
+        classFilterList=('Note', 'Chord')):
         '''
         Transpose all specified classes in the
         Stream by the
@@ -8596,10 +8599,10 @@ class Stream(base.Music21Object):
         '''
         post = {}
         for p in self.pitches:
-            key = getattr(p, pitchAttr)
-            if key not in post:
-                post[key] = 0
-            post[key] += 1
+            k = getattr(p, pitchAttr)
+            if k not in post:
+                post[k] = 0
+            post[k] += 1
         return post
 
 
@@ -8617,10 +8620,10 @@ class Stream(base.Music21Object):
         post = {}
         for e in self.getElementsByClass(classFilterList):
             if hasattr(e, attrName):
-                key = getattr(e, attrName)
-                if key not in post:
-                    post[key] = 0
-                post[key] += 1
+                k = getattr(e, attrName)
+                if k not in post:
+                    post[k] = 0
+                post[k] += 1
         return post
 
 
@@ -8630,7 +8633,7 @@ class Stream(base.Music21Object):
     def findConsecutiveNotes(self, skipRests = False, skipChords = False,
         skipUnisons = False, skipOctaves = False,
         skipGaps = False, getOverlaps = False, noNone = False, **keywords):
-        '''
+        r'''
         Returns a list of consecutive *pitched* Notes in a Stream.
 
         A single "None" is placed in the list
@@ -8674,8 +8677,9 @@ class Stream(base.Music21Object):
             vGroups = []
             for v in self.voices:
                 vGroups.append(v.flat)
-            else:
-                vGroups.append(sortedSelf)
+            vGroups.append(sortedSelf)
+        else:
+            vGroups = (sortedSelf.flat,)
 
         for v in vGroups:
             for e in v.elements:
@@ -8975,13 +8979,13 @@ class Stream(base.Music21Object):
                     # if so, use the offset of where it was stored to
                     # to store the src element below
                     store = True
-                    for key in post:
+                    for k in post:
                         # this comparison needs to be based on object id, not
                         # matching equality
-                        if id(elementObj) in [id(e) for e in post[key]]:
+                        if id(elementObj) in [id(e) for e in post[k]]:
                         # if elementObj in post[key]:
                             store = False
-                            dstOffset = key
+                            dstOffset = k
                             break
                     if dstOffset is None:
                         dstOffset = srcOffset
@@ -8993,8 +8997,8 @@ class Stream(base.Music21Object):
 
                 # check if this object has been stored anywhere yet
                 store = True
-                for key in post:
-                    if id(srcElementObj) in [id(e) for e in post[key]]:
+                for k in post:
+                    if id(srcElementObj) in [id(e) for e in post[k]]:
                     #if srcElementObj in post[key]:
                         store = False
                         break
@@ -9565,7 +9569,7 @@ class Stream(base.Music21Object):
         return None
 
     def internalize(self, container=None,
-                    classFilterList=['GeneralNote']):
+                    classFilterList=('GeneralNote',)):
         '''
         Gather all notes and related classes of this Stream
         and place inside a new container (like a Voice) in this Stream.
@@ -9632,7 +9636,7 @@ class Stream(base.Music21Object):
                     mActive.mergeAttributes(m)
                     # merge everything except Voices; this will get
                     # clefs
-                    mActive.mergeElements(m, classFilterList=['Bar', 'TimeSignature', 'Clef', 'KeySignature'])
+                    mActive.mergeElements(m, classFilterList=('Bar', 'TimeSignature', 'Clef', 'KeySignature'))
                     for vIndex, v in enumerate(m.voices):
                         # make an independent copy
                         mNew = copy.deepcopy(mActive)
@@ -9789,8 +9793,8 @@ class Stream(base.Music21Object):
 
         def appendLyricsFromNote(n, returnLists, numNonesToAppend):
             if len(n.lyrics) == 0:
-                for key in returnLists:
-                    returnLists[key].append(None)
+                for k in returnLists:
+                    returnLists[k].append(None)
                 return
 
             addLyricNums = []
@@ -9799,9 +9803,9 @@ class Stream(base.Music21Object):
                     returnLists[l.number] = [ None for dummy in range(numNonesToAppend) ]
                 returnLists[l.number].append(l)
                 addLyricNums.append(l.number)
-            for key in returnLists:
-                if key not in addLyricNums:
-                    returnLists[key].append(None)
+            for k in returnLists:
+                if k not in addLyricNums:
+                    returnLists[k].append(None)
 
         #------------------------
 
@@ -9823,10 +9827,10 @@ class Stream(base.Music21Object):
             elif recurse is True and "Stream" in eclasses:
                 s = e
                 sublists = s.lyrics(ignoreBarlines = ignoreBarlines, recurse = True, skipTies = skipTies)
-                for key in sublists:
-                    if not key in returnLists:
-                        returnLists[key] = []
-                    returnLists[key].append(sublists[key])
+                for k in sublists:
+                    if not k in returnLists:
+                        returnLists[k] = []
+                    returnLists[k].append(sublists[k])
             elif "NotRest" in eclasses: #elif "Stream" not in eclasses and hasattr(e, "lyrics"):
                 n = e
                 if skipTies is True:
@@ -10252,7 +10256,7 @@ class Stream(base.Music21Object):
             # If deletedMeasures != [], then there were more deleted measures than inserted and the remaining numbers in deletedMeasures are those that were removed.
             return deletedMeasures, (highestNumber, insertedMeasures) #In the case that the variant and stream are in the same time-signature, this should return []
 
-    def _insertDeletionVariant(self, v, matchBySpan = True):
+    def _insertDeletionVariant(self, v, matchBySpan=True):
         '''
         Helper function for activateVariants used for inserting variants that are shorter than
         the region they replace. Inserts elements in the variant and deletes elements in the
@@ -10659,7 +10663,7 @@ class Stream(base.Music21Object):
             else:
                 return numOrNumTuple
             
-        allMeasures.sort(key = measureNumberSortRoutine)
+        allMeasures.sort(key=measureNumberSortRoutine)
 
         oldMeasures = self.getElementsByClass("Measure")
         newMeasures = []
@@ -10696,7 +10700,7 @@ class Stream(base.Music21Object):
         # above which measures should be shifted by the value up to the next key. It is easiest
         # to do this in reverse order so there is no overlapping.
         previousBoundary = None
-        for k in sorted(oldCorrections.keys(), key = lambda x: -x):
+        for k in sorted(oldCorrections.keys(), key=lambda x: -x):
             shift = oldCorrections[k]
             for m in oldMeasures:
                 if previousBoundary is None or m.number < previousBoundary:
@@ -10705,7 +10709,7 @@ class Stream(base.Music21Object):
             previousBoundary = k
 
         previousBoundary = None
-        for k in sorted(newCorrections.keys(), key = lambda x: -x):
+        for k in sorted(newCorrections.keys(), key=lambda x: -x):
             shift = newCorrections[k]
             for m in newMeasures:
                 if previousBoundary is None or m.number < previousBoundary:
@@ -11149,7 +11153,7 @@ class Measure(Stream):
             #environLocal.printDebug(['got anacrusis shift:', shift,
             #                    barDuration.quarterLength, proportion])
             # this will shift all elements
-            #self.shiftElements(shift, classFilterList=[note.GeneralNote])
+            #self.shiftElements(shift, classFilterList=(note.GeneralNote,))
         else:
             pass
             #environLocal.printDebug(['padAsAnacrusis() called; however, no anacrusis shift necessary:', barDuration.quarterLength, proportion])
@@ -11709,7 +11713,8 @@ class Score(Stream):
         ''')
 
     def measures(self, numberStart, numberEnd,
-        collect=['Clef', 'TimeSignature', 'Instrument', 'KeySignature'], gatherSpanners=True, searchContext=False, ignoreNumbers=False):
+        collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'), 
+        gatherSpanners=True, searchContext=False, ignoreNumbers=False):
         '''This method override the :meth:`~music21.stream.Stream.measures` method on Stream. This creates a new Score stream that has the same measure range for all Parts.
 
         The `collect` argument is a list of classes that will be collected.
@@ -11742,8 +11747,8 @@ class Score(Stream):
 
 
     def measure(self, measureNumber,
-        collect=[clef.Clef, meter.TimeSignature,
-        instrument.Instrument, key.KeySignature], gatherSpanners=True, ignoreNumbers=False):
+        collect=(clef.Clef, meter.TimeSignature,
+        instrument.Instrument, key.KeySignature), gatherSpanners=True, ignoreNumbers=False):
         '''
         Given a measure number,
         return a single :class:`~music21.stream.Measure` object if the Measure number exists, otherwise return None.
@@ -11833,12 +11838,12 @@ class Score(Stream):
             for p in parts:
                 mapPartial = p.measureOffsetMap(classFilterList)
                 #environLocal.printDebug(['mapPartial', mapPartial])
-                for key in mapPartial:
-                    if key not in offsetMap:
-                        offsetMap[key] = []
-                    for m in mapPartial[key]: # get measures from partial
-                        if m not in offsetMap[key]:
-                            offsetMap[key].append(m)
+                for k in mapPartial:
+                    if k not in offsetMap:
+                        offsetMap[k] = []
+                    for m in mapPartial[k]: # get measures from partial
+                        if m not in offsetMap[k]:
+                            offsetMap[k].append(m)
             return offsetMap
 
     def sliceByGreatestDivisor(self, inPlace=True, addTies=True):
@@ -11976,7 +11981,7 @@ class Score(Stream):
                         # note: not copying here; and first part read will provide
                         # attributes; possible other parts may have other attributes
                         mActive.mergeAttributes(m)
-                        mActive.mergeElements(m, classFilterList=['Bar', 'TimeSignature', 'Clef', 'KeySignature'])
+                        mActive.mergeElements(m, classFilterList=('Bar', 'TimeSignature', 'Clef', 'KeySignature'))
 
 #                         if m.timeSignature is not None:
 #                             mActive.timeSignature = m.timeSignature
@@ -12022,7 +12027,7 @@ class Score(Stream):
 
 
 
-    def flattenParts(self, classFilterList=['Note', 'Chord']):
+    def flattenParts(self, classFilterList=('Note', 'Chord')):
         '''
         Given a Score, combine all Parts into a single Part
         with all elements found in each Measure of the Score.
@@ -12250,8 +12255,6 @@ class Opus(Stream):
                 return s
 
     def _getScores(self):
-        '''
-        '''
         return self.getElementsByClass(Score)
 
     scores = property(_getScores,
