@@ -3,7 +3,8 @@
 # Name:         repeat.py
 # Purpose:      Base classes for processing repeats
 #
-# Authors:      Christopher Ariza, Daniel Manesh
+# Authors:      Christopher Ariza
+#               Daniel Manesh
 #
 # Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
@@ -452,69 +453,66 @@ def insertRepeatEnding(s, start, end, endingNumber=1, inPlace=False):
 
 
 def insertRepeat(s, start, end, inPlace=False):
-        '''
-        Given a stream s, inserts a start-repeat at the beginning of the 
-        bar specified by start and inserts an end-repeat at the bar specified
-        by barEnd. Only alters the stream s if inPlace=True. 
-        
-        
-        >>> from copy import deepcopy
-        >>> chorale1 = corpus.parse('bwv10.7.mxl')
-        >>> s = repeat.insertRepeat(chorale1, 3, 6, inPlace=False)
-        >>> m4 = search.translateStreamToString( chorale1.parts[1].measure(4).notesAndRests)
-        >>> resm4 = search.translateStreamToString( s.parts[1].measure(4).notesAndRests)
-        >>> m6 = search.translateStreamToString( chorale1.parts[1].measure(4).notesAndRests)
-        >>> resm6 = search.translateStreamToString( s.parts[1].measure(4).notesAndRests)
-        >>> m7 = search.translateStreamToString( chorale1.parts[1].measure(4).notesAndRests)
-        >>> resm7 = search.translateStreamToString( s.parts[1].measure(4).notesAndRests)
-        >>> m4 == resm4
-        True
-        >>> m6 == resm6
-        True
-        >>> m7 == resm7
-        True
-        
-        We should have 2 repeats in each part (a start and end) for a total of 8 repeats
-        
-        >>> len(s.parts[0].flat.getElementsByClass(bar.Repeat))
-        2
-        >>> len(s.flat.getElementsByClass(bar.Repeat))
-        8
-        >>> s.parts[0].measure(3).leftBarline.direction
-        'start'
-        >>> s.parts[0].measure(6).rightBarline.direction
-        'end'
-        
-        '''
-        
-        if s is None:
-            return None
-        
-        if not inPlace:
-            s = copy.deepcopy(s)
-        
-        if not s.hasMeasures():
-            for part in s.parts:
-                insertRepeat(part, start, end, True)
-            if inPlace:
-                return
-            else:
-                return s
-                
-        from music21 import bar
-        s.measure(end).rightBarline = bar.Repeat(direction='end', times=2)
-        
-        #Place a starting repeat, if needed
-        if start != 1 or RepeatFinder(s).getQuarterLengthOfPickupMeasure() != 0:
-            s.measure(start).leftBarline = bar.Repeat(direction='start')
-            
+    '''
+    Given a stream s, inserts a start-repeat at the beginning of the 
+    bar specified by start and inserts an end-repeat at the bar specified
+    by barEnd. Only alters the stream s if inPlace=True. 
+    
+    
+    >>> from copy import deepcopy
+    >>> chorale1 = corpus.parse('bwv10.7.mxl')
+    >>> s = repeat.insertRepeat(chorale1, 3, 6, inPlace=False)
+    >>> m4 = search.translateStreamToString( chorale1.parts[1].measure(4).notesAndRests)
+    >>> resm4 = search.translateStreamToString( s.parts[1].measure(4).notesAndRests)
+    >>> m6 = search.translateStreamToString( chorale1.parts[1].measure(4).notesAndRests)
+    >>> resm6 = search.translateStreamToString( s.parts[1].measure(4).notesAndRests)
+    >>> m7 = search.translateStreamToString( chorale1.parts[1].measure(4).notesAndRests)
+    >>> resm7 = search.translateStreamToString( s.parts[1].measure(4).notesAndRests)
+    >>> m4 == resm4
+    True
+    >>> m6 == resm6
+    True
+    >>> m7 == resm7
+    True
+    
+    We should have 2 repeats in each part (a start and end) for a total of 8 repeats
+    
+    >>> len(s.parts[0].flat.getElementsByClass(bar.Repeat))
+    2
+    >>> len(s.flat.getElementsByClass(bar.Repeat))
+    8
+    >>> s.parts[0].measure(3).leftBarline.direction
+    'start'
+    >>> s.parts[0].measure(6).rightBarline.direction
+    'end'
+    
+    '''
+    
+    if s is None:
+        return None
+    
+    if not inPlace:
+        s = copy.deepcopy(s)
+    
+    if not s.hasMeasures():
+        for part in s.parts:
+            insertRepeat(part, start, end, True)
         if inPlace:
             return
         else:
             return s
             
+    from music21 import bar
+    s.measure(end).rightBarline = bar.Repeat(direction='end', times=2)
     
-
+    #Place a starting repeat, if needed
+    if start != 1 or RepeatFinder(s).getQuarterLengthOfPickupMeasure() != 0:
+        s.measure(start).leftBarline = bar.Repeat(direction='start')
+        
+    if inPlace:
+        return
+    else:
+        return s
 
 def deleteMeasures(s, toDelete, inPlace=False):
         '''
