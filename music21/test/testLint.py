@@ -10,7 +10,6 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
-
 # this requires pylint to be installed and available from the command line
 
 
@@ -42,6 +41,7 @@ def main(fnAccept=None):
     '''
     sourceFolder = common.getSourceFilePath()
     mg = test.ModuleGather()
+    print("If you get an error, make sure that 'sudo pip install pylint' is there")
 
     # only accept a few file names for now
     if fnAccept in (None, []):

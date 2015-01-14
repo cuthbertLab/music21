@@ -24,3 +24,7 @@ class GroupException(Music21Exception):
 
 class MetadataException(Music21Exception):
     pass
+
+class AnalysisException(Music21Exception):
+    pass
+
