@@ -1,18 +1,18 @@
 .. _usersGuide_03_pitches:
 .. code:: python
 
-    %load_ext music21.ipython21.ipExtension
 
 
 .. parsed-literal::
    :class: ipython-result
 
-    Exception reporting mode: Plain
+    The music21.ipython21.ipExtension extension is already loaded. To reload it, use:
+      %reload_ext music21.ipython21.ipExtension
 
 User's Guide, Chapter 3: Pitches, Durations, and Notes again
 ============================================================
 
-Now that you have made a couple of ``Note`` objects, it's time to dig a
+Now that you've made a couple of ``Note`` objects, it's time to dig a
 little deeper into what makes a ``Note`` really a ``Note``, namely,
 :ref:`modulePitch`, and :ref:`moduleDuration` objects.
 
@@ -225,18 +225,18 @@ object, we could do with the ``note.Note.pitch`` object instead:
 
     ---------------------------------------------------------------------------
     AttributeError                            Traceback (most recent call last)
-    <ipython-input-23-8c908c31b14e> in <module>()
+    <ipython-input-288-8c908c31b14e> in <module>()
     ----> 1 csharp.spanish
     
     AttributeError: 'Note' object has no attribute 'spanish'
 
 *By the way, you know how we said that you shouldn't have a variable
-named ``pitch`` because there's already a module named ``pitch``. You
-might wonder why ``Note`` objects can have an attribute named ``pitch``
-without causing any problems. It's because the ``.pitch`` attribute is
-always attached to a ``Note``, so it's never used without a prefix of
-some sort (in this case, ``csharp.pitch``), and that's enough to prevent
-any trouble.*
+named* ``pitch`` *because there's already a module named* ``pitch``.
+*You might wonder why* ``Note`` *objects can have an attribute named*
+``pitch`` *without causing any problems. It's because the* ``.pitch``
+*attribute is always attached to a* ``Note`` *, so it's never used
+without a prefix of some sort (in this case,* ``csharp.pitch`` *), and
+that's enough to prevent any trouble.*
 
 So far, it looks like ``Pitch`` objects can do everything ``Note``
 objects can do and more. So why do we need ``Note`` objects? It's
@@ -275,7 +275,7 @@ shorter than an eighth note, we use numbers instead of spelling out the
 whole name of the ``Duration`` type. Music21 also supports less commonly
 used types such as "breve" (2 whole notes), "longa" (4 whole notes), and
 "maxima" (8 whole notes) and on the other side, "128th", "256th", etc.
-down to "1024th" notes. (Some of these very long and very short notes
+down to "2048th" notes. (Some of these very long and very short notes
 can't be displayed in many musical notation systems, but it's good to
 know that we're ready when they are).
 
@@ -681,7 +681,12 @@ Let's change the quarterLength back to 1.0 for now:
 ``Notes`` can do things that neither ``Pitch`` or ``Duration`` objects
 can do. For instance, they can have lyrics. Let's add some lyrics to
 ``Notes``. You can easily set :class:`~music21.note.Lyric` objects
-just by setting the :attr:``~music21.note.Note.lyric`` property
+just by setting the :meth:`lyric <music21.note.GeneralNote.lyric>`
+property. (For reference, the ``lyric`` attribute is actually an
+attribute of :class:`~music21.note.GeneralNote`, which is a "base
+class" from which the ``Note`` class "inherits". In other words, the
+``Note`` class gains the ``lyric`` attribute from ``GeneralNote``. But
+that's not too important.)
 
 .. code:: python
 
@@ -691,7 +696,7 @@ just by setting the :attr:``~music21.note.Note.lyric`` property
 But let's do something more complex. Here I add multiple lyrics to
 ``n1`` using the ``Note's`` :meth:`~music21.note.GeneralNote.addLyric`
 method. And instead of adding a simple String, I'll add as a lyric the
-name of the note itself and its pitchClassString.
+name of the note itself and its ``pitchClassString``.
 
 .. code:: python
 
@@ -712,19 +717,27 @@ string. Remember that ``.quarterLength`` is not a string, but a float).
 As it should be becoming clear, we can always check our work with the
 :meth:`~music21.base.Music21Object.show` method.
 
-n1.show()
+.. code:: python
+
+    n1.show()
 
 
-If we now edit the :attr:``~music21.note.Note.quarterLength`` property
-we can still change the ``Note``'s ``Duration``. But because we already
-set the lyric to show "``QL: 1.0``, it won't be changed when we
+.. image:: usersGuide_03_pitches_files/_fig_41.png
+
+
+If we now edit the
+:meth:`quarterLength <music21.base.Music21Object.quarterLength>`
+property we can still change the ``Note``'s ``Duration``. But because we
+already set the lyric to show "``QL: 1.0``, it won't be changed when we
 ``.show()`` it again in the following example.
 
 .. code:: python
 
     n1.quarterLength = 6.25
+    n1.show()
 
-n1.show()
+
+.. image:: usersGuide_03_pitches_files/_fig_43.png
 
 
 There many more things we can do with a ``Note`` object, but I'm itching

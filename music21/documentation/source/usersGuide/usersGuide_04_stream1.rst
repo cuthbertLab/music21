@@ -1,13 +1,13 @@
 .. _usersGuide_04_stream1:
 .. code:: python
 
-    %load_ext music21.ipython21.ipExtension
 
 
 .. parsed-literal::
    :class: ipython-result
 
-    Exception reporting mode: Plain
+    The music21.ipython21.ipExtension extension is already loaded. To reload it, use:
+      %reload_ext music21.ipython21.ipExtension
 
 User's Guide, Chapter 4: Lists, Streams (I) and Output
 ======================================================
@@ -137,18 +137,16 @@ to hit enter twice to see the results.)
     C
     F
 
-| What's happening here? What ``for thisNote in noteList:`` says is that
-  Python should take each note in noteList in order and temporarily call
-  that note "``thisNote``\ " (you could have it called anything you
-  want; ``myNote``, ``n``, ``currentNote`` are all good names, but
-  ``note`` is not because ``note`` is the name of a module). Then the
-  ":" at the end of the line indicates that everything that happens for
-  a bit will apply to every ``Note`` in noteList one at a time. How does
-  Python know when "a bit" is over? Simple: every line that is a part of
-  the loop needs to be indented by putting in some spaces (I usually use
-  four spaces or hit tab. Some people use two spaces.
-
-| Just be consistent).
+What's happening here? What ``for thisNote in noteList:`` says is that
+Python should take each note in noteList in order and temporarily call
+that note "``thisNote``\ " (you could have it called anything you want;
+``myNote``, ``n``, ``currentNote`` are all good names, but ``note`` is
+not because ``note`` is the name of a module). Then the ":" at the end
+of the line indicates that everything that happens for a bit will apply
+to every ``Note`` in noteList one at a time. How does Python know when
+"a bit" is over? Simple: every line that is a part of the loop needs to
+be indented by putting in some spaces. (I usually use four spaces or hit
+tab. Some people use two spaces. Just be consistent.)
 
 Loops don't save much time here, but imagine if noteList had dozens or
 hundreds of Notes in it? Then the ability to do something to each object
@@ -255,7 +253,8 @@ If we want to get the last element of a list, we can write:
 
 
 Which is how basements are numbered in Europe as well. This is the same
-element as noteList[2] (our third Note), as we can have Python prove:
+element as ``noteList[2]`` (our third Note), as we can have Python
+prove:\`
 
 .. code:: python
 
@@ -483,10 +482,18 @@ So, what else can we do with Streams? Like ``Note`` objects, we can
 ``show()`` them in a couple of different ways. Let's hear these three
 Notes as a MIDI file:
 
-stream1.show('midi')
+.. code:: python
+
+    #_DOCS_SHOW stream1.show('midi')
+
 Or let's see them as a score:
 
-stream1.show('musicxml')
+.. code:: python
+
+    stream1.show()
+
+
+.. image:: usersGuide_04_stream1_files/_fig_26.png
 
 
 You might ask why is the piece in common-time (4/4)? This is just the
@@ -560,7 +567,7 @@ By the way, Streams have a ``__repr__`` as well:
 .. parsed-literal::
    :class: ipython-result
 
-    <music21.stream.Stream 4416614928>
+    <music21.stream.Stream 0x1073d2690>
 
 
 that number at the end is the ``.id`` of the ``Stream``, which is a way
