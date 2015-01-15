@@ -1,54 +1,3 @@
-Traceback (most recent call last):
-  File "/Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/environment.py", line 1708, in testFromSettings
-    self.assertEqual(canonic.split(), match.split())
-AssertionError: Lists differ: ['<?xml', 'version="1.0"', 'en... != ['<?xml', 'version="1.0"', 'en...
-
-First differing element 19:
-value="ipython.vexflow"/>
-value="ipython.lilypond.png"/>
-
-Diff is 1787 characters long. Set self.maxDiff to None to see it.
-
-Traceback (most recent call last):
-  File "/Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/environment.py", line 1611, in testToSettings
-    self.assertEqual(canonic.split('\n'), match.split('\n'))
-AssertionError: Lists differ: ['<?xml version="1.0" encoding... != ['<?xml version="1.0" encoding...
-
-First differing element 7:
-  <preference name="ipythonShowFormat" value="ipython.vexflow"/>
-  <preference name="ipythonShowFormat" value="ipython.lilypond.png"/>
-
-  ['<?xml version="1.0" encoding="utf-8"?>',
-   '<settings>',
-   '  <preference name="autoDownload" value="ask"/>',
-   '  <preference name="braillePath"/>',
-   '  <preference name="debug" value="0"/>',
-   '  <preference name="directoryScratch"/>',
-   '  <preference name="graphicsPath" value="/Applications/Preview.app"/>',
--  '  <preference name="ipythonShowFormat" value="ipython.vexflow"/>',
-?                                                         ----  ^
-
-+  '  <preference name="ipythonShowFormat" value="ipython.lilypond.png"/>',
-?                                                          ++++ ^^^^^^
-
-   '  <preference name="lilypondBackend" value="ps"/>',
-   '  <preference name="lilypondFormat" value="pdf"/>',
-   '  <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond"/>',
-   '  <preference name="lilypondVersion"/>',
-   '  <localCorporaSettings/>',
-   '  <localCorpusSettings/>',
-   '  <preference name="manualCoreCorpusPath"/>',
-   '  <preference name="midiPath" value="/Applications/QuickTime Player.app"/>',
-   '  <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore.app/Contents/MacOS/mscore"/>',
-   '  <preference name="musicxmlPath" value="/Applications/Finale Notepad 2012.app"/>',
-   '  <preference name="pdfPath" value="/Applications/Preview.app"/>',
-   '  <preference name="showFormat" value="musicxml"/>',
-   '  <preference name="vectorPath" value="/Applications/Preview.app"/>',
-   '  <preference name="warnings" value="1"/>',
-   '  <preference name="writeFormat" value="musicxml"/>',
-   '</settings>',
-   '']
-
 
 
 ---------------SUMMARY---------------------------------------------------
@@ -82,7 +31,6 @@ Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/test/ti
 Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/test/testSingleCoreAll.py
 Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/test/testPerformance.py
 Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/test/testLint.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/test/testInstallation.py
 Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/test/testExternal.py
 Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/test/testDefault.py
 Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/test/multiprocessTest.py
@@ -177,86 +125,87 @@ Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/b
 Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/bhadley/HarmonyRealizer.py
 Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/__init__.py
 Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/configure.py
-xmlnode successfully ran 12 tests in 0 seconds
-webapps_apps successfully ran 6 tests in 1 seconds
-webapps_templates successfully ran 9 tests in 2 seconds
+xmlnode successfully ran 12 tests in 112 seconds
+webapps_apps successfully ran 6 tests in 2 seconds
+webapps_templates successfully ran 9 tests in 114 seconds
 webapps___init__ successfully ran 14 tests in 0 seconds
 volume successfully ran 20 tests in 0 seconds
 vexflow_toMusic21j successfully ran 9 tests in 0 seconds
 vexflow_indent successfully ran 3 tests in 0 seconds
-voiceLeading successfully ran 64 tests in 2 seconds
-vexflow___init__ successfully ran 30 tests in 2 seconds
+voiceLeading successfully ran 64 tests in 1 seconds
+vexflow___init__ successfully ran 30 tests in 1 seconds
 trecento_trecentoCadence successfully ran 7 tests in 0 seconds
 variant successfully ran 34 tests in 3 seconds
+webapps_commands successfully ran 10 tests in 119 seconds
 trecento_polyphonicSnippet successfully ran 9 tests in 0 seconds
-webapps_commands successfully ran 10 tests in 10 seconds
 trecento_findTrecentoFragments successfully ran 3 tests in 0 seconds
-trecento_notation successfully ran 17 tests in 2 seconds
-trecento_capua successfully ran 9 tests in 3 seconds
-trecento_tonality successfully ran 5 tests in 7 seconds
+trecento_notation successfully ran 17 tests in 1 seconds
+trecento_capua successfully ran 9 tests in 2 seconds
 trecento___init__ successfully ran 3 tests in 0 seconds
-tie successfully ran 7 tests in 0 seconds
+trecento_tonality successfully ran 5 tests in 6 seconds
 tinyNotation successfully ran 11 tests in 0 seconds
+tie successfully ran 7 tests in 0 seconds
 theoryAnalysis_theoryResult successfully ran 4 tests in 0 seconds
 theoryAnalysis___init__ successfully ran 3 tests in 0 seconds
-trecento_cadencebook successfully ran 23 tests in 11 seconds
-text successfully ran 24 tests in 13 seconds
+trecento_cadencebook successfully ran 23 tests in 9 seconds
+text successfully ran 24 tests in 11 seconds
+test_testDocumentation successfully ran 4 tests in 0 seconds
 test___init__ successfully ran 3 tests in 0 seconds
-theoryAnalysis_theoryAnalyzer successfully ran 43 tests in 14 seconds
+theoryAnalysis_theoryAnalyzer successfully ran 43 tests in 13 seconds
 tempo successfully ran 45 tests in 0 seconds
 stream_timespanNode successfully ran 9 tests in 0 seconds
-stream_timespanAnalysis successfully ran 20 tests in 4 seconds
-stream_streamStatus successfully ran 5 tests in 1 seconds
-stream_makeNotation successfully ran 10 tests in 1 seconds
-stream_timespans successfully ran 53 tests in 12 seconds
+stream_timespanAnalysis successfully ran 20 tests in 3 seconds
+stream_streamStatus successfully ran 5 tests in 0 seconds
+stream_makeNotation successfully ran 10 tests in 0 seconds
+stream_timespans successfully ran 53 tests in 9 seconds
 spanner successfully ran 53 tests in 2 seconds
 sites successfully ran 28 tests in 4 seconds
 sieve successfully ran 40 tests in 0 seconds
-stream___init__ successfully ran 142 tests in 16 seconds
-serial successfully ran 47 tests in 9 seconds
-search___init__ successfully ran 19 tests in 2 seconds
-search_segment successfully ran 7 tests in 20 seconds
+stream___init__ successfully ran 142 tests in 15 seconds
+serial successfully ran 47 tests in 7 seconds
+search___init__ successfully ran 19 tests in 1 seconds
+search_segment successfully ran 7 tests in 15 seconds
 scala_scl___init__ successfully ran 3 tests in 0 seconds
 scala___init__ successfully ran 12 tests in 0 seconds
 romanText_testFiles successfully ran 4 tests in 0 seconds
-scale successfully ran 90 tests in 19 seconds
+scale successfully ran 90 tests in 15 seconds
 romanText___init__ successfully ran 49 tests in 0 seconds
-roman successfully ran 30 tests in 11 seconds
-romanText_clercqTemperley successfully ran 18 tests in 18 seconds
-pitch successfully ran 95 tests in 0 seconds
-omr_evaluators successfully ran 8 tests in 7 seconds
+roman successfully ran 30 tests in 9 seconds
+romanText_clercqTemperley successfully ran 18 tests in 14 seconds
+pitch successfully ran 95 tests in 1 seconds
+omr_evaluators successfully ran 8 tests in 5 seconds
 omr_correctors successfully ran 24 tests in 2 seconds
 omr___init__ successfully ran 3 tests in 0 seconds
 noteworthy_translate successfully ran 21 tests in 0 seconds
 noteworthy_binaryTranslate successfully ran 7 tests in 0 seconds
 noteworthy___init__ successfully ran 3 tests in 0 seconds
-note successfully ran 49 tests in 2 seconds
-musicxml_xmlHandler successfully ran 13 tests in 4 seconds
+note successfully ran 51 tests in 2 seconds
+musicxml_xmlHandler successfully ran 13 tests in 3 seconds
 musicxml_toMxObjects successfully ran 39 tests in 0 seconds
-test_testStream successfully ran 205 tests in 94 seconds
-musicxml_testPrimitive successfully ran 5 tests in 3 seconds
+musicxml_testPrimitive successfully ran 5 tests in 2 seconds
+repeat successfully ran 72 tests in 22 seconds
+test_testStream successfully ran 205 tests in 79 seconds
 musicxml_testFiles successfully ran 5 tests in 0 seconds
 musicxml_mxObjects successfully ran 45 tests in 0 seconds
-repeat successfully ran 72 tests in 28 seconds
 musicxml___init__ successfully ran 3 tests in 0 seconds
 musedata_base40 successfully ran 9 tests in 0 seconds
 musedata___init__ successfully ran 45 tests in 0 seconds
-midi_translate successfully ran 49 tests in 8 seconds
+midi_translate successfully ran 49 tests in 6 seconds
 midi_realtime successfully ran 4 tests in 0 seconds
 midi_percussion successfully ran 7 tests in 0 seconds
-musicxml_m21ToString successfully ran 45 tests in 14 seconds
-meter successfully ran 108 tests in 2 seconds
+musicxml_m21ToString successfully ran 45 tests in 12 seconds
+meter successfully ran 108 tests in 1 seconds
 metadata_primitives successfully ran 38 tests in 0 seconds
-metadata_caching successfully ran 6 tests in 11 seconds
-midi___init__ successfully ran 29 tests in 16 seconds
+midi___init__ successfully ran 29 tests in 12 seconds
+metadata_caching successfully ran 6 tests in 9 seconds
 metadata___init__ successfully ran 19 tests in 0 seconds
-mei_base successfully ran 21 tests in 1 seconds
+mei_base successfully ran 21 tests in 0 seconds
 mei___init__ successfully ran 3 tests in 0 seconds
-medren successfully ran 30 tests in 4 seconds
-lily_translate successfully ran 32 tests in 3 seconds
+medren successfully ran 30 tests in 5 seconds
+lily_translate successfully ran 32 tests in 2 seconds
 lily_lilyObjects successfully ran 17 tests in 0 seconds
 lily___init__ successfully ran 3 tests in 0 seconds
-musicxml_fromMxObjects successfully ran 65 tests in 55 seconds
+musicxml_fromMxObjects successfully ran 65 tests in 49 seconds
 languageExcerpts_naturalLanguageObjects successfully ran 9 tests in 0 seconds
 languageExcerpts_instrumentLookup successfully ran 3 tests in 0 seconds
 languageExcerpts___init__ successfully ran 3 tests in 0 seconds
@@ -264,64 +213,65 @@ key successfully ran 21 tests in 1 seconds
 ipython21_objects successfully ran 3 tests in 0 seconds
 ipython21_ipExtension successfully ran 3 tests in 0 seconds
 ipython21___init__ successfully ran 3 tests in 0 seconds
-intervalNetwork successfully ran 57 tests in 3 seconds
+intervalNetwork successfully ran 57 tests in 2 seconds
+layout successfully ran 22 tests in 21 seconds
 interval successfully ran 56 tests in 0 seconds
-instrument successfully ran 23 tests in 1 seconds
-layout successfully ran 22 tests in 24 seconds
 humdrum_testFiles successfully ran 3 tests in 0 seconds
-humdrum_instruments successfully ran 8 tests in 3 seconds
+instrument successfully ran 23 tests in 0 seconds
+humdrum_instruments successfully ran 8 tests in 2 seconds
 humdrum___init__ successfully ran 3 tests in 0 seconds
-humdrum_spineParser successfully ran 32 tests in 8 seconds
-harmony successfully ran 28 tests in 10 seconds
-metadata_bundles successfully ran 34 tests in 60 seconds
-figuredBass_segment successfully ran 16 tests in 4 seconds
+humdrum_spineParser successfully ran 33 tests in 6 seconds
+metadata_bundles successfully ran 34 tests in 48 seconds
+harmony successfully ran 28 tests in 9 seconds
+figuredBass_segment successfully ran 16 tests in 2 seconds
 figuredBass_rules successfully ran 5 tests in 0 seconds
-figuredBass_resolution successfully ran 17 tests in 3 seconds
+figuredBass_resolution successfully ran 17 tests in 2 seconds
 figuredBass_realizerScale successfully ran 9 tests in 0 seconds
-graph successfully ran 62 tests in 33 seconds
+figuredBass_realizer successfully ran 12 tests in 10 seconds
 figuredBass_possibility successfully ran 20 tests in 0 seconds
-freezeThaw successfully ran 30 tests in 28 seconds
 figuredBass_notation successfully ran 15 tests in 0 seconds
-figuredBass_realizer successfully ran 12 tests in 13 seconds
+freezeThaw successfully ran 30 tests in 20 seconds
+graph successfully ran 62 tests in 26 seconds
 figuredBass___init__ successfully ran 3 tests in 0 seconds
-figuredBass_checker successfully ran 16 tests in 4 seconds
-figuredBass_examples successfully ran 15 tests in 68 seconds
-features_jSymbolic successfully ran 86 tests in 70 seconds
-features_native successfully ran 25 tests in 72 seconds
+figuredBass_checker successfully ran 16 tests in 3 seconds
+features_native successfully ran 25 tests in 51 seconds
+figuredBass_examples successfully ran 15 tests in 53 seconds
+features_jSymbolic successfully ran 86 tests in 53 seconds
 expressions successfully ran 26 tests in 0 seconds
 exceptions21 successfully ran 3 tests in 0 seconds
+environment successfully ran 31 tests in 0 seconds
 editorial successfully ran 10 tests in 0 seconds
-features___init__ successfully ran 8 tests in 10 seconds
-dynamics successfully ran 15 tests in 6 seconds
+features___init__ successfully ran 8 tests in 9 seconds
+dynamics successfully ran 15 tests in 4 seconds
+duration successfully ran 72 tests in 1 seconds
 documentation_library_writers successfully ran 3 tests in 0 seconds
-duration successfully ran 70 tests in 1 seconds
-features_base successfully ran 27 tests in 19 seconds
+documentation_library_iterators successfully ran 6 tests in 1 seconds
 documentation_library_cleaners successfully ran 3 tests in 0 seconds
 documentation_library___init__ successfully ran 3 tests in 0 seconds
-documentation_library_iterators successfully ran 6 tests in 2 seconds
+documentation_library_documenters successfully ran 28 tests in 2 seconds
 documentation___init__ successfully ran 3 tests in 0 seconds
 defaults successfully ran 4 tests in 0 seconds
-documentation_library_documenters successfully ran 28 tests in 2 seconds
+derivation successfully ran 8 tests in 1 seconds
 counterpoint_species successfully ran 27 tests in 0 seconds
 counterpoint___init__ successfully ran 3 tests in 0 seconds
-derivation successfully ran 8 tests in 1 seconds
+features_base successfully ran 27 tests in 15 seconds
 corpus_virtual successfully ran 5 tests in 0 seconds
 corpus_chorales successfully ran 9 tests in 3 seconds
-corpus___init__ successfully ran 15 tests in 3 seconds
+corpus_corpora successfully ran 26 tests in 3 seconds
 converter_subConverters successfully ran 14 tests in 1 seconds
-corpus_corpora successfully ran 26 tests in 12 seconds
-contour successfully ran 10 tests in 15 seconds
-composition_aug30 successfully ran 3 tests in 0 seconds
-composition_phasing successfully ran 5 tests in 8 seconds
+corpus___init__ successfully ran 15 tests in 12 seconds
+composition_seeger successfully ran 3 tests in 0 seconds
+contour successfully ran 10 tests in 11 seconds
 composition___init__ successfully ran 3 tests in 0 seconds
+common successfully ran 64 tests in 0 seconds
 clef successfully ran 28 tests in 0 seconds
-common successfully ran 63 tests in 1 seconds
 chordTables successfully ran 17 tests in 0 seconds
+composition_phasing successfully ran 5 tests in 6 seconds
 chant successfully ran 12 tests in 0 seconds
 capella_fromCapellaXML successfully ran 20 tests in 0 seconds
 capella___init__ successfully ran 3 tests in 0 seconds
 chord successfully ran 108 tests in 5 seconds
-converter___init__ successfully ran 41 tests in 23 seconds
+converter___init__ successfully ran 41 tests in 20 seconds
 braille_text successfully ran 4 tests in 0 seconds
 braille_segment successfully ran 11 tests in 1 seconds
 braille_lookup successfully ran 3 tests in 0 seconds
@@ -331,35 +281,29 @@ braille___init__ successfully ran 3 tests in 0 seconds
 beam successfully ran 15 tests in 0 seconds
 base successfully ran 86 tests in 2 seconds
 bar successfully ran 9 tests in 0 seconds
-braille_translate successfully ran 7 tests in 17 seconds
-audioSearch_scores___init__ successfully ran 3 tests in 0 seconds
 audioSearch_transcriber successfully ran 4 tests in 1 seconds
 audioSearch_recording successfully ran 4 tests in 0 seconds
-audioSearch_scoreFollower successfully ran 7 tests in 3 seconds
+braille_translate successfully ran 7 tests in 18 seconds
 articulations successfully ran 26 tests in 0 seconds
-audioSearch___init__ successfully ran 19 tests in 5 seconds
-braille_test successfully ran 151 tests in 23 seconds
+audioSearch___init__ successfully ran 19 tests in 4 seconds
 analysis_search successfully ran 4 tests in 2 seconds
+braille_test successfully ran 151 tests in 20 seconds
 analysis_reduceChordsOld successfully ran 7 tests in 0 seconds
 analysis_reduceChords successfully ran 7 tests in 0 seconds
 analysis_patel successfully ran 6 tests in 0 seconds
 analysis_neoRiemannian successfully ran 10 tests in 1 seconds
 analysis_metrical successfully ran 6 tests in 0 seconds
-analysis_discrete successfully ran 31 tests in 5 seconds
+analysis_discrete successfully ran 31 tests in 4 seconds
 analysis_correlate successfully ran 6 tests in 1 seconds
 analysis___init__ successfully ran 3 tests in 0 seconds
-analysis_windowed successfully ran 9 tests in 18 seconds
-analysis_reduction successfully ran 15 tests in 13 seconds
-abcFormat___init__ successfully ran 53 tests in 1 seconds
+analysis_windowed successfully ran 9 tests in 14 seconds
+analysis_reduction successfully ran 15 tests in 11 seconds
+abcFormat___init__ successfully ran 53 tests in 0 seconds
 _version successfully ran 3 tests in 0 seconds
-abcFormat_testFiles successfully ran 5 tests in 12 seconds
-abcFormat_translate successfully ran 18 tests in 13 seconds
+abcFormat_testFiles successfully ran 5 tests in 10 seconds
+abcFormat_translate successfully ran 18 tests in 11 seconds
 Not in Tree Error: test.timeGraphImportStar is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.testSerialization is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: test.testDocumentation is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: test.testDocs.test is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: test.testDocs.conf is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: test.testDocs is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.mptCurses is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.memoryUsage is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: test.dedent is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -377,7 +321,9 @@ Not in Tree Error: documentation.source.conf is in the music21 directory but not
 Not in Tree Error: documentation.make is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.library.extensions is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: corpus.testCorpus is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: composition.seeger is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: composition.aug30 is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: audioSearch.scores is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: audioSearch.scoreFollower is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.repetitionGame is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.omrfollow is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: audioSearch.humanVScomputer is in the music21 directory but not imported in music21. Skipped -- fix! 
@@ -386,62 +332,6 @@ Not in Tree Error: audioSearch.graphicalInterfaceSF is in the music21 directory 
 Not in Tree Error: audioSearch.graphicalInterfaceGame is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: analysis.phrasing is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error:  is in the music21 directory but not imported in music21. Skipped -- fix! 
-
------------------------------
-environment had 0 ERRORS and 2 FAILURES in 31 tests after 0 seconds:
------------------------------
-
-Traceback (most recent call last):
-  File "/Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/environment.py", line 1708, in testFromSettings
-    self.assertEqual(canonic.split(), match.split())
-AssertionError: Lists differ: ['<?xml', 'version="1.0"', 'en... != ['<?xml', 'version="1.0"', 'en...
-
-First differing element 19:
-value="ipython.vexflow"/>
-value="ipython.lilypond.png"/>
-
-Diff is 1787 characters long. Set self.maxDiff to None to see it.
-
-Traceback (most recent call last):
-  File "/Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/environment.py", line 1611, in testToSettings
-    self.assertEqual(canonic.split('\n'), match.split('\n'))
-AssertionError: Lists differ: ['<?xml version="1.0" encoding... != ['<?xml version="1.0" encoding...
-
-First differing element 7:
-  <preference name="ipythonShowFormat" value="ipython.vexflow"/>
-  <preference name="ipythonShowFormat" value="ipython.lilypond.png"/>
-
-  ['<?xml version="1.0" encoding="utf-8"?>',
-   '<settings>',
-   '  <preference name="autoDownload" value="ask"/>',
-   '  <preference name="braillePath"/>',
-   '  <preference name="debug" value="0"/>',
-   '  <preference name="directoryScratch"/>',
-   '  <preference name="graphicsPath" value="/Applications/Preview.app"/>',
--  '  <preference name="ipythonShowFormat" value="ipython.vexflow"/>',
-?                                                         ----  ^
-
-+  '  <preference name="ipythonShowFormat" value="ipython.lilypond.png"/>',
-?                                                          ++++ ^^^^^^
-
-   '  <preference name="lilypondBackend" value="ps"/>',
-   '  <preference name="lilypondFormat" value="pdf"/>',
-   '  <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond"/>',
-   '  <preference name="lilypondVersion"/>',
-   '  <localCorporaSettings/>',
-   '  <localCorpusSettings/>',
-   '  <preference name="manualCoreCorpusPath"/>',
-   '  <preference name="midiPath" value="/Applications/QuickTime Player.app"/>',
-   '  <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore.app/Contents/MacOS/mscore"/>',
-   '  <preference name="musicxmlPath" value="/Applications/Finale Notepad 2012.app"/>',
-   '  <preference name="pdfPath" value="/Applications/Preview.app"/>',
-   '  <preference name="showFormat" value="musicxml"/>',
-   '  <preference name="vectorPath" value="/Applications/Preview.app"/>',
-   '  <preference name="warnings" value="1"/>',
-   '  <preference name="writeFormat" value="musicxml"/>',
-   '</settings>',
-   '']
-
 -------------------------------------------------------------------------
-Ran 4059 tests in 395.7253 seconds
-Run at 2015-01-09 17:50:59
+Ran 4059 tests in 433.7898 seconds
+Run at 2015-01-14 11:25:39
