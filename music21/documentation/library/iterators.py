@@ -85,8 +85,8 @@ class ModuleIterator(Iterator):
         'music21.analysis.__init__'
         'music21.analysis.correlate'
         'music21.analysis.discrete'
+        'music21.analysis.floatingKey'
         'music21.analysis.metrical'
-        'music21.analysis.neoRiemannian'
 
     '''
 
@@ -237,9 +237,9 @@ class FunctionIterator(Iterator):
         ('music21.abcFormat.translate', 'parseTokens')
         ('music21.abcFormat.translate', 'reBar')
         ('music21.analysis.discrete', 'analyzeStream')
+        ('music21.analysis.floatingKey', 'divide')
         ('music21.analysis.metrical', 'labelBeatDepth')
         ('music21.analysis.metrical', 'thomassenMelodicAccent')
-        ('music21.analysis.neoRiemannian', 'L')
 
     '''
 

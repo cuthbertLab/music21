@@ -87,7 +87,7 @@ class KeyAnalyzer(object):
         keyByMeasure = []
         for i in range(0, self.numMeasures):
             m = self.stream.measure(i)
-            if m is None:
+            if m is None or len(m.flat.notes) == 0:
                 k = None
             else:
                 k = m.analyze('key')
@@ -123,10 +123,11 @@ class KeyAnalyzer(object):
                 if mNum < 0 or mNum >= self.numMeasures or mNum == i:
                     continue
                 newInterpretations = self.getInterpretationByMeasure(mNum)
-                for k in baseInterpretations:
-                    coeff = algorithm(newInterpretations[k], j)
-                    baseInterpretations[k] += coeff
-            bestName = max(baseInterpretations.iterkeys(), key=lambda k: baseInterpretations[k])
+                if newInterpretations is not None:
+                    for k in baseInterpretations:
+                        coeff = algorithm(newInterpretations[k], j)
+                        baseInterpretations[k] += coeff
+            bestName = max(baseInterpretations, key=lambda k: baseInterpretations[k])
             smoothedKeysByMeasure.append(key.Key(bestName))
         
         return smoothedKeysByMeasure
