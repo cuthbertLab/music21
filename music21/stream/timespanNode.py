@@ -30,8 +30,8 @@ class TimespanCollectionNode(object):
     instantiated by hand. It stores a list of ElementTimespans, as well as
     various data which describes the internal structure of the tree.
 
-        >>> startOffset = 1.0
-        >>> node = stream.timespanNode.TimespanCollectionNode(startOffset)
+        >>> offset = 1.0
+        >>> node = stream.timespanNode.TimespanCollectionNode(offset)
         >>> node
         <Node: Start:1.0 Indices:(-1:-1:-1:-1) Length:{0}>
 
@@ -49,9 +49,9 @@ class TimespanCollectionNode(object):
         'payload',
         'nodeStartIndex',
         'nodeStopIndex',
-        'startOffset',
-        'stopOffsetHigh',
-        'stopOffsetLow',
+        'offset',
+        'endTimeHigh',
+        'endTimeLow',
         'subtreeStartIndex',
         'subtreeStopIndex',
 
@@ -179,7 +179,7 @@ class TimespanCollectionNode(object):
         node.
         ''',
         
-        'startOffset': r'''
+        'offset': r'''
         The start offset of this node.
 
         >>> score = stream.timespans.makeExampleScore()
@@ -194,23 +194,23 @@ class TimespanCollectionNode(object):
                 R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
                     R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
 
-        >>> tree._rootNode.startOffset
+        >>> tree._rootNode.offset
         3.0
 
-        >>> tree._rootNode.leftChild.startOffset
+        >>> tree._rootNode.leftChild.offset
         1.0
 
-        >>> tree._rootNode.rightChild.startOffset
+        >>> tree._rootNode.rightChild.offset
         5.0
 
         ''',
 
-        'stopOffsetHigh':        r'''
+        'endTimeHigh':        r'''
         The highest stop offset of any timespan in any node nof the subtree
         rooted on this node.
         ''',
         
-        'stopOffsetLow':        r'''
+        'endTimeLow':        r'''
         The lowest stop offset of any timespan in any node of the subtree
         rooted on this node.
         ''',               
@@ -230,15 +230,15 @@ class TimespanCollectionNode(object):
     
     ### INITIALIZER ###
 
-    def __init__(self, startOffset):
+    def __init__(self, offset):
         self.balance = 0
         self.height = 0
         self.payload = []
         self.nodeStartIndex = -1
         self.nodeStopIndex = -1
-        self.startOffset = startOffset
-        self.stopOffsetHigh = None
-        self.stopOffsetLow = None
+        self.offset = offset
+        self.endTimeHigh = None
+        self.endTimeLow = None
         self.subtreeStartIndex = -1
         self.subtreeStopIndex = -1
 
@@ -250,7 +250,7 @@ class TimespanCollectionNode(object):
 
     def __repr__(self):
         return '<Node: Start:{} Indices:({}:{}:{}:{}) Length:{{{}}}>'.format(
-            self.startOffset,
+            self.offset,
             self.subtreeStartIndex,
             self.nodeStartIndex,
             self.nodeStopIndex,

@@ -211,15 +211,15 @@ class ChordReducer(object):
                     tree.remove(timespan)
                     newTimespan = timespan.new(
                         beatStrength=verticalityOne.beatStrength,
-                        startOffset=verticalityOne.startOffset,
+                        offset=verticalityOne.offset,
                         )
                     tree.insert(newTimespan)
             elif pitchSetTwo.issubset(pitchSetOne):
                 for timespan in verticalityOne.startTimespans:
-                    if timespan.stopOffset < verticalityTwo.startOffset:
+                    if timespan.endTime < verticalityTwo.offset:
                         tree.remove(timespan)
                         newTimespan = timespan.new(
-                            stopOffset=verticalityTwo.startOffset,
+                            endTime=verticalityTwo.offset,
                             )
                         tree.insert(newTimespan)
 
@@ -259,7 +259,7 @@ class ChordReducer(object):
                 tree.remove(timespans)
                 merged = timespans[0].new(
                     element=sumChord,
-                    stopOffset=timespans[1].stopOffset,
+                    endTime=timespans[1].endTime,
                     )
                 tree.insert(merged)
 
@@ -326,7 +326,7 @@ class ChordReducer(object):
 
     def fillBassGaps(self, tree, partwiseTrees):
         def procedure(timespan):
-            verticality = tree.getVerticalityAt(timespan.startOffset)
+            verticality = tree.getVerticalityAt(timespan.offset)
             return verticality.bassTimespan
         for unused_part, subtree in partwiseTrees.items():
             timespans = [x for x in subtree]
@@ -336,37 +336,37 @@ class ChordReducer(object):
                 if bassTimespan is None:
                     continue
 
-                if bassTimespan.startOffset < group[0].startOffset:
+                if bassTimespan.offset < group[0].offset:
                     beatStrength = bassTimespan.beatStrength
-                    startOffset = bassTimespan.startOffset
+                    offset = bassTimespan.offset
                     previousTimespan = tree.findPreviousElementTimespanInSameStreamByClass(group[0])
                     if previousTimespan is not None:
-                        if previousTimespan.stopOffset > group[0].startOffset:
-                            msg = ('Timespan offset errors: previousTimespan.stopOffset, ' + 
-                                                        str(previousTimespan.stopOffset) + ' should be before ' +
-                                                        str(group[0].startOffset) + ' previousTimespan: ' + repr(previousTimespan) +
+                        if previousTimespan.endTime > group[0].offset:
+                            msg = ('Timespan offset errors: previousTimespan.endTime, ' + 
+                                                        str(previousTimespan.endTime) + ' should be before ' +
+                                                        str(group[0].offset) + ' previousTimespan: ' + repr(previousTimespan) +
                                                         ' groups: ' + repr(group) + ' group[0]: ' + repr(group[0])
                                                         )
                             print(msg)
                             #raise ChordReducerException(msg)
-                        if startOffset < previousTimespan.stopOffset:
-                            startOffset = previousTimespan.stopOffset
+                        if offset < previousTimespan.endTime:
+                            offset = previousTimespan.endTime
                     tree.remove(group[0])
                     subtree.remove(group[0])
                     newTimespan = group[0].new(
                         beatStrength=beatStrength,
-                        startOffset=startOffset,
+                        offset=offset,
                         )
                     tree.insert(newTimespan)
                     subtree.insert(newTimespan)
                     group[0] = newTimespan
 
-                if group[-1].stopOffset < bassTimespan.stopOffset:
-                    stopOffset = bassTimespan.stopOffset
+                if group[-1].endTime < bassTimespan.endTime:
+                    endTime = bassTimespan.endTime
                     tree.remove(group[-1])
                     subtree.remove(group[-1])
                     newTimespan = group[-1].new(
-                        stopOffset=stopOffset,
+                        endTime=endTime,
                         )
                     tree.insert(newTimespan)
                     subtree.insert(newTimespan)
@@ -375,9 +375,9 @@ class ChordReducer(object):
                 for i in range(len(group) - 1):
                     timespanOne, timespanTwo = group[i], group[i + 1]
                     if timespanOne.pitches == timespanTwo.pitches or \
-                        timespanOne.stopOffset != timespanTwo.startOffset:
+                        timespanOne.endTime != timespanTwo.offset:
                         newTimespan = timespanOne.new(
-                            stopOffset=timespanTwo.stopOffset,
+                            endTime=timespanTwo.endTime,
                             )
                         group[i] = newTimespan
                         group[i + 1] = newTimespan
@@ -399,26 +399,26 @@ class ChordReducer(object):
                 for i in range(len(group) - 1):
                     timespanOne, timespanTwo = group[i], group[i + 1]
                     if timespanOne.pitches == timespanTwo.pitches or \
-                        timespanOne.stopOffset != timespanTwo.startOffset:
+                        timespanOne.endTime != timespanTwo.offset:
                         newTimespan = timespanOne.new(
-                            stopOffset=timespanTwo.stopOffset,
+                            endTime=timespanTwo.endTime,
                             )
                         group[i] = newTimespan
                         group[i + 1] = newTimespan
                         toInsert.add(newTimespan)
                         toRemove.add(timespanOne)
                         toRemove.add(timespanTwo)
-                if group[0].startOffset != group[0].parentStartOffset:
+                if group[0].offset != group[0].parentOffset:
                     newTimespan = group[0].new(
                         beatStrength=1.0,
-                        startOffset=group[0].parentStartOffset,
+                        offset=group[0].parentOffset,
                         )
                     toRemove.add(group[0])
                     toInsert.add(newTimespan)
                     group[0] = newTimespan
-                if group[-1].stopOffset != group[-1].parentStopOffset:
+                if group[-1].endTime != group[-1].parentEndTime:
                     newTimespan = group[-1].new(
-                        stopOffset=group[-1].parentStopOffset,
+                        endTime=group[-1].parentEndTime,
                         )
                     toRemove.add(group[-1])
                     toInsert.add(newTimespan)
@@ -446,7 +446,7 @@ class ChordReducer(object):
                 continue
             tree.remove(group)
             newTimespan = group[0].new(
-                stopOffset=group[-1].stopOffset,
+                endTime=group[-1].endTime,
                 )
             tree.insert(newTimespan)
 
@@ -591,7 +591,7 @@ class ChordReducer(object):
                     horizontality[1].measureNumber:
                     continue
                 merged = horizontality[0].new(
-                    stopOffset=horizontality[1].stopOffset,
+                    endTime=horizontality[1].endTime,
                     )
                 tree.remove((horizontality[0], horizontality[1]))
                 tree.insert(merged)
@@ -607,7 +607,7 @@ class ChordReducer(object):
         def procedure(timespan):
             measureNumber = timespan.measureNumber
             isShort = timespan.quarterLength < duration
-            verticality = tree.getVerticalityAt(timespan.startOffset)
+            verticality = tree.getVerticalityAt(timespan.offset)
             bassTimespan = verticality.bassTimespan
             if bassTimespan is not None:
                 if bassTimespan.quarterLength < duration:
@@ -621,12 +621,12 @@ class ChordReducer(object):
                 if not isShort:
                     continue
                 isEntireMeasure = False
-                if group[0].startOffset == group[0].parentStartOffset:
-                    if group[-1].stopOffset == group[0].parentStopOffset:
+                if group[0].offset == group[0].parentOffset:
+                    if group[-1].endTime == group[0].parentEndTime:
                         isEntireMeasure = True
                 if bassTimespan is not None:
-                    if group[0].startOffset == bassTimespan.startOffset:
-                        if group[-1].stopOffset == bassTimespan.stopOffset:
+                    if group[0].offset == bassTimespan.offset:
+                        if group[-1].endTime == bassTimespan.endTime:
                             isEntireMeasure = True
                 if isEntireMeasure:
                     counter = collections.Counter()

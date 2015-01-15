@@ -1230,7 +1230,7 @@ class Music21Object(object):
             if getElementMethod == 'getElementAtOrBefore':
                 offsetStart += 0.0001
             while offsetStart is not None: # redundant, but useful...
-                offsetStart = ts.getStartOffsetBefore(offsetStart)
+                offsetStart = ts.getOffsetBefore(offsetStart)
                 if offsetStart is None:
                     return None
                 startTimespans = ts.findTimespansStartingAt(offsetStart)

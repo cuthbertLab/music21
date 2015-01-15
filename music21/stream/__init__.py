@@ -53,6 +53,7 @@ from music21.stream import streamStatus
 from music21.stream import timespans
 from music21.stream import timespanAnalysis
 from music21.stream import timespanNode
+from music21.stream import verticality
 
 from music21.common import opFrac
 
