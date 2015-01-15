@@ -48,28 +48,22 @@ def makeBeams(s, inPlace=False):
 
     See :meth:`~music21.meter.TimeSignature.getBeams` for the algorithm used.
 
-    ::
+    >>> from music21 import meter
+    >>> from music21 import stream
 
-        >>> from music21 import meter
-        >>> from music21 import stream
+    >>> aMeasure = stream.Measure()
+    >>> aMeasure.timeSignature = meter.TimeSignature('4/4')
+    >>> aNote = note.Note()
+    >>> aNote.quarterLength = .25
+    >>> aMeasure.repeatAppend(aNote,16)
+    >>> bMeasure = aMeasure.makeBeams(inPlace=False)
 
-    ::
-
-        >>> aMeasure = stream.Measure()
-        >>> aMeasure.timeSignature = meter.TimeSignature('4/4')
-        >>> aNote = note.Note()
-        >>> aNote.quarterLength = .25
-        >>> aMeasure.repeatAppend(aNote,16)
-        >>> bMeasure = aMeasure.makeBeams(inPlace=False)
-
-    ::
-
-        >>> for i in range(0, 4):
-        ...   print("%d %r" % (i, bMeasure.notes[i].beams))
-        0 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
-        1 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>
-        2 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>
-        3 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>
+    >>> for i in range(0, 4):
+    ...   print("%d %r" % (i, bMeasure.notes[i].beams))
+    0 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
+    1 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>
+    2 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>
+    3 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>
 
     OMIT_FROM_DOCS
     TODO: inPlace=False does not work in many cases
@@ -217,29 +211,25 @@ def makeMeasures(
     A single measure of 4/4 is created by from a Stream
     containing only three quarter notes:
 
-    ::
+    >>> from music21 import articulations
+    >>> from music21 import clef
+    >>> from music21 import meter
+    >>> from music21 import note
+    >>> from music21 import stream
 
-        >>> from music21 import articulations
-        >>> from music21 import clef
-        >>> from music21 import meter
-        >>> from music21 import note
-        >>> from music21 import stream
-
-    ::
-
-        >>> sSrc = stream.Stream()
-        >>> sSrc.append(note.Note('C4', type='quarter'))
-        >>> sSrc.append(note.Note('D4', type='quarter'))
-        >>> sSrc.append(note.Note('E4', type='quarter'))
-        >>> sMeasures = sSrc.makeMeasures()
-        >>> sMeasures.show('text')
-        {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.clef.TrebleClef>
-            {0.0} <music21.meter.TimeSignature 4/4>
-            {0.0} <music21.note.Note C>
-            {1.0} <music21.note.Note D>
-            {2.0} <music21.note.Note E>
-            {3.0} <music21.bar.Barline style=final>
+    >>> sSrc = stream.Stream()
+    >>> sSrc.append(note.Note('C4', type='quarter'))
+    >>> sSrc.append(note.Note('D4', type='quarter'))
+    >>> sSrc.append(note.Note('E4', type='quarter'))
+    >>> sMeasures = sSrc.makeMeasures()
+    >>> sMeasures.show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note D>
+        {2.0} <music21.note.Note E>
+        {3.0} <music21.bar.Barline style=final>
 
     Notice that the last measure is incomplete -- makeMeasures
     does not fill up incomplete measures.
@@ -247,116 +237,98 @@ def makeMeasures(
     We can also check that the measure created has
     the correct TimeSignature:
 
-    ::
-
-        >>> sMeasures[0].timeSignature
-        <music21.meter.TimeSignature 4/4>
+    >>> sMeasures[0].timeSignature
+    <music21.meter.TimeSignature 4/4>
 
     Now let's redo this work in 2/4 by putting a TimeSignature
     of 2/4 at the beginning of the stream and rerunning
     makeMeasures. Now we will have two measures, each with
     correct measure numbers:
 
-    ::
-
-        >>> sSrc.insert(0.0, meter.TimeSignature('2/4'))
-        >>> sMeasuresTwoFour = sSrc.makeMeasures()
-        >>> sMeasuresTwoFour.show('text')
-        {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.clef.TrebleClef>
-            {0.0} <music21.meter.TimeSignature 2/4>
-            {0.0} <music21.note.Note C>
-            {1.0} <music21.note.Note D>
-        {2.0} <music21.stream.Measure 2 offset=2.0>
-            {0.0} <music21.note.Note E>
-            {1.0} <music21.bar.Barline style=final>
+    >>> sSrc.insert(0.0, meter.TimeSignature('2/4'))
+    >>> sMeasuresTwoFour = sSrc.makeMeasures()
+    >>> sMeasuresTwoFour.show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 2/4>
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note D>
+    {2.0} <music21.stream.Measure 2 offset=2.0>
+        {0.0} <music21.note.Note E>
+        {1.0} <music21.bar.Barline style=final>
 
     Let us put 10 quarter notes in a Part.
+
+    >>> sSrc = stream.Part()
+    >>> n = note.Note('E-4')
+    >>> n.quarterLength = 1
+    >>> sSrc.repeatAppend(n, 10)
 
     After we run makeMeasures, we will have
     3 measures of 4/4 in a new Part object. This experiment
     demonstrates that running makeMeasures does not
     change the type of Stream you are using:
 
-    ::
-
-        >>> sSrc = stream.Part()
-        >>> n = note.Note('E-4')
-        >>> n.quarterLength = 1
-        >>> sSrc.repeatAppend(n, 10)
-        >>> sMeasures = sSrc.makeMeasures()
-        >>> len(sMeasures.getElementsByClass('Measure'))
-        3
-        >>> sMeasures.__class__.__name__
-        'Part'
+    >>> sMeasures = sSrc.makeMeasures()
+    >>> len(sMeasures.getElementsByClass('Measure'))
+    3
+    >>> sMeasures.__class__.__name__
+    'Part'
 
     Demonstrate what makeMeasures will do with inPlace is True:
 
-    ::
-
-        >>> sScr = stream.Stream()
-        >>> sScr.insert(0, clef.TrebleClef())
-        >>> sScr.insert(0, meter.TimeSignature('3/4'))
-        >>> sScr.append(note.Note('C4', quarterLength = 3.0))
-        >>> sScr.append(note.Note('D4', quarterLength = 3.0))
-        >>> sScr.makeMeasures(inPlace = True)
-        >>> sScr.show('text')
-        {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.clef.TrebleClef>
-            {0.0} <music21.meter.TimeSignature 3/4>
-            {0.0} <music21.note.Note C>
-        {3.0} <music21.stream.Measure 2 offset=3.0>
-            {0.0} <music21.note.Note D>
-            {3.0} <music21.bar.Barline style=final>
+    >>> sScr = stream.Stream()
+    >>> sScr.insert(0, clef.TrebleClef())
+    >>> sScr.insert(0, meter.TimeSignature('3/4'))
+    >>> sScr.append(note.Note('C4', quarterLength = 3.0))
+    >>> sScr.append(note.Note('D4', quarterLength = 3.0))
+    >>> sScr.makeMeasures(inPlace = True)
+    >>> sScr.show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 3/4>
+        {0.0} <music21.note.Note C>
+    {3.0} <music21.stream.Measure 2 offset=3.0>
+        {0.0} <music21.note.Note D>
+        {3.0} <music21.bar.Barline style=final>
 
     If after running makeMeasures you run makeTies, it will also split
     long notes into smaller notes with ties.  Lyrics and articulations
     are attached to the first note.  Expressions (fermatas,
     etc.) will soon be attached to the last note but this is not yet done:
 
-    ::
+    >>> p1 = stream.Part()
+    >>> p1.append(meter.TimeSignature('3/4'))
+    >>> longNote = note.Note("D#4")
+    >>> longNote.quarterLength = 7.5
+    >>> longNote.articulations = [articulations.Staccato()]
+    >>> longNote.lyric = "hi"
+    >>> p1.append(longNote)
+    >>> partWithMeasures = p1.makeMeasures()
+    >>> dummy = partWithMeasures.makeTies(inPlace = True)
+    >>> partWithMeasures.show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 3/4>
+        {0.0} <music21.note.Note D#>
+    {3.0} <music21.stream.Measure 2 offset=3.0>
+        {0.0} <music21.note.Note D#>
+    {6.0} <music21.stream.Measure 3 offset=6.0>
+        {0.0} <music21.note.Note D#>
+        {1.5} <music21.bar.Barline style=final>
 
-        >>> p1 = stream.Part()
-        >>> p1.append(meter.TimeSignature('3/4'))
-        >>> longNote = note.Note("D#4")
-        >>> longNote.quarterLength = 7.5
-        >>> longNote.articulations = [articulations.Staccato()]
-        >>> longNote.lyric = "hi"
-        >>> p1.append(longNote)
-        >>> partWithMeasures = p1.makeMeasures()
-        >>> dummy = partWithMeasures.makeTies(inPlace = True)
-        >>> partWithMeasures.show('text')
-        {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.clef.TrebleClef>
-            {0.0} <music21.meter.TimeSignature 3/4>
-            {0.0} <music21.note.Note D#>
-        {3.0} <music21.stream.Measure 2 offset=3.0>
-            {0.0} <music21.note.Note D#>
-        {6.0} <music21.stream.Measure 3 offset=6.0>
-            {0.0} <music21.note.Note D#>
-            {1.5} <music21.bar.Barline style=final>
+    >>> allNotes = partWithMeasures.flat.notes
+    >>> allNotes[0].articulations
+    [<music21.articulations.Staccato>]
 
-    ::
+    >>> allNotes[1].articulations
+    []
 
-        >>> allNotes = partWithMeasures.flat.notes
-        >>> allNotes[0].articulations
-        [<music21.articulations.Staccato>]
+    >>> allNotes[2].articulations
+    []
 
-    ::
-
-        >>> allNotes[1].articulations
-        []
-
-    ::
-
-        >>> allNotes[2].articulations
-        []
-
-    ::
-
-        >>> [allNotes[0].lyric, allNotes[1].lyric, allNotes[2].lyric]
-        ['hi', None, None]
-
+    >>> [allNotes[0].lyric, allNotes[1].lyric, allNotes[2].lyric]
+    ['hi', None, None]
     '''
     from music21 import spanner
     from music21 import stream
@@ -627,88 +599,85 @@ def makeRests(s, refStreamOrTimeRange=None, fillGaps=False,
     If `inPlace` is True, this is done in-place; if `inPlace` is False,
     this returns a modified deepcopy.
 
-    ::
-        >>> a = stream.Stream()
-        >>> a.insert(20, note.Note())
-        >>> len(a)
-        1
-        >>> a.lowestOffset
-        20.0
-        >>> a.show('text')
-        {20.0} <music21.note.Note C>        
+    >>> a = stream.Stream()
+    >>> a.insert(20, note.Note())
+    >>> len(a)
+    1
+    >>> a.lowestOffset
+    20.0
+    >>> a.show('text')
+    {20.0} <music21.note.Note C>        
 
 
     Now make some rests...
-    ::
 
-        >>> b = a.makeRests(inPlace = False)
-        >>> len(b)
-        2
-        >>> b.lowestOffset
-        0.0
-        >>> b.show('text')
-        {0.0} <music21.note.Rest rest>
-        {20.0} <music21.note.Note C>        
-        >>> b[0].duration.quarterLength
-        20.0
+    >>> b = a.makeRests(inPlace = False)
+    >>> len(b)
+    2
+    >>> b.lowestOffset
+    0.0
+    >>> b.show('text')
+    {0.0} <music21.note.Rest rest>
+    {20.0} <music21.note.Note C>        
+    >>> b[0].duration.quarterLength
+    20.0
         
     Same thing, but this time, with gaps...
     
-    ::
-        >>> a = stream.Stream()
-        >>> a.insert(20, note.Note('C4'))
-        >>> a.insert(30, note.Note('D4'))
-        >>> len(a)
-        2
-        >>> a.lowestOffset
-        20.0
-        >>> a.show('text')
-        {20.0} <music21.note.Note C>        
-        {30.0} <music21.note.Note D>        
-        >>> b = a.makeRests(fillGaps = True, inPlace = False)
-        >>> len(b)
-        4
-        >>> b.lowestOffset
-        0.0
-        >>> b.show('text')
-        {0.0} <music21.note.Rest rest>
-        {20.0} <music21.note.Note C>
-        {21.0} <music21.note.Rest rest>
-        {30.0} <music21.note.Note D>        
+    >>> a = stream.Stream()
+    >>> a.insert(20, note.Note('C4'))
+    >>> a.insert(30, note.Note('D4'))
+    >>> len(a)
+    2
+    >>> a.lowestOffset
+    20.0
+    >>> a.show('text')
+    {20.0} <music21.note.Note C>        
+    {30.0} <music21.note.Note D>        
+    >>> b = a.makeRests(fillGaps = True, inPlace = False)
+    >>> len(b)
+    4
+    >>> b.lowestOffset
+    0.0
+    >>> b.show('text')
+    {0.0} <music21.note.Rest rest>
+    {20.0} <music21.note.Note C>
+    {21.0} <music21.note.Rest rest>
+    {30.0} <music21.note.Note D>        
     
 
     Now with measures:
 
-        >>> a = stream.Part()
-        >>> a.insert(4, note.Note('C4'))
-        >>> a.insert(8, note.Note('D4'))
-        >>> len(a)
-        2
-        >>> a.lowestOffset
-        4.0
-        >>> a.insert(0, meter.TimeSignature('4/4'))
-        >>> a.makeMeasures(inPlace = True)
-        >>> a.show('text')
-        {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.clef.TrebleClef>
-            {0.0} <music21.meter.TimeSignature 4/4>
-        {4.0} <music21.stream.Measure 2 offset=4.0>
-            {0.0} <music21.note.Note C>
-        {8.0} <music21.stream.Measure 3 offset=8.0>
-            {0.0} <music21.note.Note D>
-            {1.0} <music21.bar.Barline style=final>
-        >>> a.makeRests(fillGaps = True, inPlace=True)
-        >>> a.show('text')
-        {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.clef.TrebleClef>
-            {0.0} <music21.meter.TimeSignature 4/4>
-        {0.0} <music21.note.Rest rest>
-        {4.0} <music21.stream.Measure 2 offset=4.0>
-            {0.0} <music21.note.Note C>
-        {5.0} <music21.note.Rest rest>
-        {8.0} <music21.stream.Measure 3 offset=8.0>
-            {0.0} <music21.note.Note D>
-            {1.0} <music21.bar.Barline style=final>        
+    >>> a = stream.Part()
+    >>> a.insert(4, note.Note('C4'))
+    >>> a.insert(8, note.Note('D4'))
+    >>> len(a)
+    2
+    >>> a.lowestOffset
+    4.0
+    >>> a.insert(0, meter.TimeSignature('4/4'))
+    >>> a.makeMeasures(inPlace = True)
+    >>> a.show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 4/4>
+    {4.0} <music21.stream.Measure 2 offset=4.0>
+        {0.0} <music21.note.Note C>
+    {8.0} <music21.stream.Measure 3 offset=8.0>
+        {0.0} <music21.note.Note D>
+        {1.0} <music21.bar.Barline style=final>
+    >>> a.makeRests(fillGaps = True, inPlace=True)
+    >>> a.show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 4/4>
+    {0.0} <music21.note.Rest rest>
+    {4.0} <music21.stream.Measure 2 offset=4.0>
+        {0.0} <music21.note.Note C>
+    {5.0} <music21.note.Rest rest>
+    {8.0} <music21.stream.Measure 3 offset=8.0>
+        {0.0} <music21.note.Note D>
+        {1.0} <music21.bar.Barline style=final>        
 
     Obviously there are problems TODO: fix them
 
@@ -821,86 +790,78 @@ def makeTies(
 
     Put a 12-quarter-note-long note into a Stream w/ 4/4 as the duration.
 
-    ::
-
-        >>> d = stream.Stream()
-        >>> d.insert(0, meter.TimeSignature('4/4'))
-        >>> n = note.Note('C4')
-        >>> n.quarterLength = 12
-        >>> d.insert(0, n)
-        >>> d.show('text')
-        {0.0} <music21.meter.TimeSignature 4/4>
-        {0.0} <music21.note.Note C>
+    >>> d = stream.Stream()
+    >>> d.insert(0, meter.TimeSignature('4/4'))
+    >>> n = note.Note('C4')
+    >>> n.quarterLength = 12
+    >>> d.insert(0, n)
+    >>> d.show('text')
+    {0.0} <music21.meter.TimeSignature 4/4>
+    {0.0} <music21.note.Note C>
 
     After running makeMeasures, we get nice measures, a clef, but only one
     way-too-long note in Measure 1:
     
-    ::
-
-        >>> x = d.makeMeasures()
-        >>> x.show('text')
-        {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.clef.TrebleClef>
-            {0.0} <music21.meter.TimeSignature 4/4>
-            {0.0} <music21.note.Note C>
-        {4.0} <music21.stream.Measure 2 offset=4.0>
-        <BLANKLINE>
-        {8.0} <music21.stream.Measure 3 offset=8.0>
-            {0.0} <music21.bar.Barline style=final>
-        >>> n2 = x.measure(1).notes[0]
-        >>> n2.duration.quarterLength
-        12.0    
-        >>> n2 is n
-        False
+    >>> x = d.makeMeasures()
+    >>> x.show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.note.Note C>
+    {4.0} <music21.stream.Measure 2 offset=4.0>
+    <BLANKLINE>
+    {8.0} <music21.stream.Measure 3 offset=8.0>
+        {0.0} <music21.bar.Barline style=final>
+    >>> n2 = x.measure(1).notes[0]
+    >>> n2.duration.quarterLength
+    12.0    
+    >>> n2 is n
+    False
     
     But after running makeTies, all is good:
     
-    ::
-            
-        >>> x.makeTies(inPlace=True)
-        >>> x.show('text')
-        {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.clef.TrebleClef>
-            {0.0} <music21.meter.TimeSignature 4/4>
-            {0.0} <music21.note.Note C>
-        {4.0} <music21.stream.Measure 2 offset=4.0>
-            {0.0} <music21.note.Note C>
-        {8.0} <music21.stream.Measure 3 offset=8.0>
-            {0.0} <music21.note.Note C>
-            {4.0} <music21.bar.Barline style=final>
-        >>> m = x.measure(1).notes[0]
-        >>> m.duration.quarterLength
-        4.0
-        >>> m is n
-        False
-        >>> m.tie
-        <music21.tie.Tie start>
-        >>> x.measure(2).notes[0].tie
-        <music21.tie.Tie continue>
-        >>> x.measure(3).notes[0].tie
-        <music21.tie.Tie stop>
+    >>> x.makeTies(inPlace=True)
+    >>> x.show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.note.Note C>
+    {4.0} <music21.stream.Measure 2 offset=4.0>
+        {0.0} <music21.note.Note C>
+    {8.0} <music21.stream.Measure 3 offset=8.0>
+        {0.0} <music21.note.Note C>
+        {4.0} <music21.bar.Barline style=final>
+    >>> m = x.measure(1).notes[0]
+    >>> m.duration.quarterLength
+    4.0
+    >>> m is n
+    False
+    >>> m.tie
+    <music21.tie.Tie start>
+    >>> x.measure(2).notes[0].tie
+    <music21.tie.Tie continue>
+    >>> x.measure(3).notes[0].tie
+    <music21.tie.Tie stop>
         
     Same experiment, but with rests:
     
-    ::
-    
-        >>> d = stream.Stream()
-        >>> d.insert(0, meter.TimeSignature('4/4'))
-        >>> r = note.Rest()
-        >>> r.quarterLength = 12
-        >>> d.insert(0, r)
-        >>> x = d.makeMeasures()
-        >>> x.makeTies(inPlace = True)
-        >>> x.show('text')
-        {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.clef.TrebleClef>
-            {0.0} <music21.meter.TimeSignature 4/4>
-            {0.0} <music21.note.Rest rest>
-        {4.0} <music21.stream.Measure 2 offset=4.0>
-            {0.0} <music21.note.Rest rest>
-        {8.0} <music21.stream.Measure 3 offset=8.0>
-            {0.0} <music21.note.Rest rest>
-            {4.0} <music21.bar.Barline style=final>        
+    >>> d = stream.Stream()
+    >>> d.insert(0, meter.TimeSignature('4/4'))
+    >>> r = note.Rest()
+    >>> r.quarterLength = 12
+    >>> d.insert(0, r)
+    >>> x = d.makeMeasures()
+    >>> x.makeTies(inPlace = True)
+    >>> x.show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.note.Rest rest>
+    {4.0} <music21.stream.Measure 2 offset=4.0>
+        {0.0} <music21.note.Rest rest>
+    {8.0} <music21.stream.Measure 3 offset=8.0>
+        {0.0} <music21.note.Rest rest>
+        {4.0} <music21.bar.Barline style=final>        
 
     Notes: uses base.Music21Object.splitAtQuarterLength() once it has figured out
     what to split.
@@ -1222,51 +1183,39 @@ def realizeOrnaments(s):
     Creates a new stream that contains all realized ornaments in addition
     to other elements in the original stream.
 
-    ::
+    >>> s1 = stream.Stream()
+    >>> m1 = stream.Measure()
+    >>> m1.timeSignature = meter.TimeSignature("4/4")
+    >>> n1 = note.Note("C4", type='whole')
+    >>> n1.expressions.append(expressions.Mordent())
+    >>> m1.append(n1)
+    >>> m2 = stream.Measure()
+    >>> n2 = note.Note("D4", type='whole')
+    >>> m2.append(n2)
+    >>> s1.append(m1)
+    >>> s1.append(m2)
+    >>> for x in s1.recurse():
+    ...     x
+    ...
+    <music21.stream.Stream ...>
+    <music21.stream.Measure 0 offset=0.0>
+    <music21.meter.TimeSignature 4/4>
+    <music21.note.Note C>
+    <music21.stream.Measure 0 offset=4.0>
+    <music21.note.Note D>
 
-        >>> from music21 import expressions
-        >>> from music21 import meter
-        >>> from music21 import note
-        >>> from music21 import stream
-
-    ::
-
-        >>> s1 = stream.Stream()
-        >>> m1 = stream.Measure()
-        >>> m1.timeSignature = meter.TimeSignature("4/4")
-        >>> n1 = note.Note("C4", type='whole')
-        >>> n1.expressions.append(expressions.Mordent())
-        >>> m1.append(n1)
-        >>> m2 = stream.Measure()
-        >>> n2 = note.Note("D4", type='whole')
-        >>> m2.append(n2)
-        >>> s1.append(m1)
-        >>> s1.append(m2)
-        >>> for x in s1.recurse():
-        ...     x
-        ...
-        <music21.stream.Stream ...>
-        <music21.stream.Measure 0 offset=0.0>
-        <music21.meter.TimeSignature 4/4>
-        <music21.note.Note C>
-        <music21.stream.Measure 0 offset=4.0>
-        <music21.note.Note D>
-
-    ::
-
-        >>> s2 = s1.realizeOrnaments()
-        >>> for x in s2.recurse():
-        ...     x
-        ...
-        <music21.stream.Stream ...>
-        <music21.stream.Measure 0 offset=0.0>
-        <music21.meter.TimeSignature 4/4>
-        <music21.note.Note C>
-        <music21.note.Note B>
-        <music21.note.Note C>
-        <music21.stream.Measure 0 offset=4.0>
-        <music21.note.Note D>
-
+    >>> s2 = s1.realizeOrnaments()
+    >>> for x in s2.recurse():
+    ...     x
+    ...
+    <music21.stream.Stream ...>
+    <music21.stream.Measure 0 offset=0.0>
+    <music21.meter.TimeSignature 4/4>
+    <music21.note.Note C>
+    <music21.note.Note B>
+    <music21.note.Note C>
+    <music21.stream.Measure 0 offset=4.0>
+    <music21.note.Note D>
     '''
     newStream = s.__class__()
     newStream.offset = s.offset

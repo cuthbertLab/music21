@@ -22,8 +22,6 @@ environLocal = environment.Environment("stream.timespanNode")
 
 
 #------------------------------------------------------------------------------
-
-
 class TimespanCollectionNode(object):
     r'''
     A node in an TimespanCollection.
@@ -143,56 +141,45 @@ class TimespanCollectionNode(object):
         Timespans are sorted by their _SortTuple, if they contain an element,
         and otherwise by their stop offset.
 
-        ::
+        >>> score = stream.timespans.makeExampleScore()
+        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> print(tree._rootNode.debug())
+        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
 
-            >>> score = stream.timespans.makeExampleScore()
-            >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
-            >>> print(tree._rootNode.debug())
-            <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-                L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                    L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                    R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-                R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                    L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                    R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                        R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        >>> tree._rootNode.payload
+        [<ElementTimespan (3.0 to 4.0) <music21.note.Note F>>]
 
-        ::
+        >>> tree._rootNode.leftChild.payload
+        [<ElementTimespan (1.0 to 2.0) <music21.note.Note D>>]
 
-            >>> tree._rootNode.payload
-            [<ElementTimespan (3.0 to 4.0) <music21.note.Note F>>]
+        >>> for x in tree._rootNode.leftChild.rightChild.payload:
+        ...     x
+        ...
+        <ElementTimespan (2.0 to 3.0) <music21.note.Note E>>
+        <ElementTimespan (2.0 to 4.0) <music21.note.Note G>>
 
-        ::
-
-            >>> tree._rootNode.leftChild.payload
-            [<ElementTimespan (1.0 to 2.0) <music21.note.Note D>>]
-
-        ::
-
-            >>> for x in tree._rootNode.leftChild.rightChild.payload:
-            ...     x
-            ...
-            <ElementTimespan (2.0 to 3.0) <music21.note.Note E>>
-            <ElementTimespan (2.0 to 4.0) <music21.note.Note G>>
-
-        ::
-
-            >>> tree._rootNode.rightChild.payload
-            [<ElementTimespan (5.0 to 6.0) <music21.note.Note A>>]
-
+        >>> tree._rootNode.rightChild.payload
+        [<ElementTimespan (5.0 to 6.0) <music21.note.Note A>>]
         ''',
         
-        'nodeStartIndex':         r'''
+        'nodeStartIndex': r'''
         The timespan start index of only those timespans stored in this
         node.
         ''',
         
-        'nodeStopIndex':        r'''
+        'nodeStopIndex': r'''
         The timespan stop index of only those timespans stored in this
         node.
         ''',
         
-        'startOffset':        r'''
+        'startOffset': r'''
         The start offset of this node.
 
         >>> score = stream.timespans.makeExampleScore()
@@ -379,39 +366,30 @@ class TimespanCollectionNode(object):
 
         Setting the right child triggers a node update.
 
-        ::
-
-            >>> score = stream.timespans.makeExampleScore()
-            >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
-            >>> print(tree._rootNode.debug())
-            <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-                L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                    L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                    R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-                R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                    L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                    R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                        R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
-
-        ::
-
-            >>> print(tree._rootNode.rightChild.debug())
-            <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+        >>> score = stream.timespans.makeExampleScore()
+        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> print(tree._rootNode.debug())
+        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
                 L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
                 R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
                     R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
 
-        ::
-
-            >>> print(tree._rootNode.rightChild.rightChild.debug())
-            <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+        >>> print(tree._rootNode.rightChild.debug())
+        <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+            L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+            R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
                 R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
 
-        ::
+        >>> print(tree._rootNode.rightChild.rightChild.debug())
+        <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+            R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
 
-            >>> print(tree._rootNode.rightChild.rightChild.rightChild.debug())
-            <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
-
+        >>> print(tree._rootNode.rightChild.rightChild.rightChild.debug())
+        <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
         '''
         return self._rightChild
 
