@@ -82,7 +82,7 @@ class ChordReducer(object):
         if 'Score' not in inputScore.classes:
             raise ChordReducerException("Must be called on a stream.Score")
 
-        tree = timespans.streamToTimespanCollection(inputScore, flatten=True, classList=(note.Note, chord.Chord))
+        tree = timespans.streamToTimespanTree(inputScore, flatten=True, classList=(note.Note, chord.Chord))
 
         if allowableChords is not None:
             assert all(isinstance(x, chord.Chord) for x in allowableChords)
@@ -108,7 +108,7 @@ class ChordReducer(object):
             forbiddenChords=forbiddenChords,
             )
 
-        partwiseTrees = tree.toPartwiseTimespanCollections()
+        partwiseTrees = tree.toPartwiseTimespanTrees()
 
         self.fillBassGaps(tree, partwiseTrees)
 
@@ -149,7 +149,7 @@ class ChordReducer(object):
 
     @staticmethod
     def _debug(tree):
-        for part, subtree in tree.toPartwiseTimespanCollections().items():
+        for part, subtree in tree.toPartwiseTimespanTrees().items():
             print(part)
             timespans = [x for x in subtree]
             for timespan in timespans:
@@ -436,7 +436,7 @@ class ChordReducer(object):
             measureNumber = timespan.measureNumber
             pitches = timespan.pitches
             return measureNumber, pitches
-        mapping = tree.toPartwiseTimespanCollections()
+        mapping = tree.toPartwiseTimespanTrees()
         subtree = mapping[part]
         timespans = [x for x in subtree]
         for unused_key, group in itertools.groupby(timespans, procedure):
@@ -680,7 +680,7 @@ class ChordReducer(object):
         parts = tree.allParts
         for part in parts:
             self.fuseTimespansByPart(tree, part)
-        mapping = tree.toPartwiseTimespanCollections()
+        mapping = tree.toPartwiseTimespanTrees()
         bassPart = parts[-1]
         bassTree = mapping[bassPart]
         bassOffsets = bassTree.allOffsets

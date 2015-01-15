@@ -22,7 +22,7 @@ from music21 import environment
 from music21 import exceptions21
 #from music21 import key
 
-environLocal = environment.Environment("stream.timespanAnalysis")
+environLocal = environment.Environment("timespans.timespanAnalysis")
 
 
 class HorizontalityException(exceptions21.TimespanException):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
-# Name:         timespanNode.py
+# Name:         timespans.timespanNode.py
 # Purpose:      Internal data structures for timespan collections
 #
 # Authors:      Josiah Wolf Oberholtzer
@@ -13,31 +13,109 @@
 '''
 Internal data structures for timespan collections.
 
-This is an implementation detail of the TimespanCollection class.
+This is an implementation detail of the TimespanTree class.
 '''
 
 import unittest
 from music21 import environment
-environLocal = environment.Environment("stream.timespanNode")
+environLocal = environment.Environment("timespans.timespanNode")
 
 
 #------------------------------------------------------------------------------
-class TimespanCollectionNode(object):
+class TimespanTreeNode(object):
     r'''
-    A node in an TimespanCollection.
+    A node in an TimespanTree.
 
-    This class is only used by TimespanCollection, and should not be
+    This class is only used by TimespanTree, and should not be
     instantiated by hand. It stores a list of ElementTimespans, as well as
     various data which describes the internal structure of the tree.
 
-        >>> offset = 1.0
-        >>> node = stream.timespanNode.TimespanCollectionNode(offset)
-        >>> node
-        <Node: Start:1.0 Indices:(-1:-1:-1:-1) Length:{0}>
+    >>> offset = 1.0
+    >>> node = timespans.timespanNode.TimespanTreeNode(offset)
+    >>> node
+    <Node: Start:1.0 Indices:(-1:-1:-1:-1) Length:{0}>
 
     Please consult the Wikipedia entry on AVL trees
     (https://en.wikipedia.org/wiki/AVL_tree) for a very detailed
     description of how this datastructure works.
+    
+    Here's an example of what it means and does:
+    
+    >>> score = timespans.makeExampleScore()
+    >>> sfn = score.flat.notes
+    >>> sfn.show('text', addEndTimes=True)
+    {0.0 - 1.0} <music21.note.Note C>
+    {0.0 - 2.0} <music21.note.Note C>
+    {1.0 - 2.0} <music21.note.Note D>
+    {2.0 - 3.0} <music21.note.Note E>
+    {2.0 - 4.0} <music21.note.Note G>
+    {3.0 - 4.0} <music21.note.Note F>
+    {4.0 - 5.0} <music21.note.Note G>
+    {4.0 - 6.0} <music21.note.Note E>
+    {5.0 - 6.0} <music21.note.Note A>
+    {6.0 - 7.0} <music21.note.Note B>
+    {6.0 - 8.0} <music21.note.Note D>
+    {7.0 - 8.0} <music21.note.Note C>
+    >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+    >>> rn = tree._rootNode
+    
+    The RootNode here represents the starting position of the Note F at 3.0; It is the center
+    of the elements in the flat Stream.  Its index is 5 (that is, it's the sixth note in the
+    element list) and its offset is 3.0
+    
+    >>> rn
+    <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+    >>> sfn[5]
+    <music21.note.Note F>
+    >>> sfn[5].offset
+    3.0
+
+    Thus, the indices of 0:5:6:12 indicate that the left-side of the node handles indices
+    from >= 0 to < 5; and the right-side of the node handles indices >= 6 and < 12, and this node
+    handles indices >= 5 and < 6.
+    
+    The `Length: {1}` indicates that there is exactly one element at this location, that is,
+    the F.
+    
+    The "payload" of the node, is just that note wrapped in a list wrapped in an ElementTimeSpan:
+    
+    >>> rn.payload
+    [<ElementTimespan (3.0 to 4.0) <music21.note.Note F>>]
+    >>> rn.payload[0].element
+    <music21.note.Note F>
+    >>> rn.payload[0].element is sfn[5]
+    True
+    
+    
+    We can look at the leftChild of the root node to get some more interesting cases:
+    
+    >>> left = rn.leftChild
+    >>> left
+    <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+    >>> leftLeft = left.leftChild
+    >>> leftLeft
+    <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+    
+    In the leftNode of the leftNode of the rootNode there are two elements: both notes that
+    begin on offset 0.0:
+    
+    >>> leftLeft.payload
+    [<ElementTimespan (0.0 to 1.0) <music21.note.Note C>>, 
+     <ElementTimespan (0.0 to 2.0) <music21.note.Note C>>]
+    
+    The Indices:(0:0:2:2) indicates that `leftLeft` has neither left nor right children
+    >>> leftLeft.leftChild is None
+    True
+    >>> leftLeft.rightChild is None
+    True
+    
+    What makes a TimespanNode more interesting than other AWL Nodes is that it is aware of
+    the fact that it might have objects that end at different times:
+    
+    >>> leftLeft.endTimeLow
+    1.0
+    >>> leftLeft.endTimeHigh
+    2.0   
     '''
 
     ### CLASS VARIABLES ###
@@ -65,9 +143,9 @@ class TimespanCollectionNode(object):
 
         This attribute is used to help balance the AVL tree.
 
-        >>> score = stream.timespans.makeExampleScore()
-        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
-        >>> print(tree._debug())
+        >>> score = timespans.makeExampleScore()
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> print(tree.debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
             L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
                 L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
@@ -105,14 +183,14 @@ class TimespanCollectionNode(object):
         1''',
         
         
-        'height':         r'''
+    'height': r'''
         The height of the subtree rooted on this node.
 
         This property is used to help balance the AVL tree.
 
-        >>> score = stream.timespans.makeExampleScore()
-        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
-        >>> print(tree._debug())
+        >>> score = timespans.makeExampleScore()
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> print(tree.debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
             L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
                 L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
@@ -135,14 +213,14 @@ class TimespanCollectionNode(object):
         0
         ''',
         
-        'payload': r'''
+    'payload': r'''
         A list of Timespans starting at this node's start offset.
 
         Timespans are sorted by their _SortTuple, if they contain an element,
         and otherwise by their stop offset.
 
-        >>> score = stream.timespans.makeExampleScore()
-        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> score = timespans.makeExampleScore()
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
         >>> print(tree._rootNode.debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
             L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
@@ -169,21 +247,21 @@ class TimespanCollectionNode(object):
         [<ElementTimespan (5.0 to 6.0) <music21.note.Note A>>]
         ''',
         
-        'nodeStartIndex': r'''
-        The timespan start index of only those timespans stored in this
-        node.
+    'nodeStartIndex': r'''
+        The timespan start index (i.e., the first x where s[x] is found in this Node's payload) 
+        of only those timespans stored in the payload of this node.
         ''',
         
-        'nodeStopIndex': r'''
-        The timespan stop index of only those timespans stored in this
-        node.
+    'nodeStopIndex': r'''
+        The timespan stop index (i.e., the last x where s[x] is found in this Node's payload) 
+        of only those timespans stored in the payload of this node.
         ''',
         
-        'offset': r'''
-        The start offset of this node.
+    'offset': r'''
+        The offset of this node.
 
-        >>> score = stream.timespans.makeExampleScore()
-        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> score = timespans.makeExampleScore()
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
         >>> print(tree._rootNode.debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
             L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
@@ -205,27 +283,25 @@ class TimespanCollectionNode(object):
 
         ''',
 
-        'endTimeHigh':        r'''
-        The highest stop offset of any timespan in any node nof the subtree
+    'endTimeHigh': r'''
+        The highest stop offset of any timespan in any node of the subtree
         rooted on this node.
         ''',
         
-        'endTimeLow':        r'''
+    'endTimeLow': r'''
         The lowest stop offset of any timespan in any node of the subtree
         rooted on this node.
         ''',               
         
-        'subTreeStartIndex':        r'''
+    'subTreeStartIndex': r'''
         The lowest timespan start index of any timespan in any node of the
         subtree rooted on this node.
         ''',
         
-        'subtreeStopIndex':         r'''
+    'subtreeStopIndex': r'''
         The highest timespan stop index of any timespan in any node of the
         subtree rooted on this node.
         ''',
-
-
     }
     
     ### INITIALIZER ###
@@ -236,9 +312,11 @@ class TimespanCollectionNode(object):
         self.payload = []
         self.nodeStartIndex = -1
         self.nodeStopIndex = -1
+        
         self.offset = offset
         self.endTimeHigh = None
         self.endTimeLow = None
+        
         self.subtreeStartIndex = -1
         self.subtreeStopIndex = -1
 
@@ -264,11 +342,9 @@ class TimespanCollectionNode(object):
         '''
         Get a debug of the Node:
         
-        >>> score = stream.timespans.makeExampleScore()
-        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
-        >>> rn = tree._rootNode
-        >>> rn
-        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+        >>> score = timespans.makeExampleScore()
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> rn = tree._rootNode        
         >>> print(rn.debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
             L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
@@ -283,9 +359,9 @@ class TimespanCollectionNode(object):
 
     def getDebugPieces(self):
         r'''
-        Return a list of the debugging information of the tree (used for _debug):
-        >>> score = stream.timespans.makeExampleScore()
-        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+        Return a list of the debugging information of the tree (used for debug):
+        >>> score = timespans.makeExampleScore()
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
         >>> rn = tree._rootNode
         >>> rn.getDebugPieces()
         ['<Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>', 
@@ -335,8 +411,8 @@ class TimespanCollectionNode(object):
 
         Setting the left child triggers a node update.
 
-        >>> score = stream.timespans.makeExampleScore()
-        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> score = timespans.makeExampleScore()
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
         >>> print(tree._rootNode.debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
             L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
@@ -366,8 +442,8 @@ class TimespanCollectionNode(object):
 
         Setting the right child triggers a node update.
 
-        >>> score = stream.timespans.makeExampleScore()
-        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> score = timespans.makeExampleScore()
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
         >>> print(tree._rootNode.debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
             L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>

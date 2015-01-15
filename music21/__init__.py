@@ -79,6 +79,7 @@ __all__ = [
     'search',
     'test',
     'theoryAnalysis',
+    'timespans',
     'trecento',
     'vexflow',
     'webapps', 

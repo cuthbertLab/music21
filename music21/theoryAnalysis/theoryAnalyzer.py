@@ -323,7 +323,7 @@ def getVLQs(score, partNum1, partNum2):
     2
     '''
     from music21.stream import timespans
-    tsCol = timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+    tsCol = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
     allVLQs = []
     defaultKey = None
     

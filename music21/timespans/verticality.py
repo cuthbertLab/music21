@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
-# Name:         verticality.py
+# Name:         timespans/verticality.py
 # Purpose:      Object for dealing with vertical simultaneities in a fast way w/o Chord's overhead
 #
 # Authors:      Josiah Wolf Oberholtzer
@@ -22,7 +22,7 @@ from music21 import exceptions21
 #from music21 import key
 from music21 import pitch
 
-environLocal = environment.Environment("stream.verticality")
+environLocal = environment.Environment("timespans.verticality")
 
 class VerticalityException(exceptions21.TimespanException):
     pass
@@ -36,7 +36,7 @@ class Verticality(object):
     Create a timespan-stream from a score:
 
     >>> score = corpus.parse('bwv66.6')
-    >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+    >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
 
 
     Find the verticality at offset 6.5, or beat 2.5 of measure 2 (there's a one
@@ -78,7 +78,7 @@ class Verticality(object):
     (There is also a previousVerticality, but not a previousStartOffset)
 
     What we just demonstrated is actually very powerful: a Verticality keeps a
-    record of exactly where it is in the timespanCollection -- scores can be
+    record of exactly where it is in the timespanTree -- scores can be
     recreated with this information.
 
     Getting back to the task at hand, we can find all the elementTimespans (and
@@ -108,7 +108,7 @@ class Verticality(object):
     ### CLASS VARIABLES ###
 
     __slots__ = (
-        'timespanCollection',
+        'timespanTree',
         'overlapTimespans',
         'startTimespans',
         'offset',
@@ -116,14 +116,14 @@ class Verticality(object):
         )
 
     _DOC_ATTR = {
-        'timespanCollection': r''' 
-            Returns the timespanCollection initially set.
+        'timespanTree': r''' 
+            Returns the timespanTree initially set.
             ''',
         'overlapTimespans': r'''
             Gets timespans overlapping the start offset of a verticality.
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+            >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
             >>> verticality = tree.getVerticalityAt(0.5)
             >>> verticality
             <Verticality 0.5 {G#3 B3 E4 B4}>
@@ -134,7 +134,7 @@ class Verticality(object):
             Gets the timespans starting at a verticality's start offset.
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+            >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> verticality
             <Verticality 1.0 {F#3 C#4 F#4 A4}>
@@ -150,7 +150,7 @@ class Verticality(object):
             Gets the start offset of a verticality.
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+            >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> verticality
             <Verticality 1.0 {F#3 C#4 F#4 A4}>
@@ -161,7 +161,7 @@ class Verticality(object):
             Gets the timespans stopping at a verticality's start offset.
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+            >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> verticality
             <Verticality 1.0 {F#3 C#4 F#4 A4}>
@@ -186,14 +186,14 @@ class Verticality(object):
         overlapTimespans=None,
         startTimespans=None,
         stopTimespans=None,
-        timespanCollection=None,
+        timespanTree=None,
         ):
-        from music21.stream import timespans
-        prototype = (timespans.TimespanCollection, type(None))
-        if not isinstance(timespanCollection, prototype):
-            raise VerticalityException("timespanCollection %r is not a TimespanCollection or None" % (timespanCollection,))
+        from music21.timespans import trees
+        prototype = (trees.TimespanTree, type(None))
+        if not isinstance(timespanTree, prototype):
+            raise VerticalityException("timespanTree %r is not a TimespanTree or None" % (timespanTree,))
         
-        self.timespanCollection = timespanCollection
+        self.timespanTree = timespanTree
         self.offset = offset
         
         if not isinstance(startTimespans, tuple):
@@ -228,7 +228,7 @@ class Verticality(object):
         TODO: Fix this!
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
         >>> verticality = tree.getVerticalityAt(1.0)
         >>> verticality
         <Verticality 1.0 {F#3 C#4 F#4 A4}>
@@ -258,7 +258,7 @@ class Verticality(object):
         Gets the beat strength of a verticality.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
         >>> verticality = tree.getVerticalityAt(1.0)
         >>> verticality.beatStrength
         1.0
@@ -306,7 +306,7 @@ class Verticality(object):
         TODO: remove, and use toChord.isConsonant() instead.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
         >>> verticalities = list(tree.iterateVerticalities())
         >>> for verticality in verticalities[:10]:
         ...     print("%r %r" % (verticality, verticality.isConsonant))
@@ -330,7 +330,7 @@ class Verticality(object):
         Gets the measure number of the verticality's starting elements.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
         >>> verticality = tree.getVerticalityAt(7.0)
         >>> verticality.measureNumber
         2
@@ -343,7 +343,7 @@ class Verticality(object):
         Gets the next start-offset in the verticality's offset-tree.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
         >>> verticality = tree.getVerticalityAt(1.0)
         >>> verticality.nextStartOffset
         2.0
@@ -351,7 +351,7 @@ class Verticality(object):
         If a verticality has no tree attached, then it cannot be 
         
         '''
-        tree = self.timespanCollection
+        tree = self.timespanTree
         if tree is None:
             return None
         offset = tree.getOffsetAfter(self.offset)
@@ -363,7 +363,7 @@ class Verticality(object):
         Gets the next verticality after a verticality.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
         >>> verticality = tree.getVerticalityAt(1.0)
         >>> print(verticality)
         <Verticality 1.0 {F#3 C#4 F#4 A4}>
@@ -382,7 +382,7 @@ class Verticality(object):
         >>> verticality.nextVerticality
         <Verticality 3.0 {A3 E4 C#5}>
         '''
-        tree = self.timespanCollection
+        tree = self.timespanTree
         if tree is None:
             return None
         offset = tree.getOffsetAfter(self.offset)
@@ -396,7 +396,7 @@ class Verticality(object):
         Gets the pitch set of all elements in a verticality.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
         >>> verticality = tree.getVerticalityAt(1.0)
         >>> for pitch in sorted(verticality.pitchSet):
         ...     pitch
@@ -426,7 +426,7 @@ class Verticality(object):
         Gets the pitch-class set of all elements in a verticality.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
         >>> verticality = tree.getVerticalityAt(1.0)
         >>> for pitchClass in sorted(verticality.pitchClassSet):
         ...     pitchClass
@@ -447,7 +447,7 @@ class Verticality(object):
         Gets the previous verticality before a verticality.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = stream.timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
         >>> verticality = tree.getVerticalityAt(1.0)
         >>> print(verticality)
         <Verticality 1.0 {F#3 C#4 F#4 A4}>
@@ -476,7 +476,7 @@ class Verticality(object):
         >>> verticality.previousVerticality
         <Verticality 0.0 {A3 E4 C#5}>
         '''
-        tree = self.timespanCollection
+        tree = self.timespanTree
         if tree is None:
             return None
         offset = tree.getOffsetBefore(self.offset)
@@ -488,7 +488,7 @@ class Verticality(object):
                                    includeNoMotion=False, returnObjects=True, partPairNumbers=None):
         '''
         >>> c = corpus.parse('luca/gloria').measures(1,8)
-        >>> tsCol = stream.timespans.streamToTimespanCollection(c, flatten=True, classList=(note.Note, chord.Chord))
+        >>> tsCol = timespans.streamToTimespanTree(c, flatten=True, classList=(note.Note, chord.Chord))
         >>> verticality22 = tsCol.getVerticalityAt(22.0)
         
         >>> from pprint import pprint as pp
@@ -558,7 +558,7 @@ class Verticality(object):
         allQuartets = itertools.combinations(pairedMotionList, 2)
         filteredList = []
         
-        verticalityStreamParts = self.timespanCollection.source.parts
+        verticalityStreamParts = self.timespanTree.source.parts
         
         for thisQuartet in allQuartets:
             if includeNoMotion is False:
@@ -601,7 +601,7 @@ class Verticality(object):
         and which move here.
         
         >>> c = corpus.parse('luca/gloria').measures(1,8)
-        >>> tsCol = stream.timespans.streamToTimespanCollection(c, flatten=True, classList=(note.Note, chord.Chord))
+        >>> tsCol = timespans.streamToTimespanTree(c, flatten=True, classList=(note.Note, chord.Chord))
         >>> verticality22 = tsCol.getVerticalityAt(22.0)
         >>> for pm in verticality22.getPairedMotion():
         ...     print(pm)
@@ -637,7 +637,7 @@ class Verticality(object):
         allPairedMotions = []
                 
         for startingTs in startTss:
-            previousTs = self.timespanCollection.findPreviousElementTimespanInSameStreamByClass(startingTs)
+            previousTs = self.timespanTree.findPreviousElementTimespanInSameStreamByClass(startingTs)
             if previousTs is None:
                 continue  # first not in piece in this part...
             
@@ -689,7 +689,7 @@ class VerticalitySequence(collections.Sequence):
     ### PUBLIC METHODS ###
 
     def unwrap(self):
-        from music21.stream.timespanAnalysis import Horizontality
+        from music21.timespans.timespanAnalysis import Horizontality
         
         unwrapped = {}
         for timespan in self[0].overlapTimespans:

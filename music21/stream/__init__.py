@@ -47,13 +47,10 @@ from music21 import spanner
 from music21 import tie
 from music21 import repeat
 from music21 import tempo
+from music21 import timespans
 
 from music21.stream import makeNotation
 from music21.stream import streamStatus
-from music21.stream import timespans
-from music21.stream import timespanAnalysis
-from music21.stream import timespanNode
-from music21.stream import verticality
 
 from music21.common import opFrac
 
@@ -5023,14 +5020,14 @@ class Stream(base.Music21Object):
 
     def asTimespans(self, classList=None, recurse=True):
         r'''
-        Convert stream to a stream.timespans.TimespanCollection instance, a
+        Convert stream to a :class:`~music21.timespans.trees.TimespanTree` instance, a
         highly optimized data structure for searching through elements and
         offsets.
 
-        >>> score = stream.timespans.makeExampleScore()
+        >>> score = timespans.makeExampleScore()
         >>> timespanColl = score.asTimespans()
         >>> print(timespanColl)
-        <TimespanCollection {12} (0.0 to 8.0) <music21.stream.Score ...>>
+        <TimespanTree {12} (0.0 to 8.0) <music21.stream.Score ...>>
             <ElementTimespan (0.0 to 1.0) <music21.note.Note C>>
             <ElementTimespan (0.0 to 2.0) <music21.note.Note C>>
             <ElementTimespan (1.0 to 2.0) <music21.note.Note D>>
@@ -5045,9 +5042,9 @@ class Stream(base.Music21Object):
             <ElementTimespan (7.0 to 8.0) <music21.note.Note C>>
         '''
         hashedAttributes = hash( (tuple(classList or () ), recurse) ) 
-        cacheKey = "timespanCollection" + str(hashedAttributes)
+        cacheKey = "timespanTree" + str(hashedAttributes)
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
-            hashedTSC = timespans.streamToTimespanCollection(
+            hashedTSC = timespans.streamToTimespanTree(
                 self,
                 flatten=recurse,
                 classList=classList,
