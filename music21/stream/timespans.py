@@ -465,11 +465,9 @@ class ElementTimespan(object):
     that is anchored to a single element but extends over rests or other
     notes following a note)
 
-    ElementTimespans give
-    information about an element (such as a Note).  It knows
-    its absolute position with respect to
-    the element passed into TimespanCollection.  It contains information
-    about what measure it's in, what part it's in, etc.
+    ElementTimespans give information about an element (such as a Note).  It knows
+    its absolute position with respect to the element passed into TimespanCollection.  
+    It contains information about what measure it's in, what part it's in, etc.
 
     Example, getting a passing tone from a known location from a Bach chorale.
 
@@ -1006,9 +1004,9 @@ class ElementTimespan(object):
 
 class TimespanCollection(object):
     r'''
-    A datastructure for efficiently slicing a score.
+    A data structure for efficiently slicing a score.
 
-    This datastructure stores timespans: objects which implement both a
+    This data structure stores timespans: objects which implement both a
     `startOffset` and `stopOffset` property. It provides fast lookups of such
     objects and can quickly locate vertical overlaps.
 
@@ -1164,113 +1162,86 @@ class TimespanCollection(object):
 
     def __contains__(self, timespan):
         r'''
-        Is true when timespan collection contains `timespan`.
+        Is true when timespan collection contains the :class:`~music21.timespans.Timespan` within it.
 
-        ::
+        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> timespans = [stream.timespans.Timespan(x, y) for x, y in tsList]
+        >>> tree = stream.timespans.TimespanCollection()
+        >>> tree.insert(timespans)
 
-            >>> timespans = [
-            ...     stream.timespans.Timespan(0, 2),
-            ...     stream.timespans.Timespan(0, 9),
-            ...     stream.timespans.Timespan(1, 1),
-            ...     stream.timespans.Timespan(2, 3),
-            ...     stream.timespans.Timespan(3, 4),
-            ...     stream.timespans.Timespan(4, 9),
-            ...     stream.timespans.Timespan(5, 6),
-            ...     stream.timespans.Timespan(5, 8),
-            ...     stream.timespans.Timespan(6, 8),
-            ...     stream.timespans.Timespan(7, 7),
-            ...     ]
-            >>> tree = stream.timespans.TimespanCollection()
-            >>> tree.insert(timespans)
+        >>> timespans[0] in tree
+        True
 
-        ::
-
-            >>> timespans[0] in tree
-            True
-
-        ::
-
-            >>> stream.timespans.Timespan(-200, 1000) in tree
-            False
-
+        >>> stream.timespans.Timespan(-200, 1000) in tree
+        False
+        
+        The exact Timespan object does not have to be in the tree, just one with the same startOffset
+        and stopOffset:
+        
+        >>> tsDuplicate = stream.timespans.Timespan(0, 2)
+        >>> tsDuplicate in tree
+        True
         '''
-        if not hasattr(timespan, 'startOffset') or \
-            not hasattr(timespan, 'stopOffset'):
-            message = 'Must have startOffset and stopOffset.'
-            raise TimespanCollectionException(message)
-        candidates = self.findTimespansStartingAt(timespan.startOffset)
-        return timespan in candidates
+        try:
+            startOffset = timespan.startOffset
+        except AttributeError:
+            raise TimespanCollectionException('timespan must be a Timespan object, i.e., must have startOffset')
+        candidates = self.findTimespansStartingAt(startOffset)
+        if timespan in candidates:
+            return True
+        else:
+            return False
 
     def __eq__(self, expr):
+        r'''
+        Two Timespan Collections are equal only if their ids are equal
+        
+        (TODO: make it true only if the two have exactly identical timespans unless this interfers
+               with hashing. Use "is" for this)
+        '''
         return id(self) == id(expr)
 
     def __getitem__(self, i):
         r'''
         Gets timespans by integer index or slice.
 
-        ::
+        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> timespans = [stream.timespans.Timespan(x, y) for x, y in tsList]
+        >>> tree = stream.timespans.TimespanCollection()
+        >>> tree.insert(timespans)
 
-            >>> timespans = [
-            ...     stream.timespans.Timespan(0, 2),
-            ...     stream.timespans.Timespan(0, 9),
-            ...     stream.timespans.Timespan(1, 1),
-            ...     stream.timespans.Timespan(2, 3),
-            ...     stream.timespans.Timespan(3, 4),
-            ...     stream.timespans.Timespan(4, 9),
-            ...     stream.timespans.Timespan(5, 6),
-            ...     stream.timespans.Timespan(5, 8),
-            ...     stream.timespans.Timespan(6, 8),
-            ...     stream.timespans.Timespan(7, 7),
-            ...     ]
-            >>> tree = stream.timespans.TimespanCollection()
-            >>> tree.insert(timespans)
+        >>> tree[0]
+        <Timespan 0 2>
 
-        ::
+        >>> tree[-1]
+        <Timespan 7 7>
 
-            >>> tree[0]
-            <Timespan 0 2>
+        >>> tree[2:5]
+        [<Timespan 1 1>, <Timespan 2 3>, <Timespan 3 4>]
 
-        ::
+        >>> tree[-6:-3]
+        [<Timespan 3 4>, <Timespan 4 9>, <Timespan 5 6>]
 
-            >>> tree[-1]
-            <Timespan 7 7>
+        >>> tree[-100:-200]
+        []
 
-        ::
-
-            >>> tree[2:5]
-            [<Timespan 1 1>, <Timespan 2 3>, <Timespan 3 4>]
-
-        ::
-
-            >>> tree[-6:-3]
-            [<Timespan 3 4>, <Timespan 4 9>, <Timespan 5 6>]
-
-        ::
-
-            >>> tree[-100:-200]
-            []
-
-        ::
-
-            >>> for x in tree[:]:
-            ...     x
-            ...
-            <Timespan 0 2>
-            <Timespan 0 9>
-            <Timespan 1 1>
-            <Timespan 2 3>
-            <Timespan 3 4>
-            <Timespan 4 9>
-            <Timespan 5 6>
-            <Timespan 5 8>
-            <Timespan 6 8>
-            <Timespan 7 7>
-
+        >>> for x in tree[:]:
+        ...     x
+        ...
+        <Timespan 0 2>
+        <Timespan 0 9>
+        <Timespan 1 1>
+        <Timespan 2 3>
+        <Timespan 3 4>
+        <Timespan 4 9>
+        <Timespan 5 6>
+        <Timespan 5 8>
+        <Timespan 6 8>
+        <Timespan 7 7>
         '''
         def recurseByIndex(node, index):
             '''
-            todo: tests...
-            
+            TODO: tests...
             '''
             if node.nodeStartIndex <= index < node.nodeStopIndex:
                 return node.payload[index - node.nodeStartIndex]
@@ -1280,6 +1251,9 @@ class TimespanCollection(object):
                 return recurseByIndex(node.rightChild, index)
 
         def recurseBySlice(node, start, stop):
+            '''
+            TODO: tests...
+            '''
             result = []
             if node is None:
                 return result
@@ -1294,6 +1268,8 @@ class TimespanCollection(object):
             if node.nodeStopIndex <= stop and node.rightChild:
                 result.extend(recurseBySlice(node.rightChild, start, stop))
             return result
+        
+        
         if isinstance(i, int):
             if self._rootNode is None:
                 raise IndexError
@@ -1308,7 +1284,8 @@ class TimespanCollection(object):
             indices = i.indices(self._rootNode.subtreeStopIndex)
             start, stop = indices[0], indices[1]
             return recurseBySlice(self._rootNode, start, stop)
-        raise TypeError('Indices must be integers or slices, got {}'.format(i))
+        else:
+            raise TypeError('Indices must be integers or slices, got {}'.format(i))
 
     def __hash__(self):
         return hash((type(self), id(self)))
@@ -1317,39 +1294,24 @@ class TimespanCollection(object):
         r'''
         Iterates through all the elementTimespans in the offset tree.
 
-        ::
+        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> timespans = [stream.timespans.Timespan(x, y) for x, y in tsList]
+        >>> tree = stream.timespans.TimespanCollection()
+        >>> tree.insert(timespans)
 
-            >>> timespans = [
-            ...     stream.timespans.Timespan(0, 2),
-            ...     stream.timespans.Timespan(0, 9),
-            ...     stream.timespans.Timespan(1, 1),
-            ...     stream.timespans.Timespan(2, 3),
-            ...     stream.timespans.Timespan(3, 4),
-            ...     stream.timespans.Timespan(4, 9),
-            ...     stream.timespans.Timespan(5, 6),
-            ...     stream.timespans.Timespan(5, 8),
-            ...     stream.timespans.Timespan(6, 8),
-            ...     stream.timespans.Timespan(7, 7),
-            ...     ]
-            >>> tree = stream.timespans.TimespanCollection()
-            >>> tree.insert(timespans)
-
-        ::
-
-            >>> for x in tree:
-            ...     x
-            ...
-            <Timespan 0 2>
-            <Timespan 0 9>
-            <Timespan 1 1>
-            <Timespan 2 3>
-            <Timespan 3 4>
-            <Timespan 4 9>
-            <Timespan 5 6>
-            <Timespan 5 8>
-            <Timespan 6 8>
-            <Timespan 7 7>
-
+        >>> for x in tree:
+        ...     x
+        ...
+        <Timespan 0 2>
+        <Timespan 0 9>
+        <Timespan 1 1>
+        <Timespan 2 3>
+        <Timespan 3 4>
+        <Timespan 4 9>
+        <Timespan 5 6>
+        <Timespan 5 8>
+        <Timespan 6 8>
+        <Timespan 7 7>
         '''
         def recurse(node):
             if node is not None:
@@ -1364,37 +1326,23 @@ class TimespanCollection(object):
         return recurse(self._rootNode)
 
     def __len__(self):
-        r'''Gets the length of the timespan collection.
+        r'''Gets the length of the timespan collection, i.e., the number of Timespans.
 
-        ::
+        >>> tree = stream.timespans.TimespanCollection()
+        >>> len(tree)
+        0
 
-            >>> tree = stream.timespans.TimespanCollection()
-            >>> len(tree)
-            0
+        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> timespans = [stream.timespans.Timespan(x, y) for x, y in tsList]
+        >>> tree.insert(timespans)
+        >>> len(tree)
+        10
+        >>> len(tree) == len(timespans)
+        True
 
-        ::
-
-            >>> timespans = [
-            ...     stream.timespans.Timespan(0, 2),
-            ...     stream.timespans.Timespan(0, 9),
-            ...     stream.timespans.Timespan(1, 1),
-            ...     stream.timespans.Timespan(2, 3),
-            ...     stream.timespans.Timespan(3, 4),
-            ...     stream.timespans.Timespan(4, 9),
-            ...     stream.timespans.Timespan(5, 6),
-            ...     stream.timespans.Timespan(5, 8),
-            ...     stream.timespans.Timespan(6, 8),
-            ...     stream.timespans.Timespan(7, 7),
-            ...     ]
-            >>> tree.insert(timespans)
-            >>> len(tree)
-            10
-
-        ::
-
-            >>> tree.remove(timespans)
-            >>> len(tree)
-            0
+        >>> tree.remove(timespans)
+        >>> len(tree)
+        0
 
         '''
         if self._rootNode is None:
@@ -1425,32 +1373,29 @@ class TimespanCollection(object):
         r'''
         Sets timespans at index `i` to `new`.
 
-        ::
+        >>> timespans = [
+        ...     stream.timespans.Timespan(0, 2),
+        ...     stream.timespans.Timespan(0, 9),
+        ...     stream.timespans.Timespan(1, 1),
+        ...     ]
+        >>> tree = stream.timespans.TimespanCollection()
+        >>> tree.insert(timespans)
+        >>> tree[0] = stream.timespans.Timespan(-1, 6)
+        >>> for x in tree:
+        ...     x
+        ...
+        <Timespan -1 6>
+        <Timespan 0 9>
+        <Timespan 1 1>
 
-            >>> timespans = [
-            ...     stream.timespans.Timespan(0, 2),
-            ...     stream.timespans.Timespan(0, 9),
-            ...     stream.timespans.Timespan(1, 1),
-            ...     ]
-            >>> tree = stream.timespans.TimespanCollection()
-            >>> tree.insert(timespans)
-            >>> tree[0] = stream.timespans.Timespan(-1, 6)
-            >>> for x in tree:
-            ...     x
-            ...
-            <Timespan -1 6>
-            <Timespan 0 9>
-            <Timespan 1 1>
+        Works with slices too.
 
-        ::
-
-            >>> tree[1:] = [stream.timespans.Timespan(10, 20)]
-            >>> for x in tree:
-            ...     x
-            ...
-            <Timespan -1 6>
-            <Timespan 10 20>
-
+        >>> tree[1:] = [stream.timespans.Timespan(10, 20)]
+        >>> for x in tree:
+        ...     x
+        ...
+        <Timespan -1 6>
+        <Timespan 10 20>
         '''
         if isinstance(i, (int, slice)):
             old = self[i]
@@ -1478,35 +1423,20 @@ class TimespanCollection(object):
 
         Useful only for debugging its internal node structure.
 
-        ::
+        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> timespans = [stream.timespans.Timespan(x, y) for x, y in tsList]
+        >>> tree = stream.timespans.TimespanCollection()
+        >>> tree.insert(timespans)
 
-            >>> timespans = [
-            ...     stream.timespans.Timespan(0, 2),
-            ...     stream.timespans.Timespan(0, 9),
-            ...     stream.timespans.Timespan(1, 1),
-            ...     stream.timespans.Timespan(2, 3),
-            ...     stream.timespans.Timespan(3, 4),
-            ...     stream.timespans.Timespan(4, 9),
-            ...     stream.timespans.Timespan(5, 6),
-            ...     stream.timespans.Timespan(5, 8),
-            ...     stream.timespans.Timespan(6, 8),
-            ...     stream.timespans.Timespan(7, 7),
-            ...     ]
-            >>> tree = stream.timespans.TimespanCollection()
-            >>> tree.insert(timespans)
-
-        ::
-
-            >>> print(tree._debug())
-            <Node: Start:3 Indices:(0:4:5:10) Length:{1}>
-                L: <Node: Start:1 Indices:(0:2:3:4) Length:{1}>
-                    L: <Node: Start:0 Indices:(0:0:2:2) Length:{2}>
-                    R: <Node: Start:2 Indices:(3:3:4:4) Length:{1}>
-                R: <Node: Start:5 Indices:(5:6:8:10) Length:{2}>
-                    L: <Node: Start:4 Indices:(5:5:6:6) Length:{1}>
-                    R: <Node: Start:6 Indices:(8:8:9:10) Length:{1}>
-                        R: <Node: Start:7 Indices:(9:9:10:10) Length:{1}>
-
+        >>> print(tree._debug())
+        <Node: Start:3 Indices:(0:4:5:10) Length:{1}>
+            L: <Node: Start:1 Indices:(0:2:3:4) Length:{1}>
+                L: <Node: Start:0 Indices:(0:0:2:2) Length:{2}>
+                R: <Node: Start:2 Indices:(3:3:4:4) Length:{1}>
+            R: <Node: Start:5 Indices:(5:6:8:10) Length:{2}>
+                L: <Node: Start:4 Indices:(5:5:6:6) Length:{1}>
+                R: <Node: Start:6 Indices:(8:8:9:10) Length:{1}>
+                    R: <Node: Start:7 Indices:(9:9:10:10) Length:{1}>
         '''
         if self._rootNode is not None:
             return self._rootNode.debug()
@@ -1659,14 +1589,14 @@ class TimespanCollection(object):
 
         Returns none.
         '''
-        def recurse(
+        def recurseUpdateIndices(
             node,
             parentStopIndex=None,
             ):
             if node is None:
                 return
             if node.leftChild is not None:
-                recurse(
+                recurseUpdateIndices(
                     node.leftChild,
                     parentStopIndex=parentStopIndex,
                     )
@@ -1681,12 +1611,12 @@ class TimespanCollection(object):
             node.nodeStopIndex = node.nodeStartIndex + len(node.payload)
             node.subtreeStopIndex = node.nodeStopIndex
             if node.rightChild is not None:
-                recurse(
+                recurseUpdateIndices(
                     node.rightChild,
                     parentStopIndex=node.nodeStopIndex,
                     )
                 node.subtreeStopIndex = node.rightChild.subtreeStopIndex
-        recurse(node)
+        recurseUpdateIndices(node)
 
     def _updateOffsets(
         self,
@@ -1749,12 +1679,9 @@ class TimespanCollection(object):
 
         This is analogous to `dict.copy()`.
 
-        ::
-
-            >>> score = corpus.parse('bwv66.6')
-            >>> tree = score.asTimespans()
-            >>> newTree = tree.copy()
-
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> newTree = tree.copy()
         '''
         newTree = type(self)()
         newTree.insert([x for x in self])
@@ -1766,41 +1693,28 @@ class TimespanCollection(object):
         
         Default classList is (stream.Part, )
 
-        ::
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> timespan = tree[0]
+        >>> timespan
+        <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
 
-            >>> score = corpus.parse('bwv66.6')
-            >>> tree = score.asTimespans()
-            >>> timespan = tree[0]
-            >>> timespan
-            <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
+        >>> timespan.part
+        <music21.stream.Part Soprano>
 
-        ::
+        >>> timespan = tree.findNextElementTimespanInSameStreamByClass(timespan)
+        >>> timespan
+        <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
 
-            >>> timespan.part
-            <music21.stream.Part Soprano>
+        >>> timespan.part
+        <music21.stream.Part Soprano>
 
-        ::
+        >>> timespan = tree.findNextElementTimespanInSameStreamByClass(timespan)
+        >>> timespan
+        <ElementTimespan (1.0 to 2.0) <music21.note.Note A>>
 
-            >>> timespan = tree.findNextElementTimespanInSameStreamByClass(timespan)
-            >>> timespan
-            <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
-
-        ::
-
-            >>> timespan.part
-            <music21.stream.Part Soprano>
-
-        ::
-
-            >>> timespan = tree.findNextElementTimespanInSameStreamByClass(timespan)
-            >>> timespan
-            <ElementTimespan (1.0 to 2.0) <music21.note.Note A>>
-
-        ::
-
-            >>> timespan.part
-            <music21.stream.Part Soprano>
-
+        >>> timespan.part
+        <music21.stream.Part Soprano>
         '''
         if not isinstance(elementTimespan, ElementTimespan):
             message = 'ElementTimespan {!r}, must be an ElementTimespan'.format(
@@ -1873,15 +1787,14 @@ class TimespanCollection(object):
         r'''
         Finds timespans in this offset-tree which start at `offset`.
 
-            >>> score = corpus.parse('bwv66.6')
-            >>> tree = score.asTimespans()
-            >>> for timespan in tree.findTimespansStartingAt(0.5):
-            ...     timespan
-            ...
-            <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
-            <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
-            <ElementTimespan (0.5 to 1.0) <music21.note.Note G#>>
-
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> for timespan in tree.findTimespansStartingAt(0.5):
+        ...     timespan
+        ...
+        <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
+        <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
+        <ElementTimespan (0.5 to 1.0) <music21.note.Note G#>>
         '''
         results = []
         node = self._search(self._rootNode, offset)
@@ -1893,15 +1806,14 @@ class TimespanCollection(object):
         r'''
         Finds timespans in this offset-tree which stop at `offset`.
 
-            >>> score = corpus.parse('bwv66.6')
-            >>> tree = score.asTimespans()
-            >>> for timespan in tree.findTimespansStoppingAt(0.5):
-            ...     timespan
-            ...
-            <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
-            <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
-            <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
-
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> for timespan in tree.findTimespansStoppingAt(0.5):
+        ...     timespan
+        ...
+        <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
+        <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
+        <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
         '''
         def recurse(node, offset):
             result = []
@@ -1924,13 +1836,12 @@ class TimespanCollection(object):
         r'''
         Finds timespans in this offset-tree which overlap `offset`.
 
-            >>> score = corpus.parse('bwv66.6')
-            >>> tree = score.asTimespans()
-            >>> for timespan in tree.findTimespansOverlapping(0.5):
-            ...     timespan
-            ...
-            <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>
-
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> for timespan in tree.findTimespansOverlapping(0.5):
+        ...     timespan
+        ...
+        <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>
         '''
         def recurse(node, offset, indent=0):
             result = []
@@ -1955,19 +1866,20 @@ class TimespanCollection(object):
         r'''
         Gets start offset after `offset`.
 
-        ::
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> tree.getStartOffsetAfter(0.5)
+        1.0
 
-            >>> score = corpus.parse('bwv66.6')
-            >>> tree = score.asTimespans()
-            >>> tree.getStartOffsetAfter(0.5)
-            1.0
+        Returns None if no succeeding offset exists.
 
-        ::
+        >>> tree.getStartOffsetAfter(35) is None
+        True
 
-            >>> tree.getStartOffsetAfter(35) is None
-            True
+        Generally speaking, negative offsets will usually return 0.0
 
-        Returns none if no succeeding offset exists.
+        >>> tree.getStartOffsetAfter(-999)
+        0.0
         '''
         def recurse(node, offset):
             if node is None:
@@ -1988,19 +1900,15 @@ class TimespanCollection(object):
         Gets the start offset immediately preceding `offset` in this
         offset-tree.
 
-        ::
-
-            >>> score = corpus.parse('bwv66.6')
-            >>> tree = score.asTimespans()
-            >>> tree.getStartOffsetBefore(100)
-            35.0
-
-        ::
-
-            >>> tree.getStartOffsetBefore(0) is None
-            True
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> tree.getStartOffsetBefore(100)
+        35.0
 
         Return None if no preceding offset exists.
+
+        >>> tree.getStartOffsetBefore(0) is None
+        True
         '''
         def recurse(node, offset):
             if node is None:
@@ -2085,45 +1993,28 @@ class TimespanCollection(object):
         r'''
         Gets index of `timespan` in tree.
 
-        ::
+        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> timespans = [stream.timespans.Timespan(x, y) for x, y in tsList]
+        >>> tree = stream.timespans.TimespanCollection()
+        >>> tree.insert(timespans)
 
-            >>> timespans = [
-            ...     stream.timespans.Timespan(0, 2),
-            ...     stream.timespans.Timespan(0, 9),
-            ...     stream.timespans.Timespan(1, 1),
-            ...     stream.timespans.Timespan(2, 3),
-            ...     stream.timespans.Timespan(3, 4),
-            ...     stream.timespans.Timespan(4, 9),
-            ...     stream.timespans.Timespan(5, 6),
-            ...     stream.timespans.Timespan(5, 8),
-            ...     stream.timespans.Timespan(6, 8),
-            ...     stream.timespans.Timespan(7, 7),
-            ...     ]
-            >>> tree = stream.timespans.TimespanCollection()
-            >>> tree.insert(timespans)
+        >>> for timespan in timespans:
+        ...     print("%r %d" % (timespan, tree.index(timespan)))
+        ...
+        <Timespan 0 2> 0
+        <Timespan 0 9> 1
+        <Timespan 1 1> 2
+        <Timespan 2 3> 3
+        <Timespan 3 4> 4
+        <Timespan 4 9> 5
+        <Timespan 5 6> 6
+        <Timespan 5 8> 7
+        <Timespan 6 8> 8
+        <Timespan 7 7> 9
 
-        ::
-
-            >>> for timespan in timespans:
-            ...     print("%r %d" % (timespan, tree.index(timespan)))
-            ...
-            <Timespan 0 2> 0
-            <Timespan 0 9> 1
-            <Timespan 1 1> 2
-            <Timespan 2 3> 3
-            <Timespan 3 4> 4
-            <Timespan 4 9> 5
-            <Timespan 5 6> 6
-            <Timespan 5 8> 7
-            <Timespan 6 8> 8
-            <Timespan 7 7> 9
-
-        ::
-
-            >>> tree.index(stream.timespans.Timespan(-100, 100))
-            Traceback (most recent call last):
-            ValueError: <Timespan -100 100> not in timespan collection.
-
+        >>> tree.index(stream.timespans.Timespan(-100, 100))
+        Traceback (most recent call last):
+        ValueError: <Timespan -100 100> not in timespan collection.
         '''
         if not hasattr(timespan, 'startOffset') or \
             not hasattr(timespan, 'stopOffset'):

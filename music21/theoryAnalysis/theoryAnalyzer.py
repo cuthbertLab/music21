@@ -317,8 +317,8 @@ def getVLQs(score, partNum1, partNum2):
     >>> part1.append(note.Note('f5'))
     >>> sc.insert(part1)
     >>> theoryAnalysis.theoryAnalyzer.getVLQs(sc, 0, 1)
-    [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note C> , v1n2=<music21.note.Note G>, v2n1=<music21.note.Note D>, v2n2=<music21.note.Note E> >,
-     <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note G> , v1n2=<music21.note.Note C>, v2n1=<music21.note.Note E>, v2n2=<music21.note.Note F> >]
+    [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note C>, v1n2=<music21.note.Note G>, v2n1=<music21.note.Note D>, v2n2=<music21.note.Note E> >,
+     <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note G>, v1n2=<music21.note.Note C>, v2n1=<music21.note.Note E>, v2n2=<music21.note.Note F> >]
     >>> len(theoryAnalysis.theoryAnalyzer.getVLQs(sc, 0, 1))
     2
     '''
@@ -932,8 +932,8 @@ def getParallelFifths(score, partNum1=None, partNum2 = None):
     >>> sc.insert(part0)
     >>> sc.insert(part1)
     >>> theoryAnalysis.theoryAnalyzer.getParallelFifths(sc)
-    [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note D> , v1n2=<music21.note.Note E>, v2n1=<music21.note.Note G>, v2n2=<music21.note.Note A>  >, 
-     <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note E> , v1n2=<music21.note.Note G>, v2n1=<music21.note.Note A>, v2n2=<music21.note.Note C>  >]
+    [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note D>, v1n2=<music21.note.Note E>, v2n1=<music21.note.Note G>, v2n2=<music21.note.Note A>  >, 
+     <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note E>, v1n2=<music21.note.Note G>, v2n1=<music21.note.Note A>, v2n2=<music21.note.Note C>  >]
     >>> len(sc.analysisData['ResultDict']['parallelFifths'])
     2
     '''
@@ -1002,7 +1002,7 @@ def getParallelOctaves(score, partNum1=None, partNum2=None):
     >>> sc.insert(part0)
     >>> sc.insert(part1)
     >>> theoryAnalysis.theoryAnalyzer.getParallelOctaves(sc)
-    [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note C> , v1n2=<music21.note.Note G>, v2n1=<music21.note.Note C>, v2n2=<music21.note.Note G>  >]
+    [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note C>, v1n2=<music21.note.Note G>, v2n1=<music21.note.Note C>, v2n2=<music21.note.Note G>  >]
     '''
     testFunction = lambda vlq: vlq.parallelOctave()
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey='parallelOctaves', testFunction=testFunction)
