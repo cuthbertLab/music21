@@ -52,7 +52,7 @@ class ReSTWriter(object):
 
 class ModuleReferenceReSTWriter(ReSTWriter):
     '''
-    Writes module reference ReST files, and their index ReST file.
+    Writes module reference ReST files, and their index.rst file.
     '''
 
     def run(self):
@@ -102,7 +102,7 @@ class ModuleReferenceReSTWriter(ReSTWriter):
 
 class CorpusReferenceReSTWriter(ReSTWriter):
     '''
-    Write the corpus reference ReST file.
+    Write the corpus reference ReST file: referenceCorpus.rst
     '''
     def run(self):
         from music21 import documentation # @UnresolvedImport
@@ -135,7 +135,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
         for ipythonNotebookFilePath in ipythonNotebookFilePaths:
             nbConvertReturnCode = self.convertOneNotebook(ipythonNotebookFilePath)
             if nbConvertReturnCode is True:
-                self._cleanupNotebookAssets(ipythonNotebookFilePath)
+                self.cleanupNotebookAssets(ipythonNotebookFilePath)
                 print('\tWROTE   {0}'.format(common.relativepath(
                     ipythonNotebookFilePath)))
             else:
@@ -144,7 +144,10 @@ class IPythonNotebookReSTWriter(ReSTWriter):
 
     ### PRIVATE METHODS ###
 
-    def _cleanupNotebookAssets(self, ipythonNotebookFilePath):
+    def cleanupNotebookAssets(self, ipythonNotebookFilePath):
+        '''
+        Deletes all .text files in the _files directory.
+        '''
         notebookFileNameWithoutExtension = os.path.splitext(
             os.path.basename(ipythonNotebookFilePath))[0]
         notebookParentDirectoryPath = os.path.abspath(

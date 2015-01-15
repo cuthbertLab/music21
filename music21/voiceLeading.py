@@ -112,7 +112,7 @@ class VoiceLeadingQuartet(base.Music21Object):
             self._findIntervals()
 
     def __repr__(self):
-        return '<music21.voiceLeading.%s v1n1=%s , v1n2=%s, v2n1=%s, v2n2=%s  >' % (self.__class__.__name__, self.v1n1, self.v1n2, self.v2n1, self.v2n2)
+        return '<music21.voiceLeading.%s v1n1=%s, v1n2=%s, v2n1=%s, v2n2=%s  >' % (self.__class__.__name__, self.v1n1, self.v1n2, self.v2n1, self.v2n2)
 
 
     def _getKey(self):

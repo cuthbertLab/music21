@@ -7,7 +7,7 @@
 # Authors:      Josiah Wolf Oberholtzer
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2013-14 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
@@ -31,6 +31,7 @@ from music21 import instrument
 from music21 import note
 from music21 import tie
 
+from music21.exceptions21 import TimespanException
 from music21 import environment
 environLocal = environment.Environment("stream.timespans")
 
@@ -355,8 +356,6 @@ def timespansToChordifiedStream(timespans, templateStream=None):
         {2.0} <music21.chord.Chord F#2 A3 C#4 F#4>
         {3.0} <music21.chord.Chord F#3 C#4 F#4 A4>
     ...
-
-    TODO: Remove assert
     '''
     from music21 import stream
     if not isinstance(timespans, TimespanCollection):
@@ -571,17 +570,9 @@ class ElementTimespan(object):
         startOffset=None,
         stopOffset=None,
         ):
-        '''
-        TODO: replace assert w/ meaningful messages.
-        '''
-        #from music21 import stream
         self._element = element
         if parentage is not None:
             parentage = tuple(parentage)
-            #assert isinstance(parentage[0], stream.Measure), \
-            #    parentage[0]
-            #assert isinstance(parentage[-1], stream.Score), \
-            #    parentage[-1]
         self._parentage = parentage
         if beatStrength is not None:
             beatStrength = float(beatStrength)
@@ -593,7 +584,8 @@ class ElementTimespan(object):
             stopOffset = float(stopOffset)
         self._stopOffset = stopOffset
         if startOffset is not None and stopOffset is not None:
-            assert startOffset <= stopOffset, (startOffset, stopOffset)
+            if startOffset > stopOffset:
+                raise TimespanException('startOffset %r must be after stopOffset %r' % (startOffset, stopOffset))
         if parentStartOffset is not None:
             parentStartOffset = float(parentStartOffset)
         self._parentStartOffset = parentStartOffset
@@ -601,7 +593,8 @@ class ElementTimespan(object):
             parentStopOffset = float(parentStopOffset)
         self._parentStopOffset = parentStopOffset
         if parentStartOffset is not None and parentStopOffset is not None:
-            assert parentStartOffset <= parentStopOffset
+            if parentStartOffset > parentStopOffset:
+                raise TimespanException('startOffset %r must be after parentStopOffset %r' % (parentStartOffset, parentStopOffset))
 
     ### SPECIAL METHODS ###
 
@@ -1543,8 +1536,6 @@ class TimespanCollection(object):
         Used internally by TimespanCollection.
 
         Returns a node.
-
-        TODO: Remove Assert
         '''
         if node is not None:
             if 1 < node.balance:
@@ -1557,7 +1548,8 @@ class TimespanCollection(object):
                     node = self._rotateLeftLeft(node)
                 else:
                     node = self._rotateLeftRight(node)
-            assert -1 <= node.balance <= 1
+            if node.balance < -1 or node.balance > 1:
+                raise TimespanException('Somehow Nodes are still not balanced. node.balance %r must be between -1 and 1')
         return node
 
     def _remove(self, node, startOffset):
@@ -2428,10 +2420,7 @@ class TimespanCollection(object):
 
     def remove(self, timespans):
         r'''
-        Removes `timespans` from this offset-tree.
-
-        TODO: remove assert
-
+        Removes `timespans` (a single one or a list) from this offset-tree.
         '''
         initialStartOffset = self.startOffset
         initialStopOffset = self.stopOffset
@@ -2439,8 +2428,8 @@ class TimespanCollection(object):
             hasattr(timespans, 'stopOffset'):
             timespans = [timespans]
         for timespan in timespans:
-            assert hasattr(timespan, 'startOffset'), timespan
-            assert hasattr(timespan, 'stopOffset'), timespan
+            if not hasattr(timespan, 'startOffset') or not hasattr(timespan, 'stopOffset'):
+                raise TimespanException('A timespan must have a startOffset and a stopOffset attribute, this one %r does not' % (timespan,))
             self._removeTimespan(timespan)
         self._updateIndices(self._rootNode)
         self._updateOffsets(self._rootNode)
@@ -2848,12 +2837,7 @@ class TimespanCollection(object):
 
 #------------------------------------------------------------------------------
 
-
-class TimespanException(exceptions21.Music21Exception):
-    pass
-
-
-class TimespanCollectionException(exceptions21.Music21Exception):
+class TimespanCollectionException(exceptions21.TimespanException):
     pass
 
 
@@ -2866,9 +2850,6 @@ class Test(unittest.TestCase):
         pass
 
     def testTimespanCollection(self):
-        '''
-        todo -- use self.assertX -- better failure messages
-        '''
         for attempt in range(100):
             starts = list(range(20))
             stops = list(range(20))
@@ -2888,17 +2869,18 @@ class Test(unittest.TestCase):
                     x.startOffset for x in currentTimespansInList)
                 currentStopOffset = max(
                     x.stopOffset for x in currentTimespansInList)
-                assert currentTimespansInTree == currentTimespansInList, \
-                    (attempt, currentTimespansInTree, currentTimespansInList)
-                assert tree._rootNode.stopOffsetLow == \
-                    min(x.stopOffset for x in currentTimespansInList)
-                assert tree._rootNode.stopOffsetHigh == \
-                    max(x.stopOffset for x in currentTimespansInList)
-                assert tree.startOffset == currentStartOffset
-                assert tree.stopOffset == currentStopOffset
+                
+                self.assertEqual(currentTimespansInTree, 
+                                 currentTimespansInList, 
+                                 (attempt, currentTimespansInTree, currentTimespansInList))
+                self.assertEqual(tree._rootNode.stopOffsetLow, 
+                                 min(x.stopOffset for x in currentTimespansInList))
+                self.assertEqual(tree._rootNode.stopOffsetHigh,
+                                 max(x.stopOffset for x in currentTimespansInList))
+                self.assertEqual(tree.startOffset, currentStartOffset)
+                self.assertEqual(tree.stopOffset, currentStopOffset)
                 for i in range(len(currentTimespansInTree)):
-                    assert currentTimespansInList[i] == \
-                        currentTimespansInTree[i]
+                    self.assertEqual(currentTimespansInList[i], currentTimespansInTree[i])
 
             random.shuffle(timespans)
             while timespans:
@@ -2907,23 +2889,24 @@ class Test(unittest.TestCase):
                     key=lambda x: (x.startOffset, x.stopOffset))
                 tree.remove(timespan)
                 currentTimespansInTree = [x for x in tree]
-                assert currentTimespansInTree == currentTimespansInList, \
-                    (attempt, currentTimespansInTree, currentTimespansInList)
+                self.assertEqual(currentTimespansInTree, 
+                                 currentTimespansInList, 
+                                 (attempt, currentTimespansInTree, currentTimespansInList))
                 if tree._rootNode is not None:
                     currentStartOffset = min(
                         x.startOffset for x in currentTimespansInList)
                     currentStopOffset = max(
                         x.stopOffset for x in currentTimespansInList)
-                    assert tree._rootNode.stopOffsetLow == \
-                        min(x.stopOffset for x in currentTimespansInList)
-                    assert tree._rootNode.stopOffsetHigh == \
-                        max(x.stopOffset for x in currentTimespansInList)
-                    assert tree.startOffset == currentStartOffset
-                    assert tree.stopOffset == currentStopOffset
-                    for i in range(len(currentTimespansInTree)):
-                        assert currentTimespansInList[i] == \
-                            currentTimespansInTree[i]
+                    self.assertEqual(tree._rootNode.stopOffsetLow, 
+                                     min(x.stopOffset for x in currentTimespansInList))
+                    self.assertEqual(tree._rootNode.stopOffsetHigh,
+                                     max(x.stopOffset for x in currentTimespansInList))
+                    self.assertEqual(tree.startOffset, currentStartOffset)
+                    self.assertEqual(tree.stopOffset, currentStopOffset)
 
+                    for i in range(len(currentTimespansInTree)):
+                        self.assertEqual(currentTimespansInList[i], currentTimespansInTree[i])
+                        
 
 #------------------------------------------------------------------------------
 
