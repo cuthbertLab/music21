@@ -475,6 +475,7 @@ class StreamFreezer(StreamFreezeThawBase):
 
         streamObj._storedElementOffsetTuples = storedElementOffsetTuples
         #streamObj._elementTree = None
+        streamObj._offsetMapDict = {}
         streamObj._elements = []
         streamObj._endElements = []
         streamObj._elementsChanged()

@@ -1225,6 +1225,9 @@ class Stream(base.Music21Object):
             elif name == 'flattenedRepresentationOf':
                 # keep a reference, not a deepcopy
                 setattr(new, name, self.flattenedRepresentationOf)
+            elif name == '_offsetMapDict':
+                newValue = {}
+                setattr(new, name, newValue)
             elif name == '_derivation':
                 # keep the old ancestor but need to update the client
                 if self._derivation is not None:
@@ -1423,22 +1426,20 @@ class Stream(base.Music21Object):
         return storeSorted
 
     def setOffsetMap(self, element, offset):
-        pass
-#         try:
-#             self._offsetMapDict[element] = offset
-#         except TypeError: # unhashable type
-#             self._offsetMapDict[id(element)] = offset
+        try:
+            self._offsetMapDict[element] = offset
+        except TypeError: # unhashable type
+            self._offsetMapDict[id(element)] = offset
     
-#    def getOffsetFromMap(self, element):
-#        pass
-#         try:
-#             try:
-#                 o = self._offsetMapDict[element]
-#             except TypeError:
-#                 o = self._offsetMapDict[id(element)]
-#         except KeyError:
-#             return None
-#         return o
+    def getOffsetFromMap(self, element):
+        try:
+            try:
+                o = self._offsetMapDict[element]
+            except TypeError:
+                o = self._offsetMapDict[id(element)]
+        except KeyError:
+            return None
+        return o
 
     def insert(self, offsetOrItemOrList, itemOrNone=None,
                      ignoreSort=False, setActiveSite=True):
