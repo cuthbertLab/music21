@@ -287,6 +287,8 @@ class Stream(base.Music21Object):
         base.Music21Object.__init__(self)
 
         self.streamStatus = streamStatus.StreamStatus(self)
+        self._offsetMapDict = {}
+        
 
         # self._elements stores Music21Object objects.
         self._elements = []
@@ -570,16 +572,19 @@ class Stream(base.Music21Object):
             value.isStream):
             self._elements = list(value._elements)
             for e in self._elements:
+                self.setOffsetMap(e, e.getOffsetBySite(value))
                 e.sites.add(self, e.getOffsetBySite(value))
                 e.activeSite = self
             self._endElements = value._endElements
             for e in self._endElements:
+                self.setOffsetMap(e, e.getOffsetBySite(value))
                 e.sites.add(self, e.getOffsetBySite(value))
                 e.activeSite = self
         else:
             # replace the complete elements list
             self._elements = list(value)
             for e in self._elements:
+                self.setOffsetMap(e, e.offset)
                 e.sites.add(self, e.offset)
                 e.activeSite = self
         self._elementsChanged()
@@ -649,6 +654,8 @@ class Stream(base.Music21Object):
         self._elements[k] = value
         value.activeSite = self
         # must get native offset
+        self.setOffsetMap(value, value.offset)
+
         value.sites.add(self, value.offset)
 
         if isinstance(value, Stream):
@@ -1405,6 +1412,7 @@ class Stream(base.Music21Object):
                         if highestSortTuple < thisSortTuple:
                             storeSorted = True
                     
+        self.setOffsetMap(element, float(offset))
         element.sites.add(self, float(offset))
         # need to explicitly set the activeSite of the element
         if setActiveSite:
@@ -1414,6 +1422,23 @@ class Stream(base.Music21Object):
         #self._elementTree.insert(float(offset), element)
         return storeSorted
 
+    def setOffsetMap(self, element, offset):
+        pass
+#         try:
+#             self._offsetMapDict[element] = offset
+#         except TypeError: # unhashable type
+#             self._offsetMapDict[id(element)] = offset
+    
+#    def getOffsetFromMap(self, element):
+#        pass
+#         try:
+#             try:
+#                 o = self._offsetMapDict[element]
+#             except TypeError:
+#                 o = self._offsetMapDict[id(element)]
+#         except KeyError:
+#             return None
+#         return o
 
     def insert(self, offsetOrItemOrList, itemOrNone=None,
                      ignoreSort=False, setActiveSite=True):
@@ -1535,6 +1560,7 @@ class Stream(base.Music21Object):
         '''
         # NOTE: this is not called by append, as that is optimized
         # for looping multiple elements
+        self.setOffsetMap(element, self.highestTime)
         element.sites.add(self, self.highestTime)
         # need to explicitly set the activeSite of the element
         element.activeSite = self
@@ -1739,6 +1765,7 @@ class Stream(base.Music21Object):
             self._addElementPreProcess(e)
             # add this Stream as a location for the new elements, with the
             # the offset set to the current highestTime
+            self.setOffsetMap(e, highestTime)
             e.sites.add(self, highestTime)
             # need to explicitly set the activeSite of the element
             e.activeSite = self
@@ -1762,6 +1789,7 @@ class Stream(base.Music21Object):
         To be called by other methods.
         '''
         self._addElementPreProcess(element)
+        self.setOffsetMap(element, 'highestTime')
         element.sites.add(self, 'highestTime')
         # need to explicitly set the activeSite of the element
         element.activeSite = self
@@ -2010,11 +2038,13 @@ class Stream(base.Music21Object):
             target = self._elements[i] # target may have been obj id; reassing
             self._elements[i] = replacement
             # place the replacement at the old objects offset for this site
+            self.setOffsetMap(replacement, target.getOffsetBySite(self))
             replacement.sites.add(self, target.getOffsetBySite(self))
         else:
             # target may have been obj id; reassign
             target = self._endElements[i - eLen]
             self._endElements[i - eLen] = replacement
+            self.setOffsetMap(replacement, 'highestTime')
             replacement.sites.add(self, 'highestTime')
 
         target.removeLocationBySite(self)
@@ -6214,6 +6244,7 @@ class Stream(base.Music21Object):
             s._endElements = shallowEndElements
 
             for e in shallowElements + shallowEndElements:
+                s.setOffsetMap(e, e.getOffsetBySite(self))
                 e.sites.add(s, e.getOffsetBySite(self))
                 # need to explicitly set activeSite
                 e.activeSite = s
