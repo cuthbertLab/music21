@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
-# Name:         timespans.timespanNode.py
+# Name:         timespans/node.py
 # Purpose:      Internal data structures for timespan collections
 #
 # Authors:      Josiah Wolf Oberholtzer
@@ -18,27 +18,318 @@ This is an implementation detail of the TimespanTree class.
 
 import unittest
 from music21 import environment
-environLocal = environment.Environment("timespans.timespanNode")
-
+environLocal = environment.Environment("timespans.node")
 
 #------------------------------------------------------------------------------
-class TimespanTreeNode(object):
+class AVLNode(object):
     r'''
-    A node in an TimespanTree.
+    An AVL Tree Node, not specialized in any way, just contains offsets.
 
     This class is only used by TimespanTree, and should not be
     instantiated by hand. It stores a list of ElementTimespans, as well as
     various data which describes the internal structure of the tree.
 
     >>> offset = 1.0
-    >>> node = timespans.timespanNode.TimespanTreeNode(offset)
+    >>> node = timespans.node.AVLNode(offset)
     >>> node
-    <Node: Start:1.0 Indices:(-1:-1:-1:-1) Length:{0}>
+    <Node: Start:1.0 Height:0 L:None R:None>
+    >>> n2 = timespans.node.AVLNode(2.0)
+    >>> node.rightChild = n2
+    >>> node
+    <Node: Start:1.0 Height:1 L:None R:0>
+    
+    Note that nodes cannot rebalance themselves, that's what a Tree is for.
+    
 
     Please consult the Wikipedia entry on AVL trees
     (https://en.wikipedia.org/wiki/AVL_tree) for a very detailed
-    description of how this datastructure works.
+    description of how this datastructure works.    
+    '''
+
+    ### CLASS VARIABLES ###
+
+    __slots__ = (
+        '__weakref__',
+        'balance',
+        'height',
+        'offset',
+        'payload',
+
+        '_leftChild',
+        '_rightChild',
+        )
+
+    _DOC_ATTR = {
+    'balance': '''
+        Returns the current state of the difference in heights of the two subtrees rooted on this node.
+
+        This attribute is used to help balance the AVL tree.
+
+        >>> score = timespans.makeExampleScore()
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> print(tree.debug())
+        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+
+
+        This tree has one more depth on the right than on the left
+
+        >>> tree.rootNode.balance
+        1
+
+
+        The leftChild of the rootNote is perfectly balanced, while the rightChild is off by
+        one (acceptable).
+
+        >>> tree.rootNode.leftChild.balance
+        0
+        >>> tree.rootNode.rightChild.balance
+        1
+
+
+        The rightChild's children are also (acceptably) unbalanced:
+
+        >>> tree.rootNode.rightChild.leftChild.balance
+        0
+        >>> tree.rootNode.rightChild.rightChild.balance
+        1
+        ''',
+        
+        
+    'height': r'''
+        The height of the subtree rooted on this node.
+
+        This property is used to help balance the AVL tree.
+
+        >>> score = timespans.makeExampleScore()
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> print(tree.debug())
+        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+
+        >>> tree.rootNode.height
+        3
+
+        >>> tree.rootNode.rightChild.height
+        2
+
+        >>> tree.rootNode.rightChild.rightChild.height
+        1
+
+        >>> tree.rootNode.rightChild.rightChild.rightChild.height
+        0
+        ''',
+        
+    'offset': r'''
+        The offset of this node.
+
+        >>> score = timespans.makeExampleScore()
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> print(tree.rootNode.debug())
+        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+
+        >>> tree.rootNode.offset
+        3.0
+
+        >>> tree.rootNode.leftChild.offset
+        1.0
+
+        >>> tree.rootNode.rightChild.offset
+        5.0
+        ''',
+    }
     
+    ### INITIALIZER ###
+
+    def __init__(self, offset):
+        self.balance = 0
+        self.height = 0        
+        self.offset = offset
+        self.payload = None
+
+        self._leftChild = None
+        self._rightChild = None
+
+
+    ### SPECIAL METHODS ###
+
+    def __repr__(self):
+        lcHeight = None
+        if self.leftChild:
+            lcHeight = self.leftChild.height
+        rcHeight = None
+        if self.rightChild:
+            rcHeight = self.rightChild.height
+            
+        return '<Node: Start:{} Height:{} L:{} R:{}>'.format(
+            self.offset,
+            self.height,
+            lcHeight,
+            rcHeight
+            )
+
+    ### PRIVATE METHODS ###
+
+    def debug(self):
+        '''
+        Get a debug of the Node:
+        
+        >>> score = timespans.makeExampleScore()
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> rn = tree.rootNode        
+        >>> print(rn.debug())
+        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        '''
+        return '\n'.join(self.getDebugPieces())
+
+    def getDebugPieces(self):
+        r'''
+        Return a list of the debugging information of the tree (used for debug):
+        >>> score = timespans.makeExampleScore()
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> rn = tree.rootNode
+        >>> rn.getDebugPieces()
+        ['<Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>', 
+         '\tL: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>',
+         '\t\tL: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>', 
+         '\t\tR: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>', 
+         '\tR: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>', 
+         '\t\tL: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>', 
+         '\t\tR: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>', 
+         '\t\t\tR: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>']        
+        '''        
+        result = []
+        result.append(repr(self))
+        if self.leftChild:
+            subresult = self.leftChild.getDebugPieces()
+            result.append('\tL: {}'.format(subresult[0]))
+            result.extend('\t' + x for x in subresult[1:])
+        if self.rightChild:
+            subresult = self.rightChild.getDebugPieces()
+            result.append('\tR: {}'.format(subresult[0]))
+            result.extend('\t' + x for x in subresult[1:])
+        return result
+
+    def update(self):
+        '''
+        Updates the height and balance attributes of the nodes.
+        
+        Called automatically when the .leftChild or .rightChild are changed.
+        
+        Returns None
+        '''        
+        leftHeight = -1
+        rightHeight = -1
+        if self.leftChild is not None:
+            leftHeight = self.leftChild.height
+        if self.rightChild is not None:
+            rightHeight = self.rightChild.height
+        self.height = max(leftHeight, rightHeight) + 1
+        self.balance = rightHeight - leftHeight
+
+    ### PUBLIC PROPERTIES ###
+
+    @property
+    def leftChild(self):
+        r'''
+        The left child of this node.
+
+        Setting the left child triggers a node update.
+
+        >>> score = timespans.makeExampleScore()
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> print(tree.rootNode.debug())
+        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+
+        >>> print(tree.rootNode.leftChild.debug())
+        <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+            L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+            R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+        '''
+        return self._leftChild
+
+    @leftChild.setter
+    def leftChild(self, node):
+        self._leftChild = node
+        self.update()
+
+    @property
+    def rightChild(self):
+        r'''
+        The right child of this node.
+
+        Setting the right child triggers a node update.
+
+        >>> score = timespans.makeExampleScore()
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> print(tree.rootNode.debug())
+        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+
+        >>> print(tree.rootNode.rightChild.debug())
+        <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+            L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+            R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+
+        >>> print(tree.rootNode.rightChild.rightChild.debug())
+        <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+            R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+
+        >>> print(tree.rootNode.rightChild.rightChild.rightChild.debug())
+        <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        '''
+        return self._rightChild
+
+    @rightChild.setter
+    def rightChild(self, node):
+        self._rightChild = node
+        self.update()
+        
+#------------------------------------------------------------------------------
+class TimespanTreeNode(AVLNode):
+    r'''
+    A node in an TimespanTree.
+
     Here's an example of what it means and does:
     
     >>> score = timespans.makeExampleScore()
@@ -56,8 +347,9 @@ class TimespanTreeNode(object):
     {6.0 - 7.0} <music21.note.Note B>
     {6.0 - 8.0} <music21.note.Note D>
     {7.0 - 8.0} <music21.note.Note C>
+    
     >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
-    >>> rn = tree._rootNode
+    >>> rn = tree.rootNode
     
     The RootNode here represents the starting position of the Note F at 3.0; It is the center
     of the elements in the flat Stream.  Its index is 5 (that is, it's the sixth note in the
@@ -121,107 +413,21 @@ class TimespanTreeNode(object):
     ### CLASS VARIABLES ###
 
     __slots__ = (
-        '__weakref__',
-        'balance',
-        'height',
-        'payload',
-        'nodeStartIndex',
-        'nodeStopIndex',
-        'offset',
         'endTimeHigh',
         'endTimeLow',
+        'nodeStartIndex',
+        'nodeStopIndex',
         'subtreeStartIndex',
         'subtreeStopIndex',
-
-        '_leftChild',
-        '_rightChild',
         )
 
     _DOC_ATTR = {
-    'balance': '''
-        Gets the difference in heights of the two subtrees rooted on this node.
-
-        This attribute is used to help balance the AVL tree.
-
-        >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
-        >>> print(tree.debug())
-        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
-
-
-        This tree has one more depth on the right than on the left
-
-        >>> tree._rootNode.balance
-        1
-
-
-        The leftChild of the rootNote is perfectly balanced, while the rightChild is off by
-        one (acceptable).
-
-
-        >>> tree._rootNode.leftChild.balance
-        0
-
-        >>> tree._rootNode.rightChild.balance
-        1
-
-
-        The rightChild's children are also (acceptably) unbalanced:
-        
-
-        >>> tree._rootNode.rightChild.leftChild.balance
-        0
-
-        >>> tree._rootNode.rightChild.rightChild.balance
-        1''',
-        
-        
-    'height': r'''
-        The height of the subtree rooted on this node.
-
-        This property is used to help balance the AVL tree.
-
-        >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
-        >>> print(tree.debug())
-        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
-
-        >>> tree._rootNode.height
-        3
-
-        >>> tree._rootNode.rightChild.height
-        2
-
-        >>> tree._rootNode.rightChild.rightChild.height
-        1
-
-        >>> tree._rootNode.rightChild.rightChild.rightChild.height
-        0
-        ''',
-        
     'payload': r'''
         A list of Timespans starting at this node's start offset.
 
-        Timespans are sorted by their _SortTuple, if they contain an element,
-        and otherwise by their stop offset.
-
         >>> score = timespans.makeExampleScore()
         >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
-        >>> print(tree._rootNode.debug())
+        >>> print(tree.rootNode.debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
             L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
                 L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
@@ -231,19 +437,19 @@ class TimespanTreeNode(object):
                 R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
                     R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
 
-        >>> tree._rootNode.payload
+        >>> tree.rootNode.payload
         [<ElementTimespan (3.0 to 4.0) <music21.note.Note F>>]
 
-        >>> tree._rootNode.leftChild.payload
+        >>> tree.rootNode.leftChild.payload
         [<ElementTimespan (1.0 to 2.0) <music21.note.Note D>>]
 
-        >>> for x in tree._rootNode.leftChild.rightChild.payload:
+        >>> for x in tree.rootNode.leftChild.rightChild.payload:
         ...     x
         ...
         <ElementTimespan (2.0 to 3.0) <music21.note.Note E>>
         <ElementTimespan (2.0 to 4.0) <music21.note.Note G>>
 
-        >>> tree._rootNode.rightChild.payload
+        >>> tree.rootNode.rightChild.payload
         [<ElementTimespan (5.0 to 6.0) <music21.note.Note A>>]
         ''',
         
@@ -256,33 +462,6 @@ class TimespanTreeNode(object):
         The timespan stop index (i.e., the last x where s[x] is found in this Node's payload) 
         of only those timespans stored in the payload of this node.
         ''',
-        
-    'offset': r'''
-        The offset of this node.
-
-        >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
-        >>> print(tree._rootNode.debug())
-        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
-
-        >>> tree._rootNode.offset
-        3.0
-
-        >>> tree._rootNode.leftChild.offset
-        1.0
-
-        >>> tree._rootNode.rightChild.offset
-        5.0
-
-        ''',
-
     'endTimeHigh': r'''
         The highest stop offset of any timespan in any node of the subtree
         rooted on this node.
@@ -307,21 +486,16 @@ class TimespanTreeNode(object):
     ### INITIALIZER ###
 
     def __init__(self, offset):
-        self.balance = 0
-        self.height = 0
+        super(TimespanTreeNode, self).__init__(offset)
         self.payload = []
         self.nodeStartIndex = -1
         self.nodeStopIndex = -1
         
-        self.offset = offset
         self.endTimeHigh = None
         self.endTimeLow = None
         
         self.subtreeStartIndex = -1
         self.subtreeStopIndex = -1
-
-        self._leftChild = None
-        self._rightChild = None
 
 
     ### SPECIAL METHODS ###
@@ -336,143 +510,8 @@ class TimespanTreeNode(object):
             len(self.payload),
             )
 
-    ### PRIVATE METHODS ###
 
-    def debug(self):
-        '''
-        Get a debug of the Node:
-        
-        >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
-        >>> rn = tree._rootNode        
-        >>> print(rn.debug())
-        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
-        '''
-        return '\n'.join(self.getDebugPieces())
 
-    def getDebugPieces(self):
-        r'''
-        Return a list of the debugging information of the tree (used for debug):
-        >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
-        >>> rn = tree._rootNode
-        >>> rn.getDebugPieces()
-        ['<Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>', 
-         '\tL: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>',
-         '\t\tL: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>', 
-         '\t\tR: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>', 
-         '\tR: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>', 
-         '\t\tL: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>', 
-         '\t\tR: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>', 
-         '\t\t\tR: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>']        
-        '''        
-        result = []
-        result.append(repr(self))
-        if self.leftChild:
-            subresult = self.leftChild.getDebugPieces()
-            result.append('\tL: {}'.format(subresult[0]))
-            result.extend('\t' + x for x in subresult[1:])
-        if self.rightChild:
-            subresult = self.rightChild.getDebugPieces()
-            result.append('\tR: {}'.format(subresult[0]))
-            result.extend('\t' + x for x in subresult[1:])
-        return result
-
-    def update(self):
-        '''
-        Updates the height and balance attributes of the nodes.
-        
-        Called automatically when the .leftChild or .rightChild are changed.
-        
-        Returns None
-        '''        
-        leftHeight = -1
-        rightHeight = -1
-        if self.leftChild is not None:
-            leftHeight = self.leftChild.height
-        if self.rightChild is not None:
-            rightHeight = self.rightChild.height
-        self.height = max(leftHeight, rightHeight) + 1
-        self.balance = rightHeight - leftHeight
-
-    ### PUBLIC PROPERTIES ###
-
-    @property
-    def leftChild(self):
-        r'''
-        The left child of this node.
-
-        Setting the left child triggers a node update.
-
-        >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
-        >>> print(tree._rootNode.debug())
-        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
-
-        >>> print(tree._rootNode.leftChild.debug())
-        <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-            L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-            R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-        '''
-        return self._leftChild
-
-    @leftChild.setter
-    def leftChild(self, node):
-        self._leftChild = node
-        self.update()
-
-    @property
-    def rightChild(self):
-        r'''
-        The right child of this node.
-
-        Setting the right child triggers a node update.
-
-        >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
-        >>> print(tree._rootNode.debug())
-        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
-
-        >>> print(tree._rootNode.rightChild.debug())
-        <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-            L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-            R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
-
-        >>> print(tree._rootNode.rightChild.rightChild.debug())
-        <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-            R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
-
-        >>> print(tree._rootNode.rightChild.rightChild.rightChild.debug())
-        <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
-        '''
-        return self._rightChild
-
-    @rightChild.setter
-    def rightChild(self, node):
-        self._rightChild = node
-        self.update()
 
 #------------------------------------------------------------------------------
 
@@ -486,8 +525,7 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 
 
-_DOC_ORDER = (
-    )
+_DOC_ORDER = (TimespanTreeNode, AVLNode)
 
 
 #------------------------------------------------------------------------------

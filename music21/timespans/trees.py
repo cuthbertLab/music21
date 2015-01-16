@@ -25,22 +25,834 @@ from music21 import common
 from music21 import exceptions21
 
 from music21.timespans import spans
+from music21.timespans import node
 
 from music21.exceptions21 import TimespanException
 from music21 import environment
 environLocal = environment.Environment("timespans")
 
 
+class AVLTree(object):
+    r'''
+    Data structure for working with timespans.node.AVLNode objects.
+    
+    To be subclassed in order to do anything useful with music21 objects.
+    '''
+    __slots__ = (
+        '__weakref__',
+        'rootNode',
+        )
+    nodeClass = node.AVLNode
+    
+    def __init__(
+        self,
+        ):
+        self.rootNode = None
 
-class TimespanTree(object):
+    def __iter__(self):
+        r'''
+        Iterates through all the nodes in the offset tree.
+
+        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> tss = [timespans.Timespan(x, y) for x, y in tsList]
+        >>> tree = timespans.trees.TimespanTree()
+        >>> tree.insert(tss)
+
+        >>> for x in tree:
+        ...     x
+        ...
+        <Timespan 0 2>
+        <Timespan 0 9>
+        <Timespan 1 1>
+        <Timespan 2 3>
+        <Timespan 3 4>
+        <Timespan 4 9>
+        <Timespan 5 6>
+        <Timespan 5 8>
+        <Timespan 6 8>
+        <Timespan 7 7>
+        '''
+        def recurse(node):
+            if node is not None:
+                if node.leftChild is not None:
+                    for n in recurse(node.leftChild):
+                        yield n
+                yield node
+                if node.rightChild is not None:
+                    for n in recurse(node.rightChild):
+                        yield n
+        return recurse(self.rootNode)
+
+    def _insertNode(self, node, offset):
+        r'''
+        Inserts a node at `offset` in the subtree rooted on `node`.
+
+        Used internally by TimespanTree.
+
+        Returns a node which should be set to the new rootNode
+        '''
+        if node is None:
+            return self.nodeClass(offset)
+        if offset < node.offset:
+            node.leftChild = self._insertNode(node.leftChild, offset)
+        elif node.offset < offset:
+            node.rightChild = self._insertNode(node.rightChild, offset)
+        return self._rebalance(node)
+
+
+    def debug(self):
+        r'''
+        Gets string representation of the timespan collection.
+
+        Useful only for debugging its internal node structure.
+
+        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> tss = [timespans.Timespan(x, y) for x, y in tsList]
+        >>> tree = timespans.trees.TimespanTree()
+        >>> tree.insert(tss)
+
+        >>> print(tree.debug())
+        <Node: Start:3 Indices:(0:4:5:10) Length:{1}>
+            L: <Node: Start:1 Indices:(0:2:3:4) Length:{1}>
+                L: <Node: Start:0 Indices:(0:0:2:2) Length:{2}>
+                R: <Node: Start:2 Indices:(3:3:4:4) Length:{1}>
+            R: <Node: Start:5 Indices:(5:6:8:10) Length:{2}>
+                L: <Node: Start:4 Indices:(5:5:6:6) Length:{1}>
+                R: <Node: Start:6 Indices:(8:8:9:10) Length:{1}>
+                    R: <Node: Start:7 Indices:(9:9:10:10) Length:{1}>
+        '''
+        if self.rootNode is not None:
+            return self.rootNode.debug()
+        return ''
+
+    def _rebalance(self, node):
+        r'''
+        Rebalances the subtree rooted on`node`.
+
+        Returns the original node.
+        '''
+        if node is not None:
+            if node.balance > 1:
+                if 0 <= node.rightChild.balance:
+                    node = self._rotateRightRight(node)
+                else:
+                    node = self._rotateRightLeft(node)
+            elif node.balance < -1:
+                if node.leftChild.balance <= 0:
+                    node = self._rotateLeftLeft(node)
+                else:
+                    node = self._rotateLeftRight(node)
+            if node.balance < -1 or node.balance > 1:
+                raise TimespanException('Somehow Nodes are still not balanced. node.balance %r must be between -1 and 1')
+        return node
+    
+    def _rotateLeftLeft(self, node):
+        r'''
+        Rotates a node left twice.
+
+        Used internally by TimespanTree during tree rebalancing.
+
+        Returns a node.
+        '''
+        nextNode = node.leftChild
+        node.leftChild = nextNode.rightChild
+        nextNode.rightChild = node
+        return nextNode
+
+    def _rotateLeftRight(self, node):
+        r'''
+        Rotates a node right twice.
+
+        Used internally by TimespanTree during tree rebalancing.
+
+        Returns a node.
+        '''
+        node.leftChild = self._rotateRightRight(node.leftChild)
+        nextNode = self._rotateLeftLeft(node)
+        return nextNode
+
+    def _rotateRightLeft(self, node):
+        r'''
+        Rotates a node right, then left.
+
+        Used internally by TimespanTree during tree rebalancing.
+
+        Returns a node.
+        '''
+        node.rightChild = self._rotateLeftLeft(node.rightChild)
+        nextNode = self._rotateRightRight(node)
+        return nextNode
+
+    def _rotateRightRight(self, node):
+        r'''
+        Rotates a node left, then right.
+
+        Used internally by TimespanTree during tree rebalancing.
+
+        Returns a node.
+        '''
+        nextNode = node.rightChild
+        node.rightChild = nextNode.leftChild
+        nextNode.leftChild = node
+        return nextNode
+
+    def _getNodeByOffset(self, node, offset):
+        r'''
+        Searches for a node whose offset is `offset` in the subtree
+        rooted on `node`.
+
+        Used internally by TimespanTree.
+
+        Returns a Node object or None
+        '''
+        if node is not None:
+            if node.offset == offset:
+                return node
+            elif node.leftChild and offset < node.offset:
+                return self._getNodeByOffset(node.leftChild, offset)
+            elif node.rightChild and node.offset < offset:
+                return self._getNodeByOffset(node.rightChild, offset)
+        return None
+
+    def _getNodeAfter(self, offset):
+        r'''
+        Gets the first node after `offset`.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> n1 = tree._getNodeAfter(0.5)
+        >>> n1
+        <Node: Start:1.0 Indices:(7:7:11:11) Length:{4}>
+        >>> n2 = tree._getNodeAfter(0.6)
+        >>> n2 is n1
+        True
+        '''
+        def recurse(node, offset):
+            if node is None:
+                return None
+            result = None
+            if node.offset <= offset and node.rightChild:
+                result = recurse(node.rightChild, offset)
+            elif offset < node.offset:
+                result = recurse(node.leftChild, offset) or node
+            return result
+        result = recurse(self.rootNode, offset)
+        if result is None:
+            return None
+        return result
+    
+    def getOffsetAfter(self, offset):
+        r'''
+        Gets start offset after `offset`.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> tree.getOffsetAfter(0.5)
+        1.0
+
+        Returns None if no succeeding offset exists.
+
+        >>> tree.getOffsetAfter(35) is None
+        True
+
+        Generally speaking, negative offsets will usually return 0.0
+
+        >>> tree.getOffsetAfter(-999)
+        0.0
+        '''
+        node = self._getNodeAfter(offset)
+        if node:            
+            return node.offset
+        else:
+            return None
+
+    def _getNodeBefore(self, offset):
+        '''
+        Finds the node immediately before offset.
+        
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> tree._getNodeBefore(100)  # last node in piece
+        <Node: Start:35.0 Indices:(161:161:165:165) Length:{4}>
+        '''
+        
+        def recurse(node, offset):
+            if node is None:
+                return None
+            result = None
+            if node.offset < offset:
+                result = recurse(node.rightChild, offset) or node
+            elif offset <= node.offset and node.leftChild:
+                result = recurse(node.leftChild, offset)
+            return result
+        result = recurse(self.rootNode, offset)
+        if result is None:
+            return None
+        return result
+    
+    def getOffsetBefore(self, offset):
+        r'''
+        Gets the start offset immediately preceding `offset` in this
+        offset-tree.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> tree.getOffsetBefore(100)
+        35.0
+
+        Return None if no preceding offset exists.
+
+        >>> tree.getOffsetBefore(0) is None
+        True
+        '''
+        node = self._getNodeBefore(offset)
+        if node is None:
+            return None
+        return node.offset
+
+    def _remove(self, node, offset):
+        r'''
+        Removes a node at `offset` in the subtree rooted on `node`.
+
+        Used internally by TimespanTree.
+
+        Returns a node which represents the new rootNote.
+        '''
+        if node is not None:
+            if node.offset == offset:
+                ### got the right node!
+                if node.leftChild and node.rightChild:
+                    nextNode = node.rightChild
+                    while nextNode.leftChild: # farthest left child of the right child.
+                        nextNode = nextNode.leftChild
+                    node.offset = nextNode.offset
+                    node.payload = nextNode.payload
+                    node.rightChild = self._remove(node.rightChild, nextNode.offset)
+                else:
+                    node = node.leftChild or node.rightChild
+            elif node.offset > offset:
+                node.leftChild = self._remove(node.leftChild, offset)
+            elif node.offset < offset:
+                node.rightChild = self._remove(node.rightChild, offset)
+        return self._rebalance(node)
+
+class ElementTree(AVLTree):
+    r'''
+    A data structure for efficiently storing a score: flat or recursed or normal.
+    
+    This data structure stores TimespanNodes: objects which implement both a
+    `offset` and `endTime` property. It provides fast lookups of such
+    objects and can quickly locate vertical overlaps.
+.
+    '''
+    ### CLASS VARIABLES ###
+
+    __slots__ = (
+        '_source',
+        '_sourceRepr'
+        '_parents',
+        )
+    nodeClass = node.TimespanTreeNode
+
+    ### INITIALIZER ###
+
+    def __init__(
+        self,
+        elements=None,
+        source=None,
+        ):
+        super(ElementTree, self).__init__()
+        self._parents = weakref.WeakSet()
+        if elements and elements is not None:
+            self.insert(elements)
+            
+        self.source = source
+    
+    ## Special Methods ##
+    def __contains__(self, element):
+        r'''
+        Is true when the ElementTree contains the object within it.
+
+        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> tss = [timespans.Timespan(x, y) for x, y in tsList]
+        >>> tree = timespans.trees.TimespanTree()
+        >>> tree.insert(tss)
+
+        >>> tss[0] in tree
+        True
+
+        >>> timespans.Timespan(-200, 1000) in tree
+        False
+        
+        The exact Timespan object does not have to be in the tree, just one with the same offset
+        and endTime:
+        
+        >>> tsDuplicate = timespans.Timespan(0, 2)
+        >>> tsDuplicate in tree
+        True
+        '''
+        try:
+            offset = element.offset
+        except AttributeError:
+            raise TimespanTreeException('element must be a Music21Object, i.e., must have offset')
+        candidates = self.findTimespansStartingAt(offset)
+        if element in candidates:
+            return True
+        else:
+            return False
+
+
+
+    def __eq__(self, expr):
+        r'''
+        Two ElementTrees are equal only if their ids are equal.
+        
+        (TODO: make it true only if the two have exactly identical elements unless this interferes
+               with hashing. Use "is" for this)
+        '''
+        return id(self) == id(expr)
+
+    def __getitem__(self, i):
+        r'''
+        Gets elements by integer index or slice.
+
+        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> tss = [timespans.Timespan(x, y) for x, y in tsList]
+        >>> tree = timespans.trees.TimespanTree()
+        >>> tree.insert(tss)
+
+        >>> tree[0]
+        <Timespan 0 2>
+
+        >>> tree[-1]
+        <Timespan 7 7>
+
+        >>> tree[2:5]
+        [<Timespan 1 1>, <Timespan 2 3>, <Timespan 3 4>]
+
+        >>> tree[-6:-3]
+        [<Timespan 3 4>, <Timespan 4 9>, <Timespan 5 6>]
+
+        >>> tree[-100:-200]
+        []
+
+        >>> for x in tree[:]:
+        ...     x
+        ...
+        <Timespan 0 2>
+        <Timespan 0 9>
+        <Timespan 1 1>
+        <Timespan 2 3>
+        <Timespan 3 4>
+        <Timespan 4 9>
+        <Timespan 5 6>
+        <Timespan 5 8>
+        <Timespan 6 8>
+        <Timespan 7 7>
+        '''
+        def recurseByIndex(node, index):
+            '''
+            TODO: tests...
+            '''
+            if node.nodeStartIndex <= index < node.nodeStopIndex:
+                return node.payload[index - node.nodeStartIndex]
+            elif node.leftChild and index < node.nodeStartIndex:
+                return recurseByIndex(node.leftChild, index)
+            elif node.rightChild and node.nodeStopIndex <= index:
+                return recurseByIndex(node.rightChild, index)
+
+        def recurseBySlice(node, start, stop):
+            '''
+            TODO: tests...
+            '''
+            result = []
+            if node is None:
+                return result
+            if start < node.nodeStartIndex and node.leftChild:
+                result.extend(recurseBySlice(node.leftChild, start, stop))
+            if start < node.nodeStopIndex and node.nodeStartIndex < stop:
+                nodeStart = start - node.nodeStartIndex
+                if nodeStart < 0:
+                    nodeStart = 0
+                nodeStop = stop - node.nodeStartIndex
+                result.extend(node.payload[nodeStart:nodeStop])
+            if node.nodeStopIndex <= stop and node.rightChild:
+                result.extend(recurseBySlice(node.rightChild, start, stop))
+            return result
+        
+        if isinstance(i, int):
+            if self.rootNode is None:
+                raise IndexError
+            if i < 0:
+                i = self.rootNode.subtreeStopIndex + i
+            if i < 0 or self.rootNode.subtreeStopIndex <= i:
+                raise IndexError
+            return recurseByIndex(self.rootNode, i)
+        elif isinstance(i, slice):
+            if self.rootNode is None:
+                return []
+            indices = i.indices(self.rootNode.subtreeStopIndex)
+            start, stop = indices[0], indices[1]
+            return recurseBySlice(self.rootNode, start, stop)
+        else:
+            raise TypeError('Indices must be integers or slices, got {}'.format(i))
+
+    def __hash__(self):
+        return hash((type(self), id(self)))
+
+    def __iter__(self):
+        r'''
+        Iterates through all the elements in the offset tree.
+
+        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> tss = [timespans.Timespan(x, y) for x, y in tsList]
+        >>> tree = timespans.trees.TimespanTree()
+        >>> tree.insert(tss)
+
+        >>> for x in tree:
+        ...     x
+        ...
+        <Timespan 0 2>
+        <Timespan 0 9>
+        <Timespan 1 1>
+        <Timespan 2 3>
+        <Timespan 3 4>
+        <Timespan 4 9>
+        <Timespan 5 6>
+        <Timespan 5 8>
+        <Timespan 6 8>
+        <Timespan 7 7>
+        '''
+        for n in super(ElementTree, self).__iter__():
+            for el in n.payload:
+                yield el
+
+    def __len__(self):
+        r'''Gets the length of the ElementTree collection, i.e., the number of elements.
+
+        >>> tree = timespans.trees.TimespanTree()
+        >>> len(tree)
+        0
+
+        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> tss = [timespans.Timespan(x, y) for x, y in tsList]
+        >>> tree.insert(tss)
+        >>> len(tree)
+        10
+        >>> len(tree) == len(tss)
+        True
+
+        >>> tree.remove(tss)
+        >>> len(tree)
+        0
+        '''
+        if self.rootNode is None:
+            return 0
+        return self.rootNode.subtreeStopIndex
+
+    def __ne__(self, expr):
+        return not self == expr
+
+    def __repr__(self):
+        if self._source is None:
+            return '<{} {{{}}} ({!r} to {!r})>'.format(
+                type(self).__name__,
+                len(self),
+                self.offset,
+                self.endTime,
+                )
+        else:
+            return '<{} {{{}}} ({!r} to {!r}) {!s}>'.format(
+                type(self).__name__,
+                len(self),
+                self.offset,
+                self.endTime,
+                self._sourceRepr,
+                )
+
+    def __setitem__(self, i, new):
+        r'''
+        Sets timespans at index `i` to `new`.
+
+        >>> tss = [
+        ...     timespans.Timespan(0, 2),
+        ...     timespans.Timespan(0, 9),
+        ...     timespans.Timespan(1, 1),
+        ...     ]
+        >>> tree = timespans.trees.TimespanTree()
+        >>> tree.insert(tss)
+        >>> tree[0] = timespans.Timespan(-1, 6)
+        >>> for x in tree:
+        ...     x
+        ...
+        <Timespan -1 6>
+        <Timespan 0 9>
+        <Timespan 1 1>
+
+        Works with slices too.
+
+        >>> tree[1:] = [timespans.Timespan(10, 20)]
+        >>> for x in tree:
+        ...     x
+        ...
+        <Timespan -1 6>
+        <Timespan 10 20>
+        '''
+        if isinstance(i, (int, slice)):
+            old = self[i]
+            self.remove(old)
+            self.insert(new)
+        else:
+            message = 'Indices must be ints or slices, got {}'.format(i)
+            raise TypeError(message)
+
+    def __str__(self):
+        result = []
+        result.append(repr(self))
+        for x in self:
+            subresult = str(x).splitlines()
+            subresult = ['\t' + x for x in subresult]
+            result.extend(subresult)
+        result = '\n'.join(result)
+        return result
+
+    ### PRIVATE METHODS ###
+    def _updateIndices(self, node):
+        r'''
+        Traverses the tree structure and updates cached indices which keep
+        track of the index of the elements stored at each node, and of the
+        maximum and minimum indices of the subtrees rooted at each node.
+
+        Indices keep track of the order of the elements in the Payload, not the
+        order of nodes.
+
+        Used internally by ElementTree.
+
+        Returns None.
+        '''
+        def recurseUpdateIndices(node, parentStopIndex=None):
+            if node is None:
+                return
+            if node.leftChild is not None:
+                recurseUpdateIndices(
+                    node.leftChild,
+                    parentStopIndex=parentStopIndex,
+                    )
+                node.nodeStartIndex = node.leftChild.subtreeStopIndex
+                node.subtreeStartIndex = node.leftChild.subtreeStartIndex
+            elif parentStopIndex is None:
+                node.nodeStartIndex = 0
+                node.subtreeStartIndex = 0
+            else:
+                node.nodeStartIndex = parentStopIndex
+                node.subtreeStartIndex = parentStopIndex
+            node.nodeStopIndex = node.nodeStartIndex + len(node.payload)
+            node.subtreeStopIndex = node.nodeStopIndex
+            if node.rightChild is not None:
+                recurseUpdateIndices(
+                    node.rightChild,
+                    parentStopIndex=node.nodeStopIndex,
+                    )
+                node.subtreeStopIndex = node.rightChild.subtreeStopIndex
+        recurseUpdateIndices(node)
+
+    def _updateEndTimes(self, node):
+        r'''
+        Traverses the tree structure and updates cached maximum and minimum
+        endTime values for the subtrees rooted at each node.
+
+        Used internally by TimespanTree.
+
+        Returns a node.
+        '''
+        if node is None:
+            return
+        endTimeLow = min(x.endTime for x in node.payload)
+        endTimeHigh = max(x.endTime for x in node.payload)
+        if node.leftChild:
+            leftChild = self._updateEndTimes(node.leftChild)
+            if leftChild.endTimeLow < endTimeLow:
+                endTimeLow = leftChild.endTimeLow
+            if endTimeHigh < leftChild.endTimeHigh:
+                endTimeHigh = leftChild.endTimeHigh
+        if node.rightChild:
+            rightChild = self._updateEndTimes(node.rightChild)
+            if rightChild.endTimeLow < endTimeLow:
+                endTimeLow = rightChild.endTimeLow
+            if endTimeHigh < rightChild.endTimeHigh:
+                endTimeHigh = rightChild.endTimeHigh
+        node.endTimeLow = endTimeLow
+        node.endTimeHigh = endTimeHigh
+        return node
+
+    def _updateParents(self, oldOffset, visitedParents=None):
+        if visitedParents is None:
+            visitedParents = set()
+        for parent in self._parents:
+            if parent is None or parent in visitedParents:
+                continue
+            visitedParents.add(parent)
+            parentOffset = parent.offset
+            parent._removeElement(self, oldOffset=oldOffset)
+            parent._insertTimespan(self)
+            parent._updateIndices(parent.rootNode)
+            parent._updateEndTimes(parent.rootNode)
+            parent._updateParents(parentOffset, visitedParents=visitedParents)
+
+    def _removeElement(self, element, oldOffset=None):
+        if oldOffset is not None:
+            offset = oldOffset
+        else:
+            offset = element.offset
+
+        node = self._getNodeByOffset(self.rootNode, offset)
+        if node is None:
+            return
+        if element in node.payload:
+            node.payload.remove(element)
+        if not node.payload:
+            self.rootNode = self._remove(self.rootNode, offset)
+        if isinstance(element, ElementTree): # represents an embedded Stream
+            element._parents.remove(self)
+
+    ### PUBLIC METHODS ###
+
+    def copy(self):
+        r'''
+        Creates a new offset-tree with the same timespans as this offset-tree.
+
+        This is analogous to `dict.copy()`.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> newTree = tree.copy()
+        '''
+        newTree = type(self)()
+        newTree.insert([x for x in self])
+        return newTree
+
+    def findTimespansStartingAt(self, offset):
+        r'''
+        Finds timespans in this offset-tree which start at `offset`.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> for timespan in tree.findTimespansStartingAt(0.5):
+        ...     timespan
+        ...
+        <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
+        <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
+        <ElementTimespan (0.5 to 1.0) <music21.note.Note G#>>
+        '''
+        results = []
+        node = self._getNodeByOffset(self.rootNode, offset)
+        if node is not None:
+            results.extend(node.payload)
+        return tuple(results)
+
+    def findTimespansStoppingAt(self, offset):
+        r'''
+        Finds timespans in this offset-tree which stop at `offset`.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> for timespan in tree.findTimespansStoppingAt(0.5):
+        ...     timespan
+        ...
+        <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
+        <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
+        <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
+        '''
+        def recurse(node, offset):
+            result = []
+            if node is not None: # could happen in an empty TimespanTree
+                if node.endTimeLow <= offset <= node.endTimeHigh:
+                    for timespan in node.payload:
+                        if timespan.endTime == offset:
+                            result.append(timespan)
+                    if node.leftChild is not None:
+                        result.extend(recurse(node.leftChild, offset))
+                    if node.rightChild is not None:
+                        result.extend(recurse(node.rightChild, offset))
+            return result
+        
+        results = recurse(self.rootNode, offset)
+        results.sort(key=lambda x: (x.offset, x.endTime))
+        return tuple(results)
+
+    def findTimespansOverlapping(self, offset):
+        r'''
+        Finds timespans in this offset-tree which overlap `offset`.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> for timespan in tree.findTimespansOverlapping(0.5):
+        ...     timespan
+        ...
+        <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>
+        '''
+        def recurse(node, offset, indent=0):
+            result = []
+            if node is not None:
+                if node.offset < offset < node.endTimeHigh:
+                    result.extend(recurse(node.leftChild, offset, indent + 1))
+                    for timespan in node.payload:
+                        if offset < timespan.endTime:
+                            result.append(timespan)
+                    result.extend(recurse(node.rightChild, offset, indent + 1))
+                elif offset <= node.offset:
+                    result.extend(recurse(node.leftChild, offset, indent + 1))
+            return result
+        results = recurse(self.rootNode, offset)
+        #if len(results) > 0 and hasattr(results[0], 'element'):
+        #    results.sort(key=lambda x: (x.offset, x.endTime, x.element.sortTuple()[1:]))
+        #else:
+        results.sort(key=lambda x: (x.offset, x.endTime))
+        return tuple(results)
+
+    def index(self, element, offset=None):
+        r'''
+        Gets index of `timespan` in tree.
+        
+        Since timespans do not have Sites, there is only one offset to deal with...
+
+        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> ts = [timespans.Timespan(x, y) for x, y in tsList]
+        >>> tree = timespans.trees.TimespanTree()
+        >>> tree.insert(ts)
+
+        >>> for timespan in ts:
+        ...     print("%r %d" % (timespan, tree.index(timespan)))
+        ...
+        <Timespan 0 2> 0
+        <Timespan 0 9> 1
+        <Timespan 1 1> 2
+        <Timespan 2 3> 3
+        <Timespan 3 4> 4
+        <Timespan 4 9> 5
+        <Timespan 5 6> 6
+        <Timespan 5 8> 7
+        <Timespan 6 8> 8
+        <Timespan 7 7> 9
+
+        >>> tree.index(timespans.Timespan(-100, 100))
+        Traceback (most recent call last):
+        ValueError: <Timespan -100 100> not in Tree at offset -100.
+        '''
+        if offset is None:
+            offset = element.offset
+        node = self._getNodeByOffset(self.rootNode, offset)
+        if node is None or element not in node.payload:
+            raise ValueError('{} not in Tree at offset {}.'.format(element, offset))
+        index = node.payload.index(element) + node.nodeStartIndex
+        return index
+
+
+class TimespanTree(ElementTree):
     r'''
     A data structure for efficiently slicing a score.
 
-    This data structure stores timespans: objects which implement both a
-    `offset` and `endTime` property. It provides fast lookups of such
-    objects and can quickly locate vertical overlaps.
-
-    While you can construct an offset-tree by hand, inserting timespans one at
+    While you can construct an TimespanTree by hand, inserting timespans one at
     a time, the common use-case is to construct the offset-tree from an entire
     score at once:
 
@@ -141,559 +953,8 @@ class TimespanTree(object):
     TODO: Doc examples for all functions, including privates.
     '''
 
-    ### CLASS VARIABLES ###
-
-    __slots__ = (
-        '__weakref__',
-        '_parents',
-        '_rootNode',
-        '_source',
-        '_sourceRepr'
-        )
-
-    ### INITIALIZER ###
-
-    def __init__(
-        self,
-        timespans=None,
-        source=None,
-        ):
-        self._parents = weakref.WeakSet()
-        self._rootNode = None
-        if timespans and timespans is not None:
-            self.insert(timespans)
-            
-        self.source = source
-
-    ### SPECIAL METHODS ###
-
-    def __contains__(self, timespan):
-        r'''
-        Is true when timespan collection contains the :class:`~music21.timespans.Timespan` within it.
-
-        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> tss = [timespans.Timespan(x, y) for x, y in tsList]
-        >>> tree = timespans.trees.TimespanTree()
-        >>> tree.insert(tss)
-
-        >>> tss[0] in tree
-        True
-
-        >>> timespans.Timespan(-200, 1000) in tree
-        False
-        
-        The exact Timespan object does not have to be in the tree, just one with the same offset
-        and endTime:
-        
-        >>> tsDuplicate = timespans.Timespan(0, 2)
-        >>> tsDuplicate in tree
-        True
-        '''
-        try:
-            offset = timespan.offset
-        except AttributeError:
-            raise TimespanTreeException('timespan must be a Timespan object, i.e., must have offset')
-        candidates = self.findTimespansStartingAt(offset)
-        if timespan in candidates:
-            return True
-        else:
-            return False
-
-    def __eq__(self, expr):
-        r'''
-        Two Timespan Collections are equal only if their ids are equal
-        
-        (TODO: make it true only if the two have exactly identical timespans unless this interfers
-               with hashing. Use "is" for this)
-        '''
-        return id(self) == id(expr)
-
-    def __getitem__(self, i):
-        r'''
-        Gets timespans by integer index or slice.
-
-        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> tss = [timespans.Timespan(x, y) for x, y in tsList]
-        >>> tree = timespans.trees.TimespanTree()
-        >>> tree.insert(tss)
-
-        >>> tree[0]
-        <Timespan 0 2>
-
-        >>> tree[-1]
-        <Timespan 7 7>
-
-        >>> tree[2:5]
-        [<Timespan 1 1>, <Timespan 2 3>, <Timespan 3 4>]
-
-        >>> tree[-6:-3]
-        [<Timespan 3 4>, <Timespan 4 9>, <Timespan 5 6>]
-
-        >>> tree[-100:-200]
-        []
-
-        >>> for x in tree[:]:
-        ...     x
-        ...
-        <Timespan 0 2>
-        <Timespan 0 9>
-        <Timespan 1 1>
-        <Timespan 2 3>
-        <Timespan 3 4>
-        <Timespan 4 9>
-        <Timespan 5 6>
-        <Timespan 5 8>
-        <Timespan 6 8>
-        <Timespan 7 7>
-        '''
-        def recurseByIndex(node, index):
-            '''
-            TODO: tests...
-            '''
-            if node.nodeStartIndex <= index < node.nodeStopIndex:
-                return node.payload[index - node.nodeStartIndex]
-            elif node.leftChild and index < node.nodeStartIndex:
-                return recurseByIndex(node.leftChild, index)
-            elif node.rightChild and node.nodeStopIndex <= index:
-                return recurseByIndex(node.rightChild, index)
-
-        def recurseBySlice(node, start, stop):
-            '''
-            TODO: tests...
-            '''
-            result = []
-            if node is None:
-                return result
-            if start < node.nodeStartIndex and node.leftChild:
-                result.extend(recurseBySlice(node.leftChild, start, stop))
-            if start < node.nodeStopIndex and node.nodeStartIndex < stop:
-                nodeStart = start - node.nodeStartIndex
-                if nodeStart < 0:
-                    nodeStart = 0
-                nodeStop = stop - node.nodeStartIndex
-                result.extend(node.payload[nodeStart:nodeStop])
-            if node.nodeStopIndex <= stop and node.rightChild:
-                result.extend(recurseBySlice(node.rightChild, start, stop))
-            return result
-        
-        
-        if isinstance(i, int):
-            if self._rootNode is None:
-                raise IndexError
-            if i < 0:
-                i = self._rootNode.subtreeStopIndex + i
-            if i < 0 or self._rootNode.subtreeStopIndex <= i:
-                raise IndexError
-            return recurseByIndex(self._rootNode, i)
-        elif isinstance(i, slice):
-            if self._rootNode is None:
-                return []
-            indices = i.indices(self._rootNode.subtreeStopIndex)
-            start, stop = indices[0], indices[1]
-            return recurseBySlice(self._rootNode, start, stop)
-        else:
-            raise TypeError('Indices must be integers or slices, got {}'.format(i))
-
-    def __hash__(self):
-        return hash((type(self), id(self)))
-
-    def __iter__(self):
-        r'''
-        Iterates through all the elementTimespans in the offset tree.
-
-        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> tss = [timespans.Timespan(x, y) for x, y in tsList]
-        >>> tree = timespans.trees.TimespanTree()
-        >>> tree.insert(tss)
-
-        >>> for x in tree:
-        ...     x
-        ...
-        <Timespan 0 2>
-        <Timespan 0 9>
-        <Timespan 1 1>
-        <Timespan 2 3>
-        <Timespan 3 4>
-        <Timespan 4 9>
-        <Timespan 5 6>
-        <Timespan 5 8>
-        <Timespan 6 8>
-        <Timespan 7 7>
-        '''
-        def recurse(node):
-            if node is not None:
-                if node.leftChild is not None:
-                    for timespan in recurse(node.leftChild):
-                        yield timespan
-                for timespan in node.payload:
-                    yield timespan
-                if node.rightChild is not None:
-                    for timespan in recurse(node.rightChild):
-                        yield timespan
-        return recurse(self._rootNode)
-
-    def __len__(self):
-        r'''Gets the length of the timespan collection, i.e., the number of Timespans.
-
-        >>> tree = timespans.trees.TimespanTree()
-        >>> len(tree)
-        0
-
-        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> tss = [timespans.Timespan(x, y) for x, y in tsList]
-        >>> tree.insert(tss)
-        >>> len(tree)
-        10
-        >>> len(tree) == len(tss)
-        True
-
-        >>> tree.remove(tss)
-        >>> len(tree)
-        0
-
-        '''
-        if self._rootNode is None:
-            return 0
-        return self._rootNode.subtreeStopIndex
-
-    def __ne__(self, expr):
-        return not self == expr
-
-    def __repr__(self):
-        if self._source is None:
-            return '<{} {{{}}} ({!r} to {!r})>'.format(
-                type(self).__name__,
-                len(self),
-                self.offset,
-                self.endTime,
-                )
-        else:
-            return '<{} {{{}}} ({!r} to {!r}) {!s}>'.format(
-                type(self).__name__,
-                len(self),
-                self.offset,
-                self.endTime,
-                self._sourceRepr,
-                )
-
-    def __setitem__(self, i, new):
-        r'''
-        Sets timespans at index `i` to `new`.
-
-        >>> tss = [
-        ...     timespans.Timespan(0, 2),
-        ...     timespans.Timespan(0, 9),
-        ...     timespans.Timespan(1, 1),
-        ...     ]
-        >>> tree = timespans.trees.TimespanTree()
-        >>> tree.insert(tss)
-        >>> tree[0] = timespans.Timespan(-1, 6)
-        >>> for x in tree:
-        ...     x
-        ...
-        <Timespan -1 6>
-        <Timespan 0 9>
-        <Timespan 1 1>
-
-        Works with slices too.
-
-        >>> tree[1:] = [timespans.Timespan(10, 20)]
-        >>> for x in tree:
-        ...     x
-        ...
-        <Timespan -1 6>
-        <Timespan 10 20>
-        '''
-        if isinstance(i, (int, slice)):
-            old = self[i]
-            self.remove(old)
-            self.insert(new)
-        else:
-            message = 'Indices must be ints or slices, got {}'.format(i)
-            raise TypeError(message)
-
-    def __str__(self):
-        result = []
-        result.append(repr(self))
-        for x in self:
-            subresult = str(x).splitlines()
-            subresult = ['\t' + x for x in subresult]
-            result.extend(subresult)
-        result = '\n'.join(result)
-        return result
-
-    ### PRIVATE METHODS ###
-
-    def debug(self):
-        r'''
-        Gets string representation of the timespan collection.
-
-        Useful only for debugging its internal node structure.
-
-        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> tss = [timespans.Timespan(x, y) for x, y in tsList]
-        >>> tree = timespans.trees.TimespanTree()
-        >>> tree.insert(tss)
-
-        >>> print(tree.debug())
-        <Node: Start:3 Indices:(0:4:5:10) Length:{1}>
-            L: <Node: Start:1 Indices:(0:2:3:4) Length:{1}>
-                L: <Node: Start:0 Indices:(0:0:2:2) Length:{2}>
-                R: <Node: Start:2 Indices:(3:3:4:4) Length:{1}>
-            R: <Node: Start:5 Indices:(5:6:8:10) Length:{2}>
-                L: <Node: Start:4 Indices:(5:5:6:6) Length:{1}>
-                R: <Node: Start:6 Indices:(8:8:9:10) Length:{1}>
-                    R: <Node: Start:7 Indices:(9:9:10:10) Length:{1}>
-        '''
-        if self._rootNode is not None:
-            return self._rootNode.debug()
-        return ''
-
-    def _insert(self, node, offset):
-        r'''
-        Inserts a node at `offset` in the subtree rooted on `node`.
-
-        Used internally by TimespanTree.
-
-        Returns a node.
-        '''
-        from music21.timespans import timespanNode
-        if node is None:
-            return timespanNode.TimespanTreeNode(offset)
-        if offset < node.offset:
-            node.leftChild = self._insert(node.leftChild, offset)
-        elif node.offset < offset:
-            node.rightChild = self._insert(node.rightChild, offset)
-        return self._rebalance(node)
-
-    def _rebalance(self, node):
-        r'''
-        Rebalances the subtree rooted at `node`.
-
-        Used internally by TimespanTree.
-
-        Returns a node.
-        '''
-        if node is not None:
-            if 1 < node.balance:
-                if 0 <= node.rightChild.balance:
-                    node = self._rotateRightRight(node)
-                else:
-                    node = self._rotateRightLeft(node)
-            elif node.balance < -1:
-                if node.leftChild.balance <= 0:
-                    node = self._rotateLeftLeft(node)
-                else:
-                    node = self._rotateLeftRight(node)
-            if node.balance < -1 or node.balance > 1:
-                raise TimespanException('Somehow Nodes are still not balanced. node.balance %r must be between -1 and 1')
-        return node
-
-    def _remove(self, node, offset):
-        r'''
-        Removes a node at `offset` in the subtree rooted on `node`.
-
-        Used internally by TimespanTree.
-
-        Returns a node.
-        '''
-        if node is not None:
-            if node.offset == offset:
-                if node.leftChild and node.rightChild:
-                    nextNode = node.rightChild
-                    while nextNode.leftChild:
-                        nextNode = nextNode.leftChild
-                    node.offset = nextNode.offset
-                    node.payload = nextNode.payload
-                    node.rightChild = self._remove(
-                        node.rightChild, nextNode.offset)
-                else:
-                    node = node.leftChild or node.rightChild
-            elif offset < node.offset:
-                node.leftChild = self._remove(node.leftChild, offset)
-            elif node.offset < offset:
-                node.rightChild = self._remove(node.rightChild, offset)
-        return self._rebalance(node)
-
-    def _rotateLeftLeft(self, node):
-        r'''
-        Rotates a node left twice.
-
-        Used internally by TimespanTree during tree rebalancing.
-
-        Returns a node.
-        '''
-        nextNode = node.leftChild
-        node.leftChild = nextNode.rightChild
-        nextNode.rightChild = node
-        return nextNode
-
-    def _rotateLeftRight(self, node):
-        r'''
-        Rotates a node right twice.
-
-        Used internally by TimespanTree during tree rebalancing.
-
-        Returns a node.
-        '''
-        node.leftChild = self._rotateRightRight(node.leftChild)
-        nextNode = self._rotateLeftLeft(node)
-        return nextNode
-
-    def _rotateRightLeft(self, node):
-        r'''
-        Rotates a node right, then left.
-
-        Used internally by TimespanTree during tree rebalancing.
-
-        Returns a node.
-        '''
-        node.rightChild = self._rotateLeftLeft(node.rightChild)
-        nextNode = self._rotateRightRight(node)
-        return nextNode
-
-    def _rotateRightRight(self, node):
-        r'''
-        Rotates a node left, then right.
-
-        Used internally by TimespanTree during tree rebalancing.
-
-        Returns a node.
-        '''
-        nextNode = node.rightChild
-        node.rightChild = nextNode.leftChild
-        nextNode.leftChild = node
-        return nextNode
-
-    def _search(self, node, offset):
-        r'''
-        Searches for a node whose offset is `offset` in the subtree
-        rooted on `node`.
-
-        Used internally by TimespanTree.
-
-        Returns a node.
-        '''
-        if node is not None:
-            if node.offset == offset:
-                return node
-            elif node.leftChild and offset < node.offset:
-                return self._search(node.leftChild, offset)
-            elif node.rightChild and node.offset < offset:
-                return self._search(node.rightChild, offset)
-        return None
-
-    def _updateIndices(
-        self,
-        node,
-        ):
-        r'''
-        Traverses the tree structure and updates cached indices which keep
-        track of the index of the timespans stored at each node, and of the
-        maximum and minimum indices of the subtrees rooted at each node.
-
-        Used internally by TimespanTree.
-
-        Returns none.
-        '''
-        def recurseUpdateIndices(
-            node,
-            parentStopIndex=None,
-            ):
-            if node is None:
-                return
-            if node.leftChild is not None:
-                recurseUpdateIndices(
-                    node.leftChild,
-                    parentStopIndex=parentStopIndex,
-                    )
-                node.nodeStartIndex = node.leftChild.subtreeStopIndex
-                node.subtreeStartIndex = node.leftChild.subtreeStartIndex
-            elif parentStopIndex is None:
-                node.nodeStartIndex = 0
-                node.subtreeStartIndex = 0
-            else:
-                node.nodeStartIndex = parentStopIndex
-                node.subtreeStartIndex = parentStopIndex
-            node.nodeStopIndex = node.nodeStartIndex + len(node.payload)
-            node.subtreeStopIndex = node.nodeStopIndex
-            if node.rightChild is not None:
-                recurseUpdateIndices(
-                    node.rightChild,
-                    parentStopIndex=node.nodeStopIndex,
-                    )
-                node.subtreeStopIndex = node.rightChild.subtreeStopIndex
-        recurseUpdateIndices(node)
-
-    def _updateOffsets(
-        self,
-        node,
-        ):
-        r'''
-        Traverses the tree structure and updates cached maximum and minimum
-        stop offset values for the subtrees rooted at each node.
-
-        Used internaly by TimespanTree.
-
-        Returns a node.
-        '''
-        if node is None:
-            return
-        endTimeLow = min(x.endTime for x in node.payload)
-        endTimeHigh = max(x.endTime for x in node.payload)
-        if node.leftChild:
-            leftChild = self._updateOffsets(
-                node.leftChild,
-                )
-            if leftChild.endTimeLow < endTimeLow:
-                endTimeLow = leftChild.endTimeLow
-            if endTimeHigh < leftChild.endTimeHigh:
-                endTimeHigh = leftChild.endTimeHigh
-        if node.rightChild:
-            rightChild = self._updateOffsets(
-                node.rightChild,
-                )
-            if rightChild.endTimeLow < endTimeLow:
-                endTimeLow = rightChild.endTimeLow
-            if endTimeHigh < rightChild.endTimeHigh:
-                endTimeHigh = rightChild.endTimeHigh
-        node.endTimeLow = endTimeLow
-        node.endTimeHigh = endTimeHigh
-        return node
-
-    def _updateParents(self, oldOffset, visitedParents=None):
-        if visitedParents is None:
-            visitedParents = set()
-        for parent in self._parents:
-            if parent is None or parent in visitedParents:
-                continue
-            visitedParents.add(parent)
-            parentOffset = parent.offset
-            parent._removeTimespan(self, oldOffset=oldOffset)
-            parent._insertTimespan(self)
-            parent._updateIndices(parent._rootNode)
-            parent._updateOffsets(parent._rootNode)
-            parent._updateParents(
-                parentOffset,
-                visitedParents=visitedParents,
-                )
-
     ### PUBLIC METHODS ###
-
-    def copy(self):
-        r'''
-        Creates a new offset-tree with the same timespans as this offset-tree.
-
-        This is analogous to `dict.copy()`.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> newTree = tree.copy()
-        '''
-        newTree = type(self)()
-        newTree.insert([x for x in self])
-        return newTree
-
+    
     def findNextElementTimespanInSameStreamByClass(self, elementTimespan, classList=None):
         r'''
         Finds next element timespan in the same stream class as `elementTimespan`.
@@ -777,146 +1038,6 @@ class TimespanTree(object):
                 if previousElementTimespan.getParentageByClass(classList) is elementTimespan.getParentageByClass(classList):
                     return previousElementTimespan
 
-    def findTimespansStartingAt(self, offset):
-        r'''
-        Finds timespans in this offset-tree which start at `offset`.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> for timespan in tree.findTimespansStartingAt(0.5):
-        ...     timespan
-        ...
-        <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
-        <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
-        <ElementTimespan (0.5 to 1.0) <music21.note.Note G#>>
-        '''
-        results = []
-        node = self._search(self._rootNode, offset)
-        if node is not None:
-            results.extend(node.payload)
-        return tuple(results)
-
-    def findTimespansStoppingAt(self, offset):
-        r'''
-        Finds timespans in this offset-tree which stop at `offset`.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> for timespan in tree.findTimespansStoppingAt(0.5):
-        ...     timespan
-        ...
-        <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
-        <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
-        <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
-        '''
-        def recurse(node, offset):
-            result = []
-            if node is not None: # could happen in an empty TimespanTree
-                if node.endTimeLow <= offset <= node.endTimeHigh:
-                    for timespan in node.payload:
-                        if timespan.endTime == offset:
-                            result.append(timespan)
-                    if node.leftChild is not None:
-                        result.extend(recurse(node.leftChild, offset))
-                    if node.rightChild is not None:
-                        result.extend(recurse(node.rightChild, offset))
-            return result
-        
-        results = recurse(self._rootNode, offset)
-        results.sort(key=lambda x: (x.offset, x.endTime))
-        return tuple(results)
-
-    def findTimespansOverlapping(self, offset):
-        r'''
-        Finds timespans in this offset-tree which overlap `offset`.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> for timespan in tree.findTimespansOverlapping(0.5):
-        ...     timespan
-        ...
-        <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>
-        '''
-        def recurse(node, offset, indent=0):
-            result = []
-            if node is not None:
-                if node.offset < offset < node.endTimeHigh:
-                    result.extend(recurse(node.leftChild, offset, indent + 1))
-                    for timespan in node.payload:
-                        if offset < timespan.endTime:
-                            result.append(timespan)
-                    result.extend(recurse(node.rightChild, offset, indent + 1))
-                elif offset <= node.offset:
-                    result.extend(recurse(node.leftChild, offset, indent + 1))
-            return result
-        results = recurse(self._rootNode, offset)
-        #if len(results) > 0 and hasattr(results[0], 'element'):
-        #    results.sort(key=lambda x: (x.offset, x.endTime, x.element.sortTuple()[1:]))
-        #else:
-        results.sort(key=lambda x: (x.offset, x.endTime))
-        return tuple(results)
-
-    def getOffsetAfter(self, offset):
-        r'''
-        Gets start offset after `offset`.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> tree.getOffsetAfter(0.5)
-        1.0
-
-        Returns None if no succeeding offset exists.
-
-        >>> tree.getOffsetAfter(35) is None
-        True
-
-        Generally speaking, negative offsets will usually return 0.0
-
-        >>> tree.getOffsetAfter(-999)
-        0.0
-        '''
-        def recurse(node, offset):
-            if node is None:
-                return None
-            result = None
-            if node.offset <= offset and node.rightChild:
-                result = recurse(node.rightChild, offset)
-            elif offset < node.offset:
-                result = recurse(node.leftChild, offset) or node
-            return result
-        result = recurse(self._rootNode, offset)
-        if result is None:
-            return None
-        return result.offset
-
-    def getOffsetBefore(self, offset):
-        r'''
-        Gets the start offset immediately preceding `offset` in this
-        offset-tree.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> tree.getOffsetBefore(100)
-        35.0
-
-        Return None if no preceding offset exists.
-
-        >>> tree.getOffsetBefore(0) is None
-        True
-        '''
-        def recurse(node, offset):
-            if node is None:
-                return None
-            result = None
-            if node.offset < offset:
-                result = recurse(node.rightChild, offset) or node
-            elif offset <= node.offset and node.leftChild:
-                result = recurse(node.leftChild, offset)
-            return result
-        result = recurse(self._rootNode, offset)
-        if result is None:
-            return None
-        return result.offset
 
     def getVerticalityAt(self, offset):
         r'''
@@ -943,7 +1064,7 @@ class TimespanTree(object):
 
         Returns a verticality.Verticality object.
         '''
-        from music21.timespans.verticality import Verticality 
+        from music21.timespans.verticality import Verticality
         startTimespans = self.findTimespansStartingAt(offset)
         stopTimespans = self.findTimespansStoppingAt(offset)
         overlapTimespans = self.findTimespansOverlapping(offset)
@@ -976,60 +1097,18 @@ class TimespanTree(object):
             verticality = verticality.previousVerticality
         return verticality
 
-    def index(self, timespan):
-        r'''
-        Gets index of `timespan` in tree.
-
-        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> ts = [timespans.Timespan(x, y) for x, y in tsList]
-        >>> tree = timespans.trees.TimespanTree()
-        >>> tree.insert(ts)
-
-        >>> for timespan in ts:
-        ...     print("%r %d" % (timespan, tree.index(timespan)))
-        ...
-        <Timespan 0 2> 0
-        <Timespan 0 9> 1
-        <Timespan 1 1> 2
-        <Timespan 2 3> 3
-        <Timespan 3 4> 4
-        <Timespan 4 9> 5
-        <Timespan 5 6> 6
-        <Timespan 5 8> 7
-        <Timespan 6 8> 8
-        <Timespan 7 7> 9
-
-        >>> tree.index(timespans.Timespan(-100, 100))
-        Traceback (most recent call last):
-        ValueError: <Timespan -100 100> not in timespan collection.
-        '''
-        if not hasattr(timespan, 'offset') or \
-            not hasattr(timespan, 'endTime'):
-            message = 'Must have offset and endTime.'
-            raise TimespanTreeException(message)
-        node = self._search(self._rootNode, timespan.offset)
-        if node is None or timespan not in node.payload:
-            raise ValueError('{} not in timespan collection.'.format(timespan))
-        index = node.payload.index(timespan) + node.nodeStartIndex
-        return index
-
     def insert(self, spans):
         r'''
         Inserts `timespans` into this offset-tree.
-
         '''
         initialOffset = self.offset
         initialEndTime = self.endTime
-        if hasattr(spans, 'offset') and \
-            hasattr(spans, 'endTime'):
+        if hasattr(spans, 'offset'): # not a list.
             spans = [spans]
         for timespan in spans:
-            if not hasattr(timespan, 'offset') or \
-                not hasattr(timespan, 'endTime'):
-                continue
             self._insertTimespan(timespan)
-        self._updateIndices(self._rootNode)
-        self._updateOffsets(self._rootNode)
+        self._updateIndices(self.rootNode)
+        self._updateEndTimes(self.rootNode)
         if (self.offset != initialOffset) or \
             (self.endTime != initialEndTime):
             self._updateParents(initialOffset)
@@ -1041,8 +1120,8 @@ class TimespanTree(object):
             elif isinstance(x, TimespanTree) and x.source is not None:
                 return x.source.sortTuple()
             return x.endTime
-        self._rootNode = self._insert(self._rootNode, timespan.offset)
-        node = self._search(self._rootNode, timespan.offset)
+        self.rootNode = self._insertNode(self.rootNode, timespan.offset)
+        node = self._getNodeByOffset(self.rootNode, timespan.offset)
         node.payload.append(timespan)
         node.payload.sort(key=key)
         if isinstance(timespan, TimespanTree):
@@ -1296,26 +1375,12 @@ class TimespanTree(object):
         for timespan in timespans:
             if not hasattr(timespan, 'offset') or not hasattr(timespan, 'endTime'):
                 raise TimespanException('A timespan must have a offset and a endTime attribute, this one %r does not' % (timespan,))
-            self._removeTimespan(timespan)
-        self._updateIndices(self._rootNode)
-        self._updateOffsets(self._rootNode)
+            self._removeElement(timespan)
+        self._updateIndices(self.rootNode)
+        self._updateEndTimes(self.rootNode)
         if (self.offset != initialOffset) or \
             (self.endTime != initialEndTime):
             self._updateParents(initialOffset)
-
-    def _removeTimespan(self, timespan, oldOffset=None):
-        offset = timespan.offset
-        if oldOffset is not None:
-            offset = oldOffset
-        node = self._search(self._rootNode, offset)
-        if node is None:
-            return
-        if timespan in node.payload:
-            node.payload.remove(timespan)
-        if not node.payload:
-            self._rootNode = self._remove(self._rootNode, offset)
-        if isinstance(timespan, TimespanTree):
-            timespan._parents.remove(self)
 
     def splitAt(self, offsets):
         r'''
@@ -1443,7 +1508,7 @@ class TimespanTree(object):
                 if node.rightChild is not None:
                     result.update(recurse(node.rightChild))
             return result
-        return tuple(sorted(recurse(self._rootNode)))
+        return tuple(sorted(recurse(self.rootNode)))
 
     @property
     def allParts(self):
@@ -1483,7 +1548,7 @@ class TimespanTree(object):
                 if node.rightChild is not None:
                     result.extend(recurse(node.rightChild))
             return result
-        return tuple(recurse(self._rootNode))
+        return tuple(recurse(self.rootNode))
 
     @property
     def allEndTimes(self):
@@ -1516,7 +1581,7 @@ class TimespanTree(object):
                 if node.rightChild is not None:
                     result.update(recurse(node.rightChild))
             return result
-        return tuple(sorted(recurse(self._rootNode)))
+        return tuple(sorted(recurse(self.rootNode)))
 
     @property
     def earliestOffset(self):
@@ -1532,8 +1597,8 @@ class TimespanTree(object):
             if node.leftChild is not None:
                 return recurse(node.leftChild)
             return node.offset
-        if self._rootNode is not None:
-            return recurse(self._rootNode)
+        if self.rootNode is not None:
+            return recurse(self.rootNode)
         return float('-inf')
 
     @property
@@ -1546,8 +1611,8 @@ class TimespanTree(object):
         >>> tree.earliestEndTime
         0.5
         '''
-        if self._rootNode is not None:
-            return self._rootNode.endTimeLow
+        if self.rootNode is not None:
+            return self.rootNode.endTimeLow
         return float('inf')
 
     @property
@@ -1564,8 +1629,8 @@ class TimespanTree(object):
             if node.rightChild is not None:
                 return recurse(node._rightChild)
             return node.offset
-        if self._rootNode is not None:
-            return recurse(self._rootNode)
+        if self.rootNode is not None:
+            return recurse(self.rootNode)
         return float('-inf')
 
     @property
@@ -1578,8 +1643,8 @@ class TimespanTree(object):
         >>> tree.latestEndTime
         36.0
         '''
-        if self._rootNode is not None:
-            return self._rootNode.endTimeHigh
+        if self.rootNode is not None:
+            return self.rootNode.endTimeHigh
         return float('inf')
 
     @property
@@ -1708,9 +1773,9 @@ class Test(unittest.TestCase):
                 self.assertEqual(currentTimespansInTree, 
                                  currentTimespansInList, 
                                  (attempt, currentTimespansInTree, currentTimespansInList))
-                self.assertEqual(tree._rootNode.endTimeLow, 
+                self.assertEqual(tree.rootNode.endTimeLow, 
                                  min(x.endTime for x in currentTimespansInList))
-                self.assertEqual(tree._rootNode.endTimeHigh,
+                self.assertEqual(tree.rootNode.endTimeHigh,
                                  max(x.endTime for x in currentTimespansInList))
                 self.assertEqual(tree.offset, currentOffset)
                 self.assertEqual(tree.endTime, currentEndTime)
@@ -1727,14 +1792,14 @@ class Test(unittest.TestCase):
                 self.assertEqual(currentTimespansInTree, 
                                  currentTimespansInList, 
                                  (attempt, currentTimespansInTree, currentTimespansInList))
-                if tree._rootNode is not None:
+                if tree.rootNode is not None:
                     currentOffset = min(
                         x.offset for x in currentTimespansInList)
                     currentEndTime = max(
                         x.endTime for x in currentTimespansInList)
-                    self.assertEqual(tree._rootNode.endTimeLow, 
+                    self.assertEqual(tree.rootNode.endTimeLow, 
                                      min(x.endTime for x in currentTimespansInList))
-                    self.assertEqual(tree._rootNode.endTimeHigh,
+                    self.assertEqual(tree.rootNode.endTimeHigh,
                                      max(x.endTime for x in currentTimespansInList))
                     self.assertEqual(tree.offset, currentOffset)
                     self.assertEqual(tree.endTime, currentEndTime)

@@ -488,8 +488,8 @@ class Stream(base.Music21Object):
         '''
         This method is called any time the elements in the Stream are changed.
 
-        The various arguments permit optimizing the clearing of cached data in situations when completely dropping all cached data is excessive.
-
+        The various arguments permit optimizing the clearing of cached data in situations 
+        when completely dropping all cached data is excessive.
 
         >>> a = stream.Stream()
         >>> a.isFlat

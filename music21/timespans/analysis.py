@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
-# Name:         timespanAnalysis.py
+# Name:         timespans/analysis.py
 # Purpose:      Tools for grouping notes and chords into a searchable tree
 #               organized by start and stop offsets
 #
@@ -22,7 +22,7 @@ from music21 import environment
 from music21 import exceptions21
 #from music21 import key
 
-environLocal = environment.Environment("timespans.timespanAnalysis")
+environLocal = environment.Environment("timespans.analysis")
 
 
 class HorizontalityException(exceptions21.TimespanException):

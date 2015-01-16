@@ -16,6 +16,8 @@ Object for dealing with vertical simultaneities in a fast way w/o Chord's overhe
 import collections
 import unittest
 
+from music21 import note
+from music21 import tie
 from music21 import chord
 from music21 import environment
 from music21 import exceptions21
@@ -484,6 +486,59 @@ class Verticality(object):
             return None
         return tree.getVerticalityAt(offset)
 
+
+
+    ######### makeElement
+    
+    def makeElement(self, quarterLength=1.0):
+        r'''
+        Makes a Chord or Rest from this verticality and quarterLength.
+        
+        >>> score = timespans.makeExampleScore()
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> verticality = tree.getVerticalityAt(4.0)
+        >>> verticality
+        <Verticality 4.0 {E3 G3}>
+        >>> el = verticality.makeElement(2.0)
+        >>> el
+        <music21.chord.Chord E3 G3>
+        >>> el.duration.quarterLength
+        2.0
+        >>> el.duration.type
+        'half'
+        
+        If there is nothing there, then a Rest is created
+        
+        >>> verticality = tree.getVerticalityAt(400.0)
+        >>> verticality
+        <Verticality 400.0 {}>
+        >>> el = verticality.makeElement(1./3)
+        >>> el
+        <music21.note.Rest rest>
+        >>> el.duration.fullName
+        'Eighth Triplet (1/3 QL)'
+        
+        
+        TODO: Consider if this is better to return a Note if only one pitch?
+        '''
+        if self.pitchSet:
+            element = chord.Chord(sorted(self.pitchSet))
+            startElements = [x.element for x in self.startTimespans]
+            try:
+                ties = [x.tie for x in startElements if x.tie is not None]
+                if any(x.type == 'start' for x in ties):
+                    element.tie = tie.Tie('start')
+                elif any(x.type == 'continue' for x in ties):
+                    element.tie = tie.Tie('continue')
+            except AttributeError:
+                pass
+        else:
+            element = note.Rest()
+        element.duration.quarterLength = quarterLength
+        return element
+
+    #########  Analysis type things...
+
     def getAllVoiceLeadingQuartets(self, includeRests = True, includeOblique = True, 
                                    includeNoMotion=False, returnObjects=True, partPairNumbers=None):
         '''
@@ -689,7 +744,7 @@ class VerticalitySequence(collections.Sequence):
     ### PUBLIC METHODS ###
 
     def unwrap(self):
-        from music21.timespans.timespanAnalysis import Horizontality
+        from music21.timespans.analysis import Horizontality
         
         unwrapped = {}
         for timespan in self[0].overlapTimespans:

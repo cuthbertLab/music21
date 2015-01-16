@@ -14,7 +14,7 @@
 '''
 Tools for grouping notes and chords into a searchable tree
 organized by start and stop offsets.
-'''
+''' 
 import unittest
 
 from music21 import exceptions21

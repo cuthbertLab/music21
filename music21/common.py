@@ -2292,7 +2292,8 @@ class SingletonCounter(object):
 #-------------------------------------------------------------------------------
 class SlottedObject(object):
     r'''
-    Provides template for classes implementing slots.
+    Provides template for classes implementing slots allowing it to be pickled
+    properly.
     '''
     
     ### CLASS VARIABLES ###

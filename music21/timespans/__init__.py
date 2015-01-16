@@ -18,13 +18,8 @@ organized by start and stop offsets.
 This is a lower-level tool that for now at least normal music21
 users won't need to worry about.
 '''
-__all__ = ['collections', 'spans', 'timespanAnalysis', 'timespanNode', 'verticality']
+__all__ = ['collections', 'spans', 'analysis', 'node', 'verticality']
 
-from music21.timespans import trees
-from music21.timespans import spans
-from music21.timespans import timespanAnalysis
-from music21.timespans import timespanNode
-from music21.timespans import verticality
 
 import random
 import unittest
@@ -33,9 +28,22 @@ import weakref
 from music21 import chord
 from music21 import common
 from music21 import exceptions21
-from music21 import instrument
 from music21 import note
-from music21 import tie
+
+from music21.ext import six
+
+if six.PY2:
+    import trees
+    import spans
+    import analysis
+    import node
+    import verticality
+else:
+    from . import trees # @Reimport
+    from . import spans # @Reimport
+    from . import analysis # @Reimport
+    from . import node # @Reimport
+    from . import verticality # @Reimport
 
 from music21.exceptions21 import TimespanException
 from music21 import environment
@@ -106,48 +114,6 @@ def makeExampleScore():
     score.insert(0, partA)
     score.insert(0, partB)
     return score
-
-
-def makeElement(verticality, quarterLength):
-    r'''
-    Makes an element from a verticality and quarterLength.
-    
-    >>> score = timespans.makeExampleScore()
-    >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
-    >>> verticality = tree.getVerticalityAt(4.0)
-    >>> verticality
-    <Verticality 4.0 {E3 G3}>
-    >>> el = timespans.makeElement(verticality, 2.0)
-    >>> el
-    <music21.chord.Chord E3 G3>
-    >>> el.duration.quarterLength
-    2.0
-    
-    If there is nothing there, then a Rest is created
-    
-    >>> verticality = tree.getVerticalityAt(400.0)
-    >>> verticality
-    <Verticality 400.0 {}>
-    >>> el = timespans.makeElement(verticality, 2.0)
-    >>> el
-    <music21.note.Rest rest>
-    '''
-    if verticality.pitchSet:
-        element = chord.Chord(sorted(verticality.pitchSet))
-        startElements = [x.element for x in
-            verticality.startTimespans]
-        try:
-            ties = [x.tie for x in startElements if x.tie is not None]
-            if any(x.type == 'start' for x in ties):
-                element.tie = tie.Tie('start')
-            elif any(x.type == 'continue' for x in ties):
-                element.tie = tie.Tie('continue')
-        except AttributeError:
-            pass
-    else:
-        element = note.Rest()
-    element.duration.quarterLength = quarterLength
-    return element
 
 
 def listOfTimespanTreesByClass(
@@ -388,7 +354,7 @@ def timespansToChordifiedStream(timespans, templateStream=None):
             quarterLength = endTime - offset
             if (quarterLength < 0):
                 raise TimespanException("Something is wrong with the verticality %r, its endTime %f is less than its offset %f" % (verticality, endTime, offset))
-            element = makeElement(verticality, quarterLength)
+            element = verticality.makeElement(quarterLength)
             outputStream[measureIndex].append(element)
         return outputStream
     else:
@@ -399,7 +365,7 @@ def timespansToChordifiedStream(timespans, templateStream=None):
             quarterLength = endTime - offset
             if (quarterLength < 0):
                 raise TimespanException("Something is wrong with the verticality %r, its endTime %f is less than its offset %f" % (verticality, endTime, offset))
-            element = makeElement(verticality, quarterLength)
+            element = verticality.makeElement(quarterLength)
             elements.append(element)
         outputStream = stream.Score()
         for element in elements:
