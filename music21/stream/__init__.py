@@ -322,11 +322,14 @@ class Stream(base.Music21Object):
         #self.analysisData = defaultdict(list)
         #self.analysisData['ResultDict'] = defaultdict(dict)
 
+        ### v2.1!
+        self._elementTree = timespans.trees.ElementTree(source=self)
+
         if givenElements is not None:
             # TODO: perhaps convert a single element into a list?
             try:
                 for e in givenElements:
-                    self.insert(e)
+                    self.insert(e) # TODO: this is probably slow...
             except AttributeError:
                 raise StreamException("Unable to insert %s")
 
@@ -1408,6 +1411,7 @@ class Stream(base.Music21Object):
             element.activeSite = self
         # will be sorted later if necessary
         self._elements.append(element)
+        self._elementTree.insert(float(offset), element)
         return storeSorted
 
 
@@ -1535,6 +1539,9 @@ class Stream(base.Music21Object):
         # need to explicitly set the activeSite of the element
         element.activeSite = self
         self._elements.append(element)
+        
+        # Make this faster
+        self._elementTree.insert(self.highestTime, element)
         # does not change sorted state
         if element.duration is not None:
             self._setHighestTime(self.highestTime +

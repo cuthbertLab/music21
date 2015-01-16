@@ -370,7 +370,6 @@ class ElementTree(AVLTree):
 
     __slots__ = (
         '_source',
-        '_sourceRepr',
         '_parents',
         )
 
@@ -583,7 +582,7 @@ class ElementTree(AVLTree):
                 len(self),
                 self.offset,
                 self.endTime,
-                self._sourceRepr,
+                repr(self.source),
                 )
 
     def __setitem__(self, i, new):
@@ -958,7 +957,6 @@ class ElementTree(AVLTree):
     @source.setter
     def source(self, expr):
         # uses weakrefs so that garbage collection on the stream cache is possible...
-        self._sourceRepr = repr(expr)
         self._source = common.wrapWeakref(expr)
 
 
@@ -1025,6 +1023,75 @@ class ElementTree(AVLTree):
         if self.rootNode is not None:
             return self.rootNode.endTimeHigh
         return float('inf')
+
+    @property
+    def allTimePoints(self):
+        r'''
+        Gets all unique offsets (both starting and stopping) of all elements/timespans
+        in this offset-tree.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> for offset in tree.allTimePoints[:10]:
+        ...     offset
+        ...
+        0.0
+        0.5
+        1.0
+        2.0
+        3.0
+        4.0
+        5.0
+        5.5
+        6.0
+        6.5
+        '''
+        def recurse(node):
+            result = set()
+            if node is not None:
+                if node.leftChild is not None:
+                    result.update(recurse(node.leftChild))
+                result.add(node.offset)
+                result.add(node.endTimeLow)
+                result.add(node.endTimeHigh)
+                if node.rightChild is not None:
+                    result.update(recurse(node.rightChild))
+            return result
+        return tuple(sorted(recurse(self.rootNode)))
+
+    @property
+    def allEndTimes(self):
+        r'''
+        Gets all unique stop offsets of all timespans in this offset-tree.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> for offset in tree.allEndTimes[:10]:
+        ...     offset
+        ...
+        0.5
+        1.0
+        2.0
+        4.0
+        5.5
+        6.0
+        7.0
+        8.0
+        9.5
+        10.5
+        '''
+        def recurse(node):
+            result = set()
+            if node is not None:
+                if node.leftChild is not None:
+                    result.update(recurse(node.leftChild))
+                result.add(node.endTimeLow)
+                result.add(node.endTimeHigh)
+                if node.rightChild is not None:
+                    result.update(recurse(node.rightChild))
+            return result
+        return tuple(sorted(recurse(self.rootNode)))
+
 
 class TimespanTree(ElementTree):
     r'''
@@ -1605,40 +1672,6 @@ class TimespanTree(ElementTree):
 
     ### PUBLIC PROPERTIES ###
 
-    @property
-    def allTimePoints(self):
-        r'''
-        Gets all unique offsets (both starting and stopping) of all timespans
-        in this offset-tree.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> for offset in tree.allTimePoints[:10]:
-        ...     offset
-        ...
-        0.0
-        0.5
-        1.0
-        2.0
-        3.0
-        4.0
-        5.0
-        5.5
-        6.0
-        6.5
-        '''
-        def recurse(node):
-            result = set()
-            if node is not None:
-                if node.leftChild is not None:
-                    result.update(recurse(node.leftChild))
-                result.add(node.offset)
-                result.add(node.endTimeLow)
-                result.add(node.endTimeHigh)
-                if node.rightChild is not None:
-                    result.update(recurse(node.rightChild))
-            return result
-        return tuple(sorted(recurse(self.rootNode)))
 
     @property
     def allParts(self):
@@ -1680,38 +1713,6 @@ class TimespanTree(ElementTree):
             return result
         return tuple(recurse(self.rootNode))
 
-    @property
-    def allEndTimes(self):
-        r'''
-        Gets all unique stop offsets of all timespans in this offset-tree.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> for offset in tree.allEndTimes[:10]:
-        ...     offset
-        ...
-        0.5
-        1.0
-        2.0
-        4.0
-        5.5
-        6.0
-        7.0
-        8.0
-        9.5
-        10.5
-        '''
-        def recurse(node):
-            result = set()
-            if node is not None:
-                if node.leftChild is not None:
-                    result.update(recurse(node.leftChild))
-                result.add(node.endTimeLow)
-                result.add(node.endTimeHigh)
-                if node.rightChild is not None:
-                    result.update(recurse(node.rightChild))
-            return result
-        return tuple(sorted(recurse(self.rootNode)))
 
     @property
     def maximumOverlap(self):
@@ -1774,7 +1775,6 @@ class TimespanTree(ElementTree):
     @element.setter
     def element(self, expr):
         # uses weakrefs so that garbage collection on the stream cache is possible...
-        self._sourceRepr = repr(expr)
         self._source = common.wrapWeakref(expr)
 
 

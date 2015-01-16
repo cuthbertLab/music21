@@ -81,6 +81,7 @@ from music21 import base
 from music21 import common
 from music21 import derivation
 from music21 import exceptions21
+from music21.timespans.trees import ElementTree
 
 from music21.ext import jsonpickle
 from music21.ext import six
@@ -473,6 +474,7 @@ class StreamFreezer(StreamFreezeThawBase):
             e.removeLocationBySite(streamObj)
 
         streamObj._storedElementOffsetTuples = storedElementOffsetTuples
+        streamObj._elementTree = None
         streamObj._elements = []
         streamObj._endElements = []
         streamObj._elementsChanged()
@@ -799,7 +801,6 @@ class StreamThawer(StreamFreezeThawBase):
         streamObj.sites.add(None, 0.0)
 
         self.restoreStreamStatusClient(streamObj) # removing seems to create problems for jsonPickle with Spanners
-        
         allEls = self.findAllM21Objects(streamObj)
 
         for e in allEls:
@@ -873,6 +874,7 @@ class StreamThawer(StreamFreezeThawBase):
         {5.0} <music21.bar.Barline style=regular>
         '''
         if hasattr(streamObj, '_storedElementOffsetTuples'):
+            streamObj._elementTree = ElementTree(source=streamObj)
             for e, offset in streamObj._storedElementOffsetTuples:
                 if offset != 'end':
                     streamObj._insertCore(offset, e)
