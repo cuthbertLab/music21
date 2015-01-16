@@ -71,7 +71,7 @@ class ReductiveNote(object):
         'voice':None,
     }
 
-    def __init__(self, specification, note, measureIndex, measureOffset):
+    def __init__(self, specification, inputNote, measureIndex, measureOffset):
         '''
         A specification must be created when access the Measure that the source note 
         is found in. Storing the measure and index position provides significant 
@@ -88,7 +88,7 @@ class ReductiveNote(object):
         # do parsing if possible
         self._isParsed = False 
         self._parseSpecification(self._specification)
-        self._note = note # keep a reference
+        self._note = inputNote # keep a reference
         self.measureIndex = measureIndex
         self.measureOffset = measureOffset
 

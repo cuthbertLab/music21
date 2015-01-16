@@ -952,7 +952,7 @@ class ABCDimStart(ABCToken):
     They function identically to ABCCrescStart tokens.
     '''
     
-    def __init(self, src):
+    def __init__(self, src):    # previous typo?: used to be __init
         ABCToken.__init__(self, src)
         self.dimObj = None
 
@@ -2683,7 +2683,8 @@ class ABCFile(object):
     ABC File or String access
     '''
     def __init__(self): 
-        pass
+        self.file = None
+        self.filename = None
 
     def open(self, filename): 
         '''

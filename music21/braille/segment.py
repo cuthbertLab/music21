@@ -153,6 +153,7 @@ class BrailleElementGrouping(list):
         <music21.note.Note F>
         """
         super(list, self).__init__()
+        self.__dict__ = {}
         self.keySignature = GROUPING_KEYSIG
         self.timeSignature = GROUPING_TIMESIG
         self.descendingChords = GROUPING_DESC_CHORDS
@@ -226,17 +227,17 @@ class BrailleSegment(collections.defaultdict):
         allKeys = []
         allGroupings = []
         prevKey = None
-        for (key, grouping) in allItems:
+        for (itemKey, grouping) in allItems:
             try:
                 if prevKey % 10 == AFFINITY_SPLIT1_NOTEGROUP:
-                    prevKey = key
+                    prevKey = itemKey
                     continue
             except TypeError:
                 pass
-            allKeys.append("Measure {0}, {1} {2}:\n".format(int(key//100),
-                affinityNames[key%10], int(key%100)//10 + 1))
+            allKeys.append("Measure {0}, {1} {2}:\n".format(int(itemKey//100),
+                affinityNames[itemKey%10], int(itemKey%100)//10 + 1))
             allGroupings.append(str(grouping))
-            prevKey = key
+            prevKey = itemKey
         allElementGroupings = u"\n".join([u"".join([k, g, "\n==="])
                                           for (k,g) in list(zip(allKeys, allGroupings))])
         return u"\n".join(["---begin segment---", name, allElementGroupings, "---end segment---"])
@@ -292,7 +293,7 @@ class BrailleSegment(collections.defaultdict):
 
     def consolidate(self):
         """
-        
+        TODO: define this method
         """
         newSegment = BrailleSegment()
         pngKey = None
@@ -534,7 +535,7 @@ class BrailleGrandSegment():
     
     def transcribe(self):
         """
-
+        TODO: define this method
         """
         bk = text.BrailleKeyboard(self.maxLineLength)
         self.allKeyPairs = self.combineGroupingKeys(self.rightSegment, self.leftSegment)   

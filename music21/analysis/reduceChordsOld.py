@@ -47,6 +47,8 @@ class ChordReducer(object):
         self.printDebug = False
         self.weightAlgorithm = self.qlbsmpConsonance
         self.maxChords = 3
+        self.positionInMeasure = None
+        self.numberOfElementsInMeasure = None
 
     def reduceMeasureToNChords(self, measureObj, numChords = 1, weightAlgorithm=None, trimBelow=0.25):
         '''

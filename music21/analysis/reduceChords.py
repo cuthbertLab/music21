@@ -69,6 +69,8 @@ class ChordReducer(object):
     def __init__(self):
         self.weightAlgorithm = self.qlbsmpConsonance
         self.maxChords = 3
+        self.positionInMeasure = None
+        self.numberOfElementsInMeasure = None
 
     def run(
         self,
@@ -174,14 +176,14 @@ class ChordReducer(object):
             result.remove(0)
         return frozenset(result)
 
-    def _iterateElementsPairwise(self, stream):
+    def _iterateElementsPairwise(self, inputStream):
         elementBuffer = []
         prototype = (
             chord.Chord,
             note.Note,
             note.Rest,
             )
-        for element in stream.flat:
+        for element in inputStream.flat:
             if not isinstance(element, prototype):
                 continue
             elementBuffer.append(element)
