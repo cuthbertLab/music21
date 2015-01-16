@@ -1233,7 +1233,7 @@ class Music21Object(object):
                 offsetStart = ts.getOffsetBefore(offsetStart)
                 if offsetStart is None:
                     return None
-                startTimespans = ts.findTimespansStartingAt(offsetStart)
+                startTimespans = ts.elementsStartingAt(offsetStart)
                 for element in startTimespans:
                     if hasattr(element, 'source'):
                         continue

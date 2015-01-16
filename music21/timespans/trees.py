@@ -24,7 +24,7 @@ import weakref
 from music21 import common
 from music21 import exceptions21
 
-from music21.timespans import spans
+from music21.timespans import spans 
 from music21.timespans import node
 
 from music21.exceptions21 import TimespanException
@@ -336,6 +336,8 @@ class AVLTree(object):
                 node.rightChild = self._remove(node.rightChild, offset)
         return self._rebalance(node)
 
+#-------------------------------#
+
 class ElementTree(AVLTree):
     r'''
     A data structure for efficiently storing a score: flat or recursed or normal.
@@ -344,23 +346,37 @@ class ElementTree(AVLTree):
     `offset` and `endTime` property. It provides fast lookups of such
     objects and can quickly locate vertical overlaps.
 .
+    >>> et = timespans.trees.ElementTree()
+    >>> et
+    <ElementTree {0} (-inf to inf)>
+    >>> for i in range(100):
+    ...     n = note.Note()
+    ...     et.insert(float(i), n)
+    >>> et
+    <ElementTree {100} (0.0 to 100.0)>
+    >>> n2 = note.Note('D#')
+    >>> et.insert(101.0, n2)
+    
+    These operations are very fast...
+
+    >>> et.index(n2, 101.0)
+    100
+    >>> et.getOffsetAfter(100.5)
+    101.0
+
     '''
     ### CLASS VARIABLES ###
+    nodeClass = node.TimespanTreeNode
 
     __slots__ = (
         '_source',
-        '_sourceRepr'
+        '_sourceRepr',
         '_parents',
         )
-    nodeClass = node.TimespanTreeNode
 
     ### INITIALIZER ###
 
-    def __init__(
-        self,
-        elements=None,
-        source=None,
-        ):
+    def __init__(self, elements=None, source=None):
         super(ElementTree, self).__init__()
         self._parents = weakref.WeakSet()
         if elements and elements is not None:
@@ -395,7 +411,7 @@ class ElementTree(AVLTree):
             offset = element.offset
         except AttributeError:
             raise TimespanTreeException('element must be a Music21Object, i.e., must have offset')
-        candidates = self.findTimespansStartingAt(offset)
+        candidates = self.elementsStartingAt(offset)
         if element in candidates:
             return True
         else:
@@ -667,8 +683,12 @@ class ElementTree(AVLTree):
         '''
         if node is None:
             return
-        endTimeLow = min(x.endTime for x in node.payload)
-        endTimeHigh = max(x.endTime for x in node.payload)
+        try:
+            endTimeLow = min(x.endTime for x in node.payload)
+            endTimeHigh = max(x.endTime for x in node.payload)
+        except AttributeError: # elements do not have endTimes.  do NOT mix elements and timespans...
+            endTimeLow = node.offset + min(x.duration.quarterLength for x in node.payload)
+            endTimeHigh = node.offset + max(x.duration.quarterLength for x in node.payload)            
         if node.leftChild:
             leftChild = self._updateEndTimes(node.leftChild)
             if leftChild.endTimeLow < endTimeLow:
@@ -694,7 +714,7 @@ class ElementTree(AVLTree):
             visitedParents.add(parent)
             parentOffset = parent.offset
             parent._removeElement(self, oldOffset=oldOffset)
-            parent._insertTimespan(self)
+            parent._insertCore(self.offset, self)
             parent._updateIndices(parent.rootNode)
             parent._updateEndTimes(parent.rootNode)
             parent._updateParents(parentOffset, visitedParents=visitedParents)
@@ -731,13 +751,13 @@ class ElementTree(AVLTree):
         newTree.insert([x for x in self])
         return newTree
 
-    def findTimespansStartingAt(self, offset):
+    def elementsStartingAt(self, offset):
         r'''
         Finds timespans in this offset-tree which start at `offset`.
 
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
-        >>> for timespan in tree.findTimespansStartingAt(0.5):
+        >>> for timespan in tree.elementsStartingAt(0.5):
         ...     timespan
         ...
         <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
@@ -750,13 +770,13 @@ class ElementTree(AVLTree):
             results.extend(node.payload)
         return tuple(results)
 
-    def findTimespansStoppingAt(self, offset):
+    def elementsStoppingAt(self, offset):
         r'''
         Finds timespans in this offset-tree which stop at `offset`.
 
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
-        >>> for timespan in tree.findTimespansStoppingAt(0.5):
+        >>> for timespan in tree.elementsStoppingAt(0.5):
         ...     timespan
         ...
         <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
@@ -780,14 +800,14 @@ class ElementTree(AVLTree):
         results.sort(key=lambda x: (x.offset, x.endTime))
         return tuple(results)
 
-    def findTimespansOverlapping(self, offset):
+    def elementsOverlappingOffset(self, offset):
         r'''
-        Finds timespans in this offset-tree which overlap `offset`.
+        Finds elements or timespans in this ElementTree which overlap `offset`.
 
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
-        >>> for timespan in tree.findTimespansOverlapping(0.5):
-        ...     timespan
+        >>> for el in tree.elementsOverlappingOffset(0.5):
+        ...     el
         ...
         <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>
         '''
@@ -847,6 +867,164 @@ class ElementTree(AVLTree):
         index = node.payload.index(element) + node.nodeStartIndex
         return index
 
+    def remove(self, elements, offsets=None):
+        r'''
+        Removes `elements` or timespans (a single one or a list) from this Tree.
+        
+        Much safer (for non-timespans) if a list of offsets is used 
+        
+        TODO: raise exception if elements length and offsets length differ
+        '''
+        initialOffset = self.offset
+        initialEndTime = self.endTime
+        if hasattr(elements, 'offset'):
+            elements = [elements]
+        if offsets is not None and not common.isListLike(offsets):
+            offsets = [offsets]
+            
+        for i, el in enumerate(elements):
+            if offsets is not None:
+                self._removeElement(el, offsets[i])
+            else:
+                self._removeElement(el)
+        self._updateIndices(self.rootNode)
+        self._updateEndTimes(self.rootNode)
+        if (self.offset != initialOffset) or \
+            (self.endTime != initialEndTime):
+            self._updateParents(initialOffset)
+
+    def insert(self, offsetsOrElements, elements=None):
+        r'''
+        Inserts elements or `timespans` into this offset-tree.
+        '''
+        initialOffset = self.offset
+        initialEndTime = self.endTime
+        if elements is None:
+            elements = offsetsOrElements
+            offsets = None
+        else:
+            offsets = offsetsOrElements
+            if not common.isListLike(offsets):
+                offsets = [offsets]
+        
+        if not common.isListLike(elements): # not a list. a single element or timespan
+            elements = [elements]
+        if offsets is None:
+            offsets = [el.offset for el in elements]
+                
+        
+        for i, el in enumerate(elements):
+            self._insertCore(offsets[i], el)
+        self._updateIndices(self.rootNode)
+        self._updateEndTimes(self.rootNode)
+        if (self.offset != initialOffset) or \
+            (self.endTime != initialEndTime):
+            self._updateParents(initialOffset)
+
+    def _insertCore(self, offset, el):
+        def key(x):
+            try:
+                return x.sortTuple()[2:] # cut off atEnd and offset
+            except AttributeError:
+                if hasattr(x, 'element'):
+                    return x.element.sortTuple()[2:]
+                elif isinstance(x, TimespanTree) and x.source is not None:
+                    return x.source.sortTuple()[2:]
+                else:
+                    return x.endTime  # ElementTimespan with no Element!
+        self.rootNode = self._insertNode(self.rootNode, offset)
+        node = self._getNodeByOffset(self.rootNode, offset)
+        node.payload.append(el)
+        node.payload.sort(key=key)
+        if isinstance(el, TimespanTree):
+            el._parents.add(self)
+
+    ### PROPERTIES ###
+    @property
+    def offset(self):
+        return self.earliestOffset
+
+    @property
+    def endTime(self):
+        return self.latestEndTime
+
+    @property
+    def source(self):
+        '''
+        the original stream.
+        '''
+        return common.unwrapWeakref(self._source)
+        
+    @source.setter
+    def source(self, expr):
+        # uses weakrefs so that garbage collection on the stream cache is possible...
+        self._sourceRepr = repr(expr)
+        self._source = common.wrapWeakref(expr)
+
+
+    @property
+    def earliestOffset(self):
+        r'''
+        Gets the earliest start offset in this offset-tree.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> tree.earliestOffset
+        0.0
+        '''
+        def recurse(node):
+            if node.leftChild is not None:
+                return recurse(node.leftChild)
+            return node.offset
+        if self.rootNode is not None:
+            return recurse(self.rootNode)
+        return float('-inf')
+
+    @property
+    def earliestEndTime(self):
+        r'''
+        Gets the earliest stop offset in this offset-tree.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> tree.earliestEndTime
+        0.5
+        '''
+        if self.rootNode is not None:
+            return self.rootNode.endTimeLow
+        return float('inf')
+
+    @property
+    def latestOffset(self):
+        r'''
+        Gets the lateset start offset in this offset-tree.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> tree.latestOffset
+        35.0
+        '''
+        def recurse(node):
+            if node.rightChild is not None:
+                return recurse(node._rightChild)
+            return node.offset
+        if self.rootNode is not None:
+            return recurse(self.rootNode)
+        return float('-inf')
+
+    @property
+    def latestEndTime(self):
+        r'''
+        Gets the latest stop offset in this offset-tree.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> tree.latestEndTime
+        36.0
+        '''
+        if self.rootNode is not None:
+            return self.rootNode.endTimeHigh
+        return float('inf')
 
 class TimespanTree(ElementTree):
     r'''
@@ -952,8 +1130,11 @@ class TimespanTree(ElementTree):
 
     TODO: Doc examples for all functions, including privates.
     '''
-
+    __slots__ = ()
     ### PUBLIC METHODS ###
+    def __init__(self, elements=None, source=None):
+        super(TimespanTree, self).__init__(elements, source)
+    
     
     def findNextElementTimespanInSameStreamByClass(self, elementTimespan, classList=None):
         r'''
@@ -1038,7 +1219,6 @@ class TimespanTree(ElementTree):
                 if previousElementTimespan.getParentageByClass(classList) is elementTimespan.getParentageByClass(classList):
                     return previousElementTimespan
 
-
     def getVerticalityAt(self, offset):
         r'''
         Gets the verticality in this offset-tree which starts at `offset`.
@@ -1053,7 +1233,6 @@ class TimespanTree(ElementTree):
         >>> tree.getVerticalityAt(2000)
         <Verticality 2000 {}>
             
-            
         Test that it still works if the tree is empty...
             
         >>> tree = bach.asTimespans(classList=(instrument.Tuba,))
@@ -1065,9 +1244,9 @@ class TimespanTree(ElementTree):
         Returns a verticality.Verticality object.
         '''
         from music21.timespans.verticality import Verticality
-        startTimespans = self.findTimespansStartingAt(offset)
-        stopTimespans = self.findTimespansStoppingAt(offset)
-        overlapTimespans = self.findTimespansOverlapping(offset)
+        startTimespans = self.elementsStartingAt(offset)
+        stopTimespans = self.elementsStoppingAt(offset)
+        overlapTimespans = self.elementsOverlappingOffset(offset)
         verticality = Verticality(
             overlapTimespans=overlapTimespans,
             startTimespans=startTimespans,
@@ -1096,37 +1275,7 @@ class TimespanTree(ElementTree):
         if not verticality.startTimespans:
             verticality = verticality.previousVerticality
         return verticality
-
-    def insert(self, spans):
-        r'''
-        Inserts `timespans` into this offset-tree.
-        '''
-        initialOffset = self.offset
-        initialEndTime = self.endTime
-        if hasattr(spans, 'offset'): # not a list.
-            spans = [spans]
-        for timespan in spans:
-            self._insertTimespan(timespan)
-        self._updateIndices(self.rootNode)
-        self._updateEndTimes(self.rootNode)
-        if (self.offset != initialOffset) or \
-            (self.endTime != initialEndTime):
-            self._updateParents(initialOffset)
-
-    def _insertTimespan(self, timespan):
-        def key(x):
-            if hasattr(x, 'element'):
-                return x.element.sortTuple()
-            elif isinstance(x, TimespanTree) and x.source is not None:
-                return x.source.sortTuple()
-            return x.endTime
-        self.rootNode = self._insertNode(self.rootNode, timespan.offset)
-        node = self._getNodeByOffset(self.rootNode, timespan.offset)
-        node.payload.append(timespan)
-        node.payload.sort(key=key)
-        if isinstance(timespan, TimespanTree):
-            timespan._parents.add(self)
-
+    
     def iterateConsonanceBoundedVerticalities(self):
         r'''
         Iterates consonant-bounded verticality subsequences in this
@@ -1363,25 +1512,6 @@ class TimespanTree(ElementTree):
                 if len(verticalities) == n:
                     yield VerticalitySequence(reversed(verticalities))
 
-    def remove(self, timespans):
-        r'''
-        Removes `timespans` (a single one or a list) from this offset-tree.
-        '''
-        initialOffset = self.offset
-        initialEndTime = self.endTime
-        if hasattr(timespans, 'offset') and \
-            hasattr(timespans, 'endTime'):
-            timespans = [timespans]
-        for timespan in timespans:
-            if not hasattr(timespan, 'offset') or not hasattr(timespan, 'endTime'):
-                raise TimespanException('A timespan must have a offset and a endTime attribute, this one %r does not' % (timespan,))
-            self._removeElement(timespan)
-        self._updateIndices(self.rootNode)
-        self._updateEndTimes(self.rootNode)
-        if (self.offset != initialOffset) or \
-            (self.endTime != initialEndTime):
-            self._updateParents(initialOffset)
-
     def splitAt(self, offsets):
         r'''
         Splits all timespans in this offset-tree at `offsets`, operating in
@@ -1389,10 +1519,10 @@ class TimespanTree(ElementTree):
 
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
-        >>> tree.findTimespansStartingAt(0.1)
+        >>> tree.elementsStartingAt(0.1)
         ()
 
-        >>> for elementTimespan in tree.findTimespansOverlapping(0.1):
+        >>> for elementTimespan in tree.elementsOverlappingOffset(0.1):
         ...     print("%r, %s" % (elementTimespan, elementTimespan.part.id))
         ...
         <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>, Soprano
@@ -1401,7 +1531,7 @@ class TimespanTree(ElementTree):
         <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>, Alto
 
         >>> tree.splitAt(0.1)
-        >>> for elementTimespan in tree.findTimespansStartingAt(0.1):
+        >>> for elementTimespan in tree.elementsStartingAt(0.1):
         ...     print("%r, %s" % (elementTimespan, elementTimespan.part.id))
         ...
         <ElementTimespan (0.1 to 0.5) <music21.note.Note C#>>, Soprano
@@ -1409,13 +1539,13 @@ class TimespanTree(ElementTree):
         <ElementTimespan (0.1 to 0.5) <music21.note.Note A>>, Tenor
         <ElementTimespan (0.1 to 0.5) <music21.note.Note A>>, Bass
 
-        >>> tree.findTimespansOverlapping(0.1)
+        >>> tree.elementsOverlappingOffset(0.1)
         ()
         '''
         if not isinstance(offsets, collections.Iterable):
             offsets = [offsets]
         for offset in offsets:
-            overlaps = self.findTimespansOverlapping(offset)
+            overlaps = self.elementsOverlappingOffset(offset)
             if not overlaps:
                 continue
             for overlap in overlaps:
@@ -1584,70 +1714,6 @@ class TimespanTree(ElementTree):
         return tuple(sorted(recurse(self.rootNode)))
 
     @property
-    def earliestOffset(self):
-        r'''
-        Gets the earliest start offset in this offset-tree.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> tree.earliestOffset
-        0.0
-        '''
-        def recurse(node):
-            if node.leftChild is not None:
-                return recurse(node.leftChild)
-            return node.offset
-        if self.rootNode is not None:
-            return recurse(self.rootNode)
-        return float('-inf')
-
-    @property
-    def earliestEndTime(self):
-        r'''
-        Gets the earliest stop offset in this offset-tree.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> tree.earliestEndTime
-        0.5
-        '''
-        if self.rootNode is not None:
-            return self.rootNode.endTimeLow
-        return float('inf')
-
-    @property
-    def latestOffset(self):
-        r'''
-        Gets the lateset start offset in this offset-tree.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> tree.latestOffset
-        35.0
-        '''
-        def recurse(node):
-            if node.rightChild is not None:
-                return recurse(node._rightChild)
-            return node.offset
-        if self.rootNode is not None:
-            return recurse(self.rootNode)
-        return float('-inf')
-
-    @property
-    def latestEndTime(self):
-        r'''
-        Gets the latest stop offset in this offset-tree.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> tree.latestEndTime
-        36.0
-        '''
-        if self.rootNode is not None:
-            return self.rootNode.endTimeHigh
-        return float('inf')
-
-    @property
     def maximumOverlap(self):
         '''
         The maximum number of timespans overlapping at any given moment in this
@@ -1695,18 +1761,6 @@ class TimespanTree(ElementTree):
                 overlap = degreeOfOverlap
         return overlap
 
-    @property
-    def source(self):
-        '''
-        the original stream.
-        '''
-        return common.unwrapWeakref(self._source)
-        
-    @source.setter
-    def source(self, expr):
-        # uses weakrefs so that garbage collection on the stream cache is possible...
-        self._sourceRepr = repr(expr)
-        self._source = common.wrapWeakref(expr)
 
     @property
     def element(self):
@@ -1725,13 +1779,6 @@ class TimespanTree(ElementTree):
 
 
 
-    @property
-    def offset(self):
-        return self.earliestOffset
-
-    @property
-    def endTime(self):
-        return self.latestEndTime
 
 
 #------------------------------------------------------------------------------

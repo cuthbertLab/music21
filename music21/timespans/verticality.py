@@ -282,15 +282,6 @@ class Verticality(object):
             return None        
         return thisElementTimespan.beatStrength
 
-    @property
-    def degreeOfOverlap(self):
-        '''
-        Counts the number of things sounding at this moment: the sum of len(self.startTimespans) and
-        len(self.overlapTimespans)
-        
-        TODO: Delete or rename: confusing!
-        '''
-        return len(self.startTimespans) + len(self.overlapTimespans)
 
     def toChord(self):
         '''
