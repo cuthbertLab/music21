@@ -1427,6 +1427,11 @@ class Stream(base.Music21Object):
 
     def setOffsetMap(self, element, offset):
         try:
+            offset = opFrac(offset)
+        except TypeError:
+            pass
+        
+        try:
             self._offsetMapDict[element] = offset
         except TypeError: # unhashable type
             self._offsetMapDict[id(element)] = offset
@@ -1438,8 +1443,14 @@ class Stream(base.Music21Object):
             except TypeError:
                 o = self._offsetMapDict[id(element)]
         except KeyError:
-            return None
-        return o
+            return 0.0
+        if o in ('highestTime', 'lowestOffset', 'highestOffset'):
+            try:
+                return getattr(self, o)
+            except AttributeError:
+                raise StreamException('attempted to set a bound offset with a string attribute that is not supported: %s' % o)
+        else:
+            return o
 
     def insert(self, offsetOrItemOrList, itemOrNone=None,
                      ignoreSort=False, setActiveSite=True):
@@ -3967,7 +3978,9 @@ class Stream(base.Music21Object):
 
     def _getSpannerBundle(self):
         if 'spannerBundle' not in self._cache or self._cache['spannerBundle'] is None:
-            self._cache['spannerBundle'] = spanner.SpannerBundle(self.flat.spanners)
+            sf = self.flat
+            sp = sf.spanners
+            self._cache['spannerBundle'] = spanner.SpannerBundle(sp)
         return self._cache['spannerBundle']
 
     spannerBundle = property(_getSpannerBundle,
@@ -6371,6 +6384,7 @@ class Stream(base.Music21Object):
         # storing .elements in here necessitates
         # create a new, independent cache instance in the flat representation
         sNew._cache = {} 
+        sNew._offsetMapDict = {}
         sNew._elements = []
         sNew._endElements = []
         sNew._elementsChanged()

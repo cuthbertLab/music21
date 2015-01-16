@@ -697,7 +697,18 @@ class Music21Object(object):
         SitesException: The object <music21.note.Note A-> is not in site <music21.stream.Stream notContainingStream>.
         '''
         try:
-            return self.sites.getOffsetBySite(site, returnType=returnType)
+            b = self.sites.getOffsetBySite(site, returnType=returnType)
+            
+            if site is not None:
+                siteId = id(site)
+                a = self.sites.getById(siteId).getOffsetFromMap(self)
+                if returnType=='float':
+                    a = float(a)
+            else:
+                a = b
+            if (a != b):
+                pass
+            return a
         except SitesException:
             raise SitesException('The object %r is not in site %r.' % (self, site))
 
@@ -708,15 +719,16 @@ class Music21Object(object):
         that already has been added.
 
         >>> import music21
-        >>> class Mock(music21.Music21Object):
-        ...     pass
-        >>> aSite = Mock()
+        >>> aSite = stream.Stream()
         >>> a = music21.Music21Object()
         >>> a.sites.add(aSite, 20)
+        >>> aSite.setOffsetMap(a, 20)
         >>> a.setOffsetBySite(aSite, 30)
         >>> a.getOffsetBySite(aSite)
         30.0
         '''
+        if site is not None:
+            site.setOffsetMap(self, value)        
         return self.sites.setOffsetBySite(site, value)
 
     def getContextAttr(self, attr):
@@ -3440,8 +3452,9 @@ class Test(unittest.TestCase):
         '''
         Basic testing of M21 base object sites
         '''
+        from music21 import stream
         a = Music21Object()
-        b = Music21Object()
+        b = stream.Stream()
 
         # storing a single offset does not add a Sites entry
         a.offset = 30
@@ -3459,6 +3472,7 @@ class Test(unittest.TestCase):
         # still have activeSite
         self.assertEqual(a.activeSite, b)
         # now the offst returns the value for the current activeSite
+        b.setOffsetMap(a, 40.0)
         self.assertEqual(a.offset, 40.0)
 
         # assigning a activeSite to None
@@ -3938,7 +3952,9 @@ class Test(unittest.TestCase):
         b1 = bar.Barline()
         s.append(n1)
         self.assertEqual(s.highestTime, 30.0)
+        s.setOffsetMap(b1, 'highestTime')
         b1.sites.add(s, 'highestTime')
+        
         self.assertEqual(b1.getOffsetBySite(s), 30.0)
 
         s.append(n2)

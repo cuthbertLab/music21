@@ -893,7 +893,7 @@ class Sites(common.SlottedObject):
             raise SitesException(errorMsg)
         # stored string are assumed to be attributes of the stored object
         if isinstance(value, str):
-            if value not in ['highestTime', 'lowestOffset', 'highestOffset']:
+            if value not in ('highestTime', 'lowestOffset', 'highestOffset'):
                 raise SitesException('attempted to set a bound offset with a string attribute that is not supported: %s' % value)
             obj = self.siteDict[idKey].site
             # offset value is an attribute string

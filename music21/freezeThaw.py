@@ -1381,7 +1381,7 @@ class JSONFreezer(JSONFreezeThawBase):
             return True
         if isinstance(possiblyFreezeable, (list, tuple, dict)):
             return False
-        if six.PY2 and isinstance(possiblyFreezeable, (int, str, unicode, float)): # pylint: disable=undefined-variable
+        if six.PY2 and isinstance(possiblyFreezeable, (int, str, unicode, float)): # @UndefinedVariable pylint: disable=undefined-variable
             return False
         elif six.PY3 and isinstance(possiblyFreezeable, (int, str, bytes, float)):
             return False 

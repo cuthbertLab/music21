@@ -657,7 +657,7 @@ def opFrac(num):
         else:
             return num # leave fraction alone
     else:
-        raise Exception("Cannot convert num: %r" % num)
+        raise TypeError("Cannot convert num: %r" % num)
         
 
 
