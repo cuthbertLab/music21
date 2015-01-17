@@ -482,7 +482,7 @@ _ARTIC_ATTR_DICT = {'acc': articulations.Accent, 'stacc': articulations.Staccato
 # for _barlineFromAttr()
 # TODO: make new music21 Barline styles for 'dbldashed' and 'dbldotted'
 _BAR_ATTR_DICT = {'dashed': 'dashed', 'dotted': 'dotted', 'dbl': 'double', 'end': 'final',
-                  'invis': 'none', 'single': 'none'}
+                  'invis': 'none', 'single': 'regular'}
 
 
 # One-to-One Translator Functions
