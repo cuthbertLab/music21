@@ -702,12 +702,20 @@ class Music21Object(object):
             if site is not None:
                 a = None
                 trySite = self
+                originMemo = set()
+                i = 0
+                maxSearch = 100
                 while a is None:
                     try:
                         a = site.getOffsetFromMap(trySite)
                     except Music21Exception as e: # currently StreamException, but will change
                         trySite = self.derivation.origin
-                        if trySite is None:
+                        if id(trySite) in originMemo:
+                            raise(e)
+                        else:
+                            originMemo.add(id(trySite))
+                        i += 1
+                        if trySite is None or i > maxSearch:
                             raise(e)
                 if returnType=='float':
                     a = float(a)

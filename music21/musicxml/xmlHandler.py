@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2009-2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -16,6 +16,7 @@ from music21.musicxml import mxObjects as musicxmlMod
 
 import sys
 from music21.ext import six
+import codecs
 
 # in order for sax parsing to properly handle unicode strings w/ unicode chars
 # stored in StringIO.StringIO, this update is necessary
@@ -27,7 +28,7 @@ if six.PY2:
     currentStdIn = sys.stdin
     currentStdErr = sys.stderr
     try:
-        reload(sys)
+        reload(sys) # @UndefinedVariable
         sys.setdefaultencoding('utf-8') # @UndefinedVariable
     except: # Python3
         pass
@@ -1037,16 +1038,16 @@ class Document(object):
             except TypeError:
                 raise
 
-        else: # TODO: should this be codecs.open()?
-            fileLikeOpen = open(fileLike)
-            #fileLikeOpen = codecs.open(fileLike, encoding='utf-8')
+        else: 
+            fileLikeOpen = codecs.open(fileLike, encoding='utf-8')
 
         # the file always needs to be closed, otherwise
         # subsequent parsing operations produce an unclosed token error
         try:
             saxparser.parse(fileLikeOpen)
-        except:
+        except Exception as e:
             fileLikeOpen.close()
+            raise e
         fileLikeOpen.close()
 
         #t.stop()
@@ -1327,7 +1328,7 @@ if __name__ == "__main__":
     # this is a temporary hack to get encoding working right
     # this may not be the best way to do this
     if six.PY2:
-        reload(sys)
+        reload(sys) # @UndefinedVariable
         sys.setdefaultencoding("utf-8") # @UndefinedVariable
 
     import music21

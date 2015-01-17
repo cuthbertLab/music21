@@ -537,7 +537,6 @@ class ClassDocumenter(ObjectDocumenter):
             'autoSort'
             'definesExplicitPageBreaks'
             'definesExplicitSystemBreaks'
-            'flattenedRepresentationOf'
             'isFlat'
             'isSorted'
 

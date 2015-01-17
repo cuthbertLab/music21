@@ -265,10 +265,6 @@ class Stream(base.Music21Object):
             Boolean describing whether this Stream contains embedded
             sub-Streams or Stream subclasses (not flat).
             ''',
-        'flattenedRepresentationOf': '''
-            When this flat Stream is derived from another non-flat stream, a
-            reference to the source Stream is stored here.
-            ''',
         'definesExplicitSystemBreaks': '''
             Boolean that says whether all system breaks in the piece are
             explicitly defined.  Only used on musicxml output (maps to the
@@ -315,9 +311,6 @@ class Stream(base.Music21Object):
         # experimental
         self._mutable = True
 
-        # when deriving a flat stream, store a reference to the non-flat Stream
-        # from which this was taken
-        self.flattenedRepresentationOf = None
 
         self._cache = {}
 
@@ -514,9 +507,10 @@ class Stream(base.Music21Object):
         # if this Stream is a flat representation of something, and its
         # elements have changed, than we must clear the cache of that
         # ancestor; we can do that by calling _elementsChanged on
-        # flattenedRepresentationOf
-        if self.flattenedRepresentationOf is not None:
-            self.flattenedRepresentationOf._elementsChanged(memo=memo)
+        # the derivation.orgin
+        if self._derivation is not None and self._derivation.method in ('flat', 'semiflat'):
+            origin = self._derivation.origin
+            origin._elementsChanged(memo=memo)
 
         # may not always need to clear cache of the active site, but may
         # be a good idea; may need to intead clear all sites
@@ -1216,9 +1210,6 @@ class Stream(base.Music21Object):
             newValue.containedById = id(new)
             setattr(new, 'sites', newValue)
 
-        if 'flattenedRepresentationOf' in self.__dict__:
-            # keep a reference, not a deepcopy
-            setattr(new, 'flattenedRepresentationOf', self.flattenedRepresentationOf)
         if '_offsetMapDict' in self.__dict__:
             newValue = {}
             setattr(new, '_offsetMapDict', newValue)
@@ -1265,7 +1256,7 @@ class Stream(base.Music21Object):
             #    environLocal.warn('%r, %r, %s' % (old, new, name))
             if name.startswith('__'):
                 continue
-            if name in ('activeSite', 'sites', 'flattenedRepresentationOf',
+            if name in ('activeSite', 'sites',
                         '_offsetMapDict', '_derivation', 'streamStatus', 
                         '_elements', '_endElements'):
                 continue
@@ -2531,7 +2522,8 @@ class Stream(base.Music21Object):
             singleClassString = True
         if singleClassString:
             if not self.hasElementOfClass(classFilterList[0]):
-                found.isSorted = self.isSorted
+                if returnList is False:
+                    found.isSorted = self.isSorted
                 return found
 
         if ((self.isSorted is False) and (self.autoSort is True)):
@@ -6453,8 +6445,6 @@ class Stream(base.Music21Object):
 
         sNew.isFlat = True
         # here, we store the source stream from which this stream was derived
-        # TODO: this should probably be a weakref
-        sNew.flattenedRepresentationOf = self #common.wrapWeakref(self)
         return sNew
 
 
@@ -6470,10 +6460,8 @@ class Stream(base.Music21Object):
         else:
             raise StreamException('_getFlatFromSemiFlat can only be called if ._cache["semiFlat"] has been created from a previous .semiFlat call')
         sNew = copy.copy(sf)
-        sNew._derivation = derivation.Derivation()
+        sNew._derivation = derivation.Derivation(sNew)
         # unwrapping a weak ref here
-        # get common container and ancestor
-        sNew._derivation.client = sf._derivation.client
         sNew.derivation.origin = sf._derivation.origin
         sNew.derivation.method = 'flat'
         # create a new, independent cache instance in the flat representation
@@ -6493,8 +6481,6 @@ class Stream(base.Music21Object):
             sNew._storeAtEndCore(e)
         sNew._elementsChanged()
         sNew.isFlat = True
-        # here, we store the source stream from which this stream was derived
-        sNew.flattenedRepresentationOf = sf.flattenedRepresentationOf
         return sNew
 
     def _getFlat(self):

@@ -763,7 +763,7 @@ class Test(unittest.TestCase):
 
     def testGetInstrumentManual(self):
         from music21 import defaults
-
+        self.assertEqual(1, 2)
         #import pdb; pdb.set_trace()
         # search activeSite from a measure within
 
@@ -1350,6 +1350,7 @@ class Test(unittest.TestCase):
 
 
     def testMeasureOffsetMapPostTie(self):
+        self.assertEqual(1, 2)
         from music21 import corpus, stream
         
         a = corpus.parse('bach/bwv4.8.xml')
@@ -1398,6 +1399,7 @@ class Test(unittest.TestCase):
     def testMusicXMLGenerationViaPropertyA(self):
         '''Test output tests above just by calling the musicxml attribute
         '''
+        self.assertEqual(1, 2)
         a = ['c', 'g#', 'd-', 'f#', 'e', 'f' ] * 4
 
         partOffset = 7.5
@@ -1440,6 +1442,7 @@ class Test(unittest.TestCase):
     def testMusicXMLGenerationViaPropertyB(self):
         '''Test output tests above just by calling the musicxml attribute
         '''
+        self.assertEqual(1, 2)
         n = note.Note()        
         n.quarterLength = 3
         a = Stream()
@@ -1455,6 +1458,7 @@ class Test(unittest.TestCase):
     def testMusicXMLGenerationViaPropertyC(self):
         '''Test output tests above just by calling the musicxml attribute
         '''
+        self.assertEqual(1, 2)
         a = ['c', 'g#', 'd-', 'f#', 'e', 'f' ] * 4
 
         s = Stream()
@@ -1638,6 +1642,8 @@ class Test(unittest.TestCase):
         '''
         Testing getting clefs from higher-level streams
         '''
+        self.assertEqual(1, 2)
+
         n1 = note.Note()
         n2 = note.Note()
 
@@ -2774,15 +2780,14 @@ class Test(unittest.TestCase):
         '''Extract phrases from the corpus and use for testing 
         '''
         from music21 import corpus
-
         # first method: iterating through notes
         src = corpus.parse('bach/bwv324.xml')
         # get some measures of the soprano; just get the notes
         #environLocal.printDebug(['testAugmentOrDiminishCorpus()', 'extracting notes:'])
         ex = src.parts[0].flat.notesAndRests[0:30]
         # attach a couple of transformations
-        s = Stream()
-        for scalar in [.5, 1.5, 2, .25]:
+        s = Score()
+        for scalar in [.5]: #, 1.5, 2, .25]:
             #n = note.Note()
             part = Part()
             #environLocal.printDebug(['testAugmentOrDiminishCorpus()', 'pre augment or diminish', 'ex', ex, 'id(ex)', id(ex)])
@@ -2790,6 +2795,7 @@ class Test(unittest.TestCase):
                 part.append(n)
             s.insert(0, part)
         junkTest = toMxObjects.streamToMx(s)
+        self.assertEqual(1, 2)
         #s.show()
     
         # second method: getting flattened stream
@@ -3722,6 +3728,7 @@ class Test(unittest.TestCase):
         '''Test makeNotation on Score objects
         '''
         from music21 import stream
+        self.assertEqual(1, 2)
         s = stream.Score()
         p1 = stream.Stream()
         p2 = stream.Stream()
@@ -3749,6 +3756,7 @@ class Test(unittest.TestCase):
     def testMakeNotationScoreB(self):
         '''Test makeNotation on Score objects
         '''
+        self.assertEqual(1, 2)
         from music21 import stream
         s = stream.Score()
         p1 = stream.Stream()
@@ -3782,6 +3790,7 @@ class Test(unittest.TestCase):
     def testMakeNotationScoreC(self):
         '''Test makeNotation on Score objects
         '''
+        self.assertEqual(1, 2)
         from music21 import stream
         s = stream.Score()
         p1 = stream.Stream()
@@ -7425,9 +7434,9 @@ if __name__ == "__main__":
     import music21
     #'testContextNestedC'
     #'testContextNestedD'
-    #import sys
-    #sys.argv.append('testMakeNotationByMeasuresA')
-    music21.mainTest(Test)
+    import sys
+    sys.argv.append('testAugmentOrDiminishCorpus')
+    music21.mainTest(Test, 'verbose')
 
 
 #------------------------------------------------------------------------------
