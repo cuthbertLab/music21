@@ -700,8 +700,15 @@ class Music21Object(object):
             b = self.sites.getOffsetBySite(site, returnType=returnType)
             
             if site is not None:
-                siteId = id(site)
-                a = self.sites.getById(siteId).getOffsetFromMap(self)
+                a = None
+                trySite = self
+                while a is None:
+                    try:
+                        a = site.getOffsetFromMap(trySite)
+                    except Music21Exception as e: # currently StreamException, but will change
+                        trySite = self.derivation.origin
+                        if trySite is None:
+                            raise(e)
                 if returnType=='float':
                     a = float(a)
             else:
@@ -1660,6 +1667,8 @@ class Music21Object(object):
         # using _activeSiteId offers a considerable speed boost, as we
         # do not have to unwrap a weakref of self.activeSite to get the id()
         # of activeSite
+        if self.activeSite is not None:
+            self.activeSite.setOffsetMap(self, offset)
         self.sites.setOffsetBySiteId(self._activeSiteId, offset)
 
     def _getOffset(self):
@@ -1882,8 +1891,8 @@ class Music21Object(object):
 
         return _SortTuple(atEnd, offset, self.priority, self.classSortOrder, isNotGrace, insertIndex)
 
-    def yieldSiteSearchOrder(self, callerFirst=None, memo=None, offsetAppend=0.0, sortByCreationTime=False,
-                             priorityTarget=None):
+    def yieldSiteSearchOrder(self, callerFirst=None, memo=None, 
+                             offsetAppend=0.0, sortByCreationTime=False, priorityTarget=None):
         '''
         >>> c = corpus.parse('bwv66.6')
         >>> c.id = 'bach'
@@ -1916,7 +1925,7 @@ class Music21Object(object):
         >>> m3 = c.parts[1].measure(3)
         >>> for y in m3.yieldSiteSearchOrder():
         ...      print(y)
-        (<music21.stream.Measure 3 offset=0.0>, 0.0, 'elementsFirst')
+        (<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')
         (<music21.stream.Part Alto>, 9.0, 'flatten')
         (<music21.stream.Score bach>, 9.0, 'elementsOnly')
         (<music21.stream.Stream ...>, 9.0, 'elementsFirst')
@@ -1996,9 +2005,10 @@ class Music21Object(object):
                 getType = recurseTypeFromStream(self)
                 yield(self, 0.0, getType)
 
-        for siteObj in self.sites.get(priorityTarget=priorityTarget,
+        allSites = self.sites.get(priorityTarget=priorityTarget,
                                       sortByCreationTime=sortByCreationTime,
-                                      excludeNone=True):
+                                      excludeNone=True)
+        for siteObj in allSites:
             if 'SpannerStorage' in siteObj.classes:
                 continue
             offsetInStream = self.getOffsetBySite(siteObj) + offsetAppend
@@ -3506,22 +3516,21 @@ class Test(unittest.TestCase):
 
         # the active site of a deepcopy should not be the same?
         #self.assertEqual(post[-1].activeSite, a)
-
-        a = Music21Object()
-
-        post = []
-        b = Music21Object()
+        from music21 import stream, base # self-import fine.
+        a = stream.Stream()
+        b = base.Music21Object()
         b.id = 'test'
-        b.activeSite = a
-        b.offset = 30
+        a.insert(30, b)
+        b.activeSite = a        
+        
+        d = stream.Stream()
+        self.assertEqual(b.activeSite, a)
         c = copy.deepcopy(b)
-        c.activeSite = b
-        post.append(c)
-
-        self.assertEqual(len(post[-1].sites), 3)
+        self.assertEqual(c.activeSite, None)
+        d.insert(20, c)
+        self.assertEqual(len(c.sites), 2)
 
         # this works because the activeSite is being set on the object
-        self.assertEqual(post[-1].activeSite, b)
         # the copied activeSite has been deepcopied, and cannot now be accessed
         # this fails! post[-1].getOffsetBySite(a)
 
@@ -4343,6 +4352,97 @@ class Test(unittest.TestCase):
         unused_n2 = copy.deepcopy(n1)
         #self.assertEqual(n2._activeSite, s1)
 
+    def testYieldSiteSearchOrderA(self):
+        from music21 import corpus
+        self.maxDiff = None
+        c = corpus.parse('bwv66.6')
+        c.id = 'bach'
+        n = c[2][4][2]
+        self.assertEqual(repr(n), '<music21.note.Note G#>')
+        siteList = []
+        for y in n.yieldSiteSearchOrder():
+            siteList.append(repr(y))
+        self.assertEqual(siteList, ["(<music21.stream.Measure 3 offset=9.0>, 0.5, 'elementsFirst')",
+                                    "(<music21.stream.Part Alto>, 9.5, 'flatten')", 
+                                    "(<music21.stream.Score bach>, 9.5, 'elementsOnly')"])
+
+        m = c[2][4]
+        self.assertEqual(repr(m), '<music21.stream.Measure 3 offset=9.0>')
+
+        siteList = []      
+        for y in m.yieldSiteSearchOrder():
+            siteList.append(repr(y))
+        self.assertEqual(siteList, ["(<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')",
+                                    "(<music21.stream.Part Alto>, 9.0, 'flatten')", 
+                                    "(<music21.stream.Score bach>, 9.0, 'elementsOnly')"])
+
+        m2 = copy.deepcopy(m)
+        m2.number = 3333
+        siteList = []      
+        for y in m2.yieldSiteSearchOrder():
+            siteList.append(repr(y))
+        self.assertEqual(siteList, ["(<music21.stream.Measure 3333 offset=9.0>, 0.0, 'elementsFirst')",
+                                    "(<music21.stream.Part Alto>, 9.0, 'flatten')", 
+                                    "(<music21.stream.Score bach>, 9.0, 'elementsOnly')"])
+        siteList = []
+        ptemp = c.parts[1]
+        m3 = ptemp.measure(3)
+        self.assertIs(m, m3)
+        for y in m3.yieldSiteSearchOrder():
+            siteList.append(repr(y))
+        
+        import re
+        for i, sl in enumerate(siteList):
+            siteList[i] = re.sub('0x[a-f0-9]*', '...', sl)
+        self.assertEqual(siteList, ["(<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')", 
+                                    "(<music21.stream.Part Alto>, 9.0, 'flatten')", 
+                                    "(<music21.stream.Score bach>, 9.0, 'elementsOnly')", 
+                                    "(<music21.stream.Stream ...>, 9.0, 'elementsFirst')"])
+
+    def testYieldSiteSearchOrderB(self):        
+        from music21 import stream, note
+        p1 = stream.Part()
+        p1.id = 'p1'
+        m1 = stream.Measure()
+        m1.number = 1
+        n = note.Note()
+        m1.append(n)
+        p1.append(m1)
+        siteList = []
+        for y in n.yieldSiteSearchOrder():
+            siteList.append(repr(y[0]))
+        self.assertEqual(siteList, ["<music21.stream.Measure 1 offset=0.0>",
+                                    "<music21.stream.Part p1>"])
+        p2 = stream.Part()
+        p2.id = 'p2'
+        m2 = stream.Measure()
+        m2.number = 2
+        m2.append(n)
+        p2.append(m2)
+
+        siteList = []
+        for y in n.yieldSiteSearchOrder(priorityTarget=n.activeSite):
+            siteList.append(repr(y[0]))
+        self.assertEqual(siteList, ["<music21.stream.Measure 2 offset=0.0>",
+                                    "<music21.stream.Part p2>",
+                                    "<music21.stream.Measure 1 offset=0.0>",
+                                    "<music21.stream.Part p1>"])
+
+        siteList = []
+        for y in n.yieldSiteSearchOrder(sortByCreationTime = True):
+            siteList.append(repr(y[0]))
+        self.assertEqual(siteList, ["<music21.stream.Measure 2 offset=0.0>",
+                                    "<music21.stream.Part p2>",
+                                    "<music21.stream.Measure 1 offset=0.0>",
+                                    "<music21.stream.Part p1>"])
+
+        siteList = []
+        for y in n.yieldSiteSearchOrder(sortByCreationTime = 'reverse'):
+            siteList.append(repr(y[0]))
+        self.assertEqual(siteList, ["<music21.stream.Measure 1 offset=0.0>",
+                                    "<music21.stream.Part p1>",
+                                    "<music21.stream.Measure 2 offset=0.0>",
+                                    "<music21.stream.Part p2>"])
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -4488,8 +4588,7 @@ def mainTest(*testClasses, **kwargs):
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
-    #import sys
-    #sys.argv.append('testSitesClef')
+    #sys.argv.append('testYieldSiteSearchOrderB')
     mainTest(Test)
 
 

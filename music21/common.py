@@ -33,7 +33,7 @@ from music21.ext import six
 
 #python3
 try:
-    basestring
+    basestring # @UndefinedVariable 
 except NameError:
     basestring = str # @ReservedAssignment
 
@@ -1064,7 +1064,7 @@ def toUnicode(usrStr):
             return usrStr
     else:
         try:
-            usrStr = unicode(usrStr, 'utf-8') # pylint: disable=undefined-variable
+            usrStr = unicode(usrStr, 'utf-8') # @UndefinedVariable  pylint: disable=undefined-variable
         # some documentation may already be in unicode; if so, a TypeException will be raised
         except TypeError: #TypeError: decoding Unicode is not supported
             pass
@@ -2154,7 +2154,7 @@ def normalizeFilename(name):
         name = name[:lenName -4]
 
     if isinstance(name, str) and six.PY2:
-        name = unicode(name) # pylint: disable=undefined-variable
+        name = unicode(name) # @UndefinedVariable pylint: disable=undefined-variable
 
     name = unicodedata.normalize('NFKD', name)
     if six.PY2:
