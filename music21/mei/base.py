@@ -118,6 +118,9 @@ MEI in any other context.
   does not have the @numbase attribute.
 * Retain consistent @n values for the same layer, staff, and instrument throughout the score.
 * Always indicate the duration of <mRest> and <mSpace> elements.
+* Avoid using the <barLine> element if you require well-formatted output from music21, since (as of
+  January 2015) the music21-to-something converters will only output a :class:`Barline` that is
+  part of a :class:`Measure`.
 
 **List of Supported Elements**
 
@@ -125,6 +128,7 @@ Alphabetical list of the elements currently supported by this module:
 
 * :func:`accidFromElement`
 * :func:`articFromElement`
+* :func:`barLineFromElement`
 * :func:`beamFromElement`
 * :func:`chordFromElement`
 * :func:`clefFromElement`
@@ -2513,7 +2517,7 @@ def beamFromElement(elem, slurBundle=None):
 
     **Attributes/Elements Implemented:**
 
-    - <clef>, <chord>, <note>, <rest>, <space>, <tuplet>, <beam>
+    - <clef>, <chord>, <note>, <rest>, <space>, <tuplet>, <beam>, <barLine>
 
     **Attributes/Elements Ignored:**
 
@@ -2545,7 +2549,7 @@ def beamFromElement(elem, slurBundle=None):
     - MEI.critapp: app
     - MEI.edittrans: (all)
     - MEI.mensural: ligature mensur proport
-    - MEI.shared: barLine clefGrp custos keySig pad
+    - MEI.shared: clefGrp custos keySig pad
     '''
 
     # mapping from tag name to our converter function
@@ -2555,12 +2559,65 @@ def beamFromElement(elem, slurBundle=None):
                      '{http://www.music-encoding.org/ns/mei}rest': restFromElement,
                      '{http://www.music-encoding.org/ns/mei}tuplet': tupletFromElement,
                      '{http://www.music-encoding.org/ns/mei}beam': beamFromElement,
-                     '{http://www.music-encoding.org/ns/mei}space': spaceFromElement}
+                     '{http://www.music-encoding.org/ns/mei}space': spaceFromElement,
+                     '{http://www.music-encoding.org/ns/mei}barLine': barLineFromElement}
 
     beamedStuff = _processEmbeddedElements(elem.findall('*'), tagToFunction, elem.tag, slurBundle)
     beamedStuff = beamTogether(beamedStuff)
 
     return beamedStuff
+
+
+def barLineFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
+    '''
+    <barLine> Vertical line drawn through one or more staves that divides musical notation into
+    metrical units.
+
+    In MEI 2013: pg.262 (276 in PDF) (MEI.shared module)
+
+    :returns: A :class:`music21.bar.Barline` or :class:`~music21.bar.Repeat`, depending on the
+        value of @rend. If @rend is ``'rptboth'``, a 2-tuplet of :class:`Repeat` objects will be
+        returned, represented an "end" and "start" barline, as specified in the :mod:`music21.bar`
+        documentation.
+
+    .. note:: The music21-to-other converters expect that a :class:`Barline` will be attached to a
+        :class:`Measure`, which it will not be when imported from MEI as a <barLine> element.
+        However, this function does import correctly to a :class:`Barline` that you can access from
+        Python in the :class:`Stream` object as expected.
+
+    **Attributes/Elements Implemented:**
+
+    - @rend from att.barLine.log
+
+    **Attributes/Elements in Testing:** none
+
+    **Attributes not Implemented:**
+
+    - att.common (@label, @n, @xml:base) (att.id (@xml:id))
+    - att.facsimile (@facs)
+    - att.pointing (@xlink:actuate, @xlink:role, @xlink:show, @target, @targettype, @xlink:title)
+    - att.barLine.log
+
+        - (att.meterconformance.bar (@metcon, @control))
+
+    - att.barLine.vis
+
+        - (att.barplacement (@barplace, @taktplace))
+        - (att.color (@color))
+        - (att.measurement (@unit))
+        - (att.width (@width))
+
+    - att.barLine.ges (att.timestamp.musical (@tstamp))
+    - att.barLine.anl
+
+        - (att.common.anl
+
+            - (@copyof, @corresp, @next, @prev, @sameas, @synch)
+            - (att.alignment (@when)))
+
+    **Contained Elements not Implemented:** none
+    '''
+    return _barlineFromAttr(elem.get('rend', 'single'))
 
 
 def tupletFromElement(elem, slurBundle=None):
@@ -2577,7 +2634,7 @@ def tupletFromElement(elem, slurBundle=None):
 
     **Attributes/Elements Implemented:**
 
-    - <tuplet>, <beam>, <note>, <rest>, <chord>, <clef>, <space>
+    - <tuplet>, <beam>, <note>, <rest>, <chord>, <clef>, <space>, <barLine>
     - @num and @numbase
 
     **Attributes/Elements in Testing:** none
@@ -2610,7 +2667,7 @@ def tupletFromElement(elem, slurBundle=None):
     - MEI.critapp: app
     - MEI.edittrans: (all)
     - MEI.mensural: ligature mensur proport
-    - MEI.shared: barLine clefGrp custos keySig pad
+    - MEI.shared: clefGrp custos keySig pad
     '''
     # mapping from tag name to our converter function
     tagToFunction = {'{http://www.music-encoding.org/ns/mei}tuplet': tupletFromElement,
@@ -2619,7 +2676,8 @@ def tupletFromElement(elem, slurBundle=None):
                      '{http://www.music-encoding.org/ns/mei}rest': restFromElement,
                      '{http://www.music-encoding.org/ns/mei}chord': chordFromElement,
                      '{http://www.music-encoding.org/ns/mei}clef': clefFromElement,
-                     '{http://www.music-encoding.org/ns/mei}space': spaceFromElement}
+                     '{http://www.music-encoding.org/ns/mei}space': spaceFromElement,
+                     '{http://www.music-encoding.org/ns/mei}barLine': barLineFromElement}
 
     # get the @num and @numbase attributes, without which we can't properly calculate the tuplet
     if elem.get('num') is None or elem.get('numbase') is None:
@@ -2680,7 +2738,8 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
 
     **Attributes/Elements Implemented:**
 
-    - <clef>, <chord>, <note>, <rest>, <mRest>, <beam>, <tuplet>, <space>, <mSpace> contained within
+    - <clef>, <chord>, <note>, <rest>, <mRest>, <beam>, <tuplet>, <space>, <mSpace> , and
+      <barLine> contained within
     - @n, from att.common
 
     **Attributes Ignored:**
@@ -2711,8 +2770,8 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
     - MEI.mensural: ligature mensur proport
     - MEI.midi: midi
     - MEI.neumes: ineume syllable uneume
-    - MEI.shared: accid annot artic barLine clefGrp custos dir dot dynam keySig pad pb phrase sb \
-                  scoreDef staffDef tempo
+    - MEI.shared: accid annot artic clefGrp custos dir dot dynam keySig pad pb phrase sb scoreDef \
+                  staffDef tempo
     - MEI.text: div
     - MEI.usersymbols: anchoredText curve line symbol
     '''
@@ -2725,7 +2784,8 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
                      '{http://www.music-encoding.org/ns/mei}beam': beamFromElement,
                      '{http://www.music-encoding.org/ns/mei}tuplet': tupletFromElement,
                      '{http://www.music-encoding.org/ns/mei}space': spaceFromElement,
-                     '{http://www.music-encoding.org/ns/mei}mSpace': mSpaceFromElement}
+                     '{http://www.music-encoding.org/ns/mei}mSpace': mSpaceFromElement,
+                     '{http://www.music-encoding.org/ns/mei}barLine': barLineFromElement}
 
     # iterate all immediate children
     theLayer = _processEmbeddedElements(elem.iterfind('*'), tagToFunction, elem.tag, slurBundle)
@@ -3367,6 +3427,7 @@ if __name__ == "__main__":
         test_base.TestInstrDef,
         test_base.TestMeasureFromElement,
         test_base.TestSectionScore,
+        test_base.TestBarLineFromElement,
     )
 
 #------------------------------------------------------------------------------

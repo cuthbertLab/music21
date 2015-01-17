@@ -4838,3 +4838,27 @@ class TestSectionScore(unittest.TestCase):
         self.assertEqual(1, len(meas[0]))
         self.assertIsInstance(meas[0][0], note.Note)
         self.assertEqual('C2', meas[0][0].nameWithOctave)
+
+
+
+#------------------------------------------------------------------------------
+class TestBarLineFromElement(unittest.TestCase):
+    '''Tests for barLineFromElement()'''
+
+    def testBarLine1(self):
+        '''
+        barLineFromElement(): <barLine rend="dbl"/>
+        '''
+        elem = ETree.Element('barLine', attrib={'rend': 'dbl'})
+        actual = base.barLineFromElement(elem)
+        self.assertIsInstance(actual, bar.Barline)
+        self.assertEqual('double', actual.style)
+
+    def testBarLine2(self):
+        '''
+        barLineFromElement(): <barLine/>
+        '''
+        elem = ETree.Element('barLine')
+        actual = base.barLineFromElement(elem)
+        self.assertIsInstance(actual, bar.Barline)
+        self.assertEqual('regular', actual.style)
