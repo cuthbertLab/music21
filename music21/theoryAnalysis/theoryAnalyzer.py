@@ -180,7 +180,6 @@ def addAnalysisData(score):
     adds an attribute "analysisData" to a Stream object if it does not exist.
 
     also adds to any embedded Streams...
-
     
     >>> p = stream.Part()
     >>> s = stream.Score()
@@ -197,7 +196,6 @@ def addAnalysisData(score):
     >>> 'ResultDict' in p.analysisData
     True
     '''
-    
     # adds analysisData if it does not exist...
     if not(hasattr(score, 'analysisData')):
         score.analysisData = defaultdict(list)
@@ -319,13 +317,13 @@ def getVLQs(score, partNum1, partNum2):
     >>> part1.append(note.Note('f5'))
     >>> sc.insert(part1)
     >>> theoryAnalysis.theoryAnalyzer.getVLQs(sc, 0, 1)
-    [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note C> , v1n2=<music21.note.Note G>, v2n1=<music21.note.Note D>, v2n2=<music21.note.Note E> >,
-     <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note G> , v1n2=<music21.note.Note C>, v2n1=<music21.note.Note E>, v2n2=<music21.note.Note F> >]
+    [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note C>, v1n2=<music21.note.Note G>, v2n1=<music21.note.Note D>, v2n2=<music21.note.Note E> >,
+     <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note G>, v1n2=<music21.note.Note C>, v2n1=<music21.note.Note E>, v2n2=<music21.note.Note F> >]
     >>> len(theoryAnalysis.theoryAnalyzer.getVLQs(sc, 0, 1))
     2
     '''
     from music21.stream import timespans
-    tsCol = timespans.streamToTimespanCollection(score, flatten=True, classList=(note.Note, chord.Chord))
+    tsCol = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
     allVLQs = []
     defaultKey = None
     
@@ -934,8 +932,8 @@ def getParallelFifths(score, partNum1=None, partNum2 = None):
     >>> sc.insert(part0)
     >>> sc.insert(part1)
     >>> theoryAnalysis.theoryAnalyzer.getParallelFifths(sc)
-    [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note D> , v1n2=<music21.note.Note E>, v2n1=<music21.note.Note G>, v2n2=<music21.note.Note A>  >, 
-     <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note E> , v1n2=<music21.note.Note G>, v2n1=<music21.note.Note A>, v2n2=<music21.note.Note C>  >]
+    [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note D>, v1n2=<music21.note.Note E>, v2n1=<music21.note.Note G>, v2n2=<music21.note.Note A>  >, 
+     <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note E>, v1n2=<music21.note.Note G>, v2n1=<music21.note.Note A>, v2n2=<music21.note.Note C>  >]
     >>> len(sc.analysisData['ResultDict']['parallelFifths'])
     2
     '''
@@ -1004,7 +1002,7 @@ def getParallelOctaves(score, partNum1=None, partNum2=None):
     >>> sc.insert(part0)
     >>> sc.insert(part1)
     >>> theoryAnalysis.theoryAnalyzer.getParallelOctaves(sc)
-    [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note C> , v1n2=<music21.note.Note G>, v2n1=<music21.note.Note C>, v2n2=<music21.note.Note G>  >]
+    [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note C>, v1n2=<music21.note.Note G>, v2n1=<music21.note.Note C>, v2n2=<music21.note.Note G>  >]
     '''
     testFunction = lambda vlq: vlq.parallelOctave()
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey='parallelOctaves', testFunction=testFunction)
@@ -1704,8 +1702,6 @@ def identifyTonicAndDominantRomanNumerals(score, color = None, dictKey = 'romanN
     in the list. For example, if only roman numerals were to be written for the vertical slice at offset 0, 6, and 7
     in the piece, pass ``responseOffsetMap = [0,6,7]``
     
-    
-
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
     >>> p0measure1 = stream.Measure(number=1)
@@ -1789,8 +1785,6 @@ def identifyHarmonicIntervals(score, partNum1 = None, partNum2 = None, color = N
     
     :class:`~music21.theoryAnalysis.theoryAnalyzerIntervalTheoryResult` created with ``.value`` set to the string most commonly
     used to identify the interval (0 through 9, with A4 and d5)
-    
-    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -1835,8 +1829,6 @@ def identifyHarmonicIntervals(score, partNum1 = None, partNum2 = None, color = N
 def identifyScaleDegrees(score, partNum = None, color = None, dictKey = 'scaleDegrees'):
     '''
     identify all the scale degrees in the score in partNum, or if not specified ALL partNums
-    
-    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -2056,7 +2048,6 @@ def setKeyMeasureMap(score, keyMeasureMap):
     {1:'C', 2:'D', 3:'B-',5:'g'}. optionally pass in the music21 key object or the key string. This is used
     for analysis purposes only - no key object is actually added to the score.
     Check the music xml to verify measure numbers; pickup measures are usually 0.
-
     
     >>> from music21.theoryAnalysis import *
     >>> n1 = note.Note('c5')
@@ -2085,8 +2076,7 @@ def setKeyMeasureMap(score, keyMeasureMap):
 def getKeyAtMeasure(score, measureNumber):
     '''
     uses keyMeasureMap to return music21 key object. If keyMeasureMap not specified,
-    returns key analysis of theory score as a whole. 
-    
+    returns key analysis of theory score as a whole.  
     
     >>> from music21.theoryAnalysis import *
     >>> s = stream.Score()
@@ -2098,9 +2088,7 @@ def getKeyAtMeasure(score, measureNumber):
     >>> sc = corpus.parse('bach/bwv66.6')
     >>> theoryAnalysis.theoryAnalyzer.getKeyAtMeasure(sc, 5)
     <music21.key.Key of f# minor>
-    
     '''
-    
     keyMeasureMap = getKeyMeasureMap(score)
     if keyMeasureMap:
         for dictKey in sorted(list(keyMeasureMap.keys()), reverse=True):

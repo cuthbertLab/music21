@@ -94,6 +94,12 @@ class SiteRef(common.SlottedObject):
 
     def __init__(self):
         self.isDead = False
+        self.classString = None
+        self.globalSiteIndex = None
+        self.siteIndex = None
+        self.isDead = False
+        self.siteWeakref = None
+        self._offset = 0.0
     
     def _getAndUnwrapSite(self):
         # should set isDead?
@@ -542,8 +548,8 @@ class Sites(common.SlottedObject):
                     found.append(obj)
                     idFound.append(id(obj))
             elif isinstance(obj, className):
-                    found.append(obj)
-                    idFound.append(id(obj))
+                found.append(obj)
+                idFound.append(id(obj))
         for obj in objs:
             if obj is None:
                 continue # in case the reference is dead
@@ -674,8 +680,8 @@ class Sites(common.SlottedObject):
                     post = obj
                     break
             elif isinstance(obj, className):
-                    post = obj
-                    break
+                post = obj
+                break
         if post is not None:
             return post
 

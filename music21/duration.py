@@ -6,10 +6,9 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2014 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-from __future__ import print_function
 '''
 The duration module contains  :class:`~music21.duration.Duration` objects
 (among other objects and functions).  Duration objects are a fundamental
@@ -59,6 +58,8 @@ Example usage:
     2
 
 '''
+from __future__ import print_function
+
 import fractions
 import unittest
 import copy
@@ -71,7 +72,7 @@ from music21 import environment
 
 try:
     basestring
-except:
+except NameError:
     basestring = str # @ReservedAssignment
 
 
@@ -393,8 +394,10 @@ def quarterLengthToTuplet(qLen, maxToReturn=4):
                     break
         # not looking for these matches will add tuple alternative
         # representations; this could be useful
-            if len(post) >= maxToReturn: break
-        if len(post) >= maxToReturn: break
+            if len(post) >= maxToReturn: 
+                break
+        if len(post) >= maxToReturn: 
+            break
     return post
 
 def quarterLengthToDurations(qLen, link=True):
@@ -1161,7 +1164,7 @@ class Tuplet(object):
         return [self.numberNotesActual, self.durationActual]
 
     @tupletActual.setter
-    def tupletActual(self, tupList=[]):
+    def tupletActual(self, tupList=(3,2)):
         if self.frozen is True:
             raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
         self.numberNotesActual, self.durationActual = tupList
@@ -1175,7 +1178,7 @@ class Tuplet(object):
         return self.numberNotesNormal, self.durationNormal
 
     @tupletNormal.setter
-    def tupletNormal(self, tupList=[]):
+    def tupletNormal(self, tupList=(3,2)):
         if self.frozen is True:
             raise TupletException("A frozen tuplet (or one attached to a duration) is immutable")
         self.numberNotesNormal, self.durationNormal = tupList
@@ -2483,7 +2486,7 @@ class Duration(DurationCommon):
             self.quarterLength, qLenDiv)
         self._componentsNeedUpdating = False
 
-    def fill(self, quarterLengthList=['quarter', 'half', 'quarter']):
+    def fill(self, quarterLengthList=('quarter', 'half', 'quarter')):
         '''Utility method for testing; a quick way to fill components. This will
         remove any exisiting values.
         '''
@@ -2635,6 +2638,20 @@ class Duration(DurationCommon):
             self.components[sliceIndex: (sliceIndex + 1)] = [d1, d2]
             # lengths should be the same as it was before
             self.updateQuarterLength()
+
+    def currentComponents(self):
+        '''
+        Advanced Method:
+        
+        returns the current components WITHOUT running the component updater.
+        
+        Needed by some internal methods.
+        
+        >>> d = duration.Duration()
+        >>> d.currentComponents()
+        []
+        '''
+        return self._components
 
     def splitDotGroups(self):
         '''
@@ -2931,9 +2948,10 @@ class Duration(DurationCommon):
 #        for dur in self.components:
             #environLocal.printDebug(['dur in components', dur])
             # any one unlinked component means this is complex
-            if self._link is False:
-                return True
-        else: return False
+            #if self._link is False:
+            #    return True
+        else: 
+            return False
 
     @property
     def isLinked(self):
@@ -3221,12 +3239,18 @@ class GraceDuration(Duration):
 
     ### CLASS VARIABLES ###
 
+    _DOC_ATTR = {
+        'stealTimePrevious': 'Number from 0 to 1 or None (default) for the amount of time to steal from the previous note.',         
+        'stealTimeFollowing': 'Number from 0 to 1 or None (default) for the amount of time to steal from the following note.'         
+        }
+    
+
     isGrace = True
 
     __slots__ = (
         '_slash',
-        '_stealTimePrevious',
-        '_stealTimeFollowing',
+        'stealTimePrevious',
+        'stealTimeFollowing',
         '_makeTime',
         )
 
@@ -3240,6 +3264,9 @@ class GraceDuration(Duration):
             self._updateComponents()
         self.unlink()
         self.quarterLength = 0.0
+        
+        self._makeTime = None
+        self._slash = None
         self.slash = True # can be True, False, or None; make None go to True?
         # values are unit interval percentages
         self.stealTimePrevious = None
@@ -3279,31 +3306,6 @@ class GraceDuration(Duration):
         assert expr in (True, False, None)
         self._slash = bool(expr)
 
-    @property
-    def stealTimePrevious(self):
-        '''
-        Number from 0 to 1 or None (default) for the amount of time to steal from
-        the previous note.
-        '''
-        return self._stealTimePrevious
-
-    @stealTimePrevious.setter
-    def stealTimePrevious(self, expr):
-        self._stealTimePrevious = expr
-
-    @property
-    def stealTimeFollowing(self):
-        '''
-        Number from 0 to 1 or None (default) for the amount of time to steal from
-        the following note.
-        '''
-
-        return self._stealTimeFollowing
-
-    @stealTimeFollowing.setter
-    def stealTimeFollowing(self, expr):
-        self._stealTimeFollowing = expr
-
 
 class AppogiaturaDuration(GraceDuration):
 
@@ -3335,6 +3337,13 @@ class TupletFixer(object):
     '''
     def __init__(self, streamIn = None):
         self.streamIn = streamIn
+        
+        self.allTupletGroups = None
+        self.currentTupletNotes = None
+        self.currentTupletDefinition = None
+        self.totalTupletDuration = None
+        self.currentTupletDuration = None
+
         self._resetValues()
 
     def setStream(self, streamIn):

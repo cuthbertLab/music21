@@ -34,7 +34,7 @@ from music21.ext import six
 #python3
 try:
     basestring
-except:
+except NameError:
     basestring = str # @ReservedAssignment
 
 
@@ -82,7 +82,7 @@ musicOrdinals[8] = "Octave"
 musicOrdinals[15] = "Double-octave"
 musicOrdinals[22] = "Triple-octave"
 
-WHITESPACE = re.compile('\s+')
+WHITESPACE = re.compile(r'\s+')
 LINEFEED = re.compile('\n+')
 
 DEBUG_OFF = 0
@@ -932,7 +932,7 @@ def isNum(usrData):
         # TODO: this may have unexpected consequences: find
         dummy = usrData + 0
         return True
-    except:
+    except Exception: # pylint: disable=broad-except
         return False
 
 #     if (isinstance(usrData, int) or
@@ -1064,7 +1064,7 @@ def toUnicode(usrStr):
             return usrStr
     else:
         try:
-            usrStr = unicode(usrStr, 'utf-8')
+            usrStr = unicode(usrStr, 'utf-8') # pylint: disable=undefined-variable
         # some documentation may already be in unicode; if so, a TypeException will be raised
         except TypeError: #TypeError: decoding Unicode is not supported
             pass
@@ -1352,6 +1352,7 @@ def weightedSelection(values, weights, randomGenerator=None):
         q = random.random()
     # normalize weights w/n unit interval
     boundaries = unitBoundaryProportion(weights)
+    i = 0
     for i, (low, high) in enumerate(boundaries):
         if q >= low and q < high: # accepts both boundaries
             return values[i]
@@ -1626,7 +1627,7 @@ def ordinalAbbreviation(value, plural=False):
     if valueHundreths in [11, 12, 13]:
         post = 'th'
     else:
-        valueMod = value % 10;        
+        valueMod = value % 10
         if valueMod == 1:
             post = 'st'
         elif valueMod in [0, 4, 5, 6, 7, 8, 9]:
@@ -1785,7 +1786,7 @@ def strTrimFloat(floatNum, maxNum = 4):
     off = off[0:offLen]
     return off
 
-def dirPartitioned(obj, skipLeading=['__']):
+def dirPartitioned(obj, skipLeading=('__',)):
     '''Given an object, return three lists of names: methods, attributes, and properties.
 
     Note that if a name/attribute is dynamically created by a property it
@@ -1830,46 +1831,17 @@ def getSourceFilePath():
     Get the music21 directory that contains source files. This is not the same as the
     outermost package development directory.
     '''
-    import music21
-    fpMusic21 = music21.__path__[0] # list, get first item
+    import music21 # pylint: disable=redefined-outer-name
+    fpMusic21 = music21.__path__[0] # list, get first item 
     # use corpus as a test case
     if 'stream' not in os.listdir(fpMusic21):
         raise Exception('cannot find expected music21 directory: %s' % fpMusic21)
     return fpMusic21
 
 
-def getBuildDocRstFilePath():
-    '''
-    Return the directory that contains the documentation RST files.
-    '''
-    outer = os.path.dirname(getSourceFilePath())
-    post = os.path.join(outer, 'buildDoc', 'rst')
-    if os.path.exists(post):
-        return post
-    raise Exception('no such path exists: %s' % post)
-
-
-def getBuildDocFilePath():
-    '''Return the directory that contains the documentation RST files.
-    '''
-    outer = os.path.dirname(getSourceFilePath())
-    post = os.path.join(outer, 'buildDoc')
-    if os.path.exists(post):
-        return post
-    raise Exception('no such path exists: %s' % post)
-
-
-def getTestDocsFilePath():
-    '''Return the directory that contains the documentation RST files.
-    '''
-    post = os.path.join(getSourceFilePath(), 'test', 'testDocs')
-    if os.path.exists(post):
-        return post
-    raise Exception('no such path exists: %s' % post)
-
 
 def getMetadataCacheFilePath():
-    '''Get the stored music21 directory that contains the corpus metadata cache.
+    r'''Get the stored music21 directory that contains the corpus metadata cache.
 
     >>> fp = common.getMetadataCacheFilePath()
     >>> fp.endswith('corpus/metadataCache') or fp.endswith(r'corpus\metadataCache')
@@ -1879,8 +1851,7 @@ def getMetadataCacheFilePath():
 
 
 def getCorpusFilePath():
-    '''Get the stored music21 directory that contains the corpus metadata cache.
-
+    r'''Get the stored music21 directory that contains the corpus metadata cache.
 
     >>> fp = common.getCorpusFilePath()
     >>> fp.endswith('music21/corpus') or fp.endswith(r'music21\corpus')
@@ -1934,7 +1905,7 @@ def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
     If `packageOnly` is true, only directories with __init__.py files are colllected.
     '''
     if fpMusic21 == None:
-        import music21
+        import music21 # pylint: disable=redefined-outer-name
         fpMusic21 = music21.__path__[0] # list, get first item
 
     # a test if this is the correct directory
@@ -2005,6 +1976,7 @@ class defaultlist(list):
     True    
     '''
     def __init__(self, fx):
+        list.__init__(self)
         self._fx = fx
     def _fill(self, index):
         while len(self) <= index:
@@ -2018,14 +1990,14 @@ class defaultlist(list):
 
 
 #-----------------------------
-def pitchList(pitchList):
+def pitchList(pitchL):
     '''
     utility method that replicates the previous behavior of lists of pitches
 
 
 
     '''
-    return '[' + ', '.join([x.nameWithOctave for x in pitchList]) + ']'
+    return '[' + ', '.join([x.nameWithOctave for x in pitchL]) + ']'
 
 #-------------------------------------------------------------------------------
 def wrapWeakref(referent):
@@ -2098,7 +2070,7 @@ def findWeakRef(target):
     for attrName in dir(target):
         try:
             attr = getattr(target, attrName)
-        except:
+        except AttributeError:
             print('exception on attribute access: %s' % attrName)
         if isWeakref(attr):
             print('found weakref', attr, attrName, 'of target:', target)
@@ -2182,14 +2154,14 @@ def normalizeFilename(name):
         name = name[:lenName -4]
 
     if isinstance(name, str) and six.PY2:
-        name = unicode(name)
+        name = unicode(name) # pylint: disable=undefined-variable
 
     name = unicodedata.normalize('NFKD', name)
     if six.PY2:
         name = name.encode('ascii', 'ignore')
     else:
         name = name.encode('ascii', 'ignore').decode('UTF-8')
-    name = re.sub('[^\w-]', '_', name).strip()
+    name = re.sub(r'[^\w-]', '_', name).strip()
     if extension is not None:
         name += extension
     return name
@@ -2248,6 +2220,7 @@ def addDocAttrTestsToSuite(suite, moduleVariableLists, outerFilename=None, globs
     >>> t
     isRest ()
     '''
+    dtp = doctest.DocTestParser()
     if globs is False:
         globs = __import__('music21').__dict__.copy()
     for lvk in moduleVariableLists:
@@ -2259,7 +2232,7 @@ def addDocAttrTestsToSuite(suite, moduleVariableLists, outerFilename=None, globs
         for dockey in docattr:
             documentation = docattr[dockey]
             #print(documentation)
-            dt = doctest.DocTestParser().get_doctest(documentation, globs, dockey, outerFilename, 0)
+            dt = dtp.get_doctest(documentation, globs, dockey, outerFilename, 0)
             if len(dt.examples) == 0:
                 continue
             dtc = doctest.DocTestCase(dt, optionflags=optionflags)
@@ -2286,17 +2259,17 @@ def fixTestsForPy2and3(doctestSuite):
                     example.exc_msg = "..." + example.exc_msg[1:]
                 elif (example.want is not None and
                         example.want.startswith('u\'')):
-                            # probably a unicode example:
-                            # simplistic, since (u'hi', u'bye')
-                            # won't be caught, but saves a lot of anguish
-                        example.want = example.want[1:]
+                    # probably a unicode example:
+                    # simplistic, since (u'hi', u'bye')
+                    # won't be caught, but saves a lot of anguish
+                    example.want = example.want[1:]
             elif six.PY2:
                 if (example.want is not None and
                         example.want.startswith('b\'')):
-                            # probably a unicode example:
-                            # simplistic, since (b'hi', b'bye')
-                            # won't be caught, but saves a lot of anguish
-                        example.want = example.want[1:]
+                    # probably a unicode example:
+                    # simplistic, since (b'hi', b'bye')
+                    # won't be caught, but saves a lot of anguish
+                    example.want = example.want[1:]
 
 #-------------------------------------------------------------------------------
 _singletonCounter = {}
@@ -2319,7 +2292,8 @@ class SingletonCounter(object):
 #-------------------------------------------------------------------------------
 class SlottedObject(object):
     r'''
-    Provides template for classes implementing slots.
+    Provides template for classes implementing slots allowing it to be pickled
+    properly.
     '''
     
     ### CLASS VARIABLES ###
@@ -2472,12 +2446,11 @@ class TestMock(object):
             setattr(new, name, newValue)
         return new
 
-    def __copy__(self, memo=None):
+    def __copy__(self):
         self.environLocal.printDebug(['copy called'])
-        return copy.copy(self, memo)
+        return copy.copy(self)
 
     property1 = property(_get1, _set1)
-
     property2 = property(_get1, _set1)
 
 
@@ -2615,9 +2588,8 @@ if __name__ == "__main__":
 #        runner.run(s1)
 
     elif len(sys.argv) > 1:
-        t = Test()
-
-        t.testWeightedSelection()
+        testModule = Test()
+        testModule.testWeightedSelection()
 
 
 #------------------------------------------------------------------------------

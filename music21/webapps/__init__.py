@@ -1010,7 +1010,7 @@ class CommandProcessor(object):
                 "ho"    : "int"
             }
         '''
-        return_obj = {};
+        return_obj = {}
         return_obj['status'] = "success"
         return_obj['dataDict'] = {}
         return_obj['errorList'] = []
@@ -1027,10 +1027,10 @@ class CommandProcessor(object):
         
         for (dataName,fmt) in iterItems:
             if dataName not in self.parsedDataDict:
-                self.recordError("Data element "+dataName+" not defined at time of return");
+                self.recordError("Data element "+dataName+" not defined at time of return")
                 continue
             if fmt not in availableDataFormats:
-                self.recordError("Format "+fmt+" not available");
+                self.recordError("Format "+fmt+" not available")
                 continue
             
             data = self.parsedDataDict[dataName]

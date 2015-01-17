@@ -77,7 +77,7 @@ def slashToFraction(value):
     elif 'fast' in valueChars.lower():
         tempoIndication = 'fast'
 
-    matches = re.match("(\d+)\/(\d+)", valueNumbers)
+    matches = re.match(r"(\d+)\/(\d+)", valueNumbers)
     if matches is not None:
         n = int(matches.group(1))
         d = int(matches.group(2))
@@ -513,6 +513,7 @@ class MeterTerminal(SlottedObject):
         self._duration = None
         self._numerator = 0
         self._denominator = 1
+        self._weight = None
         self._overriddenDuration = None
 
         if slashNotation is not None:
@@ -602,7 +603,8 @@ class MeterTerminal(SlottedObject):
         >>> a.ratioEqual(d)
         True
         '''
-        if other is None: return False
+        if other is None: 
+            return False
         if (other.numerator == self.numerator and
             other.denominator == self.denominator):
             return True
@@ -2352,6 +2354,7 @@ class MeterSequence(MeterTerminal):
 
         qPos = 0
         match = []
+        i = None
         for i in range(len(self)):
             start = qPos
             end = qPos + self[i].duration.quarterLength
@@ -2366,7 +2369,7 @@ class MeterSequence(MeterTerminal):
                     break
             qPos += self[i].duration.quarterLength
 
-        if isinstance(self[i], MeterSequence): # recurse
+        if i is not None and isinstance(self[i], MeterSequence): # recurse
             # qLenPositin needs to be relative to this subidivison
             # start is our current position that this subdivision
             # starts at
@@ -2728,6 +2731,15 @@ class TimeSignature(base.Music21Object):
 
     def __init__(self, value='4/4', partitionRequest=None):
         base.Music21Object.__init__(self)
+        self._overriddenBarDuration = None
+        self.symbol = None
+        self.displaySequence = None
+        self.beatSequence = None
+        self.accentSequence = None
+        self.beamSequence = None
+        self.symbolizeDenominator = False
+        self.summedNumerator = False
+
         self.resetValues(value, partitionRequest)
 
     def resetValues(self, value='4/4', partitionRequest=None):
@@ -2791,7 +2803,8 @@ class TimeSignature(base.Music21Object):
     def ratioEqual(self, other):
         '''A basic form of comparison; does not determine if any internatl structures are equal; only outermost ratio.
         '''
-        if other is None: return False
+        if other is None: 
+            return False
         if (other.numerator == self.numerator and
             other.denominator == self.denominator):
             return True
@@ -3000,7 +3013,6 @@ class TimeSignature(base.Music21Object):
                 self._setDefaultAccentWeights(3) # set partitions based on beat
             except MeterException:
                 environLocal.printDebug(['cannot set default accents for:', self])
-                pass
 
     def loadRatio(self, numerator, denominator, partitionRequest=None):
         '''
@@ -3315,7 +3327,6 @@ class TimeSignature(base.Music21Object):
         >>> ts.beatDivisionCount
         Traceback (most recent call last):
         TimeSignatureException: cannot determine beat backgrond when each beat is not partitioned
-
         ''')
 
     def _getBeatDivisionCountName(self):
@@ -3613,17 +3624,17 @@ class TimeSignature(base.Music21Object):
                 # last beams was active, last beamNumber was active,
                 # and it was stopped or was a partial-left
                 elif (beamPrevious is not None and
-                    beamNumber in beamPrevious.getNumbers() and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left'] and
-                    beamNext is not None):
-                        beamType = 'start'
+                      beamNumber in beamPrevious.getNumbers() and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left'] and
+                      beamNext is not None):
+                    beamType = 'start'
 
 
                 # last note had beams but stopped, next note cannot be beamed to  was active, last beamNumber was active,
                 # and it was stopped or was a partial-left
                 elif (beamPrevious is not None and
-                    beamNumber in beamPrevious.getNumbers() and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left'] and
-                    beamNext is None):
-                        beamType = 'partial-left'  # will be deleted later in the script
+                      beamNumber in beamPrevious.getNumbers() and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left'] and
+                      beamNext is None):
+                    beamType = 'partial-left'  # will be deleted later in the script
 
 
 
@@ -4166,7 +4177,6 @@ class TestExternal(unittest.TestCase):
         a.show()
 
     def testBasic(self):
-        import music21
         from music21 import stream
         a = stream.Stream()
         for meterStrDenominator in [1,2,4,8,16,32]:
@@ -4179,7 +4189,6 @@ class TestExternal(unittest.TestCase):
         a.show()
 
     def testCompound(self):
-        import music21
         from music21 import stream
         import random
 
@@ -4192,16 +4201,15 @@ class TestExternal(unittest.TestCase):
             for j in range(1, random.choice([2,4])):
                 msg.append('%s/%s' % (random.choice(meterStrNumerator),
                                       random.choice(meterStrDenominator)))
-            ts = music21.meter.TimeSignature('+'.join(msg))
+            ts = TimeSignature('+'.join(msg))
             m = stream.Measure()
             m.timeSignature = ts
             a.insert(m.timeSignature.barDuration.quarterLength, m)
         a.show()
 
     def testMeterBeam(self):
-        import music21
         from music21 import stream, note
-        ts = music21.meter.TimeSignature('6/8', 2)
+        ts = TimeSignature('6/8', 2)
         b = [duration.Duration('16th')] * 12
         s = stream.Stream()
         s.insert(0, ts)
@@ -4265,8 +4273,6 @@ class Test(unittest.TestCase):
         self.assertNotEqual(c, d)
 
     def testGetBeams(self):
-        from music21 import duration
-
         a = TimeSignature('6/8')
         b = ([duration.Duration('16th')] * 4  +
              [duration.Duration('eighth')] * 1) * 2

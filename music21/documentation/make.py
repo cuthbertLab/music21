@@ -5,8 +5,9 @@
 # Purpose:      music21 documentation script, v. 2.0
 #
 # Authors:      Josiah Wolf Oberholtzer
+#               Christopher Ariza
 #
-# Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 

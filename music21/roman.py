@@ -36,8 +36,8 @@ environLocal = environment.Environment(_MOD)
 #------------------------------------------------------------------------------
 
 
-SHORTHAND_RE = re.compile('#*-*b*o*[1-9xyz]')
-ENDWITHFLAT_RE = re.compile('[b\-]$')
+SHORTHAND_RE = re.compile(r'#*-*b*o*[1-9xyz]')
+ENDWITHFLAT_RE = re.compile(r'[b\-]$')
 
 # cache all Key/Scale objects created or passed in; re-use
 # permits using internally scored pitch segments
@@ -1107,13 +1107,13 @@ class RomanNumeral(harmony.Harmony):
 
     '''
 
-    _alterationRegex = re.compile('^(b+|\-+|\#+)')
-    _omittedStepsRegex = re.compile('(\[(no[1-9])+\]\s*)+')
-    _bracketedAlterationRegex =  re.compile('\[(b+|\-+|\#+)(\d+)\]')
-    _augmentedSixthRegex = re.compile('(It|Ger|Fr|Sw)')
+    _alterationRegex = re.compile(r'^(b+|\-+|\#+)')
+    _omittedStepsRegex = re.compile(r'(\[(no[1-9])+\]\s*)+')
+    _bracketedAlterationRegex =  re.compile(r'\[(b+|\-+|\#+)(\d+)\]')
+    _augmentedSixthRegex = re.compile(r'(It|Ger|Fr|Sw)')
     _romanNumeralAloneRegex = \
-        re.compile('(IV|I{1,3}|VI{0,2}|iv|i{1,3}|vi{0,2}|N)')
-    _secondarySlashRegex = re.compile('(.*?)\/([\#a-np-zA-NP-Z].*)')
+        re.compile(r'(IV|I{1,3}|VI{0,2}|iv|i{1,3}|vi{0,2}|N)')
+    _secondarySlashRegex = re.compile(r'(.*?)\/([\#a-np-zA-NP-Z].*)')
 
     _DOC_ATTR = {
         'scaleCardinality': '''
@@ -1150,6 +1150,9 @@ class RomanNumeral(harmony.Harmony):
         self._figure = figure
         # This is set when _setKeyOrScale() is called:
         self._scale = None
+        self.scaleDegree = None
+        self.frontAlterationAccidental = None
+        self.impliedQuality = None
         self.impliedScale = None
         self.useImpliedScale = False
         self.bracketedAlterations = None
