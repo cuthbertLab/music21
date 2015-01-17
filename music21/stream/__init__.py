@@ -292,11 +292,6 @@ class Stream(base.Music21Object):
         # self._endElements stores Music21Objects found at
         # the highestTime of this Stream.
         self._endElements = []
-
-        # store a derivation object to track derivations from other Streams
-        # pass a reference to this object
-        self._derivation = None
-
         self._unlinkedDuration = None
 
         self.isSorted = True
@@ -727,15 +722,6 @@ class Stream(base.Music21Object):
 
         #s._elementsChanged()
         return s
-
-    @property
-    def derivation(self):
-        '''
-        Return the Derivation object for this stream.
-        '''
-        if self._derivation is None:
-            self._derivation = derivation.Derivation(client=self)
-        return self._derivation
 
     def hasElement(self, obj):
         '''
@@ -1256,9 +1242,13 @@ class Stream(base.Music21Object):
             #    environLocal.warn('%r, %r, %s' % (old, new, name))
             if name.startswith('__'):
                 continue
-            if name in ('activeSite', 'sites',
+            if name in ('_activeSite', 'sites', # handled above
                         '_offsetMapDict', '_derivation', 'streamStatus', 
-                        '_elements', '_endElements'):
+                        '_elements', '_endElements',
+                        
+                        '_cache', # skip
+                        'analysisData', # skip and remove soon...
+                        ):
                 continue
             
             attrValue = getattr(self, name)
@@ -1287,8 +1277,6 @@ class Stream(base.Music21Object):
         # after performing deepcopying, .sites may contain sites
         # that the copied obj does not belong to
 
-        # do after all other copying
-        new._idLastDeepCopyOf = id(self)
         # TODO: instead of purging, have old sites become new contexts
         # have a separate option to purge contexts
 
@@ -1298,6 +1286,8 @@ class Stream(base.Music21Object):
         # it is likely that this only needs to be done at the highest
         # level of recursion, not on component Streams
         #spannerBundle = spanner.SpannerBundle(new.flat.spanners)
+        if new.id == '1':
+            pass
         spannerBundle = new.spannerBundle
         # only proceed if there are spanners, otherwise creating semiFlat
         if len(spannerBundle) > 0:
@@ -1312,7 +1302,9 @@ class Stream(base.Music21Object):
                     #environLocal.printDebug(['Stream.__deepcopy__', 'replacing component to', e])
                     # this will clear and replace the proper locations on
                     # the SpannerStorage Stream
-                    spannerBundle.replaceSpannedElement(e._idLastDeepCopyOf, e)
+                    origin = e.derivation.origin
+                    if (origin is not None and e.derivation.method == '__deepcopy__'):
+                        spannerBundle.replaceSpannedElement(id(origin), e)
                     # need to remove the old SpannerStorage Stream from this element; 
                     # however, all we have here is the new Spanner and new elements
                     # this must be done here, not when originally copying
@@ -1340,9 +1332,10 @@ class Stream(base.Music21Object):
 #                     # will scan each known variant over all elements
 #                     # this possible by optimized by selecting just a relevent
 #                     # time region
-#                     variantBundle.replaceElement(e._idLastDeepCopyOf, e)
+#                    origin = e.derivation.origin
+#                    if (origin is not None and e.derivation.method == '__deepcopy__'):
+#                        variantBundle.replaceSpannedElement(id(origin), e)
 #
-
         return new
 
     #---------------------------------------------------------------------------
@@ -3468,7 +3461,7 @@ class Stream(base.Music21Object):
         returnObj.derivation.client = returnObj
         returnObj.derivation.origin = self
         returnObj.derivation.method = 'measures'
-        returnObj.mergeAttributes(self) # get id and groups
+        returnObj.mergeAttributes(self) # get groups, optional id
         srcObj = self
 
         # create a dictionary of measure number: list of Meaures
@@ -6002,8 +5995,9 @@ class Stream(base.Music21Object):
         # assume this is sorted
         # need to just get .notesAndRests, as there may be other objects in the Measure
         # that come before the first Note, such as a SystemLayout object
-        notes = returnObj.flat.notesAndRests
-
+        f = returnObj.flat
+        notes = f.notesAndRests
+        
         posConnected = [] # temporary storage for index of tied notes
         posDelete = [] # store deletions to be processed later
 
@@ -6448,48 +6442,10 @@ class Stream(base.Music21Object):
         return sNew
 
 
-    def _getFlatFromSemiFlat(self):
-        '''
-        If the semiflat form is available, derive flat from semiflat.
-        
-        Makes it faster to create both.
-        '''
-        # this must not be None!
-        if 'semiFlat' in self._cache:
-            sf = self._cache['semiFlat']
-        else:
-            raise StreamException('_getFlatFromSemiFlat can only be called if ._cache["semiFlat"] has been created from a previous .semiFlat call')
-        sNew = copy.copy(sf)
-        sNew._derivation = derivation.Derivation(sNew)
-        # unwrapping a weak ref here
-        sNew.derivation.origin = sf._derivation.origin
-        sNew.derivation.method = 'flat'
-        # create a new, independent cache instance in the flat representation
-        sNew._cache = {}
-        sNew._elements = []
-        sNew._endElements = []
-        sNew._elementsChanged() # clear caches
-        for e in self._elements:
-            # if this element is a Stream, recurse
-            #if hasattr(e, "elements"):
-            if e.isStream:
-                continue
-            sNew._insertCore(e.getOffsetBySite(self), e)
-        # endElements should never be Streams
-        for e in self._endElements:
-            #sNew.storeAtEnd(e)
-            sNew._storeAtEndCore(e)
-        sNew._elementsChanged()
-        sNew.isFlat = True
-        return sNew
-
     def _getFlat(self):
         if 'flat' not in self._cache or self._cache['flat'] is None:
-            if 'semiFlat' in self._cache and self._cache['semiFlat'] is not None:
-                self._cache['flat'] = self._getFlatFromSemiFlat()
-            else:
-                self._cache['flat'] = self._getFlatOrSemiFlat(
-                                      retainContainers=False)
+            self._cache['flat'] = self._getFlatOrSemiFlat(
+                                  retainContainers=False)
         return self._cache['flat']
 
         # non cached approach
@@ -6770,13 +6726,43 @@ class Stream(base.Music21Object):
                         yield e
 
 
-    def _yieldElementsUpward(self, memo=None, streamsOnly=False,
+    def _yieldReverseUpwardsSearch(self, memo=None, streamsOnly=False,
                              skipDuplicates=True, classFilter=()):
         '''
-        Yield all containers (Stream subclasses), including self, and going upward.
+        Yield all containers (Stream subclasses), including self, and going upward
+        and outward.
+        
+        NOT CURRENTLY USED.
 
         Note: on first call, a new, fresh memo list must be provided; 
         otherwise, values are retained from one call to the next.
+        
+        >>> b = corpus.parse('bwv66.6')
+        >>> nMid = b[2][4][2]
+        >>> nMid
+        <music21.note.Note G#>
+        >>> nMidMeasure = b[2][4]
+        >>> nMidMeasure
+        <music21.stream.Measure 3 offset=9.0>
+        >>> list(nMidMeasure._yieldReverseUpwardsSearch())
+        [<music21.stream.Measure 3 offset=9.0>, 
+         <music21.instrument.Instrument P2: Alto: Instrument 2>, 
+         <music21.stream.Part Alto>, 
+         <music21.metadata.Metadata object at 0x...>, 
+         <music21.stream.Part Soprano>, 
+         <music21.stream.Score ...>, 
+         <music21.stream.Part Tenor>, 
+         <music21.stream.Part Bass>, 
+         <music21.layout.StaffGroup <music21.stream.Part Soprano><music21.stream.Part Alto><music21.stream.Part Tenor><music21.stream.Part Bass>>, 
+         <music21.stream.Measure 0 offset=0.0>, 
+         <music21.stream.Measure 1 offset=1.0>, 
+         <music21.stream.Measure 2 offset=5.0>, 
+         <music21.stream.Measure 4 offset=13.0>, 
+         <music21.stream.Measure 5 offset=17.0>, 
+         <music21.stream.Measure 6 offset=21.0>, 
+         <music21.stream.Measure 7 offset=25.0>, 
+         <music21.stream.Measure 8 offset=29.0>, 
+         <music21.stream.Measure 9 offset=33.0>]
         '''
         # TODO: add support for filter list
         # TODO: add add end elements
@@ -6822,7 +6808,7 @@ class Stream(base.Music21Object):
                     # this returns a generator, so need to iterate over it
                     # to get results
                     # e.activeSite will be yielded at top of recurse
-                    for y in e.activeSite._yieldElementsUpward(memo,
+                    for y in e.activeSite._yieldReverseUpwardsSearch(memo,
                             skipDuplicates=skipDuplicates,
                             streamsOnly=streamsOnly, classFilter=classFilter):
                         yield y
@@ -6837,7 +6823,7 @@ class Stream(base.Music21Object):
 
     # possible rename recurseList
     def recurse(self, streamsOnly=False,
-        restoreActiveSites=True, skipDuplicates=True, classFilter=(), direction='downward'):
+        restoreActiveSites=True, skipDuplicates=True, classFilter=()):
         '''
         Iterate over a list of all Music21Objects contained in the Stream,
         starting with self, continuing with self's elements,
@@ -6845,18 +6831,10 @@ class Stream(base.Music21Object):
 
         TODO: WRITE DOCS AND TESTS ETC.!!!!
         '''
-        if direction in ['downward']:
-            return [e for e in
-                self._yieldElementsDownward(streamsOnly=streamsOnly,
-                restoreActiveSites=restoreActiveSites,
-                classFilter=classFilter)]
-#        elif direction in ['upward']:
-#            return [e for e in
-#                self._yieldElementsUpward([], streamsOnly=streamsOnly,
-#                skipDuplicates=skipDuplicates,
-#                classFilter=classFilter)]
-        else:
-            raise StreamException('no such direction: %s (upward removed in v.1.8 -- use ._yieldElementsUpward())' % direction)
+        return [e for e in
+            self._yieldElementsDownward(streamsOnly=streamsOnly,
+            restoreActiveSites=restoreActiveSites,
+            classFilter=classFilter)]
 
     def restoreActiveSites(self):
         '''
@@ -7952,7 +7930,9 @@ class Stream(base.Music21Object):
             for e in post.semiFlat:
                 # update based on last id, new object
                 if e.sites.hasSpannerSite():
-                    spannerBundle.replaceSpannedElement(e._idLastDeepCopyOf, e)
+                    origin = e.derivation.origin
+                    if (origin is not None and e.derivation.method == '__deepcopy__'):
+                        spannerBundle.replaceSpannedElement(id(origin), e)
 
         return post
 
@@ -9618,7 +9598,7 @@ class Stream(base.Music21Object):
             for m in self.getElementsByClass('Measure'):
                 if m.hasVoices():
                     mActive = Measure()
-                    mActive.mergeAttributes(m)
+                    mActive.mergeAttributes(m) # get groups, optional id
                     # merge everything except Voices; this will get
                     # clefs
                     mActive.mergeElements(m, classFilterList=('Bar', 'TimeSignature', 'Clef', 'KeySignature'))
@@ -9633,7 +9613,7 @@ class Stream(base.Music21Object):
                 # with elements and append
                 else:
                     mNew = Measure()
-                    mNew.mergeAttributes(m)
+                    mNew.mergeAttributes(m) # get groups, optional id
                     # get all elements
                     mNew.mergeElements(m)
                     # always place in top-part
@@ -11778,7 +11758,7 @@ class Score(Stream):
         3
         '''
         post = Score()
-        # this calls on Music21Object, transfers id, groups
+        # this calls on Music21Object, transfers groups, id if not id(self)
         post.mergeAttributes(self)
         # note that this will strip all objects that are not Parts
         for p in self.parts:
@@ -11869,7 +11849,9 @@ class Score(Stream):
         for e in post.semiFlat:
             # update based on last id, new object
             if e.sites.hasSpannerSite():
-                spannerBundle.replaceSpannedElement(e._idLastDeepCopyOf, e)
+                origin = e.derivation.origin
+                if (origin is not None and e.derivation.method == '__deepcopy__'):
+                    spannerBundle.replaceSpannedElement(id(origin), e)
         return post
 
 

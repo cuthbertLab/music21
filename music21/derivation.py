@@ -158,21 +158,30 @@ class Derivation(SlottedObject):
             self._clientId = id(client)
             self._client = common.wrapWeakref(client)
 
-    @property
-    def derivationChain(self):
+    def chain(self):
         '''
-        Return a list Streams that this Derivation's client Stream was derived
+        Iterator.
+        
+        Returns Streams that this Derivation's client Stream was derived
         from. This provides a way to obtain all Streams that the client passed
         through, such as those created by
         :meth:`~music21.stream.Stream.getElementsByClass` or
         :attr:`~music21.stream.Stream.flat`.
 
         >>> s1 = stream.Stream()
+        >>> s1.id = 's1'
         >>> s1.repeatAppend(note.Note(), 10)
         >>> s1.repeatAppend(note.Rest(), 10)
         >>> s2 = s1.getElementsByClass('GeneralNote')
+        >>> s2.id = 's2'
         >>> s3 = s2.getElementsByClass('Note')
-        >>> s3.derivation.derivationChain == [s2, s1]
+        >>> s3.id = 's3'
+        >>> for y in s3.derivation.chain():
+        ...     print(y)
+        <music21.stream.Stream s2>
+        <music21.stream.Stream s1>
+        
+        >>> list(s3.derivation.chain()) == [s2, s1]
         True
         '''
         result = []
@@ -255,9 +264,9 @@ class Derivation(SlottedObject):
         >>> s3.derivation.rootDerivation is s1
         True
         '''
-        chain = self.derivationChain
-        if len(chain):
-            return chain[-1]
+        derivationChain = self.chain()
+        if len(derivationChain):
+            return derivationChain[-1]
         else:
             return None
 

@@ -2771,13 +2771,13 @@ def separateOutPartStaffs(mxPart, streamPart, spannerBundle, s, staffReferenceLi
                 m = mStream[i]
                 for eRemove in staffExclude:
                     for eMeasure in m:
-                        if eMeasure._idLastDeepCopyOf == id(eRemove):
+                        if eMeasure.derivation.origin is eRemove and eMeasure.derivation.method == '__deepcopy__':
                             m.remove(eMeasure)
                             break
                     for v in m.voices:
                         v.remove(eRemove)
                         for eVoice in v.elements:
-                            if eVoice._idLastDeepCopyOf == id(eRemove):
+                            if eVoice.derivation.origin is eRemove and eVoice.derivation.method == '__deepcopy__':
                                 v.remove(eVoice)
             # after adjusting voices see if voices can be reduced or
             # removed

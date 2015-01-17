@@ -83,6 +83,7 @@ from music21.sites import SitesException
 
 from music21 import sites
 from music21 import common
+from music21 import derivation
 from music21 import environment
 
 from music21.common import opFrac
@@ -339,6 +340,9 @@ class Music21Object(object):
         self._activeSiteId = None
         # if this element has been copied, store the id() of the last source
         self._idLastDeepCopyOf = None
+        # store a derivation object to track derivations from other Streams
+        # pass a reference to this object
+        self._derivation = None
 
         # store classes once when called
         self._classes = None
@@ -390,9 +394,9 @@ class Music21Object(object):
         'music21Object1'
         >>> "group1" in m2.groups
         True
-
         '''
-        self.id = other.id
+        if other.id != id(other.id):
+            self.id = other.id
         self.groups = copy.deepcopy(other.groups)
 
     def __deepcopy__(self, memo=None):
@@ -435,8 +439,18 @@ class Music21Object(object):
         new = self.__class__()
         #environLocal.printDebug(['Music21Object.__deepcopy__', self, id(self)])
         #for name in dir(self):
+        if '_derivation' in self.__dict__:
+            # was: keep the old ancestor but need to update the client
+            # 2.1 : NO, add a derivation of __deepcopy__ to the client
+            newDerivation = derivation.Derivation(client=new)
+            newDerivation.origin = self
+            newDerivation.method = '__deepcopy__'
+            setattr(new, '_derivation', newDerivation)
+
         for name in self.__dict__:
             if name.startswith('__'):
+                continue
+            if name in ('_derivation'):
                 continue
 
             value = getattr(self, name)
@@ -599,6 +613,36 @@ class Music21Object(object):
         ''')
 
 
+    def _getDerivation(self):
+        '''
+        Return the :class:`~music21.derivation.Derivation` object for this element.
+        
+        Or create one if none exists:
+        
+        >>> n = note.Note()
+        >>> n.derivation
+        <Derivation of <music21.note.Note C> from None via "None">
+        >>> import copy
+        >>> n2 = copy.deepcopy(n)
+        >>> n2.pitch.step = 'D' # for seeing easier...
+        >>> n2.derivation
+        <Derivation of <music21.note.Note D> from <music21.note.Note C> via "__deepcopy__">
+        >>> n2.derivation.origin is n
+        True
+        
+        Note that (for now at least) derivation.origin is NOT a weakref:
+        
+        >>> del n
+        >>> n2.derivation
+        <Derivation of <music21.note.Note D> from <music21.note.Note C> via "__deepcopy__">
+        >>> n2.derivation.origin
+        <music21.note.Note C>
+        '''
+        if self._derivation is None:
+            self._derivation = derivation.Derivation(client=self)
+        return self._derivation
+
+    derivation = property(_getDerivation)
     #--------------------------------------------------------------------------
     # look at this object for an atttribute; if not here
     # look up to activeSite
@@ -701,21 +745,21 @@ class Music21Object(object):
             
             if site is not None:
                 a = None
-                trySite = self
+                tryOrigin = self
                 originMemo = set()
                 i = 0
                 maxSearch = 100
                 while a is None:
                     try:
-                        a = site.getOffsetFromMap(trySite)
+                        a = site.getOffsetFromMap(tryOrigin)
                     except Music21Exception as e: # currently StreamException, but will change
-                        trySite = self.derivation.origin
-                        if id(trySite) in originMemo:
+                        tryOrigin = self.derivation.origin
+                        if id(tryOrigin) in originMemo:
                             raise(e)
                         else:
-                            originMemo.add(id(trySite))
+                            originMemo.add(id(tryOrigin))
                         i += 1
-                        if trySite is None or i > maxSearch:
+                        if tryOrigin is None or i > maxSearch:
                             raise(e)
                 if returnType=='float':
                     a = float(a)
@@ -1133,16 +1177,10 @@ class Music21Object(object):
 #         '''
 #         self.sites.removeNonContainedLocations()
 
-    def getContextByClass(
-        self,
-        className,
-        callerFirst=None,
-        getElementMethod='getElementAtOrBefore',
-        memo=None,
-        prioritizeActiveSite=True,
-        serialReverseSearch=True,
-        sortByCreationTime=False,
-        ):
+    def getContextByClass(self, className,
+        callerFirst=None, getElementMethod='getElementAtOrBefore',
+        memo=None, prioritizeActiveSite=True, serialReverseSearch=True,
+        sortByCreationTime=False):
         '''
         A very powerful method in music21 of fundamental importance: Returns
         the element matching the className that is closest to this element in
@@ -1269,13 +1307,9 @@ class Music21Object(object):
         if not common.isListLike(className):
             className = (className,)
 
-        for searchPlace in self.yieldSiteSearchOrder(
-            sortByCreationTime=sortByCreationTime):
-            site = searchPlace[0]
+        for site, offsetStart, searchType in self.contextSites(sortByCreationTime=sortByCreationTime):
             if site.isClassOrSubclass(className):
                 return site
-            offsetStart = searchPlace[1]
-            searchType = searchPlace[2]
             if searchType == 'elementsOnly' or searchType == 'elementsFirst':
                 tsNotFlat = site.asTimespans(classList=className, recurse=False)
                 el = findElInTimespanTreeNoRecurse(tsNotFlat, offsetStart)
@@ -1481,12 +1515,14 @@ class Music21Object(object):
     def next(self, classFilterList=None, flattenLocalSites=False,
         beginNearest=True):
         '''
-        Get the next element found in a the activeSite (or other Sites)
+        Get the next element found in the activeSite (or other Sites)
         of this Music21Object.
 
         The `classFilterList` can be used to specify one or more classes to match.
 
-        The `flattenLocalSites` parameter determines if the sites of this element (e.g., a Measure's Part) are flattened on first search. When True, elements contained in adjacent containers may be selected first.
+        The `flattenLocalSites` parameter determines if the sites of this element 
+        (e.g., a Measure's Part) are flattened on first search. 
+        When True, elements contained in adjacent containers may be selected first.
 
 
         >>> s = corpus.parse('bwv66.6')
@@ -1506,17 +1542,20 @@ class Music21Object(object):
 
         The `classFilterList` can be used to specify one or more classes to match.
 
-        The `flattenLocalSites` parameter determines if the sites of this element (e.g., a Measure's Part) are flattened on first search. When True, elements contained in adjacent containers may be selected first.
-
+        The `flattenLocalSites` parameter determines if the sites of this element 
+        (e.g., a Measure's Part) are flattened on first search. When True, elements 
+        contained in adjacent containers may be selected first.
 
         >>> s = corpus.parse('bwv66.6')
-        >>> s.parts[0].measure(3).previous() == s.parts[0].measure(2)
+        >>> m2 = s.parts[0].measure(2)
+        >>> m3 = s.parts[0].measure(3)
+        >>> m3.previous() is m2
         True
-        >>> s.parts[0].measure(3).previous('Note', flattenLocalSites=True) == s.parts[0].measure(2).notes[-1]
+        >>> m3.previous('Note', flattenLocalSites=True) is m2.notes[-1]
         True
         '''
         return self._adjacencySearch(classFilterList=classFilterList,
-                                    ascend=False, beginNearest=beginNearest, flattenLocalSites=flattenLocalSites)
+                    ascend=False, beginNearest=beginNearest, flattenLocalSites=flattenLocalSites)
 
     #--------------------------------------------------------------------------
     # properties
@@ -1899,15 +1938,24 @@ class Music21Object(object):
 
         return _SortTuple(atEnd, offset, self.priority, self.classSortOrder, isNotGrace, insertIndex)
 
-    def yieldSiteSearchOrder(self, callerFirst=None, memo=None, 
-                             offsetAppend=0.0, sortByCreationTime=False, priorityTarget=None):
+    def contextSites(self, callerFirst=None, memo=None, 
+                     offsetAppend=0.0, sortByCreationTime=False, priorityTarget=None):
         '''
+        A generator that returns a list of tuples of sites to search for a context...
+        
+        Each tuple contains a Stream object, the offset of this element in that Stream, and
+        the method of searching that should be applied to search for a context.  These methods are:
+
+            * 'flatten' -- flatten the stream and then look from this offset backwards.
+            * 'elementsOnly' -- only search the stream's personal elements from this offset backwards
+            * 'elementsFirst' -- search this stream backwards, and then flatten and search backwards
+            
         >>> c = corpus.parse('bwv66.6')
         >>> c.id = 'bach'
         >>> n = c[2][4][2]
         >>> n
         <music21.note.Note G#>
-        >>> for y in n.yieldSiteSearchOrder():
+        >>> for y in n.contextSites():
         ...      print(y)
         (<music21.stream.Measure 3 offset=9.0>, 0.5, 'elementsFirst')
         (<music21.stream.Part Alto>, 9.5, 'flatten')
@@ -1915,7 +1963,7 @@ class Music21Object(object):
         >>> m = c[2][4]
         >>> m
         <music21.stream.Measure 3 offset=9.0>
-        >>> for y in m.yieldSiteSearchOrder():
+        >>> for y in m.contextSites():
         ...      print(y)
         (<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')
         (<music21.stream.Part Alto>, 9.0, 'flatten')
@@ -1924,14 +1972,14 @@ class Music21Object(object):
         >>> import copy
         >>> m2 = copy.deepcopy(m)
         >>> m2.number = 3333
-        >>> for y in m2.yieldSiteSearchOrder():
+        >>> for y in m2.contextSites():
         ...      print(y)
         (<music21.stream.Measure 3333 offset=9.0>, 0.0, 'elementsFirst')
         (<music21.stream.Part Alto>, 9.0, 'flatten')
         (<music21.stream.Score bach>, 9.0, 'elementsOnly')
 
         >>> m3 = c.parts[1].measure(3)
-        >>> for y in m3.yieldSiteSearchOrder():
+        >>> for y in m3.contextSites():
         ...      print(y)
         (<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')
         (<music21.stream.Part Alto>, 9.0, 'flatten')
@@ -1949,7 +1997,7 @@ class Music21Object(object):
         >>> n = note.Note()
         >>> m1.append(n)
         >>> p1.append(m1)
-        >>> for y in n.yieldSiteSearchOrder():
+        >>> for y in n.contextSites():
         ...     print(y[0])
         <music21.stream.Measure 1 offset=0.0>
         <music21.stream.Part p1>
@@ -1964,7 +2012,7 @@ class Music21Object(object):
 
         Now the keys could appear in any order!  To fix set priorityTarget to activeSite
 
-        >>> for y in n.yieldSiteSearchOrder(priorityTarget=n.activeSite):
+        >>> for y in n.contextSites(priorityTarget=n.activeSite):
         ...     print(y[0])
         <music21.stream.Measure 2 offset=0.0>
         <music21.stream.Part p2>
@@ -1975,7 +2023,7 @@ class Music21Object(object):
         Or sort by creationTime...
 
 
-        >>> for y in n.yieldSiteSearchOrder(sortByCreationTime = True):
+        >>> for y in n.contextSites(sortByCreationTime = True):
         ...     print(y[0])
         <music21.stream.Measure 2 offset=0.0>
         <music21.stream.Part p2>
@@ -1984,7 +2032,7 @@ class Music21Object(object):
 
         oldest first...
 
-        >>> for y in n.yieldSiteSearchOrder(sortByCreationTime = 'reverse'):
+        >>> for y in n.contextSites(sortByCreationTime = 'reverse'):
         ...     print(y[0])
         <music21.stream.Measure 1 offset=0.0>
         <music21.stream.Part p1>
@@ -2019,16 +2067,27 @@ class Music21Object(object):
         for siteObj in allSites:
             if 'SpannerStorage' in siteObj.classes:
                 continue
-            offsetInStream = self.getOffsetBySite(siteObj) + offsetAppend
-            getType = recurseTypeFromStream(siteObj)
-            yield (siteObj, offsetInStream, getType)
-            for x in siteObj.yieldSiteSearchOrder(callerFirst=callerFirst,
+            try:
+                offsetInStream = self.getOffsetBySite(siteObj) + offsetAppend
+                getType = recurseTypeFromStream(siteObj)
+                yield (siteObj, offsetInStream, getType)
+                for x in siteObj.contextSites(callerFirst=callerFirst,
                                                   memo=memo,
                                                   offsetAppend=offsetInStream,
                                                   sortByCreationTime=sortByCreationTime,
                                                   priorityTarget=priorityTarget):
-                yield x
+                    yield x
 
+            except Music21Exception: # TODO: Too broad. fix soon
+                ## the object is not in the site... try derivations!
+                for derivedObject in self.derivation.chain():
+                    for z in derivedObject.contextSites(callerFirst=callerFirst,
+                                                  memo=memo,
+                                                  offsetAppend=offsetAppend,
+                                                  sortByCreationTime=sortByCreationTime,
+                                                  priorityTarget=priorityTarget):
+                        yield z
+            
     #------------------------------------------------------------------
     def _getDuration(self):
         '''
@@ -2324,7 +2383,7 @@ class Music21Object(object):
     #--------------------------------------------------------------------------
     # duration manipulation, processing, and splitting
 
-    def _getDerivationHierarchy(self):
+    def _getContainerHierarchy(self):
         post = []
         focus = self
         endMe = 200
@@ -2333,11 +2392,11 @@ class Music21Object(object):
             # collect activeSite unless activeSite is None;
             # if so, try to get rootDerivation
             candidate = focus.activeSite
-            #environLocal.printDebug(['_getDerivationHierarchy(): activeSite found:', candidate])
+            #environLocal.printDebug(['_getContainerHierarchy(): activeSite found:', candidate])
             if candidate is None: # nothing more to derive
                 # if this is a Stream, we might find a root derivation
                 if hasattr(focus, 'derivation'):
-                    #environLocal.printDebug(['_getDerivationHierarchy(): found rootDerivation:', focus.rootDerivation])
+                    #environLocal.printDebug(['_getContainerHierarchy(): found rootDerivation:', focus.rootDerivation])
                     alt = focus.derivation.rootDerivation
                     if alt is None:
                         return post
@@ -2349,7 +2408,7 @@ class Music21Object(object):
             focus = candidate
         return post
 
-    derivationHierarchy = property(_getDerivationHierarchy,
+    containerHierarchy = property(_getContainerHierarchy,
         doc = '''
         Return a list of Stream subclasses that this Stream
         is contained within or derived from. This provides a way of seeing
@@ -2358,7 +2417,7 @@ class Music21Object(object):
         TODO: Better Name
 
         >>> s = corpus.parse('bach/bwv66.6')
-        >>> [str(e.__class__) for e in s[1][2][3].derivationHierarchy]
+        >>> [str(e.__class__) for e in s[1][2][3].containerHierarchy]
         ["<class 'music21.stream.Measure'>", "<class 'music21.stream.Part'>", "<class 'music21.stream.Score'>"]
         ''')
 
@@ -4360,7 +4419,7 @@ class Test(unittest.TestCase):
         unused_n2 = copy.deepcopy(n1)
         #self.assertEqual(n2._activeSite, s1)
 
-    def testYieldSiteSearchOrderA(self):
+    def testContextSitesA(self):
         from music21 import corpus
         self.maxDiff = None
         c = corpus.parse('bwv66.6')
@@ -4368,7 +4427,7 @@ class Test(unittest.TestCase):
         n = c[2][4][2]
         self.assertEqual(repr(n), '<music21.note.Note G#>')
         siteList = []
-        for y in n.yieldSiteSearchOrder():
+        for y in n.contextSites():
             siteList.append(repr(y))
         self.assertEqual(siteList, ["(<music21.stream.Measure 3 offset=9.0>, 0.5, 'elementsFirst')",
                                     "(<music21.stream.Part Alto>, 9.5, 'flatten')", 
@@ -4378,7 +4437,7 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(m), '<music21.stream.Measure 3 offset=9.0>')
 
         siteList = []      
-        for y in m.yieldSiteSearchOrder():
+        for y in m.contextSites():
             siteList.append(repr(y))
         self.assertEqual(siteList, ["(<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')",
                                     "(<music21.stream.Part Alto>, 9.0, 'flatten')", 
@@ -4387,7 +4446,7 @@ class Test(unittest.TestCase):
         m2 = copy.deepcopy(m)
         m2.number = 3333
         siteList = []      
-        for y in m2.yieldSiteSearchOrder():
+        for y in m2.contextSites():
             siteList.append(repr(y))
         self.assertEqual(siteList, ["(<music21.stream.Measure 3333 offset=9.0>, 0.0, 'elementsFirst')",
                                     "(<music21.stream.Part Alto>, 9.0, 'flatten')", 
@@ -4396,7 +4455,7 @@ class Test(unittest.TestCase):
         ptemp = c.parts[1]
         m3 = ptemp.measure(3)
         self.assertIs(m, m3)
-        for y in m3.yieldSiteSearchOrder():
+        for y in m3.contextSites():
             siteList.append(repr(y))
         
         import re
@@ -4407,7 +4466,7 @@ class Test(unittest.TestCase):
                                     "(<music21.stream.Score bach>, 9.0, 'elementsOnly')", 
                                     "(<music21.stream.Stream ...>, 9.0, 'elementsFirst')"])
 
-    def testYieldSiteSearchOrderB(self):        
+    def testContextSitesB(self):        
         from music21 import stream, note
         p1 = stream.Part()
         p1.id = 'p1'
@@ -4417,7 +4476,7 @@ class Test(unittest.TestCase):
         m1.append(n)
         p1.append(m1)
         siteList = []
-        for y in n.yieldSiteSearchOrder():
+        for y in n.contextSites():
             siteList.append(repr(y[0]))
         self.assertEqual(siteList, ["<music21.stream.Measure 1 offset=0.0>",
                                     "<music21.stream.Part p1>"])
@@ -4429,7 +4488,7 @@ class Test(unittest.TestCase):
         p2.append(m2)
 
         siteList = []
-        for y in n.yieldSiteSearchOrder(priorityTarget=n.activeSite):
+        for y in n.contextSites(priorityTarget=n.activeSite):
             siteList.append(repr(y[0]))
         self.assertEqual(siteList, ["<music21.stream.Measure 2 offset=0.0>",
                                     "<music21.stream.Part p2>",
@@ -4437,7 +4496,7 @@ class Test(unittest.TestCase):
                                     "<music21.stream.Part p1>"])
 
         siteList = []
-        for y in n.yieldSiteSearchOrder(sortByCreationTime = True):
+        for y in n.contextSites(sortByCreationTime = True):
             siteList.append(repr(y[0]))
         self.assertEqual(siteList, ["<music21.stream.Measure 2 offset=0.0>",
                                     "<music21.stream.Part p2>",
@@ -4445,7 +4504,7 @@ class Test(unittest.TestCase):
                                     "<music21.stream.Part p1>"])
 
         siteList = []
-        for y in n.yieldSiteSearchOrder(sortByCreationTime = 'reverse'):
+        for y in n.contextSites(sortByCreationTime = 'reverse'):
             siteList.append(repr(y[0]))
         self.assertEqual(siteList, ["<music21.stream.Measure 1 offset=0.0>",
                                     "<music21.stream.Part p1>",
@@ -4596,7 +4655,7 @@ def mainTest(*testClasses, **kwargs):
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
-    #sys.argv.append('testYieldSiteSearchOrderB')
+    #sys.argv.append('testContextSitesB')
     mainTest(Test)
 
 
