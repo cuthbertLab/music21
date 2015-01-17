@@ -72,7 +72,7 @@ def getPaths():
     # declare that the copy of SCALA_PATHS here is the same
     # as the outer scope.  See 
     # http://stackoverflow.com/questions/423379/using-global-variables-in-a-function-other-than-the-one-that-created-them
-    global SCALA_PATHS
+    global SCALA_PATHS # pylint: disable=global-statement
     if SCALA_PATHS is not None:
         return SCALA_PATHS
     moduleName = scl

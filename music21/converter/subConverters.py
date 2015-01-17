@@ -316,6 +316,8 @@ class ConverterVexflow(SubConverter):
 class ConverterText(SubConverter):
     '''
     standard text presentation has line breaks, is printed.
+    
+    Two keyword options are allowed: addEndTimes=Boolean and useMixedNumerals=Boolean
     '''
     
     registerFormats = ('text','txt','t')

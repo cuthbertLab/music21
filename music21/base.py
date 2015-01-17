@@ -1211,7 +1211,7 @@ class Music21Object(object):
             elif len(verticality.overlapTimespans) > 0:
                 return verticality.overlapTimespans[0].element
 
-        def findElInTimespanCollection(ts, offsetStart):
+        def findElInTimespanTree(ts, offsetStart):
             if getElementMethod == 'getElementAtOrBefore':
                 verticality = ts.getVerticalityAtOrBefore(offsetStart)
             elif getElementMethod == 'getElementBeforeOffset':
@@ -1223,17 +1223,17 @@ class Music21Object(object):
                     return element
             return None
 
-        def findElInTimespanColNoRecurse(ts, offsetStart):
+        def findElInTimespanTreeNoRecurse(ts, offsetStart):
             # goes through each, but should be fast because
             # only contains containers and elements with the
             # proper classes...
             if getElementMethod == 'getElementAtOrBefore':
                 offsetStart += 0.0001
             while offsetStart is not None: # redundant, but useful...
-                offsetStart = ts.getStartOffsetBefore(offsetStart)
+                offsetStart = ts.getOffsetBefore(offsetStart)
                 if offsetStart is None:
                     return None
-                startTimespans = ts.findTimespansStartingAt(offsetStart)
+                startTimespans = ts.elementsStartingAt(offsetStart)
                 for element in startTimespans:
                     if hasattr(element, 'source'):
                         continue
@@ -1251,12 +1251,12 @@ class Music21Object(object):
             searchType = searchPlace[2]
             if searchType == 'elementsOnly' or searchType == 'elementsFirst':
                 tsNotFlat = site.asTimespans(classList=className, recurse=False)
-                el = findElInTimespanColNoRecurse(tsNotFlat, offsetStart)
+                el = findElInTimespanTreeNoRecurse(tsNotFlat, offsetStart)
                 if el is not None:
                     return el
             if searchType != 'elementsOnly':
                 tsFlat = site.asTimespans(classList=className, recurse=True)
-                el = findElInTimespanCollection(tsFlat, offsetStart)
+                el = findElInTimespanTree(tsFlat, offsetStart)
                 if el is not None:
                     return el
 

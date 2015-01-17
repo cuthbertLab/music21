@@ -11,7 +11,6 @@
 """
 Methods for exporting music21 data as braille.
 
-
 This module was made in consultation with the manual "Introduction to Braille
 Music Transcription, Second Edition" by Mary Turner De Garmo, 2005. It is
 available from the Library of Congress `here <http://www.loc.gov/nls/music/>`_,

@@ -728,8 +728,7 @@ special name and its own class (:class:`~music21.stream.Score`,
 ``Streams``.
 
 | So how do we find ``note1`` inside ``biggerStream``? That's what the
-  next two chapters are about.
-
+next two chapters are about.
 | Click ``Next`` for Chapter 5. Those with programming experience who
-  have familiarity with lists of lists and defining functions might want
-  to skip to Chapter 6.
+have familiarity with lists of lists and defining functions might want
+to skip to Chapter 6.

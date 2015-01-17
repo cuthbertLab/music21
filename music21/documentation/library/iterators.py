@@ -9,7 +9,7 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
-import abc
+import abc  # for @abc.abstractmethod decorator: requires a function to be defined in subclasses
 import os
 import types
 
@@ -24,22 +24,13 @@ class Iterator(object):
     ### INITIALIZER ###
 
     def __init__(self, verbose=True):
-        self._verbose = verbose
+        self.verbose = verbose
 
     ### SPECIAL METHODS ###
 
     @abc.abstractmethod
     def __iter__(self):
         raise NotImplementedError
-
-    ### PUBLIC PROPERTIES ###
-
-    @property
-    def verbose(self):
-        '''
-        If true, print extra information.
-        '''
-        return self._verbose
 
 
 class IPythonNotebookIterator(Iterator):
@@ -70,7 +61,7 @@ class IPythonNotebookIterator(Iterator):
 
 class ModuleIterator(Iterator):
     '''
-    Iterates over music21's packagesystem, yielding module objects:
+    Iterates over music21's package system, yielding module objects:
 
     ::
 
@@ -85,8 +76,8 @@ class ModuleIterator(Iterator):
         'music21.analysis.__init__'
         'music21.analysis.correlate'
         'music21.analysis.discrete'
+        'music21.analysis.floatingKey'
         'music21.analysis.metrical'
-        'music21.analysis.neoRiemannian'
 
     '''
 
@@ -165,7 +156,7 @@ class ModuleIterator(Iterator):
 
 class CodebaseIterator(Iterator):
     '''
-    Iterate over music21's packagesystem, yielding all classes and functions.
+    Iterate over music21's package system, yielding all classes and functions.
     '''
 
     ### SPECIAL METHODS ###
@@ -185,7 +176,7 @@ class CodebaseIterator(Iterator):
 
 class ClassIterator(Iterator):
     '''
-    Iterates over music21's packagesystem, yielding all classes discovered:
+    Iterates over music21's package system, yielding all classes discovered:
 
     ::
 
@@ -219,7 +210,7 @@ class ClassIterator(Iterator):
 
 class FunctionIterator(Iterator):
     '''
-    Iterates over music21's packagesystem, yielding all functions discovered:
+    Iterates over music21's package system, yielding all functions discovered:
 
     ::
 
@@ -237,9 +228,9 @@ class FunctionIterator(Iterator):
         ('music21.abcFormat.translate', 'parseTokens')
         ('music21.abcFormat.translate', 'reBar')
         ('music21.analysis.discrete', 'analyzeStream')
+        ('music21.analysis.floatingKey', 'divide')
         ('music21.analysis.metrical', 'labelBeatDepth')
         ('music21.analysis.metrical', 'thomassenMelodicAccent')
-        ('music21.analysis.neoRiemannian', 'L')
 
     '''
 

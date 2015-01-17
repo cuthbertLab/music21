@@ -99,8 +99,8 @@ affinityNames = {AFFINITY_SIGNATURE: "Signature Grouping",
 
 excludeFromBrailleElements = [spanner.Slur, layout.SystemLayout, layout.PageLayout, layout.StaffLayout]
 
-GROUPING_KEYSIG = key.KeySignature(0)
-GROUPING_TIMESIG = meter.TimeSignature("4/4")
+GROUPING_KEYSIG = 0 #key.KeySignature(0)
+GROUPING_TIMESIG = '4/4' #meter.TimeSignature("4/4")
 GROUPING_DESC_CHORDS = True
 GROUPING_SHOW_CLEFS = False
 GROUPING_UPPERFIRST_NOTEFINGERING = True
@@ -153,7 +153,14 @@ class BrailleElementGrouping(list):
         <music21.note.Note F>
         """
         super(list, self).__init__()
-        self.__dict__ = {}
+        global GROUPING_KEYSIG # pylint: disable=global-usage
+        global GROUPING_TIMESIG # pylint: disable=global-usage
+        if GROUPING_KEYSIG == 0:
+            GROUPING_KEYSIG = key.KeySignature(GROUPING_KEYSIG)
+        if GROUPING_TIMESIG == '4/4':
+            GROUPING_TIMESIG = meter.TimeSignature(GROUPING_TIMESIG)
+        
+
         self.keySignature = GROUPING_KEYSIG
         self.timeSignature = GROUPING_TIMESIG
         self.descendingChords = GROUPING_DESC_CHORDS
