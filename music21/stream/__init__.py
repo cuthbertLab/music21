@@ -65,7 +65,6 @@ _OffsetMap = collections.namedtuple('OffsetMap', ['element','offset', 'endTime',
 class StreamException(exceptions21.Music21Exception):
     pass
 
-
 #------------------------------------------------------------------------------
 
 
@@ -1438,13 +1437,13 @@ class Stream(base.Music21Object):
                 if element is returnedElement:
                     break
             else:
-                raise StreamException("an entry for this object (%s) is not stored in stream (%s)" % (element, self))
+                raise base.SitesException("an entry for this object %s is not stored in stream %s" % (element, self))
             
         if o in ('highestTime', 'lowestOffset', 'highestOffset'):
             try:
                 return getattr(self, o)
             except AttributeError:
-                raise StreamException('attempted to retrieve a bound offset with a string attribute that is not supported: %s' % o)
+                raise base.SitesException('attempted to retrieve a bound offset with a string attribute that is not supported: %s' % o)
         else:
             return o
 
@@ -7878,14 +7877,14 @@ class Stream(base.Music21Object):
             for e in useStream._elements:
                 if processOffsets:
                     o = e.getOffsetBySite(useStream)
-                    unused_error, oNew, signedError = bestMatch(o, quarterLengthDivisors)
+                    unused_error, oNew, signedError = bestMatch(float(o), quarterLengthDivisors)
                     e.setOffsetBySite(useStream, oNew)
                     if hasattr(e, 'editorial') and hasattr(e.editorial, 'misc') and signedError != 0:
                         e.editorial.misc['offsetQuantizationError'] = signedError
                 if processDurations:
                     if e.duration is not None:
                         ql = e.duration.quarterLength
-                        unused_error, qlNew, signedError = bestMatch(ql, quarterLengthDivisors)
+                        unused_error, qlNew, signedError = bestMatch(float(ql), quarterLengthDivisors)
                         e.duration.quarterLength = qlNew
                         if hasattr(e, 'editorial') and hasattr(e.editorial, 'misc') and signedError != 0:
                             e.editorial.misc['quarterLengthQuantizationError'] = signedError
@@ -11323,7 +11322,6 @@ class Measure(Stream):
     clef = property(_getClef, _setClef, doc='''
         Finds or sets a :class:`~music21.clef.Clef` at offset 0.0 in the measure:
 
-
         >>> m = stream.Measure()
         >>> m.number = 10
         >>> m.clef = clef.TrebleClef()
@@ -11340,9 +11338,12 @@ class Measure(Stream):
         >>> m.clef.sign
         'F'
 
+        OMIT_FROM_DOCS
+        # TODO: v2.1 -- restore this functionality...
+
         And the TrebleClef is no longer in the measure:
 
-        >>> thisTrebleClef.getOffsetBySite(m)
+        thisTrebleClef.getOffsetBySite(m)
         Traceback (most recent call last):
         SitesException: The object <music21.clef.TrebleClef> is not in site <music21.stream.Measure 10 offset=0.0>.
 

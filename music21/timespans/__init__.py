@@ -23,7 +23,6 @@ __all__ = ['collections', 'spans', 'analysis', 'node', 'verticality']
 
 import random
 import unittest
-import weakref
 
 from music21 import chord
 from music21 import common

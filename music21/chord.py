@@ -34,7 +34,7 @@ environLocal = environment.Environment(_MOD)
 
 #python3
 try:
-    basestring
+    basestring # @UndefinedVariable
 except NameError:
     basestring = str # @ReservedAssignment
 

@@ -358,7 +358,7 @@ class StreamFreezer(StreamFreezeThawBase):
         2
         >>> n.getOffsetBySite(s)
         Traceback (most recent call last):
-        SitesException: The object <music21.note.Note D#> is not in site <music21.stream.Stream stream s>.
+        SitesException: an entry for this object <music21.note.Note D#> is not stored in stream <music21.stream.Stream stream s>
         >>> n.getOffsetBySite(t)
         20.0
         
@@ -426,7 +426,7 @@ class StreamFreezer(StreamFreezeThawBase):
         [(<music21.note.Note C#>, 0.0), (<music21.note.Note E->, 1.0), (<music21.bar.Barline style=regular>, 'end')]
         >>> n1.getOffsetBySite(s)
         Traceback (most recent call last):
-        SitesException: The object <music21.note.Note C#> is not in site <music21.stream.Measure 0 offset=0.0>.
+        SitesException: an entry for this object <music21.note.Note C#> is not stored in stream <music21.stream.Measure 0 offset=0.0>
 
         Trying it again, but now with substreams:
 
@@ -678,8 +678,8 @@ class StreamFreezer(StreamFreezeThawBase):
         and return the string
         '''
         fmt = self.parseWriteFmt(fmt)
-
         storage = self.packStream(self.stream)
+
 
         if fmt == 'pickle':
             out = pickleMod.dumps(storage, protocol=-1)
@@ -1214,25 +1214,22 @@ class JSONFreezer(JSONFreezeThawBase):
 
         Returns a list of those data members
 
-        ::
-
-            >>> n = note.Note()
-            >>> jss = freezeThaw.JSONFreezer(n)
-            >>> for attr in jss.autoGatherAttributes():
-            ...     attr
-            ...
-            '_activeSite'
-            '_activeSiteId'
-            '_duration'
-            '_editorial'
-            '_idLastDeepCopyOf'
-            '_notehead'
-            '_noteheadFill'
-            '_noteheadParenthesis'
-            '_priority'
-            '_stemDirection'
-            '_volume'
-
+        >>> n = note.Note()
+        >>> jss = freezeThaw.JSONFreezer(n)
+        >>> for attr in jss.autoGatherAttributes():
+        ...     attr
+        ...
+        '_activeSite'
+        '_activeSiteId'
+        '_duration'
+        '_editorial'
+        '_idLastDeepCopyOf'
+        '_notehead'
+        '_noteheadFill'
+        '_noteheadParenthesis'
+        '_priority'
+        '_stemDirection'
+        '_volume'
         '''
         result = set()
         if self.storedObject is None:
@@ -2087,6 +2084,11 @@ class Test(unittest.TestCase):
 
         #a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
         c = converter.parse(a)
+        c = c.flat.notes[3]
+        import pickle as p
+        v = c._notes[0]._volume
+        p.dumps(v)
+        exit()
         f = converter.freezeStr(c)
         d = converter.thawStr(f)
         self.assertEqual(d[1][20].volume._parent.__class__.__name__, 'weakref')
@@ -2094,8 +2096,8 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
     import music21
-    #import sys
-    #sys.argv.append('testJSONPickleSpanner')
+    import sys
+    sys.argv.append('testPickleMidi')
     music21.mainTest(Test)
     
 

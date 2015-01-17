@@ -74,11 +74,8 @@ class SiteRef(common.SlottedObject):
     0.333...
 
     
-    OMIT_FROM_DOCS
-    if you turn sites.WEAKREF_ACTIVE to False then .siteWeakref just stores another reference to
-    the site.
-    
-    
+    If you turn sites.WEAKREF_ACTIVE to False then .siteWeakref just stores another reference to
+    the site.  Bad for memory. Good for debugging pickling.
     '''
     ### CLASS VARIABLES ###
 
@@ -102,13 +99,28 @@ class SiteRef(common.SlottedObject):
         self._offset = 0.0
     
     def _getAndUnwrapSite(self):
-        # should set isDead?
-        return common.unwrapWeakref(self.siteWeakref)
+        if WEAKREF_ACTIVE:
+            return common.unwrapWeakref(self.siteWeakref)
+        else:
+            return self.siteWeakref
     
     def _setAndWrapSite(self, site):
-        self.siteWeakref = common.wrapWeakref(site)
+        if WEAKREF_ACTIVE:
+            self.siteWeakref = common.wrapWeakref(site)
+        else:
+            self.siteWeakref = site
 
     site = property(_getAndUnwrapSite, _setAndWrapSite)
+
+    def __getstate__(self):
+        if WEAKREF_ACTIVE:
+            self.siteWeakref = common.unwrapWeakref(self.siteWeakref)
+        common.SlottedObject.__getstate__(self)
+
+    def __setstate__(self, state):
+        common.SlottedObject.__setstate__(self, state)
+        if WEAKREF_ACTIVE:
+            self.siteWeakref = common.wrapWeakref(self.siteWeakref)
 
 
     def _getOffsetFloat(self):
@@ -129,6 +141,7 @@ class SiteRef(common.SlottedObject):
             self._offset = offset
         else:
             self._offset = common.opFrac(offset)
+            
     def _getOffsetRational(self):
         '''
         returns the offset without conversion to float...
@@ -477,7 +490,7 @@ class Sites(common.SlottedObject):
         for key in keys:
             siteRef = self.siteDict[key]
             # check for None object; default location, not a weakref, keep
-            if siteRef.siteWeakref is None:
+            if siteRef.site is None:
                 if not excludeNone:
                     post.append(siteRef.site)
             else:

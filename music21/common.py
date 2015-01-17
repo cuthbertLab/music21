@@ -2308,11 +2308,19 @@ class SlottedObject(object):
         for cls in self.__class__.mro():
             slots.update(getattr(cls, '__slots__', ()))
         for slot in slots:
-            state[slot] = getattr(self, slot, None)
+            if slot == '__weakref__':
+                continue
+            sValue = getattr(self, slot, None)
+            if sValue is not None and type(sValue) is weakref.ref:
+                sValue = sValue()
+                print("Warning: uncaught weakref found in %r - %s, will not be rewrapped" % (self, slot))
+            state[slot] = sValue
         return state
 
     def __setstate__(self, state):
         for slot, value in state.items():
+            if slot == '__weakref__':
+                continue
             setattr(self, slot, value)
 
 

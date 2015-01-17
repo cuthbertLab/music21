@@ -32,7 +32,7 @@ from music21 import environment
 environLocal = environment.Environment("timespans")
 
 
-class AVLTree(object):
+class AVLTree(common.SlottedObject):
     r'''
     Data structure for working with timespans.node.AVLNode objects.
     

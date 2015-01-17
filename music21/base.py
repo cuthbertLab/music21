@@ -738,11 +738,9 @@ class Music21Object(object):
         >>> s2.id = 'notContainingStream'
         >>> n.getOffsetBySite(s2)
         Traceback (most recent call last):
-        SitesException: The object <music21.note.Note A-> is not in site <music21.stream.Stream notContainingStream>.
+        SitesException: an entry for this object <music21.note.Note A-> is not stored in stream <music21.stream.Stream notContainingStream>
         '''
         try:
-            b = self.sites.getOffsetBySite(site, returnType=returnType)
-            
             if site is not None:
                 a = None
                 tryOrigin = self
@@ -752,6 +750,8 @@ class Music21Object(object):
                 while a is None:
                     try:
                         a = site.getOffsetFromMap(tryOrigin)
+                    except AttributeError:
+                        raise SitesException("You were using %r as a site, when it is not a Stream..." % site)
                     except Music21Exception as e: # currently StreamException, but will change
                         tryOrigin = self.derivation.origin
                         if id(tryOrigin) in originMemo:
@@ -764,12 +764,10 @@ class Music21Object(object):
                 if returnType=='float':
                     a = float(a)
             else:
-                a = b
-            if (a != b):
-                pass
+                a = self.sites.getOffsetBySite(site, returnType=returnType)
             return a
         except SitesException:
-            raise SitesException('The object %r is not in site %r.' % (self, site))
+            raise SitesException('an entry for this object %r is not stored in stream %r' % (self, site))
 
     def setOffsetBySite(self, site, value):
         '''
@@ -788,6 +786,8 @@ class Music21Object(object):
         '''
         if site is not None:
             site.setOffsetMap(self, value)        
+         
+        # v2.1 -- remove
         return self.sites.setOffsetBySite(site, value)
 
     def getContextAttr(self, attr):
