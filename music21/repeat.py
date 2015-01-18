@@ -3872,7 +3872,7 @@ class Test(unittest.TestCase):
         
         from music21 import corpus
         s = corpus.parse('ryansMammoth/BanjoReel')
-        #s.show()
+        s.show('text')
         self.assertEqual(len(s.parts), 1)        
         self.assertEqual(len(s.parts[0].getElementsByClass('Measure')), 11)
         self.assertEqual(len(s.parts[0].flat.notes), 58)        
@@ -3880,10 +3880,10 @@ class Test(unittest.TestCase):
         bars = s.parts[0].flat.getElementsByClass('Barline')
         self.assertEqual(len(bars), 3)        
 
-        s2 = s.expandRepeats()    
-        #s2.show()
+        s2 = s.expandRepeats()
+        s2.show('text')
 
-        self.assertEqual(len(s2.parts[0].getElementsByClass('Measure')), 20)        
+        self.assertEqual(len(s2.parts[0].getElementsByClass('Measure')), 20)
         self.assertEqual(len(s2.parts[0].flat.notes), 105)        
     
 
@@ -4511,6 +4511,9 @@ _DOC_ORDER = [RepeatExpression, RepeatExpressionMarker, Coda, Segno, Fine, Repea
               DaCapoAlCoda, AlSegno, DalSegno, DalSegnoAlFine, DalSegnoAlCoda, RepeatFinder]
 
 if __name__ == "__main__":
+    import sys
+    sys.argv.append('testExpandRepeatsImportedA')
+    
     import music21
     music21.mainTest(Test)
 
