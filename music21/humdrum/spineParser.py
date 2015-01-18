@@ -251,9 +251,9 @@ class HumdrumDataCollection(object):
         endPositions = []
         for i, line in enumerate(dataStream):
             l = line.rstrip()
-            if re.search('^(\*\-\t)*\*\-$', l):
+            if re.search(r'^(\*\-\t)*\*\-$', l):
                 endPositions.append(i)
-            elif re.search('^(\*\*\w+\t)*\*\*\w+$', l):
+            elif re.search(r'^(\*\*\w+\t)*\*\*\w+$', l):
                 startPositions.append(i)
         if len(startPositions) < 2:
             return (False, None)
@@ -363,9 +363,9 @@ class HumdrumDataCollection(object):
             line = line.rstrip()
             if line == "":
                 continue # technically forbidden by Humdrum but the source of so many errors!
-            elif re.match('\!\!\!', line):
+            elif re.match(r'\!\!\!', line):
                 self.eventList.append(GlobalReferenceLine(self.parsePositionInStream, line))
-            elif re.match('\!\!', line): ## find global comments at the top of the line
+            elif re.match(r'\!\!', line): ## find global comments at the top of the line
                 self.eventList.append(GlobalCommentLine(self.parsePositionInStream, line))
             else:
                 thisLine = SpineLine(self.parsePositionInStream, line)
@@ -829,7 +829,7 @@ class GlobalReferenceLine(HumdrumLine):
 
     def __init__(self, position = 0, contents = "!!! NUL: None"):
         self.position = position
-        noExclaim = re.sub('^\!\!\!+','',contents)
+        noExclaim = re.sub(r'^\!\!\!+','',contents)
         try:
             (code, value) = noExclaim.split(":", 1)
             value = value.strip()
@@ -877,7 +877,7 @@ class GlobalCommentLine(HumdrumLine):
 
     def __init__(self, position = 0, contents = ""):
         self.position = position
-        value = re.sub('^\!\!+\s?','',contents)
+        value = re.sub(r'^\!\!+\s?','',contents)
         self.contents = contents
         self.value    = value
 
@@ -902,7 +902,7 @@ class ProtoSpine(object):
 # Ready to be parsed...
 
 class HumdrumSpine(object):
-    '''
+    r'''
     A HumdrumSpine is a representation of a generic HumdrumSpine
     regardless of \*\*definition after spine path indicators have
     been simplified.
@@ -1029,7 +1029,7 @@ class HumdrumSpine(object):
             return self._spineType
         else:
             for thisEvent in self.eventList:
-                m1 = re.match("\*\*(.*)", thisEvent.contents)
+                m1 = re.match(r"\*\*(.*)", thisEvent.contents)
                 if m1:
                     self._spineType = m1.group(1)
                     return self._spineType
@@ -1197,7 +1197,7 @@ class HumdrumSpine(object):
         self.stream._elementsChanged()
 
 class KernSpine(HumdrumSpine):
-    '''
+    r'''
     A KernSpine is a type of humdrum spine with the \*\*kern
     attribute set and thus events are processed as if they
     are kern notes
@@ -1324,7 +1324,7 @@ class KernSpine(HumdrumSpine):
         ## still to be done later... move things before first measure to first measure!
 
 class DynamSpine(HumdrumSpine):
-    '''
+    r'''
     A DynamSpine is a type of humdrum spine with the \*\*dynam
     attribute set and thus events are processed as if they
     are dynamics.
@@ -1417,7 +1417,7 @@ class SpineEvent(object):
         return self.contents
 
     def toNote(self, convertString = None):
-        '''
+        r'''
         parse the object as a \*\*kern note and return the a
         :class:`~music21.note.Note` object (or Rest, or Chord)
 
@@ -1678,7 +1678,7 @@ class SpineCollection(object):
 
 
     def reclassSpines(self):
-        '''
+        r'''
         changes the classes of HumdrumSpines to more specific types
         (KernSpine, DynamicSpine)
         according to their spineType (e.g., \*\*kern, \*\*dynam)
@@ -2019,8 +2019,8 @@ def hdStringToNote(contents):
     else:
         raise HumdrumException("Could not parse %s for note information" % contents)
 
-    matchedSharp = re.search("(\#+)", contents)
-    matchedFlat  = re.search("(\-+)", contents)
+    matchedSharp = re.search(r"(\#+)", contents)
+    matchedFlat  = re.search(r"(\-+)", contents)
 
     if matchedSharp:
         thisObject.accidental = matchedSharp.group(0)
@@ -2116,8 +2116,8 @@ def hdStringToNote(contents):
     # 3.2.8 N-Tuplets
 
     ## TODO: SPEEDUP -- only search for rational after foundNumber...
-    foundRational = re.search("(\d+)\%(\d+)", contents)
-    foundNumber = re.search("(\d+)", contents)
+    foundRational = re.search(r"(\d+)\%(\d+)", contents)
+    foundNumber = re.search(r"(\d+)", contents)
     if foundRational:
         durationFirst = int(foundRational.group(1))
         durationSecond = float(foundRational.group(2))
@@ -2202,7 +2202,7 @@ def hdStringToMeasure(contents, previousMeasure = None):
     create new measures.  Here is how...
     '''
     m1 = stream.Measure()
-    rematchMN = re.search("(\d+)([a-z]?)", contents)
+    rematchMN = re.search(r"(\d+)([a-z]?)", contents)
 
 
     if rematchMN:
@@ -2334,13 +2334,13 @@ def kernTandemToObject(tandem):
             return MM
         except ValueError:
             # assuming that metronomeMark here is text now
-            metronomeMark = re.sub('^\[','', metronomeMark)
-            metronomeMark = re.sub(']\s*$','', metronomeMark)
+            metronomeMark = re.sub(r'^\[','', metronomeMark)
+            metronomeMark = re.sub(r']\s*$','', metronomeMark)
             MS = tempo.MetronomeMark(text=metronomeMark)
             return MS
     elif tandem.startswith("*M"):
         meterType = tandem[2:]
-        tsTemp = re.match('(\d+)/(\d+)', meterType)
+        tsTemp = re.match(r'(\d+)/(\d+)', meterType)
         if (tsTemp):
             numerator = int(tsTemp.group(1))
             denominator = tsTemp.group(2)
@@ -2428,7 +2428,7 @@ class SpineComment(base.Music21Object):
 
     def __init__(self, comment = ""):
         base.Music21Object.__init__(self)
-        commentPart = re.sub('^\!+\s?','', comment)
+        commentPart = re.sub(r'^\!+\s?','', comment)
         self.comment = commentPart
 
     def __repr__(self):
@@ -2448,7 +2448,7 @@ class GlobalComment(base.Music21Object):
 
     def __init__(self, comment = ""):
         base.Music21Object.__init__(self)
-        commentPart = re.sub('^\!\!+\s?','', comment)
+        commentPart = re.sub(r'^\!\!+\s?','', comment)
         commentPart = commentPart.strip()
         self.comment = commentPart
 
@@ -2482,11 +2482,11 @@ class GlobalReference(base.Music21Object):
 
     def __init__(self, codeOrAll = "", valueOrNone = None):
         base.Music21Object.__init__(self)
-        codeOrAll = re.sub('^\!\!\!+','', codeOrAll)
+        codeOrAll = re.sub(r'^\!\!\!+','', codeOrAll)
         codeOrAll = codeOrAll.strip()
         if valueOrNone is None and ':' in codeOrAll:
-            valueOrNone = re.sub('^.*?\:','', codeOrAll)
-            codeOrAll = re.sub('\:.*$', '', codeOrAll)
+            valueOrNone = re.sub(r'^.*?\:','', codeOrAll)
+            codeOrAll = re.sub(r'\:.*$', '', codeOrAll)
         self.code = codeOrAll
         self.value = valueOrNone
 

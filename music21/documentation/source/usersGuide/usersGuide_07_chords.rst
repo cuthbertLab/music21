@@ -2,7 +2,6 @@
 User's Guide, Chapter 7: Chords
 ===============================
 
-
 .. code:: python
 
 
@@ -193,7 +192,6 @@ The result of that is ``None`` which we can test like so...
 Displaying Chords
 -----------------
 
-
 We can display the ``Chord`` object just like any
 :class:`~music21.note.Note` (Don't worry if this isn't working for you
 yet...we'll get this set up in Chapter 8)
@@ -316,7 +314,6 @@ American composer Elliott Carter liked a lot.
 
 More ways of creating chords; Chords and Streams
 ------------------------------------------------
-
 
 There are other ways of creating a Chord if you'd like. One way is from
 a bunch of already created ``Note`` objects:
@@ -447,7 +444,6 @@ and ``Chords``:
 
 Post-tonal chords (in brief)
 ----------------------------
-
 
 There are a lot of methods for dealing with post-tonal aspects of
 chords. If you're not interested in twentieth century music, go ahead
