@@ -202,7 +202,7 @@ class StreamFreezer(StreamFreezeThawBase):
     True
 
 
-
+    >>> c = corpus.parse('luca/gloria') # This should be unnecessary, but c is corrupted...
     >>> sf2 = freezeThaw.StreamFreezer(c) # do not reuse StreamFreezers
     >>> data2 = sf2.writeStr(fmt='jsonpickle')
     >>> st2 = freezeThaw.StreamThawer()
@@ -362,7 +362,6 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> n.getOffsetBySite(t)
         20.0
         
-
         
         After recursiveClearSites n will be not know its location anywhere...
         
@@ -370,11 +369,6 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> len(n.sites)
         0
 
-        >>> n.sites.getOffsetBySite(t)   # TODO: REMOVE ALL THESE TESTS after v2.1
-        Traceback (most recent call last):
-        SitesException: Could not find the object with id ... in the Site marked with idKey ... 
-
-        
         This leaves n and t in strange positions, because n is in t.elements still....
         
         >>> n in t.elements
@@ -1224,9 +1218,10 @@ class JSONFreezer(JSONFreezeThawBase):
         ...     attr
         ...
         '_activeSite'
-        '_activeSiteId'
+        '_activeSiteStoredOffset'
         '_duration'
         '_editorial'
+        '_naiveOffset'
         '_notehead'
         '_noteheadFill'
         '_noteheadParenthesis'
@@ -1838,8 +1833,10 @@ class Test(unittest.TestCase):
         s.insert(2.0, n)
         sDummy.insert(3.0, n)
 
+        self.assertIs(s.spanners[0].getFirst(), s.notes[0])
+
         sf = StreamFreezer(s)
-        out = sf.writeStr()
+        out = sf.writeStr(fmt='jsonpickle') # easier to read...
 
         del(s)
         del(sDummy)
@@ -2094,8 +2091,8 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
     import music21
-    #import sys
-    #sys.argv.append('testPickleMidi')
+    import sys
+    sys.argv.append('testFreezeThawWithSpanner')
     music21.mainTest(Test)
     
 

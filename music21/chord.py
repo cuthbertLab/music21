@@ -4435,7 +4435,7 @@ class Test(unittest.TestCase):
         self.assertNotEqual(chord1.activeSite, st1)
 
         # test id
-        self.assertEqual(chord1._activeSiteId, id(st2))
+        self.assertEqual(chord1.activeSite, st2)
         # for some reason this test fails when test cases are run at the
         # module level, but not at the level of running the specific method
         # from the class

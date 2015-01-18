@@ -328,9 +328,6 @@ class Music21Object(object):
     def __init__(self, *arguments, **keywords):
         # None is stored as the internal location of an obj w/o any sites
         self._activeSite = None
-        # cached id in case the weakref has gone away...
-        self._activeSiteId = None
-
         # offset when no activeSite is available
         self._naiveOffset = 0.0
         # offset when activeSite is already garbage collected/dead, as in short-lived sites
@@ -1068,11 +1065,9 @@ class Music21Object(object):
                         orphans.append(id(s))
                 else: # get all
                     orphans.append(id(s))
-        idActiveSite = self._activeSiteId
         for i in orphans:
             self.sites.removeById(i)
-            if i == idActiveSite:
-                self.activeSite = None
+        self.activeSite # reset to None if is an orphan...
 
 
     def purgeLocations(self, rescanIsDead=False):
@@ -1491,18 +1486,14 @@ class Music21Object(object):
                 self.sites.add(site, idKey=siteId)
         else:
             self._activeSiteStoredOffset = None
-            siteId = None
 
         if sites.WEAKREF_ACTIVE:
             if site is None: # leave None alone
                 self._activeSite = None
-                self._activeSiteId = None
             else:
                 self._activeSite = common.wrapWeakref(site)
-                self._activeSiteId = siteId
         else:
             self._activeSite = site
-            self._activeSiteId = siteId
 
     activeSite = property(_getActiveSite, _setActiveSite,
         doc='''
@@ -1810,10 +1801,8 @@ class Music21Object(object):
         if (useSite is not False and
                 self.sites.hasSiteId(id(useSite))):
             insertIndex = self.sites.siteDict[id(useSite)].globalSiteIndex
-        elif (self._activeSiteId is not None and
-                 self.sites.hasSiteId(self._activeSiteId)):
-            ## TODO -- expose a single Site so siteDict is not needed here.
-            insertIndex = self.sites.siteDict[self._activeSiteId].globalSiteIndex
+        elif self.activeSite is not None:
+            insertIndex = self.sites.siteDict[id(self.activeSite)].globalSiteIndex
         else:
             insertIndex = 0
 
