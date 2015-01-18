@@ -268,6 +268,23 @@ class Chord(note.NotRest):
 
 
     ### SPECIAL METHODS ###
+    def __deepcopy__(self, memo=None):
+        '''As Chord objects have one or more Volume, objects, and Volume
+        objects store weak refs to the to parent object, need to specialize
+        deepcopy handling depending on if the chord has its own volume object.
+        '''
+        #environLocal.printDebug(['calling NotRest.__deepcopy__', self])
+        # as this inherits from NotRest, can use that __deepcopy__ as basis
+        # that looks only to _volume to see if it is not None; with a
+        # Chord, _volume will always be None
+        new = note.NotRest.__deepcopy__(self, memo=memo)
+        # after copying, if a Volume exists, it is linked to the old object
+        # look at _volume so as not to create object if not already there
+        for d in new._notes:
+            # if .volume is called, a new Volume obj will be created
+            if d._volume is not None:
+                d.volume.parent = new # update with new instance
+        return new
 
 
     def __getitem__(self, key):
