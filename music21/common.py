@@ -33,7 +33,7 @@ from music21.ext import six
 
 #python3
 try:
-    basestring
+    basestring # @UndefinedVariable 
 except NameError:
     basestring = str # @ReservedAssignment
 
@@ -657,7 +657,7 @@ def opFrac(num):
         else:
             return num # leave fraction alone
     else:
-        raise Exception("Cannot convert num: %r" % num)
+        raise TypeError("Cannot convert num: %r" % num)
         
 
 
@@ -1064,7 +1064,7 @@ def toUnicode(usrStr):
             return usrStr
     else:
         try:
-            usrStr = unicode(usrStr, 'utf-8') # pylint: disable=undefined-variable
+            usrStr = unicode(usrStr, 'utf-8') # @UndefinedVariable  pylint: disable=undefined-variable
         # some documentation may already be in unicode; if so, a TypeException will be raised
         except TypeError: #TypeError: decoding Unicode is not supported
             pass
@@ -2154,7 +2154,7 @@ def normalizeFilename(name):
         name = name[:lenName -4]
 
     if isinstance(name, str) and six.PY2:
-        name = unicode(name) # pylint: disable=undefined-variable
+        name = unicode(name) # @UndefinedVariable pylint: disable=undefined-variable
 
     name = unicodedata.normalize('NFKD', name)
     if six.PY2:
@@ -2294,6 +2294,21 @@ class SlottedObject(object):
     r'''
     Provides template for classes implementing slots allowing it to be pickled
     properly.
+    
+    Only use SlottedObjects for objects that we expect to make so many of
+    that memory storage and speed become an issue.
+    
+    >>> import pickle
+    >>> class Glissdata(common.SlottedObject):
+    ...     __slots__ = ('time', 'frequency')
+    >>> s = Glissdata
+    >>> s.time = 0.125
+    >>> s.frequency = 440.0
+    >>> #_DOCS_SHOW out = pickle.dumps(s)
+    >>> #_DOCS_SHOW t = pickle.loads(out)
+    >>> t = s #_DOCS_HIDE -- cannot define classes for pickling in doctests
+    >>> t.time, t.frequency
+    (0.125, 440.0)
     '''
     
     ### CLASS VARIABLES ###
@@ -2308,7 +2323,11 @@ class SlottedObject(object):
         for cls in self.__class__.mro():
             slots.update(getattr(cls, '__slots__', ()))
         for slot in slots:
-            state[slot] = getattr(self, slot, None)
+            sValue = getattr(self, slot, None)
+            if sValue is not None and type(sValue) is weakref.ref:
+                sValue = sValue()
+                print("Warning: uncaught weakref found in %r - %s, will not be rewrapped" % (self, slot))
+            state[slot] = sValue
         return state
 
     def __setstate__(self, state):

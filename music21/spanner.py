@@ -27,6 +27,7 @@ import copy
 from music21 import exceptions21
 from music21 import base
 from music21 import common
+from music21 import derivation
 from music21 import duration
 
 from music21 import environment
@@ -285,10 +286,19 @@ class Spanner(base.Music21Object):
         '''
         new = self.__class__()
         old = self
+        
+        if '_derivation' in self.__dict__:
+            # was: keep the old ancestor but need to update the client
+            # 2.1 : NO, add a derivation of __deepcopy__ to the client
+            newDerivation = derivation.Derivation(client=new)
+            newDerivation.origin = self
+            newDerivation.method = '__deepcopy__'
+            setattr(new, '_derivation', newDerivation)
+
         for name in self.__dict__:
             if name.startswith('__'):
                 continue
-            if name == '_cache':
+            if name in ('_cache', '_derivation'):
                 continue
             part = getattr(self, name)
             # functionality duplicated from Music21Object
@@ -310,8 +320,6 @@ class Spanner(base.Music21Object):
                 #environLocal.printDebug(['Spanner.__deepcopy__', name])
                 newValue = copy.deepcopy(part, memo)
                 setattr(new, name, newValue)
-        # do after all other copying
-        new._idLastDeepCopyOf = id(self)
         return new
 
     #---------------------------------------------------------------------------

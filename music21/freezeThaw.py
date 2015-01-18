@@ -358,7 +358,7 @@ class StreamFreezer(StreamFreezeThawBase):
         2
         >>> n.getOffsetBySite(s)
         Traceback (most recent call last):
-        SitesException: The object <music21.note.Note D#> is not in site <music21.stream.Stream stream s>.
+        SitesException: an entry for this object <music21.note.Note D#> is not stored in stream <music21.stream.Stream stream s>
         >>> n.getOffsetBySite(t)
         20.0
         
@@ -369,9 +369,11 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> sf.recursiveClearSites(s)
         >>> len(n.sites)
         0
-        >>> n.getOffsetBySite(t)
+
+        >>> n.sites.getOffsetBySite(t)   # TODO: REMOVE ALL THESE TESTS after v2.1
         Traceback (most recent call last):
-        SitesException: The object <music21.note.Note D#> is not in site <music21.stream.Stream stream t>.
+        SitesException: Could not find the object with id ... in the Site marked with idKey ... 
+
         
         This leaves n and t in strange positions, because n is in t.elements still....
         
@@ -395,6 +397,8 @@ class StreamFreezer(StreamFreezeThawBase):
                 if hasattr(el, '_derivation'):
                     el._derivation = derivation.Derivation() #reset
 
+                if (hasattr(el, '_offsetMapDict')):
+                    el._offsetMapDict = {}
                 el.sites.clear()
                 el.activeSite = None
             startObj._derivation = derivation.Derivation() #reset
@@ -426,7 +430,7 @@ class StreamFreezer(StreamFreezeThawBase):
         [(<music21.note.Note C#>, 0.0), (<music21.note.Note E->, 1.0), (<music21.bar.Barline style=regular>, 'end')]
         >>> n1.getOffsetBySite(s)
         Traceback (most recent call last):
-        SitesException: The object <music21.note.Note C#> is not in site <music21.stream.Measure 0 offset=0.0>.
+        SitesException: an entry for this object <music21.note.Note C#> is not stored in stream <music21.stream.Measure 0 offset=0.0>
 
         Trying it again, but now with substreams:
 
@@ -463,7 +467,7 @@ class StreamFreezer(StreamFreezeThawBase):
             storedElementOffsetTuples.append(elementTuple)
             if e.isStream:
                 self.setupStoredElementOffsetTuples(e)
-            e.removeLocationBySite(streamObj)
+            e.removeLocationBySite(streamObj)            
 #                e._preFreezeId = id(e)
 #                elementDict[id(e)] = e.getOffsetBySite(s)
         for e in streamObj._endElements:
@@ -475,6 +479,7 @@ class StreamFreezer(StreamFreezeThawBase):
 
         streamObj._storedElementOffsetTuples = storedElementOffsetTuples
         #streamObj._elementTree = None
+        streamObj._offsetMapDict = {}
         streamObj._elements = []
         streamObj._endElements = []
         streamObj._elementsChanged()
@@ -677,8 +682,8 @@ class StreamFreezer(StreamFreezeThawBase):
         and return the string
         '''
         fmt = self.parseWriteFmt(fmt)
-
         storage = self.packStream(self.stream)
+
 
         if fmt == 'pickle':
             out = pickleMod.dumps(storage, protocol=-1)
@@ -1213,25 +1218,21 @@ class JSONFreezer(JSONFreezeThawBase):
 
         Returns a list of those data members
 
-        ::
-
-            >>> n = note.Note()
-            >>> jss = freezeThaw.JSONFreezer(n)
-            >>> for attr in jss.autoGatherAttributes():
-            ...     attr
-            ...
-            '_activeSite'
-            '_activeSiteId'
-            '_duration'
-            '_editorial'
-            '_idLastDeepCopyOf'
-            '_notehead'
-            '_noteheadFill'
-            '_noteheadParenthesis'
-            '_priority'
-            '_stemDirection'
-            '_volume'
-
+        >>> n = note.Note()
+        >>> jss = freezeThaw.JSONFreezer(n)
+        >>> for attr in jss.autoGatherAttributes():
+        ...     attr
+        ...
+        '_activeSite'
+        '_activeSiteId'
+        '_duration'
+        '_editorial'
+        '_notehead'
+        '_noteheadFill'
+        '_noteheadParenthesis'
+        '_priority'
+        '_stemDirection'
+        '_volume'
         '''
         result = set()
         if self.storedObject is None:
@@ -1380,7 +1381,7 @@ class JSONFreezer(JSONFreezeThawBase):
             return True
         if isinstance(possiblyFreezeable, (list, tuple, dict)):
             return False
-        if six.PY2 and isinstance(possiblyFreezeable, (int, str, unicode, float)): # pylint: disable=undefined-variable
+        if six.PY2 and isinstance(possiblyFreezeable, (int, str, unicode, float)): # @UndefinedVariable pylint: disable=undefined-variable
             return False
         elif six.PY3 and isinstance(possiblyFreezeable, (int, str, bytes, float)):
             return False 
@@ -2094,7 +2095,7 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     import music21
     #import sys
-    #sys.argv.append('testJSONPickleSpanner')
+    #sys.argv.append('testPickleMidi')
     music21.mainTest(Test)
     
 

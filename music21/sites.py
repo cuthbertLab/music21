@@ -74,11 +74,8 @@ class SiteRef(common.SlottedObject):
     0.333...
 
     
-    OMIT_FROM_DOCS
-    if you turn sites.WEAKREF_ACTIVE to False then .siteWeakref just stores another reference to
-    the site.
-    
-    
+    If you turn sites.WEAKREF_ACTIVE to False then .siteWeakref just stores another reference to
+    the site.  Bad for memory. Good for debugging pickling.
     '''
     ### CLASS VARIABLES ###
 
@@ -97,18 +94,32 @@ class SiteRef(common.SlottedObject):
         self.classString = None
         self.globalSiteIndex = None
         self.siteIndex = None
-        self.isDead = False
         self.siteWeakref = None
         self._offset = 0.0
     
     def _getAndUnwrapSite(self):
-        # should set isDead?
-        return common.unwrapWeakref(self.siteWeakref)
+        if WEAKREF_ACTIVE:
+            return common.unwrapWeakref(self.siteWeakref)
+        else:
+            return self.siteWeakref
     
     def _setAndWrapSite(self, site):
-        self.siteWeakref = common.wrapWeakref(site)
+        if WEAKREF_ACTIVE:
+            self.siteWeakref = common.wrapWeakref(site)
+        else:
+            self.siteWeakref = site
 
     site = property(_getAndUnwrapSite, _setAndWrapSite)
+
+    def __getstate__(self):
+        if WEAKREF_ACTIVE:
+            self.siteWeakref = common.unwrapWeakref(self.siteWeakref)
+        return common.SlottedObject.__getstate__(self)
+
+    def __setstate__(self, state):
+        common.SlottedObject.__setstate__(self, state)
+        if WEAKREF_ACTIVE:
+            self.siteWeakref = common.wrapWeakref(self.siteWeakref)
 
 
     def _getOffsetFloat(self):
@@ -129,6 +140,7 @@ class SiteRef(common.SlottedObject):
             self._offset = offset
         else:
             self._offset = common.opFrac(offset)
+            
     def _getOffsetRational(self):
         '''
         returns the offset without conversion to float...
@@ -198,33 +210,25 @@ class Sites(common.SlottedObject):
         have the former site as a location, even though the new Note instance
         is not actually found in the old Stream.
 
-        ::
+        >>> import copy
+        >>> class Mock(base.Music21Object):
+        ...     pass
+        >>> aObj = Mock()
+        >>> aContexts = sites.Sites()
+        >>> aContexts.add(aObj)
+        >>> bContexts = copy.deepcopy(aContexts)
+        >>> len(aContexts.get()) == 1
+        True
 
-            >>> import copy
-            >>> class Mock(base.Music21Object):
-            ...     pass
-            >>> aObj = Mock()
-            >>> aContexts = sites.Sites()
-            >>> aContexts.add(aObj)
-            >>> bContexts = copy.deepcopy(aContexts)
-            >>> len(aContexts.get()) == 1
-            True
+        >>> len(bContexts.get()) == 1
+        True
 
-        ::
-
-            >>> len(bContexts.get()) == 1
-            True
-
-        ::
-
-            >>> aContexts.get() == bContexts.get()
-            True
-
+        >>> aContexts.get() == bContexts.get()
+        True
         '''
         #TODO: it may be a problem that sites are being transferred to deep
         #copies; this functionality is used at times in context searches, but
         # may be a performance hog.
-
         new = self.__class__()
         locations = []  # self._locationKeys[:]
         #environLocal.printDebug(['Sites.__deepcopy__', 'self.siteDict.keys()', self.siteDict.keys()])
@@ -477,7 +481,7 @@ class Sites(common.SlottedObject):
         for key in keys:
             siteRef = self.siteDict[key]
             # check for None object; default location, not a weakref, keep
-            if siteRef.siteWeakref is None:
+            if siteRef.site is None:
                 if not excludeNone:
                     post.append(siteRef.site)
             else:
@@ -893,7 +897,7 @@ class Sites(common.SlottedObject):
             raise SitesException(errorMsg)
         # stored string are assumed to be attributes of the stored object
         if isinstance(value, str):
-            if value not in ['highestTime', 'lowestOffset', 'highestOffset']:
+            if value not in ('highestTime', 'lowestOffset', 'highestOffset'):
                 raise SitesException('attempted to set a bound offset with a string attribute that is not supported: %s' % value)
             obj = self.siteDict[idKey].site
             # offset value is an attribute string

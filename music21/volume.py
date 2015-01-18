@@ -77,7 +77,6 @@ class Volume(SlottedObject):
         elif velocityScalar is not None:
             self.velocityScalar = velocityScalar
         self._cachedRealized = None
-        #  replace with a property
         self.velocityIsRelative = velocityIsRelative
 
     ### SPECIAL METHODS ###
