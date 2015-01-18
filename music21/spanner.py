@@ -285,6 +285,10 @@ class Spanner(base.Music21Object):
         This produces a new, independent object containing references to the same spannedElements. 
         SpannedElements linked in this Spanner must be manually re-set, likely using the 
         replaceSpannedElement() method.
+        
+        Notice that we put the references to the same object so that later we can replace them;
+        otherwise in a deepcopy of a stream, the notes in the stream
+        will become independent from the notes in the spanner.
 
         >>> import copy
         >>> n1 = note.Note('g')
@@ -320,7 +324,7 @@ class Spanner(base.Music21Object):
     def purgeLocations(self, rescanIsDead=False):
         # must override Music21Object to purge locations from the contained
         # Stream
-        # base method to perform purge on the Sream
+        # base method to perform purge on the Stream
         self.spannerStorage.purgeLocations(rescanIsDead=rescanIsDead)
         base.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
 
@@ -1782,6 +1786,24 @@ class Test(unittest.TestCase):
         self.assertEqual(sb2[0], su3)
         self.assertEqual(sb2[1], su4)
         
+    def testDeepcopyStreamWithSpanners(self):
+        from music21 import note, stream
+        n1 = note.Note()
+        su1 = Slur([n1])
+        s = stream.Stream()
+        s.insert(0.0, su1)
+        s.insert(0.0, n1)
+        self.assertIs(s.spanners[0].getFirst(), n1)
+        self.assertIs(s.notes[0].getSpannerSites()[0], su1)
+
+        t = copy.deepcopy(s)
+        su2 = t.spanners[0]
+        n2 = t.notes[0]
+        self.assertIsNot(su2, su1)
+        self.assertIsNot(n2, n1)
+        self.assertIs(t.spanners[0].getFirst(), n2)
+        self.assertIs(s.notes[0].getSpannerSites()[0], su2)
+
 
     def testDeepcopySpanner(self):
         from music21 import spanner, note
@@ -2346,7 +2368,6 @@ class Test(unittest.TestCase):
 #         #s.show()
 #         raw = s.musicxml
 #         self.assertEqual(raw.count('<dashes'), 4)
-        
 
     def testOneElementSpanners(self):
         from music21 import note, spanner
@@ -2409,6 +2430,8 @@ _DOC_ORDER = [Spanner]
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
+    import sys
+    sys.argv.append('testDeepcopyStreamWithSpanners')
     import music21
     music21.mainTest(Test)
 

@@ -1082,7 +1082,7 @@ class Stream(base.Music21Object):
         self._elementsChanged(clearIsSorted=False)
         # remove self from locations here only if
         # there are no further locations
-        # post.removeLocationBySite(self)
+        post.removeLocationBySite(self)
         return post
 
 

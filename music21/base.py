@@ -424,7 +424,9 @@ class Music21Object(object):
             # TODO: Fix this so as not to allow incorrect _activeSite
             # keep a reference, not a deepcopy
             # do not use property: .activeSite; set to same weakref obj
-            setattr(new, '_activeSite', None)
+# restore jan 18
+#            setattr(new, '_activeSite', None) 
+            setattr(new, '_activeSite', self._activeSite)
 
         if 'id' in ignoreAttributes:
             value = getattr(self, 'id')
@@ -432,14 +434,15 @@ class Music21Object(object):
                 newValue = value
                 setattr(new, 'id', newValue)
         if 'sites' in ignoreAttributes:
-            pass
-#             ## TODO: Fix This to get better sites value
-#             value = getattr(self, 'sites')
-#             # this calls __deepcopy__ in Sites
-#             newValue = copy.deepcopy(value, memo)
-#             #environLocal.printDebug(['copied definedContexts:', newValue._locationKeys])
-#             newValue.containedById = id(new)
-#             setattr(new, 'sites', newValue)
+# restore jan 18
+#            pass
+            ## TODO: Fix This to get better sites value
+            value = getattr(self, 'sites')
+            # this calls __deepcopy__ in Sites
+            newValue = copy.deepcopy(value, memo)
+            #environLocal.printDebug(['copied definedContexts:', newValue._locationKeys])
+            newValue.containedById = id(new)
+            setattr(new, 'sites', newValue)
 
 
         for name in self.__dict__:
@@ -1067,7 +1070,9 @@ class Music21Object(object):
                     orphans.append(id(s))
         for i in orphans:
             self.sites.removeById(i)
-        self.activeSite # reset to None if is an orphan...
+            p = self._getActiveSite()  # this can be simplified.
+            if p is not None and id(p) == i:
+                self._setActiveSite(None)
 
 
     def purgeLocations(self, rescanIsDead=False):
