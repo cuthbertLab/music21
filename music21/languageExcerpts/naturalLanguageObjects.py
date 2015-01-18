@@ -123,7 +123,7 @@ def toChord(pitchArray, languageString):
     
     from music21 import chord
     
-    noteList = [toNote(pitch, languageString) for pitch in pitchArray]
+    noteList = [toNote(pitchObj, languageString) for pitchObj in pitchArray]
     return chord.Chord(noteList)
 
 def toDuration():

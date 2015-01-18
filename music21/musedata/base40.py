@@ -247,7 +247,7 @@ def pitchToBase40(pitchToConvert):
     Base40Exception: Base40 cannot handle this pitch F###4
     '''
     if type(pitchToConvert) == str:
-            pitchToConvert = pitch.Pitch(pitchToConvert)
+        pitchToConvert = pitch.Pitch(pitchToConvert)
     if pitchToConvert.name in base40Representation:
         tableNum = base40Representation[pitchToConvert.name]
         base40Num = (40 * (pitchToConvert.octave - 1)) + tableNum
@@ -288,7 +288,6 @@ def base40Interval(base40NumA, base40NumB):
     if pitchA == None and pitchB == None:
         raise Base40Exception('Pitch name not assigned to these Base40 numbers ' \
               + str(base40NumA) + ' and ' + str(base40NumA) + ' Interval does not exist')
-        return None
     elif pitchA == None:
         raise Base40Exception('Pitch name not assigned to this Base40 number ' \
               + str(base40NumA) + ' Interval does not exist')

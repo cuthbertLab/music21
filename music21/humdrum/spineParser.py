@@ -82,7 +82,7 @@ spinePathIndicators = ["*+", "*-", "*^", "*v", "*x", "*"]
 
 
 class HumdrumDataCollection(object):
-    '''
+    r'''
     A HumdrumDataCollection takes in a mandatory list where each element
     is a line of humdrum data.  Together this list represents a collection
     of spines.  Essentially it's the contents of a humdrum file.
@@ -125,6 +125,16 @@ class HumdrumDataCollection(object):
     parsedLines = False
 
     def __init__(self, dataStream = [], parseLines = True):
+        # attributes
+        self.eventList = None
+        self.maxSpines = None
+        self.parsePositionInStream = None
+        self.fileLength = None
+        self.protoSpines = None
+        self.eventCollections = None
+        
+        
+        self.globalEventsInserted = None
         if dataStream is []:
             raise HumdrumException("dataStream is not optional, specify some lines")
         elif isinstance(dataStream, basestring):
@@ -609,7 +619,7 @@ class HumdrumDataCollection(object):
                                 ## is totally finished by the time the second happens
                             newSpineList.append(currentSpine)
                             newSpineList.append(exchangeActive)
-                            exchangeActive = False;
+                            exchangeActive = False
                     else:  ## null processing code "*"
                         newSpineList.append(currentSpine)
 
@@ -952,6 +962,7 @@ class HumdrumSpine(object):
         self.insertPoint = 0
         self.endingPosition = 0
         self.parentSpine = None
+        self.newSpine = None
         self.isLastSpine = False
         self.childSpines = []
         self.childSpineInsertPoints = {}
@@ -962,6 +973,10 @@ class HumdrumSpine(object):
 
         self._spineCollection = None
         self._spineType = None
+        
+        self.isFirstVoice = None
+        self.iterIndex = None
+        
 
 
     def __repr__(self):
@@ -1437,6 +1452,8 @@ class SpineCollection(object):
         self.spines = []
         self.nextFreeId  = 0
         self.spineReclassDone = False
+        self.iterIndex = None
+        self.newSpine = None
 
     def __iter__(self):
         '''Resets the counter to len(self.spines) so that iteration is correct'''
@@ -2522,7 +2539,7 @@ class Test(unittest.TestCase):
         self.assertEqual(b.duration.tuplets[0].durationNormal.dots, 2)
 
     def testMeasureBoundaries(self):
-        from music21 import stream
+        from music21 import stream # pylint: disable=reimported
         m0 = stream.Measure()
         m1 = hdStringToMeasure("=29a;:|:", m0)
         self.assertEqual(m1.number, 29)

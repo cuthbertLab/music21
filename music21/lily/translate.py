@@ -154,6 +154,8 @@ class LilypondConverter(object):
         self.coloredVariants = False
         self.variantMode = False
         self.LILYEXEC = None
+        self.tempName = None
+        self.inWord = None
         
 
     def findLilyExec(self):
@@ -221,7 +223,7 @@ class LilypondConverter(object):
     def restoreContext(self):
         try:
             self.context = self.storedContexts.pop()
-        except:
+        except IndexError:
             self.context = self.topLevelObject
 
 
@@ -571,7 +573,8 @@ class LilypondConverter(object):
             try:
                 dur = str(self.lyMultipliedDurationFromDuration(el.duration))
                 returnString = returnString + 's'+ dur
-            except:
+            # general exception is the only way to catch str exceptions
+            except: #pylint: disable=bare-except
                 for c in el.duration.components:
                     dur = str(self.lyMultipliedDurationFromDuration(c))
                     returnString = returnString + 's'+ dur
@@ -2320,7 +2323,7 @@ class LilypondConverter(object):
 
         try:
             os.remove(fileName + ".eps")
-        except:
+        except OSError:
             pass
         fileform = fileName + '.' + format
         if not os.path.exists(fileform):
