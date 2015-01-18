@@ -779,7 +779,7 @@ class Expander(object):
         for m in srcStream:
             # processes uses the spanner bundle stored on this Stream
             self._repeatBrackets.spannerBundle.replaceSpannedElement(
-                m._idLastDeepCopyOf, m)
+                id(m.derivation.origin), m)
 
         #srcStream = self._srcMeasureStream
         #post = copy.deepcopy(self._srcMeasureStream)
@@ -3872,7 +3872,7 @@ class Test(unittest.TestCase):
         
         from music21 import corpus
         s = corpus.parse('ryansMammoth/BanjoReel')
-        s.show('text')
+        #s.show('text')
         self.assertEqual(len(s.parts), 1)        
         self.assertEqual(len(s.parts[0].getElementsByClass('Measure')), 11)
         self.assertEqual(len(s.parts[0].flat.notes), 58)        
@@ -3881,7 +3881,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(bars), 3)        
 
         s2 = s.expandRepeats()
-        s2.show('text')
+        #s2.show('text')
 
         self.assertEqual(len(s2.parts[0].getElementsByClass('Measure')), 20)
         self.assertEqual(len(s2.parts[0].flat.notes), 105)        
@@ -4303,7 +4303,7 @@ class Test(unittest.TestCase):
 
         #p.show()
         ex = Expander(p)
-        self.assertEqual(ex.isExpandable(), True)
+        self.assertTrue(ex.isExpandable())
         post = ex.process()
         environLocal.printDebug(['post process', [n.name for n in post.flat.notes]])
         #post.show()
@@ -4511,8 +4511,8 @@ _DOC_ORDER = [RepeatExpression, RepeatExpressionMarker, Coda, Segno, Fine, Repea
               DaCapoAlCoda, AlSegno, DalSegno, DalSegnoAlFine, DalSegnoAlCoda, RepeatFinder]
 
 if __name__ == "__main__":
-    import sys
-    sys.argv.append('testExpandRepeatsImportedA')
+    #import sys
+    #sys.argv.append('testRepeatEndingsH')
     
     import music21
     music21.mainTest(Test)
