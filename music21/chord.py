@@ -3671,8 +3671,7 @@ class Chord(note.NotRest):
             # Key is a subclass of scale.DiatonicScale
             sc = self.key
         else:
-            sc = self.getContextByClass(scale.Scale,
-                prioritizeActiveSite=True, sortByCreationTime=True)
+            sc = self.getContextByClass(scale.Scale, sortByCreationTime=True)
             if sc is None:
                 raise ChordException("Cannot find a Key or Scale context for this chord, so cannot find what scale degrees the pitches correspond to!")
 #        if hasattr(sc, 'mode'):

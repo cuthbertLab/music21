@@ -330,10 +330,18 @@ class Music21Object(object):
         self._activeSite = None
         # cached id in case the weakref has gone away...
         self._activeSiteId = None
+
+        # offset when no activeSite is available
+        self._naiveOffset = 0.0
+        # offset when activeSite is already garbage collected/dead, as in short-lived sites
+        # like .getElementsByClass
+        self._activeSiteStoredOffset = None
+
+        
         # store a derivation object to track derivations from other Streams
         # pass a reference to this object
         self._derivation = None
-
+        
         # store classes once when called
         self._classes = None
         self._fullyQualifiedClasses = None
@@ -419,7 +427,7 @@ class Music21Object(object):
             # TODO: Fix this so as not to allow incorrect _activeSite
             # keep a reference, not a deepcopy
             # do not use property: .activeSite; set to same weakref obj
-            setattr(new, '_activeSite', self._activeSite)
+            setattr(new, '_activeSite', None)
 
         if 'id' in ignoreAttributes:
             value = getattr(self, 'id')
@@ -427,13 +435,14 @@ class Music21Object(object):
                 newValue = value
                 setattr(new, 'id', newValue)
         if 'sites' in ignoreAttributes:
-            ## TODO: Fix This to get better sites value
-            value = getattr(self, 'sites')
-            # this calls __deepcopy__ in Sites
-            newValue = copy.deepcopy(value, memo)
-            #environLocal.printDebug(['copied definedContexts:', newValue._locationKeys])
-            newValue.containedById = id(new)
-            setattr(new, 'sites', newValue)
+            pass
+#             ## TODO: Fix This to get better sites value
+#             value = getattr(self, 'sites')
+#             # this calls __deepcopy__ in Sites
+#             newValue = copy.deepcopy(value, memo)
+#             #environLocal.printDebug(['copied definedContexts:', newValue._locationKeys])
+#             newValue.containedById = id(new)
+#             setattr(new, 'sites', newValue)
 
 
         for name in self.__dict__:
@@ -680,7 +689,7 @@ class Music21Object(object):
 
     derivation = property(_getDerivation)
     #--------------------------------------------------------------------------
-    # look at this object for an atttribute; if not here
+    # look at this object for an attribute; if not here
     # look up to activeSite
 
     def findAttributeInHierarchy(self, attrName):
@@ -738,15 +747,7 @@ class Music21Object(object):
                 found = self.activeSite.findAttributeInHierarchy(attrName)
         return found
 
-#     def searchActiveSiteByClass(self, classFilterList)
-#         '''
-#         The first encountered result is returned.
-#         '''
-#         if not isinstance(classFilterList, list):
-#             if not isinstance(classFilterList, tuple):
-#                 classFilterList = [classFilterList]
-
-    def getOffsetBySite(self, site, returnType='rational'):
+    def getOffsetBySite(self, site, returnType='rational', stringReturns=False):
         '''
         If this class has been registered in a container such as a Stream,
         that container can be provided here, and the offset in that object
@@ -754,7 +755,6 @@ class Music21Object(object):
 
         Note that this is different than the getOffsetByElement() method on
         Stream in that this can never access the flat representation of a Stream.
-
 
         >>> n = note.Note('A-4')  # a Music21Objecct
         >>> n.offset = 30
@@ -768,39 +768,76 @@ class Music21Object(object):
         Fraction(20, 3)
         >>> n.getOffsetBySite(s1, returnType='float')
         6.6666...
+        
+        n.getOffsetBySite(None) should still return 30.0
+        
+        >>> n.getOffsetBySite(None)
+        30.0
 
-
+        If the Stream does not contain the element then a SitesException is raised:
+        
         >>> s2 = stream.Stream()
         >>> s2.id = 'notContainingStream'
         >>> n.getOffsetBySite(s2)
         Traceback (most recent call last):
         SitesException: an entry for this object <music21.note.Note A-> is not stored in stream <music21.stream.Stream notContainingStream>
+
+
+        If the object is stored at the end of the Stream, then the highest time is usually returned:
+        
+        >>> s3 = stream.Stream()
+        >>> n3 = note.Note(type='whole')
+        >>> s3.append(n3)
+        >>> rb = bar.Barline()
+        >>> s3.storeAtEnd(rb)  # s3.rightBarline = rb would do the same...
+        >>> rb.getOffsetBySite(s3)
+        4.0
+        
+        However, setting stringReturns to True will return 'highestTime'
+        
+        >>> s3._endElements
+        [<music21.bar.Barline style=regular>]
+        
+        >>> rb.getOffsetBySite(s3, stringReturns=True)
+        'highestTime'
+        
+        Normal numbers are still returned as a float or Fraction:
+        
+        >>> n3.getOffsetBySite(s3, stringReturns=True)
+        0.0
+        
+
         '''
         try:
             if site is not None:
                 a = None
                 tryOrigin = self
                 originMemo = set()
-                i = 0
                 maxSearch = 100
                 while a is None:
                     try:
-                        a = site.getOffsetFromMap(tryOrigin)
+                        a = site.getOffsetFromMap(tryOrigin, stringReturns=stringReturns)
                     except AttributeError:
                         raise SitesException("You were using %r as a site, when it is not a Stream..." % site)
                     except Music21Exception as e: # currently StreamException, but will change
+                        if tryOrigin in site._endElements:
+                            if stringReturns is True:
+                                return 'highestTime'
+                            else:
+                                site.highestTime
+                        
                         tryOrigin = self.derivation.origin
                         if id(tryOrigin) in originMemo:
                             raise(e)
                         else:
                             originMemo.add(id(tryOrigin))
-                        i += 1
-                        if tryOrigin is None or i > maxSearch:
+                        maxSearch -= 1
+                        if tryOrigin is None or maxSearch < 0:
                             raise(e)
                 if returnType=='float':
                     a = float(a)
             else:
-                a = self.sites.getOffsetBySite(site, returnType=returnType)
+                a = self._naiveOffset
             return a
         except SitesException:
             raise SitesException('an entry for this object %r is not stored in stream %r' % (self, site))
@@ -821,10 +858,11 @@ class Music21Object(object):
         30.0
         '''
         if site is not None:
-            site.setOffsetMap(self, value)        
-         
-        # v2.1 -- remove
-        return self.sites.setOffsetBySite(site, value)
+            site.setOffsetMap(self, value)
+            if site is self.activeSite:
+                self._activeSiteStoredOffset = value # update...     
+        else:
+            self._naiveOffset = value
 
     def getContextAttr(self, attr):
         '''
@@ -864,35 +902,6 @@ class Music21Object(object):
         '''
         return self.sites.setAttrByName(attrName, value)
 
-    def hasContext(self, obj):
-        '''
-        Return a Boolean if an object reference is stored
-        in the object's Sites object.
-
-        This checks both all locations as well as all sites.
-
-        DEPRECATED: use hasSite() instead.  April 2014.
-
-        >>> import music21
-        >>> class Mock(music21.Music21Object):
-        ...     attr1 = 234
-        >>> aObj = Mock()
-        >>> aObj.attr1 = 'test'
-        >>> a = music21.Music21Object()
-        >>> a.sites.add(aObj)
-        >>> a.hasContext(aObj)
-        True
-        >>> a.hasContext(None)
-        True
-        >>> a.hasContext(45)
-        False
-        '''
-        for dc in self.sites.get(): # get all
-            if obj == dc:
-                return True
-        return False
-
-
     def hasSite(self, other):
         '''
         Return True if other is a site in this Music21Object
@@ -909,65 +918,6 @@ class Music21Object(object):
         '''
         return id(other) in self.sites.getSiteIds()
 
-#    def getCommonSiteIds(self, other):
-#        '''
-#        Given another music21 object, return a
-#        list of all common site ids. Do not include
-#        the default empty site, None.
-#
-#        >>> from music21 import note, stream
-#        >>> s1 = stream.Stream()
-#        >>> s2 = stream.Stream()
-#        >>> n1 = note.Note()
-#        >>> n2 = note.Note()
-#        >>> s1.append(n1)
-#        >>> s1.append(n2)
-#        >>> s2.append(n2)
-#        >>> n1.getCommonSiteIds(n2) == [id(s1)]
-#        True
-#        >>> s2.append(n1)
-#        >>> n1.getCommonSiteIds(n2) == [id(s1), id(s2)]
-#        True
-#        '''
-#        src = self.getSiteIds()
-#        dst = other.getSiteIds()
-#        post = []
-#        for i in src:
-#            if i is None:
-#                continue
-#            if i in dst:
-#                post.append(i)
-#        return post
-
-#    def getCommonSites(self, other):
-#        '''
-#        Given another object, return a list of all sites
-#        in common between the two objects.
-#
-#        >>> from music21 import note, stream
-#        >>> s1 = stream.Stream()
-#        >>> s2 = stream.Stream()
-#        >>> n1 = note.Note()
-#        >>> n2 = note.Note()
-#        >>> s1.append(n1)
-#        >>> s1.append(n2)
-#        >>> s2.append(n2)
-#        >>> n1.getCommonSites(n2) == [s1]
-#        True
-#        >>> s2.append(n1)
-#        >>> n1.getCommonSites(n2) == [s1, s2]
-#        True
-#
-#        '''
-#        src = self.getSites()
-#        dstIds = other.getSiteIds()
-#        post = []
-#        for obj in src:
-#            if obj is None:
-#                continue
-#            if id(obj) in dstIds:
-#                post.append(obj)
-#        return post
 
     def getSpannerSites(self, spannerClassList = None):
         '''
@@ -980,7 +930,6 @@ class Music21Object(object):
         but specialized Music21Objects that use a
         Stream subclass, SpannerStorage, internally to keep track
         of the elements that are spanned.
-
 
         >>> n1 = note.Note('C4')
         >>> n2 = note.Note('D4')
@@ -1052,29 +1001,6 @@ class Music21Object(object):
 
         return post
 
-    def hasVariantSite(self):
-        '''
-        Return True if this object is found in
-        any Variant
-        This is determined by looking
-        for a VariantStorage Stream class as a Site.
-
-        DEPRECATED April 2014, v. 1.9 -- use el.sites.hasVariantSite() instead
-
-        >>> n1 = note.Note()
-        >>> n2 = note.Note()
-        >>> n3 = note.Note()
-        >>> v1 = variant.Variant([n1, n2])
-        >>> n1.sites.hasSpannerSite()
-        False
-        >>> n1.sites.hasVariantSite()
-        True
-        >>> n2.sites.hasVariantSite()
-        True
-        >>> n3.sites.hasVariantSite()
-        False
-        '''
-        return self.sites.hasVariantSite()
 
     def removeLocationBySite(self, site):
         '''
@@ -1091,6 +1017,8 @@ class Music21Object(object):
         >>> n = note.Note()
         >>> n.sites.add(s, 10)
         >>> n.activeSite = s
+        Traceback (most recent call last):
+        music21.sites.SitesException: v2.1. -- you may not assign an activesite for an object <music21.note.Note C> not in the Stream <music21.stream.Stream 0x...>
         >>> n.removeLocationBySite(s)
         >>> n.activeSite is None
         True
@@ -1110,27 +1038,6 @@ class Music21Object(object):
 
         # if activeSite is set to that site, reassign to None
         if self._getActiveSite() == site:
-            self._setActiveSite(None)
-
-    def removeLocationBySiteId(self, siteId):
-        '''
-        DEPRECATED since at least April 2014 -- use sites.removeById and set activeSite manually.
-
-        Remove a location in the
-        :class:`~music21.base.Sites` object by id.
-
-        >>> from music21 import note, stream
-        >>> s = stream.Stream()
-        >>> n = note.Note()
-        >>> n.sites.add(s, 10)
-        >>> n.activeSite = s
-        >>> n.removeLocationBySiteId(id(s))
-        >>> n.activeSite is None
-        True
-        '''
-        self.sites.removeById(siteId)
-        p = self._getActiveSite()
-        if p is not None and id(p) == siteId:
             self._setActiveSite(None)
 
     def purgeOrphans(self, excludeStorageStreams=True):
@@ -1161,26 +1068,23 @@ class Music21Object(object):
                         orphans.append(id(s))
                 else: # get all
                     orphans.append(id(s))
+        idActiveSite = self._activeSiteId
         for i in orphans:
-            self.removeLocationBySiteId(i)
+            self.sites.removeById(i)
+            if i == idActiveSite:
+                self.activeSite = None
 
 
     def purgeLocations(self, rescanIsDead=False):
         '''
         Remove references to all locations in objects that no longer exist.
         '''
-        # NOTE: this method is overridden on Spanner and and Variant
+        # NOTE: this method is overridden on Spanner and Variant, so not an easy fix...
         self.sites.purgeLocations(rescanIsDead=rescanIsDead)
-
-#     def removeNonContainedLocations(self):
-#         '''Remove all locations in which this object does not
-#         actually reside as an element.
-#         '''
-#         self.sites.removeNonContainedLocations()
 
     def getContextByClass(self, className,
         callerFirst=None, getElementMethod='getElementAtOrBefore',
-        memo=None, prioritizeActiveSite=True, serialReverseSearch=True,
+        memo=None, serialReverseSearch=True,
         sortByCreationTime=False):
         '''
         A very powerful method in music21 of fundamental importance: Returns
@@ -1254,9 +1158,6 @@ class Music21Object(object):
         The `callerFirst` is the first object from which this method was
         called. This is needed in order to determine the final offset from
         which to search.
-
-        The `prioritizeActiveSite` parameter searches the object's activeSite
-        before any other object. By default this is True
 
         The `getElementMethod` is a string that selects which Stream method is
         used to get elements for searching. The strings 'getElementAtOrBefore'
@@ -1404,7 +1305,7 @@ class Music21Object(object):
                 else:
                     return nextObj
                 currentIndex += 1
-        # go to right, start at righmost
+        # go to right, start at rightmost
         elif ascend and not beginNearest:
             lastIndex = site.index(self) + 1 # end with next
             currentIndex = siteLength
@@ -1577,14 +1478,19 @@ class Music21Object(object):
 
         # NOTE: this is a performance intensive call
         if site is not None:
+            try:
+                storedOffset = site.getOffsetFromMap(self)
+            except SitesException:
+                raise SitesException("v2.1. -- you may not assign an activesite for " + 
+                                     "an object {} not in the Stream {}".format(self, site))
+
+            self._activeSiteStoredOffset = storedOffset
             siteId = id(site)
-            # check that the activeSite is not already set to this object
-            # this avoids making another weakref
-            if self._activeSiteId == siteId:
-                return
-            if not self.sites.hasSiteId(siteId):
-                self.sites.add(site, self.offset, idKey=siteId)
+            if not self.sites.hasSiteId(siteId): # This should raise a warning, should not happen
+                #environLocal.warn("Adding a siteDict entry for a site that should already be there!")
+                self.sites.add(site, idKey=siteId)
         else:
+            self._activeSiteStoredOffset = None
             siteId = None
 
         if sites.WEAKREF_ACTIVE:
@@ -1624,9 +1530,6 @@ class Music21Object(object):
         >>> n.activeSite = p
         >>> n.offset
         20.0
-
-        DEVELOPER N.B. -- the guts of this call will
-        be moved to .sites soon.
         ''')
 
     def _getOffsetFloatOrRational(self, returnType):
@@ -1645,12 +1548,10 @@ class Music21Object(object):
         
         Still works...
 
-        >>> n._activeSiteId = 3234234
         >>> n.offsetFloat
         3.0
         >>> n.offset
         3.0
-
 
         There is a branch that does slow searches.
         See test/testSerialization to have it active.
@@ -1659,37 +1560,27 @@ class Music21Object(object):
         # been provided for that activeSite; when self.offset is called,
         # the first case here would match
         #environLocal.printDebug(['Music21Object._getOffset', 'self.id', self.id, 'id(self)', id(self), self.__class__])
-
-        activeSiteId = None
-        if self.activeSite is not None:
-            activeSiteId = id(self.activeSite)
-            self._activeSiteId = id(self.activeSite)
-        elif self._activeSiteId is not None:
-            activeSiteId = self._activeSiteId
-
-        if (activeSiteId is not None and
-            self.sites.hasSiteId(activeSiteId)):
-            return self.sites.getOffsetBySiteId(activeSiteId, returnType=returnType)
-            #return self.sites.coordinates[activeSiteId]['offset']
-        elif self.activeSite is None: # assume we want self
+        activeSiteWeakRef = self._activeSite
+        if activeSiteWeakRef is not None:
+            activeSite = self.activeSite
+            if activeSite is None:
+                # it has died since last visit, as is the case with short-lived streams like 
+                # .getElementsByClass, so we will return the most recent position
+                return self._activeSiteStoredOffset
+            
             try:
-                return self.sites.getOffsetBySite(None, returnType=returnType)
-            except SitesException:  # might not have a None offset
-                return 0.0
+                o = activeSite.getOffsetFromMap(self)
+            except SitesException:
+                environLocal.warn('Not in Stream: changing activeSite to None and returning _naiveOffset')
+                self.activeSite = None                
+                o = self._naiveOffset
         else:
-            # try to look for it in all objects
-            environLocal.printDebug(['doing a manual activeSite search: probably means that ' +
-                                     'id(self.activeSite) (%s) is not equal to self._activeSiteId (%r)' % (id(self.activeSite), self._activeSiteId)])
-            #environLocal.printDebug(['activeSite', self.activeSite, 'self.sites.hasSiteId(activeSiteId)', self.sites.hasSiteId(activeSiteId)])
-            #environLocal.printDebug(['self.hasSite(self.activeSite)', self.hasSite(self.activeSite)])
+            o = self._naiveOffset
         
-            offset = self.sites.getOffsetByObjectMatch(
-                    self.activeSite, returnType=returnType)
-            return offset
-
-            #environLocal.printDebug(['self.sites', self.sites.siteDict])
-        raise Exception('request within %s for offset cannot be made with activeSite of %s (id: %s)' %
-                        (self.__class__, self.activeSite, activeSiteId) )
+        if returnType != 'float':
+            return o
+        else:
+            return float(o)
 
     def _setOffset(self, value):
         '''
@@ -1697,10 +1588,8 @@ class Music21Object(object):
         '''
         # assume that most times this is a number; in that case, the fastest
         # thing to do is simply try to set the offset w/ float(value)
-
-        #if common.isNum(value):
         try:
-            offset = float(value)
+            offset = opFrac(value)
         except TypeError:
             pass
 
@@ -1708,16 +1597,10 @@ class Music21Object(object):
             # probably a Duration object, but could be something else -- in any case, we'll take it.
             offset = value.quarterLength
 
-# this no longer seems necessary; an exception will be raised elsewhere
-#         else:
-#             raise Exception('We cannot set  %s as an offset' % value)
-
-        # using _activeSiteId offers a considerable speed boost, as we
-        # do not have to unwrap a weakref of self.activeSite to get the id()
-        # of activeSite
         if self.activeSite is not None:
             self.activeSite.setOffsetMap(self, offset)
-        self.sites.setOffsetBySiteId(self._activeSiteId, offset)
+        else:
+            self._naiveOffset = offset
 
     def _getOffset(self):
         return self._getOffsetFloatOrRational('rational')
@@ -1907,13 +1790,10 @@ class Music21Object(object):
             foundOffset = self.offset
         else:
             try:
-                foundOffset = self.sites.siteDict[id(useSite)].offset  # allows for text offsets
-            except KeyError:
-                try:
-                    foundOffset = self.getOffsetBySite(useSite)
-                except SitesException:
-                    #environLocal.warn(r)  # activeSite may have vanished! or does not have the element
-                    foundOffset = self.getOffsetBySite(None)
+                foundOffset = self.getOffsetBySite(useSite, stringReturns=True)
+            except SitesException:
+                #environLocal.warn(r)  # activeSite may have vanished! or does not have the element
+                foundOffset = self._naiveOffset
                 
         if foundOffset == 'highestTime':
             offset = 0.0
@@ -1975,17 +1855,20 @@ class Music21Object(object):
         >>> m2.number = 3333
         >>> for y in m2.contextSites():
         ...      print(y)
-        (<music21.stream.Measure 3333 offset=9.0>, 0.0, 'elementsFirst')
+        (<music21.stream.Measure 3333 offset=0.0>, 0.0, 'elementsFirst')
+        (<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')
         (<music21.stream.Part Alto>, 9.0, 'flatten')
         (<music21.stream.Score bach>, 9.0, 'elementsOnly')
 
-        >>> m3 = c.parts[1].measure(3)
+        >>> tempPartStream = c.parts
+        >>> tempPartStream.id = 'partStream' # for identificationBelow
+        >>> m3 = tempPartStream[1].measure(3)
         >>> for y in m3.contextSites():
         ...      print(y)
         (<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')
         (<music21.stream.Part Alto>, 9.0, 'flatten')
+        (<music21.stream.Score partStream>, 9.0, 'elementsOnly')
         (<music21.stream.Score bach>, 9.0, 'elementsOnly')
-        (<music21.stream.Stream ...>, 9.0, 'elementsFirst')
 
 
 
@@ -2011,7 +1894,8 @@ class Music21Object(object):
         >>> p2.append(m2)
 
 
-        Now the keys could appear in any order!  To fix set priorityTarget to activeSite
+        The keys could have appeared in any order, but by default
+        we set set priorityTarget to activeSite.  So this is the same as omitting.
 
         >>> for y in n.contextSites(priorityTarget=n.activeSite):
         ...     print(y[0])
@@ -2033,7 +1917,7 @@ class Music21Object(object):
 
         oldest first...
 
-        >>> for y in n.contextSites(sortByCreationTime = 'reverse'):
+        >>> for y in n.contextSites(sortByCreationTime='reverse'):
         ...     print(y[0])
         <music21.stream.Measure 1 offset=0.0>
         <music21.stream.Part p1>
@@ -2060,35 +1944,55 @@ class Music21Object(object):
             callerFirst = self
             if self.isStream:
                 getType = recurseTypeFromStream(self)
+                environLocal.printDebug("Caller first is {} with offsetAppend {}".format(callerFirst, offsetAppend))
                 yield(self, 0.0, getType)
+
+        if priorityTarget is None and sortByCreationTime is False:
+            priorityTarget = self.activeSite
+        else:
+            environLocal.printDebug('sortByCreationTime {}'.format(sortByCreationTime))
+            
 
         allSites = self.sites.get(priorityTarget=priorityTarget,
                                       sortByCreationTime=sortByCreationTime,
                                       excludeNone=True)
+        topLevel = self
         for siteObj in allSites:
             if 'SpannerStorage' in siteObj.classes:
                 continue
             try:
                 offsetInStream = self.getOffsetBySite(siteObj) + offsetAppend
-                getType = recurseTypeFromStream(siteObj)
-                yield (siteObj, offsetInStream, getType)
-                for x in siteObj.contextSites(callerFirst=callerFirst,
-                                                  memo=memo,
-                                                  offsetAppend=offsetInStream,
-                                                  sortByCreationTime=sortByCreationTime,
-                                                  priorityTarget=priorityTarget):
-                    yield x
-
-            except Music21Exception: # TODO: Too broad. fix soon
-                ## the object is not in the site... try derivations!
-                for derivedObject in self.derivation.chain():
-                    for z in derivedObject.contextSites(callerFirst=callerFirst,
-                                                  memo=memo,
-                                                  offsetAppend=offsetAppend,
-                                                  sortByCreationTime=sortByCreationTime,
-                                                  priorityTarget=priorityTarget):
-                        yield z
+            except SitesException:
+                continue # not a valid site any more.  Could be caught in derivationChain
             
+            getType = recurseTypeFromStream(siteObj)
+            yield (siteObj, offsetInStream, getType)
+            environLocal.printDebug("looking in contextSites for {} with offsetInStream {}".format(siteObj, offsetInStream))
+            for x in siteObj.contextSites(callerFirst=callerFirst,
+                                              memo=memo,
+                                              offsetAppend=offsetInStream,
+                                              sortByCreationTime=sortByCreationTime,
+                                              priorityTarget=None): # get activeSite unless sortByCreationTime
+                topLevel = x[0] # only look at the derivation chain for the topmost level
+                if x[0] not in memo:                    
+                    environLocal.printDebug("Yielding {} from contextSites".format(x))
+                    yield x
+                    memo.append(x[0])
+
+        for derivedObject in topLevel.derivation.chain():
+            environLocal.printDebug("looking now in derivedObject, {} with offsetAppend {}".format(derivedObject, offsetAppend))
+            for z in derivedObject.contextSites(callerFirst=None,
+                                          memo=memo,
+                                          offsetAppend=0.0,
+                                          sortByCreationTime=sortByCreationTime,
+                                          priorityTarget=None): # get activeSite unless sortByCreationTime
+                if z[0] not in memo:
+                    environLocal.printDebug("Yielding {} from derivedObject contextSites".format(z))
+                    zz = (z[0], z[1] + offsetAppend, z[2])
+                    yield zz
+                    memo.append(z[0])
+
+        environLocal.printDebug("--returning from derivedObject search")    
     #------------------------------------------------------------------
     def _getDuration(self):
         '''
@@ -2882,7 +2786,7 @@ class Music21Object(object):
             #environLocal.printDebug(['did not find activeSite as Measure, doing context search', 'self.activeSite', self.activeSite])
             # testing sortByCreationTime == true; this may be necessary
             # as we often want the most recent measure
-            m = self.getContextByClass('Measure', sortByCreationTime=True, prioritizeActiveSite=False)
+            m = self.getContextByClass('Measure', sortByCreationTime=True)
             if m is not None:
                 #environLocal.printDebug(['using found Measure for offset access'])
                 try:
@@ -3083,60 +2987,8 @@ class Music21Object(object):
         ''')
 
     def _getBeatStrength(self):
-        '''Return an accent weight based on local Measure and TimeSignature. If the offset of this object does not match a defined accent weight, a minimum accent weight will be returned.
-
-
-        >>> n = note.Note("D#7")
-        >>> n.quarterLength = .25
-        >>> m = stream.Measure()
-        >>> m.isMeasure
-        True
-        >>> m.timeSignature = meter.TimeSignature('4/4')
-        >>> m.repeatAppend(n, 16)
-
-        >>> m.notes[0]._getBeatStrength()
-        1.0
-        >>> m.notes[4]._getBeatStrength()
-        0.25
-        >>> m.notes[8]._getBeatStrength()
-        0.5
-
-
-        Test not using measures
-
-
-        >>> n = note.Note("E--3")
-        >>> n.quarterLength = 2
-        >>> s = stream.Stream()
-        >>> s.isMeasure
-        False
-        >>> s.insert(0, meter.TimeSignature('2/2'))
-        >>> s.repeatAppend(n, 16)
-        >>> s.notes[0]._getBeatStrength()
-        1.0
-        >>> s.notes[1]._getBeatStrength()
-        0.5
-        >>> s.notes[4]._getBeatStrength()
-        1.0
-        >>> s.notes[5]._getBeatStrength()
-        0.5
-
-
         '''
-        #from music21.meter import MeterException
-        ts = self.getContextByClass('TimeSignature')
-        if ts is None:
-            raise Music21ObjectException('this object does not have a TimeSignature in Sites')
-
-#         environLocal.printDebug(['_getBeatStrength(): calling getAccentWeight()', 'self._getMeasureOffset()', self._getMeasureOffset(), 'ts', ts, 'ts.getAccentWeight', accentWeight])
-        #mOffset = self._getMeasureOffset()
-
-        return ts.getAccentWeight(
-            self._getMeasureOffsetOrMeterModulusOffset(ts),
-                forcePositionMatch=True, permitMeterModulus=False)
-
-    beatStrength = property(_getBeatStrength,
-        doc = '''Return the metrical accent of this object
+        Return the metrical accent of this object
         in the most recently positioned Measure. Accent values
         are between zero and one, and are derived from the local
         TimeSignature's accent MeterSequence weights. If the offset
@@ -3177,7 +3029,38 @@ class Music21Object(object):
         >>> [s.notes[i].beatStrength for i in range(12)]
         [1.0, 0.25, 0.5, 0.25, 1.0, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 0.5]
 
-        ''')
+
+        Test not using measures
+
+        >>> n = note.Note("E--3")
+        >>> n.quarterLength = 2
+        >>> s = stream.Stream()
+        >>> s.isMeasure
+        False
+        >>> s.insert(0, meter.TimeSignature('2/2'))
+        >>> s.repeatAppend(n, 16)
+        >>> s.notes[0].beatStrength
+        1.0
+        >>> s.notes[1].beatStrength
+        0.5
+        >>> s.notes[4].beatStrength
+        1.0
+        >>> s.notes[5].beatStrength
+        0.5
+        '''
+        #from music21.meter import MeterException
+        ts = self.getContextByClass('TimeSignature')
+        if ts is None:
+            raise Music21ObjectException('this object does not have a TimeSignature in Sites')
+
+#         environLocal.printDebug(['_getBeatStrength(): calling getAccentWeight()', 'self._getMeasureOffset()', self._getMeasureOffset(), 'ts', ts, 'ts.getAccentWeight', accentWeight])
+        #mOffset = self._getMeasureOffset()
+
+        return ts.getAccentWeight(
+            self._getMeasureOffsetOrMeterModulusOffset(ts),
+                forcePositionMatch=True, permitMeterModulus=False)
+
+    beatStrength = property(_getBeatStrength)
 
     def _setSeconds(self, value):
         ti = self.getContextByClass('TempoIndication')
@@ -3244,6 +3127,7 @@ class ElementWrapper(Music21Object):
     ...    def getnchannels(self): return 2 #_DOCS_HIDE
 
     >>> s = stream.Stream()
+    >>> s.id = 'mainStream'
     >>> s.append(meter.TimeSignature('fast 6/8'))
     >>> for i in range(10):
     ...    fileName = 'thisSound_' + str(random.randint(1,20)) + '.wav'
@@ -3261,6 +3145,13 @@ class ElementWrapper(Music21Object):
     (3.0, 1.0, 2, 'thisSound_16.wav')
     (6.0, 1.0, 2, 'thisSound_12.wav')
     (9.0, 1.0, 2, 'thisSound_8.wav')
+    >>> for j in s.getElementsByClass('ElementWrapper'):
+    ...    if j.beatStrength > 0.4:
+    ...        (j.offset, j.beatStrength, j.getnchannels() + 1, j.fileName)
+    (0.0, 1.0, 3, 'thisSound_1.wav')
+    (3.0, 1.0, 3, 'thisSound_16.wav')
+    (6.0, 1.0, 3, 'thisSound_12.wav')
+    (9.0, 1.0, 3, 'thisSound_8.wav')
 
     Test representation of an ElementWrapper
 
@@ -3275,9 +3166,9 @@ class ElementWrapper(Music21Object):
     <ElementWrapper id=1_wrapper offset=1.0 obj="<...Wave_read object...">
     <ElementWrapper offset=2.0 obj="<...Wave_read object...">
     '''
-    obj = None
     _id = None
-
+    obj = None
+    
     _DOC_ORDER = ['obj']
     _DOC_ATTR = {
         'obj': 'The object this wrapper wraps. It should not be a Music21Object.',
@@ -3498,29 +3389,6 @@ class Test(unittest.TestCase):
         stream1.append(note1)
         unused_subStream = stream1.notes
 
-    def testLocationsRefs(self):
-        aMock = TestMock()
-        bMock = TestMock()
-
-        loc = Sites()
-        loc.add(aMock, 234)
-        loc.add(bMock, 12)
-
-#        self.assertEqual(loc.getOffsetByIndex(-1), 12)
-        self.assertEqual(loc.getOffsetBySite(aMock), 234)
-        self.assertEqual(loc.getSiteByOffset(234), aMock)
-#        self.assertEqual(loc.getSiteByIndex(-1), bMock)
-
-        #del aMock
-        # if the activeSite has been deleted, the None will be returned
-        # even though there is still an entry
-        #self.assertEqual(loc.getSiteByIndex(0), None)
-
-    def testLocationsNone(self):
-        '''Test assigning a None to activeSite
-        '''
-        loc = Sites()
-        loc.add(None, 0)
 
     def testM21BaseDeepcopy(self):
         '''
@@ -3536,27 +3404,31 @@ class Test(unittest.TestCase):
         '''
         Basic testing of M21 base object sites
         '''
-        from music21 import stream
-        a = Music21Object()
+        from music21 import stream, base # self import needed.
+        a = base.Music21Object()
         b = stream.Stream()
 
         # storing a single offset does not add a Sites entry
         a.offset = 30
         # all offsets are store in locations
         self.assertEqual(len(a.sites), 1)
-        self.assertEqual(a.getOffsetBySite(None), 30.0)
+        self.assertEqual(a._naiveOffset, 30.0)
         self.assertEqual(a.offset, 30.0)
 
-        # assigning a activeSite directly
-        a.activeSite = b
+        # assigning a activeSite directly # v2.1. no longer allowed if not in site
+        def assignActiveSite(a, b): 
+            a.activeSite = b
+        self.assertRaises(SitesException, assignActiveSite, a,b)
         # now we have two offsets in locations
+        b.insert(a)
         self.assertEqual(len(a.sites), 2)
+        self.assertEqual(a.activeSite, b)
 
         a.offset = 40
         # still have activeSite
         self.assertEqual(a.activeSite, b)
         # now the offst returns the value for the current activeSite
-        b.setOffsetMap(a, 40.0)
+        #b.setOffsetMap(a, 40.0)
         self.assertEqual(a.offset, 40.0)
 
         # assigning a activeSite to None
@@ -3571,26 +3443,28 @@ class Test(unittest.TestCase):
         '''
         Basic testing of M21 base object
         '''
-        a = Music21Object()
+        from music21 import stream, base
+        a = stream.Stream()
         a.id = "a obj"
-        b = Music21Object()
+        b = base.Music21Object()
         b.id = "b obj"
 
-        post = []
         b.id = 'test'
-        b.activeSite = a
+        a.insert(0, b)
         c = copy.deepcopy(b)
         c.id = "c obj"
-        post.append(c)
 
         # have two locations: None, and that set by assigning activeSite
         self.assertEqual(len(b.sites), 2)
-        dummy = post[-1].sites
-        self.assertEqual(len(post[-1].sites), 2)
+        dummy = c.sites
+        # c is in 1 site, None, because it is a copy of b
+        self.assertEqual(len(c.sites), 1)
 
+
+    def testM21BaseLocationsCopyB(self):
         # the active site of a deepcopy should not be the same?
         #self.assertEqual(post[-1].activeSite, a)
-        from music21 import stream, base # self-import fine.
+        from music21 import stream, base
         a = stream.Stream()
         b = base.Music21Object()
         b.id = 'test'
@@ -3599,8 +3473,9 @@ class Test(unittest.TestCase):
         
         d = stream.Stream()
         self.assertEqual(b.activeSite, a)
+        self.assertEqual(len(b.sites), 2)
         c = copy.deepcopy(b)
-        self.assertEqual(c.activeSite, None)
+        self.assertIs(c.activeSite, None)
         d.insert(20, c)
         self.assertEqual(len(c.sites), 2)
 
@@ -3666,7 +3541,7 @@ class Test(unittest.TestCase):
         # the activeSite of measures[1] is set to the new output stream
         self.assertEqual(measures[1].activeSite, measures)
         # the source Part should still be a context of this measure
-        self.assertEqual(measures[1].hasContext(a.parts[0]), True)
+        self.assertEqual(measures[1].hasSite(a.parts[0]), True)
 
         # from the first measure, we can get the clef by using
         # getElementsByClass
@@ -3689,9 +3564,9 @@ class Test(unittest.TestCase):
         newStream = stream.Stream()
         newStream.insert(0, measures[3])
         # all previous locations are still available as a context
-        self.assertEqual(measures[3].hasContext(newStream), True)
-        self.assertEqual(measures[3].hasContext(measures), True)
-        self.assertEqual(measures[3].hasContext(a.parts[0]), True)
+        self.assertEqual(measures[3].hasSite(newStream), True)
+        self.assertEqual(measures[3].hasSite(measures), True)
+        self.assertEqual(measures[3].hasSite(a.parts[0]), True)
         # we can still access the clef through this measure on this
         # new stream
         post = newStream[0].getContextByClass(clef.Clef)
@@ -3927,93 +3802,8 @@ class Test(unittest.TestCase):
         #offsets for flat representation have proper spacing
         self.assertEqual([n.offset for n in p.flat.notesAndRests], [0.0, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 12.5, 13.0, 15.0, 16.0, 16.5, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 28.5, 29.0, 31.0, 32.0, 33.0, 34.0, 34.5, 34.75, 35.0, 35.5, 36.0, 37.0, 38.0, 39.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 47.0, 48.0, 48.5, 49.0, 50.0, 51.0, 52.0, 53.0, 54.0, 55.0, 56.0, 57.0, 58.0, 59.0, 60.0, 60.5, 61.0, 63.0] )
 
-    def testBoundLocations(self):
-        '''Bound or relative locations; locations that are not based on a number but an attribute of the site.
-        '''
+    def testHighestTime(self):
         from music21 import stream, note, bar
-
-        s = stream.Stream()
-        n1 = note.Note()
-        n1.quarterLength = 20
-        s.append(n1)
-        self.assertEqual(s.highestTime, 20)
-
-        #offset = None
-
-        # this would be in a note
-        dc = Sites()
-        # we would add, for that note, a location in object s
-        # if offset is None, it is a context, and has no offset
-        dc.add(s, None)
-        self.assertEqual(len(dc), 1)
-        self.assertEqual(len(dc._locationKeys), 0)
-        self.assertEqual(dc.getSites(), [])
-
-        dc = Sites()
-        # if we have an offset, we get a location
-        dc.add(s, 30)
-        self.assertEqual(len(dc), 1)
-        self.assertEqual(len(dc._locationKeys), 1)
-        self.assertEqual(dc.getSites(), [s])
-        self.assertEqual(dc.getOffsets(), [30])
-        self.assertEqual(dc.getOffsetBySite(s), 30)
-        self.assertEqual(dc.getOffsetByObjectMatch(s), 30)
-
-
-        dc = Sites()
-        # instead of adding the position of this dc in s, we add a lambda
-        # expression that take s as an argument
-        dc.add(s, 30)
-        self.assertEqual(len(dc), 1)
-        self.assertEqual(len(dc._locationKeys), 1)
-        self.assertEqual(dc.getSites(), [s])
-        self.assertEqual(dc.getOffsets(), [30])
-        self.assertEqual(dc.getOffsetBySite(s), 30)
-        self.assertEqual(dc.getOffsetByObjectMatch(s), 30)
-
-
-        # need to account for two cases; where a location is linked
-        # to another objects location.
-        # and where location is linked to a
-
-        # could use lambda functions, but they may be hard to seralize
-        # instead, use a string for the attribute
-
-        dc = Sites()
-        # instead of adding the position of this dc in s, we add a lambda
-        # expression that take s as an argument
-        dc.add(s, 'highestTime')
-        self.assertEqual(len(dc), 1)
-        self.assertEqual(len(dc._locationKeys), 1)
-        self.assertEqual(dc.getSites(), [s])
-        self.assertEqual(dc.getOffsetBySite(s), 20.0)
-        self.assertEqual(dc.getOffsets(), [20.0])
-        self.assertEqual(dc.getOffsetByObjectMatch(s), 20.0)
-
-        # change the stream and see that the location has changed
-        n2 = note.Note()
-        n2.quarterLength = 30
-        s.append(n2)
-        self.assertEqual(s.highestTime, 50)
-        self.assertEqual(dc.getOffsetBySite(s), 50.0)
-
-        # can add another location for the lowest offset
-        dc.add(s, 'lowestOffset')
-        # still only have one site
-        self.assertEqual(dc.getSites(), [s])
-        self.assertEqual(dc.getOffsetBySite(s), 0.0)
-
-        dc.add(s, 'highestOffset')
-        # still only have one site
-        self.assertEqual(dc.getSites(), [s])
-        self.assertEqual(dc.getOffsetBySite(s), 20.0)
-
-        # valid boundLocations are the following:
-        # highestOffset, lowestOffset, highestTime
-
-        # this works, but only b/c we are not actually appending
-        # the bar object.
-
         s = stream.Stream()
         n1 = note.Note()
         n1.quarterLength = 30
@@ -4024,7 +3814,6 @@ class Test(unittest.TestCase):
         s.append(n1)
         self.assertEqual(s.highestTime, 30.0)
         s.setOffsetMap(b1, 'highestTime')
-        b1.sites.add(s, 'highestTime')
         
         self.assertEqual(b1.getOffsetBySite(s), 30.0)
 
@@ -4098,10 +3887,7 @@ class Test(unittest.TestCase):
         self.assertEqual(s2.hasElement(n1), False)
         self.assertEqual(s2.hasElement(n2), True)
 
-        # s1 is still a context of n2, but not a site
-        #self.assertEqual(n2.hasContext(s1), True)
         self.assertEqual(n2.hasSite(s1), False)
-        self.assertEqual(n2.hasContext(s2), True)
         self.assertEqual(n2.hasSite(s2), True)
 
         self.assertEqual(n2.sites.containedById, id(n2))
@@ -4411,8 +4197,39 @@ class Test(unittest.TestCase):
         s1.append(n1)
         self.assertEqual(n1.activeSite, s1)
 
-        unused_n2 = copy.deepcopy(n1)
-        #self.assertEqual(n2._activeSite, s1)
+        n2 = copy.deepcopy(n1)
+        self.assertIs(n2._activeSite, None)
+        self.assertIs(n2.derivation.origin.activeSite, s1)
+
+    def testSpannerSites(self):
+        from music21 import note, spanner, dynamics
+        
+        n1 = note.Note('C4')
+        n2 = note.Note('D4')
+        sp1 = spanner.Slur(n1, n2)
+        ss = n1.getSpannerSites()
+        self.assertEqual(ss, [sp1])
+
+        # test same for inherited classes and multiple sites, in order...
+        sp2 = dynamics.Crescendo(n2, n1)
+        self.assertEqual(n2.getSpannerSites(), [sp1, sp2])
+
+        #Optionally a class name or list of class names can be
+        #specified and only Spanners of that class will be returned
+
+        sp3 = dynamics.Diminuendo(n1, n2)
+        self.assertEqual(n2.getSpannerSites('Diminuendo'), [sp3])
+
+        # A larger class name can be used to get all subclasses:
+
+        self.assertEqual(n2.getSpannerSites('DynamicWedge'), [sp2, sp3])
+        self.assertEqual(n2.getSpannerSites(['Slur', 'Diminuendo']), [sp1, sp3])
+
+        #The order spanners are returned is generally the order that they were
+        #added, but that is not guaranteed, so for safety sake, use set comparisons:
+
+        self.assertEqual(set(n2.getSpannerSites(['Slur','Diminuendo'])), set([sp3, sp1]))
+
 
     def testContextSitesA(self):
         from music21 import corpus
@@ -4440,13 +4257,16 @@ class Test(unittest.TestCase):
 
         m2 = copy.deepcopy(m)
         m2.number = 3333
-        siteList = []      
+        siteList = []   
+        #environLocal.warn("#########################")   
         for y in m2.contextSites():
             siteList.append(repr(y))
-        self.assertEqual(siteList, ["(<music21.stream.Measure 3333 offset=9.0>, 0.0, 'elementsFirst')",
+        self.assertEqual(siteList, ["(<music21.stream.Measure 3333 offset=0.0>, 0.0, 'elementsFirst')",
+                                    "(<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')",
                                     "(<music21.stream.Part Alto>, 9.0, 'flatten')", 
                                     "(<music21.stream.Score bach>, 9.0, 'elementsOnly')"])
         siteList = []
+        c.parts.id = 'partStream' # to make it easier to see below, will be cached...
         ptemp = c.parts[1]
         m3 = ptemp.measure(3)
         self.assertIs(m, m3)
@@ -4458,8 +4278,8 @@ class Test(unittest.TestCase):
             siteList[i] = re.sub('0x[a-f0-9]*', '...', sl)
         self.assertEqual(siteList, ["(<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')", 
                                     "(<music21.stream.Part Alto>, 9.0, 'flatten')", 
-                                    "(<music21.stream.Score bach>, 9.0, 'elementsOnly')", 
-                                    "(<music21.stream.Stream ...>, 9.0, 'elementsFirst')"])
+                                    "(<music21.stream.Score partStream>, 9.0, 'elementsOnly')",
+                                    "(<music21.stream.Score bach>, 9.0, 'elementsOnly')"])
 
     def testContextSitesB(self):        
         from music21 import stream, note
