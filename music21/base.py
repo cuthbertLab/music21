@@ -389,6 +389,80 @@ class Music21Object(object):
             self.id = other.id
         self.groups = copy.deepcopy(other.groups)
 
+    def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
+        '''
+        Subclassable __deepcopy__ helper so that the same attributes do not need to be called
+        for each Music21Object subclass.
+        '''
+        defaultIgnoreSet = {'_derivation', '_activeSite', 'id', 'sites'}
+        if ignoreAttributes is None:
+            ignoreAttributes = defaultIgnoreSet
+        else:
+            ignoreAttributes = ignoreAttributes | defaultIgnoreSet
+        
+        if removeFromIgnore is not None:
+            ignoreAttributes = ignoreAttributes - removeFromIgnore
+        
+        # call class to get a new, empty instance
+        new = self.__class__()
+        #environLocal.printDebug(['Music21Object.__deepcopy__', self, id(self)])
+        #for name in dir(self):
+        if '_derivation' in ignoreAttributes:
+            # was: keep the old ancestor but need to update the client
+            # 2.1 : NO, add a derivation of __deepcopy__ to the client
+            newDerivation = derivation.Derivation(client=new)
+            newDerivation.origin = self
+            newDerivation.method = '__deepcopy__'
+            setattr(new, '_derivation', newDerivation)
+
+        if '_activeSite' in ignoreAttributes:
+            # TODO: Fix this so as not to allow incorrect _activeSite
+            # keep a reference, not a deepcopy
+            # do not use property: .activeSite; set to same weakref obj
+            setattr(new, '_activeSite', self._activeSite)
+
+        if 'id' in ignoreAttributes:
+            value = getattr(self, 'id')
+            if value != id(self) or (common.isNum(value) and value < 10000): # lowest conceivable pointer value
+                newValue = value
+                setattr(new, 'id', newValue)
+        if 'sites' in ignoreAttributes:
+            ## TODO: Fix This to get better sites value
+            value = getattr(self, 'sites')
+            # this calls __deepcopy__ in Sites
+            newValue = copy.deepcopy(value, memo)
+            #environLocal.printDebug(['copied definedContexts:', newValue._locationKeys])
+            newValue.containedById = id(new)
+            setattr(new, 'sites', newValue)
+
+
+        for name in self.__dict__:
+            if name.startswith('__'):
+                continue
+            if name in ignoreAttributes:
+                continue
+
+            attrValue = getattr(self, name)
+            # attributes that require special handling
+            try:
+                deeplyCopiedObject = copy.deepcopy(attrValue, memo)
+                setattr(new, name, deeplyCopiedObject)
+            except TypeError:
+                if not isinstance(attrValue, Music21Object):
+                    # shallow copy then...
+                    try:
+                        shallowlyCopiedObject = copy.copy(attrValue)
+                        setattr(new, name, shallowlyCopiedObject)
+                        environLocal.printDebug('__deepcopy__: Could not deepcopy %s in %s, not a music21Object so making a shallow copy' % (name, self))
+                    except TypeError:
+                        # just link...
+                        environLocal.printDebug('__deepcopy__: Could not copy (deep or shallow) %s in %s, not a music21Object so just making a link' % (name, self))
+                        setattr(new, name, attrValue)
+                else: # raise error for our own problem.
+                    raise Music21Exception('__deepcopy__: Cannot deepcopy Music21Object %s probably because it requires a default value in instantiation.' % name)
+            
+        return new
+
     def __deepcopy__(self, memo=None):
         '''
         Helper method to copy.py's deepcopy function.  Call it from there.
@@ -407,11 +481,17 @@ class Music21Object(object):
         >>> n.groups
         ['flute']
 
+        >>> idN = n.id
+        >>> idN > 10000  # pointer
+        True
+        
         >>> b = deepcopy(n)
         >>> b.offset = 2.0 #duration.Duration("half")
 
         >>> n is b
         False
+        >>> b.id != n.id
+        True        
         >>> n.accidental = "-"
         >>> b.name
         'A'
@@ -424,54 +504,12 @@ class Music21Object(object):
         (False, True)
         '''
         #environLocal.printDebug(['calling Music21Object.__deepcopy__', self])
-
-        # call class to get a new, empty instance
-        new = self.__class__()
-        #environLocal.printDebug(['Music21Object.__deepcopy__', self, id(self)])
-        #for name in dir(self):
-        if '_derivation' in self.__dict__:
-            # was: keep the old ancestor but need to update the client
-            # 2.1 : NO, add a derivation of __deepcopy__ to the client
-            newDerivation = derivation.Derivation(client=new)
-            newDerivation.origin = self
-            newDerivation.method = '__deepcopy__'
-            setattr(new, '_derivation', newDerivation)
-
-        for name in self.__dict__:
-            if name.startswith('__'):
-                continue
-            if name in ('_derivation'):
-                continue
-
-            value = getattr(self, name)
-            # attributes that require special handling
-            if name == '_activeSite':
-                #environLocal.printDebug([self, 'copying activeSite weakref', self._activeSite])
-                # keep a reference, not a deepcopy
-                # do not use activeSite property; simply use same weak ref obj
-                setattr(new, name, self._activeSite)
-                #pass
-            elif name == 'id':
-                # if the id of this source is set to its obj ide, do not copy
-                if value != id(self):
-                    newValue = copy.deepcopy(value, memo)
-                    setattr(new, name, newValue)
-            # use sites own __deepcopy__, but set contained by id
-            elif name == 'sites':
-                newValue = copy.deepcopy(value, memo)
-                #environLocal.printDebug(['copied definedContexts:', newValue._locationKeys])
-                newValue.containedById = id(new)
-                setattr(new, name, newValue)
-            else: # use copy.deepcopy, will call __deepcopy__ if available
-                newValue = copy.deepcopy(value, memo)
-                #setattr() will call the set method of a named property.
-                setattr(new, name, newValue)
-
+        new = self._deepcopySubclassable(memo)
         # must do this after copying
         new.purgeOrphans()
-
         #environLocal.printDebug([self, 'end deepcopy', 'self._activeSite', self._activeSite])
         return new
+
     
     def __getstate__(self):
         state = self.__dict__.copy()

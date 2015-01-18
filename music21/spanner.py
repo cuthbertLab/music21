@@ -27,7 +27,6 @@ import copy
 from music21 import exceptions21
 from music21 import base
 from music21 import common
-from music21 import derivation
 from music21 import duration
 
 from music21 import environment
@@ -258,6 +257,29 @@ class Spanner(base.Music21Object):
         msg.append('>')
         return ''.join(msg)
 
+    def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
+        '''
+        see __deepcopy__ for tests and docs
+        '''
+        # NOTE: this is a performance critical operation        
+        defaultIgnoreSet = {'_cache', 'spannerStorage'}
+        if ignoreAttributes is None:
+            ignoreAttributes = defaultIgnoreSet
+        else:
+            ignoreAttributes = ignoreAttributes | defaultIgnoreSet
+
+        new = super(Spanner, self)._deepcopySubclassable(memo, ignoreAttributes, removeFromIgnore)
+
+        if removeFromIgnore is not None:
+            ignoreAttributes = ignoreAttributes - removeFromIgnore
+
+        if 'spannerStorage' in ignoreAttributes:
+            for c in self.spannerStorage:
+                new.spannerStorage.append(c)
+
+        return new
+            
+
     def __deepcopy__(self, memo=None):
         '''
         This produces a new, independent object containing references to the same spannedElements. 
@@ -284,43 +306,7 @@ class Spanner(base.Music21Object):
         >>> sp2[0] is n1
         True
         '''
-        new = self.__class__()
-        old = self
-        
-        if '_derivation' in self.__dict__:
-            # was: keep the old ancestor but need to update the client
-            # 2.1 : NO, add a derivation of __deepcopy__ to the client
-            newDerivation = derivation.Derivation(client=new)
-            newDerivation.origin = self
-            newDerivation.method = '__deepcopy__'
-            setattr(new, '_derivation', newDerivation)
-
-        for name in self.__dict__:
-            if name.startswith('__'):
-                continue
-            if name in ('_cache', '_derivation'):
-                continue
-            part = getattr(self, name)
-            # functionality duplicated from Music21Object
-            if name == '_activeSite':
-                #environLocal.printDebug(['creating parent reference'])
-                # keep a reference, not a deepcopy
-                setattr(new, name, self.activeSite)
-            elif name == 'sites':
-                newValue = copy.deepcopy(part, memo)
-                newValue.containedById = id(new)
-                setattr(new, name, newValue)
-
-            # do not deepcopy spannerStorage, as this will copy the 
-            # contained objects
-            elif name == 'spannerStorage':
-                for c in old.spannerStorage:
-                    new.spannerStorage.append(c)
-            else: 
-                #environLocal.printDebug(['Spanner.__deepcopy__', name])
-                newValue = copy.deepcopy(part, memo)
-                setattr(new, name, newValue)
-        return new
+        return self._deepcopySubclassable(memo)
 
     #---------------------------------------------------------------------------
     # as spannedElements is private Stream, unwrap/wrap methods need to override

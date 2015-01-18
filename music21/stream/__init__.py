@@ -1171,41 +1171,30 @@ class Stream(base.Music21Object):
         # call elements changed once; sorted arrangement has not changed
         self._elementsChanged(clearIsSorted=False)
 
+    def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
+        # NOTE: this is a performance critical operation        
+        defaultIgnoreSet = {'_offsetMapDict', 'streamStatus', '_elements', '_endElements', '_cache',
+                            'analysisData' # TODO: REMOVE SOON
+                            }
+        if ignoreAttributes is None:
+            ignoreAttributes = defaultIgnoreSet
+        else:
+            ignoreAttributes = ignoreAttributes | defaultIgnoreSet
 
+        new = super(Stream, self)._deepcopySubclassable(memo, ignoreAttributes, removeFromIgnore)
 
-    def __deepcopy__(self, memo=None):
-        '''
-        Deepcopy the stream from copy.deepcopy()
-        '''
-        # NOTE: this is a performance critical operation
+        if removeFromIgnore is not None:
+            ignoreAttributes = ignoreAttributes - removeFromIgnore
 
-        #environLocal.printDebug(['Stream calling __deepcopy__', self])
-        new = self.__class__()
-        old = self
-        
+        if '_offsetMapDict' in ignoreAttributes:
+            newValue = {}
+            setattr(new, '_offsetMapDict', newValue)
         # all subclasses of Music21Object that define their own
         # __deepcopy__ methods must be sure to not try to copy activeSite
-        if '_activeSite' in self.__dict__:
-            # keep a reference, not a deepcopy
-            # do not use property: .activeSite; set to same weakref obj
-            setattr(new, '_activeSite', self._activeSite)
-        if 'sites' in self.__dict__:
-            # this calls __deepcopy__ in Sites
-            newValue = copy.deepcopy(getattr(self, 'sites'), memo)
-            newValue.containedById = id(new)
-            setattr(new, 'sites', newValue)
-
         if '_offsetMapDict' in self.__dict__:
             newValue = {}
             setattr(new, '_offsetMapDict', newValue)
-        if '_derivation' in self.__dict__:
-            # was: keep the old ancestor but need to update the client
-            # 2.1 : NO, add a derivation of __deepcopy__ to the client
-            newDerivation = derivation.Derivation(client=new)
-            newDerivation.origin = self
-            newDerivation.method = '__deepcopy__'
-            setattr(new, '_derivation', newDerivation)
-        if 'streamStatus' in self.__dict__:
+        if 'streamStatus' in ignoreAttributes:
             # update the client
             if self.streamStatus is not None:
                 #storedClient = self.streamStatus.client # should be self
@@ -1216,7 +1205,7 @@ class Stream(base.Music21Object):
                 #self.streamStatus.client = storedClient
         #if name == '_cache' or name == 'analysisData':
         #    continue # skip for now
-        if '_elements' in self.__dict__:
+        if '_elements' in ignoreAttributes:
             # must manually add elements to new Stream
             for e in self._elements:
                 #environLocal.printDebug(['deepcopy()', e, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new), 'old.hasElement(e)', old.hasElement(e), 'e.activeSite', e.activeSite, 'e.getSites()', e.getSites(), 'e.getSiteIds()', e.getSiteIds()], format='block')
@@ -1225,68 +1214,16 @@ class Stream(base.Music21Object):
                 # user here to provide new offset
                 #new.insert(e.getOffsetBySite(old), newElement,
                 #           ignoreSort=True)
-                offset = e.getOffsetBySite(old)
+                offset = e.getOffsetBySite(self)
                 newElement = copy.deepcopy(e, memo)
                 new._insertCore(offset, newElement, ignoreSort=True)
-        if '_endElements' in self.__dict__:
+        if '_endElements' in ignoreAttributes:
             # must manually add elements to
             for e in self._endElements:
                 # this will work for all with __deepcopy___
                 # get the old offset from the activeSite Stream
                 # user here to provide new offset
                 new._storeAtEndCore(copy.deepcopy(e, memo))                
-        
-        for name in self.__dict__:
-            #if 'Score' in old.__class__.__name__:
-            #    environLocal.warn('%r, %r, %s' % (old, new, name))
-            if name.startswith('__'):
-                continue
-            if name in ('_activeSite', 'sites', # handled above
-                        '_offsetMapDict', '_derivation', 'streamStatus', 
-                        '_elements', '_endElements',
-                        
-                        '_cache', # skip
-                        'analysisData', # skip and remove soon...
-                        ):
-                continue
-            
-            attrValue = getattr(self, name)
-            
-
-            if name == 'id' and type(old.id) == int:
-                pass
-            else:
-                try:
-                    deeplyCopiedObject = copy.deepcopy(attrValue, memo)
-                    setattr(new, name, deeplyCopiedObject)
-                except TypeError:
-                    if not isinstance(attrValue, base.Music21Object):
-                        # shallow copy then...
-                        try:
-                            shallowlyCopiedObject = copy.copy(attrValue)
-                            setattr(new, name, shallowlyCopiedObject)
-                            environLocal.printDebug('__deepcopy__: Could not deepcopy %s in %s, not a music21Object so making a shallow copy' % (name, self))
-                        except TypeError:
-                            # just link...
-                            environLocal.printDebug('__deepcopy__: Could not copy (deep or shallow) %s in %s, not a music21Object so just making a link' % (name, self))
-                            setattr(new, name, attrValue)
-                    else: # raise error for our own problem.
-                        raise StreamException('__deepcopy__: Cannot deepcopy Music21Object %s probably because it requires a default value in instantiation.' % name)
-
-        # after performing deepcopying, .sites may contain sites
-        # that the copied obj does not belong to
-
-        # TODO: instead of purging, have old sites become new contexts
-        # have a separate option to purge contexts
-
-        # after copying all elements
-        # get all spanners at all levels from new:
-        # these have references to old objects
-        # it is likely that this only needs to be done at the highest
-        # level of recursion, not on component Streams
-        #spannerBundle = spanner.SpannerBundle(new.flat.spanners)
-        if new.id == '1':
-            pass
         spannerBundle = new.spannerBundle
         # only proceed if there are spanners, otherwise creating semiFlat
         if len(spannerBundle) > 0:
@@ -1313,29 +1250,13 @@ class Stream(base.Music21Object):
         # cases where we rely on a Stream having access to Stream it was
         # part of after deepcopying
         #new.purgeOrphans()
-
-
-        # this is presently not necessary
-#         variantBundle = new.variantBundle
-#         if len(variantBundle) > 0:
-#             for e in new:
-#                 # only do once for each level; lower-levels done later
-#                 if e.isStream:
-#                     continue
-#                 if e.isVariant:
-#                     continue # copied already
-#                 # if we find an obj tt has a variant site, it is pointing
-#                 # to an old variant, not the newly copied ones; now, we need
-#                 # to re-sync it with the variants in the VariantBundle
-#                 if e.sites.hasVariantSite():
-#                     # will scan each known variant over all elements
-#                     # this possible by optimized by selecting just a relevent
-#                     # time region
-#                    origin = e.derivation.origin
-#                    if (origin is not None and e.derivation.method == '__deepcopy__'):
-#                        variantBundle.replaceSpannedElement(id(origin), e)
-#
         return new
+
+    def __deepcopy__(self, memo=None):
+        '''
+        Deepcopy the stream from copy.deepcopy()
+        '''
+        return self._deepcopySubclassable(memo)
 
     #---------------------------------------------------------------------------
     def _addElementPreProcess(self, element, checkRedundancy=True):
