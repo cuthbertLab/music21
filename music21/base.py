@@ -483,6 +483,15 @@ class Music21Object(object):
 
         #environLocal.printDebug([self, 'end deepcopy', 'self._activeSite', self._activeSite])
         return new
+    
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state['_derivation'] = None
+        state['_activeSite'] = None
+        return state
+ 
+    def __setstate__(self, state):
+        self.__dict__ = state
 
     def isClassOrSubclass(self, classFilterList):
         '''

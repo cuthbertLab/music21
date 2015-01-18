@@ -94,7 +94,6 @@ class SiteRef(common.SlottedObject):
         self.classString = None
         self.globalSiteIndex = None
         self.siteIndex = None
-        self.isDead = False
         self.siteWeakref = None
         self._offset = 0.0
     
@@ -115,7 +114,7 @@ class SiteRef(common.SlottedObject):
     def __getstate__(self):
         if WEAKREF_ACTIVE:
             self.siteWeakref = common.unwrapWeakref(self.siteWeakref)
-        common.SlottedObject.__getstate__(self)
+        return common.SlottedObject.__getstate__(self)
 
     def __setstate__(self, state):
         common.SlottedObject.__setstate__(self, state)
@@ -211,33 +210,25 @@ class Sites(common.SlottedObject):
         have the former site as a location, even though the new Note instance
         is not actually found in the old Stream.
 
-        ::
+        >>> import copy
+        >>> class Mock(base.Music21Object):
+        ...     pass
+        >>> aObj = Mock()
+        >>> aContexts = sites.Sites()
+        >>> aContexts.add(aObj)
+        >>> bContexts = copy.deepcopy(aContexts)
+        >>> len(aContexts.get()) == 1
+        True
 
-            >>> import copy
-            >>> class Mock(base.Music21Object):
-            ...     pass
-            >>> aObj = Mock()
-            >>> aContexts = sites.Sites()
-            >>> aContexts.add(aObj)
-            >>> bContexts = copy.deepcopy(aContexts)
-            >>> len(aContexts.get()) == 1
-            True
+        >>> len(bContexts.get()) == 1
+        True
 
-        ::
-
-            >>> len(bContexts.get()) == 1
-            True
-
-        ::
-
-            >>> aContexts.get() == bContexts.get()
-            True
-
+        >>> aContexts.get() == bContexts.get()
+        True
         '''
         #TODO: it may be a problem that sites are being transferred to deep
         #copies; this functionality is used at times in context searches, but
         # may be a performance hog.
-
         new = self.__class__()
         locations = []  # self._locationKeys[:]
         #environLocal.printDebug(['Sites.__deepcopy__', 'self.siteDict.keys()', self.siteDict.keys()])

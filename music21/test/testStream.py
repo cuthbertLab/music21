@@ -1666,44 +1666,44 @@ class Test(unittest.TestCase):
         
         self.assertEqual(s1.activeSite, sOuter)
 
-        sOuter.insert(0, clef.AltoClef())
+        ac = clef.AltoClef()
+        ac.priority = -1
+        sOuter.insert(0, ac)
         # both output parts have alto clefs
-        #s3.show()
-
         # get clef form higher level stream; only option
         self.assertEqual(s1.activeSite, sOuter)
         post = s1.getClefs()[0]
         
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef))
         self.assertEqual(s1.activeSite, sOuter)
 
         post = s2.getClefs()[0]
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef))
         
         # now we in sort a clef in s2; s2 will get this clef first
         s2.insert(0, clef.TenorClef())
         # only second part should have tenor clef
         post = s2.getClefs()[0]
-        self.assertEqual(isinstance(post, clef.TenorClef), True)
+        self.assertTrue(isinstance(post, clef.TenorClef))
 
         # but stream s1 should get the alto clef still
         #print list(s1.contextSites())
         post = s1.getContextByClass('Clef')
         #print post
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef))
 
         # s2 flat gets the tenor clef; it was inserted in it
         post = s2.flat.getClefs()[0]
-        self.assertEqual(isinstance(post, clef.TenorClef), True)
+        self.assertTrue(isinstance(post, clef.TenorClef))
 
         # a copy copies the clef; so we still get the same clef
         s2FlatCopy = copy.deepcopy(s2.flat)
         post = s2FlatCopy.getClefs()[0]
-        self.assertEqual(isinstance(post, clef.TenorClef), True)
+        self.assertTrue(isinstance(post, clef.TenorClef))
 
         # s1 flat will get the alto clef; it still has a pathway
         post = s1.flat.getClefs()[0]
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef))
 
         # once we create a deepcopy of s1, it is no longer connected to 
         # its parent if we purge orphans and it is not in sOuter
@@ -1713,18 +1713,22 @@ class Test(unittest.TestCase):
         s1FlatCopy.id = 's1FlatCopy'
         self.assertEqual(len(s1FlatCopy.getClefs(returnDefault=False)), 1)
         post = s1FlatCopy.getClefs(returnDefault=False)[0]
-        self.assertEqual(isinstance(post, clef.AltoClef), True, "post %r is not an AltoClef" % post)
+        self.assertTrue(isinstance(post, clef.AltoClef), "post %r is not an AltoClef" % post)
 
         post = s1Flat.getClefs()[0]
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef), post)
         #environLocal.printDebug(['s1.activeSite', s1.activeSite])
-        self.assertEqual(sOuter in s1.sites.getSites(), True)
+        self.assertTrue(sOuter in s1.sites.getSites())
         s1Measures = s1.makeMeasures()
         #print s1Measures[0].clef
-        self.assertEqual(isinstance(s1Measures[0].clef, clef.AltoClef), True)
+        
+        # this used to be True, but I think it's better as False now...
+        #self.assertTrue(isinstance(s1Measures[0].clef, clef.AltoClef), s1Measures[0].clef)
+        self.assertTrue(isinstance(s1Measures[0].clef, clef.TrebleClef), s1Measures[0].clef)
+
 
         s2Measures = s2.makeMeasures()
-        self.assertEqual(isinstance(s2Measures[0].clef, clef.TenorClef), True)
+        self.assertTrue(isinstance(s2Measures[0].clef, clef.TenorClef))
 
 
         # try making a deep copy of s3
@@ -7430,7 +7434,8 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     import music21
     #'testContextNestedC'
-    #'testContextNestedD'
+    #import sys
+    #sys.argv.append('testContextNestedD')
     music21.mainTest(Test, 'verbose')
 
 

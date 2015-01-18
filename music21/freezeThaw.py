@@ -369,9 +369,11 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> sf.recursiveClearSites(s)
         >>> len(n.sites)
         0
-        >>> n.getOffsetBySite(t)
+
+        >>> n.sites.getOffsetBySite(t)   # TODO: REMOVE ALL THESE TESTS after v2.1
         Traceback (most recent call last):
-        SitesException: The object <music21.note.Note D#> is not in site <music21.stream.Stream stream t>.
+        SitesException: Could not find the object with id ... in the Site marked with idKey ... 
+
         
         This leaves n and t in strange positions, because n is in t.elements still....
         
@@ -395,6 +397,8 @@ class StreamFreezer(StreamFreezeThawBase):
                 if hasattr(el, '_derivation'):
                     el._derivation = derivation.Derivation() #reset
 
+                if (hasattr(el, '_offsetMapDict')):
+                    el._offsetMapDict = {}
                 el.sites.clear()
                 el.activeSite = None
             startObj._derivation = derivation.Derivation() #reset
@@ -463,7 +467,7 @@ class StreamFreezer(StreamFreezeThawBase):
             storedElementOffsetTuples.append(elementTuple)
             if e.isStream:
                 self.setupStoredElementOffsetTuples(e)
-            e.removeLocationBySite(streamObj)
+            e.removeLocationBySite(streamObj)            
 #                e._preFreezeId = id(e)
 #                elementDict[id(e)] = e.getOffsetBySite(s)
         for e in streamObj._endElements:
@@ -2084,11 +2088,6 @@ class Test(unittest.TestCase):
 
         #a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
         c = converter.parse(a)
-        c = c.flat.notes[3]
-        import pickle as p
-        v = c._notes[0]._volume
-        p.dumps(v)
-        exit()
         f = converter.freezeStr(c)
         d = converter.thawStr(f)
         self.assertEqual(d[1][20].volume._parent.__class__.__name__, 'weakref')
@@ -2096,8 +2095,8 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
     import music21
-    import sys
-    sys.argv.append('testPickleMidi')
+    #import sys
+    #sys.argv.append('testPickleMidi')
     music21.mainTest(Test)
     
 

@@ -2294,6 +2294,21 @@ class SlottedObject(object):
     r'''
     Provides template for classes implementing slots allowing it to be pickled
     properly.
+    
+    Only use SlottedObjects for objects that we expect to make so many of
+    that memory storage and speed become an issue.
+    
+    >>> import pickle
+    >>> class Glissdata(common.SlottedObject):
+    ...     __slots__ = ('time', 'frequency')
+    >>> s = Glissdata
+    >>> s.time = 0.125
+    >>> s.frequency = 440.0
+    >>> #_DOCS_SHOW out = pickle.dumps(s)
+    >>> #_DOCS_SHOW t = pickle.loads(out)
+    >>> t = s #_DOCS_HIDE -- cannot define classes for pickling in doctests
+    >>> t.time, t.frequency
+    (0.125, 440.0)
     '''
     
     ### CLASS VARIABLES ###
@@ -2308,8 +2323,6 @@ class SlottedObject(object):
         for cls in self.__class__.mro():
             slots.update(getattr(cls, '__slots__', ()))
         for slot in slots:
-            if slot == '__weakref__':
-                continue
             sValue = getattr(self, slot, None)
             if sValue is not None and type(sValue) is weakref.ref:
                 sValue = sValue()
@@ -2319,8 +2332,6 @@ class SlottedObject(object):
 
     def __setstate__(self, state):
         for slot, value in state.items():
-            if slot == '__weakref__':
-                continue
             setattr(self, slot, value)
 
 

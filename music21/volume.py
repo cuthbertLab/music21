@@ -52,7 +52,6 @@ class Volume(SlottedObject):
     ### CLASS VARIABLES ###
 
     __slots__ = (
-        '__weakref__',
         '_parent',
         '_velocity',
         '_cachedRealized',

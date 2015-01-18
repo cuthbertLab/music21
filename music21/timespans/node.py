@@ -49,7 +49,6 @@ class AVLNode(common.SlottedObject):
     ### CLASS VARIABLES ###
 
     __slots__ = (
-        '__weakref__',
         'balance',
         'height',
         'offset',

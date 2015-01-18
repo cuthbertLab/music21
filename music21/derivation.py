@@ -88,7 +88,6 @@ class Derivation(SlottedObject):
     ### CLASS VARIABLES ###
 
     __slots__ = (
-        '__weakref__',
         '_client',
         '_clientId',
         '_method',
