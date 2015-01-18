@@ -23,25 +23,18 @@ The namespace of this file, as all base.py files, is loaded into the package
 that contains this file via __init__.py. Everything in this file is thus
 available after importing music21.
 
-::
+>>> import music21
+>>> music21.Music21Object
+<class 'music21.base.Music21Object'>
 
-    >>> import music21
-    >>> music21.Music21Object
-    <class 'music21.base.Music21Object'>
-
-::
-
-    >>> music21.VERSION_STR
-    '2.0.1'
+>>> music21.VERSION_STR
+'2.0.2'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
 
-::
-
-    >>> base.Music21Object
-    <class 'music21.base.Music21Object'>
-
+>>> base.Music21Object
+<class 'music21.base.Music21Object'>
 '''
 from __future__ import print_function
 
@@ -56,8 +49,7 @@ import unittest
 from music21.ext import six
 
 #------------------------------------------------------------------------------
-# string and tuple must be the same
-
+# version string and tuple must be the same
 
 if six.PY3:
     basestring = str # @ReservedAssignment
@@ -151,23 +143,17 @@ class Groups(common.SlottedObject, list):
     The Groups object enforces that all elements must be strings, and that
     the same element cannot be provided more than once.
 
-    ::
+    >>> g = Groups()
+    >>> g.append("hello")
+    >>> g[0]
+    'hello'
 
-        >>> g = Groups()
-        >>> g.append("hello")
-        >>> g[0]
-        'hello'
+    >>> g.append("hello") # not added as already present
+    >>> len(g)
+    1
 
-    ::
-
-        >>> g.append("hello") # not added as already present
-        >>> len(g)
-        1
-
-    ::
-
-        >>> g
-        ['hello']
+    >>> g
+    ['hello']
 
     >>> g.append(5)
     Traceback (most recent call last):
@@ -199,26 +185,21 @@ class Groups(common.SlottedObject, list):
         '''
         Test Group equality. In normal lists, order matters; here it does not.
 
-        ::
+        >>> a = Groups()
+        >>> a.append('red')
+        >>> a.append('green')
+        >>> a
+        ['red', 'green']
 
-            >>> a = Groups()
-            >>> a.append('red')
-            >>> a.append('green')
-            >>> a
-            ['red', 'green']
-
-        ::
-
-            >>> b = Groups()
-            >>> b.append('green')
-            >>> b.append('red')
-            >>> a == b
-            True
-
+        >>> b = Groups()
+        >>> b.append('green')
+        >>> b.append('red')
+        >>> a == b
+        True
         '''
         if not isinstance(other, Groups):
             return False
-        if (list.sort(self) == other.sort()):
+        if (sorted(list(self)) == sorted(list(other))):
             return True
         else:
             return False
@@ -226,11 +207,22 @@ class Groups(common.SlottedObject, list):
     def __ne__(self, other):
         '''
         In normal lists, order matters; here it does not.
-        TODO: Test!
+
+        >>> a = Groups()
+        >>> a.append('red')
+        >>> a.append('green')
+        >>> a
+        ['red', 'green']
+
+        >>> b = Groups()
+        >>> b.append('green')
+        >>> b.append('blue')
+        >>> a != b
+        True
         '''
         if other is None or not isinstance(other, Groups):
             return True
-        if (list.sort(self) == other.sort()):
+        if (sorted(list(self)) == sorted(list(other))):
             return False
         else:
             return True
@@ -1134,41 +1126,6 @@ class Music21Object(object):
         for i in orphans:
             self.removeLocationBySiteId(i)
 
-#    def purgeUndeclaredIds(self, declaredIds, excludeStorageStreams=True):
-#        '''
-#        TODO- remove...
-#
-#        Remove all sites except those that are declared with
-#        the `declaredIds` list.
-#
-#        The `excludeStorageStreams` are SpannerStorage and VariantStorage.
-#
-#        This method is used in Stream serialization to remove
-#        lingering sites that are the result of temporary Streams.
-#
-#        TODO: Test!
-#        '''
-#        orphans = []
-#        # TODO: this can be optimized to get actually get sites
-#        for s in self.sites.getSites():
-#            if s is None:
-#                continue
-#            idTarget = id(s)
-#            if idTarget in declaredIds: # skip all declared ids
-#                continue # do nothing
-#            if s.isStream:
-#                if excludeStorageStreams:
-#                    # only get those that are not Storage Streams
-#                    if ('SpannerStorage' not in s.classes
-#                        and 'VariantStorage' not in s.classes):
-#                        #environLocal.printDebug(['removing orphan:', s])
-#                        orphans.append(idTarget)
-#                else: # get all
-#                    orphans.append(idTarget)
-#
-#        for i in orphans:
-#            #environLocal.printDebug(['purgeingUndeclaredIds', i])
-#            self.removeLocationBySiteId(i)
 
     def purgeLocations(self, rescanIsDead=False):
         '''
@@ -2363,7 +2320,7 @@ class Music21Object(object):
         if fmt is None: # get setting in environment
             if common.runningUnderIPython():
                 try:
-                    # TODO: when everyone has updated, then remove these lines...
+                    # TODO: when everyone has updated, then remove these lines... c. August 2015
                     environLocal['ipythonShowFormat'] = 'ipython.lilypond.png'
                     environLocal.write()
                     # end delete
@@ -2420,11 +2377,17 @@ class Music21Object(object):
         is contained within or derived from. This provides a way of seeing
         Streams contained within Streams.
 
-        TODO: Better Name
-
         >>> s = corpus.parse('bach/bwv66.6')
-        >>> [str(e.__class__) for e in s[1][2][3].containerHierarchy]
-        ["<class 'music21.stream.Measure'>", "<class 'music21.stream.Part'>", "<class 'music21.stream.Score'>"]
+        >>> [e for e in s[1][2][3].containerHierarchy]
+        [<music21.stream.Measure 1 offset=1.0>, <music21.stream.Part Soprano>, <music21.stream.Score ...>]
+        
+        
+        Note that derived objects also can follow the container hierarchy:
+        
+        >>> import copy
+        >>> n2 = copy.deepcopy(s[1][2][3])
+        >>> [e for e in s[1][2][3].containerHierarchy]
+        [<music21.stream.Measure 1 offset=1.0>, <music21.stream.Part Soprano>, <music21.stream.Score ...>]
         ''')
 
 
@@ -3720,18 +3683,6 @@ class Test(unittest.TestCase):
 
         post = sInner.getClefs(clef.Clef)
         self.assertEqual(isinstance(post[0], clef.AltoClef), True)
-
-    def testSitesPitch(self):
-        # TODO: this form does not yet work
-        from music21 import note, stream
-        m = stream.Measure()
-        m.number = 34
-        n = note.Note()
-        m.append(n)
-
-        #pitchMeasure = n.pitch.getContextAttr('number')
-        #n.pitch.setContextAttr('lyric', pitchMeasure)
-        #self.assertEqual(n.lyric, 34)
 
     def testBeatAccess(self):
         '''Test getting beat data from various Music21Objects.
