@@ -1227,7 +1227,6 @@ class JSONFreezer(JSONFreezeThawBase):
         '_activeSiteId'
         '_duration'
         '_editorial'
-        '_idLastDeepCopyOf'
         '_notehead'
         '_noteheadFill'
         '_noteheadParenthesis'

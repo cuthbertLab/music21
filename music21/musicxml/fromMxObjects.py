@@ -2698,7 +2698,8 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     # if we have multiple staves defined, add more parts, and transfer elements
     # note: this presently has to look at _idLastDeepCopyOf to get matches
     # to find removed elements after copying; this is probably not the
-    # best way to do this. 
+    # best way to do this.   # V2.1 -- is not/will not be doing this. in fact idLastDeepCopyOf is
+    # going away...
 
     # for this part, if any elements are components in the spannerBundle,
     # then then we need to update the spannerBundle after the part is copied

@@ -338,8 +338,6 @@ class Music21Object(object):
         self._activeSite = None
         # cached id in case the weakref has gone away...
         self._activeSiteId = None
-        # if this element has been copied, store the id() of the last source
-        self._idLastDeepCopyOf = None
         # store a derivation object to track derivations from other Streams
         # pass a reference to this object
         self._derivation = None
@@ -478,7 +476,6 @@ class Music21Object(object):
                 setattr(new, name, newValue)
 
         # must do this after copying
-        new._idLastDeepCopyOf = id(self)
         new.purgeOrphans()
 
         #environLocal.printDebug([self, 'end deepcopy', 'self._activeSite', self._activeSite])
@@ -4097,7 +4094,7 @@ class Test(unittest.TestCase):
 
         n1 = note.Note()
         n2 = copy.deepcopy(n1)
-        self.assertEqual(n2._idLastDeepCopyOf, id(n1))
+        self.assertEqual(id(n2.derivation.origin), id(n1))
 
     def testContainedById(self):
         from music21 import note, stream
