@@ -558,7 +558,10 @@ class ConverterMusicXML(SubConverter):
         '''Open MusicXML data from a string.'''
         from music21.musicxml import xmlHandler as musicxmlHandler
         c = musicxmlHandler.Document()
-        c.read(xmlString)
+        try:
+            c.read(xmlString)
+        except AttributeError:
+            raise SubConverterException('score from xmlString (%s...) either has no parts defined, was incompletely parsed, or may not be MusicXML at all' % xmlString[:30])            
         self._mxScore = c.score #  the mxScore object from the musicxml Document
         if len(self._mxScore) == 0:
             #print xmlString
