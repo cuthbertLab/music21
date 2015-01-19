@@ -67,7 +67,7 @@ class ModuleGather(object):
             'testInstallation.py', 
             'testLint.py', 
             'timeGraphImportStar.py',
-            'testSerialization',
+            'testSerialization.py',
             'mptCurses.py',
             'memoryUsage.py',
             'dedent.py',
@@ -91,33 +91,33 @@ class ModuleGather(object):
             'test/treeYield.py',
             'test/toggleDebug.py',
             
-            'musicxml/testPrimitive',
-            'musicxml/testFiles',
-            'musedata/testPrimitive/test01',
-            'musedata/testPrimitive',
-            'mei/test_base',
-            'ipython21/ipyJSapp',
-            'humdrum/questions',
-            'humdrum/canonicalOutput',
-            'documentation/upload',
+            'musicxml/testPrimitive.py',
+            'musicxml/testFiles.py',
+            'musedata/testPrimitive/test01.py',
+            'musedata/testPrimitive.py',
+            'mei/test_base.py',
+            'ipython21/ipyJSapp.py',
+            'humdrum/questions.py',
+            'humdrum/canonicalOutput.py',
+            'documentation/upload.py',
             'documentation/source/conf'
-            'documentation/make',
-            'corpus/testCorpus',
-            'composition/seeger',
-            'composition/aug30',
-            'audioSearch/scores',
-            'audioSearch/scoreFollower',
-            'audioSearch/repetitionGame',
-            'audioSearch/omrfollow',
-            'audioSearch/humanVScomputer',
-            'audioSearch/graphicalInterfaceTranscriber',
-            'audioSearch/graphicalInterfaceSF',
-            'audioSearch/graphicalInterfaceGame',
-            'analysis/phrasing',
-            'abcFormat/testFiles'
+            'documentation/make.py',
+            'corpus/testCorpus.py',
+            'composition/seeger.py',
+            'composition/aug30.py',
+            'audioSearch/scores.py',
+            'audioSearch/scoreFollower.py',
+            'audioSearch/repetitionGame.py',
+            'audioSearch/omrfollow.py',
+            'audioSearch/humanVScomputer.py',
+            'audioSearch/graphicalInterfaceTranscriber.py',
+            'audioSearch/graphicalInterfaceSF.py',
+            'audioSearch/graphicalInterfaceGame.py',
+            'analysis/phrasing.py',
+            'abcFormat/testFiles.py',
             ]
         # skip any path that starts with this string
-        self.pathSkip = ['abj', 'obsolete', 'ext', 'server', 'demos']
+        self.pathSkip = ['obsolete', 'ext', 'server', 'demos']
         # search on init
         self._walk()
 
@@ -380,7 +380,8 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
         elif moduleResponse.returnCode == 'ImportError':
             otherSummary.append("Import Error for %s" % moduleResponse.fp)
         elif moduleResponse.returnCode == 'NotInTree':
-            otherSummary.append("Not in Tree Error: %s " % moduleResponse.moduleName) 
+            if moduleResponse.moduleName is not None:
+                otherSummary.append("Not in Tree Error: %s " % moduleResponse.moduleName) 
         elif moduleResponse.returnCode == 'TestsRun':
             totalTests += moduleResponse.testsRun
             if moduleResponse.success:
