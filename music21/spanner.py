@@ -1786,23 +1786,6 @@ class Test(unittest.TestCase):
         self.assertEqual(sb2[0], su3)
         self.assertEqual(sb2[1], su4)
         
-    def testDeepcopyStreamWithSpanners(self):
-        from music21 import note, stream
-        n1 = note.Note()
-        su1 = Slur([n1])
-        s = stream.Stream()
-        s.insert(0.0, su1)
-        s.insert(0.0, n1)
-        self.assertIs(s.spanners[0].getFirst(), n1)
-        self.assertIs(s.notes[0].getSpannerSites()[0], su1)
-
-        t = copy.deepcopy(s)
-        su2 = t.spanners[0]
-        n2 = t.notes[0]
-        self.assertIsNot(su2, su1)
-        self.assertIsNot(n2, n1)
-        self.assertIs(t.spanners[0].getFirst(), n2)
-        self.assertIs(s.notes[0].getSpannerSites()[0], su2)
 
 
     def testDeepcopySpanner(self):
@@ -2422,7 +2405,105 @@ class Test(unittest.TestCase):
         p.insert(0, sl)
         unused_data = converter.freezeStr(p, fmt='pickle')
 
+    def testDeepcopyJustSpannerAndNotes(self):
+        from music21 import note, clef
+        n1 = note.Note('g')
+        n2 = note.Note('f#')
+        c1 = clef.AltoClef()
 
+        sp1 = Spanner(n1, n2, c1)
+        sp2 = copy.deepcopy(sp1)
+        self.assertEqual(len(sp2.spannerStorage), 3)
+        self.assertIsNot(sp1, sp2)
+        self.assertIs(sp2[0], sp1[0])
+        self.assertIs(sp2[2], sp1[2])
+        self.assertIs(sp1[0], n1)
+        self.assertIs(sp2[0], n1)
+
+    def testDeepcopySpannerInStreamNotNotes(self):
+        from music21 import note, clef, stream
+        n1 = note.Note('g')
+        n2 = note.Note('f#')
+        c1 = clef.AltoClef()
+
+        sp1 = Spanner(n1, n2, c1)
+        st1 = stream.Stream()
+        st1.insert(0.0, sp1)
+        st2 = copy.deepcopy(st1)
+
+        sp2 = st2.spanners[0]
+        self.assertEqual(len(sp2.spannerStorage), 3)
+        self.assertIsNot(sp1, sp2)
+        self.assertIs(sp2[0], sp1[0])
+        self.assertIs(sp2[2], sp1[2])
+        self.assertIs(sp1[0], n1)
+        self.assertIs(sp2[0], n1)
+        
+    def testDeepcopyNotesInStreamNotSpanner(self):
+        from music21 import note, clef, stream
+        n1 = note.Note('g')
+        n2 = note.Note('f#')
+        c1 = clef.AltoClef()
+
+        sp1 = Spanner(n1, n2, c1)
+        st1 = stream.Stream()
+        st1.insert(0.0, n1)
+        st1.insert(1.0, n2)
+        st2 = copy.deepcopy(st1)
+
+        n3 = st2.notes[0]
+        self.assertEqual(len(n3.getSpannerSites()), 1)
+        sp2 = n3.getSpannerSites()[0]
+        self.assertIs(sp1, sp2)
+        self.assertIsNot(n1, n3)
+        self.assertIs(sp2[2], sp1[2])
+        self.assertIs(sp1[0], n1)
+        self.assertIs(sp2[0], n1)
+
+
+    def testDeepcopyNotesAndSpannerInStream(self):
+        from music21 import note, stream
+        n1 = note.Note('g')
+        n2 = note.Note('f#')
+
+        sp1 = Spanner(n1, n2)
+        st1 = stream.Stream()
+        st1.insert(0.0, sp1)
+        st1.insert(0.0, n1)
+        st1.insert(1.0, n2)
+        st2 = copy.deepcopy(st1)
+
+        n3 = st2.notes[0]
+        self.assertEqual(len(n3.getSpannerSites()), 1)
+        sp2 = n3.getSpannerSites()[0]
+        self.assertIsNot(sp1, sp2)
+        self.assertIsNot(n1, n3)
+        
+        sp3 = st2.spanners[0]
+        self.assertIs(sp2, sp3)
+        self.assertIs(sp1[0], n1)
+        self.assertIs(sp2[0], n3)
+
+    def testDeepcopyStreamWithSpanners(self):
+        from music21 import note, stream
+        n1 = note.Note()
+        su1 = Slur((n1,))
+        s = stream.Stream()
+        s.insert(0.0, su1)
+        s.insert(0.0, n1)
+        self.assertIs(s.spanners[0].getFirst(), n1)
+        self.assertIs(s.notes[0].getSpannerSites()[0], su1)
+
+        t = copy.deepcopy(s)
+        su2 = t.spanners[0]
+        n2 = t.notes[0]
+        self.assertIsNot(su2, su1)
+        self.assertIsNot(n2, n1)
+        self.assertIs(t.spanners[0].getFirst(), n2)
+        self.assertIs(t.notes[0].getSpannerSites()[0], su2)
+        self.assertIsNot(s.notes[0].getSpannerSites()[0], su2)
+
+        
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Spanner]
@@ -2430,8 +2511,8 @@ _DOC_ORDER = [Spanner]
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
-    import sys
-    sys.argv.append('testDeepcopyStreamWithSpanners')
+    #import sys
+    #sys.argv.append('testDeepcopyNotesAndSpannerInStream')
     import music21
     music21.mainTest(Test)
 

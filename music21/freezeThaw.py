@@ -2091,8 +2091,8 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
     import music21
-    import sys
-    sys.argv.append('testFreezeThawWithSpanner')
+    #import sys
+    #sys.argv.append('testFreezeThawWithSpanner')
     music21.mainTest(Test)
     
 

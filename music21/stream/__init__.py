@@ -1216,6 +1216,9 @@ class Stream(base.Music21Object):
                 #           ignoreSort=True)
                 offset = e.getOffsetBySite(self)
                 newElement = copy.deepcopy(e, memo)
+                ### TEST on copying!!!!
+                #if 'Note' in newElement.classes:
+                #    newElement.pitch.ps += 2.0
                 new._insertCore(offset, newElement, ignoreSort=True)
         if '_endElements' in ignoreAttributes:
             # must manually add elements to
@@ -1965,7 +1968,7 @@ class Stream(base.Music21Object):
 
         eLen = len(self._elements)
         if i < eLen:
-            target = self._elements[i] # target may have been obj id; reassing
+            target = self._elements[i] # target may have been obj id; reclassing
             self._elements[i] = replacement
             # place the replacement at the old objects offset for this site
             self.setOffsetMap(replacement, target.getOffsetBySite(self))

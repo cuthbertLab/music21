@@ -197,6 +197,7 @@ class Sites(common.SlottedObject):
                 newIdKey = id(newSite.site)
                 #if newIdKey != idKey and oldSite.site != None:
                 #    print "WHOA! %s %s" % (newIdKey, idKey)
+            locations.append(newIdKey)
             newSite.siteIndex = oldSite.siteIndex
             newSite.globalSiteIndex = _singletonCounter()
             newSite.classString = oldSite.classString
