@@ -71,7 +71,7 @@ from music21.common import SlottedObject, opFrac
 from music21 import environment
 
 try:
-    basestring
+    basestring # @UndefinedVariable
 except NameError:
     basestring = str # @ReservedAssignment
 
