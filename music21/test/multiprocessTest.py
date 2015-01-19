@@ -119,6 +119,10 @@ class ModuleGather(object):
             ]
         # skip any path that starts with this string
         self.pathSkip = ['obsolete', 'ext', 'server', 'demos']
+        self.slowModules = ['features/jSymbolic', 'features/native', 'figuredBass/examples', 
+                            'braille/test', 'test/testStream', 'analysis/windowed', 
+                            'converter/__init__', 'metadata/bundles', 'musicxml/fromMxObjects',
+                            'romanText/translate', 'musicxml/m21ToString', 'theoryAnalysis/theoryAnalyzer']
         # search on init
         self._walk()
 
@@ -137,11 +141,24 @@ class ModuleGather(object):
         '''
         Get all the modules in reverse order, storing them in self.modulePaths
         '''
-        # the results of this are stored in self.curFiles, self.dirList
+        def manyCoreSortFunc(name):
+            '''
+            for many core systems, like the MacPro, running slowest modules first
+            helps there be fewer idle cores later 
+            '''
+            name = name[len(self.dirParent) + 1:]
+            name = name.replace('.py', '')
+            return (name in self.slowModules, name)
+        
+        # the results of this are stored in self.curFiles, self.dirList        
         for dirpath, unused_dirnames, filenames in os.walk(self.dirParent):
             self._visitFunc(None, dirpath, filenames)
-        self.modulePaths.sort()
+        if multiprocessing.cpu_count() > 4:# @UndefinedVariable
+            self.modulePaths.sort(key=manyCoreSortFunc)
+        else:
+            self.modulePaths.sort
         self.modulePaths.reverse()
+        
 
     def _getName(self, fp):
         r'''
