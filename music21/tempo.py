@@ -1181,7 +1181,7 @@ def interpolateElements(element1, element2, sourceStream,
     for el in interpolatedElements:
         elOffsetSrc = el.getOffsetBySite(sourceStream)
         try:
-            dummy = el.sites.getOffsetByObjectMatch(destinationStream)
+            dummy = el.getOffsetBySite(destinationStream)
             #print dummy, el
         except base.SitesException:
             if autoAdd is True:
