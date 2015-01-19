@@ -1,21 +1,3 @@
-# -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
-# Name:         romanText/__init__.py
-# Purpose:      music21 classes for processing roman numeral analysis text files
-#
-# Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
-#
-# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
-
-'''Objects for processing roman numeral analysis text files, as defined and
-demonstrated by Dmitri Tymoczko.
-'''
-__all__ = ['clercqTemperly', 'translate', 'testFiles']
-from music21.romanText import clercqTemperley
-from music21.romanText import testFiles
 # TODO: Move to an Objects file and then import translate!
 
 
@@ -1331,6 +1313,7 @@ class Test(unittest.TestCase):
         pass
     
     def testBasicA(self):
+        from music21.romanText import testFiles
         for fileStr in testFiles.ALL:
             f = RTFile()
             unused_rth = f.readstr(fileStr) # get a handler from a string
@@ -1436,6 +1419,8 @@ class Test(unittest.TestCase):
 
     def testTokenDefinition(self):
         # test that we are always getting the right number of tokens
+        from music21.romanText import testFiles
+
         rth = RTHandler()
         rth.process(testFiles.mozartK279)
 
@@ -1476,4 +1461,3 @@ if __name__ == "__main__":
 
 #------------------------------------------------------------------------------
 # eof
-

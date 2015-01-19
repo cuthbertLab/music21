@@ -256,7 +256,7 @@ def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOu
     '''    
     
     timeStart = time.time()
-    poolSize = multiprocessing.cpu_count()
+    poolSize = multiprocessing.cpu_count() # @UndefinedVariable
     if poolSize > 2:
         poolSize = poolSize - leaveOut
     else:
@@ -270,7 +270,7 @@ def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOu
     maxTimeout = 200
     pathsToRun = modGather.modulePaths # [0:30]
 
-    pool = multiprocessing.Pool(processes=poolSize)
+    pool = multiprocessing.Pool(processes=poolSize) # @UndefinedVariable
     
     # imap returns the results as they are completed.  Since the number of files is small,
     # the overhead of returning is outweighed by the positive aspect of getting results immediately
@@ -293,7 +293,7 @@ def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOu
             timeouts = 0
             eventsProcessed += 1
             summaryOutput.append(newResult)
-        except multiprocessing.TimeoutError:
+        except multiprocessing.TimeoutError: # @UndefinedVariable
             timeouts += 1
             if timeouts == 5 and eventsProcessed > 0:
                 print("Delay in processing, seconds: ", end="")
