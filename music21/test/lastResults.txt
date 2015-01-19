@@ -1,447 +1,432 @@
 Traceback (most recent call last):
-  File "/Users/hzabriskie/Documents/Music21/anaconda/lib/python2.7/doctest.py", line 2226, in runTest
+  File "/Users/cuthbert/anaconda/lib/python2.7/doctest.py", line 2201, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.timespans.streamToTimespanTree
-  File "/Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/timespans/__init__.py", line 231, in streamToTimespanTree
+AssertionError: Failed doctest test for music21.harmony.ChordSymbol.findFigure
+  File "/Users/cuthbert/git/music21base/music21/harmony.py", line 2121, in findFigure
 
 ----------------------------------------------------------------------
-File "/Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/timespans/__init__.py", line 260, in music21.timespans.streamToTimespanTree
+File "/Users/cuthbert/git/music21base/music21/harmony.py", line 2201, in music21.harmony.ChordSymbol.findFigure
 Failed example:
-    for x in tree:
-        x
+    cs.figure
 Expected:
-    <ElementTimespan (0.0 to 0.0) <music21.metadata.Metadata object at 0x...>>
-    <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Soprano>>
-    <ElementTimespan (0.0 to 0.0) <music21.layout.StaffGroup <music21.stream.Part Soprano><music21.stream.Part Alto><music21.stream.Part Tenor><music21.stream.Part Bass>>>
-    <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Alto>>
-    <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
-    <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Bass>>
+    'C7 add b9'
 Got:
-    <ElementTimespan (0.0 to 0.0) <music21.metadata.Metadata object at 0x105c4db90>>
-    <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Soprano>>
-    <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Alto>>
-    <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
-    <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Bass>>
-    <ElementTimespan (0.0 to 0.0) <music21.layout.StaffGroup <music21.stream.Part Soprano><music21.stream.Part Alto><music21.stream.Part Tenor><music21.stream.Part Bass>>>
+    u'C7 add b9'
 ----------------------------------------------------------------------
-File "/Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/timespans/__init__.py", line 271, in music21.timespans.streamToTimespanTree
+File "/Users/cuthbert/git/music21base/music21/harmony.py", line 2232, in music21.harmony.ChordSymbol.findFigure
 Failed example:
-    tenorElements
+    cs.figure
 Expected:
-    <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
+    'C/B- add 2'
 Got:
-    <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Bass>>
-----------------------------------------------------------------------
-File "/Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/timespans/__init__.py", line 274, in music21.timespans.streamToTimespanTree
-Failed example:
-    tenorElements.source
-Expected:
-    <music21.stream.Part Tenor>
-Got:
-    <music21.stream.Part Bass>
-----------------------------------------------------------------------
-File "/Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/timespans/__init__.py", line 277, in music21.timespans.streamToTimespanTree
-Failed example:
-    tenorElements.source is score[3]
-Expected:
-    True
-Got:
-    False
+    u'C/B- add 2'
 
 
 
 
 ---------------SUMMARY---------------------------------------------------
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/webapps/server/zipfileapp.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/webapps/server/wsgiapp.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/webapps/server/visualapp.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/webapps/server/urlqueryapp.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/webapps/server/urlapp.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/webapps/server/unifiedapp.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/webapps/server/jsonapp.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/webapps/server/featureapp.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/webapps/archive/server/mod_wsgi/music21wsgiappArchive.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/webapps/archive/server/mod_python/noteinfo/index.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/webapps/archive/server/mod_python/index.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/webapps/archive/server/mod_python/humdrum/index.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/webapps/archive/server/mod_python/featureextractor/index.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/webapps/archive/server/mod_python/featureextractor/featureinfo.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/vexflow/testShow.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/vexflow/exporter.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/trecento/quodJactatur.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/trecento/find_vatican1790.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/trecento/findSevs.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/trecento/exceldiff.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/trecento/correlations.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/trecento/contenanceAngloise.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/trecento/capuaProbabilities.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/theoryAnalysis/wwnortonMGTA.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/test/treeYield.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/test/toggleDebug.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/test/timeGraphs.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/test/testSingleCoreAll.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/test/testPerformance.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/test/testLint.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/test/testExternal.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/test/testDefault.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/test/multiprocessTest.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/xlrd/xlsx.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/xlrd/xldate.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/xlrd/timemachine.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/xlrd/sheet.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/xlrd/licences.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/xlrd/info.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/xlrd/formula.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/xlrd/formatting.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/xlrd/compdoc.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/xlrd/book.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/xlrd/biffh.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/xlrd/__init__.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/webcolors.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/six.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/parmap.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/utils/lexers.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/utils/exceptions.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/utils/console.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/utils/__init__.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/transformers/sphinx.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/transformers/revealhelp.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/transformers/latex.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/transformers/extractfigure.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/transformers/csshtmlheader.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/transformers/coalescestreams.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/transformers/base.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/transformers/activatable.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/transformers/__init__.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/nbconvert_app.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/filters/strings.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/filters/markdown_filter.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/filters/latex.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/filters/highlight.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/filters/datatypefilter.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/filters/ansi.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/filters/__init__.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/exporters/sphinx_manual.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/exporters/sphinx_howto.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/exporters/rst.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/exporters/reveal.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/exporters/python_armor.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/exporters/python.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/exporters/markdown_exporter.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/exporters/latex.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/exporters/fullhtml.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/exporters/exporter.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/exporters/export.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/exporters/basichtml.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/exporters/__init__.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/nbconvert/__init__.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/mock.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/jsonpickle/version.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/jsonpickle/util.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/jsonpickle/unpickler.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/jsonpickle/tags.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/jsonpickle/pickler.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/jsonpickle/handlers.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/jsonpickle/compat.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/jsonpickle/backend.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/jsonpickle/_samples.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/jsonpickle/__init__.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/enum.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/ext/__init__.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/trecento/largestAmbitus.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/trecento/__init__.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/smt2011.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/smt2010.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/seaver_presentation_2008.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/seaverOct2009.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/runTrecentoCadence.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/nips2011.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/nemcog.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/monteverdi.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/misc2010.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/mgtaPart2.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/mgtaPart1.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/josquin/label_intervals.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/ismir2011.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/ismir2010.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/icmc2011.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/icmc2010.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/eschbeg.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/elvis_trecento_results.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/elvis_trecento.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/bhadley/mrjobaws/featureExtractorMRJOB.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/bhadley/mrjobaws/awsutility.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/bhadley/mrjobaws/__init__.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/bhadley/__init__.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/bhadley/HarmonyRealizer.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/demos/__init__.py
-Skipped: /Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/configure.py
+Skipped: /Users/cuthbert/git/music21base/music21/webapps/server/zipfileapp.py
+Skipped: /Users/cuthbert/git/music21base/music21/webapps/server/wsgiapp.py
+Skipped: /Users/cuthbert/git/music21base/music21/webapps/server/visualapp.py
+Skipped: /Users/cuthbert/git/music21base/music21/webapps/server/urlqueryapp.py
+Skipped: /Users/cuthbert/git/music21base/music21/webapps/server/urlapp.py
+Skipped: /Users/cuthbert/git/music21base/music21/webapps/server/unifiedapp.py
+Skipped: /Users/cuthbert/git/music21base/music21/webapps/server/jsonapp.py
+Skipped: /Users/cuthbert/git/music21base/music21/webapps/server/featureapp.py
+Skipped: /Users/cuthbert/git/music21base/music21/webapps/archive/server/mod_wsgi/music21wsgiappArchive.py
+Skipped: /Users/cuthbert/git/music21base/music21/webapps/archive/server/mod_python/noteinfo/index.py
+Skipped: /Users/cuthbert/git/music21base/music21/webapps/archive/server/mod_python/index.py
+Skipped: /Users/cuthbert/git/music21base/music21/webapps/archive/server/mod_python/humdrum/index.py
+Skipped: /Users/cuthbert/git/music21base/music21/webapps/archive/server/mod_python/featureextractor/index.py
+Skipped: /Users/cuthbert/git/music21base/music21/webapps/archive/server/mod_python/featureextractor/featureinfo.py
+Skipped: /Users/cuthbert/git/music21base/music21/vexflow/testShow.py
+Skipped: /Users/cuthbert/git/music21base/music21/vexflow/exporter.py
+Skipped: /Users/cuthbert/git/music21base/music21/trecento/quodJactatur.py
+Skipped: /Users/cuthbert/git/music21base/music21/trecento/find_vatican1790.py
+Skipped: /Users/cuthbert/git/music21base/music21/trecento/findSevs.py
+Skipped: /Users/cuthbert/git/music21base/music21/trecento/exceldiff.py
+Skipped: /Users/cuthbert/git/music21base/music21/trecento/correlations.py
+Skipped: /Users/cuthbert/git/music21base/music21/trecento/contenanceAngloise.py
+Skipped: /Users/cuthbert/git/music21base/music21/trecento/capuaProbabilities.py
+Skipped: /Users/cuthbert/git/music21base/music21/theoryAnalysis/wwnortonMGTA.py
+Skipped: /Users/cuthbert/git/music21base/music21/test/treeYield.py
+Skipped: /Users/cuthbert/git/music21base/music21/test/toggleDebug.py
+Skipped: /Users/cuthbert/git/music21base/music21/test/timeGraphs.py
+Skipped: /Users/cuthbert/git/music21base/music21/test/timeGraphImportStar.py
+Skipped: /Users/cuthbert/git/music21base/music21/test/testSingleCoreAll.py
+Skipped: /Users/cuthbert/git/music21base/music21/test/testSerialization.py
+Skipped: /Users/cuthbert/git/music21base/music21/test/testPerformance.py
+Skipped: /Users/cuthbert/git/music21base/music21/test/testLint.py
+Skipped: /Users/cuthbert/git/music21base/music21/test/testExternal.py
+Skipped: /Users/cuthbert/git/music21base/music21/test/testDefault.py
+Skipped: /Users/cuthbert/git/music21base/music21/test/multiprocessTest.py
+Skipped: /Users/cuthbert/git/music21base/music21/test/mptCurses.py
+Skipped: /Users/cuthbert/git/music21base/music21/test/memoryUsage.py
+Skipped: /Users/cuthbert/git/music21base/music21/test/dedent.py
+Skipped: /Users/cuthbert/git/music21base/music21/musicxml/testPrimitive.py
+Skipped: /Users/cuthbert/git/music21base/music21/musicxml/testFiles.py
+Skipped: /Users/cuthbert/git/music21base/music21/mei/test_base.py
+Skipped: /Users/cuthbert/git/music21base/music21/ipython21/ipyJSapp.py
+Skipped: /Users/cuthbert/git/music21base/music21/humdrum/questions.py
+Skipped: /Users/cuthbert/git/music21base/music21/humdrum/canonicalOutput.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/xlrd/xlsx.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/xlrd/xldate.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/xlrd/timemachine.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/xlrd/sheet.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/xlrd/licences.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/xlrd/info.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/xlrd/formula.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/xlrd/formatting.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/xlrd/compdoc.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/xlrd/book.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/xlrd/biffh.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/xlrd/__init__.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/webcolors.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/six.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/parmap.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/utils/lexers.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/utils/exceptions.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/utils/console.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/utils/__init__.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/transformers/sphinx.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/transformers/revealhelp.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/transformers/latex.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/transformers/extractfigure.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/transformers/csshtmlheader.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/transformers/coalescestreams.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/transformers/base.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/transformers/activatable.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/transformers/__init__.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/nbconvert_app.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/filters/strings.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/filters/markdown_filter.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/filters/latex.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/filters/highlight.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/filters/datatypefilter.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/filters/ansi.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/filters/__init__.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/exporters/sphinx_manual.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/exporters/sphinx_howto.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/exporters/rst.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/exporters/reveal.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/exporters/python_armor.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/exporters/python.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/exporters/markdown_exporter.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/exporters/latex.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/exporters/fullhtml.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/exporters/exporter.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/exporters/export.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/exporters/basichtml.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/exporters/__init__.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/nbconvert/__init__.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/mock.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/jsonpickle/version.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/jsonpickle/util.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/jsonpickle/unpickler.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/jsonpickle/tags.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/jsonpickle/pickler.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/jsonpickle/handlers.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/jsonpickle/compat.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/jsonpickle/backend.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/jsonpickle/_samples.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/jsonpickle/__init__.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/enum.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/utf8prober.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/universaldetector.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/sjisprober.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/sbcsgroupprober.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/sbcharsetprober.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/mbcssm.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/mbcsgroupprober.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/mbcharsetprober.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/latin1prober.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/langthaimodel.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/langhungarianmodel.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/langhebrewmodel.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/langgreekmodel.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/langcyrillicmodel.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/langbulgarianmodel.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/jpcntx.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/jisfreq.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/hebrewprober.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/gb2312prober.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/gb2312freq.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/euctwprober.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/euctwfreq.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/euckrprober.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/euckrfreq.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/eucjpprober.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/escsm.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/escprober.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/cp949prober.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/constants.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/compat.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/codingstatemachine.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/charsetprober.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/charsetgroupprober.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/chardistribution.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/chardetect.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/big5prober.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/big5freq.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/chardet/__init__.py
+Skipped: /Users/cuthbert/git/music21base/music21/ext/__init__.py
+Skipped: /Users/cuthbert/git/music21base/music21/documentation/upload.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/trecento/largestAmbitus.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/trecento/__init__.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/smt2011.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/smt2010.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/seaver_presentation_2008.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/seaverOct2009.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/runTrecentoCadence.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/nips2011.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/nemcog.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/monteverdi.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/misc2010.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/mgtaPart2.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/mgtaPart1.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/josquin/label_intervals.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/ismir2011.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/ismir2010.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/icmc2011.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/icmc2010.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/eschbeg.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/elvis_trecento_results.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/elvis_trecento.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/bhadley/mrjobaws/featureExtractorMRJOB.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/bhadley/mrjobaws/awsutility.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/bhadley/mrjobaws/__init__.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/bhadley/__init__.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/bhadley/HarmonyRealizer.py
+Skipped: /Users/cuthbert/git/music21base/music21/demos/__init__.py
+Skipped: /Users/cuthbert/git/music21base/music21/corpus/testCorpus.py
+Skipped: /Users/cuthbert/git/music21base/music21/configure.py
+Skipped: /Users/cuthbert/git/music21base/music21/composition/seeger.py
+Skipped: /Users/cuthbert/git/music21base/music21/composition/aug30.py
+Skipped: /Users/cuthbert/git/music21base/music21/audioSearch/scoreFollower.py
+Skipped: /Users/cuthbert/git/music21base/music21/audioSearch/repetitionGame.py
+Skipped: /Users/cuthbert/git/music21base/music21/audioSearch/omrfollow.py
+Skipped: /Users/cuthbert/git/music21base/music21/audioSearch/humanVScomputer.py
+Skipped: /Users/cuthbert/git/music21base/music21/audioSearch/graphicalInterfaceTranscriber.py
+Skipped: /Users/cuthbert/git/music21base/music21/audioSearch/graphicalInterfaceSF.py
+Skipped: /Users/cuthbert/git/music21base/music21/audioSearch/graphicalInterfaceGame.py
+Skipped: /Users/cuthbert/git/music21base/music21/analysis/phrasing.py
+Skipped: /Users/cuthbert/git/music21base/music21/abcFormat/testFiles.py
 xmlnode successfully ran 12 tests in 0 seconds
-webapps_apps successfully ran 6 tests in 1 seconds
-webapps_templates successfully ran 9 tests in 2 seconds
+webapps_apps successfully ran 6 tests in 2 seconds
+webapps_templates successfully ran 9 tests in 3 seconds
 webapps___init__ successfully ran 14 tests in 0 seconds
 volume successfully ran 20 tests in 0 seconds
 vexflow_toMusic21j successfully ran 9 tests in 0 seconds
 vexflow_indent successfully ran 3 tests in 0 seconds
 voiceLeading successfully ran 64 tests in 2 seconds
-vexflow___init__ successfully ran 30 tests in 1 seconds
+vexflow___init__ successfully ran 30 tests in 2 seconds
 trecento_trecentoCadence successfully ran 7 tests in 0 seconds
-variant successfully ran 34 tests in 3 seconds
-trecento_polyphonicSnippet successfully ran 9 tests in 1 seconds
 webapps_commands successfully ran 10 tests in 10 seconds
+variant successfully ran 34 tests in 4 seconds
+trecento_polyphonicSnippet successfully ran 9 tests in 1 seconds
 trecento_findTrecentoFragments successfully ran 3 tests in 0 seconds
 trecento_notation successfully ran 17 tests in 2 seconds
-trecento_tonality successfully ran 5 tests in 8 seconds
+trecento_capua successfully ran 9 tests in 3 seconds
 trecento___init__ successfully ran 3 tests in 0 seconds
-trecento_capua successfully ran 9 tests in 4 seconds
 tinyNotation successfully ran 11 tests in 0 seconds
-timespans_verticality successfully ran 17 tests in 3 seconds
-timespans_spans successfully ran 16 tests in 1 seconds
-timespans_node successfully ran 10 tests in 0 seconds
+trecento_tonality successfully ran 5 tests in 7 seconds
+timespans_verticality successfully ran 17 tests in 6 seconds
+trecento_cadencebook successfully ran 23 tests in 12 seconds
+timespans_spans successfully ran 16 tests in 2 seconds
+timespans_node successfully ran 10 tests in 1 seconds
+timespans_trees successfully ran 40 tests in 9 seconds
 timespans_analysis successfully ran 4 tests in 0 seconds
 tie successfully ran 7 tests in 0 seconds
 theoryAnalysis_theoryResult successfully ran 4 tests in 0 seconds
-timespans_trees successfully ran 40 tests in 8 seconds
+timespans___init__ successfully ran 9 tests in 1 seconds
 theoryAnalysis___init__ successfully ran 3 tests in 0 seconds
-trecento_cadencebook successfully ran 23 tests in 12 seconds
-text successfully ran 24 tests in 9 seconds
+text successfully ran 24 tests in 12 seconds
 test_testDocumentation successfully ran 4 tests in 0 seconds
 test___init__ successfully ran 3 tests in 0 seconds
 tempo successfully ran 45 tests in 0 seconds
 stream_streamStatus successfully ran 5 tests in 0 seconds
-stream_makeNotation successfully ran 10 tests in 0 seconds
-theoryAnalysis_theoryAnalyzer successfully ran 43 tests in 13 seconds
-spanner successfully ran 53 tests in 2 seconds
-sites successfully ran 28 tests in 1 seconds
+theoryAnalysis_theoryAnalyzer successfully ran 43 tests in 16 seconds
+stream_makeNotation successfully ran 10 tests in 1 seconds
+spanner successfully ran 58 tests in 2 seconds
+sites successfully ran 22 tests in 4 seconds
 sieve successfully ran 40 tests in 0 seconds
-stream___init__ successfully ran 143 tests in 7 seconds
-serial successfully ran 47 tests in 6 seconds
-search___init__ successfully ran 19 tests in 1 seconds
-search_segment successfully ran 7 tests in 12 seconds
+stream___init__ successfully ran 143 tests in 13 seconds
+serial successfully ran 47 tests in 8 seconds
+search___init__ successfully ran 19 tests in 2 seconds
+search_segment successfully ran 7 tests in 20 seconds
 scala_scl___init__ successfully ran 3 tests in 0 seconds
 scala___init__ successfully ran 12 tests in 0 seconds
+scale successfully ran 90 tests in 20 seconds
 romanText_testFiles successfully ran 4 tests in 0 seconds
-scale successfully ran 90 tests in 15 seconds
-romanText___init__ successfully ran 49 tests in 0 seconds
-romanText_clercqTemperley successfully ran 18 tests in 14 seconds
-roman successfully ran 30 tests in 8 seconds
+romanText_objects successfully ran 49 tests in 1 seconds
+romanText_clercqTemperley successfully ran 18 tests in 17 seconds
+romanText___init__ successfully ran 3 tests in 0 seconds
+romanText_translate successfully ran 18 tests in 33 seconds
+roman successfully ran 30 tests in 11 seconds
 pitch successfully ran 95 tests in 1 seconds
-test_testStream successfully ran 205 tests in 53 seconds
-omr_evaluators successfully ran 8 tests in 4 seconds
+test_testStream successfully ran 206 tests in 95 seconds
+omr_evaluators successfully ran 8 tests in 7 seconds
 omr___init__ successfully ran 3 tests in 0 seconds
 noteworthy_translate successfully ran 21 tests in 0 seconds
 noteworthy_binaryTranslate successfully ran 7 tests in 0 seconds
-omr_correctors successfully ran 24 tests in 3 seconds
+omr_correctors successfully ran 24 tests in 2 seconds
 noteworthy___init__ successfully ran 3 tests in 0 seconds
-note successfully ran 51 tests in 2 seconds
+note successfully ran 51 tests in 3 seconds
 musicxml_toMxObjects successfully ran 39 tests in 0 seconds
-musicxml_xmlHandler successfully ran 13 tests in 3 seconds
-musicxml_testFiles successfully ran 5 tests in 0 seconds
-musicxml_mxObjects successfully ran 45 tests in 0 seconds
-musicxml_testPrimitive successfully ran 5 tests in 3 seconds
-repeat successfully ran 72 tests in 22 seconds
-musicxml_m21ToString successfully ran 45 tests in 8 seconds
+musicxml_xmlHandler successfully ran 13 tests in 4 seconds
+musicxml_mxObjects successfully ran 45 tests in 1 seconds
+repeat successfully ran 72 tests in 32 seconds
 musicxml___init__ successfully ran 3 tests in 0 seconds
+musedata_translate successfully ran 8 tests in 1 seconds
+musicxml_m21ToString successfully ran 45 tests in 15 seconds
 musedata_base40 successfully ran 9 tests in 0 seconds
 musedata___init__ successfully ran 45 tests in 0 seconds
 midi_realtime successfully ran 4 tests in 0 seconds
 midi_percussion successfully ran 7 tests in 0 seconds
-midi___init__ successfully ran 29 tests in 2 seconds
-midi_translate successfully ran 49 tests in 4 seconds
-musicxml_fromMxObjects successfully ran 65 tests in 13 seconds
+midi_translate successfully ran 49 tests in 9 seconds
+meter successfully ran 108 tests in 3 seconds
+metadata_testMetadata successfully ran 9 tests in 5 seconds
 metadata_primitives successfully ran 38 tests in 0 seconds
-meter successfully ran 108 tests in 2 seconds
+midi___init__ successfully ran 29 tests in 17 seconds
+metadata_caching successfully ran 6 tests in 12 seconds
 metadata___init__ successfully ran 19 tests in 0 seconds
-mei_base successfully ran 21 tests in 0 seconds
+mei_base successfully ran 21 tests in 1 seconds
 mei___init__ successfully ran 3 tests in 0 seconds
-medren successfully ran 30 tests in 4 seconds
-metadata_caching successfully ran 6 tests in 10 seconds
-lily_translate successfully ran 32 tests in 2 seconds
+medren successfully ran 30 tests in 5 seconds
+lily_translate successfully ran 32 tests in 4 seconds
+musicxml_fromMxObjects successfully ran 65 tests in 59 seconds
 lily_lilyObjects successfully ran 17 tests in 0 seconds
 lily___init__ successfully ran 3 tests in 0 seconds
-languageExcerpts_naturalLanguageObjects successfully ran 9 tests in 0 seconds
+languageExcerpts_naturalLanguageObjects successfully ran 9 tests in 1 seconds
 languageExcerpts_instrumentLookup successfully ran 3 tests in 0 seconds
 languageExcerpts___init__ successfully ran 3 tests in 0 seconds
-key successfully ran 21 tests in 1 seconds
+key successfully ran 21 tests in 2 seconds
 ipython21_objects successfully ran 3 tests in 0 seconds
 ipython21_ipExtension successfully ran 3 tests in 0 seconds
 ipython21___init__ successfully ran 3 tests in 0 seconds
-intervalNetwork successfully ran 57 tests in 2 seconds
-interval successfully ran 56 tests in 0 seconds
-instrument successfully ran 23 tests in 0 seconds
+intervalNetwork successfully ran 57 tests in 3 seconds
+interval successfully ran 56 tests in 2 seconds
+instrument successfully ran 23 tests in 1 seconds
 humdrum_testFiles successfully ran 3 tests in 0 seconds
-humdrum_spineParser successfully ran 33 tests in 4 seconds
-humdrum_instruments successfully ran 8 tests in 0 seconds
+humdrum_spineParser successfully ran 33 tests in 8 seconds
+humdrum_instruments successfully ran 8 tests in 3 seconds
+layout successfully ran 22 tests in 28 seconds
 humdrum___init__ successfully ran 3 tests in 0 seconds
-layout successfully ran 22 tests in 19 seconds
-harmony successfully ran 28 tests in 9 seconds
-metadata_bundles successfully ran 34 tests in 44 seconds
-figuredBass_segment successfully ran 16 tests in 2 seconds
+metadata_bundles successfully ran 34 tests in 60 seconds
+figuredBass_segment successfully ran 16 tests in 3 seconds
 figuredBass_rules successfully ran 5 tests in 0 seconds
-figuredBass_resolution successfully ran 17 tests in 2 seconds
-figuredBass_realizerScale successfully ran 9 tests in 0 seconds
-freezeThaw successfully ran 30 tests in 20 seconds
-figuredBass_possibility successfully ran 20 tests in 0 seconds
+figuredBass_resolution successfully ran 17 tests in 3 seconds
+figuredBass_realizerScale successfully ran 9 tests in 1 seconds
+freezeThaw successfully ran 30 tests in 26 seconds
+figuredBass_possibility successfully ran 20 tests in 1 seconds
+figuredBass_realizer successfully ran 12 tests in 13 seconds
 figuredBass_notation successfully ran 15 tests in 0 seconds
-graph successfully ran 62 tests in 26 seconds
-figuredBass_checker successfully ran 16 tests in 3 seconds
-figuredBass_realizer successfully ran 12 tests in 9 seconds
+graph successfully ran 62 tests in 36 seconds
 figuredBass___init__ successfully ran 3 tests in 0 seconds
-figuredBass_examples successfully ran 15 tests in 52 seconds
-features_native successfully ran 25 tests in 56 seconds
-features_jSymbolic successfully ran 86 tests in 56 seconds
+figuredBass_checker successfully ran 16 tests in 5 seconds
+figuredBass_examples successfully ran 15 tests in 70 seconds
+features_native successfully ran 25 tests in 71 seconds
+features_jSymbolic successfully ran 86 tests in 79 seconds
+features___init__ successfully ran 8 tests in 12 seconds
 expressions successfully ran 26 tests in 1 seconds
 exceptions21 successfully ran 3 tests in 0 seconds
 environment successfully ran 31 tests in 0 seconds
 editorial successfully ran 10 tests in 0 seconds
-dynamics successfully ran 15 tests in 1 seconds
-duration successfully ran 72 tests in 1 seconds
+duration successfully ran 72 tests in 2 seconds
+features_base successfully ran 27 tests in 21 seconds
 documentation_library_writers successfully ran 3 tests in 0 seconds
-documentation_library_iterators successfully ran 6 tests in 1 seconds
-documentation_library_extensions successfully ran 3 tests in 0 seconds
-features___init__ successfully ran 8 tests in 10 seconds
+documentation_library_iterators successfully ran 6 tests in 3 seconds
+dynamics successfully ran 15 tests in 7 seconds
+documentation_library_documenters successfully ran 28 tests in 3 seconds
 documentation_library_cleaners successfully ran 3 tests in 0 seconds
-documentation_library_documenters successfully ran 28 tests in 2 seconds
 documentation_library___init__ successfully ran 3 tests in 0 seconds
 documentation___init__ successfully ran 3 tests in 0 seconds
 defaults successfully ran 4 tests in 0 seconds
-features_base successfully ran 27 tests in 20 seconds
 derivation successfully ran 8 tests in 1 seconds
-counterpoint_species successfully ran 27 tests in 0 seconds
+counterpoint_species successfully ran 27 tests in 1 seconds
 counterpoint___init__ successfully ran 3 tests in 0 seconds
-corpus_virtual successfully ran 5 tests in 0 seconds
-corpus_chorales successfully ran 9 tests in 1 seconds
-corpus_corpora successfully ran 26 tests in 3 seconds
-converter_subConverters successfully ran 14 tests in 0 seconds
-corpus___init__ successfully ran 15 tests in 3 seconds
-converter___init__ successfully ran 41 tests in 6 seconds
-contour successfully ran 10 tests in 9 seconds
+corpus_virtual successfully ran 5 tests in 1 seconds
+corpus_chorales successfully ran 9 tests in 4 seconds
+corpus___init__ successfully ran 15 tests in 5 seconds
+converter_subConverters successfully ran 14 tests in 1 seconds
+corpus_corpora successfully ran 26 tests in 14 seconds
+contour successfully ran 10 tests in 15 seconds
 composition___init__ successfully ran 3 tests in 0 seconds
-common successfully ran 65 tests in 0 seconds
-clef successfully ran 28 tests in 0 seconds
-chordTables successfully ran 17 tests in 0 seconds
-composition_phasing successfully ran 5 tests in 6 seconds
+composition_phasing successfully ran 5 tests in 9 seconds
+clef successfully ran 28 tests in 1 seconds
+common successfully ran 66 tests in 2 seconds
+chordTables successfully ran 17 tests in 1 seconds
 chant successfully ran 12 tests in 0 seconds
 capella_fromCapellaXML successfully ran 20 tests in 0 seconds
 capella___init__ successfully ran 3 tests in 0 seconds
-corpus_testCorpus successfully ran 19 tests in 19 seconds
+braille_translate successfully ran 7 tests in 2 seconds
 braille_text successfully ran 4 tests in 0 seconds
-braille_translate successfully ran 7 tests in 1 seconds
-braille_segment successfully ran 11 tests in 1 seconds
+chord successfully ran 108 tests in 7 seconds
+converter___init__ successfully ran 41 tests in 26 seconds
 braille_lookup successfully ran 3 tests in 0 seconds
-chord successfully ran 108 tests in 5 seconds
+braille_segment successfully ran 11 tests in 2 seconds
 braille_basic successfully ran 24 tests in 0 seconds
 braille___init__ successfully ran 3 tests in 0 seconds
 beam successfully ran 15 tests in 0 seconds
-braille_examples successfully ran 5 tests in 2 seconds
+braille_examples successfully ran 5 tests in 7 seconds
+base successfully ran 87 tests in 3 seconds
 bar successfully ran 9 tests in 0 seconds
-base successfully ran 90 tests in 2 seconds
-audioSearch_transcriber successfully ran 4 tests in 1 seconds
+audioSearch_scores___init__ successfully ran 3 tests in 0 seconds
 audioSearch_recording successfully ran 4 tests in 0 seconds
+audioSearch_transcriber successfully ran 4 tests in 2 seconds
 articulations successfully ran 26 tests in 0 seconds
-audioSearch___init__ successfully ran 19 tests in 4 seconds
-analysis_search successfully ran 4 tests in 2 seconds
-analysis_windowed successfully ran 9 tests in 14 seconds
-analysis_reduction successfully ran 15 tests in 7 seconds
-braille_test successfully ran 151 tests in 21 seconds
+audioSearch___init__ successfully ran 19 tests in 6 seconds
+analysis_search successfully ran 4 tests in 3 seconds
+braille_test successfully ran 151 tests in 26 seconds
 analysis_reduceChordsOld successfully ran 7 tests in 0 seconds
 analysis_reduceChords successfully ran 7 tests in 0 seconds
-analysis_phrasing successfully ran 3 tests in 0 seconds
-analysis_metrical successfully ran 6 tests in 0 seconds
-analysis_patel successfully ran 6 tests in 0 seconds
+analysis_patel successfully ran 6 tests in 1 seconds
+analysis_windowed successfully ran 9 tests in 18 seconds
 analysis_neoRiemannian successfully ran 10 tests in 1 seconds
-analysis_correlate successfully ran 6 tests in 1 seconds
-analysis___init__ successfully ran 3 tests in 0 seconds
+analysis_metrical successfully ran 6 tests in 0 seconds
+analysis_reduction successfully ran 15 tests in 15 seconds
 analysis_discrete successfully ran 31 tests in 5 seconds
-abcFormat___init__ successfully ran 53 tests in 0 seconds
+analysis___init__ successfully ran 3 tests in 0 seconds
+analysis_correlate successfully ran 6 tests in 2 seconds
+abcFormat___init__ successfully ran 53 tests in 1 seconds
+analysis_floatingKey successfully ran 5 tests in 9 seconds
 _version successfully ran 3 tests in 0 seconds
-analysis_floatingKey successfully ran 5 tests in 8 seconds
-abcFormat_translate successfully ran 18 tests in 6 seconds
-Not in Tree Error: test.timeGraphImportStar is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: test.testSerialization is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: test.mptCurses is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: test.memoryUsage is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: test.dedent is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: romanText.translate is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: musedata.translate is in the music21 directory but not imported in music21. Skipped -- fix! 
+abcFormat_translate successfully ran 18 tests in 11 seconds
 Not in Tree Error: musedata.testPrimitive.test01 is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: musedata.testPrimitive is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: metadata.testMetadata is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: mei.test_base is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: ipython21.ipyJSapp is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: humdrum.questions is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: humdrum.canonicalOutput is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: documentation.upload is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.source.conf is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error: documentation.make is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: composition.seeger is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: composition.aug30 is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: audioSearch.scores is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: audioSearch.scoreFollower is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: audioSearch.repetitionGame is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: audioSearch.omrfollow is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: audioSearch.humanVScomputer is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: audioSearch.graphicalInterfaceTranscriber is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: audioSearch.graphicalInterfaceSF is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: audioSearch.graphicalInterfaceGame is in the music21 directory but not imported in music21. Skipped -- fix! 
-Not in Tree Error: abcFormat.testFiles is in the music21 directory but not imported in music21. Skipped -- fix! 
+Not in Tree Error: documentation.library.extensions is in the music21 directory but not imported in music21. Skipped -- fix! 
 Not in Tree Error:  is in the music21 directory but not imported in music21. Skipped -- fix! 
 
 -----------------------------
-timespans___init__ had 0 ERRORS and 1 FAILURES in 9 tests after 1 seconds:
+harmony had 0 ERRORS and 1 FAILURES in 28 tests after 11 seconds:
 -----------------------------
 
 Traceback (most recent call last):
-  File "/Users/hzabriskie/Documents/Music21/anaconda/lib/python2.7/doctest.py", line 2226, in runTest
+  File "/Users/cuthbert/anaconda/lib/python2.7/doctest.py", line 2201, in runTest
     raise self.failureException(self.format_failure(new.getvalue()))
-AssertionError: Failed doctest test for music21.timespans.streamToTimespanTree
-  File "/Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/timespans/__init__.py", line 231, in streamToTimespanTree
+AssertionError: Failed doctest test for music21.harmony.ChordSymbol.findFigure
+  File "/Users/cuthbert/git/music21base/music21/harmony.py", line 2121, in findFigure
 
 ----------------------------------------------------------------------
-File "/Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/timespans/__init__.py", line 260, in music21.timespans.streamToTimespanTree
+File "/Users/cuthbert/git/music21base/music21/harmony.py", line 2201, in music21.harmony.ChordSymbol.findFigure
 Failed example:
-    for x in tree:
-        x
+    cs.figure
 Expected:
-    <ElementTimespan (0.0 to 0.0) <music21.metadata.Metadata object at 0x...>>
-    <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Soprano>>
-    <ElementTimespan (0.0 to 0.0) <music21.layout.StaffGroup <music21.stream.Part Soprano><music21.stream.Part Alto><music21.stream.Part Tenor><music21.stream.Part Bass>>>
-    <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Alto>>
-    <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
-    <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Bass>>
+    'C7 add b9'
 Got:
-    <ElementTimespan (0.0 to 0.0) <music21.metadata.Metadata object at 0x105c4db90>>
-    <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Soprano>>
-    <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Alto>>
-    <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
-    <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Bass>>
-    <ElementTimespan (0.0 to 0.0) <music21.layout.StaffGroup <music21.stream.Part Soprano><music21.stream.Part Alto><music21.stream.Part Tenor><music21.stream.Part Bass>>>
+    u'C7 add b9'
 ----------------------------------------------------------------------
-File "/Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/timespans/__init__.py", line 271, in music21.timespans.streamToTimespanTree
+File "/Users/cuthbert/git/music21base/music21/harmony.py", line 2232, in music21.harmony.ChordSymbol.findFigure
 Failed example:
-    tenorElements
+    cs.figure
 Expected:
-    <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
+    'C/B- add 2'
 Got:
-    <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Bass>>
-----------------------------------------------------------------------
-File "/Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/timespans/__init__.py", line 274, in music21.timespans.streamToTimespanTree
-Failed example:
-    tenorElements.source
-Expected:
-    <music21.stream.Part Tenor>
-Got:
-    <music21.stream.Part Bass>
-----------------------------------------------------------------------
-File "/Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/timespans/__init__.py", line 277, in music21.timespans.streamToTimespanTree
-Failed example:
-    tenorElements.source is score[3]
-Expected:
-    True
-Got:
-    False
+    u'C/B- add 2'
 
 
 -------------------------------------------------------------------------
-Ran 4101 tests in 280.9575 seconds
-Run at 2015-01-18 12:23:44
+Ran 4105 tests in 434.3770 seconds
+Run at 2015-01-19 14:08:40

@@ -2198,8 +2198,8 @@ class ChordSymbol(Harmony):
             >>> mxDegree.componentList = [val,alt,modType]
             >>> mxHarmony.degreeObj = mxDegree
             >>> cs = musicxml.fromMxObjects.mxToChordSymbol(mxHarmony)
-            >>> cs.figure
-            'C7 add b9'
+            >>> print(cs.figure)
+            C7 add b9
 
         ::
 
@@ -2229,8 +2229,8 @@ class ChordSymbol(Harmony):
             >>> mxDegree.componentList = [val,alt,modType]
             >>> mxHarmony.degreeObj = mxDegree
             >>> cs = musicxml.fromMxObjects.mxToChordSymbol(mxHarmony)
-            >>> cs.figure
-            'C/B- add 2'
+            >>> print(cs.figure)
+            C/B- add 2
 
         ::
 
