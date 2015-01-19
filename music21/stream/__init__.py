@@ -573,6 +573,8 @@ class Stream(base.Music21Object):
         else:
             # replace the complete elements list
             self._elements = list(value)
+            self._endElements = []
+            self._offsetMapDict = {}
             for e in self._elements:
                 self.setOffsetMap(e, e.offset)
                 e.sites.add(self)
@@ -712,7 +714,7 @@ class Stream(base.Music21Object):
         #s.elements = self._elements + other._elements
         # need to iterate over elements and re-assign to create new locations
         for e in self._elements:
-            s.insert(e.getOffsetBySite(self), e)
+            s.insert(self.getOffsetFromMap(e), e)
         for e in other._elements:
             s.insert(e.getOffsetBySite(other), e)
 
@@ -983,7 +985,7 @@ class Stream(base.Music21Object):
 
         '''
         if type(targetOrList) is list:
-            targetList = sorted(targetOrList, key=lambda target: target.getOffsetBySite(self))
+            targetList = sorted(targetOrList, key=lambda target: self.getOffsetFromMap(target) )
 
             if shiftOffsets:
                 shiftDur = 0.0
@@ -1003,7 +1005,7 @@ class Stream(base.Music21Object):
 
                 if match is not None:
                     if shiftOffsets is True:
-                        matchOffset = match.getOffsetBySite(self)
+                        matchOffset = self.getOffsetFromMap(match)
 
                     self._elementsChanged(clearIsSorted=False)
                     match.removeLocationBySite(self)
@@ -1012,7 +1014,7 @@ class Stream(base.Music21Object):
                     matchDuration = match.duration.quarterLength
                     shiftedRegionStart = matchOffset + matchDuration
                     if i+1 < len(targetList):
-                        shiftedRegionEnd = targetList[i+1].getOffsetBySite(self)
+                        shiftedRegionEnd = self.getOffsetFromMap(targetList[i+1])
                     else:
                         shiftedRegionEnd = self.duration.quarterLength
 
@@ -1024,7 +1026,7 @@ class Stream(base.Music21Object):
                             mustFinishInSpan = False,
                             mustBeginInSpan = True):
 
-                            elementOffset = e.getOffsetBySite(self)
+                            elementOffset = self.getOffsetFromMap(e)
                             e.setOffsetBySite(self, elementOffset-shiftDur)
                 #if renumberMeasures is True and matchedEndElement is False:
                 #   pass  # This should maybe just call a function renumberMeasures
@@ -1045,7 +1047,7 @@ class Stream(base.Music21Object):
 
             if match is not None:
                 if shiftOffsets is True:
-                    matchOffset = match.getOffsetBySite(self)
+                    matchOffset = self.getOffsetFromMap(match)
                 # removing an object will never change the sort status
                 self._elementsChanged(clearIsSorted=False)
                 match.removeLocationBySite(self)
@@ -1054,7 +1056,7 @@ class Stream(base.Music21Object):
                     shiftDur = match.duration.quarterLength
                     if shiftDur != 0.0:
                         for e in self._elements:
-                            elementOffset = e.getOffsetBySite(self)
+                            elementOffset = self.getOffsetFromMap(e)
                             if elementOffset < matchOffset+shiftDur: #shift only elements after the deleted section
                                 continue
                             e.setOffsetBySite(self, elementOffset-shiftDur)
@@ -1216,7 +1218,7 @@ class Stream(base.Music21Object):
                 # user here to provide new offset
                 #new.insert(e.getOffsetBySite(old), newElement,
                 #           ignoreSort=True)
-                offset = e.getOffsetBySite(self)
+                offset = self.getOffsetFromMap(e)
                 newElement = copy.deepcopy(e, memo)
                 ### TEST on copying!!!!
                 #if 'Note' in newElement.classes:
@@ -1909,7 +1911,7 @@ class Stream(base.Music21Object):
         lowestElementToShift = None
         lowestGap = None
         for e in self._elements:
-            o = e.getOffsetBySite(self)
+            o = self.getOffsetFromMap(e)
             # gap is distance from offset to insert point; tells if shift is
             # necessary
             gap = o - lowestOffsetInsert
@@ -1921,7 +1923,7 @@ class Stream(base.Music21Object):
                 lowestElementToShift = e
 
         if lowestElementToShift is not None:
-            lowestOffsetToShift = lowestElementToShift.getOffsetBySite(self)
+            lowestOffsetToShift = self.getOffsetFromMap(lowestElementToShift)
             shiftPos = highestTimeInsert - lowestOffsetToShift
         else:
             shiftPos = 0
@@ -1932,7 +1934,7 @@ class Stream(base.Music21Object):
         else:
             # need to move all the elements already in this stream
             for e in self._elements:
-                o = e.getOffsetBySite(self)
+                o = self.getOffsetFromMap(e)
                 # gap is distance from offset to insert point; tells if shift is
                 # necessary
                 gap = o - lowestOffsetInsert
@@ -1973,7 +1975,7 @@ class Stream(base.Music21Object):
             target = self._elements[i] # target may have been obj id; reclassing
             self._elements[i] = replacement
             # place the replacement at the old objects offset for this site
-            self.setOffsetMap(replacement, target.getOffsetBySite(self))
+            self.setOffsetMap(replacement, self.getOffsetFromMap(target))
             replacement.sites.add(self)
         else:
             # target may have been obj id; reassign
@@ -2459,7 +2461,7 @@ class Stream(base.Music21Object):
             #eClasses = e.classes  # store once, as this is property call
             if e.isClassOrSubclass(classFilterList):
                 if returnList is False:
-                    found._insertCore(e.getOffsetBySite(self), e, ignoreSort=True)
+                    found._insertCore(self.getOffsetFromMap(e), e, ignoreSort=True)
                 else:
                     found.append(e)
         for e in self._endElements:
@@ -2523,7 +2525,7 @@ class Stream(base.Music21Object):
         # need both _elements and _endElements
         for e in self._elements:
             if not e.isClassOrSubclass(classFilterList):
-                found._insertCore(e.getOffsetBySite(self), e, ignoreSort=True)
+                found._insertCore(self.getOffsetFromMap(e), e, ignoreSort=True)
         for e in self._endElements:
             if not e.isClassOrSubclass(classFilterList):
                 found._storeAtEndCore(e)
@@ -2574,7 +2576,7 @@ class Stream(base.Music21Object):
         for e in self._elements:
             for g in groupFilterList:
                 if hasattr(e, "groups") and g in e.groups:
-                    returnStream._insertCore(e.getOffsetBySite(self),
+                    returnStream._insertCore(self.getOffsetFromMap(e),
                                         e, ignoreSort=True)
         for e in self._endElements:
             for g in groupFilterList:
@@ -2649,7 +2651,7 @@ class Stream(base.Music21Object):
         110.0
         '''
         try:
-            return obj.getOffsetBySite(self)
+            return self.getOffsetFromMap(obj)
         except base.SitesException:
             return None
 
@@ -2657,7 +2659,7 @@ class Stream(base.Music21Object):
         # the offset of end element is always highest time
 #         for e in self.elements:
 #             if id(e) == id(obj):
-#                 post = obj.getOffsetBySite(self)
+#                 post = self.getOffsetFromMap(obj)
 #                 break
 #         return post
 
@@ -2958,7 +2960,7 @@ class Stream(base.Music21Object):
                     continue
                 
             dur = e.duration
-            offset = e.getOffsetBySite(self)
+            offset = self.getOffsetFromMap(e)
             #offset = common.cleanupFloat(offset)
 
             if offset > offsetEnd:  # anything that ends after the span is definitely out
@@ -3117,8 +3119,8 @@ class Stream(base.Music21Object):
             if classList is not None:
                 if not e.isClassOrSubclass(classList):
                     continue
-            span = opFrac(offset - e.getOffsetBySite(self))
-            #environLocal.printDebug(['e span check', span, 'offset', offset, 'e.offset', e.offset, 'e.getOffsetBySite(self)', e.getOffsetBySite(self), 'e', e])
+            span = opFrac(offset - self.getOffsetFromMap(e))
+            #environLocal.printDebug(['e span check', span, 'offset', offset, 'e.offset', e.offset, 'self.getOffsetFromMap(e)', self.getOffsetFromMap(e), 'e', e])
             if span < 0: 
                 continue
             elif span == 0:
@@ -3210,8 +3212,8 @@ class Stream(base.Music21Object):
             if classList is not None:
                 if not e.isClassOrSubclass(classList):
                     continue
-            span = opFrac(offset - e.getOffsetBySite(self))
-            #environLocal.printDebug(['e span check', span, 'offset', offset, 'e.offset', e.offset, 'e.getOffsetBySite(self)', e.getOffsetBySite(self), 'e', e])
+            span = opFrac(offset - self.getOffsetFromMap(e))
+            #environLocal.printDebug(['e span check', span, 'offset', offset, 'e.offset', e.offset, 'self.getOffsetFromMap(e)', self.getOffsetFromMap(e), 'e', e])
             # by forcing <= here, we are sure to get offsets not at zero
             if span <= 0: # the e is after this offset
                 continue
@@ -3309,7 +3311,7 @@ class Stream(base.Music21Object):
         if returnDict is True then it returns a dictionary of offsets
         and everything at that offset.  If returnDict is False (default)
         then only a list of lists of elements grouped by offset is returned.
-        (in other words, you'll need to call list[i][0].getOffsetBySite(self) to
+        (in other words, you'll need to call self.getOffsetFromMap(list[i][0]) to
         get the offset)
 
         >>> from pprint import pprint as pp
@@ -3341,7 +3343,7 @@ class Stream(base.Music21Object):
         '''
         offsetsRepresented = {}
         for el in self.elements:
-            elOff = el.getOffsetBySite(self)
+            elOff = self.getOffsetFromMap(el)
             if elOff not in offsetsRepresented:
                 offsetsRepresented[elOff] = []
             offsetsRepresented[elOff].append(el)
@@ -3788,7 +3790,7 @@ class Stream(base.Music21Object):
         # this works best of this is a Part or Score
         if Measure in classFilterList or 'Measure' in classFilterList:
             for m in self.getElementsByClass('Measure'):
-                offset = m.getOffsetBySite(self)
+                offset = self.getOffsetFromMap(m)
                 if offset not in offsetMap:
                     offsetMap[offset] = []
                 # there may be more than one measure at the same offset
@@ -4479,9 +4481,9 @@ class Stream(base.Music21Object):
         # only want _elements, do not want _endElements
         for e in self._elements:
 
-            if startOffset is not None and e.getOffsetBySite(self) < startOffset:
+            if startOffset is not None and self.getOffsetFromMap(e) < startOffset:
                 continue
-            if endOffset is not None and e.getOffsetBySite(self) >= endOffset:
+            if endOffset is not None and self.getOffsetFromMap(e) >= endOffset:
                 continue
 
             match = False
@@ -4494,7 +4496,7 @@ class Stream(base.Music21Object):
             else:
                 match = True
             if match:
-                e.setOffsetBySite(self, e.getOffsetBySite(self) + offset)
+                e.setOffsetBySite(self, self.getOffsetFromMap(e) + offset)
 
         self._elementsChanged()
 
@@ -4651,24 +4653,24 @@ class Stream(base.Music21Object):
             if b.id is not None or searchElement.id is not None:
                 if b.id == searchElement.id:
                     found = i
-                    foundOffset = elements[i].getOffsetBySite(self)
+                    foundOffset = self.getOffsetFromMap(elements[i])
                     foundEnd = foundOffset + elements[i].duration.quarterLength
             else:
                 if b is searchElement:
                     found = i
-                    foundOffset = elements[i].getOffsetBySite(self)
+                    foundOffset = self.getOffsetFromMap(elements[i])
                     foundEnd = foundOffset + elements[i].duration.quarterLength
         if found is None:
             raise StreamException("Could not find the element in the stream")
 
         # handle _elements and _endElements independently
         for e in self._elements:
-            o = e.getOffsetBySite(self)
+            o = self.getOffsetFromMap(e)
             if (o >= foundOffset - before and o < foundEnd + after):
                 display._insertCore(o, e)
 
         for e in self._endElements:
-            o = e.getOffsetBySite(self)
+            o = self.getOffsetFromMap(e)
             if (o >= foundOffset - before and o < foundEnd + after):
                 #display.storeAtEnd(e)
                 display._storeAtEndCore(e)
@@ -4719,7 +4721,7 @@ class Stream(base.Music21Object):
         '''
         uniqueOffsets = []
         for e in self.elements:
-            o = e.getOffsetBySite(self)
+            o = self.getOffsetFromMap(e)
             if endTimesOnly is not True and o not in uniqueOffsets:
                 uniqueOffsets.append(o)
             endTime = opFrac(o + e.duration.quarterLength)
@@ -5820,14 +5822,14 @@ class Stream(base.Music21Object):
         # print(_MOD, elements)
         for i in range(len(elements)-1):
             #print(i, len(elements))
-            span = elements[i+1].getOffsetBySite(self) - elements[i].getOffsetBySite(self)
+            span = self.getOffsetFromMap(elements[i+1]) - self.getOffsetFromMap(elements[i])
             elements[i].duration.quarterLength = span
 
         # handle last element
         #print(elements[-1], qLenTotal, elements[-1].duration)
         if len(elements) != 0:
             elements[-1].duration.quarterLength = (qLenTotal -
-                        elements[-1].getOffsetBySite(self))
+                        self.getOffsetFromMap(elements[-1]))
             #print(elements[-1], elements[-1].duration)
         return returnObj
 
@@ -6155,7 +6157,7 @@ class Stream(base.Music21Object):
             #environLocal.printDebug(['sorting _elements, _endElements'])
 #             self._elements.sort(
 #                 cmp=lambda x, y: cmp(
-#                     x.getOffsetBySite(self), y.getOffsetBySite(self))
+#                     self.getOffsetFromMap(x), self.getOffsetFromMap(y))
 #                     or cmp(x.priority, y.priority)
 #                     or cmp(x.classSortOrder, y.classSortOrder)
 #                     or cmp(not x.isGrace, not y.isGrace) # sort graces first
@@ -6185,7 +6187,7 @@ class Stream(base.Music21Object):
             s._endElements = shallowEndElements
 
             for e in shallowElements + shallowEndElements:
-                s.setOffsetMap(e, e.getOffsetBySite(self))
+                s.setOffsetMap(e, self.getOffsetFromMap(e))
                 e.sites.add(s)
                 # need to explicitly set activeSite
                 e.activeSite = s
@@ -6325,7 +6327,7 @@ class Stream(base.Music21Object):
             if e.isStream:
                 #environLocal.printDebug(['_getFlatOrSemiFlat', '!!! processing substream:', e])
 
-                recurseStreamOffset = e.getOffsetBySite(self)
+                recurseStreamOffset = self.getOffsetFromMap(e)
 
                 if retainContainers is True: # semiFlat
                     #environLocal.printDebug(['_getFlatOrSemiFlat(), retaining containers, storing element:', e])
@@ -6355,8 +6357,8 @@ class Stream(base.Music21Object):
             # if element not a Stream
             else:
                 # insert into new stream at offset in old stream
-                #sNew.insert(e.getOffsetBySite(self), e)
-                sNew._insertCore(e.getOffsetBySite(self), e)
+                #self.getOffsetFromMap(sNew.insert(e), e)
+                sNew._insertCore(self.getOffsetFromMap(e), e)
 
         # highest time elements should never be Streams
         for e in self._endElements:
@@ -6813,11 +6815,11 @@ class Stream(base.Music21Object):
             self._cache["HighestOffset"] = 0.0
         elif self.isSorted is True:
             eLast = self._elements[-1]
-            self._cache["HighestOffset"] = eLast.getOffsetBySite(self)
+            self._cache["HighestOffset"] = self.getOffsetFromMap(eLast)
         else: # iterate through all elements
             highestOffsetSoFar = None
             for e in self._elements:
-                candidateOffset = e.getOffsetBySite(self)
+                candidateOffset = self.getOffsetFromMap(e)
                 if highestOffsetSoFar is None or candidateOffset > highestOffsetSoFar:
                     highestOffsetSoFar = candidateOffset
             
@@ -6893,7 +6895,7 @@ class Stream(base.Music21Object):
             # isSorted would be true, but highestTime should be 4.0 not 0.25
             for e in self._elements:
                 try:
-                    candidateOffset = (e.getOffsetBySite(self) +
+                    candidateOffset = (self.getOffsetFromMap(e) +
                                    e.duration.quarterLength)
                 except:
                     #print(self, e, id(e), e.offset, e.getSites())
@@ -6967,11 +6969,11 @@ class Stream(base.Music21Object):
             self._cache["LowestOffset"] = 0.0
         elif self.isSorted is True:
             eFirst = self._elements[0]
-            self._cache["LowestOffset"] = eFirst.getOffsetBySite(self)
+            self._cache["LowestOffset"] = self.getOffsetFromMap(eFirst)
         else: # iterate through all elements
             minOffsetSoFar = None
             for e in self._elements:
-                candidateOffset = e.getOffsetBySite(self)
+                candidateOffset = self.getOffsetFromMap(e)
                 if minOffsetSoFar is None or candidateOffset < minOffsetSoFar:
                     minOffsetSoFar = candidateOffset
             self._cache["LowestOffset"] = minOffsetSoFar
@@ -7089,7 +7091,7 @@ class Stream(base.Music21Object):
             getTempoFromContext = True
         else:
             for ti in tiStream:
-                o = ti.getOffsetBySite(self)
+                o = self.getOffsetFromMap(ti)
                 # get the desired metronome mark from any of ti classes
                 mm = ti.getSoundingMetronomeMark()
                 offsetMetronomeMarkPairs.append([o, mm])
@@ -7843,7 +7845,7 @@ class Stream(base.Music21Object):
         for e in self.getElementsNotOfClass('Measure'):
             if 'RepeatBracket' not in e.classes:
                 eNew = copy.deepcopy(e) # assume that this is needed
-                post.insert(e.getOffsetBySite(self), eNew)
+                post.insert( self.getOffsetFromMap(e), eNew)
 
         # all elements at this level and in measures have been copied; now we
         # need to reconnect spanners
@@ -9115,7 +9117,7 @@ class Stream(base.Music21Object):
         returnKey = {}
 
         for thisList in stream1Offsets:
-            thisOffset = thisList[0].getOffsetBySite(self)
+            thisOffset = self.getOffsetFromMap(thisList[0])
             returnKey[thisOffset] = 1
 
         for thatList in stream2Offsets:
@@ -9159,7 +9161,7 @@ class Stream(base.Music21Object):
         '''
         for n in self.notes:
             # get simultaneous elements form other stream
-            simultEls = cmpStream.getElementsByOffset(n.getOffsetBySite(self),
+            simultEls = cmpStream.getElementsByOffset( self.getOffsetFromMap(n),
                 mustBeginInSpan=False, mustFinishInSpan=False)
             if len(simultEls) > 0:
                 for simultNote in simultEls.notes:
@@ -9470,7 +9472,7 @@ class Stream(base.Music21Object):
             container = Voice
         dst = container()
         for e in self.getElementsByClass(classFilterList):
-            dst.insert(e.getOffsetBySite(self), e)
+            dst.insert( self.getOffsetFromMap(e), e)
             self.remove(e)
         self.insert(0, dst)
 
@@ -9535,7 +9537,7 @@ class Stream(base.Music21Object):
                         # merge all elements from the voice
                         mNew.mergeElements(v)
                         # insert in the appropriate part
-                        s[vIndex].insert(m.getOffsetBySite(self), mNew)
+                        s[vIndex].insert( self.getOffsetFromMap(m), mNew)
                 # if a measure does not have voices, simply populate
                 # with elements and append
                 else:
@@ -9544,7 +9546,7 @@ class Stream(base.Music21Object):
                     # get all elements
                     mNew.mergeElements(m)
                     # always place in top-part
-                    s[0].insert(m.getOffsetBySite(self), mNew)
+                    s[0].insert( self.getOffsetFromMap(m), mNew)
         # if no measures but voices, contents of each voice go into the part
         elif self.hasVoices():
             for vIndex, v in enumerate(self.voices):
@@ -10080,7 +10082,7 @@ class Stream(base.Music21Object):
 
         removed = variant.Variant() # replacement variant
         removed.groups = ['default'] #for now, default
-        vStart = v.getOffsetBySite(self)
+        vStart = self.getOffsetFromMap(v)
         # this method matches and removes on an individual basis
         if not matchBySpan:
             targetsMatched = 0
@@ -10123,7 +10125,7 @@ class Stream(base.Music21Object):
             # this will always remove elements before inserting
             for e in targets:
                 # need to get time relative to variant container's position
-                oInVariant = e.getOffsetBySite(self) - vStart
+                oInVariant = self.getOffsetFromMap(e) - vStart
                 removed.insert(oInVariant, e)
                 #environLocal.printDebug(['matchBySpan', matchBySpan, 'activateVariants', 'removing', e])
                 self.remove(e)
@@ -10225,7 +10227,7 @@ class Stream(base.Music21Object):
         removed = variant.Variant() # what group should this have?
         removed.groups = ['default'] #for now, default
         removed.replacementDuration = v.containedHighestTime
-        vStart = v.getOffsetBySite(self)
+        vStart = self.getOffsetFromMap(v)
         deletionStart = vStart + v.containedHighestTime
 
         targets = v.replacedElements(self)
@@ -10234,7 +10236,7 @@ class Stream(base.Music21Object):
         for e in targets:
             if "Measure" in e.classes: #if a measure is deleted, save its number
                 deletedMeasures.append(e.number)
-            oInVariant = e.getOffsetBySite(self) - vStart
+            oInVariant = self.getOffsetFromMap(e) - vStart
             removed.insert(oInVariant, e)
             self.remove(e)
 
@@ -10341,7 +10343,7 @@ class Stream(base.Music21Object):
         removed = variant.Variant() # what group should this have?
         removed.groups = ['default'] #for now, default
         removed.replacementDuration = v.containedHighestTime
-        vStart = v.getOffsetBySite(self)
+        vStart = self.getOffsetFromMap(v)
 
         #First deal with the elements in the overlapping section (limit by class)
         targets = v.replacedElements(self)
@@ -10350,7 +10352,7 @@ class Stream(base.Music21Object):
         for e in targets:
             if "Measure" in e.classes: # Save deleted measure numbers.
                 deletedMeasures.append(e.number)
-            oInVariant = e.getOffsetBySite(self) - vStart
+            oInVariant = self.getOffsetFromMap(e) - vStart
             removed.insert(oInVariant, e)
             self.remove(e)
 
@@ -10370,7 +10372,7 @@ class Stream(base.Music21Object):
 
         if highestMeasure is None: #If the highestMeasure is None (which will occur if the variant is a strict insertion and replaces no measures,
                                     #we need to choose the highest measure number prior to the variant.
-            measuresToCheck = self.getElementsByOffset(0.0, v.getOffsetBySite(self),
+            measuresToCheck = self.getElementsByOffset(0.0, self.getOffsetFromMap(v),
                 includeEndBoundary=True,
                 mustFinishInSpan=False,
                 mustBeginInSpan=True,
@@ -10792,7 +10794,7 @@ class Stream(base.Music21Object):
 
             #highestVariant = {}
 
-            startOffset = v.getOffsetBySite(self)
+            startOffset = self.getOffsetFromMap(v)
             endOffset = v.replacementDuration + startOffset
             conflictingVariants = self.getElementsByOffset(offsetStart= startOffset,
                                                     offsetEnd = endOffset,
@@ -10808,11 +10810,11 @@ class Stream(base.Music21Object):
 #                    cVname = cV.groups[0]
 #                else:
 #                    cVname = None
-#                cVoffset = cV.getOffsetBySite(self)
+#                cVoffset = self.getOffsetFromMap(cV)
 
                 #if cVname in highestVariant:
                     #hVendOffset, hV = highestVariant[cVname]
-                    #hVstartOffset = hV.getOffsetBySite(self)
+                    #hVstartOffset = self.getOffsetFromMap(hV)
 
                 #    if cV.replacementDuration + cVoffset > hVendOffset:
                 #        highestVariant[cVname] = (cV.replacementDuration + cVoffset, cV)
@@ -10831,10 +10833,10 @@ class Stream(base.Music21Object):
                 #        pass
                 #else:
                     #highestVariant[cVname] = (cV.replacementDuration + cVoffset, cV)
-                if cV.getOffsetBySite(self) == startOffset:
+                if self.getOffsetFromMap(cV) == startOffset:
                     continue # do nothing
                 else:
-                    shiftOffset = cV.getOffsetBySite(self) - startOffset
+                    shiftOffset = self.getOffsetFromMap(cV) - startOffset
                     r = note.SpacerRest()
                     r.duration.quarterLength = shiftOffset
                     r.hideObjectOnPrint = True
@@ -11376,7 +11378,7 @@ class Measure(Stream):
         # in _endElements
         for e in self._elements:
             if 'Barline' in e.classes: # take the first
-                if e.getOffsetBySite(self) == 0.0:
+                if self.getOffsetFromMap(e) == 0.0:
                     barList.append(e)
                     break
         if len(barList) == 0:
@@ -11767,7 +11769,7 @@ class Score(Stream):
         # get all things in the score that are not Parts
         for e in self.getElementsNotOfClass('Part'):
             eNew = copy.deepcopy(e) # assume that this is needed
-            post.insert(e.getOffsetBySite(self), eNew)
+            post.insert( self.getOffsetFromMap(e), eNew)
 
         for p in self.getElementsByClass('Part'):
             # get spanners at highest level, not by Part
