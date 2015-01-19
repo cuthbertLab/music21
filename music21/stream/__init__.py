@@ -1027,7 +1027,7 @@ class Stream(base.Music21Object):
                             mustBeginInSpan = True):
 
                             elementOffset = self.elementOffset(e)
-                            e.setOffsetBySite(self, elementOffset-shiftDur)
+                            self.setElementOffset(e, elementOffset-shiftDur)
                 #if renumberMeasures is True and matchedEndElement is False:
                 #   pass  # This should maybe just call a function renumberMeasures
         else:
@@ -1059,7 +1059,7 @@ class Stream(base.Music21Object):
                             elementOffset = self.elementOffset(e)
                             if elementOffset < matchOffset+shiftDur: #shift only elements after the deleted section
                                 continue
-                            e.setOffsetBySite(self, elementOffset-shiftDur)
+                            self.setElementOffset(e, elementOffset-shiftDur)
                 # if renumberMeasures is True and matchedEndElement is False and type(match):
                 #    pass  #This should just call a function renumberMeasures
 
@@ -1943,7 +1943,7 @@ class Stream(base.Music21Object):
                     #environLocal.printDebug(['insertAndShift()', e, 'offset', o, 'gap:', gap, 'shiftDur:', shiftDur, 'shiftPos:', shiftPos, 'o+shiftDur', o+shiftDur, 'o+shiftPos', o+shiftPos])
 
                     # need original offset, shiftDur, plus the distance from the start
-                    e.setOffsetBySite(self, o+shiftPos)
+                    self.setElementOffset(e, o+shiftPos)
         # after shifting all the necessary elements, append new ones
         # these will not be in order
         self.insert(offsetOrItemOrList, itemOrNone)
@@ -4496,7 +4496,7 @@ class Stream(base.Music21Object):
             else:
                 match = True
             if match:
-                e.setOffsetBySite(self, self.elementOffset(e) + offset)
+                self.setElementOffset(e, self.elementOffset(e) + offset)
 
         self._elementsChanged()
 
@@ -7630,7 +7630,7 @@ class Stream(base.Music21Object):
 
             #environLocal.printDebug(['changng offset', o, scalar, offsetShift])
 
-            e.setOffsetBySite(returnObj, o) # reassign
+            returnObj.setElementOffset(e, o)
             # need to look for embedded Streams, and call this method
             # on them, with inPlace == True, as already copied if
             # inPlace is != True
@@ -7807,7 +7807,7 @@ class Stream(base.Music21Object):
                 if processOffsets:
                     o = e.getOffsetBySite(useStream)
                     unused_error, oNew, signedError = bestMatch(float(o), quarterLengthDivisors)
-                    e.setOffsetBySite(useStream, oNew)
+                    useStream.setElementOffset(e, oNew)
                     if hasattr(e, 'editorial') and hasattr(e.editorial, 'misc') and signedError != 0:
                         e.editorial.misc['offsetQuantizationError'] = signedError
                 if processDurations:
@@ -9240,8 +9240,6 @@ class Stream(base.Music21Object):
         you want, because of some fancy manipulation of
         el.activeSite
 
-
-
         >>> n1 = note.Note("G#")
         >>> n2 = note.Note("D#")
         >>> s1 = stream.Stream()
@@ -10475,7 +10473,7 @@ class Stream(base.Music21Object):
                         continue
 
                     elementOffset = e.getOffsetBySite(returnObj)
-                    e.setOffsetBySite(returnObj, elementOffset-shiftDur)
+                    returnObj.setElementOffset(e, elementOffset-shiftDur)
         else:
             shiftDur = 0.0
             shiftsDict = {}
@@ -10505,11 +10503,11 @@ class Stream(base.Music21Object):
 
                     if e in exemptObjects:
                         elementOffset = e.getOffsetBySite(returnObj)
-                        e.setOffsetBySite(returnObj, elementOffset+exemptShift)
+                        returnObj.setElementOffset(e, elementOffset + exemptShift)
                         continue
 
                     elementOffset = e.getOffsetBySite(returnObj)
-                    e.setOffsetBySite(returnObj, elementOffset+shiftDur)
+                    returnObj.setElementOffset(e, elementOffset + shiftDur)
 
         if inPlace is True:
             return
@@ -10842,7 +10840,7 @@ class Stream(base.Music21Object):
                     r.hideObjectOnPrint = True
                     for el in cV._stream:
                         oldOffset = el.getOffsetBySite(cV._stream)
-                        el.setOffsetBySite(cV._stream, oldOffset+shiftOffset)
+                        cV._stream.setElementOffset(el, oldOffset+shiftOffset)
                     cV.insert(0.0, r)
                     cV.replacementDuration = oldReplacementDuration
                     self.remove(cV)
