@@ -418,11 +418,13 @@ class Music21Object(object):
             d = self._duration
             if d is not None:
                 try:
-                    if (d._qtrLength in (0, .25, .5, .75, 1, 1.5, 2, 3, 4) and
+                    if (d._componentsNeedUpdating is False and 
+                        d._quarterLengthNeedsUpdating is False and 
+                        d._qtrLength in (0, .25, .5, .75, 1, 1.5, 2, 3, 4) and
                         (len(d.components) == 0 or 
                          (len(d.components) == 1 and d.components[0]._link
                           and len(d.components[0]._tuplets) == 0))): ## 99% of notes...
-                        newValue = duration.Duration(self._duration._qtrLength)
+                        newValue = duration.Duration(d._qtrLength)
                     else:
                         newValue = copy.deepcopy(self._duration, memo=memo)                        
                 except AttributeError:
@@ -1934,28 +1936,14 @@ class Music21Object(object):
         <music21.stream.Measure 2 offset=0.0>
         <music21.stream.Part p2>
         '''
-        from music21 import stream
-        neverRecurseStreams = (stream.Score, stream.Opus)
-        recurseFirstStreams = (stream.Voice, stream.Part)
-
-        def recurseTypeFromStream(st):
-            getType = 'elementsFirst'
-            for sc in neverRecurseStreams:
-                if isinstance(st, sc):
-                    getType = 'elementsOnly'
-            for sc in recurseFirstStreams:
-                if isinstance(st, sc):
-                    getType = 'flatten'
-            return getType
-
         if memo is None:
             memo = []
         if callerFirst is None:
             callerFirst = self
             if self.isStream:
-                getType = recurseTypeFromStream(self)
+                recursionType = self.recursionType
                 environLocal.printDebug("Caller first is {} with offsetAppend {}".format(callerFirst, offsetAppend))
-                yield(self, 0.0, getType)
+                yield(self, 0.0, recursionType)
 
         if priorityTarget is None and sortByCreationTime is False:
             priorityTarget = self.activeSite
@@ -1975,8 +1963,8 @@ class Music21Object(object):
             except SitesException:
                 continue # not a valid site any more.  Could be caught in derivationChain
             
-            getType = recurseTypeFromStream(siteObj)
-            yield (siteObj, offsetInStream, getType)
+            recursionType = siteObj.recursionType
+            yield (siteObj, offsetInStream, recursionType)
             environLocal.printDebug("looking in contextSites for {} with offsetInStream {}".format(siteObj, offsetInStream))
             for x in siteObj.contextSites(callerFirst=callerFirst,
                                               memo=memo,
@@ -2008,7 +1996,6 @@ class Music21Object(object):
         '''
         Gets the DurationObject of the object or None
         '''
-        from music21 import duration
         # lazy duration creation
         if self._duration is None:
             self._duration = duration.Duration(0)
@@ -2403,7 +2390,6 @@ class Music21Object(object):
         (<music21.tie.Tie start>, <music21.tie.Tie continue>)
         (<music21.tie.Tie start>, <music21.tie.Tie stop>)
         '''
-        from music21 import duration
         # needed for temporal manipulations; not music21 objects
         from music21 import tie
 

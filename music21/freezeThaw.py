@@ -1516,25 +1516,8 @@ class JSONFreezer(JSONFreezeThawBase):
           "__attr__": {
             "_duration": {
               "__attr__": {
-                "_cachedIsLinked": true, 
-                "_components": [
-                  {
-                    "__attr__": {
-                      "_componentsNeedUpdating": false, 
-                      "_dots": [
-                        0
-                      ], 
-                      "_link": true, 
-                      "_qtrLength": 1.0, 
-                      "_quarterLengthNeedsUpdating": false, 
-                      "_tuplets": [], 
-                      "_type": "quarter", 
-                      "_typeNeedsUpdating": false
-                    }, 
-                    "__class__": "music21.duration.DurationUnit"
-                  }
-                ], 
-                "_componentsNeedUpdating": false, 
+                "_components": [],
+                "_componentsNeedUpdating": true, 
                 "_qtrLength": 1.0, 
                 "_quarterLengthNeedsUpdating": false, 
                 "_typeNeedsUpdating": false

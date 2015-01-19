@@ -245,6 +245,7 @@ class Stream(base.Music21Object):
     isStream = True
     isMeasure = False
     classSortOrder = -20
+    recursionType = 'elementsFirst'
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['append', 'insert', 'insertAndShift',
@@ -253,6 +254,13 @@ class Stream(base.Music21Object):
         'augmentOrDiminish', 'scaleOffsets', 'scaleDurations']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
+        'recursionType': '''
+            String of ('elementsFirst' (default), 'flatten', 'elementsOnly)
+            that decides whether the stream likely holds relevant
+            contexts for the elements in it.  
+            
+            see :meth:`~music21.base.Music21Object.contextSites` 
+            ''',
         'isSorted': '''
             Boolean describing whether the Stream is sorted or not.
             ''',
@@ -10863,7 +10871,7 @@ class Voice(Stream):
     Note that both Finale's Layers and Voices as concepts are
     considered Voices here.
     '''
-    pass
+    recursionType = 'elementsFirst'
 
 
 
@@ -10877,6 +10885,7 @@ class Measure(Stream):
     All properties of a Measure that are Music21 objects are found as part of
     the Stream's elements.
     '''
+    recursionType = 'elementsFirst'
     isMeasure = True
 
     # define order to present names in documentation; use strings
@@ -11508,7 +11517,8 @@ class Part(Stream):
     assumes that this part fits on one staff and shares it with no other
     part
     '''
-
+    recursionType = 'flatten'
+    
     def __init__(self, *args, **keywords):
         Stream.__init__(self, *args, **keywords)
         self.staffLines = 5
@@ -11626,6 +11636,7 @@ class Score(Stream):
     but we figure that many people will like calling the largest
     container a Score and that this will become a standard.
     """
+    recursionType = 'elementsOnly'
 
     def __init__(self, *args, **keywords):
         Stream.__init__(self, *args, **keywords)
@@ -12160,6 +12171,7 @@ class Opus(Stream):
 
     Opus objects can contain multiple Score objects, or even other Opus objects!
     '''
+    recursionType = 'elementsOnly'
 
     #TODO: get by title, possibly w/ regex
 
