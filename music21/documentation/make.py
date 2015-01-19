@@ -78,7 +78,10 @@ def main(target):
         print('WRITING DOCUMENTATION FILES')
         documentation.ModuleReferenceReSTWriter().run()
         documentation.CorpusReferenceReSTWriter().run()
-        documentation.IPythonNotebookReSTWriter().run()
+        try:
+            documentation.IPythonNotebookReSTWriter().run()
+        except OSError:
+            raise ImportError('IPythonNotebookReSTWriter crashed; most likely cause: no pandoc installed: https://github.com/jgm/pandoc/releases')
         sphinxOptions = ['sphinx']
         sphinxOptions.extend(('-b', target))
         sphinxOptions.extend(('-d', doctreesDirectoryPath))

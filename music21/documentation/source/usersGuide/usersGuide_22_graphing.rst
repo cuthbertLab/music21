@@ -5,6 +5,7 @@
 User’s Guide, Chapter 22: Graphing
 ==================================
 
+
 There are a number of ways to visualize notes, scores, and measures in
 music21.
 
@@ -30,4 +31,3 @@ features).
     from music21 import *
     sBach = corpus.parse('bach/bwv57.8')
     sBach.getElementById('Soprano').plot('PlotHorizontalBarPitchSpaceOffset', title='Soprano')
-   
