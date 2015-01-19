@@ -24,7 +24,7 @@ from music21 import common
 from music21 import exceptions21
 from music21 import environment
 from music21 import key
-_MOD = 'romanText.base.py'
+_MOD = 'romanText.objects.py'
 environLocal = environment.Environment(_MOD)
 
 # alternate endings might end with a,b,c for non 
