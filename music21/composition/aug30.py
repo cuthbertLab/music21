@@ -85,11 +85,11 @@ def nextOrPreviousType(baseDuration):
     newDuration.type = duration.ordinalTypeFromNum[ordinalType]
     return newDuration
 
-def addPart(minLength = 80, maxProbability = 0.7, instrument = None):
+def addPart(minLength=80, maxProbability=0.7, instrument=None):
     s1 = rhythmLine(minLength = minLength, maxProbability = maxProbability)
     ts1 = meter.TimeSignature("4/4")
     s1.insert(0, ts1)
-    s1.insert(0, tempo.MetronomeMark(number = 180, value = "very fast"))
+    s1.insert(0, tempo.MetronomeMark(number=180, text="very fast"))
     if instrument is not None:
         s1.insert(0, instrument)
     s1.makeAccidentals()

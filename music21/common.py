@@ -1070,6 +1070,55 @@ def toUnicode(usrStr):
             pass
         return usrStr
 
+def readFileEncodingSafe(filePath, firstGuess='utf-8'):
+    r'''
+    Slow, but will read a file of unknown encoding as safely as possible using
+    the LGPL chardet package in music21.ext.  
+    
+    Let's try to load this file as ascii -- it has a copyright symbol at the top
+    so it won't load in Python3:
+    
+    >>> import os 
+    >>> c = common.getSourceFilePath() + os.sep + 'common.py'
+    >>> f = open(c)
+    >>> #_DOCS_SHOW data = f.read()
+    Traceback (most recent call last):
+    UnicodeDecodeError: 'ascii' codec can't decode byte 0xc2 in position ...: ordinal not in range(128)
+
+    That won't do! now I know that it is in utf-8, but maybe you don't. Or it could
+    be an old humdrum or Noteworthy file with unknown encoding.  This will load it safely.
+    
+    >>> data = common.readFileEncodingSafe(c)
+    >>> data[0:30]
+    u'#-*- coding: utf-8 -*-\n#------'
+    
+    Well, that's nothing, since the first guess here is utf-8 and it's right. So let's
+    give a worse first guess:
+    
+    >>> data = common.readFileEncodingSafe(c, firstGuess='SHIFT_JIS') # old Japanese standard
+    >>> data[0:30]
+    u'#-*- coding: utf-8 -*-\n#------'
+    
+    It worked!
+    
+    Note that this is slow enough if it gets it wrong that the firstGuess should be set
+    to something reasonable like 'ascii' or 'utf-8'.
+    '''
+    import codecs
+    from music21.ext import chardet # encoding detector... @UnresolvedImport
+    try:
+        with codecs.open(filePath, 'r', encoding=firstGuess) as thisFile:
+            data = thisFile.read()
+            return data
+    except FileNotFoundError:
+        raise
+    except UnicodeDecodeError:
+        with codecs.open(filePath, 'rb') as thisFileBinary:
+            dataBinary = thisFile.read()
+            encoding = chardet.detect(thisFileBinary)['encoding']
+            return codecs.decode(dataBinary, encoding)
+    
+
 
 def classToClassStr(classObj):
     '''Convert a class object to a class string.

@@ -60,19 +60,20 @@ Module to translate Noteworthy Composer's NWCTXT format to music21.
 # |Chord|Dur:8th|Pos:-4,n-3,b-2,#-1,x0,v1,2x|Opts:Stem=Down,Crescendo|Dur2:8th,DblDotted|Pos2:3x
 
 from music21.exceptions21 import Music21Exception
-from music21 import duration
-from music21 import note
-from music21 import pitch
-from music21 import clef
-from music21 import meter
-from music21 import stream
-from music21 import tie
-from music21 import key
-from music21 import repeat
 from music21 import bar
 from music21 import chord
+from music21 import clef
+from music21 import common
+from music21 import duration
 from music21 import dynamics
+from music21 import key
+from music21 import meter
+from music21 import note
+from music21 import pitch
+from music21 import repeat
 from music21 import spanner
+from music21 import stream
+from music21 import tie
 
 from music21 import environment
 _MOD = 'music21.noteworthy.translate'
@@ -110,12 +111,11 @@ class NoteworthyTranslator(object):
 
     def parseFile(self, filePath):
         try:
-            thisFile = open(filePath)
-        except:
+            data = common.readFileEncodingSafe(filePath)
+            dataList = data.split('\n')
+            return self.parseList(dataList)
+        except FileNotFoundError:
             raise NoteworthyTranslateException('cannot open %s: ' % filePath)
-        dataList = thisFile.readlines()
-        thisFile.close()
-        return self.parseList(dataList)
         
     def parseString(self, data):
         dataList = data.splitlines()

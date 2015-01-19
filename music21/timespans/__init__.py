@@ -32,11 +32,11 @@ from music21 import note
 
 from music21.ext import six
 
-from music21.timespans import trees
-from music21.timespans import spans
+from music21.timespans import trees 
+from music21.timespans import spans 
 from music21.timespans import analysis 
 from music21.timespans import node 
-from music21.timespans import verticality
+from music21.timespans import verticality 
 
 from music21.exceptions21 import TimespanException
 from music21 import environment

@@ -492,9 +492,8 @@ class ConverterNoteworthy(SubConverter):
         '''
         Open Noteworthy data (as nwctxt) from a file path.
 
-
         >>> import os #_DOCS_HIDE
-        >>> nwcTranslatePath = common.getSourceFilePath() + os.path.sep + 'noteworthy'
+        >>> nwcTranslatePath = common.getSourceFilePath() + os.path.sep + 'noteworthy' #_DOCS_HIDE
         >>> filePath = nwcTranslatePath + os.path.sep + 'Part_OWeisheit.nwctxt' #_DOCS_HIDE
         >>> #_DOCS_SHOW paertPath = converter.parse('d:/desktop/arvo_part_o_weisheit.nwctxt')
         >>> c = converter.subConverters.ConverterNoteworthy()
@@ -753,7 +752,7 @@ class ConverterRomanText(SubConverter):
     def parseData(self, strData, number=None):
         '''
         '''
-        from music21 import romanText as romanTextModule
+        from music21.romanText import objects as romanTextModule
         from music21.romanText import translate as romanTextTranslate
         rtf = romanTextModule.RTFile()
         rtHandler = rtf.readstr(strData)
@@ -766,7 +765,7 @@ class ConverterRomanText(SubConverter):
     def parseFile(self, fp, number=None):
         '''
         '''
-        from music21 import romanText as romanTextModule
+        from music21.romanText import objects as romanTextModule
         from music21.romanText import translate as romanTextTranslate
         rtf = romanTextModule.RTFile()
         rtf.open(fp)

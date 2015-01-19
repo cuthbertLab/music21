@@ -765,7 +765,7 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
 class URLOpenerUI(FancyURLopener):
     version = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11'
 
-googleResultsRE = re.compile('([\d\,]+) results')
+googleResultsRE = re.compile(r'([\d\,]+) results')
 
 class ComposerPopularity(featuresModule.FeatureExtractor):
     '''
@@ -877,7 +877,8 @@ class LandiniCadence(featuresModule.FeatureExtractor):
                     if cListClean[-len(cMatch):] == cMatch:
                         found = True
                         break
-            if found: break
+            if found: 
+                break
         if found:
             self._feature.vector[0] = 1
 

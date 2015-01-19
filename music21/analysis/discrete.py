@@ -227,10 +227,10 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
         for dst, valid in [(self._majorKeyColors, self.keysValidMajor), 
                            (self._minorKeyColors, self.keysValidMinor)]:
-            for key in valid:
+            for validKey in valid:
                 # convert to pitch object
-                key = pitch.Pitch(key)
-                step = key.step # get C for C#
+                validKey = pitch.Pitch(validKey)
+                step = validKey.step # get C for C#
                 rgbStep = self._hexToRgb(stepLib[step])
                 # make all the colors a bit lighter
                 for i in range(len(rgbStep)):
@@ -241,17 +241,17 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                     for i in range(len(rgbStep)):
                         rgbStep[i] = self._rgbLimit(rgbStep[i] - 100)
         
-                if len(key.name) > 1:
+                if len(validKey.name) > 1:
                     magnitude = 15
-                    if key.name[1] == '-':
+                    if validKey.name[1] == '-':
                         # index and value shift for each of rgb values
                         shiftLib = {0: magnitude, 1: magnitude, 2: -magnitude}                   
-                    elif key.name[1] == '#':                   
+                    elif validKey.name[1] == '#':                   
                         shiftLib = {0: -magnitude, 1: -magnitude, 2: magnitude}                   
                     for i in shiftLib:
                         rgbStep[i] = self._rgbLimit(rgbStep[i] + shiftLib[i])
                 # add to dictionary
-                dst[key.name] = self._rgbToHex(rgbStep)
+                dst[validKey.name] = self._rgbToHex(rgbStep)
 
 
     def _getSharpFlatCount(self, subStream):
@@ -418,12 +418,12 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
             #environLocal.printDebug(['colors used:', colorsUsed])
             keySortOrderFiltered = []
-            for key in _keySortOrder:
-                for sol in solutionsUsed: # three v alues
+            for keyEl in _keySortOrder:
+                for sol in solutionsUsed: # three values
                     if sol[0] == None: 
                         continue
-                    if key == sol[0].name: # first is key string
-                        keySortOrderFiltered.append(key)
+                    if keyEl == sol[0].name: # first is key string
+                        keySortOrderFiltered.append(keyEl)
                         break
         else:
             keySortOrderFiltered = _keySortOrder
@@ -437,16 +437,16 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             row = []
             row.append(yLabel)
             pairs = []
-            for key in [pitch.Pitch(p) for p in keySortOrderFiltered]:
+            for keyPitch in [pitch.Pitch(p) for p in keySortOrderFiltered]:
                 try:
-                    color = self.solutionToColor([key, yLabel])
+                    color = self.solutionToColor([keyPitch, yLabel])
                 except KeyError: # no such color defined; expected in a few 
                     color = None # will be masked
                 mask = False
                 if compress:
                     if color not in colorsUsed:
                         mask = True
-                if key.name not in valid:
+                if keyPitch.name not in valid:
                     mask = True
                 if mask:
                     # set as white so as to maintain spacing
@@ -455,7 +455,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                 else:
                     # replace all '-' with 'b' (or proper flat symbol)
                     #keyStr = key.name.replace('-', 'b')
-                    keyStr = key.name
+                    keyStr = keyPitch.name
                     # make minor keys in lower case
                     if yLabel == 'Minor':
                         keyStr = keyStr.lower()
@@ -471,15 +471,15 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
     
     def solutionToColor(self, solution):
-        key = solution[0]
+        solutionKey = solution[0]
         # key may be None
-        if key == None:
+        if solutionKey == None:
             return '#ffffff'
         modality = solution[1].lower()
         if modality == 'major':
-            return self._majorKeyColors[key.name]
+            return self._majorKeyColors[solutionKey.name]
         else:
-            return self._minorKeyColors[key.name]
+            return self._minorKeyColors[solutionKey.name]
 
     
     def _likelyKeys(self, sStream):
@@ -1306,7 +1306,7 @@ def analyzeStream(streamObj, *args, **keywords):
             if match != None:
                 break
     if match != None:
-        obj = analysisClassName()
+        obj = match() # NOTE: Cuthbert, this was previously analysisClassName()? - out of scope
         #environLocal.printDebug(['analysis method used:', obj])
         return obj.getSolution(streamObj)
 
@@ -1430,8 +1430,6 @@ class Test(unittest.TestCase):
         
 
     def testKeyAnalysisSpelling(self):
-        '''
-        '''
         from music21 import stream, note
             
         for p in ['A', 'B-', 'A-']:

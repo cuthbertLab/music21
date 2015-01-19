@@ -22,7 +22,6 @@ from music21.test import testSingleCoreAll as test
 # see feature list here:
 # http://docs.pylint.org/features.html
 
-# W0621:	Redefining name %r from outer scope (line %s) Used when a variable's name hide a name defined in the outer scope.
 # W0511:	Used when a warning note as FIXME or XXX is detected.
 # W0404:	Reimport %r (imported line %s) Used when a module is reimported multiple times.
 # we do this all the time in unit tests
@@ -52,14 +51,14 @@ def main(fnAccept=None):
                     'spanner.py', # hangs pylint...
                     ]
         #fnAccept = ['stream.py', 'note.py', 'chord.py']
-
     disable = [
                 #'C0301', 'C0302', 'C0103', 'C0330', 'C0324', 
                 #'W0621', 'W0511', 
                 #'W0404', 'R0201', 'R0904', 'E1101', 'R0914', 'R0903',
                 #'R0911', 'R0902', 
                 'unnecessary-pass', # nice, but not really a problem...
-                'locally-disabled', # hopefully will know what they're doing
+                'locally-disabled', # test for this later, but hopefully will know what they're doing
+
                 'arguments-differ', # someday...
                 'abstract-class-instantiated', # this trips on the fractions.Fraction() class.
                 'redefined-builtin', # remove when Eclipse tags are parsed @ReservedAssignment = pylint: disable=W0622
@@ -75,10 +74,11 @@ def main(fnAccept=None):
                 'bad-whitespace',    # maybe later, but "bad" isn't something I necessarily agree with
                 'bad-continuation',  # never remove -- this is a good thing many times.
                 'line-too-long',     # maybe later
-                'too-many-return-statements',
+                'too-many-return-statements', # we'll see
                 'unpacking-non-sequence', # gets it wrong too often.
                 'too-many-instance-attributes', # maybe later
-                'invalid-name',      # never remove 
+                
+                'invalid-name',      # never remove -- these are good music21 names; fix the regexp instead...
                 'no-self-use',       # maybe later
                 'too-few-public-methods', # never remove or set to 1
                 'trailing-whitespace',  # should ignore blank lines with tabs

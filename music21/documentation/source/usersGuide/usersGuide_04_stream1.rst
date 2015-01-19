@@ -272,8 +272,70 @@ know anything about music. To get some intelligence into our music we'll
 need to know about a ``music21`` object similar to lists, called a
 :class:`~music21.stream.Stream`.
 
+Introduction to Streams
+-----------------------
+
+The :class:`~music21.stream.Stream` object and its subclasses (Score,
+Part, Measure) are the fundamental containers for music21 objects such
+as :class:`~music21.note.Note`, :class:`~music21.chord.Chord`,
+:class:`~music21.clef.Clef`, :class:`~music21.meter.TimeSignature`
+objects.
+
+A container is like a Python list (or an array in some languages).
+
+Objects stored in a Stream are generally spaced in time; each stored
+object has an offset usually representing how many quarter notes it lies
+from the beginning of the Stream. For instance in a 4/4 measure of two
+half notes, the first note will be at offset 0.0, and the second at
+offset 2.0.
+
+Streams, further, can store other Streams, permitting a wide variety of
+nested, ordered, and timed structures. These stored streams also have
+offsets. So if we put two 4/4 Measure objects (subclasses of Stream)
+into a Part (also a type of Stream), then the first measure will be at
+offset 0.0 and the second measure will be at offset 4.0.
+
+Commonly used subclasses of Streams include the
+:class:`~music21.stream.Score`, :class:`~music21.stream.Part`, and
+:class:`~music21.stream.Measure`. It is important to grasp that any
+time we want to collect and contain a group of music21 objects, we put
+them into a Stream. Streams can also be used for less conventional
+organizational structures. We frequently will build and pass around
+short-lived, temporary Streams, since doing this opens up a wide variety
+of tools for extracting, processing, and manipulating objects on the
+Stream. For instance, if you are looking at only notes on beat 2 of any
+measure, you'll probably want to put them into a Stream as well.
+
+A critical feature of music21's design that distinguishes it from other
+music analysis frameworks is that one music21 object can be
+simultaneously stored (or, more accurately, referenced) in more than one
+Stream. For examples, we might have numerous
+:class:`~music21.stream.Measure` Streams contained in a
+:class:`~music21.stream.Part` Stream. If we extract a region of this
+Part (using the :meth:`~music21.stream.Stream.measures` method), we
+get a new Stream containing the specified Measures and the contained
+notes. We have not actually created new notes within these extracted
+measures; the output Stream simply has references to the same objects.
+Changes made to Notes in this output Stream will be simultaneously
+reflected in Notes in the source Part. There is one limitation though:
+the same object should not appear twice in one hierarchical structure of
+Streams. For instance, you should not put a note object in both measure
+3 and measure 5 of the same piece -- it can appear in measure 3 of one
+piece and measure 5 of another piece. (For instance, if you wanted to
+track a particular note's context in an original version of a score and
+an arrangement). Most users will never need to worry about these
+details: just know that this feature lets music21 do some things that no
+other software package can do.
+
 Creating simple Streams
 -----------------------
+
+Objects stored in Streams are called elements and must be some type of
+Music21Object (don’t worry, almost everything in music21 is a
+Music21Object, such as Note, Chord, TimeSignature, etc.).
+
+(If you want to put an object that's not a Music21Object in a Stream,
+put it in an :class:`~music21.base.ElementWrapper`.)
 
 Streams are similar to Python lists in that they hold individual
 elements in order. They're different in that they can only hold
@@ -287,13 +349,15 @@ to a variable using the equal sign. Let's call our Stream ``stream1``:
 
     stream1 = stream.Stream()
 
-Notice that just like how the (capital) ``Note`` object lives in a
-module called (lowercase) ``note``, the (capital) ``Stream`` object
-lives in a module called (lowercase) ``stream``. Variable names, like
-``stream1`` can be either uppercase or lowercase, but I tend to use
-lowercase variable names (or camelCase like we did with ``noteList``).
-We can add the three ``Note`` objects we created above by using the
-``append`` method of ``Stream``:
+| Notice that just like how the (capital) ``Note`` object lives in a
+  module called (lowercase) ``note``, the (capital) ``Stream`` object
+  lives in a module called (lowercase) ``stream``. Variable names, like
+  ``stream1`` can be either uppercase or lowercase, but I tend to use
+  lowercase variable names (or camelCase like we did with ``noteList``).
+
+| The most common use of Streams is as places to store Notes. So let's
+  do just that: we can add the three ``Note`` objects we created above
+  by using the ``append`` method of ``Stream``:
 
 .. code:: python
 
@@ -301,10 +365,27 @@ We can add the three ``Note`` objects we created above by using the
     stream1.append(note2)
     stream1.append(note3)
 
-(If you're thinking ahead and seeing that this would be a pain to type
-for hundreds of ``Notes``, don't worry, we'll introduce some quicker
-ways to do that soon). Now we can see that our Stream has three notes
-using the same ``len()`` function that we used before:
+Of course, this would be a pain to type for hundreds of ``Notes``, so we
+could also use the Stream method
+:meth:`~music21.stream.Stream.repeatAppend` to add a number of
+independent, unique copies of the same Note. This creates independent
+copies (using Python's ``copy.deepcopy`` function) of the supplied
+object, not references.
+
+.. code:: python
+
+    stream2 = stream.Stream()
+    n3 = note.Note('d#5') # octave values can be included in creation arguments
+    stream2.repeatAppend(n3, 4)
+    stream2.show()
+
+
+.. image:: usersGuide_04_stream1_files/_fig_15.png
+
+
+But let's worry about that later. Going back to our first stream, we can
+see that it has three notes using the same ``len()`` function that we
+used before:
 
 .. code:: python
 
@@ -317,9 +398,38 @@ using the same ``len()`` function that we used before:
     3
 
 
-And we can still get the ``step`` of each ``Note`` using the
-``for thisNote in ...:`` command, but we'll now use ``stream1`` instead
-of ``noteList``:
+Alternatively, we can use the :meth:`~music21.base.Music21Object.show`
+method called as ``show('text')`` to see what is in the Stream and what
+its offset is (here 0.0, since we put it at the end of an empty stream).
+show(‘text’) to see what is in the Stream and what its offset is (here
+0.0, since we put it at the end of an empty stream).
+
+.. code:: python
+
+    stream1.show('text')
+
+
+.. parsed-literal::
+   :class: ipython-result
+
+    {0.0} <music21.note.Note C>
+    {2.0} <music21.note.Note F#>
+    {3.0} <music21.note.Note B->
+
+If you’ve setup your environment properly, then calling show with the
+``musicxml`` argument should open up Finale Reader, or Sibelius, or
+MuseScore or some music notation software and display the notes below.
+
+.. code:: python
+
+    #_DOCS_SHOW stream1.show('musicxml')
+
+Accessing Streams
+-----------------
+
+We can also dive deeper into streams. Let's get the ``step`` of each
+``Note`` using the ``for thisNote in ...:`` command. But now we'll use
+``stream1`` instead of ``noteList``:
 
 .. code:: python
 
@@ -335,7 +445,7 @@ of ``noteList``:
     B
 
 And we can get the first and the last ``Note`` in a ``Stream`` by using
-the [X] form:
+the [X] form, just like other Python list-like objects:
 
 .. code:: python
 
@@ -359,6 +469,98 @@ the [X] form:
     <accidental sharp>
 
 
+While full list-like functionality of the Stream is not provided, some
+additional methods familiar to users of Python lists are also available.
+The Stream :meth:`~music21.stream.Stream.index` method can be used to
+get the first-encountered index of a supplied object. Given an index, an
+element from the Stream can be removed with the
+:meth:`~music21.stream.Stream.pop` method.
+
+.. code:: python
+
+    stream1.index(note3)
+
+
+.. parsed-literal::
+   :class: ipython-result
+
+    2
+
+
+We can also gather elements based on the class (object type) of the
+element, by offset range, or by specific identifiers attached to the
+element. As before, gathering elements from a Stream will often return a
+new Stream with references to the collected elements.
+
+Gathering elements from a Stream based on the class of the element
+provides a way to filter the Stream for desired types of objects. The
+:meth:`~music21.stream.Stream.getElementsByClass` method returns a
+Stream of elements that are instances or subclasses of the provided
+classes. The example below gathers all :class:`~music21.note.Note`
+objects and then all :class:`~music21.note.Rest` objects.
+
+.. code:: python
+
+    sOut = stream1.getElementsByClass(note.Note)
+    sOut.show('text')
+
+
+.. parsed-literal::
+   :class: ipython-result
+
+    {0.0} <music21.note.Note C>
+    {2.0} <music21.note.Note F#>
+    {3.0} <music21.note.Note B->
+
+There are a few other useful tools for extracting specific object
+classes from a stream:
+
+.. code:: python
+
+    sOut = stream1.notesAndRests
+    len(sOut) == len(stream1)
+
+
+.. parsed-literal::
+   :class: ipython-result
+
+    True
+
+
+.. code:: python
+
+    listOut = stream1.pitches
+    listOut
+
+
+.. parsed-literal::
+   :class: ipython-result
+
+    [<music21.pitch.Pitch C4>,
+     <music21.pitch.Pitch F#4>,
+     <music21.pitch.Pitch B-2>]
+
+
+The :meth:`~music21.stream.Stream.getElementsByOffset` method returns
+a Stream of all elements that fall either at a single offset or within a
+range of two offsets provided as an argument. In both cases a Stream is
+returned.
+
+.. code:: python
+
+    sOut = stream1.getElementsByOffset(2, 3)
+    sOut.show('text')
+
+
+.. parsed-literal::
+   :class: ipython-result
+
+    {2.0} <music21.note.Note F#>
+    {3.0} <music21.note.Note B->
+
+More Stream Features
+--------------------
+
 Okay, so far we've seen that ``Streams`` can do the same things as
 lists, but can they do more? Let's call the analyze method on stream to
 get the ambitus (that is, the range from the lowest note to the highest
@@ -375,13 +577,18 @@ note) of the ``Notes`` in the ``Stream``:
     <music21.interval.Interval A12>
 
 
-Let's take a second to check this. Our lowest note is note3 (B-flat in
-octave 2) and our highest note is note2 (F-sharp in octave 4). From
-B-flat to the F-sharp above it, is an augmented fifth. An augmented
+Let's take a second to check this. Our lowest note is ``note3`` (B-flat
+in octave 2) and our highest note is ``note2`` (F-sharp in octave 4).
+From B-flat to the F-sharp above it, is an augmented fifth. An augmented
 fifth plus an octave is an augmented twelfth. So we're doing well so
 far. (We'll get to other things we can analyze in chapter 18 and we'll
 see what an :class:`~music21.interval.Interval` object can do in
 chapter 15).
+
+As we mentioned earlier, when placed in a Stream, Notes and other
+elements also have an offset (stored in .offset) that describes their
+position from the beginning of the stream. These offset values are also
+given in quarter-lengths (QLs).
 
 Once a Note is in a Stream, we can ask for the ``offset`` of the
 ``Notes`` (or anything else) in it. The ``offset`` is the position of a
@@ -478,6 +685,21 @@ places in multiple ``Streams``, so the ``.getOffsetBySite(X)`` command
 is a safer way that specifies exactly which Stream we are talking about.
 End of digression...)
 
+As a final note about offsets, the
+:attr:``~music21.stream.Stream.lowestOffset`` property returns the
+minimum of all offsets for all elements on the Stream.
+
+.. code:: python
+
+    stream1.lowestOffset
+
+
+.. parsed-literal::
+   :class: ipython-result
+
+    0.0
+
+
 So, what else can we do with Streams? Like ``Note`` objects, we can
 ``show()`` them in a couple of different ways. Let's hear these three
 Notes as a MIDI file:
@@ -493,7 +715,7 @@ Or let's see them as a score:
     stream1.show()
 
 
-.. image:: usersGuide_04_stream1_files/_fig_26.png
+.. image:: usersGuide_04_stream1_files/_fig_35.png
 
 
 You might ask why is the piece in common-time (4/4)? This is just the
@@ -567,7 +789,7 @@ By the way, Streams have a ``__repr__`` as well:
 .. parsed-literal::
    :class: ipython-result
 
-    <music21.stream.Stream 0x1073d2690>
+    <music21.stream.Stream 0x10757e150>
 
 
 that number at the end is the ``.id`` of the ``Stream``, which is a way
@@ -646,6 +868,9 @@ attribute which stores a ``Duration`` object:
 (Notice that the ``len()`` of a ``Stream``, which stands for "length",
 is not the same as the duration. the ``len()`` of a Stream is the number
 of objects stored in it, so ``len(stream1)`` is 3).
+
+Streams within Streams
+----------------------
 
 And, as a ``Music21Object``, a ``Stream`` can be placed inside of
 another ``Stream`` object. Let's create a stream, called biggerStream
@@ -728,7 +953,8 @@ special name and its own class (:class:`~music21.stream.Score`,
 ``Streams``.
 
 | So how do we find ``note1`` inside ``biggerStream``? That's what the
-next two chapters are about.
+  next two chapters are about.
+
 | Click ``Next`` for Chapter 5. Those with programming experience who
-have familiarity with lists of lists and defining functions might want
-to skip to Chapter 6.
+  have familiarity with lists of lists and defining functions might want
+  to skip to Chapter 6.

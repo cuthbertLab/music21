@@ -416,7 +416,7 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
                 # with meta data in abcToStreamScore
                 try:
                     scoreList.append(abcToStreamScore(abcDict[key]))
-                except:
+                except IndexError:
                     environLocal.warn("Failure for piece number %d" % key)
             for scoreDocument in scoreList:
                 opus._appendCore(scoreDocument)
@@ -511,13 +511,13 @@ def reBar(music21Part, inPlace=True):
             m2.number = m1.number + 1
             measureNumberOffset += 1
             music21Part.insert(common.opFrac(m1.offsetRational + m1.highestTime), m2)
-        """
-        elif (mEnd + music21Measure.paddingLeft) < tsEnd and measureIndex != len(allMeasures) - 1:
-            # The first and last measures are allowed to be incomplete
-            music21Measure.timeSignature = music21Measure.bestTimeSignature()
-            if allMeasures[measureIndex+1].timeSignature is None:
-                allMeasures[measureIndex+1].timeSignature = lastTimeSignature
-        """
+        
+        #elif (mEnd + music21Measure.paddingLeft) < tsEnd and measureIndex != len(allMeasures) - 1:
+        #    The first and last measures are allowed to be incomplete
+        #    music21Measure.timeSignature = music21Measure.bestTimeSignature()
+        #    if allMeasures[measureIndex+1].timeSignature is None:
+        #        allMeasures[measureIndex+1].timeSignature = lastTimeSignature
+        #
 
     if not inPlace:
         return music21Part

@@ -944,7 +944,10 @@ class StreamThawer(StreamFreezeThawBase):
             elif zipType == 'zlib':
                 compressedString = f.read()
                 uncompressed = zlib.decompress(compressedString)
-                storage = pickleMod.loads(uncompressed)
+                try:
+                    storage = pickleMod.loads(uncompressed)
+                except AttributeError as e:
+                    raise FreezeThawException('Problem in decoding: {}'.format(e))
             else:
                 raise FreezeThawException("Unknown zipType %s" % zipType)
             f.close()
