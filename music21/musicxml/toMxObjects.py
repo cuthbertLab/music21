@@ -16,6 +16,8 @@ musicxml.mxObject representation.
 import unittest
 import copy
 
+from music21.ext import webcolors
+
 from music21.musicxml import mxObjects
 
 from music21 import common
@@ -44,6 +46,12 @@ class ToMxObjectsException(exceptions21.Music21Exception):
 class NoteheadException(ToMxObjectsException):
     pass
 
+def normalizeColor(color):
+    if color in (None, ''):
+        return color
+    if '#' not in color:
+        return (webcolors.css3_names_to_hex[color]).upper()
+    return color 
 
 def configureMxPartGroupFromStaffGroup(staffGroup):
     '''
@@ -1666,7 +1674,8 @@ def noteheadToMxNotehead(obj, defaultColor=None):
     if nhParen is not False:
         mxNotehead.set('parentheses', nhParen)
     if obj.color not in [None, '']:
-        mxNotehead.set('color', obj.color)
+        color = normalizeColor(obj.color)
+        mxNotehead.set('color', color)
     return mxNotehead
 
 def noteToMxNotes(n, spannerBundle=None):
@@ -1706,7 +1715,7 @@ def noteToMxNotes(n, spannerBundle=None):
 
     mxNoteList = []
     pitchMx = pitchToMx(n.pitch)
-    noteColor = n.color
+    noteColor = normalizeColor(n.color)
 
     # todo: this is not yet implemented in music21 note objects; to do
     #mxNotehead = mxObjects.Notehead()
@@ -1793,8 +1802,8 @@ def restToMxNotes(r):
         mxRest = mxObjects.Rest()
         mxRest.setDefaults()
         mxNote.set('rest', mxRest)
-        # get color from within .editorial using attribute
-        mxNote.set('color', r.color)
+        # TODO: get color from within .editorial using attribute or delete .editorial...
+        mxNote.set('color', normalizeColor(r.color))
         if r.hideObjectOnPrint == True:
             mxNote.set('printObject', "no")
             mxNote.set('printSpacing', "yes")
