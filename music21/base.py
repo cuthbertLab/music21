@@ -1018,7 +1018,7 @@ class Music21Object(object):
         >>> n.sites.add(s, 10)
         >>> n.activeSite = s
         Traceback (most recent call last):
-        music21.sites.SitesException: v2.1. -- you may not assign an activesite for an object <music21.note.Note C> not in the Stream <music21.stream.Stream 0x...>
+        SitesException: v2.1. -- you may not assign an activesite for an object <music21.note.Note C> not in the Stream <music21.stream.Stream 0x...>
         >>> n.removeLocationBySite(s)
         >>> n.activeSite is None
         True
