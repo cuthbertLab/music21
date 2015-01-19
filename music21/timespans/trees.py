@@ -25,14 +25,16 @@ from music21 import common
 from music21 import exceptions21
 
 from music21.timespans import spans 
-from music21.timespans import node
+from music21.timespans import node as nodeModule
 
 from music21.exceptions21 import TimespanException
 from music21 import environment
 environLocal = environment.Environment("timespans")
 
+INFINITY = float('inf')
+NEGATIVE_INFINITY = float('-inf')
 
-class AVLTree(common.SlottedObject):
+class AVLTree(object):
     r'''
     Data structure for working with timespans.node.AVLNode objects.
     
@@ -42,7 +44,7 @@ class AVLTree(common.SlottedObject):
         '__weakref__',
         'rootNode',
         )
-    nodeClass = node.AVLNode
+    nodeClass = nodeModule.AVLNode
     
     def __init__(
         self,
@@ -366,7 +368,7 @@ class ElementTree(AVLTree):
 
     '''
     ### CLASS VARIABLES ###
-    nodeClass = node.TimespanTreeNode
+    nodeClass = nodeModule.TimespanTreeNode
 
     __slots__ = (
         '_source',
@@ -378,6 +380,7 @@ class ElementTree(AVLTree):
     def __init__(self, elements=None, source=None):
         super(ElementTree, self).__init__()
         self._parents = weakref.WeakSet()
+        self._source = None
         if elements and elements is not None:
             self.insert(elements)
             
@@ -415,8 +418,6 @@ class ElementTree(AVLTree):
             return True
         else:
             return False
-
-
 
     def __eq__(self, expr):
         r'''
@@ -543,14 +544,17 @@ class ElementTree(AVLTree):
                 yield el
 
     def __len__(self):
-        r'''Gets the length of the ElementTree collection, i.e., the number of elements.
+        r'''
+        Gets the length of the ElementTree collection, i.e., the number of elements enclosed.
 
-        >>> tree = timespans.trees.TimespanTree()
+        >>> tree = timespans.trees.ElementTree()
         >>> len(tree)
         0
 
         >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> tss = [timespans.Timespan(x, y) for x, y in tsList]
+        >>> tss = [note.Note() for _ in tsList]
+        >>> for i,n in enumerate(tss):
+        ...     n.offset, n.quarterLength = tsList[i]
         >>> tree.insert(tss)
         >>> len(tree)
         10
@@ -866,7 +870,7 @@ class ElementTree(AVLTree):
         index = node.payload.index(element) + node.nodeStartIndex
         return index
 
-    def remove(self, elements, offsets=None):
+    def remove(self, elements, offsets=None): #, shiftOffsets=False):
         r'''
         Removes `elements` or timespans (a single one or a list) from this Tree.
         
@@ -880,21 +884,67 @@ class ElementTree(AVLTree):
             elements = [elements]
         if offsets is not None and not common.isListLike(offsets):
             offsets = [offsets]
-            
+        
+#        shiftAmount = 0.0
         for i, el in enumerate(elements):
             if offsets is not None:
-                self._removeElement(el, offsets[i])
+                self._removeElement(el, offsets[i]) # + shiftAmount)
             else:
                 self._removeElement(el)
+#           if shiftOffsets:
+#               self.shiftOffsets(shiftAmount, offsets[i] + shiftAmount)
+#               shiftAmount = common.opFrac(shiftAmount - el.quarterLength)
+                
         self._updateIndices(self.rootNode)
         self._updateEndTimes(self.rootNode)
         if (self.offset != initialOffset) or \
             (self.endTime != initialEndTime):
             self._updateParents(initialOffset)
 
+#     def shiftOffsets(self, amountToShift, startingOffset=0.0, endingOffset=None, updateParents=True):
+#         '''
+#         >>> n = note.Note()
+#         >>> n2 = note.Note()
+#         >>> et = timespans.trees.ElementTree()
+#         >>> et.insert(10.0, n)
+#         >>> et.insert(20.0, n)
+#         >>> et
+#         <ElementTree {2} (10.0 to 21.0)>
+#         >>> et.shiftOffsets(5.0, startingOffset=0.0)
+#         >>> et
+#         <ElementTree {2} (15.0 to 26.0)>
+#         '''
+#         initialOffset = 0.0
+#         if endingOffset is None:
+#             endingOffset = INFINITY
+#         if updateParents:
+#             initialOffset = self.offset
+#             
+#         raise TimespanTreeException("This was a dumb idea; rewrite without ever changing a node's offset...")
+# #         
+# #         node = self._getNodeAfter(startingOffset)
+# #         nodeList = []
+# #         while node is not None and node.offset < endingOffset:
+# #             newOffset = node.offset
+# #             nodeList.append(node)
+# #             node = self._getNodeAfter(newOffset)
+# #         for n in nodeList:
+# #             n.offset += amountToShift
+# 
+#         self._updateIndices(self.rootNode)
+#         self._updateEndTimes(self.rootNode)
+#         self.rootNode = self._rebalance(self.rootNode)
+        
+
     def insert(self, offsetsOrElements, elements=None):
         r'''
         Inserts elements or `timespans` into this offset-tree.
+        
+        >>> n = note.Note()
+        >>> et = timespans.trees.ElementTree()
+        >>> et.insert(10.0, n)
+        >>> et
+        <ElementTree {1} (10.0 to 11.0)>
         '''
         initialOffset = self.offset
         initialEndTime = self.endTime
@@ -938,10 +988,20 @@ class ElementTree(AVLTree):
         if isinstance(el, TimespanTree):
             el._parents.add(self)
 
+    def append(self, el):
+        initialOffset = self.offset # will only change if is empty
+        endTime = self.latestEndTime
+        if endTime == INFINITY:
+            endTime = 0
+        self._insertCore(endTime, el)
+        self._updateIndices(self.rootNode)
+        self._updateEndTimes(self.rootNode)
+        self._updateParents(initialOffset)
+
     ### PROPERTIES ###
     @property
     def offset(self):
-        return self.earliestOffset
+        return self.lowestOffset
 
     @property
     def endTime(self):
@@ -961,13 +1021,13 @@ class ElementTree(AVLTree):
 
 
     @property
-    def earliestOffset(self):
+    def lowestOffset(self):
         r'''
         Gets the earliest start offset in this offset-tree.
 
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
-        >>> tree.earliestOffset
+        >>> tree.lowestOffset
         0.0
         '''
         def recurse(node):
@@ -976,7 +1036,7 @@ class ElementTree(AVLTree):
             return node.offset
         if self.rootNode is not None:
             return recurse(self.rootNode)
-        return float('-inf')
+        return NEGATIVE_INFINITY
 
     @property
     def earliestEndTime(self):
@@ -990,16 +1050,16 @@ class ElementTree(AVLTree):
         '''
         if self.rootNode is not None:
             return self.rootNode.endTimeLow
-        return float('inf')
+        return INFINITY
 
     @property
-    def latestOffset(self):
+    def highestOffset(self):
         r'''
-        Gets the lateset start offset in this offset-tree.
+        Gets the latest start offset in this offset-tree.
 
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
-        >>> tree.latestOffset
+        >>> tree.highestOffset
         35.0
         '''
         def recurse(node):
@@ -1008,7 +1068,7 @@ class ElementTree(AVLTree):
             return node.offset
         if self.rootNode is not None:
             return recurse(self.rootNode)
-        return float('-inf')
+        return NEGATIVE_INFINITY
 
     @property
     def latestEndTime(self):
@@ -1022,7 +1082,40 @@ class ElementTree(AVLTree):
         '''
         if self.rootNode is not None:
             return self.rootNode.endTimeHigh
-        return float('inf')
+        return INFINITY
+
+
+    @property
+    def allOffsets(self):
+        r'''
+        Gets all unique offsets of all timespans in this offset-tree.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> for offset in tree.allOffsets[:10]:
+        ...     offset
+        ...
+        0.0
+        0.5
+        1.0
+        2.0
+        3.0
+        4.0
+        5.0
+        5.5
+        6.0
+        6.5
+        '''
+        def recurse(node):
+            result = []
+            if node is not None:
+                if node.leftChild is not None:
+                    result.extend(recurse(node.leftChild))
+                result.append(node.offset)
+                if node.rightChild is not None:
+                    result.extend(recurse(node.rightChild))
+            return result
+        return tuple(recurse(self.rootNode))
 
     @property
     def allTimePoints(self):
@@ -1475,7 +1568,7 @@ class TimespanTree(ElementTree):
         <Verticality 29.5 {A#2 F#3 D4 F#4}>
         '''
         if reverse:
-            offset = self.latestOffset
+            offset = self.highestOffset
             verticality = self.getVerticalityAt(offset)
             yield verticality
             verticality = verticality.previousVerticality
@@ -1483,7 +1576,7 @@ class TimespanTree(ElementTree):
                 yield verticality
                 verticality = verticality.previousVerticality
         else:
-            offset = self.earliestOffset
+            offset = self.lowestOffset
             verticality = self.getVerticalityAt(offset)
             yield verticality
             verticality = verticality.nextVerticality
@@ -1681,37 +1774,6 @@ class TimespanTree(ElementTree):
         parts = sorted(parts, key=lambda x: x.getInstrument().partId)
         return parts
 
-    @property
-    def allOffsets(self):
-        r'''
-        Gets all unique offsets of all timespans in this offset-tree.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> for offset in tree.allOffsets[:10]:
-        ...     offset
-        ...
-        0.0
-        0.5
-        1.0
-        2.0
-        3.0
-        4.0
-        5.0
-        5.5
-        6.0
-        6.5
-        '''
-        def recurse(node):
-            result = []
-            if node is not None:
-                if node.leftChild is not None:
-                    result.extend(recurse(node.leftChild))
-                result.append(node.offset)
-                if node.rightChild is not None:
-                    result.extend(recurse(node.rightChild))
-            return result
-        return tuple(recurse(self.rootNode))
 
 
     @property
