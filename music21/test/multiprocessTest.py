@@ -66,6 +66,12 @@ class ModuleGather(object):
             'testDefault.py', 
             'testInstallation.py', 
             'testLint.py', 
+            'timeGraphImportStar.py',
+            'testSerialization',
+            'mptCurses.py',
+            'memoryUsage.py',
+            'dedent.py',
+            
             'testPerformance.py',
             'multiprocessTest.py',
             'timeGraphs.py',
@@ -84,6 +90,31 @@ class ModuleGather(object):
             'theoryAnalysis/wwnortonMGTA.py',
             'test/treeYield.py',
             'test/toggleDebug.py',
+            
+            'musicxml/testPrimitive',
+            'musicxml/testFiles',
+            'musedata/testPrimitive/test01',
+            'musedata/testPrimitive',
+            'mei/test_base',
+            'ipython21/ipyJSapp',
+            'humdrum/questions',
+            'humdrum/canonicalOutput',
+            'documentation/upload',
+            'documentation/source/conf'
+            'documentation/make',
+            'corpus/testCorpus',
+            'composition/seeger',
+            'composition/aug30',
+            'audioSearch/scores',
+            'audioSearch/scoreFollower',
+            'audioSearch/repetitionGame',
+            'audioSearch/omrfollow',
+            'audioSearch/humanVScomputer',
+            'audioSearch/graphicalInterfaceTranscriber',
+            'audioSearch/graphicalInterfaceSF',
+            'audioSearch/graphicalInterfaceGame',
+            'analysis/phrasing',
+            'abcFormat/testFiles'
             ]
         # skip any path that starts with this string
         self.pathSkip = ['abj', 'obsolete', 'ext', 'server', 'demos']
