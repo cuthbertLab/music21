@@ -76,6 +76,7 @@ from music21.sites import SitesException
 from music21 import sites
 from music21 import common
 from music21 import derivation
+from music21 import duration
 from music21 import environment
 
 from music21.common import opFrac
@@ -399,7 +400,7 @@ class Music21Object(object):
         Subclassable __deepcopy__ helper so that the same attributes do not need to be called
         for each Music21Object subclass.
         '''
-        defaultIgnoreSet = {'_derivation', '_activeSite', 'id', 'sites'}
+        defaultIgnoreSet = {'_derivation', '_activeSite', 'id', 'sites', '_duration'}
         if ignoreAttributes is None:
             ignoreAttributes = defaultIgnoreSet
         else:
@@ -412,6 +413,22 @@ class Music21Object(object):
         new = self.__class__()
         #environLocal.printDebug(['Music21Object.__deepcopy__', self, id(self)])
         #for name in dir(self):
+        if '_duration' in ignoreAttributes:
+            ## this can be done much faster in most cases...
+            d = self._duration
+            if d is not None:
+                try:
+                    if (d._qtrLength in (0, .25, .5, .75, 1, 1.5, 2, 3, 4) and
+                        (len(d.components) == 0 or 
+                         (len(d.components) == 1 and d.components[0]._link
+                          and len(d.components[0]._tuplets) == 0))): ## 99% of notes...
+                        newValue = duration.Duration(self._duration._qtrLength)
+                    else:
+                        newValue = copy.deepcopy(self._duration, memo=memo)                        
+                except AttributeError:
+                    newValue = copy.deepcopy(self._duration, memo=memo)
+                setattr(new, '_duration', newValue)
+                
         if '_derivation' in ignoreAttributes:
             # was: keep the old ancestor but need to update the client
             # 2.1 : NO, add a derivation of __deepcopy__ to the client

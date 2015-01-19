@@ -346,8 +346,7 @@ class GeneralNote(base.Music21Object):
 
         if (self.duration.quarterLength == 0 and
             len(self.duration.currentComponents()) == 0):
-            self.duration.addDurationUnit(duration.DurationUnit('quarter'))
-            self.duration.updateQuarterLength()
+            self.duration.quarterLength = 1.0
 
         self.lyrics = [] # a list of lyric objects
         self.expressions = []
