@@ -2555,6 +2555,8 @@ class Test(unittest.TestCase):
         for fp in directory:
             if fp.endswith('midi'):
                 break
+        else:
+            fp = None
         dirLib = os.path.join(fp, 'testPrimitive')
         # a simple file created in athenacl
         fp = os.path.join(dirLib, 'test10.mid')        
@@ -2587,6 +2589,8 @@ class Test(unittest.TestCase):
         for fp in directory:
             if fp.endswith('midi'):
                 break
+        else:
+            fp = None
         dirLib = os.path.join(fp, 'testPrimitive')
         # a file with three tracks and one conductor track
         fp = os.path.join(dirLib, 'test11.mid')        
@@ -2723,6 +2727,8 @@ class Test(unittest.TestCase):
         for fp in directory:
             if fp.endswith('midi'):
                 break
+        else:
+            fp = None
         dirLib = os.path.join(fp, 'testPrimitive')
         # a simple file created in athenacl
         fp = os.path.join(dirLib, 'test12.mid')
@@ -2747,6 +2753,8 @@ class Test(unittest.TestCase):
         for fp in directory:
             if fp.endswith('midi'):
                 break
+        else:
+            fp = None
         fpMidi = fp
         fp = os.path.join(fpMidi, 'testPrimitive', 'test13.mid')
         s = converter.parse(fp)
@@ -2768,6 +2776,8 @@ class Test(unittest.TestCase):
         for fp in directory:
             if fp.endswith('midi'):
                 break
+        else:
+            fp = None
         dirLib = os.path.join(fp, 'testPrimitive')
         # a simple file created in athenacl
         fp = os.path.join(dirLib, 'test05.mid')        

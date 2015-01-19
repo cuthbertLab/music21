@@ -122,8 +122,8 @@ class ScoreCorrector(object):
         try:
             ms = self.measureSlices[i]
             if ms == 0:
-                raise Exception("nope...")
-        except:
+                raise IndexError("nope...")
+        except IndexError:
             ms = MeasureSlice(self,i)
             if i >= len(self.measureSlices):
                 self.measureSlices.extend(0 for _ in range(len(self.measureSlices), i + 1))
@@ -308,7 +308,7 @@ class ScoreCorrector(object):
                     newEl.pitch.octave = oldPitch.octave
                     newEl.pitch.name = oldPitch.name
                     pitchIndex += 1
-            except:
+            except IndexError:
                 pass
             incorrectMeasure.append(newEl) 
                                
@@ -383,9 +383,10 @@ class ScoreCorrector(object):
         return PriorsIntegrationScore(totalFlagged, totalHorizontal, totalVertical, totalIgnored)
 
 class SinglePart(object):
-    def __init__(self, part = None, pn = None):
+    def __init__(self, part=None, pn=None):
         self.scorePart = part
         self.partNumber = pn
+        self.indexArray = None
         self.probabilityDistribution = None
         self.correctingMeasure = None
         if part is not None:
@@ -433,13 +434,15 @@ class SinglePart(object):
         []
         
         '''
+        from music21 import meter
         self.incorrectMeasures = []
         if runFast is True:
             try:
                 ts = self.measureStream[0].getContextByClass('TimeSignature')
-            except:
-                from music21 import meter
-                ts = meter.TimeSignature('4/4')       
+            except IndexError:
+                ts = meter.TimeSignature('4/4') 
+            if ts is None:
+                ts = meter.TimeSignature('4/4')
         for i in range(len(self.measureStream)):
             if runFast is False:
                 ts = self.measureStream[i].getContextByClass('TimeSignature')
