@@ -93,19 +93,20 @@ class ModuleGather(object):
             
             'musicxml/testPrimitive.py',
             'musicxml/testFiles.py',
-            'musedata/testPrimitive/test01.py',
-            'musedata/testPrimitive.py',
+            'musedata/testPrimitive/test01/__init__.py',
+            'musedata/testPrimitive/__init__.py',
             'mei/test_base.py',
             'ipython21/ipyJSapp.py',
             'humdrum/questions.py',
             'humdrum/canonicalOutput.py',
             'documentation/upload.py',
-            'documentation/source/conf'
+            'documentation/source/conf.py',
+            'documentation/library/extensions.py',
             'documentation/make.py',
             'corpus/testCorpus.py',
             'composition/seeger.py',
             'composition/aug30.py',
-            'audioSearch/scores.py',
+            'audioSearch/scores/__init__.py',
             'audioSearch/scoreFollower.py',
             'audioSearch/repetitionGame.py',
             'audioSearch/omrfollow.py',
@@ -380,7 +381,7 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
         elif moduleResponse.returnCode == 'ImportError':
             otherSummary.append("Import Error for %s" % moduleResponse.fp)
         elif moduleResponse.returnCode == 'NotInTree':
-            if moduleResponse.moduleName is not None:
+            if moduleResponse.moduleName == "":
                 otherSummary.append("Not in Tree Error: %s " % moduleResponse.moduleName) 
         elif moduleResponse.returnCode == 'TestsRun':
             totalTests += moduleResponse.testsRun
