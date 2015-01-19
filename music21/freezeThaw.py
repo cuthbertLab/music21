@@ -202,7 +202,6 @@ class StreamFreezer(StreamFreezeThawBase):
     True
 
 
-    >>> c = corpus.parse('luca/gloria') # This should be unnecessary, but c is corrupted...
     >>> sf2 = freezeThaw.StreamFreezer(c) # do not reuse StreamFreezers
     >>> data2 = sf2.writeStr(fmt='jsonpickle')
     >>> st2 = freezeThaw.StreamThawer()
