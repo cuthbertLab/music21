@@ -282,8 +282,10 @@ class Stream(base.Music21Object):
         base.Music21Object.__init__(self)
 
         self.streamStatus = streamStatus.StreamStatus(self)
-        self._offsetMapDict = {}
         
+        
+        # hugely important -- keeps track of where the _elements are
+        self._offsetMapDict = {}
 
         # self._elements stores Music21Object objects.
         self._elements = []
@@ -437,7 +439,7 @@ class Stream(base.Music21Object):
                 raise StreamException("Error in defining class: %r. " + 
                                       "Stream subclasses and Music21Objects cannot have required arguments in __init__" % self.__class__)
             for e in self.elements[k]:
-                found.insert(e.getOffsetBySite(self), e)
+                found.insert(self.getOffsetFromMap(e), e)
             # each insert calls this; does not need to be done here
             #found._elementsChanged()
             return found
@@ -560,12 +562,12 @@ class Stream(base.Music21Object):
             value.isStream):
             self._elements = list(value._elements)
             for e in self._elements:
-                self.setOffsetMap(e, e.getOffsetBySite(value))
+                self.setOffsetMap(e, value.getOffsetFromMap(e))
                 e.sites.add(self)
                 e.activeSite = self
             self._endElements = value._endElements
             for e in self._endElements:
-                self.setOffsetMap(e, e.getOffsetBySite(value))
+                self.setOffsetMap(e, value.getOffsetFromMap(e, stringReturn=True))
                 e.sites.add(self)
                 e.activeSite = self
         else:
