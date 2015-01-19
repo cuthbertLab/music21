@@ -31,18 +31,11 @@ from music21 import note
 
 from music21.ext import six
 
-if six.PY2:
-    import trees
-    import spans
-    import analysis
-    import node
-    import verticality
-else:
-    from . import trees # @Reimport
-    from . import spans # @Reimport
-    from . import analysis # @Reimport
-    from . import node # @Reimport
-    from . import verticality # @Reimport
+from music21.timespans import trees 
+from music21.timespans import spans 
+from music21.timespans import analysis 
+from music21.timespans import node 
+from music21.timespans import verticality 
 
 from music21.exceptions21 import TimespanException
 from music21 import environment
@@ -262,12 +255,12 @@ def streamToTimespanTree(
     ...
     <ElementTimespan (0.0 to 0.0) <music21.metadata.Metadata object at 0x...>>
     <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Soprano>>
-    <ElementTimespan (0.0 to 0.0) <music21.layout.StaffGroup <music21.stream.Part Soprano><music21.stream.Part Alto><music21.stream.Part Tenor><music21.stream.Part Bass>>>
     <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Alto>>
     <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
     <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Bass>>
+    <ElementTimespan (0.0 to 0.0) <music21.layout.StaffGroup <music21.stream.Part Soprano><music21.stream.Part Alto><music21.stream.Part Tenor><music21.stream.Part Bass>>>
 
-    >>> tenorElements = tree[4]
+    >>> tenorElements = tree[3]
     >>> tenorElements
     <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
 
