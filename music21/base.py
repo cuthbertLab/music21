@@ -1567,7 +1567,7 @@ class Music21Object(object):
             try:
                 o = activeSite.getOffsetFromMap(self)
             except SitesException:
-                environLocal.warn('Not in Stream: changing activeSite to None and returning _naiveOffset')
+                environLocal.debug('Not in Stream: changing activeSite to None and returning _naiveOffset')
                 self.activeSite = None                
                 o = self._naiveOffset
         else:
@@ -1850,7 +1850,6 @@ class Music21Object(object):
         >>> for y in m2.contextSites():
         ...      print(y)
         (<music21.stream.Measure 3333 offset=0.0>, 0.0, 'elementsFirst')
-        (<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')
         (<music21.stream.Part Alto>, 9.0, 'flatten')
         (<music21.stream.Score bach>, 9.0, 'elementsOnly')
 
@@ -4256,7 +4255,6 @@ class Test(unittest.TestCase):
         for y in m2.contextSites():
             siteList.append(repr(y))
         self.assertEqual(siteList, ["(<music21.stream.Measure 3333 offset=0.0>, 0.0, 'elementsFirst')",
-                                    "(<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')",
                                     "(<music21.stream.Part Alto>, 9.0, 'flatten')", 
                                     "(<music21.stream.Score bach>, 9.0, 'elementsOnly')"])
         siteList = []
@@ -4267,9 +4265,6 @@ class Test(unittest.TestCase):
         for y in m3.contextSites():
             siteList.append(repr(y))
         
-        import re
-        for i, sl in enumerate(siteList):
-            siteList[i] = re.sub('0x[a-f0-9]*', '...', sl)
         self.assertEqual(siteList, ["(<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')", 
                                     "(<music21.stream.Part Alto>, 9.0, 'flatten')", 
                                     "(<music21.stream.Score partStream>, 9.0, 'elementsOnly')",
