@@ -28,7 +28,7 @@ available after importing music21.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'2.0.2'
+'2.0.3'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -816,7 +816,7 @@ class Music21Object(object):
                 maxSearch = 100
                 while a is None:
                     try:
-                        a = site.getOffsetFromMap(tryOrigin, stringReturns=stringReturns)
+                        a = site.elementOffset(tryOrigin, stringReturns=stringReturns)
                     except AttributeError:
                         raise SitesException("You were using %r as a site, when it is not a Stream..." % site)
                     except Music21Exception as e: # currently StreamException, but will change
@@ -852,13 +852,13 @@ class Music21Object(object):
         >>> aSite = stream.Stream()
         >>> a = music21.Music21Object()
         >>> a.sites.add(aSite, 20)
-        >>> aSite.setOffsetMap(a, 20)
+        >>> aSite.setElementOffset(a, 20)
         >>> a.setOffsetBySite(aSite, 30)
         >>> a.getOffsetBySite(aSite)
         30.0
         '''
         if site is not None:
-            site.setOffsetMap(self, value)
+            site.setElementOffset(self, value)
             if site is self.activeSite:
                 self._activeSiteStoredOffset = value # update...     
         else:
@@ -1479,7 +1479,7 @@ class Music21Object(object):
         # NOTE: this is a performance intensive call
         if site is not None:
             try:
-                storedOffset = site.getOffsetFromMap(self)
+                storedOffset = site.elementOffset(self)
             except SitesException:
                 raise SitesException("v2.1. -- you may not assign an activesite for " + 
                                      "an object {} not in the Stream {}".format(self, site))
@@ -1565,7 +1565,7 @@ class Music21Object(object):
                 return self._activeSiteStoredOffset
             
             try:
-                o = activeSite.getOffsetFromMap(self)
+                o = activeSite.elementOffset(self)
             except SitesException:
                 environLocal.printDebug('Not in Stream: changing activeSite to None and returning _naiveOffset')
                 self.activeSite = None                
@@ -1594,7 +1594,7 @@ class Music21Object(object):
             offset = value.quarterLength
 
         if self.activeSite is not None:
-            self.activeSite.setOffsetMap(self, offset)
+            self.activeSite.setElementOffset(self, offset)
         else:
             self._naiveOffset = offset
 
@@ -3421,7 +3421,7 @@ class Test(unittest.TestCase):
         # still have activeSite
         self.assertEqual(a.activeSite, b)
         # now the offst returns the value for the current activeSite
-        #b.setOffsetMap(a, 40.0)
+        #b.setElementOffset(a, 40.0)
         self.assertEqual(a.offset, 40.0)
 
         # assigning a activeSite to None
@@ -3806,7 +3806,7 @@ class Test(unittest.TestCase):
         b1 = bar.Barline()
         s.append(n1)
         self.assertEqual(s.highestTime, 30.0)
-        s.setOffsetMap(b1, 'highestTime')
+        s.setElementOffset(b1, 'highestTime')
         
         self.assertEqual(b1.getOffsetBySite(s), 30.0)
 

@@ -390,8 +390,8 @@ class StreamFreezer(StreamFreezeThawBase):
                 if hasattr(el, '_derivation'):
                     el._derivation = derivation.Derivation() #reset
 
-                if (hasattr(el, '_offsetMapDict')):
-                    el._offsetMapDict = {}
+                if (hasattr(el, '_offsetDict')):
+                    el._offsetDict = {}
                 el.sites.clear()
                 el.activeSite = None
             startObj._derivation = derivation.Derivation() #reset
@@ -472,7 +472,7 @@ class StreamFreezer(StreamFreezeThawBase):
 
         streamObj._storedElementOffsetTuples = storedElementOffsetTuples
         #streamObj._elementTree = None
-        streamObj._offsetMapDict = {}
+        streamObj._offsetDict = {}
         streamObj._elements = []
         streamObj._endElements = []
         streamObj._elementsChanged()
