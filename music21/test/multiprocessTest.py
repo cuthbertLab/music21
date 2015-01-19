@@ -156,7 +156,7 @@ class ModuleGather(object):
         if multiprocessing.cpu_count() > 4:# @UndefinedVariable
             self.modulePaths.sort(key=manyCoreSortFunc)
         else:
-            self.modulePaths.sort
+            self.modulePaths.sort()
         self.modulePaths.reverse()
         
 
@@ -448,9 +448,12 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
     sys.stdout.flush()
     
     import datetime
-    with open(os.path.join(common.getSourceFilePath(), 'test', 'lastResults.txt'), 'w') as f:
+    lastResults = os.path.join(environLocal.getRootTempDir(), 'lastResults.txt')
+    with open(lastResults, 'w') as f:
         f.write(outStr)
         f.write("Run at " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    
+    print("Results at " + lastResults)
 
 if __name__ == '__main__':
     #mg = ModuleGather()
