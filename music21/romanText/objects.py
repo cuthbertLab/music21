@@ -1,5 +1,18 @@
-# TODO: Move to an Objects file and then import translate!
-
+# -*- coding: utf-8 -*-
+#-------------------------------------------------------------------------------
+# Name:         romanText/objects.py
+# Purpose:      music21 objects for processing roman numeral analysis text files
+#
+# Authors:      Christopher Ariza
+#               Michael Scott Cuthbert
+#
+# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL or BSD, see license.txt
+#-------------------------------------------------------------------------------
+'''
+Objects for processing roman numeral analysis text files, as defined and
+demonstrated by Dmitri Tymoczko.
+'''
 
 #from __future__ import unicode_literals
 
