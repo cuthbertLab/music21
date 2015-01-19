@@ -509,7 +509,7 @@ class ClassDocumenter(ObjectDocumenter):
         'definesExplicitSystemBreaks'
         'isFlat'
         'isSorted'
-
+        'recursionType'
         '''
         return self._docAttr
 
