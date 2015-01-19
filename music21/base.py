@@ -1567,7 +1567,7 @@ class Music21Object(object):
             try:
                 o = activeSite.getOffsetFromMap(self)
             except SitesException:
-                environLocal.debug('Not in Stream: changing activeSite to None and returning _naiveOffset')
+                environLocal.printDebug('Not in Stream: changing activeSite to None and returning _naiveOffset')
                 self.activeSite = None                
                 o = self._naiveOffset
         else:
