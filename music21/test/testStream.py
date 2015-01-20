@@ -429,7 +429,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(midStream.flat), 24)
 #        self.assertEqual(len(midStream.getOverlaps()), 0)
         mfs = midStream.flat.sorted
-        self.assertEqual(mfs[7].sites.getOffsetBySite(mfs), 11.0)
+        self.assertEqual(mfs[7].getOffsetBySite(mfs), 11.0)
 
         farStream = Stream()
         for x in range(7):
@@ -1362,7 +1362,8 @@ class Test(unittest.TestCase):
         from music21 import corpus, stream
         
         a = corpus.parse('bach/bwv4.8.xml')
-        # alto line syncopated/tied notes accross bars
+        # alto line syncopated/tied notes across bars
+        #a.show()
         alto = a.parts[1]
         self.assertEqual(len(alto.flat.notesAndRests), 73)
         
@@ -1520,9 +1521,9 @@ class Test(unittest.TestCase):
         post = s3.getClefs()[0]
         self.assertEqual(isinstance(post, clef.TrebleClef), True)
 
-        # s1 has both stream as contexts
-        self.assertEqual(s1.hasContext(s3), True)
-        self.assertEqual(s1.hasContext(s2), True)
+        # s1 has both streams as sites
+        self.assertEqual(s1.hasSite(s3), True)
+        self.assertEqual(s1.hasSite(s2), True)
 
         # but if we search s1, shuold not it find an alto clef?
         post = s1.getClefs()
@@ -1577,12 +1578,12 @@ class Test(unittest.TestCase):
         sInnerFlat.id = 'sInnerFlat'
 
 #         # but it has sOuter has a context
-#         self.assertEqual(sInnerFlat.hasContext(sOuter), True)
+#         self.assertEqual(sInnerFlat.hasSite(sOuter), True)
 #         #environLocal.printDebug(['sites.get() of sInnerFlat', sInnerFlat.sites.get()])
 #         #environLocal.printDebug(['sites.siteDict of sInnerFlat', sInnerFlat.sites.siteDict])
 # 
 # 
-#         self.assertEqual(sInnerFlat.hasContext(sOuter), True)
+#         self.assertEqual(sInnerFlat.hasSite(sOuter), True)
 # 
 #         # this returns the proper dictionary entry
 #         #environLocal.printDebug(
@@ -2833,7 +2834,7 @@ class Test(unittest.TestCase):
 
 # temporarily commented out
 #         m.shiftElementsAsAnacrusis()
-#         self.assertEqual(m.notesAndRests[0].hasContext(m), True)
+#         self.assertEqual(m.notesAndRests[0].hasSite(m), True)
 #         self.assertEqual(m.notesAndRests[0].offset, 2.0)
 #         # now the duration is full
 #         self.assertAlmostEqual(m.barDurationProportion(), 1.0, 4)
@@ -4597,6 +4598,17 @@ class Test(unittest.TestCase):
         #s.flat.makeChords().show()
         #s.show()
 
+
+    def testSliceAtOffsetsSimple(self):
+        s = Stream()
+        n = note.Note()
+        n.quarterLength = 4
+        s.append(n)
+        unused_post = s.sliceAtOffsets([1, 2, 3], inPlace=True)
+        a = [(e.offset, e.quarterLength) for e in s]
+        b = [(0.0, 1.0), (1.0, 1.0), (2.0, 1.0), (3.0, 1.0)]
+        self.assertEqual(a, b)
+        
 
     def testSliceAtOffsetsBuilt(self):
 
@@ -7434,10 +7446,7 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     import music21
     #'testContextNestedC'
-    #import sys
-    #sys.argv.append('testContextNestedD')
     music21.mainTest(Test, 'verbose')
-
 
 #------------------------------------------------------------------------------
 # eof

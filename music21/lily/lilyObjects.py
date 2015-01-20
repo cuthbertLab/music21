@@ -23,7 +23,7 @@ The Grammar for Lilypond comes from http://lilypond.org/doc/v2.14/Documentation/
 from __future__ import unicode_literals
 #python3
 try:
-    basestring
+    basestring # @UndefinedVariable
 except:
     basestring = str # @ReservedAssignment
 
@@ -584,7 +584,7 @@ class LyBookpartBlock(LyObject):
     
     def stringOutput(self):
         if self.bookpartBody is None:
-            self.backslash + "bookpart " + self.encloseCurly("") #TODO: Cuthbert, currently meaningless statement
+            return self.backslash + "bookpart " + self.encloseCurly("") 
         else:
             return self.backslash + "bookpart " + self.encloseCurly(self.bookpartBody.stringOutput())
 

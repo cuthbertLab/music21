@@ -18,4 +18,6 @@ Users Guide
    usersGuide_14_timeSignatures
    usersGuide_17_derivations
    usersGuide_21_sorting
+   usersGuide_22_graphing
+   usersGuide_25_postTonalTools1
    usersGuide_54_extendingConverter

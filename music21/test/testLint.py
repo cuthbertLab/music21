@@ -94,7 +94,7 @@ def main(fnAccept=None):
            '--dummy-variables-rgx="_|dummy|unused|i|j|junk" ' + 
            '--docstring-min-length=3 ' +
            '--max-args=7 ' +  # should be 5 later, but baby steps
-           '--bad-name="foo,shit,fuck" ' # definitely allow "bar" for barlines
+           '--bad-name="foo,shit,fuck,stuff" ' # definitely allow "bar" for barlines
            ]
     for pyLintId in disable:
         cmd.append('--disable=%s' % pyLintId)

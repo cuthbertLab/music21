@@ -17,9 +17,10 @@ This is an implementation detail of the TimespanTree class.
 '''
 
 import unittest
+from music21 import common
 from music21 import environment
 environLocal = environment.Environment("timespans.node")
-from music21 import common
+
 #------------------------------------------------------------------------------
 class AVLNode(common.SlottedObject):
     r'''
@@ -49,6 +50,7 @@ class AVLNode(common.SlottedObject):
     ### CLASS VARIABLES ###
 
     __slots__ = (
+        '__weakref__',
         'balance',
         'height',
         'offset',

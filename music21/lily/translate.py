@@ -996,7 +996,6 @@ class LilypondConverter(object):
         if 'Stream' not in c and thisObject.duration.type == 'complex':
             thisObjectSplit = thisObject.splitAtDurations()
             for subComponent in thisObjectSplit:
-                subComponent.activeSite = thisObject.activeSite
                 self.appendM21ObjectToContext(subComponent)
             return
 
@@ -1624,7 +1623,7 @@ class LilypondConverter(object):
         True
         '''
         if six.PY2:
-            fraction = unicode(numerator) + '/' + unicode(denominator)
+            fraction = unicode(numerator) + '/' + unicode(denominator) # @UndefinedVariable
         else:
             fraction = str(numerator) + '/' + str(denominator)
         lpMusicList = lyo.LyMusicList()

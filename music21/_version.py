@@ -37,8 +37,8 @@ updated along with it.
 When changing, update the single test case in base.py, and in freezeThaw.JSONFreezer.jsonPrint
 and at the end of the two corpus/metadataCache .jsons
 
-Changing this number invalidates old pickles
+Changing this number invalidates old pickles -- do it if the old pickles create a problem.
 '''
 
-__version_info__ = (2, 0, 2)
+__version_info__ = (2, 0, 4)
 __version__ = '.'.join(str(x) for x in __version_info__)

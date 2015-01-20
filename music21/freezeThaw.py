@@ -202,7 +202,6 @@ class StreamFreezer(StreamFreezeThawBase):
     True
 
 
-
     >>> sf2 = freezeThaw.StreamFreezer(c) # do not reuse StreamFreezers
     >>> data2 = sf2.writeStr(fmt='jsonpickle')
     >>> st2 = freezeThaw.StreamThawer()
@@ -362,7 +361,6 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> n.getOffsetBySite(t)
         20.0
         
-
         
         After recursiveClearSites n will be not know its location anywhere...
         
@@ -370,11 +368,6 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> len(n.sites)
         0
 
-        >>> n.sites.getOffsetBySite(t)   # TODO: REMOVE ALL THESE TESTS after v2.1
-        Traceback (most recent call last):
-        SitesException: Could not find the object with id ... in the Site marked with idKey ... 
-
-        
         This leaves n and t in strange positions, because n is in t.elements still....
         
         >>> n in t.elements
@@ -397,8 +390,8 @@ class StreamFreezer(StreamFreezeThawBase):
                 if hasattr(el, '_derivation'):
                     el._derivation = derivation.Derivation() #reset
 
-                if (hasattr(el, '_offsetMapDict')):
-                    el._offsetMapDict = {}
+                if (hasattr(el, '_offsetDict')):
+                    el._offsetDict = {}
                 el.sites.clear()
                 el.activeSite = None
             startObj._derivation = derivation.Derivation() #reset
@@ -479,7 +472,7 @@ class StreamFreezer(StreamFreezeThawBase):
 
         streamObj._storedElementOffsetTuples = storedElementOffsetTuples
         #streamObj._elementTree = None
-        streamObj._offsetMapDict = {}
+        streamObj._offsetDict = {}
         streamObj._elements = []
         streamObj._endElements = []
         streamObj._elementsChanged()
@@ -951,7 +944,10 @@ class StreamThawer(StreamFreezeThawBase):
             elif zipType == 'zlib':
                 compressedString = f.read()
                 uncompressed = zlib.decompress(compressedString)
-                storage = pickleMod.loads(uncompressed)
+                try:
+                    storage = pickleMod.loads(uncompressed)
+                except AttributeError as e:
+                    raise FreezeThawException('Problem in decoding: {}'.format(e))
             else:
                 raise FreezeThawException("Unknown zipType %s" % zipType)
             f.close()
@@ -1224,9 +1220,10 @@ class JSONFreezer(JSONFreezeThawBase):
         ...     attr
         ...
         '_activeSite'
-        '_activeSiteId'
+        '_activeSiteStoredOffset'
         '_duration'
         '_editorial'
+        '_naiveOffset'
         '_notehead'
         '_noteheadFill'
         '_noteheadParenthesis'
@@ -1519,25 +1516,8 @@ class JSONFreezer(JSONFreezeThawBase):
           "__attr__": {
             "_duration": {
               "__attr__": {
-                "_cachedIsLinked": true, 
-                "_components": [
-                  {
-                    "__attr__": {
-                      "_componentsNeedUpdating": false, 
-                      "_dots": [
-                        0
-                      ], 
-                      "_link": true, 
-                      "_qtrLength": 1.0, 
-                      "_quarterLengthNeedsUpdating": false, 
-                      "_tuplets": [], 
-                      "_type": "quarter", 
-                      "_typeNeedsUpdating": false
-                    }, 
-                    "__class__": "music21.duration.DurationUnit"
-                  }
-                ], 
-                "_componentsNeedUpdating": false, 
+                "_components": [],
+                "_componentsNeedUpdating": true, 
                 "_qtrLength": 1.0, 
                 "_quarterLengthNeedsUpdating": false, 
                 "_typeNeedsUpdating": false
@@ -1838,8 +1818,10 @@ class Test(unittest.TestCase):
         s.insert(2.0, n)
         sDummy.insert(3.0, n)
 
+        self.assertIs(s.spanners[0].getFirst(), s.notes[0])
+
         sf = StreamFreezer(s)
-        out = sf.writeStr()
+        out = sf.writeStr(fmt='jsonpickle') # easier to read...
 
         del(s)
         del(sDummy)
@@ -2095,7 +2077,7 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     import music21
     #import sys
-    #sys.argv.append('testPickleMidi')
+    #sys.argv.append('testFreezeThawWithSpanner')
     music21.mainTest(Test)
     
 

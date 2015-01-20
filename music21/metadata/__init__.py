@@ -53,6 +53,7 @@ from music21.metadata.bundles import *
 from music21.metadata.caching import *
 from music21.metadata.primitives import *
 
+from music21.metadata import testMetadata 
 #------------------------------------------------------------------------------
 
 

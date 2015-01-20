@@ -24,7 +24,6 @@ import difflib
 
 from music21 import base
 from music21 import common
-from music21 import derivation
 from music21 import environment
 from music21 import exceptions21
 from music21 import note
@@ -1792,46 +1791,24 @@ class Variant(base.Music21Object):
         if 'name' in keywords:
             self.groups.append(keywords['name'])
 
-    def __deepcopy__(self, memo=None):
-        new = self.__class__()
-        old = self
-        if '_derivation' in self.__dict__:
-            # was: keep the old ancestor but need to update the client
-            # 2.1 : NO, add a derivation of __deepcopy__ to the client
-            newDerivation = derivation.Derivation(client=new)
-            newDerivation.origin = self
-            newDerivation.method = '__deepcopy__'
-            setattr(new, '_derivation', newDerivation)
 
-        for name in self.__dict__:
-            if name.startswith('__'):
-                continue
-            if name in ('_cache', '_derivation'):
-                continue
-            part = getattr(self, name)
-            # functionality duplicated from Music21Object
-            if name == '_activeSite':
-                setattr(new, name, self.activeSite)
-            elif name == 'sites':
-                newValue = copy.deepcopy(part, memo)
-                newValue.containedById = id(new)
-                setattr(new, name, newValue)
-            # do not deepcopy _stream, as this will copy the 
-            # contained objects
-            # this means that the new object is not really free of the 
-            # old elements it described
-            elif name == '_stream':
-                # this passes references; does not copy contained
-                #for c in old._stream:
-                #    new._stream.insert(c.getOffsetBySite(old._stream), c)
-                # this copies the contained stream
-                new._stream = copy.deepcopy(old._stream)
-            else: 
-                #environLocal.printDebug(['Spanner.__deepcopy__', name])
-                newValue = copy.deepcopy(part, memo)
-                setattr(new, name, newValue)
+    def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
+        '''
+        see __deepcopy__ for tests and docs
+        '''
+        # NOTE: this is a performance critical operation        
+        defaultIgnoreSet = {'_cache'}
+        if ignoreAttributes is None:
+            ignoreAttributes = defaultIgnoreSet
+        else:
+            ignoreAttributes = ignoreAttributes | defaultIgnoreSet
+
+        new = super(Variant, self)._deepcopySubclassable(memo, ignoreAttributes, removeFromIgnore)
+
         return new
 
+    def __deepcopy__(self, memo=None):
+        return self._deepcopySubclassable(memo)
 
     #---------------------------------------------------------------------------
     # as _stream is a private Stream, unwrap/wrap methods need to override

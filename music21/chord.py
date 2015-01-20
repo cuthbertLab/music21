@@ -266,10 +266,12 @@ class Chord(note.NotRest):
         else:
             self.beams = beam.Beams()
 
+
+    ### SPECIAL METHODS ###
     def __deepcopy__(self, memo=None):
         '''As Chord objects have one or more Volume, objects, and Volume
         objects store weak refs to the to parent object, need to specialize
-        deep copy handling.
+        deepcopy handling depending on if the chord has its own volume object.
         '''
         #environLocal.printDebug(['calling NotRest.__deepcopy__', self])
         # as this inherits from NotRest, can use that __deepcopy__ as basis
@@ -283,8 +285,6 @@ class Chord(note.NotRest):
             if d._volume is not None:
                 d.volume.parent = new # update with new instance
         return new
-
-    ### SPECIAL METHODS ###
 
 
     def __getitem__(self, key):
@@ -3688,8 +3688,7 @@ class Chord(note.NotRest):
             # Key is a subclass of scale.DiatonicScale
             sc = self.key
         else:
-            sc = self.getContextByClass(scale.Scale,
-                prioritizeActiveSite=True, sortByCreationTime=True)
+            sc = self.getContextByClass(scale.Scale, sortByCreationTime=True)
             if sc is None:
                 raise ChordException("Cannot find a Key or Scale context for this chord, so cannot find what scale degrees the pitches correspond to!")
 #        if hasattr(sc, 'mode'):
@@ -4436,7 +4435,7 @@ class Test(unittest.TestCase):
         self.assertNotEqual(chord1.activeSite, st1)
 
         # test id
-        self.assertEqual(chord1._activeSiteId, id(st2))
+        self.assertEqual(chord1.activeSite, st2)
         # for some reason this test fails when test cases are run at the
         # module level, but not at the level of running the specific method
         # from the class
