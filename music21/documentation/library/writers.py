@@ -33,13 +33,12 @@ class ReSTWriter(object):
 
     def write(self, filePath, rst): #
         '''
-        Write ``lines`` to ``filePath``, only overwriting an existing file
-        if the content differs.
+        Write ``rst`` (a unicode string) to ``filePath``, 
+        only overwriting an existing file if the content differs.
         '''
         shouldWrite = True
         if os.path.exists(filePath):
-            with open(filePath, 'r') as f:
-                oldRst = f.read()
+            oldRst = common.readFileEncodingSafe(filePath, firstGuess='utf-8')
             if rst == oldRst:
                 shouldWrite = False
         if shouldWrite:
@@ -76,7 +75,10 @@ class ModuleReferenceReSTWriter(ReSTWriter):
                 moduleReferenceDirectoryPath,
                 fileName,
                 )
-            self.write(filePath, rst)
+            try:
+                self.write(filePath, rst)
+            except TypeError as te:
+                raise TypeError("File failed: " + filePath + ", reason: " + str(te))
 
         lines = []
         lines.append('.. moduleReference:')
