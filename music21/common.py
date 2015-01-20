@@ -2109,7 +2109,7 @@ xlateAccents={0xc0:'A', 0xc1:'A', 0xc2:'A', 0xc3:'A', 0xc4:'A', 0xc5:'A',
     }
 
 def stripAccents(inputString):
-    '''
+    r'''
     removes accents from unicode strings.
 
 
