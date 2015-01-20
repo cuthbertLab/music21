@@ -66,8 +66,9 @@ topics will be linked and added as the topics are written:
 
 Tests and other ideas to be deleted
 ===================================
-95. :ref:`vexflowIPython`
-96. :ref:`ipython_comm`
-97. :ref:`timespans`
-98. :ref:`inversionDemo`
+95. :ref:`VexflowIPython <usersGuide_95_vexflowIPython>`
+96. :ref:`IPython Comm <usersGuide_96_ipython_comm>`
+96. :ref:`IPython Comm2 <usersGuide_96b_ipython_comm_noM21>`
+97. :ref:`TimeSpans <usersGuide_97_timespans>`
+98. :ref:`Inversion <usersGuide_98_inversionDemo>`
 
