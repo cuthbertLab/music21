@@ -36,7 +36,6 @@ title = 'Music21 Fragment'
 author = 'Music21'
 software = 'Music21' # used in xml encoding source software 
 
-
 meterNumerator = 4
 meterDenominator = 'quarter'
 meterDenominatorBeatType = 4  # musicxml representation
@@ -94,6 +93,11 @@ ticksPerQuarter = 1024
 # so how many millimeters = a staff?
 scalingMillimeters = 7
 scalingTenths = 40
+
+
+ipythonImageDpi = 100
+
+
 
 #-----------------------------------------------------------------||||||||||||--
 class Test(unittest.TestCase):

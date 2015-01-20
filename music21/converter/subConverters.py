@@ -16,10 +16,12 @@ parseData method that sets self.stream.
 #-------------------------------------------------------------------------------
 # Converters are associated classes; they are not subclasses, but most define a pareData() method, a parseFile() method, and a .stream attribute or property.
 import os
+import sys
 import unittest
 
 from music21.ext import six
 from music21 import common
+from music21 import defaults
 from music21 import stream
 from music21 import exceptions21
 
@@ -198,7 +200,7 @@ class ConverterIPython(SubConverter):
     def vfshow(self, s):
         import random
         from music21.vexflow import toMusic21j
-        from IPython.display import HTML
+        from IPython.display import HTML # @UnresolvedImport
         vfp = toMusic21j.VexflowPickler()
         vfp.mode = 'jsonSplit'
         outputCode = vfp.fromObject(s)
@@ -223,11 +225,21 @@ class ConverterIPython(SubConverter):
             #subformats = ['lilypond','png']
         helperFormat = subformats[0]
         helperSubformats = subformats[1:]
+        
         from music21 import converter
         helperConverter = converter.Converter()
         helperConverter.setSubconverterFromFormat(helperFormat)
         helperSubConverter = helperConverter.subConverter
+        ### hack to make musescore excerpts -- fix with a converter class in MusicXML
+        savedDefaultTitle = defaults.title
+        savedDefaultAuthor = defaults.author
+        defaults.title = ''
+        defaults.author = ''
+        
         fp = helperSubConverter.write(obj, helperFormat, subformats=helperSubformats)
+
+        defaults.title = savedDefaultTitle
+        defaults.author = savedDefaultAuthor
         if helperSubformats[0] == 'png':
             from music21.ipython21 import objects as ipythonObjects
             ipo = ipythonObjects.IPythonPNGObject(fp)
@@ -609,24 +621,23 @@ class ConverterMusicXML(SubConverter):
         self.load()
 
     def runThroughMusescore(self, fp, **keywords):
-        import sys
-        musescoreFile = environLocal['musescoreDirectPNGPath']
-        if musescoreFile == "":
+        musescorePath = environLocal['musescoreDirectPNGPath']
+        if musescorePath == "":
             raise SubConverterException("To create PNG files directly from MusicXML you need to download MuseScore")
-        elif not os.path.exists(musescoreFile):
-            raise SubConverterException("Cannot find a path to the 'mscore' file at %s -- download MuseScore" % musescoreFile)
+        elif not os.path.exists(musescorePath):
+            raise SubConverterException("Cannot find a path to the 'mscore' file at %s -- download MuseScore" % musescorePath)
 
         fpOut = fp[0:len(fp) - 3]
         fpOut += "png"
-        musescoreRun = musescoreFile + " " + fp + " -o " + fpOut
+        musescoreRun = '"' + musescorePath + '" ' + fp + " -o " + fpOut
         if 'dpi' in keywords:
             musescoreRun += " -r " + str(keywords['dpi'])
         if common.runningUnderIPython():
-            musescoreRun += " -r 72"
+            musescoreRun += " -r " + str(defaults.ipythonImageDpi)
 
         storedStrErr = sys.stderr
         if six.PY2:
-            from StringIO import StringIO # @UnusedImport
+            from StringIO import StringIO # @UnusedImport @UnresolvedImport
         else:
             from io import StringIO # @Reimport
         fileLikeOpen = StringIO()
@@ -636,6 +647,7 @@ class ConverterMusicXML(SubConverter):
         sys.stderr = storedStrErr
 
         fp = fpOut[0:len(fpOut) - 4] + "-1.png"
+        common.cropImageFromPath(fp)       
         return fp
     
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):
@@ -646,6 +658,16 @@ class ConverterMusicXML(SubConverter):
         if subformats is not None and 'png' in subformats:
             fp = self.runThroughMusescore(fp, **keywords)
         return fp
+
+    def show(self, obj, fmt, app=None, subformats=None, **keywords):
+        '''
+        Override to do something with png...
+        '''
+        returnedFilePath = self.write(obj, fmt, subformats=subformats, **keywords)
+        if subformats is not None and 'png' in subformats:
+            fmt = 'png'
+        self.launch(returnedFilePath, fmt=fmt, app=app)
+
 
 #-------------------------------------------------------------------------------
 class ConverterMidi(SubConverter):

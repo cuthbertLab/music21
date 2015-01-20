@@ -521,7 +521,7 @@ class _EnvironmentCore(object):
                 ('vectorPath', '/Applications/Preview.app'),
                 ('pdfPath', '/Applications/Preview.app'),
                 ('midiPath', '/Applications/QuickTime Player.app'),
-                ('musescoreDirectPNGPath', '/Applications/MuseScore.app/Contents/MacOS/mscore'),
+                ('musescoreDirectPNGPath', '/Applications/MuseScore 2.app/Contents/MacOS/mscore'),
                 ]:
                 self.__setitem__(name, value)  # use for key checking
 

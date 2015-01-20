@@ -109,7 +109,6 @@ class ToneRow(stream.Stream):
         if self.row != None:
             for pc in self.row:
                 n = note.Note()
-                n.duration.quarterLength = 0.0
                 n.pitch = pitch.Pitch(pc)
                 n.pitch.octave = None
                 self.append(n)
@@ -3347,17 +3346,17 @@ def pcToToneRow(pcSet):
     >>> a = serial.pcToToneRow(range(12))
     >>> a.show('text')
     {0.0} <music21.note.Note C>
-    {0.0} <music21.note.Note C#>
-    {0.0} <music21.note.Note D>
-    {0.0} <music21.note.Note E->
-    {0.0} <music21.note.Note E>
-    {0.0} <music21.note.Note F>
-    {0.0} <music21.note.Note F#>
-    {0.0} <music21.note.Note G>
-    {0.0} <music21.note.Note G#>
-    {0.0} <music21.note.Note A>
-    {0.0} <music21.note.Note B->
-    {0.0} <music21.note.Note B>
+    {1.0} <music21.note.Note C#>
+    {2.0} <music21.note.Note D>
+    {3.0} <music21.note.Note E->
+    {4.0} <music21.note.Note E>
+    {5.0} <music21.note.Note F>
+    {6.0} <music21.note.Note F#>
+    {7.0} <music21.note.Note G>
+    {8.0} <music21.note.Note G#>
+    {9.0} <music21.note.Note A>
+    {10.0} <music21.note.Note B->
+    {11.0} <music21.note.Note B>
     >>> matrixObj = a.matrix()
     >>> print(matrixObj)
       0  1  2  3  4  5  6  7  8  9  A  B
@@ -3386,7 +3385,6 @@ def pcToToneRow(pcSet):
         a = ToneRow()
     for thisPc in pcSet:
         n = note.Note()
-        n.duration.quarterLength = 0.0
         n.pitch.pitchClass = thisPc
         n.pitch.octave = None
         a.append(n)

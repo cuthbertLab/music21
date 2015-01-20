@@ -2260,8 +2260,9 @@ class Music21Object(object):
             if common.runningUnderIPython():
                 try:
                     # TODO: when everyone has updated, then remove these lines... c. August 2015
-                    environLocal['ipythonShowFormat'] = 'ipython.lilypond.png'
-                    environLocal.write()
+                    if 'vexflow' in environLocal['ipythonShowFormat']:
+                        environLocal['ipythonShowFormat'] = 'ipython.lilypond.png'
+                        environLocal.write()
                     # end delete
                     fmt = environLocal['ipythonShowFormat']
                 except environment.EnvironmentException:
