@@ -920,7 +920,7 @@ def standardDeviation(coll, bassel=False):
 
 def isNum(usrData):
     '''check if usrData is a number (float, int, long, Decimal), return boolean
-    IMPROVE: when 2.6 is everywhere: add numbers class.
+    TODO: consider using numbers class (wasn't available until 2.6)
 
     >>> common.isNum(3.0)
     True
@@ -928,11 +928,23 @@ def isNum(usrData):
     True
     >>> common.isNum('three')
     False
+    
+    True and False are NOT numbers:
+    
+    >>> common.isNum(True)
+    False
+    >>> common.isNum(False)
+    False
+    >>> common.isNum(None)
+    False
     '''
     try:
         # TODO: this may have unexpected consequences: find
         dummy = usrData + 0
-        return True
+        if usrData is not True and usrData is not False:
+            return True
+        else:
+            return False
     except Exception: # pylint: disable=broad-except
         return False
 
@@ -976,7 +988,6 @@ def contiguousList(inputListOrTuple):
 
 def isStr(usrData):
     """Check of usrData is some form of string, including unicode.
-
 
     >>> common.isStr(3)
     False

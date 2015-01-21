@@ -39,8 +39,8 @@ if six.PY2:
             'installer.py',
             '*/documentation/upload.py',
             '*/documentation/make.py',
-            '*/test/*',
-            '*/demos/*',  # maybe remove someday...
+#            '*/test/*',
+#            '*/demos/*',  # maybe remove someday...
             'music21/configure.py',
             '*/figuredBass/examples.py',
             '*/trecento/tonality.py'
