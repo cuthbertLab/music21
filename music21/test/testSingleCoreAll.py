@@ -42,6 +42,10 @@ if six.PY2:
             '*/test/*',
             '*/demos/*',  # maybe remove someday...
             'music21/configure.py',
+            ], exclude_lines=[
+            'import music21',
+            'music21.mainTest()',
+            'pragma: no cover',
             ])
         cov.start()
     except ImportError:
