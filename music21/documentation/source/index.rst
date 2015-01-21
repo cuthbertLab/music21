@@ -11,7 +11,12 @@ Music21 Documentation
 .. toctree::
    :maxdepth: 2
 
-   overview/index
+   usersGuide/index
+
+.. toctree::
+   :maxdepth: 1
+
+   moduleReference/index
 
 .. toctree::
    :maxdepth: 2
@@ -21,22 +26,19 @@ Music21 Documentation
 .. toctree::
    :maxdepth: 2
 
-   usersGuide/index
+   tutorials/index
 
 .. toctree::
    :maxdepth: 2
 
-   tutorials/index
+   overview/index
+
 
 .. toctree::
    :maxdepth: 2
 
    systemReference/index
 
-.. toctree::
-   :maxdepth: 1
-
-   moduleReference/index
 
 .. toctree::
    :maxdepth: 2

@@ -234,7 +234,7 @@ class Sites(common.SlottedObject):
         Get keys sorted by creation time, where most
         recent are first if `newFirst` is True. else, most recent are last.
 
-        >>> class Mock(music21.Music21Object):
+        >>> class Mock(base.Music21Object):
         ...     pass
         ...
         >>> aObj = Mock()
@@ -850,7 +850,7 @@ class Sites(common.SlottedObject):
         Sites's siteDict. This
         will return False if the object is simply a context and not a location.
 
-]        >>> class Mock(base.Music21Object):
+        >>> class Mock(base.Music21Object):
         ...     pass
         ...
         >>> aSite = Mock()
