@@ -1314,8 +1314,8 @@ def articulationsAndExpressionsToMx(target, mxNoteList):
 def fermataToMxFermata(fermata):
     '''
     Convert an expressions.Fermata object to a musicxml.mxObject.Fermata
-    object.  Note that the default musicxml is inverted fermatas -- those are what most of us think of as 'upright' fermatas
-    
+    object.  Note that the default musicxml is inverted fermatas -- 
+    those are what most of us think of as 'upright' fermatas
     
     >>> fermata = expressions.Fermata()
     >>> fermata.type
@@ -1792,10 +1792,17 @@ def noteToMxNotes(n, spannerBundle=None):
 
 
 
-def restToMxNotes(r):
+def restToMxNotes(r, spannerBundle=None):
     '''Translate a :class:`~music21.note.Rest` to a MusicXML :class:`~music21.musicxml.mxObjects.Note` object 
     configured with a :class:`~music21.musicxml.mxObjects.Rest`.
     '''
+    if spannerBundle is not None and len(spannerBundle) > 0:
+        # this will get all spanners that participate with this note
+        # get a new spanner bundle that only has spanned elements relevant to this 
+        # note.
+        spannerBundle = spannerBundle.getBySpannedElement(r)
+        #environLocal.printDebug(['noteToMxNotes(): spannerBundle post-filter by spannedElement:', spannerBundle, n, id(n)])
+
     mxNoteList = []
     for mxNote in durationToMx(r.duration): # returns a list of mxNote objs
         # merge method returns a new object
@@ -1804,10 +1811,23 @@ def restToMxNotes(r):
         mxNote.set('rest', mxRest)
         # TODO: get color from within .editorial using attribute or delete .editorial...
         mxNote.set('color', normalizeColor(r.color))
+
         if r.hideObjectOnPrint == True:
             mxNote.set('printObject', "no")
             mxNote.set('printSpacing', "yes")
         mxNoteList.append(mxNote)
+    articulationsAndExpressionsToMx(r, mxNoteList)
+
+    # some spanner produce direction tags, and sometimes these need
+    # to go before or after the notes of this element
+    mxDirectionPre = []
+    mxDirectionPost = []
+    # will update and fill all lists passed in as args
+    spannersToMx(r, mxNoteList, mxDirectionPre, mxDirectionPost, spannerBundle)
+
+    return mxDirectionPre + mxNoteList + mxDirectionPost
+    
+    
     return mxNoteList
 
 
@@ -1960,9 +1980,9 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
 
                     ## returns a list of note objects...
                     if 'Note' in classes:
-                        objList = noteToMxNotes(obj)
+                        objList = noteToMxNotes(obj, spannerBundle=spannerBundle)
                     elif 'Rest' in classes:
-                        objList = restToMxNotes(obj)
+                        objList = restToMxNotes(obj, spannerBundle=spannerBundle)
                     elif 'Unpitched' in classes:
                         environLocal.warn("skipping Unpitched object")
                     # need to set voice for each contained mx object

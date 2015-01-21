@@ -785,11 +785,9 @@ class ConverterRomanText(SubConverter):
     
 
     def parseData(self, strData, number=None):
-        '''
-        '''
         from music21.romanText import rtObjects
         from music21.romanText import translate as romanTextTranslate
-        rtf = rtObjects.RTFile()
+        rtf = rtObjects.RTFile() # not sure why -- @UndefinedVariable
         rtHandler = rtf.readstr(strData)
         if rtHandler.definesMovements():
             # this re-defines Score as an Opus
@@ -798,11 +796,9 @@ class ConverterRomanText(SubConverter):
             romanTextTranslate.romanTextToStreamScore(rtHandler, self.stream)
 
     def parseFile(self, fp, number=None):
-        '''
-        '''
         from music21.romanText import rtObjects
         from music21.romanText import translate as romanTextTranslate
-        rtf = rtObjects.RTFile()
+        rtf = rtObjects.RTFile() # not sure why -- @UndefinedVariable
         rtf.open(fp)
         # returns a handler instance of parse tokens
         rtHandler = rtf.read()

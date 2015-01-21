@@ -11,7 +11,7 @@
 #-------------------------------------------------------------------------------
 '''
 Objects for processing roman numeral analysis text files, as defined and
-demonstrated by Dmitri Tymoczko.
+demonstrated by Dmitri Tymoczko. 
 '''
 
 #from __future__ import unicode_literals
