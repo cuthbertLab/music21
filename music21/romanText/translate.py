@@ -125,7 +125,7 @@ from music21 import exceptions21
 from music21 import common
 from music21 import bar
 
-from music21.romanText import objects as rtObjects
+from music21.romanText import rtObjects
 
 
 from music21 import environment

@@ -642,7 +642,7 @@ class ConverterMusicXML(SubConverter):
 
         fpOut = fp[0:len(fp) - 3]
         fpOut += "png"
-        musescoreRun = '"' + musescorePath + '" ' + fp + " -o " + fpOut
+        musescoreRun = '"' + musescorePath + '" ' + fp + " -o " + fpOut + " -T 0 "
         if 'dpi' in keywords:
             musescoreRun += " -r " + str(keywords['dpi'])
         if common.runningUnderIPython():
@@ -660,7 +660,7 @@ class ConverterMusicXML(SubConverter):
         sys.stderr = storedStrErr
 
         fp = fpOut[0:len(fpOut) - 4] + "-1.png"
-        common.cropImageFromPath(fp)       
+        #common.cropImageFromPath(fp)       
         return fp
     
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):
@@ -787,9 +787,9 @@ class ConverterRomanText(SubConverter):
     def parseData(self, strData, number=None):
         '''
         '''
-        from music21.romanText import objects as romanTextModule
+        from music21.romanText import rtObjects
         from music21.romanText import translate as romanTextTranslate
-        rtf = romanTextModule.RTFile()
+        rtf = rtObjects.RTFile()
         rtHandler = rtf.readstr(strData)
         if rtHandler.definesMovements():
             # this re-defines Score as an Opus
@@ -800,9 +800,9 @@ class ConverterRomanText(SubConverter):
     def parseFile(self, fp, number=None):
         '''
         '''
-        from music21.romanText import objects as romanTextModule
+        from music21.romanText import rtObjects
         from music21.romanText import translate as romanTextTranslate
-        rtf = romanTextModule.RTFile()
+        rtf = rtObjects.RTFile()
         rtf.open(fp)
         # returns a handler instance of parse tokens
         rtHandler = rtf.read()
