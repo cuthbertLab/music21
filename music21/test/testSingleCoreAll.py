@@ -33,7 +33,16 @@ environLocal = environment.Environment(_MOD)
 if six.PY2:
     try:
         import coverage
-        cov = coverage.coverage(omit=['*/ext/*'])
+        cov = coverage.coverage(omit=[
+            '*/ext/*',
+            'dist/dist.py',
+            'installer.py',
+            '*/documentation/upload.py',
+            '*/documentation/make.py',
+            '*/test/*',
+            '*/demos/*',  # maybe remove someday...
+            'music21/configure.py',
+            ])
         cov.start()
     except ImportError:
         cov = None

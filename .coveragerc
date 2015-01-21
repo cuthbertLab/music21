@@ -1,2 +1,0 @@
-[report]
-omit = */ext/*,dist/dist.py,installer.py,documentation/upload.py,documentation/make.py
