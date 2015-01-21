@@ -236,14 +236,27 @@ class ConverterIPython(SubConverter):
         defaults.title = ''
         defaults.author = ''
         
-        fp = helperSubConverter.write(obj, helperFormat, subformats=helperSubformats)
-
-        defaults.title = savedDefaultTitle
-        defaults.author = savedDefaultAuthor
-        if helperSubformats[0] == 'png':
-            from music21.ipython21 import objects as ipythonObjects
-            ipo = ipythonObjects.IPythonPNGObject(fp)
-            return ipo
+        if 'Opus' not in obj.classes:
+            fp = helperSubConverter.write(obj, helperFormat, subformats=helperSubformats)
+    
+            defaults.title = savedDefaultTitle
+            defaults.author = savedDefaultAuthor
+            if helperSubformats[0] == 'png':
+                from music21.ipython21 import objects as ipythonObjects
+                ipo = ipythonObjects.IPythonPNGObject(fp)
+                return ipo
+        else:
+            from IPython.display import Image, display # @UnresolvedImport
+            for s in obj.scores:
+                fp = helperSubConverter.write(s, helperFormat, subformats=helperSubformats)
+        
+                if helperSubformats[0] == 'png':
+                    from music21.ipython21 import objects as ipythonObjects # @Reimport
+                    ipo = ipythonObjects.IPythonPNGObject(fp)
+                    display(Image(filename=ipo.fp, retina=True))
+            defaults.title = savedDefaultTitle
+            defaults.author = savedDefaultAuthor
+            return None
                 
 class ConverterLilypond(SubConverter):
     registerFormats = ('lilypond', 'lily')

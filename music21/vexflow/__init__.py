@@ -17,9 +17,9 @@ Objects for transcribing music21 objects as VexFlow code
 
 Here's the hierarchy:
 
-    A VexflowContext can be used to display multiple VexflowParts.
-    Each VexflowPart contains multiple VexflowStaves (one for each measure)
-    Each VexflowStave might contain multiple VexflowVoices
+*    A VexflowContext can be used to display multiple VexflowParts.
+*    Each VexflowPart contains multiple VexflowStaves (one for each measure)
+*    Each VexflowStave might contain multiple VexflowVoices
 '''
 
 import unittest
@@ -817,68 +817,61 @@ var {voiceName} = new Vex.Flow.Voice({{
         Currently supported modes are `txt` (returns the VexFlow code which can be used in conjunction with
         other VexFlow code) and `html` (returns standalone HTML code for displaying just this note.)
 
-        :: 
+        >>> n = note.Note('C-')
+        >>> v = vexflow.VexflowNote(n)
+        >>> v.generateCode('txt')
+        'new Vex.Flow.StaveNote({keys: ["Cb/4"], duration: "q"})'
 
-            >>> n = note.Note('C-')
-            >>> v = vexflow.VexflowNote(n)
-            >>> v.generateCode('txt')
-            'new Vex.Flow.StaveNote({keys: ["Cb/4"], duration: "q"})'
+        >>> print(v.generateCode('jsbody'))
+        var canvas = $('#music21canvas')[0];
+        var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
+        var ctx = renderer.getContext();
+        var stave = new Vex.Flow.Stave(10,0,500);
+        stave.addClef('treble').setContext(ctx).draw();
+        var notes = [new Vex.Flow.StaveNote({keys: ["Cb/4"], duration: "q"})];
+        var voice = new Vex.Flow.Voice({
+            num_beats: 1.0,
+            beat_value: 4,
+            resolution: Vex.Flow.RESOLUTION
+        });
+        voice.addTickables(notes);
+        var formatter = new Vex.Flow.Formatter()
+        formatter.joinVoices([voice])
+        formatter.format([voice], 500);
+        voice.draw(ctx, stave);
 
-        ::
-
-            >>> print(v.generateCode('jsbody'))
-            var canvas = $('#music21canvas')[0];
-            var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
-            var ctx = renderer.getContext();
-            var stave = new Vex.Flow.Stave(10,0,500);
-            stave.addClef('treble').setContext(ctx).draw();
-            var notes = [new Vex.Flow.StaveNote({keys: ["Cb/4"], duration: "q"})];
-            var voice = new Vex.Flow.Voice({
-                num_beats: 1.0,
-                beat_value: 4,
-                resolution: Vex.Flow.RESOLUTION
-            });
-            voice.addTickables(notes);
-            var formatter = new Vex.Flow.Formatter()
-            formatter.joinVoices([voice])
-            formatter.format([voice], 500);
-            voice.draw(ctx, stave);
-
-        ::
-
-            >>> print(v.generateCode('html'))
-            <!DOCTYPE HTML>
-            <html>
-            <head>
-                <meta name='author' content='Music21' />
-                <script src='http://code.jquery.com/jquery-latest.js'></script>
-                <script src='http://www.vexflow.com/support/vexflow-min.js'></script>
-            </head>
-            <body>
-                <canvas width="525" height="120" id='music21canvas'></canvas>
-                <script>
-                    $(document).ready(function(){
-                        var canvas = $('#music21canvas')[0];
-                        var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
-                        var ctx = renderer.getContext();
-                        var stave = new Vex.Flow.Stave(10,0,500);
-                        stave.addClef('treble').setContext(ctx).draw();
-                        var notes = [new Vex.Flow.StaveNote({keys: ["Cb/4"], duration: "q"})];
-                        var voice = new Vex.Flow.Voice({
-                            num_beats: 1.0,
-                            beat_value: 4,
-                            resolution: Vex.Flow.RESOLUTION
-                        });
-                        voice.addTickables(notes);
-                        var formatter = new Vex.Flow.Formatter()
-                        formatter.joinVoices([voice])
-                        formatter.format([voice], 500);
-                        voice.draw(ctx, stave);
+        >>> print(v.generateCode('html'))
+        <!DOCTYPE HTML>
+        <html>
+        <head>
+            <meta name='author' content='Music21' />
+            <script src='http://code.jquery.com/jquery-latest.js'></script>
+            <script src='http://www.vexflow.com/support/vexflow-min.js'></script>
+        </head>
+        <body>
+            <canvas width="525" height="120" id='music21canvas'></canvas>
+            <script>
+                $(document).ready(function(){
+                    var canvas = $('#music21canvas')[0];
+                    var renderer = new Vex.Flow.Renderer(canvas, Vex.Flow.Renderer.Backends.CANVAS);
+                    var ctx = renderer.getContext();
+                    var stave = new Vex.Flow.Stave(10,0,500);
+                    stave.addClef('treble').setContext(ctx).draw();
+                    var notes = [new Vex.Flow.StaveNote({keys: ["Cb/4"], duration: "q"})];
+                    var voice = new Vex.Flow.Voice({
+                        num_beats: 1.0,
+                        beat_value: 4,
+                        resolution: Vex.Flow.RESOLUTION
                     });
-                </script>
-            </body>
-            </html>
-
+                    voice.addTickables(notes);
+                    var formatter = new Vex.Flow.Formatter()
+                    formatter.joinVoices([voice])
+                    formatter.format([voice], 500);
+                    voice.draw(ctx, stave);
+                });
+            </script>
+        </body>
+        </html>
         '''
         if mode not in supportedDisplayModes:
             raise Vexflow21UnsupportedException("VexFlow doesn't support this "\
@@ -915,19 +908,14 @@ voice.draw(ctx, stave);""".format(defaultStaff=staffString(),
         '''
         Gets the Vexflow StemDirection String:
         
-        ::        
+        >>> n = note.Note()
+        >>> vfn = vexflow.VexflowNote(n)
+        >>> vfn.stemDirectionCode()
+        ''
 
-            >>> n = note.Note()
-            >>> vfn = vexflow.VexflowNote(n)
-            >>> vfn.stemDirectionCode()
-            ''
-
-        ::
-    
-            >>> n.stemDirection = 'up'
-            >>> vfn.stemDirectionCode()
-            'stem_direction: Vex.Flow.StaveNote.STEM_UP'
-
+        >>> n.stemDirection = 'up'
+        >>> vfn.stemDirectionCode()
+        'stem_direction: Vex.Flow.StaveNote.STEM_UP'
         '''
         
         if self.originalObject.stemDirection == 'up':
@@ -1731,8 +1719,6 @@ var {tn} = new Vex.Flow.StaveTie({{
         Returns the vexflow code necessary to display this Voice in a browser
         as a string.
         
-        ::
-
         >>> m = stream.Measure()
         >>> m.append(note.Note('c4', type='half'))
         >>> vfv = vexflow.VexflowVoice(m)

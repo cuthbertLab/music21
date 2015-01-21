@@ -10,7 +10,6 @@
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 '''
 Object definitions for graphing and 
 plotting :class:`~music21.stream.Stream` objects. 
@@ -646,7 +645,8 @@ class Graph(object):
             self.fig.savefig(fp, facecolor=getColor(self.colorBackgroundFigure),      
                              edgecolor=getColor(self.colorBackgroundFigure))
 
-        environLocal.launch('png', fp)
+        if common.runningUnderIPython() is not True:
+            environLocal.launch('png', fp)
 
 
 
@@ -5113,6 +5113,8 @@ _DOC_ORDER = [
 ]
 
 if __name__ == "__main__":
+    dicant = corpus.parse('trecento/Fava_Dicant_nunc_iudei')
+    dicant.plot('histogram')
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)

@@ -58,7 +58,11 @@ setup of your environment, open a display of the extracted measures.
 
     vlnPart = aScore.getElementById('Violin I.')
     mRange = vlnPart.measures(4,7)
-    #_DOCS_SHOW mRange.show()
+    mRange.show()
+
+
+.. image:: usersGuide_25_postTonalTools1_files/_fig_02.png
+
 
 If we want to gather all :class:`~music21.pitch.Pitch` objects from
 this measure range, we can use the
@@ -117,11 +121,12 @@ example:
 .. code:: python
 
     for n in mRange.flat.notes:
-        n.lyric = n.pitchClassString
-    #_DOCS_SHOW mRange.show()
+        if n.tie is None or n.tie.type == 'start':
+            n.lyric = n.pitchClassString
+    mRange.show()
 
 
-.. image:: usersGuide_25_postTonalTools1_files/_fig_05.png
+.. image:: usersGuide_25_postTonalTools1_files/_fig_06.png
 
 
 Chords as Forte Set Classes
@@ -144,10 +149,10 @@ pitches will be supplied to a Chord object and stored on a Stream.
     for i in range(0,12,3):
         aStream.append(chord.Chord(src[i:i+3]))
         
-    #_DOCS_SHOW aStream.show()
+    aStream.show()
 
 
-.. image:: usersGuide_25_postTonalTools1_files/_fig_07.png
+.. image:: usersGuide_25_postTonalTools1_files/_fig_08.png
 
 
 These Chords, like all Chords in music21, can be interpreted as Forte
@@ -247,10 +252,10 @@ can iterate over the Stream and assign the Forte name to each Chord's
 
     for c in aStream:
         c.lyric = c.forteClass
-    #_DOCS_SHOW aStream.show()
+    aStream.show()
 
 
-.. image:: usersGuide_25_postTonalTools1_files/_fig_15.png
+.. image:: usersGuide_25_postTonalTools1_files/_fig_16.png
 
 
 Creating and Processing Twelve-Tone Matrices
@@ -276,17 +281,17 @@ text, and then create and print a
    :class: ipython-result
 
     {0.0} <music21.note.Note G>
-    {0.0} <music21.note.Note B->
-    {0.0} <music21.note.Note D>
-    {0.0} <music21.note.Note F#>
-    {0.0} <music21.note.Note A>
-    {0.0} <music21.note.Note C>
-    {0.0} <music21.note.Note E>
-    {0.0} <music21.note.Note G#>
-    {0.0} <music21.note.Note B>
-    {0.0} <music21.note.Note C#>
-    {0.0} <music21.note.Note E->
-    {0.0} <music21.note.Note F>
+    {1.0} <music21.note.Note B->
+    {2.0} <music21.note.Note D>
+    {3.0} <music21.note.Note F#>
+    {4.0} <music21.note.Note A>
+    {5.0} <music21.note.Note C>
+    {6.0} <music21.note.Note E>
+    {7.0} <music21.note.Note G#>
+    {8.0} <music21.note.Note B>
+    {9.0} <music21.note.Note C#>
+    {10.0} <music21.note.Note E->
+    {11.0} <music21.note.Note F>
 
 .. code:: python
 
@@ -326,8 +331,8 @@ successive lines.
         c.addLyric(c.primeFormString)
         c.addLyric(c.forteClass)
         bStream.append(c)
-    #_DOCS_SHOW bStream.show()
+    bStream.show()
 
 
-.. image:: usersGuide_25_postTonalTools1_files/_fig_19.png
+.. image:: usersGuide_25_postTonalTools1_files/_fig_20.png
 

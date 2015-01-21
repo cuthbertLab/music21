@@ -19,6 +19,8 @@ and other settings.
 
 Additional documentation for and examples of using this module are found in
 :ref:`environment`.
+
+# TODO: Update to user's guide
 '''
 from __future__ import print_function
 
@@ -1598,7 +1600,7 @@ class Test(unittest.TestCase):
   <localCorpusSettings/>
   <preference name="manualCoreCorpusPath"/>
   <preference name="midiPath" value="/Applications/QuickTime Player.app"/>
-  <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore.app/Contents/MacOS/mscore"/>
+  <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore 2.app/Contents/MacOS/mscore"/>
   <preference name="musicxmlPath" value="/Applications/Finale Notepad 2012.app"/>
   <preference name="pdfPath" value="/Applications/Preview.app"/>
   <preference name="showFormat" value="musicxml"/>
@@ -1644,7 +1646,7 @@ class Test(unittest.TestCase):
   </localCorpusSettings>
   <preference name="manualCoreCorpusPath"/>
   <preference name="midiPath" value="/Applications/QuickTime Player.app"/>
-  <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore.app/Contents/MacOS/mscore"/>
+  <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore 2.app/Contents/MacOS/mscore"/>
   <preference name="musicxmlPath" value="/Applications/Finale Notepad 2012.app"/>
   <preference name="pdfPath" value="/Applications/Preview.app"/>
   <preference name="showFormat" value="musicxml"/>
@@ -1695,7 +1697,7 @@ class Test(unittest.TestCase):
   </localCorpusSettings>
   <preference name="manualCoreCorpusPath"/>
   <preference name="midiPath" value="w"/>
-  <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore.app/Contents/MacOS/mscore"/>
+  <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore 2.app/Contents/MacOS/mscore"/>
   <preference name="musicxmlPath" value="/Applications/Finale Notepad 2012.app"/>
   <preference name="pdfPath" value="/Applications/Preview.app"/>
   <preference name="showFormat" value="musicxml"/>

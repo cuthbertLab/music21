@@ -212,18 +212,19 @@ class AVLNode(common.SlottedObject):
     def getDebugPieces(self):
         r'''
         Return a list of the debugging information of the tree (used for debug):
+        
         >>> score = timespans.makeExampleScore()
         >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
         >>> rn = tree.rootNode
         >>> rn.getDebugPieces()
         ['<Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>', 
-         '\tL: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>',
-         '\t\tL: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>', 
-         '\t\tR: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>', 
-         '\tR: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>', 
-         '\t\tL: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>', 
-         '\t\tR: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>', 
-         '\t\t\tR: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>']        
+        '\tL: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>',
+        '\t\tL: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>', 
+        '\t\tR: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>', 
+        '\tR: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>', 
+        '\t\tL: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>', 
+        '\t\tR: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>', 
+        '\t\t\tR: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>']        
         '''        
         result = []
         result.append(repr(self))

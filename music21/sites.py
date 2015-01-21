@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2007-2014 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2007-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -216,15 +216,13 @@ class Sites(common.SlottedObject):
         '''
         Return the total number of references.
 
-        ::
-
-            >>> class Mock(base.Music21Object):
-            ...     pass
-            >>> aObj = Mock()
-            >>> aContexts = sites.Sites()
-            >>> aContexts.add(aObj)
-            >>> len(aContexts)
-            1
+        >>> class Mock(base.Music21Object):
+        ...     pass
+        >>> aObj = Mock()
+        >>> aContexts = sites.Sites()
+        >>> aContexts.add(aObj)
+        >>> len(aContexts)
+        1
 
         '''
         return len(self.siteDict)
@@ -236,22 +234,19 @@ class Sites(common.SlottedObject):
         Get keys sorted by creation time, where most
         recent are first if `newFirst` is True. else, most recent are last.
 
-        ::
-
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     pass
-            ...
-            >>> aObj = Mock()
-            >>> bObj = Mock()
-            >>> cObj = Mock()
-            >>> aSites = music21.Sites()
-            >>> aSites.add(cObj, 345)
-            >>> aSites.add(aObj)
-            >>> aSites.add(bObj)
-            >>> k = aSites._keysByTime()
-            >>> aSites.siteDict[k[0]].siteIndex > aSites.siteDict[k[1]].siteIndex > aSites.siteDict[k[2]].siteIndex
-            True
+        >>> class Mock(music21.Music21Object):
+        ...     pass
+        ...
+        >>> aObj = Mock()
+        >>> bObj = Mock()
+        >>> cObj = Mock()
+        >>> aSites = sites.Sites()
+        >>> aSites.add(cObj, 345)
+        >>> aSites.add(aObj)
+        >>> aSites.add(bObj)
+        >>> k = aSites._keysByTime()
+        >>> aSites.siteDict[k[0]].siteIndex > aSites.siteDict[k[1]].siteIndex > aSites.siteDict[k[2]].siteIndex
+        True
 
         '''
         post = []
@@ -373,15 +368,14 @@ class Sites(common.SlottedObject):
 
         If `priorityTarget` is defined, this object will be placed first in the list of objects.
 
-        >>> import music21
-        >>> class Mock(music21.Music21Object):
+        >>> class Mock(base.Music21Object):
         ...     pass
         ...
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> cObj = Mock()
-        >>> aSites = music21.Sites()
-        >>> aSites.add(cObj, 345) # a locations
+        >>> aSites = sites.Sites()
+        >>> aSites.add(cObj, 345) # a location
         >>> aSites.add(aObj)
         >>> aSites.add(bObj)
         >>> aSites.get() == [cObj, aObj, bObj]
@@ -449,17 +443,16 @@ class Sites(common.SlottedObject):
         This will recursively search the defined contexts of existing defined
         contexts, and return a list of all objects that match the given class.
 
-        >>> import music21
-        >>> class Mock(music21.Music21Object):
+        >>> class Mock(base.Music21Object):
         ...    pass
         ...
-        >>> class Mocker(music21.Music21Object):
+        >>> class Mocker(base.Music21Object):
         ...    pass
         ...
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> cObj = Mocker()
-        >>> dc = music21.Sites()
+        >>> dc = sites.Sites()
         >>> dc.add(aObj)
         >>> dc.add(bObj)
         >>> dc.add(cObj)
@@ -514,15 +507,14 @@ class Sites(common.SlottedObject):
         Given an attribute name, search all objects and find the first that
         matches this attribute name; then return a reference to this attribute.
 
-         >>> import music21
-        >>> class Mock(music21.Music21Object):
+        >>> class Mock(base.Music21Object):
         ...     attr1 = 234
         ...
         >>> aObj = Mock()
         >>> aObj.attr1 = 234
         >>> bObj = Mock()
         >>> bObj.attr1 = 98
-        >>> aSites = music21.Sites()
+        >>> aSites = sites.Sites()
         >>> aSites.add(aObj)
         >>> len(aSites)
         1
@@ -572,14 +564,13 @@ class Sites(common.SlottedObject):
         The `getElementMethod` is a string that selects which Stream method is
         used to get elements for searching with getElementsByClass() calls.
 
-        >>> import music21
-        >>> class Mock(music21.Music21Object):
+        >>> class Mock(base.Music21Object):
         ...     pass
         ...
         >>> import time
         >>> aObj = Mock()
         >>> bObj = Mock()
-        >>> aSites = music21.Sites()
+        >>> aSites = sites.Sites()
         >>> aSites.add(aObj)
         >>> aSites.add(bObj)
         >>> # we get the most recently added object first
@@ -711,13 +702,12 @@ class Sites(common.SlottedObject):
         '''
         Return a list of all site Ids.
 
-        >>> import music21
-        >>> class Mock(music21.Music21Object):
+        >>> class Mock(base.Music21Object):
         ...     pass
         ...
         >>> aSite = Mock()
-        >>> dc = music21.Sites()
-        >>> dc.add(aSite, 0)
+        >>> dc = sites.Sites()
+        >>> dc.add(aSite)
         >>> dc.getSiteIds() == [id(aSite)]
         True
         '''
@@ -729,13 +719,12 @@ class Sites(common.SlottedObject):
         Get all Site objects in .siteDict that are locations. 
         Note that this unwraps all sites from weakrefs and is thus an expensive operation.
 
-        >>> import music21
-        >>> class Mock(music21.Music21Object):
+        >>> class Mock(base.Music21Object):
         ...     pass
         ...
         >>> aObj = Mock()
         >>> bObj = Mock()
-        >>> aSites = music21.Sites()
+        >>> aSites = sites.Sites()
         >>> aSites.add(aObj, 234)
         >>> aSites.add(bObj, 3000)
         >>> len(aSites.getSites())
@@ -778,15 +767,13 @@ class Sites(common.SlottedObject):
 
         Input can be either a Class object or a string
 
-        >>> import music21
-        >>> from music21 import stream
-        >>> class Mock(music21.Music21Object):
+        >>> class Mock(base.Music21Object):
         ...     pass
         ...
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> cObj = stream.Stream()
-        >>> aSites = music21.Sites()
+        >>> aSites = sites.Sites()
         >>> aSites.add(aObj, 234)
         >>> aSites.add(bObj, 3000)
         >>> aSites.add(cObj, 200)
@@ -818,13 +805,12 @@ class Sites(common.SlottedObject):
         '''
         Return True or False if this Sites object already has this site id.
 
-        >>> import music21
-        >>> class Mock(music21.Music21Object):
+        >>> class Mock(base.Music21Object):
         ...     pass
         ...
         >>> aSite = Mock()
         >>> bSite = Mock()
-        >>> dc = music21.Sites()
+        >>> dc = sites.Sites()
         >>> dc.add(aSite, 0)
         >>> dc.hasSiteId(id(aSite))
         True
@@ -864,12 +850,11 @@ class Sites(common.SlottedObject):
         Sites's siteDict. This
         will return False if the object is simply a context and not a location.
 
-        >>> import music21
-        >>> class Mock(music21.Music21Object):
+]        >>> class Mock(base.Music21Object):
         ...     pass
         ...
         >>> aSite = Mock()
-        >>> aLocations = music21.Sites()
+        >>> aLocations = sites.Sites()
         >>> aLocations.add(aSite)
         >>> aLocations.isSite(aSite)
         True
@@ -887,13 +872,12 @@ class Sites(common.SlottedObject):
         have the element. This results b/c Sites are shallow-copied, and then
         elements are re-added.
 
-        >>> import music21
-        >>> class Mock(music21.Music21Object):
+        >>> class Mock(base.Music21Object):
         ...     pass
         ...
         >>> aSite = Mock()
         >>> cSite = Mock()
-        >>> aLocations = music21.Sites()
+        >>> aLocations = sites.Sites()
         >>> aLocations.add(aSite, 0)
         >>> aLocations.add(cSite) # a context
         >>> del aSite
@@ -952,43 +936,33 @@ class Sites(common.SlottedObject):
 
             streamObj.remove(elObj)
 
-        ::
+        >>> class Mock(base.Music21Object):
+        ...     pass
+        ...
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> cSite = Mock()
+        >>> aSites = sites.Sites()
+        >>> aSites.add(aSite, 23)
+        >>> len(aSites)
+        1
 
-            >>> class Mock(base.Music21Object):
-            ...     pass
-            ...
-            >>> aSite = Mock()
-            >>> bSite = Mock()
-            >>> cSite = Mock()
-            >>> aSites = sites.Sites()
-            >>> aSites.add(aSite, 23)
-            >>> len(aSites)
-            1
+        >>> aSites.add(bSite, 233)
+        >>> len(aSites)
+        2
 
-        ::
+        >>> aSites.add(cSite, 232223)
+        >>> len(aSites)
+        3
 
-            >>> aSites.add(bSite, 233)
-            >>> len(aSites)
-            2
-
-        ::
-
-            >>> aSites.add(cSite, 232223)
-            >>> len(aSites)
-            3
-
-        ::
-
-            >>> aSites.remove(aSite)
-            >>> len(aSites)
-            2
+        >>> aSites.remove(aSite)
+        >>> len(aSites)
+        2
 
         OMIT_FROM_DOCS
 
-        ::
-
-            >>> len(aSites._locationKeys)
-            2
+        >>> len(aSites._locationKeys)
+        2
 
         '''
         # must clear
@@ -1030,14 +1004,13 @@ class Sites(common.SlottedObject):
         Given an attribute name, search all objects and find the first that
         matches this attribute name; then return a reference to this attribute.
 
-        >>> import music21
-        >>> class Mock(music21.Music21Object):
+        >>> class Mock(base.Music21Object):
         ...     attr1 = 234
         ...
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> bObj.attr1 = 98
-        >>> aSites = music21.Sites()
+        >>> aSites = sites.Sites()
         >>> aSites.add(aObj)
         >>> aSites.add(bObj)
         >>> aSites.setAttrByName('attr1', 'test')

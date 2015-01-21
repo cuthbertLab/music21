@@ -41,7 +41,7 @@ can append an element to the end of the Stream:
     s.show()
 
 
-.. image:: usersGuide_21_sorting_files/_fig_02.png
+.. image:: usersGuide_21_sorting_files/_fig_01.png
 
 
 Now we're pretty sure that the C# will be the fourth element in the
@@ -417,7 +417,7 @@ tuple that determines sort order can be accessed on any
 .. parsed-literal::
    :class: ipython-result
 
-    SortTuple(atEnd=0, offset=0.0, priority=3, classSortOrder=4, isNotGrace=1, insertIndex=173)
+    SortTuple(atEnd=0, offset=0.0, priority=3, classSortOrder=4, isNotGrace=1, insertIndex=307)
 
 
 A ``SortTuple`` is a lightweight ``NamedTuple`` object that can be
@@ -451,7 +451,7 @@ end of ``s``:
 .. parsed-literal::
    :class: ipython-result
 
-    SortTuple(atEnd=1, offset=0.0, priority=0, classSortOrder=2, isNotGrace=1, insertIndex=183)
+    SortTuple(atEnd=1, offset=0.0, priority=0, classSortOrder=2, isNotGrace=1, insertIndex=317)
 
 
 Putting a rightBarline on a Measure has the same effect:
@@ -466,7 +466,7 @@ Putting a rightBarline on a Measure has the same effect:
 .. parsed-literal::
    :class: ipython-result
 
-    SortTuple(atEnd=1, offset=0.0, priority=0, classSortOrder=-5, isNotGrace=1, insertIndex=185)
+    SortTuple(atEnd=1, offset=0.0, priority=0, classSortOrder=-5, isNotGrace=1, insertIndex=319)
 
 
 The next three attributes (offset, priority, classSortOrder) have been
@@ -489,7 +489,7 @@ to access it, here's the formula:)
 .. parsed-literal::
    :class: ipython-result
 
-    (82, 173)
+    (82, 307)
 
 
 Streams have an attribute to cache whether they have been sorted, so

@@ -347,15 +347,17 @@ class ElementTree(AVLTree):
     This data structure stores TimespanNodes: objects which implement both a
     `offset` and `endTime` property. It provides fast lookups of such
     objects and can quickly locate vertical overlaps.
-.
+
     >>> et = timespans.trees.ElementTree()
     >>> et
     <ElementTree {0} (-inf to inf)>
+    
     >>> for i in range(100):
     ...     n = note.Note()
     ...     et.insert(float(i), n)
     >>> et
     <ElementTree {100} (0.0 to 100.0)>
+    
     >>> n2 = note.Note('D#')
     >>> et.insert(101.0, n2)
     
@@ -424,7 +426,7 @@ class ElementTree(AVLTree):
         Two ElementTrees are equal only if their ids are equal.
         
         (TODO: make it true only if the two have exactly identical elements unless this interferes
-               with hashing. Use "is" for this)
+        with hashing. Use "is" for this)
         '''
         return id(self) == id(expr)
 
@@ -454,7 +456,6 @@ class ElementTree(AVLTree):
 
         >>> for x in tree[:]:
         ...     x
-        ...
         <Timespan 0 2>
         <Timespan 0 9>
         <Timespan 1 1>
@@ -527,7 +528,6 @@ class ElementTree(AVLTree):
 
         >>> for x in tree:
         ...     x
-        ...
         <Timespan 0 2>
         <Timespan 0 9>
         <Timespan 1 1>
@@ -603,7 +603,6 @@ class ElementTree(AVLTree):
         >>> tree[0] = timespans.Timespan(-1, 6)
         >>> for x in tree:
         ...     x
-        ...
         <Timespan -1 6>
         <Timespan 0 9>
         <Timespan 1 1>
@@ -613,7 +612,6 @@ class ElementTree(AVLTree):
         >>> tree[1:] = [timespans.Timespan(10, 20)]
         >>> for x in tree:
         ...     x
-        ...
         <Timespan -1 6>
         <Timespan 10 20>
         '''
