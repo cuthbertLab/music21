@@ -114,7 +114,7 @@ class NoteworthyTranslator(object):
             data = common.readFileEncodingSafe(filePath)
             dataList = data.split('\n')
             return self.parseList(dataList)
-        except FileNotFoundError:
+        except OSError.FileNotFoundError:
             raise NoteworthyTranslateException('cannot open %s: ' % filePath)
         
     def parseString(self, data):
@@ -758,17 +758,17 @@ class NoteworthyTranslator(object):
         # DaCapoAlFine - Coda - Segno - ToCoda
         style = attributes['Style']
         if style == "DCalFine":
-                    g = repeat.DaCapoAlFine()
+            g = repeat.DaCapoAlFine()
         elif style == "Coda":
-                    g = repeat.Coda()
+            g = repeat.Coda()
         elif style == "ToCoda":
-                    g = repeat.Coda()
+            g = repeat.Coda()
         elif style == "Segno":
-                    g = repeat.Segno()
+            g = repeat.Segno()
         elif style == "DSalCoda":
-                    g = repeat.DalSegnoAlCoda()
+            g = repeat.DalSegnoAlCoda()
         elif style == "Fine":
-                    g = repeat.Fine()
+            g = repeat.Fine()
         else:
             raise NoteworthyTranslateException('Cannot get style from %s' % str(attributes))
         self.currentMeasure.append(g)                                                                         
@@ -787,9 +787,9 @@ class NoteworthyTranslator(object):
         style = attributes['Style']
         g = None
         if style == "Crescendo":
-                    g = dynamics.Crescendo()
+            g = dynamics.Crescendo()
         elif style == "Decrescendo":
-                    g = dynamics.Diminuendo()
+            g = dynamics.Diminuendo()
         else:
             pass
             #raise NoteworthyTranslateException('Cannot get style from %s' % str(attributes))
@@ -809,8 +809,8 @@ class NoteworthyTranslator(object):
         '''  
         # Dynamic case
         if 'Style' in attributes:
-                g = dynamics.Dynamic(attributes['Style'])
-                self.currentMeasure.append(g)                                                                        
+            g = dynamics.Dynamic(attributes['Style'])
+            self.currentMeasure.append(g)                                                                        
     
     def createLyrics(self, attributes):
         r'''
@@ -860,7 +860,7 @@ class Test(unittest.TestCase):
         pass
     def testBasic(self):
         import os
-        from music21 import common
+        from music21 import common #pylint: disable=reimported, redefined-outer-name
         nwcTranslatePath = common.getSourceFilePath() + os.path.sep + 'noteworthy'
         simplePath = nwcTranslatePath + os.path.sep + 'verySimple.nwctxt'#'NWCTEXT_Really_complete_example_file.nwctxt' # ## #'Part_OWeisheit.nwctxt' #
         myScore = NoteworthyTranslator().parseFile(simplePath)
@@ -909,7 +909,7 @@ class TestExternal(unittest.TestCase):
         pass
     def testPaert(self):
         import os
-        from music21 import common
+        from music21 import common #pylint: disable=reimported, redefined-outer-name
         nwcTranslatePath = common.getSourceFilePath() + os.path.sep + 'noteworthy'
         paertPath = nwcTranslatePath + os.path.sep + 'NWCTEXT_Really_complete_example_file.nwctxt' #'Part_OWeisheit.nwctxt' #
         #paertPath = r'D:\docs\research\music21\elvis\Wegman Masses\01\Caput\01 Kyrie.nwctxt'

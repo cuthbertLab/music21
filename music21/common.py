@@ -1110,7 +1110,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
         with codecs.open(filePath, 'r', encoding=firstGuess) as thisFile:
             data = thisFile.read()
             return data
-    except FileNotFoundError:
+    except OSError.FileNotFoundError:
         raise
     except UnicodeDecodeError:
         with codecs.open(filePath, 'rb') as thisFileBinary:

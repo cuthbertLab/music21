@@ -89,7 +89,7 @@ class CTSongException(exceptions21.Music21Exception):
     pass
 
 class CTSong(object):
-    """
+    r"""
     This parser is an object-oriented approach to parsing clercqTemperley text files into music.
     
     Create a CTSong object one of two ways:
@@ -341,6 +341,8 @@ class CTSong(object):
         self._homeTimeSig = None
         self._homeKeySigSig = None
         self._comments = []
+        #self._text = "" # CUTHBERT cannot initialize this here
+        
 
         for kw in keywords:
             if kw == 'title':
@@ -432,7 +434,7 @@ in the text file as a string, and have python do the parsing.
             return self._comments
     
     def appendComment(self, value):
-        """
+        r"""
         append a comment to self.text at the end of the text file. Only strings or lists of strings are
         acceptible to append to the text file. this list of comments (self.comments) is also appended
         #_DOCS_HIDE Please note: the backslashes included in the file below are for sphinx documentation
@@ -462,7 +464,7 @@ in the text file as a string, and have python do the parsing.
         except:
             raise CTSongException('not a valid comment to append (must be a string or list): %s' % value)
         
-    comments = property(_getComments, _setComments, doc= """
+    comments = property(_getComments, _setComments, doc= r"""
         Get or set the comments list of a CTRule object. setting comments does not alter self.text
     
         comments are stored as a list of comments, each comment on a line as a list. If the
@@ -713,7 +715,7 @@ in the text file as a string, and have python do the parsing.
             index = index + 1
             try:
                 atom = expressionString[index]
-            except:
+            except IndexError:
                 pass
         if count > 1:
             return True
@@ -794,10 +796,10 @@ in the text file as a string, and have python do the parsing.
                             outputStream.remove(currentTimeSig)
                       
                             outputStream.measure(measureNumber).insert(0.0, timeSig)
-                    except:
+                    except IndexError:
                         try:
                             outputStream.measure(measureNumber).insert(0.0, timeSig)
-                        except:
+                        except stream.StreamException:
                             # ...handles the case that not enough measures were created
                             #by just the duration of the long note (in case of changes
                             #in time signatures, such as:
@@ -986,7 +988,7 @@ in the text file as a string, and have python do the parsing.
                             x = label[1: label.index('*')]
                         if x in allSubsections:
                             referencedSubsection = label[1:]
-                            match = re.search('^(.*)\*(\d+)', referencedSubsection)
+                            match = re.search(r'^(.*)\*(\d+)', referencedSubsection)
                             if match:
                                 numRepeat = int(match.group(2))
                                 referencedSubsection = match.group(1)
@@ -1025,7 +1027,7 @@ in the text file as a string, and have python do the parsing.
     
                 elif atom.startswith('$'):
                     referencedSubsection = atom[1:]
-                    match = re.search('^(.*)\*(\d+)', referencedSubsection)
+                    match = re.search(r'^(.*)\*(\d+)', referencedSubsection)
                     if match:
                         numRepeat = int(match.group(2))
                         referencedSubsection = match.group(1)
@@ -1047,7 +1049,7 @@ in the text file as a string, and have python do the parsing.
                             if x.isClassOrSubclass([roman.RomanNumeral]):
                                 try:
                                     del x.lyrics
-                                except:
+                                except AttributeError:
                                     pass
                             currentSubsectionContents.append(copy.deepcopy(x))
         
@@ -1090,9 +1092,9 @@ in the text file as a string, and have python do the parsing.
                         except:
                             raise CTSongException('invalid character found: %s' % atom)     
                 else:
-                        #should skip all bar lines and dots...
-                        if atom != '|' and atom != '.':
-                            raise CTSongException('invalid character found: %s' % atom)               
+                    #should skip all bar lines and dots...
+                    if atom != '|' and atom != '.':
+                        raise CTSongException('invalid character found: %s' % atom)               
                
                 
             listofRomans = currentSubsectionContents.flat.getElementsByClass(roman.RomanNumeral)
@@ -1376,7 +1378,7 @@ class CTRule(object):
         if self._streamFromCTSong:
             try:
                 self._streamFromCTSong.metadata.title
-            except: 
+            except AttributeError: 
                 self._streamFromCTSong.insert(metadata.Metadata()) 
                 self._streamFromCTSong.metadata.title = self.sectionName
             return self._streamFromCTSong
@@ -1411,7 +1413,6 @@ S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co
         scoreObj = s.toScore()
         scoreObj.show()
     def xtestA(self):
-        pass
         '''
         from music21.romanText import clercqTemperley
         
@@ -1439,6 +1440,7 @@ S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co
             except:
                 print("ERROR", num)
         '''
+        pass
         #s = clercqTemperley.CTSong(exampleClercqTemperley)
         
         #sc = s.toScore()

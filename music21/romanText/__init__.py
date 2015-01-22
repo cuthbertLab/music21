@@ -13,7 +13,7 @@
 '''Objects for processing roman numeral analysis text files, as defined and
 demonstrated by Dmitri Tymoczko.
 '''
-__all__ = ['clercqTemperly', 'translate', 'testFiles', 'objects']
+__all__ = ['clercqTemperley', 'translate', 'testFiles', 'objects']
 from music21.romanText import clercqTemperley
 from music21.romanText import testFiles
 from music21.romanText import objects
