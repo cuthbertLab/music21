@@ -11878,7 +11878,7 @@ class Score(Stream):
         returnObj._elementsChanged()
         return returnObj
 
-    def partsToVoices(self, voiceAllocation=2, permitOneVoicePerPart=False):
+    def partsToVoices(self, voiceAllocation=2, permitOneVoicePerPart=False, setStems=True):
         '''
         Given a multi-part :class:`~music21.stream.Score`,
         return a new Score that combines parts into voices.
@@ -11934,7 +11934,7 @@ class Score(Stream):
 
         #environLocal.printDebug(['partsToVoices() bundle:', bundle])
 
-        s = Score()
+        s = self.__class__()
         s.metadata = self.metadata
 
         for sub in bundle: # each sub contains parts
@@ -11978,6 +11978,12 @@ class Score(Stream):
                     v.id = pIndex
                     # for now, just take notes, including rests
                     for e in m.notesAndRests: #m.getElementsByClass():
+                        if setStems:
+                            if hasattr(e, 'stemDirection'):
+                                if pIndex % 2 == 0:
+                                    e.stemDirection = 'up'
+                                else:
+                                    e.stemDirection = 'down'
                         v.insert(e.getOffsetBySite(m), e)
                     # insert voice in new  measure
                     #environLocal.printDebug(['inserting voice', v, v.id, 'into measure', mActive])
@@ -12301,13 +12307,11 @@ class Opus(Stream):
 
     def show(self, fmt=None, app=None):
         '''
-        Displays an object in a format provided by the
-        fmt argument or, if not provided, the format
-        set in the user's Environment.
-
+        Show an Opus file.
+        
         This method overrides the behavior specified in
         :class:`~music21.base.Music21Object` for all
-        formats besides explicit lily.x calls.
+        formats besides explicit lily.x calls. or when running under IPython notebook.
         '''
         if fmt is not None and 'lily' in fmt:
             return Stream.show(self, fmt, app)

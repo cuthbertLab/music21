@@ -12,9 +12,9 @@ Python is a simple but powerful programming language that music21
 is written in and in which you will write your own programs that 
 use music21.  
 
-Windows users should download and install Python version 2.7 (or, experimentally, 3.4). 
+Windows users should download and install Python version 3.4
 
-To get Python 2.7 for Windows, go to http://www.python.org/download/ 
+To get Python 3.4 for Windows, go to http://www.python.org/download/ 
 and click on the "Windows installer" link.  It is probably the 
 first link.  Save the file to your desktop
 and then click on it there.
@@ -41,7 +41,7 @@ Download music21
 
 Download the most-recent music21 package from the following URL:
 
-  http://code.google.com/p/music21/downloads/list
+  https://github.com/cuthbertLab/music21/releases
 
 Windows users should download the .exe file to their desktops
 and then click on it.

@@ -65,7 +65,7 @@ TinyNotation specification soon, as it's too Trecento specific.)
 
 #python3
 try:
-    basestring
+    basestring # @UndefinedVariable
 except NameError:
     basestring = str # @ReservedAssignment
 
@@ -264,15 +264,17 @@ class TinyNotationStream(stream.Stream):
         calling self.setupRegularExpressions 
         will replace p and b+ with `re.compile` versions of the
         same and make `self.PUNCTUS = re.compile('p')`, etc.
-
-         from music21 import tinyNotation
-         dummy = reload(tinyNotation) # show before and after
-         print(tinyNotation.TinyNotationStream.regularExpressions)
-        {'ENDBRAC': '\\}', 'QUAD': 'quad\\{', ...}
-         tns = tinyNotation.TinyNotationStream('3/4 d2 e4 f2 g4')
-         tinyNotation.TinyNotationStream.regularExpressions['ENDBRAC']
-        <_sre.SRE_Pattern object at 0x...>
         '''
+# DO NOT DOCTEST
+#         from music21 import tinyNotation
+#         dummy = reload(tinyNotation) # show before and after
+#         print(tinyNotation.TinyNotationStream.regularExpressions)
+#         {'ENDBRAC': '\\}', 'QUAD': 'quad\\{', ...}
+#         tns = tinyNotation.TinyNotationStream('3/4 d2 e4 f2 g4')
+#         tinyNotation.TinyNotationStream.regularExpressions['ENDBRAC']
+#         <_sre.SRE_Pattern object at 0x...>
+
+        
         for regexpName in self.regularExpressions:
             regexpValue = self.regularExpressions[regexpName]
             if isinstance(regexpValue, basestring):

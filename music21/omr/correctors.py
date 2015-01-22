@@ -1013,11 +1013,12 @@ class MeasureHash(object):
         Destination is in set F of flagged measures. 
         
         (Rossant & Bloch)
-        value change: 50.77% of all errors (inverse: .0197)
-        confusions: 9.23% of all errors (inverse: .108)
+        
+        * value change: 50.77% of all errors (inverse: .0197)
+        * confusions: 9.23% of all errors (inverse: .108)
             Note: these get the most probability, because they are the rarest
-        omission: 27.69% of all errors (inverse: .0361)
-        addition: 12.31% of all errors (inverse: .08125)
+        * omission: 27.69% of all errors (inverse: .0361)
+        * addition: 12.31% of all errors (inverse: .08125)
         
         >>> mh = omr.correctors.MeasureHash()
         

@@ -75,8 +75,8 @@ Additionally, the following individuals have contributed materials or knowledge 
 Their contributions and generosity are greatly appreciated.
 
 * Thomas Bonte, Nicholas Froment, and Werner Schweer of `MuseScore`_ for their support
-and for their contributions to the open source music notation projects, including the
-Bach Goldberg Variations and the Handel Arias included.
+   and for their contributions to the open source music notation projects, including the
+   Bach Goldberg Variations and the Handel Arias included.
 
 * `Donald Byrd`_, researcher on University of Indiana who created a schema for computer-aided musicology 
   (along with the source of all sorts of examples of how music notation is difficult).

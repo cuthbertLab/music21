@@ -10,7 +10,6 @@
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 '''
 Object definitions for graphing and 
 plotting :class:`~music21.stream.Stream` objects. 
@@ -61,7 +60,7 @@ def _getExtendedModules():
     Returns a namedtuple: (matplotlib, Axes3D, collections, patches, plt, networkx)
     '''
     if 'matplotlib' in base._missingImport:
-        raise GraphException('could not find matplotlib, graphing is not allowed')
+        raise GraphException('could not find matplotlib, graphing is not allowed') # pragma: no cover
     import matplotlib # @UnresolvedImport
     # backend can be configured from config file, matplotlibrc,
     # but an early test broke all processing
@@ -176,6 +175,20 @@ def getColor(color):
     '#cccccc'
     >>> graph.getColor([255, 255, 255])
     '#ffffff'
+    
+    Invalid colors raise GraphExceptions:
+    
+    >>> graph.getColor('l')
+    Traceback (most recent call last):
+    GraphException: invalid color abbreviation: l
+
+    >>> graph.getColor('chalkywhitebutsortofgreenish')
+    Traceback (most recent call last):
+    GraphException: invalid color name: chalkywhitebutsortofgreenish
+
+    >>> graph.getColor(True)
+    Traceback (most recent call last):
+    GraphException: invalid color specification: True
     '''
     # expand a single value to three
     if common.isNum(color):
@@ -219,7 +232,7 @@ def getColor(color):
             return webcolors.rgb_percent_to_hex(color)
         else: # assume integers
             return webcolors.rgb_to_hex(tuple(color))
-    raise GraphException('invalid color specificiation: %s' % color)
+    raise GraphException('invalid color specification: %s' % color)
 
 #-------------------------------------------------------------------------------
 class Graph(object):
@@ -646,7 +659,8 @@ class Graph(object):
             self.fig.savefig(fp, facecolor=getColor(self.colorBackgroundFigure),      
                              edgecolor=getColor(self.colorBackgroundFigure))
 
-        environLocal.launch('png', fp)
+        if common.runningUnderIPython() is not True:
+            environLocal.launch('png', fp)
 
 
 

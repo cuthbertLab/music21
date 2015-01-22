@@ -3866,7 +3866,7 @@ if __name__ == "__main__":
     # this is a temporary hack to get encoding working right
     # this may not be the best way to do this
     if six.PY2:
-        reload(sys)
+        reload(sys) # @UndefinedVariable
         sys.setdefaultencoding("utf-8") # @UndefinedVariable
 
     import music21

@@ -29,10 +29,10 @@ topics will be linked and added as the topics are written:
 19. Environment
 20. Basic Analysis Tools
 21. :ref:`Order and Sorting of Streams <usersGuide_21_sorting>`
-22. :ref:`Graphing <usersGuide_22_graphing>`
+22. Graphing
 23. Searching for Files and Metadata
 24. Making a local corpus
-25. :ref:`Post tonal tools (1) <usersGuide_25_postTonalTools1>`
+25. Post tonal tools (1)
 26. Bars and Layout
 27. Repeats
 28. FreezeThaw
@@ -63,11 +63,4 @@ topics will be linked and added as the topics are written:
 53. Medieval and Renaissance extensions
 54. :ref:`Extending Converter with New Formats <usersGuide_54_extendingConverter>`
 55. Advanced Meter topics
-
-Tests and other ideas to be deleted
-===================================
-95. :ref:`vexflowIPython`
-96. :ref:`ipython_comm`
-97. :ref:`timespans`
-98. :ref:`inversionDemo`
 

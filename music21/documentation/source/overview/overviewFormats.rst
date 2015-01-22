@@ -160,7 +160,6 @@ URL.
 
 Note that access restrictions prevent demonstrating Musedata conversion.
 
-::
 
 Parsing MIDI Files
 ------------------

@@ -14,6 +14,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 '''
 
 # should NOT import music21 or anything like that, except in doctests.
+import imp
 import re
 import copy
 import math, sys, os
@@ -919,7 +920,7 @@ def standardDeviation(coll, bassel=False):
 
 def isNum(usrData):
     '''check if usrData is a number (float, int, long, Decimal), return boolean
-    IMPROVE: when 2.6 is everywhere: add numbers class.
+    TODO: consider using numbers class (wasn't available until 2.6)
 
     >>> common.isNum(3.0)
     True
@@ -927,11 +928,23 @@ def isNum(usrData):
     True
     >>> common.isNum('three')
     False
+    
+    True and False are NOT numbers:
+    
+    >>> common.isNum(True)
+    False
+    >>> common.isNum(False)
+    False
+    >>> common.isNum(None)
+    False
     '''
     try:
         # TODO: this may have unexpected consequences: find
         dummy = usrData + 0
-        return True
+        if usrData is not True and usrData is not False:
+            return True
+        else:
+            return False
     except Exception: # pylint: disable=broad-except
         return False
 
@@ -975,7 +988,6 @@ def contiguousList(inputListOrTuple):
 
 def isStr(usrData):
     """Check of usrData is some form of string, including unicode.
-
 
     >>> common.isStr(3)
     False
@@ -1692,7 +1704,7 @@ def ordinalAbbreviation(value, plural=False):
 
 def stripAddresses(textString, replacement = "ADDRESS"):
     '''
-    Function that changes all memory addresses in the given
+    Function that changes all memory addresses (pointers) in the given
     textString with (replacement).  This is useful for testing
     that a function gives an expected result even if the result
     contains references to memory locations.  So for instance:
@@ -1705,8 +1717,16 @@ def stripAddresses(textString, replacement = "ADDRESS"):
 
     >>> common.stripAddresses("{0.0} <music21.humdrum.MiscTandem *>I humdrum control>")
     '{0.0} <music21.humdrum.MiscTandem *>I humdrum control>'
+
+
+    For doctests, can strip to '...' to make it work fine with doctest.ELLIPSIS
+    
+    >>> common.stripAddresses("{0.0} <music21.base.Music21Object object at 0x102a0ff10>", '0x...')
+    '{0.0} <music21.base.Music21Object object at 0x...>'
+
+
     '''
-    ADDRESS = re.compile('0x[0-9A-F]+')
+    ADDRESS = re.compile('0x[0-9A-Fa-f]+')
     return ADDRESS.sub(replacement, textString)
 
 
@@ -2382,6 +2402,56 @@ class SlottedObject(object):
     def __setstate__(self, state):
         for slot, value in state.items():
             setattr(self, slot, value)
+
+#===============================================================================
+# Image functions 
+#===============================================================================
+### Removed because only used by MuseScore and newest versions have -T option...
+# try:
+#     imp.find_module('PIL')
+#     hasPIL = True
+# except ImportError:
+#     hasPIL = False
+# 
+# def cropImageFromPath(fp, newPath=None):
+#     '''
+#     Autocrop an image in place (or at new path) from Path, if PIL is installed and return True,
+#     otherwise return False.  leave a border of size (
+#     
+#     Code from
+#     https://gist.github.com/mattjmorrison/932345
+#     '''
+#     if newPath is None:
+#         newPath = fp
+#     if hasPIL:
+#         from PIL import Image, ImageChops # overhead of reimporting is low compared to imageops
+#         imageObj = Image.open(fp)
+#         imageBox = imageObj.getbbox()
+#         if imageBox:
+#             croppedImg = imageObj.crop(imageBox)
+#         options = {}
+#         if 'transparency' in imageObj.info:
+#             options['transparency'] = imageObj.info["transparency"]
+# #         border = 255 # white border...
+# #         tempBgImage = Image.new(imageObj.mode, imageObj.size, border)
+# #         differenceObj = ImageChops.difference(imageObj, tempBgImage)
+# #         boundingBox = differenceObj.getbbox()
+# #         if boundingBox: # empty images return None...
+# #             croppedImg = imageObj.crop(boundingBox)
+#         croppedImg.save(newPath, **options)
+#         return True
+#         
+# 
+#     else:
+#         from music21 import environment
+#         if six.PY3:
+#             pip = 'pip3'
+#         else:
+#             pip = 'pip'
+#         environLocal = environment.Environment('common.py')        
+#         environLocal.warn('PIL/Pillow is not installed -- "sudo ' + pip + ' install Pillow"')
+#         return False
+#         
 
 
 #-------------------------------------------------------------------------------
