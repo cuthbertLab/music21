@@ -70,14 +70,14 @@ def charToBinary(char):
     >>> midi.charToBinary('a')
     '01100001'
     '''
-    ascii = ord(char)
+    asciiValue = ord(char)
     binaryDigits = []
-    while (ascii > 0):
-        if (ascii & 1) == 1:
+    while (asciiValue > 0):
+        if (asciiValue & 1) == 1:
             binaryDigits.append("1")
         else:
             binaryDigits.append("0")
-        ascii = ascii >> 1
+        asciiValue = asciiValue >> 1
     
     binaryDigits.reverse()
     binary = ''.join(binaryDigits)
@@ -247,7 +247,7 @@ def putNumber(num, length):
             lst.append(thisNum)
     
     if six.PY2:
-        return string.join(lst, "") 
+        return string.join(lst, "") # @UndefinedVariable
     else:
         return bytes(lst)
 
@@ -289,7 +289,7 @@ def putVariableLengthNumber(x):
     lst.reverse() 
     if six.PY2:
         lst[-1] = chr(ord(lst[-1]) & 0x7f) 
-        return string.join(lst, "") 
+        return string.join(lst, "")  # @UndefinedVariable
     else:
         lst[-1] = lst[-1] & 0x7f 
         return bytes(lst)
