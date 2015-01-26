@@ -65,8 +65,12 @@ def _getExtendedModules():
     # backend can be configured from config file, matplotlibrc,
     # but an early test broke all processing
     #matplotlib.use('WXAgg')
-
-    from mpl_toolkits.mplot3d import Axes3D # @UnresolvedImport
+    try:
+        from mpl_toolkits.mplot3d import Axes3D # @UnresolvedImport
+    except ImportError:
+        Axes3D = None
+        environLocal.warn("mpl_toolkits.mplot3d.Axes3D could not be imported -- likely cause is an old version of six.py (<1.9.0) on your system somewhere")
+    
     from matplotlib import collections # @UnresolvedImport
     from matplotlib import patches # @UnresolvedImport
 
