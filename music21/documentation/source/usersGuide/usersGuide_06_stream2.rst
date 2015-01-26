@@ -79,14 +79,15 @@ the corpus with the :func:`~music21.corpus.parse` function.
     sBach = corpus.parse('bach/bwv57.8')
 
 | We can access and examine elements at each level of this Score by
-using standard Python syntax for lists within lists. Thus, we can see
-the length of each component: first the Score which has five elements, a
-:class:`~music21.metadata.Metadata` object and four parts. Then we
-find the length of first Part at index one which indicates 19 objects
-(18 of them are measures).
+  using standard Python syntax for lists within lists. Thus, we can see
+  the length of each component: first the Score which has five elements,
+  a :class:`~music21.metadata.Metadata` object and four parts. Then we
+  find the length of first Part at index one which indicates 19 objects
+  (18 of them are measures).
+
 | Then within that part we find an object (a Measure) at index 1. All of
-these subprograms can be accessed from looking within the same score
-object ``sBach``.
+  these subprograms can be accessed from looking within the same score
+  object ``sBach``.
 
 .. code:: python
 

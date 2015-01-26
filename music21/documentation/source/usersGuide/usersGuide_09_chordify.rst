@@ -7,7 +7,6 @@
 User's Guide: Chapter 9: Chordify
 =================================
 
-
 Chordify is a powerful tool for reducing a complex score with multiple
 parts to a succession of chords in one part that represent everything
 that is happening in the score. Take this short chorale by Bach:

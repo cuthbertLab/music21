@@ -13,11 +13,9 @@
 '''Objects for processing roman numeral analysis text files, as defined and
 demonstrated by Dmitri Tymoczko.
 '''
-<<<<<<< HEAD
+
 __all__ = ['clercqTemperley', 'translate', 'testFiles', 'objects']
-=======
-__all__ = ['clercqTemperly', 'translate', 'testFiles', 'rtObjects']
->>>>>>> 00694f1f6312cd93843564fb6e782a7c70cca9f5
+
 from music21.romanText import clercqTemperley
 from music21.romanText import testFiles
 from music21.romanText import rtObjects

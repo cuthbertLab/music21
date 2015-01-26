@@ -50,12 +50,13 @@ then you'll now be able to access the ``note`` module just by typing
 <module 'music21.note' from 'D:\music21files\music21\note.pyc'>
 
 | If you get something like this you'll have access to the music21
-``note`` module any time you type ``"note"``. The filename after "from
-'D:\\music21files...'" will differ for you. It will show you where you
-have music21 installed (if you ever forget where you have music21
-installed, this is an easy way to figure it out).
+  ``note`` module any time you type ``"note"``. The filename after "from
+  'D:\\music21files...'" will differ for you. It will show you where you
+  have music21 installed (if you ever forget where you have music21
+  installed, this is an easy way to figure it out).
+
 | As long as it ends in ``note.pyc`` or ``note.py`` or something like
-that you're fine.
+  that you're fine.
 
 If you want to know what else the ``note`` module contains besides the
 Note and Rest objects you can type "``dir(note)``\ " to find out:
@@ -231,7 +232,6 @@ A couple of things that you'll notice:
    know what computer you're using, don't worry if you get slightly
    different results.
 
-
 2. There are single quotes around some of the output (like the ``'F'``
    in ``f.name``) and none around others (like the ``5`` in
    ``f.octave``). The quotes mean that that attribute is returning a
@@ -240,7 +240,6 @@ A couple of things that you'll notice:
    there's a decimal point, a sneakingly decimal-like thingy called a
    ``float`` (or "floating-point number") which looks and acts just like
    a decimal, except when it doesn't, which is never when you'd expect.
-
 
 *(The history and theory behind* ``floats`` *will be explained to you at
 length by any computer scientist, usually when he or she is the only
