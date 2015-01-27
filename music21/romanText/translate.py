@@ -643,10 +643,10 @@ def appendMeasureToRepeatEndingsDict(t, m, repeatEndings, measureNumber = None):
     
     This does not yet work for skipped measures.
     
-    >>> rtm = romanText.objects.RTMeasure('m15a V6 b1.5 V6/5 b2 I b3 viio6')
+    >>> rtm = romanText.rtObjects.RTMeasure('m15a V6 b1.5 V6/5 b2 I b3 viio6')
     >>> rtm.repeatLetter
     ['a']
-    >>> rtm2 = romanText.objects.RTMeasure('m15b V6 b1.5 V6/5 b2 I')
+    >>> rtm2 = romanText.rtObjects.RTMeasure('m15b V6 b1.5 V6/5 b2 I')
     >>> rtm2.repeatLetter
     ['b']
     >>> repeatEndings = {}
@@ -806,7 +806,7 @@ def romanTextToStreamOpus(rtHandler, inputM21=None):
     '''The main processing routine for RomanText objects that may or may not
     be multi movement.
     
-    Takes in a romanText.objects.RTFile() object, or a string as rtHandler.
+    Takes in a romanText.rtObjects.RTFile() object, or a string as rtHandler.
     
     Runs `romanTextToStreamScore()` as its main work.
     
