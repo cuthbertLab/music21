@@ -315,7 +315,6 @@ Three things to note about priority:
     Stream, so if you want to change the priority of an object, you'll
     need to remove it and then reinsert it.
 
-
 .. code:: python
 
     d.priority = 20
@@ -344,8 +343,6 @@ Three things to note about priority:
 (3) Priority overrides ``classSortOrder``. So if we wanted to move the
     6/8 TimeSignature ``(ts2)`` to sort before the 3/4 ``(ts1)``, it is
     not enough to shift the priority of ``ts2`` and reinsert it:
-
-
 
 .. code:: python
 

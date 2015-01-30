@@ -546,7 +546,8 @@ class Music21Object(object):
         return state
  
     def __setstate__(self, state):
-        self.__dict__ = state
+        # defining self.__dict__ upon initialization currently breaks everything
+        self.__dict__ = state #pylint: disable=attribute-defined-outside-init
 
     def isClassOrSubclass(self, classFilterList):
         '''

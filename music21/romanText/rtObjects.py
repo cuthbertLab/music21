@@ -29,20 +29,20 @@ environLocal = environment.Environment(_MOD)
 
 # alternate endings might end with a,b,c for non 
 # zero or more for everything after the first number
-reMeasureTag = re.compile('m[0-9]+[a-b]*-*[0-9]*[a-b]*')
-reVariant = re.compile('var[0-9]+')
-reVariantLetter = re.compile('var([A-Z]+)')
-reNoteTag = re.compile('[Nn]ote:')
+reMeasureTag = re.compile(r'm[0-9]+[a-b]*-*[0-9]*[a-b]*')
+reVariant = re.compile(r'var[0-9]+')
+reVariantLetter = re.compile(r'var([A-Z]+)')
+reNoteTag = re.compile(r'[Nn]ote:')
 
-reOptKeyOpenAtom = re.compile('\?\([A-Ga-g]+[b#]*:')
-reOptKeyCloseAtom = re.compile('\?\)[A-Ga-g]+[b#]*:?')
+reOptKeyOpenAtom = re.compile(r'\?\([A-Ga-g]+[b#]*:')
+reOptKeyCloseAtom = re.compile(r'\?\)[A-Ga-g]+[b#]*:?')
 reKeyAtom = re.compile('[A-Ga-g]+[b#]*;:')
 reAnalyticKeyAtom = re.compile('[A-Ga-g]+[b#]*:')
-reKeySignatureAtom = re.compile('KS\-?[0-7]')
+reKeySignatureAtom = re.compile(r'KS\-?[0-7]')
 # must distinguish b3 from bVII; there may be b1.66.5
-reBeatAtom = re.compile('b[1-9.]+')
-reRepeatStartAtom = re.compile('\|\|\:')
-reRepeatStopAtom = re.compile('\:\|\|')
+reBeatAtom = re.compile(r'b[1-9.]+')
+reRepeatStartAtom = re.compile(r'\|\|\:')
+reRepeatStopAtom = re.compile(r'\:\|\|')
 reNoChordAtom = re.compile('NC')
 
 
@@ -1014,7 +1014,8 @@ class RTHandler(object):
         post = []
         for i,l in enumerate(lines):
             l = l.strip()
-            if l == '': continue
+            if l == '': 
+                continue
             # wrap each line in a header token
             rtt = RTTagged(l)
             rtt.lineNumber = i + 1
@@ -1032,7 +1033,8 @@ class RTHandler(object):
             currentLineNumber = startLineNumber + i
             try:
                 l = l.strip()
-                if l == '': continue
+                if l == '': 
+                    continue
                 # first, see if it is a measure definition, if not, than assume it is tagged data
                 if reMeasureTag.match(l) is not None:
                     rtm = RTMeasure(l)
@@ -1262,13 +1264,13 @@ class RTFile(object):
     '''
     
     def __init__(self): 
-        pass
+        self.file = None
+        self.filename = None
 
     def open(self, filename): 
         '''Open a file for reading, trying a variety of codecs and then
         trying them again with an ignore if it is not possible.
         '''
-        self.file = None
         for encoding in ('utf-8', 'macintosh', 'latin-1', 'utf-16'):
             try:
                 self.file = codecs.open(filename, encoding=encoding)

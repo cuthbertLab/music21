@@ -1122,7 +1122,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
         with codecs.open(filePath, 'r', encoding=firstGuess) as thisFile:
             data = thisFile.read()
             return data
-    except FileNotFoundError:
+    except OSError.FileNotFoundError:
         raise
     except UnicodeDecodeError:
         with codecs.open(filePath, 'rb') as thisFileBinary:
@@ -2178,7 +2178,7 @@ xlateAccents={0xc0:'A', 0xc1:'A', 0xc2:'A', 0xc3:'A', 0xc4:'A', 0xc5:'A',
     }
 
 def stripAccents(inputString):
-    '''
+    r'''
     removes accents from unicode strings.
 
 

@@ -472,9 +472,9 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                         elif isinstance(a, rtObjects.RTAnalyticKey):
                             # just a change in analyzed key, not a change in anything else
                             #try: # this sets the key, not the keysignature
-                                kCurrent, pl = _getKeyAndPrefix(a)
-                                prefixLyric += pl
-                                setKeyChangeToken = True
+                            kCurrent, pl = _getKeyAndPrefix(a)
+                            prefixLyric += pl
+                            setKeyChangeToken = True
 
                             #except:
                             #    raise RomanTextTranslateException('cannot get key from %s in line %s' % (a.src, t.src))
@@ -1108,7 +1108,8 @@ m6-7 = m4-5
             self.assertEqual(str([str(p) for p in rnStream[elementNumber + 4].pitches]), "['A4', 'C5', 'F5']")
 
             x = rnStream[elementNumber + 4].pitches[2].accidental
-            if x == None: x = pitch.Accidental('natural')
+            if x == None: 
+                x = pitch.Accidental('natural')
             self.assertEqual(x.alter, 0)
 
             self.assertEqual(rnStream[elementNumber + 5].figure, 'iv6')

@@ -21,3 +21,4 @@ Users Guide
    usersGuide_22_graphing
    usersGuide_25_postTonalTools1
    usersGuide_54_extendingConverter
+   usersGuide_55_advancedMeter
