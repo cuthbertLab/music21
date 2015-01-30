@@ -6,7 +6,7 @@ __all__ = [
     'gatherAccidentals',
     ]
 
-import gatherAccidentals
+from music21.demos import gatherAccidentals
 
 
 #------------------------------------------------------------------------------
