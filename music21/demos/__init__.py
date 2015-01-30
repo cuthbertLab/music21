@@ -3,9 +3,10 @@
 __all__ = [
     'eschbeg',
     'monteverdi',
+    'gatherAccidentals',
     ]
 
-
+import gatherAccidentals
 
 
 #------------------------------------------------------------------------------

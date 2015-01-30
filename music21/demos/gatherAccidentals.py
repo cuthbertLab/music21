@@ -18,9 +18,6 @@ from music21 import key
 import unittest
 
 '''
-
-Demo for music21 documentation.
-
 Have you ever wondered whether Bach uses more sharps than flats in the Chorales? With just a
 few lines of code, music21 allows you to quickly answer this question.
 
@@ -73,10 +70,10 @@ def getAccidentalCount(score, includeNonAccidentals=False, excludeZeros=True):
     Optionally you can count for notes without accidentals as
     'natural' if includeNonAccidentals = True.
     
-    
+    >>> from pprint import pprint
     >>> from music21 import *
     >>> s1 = stream.Stream()
-    >>> getAccidentalCount(s1)
+    >>> demos.gatherAccidentals.getAccidentalCount(s1)
     {}
     
     >>> s2 = stream.Stream()
@@ -85,13 +82,13 @@ def getAccidentalCount(score, includeNonAccidentals=False, excludeZeros=True):
     >>> note3 = note.Note("D-4")
     >>> for note in [note1, note2, note3]:
     ...    s2.append(note)
-    >>> getAccidentalCount(s2)
+    >>> pprint(demos.gatherAccidentals.getAccidentalCount(s2))
     {'flat': 1, 'sharp': 1}
-    >>> getAccidentalCount(s2, True)
+    >>> pprint(demos.gatherAccidentals.getAccidentalCount(s2, True))
     {'flat': 1, 'natural': 1, 'sharp': 1}
     
     >>> s = corpus.parse('bach/bwv66.6') 
-    >>> getAccidentalCount(s)
+    >>> demos.gatherAccidentals.getAccidentalCount(s)
     {'sharp': 87}
     
     '''
@@ -121,18 +118,19 @@ def getAccidentalCountSum(scores, includeNonAccidentals=False, excludeZeros=True
     An extension of getAccidentalCount(). Given a list of scores, return an AccidentalSum
     containing a tally of accidentals for all scores in the list.
 
+    >>> from pprint import pprint
     >>> s1 = stream.Stream()
     >>> s1.append(note.Note('C4'))
     >>> s2 = stream.Score()         # all types of streams are valid
     >>> s2.append(note.Note('C#4'))
-    >>> getAccidentalCountSum([s1, s2])
+    >>> demos.gatherAccidentals.getAccidentalCountSum([s1, s2])
     {'sharp': 1}
-    >>> getAccidentalCountSum([s1, s2], True)
+    >>> pprint(demos.gatherAccidentals.getAccidentalCountSum([s1, s2], True))
     {'natural': 1, 'sharp': 1}
     
     >>> s3 = corpus.parse('bach/bwv7.7')
     >>> s4 = corpus.parse('bach/bwv66.6')
-    >>> getAccidentalCountSum([s3, s4], True)
+    >>> pprint(demos.gatherAccidentals.getAccidentalCountSum([s3, s4], True))
     {'natural': 324, 'sharp': 195}
     '''
     tally = _initializeTally()
@@ -153,7 +151,7 @@ def _initializeTally():
     Private method.
     TODO: change to pitch.Accidental.listNames()
     
-    >>> accidentalTally = _initializeTally()
+    >>> accidentalTally = demos.gatherAccidentals._initializeTally()
     >>> from pprint import pprint as pp
     >>> pp(accidentalTally)
     {'double-flat': 0,
@@ -182,12 +180,13 @@ def _deleteZeros(tally, excludeZeros):
     The updated tally is then returned.
     Usually this involves deleting the triple-flats and quadruple-sharps.
     
+    >>> from pprint import pprint
     >>> dict = {'a': 5, 'b': 3, 'c': 0}
-    >>> _deleteZeros(dict, True)
+    >>> pprint(demos.gatherAccidentals._deleteZeros(dict, True))
     {'a': 5, 'b': 3}
     '''
     if excludeZeros:
-        for key in tally.keys():
+        for key in list(tally.keys()):
             if tally[key] is 0:
                 del tally[key]
     return tally
@@ -265,7 +264,6 @@ class TestSlow(unittest.TestCase):
             
     
 if __name__ == "__main__":
-    from music21 import base, converter
-    s = converter.parse("/Users/hzabriskie/Documents/Music21/Eclipse/music21base/music21/corpus/bach/bwv282.mxl")
-    base.mainTest(Test, 'moduleRelative') # replace 'Test' with 'TestSlow' to test it on all 371 Bach Chorales.
+    from music21 import base
+    base.mainTest(Test) # replace 'Test' with 'TestSlow' to test it on all 371 Bach Chorales.
         
