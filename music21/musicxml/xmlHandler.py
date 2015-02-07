@@ -1049,6 +1049,8 @@ class Document(object):
         except Exception as e:
             # try a bunch of things to work with UTF-16 files...
             fileLikeOpen.close()
+            if not isFile:
+                raise e
             with codecs.open(fileLike, 'rb') as fileBinary:
                 fileContentsBinary = fileBinary.read()
                 encodingGuess = chardet.detect(fileContentsBinary)['encoding']
