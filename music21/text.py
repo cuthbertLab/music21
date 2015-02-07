@@ -86,9 +86,11 @@ def assembleLyrics(streamIn, lineNumber=1):
         # need to match case of non-defined syllabic attribute
         if lyricObj.text != '_': # continuation syllable in many pieces
             if lyricObj.syllabic in ['begin', 'middle']:
-                word.append(lyricObj.text)
+                if lyricObj.text is not None: # should not be possible but sometimes happens
+                    word.append(lyricObj.text)
             elif lyricObj.syllabic in ['end', 'single', None]:
-                word.append(lyricObj.text)
+                if lyricObj.text is not None: # should not be possible but sometimes happens
+                    word.append(lyricObj.text)
                 #environLocal.printDebug(['word pre-join', word])
                 words.append(''.join(word))
                 word = []
@@ -685,7 +687,7 @@ class Trigram(object):
             for line in excerpt:
                 if six.PY2:
                     try:
-                        line = unicode(line, 'utf8') # just in case # pylint: disable=undefined-variable
+                        line = unicode(line, 'utf8') # just in case  @UndefinedVariable # pylint: disable=undefined-variable
                     except (UnicodeDecodeError, NameError): # no unicode in Py3
                         continue # skip this line
                 for letter in line.strip() + u' ':
