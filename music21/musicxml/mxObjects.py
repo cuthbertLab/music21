@@ -127,7 +127,7 @@ class Tag(common.SlottedObject):
     As we do not need character data for all tags, tags have an optional flag to select 
     if the are to collect character data.
     '''
-    __slots__ = ('tag', 'cdFlag', 'status', 'charData', 'className')
+    __slots__ = ('tag', 'cdFlag', 'status', 'charData', 'className', 'count')
     
     def __init__(self, tag, cdFlag=False, className=None):
         '''        
@@ -150,7 +150,7 @@ class Tag(common.SlottedObject):
         self.charData = u''
         self.className = className
 
-        #self.count = 0 # for statistics; not presently used
+        self.count = 0 # Used for statistics/debugging -- audit; not otherwise used
 
     def start(self):
         if self.status: # already open

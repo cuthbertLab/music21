@@ -15,7 +15,7 @@ Converts musicxml xml text to the intermediate mxObjects format.
 from music21.musicxml import mxObjects as musicxmlMod
 
 import sys
-from music21.ext import six
+from music21.ext import six, chardet
 import codecs
 
 # in order for sax parsing to properly handle unicode strings w/ unicode chars
@@ -42,7 +42,7 @@ import os
 import unittest
 
 # use io.StringIO  in python 3, avail in 2.6, not 2.5
-from music21.ext.six import StringIO
+from music21.ext.six import StringIO, BytesIO
 
 try:
     import cPickle as pickleMod # much faster...
@@ -1039,6 +1039,7 @@ class Document(object):
                 raise
 
         else: 
+            
             fileLikeOpen = codecs.open(fileLike, encoding='utf-8')
 
         # the file always needs to be closed, otherwise
@@ -1046,8 +1047,34 @@ class Document(object):
         try:
             saxparser.parse(fileLikeOpen)
         except Exception as e:
+            # try a bunch of things to work with UTF-16 files...
             fileLikeOpen.close()
-            raise e
+            with codecs.open(fileLike, 'rb') as fileBinary:
+                fileContentsBinary = fileBinary.read()
+                encodingGuess = chardet.detect(fileContentsBinary)['encoding']
+            fileLikeOpen2 = codecs.open(fileLike, encoding=encodingGuess)
+            fileContentsUnicode = fileLikeOpen2.read()
+            fileLikeOpen2.close()
+            fileBytes = fileContentsUnicode.encode(encodingGuess)
+            if six.PY3:  # remove BOM
+                if fileBytes[0:2] in (b'\xff\xfe', b'\xfe\xff'):
+                    fileBytes = fileBytes[2:]                
+            else:
+                if fileBytes[0:2] in ('\xff\xfe', '\xfe\xff'):
+                    fileBytes = fileBytes[2:]                                
+            
+            fileLikeOpen = BytesIO(fileBytes)
+            try:
+                saxparser.parse(fileLikeOpen)
+            except Exception as e:
+# This may be useful for fixing incorrect XML encoding declarations
+#                 uTop = u[0:1000]
+#                 print(uTop)
+#                 if 'encoding=' in uTop:
+#                     m = re.search("encoding=[\'\"](.*?)[\'\"]", uTop)
+#                     encodingType = m.group(1).lower()
+                fileLikeOpen.close()
+                raise e
         fileLikeOpen.close()
 
         #t.stop()
@@ -1126,17 +1153,20 @@ class TestExternal(unittest.TestCase):
 
     def testOpen(self, fp=None):    
         from music21 import corpus
-        if fp == None: # get shuman
-            fp = corpus.getWork('opus41no1', 2)
+        if fp == None:
+            fp = corpus.getWork('trecento/Fava_Dicant_nunc_iudei')
         c = Document()
         c.open(fp, audit=True)
         c.repr()
 
     def testCompareFile(self, fpIn=None, fpOut=None):
-        '''input a file and write it back out as xml'''
+        '''
+        input a file and write it back out as xml 
+        -- ONLY WORKS ON XML not MXL... make sure file is in that Forman
+        '''
         from music21 import corpus
-        if fpIn == None: # get shuman
-            fpIn = corpus.getWork('opus41no1', 2)
+        if fpIn == None: # get Schumann
+            fpIn = corpus.getWork('trecento/Fava_Dicant_nunc_iudei')
 
         if fpOut == None:
             fpOut = environLocal.getTempFile('.xml')
@@ -1332,6 +1362,7 @@ if __name__ == "__main__":
         sys.setdefaultencoding("utf-8") # @UndefinedVariable
 
     import music21
+    #music21.converter.parse('/Users/Cuthbert/Dropbox/EMMSAP/MusicXML In/PMFC_05_34-Bon_Bilgrana_de_Valor.xml', forceSource=True)
     music21.mainTest(Test, TestExternal)
 
 #------------------------------------------------------------------------------

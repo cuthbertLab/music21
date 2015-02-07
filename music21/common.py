@@ -1122,12 +1122,12 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
         with codecs.open(filePath, 'r', encoding=firstGuess) as thisFile:
             data = thisFile.read()
             return data
-    except OSError.FileNotFoundError:
+    except OSError: # Python3 FileNotFoundError...
         raise
     except UnicodeDecodeError:
         with codecs.open(filePath, 'rb') as thisFileBinary:
-            dataBinary = thisFile.read()
-            encoding = chardet.detect(thisFileBinary)['encoding']
+            dataBinary = thisFileBinary.read()
+            encoding = chardet.detect(dataBinary)['encoding']
             return codecs.decode(dataBinary, encoding)
     
 
