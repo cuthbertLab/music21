@@ -44,38 +44,35 @@ def translateMonophonicPartToSegments(
     ):
     '''
     Translates a monophonic part with measures to a set of segments of length
-    `segmentLengths` with overlap of `overlap` using the algorithm of
-    `algorithm`. Returns two lists, a list of segments, and a list of measure
+    `segmentLengths` (measured in number of notes) with an overlap of `overlap` notes 
+    using a conversion algorithm of `algorithm` (default: search.translateStreamToStringNoRhythm). 
+    Returns two lists, a list of segments, and a list of measure
     numbers that match the segments.
     
     If algorithm is None then a default algorithm of music21.search.translateStreamToStringNoRhythm
     is used
-    ::
 
-        >>> from music21 import *
-        >>> luca = corpus.parse('luca/gloria')
-        >>> lucaCantus = luca.parts[0]
-        >>> segments, measureLists = search.segment.translateMonophonicPartToSegments(lucaCantus)
-        >>> segments[0:2]
-        ['HJHEAAEHHCE@JHGECA@A>@A><A@AAE', '@A>@A><A@AAEEECGHJHGH@CAE@FECA']
+    >>> from music21 import *
+    >>> luca = corpus.parse('luca/gloria')
+    >>> lucaCantus = luca.parts[0]
+    >>> segments, measureLists = search.segment.translateMonophonicPartToSegments(lucaCantus)
+    >>> segments[0:2]
+    ['HJHEAAEHHCE@JHGECA@A>@A><A@AAE', '@A>@A><A@AAEEECGHJHGH@CAE@FECA']
 
-    ::
 
-        >>> measureLists[0:3]
-        [1, 7, 14]
+    Segment zero begins at measure 1.  Segment 1 begins at measure 7:
 
-    ::
+    >>> measureLists[0:2]
+    [1, 7]
 
-        >>> segments, measureLists = search.segment.translateMonophonicPartToSegments(
-        ...     lucaCantus, 
-        ...     algorithm=search.translateDiatonicStreamToString)
-        >>> segments[0:2]
-        ['CRJOMTHCQNALRQPAGFEFDLFDCFEMOO', 'EFDLFDCFEMOOONPJDCBJSNTHLBOGFE']
+    >>> segments, measureLists = search.segment.translateMonophonicPartToSegments(
+    ...     lucaCantus, 
+    ...     algorithm=search.translateDiatonicStreamToString)
+    >>> segments[0:2]
+    ['CRJOMTHCQNALRQPAGFEFDLFDCFEMOO', 'EFDLFDCFEMOOONPJDCBJSNTHLBOGFE']
 
-    ::
-
-        >>> measureLists[0:3]
-        [1, 7, 14]
+    >>> measureLists[0:2]
+    [1, 7]
 
     '''
     from music21 import search
@@ -274,33 +271,28 @@ def scoreSimilarity(
     This takes twice as long as it should because it does not cache the
     pairwise similarity.
     
-    ::
- 
-        >>> filePaths = []
-        >>> filePaths.append(corpus.search('bwv197.5.mxl')[0].sourcePath)
-        >>> filePaths.append(corpus.search('bwv190.7.mxl')[0].sourcePath)
-        >>> filePaths.append(corpus.search('bwv197.10.mxl')[0].sourcePath)
-        >>> scoreDict = search.segment.indexScoreFilePaths(filePaths)
-        >>> scoreSim = search.segment.scoreSimilarity(scoreDict, forceDifflib=True) #_DOCS_HIDE
-        >>> #_DOCS_SHOW scoreSim = search.segment.scoreSimilarity(scoreDict)
-        >>> len(scoreSim)
-        671
+    >>> filePaths = []
+    >>> filePaths.append(corpus.search('bwv197.5.mxl')[0].sourcePath)
+    >>> filePaths.append(corpus.search('bwv190.7.mxl')[0].sourcePath)
+    >>> filePaths.append(corpus.search('bwv197.10.mxl')[0].sourcePath)
+    >>> scoreDict = search.segment.indexScoreFilePaths(filePaths)
+    >>> scoreSim = search.segment.scoreSimilarity(scoreDict, forceDifflib=True) #_DOCS_HIDE
+    >>> #_DOCS_SHOW scoreSim = search.segment.scoreSimilarity(scoreDict)
+    >>> len(scoreSim)
+    671
     
-    Returns a tuple of first score name, first score voice number, first score
+    Returns a list of tuples of first score name, first score voice number, first score
     measure number, second score name, second score voice number, second score
     measure number, and similarity score (0 to 1).
     
-    ::
-
-        >>> for result in scoreSim[64:68]:
-        ...     result
-        ...
-        (...'bwv197.5.mxl', 0, 1, 4, ...'bwv197.10.mxl', 3, 1, 4, 0.0)
-        (...'bwv197.5.mxl', 0, 1, 4, ...'bwv197.10.mxl', 3, 2, 9, 0.0)
-        (...'bwv197.5.mxl', 0, 2, 9, ...'bwv190.7.mxl', 0, 0, 0, 0.07547...)
-        (...'bwv197.5.mxl', 0, 2, 9, ...'bwv190.7.mxl', 0, 1, 5, 0.07547...)
+    >>> for result in scoreSim[64:68]:
+    ...     result
+    ...
+    (...'bwv197.5.mxl', 0, 1, 4, ...'bwv197.10.mxl', 3, 1, 4, 0.0)
+    (...'bwv197.5.mxl', 0, 1, 4, ...'bwv197.10.mxl', 3, 2, 9, 0.0)
+    (...'bwv197.5.mxl', 0, 2, 9, ...'bwv190.7.mxl', 0, 0, 0, 0.07547...)
+    (...'bwv197.5.mxl', 0, 2, 9, ...'bwv190.7.mxl', 0, 1, 5, 0.07547...)
         
-    Return tuple.
     '''
     similarityScores = []
     scoreIndex = 0

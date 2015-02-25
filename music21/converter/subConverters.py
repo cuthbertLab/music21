@@ -183,7 +183,18 @@ class SubConverter(object):
         if self.codecWrite is False:
             with open(fp, writeFlags) as f:
                 try:
+                    if six.PY3 and isinstance(dataStr, bytes):
+                        f.write(dataStr.decode('utf-8'))
+                    
+                    else:
+                        f.write(dataStr)
+                except UnicodeEncodeError:
+                    f.close()
+                    import codecs
+                    f = codecs.open(fp, mode=writeFlags, encoding=self.stringEncoding)
                     f.write(dataStr)
+                    f.close()
+
                 except TypeError as te:
                     raise SubConverterException("Could not convert %r : %r" % (dataStr, te))
         else:
@@ -666,7 +677,7 @@ class ConverterMusicXML(SubConverter):
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):
         from music21.musicxml import m21ToString
         dataStr = m21ToString.fromMusic21Object(obj)
-        fp = self.writeDataStream(fp, dataStr)        
+        fp = self.writeDataStream(fp, dataStr)
         
         if subformats is not None and 'png' in subformats:
             fp = self.runThroughMusescore(fp, **keywords)

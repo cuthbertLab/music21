@@ -36,38 +36,102 @@ environLocal = environment.Environment(_MOD)
 
 
 #-------Public Merge Functions
-def mergeVariants(streamX, streamY, variantName = 'variant', inPlace = False):
+def mergeVariants(streamX, streamY, variantName='variant', inPlace=False):
     '''
-    Takes two streams objects or their derivatives (score, part, measure, etc.) which should be variant versions of the same stream,
-    and merges them (determines differences and stores those differences as variant objects in streamX) via the appropriate merge
-    function for their type. This will not know how to deal with scores meant for mergePartAsOssia(). If this is the intention, use
+    Takes two streams objects or their derivatives (Score, Part, Measure, etc.) which 
+    should be variant versions of the same stream,
+    and merges them (determines differences and stores those differences as variant objects 
+    in streamX) via the appropriate merge
+    function for their type. This will not know how to deal with scores meant for 
+    mergePartAsOssia(). If this is the intention, use
     that function instead.
+
+
+    >>> streamX = converter.parse("tinynotation: 4/4 a4 b  c d")
+    >>> streamY = converter.parse("tinynotation: 4/4 a4 b- c e")
+    >>> mergedStream = variant.mergeVariants(streamX, streamY, variantName = 'docvariant', inPlace = False)
+    >>> mergedStream.show('text')
+    {0.0} <music21.meter.TimeSignature 4/4>
+    {0.0} <music21.note.Note A>
+    {1.0} <music21.variant.Variant object of length 1.0>
+    {1.0} <music21.note.Note B>
+    {2.0} <music21.note.Note C>
+    {3.0} <music21.variant.Variant object of length 1.0>
+    {3.0} <music21.note.Note D>
+    
+    >>> v0 = mergedStream.getElementsByClass('Variant')[0]
+    >>> v0
+    <music21.variant.Variant object of length 1.0>
+    >>> v0[0]
+    <music21.note.Note B->   
+    
+    >>> streamZ = converter.parse("tinynotation: 4/4 a4 b c d e f g a")
+    >>> variant.mergeVariants(streamX, streamZ, variantName = 'docvariant', inPlace=False)
+    Traceback (most recent call last):
+    ...
+    VariantException: Could not determine what merging method to use. Try using a more specific merging function.
     
     
-    >>> aScore, vScore= stream.Score(), stream.Score()
+    Example: Create a main score (aScore) and a variant score (vScore), each with two parts (ap1/vp1
+    and ap2/vp2) and some small variants between ap1/vp1 and ap2/vp2, marked with * below.
     
-    >>> ap1 = stream.Part(converter.parse("tinynotation: 4/4   a4 b c d    e2 f2   g2 f4 g4 ").makeMeasures())
-    >>> vp1 = stream.Part(converter.parse("tinynotation: 4/4   a4 b c e    e2 f2   g2 f4 a4 ").makeMeasures())
+    >>> aScore = stream.Score()
+    >>> vScore = stream.Score()
+
+    >>> #                                                             *
+    >>> ap1 = stream.Part(converter.parse("tinynotation: 4/4   a4 b c d    e2 f   g2 f4 g ").makeMeasures())
+    >>> vp1 = stream.Part(converter.parse("tinynotation: 4/4   a4 b c e    e2 f   g2 f4 a ").makeMeasures())
+        
+    >>> #                                                                     *    *    *
+    >>> ap2 = stream.Part(converter.parse("tinynotation: 4/4   a4 g f e    f2 e   d2 g4 f ").makeMeasures())
+    >>> vp2 = stream.Part(converter.parse("tinynotation: 4/4   a4 g f e    f2 g   f2 g4 d ").makeMeasures())
     
-    >>> ap2 = stream.Part(converter.parse("tinynotation: 4/4   a4 g f e    f2 e2   d2 g4 f4 ").makeMeasures())
-    >>> vp2 = stream.Part(converter.parse("tinynotation: 4/4   a4 g f e    f2 g2   f2 g4 d4 ").makeMeasures())
+    >>> ap1.id = 'aPart1'
+    >>> ap2.id = 'aPart2'
     
     >>> aScore.insert(0.0, ap1)
     >>> aScore.insert(0.0, ap2)
     >>> vScore.insert(0.0, vp1)
     >>> vScore.insert(0.0, vp2)
+
+    Create one merged score where everything different in vScore from aScore is called a variant.
     
-    >>> mergedScore = variant.mergeVariants(aScore, vScore, variantName = 'docvariant', inPlace = False)
+    >>> mergedScore = variant.mergeVariants(aScore, vScore, variantName='docvariant', inPlace=False)
     >>> mergedScore.show('text')
-    {0.0} <music21.stream.Part ...>
+    {0.0} <music21.stream.Part aPart1>
         {0.0} <music21.variant.Variant object of length 4.0>
-    ...
-    {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 1 offset=0.0>
-    ...
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.note.Note B>
+            {2.0} <music21.note.Note C>
+            {3.0} <music21.note.Note D>
+        {4.0} <music21.stream.Measure 2 offset=4.0>
+            {0.0} <music21.note.Note E>
+            {2.0} <music21.note.Note F>
+        {8.0} <music21.variant.Variant object of length 4.0>
+        {8.0} <music21.stream.Measure 3 offset=8.0>
+            {0.0} <music21.note.Note G>
+            {2.0} <music21.note.Note F>
+            {3.0} <music21.note.Note G>
+            {4.0} <music21.bar.Barline style=final>
+    {0.0} <music21.stream.Part aPart2>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.note.Note G>
+            {2.0} <music21.note.Note F>
+            {3.0} <music21.note.Note E>
         {4.0} <music21.variant.Variant object of length 8.0>
         {4.0} <music21.stream.Measure 2 offset=4.0>
-    ...
+            {0.0} <music21.note.Note F>
+            {2.0} <music21.note.Note E>
+        {8.0} <music21.stream.Measure 3 offset=8.0>
+            {0.0} <music21.note.Note D>
+            {2.0} <music21.note.Note G>
+            {3.0} <music21.note.Note F>
             {4.0} <music21.bar.Barline style=final>
     
     
@@ -80,23 +144,6 @@ def mergeVariants(streamX, streamY, variantName = 'variant', inPlace = False):
     ...
         {4.0} <music21.bar.Barline style=final>
     
-    >>> streamX = converter.parse("tinynotation: 4/4 a4 b c d")
-    >>> streamY = converter.parse("tinynotation: 4/4 a4 d c b")
-    >>> mergedStream = variant.mergeVariants(streamX, streamY, variantName = 'docvariant', inPlace = False)
-    >>> mergedStream.show('text')
-    {0.0} <music21.meter.TimeSignature 4/4>
-    {0.0} <music21.note.Note A>
-    {1.0} <music21.variant.Variant object of length 1.0>
-    {1.0} <music21.note.Note B>
-    {2.0} <music21.note.Note C>
-    {3.0} <music21.variant.Variant object of length 1.0>
-    {3.0} <music21.note.Note D>
-    
-    >>> streamY = converter.parse("tinynotation: 4/4 a4 b c d e f g a")
-    >>> variant.mergeVariants(streamX, streamY, variantName = 'docvariant', inPlace = False)
-    Traceback (most recent call last):
-    ...
-    VariantException: Could not determine what merging method to use. Try using a more specific merging function.
     
     '''
     classesX = streamX.classes
@@ -603,16 +650,22 @@ def mergeVariantsEqualDuration(streams, variantNames, inPlace = False):
 
 def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace = False, compareByMeasureNumber = False, recurseInMeasures = False):
     '''
-    Some MusicXML files are generated with full parts that have only a few non-rest measures instead of ossia parts, such as those
+    Some MusicXML files are generated with full parts that have only a few non-rest measures 
+    instead of ossia parts, such as those
     created by Sibelius 7. This function
-    takes two streams (mainpart and ossiapart), the second interpreted as an ossia. It outputs a stream with the ossia part merged into the stream as a 
+    takes two streams (mainpart and ossiapart), the second interpreted as an ossia. 
+    It outputs a stream with the ossia part merged into the stream as a 
     group of variants.
     
-    If compareByMeasureNumber is True, then the ossia measures will be paired with the measures in the mainpart that have the
-    same measure.number. Otherwise, they will be paired by offset. In most cases these should have the same result.
+    If compareByMeasureNumber is True, then the ossia measures will be paired with the 
+    measures in the mainpart that have the
+    same measure.number. Otherwise, they will be paired by offset. In most cases 
+    these should have the same result.
     
-    Note that this method has no way of knowing if a variant is supposed to be a different duration than the segment of stream which it replaces
-    because that information is not contained in the format of score this method is designed to deal with.
+    Note that this method has no way of knowing if a variant is supposed to be a 
+    different duration than the segment of stream which it replaces
+    because that information is not contained in the format of score this method is 
+    designed to deal with.
     
     
     >>> mainstream = converter.parse("tinynotation: 4/4   A4 B4 C4 D4   E1    F2 E2     E8 F8 F4 G2   G2 G4 F4   F4 F4 F4 F4   G1      ")
@@ -733,7 +786,7 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace = False, compareByM
 
 #------ Public Helper Functions
 
-def addVariant(s, startOffset, sVariant, variantName = None, variantGroups = None, replacementDuration = None):
+def addVariant(s, startOffset, sVariant, variantName=None, variantGroups=None, replacementDuration=None):
     '''
     Takes a stream, the location of the variant to be added to that stream (startOffset), the content of the
     variant to be added (sVariant), and the duration of the section of the stream which the variant
@@ -830,10 +883,13 @@ def addVariant(s, startOffset, sVariant, variantName = None, variantGroups = Non
 def refineVariant(s, sVariant, inPlace = False):
     '''
     Given a stream and variant contained in that stream, returns a stream with that variant 'refined.'
+    
     It is refined in the sense that, (with the best estimates) measures which have been determined
-    to be related are merged within the measure. Suppose a four-bar phrase in a piece is a slightly
+    to be related are merged within the measure. 
+    
+    Suppose a four-bar phrase in a piece is a slightly
     different five-bar phrase in a variant. In the variant, every F# has been replaced by an F,
-    and the last bar is repeated. Given this streams, mergeVariantMeasureStreams would return
+    and the last bar is repeated. Given these streams, mergeVariantMeasureStreams would return
     the first stream with a single variant object containing the entire 5 bars of the variant.
     Calling refineVariant on this stream and that variant object would result in a variant object
     in the measures for each F#/F pair, and a variant object containing the added bar at the end.
