@@ -182,19 +182,20 @@ class LilypondConverter(object):
 
     def setupTools(self):
         LILYEXEC = self.findLilyExec()
-        command = LILYEXEC + ' --version'
-        proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
-        versionString = proc.stdout.readline()
-        if six.PY3:
-            versionString = versionString.decode(encoding='utf-8')     
+        command = [LILYEXEC, '--version']
         try:
-            versionString = versionString.split()[-1]
-            versionString = versionString.strip()
-            versionPieces = versionString.split('.')
-        except KeyboardInterrupt:
+            proc = subprocess.Popen(command, stdout=subprocess.PIPE)
+        except OSError:
             raise LilyTranslateException("Cannot find a copy of Lilypond installed on your system. " +
                                          "Please be sure it is installed. And that your " +
                                          "environment.UserSettings()['lilypondPath'] is set to find it.")
+        stdout, _ = proc.communicate()
+        if six.PY3:
+            stdout = stdout.decode(encoding='utf-8')
+        versionString = stdout.split('\n')[0]
+        versionString = versionString.split()[-1]
+        versionString = versionString.strip()
+        versionPieces = versionString.split('.')
         
         self.majorVersion = versionPieces[0]
         self.minorVersion = versionPieces[1]
