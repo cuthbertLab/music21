@@ -192,9 +192,7 @@ class LilypondConverter(object):
         stdout, _ = proc.communicate()
         if six.PY3:
             stdout = stdout.decode(encoding='utf-8')
-        versionString = stdout.split('\n')[0]
-        versionString = versionString.split()[-1]
-        versionString = versionString.strip()
+        versionString = stdout.split()[2]
         versionPieces = versionString.split('.')
         
         self.majorVersion = versionPieces[0]
