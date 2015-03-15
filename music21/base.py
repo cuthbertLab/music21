@@ -2763,7 +2763,6 @@ class Music21Object(object):
         defined as `paddingLeft` (for pickup measures, etc.), padding will be added to the
         native offset gathered from the object.
 
-
         >>> n = note.Note()
         >>> n.quarterLength = 2
         >>> m = stream.Measure()

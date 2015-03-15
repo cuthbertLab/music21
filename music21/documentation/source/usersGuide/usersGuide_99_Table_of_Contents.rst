@@ -38,7 +38,7 @@ topics will be linked and added as the topics are written:
 28. FreezeThaw
 29. Slurs
 30. Spanners
-31. Ossias, Variants, and musicDiff
+31. Ossias, Variants, and scoreDiff
 32. Dynamics
 33. Searching in and among Scores
 34. Voice leading

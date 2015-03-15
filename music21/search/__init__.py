@@ -434,8 +434,7 @@ def translateDiatonicStreamToString(inputStream, previousRest=False, previousTie
 def translateStreamToStringNoRhythm(inputStream):
     '''
     takes a stream of notesAndRests only and returns
-    a string for searching on.
-    
+    a string for searching on, using translateNoteToByte.
     
     >>> s = converter.parse("tinynotation: 4/4 c4 d e FF a' b-")
     >>> sn = s.flat.notesAndRests
@@ -470,15 +469,18 @@ def translateStreamToStringOnlyRhythm(inputStream):
   
 def translateNoteToByte(n):
     '''
-    takes a note.Note object and translates it to a single byte representation
+    takes a note.Note object and translates it to a single byte representation.
 
     currently returns the chr() for the note's midi number. or chr(127) for rests
     
     
     >>> n = note.Note("C4")
-    >>> search.translateNoteToByte(n)
+    >>> b = search.translateNoteToByte(n)
+    >>> b
     '<'
-    >>> ord(search.translateNoteToByte(n)) == n.midi
+    >>> ord(b) 
+    60
+    >>> ord(b) == n.midi
     True
 
     Chords are currently just searched on the first note (or treated as a rest if none)
@@ -493,13 +495,13 @@ def translateNoteToByte(n):
     else:
         return chr(n.midi)
 
-def translateNoteWithDurationToBytes(n):
+def translateNoteWithDurationToBytes(n, includeTieByte=True):
     '''
     takes a note.Note object and translates it to a three-byte representation.
     
     currently returns the chr() for the note's midi number. or chr(127) for rests
     followed by the log of the quarter length (fitted to 1-127, see formula below)
-    followed by 's', 'c', or 'e' if includetieByte is True and there is a tie
+    followed by 's', 'c', or 'e' if includeTieByte is True and there is a tie
 
     
     >>> n = note.Note("C4")
@@ -514,6 +516,11 @@ def translateNoteWithDurationToBytes(n):
     >>> trans = search.translateNoteWithDurationToBytes(n)
     >>> trans
     '<_e'
+
+    >>> trans = search.translateNoteWithDurationToBytes(n, includeTieByte=False)
+    >>> trans
+    '<_'
+
     
     '''
     firstByte = translateNoteToByte(n)
@@ -525,8 +532,10 @@ def translateNoteWithDurationToBytes(n):
     secondByte = chr(duration1to127)
     
     thirdByte = translateNoteTieToByte(n)
-    
-    return firstByte + secondByte + thirdByte
+    if includeTieByte is True:
+        return firstByte + secondByte + thirdByte
+    else:
+        return firstByte + secondByte
 
 def translateNoteTieToByte(n):
     '''

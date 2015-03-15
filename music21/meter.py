@@ -15,7 +15,7 @@
 as well as component objects for defining nested metrical structures,
 :class:`~music21.meter.MeterTerminal` and :class:`~music21.meter.MeterSequence` objects.
 '''
-
+import collections
 import copy
 import fractions
 import re
@@ -55,16 +55,19 @@ _meterSequenceAccentArchetypes = {}
 # level dictionary
 _meterSequenceDivisionOptions = {}
 
+MeterTerminalTuple = collections.namedtuple('MeterTerminalTuple', 'numerator denominator tempoIndication')
 
-def slashToFraction(value):
+def slashToTuple(value):
     '''
+    Returns a three-element MeterTerminalTuple of numerator, denominator, and optional
+    tempo indication.
 
-    >>> meter.slashToFraction('3/8')
-    (3, 8, None)
-    >>> meter.slashToFraction('7/32')
-    (7, 32, None)
-    >>> meter.slashToFraction('slow 6/8')
-    (6, 8, 'slow')
+    >>> meter.slashToTuple('3/8')
+    MeterTerminalTuple(numerator=3, denominator=8, tempoIndication=None)    
+    >>> meter.slashToTuple('7/32')
+    MeterTerminalTuple(numerator=7, denominator=32, tempoIndication=None)    
+    >>> meter.slashToTuple('slow 6/8')
+    MeterTerminalTuple(numerator=6, denominator=8, tempoIndication='slow')
     '''
     tempoIndication = None
     # split by numbers, include slash
@@ -81,9 +84,9 @@ def slashToFraction(value):
     if matches is not None:
         n = int(matches.group(1))
         d = int(matches.group(2))
-        return n, d, tempoIndication
+        return MeterTerminalTuple(n, d, tempoIndication)
     else:
-        environLocal.printDebug(['slashToFraction() cannot find two part fraction', value])
+        environLocal.printDebug(['slashToTuple() cannot find two part fraction', value])
         return None
 
 
@@ -102,12 +105,11 @@ def slashCompoundToFraction(value):
     value = value.strip() # rem whitespace
     value = value.split('+')
     for part in value:
-        m = slashToFraction(part)
+        m = slashToTuple(part)
         if m is None:
             pass
         else:
-            n, d, unused_tempoIndication = m
-            post.append((n, d))
+            post.append((m.numerator, m.denominator))
     return post
 
 
@@ -115,7 +117,7 @@ def slashMixedToFraction(valueSrc):
     '''
     Given a mixture if possible meter fraction representations, return a list
     of pairs. If originally given as a summed numerator; break into separate
-    fractions.
+    fractions and return True as the second element of the tuple
 
     >>> meter.slashMixedToFraction('3/8+2/8')
     ([(3, 8), (2, 8)], False)
@@ -145,11 +147,10 @@ def slashMixedToFraction(valueSrc):
     value = value.split('+')
     for part in value:
         if '/' in part:
-            fraction = slashToFraction(part)
-            if fraction is None:
+            tup = slashToTuple(part)
+            if tup is None:
                 raise TimeSignatureException('cannot create time signature from:', valueSrc)
-            n, d, unused_tempoIndication = fraction
-            pre.append([n, d])
+            pre.append([tup.numerator, tup.denominator])
         else: # its just a numerator
             try:
                 pre.append([int(part), None])
@@ -219,7 +220,8 @@ def fractionToSlashMixed(fList):
 
 def fractionSum(fList):
     '''
-    Given a list of fractions represented as a list, find the sum
+    Given a list of fractions represented as a list, 
+    find the sum; does NOT reduce to lowest terms.
 
     >>> meter.fractionSum([(3,8), (5,8), (1,8)])
     (9, 8)
@@ -229,29 +231,35 @@ def fractionSum(fList):
     (5, 4)
     >>> meter.fractionSum([(1,13), (2,17)])
     (43, 221)
-
+    >>> meter.fractionSum([])
+    (0, 1)
+    
+    This method might seem like an easy place to optimize and simplify
+    by just doing a fractions.Fraction() sum (I tried!), but not reducing to lowest
+    terms is a feature of this method. 3/8 + 3/8 = 6/8, not 3/4:
+    
+    >>> meter.fractionSum([(3,8), (3,8)])
+    (6, 8)
     '''
     nList = []
     dList = []
-    nListUnique = []
     dListUnique = []
 
     for n,d in fList:
         nList.append(n)
-        if n not in nListUnique:
-            nListUnique.append(n)
         dList.append(d)
         if d not in dListUnique:
             dListUnique.append(d)
 
     if len(dListUnique) == 1:
         n = sum(nList)
-        d = dList[0]
+        d = dListUnique[0]
+        # Does not reduce to lowest terms...
         return (n, d)
     else: # there might be a better way to do this
         d = 1
         d = common.lcm(dListUnique)
-        # after finding d, multuple each numerator
+        # after finding d, multiply each numerator
         nShift = []
         for i in range(len(nList)):
             nSrc = nList[i]
@@ -519,11 +527,10 @@ class MeterTerminal(SlottedObject):
         if slashNotation is not None:
             # assign directly to values, not properties, to avoid
             # calling _ratioChanged more than necessary
-            values = slashToFraction(slashNotation)
+            values = slashToTuple(slashNotation)
             if values is not None: # if failed to parse
-                n, d, unused_tempoIndication = values
-            self._numerator = n
-            self._denominator = d
+                self._numerator = values.numerator
+                self._denominator = values.denominator
         self._ratioChanged() # sets self._duration
 
         # this will call _setWeight property for data checking
@@ -2979,10 +2986,12 @@ class TimeSignature(base.Music21Object):
         self.displaySequence = MeterSequence(value)
         self.summedNumerator = self.displaySequence.summedNumerator
 
-        # get simple representation; presently, only slashToFraction
+        # get simple representation; presently, only slashToslashToTuple
         # supports the fast/slow indication
         if common.isStr(value):
-            unused_n, unused_d, tempoIndication = slashToFraction(value)
+            valTuplet = slashToTuple(value)
+            if valTuplet is not None:
+                tempoIndication = valTuplet.tempoIndication
         else:
             tempoIndication = None
 

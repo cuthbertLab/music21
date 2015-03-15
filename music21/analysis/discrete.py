@@ -45,7 +45,8 @@ class DiscreteAnalysisException(exceptions21.Music21Exception):
 class DiscreteAnalysis(object):
     ''' Parent class for analytical methods.
 
-    Each analytical method returns a discrete numerical (or other) results as well as a color. Colors can be used in mapping output.
+    Each analytical method returns a discrete numerical (or other) results as well as a color. 
+    Colors can be used in mapping output.
 
     Analytical methods may make use of a `referenceStream` to configure the processor on initialization. 
     '''
@@ -138,7 +139,8 @@ class DiscreteAnalysis(object):
         return None
     
     def solutionToColor(self, result):
-        '''Given a analysis specific result, return the appropriate color. Must be able to handle None in the case that there is no result.
+        '''Given a analysis specific result, return the appropriate color. 
+        Must be able to handle None in the case that there is no result.
         '''
         pass
     
