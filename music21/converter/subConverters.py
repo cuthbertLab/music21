@@ -15,6 +15,7 @@ parseData method that sets self.stream.
 '''
 #-------------------------------------------------------------------------------
 # Converters are associated classes; they are not subclasses, but most define a pareData() method, a parseFile() method, and a .stream attribute or property.
+import codecs
 import os
 import sys
 import unittest
@@ -190,7 +191,6 @@ class SubConverter(object):
                         f.write(dataStr)
                 except UnicodeEncodeError:
                     f.close()
-                    import codecs
                     f = codecs.open(fp, mode=writeFlags, encoding=self.stringEncoding)
                     f.write(dataStr)
                     f.close()
@@ -198,7 +198,6 @@ class SubConverter(object):
                 except TypeError as te:
                     raise SubConverterException("Could not convert %r : %r" % (dataStr, te))
         else:
-            import codecs
             f = codecs.open(fp, mode=writeFlags, encoding=self.stringEncoding)
             f.write(dataStr)
             f.close()
@@ -676,8 +675,20 @@ class ConverterMusicXML(SubConverter):
     
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):
         from music21.musicxml import m21ToString
+        ### hack to make musescore excerpts -- fix with a converter class in MusicXML
+        if subformats is not None and 'png' in subformats:
+            savedDefaultTitle = defaults.title
+            savedDefaultAuthor = defaults.author
+            defaults.title = ''
+            defaults.author = ''
+
         dataStr = m21ToString.fromMusic21Object(obj)
         fp = self.writeDataStream(fp, dataStr)
+
+        if subformats is not None and 'png' in subformats:
+            defaults.title = savedDefaultTitle
+            defaults.author = savedDefaultAuthor
+
         
         if subformats is not None and 'png' in subformats:
             fp = self.runThroughMusescore(fp, **keywords)

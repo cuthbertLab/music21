@@ -346,7 +346,14 @@ class TinyNotationNote(object):
 
 
     OMIT_FROM_DOCS
-
+    >>> tinyNotation.TinyNotationNote("c4").note.octave
+    4
+    >>> tinyNotation.TinyNotationNote("C4").note.octave
+    3
+    >>> tinyNotation.TinyNotationNote("CC4").note.octave
+    2
+    >>> tinyNotation.TinyNotationNote("CCC4").note.octave
+    1
     
     >>> tcn2 = tinyNotation.TinyNotationNote("c''##16").note
     >>> tcn2.accidental
@@ -368,7 +375,7 @@ class TinyNotationNote(object):
     
     '''
     regularExpressions = {  'REST'    : r'r',
-                            'OCTAVE2' : r'([A-G])+[A-G]',
+                            'OCTAVE2' : r'([A-G]+)[A-G]',
                             'OCTAVE3' : r'([A-G])',
                             'OCTAVE5' : r'([a-g])(\'+)', 
                             'OCTAVE4' : r'([a-g])',
@@ -568,7 +575,7 @@ class TinyNotationNote(object):
         
     def _getPitch(self, matchObj, octave):
         noteObj = note.Note()
-        noteObj.step = matchObj.group(1).upper()
+        noteObj.step = matchObj.group(1)[0].upper()
         noteObj.octave = octave
         return noteObj
 
