@@ -1596,9 +1596,21 @@ def staffGrpFromElement(elem, slurBundle=None):
     - MEI.midi: instrDef
     - MEI.shared: grpSym label staffGrp
     '''
-    queryStr = './/{http://www.music-encoding.org/ns/mei}staffDef'
-    return {sd.get('n'): staffDefFromElement(sd, slurBundle) for sd in elem.iterfind(queryStr)}
+    
+    staffDefTag = '{http://www.music-encoding.org/ns/mei}staffDef'
+    staffGroupTag = '{http://www.music-encoding.org/ns/mei}staffGrp'
+    
+    staffDefDict = {}
+    for el in elem.findall("*"):
+        # return all staff defs in this staff group
+        if el.tag == staffDefTag:
+            staffDefDict[el.get('n')] = staffDefFromElement(el, slurBundle)
 
+        # recurse if there are more groups, append to the working staffDefDict    
+        elif el.tag == staffGroupTag:
+            backDict = staffGrpFromElement(el, slurBundle).copy()
+            staffDefDict.update(backDict);
+    return staffDefDict
 
 def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     '''
