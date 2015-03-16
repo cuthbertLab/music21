@@ -77,7 +77,6 @@ class Volume(SlottedObject):
         elif velocityScalar is not None:
             self.velocityScalar = velocityScalar
         self._cachedRealized = None
-        #  replace with a property
         self.velocityIsRelative = velocityIsRelative
 
     ### SPECIAL METHODS ###
@@ -106,23 +105,12 @@ class Volume(SlottedObject):
 
     ### PUBLIC METHODS ###
 
-    def getContextByClass(self, className, sortByCreationTime=False,
-            getElementMethod='getElementAtOrBefore'):
-        '''Simulate get context by class method as found on parent NotRest object.
-        '''
-        p = self.parent # unwrap weak ref
-        if p is None:
-            raise VolumeException('cannot call getContextByClass because parent is None.')
-        # call on parent object
-        return p.getContextByClass(className, serialReverseSearch=True,
-            callerFirst=None, sortByCreationTime=sortByCreationTime, prioritizeActiveSite=True, getElementMethod=getElementMethod,
-            memo=None)
 
     def getDynamicContext(self):
         '''Return the dynamic context of this Volume, based on the position of the NotRest parent of this object.
         '''
         # TODO: find wedges and crescendi too
-        return self.getContextByClass('Dynamic')
+        return self.parent.getContextByClass('Dynamic')
 
     def mergeAttributes(self, other):
         '''Given another Volume object, gather all attributes except parent. Values are always copied, not passed by reference.
@@ -530,7 +518,7 @@ class Test(unittest.TestCase):
         s.insert(4, n1)
 
         # can get dynamics from volume object
-        self.assertEqual(v1.getContextByClass('Dynamic'), d2)
+        self.assertEqual(v1.parent.getContextByClass('Dynamic'), d2)
         self.assertEqual(v1.getDynamicContext(), d2)
 
 

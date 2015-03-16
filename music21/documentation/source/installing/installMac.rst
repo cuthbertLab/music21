@@ -35,8 +35,9 @@ it should display in Terminal something like the following:
 .. image:: images/macScreenPythonVersion.*
     :width: 650
 
-If it says 2.6 or 2.7 (possibly with a following number like
-2.7.1), you're okay.  If it says 2.4 or 2.5, go to http://www.python.org/download
+If it says 2.7 (possibly with a following number like
+2.7.1) or 3.3 or higher, you're okay.  If it says 2.4 or 2.5 or 2.6, 
+go to http://www.python.org/download
 and download a newer version.  Multiple versions of Python can exist 
 on a single computer without any problems.
 
@@ -47,14 +48,14 @@ Download music21
 Download the most-recent music21 package by getting the first .tar.gz file
 from the following URL. 
 
-    http://code.google.com/p/music21/downloads/list
+    https://github.com/cuthbertLab/music21/releases
 
 The newest version should be at the top.  ``Do not download`` the `-no-corpus`
 version of the file.
 
 Once it's downloaded, double-click the icon on your desktop named
-something like music21-1.3.0.tar.gz -- this will create a new directory
-on your desktop called something like "music21-1.3.0".  Look inside it.
+something like music21-2.0.0.tar.gz -- this will create a new directory
+on your desktop called something like "music21-2.0.0".  Look inside it.
 
 You will see the following files:
 
@@ -160,8 +161,8 @@ it says "[process terminated]".
 After Installation
 -------------------------------
 
-CONGRATS! You're done with installing.  You can delete the `music21-1.3.0.tar.gz` file
-and `music21-1.3.0` folder from your desktop now.  
+CONGRATS! You're done with installing.  You can delete the `music21-2.0.0.tar.gz` file
+and `music21-2.0.0` folder from your desktop now.  
 
 Open up the Mac Terminal (under Applications/Utilities/Terminal). You might want
 to drag it to the dock.  You'll use it often.

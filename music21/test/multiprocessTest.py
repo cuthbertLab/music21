@@ -66,6 +66,12 @@ class ModuleGather(object):
             'testDefault.py', 
             'testInstallation.py', 
             'testLint.py', 
+            'timeGraphImportStar.py',
+            'testSerialization.py',
+            'mptCurses.py',
+            'memoryUsage.py',
+            'dedent.py',
+            
             'testPerformance.py',
             'multiprocessTest.py',
             'timeGraphs.py',
@@ -84,9 +90,40 @@ class ModuleGather(object):
             'theoryAnalysis/wwnortonMGTA.py',
             'test/treeYield.py',
             'test/toggleDebug.py',
+            
+            'musicxml/testPrimitive.py',
+            'musicxml/testFiles.py',
+            'musedata/testPrimitive/test01/__init__.py',
+            'musedata/testPrimitive/__init__.py',
+            'mei/test_base.py',
+            'ipython21/ipyJSapp.py',
+            'humdrum/questions.py',
+            'humdrum/canonicalOutput.py',
+            'documentation/upload.py',
+            'documentation/source/conf.py',
+            'documentation/library/extensions.py',
+            'documentation/make.py',
+            'corpus/testCorpus.py',
+            'composition/seeger.py',
+            'composition/aug30.py',
+            'audioSearch/scores/__init__.py',
+            'audioSearch/scoreFollower.py',
+            'audioSearch/repetitionGame.py',
+            'audioSearch/omrfollow.py',
+            'audioSearch/humanVScomputer.py',
+            'audioSearch/graphicalInterfaceTranscriber.py',
+            'audioSearch/graphicalInterfaceSF.py',
+            'audioSearch/graphicalInterfaceGame.py',
+            'analysis/phrasing.py',
+            'abcFormat/testFiles.py',
             ]
         # skip any path that starts with this string
-        self.pathSkip = ['abj', 'obsolete', 'ext', 'server', 'demos']
+        self.pathSkip = ['obsolete', 'ext', 'server', 'demos']
+        self.slowModules = ['graph', 'figuredBass/realizer', 
+                            'features/jSymbolic', 'features/native', 'figuredBass/examples', 
+                            'braille/test', 'test/testStream', 'analysis/windowed', 
+                            'converter/__init__', 'metadata/bundles', 'musicxml/fromMxObjects',
+                            'romanText/translate', 'musicxml/m21ToString', 'theoryAnalysis/theoryAnalyzer']
         # search on init
         self._walk()
 
@@ -105,11 +142,24 @@ class ModuleGather(object):
         '''
         Get all the modules in reverse order, storing them in self.modulePaths
         '''
-        # the results of this are stored in self.curFiles, self.dirList
+        def manyCoreSortFunc(name):
+            '''
+            for many core systems, like the MacPro, running slowest modules first
+            helps there be fewer idle cores later 
+            '''
+            name = name[len(self.dirParent) + 1:]
+            name = name.replace('.py', '')
+            return (name in self.slowModules, name)
+        
+        # the results of this are stored in self.curFiles, self.dirList        
         for dirpath, unused_dirnames, filenames in os.walk(self.dirParent):
             self._visitFunc(None, dirpath, filenames)
-        self.modulePaths.sort()
+        if multiprocessing.cpu_count() > 4:# @UndefinedVariable
+            self.modulePaths.sort(key=manyCoreSortFunc)
+        else:
+            self.modulePaths.sort()
         self.modulePaths.reverse()
+        
 
     def _getName(self, fp):
         r'''
@@ -256,7 +306,7 @@ def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOu
     '''    
     
     timeStart = time.time()
-    poolSize = multiprocessing.cpu_count()
+    poolSize = multiprocessing.cpu_count() # @UndefinedVariable
     if poolSize > 2:
         poolSize = poolSize - leaveOut
     else:
@@ -270,7 +320,7 @@ def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOu
     maxTimeout = 200
     pathsToRun = modGather.modulePaths # [0:30]
 
-    pool = multiprocessing.Pool(processes=poolSize)
+    pool = multiprocessing.Pool(processes=poolSize) # @UndefinedVariable
     
     # imap returns the results as they are completed.  Since the number of files is small,
     # the overhead of returning is outweighed by the positive aspect of getting results immediately
@@ -293,7 +343,7 @@ def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOu
             timeouts = 0
             eventsProcessed += 1
             summaryOutput.append(newResult)
-        except multiprocessing.TimeoutError:
+        except multiprocessing.TimeoutError: # @UndefinedVariable
             timeouts += 1
             if timeouts == 5 and eventsProcessed > 0:
                 print("Delay in processing, seconds: ", end="")
@@ -349,7 +399,8 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
         elif moduleResponse.returnCode == 'ImportError':
             otherSummary.append("Import Error for %s" % moduleResponse.fp)
         elif moduleResponse.returnCode == 'NotInTree':
-            otherSummary.append("Not in Tree Error: %s " % moduleResponse.moduleName) 
+            if moduleResponse.moduleName == "":
+                otherSummary.append("Not in Tree Error: %s " % moduleResponse.moduleName) 
         elif moduleResponse.returnCode == 'TestsRun':
             totalTests += moduleResponse.testsRun
             if moduleResponse.success:
@@ -398,9 +449,12 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
     sys.stdout.flush()
     
     import datetime
-    with open(os.path.join(common.getSourceFilePath(), 'test', 'lastResults.txt'), 'w') as f:
+    lastResults = os.path.join(environLocal.getRootTempDir(), 'lastResults.txt')
+    with open(lastResults, 'w') as f:
         f.write(outStr)
         f.write("Run at " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    
+    print("Results at " + lastResults)
 
 if __name__ == '__main__':
     #mg = ModuleGather()

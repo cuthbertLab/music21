@@ -3,9 +3,10 @@
 __all__ = [
     'eschbeg',
     'monteverdi',
+    'gatherAccidentals',
     ]
 
-
+from music21.demos import gatherAccidentals
 
 
 #------------------------------------------------------------------------------

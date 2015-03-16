@@ -1041,7 +1041,7 @@ def transcribeSignatures(music21KeySignature, music21TimeSignature, outgoingKeyS
     ⠡⠡⠡
     """
     if music21TimeSignature is None and (music21KeySignature is None or (music21KeySignature.sharps == 0 and outgoingKeySig is None)):
-            raise BrailleBasicException("No key or time signature to transcribe!")
+        raise BrailleBasicException("No key or time signature to transcribe!")
     
     trans = []
     if not music21KeySignature is None:

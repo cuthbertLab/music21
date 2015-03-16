@@ -49,7 +49,7 @@ def fromObject(thisObject, mode='html', local=False):
     '21.stream.streamStatus.StreamStatus", "_enharmonics": null, "_dirty": null, "_concertPitch": null, "_accidenta' + 
     'ls": null, "_ties": null, "_rests": null, "_ornaments": null, "_client": null, "_beams": null, "_measures": nu' + 
     ...
-    'd": null}, "definesExplicitSystemBreaks": false, "_idLastDeepCopyOf": ...}}';
+    'd": null}, "definesExplicitSystemBreaks": false, ...}}';
                 var jpc = new music21.fromPython.Converter();
                 streamObj = jpc.run(pickleIn);
                 streamObj.renderOptions.events.resize = "reflow";
@@ -116,7 +116,7 @@ class VexflowPickler(object):
         
     def splitLongJSON(self, jsonString, chunkSize=110):
         allJSONList = []
-        for i in xrange(0, len(jsonString), chunkSize):
+        for i in range(0, len(jsonString), chunkSize):
             allJSONList.append('\'' + jsonString[i:i+chunkSize] + '\'')
         return ' + \n    '.join(allJSONList)
     

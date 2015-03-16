@@ -216,7 +216,7 @@ create and print a :class:`~music21.serial.TwelveToneMatrix` object.
 
 ::
 
-    >>> aMatrix = aRow.matrix()
+    >>> p
     >>> print(aMatrix)
     0  3  7  B  2  5  9  1  4  6  8  A
     9  0  4  8  B  2  6  A  1  3  5  7

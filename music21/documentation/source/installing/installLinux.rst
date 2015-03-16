@@ -16,7 +16,7 @@ or setuptools, you should read :ref:`installAdvanced`.
 Check Your Version of Python
 ----------------------------------------------
 
-Music21 requires Python 2.6 to run. Python 2.7 is better. Python 3 is not yet supported. 
+Music21 requires Python 2.7 or Python 3.3+.
 
 To determine the Python version you have installed, open a shell 
 or terminal and enter the following command-line argument (where "$" is the prompt):
@@ -25,7 +25,7 @@ or terminal and enter the following command-line argument (where "$" is the prom
 
 it should display something like:
 
-    Python 2.6.2
+    Python 3.4.1
 
 if so, you're okay.  If not, go to http://www.python.org/download
 and download a newer version.  Multiple versions of Python can exist 
@@ -37,7 +37,7 @@ Download music21
 
 Download the most-recent music21 package from the following URL. 
 
-    http://code.google.com/p/music21/downloads/list
+    https://github.com/cuthbertLab/music21/releases
 
 Linux users should download the .tar.gz file. 
 
@@ -55,7 +55,8 @@ Open a shell or terminal, enter the outer-most music21 directory, and use `pytho
     $ cd /path/to/dir/music21-version
     $ python setup.py install
 
-You may need special  permission to write in the Python site-packages directory. An  easy way to temporarily gain this permission is to use the 
+You may need special  permission to write in the Python site-packages directory. 
+An easy way to temporarily gain this permission is to use the 
 `sudo` command. If the above returns a permissions error, 
 try the following: ::
 

@@ -116,7 +116,32 @@ class NWCConverter(object):
         self.parsePosition = 0
         self.version = 200
         self.numberOfStaves = 0
+        self.titlePageInfo = 0
+        self.pageNumberStart = 0
         self.staves = []
+        self.comment = None
+        self.fonts = []
+        self.lyricist = None
+        self.groupVisibility = None
+        self.allowLayering = None
+        self.margins = None
+        self.notationTypeface = None
+        self.extendLastSystem = None
+        self.copyright1 = None
+        self.copyright2 = None
+        self.increaseNoteSpacing = None
+        self.author = None
+        self.title = None
+        self.measureStart = None
+        self.measureNumbers = None
+        self.mirrorMargins = None
+        self.staffLables = None
+        self.sins = None
+        self.user = None
+        self.staffHeight = 0
+        
+        
+        
     
     def parseFile(self, fp = None):
         r'''
@@ -354,7 +379,7 @@ class NWCConverter(object):
             # split by space
         else:
             self.margins = "0.0 0.0 0.0 0.0"
-        self.mirrorMargins = self.readToNUL()
+        self.sins = self.readToNUL()
         unused = self.readToNUL()
         if self.version >= 130:
             self.groupVisibility = self.readToNUL()
@@ -422,6 +447,22 @@ class NWCStaff(object):
         self.parent = parent
         self.lyrics = []
         self.objects = []
+        self.instrumentName = None
+        self.group = None
+        self.layerWithNextStaff = None
+        self.transposition = None
+        self.partVolume = None
+        self.stereoPan = None
+        self.color = 0
+        self.alignSyllable = None
+        self.numberOfLyrics = 0
+        self.numberOfObjects = 0
+        self.lines = 0
+        self.name = None
+        self.staffOffset = 0
+        self.label = None
+        self.lyricAlignment = 0
+        
     
     def parse(self):
         #environLocal.warn([self.parent.parsePosition, self.objects])
@@ -557,6 +598,46 @@ class NWCObject(object):
     def __init__(self, staffParent = None, parserParent = None):
         self.staffParent = staffParent
         self.parserParent = parserParent
+        self.type = None
+        self.placement = 0
+        self.pos = 0
+        self.style = 0
+        self.localRepeatCount = 0
+        self.data = 0
+        self.data1 = None
+        self.data2 = None
+        self.data3 = None
+        self.delay = 0
+        self.clefType = 0
+        self.offset = 0
+        self.visible = 0
+        self.duration = 0
+        self.durationStr = None
+        self.font = 0
+        self.sharps = 0
+        self.octaveShift = 0
+        self.octaveShiftName = None
+        self.clefName = None
+        self.attribute1 = None
+        self.attribute2 = 0
+        self.stemLength = 0
+        self.dots = 0
+        self.bits = 0
+        self.denominator = 0
+        self.tieInfo = ""
+        self.volume = 0
+        self.base = 0
+        self.velocity = 0
+        self.count = 0
+        self.name = None
+        self.value = 0
+        self.flats = 0
+        self.keyString = ""
+        self.numerator = 0
+        self.alterationStr = ""
+        self.dotAttribute = None
+        self.text = None
+
         
         def genericDumpMethod(self):
             return ""
@@ -568,7 +649,7 @@ class NWCObject(object):
         determine what type of object I am, and set things accordingly
         '''
         p = self.parserParent
-        objectType = p.readLEShort()
+        objectType = p.readLEShort() # a number -- an index in the objMethods list
         if objectType >= len(self.objMethods):
             raise NoteworthyBinaryTranslateException("Cannot translate objectType: %d; max is %d" % (objectType, len(self.objMethods) ))
         if p.version >= 170:
@@ -919,7 +1000,7 @@ class NWCObject(object):
             self.placement = 0
         self.style = p.byteToInt()
 
-    def text(self):
+    def textObj(self):
         p = self.parserParent
         self.type = 'Text'
         self.pos = p.byteToInt()
@@ -935,7 +1016,7 @@ class NWCObject(object):
 
     objMethods = [clef, keySig, barline, ending, instrument, timeSig, tempo,
                   dynamic, note, rest, noteChordMember, pedal, flowDir, mpc,
-                  tempoVariation, dynamicVariation, performance, text, restChordMember]
+                  tempoVariation, dynamicVariation, performance, textObj, restChordMember]
 
 if __name__ == '__main__':
     import music21

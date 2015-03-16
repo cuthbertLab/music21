@@ -1932,23 +1932,25 @@ def midiAsciiStringToBinaryString(midiFormat = 1, ticksPerQuarterNote = 960, tra
     Convert Ascii midi data to a binary midi string.
     
     tracksEventsList contains a list of tracks which contain also a list of events.
+    
         asciiMidiEventList = ['0 90 27 66', '0 90 3e 60', '3840 80 27 00', '0 80 3e 00']
-    The format of one event is : 'aa bb cc dd'
+    
+    The format of one event is : 'aa bb cc dd'::
+    
         aa = delta time to last event (integer)
         bb = Midi event type
         cc = Note number (hex)
         dd = Velocity (integer)
+
     Example:
     
-    ::
-    
-        >>> asciiMidiEventList = []
-        >>> asciiMidiEventList.append('0 90 31 15')
-        >>> midiTrack = []
-        >>> midiTrack.append(asciiMidiEventList)
-        >>> midiBinStr = midi.translate.midiAsciiStringToBinaryString(tracksEventsList = midiTrack)
-        >>> midiBinStr
-        b'MThd\x00\x00\x00\x06\x00\x01\x00\x01\x03\xc0MTrk\x00\x00\x00\x04\x00\x901\x0f'
+    >>> asciiMidiEventList = []
+    >>> asciiMidiEventList.append('0 90 31 15')
+    >>> midiTrack = []
+    >>> midiTrack.append(asciiMidiEventList)
+    >>> midiBinStr = midi.translate.midiAsciiStringToBinaryString(tracksEventsList = midiTrack)
+    >>> midiBinStr
+    b'MThd\x00\x00\x00\x06\x00\x01\x00\x01\x03\xc0MTrk\x00\x00\x00\x04\x00\x901\x0f'
     '''
     from music21 import midi as midiModule
     mf = midiModule.MidiFile()
@@ -2555,6 +2557,8 @@ class Test(unittest.TestCase):
         for fp in directory:
             if fp.endswith('midi'):
                 break
+        else:
+            fp = None
         dirLib = os.path.join(fp, 'testPrimitive')
         # a simple file created in athenacl
         fp = os.path.join(dirLib, 'test10.mid')        
@@ -2587,6 +2591,8 @@ class Test(unittest.TestCase):
         for fp in directory:
             if fp.endswith('midi'):
                 break
+        else:
+            fp = None
         dirLib = os.path.join(fp, 'testPrimitive')
         # a file with three tracks and one conductor track
         fp = os.path.join(dirLib, 'test11.mid')        
@@ -2723,6 +2729,8 @@ class Test(unittest.TestCase):
         for fp in directory:
             if fp.endswith('midi'):
                 break
+        else:
+            fp = None
         dirLib = os.path.join(fp, 'testPrimitive')
         # a simple file created in athenacl
         fp = os.path.join(dirLib, 'test12.mid')
@@ -2747,6 +2755,8 @@ class Test(unittest.TestCase):
         for fp in directory:
             if fp.endswith('midi'):
                 break
+        else:
+            fp = None
         fpMidi = fp
         fp = os.path.join(fpMidi, 'testPrimitive', 'test13.mid')
         s = converter.parse(fp)
@@ -2768,6 +2778,8 @@ class Test(unittest.TestCase):
         for fp in directory:
             if fp.endswith('midi'):
                 break
+        else:
+            fp = None
         dirLib = os.path.join(fp, 'testPrimitive')
         # a simple file created in athenacl
         fp = os.path.join(dirLib, 'test05.mid')        

@@ -429,7 +429,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(midStream.flat), 24)
 #        self.assertEqual(len(midStream.getOverlaps()), 0)
         mfs = midStream.flat.sorted
-        self.assertEqual(mfs[7].sites.getOffsetBySite(mfs), 11.0)
+        self.assertEqual(mfs[7].getOffsetBySite(mfs), 11.0)
 
         farStream = Stream()
         for x in range(7):
@@ -763,7 +763,7 @@ class Test(unittest.TestCase):
 
     def testGetInstrumentManual(self):
         from music21 import defaults
-
+        
         #import pdb; pdb.set_trace()
         # search activeSite from a measure within
 
@@ -1134,7 +1134,16 @@ class Test(unittest.TestCase):
         from music21 import corpus, converter
         from music21.musicxml import testPrimitive
 
+        # This score has 4 parts, each with eight measures, and 2 half-notes
+        # per measure, equaling 16 half notes, but with differing tie type.
+        
+        # 1: .  .~|~.  .~|~.~~.~|~.  .~|~.  .~|~.~~. | .~~.~|~.~~. ||
+        # 2: .~~.~|~.~~. | .~~.~|~.~~. | .~~.~|~.~~. | .~~.~|~.  . ||
+        # 3: .~~.~|~.  .~|~.~~. | .~~.~|~.~~.~|~.~~.~|~.~~.~|~.~~. ||
+        # 4: .  . | .~~. | .  .~|~.~~. | .  .~|~.  .~|~.  .~|~.  . ||
+
         s = converter.parse(testPrimitive.multiMeasureTies)
+        
         self.assertEqual(len(s.parts), 4)
 
         self.assertEqual(len(s.parts[0].flat.notesAndRests), 16)
@@ -1353,7 +1362,8 @@ class Test(unittest.TestCase):
         from music21 import corpus, stream
         
         a = corpus.parse('bach/bwv4.8.xml')
-        # alto line syncopated/tied notes accross bars
+        # alto line syncopated/tied notes across bars
+        #a.show()
         alto = a.parts[1]
         self.assertEqual(len(alto.flat.notesAndRests), 73)
         
@@ -1455,6 +1465,7 @@ class Test(unittest.TestCase):
     def testMusicXMLGenerationViaPropertyC(self):
         '''Test output tests above just by calling the musicxml attribute
         '''
+        
         a = ['c', 'g#', 'd-', 'f#', 'e', 'f' ] * 4
 
         s = Stream()
@@ -1510,9 +1521,9 @@ class Test(unittest.TestCase):
         post = s3.getClefs()[0]
         self.assertEqual(isinstance(post, clef.TrebleClef), True)
 
-        # s1 has both stream as contexts
-        self.assertEqual(s1.hasContext(s3), True)
-        self.assertEqual(s1.hasContext(s2), True)
+        # s1 has both streams as sites
+        self.assertEqual(s1.hasSite(s3), True)
+        self.assertEqual(s1.hasSite(s2), True)
 
         # but if we search s1, shuold not it find an alto clef?
         post = s1.getClefs()
@@ -1567,12 +1578,12 @@ class Test(unittest.TestCase):
         sInnerFlat.id = 'sInnerFlat'
 
 #         # but it has sOuter has a context
-#         self.assertEqual(sInnerFlat.hasContext(sOuter), True)
+#         self.assertEqual(sInnerFlat.hasSite(sOuter), True)
 #         #environLocal.printDebug(['sites.get() of sInnerFlat', sInnerFlat.sites.get()])
 #         #environLocal.printDebug(['sites.siteDict of sInnerFlat', sInnerFlat.sites.siteDict])
 # 
 # 
-#         self.assertEqual(sInnerFlat.hasContext(sOuter), True)
+#         self.assertEqual(sInnerFlat.hasSite(sOuter), True)
 # 
 #         # this returns the proper dictionary entry
 #         #environLocal.printDebug(
@@ -1656,44 +1667,44 @@ class Test(unittest.TestCase):
         
         self.assertEqual(s1.activeSite, sOuter)
 
-        sOuter.insert(0, clef.AltoClef())
+        ac = clef.AltoClef()
+        ac.priority = -1
+        sOuter.insert(0, ac)
         # both output parts have alto clefs
-        #s3.show()
-
         # get clef form higher level stream; only option
         self.assertEqual(s1.activeSite, sOuter)
         post = s1.getClefs()[0]
         
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef))
         self.assertEqual(s1.activeSite, sOuter)
 
         post = s2.getClefs()[0]
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef))
         
         # now we in sort a clef in s2; s2 will get this clef first
         s2.insert(0, clef.TenorClef())
         # only second part should have tenor clef
         post = s2.getClefs()[0]
-        self.assertEqual(isinstance(post, clef.TenorClef), True)
+        self.assertTrue(isinstance(post, clef.TenorClef))
 
         # but stream s1 should get the alto clef still
-        #print list(s1.yieldSiteSearchOrder())
+        #print list(s1.contextSites())
         post = s1.getContextByClass('Clef')
         #print post
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef))
 
         # s2 flat gets the tenor clef; it was inserted in it
         post = s2.flat.getClefs()[0]
-        self.assertEqual(isinstance(post, clef.TenorClef), True)
+        self.assertTrue(isinstance(post, clef.TenorClef))
 
         # a copy copies the clef; so we still get the same clef
         s2FlatCopy = copy.deepcopy(s2.flat)
         post = s2FlatCopy.getClefs()[0]
-        self.assertEqual(isinstance(post, clef.TenorClef), True)
+        self.assertTrue(isinstance(post, clef.TenorClef))
 
         # s1 flat will get the alto clef; it still has a pathway
         post = s1.flat.getClefs()[0]
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef))
 
         # once we create a deepcopy of s1, it is no longer connected to 
         # its parent if we purge orphans and it is not in sOuter
@@ -1703,18 +1714,22 @@ class Test(unittest.TestCase):
         s1FlatCopy.id = 's1FlatCopy'
         self.assertEqual(len(s1FlatCopy.getClefs(returnDefault=False)), 1)
         post = s1FlatCopy.getClefs(returnDefault=False)[0]
-        self.assertEqual(isinstance(post, clef.AltoClef), True, "post %r is not an AltoClef" % post)
+        self.assertTrue(isinstance(post, clef.AltoClef), "post %r is not an AltoClef" % post)
 
         post = s1Flat.getClefs()[0]
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef), post)
         #environLocal.printDebug(['s1.activeSite', s1.activeSite])
-        self.assertEqual(sOuter in s1.sites.getSites(), True)
+        self.assertTrue(sOuter in s1.sites.getSites())
         s1Measures = s1.makeMeasures()
         #print s1Measures[0].clef
-        self.assertEqual(isinstance(s1Measures[0].clef, clef.AltoClef), True)
+        
+        # this used to be True, but I think it's better as False now...
+        #self.assertTrue(isinstance(s1Measures[0].clef, clef.AltoClef), s1Measures[0].clef)
+        self.assertTrue(isinstance(s1Measures[0].clef, clef.TrebleClef), s1Measures[0].clef)
+
 
         s2Measures = s2.makeMeasures()
-        self.assertEqual(isinstance(s2Measures[0].clef, clef.TenorClef), True)
+        self.assertTrue(isinstance(s2Measures[0].clef, clef.TenorClef))
 
 
         # try making a deep copy of s3
@@ -2774,14 +2789,13 @@ class Test(unittest.TestCase):
         '''Extract phrases from the corpus and use for testing 
         '''
         from music21 import corpus
-
         # first method: iterating through notes
         src = corpus.parse('bach/bwv324.xml')
         # get some measures of the soprano; just get the notes
         #environLocal.printDebug(['testAugmentOrDiminishCorpus()', 'extracting notes:'])
         ex = src.parts[0].flat.notesAndRests[0:30]
         # attach a couple of transformations
-        s = Stream()
+        s = Score()
         for scalar in [.5, 1.5, 2, .25]:
             #n = note.Note()
             part = Part()
@@ -2790,7 +2804,6 @@ class Test(unittest.TestCase):
                 part.append(n)
             s.insert(0, part)
         junkTest = toMxObjects.streamToMx(s)
-        #s.show()
     
         # second method: getting flattened stream
         src = corpus.parse('bach/bwv323.xml')
@@ -2821,7 +2834,7 @@ class Test(unittest.TestCase):
 
 # temporarily commented out
 #         m.shiftElementsAsAnacrusis()
-#         self.assertEqual(m.notesAndRests[0].hasContext(m), True)
+#         self.assertEqual(m.notesAndRests[0].hasSite(m), True)
 #         self.assertEqual(m.notesAndRests[0].offset, 2.0)
 #         # now the duration is full
 #         self.assertAlmostEqual(m.barDurationProportion(), 1.0, 4)
@@ -3152,7 +3165,7 @@ class Test(unittest.TestCase):
         #environLocal.printDebug(['upward, with skipDuplicates:'])
         match = []
         # must provide empty list for memo
-        for x in s7._yieldElementsUpward([], streamsOnly=True, skipDuplicates=True):
+        for x in s7._yieldReverseUpwardsSearch([], streamsOnly=True, skipDuplicates=True):
             match.append(x.id)
             #environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         self.assertEqual(match, ['3c', '2a', '1a', '2b', '2c', '3a', '3b'] )
@@ -3160,7 +3173,7 @@ class Test(unittest.TestCase):
 
         #environLocal.printDebug(['upward from a single node, with skipDuplicates'])
         match = []
-        for x in s10._yieldElementsUpward([], streamsOnly=True):
+        for x in s10._yieldReverseUpwardsSearch([], streamsOnly=True):
             match.append(x.id)
             #environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
 
@@ -3169,7 +3182,7 @@ class Test(unittest.TestCase):
 
         #environLocal.printDebug(['upward with skipDuplicates=False:'])
         match = []
-        for x in s10._yieldElementsUpward([], streamsOnly=True, skipDuplicates=False):
+        for x in s10._yieldReverseUpwardsSearch([], streamsOnly=True, skipDuplicates=False):
             match.append(x.id)
             #environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         self.assertEqual(match, ['3f', '2c', '1a', '2a', '1a', '2b', '1a'] )
@@ -3178,7 +3191,7 @@ class Test(unittest.TestCase):
         #environLocal.printDebug(['upward, with skipDuplicates, streamsOnly=False:'])
         match = []
         # must provide empty list for memo
-        for x in s8._yieldElementsUpward([], streamsOnly=False, 
+        for x in s8._yieldReverseUpwardsSearch([], streamsOnly=False, 
             skipDuplicates=True):
             match.append(x.id)
             environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
@@ -3188,7 +3201,7 @@ class Test(unittest.TestCase):
         #environLocal.printDebug(['upward, with skipDuplicates, streamsOnly=False:'])
         match = []
         # must provide empty list for memo
-        for x in s4._yieldElementsUpward([], streamsOnly=False, 
+        for x in s4._yieldReverseUpwardsSearch([], streamsOnly=False, 
             skipDuplicates=True):
             match.append(x.id)
             #environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
@@ -3722,6 +3735,7 @@ class Test(unittest.TestCase):
         '''Test makeNotation on Score objects
         '''
         from music21 import stream
+        
         s = stream.Score()
         p1 = stream.Stream()
         p2 = stream.Stream()
@@ -3749,6 +3763,7 @@ class Test(unittest.TestCase):
     def testMakeNotationScoreB(self):
         '''Test makeNotation on Score objects
         '''
+        
         from music21 import stream
         s = stream.Score()
         p1 = stream.Stream()
@@ -4583,6 +4598,17 @@ class Test(unittest.TestCase):
         #s.flat.makeChords().show()
         #s.show()
 
+
+    def testSliceAtOffsetsSimple(self):
+        s = Stream()
+        n = note.Note()
+        n.quarterLength = 4
+        s.append(n)
+        unused_post = s.sliceAtOffsets([1, 2, 3], inPlace=True)
+        a = [(e.offset, e.quarterLength) for e in s]
+        b = [(0.0, 1.0), (1.0, 1.0), (2.0, 1.0), (3.0, 1.0)]
+        self.assertEqual(a, b)
+        
 
     def testSliceAtOffsetsBuilt(self):
 
@@ -5504,7 +5530,7 @@ class Test(unittest.TestCase):
         self.assertEqual(p1FlatNotes.derivation.origin is p1Flat, True)
         self.assertEqual(p1FlatNotes.derivation.origin is p1, False)
         
-        self.assertEqual(p1FlatNotes.derivation.derivationChain, [p1Flat, p1])
+        self.assertEqual(list(p1FlatNotes.derivation.chain()), [p1Flat, p1])
 
 
         # we cannot do this, as each call to flat produces a new Stream
@@ -5526,7 +5552,7 @@ class Test(unittest.TestCase):
             'Measure')[3], True)
 
         m4 = p1.measure(4)
-        self.assertTrue(m4.flat.notesAndRests.derivation.rootDerivation is p1)
+        self.assertTrue(m4.flat.notesAndRests.derivation.rootDerivation is m4, list(m4.flat.notesAndRests.derivation.chain()))
         
         # part is the root derivation of a measures() call
         mRange = p1.measures(4, 6)
@@ -5555,7 +5581,8 @@ class Test(unittest.TestCase):
         self.assertEqual(s1Flat._derivation.client is s1Flat, True)
 
         s2  = copy.deepcopy(s1Flat)
-        self.assertEqual(s2.derivation.origin is s1, True)
+        self.assertEqual(s2.derivation.origin is s1Flat, True)
+        self.assertEqual(s2.derivation.origin.derivation.origin is s1, True)
         # check low level attrbiutes
         self.assertEqual(s2._derivation.client is s2, True)
 
@@ -5569,12 +5596,10 @@ class Test(unittest.TestCase):
         pMeasures = p1.measures(3, 10)
         pMeasuresFlat = pMeasures.flat
         pMeasuresFlatNotes = pMeasuresFlat.notesAndRests
-        self.assertEqual(pMeasuresFlatNotes.derivation.derivationChain, [pMeasuresFlat, pMeasures, p1])
-
+        self.assertEqual(list(pMeasuresFlatNotes.derivation.chain()), [pMeasuresFlat, pMeasures, p1])
 
 
     def testDerivationMethodA(self):
-        
         from music21 import stream, converter
         s1 = stream.Stream()
         s1.repeatAppend(note.Note(), 10)
@@ -5590,24 +5615,21 @@ class Test(unittest.TestCase):
         s1m = s1.makeMeasures()
         self.assertEqual(s1m.derivation.method, 'makeMeasures')
         s1m1 = s1m.measure(1)
-        self.assertEqual(s1m1.derivation.origin is s1m, True)
-        self.assertEqual(s1m1.derivation.method, 'measure')
-        s1m1.derivation.method = 'getElementsByClass' 
-        self.assertEqual(s1m1.derivation.method, 'getElementsByClass')
+        self.assertEqual(s1m1.derivation.origin, None)
 
 
-    def testDerivationHierarchyA(self):
+    def testcontainerHierarchyA(self):
         from music21 import corpus
         s = corpus.parse('bach/bwv66.6')
         # the part is not derived from anything yet
-        self.assertEqual([str(e.__class__) for e in s[1][2][3].derivationHierarchy], ["<class 'music21.stream.Measure'>", "<class 'music21.stream.Part'>", "<class 'music21.stream.Score'>"])
+        self.assertEqual([str(e.__class__) for e in s[1][2][3].containerHierarchy], ["<class 'music21.stream.Measure'>", "<class 'music21.stream.Part'>", "<class 'music21.stream.Score'>"])
         
         # after extraction and changing activeSite, cannot find
         n = s.flat.notesAndRests[0]
-        self.assertEqual([common.classToClassStr(e.__class__) for e in n.derivationHierarchy], ['Score', 'Score']  )
+        self.assertEqual([common.classToClassStr(e.__class__) for e in n.containerHierarchy], ['Score', 'Score']  )
         
         # still cannot get hierarchy
-        #self.assertEqual([str(e.__class__) for e in s.parts[0].derivationHierarchy], [])
+        #self.assertEqual([str(e.__class__) for e in s.parts[0].containerHierarchy], [])
 
 
     def testMakeMeasuresTimeSignatures(self):
@@ -7424,11 +7446,7 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     import music21
     #'testContextNestedC'
-    #'testContextNestedD'
-    #import sys
-    #sys.argv.append('testMakeNotationByMeasuresA')
-    music21.mainTest(Test)
-
+    music21.mainTest(Test, 'verbose')
 
 #------------------------------------------------------------------------------
 # eof

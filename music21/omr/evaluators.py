@@ -39,6 +39,7 @@ class OmrGroundTruthPair(object):
     '''
     def __init__(self, omr=None, ground=None):
         self._overriddenDebug = None
+        self.numberOfDifferences = None
         if hasattr(omr, 'filePath'):        
             self.omrPath = omr.filePath
             self.omrM21Score = omr
@@ -142,8 +143,11 @@ class OmrGroundTruthPair(object):
         '''
         define the substitution cost for x and y (2)
         '''
-        if x == y: return 0
-        else: return 2
+        if x == y: 
+            return 0
+        else: 
+            return 2
+        
     def insertCost(self, x):
         '''
         define the insert cost for x and y (1)
@@ -369,18 +373,15 @@ def autoCorrelationBestMeasure(inputScore):
     return (totalMeasures, totalMatches)
   
 if __name__ == '__main__':
-    #import music21
-    #music21.mainTest()
-    
+    import music21
+    music21.mainTest()
 
-    omrFilePath = '/Users/cuthbert/Desktop/SchubertOMR.xml'
-    groundTruthFilePath = '/Users/cuthbert/Dropbox/Vladimir_Myke/schubert unvoll all_fixed.xml'
-    
-    omrFilePath = correctors.K525omrFilePath
-    groundTruthFilePath = correctors.K525groundTruthFilePath
-    evaluateCorrectingModel(omrFilePath, groundTruthFilePath, debug = True)
-
-    omr.evalutators.evaluateCorrectingModel(     # @UndefinedVariable
-         omrFilePath, groundTruthFilePath)
-
-
+#     omrFilePath = '/Users/cuthbert/Desktop/SchubertOMR.xml'
+#     groundTruthFilePath = '/Users/cuthbert/Dropbox/Vladimir_Myke/schubert unvoll all_fixed.xml'
+#     
+#     omrFilePath = correctors.K525omrFilePath
+#     groundTruthFilePath = correctors.K525groundTruthFilePath
+#     evaluateCorrectingModel(omrFilePath, groundTruthFilePath, debug = True)
+# 
+#     evaluateCorrectingModel(     # @UndefinedVariable
+#          omrFilePath, groundTruthFilePath)

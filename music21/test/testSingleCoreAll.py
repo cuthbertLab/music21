@@ -33,7 +33,24 @@ environLocal = environment.Environment(_MOD)
 if six.PY2:
     try:
         import coverage
-        cov = coverage.coverage(omit=['*/ext/*'])
+        cov = coverage.coverage(omit=[
+            '*/ext/*',
+            'dist/dist.py',
+            'installer.py',
+            '*/documentation/upload.py',
+            '*/documentation/make.py',
+#            '*/test/*',
+#            '*/demos/*',  # maybe remove someday...
+            'music21/configure.py',
+            '*/figuredBass/examples.py',
+            '*/trecento/tonality.py'
+            ])
+        exclude_lines=[
+            '\s*import music21\s*',
+            '\s*music21.mainTest\(\)\s*',
+            ]
+        for e in exclude_lines:
+            cov.exclude(e, which='exclude')
         cov.start()
     except ImportError:
         cov = None
@@ -67,7 +84,7 @@ class ModuleGather(object):
             'timeGraphs.py',
             'exceldiff.py', 
             'multiprocessTest.py',
-            'figuredBass' + os.sep + 'examples.py',
+            'figuredBass' + os.sep + 'examples.py', # 40 seconds and runs fine
             'trecento' + os.sep + 'tonality.py'
             ]
         # skip any path that contains this string
@@ -263,7 +280,7 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False, limit=None):
 #-------------------------------------------------------------------------------
 if __name__ == '__main__':
     try:
-        reload(sys)
+        reload(sys) # @UndefinedVariable
         sys.setdefaultencoding("UTF-8") # @UndefinedVariable
     except:
         pass # no need in Python3

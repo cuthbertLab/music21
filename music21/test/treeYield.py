@@ -10,6 +10,9 @@
 # License:      CC-BY (see http://stackoverflow.com/questions/12611337/recursively-dir-a-python-object-to-find-values-of-a-certain-type-or-with-a-cer)
 #-------------------------------------------------------------------------------
 import types
+import sys
+if sys.version_info[0] >= 3:
+    unicode = str
 
 class TreeYielder(object):
     def __init__(self, yieldValue = None):
@@ -21,9 +24,8 @@ class TreeYielder(object):
         self.currentStack = []
         self.yieldValue = yieldValue
         self.stackVals = []
-        t = types
-        self.nonIterables = [t.IntType, t.StringType, t.UnicodeType, t.LongType,
-                             t.FloatType, t.NoneType, t.BooleanType]
+        self.nonIterables = [int, str, unicode, # t.LongType,
+                             float, type(None), bool]
 
     def run(self, obj, memo = None):
         '''
@@ -56,7 +58,7 @@ class TreeYielder(object):
         tObj = type(obj)
         if tObj in self.nonIterables:
             pass
-        elif tObj == types.DictType:
+        elif tObj == dict:
             for keyX in obj:
                 dictTuple = ('dict', keyX)
                 self.stackVals.append(dictTuple)
@@ -65,7 +67,7 @@ class TreeYielder(object):
                     yield z
                 self.stackVals.pop()
 
-        elif tObj in [types.ListType, types.TupleType]:
+        elif tObj in [list, tuple]:
             for i,x in enumerate(obj):
                 listTuple = ('listLike', i)
                 self.stackVals.append(listTuple)
@@ -137,19 +139,30 @@ def testCode():
         print(val, ty.currentLevel())
 
 def testMIDIParse():
-    from music21 import converter, corpus
+    from music21 import converter, corpus, common
     from music21 import freezeThaw
 
     #a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
     #c = converter.parse(a)
-    c = corpus.parse('bwv66.6', forceSource=True)
+#     c = corpus.parse('bwv66.6', forceSource=True)
+#     v = freezeThaw.StreamFreezer(c)
+#     v.setupSerializationScaffold()
+#     return v.writeStr() # returns a string
+    import os
+    a = os.path.join(common.getSourceFilePath(),
+                     'midi',
+                     'testPrimitive',
+                     'test03.mid')
+
+    #a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
+    c = converter.parse(a)
     v = freezeThaw.StreamFreezer(c)
     v.setupSerializationScaffold()
-    return v.writeStr() # returns a string
+
 
     mockType = lambda x: x.__class__.__name__ == 'weakref'
     ty = TreeYielder(mockType)
-    for val in ty.run(v):
+    for val in ty.run(c):
         print(val, ty.currentLevel())
 
 

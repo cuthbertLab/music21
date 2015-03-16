@@ -10,7 +10,6 @@
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 '''
 Object definitions for graphing and 
 plotting :class:`~music21.stream.Stream` objects. 
@@ -61,13 +60,17 @@ def _getExtendedModules():
     Returns a namedtuple: (matplotlib, Axes3D, collections, patches, plt, networkx)
     '''
     if 'matplotlib' in base._missingImport:
-        raise GraphException('could not find matplotlib, graphing is not allowed')
+        raise GraphException('could not find matplotlib, graphing is not allowed') # pragma: no cover
     import matplotlib # @UnresolvedImport
     # backend can be configured from config file, matplotlibrc,
     # but an early test broke all processing
     #matplotlib.use('WXAgg')
-
-    from mpl_toolkits.mplot3d import Axes3D # @UnresolvedImport
+    try:
+        from mpl_toolkits.mplot3d import Axes3D # @UnresolvedImport
+    except ImportError:
+        Axes3D = None
+        environLocal.warn("mpl_toolkits.mplot3d.Axes3D could not be imported -- likely cause is an old version of six.py (<1.9.0) on your system somewhere")
+    
     from matplotlib import collections # @UnresolvedImport
     from matplotlib import patches # @UnresolvedImport
 
@@ -176,6 +179,20 @@ def getColor(color):
     '#cccccc'
     >>> graph.getColor([255, 255, 255])
     '#ffffff'
+    
+    Invalid colors raise GraphExceptions:
+    
+    >>> graph.getColor('l')
+    Traceback (most recent call last):
+    GraphException: invalid color abbreviation: l
+
+    >>> graph.getColor('chalkywhitebutsortofgreenish')
+    Traceback (most recent call last):
+    GraphException: invalid color name: chalkywhitebutsortofgreenish
+
+    >>> graph.getColor(True)
+    Traceback (most recent call last):
+    GraphException: invalid color specification: True
     '''
     # expand a single value to three
     if common.isNum(color):
@@ -219,7 +236,7 @@ def getColor(color):
             return webcolors.rgb_percent_to_hex(color)
         else: # assume integers
             return webcolors.rgb_to_hex(tuple(color))
-    raise GraphException('invalid color specificiation: %s' % color)
+    raise GraphException('invalid color specification: %s' % color)
 
 #-------------------------------------------------------------------------------
 class Graph(object):
@@ -646,7 +663,8 @@ class Graph(object):
             self.fig.savefig(fp, facecolor=getColor(self.colorBackgroundFigure),      
                              edgecolor=getColor(self.colorBackgroundFigure))
 
-        environLocal.launch('png', fp)
+        if common.runningUnderIPython() is not True:
+            environLocal.launch('png', fp)
 
 
 

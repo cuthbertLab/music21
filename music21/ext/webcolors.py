@@ -2,8 +2,7 @@
 webcolors.py by James Bennett.  
 http://pypi.python.org/pypi/webcolors/ 
 License :: OSI Approved :: BSD License
-
-
+v.1.4
 
 Utility functions for working with the color names and color value
 formats defined by the HTML and CSS specifications for use in
@@ -71,6 +70,19 @@ For output which consists of a color specified via a predefined name,
 and for functions which perform intermediate conversion to a
 predefined name before returning a result in another format, this
 module always normalizes such values to be entirely lower-case.
+
+For colors specified via ``rgb()`` triplets, values contained in the
+triplets will be normalized via clipping in accordance with CSS:
+
+* Integer values less than 0 will be normalized to 0, and percentage
+  values less than 0% will be normalized to 0%.
+
+* Integer values greater than 255 will be normalized to 255, and
+  percentage values greater than 100% will be normalized to 100%.
+
+The functions :func:`normalize_integer_triplet` and
+:func:`normalize_percent_triplet` in this module can be used to
+perform this normalization manually if desired.
 
 For purposes of identifying the specification from which to draw the
 selection of defined color names, this module recognizes the following
@@ -149,7 +161,7 @@ def _reversedict(d):
     dictionary, returns a new dictionary with keys and values swapped.
 
     """
-    return dict(zip(d.values(), d.keys()))
+    return dict(list(zip(list(d.values()), list(d.keys()))))
 
 
 HEX_COLOR_RE = re.compile(r'^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$')
@@ -384,9 +396,113 @@ def normalize_hex(hex_value):
     except AttributeError:
         raise ValueError("'%s' is not a valid hexadecimal color value." % hex_value)
     if len(hex_digits) == 3:
-        hex_digits = ''.join(map(lambda s: 2 * s, hex_digits))
+        hex_digits = ''.join([2 * s for s in hex_digits])
     return '#%s' % hex_digits.lower()
 
+
+def normalize_integer_triplet(rgb_triplet):
+    """
+    Normalize an integer ``rgb()`` triplet so that all values are
+    within the range 0-255 inclusive.
+
+    Examples:
+
+    >>> normalize_integer_triplet((128, 128, 128))
+    (128, 128, 128)
+    >>> normalize_integer_triplet((0, 0, 0))
+    (0, 0, 0)
+    >>> normalize_integer_triplet((255, 255, 255))
+    (255, 255, 255)
+    >>> normalize_integer_triplet((270, -20, 128))
+    (255, 0, 128)
+    
+    """
+    return tuple([_normalize_integer_rgb(value) for value in rgb_triplet])
+
+
+def _normalize_integer_rgb(value):
+    """
+    Normalize ``value`` for use in an integer ``rgb()`` triplet, as follows:
+    
+    * If ``value`` is less than 0, convert to 0.
+    
+    * If ``value`` is greater than 255, convert to 255.
+
+    Examples:
+
+    >>> _normalize_integer_rgb(0)
+    0
+    >>> _normalize_integer_rgb(255)
+    255
+    >>> _normalize_integer_rgb(128)
+    128
+    >>> _normalize_integer_rgb(-20)
+    0
+    >>> _normalize_integer_rgb(270)
+    255
+    
+    """
+    if 0 <= value <= 255:
+        return value
+    if value < 0:
+        return 0
+    if value > 255:
+        return 255
+
+
+def normalize_percent_triplet(rgb_triplet):
+    """
+    Normalize a percentage ``rgb()`` triplet to that all values are
+    within the range 0%-100% inclusive.
+
+    Examples:
+
+    >>> normalize_percent_triplet(('50%', '50%', '50%'))
+    ('50%', '50%', '50%')
+    >>> normalize_percent_triplet(('0%', '100%', '0%'))
+    ('0%', '100%', '0%')
+    >>> normalize_percent_triplet(('-10%', '250%', '500%'))
+    ('0%', '100%', '100%')
+    
+    """
+    return tuple([_normalize_percent_rgb(value) for value in rgb_triplet])
+    
+
+def _normalize_percent_rgb(value):
+    """
+    Normalize ``value`` for use in a percentage ``rgb()`` triplet, as
+    follows:
+
+    * If ``value`` is less than 0%, convert to 0%.
+
+    * If ``value`` is greater than 100%, convert to 100%.
+
+    Examples:
+
+    >>> _normalize_percent_rgb('0%')
+    '0%'
+    >>> _normalize_percent_rgb('100%')
+    '100%'
+    >>> _normalize_percent_rgb('62%')
+    '62%'
+    >>> _normalize_percent_rgb('-5%')
+    '0%'
+    >>> _normalize_percent_rgb('250%')
+    '100%'
+    >>> _normalize_percent_rgb('85.49%')
+    '85.49%'
+    
+    """
+    percent = value.split('%')[0]
+    percent = float(percent) if '.' in percent else int(percent)
+    
+    if 0 <= percent <= 100:
+        return '%s%%' % percent
+    if percent < 0:
+        return '0%'
+    if percent > 100:
+        return '100%'
+    
 
 # Conversions from color names to various formats.
 #################################################################
@@ -416,6 +532,10 @@ def name_to_hex(name, spec='css3'):
     Traceback (most recent call last):
         ...
     ValueError: 'goldenrod' is not defined as a named color in html4.
+    >>> name_to_hex('goldenrod', spec='css5')
+    Traceback (most recent call last):
+        ...
+    TypeError: 'css5' is not a supported specification for color name lookups; supported specifications are: html4, css2, css21, css3.
 
     """
     if spec not in SUPPORTED_SPECIFICATIONS:
@@ -514,11 +634,15 @@ def hex_to_name(hex_value, spec='css3'):
     Traceback (most recent call last):
         ...
     ValueError: '#daa520' has no defined color name in html4.
+    >>> hex_to_name('#daa520', spec='css5')
+    Traceback (most recent call last):
+        ...
+    TypeError: 'css5' is not a supported specification for color name lookups; supported specifications are: html4, css2, css21, css3.
 
     """
     if spec not in SUPPORTED_SPECIFICATIONS:
         raise TypeError("'%s' is not a supported specification for color name lookups; supported specifications are: %s." % (spec,
-        ', '.join(SUPPORTED_SPECIFICATIONS)))
+                                                                                                                             ', '.join(SUPPORTED_SPECIFICATIONS)))
     normalized = normalize_hex(hex_value)
     try:
         name = globals()['%s_hex_to_names' % spec][normalized]
@@ -543,8 +667,7 @@ def hex_to_rgb(hex_value):
 
     """
     hex_digits = normalize_hex(hex_value)
-    return tuple(map(lambda s: int(s, 16),
-                     (hex_digits[1:3], hex_digits[3:5], hex_digits[5:7])))
+    return tuple([int(s, 16) for s in (hex_digits[1:3], hex_digits[3:5], hex_digits[5:7])])
 
 
 def hex_to_rgb_percent(hex_value):
@@ -589,7 +712,7 @@ def rgb_to_name(rgb_triplet, spec='css3'):
     'navy'
 
     """
-    return hex_to_name(rgb_to_hex(rgb_triplet), spec=spec)
+    return hex_to_name(rgb_to_hex(normalize_integer_triplet(rgb_triplet)), spec=spec)
 
 
 def rgb_to_hex(rgb_triplet):
@@ -605,7 +728,7 @@ def rgb_to_hex(rgb_triplet):
     '#000080'
 
     """
-    return '#%02x%02x%02x' % rgb_triplet
+    return '#%02x%02x%02x' % normalize_integer_triplet(rgb_triplet)
 
 
 def rgb_to_rgb_percent(rgb_triplet):
@@ -637,8 +760,8 @@ def rgb_to_rgb_percent(rgb_triplet):
     # from 0 through 4, as well as 0 itself.
     specials = {255: '100%', 128: '50%', 64: '25%',
                  32: '12.5%', 16: '6.25%', 0: '0%'}
-    return tuple(map(lambda d: specials.get(d, '%.02f%%' % ((d / 255.0) * 100)),
-                     rgb_triplet))
+    return tuple([specials.get(d, '%.02f%%' % ((d / 255.0) * 100)) \
+                  for d in normalize_integer_triplet(rgb_triplet)])
 
 
 # Conversions from percentage rgb() triplets to various formats.
@@ -667,7 +790,7 @@ def rgb_percent_to_name(rgb_percent_triplet, spec='css3'):
     'goldenrod'
 
     """
-    return rgb_to_name(rgb_percent_to_rgb(rgb_percent_triplet), spec=spec)
+    return rgb_to_name(rgb_percent_to_rgb(normalize_percent_triplet(rgb_percent_triplet)), spec=spec)
 
 
 def rgb_percent_to_hex(rgb_percent_triplet):
@@ -686,7 +809,7 @@ def rgb_percent_to_hex(rgb_percent_triplet):
     '#daa520'
 
     """
-    return rgb_to_hex(rgb_percent_to_rgb(rgb_percent_triplet))
+    return rgb_to_hex(rgb_percent_to_rgb(normalize_percent_triplet(rgb_percent_triplet)))
 
 
 def _percent_to_integer(percent):
@@ -723,9 +846,11 @@ def rgb_percent_to_rgb(rgb_percent_triplet):
     (218, 165, 32)
 
     """
-    return tuple(map(_percent_to_integer, rgb_percent_triplet))
+    return tuple(map(_percent_to_integer, normalize_percent_triplet(rgb_percent_triplet)))
 
 
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+
+

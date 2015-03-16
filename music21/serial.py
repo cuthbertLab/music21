@@ -109,7 +109,6 @@ class ToneRow(stream.Stream):
         if self.row != None:
             for pc in self.row:
                 n = note.Note()
-                n.duration.quarterLength = 0.0
                 n.pitch = pitch.Pitch(pc)
                 n.pitch.octave = None
                 self.append(n)
@@ -3242,147 +3241,79 @@ def getHistoricalRowByName(rowName):
     
     The names of the rows with stored attributes are below (each must be passed as a string, in single quotes).
     
-    RowSchoenbergOp23No5
-    
-    RowSchoenbergOp24Mvmt4
-    
-    RowSchoenbergOp24Mvmt5
-    
-    RowSchoenbergOp25
-    
-    RowSchoenbergOp26
-    
-    RowSchoenbergOp27No1
-    
-    RowSchoenbergOp27No2
-    
-    RowSchoenbergOp27No3
-    
-    RowSchoenbergOp27No4
-    
-    RowSchoenbergOp28No1
-    
-    RowSchoenbergOp28No3
-    
-    RowSchoenbergOp29
-    
-    RowSchoenbergOp30
-    
-    RowSchoenbergOp31
-    
-    RowSchoenbergOp32
-    
-    RowSchoenbergOp33A
-    
-    RowSchoenbergOp33B
-    
-    RowSchoenbergOp34
-    
-    RowSchoenbergOp35No1
-    
-    RowSchoenbergOp35No2
-    
-    RowSchoenbergOp35No3
-    
-    RowSchoenbergOp35No5
-    
-    RowSchoenbergOp36
-    
-    RowSchoenbergOp37
-    
-    RowSchoenbergFragPianoPhantasia
-    
-    RowSchoenbergFragOrganSonata
-    
-    RowSchoenbergFragPiano
-    
-    RowSchoenbergOp41
-    
-    RowSchoenbergOp42
-    
-    RowSchoenbergJakobsleiter
-    
-    RowSchoenbergOp44
-    
-    RowSchoenbergOp45
-    
-    RowSchoenbergOp46
-    
-    RowSchoenbergOp47
-    
-    RowSchoenbergOp48No1
-    
-    RowSchoenbergOp48No2
-    
-    RowSchoenbergOp48No3
-    
-    RowSchoenbergIsraelExists
-    
-    RowSchoenbergOp50A
-    
-    RowSchoenbergOp50B
-    
-    RowSchoenbergOp50C
-    
-    RowSchoenbergMosesAron
-    
+    >>> for r in sorted(list(serial.historicalDict)):
+    ...     print(r)   
     RowBergChamberConcerto
-    
-    RowBergWozzeckPassacaglia
-    
-    RowBergLyricSuite
-    
-    RowBergLyricSuitePerm
-    
     RowBergDerWein
-    
     RowBergLulu
-    
-    RowBergLuluActIScene20
-    
     RowBergLuluActIIScene1
-    
+    RowBergLuluActIScene20
+    RowBergLyricSuite
+    RowBergLyricSuitePerm
     RowBergViolinConcerto
-    
-    RowWebernOpNo17No1
-
+    RowBergWozzeckPassacaglia
+    RowSchoenbergFragOrganSonata
+    RowSchoenbergFragPiano
+    RowSchoenbergFragPianoPhantasia
+    RowSchoenbergIsraelExists
+    RowSchoenbergJakobsleiter
+    RowSchoenbergMosesAron
+    RowSchoenbergOp23No5
+    RowSchoenbergOp24Mvmt4
+    RowSchoenbergOp24Mvmt5
+    RowSchoenbergOp25
+    RowSchoenbergOp26
+    RowSchoenbergOp27No1
+    RowSchoenbergOp27No2
+    RowSchoenbergOp27No3
+    RowSchoenbergOp27No4
+    RowSchoenbergOp28No1
+    RowSchoenbergOp28No3
+    RowSchoenbergOp29
+    RowSchoenbergOp30
+    RowSchoenbergOp31
+    RowSchoenbergOp32
+    RowSchoenbergOp33A
+    RowSchoenbergOp33B
+    RowSchoenbergOp34
+    RowSchoenbergOp35No1
+    RowSchoenbergOp35No2
+    RowSchoenbergOp35No3
+    RowSchoenbergOp35No5
+    RowSchoenbergOp36
+    RowSchoenbergOp37
+    RowSchoenbergOp41
+    RowSchoenbergOp42
+    RowSchoenbergOp44
+    RowSchoenbergOp45
+    RowSchoenbergOp46
+    RowSchoenbergOp47
+    RowSchoenbergOp48No1
+    RowSchoenbergOp48No2
+    RowSchoenbergOp48No3
+    RowSchoenbergOp50A
+    RowSchoenbergOp50B
+    RowSchoenbergOp50C
     RowWebernOp17No2
-    
     RowWebernOp17No3
-    
     RowWebernOp18No1
-    
     RowWebernOp18No2
-    
     RowWebernOp18No3
-    
     RowWebernOp19No1
-    
     RowWebernOp19No2
-    
     RowWebernOp20
-    
     RowWebernOp21
-    
     RowWebernOp22
-    
     RowWebernOp23
-    
     RowWebernOp24
-    
     RowWebernOp25
-    
     RowWebernOp26
-    
     RowWebernOp27
-    
     RowWebernOp28
-    
     RowWebernOp29
-    
     RowWebernOp30
-    
     RowWebernOp31
+    RowWebernOpNo17No1
     
     
     >>> a = serial.getHistoricalRowByName('RowWebernOp29')
@@ -3415,17 +3346,17 @@ def pcToToneRow(pcSet):
     >>> a = serial.pcToToneRow(range(12))
     >>> a.show('text')
     {0.0} <music21.note.Note C>
-    {0.0} <music21.note.Note C#>
-    {0.0} <music21.note.Note D>
-    {0.0} <music21.note.Note E->
-    {0.0} <music21.note.Note E>
-    {0.0} <music21.note.Note F>
-    {0.0} <music21.note.Note F#>
-    {0.0} <music21.note.Note G>
-    {0.0} <music21.note.Note G#>
-    {0.0} <music21.note.Note A>
-    {0.0} <music21.note.Note B->
-    {0.0} <music21.note.Note B>
+    {1.0} <music21.note.Note C#>
+    {2.0} <music21.note.Note D>
+    {3.0} <music21.note.Note E->
+    {4.0} <music21.note.Note E>
+    {5.0} <music21.note.Note F>
+    {6.0} <music21.note.Note F#>
+    {7.0} <music21.note.Note G>
+    {8.0} <music21.note.Note G#>
+    {9.0} <music21.note.Note A>
+    {10.0} <music21.note.Note B->
+    {11.0} <music21.note.Note B>
     >>> matrixObj = a.matrix()
     >>> print(matrixObj)
       0  1  2  3  4  5  6  7  8  9  A  B
@@ -3454,7 +3385,6 @@ def pcToToneRow(pcSet):
         a = ToneRow()
     for thisPc in pcSet:
         n = note.Note()
-        n.duration.quarterLength = 0.0
         n.pitch.pitchClass = thisPc
         n.pitch.octave = None
         a.append(n)

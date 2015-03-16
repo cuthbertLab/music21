@@ -31,7 +31,7 @@ _MOD = "pitch.py"
 environLocal = environment.Environment(_MOD)
 
 try:
-    basestring
+    basestring # @UndefinedVariable
 except NameError:
     basestring = str # @ReservedAssignment
 
@@ -1015,6 +1015,7 @@ class Accidental(SlottedObject):
 
 
 #-------------------------------------------------------------------------------
+## tried as SlottedObject -- made creation time slower! Not worth the restrictions
 class Pitch(object):
     '''
     A fundamental object that represents a single pitch.
@@ -1205,10 +1206,10 @@ class Pitch(object):
 
     # constants shared by all classes
     _twelfth_root_of_two = TWELFTH_ROOT_OF_TWO
+    classes = ['Pitch', 'object'] # makes subclassing harder; was [x.__name__ for x in self.__class__.mro()] but 5% of creation time 
 
     def __init__(self, name=None, **keywords):
-        self.classes = [x.__name__ for x in self.__class__.mro()]  
-        self.groups = base.Groups()
+        self.groups = base.Groups() # 1% of creation time time
 
         if isinstance(name, type(self)):
             name = name.nameWithOctave
@@ -1225,7 +1226,7 @@ class Pitch(object):
         # note that creating an Accidental objects is much more time consuming
         # than a microtone
         self._accidental = None
-        self._microtone = Microtone()
+        self._microtone = Microtone() # 5% of pitch creation time.
 
         # CA, Q: should this remain an attribute or only refer to value in defaults?
         # MSC A: no, it's a useful attribute for cases such as scales where if there are

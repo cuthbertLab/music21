@@ -220,49 +220,49 @@ class ex11_1_I(wwnortonExercise):
                                 markerPartName='harmIntervals',\
                                 offsetFunc = harmonicIntervalOffsetFunc,\
                                 lyricFunc = harmonicIntervalTextFunc)
-'''    
-class ex11_1_II(wwnortonExercise):
-    
-    Assignment 11.1 II. Resolving chordal dissonances
-    
-    def __init__(self):
-        wwnortonExercise.__init__(self)
-        self.xmlFilename = '11_1_II.xml'
-        self.pn['part1'] = 0
-        self.pn['part2'] = 1
-        self.loadOriginalExercise()
+    '''    
+    class ex11_1_II(wwnortonExercise):
         
-    def addAuxillaryParts(self):
-        self.addMarkerPartFromExisting('part1', newPartName='p1ScaleDegrees',newPartTitle="1. Scale Degrees", direction = "above")
-        self.addMarkerPartFromExisting('part2', newPartName='p2ScaleDegrees',newPartTitle="2. Scale Degrees", direction = "below")
-        self.addMarkerPartFromExisting('part1', newPartName='harmIntervals',newPartTitle="3. Harmonic Intervals", rhythmType='chordify', direction = "below")
+        Assignment 11.1 II. Resolving chordal dissonances
         
-    def checkExercise(self):
+        def __init__(self):
+            wwnortonExercise.__init__(self)
+            self.xmlFilename = '11_1_II.xml'
+            self.pn['part1'] = 0
+            self.pn['part2'] = 1
+            self.loadOriginalExercise()
+            
+        def addAuxillaryParts(self):
+            self.addMarkerPartFromExisting('part1', newPartName='p1ScaleDegrees',newPartTitle="1. Scale Degrees", direction = "above")
+            self.addMarkerPartFromExisting('part2', newPartName='p2ScaleDegrees',newPartTitle="2. Scale Degrees", direction = "below")
+            self.addMarkerPartFromExisting('part1', newPartName='harmIntervals',newPartTitle="3. Harmonic Intervals", rhythmType='chordify', direction = "below")
+            
+        def checkExercise(self):
+            
+            theoryAnalyzer.setKeyMeasureMap(self.studentExercise, {1:'C',2:'C',3:'d',4:'F',5:'G',6:'e',7:'g',8:'B-',9:'A-',10:'E',11:'f',12:'c#'})
+            
+            theoryAnalyzer.identifyScaleDegrees(self.studentExercise,self.pn['part1'],dictKey='p1ScaleDegrees')
+            theoryAnalyzer.identifyScaleDegrees(self.studentExercise,self.pn['part2'],dictKey='p2ScaleDegrees')
+            theoryAnalyzer.identifyHarmonicIntervals(self.studentExercise,self.pn['part1'],self.pn['part2'],dictKey='harmIntervals')
+            
+            scaleDegreeLyricTextFunc = lambda resultObj: resultObj.value
+            self.compareMarkerLyricAnswer(self.studentExercise,taKey='p1ScaleDegrees',\
+                                    markerPartName='p1ScaleDegrees',\
+                                    lyricFunc = scaleDegreeLyricTextFunc)
+            
+            self.compareMarkerLyricAnswer(self.studentExercise,taKey='p2ScaleDegrees',\
+                                    markerPartName='p2ScaleDegrees',\
+                                    lyricFunc = scaleDegreeLyricTextFunc)
+            
+            harmonicIntervalOffsetFunc = lambda resultObj: resultObj.offset()
+            harmonicIntervalTextFunc = lambda resultObj: resultObj.value 
+            
+            self.compareMarkerLyricAnswer(self.studentExercise,taKey='harmIntervals',\
+                                    markerPartName='harmIntervals',\
+                                    offsetFunc = harmonicIntervalOffsetFunc,\
+                                    lyricFunc = harmonicIntervalTextFunc)    
         
-        theoryAnalyzer.setKeyMeasureMap(self.studentExercise, {1:'C',2:'C',3:'d',4:'F',5:'G',6:'e',7:'g',8:'B-',9:'A-',10:'E',11:'f',12:'c#'})
-        
-        theoryAnalyzer.identifyScaleDegrees(self.studentExercise,self.pn['part1'],dictKey='p1ScaleDegrees')
-        theoryAnalyzer.identifyScaleDegrees(self.studentExercise,self.pn['part2'],dictKey='p2ScaleDegrees')
-        theoryAnalyzer.identifyHarmonicIntervals(self.studentExercise,self.pn['part1'],self.pn['part2'],dictKey='harmIntervals')
-        
-        scaleDegreeLyricTextFunc = lambda resultObj: resultObj.value
-        self.compareMarkerLyricAnswer(self.studentExercise,taKey='p1ScaleDegrees',\
-                                markerPartName='p1ScaleDegrees',\
-                                lyricFunc = scaleDegreeLyricTextFunc)
-        
-        self.compareMarkerLyricAnswer(self.studentExercise,taKey='p2ScaleDegrees',\
-                                markerPartName='p2ScaleDegrees',\
-                                lyricFunc = scaleDegreeLyricTextFunc)
-        
-        harmonicIntervalOffsetFunc = lambda resultObj: resultObj.offset()
-        harmonicIntervalTextFunc = lambda resultObj: resultObj.value 
-        
-        self.compareMarkerLyricAnswer(self.studentExercise,taKey='harmIntervals',\
-                                markerPartName='harmIntervals',\
-                                offsetFunc = harmonicIntervalOffsetFunc,\
-                                lyricFunc = harmonicIntervalTextFunc)    
-    
-'''
+    '''
             
 class ex11_3_A(wwnortonExercise):
     '''

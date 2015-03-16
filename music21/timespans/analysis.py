@@ -15,7 +15,6 @@ Tools for performing voice-leading analysis with timespans.
 '''
 import collections
 import unittest
-
 #from music21 import base
 #from music21 import common
 from music21 import environment

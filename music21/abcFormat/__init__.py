@@ -10,14 +10,6 @@
 # Copyright:    Copyright © 2010, 2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
-__all__ = (
-    'translate',
-    'testFiles',
-    )
-
-from music21.abcFormat import translate
-
 '''
 ABC is a music format that, while being able to encode all sorts of scores, is especially
 strong at representing monophonic music, and folk music in particular.
@@ -45,6 +37,13 @@ reads in the text-based .abc file and converts all the information into ABCToken
 the function :func:`music21.abcFormat.translate.abcToStreamScore` of the `music21.abcFormat.translate` module
 translates those Tokens into music21 objects.
 '''
+__all__ = (
+    'translate',
+    'testFiles',
+    )
+
+from music21.abcFormat import translate
+
 
 import unittest
 import re, codecs
@@ -909,11 +908,11 @@ class ABCSlurStart(ABCToken):
         return '<music21.abcFormat.ABCSlurStart %r>' % self.src
     
     
-    '''
-    Creates a spanner object for each open paren associated with a slur;
-    these slurs are filled with notes until end parens are read.
-    '''
     def fillSlur(self):
+        '''
+        Creates a spanner object for each open paren associated with a slur;
+        these slurs are filled with notes until end parens are read.
+        '''
         from music21 import spanner
         self.slurObj = spanner.Slur()
                 
@@ -953,7 +952,7 @@ class ABCDimStart(ABCToken):
     They function identically to ABCCrescStart tokens.
     '''
     
-    def __init(self, src):
+    def __init__(self, src):    # previous typo?: used to be __init
         ABCToken.__init__(self, src)
         self.dimObj = None
 
@@ -2446,8 +2445,8 @@ class ABCHandler(object):
             raise ABCHandlerException('must process tokens before calling split')
         post = []
         pos = []
-        barCount = 0
-        noteCount = 0
+        # barCount = 0 # not used
+        # noteCount = 0 # not used
         for i in range(len(self._tokens)):
             t = self._tokens[i]
             tNext = None
@@ -2455,15 +2454,15 @@ class ABCHandler(object):
                 tNext = self._tokens[i+1]
             #environLocal.printDebug(['splitByMeasure(); tokens', t, 'isinstance(t, ABCBar)', isinstance(t, ABCBar)])
 
-            if isinstance(t, (ABCNote, ABCChord)):
-                noteCount += 1
+            #if isinstance(t, (ABCNote, ABCChord)): # not used...
+            #    noteCount += 1
 
             # either we get a bar, or we just complete metadata and we 
             # encounter a note (a pickup) 
             if isinstance(t, ABCBar): # or (barCount == 0 and noteCount > 0):
                 #environLocal.printDebug(['splitByMeasure()', 'found bar', t])
                 pos.append(i) # store position 
-                barCount += 1
+                # barCount += 1 # not used
             # case of end of metadata and start of notes in a pickup
             # tag the last metadata as the end
             elif isinstance(t, ABCMetadata) and tNext is not None and isinstance(tNext, (ABCNote, ABCChord)):
@@ -2508,7 +2507,7 @@ class ABCHandler(object):
                 pass
 
             if y >= len(self):
-                yTestIndex = y-i
+                yTestIndex = y - i  # TODO: Cuthbert, check this.  Should i be 1???
             else:
                 yTestIndex = y
             if isinstance(self._tokens[yTestIndex], ABCBar):
@@ -2684,7 +2683,8 @@ class ABCFile(object):
     ABC File or String access
     '''
     def __init__(self): 
-        pass
+        self.file = None
+        self.filename = None
 
     def open(self, filename): 
         '''
