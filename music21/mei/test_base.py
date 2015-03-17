@@ -2482,7 +2482,7 @@ class TestStaffDefFromElement(unittest.TestCase):
     @mock.patch('music21.mei.base.staffDefFromElement')
     def testStaffGrpUnit1(self, mockStaffDefFE):
         '''
-        staffGrpFromElement(): it's not a complicated function!
+        staffGrpFromElement(): it's not a very complicated function!
         '''
         elem = ETree.Element('staffGrp')
         innerElems = [ETree.Element('{}staffDef'.format(_MEINS), attrib={'n': str(n)}) for n in range(4)]
@@ -2491,7 +2491,7 @@ class TestStaffDefFromElement(unittest.TestCase):
         mockStaffDefFE.side_effect = lambda x, y: 'processed {}'.format(x.get('n'))
         expected = {str(n): 'processed {}'.format(n) for n in range(4)}
 
-        actual = base.staffGrpFromElement(elem, None)
+        actual = base.staffGrpFromElement(elem, None, {})
 
         self.assertEqual(expected, actual)
         self.assertEqual(len(innerElems), mockStaffDefFE.call_count)
