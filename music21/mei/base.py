@@ -1476,7 +1476,13 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 
     >>> meiDoc = """<?xml version="1.0" encoding="UTF-8"?>
     ... <scoreDef meter.count="3" meter.unit="4" xmlns="http://www.music-encoding.org/ns/mei">
-    ...     <staffGrp><staffDef n="1" label="Clarinet"/></staffGrp>
+    ...     <staffGrp>
+    ...         <staffDef n="1" label="Clarinet"/>
+    ...         <staffGrp>
+    ...             <staffDef n="2" label="Flute"/>
+    ...             <staffDef n="3" label="Violin"/>
+    ...         </staffGrp>
+    ...     </staffGrp>
     ... </scoreDef>
     ... """
     >>> from music21 import *
@@ -1484,9 +1490,11 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     >>> scoreDef = ET.fromstring(meiDoc)
     >>> result = mei.base.scoreDefFromElement(scoreDef)
     >>> len(result)
-    3
+    5
     >>> result['1']
     {'instrument': <music21.instrument.Instrument 1: Clarinet: Clarinet>}
+    >>> result['3']
+    {'instrument': <music21.instrument.Instrument 3: Violin: Violin>}
     >>> result['all-part objects']
     [<music21.meter.TimeSignature 3/4>]
     >>> result['whole-score objects']
@@ -1556,7 +1564,7 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     return post
 
 
-def staffGrpFromElement(elem, slurBundle=None):
+def staffGrpFromElement(elem, slurBundle=None, staffDefDict={}):
     '''
     <staffGrp> A group of bracketed or braced staves.
 
@@ -1575,6 +1583,7 @@ def staffGrpFromElement(elem, slurBundle=None):
     **Attributes/Elements Implemented:**
 
     - contained <staffDef>
+    - contained <staffGrp>
 
     **Attributes/Elements in Testing:** none
 
@@ -1594,13 +1603,12 @@ def staffGrpFromElement(elem, slurBundle=None):
     **Contained Elements not Implemented:**
 
     - MEI.midi: instrDef
-    - MEI.shared: grpSym label staffGrp
+    - MEI.shared: grpSym label
     '''
     
     staffDefTag = '{http://www.music-encoding.org/ns/mei}staffDef'
     staffGroupTag = '{http://www.music-encoding.org/ns/mei}staffGrp'
-    
-    staffDefDict = {}
+
     for el in elem.findall("*"):
         # return all staff defs in this staff group
         if el.tag == staffDefTag:
@@ -1608,8 +1616,8 @@ def staffGrpFromElement(elem, slurBundle=None):
 
         # recurse if there are more groups, append to the working staffDefDict    
         elif el.tag == staffGroupTag:
-            backDict = staffGrpFromElement(el, slurBundle).copy()
-            staffDefDict.update(backDict);
+            staffGrpFromElement(el, slurBundle, staffDefDict)
+
     return staffDefDict
 
 def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
