@@ -71,7 +71,7 @@ from music21.common import SlottedObject, opFrac
 from music21 import environment
 
 try:
-    basestring
+    basestring # @UndefinedVariable
 except NameError:
     basestring = str # @ReservedAssignment
 
@@ -1322,9 +1322,9 @@ class DurationUnit(DurationCommon):
         self._link = True  # default is True
         self._type = ""
         # dots can be a float for expressing Crumb dots (1/2 dots)
-        # dots is a list for rarely used: dotted-dotted notes;
+        # dots is a tuple for rarely used: dotted-dotted notes;
         #  e.g. dotted-dotted half in 9/8 expressed as 1,1
-        self._dots = [0]
+        self._dots = (0,)
         self._tuplets = ()  # an empty tuple
         if common.isNum(prototype):
             self._qtrLength = opFrac(prototype)
@@ -1616,7 +1616,7 @@ class DurationUnit(DurationCommon):
         if value != self._dots[0]:
             self._quarterLengthNeedsUpdating = True
         if common.isNum(value):
-            self._dots[0] = value
+            self._dots = (value,)
         else:
             raise DurationException("number of dots must be a number")
 
@@ -1694,7 +1694,7 @@ class DurationUnit(DurationCommon):
             elif dots == 1:
                 msg.append('Perfect ')
 
-        if typeStr[0] in ['1', '2', '3', '5', '6']:
+        if typeStr[0] in ('1', '2', '3', '5', '6'):
             pass # do nothing with capitalization
         else:
             typeStr = typeStr.title()
@@ -1718,17 +1718,13 @@ class DurationUnit(DurationCommon):
         '''
         Return a boolean describing this duration is linked or not.
 
-        ::
+        >>> d = duration.DurationUnit()
+        >>> d.isLinked
+        True
 
-            >>> d = duration.DurationUnit()
-            >>> d.isLinked
-            True
-
-        ::
-            >>> d.unlink()
-            >>> d.isLinked
-            False
-
+        >>> d.unlink()
+        >>> d.isLinked
+        False
         '''
         return self._link
 
@@ -1738,24 +1734,17 @@ class DurationUnit(DurationCommon):
         Converts type to an ordinal number where maxima = 1 and 1024th = 14;
         whole = 4 and quarter = 6.  Based on duration.ordinalTypeFromNum
 
-        ::
+        >>> a = duration.DurationUnit('whole')
+        >>> a.ordinal
+        4
 
-            >>> a = duration.DurationUnit('whole')
-            >>> a.ordinal
-            4
+        >>> b = duration.DurationUnit('maxima')
+        >>> b.ordinal
+        1
 
-        ::
-
-            >>> b = duration.DurationUnit('maxima')
-            >>> b.ordinal
-            1
-
-        ::
-
-            >>> c = duration.DurationUnit('1024th')
-            >>> c.ordinal
-            14
-
+        >>> c = duration.DurationUnit('1024th')
+        >>> c.ordinal
+        14
         '''
         if self._typeNeedsUpdating:
             self.updateType()
@@ -1775,35 +1764,32 @@ class DurationUnit(DurationCommon):
         Property for getting or setting the quarterLength of a
         DurationUnit.
 
-        ::
+        >>> a = duration.DurationUnit()
+        >>> a.quarterLength = 3
+        >>> a.quarterLength
+        3.0
 
-            >>> a = duration.DurationUnit()
-            >>> a.quarterLength = 3
-            >>> a.quarterLength
-            3.0
+        >>> a.type
+        'half'
 
-            >>> a.type
-            'half'
+        >>> a.dots
+        1
 
-            >>> a.dots
-            1
+        >>> a.quarterLength = .5
+        >>> a.type
+        'eighth'
 
-            >>> a.quarterLength = .5
-            >>> a.type
-            'eighth'
+        >>> a.quarterLength = .75
+        >>> a.type
+        'eighth'
 
-            >>> a.quarterLength = .75
-            >>> a.type
-            'eighth'
+        >>> a.dots
+        1
 
-            >>> a.dots
-            1
-
-            >>> b = duration.DurationUnit()
-            >>> b.quarterLength = 16
-            >>> b.type
-            'longa'
-
+        >>> b = duration.DurationUnit()
+        >>> b.quarterLength = 16
+        >>> b.type
+        'longa'
         '''
         if self._quarterLengthNeedsUpdating:
             self.updateQuarterLength()
@@ -1841,37 +1827,34 @@ class DurationUnit(DurationCommon):
 
         (We no longer unlink if quarterLength is greater than a longa)
 
-        ::
+        >>> a = duration.DurationUnit()
+        >>> a.quarterLength = 3
+        >>> a.type
+        'half'
+        >>> a.dots
+        1
 
-            >>> a = duration.DurationUnit()
-            >>> a.quarterLength = 3
-            >>> a.type
-            'half'
-            >>> a.dots
-            1
+        >>> a.quarterLength = .5
+        >>> a.type
+        'eighth'
 
-            >>> a.quarterLength = .5
-            >>> a.type
-            'eighth'
+        >>> a.quarterLength = .75
+        >>> a.type
+        'eighth'
+        >>> a.dots
+        1
 
-            >>> a.quarterLength = .75
-            >>> a.type
-            'eighth'
-            >>> a.dots
-            1
+        >>> b = duration.DurationUnit()
+        >>> b.quarterLength = 16
+        >>> b.type
+        'longa'
 
-            >>> b = duration.DurationUnit()
-            >>> b.quarterLength = 16
-            >>> b.type
-            'longa'
-
-            >>> c = duration.DurationUnit()
-            >>> c.quarterLength = 129
-            >>> c.type
-            Traceback (most recent call last):
-                ...
-            DurationException: Cannot return types greater than double duplex-maxima, your length was 129.0 : remove this when we are sure this works...
-
+        >>> c = duration.DurationUnit()
+        >>> c.quarterLength = 129
+        >>> c.type
+        Traceback (most recent call last):
+            ...
+        DurationException: Cannot return types greater than double duplex-maxima, your length was 129.0 : remove this when we are sure this works...
         '''
         if not common.isNum(value):
             raise DurationException(
@@ -1915,30 +1898,21 @@ class DurationUnit(DurationCommon):
         '''
         Property for getting or setting the type of a DurationUnit.
 
-        ::
+        >>> a = duration.DurationUnit()
+        >>> a.quarterLength = 3
+        >>> a.type
+        'half'
 
-            >>> a = duration.DurationUnit()
-            >>> a.quarterLength = 3
-            >>> a.type
-            'half'
+        >>> a.dots
+        1
 
-        ::
+        >>> a.type = 'quarter'
+        >>> a.quarterLength
+        1.5
 
-            >>> a.dots
-            1
-
-        ::
-
-            >>> a.type = 'quarter'
-            >>> a.quarterLength
-            1.5
-
-        ::
-
-            >>> a.type = '16th'
-            >>> a.quarterLength
-            0.375
-
+        >>> a.type = '16th'
+        >>> a.quarterLength
+        0.375
         '''
         if self._typeNeedsUpdating:
             self.updateType()
@@ -1980,7 +1954,6 @@ class ZeroDuration(DurationUnit):
 
     def __repr__(self):
         '''Return a string representation.
-
 
         >>> zDur = duration.ZeroDuration()
         >>> repr(zDur)
@@ -2025,40 +1998,29 @@ class Duration(DurationCommon):
 
     Example 1: a triplet eighth configured by quarterLength:
 
-    ::
+    >>> d = duration.Duration(.333333333)
+    >>> d.type
+    'eighth'
 
-        >>> d = duration.Duration(.333333333)
-        >>> d.type
-        'eighth'
-
-    ::
-
-        >>> d.tuplets
-        (<music21.duration.Tuplet 3/2/eighth>,)
+    >>> d.tuplets
+    (<music21.duration.Tuplet 3/2/eighth>,)
 
     Example 2: A Duration made up of multiple
     :class:`music21.duration.DurationUnit` objects automatically configured by
     the specified quarterLength.
 
-    ::
+    >>> d2 = duration.Duration(.625)
+    >>> d2.type
+    'complex'
 
-        >>> d2 = duration.Duration(.625)
-        >>> d2.type
-        'complex'
-
-    ::
-
-        >>> d2.components
-        [<music21.duration.DurationUnit 0.5>, <music21.duration.DurationUnit 0.125>]
+    >>> d2.components
+    [<music21.duration.DurationUnit 0.5>, <music21.duration.DurationUnit 0.125>]
 
     Example 3: A Duration configured by keywords.
 
-    ::
-
-        >>> d3 = duration.Duration(type = 'half', dots = 2)
-        >>> d3.quarterLength
-        3.5
-
+    >>> d3 = duration.Duration(type = 'half', dots = 2)
+    >>> d3.quarterLength
+    3.5
     '''
 
     ### CLASS VARIABLES ###
@@ -2125,26 +2087,19 @@ class Duration(DurationCommon):
         Test equality. Note: this may not work with Tuplets until we
         define equality tests for tuplets.
 
-        ::
+        >>> aDur = duration.Duration('quarter')
+        >>> bDur = duration.Duration('16th')
+        >>> cDur = duration.Duration('16th')
+        >>> aDur == bDur
+        False
 
-            >>> aDur = duration.Duration('quarter')
-            >>> bDur = duration.Duration('16th')
-            >>> cDur = duration.Duration('16th')
-            >>> aDur == bDur
-            False
+        >>> cDur == bDur
+        True
 
-        ::
-
-            >>> cDur == bDur
-            True
-
-        ::
-
-            >>> dDur = duration.ZeroDuration()
-            >>> eDur = duration.ZeroDuration()
-            >>> dDur == eDur
-            True
-
+        >>> dDur = duration.ZeroDuration()
+        >>> eDur = duration.ZeroDuration()
+        >>> dDur == eDur
+        True
         '''
         if other is None or not isinstance(other, DurationCommon):
             return False
@@ -2163,19 +2118,14 @@ class Duration(DurationCommon):
     def __ne__(self, other):
         '''Test not equality.
 
-        ::
+        >>> aDur = duration.Duration('quarter')
+        >>> bDur = duration.Duration('16th')
+        >>> cDur = duration.Duration('16th')
+        >>> aDur != bDur
+        True
 
-            >>> aDur = duration.Duration('quarter')
-            >>> bDur = duration.Duration('16th')
-            >>> cDur = duration.Duration('16th')
-            >>> aDur != bDur
-            True
-
-        ::
-
-            >>> cDur != bDur
-            False
-
+        >>> cDur != bDur
+        False
         '''
         return not self.__eq__(other)
 
@@ -2210,8 +2160,6 @@ class Duration(DurationCommon):
         Does not simplify the Duration.  For instance, adding two
         quarter notes results in two tied quarter notes, not one half note.
         See `consolidate` below for more info on how to do that.
-
-
 
         >>> a = duration.Duration('quarter')
         >>> b = duration.Duration('quarter')
@@ -2394,8 +2342,7 @@ class Duration(DurationCommon):
         currentPosition = 0.0
         indexFound = None
         for i in range(len(self.components)):
-            currentPosition = opFrac(currentPosition + 
-                                                           self.components[i].quarterLength)
+            currentPosition = opFrac(currentPosition + self.components[i].quarterLength)
             if currentPosition > quarterPosition:
                 indexFound = i
                 break
@@ -2427,7 +2374,6 @@ class Duration(DurationCommon):
         >>> a.componentStartTime(1)
         1.0
         '''
-
         if componentIndex not in range(len(self.components)):
             raise DurationException(('invalid component index value (%s) ' + \
                 'submitted; value must be integers between 0 and %s') % (
@@ -2444,11 +2390,8 @@ class Duration(DurationCommon):
         Duration. This can only be based on quarterLength; this is
         destructive: information is lost from components.
 
-
         This cannot be done for all Durations, as DurationUnits cannot express all durations
-
-
-
+        
         >>> a = duration.Duration()
         >>> a.fill(['quarter', 'half', 'quarter'])
         >>> a.quarterLength
@@ -2461,9 +2404,7 @@ class Duration(DurationCommon):
         >>> len(a.components)
         1
 
-
         But it gains a type!
-
 
         >>> a.type
         'whole'
@@ -2473,7 +2414,7 @@ class Duration(DurationCommon):
         else:
             dur = DurationUnit()
             # if quarter length is not notatable, will automatically unlink
-            # some notations will not properly unlin, and raise an error
+            # some notations will not properly unlink, and raise an error
             dur.quarterLength = self.quarterLength
             self.components = [dur]
 
@@ -2495,8 +2436,8 @@ class Duration(DurationCommon):
             self.addDurationUnit(Duration(x))
 
     def getGraceDuration(self, appogiatura=False):
-        '''Return a deep copy of this Duration as a GraceDuration instance with the same types.
-
+        '''
+        Return a deepcopy of this Duration as a GraceDuration instance with the same types.
 
         >>> d = duration.Duration(1.25)
         >>> gd = d.getGraceDuration()
@@ -2524,7 +2465,8 @@ class Duration(DurationCommon):
         return gd
 
     def link(self):
-        '''Set all components to be linked
+        '''
+        Set all components to be linked
         '''
         if len(self.components) >= 1:
             for c in self.components:
@@ -2536,7 +2478,8 @@ class Duration(DurationCommon):
             raise DurationException("zero DurationUnits in components: cannt link or unlink")
 
     def setQuarterLengthUnlinked(self, value):
-        '''Set the quarter note length to the specified value.
+        '''
+        Set the quarter note length to the specified value.
         '''
         # quarter length is always obtained from _qtrLength, even when
         # not linked; yet a component must be present to provide a type
@@ -2558,7 +2501,8 @@ class Duration(DurationCommon):
         self._cachedIsLinked = False
 
     def setTypeUnlinked(self, value):
-        '''Make this Duration unlinked, and set the type. Quarter note length will not be adjusted.
+        '''
+        Make this Duration unlinked, and set the type. Quarter note length will not be adjusted.
         '''
         # need to check that type is valid
         if value not in ordinalTypeFromNum:
@@ -2578,10 +2522,9 @@ class Duration(DurationCommon):
         self._cachedIsLinked = False
 
     def sliceComponentAtPosition(self, quarterPosition):
-        '''Given a quarter position within a component, divide that
+        '''
+        Given a quarter position within a component, divide that
         component into two components.
-
-
 
         >>> a = duration.Duration()
         >>> a.clear() # need to remove default
@@ -2660,7 +2603,6 @@ class Duration(DurationCommon):
 
         Probably does not handle properly tuplets of dot-groups.
         Never seen one, so probably okay.
-
 
         >>> d1 = duration.Duration(type = 'half')
         >>> d1.dotGroups = [1,1]
@@ -2758,15 +2700,12 @@ class Duration(DurationCommon):
         what dotGroups (medieval dotted-dotted notes are).  In a complex
         duration, only the dotGroups of the first component matter
 
-        ::
-
-            >>> from music21 import duration
-            >>> a = duration.Duration()
-            >>> a.type = 'half'
-            >>> a.dotGroups = [1,1]
-            >>> a.quarterLength
-            4.5
-
+        >>> from music21 import duration
+        >>> a = duration.Duration()
+        >>> a.type = 'half'
+        >>> a.dotGroups = [1,1]
+        >>> a.quarterLength
+        4.5
         '''
         if self._componentsNeedUpdating is True:
             self._updateComponents()
@@ -2810,20 +2749,14 @@ class Duration(DurationCommon):
         '''
         Set dots if a number, as first element
 
-        ::
-
-            >>> a = duration.Duration()
-            >>> a.type = 'quarter'
-            >>> a.dots = 1
-            >>> a.quarterLength
-            1.5
-
-        ::
-
-            >>> a.dots = 2
-            >>> a.quarterLength
-            1.75
-
+        >>> a = duration.Duration()
+        >>> a.type = 'quarter'
+        >>> a.dots = 1
+        >>> a.quarterLength
+        1.5
+        >>> a.dots = 2
+        >>> a.quarterLength
+        1.75
         '''
         if not common.isNum(value):
             raise DurationException('only numeric dot values can be used with this method.')
@@ -2841,54 +2774,37 @@ class Duration(DurationCommon):
         Return the most complete representation of this Duration, providing
         dots, type, tuplet, and quarter length representation.
 
-        ::
+        >>> d = duration.Duration(quarterLength=1.5)
+        >>> d.fullName
+        'Dotted Quarter'
 
-            >>> d = duration.Duration(quarterLength=1.5)
-            >>> d.fullName
-            'Dotted Quarter'
+        >>> d = duration.Duration(type='half')
+        >>> d.fullName
+        'Half'
 
-        ::
+        >>> d = duration.Duration(quarterLength=1.25)
+        >>> d.fullName
+        'Quarter tied to 16th (1 1/4 total QL)'
 
-            >>> d = duration.Duration(type='half')
-            >>> d.fullName
-            'Half'
+        >>> d.addDurationUnit(duration.DurationUnit(.3333333))
+        >>> d.fullName
+        'Quarter tied to 16th tied to Eighth Triplet (1/3 QL) (1 7/12 total QL)'
 
-        ::
+        >>> d = duration.Duration(quarterLength=0.333333)
+        >>> d.fullName
+        'Eighth Triplet (1/3 QL)'
 
-            >>> d = duration.Duration(quarterLength=1.25)
-            >>> d.fullName
-            'Quarter tied to 16th (1 1/4 total QL)'
+        >>> d = duration.Duration(quarterLength=0.666666)
+        >>> d.fullName
+        'Quarter Triplet (2/3 QL)'
 
-        ::
+        >>> d = duration.Duration(quarterLength=0.571428)
+        >>> d.fullName
+        'Quarter Tuplet of 7/4ths (4/7 QL)'
 
-            >>> d.addDurationUnit(duration.DurationUnit(.3333333))
-            >>> d.fullName
-            'Quarter tied to 16th tied to Eighth Triplet (1/3 QL) (1 7/12 total QL)'
-
-        ::
-
-            >>> d = duration.Duration(quarterLength=0.333333)
-            >>> d.fullName
-            'Eighth Triplet (1/3 QL)'
-
-        ::
-
-            >>> d = duration.Duration(quarterLength=0.666666)
-            >>> d.fullName
-            'Quarter Triplet (2/3 QL)'
-
-        ::
-
-            >>> d = duration.Duration(quarterLength=0.571428)
-            >>> d.fullName
-            'Quarter Tuplet of 7/4ths (4/7 QL)'
-
-        ::
-
-            >>> d = duration.Duration(quarterLength=0)
-            >>> d.fullName
-            'Zero Duration (0 total QL)'
-
+        >>> d = duration.Duration(quarterLength=0)
+        >>> d.fullName
+        'Zero Duration (0 total QL)'
         '''
         if len(self.components) > 1:
             msg = []
@@ -2910,38 +2826,35 @@ class Duration(DurationCommon):
         the `component` list.  That is to say if it's a single Duration that
         need multiple tied noteheads to represent.
 
-        ::
+        >>> aDur = duration.Duration()
+        >>> aDur.quarterLength = 1.375
+        >>> aDur.isComplex
+        True
 
-            >>> aDur = duration.Duration()
-            >>> aDur.quarterLength = 1.375
-            >>> aDur.isComplex
-            True
+        >>> len(aDur.components)
+        2
 
-            >>> len(aDur.components)
-            2
+        >>> aDur.components
+        [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.375>]
 
-            >>> aDur.components
-            [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.375>]
+        >>> bDur = duration.Duration()
+        >>> bDur.quarterLength = 1.6666666
+        >>> bDur.isComplex
+        True
 
-            >>> bDur = duration.Duration()
-            >>> bDur.quarterLength = 1.6666666
-            >>> bDur.isComplex
-            True
+        >>> len(bDur.components)
+        2
 
-            >>> len(bDur.components)
-            2
-
-            >>> bDur.components
-            [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 2/3>]
+        >>> bDur.components
+        [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 2/3>]
             
-            >>> cDur = duration.Duration()
-            >>> cDur.quarterLength = .25
-            >>> cDur.isComplex
-            False
+        >>> cDur = duration.Duration()
+        >>> cDur.quarterLength = .25
+        >>> cDur.isComplex
+        False
 
-            >>> len(cDur.components)
-            1
-
+        >>> len(cDur.components)
+        1
         '''
         if len(self.components) > 1:
             return True
@@ -2960,34 +2873,23 @@ class Duration(DurationCommon):
         `isLinked` of the first component in a complex duration determines the
         link status for the entire Duration
 
-        ::
+        >>> d = duration.Duration(2.0)
+        >>> d.type
+        'half'
 
-            >>> d = duration.Duration(2.0)
-            >>> d.type
-            'half'
+        >>> d.quarterLength
+        2.0
 
-        ::
+        >>> d.isLinked
+        True
 
-            >>> d.quarterLength
-            2.0
+        >>> d.unlink()
+        >>> d.quarterLength = 4.0
+        >>> d.type
+        'half'
 
-        ::
-
-            >>> d.isLinked
-            True
-
-        ::
-
-            >>> d.unlink()
-            >>> d.quarterLength = 4.0
-            >>> d.type
-            'half'
-
-        ::
-
-            >>> d.isLinked
-            False
-
+        >>> d.isLinked
+        False
         '''
         # reset _cachedIsLinked to None when components have changed
         if self._cachedIsLinked is None:
@@ -3008,7 +2910,6 @@ class Duration(DurationCommon):
     def ordinal(self):
         '''
         Get the ordinal value of the Duration.
-
 
         >>> d = duration.Duration()
         >>> d.quarterLength = 2.0
@@ -3062,43 +2963,33 @@ class Duration(DurationCommon):
         Duration to 1.75 will NOT dot the last eighth note, but instead
         give you a single double-dotted half note.
 
-        ::
+        >>> a = duration.Duration()
+        >>> a.quarterLength = 3.5
+        >>> a.quarterLength
+        3.5
 
-            >>> a = duration.Duration()
-            >>> a.quarterLength = 3.5
-            >>> a.quarterLength
-            3.5
-
-        ::
-
-            >>> for thisUnit in a.components:
-            ...    print(duration.unitSpec(thisUnit))
-            (3.5, 'half', 2, None, None, None)
+        >>> for thisUnit in a.components:
+        ...    print(duration.unitSpec(thisUnit))
+        (3.5, 'half', 2, None, None, None)
             
-            >>> a.quarterLength = 2.5
-            >>> a.quarterLength
-            2.5
+        >>> a.quarterLength = 2.5
+        >>> a.quarterLength
+        2.5
 
-            >>> for thisUnit in a.components:
-            ...    print(duration.unitSpec(thisUnit))
-            (2.0, 'half', 0, None, None, None)
-            (0.5, 'eighth', 0, None, None, None)
+        >>> for thisUnit in a.components:
+        ...    print(duration.unitSpec(thisUnit))
+        (2.0, 'half', 0, None, None, None)
+        (0.5, 'eighth', 0, None, None, None)
 
         Note that integer values of quarter lengths get silently converted to floats (internally
-        Fraction objects):
+        opFracs):
 
-        ::
-
-            >>> b = duration.Duration()
-            >>> b.quarterLength = 5
-            >>> b.quarterLength
-            5.0
-
-        ::
-
-            >>> b.type  # complex because 5qL cannot be expressed as a single note.
-            'complex'
-
+        >>> b = duration.Duration()
+        >>> b.quarterLength = 5
+        >>> b.quarterLength
+        5.0
+        >>> b.type  # complex because 5qL cannot be expressed as a single note.
+        'complex'
         ''')
 
     @property
@@ -3134,23 +3025,17 @@ class Duration(DurationCommon):
         '''
         Get or set the type of the Duration.
 
-        ::
+        >>> a = duration.Duration()
+        >>> a.type = 'half'
+        >>> a.quarterLength
+        2.0
 
-            >>> a = duration.Duration()
-            >>> a.type = 'half'
-            >>> a.quarterLength
-            2.0
-
-        ::
-
-            >>> a.type= '16th'
-            >>> a.quarterLength
-            0.25
-
+        >>> a.type= '16th'
+        >>> a.quarterLength
+        0.25
         '''
         if self._componentsNeedUpdating:
             self._updateComponents()
-
         if len(self.components) == 1:
             return self.components[0].type
         elif len(self.components) > 1:
@@ -3161,7 +3046,6 @@ class Duration(DurationCommon):
 
     @type.setter
     def type(self, value):
-
         # need to check that type is valid
         if value not in ordinalTypeFromNum:
             raise DurationException("no such type exists: %s" % value)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         layout.py
-# Purpose:      Layout objects
+# Purpose:      Layout objects 
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
@@ -337,11 +337,15 @@ class StaffLayout(LayoutBase):
     >>> sl
     <music21.layout.StaffLayout distance 3, staffNumber 1, staffSize 113.0, staffLines 5>
 
+
     There is one other attribute, '.hidden' which has three settings:
-       None - inherit from previous StaffLayout object, or False if no object exists 
-              (TODO: Not working; always gives False)
-       False - not hidden -- show as a default staff
-       True - hidden -- for playback only staves, or for a hidden/optimized-out staff
+       
+    * None - inherit from previous StaffLayout object, or False if no object exists 
+    * False - not hidden -- show as a default staff
+    * True - hidden -- for playback only staves, or for a hidden/optimized-out staff
+    
+    
+    Note: (TODO: .hidden None is not working; always gives False)
        
 
     '''

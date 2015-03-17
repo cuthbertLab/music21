@@ -9,8 +9,6 @@
 # Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
-
 '''
 Translation routines for roman numeral analysis text files, as defined 
 and demonstrated by Dmitri Tymoczko.  Also used for the ClerqTemperley
@@ -127,12 +125,16 @@ from music21 import exceptions21
 from music21 import common
 from music21 import bar
 
+from music21.romanText import rtObjects
+
+
 from music21 import environment
 _MOD = 'romanText.translate.py'
 environLocal = environment.Environment(_MOD)
 
-USE_RN_CACHE = False ## Not currently using rnCache because of problems with PivotChords,
-                     ## See mail from Dmitri, 30 September 2014
+USE_RN_CACHE = False 
+## Not currently using rnCache because of problems with PivotChords,
+## See mail from Dmitri, 30 September 2014
 
 #-------------------------------------------------------------------------------
 
@@ -280,10 +282,8 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     Given a romanText handler or string, return or fill a Score Stream.
     '''
     # accept a string directly; mostly for testing
-    from music21 import romanText as romanTextModule
-
     if common.isStr(rtHandler):
-        rtf = romanTextModule.RTFile()
+        rtf = rtObjects.RTFile()
         rtHandler = rtf.readstr(rtHandler) # return handler, processes tokens
 
     # this could be just a Stream, but b/c we are creating metadata, perhaps better to match presentation of other scores. 
@@ -437,9 +437,9 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                     setKeyChangeToken = False # first RomanNumeral object after a key change should have this set to True
                     
                     for i, a in enumerate(t.atoms):
-                        if isinstance(a, romanTextModule.RTKey) or \
+                        if isinstance(a, rtObjects.RTKey) or \
                            ((foundAKeySignatureSoFar == False) and \
-                            (isinstance(a, romanTextModule.RTAnalyticKey))): 
+                            (isinstance(a, rtObjects.RTAnalyticKey))): 
                             # found a change of Key+KeySignature or
                             # just found a change of analysis but no keysignature so far
                     
@@ -457,7 +457,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                             foundAKeySignatureSoFar = True
                             setKeyChangeToken = True
     
-                        elif isinstance(a, romanTextModule.RTKeySignature):
+                        elif isinstance(a, rtObjects.RTKeySignature):
                             try: # this sets the keysignature but not the prefix text
                                 thisSig = a.getKeySignature()
                             except:
@@ -469,17 +469,17 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                 m._insertCore(o, thisSig)
                             foundAKeySignatureSoFar = True
     
-                        elif isinstance(a, romanTextModule.RTAnalyticKey):
+                        elif isinstance(a, rtObjects.RTAnalyticKey):
                             # just a change in analyzed key, not a change in anything else
                             #try: # this sets the key, not the keysignature
-                                kCurrent, pl = _getKeyAndPrefix(a)
-                                prefixLyric += pl
-                                setKeyChangeToken = True
+                            kCurrent, pl = _getKeyAndPrefix(a)
+                            prefixLyric += pl
+                            setKeyChangeToken = True
 
                             #except:
                             #    raise RomanTextTranslateException('cannot get key from %s in line %s' % (a.src, t.src))
     
-                        elif isinstance(a, romanTextModule.RTBeat):
+                        elif isinstance(a, rtObjects.RTBeat):
                             # set new offset based on beat
                             try:
                                 o = a.getOffset(tsCurrent)
@@ -501,7 +501,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                 m._insertCore(0, firstChord)
                             pivotChordPossible = False
 
-                        elif isinstance(a, romanTextModule.RTNoChord):
+                        elif isinstance(a, rtObjects.RTNoChord):
                             # use source to evaluation roman 
                             rn = note.Rest()
                             if pivotChordPossible == False:
@@ -520,7 +520,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                 previousRn = rn
                                 pivotChordPossible = False
 
-                        elif isinstance(a, romanTextModule.RTChord):
+                        elif isinstance(a, rtObjects.RTChord):
                             # use source to evaluation roman 
                             try:
                                 asrc = a.src
@@ -586,15 +586,15 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                 prefixLyric = ""
                                 pivotChordPossible = False
 
-                        elif isinstance(a, romanTextModule.RTRepeat):
+                        elif isinstance(a, rtObjects.RTRepeat):
                             if o == 0:
-                                if isinstance(a, romanTextModule.RTRepeatStart):
+                                if isinstance(a, rtObjects.RTRepeatStart):
                                     m.leftBarline = bar.Repeat(direction='start')
                                 else:
                                     rtt = RomanTextUnprocessedToken(a)
                                     m._insertCore(o, rtt)
                             elif tsCurrent is not None and (tsCurrent.barDuration.quarterLength == o or i == numberOfAtoms - 1):
-                                if isinstance(a, romanTextModule.RTRepeatStop):
+                                if isinstance(a, rtObjects.RTRepeatStop):
                                     m.rightBarline = bar.Repeat(direction='end')
                                 else:
                                     rtt = RomanTextUnprocessedToken(a)
@@ -643,10 +643,10 @@ def appendMeasureToRepeatEndingsDict(t, m, repeatEndings, measureNumber = None):
     
     This does not yet work for skipped measures.
     
-    >>> rtm = romanText.RTMeasure('m15a V6 b1.5 V6/5 b2 I b3 viio6')
+    >>> rtm = romanText.rtObjects.RTMeasure('m15a V6 b1.5 V6/5 b2 I b3 viio6')
     >>> rtm.repeatLetter
     ['a']
-    >>> rtm2 = romanText.RTMeasure('m15b V6 b1.5 V6/5 b2 I')
+    >>> rtm2 = romanText.rtObjects.RTMeasure('m15b V6 b1.5 V6/5 b2 I')
     >>> rtm2.repeatLetter
     ['b']
     >>> repeatEndings = {}
@@ -806,7 +806,7 @@ def romanTextToStreamOpus(rtHandler, inputM21=None):
     '''The main processing routine for RomanText objects that may or may not
     be multi movement.
     
-    Takes in a romanText.base.RTFile() object, or a string as rtHandler.
+    Takes in a romanText.rtObjects.RTFile() object, or a string as rtHandler.
     
     Runs `romanTextToStreamScore()` as its main work.
     
@@ -815,11 +815,9 @@ def romanTextToStreamOpus(rtHandler, inputM21=None):
     Return either a Score object, or, if a multi-movement work is defined, an
     Opus object.
     '''
-    from music21 import romanText as romanTextModule
-
     from music21 import stream
     if common.isStr(rtHandler):
-        rtf = romanTextModule.RTFile()
+        rtf = rtObjects.RTFile()
         rtHandler = rtf.readstr(rtHandler) # return handler, processes tokens
 
     if rtHandler.definesMovements(): # create an opus
@@ -847,11 +845,10 @@ class TestExternal(unittest.TestCase):
         pass
  
     def testExternalA(self):
-        from music21 import romanText
         from music21.romanText import testFiles
 
         for tf in testFiles.ALL:
-            rtf = romanText.RTFile()
+            rtf = rtObjects.RTFile()
             rth = rtf.readstr(tf) # return handler, processes tokens
             s = romanTextToStreamScore(rth)
             s.show()
@@ -863,11 +860,10 @@ class TestSlow(unittest.TestCase):
         pass
     
     def testBasicA(self):
-        from music21 import romanText
         from music21.romanText import testFiles
 
         for tf in testFiles.ALL:
-            rtf = romanText.RTFile()
+            rtf = rtObjects.RTFile()
             rth = rtf.readstr(tf) # return handler, processes tokens
             unused_s = romanTextToStreamOpus(rth) # will run romanTextToStreamScore on all but k273
             #s.show()
@@ -1112,7 +1108,8 @@ m6-7 = m4-5
             self.assertEqual(str([str(p) for p in rnStream[elementNumber + 4].pitches]), "['A4', 'C5', 'F5']")
 
             x = rnStream[elementNumber + 4].pitches[2].accidental
-            if x == None: x = pitch.Accidental('natural')
+            if x == None: 
+                x = pitch.Accidental('natural')
             self.assertEqual(x.alter, 0)
 
             self.assertEqual(rnStream[elementNumber + 5].figure, 'iv6')

@@ -21,7 +21,7 @@ A standard mrjob conf file for running music21 tasks (using YAML) might look lik
 	    ssh_tunnel_to_job_tracker: true
 	    enable_emr_debugging: true
 	    bootstrap_scripts: ['/home/bhadley/Desktop/bootstrapScripts/install_music21.sh']
-	    bootstrap_files: ['/home/bhadley/Desktop/bootstrapFiles/music21-1.0.0.tar.gz']
+	    bootstrap_files: ['/home/bhadley/Desktop/bootstrapFiles/music21-2.0.0.tar.gz']
 	    jobconf: 
 	      mapred.task.timeout: 3600000
 	      mapreduce.task.timeout: 3600000
@@ -42,7 +42,7 @@ And the same thing, but with JSON format::
 	    "ssh_tunnel_to_job_tracker": true,
 	    "enable_emr_debugging": true,
 	    "bootstrap_scripts": ['/directory/to/music21/installation/script/install_music21.sh']
-	    "bootstrap_files": ['/directory/to/tarred/music21/music21-1.0.tar.gz']
+	    "bootstrap_files": ['/directory/to/tarred/music21/music21-2.0.0.tar.gz']
 	  }
 	 }
 	
@@ -108,7 +108,7 @@ the conf file.
 	For the time being, you'll have to provide the tarred folders of python2.7, music21, and mrjob
 	for installation. If you've made changes to the music21 source-code, you'll want to prepare a new
 	installation package (tar.gz it) and upload that. If you'd like to use the latest release of music21,
-	simply download tar.gz folder from  http://code.google.com/p/music21/downloads/list
+	simply download tar.gz folder from https://github.com/cuthbertLab/music21/releases
 	
 	The installation scripts in the conf file look like this::
 
@@ -127,8 +127,8 @@ the conf file.
 		*install_music21.sh*
 		
 		#!/bin/bash
-		tar xvfz music21-0.6.3.b3.tar.gz
-		cd music21-0.6.3.b3
+		tar xvfz music21-2.0.0.tar.gz
+		cd music21-2.0.0
 		sudo python setup.py install
 		
 		*install_mrjob.sh*

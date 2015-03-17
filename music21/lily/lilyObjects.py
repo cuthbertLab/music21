@@ -9,13 +9,6 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
-from __future__ import unicode_literals
-#python3
-try:
-    basestring
-except:
-    basestring = str # @ReservedAssignment
-
 '''
 music21 translates to Lilypond format and if Lilypond is installed on the
 local computer, can automatically generate .pdf, .png, and .svg versions
@@ -25,6 +18,16 @@ this replaces (April 2012) the old LilyString() conversion methods.
 
 The Grammar for Lilypond comes from http://lilypond.org/doc/v2.14/Documentation/notation/lilypond-grammar
 '''
+
+
+from __future__ import unicode_literals
+#python3
+try:
+    basestring # @UndefinedVariable
+except:
+    basestring = str # @ReservedAssignment
+
+
 import unittest
 from music21 import exceptions21
 from music21 import common
@@ -43,6 +46,10 @@ class LyObject(object):
         self.lilyAttributes = {}
         self._parent = None
         self.thisIndent = 0
+        self.markupTop = None
+        self.lyricMarkupOrIdentifier = None
+        self.markupListOrIdentifier = None
+        self.markupTopOrIdentifier = None
         #self.setLilyAttributes(inObject, context, **keywords)
     
     def __setattr__(self, name, value):
@@ -577,7 +584,7 @@ class LyBookpartBlock(LyObject):
     
     def stringOutput(self):
         if self.bookpartBody is None:
-            self.backslash + "bookpart " + self.encloseCurly("")
+            return self.backslash + "bookpart " + self.encloseCurly("") 
         else:
             return self.backslash + "bookpart " + self.encloseCurly(self.bookpartBody.stringOutput())
 
@@ -1267,6 +1274,7 @@ class LyReRhythmedMusic(LyObject):
         else:
             outputString = c + " "
         outputString += self.newLyrics.stringOutput()
+        return outputString # previously this did not return...
 
 class LyContextChange(LyObject):
     def __init__(self, before = None, after = None):

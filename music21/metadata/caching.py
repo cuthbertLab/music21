@@ -154,7 +154,7 @@ class MetadataCachingJob(object):
             else:
                 parsedObject = corpus.parse(
                     self.filePath, forceSource=True)
-        except Exception as e:
+        except corpus.CorpusException as e:
             environLocal.printDebug('parse failed: {0}, {1}'.format(
                 self.filePath, str(e)))
             environLocal.printDebug(traceback.format_exc())
@@ -335,7 +335,7 @@ class JobProcessor(object):
         If `processCount` is none, use 1 fewer process than the number of
         available cores.
         '''
-        processCount = processCount or (multiprocessing.cpu_count() * 2) - 1
+        processCount = processCount or (multiprocessing.cpu_count() * 2) - 1  # @UndefinedVariable
         if processCount < 1:
             processCount = 1
         remainingJobs = len(jobs)
@@ -343,8 +343,8 @@ class JobProcessor(object):
             'Processing {0} jobs in parallel, with {1} processes.'.format(
                 remainingJobs, processCount))
         results = []
-        job_queue = multiprocessing.JoinableQueue()
-        result_queue = multiprocessing.Queue()
+        job_queue = multiprocessing.JoinableQueue() # @UndefinedVariable
+        result_queue = multiprocessing.Queue() # @UndefinedVariable
         workers = [WorkerProcess(job_queue, result_queue)
             for _ in range(processCount)]
         for worker in workers:
@@ -352,7 +352,7 @@ class JobProcessor(object):
         if jobs:
             for job in jobs:
                 job_queue.put(pickle.dumps(job, protocol=0))
-            for _ in xrange(len(jobs)):
+            for _ in range(len(jobs)):
                 job = pickle.loads(result_queue.get())
                 results = job.getResults()
                 errors = job.getErrors()
@@ -394,7 +394,7 @@ class JobProcessor(object):
 #------------------------------------------------------------------------------
 
 
-class WorkerProcess(multiprocessing.Process):
+class WorkerProcess(multiprocessing.Process): # @UndefinedVariable
     '''
     A worker process for use by the multithreaded metadata-caching job
     processor.
@@ -403,7 +403,7 @@ class WorkerProcess(multiprocessing.Process):
     ### INITIALIZER ###
 
     def __init__(self, job_queue, result_queue):
-        multiprocessing.Process.__init__(self)
+        multiprocessing.Process.__init__(self) # @UndefinedVariable
         self.job_queue = job_queue
         self.result_queue = result_queue
 

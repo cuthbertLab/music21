@@ -40,62 +40,49 @@ def derivationMethod(function):
 
 class Derivation(SlottedObject):
     '''
-    A Derivation object keeps track of which Streams
+    A Derivation object keeps track of which Streams (or perhaps other Music21Objects)
+    a Stream has come from and how.
 
-    ::
+    >>> s1 = stream.Stream()
+    >>> s1.id = "DerivedStream"
+    >>> d1 = derivation.Derivation(s1)
 
-        >>> s1 = stream.Stream()
-        >>> s1.id = "DerivedStream"
-        >>> d1 = derivation.Derivation(s1)
-
-        >>> s2 = stream.Stream()
-        >>> s2.id = "OriginalStream"
-
+    >>> s2 = stream.Stream()
+    >>> s2.id = "OriginalStream"
         
-        >>> d1.method = 'manual'
-        >>> d1.origin = s2
-        >>> d1
-        <Derivation of <music21.stream.Stream DerivedStream> from <music21.stream.Stream OriginalStream> via "manual">
-        >>> d1.origin is s2
-        True
+    >>> d1.method = 'manual'
+    >>> d1.origin = s2
+    >>> d1
+    <Derivation of <music21.stream.Stream DerivedStream> from <music21.stream.Stream OriginalStream> via "manual">
+    >>> d1.origin is s2
+    True
 
-    ::
+    >>> d1.client is s1
+    True
 
-        >>> d1.client is s1
-        True
+    >>> import copy
+    >>> d2 = copy.deepcopy(d1)
+    >>> d2.origin is s2
+    True
 
-    ::
-
-        >>> import copy
-        >>> d2 = copy.deepcopy(d1)
-        >>> d2.origin is s2
-        True
-
-    ::
-
-        >>> d1.method = 'measure'
-        >>> d1.method
-        'measure'
+    >>> d1.method = 'measure'
+    >>> d1.method
+    'measure'
         
     Deleting the origin stream does not change the Derivation, since origin is held by strong ref:
     
-    ::
-
-        >>> import gc  # Garbage collection...
-        >>> del(s2)
-        >>> unused = gc.collect()  # ensure Garbage collection is run
-        >>> d1
-        <Derivation of <music21.stream.Stream DerivedStream> from <music21.stream.Stream OriginalStream> via "measure">
-
+    >>> import gc  # Garbage collection...
+    >>> del(s2)
+    >>> unused = gc.collect()  # ensure Garbage collection is run
+    >>> d1
+    <Derivation of <music21.stream.Stream DerivedStream> from <music21.stream.Stream OriginalStream> via "measure">
 
     But deleting the client stream changes the Derivation, since client is held by weak ref:
 
-    ::
-        >>> del(s1)
-        >>> unused = gc.collect()  # ensure Garbage collection is run
-        >>> d1
-        <Derivation of None from <music21.stream.Stream OriginalStream> via "measure">
-
+    >>> del(s1)
+    >>> unused = gc.collect()  # ensure Garbage collection is run
+    >>> d1
+    <Derivation of None from <music21.stream.Stream OriginalStream> via "measure">
     '''
 
     ### CLASS VARIABLES ###
@@ -171,27 +158,32 @@ class Derivation(SlottedObject):
             self._clientId = id(client)
             self._client = common.wrapWeakref(client)
 
-    @property
-    def derivationChain(self):
+    def chain(self):
         '''
-        Return a list Streams that this Derivation's client Stream was derived
+        Iterator.
+        
+        Returns Streams that this Derivation's client Stream was derived
         from. This provides a way to obtain all Streams that the client passed
         through, such as those created by
         :meth:`~music21.stream.Stream.getElementsByClass` or
         :attr:`~music21.stream.Stream.flat`.
 
-        ::
-
-            >>> s1 = stream.Stream()
-            >>> s1.repeatAppend(note.Note(), 10)
-            >>> s1.repeatAppend(note.Rest(), 10)
-            >>> s2 = s1.getElementsByClass('GeneralNote')
-            >>> s3 = s2.getElementsByClass('Note')
-            >>> s3.derivation.derivationChain == [s2, s1]
-            True
-
+        >>> s1 = stream.Stream()
+        >>> s1.id = 's1'
+        >>> s1.repeatAppend(note.Note(), 10)
+        >>> s1.repeatAppend(note.Rest(), 10)
+        >>> s2 = s1.getElementsByClass('GeneralNote')
+        >>> s2.id = 's2'
+        >>> s3 = s2.getElementsByClass('Note')
+        >>> s3.id = 's3'
+        >>> for y in s3.derivation.chain():
+        ...     print(y)
+        <music21.stream.Stream s2>
+        <music21.stream.Stream s1>
+        
+        >>> list(s3.derivation.chain()) == [s2, s1]
+        True
         '''
-
         result = []
         origin = self.origin
         while origin is not None:
@@ -205,18 +197,13 @@ class Derivation(SlottedObject):
         Returns the string of the method that was used to generate this
         Stream.
 
-        ::
+        >>> s = stream.Stream()
+        >>> s.derivation.method is None
+        True
 
-            >>> s = stream.Stream()
-            >>> s.derivation.method is None
-            True
-
-        ::
-
-            >>> sNotes = s.notes
-            >>> sNotes.derivation.method
-            'notes'
-
+        >>> sNotes = s.notes
+        >>> sNotes.derivation.method
+        'notes'
         '''
         return self._method
 
@@ -227,32 +214,23 @@ class Derivation(SlottedObject):
 
         Some examples are 'getElementsByClass' etc.
 
-        ::
+        >>> s = stream.Stream()
+        >>> s.append(clef.TrebleClef())
+        >>> s.append(note.Note())
+        >>> sNotes = s.notes
+        >>> sNotes.derivation
+        <music21.derivation.Derivation object at 0x...>
 
-            >>> s = stream.Stream()
-            >>> s.append(clef.TrebleClef())
-            >>> s.append(note.Note())
-            >>> sNotes = s.notes
-            >>> sNotes.derivation
-            <music21.derivation.Derivation object at 0x...>
+        >>> sNotes.derivation.method
+        >>> derived.method
+        'notes'
 
-        ::
+        >>> derived.method = 'blah'
+        >>> derived.method
+        'blah'
 
-            >>> sNotes.derivation.method
-            >>> derived.method
-            'notes'
-
-        ::
-
-            >>> derived.method = 'blah'
-            >>> derived.method
-            'blah'
-
-        ::
-
-            >>> sNotes.derivation.method
-            'blah'
-
+        >>> sNotes.derivation.method
+        'blah'
         '''
         self._method = method
 
@@ -278,25 +256,19 @@ class Derivation(SlottedObject):
         calls to :attr:`~music21.stream.Stream.derivesFrom` until we get to a
         Stream that cannot be further derived.
 
-        ::
-
-            >>> s1 = stream.Stream()
-            >>> s1.repeatAppend(note.Note(), 10)
-            >>> s1.repeatAppend(note.Rest(), 10)
-            >>> s2 = s1.getElementsByClass('GeneralNote')
-            >>> s3 = s2.getElementsByClass('Note')
-            >>> s3.derivation.rootDerivation is s1
-            True
-
+        >>> s1 = stream.Stream()
+        >>> s1.repeatAppend(note.Note(), 10)
+        >>> s1.repeatAppend(note.Rest(), 10)
+        >>> s2 = s1.getElementsByClass('GeneralNote')
+        >>> s3 = s2.getElementsByClass('Note')
+        >>> s3.derivation.rootDerivation is s1
+        True
         '''
-
-        chain = self.derivationChain
-        if len(chain):
-            return chain[-1]
+        derivationChain = self.chain()
+        if len(derivationChain):
+            return derivationChain[-1]
         else:
             return None
-
-
 
 #------------------------------------------------------------------------------
 

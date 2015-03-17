@@ -65,7 +65,7 @@ TinyNotation specification soon, as it's too Trecento specific.)
 
 #python3
 try:
-    basestring
+    basestring # @UndefinedVariable
 except NameError:
     basestring = str # @ReservedAssignment
 
@@ -264,15 +264,17 @@ class TinyNotationStream(stream.Stream):
         calling self.setupRegularExpressions 
         will replace p and b+ with `re.compile` versions of the
         same and make `self.PUNCTUS = re.compile('p')`, etc.
-
-         from music21 import tinyNotation
-         dummy = reload(tinyNotation) # show before and after
-         print(tinyNotation.TinyNotationStream.regularExpressions)
-        {'ENDBRAC': '\\}', 'QUAD': 'quad\\{', ...}
-         tns = tinyNotation.TinyNotationStream('3/4 d2 e4 f2 g4')
-         tinyNotation.TinyNotationStream.regularExpressions['ENDBRAC']
-        <_sre.SRE_Pattern object at 0x...>
         '''
+# DO NOT DOCTEST
+#         from music21 import tinyNotation
+#         dummy = reload(tinyNotation) # show before and after
+#         print(tinyNotation.TinyNotationStream.regularExpressions)
+#         {'ENDBRAC': '\\}', 'QUAD': 'quad\\{', ...}
+#         tns = tinyNotation.TinyNotationStream('3/4 d2 e4 f2 g4')
+#         tinyNotation.TinyNotationStream.regularExpressions['ENDBRAC']
+#         <_sre.SRE_Pattern object at 0x...>
+
+        
         for regexpName in self.regularExpressions:
             regexpValue = self.regularExpressions[regexpName]
             if isinstance(regexpValue, basestring):
@@ -344,7 +346,14 @@ class TinyNotationNote(object):
 
 
     OMIT_FROM_DOCS
-
+    >>> tinyNotation.TinyNotationNote("c4").note.octave
+    4
+    >>> tinyNotation.TinyNotationNote("C4").note.octave
+    3
+    >>> tinyNotation.TinyNotationNote("CC4").note.octave
+    2
+    >>> tinyNotation.TinyNotationNote("CCC4").note.octave
+    1
     
     >>> tcn2 = tinyNotation.TinyNotationNote("c''##16").note
     >>> tcn2.accidental
@@ -366,7 +375,7 @@ class TinyNotationNote(object):
     
     '''
     regularExpressions = {  'REST'    : r'r',
-                            'OCTAVE2' : r'([A-G])+[A-G]',
+                            'OCTAVE2' : r'([A-G]+)[A-G]',
                             'OCTAVE3' : r'([A-G])',
                             'OCTAVE5' : r'([a-g])(\'+)', 
                             'OCTAVE4' : r'([a-g])',
@@ -566,7 +575,7 @@ class TinyNotationNote(object):
         
     def _getPitch(self, matchObj, octave):
         noteObj = note.Note()
-        noteObj.step = matchObj.group(1).upper()
+        noteObj.step = matchObj.group(1)[0].upper()
         noteObj.octave = octave
         return noteObj
 

@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2009-2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -15,7 +15,8 @@ Converts musicxml xml text to the intermediate mxObjects format.
 from music21.musicxml import mxObjects as musicxmlMod
 
 import sys
-from music21.ext import six
+from music21.ext import six, chardet
+import codecs
 
 # in order for sax parsing to properly handle unicode strings w/ unicode chars
 # stored in StringIO.StringIO, this update is necessary
@@ -27,7 +28,7 @@ if six.PY2:
     currentStdIn = sys.stdin
     currentStdErr = sys.stderr
     try:
-        reload(sys)
+        reload(sys) # @UndefinedVariable
         sys.setdefaultencoding('utf-8') # @UndefinedVariable
     except: # Python3
         pass
@@ -41,7 +42,7 @@ import os
 import unittest
 
 # use io.StringIO  in python 3, avail in 2.6, not 2.5
-from music21.ext.six import StringIO
+from music21.ext.six import StringIO, BytesIO
 
 try:
     import cPickle as pickleMod # much faster...
@@ -1037,16 +1038,45 @@ class Document(object):
             except TypeError:
                 raise
 
-        else: # TODO: should this be codecs.open()?
-            fileLikeOpen = open(fileLike)
-            #fileLikeOpen = codecs.open(fileLike, encoding='utf-8')
+        else: 
+            
+            fileLikeOpen = codecs.open(fileLike, encoding='utf-8')
 
         # the file always needs to be closed, otherwise
         # subsequent parsing operations produce an unclosed token error
         try:
             saxparser.parse(fileLikeOpen)
-        except:
+        except Exception as e:
+            # try a bunch of things to work with UTF-16 files...
             fileLikeOpen.close()
+            if not isFile:
+                raise e
+            with codecs.open(fileLike, 'rb') as fileBinary:
+                fileContentsBinary = fileBinary.read()
+                encodingGuess = chardet.detect(fileContentsBinary)['encoding']
+            fileLikeOpen2 = codecs.open(fileLike, encoding=encodingGuess)
+            fileContentsUnicode = fileLikeOpen2.read()
+            fileLikeOpen2.close()
+            fileBytes = fileContentsUnicode.encode(encodingGuess)
+            if six.PY3:  # remove BOM
+                if fileBytes[0:2] in (b'\xff\xfe', b'\xfe\xff'):
+                    fileBytes = fileBytes[2:]                
+            else:
+                if fileBytes[0:2] in ('\xff\xfe', '\xfe\xff'):
+                    fileBytes = fileBytes[2:]                                
+            
+            fileLikeOpen = BytesIO(fileBytes)
+            try:
+                saxparser.parse(fileLikeOpen)
+            except Exception as e:
+# This may be useful for fixing incorrect XML encoding declarations
+#                 uTop = u[0:1000]
+#                 print(uTop)
+#                 if 'encoding=' in uTop:
+#                     m = re.search("encoding=[\'\"](.*?)[\'\"]", uTop)
+#                     encodingType = m.group(1).lower()
+                fileLikeOpen.close()
+                raise e
         fileLikeOpen.close()
 
         #t.stop()
@@ -1125,17 +1155,20 @@ class TestExternal(unittest.TestCase):
 
     def testOpen(self, fp=None):    
         from music21 import corpus
-        if fp == None: # get shuman
-            fp = corpus.getWork('opus41no1', 2)
+        if fp == None:
+            fp = corpus.getWork('trecento/Fava_Dicant_nunc_iudei')
         c = Document()
         c.open(fp, audit=True)
         c.repr()
 
     def testCompareFile(self, fpIn=None, fpOut=None):
-        '''input a file and write it back out as xml'''
+        '''
+        input a file and write it back out as xml 
+        -- ONLY WORKS ON XML not MXL... make sure file is in that Forman
+        '''
         from music21 import corpus
-        if fpIn == None: # get shuman
-            fpIn = corpus.getWork('opus41no1', 2)
+        if fpIn == None: # get Schumann
+            fpIn = corpus.getWork('trecento/Fava_Dicant_nunc_iudei')
 
         if fpOut == None:
             fpOut = environLocal.getTempFile('.xml')
@@ -1327,10 +1360,11 @@ if __name__ == "__main__":
     # this is a temporary hack to get encoding working right
     # this may not be the best way to do this
     if six.PY2:
-        reload(sys)
+        reload(sys) # @UndefinedVariable
         sys.setdefaultencoding("utf-8") # @UndefinedVariable
 
     import music21
+    #music21.converter.parse('/Users/Cuthbert/Dropbox/EMMSAP/MusicXML In/PMFC_05_34-Bon_Bilgrana_de_Valor.xml', forceSource=True)
     music21.mainTest(Test, TestExternal)
 
 #------------------------------------------------------------------------------

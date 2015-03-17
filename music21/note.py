@@ -346,8 +346,7 @@ class GeneralNote(base.Music21Object):
 
         if (self.duration.quarterLength == 0 and
             len(self.duration.currentComponents()) == 0):
-            self.duration.addDurationUnit(duration.DurationUnit('quarter'))
-            self.duration.updateQuarterLength()
+            self.duration.quarterLength = 1.0
 
         self.lyrics = [] # a list of lyric objects
         self.expressions = []
@@ -682,6 +681,10 @@ class NotRest(GeneralNote):
         else:
             self.beams = beam.Beams()
 
+    #===============================================================================================
+    # Special functions
+    #===============================================================================================
+
     def __deepcopy__(self, memo=None):
         '''
         As NotRest objects have a Volume, objects, and Volume objects
@@ -701,6 +704,18 @@ class NotRest(GeneralNote):
         if self._volume is not None:
             new.volume.parent = new # update with new instance
         return new
+
+    def __getstate__(self):
+        state = super(NotRest, self).__getstate__()
+        if '_volume' in state and state['_volume'] is not None:
+            state['_volume'].parent = None
+        return state
+ 
+    def __setstate__(self, state):
+        super(NotRest, self).__setstate__(state)
+        if self._volume is not None:
+            self._volume.parent = self
+    ####
 
     def _getStemDirection(self):
         return self._stemDirection

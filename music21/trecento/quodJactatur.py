@@ -345,16 +345,22 @@ def bentWolfSolution():
 def possibleSolution():
     getQJ()
 
-    triplum = (1, 0, False, False)  # transpose, delay, invert, retro
-    ct = (-5, 5, True, True)
-    tenor = (5, 5, False, False)
+    triplum = (5, 5, False, False)  # transpose, delay, invert, retro
+    ct = (5, 5, True, False)
+    tenor = (1, 0, False, False)
+
+#     # very good score and fits the description...
+#     triplum = (5, 5, False, False)
+#     ct = (5, 10, True, True)
+#     tenor = (1, 0, False, False)
+    
     
     unused_qjChords, avgScore, qjSolved = prepareSolution(tenor, triplum, ct)
     print(avgScore)
 #    qjSolved.insert(0, stream.Part())
 #    qjSolved.insert(0, qjChords)
     qjSolved.show('musicxml')
-#    qjChords.show('musicxml')
+    #qjChords.show('musicxml')
  
 def multipleSolve():
     import csv
@@ -431,6 +437,7 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
 #    music21.mainTest()
+#    bentWolfSolution()
     possibleSolution()
 #    findRetrogradeVoices()
     pass

@@ -14,6 +14,7 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 '''
 
 # should NOT import music21 or anything like that, except in doctests.
+import imp
 import re
 import copy
 import math, sys, os
@@ -33,7 +34,7 @@ from music21.ext import six
 
 #python3
 try:
-    basestring
+    basestring # @UndefinedVariable 
 except NameError:
     basestring = str # @ReservedAssignment
 
@@ -657,7 +658,7 @@ def opFrac(num):
         else:
             return num # leave fraction alone
     else:
-        raise Exception("Cannot convert num: %r" % num)
+        raise TypeError("Cannot convert num: %r" % num)
         
 
 
@@ -919,7 +920,7 @@ def standardDeviation(coll, bassel=False):
 
 def isNum(usrData):
     '''check if usrData is a number (float, int, long, Decimal), return boolean
-    IMPROVE: when 2.6 is everywhere: add numbers class.
+    TODO: consider using numbers class (wasn't available until 2.6)
 
     >>> common.isNum(3.0)
     True
@@ -927,11 +928,23 @@ def isNum(usrData):
     True
     >>> common.isNum('three')
     False
+    
+    True and False are NOT numbers:
+    
+    >>> common.isNum(True)
+    False
+    >>> common.isNum(False)
+    False
+    >>> common.isNum(None)
+    False
     '''
     try:
         # TODO: this may have unexpected consequences: find
         dummy = usrData + 0
-        return True
+        if usrData is not True and usrData is not False:
+            return True
+        else:
+            return False
     except Exception: # pylint: disable=broad-except
         return False
 
@@ -975,7 +988,6 @@ def contiguousList(inputListOrTuple):
 
 def isStr(usrData):
     """Check of usrData is some form of string, including unicode.
-
 
     >>> common.isStr(3)
     False
@@ -1064,11 +1076,60 @@ def toUnicode(usrStr):
             return usrStr
     else:
         try:
-            usrStr = unicode(usrStr, 'utf-8') # pylint: disable=undefined-variable
+            usrStr = unicode(usrStr, 'utf-8') # @UndefinedVariable  pylint: disable=undefined-variable
         # some documentation may already be in unicode; if so, a TypeException will be raised
         except TypeError: #TypeError: decoding Unicode is not supported
             pass
         return usrStr
+
+def readFileEncodingSafe(filePath, firstGuess='utf-8'):
+    r'''
+    Slow, but will read a file of unknown encoding as safely as possible using
+    the LGPL chardet package in music21.ext.  
+    
+    Let's try to load this file as ascii -- it has a copyright symbol at the top
+    so it won't load in Python3:
+    
+    >>> import os 
+    >>> c = common.getSourceFilePath() + os.sep + 'common.py'
+    >>> f = open(c)
+    >>> #_DOCS_SHOW data = f.read()
+    Traceback (most recent call last):
+    UnicodeDecodeError: 'ascii' codec can't decode byte 0xc2 in position ...: ordinal not in range(128)
+
+    That won't do! now I know that it is in utf-8, but maybe you don't. Or it could
+    be an old humdrum or Noteworthy file with unknown encoding.  This will load it safely.
+    
+    >>> data = common.readFileEncodingSafe(c)
+    >>> data[0:30]
+    u'#-*- coding: utf-8 -*-\n#------'
+    
+    Well, that's nothing, since the first guess here is utf-8 and it's right. So let's
+    give a worse first guess:
+    
+    >>> data = common.readFileEncodingSafe(c, firstGuess='SHIFT_JIS') # old Japanese standard
+    >>> data[0:30]
+    u'#-*- coding: utf-8 -*-\n#------'
+    
+    It worked!
+    
+    Note that this is slow enough if it gets it wrong that the firstGuess should be set
+    to something reasonable like 'ascii' or 'utf-8'.
+    '''
+    import codecs
+    from music21.ext import chardet # encoding detector... @UnresolvedImport
+    try:
+        with codecs.open(filePath, 'r', encoding=firstGuess) as thisFile:
+            data = thisFile.read()
+            return data
+    except OSError: # Python3 FileNotFoundError...
+        raise
+    except UnicodeDecodeError:
+        with codecs.open(filePath, 'rb') as thisFileBinary:
+            dataBinary = thisFileBinary.read()
+            encoding = chardet.detect(dataBinary)['encoding']
+            return codecs.decode(dataBinary, encoding)
+    
 
 
 def classToClassStr(classObj):
@@ -1643,7 +1704,7 @@ def ordinalAbbreviation(value, plural=False):
 
 def stripAddresses(textString, replacement = "ADDRESS"):
     '''
-    Function that changes all memory addresses in the given
+    Function that changes all memory addresses (pointers) in the given
     textString with (replacement).  This is useful for testing
     that a function gives an expected result even if the result
     contains references to memory locations.  So for instance:
@@ -1656,8 +1717,16 @@ def stripAddresses(textString, replacement = "ADDRESS"):
 
     >>> common.stripAddresses("{0.0} <music21.humdrum.MiscTandem *>I humdrum control>")
     '{0.0} <music21.humdrum.MiscTandem *>I humdrum control>'
+
+
+    For doctests, can strip to '...' to make it work fine with doctest.ELLIPSIS
+    
+    >>> common.stripAddresses("{0.0} <music21.base.Music21Object object at 0x102a0ff10>", '0x...')
+    '{0.0} <music21.base.Music21Object object at 0x...>'
+
+
     '''
-    ADDRESS = re.compile('0x[0-9A-F]+')
+    ADDRESS = re.compile('0x[0-9A-Fa-f]+')
     return ADDRESS.sub(replacement, textString)
 
 
@@ -2109,7 +2178,7 @@ xlateAccents={0xc0:'A', 0xc1:'A', 0xc2:'A', 0xc3:'A', 0xc4:'A', 0xc5:'A',
     }
 
 def stripAccents(inputString):
-    '''
+    r'''
     removes accents from unicode strings.
 
 
@@ -2154,7 +2223,7 @@ def normalizeFilename(name):
         name = name[:lenName -4]
 
     if isinstance(name, str) and six.PY2:
-        name = unicode(name) # pylint: disable=undefined-variable
+        name = unicode(name) # @UndefinedVariable pylint: disable=undefined-variable
 
     name = unicodedata.normalize('NFKD', name)
     if six.PY2:
@@ -2294,6 +2363,21 @@ class SlottedObject(object):
     r'''
     Provides template for classes implementing slots allowing it to be pickled
     properly.
+    
+    Only use SlottedObjects for objects that we expect to make so many of
+    that memory storage and speed become an issue.
+    
+    >>> import pickle
+    >>> class Glissdata(common.SlottedObject):
+    ...     __slots__ = ('time', 'frequency')
+    >>> s = Glissdata
+    >>> s.time = 0.125
+    >>> s.frequency = 440.0
+    >>> #_DOCS_SHOW out = pickle.dumps(s)
+    >>> #_DOCS_SHOW t = pickle.loads(out)
+    >>> t = s #_DOCS_HIDE -- cannot define classes for pickling in doctests
+    >>> t.time, t.frequency
+    (0.125, 440.0)
     '''
     
     ### CLASS VARIABLES ###
@@ -2308,12 +2392,66 @@ class SlottedObject(object):
         for cls in self.__class__.mro():
             slots.update(getattr(cls, '__slots__', ()))
         for slot in slots:
-            state[slot] = getattr(self, slot, None)
+            sValue = getattr(self, slot, None)
+            if sValue is not None and type(sValue) is weakref.ref:
+                sValue = sValue()
+                print("Warning: uncaught weakref found in %r - %s, will not be rewrapped" % (self, slot))
+            state[slot] = sValue
         return state
 
     def __setstate__(self, state):
         for slot, value in state.items():
             setattr(self, slot, value)
+
+#===============================================================================
+# Image functions 
+#===============================================================================
+### Removed because only used by MuseScore and newest versions have -T option...
+# try:
+#     imp.find_module('PIL')
+#     hasPIL = True
+# except ImportError:
+#     hasPIL = False
+# 
+# def cropImageFromPath(fp, newPath=None):
+#     '''
+#     Autocrop an image in place (or at new path) from Path, if PIL is installed and return True,
+#     otherwise return False.  leave a border of size (
+#     
+#     Code from
+#     https://gist.github.com/mattjmorrison/932345
+#     '''
+#     if newPath is None:
+#         newPath = fp
+#     if hasPIL:
+#         from PIL import Image, ImageChops # overhead of reimporting is low compared to imageops
+#         imageObj = Image.open(fp)
+#         imageBox = imageObj.getbbox()
+#         if imageBox:
+#             croppedImg = imageObj.crop(imageBox)
+#         options = {}
+#         if 'transparency' in imageObj.info:
+#             options['transparency'] = imageObj.info["transparency"]
+# #         border = 255 # white border...
+# #         tempBgImage = Image.new(imageObj.mode, imageObj.size, border)
+# #         differenceObj = ImageChops.difference(imageObj, tempBgImage)
+# #         boundingBox = differenceObj.getbbox()
+# #         if boundingBox: # empty images return None...
+# #             croppedImg = imageObj.crop(boundingBox)
+#         croppedImg.save(newPath, **options)
+#         return True
+#         
+# 
+#     else:
+#         from music21 import environment
+#         if six.PY3:
+#             pip = 'pip3'
+#         else:
+#             pip = 'pip'
+#         environLocal = environment.Environment('common.py')        
+#         environLocal.warn('PIL/Pillow is not installed -- "sudo ' + pip + ' install Pillow"')
+#         return False
+#         
 
 
 #-------------------------------------------------------------------------------

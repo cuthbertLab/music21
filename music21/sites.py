@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2007-2014 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2007-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -50,7 +50,6 @@ class SiteRef(common.SlottedObject):
     >>> s = sites.SiteRef()
     >>> s.classString = st.classes[0]
     >>> s.site = st
-    >>> s.offset = 20.0
     >>> s.isDead
     False
 
@@ -63,22 +62,8 @@ class SiteRef(common.SlottedObject):
     <weakref at 0x...; to 'Stream' at 0x...>
     
 
-    Ways of working with tuplets:
-    
-    >>> s.offset = 1/3.0
-    >>> s.offset
-    Fraction(1, 3)
-    >>> s.offsetRational # same
-    Fraction(1, 3)
-    >>> s.offsetFloat
-    0.333...
-
-    
-    OMIT_FROM_DOCS
-    if you turn sites.WEAKREF_ACTIVE to False then .siteWeakref just stores another reference to
-    the site.
-    
-    
+    If you turn sites.WEAKREF_ACTIVE to False then .siteWeakref just stores another reference to
+    the site.  Bad for memory. Good for debugging pickling.
     '''
     ### CLASS VARIABLES ###
 
@@ -88,7 +73,6 @@ class SiteRef(common.SlottedObject):
         'siteIndex',
         'isDead',
         'siteWeakref',
-        '_offset',
         )
     ### INITIALIZER ###
 
@@ -97,47 +81,31 @@ class SiteRef(common.SlottedObject):
         self.classString = None
         self.globalSiteIndex = None
         self.siteIndex = None
-        self.isDead = False
         self.siteWeakref = None
-        self._offset = 0.0
     
     def _getAndUnwrapSite(self):
-        # should set isDead?
-        return common.unwrapWeakref(self.siteWeakref)
+        if WEAKREF_ACTIVE:
+            return common.unwrapWeakref(self.siteWeakref)
+        else:
+            return self.siteWeakref
     
     def _setAndWrapSite(self, site):
-        self.siteWeakref = common.wrapWeakref(site)
+        if WEAKREF_ACTIVE:
+            self.siteWeakref = common.wrapWeakref(site)
+        else:
+            self.siteWeakref = site
 
     site = property(_getAndUnwrapSite, _setAndWrapSite)
 
+    def __getstate__(self):
+        if WEAKREF_ACTIVE:
+            self.siteWeakref = common.unwrapWeakref(self.siteWeakref)
+        return common.SlottedObject.__getstate__(self)
 
-    def _getOffsetFloat(self):
-        if isinstance(self._offset, basestring):
-            return self._offset
-        elif self._offset is not None:
-            return float(self._offset)
-        else:
-            return None
-    
-    def _setOffset(self, offset):
-        '''
-        sets the offset and if necessary, translates it to a Fraction for exact representation.
-        '''
-        if offset is None:
-            self._offset = None
-        elif isinstance(offset, basestring):
-            self._offset = offset
-        else:
-            self._offset = common.opFrac(offset)
-    def _getOffsetRational(self):
-        '''
-        returns the offset without conversion to float...
-        '''
-        return self._offset
-    
-    offset = property(_getOffsetRational, _setOffset)
-    offsetRational = property(_getOffsetRational, _setOffset)
-    offsetFloat = property(_getOffsetFloat, _setOffset, doc='''synonym for offset''')
+    def __setstate__(self, state):
+        common.SlottedObject.__setstate__(self, state)
+        if WEAKREF_ACTIVE:
+            self.siteWeakref = common.wrapWeakref(self.siteWeakref)
 
 
 _singletonCounter = common.SingletonCounter()
@@ -147,10 +115,9 @@ class Sites(common.SlottedObject):
     An object, stored within a Music21Object, that stores (weak) references to
     a collection of objects that may be contextually relevant to this object.
 
-    Some of these objects are locations (also called sites), or Streams that
-    contain this object. In this case the Sites object stores an offset value,
-    used for determining position within a Stream.
-
+    Most of these objects are locations (also called sites), or Streams that
+    contain this object.
+    
     All defined contexts are stored as dictionaries in a dictionary. The
     outermost dictionary stores objects.
     '''
@@ -160,7 +127,6 @@ class Sites(common.SlottedObject):
     __slots__ = (
         'siteDict',
         '_lastID',
-        '_lastOffset',
         '_locationKeys',
         '_siteIndex',
         'containedById',
@@ -183,7 +149,6 @@ class Sites(common.SlottedObject):
         self.containedById = containedById
         # cache for performance
         self._lastID = -1  # cannot be None
-        self._lastOffset = None
 
     ## SPECIAL METHODS ###
 
@@ -198,33 +163,25 @@ class Sites(common.SlottedObject):
         have the former site as a location, even though the new Note instance
         is not actually found in the old Stream.
 
-        ::
+        >>> import copy
+        >>> class Mock(base.Music21Object):
+        ...     pass
+        >>> aObj = Mock()
+        >>> aContexts = sites.Sites()
+        >>> aContexts.add(aObj)
+        >>> bContexts = copy.deepcopy(aContexts)
+        >>> len(aContexts.get()) == 1
+        True
 
-            >>> import copy
-            >>> class Mock(base.Music21Object):
-            ...     pass
-            >>> aObj = Mock()
-            >>> aContexts = sites.Sites()
-            >>> aContexts.add(aObj)
-            >>> bContexts = copy.deepcopy(aContexts)
-            >>> len(aContexts.get()) == 1
-            True
+        >>> len(bContexts.get()) == 1
+        True
 
-        ::
-
-            >>> len(bContexts.get()) == 1
-            True
-
-        ::
-
-            >>> aContexts.get() == bContexts.get()
-            True
-
+        >>> aContexts.get() == bContexts.get()
+        True
         '''
         #TODO: it may be a problem that sites are being transferred to deep
         #copies; this functionality is used at times in context searches, but
         # may be a performance hog.
-
         new = self.__class__()
         locations = []  # self._locationKeys[:]
         #environLocal.printDebug(['Sites.__deepcopy__', 'self.siteDict.keys()', self.siteDict.keys()])
@@ -240,14 +197,7 @@ class Sites(common.SlottedObject):
                 newIdKey = id(newSite.site)
                 #if newIdKey != idKey and oldSite.site != None:
                 #    print "WHOA! %s %s" % (newIdKey, idKey)
-            # not copying the offset in deepcopying means that
-            # the old site becomes a context, not a site
-            # this is still experimental
-            # post.offset = None
-            newSite.offset = oldSite.offset
-            if newSite.offset is not None:
-                locations.append(newIdKey)  # if offset not None, a location
-
+            locations.append(newIdKey)
             newSite.siteIndex = oldSite.siteIndex
             newSite.globalSiteIndex = _singletonCounter()
             newSite.classString = oldSite.classString
@@ -266,15 +216,13 @@ class Sites(common.SlottedObject):
         '''
         Return the total number of references.
 
-        ::
-
-            >>> class Mock(base.Music21Object):
-            ...     pass
-            >>> aObj = Mock()
-            >>> aContexts = sites.Sites()
-            >>> aContexts.add(aObj)
-            >>> len(aContexts)
-            1
+        >>> class Mock(base.Music21Object):
+        ...     pass
+        >>> aObj = Mock()
+        >>> aContexts = sites.Sites()
+        >>> aContexts.add(aObj)
+        >>> len(aContexts)
+        1
 
         '''
         return len(self.siteDict)
@@ -286,22 +234,19 @@ class Sites(common.SlottedObject):
         Get keys sorted by creation time, where most
         recent are first if `newFirst` is True. else, most recent are last.
 
-        ::
-
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     pass
-            ...
-            >>> aObj = Mock()
-            >>> bObj = Mock()
-            >>> cObj = Mock()
-            >>> aSites = music21.Sites()
-            >>> aSites.add(cObj, 345)
-            >>> aSites.add(aObj)
-            >>> aSites.add(bObj)
-            >>> k = aSites._keysByTime()
-            >>> aSites.siteDict[k[0]].siteIndex > aSites.siteDict[k[1]].siteIndex > aSites.siteDict[k[2]].siteIndex
-            True
+        >>> class Mock(base.Music21Object):
+        ...     pass
+        ...
+        >>> aObj = Mock()
+        >>> bObj = Mock()
+        >>> cObj = Mock()
+        >>> aSites = sites.Sites()
+        >>> aSites.add(cObj, 345)
+        >>> aSites.add(aObj)
+        >>> aSites.add(bObj)
+        >>> k = aSites._keysByTime()
+        >>> aSites.siteDict[k[0]].siteIndex > aSites.siteDict[k[1]].siteIndex > aSites.siteDict[k[2]].siteIndex
+        True
 
         '''
         post = []
@@ -317,6 +262,9 @@ class Sites(common.SlottedObject):
     def add(self, obj, offset=None, timeValue=None, idKey=None, classString=None):
         '''
         Add a reference to the `Sites` collection for this object.
+
+
+        OFFSET IS IGNORED NOW!
 
         N.B. -- like all .sites operations, this is an advanced tool not for
         standard music21 usage.  Instead of:
@@ -365,9 +313,8 @@ class Sites(common.SlottedObject):
             #if idKey is not None:
             #    print "Updating idKey %s for object %s" % (idKey, id(obj))
 
-        if offset is not None:  # a location, not a context
-            if idKey not in self._locationKeys:
-                self._locationKeys.append(idKey)
+        if idKey not in self._locationKeys:
+            self._locationKeys.append(idKey)
         #environLocal.printDebug(['adding obj', obj, idKey])
         # weak refs were being passed in __deepcopy__ calling this method
         # __deepcopy__ no longer call this method, so we can assume that
@@ -388,7 +335,6 @@ class Sites(common.SlottedObject):
             #    print "Houston, we have a problem %r" % obj
 
         siteRef.site = obj  # stores a weakRef
-        siteRef.offset = offset  # offset can be None for contexts
         siteRef.classString = classString
         # default
         # singleContextDict.isDead = False  # store to access w/o unwrapping
@@ -407,7 +353,6 @@ class Sites(common.SlottedObject):
         self.siteDict = {}
         self._locationKeys = []
         self._lastID = -1  # cannot be None
-        self._lastOffset = None
 
     def get(self, locationsTrail=False, sortByCreationTime=False,
             priorityTarget=None, excludeNone=False):
@@ -415,6 +360,7 @@ class Sites(common.SlottedObject):
         Get references; order, based on dictionary keys, is from most recently added to least recently added.
 
         The `locationsTrail` option forces locations to come after all other defined contexts.
+        v2.1 -- It does nothing now... TODO: Remove
 
         The `sortByCreationTime` option will sort objects by creation time,
         where most-recently assigned objects are returned first. Can be [False, other], [True, 1] or
@@ -422,31 +368,21 @@ class Sites(common.SlottedObject):
 
         If `priorityTarget` is defined, this object will be placed first in the list of objects.
 
-        ::
-        
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     pass
-            ...
-            >>> aObj = Mock()
-            >>> bObj = Mock()
-            >>> cObj = Mock()
-            >>> aSites = music21.Sites()
-            >>> aSites.add(cObj, 345) # a locations
-            >>> aSites.add(aObj)
-            >>> aSites.add(bObj)
-            >>> aSites.get() == [cObj, aObj, bObj]
-            True
+        >>> class Mock(base.Music21Object):
+        ...     pass
+        ...
+        >>> aObj = Mock()
+        >>> bObj = Mock()
+        >>> cObj = Mock()
+        >>> aSites = sites.Sites()
+        >>> aSites.add(cObj, 345) # a location
+        >>> aSites.add(aObj)
+        >>> aSites.add(bObj)
+        >>> aSites.get() == [cObj, aObj, bObj]
+        True
 
-        ::
-
-            >>> aSites.get(locationsTrail=True) == [aObj, bObj, cObj]
-            True
-
-        ::
-
-            >>> aSites.get(sortByCreationTime=True) == [bObj, aObj, cObj]
-            True
+        >>> aSites.get(sortByCreationTime=True) == [bObj, aObj, cObj]
+        True
 
         '''
         if sortByCreationTime in [True, 1]:
@@ -477,7 +413,7 @@ class Sites(common.SlottedObject):
         for key in keys:
             siteRef = self.siteDict[key]
             # check for None object; default location, not a weakref, keep
-            if siteRef.siteWeakref is None:
+            if siteRef.site is None:
                 if not excludeNone:
                     post.append(siteRef.site)
             else:
@@ -507,17 +443,16 @@ class Sites(common.SlottedObject):
         This will recursively search the defined contexts of existing defined
         contexts, and return a list of all objects that match the given class.
 
-        >>> import music21
-        >>> class Mock(music21.Music21Object):
+        >>> class Mock(base.Music21Object):
         ...    pass
         ...
-        >>> class Mocker(music21.Music21Object):
+        >>> class Mocker(base.Music21Object):
         ...    pass
         ...
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> cObj = Mocker()
-        >>> dc = music21.Sites()
+        >>> dc = sites.Sites()
         >>> dc.add(aObj)
         >>> dc.add(bObj)
         >>> dc.add(cObj)
@@ -572,15 +507,14 @@ class Sites(common.SlottedObject):
         Given an attribute name, search all objects and find the first that
         matches this attribute name; then return a reference to this attribute.
 
-         >>> import music21
-        >>> class Mock(music21.Music21Object):
+        >>> class Mock(base.Music21Object):
         ...     attr1 = 234
         ...
         >>> aObj = Mock()
         >>> aObj.attr1 = 234
         >>> bObj = Mock()
         >>> bObj.attr1 = 98
-        >>> aSites = music21.Sites()
+        >>> aSites = sites.Sites()
         >>> aSites.add(aObj)
         >>> len(aSites)
         1
@@ -610,7 +544,7 @@ class Sites(common.SlottedObject):
                 pass
 
     def getObjByClass(self, className, serialReverseSearch=True, callerFirst=None,
-             sortByCreationTime=False, prioritizeActiveSite=False,
+             sortByCreationTime=False, 
              priorityTarget=None, getElementMethod='getElementAtOrBefore',
              memo=None):
         '''
@@ -624,21 +558,19 @@ class Sites(common.SlottedObject):
         first caller; this is necessary if we are looking within a Stream for a
         flat offset position.
 
-        If `priorityTarget` is specified, this location will be searched first.
-        The `prioritizeActiveSite` is pased to to any recursively called
-        getContextByClass() calls.
+        If `priorityTarget` is specified, this location will be searched first. use
+        priorityTarget=activeSite to prioritize that.
 
         The `getElementMethod` is a string that selects which Stream method is
         used to get elements for searching with getElementsByClass() calls.
 
-        >>> import music21
-        >>> class Mock(music21.Music21Object):
+        >>> class Mock(base.Music21Object):
         ...     pass
         ...
         >>> import time
         >>> aObj = Mock()
         >>> bObj = Mock()
-        >>> aSites = music21.Sites()
+        >>> aSites = sites.Sites()
         >>> aSites.add(aObj)
         >>> aSites.add(bObj)
         >>> # we get the most recently added object first
@@ -710,7 +642,6 @@ class Sites(common.SlottedObject):
                        serialReverseSearch=serialReverseSearch,
                        callerFirst=callerFirst,
                        sortByCreationTime=sortByCreationTime,
-                       prioritizeActiveSite=prioritizeActiveSite,
                        getElementMethod=getElementMethod,
                        memo=memo)
                 if post is not None:
@@ -740,241 +671,6 @@ class Sites(common.SlottedObject):
         # need to check if these is weakref
         #if common.isWeakref(dict['obj']):
         return siteRef.site
-
-    def getOffsetByObjectMatch(self, obj, returnType='rational'):
-        '''
-        For a given object, return the offset using a direct object match.  The
-        stored id value is not used; instead, the id() of both the stored
-        object reference and the supplied object is used.
-
-        This should be replaced by getOffsetBySite(strictDeadCheck = True)...
-
-        ::
-
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     pass
-            ...
-            >>> aSite = Mock()
-            >>> bSite = Mock()
-            >>> aLocations = music21.Sites()
-            >>> aLocations.add(aSite, 5)
-            >>> aLocations.add(bSite, 3.2)
-            >>> aLocations.getOffsetByObjectMatch(aSite)
-            5.0
-            >>> aLocations.getOffsetByObjectMatch(bSite)
-            Fraction(16, 5)
-            >>> aLocations.getOffsetByObjectMatch(bSite, returnType='float')
-            3.2...
-
-        '''
-        for idKey in self.siteDict:
-            siteRef = self.siteDict[idKey]
-            if siteRef.isDead: # always skip
-                continue
-            # must unwrap references before comparison
-            #if common.isWeakref(dict['obj']):
-            compareObj = siteRef.site
-            if compareObj is None: # mark isDead for later removal
-                siteRef.isDead = True
-                continue
-            if id(compareObj) == id(obj):
-                #environLocal.printDebug(['found object as site', obj, id(obj), 'idKey', idKey])
-                return self.getOffsetBySiteId(idKey, returnType=returnType) #dict['offset']
-        raise SitesException('an entry for this object (%s) is not stored in Sites' % obj)
-
-    def getOffsetBySite(self, siteObj, returnType='rational'):
-        '''
-        For a given site return this Sites's offset in it. The None site is
-        permitted. The id() of the site is used to find the offset.
-
-        >>> import music21
-        >>> class Mock(music21.Music21Object):
-        ...     pass
-        ...
-        >>> aSite = Mock()
-        >>> bSite = Mock()
-        >>> aLocations = music21.Sites()
-        >>> aLocations.add(aSite, 23)
-        >>> aLocations.add(bSite, 121.5)
-        >>> aLocations.getOffsetBySite(aSite)
-        23.0
-
-        >>> aLocations.getOffsetBySite(bSite)
-        121.5
-
-
-        The object might not actually be in the _elements for the site object, because
-        it may be a deep copy, etc. but the number is still returned.
-        '''
-        # NOTE: this is a performance critical operation
-        siteId = None
-        if siteObj is not None:
-            siteId = id(siteObj)
-        try:
-            # will raise a key error if not found
-            return self.getOffsetBySiteId(siteId, returnType=returnType)
-            #post = self.siteDict[siteId]['offset']
-        except SitesException: # the site id is not valid
-            #environLocal.printDebug(['getOffsetBySite: trying to get an offset by a site failed; self:', self, 'site:', site, 'defined contexts:', self.siteDict])
-            raise # re-raise Exception
-
-    def getOffsetBySiteId(self, idKey, strictDeadCheck=False, returnType='rational'):
-        '''
-        Main method for getting an offset from a location key.
-
-        >>> import music21
-        >>> class Mock(music21.Music21Object):
-        ...     pass
-        ...
-        >>> aSite = Mock()
-        >>> bSite = Mock()
-        >>> cSite = Mock()
-        >>> dSite = Mock()
-        >>> eSite = Mock()
-        >>> sitesObj = music21.Sites()
-        >>> sitesObj.add(aSite, 0)
-        >>> sitesObj.add(cSite) # a context
-        >>> sitesObj.add(bSite, 234) # can add at same offset or a different one
-        >>> sitesObj.add(dSite) # a context
-        >>> sitesObj.getOffsetBySiteId(id(bSite))
-        234.0
-
-        If strictDeadCheck is False (default) we can still retrieve the context
-        from a dead weakref.  This is necessary to get the offset from an
-        iterated Stream often.  Eventually, this should become True -- but too
-        many errors for now.
-
-        >>> idBSite = id(bSite)
-        >>> del(bSite)
-        >>> sitesObj.siteDict[idBSite].siteWeakref
-        <weakref at 0x...; dead>
-
-        >>> sitesObj.siteDict[idBSite].siteWeakref is None
-        False
-
-        >>> sitesObj.siteDict[idBSite].site is None
-        True
-
-        >>> sitesObj.getOffsetBySiteId(idBSite, strictDeadCheck = False) # default
-        234.0
-
-        With this, you'll get an exception:
-
-        >>> sitesObj.getOffsetBySiteId(idBSite, strictDeadCheck = True)
-        Traceback (most recent call last):
-        SitesException: Could not find the object with id ... in the Site marked with idKey ... (was there, now site is dead).
-        object <music21.sites.Sites object at 0x...>, sitesDict: {...}
-        containedById = ...
-
-        '''
-        # NOTE: this is a core method called very frequently
-#        if idKey == self._lastID:
-#            return self._lastOffset
-        try:
-            if returnType == 'float':
-                value = self.siteDict[idKey].offsetFloat
-            else:
-                value = self.siteDict[idKey].offset
-            
-            if WEAKREF_ACTIVE and strictDeadCheck is True and self.siteDict[idKey].siteWeakref is not None:
-                obj = self.siteDict[idKey].site
-                if obj is None:
-                    #if self.siteDict[idKey]['isDead'] is True: # not good enough
-                    errorMsg = "Could not find the object with id %s in the Site marked with idKey %s (was there, now site is dead). " % (id(self), idKey)
-                    errorMsg += "\n   object %r, sitesDict: %r" % (self, self.siteDict)
-                    errorMsg += "\n   containedById = %r" % (self.containedById)
-                    raise SitesException(errorMsg)
-
-        except KeyError:
-            errorMsg = "Could not find the object with id %s in the Site marked with idKey %s. " % (id(self), idKey)
-            errorMsg += "\n   object %r, sitesDict: %r" % (self, self.siteDict)
-            errorMsg += "\n   containedById = %d" % (self.containedById)
-            raise SitesException(errorMsg)
-        # stored string are assumed to be attributes of the stored object
-        if isinstance(value, str):
-            if value not in ['highestTime', 'lowestOffset', 'highestOffset']:
-                raise SitesException('attempted to set a bound offset with a string attribute that is not supported: %s' % value)
-            obj = self.siteDict[idKey].site
-            # offset value is an attribute string
-            # cannot cache these values as may change outside of siteDict
-            return getattr(obj, value)
-        # if value is not a string, it is a numerical offset
-        self._lastID = idKey
-        self._lastOffset = value
-        return value
-
-    def getOffsets(self, returnType='rational'):
-        '''
-        Return a list of all offsets.
-
-        ::
-
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     pass
-            ...
-            >>> aSite = Mock()
-            >>> bSite = Mock()
-            >>> cSite = Mock()
-            >>> dSite = Mock()
-            >>> sitesObj = music21.Sites()
-            >>> sitesObj.add(aSite, 0)
-            >>> sitesObj.add(cSite) # a context -- no offset
-            >>> sitesObj.add(bSite, 2.33333333333) # can add at same offset or another
-            >>> sitesObj.add(dSite) # a context -- no offset
-            >>> sitesObj.getOffsets()
-            [0.0, Fraction(7, 3)]
-            
-            Can call returnType = 'float' instead:
-            
-            >>> sitesObj.getOffsets(returnType='float')
-            [0.0, 2.3333...]
-        '''
-        # here, already having location keys may be an advantage
-        return [self.getOffsetBySiteId(x, returnType=returnType) for x in self._locationKeys]
-
-    def getSiteByOffset(self, offset):
-        '''
-        For a given offset return the site that fits it
-
-        More than one Site may have the same offset; this at one point returned
-        the last site added by sorting time, but now we use a dict, so there's
-        no guarantee that the one you want will be there -- need orderedDicts!
-
-        ::
-
-            >>> import fractions
-            >>> class Mock(base.Music21Object):
-            ...     pass
-            ...
-            >>> aSite = Mock()
-            >>> bSite = Mock()
-            >>> cSite = Mock()
-            >>> sitesObj = sites.Sites()
-            >>> sitesObj.add(aSite, 2)
-            >>> sitesObj.add(bSite, 10.0/3)
-            >>> aSite is sitesObj.getSiteByOffset(2)
-            True
-            >>> bSite is sitesObj.getSiteByOffset(fractions.Fraction(10, 3))
-            True
-            >>> bSite is sitesObj.getSiteByOffset(3.33333333333)
-            True
-
-        '''
-        match = None
-        offset = common.opFrac(offset)
-        for siteId in self.siteDict:
-            # might need to use almost equals here
-            matched = False
-            if self.siteDict[siteId].offsetRational == offset:
-                matched = True
-            if matched is True:
-                if self.siteDict[siteId].isDead:
-                    return None
-                match = self.siteDict[siteId].site
-                break
-        return match
 
     def getSiteCount(self):
         '''
@@ -1006,15 +702,12 @@ class Sites(common.SlottedObject):
         '''
         Return a list of all site Ids.
 
-        >>> import music21
-        >>> class Mock(music21.Music21Object):
+        >>> class Mock(base.Music21Object):
         ...     pass
         ...
         >>> aSite = Mock()
-        >>> bSite = Mock()
-        >>> dc = music21.Sites()
-        >>> dc.add(aSite, 0)
-        >>> dc.add(bSite) # a context
+        >>> dc = sites.Sites()
+        >>> dc.add(aSite)
         >>> dc.getSiteIds() == [id(aSite)]
         True
         '''
@@ -1026,13 +719,12 @@ class Sites(common.SlottedObject):
         Get all Site objects in .siteDict that are locations. 
         Note that this unwraps all sites from weakrefs and is thus an expensive operation.
 
-        >>> import music21
-        >>> class Mock(music21.Music21Object):
+        >>> class Mock(base.Music21Object):
         ...     pass
         ...
         >>> aObj = Mock()
         >>> bObj = Mock()
-        >>> aSites = music21.Sites()
+        >>> aSites = sites.Sites()
         >>> aSites.add(aObj, 234)
         >>> aSites.add(bObj, 3000)
         >>> len(aSites.getSites())
@@ -1075,26 +767,21 @@ class Sites(common.SlottedObject):
 
         Input can be either a Class object or a string
 
-            >>> import music21
-            >>> from music21 import stream
-            >>> class Mock(music21.Music21Object):
-            ...     pass
-            ...
-            >>> aObj = Mock()
-            >>> bObj = Mock()
-            >>> cObj = stream.Stream()
-            >>> aSites = music21.Sites()
-            >>> aSites.add(aObj, 234)
-            >>> aSites.add(bObj, 3000)
-            >>> aSites.add(cObj, 200)
-            >>> aSites.getSitesByClass(Mock) == [aObj, bObj]
-            True
+        >>> class Mock(base.Music21Object):
+        ...     pass
+        ...
+        >>> aObj = Mock()
+        >>> bObj = Mock()
+        >>> cObj = stream.Stream()
+        >>> aSites = sites.Sites()
+        >>> aSites.add(aObj, 234)
+        >>> aSites.add(bObj, 3000)
+        >>> aSites.add(cObj, 200)
+        >>> aSites.getSitesByClass(Mock) == [aObj, bObj]
+        True
 
-        ::
-
-            >>> aSites.getSitesByClass('Stream') == [cObj]
-            True
-
+        >>> aSites.getSitesByClass('Stream') == [cObj]
+        True
         '''
         found = []
         if not isinstance(className, str):
@@ -1116,27 +803,17 @@ class Sites(common.SlottedObject):
 
     def hasSiteId(self, siteId):
         '''
-        Return True or False if this Sites object already has this site id
-        defined as a location
+        Return True or False if this Sites object already has this site id.
 
-        ::
-
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     pass
-            ...
-            >>> aSite = Mock()
-            >>> bSite = Mock()
-            >>> dc = music21.Sites()
-            >>> dc.add(aSite, 0)
-            >>> dc.add(bSite) # a context
-            >>> dc.hasSiteId(id(aSite))
-            True
-
-        ::
-
-            >>> dc.hasSiteId(id(bSite))
-            False
+        >>> class Mock(base.Music21Object):
+        ...     pass
+        ...
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> dc = sites.Sites()
+        >>> dc.add(aSite, 0)
+        >>> dc.hasSiteId(id(aSite))
+        True
 
         '''
         if siteId in self._locationKeys:
@@ -1173,25 +850,14 @@ class Sites(common.SlottedObject):
         Sites's siteDict. This
         will return False if the object is simply a context and not a location.
 
-        ::
-
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     pass
-            ...
-            >>> aSite = Mock()
-            >>> bSite = Mock()
-            >>> aLocations = music21.Sites()
-            >>> aLocations.add(aSite, 0)
-            >>> aLocations.add(bSite) # a context
-            >>> aLocations.isSite(aSite)
-            True
-
-        ::
-
-            >>> aLocations.isSite(bSite)
-            False
-
+        >>> class Mock(base.Music21Object):
+        ...     pass
+        ...
+        >>> aSite = Mock()
+        >>> aLocations = sites.Sites()
+        >>> aLocations.add(aSite)
+        >>> aLocations.isSite(aSite)
+        True
         '''
         if id(obj) in self._locationKeys:
             return True
@@ -1206,29 +872,21 @@ class Sites(common.SlottedObject):
         have the element. This results b/c Sites are shallow-copied, and then
         elements are re-added.
 
-        ::
+        >>> class Mock(base.Music21Object):
+        ...     pass
+        ...
+        >>> aSite = Mock()
+        >>> cSite = Mock()
+        >>> aLocations = sites.Sites()
+        >>> aLocations.add(aSite, 0)
+        >>> aLocations.add(cSite) # a context
+        >>> del aSite
+        >>> len(aLocations)
+        2
 
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     pass
-            ...
-            >>> aSite = Mock()
-            >>> bSite = Mock()
-            >>> cSite = Mock()
-            >>> dSite = Mock()
-            >>> aLocations = music21.Sites()
-            >>> aLocations.add(aSite, 0)
-            >>> aLocations.add(cSite) # a context
-            >>> del aSite
-            >>> len(aLocations)
-            2
-
-        ::
-
-            >>> aLocations.purgeLocations(rescanIsDead=True)
-            >>> len(aLocations)
-            1
-
+        >>> aLocations.purgeLocations(rescanIsDead=True)
+        >>> len(aLocations)
+        1
         '''
         # first, check if any sites are dead, and cache the results
         if rescanIsDead:
@@ -1278,48 +936,37 @@ class Sites(common.SlottedObject):
 
             streamObj.remove(elObj)
 
-        ::
+        >>> class Mock(base.Music21Object):
+        ...     pass
+        ...
+        >>> aSite = Mock()
+        >>> bSite = Mock()
+        >>> cSite = Mock()
+        >>> aSites = sites.Sites()
+        >>> aSites.add(aSite, 23)
+        >>> len(aSites)
+        1
 
-            >>> class Mock(base.Music21Object):
-            ...     pass
-            ...
-            >>> aSite = Mock()
-            >>> bSite = Mock()
-            >>> cSite = Mock()
-            >>> aSites = sites.Sites()
-            >>> aSites.add(aSite, 23)
-            >>> len(aSites)
-            1
+        >>> aSites.add(bSite, 233)
+        >>> len(aSites)
+        2
 
-        ::
+        >>> aSites.add(cSite, 232223)
+        >>> len(aSites)
+        3
 
-            >>> aSites.add(bSite, 233)
-            >>> len(aSites)
-            2
-
-        ::
-
-            >>> aSites.add(cSite, 232223)
-            >>> len(aSites)
-            3
-
-        ::
-
-            >>> aSites.remove(aSite)
-            >>> len(aSites)
-            2
+        >>> aSites.remove(aSite)
+        >>> len(aSites)
+        2
 
         OMIT_FROM_DOCS
 
-        ::
-
-            >>> len(aSites._locationKeys)
-            2
+        >>> len(aSites._locationKeys)
+        2
 
         '''
         # must clear
         self._lastID = -1  # cannot be None
-        self._lastOffset = None
 
         siteId = None
         if site is not None:
@@ -1341,7 +988,6 @@ class Sites(common.SlottedObject):
         # must clear if removing
         if idKey == self._lastID:
             self._lastID = -1  # cannot be None
-            self._lastOffset = None
         if idKey is None:
             raise SitesException('trying to remove None idKey is not allowed')
 
@@ -1358,22 +1004,18 @@ class Sites(common.SlottedObject):
         Given an attribute name, search all objects and find the first that
         matches this attribute name; then return a reference to this attribute.
 
-        ::
-
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     attr1 = 234
-            ...
-            >>> aObj = Mock()
-            >>> bObj = Mock()
-            >>> bObj.attr1 = 98
-            >>> aSites = music21.Sites()
-            >>> aSites.add(aObj)
-            >>> aSites.add(bObj)
-            >>> aSites.setAttrByName('attr1', 'test')
-            >>> aSites.getAttrByName('attr1') == 'test'
-            True
-
+        >>> class Mock(base.Music21Object):
+        ...     attr1 = 234
+        ...
+        >>> aObj = Mock()
+        >>> bObj = Mock()
+        >>> bObj.attr1 = 98
+        >>> aSites = sites.Sites()
+        >>> aSites.add(aObj)
+        >>> aSites.add(bObj)
+        >>> aSites.setAttrByName('attr1', 'test')
+        >>> aSites.getAttrByName('attr1') == 'test'
+        True
         '''
         #post = None
         for obj in self.get():
@@ -1385,58 +1027,6 @@ class Sites(common.SlottedObject):
             except AttributeError:
                 pass
 
-    def setOffsetBySite(self, site, value):
-        '''Changes the offset of the site specified.  Note that this can also
-        be done with add, but the difference is that if the site is not in
-        Sites, it will raise an exception.
-
-        ::
-
-            >>> import music21
-            >>> class Mock(music21.Music21Object):
-            ...     pass
-            ...
-            >>> aSite = Mock()
-            >>> bSite = Mock()
-            >>> cSite = Mock()
-            >>> aLocations = music21.Sites()
-            >>> aLocations.add(aSite, 23)
-            >>> aLocations.add(bSite, 121.5)
-            >>> aLocations.setOffsetBySite(aSite, 20)
-            >>> aLocations.getOffsetBySite(aSite)
-            20.0
-
-        ::
-
-            >>> aLocations.setOffsetBySite(cSite, 30)
-            Traceback (most recent call last):
-            SitesException: an entry for this object (<...Mock object at 0x...>) is not stored in Sites
-
-        '''
-        siteId = None
-        if site is not None:
-            siteId = id(site)
-        # will raise an index error if the siteId does not exist
-        try:
-            self.siteDict[siteId].offset = value
-            self._lastID = siteId
-            self._lastOffset = value
-        except KeyError:
-            raise SitesException('an entry for this object (%s) is not stored in Sites' % site)
-
-    def setOffsetBySiteId(self, siteId, value):
-        '''
-        Set an offset by siteId. This assumes that the site is valid, is best
-        used for advanced, performance critical usage only.
-
-        The `siteId` parameter can be None.
-        '''
-        try:
-            self.siteDict[siteId].offset = value
-            self._lastID = siteId
-            self._lastOffset = value
-        except KeyError:
-            raise SitesException('an entry for this object (%s) is not stored in Sites' % siteId)
 
 
 class Test(unittest.TestCase):

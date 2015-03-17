@@ -2698,7 +2698,8 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
     # if we have multiple staves defined, add more parts, and transfer elements
     # note: this presently has to look at _idLastDeepCopyOf to get matches
     # to find removed elements after copying; this is probably not the
-    # best way to do this. 
+    # best way to do this.   # V2.1 -- is not/will not be doing this. in fact idLastDeepCopyOf is
+    # going away...
 
     # for this part, if any elements are components in the spannerBundle,
     # then then we need to update the spannerBundle after the part is copied
@@ -2771,13 +2772,13 @@ def separateOutPartStaffs(mxPart, streamPart, spannerBundle, s, staffReferenceLi
                 m = mStream[i]
                 for eRemove in staffExclude:
                     for eMeasure in m:
-                        if eMeasure._idLastDeepCopyOf == id(eRemove):
+                        if eMeasure.derivation.origin is eRemove and eMeasure.derivation.method == '__deepcopy__':
                             m.remove(eMeasure)
                             break
                     for v in m.voices:
                         v.remove(eRemove)
                         for eVoice in v.elements:
-                            if eVoice._idLastDeepCopyOf == id(eRemove):
+                            if eVoice.derivation.origin is eRemove and eVoice.derivation.method == '__deepcopy__':
                                 v.remove(eVoice)
             # after adjusting voices see if voices can be reduced or
             # removed
