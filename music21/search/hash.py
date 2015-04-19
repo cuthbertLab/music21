@@ -28,8 +28,7 @@ class Hasher(object):
 	def __init__(self, stream):
 		self.stream = stream
 
-	def basicHash(stream):
-
+	def basicHash(self, stream):
 
 		"""
 		proof of concept, likely incomplete feature
@@ -45,6 +44,6 @@ class Hasher(object):
 		note_container = []
 		# TODO: perhaps change container to be a deque? ordered dict?
 		stream_notes = s.getElementsByClass(note.Note)
-		for note in steam_notes:
+		for note in stream_notes:
 			note_container.append(NoteHash(note.pitch.midi, note.duration.quarterLength, note.offset))
 		return note_container
