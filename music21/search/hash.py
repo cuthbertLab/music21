@@ -23,8 +23,9 @@ from music21 import note
 from music21 import search
 from music21 import stream
 
-class Hasher(object):
+NoteHash = collections.namedtuple('NoteHash', ['pitch', 'duration', 'beat'])
 
+class Hasher(object):
 	def __init__(self, stream):
 		self.stream = stream
 
@@ -39,13 +40,18 @@ class Hasher(object):
 		beat: offset of each note, relative to the beginning of the stream
 
 		leaves out rests for now
-		"""
-		NoteHash = collections.namedtuple('NoteHash', ['pitch', 'duration', 'beat'])
+		"""	
 		note_container = []
 		# TODO: perhaps change container to be a deque? ordered dict?
-		stream_notes = self.stream.getElementsByClass(note.Note)
+		stream_notes = self.stream.getElementsByClass(note.GeneralNote)
 		for n in stream_notes:
-			note_container.append(NoteHash(n.pitch.midi, n.duration.quarterLength, n.offset))
+			if n.isNote:
+				note_container.append(NoteHash(n.pitch.midi, n.duration.quarterLength, n.offset))
+			elif n.isChord:
+				for p in n.pitches:
+					note_container.append(NoteHash(p.midi, n.duration.quarterLength, n.offset))
+			else: # n is Rest
+				note_container.append(NoteHash(None, n.duration.quarterLength, n.offset))
 		return note_container
 
 class Test(unittest.TestCase):
@@ -60,12 +66,16 @@ class Test(unittest.TestCase):
 		note3 = note.Note("B-2")
 		cMinor = chord.Chord(["C4","G4","E-5"])
 		cMinor.duration.type = 'half'
+		r = note.Rest(quarterLength=1.5)
 		s1.append(note1)
 		s1.append(note2)
 		s1.append(note3)
 		s1.append(cMinor)
+		s1.append(r)
 		h = Hasher(s1)
-		print h.basicHash()
+		hashes_plain_numbers = [(60, 2.0, 0.0), (66, 1.0, 2.0), (46, 1.0, 3.0), (60, 2.0, 4.0), (67, 2.0, 4.0), (75, 2.0, 4.0), (None, 1.5, 6.0)]
+		hashes_in_format = [NoteHash(pitch=x, duration=y, beat=z) for (x, y, z) in hashes_plain_numbers]
+		self.assertEqual(h.basicHash(), hashes_in_format)
 
 
 class TestExternal(unittest.TestCase):
