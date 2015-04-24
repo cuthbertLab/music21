@@ -55,7 +55,7 @@ class Hasher(object):
 
 	# --- Begin Rounding Helper Functions ---
 	def _getApproxDurOrOffset(self, durOrOffset, granularity=32):
-		return round(durOrOffset*rounding)/rounding
+		return round(durOrOffset*granularity)/granularity
 	
 
 	def _approximatelyEqual(self, a, b, sig_fig = 2):
