@@ -3377,6 +3377,7 @@ class Stream(base.Music21Object):
         Get a region of Measures based on a start and end Measure number, 
         where the boundary numbers are both included. 
         That is, a request for measures 4 through 10 will return 7 Measures, numbers 4 through 10.
+        It is allowed to pass `numberEnd=None`, which will be interpreted as the last measure of the stream.
 
         Additionally, any number of associated classes can be gathered as well. 
         Associated classes are the last found class relevant to this Stream or Part.
