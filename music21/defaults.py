@@ -88,6 +88,11 @@ divisionsPerQuarter = 32*3*3*5*7 # 10080
 # midi.py gives an error with 10080
 ticksPerQuarter = 1024
 
+# quantizationQuarterLengthDivisors
+# what to snap MIDI quantization to.  (4, 3) indicates sixteenth notes and triplets.
+
+quantizationQuarterLengthDivisors = (4, 3)
+
 
 # scaling -- the size of notes in musicxml -- 40 tenths = a 5-line staff
 # so how many millimeters = a staff?
