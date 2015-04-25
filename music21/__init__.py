@@ -152,6 +152,7 @@ __all__ = [
 from music21 import base
 from music21.base import VERSION
 from music21.base import VERSION_STR
+from music21.base import VERSION_STR as __version__
 from music21.base import Music21Exception
 from music21.base import SitesException
 from music21.base import Music21ObjectException
