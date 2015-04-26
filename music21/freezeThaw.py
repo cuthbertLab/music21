@@ -91,10 +91,13 @@ _MOD = "freezeThaw.py"
 environLocal = environment.Environment(_MOD)
 
 try:
-    import cPickle as pickleMod
+    import cPickle as pickleMod # much faster...
 except ImportError:
-    import pickle as pickleMod
-#import pickle as pickleMod
+    try:
+        import _pickle as pickleMod # Python3 -- whatever the version is...
+    except ImportError:
+        # in case we're on Jython, etc.
+        import pickle as pickleMod
 
 
 #------------------------------------------------------------------------------
