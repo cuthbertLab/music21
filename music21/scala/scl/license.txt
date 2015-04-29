@@ -1,0 +1,15 @@
+#-------------------------------------------------------------------------------
+# Name:         scala/scl/license.txt
+# Purpose:      The music21 Project assumes no copyright or change in licensing
+#               for content distributed in the scala/scl collection.                
+#
+#-------------------------------------------------------------------------------
+
+The LGPL music21 software is distributed with a collection of SCL scale files (the Scala scale archive) for which music21 assumes no copyright or change in original licensing. Some included scales may not be used for commercial uses or have other restrictions: please see detaisl embedded in individual files for more details.   
+
+The complete Scala scale archive is available here:
+http://www.huygens-fokker.org/docs/scales.zip
+
+Inclusion of the Scala scale archive in music21 is provided by kind permission of Manuel Op de Coul.
+
+

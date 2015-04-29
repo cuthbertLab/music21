@@ -1,0 +1,13 @@
+X: 1
+T: JACK ON THE GREEN -- JIG
+B: Ryan's Mammoth Collection of Fiddle Tunes
+R: jig
+M: 9/8
+L: 1/8
+Z: Contributed 20000913201609 by John Chambers John.Chambers:weema.com
+K: G
+d "Segno"[|]\
+|: (g2.g) gfg efg | (a2.a) abg fed \
+| (g2.g) gfg e3 | def gdc BAG :|
+|: (F2.A) (G2.B) (A2.d) | d^cd AB=c BAG \
+|  (F2.A) (G2.B) (A2.d) | def gdc BAG "Segno"[|]:|

@@ -1,0 +1,25 @@
+! starling7.scl
+Starling[7] hobbit <7 11 16 19| in <135 214 314 379| tuning
+7
+!
+186.66667
+311.11111
+497.77778
+702.22222
+888.88889
+1013.33333
+2/1
+!
+!! prestarling7.scl
+!!
+! Starling[7] transversal <7 11 16 19| = ptolemy_diat
+! 7
+!! al-farabi_diat2 = diff7 = porchrome1 = synchrome1 = synpor1
+!!
+! 10/9
+! 6/5
+! 4/3
+! 3/2
+! 5/3
+! 9/5
+! 2/1

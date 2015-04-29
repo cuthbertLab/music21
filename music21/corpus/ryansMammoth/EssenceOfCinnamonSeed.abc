@@ -1,0 +1,18 @@
+X:17
+T:ESSENCE OF CINNAMON SEED.
+B:Coles pg 24.1
+Z:John B. Walsh, 5/8/2002 <walsh:mat:h.ubc.ca>
+N:Q before a note stands for a dotted quarter note with a
+N:beam through its tail, which seems to take up the time of one quarter note.
+M:C
+L:1/8
+K:D
+u"Slow"((3A,B,C)|:v(D>D) (F>.A) ((3[dF][dF][dF]) ((3dba)|\
+((3^gaf) ((3cdF) ((3EA,C) (E >.F)|\
+"3"QG2">"[c2G2] "3"QF2 (.[BF]>.f)|[1 ((3efd) ((3cdB) ((3ABG) ((3FGE):|[2\
+ (^A>A) ((3ABc) B2 ((3">"=A">"B">"c)|]\
+v(d>d) ((3cde) ">"d2 ((3Bc^d)|(e>.e) ((3^def) ">"e3f|Qg2 B>g Qf2 A>f|\
+((3efd) ((3cdB) ((3ABG) ((3FGE)|\
+D>d ((3cde) ">"d2 ((3Bc^d)|\
+e>e ((3^def) ">"e3f|">>> SEGUE"((3gfg) ((3bag) ((3fge) ((3cdB)|\
+((3ABG) ((3FGE) D2|]

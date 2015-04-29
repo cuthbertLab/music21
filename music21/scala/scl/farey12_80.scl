@@ -1,0 +1,17 @@
+! farey12_80.scl
+!
+Common denominator=80 Farey approximation to 12-tET
+ 12
+!
+ 17/16
+ 9/8
+ 19/16
+ 101/80
+ 107/80
+ 113/80
+ 3/2
+ 127/80
+ 27/16
+ 143/80
+ 151/80
+ 2/1

@@ -1,0 +1,9 @@
+! p4.scl
+!
+First 4 primes, for testing tempering
+ 4
+!
+ 2/1
+ 3/1
+ 5/1
+ 7/1

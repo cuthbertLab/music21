@@ -1,0 +1,29 @@
+<html>
+<head>
+<title>Basic Noteflight</title>
+<script language="javascript" src="javascript/music21.js"></script>
+<script language="javascript">
+m21 = new Music21interface();
+
+function setup() {
+	m21.noteflight.createNoteflightEmbed('noteflightembed','nfscore','fc79df30896da6aa03f90ff771015913ca6880be',750,400,1.0);
+}
+
+function loadXML() {
+	m21.noteflight.sendMusicXMLToNoteflightEmbed('nfscore',document.getElementById('xmltextarea').value);
+}
+</script>
+
+</head>
+<body onLoad="setup()">
+
+<div id="noteflightembed">
+</div>
+<input type="button" onClick="loadXML()" value="Load XML in Noteflight Viewer" /><br />
+<textarea id='xmltextarea' cols="150" rows="50">
+
+
+</textarea>
+
+</body>
+</html>

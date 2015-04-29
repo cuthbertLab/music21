@@ -1,0 +1,17 @@
+! sparschuh-epimoricwerck3.scl
+!
+PCdistribution: C 6560/6561 G 204/205 D 152/153 A E B 512/513 F#...F C
+12
+!
+256/243   ! c# limma
+272/243   ! d
+32/27     ! d#
+304/243   ! e (5/4)*(1216/1215) with "1216/1215  Eratosthenes' comma"
+4/3       ! f
+1024/729  ! f#
+3280/2187 ! g (3/2)*(6560/6561) with "41-limit schisma"
+128/81    ! g#
+1216/729  ! a
+16/9      ! a#
+152/81    ! b = g*(5/4)*(1026/1025)
+2/1

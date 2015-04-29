@@ -1,0 +1,25 @@
+Composer: J. S. Bach
+BWV: 248(2).12
+Title: Ermuntre dich, mein schwacher Geist
+Analyst: Dmitri Tymoczko
+Proofreader: Hamish Robb
+Note: please email corrections to dmitri@princeton.edu
+
+Time Signature: 4/4
+
+Form: chorale
+m0 b4 G: I
+m1 vi b2 V7 b3 I b3.5 D: V2 b4 I6
+m2 V b2 V7 b3 I || b4 G: V6/vi b4.5 V6/5/vi
+Note: V2 resolves to root pos. I over descending scale
+m3 IV6 b1.5 vii/o7 b2 I b2.5 IV7 b3 V2 b4 I
+m4 V b2.5 V7 b3 I || b4 V
+Note: in m5, the suspension on b2 could resolve to I in G major.
+m5 V b2 a: viio6 b3 i b4 vii/o7/V
+m6 V b2.5 V7 b3 i || b4 e: i b4.5 V4/3
+m7 i6 b2 V6/5/iv b3 iv b4 V6/5/V
+m8 V b2 V7 b3 i || b4 G: V
+m9 I6 b2 I b3 IV6 b3.5 viio b4 I b4.5 vi
+m10 V6/5/V b2.5 V7/V b3 V || b4 I6
+m11 IV b2 V7 b3 IV6/5 b3.5 viio b4 I
+m12 ii6/5 b2 V b3 I

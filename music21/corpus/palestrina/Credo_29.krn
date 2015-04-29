@@ -1,0 +1,1125 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Hodie Christus Natus Est
+!!!OTL: Credo
+**kern	**kern	**kern	**kern	**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Itenor	*Icalto	*Ibass	*Icalto	*Icant	*Icant
+!Bassus	!Tenor 2	!Tenor 1	!Altus	!Bassus	!Altus	!Cantus 2	!Cantus 1
+*clefF4	*clefGv2	*clefGv2	*clefG2	*clefF4	*clefG2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]	*k[]	*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix	*G:mix	*G:mix	*G:mix	*G:mix	*G:mix
+*M4/2	*M4/2	*M4/2	*M4/2	*M4/2	*M4/2	*M4/2	*M4/2
+=1	=1	=1	=1	=1	=1	=1	=1
+0r	0r	0r	0r	0G	0g	0b	0dd
+=2	=2	=2	=2	=2	=2	=2	=2
+0r	0r	0r	0r	1G	1g	1b	1dd
+.	.	.	.	1c	1g	1cc	1ee
+=3	=3	=3	=3	=3	=3	=3	=3
+0r	0r	0r	0r	2G	2g	2b	2dd
+.	.	.	.	2A	2e	2a	2cc
+.	.	.	.	1d	2.f	4a	4dd
+.	.	.	.	.	.	4g	4ee
+.	.	.	.	.	.	4a	[2ff
+.	.	.	.	.	4g	4b	.
+=4	=4	=4	=4	=4	=4	=4	=4
+1r	1r	1r	1r	0c	2a	1cc	2ff]
+.	.	.	.	.	4g	.	2ee
+.	.	.	.	.	4f	.	.
+1C	1c	1e	1g	.	2g	1cc	1ee
+.	.	.	.	.	2c	.	.
+=5	=5	=5	=5	=5	=5	=5	=5
+2C	2c	2e	2g	0r	0r	0r	0r
+2C	2c	2e	2g	.	.	.	.
+1F	1c	1f	1a	.	.	.	.
+=6	=6	=6	=6	=6	=6	=6	=6
+2C	2c	2e	2g	0r	0r	0r	0r
+2D	1A	2d	2f	.	.	.	.
+1A	.	4c	2.e	.	.	.	.
+.	.	4d	.	.	.	.	.
+.	[2c	4e	.	.	.	.	.
+.	.	4f	8d	.	.	.	.
+.	.	.	8c	.	.	.	.
+=7	=7	=7	=7	=7	=7	=7	=7
+0G	2c]	1g	2e	1r	1r	1r	1r
+.	4B	.	2d	.	.	.	.
+.	4A	.	.	.	.	.	.
+.	1B	1d	1g	2.G	2.g	2.b	2.dd
+.	.	.	.	4G	4g	4b	4dd
+=8	=8	=8	=8	=8	=8	=8	=8
+0r	0r	0r	0r	2c	2g	2ee	2cc
+.	.	.	.	2c	2g	2cc	2ee
+.	.	.	.	1G	1g	1b	1dd
+=9	=9	=9	=9	=9	=9	=9	=9
+2.D	2r	2.d	2.a	2d	2f#	2a	2dd
+.	2d	.	.	2d	2f#	2a	2dd
+4D	.	4d	4a	.	.	.	.
+2G	2B	2d	2b	1G	1g	1g	1dd
+2G	2d	[2g	2b	.	.	.	.
+=10	=10	=10	=10	=10	=10	=10	=10
+4C	2e	4g]	2cc	0r	0r	0r	0r
+4D	.	4f	.	.	.	.	.
+4E	1c	2e	2g	.	.	.	.
+4F	.	.	.	.	.	.	.
+2G	.	2d	2.g	.	.	.	.
+2G	2B	2d	.	.	.	.	.
+.	.	.	4f	.	.	.	.
+=11	=11	=11	=11	=11	=11	=11	=11
+0C	0c	2.g	4e	2r	2r	2r	2r
+.	.	.	4d	.	.	.	.
+.	.	.	4e	1c	1g	1ee	1cc
+.	.	4f	4f	.	.	.	.
+.	.	1e	1g	.	.	.	.
+.	.	.	.	2c	2g	2ee	2cc
+=12	=12	=12	=12	=12	=12	=12	=12
+0r	0r	0r	0r	2G	2g	2dd	2b
+.	.	.	.	2c	2e	2ee	2cc
+.	.	.	.	2.F	2.f	2.cc	2.a
+.	.	.	.	4F	4f	4cc	4a
+=13	=13	=13	=13	=13	=13	=13	=13
+1r	1r	1r	1r	4F	1f	0cc	4a
+.	.	.	.	4G	.	.	4b
+.	.	.	.	4A	.	.	4cc
+.	.	.	.	4B	.	.	4dd
+[1C	2.c	[1e	2.g	1c	2.e	.	1ee
+.	4d	.	4f	.	4f	.	.
+=14	=14	=14	=14	=14	=14	=14	=14
+1C]	4e	1e]	4e	1c	1g	1cc	1ee
+.	4f	.	4d	.	.	.	.
+.	1g	.	2c	.	.	.	.
+1G	.	1g	2G	1B	1g	1dd	1dd
+.	[2G	.	[2g	.	.	.	.
+=15	=15	=15	=15	=15	=15	=15	=15
+0C	2G]	1e	4g]	0c	0g	0ee	0cc
+.	.	.	4f	.	.	.	.
+.	2.c	.	4e	.	.	.	.
+.	.	.	4d	.	.	.	.
+.	.	1c	1e	.	.	.	.
+.	4B	.	.	.	.	.	.
+.	4G	.	.	.	.	.	.
+.	4A	.	.	.	.	.	.
+=16	=16	=16	=16	=16	=16	=16	=16
+2G	4B	2d	1g	0G	0g	0dd	0b
+.	4c	.	.	.	.	.	.
+2.G	2d	2.B	.	.	.	.	.
+.	1G	.	2r	.	.	.	.
+4A	.	4c	.	.	.	.	.
+2B	.	2d	[2g	.	.	.	.
+=17	=17	=17	=17	=17	=17	=17	=17
+2c	1r	2e	4g]	0r	0r	0r	0r
+.	.	.	4a	.	.	.	.
+2B	.	2d	2b	.	.	.	.
+2.A	2r	2r	2cc	.	.	.	.
+.	[2c	[2e	2a	.	.	.	.
+4B	.	.	.	.	.	.	.
+=18	=18	=18	=18	=18	=18	=18	=18
+1c	4c]	4e]	1g	0r	0r	0r	0r
+.	4d	4f	.	.	.	.	.
+.	2e	2g	.	.	.	.	.
+2A	2f	2a	2cc	.	.	.	.
+4c	2e	2g	[2cc	.	.	.	.
+4B	.	.	.	.	.	.	.
+=19	=19	=19	=19	=19	=19	=19	=19
+4A	1.a	1.f	4cc]	0r	0r	0r	0r
+4G	.	.	4b	.	.	.	.
+4F	.	.	4a	.	.	.	.
+4E	.	.	4g	.	.	.	.
+4D	.	.	4f	.	.	.	.
+4E	.	.	4g	.	.	.	.
+4F	2f	2d	[2a	.	.	.	.
+4G	.	.	.	.	.	.	.
+=20	=20	=20	=20	=20	=20	=20	=20
+2A	2e	2c	2a]	0r	0r	0r	0r
+2B-	1d	2d	2g	.	.	.	.
+1A	.	1e	[1a	.	.	.	.
+.	2c#	.	.	.	.	.	.
+=21	=21	=21	=21	=21	=21	=21	=21
+1D	1d	1f#	1a]	2r	2r	2r	2r
+.	.	.	.	2d	2a	2a	2dd
+1r	1r	1r	1r	2G	2g	2b	2dd
+.	.	.	.	[2c	[2g	[2cc	[2ee
+=22	=22	=22	=22	=22	=22	=22	=22
+0r	0r	0r	0r	2c]	2g]	2cc]	2ee]
+.	.	.	.	2B	2g	2dd	2dd
+.	.	.	.	1A	4c	[1ee	1cc
+.	.	.	.	.	4d	.	.
+.	.	.	.	.	4e	.	.
+.	.	.	.	.	4f	.	.
+=23	=23	=23	=23	=23	=23	=23	=23
+2r	2r	2r	2r	1G	2g	2ee]	1b
+2G	2d	2g	2b	.	2g	2dd	.
+2C	2e	2g	2cc	1r	1r	1r	1r
+[2F	2f	[2c	[2a	.	.	.	.
+=24	=24	=24	=24	=24	=24	=24	=24
+4F]	2F	4c]	4a]	0r	0r	0r	0r
+4F	.	4c	4a	.	.	.	.
+2E	2G	2c	2g	.	.	.	.
+2D	2A	2d	2f	.	.	.	.
+2D	2B	2f	2d	.	.	.	.
+=25	=25	=25	=25	=25	=25	=25	=25
+1C	1c	1e	1g	2r	2r	2r	2r
+.	.	.	.	2c	2e	2ee	2g
+2r	2r	2r	2r	2B	2g	2dd	2b
+2G	2G	2d	2g	2G	2g	2b	2dd
+=26	=26	=26	=26	=26	=26	=26	=26
+2C	2.G	2c	2e	1c	1g	1cc	1ee
+2C	.	2c	2e	.	.	.	.
+.	4A	.	.	.	.	.	.
+1G	1B	1d	1g	1G	1g	1b	1dd
+=27	=27	=27	=27	=27	=27	=27	=27
+1C	1c	1g	1e	2r	2r	2r	2r
+.	.	.	.	2c	2e	2g	2ee
+2r	2r	2r	2r	2B	2g	2b	2dd
+2G	2d	2G	2g	2G	2g	2dd	2b
+=28	=28	=28	=28	=28	=28	=28	=28
+2C	2c	2.G	2e	2c	2.g	2ee	2cc
+2C	2c	.	2e	2c	.	2ee	2cc
+.	.	4A	.	.	4g	.	.
+2G	2d	2B	2g	1G	1g	1dd	1b
+2G	2d	2B	2g	.	.	.	.
+=29	=29	=29	=29	=29	=29	=29	=29
+1C	1g	1c	1e	2r	2r	2r	2r
+.	.	.	.	2c	2g	2cc	2ee
+1r	1r	1r	1r	2d	2f	2a	2dd
+.	.	.	.	2B-	2d	2g	2dd
+=30	=30	=30	=30	=30	=30	=30	=30
+2r	2r	2r	2r	1A	1e	1a	1cc
+2A	2e	2c	2a	.	.	.	.
+2B-	2d	2d	2f	1r	1r	1r	1r
+2G	2B-	2e	2g	.	.	.	.
+=31	=31	=31	=31	=31	=31	=31	=31
+1F	4c	2.f	1a	0r	1r	0r	0r
+.	4d	.	.	.	.	.	.
+.	2.c	.	.	.	.	.	.
+.	.	4e	.	.	.	.	.
+1G	.	1d	1g	.	2r	.	.
+.	8B	.	.	.	.	.	.
+.	8A	.	.	.	.	.	.
+.	2B	.	.	.	[2g	.	.
+=32	=32	=32	=32	=32	=32	=32	=32
+1C	1c	1e	1g	2r	4g]	2r	2r
+.	.	.	.	.	4f	.	.
+.	.	.	.	1c	4e	1ee	1g
+.	.	.	.	.	4d	.	.
+1r	1r	1r	1r	.	2c	.	.
+.	.	.	.	2B	2d	2dd	2g
+=33	=33	=33	=33	=33	=33	=33	=33
+0r	0r	0r	0r	2A	2e	2cc	2a
+.	.	.	.	2G#	2e	2b	2b
+.	.	.	.	1A	1e	1a	1cc
+=34	=34	=34	=34	=34	=34	=34	=34
+0r	0r	0r	0r	2E	1e	2g#	2b
+.	.	.	.	1A	.	1a	1cc
+.	.	.	.	.	2c	.	.
+.	.	.	.	2G	2d	2b	2b
+=35	=35	=35	=35	=35	=35	=35	=35
+0r	0r	0r	0r	2F	2f	2.cc	2a
+.	.	.	.	2E	2g	.	2g
+.	.	.	.	.	.	4cc	.
+.	.	.	.	2F	2f	2cc	2a
+.	.	.	.	2G	2d	2b	[2g
+=36	=36	=36	=36	=36	=36	=36	=36
+1r	1r	1r	1r	1A	1c	1cc	2g]
+.	.	.	.	.	.	.	2f#
+2r	2r	2r	2r	1G	1d	1b	1g
+2G	2d	2g	2b	.	.	.	.
+=37	=37	=37	=37	=37	=37	=37	=37
+2C	2e	2g	2cc	0r	0r	0r	0r
+1F	1f	1a	1cc	.	.	.	.
+2G	2d	2g	2b	.	.	.	.
+=38	=38	=38	=38	=38	=38	=38	=38
+4D	2d	1f	1a	0r	0r	0r	0r
+4E	.	.	.	.	.	.	.
+4F	1a	.	.	.	.	.	.
+4G	.	.	.	.	.	.	.
+4A	.	1e	[1cc	.	.	.	.
+4B	.	.	.	.	.	.	.
+2c	2g	.	.	.	.	.	.
+=39	=39	=39	=39	=39	=39	=39	=39
+2F	2a	2f	2cc]	0r	0r	0r	0r
+2G	4g	1d	2b	.	.	.	.
+.	4f	.	.	.	.	.	.
+[1A	[1e	.	[1a	.	.	.	.
+.	.	4c#	.	.	.	.	.
+.	.	4B	.	.	.	.	.
+=40	=40	=40	=40	=40	=40	=40	=40
+1A]	1e]	1c#	1a]	2r	1r	1r	2r
+.	.	.	.	2A	.	.	2ee
+1r	1r	1r	1r	2d	2r	1a	2ff#
+.	.	.	.	2d	2a	.	2ff#
+=41	=41	=41	=41	=41	=41	=41	=41
+0r	0r	0r	0r	1G	2b	2dd	2gg
+.	.	.	.	.	2b	2dd	2.gg
+.	.	.	.	1c	2.cc	2ee	.
+.	.	.	.	.	.	.	4ff
+.	.	.	.	.	.	[2cc	4ee
+.	.	.	.	.	4b	.	4dd
+=42	=42	=42	=42	=42	=42	=42	=42
+1r	1r	0r	1r	1c	2a	2cc]	2ee
+.	.	.	.	.	1g	2b	2ee
+2r	2r	.	2r	[1d	.	[1a	[1dd
+2D	2d	.	2a	.	2f#	.	.
+=43	=43	=43	=43	=43	=43	=43	=43
+2D	2d	2r	2a	1d]	1f#	1a]	1dd]
+2D	2d	2d	2a	.	.	.	.
+[1G	2.B	2d	2.g	2r	2r	2r	2r
+.	.	2d	.	2G	2g	2b	2dd
+.	4c	.	4a	.	.	.	.
+=44	=44	=44	=44	=44	=44	=44	=44
+1G]	1d	0g	4b	2G	2g	2b	2dd
+.	.	.	4a	.	.	.	.
+.	.	.	4g	2G	2g	2b	2dd
+.	.	.	4f	.	.	.	.
+2C	2c	.	2e	1c	1g	[1cc	1ee
+2C	[2c	.	2g	.	.	.	.
+=45	=45	=45	=45	=45	=45	=45	=45
+1F	2c]	2c	1f	2A	2a	2cc]	2cc
+.	2.f	2c	.	2A	2a	2cc	2a
+[1D	.	1f	1a	[1d	[1a	1dd	[1ff
+.	4g	.	.	.	.	.	.
+.	[2a	.	.	.	.	.	.
+=46	=46	=46	=46	=46	=46	=46	=46
+1D]	2a]	1d	2.f	1d]	1a]	1dd	1ff]
+.	2A	.	.	.	.	.	.
+.	.	.	4g	.	.	.	.
+2r	2r	2r	2a	1A	1a	1cc#	1ee
+2A	2A	2e	2a	.	.	.	.
+=47	=47	=47	=47	=47	=47	=47	=47
+1A	1c#	2e	2.a	1r	1r	1r	1r
+.	.	2A	.	.	.	.	.
+.	.	.	4g	.	.	.	.
+[1D	1d	2.a	4f	2r	2r	2r	2r
+.	.	.	4d	.	.	.	.
+.	.	.	4f	2d	2d	2a	2dd
+.	.	4g	4g	.	.	.	.
+=48	=48	=48	=48	=48	=48	=48	=48
+1D]	2.d	4f	2a	1d	1f	1a	1dd
+.	.	4e	.	.	.	.	.
+.	.	2.d	2a	.	.	.	.
+.	4c	.	.	.	.	.	.
+[1G	4B	.	2r	1G	[1g	1b	2dd
+.	4A	4c	.	.	.	.	.
+.	2G	4B	[2d	.	.	.	2dd
+.	.	4A	.	.	.	.	.
+=49	=49	=49	=49	=49	=49	=49	=49
+1G]	1d	1B	2d]	1B	2g]	1dd	2.gg
+.	.	.	2.g	.	2g	.	.
+.	.	.	.	.	.	.	4ff
+[1C	2.c	1e	.	[1c	[1g	[1cc	[1ee
+.	.	.	4f	.	.	.	.
+.	.	.	4e	.	.	.	.
+.	4B	.	4d	.	.	.	.
+=50	=50	=50	=50	=50	=50	=50	=50
+1C]	2G	1c	1e	1c]	1g]	1cc]	1ee]
+.	2A	.	.	.	.	.	.
+1G	1B	1d	1g	1G	1g	1b	1dd
+=51	=51	=51	=51	=51	=51	=51	=51
+0r	0r	0r	0r	2r	2r	2r	2r
+.	.	.	.	2G	2g	2dd	2b
+.	.	.	.	2G	2g	2dd	2b
+.	.	.	.	2G	2g	2dd	2b
+=52	=52	=52	=52	=52	=52	=52	=52
+0r	0r	0r	0r	1D	1f#	1dd	1a
+.	.	.	.	1G	1g	1dd	1b
+=53	=53	=53	=53	=53	=53	=53	=53
+2r	2r	2r	2r	0C	0g	0ee	0cc
+2c	2e	2c	2g	.	.	.	.
+2c	2g	2e	2cc	.	.	.	.
+2c	2g	2e	2cc	.	.	.	.
+=54	=54	=54	=54	=54	=54	=54	=54
+1G	1g	1d	1b	0r	0r	0r	0r
+1c	1g	1e	1cc	.	.	.	.
+=55	=55	=55	=55	=55	=55	=55	=55
+1F	1f	1A	1a	2r	2r	2r	2r
+.	.	.	.	1F	1a	1ff	1cc
+1r	1r	1r	1r	.	.	.	.
+.	.	.	.	2F	2a	2ff	2cc
+=56	=56	=56	=56	=56	=56	=56	=56
+0r	0r	0r	0r	1F	1a	1ff	1cc
+.	.	.	.	1F	1A	1ff	2cc
+.	.	.	.	.	.	.	[2cc
+=57	=57	=57	=57	=57	=57	=57	=57
+0r	0r	0r	0r	1A	1c	1ee	4cc]
+.	.	.	.	.	.	.	4b
+.	.	.	.	.	.	.	1a
+.	.	.	.	1B-	1d	1dd	.
+.	.	.	.	.	.	.	2g
+=58	=58	=58	=58	=58	=58	=58	=58
+1r	1r	1r	1r	1A	1e	1cc#	1a
+1D	1d	1f#	1a	1r	1r	1r	1r
+=59	=59	=59	=59	=59	=59	=59	=59
+1G	1B	1g	1d	1G	1g	1b	1dd
+1G	2G	1d	1g	1B	1g	1dd	1b
+.	[2g	.	.	.	.	.	.
+=60	=60	=60	=60	=60	=60	=60	=60
+0C	4g]	2.g	2.e	1c	0g	2cc	2ee
+.	4f	.	.	.	.	.	.
+.	4e	.	.	.	.	2.gg	2.ee
+.	4d	4f	4f	.	.	.	.
+.	2c	[1e	1g	1c	.	.	.
+.	.	.	.	.	.	4ff	4dd
+.	[2e	.	.	.	.	[2ee	2cc
+=61	=61	=61	=61	=61	=61	=61	=61
+2.E	4e]	1e]	0g	0G	1.g	4ee]	2b
+.	4f	.	.	.	.	4dd	.
+.	2.g	.	.	.	.	1cc	2g
+4F	.	.	.	.	.	.	.
+1G	.	1d	.	.	.	.	2.gg
+.	4f	.	.	.	.	.	.
+.	2d	.	.	.	2g	2b	.
+.	.	.	.	.	.	.	4ff
+=62	=62	=62	=62	=62	=62	=62	=62
+0C	0e	0c	0g	0c	0g	0cc	0ee
+*	*	*	*	*-	*-	*-	*-
+!! Crucifixus
+*Ibass	*Itenor	*Itenor	*Icalto
+!Bassus	!Tenor 2	!Tenor 1	!Altus
+*clefF4	*clefGv2	*clefGv2	*clefG2
+*k[]	*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix	*G:mix
+*M4/2	*M4/2	*M4/2	*M4/2
+=63	=63	=63	=63
+0C	0c	0e	0g
+=64	=64	=64	=64
+1C	1c	1g	1e
+1F	1c	1f	1a
+=65	=65	=65	=65
+0C	0c	2e	2g
+.	.	1e	1g
+.	.	2c	2e
+=66	=66	=66	=66
+2r	2r	2d	2f
+1c	1e	2e	2g
+.	.	1c	1e
+2A	2c	.	.
+=67	=67	=67	=67
+2B	2d	2G	2d
+2c	2e	1g	2c
+1A	1c	.	1cc
+.	.	2f#	.
+=68	=68	=68	=68
+1G	2d	2.g	2b
+.	2e	.	2g
+.	.	8f	.
+.	.	8e	.
+1r	2.f	1d	2.a
+.	4e	.	4g
+=69	=69	=69	=69
+1r	2d	1r	2f
+.	2c	.	2e
+1G	1g	1B	1d
+=70	=70	=70	=70
+2.A	1e	2.c	2c
+.	.	.	2e
+4G	.	4B	.
+2F	1r	2A	4d
+.	.	.	4c
+2E	.	2G	[2g
+=71	=71	=71	=71
+1D	1d	2.A	2g]
+.	.	.	2f
+.	.	4B	.
+1C	2.e	4c	2r
+.	.	4B	.
+.	.	4c	2g
+.	4d	4d	.
+=72	=72	=72	=72
+0r	2c	4e	2.a
+.	.	4c	.
+.	2B	2d	.
+.	.	.	4g
+.	4A	1c	2f
+.	4B	.	.
+.	[2c	.	2e
+=73	=73	=73	=73
+1r	2c]	1G	1d
+.	2B	.	.
+[1C	1c	1r	1e
+=74	=74	=74	=74
+1C]	1e	1c	1g
+1G	1d	1B	1g
+=75	=75	=75	=75
+1A	1c	4c	1e
+.	.	4d	.
+.	.	4e	.
+.	.	4f	.
+1B	1G	2g	1d
+.	.	2g	.
+=76	=76	=76	=76
+1c	1g	1e	4c
+.	.	.	4d
+.	.	.	4e
+.	.	.	4f
+1C	1e	1c	2g
+.	.	.	2g
+!! Et resurrexit
+*Ibass	*Itenor	*Itenor	*Icalto
+!Bassus	!Tenor 2	!Tenor 1	!Altus
+*clefF4	*clefGv2	*clefGv2	*clefG2
+*k[]	*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix	*G:mix
+*M3/2	*M3/2	*M3/2	*M3/2
+=77	=77	=77	=77
+1.G	1d	1B	[1.g
+.	2G	2B	.
+=78	=78	=78	=78
+1G	1B	1d	1.g]
+2E	2c	2e	.
+=79	=79	=79	=79
+1G	1B	1d	2r
+.	.	.	2r
+2A	2A	2c	2e
+=80	=80	=80	=80
+1G	1d	1B	1g
+2F	2d	2A	2a
+=81	=81	=81	=81
+1E	1e	2B	1g
+.	.	2c	.
+2D	4A	2d	2f
+.	4B	.	.
+=82	=82	=82	=82
+4C	2c	2G	1e
+4D	.	.	.
+4E	4B	2.g	.
+4F	4A	.	.
+2G	2B	.	2d
+.	.	4g	.
+=83	=83	=83	=83
+2A	2.c	2f	2c
+1G	.	1g	1d
+.	8B	.	.
+.	8A	.	.
+.	2B	.	.
+=84	=84	=84	=84
+2r	2c	2e	2c
+2C	2e	2g	2cc
+2G	[2d	2g	2b
+=85	=85	=85	=85
+4D	2d]	1f	1.a
+4E	.	.	.
+4F	1c	.	.
+4G	.	.	.
+2A	.	2e	.
+=86	=86	=86	=86
+2B-	2d	1d	2g
+1A	1e	.	1a
+.	.	2c#	.
+!! Et ascendit
+*Ibass	*Itenor	*Itenor	*Icalto
+!Bassus	!Tenor 2	!Tenor 1	!Altus
+*clefF4	*clefGv2	*clefGv2	*clefG2
+*k[]	*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix	*G:mix
+*M4/2	*M4/2	*M4/2	*M4/2
+=87	=87	=87	=87
+1D	2.f#	1d	1a
+.	4g	.	.
+2r	2a	2r	2r
+2D	[2d	2f	2a
+=88	=88	=88	=88
+1A	2d]	1e	1a
+.	2c#	.	.
+1d	4d	2.f	1a
+.	4e	.	.
+.	[2f	.	.
+.	.	4g	.
+=89	=89	=89	=89
+1c	2f]	2a	1cc
+.	2e	2.g	.
+1A	1a	.	1cc
+.	.	4f	.
+.	.	2f	.
+=90	=90	=90	=90
+0c	2g	2e	0cc
+.	2.f	2a	.
+.	.	1g	.
+.	8e	.	.
+.	8d	.	.
+.	2e	.	.
+=91	=91	=91	=91
+1d	1f	2r	2a
+.	.	2f	2a
+1r	1r	2e	2g
+.	.	2d	2f
+=92	=92	=92	=92
+0r	0r	2.g	2.e
+.	.	4f	4f
+.	.	2e	2g
+.	.	4A	[2a
+.	.	4B	.
+=93	=93	=93	=93
+1A	1r	4c	4a]
+.	.	4d	4b
+.	.	4e	4cc
+.	.	4f	4a
+2G	2r	2g	2b
+2F	2d	2d	[2a
+=94	=94	=94	=94
+2.E	2c	1e	2a]
+.	2B	.	2g#
+4E	.	.	.
+2.F	2.A	1c	[1a
+4G	4B	.	.
+=95	=95	=95	=95
+2A	2c	0r	1a]
+4D	2.d	.	.
+4E	.	.	.
+4F	.	.	2r
+4G	4e	.	.
+4A	4f	.	2a
+4B	4d	.	.
+=96	=96	=96	=96
+2c	2e	1r	2g
+2d	1d	.	2f
+1A	.	2r	2.e
+.	2c	2e	.
+.	.	.	4f
+=97	=97	=97	=97
+1r	2B	2d	2g
+.	2A	2c	2.a
+1E	1e	2.B	.
+.	.	.	4g
+.	.	.	4g
+.	.	4c	8f
+.	.	.	8e
+=98	=98	=98	=98
+2D	0r	2d	2f
+2C	.	2.e	2.g
+2.E	.	.	.
+.	.	4d	4f
+.	.	[2c	2e
+4F	.	.	.
+=99	=99	=99	=99
+2G	1r	2c]	1d
+2G	.	2B	.
+2A	2r	2c	2c
+2F	2a	2c	2f
+=100	=100	=100	=100
+2E	2g	2c	2g
+2F	2f	2A	2a
+2.C	2.e	2c	2.g
+.	.	2c	.
+4D	4f	.	4f
+=101	=101	=101	=101
+1E	1g	2B	1e
+.	.	2.e	.
+1C	1e	.	1g
+.	.	4d	.
+.	.	[2c	.
+=102	=102	=102	=102
+[0G	[0d	2c]	[0g
+.	.	4B	.
+.	.	4A	.
+.	.	1B	.
+=103	=103	=103	=103
+0G]	0d]	0B	0g]
+!! Et iterum
+*Ibass	*Icalto	*Icant	*Icant
+!Bassus	!Altus	!Cantus 2	!Cantus 1
+*clefF4	*clefG2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix	*G:mix
+*M4/2	*M4/2	*M4/2	*M4/2
+=104	=104	=104	=104
+1r	1d	1r	1r
+1G	[1g	1b	1dd
+=105	=105	=105	=105
+1.c	2g]	1.cc	1.ee
+.	2g	.	.
+.	2g	.	.
+2c	2a	2cc	2ee
+=106	=106	=106	=106
+2c	1.g	2cc	2ee
+2B	.	2dd	2dd
+2c	.	2ee	2cc
+2c	2g	2ee	2cc
+=107	=107	=107	=107
+0G	1g	2dd	1.b
+.	.	2g	.
+.	2r	[1dd	.
+.	2d	.	2b
+=108	=108	=108	=108
+0r	1.g	2dd]	1.b
+.	.	2dd	.
+.	.	2dd	.
+.	2g	2ee	2b
+=109	=109	=109	=109
+0r	2g	2dd	2b
+.	2.a	2.cc	2cc
+.	.	.	1dd
+.	4g	4b	.
+.	[2g	4b	.
+.	.	8a	.
+.	.	8g	.
+=110	=110	=110	=110
+1D	2g]	1a	1dd
+.	2f#	.	.
+[1G	4g	[1g	[1b
+.	4f	.	.
+.	4e	.	.
+.	4d	.	.
+=111	=111	=111	=111
+2G]	2e	1g]	1b]
+2G	4d	.	.
+.	4c	.	.
+2G	2B	1r	1r
+[2A	[2c	.	.
+=112	=112	=112	=112
+2A]	2c]	0r	0r
+1G	2B	.	.
+.	1A	.	.
+2F#	.	.	.
+=113	=113	=113	=113
+[0G	0B	1r	2r
+.	.	.	2dd
+.	.	2r	4g
+.	.	.	4a
+.	.	2dd	4b
+.	.	.	4cc
+=114	=114	=114	=114
+1G]	2r	4g	4dd
+.	.	4a	4cc
+.	2g	4b	4dd
+.	.	4cc	4ee
+1r	4d	4dd	1ff
+.	4e	4cc	.
+.	4f	4a	.
+.	4g	4b	.
+=115	=115	=115	=115
+2r	4a	4cc	4ee
+.	4b	4dd	4dd
+2c	2.cc	4ee	4cc
+.	.	8dd	4b
+.	.	8ee	.
+4F	.	2ff	4a
+4G	4b	.	4b
+4A	2a	[2ee	[2cc
+4B	.	.	.
+=116	=116	=116	=116
+2c	2.g	2ee]	4cc]
+.	.	.	4g
+2G	.	2.dd	2b-
+.	4f	.	.
+2.A	1e	.	[1a
+.	.	4cc	.
+.	.	[2cc	.
+4G	.	.	.
+=117	=117	=117	=117
+2.F	1.A	4cc]	2a]
+.	.	4b	.
+.	.	2.a	2f
+4E	.	.	.
+2D	.	.	2.f
+.	.	4g	.
+2D	2B	[2f	.
+.	.	.	4g
+=118	=118	=118	=118
+1C	1c	2f]	2a
+.	.	2e	4g
+.	.	.	4f
+[1c	2r	2e	2g
+.	[2g	[2ee	[2cc
+=119	=119	=119	=119
+2c]	2g]	2ee]	2cc]
+2A	2a	2ee	2cc
+1c	1g	1ee	1cc
+=120	=120	=120	=120
+0G	2.g	2dd	1.b
+.	.	2g	.
+.	8f	.	.
+.	8e	.	.
+.	1d	4b	.
+.	.	4a	.
+.	.	4b	2g
+.	.	4cc	.
+=121	=121	=121	=121
+0r	2r	1dd	4b
+.	.	.	4a
+.	1g	.	4b
+.	.	.	4cc
+.	.	2b	2dd
+.	2e	[2cc	[2ee
+=122	=122	=122	=122
+0r	1g	4cc]	4ee]
+.	.	4b	4dd
+.	.	4b	1gg
+.	.	8a	.
+.	.	8g	.
+.	2d	1a	.
+.	2d	.	2ff#
+=123	=123	=123	=123
+2r	4e	1g	2gg
+.	4d	.	.
+1c	4e	.	1ee
+.	4f	.	.
+.	2g	1r	.
+2A	[2a	.	2ee
+=124	=124	=124	=124
+1c	4a]	1r	1ee
+.	4g	.	.
+.	1cc	.	.
+1G	.	2r	1dd
+.	2b	2g	.
+=125	=125	=125	=125
+2r	1cc	4a	1r
+.	.	4g	.
+2F	.	4a	.
+.	.	4b	.
+4A	1a	[1cc	2r
+4G	.	.	.
+4A	.	.	2cc
+4B	.	.	.
+=126	=126	=126	=126
+1.c	1g	2cc]	4ee
+.	.	.	4dd
+.	.	2cc	4ee
+.	.	.	4ff
+.	2e	2.ee	2gg
+2c	[2g	.	2g
+.	.	4dd	.
+=127	=127	=127	=127
+1A	4g]	1cc	1a
+.	8f#	.	.
+.	8e	.	.
+.	2f#	.	.
+[1G	1g	1b	1dd
+=128	=128	=128	=128
+1G]	2r	2r	2r
+.	2g	2b	2dd
+1r	2g	2b	2dd
+.	[2c	[2cc	[2ee
+=129	=129	=129	=129
+0r	4c]	4cc]	4ee]
+.	4c	4cc	4ee
+.	2c	2cc	2ee
+.	2g	2b	2dd
+.	2a	2a	2cc
+=130	=130	=130	=130
+0r	2.g	2.dd	2.b
+.	4g	4dd	4b
+.	2g	2dd	2b
+.	2f#	2dd	2a
+=131	=131	=131	=131
+0r	2g	1dd	2b
+.	2f#	.	2a
+.	2g	1ee	2b
+.	[2a	.	[2cc
+=132	=132	=132	=132
+0r	4a]	1a	4cc]
+.	4g	.	4b
+.	2f	.	1a
+.	1e	1b	.
+.	.	.	2g#
+=133	=133	=133	=133
+1A	2r	2cc#	2a
+.	2e	2cc#	2a
+2D	2f#	2dd	2a
+[2G	[2g	[2dd	[2b
+=134	=134	=134	=134
+2G]	2g]	2dd]	2b]
+2E	2g	2ee	2cc
+2.D	2.a	2.ff	2.dd
+4D	4b	4ff	4dd
+=135	=135	=135	=135
+2C	2cc	2ee	1g
+1c	1g	1ee	.
+.	.	.	2a
+2d	2f	[2dd	2a
+=136	=136	=136	=136
+1A	1e	2dd]	1a
+.	.	2cc#	.
+1D	1f#	1dd	1a
+=137	=137	=137	=137
+2r	2r	2r	2r
+1G	1g	1dd	1b
+2G	2g	2dd	2b
+=138	=138	=138	=138
+1G	1g	1b	1dd
+2G	2g	2b	2dd
+2C	2g	2cc	2ee
+=139	=139	=139	=139
+2F	2.a	2cc	2.ff
+2D	.	2dd	.
+.	4a	.	4ff
+2A	2a	2cc	2ee
+[2c	[2g	[2ee	[2cc
+=140	=140	=140	=140
+2c]	2g]	2ee]	2cc]
+2G	2g	2dd	2b
+2A	1e	2cc	2a
+2A	.	2cc	2a
+=141	=141	=141	=141
+0F	1a	2cc	1.cc
+.	.	4b	.
+.	.	4a	.
+.	[1a	2cc	.
+.	.	2dd	4b
+.	.	.	4a
+=142	=142	=142	=142
+1E	2a]	1ee	2cc
+.	2g#	.	2b
+1A	2r	2r	1cc
+.	2a	2ee	.
+=143	=143	=143	=143
+2c	2g	2cc	2ee
+2G	2g	2b	2dd
+2A	1e	2a	2cc
+2A	.	2a	2cc
+=144	=144	=144	=144
+0F	1a	1.cc	2cc
+.	.	.	4b
+.	.	.	4a
+.	[1a	.	2cc
+.	.	4b	2dd
+.	.	4a	.
+=145	=145	=145	=145
+1E	2a]	2cc	1ee
+.	2g#	2b	.
+2r	2r	2r	2r
+[2A	[2a	[2cc#	[2ee
+=146	=146	=146	=146
+2A]	2a]	2cc#]	2ee]
+2A	2a	2cc#	2ee
+2A	2a	2ee	2cc#
+2d	2a	2ff#	2dd
+=147	=147	=147	=147
+2G	2b	4gg	2dd
+.	.	4ff	.
+1c	2cc	4ee	1ee
+.	.	4dd	.
+.	1g	2cc	.
+2B	.	2dd	[2dd
+=148	=148	=148	=148
+1c	0g	1ee	2dd]
+.	.	.	1cc
+1G	.	1dd	.
+.	.	.	2b
+=149	=149	=149	=149
+0C	0g	0ee	0cc
+*-	*-	*-	*-
+!! Et unam sanctam
+**kern	**kern	**kern	**kern	**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Itenor	*Icalto	*Ibass	*Icalto	*Icant	*Icant
+!Bassus	!Tenor 2	!Tenor 1	!Altus	!Bassus	!Altus	!Cantus 2	!Cantus 1
+*clefF4	*clefGv2	*clefGv2	*clefG2	*clefF4	*clefG2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]	*k[]	*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix	*G:mix	*G:mix	*G:mix	*G:mix	*G:mix
+*M4/2	*M4/2	*M4/2	*M4/2	*M4/2	*M4/2	*M4/2	*M4/2
+=150	=150	=150	=150	=150	=150	=150	=150
+1C	1e	1c	1g	1c	1g	1cc	1ee
+2C	2c	2e	2g	2c	2g	2cc	2ee
+2C	2e	2g	2c	2c	2g	2cc	2ee
+=151	=151	=151	=151	=151	=151	=151	=151
+1C	2g	4e	1e	1c	1g	1cc	1ee
+.	.	4d	.	.	.	.	.
+.	2G	2c	.	.	.	.	.
+2G	1B	2d	2g	2G	2g	2b	2dd
+2G	.	2G	2g	2B	2d	2dd	2dd
+=152	=152	=152	=152	=152	=152	=152	=152
+2.C	2e	2.G	2g	2.c	2.g	2.ee	2.cc
+.	2c	.	2e	.	.	.	.
+4C	.	4A	.	4c	4g	4ee	4cc
+1G	1d	1B	1g	1G	1g	1dd	1b
+=153	=153	=153	=153	=153	=153	=153	=153
+2r	2r	2r	2r	2r	2r	2r	2r
+2C	2c	2e	2e	2c	2g	2ee	2cc
+2C	2e	2c	2g	2c	2g	2ee	2cc
+2C	2g	2e	2c	2c	2g	2ee	2cc
+=154	=154	=154	=154	=154	=154	=154	=154
+2.C	2e	2g	2.e	2.c	2.g	2.ee	2.cc
+.	2c	2G	.	.	.	.	.
+4C	.	.	4e	4c	4g	4ee	4cc
+2G	2d	2B	2g	2G	2g	2dd	2b
+2G	2G	2B	2g	2B	2d	2dd	2dd
+=155	=155	=155	=155	=155	=155	=155	=155
+2.C	2.G	2e	2g	2.c	2.g	2.cc	2.ee
+.	.	2c	2e	.	.	.	.
+4C	4A	.	.	4c	4g	4cc	4ee
+1G	1B	1d	1g	[1G	[1g	[1b	[1dd
+=156	=156	=156	=156	=156	=156	=156	=156
+2r	2r	2r	2r	1G]	1g]	1b]	1dd]
+2G	2d	2B	2g	.	.	.	.
+2.G	2.d	2.B	2.g	1r	1r	1r	1r
+4G	4d	4B	4g	.	.	.	.
+=157	=157	=157	=157	=157	=157	=157	=157
+2C	1e	2c	1g	0r	0r	0r	0r
+2c	.	2e	.	.	.	.	.
+4c	2r	4e	2r	.	.	.	.
+4B	.	4d	.	.	.	.	.
+4A	2e	4c	2cc	.	.	.	.
+4G	.	4B	.	.	.	.	.
+=158	=158	=158	=158	=158	=158	=158	=158
+0A	4e	2.c	4cc	0r	0r	0r	0r
+.	4d	.	4b	.	.	.	.
+.	4c	.	4a	.	.	.	.
+.	4B	4d	4g	.	.	.	.
+.	[1c	1e	2a	.	.	.	.
+.	.	.	2a	.	.	.	.
+=159	=159	=159	=159	=159	=159	=159	=159
+1A	2c]	2r	4f	0r	0r	0r	0r
+.	.	.	4e	.	.	.	.
+.	2c	2e	1e	.	.	.	.
+1F	1A	1a	.	.	.	.	.
+.	.	.	2d	.	.	.	.
+=160	=160	=160	=160	=160	=160	=160	=160
+1E	1B	1g#	1e	1r	1r	1r	1r
+1r	1r	1r	1r	2.A	2.a	2.ee	2.cc#
+.	.	.	.	4A	4a	4ee	4cc#
+=161	=161	=161	=161	=161	=161	=161	=161
+1r	2r	1r	1r	2A	2a	2ee	2cc#
+.	2.A	.	.	2A	2a	2ee	2cc#
+2.D	.	2.d	2.a	1d	[1a	1ff#	1dd
+.	4A	.	.	.	.	.	.
+.	2A	.	.	.	.	.	.
+4D	.	4d	4a	.	.	.	.
+=162	=162	=162	=162	=162	=162	=162	=162
+2D	2A	2d	2a	1d	2a]	1ff#	1dd
+2D	1d	2d	2a	.	2d	.	.
+1G	.	1B	1d	2r	2r	2r	2r
+.	2G	.	.	[2G	2d	2gg	[2b
+=163	=163	=163	=163	=163	=163	=163	=163
+1G	2r	1B	1d	2G]	1g	1dd	2b]
+.	2.g	.	.	2B	.	.	2dd
+2r	.	2r	2r	1c	1g	1ee	1cc
+.	4f	.	.	.	.	.	.
+[2C	4e	[2c	[2g	.	.	.	.
+.	4d	.	.	.	.	.	.
+=164	=164	=164	=164	=164	=164	=164	=164
+2C]	2e	2c]	2g]	1C	1g	1ee	1cc
+2E	2e	2c	2g	.	.	.	.
+1F	1c	4A	1f	1r	1r	1r	1r
+.	.	4B	.	.	.	.	.
+.	.	4c	.	.	.	.	.
+.	.	4A	.	.	.	.	.
+=165	=165	=165	=165	=165	=165	=165	=165
+0G	0g	2B	1e	1r	1r	1r	1r
+.	.	1c	.	.	.	.	.
+.	.	.	1d	2r	2r	2r	2r
+.	.	2B	.	[2G	[2g	[2dd	[2b
+=166	=166	=166	=166	=166	=166	=166	=166
+1r	0r	1r	1r	2G]	2g]	2dd]	2b]
+.	.	.	.	2E	2g	2cc#	2g
+2r	.	2r	2r	1D	1f#	1dd	1a
+[2d	.	2d	2a	.	.	.	.
+=167	=167	=167	=167	=167	=167	=167	=167
+2d]	2.d	2G	1g	1G	1g	1dd	1b
+2B	.	2.d	.	.	.	.	.
+.	4d	.	.	.	.	.	.
+1A	1e	.	1a	1r	1r	1r	1r
+.	.	4c#	.	.	.	.	.
+.	.	2c#	.	.	.	.	.
+=168	=168	=168	=168	=168	=168	=168	=168
+1D	1f#	1d	1a	2r	2r	2r	2r
+.	.	.	.	1d	2d	1dd	1a
+1r	1r	1r	1r	.	1f#	.	.
+.	.	.	.	2d	.	2dd	2b
+=169	=169	=169	=169	=169	=169	=169	=169
+0r	0r	0r	0r	2.c	2.g	2.ee	2.cc
+.	.	.	.	4B	4g	4dd	4dd
+.	.	.	.	2c	2g	2cc	2ee
+.	.	.	.	2G	2g	2b	2dd
+=170	=170	=170	=170	=170	=170	=170	=170
+0r	0r	0r	0r	2A	2f	2a	2dd
+.	.	.	.	2A	2e	2a	2cc#
+.	.	.	.	1D	1f	1a	1dd
+=171	=171	=171	=171	=171	=171	=171	=171
+2r	2r	2r	2r	1A	1e	1a	1cc#
+1A	1e	2A	2a	.	.	.	.
+.	.	1c#	1e	1r	1r	1r	1r
+2A	2A	.	.	.	.	.	.
+=172	=172	=172	=172	=172	=172	=172	=172
+2.G	2.B	2.d	2.g	0r	0r	0r	0r
+4F#	4A	4d	4a	.	.	.	.
+2G	2d	2B	2g	.	.	.	.
+2D	2d	2A	2f	.	.	.	.
+=173	=173	=173	=173	=173	=173	=173	=173
+2E	2c	2G	2e	0r	0r	0r	0r
+2E	2B	2G	2e	.	.	.	.
+1C	1e	1c	1g	.	.	.	.
+!! Et vitam
+*Ibass	*Itenor	*Itenor	*Icalto	*Ibass	*Icalto	*Icant	*Icant
+!Bassus	!Tenor 2	!Tenor 1	!Altus	!Bassus	!Altus	!Cantus 2	!Cantus 1
+*clefF4	*clefGv2	*clefGv2	*clefG2	*clefF4	*clefG2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]	*k[]	*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix	*G:mix	*G:mix	*G:mix	*G:mix	*G:mix
+*M3/2	*M3/2	*M3/2	*M3/2	*M3/2	*M3/2	*M3/2	*M3/2
+=174	=174	=174	=174	=174	=174	=174	=174
+1.G	1.d	1.B	1.g	2r	2r	2r	2r
+.	.	.	.	2r	2r	2r	2r
+.	.	.	.	2G	2g	2b	2dd
+=175	=175	=175	=175	=175	=175	=175	=175
+1r	1r	1r	1r	1c	1g	1cc	1ee
+2r	2r	2r	2r	2c	2g	2cc	2ee
+=176	=176	=176	=176	=176	=176	=176	=176
+1r	1r	1r	1r	1F	1a	1cc	1ff
+2r	2r	2r	2r	2F	2a	2cc	2ff
+=177	=177	=177	=177	=177	=177	=177	=177
+1r	1r	1r	1r	2c	2g	2cc	2ee
+.	.	.	.	2.d	2.f#	2.a	2.dd
+2r	2r	2r	2r	.	.	.	.
+.	.	.	.	4d	4f#	4b	4dd
+=178	=178	=178	=178	=178	=178	=178	=178
+2r	2r	2r	2r	2c	1g	2cc	2ee
+2r	2r	2r	2r	1d	.	1a	1dd
+2D	2d	2d	2a	.	2f#	.	.
+=179	=179	=179	=179	=179	=179	=179	=179
+1G	1d	1B	1g	1.G	1.g	1.b	1.dd
+2G	2d	2B	2g	.	.	.	.
+=180	=180	=180	=180	=180	=180	=180	=180
+1C	1e	1c	1g	1r	1r	1r	1r
+2C	2g	2e	2cc	2r	2r	2r	2r
+=181	=181	=181	=181	=181	=181	=181	=181
+2G	2g	2d	2b	1r	1r	1r	1r
+2.A	2.e	2.c	2.a	.	.	.	.
+.	.	.	.	2r	2r	2r	2r
+4A	4e	4c	4a	.	.	.	.
+=182	=182	=182	=182	=182	=182	=182	=182
+2B-	1d	2d	2g	2r	1r	2r	2r
+1A	.	1e	1a	2r	.	2r	2r
+.	2c#	.	.	2A	2r	[2a	2ee
+=183	=183	=183	=183	=183	=183	=183	=183
+1D	2d	2d	2a	1d	2a	2a]	1ff#
+.	2r	2r	2r	.	2a	1dd	.
+2D	2d	2d	2a	2d	2a	.	2ff#
+=184	=184	=184	=184	=184	=184	=184	=184
+1G	1d	1B	1g	1G	1b	2dd	1gg
+.	.	.	.	.	.	2dd	.
+2G	2G	2B	2g	2G	2b	2dd	2gg
+=185	=185	=185	=185	=185	=185	=185	=185
+1C	2g	2G	1g	2c	2cc	2cc	2ee
+.	2e	2.G	.	2.c	2.g	2.ee	2.cc
+2C	2e	.	2g	.	.	.	.
+.	.	4A	.	4c	4g	4ee	4cc
+=186	=186	=186	=186	=186	=186	=186	=186
+2G	2.d	2.B	2g	1.B	1.g	1.gg	1.dd
+2.G	.	.	2.g	.	.	.	.
+.	4d	4B	.	.	.	.	.
+.	2d	2B	.	.	.	.	.
+4G	.	.	4g	.	.	.	.
+=187	=187	=187	=187	=187	=187	=187	=187
+2C	4e	2G	2g	1.c	1.g	1.ee	1.cc
+.	4d	.	.	.	.	.	.
+1C	4c	2.G	1g	.	.	.	.
+.	4B	.	.	.	.	.	.
+.	2c	.	.	.	.	.	.
+.	.	4A	.	.	.	.	.
+=188	=188	=188	=188	=188	=188	=188	=188
+1.G	1.d	1.B	1.g	1.G	1.g	1.dd	1.b
+==	==	==	==	==	==	==	==
+*-	*-	*-	*-	*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Parody)
+!!!AST: renaissance, vocal
+!!!ASW: Motet 1575 (Palestrina)
+!!!PWK: Masses, Book 8vce
+!!!RNB: Cadence finals: C,D
+!!!YOR: Le Opere Complete, v. 30, p. 59
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

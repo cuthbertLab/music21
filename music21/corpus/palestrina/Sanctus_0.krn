@@ -1,0 +1,428 @@
+!!!COM: Palestrina, Giovanni Perluigi da
+!!!OPR: Ad fugam
+!!!OTL: Sanctus
+**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor	!Altus	!Cantus
+*clefF4	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix	*G:mix
+*M4/2	*M4/2	*M4/2	*M4/2
+=1	=1	=1	=1
+0r	0r	1g	1r
+.	.	1a	1cc
+=2	=2	=2	=2
+0r	0r	1g	1dd
+.	.	2r	1cc
+.	.	[2cc	.
+=3	=3	=3	=3
+0r	0r	4cc]	2r
+.	.	4b	.
+.	.	4a	2.ff
+.	.	4g	.
+.	.	2f	.
+.	.	.	4ee
+.	.	[2g	4dd
+.	.	.	4cc
+=4	=4	=4	=4
+0r	0r	2g]	2b
+.	.	2e	1cc
+.	.	2f	.
+.	.	[2a	2a
+=5	=5	=5	=5
+1G	1r	4a]	2b
+.	.	4g	.
+.	.	1g	2.dd
+1A	1c	.	.
+.	.	.	4cc
+.	.	2f#	[2cc
+=6	=6	=6	=6
+1G	1d	1g	2cc]
+.	.	.	2b
+2r	1c	1g	1cc
+[2c	.	.	.
+=7	=7	=7	=7
+4c]	2r	2e	1cc
+4B	.	.	.
+4A	2.f	2.a	.
+4G	.	.	.
+1F	.	.	2a
+.	4e	4g	.
+.	4d	4f	[2dd
+.	4c	4e	.
+=8	=8	=8	=8
+1G	1B	2d	4dd]
+.	.	.	4cc
+.	.	2.g	4b
+.	.	.	4a
+2E	1c	.	2g
+.	.	4f	.
+[2A	.	4e	[2cc
+.	.	4d	.
+=9	=9	=9	=9
+4A]	2A	2e	4cc]
+4G	.	.	4b
+4F	2.d	2.f	4a
+4E	.	.	4g
+1D	.	.	2a
+.	4c	4e	.
+.	4B	[2d	[2b
+.	4A	.	.
+=10	=10	=10	=10
+1E	1G	4d]	4b]
+.	.	8c	4a
+.	.	8B	.
+.	.	2c#	2.g
+1D	1A	2d	.
+.	.	.	8f
+.	.	.	8e
+.	.	2a	2f#
+=11	=11	=11	=11
+1G	1G	2b	2g
+.	.	2b	2dd
+1r	1c	2cc	2ee
+.	.	2g	2ee
+=12	=12	=12	=12
+2r	1r	2a	2ff
+2A	.	2a	2cc
+2B	2r	1d	2dd
+2B	2d	.	2dd
+=13	=13	=13	=13
+2c	2e	1r	1g
+2G	2e	.	.
+2A	2f	2r	1r
+2A	2c	2e	.
+=14	=14	=14	=14
+1D	2d	2f#	2r
+.	2d	2f#	2a
+1r	1G	2g	2b
+.	.	2d	2b
+=15	=15	=15	=15
+1E	1r	2e	2cc
+.	.	2g	2g
+2F	1A	2.f	2a
+2F	.	.	2cc
+.	.	4e	.
+=16	=16	=16	=16
+2G	2B	2d	2.b
+2D	2B	2f	.
+.	.	.	4a
+2E	2c	2e	2g
+2G	2G	[2d	2b
+=17	=17	=17	=17
+2F	2A	4d]	2a
+.	.	4c	.
+2E	2c	2c	2.g
+1D	2B	1d	.
+.	.	.	4f#
+.	2A	.	2f#
+=18	=18	=18	=18
+[0G	[0G	[0d	[0g
+=19	=19	=19	=19
+0G]	0G]	0d]	0g]
+*-	*-	*-	*-
+!! Pleni
+**kern	**kern	**kern
+*Ibass	*Itenor	*Icalto
+!Bassus	!Tenor	!Altus
+*clefF4	*clefGv2	*clefG2
+*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix
+*M4/2	*M4/2	*M4/2
+=20	=20	=20
+1G	1r	0r
+1A	1c	.
+=21	=21	=21
+1B	1d	1r
+1c	1e	1g
+=22	=22	=22
+2A	1f	1a
+4d	.	.
+4c	.	.
+4B	2d	1b
+4A	.	.
+2G	4g	.
+.	4f	.
+=23	=23	=23
+1A	4e	1cc
+.	4d	.
+.	2c	.
+1D	1d	2a
+.	.	4dd
+.	.	4cc
+=24	=24	=24
+2r	1G	4b
+.	.	4a
+1G	.	2g
+.	2r	1a
+2F#	[2c	.
+=25	=25	=25
+1G	2c]	1d
+.	2B	.
+2F	1c	2r
+2E	.	[2g
+=26	=26	=26
+1D	2B	2g]
+.	2A	2f#
+2r	1G	1g
+2G	.	.
+=27	=27	=27
+2A	2r	2f
+2c	2c	2e
+4B	2d	1d
+4c	.	.
+4d	2f	.
+8c	.	.
+8B	.	.
+=28	=28	=28
+2c	4e	2r
+.	4f	.
+2B	4g	2g
+.	8f	.
+.	8e	.
+1A	2f	2a
+.	2e	2cc
+=29	=29	=29
+2r	1d	4b
+.	.	4cc
+2D	.	4dd
+.	.	8cc
+.	.	8b
+2E	2r	2cc
+2G	2G	2b
+=30	=30	=30
+4F	2A	1a
+4G	.	.
+4A	2c	.
+8G	.	.
+8F	.	.
+2G	4B	2r
+.	4c	.
+2F	4d	2d
+.	8c	.
+.	8B	.
+=31	=31	=31
+1E	2c	2e
+.	2B	2g
+2r	1A	4f
+.	.	4g
+2A	.	4a
+.	.	8g
+.	.	8f
+=32	=32	=32
+2B	2r	2g
+2d	2d	2f
+2.c	2e	1e
+.	2g	.
+4B	.	.
+=33	=33	=33
+4A	2.f	2r
+4G	.	.
+2F	.	2a
+.	4e	.
+1G	4d	2b
+.	4c	.
+.	2B	2dd
+=34	=34	=34
+1A	1c	2.cc
+.	.	4b
+1D	1d	4a
+.	.	4g
+.	.	2f
+=35	=35	=35
+2r	1G	1g
+1G	.	.
+.	2r	1a
+2F#	[2c	.
+=36	=36	=36
+2G	2c]	1d
+2D	2B	.
+1E	2c	2r
+.	2G	[2g
+=37	=37	=37
+1D	1A	2g]
+.	.	2f#
+1G	[1G	2g
+.	.	2d
+=38	=38	=38
+2C	0G]	1e
+1c	.	.
+.	.	1d
+4B	.	.
+4A	.	.
+=39	=39	=39
+[0B	[0G	[0d
+=40	=40	=40
+0B]	0G]	0d]
+*-	*-	*-
+!! Hosanna
+**kern	**kern	**kern	**kern
+*Ibass	*Itenor	*Icalto	*Icant
+!Bassus	!Tenor	!Altus	!Cantus
+*clefF4	*clefGv2	*clefG2	*clefG2
+*k[]	*k[]	*k[]	*k[]
+*G:mix	*G:mix	*G:mix	*G:mix
+*M3/2	*M3/2	*M3/2	*M3/2
+=41	=41	=41	=41
+1r	1r	1g	1r
+2r	2r	[2a	[2cc
+=42	=42	=42	=42
+1r	1r	2a]	2cc]
+.	.	2f	1dd
+2r	2r	2g	.
+=43	=43	=43	=43
+1r	1r	2g	2b
+.	.	1a	2cc
+2r	2r	.	2cc
+=44	=44	=44	=44
+1G	1r	2.g	1dd
+.	.	4f	.
+[2A	[2c	2e	[2cc
+=45	=45	=45	=45
+2A]	2c]	1a	4cc]
+.	.	.	4b
+2F	1d	.	2a
+2G	.	[2g	[2dd
+=46	=46	=46	=46
+2G	2B	4g]	2dd]
+.	.	4f	.
+1A	2c	4e	2.cc
+.	.	4d	.
+.	2c	[2e	.
+.	.	.	4b
+=47	=47	=47	=47
+1D	1d	4e]	4a
+.	.	4d	4g
+.	.	1d	2.a
+[2E	[2G	.	.
+.	.	.	4g
+=48	=48	=48	=48
+2E]	2G]	2c#	1g
+1D	1A	2d	.
+.	.	2a	2f#
+=49	=49	=49	=49
+2r	1G	1b	2g
+1G	.	.	2dd
+.	2r	2b	[2ee
+=50	=50	=50	=50
+1A	1c	2cc	2ee]
+.	.	1a	2ee
+2F	[2d	.	2ff
+=51	=51	=51	=51
+1G	2d]	2.b	1dd
+.	2B	.	.
+.	.	4a	.
+2r	[2c	4g	[2ee
+.	.	4f	.
+=52	=52	=52	=52
+1c	2c]	1e	4ee]
+.	.	.	4dd
+.	2r	.	4cc
+.	.	.	4b
+[2d	[2f	2f	[2a
+=53	=53	=53	=53
+2d]	2f]	1d	2a]
+2B	1g	.	2b
+2c	.	2r	[2g
+=54	=54	=54	=54
+2c	2e	2r	2g]
+1d	2f	1a	1r
+.	2f	.	.
+=55	=55	=55	=55
+1G	1g	1b	1dd
+2r	[2c	2g	[2ee
+=56	=56	=56	=56
+1r	2c]	2g	2ee]
+.	1r	1a	2cc
+2r	.	.	2cc
+=57	=57	=57	=57
+1r	1r	1b	1dd
+[2c	2r	[2cc	[2ee
+=58	=58	=58	=58
+2c]	2r	4cc]	2ee]
+.	.	4b	.
+1d	1f	2a	2.ff
+.	.	2d	.
+.	.	.	4ee
+=59	=59	=59	=59
+2B	1g	2r	2dd
+2.c	.	2e	2g
+.	2e	[2cc	2r
+4B	.	.	.
+=60	=60	=60	=60
+4A	2.f	4cc]	2a
+4G	.	4b	.
+1F	.	4a	2.ff
+.	4e	4g	.
+.	4d	[2a	.
+.	4c	.	4ee
+=61	=61	=61	=61
+2G	1B	4a]	4dd
+.	.	4g	4cc
+2G	.	1g	2.dd
+[2A	2c	.	.
+.	.	.	4cc
+=62	=62	=62	=62
+2A]	2c	2f#	1cc
+1G	1d	1g	.
+.	.	.	2b
+=63	=63	=63	=63
+1C	1c	1g	1cc
+2r	[2F	[2a	2r
+=64	=64	=64	=64
+1r	2F]	2a]	2cc
+.	1r	2f	1dd
+2r	.	2g	.
+=65	=65	=65	=65
+1r	1r	2g	2b
+.	.	1a	2cc
+2r	2r	.	2cc
+=66	=66	=66	=66
+1G	1r	1g	1dd
+[2A	[2c	2e	[2cc
+=67	=67	=67	=67
+2A]	2c]	1a	2cc]
+2F	1d	.	2a
+2G	.	[2g	[2dd
+=68	=68	=68	=68
+2G	2B	4g]	2dd]
+.	.	4f	.
+1A	2c	4e	2.cc
+.	.	4d	.
+.	2c	[2e	.
+.	.	.	4b
+=69	=69	=69	=69
+1D	1d	4e]	4a
+.	.	4d	4g
+.	.	1d	2.a
+[2E	[2G	.	.
+.	.	.	4g
+=70	=70	=70	=70
+2E]	2G]	2c#	1g
+1D	1A	1d	.
+.	.	.	2f#
+=71	=71	=71	=71
+[1.G	[1.G	[1.d	1g
+.	.	.	[2g
+=72	=72	=72	=72
+1.G]	1.G]	1.d]	1.g]
+==	==	==	==
+*-	*-	*-	*-
+!!!CDT: 1525/^1526/-1594/2/2
+!!!OCY: Italia
+!!!AGN: Mass (Canonic)
+!!!AST: renaissance, vocal
+!!!ASW: Motet (Maffoni)
+!!!PWK: Masses, Book 2
+!!!RNB: Cadence finals: C
+!!!YOR: Le Opere Complete, v. 4, p. 74
+!!!YOO: Rome, Italy: Fratelli Scalera
+!!!END: 1992//
+!!!EED: John Miller
+!!!YEC: Copyright 2000, John Miller
+!!!YEN: United States of America
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEM: This file must be accompanied by the licensing agreement.
+!!!YEM: A copy of the licensing agreement may be found at http://www.music-cog.ohio-state.edu/HumdrumDatabases/Palestrina/license.txt
+!!!EMD: converted to Humdrum by Bret Aarden

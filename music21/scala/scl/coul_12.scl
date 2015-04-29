@@ -1,0 +1,17 @@
+! coul_12.scl
+!
+Scale 1 5/4 3/2 2 successively split largest intervals by smallest interval     
+ 12
+!
+ 25/24
+ 10/9
+ 6/5
+ 5/4
+ 125/96
+ 25/18
+ 3/2
+ 25/16
+ 5/3
+ 9/5
+ 15/8
+ 2/1

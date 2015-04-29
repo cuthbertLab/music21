@@ -1,0 +1,16 @@
+! diamond_chess.scl
+!
+9-limit chessboard pattern diamond. OdC                                         
+ 11
+!
+ 8/7
+ 6/5
+ 9/7
+ 4/3
+ 7/5
+ 10/7
+ 3/2
+ 14/9
+ 5/3
+ 7/4
+ 2/1

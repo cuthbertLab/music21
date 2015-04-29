@@ -35,9 +35,7 @@ class Hasher(object):
 
 		# --- begin hashing settings --- 
 		self.stripTies = False
-		self.roundDuration = True
-		self.roundOffset = True
-		self.granularity = 32
+		
 		# self.key = None # useful if available to see if notes are in key maybe?
 		# --- end hashing settings ---
 
@@ -45,7 +43,10 @@ class Hasher(object):
 		self.hashPitch = True
 		self.hashMIDI = True # otherwise, hash string "C-- instead of 58"
 		self.hashDuration = True
+		self.roundDuration = True
 		self.hashOffset = True
+		self.roundOffset = True
+		self.granularity = 32
 		self.hashIntervalFromLastNote = False
 		# self.outOfKey = False
 		# self.isAccidental = False
@@ -98,6 +99,14 @@ class Hasher(object):
 		if self.hashIntervalFromLastNote:
 			noteHashes.append("IntervalFromLastNote")
 			self.hashingFunctions["IntervalFromLastNote"] = "hashIntervalFromLastNote"
+
+	def buildRestHashes(self):
+		# see buildNoteHashes for example
+		pass
+
+	def buildChordHashes(self):
+		# see buildNoteHashes for example
+		pass
 
 	def preprocessStream(self, stream):
 		if self.stripTies:

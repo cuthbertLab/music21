@@ -1,0 +1,12 @@
+! kring3bp.scl
+!
+Double-tie BP circular mirroring of 3:5:7
+ 7
+!
+ 9/7
+ 7/5
+ 5/3
+ 9/5
+ 15/7
+ 7/3
+ 3/1

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN" "http://www.musicxml.com/dtds/partwise.dtd">
+<score-partwise version="2.0">
+	<work>
+		<work-title>Multiple verses</work-title>
+	</work>
+	<identification>
+		<miscellaneous>
+			<miscellaneous-field name="description">music21 multiple verses</miscellaneous-field>
+		</miscellaneous>
+	</identification>
+	<part-list>
+		<score-part id="P1">
+			<part-name>test</part-name>
+		</score-part>
+	</part-list>
+	<part id="P1">
+		<!--==========================[1,1]=============================-->
+		<measure number="1">
+			<attributes>
+				<divisions>1</divisions>
+				<time symbol="common">
+					<beats>4</beats>
+					<beat-type>4</beat-type>
+				</time>
+				<clef number="1">
+					<sign>G</sign>
+					<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<pitch>
+					<step>A</step>
+					<octave>4</octave>
+				</pitch>
+				<duration>4</duration>
+				<voice>1</voice>
+				<type>whole</type>
+				<stem default-y="9.51">up</stem>
+				<lyric number="1" justify="right" default-y="-64.10">
+					<syllabic>single</syllabic>
+					<text font-family="CenturySchL" font-size="11" font-weight="normal"
+						font-style="normal" xml:lang="de">1. First</text>
+				</lyric>
+				<lyric number="2" justify="right" default-y="-92.11">
+					<syllabic>single</syllabic>
+					<text font-family="CenturySchL" font-size="11" font-weight="normal"
+						font-style="normal" xml:lang="de">2. Second</text>
+				</lyric>
+				<lyric number="3" justify="right" default-y="-120.12">
+					<syllabic>single</syllabic>
+					<text font-family="CenturySchL" font-size="11" font-weight="normal"
+						font-style="normal" xml:lang="de">3. Third</text>
+				</lyric>
+				<lyric number="4" justify="right" default-y="-148.13">
+					<syllabic>single</syllabic>
+					<text font-family="CenturySchL" font-size="11" font-weight="normal"
+						font-style="normal" xml:lang="de">4. Fourth</text>
+				</lyric>
+				<lyric number="5" justify="right" default-y="-176.13">
+					<syllabic>single</syllabic>
+					<text font-family="CenturySchL" font-size="11" font-weight="normal"
+						font-style="normal" xml:lang="de">5. Fifth</text>
+				</lyric>
+			</note>
+		</measure>
+	</part>
+</score-partwise>

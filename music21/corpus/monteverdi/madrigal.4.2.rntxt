@@ -1,0 +1,61 @@
+Composer: Monteverdi
+Madrigal: 4.2
+Title: Cor mio, mentre vi miro
+Analyst: Ian Quinn
+Proofreader:
+Time Signature: 4/4
+Key Signature: 
+Note: This is dorian music -- IV, not iv; ii, not iio
+
+m1 d: V/iv
+m2 iv
+m3 III6 b3 VII b4 III6
+m4 iv6/5[no1]
+m5 i6/4 b3 V
+m6 i b3 iv
+m7 VII b2 ii4/3 b3 v b4 ii6
+m8 a: i6
+m9 V b2 i6/4 b3 V
+m10 I ||
+m11 d: i
+m12 IV b2 viio6 b3 i
+m13 V b3 i
+m14 i6 b2 i b4 viio6/iv
+m15 iv b3 i
+m16 b3 v6 b4 v
+m17 b4 V6
+Note: Parallel 6/3 chords
+m18 iv6 b4 III6
+m19 b1.5 ii6 b2 i6 b3 viio6 b4 i
+m20 V/IV
+m21 IV b3 III
+m22 VII b3 IV b4 v
+m23 V/v b2 v b4 i6
+m24 b2 i b3 V6[no1] b4 i
+Note: Sequence by asc fifth (2-bar segments)
+m25 F: IV b4 I6
+m26 V b3 I
+m27 C: IV b4 I6
+m28 V b3 I
+m29 G: IV b4 I6
+m30 V b3 I
+m31 D: IV b4 I6
+m32 V b3 i
+Note: Sequence by asc fifth (2-bar segments)
+m33 C: IV[no3] b2 I6 b3 V
+m34 I
+m35 G: IV b2 I6 b3 V
+m36 I
+m37 D: IV b2 I6 b3 V
+m38 I
+m39 A: IV b2 I6 b3 V
+m40 I
+m41 d: V b3 i b4 V b4.5 i
+m42 VII b2.5 i b3 VII b3.5 III b4 ii
+m43 b1.5 III b2 ii b2.5 v b3 IV
+m44 VII b3 viio6/iv6 b4 iv6
+m45 v6 b3 V/v b4 i6/4/v
+m46 V/v b3 v || b4 i6
+m47 I b2 VII6 b3 I6 b4 ii6
+m48 v b2 I6/4 b3 V
+m49 I

@@ -1,0 +1,28 @@
+Composer: J. S. Bach
+BWV: 347
+Title: Ich dank dir, lieber Herre
+Analyst: Andrew Jones
+Proofreader: Dmitri Tymoczko and Hamish Robb
+Note: please email corrections to dmitri@princeton.edu
+
+Time Signature: 4/4
+
+Form: chorale
+m0 b4 A: I
+m1 vi b2 I6 b3 IV b4 V6/V
+m2 E: i b2 V b2.5 V7 b3 I || b4 I
+m3 IV b2 V b3 IV6 b4 ii6/5
+m4 I6/4 b2 V b2.5 V7 b3 I :|| b4 A: iii
+m5 IV6 b2 I b3 V b4 I6 b4.5 V7/IV
+m6 IV b1.5 viio6/4 b2 I6 b3 V || b4 b: viio6
+m7 i b2 viio6/5 b3 i6 b3.5 iv6 b4 V
+m8 i || b4 A: iii
+Note: doubled seventh in m9 b2, with one resolving upwards; no root on b3
+m9 vi b2 V7 b3 I6 b4 ii b4.5 viio6
+m10 I b2 I6 b3 V || b4 ii
+m10var1 I b2 I6 b2.5 IV7 b3 V || b4 ii
+Note: pair of passing tones in alto disguises tonic arrival on b4 of m11
+m11 vi b2 ii2 b3 V6 b4 I
+m11var1 vi b2 ii2 b3 V6 b4 vi6/5 b4.5 viio6/4
+m12 I b2 IV6 b3 I6/4 b3.5 IV7 b4 V b4.75 V7
+m13 I

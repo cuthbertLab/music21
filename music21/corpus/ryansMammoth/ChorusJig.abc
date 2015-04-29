@@ -1,0 +1,24 @@
+X: 1
+T: CHORUS -- JIG
+B: Ryan's Mammoth Collection of Fiddle Tunes
+R: reel
+M: 2/4
+L: 1/16
+P: Modern Version.
+Z: Contributed 20001214192202 by John Chambers John.Chambers:weema.com
+N:
+N: W: CHORUS JIG. -- First couple down the outside, back. Down the centre, back.
+N: W: Turn contra corners. Balance, turn partners to place.
+K: G
+(uAG) \
+| .F2(DF) ABAG | F"4"ADF .A2.d2 | .D2(DF) ABAF | GFEF .G2(AG) \
+| .F2(DF) ABAG | F"4"ADF .A2.d2 | .D2(DF) ABAF | GFEF .G2 |]
+u(Bc) \
+| dBcA BGFG | ABcd .A2(Bc) | dBcA BGFG | AcBA .G2(Bc) \
+| dBcA BGFG | ABcd efge | dBcA BGFG | AcBA G2 |]
+(uag) \
+| (.fd).d.d (.fd).d.d | Adfg abag | (.fd).d.d (.fd).d.d | Adef .g2(ag) \
+| (.fd).d.d (.fd).d.d | Adfg abag | (.fd).d.d (.fd).d.d | edef g2 |]
+u(Bc) \
+| dBcA BGFG | ABcd .A2(Bc) | dBcA BGFG | AcBA .G2(Bc) \
+| dBcA BGFG | ABcd efge | dBcA BGFG | AcBA G2 |]

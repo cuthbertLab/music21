@@ -1,0 +1,1411 @@
+
+X:1
+T: Graf und Nonne (Die Nonne)
+N: Q0155
+O: Mitteleuropa, Deutschland
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 6/8
+L: 1/8
+K: C
+G | C2D_E2F | G2GF2
+G | _A2GF_EF | G3-G2
+G | G_A_BBAG | G2FF2
+F | _EFGGFE | _E2DD2
+G | GF_EDCB, | C3-C2
+
+X:2
+T: Graf und Nonne (Die Nonne)
+N: Q0155A
+O: Mitteleuropa, Schweiz
+N: Verzierungen (Vorschlaege) in der ersten und dritten Zeile.
+N: Anhaengsel an der dritten Zeile.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 2/4
+L: 1/16
+K: D
+DF | A2AdAFGE | F4E2
+E2 | F2FAG2GB | A4z2
+ABc | d2d2dcBA | B4A4 | G4F2
+A2 | B2AGF2E2 | D4z2
+
+X:3
+T: Graf und Nonne (Die Nonne)
+N: Q0155B
+O: Mitteleuropa, Deutschland
+N: Anhaengsel an der dritten Zeile.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 2/4
+L: 1/8
+K: G
+G | BGdB | B2A
+G | BGdB | A2z
+G | dddd | dBG2 | c2e2 | dBG
+d | dcAF | G2z
+
+X:4
+T: Graf und Nonne (Die Nonne)
+N: Q0155C
+O: Mitteleuropa, Deutschland (BRD) , Nordrhein - Westfalen, Meurs
+N: Anhaengsel an der dritten Zeile.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 2/4
+L: 1/32
+K: F
+F2A2 | c6f2c2A2B2G2 | A8G4
+G3B | A4A2c2=B4B2d2 | c8z4
+c4 | f4f2f2e2d2c4 | d8c4z2c2 | c6B2A4
+c4 | d4c2B2A4G4 | F8z4
+
+X:5
+T: Graf und Nonne (Die Nonne)
+N: Q0155D
+O: Mitteleuropa, Deutschland / Polen, Schlesien, Kanth
+R: Ballade, Standesunterschied, Werbung, Liebe, Glueck
+M: 2/4
+L: 1/8
+K: D
+G | BAGA | G2F
+F | AGEA | F2z
+F | AFEF | G2F
+F | AFEF | G2F
+D | DDDD | d2c
+B | BFBG | G2F
+F | AFEG | G2F
+F | AFEG | G2F
+D | DDDD | d2c
+B | AFBG | G2F
+
+X:6
+T: Graf und Nonne (Die Nonne)
+N: Q0155E
+O: Mitteleuropa, Deutschland (BRD) , Nordrhein - Westfalen, Siegen
+N: Grundton in der zweigestrichenen Oktave.
+R: Ballade, Standesunterschied, Werbung, Liebe
+M: 3/4
+L: 1/8
+K: C
+C2 | C2G,2EF | E2C2
+G2 | A2G2FG | E2z2
+CC | A2A2AA | AGG2
+GG | AGFEGE | D2D2
+G2 | A2G2FG | E2z2
+
+X:7
+T: Graf und Nonne (Die Nonne)
+N: Q0155F
+O: Mitteleuropa, Deutschland (DDR) , Brandenburg an der Havel
+N: Anhaengsel an der dritten Zeile.
+R: Ballade, Standesunterschied, Werbung, Liebe
+M: 4/4
+L: 1/8
+K: C
+C2 | G3cGEFD | E4D2
+D2 | E2A2G2^F2 | G4z2
+G2 | c2c2B2G2 | A4G2z2 | F4E2
+G2 | A2F2E2D2 | C4z2
+
+X:8
+T: Graf und Nonne (Die Nonne)
+N: Q0155G
+O: Mitteleuropa, Deutschland (DDR) , Brandenburg, Soldin, Adamsdorf
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage, Tod
+M: 2/4
+L: 1/16
+K: F
+FA | c3fcBAG | A4G2
+G2 | A2A2BABd | c4z2
+c2 | f2f2edc2 | d4c4 | B4A2
+c2 | d2cBA2G2 | F4z2
+
+X:9
+T: Graf und Nonne (Die Nonne)
+N: Q0155H
+O: Mitteleuropa, Deutschland (BRD) , Rheinland - Pfalz, Simmern, Laubach
+N: Pause am Schluss der vierten und letzten Zeile angefuegt.
+N: Eingeklammerte Pausen gespielt.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 6/8
+L: 1/16
+K: G
+D2 | B4B2B2A2G2 | A2A4z2
+D3D | c4c2d4A2 | B8z2
+d2 | d2c2B2B2c2d2 | e6e2d2
+B2 | d2d2d2d2c2c2 | B8z2
+d2 | d2c2B2B2c2d2 | e6e2d2
+B2 | d2d2d2d2c2c2 | B8z2
+
+X:10
+T: Graf und Nonne (Die Nonne)
+N: Q0155I
+O: Mitteleuropa, Deutschland (BRD) , Nordrhein - Westfalen, Attendorn
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 4/4
+L: 1/8
+K: F
+C2 | F3CA,2C2 | F2A2A2
+c2 | G3FE2F2 | G4z2
+FG | A2A2A2A2 | A2c2B2
+AA | G2G2G2G2 | G2d2c2
+cB | A2A2G2G2 | A4z2
+d2 | c3AB2c2 | A4z2
+
+X:11
+T: Graf und Nonne (Die Nonne)
+N: Q0155J
+O: Mitteleuropa, Deutschland (DDR) , Thueringen, Poermitz
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 6/8
+L: 1/8
+K: F
+C | F2Ac2F | FEz3
+C | E2Gc2B | A2z3
+C | F2GA2B | c2fe2
+d | cccB2E | F4z
+
+X:12
+T: Graf und Nonne (Die Nonne)
+N: Q0155K
+O: Mitteleuropa, Schweiz, Aargau, Zufikon
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 6/8
+L: 1/16
+K: Bb
+F2 | B2A2G2F3DD2 | G4F2F4
+B2 | F4D2G2F2E2 | E6D2z2
+F2 | B2A2G2F3DD2 | G4F2F4
+B2 | F4D2G2F2E2 | E6D2z2
+B2 | c2e2e2c2A2F2 | B4d2d6
+c3cc2e2d2c2 | B8z2
+B2 | c2e2e2c2A2F2 | B4d2d6
+c3cc2e2d2c2 | B8z2
+
+X:13
+T: Graf und Nonne (Die Nonne)
+N: Q0155L
+O: Mitteleuropa, Deutschland / Polen, Schlesien, Ziegenhals
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage, Tod
+M: 4/4
+L: 1/8
+K: F
+c2 | c3cd2A2 | c4B2
+B2 | B3Bc2B2 | A4z2
+f2 | f3fg2f2 | e3dd2
+d2 | c2c2c2B2 | A2A2z2
+
+X:14
+T: Graf und Nonne (Die Nonne)
+N: Q0155M
+O: Mitteleuropa, Oesterreich, Niederoesterreich, Goggendorf
+N: Grundton taucht nicht auf ! Grundton in der eingestrichenen Oktave.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage, Tod
+M: 6/8
+L: 1/16
+K: Bb
+f2 | f3dd2d2c2d2 | e2e2z6
+g2 | g4e2e2f2g2 | f6z4
+f2 | f3dd2d3cd2 | e4g2g4
+g2 | f2g2f2e4e2 | d4z6
+
+X:15
+T: Graf und Nonne (Die Nonne)
+N: Q0155N
+O: Mitteleuropa, Deutschland (BRD) , Nordrhein - Westfalen, Muenster
+N: Anhaengsel an der dritten bzw. fuenften Zeile.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe;
+M: 3/4
+L: 1/8
+K: G
+D2 | G4D2 | D2G2B2 | B2A2
+D2 | D2F2A2 | e2d2c2 | B4
+GB | d4d2 | d2c2B2 | c2A2D2 | E2D2
+D2 | D2F2A2 | e2d2c2 | B4
+GB | d4d2 | d2c2B2 | c2A2D2 | E2D2
+D2 | D2F2A2 | e2d2c2 | B4
+
+X:16
+T: Graf und Nonne (Die Nonne)
+N: Q0155O
+O: Mitteleuropa, Deutschland (BRD) , Franken, Mittelfranken, Hersbruck,
+N: Grundton in der zweigestrichenen Oktave
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage;
+M: 4/4
+L: 1/8
+K: C
+G,2 | C3G,E,2G,2 | G,2E2E2
+E2 | D3CB,2D2 | D6
+G,2 | E3EE2E2 | E2G2F2
+E2 | D3DD2E2 | F2A2G2
+E2 | G4F4 | E6
+
+X:17
+T: Graf und Nonne (Die Nonne)
+N: Q0155P
+O: Mitteleuropa, Schweiz, Kanton Wallis, Visp, Randa
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 4/4
+L: 1/8
+K: D
+A2 | D2FAD2F2 | E2A2G2
+E2 | C2EGC2E2 | D2A2F2
+D2 | D2DDD2G2 | B4dc
+B2 | A2AAG2C2 | D2z4
+
+X:18
+T: Graf und Nonne (Die Nonne)
+N: Q0155Q
+O: Mitteleuropa, Deutschland (BRD) , Wuerttemberg, Lauingen
+N: Grundton in der zweigestrichenen Oktave.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 3/4
+L: 1/16
+K: C
+G,3G, | C4E4D2C2 | D4F4
+D3D | E4E4G2E2 | D8
+C2E2 | G4G2G2F2E2 | E2D2z2
+G,2 | G,2B,2D2A2G2F2 | E8
+
+X:19
+T: Graf und Nonne (Die Nonne)
+N: Q0155R
+O: Mitteleuropa, Deutschland (BRD) , Hessen, Giessen, Crumbach
+R: Ballade, Standesunterschied, Werbung, Liebe, Glueck
+M: 6/8
+L: 1/16
+K: G
+D2 | B4A2G4E2 | D4B2B4
+BB | A4A2c2B2A2 | B8z2
+B2 | d4B2e4d2 | c4B2A4
+G2 | F4A2d4c2 | B8z2
+B2 | c4e2d4c2 | B4A2G4
+G2 | F4A2d4c2 | B6-B4
+
+X:20
+T: Graf und Nonne (Die Nonne)
+N: Q0155S
+O: Osteuropa, UdSSR, Krim, Friedental
+N: Pause am Ende der ersten Zeile weggelassen.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 6/8
+L: 1/16
+K: C
+G,2 | C4E2F2E2C2 | D4B,2G,4
+G,2 | D4G2G2F2D2 | E8z2
+CD | E4A2G4E2F2D2
+B,C | D4D2F4D2E2C2
+G,2 | G4E2D4E2 | C6z4
+
+X:21
+T: Graf und Nonne (Die Nonne)
+N: Q0155T
+O: Mitteleuropa, Deutschland (BRD) , Hessen, Kassel, Vollmarshausen
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe
+M: 3/4
+L: 1/8
+K: C
+ED | C3DED | CGG2
+ED | C3DEE | D4
+CE | G2ECAG | GFD2
+Gc | G2E2DD | C4
+
+X:22
+T: Graf und Nonne (Die Nonne)
+N: Q0155U
+O: Mitteleuropa, Oesterreich, Burgenland, Pamhagen
+R: Ballade, Standesunterschied, Werbung, Liebe, Glueck
+M: 4/4
+L: 1/4
+K: G
+GB | ddcd | B2
+GB | ddcd | B2
+AA | BB^cA | dd
+AA | BB^cA | dd
+gd | dcBc | d2
+dc | BBAA | G2
+
+X:23
+T: Graf und Nonne (Die Nonne)
+N: Q0155V
+O: Mitteleuropa, Deutschland (BRD) , Nordrhein - Westfalen,
+N: Anhaengsel an der dritten Zeile. Grundton in der zweigestrichenen
+N: Oktave.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 3/4
+L: 1/4
+K: C
+G, | G,E,G, | EDC | CB,z | z2
+G, | G,B,D | FED | C3 | z2
+E | GGG | GFE | FG,G, | A,G,
+G, | G,B,D | FED | C3 | z2
+
+X:24
+T: Graf und Nonne (Die Nonne)
+N: Q0155W
+O: Osteuropa, Ungarn, Deutsch - Pilsen, Honter Gespannschaft
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 4/4
+L: 1/8
+K: G
+D2 | G2F2G2A2 | _B2B2A2
+A2 | d2d2c2_B2 | A4z2
+_Bc | _B2=F2B2c2 | d4c2
+_B2 | A2G2_B2A2 | G4z2
+_Bc | _B2=F2B2c2 | d4c2
+_B2 | A2G2_B2A2 | G4z2
+
+X:25
+T: Graf und Nonne (Die Nonne)
+N: Q0155X
+O: Mitteleuropa, Deutschland (BRD) , Hessen, Eder, Kleinern
+N: Schlusspause korrigiert.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe
+M: 3/4
+L: 1/16
+K: Eb
+E4 | G6G2G2G2 | F2B2B4
+G3F | E6F2G2B2 | F6
+E2E2F2 | B4G3Bc3B | B2A2F4
+c2c2 | B6G2A2F2 | E6
+E2E2F2 | B4G3Bc3B | B2A2F4
+c2c2 | B6G2A2F2 | E6z2
+
+X:26
+T: Graf und Nonne (Die Nonne)
+N: Q0155Y
+O: Mitteleuropa, Schweiz, Basel - Land
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 4/4
+L: 1/8
+K: F
+C2 | F2c2cAAc | A4A2
+C2 | F2F2Bddf | f4z2
+C2 | F2c2cAAc | A4A2
+c2 | A2F2G2E2 | F4z2
+c2 | A2F2G2E2 | F4z2
+
+X:27
+T: Graf und Nonne (Die Nonne)
+N: Q0155Z
+O: Mitteleuropa, Deutschland (BRD) , Hessen, Fulda, Neuhof
+N: Anhaengsel an der ersten, dritten und fuenften Zeile.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage, Tod
+M: 6/8
+L: 1/16
+K: G
+D2 | G4D2B,2D2B2 | B2A2D2E2D2
+D2 | D2F2A2e2d2c2 | B6z4
+GB | d4d2d2c2B2 | B2A2D2E2D2
+D2 | D2F2A2e2d2c2 | B6z4
+GB | d4d2d2c2B2 | B2A2D2E2D2
+D2 | D2F2A2e2d2c2 | B6z4
+
+X:28
+T: Graf und Nonne (Die Nonne)
+N: Q0155a
+O: Mitteleuropa, Deutschland (BRD) , Franken, Haselbach v.d. Rhoen
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 2/4
+L: 1/16
+K: Bb
+F2 | B3FD2F2 | B2d2d2
+f2 | c3BA2B2 | c4z2
+Bc | d3dd3d | d2f2e2
+dd | c3ee3e | e2g2f2
+fe | d2d2c2c2 | d4z2
+
+X:29
+T: Graf und Nonne (Die Nonne)
+N: Q0155b
+O: Mitteleuropa, Deutschland (BRD) , Franken, Haselbach v.d. Rhoen
+N: Gleiche Informantin wie in Q0155a.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 3/4
+L: 1/8
+K: F
+C2 | F3GAB | A2F2
+FG | A3GAB | c4
+c2 | d3cBd | c2A2
+FA | c3ABc | A2z2
+F2 | d3dfd | c2A2
+FA | c3dcB | A2z2
+
+X:30
+T: Graf und Nonne (Die Nonne)
+N: Q0155c
+O: Mitteleuropa, Deutschland / Frankreich, Lothringen, Forbach,
+N: Modulation in der letzten Zeile.
+R: Ballade, Standesunterschied, Werbung, Liebe, Glueck
+M: 4/4
+L: 1/8
+K: G
+D2 | B2B2G2B2 | B2A2G2z2
+c3BA2G2 | A2A2G2
+Bc | ddB2e2d2 | dcB2A2
+FG | AAA2B2BA | G2E2D2
+D2 | GGG2A2A2 | B4
+c4 | G2EFG2F2 | E4z2
+
+X:31
+T: Graf und Nonne (Die Nonne)
+N: Q0155d
+O: Suedosteuropa, Rumaenien, Sathmar, Arded, Scheindorf
+N: Schlusspause korrigiert.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 4/4
+L: 1/16
+K: E
+ | B4A4G4B4 | A4G4F8
+B4A4G4F4 | E4F2G2F4
+B,4 | G3FE3DG2F2E4 | E4c4B4
+A4 | G2B2G4F2GEF4 | E8z8
+
+X:32
+T: Graf und Nonne (Die Nonne)
+N: Q0155e
+O: Osteuropa, Ungarn, Batschka, Ujfutak
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage, Tod
+M: 6/8
+L: 1/16
+K: D
+D2 | =F4F2G2F2E2 | =F6D4
+FG | A4G2A4G2 | A6z4
+A2 | d2d2=c2_B2A2G2 | A6=F4
+F2 | E2E2E2A4A2 | D6z4
+
+X:33
+T: Graf und Nonne (Die Nonne)
+N: Q0155f
+O: Osteuropa, Polen, Galizien, Konstantynowka
+N: Anhaengsel in der dritten Zeile.
+R: Ballade, Standesunterschied, Werbung, Liebe, Glueck
+M: 4/4
+L: 1/8
+K: C
+C2 | G2A2G2F2 | E3ED3
+D | E2E2F2A2 | G4z2
+G2 | c2c2cBA2 | G2c2G2z2 | F4E2
+c2 | A2F2FED2 | C2z4
+
+X:34
+T: Graf und Nonne (Die Nonne)
+N: Q0155g
+O: Mitteleuropa, Oesterreich / Italien, Suedtirol, Meran, Marling
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage, Tod
+M: 6/8
+L: 1/8
+K: G
+D | G2GF2G | A3D2
+D | A2AG2A | B3z2
+d | d2cE2c | c2BD2
+B | B2AE2F | G3z2
+d | d2cE2c | c2BD2
+B | B2AE2F | G3z2
+
+X:35
+T: Graf und Nonne (Die Nonne)
+N: Q0155h
+O: Mitteleuropa, Oesterreich / Italien, Suedtirol, Sterzing, Pfitsch,
+R: Ballade, Standesunterschied, Werbung, Liebe
+M: 6/8
+L: 1/16
+K: G
+D2 | B4G2G2F2G2 | A2A2z6
+DD | A4A2A2G2A2 | B4z6
+B2 | d4c2A4c2 | c4B2G4
+B2 | A4F2B4A2 | G4z6
+B2 | d4c2A4c2 | c4B2G4
+B2 | A4F2B4A2 | G4z6
+
+X:36
+T: Graf und Nonne (Die Nonne)
+N: Q0155i
+O: Mitteleuropa, Oesterreich / Italien, Suedtirol, Brixen, Vals
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage, Tod
+M: 6/8
+L: 1/8
+K: G
+D | BBBBAB | cAz3
+F | ccccBc | d2z3
+g | f2ec2e | e2dB2
+d | d2cd2c | B2z3
+g | f2ec2e | e2dB2
+d | d2cd2c | B2z3
+
+X:37
+T: Graf und Nonne (Die Nonne)
+N: Q0155j
+O: Suedosteuropa, Rumaenien, Bukowina, Alt - Fratautz
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage, Tod
+M: 6/8
+L: 1/8
+K: F
+C | A2AG2G | F3G2
+G | A2Ad2d | c3z2
+c | cccfed | d3c2
+c | cdcBGc | A3z2
+
+X:38
+T: Graf und Nonne (Die Nonne)
+N: Q0155k
+O: Osteuropa, UdSSR, Bessarabien, Karolinengrund, Eigenheim
+R: Ballade, Standesunterschied, Werbung, Liebe
+M: 6/8
+L: 1/16
+K: Eb
+B,2 | E4G2B4E2 | E2D4z4
+B,2 | D4F2B4A2 | G6z4
+EF | G4G2A4B2 | c4e2d4
+c2 | B2B2B2B4A2 | G6z4
+
+X:39
+T: Graf und Nonne (Die Nonne)
+N: Q0155l
+O: Mitteleuropa, Deutschland (BRD) , Niedersachsen, Hildesheim, Mehle
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 4/4
+L: 1/8
+K: G
+D2 | G3DB,2D2 | G2B2B2
+d2 | A3GF2G2 | A4z2
+D2 | G3DB,2D2 | G2B2B2
+d2 | A3GF2G2 | A4z2
+GA | B3BB2B2 | B2d2d2
+cB | A3Bc2c2 | c2e2d2
+c2 | B3AB2c2 | d4
+e4 | d3Bc2d2 | B4z2
+
+X:40
+T: Graf und Nonne (Die Nonne)
+N: Q2155m
+O: Mitteleuropa, Niederlande, Zeeland, te Oost - Souburg
+N: Niederlaendische Fassung der Ballade. Verzierung: Glissando. Unteren
+N: Anfangston kodiert. Schluss rhythmisch korrigiert und Pause ergaenzt.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage, Tod
+M: 6/8
+L: 1/8
+K: G
+D | G2Bd2d | e2ed2
+d | e2ef2f | g3-g2
+d | ggge2e | d3Bz
+d | deddcB | A3
+eee | d2GB2c | d3
+eee | d2GB2A | G2z3
+
+X:41
+T: Graf und Nonne (Die Nonne)
+N: Q0155n
+O: Osteuropa, Tschechoslowakei, Boehmen, Egerland, Hostau, Muttersdorf
+N: Pause in der vierten und letzten Zeile ergaenzt.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage, Tod
+M: 6/8
+L: 1/8
+K: E
+B, | GFEEDE | FF2z2
+B, | AGFFEF | G3z2
+B, | GFEEDE | C2AAG
+F | EDEGFF | E3z2
+B, | GFEEDE | C2AAG
+F | EDEGFF | E3z2
+
+X:42
+T: Graf und Nonne (Die Nonne)
+N: Q0155o
+O: Osteuropa, Ungarn, Tata, Tatabanya
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage, Tod
+M: 6/8
+L: 1/16
+K: G
+D2 | G4G2G4B2 | A6A4
+DD | B2B2B2d2c2B2 | A6z4
+A2 | c2c2c2c2B2A2 | G4A2B4
+G2 | D2B2B2B4A2 | G6z4
+
+X:43
+T: Graf und Nonne (Die Nonne)
+N: Q2155p
+O: Osteuropa, Ungarn, Tata, Tatabanya
+N: Derselbe Informant wie in Q0155n. Ersten Taktstrich eingefuegt.
+N: Ungarische Fassung der Ballade.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage, Tod
+M: 6/8
+L: 1/8
+K: G
+G | GGG_BAG | d3z2
+d | g2g=f2_e | d3z2
+d | d2dd2A | c3_B2
+G | _B2BA2A | G3z2
+
+X:44
+T: Graf und Nonne (Die Nonne)
+N: Q0155q
+O: Osteuropa, Ungarn, Tata, Tarjan
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage, Tod
+M: 2/4
+L: 1/16
+K: F
+C2 | F2F2E2D2 | D2F2C2
+C2 | F2F2G2G2 | A4z2
+C2 | A3AA2c2 | c4B2
+A2 | G3FE2D2 | C2B2A2
+G2 | c2B2B2B2 | A4z2
+
+X:45
+T: Graf und Nonne (Die Nonne)
+N: Q0155r
+O: Osteuropa, Ungarn, Kalocsa, Hajos
+N: Anhaengsel an der zweiten Zeile.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 4/4
+L: 1/8
+K: F
+C2 | F3CA,2C2 | F2A2A2
+A2 | G3FE2F2 | G2CCC2
+FG | A3AA3A | A2c2BA
+GA | B3BB2B2 | B2d2c2
+cB | A2A2G2B2 | A4z2
+
+X:46
+T: Graf und Nonne (Die Nonne)
+N: Q0155s
+O: Osteuropa, Ungarn, Felsoeszentivan, Csavoly
+N: Eingeklammerte Noten (Strophenvariante) nicht gespielt.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 6/8
+L: 1/8
+K: E
+ | =G2FE2E | BB2z2
+B | A2Bee=c | B3z2
+B | eeB=d=cB | A3B2
+=D | =GGGAGF | E3z2
+B | eeB=d=cB | A3B2
+=D | =GGGAGF | E3z3
+
+X:47
+T: Graf und Nonne (Die Nonne)
+N: Q0155t
+O: Mitteleuropa, Deutschland (BRD) , Westfalen
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 3/4
+L: 1/8
+K: G
+D2 | G3GBG | D2D2
+GF | E3FGE | D4
+DD | A3cBA | G2G2
+G2 | B2A2FF | G4
+DD | A3cBA | G2G2
+G2 | B2A2FF | G4
+
+X:48
+T: Graf und Nonne (Die Nonne)
+N: Q1155u
+O: Mitteleuropa, Deutschland / Polen, Danzig
+N: Melodievergleich zu Q0155t, andere Ballade "Der Schlemmer" .
+R: Ballade, Fuhrmanns - Lied
+M: 3/4
+L: 1/16
+K: G
+D4 | G4G2A2B2G2 | D4D4
+G3G | E6F2G2E2 | D6z2
+D4 | c4c4d2c2 | B4B4
+G3B | B4A4F4 | G8
+D4 | c4c4d2c2 | B4B4
+G3B | B4A4F4 | G8
+
+X:49
+T: Graf und Nonne (Die Nonne)
+N: Q2155v
+O: Mitteleuropa, Niederlande
+N: Zusammenhang zur Balladengruppe unsicher. Geistliche Kontrafaktur.
+N: Taktart in FREI geaendert.
+R: Ballade, Standesunterschied, Werbung, Liebe; geistlich
+M: none
+L: 1/8
+K: G
+G2 | d2d2e2f2 | g2d
+e | =f3ae3d | d4z2
+d2 | =f3_BB2d2 | c4c4z2
+F2 | GA_BcA3G | G4z2
+d2 | =f3_BB2d2 | c4c4z2
+F2 | GA_BcA3G | G4
+
+X:50
+T: Graf und Nonne (Die Nonne)
+N: Q0155w
+O: Mitteleuropa, Deutschland
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 2/4
+L: 1/16
+K: G
+_Bc | d3c_B2A2 | G2_Bcd2
+d2 | _e2e2ccc2 | d4z2
+d2 | d3_e=f2d2 | c2_Bcd2
+c2 | _B3cd2B2 | A2GA_B2
+d2 | g2_B2cdBA | G4
+d4 | g2_B2cdBA | G4z2
+
+X:51
+T: Graf und Nonne (Die Nonne)
+N: Q0155x
+O: Suedosteuropa, Rumaenien, Siebenbuergen
+N: Vorletzten Takt der fuenften und sechsten Zeile gemaess der Taktart
+N: rhythmisch korrigiert.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 4/4
+L: 1/8
+K: G
+D2 | G3A_BAG2 | d3cdc
+_B2 | c2d2_edc_B | A4z2
+d_e | =f_ed2dc_B2 | c3_Bc4
+B2d2BAG2 | A3GA2
+d2 | dc_BAG2F2 | G4z2
+d2 | dc_BAG2F2 | G4z2
+
+X:52
+T: Graf und Nonne (Die Nonne)
+N: Q2155y
+O: Mitteleuropa, Niederlande
+N: Niederlaendische Fassung der Ballade.
+N: Schlusston rhythmisch korrigiert.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 6/8
+L: 1/16
+K: G
+D2 | G2G2A2_B4A2 | G6D4
+GG | _B2B2B2c2B2c2 | d6-d4
+d2 | d2d2d2_e4d2 | d4c2A4
+c2 | c4_e2d4d2 | d2c2_B2A4
+A2 | c2d2_e2G4A2 | G6-G4
+
+X:53
+T: Graf und Nonne (Die Nonne)
+N: Q2155z
+O: Nordeuropa, Norwegen
+N: Norwegische Fassung der Ballade.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 4/4
+L: 1/8
+K: G
+G_B | d2d2c2cd | _B2BAG2
+GB | d2ddc_Bc2 | d4z2
+_e2 | =f2fd_e2ed | dcc2c3
+d | _B2A2G3
+G | A3GF2F2 | G4z2
+
+X:54
+T: Graf und Nonne (Die Nonne)
+N: Q21550
+O: Nordeuropa, Schweden
+N: Schwedische Fassung der Ballade.
+N: Schlusspause und Pause in der zweiten Zeile rhythmisch korrigiert.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 2/4
+L: 1/16
+K: G
+G4 | G2d2dc_BA | G4F3
+G | _B2B2c2c2 | d4
+G4 | G2d2dc_BA | G4F3
+G | _B2B2c2c2 | d4z2
+d2 | d3=ff3d | d3_BB3
+d | d2c2c3_B | A4z2
+A2 | _B3Bc2c2 | d3dG3
+A | _B2B2A2A2 | G4
+
+X:55
+T: Graf und Nonne (Die Nonne)
+N: Q21551
+O: Osteuropa, Ungarn, Komitat Komarom, Oroszlany
+N: Ungarische Fassung der Ballade.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 6/8
+L: 1/8
+K: G
+ | _BAGBAG | d3z2
+d | g2=f_B2c | d2z4
+_eeed2A | c3_B2
+G | _B2dA2B | G3z3
+
+X:56
+T: Graf und Nonne (Die Nonne)
+N: Q01552
+O: Suedosteuropa, Rumaenien, Siebenbuergen
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 4/4
+L: 1/8
+K: G
+D2 | G2A2_B2c2 | _B2A2G2
+G2 | d2ddd2g2 | d4z2
+d2 | g2d2_e2c2 | d4c2
+_B2 | A2c2_B2A2 | G2_B2d2
+d2 | g2d2_e2c2 | d4c2
+_B2 | A2c2_B2A2 | G4z2
+
+X:57
+T: Graf und Nonne (Die Nonne)
+N: Q01553
+O: Osteuropa, UdSSR, Bessarabien
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 6/8
+L: 1/8
+K: G
+D | G2GAGA | _B3G2
+G | _B2Bc2c | d4z
+d | g2d_BAG | d3G2
+G | _B2cB2A | G4z
+
+X:58
+T: Graf und Nonne (Die Nonne)
+N: Q01554
+O: Osteuropa, Polen
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 6/8
+L: 1/8
+K: G
+D | G2GAGA | _B3G2
+G | _B2BcBc | d4z
+d | g2d_BAG | d3A2
+A | G2_BA2D | G4z
+
+X:59
+T: Graf und Nonne (Die Nonne)
+N: Q01555
+O: Osteuropa, Ungarn
+N: Taktart in Taktwechsel geaendert.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 6/8
+L: 1/16
+K: G
+=F2 | _B4B2A4A2 | G6=F4
+F2 | d4d2d3dd2c2d2_e2 | d6z4
+d2 | g4d2_e2d2c2 | d4_e2d4
+c2 | _B2B2B2A4d2 | G6z4
+
+X:60
+T: Graf und Nonne (Die Nonne)
+N: Q01556
+O: Osteuropa, Tschechoslowakei, Sudetenland, Zips
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 6/8
+L: 1/8
+K: G
+D | _B2BA2A | G3=F2
+F | _B2Bc2c | d3z2
+d | g2d_e2c | d3G2
+A | _BBBA2A | G3z2
+A | _BBBA2A | G3z2
+
+X:61
+T: Graf und Nonne (Die Nonne)
+N: Q01557
+O: Osteuropa, Ungarn
+N: Schlusspause gestrichen.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebes - Lied
+M: 2/4
+L: 1/16
+K: G
+D2D2 | GGG2F2E2 | E2D2D2
+D2 | G2G2A2c2 | B8
+D2D2 | GGG2F2E2 | E2D2D2
+D2 | G2G2A2c2 | B8z2
+B2 | B3BB2B2 | B2d2c2
+B2 | A3GF2E2 | D2c2B2
+A2 | G2G2A2F2 | G4z2
+B2 | B3BB2B2 | B2d2c2
+B2 | A3GF2E2 | D2c2B2
+A2 | G2G2A2F2 | G4
+
+X:62
+T: Graf und Nonne (Die Nonne)
+N: Q01558
+O: Suedosteuropa, Rumaenien
+N: Fermatenton zu Beginn der dritten und sechsten Zeile entsprechend
+N: der Taktart zur Halben verlaengert.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebes - Lied
+M: 2/4
+L: 1/8
+K: G
+D | GGFE | E2D
+D | GGAc | B2z2
+D4 | BABd | d2c
+B | ADDc | c2B
+A | GDBA | G2z2
+D4 | BABd | d2c
+B | ADDc | c2B
+A | GDBA | G2z
+
+X:63
+T: Graf und Nonne (Die Nonne)
+N: Q01559
+O: Suedosteuropa, Jugoslawien, Batschka
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebes - Lied
+M: 2/4
+L: 1/16
+K: G
+D2 | G2G2F2E2 | E2D2D2
+D2 | G2G2A2D2 | B4z2
+d2 | B3BB2B2 | B2d2d2
+B2 | c2B2A2G2 | F2E2D2
+DD | B2B2A2A2 | G4z2
+d2 | B3BB2B2 | B2d2d2
+B2 | c2B2A2G2 | F2E2D2
+DD | B2B2A2A2 | G4z2
+
+X:64
+T: Graf und Nonne (Die Nonne)
+N: Q0155A
+O: Osteuropa, Ungarn, Banat, Almaskamaras
+N: Sehr viele Verzierungen (Vorschlaege) . Schlusston rhythmisch
+N: korrigiert.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebes - Lied
+M: 2/4
+L: 1/16
+K: G
+D2 | G2G2F2E2 | E2D2D2
+F2 | G2G2A2D2 | B4z2
+G2 | G3BB2d2 | d4c2
+B2 | A2G2F2e2 | e4d2
+c2 | B2B2d2c2 | B4z2
+G2 | G3BB2d2 | d4c2
+B2 | A2G2F2e2 | e4d2
+c2 | B2B2d2c2 | B4z2
+
+X:65
+T: Graf und Nonne (Die Nonne)
+N: Q0155B
+O: Osteuropa, UdSSR, Russland, Bessarabien
+N: Verzierungen (Vorschlaege) in der dritten und sechsten Zeile.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebes - Lied
+M: 4/4
+L: 1/8
+K: G
+D2 | G3FA2EF | G2G2D2
+D2 | B2B2ABc2 | B2z4
+GA | B3dd2e2 | d2edc2
+B2 | A3AA2B2 | cde2d2
+dc | B2B2ABc2 | B4z2
+GA | B3dd2e2 | d2edc2
+B2 | A3AA2B2 | cde2d2
+dc | B2B2ABc2 | B4z2
+
+X:66
+T: Graf und Nonne (Die Nonne)
+N: Q0155C
+O: Suedosteuropa, Jugoslawien, Gottschee
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebes - Lied
+M: 6/8
+L: 1/8
+K: G
+D | B2AG2D | D2GG2
+G | A2AA2A | B2z3
+D | B2BB2B | B2dc2
+B | A2GF2E | D2GG2
+D | G2ABB2AB | G2z3
+
+X:67
+T: Graf und Nonne (Die Nonne)
+N: Q0155D
+O: Osteuropa, Tschechoslowakei, Kremnitz, Kuneschau
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebes - Lied
+M: 2/4
+L: 1/16
+K: G
+D2 | B2B2A2A2 | G2D2D2
+D2 | B2B2A2A2 | B4z2
+GA | B2B2B2B2 | d4c2
+B2 | B2A2A2A2 | e4d2
+c2 | B2B2A2A2 | G4z2
+
+X:68
+T: Graf und Nonne (Die Nonne)
+N: Q0155E
+O: Osteuropa, Ungarn, Batschka
+N: Anhaengsel an der zweiten Zeile. Taktart in Taktwechsel geaendert.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 4/4
+L: 1/8
+K: G
+D2 | G3DB,2D2 | G2B2B2z
+B | A3GF2G2 | A2DDD2z2
+GA | B3BB3B | B2d2c2
+AB | c3cc3c | c2e2d2
+dc | B2B2A2Ac | B2z4
+
+X:69
+T: Graf und Nonne (Die Nonne)
+N: Q1155F
+O: Mitteleuropa, Deutschland (DDR) , Brandenburg, Uckermark, Gramzow
+N: Melodievergleich zu Q0155I., anderes Lied.
+R: Trink - Lied
+M: 4/4
+L: 1/8
+K: G
+D2 | G3DB,2D2 | G3FG2
+B2 | A3FAGE2 | D4z2
+GB | A2G2A2d2 | c2AcB2
+A2 | G4F4 | G4z2
+
+X:70
+T: Graf und Nonne (Die Nonne)
+N: Q1155G
+O: Mitteleuropa, Deutschland (BRD) , Nordrhein - Westfalen, Meurs
+N: Melodievergleich zu Q0155I., anderes Lied. Vierte Zeile = Refrain
+N: auf sinnfreie Silben.
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: G
+D2 | G2D2B,2D2 | B3AG2
+B2 | A3GF2GB | A4z2
+FG | A2A2A2c2 | B3AG4
+A4A2c2 | BABAG2
+G2 | E2G2FFA2 | G4z2
+
+X:71
+T: Graf und Nonne (Die Nonne)
+N: Q1155H
+O: Mitteleuropa, Deutschland (BRD) , Nordrhein - Westfalen, Elberfeld
+N: Melodievergleich zu Q0155I., anderes Lied. Refrain in der vierten
+N: Zeile (z.T. sinnfreie Silben) . Vorletzten Takt rhythmisch
+N: korrigiert.
+R: Liebes - Lied
+M: 2/4
+L: 1/16
+K: G
+D2 | G3DB,2D2 | G4G2
+B2 | A3GF2G2 | A4z2
+GA | B2B2B2B2 | B2c2d2
+B2 | d2A2A2A2 | A2B2c2
+d2 | B2B2AGAB | G4z2
+
+X:72
+T: Graf und Nonne (Die Nonne)
+N: Q0155I
+O: Mitteleuropa, Deutschland (BRD) , Franken
+N: Letzten Takt der dritten Zeile rhythmisch korrigiert. Schlusspause
+N: ergaenzt.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 4/4
+L: 1/8
+K: G
+D2 | G2D2B,2D2 | G2B2B2
+d2 | c3BA2Ac | B4z2
+dc | B2B2B2dB | c2d2c2
+cB | A2A2A2cA | B2c2B2
+dc | B2B2A2Ac | B4z2
+
+X:73
+T: Graf und Nonne (Die Nonne)
+N: Q1155J
+O: Mitteleuropa, Deutschland / Polen, Schlesien, Conradsdorf
+N: Melodievergleich zu Q0155M. ff., anderes Lied (genetisch verwandt ?).
+N: Pause am Ende der vierten Zeile ergaenzt.
+R: Klage - Lied ???
+M: 6/8
+L: 1/16
+K: G
+D2 | G4D2B,2D2G2 | G2F2z6
+DF | A4c2c3BA2 | B6z4
+D2 | G4G2B2A2G2 | F2E2z6
+E2 | D4D2D2F2A2 | G6z4
+D2 | G4G2B2A2G2 | F2E2z6
+E2 | D4D2D2C2A,2 | G,4z6
+
+X:74
+T: Graf und Nonne (Die Nonne)
+N: Q1155K
+O: Mitteleuropa, Deutschland (DDR) , Brandenburg, Berlin
+N: Melodievergleich zu Q0155M., anderes Lied (genetisch verwandt ?).
+N: Anhaengsel an der vierten Zeile.
+R: Ehestands - Klage ???
+M: 6/8
+L: 1/8
+K: G
+D | G2DB,DG | GFz3
+D | DFAd2c | B3z2
+B | BAGGFE | EEz3
+E | DDDDEF | G2BBA
+G | FEFDEF | G3z2
+
+X:75
+T: Graf und Nonne (Die Nonne)
+N: Q1155L
+O: Mitteleuropa, Deutschland (BRD) , Niedersachsen, Dransfeld
+N: Melodievergleich zu Q0155M., anderes Lied (genetisch verwandt ?).
+N: Refrain auf sinnfreie Silben in der fuenften und siebten Zeile.
+N: Schlusspause ergaenzt.
+R: Klage - Lied ???
+M: 3/4
+L: 1/8
+K: G
+D2 | G2G2D2 | B,2D2G2 | B2A4 | z4
+D2 | D2F2A2 | c3AF2 | G6 | z4
+B2 | B3BB2 | B3AG2 | G2E4 | z4
+c2 | B3AG2 | A3GF2 | G6
+G,2B,2D2 | G6 | D2F2A2 | c4
+d2 | B3AG2 | A3GF2 | G6
+G,2B,2D2 | G6 | D2F2A2 | c4
+d2 | B3AG2 | A3GF2 | G6 | z4
+
+X:76
+T: Graf und Nonne (Die Nonne)
+N: Q0155M
+O: Mitteleuropa, Deutschland (BRD) , Franken, Oberfranken,
+N: Anhaengsel an der dritten Zeile.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 3/4
+L: 1/8
+K: G
+D2 | G4D2 | B,2D2G2 | G2F2z2 | z4
+D2 | D2F2A2 | e2d2c2 | B4
+GB | d4d2 | d2c2B2 | c2A2D2 | E2D2
+D2 | D2F2A2 | e2d2c2 | B4
+
+X:77
+T: Graf und Nonne (Die Nonne)
+N: Q0155N
+O: Mitteleuropa, Deutschland (BRD) , Nordrhein - Westfalen, Muenster
+N: Anhaengsel an der dritten Zeile.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 6/8
+L: 1/16
+K: G
+D2 | G4D2B,2D2B2 | B2A2z6
+D2 | D2F2A2e2d2c2 | B6z4
+GB | d4d2d2c2B2 | c2A2D2E2D2
+D2 | D2F2A2e2d2c2 | B4z6
+
+X:78
+T: Graf und Nonne (Die Nonne)
+N: Q0155O
+O: Mitteleuropa, Deutschland (BRD) , Wuerttemberg, Sindelfingen
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 6/8
+L: 1/16
+K: G
+D2 | B,2D2G2B,2D2B2 | B2A2z6
+DD | D2F2A2e2d2c2 | B6z4
+GB | d4d2d2c2B2 | B2A2z6
+D2 | D2F2A2e2d2c2 | B6z4
+GB | d4d2d2c2B2 | B2A2z6
+D2 | D2F2A2e2d2c2 | B6z4
+
+X:79
+T: Graf und Nonne (Die Nonne)
+N: Q1155P
+O: Mitteleuropa, Deutschland
+N: Melodievergleich zu Q0155Q., anderes Lied (genetisch verwandt ?).
+N: Schlusspause ergaenzt.
+R: Liebes - Lied
+M: 4/4
+L: 1/16
+K: G
+G2A2 | B4B4d4dcBA | B8A4
+A4 | B4B4^c4cdef | d8z4
+d4 | e6f2g4d4 | e2f2e3dd4
+B4 | c4B4A6G2 | G8z4
+
+X:80
+T: Graf und Nonne (Die Nonne)
+N: Q0155Q
+O: Mitteleuropa, Deutschland (BRD) , Nordrhein - Westfalen, Bonn
+N: Anhaengsel an der dritten Zeile.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 2/4
+L: 1/16
+K: G
+G2 | B2B2B2BA | G4D2
+D2 | G2G2BAGA | B4z2
+d2 | g2fed2BG | e4d2z2 | c4B2
+d2 | e2dcB2A2 | G4z2
+
+X:81
+T: Graf und Nonne (Die Nonne)
+N: Q0155R
+O: Mitteleuropa, Deutschland / UdSSR, Kurisches Haff, Karkeln
+N: Anhaengsel an der fuenften und siebten Zeile. Verzierung (Vorschlag)
+N: Taktstrich in der ersten und dritten Zeile eingefuegt.
+N: Schlusspause ergaenzt.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 2/4
+L: 1/8
+K: G
+Bc | d3e | dcBA | B4 | A4
+B2BB | ^c2c2 | d2
+Bc | d3e | dcBA | B4 | A4
+B2BB | ^c2c2 | d2
+d2 | g2g2 | f2f2 | e4 | d3d | c4 | B2
+d2 | e2dc | B2A2 | G4 | z2
+d2 | g2g2 | f2f2 | e4 | d3d | c4 | B2
+d2 | e2dc | B2A2 | G4 | z2
+
+X:82
+T: Graf und Nonne (Die Nonne)
+N: Q0155S
+O: Mitteleuropa, Deutschland / Polen, Schlesien
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 4/4
+L: 1/8
+K: G
+GB | d2e2d2c2 | B4A2
+A2 | B2B2^c2c2 | d4z2
+d2 | g2g2f2f2 | e4d2
+d2 | e2dcB2A2 | G4z2
+
+X:83
+T: Graf und Nonne (Die Nonne)
+N: Q0155T
+O: Mitteleuropa, Deutschland (DDR) , Sachsen, Eisleben
+N: Anhaengsel an der dritten Zeile.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 2/4
+L: 1/16
+K: G
+GB | d3ed2c2 | B4A2
+A2 | B2B2^c2ce | d4z2
+d2 | g2g2f2f2 | e4d2z2 | c4B2
+d2 | e2c2d2F2 | G4z2
+
+X:84
+T: Graf und Nonne (Die Nonne)
+N: Q0155U
+O: Mitteleuropa, Schweiz
+N: Anhaengsel an der dritten Zeile. Verzierungen (Vorschlaege)
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 2/4
+L: 1/16
+K: G
+GB | d2dgdBcA | B4A2
+A2 | B2Bdc2ce | d4z2
+def | g2g2gfed | e4d4 | c4B2
+d2 | e2dcB2A2 | G4z2
+
+X:85
+T: Graf und Nonne (Die Nonne)
+N: Q0155V
+O: Mitteleuropa, Deutschland (DDR) , Brandenburg, Uckermark
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 2/4
+L: 1/16
+K: G
+G2 | d3gdcBA | G4A2
+A2 | B2B2c2e2 | d4z2
+d2 | g2g2fed2 | e4d4 | c4B2
+g2 | e2dcB2A2 | G4z2
+
+X:86
+T: Graf und Nonne (Die Nonne)
+N: Q0155W
+O: Mitteleuropa, Deutschland (DDR) , Sachsen, Eisleben
+N: Anhaengsel an der fuenften und siebten Zeile.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 2/4
+L: 1/16
+K: G
+GB | d3gdBcA | B4A2
+A2 | B2g2f2e2 | d4z2
+GB | d3gdBcA | B4A2
+A2 | B2g2f2e2 | d4z2
+d2 | g2g2fef2 | e4d2z2 | c4B2
+d2 | e2dcB2A2 | G4z2
+d2 | g2g2fef2 | e4d2z2 | c4B2
+d2 | e2dcB2A2 | G4z2
+
+X:87
+T: Graf und Nonne (Die Nonne)
+N: Q0155X
+O: Mitteleuropa, Deutschland / Polen, Schlesien, Kr. Liegnitz,
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 4/4
+L: 1/16
+K: G
+G4 | d6g2d2e2d2c2 | B8A2G2
+A4 | B3BB4c4e4 | d8z4
+d4 | g4g4f4a2f2 | e8d4B4 | c8B4
+d4 | g4d2c2B4A4 | G8z4
+
+X:88
+T: Graf und Nonne (Die Nonne)
+N: Q0155Y
+O: Mitteleuropa, Deutschland (BRD) , Nordrhein - Westfalen, Siegkreis,
+N: Stark "zersungene" Fassung.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 6/8
+L: 1/16
+K: G
+d2 | d3dd2d4d2 | B6B4
+B2 | c3cc2c2d2e2 | d6z4
+d2 | d2e2f2g2f2e2 | e3dcdB4
+d2 | d2e2d2c2A2d2 | B6z4
+
+X:89
+T: Graf und Nonne (Die Nonne)
+N: Q0155Z
+O: Mitteleuropa, Deutschland (BRD) , Nordrhein - Westfalen, Siegkreis
+N: Stark "zersungene" Fassung.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 3/4
+L: 1/8
+K: G
+d2 | d4d2 | d4d2 | B6 | B4z
+B | c2c2c2 | c2d2e2 | d6- | d4z
+d | d2g2g2 | g2f2e2 | e6 | d6 | c4d2 | B4
+d2 | d2e2d2 | c2A2d2 | B4
+
+X:90
+T: Graf und Nonne (Die Nonne)
+N: Q0155a
+O: Mitteleuropa, Deutschland (BRD) , Niedersachsen, Osnabrueck, Hagen
+N: Kontaminierte Fassung mit "Im schoensten Wiesengrunde" . Anhaengsel
+N: an der dritten Zeile.
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 4/4
+L: 1/8
+K: G
+GB | d3gdBcA | B3AB2
+dd | e2d2c2B2 | A4z2
+GB | d2d2d2d2 | e4d4 | c4B2
+d2 | e2dcB2A2 | G4z2
+
+X:91
+T: Graf und Nonne (Die Nonne)
+N: Q1155b
+O: Mitteleuropa, Deutschland
+N: Melodievergleich zu Q0155c., anderes Lied "Der Tod von Basel" .
+N: Schlusspause ergaenzt.
+R: ???
+M: 2/4
+L: 1/8
+K: G
+D | GBBA | AGG
+G | BddB | A2z
+G | Bddd | d2B2
+g2e2 | d2B
+d | cAGF | G2z
+
+X:92
+T: Graf und Nonne (Die Nonne)
+N: Q0155c
+O: Mitteleuropa, Deutschland
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 2/4
+L: 1/8
+K: G
+G | BGdB | B2A
+G | BGdB | A2z
+G | dddd | dBG2
+c2e2 | dBG
+d | dcAF | G2z
+
+X:93
+T: Graf und Nonne (Die Nonne)
+N: Q0155d
+O: Mitteleuropa, Deutschland (BRD) , Franken
+R: Ballade, Standesunterschied, vergebliche Werbung, Liebe, Klage
+M: 2/4
+L: 1/16
+K: G
+D2 | G2G2d2B2 | B3AA2
+cB | B2cAG2F2 | G4z2
+D2 | G2G2d2B2 | B3AA2
+cB | B2cAG2F2 | G4z2
+G2 | G2B2d2d2 | d3gg4
+c4c2e2 | d4e2
+dc | B2B2c2A2 | A4G2

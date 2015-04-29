@@ -1,0 +1,18 @@
+! kellner_org.scl
+!
+Kellner's original Bach tuning. C-E & C-G beat at identical rates, so B-F# slightly wider than C-G-D-A-E, 7 pure fifths
+!
+ 12
+!
+ 256/243           Cs
+ 194.5718	    D
+ 32/27             Ds
+ 389.1437	    E
+ 4/3               F 
+ 1024/729          Fs
+ 697.2859          G
+ 128/81            Gs 
+ 891.8577          A
+ 16/9              As
+ 1091.0987         H
+ 2/1               c

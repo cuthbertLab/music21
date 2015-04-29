@@ -1,0 +1,58 @@
+Composer: Claudio Monteverdi
+Madrigal: 3.17
+Title: Io Pur Verra la Dove Sete
+Analyst: Steve Taylor
+Time Signature: 4/4
+Key Signature: 
+
+Note: The first bar has only A in the bass; analysis begins with m2.
+m2 b2 a: i[no3]
+m3 III
+m4 III[no3] b4 III6
+m5 b4 v
+m7 iv C: ii
+Note: m7 has a pivot chord modulation from a to C, after a long e minor chord. It seems that if a chord lasts for long enough, one can forget what came before, and it's easy to re-contextualize it in a new key. This seems to be pretty common in Monteverdi; this madrigal in particular has long passages with a single chord.
+m9 I
+m14 iii b4 I6
+m15 ii b3 viio6
+m16 I ||
+m18 b3 ii
+m19 I6 b3 viio6/4
+Note: b3-4 have the three inner voices moving in descending passing tones in "first inversion" (if you don't count the bass underneath).
+m20 V b3 I6/4
+m21 V
+m22 I || 
+m24 b2 V/ii
+m25 b2 ii b3 I
+m27 b3 IV d: III
+Note: another pivot chord modulation after a long chord.
+m28 III b2 ii b3 V b4 iv6
+m29 i6/4 b3 V ||
+Note: m29 sounds like a half cadence.
+m30 b2 I
+m32 b2 IV b3 III F: I
+Note: m32 sounds somewhat like a Landini cadence.
+m33 b4 IV
+m36 viio6[no5] b2 I b3 V
+m37 I d: III
+Note: another pivot chord modulation after a long chord.
+m39 b1.5 VII b2 i b3 V ||
+Note: this sounds like a plagal cadence (iv I) in A, at least as much as a half cadence in d; but since we're soon heading to d, I've analyzed this passage in d.
+m41 b2 ii/o b3 V
+m42 b1.5 V2 b2 i6 b3 viio6
+m42var1 b1.5 V4/2 b2 i6 b3 V4/3[no1] b4 viio6
+Note: m42 b3 has only the notes E and G, but in context it sounds like a V4/3, even though it is [no1] [no3].
+m43 i ||
+m45 b1.5 III4/3 b2 iv6 b3 V b4 i6/4
+m46 V b3 i ||
+m47 b4 III6
+m48 b2 vio b3 V6
+m49 b2 i b3 V6
+m50 b2 i b3 V6 b4 viio
+m51 I || b2 i
+m52 b4 VII
+m53 III b4 ii
+m54 v b3 III6
+m55 v
+m57 V b2 i6/4 b3 V
+m58 I 

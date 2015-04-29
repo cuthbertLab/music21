@@ -1,0 +1,21 @@
+! comptine_h3.scl
+!
+1/4 pyth. comma meantone sequence between G and B, completed by 8 pure fifths
+ 12
+!
+ 2225/2112
+ 592/528
+ 20025/16896
+ 1323/1056
+ 4/3
+ 29667/21120
+ 3/2
+ 6675/4224
+ 885/528
+ 60075/33792
+ 9889/5280
+ 2/1
+! Quasi well-temperament (except for G : B  a schisma below 5/4)
+! C : G pure facilitates the tuning of open-tuning instruments.
+! Comptine recurrent sequence  x^3 = (3/5)x^2 + 2,   x = 1.494929263,  Dudon 2006  
+! Equal-beating properties :   6E - 5G  =  3A - 4E,    6B - 10D  =  8F# - 10D  =  6E - 4B

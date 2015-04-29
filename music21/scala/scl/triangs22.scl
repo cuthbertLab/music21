@@ -1,0 +1,24 @@
+! triangs22.scl
+!
+The first 22 terms of the triangular number series, octave reduced
+ 19
+!
+ 33/32
+ 17/16
+ 9/8
+ 153/128
+ 39/32
+ 5/4
+ 21/16
+ 171/128
+ 45/32
+ 91/64
+ 95/64
+ 3/2
+ 105/64
+ 55/32
+ 7/4
+ 231/128
+ 15/8
+ 253/128
+ 2/1

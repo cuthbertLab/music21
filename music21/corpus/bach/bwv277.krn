@@ -1,0 +1,134 @@
+!!!COM: Bach, Johann Sebastian
+!!!OPR: Four-part Chorales
+!!!OTL: 25. Christ lag in Todesbanden
+!!!ONM: 
+!!!OMV: 1
+!!!CDT: 1685/3//-1750/7/28/
+!!!OCY: Deutschland
+**kern	**silbe	**kern	**silbe	**kern	**silbe	**kern	**silbe	**silbe
+*clefF4	*	*clefGv2	*	*clefG2	*	*clefG2	*	*
+*I:[BASSO]	*I:[BASSO]	*I:[TENORE]	*I:[TENORE]	*I:[ALTO]	*I:[ALTO]	*I:[SOPRANO]	*I:[SOPRANO]	*I:[SOPRANO]
+*k[]	*	*k[]	*	*k[]	*	*k[]	*	*
+*a:	*	*a:	*	*a:	*	*a:	*	*
+*M4/4	*	*M4/4	*	*M4/4	*	*M4/4	*	*
+*>[A,A,B]	*>[A,A,B]	*>[A,A,B]	*>[A,A,B]	*>[A,A,B]	*>[A,A,B]	*>[A,A,B]	*>[A,A,B]	*>[A,A,B]
+*>A	*>A	*>A	*>A	*>A	*>A	*>A	*>A	*>A
+!! Initial conversion from stage 1 to stage 2
+4D\	.	8d\L	.	4f/	.	4a/	Christ	der
+.	.	8c\J	.	.	.	.	.	.
+=1	=1	=1	=1	=1	=1	=1	=1	=1
+4D\	.	4B\	.	(8f/	.	4g#/	lag	ist
+.	.	.	.	4e/)	.	.	.	.
+8C/L	.	8c\L	.	.	.	8a/L	in	wie-
+8BB/J	.	8d\J	.	8g#/	.	8b/J	|	|
+(8AA/	.	4e\	.	4a/	.	4cc\	To-	-der
+4A\)	.	.	.	.	.	.	.	.
+.	.	8f\L	.	4b\	.	4dd\	-des-	er-
+8G#\	.	8e\J	.	.	.	.	.	.
+=2	=2	=2	=2	=2	=2	=2	=2	=2
+8A\L	.	8e\	.	8b\	.	4cc\	-ban-	-stan-
+8F\	.	4f\	.	4a/	.	.	.	.
+8D\	.	.	.	.	.	4b\	|	|
+8E\J	.	16e\LL	.	8g#/	.	.	.	.
+.	.	16d\JJ	.	.	.	.	.	.
+4AA;/	.	4c#;\	.	4e;/	.	4a;/	-den	-den
+4C#/	.	4A/	.	4e/	.	4a/	f\u3r	und
+=3	=3	=3	=3	=3	=3	=3	=3	=3
+8D\L	.	4A/	.	8e/L	.	4f/	un-	hat
+8F\J	.	.	.	8d/J	.	.	.	.
+8E\L	.	4B-\	.	8c#/L	.	4g/	-ser	uns
+8D\J	.	.	.	8d/J	.	.	.	.
+8C#/L	.	4A/	.	4.e/	.	4a/	S\u3nd'	bracht
+8AA/J	.	.	.	.	.	.	.	.
+4D\	.	4A/	.	.	.	8g/L	ge-	das
+.	.	.	.	8d/	.	8f/J	|	|
+=4	=4	=4	=4	=4	=4	=4	=4	=4
+4A\	.	8A/L	.	8c#/	.	8e/L	-ge-	Le-
+.	.	8F/	.	4d/	.	8d/J	|	|
+4AA/	.	8G/	.	.	.	4e/	|	|
+.	.	8E/J	.	8c#/	.	.	.	.
+4D;\	.	4F;/	.	4A;/	.	4d;/	-ben,	-ben.
+=:|!	=:|!	=:|!	=:|!	=:|!	=:|!	=:|!	=:|!	=:|!
+*>B	*>B	*>B	*>B	*>B	*>B	*>B	*>B	*>B
+4r	.	4r	.	4r	.	4r	.	.
+=5	=5	=5	=5	=5	=5	=5	=5	=5
+4.D\	.	8F/L	.	4A/	.	8d/L	Dess	.
+.	.	8G/J	.	.	.	8e/J	|	.
+.	.	4A/	.	4d/	.	4f/	wir	.
+8C/	.	.	.	.	.	.	.	.
+8BB-/L	.	8G/L	.	8d/L	.	4g/	sol-	.
+8AA/J	.	8A/J	.	8c/J	.	.	.	.
+4GG/	.	4B-\	.	8B-/L	.	8d/L	-len	.
+.	.	.	.	8c/J	.	8e/J	|	.
+=6	=6	=6	=6	=6	=6	=6	=6	=6
+8D/L	.	8A\L	.	8d/L	.	4f/	fr\o3h-	.
+8C/J	.	8f\J	.	8A/J	.	.	.	.
+8BB-/L	.	8f\L	.	8d/L	.	4g/	-lich	.
+8C/J	.	8e\J	.	8c/J	.	.	.	.
+4FF;/	.	4f;\	.	4c;/	.	4a;/	sein,	.
+8F\L	.	4c\	.	8f/L	.	4a/	Gott	.
+8E\J	.	.	.	8g/J	.	.	.	.
+=7	=7	=7	=7	=7	=7	=7	=7	=7
+4D\	.	4F/	.	8a/L	.	4dd\	lo-	.
+.	.	.	.	8b-/J	.	.	.	.
+4E\	.	4G/	.	8b-/L	.	4cc#\	-ben	.
+.	.	.	.	8a/J	.	.	.	.
+4F#\	.	8d\L	.	4a/	.	4dd\	und	.
+.	.	8c\J	.	.	.	.	.	.
+4G#\	.	4B\	.	4e/	.	8ee\L	ihm	.
+.	.	.	.	.	.	8dd\J	|	.
+=8	=8	=8	=8	=8	=8	=8	=8	=8
+8A\L	.	(8B\	.	(8e/	.	4cc\	dank-	.
+8F\J	.	4A/)	.	4f/)	.	.	.	.
+8D\L	.	.	.	.	.	4b\	-bar	.
+8E\J	.	8G#/	.	8e/	.	.	.	.
+4AA;/	.	4c;\	.	4e;/	.	4a;/	sein,	.
+4D\	.	4d\	.	4f/	.	4b\	und	.
+=9	=9	=9	=9	=9	=9	=9	=9	=9
+4C/	.	8G/L	.	8f/L	.	4cc\	sin-	.
+.	.	8c/J	.	8e/J	.	.	.	.
+8FF/L	.	4c\	.	4f/	.	8a/L	-gen	.
+8GG/J	.	.	.	.	.	8b-/J	|	.
+8AA/L	.	8c\L	Hal-	4f/	Hal-	4cc\	Hal-	.
+8BB-/J	.	8d\J	|	.	.	.	.	.
+8C/L	.	8e\L	-le-	[4e/	-le-	4g/	-le-	.
+8BB-/J	.	8d\J	|	.	.	.	.	.
+=10	=10	=10	=10	=10	=10	=10	=10	=10
+8AA/L	.	8c#/L	-lu-	8e/]	|	(4f/	-lu-	.
+8FF/	.	8A/	|	4d/	-lu-	.	.	.
+8GG/	.	8B-/	|	.	.	4e/)	|	.
+8AA/J	.	16A/L	|	8c#/	|	.	.	.
+.	.	16G/JJ	|	.	.	.	.	.
+2BB-;/	.	2F;/	-ja,	2d;/	-ja,	2d;/	-ja,	.
+=11	=11	=11	=11	=11	=11	=11	=11	=11
+4FF#/	Hal-	8A\L	Hal-	4.d/	.	4a/	Hal-	.
+.	.	8c\J	|	.	.	.	.	.
+4GG/	-le-	4B-\	-le-	.	.	4g/	-le-	.
+.	.	.	.	8e/	.	.	.	.
+2AA/	-lu-	4A/	-lu-	8c#/	.	(4f/	-lu-	.
+.	.	.	.	4d/	.	.	.	.
+.	.	[4G/	|	.	.	4e/)	|	.
+.	.	.	.	8c#/	.	.	.	.
+=12	=12	=12	=12	=12	=12	=12	=12	=12
+1DD;/	-ja!	4G/]	|	1A;/	.	1d;/	-ja!	.
+.	.	8F#/L	|	.	.	.	.	.
+.	.	8E/J	|	.	.	.	.	.
+.	.	2F#;/	-ja!	.	.	.	.	.
+==|!	==|!	==|!	==|!	==|!	==|!	==|!	==|!	==|!
+*-	*-	*-	*-	*-	*-	*-	*-	*-
+!!!RWG: Key is interpreted using the Humdrum key tool.
+!!!SCA: BWV 277
+!!!YOR: Bach Gesellschaft Edition
+!!!AGN: choral
+!!!AFT: stage2
+!!!ENC: S. Rasmussen
+!!!END: 1994/05/11
+!!!AST: baroque
+!!!YEC: Copyright 1994, Center for Computer Assisted Research in the Humanities
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEN: United States of America
+!!!EED: W.B. Hewlett
+!!!KEY: 3551684838
+!!!EMD: Converted from MuseData to Humdrum Nov 5, 1999, by Bret Aarden using muse2kern.
+!!!VTS: 2476146699

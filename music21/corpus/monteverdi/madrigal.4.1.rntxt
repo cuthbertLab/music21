@@ -1,0 +1,92 @@
+Composer: Claudio Monteverdi
+Madrigal: 4.1
+Title: Ah, Dolente Partita
+Time Signature: 4/4
+Analyst: Dmitri Tymoczko
+Key Signature: 
+
+Note: m1-6 open with a two voice texture in which harmony is ambiguous; the analysis begins with the first complete triad
+
+m7 a: iv6
+m7var1 VI7 b3 iv6
+m8 v
+m9 i
+m10 VII
+m11 III
+m12 b3 i6
+m13 iv b2 iio6
+m14 V
+Note: the harmony in m15-21 echoes m11-14 a fifth lower; this occurs several times in the piece.
+m15 i b3 VI d: III
+m17 i6 b3 IV
+m18 ii6
+m19 V
+m21 i
+m22 v a: i
+m24 b3 iv6/4
+m25 i
+m27 iv6
+m28 i6/4 b3 v
+m29 iv6
+m30 V
+m31 i
+m34 iv
+m35 i
+m37 d: iv6 b3 VI
+m38 i6/4 b3 V
+m39 i
+m41 v6 a: i6
+m42 VI
+m43 III
+m45 iio6
+m46 i6/4 b3 V
+m47 i
+m50 iv6
+m51 V
+m52 i
+m54 b2 VI6 b4 v6
+m55 iv6 b2 iii6 b3 iv6
+m56 V[no3] b4 III
+m57 VII b4 I
+m58 IV 
+m59 IV b3 ii6 b4 ii
+m60 i6/4 b3 V
+Note: m62-65 repeat 57-60 a fifth lower
+m61 i b4 d: III
+m62-65 = m57-60
+m66 i
+m67 b2 v a: i b4.5 v6
+m68 iv6 b2.5 VII b3 i
+Note: beat 2.5 in m69 can be analyzed as passing, as a iv6 with a suspension (or upper-voice pedal), or as a seventh chord.
+m69 b2 v6 b2.5 iv6 b3 V b4 i6/4
+m69var1 b2 v6 b2.5 VI7 b3 V b4 i6/4
+m69var2 b3 V b4 i6/4
+m70 V b3 i
+m71 b3 d: i6
+m72 V6 b3 i
+m73 = m72
+m74 = m72
+m75 = m72
+m76 V b4.5 V2
+m77 i6 a: iv6 b2.5 VII b3 i
+m78 b3 V
+m79 b3 i
+m80 V b3 i
+m81 V b3 VI
+m82 V6/iv b3 iv
+m82var1 I6 b3 iv
+m83 v 
+m84 i6/4 b3 V
+m85 = m84
+m86 = m84
+m87 b3 i6/4
+m88 V
+Note: final six measures of the piece echo the preceding music a fifth lower.  I am analyzing this as I-iv-I rather than V-i-V in d minor.
+m89 I
+m90 b3 iv6/4
+m91 V b3 iv6/4
+m92 = m91
+m93 = m91
+m94 I
+m95 iv
+m96 I

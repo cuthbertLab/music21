@@ -1,0 +1,100 @@
+Composer: Claudio Monteverdi
+Madrigal: 4.17
+Title: Anima Dolorosa, Che Vivendo
+Analyst: Steve Taylor
+Time Signature: 4/4
+
+Note: we move freely between D major and minor throughout.
+m1 D: I
+m3 b3 iv
+Note: the v chord in m5 has an added 4th in the soprano
+m5 v b3 V4/3
+m6 I ||
+m7 I b1.5 vi b2 ii b3 I b4 IV b4.5 ii
+m8 v b2 IV b3 VII
+m8var1 C: vi b2 V b3 I
+Note: m8 sounds like a cadence in C but it's very short, so I've put a modulation to C only as a variant, then immediately back to D.
+m9 D: b3 iv6
+m10 i6/4
+m11 V b3 ii6 b4 I6
+m12 viio6/V
+m13 v b3 I
+m14 b4 IV
+m15 VII
+m16 b3 III
+m17 b4 I
+m18 IV b3 i6
+m19 V7/V b2 i6/4 b3 V/V
+m20 V || b4 v
+m20var1 V || b4 v C: vi
+m21 IV
+m21var1 C: V
+m22 b2 VII b4 V
+m22var1 C: b2 I D: b4 V
+Note: as in m8 above, the G - C chords in m21-22 here suggest a very brief modulation to C which I've described as a variant. m23-24 are a sequence a step higher.
+m23 b4 I
+m23var1 b4 i
+Note: on my recording b4 is sung as a minor chord, instead of the major chord in the score (there are several instances of this through many of the Madrigals I've listened to).
+m24 C: b2 I
+m26 b4 ii
+m27 I b4 IV
+m28 b2 V/vi b4 vi
+m29 V
+m30 b4 I6
+m31 V b4 I ||
+Note: finally we have a longer modulation to C.
+m33 d: III b3 III6[no1]
+m33var1 d: III b3 v
+m34 b3 V
+Note: m33-34 have a very beautiful and strange cross relation from C to C# between sop and alto.
+m36 b3 i6/4 
+m37 b3 V
+m38 b3 i
+m39 b2 VII C: I
+m40 b2 IV b4 I
+m42 b4 iii
+m43 b3 V/V
+m44 b2 V b4 IV F: I
+m44var1 b2 V b4 IV Bb: V
+m45 b4 IV6
+m45var1 b4 I6
+m46 I b4 IV
+m46var1 V b4 I
+Note: m38-46 are a sequence of V-I progressions in various keys - d in m38, F in m40, G in m44, Bb in m46.
+m47 b4 G: I
+m47var1 D: IV
+Note: after the preceding sequence our sense of key has been thoroughly confused; but it sounds as if we're returning to the implied G tonality of m44.
+m48 b3 G: viio6/ii
+m48var1 b3 D: viio6/V
+Note: this harmony = m12
+m50 b3 G: V[#5]
+m50var1: D I[#5]
+Note: in my recording they sing a major triad, not augmented as shown in the score.
+m51 b3 G: i6/4
+m51var1 b3 D: iv6/4
+m52 b3 G: V b4 v
+m52var1 b3 D: I b4 i
+m53 D: v b3 VI
+m53var1 F: iii IV
+Note: m53 contains a discursive modulation; there is no V-I progression to orient us.
+m54 C: I
+m55 b2 I6 b3 V/V
+m56 I
+m57 b3 I6
+m58 V
+m59 I ||
+m60 I b4 I6
+m61 b2 III
+Note: the harmony in m60-61 echoes m33-34 a 4th lower.
+m62 b1.5 A: V6 b4 iv
+m62var1 b1.5 D: V6 b4 i
+m63 A: V b2 b2 i6/4 b3 V
+m63var1 D: V/V b2 v6/4 b3 V/V
+m64 A: I[no3] b2 VI b4 VI6
+m64var1 D: V[no3] b2 III b4 III6
+m65 A: I
+m65var1 D: V
+m66 D: I6
+m67 b1.5 V b2 i6/4 b3 V
+m68 I
+Note: m66-68 echoes m62-64 a fifth lower.

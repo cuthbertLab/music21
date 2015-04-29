@@ -1,0 +1,82 @@
+!!!COM: Bach, Johann Sebastian
+!!!OPR: Four-part Chorales
+!!!OTL: 28. Christus, der ist mein Leben
+!!!ONM: 
+!!!OMV: 1
+!!!CDT: 1685/3//-1750/7/28/
+!!!OCY: Deutschland
+**kern	**kern	**kern	**kern	**silbe
+*clefF4	*clefGv2	*clefG2	*clefG2	*
+*I:[BASSO]	*I:[TENORE]	*I:[ALTO]	*I:[SOPRANO]	*I:[SOPRANO]
+*k[b-]	*k[b-]	*k[b-]	*k[b-]	*
+*F:	*F:	*F:	*F:	*
+*M4/4	*M4/4	*M4/4	*M4/4	*
+!! Initial conversion from stage 1 to stage 2
+4FF/	4A/	4c/	4f/	Chri-
+=1	=1	=1	=1	=1
+4F\	4c\	4f/	4a/	-stus,
+4E\	4c\	4g/	4g/	der
+4E-\	4c\	4f/	4a/	ist
+4D\	4d\	4f/	4b-\	mein
+=2	=2	=2	=2	=2
+8C\L	4G/	8e/L	2cc\	Le-
+8D\	.	8f/	.	.
+8E\	4c\	8g/	.	.
+8C\J	.	8e/J	.	.
+4F;\	4c;\	4f;/	4a;/	-ben
+4BB-/	4B-\	4f/	4dd\	und
+=3	=3	=3	=3	=3
+4AA/	4c\	4.f/	4cc\	Ster-
+4GG/	8d\L	.	4b-\	-ben
+.	8B-\J	8e/	.	.
+8FF/L	4c\	4.f/	4a/	mein
+8AA/J	.	.	.	.
+4C/	4c\	.	4g/	Ge-
+.	.	8e/	.	.
+=4	=4	=4	=4	=4
+2FF;/	2c;\	2f;/	2a;/	-winn;
+4r	4r	4r	4r	.
+4F\	4f\	4a/	4cc\	dem
+=5	=5	=5	=5	=5
+4BBn/	4f\	8a/L	4dd\	tu'
+.	.	8g/J	.	.
+4C/	4e\	8g\L	4ee\	ich
+.	.	16cc\L	.	.
+.	.	16b-\JJ	.	.
+8D\L	8e\L	4a/	4ff\	mich
+8F\J	8d\J	.	.	.
+8A\L	4c\	4a/	4ee\	er-
+8G\J	.	.	.	.
+=6	=6	=6	=6	=6
+8F\L	4c\	4a/	2dd\	-ge-
+8D\J	.	.	.	.
+4G\	4Bn\	4g/	.	.
+4C;/	4e;\	4g;/	4cc;\	-ben,
+4FF/	4c\	4f/	4a/	mit
+=7	=7	=7	=7	=7
+4GG/	4B-\	8f/L	4b-\	Freud'
+.	.	8e/J	.	.
+4AA/	4c\	4f/	4a/	fahr'
+4BB-/	4d\	4f/	4g/	ich
+4C/	8.c\L	4e/	4g/	da-
+.	16B-\Jk	.	.	.
+=8	=8	=8	=8	=8
+2.FF;/	2.A;/	2.c;/	2.f;/	-hin.
+==|!	==|!	==|!	==|!	==|!
+*-	*-	*-	*-	*-
+!!!RWG: Key is interpreted using the Humdrum key tool.
+!!!SCA: BWV 281
+!!!YOR: Bach Gesellschaft Edition
+!!!AGN: choral
+!!!AFT: stage2
+!!!ENC: S. Rasmussen
+!!!END: 1994/05/11
+!!!AST: baroque
+!!!YEC: Copyright 1994, Center for Computer Assisted Research in the Humanities
+!!!YEM: Rights to all derivative electronic formats reserved.
+!!!YEM: Refer to licensing agreement for further details.
+!!!YEN: United States of America
+!!!EED: W.B. Hewlett
+!!!KEY: 2776303321
+!!!EMD: Converted from MuseData to Humdrum Nov 5, 1999, by Bret Aarden using muse2kern.
+!!!VTS: 2731986497

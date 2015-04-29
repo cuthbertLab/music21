@@ -1,0 +1,18 @@
+! cons16.scl
+!
+Set of intervals with num + den <= 16 not exceeding 2/1                         
+ 13
+!
+ 8/7
+ 7/6
+ 6/5
+ 5/4
+ 9/7
+ 4/3
+ 7/5
+ 3/2
+ 8/5
+ 5/3
+ 7/4
+ 9/5
+ 2/1

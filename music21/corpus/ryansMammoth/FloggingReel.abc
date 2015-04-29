@@ -1,0 +1,17 @@
+X: 1
+T: FLOGGING -- REEL
+B: Ryan's Mammoth Collection of Fiddle Tunes
+R: reel
+M: C|
+L: 1/8
+Z: Contributed 20010522155116 by John Chambers jc:trillian.mit.edu
+K: G
+vdc "^Segno"\
+|] BG~G2 BGAF | BGGc Bdgd | BGGc BdcB | AGFG ABcA \
+|  BG~G2 BGAF | BGGc Bdgd | BGGc BdcB | AGFG ABcA |]
+  ~g3d BGBd | {a}gfge fgaf | ~g3d BcdB | AGFG ABcA \
+| ~g3d BGBd | ~g3e fgaf | gbfg edcB | AGFG Aedc |]
+  ((3Bcd).g.d ((3Bcd).g.d | ((3Bcd).g.d BGGB \
+| ((3ABc).f.c ((3ABc).f.c | ((3ABc).f.c AFFc \
+| ((3Bcd).g.d ((3Bcd).g.d | Bdef {a}gfga \
+| bgaf gedB | AGFG ABcA "^Segno"|]
