@@ -23,39 +23,96 @@ from music21 import note
 from music21 import search
 from music21 import stream
 
-NoteHash = collections.namedtuple('NoteHash', ['pitch', 'duration', 'beat'])
-
 class Hasher(object):
-	def __init__(self, stream):
+	def __init__(self):
 		self.stream = stream
 		
-
 		# --- begin general types of things to hash ---
-		self.hashNotes = True # is this even necessary?
+		self.hashNotes = True
 		self.hashRests = True
 		self.hashChords = True
 		# --- end general types of things to hash ---
 
+		# --- begin hashing settings --- 
+		self.stripTies = False
+		self.roundDuration = True
+		self.roundOffset = True
+		self.granularity = 32
+		# self.key = None # useful if available to see if notes are in key maybe?
+		# --- end hashing settings ---
+
 		# --- begin note properties to hash ---
 		self.hashPitch = True
+		self.hashMIDI = True # otherwise, hash string "C-- instead of 58"
 		self.hashDuration = True
-		self.roundDuration = True
 		self.hashOffset = True
-		self.roundOffset = True
-		self.outOfKey = False
-		self.isAccidental = False
-		self.isTied = False
+		self.hashIntervalFromLastNote = False
+		# self.outOfKey = False
+		# self.isAccidental = False
+		self.hashisTied = False
 		# --- end note properties to hash ---
 
-	def setSmartDefaults(self):
-		"""
-		maybe multiple of these kind of functions to set defaults that aid certain types of hashes
-		"""
-		pass
+		# self.tupleList = []
+		self.hashingFunctions = {}
+		self.hash()
+
+	def setupTupleList(self):
+		tupleList = []
+		if self.hashNotes:
+			tupleList.append(self.buildNoteHashes())
+		if self.hashRests:
+			tupleList.append(self.buildRestHashes())
+		if self.hashChords:
+			pass
+
+		self.tupleList = tupleList
+		self.tupleClass = collections.namedtuple('NoteHash', tupleList)
+
+	def buildNoteHashes(self):
+		noteHashes = []
+		if self.hashPitch:
+			noteHashes.append("Pitch")
+			if self.hashMIDI:
+				self.hashingFunctions["Pitch"] = "hashMIDIPitch"
+			elif not self.hashMIDI:
+				self.hashingFunctions["Pitch"] = "hashNotePitch" 
+				# note to self: look at pitch.py functions
+
+				# if self.isAccidental:
+				# 	noteHashes.append("IsAccidental")
+
+		if self.hashDuration:
+			noteHashes.append("Duration")
+			if self.roundDuration:
+				self.hashingFunctions["Duration"] = "hashRoundedDuration"
+			else:
+				self.hashingFunctions["Duration"] = "hashDuration"
+
+		if self.hashOffset:
+			noteHashes.append("Offset")
+			if self.roundOffset:
+				self.hashingFunctions["Offset"] = "hashRoundedOffset"
+			else:
+				self.hashingFunctions["Offset"] = "hashOffset"
+
+		if self.hashIntervalFromLastNote:
+			noteHashes.append("IntervalFromLastNote")
+			self.hashingFunctions["IntervalFromLastNote"] = "hashIntervalFromLastNote"
+
+	def preprocessStream(self, stream):
+		if self.stripTies:
+			stream = stream.stripTies()
+		return stream
+		# TODO: more preprocessing options
+
+	def hash(self, stream):
+		self.setupTupleList()
+		stream = self.preprocessStream(stream)
+		
 
 	# --- Begin Rounding Helper Functions ---
-	def _getApproxDurOrOffset(self, durOrOffset, granularity=32):
-		return round(durOrOffset*granularity)/granularity
+	def _getApproxDurOrOffset(self, durOrOffset):
+		return round(durOrOffset*self.granularity)/self.granularity
 	
 
 	def _approximatelyEqual(self, a, b, sig_fig = 2):
@@ -69,7 +126,7 @@ class Hasher(object):
 
 	# --- Begin Hashing Functions --- 
 
-	def generalHash(self, granularity=32):
+	def generalHash(self, stream):
 		"""
 		hasher with ability to turn certain parts off/on
 		"""
@@ -79,14 +136,14 @@ class Hasher(object):
 			if n.isNote and self.hashNotes:
 				if self.hashDuration:
 					if self.roundDuration:
-						note_dur = _getApproxDurOrOffset(n.duration.quarterLength, granularity)
+						note_dur = _getApproxDurOrOffset(n.duration.quarterLength)
 					else: 
 						note_dur = n.duration.quarterLength
 				else: note_dur = None
 
 				if self.hashOffset:
 					if self.roundOffset:
-						note_offset = _getApproxDurOrOffset(n.offset, granularity)
+						note_offset = _getApproxDurOrOffset(n.offset)
 					else:
 						note_offset = n.offset
 				else:
@@ -100,7 +157,7 @@ class Hasher(object):
 				note_container.append(NoteHash(None, note_dur, note_offset))
 
 			else:
-				raise Exception("Not a note, rest, or chord; shouldn't get here!")
+				print Exception("Not a note, rest, or chord; shouldn't get here!")
 		return note_container
 			 
 
@@ -145,10 +202,10 @@ class Test(unittest.TestCase):
 		s1.append(note3)
 		s1.append(cMinor)
 		s1.append(r)
-		h = Hasher(s1)
+		h = Hasher()
 		hashes_plain_numbers = [(60, 2.0, 0.0), (66, 1.0, 2.0), (46, 1.0, 3.0), (60, 2.0, 4.0), (67, 2.0, 4.0), (75, 2.0, 4.0), (None, 1.5, 6.0)]
 		hashes_in_format = [NoteHash(pitch=x, duration=y, beat=z) for (x, y, z) in hashes_plain_numbers]
-		self.assertEqual(h.basicHash(), hashes_in_format)
+		self.assertEqual(h.basicHash(s1), hashes_in_format)
 
 
 class TestExternal(unittest.TestCase):
@@ -158,7 +215,7 @@ class TestExternal(unittest.TestCase):
 	def testBasicHash(self):
 		from music21 import corpus
 		s1 = corpus.parse('xmlscores/Bologna_596_Nulla_Pitie')
-		print basicHash(s1)
+		print basicHash(s1.parts[0])
 
 if __name__ == "__main__":
     import music21
