@@ -17681,12 +17681,80 @@ class Test(unittest.TestCase):
         for testMaterial in ALL:
             dummy = converter.parse(testMaterial)
 
+#-------------------------------------------------------------------------------
 
+class TestMidMeasureClef1(unittest.TestCase):
+    """ Tests if there are mid-mesure clefs clefs: single staff """
+
+    def runTest(self):
+        pass
+
+    def testBasic(self):
+        from music21 import stream, note, clef, musicxml, converter, meter
+
+        orig_stream = stream.Stream()
+        orig_stream.append(meter.TimeSignature("4/4"))
+        orig_stream.append(clef.TrebleClef())
+        orig_stream.repeatAppend(note.Note("C4"), 2)
+        orig_stream.append(clef.BassClef())
+        orig_stream.repeatAppend(note.Note("C4"), 2)
+        orig_clefs = orig_stream.flat.getElementsByClass('Clef')
+
+        xml = musicxml.m21ToString.fromStream(orig_stream)
+        
+        new_stream = converter.parse(xml)
+        new_clefs = new_stream.flat.getElementsByClass('Clef')
+
+        assert len(new_clefs) == len(orig_clefs)
+        assert [c.offset for c in new_clefs] == [c.offset for c in orig_clefs]
+        assert [c.classes for c in new_clefs] == [c.classes for c in orig_clefs]
+
+class TestMidMeasureClef2(unittest.TestCase):
+    """ Tests if there are mid-mesure clefs clefs: multiple staves """
+
+    def runTest(self):
+        pass
+
+    def testBasic(self):
+        from music21 import stream, note, clef, musicxml, converter, meter
+
+        orig_stream = stream.Stream()
+        orig_stream.append(stream.Part())
+        orig_stream.append(stream.Part())
+        orig_stream.append(meter.TimeSignature("3/4"))
+        
+        for item in [clef.TrebleClef(), note.Note("C4"), clef.BassClef(), \
+            note.Note("C4"), note.Note("C4")]:
+            orig_stream[0].append(item)
+
+        for item in [clef.BassClef(), note.Note("C4"), note.Note("C4"), \
+            clef.TrebleClef(), note.Note("C4")]:
+            orig_stream[1].append(item)
+
+        orig_clefs = [staff.flat.getElementsByClass('Clef') for staff in
+            orig_stream.getElementsByClass('Part')]
+
+        xml = musicxml.m21ToString.fromStream(orig_stream)
+
+        new_stream = converter.parse(xml)
+        new_clefs = [staff.flat.getElementsByClass('Clef') for staff in
+            new_stream.getElementsByClass('Part')]
+
+        assert [len(clefs) for clefs in new_clefs] == \
+          [len(clefs) for clefs in orig_clefs]
+        assert [c.offset for c in clefs for clefs in new_clefs] == \
+          [c.offset for c in clefs for clefs in orig_clefs]
+        assert [c.classes for c in clefs for clefs in new_clefs] == \
+          [c.classes for c in clefs for clefs in orig_clefs]
+
+#-------------------------------------------------------------------------------
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)
+    music21.mainTest(TestMidMeasureClef1)
+    music21.mainTest(TestMidMeasureClef2)
 
 
 #------------------------------------------------------------------------------
