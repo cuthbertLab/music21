@@ -2083,6 +2083,11 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
                 mxDirection.offset = mxOffset
                 # place at zero position, as offset value determines horizontal position, not location amongst notes
                 mxMeasure.insert(0, mxDirection)
+            elif 'Clef' in classes and obj.offset != 0.0:
+                # clef within bar
+                clefAttributes = mxObjects.Attributes()
+                clefAttributes.clefList = [clefToMxClef(obj)]
+                mxMeasure.componentList.append(clefAttributes)
             else: # other objects may have already been added
                 pass
                 #environLocal.printDebug(['mesureToMx of Measure is not processing', obj])
