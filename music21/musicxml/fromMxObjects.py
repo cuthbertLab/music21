@@ -2496,6 +2496,11 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None, lastMeasureInfo=No
             addToStaffReference(mxObj, h, staffReference)
             m._insertCore(offsetMeasureNote, h)
 
+        elif isinstance(mxObj, mxObjects.Clef):
+            cl = mxClefToClef(mxObj)
+            addToStaffReference(mxObj, cl, staffReference)
+            m._insertCore(offsetMeasureNote, cl)
+
 
     #environLocal.printDebug(['staffReference', staffReference])
     # if we have voices and/or if we used backup/forward, we may have

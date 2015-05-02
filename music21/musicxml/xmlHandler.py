@@ -930,7 +930,7 @@ class Handler(xml.sax.ContentHandler):
                 musicxmlMod.BeatType(self._currentTag.charData))
 
         elif name == 'clef':
-            self._mxObjs['attributes'].clefList.append(self._mxObjs['clef'])
+            self._mxObjs['measure'].componentList.append(self._mxObjs['clef'])
 
         elif name == 'multiple-rest':
             self._mxObjs['measure-style'].multipleRest = self._currentTag.charData
