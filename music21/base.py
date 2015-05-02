@@ -1475,6 +1475,12 @@ class Music21Object(object):
         True
         >>> m3.previous('Note', flattenLocalSites=True) is m2.notes[-1]
         True
+        
+        
+        TODO:  Try:  l = corpus.parse('luca/gloria'); for el in l.recurse: print(el, el.previous('Note'))
+        SLOWEST THING EVER! why????
+        
+        
         '''
         return self._adjacencySearch(classFilterList=classFilterList,
                     ascend=False, beginNearest=beginNearest, flattenLocalSites=flattenLocalSites)

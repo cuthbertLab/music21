@@ -7855,13 +7855,19 @@ class Stream(base.Music21Object):
             for e in useStream._elements:
                 if processOffsets:
                     o = e.getOffsetBySite(useStream)
+                    sign = 1
+                    if o < 0:
+                        sign = -1
+                        o = -1 * o
                     unused_error, oNew, signedError = bestMatch(float(o), quarterLengthDivisors)
-                    useStream.setElementOffset(e, oNew)
+                    useStream.setElementOffset(e, oNew * sign)
                     if hasattr(e, 'editorial') and hasattr(e.editorial, 'misc') and signedError != 0:
-                        e.editorial.misc['offsetQuantizationError'] = signedError
+                        e.editorial.misc['offsetQuantizationError'] = signedError * sign
                 if processDurations:
                     if e.duration is not None:
                         ql = e.duration.quarterLength
+                        if ql < 0:  # buggy MIDI file? 
+                            ql = 0
                         unused_error, qlNew, signedError = bestMatch(float(ql), quarterLengthDivisors)
                         e.duration.quarterLength = qlNew
                         if hasattr(e, 'editorial') and hasattr(e.editorial, 'misc') and signedError != 0:

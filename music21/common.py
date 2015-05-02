@@ -14,7 +14,6 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 '''
 
 # should NOT import music21 or anything like that, except in doctests.
-import imp
 import re
 import copy
 import math, sys, os
@@ -835,9 +834,9 @@ def lessThan(x, y = 0.0, grain=1e-7):
 
 
 def nearestMultiple(n, unit):
-    '''Given a positive value `n`, return the nearest multiple of the supplied `unit` as well as 
+    '''
+    Given a positive value `n`, return the nearest multiple of the supplied `unit` as well as 
     the absolute difference (error) to seven significant digits and the signed difference.
-
 
     >>> print(common.nearestMultiple(.25, .25))
     (0.25, 0.0, 0.0)
@@ -875,9 +874,13 @@ def nearestMultiple(n, unit):
     True
 
 
+    >>> common.nearestMultiple(-0.5, 0.125)
+    Traceback (most recent call last):
+    ValueError: n (-0.5) is less than zero. Thus cannot find nearest multiple for a value less than the unit, 0.125
+
     '''
     if n < 0:
-        raise Exception('cannot find nearest multiple for a value less than the unit: %s, %s' % (n, unit))
+        raise ValueError('n (%s) is less than zero. Thus cannot find nearest multiple for a value less than the unit, %s' % (n, unit))
 
     mult = math.floor(n / float(unit)) # can start with the floor
     halfUnit = unit / 2.0
