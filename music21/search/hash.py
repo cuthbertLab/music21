@@ -21,6 +21,7 @@ from music21 import common
 from music21 import environment
 from music21 import exceptions21
 from music21 import note, chord
+from music21 import interval
 from music21 import search
 from music21 import stream
 
@@ -41,7 +42,7 @@ class Hasher(object):
 		self.hashMIDI = True # otherwise, hash string "C-- instead of 58"
 		self.hashOctave = False
 		self.hashDuration = True
-		self.roundDuration = False
+		self.roundDuration = True
 		self.hashOffset = True
 		self.roundOffset = True
 		self.granularity = 32
@@ -79,20 +80,24 @@ class Hasher(object):
 
 		# -- Begin Individual Hashing Functions ---
 	def _hashDuration(self, e, c=None):
+		if c:
+			return c.duration.quarterLengthFloat
 		return e.duration.quarterLengthFloat
 
 	def _hashRoundedDuration(self, e, c=None):
+		if c:
+			return self._getApproxDurOrOffset(c.duration.quarterLengthFloat)
 		return self._getApproxDurOrOffset(n.duration.quarterLengthFloat)
 
 	def _hashMIDIPitchName(self, e, c=None):
-		if type(e) == chord.Chord and self.hashChordsAsChords:
+		if c and self.hashChordsAsChords:
 			return None
 		elif type(e) == note.Rest:
 			return None
 		return e.pitch.midi
 
 	def _hashPitchName(self, e, c=None):
-		if type(e) == chord.Chord and self.hashChordsAsChords:
+		if c and self.hashChordsAsChords:
 			return None
 		elif type(e) == note.Rest:
 			return None
@@ -103,7 +108,7 @@ class Hasher(object):
 			return None
 		elif type(e) == note.Rest:
 			return None
-		return _convertPsToOct(e.pitch.midi)
+		return e.octave
 
 	def _hashIsAccidental(self, e, c=None):
 		pass
@@ -115,7 +120,7 @@ class Hasher(object):
 
 	def _hashOffset(self, e, c=None):
 		if c:
-			return self._getApproxDurOrOffset(e.offset)
+			return c.offset
 		return e.offset.quarterLengthFloat
 
 	def _hashIntervalFromLastNote(self, e, c=None):
@@ -123,13 +128,20 @@ class Hasher(object):
 			return None
 		elif type(e) == note.Rest:
 			return None
-		return interval.Interval(e.previous('Note'), e)
+		if e is not None and e.previous('Note') is not None:
+			# print e.previous
+			return interval.Interval(noteStart=e.previous('Note'), noteEnd=e)
+		return None
 
-	def _hashOrderedPitchClassesString(self, e, c=None):
-		return c.orderedPitchClassesString
+	def _hashOrderedPitchClassesString(self, e ,c=None):
+		if c:
+			return c.orderedPitchClassesString
+		return None
 
-	def _hashChordNormalFormString(self, e, c=None):
-		return c.normalFormString
+	def _hashChordNormalFormString(self, e ,c=None):
+		if c:
+			return c.normalFormString
+		return None
 
 	# --- End Indivdual Hashing Functions
 
@@ -156,8 +168,8 @@ class Hasher(object):
 				pass
 			elif self.hashChordsAsChords:
 				if self.hashNormalFormString:
-					tupleList.append("ChordNormalFormString")
-					self.hashingFunctions["ChordNormalFormString"] = self._hashChordNormalFormString
+					tupleList.append("NormalFormString")
+					self.hashingFunctions["NormalFormString"] = self._hashChordNormalFormString
 				if self.hashOrderedPitchClassesString:
 					tupleList.append("OrderedPitchClassesString")
 					self.hashingFunctions["OrderedPitchClassesString"] = self._hashOrderedPitchClassesString
@@ -179,7 +191,7 @@ class Hasher(object):
 
 		if self.hashIntervalFromLastNote:
 			tupleList.append("IntervalFromLastNote")
-			self.hashingFunctions["IntervalFromLastNote"] = hashIntervalFromLastNote
+			self.hashingFunctions["IntervalFromLastNote"] = self._hashIntervalFromLastNote
 		
 
 		self.tupleList = tupleList
@@ -200,6 +212,7 @@ class Hasher(object):
 		self.setupTupleList()
 		
 		for elt in finalEltsToBeHashed:
+			# import pdb; pdb.set_trace()
 			# single_note_hash = []
 			if self.hashIsAccidental and type(elt) == key.KeySignature:
 				self.stateVars["currKeySig"] = elt
@@ -209,7 +222,7 @@ class Hasher(object):
 						single_note_hash = [self.hashingFunctions[prop](n, c=elt) for prop in self.tupleList]		
 						finalHash.append(self.tupleClass._make(single_note_hash))
 				elif self.hashChordsAsChords:
-					single_note_hash = [self.hashingFunctions[prop](elt) for prop in self.tupleList]
+					single_note_hash = [self.hashingFunctions[prop](None, c=elt) for prop in self.tupleList]
 					finalHash.append(self.tupleClass._make(single_note_hash))
 			else: #type(elt) == note.Note or type(elt) == note.Rest
 				single_note_hash = [self.hashingFunctions[prop](elt) for prop in self.tupleList]
@@ -235,11 +248,17 @@ class Hasher(object):
 	# --- End Rounding Helper Functions ---
 
 class Test(unittest.TestCase):
+	# def setUp(self):
+	# 	from music21 import *
+
 	def runTest(self):
 		pass
 
+	"""
+	test for hasher with basic settings: pitch, rounded duration, offset
+	with notes, chord, and rest
+	"""
 	def testBasicHash(self):
-		from music21 import *
 		s1 = stream.Stream()
 		note1 = note.Note("C4")
 		note1.duration.type = 'half'
@@ -258,22 +277,75 @@ class Test(unittest.TestCase):
 		NoteHash = collections.namedtuple('NoteHash', ["Pitch", "Duration", "Offset"])
 		hashes_in_format = [NoteHash(Pitch=x, Duration=y, Offset=z) for (x, y, z) in hashes_plain_numbers]
 		self.assertEqual(h.hash(s1), hashes_in_format)
-		# print h.hash(s1)
+
+	"""
+	test to make sure that hashing works when trying to hash chord as chord
+	"""
+	def testHashChordsAsChordsOrderedPitchClassesString(self):
+		s1 = stream.Stream()
+		note1 = note.Note("C4")
+		note1.duration.type = 'half'
+		cMinor = chord.Chord(["C4","G4","E-5"])
+		cMinor.duration.type = 'half'
+		cMajor = chord.Chord(["C4","G4","E4"])
+		cMajor.duration.type = "whole"
+		s1.append(note1)
+		s1.append(cMinor)
+		s1.append(cMajor)
+		h = Hasher()
+		h.hashChordsAsChords = True
+		h.hashChordsAsNotes = False
+		h.hashOrderedPitchClassesString = True
+		NoteHash = collections.namedtuple('NoteHash', ["Pitch", "OrderedPitchClassesString", "Duration", "Offset"])
+		hashes_plain_numbers = [(60, None, 2.0, 0.0), (None, '<037>', 2.0, 2.0), (None, '<047>', 4.0, 4.0)]
+		hashes_in_format = [NoteHash(Pitch=x, OrderedPitchClassesString=y, Duration = z, Offset=a) for (x, y, z, a) in hashes_plain_numbers]
+		self.assertEqual(h.hash(s1), hashes_in_format)
+
+	def testHashChordsAsChordsOctave(self):
+		s2 = stream.Stream()
+		note1 = note.Note("C4")
+		note1.duration.type = 'half'
+		note2 = note.Note("F#4")
+		note3 = note.Note("B-2")
+		cMinor = chord.Chord(["C4","G4","E-5"])
+		cMinor.duration.type = 'half'
+		cMajor = chord.Chord(["C4","G4","E3"])
+		cMajor.duration.type = "whole"
+		r = note.Rest(quarterLength=1.5)
+		s2.append(note1)
+		s2.append(note2)
+		s2.append(note3)
+		s2.append(cMinor)
+		s2.append(cMajor)
+		s2.append(r)
+		h = Hasher()
+		h.hashChordsAsChords = True
+		h.hashChordsAsNotes = False
+		h.hashOrderedPitchClassesString = False
+		h.hashNormalFormString = True
+		h.hashIntervalFromLastNote = True
+		NoteHash = collections.namedtuple('NoteHash', ["Pitch", "OrderedPitchClassesString", "Duration", "Offset"])
+		hashes_plain_numbers = [(60, None, 2.0, 0.0), (None, '<037>', 2.0, 2.0), (None, '<047>', 4.0, 4.0)]
+		hashes_in_format = [NoteHash(Pitch=x, OrderedPitchClassesString=y, Duration = z, Offset=a) for (x, y, z, a) in hashes_plain_numbers]
+		print h.hash(s2)
+		print hashes_in_format
+		# self.assertEqual(h.hash(s2), hashes_in_format)
 
 class TestExternal(unittest.TestCase):
+
 	def runTest(self):
 		pass
 
 	def testBasicHash(self):
 		from music21 import converter
-		s1 = converter.parse('../xmlscores/Bologna_596_Nulla_Pitie.xml')
+		s1 = converter.parse('../xmlscores/Jacopo_O_Cieco_Mondo.xml')
 		h = Hasher()
+		h.hashChordsAsNotes = False
+		h.hashChordsAsChords = True
+		h.hashOctave = True
+		h.hashOrderedPitchClassesString = True
+		h.hashIntervalFromLastNote = True
 		print h.hash(s1.recurse())
-		# classList = ['Note', 'Rest']
-		# for elt in s1.recurse(): # use this to look in order at things instead of flat
-		# 	if not elt.isClassOrSubclass(classList): # use this to set up what kind of elements to look at 
-		# 		continue
-		# 	print elt
 
 
 if __name__ == "__main__":
