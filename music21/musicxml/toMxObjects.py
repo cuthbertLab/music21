@@ -2205,7 +2205,7 @@ def streamPartToMx(part, instStream=None, meterStream=None,
             # if making beams, have to make a deep copy, as modifying notes
             try:
                 measureStream.makeBeams(inPlace=True)
-            except: # cannot match StreamException, must catch all
+            except exceptions21.StreamException: 
                 pass
         if spannerBundle is None:
             spannerBundle = spanner.SpannerBundle(measureStream.flat)

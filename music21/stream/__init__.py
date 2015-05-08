@@ -58,12 +58,11 @@ from music21 import environment
 _MOD = "stream.py"
 environLocal = environment.Environment(_MOD)
 
+StreamException = exceptions21.StreamException
+
 #------------------------------------------------------------------------------
 # Metaclass
 _OffsetMap = collections.namedtuple('OffsetMap', ['element','offset', 'endTime', 'voiceIndex'])
-
-class StreamException(exceptions21.Music21Exception):
-    pass
 
 #------------------------------------------------------------------------------
 

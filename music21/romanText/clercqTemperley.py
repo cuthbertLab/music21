@@ -799,7 +799,7 @@ in the text file as a string, and have python do the parsing.
                     except IndexError:
                         try:
                             outputStream.measure(measureNumber).insert(0.0, timeSig)
-                        except stream.StreamException:
+                        except exceptions21.StreamException:
                             # ...handles the case that not enough measures were created
                             #by just the duration of the long note (in case of changes
                             #in time signatures, such as:

@@ -501,7 +501,7 @@ def reBar(music21Part, inPlace=True):
             if lastTimeSignature.barDuration.quarterLength != m2.highestTime:
                 try:
                     m2.timeSignature = m2.bestTimeSignature()
-                except stream.StreamException as e:
+                except exceptions21.StreamException as e:
                     raise ABCTranslateException("Problem with measure %d (%r): %s" % (music21Measure.number, music21Measure, e))
                 if measureIndex != len(allMeasures) - 1:
                     if allMeasures[measureIndex+1].timeSignature is None:

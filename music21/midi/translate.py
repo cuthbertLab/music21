@@ -2057,7 +2057,7 @@ def midiFileToStream(mf, inputM21=None, quantizePost=True):
         s = inputM21
 
     if len(mf.tracks) == 0:
-        raise stream.StreamException('no tracks are defined in this MIDI file.')
+        raise exceptions21.StreamException('no tracks are defined in this MIDI file.')
     else:
         # create a stream for each tracks   
         # may need to check if tracks actually have event data

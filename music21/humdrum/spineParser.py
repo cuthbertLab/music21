@@ -1772,7 +1772,7 @@ class SpineCollection(object):
                                 if el.priority in prioritiesToSearch:
                                     try:
                                         el.activeSite.insert(el.offset, prioritiesToSearch[el.priority])
-                                    except stream.StreamException: # may appear twice because of voices...
+                                    except exceptions21.StreamException: # may appear twice because of voices...
                                         pass
                                         #el.activeSite.insert(el.offset, copy.deepcopy(prioritiesToSearch[el.priority]))
                     elif thisSpine.spineType == 'lyrics' or thisSpine.spineType == 'text':
