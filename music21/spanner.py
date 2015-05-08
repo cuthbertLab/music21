@@ -1085,10 +1085,65 @@ class SpannerBundle(object):
             idLocal).getByCompleteStatus(completeStatus)
 
     def setPendingSpannedElementAssignment(self, sp, className):
+        '''
+        Sets that a particular spanner (sp) is looking for an element of
+        class (className) to complete it.
+        
+        >>> n1 = note.Note('C')
+        >>> r1 = note.Rest()
+        >>> n2 = note.Note('D')
+        >>> n3 = note.Note('E')
+        >>> su1 = spanner.Slur([n1])
+        >>> sb = spanner.SpannerBundle()
+        >>> sb.append(su1)
+        >>> su1.getSpannedElements()
+        [<music21.note.Note C>]
+
+        >>> n1.getSpannerSites()
+        [<music21.spanner.Slur <music21.note.Note C>>]
+
+        Now set up su1 to get the next note assigned to it.
+        
+        >>> sb.setPendingSpannedElementAssignment(su1, 'Note')
+
+        Call freePendingSpannedElementAssignment to attach.
+        Should not get a rest...
+    
+        >>> sb.freePendingSpannedElementAssignment(r1)
+        >>> su1.getSpannedElements()
+        [<music21.note.Note C>]
+        
+        But will get the next note:
+        
+        >>> sb.freePendingSpannedElementAssignment(n2)
+        >>> su1.getSpannedElements()
+        [<music21.note.Note C>, <music21.note.Note D>]        
+        
+        >>> n2.getSpannerSites()
+        [<music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>]
+        
+        And now that the assignment has been made, the pending assignment
+        has been cleared, so n3 will not get assigned to the slur:
+        
+
+        >>> sb.freePendingSpannedElementAssignment(n3)
+        >>> su1.getSpannedElements()
+        [<music21.note.Note C>, <music21.note.Note D>]        
+        
+        >>> n3.getSpannerSites()
+        []
+        
+        '''
         ref = {'spanner':sp, 'className':className}
         self._pendingSpannedElementAssignment.append(ref)
 
     def freePendingSpannedElementAssignment(self, spannedElementCandidate):
+        '''
+        Assigns and frees up a pendingSpannedElementAssignment if one is
+        active and the candidate matches the class.  See 
+        setPendingSpannedElementAssignment for documentation and tests.
+        '''
+        
         if len(self._pendingSpannedElementAssignment) == 0:
             return
 
