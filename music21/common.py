@@ -24,8 +24,8 @@ import hashlib
 import random
 import inspect
 import weakref
-from fractions import Fraction # speedup 50% below...
 
+from fractions import Fraction # speedup 50% below...
 
 from music21 import defaults
 from music21 import exceptions21
@@ -119,44 +119,15 @@ def getMissingImportStr(modNameList):
         return 'Certain music21 functions might need these optional packages: %s; if you run into errors, install it by following the instructions at http://mit.edu/music21/doc/installing/installAdditional.html' % ', '.join(modNameList)
 
 #-------------------------------------------------------------------------------
-_subconverterCachedList = []
-
 def subConverterList():
     '''
     returns a list of subconverter classes available to music21
     in converter/subConverters, including the stub SubConverter class
     
-    >>> for sc in common.subConverterList():
-    ...    sc
-    <class 'music21.converter.subConverters.ConverterABC'>
-    <class 'music21.converter.subConverters.ConverterBraille'>
-    <class 'music21.converter.subConverters.ConverterCapella'>
-    <class 'music21.converter.subConverters.ConverterHumdrum'>
-    <class 'music21.converter.subConverters.ConverterIPython'>
-    <class 'music21.converter.subConverters.ConverterLilypond'>
-    <class 'music21.converter.subConverters.ConverterMEI'>
-    <class 'music21.converter.subConverters.ConverterMidi'>
-    <class 'music21.converter.subConverters.ConverterMuseData'>
-    <class 'music21.converter.subConverters.ConverterMusicXML'>
-    <class 'music21.converter.subConverters.ConverterNoteworthy'>
-    <class 'music21.converter.subConverters.ConverterNoteworthyBinary'>
-    <class 'music21.converter.subConverters.ConverterRomanText'>
-    <class 'music21.converter.subConverters.ConverterScala'>
-    <class 'music21.converter.subConverters.ConverterText'>
-    <class 'music21.converter.subConverters.ConverterTextLine'>
-    <class 'music21.converter.subConverters.ConverterTinyNotation'>
-    <class 'music21.converter.subConverters.ConverterVexflow'>
-    <class 'music21.converter.subConverters.SubConverter'>    '''
-    from music21.converter import subConverters
-    import types
-    if len(_subconverterCachedList) > 0:
-        return _subconverterCachedList
-    for i in sorted(list(subConverters.__dict__)):
-        name = getattr(subConverters, i)
-        if callable(name) and not isinstance(name, types.FunctionType):
-            if hasattr(name, 'registerFormats'):     
-                _subconverterCachedList.append(name)
-    return _subconverterCachedList
+    DEPRECATED May 2015: moved to converter. #TODO: Remove
+    '''
+    from music21 import converter
+    return converter.Converter().subconvertersList()
 
 def findSubConverterForFormat(fmt):
     '''
@@ -177,7 +148,8 @@ def findSubConverterForFormat(fmt):
     
     '''
     fmt = fmt.lower().strip()
-    for sc in subConverterList():
+    scl = subConverterList()
+    for sc in scl:
         formats = sc.registerFormats
         if fmt in formats:
             return sc

@@ -44,7 +44,7 @@ SpineParsing consists of several steps.
 '''
 #python3
 try:
-    basestring
+    basestring # @UndefinedVariable
 except:
     basestring = str # @ReservedAssignment
 

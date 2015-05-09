@@ -45,6 +45,7 @@ import unittest
 import copy
 import os
 import re
+import types
 import urllib
 import zipfile
 
@@ -381,6 +382,8 @@ def unregisterSubconverter(removeSubconverter):
             _deregisteredSubconverters.append(removeSubconverter)
         else:       
             raise ConverterException("Could not remove %r from registered subconverters" % removeSubconverter)
+
+
 
 
 #-------------------------------------------------------------------------------
