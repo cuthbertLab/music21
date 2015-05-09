@@ -96,7 +96,6 @@ class ModuleGather(object):
             'musedata/testPrimitive/test01/__init__.py',
             'musedata/testPrimitive/__init__.py',
             'mei/test_base.py',
-            'ipython21/ipyJSapp.py',
             'humdrum/questions.py',
             'humdrum/canonicalOutput.py',
             'documentation/upload.py',

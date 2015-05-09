@@ -14,6 +14,7 @@ Users Guide
    usersGuide_06_stream2
    usersGuide_07_chords
    usersGuide_09_chordify
+   usersGuide_10_fileFormats1
    usersGuide_11_corpusSearching
    usersGuide_14_timeSignatures
    usersGuide_17_derivations
