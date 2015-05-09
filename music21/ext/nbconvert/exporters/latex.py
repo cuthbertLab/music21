@@ -21,12 +21,12 @@ from IPython.utils.traitlets import Unicode
 from IPython.config import Config
 
 # other libs/dependencies
-import nbconvert.filters.latex
-import nbconvert.filters.highlight
-from nbconvert.transformers.latex import LatexTransformer
+import music21.ext.nbconvert.filters.latex
+import music21.ext.nbconvert.filters.highlight
+from music21.ext.nbconvert.transformers.latex import LatexTransformer
 
 # local import
-import exporter
+from music21.ext.nbconvert.exporters import exporter
 
 #-----------------------------------------------------------------------------
 # Classes and functions

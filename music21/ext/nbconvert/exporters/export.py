@@ -17,17 +17,17 @@ from functools import wraps
 
 from IPython.nbformat.v3.nbbase import NotebookNode
 
-from .exporter import Exporter
-from .basichtml import BasicHtmlExporter
-from .fullhtml import FullHtmlExporter
-from .latex import LatexExporter
-from .markdown_exporter import MarkdownExporter
-from .python import PythonExporter
-from .python_armor import PythonArmorExporter
-from .reveal import RevealExporter
-from .rst import RstExporter
-from .sphinx_howto import SphinxHowtoExporter
-from .sphinx_manual import SphinxManualExporter
+from music21.ext.nbconvert.exporters.exporter import Exporter
+from music21.ext.nbconvert.exporters.basichtml import BasicHtmlExporter
+from music21.ext.nbconvert.exporters.fullhtml import FullHtmlExporter
+from music21.ext.nbconvert.exporters.latex import LatexExporter
+from music21.ext.nbconvert.exporters.markdown_exporter import MarkdownExporter
+from music21.ext.nbconvert.exporters.python import PythonExporter
+from music21.ext.nbconvert.exporters.python_armor import PythonArmorExporter
+from music21.ext.nbconvert.exporters.reveal import RevealExporter
+from music21.ext.nbconvert.exporters.rst import RstExporter
+from music21.ext.nbconvert.exporters.sphinx_howto import SphinxHowtoExporter
+from music21.ext.nbconvert.exporters.sphinx_manual import SphinxManualExporter
 
 #-----------------------------------------------------------------------------
 # Classes

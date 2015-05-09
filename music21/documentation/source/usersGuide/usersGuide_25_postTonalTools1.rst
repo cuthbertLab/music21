@@ -10,6 +10,7 @@
 User's Guide, Chapter 25: Post-Tonal Tools (1)
 ==============================================
 
+
 The music21 toolkit features many tools for analyzing and creating music
 within a post-tonal context. A :class:`~music21.chord.Chord` can be
 identified as a Forte class, a list of pitch classes can be used to
@@ -262,6 +263,41 @@ can iterate over the Stream and assign the Forte name to each Chord's
 .. image:: usersGuide_25_postTonalTools1_files/_fig_16.png
 
 
+We can use the ``itertools.combinations`` function to find all possible
+subsets of a chord for a given cardinality. (Hat tip to John Chittum for
+the hint). Here is the ``all tri-chord hexachord`` which contains within
+it all possible three-note chords under inversion and transposition:
+
+.. code:: python
+
+    import itertools
+    c = chord.Chord([0, 1, 2, 4, 7, 8])
+    c.commonName
+
+
+.. parsed-literal::
+   :class: ipython-result
+
+    'all tri-chord hexachord'
+
+
+Now we'll test this create a set to hold the Forte number for each
+trichord and see that all twelve of them are there:
+
+.. code:: python
+
+    cc = set()
+    for i in itertools.combinations(c.pitches, 3):
+        cc.add(chord.Chord(i).forteClassNumber)
+    cc
+
+
+.. parsed-literal::
+   :class: ipython-result
+
+    {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+
+
 Creating and Processing Twelve-Tone Matrices
 --------------------------------------------
 
@@ -338,5 +374,5 @@ successive lines.
     bStream.show()
 
 
-.. image:: usersGuide_25_postTonalTools1_files/_fig_20.png
+.. image:: usersGuide_25_postTonalTools1_files/_fig_22.png
 

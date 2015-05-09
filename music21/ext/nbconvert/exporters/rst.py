@@ -17,7 +17,7 @@ from IPython.utils.traitlets import Unicode
 from IPython.config import Config
 
 # local import
-import exporter
+from music21.ext.nbconvert.exporters import exporter
 
 #-----------------------------------------------------------------------------
 # Classes

@@ -18,9 +18,9 @@ from IPython.utils.traitlets import Unicode
 from IPython.config import Config
 
 # local import
-import latex
+from music21.ext.nbconvert.exporters import latex
 
-from nbconvert.transformers.sphinx import SphinxTransformer
+from music21.ext.nbconvert.transformers.sphinx import SphinxTransformer
 
 #-----------------------------------------------------------------------------
 # Classes

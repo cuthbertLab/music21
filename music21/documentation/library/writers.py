@@ -9,9 +9,11 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
+import codecs
 import os
 import re
 
+from music21.ext import six
 from music21 import common
 from music21 import exceptions21
 
@@ -42,8 +44,11 @@ class ReSTWriter(object):
             if rst == oldRst:
                 shouldWrite = False
         if shouldWrite:
-            with open(filePath, 'w') as f:
-                f.write(rst)
+            with codecs.open(filePath, 'w', 'utf-8') as f:
+                try:
+                    f.write(rst)
+                except UnicodeEncodeError as uee:
+                    six.raise_from(DocumentationWritersException("Could not write %s with rst:\n%s" % (filePath, rst)), uee)
             print('\tWROTE   {0}'.format(common.relativepath(filePath)))
         else:
             print('\tSKIPPED {0}'.format(common.relativepath(filePath)))

@@ -16,7 +16,7 @@ Reveal slide show exporter.
 from IPython.utils.traitlets import Unicode
 
 # local import
-import basichtml
+from music21.ext.nbconvert.exporters import basichtml
 
 import nbconvert.transformers.revealhelp
 

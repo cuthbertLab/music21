@@ -303,8 +303,10 @@ class PickleFilter(object):
 _registeredSubconverters = []
 _deregisteredSubconverters = [] # default subconverters to skip
 
-def _resetSubconverters():
-    '''hidden method to reset state'''
+def resetSubconverters():
+    '''
+    Reset state to default (removing all registered and deregistered subconverters.
+    '''
     global _registeredSubconverters # pylint: disable=global-statement
     global _deregisteredSubconverters # pylint: disable=global-statement
     _registeredSubconverters = []
@@ -328,7 +330,7 @@ def registerSubconverter(newSubConverter):
     ('sonix', <class 'music21.ConverterSonix'>)   
     ...
 
-    >>> converter._resetSubconverters() #_DOCS_HIDE
+    >>> converter.resetSubconverters() #_DOCS_HIDE
 
     '''
     _registeredSubconverters.append(newSubConverter)
@@ -337,7 +339,7 @@ def unregisterSubconverter(removeSubconverter):
     '''
     Remove a Subconverter from the list of registered subconverters.
     
-    >>> converter._resetSubconverters() #_DOCS_HIDE    
+    >>> converter.resetSubconverters() #_DOCS_HIDE    
     >>> mxlConverter = converter.subConverters.ConverterMusicXML
 
     >>> c = converter.Converter()
@@ -363,7 +365,7 @@ def unregisterSubconverter(removeSubconverter):
     >>> c.subconvertersList()
     []
 
-    >>> converter._resetSubconverters() #_DOCS_HIDE
+    >>> converter.resetSubconverters() #_DOCS_HIDE
 
     '''
     global _registeredSubconverters # pylint: disable=global-statement
@@ -616,7 +618,7 @@ class Converter(object):
     # Subconverters
     def subconvertersList(self):
         '''
-        >>> converter._resetSubconverters() #_DOCS_HIDE
+        >>> converter.resetSubconverters() #_DOCS_HIDE
         >>> c = converter.Converter()
         >>> scl = c.subconvertersList()
         >>> defaultScl = c.defaultSubconverters()
@@ -630,7 +632,7 @@ class Converter(object):
         >>> ConverterSonix in c.subconvertersList()
         True
 
-        >>> converter._resetSubconverters() #_DOCS_HIDE
+        >>> converter.resetSubconverters() #_DOCS_HIDE
         '''
         subConverterList = []
         if len(_registeredSubconverters) > 0:
@@ -680,7 +682,6 @@ class Converter(object):
         <class 'music21.converter.subConverters.ConverterVexflow'>
         <class 'music21.converter.subConverters.SubConverter'>        
         '''
-        import types
         defaultSubconverters = []
         for i in sorted(list(subConverters.__dict__.keys())):
             name = getattr(subConverters, i)
@@ -775,7 +776,7 @@ class Converter(object):
         >>> converter.registerSubconverter(ConverterSonix)
         >>> c.formatFromHeader('sonix: AIFF data')
         ('sonix', 'AIFF data')
-        >>> converter._resetSubconverters() #_DOCS_HIDE    
+        >>> converter.resetSubconverters() #_DOCS_HIDE    
         '''
         dataStrStartLower = dataStr[:20].lower()
         if six.PY3 and isinstance(dataStrStartLower, bytes):
@@ -1188,7 +1189,7 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
-        import sys, types
+        import sys
         for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:

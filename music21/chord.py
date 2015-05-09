@@ -3076,10 +3076,13 @@ class Chord(note.NotRest):
         >>> c3.commonName
         'all-interval tetrachord'
 
+        >>> c3 = chord.Chord([0, 1, 2, 3, 4, 9])
+        >>> c3.commonName
+        ''
         '''
         self._updateChordTablesAddress()
         ctn = chordTables.addressToCommonNames(self._chordTablesAddress)
-        if len(ctn) == 0:
+        if ctn is None or len(ctn) == 0:
             return ''
         else:
             return ctn[0]
