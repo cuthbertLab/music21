@@ -20,6 +20,10 @@ can freely import from it.
 class Music21Exception(Exception):
     pass
 
+class StreamException(Music21Exception):
+    pass
+
+
 # should be renamed:
 class GroupException(Music21Exception):
     pass

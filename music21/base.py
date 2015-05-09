@@ -1327,7 +1327,10 @@ class Music21Object(object):
                 currentIndex += 1
         # go to right, start at rightmost
         elif ascend and not beginNearest:
-            lastIndex = site.index(self) + 1 # end with next
+            try:
+                lastIndex = site.index(self) + 1 # end with next
+            except exceptions21.StreamException: 
+                return None # see note below
             currentIndex = siteLength
             while (currentIndex >= lastIndex):
                 nextObj = siteElements[currentIndex]
@@ -1339,7 +1342,13 @@ class Music21Object(object):
                 currentIndex -= 1
         # go to left, start at nearest
         elif not ascend and beginNearest:
-            currentIndex = site.index(self) - 1 # start with next
+            try:
+                currentIndex = site.index(self) - 1 # start with next
+            except exceptions21.StreamException: 
+                return None 
+                # this may happen because a Stream may be in an object's .sites
+                # after a deepcopy but which does not actually have the object in it.
+                # TODO: Remove this check after sites is completely cleaned up so does not happen. 
             while (currentIndex >= 0):
                 nextObj = siteElements[currentIndex]
                 if classFilterList is not None:
@@ -1350,7 +1359,10 @@ class Music21Object(object):
                 currentIndex -= 1
         # go to left, start at leftmost
         elif not ascend and not beginNearest:
-            lastIndex = site.index(self) - 1 # start with next
+            try:
+                lastIndex = site.index(self) - 1 # start with next
+            except exceptions21.StreamException:
+                return None # see note above
             currentIndex = 0
             while (currentIndex <= lastIndex):
                 nextObj = siteElements[currentIndex]
@@ -1475,6 +1487,12 @@ class Music21Object(object):
         True
         >>> m3.previous('Note', flattenLocalSites=True) is m2.notes[-1]
         True
+        
+        
+        TODO:  Try:  l = corpus.parse('luca/gloria'); for el in l.recurse: print(el, el.previous('Note'))
+        SLOWEST THING EVER! why????
+        
+        
         '''
         return self._adjacencySearch(classFilterList=classFilterList,
                     ascend=False, beginNearest=beginNearest, flattenLocalSites=flattenLocalSites)
@@ -3758,7 +3776,7 @@ class Test(unittest.TestCase):
         # we cannot get a bar duration b/c we have not associated a ts
         try:
             m2.barDuration.quarterLength
-        except stream.StreamException:
+        except exceptions21.StreamException:
             pass
 
         # append to Score
@@ -4328,6 +4346,43 @@ class Test(unittest.TestCase):
                                     "<music21.stream.Part p1>",
                                     "<music21.stream.Measure 2 offset=0.0>",
                                     "<music21.stream.Part p2>"])
+        
+    def testPreviousAfterDeepcopy(self):
+        from music21 import stream, note
+        e1 = note.Note('C')
+        e2 = note.Note('D')
+        s = stream.Stream()
+        s.insert(0, e1)
+        s.insert(1, e2)
+        self.assertIs(e2.previous(), e1)
+        self.assertIs(s[1].previous(), e1)
+        t = copy.deepcopy(s)
+        self.assertIs(t[1].previous(), t[0])
+
+        e1 = note.Note('C')
+        e2 = note.Note('D')
+        
+        v = stream.Part()
+        m1 = stream.Measure()
+        m1.number = 1
+        m1.insert(0, e1)
+        v.insert(0, m1)
+        m2 = stream.Measure()
+        m2.insert(0, e2)
+        m2.number = 2
+        v.append(m2)
+        self.assertIs(e2.previous('Note'), e1)
+        self.assertIs(v[1][0], e2)
+        self.assertIs(v[1][0].previous('Note'), e1)
+
+        w = v.transpose('M3') # same as deepcopy, but more instructive in debugging since pitches change...
+        #w = copy.deepcopy(v)
+        ecopy1 = w[0][0]
+        ecopy2 = w[1][0]
+        prev = ecopy2.previous('Note')
+        self.assertIs(prev, ecopy1)
+        
+        
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -4383,7 +4438,7 @@ def mainTest(*testClasses, **kwargs):
     
     globs = None
     if ('noDocTest' in testClasses or 'noDocTest' in sys.argv
-        or 'nodoctest' in sys.argv):
+        or 'nodoctest' in sys.argv or bool(kwargs.get('noDocTest', False))):
         skipDoctest = True
     else:
         skipDoctest = False
@@ -4395,7 +4450,7 @@ def mainTest(*testClasses, **kwargs):
     else:
         # create test suite derived from doc tests
         # here we use '__main__' instead of a module
-        if 'moduleRelative' in testClasses or 'moduleRelative' in sys.argv:
+        if 'moduleRelative' in testClasses or 'moduleRelative' in sys.argv or bool(kwargs.get('moduleRelative', False)):
             pass
         else:
             globs = __import__('music21').__dict__.copy()
@@ -4406,11 +4461,11 @@ def mainTest(*testClasses, **kwargs):
             )
 
     verbosity = 1
-    if 'verbose' in testClasses or 'verbose' in sys.argv:
+    if 'verbose' in testClasses or 'verbose' in sys.argv or bool(kwargs.get('verbose', False)):
         verbosity = 2 # this seems to hide most display
 
     displayNames = False
-    if 'list' in sys.argv or 'display' in sys.argv:
+    if 'list' in sys.argv or 'display' in sys.argv or bool(kwargs.get('display', False)) or bool(kwargs.get('list', False)):
         displayNames = True
         runAllTests = False
 
@@ -4420,9 +4475,11 @@ def mainTest(*testClasses, **kwargs):
         if arg not in ['list', 'display', 'verbose', 'nodoctest']:
             # run a test directly named in this module
             runThisTest = sys.argv[1]
+    if bool(kwargs.get('runTest', False)):
+        runThisTest = kwargs.get('runTest', False)
 
     # -f, --failfast
-    if 'onlyDocTest' in sys.argv or 'onlyDocTest' in testClasses:
+    if 'onlyDocTest' in sys.argv or 'onlyDocTest' in testClasses or bool(kwargs.get('onlyDocTest', False)):
         testClasses = [] # remove cases
     for t in testClasses:
         if not isinstance(t, basestring):
@@ -4473,8 +4530,7 @@ def mainTest(*testClasses, **kwargs):
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
-    #sys.argv.append('testContextSitesB')
-    mainTest(Test)
+    mainTest(Test, runTest='testPreviousAfterDeepcopy')
 
 
 #------------------------------------------------------------------------------

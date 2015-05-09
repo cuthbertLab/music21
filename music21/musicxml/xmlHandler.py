@@ -47,8 +47,11 @@ from music21.ext.six import StringIO, BytesIO
 try:
     import cPickle as pickleMod # much faster...
 except ImportError:
-    # in case we're on Jython, etc.
-    import pickle as pickleMod
+    try:
+        import _pickle as pickleMod # Python3 -- whatever the version is...
+    except ImportError:
+        # in case we're on Jython, etc.
+        import pickle as pickleMod
 
 import xml.sax
 import xml.dom.minidom # @UnusedImport

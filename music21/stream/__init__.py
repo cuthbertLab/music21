@@ -58,12 +58,11 @@ from music21 import environment
 _MOD = "stream.py"
 environLocal = environment.Environment(_MOD)
 
+StreamException = exceptions21.StreamException
+
 #------------------------------------------------------------------------------
 # Metaclass
 _OffsetMap = collections.namedtuple('OffsetMap', ['element','offset', 'endTime', 'voiceIndex'])
-
-class StreamException(exceptions21.Music21Exception):
-    pass
 
 #------------------------------------------------------------------------------
 
@@ -3377,6 +3376,7 @@ class Stream(base.Music21Object):
         Get a region of Measures based on a start and end Measure number, 
         where the boundary numbers are both included. 
         That is, a request for measures 4 through 10 will return 7 Measures, numbers 4 through 10.
+        It is allowed to pass `numberEnd=None`, which will be interpreted as the last measure of the stream.
 
         Additionally, any number of associated classes can be gathered as well. 
         Associated classes are the last found class relevant to this Stream or Part.
@@ -7738,7 +7738,7 @@ class Stream(base.Music21Object):
         return returnObj
 
 
-    def quantize(self, quarterLengthDivisors=(4, 3),
+    def quantize(self, quarterLengthDivisors=None,
             processOffsets=True, processDurations=True, inPlace=False, recurse=True):
         '''
         Quantize time values in this Stream by snapping offsets
@@ -7750,7 +7750,8 @@ class Stream(base.Music21Object):
         settings. For example, (2,) will snap all events to eighth note grid.
         (4, 3) will snap events to sixteenth notes and eighth note triplets,
         whichever is closer. (4, 6) will snap events to sixteenth notes and
-        sixteenth note triplets.
+        sixteenth note triplets.  If quarterLengthDivisors is not specified then
+        defaults.quantizationQuarterLengthDivisors is used.  The default is (4, 3).
 
         `processOffsets` determines whether the Offsets are quantized.
 
@@ -7780,10 +7781,49 @@ class Stream(base.Music21Object):
         [0.5, 0.5, 0.5, 0.25, 0.25]
 
 
+        # test with default quarterLengthDivisors...
+
+        >>> s = stream.Stream()
+        >>> s.repeatInsert(n, [0.1, .49, .9])
+        >>> nshort = note.Note()
+        >>> nshort.quarterLength = .26
+        >>> s.repeatInsert(nshort, [1.49, 1.76])
+        >>> t = s.quantize(processOffsets=True, processDurations=True, inPlace=False)
+        >>> [e.offset for e in t]
+        [0.0, 0.5, 1.0, 1.5, 1.75]
+        >>> [e.duration.quarterLength for e in t]
+        [0.5, 0.5, 0.5, 0.25, 0.25]
+
+        OMIT_FROM_DOCS
+
+
+        Test changing defaults, running, and changing back...
+        
+
+        >>> dd = defaults.quantizationQuarterLengthDivisors
+        >>> defaults.quantizationQuarterLengthDivisors = (3,)
+
+        >>> u = s.quantize(processOffsets=True, processDurations=True, inPlace=False)
+        >>> [e.offset for e in u]
+        [0.0, Fraction(1, 3), 1.0, Fraction(4, 3), Fraction(5, 3)]
+        >>> [e.duration.quarterLength for e in u]
+        [Fraction(1, 3), Fraction(1, 3), Fraction(1, 3), Fraction(1, 3), Fraction(1, 3)]
+
+        >>> defaults.quantizationQuarterLengthDivisors = dd
+        >>> v = s.quantize(processOffsets=True, processDurations=True, inPlace=False)
+        >>> [e.offset for e in v]
+        [0.0, 0.5, 1.0, 1.5, 1.75]
+        >>> [e.duration.quarterLength for e in v]
+        [0.5, 0.5, 0.5, 0.25, 0.25]
+        
+
         TODO: test recurse and inPlace etc.
         TODO: recurse should be off by default -- standard
 
         '''
+        if quarterLengthDivisors is None:
+            quarterLengthDivisors = defaults.quantizationQuarterLengthDivisors
+        
         # this presently is not trying to avoid overlaps that
         # result from quantization; this may be necessary
 
@@ -7814,13 +7854,19 @@ class Stream(base.Music21Object):
             for e in useStream._elements:
                 if processOffsets:
                     o = e.getOffsetBySite(useStream)
+                    sign = 1
+                    if o < 0:
+                        sign = -1
+                        o = -1 * o
                     unused_error, oNew, signedError = bestMatch(float(o), quarterLengthDivisors)
-                    useStream.setElementOffset(e, oNew)
+                    useStream.setElementOffset(e, oNew * sign)
                     if hasattr(e, 'editorial') and hasattr(e.editorial, 'misc') and signedError != 0:
-                        e.editorial.misc['offsetQuantizationError'] = signedError
+                        e.editorial.misc['offsetQuantizationError'] = signedError * sign
                 if processDurations:
                     if e.duration is not None:
                         ql = e.duration.quarterLength
+                        if ql < 0:  # buggy MIDI file? 
+                            ql = 0
                         unused_error, qlNew, signedError = bestMatch(float(ql), quarterLengthDivisors)
                         e.duration.quarterLength = qlNew
                         if hasattr(e, 'editorial') and hasattr(e.editorial, 'misc') and signedError != 0:

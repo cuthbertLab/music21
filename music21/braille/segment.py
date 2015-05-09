@@ -962,7 +962,7 @@ def prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets = SEGMENT_SLURLO
             try:
                 slur[0].index = allNotes.index(slur[0])
                 slur[1].index = allNotes.index(slur[1])
-            except stream.StreamException:
+            except exceptions21.StreamException:
                 continue
             beginIndex = slur[0].index
             endIndex = slur[1].index
@@ -1289,7 +1289,7 @@ def prepareBeamedNotes(music21Measure):
             afterStopNote = allNotesAndRests[stopIndex+1]
             if isinstance(afterStopNote, note.Rest) and (int(afterStopNote.beat) == int(stopNote.beat)):
                 allNotesOfSameValue = False
-        except stream.StreamException: # stopNote is last note of measure.
+        except exceptions21.StreamException: # stopNote is last note of measure.
             pass
         if not allNotesOfSameValue:
             continue
@@ -1298,7 +1298,7 @@ def prepareBeamedNotes(music21Measure):
             # grouping may not be used, unless the eighth is located in a new measure.
             if allNotesAndRests[stopIndex+1].quarterLength == 0.5:
                 continue
-        except stream.StreamException: # stopNote is last note of measure.
+        except exceptions21.StreamException: # stopNote is last note of measure.
             pass
         startNote.beamStart = True
         try:

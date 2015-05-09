@@ -929,7 +929,11 @@ class Key(KeySignature, scale.DiatonicScale):
                 focus.append(cc)
 #         print focus
 #         print
-
+        if len(focus) < 2:
+            if self.correlationCoefficient <= 0:
+                return 0.0
+            else:
+                return self.correlationCoefficient
         # take abs magnitude as one factor; assume between 0 and 1
         # greater certainty often has a larger number
         absMagnitude = focus[0] 
