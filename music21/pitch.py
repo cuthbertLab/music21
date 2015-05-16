@@ -3258,20 +3258,41 @@ class Pitch(object):
                 return True
             return False
 
+    def _getEnharmonicHelper(self, inPlace, intervalString):
+        '''
+        abstracts the code from `getHigherEnharmonic` and `getLowerEnharmonic`
+        '''
+        intervalObj = interval.Interval(intervalString)
+        octaveStored = self.octave # may be None
+        if not inPlace:
+            post = intervalObj.transposePitch(self, maxAccidental=None)
+            if octaveStored is None:
+                post.octave = None
+            return post
+        else:
+            p = intervalObj.transposePitch(self, maxAccidental=None)
+            self.step = p.step
+            self.accidental = p.accidental
+            if p.microtone is not None:
+                self.microtone = p.microtone
+            if octaveStored is None:
+                self.octave = None
+            else:
+                self.octave = p.octave
+            return None
+
     def getHigherEnharmonic(self, inPlace=False):
         '''
         Returns an enharmonic `Pitch` object that is a higher
         enharmonic.  That is, the `Pitch` a diminished-second above
         the current `Pitch`.
 
-
         >>> p1 = pitch.Pitch('C#3')
         >>> p2 = p1.getHigherEnharmonic()
         >>> print(p2)
         D-3
 
-
-        We can also set it in place:
+        We can also set it in place (in which case it returns None):
 
         >>> p1 = pitch.Pitch('C#3')
         >>> p1.getHigherEnharmonic(inPlace=True)
@@ -3291,29 +3312,30 @@ class Pitch(object):
         Traceback (most recent call last):
         AccidentalException: -5 is not a supported accidental type
 
+
+        Note that half accidentals get converted to microtones:
+
+        >>> pHalfSharp = pitch.Pitch('D~4')
+        >>> p3QtrsFlat = pHalfSharp.getHigherEnharmonic()
+        >>> print(p3QtrsFlat)
+        E-4(-50c)
+
+        (Same thing if done in place; prior bug)
+
+        >>> pHalfSharp = pitch.Pitch('D~4')
+        >>> pHalfSharp.getHigherEnharmonic(inPlace=True)
+        >>> print(pHalfSharp)
+        E-4(-50c)
+
         '''
-        intervalObj = interval.Interval('d2')
-        octaveStored = self.octave # may be None
-        if not inPlace:
-            post = intervalObj.transposePitch(self, maxAccidental=None)
-            if octaveStored is None:
-                post.octave = None
-            return post
-        else:
-            p = intervalObj.transposePitch(self, maxAccidental=None)
-            self._setName(p.nameWithOctave)
-            self.accidental = p.accidental
-            if octaveStored is None:
-                self.octave = None
-            return None
+        return self._getEnharmonicHelper(inPlace, 'd2')
 
     def getLowerEnharmonic(self, inPlace=False):
         '''
         returns a Pitch enharmonic that is a diminished second
         below the current note
 
-        If `inPlace` is set to true, changes the current Pitch.
-
+        If `inPlace` is set to true, changes the current Pitch and returns None.
 
         >>> p1 = pitch.Pitch('C-3')
         >>> p2 = p1.getLowerEnharmonic()
@@ -3325,20 +3347,7 @@ class Pitch(object):
         >>> print(p1)
         B##2
         '''
-        intervalObj = interval.Interval('-d2')
-        octaveStored = self.octave # may be None
-        if not inPlace:
-            post = intervalObj.transposePitch(self)
-            if octaveStored is None:
-                post.octave = None
-            return post
-        else:
-            p = intervalObj.transposePitch(self)
-            self._setName(p.nameWithOctave)
-            self.accidental = p.accidental
-            if octaveStored is None:
-                self.octave = None
-            return None
+        return self._getEnharmonicHelper(inPlace, '-d2')
 
     def simplifyEnharmonic(self, inPlace=False, mostCommon=False):
         '''
@@ -3482,6 +3491,14 @@ class Pitch(object):
         >>> p = pitch.Pitch('B#')
         >>> p.getEnharmonic()
         <music21.pitch.Pitch C>
+        
+        
+        Works with half-sharps, etc. but converts them to microtones:
+        
+        >>> p = pitch.Pitch('D~')
+        >>> print(p.getEnharmonic())
+        E-(-50c)
+        
         '''
         if inPlace:
             post = self
