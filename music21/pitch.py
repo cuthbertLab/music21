@@ -1600,7 +1600,11 @@ class Pitch(object):
         return post
 
     alter = property(_getAlter,
-        doc = '''Return the pitch alteration as a numeric value, where 1 is the space of one half step and all base pitch values are given by step alone. Thus, the alter value combines the pitch change suggested by the Accidental and the Microtone combined.
+        doc = '''
+        Return the pitch alteration as a numeric value, where 1 
+        is the space of one half step and all base pitch values are 
+        given by step alone. Thus, the alter value combines the pitch change 
+        suggested by the Accidental and the Microtone combined.
 
 
         >>> p = pitch.Pitch('g#4')
@@ -1628,7 +1632,8 @@ class Pitch(object):
         >>> str(p), p.microtone
         ('G#(+50c)', (+50c))
 
-        >>> p = pitch.Pitch('A`')
+        >>> p = pitch.Pitch('A')
+        >>> p.accidental = pitch.Accidental('half-flat')  # back-tick
         >>> str(p), p.microtone
         ('A`', (+0c))
         >>> x = p.convertQuarterTonesToMicrotones(inPlace=False)
@@ -2249,11 +2254,13 @@ class Pitch(object):
             return self.step + str(self.octave)
 
     def _getPitchClass(self):
-        return int(round(self.ps % 12))
+        pc = int(round(self.ps) % 12)
+        if pc == 12:
+            pc = 0
+        return pc
 
     def _setPitchClass(self, value):
         '''Set the pitchClass.
-
 
         >>> a = pitch.Pitch('a3')
         >>> a.pitchClass = 3
@@ -2279,7 +2286,6 @@ class Pitch(object):
         C#=1, D=2...B=11. Can be set using integers (0-11) or 'A' or 'B'
         for 10 or 11.
 
-
         >>> a = pitch.Pitch('a3')
         >>> a.pitchClass
         9
@@ -2298,6 +2304,57 @@ class Pitch(object):
         10
         >>> dis.name
         'B-'
+        
+        Extreme octaves will not affect pitchClass
+        
+        >>> dis.octave = -10
+        >>> dis.pitchClass
+        10
+        
+        In the past, certain microtones and/or octaves were returning pc 12! 
+        This is now fixed.
+        
+        >>> flattedC = pitch.Pitch('C4')
+        >>> flattedC.microtone = -4
+        >>> print(flattedC)
+        C4(-4c)
+        >>> flattedC.pitchClass
+        0
+        >>> print(flattedC.ps)
+        59.96
+        >>> flattedC.octave = -3
+        >>> print(flattedC.ps)
+        -24.04
+        >>> flattedC.pitchClass
+        0
+        
+        Note that the pitchClass of a microtonally altered pitch is the pitch class of
+        the nearest pitch and that differences can occur between Python 2 and Python 3
+        rounding mechanisms.  For instance, C~4 (C half sharp 4) is pitchClass 1 in
+        Python 2, which rounds the ps of 60.5 to 61, while it is pitchClass 0 in Python 3,
+        which uses the "round-to-even" algorithm for rounding. However, C#~ (C one-and-a-half-sharp)
+        will round the same way in each system, to D.
+        
+        >>> p = pitch.Pitch("C#~4")
+        >>> p.ps
+        61.5
+        >>> p.pitchClass
+        2
+        
+        This means that pitchClass + microtone is NOT a good way to estimate the frequency
+        of a pitch.  For instance, if we take a pitch that is 90% of the way between pitchClass
+        0 (C) and pitchClass 1 (C#/D-flat), this formula gives an inaccurate answer of 1.9, not
+        0.9:
+        
+        >>> p = pitch.Pitch("C4")
+        >>> p.microtone = 90
+        >>> p
+        <music21.pitch.Pitch C4(+90c)>
+        >>> p.pitchClass + p.microtone.cents/100.0
+        1.9
+        
+        
+        
         ''')
 
 
@@ -3138,16 +3195,68 @@ class Pitch(object):
         >>> p3.isEnharmonic(p1)
         False
 
-        OMIT_FROM_DOCS
+        Quarter tone enharmonics work as well:
+        
+        >>> pC = pitch.Pitch('C4')
+        >>> pC.accidental = pitch.Accidental('one-and-a-half-sharp')
+        >>> pC
+        <music21.pitch.Pitch C#~4>
+        >>> pD = pitch.Pitch('D4')
+        >>> pD.accidental = pitch.Accidental('half-flat')
+        >>> pD
+        <music21.pitch.Pitch D`4>
+        >>> pC.isEnharmonic(pD)
+        True
+
+        Notes in different ranges are not enharmonics:
+        
+        >>> pitch.Pitch("C#4").isEnharmonic( pitch.Pitch("D-5") )
+        False
+
+        However, different octaves can be the same range, because octave number
+        is relative to the `step` (natural form) of the pitch.
+        
+        >>> pitch.Pitch("C4").isEnharmonic( pitch.Pitch("B#3") )
+        True
+        >>> pitch.Pitch("C4").isEnharmonic( pitch.Pitch("B#4") )
+        False
+
+        If either pitch is octaveless, then they a pitch in any octave will match:
+        
+        >>> pitch.Pitch("C#").isEnharmonic( pitch.Pitch("D-9") )
+        True
+        >>> pitch.Pitch("C#4").isEnharmonic( pitch.Pitch("D-") )
+        True
+        
+        Microtonally altered pitches do not return True unless the microtones are the same:
+        
+        >>> pSharp = pitch.Pitch("C#4")
+        >>> pSharp.microtone = 20
+        >>> pFlat = pitch.Pitch("D-4")
+        >>> pSharp.isEnharmonic(pFlat)
+        False
+        
+        >>> pFlat.microtone = 20
+        >>> pSharp.isEnharmonic(pFlat)
+        True
+        
+
+        Extreme enharmonics seem to work great.
+
         >>> p4 = pitch.Pitch('B##3')
         >>> p5 = pitch.Pitch('D-4')
         >>> p4.isEnharmonic(p5)
         True
         '''
+        if other.octave is None or self.octave is None:
+            if (other.ps - self.ps) % 12 == 0:
+                return True
+            return False
         # if pitch space are equal, these are enharmonics
-        if other.ps == self.ps:
-            return True
-        return False
+        else:
+            if other.ps == self.ps:
+                return True
+            return False
 
     def getHigherEnharmonic(self, inPlace=False):
         '''
