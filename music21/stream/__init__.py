@@ -11010,7 +11010,7 @@ class Measure(Stream):
         
         >>> xml = musicxml.m21ToString.fromMeasure(m)
         >>> print(xml)
-        <?xml version="1.0" ?>
+        <?xml version="1.0"...?>
         ...
         <part id="...">
             <measure number="4A">
@@ -11019,8 +11019,10 @@ class Measure(Stream):
         Test round tripping:
         
         >>> s2 = converter.parseData(xml)
-        >>> s2.semiFlat.getElementsByClass('Measure')[0].measureNumberWithSuffix()
-        '4A'        
+        >>> print(s2.semiFlat.getElementsByClass('Measure')[0].measureNumberWithSuffix())
+        4A        
+        
+        Note that we use print here because in parsing the data will become a unicode string.        
         '''
         if self.numberSuffix:
             return str(self.number) + self.numberSuffix
