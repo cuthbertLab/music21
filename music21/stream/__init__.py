@@ -10997,6 +10997,31 @@ class Measure(Stream):
 #        pass
 
     def measureNumberWithSuffix(self):
+        '''
+        Return the measure `.number` with the `.numberSuffix` as a string.
+        
+        >>> m = stream.Measure()
+        >>> m.number = 4
+        >>> m.numberSuffix = "A"
+        >>> m.measureNumberWithSuffix()
+        '4A'
+        
+        Test that it works as musicxml
+        
+        >>> xml = musicxml.m21ToString.fromMeasure(m)
+        >>> print(xml)
+        <?xml version="1.0" ?>
+        ...
+        <part id="...">
+            <measure number="4A">
+        ...
+        
+        Test round tripping:
+        
+        >>> s2 = converter.parseData(xml)
+        >>> s2.semiFlat.getElementsByClass('Measure')[0].measureNumberWithSuffix()
+        '4A'        
+        '''
         if self.numberSuffix:
             return str(self.number) + self.numberSuffix
         else:

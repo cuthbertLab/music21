@@ -1850,7 +1850,7 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
         rbSpanners = [] # for size comparison
 
     mxMeasure = mxObjects.Measure()
-    mxMeasure.set('number', m.number)
+    mxMeasure.set('number', m.measureNumberWithSuffix())
     if m.layoutWidth is not None:
         mxMeasure.set('width', m.layoutWidth)
 
