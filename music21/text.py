@@ -548,12 +548,15 @@ class LanguageDetector(object):
     
     See Trigram docs below...
     '''
-    languageCodes = ['en', 'fr', 'it', 'de', 'cn']
+    languageCodes = ['en', 'fr', 'it', 'de', 'cn', 'la', 'nl']
     languageLong = {'en': 'English',
                     'fr': 'French',
                     'it': 'Italian',
                     'de': 'German',
-                    'cn': 'Chinese',}
+                    'cn': 'Chinese',
+                    'la': 'Latin',
+                    'nl': 'Dutch',
+                    }
     
     def __init__(self, text = None):
         self.text = text
@@ -580,6 +583,8 @@ class LanguageDetector(object):
         'en'
         >>> ld.mostLikelyLanguage("Ciao come stai? Sono molto lento oggi, ma non so perche.")
         'it'
+        >>> ld.mostLikelyLanguage("Credo in unum deum. Patrem omnipotentem. Factorum celi et terre")
+        'la'
         '''
         excTrigram = Trigram(excerpt)
         maxLang = ""
@@ -610,6 +615,8 @@ class LanguageDetector(object):
         3 it
         4 de
         5 cn
+        6 la
+        7 nl
         >>> numLang = ld.mostLikelyLanguageNumeric("Hello there, how are you doing today? I haven't seen you in a while.")
         >>> numLang
         1

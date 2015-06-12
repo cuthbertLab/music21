@@ -862,6 +862,13 @@ class DataSet(object):
     >>> ds.getFeaturesAsList()[1]
     ['bach/bwv324.xml', 0.12, 0.0, 1.0, 0.12, 0.56..., 0.0, ..., 0.52..., 0.0, 0.68..., 0.0, 0.56..., 0, 4, 4, 'Bach']
     >>> ds = ds.getString()
+    
+    
+    By default, all exceptions are caught and printed if debug mode is on.
+    
+    Set ds.failFast = True to not catch them.    
+    
+    Set ds.quiet = False to print them regardless of debug mode.
     '''
 
     def __init__(self, classLabel=None, featureExtractors=()):
@@ -874,6 +881,9 @@ class DataSet(object):
         self._classLabel = classLabel
         # store a multidimensional storage of all features
         self._features = [] 
+        
+        self.failFast = False
+        self.quiet = True
         # set extractors
         self.addFeatureExtractors(featureExtractors)
         
@@ -993,8 +1003,14 @@ class DataSet(object):
                 # in some cases there might be problem; to not fail 
                 try:
                     fReturned = fe.extract()
-                except Exception: # for now take any error  # pylint: disable=broad-except
-                    environLocal.printDebug(['failed feature extactor:', fe])
+                except Exception as e: # for now take any error  # pylint: disable=broad-except
+                    fList = ['failed feature extactor:', fe, str(e)]
+                    if self.quiet is True:                   
+                        environLocal.printDebug(fList)
+                    else:
+                        environLocal.warn(fList)
+                    if self.failFast is True:
+                        raise e
                     # provide a blank feature extactor
                     fReturned = fe.getBlankFeature()
 

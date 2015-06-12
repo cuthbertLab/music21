@@ -1664,7 +1664,10 @@ def noteheadToMxNotehead(obj, defaultColor=None):
 
 
     if nh not in note.noteheadTypeNames:
-        raise NoteheadException('This notehead type is not supported by MusicXML: "%s"' % nh)
+        if nh is None:
+            nh = 'none'
+        else:
+            raise NoteheadException('This notehead type is not supported by MusicXML: "%s"' % nh)
     else:
         # should only set if needed, otherwise creates extra musicxl  data
         #if nh not in ['normal']: 
@@ -2435,6 +2438,7 @@ def streamToMx(s, spannerBundle=None):
         # add score part
         mxPartList.append(mxScorePart)
         # check for last
+        activeIndex = None
         for sg in staffGroups:
             if sg.isLast(p):
                 # find the spanner in the dictionary already-assigned
@@ -2444,7 +2448,8 @@ def streamToMx(s, spannerBundle=None):
                         break
                 mxPartGroup = mxObjects.PartGroup()
                 mxPartGroup.set('type', 'stop')
-                mxPartGroup.set('number', activeIndex)
+                if activeIndex is not None:
+                    mxPartGroup.set('number', activeIndex)
                 mxPartList.append(mxPartGroup)
 
     # addition of parts must simply be in the same order as above
