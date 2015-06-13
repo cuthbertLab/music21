@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+#-------------------------------------------------------------------------------
+# Name:         converter/qmConverter.py
+# Purpose:      Example of subclassing Subconverter to parse a new format
+#
+# Authors:      Michael Scott Cuthbert
+#
+# Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL or BSD, see license.txt
+#-------------------------------------------------------------------------------
 '''
 This is an example of how converter.subConverters.SubConverter
 can be subclassed in order to parse and write an unsupported format
@@ -7,6 +17,10 @@ by spaces:
     C E G D F
     
 and turns each of them into a quarter note in octave 4 in 4/4.
+
+Consult the code to see how it works.  To use, call 
+`converter.registerSubconverter(converter.qmConverter.QMConverter)`.
+
 '''
 
 from music21 import converter, note, stream, meter, environment

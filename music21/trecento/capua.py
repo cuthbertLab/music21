@@ -86,6 +86,10 @@ def applyCapuaToStream(thisStream):
     
     Runs in place.
     '''
+    for n in thisStream:
+        if hasattr(n, 'editorial') and n.editorial.ficta is not None:
+            n.editorial.misc['pmfc-ficta'] = n.editorial.ficta
+    
     clearFicta(thisStream)
     capuaRuleOne(thisStream)
     capuaRuleTwo(thisStream)

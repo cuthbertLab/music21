@@ -506,8 +506,8 @@ class TinyNotationNote(object):
             newTup.durationActual.type = noteObj.duration.type
             newTup.durationNormal.type = noteObj.duration.type
             if 'inQuad' in storedDict and storedDict['inQuad'] == True:
-                newTup.numNotesActual = 4.0
-                newTup.numNotesNormal = 3.0            
+                newTup.numberNotesActual = 4.0
+                newTup.numberNotesNormal = 3.0            
             if 'beginTuplet' in storedDict and storedDict['beginTuplet'] == True:
                 newTup.type = "start"
             noteObj.duration.appendTuplet(newTup)

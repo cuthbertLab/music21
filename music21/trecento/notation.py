@@ -714,7 +714,7 @@ def convertBrevisLength(brevisLength, convertedStream, inpDiv = None, measureNum
         finalMeasure = stream.Measure(number = brevisLength.number + measureNumOffset)
         finalNote = note.Note(mList[0].pitch)
         finalNote.duration = div.barDuration
-        finalNote.tie = tie.Tie('end')
+        finalNote.tie = tie.Tie('stop')
         finalMeasure.append(finalNote)
         measureList.append(finalMeasure)
 

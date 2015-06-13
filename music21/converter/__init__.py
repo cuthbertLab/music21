@@ -330,6 +330,8 @@ def registerSubconverter(newSubConverter):
     ('sonix', <class 'music21.ConverterSonix'>)   
     ...
 
+    See `converter.qmConverter` for an example of an extended subconverter.
+
     >>> converter.resetSubconverters() #_DOCS_HIDE
 
     '''
