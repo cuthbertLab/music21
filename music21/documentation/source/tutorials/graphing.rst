@@ -304,7 +304,7 @@ A basic example follows::
     >>> data = {1:[], 2:[], 3:[]}
     >>> for i in range(len(data.keys())):
     ...    q = [(x, random.choice(range(10*(i+1)))) for x in range(20)]
-    ...    data[data.keys()[i]] = q
+    ...    data[list(data.keys())[i]] = q
     >>> a.setData(data) 
     >>> a.process()  # doctest: +SKIP
 
