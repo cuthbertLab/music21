@@ -3,7 +3,7 @@
 Module to determine how often we would expect to have Francesco\'s cadences happen by chance
 '''
 
-from music21 import common, note
+from music21 import note
 from music21.trecento import cadencebook
 from collections import defaultdict
 #import random
@@ -64,8 +64,8 @@ def countCadencePercentages():
         if incipitTenor is None or cadenceBTenor is None:
             continue
         
-        firstNotes = incipitTenor.getElementsByClass(note.Note)
-        lastNotes  = cadenceBTenor.getElementsByClass(note.Note)
+        firstNotes = incipitTenor.flat.getElementsByClass('Note')
+        lastNotes  = cadenceBTenor.flat.getElementsByClass('Note')
             
         if len(firstNotes) == 0 or len(lastNotes) == 0:
             continue

@@ -39,39 +39,65 @@ def _sendNoteInfo(music21noteObject):
     return retstr
 
 
-class TrecentoCadenceStream(tinyNotation.TinyNotationStream):
-    '''
-    Subclass of Tiny Notation that calls TrecentoCadenceNote instead of TinyNotationNote    
-    
-    
-    >>> dLucaGloriaIncipit = trecento.trecentoCadence.TrecentoCadenceStream("c'2. d'8 c'4 a8 f4 f8 a4 c'4 c'8", '6/8')
-    >>> dLucaGloriaIncipit.makeMeasures(inPlace = True)
-    >>> dLucaGloriaIncipit.rightBarline = 'final'
-    >>> dLucaGloriaIncipit.elements
-    (<music21.stream.Measure 1 offset=0.0>, <music21.stream.Measure 2 offset=3.0>, <music21.stream.Measure 3 offset=6.0>)
-    '''
-    def getNote(self, stringRep, storedDict = {}):
-        try:
-            tcN = TrecentoCadenceNote(stringRep, storedDict)
-            return tcN
-        except tinyNotation.TinyNotationException as inst:
-            raise tinyNotation.TinyNotationException(inst.args[0] + "\nLarger context: " + self.stringRep)
 
-class TrecentoCadenceNote(tinyNotation.TinyNotationNote):
+
+class CadenceNoteToken(tinyNotation.NoteToken):
     '''
     Subclass of TinyNotationNote where 2.. represents a dotted dotted half note (that is, a dotted
     half tied to a dotted quarter) instead of a double dotted note.  This makes entering Trecento
     music (which uses this note value often) much easier.  1.. and 4.. etc. are similarly transformed. 
     '''
-    ## for trecento notation: a double dotted half = 9 eighths, not 7;
-    def getDots(self, stringRep, noteObj):
-        DBLDOT  = '\.\.' 
-        DOT     = '\.'
+    def dots(self, n, search, pm, t, parent):
+        '''
+        adds the appropriate number of dots to the right place.
+        
+        Subclassed in TrecentoNotation where two dots has a different meaning.
+        '''
+        dots = len(search.group(1))
+        if dots == 1:
+            n.duration.dots = 1
+        elif dots == 2:
+            n.duration.dotGroups = [1, 1]
+        t = re.sub(pm, '', t)
+        return t
 
-        if (re.search(DBLDOT, stringRep)):
-            noteObj.duration.dotGroups = [1,1]
-        elif (re.search(DOT, stringRep)):
-            noteObj.duration.dots = 1
+class CadenceRestToken(tinyNotation.RestToken):
+    '''
+    Subclass of TinyNotationNote where 2.. represents a dotted dotted half note (that is, a dotted
+    half tied to a dotted quarter) instead of a double dotted note.  This makes entering Trecento
+    music (which uses this note value often) much easier.  1.. and 4.. etc. are similarly transformed. 
+    '''
+    def dots(self, n, search, pm, t, parent):
+        '''
+        adds the appropriate number of dots to the right place.
+        
+        Subclassed in TrecentoNotation where two dots has a different meaning.
+        '''
+        dots = len(search.group(1))
+        if dots == 1:
+            n.duration.dots = 1
+        elif dots == 2:
+            n.duration.dotGroups = [1, 1]
+        t = re.sub(pm, '', t)
+        return t
+
+
+
+class CadenceConverter(tinyNotation.Converter):
+    '''
+    Subclass of Tiny Notation that calls TrecentoCadenceNote instead of TinyNotationNote    
+    
+    
+    >>> dLucaGloriaIncipit = trecento.trecentoCadence.CadenceConverter("6/8 c'2. d'8 c'4 a8 f4 f8 a4 c'4 c'8").parse().stream
+    >>> dLucaGloriaIncipit.rightBarline = 'final'
+    >>> dLucaGloriaIncipit.elements
+    (<music21.stream.Measure 1 offset=0.0>, <music21.stream.Measure 2 offset=3.0>, <music21.stream.Measure 3 offset=6.0>)
+    '''
+    tokenMap = [
+                (r'(\d+\/\d+)', tinyNotation.TimeSignatureToken),
+                (r'r(\S*)', CadenceRestToken),
+                (r'(\S*)', CadenceNoteToken), # last
+    ]
 
 ###### test routines
 
@@ -98,31 +124,15 @@ class Test(unittest.TestCase):
                 self.assertNotEqual(b, obj)
 
 
-    def testTrecentoNote(self):
-        cn = TrecentoCadenceNote('AA-4.~')
-        a = cn.note # returns the stored music21 note.
-        self.assertEqual(_sendNoteInfo(a),
-                          '''Name: A-
-Step: A
-Octave: 2
-Accidental: flat
-Tie: start
-Duration Type: quarter
-QuarterLength: 1.5
-''')
-
     def testDotGroups(self):
-        cn = TrecentoCadenceNote('c#2..')
-        a = cn.note # returns the stored music21 note.
-
-        self.assertEqual(_sendNoteInfo(a),
-                          '''Name: C#
-Step: C
-Octave: 4
-Accidental: sharp
-Duration Type: half
-QuarterLength: 4.5
-''')
+        cn = CadenceConverter('c#2..')
+        cn.parse()
+        
+        a = cn.stream.flat.notes[0] # returns the stored music21 note.
+        self.assertEqual(a.name, 'C#')
+        self.assertEqual(a.duration.type, 'half')
+        self.assertEqual(a.duration.dotGroups, (1,1))
+        self.assertEqual(a.duration.quarterLength, 4.5)
 
     
 class TestExternal(unittest.TestCase):
@@ -136,7 +146,7 @@ class TestExternal(unittest.TestCase):
         '''
         should display a 6 beat long line with some triplets
         '''
-        st = TrecentoCadenceStream('e2 f8 e f trip{g16 f e} d8 c B trip{d16 c B}')
+        st = CadenceConverter('e2 f8 e f trip{g16 f e} d8 c B trip{d16 c B}').parse().stream
         #for thisNote in st:
         #    print _sendNoteInfo(thisNote)
         #    print "--------"

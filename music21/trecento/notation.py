@@ -49,9 +49,155 @@ _validDivisiones = {
     }
 
 
-#------------------------------------------------------------------------------
+class ClefToken(tinyNotation.Token):
+    def parse(self, parent):
+        from music21 import medren
+        t = self.token
+        menclef = medren.MensuralClef(t[1])
+        if len(t) > 2:
+            menclef.line = t[2]
+        return menclef
 
-class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
+class DivisioneToken(tinyNotation.Token):
+    def parse(self, parent):
+        return Divisione(self.token)
+
+class PunctusToken(tinyNotation.Token):
+    def parse(self, parent):
+        return Punctus()
+    
+class LigatureState(tinyNotation.State):
+    '''
+    defines that the notes in here will be in a ligature
+    '''
+    def start(self):
+        from music21 import medren
+        self.ligature = medren.Ligature()
+        self.ligature.state = self
+        self.obliqueNums = []
+        self.squareNums = []
+        self.ligatureStems = []
+        self.reverseNums = []
+
+    def end(self):
+        for o in self.obliqueNums:
+            self.ligature.makeOblique(o)
+        for s in self.squareNums:
+            self.ligature.makeSquare(s)
+        for i, d, o in self.ligatureStems:
+            self.ligature.setStem(i, d, o)
+        for i in self.reverseNums:
+            self.ligature.setReverse(i, True)
+        del(self.ligature.state)
+        return self.ligature # not nothing
+    
+    def affectTokenAfterParseBeforeModifiers(self, n):
+        n.activeLigature = self.ligature
+        n.numberInLigature = len(self.affectedTokens)
+        self.ligature.pitches = self.ligature.pitches + [n.pitch]
+        return n
+    
+    def affectTokenAfterParse(self, n):
+        super(LigatureState, self).affectTokenAfterParse(n)
+        #        n.ligatureParent = self
+        return None # do not add note to Stream
+
+class MensuralTypeModifier(tinyNotation.Modifier):
+    def postParse(self, n):
+        mensuralType = self.modifierData
+        if mensuralType in ['Mx','L','B','SB','M','SM']:
+            n.mensuralType = mensuralType
+        if hasattr(n, 'activeLigature') and mensuralType == 'Mx':
+            n.activeLigature.setMaxima(n.numberInLigature, True)
+        parent = common.unwrapWeakref(self.parent)
+        parent.stateDict['previousMensuralType'] = mensuralType
+        return n
+
+class StemsModifier(tinyNotation.Modifier):
+    def postParse(self, m21Obj):
+        direction = {'': None, 'S': 'side', 'D': 'down', 'U':'up'}
+        for stem in self.modifierData.split('/'):
+            if stem in direction:
+                m21Obj.setStem(direction[stem])
+            else:
+                raise TrecentoNotationException('could not determine stem direction from %s' % stem)
+
+        return m21Obj
+
+class FlagsModifier(tinyNotation.Modifier):
+    def postParse(self, m21Obj):
+        direction = {'': None, 'S': 'side', 'D': 'down', 'U':'up'}
+        orientation = {'': None,'L': 'left', 'R': 'right'}
+        for flag in self.modifierData.split('/'):
+            if len(flag) > 1 and (flag[0] in direction) and (flag[1] in orientation):
+                m21Obj.setFlag(direction[flag[0]], orientation[flag[1]])
+            else:
+                raise TrecentoNotationException('cannot determine flag from %s' % flag)
+        return m21Obj
+
+class LigatureStemsModifier(tinyNotation.Modifier):
+    def postParse(self, m21Obj):
+        direction = {'D': 'down', 'U':'up'}
+        orientation = {'L': 'left', 'R': 'right'}
+        try:
+            d = direction[self.modifierData[0]]
+            o = orientation[self.modifierData[1]]
+            tup = (m21Obj.numberInLigature, d, o)
+            m21Obj.activeLigature.state.ligatureStems.append(tup)
+        except (IndexError, KeyError):
+            raise TrecentoNotationException('cannot determine ligature stem from %s' % self.modifierData)
+        return m21Obj
+
+
+class LigatureNoteheadModifier(tinyNotation.Modifier):
+    def postParse(self, m21Obj):
+        try:
+            n = self.modifierData[0]
+            if n == 'o':
+                m21Obj.activeLigature.state.obliqueNums.append(m21Obj.numberInLigature)
+            elif n == 's':
+                m21Obj.activeLigature.state.squareNums.append(m21Obj.numberInLigature)
+            else:
+                raise IndexError
+        except (IndexError, KeyError):
+            raise TrecentoNotationException('cannot make out notehead shape from %s' % self.modifierData)
+        return m21Obj
+
+class LigatureReverseModifier(tinyNotation.Modifier):
+    def __init__(self, modifierData, modifierString, parent):
+        self.modifierData = modifierData
+        self.modifierString = modifierString
+        self.parent = common.wrapWeakref(parent)
+        
+    def postParse(self, n):
+        n.activeLigature.state.reverseNums.append(n.numberInLigature)
+# #------------------------------------------------------------------------------
+# def breakString(string, startBreakChar, endBreakChar,
+#     func=lambda s: s.split()):
+# 
+#     broken = []
+#     while len(string) > 0:
+#         startInd = string.find(startBreakChar)
+#         endInd = string.find(endBreakChar) + 1
+# 
+#         if startInd == -1 and endInd == 0:
+#             broken += string.split()
+#             break
+# 
+#         elif startInd != -1 and endInd != 0:
+#             while string[startInd] != ' ':
+#                 startInd -= 1
+# 
+#             broken += func(string[:startInd])
+#             broken.append(string[startInd:endInd])
+#             string = string[endInd + 1:]
+# 
+#         else:
+#             raise TrecentoNotationException('%s, %s invalid indices' % (startInd, endInd))
+#     return broken
+
+
+class TrecentoTinyConverter(tinyNotation.Converter):
     r'''
     These are modified from a standard lilypond format called TinyNotation.
 
@@ -86,7 +232,7 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
 
         ::
 
-            pitch(mensuralType)[stems]{flags}
+            pitch(mensuralType)[stems]_flags
 
         A mensuralType may be any of Mx for maxima, L for longa, B for brevis,
         SB for semibrevis, M for minima, or SM for semimina. For more
@@ -94,18 +240,16 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
         :class:`music21.medren.generalMensuralNote`.
 
         If no mensural type is specified, it is assumed to be the same as the
-        previous note. I.e., c(SB) B c d is a string of semibrevises.
+        previous note. I.e., c(SB) B c d is a string of semibreves.
 
     ::
 
         >>> from music21 import trecento
-        >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(M)')
-        >>> tTNN.note.pitch
+        >>> tTNN = trecento.notation.TrecentoTinyConverter('a(M)').parse().stream.flat.notes[0]
+        >>> tTNN.pitch
         <music21.pitch.Pitch A4>
 
-    ::
-
-        >>> tTNN.note.mensuralType
+        >>> tTNN.mensuralType
         'minima'
 
     An additional stem may be added by specifying direction: S for a sidestem,
@@ -117,50 +261,46 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
 
     ::
 
-        >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(SB)[S]')
-        >>> tTNN.note.getStems()
+        >>> tTNN = trecento.notation.TrecentoTinyConverter('a(SB)[S]').parse().stream.flat.notes[0]
+        >>> tTNN.getStems()
         ['side']
 
-    ::
-
-        >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(M)[D]')
-        >>> tTNN.note.getStems()
+        >>> tTNN = trecento.notation.TrecentoTinyConverter('a(M)[D]').parse().stream.flat.notes[0]
+        >>> tTNN.getStems()
         ['up', 'down']
 
     A flag may be added by specifying direction of stem and orientation of
     flag. Valid directions are U for up, D for down, and an empty string to
-    reset (sidestems cannot have flags). Valid orietations are L for left, R
-    for right, and an empty string to reset. For example, adding {DL} to a note
+    reset (sidestems cannot have flags). Valid orientations are L for left, R
+    for right, and an empty string to reset. For example, adding _DL to a note
     string would add a left flag to that note's downstem. Flags must still
     follow the rules outlined in :meth:`music21.medren.MensuralNote.setFlag()`.
 
     ::
 
-        >>> tTNN = trecento.notation.TinyTrecentoNotationNote('a(SM){UL}')
-        >>> tTNN.note.getStems()
+        >>> tTNN = trecento.notation.TrecentoTinyConverter('a(SM)_UL').parse().stream.flat.notes[0]
+        >>> tTNN.getStems()
         ['up']
 
-    ::
-
-        >>> flags = tTNN.note.getFlags()
+        >>> flags = tTNN.getFlags()
         >>> sorted(list(flags.keys()))
         ['up']
         >>> flags['up']
         'left'
 
-    Multiple flags may be added by placing a space between
+    Multiple flags may be added by placing a slash between
     direction-orientation pairs, as shown in the following complex example:
 
     ::
 
-        >>> tTNN = trecento.notation.TinyTrecentoNotationNote(
-        ...     'a(SM)[D]{UL DR}')
-        >>> tTNN.note.getStems()
+        >>> tTNN = trecento.notation.TrecentoTinyConverter(
+        ...     'a(SM)[D]_UL/DR').parse().stream.flat.notes[0]
+        >>> tTNN.pitch
+        <music21.pitch.Pitch A4>
+        >>> tTNN.getStems()
         ['up', 'down']
 
-    ::
-        
-        >>> flags = tTNN.note.getFlags()
+        >>> flags = tTNN.getFlags()
         >>> sorted(list(flags.keys()))
         ['down', 'up']
         >>> flags['down']
@@ -169,21 +309,31 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
         'left'
 
     5.  It is also possible to create ligatures using the
-        TinyTrecentoNotationNote class. Put all notes in a ligature within `<`
-        and `>` symbols.
+        TinyTrecentoNotationNote class. Put all notes in a ligature within `lig{`
+        and `}` symbols.
 
     ::
 
-        >>> tTNN = trecento.notation.TinyTrecentoNotationNote('<f g a g f >')
-        >>> tTNN.note
+        >>> ttc = trecento.notation.TrecentoTinyConverter('lig{f g a g f }').parse()
+        >>> ts = ttc.stream
+        >>> ts.show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.medren.Ligature object at 0x...>
+            {0.0} <music21.bar.Barline style=final>
+        >>> tTNN = ts.flat.getElementsByClass('Ligature')[0]
+        >>> tTNN
         <music21.medren.Ligature...>
+        >>> [str(p) for p in tTNN.pitches]
+        ['F4', 'G4', 'A4', 'G4', 'F4', 'C4']
 
-    The notes within a ligature have the syntax pitch*notehead*[stems](maxima).
+    The notes within a ligature have the syntax pitch<notehead>[stems](maxima).
     Valid notehead shapes are s for square and o for oblique. Valid stem
     directions are U for up and D for down, and valid orientations are L for
     left and R for right. To set a note of a ligature as a maxima, append (Mx)
     to the note string. To set a note of a ligature as reversed, append a
-    forward slash to the note string.
+    forward slash followed by an R ("/R") to the note string.
 
     Note, ligatures must follow the rules outlined by
     :class:`music21.medren.Ligature`.
@@ -193,25 +343,23 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
     ::
 
         >>> from music21 import trecento
-        >>> tTNN = trecento.notation.TinyTrecentoNotationNote('<f a[DL]/>')
-        >>> tTNN.note.getStem(1)
+        >>> ts = trecento.notation.TrecentoTinyConverter(r'lig{f a[DL]/R}').parse().stream
+        >>> tTNN = ts.flat.getElementsByClass('Ligature')[0]
+        >>> tTNN.getStem(1)
         ('down', 'left')
 
-    ::
-
-        >>> tTNN.note.isReversed(1)
+        >>> tTNN.isReversed(1)
         True
 
-    ::
 
-        >>> tTNN = trecento.notation.TinyTrecentoNotationNote(
-        ...     '<f*o* g a[UR] g f(Mx)>')
-        >>> print([n.mensuralType for n in tTNN.note.notes])
+        >>> tTNN = trecento.notation.TrecentoTinyConverter(
+        ...     'lig{f<o> g a[UR] g f(Mx)}').parse().stream.flat.getElementsByClass('Ligature')[0]        
+        >>> print([n.mensuralType for n in tTNN.notes])
         ['longa', 'brevis', 'semibrevis', 'semibrevis', 'maxima']
 
     ::
 
-        >>> tTNN.note.getNoteheadShape(1)
+        >>> tTNN.getNoteheadShape(1)
         'oblique'
 
     6.  Separate objects in a TinyNotationStream by spaces. To add a mensural
@@ -226,9 +374,10 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
 
     ::
 
-        >>> tTNS = trecento.notation.TinyTrecentoNotationStream(
-        ...     '$C3 .p. c(SB) d e p d(B) <e d c>')
+        >>> tTNS = trecento.notation.TrecentoTinyConverter(
+        ...     '$C3 .p. c(SB) d e p d(B) lig{e d c}').parse().stream.flat
         >>> tTNS.show('text')
+        {0.0} <music21.bar.Barline style=final>
         {0.0} <music21.clef.MensuralClef>
         {0.0} <music21.trecento.notation.Divisione .p.>
         {0.0} <music21.medren.MensuralNote semibrevis C>
@@ -240,223 +389,47 @@ class TinyTrecentoNotationStream(tinyNotation.TinyNotationStream):
 
     '''
 
-    regularExpressions = {'CLEF': '(\$[A-Z]\d?)',
-                          'DIVISIONE': '(\.[a-z]\.)'}
+    def __init__(self, stringRep=""):
+        super(TrecentoTinyConverter, self).__init__(stringRep)
+        self.tokenMap = [
+                         (r'(\$[A-Z]\d?)', ClefToken),
+                         (r'(\.[a-z]\.)', DivisioneToken),
+                         (r'(p)', PunctusToken),
+                         (r'r(\S*)', TrecentoRestToken),
+                         (r'(\S*)', TrecentoNoteToken)
+                         ]
+        self.stateMap = [
+                        (r'trip\{', tinyNotation.TripletState),
+                        (r'lig\{', LigatureState)                          
+                         ]
+        self.modifierMap = [
+                        (r'\(([A-Z][A-Za-z]?)\)', MensuralTypeModifier),
+                        (r'\[([A-Z]?(\/[A-Z])*)\]', StemsModifier),
+                        (r'\_(([A-Z][A-Z])?(\/[A-Z][A-Z])*)', FlagsModifier),
+                        (r'\[([A-Z][A-Z])\]', LigatureStemsModifier),
+                        (r'\<([a-z])\>', LigatureNoteheadModifier),
+                        (r'(\/R)', LigatureReverseModifier),    
+                        ]
+        self.stateDict['lastDuration'] = 0.0
+        self.stateDict['previousMensuralType'] = None
 
-    def __init__(self, stringRep="", div=None):
-        if 'TRIP' not in self.regularExpressions:
-            self.regularExpressions.update(
-                tinyNotation.TinyNotationStream.regularExpressions)
-        tinyNotation.TinyNotationStream.__init__(self)
-        self.stringRep = stringRep
-        storedDict = {}
-        objList = []
 
+class TrecentoRestToken(tinyNotation.RestToken):
+    def parse(self, parent):
         from music21 import medren
+        r = medren.MensuralRest()  # to-do -- affect..
+        r.mensuralType = parent.stateDict['previousMensuralType']
 
-        def breakString(string, startBreakChar, endBreakChar,
-            func=lambda s: s.split()):
-
-            broken = []
-            while len(string) > 0:
-                startInd = string.find(startBreakChar)
-                endInd = string.find(endBreakChar) + 1
-
-                if startInd == -1 and endInd == 0:
-                    broken += string.split()
-                    break
-
-                elif startInd != -1 and endInd != 0:
-                    while string[startInd] != ' ':
-                        startInd -= 1
-
-                    broken += func(string[:startInd])
-                    broken.append(string[startInd:endInd])
-                    string = string[endInd + 1:]
-
-                else:
-                    raise TrecentoNotationException('%s, %s invalid indices' % (startInd, endInd))
-            return broken
-
-
-        noteStrs = breakString(stringRep, '<', '>', lambda s: breakString(s, '{', '}'))
-
-#        if div is not None:
-#            divisione = div
-
-        for ns in noteStrs:
-            ns = ns.strip()
-
-            if self.CLEF.match(ns) is not None:
-                clefString = self.CLEF.match(ns).group()[1:]
-                clef = medren.MensuralClef(clefString[0])
-                if len(clefString) > 1:
-                    clef.line = clefString[1]
-                objList.append(clef)
-
-            elif self.DIVISIONE.match(ns) is not None:
-                divisioneString = self.DIVISIONE.match(ns).group()
-                objList.append(Divisione(divisioneString))
-
-            else:
-                tTN = None
-                try:
-                    tTN = self.getNote(ns, storedDict)
-                    objList.append(tTN.note)
-                except TrecentoNotationException as value:
-                    raise TrecentoNotationException('%s in context %s' % (value, ns))
-
-        for obj in objList:
-            self.append(obj)
-
-    def getNote(self, stringRep, storedDict = {}):
-
-        return TinyTrecentoNotationNote(stringRep, storedDict)
-
-class TinyTrecentoNotationNote(tinyNotation.TinyNotationNote):
+class TrecentoNoteToken(tinyNotation.NoteToken):
     '''
-    For documentation please see :class:`music21.trecento.notation.TinyTrecentoNotationStream`.
+    For documentation please see :class:`music21.trecento.notation.TrecentoTinyConverter`.
     '''
-    regularExpressions = {
-                    'LIGATURE': '\<.+\>',
-                    'PUNCTUS': 'p',
-                    'MENSURALTYPE': '\([A-Z][A-Za-z]?\)',
-                    'STEMS': '\[[A-Z]?(\s[A-Z])*\]',
-                    'FLAGS': '\{([A-Z][A-Z])?(\s[A-Z][A-Z])*\}',
-                    'LIG_STEMS': '\[[A-Z][A-Z]\]',
-                    'LIG_NOTEHEAD': '\*[a-z]\*',
-                    'LIG_REVERSE': '.\/',
-                    }
-
-    def __init__(self, stringRep = "", timeSignature = None):
-        if tinyNotation.TinyNotationNote.regularExpressions['REST'] not in self.regularExpressions:
-            self.regularExpressions.update(tinyNotation.TinyNotationNote.regularExpressions)
-        tinyNotation.TinyNotationNote.__init__(self, stringRep, timeSignature)
-
-    def _getPitch(self, stringRep):
-        if (self.OCTAVE2.match(stringRep)) is not None: # BB etc.
-            step = self.OCTAVE2.match(stringRep)
-            octave = 3 - len(step.group(1))
-            pitchObj = pitch.Pitch(step.group(1)[0])
-            pitchObj.octave = octave
-
-        elif (self.OCTAVE3.match(stringRep)) is not None:
-            step = self.OCTAVE3.match(stringRep).group(1)
-            octave = 3
-            pitchObj = pitch.Pitch(step)
-            pitchObj.octave = octave
-
-        elif (self.OCTAVE5.match(stringRep)) is not None: # must match octave 5 then 4!
-            step = self.OCTAVE5.match(stringRep)
-            octave = 4 + len(step.group(2))
-            pitchObj = pitch.Pitch(step.group(1)[0])
-            pitchObj.octave = octave
-
-        elif (self.OCTAVE4.match(stringRep)) is not None:
-            step = self.OCTAVE4.match(stringRep).group(1)
-            octave = 4
-            pitchObj = pitch.Pitch(step)
-            pitchObj.octave = octave
-        else:
-            raise TrecentoNotationException("could not get pitch information from " + str(stringRep))
-
-        return pitchObj
-
-    def customPitchMatch(self, stringRep, storedDict):
+    def parse(self, parent):
         from music21 import medren
-
-        noteLikeObj = None
-        storedDict['lastDuration'] = duration.ZeroDuration()
-
-        if self.LIGATURE.search(stringRep) is not None:
-            noteLikeObj = medren.Ligature()
-
-        elif self.PUNCTUS.search(stringRep) is not None:
-            noteLikeObj = Punctus()
-
-        elif self.REST.search(stringRep) is not None:
-            noteLikeObj = medren.MensuralRest()
-
-        else:
-            noteLikeObj = medren.MensuralNote(self._getPitch(stringRep))
-
-        return noteLikeObj
-
-    def customNotationMatch(self, noteLikeObject, stringRep, storedDict):
-        from music21 import medren
-
-        if isinstance(noteLikeObject, medren.Ligature): #Ligature syntax
-
-            ligString = stringRep[1:-1]
-            ligList = ligString.split()
-            noteLikeObject.pitches = [self._getPitch(p[0]) for p in ligList]
-
-            index = 0
-            direction = {'D': 'down', 'U':'up'}
-            orientation = {'L': 'left', 'R': 'right'}
-
-            for ligNote in ligList:
-
-                if self.LIG_STEMS.search(ligNote) is not None:
-                    ligstem = self.LIG_STEMS.search(ligNote).group()[1:-1]
-                    if len(ligstem) > 1 and (ligstem[0] in direction) and (ligstem[1] in orientation):
-                        noteLikeObject.setStem(index, direction[ligstem[0]], orientation[ligstem[1]])
-                    else:
-                        raise TrecentoNotationException('cannot determine ligature stem from %s' % ligstem)
-
-                if self.LIG_NOTEHEAD.search(ligNote) is not None:
-                    notehead = self.LIG_NOTEHEAD.search(ligNote).group()[1:-1]
-                    if notehead == 'o':
-                        noteLikeObject.makeOblique(index)
-                    elif notehead == 's':
-                        noteLikeObject.makeSquare(index)
-                    else:
-                        raise TrecentoNotationException('cannot make out notehead shape from %s' % notehead)
-
-                if self.MENSURALTYPE.search(ligNote) is not None:
-                    mensuralType = self.MENSURALTYPE.search(ligNote).group()[1:-1]
-                    if mensuralType == 'Mx':
-                        noteLikeObject.setMaxima(index, True)
-
-                if self.LIG_REVERSE.search(ligNote) is not None:
-                    noteLikeObject.setReverse(index, True)
-
-                index += 1
-
-        else: #Note syntax
-
-            if self.MENSURALTYPE.search(stringRep) is not None:
-                mensuralType = self.MENSURALTYPE.search(stringRep).group()[1:-1]
-
-                if mensuralType in ['Mx','L','B','SB','M','SM']:
-                    noteLikeObject.mensuralType = mensuralType
-                    storedDict['previousMensuralType'] = mensuralType
-                else:
-                    raise TrecentoNotationException('could not determine mensural type from %s' % mensuralType)
-            else:
-                if 'previousMensuralType' in storedDict:
-                    noteLikeObject.mensuralType = storedDict['previousMensuralType']
-
-            direction = {'': None, 'S': 'side', 'D': 'down', 'U':'up'}
-            orientation = {'': None,'L': 'left', 'R': 'right'}
-
-            if self.STEMS.search(stringRep) is not None:
-                stems = self.STEMS.search(stringRep).group()[1:-1]
-
-                for stem in stems.split():
-                    if stem in direction:
-                        noteLikeObject.setStem(direction[stem])
-                    else:
-                        raise TrecentoNotationException('could not determine stem direction from %s' % stem)
-
-            if self.FLAGS.search(stringRep) is not None:
-                flags = self.FLAGS.search(stringRep).group()[1:-1]
-
-                for flag in flags.split():
-                    if len(flag) > 1 and (flag[0] in direction) and (flag[1] in orientation):
-                        noteLikeObject.setFlag(direction[flag[0]], orientation[flag[1]])
-                    else:
-                        raise TrecentoNotationException('cannot determsine flag from %s' % flag)
+        n = medren.MensuralNote()
+        self.getPitch(n, self.token)
+        n.mensuralType = parent.stateDict['previousMensuralType']
+        return n
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -583,7 +556,7 @@ def convertTrecentoStream(inpStream, inpDiv = None):
     >>> upperString += "b c' b a g a p b(SB) c'(SM) b a g(M) f p a(SB) a(M) g(SB) f(M) p "
     >>> upperString += "e(SB) r g(M) f p g f e f e d p c(SB) d r p a g(SM) a g f e d p e(M) r f(SM) e d e(SB) d(Mx)"
 
-    >>> lowerString = ".p. $C3 c(L) G(B) A(SB) B c p d c r p A B c p d c B p <A*o*[DL] G> A c B A(L) "
+    >>> lowerString = ".p. $C3 c(L) G(B) A(SB) B c p d c r p A B c p d c B p lig{A<o>[DL] G} A c B A(L) "
     >>> lowerString += "A(SB) A p  G A B p c c(M) B(SB) A(M) p G(SB) G p A B c p d A r p G[D] A p "
     >>> lowerString += "B B(M) c(SB) c(M) p d(SB) d(M) A(SB) A(M) p G(SB) A B C(L) "
     >>> lowerString += "c(SB)[D] c e(B) d c(SB) c d p e d r p c c(M) d(SB) d(M) p c(SB) r r p "
@@ -591,8 +564,8 @@ def convertTrecentoStream(inpStream, inpDiv = None):
     >>> lowerString += "d(SB) d(M) c(SB) d(M) p e(SB) d r p c c(M) A(SB) B(M) p c(SB) B B p A B[D] p A B c d(Mx)"
 
     >>> SePerDureca = stream.Stream()
-    >>> SePerDureca.append(trecento.notation.TinyTrecentoNotationStream(upperString))
-    >>> SePerDureca.append(trecento.notation.TinyTrecentoNotationStream(lowerString))
+    >>> SePerDureca.append(trecento.notation.TrecentoTinyConverter(upperString).parse().stream.flat)
+    >>> SePerDureca.append(trecento.notation.TrecentoTinyConverter(lowerString).parse().stream.flat)
 
     >>> SePerDurecaConverted = trecento.notation.convertTrecentoStream(SePerDureca)
     <BLANKLINE>
@@ -1880,105 +1853,113 @@ class TrecentoNotationException(exceptions21.Music21Exception):
     pass
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-def testTinyTrecentoStream():
-    from music21 import trecento, medren
-    from music21 import text
+class TestExternal(unittest.TestCase):
 
-    SePerDureca = stream.Score()
-    TinySePerDureca = stream.Score()
-    SePerDureca.append(text.TextBox('Se Per Dureca'))
-    TinySePerDureca.append(text.TextBox('Se Per Dureca'))
-
-    upper = stream.Part()
-    lower = stream.Part()
-
-    def processStream(mStream, pitches, lengths, downStems = []):
-        pInd, lInd = 0, 0
-        while lInd < len(lengths):
-            if lengths[lInd] == 'P':
-                mStream.append(trecento.notation.Punctus())
-                lInd += 1
-            else:
-                if pitches[pInd] == 'R':
-                    mStream.append(medren.MensuralRest(lengths[lInd]))
+    def testTinyTrecentoStream(self):
+        from music21 import trecento, medren
+        from music21 import text
+    
+        SePerDureca = stream.Score()
+        TinySePerDureca = stream.Score()
+        
+        SePerDureca.append(text.TextBox('Se Per Dureca'))
+        TinySePerDureca.append(text.TextBox('Se Per Dureca'))
+    
+        upper = stream.Part()
+        lower = stream.Part()
+    
+        def processStream(mStream, pitches, lengths, downStems = []):
+            pInd, lInd = 0, 0
+            while lInd < len(lengths):
+                if lengths[lInd] == 'P':
+                    mStream.append(trecento.notation.Punctus())
+                    lInd += 1
                 else:
-                    mn = medren.MensuralNote(pitches[pInd], lengths[lInd])
-                    if lInd in downStems:
-                        mn.setStem('down')
-                    mStream.append(mn)
-                lInd += 1
-                pInd += 1
+                    if pitches[pInd] == 'R':
+                        mStream.append(medren.MensuralRest(lengths[lInd]))
+                    else:
+                        mn = medren.MensuralNote(pitches[pInd], lengths[lInd])
+                        if lInd in downStems:
+                            mn.setStem('down')
+                        mStream.append(mn)
+                    lInd += 1
+                    pInd += 1
+    
+        pitches_upper_1 = ['G4','G4','F4','E4','G4','F4','E4','G4','F4','E4','D4','E4','F4','E4','E4','F4','E4','D4','C4','D4','R','E4','F4','E4','D4','E4','D4','C4','D4','C4','D4','C4','D4','E4','R','G4','F4','E4','G4','A4','G4','F4','E4','D4','E4','F4','E4','D4','C4','D4','E4']
+        lengths_upper_1 = ['B','M','M','M','M','M','M','P','SB','SM','SM','SM','M','M','P','SB','SM','SM','SM','M','M','P','SB','SB','SB','P','M','M','M','M','M','M','P','SB','M','M','M','M','P','SB','M','M','M','M','P','SB','SM','SM','SM','M','M','P','SB','SM','SM','SM','M','M','L']
+        pitches_upper_2 = ['A4','A4','B-4','A4','G4','A4','G4','F4','G4','F4','E4','F4','E4','F4','G4','G4','A4','G4','F4','E4','D4','E4','R','F4','E4','D4','E4','D4','R','E4','F4','G4','D4','R','E4','F4','E','D4','E4','D4','C4','D4','D4','E4','C4','D4','C4','D4','C4','B4','C4']
+        lengths_upper_2 = ['SB','SB','P','M','M','M','M','M','M','P','M','M','M','M','M','M','P','SB','SM','SM','SM','SM','SM','SM','P','SB','M','SM','SM','SM','M','P','SB','SB','M','M','P','SB','SB','M','M','P','M','M','M','M','M','M','P','SB','M','SB','M','P','SB','M','M','M','M','L']
+        pitches_upper_3 = ['C5','C5','C5','B4','A4','B4','C5','B4','C5','B4','A4','G4','A4','B4','A4','B4','G4','G4','A4','G4','F4','E4','D4','E4','R','E4','F4','G4','F4','E4','F4','E4','F4','G4','R','G4','F4','G4','F4','E4','D4','E4','F4','E4']
+        lengths_upper_3 = ['SB','SB','P','SM','SM','SM','M','M','M','M','P','SM','SM','SM','M','M','M','M','P','SB','SM','SM','SM','SM','SM','SM','P','SB','SB','M','M','P','M','M','M','M','M','M','P','SB','SB','M','M','P','SB','SM','SM','SM','M','M','L']
+        downStems_upper_3 = [0]
+        pitches_upper_4 = ['A4','B4','A4','B4','G4','C5','B4','A4','C5','B4','A4','B4','C5','B4','A4','G4','A4','B4','C5','B4','A4','G4','F4','A4','A4','G4','F4','E4','R','G4','F4','G4','F4','E4','F4','E4','D4','C4','D4','R','A4','G4','A4','G4','F4','E4','D4','E4','R','F4','E4','D4','E4','D4']
+        lengths_upper_4 = ['M','M','M','M','SB','P','M','M','M','M','M','M','P','M','M','M','M','M','M','P','SB','SM','SM','SM','M','M','P','SB','M','SB','M','P','SB','SB','M','M','P','M','M','M','M','M','M','P','SB','SB','SB','P','SB','SM','SM','SM','SM','SM','SM','P','M','M','SM','SM','SM','SB','Mx']
+        pitches_lower_1 = ['C4','G3','A','B3','C4','D4','C4','R','A3','B3','C4','D4','C4','B3']
+        lengths_lower_1 = ['L','B','SB','SB','SB','P','SB','SB','SB','P','SB','SB','SB','P','SB','SB','SB','P']
+        lowerlig = medren.Ligature(['A4','B4'])
+        lowerlig.makeOblique(0)
+        lowerlig.setStem(0, 'down', 'left')
+        pitches_lower_2 = ['A4','C5','B4','A4']
+        lengths_lower_2 = ['SB','SB','SB','P','L']
+        pitches_lower_3 = ['A4','A4','G4','A4','B4','C5','C5','B4','A4','G4','G4','A4','B4','C5','D5','A4','R','G4','A4','B4','B4','C5','C5','D5','D5','A4','A4','G4','A4','B4','C5']
+        lengths_lower_3 = ['SB','SB','P','SB','SB','SB','P','SB','M','SB','M','P','SB','SB','P','SB','SB','SB','P','SB','SB','SB','P','SB','SB','P','SB','M','SB','M','P','SB','M','SB','M','P','SB','SB','SB','L']
+        downStems_lower_3 = [23]
+        pitches_lower_4 = ['C4','C4','E4','D4','C4','C4','D4','E4','D4','R','C4','C4','D4','D4','C4','R','R','C4','D4','C4','D4','E4']
+        lengths_lower_4 = ['SB','SB','B','B','SB','SB','SB','P','SB','SB','SB','P','SB','M','SB','M','P','SB','SB','SB','P','SB','SB','M','M','L']
+        downStems_lower_4 = [0]
+        pitches_lower_5 = ['D4','E4','C4','D4','E4','E4','D4','C4','B3','A3','B3','C4','D4','D4','C4','D4','E4','D4','R','C4','C4','A3','B3','C4','B3','B3','A3','B3','A3','B3','C4','D4']
+        lengths_lower_5 = ['SB','SB','P','SB','SB','P','SB','M','SB','M','P','SB','SB','M','M','P','SB','M','SB','M','P','SB','SB','SB','P','SB','M','SB','M','P','SB','SB','SB','P','SB','SB','P','SB','SB','SB','Mx']
+        downStems_lower_5 = [0,3]
+    
+        upperClef = medren.MensuralClef('C')
+        upperClef.line = 1
+        lowerClef = medren.MensuralClef('C')
+        lowerClef.line = 3
+    
+        upper.append(trecento.notation.Divisione('.p.'))
+        upper.append(upperClef)
+        processStream(upper, pitches_upper_1, lengths_upper_1)
+        processStream(upper, pitches_upper_2, lengths_upper_2)
+        processStream(upper, pitches_upper_3, lengths_upper_3, downStems_upper_3)
+        processStream(upper, pitches_upper_4, lengths_upper_4)
+    
+        lower.append(trecento.notation.Divisione('.p.'))
+        lower.append(lowerClef)
+        processStream(lower, pitches_lower_1, lengths_lower_1)
+        lower.append(lowerlig)
+        processStream(lower, pitches_lower_2, lengths_lower_2)
+        processStream(lower, pitches_lower_3, lengths_lower_3, downStems_lower_3)
+        processStream(lower, pitches_lower_4, lengths_lower_4, downStems_lower_4)
+        processStream(lower, pitches_lower_5, lengths_lower_5, downStems_lower_5)
+    
+        SePerDureca.append(upper)
+        SePerDureca.append(lower)
+    
+        upperString = ".p. $C1 g(B) g(M) f e g f e p g(SB) f(SM) e d e(M) f p e(SB) e(SM) f e d(M) c p d(SB) r e p f(M) e d e d c p d(SB) c(M) d c d p e(SB) r(M) g f e p g(SB) a(SM) g f e(M) d p e(SB) f(SM) e d c(M) d e(L) a(SB) a p b(M) a g a g f p g f e f e f p g(SB) g(SM) a g f e d p e(SB) r(M) f(SM) e d e(M) p d(SB) r e(M) f p g(SB) d r(SM) e p f e d e d c p d(SB) d(M) e(SB) c(M) p d(SB) c(M) d c B c(L) c'(SB)[D] c' p c'(SM) b a  b(M) c' b c' p b(SM) a g a(M) b a b p g(SB) g(SM) a g f e d p e(SB) r e(M) f p g f e f e f p g(SB) r g(M) f p g(SB) f(SM) e d e(M) f e(L) a(M) b a b g(SB) p c'(M) b a c' b a p  b c' b a g a p b(SB) c'(SM) b a g(M) f p a(SB) a(M) g(SB) f(M) p e(SB) r g(M) f p g f e f e d p c(SB) d r p a g(SM) a g f e d p e(SB) r f(SM) e d e(SB) d(Mx)"
+        lowerString = ".p. $C3 c(L) G(B) A(SB) B c p d c r p A B c p d c B p lig{A<o>[DL] G} A c B A(L) A(SB) A p  G A B p c c(M) B(SB) A(M) p G(SB) G p A B c p d A r p G[D] A p B B(M) c(SB) c(M) p d(SB) d(M) A(SB) A(M) p G(SB) A B C(L) c(SB)[D] c e(B) d c(SB) c d p e d r p c c(M) d(SB) d(M) p c(SB) r r p c d c(M) d e(L) d(SB)[D] e p c[D] d p e e(M) d(SB) c(M) p B(SB) A B(M) c p d(SB) d(M) c(SB) d(M) p e(SB) d r p c c c(M) A(SB) B(M) p c(SB) B B p A B[D] p A B c d(Mx)"
+    
+        upperConverted = TrecentoTinyConverter(upperString).parse().stream.flat.getElementsNotOfClass('Barline')
+        lowerConverted = TrecentoTinyConverter(lowerString).parse().stream.flat.getElementsNotOfClass('Barline')
+    
+        TinySePerDureca.append(upperConverted)
+        TinySePerDureca.append(lowerConverted)
+    
+        print('''Length comparison
+        normal: %s
+        tiny: %s
+        ''' % (len(SePerDureca.recurse()), len(TinySePerDureca.recurse())))
+    
+        for i in range(2):
+            for j in range(len(SePerDureca[i+1])):
+                if j < len(TinySePerDureca[i+1]):
+                    print('norm: %s' % SePerDureca[i+1][j])
+                    print('tiny: %s' % TinySePerDureca[i+1][j])
+                    print('')
+                else:
+                    print('norm only: %s' % SePerDureca[i+1][j])
+                    print('')
 
-    pitches_upper_1 = ['G4','G4','F4','E4','G4','F4','E4','G4','F4','E4','D4','E4','F4','E4','E4','F4','E4','D4','C4','D4','R','E4','F4','E4','D4','E4','D4','C4','D4','C4','D4','C4','D4','E4','R','G4','F4','E4','G4','A4','G4','F4','E4','D4','E4','F4','E4','D4','C4','D4','E4']
-    lengths_upper_1 = ['B','M','M','M','M','M','M','P','SB','SM','SM','SM','M','M','P','SB','SM','SM','SM','M','M','P','SB','SB','SB','P','M','M','M','M','M','M','P','SB','M','M','M','M','P','SB','M','M','M','M','P','SB','SM','SM','SM','M','M','P','SB','SM','SM','SM','M','M','L']
-    pitches_upper_2 = ['A4','A4','B-4','A4','G4','A4','G4','F4','G4','F4','E4','F4','E4','F4','G4','G4','A4','G4','F4','E4','D4','E4','R','F4','E4','D4','E4','D4','R','E4','F4','G4','D4','R','E4','F4','E','D4','E4','D4','C4','D4','D4','E4','C4','D4','C4','D4','C4','B4','C4']
-    lengths_upper_2 = ['SB','SB','P','M','M','M','M','M','M','P','M','M','M','M','M','M','P','SB','SM','SM','SM','SM','SM','SM','P','SB','M','SM','SM','SM','M','P','SB','SB','M','M','P','SB','SB','M','M','P','M','M','M','M','M','M','P','SB','M','SB','M','P','SB','M','M','M','M','L']
-    pitches_upper_3 = ['C5','C5','C5','B4','A4','B4','C5','B4','C5','B4','A4','G4','A4','B4','A4','B4','G4','G4','A4','G4','F4','E4','D4','E4','R','E4','F4','G4','F4','E4','F4','E4','F4','G4','R','G4','F4','G4','F4','E4','D4','E4','F4','E4']
-    lengths_upper_3 = ['SB','SB','P','SM','SM','SM','M','M','M','M','P','SM','SM','SM','M','M','M','M','P','SB','SM','SM','SM','SM','SM','SM','P','SB','SB','M','M','P','M','M','M','M','M','M','P','SB','SB','M','M','P','SB','SM','SM','SM','M','M','L']
-    downStems_upper_3 = [0]
-    pitches_upper_4 = ['A4','B4','A4','B4','G4','C5','B4','A4','C5','B4','A4','B4','C5','B4','A4','G4','A4','B4','C5','B4','A4','G4','F4','A4','A4','G4','F4','E4','R','G4','F4','G4','F4','E4','F4','E4','D4','C4','D4','R','A4','G4','A4','G4','F4','E4','D4','E4','R','F4','E4','D4','E4','D4']
-    lengths_upper_4 = ['M','M','M','M','SB','P','M','M','M','M','M','M','P','M','M','M','M','M','M','P','SB','SM','SM','SM','M','M','P','SB','M','SB','M','P','SB','SB','M','M','P','M','M','M','M','M','M','P','SB','SB','SB','P','SB','SM','SM','SM','SM','SM','SM','P','M','M','SM','SM','SM','SB','Mx']
-    pitches_lower_1 = ['C4','G3','A','B3','C4','D4','C4','R','A3','B3','C4','D4','C4','B3']
-    lengths_lower_1 = ['L','B','SB','SB','SB','P','SB','SB','SB','P','SB','SB','SB','P','SB','SB','SB','P']
-    lowerlig = medren.Ligature(['A4','B4'])
-    lowerlig.makeOblique(0)
-    lowerlig.setStem(0, 'down', 'left')
-    pitches_lower_2 = ['A4','C5','B4','A4']
-    lengths_lower_2 = ['SB','SB','SB','P','L']
-    pitches_lower_3 = ['A4','A4','G4','A4','B4','C5','C5','B4','A4','G4','G4','A4','B4','C5','D5','A4','R','G4','A4','B4','B4','C5','C5','D5','D5','A4','A4','G4','A4','B4','C5']
-    lengths_lower_3 = ['SB','SB','P','SB','SB','SB','P','SB','M','SB','M','P','SB','SB','P','SB','SB','SB','P','SB','SB','SB','P','SB','SB','P','SB','M','SB','M','P','SB','M','SB','M','P','SB','SB','SB','L']
-    downStems_lower_3 = [23]
-    pitches_lower_4 = ['C4','C4','E4','D4','C4','C4','D4','E4','D4','R','C4','C4','D4','D4','C4','R','R','C4','D4','C4','D4','E4']
-    lengths_lower_4 = ['SB','SB','B','B','SB','SB','SB','P','SB','SB','SB','P','SB','M','SB','M','P','SB','SB','SB','P','SB','SB','M','M','L']
-    downStems_lower_4 = [0]
-    pitches_lower_5 = ['D4','E4','C4','D4','E4','E4','D4','C4','B3','A3','B3','C4','D4','D4','C4','D4','E4','D4','R','C4','C4','A3','B3','C4','B3','B3','A3','B3','A3','B3','C4','D4']
-    lengths_lower_5 = ['SB','SB','P','SB','SB','P','SB','M','SB','M','P','SB','SB','M','M','P','SB','M','SB','M','P','SB','SB','SB','P','SB','M','SB','M','P','SB','SB','SB','P','SB','SB','P','SB','SB','SB','Mx']
-    downStems_lower_5 = [0,3]
-
-    upperClef = medren.MensuralClef('C')
-    upperClef.line = 1
-    lowerClef = medren.MensuralClef('C')
-    lowerClef.line = 3
-
-    upper.append(trecento.notation.Divisione('.p.'))
-    upper.append(upperClef)
-    processStream(upper, pitches_upper_1, lengths_upper_1)
-    processStream(upper, pitches_upper_2, lengths_upper_2)
-    processStream(upper, pitches_upper_3, lengths_upper_3, downStems_upper_3)
-    processStream(upper, pitches_upper_4, lengths_upper_4)
-
-    lower.append(trecento.notation.Divisione('.p.'))
-    lower.append(lowerClef)
-    processStream(lower, pitches_lower_1, lengths_lower_1)
-    lower.append(lowerlig)
-    processStream(lower, pitches_lower_2, lengths_lower_2)
-    processStream(lower, pitches_lower_3, lengths_lower_3, downStems_lower_3)
-    processStream(lower, pitches_lower_4, lengths_lower_4, downStems_lower_4)
-    processStream(lower, pitches_lower_5, lengths_lower_5, downStems_lower_5)
-
-    SePerDureca.append(upper)
-    SePerDureca.append(lower)
-
-    upperString = ".p. $C1 g(B) g(M) f e g f e p g(SB) f(SM) e d e(M) f p e(SB) e(SM) f e d(M) c p d(SB) r e p f(M) e d e d c p d(SB) c(M) d c d p e(SB) r(M) g f e p g(SB) a(SM) g f e(M) d p e(SB) f(SM) e d c(M) d e(L) a(SB) a p b(M) a g a g f p g f e f e f p g(SB) g(SM) a g f e d p e(SB) r(M) f(SM) e d e(M) p d(SB) r e(M) f p g(SB) d r(SM) e p f e d e d c p d(SB) d(M) e(SB) c(M) p d(SB) c(M) d c B c(L) c'(SB)[D] c' p c'(SM) b a  b(M) c' b c' p b(SM) a g a(M) b a b p g(SB) g(SM) a g f e d p e(SB) r e(M) f p g f e f e f p g(SB) r g(M) f p g(SB) f(SM) e d e(M) f e(L) a(M) b a b g(SB) p c'(M) b a c' b a p  b c' b a g a p b(SB) c'(SM) b a g(M) f p a(SB) a(M) g(SB) f(M) p e(SB) r g(M) f p g f e f e d p c(SB) d r p a g(SM) a g f e d p e(SB) r f(SM) e d e(SB) d(Mx)"
-    lowerString = ".p. $C3 c(L) G(B) A(SB) B c p d c r p A B c p d c B p <A*o*[DL] G> A c B A(L) A(SB) A p  G A B p c c(M) B(SB) A(M) p G(SB) G p A B c p d A r p G[D] A p B B(M) c(SB) c(M) p d(SB) d(M) A(SB) A(M) p G(SB) A B C(L) c(SB)[D] c e(B) d c(SB) c d p e d r p c c(M) d(SB) d(M) p c(SB) r r p c d c(M) d e(L) d(SB)[D] e p c[D] d p e e(M) d(SB) c(M) p B(SB) A B(M) c p d(SB) d(M) c(SB) d(M) p e(SB) d r p c c c(M) A(SB) B(M) p c(SB) B B p A B[D] p A B c d(Mx)"
-
-    TinySePerDureca.append(trecento.notation.TinyTrecentoNotationStream(upperString))
-    TinySePerDureca.append(trecento.notation.TinyTrecentoNotationStream(lowerString))
-
-    print('''Length comparison
-    normal: %s
-    tiny: %s
-    ''' % (len(SePerDureca.recurse()), len(TinySePerDureca.recurse())))
-
-    for i in range(2):
-        for j in range(len(SePerDureca[i+1])):
-            if j < len(TinySePerDureca[i+1]):
-                print('norm: %s' % SePerDureca[i+1][j])
-                print('tiny: %s' % TinySePerDureca[i+1][j])
-                print('')
-            else:
-                print('norm only: %s' % SePerDureca[i+1][j])
-                print('')
+        #TinySePerDureca.show('text')
 
 class Test(unittest.TestCase):
 
@@ -1987,4 +1968,4 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test, TestExternal)

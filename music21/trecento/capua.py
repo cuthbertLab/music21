@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2008-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2012, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
@@ -51,7 +51,7 @@ def applyCapuaToScore(thisWork):
     calls `applyCapuaToStream` to each `part.flat` in `parts`.
     '''
     for thisPart in thisWork.parts:
-        applyCapuaToStream(thisPart.flat)
+        applyCapuaToStream(thisPart.flat.notes)
 
 def applyCapuaToCadencebookWork(thisWork):
     '''
@@ -89,7 +89,8 @@ def applyCapuaToStream(thisStream):
     for n in thisStream:
         if hasattr(n, 'editorial') and n.editorial.ficta is not None:
             n.editorial.misc['pmfc-ficta'] = n.editorial.ficta
-    
+            clearAccidental(n)
+            
     clearFicta(thisStream)
     capuaRuleOne(thisStream)
     capuaRuleTwo(thisStream)

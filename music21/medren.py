@@ -29,6 +29,9 @@ from music21 import stream
 from music21 import tempo
 from music21 import trecento
 
+from music21 import environment
+environLocal = environment.Environment('medren')
+
 import unittest
 
 allowableStrettoIntervals = { 
@@ -1029,6 +1032,7 @@ class Ligature(base.Music21Object):
         return self._pitches
     
     def _setPitches(self, pitches):
+        self._pitches = []
         for p in pitches:
             if isinstance(p, pitch.Pitch):
                 self._pitches.append(p)
@@ -1417,16 +1421,19 @@ class Ligature(base.Music21Object):
                             else:
                                 raise MedRenException('a stem with direction %s not permitted at index %d' % (direction, index))
                         elif direction == 'up':
-                            if (index < self._ligatureLength()-1) and (prevStem[0] != 'up') and (nextStem[0] == None) and not self.isMaxima(index+1):
+                            if ((index < self._ligatureLength()-1) 
+                                    and (prevStem[0] != 'up') 
+                                    and (nextStem[0] == None) 
+                                    and not self.isMaxima(index+1)):
                                 self.stems[index] = (direction, orientation)
                             else:
-                                raise MedRenException('a stem with direction %s not permitted at index %d' % (direction, index))
+                                raise MedRenException('a stem with direction "%s" not permitted at index %d' % (direction, index))
                         else:
-                            raise MedRenException('direction %s and orientation %s not supported for ligatures' % (direction, orientation))
+                            raise MedRenException('direction %s and orientation "%s" not supported for ligatures' % (direction, orientation))
                     else:
-                        raise MedRenException('a stem with orientation %s not permitted at index %d' % (orientation,index))
+                        raise MedRenException('a stem with orientation "%s" not permitted at index %d' % (orientation,index))
                 else:
-                    raise MedRenException('direction %s and orientation %s not supported for ligatures' % (direction,orientation))
+                    raise MedRenException('direction "%s" and orientation "%s" not supported for ligatures' % (direction,orientation))
         else:
             raise MedRenException('no note exists at index %d' % index)
         self._notes = []     
@@ -1485,9 +1492,13 @@ class Ligature(base.Music21Object):
                        
                         tempPitchCurrent._setAccidental(None)
                         tempPitchPrev._setAccidental(None)
-                        if (not self.isReversed(endIndex-1)) and (self.getStem(endIndex-1)[0] != 'up') and (self.getStem(endIndex) == ('down','left')) and (tempPitchCurrent > tempPitchPrev):
+                        if ((not self.isReversed(endIndex-1)) 
+                                and (self.getStem(endIndex-1)[0] != 'up') 
+                                and (self.getStem(endIndex) == ('down','left')) 
+                                and (tempPitchCurrent > tempPitchPrev)):
                             self.reversedNotes[endIndex] = True
                         else:                           
+                            environLocal.warn([tempPitchCurrent, tempPitchPrev])
                             raise MedRenException('the note at index %d cannot be given reverse value %s' % (endIndex, value))
                     else:
                         raise MedRenException('no note exists at index %d' % (endIndex-1,)) 

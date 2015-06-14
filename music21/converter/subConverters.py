@@ -477,30 +477,32 @@ class ConverterTinyNotation(SubConverter):
     registerInputExtensions = ('tntxt', 'tinynotation')
     #---------------------------------------------------------------------------
     def parseData(self, tnData, number=None):
-        '''Open TinyNotation data from a string or list
+        '''Open TinyNotation data from a string
 
-        >>> tnData = ["E4 r f# g=lastG trip{b-8 a g} c", "3/4"]
+        >>> tnData = "3/4 E4 r f# g=lastG trip{b-8 a g} c"
         >>> c = converter.subConverters.ConverterTinyNotation()
         >>> s = c.parseData(tnData)
         >>> c.stream.show('text')
-        {0.0} <music21.meter.TimeSignature 3/4>
-        {0.0} <music21.note.Note E>
-        {1.0} <music21.note.Rest rest>
-        {2.0} <music21.note.Note F#>
-        {3.0} <music21.note.Note G>
-        {4.0} <music21.note.Note B->
-        {4.3333} <music21.note.Note A>
-        {4.6667} <music21.note.Note G>
-        {5.0} <music21.note.Note C>        
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 3/4>
+            {0.0} <music21.note.Note E>
+            {1.0} <music21.note.Rest rest>
+            {2.0} <music21.note.Note F#>
+        {3.0} <music21.stream.Measure 2 offset=3.0>
+            {0.0} <music21.note.Note G>
+            {1.0} <music21.note.Note B->
+            {1.3333} <music21.note.Note A>
+            {1.6667} <music21.note.Note G>
+            {2.0} <music21.note.Note C>
+            {2.5} <music21.bar.Barline style=final>
         '''
         if common.isStr(tnData):
             tnStr = tnData
-            tnTs = None
         else: # assume a 2 element sequence
-            tnStr = tnData[0]
-            tnTs = tnData[1]
+            raise SubConverterException("TinyNotation no longer supports two-element calls; put the time signature in the stream")
         from music21 import tinyNotation
-        self.stream = tinyNotation.TinyNotationStream(tnStr, tnTs)
+        self.stream = tinyNotation.Converter(tnStr).parse().stream
 
 
 class ConverterNoteworthy(SubConverter):

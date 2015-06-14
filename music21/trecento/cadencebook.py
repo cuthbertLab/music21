@@ -432,7 +432,6 @@ class TrecentoCadenceWork(object):
         <music21.stream.Score ...>
         >>> #_DOCS_HIDE dedutoScore.show()
 
-
         Changes made to a snippet are reflected in the asScore() score object:
         
         >>> deduto.snippets[0].parts[0].flat.notes[0].name = "C###"
@@ -453,7 +452,7 @@ class TrecentoCadenceWork(object):
                 continue
             if thisSnippet.tenor is None and thisSnippet.cantus is None and thisSnippet.contratenor is None:
                 continue
-            for partNumber, snippetPart in enumerate(thisSnippet.getElementsByClass('TrecentoCadenceStream')):
+            for partNumber, snippetPart in enumerate(thisSnippet.getElementsByClass('Stream')):
                 if thisSnippet.snippetName != "" and partNumber == self.totalVoices - 1:
                     textEx = expressions.TextExpression(thisSnippet.snippetName)
                     textEx.positionVertical = 'below'
@@ -589,17 +588,23 @@ class TrecentoCadenceWork(object):
         >>> blockStreams = dummyPiece.convertBlockToStreams(block1)
         >>> for x in blockStreams:
         ...     print(x)
-        <music21.trecento.trecentoCadence.TrecentoCadenceStream ...>
-        <music21.trecento.trecentoCadence.TrecentoCadenceStream ...>
+        <music21.stream.Stream ...>
+        <music21.stream.Stream ...>
         None
         no-cadence
         2/4
         >>> blockStreams[0].show('text')
-        {0.0} <music21.meter.TimeSignature 2/4>
-        {0.0} <music21.note.Note E>
-        {1.0} <music21.note.Note F>
-        {2.0} <music21.note.Note G>
-        {3.0} <music21.note.Note A>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 2/4>
+            {0.0} <music21.note.Note E>
+            {1.0} <music21.note.Note F>
+        {2.0} <music21.stream.Measure 2 offset=2.0>
+            {0.0} <music21.note.Note G>
+            {1.0} <music21.note.Note A>
+            {2.0} <music21.bar.Barline style=final>
+    
+
         '''
         returnBlock = [None, None, None, None, None]
         currentTimeSig = thisBlock[4]
@@ -610,7 +615,7 @@ class TrecentoCadenceWork(object):
             thisVoice = thisVoice.strip()
             if (thisVoice):
                 try:
-                    returnBlock[i] = trecentoCadence.TrecentoCadenceStream(thisVoice, currentTimeSig)
+                    returnBlock[i] = trecentoCadence.CadenceConverter(currentTimeSig + " " + thisVoice).parse().stream
                 except duration.DurationException as value:
                     raise duration.DurationException("Problems in line %s: specifically %s" % (thisVoice,  value))
 #                except Exception, (value):
