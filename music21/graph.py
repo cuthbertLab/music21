@@ -3157,7 +3157,7 @@ class PlotScatterPitchSpaceDynamicSymbol(PlotScatter):
     '''A graph of dynamics used by pitch space.
 
     
-    >>> s = tinyNotation.TinyNotationStream('4/4 C4 d E f') #_DOCS_HIDE
+    >>> s = converter.parse('4/4 C4 d E f', makeNotation=False) #_DOCS_HIDE
     >>> s.insert(0.0, dynamics.Dynamic('pp')) #_DOCS_HIDE
     >>> s.insert(2.0, dynamics.Dynamic('ff')) #_DOCS_HIDE
     >>> p = graph.PlotScatterPitchSpaceDynamicSymbol(s, doneAction=None) #_DOCS_HIDE
@@ -3724,7 +3724,7 @@ class PlotScatterWeightedPitchSpaceDynamicSymbol(PlotScatterWeighted):
     '''A graph of dynamics used by pitch space.
 
     >>> #_DOCS_SHOW s = converter.parse('/Desktop/schumann/opus41no1/movement2.xml')
-    >>> s = tinyNotation.TinyNotationStream('4/4 C4 d E f') #_DOCS_HIDE
+    >>> s = converter.parse('4/4 C4 d E f', makeNotation=False) #_DOCS_HIDE
     >>> s.insert(0.0, dynamics.Dynamic('pp')) #_DOCS_HIDE
     >>> s.insert(2.0, dynamics.Dynamic('ff')) #_DOCS_HIDE
     >>> p = graph.PlotScatterWeightedPitchSpaceDynamicSymbol(s, doneAction=None) #_DOCS_HIDE

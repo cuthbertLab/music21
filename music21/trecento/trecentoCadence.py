@@ -43,7 +43,7 @@ def _sendNoteInfo(music21noteObject):
 
 class CadenceNoteToken(tinyNotation.NoteToken):
     '''
-    Subclass of TinyNotationNote where 2.. represents a dotted dotted half note (that is, a dotted
+    Subclass of NoteToken where 2.. represents a dotted dotted half note (that is, a dotted
     half tied to a dotted quarter) instead of a double dotted note.  This makes entering Trecento
     music (which uses this note value often) much easier.  1.. and 4.. etc. are similarly transformed. 
     '''
@@ -63,7 +63,7 @@ class CadenceNoteToken(tinyNotation.NoteToken):
 
 class CadenceRestToken(tinyNotation.RestToken):
     '''
-    Subclass of TinyNotationNote where 2.. represents a dotted dotted half note (that is, a dotted
+    Subclass of RestToken where 2.. represents a dotted dotted half note (that is, a dotted
     half tied to a dotted quarter) instead of a double dotted note.  This makes entering Trecento
     music (which uses this note value often) much easier.  1.. and 4.. etc. are similarly transformed. 
     '''
@@ -85,7 +85,7 @@ class CadenceRestToken(tinyNotation.RestToken):
 
 class CadenceConverter(tinyNotation.Converter):
     '''
-    Subclass of Tiny Notation that calls TrecentoCadenceNote instead of TinyNotationNote    
+    Subclass of Tiny Notation that calls these tokens instead of the defaults    
     
     
     >>> dLucaGloriaIncipit = trecento.trecentoCadence.CadenceConverter("6/8 c'2. d'8 c'4 a8 f4 f8 a4 c'4 c'8").parse().stream

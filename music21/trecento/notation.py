@@ -362,7 +362,7 @@ class TrecentoTinyConverter(tinyNotation.Converter):
         >>> tTNN.getNoteheadShape(1)
         'oblique'
 
-    6.  Separate objects in a TinyNotationStream by spaces. To add a mensural
+    6.  Separate objects in a tiny notation by spaces. To add a mensural
         clef to the stream, add $, followed by the clef type (F or C) to the
         string. If the clef line on the staff is non-standard, include that
         after the type.

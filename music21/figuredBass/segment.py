@@ -10,7 +10,7 @@
 #-------------------------------------------------------------------------------
 #python3
 try:
-    basestring
+    basestring # @UndefinedVariable
 except:
     basestring = str # @ReservedAssignment
 

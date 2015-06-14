@@ -171,7 +171,6 @@ availableFunctions = ['checkLeadSheetPitches',
                       'theoryAnalyzer.identifyHiddenOctaves',
                       'theoryAnalyzer.identifyParallelFifths',
                       'theoryAnalyzer.identifyParallelOctaves',
-                      'tinyNotation.TinyNotationStream',
                       ] 
 
 # Commands of type method (have a caller) must be in this list

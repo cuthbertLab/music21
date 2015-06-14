@@ -13,8 +13,8 @@
 #-------------------------------------------------------------------------------
 
 
-from music21 import corpus, features, converter
-from music21 import trecento, figuredBass, tinyNotation
+from music21 import corpus, features, converter, graph
+from music21 import trecento, figuredBass
 from music21 import expressions, stream
 
 # def example2():
@@ -125,7 +125,7 @@ def prepareChinaEurope2():
     ds2.write('d:/desktop/folkTest.tab')
 
 def testChinaEuropeFull():
-    import orange, orngTree
+    import orange, orngTree # @UnresolvedImport
     data1 = orange.ExampleTable('d:/desktop/1.tab')
     data2 = orange.ExampleTable('d:/desktop/2.tab')
 
@@ -153,7 +153,7 @@ def testChinaEuropeFull():
 
 # this test requires orange and related files
 def xtestChinaEuropeSimpler():
-    import orange, orngTree
+    import orange, orngTree # @UnusedImport @UnresolvedImport
 
     trainData = orange.ExampleTable('ismir2011_fb_folkTrain.tab')
     testData  = orange.ExampleTable('ismir2011_fb_folkTest.tab')
@@ -210,7 +210,7 @@ def prepareTrecentoCadences():
 
 
 def testTrecentoSimpler():
-    import orange, orngTree
+    import orange, orngTree # @UnusedImport @UnresolvedImport
 
     trainData = orange.ExampleTable('d:/desktop/trecento2.tab')
     testData  = orange.ExampleTable('d:/desktop/trecento1.tab')
@@ -293,7 +293,7 @@ def wekaCommands():
 ### FIGURED BASS PAPER ###
 
 def tinyNotationBass():
-    bass1 = tinyNotation.TinyNotationStream('4/4 C4 D8_6 E8_6 F4 G4_7 c1')
+    bass1 = converter.parse('tinyNotation: 4/4 C4 D8_6 E8_6 F4 G4_7 c1', makeNotation=False)
     #bass1.show('lily.png')
     fbLine1 = figuredBass.realizer.figuredBassFromStream(bass1)
     fbLine1.showAllRealizations()

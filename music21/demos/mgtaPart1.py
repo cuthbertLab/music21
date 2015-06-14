@@ -367,10 +367,8 @@ def ch1_writing_I_B_1(show=True, *arguments, **keywords):
     p.6 
     Transcribe these melodies into the clef specified without changing octaves.
     '''
-    from music21 import tinyNotation
-
     # camptown races
-    ex = tinyNotation.TinyNotationStream("2/4 g8 g e g")
+    ex = converter.parse("tinynotation: 2/4 g8 g e g", makeNotation=False)
     ex.insert(0, clef.AltoClef()) # maintain clef
     if show:
         ex.show()

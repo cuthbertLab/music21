@@ -262,7 +262,6 @@ class LilypondConverter(object):
         arbitrary music21 object.
 
         TODO: Add tests...
-        TODO: Add test for TinyNotationStream...
         '''
         from music21 import stream
         c = m21ObjectIn.classes

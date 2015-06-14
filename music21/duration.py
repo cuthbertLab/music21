@@ -3255,7 +3255,7 @@ class TupletFixer(object):
         This demonstration has three groups of tuplets, two sets of 8th note tuplets and one of 16ths:
 
 
-        >>> c = converter.parse('tinynotation: 4/4 trip{c8 d e} f4 trip{c#8 d# e#} g8 trip{c-16 d- e-}')
+        >>> c = converter.parse('tinynotation: 4/4 trip{c8 d e} f4 trip{c#8 d# e#} g8 trip{c-16 d- e-}', makeNotation=False)
         >>> tf = duration.TupletFixer(c) # no need to flatten this stream
         >>> tupletGroups = tf.findTupletGroups()
         >>> tupletGroups

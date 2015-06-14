@@ -8725,7 +8725,7 @@ class Stream(base.Music21Object):
 
 
 
-        >>> s1 = tinyNotation.TinyNotationStream("3/4 c4 d' r b b'")
+        >>> s1 = converter.parse("3/4 c4 d' r b b'", makeNotation=False)
         >>> #_DOCS_SHOW s1.show()
 
         .. image:: images/streamMelodicIntervals1.*

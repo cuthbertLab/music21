@@ -32,8 +32,7 @@ The same can be accomplished by taking the notes and notations from a :class:`~m
 See :meth:`~music21.figuredBass.realizer.figuredBassFromStream` for more details.
 
 
->>> from music21 import tinyNotation
->>> s = tinyNotation.TinyNotationStream("C4 D4_4,3 C2")
+>>> s = converter.parse("tinynotation: C4 D4_4,3 C2", makeNotation=False)
 >>> fbLine = realizer.figuredBassFromStream(s)
 >>> allSols2 = fbLine.realize()
 >>> allSols2.getNumSolutions()
@@ -75,7 +74,7 @@ def figuredBassFromStream(streamPart):
     way of converting from a notated version of a figured bass (such as in a MusicXML file) to 
     a realized version of the same line.
     
-    >>> s = tinyNotation.TinyNotationStream('4/4 C4 D8_6 E8_6 F4 G4_7 c1')
+    >>> s = converter.parse('tinynotation: 4/4 C4 D8_6 E8_6 F4 G4_7 c1', makeNotation=False)
     >>> fb = figuredBass.realizer.figuredBassFromStream(s)
     >>> fb
     <music21.figuredBass.realizer.FiguredBassLine object at 0x...>

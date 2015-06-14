@@ -46,7 +46,7 @@ def pitchedPhase(cycles=None, show=False):
     '''
 
     sSrc = converter.parse("""tinynotation: 12/16 E16 F# B c# d F# E c# B F# d c# 
-                              E16 F# B c# d F# E c# B F# d c#""")
+                              E16 F# B c# d F# E c# B F# d c#""", makeNotation=False)
     sPost = stream.Score()
     sPost.title = 'phasing experiment'
     sPost.insert(0, stream.Part())

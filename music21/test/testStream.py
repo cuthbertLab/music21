@@ -2321,8 +2321,8 @@ class Test(unittest.TestCase):
         '''
         tests to make sure that Accidental display status is correct after a tie.
         '''
-        from music21 import tinyNotation
-        bm = tinyNotation.TinyNotationStream("4/4 c#'2 b-2~ b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8")
+        from music21 import converter
+        bm = converter.parse("tinynotation: 4/4 c#'2 b-2~ b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8", makeNotation=False)
         bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
         allNotes = bm.flat.notes
         #      0C#  1B-~  | 2B-  3C#~  4C#    6B-     7C#    8B-~   9B-~   10B-
@@ -2332,7 +2332,7 @@ class Test(unittest.TestCase):
 
 
         # add another B-flat just after the tied one...
-        bm = tinyNotation.TinyNotationStream("4/4 c#'2 b-2~ b-8 b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8")
+        bm = converter.parse("tinynotation: 4/4 c#'2 b-2~ b-8 b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8", makeNotation=False)
         bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
         allNotes = bm.flat.notes
         #      0C#  1B-~  | 2B-   3B-  4C#~  5C#    6B-     7C#    8B-~   9B-~  | 10B-
