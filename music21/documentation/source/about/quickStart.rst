@@ -181,7 +181,7 @@ Examining a Score by Part Id
 Alternatively, we can access components of a Stream by `id`, or string identifiers. Streams can get components by `id` by using the :meth:`~music21.stream.Stream.getElementById` method. For example, we can first look at all `id` attributes of all Score elements, and then select one. 
 
 >>> [part.id for part in sBach.parts]
-[u'Soprano', u'Alto', u'Tenor', u'Bass']
+['Soprano', 'Alto', 'Tenor', 'Bass']
 >>> sBach.getElementById('Soprano')
 <music21.stream.Part Soprano>
 

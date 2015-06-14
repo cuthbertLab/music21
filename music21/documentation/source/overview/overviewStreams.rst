@@ -303,7 +303,7 @@ While full list-like functionality of the Stream is not provided, some additiona
 >>> s.index(n3) 
 Traceback (most recent call last):
 ...
-StreamException: cannot find object (<music21.note.Note D#>) in Stream
+music21.exceptions21.StreamException: cannot find object (<music21.note.Note D#>) in Stream
 
 
 The index for `n3` cannot be obtained because the :meth:`~music21.stream.Stream.repeatAppend` method makes independent copies (deep copies) of the object provided as an argument. Thus, only copies of `n3`, not references to `n3`, are stored on the Stream. There are, of course, other ways to find these Notes. 
@@ -549,7 +549,7 @@ rearranging the order of the Parts by using the
 :meth:`~music21.stream.Stream.insert` method with an offset of zero.
 
 >>> [part.id for part in sBach.parts]
-[u'Soprano', u'Alto', u'Tenor', u'Bass']
+['Soprano', 'Alto', 'Tenor', 'Bass']
 >>> sNew = stream.Score()
 >>> sNew.insert(0, sBach.getElementById('Bass'))
 >>> sNew.insert(0, sBach.getElementById('Tenor'))
@@ -637,7 +637,7 @@ when we iterate over the Stream:
 >>> s.insert(0.0, triple)
 >>> s.insert(0.0, n)
 >>> for el in s:
-...     print el
+...     print(el)
 <music21.clef.TrebleClef>
 <music21.key.KeySignature of 2 sharps>
 <music21.note.Note F#>

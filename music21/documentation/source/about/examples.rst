@@ -211,7 +211,7 @@ Here, we load a file and count the number of G#'s in it.
     >>> for p in s.pitches:
     ...     if p.name == 'G#':
     ...         total += 1
-    >>> print total
+    >>> print(total)
     28
 
 2. This example searches a Part for a particular chord formation, a dominant

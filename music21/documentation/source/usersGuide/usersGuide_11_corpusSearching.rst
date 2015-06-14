@@ -138,7 +138,7 @@ all saved *local* corpora:
 ::
 
     >>> #_DOCS_SHOW corpus.LocalCorpus.listLocalCorporaNames()
-    >>> print [None, u'trecento', u'A new corpus', u'bach', u'fake'] #_DOCS_HIDE
+    >>> print("[None, u'trecento', u'A new corpus', u'bach', u'fake']") #_DOCS_HIDE
     [None, u'trecento', u'A new corpus', u'bach', u'fake']
 
 ..  note::
@@ -332,7 +332,7 @@ also allow us to parse the associated file into a music21 score:
 ::
 
     >>> bachBundle[0].sourcePath
-    u'bach/choraleAnalyses/riemenschneider001.rntxt'
+    'bach/choraleAnalyses/riemenschneider001.rntxt'
 
 ::
 
@@ -465,7 +465,7 @@ then call ``.write()`` to save to disk.
 ::
 
     >>> #_DOCS_SHOW newBundle
-    >>> print "<music21.metadata.bundles.MetadataBundle {402 entries}>" # did not actually run addFromPaths... #_DOCS_HIDE
+    >>> print("<music21.metadata.bundles.MetadataBundle {402 entries}>") # did not actually run addFromPaths... #_DOCS_HIDE
     <music21.metadata.bundles.MetadataBundle {402 entries}>
     
 ..  note::

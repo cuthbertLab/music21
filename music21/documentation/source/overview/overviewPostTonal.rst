@@ -35,7 +35,7 @@ used to create a :class:`~music21.stream.Score` object. The
     >>> from music21 import corpus
     >>> aScore = corpus.parse('beethoven/opus59no2', 3)
     >>> [e.id for e in aScore.parts]
-    [u'Violin I.', u'Violin II.', u'Viola.', u'Violoncello.']
+    ['Violin I.', 'Violin II.', 'Viola.', 'Violoncello.']
 
 We can view the fourth and fifth measures of the violin Part by obtaining the
 Part from the Stream with :meth:`~music21.stream.Stream.getElementById` method.
@@ -101,7 +101,7 @@ supplied to a Chord object and stored on a Stream.
 
     >>> from music21 import stream, chord
     >>> aStream = stream.Stream()
-    >>> src = range(12) # cheate a list of integers 0 through 11
+    >>> src = list(range(12)) # cheate a list of integers 0 through 11
     >>> src = src[2:4] + src[0:2] + src[8:9] + src[4:8] + src[9:12] # recombine
     >>> for i in range(0,12,3):
     ...     aStream.append(chord.Chord(src[i:i+3]))
@@ -202,21 +202,20 @@ create and print a :class:`~music21.serial.TwelveToneMatrix` object.
     >>> aRow = serial.getHistoricalRowByName('RowBergViolinConcerto')
     >>> aRow.show('text')
     {0.0} <music21.note.Note G>
-    {0.0} <music21.note.Note B->
-    {0.0} <music21.note.Note D>
-    {0.0} <music21.note.Note F#>
-    {0.0} <music21.note.Note A>
-    {0.0} <music21.note.Note C>
-    {0.0} <music21.note.Note E>
-    {0.0} <music21.note.Note G#>
-    {0.0} <music21.note.Note B>
-    {0.0} <music21.note.Note C#>
-    {0.0} <music21.note.Note E->
-    {0.0} <music21.note.Note F>
+    {1.0} <music21.note.Note B->
+    {2.0} <music21.note.Note D>
+    {3.0} <music21.note.Note F#>
+    {4.0} <music21.note.Note A>
+    {5.0} <music21.note.Note C>
+    {6.0} <music21.note.Note E>
+    {7.0} <music21.note.Note G#>
+    {8.0} <music21.note.Note B>
+    {9.0} <music21.note.Note C#>
+    {10.0} <music21.note.Note E->
+    {11.0} <music21.note.Note F>
 
 ::
 
-    >>> p
     >>> print(aMatrix)
     0  3  7  B  2  5  9  1  4  6  8  A
     9  0  4  8  B  2  6  A  1  3  5  7
