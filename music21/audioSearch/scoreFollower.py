@@ -104,7 +104,7 @@ class ScoreFollower(object):
         >>> scoreNotes = " ".join(["c4", "d", "e", "f", "g", "a", "b", "c'", "c", "e",
         ...     "g", "c'", "a", "f", "d", "c#", "d#", "f#","c", "e", "g", "c'",
         ...     "a", "f", "d", "c#", "d#", "f#"])
-        >>> scNotes = converter.parse("tinynotation: 4/4 " + scoreNotes)
+        >>> scNotes = converter.parse("tinynotation: 4/4 " + scoreNotes, makeNotation=False)
         >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         >>> ScF.useMic = False
         >>> import os #_DOCS_HIDE
