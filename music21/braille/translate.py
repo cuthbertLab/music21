@@ -76,7 +76,7 @@ memorization" (BMTM, 71). Some of these keywords are changed automatically in co
   number is transcribed before the lower number. If False, the reverse is the case.
 """
 
-from music21 import metadata, stream, tinyNotation, exceptions21
+from music21 import metadata, stream, exceptions21
 from music21.braille import segment
 from music21.ext import six
 
@@ -100,8 +100,8 @@ def objectToBraille(music21Obj, **keywords):
     Translates an arbitrary object to braille.
 
     >>> from music21.braille import translate
-    >>> from music21 import tinyNotation
-    >>> samplePart = tinyNotation.TinyNotationStream("3/4 C4 D16 E F G# r4 e2.")
+    >>> from music21 import converter
+    >>> samplePart = converter.parse("tinynotation: 3/4 C4 D16 E F G# r4 e2.")
     >>> #_DOCS_SHOW samplePart.show()
 
 
@@ -148,7 +148,7 @@ def streamToBraille(music21Stream, **keywords):
     Translates a :class:`~music21.stream.Stream` to braille.
     """
 
-    if isinstance(music21Stream, stream.Part) or isinstance(music21Stream, tinyNotation.TinyNotationStream):
+    if isinstance(music21Stream, stream.Part):
         return partToBraille(music21Stream, **keywords)
     if isinstance(music21Stream, stream.Measure):
         return measureToBraille(music21Stream, **keywords)

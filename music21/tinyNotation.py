@@ -513,8 +513,11 @@ class NoteToken(NoteOrRestToken):
 class Converter(object):
     '''
     Main conversion object for TinyNotation.
+    
+    Accepts one keyword: makeNotation=False to get "classic" TinyNotation formats.
+    
     '''
-    def __init__(self, stringRep = ""):
+    def __init__(self, stringRep = "", **keywords):
         self.stateMap = [ 
             (r'trip\{', TripletState),
             (r'quad\{', QuadrupletState),
@@ -535,8 +538,13 @@ class Converter(object):
                     (r'\*(.*)\*', StarModifier),
         ]
 
+        self.keywords = keywords
+        if 'makeNotation' in keywords:
+            self.makeNotation = keywords['makeNotation']
+        else:
+            self.makeNotation = True
         
-        self.stream = stream.Stream()
+        self.stream = stream.Part()
         self.stateDict = {'currentTimeSignature': None,
                           'lastDuration': 1.0
                           }
@@ -672,8 +680,8 @@ class Converter(object):
         '''
         Call postParse calls on .stream, currently just .makeMeasures.
         '''
-        self.stream.makeMeasures(inPlace=True)
-        
+        if self.makeNotation is not False:
+            self.stream.makeMeasures(inPlace=True)
         
 class Test(unittest.TestCase):
     parseTest = "1/4 trip{C8~ C~_hello C=mine} F~ F~ 2/8 F F# quad{g--16 a## FF(n) g#} g16 F0"

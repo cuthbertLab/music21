@@ -447,7 +447,7 @@ def fromObject(thisObject, mode='txt'):
 
         >>> #print vexflow.fromObject(soprano)
         >>> #print vexflow.fromObject(bwv666)
-        >>> #print vexflow.fromObject(tinyNotation.TinyNotationStream("3/4 E4 r f# g=lastG b-8 a g c4~ c"), mode='txt') 
+        >>> #print vexflow.fromObject(converter.parse("tinynotation: 3/4 E4 r f# g=lastG b-8 a g c4~ c"), mode='txt') 
 
     '''
     if 'Note' in thisObject.classes:
@@ -497,8 +497,8 @@ def fromStream(thisStream, mode='txt'):
     
     ::
 
-        >>> #print vexflow.fromStream(tinyNotation.TinyNotationStream('c8 d8 e-4 dd4 cc2'), mode='txt')
-        >>> #print vexflow.fromStream(tinyNotation.TinyNotationStream('C8 D8 E-4 d4 c2'), mode='txt')
+        >>> #print vexflow.fromStream(converter.parse('tinynotation: c8 d8 e-4 dd4 cc2'), mode='txt')
+        >>> #print vexflow.fromStream(converter.parse('tinynotation: C8 D8 E-4 d4 c2'), mode='txt')
 
     '''
     if mode not in supportedDisplayModes:
@@ -1176,7 +1176,7 @@ class VexflowNote(VexflowObject):
 
     ::
 
-        >>> n = tinyNotation.TinyNotationNote('c##2.').note
+        >>> n = converter.parse('tinynotation: c##2.').flat.notes[0]
         >>> n.stemDirection = 'up'
         >>> v = vexflow.VexflowNote(n)
         >>> v.vexflowKey()

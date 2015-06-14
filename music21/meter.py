@@ -302,7 +302,7 @@ def bestTimeSignature(meas):
 
     Note: this does not yet accommodate triplets.
 
-    >>> s = converter.parse('C4 D4 E8 F8', format='tinyNotation')
+    >>> s = converter.parse('tinynotation: C4 D4 E8 F8').flat.notes
     >>> m = stream.Measure()
     >>> for el in s:
     ...     m.insert(el.offset, el)
@@ -310,7 +310,7 @@ def bestTimeSignature(meas):
     >>> ts
     <music21.meter.TimeSignature 3/4>
 
-    >>> s2 = converter.parse('C8. D16 E8 F8. G16 A8', format='tinyNotation')
+    >>> s2 = converter.parse('tinynotation: C8. D16 E8 F8. G16 A8').flat.notes
     >>> m2 = stream.Measure()
     >>> for el in s2:
     ...     m2.insert(el.offset, el)
@@ -318,7 +318,7 @@ def bestTimeSignature(meas):
     >>> ts2
     <music21.meter.TimeSignature 6/8>
 
-    >>> s3 = converter.parse('C2 D2 E2', format='tinyNotation')
+    >>> s3 = converter.parse('C2 D2 E2', format='tinyNotation').flat.notes
     >>> m3 = stream.Measure()
     >>> for el in s3:
     ...     m3.insert(el.offset, el)
@@ -326,7 +326,7 @@ def bestTimeSignature(meas):
     >>> ts3
     <music21.meter.TimeSignature 3/2>
 
-    >>> s4 = converter.parse('C8. D16 E8 F8. G16 A8 C4. D4.', format='tinyNotation')
+    >>> s4 = converter.parse('C8. D16 E8 F8. G16 A8 C4. D4.', format='tinyNotation').flat.notes
     >>> m4 = stream.Measure()
     >>> for el in s4:
     ...     m4.insert(el.offset, el)
@@ -334,7 +334,7 @@ def bestTimeSignature(meas):
     >>> ts4
     <music21.meter.TimeSignature 12/8>
 
-    >>> s5 = converter.parse('C4 D2 E4 F2', format='tinyNotation')
+    >>> s5 = converter.parse('C4 D2 E4 F2', format='tinyNotation').flat.notes
     >>> m5 = stream.Measure()
     >>> for el in s5:
     ...     m5.insert(el.offset, el)
@@ -342,7 +342,7 @@ def bestTimeSignature(meas):
     >>> ts5
     <music21.meter.TimeSignature 6/4>
 
-    >>> s6 = converter.parse('C4 D16.', format='tinyNotation')
+    >>> s6 = converter.parse('C4 D16.', format='tinyNotation').flat.notes
     >>> m6 = stream.Measure()
     >>> for el in s6:
     ...     m6.insert(el.offset, el)
@@ -3788,7 +3788,7 @@ class TimeSignature(base.Music21Object):
         [default] only the notes) in the `Stream` specified as streamIn.
 
 
-        >>> s = converter.parse('C4 D4 E8 F8', format='tinyNotation')
+        >>> s = converter.parse('C4 D4 E8 F8', format='tinyNotation').flat.notes
         >>> sixEight = meter.TimeSignature('6/8')
         >>> sixEight.averageBeatStrength(s)
         0.4375
@@ -4599,13 +4599,13 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(beamList), '[None, None, None, <music21.beam.Beams <music21.beam.Beam 1/start>>, <music21.beam.Beams <music21.beam.Beam 1/stop>>, None]')
 
     def testMixedDurationBeams2(self):
-        from music21 import tinyNotation
-        bm = tinyNotation.TinyNotationStream('3/8 b8 c16 r e. d32')
+        from music21 import converter
+        bm = converter.parse('tinyNotation: 3/8 b8 c16 r e. d32').flat
         bm2 = bm.makeNotation()
         beamList = [n.beams for n in bm2.flat.notes]
         self.assertEqual(repr(beamList), '[<music21.beam.Beams <music21.beam.Beam 1/start>>, <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/left>>, <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>, <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>/<music21.beam.Beam 3/partial/left>>]')
 
-        bm = tinyNotation.TinyNotationStream("2/4 b16 c' b a g f# g r")
+        bm = converter.parse("tinyNotation: 2/4 b16 c' b a g f# g r")
         bm2 = bm.makeNotation()
         beamList = [n.beams for n in bm2.flat.notes]
         beamListRepr = [str(i) + repr(beamList[i]) for i in range(len(beamList))]
@@ -4622,7 +4622,7 @@ class Test(unittest.TestCase):
 
     def testBestTimeSignature(self):
         from music21 import converter, stream
-        s6 = converter.parse('C4 D16.', format='tinyNotation')
+        s6 = converter.parse('C4 D16.', format='tinyNotation').flat.notes
         m6 = stream.Measure()
         for el in s6:
             m6.insert(el.offset, el)

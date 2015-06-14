@@ -678,7 +678,7 @@ def splitNoteGrouping(noteGrouping, value = 2, beatDivisionOffset = 0):
 
 def findSegments(music21Part, **partKeywords):
     """
-    Takes in a :class:`~music21.stream.Part` or :class:`~music21.tinyNotation.TinyNotationStream`
+    Takes in a :class:`~music21.stream.Part`
     and a list of partKeywords. Returns a list of :class:`~music21.segment.BrailleSegment` instances.
     
     
@@ -861,22 +861,23 @@ def prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets = SEGMENT_SLURLO
     
     >>> import copy
     >>> from music21.braille import segment
-    >>> from music21 import spanner
-    >>> from music21 import tinyNotation
-    >>> short = tinyNotation.TinyNotationStream("3/4 c4 d e")
-    >>> s1 = spanner.Slur(short.notes[0],short.notes[-1])
+    >>> short = converter.parse("tinynotation: 3/4 c4 d e")
+    >>> s1 = spanner.Slur(short.flat.notes[0], short.flat.notes[-1])
     >>> short.append(s1)
     >>> short.show("text")
-    {0.0} <music21.meter.TimeSignature 3/4>
-    {0.0} <music21.note.Note C>
-    {1.0} <music21.note.Note D>
-    {2.0} <music21.note.Note E>
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 3/4>
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note D>
+        {2.0} <music21.note.Note E>
+        {3.0} <music21.bar.Barline style=final>
     {3.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note E>>
     >>> shortA = copy.deepcopy(short)
     >>> segment.prepareSlurredNotes(shortA)
-    >>> shortA.notes[0].shortSlur
+    >>> shortA.flat.notes[0].shortSlur
     True
-    >>> shortA.notes[1].shortSlur
+    >>> shortA.flat.notes[1].shortSlur
     True
     
     
@@ -887,23 +888,26 @@ def prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets = SEGMENT_SLURLO
     sign is put before the last note.
     
     
-    >>> long = tinyNotation.TinyNotationStream("3/4 c8 d e f g a")
-    >>> s2 = spanner.Slur(long.notes[0],long.notes[-1])
+    >>> long = converter.parse("tinynotation: 3/4 c8 d e f g a")
+    >>> s2 = spanner.Slur(long.flat.notes[0], long.flat.notes[-1])
     >>> long.append(s2)
     >>> long.show("text")
-    {0.0} <music21.meter.TimeSignature 3/4>
-    {0.0} <music21.note.Note C>
-    {0.5} <music21.note.Note D>
-    {1.0} <music21.note.Note E>
-    {1.5} <music21.note.Note F>
-    {2.0} <music21.note.Note G>
-    {2.5} <music21.note.Note A>
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 3/4>
+        {0.0} <music21.note.Note C>
+        {0.5} <music21.note.Note D>
+        {1.0} <music21.note.Note E>
+        {1.5} <music21.note.Note F>
+        {2.0} <music21.note.Note G>
+        {2.5} <music21.note.Note A>
+        {3.0} <music21.bar.Barline style=final>
     {3.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note A>>
     >>> longA = copy.deepcopy(long)
     >>> segment.prepareSlurredNotes(longA)
-    >>> longA.notes[0].beginLongBracketSlur
+    >>> longA.flat.notes[0].beginLongBracketSlur
     True
-    >>> longA.notes[-1].endLongBracketSlur
+    >>> longA.flat.notes[-1].endLongBracketSlur
     True
     
     
@@ -915,9 +919,9 @@ def prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets = SEGMENT_SLURLO
     
     >>> longB = copy.deepcopy(long)
     >>> segment.prepareSlurredNotes(longB, slurLongPhraseWithBrackets=False)
-    >>> longB.notes[1].beginLongDoubleSlur
+    >>> longB.flat.notes[1].beginLongDoubleSlur
     True
-    >>> longB.notes[-2].endLongDoubleSlur
+    >>> longB.flat.notes[-2].endLongDoubleSlur
     True
     
     
@@ -933,15 +937,15 @@ def prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets = SEGMENT_SLURLO
 
 
     >>> from music21 import tie
-    >>> short.notes[0].tie = tie.Tie("start")
+    >>> short.flat.notes[0].tie = tie.Tie("start")
     >>> shortB = copy.deepcopy(short)
     >>> segment.prepareSlurredNotes(shortB)
-    >>> shortB.notes[0].shortSlur
+    >>> shortB.flat.notes[0].shortSlur
     Traceback (most recent call last):
     AttributeError: 'Note' object has no attribute 'shortSlur'
-    >>> shortB.notes[0].tie
+    >>> shortB.flat.notes[0].tie
     <music21.tie.Tie start>
-    >>> shortB.notes[1].shortSlur
+    >>> shortB.flat.notes[1].shortSlur
     True
   
   
@@ -951,9 +955,9 @@ def prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets = SEGMENT_SLURLO
   
     >>> shortC = copy.deepcopy(short)
     >>> segment.prepareSlurredNotes(shortC, showShortSlursAndTiesTogether=True)
-    >>> shortC.notes[0].shortSlur
+    >>> shortC.flat.notes[0].shortSlur
     True
-    >>> shortC.notes[0].tie
+    >>> shortC.flat.notes[0].tie
     <music21.tie.Tie start>
     """
     if len(music21Part.spannerBundle) > 0:
@@ -1004,8 +1008,7 @@ def getRawSegments(music21Part, segmentBreaks=SEGMENT_SEGMENTBREAKS):
     * :meth:`~music21.braille.segment.extractBrailleElements`
     
     
-    >>> from music21 import tinyNotation
-    >>> tn = tinyNotation.TinyNotationStream("3/4 c4 c c e e e g g g c'2.")
+    >>> tn = converter.parse("tinynotation: 3/4 c4 c c e e e g g g c'2.")
     >>> tn = tn.makeNotation(cautionaryNotImmediateRepeat=False)
     >>> tn.show("text")
     {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -1150,8 +1153,7 @@ def extractBrailleElements(music21Measure):
 
     >>> from music21.braille import segment
     >>> from music21 import spanner
-    >>> from music21 import tinyNotation
-    >>> tn = tinyNotation.TinyNotationStream("2/4 c16 c c c d d d d")
+    >>> tn = converter.parse("tinynotation: 2/4 c16 c c c d d d d", makeNotation=False)
     >>> tn = tn.makeNotation(cautionaryNotImmediateRepeat=False)
     >>> measure = tn[0]
     >>> measure.append(spanner.Slur(measure.notes[0],measure.notes[-1]))
@@ -1222,8 +1224,7 @@ def prepareBeamedNotes(music21Measure):
     
 
     >>> from music21.braille import segment
-    >>> from music21 import tinyNotation
-    >>> tn = tinyNotation.TinyNotationStream("2/4 c16 c c c d d d d")
+    >>> tn = converter.parse("tinynotation: 2/4 c16 c c c d d d d")
     >>> tn = tn.makeNotation(cautionaryNotImmediateRepeat=False)
     >>> tn.show("text")
     {0.0} <music21.stream.Measure 1 offset=0.0>

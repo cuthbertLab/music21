@@ -36,10 +36,10 @@ def nPVI(streamForAnalysis):
 
 
     
-    >>> s2 = converter.parse('tinynotation: 4/4 C4 D E F G').notesAndRests
+    >>> s2 = converter.parse('tinynotation: 4/4 C4 D E F G').flat.notesAndRests
     >>> analysis.patel.nPVI(s2)
     0.0
-    >>> s3 = converter.parse('tinynotation: 4/4 C4 D8 C4 D8 C4').notesAndRests
+    >>> s3 = converter.parse('tinynotation: 4/4 C4 D8 C4 D8 C4').flat.notesAndRests
     >>> analysis.patel.nPVI(s3)
     66.6666...
     >>> s4 = corpus.parse('bwv66.6').parts[0].flat.notesAndRests
@@ -78,10 +78,10 @@ def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
     
     
     
-    >>> s2 = converter.parse('tinynotation: 4/4 C4 D E F# G#').notesAndRests
+    >>> s2 = converter.parse('tinynotation: 4/4 C4 D E F# G#').flat.notesAndRests
     >>> analysis.patel.melodicIntervalVariability(s2)
     0.0
-    >>> s3 = converter.parse('tinynotation: 4/4 C4 D E F G C').notesAndRests
+    >>> s3 = converter.parse('tinynotation: 4/4 C4 D E F G C').flat.notesAndRests
     >>> analysis.patel.melodicIntervalVariability(s3)
     85.266688...
     >>> s4 = corpus.parse('bwv66.6').parts[0].flat.notesAndRests

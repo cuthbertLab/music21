@@ -793,12 +793,16 @@ class LilypondConverter(object):
         >>> lySequentialMusicOut
         <music21.lily.lilyObjects.LySequentialMusic object at 0x...>
         >>> print(lySequentialMusicOut)
-        { \time 3/4
-         c 4
-         d 4
-         e 4
-         f 2.
-        }
+        { \clef "bass" 
+         \time 3/4
+         c 4  
+         d 4  
+         e 4  
+         \bar "|"  %{ end measure 1 %} 
+         f 2.  
+         \bar "|."  %{ end measure 2 %} 
+          } 
+        <BLANKLINE>
         '''
         musicList = []
 
@@ -830,12 +834,17 @@ class LilypondConverter(object):
         \new Staff = ... \with {
          \override StaffSymbol #'line-count = #4
         }
-        { \time 3/4
-           c 4
-           d 4
-           e 4
-           f 2.
-          }
+        { \clef "bass" 
+             \time 3/4
+             c 4  
+             d 4  
+             e 4  
+             \bar "|"  %{ end measure 1 %} 
+             f 2.  
+             \bar "|."  %{ end measure 2 %} 
+              } 
+        <BLANKLINE>
+        <BLANKLINE>
         '''
         compositeMusicType = type
 
@@ -906,6 +915,7 @@ class LilypondConverter(object):
         >>> print(lpc.context.contents)
         [<music21.lily.lilyObjects.LyEmbeddedScm...>, <music21.lily.lilyObjects.LySimpleMusic...>, <music21.lily.lilyObjects.LySimpleMusic...>, <music21.lily.lilyObjects.LySimpleMusic...]
         >>> print(lpc.context)
+        \clef "treble" 
         \time 3/4
         c' 4
         des' 4
@@ -925,6 +935,7 @@ class LilypondConverter(object):
         >>> lpc.appendObjectsToContextFromStream(m)
         >>> print(lpc.context) # internal spaces removed...
           << \new Voice { c'' 1
+                    \bar "|."  %{ end measure 1 %} 
                   }
            \new Voice { cis'' 1
                   }
@@ -2112,12 +2123,16 @@ class LilypondConverter(object):
         >>> lySequentialMusicOut
         <music21.lily.lilyObjects.LySequentialMusic object at 0x...>
         >>> print(lySequentialMusicOut)
-        { \time 3/4
-         c 4
-         d 4
-         e 4
-         f 2.
-        }
+        { \clef "bass" 
+         \time 3/4
+         c 4  
+         d 4  
+         e 4  
+         \bar "|"  %{ end measure 1 %} 
+         f 2.  
+         \bar "|."  %{ end measure 2 %} 
+          } 
+        <BLANKLINE>
         '''
         musicList = []
 

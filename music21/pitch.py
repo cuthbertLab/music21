@@ -4756,8 +4756,8 @@ class Test(unittest.TestCase):
         a nasty test from Jose Cabal-Ugaz about octave leaps, cautionaryNotImmediateRepeat = False
         and key signature conflicts.
         '''
-        from music21 import tinyNotation, key
-        bm = tinyNotation.TinyNotationStream("4/4 fn1 fn1 e-8 e'-8 fn4 en4 e'n4")
+        from music21 import converter, key
+        bm = converter.parse("tinynotation: 4/4 fn1 fn1 e-8 e'-8 fn4 en4 e'n4").flat
         bm.insert(0, key.KeySignature(1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         assert(bm.flat.notes[0].accidental.name == 'natural')     # Fn

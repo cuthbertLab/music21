@@ -1538,9 +1538,6 @@ def partitionByInstrument(streamObj):
     >>> p1 = converter.parse("tinynotation: 4/4 c4  d  e  f  g  a  b  c'  c1")
     >>> p2 = converter.parse("tinynotation: 4/4 C#4 D# E# F# G# A# B# c#  C#1")
 
-    >>> p1.makeMeasures(inPlace=True)
-    >>> p2.makeMeasures(inPlace=True)
-
     >>> p1.getElementsByClass('Measure')[0].insert(0.0, instrument.Piccolo())
     >>> p1.getElementsByClass('Measure')[0].insert(2.0, instrument.AltoSaxophone())
     >>> p1.getElementsByClass('Measure')[1].insert(3.0, instrument.Piccolo())
@@ -1553,7 +1550,7 @@ def partitionByInstrument(streamObj):
     >>> s.insert(0, p1)
     >>> s.insert(0, p2)
     >>> s.show('text')
-    {0.0} <music21.tinyNotation.TinyNotationStream ...>
+    {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.instrument.Instrument Piccolo>
             {0.0} <music21.clef.TrebleClef>
@@ -1572,7 +1569,7 @@ def partitionByInstrument(streamObj):
         {8.0} <music21.stream.Measure 3 offset=8.0>
             {0.0} <music21.note.Note C>
             {4.0} <music21.bar.Barline style=final>
-    {0.0} <music21.tinyNotation.TinyNotationStream ...>
+    {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.instrument.Instrument Trombone>
             {0.0} <music21.clef.BassClef>

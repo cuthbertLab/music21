@@ -69,8 +69,9 @@ class SubConverter(object):
     codecWrite = False
     stringEncoding='utf-8'
     
-    def __init__(self):
+    def __init__(self, **keywords):
         self._stream = stream.Score()
+        self.keywords = keywords
 
     def parseData(self, dataString, number=None):
         '''
@@ -502,7 +503,7 @@ class ConverterTinyNotation(SubConverter):
         else: # assume a 2 element sequence
             raise SubConverterException("TinyNotation no longer supports two-element calls; put the time signature in the stream")
         from music21 import tinyNotation
-        self.stream = tinyNotation.Converter(tnStr).parse().stream
+        self.stream = tinyNotation.Converter(tnStr, **self.keywords).parse().stream
 
 
 class ConverterNoteworthy(SubConverter):

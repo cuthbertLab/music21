@@ -1337,8 +1337,8 @@ class Test(unittest.TestCase):
 
         #self.assertEqual(p._getPitchClassDistribution(s1), [1.0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
-        p.process(s1)
-        likelyKeysMajor1, likelyKeysMinor1 = p._likelyKeys(s1)
+        p.process(s1.flat)
+        likelyKeysMajor1, likelyKeysMinor1 = p._likelyKeys(s1.flat)
         likelyKeysMajor1.sort()
         likelyKeysMinor1.sort()
         allResults1 =  likelyKeysMajor1 + likelyKeysMinor1
@@ -1347,8 +1347,8 @@ class Test(unittest.TestCase):
         unused_post = sorted([(y, x) for x, y in allResults1])
         #print post
 
-        p.process(s2)
-        likelyKeysMajor2, likelyKeysMinor2 = p._likelyKeys(s2)
+        p.process(s2.flat)
+        likelyKeysMajor2, likelyKeysMinor2 = p._likelyKeys(s2.flat)
         likelyKeysMajor2.sort()
         likelyKeysMinor2.sort()
         allResults2 =  likelyKeysMajor2 + likelyKeysMinor2
@@ -1357,7 +1357,7 @@ class Test(unittest.TestCase):
         unused_post = sorted([(y, x) for x, y in allResults2])
         #print post
 
-        likelyKeysMajor3, likelyKeysMinor3 = p._likelyKeys(s3)
+        likelyKeysMajor3, likelyKeysMinor3 = p._likelyKeys(s3.flat)
         likelyKeysMajor3.sort()
         likelyKeysMinor3.sort()
         allResults3 =  likelyKeysMajor3 + likelyKeysMinor3

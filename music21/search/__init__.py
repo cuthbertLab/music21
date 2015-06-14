@@ -75,8 +75,9 @@ def rhythmicSearch(thisStream, searchStream):
     Example 1: First we will set up a simple stream for searching:
     
     
-    >>> thisStream = tinyNotation.TinyNotationStream("3/4 c4. d8 e4 g4. a8 f4. c4.")
+    >>> thisStream = converter.parse("tinynotation: 3/4 c4. d8 e4 g4. a8 f4. c4.").flat
     >>> thisStream.show('text')
+    {0.0} <music21.clef.TrebleClef>
     {0.0} <music21.meter.TimeSignature 3/4>
     {0.0} <music21.note.Note C>
     {1.5} <music21.note.Note D>
@@ -85,7 +86,8 @@ def rhythmicSearch(thisStream, searchStream):
     {4.5} <music21.note.Note A>
     {5.0} <music21.note.Note F>
     {6.5} <music21.note.Note C>    
-    
+    {8.0} <music21.bar.Barline style=final>
+        
     Now we will search for all dotted-quarter/eighth elements in the Stream:
     
     >>> searchStream1 = stream.Stream()
@@ -93,8 +95,8 @@ def rhythmicSearch(thisStream, searchStream):
     >>> searchStream1.append(note.Note(quarterLength = .5))
     >>> l = search.rhythmicSearch(thisStream, searchStream1)
     >>> l
-    [1, 4]
-    >>> stream.Stream(thisStream[4:6]).show('text')
+    [2, 5]
+    >>> stream.Stream(thisStream[5:7]).show('text')
     {3.0} <music21.note.Note G>
     {4.5} <music21.note.Note A>
     
@@ -111,7 +113,7 @@ def rhythmicSearch(thisStream, searchStream):
     >>> searchStream2.append(note.Note(quarterLength = 1.5))
     >>> l = search.rhythmicSearch(thisStream, searchStream2)
     >>> l
-    [2, 5]
+    [3, 6]
     >>> for found in l:
     ...     thisStream[found].lyric = "*"
     >>> #_DOCS_SHOW thisStream.show()
