@@ -8725,7 +8725,7 @@ class Stream(base.Music21Object):
 
 
 
-        >>> s1 = converter.parse("3/4 c4 d' r b b'", makeNotation=False)
+        >>> s1 = converter.parse("tinynotation: 3/4 c4 d' r b b'", makeNotation=False)
         >>> #_DOCS_SHOW s1.show()
 
         .. image:: images/streamMelodicIntervals1.*
@@ -9199,8 +9199,8 @@ class Stream(base.Music21Object):
         Example usage:
 
 
-        >>> s1 = converter.parse('tinynotation: 7/4 C4 d8 e f# g A2 d2')
-        >>> s2 = converter.parse('tinynotation: 7/4 g4 e8 d c4   a2 r2')
+        >>> s1 = converter.parse('tinynotation: 7/4 C4 d8 e f# g A2 d2', makeNotation=False)
+        >>> s2 = converter.parse('tinynotation: 7/4 g4 e8 d c4   a2 r2', makeNotation=False)
         >>> s1.attachIntervalsBetweenStreams(s2)
         >>> for n in s1.notes:
         ...     if n.editorial.harmonicInterval is None: print("None") # if other voice had a rest...
@@ -9233,7 +9233,7 @@ class Stream(base.Music21Object):
         editorial that is the interval between it and the previous element in the stream. Thus,
         the first element will have a value of None.
 
-        >>> s1 = converter.parse('tinyNotation: 7/4 C4 d8 e f# g A2 d2')
+        >>> s1 = converter.parse('tinyNotation: 7/4 C4 d8 e f# g A2 d2', makeNotation=False)
         >>> s1.attachMelodicIntervals()
         >>> for n in s1.notes:
         ...     if n.editorial.melodicInterval is None: print("None")
@@ -9686,7 +9686,7 @@ class Stream(base.Music21Object):
         recurses through measures, but not other container streams.
 
 
-        >>> s = converter.parse("tinynotation: 4/4 a4 b c d     e f g a")
+        >>> s = converter.parse("tinynotation: 4/4 a4 b c d     e f g a", makeNotation=False)
         >>> someLyrics = ['this', 'is', 'a', 'list', 'of', 'eight', 'lyric', 'words']
         >>> for n, lyric in zip(s.notes, someLyrics):
         ...     n.lyric = lyric
@@ -9857,11 +9857,11 @@ class Stream(base.Music21Object):
         elements will be swapped in when a match is found between an element
         in the variant and an element in the replcement region of the string.
 
-        >>> s = converter.parse("tinynotation: 4/4 d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                  d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1")
+        >>> s = converter.parse("tinynotation: 4/4 d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                  d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1", makeNotation=False)
         >>> s.makeMeasures(inPlace = True)
-        >>> v1stream = converter.parse("tinynotation: 4/4        a2. b-8 a8")
-        >>> v2stream1 = converter.parse("tinynotation: 4/4                                      d4 f4 a2")
-        >>> v2stream2 = converter.parse("tinynotation: 4/4                                                  d4 f4 AA2")
+        >>> v1stream = converter.parse("tinynotation: 4/4        a2. b-8 a8", makeNotation=False)
+        >>> v2stream1 = converter.parse("tinynotation: 4/4                                      d4 f4 a2", makeNotation=False)
+        >>> v2stream2 = converter.parse("tinynotation: 4/4                                                  d4 f4 AA2", makeNotation=False)
 
         >>> v1 = variant.Variant()
         >>> v1measure = stream.Measure()
@@ -11273,7 +11273,7 @@ class Measure(Stream):
         We create a simple stream that should be in 3/4
 
 
-        >>> s = converter.parse('C4 D4 E8 F8', format='tinyNotation')
+        >>> s = converter.parse('C4 D4 E8 F8', format='tinyNotation', makeNotation=False)
         >>> m = stream.Measure()
         >>> for el in s:
         ...     m.insert(el.offset, el)

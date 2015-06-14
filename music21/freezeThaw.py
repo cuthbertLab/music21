@@ -240,8 +240,8 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> s.append(n)
         >>> sf = freezeThaw.StreamFreezer(s)
         >>> #_DOCS_SHOW sf.packStream()
-        >>> print("{'m21Version': (1, 9, 3), 'stream': <music21.stream.Stream 4391393680>}") #_DOCS_HIDE
-        {'m21Version': (1, 9, 3), 'stream': <music21.stream.Stream 4391393680>}
+        >>> print("{'m21Version': (2, 0, 5), 'stream': <music21.stream.Stream 4391393680>}") #_DOCS_HIDE
+        {'m21Version': (2, 0, 5), 'stream': <music21.stream.Stream 4391393680>}
         
         '''
         # do all things necessary to setup the stream

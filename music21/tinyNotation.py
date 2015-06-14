@@ -348,13 +348,14 @@ class NoteOrRestToken(Token):
     '''
     represents a Note or Rest.  Chords are represented by Note objects
     '''
-    durationMap = [
-        (r'(\d+)', 'durationType'),
-        (r'(\.+)', 'dots'),
-    ]  ## tie later...
-    
     def __init__(self, token=""):
         super(NoteOrRestToken, self).__init__(token)
+        self.durationMap = [
+                            (r'(\d+)', 'durationType'),
+                            (r'(\.+)', 'dots'),
+        ]  ## tie later...
+    
+        
         self.durationFound = False
 
     def applyDuration(self, n, t, parent):
