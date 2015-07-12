@@ -29,7 +29,8 @@ To do a release,
 [*] you will need sphinx, IPython (pip or easy_install), markdown, and pandoc (.dmg) installed
 
 9. run documentation/upload [not via eclipse] or upload via ssh.
-10. And finally this file. 
+
+10. And finally this file ON PYTHON 2.7
 
 11. COMMIT to Github at this point, then don't change anything until the next step is done.
     (.gitignore SHOULD avoid uploading the large files created here...)
@@ -119,6 +120,7 @@ class Distributor(object):
             elif self.version in fn and fn.endswith('.exe'):
                 fpNew = fp.replace('.macosx-10.8-intel.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.8-x86_64.exe', '.win32.exe')
+                fpNew = fpNew.replace('.macosx-10.6-x86_64.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.9-intel.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.9-x86_64.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.10-intel.exe', '.win32.exe')
@@ -256,8 +258,11 @@ class Distributor(object):
         remove extract build products.
         '''
         # call setup.py
-        #import setup -- for some reason doesnt work unless called from commandline
-        for buildType in ['bdist_egg', 'bdist_wininst', 'sdist --formats=gztar']:    
+        #import setup # -- for some reason does not work unless called from command line
+        for buildType in ['bdist_egg', 
+                          'bdist_wininst', 
+                          'sdist --formats=gztar'
+                          ]:    
                 environLocal.warn('making %s' % buildType)
 
                 #setup.writeManifestTemplate(self.fpPackageDir)

@@ -3755,9 +3755,7 @@ class Pitch(object):
 
         '''
         #environLocal.printDebug(['Pitch.transpose()', value])
-        if hasattr(value, 'diatonic'): # its an Interval class with a DiatonicInterval class
-            intervalObj = value
-        elif hasattr(value, 'classes') and 'GenericInterval' in value.classes:
+        if hasattr(value, 'classes') and 'IntervalBase' in value.classes:
             intervalObj = value
         else: # try to process
             intervalObj = interval.Interval(value)

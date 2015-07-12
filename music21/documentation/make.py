@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:         documentation/make.py
@@ -10,7 +9,6 @@
 # Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 
 import os
 import shutil

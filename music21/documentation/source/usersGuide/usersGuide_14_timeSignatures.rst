@@ -42,6 +42,7 @@ notes and a ``TimeSignature`` object.
 
 .. code:: python
 
+    from __future__ import print_function # DOCS_HIDE
     from music21 import *
     
     noteC = note.Note("C4", type="half")
@@ -51,7 +52,7 @@ notes and a ``TimeSignature`` object.
     
     tsThreeFour = meter.TimeSignature('3/4')
     
-    print tsThreeFour.numerator, '/',  tsThreeFour.denominator
+    print(tsThreeFour.numerator, '/',  tsThreeFour.denominator)
 
 
 .. parsed-literal::
@@ -194,7 +195,7 @@ all the notes in the Stream:
 .. code:: python
 
     for n in stream1.notes:
-        print n, n.beat
+        print(n, n.beat)
 
 
 .. parsed-literal::
@@ -212,7 +213,7 @@ filter on beats like so:
 
     for n in stream1.notes:
         if n.beat == 1.0:
-            print n
+            print(n)
 
 
 .. parsed-literal::
@@ -246,7 +247,7 @@ downbeat.
 .. code:: python
 
     for n in stream1.notes:
-        print n, n.beat
+        print(n, n.beat)
 
 
 .. parsed-literal::
@@ -281,7 +282,7 @@ documented in full at :class:`music21.meter.TimeSignature`.
 .. code:: python
 
     for n in stream1.notes:
-        print n, n.beat
+        print(n, n.beat)
 
 
 .. parsed-literal::
@@ -317,7 +318,7 @@ And we can change that and see how it affects the results:
     tsThreeFour.beatCount = 6
     
     for n in stream1.notes:
-        print n, n.beat
+        print(n, n.beat)
 
 
 .. parsed-literal::
@@ -363,7 +364,7 @@ module's :func:`~music21.corpus.parse` function. It returns a
 
     myBach = corpus.parse('bach/bwv57.8')
     
-    print myBach.__class__
+    print(myBach.__class__)
 
 
 .. parsed-literal::
@@ -603,7 +604,7 @@ tsList is a ``Part`` object so we can show it:
 
 .. code:: python
 
-    print tsList.__class__
+    print(tsList.__class__)
     tsList.show('text')
 
 
@@ -665,7 +666,7 @@ in the Soprano part:
     sopr = myBach.parts['Soprano'].measures(1,2)
     
     for n in sopr.flat.notes:
-        print n, n.beatStr
+        print(n, n.beatStr)
 
 
 .. parsed-literal::
@@ -718,7 +719,7 @@ most accented and 0 being least.
 .. code:: python
 
     for n in sopr.flat.notes:
-        print n, n.beatStrength
+        print(n, n.beatStrength)
 
 
 .. parsed-literal::

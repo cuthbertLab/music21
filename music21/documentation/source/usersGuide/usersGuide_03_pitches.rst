@@ -485,9 +485,9 @@ weird ``2.25`` Duration. We have to first assign it to a note:
 
 Music21 can also deal with other ``quarterLengths`` such as 0.8, which
 is 4/5ths of a quarter note, or 1/3 which is an eighth note triplet.
-Just be careful when creating triplets, because of a weird Python quirk
-that makes it so that if you divide two integers you always get back
-just the integer part of the number, so 8/3 is 2, since 8/3 is
+Just be careful when creating triplets, because of a weird Python 2
+quirk that makes it so that if you divide two integers you always get
+back just the integer part of the number, so 8/3 is 2, since 8/3 is
 2.66666... and the integer part is 2:
 
 .. code:: python
@@ -512,8 +512,8 @@ just the integer part of the number, so 8/3 is 2, since 8/3 is
     0
 
 
-To get the number you probably want, make sure that at least one of the
-numbers you are dividing is a float. So:
+To get the number you probably want either use Python 3 or make sure
+that at least one of the numbers you are dividing is a float. So:
 
 .. code:: python
 

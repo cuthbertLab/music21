@@ -30,6 +30,7 @@ from music21 import environment
 
 _MOD = 'search.segment.py'
 environLocal = environment.Environment(_MOD)
+import copy
 import os
 import math
 import json
@@ -202,16 +203,26 @@ def indexScoreFilePaths(
             print("Indexing %s (%d/%d)" % (
                 shortfp, scoreIndex, totalScores))
         scoreIndex += 1
-        try:
-            if not os.path.isabs(filePath):
-                scoreObj = corpus.parse(filePath)
-            else:
-                scoreObj = converter.parse(filePath)
-            scoreDict[shortfp] = indexScoreParts(scoreObj, *args, **kwds)
-        except:
-            print("Failed on parse for: %s" % filePath)
+        if 'failFast' not in kwds or kwds['failFast'] is False:        
+            try:
+                scoreDict[shortfp] = indexOnePath(filePath, *args, **kwds)
+            except Exception as e:
+                print("Failed on parse for, %s: %s" % (filePath, str(e)))
+        else:
+            kwds2 = copy.copy(kwds)
+            del(kwds2['failFast'])
+            scoreDict[shortfp] = indexOnePath(filePath, *args, **kwds2)
+            
     return scoreDict
 
+
+def indexOnePath(filePath, *args, **kwds):
+    if not os.path.isabs(filePath):
+        scoreObj = corpus.parse(filePath)
+    else:
+        scoreObj = converter.parse(filePath)
+    scoreDictEntry = indexScoreParts(scoreObj, *args, **kwds)
+    return scoreDictEntry
 
 def saveScoreDict(scoreDict, filePath=None):
     '''

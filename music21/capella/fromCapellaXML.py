@@ -231,6 +231,9 @@ class CapellaImporter(object):
             parts[partDict['number']] = partDict['part']
         for p in parts:
             # remove redundant Clef and KeySignatures
+            if p is None:
+                print('part entries do not match partDict!')
+                continue
             clefs = p.getElementsByClass('Clef')
             keySignatures = p.getElementsByClass('KeySignature')
             lastClef = None
@@ -411,6 +414,8 @@ class CapellaImporter(object):
                     if isinstance(el, list): #barlineList returns a list
                         for elSub in el:
                             s._appendCore(elSub)
+                    elif el is None:
+                        pass
                     else:
                         s._appendCore(el)
                     
@@ -564,6 +569,9 @@ class CapellaImporter(object):
         '''
         if 'step' in alterElement._attrs:
             alteration = int(alterElement._attrs['step'].value)
+        else:
+            print("No alteration...")
+            alteration = 0
         acc = pitch.Accidental(alteration)
 
         if 'display' in alterElement._attrs and alterElement._attrs['display'].value == 'suppress':
@@ -746,7 +754,10 @@ class CapellaImporter(object):
         '''
         if 'time' in timeSign._attrs:
             timeString = timeSign._attrs['time'].value
-            return meter.TimeSignature(timeString)
+            if timeString != 'infinite':
+                return meter.TimeSignature(timeString)
+            else:
+                return None
         else:
             return None
     
@@ -857,7 +868,7 @@ class CapellaImporter(object):
         '''
         barlineList = []
         hasRepeatEnd = False
-        if 'type' in barlineElement._attrs:
+        if barlineElement._attrs is not None and 'type' in barlineElement._attrs:
             barlineType = barlineElement._attrs['type'].value
             if barlineType.startswith('rep'): # begins with rep
                 if barlineType in self.barlineMap:

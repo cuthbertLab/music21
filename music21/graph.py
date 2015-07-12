@@ -519,7 +519,7 @@ class Graph(object):
         # this sets the color of the main data presentation window
         rect.set_facecolor(getColor(self.colorBackgroundData))
         # this does not do anything yet
-        # rect.set_edgecolor('red')
+        # rect.set_edgecolor(getColor('red'))
 
         for axis in self.axisKeys:
             if self.axis[axis]['range'] != None:

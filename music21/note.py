@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2014 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2006-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -1344,9 +1344,7 @@ class Note(NotRest):
         <music21.note.Note C#>
 
         '''
-        if hasattr(value, 'diatonic'): # its an Interval class
-            intervalObj = value
-        elif hasattr(value, 'classes') and 'GenericInterval' in value.classes:
+        if hasattr(value, 'classes') and 'IntervalBase' in value.classes:
             intervalObj = value
         else: # try to process
             intervalObj = interval.Interval(value)

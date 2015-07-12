@@ -564,7 +564,6 @@ def opFrac(num):
     Code Completion easily. That is to say, this function has been set up to be used, so please
     use it.
     
-    
     >>> from fractions import Fraction
     >>> defaults.limitOffsetDenominator
     65535
@@ -581,6 +580,8 @@ def opFrac(num):
     Fraction(10, 81)
     >>> common.opFrac(None) is None
     True
+    
+    :type num: float
     '''
     # This is a performance critical operation, tuned to go as fast as possible.
     # hence redundancy -- first we check for type (no inheritance) and then we
@@ -2188,6 +2189,9 @@ def normalizeFilename(name):
 
     >>> common.normalizeFilename(u'03-Niccolò all’lessandra.not really.xml')
     '03-Niccolo_alllessandra_not_really.xml'
+
+    :type name: str
+    :rtype str
     '''
     import unicodedata
     extension = None
@@ -2220,6 +2224,8 @@ def runningUnderIPython():
     This post:
     http://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook
     says not to do this, but really, I can't think of another way to have different output as default.
+    
+    :rtype bool
     '''
     if sys.stderr.__class__.__name__ == 'OutStream':
         return True
@@ -2234,6 +2240,10 @@ def relativepath(path, start='.'):
 
     This avoids problems under Windows when the current working directory is
     on a different drive letter from `path`.
+    
+    :type path: str
+    :type start: str
+    :rtype str
     '''
     import platform
     if platform == 'Windows':

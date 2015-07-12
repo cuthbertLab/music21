@@ -7,13 +7,6 @@
 .. code:: python
 
 
-
-.. parsed-literal::
-   :class: ipython-result
-
-    The music21.ipython21.ipExtension extension is already loaded. To reload it, use:
-      %reload_ext music21.ipython21.ipExtension
-
 File Formats(1)
 ===============
 
@@ -39,7 +32,8 @@ the file with the following.
 
 .. code:: python
 
-    #INSERT EXAMPLE HERE
+    from music21 import *
+    #_DOCS_SHOW c = converter.parse('/Users/cuthbert/Desktop/myXML.xml')
 
 Alternative, we can provide a URL to the
 :func:`music21.converter.parse` function that points to the desired
@@ -53,7 +47,7 @@ the file will be downloaded and parsed.
     sAlt[1][:6].show() # show first 5 measures
 
 
-.. image:: usersGuide_10_fileFormats1_files/_fig_02.png
+.. image:: usersGuide_10_fileFormats1_files/_fig_01.png
 
 
 Note that presently music21 offers limited support for compressed .mxl
@@ -64,11 +58,7 @@ Getting MusicXML Files
 
 Numerous MusicXML files can be found at the following URLs.
 
-http://www.wikifonia.org
-
-http://kern.ccarh.org
-
-http://www.gutenberg.org
+http://kern.ccarh.org http://www.gutenberg.org
 
 Parsing Humdrum Files
 ---------------------

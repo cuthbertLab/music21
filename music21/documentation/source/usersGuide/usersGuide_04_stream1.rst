@@ -348,14 +348,13 @@ to a variable using the equal sign. Let's call our Stream ``stream1``:
     stream1 = stream.Stream()
 
 | Notice that just like how the (capital) ``Note`` object lives in a
-  module called (lowercase) ``note``, the (capital) ``Stream`` object
-  lives in a module called (lowercase) ``stream``. Variable names, like
-  ``stream1`` can be either uppercase or lowercase, but I tend to use
-  lowercase variable names (or camelCase like we did with ``noteList``).
-
+module called (lowercase) ``note``, the (capital) ``Stream`` object
+lives in a module called (lowercase) ``stream``. Variable names, like
+``stream1`` can be either uppercase or lowercase, but I tend to use
+lowercase variable names (or camelCase like we did with ``noteList``).
 | The most common use of Streams is as places to store Notes. So let's
-  do just that: we can add the three ``Note`` objects we created above
-  by using the ``append`` method of ``Stream``:
+do just that: we can add the three ``Note`` objects we created above by
+using the ``append`` method of ``Stream``:
 
 .. code:: python
 
@@ -791,7 +790,7 @@ By the way, Streams have a ``__repr__`` as well:
 .. parsed-literal::
    :class: ipython-result
 
-    <music21.stream.Stream 0x106f226d0>
+    <music21.stream.Stream 0x106fa4890>
 
 
 that number at the end is the ``.id`` of the ``Stream``, which is a way
@@ -955,9 +954,8 @@ special name and its own class (:class:`~music21.stream.Score`,
 ``Streams``.
 
 | So how do we find ``note1`` inside ``biggerStream``? That's what the
-  next two chapters are about.
-
+next two chapters are about.
 | :ref:`Lists of Lists <usersGuide_05_listsOfLists>` are covered in
-  Chapter 5. Those with programming experience who have familiarity with
-  lists of lists and defining functions might want to skip to Chapter 6,
-  :ref:`Streams of Streams <usersGuide_06_stream2>`.
+Chapter 5. Those with programming experience who have familiarity with
+lists of lists and defining functions might want to skip to Chapter 6,
+:ref:`Streams of Streams <usersGuide_06_stream2>`.

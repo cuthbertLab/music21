@@ -8,7 +8,7 @@
 #               Amy Hailes 
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -441,13 +441,14 @@ def convertSemitoneToSpecifierGeneric(count):
 
 
 
-
-
-
-
-
 #-------------------------------------------------------------------------------
-class GenericInterval(base.Music21Object):
+class IntervalBase(base.Music21Object):
+    '''
+    General base class for inheritance.
+    '''
+    pass
+
+class GenericInterval(IntervalBase):
     '''
     A GenericInterval is an interval such as Third, Seventh, Octave, or Tenth.
     Constructor takes an integer or string specifying the interval and direction. 
@@ -535,7 +536,7 @@ class GenericInterval(base.Music21Object):
         >>> aInterval.niceName
         '23'
         '''
-        base.Music21Object.__init__(self)
+        IntervalBase.__init__(self)
 
         self.value = convertGeneric(value)
         self.directed = self.value
@@ -758,7 +759,7 @@ class GenericInterval(base.Music21Object):
         return DiatonicInterval(specifier, self)
 
 
-class DiatonicInterval(base.Music21Object):
+class DiatonicInterval(IntervalBase):
     '''
     A class representing a diatonic interval. Two required arguments are a string `specifier` 
     (such as perfect, major, or minor) and `generic`, either an int of an interval size (such as 
@@ -851,7 +852,7 @@ class DiatonicInterval(base.Music21Object):
         >>> dimDescending.direction == interval.DESCENDING
         True
         '''
-        base.Music21Object.__init__(self)
+        IntervalBase.__init__(self)
 
         if specifier is not None and generic is not None:
             if common.isNum(generic) or common.isStr(generic):
@@ -1077,7 +1078,7 @@ class DiatonicInterval(base.Music21Object):
 
 
 
-class ChromaticInterval(base.Music21Object):
+class ChromaticInterval(IntervalBase):
     '''
     Chromatic interval class. Unlike a :class:`~music21.interval.DiatonicInterval`, this Interval 
     class treats interval spaces in half-steps.  So Major 3rd and Diminished 4th are the same.
@@ -1108,7 +1109,7 @@ class ChromaticInterval(base.Music21Object):
         >>> aInterval.isStep
         True
         '''
-        base.Music21Object.__init__(self)
+        IntervalBase.__init__(self)
 
         if value == int(value):
             value = int(value)
@@ -1496,7 +1497,7 @@ def intervalFromGenericAndChromatic(gInt, cInt):
 # if implicit, turing transpose, set to simplifyEnharmonic
 
 
-class Interval(base.Music21Object):
+class Interval(IntervalBase):
     '''
     An Interval class that encapsulates both :class:`~music21.interval.ChromaticInterval` and 
     :class:`~music21.interval.DiatonicInterval` objects all in one model. 
@@ -1626,21 +1627,22 @@ class Interval(base.Music21Object):
 #        _noteEnd = Pitch (or Note) object
 #     in which case it figures out the diatonic and chromatic intervals itself
 
-    diatonic = None
-    chromatic = None
-    direction = None
-    generic = None
-
-    # these can be accessed through noteStart and noteEnd properties
-    _noteStart = None 
-    _noteEnd = None 
-
-    type = "" # harmonic or melodic
-    diatonicType = 0
-    niceName = ""
-
     def __init__(self, *arguments, **keywords):
-        base.Music21Object.__init__(self)
+        IntervalBase.__init__(self)
+        self.diatonic = None
+        self.chromatic = None
+        self.direction = None
+        self.generic = None
+
+        # these can be accessed through noteStart and noteEnd properties
+        self._noteStart = None 
+        self._noteEnd = None 
+    
+        self.type = "" # harmonic or melodic
+        self.diatonicType = 0
+        self.niceName = ""
+
+
         if len(arguments) == 1 and common.isStr(arguments[0]):
             # convert common string representations 
             dInterval, cInterval = _stringToDiatonicChromatic(arguments[0])
@@ -2831,6 +2833,19 @@ class Test(unittest.TestCase):
         directedNiceName = i.directedNiceName
         self.assertEqual(directedNiceName, "Descending Diminished Unison")
 
+    def testTransposeWithChromaticInterval(self):
+        from music21 import interval, note
+        ns = note.Note("C4")
+        i = interval.ChromaticInterval(5)
+        n2 = ns.transpose(i)
+        self.assertEqual(n2.nameWithOctave, "F4")
+
+        ns = note.Note("B#3")
+        i = interval.ChromaticInterval(5)
+        n2 = ns.transpose(i)
+        self.assertEqual(n2.nameWithOctave, "F4")
+
+        
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [notesToChromatic, intervalsToDiatonic, 
