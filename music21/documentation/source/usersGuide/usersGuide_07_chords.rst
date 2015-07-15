@@ -4,6 +4,7 @@
    AUTOMATICALLY GENERATED.
    PLEASE EDIT THE .py FILE DIRECTLY.
 
+
 User's Guide, Chapter 7: Chords
 ===============================
 
@@ -31,10 +32,13 @@ common:
     cMinor.quarterLength
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     2.0
+
 
 
 But since a ``Chord`` contains many pitches, it does not have a
@@ -44,14 +48,19 @@ But since a ``Chord`` contains many pitches, it does not have a
 
     cMinor.pitch
 
+
 ::
+
 
     ---------------------------------------------------------------------------
     AttributeError                            Traceback (most recent call last)
+
     <ipython-input-4-682233136f94> in <module>()
     ----> 1 cMinor.pitch
     
+
     AttributeError: 'Chord' object has no attribute 'pitch'
+
 
 Instead it has a :meth:`.pitches <music21.chord.Chord.pitches>`
 attribute which returns a Tuple of pitches in the Chord.
@@ -61,10 +70,13 @@ attribute which returns a Tuple of pitches in the Chord.
     cMinor.pitches
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     (<music21.pitch.Pitch C4>, <music21.pitch.Pitch G4>, <music21.pitch.Pitch E-5>)
+
 
 
 Okay, but you already knew what pitches were in the ``Chord`` since you
@@ -79,10 +91,13 @@ How about determining if it is a
     cMinor.isMajorTriad()
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     False
+
 
 
 .. code:: python
@@ -90,10 +105,13 @@ How about determining if it is a
     cMinor.isMinorTriad()
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     True
+
 
 
 You can also figure out if it is in inversion or not:
@@ -103,10 +121,13 @@ You can also figure out if it is in inversion or not:
     cMinor.inversion()
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     0
+
 
 
 Chords in root position have inversion of 0. But consider this other
@@ -118,10 +139,13 @@ chord:
     cMajor.inversion()
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     1
+
 
 
 With this chord, two other methods become important:
@@ -131,10 +155,13 @@ With this chord, two other methods become important:
     cMajor.root()
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.pitch.Pitch C4>
+
 
 
 .. code:: python
@@ -142,10 +169,13 @@ With this chord, two other methods become important:
     cMajor.bass()
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.pitch.Pitch E3>
+
 
 
 You can find the third and fifth of the ``Chord`` with .third and
@@ -158,10 +188,13 @@ be fixed and consistent soon:
     cMajor.third
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.pitch.Pitch E3>
+
 
 
 .. code:: python
@@ -169,10 +202,13 @@ be fixed and consistent soon:
     cMajor.fifth
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.pitch.Pitch G4>
+
 
 
 There is also a .seventh property, but it won't do anything here:
@@ -188,10 +224,13 @@ The result of that is ``None`` which we can test like so...
     cMajor.seventh is None
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     True
+
 
 
 Displaying Chords
@@ -206,7 +245,10 @@ yet...we'll get this set up in Chapter 8)
     cMinor.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_12.png
+
+
+.. image:: usersGuide_07_chords_files/usersGuide_07_chords_29_0.png
+
 
 
 .. code:: python
@@ -214,7 +256,10 @@ yet...we'll get this set up in Chapter 8)
     cMajor.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_14.png
+
+
+.. image:: usersGuide_07_chords_files/usersGuide_07_chords_30_0.png
+
 
 
 These chords are a bit "spacey", so let's get ``c`` in
@@ -226,7 +271,10 @@ These chords are a bit "spacey", so let's get ``c`` in
     cClosed.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_16.png
+
+
+.. image:: usersGuide_07_chords_files/usersGuide_07_chords_32_0.png
+
 
 
 Notice that ``c`` is unchanged. The closed position chord is only
@@ -237,7 +285,10 @@ Notice that ``c`` is unchanged. The closed position chord is only
     cMinor.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_18.png
+
+
+.. image:: usersGuide_07_chords_files/usersGuide_07_chords_34_0.png
+
 
 
 If we wanted to change the Chord object itself, we call
@@ -250,7 +301,10 @@ original is altered, we don't need to put ``x = ...`` in front of it
     cMajor.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_20.png
+
+
+.. image:: usersGuide_07_chords_files/usersGuide_07_chords_36_0.png
+
 
 
 There is also a method,
@@ -267,7 +321,10 @@ the most compact form possible:
     c2.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_22.png
+
+
+.. image:: usersGuide_07_chords_files/usersGuide_07_chords_38_0.png
+
 
 
 We can get the :meth:`common name <music21.chord.Chord.commonName>` of
@@ -284,6 +341,7 @@ each of these Chords:
 
     minor triad
 
+
 .. code:: python
 
     print cMajor.commonName
@@ -294,6 +352,7 @@ each of these Chords:
 
     major triad
 
+
 More complex chords have less common "commonNames". Here's one that the
 American composer Elliott Carter liked a lot.
 
@@ -303,10 +362,13 @@ American composer Elliott Carter liked a lot.
     elliottCarterChord.commonName
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     'all-interval tetrachord'
+
 
 
 .. code:: python
@@ -314,7 +376,10 @@ American composer Elliott Carter liked a lot.
     elliottCarterChord.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_27.png
+
+
+.. image:: usersGuide_07_chords_files/usersGuide_07_chords_44_0.png
+
 
 
 More ways of creating chords; Chords and Streams
@@ -333,7 +398,10 @@ a bunch of already created ``Note`` objects:
     dMajor.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_29.png
+
+
+.. image:: usersGuide_07_chords_files/usersGuide_07_chords_47_0.png
+
 
 
 Or we can pass a string with note names separated by spaces:
@@ -344,7 +412,10 @@ Or we can pass a string with note names separated by spaces:
     e7.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_31.png
+
+
+.. image:: usersGuide_07_chords_files/usersGuide_07_chords_49_0.png
+
 
 
 The octaves are optional, especially if everything is within an octave:
@@ -355,7 +426,10 @@ The octaves are optional, especially if everything is within an octave:
     es.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_33.png
+
+
+.. image:: usersGuide_07_chords_files/usersGuide_07_chords_51_0.png
+
 
 
 But you will definitely want them if a chord crosses the boundary of an
@@ -368,7 +442,10 @@ not what you want:
     fMajor.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_35.png
+
+
+.. image:: usersGuide_07_chords_files/usersGuide_07_chords_53_0.png
+
 
 
 Notice that because C sorts before F and A that the chord is in second
@@ -387,6 +464,7 @@ so:
     2
     64
 
+
 In addition to .commonName, there are a few other "name" properties that
 might be interesting:
 
@@ -395,10 +473,13 @@ might be interesting:
     fMajor.fullName
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     'Chord {F | A | C} Quarter'
+
 
 
 .. code:: python
@@ -406,10 +487,13 @@ might be interesting:
     fMajor.pitchedCommonName
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     'F-major triad'
+
 
 
 Like ``Note`` objects, we can put ``Chord`` objects inside a
@@ -424,7 +508,10 @@ Like ``Note`` objects, we can put ``Chord`` objects inside a
     stream1.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_40.png
+
+
+.. image:: usersGuide_07_chords_files/usersGuide_07_chords_60_0.png
+
 
 
 We can mix and match ``Notes``, :class:`Rests <music21.note.Rest>`,
@@ -444,7 +531,10 @@ and ``Chords``:
     stream2.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_42.png
+
+
+.. image:: usersGuide_07_chords_files/usersGuide_07_chords_62_0.png
+
 
 
 Post-tonal chords (in brief)
@@ -465,10 +555,13 @@ fourth (G to C above, since octave does not matter):
     cMinor.intervalVector
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     [0, 0, 1, 1, 1, 0]
+
 
 
 A major triad has the same interval vector:
@@ -478,10 +571,13 @@ A major triad has the same interval vector:
     cMajor.intervalVector
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     [0, 0, 1, 1, 1, 0]
+
 
 
 The elliottCarterChord is unique in that it has an ``.intervalVector``
@@ -492,10 +588,13 @@ of all 1's:
     elliottCarterChord.intervalVector
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     [1, 1, 1, 1, 1, 1]
+
 
 
 Well, it's almost unique: there is another chord with the same
@@ -506,10 +605,13 @@ Well, it's almost unique: there is another chord with the same
     elliottCarterChord.hasZRelation
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     True
+
 
 
 .. code:: python
@@ -518,10 +620,13 @@ Well, it's almost unique: there is another chord with the same
     otherECChord
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.chord.Chord C C# E- G>
+
 
 
 We can see it though there's a little problem with accidentals still on
@@ -534,7 +639,10 @@ C# to Db).
     otherECChord.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_49.png
+
+
+.. image:: usersGuide_07_chords_files/usersGuide_07_chords_74_0.png
+
 
 
 .. code:: python
@@ -542,10 +650,13 @@ C# to Db).
     otherECChord.intervalVector
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     [1, 1, 1, 1, 1, 1]
+
 
 
 The other post-tonal tools you might be interested in are given below.
@@ -566,6 +677,7 @@ ones:
     [0, 1, 4, 6]
     4-15A
 
+
 If you really only care about semitones, you can create a chord just
 with the pitchClasses:
 
@@ -575,7 +687,10 @@ with the pitchClasses:
     oddChord.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_53.png
+
+
+.. image:: usersGuide_07_chords_files/usersGuide_07_chords_79_0.png
+
 
 
 Though if you use pitchClasses above 11, then they are treated as MIDI
@@ -588,7 +703,10 @@ automatically.
     midiChordType.show()
 
 
-.. image:: usersGuide_07_chords_files/_fig_55.png
+
+
+.. image:: usersGuide_07_chords_files/usersGuide_07_chords_81_0.png
+
 
 
 Okay, so now you've learned the basics (and more!) of Notes and Chords,

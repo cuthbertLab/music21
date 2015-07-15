@@ -4,6 +4,7 @@
    AUTOMATICALLY GENERATED.
    PLEASE EDIT THE .py FILE DIRECTLY.
 
+
 .. code:: python
 
     from music21 import *
@@ -35,10 +36,13 @@
     cList
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     [<music21.pitch.Pitch D-4>, <music21.pitch.Pitch F4>, <music21.pitch.Pitch B4>]
+
 
 
 .. code:: python
@@ -47,7 +51,10 @@
     chord1.show()
 
 
-.. image:: usersGuide_98_inversionDemo_files/_fig_02.png
+
+
+.. image:: usersGuide_98_inversionDemo_files/usersGuide_98_inversionDemo_7_0.png
+
 
 
 .. code:: python
@@ -59,7 +66,10 @@
     chord1.show()
 
 
-.. image:: usersGuide_98_inversionDemo_files/_fig_04.png
+
+
+.. image:: usersGuide_98_inversionDemo_files/usersGuide_98_inversionDemo_9_0.png
+
 
 
 .. code:: python
@@ -67,10 +77,13 @@
     max(chord1.pitches)
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.pitch.Pitch F5>
+
 
 
 .. code:: python
@@ -114,12 +127,16 @@
     {18.0} <music21.chord.Chord G8 C9 E9>
     {19.0} <music21.chord.Chord C9 E9 G9>
 
+
 .. code:: python
 
     s.show()
 
 
-.. image:: usersGuide_98_inversionDemo_files/_fig_08.png
+
+
+.. image:: usersGuide_98_inversionDemo_files/usersGuide_98_inversionDemo_13_0.png
+
 
 
 .. code:: python
@@ -138,7 +155,10 @@
     s.show()
 
 
-.. image:: usersGuide_98_inversionDemo_files/_fig_10.png
+
+
+.. image:: usersGuide_98_inversionDemo_files/usersGuide_98_inversionDemo_15_0.png
+
 
 
 .. code:: python
@@ -157,7 +177,10 @@
     s.show()
 
 
-.. image:: usersGuide_98_inversionDemo_files/_fig_12.png
+
+
+.. image:: usersGuide_98_inversionDemo_files/usersGuide_98_inversionDemo_17_0.png
+
 
 
 .. code:: python
@@ -182,12 +205,16 @@
 
     1
 
+
 .. code:: python
 
     s.show()
 
 
-.. image:: usersGuide_98_inversionDemo_files/_fig_15.png
+
+
+.. image:: usersGuide_98_inversionDemo_files/usersGuide_98_inversionDemo_20_0.png
+
 
 
 All subchords.
@@ -202,10 +229,13 @@ All subchords.
     c.commonName
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     'all tri-chord hexachord'
+
 
 
 .. code:: python
@@ -216,12 +246,11 @@ All subchords.
     cc
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
 
 
-.. code:: python
-
-    

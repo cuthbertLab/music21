@@ -4,6 +4,7 @@
    AUTOMATICALLY GENERATED.
    PLEASE EDIT THE .py FILE DIRECTLY.
 
+
 User's Guide: Chapter 54: Extending Converter with New Formats
 ==============================================================
 
@@ -94,6 +95,7 @@ data:
         {3.0} <music21.note.Note C>
         {4.0} <music21.bar.Barline style=final>
 
+
 Or, singleBeat is now a custom header for parse:
 
 .. code:: python
@@ -102,10 +104,13 @@ Or, singleBeat is now a custom header for parse:
     s[-1][0]
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.note.Note G>
+
 
 
 Or we can write out a file and read it in:
@@ -125,6 +130,7 @@ Or we can write out a file and read it in:
    :class: ipython-result
 
     /var/folders/x5/rymq2tx16lqbpytwb1n_cc4c0000gn/T/music21/tmpfcXJDV.sb
+
 
 .. code:: python
 
@@ -160,6 +166,7 @@ Or we can write out a file and read it in:
         {3.0} <music21.note.Note C>
         {4.0} <music21.bar.Barline style=final>
 
+
 If you want to be extra-safe, pass the format in with the parse
 
 .. code:: python
@@ -168,10 +175,13 @@ If you want to be extra-safe, pass the format in with the parse
     s3
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.stream.Part 4385909904>
+
 
 
 SingleBeat will now appear in all places where fileformats are listed:
@@ -182,10 +192,13 @@ SingleBeat will now appear in all places where fileformats are listed:
     common.findFormat('singleBeat')
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     ('singlebeat', '.sb')
+
 
 
 We can cleanup what we've done (always be a good citizen) by calling

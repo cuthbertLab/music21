@@ -4,6 +4,7 @@
    AUTOMATICALLY GENERATED.
    PLEASE EDIT THE .py FILE DIRECTLY.
 
+
 .. code:: python
 
 
@@ -60,6 +61,7 @@ notes and a ``TimeSignature`` object.
 
     3 / 4
 
+
 Now that we have our objects, let's create a
 :class:`~music21.stream.Stream` object that uses these notes and the
 TimeSignature object. We'll append each object in order using a ``for``
@@ -88,6 +90,7 @@ Let's look at ``stream1`` using ``.show('text')``:
     {3.0} <music21.note.Note E>
     {4.0} <music21.note.Note F>
 
+
 Wondering why both the time signature and the first note begin at
 ``offset`` 0.0 in the Stream? That's because by default TimeSignature
 objects have no length:
@@ -97,10 +100,13 @@ objects have no length:
     tsThreeFour.duration.quarterLength
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     0.0
+
 
 
 If we :meth:`~music21.base.Music21Object.show` the ``Stream`` without
@@ -111,7 +117,10 @@ using ``show('text')``, we see that there are two measures of 3/4:
     stream1.show()
 
 
-.. image:: usersGuide_14_timeSignatures_files/_fig_04.png
+
+
+.. image:: usersGuide_14_timeSignatures_files/usersGuide_14_timeSignatures_11_0.png
+
 
 
 The ``TimeSignature`` object helps the display module known how to
@@ -139,6 +148,7 @@ can see this process directly if we create a new ``Stream`` from
         {1.0} <music21.note.Note F>
         {3.0} <music21.bar.Barline style=final>
 
+
 The makeMeasures command, by the way, also put a TrebleClef into the
 ``Stream`` and set the last barline to "final", which makes its output a
 little prettier in Lilypond (which is what the documentation uses; you
@@ -150,7 +160,10 @@ right...)
     stream2.show()
 
 
-.. image:: usersGuide_14_timeSignatures_files/_fig_07.png
+
+
+.. image:: usersGuide_14_timeSignatures_files/usersGuide_14_timeSignatures_15_0.png
+
 
 
 Working with Beats in TimeSignatures
@@ -167,10 +180,13 @@ without measures and look at each note's beat:
     stream1.notes[0]
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.note.Note C>
+
 
 
 .. code:: python
@@ -178,10 +194,13 @@ without measures and look at each note's beat:
     stream1.notes[0].beat
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     1.0
+
 
 
 Okay, so the first note is on beat 1 (represented as 1.0 here). That's
@@ -206,6 +225,7 @@ all the notes in the Stream:
     <music21.note.Note E> 1.0
     <music21.note.Note F> 2.0
 
+
 If we only wanted to find notes that were on the downbeat we could
 filter on beats like so:
 
@@ -222,6 +242,7 @@ filter on beats like so:
     <music21.note.Note C>
     <music21.note.Note E>
 
+
 What would happen if the time signature were different? We can find out
 by changing the TimeSignature object already in the Stream:
 
@@ -230,10 +251,13 @@ by changing the TimeSignature object already in the Stream:
     tsThreeFour.ratioString
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     '3/4'
+
 
 
 .. code:: python
@@ -258,6 +282,7 @@ downbeat.
     <music21.note.Note E> 2.0
     <music21.note.Note F> 1.0
 
+
 If we change the TimeSignature again to 6/8 then the same notes will be
 on the downbeat as in the original 3/4 Stream, but they will have
 different beat numbers. This time we'll use the
@@ -273,10 +298,13 @@ documented in full at :class:`music21.meter.TimeSignature`.
     tsThreeFour
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.meter.TimeSignature 6/8>
+
 
 
 .. code:: python
@@ -293,6 +321,7 @@ documented in full at :class:`music21.meter.TimeSignature`.
     <music21.note.Note E> 1.0
     <music21.note.Note F> 1.66666666667
 
+
 Notice that by default 6/8 is assumed to be a "fast" 6/8, that is,
 having two beats and not six per measure. That's because there's no easy
 way to specify the former. We can see how many beats there are per
@@ -305,10 +334,13 @@ measure by requesting the
     tsThreeFour.beatCount
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     2
+
 
 
 And we can change that and see how it affects the results:
@@ -329,6 +361,7 @@ And we can change that and see how it affects the results:
     <music21.note.Note E> 1.0
     <music21.note.Note F> 3.0
 
+
 Using the terminology most musicians use, you can create TimeSignatures
 of 6/8 with either beat count directly:
 
@@ -340,15 +373,17 @@ of 6/8 with either beat count directly:
     tsFast68.beatCount, tsSlow68.beatCount
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     (2, 6)
 
 
+
 Working with TimeSignatures in scores
 -------------------------------------
-
 
 We have been dealing with TimeSignature objects that are in a single
 Stream. However, in general, :class:`~music21.meter.TimeSignature`
@@ -372,6 +407,7 @@ module's :func:`~music21.corpus.parse` function. It returns a
 
     <class 'music21.stream.Score'>
 
+
 We will get the Alto part using the ``Score`` object's
 :meth:`parts <music21.stream.Score.parts>` list:
 
@@ -382,10 +418,13 @@ We will get the Alto part using the ``Score`` object's
     alto
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.stream.Part Alto>
+
 
 
 When we call ``.show()`` on this Part (or on ``myBach`` itself), we can
@@ -396,7 +435,10 @@ see that this is one of the few chorales that Bach wrote that is in 3/4:
     alto.show()
 
 
-.. image:: usersGuide_14_timeSignatures_files/_fig_22.png
+
+
+.. image:: usersGuide_14_timeSignatures_files/usersGuide_14_timeSignatures_43_0.png
+
 
 
 To examine the :class:`~music21.meter.TimeSignature` object active for
@@ -415,10 +457,13 @@ Stream is the TimeSignature.
     alto.flat.getElementsByClass(meter.TimeSignature)[0]
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.meter.TimeSignature 3/4>
+
 
 
 .. code:: python
@@ -426,10 +471,13 @@ Stream is the TimeSignature.
     len(alto.flat.getElementsByClass(meter.TimeSignature))
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     1
+
 
 
 We see that there is exactly one TimeSignatures in the ``Part``.
@@ -442,10 +490,13 @@ examine the timeSignature property.
     alto.measure(1).timeSignature
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.meter.TimeSignature 3/4>
+
 
 
 Other measures don't have TimeSignature objects:
@@ -455,10 +506,13 @@ Other measures don't have TimeSignature objects:
     alto.measure(7).timeSignature is None
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     True
+
 
 
 Let's change that!
@@ -484,7 +538,10 @@ beams, and then show the new score.
     alto.show()
 
 
-.. image:: usersGuide_14_timeSignatures_files/_fig_28.png
+
+
+.. image:: usersGuide_14_timeSignatures_files/usersGuide_14_timeSignatures_56_0.png
+
 
 
 We've sort of cheated by changing the TimeSignature to something that
@@ -503,7 +560,10 @@ do here:
     newAlto.show()
 
 
-.. image:: usersGuide_14_timeSignatures_files/_fig_30.png
+
+
+.. image:: usersGuide_14_timeSignatures_files/usersGuide_14_timeSignatures_58_0.png
+
 
 
 Whoops! Some of those measures, such as mm 2-3, are screwy. Let's run
@@ -516,7 +576,10 @@ before showing:
     newAltoFixed.show()
 
 
-.. image:: usersGuide_14_timeSignatures_files/_fig_32.png
+
+
+.. image:: usersGuide_14_timeSignatures_files/usersGuide_14_timeSignatures_60_0.png
+
 
 
 We can continue to add multiple TimeSignature objects to this Stream of
@@ -533,10 +596,13 @@ Measures, temporary Measures are automatically created when calling the
     ts
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.meter.TimeSignature 2/4>
+
 
 
 .. code:: python
@@ -545,10 +611,13 @@ Measures, temporary Measures are automatically created when calling the
     newAlto.getTimeSignatures()[0]
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.meter.TimeSignature 5/8>
+
 
 
 .. code:: python
@@ -565,7 +634,10 @@ of Bach:
     newAlto.makeNotation().show()
 
 
-.. image:: usersGuide_14_timeSignatures_files/_fig_36.png
+
+
+.. image:: usersGuide_14_timeSignatures_files/usersGuide_14_timeSignatures_66_0.png
+
 
 
 A quick note: If you only want to gather Notes, Rests, or other
@@ -586,7 +658,10 @@ same change in time signature using the notesAndRests property.
     newAlto.makeNotation().show()   
 
 
-.. image:: usersGuide_14_timeSignatures_files/_fig_38.png
+
+
+.. image:: usersGuide_14_timeSignatures_files/usersGuide_14_timeSignatures_68_0.png
+
 
 
 Let's see how that looks in all the parts by putting the time signatures
@@ -617,6 +692,7 @@ tsList is a ``Part`` object so we can show it:
     {17.0} <music21.meter.TimeSignature 9/8>
     {26.0} <music21.meter.TimeSignature 3/8>
 
+
 Now we'll create a new ``Score`` object and flatten all the parts from
 the original ``myBach`` and get everything but the ``TimeSignature``
 objects, run ``.makeNotation()`` and put it in the new score:
@@ -636,12 +712,14 @@ objects, run ``.makeNotation()`` and put it in the new score:
     newScore.measures(1, 10).show()
 
 
-.. image:: usersGuide_14_timeSignatures_files/_fig_41.png
+
+
+.. image:: usersGuide_14_timeSignatures_files/usersGuide_14_timeSignatures_74_0.png
+
 
 
 Working with Beats in a score
 -----------------------------
-
 
 If a Note is in a Measure, and that Measure or a preceding Measure has a
 TimeSignature, it is possible to find the beat, or the position of the
@@ -679,6 +757,7 @@ in the Soprano part:
     <music21.note.Note C> 2 1/2
     <music21.note.Note B-> 3
 
+
 Instead of just printing that though, let's put the beatStr as a lyric
 on each note:
 
@@ -690,7 +769,10 @@ on each note:
     sopr.show()
 
 
-.. image:: usersGuide_14_timeSignatures_files/_fig_44.png
+
+
+.. image:: usersGuide_14_timeSignatures_files/usersGuide_14_timeSignatures_79_0.png
+
 
 
 If we change the TimeSignature in a Part, the beat counts will reflect
@@ -708,7 +790,10 @@ re-barred in 6/8, new, syncopated beat counts will be given.
     newMeasures.show()   
 
 
-.. image:: usersGuide_14_timeSignatures_files/_fig_46.png
+
+
+.. image:: usersGuide_14_timeSignatures_files/usersGuide_14_timeSignatures_81_0.png
+
 
 
 Each note also has a particular
@@ -731,6 +816,7 @@ most accented and 0 being least.
     <music21.note.Note D> 1.0
     <music21.note.Note C> 0.25
     <music21.note.Note B-> 0.5
+
 
 This chapter gives a solid introduction to the types of things you can
 do with TimeSignatures and beats. We will return again to this topic

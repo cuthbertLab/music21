@@ -4,6 +4,7 @@
    AUTOMATICALLY GENERATED.
    PLEASE EDIT THE .py FILE DIRECTLY.
 
+
 .. code:: python
 
 
@@ -48,10 +49,13 @@ default all ``Note`` objects are quarter notes):
     note1.duration.quarterLength
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     2.0
+
 
 
 .. code:: python
@@ -59,10 +63,13 @@ default all ``Note`` objects are quarter notes):
     note2.duration.quarterLength
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     1.0
+
 
 
 To print the ``step`` (that is, the name without any octave or
@@ -79,6 +86,7 @@ like this:
 
     C
 
+
 .. code:: python
 
     print(note2.step)
@@ -88,6 +96,7 @@ like this:
    :class: ipython-result
 
     F
+
 
 But suppose you had thirty notes? Then it'd be a pain to type
 "``print noteX.step``\ " thirty times. Fortunately, there's a solution:
@@ -114,6 +123,7 @@ We can check that ``noteList`` contains our Notes by printing it:
 
     [<music21.note.Note C>, <music21.note.Note F#>]
 
+
 Now we can write a two-line program that will print the step of each
 note in noteList. Most modern languages have a way of doing some action
 for each member ("element") in a list (also called an "array" or
@@ -134,6 +144,7 @@ to hit enter twice to see the results.)
 
     C
     F
+
 
 What's happening here? What ``for thisNote in noteList:`` says is that
 Python should take each note in noteList in order and temporarily call
@@ -171,10 +182,13 @@ function:
     len(noteList)
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     3
+
 
 
 And if we write our looping function again, we will get a third note:
@@ -192,6 +206,7 @@ And if we write our looping function again, we will get a third note:
     F
     B
 
+
 We can find out what the first note of noteList is by writing:
 
 .. code:: python
@@ -199,10 +214,13 @@ We can find out what the first note of noteList is by writing:
     noteList[0]
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.note.Note C>
+
 
 
 Notice that in a list, the first element is ``[0]``, not ``[1]``. There
@@ -217,10 +235,13 @@ buildings. If we go forward one note, to the second note, we write:
     noteList[1]
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.note.Note F#>
+
 
 
 We can also ask ``noteList`` where is ``note2`` within it, using the
@@ -231,10 +252,13 @@ We can also ask ``noteList`` where is ``note2`` within it, using the
     noteList.index(note2)
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     1
+
 
 
 If we want to get the last element of a list, we can write:
@@ -244,10 +268,13 @@ If we want to get the last element of a list, we can write:
     noteList[-1]
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.note.Note B->
+
 
 
 Which is how basements are numbered in Europe as well. This is the same
@@ -259,10 +286,13 @@ prove:\`
     noteList[-1] is noteList[2]
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     True
+
 
 
 Lists will become important tools in your programming, but they don't
@@ -377,7 +407,10 @@ object, not references.
     stream2.show()
 
 
-.. image:: usersGuide_04_stream1_files/_fig_14.png
+
+
+.. image:: usersGuide_04_stream1_files/usersGuide_04_stream1_48_0.png
+
 
 
 But let's worry about that later. Going back to our first stream, we can
@@ -389,10 +422,13 @@ used before:
     len(stream1)
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     3
+
 
 
 Alternatively, we can use the :meth:`~music21.base.Music21Object.show`
@@ -413,6 +449,7 @@ show(‘text’) to see what is in the Stream and what its offset is (here
     {2.0} <music21.note.Note F#>
     {3.0} <music21.note.Note B->
 
+
 If you’ve setup your environment properly, then calling show with the
 ``musicxml`` argument should open up Finale Reader, or Sibelius, or
 MuseScore or some music notation software and display the notes below.
@@ -422,7 +459,10 @@ MuseScore or some music notation software and display the notes below.
     stream1.show()
 
 
-.. image:: usersGuide_04_stream1_files/_fig_18.png
+
+
+.. image:: usersGuide_04_stream1_files/usersGuide_04_stream1_54_0.png
+
 
 
 Accessing Streams
@@ -445,6 +485,7 @@ We can also dive deeper into streams. Let's get the ``step`` of each
     F
     B
 
+
 And we can get the first and the last ``Note`` in a ``Stream`` by using
 the [X] form, just like other Python list-like objects:
 
@@ -453,10 +494,13 @@ the [X] form, just like other Python list-like objects:
     stream1[0]
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.note.Note C>
+
 
 
 .. code:: python
@@ -464,10 +508,13 @@ the [X] form, just like other Python list-like objects:
     stream1[1].accidental
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <accidental sharp>
+
 
 
 While full list-like functionality of the Stream is not provided, some
@@ -482,10 +529,13 @@ element from the Stream can be removed with the
     stream1.index(note3)
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     2
+
 
 
 We can also gather elements based on the class (object type) of the
@@ -513,6 +563,7 @@ objects and then all :class:`~music21.note.Rest` objects.
     {2.0} <music21.note.Note F#>
     {3.0} <music21.note.Note B->
 
+
 There are a few other useful tools for extracting specific object
 classes from a stream:
 
@@ -522,10 +573,13 @@ classes from a stream:
     len(sOut) == len(stream1)
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     True
+
 
 
 .. code:: python
@@ -534,12 +588,15 @@ classes from a stream:
     listOut
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     [<music21.pitch.Pitch C4>,
      <music21.pitch.Pitch F#4>,
      <music21.pitch.Pitch B-2>]
+
 
 
 The :meth:`~music21.stream.Stream.getElementsByOffset` method returns
@@ -559,6 +616,7 @@ returned.
     {2.0} <music21.note.Note F#>
     {3.0} <music21.note.Note B->
 
+
 More Stream Features
 --------------------
 
@@ -572,10 +630,13 @@ note) of the ``Notes`` in the ``Stream``:
     stream1.analyze('ambitus')
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.interval.Interval A12>
+
 
 
 Let's take a second to check this. Our lowest note is ``note3`` (B-flat
@@ -601,10 +662,13 @@ So note1's offset will be 0.0, since it's at the start of the Stream:
     note1.offset
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     0.0
+
 
 
 ``note2``'s offset will be 2.0, since ``note1`` is a half note, worth
@@ -615,10 +679,13 @@ two quarter notes:
     note2.offset
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     2.0
+
 
 
 And ``note3``, which follows the quarter note ``note2`` will be at
@@ -629,10 +696,13 @@ offset 3.0:
     note3.offset
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     3.0
+
 
 
 (If we made ``note2`` an eighth note, then ``note3``'s offset would be
@@ -654,6 +724,7 @@ line, separated by a comma:
     2.0 F#
     3.0 B-
 
+
 (**Digression**: It's probably not too early to learn that a safer form
 of ``.offset`` is ``.getOffsetBySite(stream1)``:
 
@@ -662,10 +733,13 @@ of ``.offset`` is ``.getOffsetBySite(stream1)``:
     note2.offset
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     2.0
+
 
 
 .. code:: python
@@ -673,10 +747,13 @@ of ``.offset`` is ``.getOffsetBySite(stream1)``:
     note2.getOffsetBySite(stream1)
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     2.0
+
 
 
 What's the difference? Remember how I said that ``.offset`` refers to
@@ -695,10 +772,13 @@ minimum of all offsets for all elements on the Stream.
     stream1.lowestOffset
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     0.0
+
 
 
 So, what else can we do with Streams? Like ``Note`` objects, we can
@@ -716,7 +796,10 @@ Or let's see them as a score:
     stream1.show()
 
 
-.. image:: usersGuide_04_stream1_files/_fig_36.png
+
+
+.. image:: usersGuide_04_stream1_files/usersGuide_04_stream1_89_0.png
+
 
 
 You might ask why is the piece in common-time (4/4)? This is just the
@@ -727,10 +810,13 @@ default for new pieces, which is in the ``defaults`` module:
     defaults.meterNumerator
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     4
+
 
 
 .. code:: python
@@ -738,10 +824,13 @@ default for new pieces, which is in the ``defaults`` module:
     defaults.meterDenominator
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     'quarter'
+
 
 
 We'll learn how to switch the :class:`~music21.meter.TimeSignature`
@@ -763,6 +852,7 @@ a ``Stream`` in text in your editor:
     {2.0} <music21.note.Note F#>
     {3.0} <music21.note.Note B->
 
+
 This display shows the ``offset`` for each element (that is, each object
 in the Stream) along with what class it is, and a little bit more
 helpful information. The information is the same as what's called the
@@ -774,10 +864,13 @@ you type its variable name at the prompt:
     note1
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.note.Note C>
+
 
 
 By the way, Streams have a ``__repr__`` as well:
@@ -787,10 +880,13 @@ By the way, Streams have a ``__repr__`` as well:
     stream1
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.stream.Stream 0x106fa4890>
+
 
 
 that number at the end is the ``.id`` of the ``Stream``, which is a way
@@ -805,10 +901,13 @@ memory). We can change the ``.id`` of a Stream:
     stream1
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.stream.Stream some notes>
+
 
 
 We could have also changed the ``.id`` of any of our ``Note`` objects,
@@ -820,10 +919,13 @@ but it doesn't show up in the ``Note``'s ``__repr__``:
     note1
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.note.Note C>
+
 
 
 Now, a ``Stream`` is a :class:`~music21.base.Music21Object` just like
@@ -838,15 +940,20 @@ attribute which stores a ``Duration`` object:
     stream1.duration
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.duration.Duration 4.0>
 
 
+
 .. code:: python
 
     stream1.duration.type
+
+
 
 
 .. parsed-literal::
@@ -855,15 +962,19 @@ attribute which stores a ``Duration`` object:
     'whole'
 
 
+
 .. code:: python
 
     stream1.duration.quarterLength
+
+
 
 
 .. parsed-literal::
    :class: ipython-result
 
     4.0
+
 
 
 (Notice that the ``len()`` of a ``Stream``, which stands for "length",
@@ -909,6 +1020,7 @@ of ``stream1`` as well:
         {2.0} <music21.note.Note F#>
         {3.0} <music21.note.Note B->
 
+
 Notice though that the offsets, the little numbers inside curly
 brackets, for the elements of ``stream1`` ("some notes") relate only to
 their positions within ``stream1``, not to their position within
@@ -924,10 +1036,13 @@ know that it is somewhere inside ``biggerStream``:
     note1 in stream1
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     True
+
 
 
 .. code:: python
@@ -935,10 +1050,13 @@ know that it is somewhere inside ``biggerStream``:
     note1 in biggerStream
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     False
+
 
 
 All this might not seem like much of a big deal, until we tell you that

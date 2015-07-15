@@ -4,6 +4,7 @@
    AUTOMATICALLY GENERATED.
    PLEASE EDIT THE .py FILE DIRECTLY.
 
+
 .. code:: python
 
 
@@ -52,6 +53,7 @@ method using the ``('text')`` argument.
         {2.0} <music21.note.Note F#>
         {3.0} <music21.note.Note B->
 
+
 As Chapter 4 noted, there's
 
 Accessing Scores, Parts, Measures, and Notes
@@ -79,19 +81,20 @@ the corpus with the :func:`~music21.corpus.parse` function.
     sBach = corpus.parse('bach/bwv57.8')
 
 | We can access and examine elements at each level of this Score by
-  using standard Python syntax for lists within lists. Thus, we can see
-  the length of each component: first the Score which has five elements,
-  a :class:`~music21.metadata.Metadata` object and four parts. Then we
-  find the length of first Part at index one which indicates 19 objects
-  (18 of them are measures).
-
+using standard Python syntax for lists within lists. Thus, we can see
+the length of each component: first the Score which has five elements, a
+:class:`~music21.metadata.Metadata` object and four parts. Then we
+find the length of first Part at index one which indicates 19 objects
+(18 of them are measures).
 | Then within that part we find an object (a Measure) at index 1. All of
-  these subprograms can be accessed from looking within the same score
-  object ``sBach``.
+these subprograms can be accessed from looking within the same score
+object ``sBach``.
 
 .. code:: python
 
     len(sBach)
+
+
 
 
 .. parsed-literal::
@@ -100,9 +103,12 @@ the corpus with the :func:`~music21.corpus.parse` function.
     6
 
 
+
 .. code:: python
 
     len(sBach[1])
+
+
 
 
 .. parsed-literal::
@@ -111,15 +117,19 @@ the corpus with the :func:`~music21.corpus.parse` function.
     19
 
 
+
 .. code:: python
 
     len(sBach[1][1])
+
+
 
 
 .. parsed-literal::
    :class: ipython-result
 
     6
+
 
 
 But how did we know that index [1] would be a Part and index [1][1]
@@ -141,15 +151,20 @@ Notice how the counts deviate from the examples above.
     len(sBach.getElementsByClass(stream.Part))
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     4
 
 
+
 .. code:: python
 
     len(sBach.getElementsByClass(stream.Part)[0].getElementsByClass(stream.Measure))
+
+
 
 
 .. parsed-literal::
@@ -158,15 +173,19 @@ Notice how the counts deviate from the examples above.
     18
 
 
+
 .. code:: python
 
     len(sBach.getElementsByClass(stream.Part)[0].getElementsByClass(stream.Measure)[1].getElementsByClass(note.Note))
+
+
 
 
 .. parsed-literal::
    :class: ipython-result
 
     3
+
 
 
 The :meth:`~music21.stream.Stream.getElementsByClass` method can also
@@ -178,10 +197,13 @@ we could've rewritten the first call above as:
     len(sBach.getElementsByClass('Part'))
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     4
+
 
 
 This way of doing things is a bit faster to code, but a little less
@@ -232,10 +254,13 @@ and Measure objects by accessing the ``flat`` attribute.
     len(sBach.getElementsByClass(note.Note))
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     0
+
 
 
 .. code:: python
@@ -243,10 +268,13 @@ and Measure objects by accessing the ``flat`` attribute.
     len(sBach.flat.getElementsByClass(note.Note))
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     213
+
 
 
 Element offsets are always relative to the Stream that contains them.
@@ -265,10 +293,13 @@ offset of the second Note in this Measure (index 1), however, is 1.
     m.getOffsetBySite(sBach.parts[0])
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     21.0
+
 
 
 .. code:: python
@@ -277,10 +308,13 @@ offset of the second Note in this Measure (index 1), however, is 1.
     n
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.note.Note B->
+
 
 
 .. code:: python
@@ -288,10 +322,13 @@ offset of the second Note in this Measure (index 1), however, is 1.
     n.getOffsetBySite(m)
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     1.0
+
 
 
 Flattening a structure of nested Streams will set new, shifted offsets
@@ -309,10 +346,13 @@ Measure of 1).
     pFlat[indexN]
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.note.Note B->
+
 
 
 .. code:: python
@@ -320,10 +360,13 @@ Measure of 1).
     pFlat[indexN].offset
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     22.0
+
 
 
 As an aside, it is important to recognize that the offset of the Note

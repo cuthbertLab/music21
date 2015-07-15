@@ -2907,6 +2907,8 @@ class Pitch(object):
         <music21.pitch.Pitch F#~6(+19c)>
         >>> h2.fundamental.fundamental
         <music21.pitch.Pitch A2>
+        
+        :rtype: music21.pitch.Pitch
         '''
         centShift = _convertHarmonicToCents(number)
         temp = copy.deepcopy(self)
@@ -3170,6 +3172,7 @@ class Pitch(object):
         >>> p.harmonicAndFundamentalStringFromPitch('c2')
         '7thH/C2(-69c)'
 
+        :rtype: str
         '''
         harmonic, fundamental = self.harmonicAndFundamentalFromPitch(
             fundamental)
@@ -3247,6 +3250,8 @@ class Pitch(object):
         >>> p5 = pitch.Pitch('D-4')
         >>> p4.isEnharmonic(p5)
         True
+        
+        :rtype: bool
         '''
         if other.octave is None or self.octave is None:
             if (other.ps - self.ps) % 12 == 0:
@@ -3261,6 +3266,8 @@ class Pitch(object):
     def _getEnharmonicHelper(self, inPlace, intervalString):
         '''
         abstracts the code from `getHigherEnharmonic` and `getLowerEnharmonic`
+        
+        :rtype: music21.pitch.Pitch
         '''
         intervalObj = interval.Interval(intervalString)
         octaveStored = self.octave # may be None
@@ -3327,6 +3334,7 @@ class Pitch(object):
         >>> print(pHalfSharp)
         E-4(-50c)
 
+        :rtype: music21.pitch.Pitch
         '''
         return self._getEnharmonicHelper(inPlace, 'd2')
 
@@ -3346,6 +3354,8 @@ class Pitch(object):
         >>> p1.getLowerEnharmonic(inPlace=True)
         >>> print(p1)
         B##2
+        
+        :rtype: music21.pitch.Pitch
         '''
         return self._getEnharmonicHelper(inPlace, '-d2')
 
@@ -3399,6 +3409,8 @@ class Pitch(object):
         [59.0, 72.0]
         >>> [p.simplifyEnharmonic().ps for p in pList]
         [71.0, 60.0]
+        
+        :rtype: music21.pitch.Pitch
         '''
 
         if inPlace:
@@ -3499,6 +3511,7 @@ class Pitch(object):
         >>> print(p.getEnharmonic())
         E-(-50c)
         
+        :rtype: music21.pitch.Pitch
         '''
         if inPlace:
             post = self
@@ -3575,7 +3588,9 @@ class Pitch(object):
 
         Music21 does not support accidentals beyond quadruple sharp/flat, so
         `alterLimit` = 4 is the most you can use. (Thank goodness!)
-        '''
+        
+        :rtype: list(Pitch)
+        '''        
         post = []
         c = self.simplifyEnharmonic(inPlace=False)
         if c.name != self.name:
@@ -3682,6 +3697,8 @@ class Pitch(object):
         >>> lowlowlowD.octave = -3
         >>> lowlowlowD.diatonicNoteNum
         -19
+        
+        :rtype: int
         '''
         if ['C','D','E','F','G','A','B'].count(self.step.upper()):
             noteNumber = ['C','D','E','F','G','A','B'].index(self.step.upper())
@@ -3753,6 +3770,7 @@ class Pitch(object):
         >>> print(otherPitch)
         C#-1
 
+        :rtype: music21.pitch.Pitch
         '''
         #environLocal.printDebug(['Pitch.transpose()', value])
         if hasattr(value, 'classes') and 'IntervalBase' in value.classes:
@@ -3829,6 +3847,7 @@ class Pitch(object):
         >>> pitch.Pitch('f#2').transposeBelowTarget(pitch.Pitch('f#8'), minimize=True)
         <music21.pitch.Pitch F#8>
 
+        :rtype: music21.pitch.Pitch
         '''
         # TODO: switch inPlace: default is True now, will become False.
         if inPlace:
@@ -3883,6 +3902,7 @@ class Pitch(object):
         >>> pitch.Pitch('d0').transposeAboveTarget(pitch.Pitch('e2'), minimize=True)
         <music21.pitch.Pitch D3>
 
+        :rtype: music21.pitch.Pitch
         '''
         # TODO: switch inPlace: default is True now, will become False.
         if inPlace:

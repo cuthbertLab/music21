@@ -4,6 +4,7 @@
    AUTOMATICALLY GENERATED.
    PLEASE EDIT THE .py FILE DIRECTLY.
 
+
 .. code:: python
 
 
@@ -47,15 +48,20 @@ first three will be old hat from ``Note`` objects:
     p1.octave
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     4
 
 
+
 .. code:: python
 
     p1.pitchClass
+
+
 
 
 .. parsed-literal::
@@ -64,9 +70,12 @@ first three will be old hat from ``Note`` objects:
     10
 
 
+
 .. code:: python
 
     p1.name
+
+
 
 
 .. parsed-literal::
@@ -75,15 +84,19 @@ first three will be old hat from ``Note`` objects:
     'B-'
 
 
+
 .. code:: python
 
     p1.accidental.alter
+
+
 
 
 .. parsed-literal::
    :class: ipython-result
 
     -1.0
+
 
 
 Here are two more that you can use. The first is pretty
@@ -97,10 +110,13 @@ etc.
     p1.nameWithOctave
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     'B-4'
+
 
 
 .. code:: python
@@ -108,10 +124,13 @@ etc.
     p1.midi
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     70
+
 
 
 Most of these attributes can be changed (they are "settable properties"
@@ -127,10 +146,13 @@ necessary to reflect the new value:
     p1.nameWithOctave
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     'D#3'
+
 
 
 And our familiar ``.transpose()`` method also appears on ``Pitch`` as
@@ -142,10 +164,13 @@ well. Remember that ``p1`` is now a ``D#``:
     p2
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.pitch.Pitch C##4>
+
 
 
 Notice that at the command line, just printing the variable name gives
@@ -165,10 +190,13 @@ object, we could do with the ``note.Note.pitch`` object instead:
     csharp.name
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     'C#'
+
 
 
 .. code:: python
@@ -176,10 +204,13 @@ object, we could do with the ``note.Note.pitch`` object instead:
     csharp.pitch.name
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     'C#'
+
 
 
 .. code:: python
@@ -187,10 +218,13 @@ object, we could do with the ``note.Note.pitch`` object instead:
     csharp.accidental
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <accidental sharp>
+
 
 
 .. code:: python
@@ -198,15 +232,20 @@ object, we could do with the ``note.Note.pitch`` object instead:
     csharp.pitch.accidental
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <accidental sharp>
 
 
+
 .. code:: python
 
     csharp.pitch.spanish
+
+
 
 
 .. parsed-literal::
@@ -215,18 +254,24 @@ object, we could do with the ``note.Note.pitch`` object instead:
     'do sostenido'
 
 
+
 .. code:: python
 
     csharp.spanish
 
+
 ::
+
 
     ---------------------------------------------------------------------------
     AttributeError                            Traceback (most recent call last)
+
     <ipython-input-16-8c908c31b14e> in <module>()
     ----> 1 csharp.spanish
     
+
     AttributeError: 'Note' object has no attribute 'spanish'
+
 
 *By the way, you know how we said that you shouldn't have a variable
 named* ``pitch`` *because there's already a module named* ``pitch``.
@@ -301,10 +346,13 @@ set:
     dottedQuarter.quarterLength
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     1.5
+
 
 
 .. code:: python
@@ -312,10 +360,13 @@ set:
     halfDuration.quarterLength
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     2.0
+
 
 
 The ``.type`` attribute tells you what general type of ``Duration`` you
@@ -326,10 +377,13 @@ have:
     halfDuration.type
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     'half'
+
 
 
 .. code:: python
@@ -337,10 +391,13 @@ have:
     dottedQuarter.type
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     'quarter'
+
 
 
 The ``type`` attribute cannot be everything that describes the
@@ -354,10 +411,13 @@ called ``.dots``:
     halfDuration.dots
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     0
+
 
 
 .. code:: python
@@ -365,10 +425,13 @@ called ``.dots``:
     dottedQuarter.dots
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     1
+
 
 
 The attributes of ``dots``, ``type``, and ``quarterLength`` are actually
@@ -383,10 +446,13 @@ property:
     dottedQuarter.quarterLength
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     1.75
+
 
 
 .. code:: python
@@ -395,10 +461,13 @@ property:
     dottedQuarter.quarterLength
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     1.875
+
 
 
 .. code:: python
@@ -407,10 +476,13 @@ property:
     dottedQuarter.quarterLength
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     1.9375
+
 
 
 Or let's change the ``quarterLength`` of the dottedQuarter and see what
@@ -422,10 +494,13 @@ happens to the ``type`` and ``dots``:
     dottedQuarter.type
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     '16th'
+
 
 
 .. code:: python
@@ -433,10 +508,13 @@ happens to the ``type`` and ``dots``:
     dottedQuarter.dots
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     0
+
 
 
 QuarterLengths are so important to music21 that we'll sometimes
@@ -459,10 +537,13 @@ The ``type`` for these odd values is called "complex":
     dottedQuarter.type
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     'complex'
+
 
 
 *(There's one more strange* ``type`` *called "zero" for Durations that
@@ -480,7 +561,10 @@ weird ``2.25`` Duration. We have to first assign it to a note:
     n.show()
 
 
-.. image:: usersGuide_03_pitches_files/_fig_26.png
+
+
+.. image:: usersGuide_03_pitches_files/usersGuide_03_pitches_57_0.png
+
 
 
 Music21 can also deal with other ``quarterLengths`` such as 0.8, which
@@ -495,10 +579,13 @@ back just the integer part of the number, so 8/3 is 2, since 8/3 is
     8/3
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     2
+
 
 
 .. code:: python
@@ -506,10 +593,13 @@ back just the integer part of the number, so 8/3 is 2, since 8/3 is
     1/3
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     0
+
 
 
 To get the number you probably want either use Python 3 or make sure
@@ -520,10 +610,13 @@ that at least one of the numbers you are dividing is a float. So:
     8.0/3.0
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     2.6666666666666665
+
 
 
 .. code:: python
@@ -531,10 +624,13 @@ that at least one of the numbers you are dividing is a float. So:
     1.0/3
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     0.3333333333333333
+
 
 
 You can go ahead and make a Triplet or other
@@ -556,10 +652,13 @@ default ``Duration`` is 1.0, or a quarter note.
     n1.pitch
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.pitch.Pitch C4>
+
 
 
 .. code:: python
@@ -567,10 +666,13 @@ default ``Duration`` is 1.0, or a quarter note.
     n1.duration
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.duration.Duration 1.0>
+
 
 
 But we can play around with them:
@@ -587,15 +689,20 @@ and then the other properties change accordingly:
     n1.duration.type
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     'half'
 
 
+
 .. code:: python
 
     n1.duration.dots
+
+
 
 
 .. parsed-literal::
@@ -604,9 +711,12 @@ and then the other properties change accordingly:
     1
 
 
+
 .. code:: python
 
     n1.pitch.name
+
+
 
 
 .. parsed-literal::
@@ -615,9 +725,12 @@ and then the other properties change accordingly:
     'E-'
 
 
+
 .. code:: python
 
     n1.pitch.accidental
+
+
 
 
 .. parsed-literal::
@@ -626,15 +739,19 @@ and then the other properties change accordingly:
     <accidental flat>
 
 
+
 .. code:: python
 
     n1.octave
+
+
 
 
 .. parsed-literal::
    :class: ipython-result
 
     5
+
 
 
 We already said that some of the attributes of ``Pitch`` can also be
@@ -646,15 +763,20 @@ important attributes of ``Duration``:
     n1.name
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     'E-'
 
 
+
 .. code:: python
 
     n1.quarterLength
+
+
 
 
 .. parsed-literal::
@@ -663,15 +785,19 @@ important attributes of ``Duration``:
     3.0
 
 
+
 .. code:: python
 
     n1.accidental
+
+
 
 
 .. parsed-literal::
    :class: ipython-result
 
     <accidental flat>
+
 
 
 Let's change the quarterLength back to 1.0 for now:
@@ -724,7 +850,10 @@ As it should be becoming clear, we can always check our work with the
     n1.show()
 
 
-.. image:: usersGuide_03_pitches_files/_fig_42.png
+
+
+.. image:: usersGuide_03_pitches_files/usersGuide_03_pitches_91_0.png
+
 
 
 If we now edit the
@@ -739,7 +868,10 @@ already set the lyric to show "``QL: 1.0``, it won't be changed when we
     n1.show()
 
 
-.. image:: usersGuide_03_pitches_files/_fig_44.png
+
+
+.. image:: usersGuide_03_pitches_files/usersGuide_03_pitches_93_0.png
+
 
 
 There many more things we can do with a ``Note`` object, but I'm itching

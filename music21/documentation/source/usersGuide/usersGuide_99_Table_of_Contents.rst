@@ -4,6 +4,7 @@
    AUTOMATICALLY GENERATED.
    PLEASE EDIT THE .py FILE DIRECTLY.
 
+
 User's Guide, Table of Contents
 ===============================
 
@@ -68,4 +69,3 @@ topics will be linked and added as the topics are written:
 53. Medieval and Renaissance extensions
 54. :ref:`Extending Converter with New Formats <usersGuide_54_extendingConverter>`
 55. Advanced Meter topics
-

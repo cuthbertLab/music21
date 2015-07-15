@@ -4,12 +4,12 @@
    AUTOMATICALLY GENERATED.
    PLEASE EDIT THE .py FILE DIRECTLY.
 
+
 .. code:: python
 
 
 User's Guide, Chapter 25: Post-Tonal Tools (1)
 ==============================================
-
 
 The music21 toolkit features many tools for analyzing and creating music
 within a post-tonal context. A :class:`~music21.chord.Chord` can be
@@ -45,10 +45,13 @@ is used to create a :class:`~music21.stream.Score` object. The
     [e.id for e in aScore.parts]
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     [u'Violin I.', u'Violin II.', u'Viola.', u'Violoncello.']
+
 
 
 We can view the fourth and fifth measures of the violin Part by
@@ -66,7 +69,10 @@ setup of your environment, open a display of the extracted measures.
     mRange.show()
 
 
-.. image:: usersGuide_25_postTonalTools1_files/_fig_02.png
+
+
+.. image:: usersGuide_25_postTonalTools1_files/usersGuide_25_postTonalTools1_7_0.png
+
 
 
 If we want to gather all :class:`~music21.pitch.Pitch` objects from
@@ -81,6 +87,8 @@ respectively.
 .. code:: python
 
     [str(p) for p in mRange.pitches]
+
+
 
 
 .. parsed-literal::
@@ -103,15 +111,19 @@ respectively.
      'C#5']
 
 
+
 .. code:: python
 
     [p.pitchClass for p in mRange.pitches]
+
+
 
 
 .. parsed-literal::
    :class: ipython-result
 
     [9, 6, 7, 7, 11, 4, 7, 7, 7, 1, 4, 4, 4, 7, 1]
+
 
 
 If we want to label the notes in our measure range with the Note's pitch
@@ -131,7 +143,10 @@ example:
     mRange.show()
 
 
-.. image:: usersGuide_25_postTonalTools1_files/_fig_06.png
+
+
+.. image:: usersGuide_25_postTonalTools1_files/usersGuide_25_postTonalTools1_12_0.png
+
 
 
 Chords as Forte Set Classes
@@ -157,7 +172,10 @@ pitches will be supplied to a Chord object and stored on a Stream.
     aStream.show()
 
 
-.. image:: usersGuide_25_postTonalTools1_files/_fig_08.png
+
+
+.. image:: usersGuide_25_postTonalTools1_files/usersGuide_25_postTonalTools1_15_0.png
+
 
 
 These Chords, like all Chords in music21, can be interpreted as Forte
@@ -179,6 +197,7 @@ sampling of some of the many relevant methods.
     <567>
     <9AB>
 
+
 .. code:: python
 
     for c in aStream: 
@@ -192,6 +211,7 @@ sampling of some of the many relevant methods.
     3-11A
     3-1
     3-1
+
 
 .. code:: python
 
@@ -207,6 +227,7 @@ sampling of some of the many relevant methods.
     3-1
     3-1
 
+
 .. code:: python
 
     for c in aStream: 
@@ -220,6 +241,7 @@ sampling of some of the many relevant methods.
     [0, 3, 7]
     [0, 1, 2]
     [0, 1, 2]
+
 
 .. code:: python
 
@@ -235,6 +257,7 @@ sampling of some of the many relevant methods.
     <012>
     <012>
 
+
 .. code:: python
 
     for c in aStream: 
@@ -249,6 +272,7 @@ sampling of some of the many relevant methods.
     [2, 1, 0, 0, 0, 0]
     [2, 1, 0, 0, 0, 0]
 
+
 To annotate the Chords stored on the Stream with their Forte name, we
 can iterate over the Stream and assign the Forte name to each Chord's
 ``lyric`` attribute.
@@ -260,7 +284,10 @@ can iterate over the Stream and assign the Forte name to each Chord's
     aStream.show()
 
 
-.. image:: usersGuide_25_postTonalTools1_files/_fig_16.png
+
+
+.. image:: usersGuide_25_postTonalTools1_files/usersGuide_25_postTonalTools1_24_0.png
+
 
 
 We can use the ``itertools.combinations`` function to find all possible
@@ -275,10 +302,13 @@ it all possible three-note chords under inversion and transposition:
     c.commonName
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     'all tri-chord hexachord'
+
 
 
 Now we'll test this create a set to hold the Forte number for each
@@ -292,10 +322,13 @@ trichord and see that all twelve of them are there:
     cc
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+
 
 
 Creating and Processing Twelve-Tone Matrices
@@ -333,6 +366,7 @@ text, and then create and print a
     {10.0} <music21.note.Note E->
     {11.0} <music21.note.Note F>
 
+
 .. code:: python
 
     aMatrix = aRow.matrix()
@@ -356,6 +390,7 @@ text, and then create and print a
       2  5  9  1  4  7  B  3  6  8  A  0
     
 
+
 We might divide this row into trichords, present each of those trichords
 as Chords, and label the resulting pitch classes and Forte set class. As
 shown above, we can set the ``lyric`` attribute to assign a single line
@@ -374,5 +409,7 @@ successive lines.
     bStream.show()
 
 
-.. image:: usersGuide_25_postTonalTools1_files/_fig_22.png
+
+
+.. image:: usersGuide_25_postTonalTools1_files/usersGuide_25_postTonalTools1_34_0.png
 

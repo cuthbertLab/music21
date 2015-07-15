@@ -4,11 +4,12 @@
    AUTOMATICALLY GENERATED.
    PLEASE EDIT THE .py FILE DIRECTLY.
 
+
 .. code:: python
 
 
-File Formats(1)
-===============
+User's Guide, Chapter 10: File Formats (1)
+==========================================
 
 Music21 can import and export a variety of musical data formats. Many
 examples of these formats are distributed with music21 as part of the
@@ -47,7 +48,10 @@ the file will be downloaded and parsed.
     sAlt[1][:6].show() # show first 5 measures
 
 
-.. image:: usersGuide_10_fileFormats1_files/_fig_01.png
+
+
+.. image:: usersGuide_10_fileFormats1_files/usersGuide_10_fileFormats1_7_0.png
+
 
 
 Note that presently music21 offers limited support for compressed .mxl
@@ -108,10 +112,13 @@ the :meth:`~music21.stream.Opus.getScoreByNumber` method.
     o.getNumbers()
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     ['1', '2', '3']
+
 
 
 .. code:: python
@@ -120,10 +127,13 @@ the :meth:`~music21.stream.Opus.getScoreByNumber` method.
     s.metadata.title
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     'O Venus bant'
+
 
 
 Direct access to Score objects contained in an Opus by title is
@@ -146,10 +156,13 @@ single Score with the :meth:`music21.stream.Opus.mergeScores` method.
     s.metadata.title
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     'Mille regrets'
+
 
 
 .. code:: python
@@ -157,10 +170,13 @@ single Score with the :meth:`music21.stream.Opus.mergeScores` method.
     len(s.parts)
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     4
+
 
 
 Getting ABC Files

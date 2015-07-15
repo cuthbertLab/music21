@@ -4,6 +4,7 @@
    AUTOMATICALLY GENERATED.
    PLEASE EDIT THE .py FILE DIRECTLY.
 
+
 User's Guide: Chapter 9: Chordify
 =================================
 
@@ -22,7 +23,10 @@ that is happening in the score. Take this short chorale by Bach:
     b.show()
 
 
-.. image:: usersGuide_09_chordify_files/_fig_01.png
+
+
+.. image:: usersGuide_09_chordify_files/usersGuide_09_chordify_3_0.png
+
 
 
 Let's take it and chordify it using the
@@ -55,6 +59,7 @@ chords.
     4 3 1/2 <music21.chord.Chord F#4 D#4 A3 B2>
     8 2 <music21.chord.Chord F#4 E4 C#4 A#2>
 
+
 Sure enough we can check the score above and see that there are four of
 them: three of them on the offbeat (m.2 beat 2.5, m. 3 beat 2.5, and m.
 4 beat 3.5) which are made from passing motion, and one of them in m. 8
@@ -71,7 +76,10 @@ should go at the beginning) and then show just measures 0 (pickup) to 4:
     b.measures(0, 4).show()
 
 
-.. image:: usersGuide_09_chordify_files/_fig_04.png
+
+
+.. image:: usersGuide_09_chordify_files/usersGuide_09_chordify_9_0.png
+
 
 
 That's a bit messy to read, so let's put all these chords in
@@ -88,7 +96,10 @@ information).
     b.measures(0,2).show()
 
 
-.. image:: usersGuide_09_chordify_files/_fig_06.png
+
+
+.. image:: usersGuide_09_chordify_files/usersGuide_09_chordify_11_0.png
+
 
 
 We can use the function ``roman.romanNumeralFromChord`` to label each of
@@ -105,7 +116,10 @@ the chordified Chords:
     b.measures(0, 2).show()
 
 
-.. image:: usersGuide_09_chordify_files/_fig_08.png
+
+
+.. image:: usersGuide_09_chordify_files/usersGuide_09_chordify_14_0.png
+
 
 
 We can also see everything directly if we look at the ``.show('text')``
@@ -138,6 +152,7 @@ output:
         {2.0} <music21.chord.Chord A4 C#5 E5>
         {3.0} <music21.chord.Chord E#4 G#4 C#5>
 
+
 We can also just extract the lyrics, where we stored the RomanNumeral
 information:
 
@@ -153,6 +168,7 @@ information:
    :class: ipython-result
 
     I V6 vi V6 I V6 I I6 V V7 I III6
+
 
 There are more specialized commands for ``.chordify``, so if you want to
 learn more, look at the :meth:`~music21.stream.Stream.chordify`

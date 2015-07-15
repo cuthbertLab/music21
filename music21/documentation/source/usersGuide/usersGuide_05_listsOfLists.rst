@@ -4,6 +4,7 @@
    AUTOMATICALLY GENERATED.
    PLEASE EDIT THE .py FILE DIRECTLY.
 
+
 .. code:: python
 
 
@@ -42,10 +43,13 @@ Now when we look at listB, we'll see that listA is inside it:
     listB
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     [1, 2, 3, [10, 20, 30]]
+
 
 
 Notice that when we look at the length (``len()``) of listB it shows
@@ -56,10 +60,13 @@ that there are 4 elements, not 6:
     len(listB)
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     4
+
 
 
 That's because the fourth element of listB (which, you'll recall, is
@@ -70,10 +77,13 @@ called ``listB[3]`` not ``listB[4]``) is itself a list, listA:
     listB[3]
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     [10, 20, 30]
+
 
 
 .. code:: python
@@ -81,10 +91,13 @@ called ``listB[3]`` not ``listB[4]``) is itself a list, listA:
     listB[3] is listA
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     True
+
 
 
 So if we want to get the third element of listA, there is an easy way to
@@ -95,10 +108,13 @@ do it:
     listA[2]
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     30
+
 
 
 But we can also think that ``30`` is also the third element *of the
@@ -109,10 +125,13 @@ fourth element* of listB. So we can write this instead:
     listB[3][2]
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     30
+
 
 
 Oh, and since each of these is the last elements of their respective
@@ -123,10 +142,13 @@ lists, we could instead write:
     listB[-1][-1]
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     30
+
 
 
 which means "get the last element of the last element of listB"
@@ -147,6 +169,7 @@ listB, even if that number is inside a list itself? This won't work:
     2
     3
     [10, 20, 30]
+
 
 Instead, we have to test to see if each "number" in ``listB`` is
 actually a number or a list. And if it's a list, we should find each
@@ -174,19 +197,18 @@ they'll appear automatically in Python's shell):
     20
     30
 
-| That did it! How does it work? Well we look at each "thing" in
-  ``listB`` -- we call it "thing" here, because we're not sure if it's a
-  number of a list. Then in the next line
-  ``if isinstance(thing, list):`` checks if the thing is a list. If that
-  is ``True`` then we get to an inner loop, where we look at "thing"
-  (which in this case is ``listA``, but the program doesn't know that)
-  and get the "number" from it. But if "thing" is not a list, that's
-  where the ``else`` comes in, which is what we run if we don't have a
-  list, which just says, print the number.
 
+| That did it! How does it work? Well we look at each "thing" in
+``listB`` -- we call it "thing" here, because we're not sure if it's a
+number of a list. Then in the next line ``if isinstance(thing, list):``
+checks if the thing is a list. If that is ``True`` then we get to an
+inner loop, where we look at "thing" (which in this case is ``listA``,
+but the program doesn't know that) and get the "number" from it. But if
+"thing" is not a list, that's where the ``else`` comes in, which is what
+we run if we don't have a list, which just says, print the number.
 | (We're assuming in this case that there are only two types of things
-  in ``listB``, numbers and other lists.) If you get an error, be sure
-  not to forget the ending ":" or to indent the next line.
+in ``listB``, numbers and other lists.) If you get an error, be sure not
+to forget the ending ":" or to indent the next line.
 
 Functions and Recursion
 -----------------------
@@ -205,10 +227,13 @@ within a list:
     listC
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     [100, 200, 300, [1, 2, 3, [10, 20, 30]]]
+
 
 
 If we wanted to print all the numbers in listC, we could write an ugly
@@ -241,6 +266,7 @@ want to type this and just want to trust me that this works):
     10
     20
     30
+
 
 Whew! If this were the only way to do it, I wouldn't blame you if you
 decided that programming just wasn't worth the headache. Especially
@@ -285,6 +311,7 @@ Now try:
     20
     30
 
+
 It works! But how? Here's how functions work in general (skip this, if
 you know all about functions):
 
@@ -326,6 +353,7 @@ Now we can try:
 
     100
 
+
 .. code:: python
 
     squareMe(2.5)
@@ -335,6 +363,7 @@ Now we can try:
    :class: ipython-result
 
     6.25
+
 
 .. code:: python
 
@@ -346,6 +375,7 @@ Now we can try:
    :class: ipython-result
 
     9.8596
+
 
 Notice two things in the last case. First that pi isn't exactly 3.14 --
 we all know that; I just wanted to make sure the math teachers in the
@@ -376,10 +406,13 @@ another variable:
     x
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     8
+
 
 
 .. code:: python
@@ -388,10 +421,13 @@ another variable:
     y
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     512
+
 
 
 Notice that if ``x = cubeMe(2)`` and ``y = cubeMe(x)`` then we can
@@ -403,10 +439,13 @@ substitute ``cubeMe(2)`` for ``x`` and write:
     y
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     512
+
 
 
 Thus, using ``return`` instead of ``print`` is more powerful, so after
@@ -459,13 +498,17 @@ isn't a list, you'll get an error:
 
     flatPrint(30)
 
+
 ::
+
 
     ---------------------------------------------------------------------------
     TypeError                                 Traceback (most recent call last)
+
     <ipython-input-26-d6916f79680c> in <module>()
     ----> 1 flatPrint(30)
     
+
     <ipython-input-25-910b883fde2e> in flatPrint(myList)
           1 def flatPrint(myList):              # 1
     ----> 2     for thing in myList:            # 2
@@ -473,7 +516,9 @@ isn't a list, you'll get an error:
           4             flatPrint(thing)        # 4
           5         else:                       # 5
 
+
     TypeError: 'int' object is not iterable
+
 
 For more information on data structures (lists, lists of lists, and
 things we didn't get to, I suggest watching Google's Python tutorial,

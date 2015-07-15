@@ -622,6 +622,8 @@ class Stream(base.Music21Object):
 
         >>> len(a.flat.notes) == len(b.flat.notes) == 20
         True
+        
+        :rtype: list(base.Music21Object)
         ''')
 
     def __setitem__(self, k, value):
@@ -1082,6 +1084,8 @@ class Stream(base.Music21Object):
         >>> junk = a.pop(0)
         >>> len(a)
         9
+        
+        :rtype: base.Music21Object
         '''
         eLen = len(self._elements)
         # if less then base length, its in _elements
@@ -2345,7 +2349,7 @@ class Stream(base.Music21Object):
 
     def getElementsByClass(self, classFilterList, returnStreamSubClass=True):
         '''
-        Return a list of all Elements that match one
+        Return a Stream containing all Elements that match one
         or more classes in the `classFilterList`. A single class
         can also used for the `classFilterList` parameter instead of a List.
 
@@ -2356,6 +2360,8 @@ class Stream(base.Music21Object):
         ...     n.offset = x * 3
         ...     a.insert(n)
         >>> found = a.getElementsByClass(note.Note)
+        >>> "Score" in found.classes
+        True
         >>> len(found)
         4
         >>> found[0].pitch.accidental.name
@@ -2412,7 +2418,7 @@ class Stream(base.Music21Object):
         >>> len(foundList)
         25
 
-
+        :rtype: Stream
         '''
         # TODO: could add `domain` parameter to allow searching only _elements,
         # or _endElements, or both; possible performance hit
@@ -2510,6 +2516,8 @@ class Stream(base.Music21Object):
         >>> found = a.flat.getElementsNotOfClass(note.Note)
         >>> len(found)
         25
+        
+        :rtype: Stream
         '''
         # should probably be whatever class the caller is
         if returnStreamSubClass:
@@ -2675,8 +2683,6 @@ class Stream(base.Music21Object):
         Returns the first encountered element for a given id. Return None
         if no match. Note: this uses the id attribute stored on elements, which may not be the same as id(e).
 
-
-
         >>> a = stream.Stream()
         >>> ew = note.Note()
         >>> a.insert(0, ew)
@@ -2701,6 +2707,8 @@ class Stream(base.Music21Object):
         True
         >>> ew.activeSite is a
         True
+        
+        :rtype: base.Music21Object
         '''
         for e in self._elements:
             match = False
@@ -2944,6 +2952,7 @@ class Stream(base.Music21Object):
         >>> [el.step for el in out7]
         ['C', 'D']
 
+        :rtype: Stream
         '''
         offsetStart = opFrac(offsetStart)
         if offsetEnd is None:

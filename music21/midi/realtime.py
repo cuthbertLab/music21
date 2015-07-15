@@ -30,7 +30,7 @@ except ImportError:
     try:
         import StringIO as stringIOModule
     except ImportError:
-        from io import StringIO as stringIOModule
+        import io as stringIOModule
 
 class StreamPlayerException(Music21Exception):
     pass

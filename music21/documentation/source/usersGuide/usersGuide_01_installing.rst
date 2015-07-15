@@ -4,6 +4,7 @@
    AUTOMATICALLY GENERATED.
    PLEASE EDIT THE .py FILE DIRECTLY.
 
+
 User's Guide, Chapter 1: Installing and Getting Started with ``music21``
 ========================================================================
 

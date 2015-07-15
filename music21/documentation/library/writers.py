@@ -300,9 +300,11 @@ class IPythonNotebookReSTWriter(ReSTWriter):
 
     def runNBConvert(self, ipythonNotebookFilePath):
 #         import music21
-        from music21.ext.nbconvert import nbconvert_app as nb # @UnresolvedImport
+        from music21.ext.nbconvert import nbconvertapp as nb # @UnresolvedImport
         app = nb.NbConvertApp.instance() # @UndefinedVariable
-        app.start(argv=['nbconvert', 'rst', ipythonNotebookFilePath])
+        app.initialize(argv=['--to', 'rst', ipythonNotebookFilePath])
+        app.writer.build_directory = os.path.dirname(ipythonNotebookFilePath)
+        app.start()
 
 
 ## UNUSED

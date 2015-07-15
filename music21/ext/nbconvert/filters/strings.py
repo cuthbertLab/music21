@@ -1,28 +1,44 @@
+# coding: utf-8
 """String filters.
 
 Contains a collection of useful string manipulation filters for use in Jinja
 templates.
 """
-#-----------------------------------------------------------------------------
-# Copyright (c) 2013, the IPython Development Team.
-#
+
+# Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
-#
-# The full license is in the file COPYING.txt, distributed with this software.
-#-----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
-
-# Our own imports
+import os
+import re
 import textwrap
+try:
+    from urllib.parse import quote  # Py 3
+except ImportError:
+    from urllib2 import quote  # Py 2
+from xml.etree import ElementTree
 
-#-----------------------------------------------------------------------------
-# Functions
-#-----------------------------------------------------------------------------
+from IPython.core.interactiveshell import InteractiveShell
+from IPython.utils import py3compat
 
-def wrap(text, width=100):
+
+__all__ = [
+    'wrap_text',
+    'html2text',
+    'add_anchor',
+    'strip_dollars',
+    'strip_files_prefix',
+    'comment_lines',
+    'get_lines',
+    'ipython2python',
+    'posix_path',
+    'path2url',
+    'add_prompts',
+    'ascii_only',
+    'prevent_list_blocks',
+]
+
+
+def wrap_text(text, width=100):
     """ 
     Intelligently wrap text.
     Wrap text without breaking words if possible.
@@ -41,6 +57,57 @@ def wrap(text, width=100):
     return '\n'.join(wrpd)
 
 
+def html2text(element):
+    """extract inner text from html
+    
+    Analog of jQuery's $(element).text()
+    """
+    if isinstance(element, py3compat.string_types):
+        try:
+            element = ElementTree.fromstring(element)
+        except Exception:
+            # failed to parse, just return it unmodified
+            return element
+    
+    text = element.text or ""
+    for child in element:
+        text += html2text(child)
+    text += (element.tail or "")
+    return text
+
+
+def add_anchor(html):
+    """Add an anchor-link to an html header
+    
+    For use on markdown headings
+    """
+    try:
+        h = ElementTree.fromstring(py3compat.cast_bytes_py2(html, encoding='utf-8'))
+    except Exception:
+        # failed to parse, just return it unmodified
+        return html
+    link = html2text(h).replace(' ', '-')
+    h.set('id', link)
+    a = ElementTree.Element("a", {"class" : "anchor-link", "href" : "#" + link})
+    a.text = u'¶'
+    h.append(a)
+
+    # Known issue of Python3.x, ElementTree.tostring() returns a byte string
+    # instead of a text string.  See issue http://bugs.python.org/issue10942
+    # Workaround is to make sure the bytes are casted to a string.
+    return py3compat.decode(ElementTree.tostring(h), 'utf-8')
+
+
+def add_prompts(code, first='>>> ', cont='... '):
+    """Add prompts to code snippets"""
+    new_code = []
+    code_list = code.split('\n')
+    new_code.append(first + code_list[0])
+    for line in code_list[1:]:
+        new_code.append(cont + line)
+    return '\n'.join(new_code)
+
+    
 def strip_dollars(text):
     """
     Remove all dollar symbols from text
@@ -54,19 +121,25 @@ def strip_dollars(text):
     return text.strip('$')
 
 
-def rm_fake(text):
+files_url_pattern = re.compile(r'(src|href)\=([\'"]?)/?files/')
+markdown_url_pattern = re.compile(r'(!?)\[(?P<caption>.*?)\]\(/?files/(?P<location>.*?)\)')
+
+def strip_files_prefix(text):
     """
-    Remove all occurrences of '/files/' from text
+    Fix all fake URLs that start with `files/`, stripping out the `files/` prefix.
+    Applies to both urls (for html) and relative paths (for markdown paths).
     
     Parameters
     ----------
     text : str
-        Text to remove '/files/' from
+        Text in which to replace 'src="files/real...' with 'src="real...'
     """
-    return text.replace('/files/', '')
+    cleaned_text = files_url_pattern.sub(r"\1=\2", text)
+    cleaned_text = markdown_url_pattern.sub(r'\1[\2](\3)', cleaned_text)
+    return cleaned_text
 
 
-def python_comment(text):
+def comment_lines(text, prefix='# '):
     """
     Build a Python comment line from input text.
     
@@ -74,12 +147,14 @@ def python_comment(text):
     ----------
     text : str
         Text to comment out.
+    prefix : str
+        Character to append to the start of each line.
     """
     
     #Replace line breaks with line breaks and comment symbols.
     #Also add a comment symbol at the beginning to comment out
     #the first line.
-    return '# '+'\n# '.join(text.split('\n')) 
+    return prefix + ('\n'+prefix).join(text.split('\n')) 
 
 
 def get_lines(text, start=None,end=None):
@@ -102,3 +177,45 @@ def get_lines(text, start=None,end=None):
     
     # Return the right lines.
     return "\n".join(lines[start:end]) #re-join
+
+def ipython2python(code):
+    """Transform IPython syntax to pure Python syntax
+
+    Parameters
+    ----------
+
+    code : str
+        IPython code, to be transformed to pure Python
+    """
+    shell = InteractiveShell.instance()
+    return shell.input_transformer_manager.transform_cell(code)
+
+def posix_path(path):
+    """Turn a path into posix-style path/to/etc
+    
+    Mainly for use in latex on Windows,
+    where native Windows paths are not allowed.
+    """
+    if os.path.sep != '/':
+        return path.replace(os.path.sep, '/')
+    return path
+
+def path2url(path):
+    """Turn a file path into a URL"""
+    parts = path.split(os.path.sep)
+    return '/'.join(quote(part) for part in parts)
+
+def ascii_only(s):
+    """ensure a string is ascii"""
+    s = py3compat.cast_unicode(s)
+    return s.encode('ascii', 'replace').decode('ascii')
+
+def prevent_list_blocks(s):
+    """
+    Prevent presence of enumerate or itemize blocks in latex headings cells
+    """
+    out = re.sub('(^\s*\d*)\.', '\\1\.', s)
+    out = re.sub('(^\s*)\-', '\\1\-', out)
+    out = re.sub('(^\s*)\+', '\\1\+', out)
+    out = re.sub('(^\s*)\*', '\\1\*', out)
+    return out

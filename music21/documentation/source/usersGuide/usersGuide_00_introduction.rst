@@ -4,6 +4,7 @@
    AUTOMATICALLY GENERATED.
    PLEASE EDIT THE .py FILE DIRECTLY.
 
+
 .. code:: python
 
 
@@ -60,7 +61,10 @@ and then create a score example faster than you ever could before:
     converter.parse("tinynotation: 3/4 c4 d8 f g16 a g f#").show()
 
 
-.. image:: usersGuide_00_introduction_files/_fig_01.png
+
+
+.. image:: usersGuide_00_introduction_files/usersGuide_00_introduction_2_0.png
+
 
 
 Print the twelve-tone matrix for a tone row:
@@ -88,6 +92,7 @@ Print the twelve-tone matrix for a tone row:
       3  2 10 11  6  4  5  1  9  8  7  0
     
 
+
 Get a quick graph showing how common various pitches are in a fourteenth
 century piece
 
@@ -96,7 +101,10 @@ century piece
     dicant = corpus.parse('trecento/Fava_Dicant_nunc_iudei')
     dicant.plot('histogram')
 
-.. image:: usersGuide_00_introduction_files/_fig_04.png
+
+
+.. image:: usersGuide_00_introduction_files/usersGuide_00_introduction_6_0.png
+
 
 Prepare an incipit index (thematic catalog) of every Bach chorale that
 is in 3/4: (we'll just look at the first 25 here)
@@ -112,11 +120,18 @@ is in 3/4: (we'll just look at the first 25 here)
     
     catalog.show()
 
-.. image:: usersGuide_00_introduction_files/_fig_06.png
 
-.. image:: usersGuide_00_introduction_files/_fig_08.png
 
-.. image:: usersGuide_00_introduction_files/_fig_10.png
+.. image:: usersGuide_00_introduction_files/usersGuide_00_introduction_8_0.png
+
+
+
+.. image:: usersGuide_00_introduction_files/usersGuide_00_introduction_8_1.png
+
+
+
+.. image:: usersGuide_00_introduction_files/usersGuide_00_introduction_8_2.png
+
 
 We'll show how to do this and much more in the next chapters. If you're
 ready to give it a shot, jump in to the next chapter:

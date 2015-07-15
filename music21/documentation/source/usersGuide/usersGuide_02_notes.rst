@@ -4,6 +4,7 @@
    AUTOMATICALLY GENERATED.
    PLEASE EDIT THE .py FILE DIRECTLY.
 
+
 .. code:: python
 
 
@@ -49,14 +50,14 @@ then you'll now be able to access the ``note`` module just by typing
 >>> note # doctest: +SKIP
 <module 'music21.note' from 'D:\music21files\music21\note.pyc'>
 
-| If you get something like this you'll have access to the music21
-  ``note`` module any time you type ``"note"``. The filename after "from
-  'D:\\music21files...'" will differ for you. It will show you where you
-  have music21 installed (if you ever forget where you have music21
-  installed, this is an easy way to figure it out).
 
+| If you get something like this you'll have access to the music21
+``note`` module any time you type ``"note"``. The filename after "from
+'D:\\music21files...'" will differ for you. It will show you where you
+have music21 installed (if you ever forget where you have music21
+installed, this is an easy way to figure it out).
 | As long as it ends in ``note.pyc`` or ``note.py`` or something like
-  that you're fine.
+that you're fine.
 
 If you want to know what else the ``note`` module contains besides the
 Note and Rest objects you can type "``dir(note)``\ " to find out:
@@ -64,6 +65,8 @@ Note and Rest objects you can type "``dir(note)``\ " to find out:
 .. code:: python
 
     dir(note)
+
+
 
 
 .. parsed-literal::
@@ -108,6 +111,7 @@ Note and Rest objects you can type "``dir(note)``\ " to find out:
      'volume']
 
 
+
 Some of the things in this list are classes of notes -- they are
 capitalized. Other classes are things that we'll get to later, like
 :class:`~music21.note.Lyric` objects. (By the way: I'm highlighting
@@ -131,6 +135,7 @@ in which case instead of using the word ``note``, you'll need to call it
 >>> music21.note # doctest: +SKIP
 <module 'music21.note' from 'D:\music21files\music21\note.pyc'>
     
+
 If you are a Python guru, you already knew that. Probably if you didn't
 already know that, but you've heard about "polluting your namespace,"
 you have a Python guru friend who has screamed, "Never use
@@ -160,10 +165,13 @@ can verify this just by typing ``f``:
     f
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.note.Note F>
+
 
 
 And you can see that it's actually an F and actually in octave 5 by
@@ -175,10 +183,13 @@ object, ``f``:
     f.name
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     'F'
+
 
 
 .. code:: python
@@ -186,10 +197,13 @@ object, ``f``:
     f.octave
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     5
+
 
 
 Well, that didn't tell you anything you didn't know already! Let's look
@@ -200,10 +214,13 @@ at some other attributes that might tell you something you didn't know:
     f.frequency
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     698.456462866008
+
 
 
 .. code:: python
@@ -211,10 +228,13 @@ at some other attributes that might tell you something you didn't know:
     f.pitchClassString
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     '5'
+
 
 
 That's a bit better! So an f is about 698hz (if A4 = 440hz), and it is
@@ -257,10 +277,13 @@ equal. So:
     f.octave == 5
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     True
+
 
 
 That's what we'd expect. But try:
@@ -270,10 +293,13 @@ That's what we'd expect. But try:
     f.pitchClassString == 5
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     False
+
 
 
 That's because ``5 == '5'`` is ``False``. (There are some lovely
@@ -287,10 +313,13 @@ might see this as an advantage). So to see if ``f.pitchClassString`` is
     f.pitchClassString == "5"
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     True
+
 
 
 In Python it doesn't matter if you put the ``5`` in single or double
@@ -301,10 +330,13 @@ quotes:
     f.pitchClassString == '5'
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     True
+
 
 
 ``pitchClassString`` tells you that you should expect a string, because
@@ -316,10 +348,13 @@ number:
     f.pitchClass
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     5
+
 
 
 These two ways of getting a pitch class are basically the same for the
@@ -345,11 +380,15 @@ dashes aren't allowed in variable names:
 
     b-flat = note.Note("B-2")
 
+
 ::
+
 
       File "<ipython-input-18-d519b3e88921>", line 1
         b-flat = note.Note("B-2")
     SyntaxError: can't assign to operator
+
+
 
 Since this note has an accidental you can get it by using the
 ``.accidental`` property:
@@ -359,10 +398,13 @@ Since this note has an accidental you can get it by using the
     bflat.accidental
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <accidental flat>
+
 
 
 Here we have something that isn't a number and doesn't have quotes
@@ -386,10 +428,13 @@ the first one quite a bit: it shows how many semitones this
     acc.alter
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     -1.0
+
 
 
 Since this ``Accidental`` is a flat, its ``.alter`` is a negative
@@ -408,10 +453,13 @@ and "chained" the two attributes together in one step:
     bflat.accidental.alter
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     -1.0
+
 
 
 .. code:: python
@@ -419,10 +467,13 @@ and "chained" the two attributes together in one step:
     acc.displayLocation
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     'normal'
+
 
 
 Good to know that we've set a sensible default. If you want to have the
@@ -434,10 +485,13 @@ accidental display above the note, you'll have to set that yourself:
     acc.displayLocation
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     'above'
+
 
 
 Our variable ``"acc"`` is the **exact** accidental that is attached to
@@ -452,10 +506,13 @@ to the silly "above" position:
     bflat.accidental.displayLocation
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     'above'
+
 
 
 Python is one of those cool computer languages where if an object
@@ -469,14 +526,19 @@ you try to access it, you'll get an error:
 
     bflat.wasWrittenByStockhausen
 
+
 ::
+
 
     ---------------------------------------------------------------------------
     AttributeError                            Traceback (most recent call last)
+
     <ipython-input-26-3e7bfdcb790a> in <module>()
     ----> 1 bflat.wasWrittenByStockhausen
     
+
     AttributeError: 'Note' object has no attribute 'wasWrittenByStockhausen'
+
 
 But if you set the value of that weird attribute, you can use it later:
 
@@ -497,6 +559,7 @@ Then you can write an “if” statement to see if this is True or not:
    :class: ipython-result
 
     Hope you're enjoying Sirius!
+
 
 Just as you don’t type the “>>>” at the beginning of the line, don’t
 type the ”...” either. But you will need to put the spaces before the
@@ -522,7 +585,10 @@ such as MuseScore, Finale, Sibelius, or Finale Notepad, you can type:
     f.show()
 
 
-.. image:: usersGuide_02_notes_files/_fig_19.png
+
+
+.. image:: usersGuide_02_notes_files/usersGuide_02_notes_76_0.png
+
 
 
 and see it. We make the default note length a quarter-note. We'll get to
@@ -560,10 +626,13 @@ by transposing our B-flat up a major-third (“M3”):
     d
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.note.Note D>
+
 
 
 .. code:: python
@@ -571,10 +640,13 @@ by transposing our B-flat up a major-third (“M3”):
     bflat
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.note.Note B->
+
 
 
 Instead of changing the original note, the ``transpose()`` method
@@ -592,10 +664,13 @@ comma. Let's take it up a perfect fourth:
     bflat
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.note.Note E->
+
 
 
 Of course now ``bflat`` is a terrible name for our variable! You could
@@ -612,10 +687,13 @@ even), let's transpose it up a doubly-diminished sixth:
     whatNoteIsThis
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.note.Note B--->
+
 
 
 B-triple-flat! Haven't seen one of those in a while! Let's check that
@@ -641,6 +719,7 @@ If you want to be sure that it is ``None``, you can print the value:
 
     None
 
+
 Since ``d.accidental`` is ``None`` does this mean that
 ``d.accidental.name`` is ``None`` too?
 
@@ -648,14 +727,19 @@ Since ``d.accidental`` is ``None`` does this mean that
 
     d.accidental.name
 
+
 ::
+
 
     ---------------------------------------------------------------------------
     AttributeError                            Traceback (most recent call last)
+
     <ipython-input-39-2b6769f305a4> in <module>()
     ----> 1 d.accidental.name
     
+
     AttributeError: 'NoneType' object has no attribute 'name'
+
 
 Nope! In fact it creates an error (which we'll also call "raising an
 Exception" for reasons that will become clear soon). That's because
@@ -701,7 +785,10 @@ You can ``.show()`` it as a '``musicxml``\ ' file of course...
     r.show()
 
 
-.. image:: usersGuide_02_notes_files/_fig_26.png
+
+
+.. image:: usersGuide_02_notes_files/usersGuide_02_notes_102_0.png
+
 
 
 ...but if you try to hear it as a '``midi``\ ' file, don't expect to be

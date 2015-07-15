@@ -4,6 +4,7 @@
    AUTOMATICALLY GENERATED.
    PLEASE EDIT THE .py FILE DIRECTLY.
 
+
 .. code:: python
 
 
@@ -51,15 +52,20 @@ stores a :class:`~music21.duration.Duration` object.
     mt
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <MeterTerminal 3/4>
 
 
+
 .. code:: python
 
     mt.numerator, mt.denominator
+
+
 
 
 .. parsed-literal::
@@ -68,15 +74,19 @@ stores a :class:`~music21.duration.Duration` object.
     (3, 4)
 
 
+
 .. code:: python
 
     mt.duration.quarterLength
+
+
 
 
 .. parsed-literal::
    :class: ipython-result
 
     3.0
+
 
 
 A MeterTerminal can be broken into an ordered sequence of MeterTerminal
@@ -93,15 +103,20 @@ fraction representations.
     mt.subdivide(3)
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <MeterSequence {1/4+1/4+1/4}>
 
 
+
 .. code:: python
 
      mt.subdivide([3,3]) 
+
+
 
 
 .. parsed-literal::
@@ -110,15 +125,19 @@ fraction representations.
     <MeterSequence {3/8+3/8}>
 
 
+
 .. code:: python
 
     mt.subdivide(['1/4','4/8']) 
+
+
 
 
 .. parsed-literal::
    :class: ipython-result
 
     <MeterSequence {1/4+4/8}>
+
 
 
 Creating and Editing MeterSequence Objects
@@ -169,10 +188,13 @@ list-like index access is also demonstrated.
     ms
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <MeterSequence {3/4}>
+
 
 
 .. code:: python
@@ -181,15 +203,20 @@ list-like index access is also demonstrated.
     ms
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <MeterSequence {3/8+3/8}>
 
 
+
 .. code:: python
 
     ms[0] 
+
+
 
 
 .. parsed-literal::
@@ -198,10 +225,13 @@ list-like index access is also demonstrated.
     <MeterTerminal 3/8>
 
 
+
 .. code:: python
 
     ms[0] = ms[0].subdivide([3,3])
     ms[0]
+
+
 
 
 .. parsed-literal::
@@ -210,9 +240,12 @@ list-like index access is also demonstrated.
     <MeterSequence {3/16+3/16}>
 
 
+
 .. code:: python
 
     ms
+
+
 
 
 .. parsed-literal::
@@ -221,10 +254,13 @@ list-like index access is also demonstrated.
     <MeterSequence {{3/16+3/16}+3/8}>
 
 
+
 .. code:: python
 
     ms[1] = ms[1].subdivide([1,1,1]) 
     ms[1][0]
+
+
 
 
 .. parsed-literal::
@@ -233,9 +269,12 @@ list-like index access is also demonstrated.
     <MeterTerminal 1/8>
 
 
+
 .. code:: python
 
     ms[1]
+
+
 
 
 .. parsed-literal::
@@ -244,15 +283,19 @@ list-like index access is also demonstrated.
     <MeterSequence {1/8+1/8+1/8}>
 
 
+
 .. code:: python
 
     ms
+
+
 
 
 .. parsed-literal::
    :class: ipython-result
 
     <MeterSequence {{3/16+3/16}+{1/8+1/8+1/8}}>
+
 
 
 The resulting structure can be graphically displayed with the following
@@ -265,7 +308,10 @@ diagram:
     #_DOCS_HIDE i
 
 
-.. image:: usersGuide_55_advancedMeter_files/_fig_15.png
+
+
+.. image:: usersGuide_55_advancedMeter_files/usersGuide_55_advancedMeter_24_0.png
+
 
 
 Numerous MeterSequence attributes provide convenient ways to access
@@ -281,15 +327,20 @@ MeterTerminal objects (all leaf nodes).
     ms.depth
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     2
 
 
+
 .. code:: python
 
     ms[0].depth
+
+
 
 
 .. parsed-literal::
@@ -298,15 +349,19 @@ MeterTerminal objects (all leaf nodes).
     1
 
 
+
 .. code:: python
 
     ms.flat
+
+
 
 
 .. parsed-literal::
    :class: ipython-result
 
     <MeterSequence {3/16+3/16+1/8+1/8+1/8}>
+
 
 
 Numerous methods provide ways to access levels (slices) of the
@@ -324,15 +379,20 @@ values.
     ms.getLevel(0)
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <MeterSequence {3/8+3/8}>
 
 
+
 .. code:: python
 
     ms.getLevel(1)
+
+
 
 
 .. parsed-literal::
@@ -341,9 +401,12 @@ values.
     <MeterSequence {3/16+3/16+1/8+1/8+1/8}>
 
 
+
 .. code:: python
 
     ms.getLevelSpan(1)
+
+
 
 
 .. parsed-literal::
@@ -352,15 +415,19 @@ values.
     [(0.0, 0.75), (0.75, 1.5), (1.5, 2.0), (2.0, 2.5), (2.5, 3.0)]
 
 
+
 .. code:: python
 
     ms[1].getLevelSpan(1)
+
+
 
 
 .. parsed-literal::
    :class: ipython-result
 
     [(0.0, 0.5), (0.5, 1.0), (1.0, 1.5)]
+
 
 
 Finally, numerous methods provide ways to find and access the relevant
@@ -378,15 +445,20 @@ a given QL, the maximum depth at this position.
     ms.offsetToIndex(2.5)
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     1
 
 
+
 .. code:: python
 
     ms.offsetToSpan(2.5)
+
+
 
 
 .. parsed-literal::
@@ -395,9 +467,12 @@ a given QL, the maximum depth at this position.
     (1.5, 3.0)
 
 
+
 .. code:: python
 
     ms.offsetToDepth(.5)
+
+
 
 
 .. parsed-literal::
@@ -406,9 +481,12 @@ a given QL, the maximum depth at this position.
     2
 
 
+
 .. code:: python
 
      ms[0].offsetToDepth(.5)
+
+
 
 
 .. parsed-literal::
@@ -417,15 +495,19 @@ a given QL, the maximum depth at this position.
     1
 
 
+
 .. code:: python
 
      ms.getLevel(1).offsetToSpan(.5)
+
+
 
 
 .. parsed-literal::
    :class: ipython-result
 
     (0, 0.75)
+
 
 
 Advanced Time Signature Configuration
@@ -446,7 +528,10 @@ MeterSequence objects.
     #_DOCS_HIDE i
 
 
-.. image:: usersGuide_55_advancedMeter_files/_fig_29.png
+
+
+.. image:: usersGuide_55_advancedMeter_files/usersGuide_55_advancedMeter_42_0.png
+
 
 
 The TimeSignature provides a model of all common hierarchical structures
@@ -500,7 +585,10 @@ a TimeSignature.
 
 
 
-.. image:: usersGuide_55_advancedMeter_files/_fig_31.png
+
+
+.. image:: usersGuide_55_advancedMeter_files/usersGuide_55_advancedMeter_46_0.png
+
 
 
 Configuring Beam
@@ -565,7 +653,10 @@ flexibility of this model.
     s.show()   
 
 
-.. image:: usersGuide_55_advancedMeter_files/_fig_33.png
+
+
+.. image:: usersGuide_55_advancedMeter_files/usersGuide_55_advancedMeter_49_0.png
+
 
 
 The following is a fractional grid representation of the four beam
@@ -611,15 +702,20 @@ property.
     ts.beatSequence.getLevel(0)
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <MeterSequence {1/4+1/4+1/4}>
 
 
+
 .. code:: python
 
     ts.beatSequence.getLevel(1)
+
+
 
 
 .. parsed-literal::
@@ -628,9 +724,12 @@ property.
     <MeterSequence {1/8+1/8+1/8+1/8+1/8+1/8}>
 
 
+
 .. code:: python
 
     ts.beatDuration
+
+
 
 
 .. parsed-literal::
@@ -639,9 +738,12 @@ property.
     <music21.duration.Duration 1.0>
 
 
+
 .. code:: python
 
     ts.beatCount
+
+
 
 
 .. parsed-literal::
@@ -650,9 +752,12 @@ property.
     3
 
 
+
 .. code:: python
 
     ts.beatCountName
+
+
 
 
 .. parsed-literal::
@@ -661,9 +766,12 @@ property.
     'Triple'
 
 
+
 .. code:: python
 
     ts.beatDivisionCount
+
+
 
 
 .. parsed-literal::
@@ -672,9 +780,12 @@ property.
     2
 
 
+
 .. code:: python
 
     ts.beatDivisionCountName
+
+
 
 
 .. parsed-literal::
@@ -683,9 +794,12 @@ property.
     'Simple'
 
 
+
 .. code:: python
 
     ts.classification
+
+
 
 
 .. parsed-literal::
@@ -694,10 +808,13 @@ property.
     'Simple Triple'
 
 
+
 .. code:: python
 
     ts = meter.TimeSignature('12/16')
     ts.beatSequence.getLevel(0)
+
+
 
 
 .. parsed-literal::
@@ -706,9 +823,12 @@ property.
     <MeterSequence {3/16+3/16+3/16+3/16}>
 
 
+
 .. code:: python
 
     ts.beatSequence.getLevel(1)
+
+
 
 
 .. parsed-literal::
@@ -717,9 +837,12 @@ property.
     <MeterSequence {1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16+1/16}>
 
 
+
 .. code:: python
 
     ts.beatDuration
+
+
 
 
 .. parsed-literal::
@@ -728,9 +851,12 @@ property.
     <music21.duration.Duration 0.75>
 
 
+
 .. code:: python
 
     ts.beatCount
+
+
 
 
 .. parsed-literal::
@@ -739,9 +865,12 @@ property.
     4
 
 
+
 .. code:: python
 
     ts.beatCountName
+
+
 
 
 .. parsed-literal::
@@ -750,9 +879,12 @@ property.
     'Quadruple'
 
 
+
 .. code:: python
 
     ts.beatDivisionCount
+
+
 
 
 .. parsed-literal::
@@ -761,9 +893,12 @@ property.
     3
 
 
+
 .. code:: python
 
     ts.beatDivisionCountName
+
+
 
 
 .. parsed-literal::
@@ -772,15 +907,19 @@ property.
     'Compound'
 
 
+
 .. code:: python
 
     ts.classification
+
+
 
 
 .. parsed-literal::
    :class: ipython-result
 
     'Compound Quadruple'
+
 
 
 Annotating Found Notes with Beat Count
@@ -861,7 +1000,10 @@ method.
     partBass.getElementsByClass('Measure')[0:7].show()  
 
 
-.. image:: usersGuide_55_advancedMeter_files/_fig_51.png
+
+
+.. image:: usersGuide_55_advancedMeter_files/usersGuide_55_advancedMeter_75_0.png
+
 
 
 Alternatively, this type of annotation can be applied to a Stream using
@@ -917,7 +1059,10 @@ accents to reflect a meter of 6/8.
     partBass.getElementsByClass('Measure')[0:8].show() 
 
 
-.. image:: usersGuide_55_advancedMeter_files/_fig_53.png
+
+
+.. image:: usersGuide_55_advancedMeter_files/usersGuide_55_advancedMeter_81_0.png
+
 
 
 .. code:: python
@@ -930,5 +1075,7 @@ accents to reflect a meter of 6/8.
     partBass.getElementsByClass('Measure')[0:8].show()
 
 
-.. image:: usersGuide_55_advancedMeter_files/_fig_55.png
+
+
+.. image:: usersGuide_55_advancedMeter_files/usersGuide_55_advancedMeter_82_0.png
 

@@ -699,7 +699,7 @@ def mixedNumeral(expr, limitDenominator=defaults.limitOffsetDenominator):
 
 def roundToHalfInteger(num):
     '''
-    Given a floating-point number, round to the nearest half-integer.
+    Given a floating-point number, round to the nearest half-integer. Returns int or float
 
     >>> common.roundToHalfInteger(1.2)
     1
@@ -709,6 +709,8 @@ def roundToHalfInteger(num):
     2
     >>> common.roundToHalfInteger(1.6234)
     1.5
+    
+    :rtype: float
     '''
     intVal, floatVal = divmod(num, 1.0)
     intVal = int(intVal)
@@ -727,7 +729,6 @@ def almostEquals(x, y = 0.0, grain=1e-7):
 
     almostEquals(x, y) -- returns True if x and y are within 0.0000001 of each other
 
-
     >>> from music21 import common
     >>> common.almostEquals(1.000000001, 1)
     True
@@ -736,7 +737,7 @@ def almostEquals(x, y = 0.0, grain=1e-7):
     >>> common.almostEquals(1.001, 1, grain=0.1)
     True
 
-
+    :rtype: bool
     '''
     # for very small grains, just compare Fractions without converting...
     if (isinstance(x, Fraction) and isinstance(y, Fraction) and grain <= 5e-6):
@@ -752,7 +753,6 @@ def nearestCommonFraction(x, grain=1e-2):
     '''Given a value that suggests a floating point fraction, like .33,
     return a float that provides greater specification, such as .333333333
 
-
     >>> common.nearestCommonFraction(.333) == 1/3.
     True
     >>> common.nearestCommonFraction(.33) == 1/3.
@@ -763,6 +763,8 @@ def nearestCommonFraction(x, grain=1e-2):
     True
     >>> common.nearestCommonFraction(.125)
     0.125
+    
+    :rtype: float
     '''
     if isStr(x):
         x = float(x)
@@ -778,6 +780,8 @@ def nearestCommonFraction(x, grain=1e-2):
 def greaterThanOrEqual(x, y=0.0, grain=1e-7):
     '''
     greaterThan returns True if x is greater than or almostEquals y
+    
+    :rtype: bool
     '''
     if x > y or almostEquals(x, y, grain):
         return True
@@ -800,6 +804,7 @@ def lessThan(x, y = 0.0, grain=1e-7):
     >>> common.lessThan(5.000000000006, 5.000000000005)
     False
 
+    :rtype: bool
     '''
     if x > y or almostEquals(x, y, grain):
         return False
@@ -851,6 +856,8 @@ def nearestMultiple(n, unit):
     Traceback (most recent call last):
     ValueError: n (-0.5) is less than zero. Thus cannot find nearest multiple for a value less than the unit, 0.125
 
+
+    :rtype: tuple(float)
     '''
     if n < 0:
         raise ValueError('n (%s) is less than zero. Thus cannot find nearest multiple for a value less than the unit, %s' % (n, unit))
@@ -875,13 +882,14 @@ def nearestMultiple(n, unit):
 def standardDeviation(coll, bassel=False):
     '''Given a collection of values, return the standard deviation.
 
-
     >>> common.standardDeviation([2,4,4,4,5,5,7,9])
     2.0
     >>> common.standardDeviation([600, 470, 170, 430, 300])
     147.3227...
     >>> common.standardDeviation([4, 2, 5, 8, 6], bassel=True)
     2.23606...
+
+    :rtype: float
     '''
     avg = sum(coll) / float(len(coll))
     diffColl = [math.pow(val-avg, 2) for val in coll]
@@ -913,6 +921,8 @@ def isNum(usrData):
     False
     >>> common.isNum(None)
     False
+    
+    :rtype: bool
     '''
     try:
         # TODO: this may have unexpected consequences: find
@@ -953,6 +963,8 @@ def contiguousList(inputListOrTuple):
     False
     >>> common.contiguousList(sorted(l))
     True
+    
+    :rtype: bool
     '''
     currentMaxVal = inputListOrTuple[0]
     for i in range(1, len(inputListOrTuple)):
@@ -971,6 +983,8 @@ def isStr(usrData):
     True
     >>> common.isStr(u'flat')
     True
+    
+    :rtype: bool
     """
     #python3 compatibility
     try:
@@ -1002,6 +1016,8 @@ def isListLike(usrData):
     True
     >>> common.isListLike(stream.Stream())
     False
+    
+    :rtype: bool
     """
     #TODO: add immutable sets
     if (isinstance(usrData, list) or
@@ -1024,6 +1040,8 @@ def isIterable(usrData):
     True
     >>> common.isIterable(stream.Stream())
     True
+    
+    :rtype: bool
     """
     if hasattr(usrData, "__iter__"):
         if six.PY3:
@@ -1041,6 +1059,8 @@ def toUnicode(usrStr):
     u'test'
     >>> common.toUnicode(u'test')
     u'test'
+    
+    :rtype: str
     '''
     if six.PY3:
         if not isinstance(usrStr, str):
@@ -1091,6 +1111,8 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
     
     Note that this is slow enough if it gets it wrong that the firstGuess should be set
     to something reasonable like 'ascii' or 'utf-8'.
+    
+    :rtype: str
     '''
     import codecs
     from music21.ext import chardet # encoding detector... @UnresolvedImport
@@ -1115,6 +1137,8 @@ def classToClassStr(classObj):
     'Note'
     >>> common.classToClassStr(chord.Chord)
     'Chord'
+    
+    :rtype: str
     '''
     # remove closing quotes
     return str(classObj).split('.')[-1][:-2]
@@ -1128,6 +1152,8 @@ def getNumFromStr(usrStr, numbers='0123456789'):
     ('23954', 'asdfwer')
     >>> common.getNumFromStr('')
     ('', '')
+    
+    :rtype: tuple(str)
     '''
     found = []
     remain = []
@@ -1152,6 +1178,8 @@ def numToIntOrFloat(value):
     1.5
     >>> common.numToIntOrFloat(1.0000000005)
     1
+    
+    :rtype: float
     '''
     intVal = int(round(value))
     if almostEquals(intVal, value, 1e-6):
@@ -1184,6 +1212,7 @@ def spaceCamelCase(usrStr, replaceUnderscore=True):
     >>> common.spaceCamelCase('hello_myke', replaceUnderscore = False)
     'hello_myke'
 
+    :rtype: str
     '''
     numbers = '0123456789.'
     firstNum = False
@@ -1230,6 +1259,8 @@ def getPlatform():
     '''
     Return the name of the platform, where platforms are divided
     between 'win' (for Windows), 'darwin' (for MacOS X), and 'nix' for (GNU/Linux and other variants).
+
+    :rtype: str
     '''
     # possible os.name values: 'posix', 'nt', 'mac', 'os2', 'ce',
     # 'java', 'riscos'.
@@ -1251,6 +1282,8 @@ def dotMultiplier(dots):
     Fraction(7, 4)
     >>> common.dotMultiplier(3)
     Fraction(15, 8)
+    
+    :rtype: Fraction
     '''
     x = (((2**(dots+1.0))-1.0)/(2**dots))
     return Fraction(x)
@@ -1266,7 +1299,6 @@ def decimalToTuplet(decNum):
     denominators over 100.  Too bad, math geeks.  This is real life.  :-)
 
     returns (numerator, denominator)
-
 
     >>> common.decimalToTuplet(1.5)
     (3, 2)
@@ -1285,6 +1317,8 @@ def decimalToTuplet(decNum):
     ZeroDivisionError: number must be greater than zero
 
     TODO: replace with fractions...
+    
+    :rtype: tuple(int)
     '''
 
     def findSimpleFraction(working):
@@ -1338,6 +1372,9 @@ def unitNormalizeProportion(values):
 
     #>>> common.unitNormalizeProportion([.2, .6, .2])
     #[0.20000000000000001, 0.59999999999999998, 0.20000000000000001]
+
+
+    :rtype: list(float)
     """
     # note: negative values should be shifted to positive region first
     summation = 0
@@ -1358,6 +1395,9 @@ def unitBoundaryProportion(series):
     [(0, 0.25), (0.25, 0.5), (0.5, 1.0)]
     >>> common.unitBoundaryProportion([8,1,1])
     [(0, 0.8...), (0.8..., 0.9...), (0.9..., 1.0)]
+
+
+    :rtype: list(tuple(float))
     """
     unit = unitNormalizeProportion(series)
     bounds = []
@@ -1382,6 +1422,9 @@ def weightedSelection(values, weights, randomGenerator=None):
 
     >>> -30 < sum([common.weightedSelection([-1, 1], [1,1]) for x in range(100)]) < 30
     True
+
+
+    :rtype: int
     '''
     if randomGenerator is not None:
         q = randomGenerator() # must be in unit interval
@@ -1407,6 +1450,8 @@ def euclidGCD(a, b):
     4
     >>> common.euclidGCD(20,16)
     4
+    
+    :rtype: int
     '''
     if b == 0:
         return a
@@ -1438,6 +1483,7 @@ def approximateGCD(values, grain=1e-4):
     >>> common.strTrimFloat(common.approximateGCD([5/3.,2/3.,5/6.,3/6.]))
     '0.1667'
 
+    :rtype: float
     '''
     lowest = float(min(values))
 
@@ -1491,7 +1537,6 @@ def lcm(filterList):
     '''
     Find the least common multiple of a list of values
 
-
     >>> common.lcm([3,4,5])
     60
     >>> common.lcm([3,4])
@@ -1500,6 +1545,8 @@ def lcm(filterList):
     2
     >>> common.lcm([3,6])
     6
+    
+    :rtype: int
     '''
     # derived from
     # http://www.oreillynet.com/cs/user/view/cs_msg/41022
@@ -1568,6 +1615,7 @@ def fromRoman(num):
     7
 
     Works with both IIII and IV forms:
+    
     >>> common.fromRoman('MCCCCLXXXIX')
     1489
     >>> common.fromRoman('MCDLXXXIX')
@@ -1585,6 +1633,7 @@ def fromRoman(num):
     Traceback (most recent call last):
     Music21CommonException: input contains an invalid subtraction element: vx
 
+    :rtype: int
     '''
     inputRoman = num.upper()
     nums = ['M', 'D', 'C', 'L', 'X', 'V', 'I']
@@ -1633,6 +1682,8 @@ def toRoman(num):
     >>> common.toRoman("hi")
     Traceback (most recent call last):
     TypeError: expected integer, got <... 'str'>
+    
+    :rtype: str
     '''
     if type(num) != type(1):
         raise TypeError("expected integer, got %s" % type(num))
@@ -1659,6 +1710,7 @@ def ordinalAbbreviation(value, plural=False):
     >>> common.ordinalAbbreviation(255, plural=True)
     'ths'
 
+    :rtype: str
     '''
     valueHundreths = value % 100
     if valueHundreths in [11, 12, 13]:
@@ -1700,7 +1752,7 @@ def stripAddresses(textString, replacement = "ADDRESS"):
     >>> common.stripAddresses("{0.0} <music21.base.Music21Object object at 0x102a0ff10>", '0x...')
     '{0.0} <music21.base.Music21Object object at 0x...>'
 
-
+    :rtype: str
     '''
     ADDRESS = re.compile('0x[0-9A-Fa-f]+')
     return ADDRESS.sub(replacement, textString)
@@ -1712,6 +1764,8 @@ def sortModules(moduleList):
     first.  In ties, last accesstime is used then module name
     
     Will return a different order each time depending on the last mod time
+    
+    :rtype: list(str)
     '''
     sort = []
     modNameToMod = {}    
@@ -1736,6 +1790,8 @@ def sortFilesRecent(fileList):
     >>> import os
     >>> a = os.listdir(os.curdir)
     >>> b = common.sortFilesRecent(a)
+
+    :rtype: list(str)
     '''
     sort = []
     for fp in fileList:
@@ -1755,6 +1811,7 @@ def getMd5(value=None):
     >>> common.getMd5('test')
     '098f6bcd4621d373cade4e832627b4f6'
 
+    :rtype: str
     '''
     if value == None:
         value = str(time.time()) + str(random.random())
@@ -1875,6 +1932,8 @@ def getSourceFilePath():
     '''
     Get the music21 directory that contains source files. This is not the same as the
     outermost package development directory.
+    
+    :rtype: str
     '''
     import music21 # pylint: disable=redefined-outer-name
     fpMusic21 = music21.__path__[0] # list, get first item 
@@ -1891,6 +1950,8 @@ def getMetadataCacheFilePath():
     >>> fp = common.getMetadataCacheFilePath()
     >>> fp.endswith('corpus/metadataCache') or fp.endswith(r'corpus\metadataCache')
     True
+    
+    :rtype: str
     '''
     return os.path.join(getSourceFilePath(), 'corpus', 'metadataCache')
 
@@ -2190,8 +2251,10 @@ def normalizeFilename(name):
     >>> common.normalizeFilename(u'03-Niccolò all’lessandra.not really.xml')
     '03-Niccolo_alllessandra_not_really.xml'
 
+
     :type name: str
-    :rtype str
+    :rtype: str
+
     '''
     import unicodedata
     extension = None
@@ -2225,7 +2288,7 @@ def runningUnderIPython():
     http://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook
     says not to do this, but really, I can't think of another way to have different output as default.
     
-    :rtype bool
+    :rtype: bool
     '''
     if sys.stderr.__class__.__name__ == 'OutStream':
         return True
@@ -2243,13 +2306,12 @@ def relativepath(path, start='.'):
     
     :type path: str
     :type start: str
-    :rtype str
+    :rtype: str
     '''
     import platform
     if platform == 'Windows':
         return path
     return os.path.relpath(path, start)
-
 
 ###### test related functions
 
@@ -2350,7 +2412,8 @@ class SlottedObject(object):
     properly.
     
     Only use SlottedObjects for objects that we expect to make so many of
-    that memory storage and speed become an issue.
+    that memory storage and speed become an issue. Thus, unless you are Xenakis, 
+    Glissdata is probably not the best example:
     
     >>> import pickle
     >>> class Glissdata(common.SlottedObject):
@@ -2465,13 +2528,16 @@ class Iterator(object):
 #-------------------------------------------------------------------------------
 class Timer(object):
     """
-    An object for timing.
+    An object for timing. Call it to get the current time since starting.
     
     >>> t = common.Timer()
     >>> now = t()
     >>> nownow = t()
     >>> nownow > now
     True
+    
+    Call `stop` to stop it. Calling `start` again will reset the number
+    
     >>> t.stop()
     >>> stopTime = t()
     >>> stopNow = t()

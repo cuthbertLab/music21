@@ -1,88 +1,85 @@
 {%- extends 'display_priority.tpl' -%}
-{% block in_prompt -%}
-In[{{cell.prompt_number if cell.prompt_number else ' '}}]:
 
-.. code:: python
 
+{% block in_prompt %}
 {% endblock in_prompt %}
 
-{% block output_prompt %}{% if cell.haspyout -%}
-Out[{{cell.prompt_number}}]:{% endif %}{% endblock output_prompt %}
+{% block output_prompt %}
+{% endblock output_prompt %}
 
-{% block input %}{{ cell.input | indent}}
+{% block input %}
+{%- if cell.source.strip() -%}
+.. code:: python
 
+{{ cell.source | indent}}
+{% endif -%}
 {% endblock input %}
 
-{% block pyerr %}::
+{% block error %}
+::
+
 {{ super() }}
-{% endblock pyerr %}
+{% endblock error %}
 
 {% block traceback_line %}
-{{ line |indent| rm_ansi }}{% endblock traceback_line %}
+{{ line | indent | strip_ansi }}
+{% endblock traceback_line %}
 
-{% block pyout %}
-{% block data_priority scoped %}{{ super()}}{% endblock %}
-{% endblock pyout %}
+{% block execute_result %}
+{% block data_priority scoped %}
+{{ super() }}
+{% endblock %}
+{% endblock execute_result %}
 
 {% block stream %}
 .. parsed-literal::
 
-{{ output.text| indent }}
+{{ output.text | indent }}
 {% endblock stream %}
 
-
-
-
-{% block data_svg %}.. image:: {{output.key_svg}}
-
+{% block data_svg %}
+.. image:: {{ output.metadata.filenames['image/svg+xml'] | urlencode }}
 {% endblock data_svg %}
 
-{% block data_png %}.. image:: {{output.key_png}}
-
+{% block data_png %}
+.. image:: {{ output.metadata.filenames['image/png'] | urlencode }}
 {% endblock data_png %}
 
-{% block data_jpg %}..jpg image:: {{output.key_jpg}}
-
+{% block data_jpg %}
+.. image:: {{ output.metadata.filenames['image/jpeg'] | urlencode }}
 {% endblock data_jpg %}
 
+{% block data_latex %}
+.. math::
 
-
-{% block data_latex %}.. math::
-
-{{output.latex| indent}}
-
+{{ output.data['text/latex'] | strip_dollars | indent }}
 {% endblock data_latex %}
 
-{% block data_text scoped %}.. parsed-literal::
+{% block data_text scoped %}
+.. parsed-literal::
 
-{{output.text | indent}}
-
+{{ output.data['text/plain'] | indent }}
 {% endblock data_text %}
 
-{% block markdowncell scoped %}{{ cell.source | markdown2rst }}
+{% block data_html scoped %}
+.. raw:: html
+
+{{ output.data['text/html'] | indent }}
+{% endblock data_html %}
+
+{% block markdowncell scoped %}
+{{ cell.source | markdown2rst }}
 {% endblock markdowncell %}
 
+{%- block rawcell scoped -%}
+{%- if cell.metadata.get('raw_mimetype', '').lower() in resources.get('raw_mimetypes', ['']) %}
+{{cell.source}}
+{% endif -%}
+{%- endblock rawcell -%}
+
 {% block headingcell scoped %}
-{%- set len = cell.source|length -%}
-{{ cell.source}}
-{% if cell.level == 1 %}
-{{- '=' * len }}
-{%- elif cell.level == 2 %}
-{{- '-' * len }}
-{%- elif cell.level == 3 %}
-{{- '~' * len }}
-{%- elif cell.level == 4 %}
-{{- '.' * len }}
-{%- elif cell.level == 5 %}
-{{- '\\' * len }}
-{%- elif cell.level == 6 %}
-{{- '`' * len }}
-{% endif %}
-
+{{ ("#" * cell.level + cell.source) | replace('\n', ' ') | markdown2rst }}
 {% endblock headingcell %}
-
-{% block rawcell scoped %}{{ cell.source  }}
-{% endblock rawcell %}
 
 {% block unknowncell scoped %}
 unknown type  {{cell.type}}

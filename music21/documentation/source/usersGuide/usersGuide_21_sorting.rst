@@ -4,6 +4,7 @@
    AUTOMATICALLY GENERATED.
    PLEASE EDIT THE .py FILE DIRECTLY.
 
+
 User's Guide, Chapter 21: Ordering and Sorting of Stream Elements
 =================================================================
 
@@ -46,7 +47,10 @@ can append an element to the end of the Stream:
     s.show()
 
 
-.. image:: usersGuide_21_sorting_files/_fig_01.png
+
+
+.. image:: usersGuide_21_sorting_files/usersGuide_21_sorting_5_0.png
+
 
 
 Now we're pretty sure that the C# will be the fourth element in the
@@ -58,10 +62,13 @@ Stream, which is referred to as ``[3]`` and the D# will be the fifth, or
     s[3]
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.note.Note C#>
+
 
 
 .. code:: python
@@ -69,10 +76,13 @@ Stream, which is referred to as ``[3]`` and the D# will be the fifth, or
     s[4]
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.note.Note D#>
+
 
 
 The E will be ``[5]`` but we can also get it by saying it's the last
@@ -83,10 +93,13 @@ element, or ``[-1]``
     s[-1]
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.note.Note E>
+
 
 
 The other way to describe the position of an element is by its offset.
@@ -96,10 +109,13 @@ The other way to describe the position of an element is by its offset.
     e.offset
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     2.0
+
 
 
 You may recall from previous discussions that the ``offset`` of an
@@ -113,10 +129,13 @@ particular Stream, it is always safer to use the method
     e.getOffsetBySite(s)
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     2.0
+
 
 
 If you want to find all the elements at a particular offset, call
@@ -129,10 +148,13 @@ bracket index to reference it:
     s.getElementsByOffset(2.0)[0]
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     <music21.note.Note E>
+
 
 
 This description might seem a bit obnoxious, but it is necessary because
@@ -144,10 +166,13 @@ you can get multiple elements back, such as with an offset range:
     (y[0], y[1])
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     (<music21.note.Note D#>, <music21.note.Note E>)
+
 
 
 At this point, you might think that you know everything about how
@@ -170,6 +195,7 @@ Stream as a text file:
     {1.0} <music21.note.Note D#>
     {2.0} <music21.note.Note E>
 
+
 Something has happened: the ``TrebleClef`` object which was inserted
 third has now become the first element of the Stream. The
 ``KeySignature`` and ``TimeSignature`` objects have also switched
@@ -181,12 +207,15 @@ score:
     (s[0], s[1], s[2])
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     (<music21.clef.TrebleClef>,
      <music21.key.KeySignature of 2 sharps>,
      <music21.meter.TimeSignature 3/4>)
+
 
 
 Even though they have the same ``.offset``, each of these objects knows
@@ -200,10 +229,13 @@ different class, one will sort before the other:
     (s[0].classSortOrder, s[1].classSortOrder, s[2].classSortOrder)
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     (0, 2, 4)
+
 
 
 In fact, ``classSortOrder`` is present not just on objects but on
@@ -214,10 +246,13 @@ classes:
     (clef.Clef.classSortOrder, key.KeySignature.classSortOrder, meter.TimeSignature.classSortOrder)
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     (0, 2, 4)
+
 
 
 Notes sort even higher, hence why the C# appears after the clefs and
@@ -228,10 +263,13 @@ signatures:
     (note.Note.classSortOrder, base.Music21Object.classSortOrder)
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     (20, 20)
+
 
 
 There are a few elements that sort even lower than Clefs because they
@@ -242,10 +280,13 @@ usually refer to the area of the composition that precedes the clef:
     (bar.Barline.classSortOrder, instrument.Instrument.classSortOrder, metadata.Metadata.classSortOrder)
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     (-5, -25, -30)
+
 
 
 The numbers are actually completely arbitrary (it could be -6.432
@@ -273,6 +314,7 @@ first one inserted:
     {0.0} <music21.note.Note C#>
     {1.0} <music21.note.Note D#>
     {2.0} <music21.note.Note E>
+
 
 If we wanted to make sure that the two TimeSignatures appeared in a
 particular order regardless of when they were inserted, there is one way
@@ -309,6 +351,7 @@ we'll make the note at offset 1 come before the D# and the one at offset
     {2.0} <music21.note.Note E>
     {2.0} <music21.note.Note E#>
 
+
 Three things to note about priority:
 
 (1) Priority changes do not immediately affect the sorting of the
@@ -335,6 +378,7 @@ Three things to note about priority:
     {1.0} <music21.note.Note D>
     {2.0} <music21.note.Note E>
     {2.0} <music21.note.Note E#>
+
 
 (2) Priority is currently a global property that affects all Streams
     that an object is in. This is behavior that may change in later
@@ -365,6 +409,7 @@ Three things to note about priority:
     {2.0} <music21.note.Note E>
     {2.0} <music21.note.Note E#>
 
+
 Now it's appearing before the clef and key signature. A fix for this
 would involve assigning some priority to each object at offset 0.0 and
 then forcing a re-sorting:
@@ -392,6 +437,7 @@ then forcing a re-sorting:
     {2.0} <music21.note.Note E>
     {2.0} <music21.note.Note E#>
 
+
 Behind the scenes:
 ------------------
 
@@ -405,10 +451,13 @@ tuple that determines sort order can be accessed on any
     ts1.sortTuple()
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     SortTuple(atEnd=0, offset=0.0, priority=4, classSortOrder=4, isNotGrace=1, insertIndex=82)
+
 
 
 .. code:: python
@@ -416,10 +465,13 @@ tuple that determines sort order can be accessed on any
     ts2.sortTuple()
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     SortTuple(atEnd=0, offset=0.0, priority=3, classSortOrder=4, isNotGrace=1, insertIndex=307)
+
 
 
 A ``SortTuple`` is a lightweight ``NamedTuple`` object that can be
@@ -432,10 +484,13 @@ next one becomes important:
     ts1.sortTuple() > ts2.sortTuple()
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     True
+
 
 
 In this case, the third element, priority, decides the order. The first
@@ -450,10 +505,13 @@ end of ``s``:
     ks2.sortTuple()
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     SortTuple(atEnd=1, offset=0.0, priority=0, classSortOrder=2, isNotGrace=1, insertIndex=317)
+
 
 
 Putting a rightBarline on a Measure has the same effect:
@@ -465,10 +523,13 @@ Putting a rightBarline on a Measure has the same effect:
     rb.sortTuple()
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     SortTuple(atEnd=1, offset=0.0, priority=0, classSortOrder=-5, isNotGrace=1, insertIndex=319)
+
 
 
 The next three attributes (offset, priority, classSortOrder) have been
@@ -488,10 +549,13 @@ to access it, here's the formula:)
     (ts1.sites.siteDict[id(s)].globalSiteIndex, ts2.sites.siteDict[id(s)].globalSiteIndex)
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     (82, 307)
+
 
 
 Streams have an attribute to cache whether they have been sorted, so
@@ -503,10 +567,13 @@ that alters the sort order.
     s.isSorted
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     False
+
 
 
 Calling a command that needs a particular order (``.show()``, ``[x]``,
@@ -518,10 +585,13 @@ etc.) automatically sorts the Stream:
     s.isSorted
 
 
+
+
 .. parsed-literal::
    :class: ipython-result
 
     True
+
 
 
 There is one more way that elements in a Stream can be returned, for
@@ -551,6 +621,7 @@ Here is an example of that:
     {2.0} <music21.note.Note E#>
     {20.0} <music21.bar.Barline style=double>
     {20.0} <music21.key.KeySignature of 3 flats>
+
 
 The setting ``autoSort = False`` can speed up some operations if you
 already know that all the notes are in order. Inside the stream.py
@@ -588,6 +659,7 @@ If you want to get back to the sorted state, just turn
     {20.0} <music21.meter.TimeSignature 3/4>
     {20.0} <music21.bar.Barline style=double>
     {20.0} <music21.key.KeySignature of 3 flats>
+
 
 Note that this is a destructive operation. Turning ``autoSort`` back to
 ``False`` won’t get you back the earlier order:

@@ -1,345 +1,282 @@
-"""This module defines Exporter, a highly configurable converter
-that uses Jinja2 to export notebook files into different formats.
+"""This module defines a base Exporter class. For Jinja template-based export,
+see templateexporter.py.
 """
 
-#-----------------------------------------------------------------------------
-# Copyright (c) 2013, the IPython Development Team.
-#
-# Distributed under the terms of the Modified BSD License.
-#
-# The full license is in the file COPYING.txt, distributed with this software.
-#-----------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------------
 
 from __future__ import print_function, absolute_import
 
-# Stdlib imports
 import io
 import os
-import inspect
-from copy import deepcopy
+import copy
+import collections
+import datetime
 
-# IPython imports
-from IPython.config.configurable import Configurable
+from IPython.config.configurable import LoggingConfigurable
 from IPython.config import Config
-from IPython.nbformat import current as nbformat
-from IPython.utils.traitlets import MetaHasTraits, Unicode, List, Bool
-from IPython.utils.text import indent
-
-import music21.ext.nbconvert
-# local import
-from music21.ext.nbconvert import filters 
-
-import music21.ext.nbconvert.transformers.extractfigure
-import music21.ext.nbconvert.transformers.coalescestreams
-
-# other libs/dependencies
-from jinja2 import Environment, FileSystemLoader
-from markdown import markdown
+from IPython import nbformat
+from IPython.utils.traitlets import MetaHasTraits, Unicode, List, TraitError
+from IPython.utils.importstring import import_item
+from IPython.utils import text, py3compat
 
 
-#-----------------------------------------------------------------------------
-# Globals and constants
-#-----------------------------------------------------------------------------
+class ResourcesDict(collections.defaultdict):
+    def __missing__(self, key):
+        return ''
 
-#Jinja2 extensions to load.
-JINJA_EXTENSIONS = ['jinja2.ext.loopcontrols']
 
-default_filters = {
-        'indent': indent,
-        'markdown': markdown,
-        'ansi2html': filters.ansi.ansi2html,
-        'filter_data_type': filters.datatypefilter.DataTypeFilter,
-        'get_lines': filters.strings.get_lines,
-        'highlight': filters.highlight.highlight,
-        'highlight2html': filters.highlight.highlight,
-        'highlight2latex': filters.highlight.highlight2latex,
-        'markdown2latex': filters.markdown_filter.markdown2latex,
-        'markdown2rst': filters.markdown_filter.markdown2rst,
-        'pycomment': filters.strings.python_comment,
-        'rm_ansi': filters.ansi.remove_ansi,
-        'rm_dollars': filters.strings.strip_dollars,
-        'rm_fake': filters.strings.rm_fake,
-        'rm_math_space': filters.latex.rm_math_space,
-        'wrap': filters.strings.wrap
-}
+class FilenameExtension(Unicode):
+    """A trait for filename extensions."""
 
-#-----------------------------------------------------------------------------
-# Class
-#-----------------------------------------------------------------------------
+    default_value = u''
+    info_text = 'a filename extension, beginning with a dot'
 
-class Exporter(Configurable):
+    def validate(self, obj, value):
+        # cast to proper unicode
+        value = super(FilenameExtension, self).validate(obj, value)
+
+        # check that it starts with a dot
+        if value and not value.startswith('.'):
+            msg = "FileExtension trait '{}' does not begin with a dot: {!r}"
+            raise TraitError(msg.format(self.name, value))
+
+        return value
+
+
+class Exporter(LoggingConfigurable):
     """
-    Exports notebooks into other file formats.  Uses Jinja 2 templating engine
-    to output new formats.  Inherit from this class if you are creating a new
-    template type along with new filters/transformers.  If the filters/
-    transformers provided by default suffice, there is no need to inherit from
-    this class.  Instead, override the template_file and file_extension
-    traits via a config file.
-    
-    {filters}
+    Class containing methods that sequentially run a list of preprocessors on a 
+    NotebookNode object and then return the modified NotebookNode object and 
+    accompanying resources dict.
     """
-    
-    # finish the docstring
-    __doc__ = __doc__.format(filters = '- '+'\n    - '.join(default_filters.keys()))
 
-
-    template_file = Unicode(
-            '', config=True,
-            help="Name of the template file to use")
-
-    file_extension = Unicode(
-        'txt', config=True, 
+    file_extension = FilenameExtension(
+        '.txt', config=True,
         help="Extension of the file that should be written to disk"
         )
 
-    template_path = Unicode(
-        "/../templates/", config=True,
-        help="Path where the template files are located.")
+    # MIME type of the result file, for HTTP response headers.
+    # This is *not* a traitlet, because we want to be able to access it from
+    # the class, not just on instances.
+    output_mimetype = ''
 
-    template_skeleton_path = Unicode(
-        "/../templates/skeleton/", config=True,
-        help="Path where the template skeleton files are located.") 
+    #Configurability, allows the user to easily add filters and preprocessors.
+    preprocessors = List(config=True,
+        help="""List of preprocessors, by name or namespace, to enable.""")
 
-    #Jinja block definitions
-    jinja_comment_block_start = Unicode("", config=True)
-    jinja_comment_block_end = Unicode("", config=True)
-    jinja_variable_block_start = Unicode("", config=True)
-    jinja_variable_block_end = Unicode("", config=True)
-    jinja_logic_block_start = Unicode("", config=True)
-    jinja_logic_block_end = Unicode("", config=True)
-    
-    #Extension that the template files use.    
-    template_extension = Unicode(".tpl", config=True)
+    _preprocessors = List()
 
-    #Processors that process the input data prior to the export, set in the 
-    #constructor for this class.
-    transformers = None
+    default_preprocessors = List([
+                                  'IPython.nbconvert.preprocessors.ClearOutputPreprocessor',
+                                  'IPython.nbconvert.preprocessors.ExecutePreprocessor',
+                                  'IPython.nbconvert.preprocessors.coalesce_streams',
+                                  'IPython.nbconvert.preprocessors.SVG2PDFPreprocessor',
+                                  'IPython.nbconvert.preprocessors.CSSHTMLHeaderPreprocessor',
+                                  'IPython.nbconvert.preprocessors.RevealHelpPreprocessor',
+                                  'IPython.nbconvert.preprocessors.LatexPreprocessor',
+                                  'IPython.nbconvert.preprocessors.HighlightMagicsPreprocessor',
+                                  'IPython.nbconvert.preprocessors.ExtractOutputPreprocessor',
+                                 ],
+        config=True,
+        help="""List of preprocessors available by default, by name, namespace, 
+        instance, or type.""")
 
-    _default_config = Config()
 
-    
-    def __init__(self, transformers=None, filters=None, config=None, **kw):
+    def __init__(self, config=None, **kw):
         """
         Public constructor
-    
+
         Parameters
         ----------
-        transformers : list[of transformer]
-            Custom transformers to apply to the notebook prior to engaging
-            the Jinja template engine.  Any transformers specified here 
-            will override existing transformers if a naming conflict
-            occurs.
-        filters : dict[of filter]
-            filters specified here will override existing filters if a naming
-            conflict occurs. Filters are availlable in jinja template through
-            the name of the corresponding key. Cf class docstring for
-            availlable default filters.
         config : config
             User configuration instance.
         """
+        with_default_config = self.default_config
+        if config:
+            with_default_config.merge(config)
         
-        #Call the base class constructor
-        super(Exporter, self).__init__(config=config, **kw)
+        super(Exporter, self).__init__(config=with_default_config, **kw)
 
-        #Standard environment
-        self._init_environment()
+        self._init_preprocessors()
 
-        #Add transformers
-        self._register_transformers()
-
-        #Add filters to the Jinja2 environment
-        self._register_filters()
-
-        #Load user transformers.  Overwrite existing transformers if need be.
-        if transformers :
-            for transformer in transformers:
-                self.register_transformer(transformer)
-                
-        #Load user filters.  Overwrite existing filters if need be.
-        if not filters is None:
-            for key, user_filter in filters.iteritems():
-                if issubclass(user_filter, MetaHasTraits):
-                    self.environment.filters[key] = user_filter(config=config)
-                else:
-                    self.environment.filters[key] = user_filter
 
     @property
     def default_config(self):
-        if self._default_config:
-            return Config(deepcopy(self._default_config))
-        else :
-            return Config()
-    
-    
-    def from_notebook_node(self, nb, resources=None):
+        return Config()
+
+    def from_notebook_node(self, nb, resources=None, **kw):
         """
         Convert a notebook from a notebook node instance.
-    
+
         Parameters
         ----------
-        nb : Notebook node
-        resources : a dict of additional resources that
-                can be accessed read/write by transformers
-                and filters.
+        nb : :class:`~IPython.nbformat.NotebookNode`
+          Notebook node (dict-like with attr-access)
+        resources : dict
+          Additional resources that can be accessed read/write by
+          preprocessors and filters.
+        **kw
+          Ignored (?)
         """
-        if resources is None:
-            resources = {}
-        nb, resources = self._preprocess(nb, resources)
+        nb_copy = copy.deepcopy(nb)
+        resources = self._init_resources(resources)
         
-        #Load the template file.
-        self.template = self.environment.get_template(self.template_file+self.template_extension)
-        
-        return self.template.render(nb=nb, resources=resources), resources
+        if 'language' in nb['metadata']:
+            resources['language'] = nb['metadata']['language'].lower()
+
+        # Preprocess
+        nb_copy, resources = self._preprocess(nb_copy, resources)
+
+        return nb_copy, resources
 
 
-    def from_filename(self, filename):
+    def from_filename(self, filename, resources=None, **kw):
         """
         Convert a notebook from a notebook file.
-    
+
         Parameters
         ----------
         filename : str
             Full filename of the notebook file to open and convert.
         """
-        
-        with io.open(filename) as f:
-            return self.from_notebook_node(nbformat.read(f, 'json'))
+
+        # Pull the metadata from the filesystem.
+        if resources is None:
+            resources = ResourcesDict()
+        if not 'metadata' in resources or resources['metadata'] == '':
+            resources['metadata'] = ResourcesDict()
+        path, basename = os.path.split(filename)
+        notebook_name = basename[:basename.rfind('.')]
+        resources['metadata']['name'] = notebook_name
+        resources['metadata']['path'] = path
+
+        modified_date = datetime.datetime.fromtimestamp(os.path.getmtime(filename))
+        resources['metadata']['modified_date'] = modified_date.strftime(text.date_format)
+
+        with io.open(filename, encoding='utf-8') as f:
+            return self.from_notebook_node(nbformat.read(f, as_version=4), resources=resources, **kw)
 
 
-    def from_file(self, file_stream):
+    def from_file(self, file_stream, resources=None, **kw):
         """
         Convert a notebook from a notebook file.
-    
+
         Parameters
         ----------
         file_stream : file-like object
             Notebook file-like object to convert.
         """
-        return self.from_notebook_node(nbformat.read(file_stream, 'json'))
+        return self.from_notebook_node(nbformat.read(file_stream, as_version=4), resources=resources, **kw)
 
 
-    def register_transformer(self, transformer):
+    def register_preprocessor(self, preprocessor, enabled=False):
         """
-        Register a transformer.
-        Transformers are classes that act upon the notebook before it is
-        passed into the Jinja templating engine.  Transformers are also
+        Register a preprocessor.
+        Preprocessors are classes that act upon the notebook before it is
+        passed into the Jinja templating engine.  preprocessors are also
         capable of passing additional information to the Jinja
         templating engine.
-    
+
         Parameters
         ----------
-        transformer : transformer
+        preprocessor : preprocessor
         """
-        if self.transformers is None:
-            self.transformers = []
-        
-        if inspect.isfunction(transformer):
-            self.transformers.append(transformer)
-            return transformer
-        elif isinstance(transformer, MetaHasTraits):
-            transformer_instance = transformer(config=self.config)
-            self.transformers.append(transformer_instance)
-            return transformer_instance
+        if preprocessor is None:
+            raise TypeError('preprocessor')
+        isclass = isinstance(preprocessor, type)
+        constructed = not isclass
+
+        # Handle preprocessor's registration based on it's type
+        if constructed and isinstance(preprocessor, py3compat.string_types):
+            # Preprocessor is a string, import the namespace and recursively call
+            # this register_preprocessor method
+            preprocessor_cls = import_item(preprocessor)
+            return self.register_preprocessor(preprocessor_cls, enabled)
+
+        if constructed and hasattr(preprocessor, '__call__'):
+            # Preprocessor is a function, no need to construct it.
+            # Register and return the preprocessor.
+            if enabled:
+                preprocessor.enabled = True
+            self._preprocessors.append(preprocessor)
+            return preprocessor
+
+        elif isclass and isinstance(preprocessor, MetaHasTraits):
+            # Preprocessor is configurable.  Make sure to pass in new default for 
+            # the enabled flag if one was specified.
+            self.register_preprocessor(preprocessor(parent=self), enabled)
+
+        elif isclass:
+            # Preprocessor is not configurable, construct it
+            self.register_preprocessor(preprocessor(), enabled)
+
         else:
-            transformer_instance = transformer()
-            self.transformers.append(transformer_instance)
-            return transformer_instance
+            # Preprocessor is an instance of something without a __call__ 
+            # attribute.  
+            raise TypeError('preprocessor')
 
 
-    def register_filter(self, name, filter):
+    def _init_preprocessors(self):
         """
-        Register a filter.
-        A filter is a function that accepts and acts on one string.  
-        The filters are accesible within the Jinja templating engine.
-    
-        Parameters
-        ----------
-        name : str
-            name to give the filter in the Jinja engine
-        filter : filter
+        Register all of the preprocessors needed for this exporter, disabled
+        unless specified explicitly.
         """
-        if inspect.isfunction(filter):
-            self.environment.filters[name] = filter
-        elif isinstance(filter, MetaHasTraits):
-            self.environment.filters[name] = filter(config=self.config)
+        self._preprocessors = []
+
+        # Load default preprocessors (not necessarly enabled by default).
+        for preprocessor in self.default_preprocessors:
+            self.register_preprocessor(preprocessor)
+
+        # Load user-specified preprocessors.  Enable by default.
+        for preprocessor in self.preprocessors:
+            self.register_preprocessor(preprocessor, enabled=True)
+
+
+    def _init_resources(self, resources):
+
+        #Make sure the resources dict is of ResourcesDict type.
+        if resources is None:
+            resources = ResourcesDict()
+        if not isinstance(resources, ResourcesDict):
+            new_resources = ResourcesDict()
+            new_resources.update(resources)
+            resources = new_resources
+
+        #Make sure the metadata extension exists in resources
+        if 'metadata' in resources:
+            if not isinstance(resources['metadata'], ResourcesDict):
+                new_metadata = ResourcesDict()
+                new_metadata.update(resources['metadata'])
+                resources['metadata'] = new_metadata
         else:
-            self.environment.filters[name] = filter()
-        return self.environment.filters[name]
+            resources['metadata'] = ResourcesDict()
+            if not resources['metadata']['name']:
+                resources['metadata']['name'] = 'Notebook'
 
-    
-    def _register_transformers(self):
-        """
-        Register all of the transformers needed for this exporter.
-        """
-         
-        self.register_transformer(music21.ext.nbconvert.transformers.coalescestreams.coalesce_streams)
-        
-        #Remember the figure extraction transformer so it can be enabled and
-        #disabled easily later.
-        self.extract_figure_transformer = self.register_transformer(music21.ext.nbconvert.transformers.extractfigure.ExtractFigureTransformer)
-        
-        
-    def _register_filters(self):
-        """
-        Register all of the filters required for the exporter.
-        """
-        for k, v in default_filters.iteritems():
-            self.register_filter(k, v)
-        
-        
-    def _init_environment(self):
-        """
-        Create the Jinja templating environment.
-        """
-        
-        self.environment = Environment(
-            loader=FileSystemLoader([
-                os.path.dirname(os.path.realpath(__file__)) + self.template_path,
-                os.path.dirname(os.path.realpath(__file__)) + self.template_skeleton_path,
-                ]),
-            extensions=JINJA_EXTENSIONS
-            )
-        
-        #Set special Jinja2 syntax that will not conflict with latex.
-        if self.jinja_logic_block_start:
-            self.environment.block_start_string = self.jinja_logic_block_start
-        if self.jinja_logic_block_end:
-            self.environment.block_end_string = self.jinja_logic_block_end
-        if self.jinja_variable_block_start:
-            self.environment.variable_start_string = self.jinja_variable_block_start
-        if self.jinja_variable_block_end:
-            self.environment.variable_end_string = self.jinja_variable_block_end
-        if self.jinja_comment_block_start:
-            self.environment.comment_start_string = self.jinja_comment_block_start
-        if self.jinja_comment_block_end:
-            self.environment.comment_end_string = self.jinja_comment_block_end
+        #Set the output extension
+        resources['output_extension'] = self.file_extension
+        return resources
 
 
     def _preprocess(self, nb, resources):
         """
         Preprocess the notebook before passing it into the Jinja engine.
-        To preprocess the notebook is to apply all of the 
-    
+        To preprocess the notebook is to apply all of the
+
         Parameters
         ----------
         nb : notebook node
             notebook that is being exported.
         resources : a dict of additional resources that
-            can be accessed read/write by transformers
-            and filters.
+            can be accessed read/write by preprocessors
         """
-        
-        # Do a deepcopy first, 
-        # we are never safe enough with what the transformers could do.
-        nbc =  deepcopy(nb)
-        resc = deepcopy(resources)
-        #Run each transformer on the notebook.  Carry the output along
-        #to each transformer
-        for transformer in self.transformers:
-            nb, resources = transformer(nbc, resc)
-        return nb, resources
 
+        # Do a copy.deepcopy first,
+        # we are never safe enough with what the preprocessors could do.
+        nbc =  copy.deepcopy(nb)
+        resc = copy.deepcopy(resources)
+
+        #Run each preprocessor on the notebook.  Carry the output along
+        #to each preprocessor
+        for preprocessor in self._preprocessors:
+            nbc, resc = preprocessor(nbc, resc)
+        return nbc, resc

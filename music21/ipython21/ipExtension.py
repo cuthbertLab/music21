@@ -1,21 +1,13 @@
 # -*- coding: utf-8 -*-
 import music21.ipython21.objects
-import os
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 # See converter/subConverters/ConverterIPython for more info.
 
-
-def returnDataFromIPython21Object(obj):
-    fp = obj.fp
-    data = open(fp, 'rb').read()
-    os.remove(fp)
-    return data
-
 def load_ipython_extension(ip):
     pngFormatter = ip.display_formatter.formatters['image/png']
-    pngFormatter.for_type(music21.ipython21.objects.IPythonPNGObject, returnDataFromIPython21Object)  
+    pngFormatter.for_type(music21.ipython21.objects.IPythonPNGObject, music21.ipython21.objects.IPythonPNGObject.getData)  
 #     from IPython.display import display, HTML # @UnresolvedImport
 #     display(HTML('''
 #      <script src='http://web.mit.edu/music21/music21j/ext/require/require.js'></script>
