@@ -297,7 +297,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
         p._appendCore(m)
         barCount += 1
 
-    p._elementsChanged()
+    p.elementsChanged()
     # for now, make all imports a c-score on import; 
     tInterval = museDataPart.getTranspositionIntervalObject()
     #environLocal.printDebug(['got transposition interval', p.id, tInterval])
