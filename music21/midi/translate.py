@@ -1608,7 +1608,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
         n.midiTickStart = notes[i][0][0]
         s._insertCore(o, n)
                     
-    s._elementsChanged()
+    s.elementsChanged()
     # quantize to nearest 16th
     if quantizePost:    
         s.quantize([8, 3], processOffsets=True, processDurations=True, inPlace=True)

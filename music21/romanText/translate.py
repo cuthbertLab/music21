@@ -397,7 +397,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
 
                 # create a new measure or copy a past measure
                 if len(t.number) == 1 and t.isCopyDefinition: # if not a range
-                    p._elementsChanged()
+                    p.elementsChanged()
                     m, kCurrent = _copySingleMeasure(t, p, kCurrent)
                     p._appendCore(m)
                     lastMeasureNumber = m.number
@@ -407,7 +407,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                         previousRn = romans[-1] 
 
                 elif len(t.number) > 1:
-                    p._elementsChanged()
+                    p.elementsChanged()
                     measures, kCurrent = _copyMultipleMeasures(t, p, kCurrent)
                     p.append(measures) # appendCore does not work with list
                     lastMeasureNumber = measures[-1].number
@@ -611,7 +611,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                     # may need to adjust duration of last chord added
                     if tsCurrent is not None:
                         previousRn.quarterLength = tsCurrent.barDuration.quarterLength - o
-                    m._elementsChanged()
+                    m.elementsChanged()
                     p._appendCore(m)
 
         except Exception:
@@ -619,7 +619,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
             tracebackMessage = traceback.format_exc()
             raise RomanTextTranslateException("At line %d for token %r, an exception was raised: \n%s" % (t.lineNumber, t, tracebackMessage))
 
-    p._elementsChanged()
+    p.elementsChanged()
     fixPickupMeasure(p)
     p.makeBeams(inPlace=True)
     p.makeAccidentals(inPlace=True)

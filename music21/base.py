@@ -2061,7 +2061,10 @@ class Music21Object(object):
         '''
         if not isinstance(value, int):
             raise ElementException('priority values must be integers.')
-        self._priority = value
+        if self._priority != value:
+            self._priority = value
+            for s in self.sites.getSites(excludeNone=True):
+                pass
 
     priority = property(_getPriority, _setPriority,
         doc = '''
@@ -3085,7 +3088,7 @@ class Music21Object(object):
         self.duration = mm.secondsToDuration(value)
         for s in self.sites.getSites(excludeNone=True):
             if self in s._elements:
-                s._elementsChanged() # highest time is changed.
+                s.elementsChanged() # highest time is changed.
 
     def _getSeconds(self):
         # do not search of duration is zero

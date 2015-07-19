@@ -458,7 +458,7 @@ class Spanner(base.Music21Object):
                 # it makes sense to not have multiple copies
                 #environLocal.printDebug(['attempting to add an object (%s) that is already found in the SpannerStorage stream of spaner %s; this may not be an error.' % (c, self)])
 
-        self.spannerStorage._elementsChanged()
+        self.spannerStorage.elementsChanged()
         # always clear cache
         if len(self._cache) > 0:
             self._cache = {} 

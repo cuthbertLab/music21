@@ -268,7 +268,7 @@ class ChordReducer(object):
                         cLast.quarterLength += tsContext.barDuration.quarterLength - cLastEnd
                 
                 
-                m._elementsChanged()
+                m.elementsChanged()
 
                 # add ties
                 if lastPitchedObject is not None:
@@ -297,7 +297,7 @@ class ChordReducer(object):
                 if i % 20 == 0 and i != 0:
                     print("")
             i += 1
-        p._elementsChanged()
+        p.elementsChanged()
         p.getElementsByClass('Measure')[0].insert(0, p.bestClef(allowTreble8vb=True))
         p.makeNotation(inPlace=True)
         return p

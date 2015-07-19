@@ -284,10 +284,10 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
 
         # may be bending elements in a voice to append to a measure
         if vActive is not None and len(vActive) > 0:
-            vActive._elementsChanged()
+            vActive.elementsChanged()
             m._insertCore(0, vActive)
 
-        m._elementsChanged()
+        m.elementsChanged()
 
         if barCount == 0 and m.timeSignature != None: # easy case
             # can only do this b/c ts is defined

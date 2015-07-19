@@ -2515,8 +2515,8 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None, lastMeasureInfo=No
         for v in m.voices:
             if len(v) > 0: # do not bother with empty voices
                 v.makeRests(inPlace=True)
-            v._elementsChanged()
-    m._elementsChanged()
+            v.elementsChanged()
+    m.elementsChanged()
 
     if restAndNoteCount['rest'] == 1 and restAndNoteCount['note'] == 0:
         # full measure rest with no notes...
@@ -2651,7 +2651,7 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
             r1 = m.getElementsByClass('Rest')[0]
             if r1.duration.quarterLength == 4.0 and r1.duration.quarterLength != lastTimeSignature.barDuration.quarterLength:
                 r1.duration.quarterLength = lastTimeSignature.barDuration.quarterLength
-                m._elementsChanged()
+                m.elementsChanged()
         
         del(m._fullMeasureRest)
         
@@ -2735,10 +2735,10 @@ def mxToStreamPart(mxScore, partId, spannerBundle=None, inputM21=None):
         for sp in rm:
             spannerBundle.remove(sp)
         # s is the score; adding the aprt to the score
-        streamPart._elementsChanged()
+        streamPart.elementsChanged()
         s._insertCore(0, streamPart)
 
-    s._elementsChanged()
+    s.elementsChanged()
     # when adding parts to this Score
     # this assumes all start at the same place
     # even if there is only one part, it will be placed in a Stream
@@ -2801,7 +2801,7 @@ def separateOutPartStaffs(mxPart, streamPart, spannerBundle, s, staffReferenceLi
         # in this part; should be deleted
         streamPartStaff.addGroupForElements(partStaffId)
         streamPartStaff.groups.append(partStaffId)
-        streamPartStaff._elementsChanged()
+        streamPartStaff.elementsChanged()
         s._insertCore(0, streamPartStaff)
 
 def _getUniqueStaffKeys(staffReferenceList):
@@ -2944,7 +2944,7 @@ def mxScoreToScore(mxScore, spannerBundle=None, inputM21=None):
     for sp in rm:
         spannerBundle.remove(sp)
 
-    s._elementsChanged()
+    s.elementsChanged()
     return s
 
 #------------------------------------------------------------------------------

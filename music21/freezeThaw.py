@@ -478,7 +478,7 @@ class StreamFreezer(StreamFreezeThawBase):
         streamObj._offsetDict = {}
         streamObj._elements = []
         streamObj._endElements = []
-        streamObj._elementsChanged()
+        streamObj.elementsChanged()
 
     def findActiveStreamIdsInHierarchy(self, hierarchyObject = None, getSpanners=True, getVariants=True):
         '''
@@ -809,14 +809,14 @@ class StreamThawer(StreamFreezeThawBase):
 #                # works like a whole new hierarchy... # no need for deepcopy
                 subSF = StreamThawer()
                 subSF.teardownSerializationScaffold(e._stream)
-                e._stream._elementsChanged()
+                e._stream.elementsChanged()
                 e._cache = {}
                 #for el in e._stream.flat:
                 #    print el, el.offset, el.sites.siteDict
             elif e.isSpanner:
                 subSF = StreamThawer()
                 subSF.teardownSerializationScaffold(e.spannerStorage)
-                e.spannerStorage._elementsChanged()
+                e.spannerStorage.elementsChanged()
                 e._cache = {}
             elif e.isStream: 
                 self.restoreStreamStatusClient(e) # removing seems to create problems for jsonPickle with Spanners
@@ -826,7 +826,7 @@ class StreamThawer(StreamFreezeThawBase):
 
         # restore to whatever it was
         streamObj.autoSort = storedAutoSort
-        streamObj._elementsChanged()
+        streamObj.elementsChanged()
 
     def restoreElementsFromTuples(self, streamObj):
         '''
@@ -884,7 +884,7 @@ class StreamThawer(StreamFreezeThawBase):
                 # add a None site as well...
                 e.sites.add(None, 0.0)
             del(streamObj._storedElementOffsetTuples)
-            streamObj._elementsChanged()
+            streamObj.elementsChanged()
 
         for subElement in streamObj:
             if subElement.isStream is True:

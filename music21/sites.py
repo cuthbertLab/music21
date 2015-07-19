@@ -716,7 +716,7 @@ class Sites(common.SlottedObject):
 
     def getSites(self, idExclude=None, excludeNone=False):
         '''
-        Get all Site objects in .siteDict that are locations. 
+        Get all Site objects in .siteDict that are locations (that is, generally, Streams). 
         Note that this unwraps all sites from weakrefs and is thus an expensive operation.
 
         >>> class Mock(base.Music21Object):
@@ -731,6 +731,8 @@ class Sites(common.SlottedObject):
         2
         >>> len(aSites.getSites(idExclude=[id(aObj)]))
         1
+        
+        :rtype: list(music21.stream.Stream)
         '''
 #         if idExclude is None:
 #             idExclude = [] # else, assume a list

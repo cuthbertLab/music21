@@ -2905,7 +2905,7 @@ class Test(unittest.TestCase):
             # try the same with scrambled elements
             sProc = copy.deepcopy(s)        
             random.shuffle(sProc._elements)
-            sProc._elementsChanged()
+            sProc.elementsChanged()
 
             self.assertEqual(sProc.highestOffset, 12)
             self.assertEqual(sProc.highestTime, 14)
@@ -5971,7 +5971,7 @@ class Test(unittest.TestCase):
         #m1.show('t')
         #m1.insert(0, key.KeySignature(5))
         qj[1].insert(0, key.KeySignature(5))
-        #qj._elementsChanged()
+        #qj.elementsChanged()
         unused_keySigSearch = qj.flat.getElementsByClass(key.KeySignature)
 
         for n in qj.flat.notes:

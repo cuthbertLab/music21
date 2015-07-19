@@ -546,7 +546,7 @@ def makeMeasures(
     for sp in spannerBundleAccum:
         post.append(sp)
 
-    post._elementsChanged()
+    post.elementsChanged()
 
     # clean up temporary streams to avoid extra site accumulation
     del srcObj
@@ -569,7 +569,7 @@ def makeMeasures(
         # with Measures created above
         s._elements = []
         s._endElements = []
-        s._elementsChanged()
+        s.elementsChanged()
         for e in post.sorted:
             # may need to handle spanners; already have s as site
             s.insert(e.getOffsetBySite(post), e)
@@ -719,7 +719,7 @@ def makeRests(s, refStreamOrTimeRange=None, fillGaps=False,
         bundle = [returnObj]
 
     for v in bundle:
-        v._elementsChanged()  # required to get correct offset times
+        v.elementsChanged()  # required to get correct offset times
         oLow = v.lowestOffset
         oHigh = v.highestTime
 
@@ -740,7 +740,7 @@ def makeRests(s, refStreamOrTimeRange=None, fillGaps=False,
             r.duration.quarterLength = qLen
             # place at oHigh to reach to oHighTarget
             v._insertCore(oHigh, r)
-        v._elementsChanged()  # must update otherwise might add double r
+        v.elementsChanged()  # must update otherwise might add double r
 
         if fillGaps:
             gapStream = v.findGaps()
@@ -749,7 +749,7 @@ def makeRests(s, refStreamOrTimeRange=None, fillGaps=False,
                     r = note.Rest()
                     r.duration.quarterLength = e.duration.quarterLength
                     v._insertCore(e.offset, r)
-        v._elementsChanged()
+        v.elementsChanged()
         #environLocal.printDebug(['post makeRests show()', v])
         # NOTE: this sorting has been found to be necessary, as otherwise
         # the resulting Stream is not sorted and does not get sorted in
@@ -762,7 +762,7 @@ def makeRests(s, refStreamOrTimeRange=None, fillGaps=False,
     #returnObj.elements = returnObj.sorted.elements
     #s.isSorted = False
     # changes elements
-#         returnObj._elementsChanged()
+#         returnObj.elementsChanged()
 #         if returnObj.autoSort:
 #             returnObj.sort()
     if inPlace is not True:
@@ -1030,7 +1030,7 @@ def makeTies(
         mCount += 1
     del measureStream  # clean up unused streams
     # changes elements
-    returnObj._elementsChanged()
+    returnObj.elementsChanged()
     if not inPlace:
         return returnObj
     else:

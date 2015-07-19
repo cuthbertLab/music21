@@ -202,7 +202,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     # remove from original spanner bundle
     for sp in rm:
         spannerBundle.remove(sp)
-    p._elementsChanged()
+    p.elementsChanged()
     return p
 
 def parseTokens(mh, dst, p, useMeasures):        
@@ -311,7 +311,7 @@ def parseTokens(mh, dst, p, useMeasures):
             p._appendCore(t.crescObj)
         elif isinstance(t, abcFormat.ABCDimStart):
             p._appendCore(t.dimObj)
-    dst._elementsChanged()
+    dst.elementsChanged()
     return postTransposition, clefSet
 
 def abcToStreamScore(abcHandler, inputM21=None):
@@ -384,7 +384,7 @@ def abcToStreamScore(abcHandler, inputM21=None):
 
     for p in partList:
         s._insertCore(0, p)
-    s._elementsChanged()
+    s.elementsChanged()
     return s
 
 
@@ -420,7 +420,7 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
                     environLocal.warn("Failure for piece number %d" % key)
             for scoreDocument in scoreList:
                 opus._appendCore(scoreDocument)
-            opus._elementsChanged()
+            opus.elementsChanged()
 
     else: # just return single entry in opus object
         opus.append(abcToStreamScore(abcHandler))

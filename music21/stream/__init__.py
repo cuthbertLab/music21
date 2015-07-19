@@ -448,7 +448,7 @@ class Stream(base.Music21Object):
             for e in self.elements[k]:
                 found.insert(self.elementOffset(e), e)
             # each insert calls this; does not need to be done here
-            #found._elementsChanged()
+            #found.elementsChanged()
             return found
 
         elif common.isStr(k):
@@ -481,13 +481,18 @@ class Stream(base.Music21Object):
 
 
     #---------------------------------------------------------------------------
-    # adding and editing Elements and Streams -- all need to call _elementsChanged
+    # adding and editing Elements and Streams -- all need to call elementsChanged
     # most will set isSorted to False
 
-    def _elementsChanged(self, updateIsFlat=True, clearIsSorted=True,
+    def elementsChanged(self, updateIsFlat=True, clearIsSorted=True,
         memo=None, keepIndex=False):
         '''
-        This method is called any time the elements in the Stream are changed.
+        An advanced stream method that is not necessary for most users.
+        
+        This method is called automatically any time the elements in the Stream are changed.
+        However, it may be called manually in case sites or other advanced features of an
+        element have been modified.  It was previously a private method and for most users
+        should still be treated as such.
 
         The various arguments permit optimizing the clearing of cached data in situations 
         when completely dropping all cached data is excessive.
@@ -495,8 +500,15 @@ class Stream(base.Music21Object):
         >>> a = stream.Stream()
         >>> a.isFlat
         True
+        
+        Here we manipulate the private `._elements` storage (which generally shouldn't
+        be done) and thus need to call `.elementsChanged` directly.
+        
         >>> a._elements.append(stream.Stream())
-        >>> a._elementsChanged()
+        >>> a.isFlat # this is wrong.
+        True
+        
+        >>> a.elementsChanged()
         >>> a.isFlat
         False
         '''
@@ -509,16 +521,16 @@ class Stream(base.Music21Object):
         memo.append(id(self))
         # if this Stream is a flat representation of something, and its
         # elements have changed, than we must clear the cache of that
-        # ancestor; we can do that by calling _elementsChanged on
+        # ancestor; we can do that by calling elementsChanged on
         # the derivation.orgin
         if self._derivation is not None and self._derivation.method in ('flat', 'semiflat'):
             origin = self._derivation.origin
-            origin._elementsChanged(memo=memo)
+            origin.elementsChanged(memo=memo)
 
         # may not always need to clear cache of the active site, but may
         # be a good idea; may need to intead clear all sites
         if self.activeSite is not None:
-            self.activeSite._elementsChanged()
+            self.activeSite.elementsChanged()
 
         # clear these attributes for setting later
         if clearIsSorted:
@@ -554,7 +566,7 @@ class Stream(base.Music21Object):
             self.sort() # will set isSorted to True
         if 'elements' not in self._cache or self._cache["elements"] is None:
             # this list concatenation may take time; thus, only do when
-            # _elementsChanged has been called
+            # elementsChanged has been called
             self._cache["elements"] = self._elements + self._endElements
         return tuple(self._cache["elements"])
 
@@ -586,7 +598,7 @@ class Stream(base.Music21Object):
                 self.setElementOffset(e, e.offset)
                 e.sites.add(self)
                 e.activeSite = self
-        self._elementsChanged()
+        self.elementsChanged()
         return value
 
     elements = property(_getElements, _setElements,
@@ -661,12 +673,12 @@ class Stream(base.Music21Object):
 
         if isinstance(value, Stream):
             # know that this is now not flat
-            self._elementsChanged(updateIsFlat=False) # set manualy
+            self.elementsChanged(updateIsFlat=False) # set manualy
             self.isFlat = False
         else:
             # cannot be sure if this is flat, as we do not know if
             # we replaced a Stream at this index
-            self._elementsChanged()
+            self.elementsChanged()
 
 
     def __delitem__(self, k):
@@ -681,7 +693,7 @@ class Stream(base.Music21Object):
         9
         '''
         del self._elements[k]
-        self._elementsChanged()
+        self.elementsChanged()
 
 
     def __add__(self, other):
@@ -732,7 +744,7 @@ class Stream(base.Music21Object):
         for e in other._endElements:
             s.storeAtEnd(e)
 
-        #s._elementsChanged()
+        #s.elementsChanged()
         return s
 
     def hasElement(self, obj):
@@ -866,7 +878,7 @@ class Stream(base.Music21Object):
 #                     break
 #             if len(classFilterList) == 0 or match:
 #                 self.storeAtEnd(e)
-        self._elementsChanged()
+        self.elementsChanged()
 
 
     def _getElementByObjectId(self, objId):
@@ -1016,7 +1028,7 @@ class Stream(base.Music21Object):
                     if shiftOffsets is True:
                         matchOffset = self.elementOffset(match)
 
-                    self._elementsChanged(clearIsSorted=False)
+                    self.elementsChanged(clearIsSorted=False)
                     match.removeLocationBySite(self)
 
                 if shiftOffsets is True and matchedEndElement is False:
@@ -1058,7 +1070,7 @@ class Stream(base.Music21Object):
                 if shiftOffsets is True:
                     matchOffset = self.elementOffset(match)
                 # removing an object will never change the sort status
-                self._elementsChanged(clearIsSorted=False)
+                self.elementsChanged(clearIsSorted=False)
                 match.removeLocationBySite(self)
 
                 if shiftOffsets is True and matchedEndElement is False: #shift all elements after the deletion point
@@ -1094,7 +1106,7 @@ class Stream(base.Music21Object):
         else: # its in the _endElements
             post = self._endElements.pop(index - eLen)
 
-        self._elementsChanged(clearIsSorted=False)
+        self.elementsChanged(clearIsSorted=False)
         # remove self from locations here only if
         # there are no further locations
         post.removeLocationBySite(self)
@@ -1146,7 +1158,7 @@ class Stream(base.Music21Object):
             post.removeLocationBySite(self)
 
         # call elements changed once; sorted arrangement has not changed
-        self._elementsChanged(clearIsSorted=False)
+        self.elementsChanged(clearIsSorted=False)
 
 
     def removeByNotOfClass(self, classFilterList):
@@ -1184,7 +1196,7 @@ class Stream(base.Music21Object):
             post.removeLocationBySite(self)
 
         # call elements changed once; sorted arrangement has not changed
-        self._elementsChanged(clearIsSorted=False)
+        self.elementsChanged(clearIsSorted=False)
 
     def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
         # NOTE: this is a performance critical operation        
@@ -1312,7 +1324,7 @@ class Stream(base.Music21Object):
         Only be used in contexts that we know we have a proper, single Music21Object.
         Best for usage when taking objects in a known Stream and creating a new Stream
 
-        When using this method, the caller is responsible for calling Stream._elementsChanged
+        When using this method, the caller is responsible for calling Stream.elementsChanged
         after all operations are completed.
 
         Do not mix _insertCore with _appendCore operations.
@@ -1493,7 +1505,7 @@ class Stream(base.Music21Object):
         updateIsFlat = False
         if element.isStream:
             updateIsFlat = True
-        self._elementsChanged(updateIsFlat=updateIsFlat)
+        self.elementsChanged(updateIsFlat=updateIsFlat)
         if ignoreSort is False:
             self.isSorted = storeSorted
 
@@ -1504,7 +1516,7 @@ class Stream(base.Music21Object):
         determine elements changed, or similar operations.
 
         When using this method, the caller is responsible for calling
-        Stream._elementsChanged after all operations are completed.
+        Stream.elementsChanged after all operations are completed.
         '''
         # NOTE: this is not called by append, as that is optimized
         # for looping multiple elements
@@ -1726,7 +1738,7 @@ class Stream(base.Music21Object):
         # does not change sorted state
         storeSorted = self.isSorted
         # we cannot keep the index cache here b/c we might
-        self._elementsChanged(updateIsFlat=updateIsFlat)
+        self.elementsChanged(updateIsFlat=updateIsFlat)
         self.isSorted = storeSorted
         self._setHighestTime(highestTime) # call after to store in cache
 
@@ -1793,7 +1805,7 @@ class Stream(base.Music21Object):
 
         self._storeAtEndCore(element)
         # Streams cannot reside in end elements, thus do not update is flat
-        self._elementsChanged(updateIsFlat=False)
+        self.elementsChanged(updateIsFlat=False)
 
 
     #---------------------------------------------------------------------------
@@ -1959,7 +1971,7 @@ class Stream(base.Music21Object):
         # these will not be in order
         self.insert(offsetOrItemOrList, itemOrNone)
         # call this is elements are now out of order
-        self._elementsChanged()
+        self.elementsChanged()
 
     #---------------------------------------------------------------------------
     # searching and replacing routines
@@ -2001,7 +2013,7 @@ class Stream(base.Music21Object):
         if replacement.isStream:
             updateIsFlat = True
         # elements have changed: sort order may change b/c have diff classes
-        self._elementsChanged(updateIsFlat=updateIsFlat)
+        self.elementsChanged(updateIsFlat=updateIsFlat)
 
         if allTargetSites:
             for site in target.sites.getSites():
@@ -2292,7 +2304,7 @@ class Stream(base.Music21Object):
 
     #---------------------------------------------------------------------------
     # methods that act on individual elements without requiring
-    # @ _elementsChanged to fire
+    # @ elementsChanged to fire
 
     def addGroupForElements(self, group, classFilter=None):
         '''
@@ -2485,7 +2497,7 @@ class Stream(base.Music21Object):
                     found.append(e)
 
         if returnList is False:
-            found._elementsChanged()
+            found.elementsChanged()
         return found
 
     def getElementsNotOfClass(self, classFilterList, returnStreamSubClass = True):
@@ -2546,7 +2558,7 @@ class Stream(base.Music21Object):
                 found._storeAtEndCore(e)
 
         # if this stream was sorted, the resultant stream is sorted
-        found._elementsChanged(clearIsSorted=False)
+        found.elementsChanged(clearIsSorted=False)
         found.isSorted = self.isSorted
         return found
 
@@ -2599,7 +2611,7 @@ class Stream(base.Music21Object):
                     #returnStream.storeAtEnd(e, ignoreSort=True)
                     returnStream._storeAtEndCore(e)
 
-        returnStream._elementsChanged(clearIsSorted=False)
+        returnStream.elementsChanged(clearIsSorted=False)
         returnStream.isSorted = self.isSorted
         return returnStream
 
@@ -3034,7 +3046,7 @@ class Stream(base.Music21Object):
 
             found._insertCore(offset, e)
 
-        found._elementsChanged()
+        found.elementsChanged()
         return found
 
 
@@ -3149,9 +3161,9 @@ class Stream(base.Music21Object):
                     nearestTrailSpan = span
         #environLocal.printDebug(['getElementAtOrBefore(), e candidates', candidates])
         if len(candidates) > 0:
-            candidates.sort(key=lambda x: (x[0], x[1].sortTuple())) # TODO: this sort has side effects -- see icmc2011 -- sorting clef vs. note, etc.
-            candidates[0][1].activeSite = self
-            return candidates[0][1]
+            candidates.sort(key=lambda x: (-1 * x[0], x[1].sortTuple())) # TODO: this sort has side effects -- see icmc2011 -- sorting clef vs. note, etc.
+            candidates[-1][1].activeSite = self
+            return candidates[-1][1]
         else:
             return None
 
@@ -3216,6 +3228,25 @@ class Stream(base.Music21Object):
         >>> b = stream1.getElementBeforeOffset(0.1)
         >>> b.offset, b.id
         (0.0, 'z')
+
+        >>> w = note.Note('F4')
+        >>> w.id = 'w'
+        >>> stream1.insert( 0, w)
+
+        This should get w because it was inserted last.
+        
+        >>> b = stream1.getElementBeforeOffset(0.1)
+        >>> b.offset, b.id
+        (0.0, 'w')
+        
+        But if we give it a lower priority than z then z will appear first.
+        
+        >>> w.priority = z.priority - 1
+        >>> b = stream1.getElementBeforeOffset(0.1)
+        >>> b.offset, b.id
+        (0.0, 'z')
+        
+        
         '''
         # NOTE: this is a performance critical method
         candidates = []
@@ -3239,9 +3270,9 @@ class Stream(base.Music21Object):
                     nearestTrailSpan = span
         #environLocal.printDebug(['getElementBeforeOffset(), e candidates', candidates])
         if len(candidates) > 0:
-            candidates.sort() # TODO: this sort has side effects
-            candidates[0][1].activeSite = self
-            return candidates[0][1]
+            candidates.sort(key=lambda x: (-1 * x[0], x[1].sortTuple())) 
+            candidates[-1][1].activeSite = self
+            return candidates[-1][1]
         else:
             return None
 
@@ -3555,9 +3586,9 @@ class Stream(base.Music21Object):
 #                 startMeasureNew._insertCore(0, found)
 #
 #         # as we have inserted elements, need to call
-#         startMeasureNew._elementsChanged()
+#         startMeasureNew.elementsChanged()
         if changedObjects:
-            returnObj._elementsChanged()
+            returnObj.elementsChanged()
             
         if gatherSpanners:
             for sp in spannerBundle:
@@ -3569,7 +3600,7 @@ class Stream(base.Music21Object):
                 #environLocal.printDebug(['Stream.measrues: copying spanners:', sp])
 
         # used _insertcore
-        returnObj._elementsChanged()
+        returnObj.elementsChanged()
         #environLocal.printDebug(['len(returnObj.flat)', len(returnObj.flat)])
         return returnObj
 
@@ -4515,7 +4546,7 @@ class Stream(base.Music21Object):
             if match:
                 self.setElementOffset(e, self.elementOffset(e) + offset)
 
-        self._elementsChanged()
+        self.elementsChanged()
 
     def transferOffsetToElements(self):
         '''
@@ -4538,7 +4569,7 @@ class Stream(base.Music21Object):
         '''
         self.shiftElements(self.offset)
         self.offset = 0.0
-        self._elementsChanged()
+        self.elementsChanged()
 
 
     #--------------------------------------------------------------------------
@@ -4623,7 +4654,7 @@ class Stream(base.Music21Object):
         for offset in offsets:
             elementCopy = copy.deepcopy(element)
             self._insertCore(offset, elementCopy)
-        self._elementsChanged()
+        self.elementsChanged()
 
 
     def extractContext(self, searchElement, before = 4.0, after = 4.0,
@@ -4691,7 +4722,7 @@ class Stream(base.Music21Object):
             if (o >= foundOffset - before and o < foundEnd + after):
                 #display.storeAtEnd(e)
                 display._storeAtEndCore(e)
-        display._elementsChanged()
+        display.elementsChanged()
         return display
 
 
@@ -5011,7 +5042,7 @@ class Stream(base.Music21Object):
             returnObj.makeRests(
                 refStreamOrTimeRange=(preLowestOffset, preHighestTime),
                 fillGaps=True, inPlace=True)
-        returnObj._elementsChanged()
+        returnObj.elementsChanged()
         return returnObj
 
     def asTimespans(self, classList=None, recurse=True):
@@ -5272,17 +5303,17 @@ class Stream(base.Music21Object):
                         #environLocal.printDebug(['inserting element', e, 'at', o, 'in', m, 'localOffset', localOffset])
                         m.insert(localOffset, e)
                 # call for each measure
-                m._elementsChanged()
+                m.elementsChanged()
             # call this post now
             post = mStream
         else: # place in a single flat Stream
-            post._elementsChanged()
+            post.elementsChanged()
 
         if hasattr(returnObj, 'metadata') and returnObj.metadata is not None and returnObj.hasPartLikeStreams() is True:
             post.insert(0, returnObj.metadata)
         return post
 
-        #post._elementsChanged()
+        #post.elementsChanged()
         #return mStream
         #return post
 
@@ -5347,8 +5378,8 @@ class Stream(base.Music21Object):
             else:
                 #b.storeAtEnd(e)
                 b._storeAtEndCore(e)
-        a._elementsChanged()
-        b._elementsChanged()
+        a.elementsChanged()
+        b.elementsChanged()
         return a, b
 
 
@@ -6057,14 +6088,14 @@ class Stream(base.Music21Object):
                     # get a new note
                     # we should not continue searching Measures
                     break
-            returnObj._elementsChanged()
+            returnObj.elementsChanged()
             return returnObj
 
         else:
             for i in posDelete:
                 # removing the note from notes
                 junk = notes.pop(i)
-            notes._elementsChanged()
+            notes.elementsChanged()
             return notes
 
 
@@ -6189,7 +6220,7 @@ class Stream(base.Music21Object):
 
             # as sorting changes order, elements have changed;
             # need to clear cache, but flat status is the same
-            self._elementsChanged(updateIsFlat=False, clearIsSorted=False)
+            self.elementsChanged(updateIsFlat=False, clearIsSorted=False)
             self.isSorted = True
             #environLocal.printDebug(['_elements', self._elements])
 
@@ -6199,7 +6230,7 @@ class Stream(base.Music21Object):
             shallowEndElements = copy.copy(self._endElements) # already a copy
             s = copy.copy(self)
             # assign directly to _elements, as we do not need to call
-            # _elementsChanged()
+            # elementsChanged()
             s._elements = shallowElements
             s._endElements = shallowEndElements
 
@@ -6219,7 +6250,7 @@ class Stream(base.Music21Object):
 #         shallowEndElements = copy.copy(self._endElements) # already a copy
 #         newStream = copy.copy(self)
 #         # assign directly to _elements, as we do not need to call
-#         # _elementsChanged()
+#         # elementsChanged()
 #         newStream._elements = shallowElements
 #         newStream._endElements = shallowEndElements
 #
@@ -6333,7 +6364,7 @@ class Stream(base.Music21Object):
         sNew._offsetDict = {}
         sNew._elements = []
         sNew._endElements = []
-        sNew._elementsChanged()
+        sNew.elementsChanged()
 
         for e in self._elements:
             #environLocal.printDebug(['_getFlatOrSemiFlat', 'processing e:', e])
@@ -6813,7 +6844,7 @@ class Stream(base.Music21Object):
                 restoreActiveSites=True):
                 # do not recurse, as will get all Stream
                 e.makeMutable(recurse=False)
-        self._elementsChanged()
+        self.elementsChanged()
 
     #---------------------------------------------------------------------------
     # duration and offset methods and properties
@@ -7658,7 +7689,7 @@ class Stream(base.Music21Object):
                                anchorZeroRecurse=anchorZeroRecurse,
                 inPlace=True)
 
-        returnObj._elementsChanged()
+        returnObj.elementsChanged()
         return returnObj
 
 
@@ -7690,7 +7721,7 @@ class Stream(base.Music21Object):
                     # inPlace is True as a  copy has already been made if nec
                     e.duration.augmentOrDiminish(amountToScale, inPlace=True)
 
-        returnObj._elementsChanged()
+        returnObj.elementsChanged()
         return returnObj
 
 
@@ -7741,7 +7772,7 @@ class Stream(base.Music21Object):
         returnObj.scaleOffsets(amountToScale=amountToScale, anchorZero='lowest',
             anchorZeroRecurse=None, inPlace=True)
         returnObj.scaleDurations(amountToScale=amountToScale, inPlace=True)
-        returnObj._elementsChanged()
+        returnObj.elementsChanged()
 
         # do not need to call elements changed, as called in sub methods
         return returnObj
@@ -7956,14 +7987,14 @@ class Stream(base.Music21Object):
             for m in returnObj.getElementsByClass('Measure'):
                 m.sliceByQuarterLengths(quarterLengthList,
                     target=target, addTies=addTies, inPlace=True)
-            returnObj._elementsChanged()
+            returnObj.elementsChanged()
             return returnObj # exit
 
         if returnObj.hasPartLikeStreams():
             for p in returnObj.getElementsByClass('Part'):
                 p.sliceByQuarterLengths(quarterLengthList,
                     target=target, addTies=addTies, inPlace=True)
-            returnObj._elementsChanged()
+            returnObj.elementsChanged()
             return returnObj # exit
 
         if not common.isListLike(quarterLengthList):
@@ -8007,7 +8038,7 @@ class Stream(base.Music21Object):
                 returnObj._insertCore(oInsert, eNew)
                 oInsert = opFrac(oInsert + eNew.quarterLength)
 
-        returnObj._elementsChanged()
+        returnObj.elementsChanged()
         return returnObj
 
 
@@ -8029,7 +8060,7 @@ class Stream(base.Music21Object):
             # call on component measures
             for m in returnObj.getElementsByClass('Measure'):
                 m.sliceByGreatestDivisor(addTies=addTies, inPlace=True)
-            returnObj._elementsChanged()
+            returnObj.elementsChanged()
             return returnObj # exit
 
         uniqueQuarterLengths = []
@@ -8046,7 +8077,7 @@ class Stream(base.Music21Object):
         returnObj.sliceByQuarterLengths(quarterLengthList=[divisor],
             target=None, addTies=addTies, inPlace=True)
 
-        returnObj._elementsChanged()
+        returnObj.elementsChanged()
         return returnObj
 
 
@@ -8127,7 +8158,7 @@ class Stream(base.Music21Object):
                     # insert at o, not oCut (duration into element)
                     returnObj._insertCore(o, eNext)
                     oStartNext = o
-        returnObj._elementsChanged()
+        returnObj.elementsChanged()
         return returnObj
 
 
@@ -9678,7 +9709,7 @@ class Stream(base.Music21Object):
                     returnObj._insertCore(shiftOffset + e.getOffsetBySite(v), e)
                 returnObj.remove(v)
 
-        returnObj._elementsChanged()
+        returnObj.elementsChanged()
         if not inPlace:
             return returnObj
         else:
@@ -10069,7 +10100,7 @@ class Stream(base.Music21Object):
         returnObj._fixMeasureNumbers(deletedMeasures, insertedMeasures)
 
         # have to clear cached variants, as they are no longer the same
-        returnObj._elementsChanged()
+        returnObj.elementsChanged()
         if not inPlace:
             return returnObj
         else:
@@ -11336,7 +11367,7 @@ class Measure(Stream):
             # there is no new clef - suppresses the clef of a stream
             return
         self.insert(0.0, clefObj)
-        self._elementsChanged() # for some reason needed to make sure that sorting of Clef happens before TimeSignature
+        self.elementsChanged() # for some reason needed to make sure that sorting of Clef happens before TimeSignature
 
     clef = property(_getClef, _setClef, doc='''
         Finds or sets a :class:`~music21.clef.Clef` at offset 0.0 in the measure:
@@ -11957,7 +11988,7 @@ class Score(Stream):
                 m.sliceByQuarterLengths(quarterLengthList=[divisor],
                     target=None, addTies=addTies, inPlace=True)
         del mStream # cleanup Streams
-        returnObj._elementsChanged()
+        returnObj.elementsChanged()
         return returnObj
 
     def partsToVoices(self, voiceAllocation=2, permitOneVoicePerPart=False, setStems=True):
@@ -12156,7 +12187,7 @@ class Score(Stream):
             # note: while the local-streams have updated their caches, the
             # containing score has an out-of-date cache of flat.
             # this, must call elements changed
-            returnStream._elementsChanged()
+            returnStream.elementsChanged()
         else: # call the base method
             Stream.makeNotation(self, meterStream=meterStream, refStreamOrTimeRange=refStreamOrTimeRange, inPlace=True, bestClef=bestClef, **subroutineKeywords)
 

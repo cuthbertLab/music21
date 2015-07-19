@@ -677,11 +677,11 @@ class HumdrumDataCollection(object):
         for offset, el in insertList:
             self.stream._insertCore(offset, el)
         if len(insertList) > 0:
-            self.stream._elementsChanged()
+            self.stream.elementsChanged()
         for el in appendList:
             self.stream._appendCore(el)
         if len(appendList) > 0:
-            self.stream._elementsChanged()
+            self.stream.elementsChanged()
 
     def _getStream(self):
         if self._storedStream is not None:
@@ -1123,7 +1123,7 @@ class HumdrumSpine(object):
         for el in streamIn:
             if 'Stream' in el.classes:
                 if currentMeasureNumber != 0 or len(currentMeasure) > 0:
-                    currentMeasure._elementsChanged()
+                    currentMeasure.elementsChanged()
                     #streamOut.append(currentMeasure)
                     streamOut._appendCore(currentMeasure)
                 currentMeasure = el
@@ -1139,8 +1139,8 @@ class HumdrumSpine(object):
                     #streamOut.append(el)
                     streamOut._appendCore(el)
         # update the most recent measure and the surrounding stream, then append the last
-        currentMeasure._elementsChanged()
-        streamOut._elementsChanged()
+        currentMeasure.elementsChanged()
+        streamOut.elementsChanged()
         if len(currentMeasure) > 0:
             streamOut.append(currentMeasure)
 
@@ -1194,7 +1194,7 @@ class HumdrumSpine(object):
 
             if thisObject is not None:
                 self.stream._appendCore(thisObject)
-        self.stream._elementsChanged()
+        self.stream.elementsChanged()
 
 class KernSpine(HumdrumSpine):
     r'''
@@ -1320,7 +1320,7 @@ class KernSpine(HumdrumSpine):
                 environLocal.printDebug("Traceback for the exeception: \n%s" % (tb))
                 # traceback... environLocal.printDebug()
 
-        self.stream._elementsChanged()
+        self.stream.elementsChanged()
         ## still to be done later... move things before first measure to first measure!
 
 class DynamSpine(HumdrumSpine):
@@ -1342,7 +1342,7 @@ class DynamSpine(HumdrumSpine):
                     thisObject = MiscTandem(eventC)
             elif eventC.startswith('='):
                 if thisContainer is not None:
-                    thisContainer._elementsChanged()
+                    thisContainer.elementsChanged()
                     self.stream._appendCore(thisContainer)
                 thisContainer = hdStringToMeasure(eventC)
             elif eventC.startswith('!'):
@@ -1365,7 +1365,7 @@ class DynamSpine(HumdrumSpine):
                 else:
                     thisContainer._appendCore(thisObject)
 
-        self.stream._elementsChanged()
+        self.stream.elementsChanged()
 
 ####### END HUMDRUM SPINES
 
@@ -1643,7 +1643,7 @@ class SpineCollection(object):
                     pass
                 newStream._appendCore(el)
                 #newStream.append(el)
-            newStream._elementsChanged()
+            newStream.elementsChanged()
             thisSpine.stream = newStream
 
             if len(insertPoints) > 0:
@@ -1659,7 +1659,7 @@ class SpineCollection(object):
         '''
         Insert all the spines into newStream that should be inserted into thisSpine at insertionPoint.
         '''
-        newStream._elementsChanged() # update highestTime
+        newStream.elementsChanged() # update highestTime
         startPoint = newStream.highestTime
         childrenToInsert = thisSpine.childSpineInsertPoints[insertionPoint]
         voiceNumber = 0
@@ -1674,7 +1674,7 @@ class SpineCollection(object):
                     insertEl.groups.append(voiceStr)
                     #newStream.insert(startPoint + insertEl.offset, insertEl)
                     newStream._insertCore(startPoint + insertEl.offset, insertEl)
-        newStream._elementsChanged() # call between _insertCore and _appendCore
+        newStream.elementsChanged() # call between _insertCore and _appendCore
 
 
     def reclassSpines(self):
@@ -1828,9 +1828,9 @@ class SpineCollection(object):
                             for voicePart in voices:
                                 if voicePart is not None:
                                     #voicePart.show('text')
-                                    voicePart._elementsChanged()
+                                    voicePart.elementsChanged()
                                     el._insertCore(lowestVoiceOffset, voicePart)
-                            el._elementsChanged()
+                            el.elementsChanged()
                             #print el.number, "has voices at", lowestVoiceOffset
 
 
