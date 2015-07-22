@@ -89,10 +89,10 @@ class LilypondConverter(object):
     colorDef = \
     r'''
     color = #(define-music-function (parser location color) (string?) #{
-        \once \override NoteHead #'color = #(x11-color $color)
-        \once \override Stem #'color = #(x11-color $color)
-        \once \override Rest #'color = #(x11-color $color)
-        \once \override Beam #'color = #(x11-color $color)
+        \once \override NoteHead #'color = #(x11-color color)
+        \once \override Stem #'color = #(x11-color color)
+        \once \override Rest #'color = #(x11-color color)
+        \once \override Beam #'color = #(x11-color color)
      #})
     '''.lstrip()
     simplePaperDefinitionScm  = r'''
@@ -237,10 +237,10 @@ class LilypondConverter(object):
         \version "2..."
         \include "lilypond-book-preamble.ly"
         color = #(define-music-function (parser location color) (string?) #{
-                \once \override NoteHead #'color = #(x11-color $color)
-                \once \override Stem #'color = #(x11-color $color)
-                \once \override Rest #'color = #(x11-color $color)
-                \once \override Beam #'color = #(x11-color $color)
+                \once \override NoteHead #'color = #(x11-color color)
+                \once \override Stem #'color = #(x11-color color)
+                \once \override Rest #'color = #(x11-color color)
+                \once \override Beam #'color = #(x11-color color)
              #})
         \header { }
         \score  {
