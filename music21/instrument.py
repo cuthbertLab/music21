@@ -123,6 +123,22 @@ class Instrument(base.Music21Object):
     for subclassing, though usually a more specific
     instrument class (such as StringInstrument) would
     be better to subclass.
+    
+    Some defined attributes for instruments include:
+    
+    * partId
+    * partName
+    * partAbbreviation
+    * instrumentId
+    * instrumentName
+    * instrumentAbbreviation
+    * midiProgram
+    * midiChannel
+    * lowestNote (a note object or a string)
+    * highestNote (a note object or a string)
+    * transposition (an interval object)
+    * inGMPercMap (bool -- if it uses the GM percussion map)
+    * soundfontFn (filepath to a sound font, optional)
     '''
     
     classSortOrder = -25
