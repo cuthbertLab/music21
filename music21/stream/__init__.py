@@ -949,7 +949,7 @@ class Stream(base.Music21Object):
         raise StreamException('cannot find object (%s) in Stream' % obj)
 
 
-    def remove(self, targetOrList, firstMatchOnly=True, shiftOffsets = False): #, renumberMeasures = False):
+    def remove(self, targetOrList, firstMatchOnly=True, shiftOffsets = False, recurse=False): 
         '''
         Remove an object from this Stream. Additionally, this Stream is
         removed from the object's sites in :class:`~music21.base.Sites`.
@@ -1004,17 +1004,66 @@ class Stream(base.Music21Object):
         {2.0} <music21.note.Note G>
         {3.0} <music21.note.Note A>
 
+        With the recurse=True parameter, we can remove elements deeply nested. However, shiftOffsets
+        does not work with recurse=True yet.
+        
+        >>> p1 = stream.Part()
+        >>> m1 = stream.Measure()
+        >>> c = clef.BassClef()
+        >>> m1.insert(0, c)
+        >>> m1.append(note.Note())
+        >>> p1.append(m1)
+        >>> p1.show('text')
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.clef.BassClef>
+            {0.0} <music21.note.Note C>
+
+        Without recurse=True:
+        
+        >>> p1.remove(c)
+        >>> p1.show('text')
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.clef.BassClef>
+            {0.0} <music21.note.Note C>
+
+        With recurse=True:
+        
+        >>> p1.remove(c, recurse=True)
+        >>> p1.show('text')
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.note.Note C>
+
         '''
-        if type(targetOrList) is list:
-            targetList = sorted(targetOrList, key=lambda target: self.elementOffset(target) )
+        # TODO: Add a renumber measures option
+        # TODO: Shift offsets if recurse is True
+        if shiftOffsets is True and recurse is True:
+            raise StreamException("Cannot do both shiftOffsets and recurse search at the same time...yet")
+        if type(targetOrList) not in (list, set, tuple):
+            self.remove([targetOrList], firstMatchOnly=firstMatchOnly, shiftOffsets=shiftOffsets, recurse=recurse)
+        else:
+            if len(targetOrList) > 1:
+                targetList = sorted(targetOrList, key=lambda target: self.elementOffset(target) )
+            else:
+                targetList = targetOrList
 
             if shiftOffsets:
                 shiftDur = 0.0
-            for i,target in enumerate(targetList):
+            for i, target in enumerate(targetList):
                 try:
                     indexInStream = self.index(target)
                 except StreamException:
-                    return # if not found, no error is raised
+                    if recurse is True:
+                        for s in self.recurse(streamsOnly=True):
+                            if s is self:
+                                continue
+                            try:
+                                indexInStream = s.index(target)
+                                s.remove(target)
+                                break
+                            except StreamException:
+                                continue
+                    continue # recursion matched or didn't or wasn't run. either way no need for rest...
+                
                 match = None
                 matchedEndElement = False
                 baseElementCount = len(self._elements)
@@ -1031,7 +1080,7 @@ class Stream(base.Music21Object):
                     self.elementsChanged(clearIsSorted=False)
                     match.removeLocationBySite(self)
 
-                if shiftOffsets is True and matchedEndElement is False:
+                if shiftOffsets is True and matchedEndElement is False: 
                     matchDuration = match.duration.quarterLength
                     shiftedRegionStart = matchOffset + matchDuration
                     if i+1 < len(targetList):
@@ -1051,38 +1100,6 @@ class Stream(base.Music21Object):
                             self.setElementOffset(e, elementOffset-shiftDur)
                 #if renumberMeasures is True and matchedEndElement is False:
                 #   pass  # This should maybe just call a function renumberMeasures
-        else:
-            target = targetOrList
-            try:
-                i = self.index(target)
-            except StreamException:
-                return # if not found, no error is raised
-            match = None
-            matchedEndElement = False
-            baseElementCount = len(self._elements)
-            if i < baseElementCount:
-                match = self._elements.pop(i)
-            else: # its in end elements
-                match = self._endElements.pop(i-baseElementCount)
-                matchedEndElement = True
-
-            if match is not None:
-                if shiftOffsets is True:
-                    matchOffset = self.elementOffset(match)
-                # removing an object will never change the sort status
-                self.elementsChanged(clearIsSorted=False)
-                match.removeLocationBySite(self)
-
-                if shiftOffsets is True and matchedEndElement is False: #shift all elements after the deletion point
-                    shiftDur = match.duration.quarterLength
-                    if shiftDur != 0.0:
-                        for e in self._elements:
-                            elementOffset = self.elementOffset(e)
-                            if elementOffset < matchOffset+shiftDur: #shift only elements after the deleted section
-                                continue
-                            self.setElementOffset(e, elementOffset-shiftDur)
-                # if renumberMeasures is True and matchedEndElement is False and type(match):
-                #    pass  #This should just call a function renumberMeasures
 
     def pop(self, index):
         '''

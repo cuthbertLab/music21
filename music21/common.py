@@ -2506,12 +2506,25 @@ class SlottedObject(object):
 class Iterator(object):
     '''A simple Iterator object used to handle iteration of Streams and other
     list-like objects.
+    
+    >>> i = common.Iterator([2,3,4])
+    >>> for x in i:
+    ...     print(x)
+    2
+    3
+    4
+    >>> for y in i:
+    ...     print(y)
+    2
+    3
+    4
     '''
     def __init__(self, data):
         self.data = data
         self.index = 0
 
     def __iter__(self):
+        self.index = 0
         return self
 
     def __next__(self):

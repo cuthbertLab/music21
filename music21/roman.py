@@ -121,53 +121,46 @@ functionalityScores = {
 def expandShortHand(shorthand):
     '''Expands shorthand notation into a list with all figures expanded:
 
-    ::
-        >>> from music21 import roman
-        >>> roman.expandShortHand("64")
-        ['6', '4']
 
-    ::
+    >>> roman.expandShortHand("64")
+    ['6', '4']
 
-        >>> roman.expandShortHand("973")
-        ['9', '7', '3']
+    >>> roman.expandShortHand("973")
+    ['9', '7', '3']
 
-    ::
+    >>> roman.expandShortHand("11b3")
+    ['11', 'b3']
 
-        >>> roman.expandShortHand("11b3")
-        ['11', 'b3']
+    >>> roman.expandShortHand("b13#9-6")
+    ['b13', '#9', '-6']
 
-    ::
+    >>> roman.expandShortHand("-")
+    ['5', '-3']
 
-        >>> roman.expandShortHand("b13#9-6")
-        ['b13', '#9', '-6']
-
-    ::
-
-        >>> roman.expandShortHand("-")
-        ['5', '-3']
 
 
     Slashes don't matter
     
-    ::
-
-        >>> roman.expandShortHand("6/4")
-        ['6', '4']
+    >>> roman.expandShortHand("6/4")
+    ['6', '4']
 
     Note that this is not where abbreviations get expanded
 
-    ::
+    >>> roman.expandShortHand("7") # not 7,5,3
+    ['7']
 
-        >>> roman.expandShortHand("7") # not 7,5,3
-        ['7']
+    >>> roman.expandShortHand("4/3") # not 6,4,3
+    ['4', '3']
 
-        >>> roman.expandShortHand("4/3") # not 6,4,3
-        ['4', '3']
+    Note that this is '6' not '6','3':
+    
+    >>> roman.expandShortHand("6")
+    ['6']
 
 
     Returns a list of expanded abbreviations.
     '''
-    shorthand = shorthand.replace('/', '')
+    shorthand = shorthand.replace('/', '') # this line actually seems unnecessary...
     if ENDWITHFLAT_RE.match(shorthand):
         shorthand += "3"
     shorthand = re.sub('11', 'x', shorthand)
@@ -191,51 +184,41 @@ def figureFromChordAndKey(chordObj, keyObj=None):
 
     If keyObj is none, it uses the root as a major key:
 
-    ::
-
-        >>> from music21 import roman
-        >>> roman.figureFromChordAndKey(
-        ...     chord.Chord(['F#2','D3','A-3','C#4']),
-        ...     key.Key('C'),
-        ...     )
-        '6#5b3'
+    >>> from music21 import roman
+    >>> roman.figureFromChordAndKey(
+    ...     chord.Chord(['F#2','D3','A-3','C#4']),
+    ...     key.Key('C'),
+    ...     )
+    '6#5b3'
 
     The method substitutes shorthand (e.g., '6' not '63')
 
-    ::
+    >>> roman.figureFromChordAndKey(
+    ...     chord.Chord(['E3','C4','G4']),
+    ...     key.Key('C'),
+    ...     )
+    '6'
 
-        >>> roman.figureFromChordAndKey(
-        ...     chord.Chord(['E3','C4','G4']),
-        ...     key.Key('C'),
-        ...     )
-        '6'
+    >>> roman.figureFromChordAndKey(
+    ...     chord.Chord(['E3','C4','G4','B-5']),
+    ...     key.Key('F'),
+    ...     )
+    '65'
 
-    ::
-
-        >>> roman.figureFromChordAndKey(
-        ...     chord.Chord(['E3','C4','G4','B-5']),
-        ...     key.Key('F'),
-        ...     )
-        '65'
-
-    ::
-
-        >>> roman.figureFromChordAndKey(
-        ...     chord.Chord(['E3','C4','G4','B-5']),
-        ...     key.Key('C'),
-        ...     )
-        '6b5'
+    >>> roman.figureFromChordAndKey(
+    ...     chord.Chord(['E3','C4','G4','B-5']),
+    ...     key.Key('C'),
+    ...     )
+    '6b5'
 
     We reduce common omissions from seventh chords to be '7' instead
     of '75', '73', etc.
 
-    ::
-
-        >>> roman.figureFromChordAndKey(
-        ...     chord.Chord(['A3','E-4','G-4']),
-        ...     key.Key('b-'),
-        ...     )
-        '7'
+    >>> roman.figureFromChordAndKey(
+    ...     chord.Chord(['A3','E-4','G-4']),
+    ...     key.Key('b-'),
+    ...     )
+    '7'
 
     Return string.
     '''
@@ -2118,21 +2101,7 @@ class Test(unittest.TestCase):
                 for e in c.getElementsByClass('KeySignature'):
                     c.remove(e)
 
-    def testYieldRemoveB(self):
-        from music21 import stream, note
-        m = stream.Measure()
-        m.append(key.KeySignature(4))
-        m.append(note.Note())
-        p = stream.Part()
-        p.append(m)
-        s = stream.Score()
-        s.append(p)
-        #s = corpus.parse('madrigal.3.1.rntxt')
-        for e in s._yieldElementsDownward(streamsOnly=False):
-            #environLocal.printDebug(['activeSite:', e, e.activeSite])
-            if 'KeySignature' in e.classes:
-                e.activeSite.remove(e)
-        self.assertEqual(len(s.flat.getElementsByClass('KeySignature')), 0)
+
 
     def testScaleDegreesA(self):
         from music21 import roman
@@ -2385,8 +2354,6 @@ class TestExternal(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    #import sys
-    #sys.argv.append('testAugmented')
     music21.mainTest(Test)
 
 

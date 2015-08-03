@@ -522,7 +522,6 @@ class Microtone(SlottedObject):
 
 
 class Accidental(SlottedObject):
-#class Accidental(base.Music21Object):
     '''
     Accidental class, representing the symbolic and numerical representation of
     pitch deviation from a pitch name (e.g., G, B).
