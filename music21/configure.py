@@ -19,7 +19,7 @@ import textwrap
 
 
 try:
-    reload  # python2
+    reload  # python2 @UndefinedVariable
 except NameError:
     try:
         from importlib import reload # Python 3.4
@@ -36,7 +36,7 @@ except ImportError:
     from io import StringIO # python3 (also in python 2.6+)
 
 try:
-    input = raw_input # @ReservedAssignment # pylint: disable=undefined-variable
+    input = raw_input #  @ReservedAssignment # pylint: disable=undefined-variable @UndefinedVariable
 except NameError:
     pass
 
@@ -56,10 +56,10 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 reFinaleApp = re.compile('Finale 20[0-1][0-9][a-z]*.app')
 reFinaleExe = re.compile('Finale 20[0-1][0-9][a-z]*.exe')
 reFinaleReaderApp = re.compile('Finale Reader.app')
-reMuseScoreApp = re.compile('MuseScore.app')
+reMuseScoreApp = re.compile('MuseScore\s?[0-9]*.app')
 
 
-urlMusic21 = 'http://mit.edu/music21'
+urlMusic21 = 'http://web.mit.edu/music21'
 urlFinaleReader = 'http://www.finalemusic.com/Reader'
 urlMuseScore = 'http://musescore.org'
 urlGettingStarted = 'http://mit.edu/music21/doc/about/quickStart.html'
@@ -85,7 +85,8 @@ LINE_WIDTH = 78
 
 
 def writeToUser(msg, wrap=True, linesPerPage=20):
-    '''Display a message to the user, handling multiple lines as necessary and wrapping text
+    '''
+    Display a message to the user, handling multiple lines as necessary and wrapping text
     '''
     # wrap everything to 60 lines
     if common.isListLike(msg):
@@ -1209,9 +1210,8 @@ class SelectFilePath(SelectFromList):
 
 
 class SelectMusicXMLReader(SelectFilePath):
-    '''Select a MusicXML Reader by presenting a user a list of options. 
-
-    
+    '''
+    Select a MusicXML Reader by presenting a user a list of options. 
     '''
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         SelectFilePath.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
@@ -1225,7 +1225,7 @@ class SelectMusicXMLReader(SelectFilePath):
         return ['Defining an XML Reader permits automatically opening music21-generated MusicXML in an editor for display and manipulation when calling the show() method. Setting this option is highly recommended.', ' ']
 
     def _getMusicXMLReaderDarwin(self):
-        '''Get all possible Finale paths on Darwin
+        '''Get all possible Finale or MuseScore paths on Darwin
         '''
         # order here results in ranks
         def comparisonFinale(name):
@@ -1286,9 +1286,8 @@ class SelectMusicXMLReader(SelectFilePath):
 
 
     def _askFillEmptyList(self, default=None, force=None):
-        '''If we do not have an musicxml readers, ask user if they want to download. 
-
-        
+        '''
+        If we do not have an musicxml readers, ask user if they want to download. 
         '''
         platform = common.getPlatform()
         if platform == 'win':
@@ -1300,7 +1299,7 @@ class SelectMusicXMLReader(SelectFilePath):
         
         # this does not do anything: customize in subclass
         d = AskOpenInBrowser(urlTarget=urlTarget, default=True, tryAgain=False, 
-            promptHeader='No available MusicXML readers are found on your system. It is reccomended to download and install a reader before continuing.')
+            promptHeader='No available MusicXML readers are found on your system. It is recomended to download and install a reader before continuing.')
         d.askUser(force=force)
         post = d.getResult()
         # can call regardless of result; will only function if result is True
@@ -1358,7 +1357,9 @@ class ConfigurationAssistant(object):
 
         # add dialogs to list
         self._dialogs = []
-
+        self.getDialogs()
+        
+    def getDialogs(self):
         d = AskInstall(default=1)
         self._dialogs.append(d)
 
@@ -1379,7 +1380,8 @@ class ConfigurationAssistant(object):
 
         # note: this is the on-line URL: 
         # might be better to find local documentaiton
-        d = AskOpenInBrowser(urlTarget=urlGettingStarted, prompt='Would you like to view the music21 Quick Start in a web browser?')
+        d = AskOpenInBrowser(urlTarget=urlGettingStarted, 
+                             prompt='Would you like to view the music21 Quick Start in a web browser?')
         self._dialogs.append(d)
 
         d = AnyKey(promptHeader='The music21 Configuration Assistant is complete.')
@@ -1414,7 +1416,8 @@ class ConfigurationAssistant(object):
 
     def run(self, forceList=None):
         '''
-        The forceList, if provided, is a list of string arguments passed in order to the included dialogs. Used for testing. 
+        The forceList, if provided, is a list of string arguments 
+        passed in order to the included dialogs. Used for testing. 
         '''
         if forceList is None:
             forceList = []
