@@ -1061,11 +1061,19 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
     Convenience routine to create and add MusicXML objects from music21 objects provided 
     as a target and as a SpannerBundle. 
 
-    The `target` parameter here may be music21 Note or Chord.
+    The `target` parameter here may be music21 Note, Rest, or Chord.
     This may edit the mxNoteList and direction lists in place, and thus returns None.
     
-    TODO: Improve docs and show a test...
-    TODO: TremoloBundles
+    mxNoteList is a list of <mxNote> objects that represent the note or Chord (multiple for chords)
+    
+    some spanner produce direction tags, and sometimes these need
+    to go before or after the notes of this element, hence the mxDirectionPre and mxDirectionPost lists
+    
+    spannerBundle is a bundle that has already been created by getBySpannedElement, so not
+    a big deal to iterate over it.
+    
+    
+    TODO: Show a test...
     '''
     if spannerBundle is None or len(spannerBundle) == 0:
         return
@@ -1085,9 +1093,28 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
             mxSlur.set('type', 'stop')
         else:
             # this may not always be an error
-            environLocal.printDebug(['spanner w/ a component that is neither a start nor an end.', su, target])
+            #environLocal.printDebug(['spanner w/ a component that is neither a start nor an end.', su, target])
             continue
         mxNoteList[0].notationsObj.componentList.append(mxSlur)
+
+    for su in spannerBundle.getByClass('TremoloSpanner'):
+        mxTrem = mxObjects.Tremolo()
+        mxTrem.charData = str(su.numberOfMarks)
+        if su.isFirst(target):
+            mxTrem.set('type', 'start')
+        elif su.isLast(target):
+            mxTrem.set('type', 'stop')
+        else:
+            # this is always an error for tremolos
+            environLocal.printDebug(['spanner w/ a component that is neither a start nor an end.', su, target])
+        mxOrnamentsList = mxNoteList[0].notationsObj.getOrnaments()
+        if mxOrnamentsList == []: # need to create ornaments obj
+            mxOrnaments = mxObjects.Ornaments()
+            mxNoteList[0].notationsObj.componentList.append(mxOrnaments)
+            mxOrnamentsList = [mxOrnaments] # emulate returned obj
+
+        mxOrnamentsList[0].append(mxTrem)
+        
 
     for su in spannerBundle.getByClass('TrillExtension'):
         mxWavyLine = mxObjects.WavyLine()
