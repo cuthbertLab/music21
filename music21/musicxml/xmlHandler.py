@@ -1371,7 +1371,7 @@ if __name__ == "__main__":
 
     import music21
     #music21.converter.parse('/Users/Cuthbert/Dropbox/EMMSAP/MusicXML In/PMFC_05_34-Bon_Bilgrana_de_Valor.xml', forceSource=True)
-    music21.mainTest(Test, TestExternal)
+    music21.mainTest(Test) #, TestExternal)
 
 #------------------------------------------------------------------------------
 # eof

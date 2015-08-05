@@ -51,9 +51,6 @@ from music21.ext import six
 #------------------------------------------------------------------------------
 # version string and tuple must be the same
 
-if six.PY3:
-    basestring = str # @ReservedAssignment
-
 from music21._version import __version__, __version_info__
 VERSION = __version_info__
 VERSION_STR = __version__
@@ -169,7 +166,7 @@ class Groups(common.SlottedObject, list):
     __slots__ = ()
 
     def append(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             # do not permit the same entry more than once
             if not list.__contains__(self, value):
                 list.append(self, value)
@@ -177,7 +174,7 @@ class Groups(common.SlottedObject, list):
             raise exceptions21.GroupException("Only strings can be used as list names")
 
     def __setitem__(self, i, y):
-        if isinstance(y, basestring):
+        if isinstance(y, six.string_types):
             list.__setitem__(self, i, y)
         else:
             raise exceptions21.GroupException("Only strings can be used as list names")
@@ -4515,7 +4512,7 @@ def mainTest(*testClasses, **kwargs):
     if 'onlyDocTest' in sys.argv or 'onlyDocTest' in testClasses or bool(kwargs.get('onlyDocTest', False)):
         testClasses = [] # remove cases
     for t in testClasses:
-        if not isinstance(t, basestring):
+        if not isinstance(t, six.string_types):
             if displayNames is True:
                 for tName in unittest.defaultTestLoader.getTestCaseNames(t):
                     print('Unit Test Method: %s' % tName)

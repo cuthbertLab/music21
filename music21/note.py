@@ -785,7 +785,7 @@ class NotRest(GeneralNote):
         if value in ('filled', 'yes'):
             value = True
         elif value in ('notfilled', 'no'):
-            value = True
+            value = False
         if value not in (True, False, None):
             raise NotRestException('not a valid notehead fill value: %s' % value)
         self._noteheadFill = value

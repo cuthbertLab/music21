@@ -1528,7 +1528,6 @@ class JSONFreezer(JSONFreezeThawBase):
               "__class__": "music21.duration.Duration"
             }, 
             "_notehead": "normal", 
-            "_noteheadFill": "default", 
             "_noteheadParenthesis": false, 
             "_priority": 0, 
             "_stemDirection": "unspecified", 
