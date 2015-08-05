@@ -141,7 +141,7 @@ class Chord(note.NotRest):
     
     >>> chord.Chord([base])
     Traceback (most recent call last):
-    ChordException: Could not process input argument <module 'music21.base' from '...music21/base.py'>
+    ChordException: Could not process input argument <module 'music21.base' from '...base...'>
 
     '''
     ### CLASS VARIABLES ###
