@@ -331,8 +331,7 @@ class Node(common.SlottedObject):
         >>> n1 == n2
         False
         '''
-        return (isinstance(other, self.__class__)
-            and self.__slots__ == other.__slots__)
+        return (hash(self) == hash(other))
 
     def __ne__(self, other):
         return not self.__eq__(other)
