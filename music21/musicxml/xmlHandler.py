@@ -47,11 +47,8 @@ from music21.ext.six import StringIO, BytesIO
 try:
     import cPickle as pickleMod # much faster...
 except ImportError:
-    try:
-        import _pickle as pickleMod # Python3 -- whatever the version is...
-    except ImportError:
-        # in case we're on Jython, etc.
-        import pickle as pickleMod
+    # in case we're on Jython, etc.
+    import pickle as pickleMod
 
 import xml.sax
 import xml.dom.minidom # @UnusedImport
@@ -390,6 +387,7 @@ class Handler(xml.sax.ContentHandler):
             self._mxObjs['ornaments'].append(self._mxObjs['schleifer'])
 
         elif name == 'tremolo':
+            self._mxObjs['tremolo'].charData = self._currentTag.charData
             self._mxObjs['ornaments'].append(self._mxObjs['tremolo'])
 
         elif name == 'sound':

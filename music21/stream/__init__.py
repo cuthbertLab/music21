@@ -289,8 +289,7 @@ class Stream(base.Music21Object):
         base.Music21Object.__init__(self)
 
         self.streamStatus = streamStatus.StreamStatus(self)
-        
-        
+                
         # hugely important -- keeps track of where the _elements are
         self._offsetDict = {}
 
@@ -441,7 +440,7 @@ class Stream(base.Music21Object):
             # manually inserting elements is critical to setting the element
             # locations
             try:
-                found = self.__class__()
+                found = self.cloneEmpty(derivationMethod='__getitem__')
             except TypeError:
                 raise StreamException("Error in defining class: %r. " + 
                                       "Stream subclasses and Music21Objects cannot have required arguments in __init__" % self.__class__)
@@ -729,8 +728,7 @@ class Stream(base.Music21Object):
         if other is None or not isinstance(other, Stream):
             raise TypeError('cannot concatenate a Stream with a non-Stream')
 
-        s = self.__class__()
-        s.autoSort = self.autoSort
+        s = self.cloneEmpty(derivationMethod='__add__')
         # may want to keep activeSite of source Stream?
         #s.elements = self._elements + other._elements
         # need to iterate over elements and re-assign to create new locations
@@ -746,6 +744,53 @@ class Stream(base.Music21Object):
 
         #s.elementsChanged()
         return s
+
+    def cloneEmpty(self, derivationMethod = None):
+        '''
+        Create a Stream that is identical to this one except that the measures are empty
+        and set derivation
+        
+        >>> p = stream.Part()
+        >>> p.autoSort = False
+        >>> p.id = 'hi'
+        >>> p.insert(0, note.Note())
+        >>> q = p.cloneEmpty(derivationMethod="demo")
+        >>> q.autoSort
+        False
+        >>> q
+        <music21.stream.Part hi>
+        >>> q.derivation.origin is p
+        True
+        >>> q.derivation.method
+        'demo'
+        >>> len(q)
+        0
+        '''
+        returnObj = self.__class__()
+        returnObj.derivation.client = returnObj
+        returnObj.derivation.origin = self
+        if derivationMethod is not None:
+            returnObj.derivation.method = derivationMethod
+        returnObj.mergeAttributes(self) # get groups, optional id
+        return returnObj
+
+    def mergeAttributes(self, other):
+        '''
+        Merge relevant attributes from the Other stream into this one.
+        
+        >>> s = stream.Stream()
+        >>> s.autoSort = False
+        >>> s.id = 'hi'
+        >>> t = stream.Stream()
+        >>> t.mergeAttributes(s)
+        >>> t.autoSort
+        False
+        >>> t
+        <music21.stream.Stream hi>
+        '''
+        base.Music21Object.mergeAttributes(self, other)
+        self.autoSort = other.autoSort
+
 
     def hasElement(self, obj):
         '''
@@ -3449,13 +3494,8 @@ class Stream(base.Music21Object):
 
         if ignoreNumbers is True, then it ignores defined measureNumbers and 
         uses 0-indexed measure objects
-
         '''
-        returnObj = self.__class__()
-        returnObj.derivation.client = returnObj
-        returnObj.derivation.origin = self
-        returnObj.derivation.method = 'measures'
-        returnObj.mergeAttributes(self) # get groups, optional id
+        returnObj = self.cloneEmpty(derivationMethod='measures')
         srcObj = self
 
         # create a dictionary of measure number: list of Meaures
@@ -4152,9 +4192,7 @@ class Stream(base.Music21Object):
         # search activeSite Streams through contexts
         if len(post) == 0 and searchContext:
             # returns a single value
-            post = self.__class__()
-            post.derivation.origin = self
-            post.derivation.method = 'getTimeSignatures'
+            post = self.cloneEmpty(derivationMethod='getTimeSignatures')
 
             # sort by time to search the most recent objects
             obj = self.getContextByClass('TimeSignature', sortByCreationTime=sortByCreationTime)
@@ -4391,7 +4429,7 @@ class Stream(base.Music21Object):
         post = self.getElementsByClass('KeySignature')
         if len(post) == 0 and searchContext:
             # returns a single value
-            post = self.__class__()
+            post = self.cloneEmpty(derivationMethod='getKeySignatures')
             obj = self.getContextByClass(key.KeySignature)
             if obj is not None:
                 post.append(obj)
@@ -4705,7 +4743,7 @@ class Stream(base.Music21Object):
         if forceOutputClass is None:
             display = self.__class__()
         else:
-            display = forceOutputClass()
+            display = forceOutputClass() # is this ever used? prevents using .cloneEmpty('extractContext')
         display.derivation.origin = self
         display.derivation.method = 'extractContext'
 
@@ -5377,8 +5415,8 @@ class Stream(base.Music21Object):
         >>> (c[0].nameWithOctave, c[-1].nameWithOctave)
         ('C4', 'G#5')
         '''
-        a = self.__class__()
-        b = self.__class__()
+        a = self.cloneEmpty(derivationMethod='splitByClass')
+        b = self.cloneEmpty(derivationMethod='splitByClass')
         if classObj is not None:
             found = self.getElementsByClass(classObj)
         else:
@@ -5764,6 +5802,12 @@ class Stream(base.Music21Object):
         # note that this functionality is also placed in Part
         if not measureStream.haveAccidentalsBeenMade():
             ksLast = None
+            srkCopy = subroutineKeywords.copy()
+            if 'meterStream' in srkCopy:
+                del(srkCopy['meterStream'])
+            if 'refStreamOrTimeRange' in srkCopy:
+                del(srkCopy['refStreamOrTimeRange'])
+
             for i in range(len(measureStream)):
                 m = measureStream[i]
                 if m.keySignature is not None:
@@ -5779,10 +5823,10 @@ class Stream(base.Music21Object):
                     m.makeAccidentals(
                         pitchPastMeasure=measureStream[i-1].pitches,
                         useKeySignature=ksLast, searchKeySignatureByContext=False,
-                        lastNoteWasTied = lastNoteWasTied, **subroutineKeywords)
+                        lastNoteWasTied = lastNoteWasTied, **srkCopy)
                 else:
                     m.makeAccidentals(useKeySignature=ksLast,
-                        searchKeySignatureByContext=False, **subroutineKeywords)
+                        searchKeySignatureByContext=False, **srkCopy)
         #environLocal.printDebug(['makeNotation(): meterStream:', meterStream, meterStream[0]])
         measureStream.makeTies(meterStream, inPlace=True)
         #measureStream.makeBeams(inPlace=True)
@@ -8811,9 +8855,9 @@ class Stream(base.Music21Object):
         '''
         returnList = self.findConsecutiveNotes(**skipKeywords)
         if len(returnList) < 2:
-            return self.__class__()
+            return self.cloneEmpty(derivationMethod='melodicIntervals')
 
-        returnStream = self.__class__()
+        returnStream = self.cloneEmpty(derivationMethod='melodicIntervals')
         for i in range(len(returnList) - 1):
             firstNote = returnList[i]
             secondNote = returnList[i+1]
@@ -9037,7 +9081,7 @@ class Stream(base.Music21Object):
             return self._cache["GapStream"]
 
         sortedElements = self.sorted.elements
-        gapStream = self.__class__()
+        gapStream = self.cloneEmpty(derivationMethod='findGaps')
         highestCurrentEndTime = 0.0
         for e in sortedElements:
             if e.offset > highestCurrentEndTime:
@@ -11099,9 +11143,27 @@ class Measure(Stream):
 
         This method is necessary because Measures, unlike some Streams,
         have attributes independent of any stored elements.
+
+        Overrides base.Music21Object.mergeAttributes
+        
+        >>> m1 = stream.Measure()
+        >>> m1.id = 'MyMeasure'
+        >>> m1.clefIsNew = True
+        >>> m1.number = 2
+        >>> m1.numberSuffix = 'b'
+        >>> m1.layoutWidth = 200
+        
+        >>> m2 = stream.Measure()
+        >>> m2.mergeAttributes(m1)
+        >>> m2.layoutWidth
+        200
+        >>> m2.id
+        'MyMeasure'
+        >>> m2
+        <music21.stream.Measure 2b offset=0.0>
         '''
         # calling bass class sets id, groups
-        base.Music21Object.mergeAttributes(self, other)
+        super(Measure, self).mergeAttributes(other)
 
         self.timeSignatureIsNew = other.timeSignatureIsNew
         self.clefIsNew = other.clefIsNew
@@ -11122,7 +11184,6 @@ class Measure(Stream):
         If `inPlace` is True, this is done in-place; if
         `inPlace` is False, this returns a modified deep copy.
 
-
         >>> m = stream.Measure()
         >>> n1 = note.Note('g#')
         >>> n2 = note.Note('g')
@@ -11140,7 +11201,13 @@ class Measure(Stream):
         else:
             m = self
 
-        m.makeAccidentals(searchKeySignatureByContext=True, inPlace=True, **subroutineKeywords)
+        srkCopy = subroutineKeywords.copy()
+        if 'meterStream' in srkCopy:
+            del(srkCopy['meterStream'])
+        if 'refStreamOrTimeRange' in srkCopy:
+            del(srkCopy['refStreamOrTimeRange'])
+
+        m.makeAccidentals(searchKeySignatureByContext=True, inPlace=True, **srkCopy)
         # makeTies is for cross-bar associations, and cannot be used
         # at just the measure level
         #m.makeTies(meterStream, inPlace=True)
@@ -11901,7 +11968,7 @@ class Score(Stream):
         This method always returns a new Stream, with deepcopies
         of all contained elements at all level.
         '''
-        post = self.__class__()
+        post = self.cloneEmpty(derivationMethod='expandRepeats')
         # this calls on Music21Object, transfers id, groups
         post.mergeAttributes(self)
 
@@ -12064,7 +12131,7 @@ class Score(Stream):
 
         #environLocal.printDebug(['partsToVoices() bundle:', bundle])
 
-        s = self.__class__()
+        s = self.cloneEmpty(derivationMethod='partsToVoices')
         s.metadata = self.metadata
 
         for sub in bundle: # each sub contains parts

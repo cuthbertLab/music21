@@ -380,7 +380,6 @@ class Music21Object(object):
         `id` and `groups` attributes from another music21 object.
         Can be useful for copy-like operations.
 
-
         >>> m1 = base.Music21Object()
         >>> m2 = base.Music21Object()
         >>> m1.id = 'music21Object1'
@@ -2412,6 +2411,34 @@ class Music21Object(object):
         (<music21.tie.Tie start>, <music21.tie.Tie stop>)
         (<music21.tie.Tie start>, <music21.tie.Tie continue>)
         (<music21.tie.Tie start>, <music21.tie.Tie stop>)
+        
+        
+        If quarterLength == self.quarterLength then the second element will be None.
+        
+        >>> n = note.Note()
+        >>> n.quarterLength = 0.5
+        >>> a, b = n.splitAtQuarterLength(0.5)
+        >>> b is None
+        True
+        >>> a is n
+        True
+        
+        (same with retainOrigin off)
+        
+        >>> n = note.Note()
+        >>> n.quarterLength = 0.5
+        >>> a, b = n.splitAtQuarterLength(0.5, retainOrigin=False)
+        >>> a is n
+        False
+        
+        
+        If quarterLength > self.quarterLength then a DurationException will be raised:
+        
+        >>> n = note.Note()
+        >>> n.quarterLength = 0.5
+        >>> a, b = n.splitAtQuarterLength(0.7)
+        Traceback (most recent call last):
+        DurationException: cannot split a duration (0.5) at this quarterLength (0.7)
         '''
         # needed for temporal manipulations; not music21 objects
         from music21 import tie
@@ -2529,7 +2556,10 @@ class Music21Object(object):
                 eRemain.accidental.displayType = 'even-tied'
                 eRemain.accidental.displayStatus = True
 
-        return [e, eRemain]
+        if eRemain.duration.quarterLength > 0.0:
+            return [e, eRemain]
+        else:
+            return [e, None]
 
     def splitByQuarterLengths(self, quarterLengthList, addTies=True,
         displayTiedAccidentals=False):
@@ -4533,7 +4563,7 @@ def mainTest(*testClasses, **kwargs):
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
-    mainTest(Test, runTest='testPreviousAfterDeepcopy')
+    mainTest(Test) #, runTest='testPreviousAfterDeepcopy')
 
 
 #------------------------------------------------------------------------------

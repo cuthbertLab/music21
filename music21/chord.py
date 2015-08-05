@@ -1176,6 +1176,34 @@ class Chord(note.NotRest):
                 return d.notehead
         return None
 
+    def getNoteheadFill(self, p):
+        '''Given a pitch in this Chord, return an associated noteheadFill
+        attribute, or return None if not defined for that Pitch.
+
+        If the pitch is not found, None will also be returned.
+
+        >>> n1 = note.Note('D4')
+        >>> n2 = note.Note('G4')
+        >>> n2.noteheadFill = True
+        >>> c1 = chord.Chord([n1, n2])
+        >>> c1.getNoteheadFill(c1.pitches[1])
+        True
+
+        >>> print(c1.getNoteheadFill(c1.pitches[0]))
+        None
+
+        >>> c1.getNotehead(pitch.Pitch('A#6')) is None
+        True
+        '''
+        for d in self._notes:
+            if d.pitch is p:
+                return d.noteheadFill
+        for d in self._notes:
+            if d.pitch == p:
+                return d.noteheadFill
+        return None
+
+
     def getStemDirection(self, p):
         '''Given a pitch in this Chord, return an associated stem attribute, or
         return 'unspecified' if not defined for that Pitch.
@@ -2771,6 +2799,55 @@ class Chord(note.NotRest):
                     break
         if not match:
             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
+
+    def setNoteheadFill(self, nh, pitchTarget):
+        '''Given a noteheadFill attribute as a string and a pitch object in this
+        Chord, set the noteheadFill attribute of that pitch to the value of that
+        notehead. Valid noteheadFill names are True, False, None (default)
+        
+        >>> n1 = note.Note('D4')
+        >>> n2 = note.Note('G4')
+        >>> c1 = chord.Chord([n1, n2])
+        >>> c1.setNoteheadFill(False, c1.pitches[1]) # just to g
+        >>> c1.getNoteheadFill(c1.pitches[1])
+        False
+
+        >>> c1.getNoteheadFill(c1.pitches[0]) is None
+        True
+
+        If a chord has two of the same pitch, but each associated with a different notehead, then
+        object equality must be used to distinguish between the two.
+
+        >>> c2 = chord.Chord(['D4','D4'])
+        >>> secondD4 = c2.pitches[1]
+        >>> c2.setNoteheadFill(False, secondD4)
+        >>> for i in [0,1]:
+        ...     print(c2.getNoteheadFill(c2.pitches[i]))
+        ...
+        None
+        False
+
+        '''
+        # assign to first pitch by default
+        if pitchTarget is None and len(self._notes) > 0:
+            pitchTarget = self._notes[0].pitch
+        elif common.isStr(pitchTarget):
+            pitchTarget = pitch.Pitch(pitchTarget)
+        match = False
+        for d in self._notes:
+            if d.pitch is pitchTarget:
+                d.noteheadFill = nh
+                match = True
+                break
+        if not match:
+            for d in self._notes:
+                if d.pitch == pitchTarget:
+                    d.noteheadFill = nh
+                    match = True
+                    break
+        if not match:
+            raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
+
 
     def setStemDirection(self, stem, pitchTarget):
         '''Given a stem attribute as a string and a pitch object in this Chord,
@@ -4503,7 +4580,7 @@ class Test(unittest.TestCase):
         out = out.replace(' ', '')
         out = out.replace('\n', '')
         #print out
-        self.assertTrue(out.find('''<pitch><step>A</step><octave>4</octave></pitch><duration>15120</duration><tietype="start"/><type>quarter</type><dot/><stem>up</stem><notehead>normal</notehead><notations><tiedtype="start"/></notations>''') != -1)
+        self.assertTrue(out.find('''<pitch><step>A</step><octave>4</octave></pitch><duration>15120</duration><tietype="start"/><type>quarter</type><dot/><stem>up</stem><notehead>normal</notehead><notations><tiedtype="start"/></notations>''') != -1, out)
 
     def testTiesB(self):
         from music21 import stream, scale

@@ -90,15 +90,14 @@ from music21 import environment
 _MOD = "freezeThaw.py"
 environLocal = environment.Environment(_MOD)
 
-try:
-    import cPickle as pickleMod # much faster...
-except ImportError:
+if six.PY2:
     try:
-        import _pickle as pickleMod # Python3 -- whatever the version is...
+        import cPickle as pickleMod # much faster on Python 2
     except ImportError:
-        # in case we're on Jython, etc.
-        import pickle as pickleMod
-
+        import pickle as pickleMod # @UnusedImport
+else:
+    import pickle as pickleMod # @Reimport
+    # on python 3 -- do NOT import _pickle directly. it will be used if  it exists, and _pickle lacks HIGHEST_PROTOCOL constant.
 
 #------------------------------------------------------------------------------
 
@@ -650,10 +649,10 @@ class StreamFreezer(StreamFreezeThawBase):
         environLocal.printDebug(['writing fp', fp])
 
         if fmt == 'pickle':
-            # a negative protocol value will get the highest protocal;
+            # a negative protocol value will get the highest protocol;
             # this is generally desirable
             # packStream() returns a storage dictionary
-            pickleString = pickleMod.dumps(storage, protocol=-1)
+            pickleString = pickleMod.dumps(storage, protocol=pickleMod.HIGHEST_PROTOCOL)
             if zipType == 'zlib':
                 pickleString = zlib.compress(pickleString)
             with open(fp, 'wb') as f: # binary
@@ -911,7 +910,8 @@ class StreamThawer(StreamFreezeThawBase):
         return streamObj
 
     def parseOpenFmt(self, storage):
-        '''Look at the file and determine the format
+        '''
+        Look at the file and determine the format
         '''
         if (six.PY3 and isinstance(storage, bytes)):
             if storage.startswith(b'{"'): # was m21Version": {"py/tuple" but order of dict may change

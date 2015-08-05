@@ -28,35 +28,24 @@ duration when played, and have a duration-type representation when performed.
 
 Example usage:
 
-::
+>>> d = duration.Duration()
+>>> d.quarterLength = 0.5
+>>> d.type
+'eighth'
 
-    >>> d = duration.Duration()
-    >>> d.quarterLength = 0.5
-    >>> d.type
-    'eighth'
+>>> d.type = 'whole'
+>>> d.quarterLength
+4.0
 
-::
+>>> d.quarterLength = 0.166666666
+>>> d.type
+'16th'
 
-    >>> d.type = 'whole'
-    >>> d.quarterLength
-    4.0
+>>> d.tuplets[0].numberNotesActual
+3
 
-::
-
-    >>> d.quarterLength = 0.166666666
-    >>> d.type
-    '16th'
-
-::
-
-    >>> d.tuplets[0].numberNotesActual
-    3
-
-::
-
-    >>> d.tuplets[0].numberNotesNormal
-    2
-
+>>> d.tuplets[0].numberNotesNormal
+2
 '''
 from __future__ import print_function
 
@@ -808,73 +797,55 @@ class Tuplet(object):
     Note that this is a duration modifier, or a generator of ratios to scale
     quarterLength values in Duration objects.
 
-    ::
-
-        >>> myTup = duration.Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
-        >>> print(myTup.tupletMultiplier())
-        4/5
+    >>> myTup = duration.Tuplet(numberNotesActual = 5, numberNotesNormal = 4)
+    >>> print(myTup.tupletMultiplier())
+    4/5
 
 
     In this case, the tupletMultiplier is a float because it can be expressed
     as a binary number:
 
-    ::
+    >>> myTup2 = duration.Tuplet(8, 5)
+    >>> tm = myTup2.tupletMultiplier()
+    >>> tm
+    0.625
 
-        >>> myTup2 = duration.Tuplet(8, 5)
-        >>> tm = myTup2.tupletMultiplier()
-        >>> tm
-        0.625
+    >>> myTup2 = duration.Tuplet(6, 4, "16th")
+    >>> print(myTup2.durationActual.type)
+    16th
 
-    ::
-
-        >>> myTup2 = duration.Tuplet(6, 4, "16th")
-        >>> print(myTup2.durationActual.type)
-        16th
-
-    ::
-
-        >>> print(myTup2.tupletMultiplier())
-        2/3
+    >>> print(myTup2.tupletMultiplier())
+    2/3
 
     Tuplets may be frozen, in which case they become immutable. Tuplets
     which are attached to Durations are automatically frozen.  Otherwise
     a tuplet could change without the attached duration knowing about it,
     which would be a real problem.
 
-    ::
+    >>> myTup.frozen = True
+    >>> myTup.tupletActual = [3, 2]
+    Traceback (most recent call last):
+    TupletException: A frozen tuplet (or one attached to a duration) is immutable
 
-        >>> myTup.frozen = True
-        >>> myTup.tupletActual = [3, 2]
-        Traceback (most recent call last):
-        ...
-        TupletException: A frozen tuplet (or one attached to a duration) is immutable
-
-    ::
-
-        >>> myHalf = duration.Duration("half")
-        >>> myHalf.appendTuplet(myTup2)
-        >>> myTup2.tupletActual = [5, 4]
-        Traceback (most recent call last):
-        ...
-        TupletException: A frozen tuplet (or one attached to a duration) is immutable
+    >>> myHalf = duration.Duration("half")
+    >>> myHalf.appendTuplet(myTup2)
+    >>> myTup2.tupletActual = [5, 4]
+    Traceback (most recent call last):
+    TupletException: A frozen tuplet (or one attached to a duration) is immutable
 
     Note that if you want to create a note with a simple Tuplet attached to it,
     you can just change the quarterLength of the note:
 
-    ::
+    >>> myNote = note.Note("C#4")
+    >>> myNote.duration.quarterLength = 0.8
+    >>> myNote.duration.quarterLength
+    Fraction(4, 5)
+    >>> myNote.duration.fullName
+    'Quarter Quintuplet (4/5 QL)'
 
-        >>> myNote = note.Note("C#4")
-        >>> myNote.duration.quarterLength = 0.8
-        >>> myNote.duration.quarterLength
-        Fraction(4, 5)
-        >>> myNote.duration.fullName
-        'Quarter Quintuplet (4/5 QL)'
-
-    ::
-
-        >>> myNote.duration.tuplets
-        (<music21.duration.Tuplet 5/4/quarter>,)
-
+    >>> myNote.duration.tuplets
+    (<music21.duration.Tuplet 5/4/quarter>,)
+    
     OMIT_FROM_DOCS
     We should also have a tupletGroup spanner.
 

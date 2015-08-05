@@ -874,12 +874,12 @@ spirit</words>
     def testChordNoteheadFillA(self):
         from music21 import chord
         c = chord.Chord(['c4', 'g4'])
-        c[0].noteheadFill = 'no'
+        c[0].noteheadFill = False
 
         raw = fromMusic21Object(c)
         self.assertEqual(raw.count('<notehead filled="no">normal</notehead>'), 1)
         
-        c[1].noteheadFill = 'no'
+        c[1].noteheadFill = False
         raw = fromMusic21Object(c)
         self.assertEqual(raw.count('<notehead filled="no">normal</notehead>'), 2)
 

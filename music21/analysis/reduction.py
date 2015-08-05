@@ -167,8 +167,13 @@ class ReductiveNote(object):
         if 'stemDirection' in self._parameters:
             n.stemDirection = self._parameters['stemDirection']
         if 'noteheadFill' in self._parameters:
-            if self._parameters['noteheadFill'] is not None:
-                n.noteheadFill = self._parameters['noteheadFill']
+            nhf = self._parameters['noteheadFill']
+            if nhf is not None:
+                if nhf == 'yes':
+                    nhf = True
+                elif nhf == 'no':
+                    nhf = False
+                n.noteheadFill = nhf
                 #environLocal.printDebug(['set nothead fill:', n.noteheadFill])
         if 'textBelow' in self._parameters:
             n.addLyric(self._parameters['textBelow'])

@@ -250,7 +250,7 @@ class TagLib(object):
         ('accidental-mark', True, AccidentalMark), 
         ('shake', False, Shake), 
         ('schleifer', False, Schleifer), 
-        ('tremolo', False, Tremolo), 
+        ('tremolo', True, Tremolo), 
         
         ('attributes', False, Attributes), 
         
@@ -2638,9 +2638,10 @@ class Tremolo(MusicXMLElement):
     def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'tremolo'
+        self.charData = None
         # type may or may not be defined
         self._attr['type'] = None # start or stop; 
-        self._attr['number'] = None # for id
+        #self._attr['number'] = None # for id
 
 class Notehead(MusicXMLElement):
     def __init__(self, type=None): # @ReservedAssignment

@@ -1065,6 +1065,7 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
     This may edit the mxNoteList and direction lists in place, and thus returns None.
     
     TODO: Improve docs and show a test...
+    TODO: TremoloBundles
     '''
     if spannerBundle is None or len(spannerBundle) == 0:
         return
@@ -1438,6 +1439,10 @@ def expressionToMx(orn):
         mx.set('placement', orn.placement)
     elif 'Fermata' in orn.classes:
         mx = fermataToMxFermata(orn)
+    elif 'Tremolo' in orn.classes:
+        mx = mxObjects.Tremolo()
+        mx.charData = orn.numberOfMarks
+        mx.set('type', 'single')
     elif 'Mordent' in orn.classes:
         mx = mxObjects.Mordent()
     elif 'InvertedMordent' in orn.classes:
@@ -1634,7 +1639,7 @@ def noteheadToMxNotehead(obj, defaultColor=None):
     >>> n1 = note.Note('c3')
     >>> n1.notehead = 'diamond'
     >>> n1.noteheadParenthesis = True
-    >>> n1.noteheadFill = 'no'
+    >>> n1.noteheadFill = False
     >>> mxN4 = musicxml.toMxObjects.noteheadToMxNotehead(n1)
     >>> mxN4._attr['filled']
     'no'
@@ -1643,7 +1648,7 @@ def noteheadToMxNotehead(obj, defaultColor=None):
     '''
     mxNotehead = mxObjects.Notehead()
     nh = 'normal'
-    nhFill = 'default'
+    nhFill = None
     nhParen = False
 
     # default noteheard, regardless of if set as attr
@@ -1672,7 +1677,7 @@ def noteheadToMxNotehead(obj, defaultColor=None):
         # should only set if needed, otherwise creates extra musicxl  data
         #if nh not in ['normal']: 
         mxNotehead.set('charData', nh)
-    if nhFill != 'default':
+    if nhFill is not None:
         mxNotehead.set('filled', nhFill)
     if nhParen is not False:
         mxNotehead.set('parentheses', nhParen)
@@ -1771,7 +1776,7 @@ def noteToMxNotes(n, spannerBundle=None):
             mxNote.beamList = nBeamsMx
 
     #Adds the notehead type if it is not set to the default 'normal'.
-    if (n.notehead != 'normal' or n.noteheadFill != 'default' or
+    if (n.notehead != 'normal' or n.noteheadFill is not None or
         n.color not in [None, '']):
         mxNoteList[0].noteheadObj = noteheadToMxNotehead(n)
 

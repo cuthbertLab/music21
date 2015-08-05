@@ -1185,11 +1185,13 @@ def realizeOrnaments(s):
 
     >>> s1 = stream.Stream()
     >>> m1 = stream.Measure()
-    >>> m1.timeSignature = meter.TimeSignature("4/4")
+    >>> m1.number = 1
+    >>> m1.append(meter.TimeSignature("4/4"))
     >>> n1 = note.Note("C4", type='whole')
     >>> n1.expressions.append(expressions.Mordent())
     >>> m1.append(n1)
     >>> m2 = stream.Measure()
+    >>> m2.number = 2
     >>> n2 = note.Note("D4", type='whole')
     >>> m2.append(n2)
     >>> s1.append(m1)
@@ -1198,10 +1200,10 @@ def realizeOrnaments(s):
     ...     x
     ...
     <music21.stream.Stream ...>
-    <music21.stream.Measure 0 offset=0.0>
+    <music21.stream.Measure 1 offset=0.0>
     <music21.meter.TimeSignature 4/4>
     <music21.note.Note C>
-    <music21.stream.Measure 0 offset=4.0>
+    <music21.stream.Measure 2 offset=4.0>
     <music21.note.Note D>
 
     >>> s2 = s1.realizeOrnaments()
@@ -1209,38 +1211,38 @@ def realizeOrnaments(s):
     ...     x
     ...
     <music21.stream.Stream ...>
-    <music21.stream.Measure 0 offset=0.0>
+    <music21.stream.Measure 1 offset=0.0>
     <music21.meter.TimeSignature 4/4>
     <music21.note.Note C>
     <music21.note.Note B>
     <music21.note.Note C>
-    <music21.stream.Measure 0 offset=4.0>
+    <music21.stream.Measure 2 offset=4.0>
     <music21.note.Note D>
+
+    TODO: does not work for Gapful streams because it uses append rather than the offset of the original
     '''
-    newStream = s.__class__()
+    newStream = s.cloneEmpty()
     newStream.offset = s.offset
 
     # If this streamObj contains more streams (i.e., a Part that contains
     # multiple measures):
-    recurse = s.recurse(streamsOnly=True)
-
-    if len(recurse) > 1:
-        i = 0
-        for innerStream in recurse:
-            if i > 0:
-                newStream.append(innerStream.realizeOrnaments())
-            i = i + 1
-    else:
-        for element in s:
+    for element in s:
+        if element.isStream:
+            newStream.append(element.realizeOrnaments())
+        else:
             if hasattr(element, "expressions"):
-                realized = False
+                elementHasBeenRealized = False
                 for exp in element.expressions:
                     if hasattr(exp, "realize"):
-                        newNotes = exp.realize(element)
-                        realized = True
-                        for n in newNotes:
+                        before, during, after = exp.realize(element)
+                        elementHasBeenRealized = True
+                        for n in before:
                             newStream.append(n)
-                if not realized:
+                        if during is not None:
+                            newStream.append(during)
+                        for n in after:
+                            newStream.append(n)
+                if elementHasBeenRealized is False:
                     newStream.append(element)
             else:
                 newStream.append(element)

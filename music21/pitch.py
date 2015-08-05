@@ -4379,7 +4379,7 @@ class Pitch(object):
         >>> n1 = note.Note('d3')
         >>> n2 = note.Note('g3')
         >>> n2.notehead = 'diamond'
-        >>> n2.noteheadFill = 'no'
+        >>> n2.noteheadFill = False
         >>> p1 = pitch.Pitch('d3')
         >>> harmChord = chord.Chord([n1, n2])
         >>> harmChord.quarterLength = 1
@@ -4422,7 +4422,7 @@ class Pitch(object):
 
         noteOut = note.Note(soundingPitch.nameWithOctave)
         noteOut.noteheadParenthesis = True
-        noteOut.noteheadFill = 'yes'
+        noteOut.noteheadFill = True
         noteOut.stemDirection = 'noStem'
 
         note1 = note.Note(pitchList[0].nameWithOctave)

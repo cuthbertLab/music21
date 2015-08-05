@@ -671,7 +671,7 @@ class NotRest(GeneralNote):
     def __init__(self, *arguments, **keywords):
         GeneralNote.__init__(self, **keywords)
         self._notehead = 'normal'
-        self._noteheadFill = 'default'
+        self._noteheadFill = None
         self._noteheadParenthesis = False
         self._stemDirection = 'unspecified'
         self._volume = None # created on demand
@@ -775,30 +775,32 @@ class NotRest(GeneralNote):
 
 
     def _getNoteheadFill(self):
-        '''Return the Notehead fill type.
+        '''Return the Notehead fill type.  "yes" and "no" are converted to True, False
         '''
         return self._noteheadFill
 
     def _setNoteheadFill(self, value):
-        if value == 'none' or value is None:
+        if value in ('none', None, 'default'):
             value = None # allow setting to none or None
-        if value == 'filled':
-            value = 'yes'
-        elif value not in ('default', 'yes', 'no'):
+        if value in ('filled', 'yes'):
+            value = True
+        elif value in ('notfilled', 'no'):
+            value = True
+        if value not in (True, False, None):
             raise NotRestException('not a valid notehead fill value: %s' % value)
         self._noteheadFill = value
 
     noteheadFill = property(_getNoteheadFill, _setNoteheadFill, doc='''
         Get or set the note head fill status of this NotRest. Valid note head fill values are 
-        'yes', 'no', 'default', and None.
+        True, False, or None (meaning default).
 
         >>> n = note.Note()
         >>> n.noteheadFill = 'no'
         >>> n.noteheadFill
-        'no'
+        False
         >>> n.noteheadFill = 'filled'
         >>> n.noteheadFill
-        'yes'
+        True
 
         >>> n.noteheadFill = 'junk'
         Traceback (most recent call last):

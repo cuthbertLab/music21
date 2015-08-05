@@ -719,7 +719,6 @@ def mxToTuplet(mxNote, inputM21Object = None):
     Given an mxNote, based on mxTimeModification 
     and mxTuplet objects, return a Tuplet object
     (or alter the input object and then return it)
-
     ''' 
     if inputM21Object is None:
         t = duration.Tuplet()
@@ -737,6 +736,8 @@ def mxToTuplet(mxNote, inputM21Object = None):
     mxNormalType = mxTimeModification.get('normal-type')
     # TODO: implement dot
     # mxNormalDot = mxTimeModification.get('normal-dot')
+
+
 
     if mxNormalType != None:
         # this value does not seem to frequently be supplied by mxl
@@ -757,6 +758,10 @@ def mxToTuplet(mxNote, inputM21Object = None):
         t.type = mxTuplet.get('type') 
         t.bracket = mxObjects.yesNoToBoolean(mxTuplet.get('bracket'))
         #environLocal.printDebug(['got bracket', self.bracket])
+        showNumber = mxTuplet.get('show-number')
+        if showNumber is not None and showNumber == 'none':
+            # do something for 'both'; 'actual' is the default
+            t.tupletActualShow = 'none'
 
         t.placement = mxTuplet.get('placement') 
 
@@ -1053,61 +1058,43 @@ def mxToChordSymbol(mxHarmony):
     '''
     Convert a musicxml.mxObjects.Harmony() object to a harmony.ChordSymbol object:
     
-    ::
+    >>> mxHarmony = musicxml.mxObjects.Harmony()
+    >>> mxKind = musicxml.mxObjects.Kind()
+    >>> mxKind.charData = 'major-seventh'
+    >>> mxHarmony.kindObj = mxKind
+    >>> mxRoot = musicxml.mxObjects.Root()
+    >>> mxRoot.set('root-step', 'D')
+    >>> mxRoot.set('root-alter', '-1')
+    >>> mxHarmony.rootObj = mxRoot
+    >>> cs = musicxml.fromMxObjects.mxToChordSymbol(mxHarmony)
+    >>> cs
+    <music21.harmony.ChordSymbol D-maj7>
 
-        >>> mxHarmony = musicxml.mxObjects.Harmony()
-        >>> mxKind = musicxml.mxObjects.Kind()
-        >>> mxKind.charData = 'major-seventh'
-        >>> mxHarmony.kindObj = mxKind
-        >>> mxRoot = musicxml.mxObjects.Root()
-        >>> mxRoot.set('root-step', 'D')
-        >>> mxRoot.set('root-alter', '-1')
-        >>> mxHarmony.rootObj = mxRoot
-        >>> cs = musicxml.fromMxObjects.mxToChordSymbol(mxHarmony)
-        >>> cs
-        <music21.harmony.ChordSymbol D-maj7>
+    >>> cs.figure
+    'D-maj7'
 
-    ::
+    >>> cs.pitches
+    (<music21.pitch.Pitch D-3>, <music21.pitch.Pitch F3>, <music21.pitch.Pitch A-3>, <music21.pitch.Pitch C4>)
 
-        >>> cs.figure
-        'D-maj7'
-
-    ::
-
-        >>> cs.pitches
-        (<music21.pitch.Pitch D-3>, <music21.pitch.Pitch F3>, <music21.pitch.Pitch A-3>, <music21.pitch.Pitch C4>)
-
-    ::
-
-        >>> cs.root()
-        <music21.pitch.Pitch D-3>
+    >>> cs.root()
+    <music21.pitch.Pitch D-3>
     
-    TODO: this is very classically-oriented.  Make it more Jazz/Rock like.
+    TODO: this is very classically-oriented.  Make more Jazz/Rock like possible/default?.
     
-    ::
+    >>> mxKind.charData = 'major-sixth'
+    >>> cs = musicxml.fromMxObjects.mxToChordSymbol(mxHarmony)
+    >>> cs
+    <music21.harmony.ChordSymbol D-6>
 
-        >>> mxKind.charData = 'major-sixth'
-        >>> cs = musicxml.fromMxObjects.mxToChordSymbol(mxHarmony)
-        >>> cs
-        <music21.harmony.ChordSymbol D-6>
+    >>> cs.figure
+    'D-6'
 
-    ::
+    >>> cs.pitches
+    (<music21.pitch.Pitch D-3>, <music21.pitch.Pitch F3>, <music21.pitch.Pitch A-3>, <music21.pitch.Pitch B-3>)
 
-        >>> cs.figure
-        'D-6'
-
-    ::
-
-        >>> cs.pitches
-        (<music21.pitch.Pitch D-3>, <music21.pitch.Pitch F3>, <music21.pitch.Pitch A-3>, <music21.pitch.Pitch B-3>)
-
-    ::
-
-        >>> cs.root()
-        <music21.pitch.Pitch D-3>  
-
+    >>> cs.root()
+    <music21.pitch.Pitch D-3>  
     '''
-    
     #environLocal.printDebug(['mxToChordSymbol():', mxHarmony])
     cs = harmony.ChordSymbol()
     
@@ -1293,23 +1280,43 @@ def mxNotationsToSpanners(target, mxNotations, spannerBundle):
     mxTremoloList = mxNotations.getTremolos()
     for mxObj in mxTremoloList:
         environLocal.printDebug(['mxTremoloList', mxObj])
-        idFound = mxObj.get('number')
+        tremoloType = mxObj.get('type')
+        isSingle = True
+        try:
+            numMarks = int(mxObj.charData)
+        except (ValueError, TypeError):
+            #environLocal.warn("could not convert ", dir(mxObj))
+            numMarks = 3
+        
+        if tremoloType in ('start', 'stop'):
+            isSingle = False
+        
+        if isSingle is True:
+            environLocal.printDebug(['creating single Tremolo'])
+            ts = expressions.Tremolo()            
+            ts.numberOfMarks = numMarks
+            target.expressions.append(ts)
+            continue
+        
+        idFound = 1 # mxObj.get('number') -- tremolo has no id number
         sb = spannerBundle.getByClassIdLocalComplete('Tremolo',
             idFound, False)
         if len(sb) > 0: # if we already have 
             su = sb[0] # get the first
         else: # create a new spanner
-            environLocal.printDebug(['creating Tremolo'])
-            su = expressions.Tremolo()
+            environLocal.printDebug(['creating TremoloSpanner'])
+            su = expressions.TremoloSpanner()
+            su.numberOfMarks = numMarks
             su.idLocal = idFound
             #su.placement = mxObj.get('placement')
             spannerBundle.append(su)
         # add a reference of this note to this spanner
         su.addSpannedElements(target)
         # can be stop or None; we can have empty single-element tremolo
-        if mxObj.get('type') in ['stop', None]:
+        if tremoloType == 'stop':
             su.completeStatus = True
             # only add after complete
+
 
     mxGlissandoList = mxNotations.getGlissandi()
     for mxObj in mxGlissandoList:
@@ -1777,8 +1784,14 @@ def mxToNote(mxNote, spannerBundle=None, inputM21=None):
     # to the value of the notehead object        
     mxNotehead = mxNote.get('noteheadObj')
     if mxNotehead is not None:
-        if mxNotehead.charData not in ['', None]:
+        if mxNotehead.charData not in ('', None):
             n.notehead = mxNotehead.charData
+        nhf = mxNotehead.get('filled')
+        if nhf is not None:
+            if nhf == 'yes':
+                n.noteheadFill = True 
+            elif nhf == 'no':
+                n.noteheadFill = False 
         if mxNotehead.get('color') is not None:
             n.color = mxNotehead.get('color')
 
@@ -3862,7 +3875,14 @@ class Test(unittest.TestCase):
         s = converter.parse(testPrimitive.notations32a)
 
         #s.flat.show('t')
-        self.assertEqual(len(s.flat.getElementsByClass('Tremolo')), 1)
+        self.assertEqual(len(s.flat.getElementsByClass('TremoloSpanner')), 0) # no spanned tremolos
+        
+        count = 0
+        for n in s.flat.notes:
+            for e in n.expressions:
+                if 'Tremolo' in e.classes:
+                    count += 1
+        self.assertEqual(count, 1) # One single Tremolo
 
 
         count = 0
