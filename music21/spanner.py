@@ -792,11 +792,10 @@ class SpannerBundle(object):
         return post
 
     def getByIdLocal(self, idLocal=None):
-        '''Get spanners by `idLocal` or `complete` status.
+        '''Get spanners by `idLocal`.
 
         Returns a new SpannerBundle object
 
-        
         >>> su1 = spanner.Slur()
         >>> su1.idLocal = 1
         >>> su2 = spanner.Slur()

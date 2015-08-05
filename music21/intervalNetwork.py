@@ -145,9 +145,9 @@ class Edge(object):
         return self._interval
 
     interval = property(_getInterval, 
-        doc = '''Return the stored Interval object
+        doc = '''
+        Return the stored Interval object
 
-        
         >>> i = interval.Interval('M3')
         >>> e1 = intervalNetwork.Edge(i, id=0)
         >>> n1 = intervalNetwork.Node(id=0)
@@ -161,9 +161,9 @@ class Edge(object):
         return self._direction
 
     direction = property(_geDirection, 
-        doc = '''Return the direction of the Edge.
+        doc = '''
+        Return the direction of the Edge.
 
-        
         >>> i = interval.Interval('M3')
         >>> e1 = intervalNetwork.Edge(i, id=0)
         >>> n1 = intervalNetwork.Node(id=0)
@@ -288,7 +288,7 @@ class Edge(object):
     connections = property(getConnections)
 
 
-class Node(object):
+class Node(common.SlottedObject):
     '''Abstraction of an unrealized Pitch Node.
 
     The Node `id` is used to storing connections in Edges and has no real meaning.
@@ -298,8 +298,8 @@ class Node(object):
     The Node `degree` is translated to scale degrees in various applications, and is used to request a pitch from the network.
 
     The `weight` attribute is used to probabilistically select between multiple nodes when multiple nodes satisfy either a branching option in a pathway or a request for a degree. 
-
     '''
+    __slots__ = ('id', 'degree', 'weight')
     def __init__(self, id=None, degree=None, weight=1.0): # id is okay: @ReservedAssignment
         # store id, either as string, such as terminusLow, or a number. 
         # ids are unique to any node in the network
@@ -327,12 +327,12 @@ class Node(object):
         True
         >>> n1 == n3
         False
-        >>> n2.boogie = 'rightNow'
+        >>> n2.weight = 2.0
         >>> n1 == n2
         False
         '''
         return (isinstance(other, self.__class__)
-            and self.__dict__ == other.__dict__)
+            and self.__slots__ == other.__slots__)
 
     def __ne__(self, other):
         return not self.__eq__(other)

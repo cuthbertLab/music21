@@ -1287,7 +1287,8 @@ def mxNotationsToSpanners(target, mxNotations, spannerBundle):
         except (ValueError, TypeError):
             #environLocal.warn("could not convert ", dir(mxObj))
             numMarks = 3
-        
+
+        #environLocal.warn('tremoloType', tremoloType)        
         if tremoloType in ('start', 'stop'):
             isSingle = False
         
@@ -1297,20 +1298,21 @@ def mxNotationsToSpanners(target, mxNotations, spannerBundle):
             ts.numberOfMarks = numMarks
             target.expressions.append(ts)
             continue
-        
+        # else...
         idFound = 1 # mxObj.get('number') -- tremolo has no id number
-        sb = spannerBundle.getByClassIdLocalComplete('Tremolo',
+        sb = spannerBundle.getByClassIdLocalComplete('TremoloSpanner',
             idFound, False)
         if len(sb) > 0: # if we already have 
             su = sb[0] # get the first
         else: # create a new spanner
-            environLocal.printDebug(['creating TremoloSpanner'])
+            #environLocal.warn(['creating TremoloSpanner'])
             su = expressions.TremoloSpanner()
             su.numberOfMarks = numMarks
             su.idLocal = idFound
             #su.placement = mxObj.get('placement')
             spannerBundle.append(su)
         # add a reference of this note to this spanner
+        #environLocal.warn('adding target', target)        
         su.addSpannedElements(target)
         # can be stop or None; we can have empty single-element tremolo
         if tremoloType == 'stop':
