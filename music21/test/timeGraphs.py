@@ -15,8 +15,8 @@
 # generates pretty graphs showing what the bottlenecks in the system are, for helping to
 # improve them.  Requires pycallgraph (not included with music21).  
 
-
 import pycallgraph
+import pycallgraph.output
 import time
 
 
@@ -107,7 +107,7 @@ class M21CallTest(object):
 #-------------------------------------------------------------------------------
 class TestTimeHumdrum(M21CallTest):
     def testFocus(self):
-        import music21
+        music21 = self.m21
         masterStream = music21.humdrum.parseData(music21.humdrum.humdrumTestFiles.mazurka6).stream #@UnusedVariable @UndefinedVariable
 
 class TestTimeMozart(M21CallTest):
@@ -563,7 +563,7 @@ class TestRomantextParse(CallTest):
 
 #-------------------------------------------------------------------------------
 # handler
-class CallGraph:
+class CallGraph(object):
 
     def __init__(self):
         self.includeList = None
@@ -599,10 +599,10 @@ class CallGraph:
         #self.callTest = TestTimeMozart
         #self.callTest = TestTimeIsmir
         #self.callTest = TestGetContextByClassB
-        #self.callTest = TestMeasuresB
+        self.callTest = TestMeasuresB
         #self.callTest = TestImportCorpus
         #self.callTest = TestImportCorpus3
-        self.callTest = TestRomantextParse
+        #self.callTest = TestRomantextParse
         #self.callTest = TestImportStar
 
         # common to all call tests. 
@@ -616,7 +616,7 @@ class CallGraph:
         Note that the default of runWithEnviron imports music21.environment.  That might
         skew results
         '''
-        suffix = '.svg'
+        suffix = '.png' # '.svg'
         outputFormat = suffix[1:]
         _MOD = "test.timeGraphs.py"
 
@@ -663,11 +663,17 @@ class CallGraph:
         t = Timer()
         t.start()
 
-        pycallgraph.start_trace(filter_func = gf)
-        ct.testFocus() # run routine
+        graphviz = pycallgraph.output.GraphvizOutput(output_file=fp)
+        graphviz.tool = '/usr/local/bin/dot'
+        
+        config = pycallgraph.Config()
+        config.trace_filter = gf
 
-        pycallgraph.stop_trace()
-        pycallgraph.make_dot_graph(fp, format=outputFormat, tool='/usr/local/bin/dot')
+        from music21 import note
+        with pycallgraph.PyCallGraph(output=graphviz, config=config):
+            n = note.Note()
+            #ct.testFocus() # run routine
+
         print('elapsed time: %s' % t)
         # open the completed file
         print('file path: ' + fp)
