@@ -1730,33 +1730,6 @@ def ordinalAbbreviation(value, plural=False):
         post += 's'
     return post
 
-def stripAddresses(textString, replacement = "ADDRESS"):
-    '''
-    Function that changes all memory addresses (pointers) in the given
-    textString with (replacement).  This is useful for testing
-    that a function gives an expected result even if the result
-    contains references to memory locations.  So for instance:
-
-
-    >>> common.stripAddresses("{0.0} <music21.clef.TrebleClef object at 0x02A87AD0>")
-    '{0.0} <music21.clef.TrebleClef object at ADDRESS>'
-
-    while this is left alone:
-
-    >>> common.stripAddresses("{0.0} <music21.humdrum.MiscTandem *>I humdrum control>")
-    '{0.0} <music21.humdrum.MiscTandem *>I humdrum control>'
-
-
-    For doctests, can strip to '...' to make it work fine with doctest.ELLIPSIS
-    
-    >>> common.stripAddresses("{0.0} <music21.base.Music21Object object at 0x102a0ff10>", '0x...')
-    '{0.0} <music21.base.Music21Object object at 0x...>'
-
-    :rtype: str
-    '''
-    ADDRESS = re.compile('0x[0-9A-Fa-f]+')
-    return ADDRESS.sub(replacement, textString)
-
 
 def sortModules(moduleList):
     '''
@@ -2110,6 +2083,20 @@ def wrapWeakref(referent):
     '''
     utility function that wraps objects as weakrefs but does not wrap
     already wrapped objects; also prevents wrapping the unwrapable "None" type, etc.
+
+    >>> import weakref
+    >>> class Mock(object):
+    ...     pass
+    >>> a1 = Mock()
+    >>> ref1 = common.wrapWeakref(a1)
+    >>> ref1
+    <weakref at 0x101f29ae8; to 'Mock' at 0x101e45358>
+    >>> ref2 = common.wrapWeakref(ref1)
+    >>> ref2
+    <weakref at 0x101f299af; to 'Mock' at 0x101e45358>
+    >>> ref3 = common.wrapWeakref(5)
+    >>> ref3
+    5
     '''
     #if type(referent) is weakref.ref:
 #     if isinstance(referent, weakref.ref):
@@ -2119,15 +2106,14 @@ def wrapWeakref(referent):
     # if referent is None, will raise a TypeError
     # if referent is a weakref, will also raise a TypeError
     # will also raise a type error for string, ints, etc.
-    # slight performance bost rather than checking if None
+    # slight performance boost rather than checking if None
     except TypeError:
         return referent
-        #return None
 
 def unwrapWeakref(referent):
     '''
     Utility function that gets an object that might be an object itself
-    or a weak reference to an object.  It returns obj() if it's a weakref
+    or a weak reference to an object.  It returns obj() if it's a weakref.
     and obj if it's not.
 
 
@@ -2313,81 +2299,6 @@ def relativepath(path, start='.'):
         return path
     return os.path.relpath(path, start)
 
-###### test related functions
-
-def addDocAttrTestsToSuite(suite, moduleVariableLists, outerFilename=None, globs=False, optionflags=(
-            doctest.ELLIPSIS |
-            doctest.NORMALIZE_WHITESPACE
-            )):
-    '''
-    takes a suite, such as a doctest.DocTestSuite and the list of variables
-    in a module and adds from those classes that have a _DOC_ATTR dictionary
-    (which documents the properties in the class) any doctests to the suite.
-    
-    >>> import doctest
-    >>> s1 = doctest.DocTestSuite(chord)
-    >>> s1TestsBefore = len(s1._tests)
-    >>> allLocals = [getattr(chord, x) for x in dir(chord)]
-    >>> common.addDocAttrTestsToSuite(s1, allLocals)
-    >>> s1TestsAfter = len(s1._tests)
-    >>> s1TestsAfter - s1TestsBefore
-    1
-    >>> t = s1._tests[-1]
-    >>> t
-    isRest ()
-    '''
-    dtp = doctest.DocTestParser()
-    if globs is False:
-        globs = __import__('music21').__dict__.copy()
-    for lvk in moduleVariableLists:
-        if not (inspect.isclass(lvk)):
-            continue
-        docattr = getattr(lvk, '_DOC_ATTR', None)
-        if docattr is None:
-            continue
-        for dockey in docattr:
-            documentation = docattr[dockey]
-            #print(documentation)
-            dt = dtp.get_doctest(documentation, globs, dockey, outerFilename, 0)
-            if len(dt.examples) == 0:
-                continue
-            dtc = doctest.DocTestCase(dt, optionflags=optionflags)
-            #print(dtc)
-            suite.addTest(dtc)
-
-
-def fixTestsForPy2and3(doctestSuite):
-    '''
-    Fix doctests so that they work in both python2 and python3, namely
-    unicode/byte characters and added module names to exceptions.
-    
-    >>> import doctest
-    >>> s1 = doctest.DocTestSuite(chord)
-    >>> common.fixTestsForPy2and3(s1)
-    '''
-    for dtc in doctestSuite: # Suite to DocTestCase
-        if not hasattr(dtc, '_dt_test'):
-            continue
-        dt = dtc._dt_test # DocTest
-        for example in dt.examples: # fix Traceback exception differences Py2 to Py3
-            if six.PY3:
-                if example.exc_msg is not None and len(example.exc_msg) > 0:
-                    example.exc_msg = "..." + example.exc_msg[1:]
-                elif (example.want is not None and
-                        example.want.startswith('u\'')):
-                    # probably a unicode example:
-                    # simplistic, since (u'hi', u'bye')
-                    # won't be caught, but saves a lot of anguish
-                    example.want = example.want[1:]
-            elif six.PY2:
-                if (example.want is not None and
-                        example.want.startswith('b\'')):
-                    # probably a unicode example:
-                    # simplistic, since (b'hi', b'bye')
-                    # won't be caught, but saves a lot of anguish
-                    example.want = example.want[1:]
-
-#-------------------------------------------------------------------------------
 _singletonCounter = {}
 _singletonCounter['value'] = 0
 

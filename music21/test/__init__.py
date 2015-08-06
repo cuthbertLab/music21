@@ -7,19 +7,11 @@ __all__ = [
     'testDocumentation', 
     'testExternal', 
     'testPerformance', 
+    'testRunner',
     'timeGraphs', 
     'testStream',
     'helpers',
     ]
-
-import sys
-
-if sys.version > '3':
-    from music21.test import testStream
-    from music21.test import testDocumentation
-else:
-    import testDocumentation # @Reimport
-    import testStream # @Reimport
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 

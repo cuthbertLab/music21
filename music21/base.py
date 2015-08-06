@@ -40,12 +40,11 @@ from __future__ import print_function
 
 import collections
 import copy
-import doctest
 import sys
 import types
 import unittest
 #import uuid
-
+from music21.test.testRunner import mainTest
 from music21.ext import six
 
 #------------------------------------------------------------------------------
@@ -4419,143 +4418,6 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [Music21Object, ElementWrapper]
 
 
-def mainTest(*testClasses, **kwargs):
-    '''
-    Takes as its arguments modules (or a string 'noDocTest' or 'verbose')
-    and runs all of these modules through a unittest suite
-
-    Unless 'noDocTest' is passed as a module, a docTest
-    is also performed on `__main__`, hence the name "mainTest".
-
-    If 'moduleRelative' (a string) is passed as a module, then
-    global variables are preserved.
-
-    Run example (put at end of your modules):
-
-    ::
-
-        import unittest
-        class Test(unittest.TestCase):
-            def testHello(self):
-                hello = "Hello"
-                self.assertEqual("Hello", hello)
-
-        import music21
-        if __name__ == '__main__':
-            music21.mainTest(Test)
-
-
-    This module tries to fix up some differences between python2 and python3 so
-    that the same doctests can work.
-    '''
-    #environLocal.printDebug(['mainTest()', testClasses])
-
-    runAllTests = True
-
-
-    failFast = bool(kwargs.get('failFast', True))
-    if failFast:
-        optionflags = (
-            doctest.ELLIPSIS |
-            doctest.NORMALIZE_WHITESPACE |
-            doctest.REPORT_ONLY_FIRST_FAILURE
-            )
-    else:
-        optionflags = (
-            doctest.ELLIPSIS |
-            doctest.NORMALIZE_WHITESPACE
-            )
-    
-    globs = None
-    if ('noDocTest' in testClasses or 'noDocTest' in sys.argv
-        or 'nodoctest' in sys.argv or bool(kwargs.get('noDocTest', False))):
-        skipDoctest = True
-    else:
-        skipDoctest = False
-
-    # start with doc tests, then add unit tests
-    if skipDoctest:
-        # create a test suite for storage
-        s1 = unittest.TestSuite()
-    else:
-        # create test suite derived from doc tests
-        # here we use '__main__' instead of a module
-        if 'moduleRelative' in testClasses or 'moduleRelative' in sys.argv or bool(kwargs.get('moduleRelative', False)):
-            pass
-        else:
-            globs = __import__('music21').__dict__.copy()
-        s1 = doctest.DocTestSuite(
-            '__main__',
-            globs=globs,
-            optionflags=optionflags,
-            )
-
-    verbosity = 1
-    if 'verbose' in testClasses or 'verbose' in sys.argv or bool(kwargs.get('verbose', False)):
-        verbosity = 2 # this seems to hide most display
-
-    displayNames = False
-    if 'list' in sys.argv or 'display' in sys.argv or bool(kwargs.get('display', False)) or bool(kwargs.get('list', False)):
-        displayNames = True
-        runAllTests = False
-
-    runThisTest = None
-    if len(sys.argv) == 2:
-        arg = sys.argv[1].lower()
-        if arg not in ['list', 'display', 'verbose', 'nodoctest']:
-            # run a test directly named in this module
-            runThisTest = sys.argv[1]
-    if bool(kwargs.get('runTest', False)):
-        runThisTest = kwargs.get('runTest', False)
-
-    # -f, --failfast
-    if 'onlyDocTest' in sys.argv or 'onlyDocTest' in testClasses or bool(kwargs.get('onlyDocTest', False)):
-        testClasses = [] # remove cases
-    for t in testClasses:
-        if not isinstance(t, six.string_types):
-            if displayNames is True:
-                for tName in unittest.defaultTestLoader.getTestCaseNames(t):
-                    print('Unit Test Method: %s' % tName)
-            if runThisTest is not None:
-                tObj = t() # call class
-                # search all names for case-insensitive match
-                for name in dir(tObj):
-                    if name.lower() == runThisTest.lower() or \
-                         name.lower() == ('test' + runThisTest.lower()) or \
-                         name.lower() == ('xtest' + runThisTest.lower()):
-                        runThisTest = name
-                        break
-                if hasattr(tObj, runThisTest):
-                    print('Running Named Test Method: %s' % runThisTest)
-                    getattr(tObj, runThisTest)()
-                    runAllTests = False
-                    break
-                else:
-                    print('Could not find named test method: %s, running all tests' % runThisTest)
-
-            # normally operation collects all tests
-            s2 = unittest.defaultTestLoader.loadTestsFromTestCase(t)
-            s1.addTests(s2)
-
-    ### Add _DOC_ATTR tests...
-    if not skipDoctest:
-        import inspect
-        stacks = inspect.stack()
-        if len(stacks) > 1:
-            outerFrameTuple = stacks[1]
-        else:
-            outerFrameTuple = stacks[0]
-        outerFrame = outerFrameTuple[0]
-        outerFilename = outerFrameTuple[1]
-        localVariables = list(outerFrame.f_locals.values())
-        common.addDocAttrTestsToSuite(s1, localVariables, outerFilename, globs, optionflags)
-
-    if runAllTests is True:
-        common.fixTestsForPy2and3(s1)
-                                    
-        runner = unittest.TextTestRunner()
-        runner.verbosity = verbosity
-        unused_testResult = runner.run(s1)
 
 
 #------------------------------------------------------------------------------

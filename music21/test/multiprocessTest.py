@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2012-13 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012-15 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
@@ -35,8 +35,9 @@ import unittest
 
 import music21
 from music21 import base
-from music21 import common
 from music21 import environment
+from music21.test import testRunner
+
 _MOD = 'multiprocessTest.py'
 environLocal = environment.Environment(_MOD)
 
@@ -273,7 +274,7 @@ def runOneModuleWithoutImp(args):
             environLocal.printDebug('%s cannot load Doctests' % moduleObject)
             pass        
 
-        common.fixTestsForPy2and3(s1)
+        testRunner.fixTestsForPy2and3(s1)
         
         
         environLocal.printDebug('running Tests...\n')

@@ -24,6 +24,7 @@ import warnings
 
 from music21 import base
 from music21 import common
+from music21.test import testRunner
 from music21 import environment
 from music21.ext import six
 
@@ -250,9 +251,9 @@ def main(testGroup=['test'], restoreEnvironmentDefaults=False, limit=None):
             continue
         
         allLocals = [getattr(module, x) for x in dir(module)]
-        common.addDocAttrTestsToSuite(s1, allLocals, outerFilename=module.__file__, globs=globs, optionflags=docTestOptions)
+        testRunner.addDocAttrTestsToSuite(s1, allLocals, outerFilename=module.__file__, globs=globs, optionflags=docTestOptions)
     
-    common.fixTestsForPy2and3(s1)
+    testRunner.fixTestsForPy2and3(s1)
     
     environLocal.printDebug('running Tests...\n')
             
