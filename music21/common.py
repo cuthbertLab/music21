@@ -17,7 +17,6 @@ Utility constants, dictionaries, functions, and objects used throughout music21.
 import re
 import copy
 import math, sys, os
-import doctest
 import unittest
 import time
 import hashlib
