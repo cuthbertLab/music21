@@ -370,7 +370,7 @@ Again, in Git, these actions are broken into smaller discrete steps:
     **pull** from any point in the history of the repository. Git is incredibly
     flexible, but also potentially intimidating for the same reason.
 
-Eclipse with EGit makes all of this simple. You'll probably never have to worry 
+Eclipse with EGit makes much of this simple. You'll probably never have to worry 
 about most of Git's advanced features - branching, rebasing, etc.
 
 Adding changes, committing and pushing
@@ -413,10 +413,21 @@ the former.
 Fetching and pulling in Eclipse
 ```````````````````````````````
 
-Fetching and pulling in Eclipse are even easier than committing and pushing.
+Fetching and pulling in Eclipse can be easier for most people 
+than committing and pushing.
 Just right-click on the music21 project folder in Eclipse's Project Explorer
 and select either **Pull** to pull or **Fetch from Upstream** to fetch from
 your fork on GitHub.
+
+Some people have had major problems with this system, however, so there's
+an alternate way described below.
+
+Fetching and pulling via the GitHub app
+```````````````````````````````````````
+This is possible but a little bit harder.  See this post I made,
+http://prolatio.blogspot.com/2015/08/merge-upstream-into-your-fork-in-github.html
+, for information.  Replace all references to "mk270/master" to "cuthbertLab/master"
+and it should make sense.
 
 
 Configurating Git remotes in Eclipse
