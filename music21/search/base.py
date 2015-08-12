@@ -8,20 +8,6 @@
 # Copyright:    Copyright © 2011-2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-'''
-Methods and Classes useful in searching within scores.
-
-For searching a group of scores see the search functions within
-:ref:`moduleCorpus` .
-
-'''
-
-
-### __init__.py ######
-__all__ = ['segment']
-
-from music21.search import segment
-
 ### end __init__.py #####
 
 
