@@ -59,7 +59,7 @@ class LyricSearcher(object):
             if len(ls) == 0:
                 continue
             l = ls[0]
-            if l is not None and l.text != "":
+            if l is not None and l.text != "" and l.text is not None:
                 posStart = len(iText)
                 mNum = n.measureNumber
                 txt = l.text

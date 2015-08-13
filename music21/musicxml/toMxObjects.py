@@ -2389,7 +2389,10 @@ def streamToMx(s, spannerBundle=None):
 
             if (inst.midiChannel == None or
                 inst.midiChannel in midiChannelList):
-                inst.autoAssignMidiChannel(usedChannels=midiChannelList)
+                try:
+                    inst.autoAssignMidiChannel(usedChannels=midiChannelList)
+                except exceptions21.InstrumentException as e:
+                    environLocal.warn(str(e))
             midiChannelList.append(inst.midiChannel)
             #environLocal.printDebug(['midiChannel list', midiChannelList])
 

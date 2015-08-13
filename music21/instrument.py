@@ -27,10 +27,11 @@ import sys
 from collections import OrderedDict
 
 from music21 import base
-from music21 import exceptions21
 from music21 import common
 from music21 import interval
 from music21 import pitch
+
+from music21.exceptions21 import InstrumentException
 
 from music21.ext import six
 
@@ -39,8 +40,6 @@ _MOD = "instrument.py"
 environLocal = environment.Environment(_MOD)
 
 
-class InstrumentException(exceptions21.Music21Exception):
-    pass
 
 
 def unbundleInstruments(streamIn, inPlace = False):
