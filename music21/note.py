@@ -986,19 +986,26 @@ class Note(NotRest):
         if other == None or not isinstance(other, Note):
             return False
         # checks pitch.octave, pitch.accidental, uses Pitch.__eq__
-        if self.pitch == other.pitch:
-            # checks type, dots, tuplets, quarterlength, uses Pitch.__eq__
-            if self.duration == other.duration:
-                # articulations are a list of Articulation objects
-                # converting to sets produces ordered cols that remove duplicate
-                # however, must then convert to list to match based on class ==
-                # not on class id()
-                if (sorted(list(set([x.classes[0] for x in self.articulations]))) ==
-                    sorted(list(set([x.classes[0] for x in other.articulations])))):
-                    # Tie objects if present compare only type
-                    if self.tie == other.tie:
-                        return True
-        return False
+        if self.pitch != other.pitch:
+            return False
+        # checks type, dots, tuplets, quarterlength, uses Pitch.__eq__
+        if self.duration != other.duration:
+            return False
+        # articulations are a list of Articulation objects
+        # converting to sets produces ordered cols that remove duplicate
+        # however, must then convert to list to match based on class ==
+        # not on class id()
+        if (sorted(list(set([x.classes[0] for x in self.articulations]))) !=
+            sorted(list(set([x.classes[0] for x in other.articulations])))):
+            return False
+        if (sorted(list(set([x.classes[0] for x in self.expressions]))) !=
+            sorted(list(set([x.classes[0] for x in other.expressions])))):
+            return False
+
+        # Tie objects if present compare only type
+        if self.tie != other.tie:
+            return False
+        return True
 
     def __ne__(self, other):
         '''Inequality.

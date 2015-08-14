@@ -1,4 +1,4 @@
-##!/usr/local/bin/python   
+##!/usr/bin/env python   
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
 # Name:          setup.py
@@ -7,8 +7,8 @@
 # Authors:       Christopher Ariza
 #                Michael Scott Cuthbert
 #
-# Copyright:     (c) 2009-2013 The music21 Project
-# License:       LGPL
+# Copyright:     (c) 2009-2015 The music21 Project
+# License:       LGPL or BSD
 #-------------------------------------------------------------------------------
 
 import os
