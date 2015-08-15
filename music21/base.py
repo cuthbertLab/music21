@@ -101,9 +101,12 @@ except ImportError:
 
 # used for better PNG processing in lily -- not very important
 #try:
-#    import Image
+#    from PIL import Image
 #except ImportError:
-#    _missingImport.append('PIL')
+#    try:
+#         import Image
+#    except ImportError:
+#        _missingImport.append('PIL')
 
 # as this is only needed for one module, and error messages print
 # to standard io, this has been removed

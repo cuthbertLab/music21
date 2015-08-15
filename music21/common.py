@@ -2369,7 +2369,9 @@ class SlottedObject(object):
 #     imp.find_module('Image')
 #     hasPIL = True
 # except ImportError:
-#     hasPIL = False
+#     imp.find_module('PIL')
+#     except ImportError:
+#         hasPIL = False
 # 
 # def cropImageFromPath(fp, newPath=None):
 #     '''
@@ -2382,7 +2384,10 @@ class SlottedObject(object):
 #     if newPath is None:
 #         newPath = fp
 #     if hasPIL:
-#         import Image, ImageChops # overhead of reimporting is low compared to imageops
+#         try: 
+#             from PIL import Image, ImageChops # overhead of reimporting is low compared to imageops
+#         except ImportError:
+#             import Image, ImageChops
 #         imageObj = Image.open(fp)
 #         imageBox = imageObj.getbbox()
 #         if imageBox:

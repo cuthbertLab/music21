@@ -39,11 +39,16 @@ environLocal = environment.Environment(_MOD)
 
 try:
     # optional imports for PIL
-    import Image
-    import ImageOps
+    from PIL import Image
+    from PIL import ImageOps
     noPIL = False
 except ImportError:
-    noPIL = True
+    try:
+        import Image
+        import ImageOps
+        noPIL = False
+    except ImportError:
+        noPIL = True
 
 from music21 import corpus
 
