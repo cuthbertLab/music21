@@ -22,7 +22,7 @@ the external modules.
 
 Note that on the Mac if you're using Python 2.7 (installed with recent operating
 systems), it comes with Matplotlib and its dependencies, so unless you need
-pyaudio or PIL, you're all set!.
+pyaudio or pillow/PIL, you're all set!.
 
 
 
@@ -59,22 +59,16 @@ pygame
 Allows for realtime MIDI performance.  We use it in the midi.realtime module, and nowhere else
 Not essential.
 
-Python Imaging Library (PIL)
+Python Imaging Library (pillow or PIL)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The Python Imaging Library provides resources for transforming 
+The Python Imaging Library (pillow; formerly PIL) 
+provides resources for transforming 
 and editing graphics files.  Without this library, the output from
 Lilypond is less good. Not essential.
 
-Windows 32-bit can download from:
-http://www.pythonware.com/products/pil
-
-Users of 64-bit windows will want to install from the site below.
-The paradox is that if you are using 64-bit windows but 32-bit Python
-(as most people will) you will probably want to download the 32-bit install
-(x86) rather than the 64-bit (AMD64).
-
-http://www.lfd.uci.edu/~gohlke/pythonlibs/
+On the command line type `pip install image` and you should get the latest version
+of pillow.
 
 
 PIL (which is only used in audiosearch and to make slightly better PNGs from

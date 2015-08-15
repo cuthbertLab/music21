@@ -104,7 +104,7 @@ class CallGraph:
         self.excludeList += ['difflib*','urlparse*', 'dateutil.*', 'calendar.*',]
         self.excludeList += ['zipfile*','io.*', 'collections.*', 'tempfile.*', 'urllib.*', 'StringIO*']
         self.excludeList += ['csv.*', 'json.*', 'os.*', 'distutils.*','ctypes*']
-        self.excludeList += ['FileDialog.*', 'Tk*', 'PIL*']
+        self.excludeList += ['FileDialog.*', 'Tk*', 'PIL*', 'tk*', 'pillow*']
         
         # these have been shown to be very fast
         self.excludeList += ['*xmlnode*', 'xml.dom.*', 'xml.sax.*', 'codecs.*']

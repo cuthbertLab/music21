@@ -7,20 +7,21 @@
 # Authors:      Jordi Bartolome
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-'''
-
-'''
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 from music21 import corpus
 from music21 import converter
 from music21 import exceptions21
 import threading
-import Queue as queue
-import Tkinter
+try:
+    import queue
+    import tkinter
+except ImportError:
+    import Queue as queue 
+    import Tkinter as tkinter
 import time
 import math
 
@@ -29,7 +30,11 @@ try:
     from PIL import Image as PILImage
     from PIL import ImageTk as PILImageTk
 except ImportError:
-    _missingImport.append('PIL')
+    try:
+        import Image as PILImage
+        import ImageTk as PILImageTk
+    except ImportError:
+        _missingImport.append('PIL')
 
 from music21 import environment
 _MOD = 'audioSearch/graphicalInterfaceSF.py'
@@ -58,7 +63,7 @@ class SFApp():
         if 'PIL' in _missingImport:
             raise exceptions21.Music21Exception("Need PIL installed to run Score Follower")
         self.master = master
-        self.frame = Tkinter.Frame(master)
+        self.frame = tkinter.Frame(master)
         self.master.wm_title("Score follower - music21")
         
         self.scoreNameSong = 'scores/d luca gloria_Page_'#'/Users/cuthbert/Desktop/scores/Saint-Saens-Clarinet-Sonata/Saint-Saens-Clarinet-Sonata_Page_'#C:\Users\Jordi\Desktop\m21\Saint-Saens-Clarinet-Sonata\Saint-Saens-Clarinet-Sonata\Saint-Saens-Clarinet-Sonata_Page_'#'scores/d luca gloria_Page_'##'scores/d luca gloria_Page_' #  #       
@@ -107,19 +112,19 @@ class SFApp():
         
     def filenameRequest(self):
         master = self.master
-        self.textVarName = Tkinter.StringVar()
-        self.box = Tkinter.Entry(master, width=2 * self.sizeButton, textvariable=self.textVarName)
+        self.textVarName = tkinter.StringVar()
+        self.box = tkinter.Entry(master, width=2 * self.sizeButton, textvariable=self.textVarName)
         self.textVarName.set(self.scoreNameSong)
         self.box.grid(row=0, column=3, columnspan=2)
                             
-        self.buttonSubmit = Tkinter.Button(master, text="Submit score name",
+        self.buttonSubmit = tkinter.Button(master, text="Submit score name",
                                            width=2 * self.sizeButton, command=self.startMainCanvas)
         self.buttonSubmit.grid(row=1, column=3, columnspan=2, padx=0)
                 
                 
-        self.textVar3 = Tkinter.StringVar()
+        self.textVar3 = tkinter.StringVar()
         self.textVar3.set('example: scores/d luca gloria_Page_') 
-        self.label3 = Tkinter.Label(master, width=3 * self.sizeButton, textvariable=self.textVar3)
+        self.label3 = tkinter.Label(master, width=3 * self.sizeButton, textvariable=self.textVar3)
         self.label3.grid(row=6, column=3, columnspan=2, rowspan=1)
     
     def startMainCanvas(self):
@@ -145,12 +150,12 @@ class SFApp():
             numberLength = len(str(self.totalPagesScore))
             namePage = '%s%s.%s' % (str(self.scoreNameSong), str(i + 1).zfill(numberLength), self.format)
             self.listNamePages.append(namePage)
-            pilPage = PILImage.open(namePage)
+            pilPage = PILImage.open(namePage) # @UndefinedVariable
             if pilPage.mode != "RGB":
                 pilPage = pilPage.convert("RGB")
             pilPage = self.cropBorder(pilPage)  
-            self.pagesScore.append(pilPage.resize(self.newSize, PILImage.ANTIALIAS))   
-            self.phimage.append(PILImageTk.PhotoImage(self.pagesScore[i]))   
+            self.pagesScore.append(pilPage.resize(self.newSize, PILImage.ANTIALIAS)) # @UndefinedVariable
+            self.phimage.append(PILImageTk.PhotoImage(self.pagesScore[i])) # @UndefinedVariable  
         environLocal.printDebug("initializeName finished")
                   
       
@@ -302,56 +307,56 @@ class SFApp():
         self.sizeCanvasx = 2 * self.x + self.separation
         self.sizeCanvasy = self.y    
         
-        self.canvas1 = Tkinter.Canvas(master, borderwidth=1, width=self.sizeCanvasx, height=self.sizeCanvasy, bg="black")
+        self.canvas1 = tkinter.Canvas(master, borderwidth=1, width=self.sizeCanvasx, height=self.sizeCanvasy, bg="black")
         self.canvas1.create_image(self.positionxLeft, self.positionyLeft, image=self.phimage[0], tag='leftImage')
         
         if self.totalPagesScore >= 2:
             self.canvas1.create_image(self.positionxRight, self.positionyRight, image=self.phimage[1], tag='rightImage')
         self.canvas1.grid(row=1, column=0, columnspan=3, rowspan=7)
 
-        self.textVarTitle = Tkinter.StringVar()
+        self.textVarTitle = tkinter.StringVar()
         self.textVarTitle.set('%s' % self.scoreNameSong) 
-        self.labelTitle = Tkinter.Label(master, textvariable=self.textVarTitle)
+        self.labelTitle = tkinter.Label(master, textvariable=self.textVarTitle)
         self.labelTitle.grid(row=0, column=1)
         
-        self.textVar2 = Tkinter.StringVar()
+        self.textVar2 = tkinter.StringVar()
         self.textVar2.set('Right page: %d/%d' % (self.currentLeftPage + 1, self.totalPagesScore)) 
-        self.label2 = Tkinter.Label(master, textvariable=self.textVar2)
-        self.label2.grid(row=0, column=2, sticky=Tkinter.E)
+        self.label2 = tkinter.Label(master, textvariable=self.textVar2)
+        self.label2.grid(row=0, column=2, sticky=tkinter.E)
         
-        self.textVar1 = Tkinter.StringVar()
+        self.textVar1 = tkinter.StringVar()
         self.textVar1.set('Left page: %d/%d' % (self.currentLeftPage, self.totalPagesScore))            
-        self.label1 = Tkinter.Label(master, textvariable=self.textVar1)
-        self.label1.grid(row=0, column=0, sticky=Tkinter.W)
+        self.label1 = tkinter.Label(master, textvariable=self.textVar1)
+        self.label1.grid(row=0, column=0, sticky=tkinter.W)
         
         self.textVar3.set('That is a good song! :)')
         
         if self.firstTime == True:
-            self.button2 = Tkinter.Button(master, text="START SF", width=self.sizeButton, command=self.startScoreFollower, bg='green')
+            self.button2 = tkinter.Button(master, text="START SF", width=self.sizeButton, command=self.startScoreFollower, bg='green')
             self.button2.grid(row=5, column=3)
             
-            self.button3 = Tkinter.Button(master, text="1st page", width=self.sizeButton, command=self.goTo1stPage)
+            self.button3 = tkinter.Button(master, text="1st page", width=self.sizeButton, command=self.goTo1stPage)
             self.button3.grid(row=4, column=3)
             
-            self.button3 = Tkinter.Button(master, text="Last page", width=self.sizeButton, command=self.goToLastPage)
+            self.button3 = tkinter.Button(master, text="Last page", width=self.sizeButton, command=self.goToLastPage)
             self.button3.grid(row=4, column=4)
             
-            self.button4 = Tkinter.Button(master, text="Forward", width=self.sizeButton, command=self.pageForward)
+            self.button4 = tkinter.Button(master, text="Forward", width=self.sizeButton, command=self.pageForward)
             self.button4.grid(row=3, column=4)
             
-            self.button7 = Tkinter.Button(master, text="Backward", width=self.sizeButton, command=self.pageBackward)
+            self.button7 = tkinter.Button(master, text="Backward", width=self.sizeButton, command=self.pageBackward)
             self.button7.grid(row=3, column=3)
             
-            self.button5 = Tkinter.Button(master, text="MOVE", width=self.sizeButton, command=self.moving, bg='beige')
+            self.button5 = tkinter.Button(master, text="MOVE", width=self.sizeButton, command=self.moving, bg='beige')
             self.button5.grid(row=2, column=3)
             
-            self.button6 = Tkinter.Button(master, text="STOP SF", width=self.sizeButton, command=self.stopScoreFollower, bg='red')
+            self.button6 = tkinter.Button(master, text="STOP SF", width=self.sizeButton, command=self.stopScoreFollower, bg='red')
             self.button6.grid(row=5, column=4)
                                 
-            self.textVarComments = Tkinter.StringVar()
+            self.textVarComments = tkinter.StringVar()
             self.textVarComments.set('Comments') 
-            self.label2 = Tkinter.Label(master, textvariable=self.textVarComments)
-            self.label2.grid(row=7, column=3, sticky=Tkinter.E)
+            self.label2 = tkinter.Label(master, textvariable=self.textVarComments)
+            self.label2.grid(row=7, column=3, sticky=tkinter.E)
             
             self.firstTime = False
         environLocal.printDebug("initializeGraphicInterface finished")
@@ -462,7 +467,7 @@ class SFApp():
        
     def startScoreFollower(self):
         environLocal.printDebug("startScoreFollower starting")
-        self.button2 = Tkinter.Button(self.master, text="START SF", width=self.sizeButton, command=self.startScoreFollower, state='disable', bg='green')
+        self.button2 = tkinter.Button(self.master, text="START SF", width=self.sizeButton, command=self.startScoreFollower, state='disable', bg='green')
         self.button2.grid(row=5, column=3)        
         scNotes = self.scorePart.flat.notesAndRests
         ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
@@ -526,7 +531,7 @@ class SFApp():
             environLocal.printDebug("stopped...")
 
             self.button2.destroy() 
-            self.button2 = Tkinter.Button(self.master, text="START SF", width=self.sizeButton, command=self.startScoreFollower, bg='green')
+            self.button2 = tkinter.Button(self.master, text="START SF", width=self.sizeButton, command=self.startScoreFollower, bg='green')
             self.button2.grid(row=5, column=3)
             self.textVarComments.set('END!! %s' % (self.rt.resultInThread))
 
@@ -657,6 +662,6 @@ class RecordThread(threading.Thread):
                
 
 if __name__ == "__main__":
-    root = Tkinter.Tk()
+    root = tkinter.Tk()
     sfapp = SFApp(root)
     root.mainloop()

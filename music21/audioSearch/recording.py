@@ -66,6 +66,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
         recordFormatDefault = pyaudio.paInt16
     except (ImportError, SystemExit):
         pyaudio = None
+        environLocal.warn("No Pyaudio found. Recording will probably not work.")
         recordFormatDefault = 8 # pyaudio.paInt16    
 
     if recordFormat is None:

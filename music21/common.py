@@ -2366,7 +2366,7 @@ class SlottedObject(object):
 #===============================================================================
 ### Removed because only used by MuseScore and newest versions have -T option...
 # try:
-#     imp.find_module('PIL')
+#     imp.find_module('Image')
 #     hasPIL = True
 # except ImportError:
 #     hasPIL = False
@@ -2382,7 +2382,7 @@ class SlottedObject(object):
 #     if newPath is None:
 #         newPath = fp
 #     if hasPIL:
-#         from PIL import Image, ImageChops # overhead of reimporting is low compared to imageops
+#         import Image, ImageChops # overhead of reimporting is low compared to imageops
 #         imageObj = Image.open(fp)
 #         imageBox = imageObj.getbbox()
 #         if imageBox:

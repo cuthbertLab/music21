@@ -39,8 +39,8 @@ environLocal = environment.Environment(_MOD)
 
 try:
     # optional imports for PIL
-    from PIL import Image
-    from PIL import ImageOps
+    import Image
+    import ImageOps
     noPIL = False
 except ImportError:
     noPIL = True
