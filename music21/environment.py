@@ -688,14 +688,9 @@ class _EnvironmentCore(object):
             else:
                 fileDescriptor.close()
         else:  # win
-            if sys.hexversion < 0x02030000:
-                raise EnvironmentException(
-                    'Need at least Version 2.3 on Windows to create temporary '
-                    'files!')
-            else:
-                tf = tempfile.NamedTemporaryFile(dir=rootDir, suffix=suffix)
-                filePath = tf.name
-                tf.close()
+            tf = tempfile.NamedTemporaryFile(dir=rootDir, suffix=suffix)
+            filePath = tf.name
+            tf.close()
         #self.printDebug([_MOD, 'temporary file:', filePath])
         return filePath
 
