@@ -2299,7 +2299,7 @@ class SlottedObject(object):
     >>> import pickle
     >>> class Glissdata(common.SlottedObject):
     ...     __slots__ = ('time', 'frequency')
-    >>> s = Glissdata
+    >>> s = Glissdata()
     >>> s.time = 0.125
     >>> s.frequency = 440.0
     >>> #_DOCS_SHOW out = pickle.dumps(s)
@@ -2307,6 +2307,19 @@ class SlottedObject(object):
     >>> t = s #_DOCS_HIDE -- cannot define classes for pickling in doctests
     >>> t.time, t.frequency
     (0.125, 440.0)
+
+    OMIT_FROM_DOCS
+    
+    >>> class BadSubclass(Glissdata):
+    ...     pass
+    
+    >>> bsc = BadSubclass()
+    >>> bsc.amplitude = 2
+    >>> #_DOCS_SHOW out = pickle.dumps(bsc)
+    >>> #_DOCS_SHOW t = pickle.loads(out)
+    >>> t = s #_DOCS_HIDE -- cannot define classes for pickling in doctests
+    >>> t.amplitude
+    2
     '''
     
     ### CLASS VARIABLES ###
@@ -2316,7 +2329,10 @@ class SlottedObject(object):
     ### SPECIAL METHODS ###
 
     def __getstate__(self):
-        state = {}
+        if getattr(self, '__dict__', None) is not None:
+            state = getattr(self, '__dict__').copy()
+        else:
+            state = {}
         slots = set()
         for cls in self.__class__.mro():
             slots.update(getattr(cls, '__slots__', ()))
