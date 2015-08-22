@@ -2317,7 +2317,7 @@ class SlottedObject(object):
     >>> bsc.amplitude = 2
     >>> #_DOCS_SHOW out = pickle.dumps(bsc)
     >>> #_DOCS_SHOW t = pickle.loads(out)
-    >>> t = s #_DOCS_HIDE -- cannot define classes for pickling in doctests
+    >>> t = bsc #_DOCS_HIDE -- cannot define classes for pickling in doctests
     >>> t.amplitude
     2
     '''
