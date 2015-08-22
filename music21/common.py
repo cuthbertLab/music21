@@ -469,7 +469,7 @@ DENOM_LIMIT = defaults.limitOffsetDenominator
 
 def _preFracLimitDenominator(n, d):
     '''
-    copied from fractions.limit_denominator.  Their method
+    Copied from fractions.limit_denominator.  Their method
     requires creating three new Fraction instances to get one back. this doesn't create any
     call before Fraction...
     
@@ -563,6 +563,10 @@ def opFrac(num):
     Code Completion easily. That is to say, this function has been set up to be used, so please
     use it.
     
+    This is a performance critical operation. Do not alter it in any way without running
+    many timing tests.
+    
+    
     >>> from fractions import Fraction
     >>> defaults.limitOffsetDenominator
     65535
@@ -595,7 +599,7 @@ def opFrac(num):
         # which is a nice test, but denominator here is always a power of two...
         #unused_numerator, denominator = num.as_integer_ratio() # too slow
         ir = num.as_integer_ratio()
-        if ir[1] > DENOM_LIMIT: # slightly faster than hardcoding 65535!
+        if ir[1] > DENOM_LIMIT: # slightly faster[SIC!] than hardcoding 65535!
             return Fraction(*_preFracLimitDenominator(*ir)) # way faster!
             #return Fraction(*ir).limit_denominator(DENOM_LIMIT) # *ir instead of float -- this happens
                 # internally in Fraction constructor, but is twice as fast...
@@ -750,15 +754,16 @@ def almostEquals(x, y = 0.0, grain=1e-7):
 
 def nearestCommonFraction(x, grain=1e-2):
     '''Given a value that suggests a floating point fraction, like .33,
-    return a float that provides greater specification, such as .333333333
+    return a Fraction or float that provides greater specification, such as .333333333
 
-    >>> common.nearestCommonFraction(.333) == 1/3.
-    True
-    >>> common.nearestCommonFraction(.33) == 1/3.
-    True
-    >>> common.nearestCommonFraction(.35) == 1/3.
+    >>> import fractions
+    >>> common.nearestCommonFraction(.333)
+    Fraction(1, 3)
+    >>> common.nearestCommonFraction(.33)
+    Fraction(1, 3)
+    >>> common.nearestCommonFraction(.35) == fractions.Fraction(1, 3)
     False
-    >>> common.nearestCommonFraction(.2) == .2
+    >>> common.nearestCommonFraction(.2) == 0.2
     True
     >>> common.nearestCommonFraction(.125)
     0.125
@@ -768,46 +773,12 @@ def nearestCommonFraction(x, grain=1e-2):
     if isStr(x):
         x = float(x)
 
-    values = [1/3., 2/3.,
-              1/6., 5/6.]
+    values = (1/3., 2/3.,
+              1/6., 5/6.)
     for v in values:
         if almostEquals(x, v, grain=grain):
-            return v
+            return opFrac(v)
     return x
-
-
-def greaterThanOrEqual(x, y=0.0, grain=1e-7):
-    '''
-    greaterThan returns True if x is greater than or almostEquals y
-    
-    :rtype: bool
-    '''
-    if x > y or almostEquals(x, y, grain):
-        return True
-    return False
-
-
-def lessThan(x, y = 0.0, grain=1e-7):
-    '''
-    lessThan -- returns True if x is less than and not almostEquals y
-
-
-    >>> common.lessThan(5, 4)
-    False
-    >>> common.lessThan(5.2, 5.5)
-    True
-    >>> common.lessThan(5.2, 5.5, grain=1)
-    False
-    >>> common.lessThan(5.000000000005, 5.000000000006)
-    False
-    >>> common.lessThan(5.000000000006, 5.000000000005)
-    False
-
-    :rtype: bool
-    '''
-    if x > y or almostEquals(x, y, grain):
-        return False
-    return True
 
 
 def nearestMultiple(n, unit):

@@ -201,11 +201,15 @@ def mainTest(*testClasses, **kwargs):
         else:
             for di in defaultImports:
                 globs = __import__(di).__dict__.copy()
-        s1 = doctest.DocTestSuite(
-            '__main__',
-            globs=globs,
-            optionflags=optionflags,
-            )
+        try:
+            s1 = doctest.DocTestSuite(
+                '__main__',
+                globs=globs,
+                optionflags=optionflags,
+                )
+        except ValueError: # no docstrings
+            s1 = unittest.TestSuite()
+
 
     verbosity = 1
     if 'verbose' in testClasses or 'verbose' in sys.argv or bool(kwargs.get('verbose', False)):

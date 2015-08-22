@@ -2819,7 +2819,7 @@ class Test(unittest.TestCase):
 
 
     def testMeasureBarDurationProportion(self):
-        
+        from fractions import Fraction
         from music21 import stream
 
         m = stream.Measure()
@@ -2829,8 +2829,8 @@ class Test(unittest.TestCase):
         m.append(copy.deepcopy(n))
 
         self.assertEqual(m.notes[0].offset, 0)
-        self.assertAlmostEqual(m.barDurationProportion(), .333333, 4)
-        self.assertAlmostEqual(m.barDuration.quarterLength, 3, 4)
+        self.assertEqual(m.barDurationProportion(), Fraction(1, 3), 4)
+        self.assertEqual(m.barDuration.quarterLength, 3, 4)
 
 # temporarily commented out
 #         m.shiftElementsAsAnacrusis()
@@ -2850,7 +2850,7 @@ class Test(unittest.TestCase):
         m.append(n1)
         m.append(n2)
 
-        self.assertAlmostEqual(m.barDurationProportion(), .4, 4)
+        self.assertEqual(m.barDurationProportion(), Fraction(2, 5), 4)
         self.assertEqual(m.barDuration.quarterLength, 5.0)
 
 #         m.shiftElementsAsAnacrusis()

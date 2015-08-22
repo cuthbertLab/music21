@@ -22,7 +22,14 @@ the external modules.
 
 Note that on the Mac if you're using Python 2.7 (installed with recent operating
 systems), it comes with Matplotlib and its dependencies, so unless you need
-pyaudio or pillow/PIL, you're all set!.
+pyaudio or pillow/PIL, you're all set!
+
+For installing the majority of dependencies at once or for Python 3.4, 
+there are two good solutions: either use the Anaconda python installation or 
+on Mac follow Dave Hofmann's instructions for using homebrew.
+
+Anaconda: http://continuum.io/downloads#py34
+Homebrew: http://www.davehofmann.de/?p=244
 
 
 

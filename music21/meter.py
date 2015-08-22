@@ -2309,7 +2309,7 @@ class MeterSequence(MeterTerminal):
         match = None
         for i in range(len(self)):
             start = qPos
-            end = qPos + self[i].duration.quarterLength
+            end = opFrac(qPos + self[i].duration.quarterLength)
             # if adjoing ends are permitted, first match is found
             if includeCoincidentBoundaries:
                 if qLenPos >= start and qLenPos <= end:
@@ -2318,12 +2318,10 @@ class MeterSequence(MeterTerminal):
             else:
                 # note that this is >=, meaning that the first boundary
                 # is coincident
-                if (common.greaterThanOrEqual(qLenPos, start) and
-                    common.lessThan(qLenPos, end)):
-#                if qLenPos >= start and qLenPos < end:
+                if qLenPos >= start and qLenPos < end:
                     match = i
                     break
-            qPos += self[i].duration.quarterLength
+            qPos = opFrac(qPos + self[i].duration.quarterLength)
         return match
 
     def offsetToAddress(self, qLenPos, includeCoincidentBoundaries=False):
@@ -2444,9 +2442,9 @@ class MeterSequence(MeterTerminal):
 
         >>> a = meter.MeterSequence('3/4', 3)
         >>> a.offsetToWeight(0.0)
-        0.3333333333333333...
+        Fraction(1, 3)
         >>> a.offsetToWeight(1.5)
-        0.3333333333333333...
+        Fraction(1, 3)
 
         ??? Not sure what this does...
         '''
@@ -2454,7 +2452,7 @@ class MeterSequence(MeterTerminal):
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
             raise MeterException('cannot access qLenPos %s when total duration is %s and ts is %s' % (qLenPos, self.duration.quarterLength, self))
         iMatch = self.offsetToIndex(qLenPos)
-        return self[iMatch].weight
+        return opFrac(self[iMatch].weight)
 
     def offsetToDepth(self, qLenPos, align='quantize'):
         '''
@@ -3535,9 +3533,9 @@ class TimeSignature(base.Music21Object):
                     pos += dur.quarterLength
                     continue
 
-                start = pos
-                end = pos + dur.quarterLength
-                startNext = pos + dur.quarterLength
+                start = opFrac(pos)
+                end = opFrac(pos + dur.quarterLength)
+                startNext = opFrac(pos + dur.quarterLength)
                 #endPrevious = pos
 
                 if i == len(durList) - 1: # last
@@ -3613,8 +3611,7 @@ class TimeSignature(base.Music21Object):
                     elif beamNext is None and beamNumber > 1:
                         beamType = 'partial-left'
 
-                    elif (common.greaterThanOrEqual(startNext,
-                        archetypeSpan[1])):
+                    elif startNext >= archetypeSpan[1]:
                         # case of where we need a partial left:
                         # if the next start value is outside of this span (or at the
                         # the greater boundary of this span), and we did not have a
@@ -3644,11 +3641,7 @@ class TimeSignature(base.Music21Object):
                       beamNumber in beamPrevious.getNumbers() and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left'] and
                       beamNext is None):
                     beamType = 'partial-left'  # will be deleted later in the script
-
-
-
-
-
+                    
                 # if no beam is defined next (we know this already)
                 # then must stop
                 elif (beamNext is None or
@@ -3662,15 +3655,13 @@ class TimeSignature(base.Music21Object):
                 # as this one.
                 # if endNext is outside of the archetype span,
                 # not sure what to do
-                # use common.lessThan to avoid floating point noise
-                elif common.lessThan(startNext, archetypeSpan[1]):
+                elif startNext < archetypeSpan[1]:
                     #environLocal.printDebug(['continue match: durtype, startNext, archetypeSpan', dur.type, startNext, archetypeSpan])
                     beamType = 'continue'
 
                 # we stop if the next beam is not in the same beaming archetype
                 # and (as shown above) a valid beam number is not previous
-                # use common to avoid floating point noise
-                elif common.greaterThanOrEqual(startNext, archetypeSpanNext[0]):
+                elif startNext >= archetypeSpanNext[0]:
                     beamType = 'stop'
 
                 else:
@@ -3698,7 +3689,6 @@ class TimeSignature(base.Music21Object):
             if 'start' not in allTypes and 'stop' not in allTypes and 'continue' not in allTypes:
                 # nothing but partials
                 beamsList[i] = None
-
 
         return beamsList
 
@@ -4021,6 +4011,7 @@ class TimeSignature(base.Music21Object):
         beatInt, beatFraction = divmod(beat, 1)
         beatInt = int(beatInt) # convert to integer
         # resolve .33 to .3333333
+        # TODO -- REMOVE -- require CORRECT beats as Fractions
         beatFraction = common.nearestCommonFraction(beatFraction)
 
         if beatInt-1 > len(self.beatSequence)-1:

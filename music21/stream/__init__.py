@@ -2092,7 +2092,9 @@ class Stream(base.Music21Object):
         similar functionality for Streams.
 
         Most arguments are passed to Music21Object.splitAtQuarterLength.
+        
         '''
+        quarterLength = opFrac(quarterLength)
         if retainOrigin == True:
             sLeft = self
         else:
@@ -2128,8 +2130,7 @@ class Stream(base.Music21Object):
         # find all those that need to split v. those that need to be movewd
         for t in targets:
             # if target starts before the boundary, it needs to be split
-            if common.lessThan(t.getOffsetBySite(sLeft), quarterLength,
-                grain=delta):
+            if t.getOffsetBySite(sLeft) < quarterLength:
                 targetSplit.append(t)
             else:
                 targetMove.append(t)
@@ -11265,21 +11266,21 @@ class Measure(Stream):
         >>> n.quarterLength = 1
         >>> m.append(copy.deepcopy(n))
         >>> m.barDurationProportion()
-        0.33333...
+        Fraction(1, 3)
         >>> m.append(copy.deepcopy(n))
         >>> m.barDurationProportion()
-        0.66666...
+        Fraction(2, 3)
         >>> m.append(copy.deepcopy(n))
         >>> m.barDurationProportion()
         1.0
         >>> m.append(copy.deepcopy(n))
         >>> m.barDurationProportion()
-        1.33333...
+        Fraction(4, 3)
         '''
         # passing a barDuration may save time in the lookup process
         if barDuration is None:
             barDuration = self.barDuration
-        return self.highestTime / barDuration.quarterLength
+        return opFrac(self.highestTime / barDuration.quarterLength)
 
     def padAsAnacrusis(self):
         '''
@@ -11309,10 +11310,10 @@ class Measure(Stream):
         # may not be the same as Stream duration, which is based on contents
         barDuration = self.barDuration
         proportion = self.barDurationProportion(barDuration=barDuration)
-        if proportion < 1.:
+        if proportion < 1:
             # get 1 complement
             proportionShift = 1 - proportion
-            self.paddingLeft = barDuration.quarterLength * proportionShift
+            self.paddingLeft = opFrac(barDuration.quarterLength * proportionShift)
 
             #shift = barDuration.quarterLength * proportionShift
             #environLocal.printDebug(['got anacrusis shift:', shift,

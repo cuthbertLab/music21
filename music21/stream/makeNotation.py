@@ -1132,7 +1132,7 @@ def makeTupletBrackets(s, inPlace=False):
 
         if tupletObj is not None:
 #            thisNormalType = tuplet.durationNormal.type
-            completionCount += durationUnit.quarterLength
+            completionCount = opFrac(completionCount + durationUnit.quarterLength)
             # if previous tuplet is None, always start
             # always reset completion target
             if tupletPrevious is None or completionTarget is None:
@@ -1154,9 +1154,7 @@ def makeTupletBrackets(s, inPlace=False):
 
             # this, below, is optional:
             # if next normal type is not the same as this one, also stop
-            # common.greaterThanOrEqual uses is >= w/ almost equals
-            elif (tupletNext is None or
-                common.greaterThanOrEqual(completionCount, completionTarget)):
+            elif (tupletNext is None or completionCount >= completionTarget):
                 tupletObj.type = 'stop'
                 completionTarget = None # reset
                 completionCount = 0 # reset
