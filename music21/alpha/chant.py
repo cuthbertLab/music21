@@ -5,9 +5,19 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 15 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
+'''
+``ALPHA MODULE``: Not directly supported by cuthbertLab.
+
+Classes and Tools for converting Music21 Streams to Gregorio .gabc
+
+Requires the amazing Gregoio library: http://gregorio-project.github.io , which itself
+requires LaTeX. (MacTeX, etc.; I suggest Basic TeX instead of the full MacTeX for this,
+since it's only 100MB instead of 2.5GB)
+'''
+
 
 from __future__ import unicode_literals
 
@@ -41,9 +51,9 @@ def fromStream(inputStream):
 class GregorianStream(stream.Stream):
     r'''
     
-    >>> s = chant.GregorianStream()
+    >>> s = alpha.chant.GregorianStream()
     >>> s.append(clef.AltoClef())
-    >>> n = chant.GregorianNote("C4")
+    >>> n = alpha.chant.GregorianNote("C4")
     >>> l = note.Lyric("Po")
     >>> l.syllabic = "start"
     >>> n.lyrics.append(l)
@@ -81,7 +91,7 @@ class GregorianStream(stream.Stream):
         return outLine
     def clefToGABC(self, clefIn):
         '''
-        >>> s = chant.GregorianStream()
+        >>> s = alpha.chant.GregorianStream()
         >>> c = clef.AltoClef()
         >>> s.clefToGABC(c)
         u'(c3)'  
@@ -102,7 +112,7 @@ class GregorianNote(note.Note):
     Example: a very special note.
     
     
-    >>> n = chant.GregorianNote("C4")
+    >>> n = alpha.chant.GregorianNote("C4")
     >>> n.liquescent = True 
     >>> n.quilisma = True
     >>> n.basicShape = 'virga'  # default: punctus
@@ -206,7 +216,7 @@ class GregorianNote(note.Note):
        
         
         
-        >>> n = chant.GregorianNote("C4")
+        >>> n = alpha.chant.GregorianNote("C4")
         >>> c = clef.AltoClef()
         >>> n.toBasicGABC(c)
         u'h'
@@ -271,7 +281,7 @@ class GregorianNote(note.Note):
     See the docs for Gregorio for graphical representations of these figures.
     
     
-    >>> n = chant.GregorianNote("D3")
+    >>> n = alpha.chant.GregorianNote("D3")
     >>> n.fill
     u'solid'
     >>> n.fill = 'cavum'
@@ -320,7 +330,7 @@ class BaseScoreConverter(object):
     def writeFile(self, text=None):
         '''
         
-        >>> bsc = chant.BaseScoreConverter()
+        >>> bsc = alpha.chant.BaseScoreConverter()
         >>> filePath = bsc.writeFile('hello')
         >>> assert(filePath.endswith('.gabc')) #_DOCS_HIDE
         >>> filePath = u'/var/folders/k9/85ztxmy53xg1qxvr0brw1zyr0000gn/T/music21/tmpekHFCr.gabc' #_DOCS_HIDE
@@ -343,7 +353,7 @@ class BaseScoreConverter(object):
         converts a .gabc file to LaTeX using the
         gregorio converter.  Returns the filename with .tex substituted for .gabc
         
-        >>> bsc = chant.BaseScoreConverter()
+        >>> bsc = alpha.chant.BaseScoreConverter()
         >>> #_DOCS_SHOW newFp = bsc.launchGregorio('~cuthbert/Library/Gregorio/examples/Populas.gabc')
         >>> #_DOCS_SHOW bsc.gregorioCommand
         >>> u'open -a"/usr/local/bin/gregorio"  ~cuthbert/Library/Gregorio/examples/Populas.gabc' #_DOCS_HIDE
@@ -455,7 +465,7 @@ SCOREGOESHERE
         Puts the correct information into the TeXWrapper for the document
         
         
-        >>> wrapper = chant.DefaultTeXWrapper()
+        >>> wrapper = alpha.chant.DefaultTeXWrapper()
         >>> class Converter():
         ...    score = r'\note{C}' + "\n" + r'\endgregorioscore %' + "\n" + r'\endinput %'
         ...    incipit = 'Gaudeamus Omnes'

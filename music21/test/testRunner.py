@@ -207,7 +207,8 @@ def mainTest(*testClasses, **kwargs):
                 globs=globs,
                 optionflags=optionflags,
                 )
-        except ValueError: # no docstrings
+        except ValueError as ve: # no docstrings
+            print("Problem in docstrings [usually a missing r value before the quotes:] {0}".format(str(ve)))
             s1 = unittest.TestSuite()
 
 

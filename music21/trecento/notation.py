@@ -51,7 +51,7 @@ _validDivisiones = {
 
 class ClefToken(tinyNotation.Token):
     def parse(self, parent):
-        from music21 import medren
+        from music21.alpha import medren
         t = self.token
         menclef = medren.MensuralClef(t[1])
         if len(t) > 2:
@@ -71,7 +71,7 @@ class LigatureState(tinyNotation.State):
     defines that the notes in here will be in a ligature
     '''
     def start(self):
-        from music21 import medren
+        from music21.alpha import medren
         self.ligature = medren.Ligature()
         self.ligature.state = self
         self.obliqueNums = []
@@ -320,11 +320,11 @@ class TrecentoTinyConverter(tinyNotation.Converter):
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.meter.TimeSignature 4/4>
-            {0.0} <music21.medren.Ligature object at 0x...>
+            {0.0} <music21...medren.Ligature object at 0x...>
             {0.0} <music21.bar.Barline style=final>
         >>> tTNN = ts.flat.getElementsByClass('Ligature')[0]
         >>> tTNN
-        <music21.medren.Ligature...>
+        <music21...medren.Ligature...>
         >>> [str(p) for p in tTNN.pitches]
         ['F4', 'G4', 'A4', 'G4', 'F4', 'C4']
 
@@ -380,12 +380,12 @@ class TrecentoTinyConverter(tinyNotation.Converter):
         {0.0} <music21.bar.Barline style=final>
         {0.0} <music21.clef.MensuralClef>
         {0.0} <music21.trecento.notation.Divisione .p.>
-        {0.0} <music21.medren.MensuralNote semibrevis C>
-        {0.0} <music21.medren.MensuralNote semibrevis D>
-        {0.0} <music21.medren.MensuralNote semibrevis E>
+        {0.0} <music21...medren.MensuralNote semibrevis C>
+        {0.0} <music21...medren.MensuralNote semibrevis D>
+        {0.0} <music21...medren.MensuralNote semibrevis E>
         {0.0} <music21.trecento.notation.Punctus...>
-        {0.0} <music21.medren.MensuralNote brevis D>
-        {0.0} <music21.medren.Ligature...>
+        {0.0} <music21...medren.MensuralNote brevis D>
+        {0.0} <music21...medren.Ligature...>
 
     '''
 
@@ -416,7 +416,7 @@ class TrecentoTinyConverter(tinyNotation.Converter):
 
 class TrecentoRestToken(tinyNotation.RestToken):
     def parse(self, parent):
-        from music21 import medren
+        from music21.alpha import medren
         r = medren.MensuralRest()  # to-do -- affect..
         r.mensuralType = parent.stateDict['previousMensuralType']
 
@@ -425,7 +425,7 @@ class TrecentoNoteToken(tinyNotation.NoteToken):
     For documentation please see :class:`music21.trecento.notation.TrecentoTinyConverter`.
     '''
     def parse(self, parent):
-        from music21 import medren
+        from music21.alpha import medren
         n = medren.MensuralNote()
         self.getPitch(n, self.token)
         n.mensuralType = parent.stateDict['previousMensuralType']
@@ -578,7 +578,7 @@ def convertTrecentoStream(inpStream, inpDiv = None):
         :width: 600
 
     '''
-    from music21 import medren
+    from music21.alpha import medren
 
     div = inpDiv
     offset = 0
@@ -795,21 +795,16 @@ class BrevisLengthTranslator(object):
         and see that the second is more logical.  Note that the strength itself is meaningless
         except when compared to other possible lengths for the same notes.
 
-        ::
+        >>> from music21.alpha import medren
 
-            >>> from music21 import medren, trecento
-
-            >>> div = trecento.notation.Divisione('.n.')
-            >>> names = ['SB', 'M', 'M', 'M', 'SB']
-            >>> BL = [medren.MensuralNote('A', n) for n in names]
-            >>> TBL = trecento.notation.BrevisLengthTranslator(div, BL)
-            >>> TBL.getBreveStrength([2.0, 1.0, 1.0, 1.0, 4.0])
-            2.0555...
-
-        ::
-
-            >>> TBL.getBreveStrength([3.0, 1.0, 1.0, 1.0, 3.0])
-            2.8333...
+        >>> div = trecento.notation.Divisione('.n.')
+        >>> names = ['SB', 'M', 'M', 'M', 'SB']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> TBL = trecento.notation.BrevisLengthTranslator(div, BL)
+        >>> TBL.getBreveStrength([2.0, 1.0, 1.0, 1.0, 4.0])
+        2.0555...
+        >>> TBL.getBreveStrength([3.0, 1.0, 1.0, 1.0, 3.0])
+        2.8333...
 
         '''
         div = self.div
@@ -861,7 +856,7 @@ class BrevisLengthTranslator(object):
 
         strength -= abs(div.minimaPerBrevis - curBeat)
 
-        from music21 import medren
+        from music21.alpha import medren
         for i, item in enumerate(self.brevisLength):
             if isinstance(item, medren.MensuralNote) and (not 'down' in item.getStems()) and (lengths[i] > lastSBLen):
                 strength = 0
@@ -880,16 +875,14 @@ class BrevisLengthTranslator(object):
         :param lenRem: input of the remaining SM in the measure. Gets updated and returned.
         :param shrinkable_indices: tuple of indices of elements able to take up slack (i.e. ending SB, or downstem SB)
 
-        ::
+        >>> from music21.alpha import medren
 
-            >>> from music21 import medren, trecento
-
-            >>> div = trecento.notation.Divisione('.n.')
-            >>> names = ['SB', 'M', 'M', 'M', 'SB']
-            >>> BL = [medren.MensuralNote('A', n) for n in names]
-            >>> TBL = trecento.notation.BrevisLengthTranslator(div, BL)
-            >>> TBL.determineStrongestMeasureLengths([2.0, 1.0, 1.0, 1.0, 4.0], ([0],), (1,), (1.0,), 0.0, shrinkable_indices = (-1,))
-            ([3.0, 1.0, 1.0, 1.0, 3.0], 0.0)
+        >>> div = trecento.notation.Divisione('.n.')
+        >>> names = ['SB', 'M', 'M', 'M', 'SB']
+        >>> BL = [medren.MensuralNote('A', n) for n in names]
+        >>> TBL = trecento.notation.BrevisLengthTranslator(div, BL)
+        >>> TBL.determineStrongestMeasureLengths([2.0, 1.0, 1.0, 1.0, 4.0], ([0],), (1,), (1.0,), 0.0, shrinkable_indices = (-1,))
+        ([3.0, 1.0, 1.0, 1.0, 3.0], 0.0)
 
         '''
 
@@ -943,7 +936,7 @@ class BrevisLengthTranslator(object):
         cannot be determined without taking into account the context (e.g., semiminims, semibreves)
         then None is placed in that list.
         
-        >>> from music21 import medren, trecento
+        >>> from music21.alpha import medren
 
         >>> div = trecento.notation.Divisione('.i.')
         >>> names = ['SB', 'M','SB']
@@ -1019,7 +1012,7 @@ class BrevisLengthTranslator(object):
         and the values are a list of indices in self.brevisLength (and unchangeableNoteLengthsList)
         which are those types...
 
-        >>> from music21 import medren, trecento
+        >>> from music21.alpha import medren
 
         >>> div = trecento.notation.Divisione('.n.')
         >>> names = ['SB', 'M', 'M', 'M', 'SB', 'M']
@@ -1147,7 +1140,7 @@ class BrevisLengthTranslator(object):
     def translateDivI(self, unchangeableNoteLengthsList=None, unknownLengthsDict=None, minRem=None):
         '''
 
-        >>> from music21 import medren, trecento
+        >>> from music21.alpha import medren
 
         >>> div = trecento.notation.Divisione('.i.')
         >>> names = ['SB', 'M', 'SB']
@@ -1204,6 +1197,8 @@ class BrevisLengthTranslator(object):
         '''
         Translate the Novanaria (9) Divisio; returns the number of minims for each note.
         
+        >>> from music21.alpha import medren
+
         >>> div = trecento.notation.Divisione('.n.')
         >>> names = ['SB', 'M', 'M', 'M', 'SB', 'M']
         >>> BL = [medren.MensuralNote('A', n) for n in names]
@@ -1336,6 +1331,8 @@ class BrevisLengthTranslator(object):
         '''
         Translates P and Q (6 and 4)
 
+        >>> from music21.alpha import medren
+        
         >>> div = trecento.notation.Divisione('.q.')
         >>> names = ['SB','SB']
         >>> BL = [medren.MensuralNote('A', n) for n in names]
@@ -1571,6 +1568,8 @@ class BrevisLengthTranslator(object):
         '''
         Translates the octonaria and duodenaria divisions
 
+        >>> from music21.alpha import medren
+
         >>> divO = trecento.notation.Divisione('.o.')
         >>> names = ['SB', 'SB', 'SB']
         >>> BL = [medren.MensuralNote('A', n) for n in names]
@@ -1759,7 +1758,7 @@ class BrevisLengthTranslator(object):
                             shrink_tup += semibrevis_downstem_index,
 
                     else: #downstems >= 2
-                        from music21 import medren
+                        from music21.alpha import medren
                         newMensuralBL = [medren.MensuralNote('A', 'SB') for i in range(len(semibrevis_downstem))]
 
                         newDiv = Divisione('.d.')
@@ -1856,8 +1855,8 @@ class TrecentoNotationException(exceptions21.Music21Exception):
 class TestExternal(unittest.TestCase):
 
     def testTinyTrecentoStream(self):
-        from music21 import trecento, medren
-        from music21 import text
+        from music21.alpha import medren
+        from music21 import text, trecento
     
         SePerDureca = stream.Score()
         TinySePerDureca = stream.Score()

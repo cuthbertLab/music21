@@ -53,6 +53,7 @@ __all__ = [
     'sites', # important 
     # sub folders
     'abcFormat', 
+    'alpha',
     'analysis', 
     'audioSearch',
     'braille', 
@@ -90,13 +91,11 @@ __all__ = [
     'bar',
     # base listed above
     'beam', 
-    'chant',
     'chord',
     'chordTables', 
     'clef',
     'common',
     'configure',
-    'contour',
     'converter',
     'defaults',
     'derivation',
@@ -114,7 +113,6 @@ __all__ = [
     'intervalNetwork', 
     'key', 
     'layout',
-    'medren',
     'metadata',
     'meter', 
     'note', 

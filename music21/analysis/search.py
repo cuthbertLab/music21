@@ -34,17 +34,24 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
         stepSize=1, comparisonAttribute='name',   
         repeatsAllowed=True, restsAllowed=False):
     '''
-    Given a pitch source and a concrete scale, return references to all elements found that represent consecutive scale segments in one direction. 
+    Given a pitch source and a concrete scale, return references to all 
+    elements found that represent consecutive scale segments in one direction. 
 
     The `targetScale` is a concrete scale instance.
 
-    The `degreesRequired` specifies how many consecutive scale degrees are required for grouping. Note that if more are found, the will continue to be gathered until a break is found.
+    The `degreesRequired` specifies how many consecutive scale degrees 
+    are required for grouping. Note that if more are found, the will 
+    continue to be gathered until a break is found.
 
     The `stepSize` determines what scale step size is examined
 
-    The `comparisonAttribute` is the Pitch class attribute used for all pitch comparisons; this can be used to force enharmonic comparison ('name'), pitch space comparison ('nameWithOctave') or permit pitch class matching ('pitchClass'). 
+    The `comparisonAttribute` is the Pitch class attribute used 
+    for all pitch comparisons; this can be used to force enharmonic 
+    comparison ('name'), pitch space comparison ('nameWithOctave') or 
+    permit pitch class matching ('pitchClass'). 
 
-    If `repeatsAllowed` is True, repeated Pitches will be counted as part of the consecutive segment.
+    If `repeatsAllowed` is True, repeated Pitches will be counted as 
+    part of the consecutive segment.
 
     If `restsAllowed` is True, rests will not interrupt a consecutive segment. 
     '''

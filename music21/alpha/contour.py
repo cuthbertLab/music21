@@ -103,7 +103,7 @@ class ContourFinder(object):
         
         >>> metric = lambda s: len(s.measureOffsetMap())
         >>> c = corpus.parse('bwv10.7')
-        >>> res = contour.ContourFinder(c).getContourValuesForMetric(metric, 3, 2, False)
+        >>> res = alpha.contour.ContourFinder(c).getContourValuesForMetric(metric, 3, 2, False)
         
         >>> resList = sorted(list(res.keys()))
         >>> resList
@@ -166,7 +166,7 @@ class ContourFinder(object):
         
         ::
 
-            >>> cf = contour.ContourFinder( corpus.parse('bwv10.7'))
+            >>> cf = alpha.contour.ContourFinder( corpus.parse('bwv10.7'))
             >>> mycontour = cf.getContour('dissonance')
             >>> [mycontour[x] for x in sorted(mycontour.keys())]
             [0.0, 0.25, 0.5, 0.5, 0.0, 0.0, 0.25, 0.75, 0.0, 0.0, 0.5, 0.75, 0.75, 0.0, 0.5, 0.5, 0.5, 0.5, 0.75, 0.75, 0.75, 0.0]
@@ -264,7 +264,7 @@ class ContourFinder(object):
         
         >>> mycontour = { 0.0: 1.0, 3.0: 0.5, 6.0: 0.8, 9.0: 0.3, 12.0: 0.15, 
         ...            15.0: 0.13, 18.0: 0.4, 21.0: 0.6 }
-        >>> res = contour.ContourFinder()._normalizeContour(mycontour, 100)
+        >>> res = alpha.contour.ContourFinder()._normalizeContour(mycontour, 100)
         >>> resKeys = list(res.keys())
         >>> resKeys.sort()
         >>> contourKeys = list(mycontour.keys())
@@ -298,18 +298,18 @@ class ContourFinder(object):
         return res
         
     #TODO: give same args as getContour, maybe? Also, test this.
-    def plot(self, cType, contour=None, regression=True, order=4, title='Contour Plot', fileName=None):
+    def plot(self, cType, contourIn=None, regression=True, order=4, title='Contour Plot', fileName=None):
         (plt, numpy) = _getExtendedModules()
 
-        if contour is None:
+        if contourIn is None:
             if cType not in self._contours:
-                contour = self.getContour(cType)
+                contourIn = self.getContour(cType)
             else:
-                contour = self._contours[cType]
+                contourIn = self._contours[cType]
         
-        x = contour.keys()
+        x = contourIn.keys()
         x.sort()
-        y = [contour[i] for i in x]
+        y = [contourIn[i] for i in x]
         
         plt.plot(x, y, '.', label='contour', markersize=5)
         
@@ -343,7 +343,7 @@ class ContourFinder(object):
         
         >>> myDict = {1:1, 2:2, 3:3, 4:4, 5:5, 6:6, 7:7, 8:8, 9:9, 10:10, 11:11, 12:12, 13:13, 
         ...           14:14, 15:15, 16:16, 17:17, 18:18, 19:19, 20:20}
-        >>> res = contour.ContourFinder().randomize(myDict)
+        >>> res = alpha.contour.ContourFinder().randomize(myDict)
         >>> res == myDict
         False
         >>> sorted(list(res.keys())) == sorted(list(myDict.keys()))
@@ -399,11 +399,11 @@ class ContourFinder(object):
         
         
         >>> c = corpus.parse('bwv102.7').chordify()
-        >>> contour.ContourFinder().dissonanceMetric( c.measures(1, 1) )
+        >>> alpha.contour.ContourFinder().dissonanceMetric( c.measures(1, 1) )
         0.25
-        >>> contour.ContourFinder().dissonanceMetric( c.measures(8, 8) )
+        >>> alpha.contour.ContourFinder().dissonanceMetric( c.measures(8, 8) )
         0.5
-        >>> contour.ContourFinder().dissonanceMetric( c.measures(1, 10)) < 1.0
+        >>> alpha.contour.ContourFinder().dissonanceMetric( c.measures(1, 10)) < 1.0
         True
         '''
         
