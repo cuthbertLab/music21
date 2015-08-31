@@ -101,19 +101,23 @@ class ModuleIterator(Iterator):
         rootFilesystemPath = music21.__path__[0]
         for directoryPath, directoryNames, fileNames in os.walk(
             rootFilesystemPath):
-            if directoryPath.startswith('/Users/cuthbert/git/music21base/music21/alpha/analysis'):
-                print("YAHOO!")
             directoryNamesToRemove = []
             for directoryName in directoryNames:
                 if directoryName in self._ignoredDirectoryNames:
                     directoryNamesToRemove.append(directoryName)
+            if directoryPath.startswith('/Users/cuthbert/git/music21base/music21/alpha/analysis'):
+                print("YAHOO!1")
             for directoryName in directoryNamesToRemove:
                 directoryNames.remove(directoryName)
+            if directoryPath.startswith('/Users/cuthbert/git/music21base/music21/alpha/analysis'):
+                print("YAHOO!2")
             if '__init__.py' in fileNames:
                 strippedPath = directoryPath.partition(rootFilesystemPath)[2]
                 pathParts = [x for x in strippedPath.split(os.path.sep) if x]
                 pathParts.insert(0, 'music21')
                 packagesystemPath = '.'.join(pathParts)
+                if directoryPath.startswith('/Users/cuthbert/git/music21base/music21/alpha/analysis'):
+                    print("YAHOO!3")
                 try:
                     module = __import__(packagesystemPath, fromlist=['*'])
                     if getattr(module, '_DOC_IGNORE_MODULE_OR_PACKAGE', False):
@@ -126,6 +130,8 @@ class ModuleIterator(Iterator):
                         continue
                 except ImportError:
                     pass
+                if directoryPath.startswith('/Users/cuthbert/git/music21base/music21/alpha/analysis'):
+                    print("YAHOO!4")
             for fileName in fileNames:
                 if fileName in self._ignoredFileNames:
                     continue
