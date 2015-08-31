@@ -6,17 +6,12 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009-2010 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2009-10 Michael Scott Cuthbert and the music21 Project
+# License:      BSD or LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
-
-
-
-
-
 import unittest
-from music21 import note, stream, clef, metadata, spanner, environment, converter, scale, corpus, common
+from music21 import alpha, note, stream, clef, metadata, spanner, environment, converter, scale, corpus, common
 
 
 _MOD = 'demo/smt2010.py'

@@ -24,10 +24,10 @@ class NGramJobHandler(object):
     @staticmethod
     def execute(jobs):
         finishedJobs = []
-        jobQueue = multiprocessing.JoinableQueue()
-        resultQueue = multiprocessing.Queue()
+        jobQueue = multiprocessing.JoinableQueue() # @UndefinedVariable
+        resultQueue = multiprocessing.Queue() # @UndefinedVariable
         workers = [NGramJobHandlerWorker(jobQueue, resultQueue)
-            for i in range(multiprocessing.cpu_count() / 2)]
+            for i in range(multiprocessing.cpu_count() / 2)] # @UndefinedVariable
         for worker in workers:
             worker.start()
         for job in jobs:
@@ -44,7 +44,7 @@ class NGramJobHandler(object):
         return finishedJobs
 
 
-class NGramJobHandlerWorker(multiprocessing.Process):
+class NGramJobHandlerWorker(multiprocessing.Process): # @UndefinedVariable
     r'''Worker process which runs ``QuantizationJobs``.
 
     Not composer-safe.
@@ -55,7 +55,7 @@ class NGramJobHandlerWorker(multiprocessing.Process):
     ### INITIALIZER ###
 
     def __init__(self, jobQueue=None, resultQueue=None):
-        multiprocessing.Process.__init__(self)
+        multiprocessing.Process.__init__(self) # @UndefinedVariable
         jobQueue = jobQueue or ()
         resultQueue = resultQueue or ()
         self.jobQueue = jobQueue

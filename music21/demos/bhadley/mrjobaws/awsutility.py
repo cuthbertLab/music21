@@ -5,17 +5,13 @@
 #
 # Authors:      Beth Hadley
 #
-# Copyright:    (c) 2011 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2011 The music21 Project
+# License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
-import unittest, doctest
+import unittest
 import music21
 import os
-from music21 import *
-from music21 import features
-from music21.features import jSymbolic
-from music21.features import native
 from music21 import corpus
 from music21 import common
 
@@ -93,7 +89,7 @@ def unbundleOpus(opusStream):
     md5hash = md5OfCorpusFile(corpusFilepath)
     for num in opusStream.getNumbers():
         st = opusStream.getScoreByNumber(num)
-        corpus.base._addCorpusFilepath(st, corpusFilepath)
+        corpus._addCorpusFilepath(st, corpusFilepath)
         results.append ( (st, (md5hash+'.'+num) ) ) 
     return results
 

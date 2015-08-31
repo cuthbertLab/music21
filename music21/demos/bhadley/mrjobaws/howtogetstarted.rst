@@ -18,14 +18,16 @@ making it easy to run your music21 processes on the cloud with a simple
 one-line command in the linux terminal.
 
 **Map Reduce Algorithm**
-Dean, J., Ghemawat,S.(2004).“MapReduce:Simplified data processing on large clusters,” Proceedings of the 6th Symposium on Operating System Design and Implementation, pp. 137–50.
+Dean, J., Ghemawat,S.(2004).“MapReduce:Simplified data processing on large clusters,” 
+Proceedings of the 6th Symposium on Operating System Design and Implementation, pp. 137–50.
 
 From their paper:
 "MapReduce is a programming model and an associated implementation for processing
 and generating large datasets that is amenable to a broad variety of real-world tasks.
 Users specify the computation in terms of a map and a reduce function, and the under-
 lying runtime system automatically parallelizes the computation across large-scale clusters of
-machines, handles machine failures, and schedules inter-machine communication to make efficient use of the network and disks. Programmers find the system easy to use: more than ten
+machines, handles machine failures, and schedules inter-machine communication to make 
+efficient use of the network and disks. Programmers find the system easy to use: more than ten
 thousand distinct MapReduce programs have been implemented internally at Google over the
 past four years, and an average of one hundred thousand MapReduce jobs are executed on
 Google’s clusters every day, processing a total of more than twenty petabytes of data per day."

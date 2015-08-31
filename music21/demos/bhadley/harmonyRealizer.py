@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         HarmonyRealizer.py
+# Name:         harmonyRealizer.py
+#
 # Purpose:      Demonstration of using music21 (especially fbRealizer, harmony, 
 #               and romanText.clercqTemperley) to generate smooth voice-leading 
 #               arrangements of a harmony line (roman Numerals and chord symbols)
@@ -193,7 +194,7 @@ class TestExternal(unittest.TestCase):
         output.metadata.title = s.title
         output.show()
     
-    def leadsheetEx1(self):
+    def testLeadsheetEx1(self):
         '''
         Example realization of a lead sheet, "Jeanie With The Light Brown Hair" from music21 corpus
         
@@ -207,7 +208,7 @@ class TestExternal(unittest.TestCase):
         output = generateContrapuntalBassLine(smoothBassCS, generatePopSongRules())
         mergeLeadSheetAndBassLine(testFile1, output).show()
 
-    def realizeLeadsheet(self, music21Stream):
+    def testRealizeLeadsheet(self, music21Stream):
         '''
         Example realization (using fbRealizer - chordSymbols flavor) of any leadsheet 
         converted to a music21Stream
@@ -221,7 +222,7 @@ class TestExternal(unittest.TestCase):
             
 if __name__ == "__main__":
     from music21 import base
-    base.mainTest(Test)
+    base.mainTest(Test, TestExternal)
     
     #from music21 import corpus
     #from music21.demos.bhadley import HarmonyRealizer

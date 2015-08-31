@@ -1015,7 +1015,7 @@ class Test(unittest.TestCase):
                 self.assertAlmostEqual(dataMatch[1], dataTarget[1])
                 # weight
                 self.assertAlmostEqual(dataMatch[2], dataTarget[2], 
-                                "for partId %s, entry %d: should be %s <-> was %s" % (
+                                msg="for partId %s, entry %d: should be %s <-> was %s" % (
                                                     partId, i, dataMatch[2], dataTarget[2]))
 
     def testPartReductionB(self, show=False):

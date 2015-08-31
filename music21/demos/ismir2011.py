@@ -8,8 +8,8 @@
 #               Michael Scott Cuthbert
 #               Lisa D. Friedland
 #
-# Copyright:    (c) 2011 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# License:      BSD or LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 
