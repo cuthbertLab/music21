@@ -157,57 +157,39 @@ def runPerceivedDissonanceAnalysis(scoreIn, offsetList, keyStr=None):
     each of which is a dictionary containing these keys:
     {'stream', 'numUserIdentified', 'numMusic21Identified', 'numBothIdentified', 'accuracy', 'romans', 'key'}
 
-    ::
+    >>> piece = corpus.parse('bwv7.7').measures(0,3)
+    >>> offsetList = [
+    ...     1.1916666666666667,
+    ...     2.3641666666666667,
+    ...     3.6041666666666665,
+    ...     4.5808333333333335,
+    ...     6.131666666666667,
+    ...     8.804166666666667,
+    ...     10.148333333333333,
+    ...     11.700833333333334,
+    ...     ]
 
-        >>> piece = corpus.parse('bwv7.7').measures(0,3)
-        >>> offsetList = [
-        ...     1.1916666666666667,
-        ...     2.3641666666666667,
-        ...     3.6041666666666665,
-        ...     4.5808333333333335,
-        ...     6.131666666666667,
-        ...     8.804166666666667,
-        ...     10.148333333333333,
-        ...     11.700833333333334,
-        ...     ]
-        >>> analysisDict = webapps.commands.runPerceivedDissonanceAnalysis(piece, offsetList)
-        >>> a = analysisDict['fullScore']
+    >>> a['numMusic21Identified']
+    7
 
-    ::
+    >>> a['numBothIdentified']
+    3
 
-        >>> a['numMusic21Identified']
-        7
+    >>> a['numUserIdentified']
+    8
 
-    ::
+    >>> a['romans']
+    ['v43', 'iio65', 'bVIIb73']
 
-        >>> a['numBothIdentified']
-        3
+    >>> b = analysisDict['nonharmonicTonesRemovedScore']
+    >>> b['numMusic21Identified']
+    5
 
-    ::
+    >>> b['numBothIdentified']
+    2
 
-        >>> a['numUserIdentified']
-        8
-
-    ::
-
-        >>> a['romans']
-        ['v43', 'iio65', 'bVIIb73']
-
-    ::
-    
-        >>> b = analysisDict['nonharmonicTonesRemovedScore']
-        >>> b['numMusic21Identified']
-        5
-
-    ::
-
-        >>> b['numBothIdentified']
-        2
-
-    ::
-
-        >>> b['accuracy']
-        40.0 
+    >>> b['accuracy']
+    40.0 
    
     Return dictionary.
     '''
@@ -339,33 +321,28 @@ def correctChordSymbols(worksheet, studentResponse):
     and the student's attempt to write out the pitches for each chord symbol of the worksheet.
     The student's work is returned with annotations, and the percentage correct is also returned
     
-    
-    ::
+    >>> worksheet = stream.Stream()
+    >>> worksheet.append(harmony.ChordSymbol('C'))
+    >>> worksheet.append(harmony.ChordSymbol('G7'))
+    >>> worksheet.append(harmony.ChordSymbol('B-'))
+    >>> worksheet.append(harmony.ChordSymbol('D7/A')) 
+    >>> studentResponse = stream.Stream()
+    >>> studentResponse.append(clef.TrebleClef())
 
-        >>> worksheet = stream.Stream()
-        >>> worksheet.append(harmony.ChordSymbol('C'))
-        >>> worksheet.append(harmony.ChordSymbol('G7'))
-        >>> worksheet.append(harmony.ChordSymbol('B-'))
-        >>> worksheet.append(harmony.ChordSymbol('D7/A')) 
-        >>> studentResponse = stream.Stream()
-        >>> studentResponse.append(clef.TrebleClef())
-
-    ::
-
-        >>> studentResponse.append(chord.Chord(['C','E','G']))
-        >>> studentResponse.append(chord.Chord(['G', 'B', 'D5', 'F5']))
-        >>> studentResponse.append(chord.Chord(['B-', 'C']))
-        >>> studentResponse.append(chord.Chord(['D4', 'F#4', 'A4', 'C5']))
-        >>> newScore, percentCorrect = webapps.commands.correctChordSymbols(
-        ...     worksheet, studentResponse)
-        >>> for x in newScore.notes:
-        ...  x.lyric
-        ':)'
-        ':)'
-        'PITCHES'
-        'INVERSION'
-        >>> percentCorrect
-        50.0   
+    >>> studentResponse.append(chord.Chord(['C','E','G']))
+    >>> studentResponse.append(chord.Chord(['G', 'B', 'D5', 'F5']))
+    >>> studentResponse.append(chord.Chord(['B-', 'C']))
+    >>> studentResponse.append(chord.Chord(['D4', 'F#4', 'A4', 'C5']))
+    >>> newScore, percentCorrect = webapps.commands.correctChordSymbols(
+    ...     worksheet, studentResponse)
+    >>> for x in newScore.notes:
+    ...  x.lyric
+    ':)'
+    ':)'
+    'PITCHES'
+    'INVERSION'
+    >>> percentCorrect
+    50.0   
 
     Return object.
     '''

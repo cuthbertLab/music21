@@ -242,15 +242,13 @@ class TrecentoTinyConverter(tinyNotation.Converter):
         If no mensural type is specified, it is assumed to be the same as the
         previous note. I.e., c(SB) B c d is a string of semibreves.
 
-    ::
+    >>> from music21 import trecento
+    >>> tTNN = trecento.notation.TrecentoTinyConverter('a(M)').parse().stream.flat.notes[0]
+    >>> tTNN.pitch
+    <music21.pitch.Pitch A4>
 
-        >>> from music21 import trecento
-        >>> tTNN = trecento.notation.TrecentoTinyConverter('a(M)').parse().stream.flat.notes[0]
-        >>> tTNN.pitch
-        <music21.pitch.Pitch A4>
-
-        >>> tTNN.mensuralType
-        'minima'
+    >>> tTNN.mensuralType
+    'minima'
 
     An additional stem may be added by specifying direction: S for a sidestem,
     D for a downstem, and an empty string to reset.
@@ -259,15 +257,13 @@ class TrecentoTinyConverter(tinyNotation.Converter):
     Stems must still follow the rules outlined in
     :meth:`music21.medren.MensuralNote.setStem()`.
 
-    ::
+    >>> tTNN = trecento.notation.TrecentoTinyConverter('a(SB)[S]').parse().stream.flat.notes[0]
+    >>> tTNN.getStems()
+    ['side']
 
-        >>> tTNN = trecento.notation.TrecentoTinyConverter('a(SB)[S]').parse().stream.flat.notes[0]
-        >>> tTNN.getStems()
-        ['side']
-
-        >>> tTNN = trecento.notation.TrecentoTinyConverter('a(M)[D]').parse().stream.flat.notes[0]
-        >>> tTNN.getStems()
-        ['up', 'down']
+    >>> tTNN = trecento.notation.TrecentoTinyConverter('a(M)[D]').parse().stream.flat.notes[0]
+    >>> tTNN.getStems()
+    ['up', 'down']
 
     A flag may be added by specifying direction of stem and orientation of
     flag. Valid directions are U for up, D for down, and an empty string to
@@ -276,57 +272,51 @@ class TrecentoTinyConverter(tinyNotation.Converter):
     string would add a left flag to that note's downstem. Flags must still
     follow the rules outlined in :meth:`music21.medren.MensuralNote.setFlag()`.
 
-    ::
+    >>> tTNN = trecento.notation.TrecentoTinyConverter('a(SM)_UL').parse().stream.flat.notes[0]
+    >>> tTNN.getStems()
+    ['up']
 
-        >>> tTNN = trecento.notation.TrecentoTinyConverter('a(SM)_UL').parse().stream.flat.notes[0]
-        >>> tTNN.getStems()
-        ['up']
-
-        >>> flags = tTNN.getFlags()
-        >>> sorted(list(flags.keys()))
-        ['up']
-        >>> flags['up']
-        'left'
+    >>> flags = tTNN.getFlags()
+    >>> sorted(list(flags.keys()))
+    ['up']
+    >>> flags['up']
+    'left'
 
     Multiple flags may be added by placing a slash between
     direction-orientation pairs, as shown in the following complex example:
 
-    ::
+    >>> tTNN = trecento.notation.TrecentoTinyConverter(
+    ...     'a(SM)[D]_UL/DR').parse().stream.flat.notes[0]
+    >>> tTNN.pitch
+    <music21.pitch.Pitch A4>
+    >>> tTNN.getStems()
+    ['up', 'down']
 
-        >>> tTNN = trecento.notation.TrecentoTinyConverter(
-        ...     'a(SM)[D]_UL/DR').parse().stream.flat.notes[0]
-        >>> tTNN.pitch
-        <music21.pitch.Pitch A4>
-        >>> tTNN.getStems()
-        ['up', 'down']
-
-        >>> flags = tTNN.getFlags()
-        >>> sorted(list(flags.keys()))
-        ['down', 'up']
-        >>> flags['down']
-        'right'
-        >>> flags['up']
-        'left'
+    >>> flags = tTNN.getFlags()
+    >>> sorted(list(flags.keys()))
+    ['down', 'up']
+    >>> flags['down']
+    'right'
+    >>> flags['up']
+    'left'
 
     5.  It is also possible to create ligatures using the
         TinyTrecentoNotationNote class. Put all notes in a ligature within `lig{`
         and `}` symbols.
 
-    ::
-
-        >>> ttc = trecento.notation.TrecentoTinyConverter('lig{f g a g f }').parse()
-        >>> ts = ttc.stream
-        >>> ts.show('text')
-        {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.clef.TrebleClef>
-            {0.0} <music21.meter.TimeSignature 4/4>
-            {0.0} <music21...medren.Ligature object at 0x...>
-            {0.0} <music21.bar.Barline style=final>
-        >>> tTNN = ts.flat.getElementsByClass('Ligature')[0]
-        >>> tTNN
-        <music21...medren.Ligature...>
-        >>> [str(p) for p in tTNN.pitches]
-        ['F4', 'G4', 'A4', 'G4', 'F4', 'C4']
+    >>> ttc = trecento.notation.TrecentoTinyConverter('lig{f g a g f }').parse()
+    >>> ts = ttc.stream
+    >>> ts.show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21...medren.Ligature object at 0x...>
+        {0.0} <music21.bar.Barline style=final>
+    >>> tTNN = ts.flat.getElementsByClass('Ligature')[0]
+    >>> tTNN
+    <music21...medren.Ligature...>
+    >>> [str(p) for p in tTNN.pitches]
+    ['F4', 'G4', 'A4', 'G4', 'F4', 'C4']
 
     The notes within a ligature have the syntax pitch<notehead>[stems](maxima).
     Valid notehead shapes are s for square and o for oblique. Valid stem
@@ -340,27 +330,23 @@ class TrecentoTinyConverter(tinyNotation.Converter):
 
     Examples:
 
-    ::
+    >>> from music21 import trecento
+    >>> ts = trecento.notation.TrecentoTinyConverter(r'lig{f a[DL]/R}').parse().stream
+    >>> tTNN = ts.flat.getElementsByClass('Ligature')[0]
+    >>> tTNN.getStem(1)
+    ('down', 'left')
 
-        >>> from music21 import trecento
-        >>> ts = trecento.notation.TrecentoTinyConverter(r'lig{f a[DL]/R}').parse().stream
-        >>> tTNN = ts.flat.getElementsByClass('Ligature')[0]
-        >>> tTNN.getStem(1)
-        ('down', 'left')
-
-        >>> tTNN.isReversed(1)
-        True
+    >>> tTNN.isReversed(1)
+    True
 
 
-        >>> tTNN = trecento.notation.TrecentoTinyConverter(
-        ...     'lig{f<o> g a[UR] g f(Mx)}').parse().stream.flat.getElementsByClass('Ligature')[0]        
-        >>> print([n.mensuralType for n in tTNN.notes])
-        ['longa', 'brevis', 'semibrevis', 'semibrevis', 'maxima']
+    >>> tTNN = trecento.notation.TrecentoTinyConverter(
+    ...     'lig{f<o> g a[UR] g f(Mx)}').parse().stream.flat.getElementsByClass('Ligature')[0]        
+    >>> print([n.mensuralType for n in tTNN.notes])
+    ['longa', 'brevis', 'semibrevis', 'semibrevis', 'maxima']
 
-    ::
-
-        >>> tTNN.getNoteheadShape(1)
-        'oblique'
+    >>> tTNN.getNoteheadShape(1)
+    'oblique'
 
     6.  Separate objects in a tiny notation by spaces. To add a mensural
         clef to the stream, add $, followed by the clef type (F or C) to the
@@ -372,21 +358,18 @@ class TrecentoTinyConverter(tinyNotation.Converter):
         divisione abbreviation in the string. For example, .p. would indicate
         senaria perfecta.
 
-    ::
-
-        >>> tTNS = trecento.notation.TrecentoTinyConverter(
-        ...     '$C3 .p. c(SB) d e p d(B) lig{e d c}').parse().stream.flat
-        >>> tTNS.show('text')
-        {0.0} <music21.bar.Barline style=final>
-        {0.0} <music21.clef.MensuralClef>
-        {0.0} <music21.trecento.notation.Divisione .p.>
-        {0.0} <music21...medren.MensuralNote semibrevis C>
-        {0.0} <music21...medren.MensuralNote semibrevis D>
-        {0.0} <music21...medren.MensuralNote semibrevis E>
-        {0.0} <music21.trecento.notation.Punctus...>
-        {0.0} <music21...medren.MensuralNote brevis D>
-        {0.0} <music21...medren.Ligature...>
-
+    >>> tTNS = trecento.notation.TrecentoTinyConverter(
+    ...     '$C3 .p. c(SB) d e p d(B) lig{e d c}').parse().stream.flat
+    >>> tTNS.show('text')
+    {0.0} <music21.bar.Barline style=final>
+    {0.0} <music21.clef.MensuralClef>
+    {0.0} <music21.trecento.notation.Divisione .p.>
+    {0.0} <music21...medren.MensuralNote semibrevis C>
+    {0.0} <music21...medren.MensuralNote semibrevis D>
+    {0.0} <music21...medren.MensuralNote semibrevis E>
+    {0.0} <music21.trecento.notation.Punctus...>
+    {0.0} <music21...medren.MensuralNote brevis D>
+    {0.0} <music21...medren.Ligature...>
     '''
 
     def __init__(self, stringRep=""):

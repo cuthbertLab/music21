@@ -106,18 +106,15 @@ class MetadataCachingJob(object):
     '''
     Parses one corpus path, and attempts to extract metadata from it:
 
-    ::
-
-        >>> from music21 import metadata
-        >>> job = metadata.MetadataCachingJob(
-        ...     'bach/bwv66.6',
-        ...     useCorpus=True,
-        ...     )
-        >>> job.run()
-        ((<music21.metadata.bundles.MetadataEntry: bach_bwv66_6>,), ())
-        >>> results = job.getResults()
-        >>> errors = job.getErrors()
-
+    >>> from music21 import metadata
+    >>> job = metadata.MetadataCachingJob(
+    ...     'bach/bwv66.6',
+    ...     useCorpus=True,
+    ...     )
+    >>> job.run()
+    ((<music21.metadata.bundles.MetadataEntry: bach_bwv66_6>,), ())
+    >>> results = job.getResults()
+    >>> errors = job.getErrors()
     '''
 
     ### INITIALIZER ###
@@ -289,24 +286,21 @@ class JobProcessor(object):
     * the last processed file path
     * the number of remaining jobs
 
-    ::
-
-        >>> from music21 import corpus, metadata
-        >>> jobs = []
-        >>> for corpusPath in corpus.getMonteverdiMadrigals()[:3]:
-        ...     job = metadata.MetadataCachingJob(
-        ...         corpusPath,
-        ...         useCorpus=True,
-        ...         )
-        ...     jobs.append(job)
-        >>> jobGenerator = metadata.JobProcessor.process_serial(jobs)
-        >>> for result in jobGenerator:
-        ...     print(result['remainingJobs'])
-        ...
-        2
-        1
-        0
-
+    >>> from music21 import corpus, metadata
+    >>> jobs = []
+    >>> for corpusPath in corpus.getMonteverdiMadrigals()[:3]:
+    ...     job = metadata.MetadataCachingJob(
+    ...         corpusPath,
+    ...         useCorpus=True,
+    ...         )
+    ...     jobs.append(job)
+    >>> jobGenerator = metadata.JobProcessor.process_serial(jobs)
+    >>> for result in jobGenerator:
+    ...     print(result['remainingJobs'])
+    ...
+    2
+    1
+    0
     '''
 
     ### PRIVATE METHODS ###

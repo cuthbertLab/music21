@@ -164,37 +164,26 @@ class ContourFinder(object):
         To get a contour where measures map to the metric values, use normalized=False (the default), but to get a contour
         which evenly divides time between 1.0 and 100.0, use normalized=True
         
-        ::
-
-            >>> cf = alpha.contour.ContourFinder( corpus.parse('bwv10.7'))
-            >>> mycontour = cf.getContour('dissonance')
-            >>> [mycontour[x] for x in sorted(mycontour.keys())]
-            [0.0, 0.25, 0.5, 0.5, 0.0, 0.0, 0.25, 0.75, 0.0, 0.0, 0.5, 0.75, 0.75, 0.0, 0.5, 0.5, 0.5, 0.5, 0.75, 0.75, 0.75, 0.0]
+        >>> cf = alpha.contour.ContourFinder( corpus.parse('bwv10.7'))
+        >>> mycontour = cf.getContour('dissonance')
+        >>> [mycontour[x] for x in sorted(mycontour.keys())]
+        [0.0, 0.25, 0.5, 0.5, 0.0, 0.0, 0.25, 0.75, 0.0, 0.0, 0.5, 0.75, 0.75, 0.0, 0.5, 0.5, 0.5, 0.5, 0.75, 0.75, 0.75, 0.0]
         
-        ::
-
-            >>> mycontour = cf.getContour('always one', 2, 2, metric= lambda x: 1.0)
-            >>> [mycontour[x] for x in sorted(mycontour.keys())]
-            [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+        >>> mycontour = cf.getContour('always one', 2, 2, metric= lambda x: 1.0)
+        >>> [mycontour[x] for x in sorted(mycontour.keys())]
+        [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
         
-        ::
-
-            >>> mycontour = cf.getContour('spacing', metric = lambda x: 2, overwrite=False)
-            Traceback (most recent call last):
-            OverwriteException: Attempted to overwrite 'spacing' metric but did not specify overwrite=True
+        >>> mycontour = cf.getContour('spacing', metric = lambda x: 2, overwrite=False)
+        Traceback (most recent call last):
+        OverwriteException: Attempted to overwrite 'spacing' metric but did not specify overwrite=True
         
-        ::
-
-            >>> mycontour = cf.getContour('spacing', slide=3, metric = lambda x: 2.0, overwrite=True)
-            >>> [mycontour[x] for x in sorted(mycontour.keys())]
-            [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]
+        >>> mycontour = cf.getContour('spacing', slide=3, metric = lambda x: 2.0, overwrite=True)
+        >>> [mycontour[x] for x in sorted(mycontour.keys())]
+        [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]
         
-        ::
-
-            >>> mycontour = cf.getContour('spacing')
-            >>> [mycontour[x] for x in sorted(mycontour.keys())]
-            [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]
-        
+        >>> mycontour = cf.getContour('spacing')
+        >>> [mycontour[x] for x in sorted(mycontour.keys())]
+        [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]        
         '''
         
         if overwrite is False:

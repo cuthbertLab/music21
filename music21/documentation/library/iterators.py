@@ -63,22 +63,19 @@ class ModuleIterator(Iterator):
     '''
     Iterates over music21's package system, yielding module objects:
 
-    ::
-
-        >>> iterator = documentation.ModuleIterator(verbose=False)
-        >>> modules = [x for x in iterator]
-        >>> for module in sorted(modules, key=lambda x: x.__name__)[:8]:
-        ...     module.__name__
-        ...
-        'music21.__init__'
-        'music21.abcFormat.__init__'
-        'music21.abcFormat.translate'
-        'music21.alpha.__init__'
-        'music21.alpha.chant'
-        'music21.alpha.contour'
-        'music21.alpha.medren'
-        'music21.analysis.__init__'
-
+    >>> iterator = documentation.ModuleIterator(verbose=False)
+    >>> modules = [x for x in iterator]
+    >>> for module in sorted(modules, key=lambda x: x.__name__)[:8]:
+    ...     module.__name__
+    ...
+    'music21.__init__'
+    'music21.abcFormat.__init__'
+    'music21.abcFormat.translate'
+    'music21.alpha.__init__'
+    'music21.alpha.chant'
+    'music21.alpha.contour'
+    'music21.alpha.medren'
+    'music21.analysis.__init__'
     '''
 
     ### CLASS VARIABLES ###
@@ -178,25 +175,22 @@ class ClassIterator(Iterator):
     '''
     Iterates over music21's package system, yielding all classes discovered:
 
-    ::
-
-        >>> iterator = documentation.ClassIterator(verbose=False)
-        >>> classes = sorted([x for x in iterator],
-        ...     key=lambda x: (x.__module__, x.__name__))
-        >>> for cls in classes[:10]:
-        ...     cls
-        ...
-        <class 'music21.abcFormat.__init__.ABCAccent'>
-        <class 'music21.abcFormat.__init__.ABCBar'>
-        <class 'music21.abcFormat.__init__.ABCBrokenRhythmMarker'>
-        <class 'music21.abcFormat.__init__.ABCChord'>
-        <class 'music21.abcFormat.__init__.ABCCrescStart'>
-        <class 'music21.abcFormat.__init__.ABCDimStart'>
-        <class 'music21.abcFormat.__init__.ABCDownbow'>
-        <class 'music21.abcFormat.__init__.ABCFile'>
-        <class 'music21.abcFormat.__init__.ABCFileException'>
-        <class 'music21.abcFormat.__init__.ABCGraceStart'>
-
+    >>> iterator = documentation.ClassIterator(verbose=False)
+    >>> classes = sorted([x for x in iterator],
+    ...     key=lambda x: (x.__module__, x.__name__))
+    >>> for cls in classes[:10]:
+    ...     cls
+    ...
+    <class 'music21.abcFormat.__init__.ABCAccent'>
+    <class 'music21.abcFormat.__init__.ABCBar'>
+    <class 'music21.abcFormat.__init__.ABCBrokenRhythmMarker'>
+    <class 'music21.abcFormat.__init__.ABCChord'>
+    <class 'music21.abcFormat.__init__.ABCCrescStart'>
+    <class 'music21.abcFormat.__init__.ABCDimStart'>
+    <class 'music21.abcFormat.__init__.ABCDownbow'>
+    <class 'music21.abcFormat.__init__.ABCFile'>
+    <class 'music21.abcFormat.__init__.ABCFileException'>
+    <class 'music21.abcFormat.__init__.ABCGraceStart'>
     '''
 
     ### SPECIAL METHODS ###
@@ -212,26 +206,23 @@ class FunctionIterator(Iterator):
     '''
     Iterates over music21's package system, yielding all functions discovered:
 
-    ::
-
-        >>> from music21 import documentation
-        >>> iterator = documentation.FunctionIterator(verbose=False)
-        >>> functions = [x for x in iterator]
-        >>> for function in sorted(functions,
-        ...     key=lambda x: (x.__module__, x.__name__))[:10]:
-        ...     function.__module__, function.__name__
-        ...
-        ('music21.abcFormat.__init__', 'mergeLeadingMetaData')
-        ('music21.abcFormat.translate', 'abcToStreamOpus')
-        ('music21.abcFormat.translate', 'abcToStreamPart')
-        ('music21.abcFormat.translate', 'abcToStreamScore')
-        ('music21.abcFormat.translate', 'parseTokens')
-        ('music21.abcFormat.translate', 'reBar')
-        ('music21.alpha.chant', 'fromStream')
-        ('music21.alpha.medren', 'breakMensuralStreamIntoBrevisLengths')
-        ('music21.alpha.medren', 'convertHouseStyle')
-        ('music21.alpha.medren', 'cummingSchubertStrettoFuga')
-
+    >>> from music21 import documentation
+    >>> iterator = documentation.FunctionIterator(verbose=False)
+    >>> functions = [x for x in iterator]
+    >>> for function in sorted(functions,
+    ...     key=lambda x: (x.__module__, x.__name__))[:10]:
+    ...     function.__module__, function.__name__
+    ...
+    ('music21.abcFormat.__init__', 'mergeLeadingMetaData')
+    ('music21.abcFormat.translate', 'abcToStreamOpus')
+    ('music21.abcFormat.translate', 'abcToStreamPart')
+    ('music21.abcFormat.translate', 'abcToStreamScore')
+    ('music21.abcFormat.translate', 'parseTokens')
+    ('music21.abcFormat.translate', 'reBar')
+    ('music21.alpha.chant', 'fromStream')
+    ('music21.alpha.medren', 'breakMensuralStreamIntoBrevisLengths')
+    ('music21.alpha.medren', 'convertHouseStyle')
+    ('music21.alpha.medren', 'cummingSchubertStrettoFuga')
     '''
 
     ### SPECIAL METHODS ###

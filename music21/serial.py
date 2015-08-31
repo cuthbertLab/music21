@@ -2308,10 +2308,8 @@ def labelTransformedSegments(inputStream, segmentDict, reps = 'skipConsecutive',
     
     OMIT_FROM_DOCS
     
-    ::
-
-        >>> [len(n.lyrics) for n in labeledPart.flat.notes]
-        [1, 1, 0]
+    >>> [len(n.lyrics) for n in labeledPart.flat.notes]
+    [1, 1, 0]
     
     '''
     
@@ -2859,10 +2857,8 @@ def labelTransposedMultisets(inputStream, multisetDict, reps = 'skipConsecutive'
     We learn the obvious - it appears that the alto section would be the most 
     bored while performing this chorale.
     
-    :: 
-
-        >>> bach = corpus.parse('bach/bwv57.8')
-        >>> #_DOCS_SHOW serial.labelTransposedMultisets(bach, {'x3':[0, 0, 0]}, reps = 'includeAll', includeChords = False).show()
+    >>> bach = corpus.parse('bach/bwv57.8')
+    >>> #_DOCS_SHOW serial.labelTransposedMultisets(bach, {'x3':[0, 0, 0]}, reps = 'includeAll', includeChords = False).show()
     
     .. image:: images/serial-labelTransposedMultisets.png
         :width: 500
@@ -3128,21 +3124,19 @@ def labelTransposedAndInvertedMultisets(inputStream, multisetDict, reps = 'skipC
     than six spanners active simultaneously, which may result in some spanners 
     not showing correctly in XML format, or not at all.
     
-    ::
-
-        >>> s = stream.Stream()
-        >>> n1 = note.Note('c4')
-        >>> n2 = note.Note('e-4')
-        >>> n3 = note.Note('g4')
-        >>> n4 = note.Note('e4')
-        >>> n5 = note.Note('c4')
-        >>> for n in [n1, n2, n3, n4]:
-        ...     n.quarterLength = 1
-        ...     s.append(n)
-        >>> n5.quarterLength = 4
-        >>> s.append(n5)
-        >>> s = s.makeMeasures()
-        >>> #_DOCS_SHOW serial.labelTransposedAndInvertedMultisets(s, {'triad':[0, 4, 7]}, includeChords = False).show()
+    >>> s = stream.Stream()
+    >>> n1 = note.Note('c4')
+    >>> n2 = note.Note('e-4')
+    >>> n3 = note.Note('g4')
+    >>> n4 = note.Note('e4')
+    >>> n5 = note.Note('c4')
+    >>> for n in [n1, n2, n3, n4]:
+    ...     n.quarterLength = 1
+    ...     s.append(n)
+    >>> n5.quarterLength = 4
+    >>> s.append(n5)
+    >>> s = s.makeMeasures()
+    >>> #_DOCS_SHOW serial.labelTransposedAndInvertedMultisets(s, {'triad':[0, 4, 7]}, includeChords = False).show()
         
     .. image:: images/serial-labelTransposedAndInvertedMultisets.png
        :width: 500

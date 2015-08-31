@@ -147,25 +147,23 @@ def unitSpec(durationObjectOrObjects):
 
     This function does not deal with nested tuplets, etc.
 
-    ::
+    >>> aDur = duration.Duration()
+    >>> aDur.quarterLength = 3
+    >>> duration.unitSpec(aDur)
+    (3.0, 'half', 1, None, None, None)
 
-        >>> aDur = duration.Duration()
-        >>> aDur.quarterLength = 3
-        >>> duration.unitSpec(aDur)
-        (3.0, 'half', 1, None, None, None)
+    >>> bDur = duration.Duration()
+    >>> bDur.quarterLength = 1.125
+    >>> duration.unitSpec(bDur)
+    (1.125, 'complex', None, None, None, None)
 
-        >>> bDur = duration.Duration()
-        >>> bDur.quarterLength = 1.125
-        >>> duration.unitSpec(bDur)
-        (1.125, 'complex', None, None, None, None)
+    >>> cDur = duration.Duration()
+    >>> cDur.quarterLength = 0.3333333
+    >>> duration.unitSpec(cDur)
+    (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')
 
-        >>> cDur = duration.Duration()
-        >>> cDur.quarterLength = 0.3333333
-        >>> duration.unitSpec(cDur)
-        (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')
-
-        >>> duration.unitSpec([aDur, bDur, cDur])
-        [(3.0, 'half', 1, None, None, None), (1.125, 'complex', None, None, None, None), (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')]
+    >>> duration.unitSpec([aDur, bDur, cDur])
+    [(3.0, 'half', 1, None, None, None), (1.125, 'complex', None, None, None, None), (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')]
     '''
     if common.isListLike(durationObjectOrObjects):
         ret = []
@@ -186,15 +184,13 @@ def nextLargerType(durType):
     '''
     Given a type (such as 16th or quarter), return the next larger type.
 
-    ::
-
-        >>> duration.nextLargerType("16th")
-        'eighth'
-        >>> duration.nextLargerType("whole")
-        'breve'
-        >>> duration.nextLargerType("duplex-maxima")
-        Traceback (most recent call last):
-        DurationException: cannot get the next larger of duplex-maxima
+    >>> duration.nextLargerType("16th")
+    'eighth'
+    >>> duration.nextLargerType("whole")
+    'breve'
+    >>> duration.nextLargerType("duplex-maxima")
+    Traceback (most recent call last):
+    DurationException: cannot get the next larger of duplex-maxima
     '''
     if durType not in ordinalTypeFromNum:
         raise DurationException("cannot get the next larger of %s" % durType)
@@ -1207,29 +1203,23 @@ class DurationCommon(SlottedObject):
 
         No tuplets...
 
-        ::
-
-            >>> complexDur = duration.Duration('eighth')
-            >>> complexDur.aggregateTupletMultiplier()
-            1.0
+        >>> complexDur = duration.Duration('eighth')
+        >>> complexDur.aggregateTupletMultiplier()
+        1.0
             
         With tuplets:
         
-        ::
-            
-            >>> complexDur.appendTuplet(duration.Tuplet())
-            >>> complexDur.aggregateTupletMultiplier()
-            Fraction(2, 3)
+        >>> complexDur.appendTuplet(duration.Tuplet())
+        >>> complexDur.aggregateTupletMultiplier()
+        Fraction(2, 3)
 
         Nested tuplets are possible...
 
-        ::
-
-            >>> tup2 = duration.Tuplet()
-            >>> tup2.setRatio(5, 4)
-            >>> complexDur.appendTuplet(tup2)
-            >>> complexDur.aggregateTupletMultiplier()
-            Fraction(8, 15)
+        >>> tup2 = duration.Tuplet()
+        >>> tup2.setRatio(5, 4)
+        >>> complexDur.appendTuplet(tup2)
+        >>> complexDur.aggregateTupletMultiplier()
+        Fraction(8, 15)
         '''
         currentMultiplier = 1
         for thisTuplet in self.tuplets:
@@ -1315,22 +1305,16 @@ class DurationUnit(DurationCommon):
 
     def __eq__(self, other):
         '''
-        Test equality. Note: this may not work with Tuplets until we
-        define equality tests for tuplets.
+        Test equality. Based on type, dots, tuplets, and quarterLength
 
-        ::
+        >>> aDur = duration.DurationUnit('quarter')
+        >>> bDur = duration.DurationUnit('16th')
+        >>> cDur = duration.DurationUnit('16th')
+        >>> aDur == bDur
+        False
 
-            >>> aDur = duration.DurationUnit('quarter')
-            >>> bDur = duration.DurationUnit('16th')
-            >>> cDur = duration.DurationUnit('16th')
-            >>> aDur == bDur
-            False
-
-        ::
-
-            >>> cDur == bDur
-            True
-
+        >>> cDur == bDur
+        True
         '''
         if other is None or not isinstance(other, DurationCommon):
             return False
@@ -1345,19 +1329,14 @@ class DurationUnit(DurationCommon):
         '''
         Test not equality.
 
-        ::
+        >>> aDur = duration.DurationUnit('quarter')
+        >>> bDur = duration.DurationUnit('16th')
+        >>> cDur = duration.DurationUnit('16th')
+        >>> aDur != bDur
+        True
 
-            >>> aDur = duration.DurationUnit('quarter')
-            >>> bDur = duration.DurationUnit('16th')
-            >>> cDur = duration.DurationUnit('16th')
-            >>> aDur != bDur
-            True
-
-        ::
-
-            >>> cDur != bDur
-            False
-
+        >>> cDur != bDur
+        False
         '''
         return not self.__eq__(other)
 
@@ -1365,11 +1344,9 @@ class DurationUnit(DurationCommon):
         '''
         Return a string representation.
 
-        ::
-
-            >>> aDur = duration.DurationUnit('quarter')
-            >>> repr(aDur)
-            '<music21.duration.DurationUnit 1.0>'
+        >>> aDur = duration.DurationUnit('quarter')
+        >>> repr(aDur)
+        '<music21.duration.DurationUnit 1.0>'
 
         '''
         qlr = self.quarterLength
@@ -1464,25 +1441,22 @@ class DurationUnit(DurationCommon):
 
         To set quarterLength, use self.quarterLength.
 
-        ::
+        >>> bDur = duration.DurationUnit('16th')
+        >>> bDur.quarterLength
+        0.25
 
-            >>> bDur = duration.DurationUnit('16th')
-            >>> bDur.quarterLength
-            0.25
+        >>> bDur.unlink()
+        >>> bDur.quarterLength = 234
+        >>> bDur.quarterLength
+        234.0
 
-            >>> bDur.unlink()
-            >>> bDur.quarterLength = 234
-            >>> bDur.quarterLength
-            234.0
+        >>> bDur.type
+        '16th'
 
-            >>> bDur.type
-            '16th'
-
-            >>> bDur.link() # if linking is restored, type is used to get qLen
-            >>> bDur.updateQuarterLength()
-            >>> bDur.quarterLength
-            0.25
-
+        >>> bDur.link() # if linking is restored, type is used to get qLen
+        >>> bDur.updateQuarterLength()
+        >>> bDur.quarterLength
+        0.25
         '''
         if self._link is True:
             self._qtrLength = convertTypeToQuarterLength(
@@ -1516,24 +1490,17 @@ class DurationUnit(DurationCommon):
         _dots is a list (so we can do weird things like dot groups)
         _getDotGroups lets you do the entire list (as a tuple)
 
-        ::
+        >>> d1 = duration.DurationUnit()
+        >>> d1.type = 'half'
+        >>> d1.dotGroups = [1, 1]  # dotted dotted half
+        >>> d1.dots
+        1
 
-            >>> d1 = duration.DurationUnit()
-            >>> d1.type = 'half'
-            >>> d1.dotGroups = [1, 1]  # dotted dotted half
-            >>> d1.dots
-            1
+        >>> d1.dotGroups
+        (1, 1)
 
-        ::
-
-            >>> d1.dotGroups
-            (1, 1)
-
-        ::
-
-            >>> d1.quarterLength
-            4.5
-
+        >>> d1.quarterLength
+        4.5
         '''
         if self._typeNeedsUpdating:
             self.updateType()
@@ -1560,25 +1527,18 @@ class DurationUnit(DurationCommon):
         Normally we only want the first element.
         So that's what dots returns...
 
-        ::
+        >>> a = duration.DurationUnit()
+        >>> a.dots # dots is zero before assignment
+        0
 
-            >>> a = duration.DurationUnit()
-            >>> a.dots # dots is zero before assignment
-            0
+        >>> a.type = 'quarter'
+        >>> a.dots = 1
+        >>> a.quarterLength
+        1.5
 
-        ::
-
-            >>> a.type = 'quarter'
-            >>> a.dots = 1
-            >>> a.quarterLength
-            1.5
-
-        ::
-
-            >>> a.dots = 2
-            >>> a.quarterLength
-            1.75
-
+        >>> a.dots = 2
+        >>> a.quarterLength
+        1.75
         '''
         if self._typeNeedsUpdating:
             self.updateType()
@@ -1599,37 +1559,29 @@ class DurationUnit(DurationCommon):
         Return the most complete representation of this Duration, providing
         dots, type, tuplet, and quarter length representation.
 
-        ::
+        >>> d = duration.DurationUnit()
+        >>> d.quarterLength = 1.5
+        >>> d.fullName
+        'Dotted Quarter'
 
-            >>> d = duration.DurationUnit()
-            >>> d.quarterLength = 1.5
-            >>> d.fullName
-            'Dotted Quarter'
+        >>> d = duration.DurationUnit()
+        >>> d.quarterLength = 1.75
+        >>> d.fullName
+        'Double Dotted Quarter'
 
-        ::
+        >>> d = duration.DurationUnit()
+        >>> d.type = 'half'
+        >>> d.fullName
+        'Half'
 
-            >>> d = duration.DurationUnit()
-            >>> d.quarterLength = 1.75
-            >>> d.fullName
-            'Double Dotted Quarter'
+        >>> d = duration.DurationUnit()
+        >>> d.type = 'longa'
+        >>> d.fullName
+        'Imperfect Longa'
 
-        ::
-
-            >>> d = duration.DurationUnit()
-            >>> d.type = 'half'
-            >>> d.fullName
-            'Half'
-
-        ::
-
-            >>> d = duration.DurationUnit()
-            >>> d.type = 'longa'
-            >>> d.fullName
-            'Imperfect Longa'
-
-            >>> d.dots = 1
-            >>> d.fullName
-            'Perfect Longa'
+        >>> d.dots = 1
+        >>> d.fullName
+        'Perfect Longa'
         '''
         dots = self.dots
         if dots == 1:
