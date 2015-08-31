@@ -154,6 +154,11 @@ class ModuleIterator(Iterator):
 class CodebaseIterator(Iterator):
     '''
     Iterate over music21's package system, yielding all classes and functions.
+
+    This currently yields enums that are defined in the module (because they are
+    an instance of type 'class') -- should it? 
+
+    Enums have a different repr: <enum 'MotionType'> not <class 'enum'>
     '''
 
     ### SPECIAL METHODS ###
@@ -176,6 +181,8 @@ class ClassIterator(Iterator):
     Iterates over music21's package system, yielding all classes discovered:
 
     >>> citerator = documentation.ClassIterator(verbose=False)
+    >>> for x in citerator:
+    ...     print(x)
     >>> allClasses = [x for x in citerator]
     >>> classes = sorted(allClasses, key=lambda x: (x.__module__, x.__name__))
     >>> for cls in classes[:10]:
@@ -198,7 +205,7 @@ class ClassIterator(Iterator):
     def __iter__(self):
         for x in CodebaseIterator(verbose=self.verbose):
             if isinstance(x, six.class_types):
-                yield "" #x
+                yield x
         raise StopIteration
 
 
