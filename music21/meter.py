@@ -2514,53 +2514,40 @@ class TimeSignature(base.Music21Object):
     within music21 but they won't necessarily display properly in musicxml,
     lilypond, etc.  So best is to create structures like this:
 
-    ::
-
-        >>> s = stream.Score()
-        >>> p = stream.Part()
-        >>> m1 = stream.Measure()
-        >>> ts = meter.TimeSignature('3/4')
-        >>> m1.insert(0, ts)
-        >>> m1.insert(0, note.Note('C#3', type='half'))
-        >>> n = note.Note('D3', type='quarter') # we will need this later
-        >>> m1.insert(1.0, n)
-        >>> m1.number = 1
-        >>> p.insert(0, m1)
-        >>> s.insert(0, p)
-        >>> s.show('t')
-        {0.0} <music21.stream.Part ...>
-            {0.0} <music21.stream.Measure 1 offset=0.0>
-                {0.0} <music21.meter.TimeSignature 3/4>
-                {0.0} <music21.note.Note C#>
-                {1.0} <music21.note.Note D>
-
+    >>> s = stream.Score()
+    >>> p = stream.Part()
+    >>> m1 = stream.Measure()
+    >>> ts = meter.TimeSignature('3/4')
+    >>> m1.insert(0, ts)
+    >>> m1.insert(0, note.Note('C#3', type='half'))
+    >>> n = note.Note('D3', type='quarter') # we will need this later
+    >>> m1.insert(1.0, n)
+    >>> m1.number = 1
+    >>> p.insert(0, m1)
+    >>> s.insert(0, p)
+    >>> s.show('t')
+    {0.0} <music21.stream.Part ...>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.meter.TimeSignature 3/4>
+            {0.0} <music21.note.Note C#>
+            {1.0} <music21.note.Note D>
 
     Basic operations on a TimeSignature object are designed to be very simple.
 
-    ::
+    >>> ts.ratioString
+    '3/4'
 
-        >>> ts.ratioString
-        '3/4'
+    >>> ts.numerator
+    3
 
-    ::
+    >>> ts.beatCount
+    3
 
-        >>> ts.numerator
-        3
+    >>> ts.beatCountName
+    'Triple'
 
-    ::
-
-        >>> ts.beatCount
-        3
-
-    ::
-
-        >>> ts.beatCountName
-        'Triple'
-
-    ::
-
-        >>> ts.beatDuration.quarterLength
-        1.0
+    >>> ts.beatDuration.quarterLength
+    1.0
 
     As an alternative to putting a `TimeSignature` in a Stream at a specific
     position (offset), it can be assigned to a special property in Measure that
@@ -2568,123 +2555,89 @@ class TimeSignature(base.Music21Object):
     `show()` the Measure (or if we iterate through it), the TimeSignature
     appears as if it's in the measure itself:
 
-    ::
-
-        >>> m2 = stream.Measure()
-        >>> m2.number = 2
-        >>> ts2 = meter.TimeSignature('2/4')
-        >>> m2.timeSignature = ts2
-        >>> m2.append(note.Note('E3', type='half'))
-        >>> p.append(m2)
-        >>> s.show('text')
-        {0.0} <music21.stream.Part ...>
-            {0.0} <music21.stream.Measure 1 offset=0.0>
-                {0.0} <music21.meter.TimeSignature 3/4>
-                {0.0} <music21.note.Note C#>
-                {1.0} <music21.note.Note D>
-            {2.0} <music21.stream.Measure 2 offset=2.0>
-                {0.0} <music21.meter.TimeSignature 2/4>
-                {0.0} <music21.note.Note E>
+    >>> m2 = stream.Measure()
+    >>> m2.number = 2
+    >>> ts2 = meter.TimeSignature('2/4')
+    >>> m2.timeSignature = ts2
+    >>> m2.append(note.Note('E3', type='half'))
+    >>> p.append(m2)
+    >>> s.show('text')
+    {0.0} <music21.stream.Part ...>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.meter.TimeSignature 3/4>
+            {0.0} <music21.note.Note C#>
+            {1.0} <music21.note.Note D>
+        {2.0} <music21.stream.Measure 2 offset=2.0>
+            {0.0} <music21.meter.TimeSignature 2/4>
+            {0.0} <music21.note.Note E>
 
     Once a Note has a local TimeSignature, a Note can get its beat position and
     other meter-specific parameters.  Remember `n`, our quarter note at offset
     2.0 of `m1`, a 3/4 measure? Let's get its beat:
 
-    ::
-
-        >>> n.beat
-        2.0
+    >>> n.beat
+    2.0
 
     This feature is more useful if there are more beats:
 
-    ::
-
-        >>> m3 = stream.Measure()
-        >>> m3.timeSignature = meter.TimeSignature('3/4')
-        >>> eighth = note.Note(type='eighth')
-        >>> m3.repeatAppend(eighth, 6)
-        >>> [thisNote.beatStr for thisNote in m3.notes]
-        ['1', '1 1/2', '2', '2 1/2', '3', '3 1/2']
+    >>> m3 = stream.Measure()
+    >>> m3.timeSignature = meter.TimeSignature('3/4')
+    >>> eighth = note.Note(type='eighth')
+    >>> m3.repeatAppend(eighth, 6)
+    >>> [thisNote.beatStr for thisNote in m3.notes]
+    ['1', '1 1/2', '2', '2 1/2', '3', '3 1/2']
 
     Now lets change its measure's TimeSignature and see what happens:
 
-    ::
-
-        >>> sixEight = meter.TimeSignature('6/8')
-        >>> m3.timeSignature = sixEight
-        >>> [thisNote.beatStr for thisNote in m3.notes]
-        ['1', '1 1/3', '1 2/3', '2', '2 1/3', '2 2/3']
+    >>> sixEight = meter.TimeSignature('6/8')
+    >>> m3.timeSignature = sixEight
+    >>> [thisNote.beatStr for thisNote in m3.notes]
+    ['1', '1 1/3', '1 2/3', '2', '2 1/3', '2 2/3']
 
     TimeSignature('6/8') defaults to fast 6/8:
 
-    ::
+    >>> sixEight.beatCount
+    2
 
-        >>> sixEight.beatCount
-        2
+    >>> sixEight.beatDuration.quarterLength
+    1.5
 
-    ::
-
-        >>> sixEight.beatDuration.quarterLength
-        1.5
-
-    ::
-
-        >>> sixEight.beatDivisionCountName
-        'Compound'
+    >>> sixEight.beatDivisionCountName
+    'Compound'
 
     Let's make it slow 6/8 instead:
 
-    ::
+    >>> sixEight.beatCount = 6
+    >>> sixEight.beatDuration.quarterLength
+    0.5
 
-        >>> sixEight.beatCount = 6
-        >>> sixEight.beatDuration.quarterLength
-        0.5
-
-    ::
-
-        >>> sixEight.beatDivisionCountName
-        'Simple'
+    >>> sixEight.beatDivisionCountName
+    'Simple'
 
     Now let's look at the `beatStr` for each of the notes in `m3`:
 
-    ::
-
-        >>> [thisNote.beatStr for thisNote in m3.notes]
-        ['1', '2', '3', '4', '5', '6']
+    >>> [thisNote.beatStr for thisNote in m3.notes]
+    ['1', '2', '3', '4', '5', '6']
 
     `TimeSignatures` can also use symbols instead of numbers
 
-    ::
+    >>> tsCommon = meter.TimeSignature('c')  # or common
+    >>> tsCommon.beatCount
+    4
+    >>> tsCommon.denominator
+    4
 
-        >>> tsCommon = meter.TimeSignature('c')  # or common
-        >>> tsCommon.beatCount
-        4
+    >>> tsCommon.symbol
+    'common'
 
-    ::
+    >>> tsCut = meter.TimeSignature("cut")
+    >>> tsCut.beatCount
+    2
+    >>> tsCut.denominator
+    2
 
-        >>> tsCommon.denominator
-        4
-
-    ::
-
-        >>> tsCommon.symbol
-        'common'
-
-    ::
-
-        >>> tsCut = meter.TimeSignature("cut")
-        >>> tsCut.beatCount
-        2
-
-    ::
-
-        >>> tsCut.denominator
-        2
-
-    ::
-
-        >>> tsCut.symbol
-        'cut'
+    >>> tsCut.symbol
+    'cut'
 
     For complete details on using this object, see :ref:`overviewMeters`.
 

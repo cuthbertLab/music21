@@ -284,29 +284,24 @@ def figureTuplets(chordObject, keyObject):
 
     For instance, in C major, F# D A- C# would be:
 
-    ::
+    >>> from music21 import roman
+    >>> roman.figureTuplets(
+    ...     chord.Chord(['F#2','D3','A-3','C#4']),
+    ...     key.Key('C'),
+    ...     )
+    [(1, 1.0, '#', <music21.pitch.Pitch F#2>),
+    (6, 0.0, '', <music21.pitch.Pitch D3>),
+    (3, -1.0, 'b', <music21.pitch.Pitch A-3>),
+    (5, 1.0, '#', <music21.pitch.Pitch C#4>)]
 
-        >>> from music21 import roman
-        >>> roman.figureTuplets(
-        ...     chord.Chord(['F#2','D3','A-3','C#4']),
-        ...     key.Key('C'),
-        ...     )
-        [(1, 1.0, '#', <music21.pitch.Pitch F#2>),
-        (6, 0.0, '', <music21.pitch.Pitch D3>),
-        (3, -1.0, 'b', <music21.pitch.Pitch A-3>),
-        (5, 1.0, '#', <music21.pitch.Pitch C#4>)]
-
-    ::
-
-        >>> roman.figureTuplets(
-        ...     chord.Chord(['E3','C4','G4','B-5']),
-        ...     key.Key('C'),
-        ...     )
-        [(1, 0.0, '', <music21.pitch.Pitch E3>),
-        (6, 0.0, '', <music21.pitch.Pitch C4>),
-        (3, 0.0, '', <music21.pitch.Pitch G4>),
-        (5, -1.0, 'b', <music21.pitch.Pitch B-5>)]
-
+    >>> roman.figureTuplets(
+    ...     chord.Chord(['E3','C4','G4','B-5']),
+    ...     key.Key('C'),
+    ...     )
+    [(1, 0.0, '', <music21.pitch.Pitch E3>),
+    (6, 0.0, '', <music21.pitch.Pitch C4>),
+    (3, 0.0, '', <music21.pitch.Pitch G4>),
+    (5, -1.0, 'b', <music21.pitch.Pitch B-5>)]
     '''
     result = []
     bass = chordObject.bass()
@@ -324,18 +319,17 @@ def figureTupletSolo(pitchObj, keyObj, bass):
 
     For instance, in C major, an A-3 above an F# bass would be:
 
-    ::
-
-        >>> from music21 import roman
-        >>> roman.figureTupletSolo(
-        ...     pitch.Pitch('A-3'),
-        ...     key.Key('C'),
-        ...     pitch.Pitch('F#2'),
-        ...     )
-        (3, -1.0, 'b', <music21.pitch.Pitch A-3>)
+    >>> from music21 import roman
+    >>> roman.figureTupletSolo(
+    ...     pitch.Pitch('A-3'),
+    ...     key.Key('C'),
+    ...     pitch.Pitch('F#2'),
+    ...     )
+    (3, -1.0, 'b', <music21.pitch.Pitch A-3>)
 
     Return tuple.
     '''
+    #TODO: Return namedtuple
     unused_scaleStep, scaleAccidental = \
         keyObj.getScaleDegreeAndAccidentalFromPitch(pitchObj)
 
@@ -365,27 +359,18 @@ def identifyAsTonicOrDominant(inChord, inKey):
     dominant, but only two pitches are provided in the chord. If neither tonic
     nor dominant is possibly correct, False is returned
 
-    ::
+    >>> from music21 import roman
+    >>> roman.identifyAsTonicOrDominant(['B2','F5'], key.Key('C'))
+    'V65'
 
-        >>> from music21 import roman
-        >>> roman.identifyAsTonicOrDominant(['B2','F5'], key.Key('C'))
-        'V65'
+    >>> roman.identifyAsTonicOrDominant(['B3','G4'], key.Key('g'))
+    'i6'
 
-    ::
+    >>> roman.identifyAsTonicOrDominant(['C3', 'B4'], key.Key('f'))
+    'V7'
 
-        >>> roman.identifyAsTonicOrDominant(['B3','G4'], key.Key('g'))
-        'i6'
-
-    ::
-
-        >>> roman.identifyAsTonicOrDominant(['C3', 'B4'], key.Key('f'))
-        'V7'
-
-    ::
-
-        >>> roman.identifyAsTonicOrDominant(['D3'], key.Key('f'))
-        False
-
+    >>> roman.identifyAsTonicOrDominant(['D3'], key.Key('f'))
+    False
     '''
     if isinstance(inChord, list):
         inChord = chord.Chord(inChord)
@@ -479,107 +464,87 @@ def romanNumeralFromChord(
     omitted, the root of the chord is considered the key (if the chord has a
     major third, it's major; otherwise it's minor):
 
-    ::
-
-        >>> from music21 import roman
-        >>> rn = roman.romanNumeralFromChord(
-        ...     chord.Chord(['E-3','C4','G-6']),
-        ...     key.Key('g#'),
-        ...     )
-        >>> rn
-        <music21.roman.RomanNumeral bivo6 in g# minor>
+    >>> from music21 import roman
+    >>> rn = roman.romanNumeralFromChord(
+    ...     chord.Chord(['E-3','C4','G-6']),
+    ...     key.Key('g#'),
+    ...     )
+    >>> rn
+    <music21.roman.RomanNumeral bivo6 in g# minor>
 
     The pitches remain the same with the same octaves:
 
-    ::
+    >>> for pitch in rn.pitches:
+    ...     pitch
+    ...
+    <music21.pitch.Pitch E-3>
+    <music21.pitch.Pitch C4>
+    <music21.pitch.Pitch G-6>
 
-        >>> for pitch in rn.pitches:
-        ...     pitch
-        ...
-        <music21.pitch.Pitch E-3>
-        <music21.pitch.Pitch C4>
-        <music21.pitch.Pitch G-6>
-
-    ::
-
-        >>> romanNumeral2 = roman.romanNumeralFromChord(
-        ...     chord.Chord(['E3','C4','G4','B-4','E5','G5']),
-        ...     key.Key('F'),
-        ...     )
-        >>> romanNumeral2
-        <music21.roman.RomanNumeral V65 in F major>
+    >>> romanNumeral2 = roman.romanNumeralFromChord(
+    ...     chord.Chord(['E3','C4','G4','B-4','E5','G5']),
+    ...     key.Key('F'),
+    ...     )
+    >>> romanNumeral2
+    <music21.roman.RomanNumeral V65 in F major>
 
     Note that vi and vii in minor signifies what you might think of
     alternatively as #vi and #vii:
 
-    ::
+    >>> romanNumeral3 = roman.romanNumeralFromChord(
+    ...     chord.Chord(['A4','C5','E-5']),
+    ...     key.Key('c'),
+    ...     )
+    >>> romanNumeral3
+    <music21.roman.RomanNumeral vio in c minor>
 
-        >>> romanNumeral3 = roman.romanNumeralFromChord(
-        ...     chord.Chord(['A4','C5','E-5']),
-        ...     key.Key('c'),
-        ...     )
-        >>> romanNumeral3
-        <music21.roman.RomanNumeral vio in c minor>
+    >>> romanNumeral4 = roman.romanNumeralFromChord(
+    ...     chord.Chord(['A-4','C5','E-5']),
+    ...     key.Key('c'),
+    ...     )
+    >>> romanNumeral4
+    <music21.roman.RomanNumeral bVI in c minor>
 
-    ::
+    >>> romanNumeral5 = roman.romanNumeralFromChord(
+    ...     chord.Chord(['B4','D5','F5']),
+    ...     key.Key('c'),
+    ...     )
+    >>> romanNumeral5
+    <music21.roman.RomanNumeral viio in c minor>
 
-        >>> romanNumeral4 = roman.romanNumeralFromChord(
-        ...     chord.Chord(['A-4','C5','E-5']),
-        ...     key.Key('c'),
-        ...     )
-        >>> romanNumeral4
-        <music21.roman.RomanNumeral bVI in c minor>
-
-    ::
-
-        >>> romanNumeral5 = roman.romanNumeralFromChord(
-        ...     chord.Chord(['B4','D5','F5']),
-        ...     key.Key('c'),
-        ...     )
-        >>> romanNumeral5
-        <music21.roman.RomanNumeral viio in c minor>
-
-    ::
-
-        >>> romanNumeral6 = roman.romanNumeralFromChord(
-        ...     chord.Chord(['B-4','D5','F5']),
-        ...     key.Key('c'),
-        ...     )
-        >>> romanNumeral6
-        <music21.roman.RomanNumeral bVII in c minor>
+    >>> romanNumeral6 = roman.romanNumeralFromChord(
+    ...     chord.Chord(['B-4','D5','F5']),
+    ...     key.Key('c'),
+    ...     )
+    >>> romanNumeral6
+    <music21.roman.RomanNumeral bVII in c minor>
 
     Diminished and half-diminished seventh chords can omit the third and still
     be diminished: (n.b. we also demonstrate that chords can be created from a
     string):
 
-    ::
-
-        >>> romanNumeralDim7 = roman.romanNumeralFromChord(
-        ...     chord.Chord("A3 E-4 G-4"),
-        ...     key.Key('b-'),
-        ...     )
-        >>> romanNumeralDim7
-        <music21.roman.RomanNumeral viio7 in b- minor>
+    >>> romanNumeralDim7 = roman.romanNumeralFromChord(
+    ...     chord.Chord("A3 E-4 G-4"),
+    ...     key.Key('b-'),
+    ...     )
+    >>> romanNumeralDim7
+    <music21.roman.RomanNumeral viio7 in b- minor>
 
     For reference, odder notes:
 
-    ::
+    >>> romanNumeral7 = roman.romanNumeralFromChord(
+    ...     chord.Chord(['A--4','C-5','E--5']),
+    ...     key.Key('c'),
+    ...     )
+    >>> romanNumeral7
+    <music21.roman.RomanNumeral bbVI in c minor>
 
-        >>> romanNumeral7 = roman.romanNumeralFromChord(
-        ...     chord.Chord(['A--4','C-5','E--5']),
-        ...     key.Key('c'),
-        ...     )
-        >>> romanNumeral7
-        <music21.roman.RomanNumeral bbVI in c minor>
-
-    ::
-
-        >>> romanNumeral8 = roman.romanNumeralFromChord(
-        ...     chord.Chord(['A#4','C#5','E#5']),
-        ...     key.Key('c'),
-        ...     )
-        >>> romanNumeral8
-        <music21.roman.RomanNumeral #vi in c minor>
+    >>> romanNumeral8 = roman.romanNumeralFromChord(
+    ...     chord.Chord(['A#4','C#5','E#5']),
+    ...     key.Key('c'),
+    ...     )
+    >>> romanNumeral8
+    <music21.roman.RomanNumeral #vi in c minor>
 
     OMIT_FROM_DOCS
 
@@ -598,6 +563,7 @@ def romanNumeralFromChord(
 #    <music21.roman.RomanNumeral #iiio/7 in d minor>
 
     '''
+    #TODO: Make sure 9 and 10 work
     #stepAdjustments = {'minor' : {3: -1, 6: -1, 7: -1},
     #                   'diminished' : {3: -1, 5: -1, 6: -1, 7: -2},
     #                   'half-diminished': {3: -1, 5: -1, 6: -1, 7: -1},

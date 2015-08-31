@@ -41,12 +41,7 @@ class Volume(SlottedObject):
     The Volume object lives on NotRest objects and subclasses. It is not a
     Music21Object subclass.
 
-    ::
-
-        >>> v = volume.Volume()
-        
-        
-
+    >>> v = volume.Volume(velocity=90)
     '''
 
     ### CLASS VARIABLES ###
@@ -181,45 +176,33 @@ class Volume(SlottedObject):
         The `velocityIsRelative` tag determines if the velocity value includes
         contextual values, such as dynamics and and accents, or not.
 
-        ::
+        >>> s = stream.Stream()
+        >>> s.repeatAppend(note.Note('d3', quarterLength=.5), 8)
+        >>> s.insert([0, dynamics.Dynamic('p'), 1, dynamics.Dynamic('mp'), 2, dynamics.Dynamic('mf'), 3, dynamics.Dynamic('f')])
 
-            >>> s = stream.Stream()
-            >>> s.repeatAppend(note.Note('d3', quarterLength=.5), 8)
-            >>> s.insert([0, dynamics.Dynamic('p'), 1, dynamics.Dynamic('mp'), 2, dynamics.Dynamic('mf'), 3, dynamics.Dynamic('f')])
+        >>> s.notes[0].volume.getRealized()
+        0.496...
 
-        ::
+        >>> s.notes[1].volume.getRealized()
+        0.496...
 
-            >>> s.notes[0].volume.getRealized()
-            0.496...
+        >>> s.notes[2].volume.getRealized()
+        0.63779...
 
-        ::
+        >>> s.notes[7].volume.getRealized()
+        0.99212...
 
-            >>> s.notes[1].volume.getRealized()
-            0.496...
+        velocity, if set, will be scaled by dynamics
+        
+        >>> s.notes[7].volume.velocity = 20
+        >>> s.notes[7].volume.getRealized()
+        0.22047...
 
-        ::
-
-            >>> s.notes[2].volume.getRealized()
-            0.63779...
-
-        ::
-
-            >>> s.notes[7].volume.getRealized()
-            0.99212...
-
-        ::
-
-            >>> # velocity, if set, will be scaled by dynamics
-            >>> s.notes[7].volume.velocity = 20
-            >>> s.notes[7].volume.getRealized()
-            0.22047...
-
-        ::
-
-            >>> # unless we set the velocity to not be relative
-            >>> s.notes[7].volume.velocityIsRelative = False
-            >>> s.notes[7].volume.getRealized()
-            0.1574803...
+        unless we set the velocity to not be relative...
+        
+        >>> s.notes[7].volume.velocityIsRelative = False
+        >>> s.notes[7].volume.getRealized()
+        0.1574803...
 
         '''
         #velocityIsRelative might be best set at import. e.g., from MIDI,
@@ -294,12 +277,9 @@ class Volume(SlottedObject):
         recently set, using this property will add significant performance
         boost.
 
-        ::
-
-            >>> v = volume.Volume(velocity=128)
-            >>> v.cachedRealized
-            1.0
-
+        >>> v = volume.Volume(velocity=128)
+        >>> v.cachedRealized
+        1.0
         '''
         if self._cachedRealized is None:
             self._cachedRealized = self.getRealized()
@@ -310,12 +290,9 @@ class Volume(SlottedObject):
         '''
         Convenience property for testing.
 
-        ::
-
-            >>> v = volume.Volume(velocity=128)
-            >>> v.cachedRealizedStr
-            '1.0'
-
+        >>> v = volume.Volume(velocity=128)
+        >>> v.cachedRealizedStr
+        '1.0'
         '''
         return str(round(self.cachedRealized, 2))
 
@@ -351,17 +328,13 @@ class Volume(SlottedObject):
         Get or set the velocity value, a numerical value between 0 and 127 and
         available setting amplitude on each Note or Pitch in chord.
 
-        ::
+        >>> n = note.Note()
+        >>> n.volume.velocity = 20
+        >>> n.volume.parent == n
+        True
 
-            >>> n = note.Note()
-            >>> n.volume.velocity = 20
-            >>> n.volume.parent == n
-            True
-
-        ::
-
-            >>> n.volume.velocity
-            20
+        >>> n.volume.velocity
+        20
         '''
         return self._velocity
 
@@ -390,19 +363,14 @@ class Volume(SlottedObject):
         When setting this value, an integer-based velocity value will be
         derived and stored.
 
-        ::
+        >>> n = note.Note()
+        >>> n.volume.velocityScalar = .5
+        >>> n.volume.velocity
+        64
 
-            >>> n = note.Note()
-            >>> n.volume.velocityScalar = .5
-            >>> n.volume.velocity
-            64
-
-        ::
-
-            >>> n.volume.velocity = 127
-            >>> n.volume.velocityScalar
-            1.0
-
+        >>> n.volume.velocity = 127
+        >>> n.volume.velocityScalar
+        1.0
         '''
         # multiplying by 1/127. for performance
         return self._velocity * 0.007874015748031496
