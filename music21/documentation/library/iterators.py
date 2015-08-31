@@ -125,13 +125,13 @@ class ModuleIterator(Iterator):
                 except ImportError:
                     pass
             for fileName in fileNames:
-                print("YAHOO!5", fileName, directoryPath)
                 if fileName in self._ignoredFileNames:
                     continue
                 if not fileName.endswith('.py'):
                     continue
                 if fileName.startswith('_') and not fileName.startswith('__'):
                     continue
+                print("YAHOO!5", fileName, directoryPath)
                 filePath = os.path.join(directoryPath, fileName)
                 strippedPath = filePath.partition(rootFilesystemPath)[2]
                 pathParts = [x for x in os.path.splitext(
