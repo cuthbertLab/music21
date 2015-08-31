@@ -13,6 +13,8 @@
 '''
 Tools for generation reduction displays, showing a score and or a chord reduction, 
 and one or more reductive representation lines.
+
+Used by graph.PlotHorizontalBarWeighted()
 '''
 
 
@@ -217,8 +219,8 @@ class ScoreReduction(object):
         return self._score
 
     score = property(_getScore, _setScore, doc='''
-        Get or set the Score. Setting the score set a deepcopy of the score; the score set here will not be altered.
-
+        Get or set the Score. Setting the score set a deepcopy of the score; the score 
+        set here will not be altered.
         
         >>> s = corpus.parse('bwv66.6')
         >>> sr = analysis.reduction.ScoreReduction()
@@ -241,7 +243,8 @@ class ScoreReduction(object):
         return self._chordReduction
 
     chordReduction = property(_getChordReduction, _setChordReduction, doc='''
-        Get or set a Chord reduction as a Stream or Score. Setting the this values set a deepcopy of the reduction; the reduction set here will not be altered.
+        Get or set a Chord reduction as a Stream or Score. Setting the this values 
+        set a deepcopy of the reduction; the reduction set here will not be altered.
         ''')
 
 
@@ -409,18 +412,24 @@ class PartReduction(object):
     Each resulting part is then segmented by an object. 
     This object is assigned as floating-point value.
 
-    This reduction is designed to work with the GraphHorizontalBarWeighted and related Plot subclasses.
+    This reduction is designed to work with the GraphHorizontalBarWeighted and related Plot 
+    subclasses.
 
     If the `fillByMeasure` parameter is True, and if measures are available, 
-    each part will segment by Measure divisions, and look for the target activity only once per Measure. 
+    each part will segment by Measure divisions, and look for the target activity only 
+    once per Measure. 
+    
     If more than one target is found in the Measure, values will be averaged. 
+    
     If `fillByMeasure` is False, the part will be segmented by each Note. 
 
     The `segmentByTarget` parameter is True, segments, which may be Notes or Measures, 
-    will be divided if necessary to show changes that occur over the duration of the segment by a target object. 
+    will be divided if necessary to show changes that occur over the duration of the 
+    segment by a target object. 
 
     If the `normalizeByPart` parameter is True, each part will be normalized within 
-    the range only of that part. If False, all parts will be normalized by the max of all parts. The default is True. 
+    the range only of that part. If False, all parts will be normalized by the max 
+    of all parts. The default is True. 
 
     If the `normalize` parameter is False, no normalization will take place. The default is True. 
 
@@ -470,7 +479,8 @@ class PartReduction(object):
     def _createPartBundles(self):
         '''
         Fill the _partBundles list with dictionaries, 
-        each dictionary defining a name (part id or supplied), a color, and list of Parts that match.
+        each dictionary defining a name (part id or supplied), a color, and list 
+        of Parts that match.
         '''
         self._partBundles = []
         if self._partGroups is not None:
@@ -621,11 +631,15 @@ class PartReduction(object):
 
     def _getValueForSpan(self, target='Dynamic', splitSpans=True, 
         targetToWeight=None):
-        '''For each span, determine the measured parameter value. This is translated as the height of the bar graph.
+        '''
+        For each span, determine the measured parameter value. This is translated 
+        as the height of the bar graph.
 
-        If `splitSpans` is True, a span will be split of the target changes over the span. Otherwise, Spans will be averaged. This is the `segmentByTarget` parameter. 
+        If `splitSpans` is True, a span will be split of the target changes over the span. 
+        Otherwise, Spans will be averaged. This is the `segmentByTarget` parameter. 
 
-        The `targetToWeight` parameter is a function that takes a list or Stream of objects (of the class specified by `target`) and returns a single floating-point value.
+        The `targetToWeight` parameter is a function that takes a list or Stream of objects 
+        (of the class specified by `target`) and returns a single floating-point value.
         ''' 
         # this temporary function only works with dynamics
         def _dynamicToWeight(targets):
@@ -695,7 +709,8 @@ class PartReduction(object):
                         # thus, span needs to be distance to end of regions
                         if targetSpan <= 0.001: 
                             targetSpan = offsetEnd - targetStart
-                        #environLocal.printDebug([t, 'targetSpan', targetSpan, 'offsetEnd', offsetEnd, "ds['span']", ds['span']])
+                        #environLocal.printDebug([t, 'targetSpan', targetSpan, 
+                        #  'offsetEnd', offsetEnd, "ds['span']", ds['span']])
 
                         if i==0 and ds['eStart'] == targetStart:
                             # the target start at the same position
@@ -725,7 +740,9 @@ class PartReduction(object):
                 self._eventSpans[partBundle['pGroupId']] = finalBundle
 
     def _extendSpans(self):
-        '''Extend a the value of a target parameter to the next boundary. An undefined boundary will wave as its weight None. 
+        '''
+        Extend a the value of a target parameter to the next boundary. 
+        An undefined boundary will wave as its weight None. 
         ''' 
 #         environLocal.printDebug(['_extendSpans: pre'])    
 #         for partBundle in self._partBundles:
@@ -794,7 +811,8 @@ class PartReduction(object):
 
 
     def getGraphHorizontalBarWeightedData(self):
-        '''Get all data organized into bar span specifications. 
+        '''
+        Get all data organized into bar span specifications. 
         '''
 #         data =  [
 #         ('Violins',  [(3, 5, 1, '#fff000'), (1, 12, .2, '#3ff203',.1, 1)]  ), 
@@ -836,8 +854,10 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.parts[0].flat.notes), 3)
         #post.parts[0].show('t')
 
-        match = [(e, e.offset, e.duration.quarterLength) for e in post.parts[0].getElementsByClass('Measure')[0:3].flat.notesAndRests]
-        self.assertEqual(str(match), '[(<music21.note.Rest rest>, 0.0, 1.0), (<music21.note.Note F#>, 1.0, 1.0), (<music21.note.Rest rest>, 2.0, 1.0), (<music21.note.Note C#>, 3.0, 1.0), (<music21.note.Rest rest>, 5.0, 1.0), (<music21.note.Note G#>, 6.0, 1.0)]')
+        match = [(e, e.offset, e.duration.quarterLength) 
+                  for e in post.parts[0].getElementsByClass('Measure')[0:3].flat.notesAndRests]
+        self.assertEqual(str(match), 
+                         '''[(<music21.note.Rest rest>, 0.0, 1.0), (<music21.note.Note F#>, 1.0, 1.0), (<music21.note.Rest rest>, 2.0, 1.0), (<music21.note.Note C#>, 3.0, 1.0), (<music21.note.Rest rest>, 5.0, 1.0), (<music21.note.Note G#>, 6.0, 1.0)]''')
 
         # test that lyric is found
         self.assertEqual(post.parts[0].flat.notes[0].lyric, 'fromBass')
@@ -990,11 +1010,13 @@ class Test(unittest.TestCase):
             for i, dataMatch in enumerate(a[1]): # second item has data
                 dataTarget = b[1][i]
                 # start
-                self.assertTrue(common.almostEquals(dataMatch[0], dataTarget[0]))
+                self.assertAlmostEqual(dataMatch[0], dataTarget[0])
                 # span
-                self.assertTrue(common.almostEquals(dataMatch[1], dataTarget[1]))
+                self.assertAlmostEqual(dataMatch[1], dataTarget[1])
                 # weight
-                self.assertTrue(common.almostEquals(dataMatch[2], dataTarget[2]), "for partId %s, entry %d: should be %s <-> was %s" % (partId, i, dataMatch[2], dataTarget[2]))
+                self.assertAlmostEqual(dataMatch[2], dataTarget[2], 
+                                "for partId %s, entry %d: should be %s <-> was %s" % (
+                                                    partId, i, dataMatch[2], dataTarget[2]))
 
     def testPartReductionB(self, show=False):
         '''Artificially create test cases.
@@ -1147,7 +1169,12 @@ class Test(unittest.TestCase):
                     segmentByTarget=False, normalize=False)
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
-        match = [(0, [[0.0, 4.0, 0.178571428571, '#666666'], [4.0, 4.0, 0.0214285714286, '#666666'], [8.0, 4.0, 0.0214285714286, '#666666']]), (1, [[0.0, 4.0, 0.178571428571, '#666666'], [4.0, 4.0, 0.07857142857142858, '#666666'], [8.0, 4.0, 0.07857142857142858, '#666666']])]
+        match = [(0, [[0.0, 4.0, 0.178571428571, '#666666'], 
+                      [4.0, 4.0, 0.0214285714286, '#666666'], 
+                      [8.0, 4.0, 0.0214285714286, '#666666']]), 
+                 (1, [[0.0, 4.0, 0.178571428571, '#666666'], 
+                      [4.0, 4.0, 0.07857142857142858, '#666666'], 
+                      [8.0, 4.0, 0.07857142857142858, '#666666']])]
 
         self._matchWeightedData(match, target)
 

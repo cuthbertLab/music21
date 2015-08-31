@@ -3363,7 +3363,9 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
 
 #-------------------------------------------------------------------------------
 class PlotHorizontalBarWeighted(PlotStream):
-    '''A base class for plots of Scores with weighted (by height) horizontal bars. Many different weighted segments can provide a representation of a dynamic parameter of a Part.
+    '''A base class for plots of Scores with weighted (by height) horizontal bars. 
+    Many different weighted segments can provide a 
+    representation of a dynamic parameter of a Part.
 
 
     '''

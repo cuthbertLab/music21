@@ -141,11 +141,17 @@ def LRP_transform(c, transposeInterval, changingPitch):
             newChord.pitches[i].transpose(transposeInterval, inPlace=True) 
     return chord.Chord(newChord.pitches)
 
-def LRP_combinations(c, transformationString, raiseException = False, leftOrdered = False, simplifyEnharmonic = False):
+def LRP_combinations(c, 
+                     transformationString, 
+                     raiseException = False, 
+                     leftOrdered = False, 
+                     simplifyEnharmonic = False):
     '''
     LRP_combinations is a function that takes a major or minor triad and a transformationString
-    and returns a transformed triad, using the L, R, and P transformations. Certain combinations, such
-    as LPLPLP, are cyclical, and therefore will return the original chord if simplifyEnharmonic = True.
+    and returns a transformed triad, using the L, R, and P transformations. 
+    Certain combinations, such
+    as LPLPLP, are cyclical, and therefore will return the original chord 
+    if simplifyEnharmonic = True.
     
     leftOrdered allows a user to work with the function notation that they prefer. 
     leftOrdered = False, the default, will mean that a transformationString that reads 
@@ -154,8 +160,11 @@ def LRP_combinations(c, transformationString, raiseException = False, leftOrdere
     transforming the chord by R, then P, then L--by reading the transformations left to right. 
     
     simplifyEnharmonic allows a user to determine if they want the transformation to return
-    the actual results of such combined transformations, which may include multiple sharps and flats.
-    if simplifyEnharmonic= True, the resulting chord will be simplified to notes with at most 1 flat
+    the actual results of such combined transformations, 
+    which may include multiple sharps and flats.
+    
+    If simplifyEnharmonic is True, the resulting chord will be simplified 
+    to notes with at most 1 flat
     or 1 sharp, in their most common form. 
     
     >>> c1 = chord.Chord("C4 E4 G4")
@@ -223,7 +232,8 @@ def LRP_combinations(c, transformationString, raiseException = False, leftOrdere
         return c
     
     # TODO: Fix enharmonic problem
-    # create method, chord.simplifyEnharmonic() that will take the c.root() [call it correctlySpelled or simplifySpelling or something]
+    # create method, chord.simplifyEnharmonic() that will take the c.root() 
+    # [call it correctlySpelled or simplifySpelling or something]
     # and simplify it--how do we make sure it take the right one?
     # Conflict between G# and A-. Then build triads from there using pitch.flipEnharmonic()
     # have to make sure it is a minor or major triad
@@ -242,7 +252,8 @@ def LRP_combinations(c, transformationString, raiseException = False, leftOrdere
     
     # can also use isTriad and incorrectlySpelled
     
-    # first figure out what scale you're simplifying into, then simplify it. Optional parameter to take the scale/key
+    # first figure out what scale you're simplifying into, then simplify it. 
+    # Optional parameter to take the scale/key
     # to simplify into, and then we can skip the step of having to find the key. 
     
 def completeHexatonic(c):

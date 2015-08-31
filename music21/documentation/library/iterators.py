@@ -72,10 +72,10 @@ class ModuleIterator(Iterator):
     'music21.abcFormat.__init__'
     'music21.abcFormat.translate'
     'music21.alpha.__init__'
+    'music21.alpha.analysis.__init__'
+    'music21.alpha.analysis.scoreDiff'
+    'music21.alpha.analysis.search'
     'music21.alpha.chant'
-    'music21.alpha.contour'
-    'music21.alpha.medren'
-    'music21.analysis.__init__'
     '''
 
     ### CLASS VARIABLES ###
@@ -219,10 +219,10 @@ class FunctionIterator(Iterator):
     ('music21.abcFormat.translate', 'abcToStreamScore')
     ('music21.abcFormat.translate', 'parseTokens')
     ('music21.abcFormat.translate', 'reBar')
+    ('music21.alpha.analysis.search', 'findConsecutiveScale')
     ('music21.alpha.chant', 'fromStream')
     ('music21.alpha.medren', 'breakMensuralStreamIntoBrevisLengths')
     ('music21.alpha.medren', 'convertHouseStyle')
-    ('music21.alpha.medren', 'cummingSchubertStrettoFuga')
     '''
 
     ### SPECIAL METHODS ###

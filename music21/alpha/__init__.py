@@ -26,10 +26,13 @@ to the main music21 module set.  Some may be removed.  Some may stay here
 indefinitely.
 
 medren will probably reappear in another form in a directory called "medren" at some
-point, along with chant and trecento
-'''
-__all__ = ['chant', 'contour', 'medren']
+point, along with chant and trecento.
 
+When adding files here, update documentation.library.iterators
+'''
+__all__ = ['analysis', 'chant', 'contour', 'medren']
+
+from music21.alpha import analysis
 from music21.alpha import chant
 from music21.alpha import contour
 from music21.alpha import medren 

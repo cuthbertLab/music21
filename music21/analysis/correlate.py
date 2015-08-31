@@ -138,7 +138,8 @@ class ActivityMatch(object):
         for objName in [objNameSrc, objNameDst]:
             dstCheck = self.streamObj.flat.getElementsByClass(objName)
             if len(dstCheck) == 0:
-                raise CorrelateException('cannot create correlation an object that is not found in the Stream: %s' % objName)
+                raise CorrelateException('cannot create correlation an object ' +
+                                         'that is not found in the Stream: %s' % objName)
 
         self._findActive(objNameSrc, objNameDst)
 
@@ -196,7 +197,8 @@ class Test(unittest.TestCase):
         pass
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
+        '''
+        Test copying all objects defined in this module
         '''
         import sys, types, copy
         for part in sys.modules[self.__module__].__dict__:

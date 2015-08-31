@@ -76,7 +76,8 @@ def thomassenMelodicAccent(streamIn):
     according to the method postulated in Joseph M. Thomassen, "Melodic accent: Experiments and 
     a tentative model," ''Journal of the Acoustical Society of America'', Vol. 71, No. 6 (1982) pp. 
     1598-1605; with, Erratum, ''Journal of the Acoustical Society of America'', Vol. 73, 
-    No. 1 (1983) p.373, and in David Huron and Matthew Royal, "What is melodic accent? Converging evidence 
+    No. 1 (1983) p.373, and in David Huron and Matthew Royal, 
+    "What is melodic accent? Converging evidence 
     from musical practice." ''Music Perception'', Vol. 13, No. 4 (1996) pp. 489-516. 
     
     Similar to the humdrum melac_ tool.
