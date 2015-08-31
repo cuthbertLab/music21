@@ -119,8 +119,9 @@ class ModuleGather(object):
             ]
         # skip any path that starts with this string
         self.pathSkip = ['obsolete', 'ext', 'server', 'demos', 
-                         #temp...
-                         'graph', 'figuredBass', 'braille', 'features', 'test', 'analysis', 'musicxml', 'metadata', 'stream']
+                         #temp... make fast...
+                         #'graph', 'figuredBass', 'braille', 'features', 'test', 'analysis', 'musicxml', 'metadata', 'stream',
+                         ]
         self.slowModules = ['graph', 'figuredBass/realizer', 
                             'features/jSymbolic', 'features/native', 'figuredBass/examples', 
                             'braille/test', 'test/testStream', 'analysis/windowed', 
