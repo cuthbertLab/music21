@@ -103,7 +103,7 @@ from music21 import features #@UnusedImport
 from music21 import harmony #@UnusedImport
 from music21 import clef #@UnusedImport
 from music21 import tempo #@UnusedImport
-from music21.theoryAnalysis import theoryAnalyzer #@UnusedImport
+from music21.alpha.theoryAnalysis import theoryAnalyzer #@UnusedImport
 
 from music21.ext import six
 

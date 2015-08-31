@@ -79,7 +79,6 @@ __all__ = [
     'scala', 
     'search',
     'test',
-    'theoryAnalysis',
     'timespans',
     'trecento',
     'vexflow',

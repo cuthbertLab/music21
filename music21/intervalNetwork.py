@@ -9,8 +9,8 @@
 # Copyright:    Copyright © 2010-2012, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
-'''An BoundIntervalNetwork defines a scale or harmonic unit as a (weighted) 
+'''
+A BoundIntervalNetwork defines a scale or harmonic unit as a (weighted) 
 digraph, or directed graph, where pitches are nodes and intervals are 
 edges. Nodes, however, are not stored; instead, an ordered list of edges 
 (Intervals) is provided as an archetype of adjacent nodes. 
@@ -85,9 +85,12 @@ class EdgeException(exceptions21.Music21Exception):
 
 
 class Edge(object):
-    '''Abstraction of an Interval as an Edge. 
+    '''
+    Abstraction of an Interval as an Edge. 
 
-    Edges store an Interval object as well as a pathway direction specification. The pathway is the route through the network from terminus to terminus, and can either by ascending or descending. 
+    Edges store an Interval object as well as a pathway direction specification. 
+    The pathway is the route through the network from terminus to terminus, 
+    and can either by ascending or descending. 
 
     For directed Edges, the direction of the Interval may be used to 
     suggest non-pitch ascending movements (even if the pathway direction is ascending). 
@@ -97,17 +100,19 @@ class Edge(object):
     
     >>> i = interval.Interval('M3')
     >>> e = intervalNetwork.Edge(i)
-    >>> i is e.interval
+    >>> e.interval is i
     True
+    >>> e.direction
+    'bi'
     '''
-    def __init__(self, intervalData=None, id=None, direction='bi'): # id is okay: @ReservedAssignment
+    def __init__(self, intervalData=None, id=None, direction=DIRECTION_BI): # id is okay: @ReservedAssignment
         if common.isStr(intervalData):
             i = interval.Interval(intervalData)
         else:
             i = intervalData
         self._interval = i
         # direction will generally be set when connections added 
-        self._direction = DIRECTION_BI # can be ascending, descending
+        self._direction = direction # can be bi, ascending, descending
         self.weight = 1.0
         # store id
         self.id = id
@@ -157,10 +162,10 @@ class Edge(object):
         <music21.interval.Interval M3>
         ''')
 
-    def _geDirection(self):
+    def _getDirection(self):
         return self._direction
 
-    direction = property(_geDirection, 
+    direction = property(_getDirection, 
         doc = '''
         Return the direction of the Edge.
 
@@ -174,7 +179,7 @@ class Edge(object):
         ''')
 
 
-    def addDirectedConnection(self, n1, n2, direction=None):
+    def addDirectedConnection(self, node1, node2, direction=None):
         '''Provide two Node objects that connect this Edge, in the direction from the first to the second. 
         
         When calling directly, a direction, either 
@@ -182,7 +187,6 @@ class Edge(object):
         this will override whatever the interval is.  
         If None, this will not be set. 
 
-        
         >>> i = interval.Interval('M3')
         >>> e1 = intervalNetwork.Edge(i, id=0)
         >>> n1 = intervalNetwork.Node(id=0)
@@ -195,15 +199,15 @@ class Edge(object):
         <music21.intervalNetwork.Edge ascending M3 [(0,1)]>
         '''
         # may be Node objects, or number, or string
-        if common.isStr(n1) or common.isNum(n1):
-            n1Id = n1
+        if common.isStr(node1) or common.isNum(node1):
+            n1Id = node1
         else: # assume an Node
-            n1Id = n1.id
+            n1Id = node1.id
 
-        if common.isStr(n2) or common.isNum(n2):
-            n2Id = n2
+        if common.isStr(node2) or common.isNum(node2):
+            n2Id = node2
         else: # assume an Node
-            n2Id = n2.id
+            n2Id = node2.id
 
         self._connections.append((n1Id, n2Id))
 
@@ -213,11 +217,11 @@ class Edge(object):
         self._direction = direction
 
 
-    def addBiDirectedConnections(self, n1, n2):
-        '''Provide two Edge objects that pass through 
+    def addBiDirectedConnections(self, node1, node2):
+        '''
+        Provide two Edge objects that pass through 
         this Node, in the direction from the first to the second. 
 
-        
         >>> i = interval.Interval('M3')
         >>> e1 = intervalNetwork.Edge(i, id=0)
         >>> n1 = intervalNetwork.Node(id='terminusLow')
@@ -230,8 +234,8 @@ class Edge(object):
         <music21.intervalNetwork.Edge bi M3 [('terminusLow',1),(1,'terminusLow')]>
         '''
         # must assume here that n1 to n2 is ascending; need to know
-        self.addDirectedConnection(n1, n2, DIRECTION_ASCENDING)
-        self.addDirectedConnection(n2, n1, DIRECTION_DESCENDING)
+        self.addDirectedConnection(node1, node2, DIRECTION_ASCENDING)
+        self.addDirectedConnection(node2, node1, DIRECTION_DESCENDING)
         self._direction = DIRECTION_BI # can be ascending, descending
 
 
@@ -289,15 +293,19 @@ class Edge(object):
 
 
 class Node(common.SlottedObject):
-    '''Abstraction of an unrealized Pitch Node.
+    '''
+    Abstraction of an unrealized Pitch Node.
 
     The Node `id` is used to storing connections in Edges and has no real meaning.
 
     Terminal Nodes have special ids: 'terminusLow', 'terminusHigh'
 
-    The Node `degree` is translated to scale degrees in various applications, and is used to request a pitch from the network.
+    The Node `degree` is translated to scale degrees in various applications, 
+    and is used to request a pitch from the network.
 
-    The `weight` attribute is used to probabilistically select between multiple nodes when multiple nodes satisfy either a branching option in a pathway or a request for a degree. 
+    The `weight` attribute is used to probabilistically select between 
+    multiple nodes when multiple nodes satisfy either a branching option in a pathway 
+    or a request for a degree. 
     '''
     __slots__ = ('id', 'degree', 'weight')
     def __init__(self, id=None, degree=None, weight=1.0): # id is okay: @ReservedAssignment
@@ -317,8 +325,7 @@ class Node(common.SlottedObject):
 
     def __eq__(self, other):
         ''' 
-        Nodes are equal if everything in the object.__dict__ is equal.
-        
+        Nodes are equal if everything in the object.__slots__ is equal.
         
         >>> n1 = intervalNetwork.Node(id=3)
         >>> n2 = intervalNetwork.Node(id=3)
@@ -366,7 +373,9 @@ class IntervalNetworkException(exceptions21.Music21Exception):
 
 #-------------------------------------------------------------------------------
 class IntervalNetwork(object):
-
+    '''
+    abstract class to subclass -- no need to use.
+    '''
 
     def __init__(self):
         pass
@@ -379,14 +388,11 @@ class BoundIntervalNetwork(IntervalNetwork):
     A graph of undefined Pitch nodes connected by a defined, 
     ordered list of :class:`~music21.interval.Interval` objects as edges. 
 
-
     An `octaveDuplicating` boolean, if defined, can be used 
     to optimize pitch realization routines. 
 
-
     The `deterministic` boolean, if defined, can be used to declare that there 
     is no probabilistic or multi-pathway segments of this network. 
-    
     
     The `pitchSimplification` method specifies how to simplify the pitches
     if they spiral out into double and triple sharps, etc.  The default is
@@ -432,7 +438,8 @@ class BoundIntervalNetwork(IntervalNetwork):
         self._minMaxCache = OrderedDict()
 
     def clear(self):
-        '''Remove and reset all Nodes and Edges. 
+        '''
+        Remove and reset all Nodes and Edges. 
         '''
         self._edgeIdCount = 0
         self._nodeIdCount = 0
@@ -478,8 +485,6 @@ class BoundIntervalNetwork(IntervalNetwork):
         specifications, create and define appropriate Nodes. This 
         assumes that all edges are bidirected and all all edges are in order.
     
-    
-        
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = intervalNetwork.BoundIntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
@@ -536,10 +541,12 @@ class BoundIntervalNetwork(IntervalNetwork):
 
     def fillDirectedEdges(self, ascendingEdgeList, descendingEdgeList):
         '''
-        Given two lists of edges, one for ascending :class:`~music21.interval.Interval` objects and 
+        Given two lists of edges, one for ascending :class:`~music21.interval.Interval` 
+        objects and 
         another for  descending, construct appropriate Nodes and Edges.
 
-        Note that the descending :class:`~music21.interval.Interval` ojbects should be given in ascending form. 
+        Note that the descending :class:`~music21.interval.Interval` objects 
+        should be given in ascending form. 
         '''
         self.clear()
 
@@ -614,14 +621,17 @@ class BoundIntervalNetwork(IntervalNetwork):
     def fillArbitrary(self, nodes, edges):
         '''Fill any arbitrary network given node and edge definitions.
 
-        Nodes must be defined by a dictionary of id and degree values. There must be a terminusLow and terminusHigh id as string::
+        Nodes must be defined by a dictionary of id and degree values. 
+        There must be a terminusLow and terminusHigh id as string::
 
             nodes = ({'id':'terminusLow', 'degree':1},
                      {'id':0, 'degree':2},
                      {'id':'terminusHigh', 'degree':3},
                     )
 
-        Edges must be defined by a dictionary of :class:`~music21.interval.Interval` strings and connections. Id values will be automatically assigned. Each connection must define direction and pairs of valid node ids::
+        Edges must be defined by a dictionary of :class:`~music21.interval.Interval` 
+        strings and connections. Id values will be automatically assigned. 
+        Each connection must define direction and pairs of valid node ids::
 
             edges = ({'interval':'m2', connections:(
                             ['terminusLow', 0, 'bi'],
@@ -667,8 +677,8 @@ class BoundIntervalNetwork(IntervalNetwork):
 
 
     def fillMelodicMinor(self):
-        '''A convenience routine for testing a complex, bi-directional scale.
-
+        '''
+        A convenience routine for testing a complex, bi-directional scale.
         
         >>> net = intervalNetwork.BoundIntervalNetwork()
         >>> net.fillMelodicMinor()
@@ -726,9 +736,6 @@ class BoundIntervalNetwork(IntervalNetwork):
         self.fillArbitrary(nodes, edges)
         self.octaveDuplicating = True
         self.deterministic = True
-        
-
-
 
 
 
@@ -736,8 +743,9 @@ class BoundIntervalNetwork(IntervalNetwork):
     # for weighted selection of nodes
 
     def weightedSelection(self, edges, nodes):
-        '''Perform weighted random selection on a parallel list of edges and corresponding nodes.
-
+        '''
+        Perform weighted random selection on a parallel list of 
+        edges and corresponding nodes.
         
         >>> n1 = intervalNetwork.Node(id='a', weight=1000000)
         >>> n2 = intervalNetwork.Node(id='b', weight=1)
@@ -761,25 +769,17 @@ class BoundIntervalNetwork(IntervalNetwork):
 
     #---------------------------------------------------------------------------
     def _getDegreeMin(self):
-        '''
-        
-        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork()
-        >>> net.fillBiDirectedEdges(edgeList)
-        >>> net._getDegreeMin()
-        1
-        '''
         x = None
         for n in self._nodes.values():
-            if x == None:
+            if x is None:
                 x = n.degree
             if n.degree < x:
                 x = n.degree
         return x
 
     degreeMin = property(_getDegreeMin, 
-        doc = '''Return the lowest degree value.
-
+        doc = '''
+        Return the lowest degree value.
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = intervalNetwork.BoundIntervalNetwork()
@@ -789,14 +789,6 @@ class BoundIntervalNetwork(IntervalNetwork):
         ''')
 
     def _getDegreeMax(self):
-        '''
-        
-        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork()
-        >>> net.fillBiDirectedEdges(edgeList)
-        >>> net._getDegreeMax() # returns eight, as this is the last node
-        8
-        '''
         x = None
         for n in self._nodes.values():
             if x == None:
@@ -806,13 +798,13 @@ class BoundIntervalNetwork(IntervalNetwork):
         return x
 
     degreeMax = property(_getDegreeMax, 
-        doc = '''Return the largest degree value.
-
+        doc = '''
+        Return the largest degree value.
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = intervalNetwork.BoundIntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
-        >>> net.degreeMax    
+        >>> net.degreeMax    # returns eight, as this is the last node
         8
         ''')
 
@@ -830,8 +822,9 @@ class BoundIntervalNetwork(IntervalNetwork):
         return x
 
     degreeMaxUnique = property(_getDegreeMaxUnique, 
-        doc = '''Return the largest degree value that represents a pitch level that is not a terminus of the scale. 
-
+        doc = '''
+        Return the largest degree value that represents a pitch level 
+        that is not a terminus of the scale. 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = intervalNetwork.BoundIntervalNetwork()
@@ -847,14 +840,14 @@ class BoundIntervalNetwork(IntervalNetwork):
         return post
     
     terminusLowNodes = property(_getTerminusLowNodes, 
-        doc='''Return a list of first Nodes, or Nodes that contain "terminusLow". Nodes are not stored, but are encoded as pairs, index values, to stored edges. Indices are either integers or the strings 
-
+        doc='''
+        Return a list of first Nodes, or Nodes that contain "terminusLow". 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = intervalNetwork.BoundIntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
-        >>> net.terminusLowNodes[0]
-        <music21.intervalNetwork.Node id='terminusLow'>
+        >>> net.terminusLowNodes
+        [<music21.intervalNetwork.Node id='terminusLow'>]
         ''')
 
     def _getTerminusHighNodes(self):
@@ -865,14 +858,14 @@ class BoundIntervalNetwork(IntervalNetwork):
 
     
     terminusHighNodes = property(_getTerminusHighNodes, 
-        doc='''Return a list of last Nodes, or Nodes that contain "end". Return the coordinates of the last Node. Nodes are not stored, but are encoded as pairs, index values, to stored edges. Indices are either integers or the
-
+        doc='''
+        Return a list of last Nodes, or Nodes that contain "terminusHigh". 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = intervalNetwork.BoundIntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
-        >>> net.terminusHighNodes[0]
-        <music21.intervalNetwork.Node id='terminusHigh'>
+        >>> net.terminusHighNodes
+        [<music21.intervalNetwork.Node id='terminusHigh'>]
         ''')
 
 
@@ -880,7 +873,8 @@ class BoundIntervalNetwork(IntervalNetwork):
     def _getNodeDegreeDictionary(self, direction=None, equateTermini=True):
         '''Return a dictionary of node id, node degree pairs. The same degree may be given for each node 
 
-        There may not be unambiguous way to determine degree. Or, a degree may have different meanings when ascending or descending.
+        There may not be unambiguous way to determine degree. 
+        Or, a degree may have different meanings when ascending or descending.
 
         If `equateTermini` is True, the terminals will be given the same degree. 
         '''
@@ -903,7 +897,8 @@ class BoundIntervalNetwork(IntervalNetwork):
     def _nodeIdToDegree(self, nId, direction=None):
         '''Given a strict node id (the .id attribute of the Node), return the degree.
 
-        There may not be unambiguous way to determine degree. Or, a degree may have different meanings when ascending or descending.
+        There may not be unambiguous way to determine degree. 
+        Or, a degree may have different meanings when ascending or descending.
         '''
         nodeStep = self._getNodeDegreeDictionary(direction=direction)
         return nodeStep[nId] # gets degree integer
@@ -955,8 +950,8 @@ class BoundIntervalNetwork(IntervalNetwork):
 
 
     def _degreeModulus(self, degree):
-        '''Return the modulus of the degree.
-
+        '''
+        Return the degree modulus degreeMax - degreeMin.
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = intervalNetwork.BoundIntervalNetwork()
@@ -978,7 +973,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         # the number of unique values; assumes redundancy in 
         # top and bottom value, so 8 steps, from 1 to 8, have
         # seven unique values
-        spanCount = sMax-sMin
+        spanCount = sMax - sMin
         # assume continuous span, assume start at min
         # example for diatonic scale degree 3:
         # ((3-1) % 7)+1
@@ -987,12 +982,14 @@ class BoundIntervalNetwork(IntervalNetwork):
         return ((degree-1) % spanCount) + sMin
 
     def _nodeNameToNodes(self, id, equateTermini=True, permitDegreeModuli=True): # id is okay: @ReservedAssignment
-        '''The `nodeName` parameter may be a :class:`~music21.intervalNetwork.Node` object, a node degree (as a number), a terminus string, or a None (indicating 'terminusLow'). 
+        '''
+        The `nodeName` parameter may be a :class:`~music21.intervalNetwork.Node` object, 
+        a node degree (as a number), a terminus string, or a None (indicating 'terminusLow'). 
 
         Return a list of Node objects that match this identifications. 
 
-        If `equateTermini` is True, and the name given is a degree number, then the first terminal will return both the first and last.
-
+        If `equateTermini` is True, and the name given is a degree number, 
+        then the first terminal will return both the first and last.
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = intervalNetwork.BoundIntervalNetwork()
@@ -1051,10 +1048,11 @@ class BoundIntervalNetwork(IntervalNetwork):
 
 
     def _getNext(self, nodeStart, direction):
-        '''Given a Node, get two lists, one of next Edges, and one of next Nodes, searching all Edges to find all matches. 
+        '''Given a Node, get two lists, one of next Edges, and one of next Nodes, 
+        searching all Edges to find all matches. 
 
-        There may be more than one possibility. If so, the caller must look at the Edges and determine which to use
-
+        There may be more than one possibility. If so, the caller must look 
+        at the Edges and determine which to use
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = intervalNetwork.BoundIntervalNetwork()
@@ -1102,7 +1100,8 @@ class BoundIntervalNetwork(IntervalNetwork):
 
 
     def _processAlteredNodes(self, alteredDegrees, n, p, direction):
-        '''Return an altered pitch for given node, if an alteration is specified
+        '''
+        Return an altered pitch for given node, if an alteration is specified
         in the alteredDegrees dictionary
         '''
         if n.degree in alteredDegrees:
@@ -1155,11 +1154,14 @@ class BoundIntervalNetwork(IntervalNetwork):
     def nextPitch(self, pitchReference, nodeName, pitchOrigin, 
         direction=DIRECTION_ASCENDING, stepSize=1, alteredDegrees=None, 
         getNeighbor=True):
-        '''Given a pitchReference, nodeName, and a pitch origin, return the next pitch. 
+        '''
+        Given a pitchReference, nodeName, and a pitch origin, return the next pitch. 
 
-        The `nodeName` parameter may be a :class:`~music21.intervalNetwork.Node` object, a node degree, a terminus string, or a None (indicating 'terminusLow'). 
+        The `nodeName` parameter may be a :class:`~music21.intervalNetwork.Node` object, 
+        a node degree, a terminus string, or a None (indicating 'terminusLow'). 
 
-        The `stepSize` parameter can be configured to permit different sized steps in the specified direction.
+        The `stepSize` parameter can be configured to permit different sized steps 
+        in the specified direction.
 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
@@ -1196,7 +1198,9 @@ class BoundIntervalNetwork(IntervalNetwork):
                     direction=direction,
                     alteredDegrees=alteredDegrees)
 
-        #environLocal.printDebug(['nextPitch()', 'got node Id', nodeId, 'direction', direction, 'self._nodes[nodeId].degree', self._nodes[nodeId].degree, 'pitchOrigin', pitchOrigin])
+        #environLocal.printDebug(['nextPitch()', 'got node Id', nodeId, 
+        #  'direction', direction, 'self._nodes[nodeId].degree', self._nodes[nodeId].degree, 
+        #  'pitchOrigin', pitchOrigin])
 
         # if no match, get the neighbor
         if nodeId is None and getNeighbor in [True,     
@@ -1207,7 +1211,8 @@ class BoundIntervalNetwork(IntervalNetwork):
                 pitchTarget=pitchOrigin,
                 direction=direction) # must add direction
 
-            #environLocal.printDebug(['nextPitch()', 'looking for neighbor', 'getNeighbor', getNeighbor, 'source nodeId', nodeId, 'lowId/highId', lowId, highId])
+            #environLocal.printDebug(['nextPitch()', 'looking for neighbor', 
+            # 'getNeighbor', getNeighbor, 'source nodeId', nodeId, 'lowId/highId', lowId, highId])
 
             # replace the node with the nearest neighbor
             if getNeighbor in [True, DIRECTION_ASCENDING, DIRECTION_BI]:
@@ -1228,7 +1233,9 @@ class BoundIntervalNetwork(IntervalNetwork):
             alteredDegrees={} # need unaltered tone here, thus leaving out
             )
 
-        #environLocal.printDebug(['nextPitch()', 'pitch obtained based on nodeName', nodeName, 'p', p, 'nodeId', nodeId, 'self._nodes[nodeId].degree', self._nodes[nodeId].degree])
+        #environLocal.printDebug(['nextPitch()', 'pitch obtained based on nodeName', 
+        # nodeName, 'p', p, 'nodeId', nodeId, 'self._nodes[nodeId].degree', 
+        # self._nodes[nodeId].degree])
 
         # transfer octave from origin to new pitch derived from node
         # note: this assumes octave equivalence and may be a problem
@@ -1247,7 +1254,8 @@ class BoundIntervalNetwork(IntervalNetwork):
                 intervalObj = postEdge[0].interval # get first
                 n = postNode[0] # n is passed on
 
-            #environLocal.printDebug(['nextPitch()', 'intervalObj', intervalObj, 'p', p, 'postNode', postNode])
+            #environLocal.printDebug(['nextPitch()', 'intervalObj', intervalObj, 
+            #  'p', p, 'postNode', postNode])
             #n = postNode[0]
 
             # for now, only taking first edge
@@ -1265,7 +1273,8 @@ class BoundIntervalNetwork(IntervalNetwork):
 
     def _getCacheKey(self, nodeObj, pitchReference, minPitch, maxPitch, 
                     includeFirst=None):
-        '''Return key for caching based on critical components. 
+        '''
+        Return key for caching based on critical components. 
         '''
         if minPitch is not None:
             minKey = minPitch.nameWithOctave
@@ -1282,8 +1291,8 @@ class BoundIntervalNetwork(IntervalNetwork):
     def _realizeAscending(self, pitchReference, nodeId=None, 
         minPitch=None, maxPitch=None, alteredDegrees=None,
         fillMinMaxIfNone=False):
-        '''Given a reference pitch, realize downward to a minimum.
-
+        '''
+        Given a reference pitch, realize upwards to a maximum pitch.
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
 
@@ -1443,7 +1452,8 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         If `includeFirst` is False, the starting (highest) pitch will not be included.        
 
-        If `fillMinMaxIfNone` is True, a min and max will be artificially derived from an ascending scale and used as min and max values. 
+        If `fillMinMaxIfNone` is True, a min and max will be artificially 
+        derived from an ascending scale and used as min and max values. 
 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
@@ -1805,7 +1815,8 @@ class BoundIntervalNetwork(IntervalNetwork):
         assigned to a valid `nodeId`, where `nodeId` can be specified by integer 
         (starting from 1) or key (a tuple of origin, destination keys). 
 
-        The nodeId, when a simple, linear network, can be used as a scale degree value starting from one.
+        The nodeId, when a simple, linear network, can be used as a scale degree 
+        value starting from one.
 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
@@ -2041,7 +2052,8 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> net = intervalNetwork.BoundIntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
 
-        Now for every "scale" where G is the 3rd degree, give me the tonic if that note is between C2 and C3.
+        Now for every "scale" where G is the 3rd degree, give me the 
+        tonic if that note is between C2 and C3.
         (There's only one such note: E-2).
 
         >>> net.realizePitchByDegree('G', 3, [1], 'c2', 'c3')
@@ -2089,8 +2101,13 @@ class BoundIntervalNetwork(IntervalNetwork):
         return post
 
 
-    def _getNetworkxGraph(self):
-        '''Create a networx graph from the raw Node representation.
+    def getNetworkxGraph(self):
+        '''
+        Create a networx graph from the raw Node representation.
+        
+        Return a networks Graph object representing a realized version 
+        of this BoundIntervalNetwork if networkx is installed
+
         '''
         #g = networkx.DiGraph()
         g = networkx.MultiDiGraph()
@@ -2123,29 +2140,12 @@ class BoundIntervalNetwork(IntervalNetwork):
         environLocal.printDebug(['got degree count', degreeCount])
         return g
 
-#     def _getNetworkxRealizedGraph(self, pitchObj, nodeId=None, 
-#         minPitch=None, maxPitch=None):
-#         '''Create a networx graph from this representation.
-#         '''
-#         # this presently assumes that the realized form is in linear order
-#         realized = self.realizePitch(pitchObj=pitchObj, nodeId=nodeId, 
-#                    minPitch=minPitch, maxPitch=maxPitch)
-#         g = networkx.Graph()
-#         for i, p in enumerate(realized):
-#             if i > len(realized) - 2: 
-#                 continue # will be last, will continue
-#             pNext = realized[i+1]
-#             g.add_edge(p.nameWithOctave, pNext.nameWithOctave, weight=0.6)
-#         return g
-
-
-    networkxGraph = property(_getNetworkxGraph, doc='''
-        Return a networks Graph object representing a realized version of this BoundIntervalNetwork
-        ''')
-
     def plot(self, pitchObj=None, nodeId=None, minPitch=None, maxPitch=None, 
             *args, **keywords):
-        '''Given a method and keyword configuration arguments, create and display a plot.
+        '''
+        Given a method and keyword configuration arguments, create and display a plot.
+        
+        Requires networkx to be installed.
         '''
 #         
 #         >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE

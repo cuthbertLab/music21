@@ -81,7 +81,7 @@ class ModuleGather(object):
             'trecento/correlations.py',
             'trecento/contenanceAngloise.py',
             'trecento/capuaProbabilities.py',
-            'theoryAnalysis/wwnortonMGTA.py',
+            'alpha/theoryAnalysis/wwnortonMGTA.py',
             'test/treeYield.py',
             'test/toggleDebug.py',
             ]

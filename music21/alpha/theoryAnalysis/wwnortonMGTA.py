@@ -17,7 +17,7 @@ from music21 import converter
 from music21 import stream
 from music21 import instrument
 from music21 import note
-from music21.theoryAnalysis import theoryAnalyzer
+from music21.alpha.theoryAnalysis import theoryAnalyzer
 
 import unittest
 import copy

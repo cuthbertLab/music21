@@ -88,7 +88,7 @@ class ModuleGather(object):
             'trecento/correlations.py',
             'trecento/contenanceAngloise.py',
             'trecento/capuaProbabilities.py',
-            'theoryAnalysis/wwnortonMGTA.py',
+            'alpha/theoryAnalysis/wwnortonMGTA.py',
             'test/treeYield.py',
             'test/toggleDebug.py',
             
@@ -123,7 +123,7 @@ class ModuleGather(object):
                             'features/jSymbolic', 'features/native', 'figuredBass/examples', 
                             'braille/test', 'test/testStream', 'analysis/windowed', 
                             'converter/__init__', 'metadata/bundles', 'musicxml/fromMxObjects',
-                            'romanText/translate', 'musicxml/m21ToString', 'theoryAnalysis/theoryAnalyzer']
+                            'romanText/translate', 'musicxml/m21ToString', 'alpha/theoryAnalysis/theoryAnalyzer']
         # search on init
         self._walk()
 

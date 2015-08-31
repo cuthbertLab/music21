@@ -5,10 +5,9 @@
 #
 # Authors:      Beth Hadley
 #               Lars Johnson
-#               Josiah Wolf Oberholtzer
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009-2014 The music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
@@ -18,29 +17,36 @@ Module Introduction
 ===========================================
 
 Theory Analyzer methods provide easy analysis tools for common music theory type queries regarding
-a :class:`~music21.stream.Score` (**must have parts**), such as finding the parallel fifths, locating the passing tones, finding
+a :class:`~music21.stream.Score` (**must have parts**), such as finding the parallel fifths, 
+locating the passing tones, finding
 dissonant harmonic intervals, etc. These analysis methods typically operate in the following way:
 
-1. the score is automatically parsed into small bits for analysis (such as :class:`~music21.voiceLeading.Verticality`, :class:`~music21.voiceLeading.VoiceLeadingQuartet`,  etc.)
-2. these bits are analyzed for certain attributes, according to analysis methods in :class:`~music21.voiceLeading`
-3. the results are stored in the score's analysisData dictionary, (and also returned as a list depending on which method is called)
+1. the score is automatically parsed into small bits for analysis (such as 
+   :class:`~music21.voiceLeading.Verticality`, 
+   :class:`~music21.voiceLeading.VoiceLeadingQuartet`,  etc.)
+2. these bits are analyzed for certain attributes, according to analysis 
+   methods in :class:`~music21.voiceLeading`
+3. the results are stored in the score's analysisData dictionary, 
+   (and also returned as a list depending on which method is called)
 
 ===========================================
 Example Module Uses
 ===========================================
 
 **get voiceLeading objects from a score**
-these methods break the score up into voiceLeading atoms, and return objects of that type. These objects are then useful
-because they provide easy access to the components within them, and those components (notes, chords, etc.) contain
+these methods break the score up into voiceLeading atoms, and return objects of that type. 
+These objects are then useful
+because they provide easy access to the components within them, and 
+those components (notes, chords, etc.) contain
 a direct pointer to the original object in the score.
 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.getVerticalities` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.getVLQs` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.getThreeNoteLinearSegments` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.getLinearSegments` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.getVerticalityNTuplets` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.getHarmonicIntervals` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.getMelodicIntervals` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.getVerticalities` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.getVLQs` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.getThreeNoteLinearSegments` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.getVerticalityNTuplets` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.getHarmonicIntervals` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.getMelodicIntervals` 
 
 You can then iterate through these objects and access the attributes directly. Here is an example
 of this that will analyze the root motion in a score:
@@ -49,10 +55,12 @@ of this that will analyze the root motion in a score:
     >>> p = corpus.parse('leadsheet').flat.getElementsByClass('Harmony')
     >>> p = harmony.realizeChordSymbolDurations(p)
     >>> averageMotion = 0
-    >>> l = theoryAnalysis.theoryAnalyzer.getLinearSegments(p,0,2, ['Harmony']) #gets a list of tuples, adjacent chord symbol objects in the score
+    >>> l = alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(p,0,2, ['Harmony']) 
+    >>> # gets a list of tuples, adjacent chord symbol objects in the score
     >>> for x in l:
-    ...    averageMotion+= abs(x.rootInterval().intervalClass) #rootInterval() returns the interval between the roots of the first chordSymbol and second
-    >>> averageMotion=averageMotion // len(l)
+    ...    averageMotion += abs(x.rootInterval().intervalClass) 
+    >>> #rootInterval() returns the interval between the roots of the first chordSymbol and second
+    >>> averageMotion = averageMotion // len(l)
     >>> averageMotion #average intervalClass in this piece is about 4
     4
     
@@ -60,67 +68,73 @@ of this that will analyze the root motion in a score:
 These methods return voiceLeading objects identified by certain methods. For example,
 they may return all the parallel fifths in the score as voiceLeadingQuartetObjects.
 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.getHarmonicIntervals` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.getMelodicIntervals` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.getParallelFifths` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.getPassingTones` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.getNeighborTones` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.getHarmonicIntervals` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.getMelodicIntervals` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.getParallelFifths` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.getPassingTones` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.getNeighborTones` 
 
 **identify music theory objects in score**
 These identify methods were the original purpose of theoryAnalyzer, to identify interesting
-music theory anomalies in a score, color them, and write specific text regarding them. However, if you find these methods more
-useful as 'get' methods (such as those above), merely run the identify method and access the score's ``self.analysisData['dictKey']``
+music theory anomalies in a score, color them, and write specific text regarding them. 
+However, if you find these methods more
+useful as 'get' methods (such as those above), merely run the identify method and 
+access the score's ``self.analysisData['dictKey']``
 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyParallelFifths` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyParallelOctaves` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyParallelUnisons` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyHiddenFifths` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyHiddenOctaves`
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyImproperResolutions` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyLeapNotSetWithStep` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyOpensIncorrectly` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyClosesIncorrectly` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyPassingTones`
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyDissonantHarmonicIntervals` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyImproperDissonantIntervals`
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyDissonantMelodicIntervals` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyObliqueMotion` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifySimilarMotion` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyParallelMotion`
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyContraryMotion` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyOutwardContraryMotion`
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyInwardContraryMotion` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyAntiParallelMotion` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyTonicAndDominantRomanNumerals` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyHarmonicIntervals`
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyScaleDegrees` 
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyMotionType`
-* :meth:`~music21.theoryAnalysis.theoryAnalyzer.identifyCommonPracticeErrors`
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyParallelFifths` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyParallelOctaves` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyParallelUnisons` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyHiddenFifths` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyHiddenOctaves`
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyImproperResolutions` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyLeapNotSetWithStep` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyOpensIncorrectly` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyClosesIncorrectly` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyPassingTones`
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyDissonantHarmonicIntervals` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyImproperDissonantIntervals`
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyDissonantMelodicIntervals` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyObliqueMotion` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifySimilarMotion` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyParallelMotion`
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyContraryMotion` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyOutwardContraryMotion`
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyInwardContraryMotion` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyAntiParallelMotion` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyTonicAndDominantRomanNumerals` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyHarmonicIntervals`
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyScaleDegrees` 
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyMotionType`
+* :meth:`~music21.alpha.theoryAnalysis.theoryAnalyzer.identifyCommonPracticeErrors`
 
 **special use case: remove passing tones/neighbor tones**
-These methods provide a preliminary implementation for removing passing tones & neighbor tones from a score.
+These methods provide a preliminary implementation for removing passing tones and 
+neighbor tones from a score.
 As an example, the steps involved in these methods calls include:
 
 1. break the score into Verticalities 
 2. forms verticalityTriplets out of these vertical slices 
 3. break each verticalityTriplet into threeNoteLinearSegments 
-4. check to see if the threeNoteLinearSegment couldBePassingTone() or couldBeNeighborTone() (horizontal analysis) 
+4. check to see if the threeNoteLinearSegment couldBePassingTone() or 
+   couldBeNeighborTone() (horizontal analysis) 
 5. check to see if the Verticality identified as a possible passingTone or neighborTone is dissonant
 6. check to see if previous Verticality and next Verticality isdissonant
-7. if all checks are true, the passingTone or neighborTone is removed from the score (because the whole point of parsing the score into voiceLeadingObjects was to maintain a direct pointer to the original object in the score.
+7. if all checks are true, the passingTone or neighborTone is removed from the score 
+   (because the whole point of parsing the score into voiceLeadingObjects was to 
+   maintain a direct pointer to the original object in the score.)
 8. the gap created by the deletion is filled in by extending the duration of the previous note
 
     
-    >>> p = corpus.parse('bwv6.6').measures(0,20)
-    >>> #_DOCS_SHOW p.show()
-        .. image:: images/completebach.*
-        :width: 500
+>>> p = corpus.parse('bwv6.6').measures(0,20)
+>>> #_DOCS_SHOW p.show()
+    .. image:: images/completebach.*
+    :width: 500
         
-    >>> theoryAnalysis.theoryAnalyzer.removePassingTones(p)
-    >>> theoryAnalysis.theoryAnalyzer.removeNeighborTones(p)
-    >>> #_DOCS_SHOW p.show()
-        .. image:: images/bachnononharm.*
-        :width: 500
+>>> alpha.theoryAnalysis.theoryAnalyzer.removePassingTones(p)
+>>> alpha.theoryAnalysis.theoryAnalyzer.removeNeighborTones(p)
+>>> #_DOCS_SHOW p.show()
+    .. image:: images/bachnononharm.*
+    :width: 500
 
 ===========================================
 Detailed Method Documentation
@@ -128,11 +142,16 @@ Detailed Method Documentation
 
 
 OMIT_FROM_DOCS
-This module was originally written for the WWNorton theory checking project, but re-factored to provide a more
-general interface to identifying common music-theory type analysis of a score. Thus, most methods are 'identify'
-methods, which color the score, print to the result dict, etc. If this module were to be re-written, all 'identify'
-methods should be changed to 'get' methods and return lists of notable atoms, and one single identify method should
-be written to color/write comments, etc. But for now, all methods serve their purpose and the appropriate get methods
+This module was originally written for the WWNorton theory checking project, 
+but re-factored to provide a more
+general interface to identifying common music-theory type analysis of a score. 
+Thus, most methods are 'identify'
+methods, which color the score, print to the result dict, etc. 
+If this module were to be re-written, all 'identify'
+methods should be changed to 'get' methods and return lists of notable atoms, 
+and one single identify method should
+be written to color/write comments, etc. But for now, all methods serve their 
+purpose and the appropriate get methods
 can easily be written (reference getPassingTones for example)
 '''
 
@@ -146,14 +165,10 @@ from music21 import roman
 from music21 import note
 from music21 import chord
 from music21 import key
-from music21.theoryAnalysis import theoryResult
+from music21.alpha.theoryAnalysis import theoryResult
 
 import string
 import unittest
-try:
-    s = set()
-except:
-    from sets import Set as set
     
 from collections import defaultdict
 
@@ -161,17 +176,27 @@ from music21 import environment
 _MOD = 'theoryAnalyzer.py'
 environLocal = environment.Environment(_MOD)
 
-_DOC_ORDER = ['getVerticalities', 'getVLQs', 'getThreeNoteLinearSegments', 'getLinearSegments', 'getVerticalityNTuplets','getHarmonicIntervals', 'getMelodicIntervals', 'getParallelFifths', 'getPassingTones', 
-            'getNeighborTones','getParallelOctaves', 'identifyParallelFifths',  'identifyParallelOctaves', 'identifyParallelUnisons',
-            'identifyHiddenFifths', 'identifyHiddenOctaves', 'identifyImproperResolutions',
-            'identifyLeapNotSetWithStep', 'identifyOpensIncorrectly', 'identifyClosesIncorrectly',
-            'identifyPassingTones', 'removePassingTones', 'identifyNeighborTones', 'removeNeighborTones', 'identifyDissonantHarmonicIntervals', 'identifyImproperDissonantIntervals',
-            'identifyDissonantMelodicIntervals', 'identifyObliqueMotion', 'identifySimilarMotion', 'identifyParallelMotion',
-            'identifyContraryMotion', 'identifyOutwardContraryMotion', 'identifyInwardContraryMotion', 'identifyAntiParallelMotion', 
-            'identifyTonicAndDominantRomanNumerals', 'identifyHarmonicIntervals', 'identifyScaleDegrees', 'identifyMotionType', 
-            'identifyCommonPracticeErrors',
-            'addAnalysisData', 'removeFromAnalysisData', 'setKeyMeasureMap','getKeyMeasureMap','getKeyAtMeasure',
-            'getResultsString', 'colorResults', 'getHTMLResultsString', 'getAllPartNumPairs', 'getNotes'
+_DOC_ORDER = ['getVerticalities', 'getVLQs', 'getThreeNoteLinearSegments', 
+              'getLinearSegments', 'getVerticalityNTuplets','getHarmonicIntervals', 
+              'getMelodicIntervals', 'getParallelFifths', 'getPassingTones', 
+              'getNeighborTones','getParallelOctaves', 'identifyParallelFifths',  
+              'identifyParallelOctaves', 'identifyParallelUnisons',
+              'identifyHiddenFifths', 'identifyHiddenOctaves', 'identifyImproperResolutions',
+              'identifyLeapNotSetWithStep', 'identifyOpensIncorrectly', 'identifyClosesIncorrectly',
+              'identifyPassingTones', 'removePassingTones', 'identifyNeighborTones', 
+              'removeNeighborTones', 'identifyDissonantHarmonicIntervals', 
+              'identifyImproperDissonantIntervals',
+              'identifyDissonantMelodicIntervals', 'identifyObliqueMotion', 'identifySimilarMotion', 
+              'identifyParallelMotion',
+              'identifyContraryMotion', 'identifyOutwardContraryMotion', 
+              'identifyInwardContraryMotion', 'identifyAntiParallelMotion', 
+              'identifyTonicAndDominantRomanNumerals', 'identifyHarmonicIntervals', 
+              'identifyScaleDegrees', 'identifyMotionType', 
+              'identifyCommonPracticeErrors',
+              'addAnalysisData', 'removeFromAnalysisData', 'setKeyMeasureMap', 
+              'getKeyMeasureMap','getKeyAtMeasure',
+              'getResultsString', 'colorResults', 'getHTMLResultsString', 
+              'getAllPartNumPairs', 'getNotes'
             ]
 
 
@@ -188,7 +213,7 @@ def addAnalysisData(score):
     False
     >>> hasattr(s, 'analysisData')
     False
-    >>> theoryAnalysis.theoryAnalyzer.addAnalysisData(s)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.addAnalysisData(s)
     >>> hasattr(p, 'analysisData')
     True
     >>> hasattr(s, 'analysisData')
@@ -218,8 +243,6 @@ def getVerticalities(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest']
     by parsing the score. Note that it uses the combined rhythm of the parts 
     to determine what vertical slices to take. Default is to return only objects of
     type Note, Chord, Harmony, and Rest.
-    
-    
 
     >>> n1 = note.Note('c5')
     >>> n1.quarterLength = 4
@@ -235,10 +258,10 @@ def getVerticalities(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest']
     >>> part1.append(n3)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.getVerticalities(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getVerticalities(sc)
     [<music21.voiceLeading.Verticality contentDict=... >, 
      <music21.voiceLeading.Verticality contentDict=... >]
-    >>> len(theoryAnalysis.theoryAnalyzer.getVerticalities(sc))
+    >>> len(alpha.theoryAnalysis.theoryAnalyzer.getVerticalities(sc))
     2
 
     >>> sc4 = stream.Score()
@@ -247,7 +270,7 @@ def getVerticalities(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest']
     >>> part4.append(chord.Chord(['A','B','C']))
     >>> part4.append(chord.Chord(['A','B','C']))
     >>> sc4.insert(part4)
-    >>> theoryAnalysis.theoryAnalyzer.getVerticalities(sc4)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getVerticalities(sc4)
     [<music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.chord.Chord A B C>]}) >, 
      <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.chord.Chord A B C>]}) >, 
      <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.chord.Chord A B C>]}) >]
@@ -258,7 +281,7 @@ def getVerticalities(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest']
     >>> p1.append(harmony.ChordSymbol('D', quarterLength = 3))
     >>> p1.append(harmony.ChordSymbol('E7', quarterLength = 4))
     >>> sc3.append(p1)
-    >>> theoryAnalysis.theoryAnalyzer.getVerticalities(sc3)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getVerticalities(sc3)
     [<music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.harmony.ChordSymbol C>]}) >, 
      <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.harmony.ChordSymbol D>]}) >, 
      <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.harmony.ChordSymbol E7>]}) >]
@@ -281,21 +304,25 @@ def getVerticalities(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest']
         
         if len(score.parts) > 1:
             for part in score.parts:
-                elementStream = part.flat.getElementsByOffset(c.offset,mustBeginInSpan=False, classList=classFilterList)
+                elementStream = part.flat.getElementsByOffset(c.offset, 
+                                                              mustBeginInSpan=False, 
+                                                              classList=classFilterList)
                 #el = part.flat.getElementAtOrBefore(c.offset,classList=['Note','Rest', 'Chord', 'Harmony'])
                 for el in elementStream.elements:
                     contentDict[partNum].append(el)    
-                partNum+=1
+                partNum +=1
         else:
-            elementStream = score.flat.getElementsByOffset(c.offset,mustBeginInSpan=False, classList=classFilterList)
+            elementStream = score.flat.getElementsByOffset(c.offset, 
+                                                           mustBeginInSpan=False, 
+                                                           classList=classFilterList)
             #el = part.flat.getElementAtOrBefore(c.offset,classList=['Note','Rest', 'Chord', 'Harmony'])
             for el in elementStream.elements:
                 contentDict[partNum].append(el)    
-            partNum+=1
+            partNum +=1
 
         vs = voiceLeading.Verticality(contentDict)
         vsList.append(vs)
-    if classFilterList==['Note', 'Chord', 'Harmony', 'Rest']:
+    if classFilterList == ['Note', 'Chord', 'Harmony', 'Rest']:
         score.analysisData['Verticalities'] = vsList
     
     return vsList
@@ -316,10 +343,10 @@ def getVLQs(score, partNum1, partNum2):
     >>> part1.append(note.Note('e4'))
     >>> part1.append(note.Note('f5'))
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.getVLQs(sc, 0, 1)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getVLQs(sc, 0, 1)
     [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note C>, v1n2=<music21.note.Note G>, v2n1=<music21.note.Note D>, v2n2=<music21.note.Note E> >,
      <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note G>, v1n2=<music21.note.Note C>, v2n1=<music21.note.Note E>, v2n2=<music21.note.Note F> >]
-    >>> len(theoryAnalysis.theoryAnalyzer.getVLQs(sc, 0, 1))
+    >>> len(alpha.theoryAnalysis.theoryAnalyzer.getVLQs(sc, 0, 1))
     2
     '''
     from music21.stream import timespans
@@ -363,7 +390,8 @@ def getVLQs(score, partNum1, partNum2):
         if v1n1 != None and v1n2 != None and v2n1 != None and v2n2 != None:
             getKeyAtMeasure(score, v1n1.measureNumber)
             
-            vlq = voiceLeading.VoiceLeadingQuartet(v1n1,v1n2,v2n1,v2n2, key=getKeyAtMeasure(score, v1n1.measureNumber))
+            vlq = voiceLeading.VoiceLeadingQuartet(v1n1, v1n2, v2n1, v2n2, 
+                                                   key=getKeyAtMeasure(score, v1n1.measureNumber))
             
             vlqList.append(vlq)
         
@@ -387,12 +415,12 @@ def getThreeNoteLinearSegments(score, partNum):
     >>> part0.append(note.Note('c5'))
     >>> part0.append(note.Note('c6'))
     >>> sc.insert(part0)
-    >>> theoryAnalysis.theoryAnalyzer.getThreeNoteLinearSegments(sc, 0)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getThreeNoteLinearSegments(sc, 0)
     [<music21.voiceLeading.ThreeNoteLinearSegment n1=<music21.note.Note C> n2=<music21.note.Note G> n3=<music21.note.Note C> >, 
      <music21.voiceLeading.ThreeNoteLinearSegment n1=<music21.note.Note G> n2=<music21.note.Note C> n3=<music21.note.Note C> >]
-    >>> len(theoryAnalysis.theoryAnalyzer.getThreeNoteLinearSegments(sc, 0))
+    >>> len(alpha.theoryAnalysis.theoryAnalyzer.getThreeNoteLinearSegments(sc, 0))
     2
-    >>> theoryAnalysis.theoryAnalyzer.getThreeNoteLinearSegments(sc, 0)[1]
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getThreeNoteLinearSegments(sc, 0)[1]
     <music21.voiceLeading.ThreeNoteLinearSegment n1=<music21.note.Note G> n2=<music21.note.Note C> n3=<music21.note.Note C> >
     '''
     # Caches the list of TNLS once they have been computed
@@ -425,9 +453,9 @@ def getLinearSegments(score, partNum, lengthLinearSegment, classFilterList=None)
     >>> part0.append(note.Note('c5'))
     >>> part0.append(note.Note('c6'))
     >>> sc.insert(part0)
-    >>> len(theoryAnalysis.theoryAnalyzer.getLinearSegments(sc, 0,3, ['Note']))
+    >>> len(alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc, 0,3, ['Note']))
     2
-    >>> theoryAnalysis.theoryAnalyzer.getLinearSegments(sc, 0,3, ['Note'])
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc, 0,3, ['Note'])
     [<music21.voiceLeading.ThreeNoteLinearSegment n1=<music21.note.Note C> n2=<music21.note.Note G> n3=<music21.note.Note C> >,
      <music21.voiceLeading.ThreeNoteLinearSegment n1=<music21.note.Note G> n2=<music21.note.Note C> n3=<music21.note.Note C> >]
 
@@ -438,13 +466,13 @@ def getLinearSegments(score, partNum, lengthLinearSegment, classFilterList=None)
     >>> part1.append(chord.Chord(['E','G','C']))
     >>> part1.append(chord.Chord(['F','A','C']))
     >>> sc2.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.getLinearSegments(sc2, 0,2, ['Chord'])
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc2, 0,2, ['Chord'])
     [<music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.chord.Chord C E G>, <music21.chord.Chord G B D>]  >,
      <music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.chord.Chord G B D>, <music21.chord.Chord E G C>]  >,
      <music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.chord.Chord E G C>, <music21.chord.Chord F A C>]  >]
-    >>> len(theoryAnalysis.theoryAnalyzer.getLinearSegments(sc2, 0,2, ['Chord']))
+    >>> len(alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc2, 0,2, ['Chord']))
     3
-    >>> for x in theoryAnalysis.theoryAnalyzer.getLinearSegments(sc2, 0,2, ['Chord']):
+    >>> for x in alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc2, 0,2, ['Chord']):
     ...   print("%r %r" % (x.rootInterval(), x.bassInterval()))
     <music21.interval.ChromaticInterval 7> <music21.interval.ChromaticInterval 2>
     <music21.interval.ChromaticInterval -7> <music21.interval.ChromaticInterval -2>
@@ -456,9 +484,9 @@ def getLinearSegments(score, partNum, lengthLinearSegment, classFilterList=None)
     >>> part2.append(harmony.ChordSymbol('C11', quarterLength = 1))
     >>> part2.append(harmony.ChordSymbol('C7', quarterLength = 1))
     >>> sc3.insert(part2)
-    >>> len(theoryAnalysis.theoryAnalyzer.getLinearSegments(sc3, 0,2, ['Harmony']))
+    >>> len(alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc3, 0,2, ['Harmony']))
     2
-    >>> theoryAnalysis.theoryAnalyzer.getLinearSegments(sc3,0,2, ['Harmony'])
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc3,0,2, ['Harmony'])
     [<music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.harmony.ChordSymbol D->, <music21.harmony.ChordSymbol C11>]  >,
      <music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.harmony.ChordSymbol C11>, <music21.harmony.ChordSymbol C7>]  >]
     '''
@@ -505,8 +533,6 @@ def getVerticalityNTuplets(score, ntupletNum):
     extracts and returns a list of the :class:`~music21.voiceLeading.VerticalityNTuplet` or the 
     corresponding subclass (currently only supports triplets) 
     
-    
-
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
     >>> part1 = stream.Part()
@@ -520,9 +546,9 @@ def getVerticalityNTuplets(score, ntupletNum):
     >>> part1.append(note.Note('d6'))
     >>> sc.insert(part0)
     >>> sc.insert(part1) 
-    >>> len(theoryAnalysis.theoryAnalyzer.getVerticalityNTuplets(sc, 3))
+    >>> len(alpha.theoryAnalysis.theoryAnalyzer.getVerticalityNTuplets(sc, 3))
     2
-    >>> theoryAnalysis.theoryAnalyzer.getVerticalityNTuplets(sc, 3)[1]
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getVerticalityNTuplets(sc, 3)[1]
     <music21.voiceLeading.VerticalityTriplet 
         listofVerticalities=[<music21.voiceLeading.Verticality...>,
                              <music21.voiceLeading.Verticality...>,
@@ -559,8 +585,6 @@ def getHarmonicIntervals(score, partNum1, partNum2):
     '''
     returns a list of all the harmonic intervals (:class:`~music21.interval.Interval` ) 
     occurring between the two specified parts.
-    
-    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -571,11 +595,11 @@ def getHarmonicIntervals(score, partNum1, partNum2):
     >>> part1.append(note.Note('b3'))
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> len(theoryAnalysis.theoryAnalyzer.getHarmonicIntervals(sc, 0,1))
+    >>> len(alpha.theoryAnalysis.theoryAnalyzer.getHarmonicIntervals(sc, 0,1))
     2
-    >>> theoryAnalysis.theoryAnalyzer.getHarmonicIntervals(sc, 0,1)[0].name
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getHarmonicIntervals(sc, 0,1)[0].name
     'P5'
-    >>> theoryAnalysis.theoryAnalyzer.getHarmonicIntervals(sc, 0,1)[1].name
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getHarmonicIntervals(sc, 0,1)[1].name
     'm3'
     '''
     hInvList = []
@@ -596,9 +620,8 @@ def getHarmonicIntervals(score, partNum1, partNum2):
 
 def getMelodicIntervals(score, partNum):
     '''
-    returns a list of all the melodic intervals (:class:`~music21.interval.Interval`) in the specified part.
-    
-    
+    returns a list of all the melodic intervals (:class:`~music21.interval.Interval`) 
+    in the specified part.
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -606,11 +629,11 @@ def getMelodicIntervals(score, partNum):
     >>> part0.append(note.Note('g4'))
     >>> part0.append(note.Note('c5'))
     >>> sc.insert(part0)
-    >>> theoryAnalysis.theoryAnalyzer.getMelodicIntervals(sc,0)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getMelodicIntervals(sc,0)
     [<music21.interval.Interval P5>, <music21.interval.Interval P4>]
-    >>> theoryAnalysis.theoryAnalyzer.getMelodicIntervals(sc, 0)[0].name
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getMelodicIntervals(sc, 0)[0].name
     'P5'
-    >>> theoryAnalysis.theoryAnalyzer.getMelodicIntervals(sc, 0)[1].name
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getMelodicIntervals(sc, 0)[1].name
     'P4'
     '''
     mInvList = []
@@ -630,15 +653,13 @@ def getMelodicIntervals(score, partNum):
 def getNotes(score, partNum):
     '''
     returns a list of notes present in the score. If Rests are present, appends None to the list
-    
-    
 
     >>> sc = stream.Score()
     >>> p = stream.Part()
     >>> p.repeatAppend(note.Note('C'), 3)
     >>> p.append(note.Rest(1.0))
     >>> sc.append(p)
-    >>> theoryAnalysis.theoryAnalyzer.getNotes(sc, 0)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getNotes(sc, 0)
     [<music21.note.Note C>, <music21.note.Note C>, <music21.note.Note C>, None]
 
     '''
@@ -661,8 +682,6 @@ def getAllPartNumPairs(score):
     '''
     Gets a list of all possible pairs of partNumbers:
     tuples (partNum1, partNum2) where 0 <= partNum1 < partnum2 < numParts
-    
-    
 
     >>> sc = stream.Score()
     >>> part0 = stream.Part()
@@ -674,13 +693,13 @@ def getAllPartNumPairs(score):
     >>> sc.insert(part0)
     >>> sc.insert(part1)
     >>> sc.insert(part2)
-    >>> theoryAnalysis.theoryAnalyzer.getAllPartNumPairs(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getAllPartNumPairs(sc)
     [(0, 1), (0, 2), (1, 2)]
-    >>> theoryAnalysis.theoryAnalyzer.getAllPartNumPairs(sc)[0]
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getAllPartNumPairs(sc)[0]
     (0, 1)
-    >>> theoryAnalysis.theoryAnalyzer.getAllPartNumPairs(sc)[1]
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getAllPartNumPairs(sc)[1]
     (0, 2)
-    >>> theoryAnalysis.theoryAnalyzer.getAllPartNumPairs(sc)[2]
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getAllPartNumPairs(sc)[2]
     (1, 2)
     '''
     partNumPairs = []
@@ -707,23 +726,31 @@ def _updateScoreResultDict(score, dictKey, tr):
 - color is the color to mark the VLQ theory result object
 - dictKey is the dictionary key in the resultDict to assign the result objects found to
 - testFunction is the function to test (if not False is returned, a theory Result object is created)
-- textFunction is the function that returns the text as a string to be set as the theory result object's text parameter      
-- startIndex is the first VLQ in the list to start with (0 is default). endIndex is the first VLQ in list not to search 
-(length of VLQ list is default), meaning default values are to search the entire vlqList
-- if editorialDictKey is specified, the elements in the VLQ as specified by editorialMarkList are assigned the editorialValue
+- textFunction is the function that returns the text as a string to be set as the 
+  theory result object's text parameter   
+- startIndex is the first VLQ in the list to start with (0 is default). endIndex 
+  is the first VLQ in list not to search (length of VLQ list is default), meaning default 
+  values are to search the entire vlqList
+- if editorialDictKey is specified, the elements in the VLQ as specified by editorialMarkList 
+  are assigned the editorialValue
 
 '''
 # Template for analysis based on VLQs   
 
-def _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction=None, color=None, \
-                        startIndex=0, endIndex = None, editorialDictKey=None,editorialValue=None, editorialMarkList=[]):
-    
+def _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction=None, 
+                        color=None,
+                        startIndex=0, endIndex = None, editorialDictKey=None, 
+                        editorialValue=None, editorialMarkList=None):
+    if editorialMarkList is None:
+        editorialMarkList = []
     addAnalysisData(score)
 
     if partNum1 == None or partNum2 == None:
         for (partNum1,partNum2) in getAllPartNumPairs(score):
-            _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color, \
-                                     startIndex, endIndex, editorialDictKey, editorialValue, editorialMarkList)
+            _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, 
+                                textFunction, color,
+                                startIndex, endIndex, editorialDictKey, 
+                                editorialValue, editorialMarkList)
     else:
       
         vlqList = getVLQs(score, partNum1, partNum2)
@@ -745,14 +772,17 @@ def _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFu
                     tr.color(color)
                 _updateScoreResultDict(score, dictKey, tr)
                         
-def _identifyBasedOnHarmonicInterval(score, partNum1, partNum2, color, dictKey, testFunction, textFunction, valueFunction=None):
+def _identifyBasedOnHarmonicInterval(score, partNum1, partNum2, color, dictKey, 
+                                     testFunction, textFunction, valueFunction=None):
     addAnalysisData(score)
     if valueFunction == None:
         valueFunction = testFunction
     
     if partNum1 == None or partNum2 == None:
         for (partNum1,partNum2) in getAllPartNumPairs(score):
-            _identifyBasedOnHarmonicInterval(score, partNum1, partNum2, color, dictKey, testFunction, textFunction, valueFunction=valueFunction)
+            _identifyBasedOnHarmonicInterval(score, partNum1, partNum2, color, dictKey, 
+                                             testFunction, textFunction, 
+                                             valueFunction=valueFunction)
     else:
         hIntvList = getHarmonicIntervals(score, partNum1, partNum2)
         
@@ -771,7 +801,8 @@ def _identifyBasedOnMelodicInterval(score, partNum, color, dictKey, testFunction
     addAnalysisData(score)    
     if partNum == None:
         for partNum in range(0, len(score.parts)):
-            _identifyBasedOnMelodicInterval(score, partNum, color, dictKey, testFunction, textFunction)
+            _identifyBasedOnMelodicInterval(score, partNum, color, dictKey, 
+                                            testFunction, textFunction)
     else:
         mIntvList = getMelodicIntervals(score, partNum)
         
@@ -804,7 +835,10 @@ def _identifyBasedOnNote(score, partNum, color, dictKey, testFunction, textFunct
                     tr.color(color)
                 _updateScoreResultDict(score, dictKey, tr)
                    
-def _identifyBasedOnVerticality(score, color, dictKey, testFunction, textFunction, responseOffsetMap=[]):
+def _identifyBasedOnVerticality(score, color, dictKey, testFunction, 
+                                textFunction, responseOffsetMap=None):
+    if responseOffsetMap is None:
+        responseOffsetMap = []
     addAnalysisData(score)
     if 'Verticalities' not in score.analysisData:
         unused_vslist = getVerticalities(score)
@@ -823,14 +857,22 @@ def _identifyBasedOnVerticality(score, color, dictKey, testFunction, textFunctio
             
             _updateScoreResultDict(score, dictKey, tr)
 
-def _identifyBasedOnVerticalityNTuplet(score, partNumToIdentify, dictKey, testFunction, textFunction=None, color=None, \
-                                         editorialDictKey=None,editorialValue=None, editorialMarkDict={}, nTupletNum=3):        
+def _identifyBasedOnVerticalityNTuplet(score, partNumToIdentify, dictKey, 
+                                       testFunction, textFunction=None, color=None, 
+                                       editorialDictKey=None, editorialValue=None, 
+                                       editorialMarkDict=None, nTupletNum=3):
+    if editorialMarkDict is None:
+        editorialMarkDict = {} 
 
     addAnalysisData(score)
     if partNumToIdentify == None:
         for partNum in range(0,len(score.parts)):
-            _identifyBasedOnVerticalityNTuplet(score, partNum, dictKey, testFunction,  textFunction, color, \
-                                                      editorialDictKey=None,editorialValue=None, editorialMarkDict={}, nTupletNum=3)
+            _identifyBasedOnVerticalityNTuplet(score, partNum, dictKey, testFunction, 
+                                               textFunction, color,
+                                               editorialDictKey=editorialDictKey, 
+                                               editorialValue=editorialValue, 
+                                               editorialMarkDict=editorialMarkDict, 
+                                               nTupletNum=nTupletNum)
     else:
         for vsnt in getVerticalityNTuplets(score, nTupletNum):
             if testFunction(vsnt, partNumToIdentify) is not False:
@@ -843,12 +885,14 @@ def _identifyBasedOnVerticalityNTuplet(score, partNumToIdentify, dictKey, testFu
                     tr.color(color)
                 _updateScoreResultDict(score, dictKey, tr)
 
-def _identifyBasedOnThreeNoteLinearSegment(score, partNum, color, dictKey, testFunction, textFunction):            
+def _identifyBasedOnThreeNoteLinearSegment(score, partNum, color, dictKey, 
+                                           testFunction, textFunction):            
 
     addAnalysisData(score)
     if partNum == None:
         for partNum in range(0,len(score.parts)):
-            _identifyBasedOnThreeNoteLinearSegment(score, partNum, color, dictKey, testFunction, textFunction)
+            _identifyBasedOnThreeNoteLinearSegment(score, partNum, color, dictKey, 
+                                                   testFunction, textFunction)
     else:
         tnlsList = getThreeNoteLinearSegments(score, partNum)
 
@@ -868,7 +912,7 @@ def _identifyBasedOnThreeNoteLinearSegment(score, partNum, color, dictKey, testF
 #-------------------------------------------------------------------------------           
 # Theory Errors using VLQ template
 
-def identifyParallelFifths(score, partNum1 = None, partNum2 = None, color = None, dictKey = 'parallelFifths'):
+def identifyParallelFifths(score, partNum1=None, partNum2=None, color=None, dictKey='parallelFifths'):
     '''
     
     Identifies parallel fifths (calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.parallelFifth`) between 
@@ -895,7 +939,7 @@ def identifyParallelFifths(score, partNum1 = None, partNum2 = None, color = None
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.identifyParallelFifths(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.identifyParallelFifths(sc)
     >>> len(sc.analysisData['ResultDict']['parallelFifths'])
     2
     >>> sc.analysisData['ResultDict']['parallelFifths'][0].text
@@ -907,7 +951,7 @@ def identifyParallelFifths(score, partNum1 = None, partNum2 = None, color = None
                  + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey,testFunction,textFunction, color)
 
-def getParallelFifths(score, partNum1=None, partNum2 = None):
+def getParallelFifths(score, partNum1=None, partNum2=None):
     '''
     Identifies all parallel fifths in score, or only the parallel fifths found between partNum1 and partNum2, and
     returns these as instances of :class:`~music21.voiceLeading.VoiceLeadingQuartet`
@@ -931,7 +975,7 @@ def getParallelFifths(score, partNum1=None, partNum2 = None):
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.getParallelFifths(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getParallelFifths(sc)
     [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note D>, v1n2=<music21.note.Note E>, v2n1=<music21.note.Note G>, v2n2=<music21.note.Note A>  >, 
      <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note E>, v1n2=<music21.note.Note G>, v2n1=<music21.note.Note A>, v2n2=<music21.note.Note C>  >]
     >>> len(sc.analysisData['ResultDict']['parallelFifths'])
@@ -945,7 +989,8 @@ def getParallelFifths(score, partNum1=None, partNum2 = None):
     else:
         return None
     
-def identifyParallelOctaves(score, partNum1 = None, partNum2 = None, color = None, dictKey = 'parallelOctaves'):
+def identifyParallelOctaves(score, partNum1=None, partNum2=None, 
+                            color=None, dictKey='parallelOctaves'):
     '''
     Identifies parallel octaves (calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.parallelOctave`) between 
     two parts (if specified) or between all possible pairs of parts (if not specified) 
@@ -967,7 +1012,7 @@ def identifyParallelOctaves(score, partNum1 = None, partNum2 = None, color = Non
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.identifyParallelOctaves(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.identifyParallelOctaves(sc)
     >>> len(sc.analysisData['ResultDict']['parallelOctaves'])
     1
     >>> sc.analysisData['ResultDict']['parallelOctaves'][0].text
@@ -1001,7 +1046,7 @@ def getParallelOctaves(score, partNum1=None, partNum2=None):
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.getParallelOctaves(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getParallelOctaves(sc)
     [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note C>, v1n2=<music21.note.Note G>, v2n1=<music21.note.Note C>, v2n2=<music21.note.Note G>  >]
     '''
     testFunction = lambda vlq: vlq.parallelOctave()
@@ -1011,7 +1056,7 @@ def getParallelOctaves(score, partNum1=None, partNum2=None):
     else:
         return None
        
-def identifyParallelUnisons(score, partNum1 = None, partNum2 = None, color = None,dictKey = 'parallelUnisons'):
+def identifyParallelUnisons(score, partNum1=None, partNum2=None, color=None, dictKey='parallelUnisons'):
     '''
     Identifies parallel unisons (calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.parallelUnison`) between 
     two parts (if specified) or between all possible pairs of parts (if not specified) 
@@ -1038,7 +1083,7 @@ def identifyParallelUnisons(score, partNum1 = None, partNum2 = None, color = Non
     >>> sc.insert(part0)
     >>> sc.insert(part1)
    
-    >>> theoryAnalysis.theoryAnalyzer.identifyParallelUnisons(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.identifyParallelUnisons(sc)
     >>> len(sc.analysisData['ResultDict']['parallelUnisons'])
     3
     >>> sc.analysisData['ResultDict']['parallelUnisons'][2].text
@@ -1052,7 +1097,7 @@ def identifyParallelUnisons(score, partNum1 = None, partNum2 = None, color = Non
                  + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color)
     
-def identifyHiddenFifths(score, partNum1 = None, partNum2 = None, color = None,dictKey = 'hiddenFifths'):
+def identifyHiddenFifths(score, partNum1=None, partNum2=None, color=None, dictKey='hiddenFifths'):
     '''
     Identifies hidden fifths (calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.hiddenFifth`) between 
     two parts (if specified) or between all possible pairs of parts (if not specified) 
@@ -1074,7 +1119,7 @@ def identifyHiddenFifths(score, partNum1 = None, partNum2 = None, color = None,d
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.identifyHiddenFifths(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.identifyHiddenFifths(sc)
     >>> len(sc.analysisData['ResultDict']['hiddenFifths'])
     1
     >>> sc.analysisData['ResultDict']['hiddenFifths'][0].text
@@ -1109,7 +1154,7 @@ def identifyHiddenOctaves(score, partNum1 = None, partNum2 = None, color = None,
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.identifyHiddenOctaves(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.identifyHiddenOctaves(sc)
     >>> len(sc.analysisData['ResultDict']['hiddenOctaves'])
     1
     >>> sc.analysisData['ResultDict']['hiddenOctaves'][0].text
@@ -1122,7 +1167,8 @@ def identifyHiddenOctaves(score, partNum1 = None, partNum2 = None, color = None,
                  + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color)
     
-def identifyImproperResolutions(score, partNum1 = None, partNum2 = None, color = None, dictKey = 'improperResolution', editorialMarkList=[]):
+def identifyImproperResolutions(score, partNum1 = None, partNum2 = None, color = None, 
+                                dictKey = 'improperResolution', editorialMarkList=[]):
     '''
     Identifies improper resolutions of dissonant intervals (calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.improperResolution`) 
     between two parts (if specified) or between all possible pairs of parts (if not specified) 
@@ -1144,7 +1190,7 @@ def identifyImproperResolutions(score, partNum1 = None, partNum2 = None, color =
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.identifyImproperResolutions(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.identifyImproperResolutions(sc)
     >>> len(sc.analysisData['ResultDict']['improperResolution'])
     1
     >>> sc.analysisData['ResultDict']['improperResolution'][0].text
@@ -1156,9 +1202,12 @@ def identifyImproperResolutions(score, partNum1 = None, partNum2 = None, color =
     textFunction = lambda vlq, pn1, pn2: "Improper resolution of " + vlq.vIntervals[0].simpleNiceName +" in measure " + str(vlq.v1n1.measureNumber) +": "\
              + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
              + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name + " to " + vlq.v2n2.name
-    _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color, editorialDictKey='isImproperResolution',editorialValue=True, editorialMarkList=editorialMarkList)
+    _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, 
+                        textFunction, color, editorialDictKey='isImproperResolution', 
+                        editorialValue=True, editorialMarkList=editorialMarkList)
     
-def identifyLeapNotSetWithStep(score, partNum1 = None, partNum2 = None, color = None,dictKey = 'LeapNotSetWithStep'):
+def identifyLeapNotSetWithStep(score, partNum1 = None, partNum2 = None, 
+                               color = None, dictKey = 'LeapNotSetWithStep'):
     '''
     Identifies a leap/skip in one voice not set with a step in the other voice 
     (calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.leapNotSetWithStep`) 
@@ -1181,7 +1230,7 @@ def identifyLeapNotSetWithStep(score, partNum1 = None, partNum2 = None, color = 
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.identifyLeapNotSetWithStep(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.identifyLeapNotSetWithStep(sc)
     >>> len(sc.analysisData['ResultDict']['LeapNotSetWithStep'])
     1
     >>> sc.analysisData['ResultDict']['LeapNotSetWithStep'][0].text
@@ -1194,7 +1243,8 @@ def identifyLeapNotSetWithStep(score, partNum1 = None, partNum2 = None, color = 
              + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name + " to " + vlq.v2n2.name
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color)
 
-def identifyOpensIncorrectly(score, partNum1 = None, partNum2 = None, color = None,dictKey = 'opensIncorrectly'):
+def identifyOpensIncorrectly(score, partNum1=None, partNum2=None, 
+                             color=None, dictKey = 'opensIncorrectly'):
     '''
     Identifies if the piece opens correctly; calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.opensIncorrectly`
     
@@ -1213,7 +1263,7 @@ def identifyOpensIncorrectly(score, partNum1 = None, partNum2 = None, color = No
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.identifyOpensIncorrectly(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.identifyOpensIncorrectly(sc)
     >>> len(sc.analysisData['ResultDict']['opensIncorrectly'])
     1
     >>> sc.analysisData['ResultDict']['opensIncorrectly'][0].text
@@ -1223,9 +1273,10 @@ def identifyOpensIncorrectly(score, partNum1 = None, partNum2 = None, color = No
     
     testFunction = lambda vlq: vlq.opensIncorrectly()
     textFunction = lambda vlq, pn1, pn2: "Opening harmony is not in style"
-    _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color, startIndex = 0, endIndex = 1)
+    _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, 
+                        textFunction, color, startIndex = 0, endIndex = 1)
     
-def identifyClosesIncorrectly(score, partNum1 = None, partNum2 = None, color = None,dictKey = 'closesIncorrectly'):
+def identifyClosesIncorrectly(score, partNum1 = None, partNum2 = None, color = None, dictKey = 'closesIncorrectly'):
     '''
     Identifies if the piece closes correctly; calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.closesIncorrectly`
     
@@ -1247,8 +1298,8 @@ def identifyClosesIncorrectly(score, partNum1 = None, partNum2 = None, color = N
     >>> sc.insert(part0)
     >>> sc.insert(part1)
 
-    >>> theoryAnalysis.theoryAnalyzer.setKeyMeasureMap(sc,{1:'G'})
-    >>> theoryAnalysis.theoryAnalyzer.identifyClosesIncorrectly(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.setKeyMeasureMap(sc,{1:'G'})
+    >>> alpha.theoryAnalysis.theoryAnalyzer.identifyClosesIncorrectly(sc)
     >>> len(sc.analysisData['ResultDict']['closesIncorrectly'])
     1
     >>> sc.analysisData['ResultDict']['closesIncorrectly'][0].text
@@ -1261,8 +1312,9 @@ def identifyClosesIncorrectly(score, partNum1 = None, partNum2 = None, color = N
 
 # Using the Vertical Slice N Tuplet Template
 
-def identifyPassingTones(score, partNumToIdentify = None, color = None, dictKey = None, unaccentedOnly=True, \
-                         editorialDictKey=None,editorialValue=True):
+def identifyPassingTones(score, partNumToIdentify = None, color = None, dictKey = None, 
+                         unaccentedOnly=True, 
+                         editorialDictKey=None, editorialValue=True):
     '''
     Identifies the passing tones in the piece by looking at the vertical and horizontal cross-sections. Optionally
     specify unaccentedOnly to identify only unaccented passing tones (passing tones on weak beats). unaccentedOnly
@@ -1288,7 +1340,7 @@ def identifyPassingTones(score, partNumToIdentify = None, color = None, dictKey 
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.identifyPassingTones(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.identifyPassingTones(sc)
     >>> len(sc.analysisData['ResultDict']['unaccentedPassingTones'])
     1
     >>> sc.analysisData['ResultDict']['unaccentedPassingTones'][0].text
@@ -1325,7 +1377,7 @@ def getPassingTones(score, dictKey=None, partNumToIdentify=None, unaccentedOnly=
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.getPassingTones(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getPassingTones(sc)
     [<music21.note.Note G>]
     '''
     if dictKey == None and unaccentedOnly:
@@ -1360,7 +1412,7 @@ def getNeighborTones(score, dictKey=None, partNumToIdentify=None, unaccentedOnly
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.getNeighborTones(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getNeighborTones(sc)
     [<music21.note.Note B>]
     '''
     if dictKey == None and unaccentedOnly:
@@ -1374,7 +1426,7 @@ def getNeighborTones(score, dictKey=None, partNumToIdentify=None, unaccentedOnly
     else:
         return None
 
-def removePassingTones(score, dictKey = 'unaccentedPassingTones'):
+def removePassingTones(score, dictKey='unaccentedPassingTones'):
     '''
     primitively removes the passing tones found in a piece and fills the gap by extending note duraitons 
     (method under development)
@@ -1395,7 +1447,7 @@ def removePassingTones(score, dictKey = 'unaccentedPassingTones'):
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.removePassingTones(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.removePassingTones(sc)
     >>> for x in sc.flat.notes:
     ...   print(x)
     <music21.note.Note A>
@@ -1415,13 +1467,13 @@ def removePassingTones(score, dictKey = 'unaccentedPassingTones'):
         score.stripTies(inPlace=True, matchByPitch=True, retainContainers=False)
     score.analysisData['Verticalities'] = None
     
-def removeNeighborTones(score, dictKey = 'unaccentedNeighborTones'):
+def removeNeighborTones(score, dictKey='unaccentedNeighborTones'):
     '''
     primitively removes the neighbor tones found in a piece and fills the gap by extending note duraitons 
     (method under development)
     
     
-    >>> from music21.theoryAnalysis import *
+    >>> from music21.alpha.theoryAnalysis import *
     >>> sc = stream.Score()
     >>> sc.insert(0, meter.TimeSignature('2/4'))
     >>> part0 = stream.Part()
@@ -1458,7 +1510,8 @@ def removeNeighborTones(score, dictKey = 'unaccentedNeighborTones'):
         #a.n1.color = 'red'
     score.analysisData['Verticalities'] = None
 
-def identifyNeighborTones(score, partNumToIdentify = None, color = None, dictKey = None, unaccentedOnly=True, \
+def identifyNeighborTones(score, partNumToIdentify = None, color = None, dictKey = None, 
+                          unaccentedOnly=True,
                           editorialDictKey='isNeighborTone', editorialValue=True):
     '''
     Identifies the neighbor tones in the piece by looking at the vertical and horizontal cross-sections. Optionally
@@ -1482,7 +1535,7 @@ def identifyNeighborTones(score, partNumToIdentify = None, color = None, dictKey
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.identifyNeighborTones(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.identifyNeighborTones(sc)
     >>> len(sc.analysisData['ResultDict']['unaccentedNeighborTones'])
     1
     >>> sc.analysisData['ResultDict']['unaccentedNeighborTones'][0].text
@@ -1497,7 +1550,8 @@ def identifyNeighborTones(score, partNumToIdentify = None, color = None, dictKey
     textFunction = lambda vsnt, pn:  vsnt.tnlsDict[pn].n2.name + ' identified as a neighbor tone in part ' + str(pn+1)
     _identifyBasedOnVerticalityNTuplet(score, partNumToIdentify,  dictKey, testFunction, textFunction, color, editorialDictKey, editorialValue, editorialMarkDict={1:[partNumToIdentify]}, nTupletNum=3)
 
-def identifyDissonantHarmonicIntervals(score, partNum1 = None, partNum2 = None, color = None, dictKey = 'dissonantHarmonicIntervals'):
+def identifyDissonantHarmonicIntervals(score, partNum1 = None, partNum2 = None, color = None, 
+                                       dictKey = 'dissonantHarmonicIntervals'):
     '''
     Identifies dissonant harmonic intervals (calls :meth:`~music21.interval.Interval.isConsonant`) 
     between the two parts (if specified) or between all possible pairs of parts (if not specified) 
@@ -1523,7 +1577,7 @@ def identifyDissonantHarmonicIntervals(score, partNum1 = None, partNum2 = None, 
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.identifyDissonantHarmonicIntervals(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.identifyDissonantHarmonicIntervals(sc)
     >>> len(sc.analysisData['ResultDict']['dissonantHarmonicIntervals'])
     3
     >>> sc.analysisData['ResultDict']['dissonantHarmonicIntervals'][2].text
@@ -1535,7 +1589,7 @@ def identifyDissonantHarmonicIntervals(score, partNum1 = None, partNum2 = None, 
                  + " between part " + str(pn1 + 1) + " and part " + str(pn2 + 1)
     _identifyBasedOnHarmonicInterval(score, partNum1, partNum2, color, dictKey, testFunction, textFunction)
 
-def identifyImproperDissonantIntervals(score, partNum1 = None, partNum2 = None, color = None, \
+def identifyImproperDissonantIntervals(score, partNum1 = None, partNum2 = None, color = None, 
                                        dictKey = 'improperDissonantIntervals', unaccentedOnly=True):
     '''
     Identifies dissonant harmonic intervals that are not passing tones or neighbor tones or don't resolve correctly
@@ -1559,7 +1613,7 @@ def identifyImproperDissonantIntervals(score, partNum1 = None, partNum2 = None, 
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.identifyImproperDissonantIntervals(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.identifyImproperDissonantIntervals(sc)
     >>> len(sc.analysisData['ResultDict']['improperDissonantIntervals'])
     2
     >>> sc.analysisData['ResultDict']['improperDissonantIntervals'][1].text
@@ -1579,8 +1633,9 @@ def identifyImproperDissonantIntervals(score, partNum1 = None, partNum2 = None, 
         identifyImproperResolutions(score, partNum1, partNum2, dictKey='res', editorialMarkList=[1,2,3,4])
         if 'ResultDict' in score.analysisData and 'h1' in score.analysisData['ResultDict']:
             for resultTheoryObject in score.analysisData['ResultDict']['h1'] :
-                if  (resultTheoryObject.hasEditorial('isPassingTone', True) or resultTheoryObject.hasEditorial('isNeigborTone', True)) or \
-                    not resultTheoryObject.hasEditorial('isImproperResolution', True):
+                if  (resultTheoryObject.hasEditorial('isPassingTone', True) or 
+                     resultTheoryObject.hasEditorial('isNeigborTone', True)) or \
+                     not resultTheoryObject.hasEditorial('isImproperResolution', True):
                     continue
                 else:
                     intv = resultTheoryObject.intv
@@ -1595,7 +1650,8 @@ def identifyImproperDissonantIntervals(score, partNum1 = None, partNum2 = None, 
 
         removeFromAnalysisData(score, ['h1','pt1', 'pt2', 'nt1', 'nt2'])
        
-def identifyDissonantMelodicIntervals(score, partNum = None, color = None, dictKey = 'dissonantMelodicIntervals'):
+def identifyDissonantMelodicIntervals(score, partNum = None, color = None, 
+                                      dictKey='dissonantMelodicIntervals'):
     '''
     Identifies dissonant melodic intervals (A2, A4, d5, m7, M7) in the part (if specified) 
     or for all parts (if not specified) and stores the resulting list of 
@@ -1617,7 +1673,7 @@ def identifyDissonantMelodicIntervals(score, partNum = None, color = None, dictK
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.identifyDissonantMelodicIntervals(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.identifyDissonantMelodicIntervals(sc)
     >>> len(sc.analysisData['ResultDict']['dissonantMelodicIntervals'])
     2
     >>> sc.analysisData['ResultDict']['dissonantMelodicIntervals'][0].text
@@ -1694,7 +1750,8 @@ def identifyAntiParallelMotion(score, partNum1 = None, partNum2 = None, color = 
 
 # More Properties, not using VLQ template
 
-def identifyTonicAndDominantRomanNumerals(score, color = None, dictKey = 'romanNumeralsVandI', responseOffsetMap = []):
+def identifyTonicAndDominantRomanNumerals(score, color = None, 
+                                          dictKey = 'romanNumeralsVandI', responseOffsetMap = []):
     '''
     Identifies the roman numerals in the piece by iterating throgh the vertical slices and figuring
     out which roman numeral best corresponds to that vertical slice. Optionally specify the responseOffsetMap
@@ -1715,8 +1772,8 @@ def identifyTonicAndDominantRomanNumerals(score, color = None, dictKey = 'romanN
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.setKeyMeasureMap(sc, {0:'Bb'} )
-    >>> theoryAnalysis.theoryAnalyzer.identifyTonicAndDominantRomanNumerals(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.setKeyMeasureMap(sc, {0:'Bb'} )
+    >>> alpha.theoryAnalysis.theoryAnalyzer.identifyTonicAndDominantRomanNumerals(sc)
     >>> len(sc.analysisData['ResultDict']['romanNumeralsVandI'])
     2
     >>> sc.analysisData['ResultDict']['romanNumeralsVandI'][0].text
@@ -1742,7 +1799,8 @@ def identifyTonicAndDominantRomanNumerals(score, color = None, dictKey = 'romanN
             notes+= n.name + ','
         notes = notes[:-1]
         return "Roman Numeral of " + notes + ' is ' + rn
-    _identifyBasedOnVerticality(score, color, dictKey, testFunction, textFunction, responseOffsetMap=responseOffsetMap)                
+    _identifyBasedOnVerticality(score, color, dictKey, testFunction, textFunction, 
+                                responseOffsetMap=responseOffsetMap)                
 
 # TODO: improve this method...it's the beginnings of a harmonic analysis system for music21, but not developed well enough
 # for general use - it was used briefly as a proof-of-concept for some music theory homework assignments
@@ -1778,12 +1836,13 @@ def identifyTonicAndDominantRomanNumerals(score, color = None, dictKey = 'romanN
 #        return "Roman Numeral of " + notes + ' is ' + rn
 #    _identifyBasedOnVerticality(score, color, dictKey, testFunction, textFunction, responseOffsetMap=responseOffsetMap)                
     
-def identifyHarmonicIntervals(score, partNum1 = None, partNum2 = None, color = None, dictKey = 'harmonicIntervals'):
+def identifyHarmonicIntervals(score, partNum1 = None, partNum2 = None, 
+                              color = None, dictKey = 'harmonicIntervals'):
     '''
     identify all the harmonic intervals in the score between partNum1 or partNum2, or if not specified ALL
     possible combinations
     
-    :class:`~music21.theoryAnalysis.theoryAnalyzerIntervalTheoryResult` created with ``.value`` set to the string most commonly
+    :class:`~music21.alpha.theoryAnalysis.theoryAnalyzerIntervalTheoryResult` created with ``.value`` set to the string most commonly
     used to identify the interval (0 through 9, with A4 and d5)
 
     >>> sc = stream.Score()
@@ -1803,7 +1862,7 @@ def identifyHarmonicIntervals(score, partNum1 = None, partNum2 = None, color = N
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.identifyHarmonicIntervals(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.identifyHarmonicIntervals(sc)
     >>> len(sc.analysisData['ResultDict']['harmonicIntervals'])
     4
     >>> sc.analysisData['ResultDict']['harmonicIntervals'][1].value
@@ -1847,8 +1906,8 @@ def identifyScaleDegrees(score, partNum = None, color = None, dictKey = 'scaleDe
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.setKeyMeasureMap(sc, {0:'G'})
-    >>> theoryAnalysis.theoryAnalyzer.identifyScaleDegrees(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.setKeyMeasureMap(sc, {0:'G'})
+    >>> alpha.theoryAnalysis.theoryAnalyzer.identifyScaleDegrees(sc)
     >>> len(sc.analysisData['ResultDict']['scaleDegrees'])
     8
     >>> sc.analysisData['ResultDict']['scaleDegrees'][1].value
@@ -1861,7 +1920,8 @@ def identifyScaleDegrees(score, partNum = None, color = None, dictKey = 'scaleDe
     textFunction = lambda n, pn, scaleDegree: "scale degree of " + n.name + ' in part ' + str(pn+ 1) + ' is ' + str(scaleDegree) 
     _identifyBasedOnNote(score, partNum, color, dictKey, testFunction, textFunction)
         
-def identifyMotionType(score, partNum1 = None, partNum2 = None, color = None, dictKey = 'motionType'):
+def identifyMotionType(score, partNum1 = None, partNum2 = None, 
+                       color = None, dictKey = 'motionType'):
     '''
     Identifies the motion types in the score by analyzing each voice leading quartet between partNum1 and
     partNum2, or all possible voiceLeadingQuartets if not specified
@@ -1888,7 +1948,7 @@ def identifyMotionType(score, partNum1 = None, partNum2 = None, color = None, di
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.identifyMotionType(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.identifyMotionType(sc)
     >>> len(sc.analysisData['ResultDict']['motionType'])
     3
     >>> sc.analysisData['ResultDict']['motionType'][1].value
@@ -1906,7 +1966,8 @@ def identifyMotionType(score, partNum1 = None, partNum2 = None, color = None, di
 #-------------------------------------------------------------------------------
 # Combo method that wraps many identify methods into one 
 
-def identifyCommonPracticeErrors(score, partNum1=None,partNum2=None,dictKey='commonPracticeErrors'):
+def identifyCommonPracticeErrors(score, partNum1=None, partNum2=None, 
+                                 dictKey='commonPracticeErrors'):
     '''
     wrapper method that calls all identify methods for common-practice counterpoint errors, 
     assigning a color identifier to each
@@ -1955,8 +2016,8 @@ def getResultsString(score, typeList=None):
     >>> part1.append(p1measure1)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.identifyCommonPracticeErrors(sc)
-    >>> print(theoryAnalysis.theoryAnalyzer.getResultsString(sc))
+    >>> alpha.theoryAnalysis.theoryAnalyzer.identifyCommonPracticeErrors(sc)
+    >>> print(alpha.theoryAnalysis.theoryAnalyzer.getResultsString(sc))
     commonPracticeErrors: 
     Parallel fifth in measure 1: Part 1 moves from D to E while part 2 moves from G to A
     Parallel fifth in measure 1: Part 1 moves from E to G while part 2 moves from A to C
@@ -2006,14 +2067,14 @@ def removeFromAnalysisData(score, dictKeys):
     
     
     >>> sc = stream.Score()
-    >>> theoryAnalysis.theoryAnalyzer.addAnalysisData(sc)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.addAnalysisData(sc)
     >>> sc.analysisData['ResultDict'] = {'sampleDictKey': 'sample response', 'h1':'another sample response', '5':'third sample response'}
-    >>> theoryAnalysis.theoryAnalyzer.removeFromAnalysisData(sc, 'sampleDictKey')
+    >>> alpha.theoryAnalysis.theoryAnalyzer.removeFromAnalysisData(sc, 'sampleDictKey')
     >>> for k in sorted(list(sc.analysisData['ResultDict'].keys())):
     ...     print("{0}\t{1}".format(k, sc.analysisData['ResultDict'][k]))
     5   third sample response
     h1  another sample response
-    >>> theoryAnalysis.theoryAnalyzer.removeFromAnalysisData(sc, ['h1', '5'])
+    >>> alpha.theoryAnalysis.theoryAnalyzer.removeFromAnalysisData(sc, ['h1', '5'])
     >>> sc.analysisData['ResultDict']
     {}
     '''  
@@ -2049,7 +2110,7 @@ def setKeyMeasureMap(score, keyMeasureMap):
     for analysis purposes only - no key object is actually added to the score.
     Check the music xml to verify measure numbers; pickup measures are usually 0.
     
-    >>> from music21.theoryAnalysis import *
+    >>> from music21.alpha.theoryAnalysis import *
     >>> n1 = note.Note('c5')
     >>> n1.quarterLength = 4
     >>> n2 = note.Note('f4')
@@ -2064,10 +2125,10 @@ def setKeyMeasureMap(score, keyMeasureMap):
     >>> part1.append(n3)
     >>> sc.insert(part0)
     >>> sc.insert(part1)
-    >>> theoryAnalysis.theoryAnalyzer.setKeyMeasureMap(sc, {1:'C',2:'a'})
-    >>> theoryAnalysis.theoryAnalyzer.getKeyMeasureMap(sc)[1]
+    >>> alpha.theoryAnalysis.theoryAnalyzer.setKeyMeasureMap(sc, {1:'C',2:'a'})
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getKeyMeasureMap(sc)[1]
     'C'
-    >>> theoryAnalysis.theoryAnalyzer.getKeyMeasureMap(sc)[2]
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getKeyMeasureMap(sc)[2]
     'a'
     '''
     addAnalysisData(score)
@@ -2078,15 +2139,15 @@ def getKeyAtMeasure(score, measureNumber):
     uses keyMeasureMap to return music21 key object. If keyMeasureMap not specified,
     returns key analysis of theory score as a whole.  
     
-    >>> from music21.theoryAnalysis import *
+    >>> from music21.alpha.theoryAnalysis import *
     >>> s = stream.Score()
-    >>> theoryAnalysis.theoryAnalyzer.setKeyMeasureMap(s, {1:'C', 2:'G', 4:'a', 7:'C'})
-    >>> theoryAnalysis.theoryAnalyzer.getKeyAtMeasure(s, 3)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.setKeyMeasureMap(s, {1:'C', 2:'G', 4:'a', 7:'C'})
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getKeyAtMeasure(s, 3)
     <music21.key.Key of G major>
-    >>> theoryAnalysis.theoryAnalyzer.getKeyAtMeasure(s, 5)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getKeyAtMeasure(s, 5)
     <music21.key.Key of a minor>
     >>> sc = corpus.parse('bach/bwv66.6')
-    >>> theoryAnalysis.theoryAnalyzer.getKeyAtMeasure(sc, 5)
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getKeyAtMeasure(sc, 5)
     <music21.key.Key of f# minor>
     '''
     keyMeasureMap = getKeyMeasureMap(score)
@@ -2118,7 +2179,7 @@ class Test(unittest.TestCase):
 #         p = corpus.parse('leadsheet').flat.getElementsByClass('Harmony')
 #         harmony.realizeChordSymbolDurations(p)
 #         averageMotion = 0
-#         l = theoryAnalysis.theoryAnalyzer.getLinearSegments(p,0,2, ['Harmony'])
+#         l = alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(p,0,2, ['Harmony'])
 #         for x in l:
 #             averageMotion+= abs(x.rootInterval().intervalClass)
 #         averageMotion = averageMotion // len(l)
@@ -2133,19 +2194,12 @@ class TestExternal(unittest.TestCase):
     
     def demo(self):
         from music21 import converter
-        #s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/WWNortonWorksheets/WWNortonXMLFiles/XML11_worksheets/S11_1_II_cleaned.xml')
-        #s = converter.parse('/Users/larsj/Dropbox/Music21Theory/WWNortonWorksheets/WWNortonXMLFiles/XML11_worksheets/S11_1_II_cleaned.xml')
-        #s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/WWNortonWorksheets/WWNortonXMLFiles/XML11_worksheets/S11_6_IA_completed.xml')
-        #s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/FromServer/11_3_A_1.xml')
         sc = converter.parse('/Users/bhadley/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
-        #s = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/S11_6_IA_student.xml')
-        #s.show()
-        #s = corpus.parse('k545').measures(1,5)
         identifyCommonPracticeErrors(sc)
         
         #sc.show()
     def removeNHTones(self):
-        from music21.theoryAnalysis import theoryAnalyzer
+        from music21.alpha.theoryAnalysis import theoryAnalyzer
         p = corpus.parse('bwv6.6').measures(0,20)
         p.show()
         theoryAnalyzer.removePassingTones(p)
@@ -2153,7 +2207,6 @@ class TestExternal(unittest.TestCase):
         p.show()
         
 if __name__ == "__main__":
-
     music21.mainTest(Test)
 
     
