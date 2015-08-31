@@ -125,8 +125,7 @@ class ModuleIterator(Iterator):
                 except ImportError:
                     pass
             for fileName in fileNames:
-                if directoryPath.startswith('/Users/cuthbert/git/music21base/music21/alpha/analysis'):
-                    print("YAHOO!5", fileName, directoryPath)
+                print("YAHOO!5", fileName, directoryPath)
                 if fileName in self._ignoredFileNames:
                     continue
                 if not fileName.endswith('.py'):
@@ -139,25 +138,18 @@ class ModuleIterator(Iterator):
                     strippedPath)[0].split(os.path.sep)[1:] if x]
                 pathParts = ['music21'] + pathParts
                 packagesystemPath = '.'.join(pathParts)
-                if directoryPath.startswith('/Users/cuthbert/git/music21base/music21/alpha/analysis'):
-                    print("YAHOO!6", fileName, directoryPath)
                 try:
                     module = __import__(packagesystemPath, fromlist=['*'])
-                    if directoryPath.startswith('/Users/cuthbert/git/music21base/music21/alpha/analysis'):
-                        print("YAHOO!7", fileName, directoryPath)
                     if getattr(module, '_DOC_IGNORE_MODULE_OR_PACKAGE',
                         False):
                         if self.verbose:
                             print('\tIGNORED {0}'.format(
                                 common.relativepath(filePath)))
                         continue
-                    if directoryPath.startswith('/Users/cuthbert/git/music21base/music21/alpha/analysis'):
-                        print("YAHOO!8", fileName, directoryPath)
                     yield module
-                    if directoryPath.startswith('/Users/cuthbert/git/music21base/music21/alpha/analysis'):
-                        print("YAHOO!9", fileName, directoryPath)                    
                 except ImportError:
                     pass
+        print("?????")
         raise StopIteration
 
 
