@@ -175,8 +175,8 @@ class ClassIterator(Iterator):
     '''
     Iterates over music21's package system, yielding all classes discovered:
 
-    >>> iterator = documentation.ClassIterator(verbose=False)
-    >>> classes = sorted([x for x in iterator], key=lambda x: (x.__module__, x.__name__))
+    >>> citerator = documentation.ClassIterator(verbose=False)
+    >>> classes = sorted([x for x in citerator], key=lambda x: (x.__module__, x.__name__))
     >>> for cls in classes[:10]:
     ...     cls
     ...

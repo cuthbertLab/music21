@@ -76,8 +76,8 @@ def generateChords(numChords,kind=''):
     only diatonic triads will be generated
         
     
-    >>> sc = webapps.commands.generateChords(4,'diatonicTriads')
-    >>> a = webapps.commands.runPerceivedDissonanceAnalysis(sc,[1.2,3.2,5.2])
+    >>> sc = alpha.webapps.commands.generateChords(4,'diatonicTriads')
+    >>> a = alpha.webapps.commands.runPerceivedDissonanceAnalysis(sc,[1.2,3.2,5.2])
     >>> chords = a['fullScore']['stream'].flat.getElementsByClass('Chord')
     >>> chords[0].color != None
     True
@@ -87,8 +87,8 @@ def generateChords(numChords,kind=''):
     True
     >>> chords[3].color in [None, '#cc3300']
     True
-    >>> sc2 = webapps.commands.generateChords(4)
-    >>> a = webapps.commands.runPerceivedDissonanceAnalysis(sc2,[1.2,3.2])
+    >>> sc2 = alpha.webapps.commands.generateChords(4)
+    >>> a = alpha.webapps.commands.runPerceivedDissonanceAnalysis(sc2,[1.2,3.2])
     >>> chords = a['fullScore']['stream'].flat.getElementsByClass('Chord')
     >>> chords[0].color != None
     True
@@ -168,7 +168,7 @@ def runPerceivedDissonanceAnalysis(scoreIn, offsetList, keyStr=None):
     ...     10.14833,
     ...     11.700833,
     ...     ]
-    >>> analysisDict = webapps.commands.runPerceivedDissonanceAnalysis(piece, offsetList)
+    >>> analysisDict = alpha.webapps.commands.runPerceivedDissonanceAnalysis(piece, offsetList)
     >>> a = analysisDict['fullScore']
 
     >>> a['numMusic21Identified']
@@ -209,9 +209,9 @@ def _withinRange(dataList, lowLim, upperLim):
     '''helper function: returns true if there exists a number in dataList 
     for which the inequality lowLim <= number < upperLim
     
-    >>> webapps.commands._withinRange([1,5.5,8], 2,3)
+    >>> alpha.webapps.commands._withinRange([1,5.5,8], 2,3)
     False
-    >>> webapps.commands._withinRange([1,5.5,8], 4,6)
+    >>> alpha.webapps.commands._withinRange([1,5.5,8], 4,6)
     True
     '''
     dataList.sort()
@@ -252,7 +252,7 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
     >>> p.append(c4)
     >>> p.makeMeasures(inPlace=True)
     >>> s.append(p)
-    >>> aData = webapps.commands.determineDissonantIdentificationAccuracy(s, [2.3, 3.2])
+    >>> aData = alpha.webapps.commands.determineDissonantIdentificationAccuracy(s, [2.3, 3.2])
     >>> chords = aData['stream'].flat.getElementsByClass('Chord')
     >>> chords[0].color == None #BLACK (by default)
     True
@@ -335,7 +335,7 @@ def correctChordSymbols(worksheet, studentResponse):
     >>> studentResponse.append(chord.Chord(['G', 'B', 'D5', 'F5']))
     >>> studentResponse.append(chord.Chord(['B-', 'C']))
     >>> studentResponse.append(chord.Chord(['D4', 'F#4', 'A4', 'C5']))
-    >>> newScore, percentCorrect = webapps.commands.correctChordSymbols(
+    >>> newScore, percentCorrect = alpha.webapps.commands.correctChordSymbols(
     ...     worksheet, studentResponse)
     >>> for x in newScore.notes:
     ...  x.lyric
@@ -407,7 +407,7 @@ def checkLeadSheetPitches(worksheet, returnType=''):
     >>> worksheet.append(harmony.ChordSymbol('B'))
     >>> worksheet.append(harmony.ChordSymbol('D7/A')) 
 
-    >>> answerKey = webapps.commands.checkLeadSheetPitches( worksheet, returnType = 'answerkey' )
+    >>> answerKey = alpha.webapps.commands.checkLeadSheetPitches( worksheet, returnType = 'answerkey' )
     >>> for x in answerKey.notes:
     ...     [str(p) for p in x.pitches]
     ['C3', 'E3', 'G3']

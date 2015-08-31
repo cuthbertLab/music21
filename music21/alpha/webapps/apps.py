@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         webapps.apps.py
+# Name:         alpha.webapps.apps.py
 # Purpose:      application-specific commands and templates.
 #
 # Authors:      Lars Johnson
@@ -27,14 +27,14 @@ def setupURLCorpusParseApp(agenda):
     
     ResponseData is returned as a bytes object in Python3
     
-    >>> agenda = webapps.Agenda()
+    >>> agenda = alpha.webapps.Agenda()
     >>> agenda.addData('measureEnd','4')
     >>> agenda.addData('workName',"'bwv7.7'")
     >>> agenda.addData('command',"commands.reduction")
     >>> agenda.addData('output',"musicxmlDownload")
-    >>> webapps.apps.setupURLCorpusParseApp(agenda)
+    >>> alpha.webapps.apps.setupURLCorpusParseApp(agenda)
 
-    >>> processor = webapps.CommandProcessor(agenda)
+    >>> processor = alpha.webapps.CommandProcessor(agenda)
     >>> processor.executeCommands()
     >>> (responseData, responseContentType) = processor.getOutput()
     >>> responseContentType
@@ -82,12 +82,12 @@ def setupConverterApp(agenda):
     http://ciconia.mit.edu/music21/webinterface?appName=converterApp&source="tinynotation:F4 A-  B- B c e f2"&output=vexflow
     
     
-    >>> agenda = webapps.Agenda()
+    >>> agenda = alpha.webapps.Agenda()
     >>> agenda.addData('source','tinynotation:F4 A- B- B c e f2')
     >>> agenda.addData('output',"musicxml")
-    >>> webapps.apps.setupConverterApp(agenda)
+    >>> alpha.webapps.apps.setupConverterApp(agenda)
 
-    >>> processor = webapps.CommandProcessor(agenda)
+    >>> processor = alpha.webapps.CommandProcessor(agenda)
     >>> processor.executeCommands()
     >>> (responseData, responseContentType) = processor.getOutput()
     >>> responseContentType

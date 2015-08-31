@@ -35,7 +35,7 @@ def sortByPMFC(work):
     '''
     Sort a work according to which one comes first in PMFC:
 
-    >>> from music21.demos.runTrecentoCadence import sortByPMFC
+    >>> from music21.trecento.runTrecentoCadence import sortByPMFC
     
     >>> class Work(object):
     ...    def __init__(self, id):

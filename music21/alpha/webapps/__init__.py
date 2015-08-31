@@ -219,7 +219,7 @@ def ModWSGIApplication(environ, start_response):
     >>> environ['SCRIPT_NAME'] = "/music21/unifiedinterface"
     >>> environ['CONTENT_TYPE'] = "application/json"
     >>> start_response = lambda status, headers: None         # usually called by mod_wsgi server. Used to initiate response
-    >>> webapps.ModWSGIApplication(environ, start_response)
+    >>> alpha.webapps.ModWSGIApplication(environ, start_response)
     [...'{"dataDict": {"a": ...}, "errorList": [], "status": "success"}']    
     '''    
 
@@ -271,7 +271,7 @@ def makeAgendaFromRequest(requestInput, environ, requestType = None):
     >>> unused = requestInput.write('{"dataDict":{"a":{"data":3}}}')
     >>> unused = requestInput.seek(0)
     >>> environ = {"QUERY_STRING":"b=3"}
-    >>> agenda = webapps.makeAgendaFromRequest(requestInput, environ, 'application/json')
+    >>> agenda = alpha.webapps.makeAgendaFromRequest(requestInput, environ, 'application/json')
 
     >>> from pprint import pprint as pp
     >>> pp(agenda)
@@ -282,7 +282,7 @@ def makeAgendaFromRequest(requestInput, environ, requestType = None):
     (the ellipses above comment out the u unicode prefix in PY2)
 
     >>> environ2 = {"QUERY_STRING":"a=2&b=3&b=4"}
-    >>> agenda2 = webapps.makeAgendaFromRequest(requestInput, environ2, 'multipart/form-data')
+    >>> agenda2 = alpha.webapps.makeAgendaFromRequest(requestInput, environ2, 'multipart/form-data')
 
     Note that the 3 in a:data becomes '2' -- a string.
     
@@ -435,7 +435,7 @@ class Agenda(dict):
         Initializes core key values 'dataDict', 'commandList', 'returnDict'
 
         >>> from pprint import pprint as pp
-        >>> agenda = webapps.Agenda()
+        >>> agenda = alpha.webapps.Agenda()
         >>> pp(agenda)
         {'commandList': [], 'dataDict': {}, 'returnDict': {}}
         '''
@@ -450,7 +450,7 @@ class Agenda(dict):
         to values that are not of the corresponding dict/list type.
 
         >>> from pprint import pprint as pp
-        >>> agenda = webapps.Agenda()
+        >>> agenda = alpha.webapps.Agenda()
         >>> pp(agenda)
         {'commandList': [], 'dataDict': {}, 'returnDict': {}}
         >>> agenda['dataDict'] = {"a":{"data":2}}
@@ -473,7 +473,7 @@ class Agenda(dict):
         and adds it to the dataDict of the agenda.
         
         >>> from pprint import pprint as pp
-        >>> agenda = webapps.Agenda()
+        >>> agenda = alpha.webapps.Agenda()
         >>> pp(agenda)
         {'commandList': [], 'dataDict': {}, 'returnDict': {}}
         >>> agenda.addData('a', 2)
@@ -497,7 +497,7 @@ class Agenda(dict):
         returns the value None.        
 
         >>> from pprint import pprint as pp        
-        >>> agenda = webapps.Agenda()
+        >>> agenda = alpha.webapps.Agenda()
         >>> pp(agenda)
         {'commandList': [], 'dataDict': {}, 'returnDict': {}}
         >>> agenda.getData('a') == None
@@ -523,7 +523,7 @@ class Agenda(dict):
         
         >>> from pprint import pprint as pp
         
-        >>> agenda = webapps.Agenda()
+        >>> agenda = alpha.webapps.Agenda()
         >>> pp(agenda)
         {'commandList': [], 'dataDict': {}, 'returnDict': {}}
         >>> agenda.addCommand('method','sc','sc','transpose',['p5'])
@@ -561,7 +561,7 @@ class Agenda(dict):
         
         >>> from pprint import pprint as pp ## pprint stablizes dictionary order
         
-        >>> agenda = webapps.Agenda()
+        >>> agenda = alpha.webapps.Agenda()
         >>> pp(agenda)
         {'commandList': [], 'dataDict': {}, 'returnDict': {}}
         
@@ -582,10 +582,10 @@ class Agenda(dict):
         
         >>> from pprint import pprint as pp ## pprint stablizes dictionary order
         
-        >>> agenda = webapps.Agenda()
+        >>> agenda = alpha.webapps.Agenda()
         >>> pp(agenda)
         {'commandList': [], 'dataDict': {}, 'returnDict': {}}
-        >>> agenda.loadJson(webapps.sampleJsonStringSimple)
+        >>> agenda.loadJson(alpha.webapps.sampleJsonStringSimple)
         >>> pp(agenda)
         {'commandList': [],
          'dataDict': {...'myNum': {...'data': ...'23', ...'fmt': ...'int'}},
@@ -1077,11 +1077,11 @@ class CommandProcessor(object):
         If the input corresponds to none of these types, it is returned as a string.
         
         
-        >>> agenda = webapps.Agenda()
+        >>> agenda = alpha.webapps.Agenda()
         >>> agenda.addData("a",2)
         >>> agenda.addData("b",[1,2,3],"list")
 
-        >>> processor = webapps.CommandProcessor(agenda)
+        >>> processor = alpha.webapps.CommandProcessor(agenda)
         >>> processor.parseInputToPrimitive("a")
         2
         >>> processor.parseInputToPrimitive("b")
