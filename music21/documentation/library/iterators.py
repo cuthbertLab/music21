@@ -81,6 +81,7 @@ class ModuleIterator(Iterator):
     ### CLASS VARIABLES ###
 
     _ignoredDirectoryNames = (
+                              'alpha',
         'archive',
         'demos',
         'doc',
