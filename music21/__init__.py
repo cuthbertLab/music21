@@ -82,7 +82,6 @@ __all__ = [
     'timespans',
     'trecento',
     'vexflow',
-    'webapps', 
     # individual modules 
     # KEEP ALPHABETICAL unless necessary for load reasons, if so
     # put a note.  Keep one letter per line.

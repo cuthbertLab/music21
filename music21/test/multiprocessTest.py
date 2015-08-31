@@ -54,7 +54,7 @@ class ModuleGather(object):
     >>> from music21.test import testSingleCoreAll as testModule
     >>> mg = testModule.ModuleGather()
     >>> #_DOCS_SHOW print mg.modulePaths[0]
-    D:\Web\eclipse\music21base\music21\xmlnode.py
+    D:\Web\eclipse\music21base\music21\chord.py
     '''
     def __init__(self):
         self.dirParent = os.path.dirname(base.__file__)
@@ -167,8 +167,8 @@ class ModuleGather(object):
         
         >>> from music21.test import testSingleCoreAll as testModule
         >>> mg = testModule.ModuleGather()
-        >>> #_DOCS_SHOW mg._getName(r'D:\Web\eclipse\music21base\music21\xmlnode.py')
-        'xmlnode'
+        >>> #_DOCS_SHOW mg._getName(r'D:\Web\eclipse\music21base\music21\chord.py')
+        'chord'
         '''
         fn = fp.replace(self.dirParent, '') # remove parent
         if fn.startswith(os.sep):

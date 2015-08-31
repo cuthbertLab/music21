@@ -19,7 +19,7 @@ specific to a given application as well as a set of commands specific to the var
 '''
 import unittest
 
-from music21.webapps import templates
+from music21.alpha.webapps import templates
 
 def setupURLCorpusParseApp(agenda):
     '''

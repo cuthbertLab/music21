@@ -33,9 +33,14 @@ from music21 import note
 from music21 import interval
 from music21 import exceptions21
 
+from music21.ext import six
+if six.PY2:
+    from StringIO import StringIO # @UnusedImport @UnresolvedImport
+else:
+    from io import StringIO # @Reimport
+
 import zipfile
 import cgi
-import StringIO
 import re
 #
 

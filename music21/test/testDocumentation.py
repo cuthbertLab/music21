@@ -88,7 +88,7 @@ def main(runOne=False):
             print("failed miserably! %s" % str(e))
             import traceback
             tb = traceback.format_exc()
-            print("Here's the traceback for the exeception: \n%s" % (tb))
+            print("Here's the traceback for the exception: \n%s" % (tb))
 
 
     elapsedTime = time.time() - timeStart

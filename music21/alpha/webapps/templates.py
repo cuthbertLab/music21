@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         webapps.commands.py
+# Name:         alpha.webapps.commands.py
 # Purpose:      music21 functions for implementing web interfaces
 #
 # Authors:      Lars Johnson
@@ -49,7 +49,7 @@ def musicxmlText(outputStream):
     Takes in a stream outputStream and returns its musicxml with content-type 'text/plain' for displaying in a browser
     
     >>> sc = corpus.parse('bwv7.7').measures(0,2)
-    >>> (output, contentType) = webapps.templates.musicxmlText(sc)
+    >>> (output, contentType) = alpha.webapps.templates.musicxmlText(sc)
     >>> contentType
     'text/plain; charset=utf-8'
     >>> b'score-partwise' in output
@@ -64,7 +64,7 @@ def musicxmlFile(outputStream):
     Takes in a stream outputStream and returns its musicxml with content-type 'application/vnd.recordare.musicxml+xml' for downloading
     
     >>> sc = corpus.parse('bwv7.7').measures(0,2)
-    >>> (output, contentType) = webapps.templates.musicxmlFile(sc)
+    >>> (output, contentType) = alpha.webapps.templates.musicxmlFile(sc)
     >>> contentType
     'application/vnd.recordare.musicxml+xml; charset=utf-8'
     >>> b'score-partwise' in output
@@ -81,7 +81,7 @@ def vexflow(outputStream):
     outputs it with content-type text/html for displying in a browser.
     
     >>> sc = corpus.parse('bwv7.7').measures(0,2)
-    >>> (output, contentType) = webapps.templates.vexflow(sc)
+    >>> (output, contentType) = alpha.webapps.templates.vexflow(sc)
     >>> contentType
     'text/html; charset=utf-8'
     '''
@@ -95,7 +95,7 @@ def braille(outputStream):
     the unicode output with content-type text/html for display in a browser
   
     >>> sc = corpus.parse('bwv7.7').measures(0,2)
-    >>> (output, contentType) = webapps.templates.braille(sc)
+    >>> (output, contentType) = alpha.webapps.templates.braille(sc)
     >>> contentType
     'text/html; charset=utf-8'
     '''
@@ -113,7 +113,7 @@ def noteflightEmbed(outputStream):
     TODO: Change javascript and noteflight embed to relate to be server-specific
   
     >>> sc = corpus.parse('bwv7.7').measures(0,2)
-    >>> (output, contentType) = webapps.templates.noteflightEmbed(sc)
+    >>> (output, contentType) = alpha.webapps.templates.noteflightEmbed(sc)
     >>> contentType
     'text/html; charset=utf-8'
     '''

@@ -11,7 +11,8 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
-'''This module defines objects for defining and manipulating structures 
+'''
+This module defines objects for defining and manipulating structures 
 common to serial and/or twelve-tone music, 
 including :class:`~music21.serial.ToneRow` subclasses.
 '''
@@ -117,8 +118,7 @@ class ToneRow(stream.Stream):
     def pitchClasses(self):
         
         '''
-        Convenience function showing the pitch classes of a :class:`~music21.serial.ToneRow` as a list.
-        
+        Convenience function showing the pitch classes of a :class:`~music21.serial.ToneRow` as a list.  
         
         >>> L = [5*i for i in range(0,12)]
         >>> quintupleRow = serial.pcToToneRow(L)
@@ -126,8 +126,7 @@ class ToneRow(stream.Stream):
         [0, 5, 10, 3, 8, 1, 6, 11, 4, 9, 2, 7]
         >>> halfStep = serial.pcToToneRow([0, 1])
         >>> halfStep.pitchClasses()
-        [0, 1]
-        
+        [0, 1] 
         '''
         
         pitchlist = [n.pitch.pitchClass for n in self]

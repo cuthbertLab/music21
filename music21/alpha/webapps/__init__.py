@@ -112,9 +112,9 @@ if six.PY2:
     import commands
     import templates
 else:
-    from music21.webapps import templates # @Reimport
-    from music21.webapps import apps      # @Reimport
-    from music21.webapps import commands  # @Reimport
+    from music21.alpha.webapps import templates # @Reimport
+    from music21.alpha.webapps import apps      # @Reimport
+    from music21.alpha.webapps import commands  # @Reimport
 
 # python library imports
 import json

@@ -123,8 +123,8 @@ class ModuleGather(object):
         
         >>> from music21.test import testSingleCoreAll as testModule
         >>> mg = testModule.ModuleGather()
-        >>> #_DOCS_SHOW mg._getName(r'D:\Web\eclipse\music21base\music21\xmlnode.py')
-        'xmlnode'
+        >>> #_DOCS_SHOW mg._getName(r'D:\Web\eclipse\music21base\music21\chord.py')
+        'chord'
         '''
         fn = fp.replace(self.dirParent, '') # remove parent
         parts = [x for x in fn.split(os.sep) if x]
