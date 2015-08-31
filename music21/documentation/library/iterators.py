@@ -182,7 +182,7 @@ class ClassIterator(Iterator):
 
     >>> citerator = documentation.ClassIterator(verbose=False)
     >>> for x in citerator:
-    ...     print(x)
+    ...     pass
     >>> allClasses = [x for x in citerator]
     >>> classes = sorted(allClasses, key=lambda x: (x.__module__, x.__name__))
     >>> for cls in classes[:10]:

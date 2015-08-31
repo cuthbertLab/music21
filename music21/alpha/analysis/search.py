@@ -22,9 +22,6 @@ _MOD = 'analysis.search'
 environLocal = environment.Environment(_MOD)
 
 
-
-
-
 class SearchModuleException(exceptions21.Music21Exception):
     pass
 
