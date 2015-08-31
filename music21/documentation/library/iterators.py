@@ -131,7 +131,6 @@ class ModuleIterator(Iterator):
                     continue
                 if fileName.startswith('_') and not fileName.startswith('__'):
                     continue
-                print("YAHOO!5", fileName, directoryPath)
                 filePath = os.path.join(directoryPath, fileName)
                 strippedPath = filePath.partition(rootFilesystemPath)[2]
                 pathParts = [x for x in os.path.splitext(
@@ -149,7 +148,6 @@ class ModuleIterator(Iterator):
                     yield module
                 except ImportError:
                     pass
-        print("?????")
         raise StopIteration
 
 
