@@ -296,7 +296,6 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
     def _getPitchClassDistribution(self, streamObj):
         '''Given a flat Stream, obtain a pitch class distribution. The value of each pitch class is scaled by its duration in quarter lengths.
 
-        >>> from music21 import note, stream, chord
         >>> a = analysis.discrete.KrumhanslSchmuckler()
         >>> s = stream.Stream()
         >>> n1 = note.Note('c')

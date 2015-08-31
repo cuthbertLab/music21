@@ -430,7 +430,6 @@ def reBar(music21Part, inPlace=True):
     """
     Re-bar overflow measures using the last known time signature.
 
-    >>> from music21 import corpus
     >>> irl2 = corpus.parse("irl", number=2)
     >>> irl2.metadata.title
     'Aililiu na Gamhna, S.35'

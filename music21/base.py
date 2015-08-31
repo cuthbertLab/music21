@@ -515,7 +515,6 @@ class Music21Object(object):
         results in the copy happening twice. Thus, __dict__.keys() is used.
 
         >>> from copy import deepcopy
-        >>> from music21 import note, duration
         >>> n = note.Note('A')
         >>> n.offset = 1.0 #duration.Duration("quarter")
         >>> n.groups.append("flute")
@@ -1045,7 +1044,6 @@ class Music21Object(object):
         This is only for advanced location method and
         is not a complete or sufficient way to remove an object from a Stream.
 
-        >>> from music21 import note, stream
         >>> s = stream.Stream()
         >>> n = note.Note()
         >>> n.sites.add(s, 10)
@@ -3192,7 +3190,6 @@ class ElementWrapper(Music21Object):
     always 2) if they fall on a strong beat in fast 6/8
 
     >>> import music21
-    >>> from music21 import stream, meter
     >>> #_DOCS_SHOW import wave
     >>> import random
     >>> class Wave_read(object): #_DOCS_HIDE
@@ -3271,7 +3268,6 @@ class ElementWrapper(Music21Object):
         '''Test ElementWrapper equality
 
         >>> import music21
-        >>> from music21 import note
         >>> n = note.Note("C#")
         >>> a = music21.ElementWrapper(n)
         >>> a.offset = 3.0
@@ -3349,7 +3345,6 @@ class ElementWrapper(Music21Object):
 
         >>> import copy
         >>> import music21
-        >>> from music21 import note
 
         >>> aE = music21.ElementWrapper(obj = "hello")
 

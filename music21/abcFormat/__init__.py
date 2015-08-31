@@ -1172,8 +1172,6 @@ class ABCNote(ABCToken):
         accidental display status, are adjusted if a key is 
         declared in the Note. 
 
-        >>> from music21 import abcFormat, key
-
         >>> an = abcFormat.ABCNote()
         >>> an._getPitchName('e2')
         ('E5', None)

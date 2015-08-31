@@ -68,7 +68,6 @@ def barlineToBraille(music21Barline):
     .. note:: Only double barlines and final barlines can be transcribed.
 
     >>> from music21.braille import basic
-    >>> from music21 import bar
     >>> doubleBarline = bar.Barline('double')
     >>> print(basic.barlineToBraille(doubleBarline))
     ⠣⠅⠄
@@ -107,7 +106,6 @@ def chordToBraille(music21Chord, descending = True, showOctave = True):
     octave marks are shown in context relative to the brailled pitch.
 
     >>> from music21.braille import basic
-    >>> from music21 import chord
     >>> gMajorTriadA = chord.Chord(['G4','B4','D5','G5'], quarterLength = 4.0)
     >>> print(basic.chordToBraille(gMajorTriadA, descending = True))
     ⠨⠷⠼⠴⠤
@@ -184,7 +182,6 @@ def clefToBraille(music21Clef):
 
 
     >>> from music21.braille import basic
-    >>> from music21 import clef
     >>> trebleClef = clef.TrebleClef()
     >>> print(basic.clefToBraille(trebleClef))
     ⠜⠌⠇
@@ -234,7 +231,6 @@ def dynamicToBraille(music21Dynamic, precedeByWordSign = True):
 
 
     >>> from music21.braille import basic
-    >>> from music21 import dynamics
     >>> print(basic.dynamicToBraille(dynamics.Dynamic('f')))
     ⠜⠋
     >>> print(basic.dynamicToBraille(dynamics.Dynamic('pp')))
@@ -262,7 +258,6 @@ def instrumentToBraille(music21Instrument):
 
 
     >>> from music21.braille import basic
-    >>> from music21 import instrument
     >>> print(basic.instrumentToBraille(instrument.Bassoon()))
     ⠠⠃⠁⠎⠎⠕⠕⠝
     >>> print(basic.instrumentToBraille(instrument.BassClarinet()))
@@ -286,7 +281,6 @@ def keySigToBraille(music21KeySignature, outgoingKeySig = None):
     in braille as a string in UTF-8 unicode.
 
     >>> from music21.braille import basic
-    >>> from music21 import key
     >>> print(basic.keySigToBraille(key.KeySignature(4)))
     ⠼⠙⠩
 
@@ -338,7 +332,6 @@ def metronomeMarkToBraille(music21MetronomeMark):
     The format is (note C with duration of metronome's referent)(metronome symbol)(number/bpm).
 
     >>> from music21.braille import basic
-    >>> from music21 import tempo
     >>> print(basic.metronomeMarkToBraille(tempo.MetronomeMark(number = 80, referent = note.Note(type='half'))))
     ⠝⠶⠼⠓⠚
     >>> print(basic.metronomeMarkToBraille(tempo.MetronomeMark(number = 135, referent = note.Note(quarterLength = 0.5))))
@@ -378,7 +371,6 @@ def noteToBraille(music21Note, showOctave = True, upperFirstInFingering = True):
 
 
     >>> from music21.braille import basic
-    >>> from music21 import note
     >>> C4 = note.Note('C4')
     >>> print(basic.noteToBraille(C4))
     ⠐⠹
@@ -546,7 +538,6 @@ def restToBraille(music21Rest):
     Complex rests are not supported.
 
     >>> from music21.braille import basic
-    >>> from music21 import note
     >>> dottedQuarter = note.Rest(quarterLength = 1.5)
     >>> print(basic.restToBraille(dottedQuarter))
     ⠧⠄
@@ -581,7 +572,6 @@ def tempoTextToBraille(music21TempoText, maxLineLength = 40):
     
     
     >>> from music21.braille import basic
-    >>> from music21 import tempo
     >>> print(basic.tempoTextToBraille(tempo.TempoText("Lento assai, cantante e tranquillo")))
     ⠠⠇⠑⠝⠞⠕⠀⠁⠎⠎⠁⠊⠂
     ⠉⠁⠝⠞⠁⠝⠞⠑⠀⠑⠀⠞⠗⠁⠝⠟⠥⠊⠇⠇⠕⠲
@@ -627,7 +617,6 @@ def textExpressionToBraille(music21TextExpression, precedeByWordSign = True):
     representation in UTF-8 unicode.
 
     >>> from music21.braille import basic
-    >>> from music21 import expressions
     >>> print(basic.textExpressionToBraille(expressions.TextExpression('dim. e rall.')))
     ⠜⠙⠊⠍⠄⠀⠑⠀⠗⠁⠇⠇⠄⠜
     >>> print(basic.textExpressionToBraille(expressions.TextExpression('dolce')))
@@ -671,7 +660,6 @@ def timeSigToBraille(music21TimeSignature):
     representation in braille as a string in UTF-8 unicode.
 
     >>> from music21.braille import basic
-    >>> from music21 import meter
     >>> print(basic.timeSigToBraille(meter.TimeSignature('4/4')))
     ⠼⠙⠲
     >>> print(basic.timeSigToBraille(meter.TimeSignature('3/4')))
@@ -747,7 +735,6 @@ def showOctaveWithNote(previousNote, currentNote):
 
 
     >>> from music21.braille import basic
-    >>> from music21 import note
     >>> basic.showOctaveWithNote(note.Note('C4'), note.Note('E4'))
     False
     >>> basic.showOctaveWithNote(note.Note('C4'), note.Note('F4'))
@@ -784,10 +771,6 @@ def transcribeHeading(music21KeySignature = None, music21TimeSignature = None, m
     If the resulting heading is of length zero, a BrailleBasicException is raised.
 
     >>> from music21.braille import basic
-    >>> from music21 import key
-    >>> from music21 import meter
-    >>> from music21 import note
-    >>> from music21 import tempo
     >>> print(basic.transcribeHeading(key.KeySignature(5), meter.TimeSignature('3/8'), tempo.TempoText("Allegretto"),
     ... tempo.MetronomeMark(number = 135, referent = note.Note(type='eighth'))))
     ⠀⠀⠀⠀⠀⠀⠀⠠⠁⠇⠇⠑⠛⠗⠑⠞⠞⠕⠲⠀⠙⠶⠼⠁⠉⠑⠀⠼⠑⠩⠼⠉⠦⠀⠀⠀⠀⠀⠀⠀
@@ -1033,8 +1016,6 @@ def transcribeSignatures(music21KeySignature, music21TimeSignature, outgoingKeyS
     is None and (a) the key signature is None or (b) the key signature has zero sharps and there is no previous key signature.
 
     >>> from music21.braille import basic
-    >>> from music21 import key
-    >>> from music21 import meter
     >>> print(basic.transcribeSignatures(key.KeySignature(5), meter.TimeSignature('3/8'), None))
     ⠼⠑⠩⠼⠉⠦
     >>> print(basic.transcribeSignatures(key.KeySignature(0), None, key.KeySignature(-3)))
@@ -1071,7 +1052,6 @@ def brailleUnicodeToBrailleAscii(brailleUnicode):
 
 
     >>> from music21.braille import basic
-    >>> from music21 import note
     >>> basic.brailleUnicodeToBrailleAscii(u'\u2800')
     ' '
     >>> Cs8 = note.Note('C#4', quarterLength = 0.5)
@@ -1110,7 +1090,6 @@ def brailleAsciiToBrailleUnicode(brailleAscii):
 
 
     >>> from music21.braille import basic
-    >>> from music21 import tempo
     >>> t1 = basic.brailleAsciiToBrailleUnicode(",ANDANTE ,MAESTOSO4")
     >>> t2 = basic.tempoTextToBraille(tempo.TempoText("Andante Maestoso"))
     >>> t1 == t2
