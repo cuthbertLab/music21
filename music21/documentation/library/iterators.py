@@ -81,7 +81,6 @@ class ModuleIterator(Iterator):
     ### CLASS VARIABLES ###
 
     _ignoredDirectoryNames = (
-                              'alpha',
         'archive',
         'demos',
         'doc',
@@ -102,6 +101,8 @@ class ModuleIterator(Iterator):
         rootFilesystemPath = music21.__path__[0]
         for directoryPath, directoryNames, fileNames in os.walk(
             rootFilesystemPath):
+            if directoryPath.startswith('/Users/cuthbert/git/music21base/music21/alpha/analysis'):
+                print("YAHOO!")
             directoryNamesToRemove = []
             for directoryName in directoryNames:
                 if directoryName in self._ignoredDirectoryNames:
@@ -160,6 +161,21 @@ class CodebaseIterator(Iterator):
     an instance of type 'class') -- should it? 
 
     Enums have a different repr: <enum 'MotionType'> not <class 'enum'>
+    
+    >>> cbi = documentation.CodebaseIterator(verbose=False)
+    >>> firstTen = list(cbi)[:10]
+    >>> for x in firstTen:
+    ...     print(x)
+    <class 'music21.articulations.Accent'>
+    <class 'music21.articulations.Articulation'>
+    <class 'music21.articulations.ArticulationException'>
+    <class 'music21.articulations.Bowing'>
+    <class 'music21.articulations.BrassIndication'>
+    <class 'music21.articulations.BreathMark'>
+    <class 'music21.articulations.Caesura'>
+    <class 'music21.articulations.DetachedLegato'>
+    <class 'music21.articulations.Doit'>
+    <class 'music21.articulations.DoubleTongue'>    
     '''
 
     ### SPECIAL METHODS ###
