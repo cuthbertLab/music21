@@ -7,8 +7,11 @@ import json
 try:
     import orange, orngTree
 except ImportError:
-    print("Orange must be installed to run this.")
-    exit()
+    if __name__ == '__main__':
+        print("Orange must be installed to run this.")
+        exit()
+    orange = None
+    orngTree = None
 
 try:
     import BeautifulSoup
