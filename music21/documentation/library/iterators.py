@@ -165,8 +165,8 @@ class CodebaseIterator(Iterator):
                     continue
                 named = getattr(module, name)
                 validTypes = six.class_types + (types.FunctionType,)
-                if isinstance(named, validTypes) and \
-                    named.__module__ == module.__name__:
+                if (isinstance(named, validTypes) and 
+                    named.__module__ == module.__name__):
                     yield named
         raise StopIteration
 
@@ -198,7 +198,7 @@ class ClassIterator(Iterator):
     def __iter__(self):
         for x in CodebaseIterator(verbose=self.verbose):
             if isinstance(x, six.class_types):
-                yield x
+                yield "" #x
         raise StopIteration
 
 
