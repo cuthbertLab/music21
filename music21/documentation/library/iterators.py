@@ -188,6 +188,7 @@ class CodebaseIterator(Iterator):
                 if (isinstance(named, validTypes) and 
                     named.__module__ == module.__name__):
                     yield named
+        pass
         raise StopIteration
 
 
