@@ -193,13 +193,14 @@ def nextLargerType(durType):
         >>> duration.nextLargerType("whole")
         'breve'
         >>> duration.nextLargerType("duplex-maxima")
-        'unexpressible'
+        Traceback (most recent call last):
+        DurationException: cannot get the next larger of duplex-maxima
     '''
     if durType not in ordinalTypeFromNum:
         raise DurationException("cannot get the next larger of %s" % durType)
     thisOrdinal = ordinalTypeFromNum.index(durType)
-    if thisOrdinal == 0: # TODO: should this raise an exception?
-        return 'unexpressible'
+    if thisOrdinal == 0: 
+        raise DurationException("cannot get the next larger of %s" % durType)
     else:
         return ordinalTypeFromNum[thisOrdinal - 1]
 
@@ -216,13 +217,14 @@ def nextSmallerType(durType):
     >>> duration.nextSmallerType("1024th")
     '2048th'
     >>> duration.nextSmallerType("2048th")
-    'unexpressible'
+    Traceback (most recent call last):
+    DurationException: cannot get the next smaller of 2048th
     '''
     if durType not in ordinalTypeFromNum:
         raise DurationException("cannot get the next smaller of %s" % durType)
     thisOrdinal = ordinalTypeFromNum.index(durType)
-    if thisOrdinal == 15: # TODO: should this raise an exception?
-        return 'unexpressible'
+    if thisOrdinal == 15: 
+        raise DurationException("cannot get the next smaller of %s" % durType)
     else:
         return ordinalTypeFromNum[thisOrdinal + 1]
 
@@ -3044,49 +3046,32 @@ class GraceDuration(Duration):
     values are used to configure the duration, but then may not be relevant
     after instantiation.
 
-    ::
+    >>> gd = duration.GraceDuration(type='half')
+    >>> gd.quarterLength
+    0.0
 
-        >>> gd = duration.GraceDuration(type='half')
-        >>> gd.quarterLength
-        0.0
+    >>> gd.type
+    'half'
 
-    ::
+    >>> gd = duration.GraceDuration(.25)
+    >>> gd.type
+    '16th'
 
-        >>> gd.type
-        'half'
+    >>> gd.quarterLength
+    0.0
 
-    ::
+    >>> gd.isLinked
+    False
 
-        >>> gd = duration.GraceDuration(.25)
-        >>> gd.type
-        '16th'
+    >>> gd = duration.GraceDuration(1.25)
+    >>> gd.type
+    'complex'
 
-    ::
+    >>> gd.quarterLength
+    0.0
 
-        >>> gd.quarterLength
-        0.0
-
-    ::
-
-        >>> gd.isLinked
-        False
-
-    ::
-
-        >>> gd = duration.GraceDuration(1.25)
-        >>> gd.type
-        'complex'
-
-    ::
-
-        >>> gd.quarterLength
-        0.0
-
-    ::
-
-        >>> [(x.quarterLength, x.type) for x in gd.components]
-        [(0.0, 'quarter'), (0.0, '16th')]
-
+    >>> [(x.quarterLength, x.type) for x in gd.components]
+    [(0.0, 'quarter'), (0.0, '16th')]
     '''
 
     # TODO: there are many properties/methods of Duration that must
@@ -3094,6 +3079,7 @@ class GraceDuration(Duration):
 
     ### CLASS VARIABLES ###
 
+    # TODO: What does "amount of time" mean here?
     _DOC_ATTR = {
         'stealTimePrevious': 'Number from 0 to 1 or None (default) for the amount of time to steal from the previous note.',         
         'stealTimeFollowing': 'Number from 0 to 1 or None (default) for the amount of time to steal from the following note.'         
@@ -3345,14 +3331,13 @@ class TupletFixer(object):
         if len(tupletGroup) == 0:
             return
         firstTup = tupletGroup[0].duration.tuplets[0]
-        totalTupletDuration = firstTup.totalTupletLength()
-        # TODO: Tuplets should all be as Fractions...
+        totalTupletDuration = opFrac(firstTup.totalTupletLength())
         currentTupletDuration = 0.0
         smallestTupletTypeOrdinal = None
         largestTupletTypeOrdinal = None
 
         for n in tupletGroup:
-            currentTupletDuration += n.duration.quarterLength
+            currentTupletDuration = opFrac(currentTupletDuration + n.duration.quarterLength)
             thisTup = n.duration.tuplets[0]
             thisTupType = thisTup.durationActual.type
             thisTupTypeOrdinal = ordinalTypeFromNum.index(thisTupType)
@@ -3368,11 +3353,11 @@ class TupletFixer(object):
                 largestTupletTypeOrdinal = thisTupTypeOrdinal
 
 
-        if round(currentTupletDuration, 7) == round(totalTupletDuration, 7):
+        if currentTupletDuration == totalTupletDuration:
             return
         else:
-            excessRatio = round(currentTupletDuration / totalTupletDuration, 7)
-            inverseExcessRatio = round(1.0/excessRatio, 7)
+            excessRatio = opFrac(currentTupletDuration / totalTupletDuration)
+            inverseExcessRatio = opFrac(1.0/excessRatio)
 
             if excessRatio == int(excessRatio): # divide tuplets into smaller
                 largestTupletType = ordinalTypeFromNum[largestTupletTypeOrdinal]
@@ -3511,12 +3496,12 @@ class Test(unittest.TestCase):
 #         print dur3.getQuarterLength(),
 #         print "quarter notes"
 
-        self.assertAlmostEquals(dur3.quarterLength, 0.7)
+        self.assertEqual(dur3.quarterLength, opFrac(7/10.0))
 
         myTuplet = Tuplet()
-        self.assertAlmostEquals(round(myTuplet.tupletMultiplier(), 3), 0.667)
+        self.assertEqual(myTuplet.tupletMultiplier(), opFrac(2/3.0))
         myTuplet.tupletActual = [5, DurationUnit('eighth')]
-        self.assertAlmostEquals(myTuplet.tupletMultiplier(), 0.4)
+        self.assertEqual(myTuplet.tupletMultiplier(), opFrac(2/5.0))
 
 
     def testMxLoading(self):
@@ -3603,21 +3588,21 @@ class Test(unittest.TestCase):
         # test halfs and doubles
 
         for ql, half, double in [(2,1,4), (.5,.25,1), (1.5, .75, 3),
-                                 (.6666666, .3333333, 1.3333333)]:
+                                 (2/3., 1/3., 4/3.)]:
 
             d = Duration()
             d.quarterLength = ql
             a = d.augmentOrDiminish(.5, inPlace=False)
-            self.assertAlmostEquals(a.quarterLength, half, 5)
+            self.assertEqual(a.quarterLength, opFrac(half), 5)
 
             b = d.augmentOrDiminish(2, inPlace=False)
-            self.assertAlmostEquals(b.quarterLength, double, 5)
+            self.assertEqual(b.quarterLength, opFrac(double), 5)
 
 
         # testing tuplets in duration units
 
         a = DurationUnit()
-        a.quarterLength = .3333333
+        a.quarterLength = 1/3.0
         self.assertEqual(a.aggregateTupletMultiplier(), opFrac(2/3.))
         self.assertEqual(repr(a.tuplets[0].durationNormal), '<music21.duration.Duration 0.5>')
 
@@ -3632,7 +3617,7 @@ class Test(unittest.TestCase):
 
         # testing tuplets on Durations
         a = Duration()
-        a.quarterLength = .3333333
+        a.quarterLength = 1/3.0
         self.assertEqual(a.aggregateTupletMultiplier(), opFrac(2/3.), 5)
         self.assertEqual(repr(a.tuplets[0].durationNormal), '<music21.duration.Duration 0.5>')
 
