@@ -159,15 +159,17 @@ def runPerceivedDissonanceAnalysis(scoreIn, offsetList, keyStr=None):
 
     >>> piece = corpus.parse('bwv7.7').measures(0,3)
     >>> offsetList = [
-    ...     1.1916666666666667,
-    ...     2.3641666666666667,
-    ...     3.6041666666666665,
-    ...     4.5808333333333335,
-    ...     6.131666666666667,
-    ...     8.804166666666667,
-    ...     10.148333333333333,
-    ...     11.700833333333334,
+    ...     1.19166,
+    ...     2.364166,
+    ...     3.604166,
+    ...     4.58083,
+    ...     6.13166,
+    ...     8.804166,
+    ...     10.14833,
+    ...     11.700833,
     ...     ]
+    >>> analysisDict = webapps.commands.runPerceivedDissonanceAnalysis(piece, offsetList)
+    >>> a = analysisDict['fullScore']
 
     >>> a['numMusic21Identified']
     7
