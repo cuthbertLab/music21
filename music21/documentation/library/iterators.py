@@ -244,8 +244,8 @@ class FunctionIterator(Iterator):
     ('music21.abcFormat.translate', 'reBar')
     ('music21.alpha.analysis.search', 'findConsecutiveScale')
     ('music21.alpha.chant', 'fromStream')
+    ('music21.alpha.counterpoint.species', 'getRandomCF')
     ('music21.alpha.medren', 'breakMensuralStreamIntoBrevisLengths')
-    ('music21.alpha.medren', 'convertHouseStyle')
     '''
 
     ### SPECIAL METHODS ###
