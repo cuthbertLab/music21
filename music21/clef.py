@@ -114,26 +114,57 @@ class PitchClef(Clef):
 class PercussionClef(Clef):
     '''
     represents a Percussion clef. 
+    
+    >>> pc = clef.PercussionClef()
+    >>> pc.sign
+    'percussion'
+    >>> pc.line is None
+    True
     '''    
-    pass
-
+    def __init__(self):
+        Clef.__init__(self)
+        self.sign = 'percussion'
+        
 class NoClef(Clef):
     '''
     represents the absence of a Clef. 
+    
+    >>> nc = clef.NoCLef()
+    >>> nc.sign
+    'none'
+    
+    Note that the sign is the string 'none' not the None object
+    
+    >>> nc.sign is None
+    False
     '''
-    pass
+    def __init__(self):
+        Clef.__init__(self)
+        self.sign = 'none'
+
+class JianpuClef(NoClef):
+    '''
+    Jianpu notation does not use a clef, but musicxml marks it
+    with a specialized "jianpu" sign.
+    
+    >>> jc = clef.JianpuClef()
+    >>> jc.sign
+    'jianpu'
+    '''
+    def __init__(self):
+        NoClef.__init__(self)
+        self.sign = 'jianpu'
+
 
 class TabClef(PitchClef):
     '''
     represents a Tablature clef. 
+
+    >>> a = clef.TabClef()
+    >>> a.sign
+    'TAB'
     '''
     def __init__(self):
-        '''
-        
-        >>> a = clef.TabClef()
-        >>> a.sign
-        'TAB'
-        '''        
         PitchClef.__init__(self)
         self.sign = "TAB"
         self.line = 5
@@ -394,6 +425,8 @@ CLASS_FROM_TYPE = {
 def clefFromString(clefString, octaveShift = 0):
     '''
     Returns a Clef object given a string like "G2" or "F4" etc.
+    
+    Does not refer to a violin/guitar string.
 
     
     >>> tc = clef.clefFromString("G2")
@@ -417,24 +450,41 @@ def clefFromString(clefString, octaveShift = 0):
     >>> tc8vb
     <music21.clef.Treble8vbClef>
 
+    Three special clefs, Tab, Percussion, and None are also supported.
 
     >>> tabClef = clef.clefFromString("TAB")
     >>> tabClef
     <music21.clef.TabClef>
+
+    Case does not matter.
+
+    >>> tc8vb = clef.clefFromString("g2", -1)
+    >>> tc8vb
+    <music21.clef.Treble8vbClef>
+
+    >>> percussionClef = clef.clefFromString('Percussion')
+    >>> percussionClef
+    <music21.clef.PercussionClef>
+
+    >>> percussionClef = clef.clefFromString('None')
+    >>> percussionClef
+    <music21.clef.PercussionClef>
     '''
     xnStr = clefString.strip()
-    if xnStr.lower() in ['tab', 'percussion', 'none']:
+    if xnStr.lower() in ('tab', 'percussion', 'none', 'jianpu'):
         if xnStr.lower() == 'tab':
             return TabClef()
         elif xnStr.lower() == 'percussion':
             return PercussionClef()
         elif xnStr.lower() == 'none':
             return NoClef()
+        elif xnStr.lower() == 'jianpu':
+            return JianpuClef()
     
     if len(xnStr) > 1:
         (thisType, lineNum) = (xnStr[0], xnStr[1])
     elif len(xnStr) == 1: # some Humdrum files have just ClefG, eg. Haydn op. 9 no 3, mvmt 1
-        thisType = xnStr[0]
+        thisType = xnStr[0].upper()
         if thisType == "G":
             lineNum = 2
         elif thisType == "F":

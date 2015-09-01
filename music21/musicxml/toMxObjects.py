@@ -770,10 +770,18 @@ def clefToMxClef(clefObj):
     'G'
     >>> mxc2.get('clefOctaveChange')
     -1
+
+    >>> pc = clef.PercussionClef()
+    >>> mxc3 = musicxml.toMxObjects.clefToMxClef(pc)
+    >>> mxc3.get('sign')
+    'percussion'
+    >>> mxc3.get('line') is None
+    True
     '''
     mxClef = mxObjects.Clef()
-    mxClef.set('sign', clefObj.sign)
-    mxClef.set('line', clefObj.line)
+    mxClef.set('sign', clefObj.sign) # we use musicxml signs internally, so no problem...
+    if clefObj.line is not None:
+        mxClef.set('line', clefObj.line)
     if clefObj.octaveChange != 0:
         mxClef.set('clefOctaveChange', clefObj.octaveChange)
     return mxClef
