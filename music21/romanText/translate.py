@@ -1217,8 +1217,8 @@ if __name__ == "__main__":
     #t = time.time()
     #import sys
     #sys.argv.append('PivotInCopyMultiple2')
-    music21.mainTest(Test, runTest='testTimeSigChanges')
-    #music21.mainTest(Test, TestSlow)
+    # music21.mainTest(Test, runTest='testTimeSigChanges')
+    music21.mainTest(Test, TestSlow)
     #print(time.time() - t)
 
 
