@@ -2,7 +2,7 @@
 
 
 '''
-counterpoint.species -- set of tools for dealing with Species Counterpoint and 
+alpha.counterpoint.species -- set of tools for dealing with Species Counterpoint and 
 later other forms of counterpoint.
 
 Mostly coded by Jackie Rogoff -- some routines have been moved to
@@ -48,8 +48,6 @@ class ModalCounterpoint(object):
         assigns a flag under note.editorial.misc["Parallel Fifth"] for
         any note that has harmonic interval of a fifth and is preceded by a
         harmonic interval of a fifth.
-
-
         
         >>> n1 = note.Note('G3')
         >>> n2 = note.Note('A3')
@@ -64,7 +62,7 @@ class ModalCounterpoint(object):
         >>> sop = stream.Stream()
         >>> sop.append([m1, m2, m3, m4])
 
-        >>> cp = counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint(stream1=bass, stream2=sop)
         >>> cp.findParallelFifths(cp.stream1, cp.stream2)
         3
         >>> n1.editorial.harmonicInterval.name
@@ -110,7 +108,7 @@ class ModalCounterpoint(object):
         >>> bass.append([n1, n2, n3, n4])
         >>> sop = stream.Stream()
         >>> sop.append([m1, m2, m3, m4])
-        >>> cp = counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
         >>> cp.findHiddenFifths(cp.stream1, cp.stream2)
         2
         >>> n2.editorial.misc['Hidden Fifth']
@@ -144,7 +142,7 @@ class ModalCounterpoint(object):
         >>> n2 = note.Note('B-3')
         >>> m1 = note.Note('D4')
         >>> m2 = note.Note('F4')
-        >>> cp = counterpoint.species.ModalCounterpoint()
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint()
         >>> cp.isParallelFifth(n1, m1, n2, m2) #(n1, n2) and (m1, m2) are chords
         False
         >>> cp.isParallelFifth(n1, n2, m1, m2) #(n1, m1) and (n2, m2) are chords
@@ -174,7 +172,7 @@ class ModalCounterpoint(object):
         >>> n2 = note.Note('B-3')
         >>> m1 = note.Note('E4')
         >>> m2 = note.Note('F4')
-        >>> cp = counterpoint.species.ModalCounterpoint()
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint()
         >>> cp.isHiddenFifth(n1, m1, n2, m2) #(n1, n2) and (m1, m2) are chords
         False
         >>> cp.isHiddenFifth(n1, n2, m1, m2) #(n1, m1) and (n2, m2) are chords
@@ -224,7 +222,7 @@ class ModalCounterpoint(object):
         >>> bass.append([n1, n2, n3, n4])
         >>> sop = stream.Stream()
         >>> sop.append([m1, m2, m3, m4])
-        >>> cp = counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
         >>> cp.findParallelOctaves(cp.stream1, cp.stream2)
         3
         >>> n2.editorial.misc['Parallel Octave']
@@ -278,7 +276,7 @@ class ModalCounterpoint(object):
         >>> bass.append([n1, n2, n3, n4])
         >>> sop = stream.Stream()
         >>> sop.append([m1, m2, m3, m4])
-        >>> cp = counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
         >>> cp.findHiddenOctaves(cp.stream1, cp.stream2)
         2
         >>> n2.editorial.misc['Hidden Octave']
@@ -315,7 +313,7 @@ class ModalCounterpoint(object):
         >>> n2 = note.Note('B-3')
         >>> m1 = note.Note('A4')
         >>> m2 = note.Note('B-4')
-        >>> cp = counterpoint.species.ModalCounterpoint()
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint()
         >>> cp.isParallelOctave(n1, m1, n2, m2) #(n1, n2) and (m1, m2) are chords
         False
         >>> cp.isParallelOctave(n1, n2, m1, m2) #(n1, m1) and (n2, m2) are chords
@@ -347,7 +345,7 @@ class ModalCounterpoint(object):
         >>> n2 = note.Note('B-3')
         >>> m1 = note.Note('F4')
         >>> m2 = note.Note('B-4')
-        >>> cp = counterpoint.species.ModalCounterpoint()
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint()
         >>> cp.isHiddenOctave(n1, m1, n2, m2) #(n1, n2) and (m1, m2) are chords
         False
         >>> cp.isHiddenOctave(n1, n2, m1, m2) #(n1, m1) and (n2, m2) are chords
@@ -396,7 +394,7 @@ class ModalCounterpoint(object):
         >>> bass.append([n1, n2, n3, n4])
         >>> sop = stream.Stream()
         >>> sop.append([m1, m2, m3, m4])
-        >>> cp = counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
         >>> cp.findParallelUnisons(cp.stream1, cp.stream2)
         3
         >>> n2.editorial.misc['Parallel Unison']
@@ -436,7 +434,7 @@ class ModalCounterpoint(object):
         >>> n2 = note.Note('B-3')
         >>> m1 = note.Note('A3')
         >>> m2 = note.Note('B-3')
-        >>> cp = counterpoint.species.ModalCounterpoint()
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint()
         >>> cp.isParallelUnison(n1, m1, n2, m2) #(n1, n2) and (m1, m2) are chords
         False
         >>> cp.isParallelUnison(n1, n2, m1, m2) #(n1, m1) and (n2, m2) are chords
@@ -467,7 +465,7 @@ class ModalCounterpoint(object):
         >>> c = note.Note('C4')
         >>> d = note.Note('D4')
         >>> e = note.Note('E4')
-        >>> cp = counterpoint.species.ModalCounterpoint()
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint()
         >>> cp.isValidHarmony(c, d)
         False
         >>> cp.isValidHarmony(c, c)
@@ -496,7 +494,7 @@ class ModalCounterpoint(object):
         >>> d = note.Note('D4')
         >>> e = note.Note('E4')
         >>> f = note.Note('F4')
-        >>> cp = counterpoint.species.ModalCounterpoint()
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint()
         >>> cp.isValidMiddleHarmony(c, d)
         False
         >>> cp.isValidMiddleHarmony(c, c)
@@ -533,7 +531,7 @@ class ModalCounterpoint(object):
         >>> bass.append([n1, n2, n3, n4])
         >>> sop = stream.Stream()
         >>> sop.append([m1, m2, m3, m4])
-        >>> cp = counterpoint.species.ModalCounterpoint(stream1 = sop, stream2 = bass)
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint(stream1 = sop, stream2 = bass)
         >>> cp.allValidHarmony(cp.stream1, cp.stream2)
         False
         >>> n4.name = 'C4'
@@ -589,7 +587,7 @@ class ModalCounterpoint(object):
         >>> bass.append([n1, n2, n3, n4])
         >>> sop = stream.Stream()
         >>> sop.append([m1, m2, m3, m4])
-        >>> cp = counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
         >>> cp.allValidHarmonyMiddleVoices(cp.stream1, cp.stream2)
         True
         >>> n1.name = 'F#4'
@@ -628,7 +626,7 @@ class ModalCounterpoint(object):
         >>> bass.append([n1, n2, n3, n4])
         >>> sop = stream.Stream()
         >>> sop.append([m1, m2, m3, m4])
-        >>> cp = counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
         >>> cp.countBadHarmonies(cp.stream1, cp.stream2)
         0
         >>> n1.name = 'F#4'
@@ -655,7 +653,7 @@ class ModalCounterpoint(object):
         >>> c = note.Note('C4')
         >>> d = note.Note('D4')
         >>> e = note.Note('E#4')
-        >>> cp = counterpoint.species.ModalCounterpoint()
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint()
         >>> cp.isValidStep(c, d)
         True
         >>> cp.isValidStep(c, c)
@@ -691,7 +689,7 @@ class ModalCounterpoint(object):
         >>> bass.append([n1, n2, n3, n4])
         >>> sop = stream.Stream()
         >>> sop.append([m1, m2, m3, m4])
-        >>> cp = counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
         >>> cp.isValidMelody(cp.stream1)
         False
         >>> n1.name = 'F#4'
@@ -725,7 +723,7 @@ class ModalCounterpoint(object):
         >>> bass.append([n1, n2, n3, n4])
         >>> sop = stream.Stream()
         >>> sop.append([m1, m2, m3, m4])
-        >>> cp = counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
         >>> cp.countBadSteps(cp.stream1)
         2
         >>> n1.name = 'F#4'
@@ -763,7 +761,7 @@ class ModalCounterpoint(object):
         >>> m4 = note.Note('C5')
         >>> s2 = stream.Stream()
         >>> s2.append([m1, m2, m3, m4])
-        >>> cp = counterpoint.species.ModalCounterpoint(s1, s2)
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint(s1, s2)
         >>> cp.findAllBadFifths(cp.stream1, cp.stream2)
         2
 
@@ -791,7 +789,7 @@ class ModalCounterpoint(object):
         >>> m4 = note.Note('F5')
         >>> s2 = stream.Stream()
         >>> s2.append([m1, m2, m3, m4])
-        >>> cp = counterpoint.species.ModalCounterpoint(s1, s2)
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint(s1, s2)
         >>> cp.findAllBadOctaves(cp.stream1, cp.stream2)
         2
 
@@ -819,7 +817,7 @@ class ModalCounterpoint(object):
         >>> bass.append([n1, n2, n3, n4])
         >>> sop = stream.Stream()
         >>> sop.append([m1, m2, m3, m4])
-        >>> cp = counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
         >>> cp.tooManyThirds(cp.stream1, cp.stream2)
         True
         >>> cp.tooManyThirds(cp.stream1, cp.stream2, 4)
@@ -889,7 +887,7 @@ class ModalCounterpoint(object):
         >>> bass.append([n1, n2, n3, n4])
         >>> sop = stream.Stream()
         >>> sop.append([m1, m2, m3, m4])
-        >>> cp = counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
         >>> cp.tooManySixths(cp.stream1, cp.stream2)
         True
         >>> cp.tooManySixths(cp.stream1, cp.stream2, 4)
@@ -961,7 +959,7 @@ class ModalCounterpoint(object):
         >>> s2 = stream.Stream()
         >>> s1.append([n1, n2, n3, n4, n5, n6, n7, n8, n9])
         >>> s2.append([n1, n2, n3, n4, n5, n6, n7, n8, n9])
-        >>> cp = counterpoint.species.ModalCounterpoint(s1, s2)
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint(s1, s2)
         >>> aMinor = scale.MinorScale(n3)
         >>> s2 = cp.raiseLeadingTone(s1, aMinor)
         >>> s2.notes[1].name
@@ -1577,7 +1575,7 @@ def getRandomCF(mode = None):
 
 
     
-    >>> cf = counterpoint.species.getRandomCF()
+    >>> cf = alpha.counterpoint.species.getRandomCF()
     >>> sorted(list(cf.keys()))
     ['mode', 'notes']
     >>> isinstance(cf['notes'], str)

@@ -58,8 +58,6 @@ __all__ = [
     'audioSearch',
     'braille', 
     'capella',
-    'composition',
-    'counterpoint',
     'corpus', 
     'demos',
     'documentation',
