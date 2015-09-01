@@ -54,8 +54,6 @@ import xml.sax
 import xml.dom.minidom # @UnusedImport
 
 from music21.base import VERSION
-from music21 import xmlnode
-xml.dom.minidom.Element.writexml = xmlnode.fixed_writexml
 
 from music21 import environment
 _MOD = 'musicxml/xmlHandler.py'

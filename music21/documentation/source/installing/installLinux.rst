@@ -4,24 +4,35 @@
 Installing Music21 on GNU/Linux
 ============================================
 
+GNU/Linux, FreeBSD, etc. are supported by music21. However, by choosing to use 
+Unix-like systems you should be an advanced user -- the music21list should not
+be used for general installation/configuration problems that are specific to
+your operating system. Because of the number of different Unix variants, the list
+maintainers can only help with music21-specific problems post installation or
+Mac/PC problems.
+
 
 Alternative Installation Methods
 ----------------------------------------------
 
 The following instructions are for general users. If you are an advanced user 
-and have installed other Python packages before, or want to use an EGG, SVN, PIP, 
+and have installed other Python packages before, or want to use an EGG, SVN, PIP3, 
 or setuptools, you should read :ref:`installAdvanced`.
 
 
 Check Your Version of Python
 ----------------------------------------------
 
-Music21 requires Python 2.7 or Python 3.3+.
+Music21 requires Python 2.7.3+ or Python 3.3+.
 
 To determine the Python version you have installed, open a shell 
 or terminal and enter the following command-line argument (where "$" is the prompt):
 
     $ python -V
+    
+or in many 3.X installation cases:
+
+    $ python3 -V
 
 it should display something like:
 
@@ -90,8 +101,7 @@ begin using `music21`.
 Installation Help
 -------------------------------
 
-If you have followed all the instructions and still encounter problems, start over from scratch
-and try it again very carefully.  If you still have problems
-contact the music21 group and someone should be able to help:
-
-http://groups.google.com/group/music21list
+If you have followed all the instructions and still encounter problems, 
+start over from scratch
+and try it again very carefully.  If you still have problems contact an
+expert in your operating system.
