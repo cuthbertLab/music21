@@ -2754,20 +2754,16 @@ class RepeatFinder(object):
         Specifically, returns a list of tuples of the form (l1, l2) where l1 and l2 are lists
         of measure numbers such that measure l1[i] is the same as measure l2[i].
         
-        ::
-
-            >>> chorale = corpus.parse('bwv117.4.mxl')
-            >>> #_DOCS_SHOW chorale.show()
+        >>> chorale = corpus.parse('bwv117.4.mxl')
+        >>> #_DOCS_SHOW chorale.show()
     
         Measures 1-3 are the same as measures 4-6.  
 
         .. image:: images/repeat-SimplifyExample_Chorale.*
            :width: 600
         
-        ::
-
-            >>> repeat.RepeatFinder(chorale).getSimilarMeasureGroups()
-            [([1, 2, 3], [5, 6, 7])]
+        >>> repeat.RepeatFinder(chorale).getSimilarMeasureGroups()
+        [([1, 2, 3], [5, 6, 7])]
         
         Notice that although measures 2-3 are the same as measures 6-7, we
         don't have ([2, 3], [6, 7]) in our result, since ([1, 2, 3], [5, 6, 7])

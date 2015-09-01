@@ -99,7 +99,6 @@ class ScoreFollower(object):
         if there has been a problem like some consecutive bad matchings or the
         score has finished.
 
-        >>> from music21 import common, converter
         >>> from music21.audioSearch import scoreFollower
         >>> scoreNotes = " ".join(["c4", "d", "e", "f", "g", "a", "b", "c'", "c", "e",
         ...     "g", "c'", "a", "f", "d", "c#", "d#", "f#","c", "e", "g", "c'",
@@ -213,7 +212,6 @@ class ScoreFollower(object):
         Detection of consecutive periods of silence.
         Useful if the musician has some consecutive measures of silence.
 
-        >>> from music21 import corpus, note
         >>> from music21.audioSearch import scoreFollower
         >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
         >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
@@ -267,7 +265,6 @@ class ScoreFollower(object):
         See example of a bad prediction at the beginning of the song:
 
         >>> from time import time
-        >>> from music21 import corpus
         >>> from music21.audioSearch import scoreFollower
         >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
         >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
@@ -458,7 +455,6 @@ class ScoreFollower(object):
         It returns a number with the position of the predicted note in the
         score.
 
-        >>> from music21 import corpus
         >>> from time import time
         >>> from music21.audioSearch import scoreFollower
         >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes

@@ -441,7 +441,6 @@ def example5_7c():
 def example6_1():
     u"""
     >>> from music21.braille import basic
-    >>> from music21 import note
     >>> print(basic.noteToBraille(note.Note('C#4', quarterLength = 2.0), showOctave = False))
     ⠩⠝
     >>> print(basic.noteToBraille(note.Note('Gn4', quarterLength = 2.0), showOctave = False))
@@ -879,7 +878,6 @@ def example8_1a():
     Flats.
 
     >>> from music21.braille import basic
-    >>> from music21 import key
     >>> print(basic.keySigToBraille(key.KeySignature(-1)))
     ⠣
     >>> print(basic.keySigToBraille(key.KeySignature(-2)))
@@ -902,7 +900,6 @@ def example8_1b():
     Sharps.
 
     >>> from music21.braille import basic
-    >>> from music21 import key
     >>> print(basic.keySigToBraille(key.KeySignature(1)))
     ⠩
     >>> print(basic.keySigToBraille(key.KeySignature(2)))
@@ -925,7 +922,6 @@ def example8_2():
     Time signatures with two numbers.
 
     >>> from music21.braille import basic
-    >>> from music21 import meter
     >>> print(basic.timeSigToBraille(meter.TimeSignature('6/8')))
     ⠼⠋⠦
     >>> print(basic.timeSigToBraille(meter.TimeSignature('2/4')))
@@ -954,7 +950,6 @@ def example8_5():
     Common/cut time signatures.
 
     >>> from music21.braille import basic
-    >>> from music21 import meter
     >>> print(basic.timeSigToBraille(meter.TimeSignature('common')))
     ⠨⠉
     >>> print(basic.timeSigToBraille(meter.TimeSignature('cut')))
@@ -967,8 +962,6 @@ def example8_6():
     Combined key and time signatures.
 
     >>> from music21.braille import basic
-    >>> from music21 import key
-    >>> from music21 import meter
     >>> print(basic.transcribeSignatures(key.KeySignature(1), meter.TimeSignature('2/4')))
     ⠩⠼⠃⠲
     >>> print(basic.transcribeSignatures(key.KeySignature(-3), meter.TimeSignature('3/4')))
@@ -998,9 +991,6 @@ def example8_6():
 def example8_7a():
     u"""
     >>> from music21.braille import basic
-    >>> from music21 import key
-    >>> from music21 import meter
-    >>> from music21 import tempo
     >>> print(basic.transcribeHeading(key.KeySignature(-4), meter.TimeSignature("4/4"), tempo.TempoText("Andante"), None))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠁⠝⠙⠁⠝⠞⠑⠲⠀⠼⠙⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     >>> print(basic.transcribeHeading(key.KeySignature(3), meter.TimeSignature("3/8"), tempo.TempoText("Con moto"), None))
@@ -1017,7 +1007,6 @@ def example8_8():
     Metronome Markings
 
     >>> from music21.braille import basic
-    >>> from music21 import tempo
     >>> print(basic.metronomeMarkToBraille(tempo.MetronomeMark(number = 80, referent = note.Note(type='half'))))
     ⠝⠶⠼⠓⠚
     """
@@ -1026,9 +1015,6 @@ def example8_8():
 def example8_9():
     u"""
     >>> from music21.braille import basic
-    >>> from music21 import key
-    >>> from music21 import meter
-    >>> from music21 import tempo
     >>> print(basic.transcribeHeading(key.KeySignature(-3), meter.TimeSignature("12/8"), tempo.TempoText("Andante"),
     ...   tempo.MetronomeMark(number = 132, referent = note.Note(type='eighth'))))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠠⠁⠝⠙⠁⠝⠞⠑⠲⠀⠙⠶⠼⠁⠉⠃⠀⠣⠣⠣⠼⠁⠃⠦⠀⠀⠀⠀⠀⠀⠀⠀
@@ -1038,9 +1024,6 @@ def example8_9():
 def example8_10():
     u"""
     >>> from music21.braille import basic
-    >>> from music21 import key
-    >>> from music21 import meter
-    >>> from music21 import tempo
     >>> print(basic.transcribeHeading(key.KeySignature(-5), meter.TimeSignature("6/8"),
     ... tempo.TempoText("Lento assai, cantante e tranquillo"),
     ... tempo.MetronomeMark(number = 52, referent = note.Note(quarterLength = 1.5))))

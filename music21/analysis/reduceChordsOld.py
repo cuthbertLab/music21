@@ -23,7 +23,6 @@ def testMeasureStream1():
     '''
     returns a simple measure stream for testing:
     
-    
     >>> s = analysis.reduceChords.testMeasureStream1()
     >>> s.show('text')
     {0.0} <music21.meter.TimeSignature 4/4>

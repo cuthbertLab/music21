@@ -6,8 +6,8 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009-2010, 2014 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2009-10, 2014 Michael Scott Cuthbert and the music21 Project
+# License:      BSD or LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 

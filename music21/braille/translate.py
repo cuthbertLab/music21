@@ -100,7 +100,6 @@ def objectToBraille(music21Obj, **keywords):
     Translates an arbitrary object to braille.
 
     >>> from music21.braille import translate
-    >>> from music21 import converter
     >>> samplePart = converter.parse("tinynotation: 3/4 C4 D16 E F G# r4 e2.")
     >>> #_DOCS_SHOW samplePart.show()
 
@@ -125,12 +124,10 @@ def objectToBraille(music21Obj, **keywords):
     Other examples:
 
 
-    >>> from music21 import note
     >>> sampleNote = note.Note("C3")
     >>> print(translate.objectToBraille(sampleNote))
     ⠸⠹
 
-    >>> from music21 import dynamics
     >>> sampleDynamic = dynamics.Dynamic("fff")
     >>> print(translate.objectToBraille(sampleDynamic))
     ⠜⠋⠋⠋
@@ -176,7 +173,6 @@ def scoreToBraille(music21Score, **keywords):
 def metadataToString(music21Metadata):
     """
     >>> from music21.braille import translate
-    >>> from music21 import corpus
     >>> corelli = corpus.parse("monteverdi/madrigal.3.1.rntxt")
     >>> corelli.getElementsByClass('Metadata')[0].__class__
     <class 'music21.metadata.Metadata'>

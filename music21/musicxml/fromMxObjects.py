@@ -613,20 +613,18 @@ def mxToDuration(mxNote, inputM21=None):
     Translate a `MusicXML` :class:`~music21.musicxml.mxObjects.Note` object 
     to a music21 :class:`~music21.duration.Duration` object.
 
-    ::
-        >>> a = musicxml.mxObjects.Note()
-        >>> a.setDefaults()
-        >>> m = musicxml.mxObjects.Measure()
-        >>> m.setDefaults()
-        >>> a.external['measure'] = m # assign measure for divisions ref
-        >>> a.external['divisions'] = m.external['divisions']
-    
-        >>> c = duration.Duration()
-        >>> musicxml.fromMxObjects.mxToDuration(a, c)
-        <music21.duration.Duration 1.0>
-        >>> c.quarterLength
-        1.0
+    >>> a = musicxml.mxObjects.Note()
+    >>> a.setDefaults()
+    >>> m = musicxml.mxObjects.Measure()
+    >>> m.setDefaults()
+    >>> a.external['measure'] = m # assign measure for divisions ref
+    >>> a.external['divisions'] = m.external['divisions']
 
+    >>> c = duration.Duration()
+    >>> musicxml.fromMxObjects.mxToDuration(a, c)
+    <music21.duration.Duration 1.0>
+    >>> c.quarterLength
+    1.0
     '''
     if inputM21 == None:
         d = duration.Duration()

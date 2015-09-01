@@ -24,7 +24,6 @@ A piano reduction of Giuseppi Verdi's famous aria from the opera
 Rigoletto, "La Donna É Mobile," in Bb major and 3/8 time.
 
 
->>> from music21 import corpus
 >>> verdi = corpus.parse('verdi/laDonnaEMobile')
 >>> #_DOCS_SHOW verdi.show('braille')
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠉⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀

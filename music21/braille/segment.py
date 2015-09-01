@@ -140,7 +140,6 @@ class BrailleElementGrouping(list):
         without a space in braille.
         
         >>> from music21.braille import segment
-        >>> from music21 import note
         >>> bg = segment.BrailleElementGrouping()
         >>> bg.append(note.Note("C4"))
         >>> bg.append(note.Note("D4"))
@@ -936,7 +935,6 @@ def prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets = SEGMENT_SLURLO
     ties are present, as shown below.
 
 
-    >>> from music21 import tie
     >>> short.flat.notes[0].tie = tie.Tie("start")
     >>> shortB = copy.deepcopy(short)
     >>> segment.prepareSlurredNotes(shortB)
@@ -1152,7 +1150,6 @@ def extractBrailleElements(music21Measure):
     
 
     >>> from music21.braille import segment
-    >>> from music21 import spanner
     >>> tn = converter.parse("tinynotation: 2/4 c16 c c c d d d d", makeNotation=False)
     >>> tn = tn.makeNotation(cautionaryNotImmediateRepeat=False)
     >>> measure = tn[0]

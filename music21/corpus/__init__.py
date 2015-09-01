@@ -63,7 +63,6 @@ def getCorePaths(fileExtensions=None, expandExtensions=True):
     This is convenient when an input format might match for multiple
     extensions.
 
-    >>> from music21 import corpus
     >>> corpusFilePaths = corpus.getCorePaths()
     >>> cpl = len(corpusFilePaths) 
     >>> 2550 < cpl < 2600
@@ -89,7 +88,6 @@ def getVirtualPaths(fileExtensions=None, expandExtensions=True):
 
     An extension of None will return all known extensions.
 
-    >>> from music21 import corpus
     >>> len(corpus.getVirtualPaths()) > 6
     True
 
@@ -250,7 +248,6 @@ def getComposer(composerName, fileExtensions=None):
 
     Note that xml and mxl are treated equivalently.
 
-    >>> from music21 import corpus
     >>> a = corpus.getComposer('schoenberg')
     >>> len(a) > 1
     True
@@ -276,7 +273,6 @@ def getComposerDir(composerName):
     that composer:
 
     >>> import os
-    >>> from music21 import corpus
     >>> a = corpus.getComposerDir('bach')
     >>> a.endswith(os.path.join('corpus', os.sep, 'bach'))
     True
@@ -289,7 +285,6 @@ def noCorpus():
     '''
     Return True or False if this is a `corpus` or `noCoprus` distribution.
 
-    >>> from music21 import corpus
     >>> corpus.noCorpus
     False
 
@@ -306,7 +301,6 @@ def getWorkList(workName, movementNumber=None, fileExtensions=None):
 
     If no matches are found, an empty list is returned.
 
-    >>> from music21 import corpus
     >>> len(corpus.getWorkList('schumann_clara', 3, '.xml'))
     1
 
@@ -330,7 +324,6 @@ def getVirtualWorkList(workName, movementNumber=None, fileExtensions=None):
     any matches.
 
 
-    >>> from music21 import corpus
     >>> corpus.getVirtualWorkList('bach/bwv1007/prelude')
     ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
 
@@ -357,7 +350,6 @@ def getWorkReferences(sort=True):
 
     This is used in the generation of corpus documentation
 
-    >>> from music21 import corpus
     >>> post = corpus.getWorkReferences()
 
     '''
@@ -486,7 +478,6 @@ def getWork(workName, movementNumber=None, fileExtensions=None):
     raised.
 
     >>> import os
-    >>> from music21 import corpus
     >>> a = corpus.getWork('luca/gloria')
     >>> a.endswith(os.path.sep.join([
     ...     'luca', 'gloria.xml']))
@@ -547,7 +538,6 @@ def parse(
     be specified, nor does the name Bach even (since it's the only piece with
     the title BWV 66.6)
 
-    >>> from music21 import corpus
     >>> bachChorale = corpus.parse('bwv66.6')
     >>> len(bachChorale.parts)
     4
@@ -709,7 +699,6 @@ def getBachChorales(fileExtensions='xml'):
     N.B. Look at the module corpus.chorales for many better ways to work with
     the chorales.
 
-    >>> from music21 import corpus
     >>> a = corpus.getBachChorales()
     >>> len(a) > 400
     True
@@ -735,7 +724,6 @@ def getMonteverdiMadrigals(fileExtensions='xml'):
     '''
     Return a list of the filenames of all Monteverdi madrigals.
 
-    >>> from music21 import corpus
     >>> a = corpus.getMonteverdiMadrigals()
     >>> len(a) > 40
     True

@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Music21 Command Builder</title>
+<link href="css/music21.css" rel="stylesheet" type="text/css" />
+
+<script language="javascript" src="javascript/music21.js"></script>
+
+<script language="javascript">
+
+m21 = new Music21interface();
+
+var embedDiv = document.getElementById('noteflightembed');
+
+function addCurrentScore() {
+	var varName = document.getElementById('currentScoreVar').value;
+	var data = m21.noteflight.getMusicXMLFromNoteflightEmbed('nfscore');
+	m21.request.addData(varName,'musicxml',data);
+	
+	updateRequestJSON();
+}
+
+function addData() {
+	var varName = document.getElementById('varName').value;
+	var data = document.getElementById('data').value;
+	var fmt = document.getElementById('fmt').value;
+	m21.request.addData(varName,fmt,data);
+	document.getElementById('dataDictDisp').innerHTML += varName
+	if(fmt) {
+		document.getElementById('dataDictDisp').innerHTML += " ("+fmt+")"
+	}
+	document.getElementById('dataDictDisp').innerHTML += " = "+data+"<br />";
+
+	document.getElementById('varName').value = "";
+	document.getElementById('data').value = "";
+	document.getElementById('fmt').value = "";
+	
+	
+	updateRequestJSON();
+
+}
+
+function addCommand() {
+	var resultVar = document.getElementById('resultVar').value;
+	var caller = document.getElementById('caller').value;
+	var command = document.getElementById('command').value;
+	var arguments = document.getElementById('arguments').value;
+	
+	var type = 'function';
+	if(document.getElementById('attribute').checked) {
+		var type = 'attribute';
+	}
+	
+	var arglist = null;
+	if (arguments) {
+		argList = arguments.split(",");
+		for(i = 0; i < argList.length; i++) {
+			argList[i] = argList[i].replace(/^\s+|\s+$/g,"");
+		}
+	}
+	
+	if(caller && type == 'function') {
+		type = 'method';
+	}
+	m21.request.addCommand(type,resultVar,caller,command,argList);
+	
+	if(resultVar) {
+		document.getElementById('commandListDisp').innerHTML += resultVar + " = ";
+	}
+	if(caller) {
+		document.getElementById('commandListDisp').innerHTML += caller + ".";
+	}
+	document.getElementById('commandListDisp').innerHTML += command;
+	if(type != 'attribute') {
+		document.getElementById('commandListDisp').innerHTML += "(";
+		if(arguments) {
+			for(i in argList) {
+				if (i > 0) {
+					document.getElementById('commandListDisp').innerHTML += ", ";
+				}
+				document.getElementById('commandListDisp').innerHTML += argList[i];
+			}
+		}
+		document.getElementById('commandListDisp').innerHTML += ")";
+	}
+	document.getElementById('commandListDisp').innerHTML += "<br />";
+	
+	document.getElementById('resultVar').value = "";
+	document.getElementById('caller').value = "";
+	document.getElementById('command').value = "";
+	document.getElementById('arguments').value = "";
+	
+	
+	updateRequestJSON();
+}
+
+function addReturnVar() {
+	var returnVarName = document.getElementById('returnVarName').value;
+	var returnVarFmt = document.getElementById('returnVarFmt').value;
+	m21.request.addReturnVar(returnVarName,returnVarFmt);
+	
+	document.getElementById('returnListDisp').innerHTML += returnVarName+" ("+returnVarFmt+")<br />";
+	
+	document.getElementById('returnVarName').value = "";
+	document.getElementById('returnVarFmt').value = "";
+	
+	updateRequestJSON();
+}
+
+function updateRequestJSON() {
+	document.getElementById('rawJSONRequest').value = m21.request.prettyJsonText();
+}
+
+function sendRequest() {
+	document.getElementById('resultDisp').value = ""
+	document.getElementById('errorDisp').value = ""
+	document.getElementById('rawJSONResponse').value = ""
+	
+	if(document.getElementById('currentScoreVar').value) {
+		addCurrentScore(); // Updates to current score in embed
+	}
+	var returnVarToNoteflight = document.getElementById('varToNoteflight').value;
+	if(returnVarToNoteflight) {
+		m21.request.addReturnVar(returnVarToNoteflight,"musicxml");
+	}
+	
+	updateRequestJSON();
+	
+	
+	m21.sendRequest();
+}
+
+function sendRawRequest() {
+	document.getElementById('resultDisp').value = ""
+	document.getElementById('errorDisp').value = ""
+	document.getElementById('rawJSONResponse').value = ""
+	var jsonStr = document.getElementById('rawJSONRequest').value;
+	
+	m21.sendRawRequest(jsonStr);
+}
+
+
+function showRawResponse() {
+	document.getElementById('rawJSONResponse').value = m21.result.rawResponse;
+}
+
+function toggleAttribute() {
+	if(document.getElementById('attribute').checked) {
+		document.getElementById('functionSpan').style.display="none";
+	} else {
+		document.getElementById('functionSpan').style.display="";
+	
+	}
+}
+
+function clearRequest() {
+	m21.request.clear();
+	document.getElementById('dataDictDisp').innerHTML = "";
+	document.getElementById('commandListDisp').innerHTML = "";
+	document.getElementById('returnListDisp').innerHTML = "";
+	
+	
+	updateRequestJSON();
+}
+function setup() {
+	m21.noteflight.createNoteflightEmbed('noteflightembed','nfscore','fc79df30896da6aa03f90ff771015913ca6880be',750,400,1.0);
+
+	m21.onSuccess = function () {
+		document.getElementById('errorDisp').innerHTML = "";
+		document.getElementById('rawJSONResponse').value = JSON.stringify(m21.result.responseObj,null,2);
+		for (varName in m21.result.responseObj.dataDict) {
+			if(varName != returnVarToNoteflight) {
+				document.getElementById('resultDisp').value += varName +": \n" + m21.result.responseObj.dataDict[varName].data + "\n";
+			}
+		}
+		var returnVarToNoteflight = document.getElementById('varToNoteflight').value;
+		if(returnVarToNoteflight) {
+			m21.noteflight.sendMusicXMLToNoteflightEmbed('nfscore',m21.result.getData(returnVarToNoteflight));
+		}
+	};
+	
+	m21.onError = function () {
+		document.getElementById('errorDisp').innerHTML = m21.result.errorString();
+	};
+
+
+	updateRequestJSON();
+}
+</script>
+
+</head>
+
+<body onload="setup();">
+
+<div id='wrapper'>
+<h1><span style="font-family:'Courier New', Courier, monospace">music21</span> Command Builder</h1>
+<p class="smaller"><a href="index.html">Back to All music21 Web Apps</a>
+<div id='content'>
+
+<p class="smaller">Not logged in to Noteflight? <a href="http://music21.sites.noteflight.com/login" target="_blank">Log in</a></p>
+<div id='noteflightembed'>
+</div>
+<h3> Request JSON</h3>
+<textarea id='rawJSONRequest' style="width:700px; height:200px; margin-top:10px">
+</textarea>
+<input id='sendedited' type="button" value="Send Edited Request" onclick="sendRawRequest()" />
+<h3> Response JSON</h3>
+<textarea id='rawJSONResponse' style="width:700px; height:200px; margin-top:10px">
+</textarea>
+<input id='sendedited' type="button" value="Show Raw Response" onclick="showRawResponse()" />
+</div>
+
+<div id='interface'>
+
+<p><input type="button" value="Clear Request" onclick="clearRequest()" /></p>
+<hr />
+
+<h2>Data:</h2>
+<p class="smaller">Enter data you wish to include in the request. May be used by name in later commands </p>
+<p class="smaller">format only needs to be specified for data that needs to be parsed by converter.parse; it is optional for primitives (int, float, bool) and raw strings</p>
+ <input id='varName' type="text" style="width:60px" placeholder='varName'/> (
+ <input id='fmt' type="text"  style="width:60px" placeholder='format' />) =
+ <input id='data' type="text"  style="width:80px" placeholder='data' />
+<p><input type="button" value="Add Data" onclick="addData()" /></p>
+<p id='dataDictDisp' class="code"> </p>
+<hr />
+<p> Set current score as variable: <input id='currentScoreVar' type="text" value="sc" /> <input type="button" value="Add/Update" onclick="addCurrentScore()" /></p>
+
+<hr />
+<h2>Commands:</h2>
+<p class="smaller">Note: commands using modules (i.e. corpus.parse) should be listed entirely in the commandName field, leaving the caller field empty</p>
+<p class="smaller">Arguments may be separated by commas.</p>
+Attribute: <input id='attribute' type="checkbox"  style="width:60px" value='1' onchange="toggleAttribute()"/><br />
+ <input id='resultVar' type="text" style="width:60px" placeholder='resultVar'/> = 
+ <input id='caller' type="text"  style="width:60px" placeholder='caller' />.
+ <input id='command' type="text"  style="width:90px" placeholder='commandName' /><span id='functionSpan'>
+ (<input id='arguments' type="text"  style="width:60px" placeholder='arguments' />)</span>
+<p><input type="button" value="Add Command" onclick="addCommand()" /></p>
+<p id='commandListDisp'  class="code"> </p>
+<hr />
+<h2>Return:</h2>
+<p class="smaller">Select the variables and their format that should be returned in the JSON response </p>
+<p><input id='returnVarName' type="text" width="50" placeHolder='varName'/> (<input id='returnVarFmt' type="text" placeholder='fmt' />)</p>
+<p><input type="button" value="Add Return Var" onclick="addReturnVar()" /></p>
+<p id='returnListDisp'  class="code"> </p>
+<hr />
+
+<p> Variable to send to noteflight: <input id='varToNoteflight' type="text" value='sc' /></p>
+<p class="smaller"> If nonempty, this variable will be automatically added to returnDict with return type 'musicxml' when submitting</p>
+<hr />
+<p><input type="button" value="Send Generated Request" onclick="sendRequest()" /></p>
+
+<hr />
+<h3>Errors:</h3>
+<p id='errorDisp' style="color:red"></p>
+<h3>Results:</h3>
+<textarea id='resultDisp' style="width:450px; height:100px"></textarea>
+
+
+</div>
+<div id="footer">
+<p id="footer">&nbsp;</p>
+</div>
+
+</div>
+</body>
+</html>

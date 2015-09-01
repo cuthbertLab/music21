@@ -8,15 +8,15 @@
 #               Michael Scott Cuthbert
 #               Lisa D. Friedland
 #
-# Copyright:    (c) 2011 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# License:      BSD or LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 
 from music21 import corpus, features, converter, graph
-from music21 import trecento, figuredBass
+from music21 import figuredBass
 from music21 import expressions, stream
-
+from music21.alpha import trecento
 # def example2():
 #     handel = corpus.parse('hwv56/movement3-05.md')
 #     fe = features.jSymbolic.TripleMeterFeature(handel)

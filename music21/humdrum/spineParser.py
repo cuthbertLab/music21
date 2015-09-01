@@ -1317,7 +1317,7 @@ class KernSpine(HumdrumSpine):
                 import traceback
                 environLocal.warn("Error in parsing event ('%s') at position %r for spine %r: %s" % (event.contents, event.position, event.spineId, str(e)))
                 tb = traceback.format_exc()
-                environLocal.printDebug("Traceback for the exeception: \n%s" % (tb))
+                environLocal.printDebug("Traceback for the exception: \n%s" % (tb))
                 # traceback... environLocal.printDebug()
 
         self.stream.elementsChanged()

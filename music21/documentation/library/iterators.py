@@ -63,22 +63,19 @@ class ModuleIterator(Iterator):
     '''
     Iterates over music21's package system, yielding module objects:
 
-    ::
-
-        >>> iterator = documentation.ModuleIterator(verbose=False)
-        >>> modules = [x for x in iterator]
-        >>> for module in sorted(modules, key=lambda x: x.__name__)[:8]:
-        ...     module.__name__
-        ...
-        'music21.__init__'
-        'music21.abcFormat.__init__'
-        'music21.abcFormat.translate'
-        'music21.analysis.__init__'
-        'music21.analysis.correlate'
-        'music21.analysis.discrete'
-        'music21.analysis.floatingKey'
-        'music21.analysis.metrical'
-
+    >>> iterator = documentation.ModuleIterator(verbose=False)
+    >>> modules = [x for x in iterator]
+    >>> for module in sorted(modules, key=lambda x: x.__name__)[:8]:
+    ...     module.__name__
+    ...
+    'music21.__init__'
+    'music21.abcFormat.__init__'
+    'music21.abcFormat.translate'
+    'music21.alpha.__init__'
+    'music21.alpha.analysis.__init__'
+    'music21.alpha.analysis.scoreDiff'
+    'music21.alpha.analysis.search'
+    'music21.alpha.chant'
     '''
 
     ### CLASS VARIABLES ###
@@ -157,6 +154,26 @@ class ModuleIterator(Iterator):
 class CodebaseIterator(Iterator):
     '''
     Iterate over music21's package system, yielding all classes and functions.
+
+    This currently yields enums that are defined in the module (because they are
+    an instance of type 'class') -- should it? 
+
+    Enums have a different repr: <enum 'MotionType'> not <class 'enum'>
+    
+    >>> cbi = documentation.CodebaseIterator(verbose=False)
+    >>> firstTen = list(cbi)[:10]
+    >>> for x in firstTen:
+    ...     print(x)
+    <class 'music21.articulations.Accent'>
+    <class 'music21.articulations.Articulation'>
+    <class 'music21.articulations.ArticulationException'>
+    <class 'music21.articulations.Bowing'>
+    <class 'music21.articulations.BrassIndication'>
+    <class 'music21.articulations.BreathMark'>
+    <class 'music21.articulations.Caesura'>
+    <class 'music21.articulations.DetachedLegato'>
+    <class 'music21.articulations.Doit'>
+    <class 'music21.articulations.DoubleTongue'>    
     '''
 
     ### SPECIAL METHODS ###
@@ -168,9 +185,10 @@ class CodebaseIterator(Iterator):
                     continue
                 named = getattr(module, name)
                 validTypes = six.class_types + (types.FunctionType,)
-                if isinstance(named, validTypes) and \
-                    named.__module__ == module.__name__:
+                if (isinstance(named, validTypes) and 
+                    named.__module__ == module.__name__):
                     yield named
+        pass
         raise StopIteration
 
 
@@ -178,25 +196,24 @@ class ClassIterator(Iterator):
     '''
     Iterates over music21's package system, yielding all classes discovered:
 
-    ::
-
-        >>> iterator = documentation.ClassIterator(verbose=False)
-        >>> classes = sorted([x for x in iterator],
-        ...     key=lambda x: (x.__module__, x.__name__))
-        >>> for cls in classes[:10]:
-        ...     cls
-        ...
-        <class 'music21.abcFormat.__init__.ABCAccent'>
-        <class 'music21.abcFormat.__init__.ABCBar'>
-        <class 'music21.abcFormat.__init__.ABCBrokenRhythmMarker'>
-        <class 'music21.abcFormat.__init__.ABCChord'>
-        <class 'music21.abcFormat.__init__.ABCCrescStart'>
-        <class 'music21.abcFormat.__init__.ABCDimStart'>
-        <class 'music21.abcFormat.__init__.ABCDownbow'>
-        <class 'music21.abcFormat.__init__.ABCFile'>
-        <class 'music21.abcFormat.__init__.ABCFileException'>
-        <class 'music21.abcFormat.__init__.ABCGraceStart'>
-
+    >>> citerator = documentation.ClassIterator(verbose=False)
+    >>> for x in citerator:
+    ...     pass
+    >>> allClasses = [x for x in citerator]
+    >>> classes = sorted(allClasses, key=lambda x: (x.__module__, x.__name__))
+    >>> for cls in classes[:10]:
+    ...     cls
+    ...
+    <class 'music21.abcFormat.__init__.ABCAccent'>
+    <class 'music21.abcFormat.__init__.ABCBar'>
+    <class 'music21.abcFormat.__init__.ABCBrokenRhythmMarker'>
+    <class 'music21.abcFormat.__init__.ABCChord'>
+    <class 'music21.abcFormat.__init__.ABCCrescStart'>
+    <class 'music21.abcFormat.__init__.ABCDimStart'>
+    <class 'music21.abcFormat.__init__.ABCDownbow'>
+    <class 'music21.abcFormat.__init__.ABCFile'>
+    <class 'music21.abcFormat.__init__.ABCFileException'>
+    <class 'music21.abcFormat.__init__.ABCGraceStart'>
     '''
 
     ### SPECIAL METHODS ###
@@ -212,26 +229,23 @@ class FunctionIterator(Iterator):
     '''
     Iterates over music21's package system, yielding all functions discovered:
 
-    ::
-
-        >>> from music21 import documentation
-        >>> iterator = documentation.FunctionIterator(verbose=False)
-        >>> functions = [x for x in iterator]
-        >>> for function in sorted(functions,
-        ...     key=lambda x: (x.__module__, x.__name__))[:10]:
-        ...     function.__module__, function.__name__
-        ...
-        ('music21.abcFormat.__init__', 'mergeLeadingMetaData')
-        ('music21.abcFormat.translate', 'abcToStreamOpus')
-        ('music21.abcFormat.translate', 'abcToStreamPart')
-        ('music21.abcFormat.translate', 'abcToStreamScore')
-        ('music21.abcFormat.translate', 'parseTokens')
-        ('music21.abcFormat.translate', 'reBar')
-        ('music21.analysis.discrete', 'analyzeStream')
-        ('music21.analysis.floatingKey', 'divide')
-        ('music21.analysis.metrical', 'labelBeatDepth')
-        ('music21.analysis.metrical', 'thomassenMelodicAccent')
-
+    >>> from music21 import documentation
+    >>> iterator = documentation.FunctionIterator(verbose=False)
+    >>> functions = [x for x in iterator]
+    >>> for function in sorted(functions,
+    ...     key=lambda x: (x.__module__, x.__name__))[:10]:
+    ...     function.__module__, function.__name__
+    ...
+    ('music21.abcFormat.__init__', 'mergeLeadingMetaData')
+    ('music21.abcFormat.translate', 'abcToStreamOpus')
+    ('music21.abcFormat.translate', 'abcToStreamPart')
+    ('music21.abcFormat.translate', 'abcToStreamScore')
+    ('music21.abcFormat.translate', 'parseTokens')
+    ('music21.abcFormat.translate', 'reBar')
+    ('music21.alpha.analysis.search', 'findConsecutiveScale')
+    ('music21.alpha.chant', 'fromStream')
+    ('music21.alpha.counterpoint.species', 'getRandomCF')
+    ('music21.alpha.medren', 'breakMensuralStreamIntoBrevisLengths')
     '''
 
     ### SPECIAL METHODS ###
@@ -241,7 +255,6 @@ class FunctionIterator(Iterator):
             if isinstance(x, types.FunctionType):
                 yield x
         raise StopIteration
-
 
 if __name__ == '__main__':
     import music21

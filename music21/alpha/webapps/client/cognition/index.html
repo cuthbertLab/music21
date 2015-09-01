@@ -1,0 +1,354 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link href="css/cognition.css" rel="stylesheet" type="text/css" />
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Music21 Perceived Dissonance App</title>
+
+<script language="javascript" src="../javascript/music21.js"></script>
+
+<script language="javascript">
+
+m21 = new Music21interface();
+
+var state = "selectPiece";
+var playing = 0;
+var finished = 0;
+
+var tempo = 120;
+var key = "b";
+
+var offsetList = [];
+var scoreMusicXML = "";
+var resultMusicXML = "";
+
+function setup() {
+	m21.onError = function() {
+		alert(m21.result.errorString());
+	}
+}
+
+// Selecting work
+function updateTempo() {
+	parsedTempo = parseInt(document.getElementById('tempo').value);
+	if (isNaN(parsedTempo)) {
+		alert("Invalid tempo. Setting tempo to 120")
+		tempo = 120
+		document.getElementById('tempo').value = '120'
+	}
+	tempo = parsedTempo
+}
+function hardCodedPiece() {
+	workNameWithQuotes = "\"" + workName + "\""
+	//alert('submitting request'+workNameWithQuotes);
+	m21.request.clear();
+	m21.request.addCommand('function','sc','','converter.parse',['"/Library/WebServer/Documents/music21/OutputFiles/generatedSampleChords.xml"'])
+	key = "C";
+	
+	m21.request.addCommand('function','mm','','tempo.MetronomeMark',['None',tempo])
+	m21.request.addCommand('method','','sc','insert',[0,'mm']);
+	//m21.request.addCommand('method','sc','sc','measures',[0,3]);
+	m21.request.addCommand('function','midPath','','commands.writeMIDIFileToServer',['sc'])
+	m21.request.addReturnVar('sc','musicxml');
+	m21.request.addReturnVar('midPath','str');
+	
+	m21.onSuccess = function() {
+		scoreMusicXML = m21.result.getData('sc');
+		//alert(m21.result.getData('sc'));
+		document.getElementById('player').SetURL(m21.result.getData('midPath'));
+		document.getElementById('player').Stop();
+		selectToListenTransition();
+	}
+	m21.sendRequest();
+}
+
+function generateIntervals() {
+	kind = document.getElementById('generatedKind').value
+	octaveOffset = document.getElementById('octaveOffset').value
+	numIntervals = document.getElementById('numIntervals').value
+	tempo = document.getElementById('generatedTempo').value
+	
+	updateTempo()
+	kindWithQuotes = "\"" + kind + "\""
+	//alert('submitting request'+workNameWithQuotes);
+	m21.request.clear();
+	m21.request.addCommand('function','sc','','commands.generateIntervals',[numIntervals,kindWithQuotes,octaveOffset])
+	key = "C";
+	
+	m21.request.addCommand('function','mm','','tempo.MetronomeMark',['None',tempo])
+	m21.request.addCommand('method','','sc','insert',[0,'mm']);
+	//m21.request.addCommand('function','sc','sc','measures',[0,3]);
+	m21.request.addCommand('function','midPath','','commands.writeMIDIFileToServer',['sc'])
+	m21.request.addReturnVar('sc','musicxml');
+	m21.request.addReturnVar('midPath','str');
+	
+	m21.onSuccess = function() {
+		scoreMusicXML = m21.result.getData('sc');
+		//alert(m21.result.getData('sc'));
+		document.getElementById('player').SetURL(m21.result.getData('midPath'));
+		document.getElementById('player').Stop();
+		selectToListenTransition();
+	}
+	m21.sendRequest();
+}
+
+
+function selectPiece(workName) {
+	updateTempo()
+	workName = document.getElementById('workName').value;
+	//alert("SELECTING PIECE");
+	workNameWithQuotes = "\"" + workName + "\""
+	//alert('submitting request'+workNameWithQuotes);
+	m21.request.clear();
+	m21.request.addData('workName','str',workNameWithQuotes)
+	m21.request.addCommand('function','sc','','corpus.parse',['workName'])
+	m21.request.addCommand('method','sc','sc','measures',[0,3]);
+	key = "b"
+	//m21.request.addCommand('function','sc','','converter.parse',['"/Library/WebServer/Documents/music21/OutputFiles/generatedSample.xml"'])
+	
+	m21.request.addCommand('function','mm','','tempo.MetronomeMark',['None',tempo])
+	m21.request.addCommand('method','','sc','insert',[0,'mm']);
+	m21.request.addCommand('function','midPath','','commands.writeMIDIFileToServer',['sc'])
+	m21.request.addReturnVar('sc','musicxml');
+	m21.request.addReturnVar('midPath','str');
+	
+	m21.onSuccess = function() {
+		scoreMusicXML = m21.result.getData('sc');
+		//alert(m21.result.getData('sc'));
+		document.getElementById('player').SetURL(m21.result.getData('midPath'));
+		document.getElementById('player').Stop();
+		selectToListenTransition();
+	}
+	m21.sendRequest();
+}
+
+function selectToListenTransition() {
+	document.getElementById('selectpiece').style.display = 'none';
+	document.getElementById('listenrespond').style.display = '';
+	state = "listenrespond";
+}
+
+// Listening and Responding
+
+function start() {
+	player = document.getElementById('player')
+	playing = 1;
+	player.Play()
+	document.getElementById('triggerInstructions').innerHTML = "Click here or press space each time you hear a dissonance";
+	document.getElementById('pause').style.display="";
+	onTick();
+}
+
+function submitAnswer() {
+	keyWithQuotes = "\"" + key + "\""
+	m21.request.clear();
+	//alert(offsetList);
+	m21.request.addData('offsetList','list',offsetList);
+	m21.request.addData('sc','musicxml',scoreMusicXML);
+	
+	m21.request.addCommand('function', 'analysisResultsDict', '', 'commands.runPerceivedDissonanceAnalysis', ['sc','offsetList',"'b'"]);
+	m21.request.addCommand('method', 'fullStreamData', 'analysisResultsDict', '__getitem__', ['"fullScore"']);
+	m21.request.addCommand('method', 'resultSc', 'fullStreamData', '__getitem__', ['"stream"']);
+	m21.request.addCommand('method', 'numUserIdentified', 'fullStreamData', '__getitem__', ['"numUserIdentified"']);
+	m21.request.addCommand('method', 'numMusic21Identified', 'fullStreamData', '__getitem__', ['"numMusic21Identified"']);
+	m21.request.addCommand('method', 'numBothIdentified', 'fullStreamData', '__getitem__', ['"numBothIdentified"']);
+	m21.request.addCommand('method', 'accuracy', 'fullStreamData', '__getitem__', ['"accuracy"']);
+	m21.request.addCommand('method', 'romans', 'fullStreamData', '__getitem__', ['"romans"']);
+m21.request.addCommand('method', 'key', 'fullStreamData', '__getitem__', ['"key"']);
+
+	m21.request.addReturnVar('resultSc','musicxml');
+	m21.request.addReturnVar('fullStreamData','str');
+	m21.request.addReturnVar('numUserIdentified','int');
+	m21.request.addReturnVar('numMusic21Identified','int');
+	m21.request.addReturnVar('numBothIdentified','int');
+	m21.request.addReturnVar('accuracy','float');
+	m21.request.addReturnVar('fullStreamData','str');
+	m21.request.addReturnVar('romans','str');
+	m21.request.addReturnVar('key','str');
+	
+	m21.onSuccess = function() {
+		m21.noteflight.createNoteflightEmbed('noteflightembed','nfscore','fc79df30896da6aa03f90ff771015913ca6880be',750,400,1.0);
+		resultMusicXML = m21.result.getData('resultSc')
+		document.getElementById('fullStreamData').innerHTML = m21.result.getData('fullStreamData')
+		
+		document.getElementById('numUserIdentified').innerHTML = m21.result.getData('numUserIdentified')
+		document.getElementById('numMusic21Identified').innerHTML = m21.result.getData('numMusic21Identified')
+		document.getElementById('numBothIdentified').innerHTML = m21.result.getData('numBothIdentified')
+		document.getElementById('accuracy').innerHTML = Math.round(m21.result.getData('accuracy'))+"%"
+
+
+		document.getElementById('romans').innerHTML = m21.result.getData('romans')
+		listenToResultsTransition();
+	}
+	m21.sendRequest();
+}
+
+function onFinish() {
+	document.getElementById('triggerInstructions').innerHTML = "Click here to submit your answers";
+}
+
+function recordTime() {
+	time = player.GetTime();
+	timeScale = player.GetTimeScale();
+	secs = time * 1/ timeScale;
+	offset = secs * tempo / 60
+	offsetList[offsetList.length] = offset;
+	
+	var marker = document.createElement('div')
+	marker.setAttribute("class","marker")
+	marker.style.left = parseInt(500 * player.GetTime() / player.GetDuration() - 2)+"px";
+	document.getElementById('displaywrapper').appendChild(marker)
+	document.getElementById('displayprogress').style.width = parseInt(500 * player.GetTime() / player.GetDuration())+"px";
+}
+
+function pause() {
+	player = document.getElementById('player');
+	player.Stop();
+	document.getElementById('pause').style.display='none';
+	document.getElementById('triggerInstructions').innerHTML =  "Click here to submit your answers";
+	playing = 0;
+	/// ONLY FOR DEBUGGING:
+	finished = 1;
+}
+
+function onTick() {
+	//alert('ontick');
+	player = document.getElementById('player')
+	document.getElementById('displayprogress').style.width = parseInt(500 * player.GetTime() / player.GetDuration())+"px";
+	if (player.GetTime() < player.GetDuration()) {
+		setTimeout("onTick()",100);
+	} else {
+		onFinish();
+		finished = 1;
+	}
+}
+
+function onTrigger() {
+	if(playing == 0 && finished == 0) {
+		start();
+	} else if(finished == 0) {
+		recordTime();
+	} else {
+		submitAnswer();
+	}
+}
+
+function onKeyPress(e) {
+	if (state == "listenrespond") {
+		player = document.getElementById('player')
+		if (e.charCode == 32) { // Space
+			onTrigger()
+		}
+	}
+}
+
+function listenToResultsTransition() {
+	document.getElementById('listenrespond').style.display = 'none';
+	document.getElementById('viewresults').style.display = '';
+	state = "viewresults";
+}
+
+//  Displaying Results
+function noteflightEventHandler(e)
+{
+	if(e.type == 'scoreDataLoaded') {
+		m21.noteflight.sendMusicXMLToNoteflightEmbed('nfscore',resultMusicXML)
+	}
+}
+
+
+</script>
+</head>
+
+<body onkeypress="onKeyPress(event)" onload="setup()">
+
+<div style="height:1px; width:1px">
+<object classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" codebase="http://www.apple.com/qtactivex/qtplugin.cab" controller='false'>
+<embed id='player' src="/file.mid" enableJavaScript="true" autostart="false" controller='false' height="1px" width="1px"/>
+</object>
+</div>
+
+<div id='wrapper'>
+<h1>Perceived Dissonance</h1>
+<!--- Selecting Piece --->
+<div id='selectpiece'>
+<p>Please select the piece you would like to use as the test:</p>
+<hr />
+<h3>File from Corpus:</h3>
+<table cellpadding="4" cellspacing="0" border="0">
+<tr><td width="175px">Work Name:</td>
+<td>
+<input type="text" id='workName' placeholder="workname" />
+</td></tr>
+<tr><td>Tempo:</td>
+<td>
+<input type="text" id='tempo' value='60'/>
+</td></tr>
+</table>
+<input type='button' onclick="selectPiece()" value="Load Corpus Piece"/>
+<hr />
+<h3>Generated Piece:</h3>
+<table cellpadding="4" cellspacing="0" border="0">
+<tr><td>Kind:</td>
+<td><select id='generatedKind'>
+<option value='None'>Random Intervals</option>
+<option value='consonant'>Random Consonant Intervals</option>
+<option value='diatonic'>Random Diatonic Intervals</option>
+<option value='diatonicTriads'>Random Diatonic Triads</option>
+</select></td></tr>
+<tr><td  width="175px">OctaveOffset:</td>
+<td>
+<input type="text" id='octaveOffset' value="0"/>
+</td></tr>
+<tr><td>Number of Intervals:</td>
+<td>
+<input type="text" id='numIntervals' value="5" />
+</td></tr>
+<tr><td>Tempo:</td>
+<td>
+<input type="text" id='generatedTempo' value="60" />
+</td></tr>
+
+</table>
+<input type='button' onclick="generateIntervals() " value="Generated Intervals"/>
+<hr />
+<input type='button' onclick="hardCodedPiece() " value="Hard-Coded Piece" style="display:none"/>
+</div>
+<!--- Listening and Responding --->
+<div id='listenrespond' style="display:none">
+<div id='displaywrapper'>
+<div id='pause' style="display:none" onclick="pause()">X
+</div>
+<div id='displayprogress'>
+</div>
+</div>
+
+<br />
+
+<div id='trigger' onclick="onTrigger()">
+<p id='triggerInstructions'>Click here or press space to begin</p>
+</div>
+</div>
+
+<!--- Viewing Results --->
+<div id='viewresults' style="display:none">
+<p style="font-size:15px"><a href="#" onclick="location.reload(true)">New Test</a></p>
+<div id='noteflightembed'></div>
+
+<p>Number of vertical slices identified as dissonant by:</p>
+<table border='0' cellspacing="0" cellpadding="1" style="margin-left:10px">
+<tr><td width="155"><b>User: </b></td><td id='numUserIdentified'></td></tr>
+<tr><td><b>Music21:</b> </td><td id='numMusic21Identified'></td></tr>
+<tr><td><b>Both: </b></td><td id='numBothIdentified'></td></tr>
+<tr><td><b>User's Accuracy: </b> </td><td  id='accuracy'></td></tr>
+</table>
+<p>Sample Data Results:<br  /> <span id='romans' style="font-family:'Courier New', Courier, monospace"></span></p>
+<p id='fullStreamData' style="display:none">
+
+</div>
+<!--- END --->
+</div>
+
+</body>
+</html>

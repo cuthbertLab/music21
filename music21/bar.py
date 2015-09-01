@@ -289,7 +289,6 @@ class Repeat(repeat.RepeatMark, Barline):
     times = property(_getTimes, _setTimes, 
         doc = '''Get or set the times property of this barline. This defines how many times the repeat happens. A standard repeat repeats 2 times; values equal to or greater than 0 are permitted. A repeat of 0 skips the repeated passage. 
         
-        >>> from music21 import bar
         >>> lb = bar.Repeat(direction='start')
         >>> rb = bar.Repeat(direction='end')
         >>> lb.times = 3

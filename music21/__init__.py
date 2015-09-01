@@ -53,12 +53,11 @@ __all__ = [
     'sites', # important 
     # sub folders
     'abcFormat', 
+    'alpha',
     'analysis', 
     'audioSearch',
     'braille', 
     'capella',
-    'composition',
-    'counterpoint',
     'corpus', 
     'demos',
     'documentation',
@@ -78,11 +77,8 @@ __all__ = [
     'scala', 
     'search',
     'test',
-    'theoryAnalysis',
     'timespans',
-    'trecento',
     'vexflow',
-    'webapps', 
     # individual modules 
     # KEEP ALPHABETICAL unless necessary for load reasons, if so
     # put a note.  Keep one letter per line.
@@ -90,13 +86,11 @@ __all__ = [
     'bar',
     # base listed above
     'beam', 
-    'chant',
     'chord',
     'chordTables', 
     'clef',
     'common',
     'configure',
-    'contour',
     'converter',
     'defaults',
     'derivation',
@@ -114,7 +108,6 @@ __all__ = [
     'intervalNetwork', 
     'key', 
     'layout',
-    'medren',
     'metadata',
     'meter', 
     'note', 

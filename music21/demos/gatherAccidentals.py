@@ -6,8 +6,7 @@
 # Authors:      Hugh Zabriskie
 #
 # Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
-#
-# License:      LGPL, see license.txt
+# License:      BSD or LGPL, see license.txt
 #--------------------------------------------------------
 from music21 import exceptions21
 from music21 import stream

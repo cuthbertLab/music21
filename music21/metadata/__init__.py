@@ -26,14 +26,12 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
 :attr:`~music21.metadata.Metadata.title` and
 :attr:`~music21.metadata.Metadata.composer` properties of a Metadata object.
 
-::
-
-    >>> s = stream.Stream()
-    >>> s.append(note.Note())
-    >>> s.insert(metadata.Metadata())
-    >>> s.metadata.title = 'title'
-    >>> s.metadata.composer = 'composer'
-    >>> #_DOCS_SHOW s.show()
+>>> s = stream.Stream()
+>>> s.append(note.Note())
+>>> s.insert(metadata.Metadata())
+>>> s.metadata.title = 'title'
+>>> s.metadata.composer = 'composer'
+>>> #_DOCS_SHOW s.show()
 
 .. image:: images/moduleMetadata-01.*
     :width: 600
@@ -76,29 +74,20 @@ class Metadata(base.Music21Object):
     In many cases, each Stream will have a single Metadata object at the zero
     offset position.
 
-    ::
+    >>> md = metadata.Metadata(title='Concerto in F')
+    >>> md.title
+    'Concerto in F'
 
-        >>> from music21 import metadata
-        >>> md = metadata.Metadata(title='Concerto in F')
-        >>> md.title
-        'Concerto in F'
+    >>> md = metadata.Metadata(otl='Concerto in F') # can use abbreviations
+    >>> md.title
+    'Concerto in F'
 
-    ::
+    >>> md.setWorkId('otl', 'Rhapsody in Blue')
+    >>> md.otl
+    'Rhapsody in Blue'
 
-        >>> md = metadata.Metadata(otl='Concerto in F') # can use abbreviations
-        >>> md.title
-        'Concerto in F'
-
-    ::
-
-        >>> md.setWorkId('otl', 'Rhapsody in Blue')
-        >>> md.otl
-        'Rhapsody in Blue'
-
-    ::
-
-        >>> md.title
-        'Rhapsody in Blue'
+    >>> md.title
+    'Rhapsody in Blue'
 
     '''
 
@@ -265,17 +254,12 @@ class Metadata(base.Music21Object):
     def abbreviationToWorkId(abbreviation):
         '''Get work id abbreviations.
 
-        ::
+        >>> metadata.Metadata.abbreviationToWorkId('otl')
+        'title'
 
-            >>> from music21 import metadata
-            >>> metadata.Metadata.abbreviationToWorkId('otl')
-            'title'
-
-        ::
-
-            >>> for id in metadata.Metadata.workIdAbbreviationDict.keys():
-            ...    result = metadata.Metadata.abbreviationToWorkId(id)
-            ...
+        >>> for id in metadata.Metadata.workIdAbbreviationDict.keys():
+        ...    result = metadata.Metadata.abbreviationToWorkId(id)
+        ...
 
         '''
         abbreviation = abbreviation.lower()
@@ -289,22 +273,17 @@ class Metadata(base.Music21Object):
         Assign a :class:`~music21.metadata.Contributor` object to this
         Metadata.
 
-        ::
+        >>> md = metadata.Metadata(title='Third Symphony')
+        >>> c = metadata.Contributor()
+        >>> c.name = 'Beethoven, Ludwig van'
+        >>> c.role = 'composer'
+        >>> md.addContributor(c)
+        >>> md.composer
+        'Beethoven, Ludwig van'
 
-            >>> from music21 import metadata
-            >>> md = metadata.Metadata(title='Third Symphony')
-            >>> c = metadata.Contributor()
-            >>> c.name = 'Beethoven, Ludwig van'
-            >>> c.role = 'composer'
-            >>> md.addContributor(c)
-            >>> md.composer
-            'Beethoven, Ludwig van'
-
-        ::
-
-            >>> md.composer = 'frank'
-            >>> md.composers
-            ['Beethoven, Ludwig van', 'frank']
+        >>> md.composer = 'frank'
+        >>> md.composers
+        ['Beethoven, Ludwig van', 'frank']
 
         '''
         if not isinstance(c, Contributor):
@@ -317,41 +296,31 @@ class Metadata(base.Music21Object):
         Return a :class:`~music21.metadata.Contributor` if defined for a
         provided role.
 
-        ::
+        >>> md = metadata.Metadata(title='Third Symphony')
 
-            >>> from music21 import metadata
-            >>> md = metadata.Metadata(title='Third Symphony')
-
-        ::
-
-            >>> c = metadata.Contributor()
-            >>> c.name = 'Beethoven, Ludwig van'
-            >>> c.role = 'composer'
-            >>> md.addContributor(c)
-            >>> cList = md.getContributorsByRole('composer')
-            >>> cList[0].name
-            'Beethoven, Ludwig van'
+        >>> c = metadata.Contributor()
+        >>> c.name = 'Beethoven, Ludwig van'
+        >>> c.role = 'composer'
+        >>> md.addContributor(c)
+        >>> cList = md.getContributorsByRole('composer')
+        >>> cList[0].name
+        'Beethoven, Ludwig van'
 
         Some musicxml files have contributors with no role defined.  To get
         these contributors, search for getContributorsByRole(None).  N.B. upon
         output to MusicXML, music21 gives these contributors the generic role
         of "creator"
 
-        ::
+        >>> c2 = metadata.Contributor()
+        >>> c2.name = 'Beth Hadley'
+        >>> md.addContributor(c2)
+        >>> noRoleList = md.getContributorsByRole(None)
+        >>> len(noRoleList)
+        1
 
-            >>> c2 = metadata.Contributor()
-            >>> c2.name = 'Beth Hadley'
-            >>> md.addContributor(c2)
-            >>> noRoleList = md.getContributorsByRole(None)
-            >>> len(noRoleList)
-            1
-
-        ::
-
-            >>> noRoleList[0].role
-            >>> noRoleList[0].name
-            'Beth Hadley'
-
+        >>> noRoleList[0].role
+        >>> noRoleList[0].name
+        'Beth Hadley'
         '''
         result = []  # there may be more than one per role
         for c in self._contributors:
@@ -367,75 +336,54 @@ class Metadata(base.Music21Object):
         Search one or all fields with a query, given either as a string or a
         regular expression match.
 
-        ::
+        >>> md = metadata.Metadata()
+        >>> md.composer = 'Beethoven, Ludwig van'
+        >>> md.title = 'Third Symphony'
 
-            >>> from music21 import metadata
-            >>> md = metadata.Metadata()
-            >>> md.composer = 'Beethoven, Ludwig van'
-            >>> md.title = 'Third Symphony'
-
-        ::
-
-            >>> md.search(
-            ...     'beethoven',
-            ...     field='composer',
-            ...     )
-            (True, 'composer')
+        >>> md.search(
+        ...     'beethoven',
+        ...     field='composer',
+        ...     )
+        (True, 'composer')
 
         Note how the incomplete field name in the following example is still
         matched:
 
-        ::
+        >>> md.search(
+        ...     'beethoven',
+        ...     field='compose',
+        ...     )
+        (True, 'composer')
 
-            >>> md.search(
-            ...     'beethoven',
-            ...     field='compose',
-            ...     )
-            (True, 'composer')
+        >>> md.search(
+        ...     'frank',
+        ...     field='composer',
+        ...     )
+        (False, None)
 
-        ::
+        >>> md.search('frank')
+        (False, None)
 
-            >>> md.search(
-            ...     'frank',
-            ...     field='composer',
-            ...     )
-            (False, None)
+        >>> md.search('third')
+        (True, 'title')
 
-        ::
+        >>> md.search(
+        ...     'third',
+        ...     field='composer',
+        ...     )
+        (False, None)
 
-            >>> md.search('frank')
-            (False, None)
+        >>> md.search(
+        ...     'third',
+        ...     field='title',
+        ...     )
+        (True, 'title')
 
-        ::
+        >>> md.search('third|fourth')
+        (True, 'title')
 
-            >>> md.search('third')
-            (True, 'title')
-
-        ::
-
-            >>> md.search(
-            ...     'third',
-            ...     field='composer',
-            ...     )
-            (False, None)
-
-        ::
-
-            >>> md.search(
-            ...     'third',
-            ...     field='title',
-            ...     )
-            (True, 'title')
-
-        ::
-
-            >>> md.search('third|fourth')
-            (True, 'title')
-
-        ::
-
-            >>> md.search('thove(.*)')
-            (True, 'composer')
+        >>> md.search('thove(.*)')
+        (True, 'composer')
 
         '''
         valueFieldPairs = []
@@ -511,25 +459,17 @@ class Metadata(base.Music21Object):
         collectionDesignation, txo / textOriginalLanguage, txl / textLanguage,
         ocy / countryOfComposition, opc / localeOfComposition.
 
-        ::
+        >>> md = metadata.Metadata(title='Quartet')
+        >>> md.title
+        'Quartet'
 
-            >>> from music21 import metadata
-            >>> md = metadata.Metadata(title='Quartet')
-            >>> md.title
-            'Quartet'
+        >>> md.setWorkId('otl', 'Trio')
+        >>> md.title
+        'Trio'
 
-        ::
-
-            >>> md.setWorkId('otl', 'Trio')
-            >>> md.title
-            'Trio'
-
-        ::
-
-            >>> md.setWorkId('sdf', None)
-            Traceback (most recent call last):
-            MetadataException: no work id available with id: sdf
-
+        >>> md.setWorkId('sdf', None)
+        Traceback (most recent call last):
+        MetadataException: no work id available with id: sdf
         '''
         idStr = idStr.lower()
         match = False
@@ -552,18 +492,12 @@ class Metadata(base.Music21Object):
     def workIdToAbbreviation(value):
         '''Get a work abbreviation from a string representation.
 
-        ::
+        >>> metadata.Metadata.workIdToAbbreviation('localeOfComposition')
+        'opc'
 
-            >>> from music21 import metadata
-            >>> metadata.Metadata.workIdToAbbreviation('localeOfComposition')
-            'opc'
-
-        ::
-
-            >>> for n in metadata.Metadata.workIdAbbreviationDict.values():
-            ...     result = metadata.Metadata.workIdToAbbreviation(n)
-            ...
-
+        >>> for n in metadata.Metadata.workIdAbbreviationDict.values():
+        ...     result = metadata.Metadata.workIdToAbbreviation(n)
+        ...
         '''
         # NOTE: this is a performance critical function
         try:
@@ -587,14 +521,10 @@ class Metadata(base.Music21Object):
         r'''
         Get or set the alternative title.
 
-        ::
-
-            >>> from music21 import metadata
-            >>> md = metadata.Metadata(popularTitle='Eroica')
-            >>> md.alternativeTitle = 'Heroic Symphony'
-            >>> md.alternativeTitle
-            'Heroic Symphony'
-
+        >>> md = metadata.Metadata(popularTitle='Eroica')
+        >>> md.alternativeTitle = 'Heroic Symphony'
+        >>> md.alternativeTitle
+        'Heroic Symphony'
         '''
         result = self._workIds['alternativeTitle']
         if result is not None:
@@ -614,17 +544,13 @@ class Metadata(base.Music21Object):
         :class:`~music21.metadata.Contributor` object in the Metadata
         object.
 
-        ::
-
-            >>> from music21 import metadata
-            >>> md = metadata.Metadata(
-            ...     title='Third Symphony',
-            ...     popularTitle='Eroica',
-            ...     composer='Beethoven, Ludwig van',
-            ...     )
-            >>> md.composer
-            'Beethoven, Ludwig van'
-
+        >>> md = metadata.Metadata(
+        ...     title='Third Symphony',
+        ...     popularTitle='Eroica',
+        ...     composer='Beethoven, Ludwig van',
+        ...     )
+        >>> md.composer
+        'Beethoven, Ludwig van'
         '''
         result = self.getContributorsByRole('composer')
         if result is not None:
@@ -660,24 +586,18 @@ class Metadata(base.Music21Object):
         :class:`~music21.metadata.DateBetween`,
         :class:`~music21.metadata.DateSelection`,
 
-        ::
+        >>> md = metadata.Metadata(
+        ...     title='Third Symphony',
+        ...     popularTitle='Eroica',
+        ...     composer='Beethoven, Ludwig van',
+        ...     )
+        >>> md.date = '2010'
+        >>> md.date
+        '2010/--/--'
 
-            >>> from music21 import metadata
-            >>> md = metadata.Metadata(
-            ...     title='Third Symphony',
-            ...     popularTitle='Eroica',
-            ...     composer='Beethoven, Ludwig van',
-            ...     )
-            >>> md.date = '2010'
-            >>> md.date
-            '2010/--/--'
-
-        ::
-
-            >>> md.date = metadata.DateBetween(['2009/12/31', '2010/1/28'])
-            >>> md.date
-            '2009/12/31 to 2010/01/28'
-
+        >>> md.date = metadata.DateBetween(['2009/12/31', '2010/1/28'])
+        >>> md.date
+        '2009/12/31 to 2010/01/28'
         '''
         return str(self._date)
 
@@ -768,38 +688,26 @@ class Metadata(base.Music21Object):
         Get the title of the work, or the next-matched title string
         available from a related parameter fields.
 
-        ::
+        >>> md = metadata.Metadata(title='Third Symphony')
+        >>> md.title
+        'Third Symphony'
 
-            >>> from music21 import metadata
-            >>> md = metadata.Metadata(title='Third Symphony')
-            >>> md.title
-            'Third Symphony'
+        >>> md = metadata.Metadata(popularTitle='Eroica')
+        >>> md.title
+        'Eroica'
 
-        ::
+        >>> md = metadata.Metadata(
+        ...     title='Third Symphony',
+        ...     popularTitle='Eroica',
+        ...     )
+        >>> md.title
+        'Third Symphony'
 
-            >>> md = metadata.Metadata(popularTitle='Eroica')
-            >>> md.title
-            'Eroica'
+        >>> md.popularTitle
+        'Eroica'
 
-        ::
-
-            >>> md = metadata.Metadata(
-            ...     title='Third Symphony',
-            ...     popularTitle='Eroica',
-            ...     )
-            >>> md.title
-            'Third Symphony'
-
-        ::
-
-            >>> md.popularTitle
-            'Eroica'
-
-        ::
-
-            >>> md.otp
-            'Eroica'
-
+        >>> md.otp
+        'Eroica'
         '''
         searchId = (
             'title',
@@ -831,19 +739,13 @@ class RichMetadata(Metadata):
     stored.  RichMetadata are generally only created in the process of creating
     stored JSON metadata.
 
-    ::
+    >>> richMetadata = metadata.RichMetadata(title='Concerto in F')
+    >>> richMetadata.title
+    'Concerto in F'
 
-        >>> from music21 import metadata
-        >>> richMetadata = metadata.RichMetadata(title='Concerto in F')
-        >>> richMetadata.title
-        'Concerto in F'
-
-    ::
-
-        >>> from music21 import key
-        >>> richMetadata.keySignatureFirst = key.KeySignature(-1)
-        >>> 'keySignatureFirst' in richMetadata._searchAttributes
-        True
+    >>> richMetadata.keySignatureFirst = key.KeySignature(-1)
+    >>> 'keySignatureFirst' in richMetadata._searchAttributes
+    True
 
     '''
 
@@ -886,19 +788,14 @@ class RichMetadata(Metadata):
         Given another Metadata or RichMetadata object, combine
         all attributes and return a new object.
 
-        ::
+        >>> md = metadata.Metadata(title='Concerto in F')
+        >>> md.title
+        'Concerto in F'
 
-            >>> from music21 import metadata
-            >>> md = metadata.Metadata(title='Concerto in F')
-            >>> md.title
-            'Concerto in F'
-
-        ::
-
-            >>> richMetadata = metadata.RichMetadata()
-            >>> richMetadata.merge(md)
-            >>> richMetadata.title
-            'Concerto in F'
+        >>> richMetadata = metadata.RichMetadata()
+        >>> richMetadata.merge(md)
+        >>> richMetadata.title
+        'Concerto in F'
 
         '''
         # specifically name attributes to copy, as do not want to get all

@@ -6,17 +6,12 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009-2010 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2009-10 Michael Scott Cuthbert and the music21 Project
+# License:      BSD or LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
-
-
-
-
-
 import unittest
-from music21 import note, stream, clef, metadata, spanner, environment, converter, scale, corpus, common
+from music21 import alpha, note, stream, clef, metadata, spanner, environment, converter, scale, corpus, common
 
 
 _MOD = 'demo/smt2010.py'
@@ -547,7 +542,7 @@ class Test(unittest.TestCase):
         s.remove(s['viola'])
         for part in s.parts: 
             for sc in [scGMajor, scDMajor]:
-                groups = analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=5, comparisonAttribute='name')
+                groups = alpha.analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=5, comparisonAttribute='name')
                 for group in groups:
                     for n in group['stream'].notesAndRests:
                         n.addLyric('%s^%s' % (sc.getTonic().name, sc.getScaleDegreeFromPitch(n.pitch)))
@@ -568,7 +563,7 @@ class Test(unittest.TestCase):
 #         part = corpus.parse('bwv1080/03').parts[0].measures(46,53)
 #         
 #         for sc in [scDMelodicMinor, scGMelodicMinor]:
-#             groups = analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=4, comparisonAttribute='name')
+#             groups = alpha.analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=4, comparisonAttribute='name')
 #             for group in groups:
 #                 for n in group['stream'].notes:
 #                     n.addLyric('%s^%s' % (sc.getTonic().name.lower(), sc.getScaleDegreeFromPitch(n.pitch, group['direction'])))
@@ -582,7 +577,7 @@ class Test(unittest.TestCase):
 #         s = corpus.parse('mozart/k80/movement1').measures(1,28)
 #         for sc in [scGMajor, scDMajor, scAMajor]:
 #             for part in s.parts: 
-#                 post = analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=5,             
+#                 post = alpha.analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=5,             
 #                        comparisonAttribute='name')
 #                 for g, group in enumerate(post):
 #                     for n in group:

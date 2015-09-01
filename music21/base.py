@@ -159,11 +159,8 @@ class Groups(common.SlottedObject, list):
     Traceback (most recent call last):
     GroupException: Only strings can be used as list names
     '''
-    # TODO: presently groups can be cased-differentiated; this may
-    # need to be made case independent
-
     # could be made into a set instance, but actually
-    # timing: a subclassed list and a set are almost the same speed...
+    # timing: a subclassed list and a set are almost the same speed and set does not allow calling but number
 
     __slots__ = ()
 
@@ -185,24 +182,42 @@ class Groups(common.SlottedObject, list):
         '''
         Test Group equality. In normal lists, order matters; here it does not.
 
-        >>> a = Groups()
+        >>> a = base.Groups()
         >>> a.append('red')
         >>> a.append('green')
         >>> a
         ['red', 'green']
 
-        >>> b = Groups()
+        >>> b = base.Groups()
         >>> b.append('green')
-        >>> b.append('red')
+        >>> a == b
+        False
+
+        >>> b.append('reD') # case insensitive
         >>> a == b
         True
+        
+        >>> a == ['red', 'green'] # need both to be groups
+        False
+        
+        >>> c = base.Groups()
+        >>> c.append('black')
+        >>> c.append('tuba')
+        >>> a == c
+        False
         '''
         if not isinstance(other, Groups):
             return False
-        if (sorted(list(self)) == sorted(list(other))):
-            return True
-        else:
+        
+        sls = sorted(list(self))
+        slo = sorted(list(other))
+        
+        if len(sls) != len(slo):
             return False
+        for x in range(len(sls)):
+            if sls[x].lower() != slo[x].lower():
+                return False
+        return True
 
     def __ne__(self, other):
         '''
@@ -438,7 +453,7 @@ class Music21Object(object):
             setattr(new, '_derivation', newDerivation)
 
         if '_activeSite' in ignoreAttributes:
-            # TODO: Fix this so as not to allow incorrect _activeSite
+            # TODO: Fix this so as not to allow incorrect _activeSite (???)
             # keep a reference, not a deepcopy
             # do not use property: .activeSite; set to same weakref obj
 # restore jan 18
@@ -453,7 +468,7 @@ class Music21Object(object):
         if 'sites' in ignoreAttributes:
 # restore jan 18
 #            pass
-            ## TODO: Fix This to get better sites value
+            ## TODO: Fix This to get better sites value ?????
             value = getattr(self, 'sites')
             # this calls __deepcopy__ in Sites
             newValue = copy.deepcopy(value, memo)
@@ -500,7 +515,6 @@ class Music21Object(object):
         results in the copy happening twice. Thus, __dict__.keys() is used.
 
         >>> from copy import deepcopy
-        >>> from music21 import note, duration
         >>> n = note.Note('A')
         >>> n.offset = 1.0 #duration.Duration("quarter")
         >>> n.groups.append("flute")
@@ -1030,7 +1044,6 @@ class Music21Object(object):
         This is only for advanced location method and
         is not a complete or sufficient way to remove an object from a Stream.
 
-        >>> from music21 import note, stream
         >>> s = stream.Stream()
         >>> n = note.Note()
         >>> n.sites.add(s, 10)
@@ -2279,7 +2292,7 @@ class Music21Object(object):
         if fmt is None: # get setting in environment
             if common.runningUnderIPython():
                 try:
-                    # TODO: when everyone has updated, then remove these lines... c. August 2015
+                    # TODO: when everyone has updated, then remove these lines... do around January 2016
                     if 'vexflow' in environLocal['ipythonShowFormat']:
                         environLocal['ipythonShowFormat'] = 'ipython.lilypond.png'
                         environLocal.write()
@@ -2951,6 +2964,16 @@ class Music21Object(object):
         >>> s.repeatAppend(note.Note(), 8)
         >>> [n.beat for n in s.notes]
         [1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0]
+
+
+        >>> s = stream.Stream()
+        >>> ts = meter.TimeSignature('4/4')
+        >>> s.insert(0, ts)
+        >>> n = note.Note(type='eighth')
+        >>> s.repeatAppend(n, 8)
+        >>> s.makeMeasures(inPlace = True)
+        >>> [n.beat for n in s.flat.notes]
+        [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5]
         ''')
 
     def _getBeatStr(self):
@@ -3167,7 +3190,6 @@ class ElementWrapper(Music21Object):
     always 2) if they fall on a strong beat in fast 6/8
 
     >>> import music21
-    >>> from music21 import stream, meter
     >>> #_DOCS_SHOW import wave
     >>> import random
     >>> class Wave_read(object): #_DOCS_HIDE
@@ -3246,7 +3268,6 @@ class ElementWrapper(Music21Object):
         '''Test ElementWrapper equality
 
         >>> import music21
-        >>> from music21 import note
         >>> n = note.Note("C#")
         >>> a = music21.ElementWrapper(n)
         >>> a.offset = 3.0
@@ -3324,7 +3345,6 @@ class ElementWrapper(Music21Object):
 
         >>> import copy
         >>> import music21
-        >>> from music21 import note
 
         >>> aE = music21.ElementWrapper(obj = "hello")
 

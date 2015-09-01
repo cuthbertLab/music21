@@ -54,7 +54,7 @@ class ModuleGather(object):
     >>> from music21.test import testSingleCoreAll as testModule
     >>> mg = testModule.ModuleGather()
     >>> #_DOCS_SHOW print mg.modulePaths[0]
-    D:\Web\eclipse\music21base\music21\xmlnode.py
+    D:\Web\eclipse\music21base\music21\chord.py
     '''
     def __init__(self):
         self.dirParent = os.path.dirname(base.__file__)
@@ -88,7 +88,7 @@ class ModuleGather(object):
             'trecento/correlations.py',
             'trecento/contenanceAngloise.py',
             'trecento/capuaProbabilities.py',
-            'theoryAnalysis/wwnortonMGTA.py',
+            'alpha/theoryAnalysis/wwnortonMGTA.py',
             'test/treeYield.py',
             'test/toggleDebug.py',
             
@@ -118,12 +118,15 @@ class ModuleGather(object):
             'abcFormat/testFiles.py',
             ]
         # skip any path that starts with this string
-        self.pathSkip = ['obsolete', 'ext', 'server', 'demos']
+        self.pathSkip = ['obsolete', 'ext', 'server', 'demos', 
+                         #temp... make fast...
+                         #'graph', 'figuredBass', 'braille', 'features', 'test', 'analysis', 'musicxml', 'metadata', 'stream',
+                         ]
         self.slowModules = ['graph', 'figuredBass/realizer', 
                             'features/jSymbolic', 'features/native', 'figuredBass/examples', 
                             'braille/test', 'test/testStream', 'analysis/windowed', 
                             'converter/__init__', 'metadata/bundles', 'musicxml/fromMxObjects',
-                            'romanText/translate', 'musicxml/m21ToString', 'theoryAnalysis/theoryAnalyzer']
+                            'romanText/translate', 'musicxml/m21ToString', 'alpha/theoryAnalysis/theoryAnalyzer']
         # search on init
         self._walk()
 
@@ -167,8 +170,8 @@ class ModuleGather(object):
         
         >>> from music21.test import testSingleCoreAll as testModule
         >>> mg = testModule.ModuleGather()
-        >>> #_DOCS_SHOW mg._getName(r'D:\Web\eclipse\music21base\music21\xmlnode.py')
-        'xmlnode'
+        >>> #_DOCS_SHOW mg._getName(r'D:\Web\eclipse\music21base\music21\chord.py')
+        'chord'
         '''
         fn = fp.replace(self.dirParent, '') # remove parent
         if fn.startswith(os.sep):

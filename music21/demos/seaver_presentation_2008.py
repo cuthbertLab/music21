@@ -5,8 +5,8 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    (c) 2008 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2008 Michael Scott Cuthbert and the music21 Project
+# License:      BSD or LGPL, see license.txt
 #-------------------------------------------------------------------------------
 '''
 This script was used to create the musical examples used in the presentation given by MSC to the

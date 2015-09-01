@@ -732,7 +732,6 @@ def almostEquals(x, y = 0.0, grain=1e-7):
 
     almostEquals(x, y) -- returns True if x and y are within 0.0000001 of each other
 
-    >>> from music21 import common
     >>> common.almostEquals(1.000000001, 1)
     True
     >>> common.almostEquals(1.001, 1)
@@ -1672,7 +1671,6 @@ def toRoman(num):
 def ordinalAbbreviation(value, plural=False):
     '''Return the ordinal abbreviations for integers
 
-    >>> from music21 import common
     >>> common.ordinalAbbreviation(3)
     'rd'
     >>> common.ordinalAbbreviation(255)

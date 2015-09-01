@@ -2974,9 +2974,7 @@ class Defaults(MusicXMLElementList):
     def __init__(self):
         '''From the MusicXML schema:
         
-        ::
-
-            The defaults type specifies score-wide defaults for scaling, layout, and appearance.
+        The defaults type specifies score-wide defaults for scaling, layout, and appearance::
 
             <xs:sequence>
                 <xs:element name="scaling" type="scaling" minOccurs="0"/>

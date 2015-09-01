@@ -29,18 +29,14 @@ class Tie(SlottedObject):
     Object added to notes that are tied to other notes. The `type` value is one
     of start, stop, or continue.
 
-    ::
+    >>> note1 = note.Note()
+    >>> note1.tie = tie.Tie("start") # start, stop, or continue
+    >>> note1.tie.style = "normal" # default; could also be "dotted" or "dashed" or "hidden"
+    >>> note1.tie.type
+    'start'
 
-        >>> note1 = note.Note()
-        >>> note1.tie = tie.Tie("start") # start, stop, or continue
-        >>> note1.tie.style = "normal" # default; could also be "dotted" or "dashed" or "hidden"
-        >>> note1.tie.type
-        'start'
-
-    ::
-
-        >>> note1.tie
-        <music21.tie.Tie start>
+    >>> note1.tie
+    <music21.tie.Tie start>
 
     Differences from MusicXML:
        notes do not need to know if they are tied from a
@@ -82,28 +78,19 @@ class Tie(SlottedObject):
 
     def __eq__(self, other):
         '''
-        Equality. Based on attributes (such as pitch, accidental, duration,
-        articulations, and ornaments) that are  not dependent on the wider
-        context of a note (such as offset, beams, stem direction).
+        Equality. Based entirely on Tie.type.
 
-        ::
+        >>> t1 = tie.Tie('start')
+        >>> t2 = tie.Tie('start')
+        >>> t3 = tie.Tie('stop')
+        >>> t1 == t2
+        True
 
-            >>> t1 = tie.Tie('start')
-            >>> t2 = tie.Tie('start')
-            >>> t3 = tie.Tie('stop')
-            >>> t1 == t2
-            True
+        >>> t2 == t3, t3 == t1
+        (False, False)
 
-        ::
-
-            >>> t2 == t3, t3 == t1
-            (False, False)
-
-        ::
-
-            >>> t2 == None
-            False
-
+        >>> t2 == None
+        False
         '''
         if other is None or not isinstance(other, Tie):
             return False

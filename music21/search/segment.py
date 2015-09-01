@@ -169,29 +169,21 @@ def indexScoreFilePaths(
     Returns a dictionary of the lists from indexScoreParts for each score in
     scoreFilePaths
     
-    ::
+    >>> searchResults = corpus.search('bwv19')
+    >>> fpsNamesOnly = sorted([searchResult.sourcePath
+    ...     for searchResult in searchResults])
+    >>> len(fpsNamesOnly)
+    9
 
-        >>> searchResults = corpus.search('bwv19')
-        >>> fpsNamesOnly = sorted([searchResult.sourcePath
-        ...     for searchResult in searchResults])
-        >>> len(fpsNamesOnly)
-        9
+    >>> scoreDict = search.segment.indexScoreFilePaths(fpsNamesOnly[2:5])
+    >>> len(scoreDict['bwv190.7.mxl'])
+    4
 
-    ::
+    >>> scoreDict['bwv190.7.mxl'][0]['measureList']
+    [0, 5, 11, 17, 22, 27]
 
-        >>> scoreDict = search.segment.indexScoreFilePaths(fpsNamesOnly[2:5])
-        >>> len(scoreDict['bwv190.7.mxl'])
-        4
-
-    ::
-
-        >>> scoreDict['bwv190.7.mxl'][0]['measureList']
-        [0, 5, 11, 17, 22, 27]
-
-    ::
-
-        >>> scoreDict['bwv190.7.mxl'][0]['segmentList'][0]
-        'NNJLNOLLLJJIJLLLLNJJJIJLLJNNJL'
+    >>> scoreDict['bwv190.7.mxl'][0]['segmentList'][0]
+    'NNJLNOLLLJJIJLLLLNJJJIJLLJNNJL'
     
     '''
     scoreDict = OrderedDict()

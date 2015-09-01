@@ -9,8 +9,10 @@
 #               Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-'''A comprehensive, object model of the Xenakis Sieve. :class:`music21.sieve.Sieve` objects can be created from high-level string notations, and used to generate line segments in various representation. Additional functionality is available through associated objects. 
-
+'''
+A comprehensive, object model of the Xenakis Sieve. :class:`music21.sieve.Sieve` 
+objects can be created from high-level string notations, and used to generate line segments 
+in various representation. Additional functionality is available through associated objects. 
 
 The :class:`music21.sieve.Sieve` class permits generation segments in four formats. 
 
