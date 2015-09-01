@@ -44,7 +44,7 @@ def cacheMetadata(
     useMultiprocessing=True,
     ):
     '''
-    Cache metadata from corpuses in `corpusNames` as local cache files:
+    Cache metadata from corpora in `corpusNames` as local cache files:
 
     Call as ``metadata.cacheMetadata()``
 

@@ -17,9 +17,9 @@ To do a release,
 1. update the VERSION in _version.py and the single test cases in base.py and 
      in case of major version changes freezeThaw.JSONFreezer.jsonPrint if this wasn't done already.
 2. run test/multiprocessTest.py  for Python2 AND Python3
-3. If all tests pass, run `corpus.cacheMetadata(['core', 'virtual'])`.
+3. If all tests pass, for a major change, run `corpus.cacheMetadata(['core', 'virtual'])`. (TODO: check is working?)
 4. run test/testSingleCoreAll.py 
-     (normally not necessary,because it's slower and mostly duplicates multiprocessTest, 
+     (normally not necessary, because it's slower and mostly duplicates multiprocessTest, 
      but should be done before making a release).  Done automatically by Travis-CI on GitHub commit
 5. then test/testDocumentation
 6. then test/testSerialization
@@ -28,7 +28,7 @@ To do a release,
 
 [*] you will need sphinx, IPython (pip or easy_install), markdown, and pandoc (.dmg) installed
 
-9. run documentation/upload [not via eclipse] or upload via ssh.
+9. run documentation/upload.py [not via eclipse] or upload via ssh.
 
 10. And finally this file ON PYTHON 2.7
 

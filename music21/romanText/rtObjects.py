@@ -36,6 +36,7 @@ reNoteTag = re.compile(r'[Nn]ote:')
 
 reOptKeyOpenAtom = re.compile(r'\?\([A-Ga-g]+[b#]*:')
 reOptKeyCloseAtom = re.compile(r'\?\)[A-Ga-g]+[b#]*:?')
+# ?g:( ?
 reKeyAtom = re.compile('[A-Ga-g]+[b#]*;:')
 reAnalyticKeyAtom = re.compile('[A-Ga-g]+[b#]*:')
 reKeySignatureAtom = re.compile(r'KS\-?[0-7]')
