@@ -9,7 +9,7 @@ Mostly works, but needs some better snippet training...
 '''
 
 from music21 import stream
-from music21.trecento import cadencebook
+from music21.alpha.trecento import cadencebook
 
 def find():
     ballatas = cadencebook.BallataSheet()

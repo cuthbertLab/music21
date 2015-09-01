@@ -58,7 +58,7 @@ class CadenceConverter(tinyNotation.Converter):
     Subclass of Tiny Notation that calls these tokens instead of the defaults    
     
     
-    >>> dLucaGloriaIncipit = trecento.trecentoCadence.CadenceConverter("6/8 c'2. d'8 c'4 a8 f4 f8 a4 c'4 c'8").parse().stream
+    >>> dLucaGloriaIncipit = alpha.trecento.trecentoCadence.CadenceConverter("6/8 c'2. d'8 c'4 a8 f4 f8 a4 c'4 c'8").parse().stream
     >>> dLucaGloriaIncipit.rightBarline = 'final'
     >>> dLucaGloriaIncipit.elements
     (<music21.stream.Measure 1 offset=0.0>, <music21.stream.Measure 2 offset=3.0>, <music21.stream.Measure 3 offset=6.0>)

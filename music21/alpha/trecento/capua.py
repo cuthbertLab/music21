@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         trecento.capua.py
+# Name:         alpha.trecento.capua.py
 # Purpose:      The regola of Nicolaus de Capua for Musica Ficta
 #
 # Authors:      Michael Scott Cuthbert
@@ -25,8 +25,8 @@ harmonic problems in the music.
 import unittest
 
 from music21 import exceptions21
+from music21.alpha.trecento import cadencebook
 from music21 import stream
-from music21.trecento import cadencebook
 from music21 import note
 from music21 import pitch
 from music21 import interval 
@@ -56,17 +56,17 @@ def applyCapuaToScore(thisWork):
 def applyCapuaToCadencebookWork(thisWork):
     '''
     runs Nicolaus de Capua's rules on a set of incipits and cadences as
-    :class:`~music21.trecento.polyphonicSnippet.PolyphonicSnippet` objects
+    :class:`~music21.alpha.trecento.polyphonicSnippet.PolyphonicSnippet` objects
     (a Score subclass)
     
     >>> import copy
     
-    >>> b = trecento.cadencebook.BallataSheet().makeWork(331) # Francesco, Non Creder Donna
+    >>> b = alpha.trecento.cadencebook.BallataSheet().makeWork(331) # Francesco, Non Creder Donna
     >>> bOrig = copy.deepcopy(b)
-    >>> trecento.capua.applyCapuaToCadencebookWork(b)
+    >>> alpha.trecento.capua.applyCapuaToCadencebookWork(b)
     >>> bFN = b.asScore().flat.notes
     >>> for n in bFN:
-    ...    trecento.capua.capuaFictaToAccidental(n)
+    ...    alpha.trecento.capua.capuaFictaToAccidental(n)
     >>> bOrigFN = bOrig.asScore().flat.notes
     >>> for i in range(len(bFN)):
     ...    if bFN[i].pitch != bOrigFN[i].pitch: 
@@ -564,10 +564,10 @@ def compareThreeFictas(srcStream1, srcStream2):
     srcStream1 and srcStream2 should be .flat.notesAndRests
     
     
-    >>> b = trecento.cadencebook.BallataSheet().makeWork(331).asScore()
+    >>> b = alpha.trecento.cadencebook.BallataSheet().makeWork(331).asScore()
     >>> #_DOCS_SHOW b.show()
-    >>> trecento.capua.applyCapuaToStream(b.parts[0].flat.notesAndRests)
-    >>> trecento.capua.compareThreeFictas(b.parts[0].flat.notesAndRests, b.parts[1].flat.notesAndRests)
+    >>> alpha.trecento.capua.applyCapuaToStream(b.parts[0].flat.notesAndRests)
+    >>> alpha.trecento.capua.compareThreeFictas(b.parts[0].flat.notesAndRests, b.parts[1].flat.notesAndRests)
     >>> for n in b.parts[0].flat.notesAndRests:
     ...    pass #print n.pitch, n.editorial.misc['normal-harmonicInterval'], n.editorial.misc['pmfc-harmonicInterval'], n.editorial.misc['capua-harmonicInterval']
     
@@ -804,7 +804,7 @@ def findCorrections(correctionType="Maj3", startPiece=2, endPiece=459):
 #    {'potentialChange': 82, 'capuaAlt': 30, 'pmfcAndCapua': 3, 'capuaNotPmfc': 27, 'pmfcAlt': 4, 'pmfcNotCapua': 1, 'totalNotes': 82}
 #    >>> foundPieceOpus.show('lily.pdf')
 
-#    >>> #_DOCS_SHOW (totalDict, foundPieceOpus) = trecento.capua.correctedMin6()
+#    >>> #_DOCS_SHOW (totalDict, foundPieceOpus) = alpha.trecento.capua.correctedMin6()
 #    >>> totalDict = {'potentialChange': 82, 'capuaAlt': 30, 'pmfcAndCapua': 3, 'capuaNotPmfc': 27, 'pmfcAlt': 4, 'pmfcNotCapua': 1, 'totalNotes': 82} #_DOCS_HIDE
 #    >>> print(totalDict)
 #    {'alterAll': 82, 'capuaAlt': 30, 'pmfcAndCapua': 3, 'capuaNotPmfc': 27, 'pmfcAlt': 4, 'pmfcNotCapua': 1, 'totalNotes': 82}
@@ -910,7 +910,7 @@ def improvedHarmony(startPiece = 2, endPiece = 459):
     Returns a dict showing the results
     
     
-    >>> #_DOCS_SHOW trecento.capua.improvedHarmony()
+    >>> #_DOCS_SHOW alpha.trecento.capua.improvedHarmony()
     >>> print("{'imperfCapua': 22, 'imperfIgnored': 155, 'perfCapua': 194, 'perfIgnored': 4057}") #_DOCS_HIDE
     {'imperfCapua': 22, 'imperfIgnored': 155, 'perfCapua': 194, 'perfIgnored': 4057}
     '''

@@ -27,8 +27,8 @@ from music21 import metadata
 from music21 import stream
 
 from music21.ext import xlrd
-from music21.trecento import trecentoCadence
-from music21.trecento import polyphonicSnippet
+from music21.alpha.trecento import trecentoCadence
+from music21.alpha.trecento import polyphonicSnippet
 
 class TrecentoSheet(object):
     '''
@@ -44,7 +44,7 @@ class TrecentoSheet(object):
 
 
     
-    >>> kyrieSheet = trecento.cadencebook.TrecentoSheet(sheetname = 'kyrie')
+    >>> kyrieSheet = alpha.trecento.cadencebook.TrecentoSheet(sheetname = 'kyrie')
     >>> for thisKyrie in kyrieSheet:
     ...     print(thisKyrie.title)
     Questa Fanc.
@@ -62,8 +62,8 @@ class TrecentoSheet(object):
             try:
                 xbook = xlrd.open_workbook(self.filename)        
             except IOError:
-                import music21.trecento
-                xbook = xlrd.open_workbook(music21.trecento.__path__[0] + os.sep + self.filename)
+                import music21.alpha.trecento
+                xbook = xlrd.open_workbook(music21.alpha.trecento.__path__[0] + os.sep + self.filename)
 
             
             if ("sheetname" in keywords): 
@@ -118,7 +118,7 @@ class TrecentoSheet(object):
         Row 1 is a header, so makeWork(2) gives the first piece.
         
         
-        >>> ballataSheet = trecento.cadencebook.BallataSheet()
+        >>> ballataSheet = alpha.trecento.cadencebook.BallataSheet()
         >>> b = ballataSheet.makeWork(3)
         >>> print(b.title)
         Ad(d)io, amore mio
@@ -131,7 +131,7 @@ class TrecentoSheet(object):
         return the first work with TITLE in the work's title.  Case insensitive
         
         
-        >>> ballataSheet = trecento.cadencebook.BallataSheet()
+        >>> ballataSheet = alpha.trecento.cadencebook.BallataSheet()
         >>> farina = ballataSheet.workByTitle('farina')
         >>> print(farina.title)
         De mia farina
@@ -172,7 +172,7 @@ class CacciaSheet(TrecentoSheet):
     
     
     
-    >>> cacciaSheet = trecento.cadencebook.CacciaSheet()
+    >>> cacciaSheet = alpha.trecento.cadencebook.CacciaSheet()
     '''
     
     sheetname = "fischer_caccia"
@@ -217,7 +217,7 @@ class GloriaSheet(TrecentoSheet):
     
     
     
-    >>> cadenceSpreadSheet = trecento.cadencebook.GloriaSheet()
+    >>> cadenceSpreadSheet = alpha.trecento.cadencebook.GloriaSheet()
     >>> gloriaNo20 = cadenceSpreadSheet.makeWork(20)
     >>> incipit = gloriaNo20.incipit
     >>> incipit.show('text')
@@ -300,7 +300,7 @@ class TrecentoCadenceWork(object):
     test just creating an empty TrecentoCadenceWork:
     
     
-    >>> tcw = trecento.cadencebook.TrecentoCadenceWork()
+    >>> tcw = alpha.trecento.cadencebook.TrecentoCadenceWork()
     '''
     beginSnippetPositions = [8]
     endSnippetPositions = []
@@ -364,7 +364,7 @@ class TrecentoCadenceWork(object):
         returns all snippets as a :class:`~music21.stream.Opus` object
 
         
-        >>> deduto = trecento.cadencebook.BallataSheet().workByTitle('deduto')
+        >>> deduto = alpha.trecento.cadencebook.BallataSheet().workByTitle('deduto')
         >>> deduto.title
         u'Deduto sey a quel'
         >>> dedutoScore = deduto.asOpus()
@@ -424,7 +424,7 @@ class TrecentoCadenceWork(object):
         returns all snippets as a score chunk
 
         
-        >>> deduto = trecento.cadencebook.BallataSheet().workByTitle('deduto')
+        >>> deduto = alpha.trecento.cadencebook.BallataSheet().workByTitle('deduto')
         >>> deduto.title
         u'Deduto sey a quel'
         >>> dedutoScore = deduto.asScore()
@@ -496,11 +496,11 @@ class TrecentoCadenceWork(object):
         
         
         
-        >>> bs = trecento.cadencebook.BallataSheet()
+        >>> bs = alpha.trecento.cadencebook.BallataSheet()
         >>> accur = bs.makeWork(2)
         >>> accurIncipit = accur.incipit
         >>> print(accurIncipit)
-        <music21.trecento.polyphonicSnippet.Incipit ...>
+        <music21.alpha.trecento.polyphonicSnippet.Incipit ...>
         '''
         rowBlock = self.rowvalues[8:12]
         rowBlock.append(self.rowvalues[7])
@@ -519,13 +519,13 @@ class TrecentoCadenceWork(object):
 
 
         
-        >>> bs = trecento.cadencebook.BallataSheet()
+        >>> bs = alpha.trecento.cadencebook.BallataSheet()
         >>> accur = bs.makeWork(2)
         >>> accurSnippets = accur.getOtherSnippets()
         >>> for thisSnip in accurSnippets:
         ...     print(thisSnip)
-        <music21.trecento.polyphonicSnippet.FrontPaddedSnippet ...>
-        <music21.trecento.polyphonicSnippet.FrontPaddedSnippet ...>
+        <music21.alpha.trecento.polyphonicSnippet.FrontPaddedSnippet ...>
+        <music21.alpha.trecento.polyphonicSnippet.FrontPaddedSnippet ...>
          
         '''
         beginSnippetPositions = self.beginSnippetPositions
@@ -557,10 +557,10 @@ class TrecentoCadenceWork(object):
         and a description of the cadence.
 
         
-        >>> bs = trecento.cadencebook.BallataSheet()
+        >>> bs = alpha.trecento.cadencebook.BallataSheet()
         >>> accur = bs.makeWork(2)
         >>> print(accur.getSnippetAtPosition(12))
-        <music21.trecento.polyphonicSnippet.FrontPaddedSnippet ...>
+        <music21.alpha.trecento.polyphonicSnippet.FrontPaddedSnippet ...>
         '''
         
         if self.rowvalues[snippetPosition].strip() != "":
@@ -577,13 +577,13 @@ class TrecentoCadenceWork(object):
 
     def convertBlockToStreams(self, thisBlock):
         '''
-        Takes a block of music information (in :class:`~music21.trecento.trecentoCadence.TrecentoCadenceStream` notation)
+        Takes a block of music information (in :class:`~music21.alpha.trecento.trecentoCadence.TrecentoCadenceStream` notation)
         and returns a list of Streams and other information
         
         
         
         >>> block1 = ['e4 f g a', 'g4 a b cc', '', 'no-cadence', '2/4']
-        >>> bs = trecento.cadencebook.BallataSheet()
+        >>> bs = alpha.trecento.cadencebook.BallataSheet()
         >>> dummyPiece = bs.makeWork(2)
         >>> blockStreams = dummyPiece.convertBlockToStreams(block1)
         >>> for x in blockStreams:
@@ -685,7 +685,7 @@ class TrecentoCadenceWork(object):
         the other polyphonic units.
         
         
-        >>> b = trecento.cadencebook.BallataSheet().makeWork(20)
+        >>> b = alpha.trecento.cadencebook.BallataSheet().makeWork(20)
         >>> sList = b.getAllStreams()
         >>> sList
         [<music21.stream.Part ...>, <music21.stream.Part ...>, ...] 
@@ -705,7 +705,7 @@ class TrecentoCadenceWork(object):
         returns a nicely formatted string giving the page numbers in PMFC where the piece
         can be found
         
-        >>> bs = trecento.cadencebook.BallataSheet()
+        >>> bs = alpha.trecento.cadencebook.BallataSheet()
         >>> altroCheSospirar = bs.makeWork(4)
         >>> altroCheSospirar.title
         u'Altro che sospirar'

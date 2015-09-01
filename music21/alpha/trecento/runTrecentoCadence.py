@@ -6,7 +6,7 @@ Python script to find out certain statistics about the trecento cadences
 from __future__ import unicode_literals
 
 import unittest
-from music21 import trecento
+from music21.alpha import trecento
 
 def countTimeSig():
     '''
@@ -35,7 +35,7 @@ def sortByPMFC(work):
     '''
     Sort a work according to which one comes first in PMFC:
 
-    >>> from music21.trecento.runTrecentoCadence import sortByPMFC
+    >>> from music21.alpha.trecento.runTrecentoCadence import sortByPMFC
     
     >>> class Work(object):
     ...    def __init__(self, id):

@@ -14,9 +14,9 @@
 
 
 from music21 import corpus, features, converter, graph
-from music21 import trecento, figuredBass
+from music21 import figuredBass
 from music21 import expressions, stream
-
+from music21.alpha import trecento
 # def example2():
 #     handel = corpus.parse('hwv56/movement3-05.md')
 #     fe = features.jSymbolic.TripleMeterFeature(handel)

@@ -27,7 +27,7 @@ from music21 import note
 from music21 import pitch
 from music21 import stream
 from music21 import tempo
-from music21 import trecento
+from music21.alpha import trecento
 
 from music21 import environment
 environLocal = environment.Environment('medren')
@@ -380,6 +380,7 @@ class GeneralMensuralNote(base.Music21Object):
         However, if subclass is given, context (a stream) is given, and a mensuration or divisione is given, duration can be determined.
         
         >>> from music21.alpha import medren
+        >>> from music21.alpha import trecento
         
         >>> s = stream.Stream()
         >>> s.append(trecento.notation.Divisione('.p.'))
@@ -452,6 +453,7 @@ class GeneralMensuralNote(base.Music21Object):
         If no context is present, returns None.
         
         >>> from music21.alpha import medren
+        >>> from music21.alpha import trecento
         
         >>> gmn = medren.GeneralMensuralNote('longa')
         >>> gmn._determineMensurationOrDivisione()
@@ -465,7 +467,7 @@ class GeneralMensuralNote(base.Music21Object):
         >>> s_2.insert(2, s_3)
         >>> s_1.insert(3, s_2)
         >>> gmn._determineMensurationOrDivisione()
-        <music21.trecento.notation.Divisione .q.>
+        <music21.alpha.trecento.notation.Divisione .q.>
         '''
         
         #mOrD = music21.medren._getTargetBeforeOrAtObj(self, [Mensuration, trecento.notation.Divisione])
@@ -489,6 +491,7 @@ class GeneralMensuralNote(base.Music21Object):
         If the general mensural note has more than one context, only the surrounding measure of the first context is returned.
         
         >>> from music21.alpha import medren
+        >>> from music21.alpha import trecento
         
         >>> s_1 = stream.Stream()
         >>> s_1.append(trecento.notation.Divisione('.p.'))
@@ -694,6 +697,7 @@ class MensuralNote(GeneralMensuralNote, note.Note):
         Only pitch is shown as a test. For other cases, please see the docs for :meth:``music21.medren.GeneralMensuralNote.__eq__``
         
         >>> from music21.alpha import medren
+        >>> from music21.alpha import trecento
         
         >>> m = medren.MensuralNote('A', 'minima')
         >>> n = medren.MensuralNote('B', 'minima')
@@ -1648,7 +1652,7 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None, printUpdates
     Traceback (most recent call last):
     MedRenException: Hierarchy of <class 'music21.stream.Part'> violated by <class 'music21.stream.Score'>
 
-    
+    >>> from music21.alpha import trecento
     >>> p = stream.Part()
     >>> m.append(medren.MensuralNote('G','B'))
     >>> p.append(trecento.notation.Divisione('.q.'))
@@ -1662,7 +1666,7 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None, printUpdates
     >>> s.append(m)
     >>> medren.breakMensuralStreamIntoBrevisLengths(s, printUpdates = True)
     Traceback (most recent call last):
-    MedRenException: Mensuration or divisione <music21.trecento.notation.Divisione .q.> not consistent within hierarchy
+    MedRenException: Mensuration or divisione <music21.alpha.trecento.notation.Divisione .q.> not consistent within hierarchy
     
     >>> s = stream.Stream()
     >>> s.append(trecento.notation.Divisione('.q.'))
@@ -1672,7 +1676,7 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None, printUpdates
     Getting measure 0...
     ...
     >>> t.show('text')
-    {0.0} <music21.trecento.notation.Divisione .q.>
+    {0.0} <music21.alpha.trecento.notation.Divisione .q.>
     {0.0} <music21.stream.Part...>
         {0.0} <music21.stream.Measure...>  
             {0.0} <music21.medren.MensuralNote semibrevis A>

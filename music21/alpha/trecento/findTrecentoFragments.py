@@ -9,7 +9,7 @@ from music21 import interval
 from music21 import note
 from music21 import stream
 
-from music21.trecento import cadencebook
+from music21.alpha.trecento import cadencebook
 
 class IntervalSearcher(object):
     def __init__(self, intervalList = []):

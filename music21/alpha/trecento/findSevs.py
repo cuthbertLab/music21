@@ -13,7 +13,7 @@
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 
-from music21.trecento import cadencebook
+from music21.alpha.trecento import cadencebook
 #this is a terrible way of doing this...
 from music21 import stream
 

@@ -24,7 +24,7 @@ too often.
 '''
 import unittest
 
-from music21.trecento import cadencebook
+from music21.alpha.trecento import cadencebook
 from collections import defaultdict
 
 class TonalityCounter(object):
@@ -53,9 +53,9 @@ class TonalityCounter(object):
     flat) repsectively.
     
     
-    >>> from music21.trecento import cadencebook
+    >>> from music21.alpha.trecento import cadencebook
     >>> threeBallata = cadencebook.BallataSheet()[15:18]
-    >>> tc1 = trecento.tonality.TonalityCounter(threeBallata)
+    >>> tc1 = alpha.trecento.tonality.TonalityCounter(threeBallata)
     >>> tc1.run() 
     >>> print(tc1.output)
                         Bench'amar    C    D

@@ -80,7 +80,6 @@ __all__ = [
     'search',
     'test',
     'timespans',
-    'trecento',
     'vexflow',
     # individual modules 
     # KEEP ALPHABETICAL unless necessary for load reasons, if so
