@@ -129,7 +129,7 @@ class NoClef(Clef):
     '''
     represents the absence of a Clef. 
     
-    >>> nc = clef.NoCLef()
+    >>> nc = clef.NoClef()
     >>> nc.sign
     'none'
     
@@ -466,9 +466,9 @@ def clefFromString(clefString, octaveShift = 0):
     >>> percussionClef
     <music21.clef.PercussionClef>
 
-    >>> percussionClef = clef.clefFromString('None')
-    >>> percussionClef
-    <music21.clef.PercussionClef>
+    >>> noClef = clef.clefFromString('None')
+    >>> noClef
+    <music21.clef.NoClef>
     '''
     xnStr = clefString.strip()
     if xnStr.lower() in ('tab', 'percussion', 'none', 'jianpu'):
@@ -495,7 +495,7 @@ def clefFromString(clefString, octaveShift = 0):
         raise ClefException("Entry has clef info but no clef specified")
 
     if octaveShift != 0:
-        params = (thisType, int(lineNum), octaveShift)
+        params = (thisType.upper(), int(lineNum), octaveShift)
         if params == ('G', 2, -1):
             return Treble8vbClef()
         elif params == ('G', 2, 1):
