@@ -996,7 +996,7 @@ def parse(value, *args, **keywords):
         isinstance(value[1], int) and os.path.exists(value[0])):
         # corpus or other file with movement number
         return parseFile(value[0], format=m21Format, **keywords).getScoreByNumber(value[1])
-    elif common.isListLike(value) or len(args) > 0: # tiny notation list
+    elif common.isListLike(value) or len(args) > 0: # tiny notation list # TODO: Remove.
         if len(args) > 0: # add additional args to a list
             value = [value] + list(args)
         return parseData(value, number=number, **keywords)
