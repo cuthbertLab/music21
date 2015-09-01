@@ -777,9 +777,25 @@ def clefToMxClef(clefObj):
     'percussion'
     >>> mxc3.get('line') is None
     True
+    
+    
+    Clefs without signs get exported as G clefs with a warning
+    
+    >>> generic = clef.Clef()
+    >>> mxc4 = musicxml.toMxObjects.clefToMxClef(generic)
+    Clef with no .sign exported; setting as a G clef
+    >>> mxc4.get('sign')
+    'G'
+    >>> mxc4.get('line') is None
+    True 
     '''
     mxClef = mxObjects.Clef()
-    mxClef.set('sign', clefObj.sign) # we use musicxml signs internally, so no problem...
+    sign = clefObj.sign
+    if sign is None:
+        print("Clef with no .sign exported; setting as a G clef")
+        sign = 'G'
+    
+    mxClef.set('sign', sign) # we use musicxml signs internally, so no problem...
     if clefObj.line is not None:
         mxClef.set('line', clefObj.line)
     if clefObj.octaveChange != 0:
