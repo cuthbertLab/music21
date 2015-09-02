@@ -10,7 +10,6 @@
 # Copyright:    Copyright © 2009-2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 '''
 The various Scale objects provide a bi-directional object representation 
 of octave repeating and non-octave repeating scales built by network of 
@@ -47,9 +46,12 @@ next pitch. In all cases :class:`~music21.pitch.Pitch` objects are returned.
 
 >>> [str(p) for p in sc2.getPitches('g2', 'g4', direction='ascending')]
 ['G#2', 'A2', 'B2', 'C3', 'D3', 'E3', 'F#3', 'G#3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F#4']
-
-
 '''
+
+__ALL__ = ['intervalNetwork', 'scala']
+from music21.scale import intervalNetwork
+from music21 import scala
+#--------------------------
 
 import copy
 import unittest
@@ -59,9 +61,9 @@ from music21 import common
 from music21 import exceptions21
 from music21 import pitch
 from music21 import interval
-from music21 import intervalNetwork
 from music21 import sieve
-from music21 import scala
+
+
 
 from music21 import environment
 _MOD = "scale.py"
@@ -288,7 +290,7 @@ class AbstractScale(Scale):
         >>> absc.octaveDuplicating
         True
         >>> absc._net
-        <music21.intervalNetwork.BoundIntervalNetwork object at 0x...>
+        <music21.scale.intervalNetwork.BoundIntervalNetwork object at 0x...>
         
         
         Now see it return a new "scale" of the augmentedTriad on D5
