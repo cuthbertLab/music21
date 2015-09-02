@@ -901,7 +901,7 @@ def mxClefToClef(mxClefList, inputM21 = None):
         mxClef = mxClefList[0]
 
     sign = mxClef.get('sign')
-    if sign in ['TAB', 'percussion', 'none']:
+    if sign.lower() in ('tab', 'percussion', 'none', 'jianpu'):
         clefObj = clef.clefFromString(sign)
     else:
         line = mxClef.get('line')
