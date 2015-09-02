@@ -32,6 +32,10 @@ from music21 import tie
 from music21 import note
 from music21 import metadata
 
+from music21 import environment
+environLocal = environment.Environment()
+
+
 #clercqTemperley test files used as tests throughout this module
 BlitzkriegBopCT = '''
 % Blitzkrieg Bop
@@ -604,7 +608,7 @@ class CTRule(object):
                 for i in range(1, numReps):
                     measures.append(copy.deepcopy(m))
             else:    
-                raise CTRuleException("Rule found without | or $ : '{0}','{1}': in {2}".format(
+                environLocal.warn("Rule found without | or $, ignoring: '{0}','{1}': in {2}".format(
                                                                         content, sep, self.text))
                 #pass
                 
