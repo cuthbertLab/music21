@@ -74,7 +74,6 @@ __all__ = [
     'noteworthy',
     'omr',
     'romanText', 
-    'scala', 
     'scale',
     'search',
     'test',

@@ -27,7 +27,7 @@ To create a :class:`~music21.scale.ScalaScale` instance, simply
 provide a root pitch and the name of the scale. Scale names are given as a the scala .scl file name. 
 
 
->>> mbiraScales = scala.search('mbira')
+>>> mbiraScales = scale.scala.search('mbira')
 >>> mbiraScales
 ['mbira_banda.scl', 'mbira_banda2.scl', 'mbira_gondo.scl', 'mbira_kunaka.scl', 'mbira_kunaka2.scl', 'mbira_mude.scl', 'mbira_mujuru.scl', 'mbira_zimb.scl']
 
@@ -48,7 +48,7 @@ import math, codecs
 from music21 import common
 from music21 import interval
 # scl is the library of scala files
-from music21.scala import scl
+from music21.scale.scala import scl
 
 from music21 import environment
 _MOD = "pitch.py"
@@ -64,8 +64,7 @@ SCALA_PATHS = None
 def getPaths():    
     '''Get all scala scale paths. This is called once or the module and cached as SCALA_PATHS, which should be used instead of calls to this function. 
 
-    >>> from music21 import scala
-    >>> a = scala.getPaths()
+    >>> a = scale.scala.getPaths()
     >>> len(a) >= 3800
     True
     '''
@@ -117,11 +116,11 @@ class ScalaPitch(object):
     '''Representation of a scala pitch notation
 
     
-    >>> sp = scala.ScalaPitch(' 1066.667 cents')
+    >>> sp = scale.scala.ScalaPitch(' 1066.667 cents')
     >>> print(sp.parse())
     1066.667
 
-    >>> sp = scala.ScalaPitch(' 2/1')
+    >>> sp = scale.scala.ScalaPitch(' 2/1')
     >>> sp.parse()
     1200.0
     >>> sp.parse('100.0 C#')
@@ -307,7 +306,7 @@ class ScalaFile(object):
     On reading, returns a :class:`~music21.scala.ScalaData` object.
 
     
-    >>> sf = scala.ScalaFile() 
+    >>> sf = scale.scala.ScalaFile() 
     '''
     
     def __init__(self, data=None): 
@@ -365,26 +364,25 @@ def parse(target):
     Get a :class:`~music21.scala.ScalaData` object from 
     the bundled SCL archive or a file path. 
 
-    >>> from music21 import scala
-    >>> ss = scala.parse('balafon6')
+    >>> ss = scale.scala.parse('balafon6')
     >>> ss.description
     u'Observed balafon tuning from Burma, Helmholtz/Ellis p. 518, nr.84'
     >>> [str(i) for i in ss.getIntervalSequence()]
     ['<music21.interval.Interval m2 (+14c)>', '<music21.interval.Interval M2 (+36c)>', '<music21.interval.Interval M2>', '<music21.interval.Interval m2 (+37c)>', '<music21.interval.Interval M2 (-49c)>', '<music21.interval.Interval M2 (-6c)>', '<music21.interval.Interval M2 (-36c)>']
 
 
-    >>> scala.parse('incorrectFileName.scl') == None
+    >>> scale.scala.parse('incorrectFileName.scl') == None
     True
 
 
-    >>> ss = scala.parse('barbourChrom1')
+    >>> ss = scale.scala.parse('barbourChrom1')
     >>> print(ss.description)
     Barbour's #1 Chromatic
     >>> ss.fileName
     'barbour_chrom1.scl'
 
 
-    >>> ss = scala.parse('blackj_gws.scl')
+    >>> ss = scale.scala.parse('blackj_gws.scl')
     >>> ss.description
     u'Detempered Blackjack in 1/4 kleismic marvel tuning'
     '''
@@ -434,7 +432,7 @@ def search(target):
     '''Search the scala archive for matches based on a string
 
     
-    >>> mbiraScales = scala.search('mbira')
+    >>> mbiraScales = scale.scala.search('mbira')
     >>> mbiraScales
     ['mbira_banda.scl', 'mbira_banda2.scl', 'mbira_gondo.scl', 'mbira_kunaka.scl', 'mbira_kunaka2.scl', 'mbira_mude.scl', 'mbira_mujuru.scl', 'mbira_zimb.scl']
     '''
