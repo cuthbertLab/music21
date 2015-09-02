@@ -554,6 +554,12 @@ class CTRule(object):
                 for i in range(numReps):
                     returnedMeasures = rule.expand(ts, ks)
                     self.insertKsTs(returnedMeasures[0], ts, ks)
+                    for m in returnedMeasures:
+                        tsEs = m.getElementsByClass('TimeSignature', returnStreamSubClass='list')
+                        for returnedTs in tsEs:
+                            if returnedTs is not ts:
+                                ts = copy.deepcopy(ts) # the TS changed mid-rule; create a new one for return.
+                    
                     measures.extend(returnedMeasures)
             elif sep == "|":
                 m = stream.Measure()
