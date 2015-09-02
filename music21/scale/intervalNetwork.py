@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         intervalNetwork.py
+# Name:         scale.intervalNetwork.py
 # Purpose:      A graph of intervals, for scales and harmonies. 
 #
 # Authors:      Christopher Ariza
@@ -10,7 +10,7 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
-A BoundIntervalNetwork defines a scale or harmonic unit as a (weighted) 
+An IntervalNetwork defines a scale or harmonic unit as a (weighted) 
 digraph, or directed graph, where pitches are nodes and intervals are 
 edges. Nodes, however, are not stored; instead, an ordered list of edges 
 (Intervals) is provided as an archetype of adjacent nodes. 
@@ -19,12 +19,12 @@ IntervalNetworks are unlike conventional graphs in that each graph must
 define a low and high terminus. These points are used to create a cyclic 
 graph and are treated as point of cyclical overlap. 
 
-BoundIntervalNetwork permits the definition of conventional octave repeating 
+IntervalNetwork permits the definition of conventional octave repeating 
 scales or harmonies (abstract chords), non-octave repeating scales and 
 chords, and ordered interval sequences that might move in multiple 
 directions. 
 
-A scale or harmony may be composed of one or more BoundIntervalNetwork objects. 
+A scale or harmony may be composed of one or more IntervalNetwork objects. 
 
 Both nodes and edges can be weighted to suggest tonics, dominants, 
 finals, or other attributes of the network. 
@@ -96,10 +96,9 @@ class Edge(object):
     suggest non-pitch ascending movements (even if the pathway direction is ascending). 
 
     Weight values, as well as other attributes, can be stored. 
-
     
     >>> i = interval.Interval('M3')
-    >>> e = intervalNetwork.Edge(i)
+    >>> e = scale.intervalNetwork.Edge(i)
     >>> e.interval is i
     True
     >>> e.direction
@@ -127,9 +126,9 @@ class Edge(object):
         >>> i1 = interval.Interval('M3')
         >>> i2 = interval.Interval('M3')
         >>> i3 = interval.Interval('m3')
-        >>> e1 = intervalNetwork.Edge(i1)
-        >>> e2 = intervalNetwork.Edge(i2)
-        >>> e3 = intervalNetwork.Edge(i3)
+        >>> e1 = scale.intervalNetwork.Edge(i1)
+        >>> e2 = scale.intervalNetwork.Edge(i2)
+        >>> e3 = scale.intervalNetwork.Edge(i3)
         >>> e1 == e2
         True
         >>> e1 == e3
@@ -143,7 +142,7 @@ class Edge(object):
 
 
     def __repr__(self):
-        return '<music21.intervalNetwork.Edge %s %s %s>' % (self._direction, 
+        return '<music21.scale.intervalNetwork.Edge %s %s %s>' % (self._direction, 
              self._interval.name, repr(self._connections).replace(' ', ''))
 
     def _getInterval(self):
@@ -154,9 +153,9 @@ class Edge(object):
         Return the stored Interval object
 
         >>> i = interval.Interval('M3')
-        >>> e1 = intervalNetwork.Edge(i, id=0)
-        >>> n1 = intervalNetwork.Node(id=0)
-        >>> n2 = intervalNetwork.Node(id=1)
+        >>> e1 = scale.intervalNetwork.Edge(i, id=0)
+        >>> n1 = scale.intervalNetwork.Node(id=0)
+        >>> n2 = scale.intervalNetwork.Node(id=1)
         >>> e1.addDirectedConnection(n1, n2, 'ascending')
         >>> e1.interval
         <music21.interval.Interval M3>
@@ -170,9 +169,9 @@ class Edge(object):
         Return the direction of the Edge.
 
         >>> i = interval.Interval('M3')
-        >>> e1 = intervalNetwork.Edge(i, id=0)
-        >>> n1 = intervalNetwork.Node(id=0)
-        >>> n2 = intervalNetwork.Node(id=1)
+        >>> e1 = scale.intervalNetwork.Edge(i, id=0)
+        >>> n1 = scale.intervalNetwork.Node(id=0)
+        >>> n2 = scale.intervalNetwork.Node(id=1)
         >>> e1.addDirectedConnection(n1, n2, 'ascending')
         >>> e1.direction
         'ascending'
@@ -188,15 +187,15 @@ class Edge(object):
         If None, this will not be set. 
 
         >>> i = interval.Interval('M3')
-        >>> e1 = intervalNetwork.Edge(i, id=0)
-        >>> n1 = intervalNetwork.Node(id=0)
-        >>> n2 = intervalNetwork.Node(id=1)
+        >>> e1 = scale.intervalNetwork.Edge(i, id=0)
+        >>> n1 = scale.intervalNetwork.Node(id=0)
+        >>> n2 = scale.intervalNetwork.Node(id=1)
 
         >>> e1.addDirectedConnection(n1, n2, 'ascending')
         >>> e1.connections
         [(0, 1)]
         >>> e1
-        <music21.intervalNetwork.Edge ascending M3 [(0,1)]>
+        <music21.scale.intervalNetwork.Edge ascending M3 [(0,1)]>
         '''
         # may be Node objects, or number, or string
         if common.isStr(node1) or common.isNum(node1):
@@ -223,15 +222,15 @@ class Edge(object):
         this Node, in the direction from the first to the second. 
 
         >>> i = interval.Interval('M3')
-        >>> e1 = intervalNetwork.Edge(i, id=0)
-        >>> n1 = intervalNetwork.Node(id='terminusLow')
-        >>> n2 = intervalNetwork.Node(id=1)
+        >>> e1 = scale.intervalNetwork.Edge(i, id=0)
+        >>> n1 = scale.intervalNetwork.Node(id='terminusLow')
+        >>> n2 = scale.intervalNetwork.Node(id=1)
 
         >>> e1.addBiDirectedConnections(n1, n2)
         >>> e1.connections
         [('terminusLow', 1), (1, 'terminusLow')]
         >>> e1
-        <music21.intervalNetwork.Edge bi M3 [('terminusLow',1),(1,'terminusLow')]>
+        <music21.scale.intervalNetwork.Edge bi M3 [('terminusLow',1),(1,'terminusLow')]>
         '''
         # must assume here that n1 to n2 is ascending; need to know
         self.addDirectedConnection(node1, node2, DIRECTION_ASCENDING)
@@ -250,9 +249,9 @@ class Edge(object):
 
         
         >>> i = interval.Interval('M3')
-        >>> e1 = intervalNetwork.Edge(i, id=0)
-        >>> n1 = intervalNetwork.Node(id='terminusLow')
-        >>> n2 = intervalNetwork.Node(id=1)
+        >>> e1 = scale.intervalNetwork.Edge(i, id=0)
+        >>> n1 = scale.intervalNetwork.Node(id='terminusLow')
+        >>> n2 = scale.intervalNetwork.Node(id=1)
 
         >>> e1.addBiDirectedConnections(n1, n2)
         >>> e1.connections
@@ -327,9 +326,9 @@ class Node(common.SlottedObject):
         ''' 
         Nodes are equal if everything in the object.__slots__ is equal.
         
-        >>> n1 = intervalNetwork.Node(id=3)
-        >>> n2 = intervalNetwork.Node(id=3)
-        >>> n3 = intervalNetwork.Node(id=2)
+        >>> n1 = scale.intervalNetwork.Node(id=3)
+        >>> n2 = scale.intervalNetwork.Node(id=3)
+        >>> n3 = scale.intervalNetwork.Node(id=2)
         >>> n1 == n2
         True
         >>> n1 == n3
@@ -344,7 +343,7 @@ class Node(common.SlottedObject):
         return not self.__eq__(other)
 
     def __repr__(self):
-        return '<music21.intervalNetwork.Node id=%s>' % (repr(self.id))
+        return '<music21.scale.intervalNetwork.Node id=%s>' % (repr(self.id))
 
 
 
@@ -372,18 +371,8 @@ class IntervalNetworkException(exceptions21.Music21Exception):
 
 
 #-------------------------------------------------------------------------------
+
 class IntervalNetwork(object):
-    '''
-    abstract class to subclass -- no need to use.
-    '''
-
-    def __init__(self):
-        pass
-
-
-
-
-class BoundIntervalNetwork(IntervalNetwork):
     '''
     A graph of undefined Pitch nodes connected by a defined, 
     ordered list of :class:`~music21.interval.Interval` objects as edges. 
@@ -408,8 +397,6 @@ class BoundIntervalNetwork(IntervalNetwork):
 
     def __init__(self, edgeList=None, octaveDuplicating=False, 
                  deterministic=True, pitchSimplification='maxAccidental'):
-        IntervalNetwork.__init__(self)
-
         # store each edge with and index that is incremented when added
         # these values have no fixed meaning but are only for reference
         self._edgeIdCount = 0
@@ -456,13 +443,13 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> edgeList1 = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> edgeList2 = ['M2', 'M2', 'm2', 'M2', 'A3', 'm2']
 
-        >>> net1 = intervalNetwork.BoundIntervalNetwork()
+        >>> net1 = scale.intervalNetwork.IntervalNetwork()
         >>> net1.fillBiDirectedEdges(edgeList1)
 
-        >>> net2 = intervalNetwork.BoundIntervalNetwork()
+        >>> net2 = scale.intervalNetwork.IntervalNetwork()
         >>> net2.fillBiDirectedEdges(edgeList1)
 
-        >>> net3 = intervalNetwork.BoundIntervalNetwork()
+        >>> net3 = scale.intervalNetwork.IntervalNetwork()
         >>> net3.fillBiDirectedEdges(edgeList2)
 
         >>> net1 == net2
@@ -486,7 +473,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         assumes that all edges are bidirected and all all edges are in order.
     
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         >>> [str(p) for p in net.realizePitch('g4')]
         ['G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F#5', 'G5']
@@ -646,7 +633,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> nodes = ({'id':'terminusLow', 'degree':1}, {'id':0, 'degree':2}, {'id':'terminusHigh', 'degree':3})
         >>> edges = ({'interval':'m2', 'connections':(['terminusLow', 0, 'bi'],)},{'interval':'M3', 'connections':([0, 'terminusHigh', 'bi'],)},)
 
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillArbitrary(nodes, edges)
         >>> net.realizePitch('c4', 1)
         [<music21.pitch.Pitch C4>, <music21.pitch.Pitch D-4>, <music21.pitch.Pitch F4>]
@@ -680,7 +667,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         '''
         A convenience routine for testing a complex, bi-directional scale.
         
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillMelodicMinor()
         >>> [str(p) for p in net.realizePitch('c4')]
         ['C4', 'D4', 'E-4', 'F4', 'G4', 'A4', 'B4', 'C5']
@@ -747,11 +734,11 @@ class BoundIntervalNetwork(IntervalNetwork):
         Perform weighted random selection on a parallel list of 
         edges and corresponding nodes.
         
-        >>> n1 = intervalNetwork.Node(id='a', weight=1000000)
-        >>> n2 = intervalNetwork.Node(id='b', weight=1)
-        >>> e1 = intervalNetwork.Edge(interval.Interval('m3'), id='a')
-        >>> e2 = intervalNetwork.Edge(interval.Interval('m3'), id='b')
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> n1 = scale.intervalNetwork.Node(id='a', weight=1000000)
+        >>> n2 = scale.intervalNetwork.Node(id='b', weight=1)
+        >>> e1 = scale.intervalNetwork.Edge(interval.Interval('m3'), id='a')
+        >>> e2 = scale.intervalNetwork.Edge(interval.Interval('m3'), id='b')
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> e, n = net.weightedSelection([e1, e2], [n1, n2])
         >>> e.id # note: this may fail as there is a slight chance to get 'b'
         'a'
@@ -782,7 +769,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         Return the lowest degree value.
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net.degreeMin    
         1
@@ -802,7 +789,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         Return the largest degree value.
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net.degreeMax    # returns eight, as this is the last node
         8
@@ -827,7 +814,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         that is not a terminus of the scale. 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net.degreeMaxUnique
         7
@@ -844,10 +831,10 @@ class BoundIntervalNetwork(IntervalNetwork):
         Return a list of first Nodes, or Nodes that contain "terminusLow". 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net.terminusLowNodes
-        [<music21.intervalNetwork.Node id='terminusLow'>]
+        [<music21.scale.intervalNetwork.Node id='terminusLow'>]
         ''')
 
     def _getTerminusHighNodes(self):
@@ -862,10 +849,10 @@ class BoundIntervalNetwork(IntervalNetwork):
         Return a list of last Nodes, or Nodes that contain "terminusHigh". 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net.terminusHighNodes
-        [<music21.intervalNetwork.Node id='terminusHigh'>]
+        [<music21.scale.intervalNetwork.Node id='terminusHigh'>]
         ''')
 
 
@@ -909,7 +896,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         Given a Node id, find all edges associated 
         with this node and report on their directions
         
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillMelodicMinor()
         >>> net._nodeIdToEdgeDirections('terminusLow')
         ['bi']
@@ -954,7 +941,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         Return the degree modulus degreeMax - degreeMin.
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net._degreeModulus(3)
         3
@@ -983,7 +970,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
     def _nodeNameToNodes(self, id, equateTermini=True, permitDegreeModuli=True): # id is okay: @ReservedAssignment
         '''
-        The `nodeName` parameter may be a :class:`~music21.intervalNetwork.Node` object, 
+        The `nodeName` parameter may be a :class:`~music21.scale.intervalNetwork.Node` object, 
         a node degree (as a number), a terminus string, or a None (indicating 'terminusLow'). 
 
         Return a list of Node objects that match this identifications. 
@@ -992,29 +979,29 @@ class BoundIntervalNetwork(IntervalNetwork):
         then the first terminal will return both the first and last.
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net._nodeNameToNodes(1)[0]
-        <music21.intervalNetwork.Node id='terminusLow'>
+        <music21.scale.intervalNetwork.Node id='terminusLow'>
         >>> net._nodeNameToNodes('high')
-        [<music21.intervalNetwork.Node id='terminusHigh'>]
+        [<music21.scale.intervalNetwork.Node id='terminusHigh'>]
         >>> net._nodeNameToNodes('low')
-        [<music21.intervalNetwork.Node id='terminusLow'>]
+        [<music21.scale.intervalNetwork.Node id='terminusLow'>]
 
         >>> # test using a nodeStep, or an integer nodeName
         >>> net._nodeNameToNodes(1)
-        [<music21.intervalNetwork.Node id='terminusLow'>, <music21.intervalNetwork.Node id='terminusHigh'>]
+        [<music21.scale.intervalNetwork.Node id='terminusLow'>, <music21.scale.intervalNetwork.Node id='terminusHigh'>]
         >>> net._nodeNameToNodes(1, equateTermini=False)
-        [<music21.intervalNetwork.Node id='terminusLow'>]
+        [<music21.scale.intervalNetwork.Node id='terminusLow'>]
         >>> net._nodeNameToNodes(2)
-        [<music21.intervalNetwork.Node id=0>]
+        [<music21.scale.intervalNetwork.Node id=0>]
         >>> # with degree moduli, degree zero is the top-most non-terminal (as terminals are redundant
         >>> net._nodeNameToNodes(0)
-        [<music21.intervalNetwork.Node id=5>]
+        [<music21.scale.intervalNetwork.Node id=5>]
         >>> net._nodeNameToNodes(-1)
-        [<music21.intervalNetwork.Node id=4>]
+        [<music21.scale.intervalNetwork.Node id=4>]
         >>> net._nodeNameToNodes(8)
-        [<music21.intervalNetwork.Node id='terminusLow'>, <music21.intervalNetwork.Node id='terminusHigh'>]
+        [<music21.scale.intervalNetwork.Node id='terminusLow'>, <music21.scale.intervalNetwork.Node id='terminusHigh'>]
         '''
         # if a number, this is interpreted as a node degree
         if common.isNum(id):
@@ -1055,10 +1042,10 @@ class BoundIntervalNetwork(IntervalNetwork):
         at the Edges and determine which to use
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net._nodeNameToNodes(1)[0]
-        <music21.intervalNetwork.Node id='terminusLow'>
+        <music21.scale.intervalNetwork.Node id='terminusLow'>
         '''
 
         postEdge = []
@@ -1157,7 +1144,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         '''
         Given a pitchReference, nodeName, and a pitch origin, return the next pitch. 
 
-        The `nodeName` parameter may be a :class:`~music21.intervalNetwork.Node` object, 
+        The `nodeName` parameter may be a :class:`~music21.scale.intervalNetwork.Node` object, 
         a node degree, a terminus string, or a None (indicating 'terminusLow'). 
 
         The `stepSize` parameter can be configured to permit different sized steps 
@@ -1165,7 +1152,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net.nextPitch('g', 1, 'f#5', 'ascending')
         <music21.pitch.Pitch G5>
@@ -1296,7 +1283,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
 
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         >>> (pitches, nodeKeys) = net._realizeAscending('c2', 1, 'c5', 'c6')
         >>> [str(p) for p in pitches]
@@ -1304,7 +1291,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> nodeKeys
         ['terminusHigh', 0, 1, 2, 3, 4, 5, 'terminusHigh']
 
-        >>> net = intervalNetwork.BoundIntervalNetwork(octaveDuplicating=True)
+        >>> net = scale.intervalNetwork.IntervalNetwork(octaveDuplicating=True)
         >>> net.fillBiDirectedEdges(edgeList)
         >>> (pitches, nodeKeys) = net._realizeAscending('c2', 1, 'c5', 'c6')
         >>> [str(p) for p in pitches]
@@ -1457,7 +1444,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net._realizeDescending('c2', 1, 'c3') # minimum is above ref
         ([], [])
@@ -1484,7 +1471,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         >>> nodeKeys        
         ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh']
 
-        >>> net = intervalNetwork.BoundIntervalNetwork(octaveDuplicating=True)
+        >>> net = scale.intervalNetwork.IntervalNetwork(octaveDuplicating=True)
         >>> net.fillBiDirectedEdges(edgeList)
         >>> (pitches, nodeKeys) = net._realizeDescending('c2', 1, 'c0', 'c1')
         >>> [str(p) for p in pitches]
@@ -1642,7 +1629,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         >>> (pitches, nodeKeys) = net.realize('c2', 1, 'c2', 'c3')
         >>> [str(p) for p in pitches]
@@ -1820,7 +1807,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         >>> [str(p) for p in net.realizePitch(pitch.Pitch('G3'))]
         ['G3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F#4', 'G4']
@@ -1846,7 +1833,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         
 
         >>> edgeList = ['P5', 'P5', 'P5', 'P5', 'P5', 'P5', 'd6', 'P5', 'P5', 'P5', 'P5', 'P5']
-        >>> net5ths = intervalNetwork.BoundIntervalNetwork()
+        >>> net5ths = scale.intervalNetwork.IntervalNetwork()
         >>> net5ths.fillBiDirectedEdges(edgeList)
         >>> [str(p) for p in net5ths.realizePitch(pitch.Pitch('C1'))]
         ['C1', 'G1', 'D2', 'A2', 'E3', 'B3', 'F#4', 'D-5', 'A-5', 'E-6', 'B-6', 'F7', 'C8']
@@ -1876,7 +1863,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net.realizeIntervals()
         [<music21.interval.Interval M2>, <music21.interval.Interval M2>, <music21.interval.Interval m2>, <music21.interval.Interval M2>, <music21.interval.Interval M2>, <music21.interval.Interval M2>, <music21.interval.Interval m2>]
@@ -1910,7 +1897,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net.realizeTermini(pitch.Pitch('G3'))
         (<music21.pitch.Pitch G3>, <music21.pitch.Pitch G4>)
@@ -1945,7 +1932,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         '''
         if alteredDegrees is None:
@@ -2049,7 +2036,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
 
         Now for every "scale" where G is the 3rd degree, give me the 
@@ -2106,7 +2093,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         Create a networx graph from the raw Node representation.
         
         Return a networks Graph object representing a realized version 
-        of this BoundIntervalNetwork if networkx is installed
+        of this IntervalNetwork if networkx is installed
 
         '''
         #g = networkx.DiGraph()
@@ -2177,7 +2164,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         relative node id of pitchTarget, even if displaced over multiple octaves
 
         The `nodeName` parameter may be 
-        a :class:`~music21.intervalNetwork.Node` object, a node degree, 
+        a :class:`~music21.scale.intervalNetwork.Node` object, a node degree, 
         a terminus string, or a None (indicating 'terminusLow'). 
 
         Returns None if no match.
@@ -2189,7 +2176,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork(edgeList)
+        >>> net = scale.intervalNetwork.IntervalNetwork(edgeList)
         >>> net.getRelativeNodeId('a', 1, 'a4')
         'terminusLow'
         >>> net.getRelativeNodeId('a', 1, 'b4')
@@ -2267,7 +2254,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork(edgeList)
+        >>> net = scale.intervalNetwork.IntervalNetwork(edgeList)
         >>> net.getNeighborNodeIds('c4', 1, 'b-')
         (4, 5)
         >>> net.getNeighborNodeIds('c4', 1, 'b')
@@ -2328,7 +2315,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork(edgeList)
+        >>> net = scale.intervalNetwork.IntervalNetwork(edgeList)
         >>> [str(p) for p in net.realizePitch(pitch.Pitch('e-2')) ]
         ['E-2', 'F2', 'G2', 'A-2', 'B-2', 'C3', 'D3', 'E-3']
 
@@ -2370,7 +2357,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
 
         >>> edgeList = ['p4', 'p4', 'p4'] # a non octave-repeating scale
-        >>> net = intervalNetwork.BoundIntervalNetwork(edgeList)
+        >>> net = scale.intervalNetwork.IntervalNetwork(edgeList)
         >>> [str(p) for p in net.realizePitch('f2')]
         ['F2', 'B-2', 'E-3', 'A-3']
         >>> [str(p) for p in net.realizePitch('f2', 1, 'f2', 'f6')]
@@ -2420,7 +2407,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork(edgeList)
+        >>> net = scale.intervalNetwork.IntervalNetwork(edgeList)
         >>> [str(p) for p in net.realizePitch(pitch.Pitch('e-2')) ]
         ['E-2', 'F2', 'G2', 'A-2', 'B-2', 'C3', 'D3', 'E-3']
         >>> net.getPitchFromNodeDegree('e4', 1, 1)
@@ -2524,7 +2511,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         '''Given a list or one pitch, check if all are pitch objects; convert if necessary.
 
         
-        >>> net = intervalNetwork.BoundIntervalNetwork()
+        >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net._filterPitchList('c#')
         ([<music21.pitch.Pitch C#>], <music21.pitch.Pitch C#>, <music21.pitch.Pitch C#>)
 
@@ -2560,7 +2547,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork(edgeList)
+        >>> net = scale.intervalNetwork.IntervalNetwork(edgeList)
         >>> [str(p) for p in net.realizePitch('e-2')]
         ['E-2', 'F2', 'G2', 'A-2', 'B-2', 'C3', 'D3', 'E-3']
 
@@ -2632,7 +2619,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork(edgeList)
+        >>> net = scale.intervalNetwork.IntervalNetwork(edgeList)
         >>> [str(p) for p in net.realizePitch('G3')]
         ['G3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F#4', 'G4']
         >>> net.findMissing('g', 1, ['g', 'a', 'b', 'd', 'f#'])
@@ -2676,7 +2663,7 @@ class BoundIntervalNetwork(IntervalNetwork):
 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = intervalNetwork.BoundIntervalNetwork(edgeList)
+        >>> net = scale.intervalNetwork.IntervalNetwork(edgeList)
         >>> # a network built on G or D as 
         >>> net.find(['g', 'a', 'b', 'd', 'f#'])
         [(5, <music21.pitch.Pitch G>), (5, <music21.pitch.Pitch D>), (4, <music21.pitch.Pitch A>), (4, <music21.pitch.Pitch C>)]
@@ -2729,7 +2716,7 @@ class BoundIntervalNetwork(IntervalNetwork):
         uses the simplification of the `pitchSimplification` property
         to simplify it afterwards.
         
-        >>> b = intervalNetwork.BoundIntervalNetwork()
+        >>> b = scale.intervalNetwork.IntervalNetwork()
         >>> b.pitchSimplification # default
         'maxAccidental' 
         >>> i = interval.Interval('m2')
@@ -2752,10 +2739,10 @@ class BoundIntervalNetwork(IntervalNetwork):
         ['C#4', 'D4', 'E-4', 'E4', 'F4', 'F#4', 'G4', 'A-4', 'A4', 'B-4', 'B4', 'C5', 'C#5', 'D5', 'E-5']
 
 
-        PitchSimplifcation can also be specified in the creation of the BoundIntervalNetwork object
+        PitchSimplifcation can also be specified in the creation of the IntervalNetwork object
 
 
-        >>> b = intervalNetwork.BoundIntervalNetwork(pitchSimplification = None)
+        >>> b = scale.intervalNetwork.IntervalNetwork(pitchSimplification = None)
         >>> p = pitch.Pitch("C4")
         >>> allPitches = []
         >>> for j in range(5):
@@ -2789,6 +2776,11 @@ class BoundIntervalNetwork(IntervalNetwork):
                 raise IntervalNetworkException('unknown pitchSimplification type %s, allowable values are "maxAccidental" (default), "simplifyEnharmonic", "mostCommon", or None (or "none")' % self.simplifyEnharmonic)
         return pPost
 
+class BoundIntervalNetwork(IntervalNetwork):
+    '''
+    This class is kept only because of the ICMC Paper.  Just use IntervalNetwork instead.
+    '''
+    pass
 
 
 
@@ -2822,7 +2814,7 @@ class Test(unittest.TestCase):
 
         # define ordered list of intervals
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        net = BoundIntervalNetwork(edgeList)
+        net = IntervalNetwork(edgeList)
         
         # get this scale for any pitch at any degree over any range
         # need a major scale with c# as the third degree
@@ -2847,7 +2839,7 @@ class Test(unittest.TestCase):
         
         # we can create non-octave repeating scales too
         edgeList = ['P5', 'P5', 'P5']
-        net = BoundIntervalNetwork(edgeList)
+        net = IntervalNetwork(edgeList)
         match = net.realizePitch('c4', 1)        
         self.assertEqual(self.pitchOut(match), '[C4, G4, D5, A5]')
         match = net.realizePitch('c4', 1, 'c4', 'c11')        
@@ -2859,7 +2851,7 @@ class Test(unittest.TestCase):
         
         # we can also search for realized and possible matches in a network
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        net = BoundIntervalNetwork(edgeList)
+        net = IntervalNetwork(edgeList)
         
         # if we know a realized version, we can test if pitches match in that version; returns matched, not found, and no match lists
         # f i s found in a scale where e- is the tonic
@@ -2892,7 +2884,7 @@ class Test(unittest.TestCase):
         # this could be managed in specialized subclass
         
         edgeList = ['M3', 'm3', 'P4']
-        net = BoundIntervalNetwork(edgeList)
+        net = IntervalNetwork(edgeList)
         
         # if g# is the root, or first node
         match = net.realizePitch('g#', 1)        
@@ -2925,7 +2917,7 @@ class Test(unittest.TestCase):
         # we can do the same with larger or more complicated chords
         # again, we must provide the interval to the octave
         edgeList = ['M3', 'm3', 'M3', 'm3', 'm7']
-        net = BoundIntervalNetwork(edgeList)
+        net = IntervalNetwork(edgeList)
         match = net.realizePitch('c4', 1)        
         self.assertEqual(self.pitchOut(match), '[C4, E4, G4, B4, D5, C6]')
         
@@ -2943,11 +2935,11 @@ class Test(unittest.TestCase):
 
         # start with a major scale
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        netScale = BoundIntervalNetwork(edgeList)
+        netScale = IntervalNetwork(edgeList)
         
         # take a half diminished seventh chord
         edgeList = ['m3', 'm3', 'M3', 'M2']
-        netHarmony = BoundIntervalNetwork(edgeList)
+        netHarmony = IntervalNetwork(edgeList)
         match = netHarmony.realizePitch('b4', 1)        
         self.assertEqual(self.pitchOut(match), '[B4, D5, F5, A5, B5]')
         
@@ -2964,26 +2956,26 @@ class Test(unittest.TestCase):
     def testGraphedOutput(self):
         # note this relies on networkx
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        unused_netScale = BoundIntervalNetwork(edgeList)
+        unused_netScale = IntervalNetwork(edgeList)
         #netScale.plot(pitchObj='F#', nodeId=3, minPitch='c2', maxPitch='c5')
 
 
     def testBasicA(self):
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        net = BoundIntervalNetwork()
+        net = IntervalNetwork()
         net.fillBiDirectedEdges(edgeList)
 
         self.assertEqual(sorted(list(net._edges.keys())), [0, 1, 2, 3, 4, 5, 6])
         self.assertEqual(sorted([str(x) for x in net._nodes.keys()]), ['0', '1', '2', '3', '4', '5', 'terminusHigh', 'terminusLow'])
 
-        self.assertEqual(repr(net._nodes[0]), "<music21.intervalNetwork.Node id=0>")
-        self.assertEqual(repr(net._nodes['terminusLow']), "<music21.intervalNetwork.Node id='terminusLow'>")
+        self.assertEqual(repr(net._nodes[0]), "<music21.scale.intervalNetwork.Node id=0>")
+        self.assertEqual(repr(net._nodes['terminusLow']), "<music21.scale.intervalNetwork.Node id='terminusLow'>")
 
-        self.assertEqual(repr(net._edges[0]), "<music21.intervalNetwork.Edge bi M2 [('terminusLow',0),(0,'terminusLow')]>")
+        self.assertEqual(repr(net._edges[0]), "<music21.scale.intervalNetwork.Edge bi M2 [('terminusLow',0),(0,'terminusLow')]>")
 
-        self.assertEqual(repr(net._edges[3]), "<music21.intervalNetwork.Edge bi M2 [(2,3),(3,2)]>")
+        self.assertEqual(repr(net._edges[3]), "<music21.scale.intervalNetwork.Edge bi M2 [(2,3),(3,2)]>")
 
-        self.assertEqual(repr(net._edges[6]), "<music21.intervalNetwork.Edge bi m2 [(5,'terminusHigh'),('terminusHigh',5)]>")
+        self.assertEqual(repr(net._edges[6]), "<music21.scale.intervalNetwork.Edge bi m2 [(5,'terminusHigh'),('terminusHigh',5)]>")
 
 
         # getting connections: can filter by direction
@@ -3031,20 +3023,20 @@ class Test(unittest.TestCase):
         # these are given in ascending order
         descendingEdgeList = ['M2', 'm2', 'M2', 'M2', 'm2', 'M2', 'M2']
 
-        net = BoundIntervalNetwork()
+        net = IntervalNetwork()
         net.fillDirectedEdges(ascendingEdgeList, descendingEdgeList)
 
-        self.assertEqual(repr(net._edges), "OrderedDict([(0, <music21.intervalNetwork.Edge ascending M2 [(\'terminusLow\',0)]>), (1, <music21.intervalNetwork.Edge ascending m2 [(0,1)]>), (2, <music21.intervalNetwork.Edge ascending M2 [(1,2)]>), (3, <music21.intervalNetwork.Edge ascending M2 [(2,3)]>), (4, <music21.intervalNetwork.Edge ascending M2 [(3,4)]>), (5, <music21.intervalNetwork.Edge ascending M2 [(4,5)]>), (6, <music21.intervalNetwork.Edge ascending m2 [(5,'terminusHigh')]>), (7, <music21.intervalNetwork.Edge descending M2 [(6,'terminusLow')]>), (8, <music21.intervalNetwork.Edge descending m2 [(7,6)]>), (9, <music21.intervalNetwork.Edge descending M2 [(8,7)]>), (10, <music21.intervalNetwork.Edge descending M2 [(9,8)]>), (11, <music21.intervalNetwork.Edge descending m2 [(10,9)]>), (12, <music21.intervalNetwork.Edge descending M2 [(11,10)]>), (13, <music21.intervalNetwork.Edge descending M2 [('terminusHigh',11)]>)])")
+        self.assertEqual(repr(net._edges), "OrderedDict([(0, <music21.scale.intervalNetwork.Edge ascending M2 [(\'terminusLow\',0)]>), (1, <music21.scale.intervalNetwork.Edge ascending m2 [(0,1)]>), (2, <music21.scale.intervalNetwork.Edge ascending M2 [(1,2)]>), (3, <music21.scale.intervalNetwork.Edge ascending M2 [(2,3)]>), (4, <music21.scale.intervalNetwork.Edge ascending M2 [(3,4)]>), (5, <music21.scale.intervalNetwork.Edge ascending M2 [(4,5)]>), (6, <music21.scale.intervalNetwork.Edge ascending m2 [(5,'terminusHigh')]>), (7, <music21.scale.intervalNetwork.Edge descending M2 [(6,'terminusLow')]>), (8, <music21.scale.intervalNetwork.Edge descending m2 [(7,6)]>), (9, <music21.scale.intervalNetwork.Edge descending M2 [(8,7)]>), (10, <music21.scale.intervalNetwork.Edge descending M2 [(9,8)]>), (11, <music21.scale.intervalNetwork.Edge descending m2 [(10,9)]>), (12, <music21.scale.intervalNetwork.Edge descending M2 [(11,10)]>), (13, <music21.scale.intervalNetwork.Edge descending M2 [('terminusHigh',11)]>)])")
                          
         # returns a list of edges and notes
-        self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_LOW], 'ascending')), "([<music21.intervalNetwork.Edge ascending M2 [('terminusLow',0)]>], [<music21.intervalNetwork.Node id=0>])")
+        self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_LOW], 'ascending')), "([<music21.scale.intervalNetwork.Edge ascending M2 [('terminusLow',0)]>], [<music21.scale.intervalNetwork.Node id=0>])")
 
-        self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_LOW], 'descending')), "([<music21.intervalNetwork.Edge descending M2 [('terminusHigh',11)]>], [<music21.intervalNetwork.Node id=11>])")
+        self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_LOW], 'descending')), "([<music21.scale.intervalNetwork.Edge descending M2 [('terminusHigh',11)]>], [<music21.scale.intervalNetwork.Node id=11>])")
 
         # high terminus gets the same result, as this is the wrapping point
-        self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_HIGH], 'ascending')), "([<music21.intervalNetwork.Edge ascending M2 [('terminusLow',0)]>], [<music21.intervalNetwork.Node id=0>])")
+        self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_HIGH], 'ascending')), "([<music21.scale.intervalNetwork.Edge ascending M2 [('terminusLow',0)]>], [<music21.scale.intervalNetwork.Node id=0>])")
 
-        self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_LOW], 'descending')), "([<music21.intervalNetwork.Edge descending M2 [('terminusHigh',11)]>], [<music21.intervalNetwork.Node id=11>])")
+        self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_LOW], 'descending')), "([<music21.scale.intervalNetwork.Edge descending M2 [('terminusHigh',11)]>], [<music21.scale.intervalNetwork.Node id=11>])")
 
 
         # this is ascending from a4 to a5, then descending from a4 to a3
@@ -3064,9 +3056,9 @@ class Test(unittest.TestCase):
         # two results, as one is the ascending and one is the descending
         # form
         self.assertEqual(str(net._nodeNameToNodes(3)), 
-        "[<music21.intervalNetwork.Node id=1>, <music21.intervalNetwork.Node id=7>]")
+        "[<music21.scale.intervalNetwork.Node id=1>, <music21.scale.intervalNetwork.Node id=7>]")
         self.assertEqual(str(net._nodeNameToNodes(7)), 
-        "[<music21.intervalNetwork.Node id=5>, <music21.intervalNetwork.Node id=11>]")
+        "[<music21.scale.intervalNetwork.Node id=5>, <music21.scale.intervalNetwork.Node id=11>]")
         #net.plot()
 
 
@@ -3092,9 +3084,9 @@ class Test(unittest.TestCase):
                     )},
                 )
 
-        net = BoundIntervalNetwork()
+        net = IntervalNetwork()
         net.fillArbitrary(nodes, edges)
-        self.assertEqual(str(net._edges), '''OrderedDict([(0, <music21.intervalNetwork.Edge bi m2 [('terminusLow',0),(0,'terminusLow')]>), (1, <music21.intervalNetwork.Edge bi M3 [(0,'terminusHigh'),('terminusHigh',0)]>)])''')
+        self.assertEqual(str(net._edges), '''OrderedDict([(0, <music21.scale.intervalNetwork.Edge bi m2 [('terminusLow',0),(0,'terminusLow')]>), (1, <music21.scale.intervalNetwork.Edge bi M3 [(0,'terminusHigh'),('terminusHigh',0)]>)])''')
         
         self.assertEqual(net.degreeMax, 3)
         self.assertEqual(net.degreeMaxUnique, 2)
@@ -3105,7 +3097,7 @@ class Test(unittest.TestCase):
 
     def testRealizeDescending(self):
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        net = BoundIntervalNetwork()
+        net = IntervalNetwork()
         net.fillBiDirectedEdges(edgeList)
 
         pitches, nodes = net._realizeDescending('c3', 1, 'c2')
@@ -3142,7 +3134,7 @@ class Test(unittest.TestCase):
 
     def testBasicB(self):
         
-        net = BoundIntervalNetwork()
+        net = IntervalNetwork()
         net.fillMelodicMinor()
 
         self.assertEqual(self.realizePitchOut(net.realize('g4')), 
@@ -3181,7 +3173,7 @@ class Test(unittest.TestCase):
 
     def testGetPitchFromNodeStep(self):
 
-        net = BoundIntervalNetwork()
+        net = IntervalNetwork()
         net.fillMelodicMinor()
         self.assertEqual(str(net.getPitchFromNodeDegree('c4', 1, 1)), 'C4')
         self.assertEqual(str(net.getPitchFromNodeDegree('c4', 1, 5)), 'G4')
@@ -3200,7 +3192,7 @@ class Test(unittest.TestCase):
     def testNextPitch(self):
 
 
-        net = BoundIntervalNetwork()
+        net = IntervalNetwork()
         net.fillMelodicMinor()
         
         # ascending from known pitches
@@ -3272,11 +3264,11 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [BoundIntervalNetwork]
+_DOC_ORDER = [IntervalNetwork, Node, Edge]
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test, 'noDocTest')
+    music21.mainTest(Test)
 
 
 #------------------------------------------------------------------------------
