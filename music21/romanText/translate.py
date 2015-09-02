@@ -308,6 +308,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     p = stream.Part()
     # ts indication are found in header, and also found elsewhere
     tsCurrent = meter.TimeSignature('4/4') # create default 4/4
+    tsAtTimeOfLastChord = tsCurrent
     tsSet = False # store if set to a measure
     lastMeasureToken = None
     lastMeasureNumber = 0
@@ -381,7 +382,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                         newRn = copy.deepcopy(previousRn)
                         newRn.lyric = ""
                         # set to entire bar duration and tie 
-                        newRn.duration = copy.deepcopy(tsCurrent.barDuration)
+                        newRn.duration = copy.deepcopy(tsAtTimeOfLastChord.barDuration)
                         if previousRn.tie is None:
                             previousRn.tie = tie.Tie('start')
                         else:
@@ -503,6 +504,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
 
                         elif isinstance(a, rtObjects.RTNoChord):
                             # use source to evaluation roman 
+                            tsAtTimeOfLastChord = tsCurrent
                             rn = note.Rest()
                             if pivotChordPossible == False:
                                 # probably best to find duration
@@ -522,6 +524,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
 
                         elif isinstance(a, rtObjects.RTChord):
                             # use source to evaluation roman 
+                            tsAtTimeOfLastChord = tsCurrent
                             try:
                                 asrc = a.src
     #                            if kCurrent.mode == 'minor':
@@ -1157,6 +1160,39 @@ m3 NC b3 G: V
         self.assertIsNone(notPChord.pivotChord)
         #s.show('text')
         
+    def testTimeSigChanges(self):
+        from music21 import converter
+        src = """Time Signature: 4/4
+        m1 C: I
+        Time Signature: 2/4
+        m10 V
+        Time Signature: 4/4
+        m12 I
+        m14-25 = m1-12
+        """
+        s = converter.parse(src, format='romantext')
+        p = s.parts[0]
+        m3 = p.getElementsByClass('Measure')[2]
+        self.assertEqual(m3.getOffsetBySite(p), 8.0)
+        m10 = p.getElementsByClass('Measure')[9]
+        self.assertEqual(m10.getOffsetBySite(p), 36.0)
+        m11 = p.getElementsByClass('Measure')[10]
+        self.assertEqual(m11.getOffsetBySite(p), 38.0)
+        m12 = p.getElementsByClass('Measure')[11]
+        self.assertEqual(m12.getOffsetBySite(p), 40.0)
+        m13 = p.getElementsByClass('Measure')[12]
+        self.assertEqual(m13.getOffsetBySite(p), 44.0)
+        
+        m16 = p.getElementsByClass('Measure')[15]
+        self.assertEqual(m16.getOffsetBySite(p), 56.0)
+        m23 = p.getElementsByClass('Measure')[22]
+        self.assertEqual(m23.getOffsetBySite(p), 84.0)
+        m24 = p.getElementsByClass('Measure')[23]
+        self.assertEqual(m24.getOffsetBySite(p), 86.0)
+        m25 = p.getElementsByClass('Measure')[24]
+        self.assertEqual(m25.getOffsetBySite(p), 88.0)
+
+        
     def testEndings(self):
         # has first and second endings...
         
@@ -1181,7 +1217,7 @@ if __name__ == "__main__":
     #t = time.time()
     #import sys
     #sys.argv.append('PivotInCopyMultiple2')
-    
+    # music21.mainTest(Test, runTest='testTimeSigChanges')
     music21.mainTest(Test, TestSlow)
     #print(time.time() - t)
 

@@ -670,6 +670,7 @@ class Converter(object):
         <class 'music21.converter.subConverters.ConverterABC'>
         <class 'music21.converter.subConverters.ConverterBraille'>
         <class 'music21.converter.subConverters.ConverterCapella'>
+        <class 'music21.converter.subConverters.ConverterClercqTemperley'>
         <class 'music21.converter.subConverters.ConverterHumdrum'>
         <class 'music21.converter.subConverters.ConverterIPython'>
         <class 'music21.converter.subConverters.ConverterLilypond'>
@@ -706,6 +707,8 @@ class Converter(object):
         ('abc', <class 'music21.converter.subConverters.ConverterABC'>)
         ('braille', <class 'music21.converter.subConverters.ConverterBraille'>)
         ('capella', <class 'music21.converter.subConverters.ConverterCapella'>)
+        ('cttxt', <class 'music21.converter.subConverters.ConverterClercqTemperley'>)
+        ('har', <class 'music21.converter.subConverters.ConverterClercqTemperley'>)
         ('humdrum', <class 'music21.converter.subConverters.ConverterHumdrum'>)
         ('ipython', <class 'music21.converter.subConverters.ConverterIPython'>)
         ('lily', <class 'music21.converter.subConverters.ConverterLilypond'>)
@@ -996,7 +999,7 @@ def parse(value, *args, **keywords):
         isinstance(value[1], int) and os.path.exists(value[0])):
         # corpus or other file with movement number
         return parseFile(value[0], format=m21Format, **keywords).getScoreByNumber(value[1])
-    elif common.isListLike(value) or len(args) > 0: # tiny notation list
+    elif common.isListLike(value) or len(args) > 0: # tiny notation list # TODO: Remove.
         if len(args) > 0: # add additional args to a list
             value = [value] + list(args)
         return parseData(value, number=number, **keywords)

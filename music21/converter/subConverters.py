@@ -852,6 +852,22 @@ class ConverterRomanText(SubConverter):
         romanTextTranslate.romanTextToStreamScore(rtHandler, self.stream)
 
 
+class ConverterClercqTemperley(SubConverter):
+    '''Simple class wrapper for parsing roman text harmonic definitions.
+    '''
+    registerFormats = ('cttxt', 'har')
+    registerInputExtensions = ('cttxt', 'har')
+    
+
+    def parseData(self, strData, number=None):
+        from music21.romanText import clercqTemperley
+        ctSong = clercqTemperley.CTSong(strData)
+        self.stream = ctSong.toScore()
+        
+    def parseFile(self, fp, number=None):
+        self.parseData(fp)
+
+
 class ConverterCapella(SubConverter):
     '''
     Simple class wrapper for parsing Capella .capx XML files.  See capella/fromCapellaXML.
