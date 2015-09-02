@@ -213,6 +213,7 @@ class CTSong(object):
     >>> score = s.toScore()
     >>> score.highestTime
     376.0 
+    >>> score.show()
 
     >>> s.title
     'Rock Around the Clock'
@@ -369,7 +370,8 @@ class CTSong(object):
             return self._rules
 
         for line in self.lines:
-            if line.split()[0].endswith(':'):
+            ls = line.split()
+            if len(ls) > 0 and ls[0].endswith(':'):
                 rule = CTRule(line, parent=self)
                 self._rules[rule.LHS] = rule
 
@@ -455,170 +457,6 @@ class CTSong(object):
         <music21.key.Key of A major>
         ''')
     
-    #---------------------------------------------------------------------------------
-    #HELPER METHODS FOR .toScore method
-    
-    def _stringHasDotsAndBars(self, expressionString):
-        '''
-        returns True if expressionString contains both more than one bar (|), dot (.), and brackets
-        ([) which signifies either a change in time or key signature. 
-        
-        Method is necessary because if both bars and dots are present, parser must be careful
-        about time signatures nested within, and also tied chords (implied by the dot)
-        vs. repeated by untied chords (implied by the bar)
-        
-        >>> change = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.changeIsGonnaCome)
-        >>> change._stringHasDotsAndBars('3 . [3/4] | 4 . [2/4] |')
-        True
-        >>> change._stringHasDotsAndBars('3 [3/4]')
-        False
-        '''
-        
-        split = expressionString.split()
-        if split.count('|') > 1 and split.count('.') > 1 and expressionString.count('[') > 1:
-            return True
-        else:
-            return False
-
-    def _getStringWithBarsandDots(self, containsIndex, entireSplitString):
-        '''
-        given an index which corresponds to a charcter in the entireSplitString, method
-        returns the surrounding bars and dots (if they exist) that correspond to
-        that character.
-        '''
-        if entireSplitString[containsIndex - 1].startswith('['):
-            expressionString = entireSplitString[containsIndex - 1] + ' '
-            if entireSplitString[containsIndex - 2].startswith('['):
-                expressionString = expressionString + entireSplitString[containsIndex - 2] + ' '
-        else:
-            expressionString = ''
-        expressionString = expressionString + entireSplitString[containsIndex] + ' '
-        searchlocation = containsIndex + 1
-        nextChar = entireSplitString[searchlocation]
-        while (nextChar == '|' or nextChar == '.' or (nextChar.startswith('[') and '/' in nextChar)) and len(entireSplitString) > searchlocation + 1:
-            expressionString = expressionString + nextChar + ' '
-            searchlocation = searchlocation + 1
-            nextChar = entireSplitString[searchlocation]
-        #print expressionString
-        s = expressionString.split()
-        if s.count('|') > 1 or s.count('.') > 0:
-            if '/' in s[-1]:
-                s.pop()      
-            return ' '.join(s)
-        else:
-            return ""
-
-    def _barIsDouble(self, indexofbar, expressionString):
-        '''
-        returns true if the expressionString contains double bars (a repeated roman numeral)
-        '''
-        expressionString = expressionString.split()
-        count = 0
-        index = indexofbar
-        atom = expressionString[index]
-        while (atom == '|' or atom.startswith('[')) and len(expressionString) > index:
-            if atom == '|':
-                count = count + 1
-            index = index + 1
-            try:
-                atom = expressionString[index]
-            except IndexError:
-                pass
-        if count > 1:
-            return True
-        else:
-            return False
-
-    def _getStreamWithBarsandDots(self, indexOfAtom, expressionString, splitFile, atom, currentKey, timeSig):
-        '''
-        a very ugly method, and all the methods it calls are also very ugly. A messy solution to 
-        dealing with roman numerals with bars and dots after it, but this method is necessary to deal
-        with possible changes in key or time signature found embedded within the string.
-        
-        If there's a parsing error related to missing key signatures or time signatures, 
-        it's probably here or in the methods this method depends on.
-        '''        
-        outputStream = stream.Stream()
-        index = -1
-        starters = ['I', '#', 'B', 'V']
-        dur = 0
-        pleaseAppend = False
-        for x in expressionString.split():
-            index = index + 1
-            if expressionString:
-                if x.startswith('[') and "/" in x:
-                    timeSig = meter.TimeSignature(x[1:-1])
-                    outputStream.append(timeSig)
-                elif x.startswith('['):
-                    m21keyStr = key.convertKeyStringToMusic21KeyString(x[1:-1])
-                    currentKey = key.Key(m21keyStr)
-                    outputStream.append(currentKey)
-                elif x[0].upper() in starters:
-                    rn = roman.RomanNumeral(atom, currentKey)
-                    rn.duration.quarterLength = self._getDuration(indexOfAtom, splitFile, timeSig)
-                    outputStream.append(rn)
-                    if self._stringHasDotsAndBars(expressionString):
-                        for x in rn.pitches:
-                            rn.setTie(tie.Tie('start'), x) 
-                elif x == '|':
-                    if self._stringHasDotsAndBars(expressionString) and expressionString.split()[index - 2] == '|' :
-                        z = roman.RomanNumeral(atom, currentKey)
-                        z.duration.quarterLength = timeSig.totalLength
-                        outputStream.append(z)
-                    elif self._barIsDouble(index, expressionString) and not self._stringHasDotsAndBars(expressionString):
-                        rn.duration.quarterLength = rn.duration.quarterLength + timeSig.totalLength
-                elif x == '.':
-                    if not self._stringHasDotsAndBars(expressionString):
-                        rn.duration.quarterLength = rn.duration.quarterLength + self._getDuration((indexOfAtom + index), splitFile, timeSig)
-                    else:
-                        pleaseAppend = True
-                        dur = dur +  self._getDuration((indexOfAtom + index), splitFile, timeSig)
-                        
-                else:
-                    pass
-                
-        if pleaseAppend:
-            xy = roman.RomanNumeral(atom, currentKey)
-            xy.duration.quarterLength = dur
-            outputStream.append(xy)
-        outputStream = outputStream.makeMeasures(finalBarline = None)
-        
-        measureNumber = 1
-        for x in expressionString.split():
-         
-            if expressionString:
-                if x.startswith('[') and "/" in x:
-                    
-                    timeSig = meter.TimeSignature(x[1:-1])
-                    try:
-                        currentTimeSig = outputStream.measure(measureNumber).flat.getElementsByClass(meter.TimeSignature)[0]
-                        if str(currentTimeSig) != str(timeSig):
-                            
-                            outputStream.remove(currentTimeSig)
-                      
-                            outputStream.measure(measureNumber).insert(0.0, timeSig)
-                    except IndexError:
-                        try:
-                            outputStream.measure(measureNumber).insert(0.0, timeSig)
-                        except exceptions21.StreamException:
-                            # ...handles the case that not enough measures were created
-                            #by just the duration of the long note (in case of changes
-                            #in time signatures, such as:
-                            #I | [2/4] | [4/4] . . .
-                            #where the I is really IV I in the previous measure
-                            
-                            newM = stream.Measure()
-                            newM.timeSignature = timeSig
-                            outputStream.append(newM)
-                            outputStream = outputStream.makeMeasures(finalBarline = None)
-
-                elif x == '|':
-                    measureNumber = measureNumber + 1
-                else:
-                    pass
-                    
-        outputStream.makeTies()       
-        return outputStream
 
     def labelRomanNumerals(self, scoreObj):
         '''
@@ -757,21 +595,17 @@ class CTRule(object):
                 for atom in regularAtoms:
                     if atom == 'R':
                         rest = note.Rest(quarterLength=atomLength)
+                        lastChord = None
                         m.append(rest)
                     else:
-#                         tieMe = False
-#                         if lastRegularAtom == atom and lastChord is not None:
-#                             if lastChord.tie is None:
-#                                 lastChord.tie = tie.Tie('start')
-#                             else:
-#                                 lastChord.tie.type = 'continue'
-#                             tieMe = True
                         atom = self.fixupChordAtom(atom)
                         rn = roman.RomanNumeral(atom, ks)
                         rn.duration.quarterLength = atomLength
-#                         if tieMe is True:
-#                             rn.tie = tie.Tie('stop')
+                        self.addOptionalTieAndLyrics(rn, lastChord)
                         lastChord = rn
+                        if len(measures) == 0 and len(m.flat.notes) == 0:
+                            rn.lyrics.append(note.Lyric(self.LHS, number=2))
+                        
                         m.append(rn)
                 measures.append(m)
                 for i in range(1, numReps):
@@ -845,6 +679,30 @@ class CTRule(object):
         return measureGroups2
     
     #---------------------------------------------------------------------------
+    def addOptionalTieAndLyrics(self, rn, lastChord):
+        if lastChord is None:
+            same = False
+        else:
+            rnP = [p.nameWithOctave for p in rn.pitches]
+            lcP = [p.nameWithOctave for p in lastChord.pitches]
+            if rnP == lcP:
+                same = True
+            else:
+                same = False
+        if same is False and lastChord is not None and lastChord.tie is not None:
+            lastChord.tie.type = 'stop'
+        if same is False:
+            rn.lyrics.append(note.Lyric(rn.figure, number=1))
+            
+        if same is True and lastChord is not None and lastChord.tie is None:
+            lastChord.tie = tie.Tie('start')
+            rn.tie = tie.Tie('stop')
+        elif same is True and lastChord is not None and lastChord.tie is not None:
+            lastChord.tie.type = 'continue'
+            rn.tie = tie.Tie('stop')
+            
+        
+
     def insertKsTs(self, m, ts, ks):
         '''
         insert a new time signature or key signature into measure m, if it's
