@@ -14,11 +14,13 @@
 Parses the de Clercq-Temperley popular music flavor of RomanText.
 The Clercq-Temperley file format and additional rock corpus analysis
 information may be located at http://theory.esm.rochester.edu/rock_corpus/
-
 '''
+import codecs
 import re
 import copy
 import unittest
+from collections import OrderedDict
+
 from music21 import exceptions21
 
 from music21 import common
@@ -85,21 +87,6 @@ Fadeout: I . . V | I . . V | I . . V |
 Co: [2/4] I | [4/4] . . . V | I . . V | $Fadeout
 S: [G] $In $Vr $Ch $In*2 $Ch $Vr2 $Ch $Ch $Co
 '''
-def _convertTextFileToCTString(fileName):
-    '''
-    Called when a CTSong is created by passing a filename; opens the file
-    and removes all blank lines, and adds in new line characters
-    returns pieceString that CTSong can parse.
-    '''
-    fileOpened = open(fileName, 'r')
-            
-    pieceString = ""
-    for l in fileOpened:
-        line = str(l).strip()
-        if len(line) > 0:
-            pieceString = pieceString + line.strip() + ' ' + '\n'
-    
-    return pieceString
 
 class CTSongException(exceptions21.Music21Exception):
     pass
@@ -166,11 +153,12 @@ class CTSong(object):
     the individual rules that make up the song object. For example,
     
     >>> s.rules
-    [<music21.CTRule.CTRule text="VP: I | IV | I | V |">, 
-     <music21.CTRule.CTRule text="In: $VP*2">, 
-     <music21.CTRule.CTRule text="Vr: $VP*4 IV | V | I | vi | IV | V | I | V |  % Second part of verse could be called chorus">, 
-     <music21.CTRule.CTRule text="Ch: V | | $VP*2 I |*4 ">, 
-     <music21.CTRule.CTRule text="Ch2: V | | $VP*3     % Fadeout">]
+    OrderedDict([('VP', <music21.CTRule.CTRule text="VP: I | IV | I | V |">), 
+                 ('In', <music21.CTRule.CTRule text="In: $VP*2">), 
+                 ('Vr', <music21.CTRule.CTRule text="Vr: $VP*4 IV | V | I | vi | IV | V | I | V |  % Second part of verse could be called chorus">), 
+                 ('Ch', <music21.CTRule.CTRule text="Ch: V | | $VP*2 I |*4">), 
+                 ('Ch2', <music21.CTRule.CTRule text="Ch2: V | | $VP*3     % Fadeout">), 
+                 ('S', <music21.CTRule.CTRule text="S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2">)])
 
     The parser extracts meaningful properties to each rule, such as sectionName,
     home time signature of that rule, home key of that rule, and of course the individual
@@ -179,7 +167,7 @@ class CTSong(object):
     The following examples display the instantiated properties of the second rule (list indexes
     start at one) as created above.
 
-    >>> rule = s.rules[1]
+    >>> rule = s.rules['In']
     >>> rule.text
     'In: $VP*2'
 
@@ -236,8 +224,9 @@ class CTSong(object):
     S: [A] $In $Vr $Vr $Vr $Vr $Vr $Vr $Vrf    % 3rd and 6th verses are instrumental
 
     >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.RockClockCT)
-    >>> s.toScore().highestOffset
-    374.0 
+    >>> score = s.toScore()
+    >>> score.highestTime
+    376.0 
 
     >>> s.title
     'Rock Around the Clock'
@@ -256,11 +245,13 @@ class CTSong(object):
     1952
 
     >>> s.rules
-    [<music21.CTRule.CTRule text="In: I | | | | | | V | |">, 
-     <music21.CTRule.CTRule text="Vr: I | | | | IVd7 | | I | | V7 | | I | | %a comment on verse">, 
-     <music21.CTRule.CTRule text="Vrf: I | | | | IVd7 | | I | | V7 | | I | IV iv | V | . I |">]
+    OrderedDict([('In', <music21.CTRule.CTRule text="In: I | | | | | | V | |">), 
+                 ('Vr', <music21.CTRule.CTRule text="Vr: I | | | | IVd7 | | I | | V7 | | I | | %a comment on verse">), 
+                 ('Vrf', <music21.CTRule.CTRule text="Vrf: I | | | | IVd7 | | I | | V7 | | I | IV iv | V | . I |">), 
+                 ('S', <music21.CTRule.CTRule text="S: [A] $In $Vr $Vr $Vr $Vr $Vr $Vr $Vrf    % 3rd and 6th verses are instrumental">)])
 
-    >>> rule = s.rules[0]
+
+    >>> rule = s.rules['In']
     >>> rule.text
     'In: I | | | | | | V | |'
 
@@ -291,17 +282,21 @@ class CTSong(object):
 
 
     """
-    _DOC_ORDER = ['text', 'toScore', 'title', 'homeTimeSig', 'homeKeySig', 'comments', 'appendComment', 'rules']
+    _DOC_ORDER = ['text', 'toScore', 'title', 'homeTimeSig', 'homeKeySig', 'comments', 'rules']
     _DOC_ATTR = {'year': 'the year of the CTSong; not formally defined by the Clercq-Temperley format'}
                  
     def __init__(self, textFile, **keywords):
         self._title = None
-        self.year = None
-        self._rules = [] #list of all component rules of the type CTRule
+        self.text = "" 
+        self.lines = []
+        self._rules = OrderedDict() # Dictionary of all component rules of the type CTRule
+        self.ksList = [] # keeps a list of all key signatures in the Score -- for avoiding duplicates
+        self.tsList = [] # same for time signatures
         self._homeTimeSig = None
         self._homeKeySig = None
         self._comments = []
-        self._text = "" 
+
+        self.year = None
         self.splitFile = None
 
         for kw in keywords:
@@ -310,36 +305,39 @@ class CTSong(object):
             if kw == 'year':
                 self.year = kw
 
-        self.text = textFile
+        self.parse(textFile)
 
     
     def __repr__(self):
         return '<music21.CTSong.%s title=%s year=%s text=%s>' % (self.__class__.__name__, self.text, self.title, self.year)
 
     #---------------------------------------------------------------------------
-    
-    def _setText(self, value):
-        if '|' in value and 'S:' in value:
-            self._text = value
+    def parse(self, textFile):
+        '''
+        Called when a CTSong is created by passing a string or filename; 
+        in the second case, it opens the file
+        and removes all blank lines, and adds in new line characters
+        returns pieceString that CTSong can parse.
+        '''
+        if '|' in textFile and 'S:' in textFile:
+            lines = textFile.split('\n') 
         else:
             try:
-                self._text = _convertTextFileToCTString(value)
+                with codecs.open(textFile, 'r', 'utf-8', errors='replace') as fileOpened:
+                    lines = fileOpened.readlines() 
             except FileNotFoundError:
-                raise CTSongException('Cannot find file: %s' % value)
+                raise CTSongException('Cannot find file: %s' % textFile)
             except Exception:
-                raise CTSongException('Invalid File Format; must be string or text file: %s' % value)
-                
-    def _getText(self):
-        return self._text
-    
-    text = property (_getText, _setText, doc = '''
-        Get the text of the CTSong.
-        
-        This is the full text of the Clercq-Temperley file. This
-        attribute is typically instantiated when the CTSong object is created, either by passing 
-        in the full string, with newline characters (\n) at the end of each line or by passing 
-        in the text file as a string, and have python do the parsing.
-        ''')
+                raise CTSongException('Invalid File Format; must be string or text file: %s' % textFile)
+
+        lines = list(filter(lambda e: len(e) != 0, lines))
+        for i in range(len(lines)):
+            lines[i] = lines[i].strip()
+        self.lines = lines
+        pieceString = '\n'.join(lines)
+
+        self.text = pieceString
+
        
     def _setTitle(self, value):
         if isinstance(value, str):
@@ -348,21 +346,13 @@ class CTSong(object):
             raise CTSongException('not a valid title; must be string: %s' % value)
     
     def _getTitle(self):
-        if self._title == None or self._title == '':
-            if self.text:
-                lines = self.text.split('\n')
-                for x in lines:
-                    line = str(x).strip()
-                    if "%" in line:
-                        pieceTitle = line
-                        pieceTitle = pieceTitle.replace('%', '').strip()
-                        self._title = pieceTitle
-                        return self._title
-                    elif len(line) > 0 and '|' in line:
-                        self._title = ''
-                        return self._title
-        else:
+        if self._title not in (None, ''):
             return self._title
+
+        line = self.lines[0]
+        title = line.replace('%', '').strip()
+        self._title = title
+        return title
 
     title = property(_getTitle, _setTitle, doc= '''
         Get or set the title of the CTSong. If not specified explicitly but the clercq-Temperley text exists, 
@@ -422,75 +412,36 @@ class CTSong(object):
         >>> s.comments = ['a new list of comments']
         >>> s.comments
         ['a new list of comments']
-        >>> s.appendComment('please append this comment to list')
-        >>> s.comments
-        ['a new list of comments', 'please append this comment to list']
         """)
-    
-    
-    def appendComment(self, value):
-        r"""
-        append a comment to self.text at the end of the text file. Only strings or lists of strings are
-        acceptible to append to the text file. this list of comments (self.comments) is also appended
-        #_DOCS_HIDE Please note: the backslashes included in the file below are for sphinx documentation
-        #_DOCS_HIDE purposes only. They are not permitted in the clercq-temperley file format   
             
-            | textString = '''
-            | %Simple Gifts
-            | % A wonderful shaker melody
-            | Vr: I \| I \| %incomplete verse
-            | S: [A] $Vr % Not quite finished!'''
 
-        
-        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.textString)
-        >>> s.comments
-        [['A wonderful shaker melody'], ['Vr:', 'incomplete verse'], ['S:', 'Not quite finished!']]
-        >>> s.appendComment('please append this comment to list')
-        >>> s.comments
-        [['A wonderful shaker melody'], ['Vr:', 'incomplete verse'], ['S:', 'Not quite finished!'], 'please append this comment to list']
-        """
-        try:
-            self._comments.append(value)
-            if isinstance(value, str) and value != '':
-                self.text = self.text + ' %' + str(value)
-            elif isinstance(value, list):
-                for x in value:
-                    self.text = self.text + ' % ' + str(x)
-        except:
-            raise CTSongException('not a valid comment to append (must be a string or list): %s' % value)
-        
-
-    def _setRules(self, value):
-        self._rules = value
-    
     def _getRules(self):
-        if self._rules == None or self._rules == []:
-            lines = self.text.split('\n')
-            for line in lines:
-                if not line == '':
-                    if line.split()[0].endswith(':') and 'S:' not in line: #or 'S:' in line Let's not include 'Song' line for now...
-                        rule = CTRule(line, parent=self)
-                        self._rules.append(rule)
-            return self._rules
-        else:
+        if len(self._rules) > 0:
             return self._rules
 
+        for line in self.lines:
+            if line.split()[0].endswith(':'):
+                rule = CTRule(line, parent=self)
+                self._rules[rule.LHS] = rule
 
-    rules = property(_getRules, _setRules, doc= '''
-        Get the rules of a CTSong. the Rules is a list of objects of type CTRule. If only a textfile
+        return self._rules
+
+    rules = property(_getRules, doc= '''
+        Get the rules of a CTSong. the Rules is an OrderedDict of objects of type CTRule. If only a textfile
         provided, this goes through text file and creates the rule object out of each line containing
-        a LHS...NOT including the Song line
+        a LHS including the Song line, which should always be last.
         
         >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.BlitzkriegBopCT)
         >>> len(s.rules)
-        5
+        6
         >>> for rule in s.rules:
-        ...   print(rule.LHS)
-        BP
-        In
-        Vr
-        Br
-        Co
+        ...   print(rule, s.rules[rule])
+        BP <music21.CTRule.CTRule text="BP: I | IV V | %THIS IS A COMMENT">
+        In <music21.CTRule.CTRule text="In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4">
+        Vr <music21.CTRule.CTRule text="Vr: $BP*3 I IV | I |">
+        Br <music21.CTRule.CTRule text="Br: IV | | I | IV I | IV | | ii | IV V |">
+        Co <music21.CTRule.CTRule text="Co: R |*4 I |*4">
+        S <music21.CTRule.CTRule text="S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co">
         ''')
     
     
@@ -924,7 +875,7 @@ class CTSong(object):
         return (self.homeTimeSig, self.homeKeySig)
 
             
-    def toScore(self ,labelRomanNumerals=True, labelSubsectionsOnScore = True):
+    def toScore(self, labelRomanNumerals=True, labelSubsectionsOnScore=True):
         '''
         creates Score object out of a from CTSong...also creates CTRule objects in the process,
         filling their .streamFromCTSong attribute with the corresponding smaller inner stream. 
@@ -937,7 +888,10 @@ class CTSong(object):
         >>> scoreObj.highestOffset   
         380.0
         '''        
-        scoreObj = stream.Score() 
+        scoreObj = stream.Part() 
+        measures = self.rules['S'].expand()
+        scoreObj.append(measures)
+        return scoreObj
  
         allSubsections = {}
         currentSubsectionName = None
@@ -1097,7 +1051,8 @@ class CTSong(object):
                 putLyricOnNextItemInStream = False      
                     
         for streamKey in allSubsections:
-            for CTRuleObject in self.rules:
+            for ruleName in self.rules:
+                CTRuleObject = self.rules[ruleName]
                 if CTRuleObject.LHS == streamKey:
                     allSubsections[streamKey] = self._removeDuplicateClefs(allSubsections[streamKey])
                     allSubsections[streamKey] = self._removeDuplicateMeters(allSubsections[streamKey])                                          
@@ -1132,11 +1087,13 @@ class CTRule(object):
     has a :meth:`~music21.romanText.clercqTemperley.CTRUle.streamFromCTSong` attribute, 
     which is the stream from the entire score that the rule corresponds to.
     '''
-    _DOC_ORDER = ['LHS', 'sectionName','musicText', 'homeTimeSig', 'homeKeySig', 'comments', 'appendComment']
+    _DOC_ORDER = ['LHS', 'sectionName','musicText', 'homeTimeSig', 'homeKeySig', 'comments']
     _DOC_ATTR = {'text': 'the full text of the CTRule, including the LHS, chords, and comments'}
-     
+    
+    SPLITMEASURES = re.compile('(\|\*?\d*)')
+    REPETITION = re.compile('\*(\d+)')
+    
     def __init__(self, text='', parent=None):
-        self.text = text #FULL TEXT OF CTRULE (includes LHS, chords, and comments
         self._parent = None
         if parent is not None:
             self.parent = parent
@@ -1148,6 +1105,7 @@ class CTRule(object):
         self._homeTimeSig = None
         self._homeKeySig = None
         self._streamFromCTSong = None
+        self.text = text #FULL TEXT OF CTRULE (includes LHS, chords, and comments
   
     def __repr__(self):
         return '<music21.CTRule.%s text="%s">' % (self.__class__.__name__, self.text)
@@ -1162,7 +1120,170 @@ class CTRule(object):
     parent = property(_getParent, _setParent, doc=r'''
     A reference to the CTSong object housing the CTRule if any.
     ''')
+    #---------------------------------------------------------------------------
+    def expand(self, ts=None, ks=None):
+        '''
+        The meat of it all -- expand one rule completely and return a list of Measure objects.
+        '''
+        if ts is None:
+            ts = meter.TimeSignature('4/4')
+        if ks is None:
+            ks = key.Key('C')
+        measures = []
+
+        lastRegularAtom = None
+        
+        for content, sep, numReps in self._measureGroups():
+            if sep == "$":
+                if content not in self.parent.rules:
+                    raise CTRuleException("Cannot expand rule {0} in {2}".format(content, self))
+                rule = self.parent.rules[content]
+                for i in range(numReps):
+                    returnedMeasures = rule.expand(ts, ks)
+                    self.insertKsTs(returnedMeasures[0], ts, ks)
+                    measures.extend(returnedMeasures)
+            elif sep == "|":
+                m = stream.Measure()
+                atoms = content.split()
+                # key/timeSig pass...
+                regularAtoms = []
+                for atom in atoms:
+                    if atom.startswith('['):
+                        atomContent = atom[1:-1]
+                        if '/' in atomContent: # only one key / ts per measure.
+                            ts = meter.TimeSignature(atomContent)
+                        else:
+                            ks = key.Key(key.convertKeyStringToMusic21KeyString(atomContent))
+                            
+                    elif atom == '.':
+                        if lastRegularAtom is None:
+                            raise CTRuleException(" . w/o previous atom: %s" % self)
+                        regularAtoms.append(lastRegularAtom)
+                    elif atom in ("", None):
+                        pass
+                    else:
+                        regularAtoms.append(atom)
+                        lastRegularAtom = atom
+                numAtoms = len(regularAtoms)
+                if numAtoms == 0:
+                    continue # maybe just ts and ks setting
+
+                self.insertKsTs(m, ts, ks)
+                
+                atomLength = common.opFrac(ts.barDuration.quarterLength / numAtoms)            
+                for atom in regularAtoms:
+                    if atom == 'R':
+                        rest = note.Rest(quarterLength=atomLength)
+                        m.append(rest)
+                    else:
+                        atom = self.fixupChordAtom(atom)
+                        rn = roman.RomanNumeral(atom, ks)
+                        rn.duration.quarterLength = atomLength
+                        m.append(rn)
+                measures.append(m)
+            
+            else:    
+                raise CTRuleException("Rule found without | or $ : '{0}','{1}': in {2}".format(
+                                                                        content, sep, self.text))
+                #pass
+                
+        return measures
+
+    def _measureGroups(self):
+        '''
+        Returns content, "|" (normal) or "$" (expansion), and number of repetitions.
+        
+        >>> s = romanText.clercqTemperley.CTRule('In: [A] [4/4] $Vr $BP*3 I IV | I | $BP*3 I IV | I | | R |*4 I |*4 % This is a comment')
+        >>> s._measureGroups()
+        [('[A] [4/4]', '|', 1), 
+         ('Vr', '$', 1), ('BP', '$', 3), ('I IV', '|', 1), ('I', '|', 1), 
+         ('BP', '$', 3), ('I IV', '|', 1), ('I', '|', 1), ('I', '|', 1), 
+         ('R', '|', 4), ('I', '|', 4)]
+        '''
+        measureGroups1 = []
+        measureGroups2 = []
+        measureGroupTemp = self.SPLITMEASURES.split(self.musicText)
+        # first pass -- separate by | or |*3, etc.
+        for i in range(0, len(measureGroupTemp), 2):
+            content = measureGroupTemp[i].strip()
+            if i+1 < len(measureGroupTemp):
+                sep = measureGroupTemp[i+1]
+            else:
+                sep = ""
+            if content != "" or sep != "":
+                measureGroups1.append((content, sep))
+        # second pass -- filter out expansions.
+        lastContent = ""
+        for content, sep in measureGroups1:
+            if content == "":
+                content = lastContent
+            else:
+                lastContent = content
+            contentList = content.split()
+            contentOut = []
+            
+            for atom in contentList:
+                if atom.startswith('$'): # $BP or $Vr*3, etc.
+                    if len(contentOut) > 0: # clear existing content
+                        measureGroups2.append((" ".join(contentOut), "|", 1))
+                        contentOut = []
+                        
+                    repetitions = self.REPETITION.search(atom)
+                    if repetitions is not None:
+                        expandReps = int(repetitions.group(1))
+                        atom = self.REPETITION.sub('', atom)
+                    else:
+                        expandReps = 1                   
+                    measureGroups2.append((atom[1:], '$', expandReps))
+                else:
+                    contentOut.append(atom)
+                    
+            # normally get repetitions from |*3 info
+            repetitions = self.REPETITION.search(sep)
+            if repetitions is not None:
+                numReps = int(repetitions.group(1))
+                sep = self.REPETITION.sub('', sep)                       
+            else:
+                numReps = 1
+            
+            if len(contentOut) > 0:
+                measureGroups2.append((" ".join(contentOut), sep, numReps))
+        return measureGroups2
     
+    #---------------------------------------------------------------------------
+    def insertKsTs(self, m, ts, ks):
+        '''
+        insert a new time signature or key signature into measure m, if it's
+        not already in the stream somewhere.
+        '''
+        if ts not in self.parent.tsList:
+            m.timeSignature = ts
+            self.parent.tsList.append(ts)
+        if ks not in self.parent.ksList:
+            m.keySignature = ks
+            self.parent.tsList.append(ks)
+    
+    def fixupChordAtom(self, atom):
+        '''
+        changes some CT values into music21 values
+        
+        >>> s = romanText.clercqTemperley.CTRule()
+        >>> s.fixupChordAtom('iix')
+        'iio'
+        >>> s.fixupChordAtom('viih7')
+        'vii/o7'
+        >>> s.fixupChordAtom('iia')
+        'ii+'
+        
+        '''
+        if 'x' in atom:
+            atom = atom.replace('x', 'o')
+        if 'h' in atom:
+            atom = atom.replace('h', '/o')
+        if atom[0].islower() and 'a' in atom: # todo: what about biia ?
+            atom = atom.replace('a', '+')
+        return atom
+    #---------------------------------------------------------------------------
     
     def _setMusicText(self, value):
         self._musicText = str(value)
@@ -1210,27 +1331,10 @@ class CTRule(object):
             return self._comments
         else:
             return self._comments
-        
-    def appendComment(self, value):
-        '''
-        append a comment to self.text at the end of the text file. Only strings or lists of strings are
-        acceptible to append to the text file. Identical to 
-        :meth:`~music21.romanText.clercqTemperley.CTSong.appendComment`
-        '''
-        try:
-            self._comments.append(value)
-            if isinstance(value, str) and value != '':
-                self.text = self.text + ' %' + str(value)
-            elif isinstance(value, list):
-                for x in value:
-                    self.text = self.text + ' % ' + str(x)
-        except:
-            raise CTRuleException('not a valid comment to append (must be a string or list): %s' % value)
-                
+                        
 
     comments = property(_getComments, _setComments, doc= '''
-        Get or set the comments of a CTRule object. Functionality is identical to CTRule comments
-
+        Get or set the comments of a CTRule object. Functionality is identical to CTSong comments
         
         >>> s = romanText.clercqTemperley.CTRule('In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment')
         >>> s.comments
@@ -1275,6 +1379,8 @@ class CTRule(object):
                 self._sectionName = 'Bridge' + self.LHS[2:]
             elif 'Vr' in self.LHS:
                 self._sectionName = 'Verse' + self.LHS[2:]
+            elif 'Ch' in self.LHS:
+                self._sectionName = 'Chorus' + self.LHS[2:]
             elif 'S' in self.LHS:
                 self._sectionName = 'Song' + self.LHS[1:]
             elif 'Fadeout' == self.LHS:
@@ -1286,11 +1392,17 @@ class CTRule(object):
             return self._sectionName
 
     sectionName = property(_getSectionName, _setSectionName, doc= '''
-        stores the expanded version of the Left hand side (LHS) such as Introduction, Verse, etc. if
+        Stores the expanded version of the Left hand side (LHS) such as Introduction, Verse, etc. if
         text present uses LHS to expand)
         
-        Currently supported abbreviations: In: Introduction, Br: Bridge, Vr: Verse, S: Song, Fadeout: Fadeout
-
+        Currently supported abbreviations: 
+        
+        * In: Introduction
+        * Br: Bridge
+        * Vr: Verse
+        * Ch: Chorus
+        * Fadeout: Fadeout
+        * S: Song
         
         >>> s = romanText.clercqTemperley.CTRule('Vr2: $BP*3 I IV | I |')
         >>> s.sectionName
@@ -1450,13 +1562,6 @@ _DOC_ORDER = [CTSong, CTRule]
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
-    # from music21.romanText import clercqTemperley
-    # test = clercqTemperley.TestExternal()
-    # test.testB()
-#------------------------------------------------------------------------------
-# eof
-
     music21.mainTest(Test)
     # from music21.romanText import clercqTemperley
     # test = clercqTemperley.TestExternal()
