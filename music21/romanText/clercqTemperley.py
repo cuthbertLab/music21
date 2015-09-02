@@ -21,6 +21,7 @@ import copy
 import unittest
 from music21 import exceptions21
 
+from music21 import common
 from music21 import key
 from music21 import meter
 
@@ -112,7 +113,7 @@ class CTSong(object):
     ... % Brown-Eyed Girl
     ... VP: I \| IV \| I \| V \|
     ... In: $VP\*2
-    ... Vr: $VP\*4 IV \| V \| I \| vi \| IV \| V \| I \| V \|       % Second part of verse could be called chorus
+    ... Vr: $VP\*4 IV \| V \| I \| vi \| IV \| V \| I \| V \|  % Second part of verse could be called chorus
     ... Ch: V \| \| $VP\*2 I \|\*4 
     ... Ch2: V \| \| $VP\*3     % Fadeout
     ... S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2
@@ -149,7 +150,7 @@ class CTSong(object):
     >>> s.comments
     [['Vr:', 'Second part of verse could be called chorus'], ['Ch2:', 'Fadeout']]
         
-    Year is not defined as part of the clercq-temperley format, but it will be helpful
+    Year is not defined as part of the Clercq-Temperley format, but it will be helpful
     to have it as a property. So let's assign a year to this song:
     
     >>> s.year = 1967
@@ -160,7 +161,11 @@ class CTSong(object):
     the individual rules that make up the song object. For example,
     
     >>> s.rules
-    [<music21.CTRule.CTRule text = VP: I | IV | I | V | , <music21.CTRule.CTRule text = In: $VP*2 , <music21.CTRule.CTRule text = Vr: $VP*4 IV | V | I | vi | IV | V | I | V |       % Second part of verse could be called chorus , <music21.CTRule.CTRule text = Ch: V | | $VP*2 I |*4  , <music21.CTRule.CTRule text = Ch2: V | | $VP*3     % Fadeout ]
+    [<music21.CTRule.CTRule text="VP: I | IV | I | V |">, 
+     <music21.CTRule.CTRule text="In: $VP*2">, 
+     <music21.CTRule.CTRule text="Vr: $VP*4 IV | V | I | vi | IV | V | I | V |  % Second part of verse could be called chorus">, 
+     <music21.CTRule.CTRule text="Ch: V | | $VP*2 I |*4 ">, 
+     <music21.CTRule.CTRule text="Ch2: V | | $VP*3     % Fadeout">]
 
     The parser extracts meaningful properties to each rule, such as sectionName,
     home time signature of that rule, home key of that rule, and of course the individual
@@ -179,15 +184,13 @@ class CTSong(object):
     >>> rule.homeTimeSig
     <music21.meter.TimeSignature 4/4>
 
-
-
     Note that the rule.homeKeySig will be different after calling song.toStream() which will
     apply the key signature of G major everywhere:
     
     >>> rule.homeKeySig
     <music21.key.Key of C major>
 
-    >>> #_DOCS_HIDE assert(rule.streamFromCTSong().highestOffset == 28.0)
+    >>> #assert(rule.streamFromCTSong().highestOffset == 28.0) #_DOCS_HIDE 
     >>> #_DOCS_SHOW rule.streamFromCTSong().show()
     
     .. image:: images/ClercqTemperleyIntroduction.png
@@ -248,7 +251,9 @@ class CTSong(object):
     1952
 
     >>> s.rules
-    [<music21.CTRule.CTRule text = In: I | | | | | | V | | , <music21.CTRule.CTRule text = Vr: I | | | | IVd7 | | I | | V7 | | I | | %a comment on verse , <music21.CTRule.CTRule text = Vrf: I | | | | IVd7 | | I | | V7 | | I | IV iv | V | . I | ]
+    [<music21.CTRule.CTRule text="In: I | | | | | | V | |">, 
+     <music21.CTRule.CTRule text="Vr: I | | | | IVd7 | | I | | V7 | | I | | %a comment on verse">, 
+     <music21.CTRule.CTRule text="Vrf: I | | | | IVd7 | | I | | V7 | | I | IV iv | V | . I |">]
 
     >>> rule = s.rules[0]
     >>> rule.text
@@ -284,14 +289,13 @@ class CTSong(object):
     _DOC_ORDER = ['text', 'toScore', 'title', 'homeTimeSig', 'homeKeySig', 'comments', 'appendComment', 'rules']
     _DOC_ATTR = {'year': 'the year of the CTSong; not formally defined by the Clercq-Temperley format'}
                  
-    
     def __init__(self, textFile, **keywords):
         self.text = textFile
         self._title = None
         self.year = None
         self._rules = [] #list of all component rules of the type CTRule
         self._homeTimeSig = None
-        self._homeKeySigSig = None
+        self._homeKeySig = None
         self._comments = []
         #self._text = "" # CUTHBERT cannot initialize this here
         self.splitFile = None
@@ -303,7 +307,7 @@ class CTSong(object):
                 self.year = kw
     
     def __repr__(self):
-        return '<music21.CTSong.%s text = %s title=%s year=%s' % (self.__class__.__name__, self.text, self.title, self.year)
+        return '<music21.CTSong.%s title=%s year=%s text=%s>' % (self.__class__.__name__, self.text, self.title, self.year)
 
     #---------------------------------------------------------------------------
     
@@ -458,7 +462,8 @@ class CTSong(object):
             for line in lines:
                 if not line == '':
                     if line.split()[0].endswith(':') and 'S:' not in line: #or 'S:' in line Let's not include 'Song' line for now...
-                        self._rules.append(CTRule(line))
+                        rule = CTRule(line, parent=self)
+                        self._rules.append(rule)
             return self._rules
         else:
             return self._rules
@@ -528,11 +533,11 @@ class CTSong(object):
 
     def _setHomeKeySig(self, value):
         if hasattr(value, 'classes') and 'Key' in value.classes:
-            self._homeKeySigSig = value
+            self._homeKeySig = value
             return
         try:
             m21keyStr = key.convertKeyStringToMusic21KeyString(value)
-            self._homeKeySigSig = key.Key(m21keyStr)
+            self._homeKeySig = key.Key(m21keyStr)
             return
         except:
             raise CTSongException('not a valid key signature: %s' % value)
@@ -545,15 +550,15 @@ class CTSong(object):
                 if line.startswith('S:'):
                     for atom in line.split()[1:3]:
                         if '[' not in atom:
-                            self._homeKeySigSig = key.Key('C')
-                            return self._homeKeySigSig
+                            self._homeKeySig = key.Key('C')
+                            return self._homeKeySig
                         elif not '/' in atom:
                             m21keyStr = key.convertKeyStringToMusic21KeyString(atom[1:-1])
-                            self._homeKeySigSig = key.Key(m21keyStr)
-                            return self._homeKeySigSig
+                            self._homeKeySig = key.Key(m21keyStr)
+                            return self._homeKeySig
                         else:
                             pass
-        return self._homeKeySigSig
+        return self._homeKeySig
     
     homeKeySig = property(_getHomeKeySig, _setHomeKeySig, doc = '''
         gets the initial, or 'home', key signature by looking at the musictext and locating
@@ -1133,47 +1138,55 @@ class CTRule(object):
     _DOC_ORDER = ['LHS', 'sectionName','musicText', 'homeTimeSig', 'homeKeySig', 'comments', 'appendComment']
     _DOC_ATTR = {'text': 'the full text of the CTRule, including the LHS, chords, and comments'}
      
-    def __init__(self, text = '', **keywords):
+    def __init__(self, text='', parent=None):
         self.text = text #FULL TEXT OF CTRULE (includes LHS, chords, and comments
+        self._parent = None
+        if parent is not None:
+            self.parent = parent
+        
         self._comments = []
         self._musicText = None #just the text above without the rule string or comments
-        self._LHS = None #rule string
+        self._LHS = None # rule name string, such as "In"
         self._sectionName = None #nice name of LHS
         self._homeTimeSig = None
         self._homeKeySig = None
         self._streamFromCTSong = None
   
     def __repr__(self):
-        return '<music21.CTRule.%s text = %s ' % (self.__class__.__name__, self.text)
+        return '<music21.CTRule.%s text="%s">' % (self.__class__.__name__, self.text)
+
     #---------------------------------------------------------------------------
+    def _getParent(self):
+        return common.unwrapWeakref(self._parent)
+    
+    def _setParent(self, parent):
+        self._parent = common.wrapWeakref(parent)
+
+    parent = property(_getParent, _setParent, doc=r'''
+    A reference to the CTSong object housing the CTRule if any.
+    ''')
+    
+    
     def _setMusicText(self, value):
         self._musicText = str(value)
          
     def _getMusicText(self):
-        if self._musicText == None or self._musicText == '':
-            text = ''
-            stillOnLHS = True
-            if self.text:
-                for char in self.text:
-                    if char != ':' and stillOnLHS:
-                        continue
-                    else:
-                        if char == '%':
-                            self._musicText = text.strip()
-                            return self._musicText
-                        elif char == ':':
-                            stillOnLHS = False
-                        else:
-                            text = text + char 
-                
-                self._musicText = text.strip()
-                return self._musicText
-        else:
+        if self._musicText not in (None, ''):
             return self._musicText
+        
+        if not self.text:
+            return ""
+
+        text = self.text[len(self.LHS) + 1:]
+        if '%' in text:
+            commentStartIndex = text.index('%')
+            text = text[0:commentStartIndex]
+
+        self._musicText = text.strip()
+        return self._musicText
 
     musicText = property(_getMusicText, _setMusicText, doc= '''
         Gets just the music text of the CTRule, excluding the left hand side and comments
-        
         
         >>> s = romanText.clercqTemperley.CTRule('In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment')
         >>> s.text
@@ -1231,24 +1244,23 @@ class CTRule(object):
         self._LHS = str(value)
          
     def _getLHS(self):
-        if self._LHS == None or self._LHS == '':
-            LHS = ''
-            if self.text and self.text.split()[0].endswith(':'):
-                for char in self.text:
-                    if char == ':':
-                        self._LHS = LHS.strip()
-                        return self._LHS
-                    LHS = LHS + char
-            else:
-                return self._LHS
-        else:
+        if self._LHS not in (None, ''):
             return self._LHS
+
+        LHS = ''
+        if self.text and self.text.split()[0].endswith(':'):
+            for char in self.text:
+                if char == ':':
+                    self._LHS = LHS.strip()
+                    return self._LHS
+                LHS = LHS + char
+        else:
+            return ""
 
     LHS = property(_getLHS, _setLHS, doc= '''
         Get the LHS (Left Hand Side) of the CTRule. If not specified explicitly but CTtext present, searches
         first characters up until ':' for rule and returns string)
 
-        
         >>> s = romanText.clercqTemperley.CTRule('In: $BP*3 I IV | R |*4 I |*4 % This is a comment')
         >>> s.LHS
         'In'
