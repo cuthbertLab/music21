@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:          chordTables.py
+# Name:          chord.tables.py
 # Purpose:       data and tables for chord and set class processing.
 #
 # Authors:       Christopher Ariza
@@ -2499,13 +2499,13 @@ def forteIndexToInversionsAvailable(card, index):
     '''
     Return possible inversion values for any cardinality and index
 
-    >>> chordTables.forteIndexToInversionsAvailable(3,1)
+    >>> chord.tables.forteIndexToInversionsAvailable(3,1)
     [0]
-    >>> chordTables.forteIndexToInversionsAvailable(3,2)
+    >>> chord.tables.forteIndexToInversionsAvailable(3,2)
     [-1, 1]
-    >>> chordTables.forteIndexToInversionsAvailable(3,3)
+    >>> chord.tables.forteIndexToInversionsAvailable(3,3)
     [-1, 1]
-    >>> chordTables.forteIndexToInversionsAvailable(3,6)
+    >>> chord.tables.forteIndexToInversionsAvailable(3,6)
     [0]
     '''
     if card not in list(range(1,13)):
@@ -2522,20 +2522,20 @@ def forteIndexToInversionsAvailable(card, index):
 def _validateAddress(address):
     '''Check that an address is valid
 
-    >>> chordTables._validateAddress((3,1,0))
+    >>> chord.tables._validateAddress((3,1,0))
     (3, 1, 0)
-    >>> chordTables._validateAddress((2,3))
+    >>> chord.tables._validateAddress((2,3))
     (2, 3, 0)
-    >>> chordTables._validateAddress((3,12,None))
+    >>> chord.tables._validateAddress((3,12,None))
     (3, 12, 0)
 
-    >>> chordTables._validateAddress((20,1,0))
+    >>> chord.tables._validateAddress((20,1,0))
     Traceback (most recent call last):
     ChordTablesException: cardinality 20 not valid
-    >>> chordTables._validateAddress((8,3000,0))
+    >>> chord.tables._validateAddress((8,3000,0))
     Traceback (most recent call last):
     ChordTablesException: index 3000 not valid
-    >>> chordTables._validateAddress((8,3,-30))
+    >>> chord.tables._validateAddress((8,3,-30))
     Traceback (most recent call last):
     ChordTablesException: inversion -30 not valid
     '''
@@ -2579,15 +2579,15 @@ def _validateAddress(address):
 def addressToNormalForm(address):
     '''Given a TN address, return the normal form
 
-    >>> chordTables.addressToNormalForm((3,1,0))
+    >>> chord.tables.addressToNormalForm((3,1,0))
     (0, 1, 2)
-    >>> chordTables.addressToNormalForm((3,11,-1))
+    >>> chord.tables.addressToNormalForm((3,11,-1))
     (0, 4, 7)
-    >>> chordTables.addressToNormalForm((3,11,1))
+    >>> chord.tables.addressToNormalForm((3,11,1))
     (0, 3, 7)
-    >>> chordTables.addressToNormalForm((3,11))
+    >>> chord.tables.addressToNormalForm((3,11))
     (0, 3, 7)
-    >>> chordTables.addressToNormalForm((3,11,None))
+    >>> chord.tables.addressToNormalForm((3,11,None))
     (0, 3, 7)
     '''
     card, index, inversion = _validateAddress(address)
@@ -2597,15 +2597,15 @@ def addressToNormalForm(address):
 def addressToPrimeForm(address):
     '''Given a TN address, return the normal form
 
-    >>> chordTables.addressToPrimeForm((3,1,0))
+    >>> chord.tables.addressToPrimeForm((3,1,0))
     (0, 1, 2)
-    >>> chordTables.addressToPrimeForm((3,11,-1))
+    >>> chord.tables.addressToPrimeForm((3,11,-1))
     (0, 3, 7)
-    >>> chordTables.addressToPrimeForm((3,11,1))
+    >>> chord.tables.addressToPrimeForm((3,11,1))
     (0, 3, 7)
-    >>> chordTables.addressToPrimeForm((3,11))
+    >>> chord.tables.addressToPrimeForm((3,11))
     (0, 3, 7)
-    >>> chordTables.addressToPrimeForm((3,11,None))
+    >>> chord.tables.addressToPrimeForm((3,11,None))
     (0, 3, 7)
     '''
     # overridding inversion with None will aleways return prime form
@@ -2616,15 +2616,15 @@ def addressToPrimeForm(address):
 def addressToIntervalVector(address):
     '''Given a TN address, return the normal form
 
-    >>> chordTables.addressToIntervalVector((3,1,0))
+    >>> chord.tables.addressToIntervalVector((3,1,0))
     (2, 1, 0, 0, 0, 0)
-    >>> chordTables.addressToIntervalVector((3,11,-1))
+    >>> chord.tables.addressToIntervalVector((3,11,-1))
     (0, 0, 1, 1, 1, 0)
-    >>> chordTables.addressToIntervalVector((3,11,1))
+    >>> chord.tables.addressToIntervalVector((3,11,1))
     (0, 0, 1, 1, 1, 0)
-    >>> chordTables.addressToIntervalVector((3,11))
+    >>> chord.tables.addressToIntervalVector((3,11))
     (0, 0, 1, 1, 1, 0)
-    >>> chordTables.addressToIntervalVector((3,11,None))
+    >>> chord.tables.addressToIntervalVector((3,11,None))
     (0, 0, 1, 1, 1, 0)
     '''
     card, index, inversion = _validateAddress(address)
@@ -2634,13 +2634,13 @@ def addressToIntervalVector(address):
 def intervalVectorToAddress(vector):
     '''Given a vector, collect all addresses that match.
 
-    >>> chordTables.intervalVectorToAddress((7,6,5,4,4,2))
+    >>> chord.tables.intervalVectorToAddress((7,6,5,4,4,2))
     [(8, 1)]
-    >>> chordTables.intervalVectorToAddress((12,12,12,12,12,6))
+    >>> chord.tables.intervalVectorToAddress((12,12,12,12,12,6))
     [(12, 1)]
-    >>> chordTables.intervalVectorToAddress((2,2,3,1,1,1))
+    >>> chord.tables.intervalVectorToAddress((2,2,3,1,1,1))
     [(5, 10)]
-    >>> chordTables.intervalVectorToAddress((1,1,1,1,1,1))
+    >>> chord.tables.intervalVectorToAddress((1,1,1,1,1,1))
     [(4, 15), (4, 29)]
     '''
     post = []
@@ -2657,15 +2657,15 @@ def intervalVectorToAddress(vector):
 def addressToZAddress(address):
     '''Given a TN address, return the address of the z set, if not None
 
-    >>> chordTables.addressToZAddress((5,12))
+    >>> chord.tables.addressToZAddress((5,12))
     (5, 36, 1)
-    >>> chordTables.addressToZAddress((5,36,None))
+    >>> chord.tables.addressToZAddress((5,36,None))
     (5, 12, 0)
-    >>> chordTables.addressToZAddress((5,37))
+    >>> chord.tables.addressToZAddress((5,37))
     (5, 17, 0)
-    >>> chordTables.addressToZAddress((8,29))
+    >>> chord.tables.addressToZAddress((8,29))
     (8, 15, 1)
-    >>> chordTables.addressToZAddress((8,29))
+    >>> chord.tables.addressToZAddress((8,29))
     (8, 15, 1)
     '''
     card, index, unused_inversion = _validateAddress(address)
@@ -2680,9 +2680,9 @@ def addressToCommonNames(address):
     '''
     Given a TN address, return one or more common names if available
 
-    >>> chordTables.addressToCommonNames((3,1,0))
+    >>> chord.tables.addressToCommonNames((3,1,0))
     ['chromatic trimirror']
-    >>> chordTables.addressToCommonNames((3,11,-1))
+    >>> chord.tables.addressToCommonNames((3,11,-1))
     ['major triad']
     '''
     address = _validateAddress(address)
@@ -2695,13 +2695,13 @@ def addressToCommonNames(address):
 def addressToForteName(address, classification='tn'):
     '''Given an address, return the set-class name as a string.
 
-    >>> chordTables.addressToForteName((8,15,1))
+    >>> chord.tables.addressToForteName((8,15,1))
     '8-15A'
-    >>> chordTables.addressToForteName((8,15))
+    >>> chord.tables.addressToForteName((8,15))
     '8-15A'
-    >>> chordTables.addressToForteName((8,15), 'tni')
+    >>> chord.tables.addressToForteName((8,15), 'tni')
     '8-15'
-    >>> chordTables.addressToForteName((5,37))
+    >>> chord.tables.addressToForteName((5,37))
     '5-37'
     '''
     card, index, inversion = _validateAddress(address)

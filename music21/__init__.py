@@ -58,6 +58,7 @@ __all__ = [
     'audioSearch',
     'braille', 
     'capella',
+    'chord',
     'corpus', 
     'demos',
     'documentation',
@@ -86,8 +87,6 @@ __all__ = [
     'bar',
     # base listed above
     'beam', 
-    'chord',
-    'chordTables', 
     'clef',
     'common',
     'configure',
