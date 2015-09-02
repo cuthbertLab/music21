@@ -547,6 +547,7 @@ class CTRule(object):
         lastChord = None
         
         for content, sep, numReps in self._measureGroups():
+            lastChordIsInSameMeasure = False
             if sep == "$":
                 if content not in self.parent.rules:
                     raise CTRuleException("Cannot expand rule {0} in {2}".format(content, self))
@@ -598,18 +599,19 @@ class CTRule(object):
                     if atom == 'R':
                         rest = note.Rest(quarterLength=atomLength)
                         lastChord = None
+                        lastChordIsInSameMeasure = False
                         m.append(rest)
                     else:
                         atom = self.fixupChordAtom(atom)
                         rn = roman.RomanNumeral(atom, ks)
-                        rn.duration.quarterLength = atomLength
-                        self.addOptionalTieAndLyrics(rn, lastChord)
-                        lastChord = rn
-                        if len(measures) == 0 and len(m.flat.notes) == 0:
-                            if self.parent.labelSubsectionsOnScore:
-                                rn.lyrics.append(note.Lyric(self.LHS, number=2))
-                        
-                        m.append(rn)
+                        if self.isSame(rn, lastChord) and lastChordIsInSameMeasure:
+                            lastChord.duration.quarterLength += atomLength
+                        else:
+                            rn.duration.quarterLength = atomLength
+                            self.addOptionalTieAndLyrics(rn, lastChord)
+                            lastChord = rn
+                            lastChordIsInSameMeasure = True
+                            m.append(rn)
                 measures.append(m)
                 for i in range(1, numReps):
                     measures.append(copy.deepcopy(m))
@@ -617,6 +619,13 @@ class CTRule(object):
                 environLocal.warn("Rule found without | or $, ignoring: '{0}','{1}': in {2}".format(
                                                                         content, sep, self.text))
                 #pass
+        if len(measures) > 0:
+            for m in measures:
+                if len(m.flat.notes) > 0 and self.parent.labelSubsectionsOnScore and self.LHS != 'S':
+                    rn = m.flat.notes[0]
+                    lyricNum = len(rn.lyrics) + 1
+                    rn.lyrics.append(note.Lyric(self.LHS, number=lyricNum))       
+                    break                 
                 
         return measures
 
@@ -682,10 +691,7 @@ class CTRule(object):
         return measureGroups2
     
     #---------------------------------------------------------------------------
-    def addOptionalTieAndLyrics(self, rn, lastChord):
-        '''
-        Adds ties to chords that are the same.  Adds lyrics to chords that change.
-        '''
+    def isSame(self, rn, lastChord):
         if lastChord is None:
             same = False
         else:
@@ -695,6 +701,13 @@ class CTRule(object):
                 same = True
             else:
                 same = False
+        return same
+    
+    def addOptionalTieAndLyrics(self, rn, lastChord):
+        '''
+        Adds ties to chords that are the same.  Adds lyrics to chords that change.
+        '''
+        same = self.isSame(rn, lastChord)
         if same is False and lastChord is not None and lastChord.tie is not None:
             lastChord.tie.type = 'stop'
         if same is False and self.parent.labelRomanNumerals is True:
@@ -822,6 +835,8 @@ class CTRule(object):
             sectionName = 'Verse' + self.LHS[2:]
         elif 'Ch' in self.LHS:
             sectionName = 'Chorus' + self.LHS[2:]
+        elif 'Tg' in self.LHS:
+            sectionName = 'Tag' + self.LHS[2:]
         elif 'S' in self.LHS:
             sectionName = 'Song' + self.LHS[1:]
         elif 'Fadeout' == self.LHS:
