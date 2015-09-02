@@ -213,7 +213,6 @@ class CTSong(object):
     >>> score = s.toScore()
     >>> score.highestTime
     376.0 
-    >>> score.show()
 
     >>> s.title
     'Rock Around the Clock'
@@ -273,6 +272,9 @@ class CTSong(object):
 
         self._scoreObj = None
         self.year = None
+
+        self.labelRomanNumerals = True
+        self.labelSubsectionsOnScore = True
 
         for kw in keywords:
             if kw == 'title':
@@ -458,26 +460,6 @@ class CTSong(object):
         ''')
     
 
-    def labelRomanNumerals(self, scoreObj):
-        '''
-        provided a scoreObject, labels the roman numerals on each chord.
-        The CTSong.toScore() method calls this function by default unless
-        labelRomanNumerals=False is passed as a parameter. Method labeling 
-        doesn't relabel tied roman numeral chords.
-        '''
-        lastel = roman.RomanNumeral(None, None)
-        for el in scoreObj.flat.getElementsByClass("RomanNumeral"):
-            if el.tie == None:
-                el.insertLyric(el.figure)
-            elif lastel.figure != el.figure and el.figure != None:
-                el.insertLyric(el.figure)
-            elif el.tie != None and el.tie.type == 'start':
-                el.insertLyric(el.figure)
-            else:
-                pass
-            lastel = el
-        return scoreObj
-
     def toScore(self, labelRomanNumerals=True, labelSubsectionsOnScore=True):
         '''
         creates Score object out of a from CTSong...also creates CTRule objects in the process,
@@ -490,12 +472,18 @@ class CTSong(object):
         >>> scoreObj = s.toScore()
         >>> scoreObj.highestOffset   
         380.0
-        '''        
+        '''
+        self.labelRomanNumerals = labelRomanNumerals
+        self.labelSubsectionsOnScore = labelSubsectionsOnScore
         if self._scoreObj is not None:
             return self._scoreObj
         scoreObj = stream.Part() 
         measures = self.rules['S'].expand()
         scoreObj.append(measures)
+        
+        scoreObj.insert(0, metadata.Metadata()) 
+        scoreObj.metadata.title = self.title        
+        
         self._scoreObj = scoreObj
         return scoreObj
 
@@ -571,7 +559,11 @@ class CTRule(object):
                 for atom in atoms:
                     if atom.startswith('['):
                         atomContent = atom[1:-1]
-                        if '/' in atomContent: # only one key / ts per measure.
+                        if atomContent == '0':
+                            ts = meter.TimeSignature('4/4') # irregular meter.  Cannot fully represent; 
+                            #TODO: replace w/ senza misura when possible. 
+                                                        
+                        elif '/' in atomContent: # only one key / ts per measure.
                             ts = meter.TimeSignature(atomContent)
                         else:
                             ks = key.Key(key.convertKeyStringToMusic21KeyString(atomContent))
@@ -604,7 +596,8 @@ class CTRule(object):
                         self.addOptionalTieAndLyrics(rn, lastChord)
                         lastChord = rn
                         if len(measures) == 0 and len(m.flat.notes) == 0:
-                            rn.lyrics.append(note.Lyric(self.LHS, number=2))
+                            if self.parent.labelSubsectionsOnScore:
+                                rn.lyrics.append(note.Lyric(self.LHS, number=2))
                         
                         m.append(rn)
                 measures.append(m)
@@ -680,6 +673,9 @@ class CTRule(object):
     
     #---------------------------------------------------------------------------
     def addOptionalTieAndLyrics(self, rn, lastChord):
+        '''
+        Adds ties to chords that are the same.  Adds lyrics to chords that change.
+        '''
         if lastChord is None:
             same = False
         else:
@@ -691,7 +687,7 @@ class CTRule(object):
                 same = False
         if same is False and lastChord is not None and lastChord.tie is not None:
             lastChord.tie.type = 'stop'
-        if same is False:
+        if same is False and self.parent.labelRomanNumerals is True:
             rn.lyrics.append(note.Lyric(rn.figure, number=1))
             
         if same is True and lastChord is not None and lastChord.tie is None:
