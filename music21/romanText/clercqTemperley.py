@@ -24,6 +24,11 @@ from music21 import exceptions21
 from music21 import common
 from music21 import key
 from music21 import meter
+from music21 import stream
+from music21 import roman
+from music21 import tie
+from music21 import note
+from music21 import metadata
 
 #clercqTemperley test files used as tests throughout this module
 BlitzkriegBopCT = '''
@@ -290,14 +295,13 @@ class CTSong(object):
     _DOC_ATTR = {'year': 'the year of the CTSong; not formally defined by the Clercq-Temperley format'}
                  
     def __init__(self, textFile, **keywords):
-        self.text = textFile
         self._title = None
         self.year = None
         self._rules = [] #list of all component rules of the type CTRule
         self._homeTimeSig = None
         self._homeKeySig = None
         self._comments = []
-        #self._text = "" # CUTHBERT cannot initialize this here
+        self._text = "" 
         self.splitFile = None
 
         for kw in keywords:
@@ -305,6 +309,9 @@ class CTSong(object):
                 self._title = kw
             if kw == 'year':
                 self.year = kw
+
+        self.text = textFile
+
     
     def __repr__(self):
         return '<music21.CTSong.%s title=%s year=%s text=%s>' % (self.__class__.__name__, self.text, self.title, self.year)
@@ -693,11 +700,7 @@ class CTSong(object):
         
         If there's a parsing error related to missing key signatures or time signatures, 
         it's probably here or in the methods this method depends on.
-        '''
-        from music21 import stream
-        from music21 import roman
-        from music21 import tie
-        
+        '''        
         outputStream = stream.Stream()
         index = -1
         starters = ['I', '#', 'B', 'V']
@@ -831,7 +834,6 @@ class CTSong(object):
         labelRomanNumerals=False is passed as a parameter. Method labeling 
         doesn't relabel tied roman numeral chords.
         '''
-        from music21 import roman
         lastel = roman.RomanNumeral(None, None)
         for el in scoreObj.flat.getElementsByClass("RomanNumeral"):
             if el.tie == None:
@@ -934,12 +936,7 @@ class CTSong(object):
         >>> scoreObj = s.toScore()
         >>> scoreObj.highestOffset   
         380.0
-        '''
-        from music21 import stream
-        from music21 import roman
-        from music21 import note
-        from music21 import metadata
-        
+        '''        
         scoreObj = stream.Score() 
  
         allSubsections = {}
@@ -1338,8 +1335,6 @@ class CTRule(object):
         self._homeKeySig = str(value)
          
     def _getHomeKeySig(self):
-        from music21 import key
-        
         if self._homeKeySig == None or self._homeKeySig == '':
             if self._streamFromCTSong:
                 return self._streamFromCTSong.flat.getElementsByClass(key.KeySignature)[0]
@@ -1376,8 +1371,6 @@ class CTRule(object):
         by the :meth:`~music21.romanText.clercqTemperley.CTSong.toScore` method on a 
         :class:`~music21.romanText.clercqTemperley.CTSong` object
         '''
-        from music21 import metadata
-        
         if self._streamFromCTSong:
             try:
                 self._streamFromCTSong.metadata.title
@@ -1457,6 +1450,13 @@ _DOC_ORDER = [CTSong, CTRule]
 
 if __name__ == "__main__":
     import music21
+    music21.mainTest(Test)
+    # from music21.romanText import clercqTemperley
+    # test = clercqTemperley.TestExternal()
+    # test.testB()
+#------------------------------------------------------------------------------
+# eof
+
     music21.mainTest(Test)
     # from music21.romanText import clercqTemperley
     # test = clercqTemperley.TestExternal()
