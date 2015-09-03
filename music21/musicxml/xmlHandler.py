@@ -41,17 +41,15 @@ import copy
 import os
 import unittest
 
-# use io.StringIO  in python 3, avail in 2.6, not 2.5
 from music21.ext.six import StringIO, BytesIO
 
 try:
-    import cPickle as pickleMod # much faster...
+    import cPickle as pickleMod # much faster.. on python2..
 except ImportError:
-    # in case we're on Jython, etc.
+    # in case we're on Jython, etc. or Py3
     import pickle as pickleMod
 
 import xml.sax
-import xml.dom.minidom # @UnusedImport
 
 from music21.base import VERSION
 

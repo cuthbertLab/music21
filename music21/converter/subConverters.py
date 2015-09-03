@@ -596,9 +596,6 @@ class ConverterMusicXML(SubConverter):
         SubConverter.__init__(self)
 
     #---------------------------------------------------------------------------
-    def partIdToNameDict(self):
-        return self._mxScore.partIdToNameDict()
-
     def load(self):
         '''Load all parts from a MusicXML object representation.
         This determines the order parts are found in the stream
