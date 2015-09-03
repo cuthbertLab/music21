@@ -574,7 +574,8 @@ class AbstractScale(Scale):
         return ss
 
     def write(self, fmt=None, fp=None, direction=DIRECTION_ASCENDING):
-        '''Write the scale in a format. Here, prepare scala format if requested.
+        '''
+        Write the scale in a format. Here, prepare scala format if requested.
         '''
         if fmt is not None:
             fileFormat, ext = common.findFormat(fmt)
@@ -591,7 +592,8 @@ class AbstractScale(Scale):
 
 
     def show(self, fmt=None, app=None, direction=DIRECTION_ASCENDING):
-        '''Show the scale in a format. Here, prepare scala format if requested.
+        '''
+        Show the scale in a format. Here, prepare scala format if requested.
         '''
         if fmt is not None:
             fileFormat, unused_ext = common.findFormat(fmt)
@@ -603,7 +605,8 @@ class AbstractScale(Scale):
 
 
     def _getNetworkxGraph(self):
-        '''Create a networx graph from the stored network.
+        '''
+        Create a networx graph from the stored network.
         '''
         return self._net._getNetworkxGraph()
 
@@ -614,7 +617,8 @@ class AbstractScale(Scale):
 
 
     def plot(self, *args, **keywords):
-        '''Create and display a plot.
+        '''
+        Create and display a plot.
         '''
 #         
 #         >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE

@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2009-2012, 2015 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
@@ -30,13 +30,10 @@ import tempfile
 import unittest
 
 import xml.etree.ElementTree as ET
-
-import xml.sax
 from xml.sax import saxutils
 
 from music21 import exceptions21
 from music21 import common
-from music21 import xmlnode
 from music21.ext import six
 
 
@@ -72,206 +69,6 @@ class UserSettingsException(EnvironmentException):
 
 
 #------------------------------------------------------------------------------
-
-
-class Settings(xmlnode.XMLNodeList):
-    '''
-    A settings object:
-
-    >>> from music21 import environment
-    >>> a = environment.Settings()
-    '''
-    # TODO: Document or make private.
-    ### INITIALIZER ###
-
-    def __init__(self):
-        xmlnode.XMLNodeList.__init__(self)
-        self._tag = 'settings'  # assumed for now
-        self.componentList = []  
-
-    ### PRIVATE METHODS ###
-
-    def _getComponents(self):
-        return self.componentList
-
-
-class _Preference(xmlnode.XMLNode):
-    '''
-    An xmlnode.XMLNode subclass representing a single environment preference:
-
-    >>> from music21 import environment
-    >>> a = environment._Preference()
-    '''
-
-    ### INITIALIZER ###
-    def __init__(self):
-        xmlnode.XMLNode.__init__(self)
-        self._tag = 'preference'  # assumed for now
-        # attributes
-        self._attr['name'] = None
-        self._attr['value'] = None
-
-#     def loadAttrs(self, attrs):
-#         # thought that this would solve a bytes problem for Python3, but nope...
-#         try:
-#             x = attrs.getValue('value')
-#             print(repr(x), type(x))
-#         except KeyError:
-#             pass
-#         return xmlnode.XMLNode.loadAttrs(self, attrs)
-
-
-class LocalCorpusSettings(xmlnode.XMLNodeList):
-    '''
-    >>> from music21 import environment
-    >>> a = environment.LocalCorpusSettings()
-
-    '''
-
-    ### INITIALIZER ###
-
-    def __init__(self, name=None):
-        xmlnode.XMLNodeList.__init__(self)
-        self._attr['name'] = name
-        self._tag = 'localCorpusSettings'  # assumed for now
-
-    ### PRIVATE METHODS ###
-
-    def _getComponents(self):
-        return self.componentList
-
-
-class LocalCorporaSettings(xmlnode.XMLNodeList):
-    '''
-    An xmlnode.XMLNode subclass representing information about various
-    secondary local corpora:
-
-    >>> from music21 import environment
-    >>> localCorpora = environment.LocalCorporaSettings()
-    >>> corpusA = environment.LocalCorpusSettings(name='A')
-    >>> corpusA.append(environment.LocalCorpusPath(path='foo'))
-    >>> corpusA.append(environment.LocalCorpusPath(path='bar'))
-    >>> corpusB = environment.LocalCorpusSettings(name='B')
-    >>> corpusB.append(environment.LocalCorpusPath(path='baz'))
-    >>> localCorpora.append(corpusA)
-    >>> localCorpora.append(corpusB)
-    >>> print(localCorpora.xmlStr())
-    <?xml version="1.0" ...?>
-    <localCorporaSettings>
-      <localCorpusSettings name="A">
-        <localCorpusPath>foo</localCorpusPath>
-        <localCorpusPath>bar</localCorpusPath>
-      </localCorpusSettings>
-      <localCorpusSettings name="B">
-        <localCorpusPath>baz</localCorpusPath>
-      </localCorpusSettings>
-    </localCorporaSettings>
-    <BLANKLINE>
-    '''
-
-    ### INITIALIZER ###
-
-    def __init__(self):
-        xmlnode.XMLNodeList.__init__(self)
-        self._tag = 'localCorporaSettings'
-
-    ### PRIVATE METHODS ###
-
-    def _getComponents(self):
-        return self.componentList
-
-
-class LocalCorpusPath(xmlnode.XMLNode):
-    '''
-    An xmlnode.XMLNode subclass representing a list of environment
-    preference:
-
-    >>> from music21 import environment
-    >>> lcs = environment.LocalCorpusSettings()
-    >>> lcp = environment.LocalCorpusPath()
-    >>> lcp.charData = 'testing'
-    >>> lcs.append(lcp)
-    >>> print(lcs.xmlStr())
-    <?xml version="1.0" ...?>
-    <localCorpusSettings>
-    <localCorpusPath>testing</localCorpusPath>
-    </localCorpusSettings>
-    <BLANKLINE>
-    '''
-
-    ### INITIALIZER ###
-
-    def __init__(self, path=None):
-        xmlnode.XMLNode.__init__(self)
-        self._tag = 'localCorpusPath'  # assumed for now
-        self.charData = path  # char data stores path
-        # attributes
-
-
-#------------------------------------------------------------------------------
-
-
-class SettingsHandler(xml.sax.ContentHandler):
-    '''
-    An xml.sax.ContentHandler subclass holding settings:
-
-    >>> from music21 import environment
-    >>> sh = environment.SettingsHandler()
-    '''
-    #TODO: Make private class because there's no docs and no public interface.
-
-    ### INITIALIZER ###
-
-    def __init__(self):
-        xml.sax.ContentHandler.__init__(self)
-        self._characters = ''
-        self._objectStack = []
-        self._settings = None
-
-    ### PUBLIC METHODS ###
-
-    def characters(self, characters):
-        self._characters += characters
-
-    def endElement(self, name):
-        currentObject = self._objectStack.pop()
-        if isinstance(currentObject, _Preference):
-            self._objectStack[-1].append(currentObject)
-        elif isinstance(currentObject, LocalCorpusPath):
-            currentObject.charData = self._characters.strip()
-            self._objectStack[-1].append(currentObject)
-        elif isinstance(currentObject, LocalCorporaSettings):
-            currentObject.componentList.sort(
-                key=lambda x: (x.__class__.__name__, x._attr.get('name')))
-            self._objectStack[-1].append(currentObject)
-        elif isinstance(currentObject, LocalCorpusSettings):
-            currentObject.componentList.sort(
-                key=lambda x: (x.__class__.__name__, x._attr.get('name')))
-            self._objectStack[-1].append(currentObject)
-        elif isinstance(currentObject, Settings):
-            currentObject.componentList.sort(
-                key=lambda x: (x.__class__.__name__, x._attr.get('name')))
-            self._settings = currentObject
-
-    def getSettings(self):
-        return self._settings
-
-    def startElement(self, name, attrs):
-        self._characters = ''
-        if name == 'preference':
-            slot = _Preference()
-            slot.loadAttrs(attrs)
-        elif name == 'localCorporaSettings':
-            slot = LocalCorporaSettings()
-        elif name == 'localCorpusSettings':
-            slot = LocalCorpusSettings(name=attrs.get('name', None))
-        elif name == 'localCorpusPath':
-            slot = LocalCorpusPath()
-        elif name == 'settings':
-            slot = Settings()
-        self._objectStack.append(slot)
-
-
 #------------------------------------------------------------------------------
 
 
@@ -416,7 +213,7 @@ class _EnvironmentCore(object):
         return repr(self._ref)
 
     ### PRIVATE METHODS ###
-    def _fromSettingsET(self, settingsTree, ref=None):
+    def _fromSettings(self, settingsTree, ref=None):
         if ref is None:
             ref = {}
         settings = settingsTree.getroot()
@@ -443,38 +240,6 @@ class _EnvironmentCore(object):
                 else:  # load up stored values, overwriting defaults
                     ref[name] = value
                 
-
-    def _fromSettings(self, settings, ref=None):
-        '''
-        Load a ref dictionary from the Settings object. Change the passed-in
-        ref dictionary in place.
-        '''
-        if ref is None:
-            ref = {}
-        for slot in settings:
-            if isinstance(slot, LocalCorpusSettings):
-                ref['localCorpusSettings'] = []
-                for lcp in slot:
-                    # validate paths on load
-                    fpCandidate = lcp.charData.strip()
-                    ref['localCorpusSettings'].append(fpCandidate)
-            elif isinstance(slot, LocalCorporaSettings):
-                ref['localCorporaSettings'] = {}
-                for localCorpusSettings in slot:
-                    name = localCorpusSettings._attr['name']
-                    ref['localCorporaSettings'][name] = []
-                    for localCorpusPath in localCorpusSettings:
-                        fpCandidate = localCorpusPath.charData.strip()
-                        ref['localCorporaSettings'][name].append(fpCandidate)
-            else:
-                name = slot.get('name')
-                value = slot.get('value')
-                if name not in ref:
-                    continue
-                    # do not set, ignore for now
-                else:  # load up stored values, overwriting defaults
-                    ref[name] = value
-
     def _loadDefaults(self, forcePlatform=None):
         '''
         Load defaults.
@@ -857,23 +622,10 @@ class _EnvironmentCore(object):
             filePath = self.getSettingsPath()
         if not os.path.exists(filePath):
             return None  # do nothing if no file exists
-        saxparser = xml.sax.make_parser()
-        saxparser.setFeature(xml.sax.handler.feature_external_ges, 0)
-        saxparser.setFeature(xml.sax.handler.feature_external_pes, 0)
-        saxparser.setFeature(xml.sax.handler.feature_namespaces, 0)
-        h = SettingsHandler()
-        saxparser.setContentHandler(h)
-#         if six.PY2:
-#             openStyle = 'r'
-#         else:
-#             openStyle = 'rt'
-#         
-        openStyle = 'r'
-        with open(filePath, openStyle) as f:
-            saxparser.parse(f)
+        settingsTree = ET.parse(filePath)
         # load from XML into dictionary
         # updates self._ref in place
-        self._fromSettings(h.getSettings(), self._ref)
+        self._fromSettings(settingsTree, self._ref)
 
     def restoreDefaults(self):
         self._ref = {}
@@ -1078,7 +830,6 @@ class Environment(object):
         'vectorPath'
         'warnings'
         'writeFormat'
-
         '''
         return _environStorage['instance'].getRefKeys()
 
@@ -1137,7 +888,6 @@ class Environment(object):
         'vectorPath'
         'warnings'
         'writeFormat'
-
         '''
         return _environStorage['instance'].keys()
 
@@ -1201,7 +951,6 @@ class Environment(object):
         configuration file to restore our normal working environment.
 
         >>> a = environment.Environment().read()
-
         '''
         _environStorage['instance'].restoreDefaults()
 
@@ -1241,6 +990,8 @@ class UserSettings(object):
     The UserSettings object provides a simple interface for configuring the
     user preferences in the :class:`~music21.environment.Environment` object.
 
+    It automatically writes all changes to disk.
+
     First, create an instance of UserSettings:
 
     >>> from music21 import environment
@@ -1250,7 +1001,6 @@ class UserSettings(object):
 
     >>> for key in sorted(us.keys()):
     ...     key
-    ...
     'autoDownload'
     'braillePath'
     'debug'
@@ -1475,32 +1225,6 @@ class Test(unittest.TestCase):
         match = bio.getvalue().decode('utf-8')
         return match
 
-    def testSettings(self):
-        storage = Settings()
-        for i in range(10):
-            slot = _Preference()
-            slot.set('name', 'name%s' % i)
-            slot.set('value', i)
-            storage.append(slot)
-        xstr = storage.xmlStr()
-        if 'encoding' in xstr:
-            enc = 'encoding="utf-8"'
-        else:
-            enc = ''
-        self.assertEqual("""<?xml version="1.0" """ + enc + """?>
-<settings>
-  <preference name="name0" value="0"/>
-  <preference name="name1" value="1"/>
-  <preference name="name2" value="2"/>
-  <preference name="name3" value="3"/>
-  <preference name="name4" value="4"/>
-  <preference name="name5" value="5"/>
-  <preference name="name6" value="6"/>
-  <preference name="name7" value="7"/>
-  <preference name="name8" value="8"/>
-  <preference name="name9" value="9"/>
-</settings>
-""", xstr)
 
     def testToSettings(self):
         env = Environment(forcePlatform='darwin')
@@ -1597,7 +1321,7 @@ class Test(unittest.TestCase):
         settings = _environStorage['instance']._toSettings(ref)
 
         # this will load values into the env._ref dictionary
-        _environStorage['instance']._fromSettingsET(settings,
+        _environStorage['instance']._fromSettings(settings,
             _environStorage['instance']._ref)
         # get xml strings
         match = self.stringFromTree(_environStorage['instance']._toSettings(
@@ -1651,7 +1375,7 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 
 
-_DOC_ORDER = [UserSettings, Environment, _Preference]
+_DOC_ORDER = [UserSettings, Environment]
 
 if __name__ == "__main__":
     import music21
