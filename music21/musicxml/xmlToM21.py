@@ -742,9 +742,65 @@ class MeasureParser(object):
         return clefObj
         
     def handleKeySignature(self, mxKey):
-        pass
+        keySig = self.xmlToKeySignature(mxKey)
+        self.insertCoreAndRef(0, mxKey, keySig)
+
+    def xmlToKeySignature(self, mxKey):
+        '''
+        >>> import xml.etree.ElementTree as ET
+        >>> mxKey = ET.fromstring('<key><fifths>-4</fifths><mode>minor</mode></key>')
+        
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> MP.xmlToKeySignature(mxKey)
+        <music21.key.KeySignature of 4 flats, mode minor>
+        '''
+        ks = key.KeySignature()
+        seta = _setAttributeFromTagText
+        seta(ks, mxKey, 'fifths', 'sharps', transform=int)
+        seta(ks, mxKey, 'mode')
+        return ks
+    
     def handleStaffDetails(self, mxDetails):
-        pass
+        seta = _setAttributeFromTagText
+        staffNumber = mxDetails.get('number')
+        if staffNumber is not None:
+            staffNumber = int(staffNumber)
+            for stl in self.staffLayoutObjects:
+                if stl.staffNumber == staffNumber:
+                    try:
+                        seta(stl, mxDetails, 'staff-size', transform=float)
+                    except TypeError:
+                        staffSize = mxDetails.find('staff-size')
+                        if staffSize is None:
+                            raise TypeError("Incorrect number for mxStaffDetails.staffSize: %s", staffSize)
+                    return
+        else:
+            foundMatch = False
+            for stl in self.staffLayoutObjects:
+                if stl.staffSize is None:
+                    seta(stl, mxDetails, 'staff-size', transform=float)
+                    foundMatch = True
+                if stl.staffLines is None:
+                    seta(stl, mxDetails, 'staff-lines', transform=int)
+                    foundMatch = True
+            if foundMatch is True:
+                return
+        # no staffLayoutObjects or none that match on number
+        stl = layout.StaffLayout()
+        seta(stl, mxDetails, 'staff-size', transform=float)
+        seta(stl, mxDetails, 'staff-lines', transform=int)
+        staffNumber = mxDetails.get('number')
+        if staffNumber is not None:
+            stl.staffNumber = int(staffNumber)
+        staffPrinted = mxDetails.get('print-object')
+        if staffPrinted == 'no' or staffPrinted is False:
+            stl.hidden = True
+        elif staffPrinted == 'yes' or staffPrinted is True:
+            stl.hidden = False
+        
+        self.insertCoreAndRef(0.0, mxDetails, stl)
+        self.staffLayoutObjects.append(stl)
+
     
     def parseMeasureNumbers(self):
         m = self.stream
