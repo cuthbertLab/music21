@@ -52,6 +52,78 @@ class MusicXMLImportException(exceptions21.Music21Exception):
 
 class XMLBarException(MusicXMLImportException):
     pass
+
+
+#-------------------------------------------------------------------------------
+# Helpers...
+
+#     def _runIfTag(el, tag, func, inputM21=None):
+#         '''
+#         If an ElementTree.Element has a element of a certain tag, get it as
+#         mxObj, then call:
+#         
+#             return self.func(mxObj, inputM21)
+#             
+#         else, ret
+#         CRAP, needs more...
+#         '''
+#         
+#         mxObj = el.find('tag')
+        
+
+def _setAttributeFromTagText(m21El, xmlEl, tag, attributeName=None, transform=None):
+    '''
+    If xmlEl has a at least one element of tag==tag with some text. If
+    it does, set the attribute either with the same name (with "foo-bar" changed to
+    "fooBar") or with attributeName to the text contents.
+    
+    Pass a function or lambda function as transform to transform the value before setting it
+    
+    >>> from xml.etree.ElementTree import Element, SubElement
+    >>> e = Element('accidental')
+    >>> a = SubElement(e, 'alter')
+    >>> a.text = '-2'
+
+    >>> seta = musicxml.xmlToM21._setAttributeFromTagText
+    >>> acc = pitch.Accidental()
+    >>> seta(acc, e, 'alter')
+    >>> acc.alter
+    '-2'
+
+    Transform the alter text to an int.
+
+    >>> seta(acc, e, 'alter', transform=int)
+    >>> acc.alter
+    -2
+    
+    >>> e2 = Element('score-partwise')
+    >>> a2 = SubElement(e2, 'movement-title')
+    >>> a2.text = "Trout"
+    >>> md = metadata.Metadata()
+    >>> seta(md, e2, 'movement-title')
+    >>> md.movementTitle
+    'Trout'
+    
+    set a different attribute
+    
+    >>> seta(md, e2, 'movement-title', 'composer')
+    >>> md.composer
+    'Trout'
+    '''
+    matchEl = xmlEl.find(tag) # find first
+    if matchEl is None:
+        return
+    if matchEl.text in (None, ""):
+        return 
+    value = matchEl.text
+
+    if transform is not None:
+        value = transform(value)
+
+    if attributeName is None:
+        attributeName = common.hyphenToCamelCase(tag)
+    setattr(m21El, attributeName, value)
+
 #-------------------------------------------------------------------------------
 
 
@@ -77,18 +149,15 @@ class MusicXMLImporter(object):
         
         self.musicXmlVersion = "1.0"
     
-    def scoreFromFile(self, filename, systemScore = False):
+    def scoreFromFile(self, filename):
         '''
         main program: opens a file given by filename and returns a complete
         music21 Score from it.
         '''
+        # load filename into text
+        self.readFile(filename)
         self.parseXMLText()
-        scoreObj = self.systemScoreFromScore(self.mainDom)
-        if systemScore is True:
-            return scoreObj
-        else:
-            partScore = self.partScoreFromSystemScore(scoreObj)
-            return partScore
+        return self.stream
     
     def parseXMLText(self):
         sio = six.StringIO(self.xmlText)
@@ -126,11 +195,19 @@ class MusicXMLImporter(object):
 
         self.parsePartList(mxScore)
         for p in mxScore.findall('part'):
-            pass
+            partId = p.get('id')
+            part = self.xmlPartToPart(p, self.partIdDict[partId])        
+            s._insertCore(0, part)
         
+        s.elementsChanged()
         
         if inputM21 is None:
             return s
+
+    def xmlPartToPart(self, mxPart, partIdDict):
+        parser = PartParser(mxPart, partIdDict, parent=self)
+        parser.parse()
+        return parser.stream
 
     def parsePartList(self, mxScore):
         mxPartList = mxScore.find('part-list')
@@ -200,7 +277,7 @@ class MusicXMLImporter(object):
         else:
             scoreLayout = inputM21
 
-        seta = self._setAttributeFromTagText
+        seta = _setAttributeFromTagText
 
         mxScaling = mxDefaults.find('scaling')
         if mxScaling is not None:
@@ -237,7 +314,7 @@ class MusicXMLImporter(object):
         else:
             pageLayout = inputM21
 
-        seta = self._setAttributeFromTagText
+        seta = _setAttributeFromTagText
         
         seta(pageLayout, mxPageLayout, 'page-height', transform=float)
         seta(pageLayout, mxPageLayout, 'page-width', transform=float)
@@ -263,7 +340,7 @@ class MusicXMLImporter(object):
         else:
             systemLayout = inputM21
     
-        seta = self._setAttributeFromTagText
+        seta = _setAttributeFromTagText
 
         #TODO -- record even, odd, both margins
         mxSystemMargins = mxSystemLayout.find('system-margins')
@@ -288,7 +365,7 @@ class MusicXMLImporter(object):
         else:
             staffLayout = inputM21
         
-        seta = self._setAttributeFromTagText
+        seta = _setAttributeFromTagText
         seta(staffLayout, mxStaffLayout, 'staff-distance', 'distance', transform=float)
 
         if mxStaffLayout.staffDistance != None:
@@ -327,7 +404,7 @@ class MusicXMLImporter(object):
         else:
             md = metadata.Metadata()
             
-        seta = self._setAttributeFromTagText
+        seta = _setAttributeFromTagText
         #work
         work = el.find('work')
         if work is not None:
@@ -399,75 +476,310 @@ class MusicXMLImporter(object):
             return c        
         
 
-    #------------------------------------------------------------------------------
-    # Helpers...
-
-#     def _runIfTag(self, el, tag, func, inputM21=None):
-#         '''
-#         If an ElementTree.Element has a element of a certain tag, get it as
-#         mxObj, then call:
-#         
-#             return self.func(mxObj, inputM21)
-#             
-#         else, ret
-#         CRAP, needs more...
-#         '''
-#         
-#         mxObj = el.find('tag')
+#------------------------------------------------------------------------------
+class PartParser(object):
+    '''
+    parser to work with a single <part> tag.
+    
+    called out for multiprocessing potential in future
+    '''
+    def __init__(self, mxPart=None, mxPartInfo=None, parent=None):
+        self.mxPart = mxPart
+        self.mxPartInfo = mxPartInfo
+        self.partId = mxPart.get('id')
+        self._parent = common.wrapWeakref(parent)
+        self.spannerBundle = parent.spannerBundle
+        self.stream = stream.Part()
+        self.atSoundingPitch = True
         
+        self.lastTimeSignature = None
+        self.lastTransposition = None  # may change at measure boundaries
+        self.lastMeasureWasShort = False
+        self.lastMeasureOffset = 0.0
+        
+        self.lastMeasureNumber = 0
+        self.lastMeasureSuffix = None
+        
+        self.activeAttributes = None # divisions, clef, etc.        
 
-    def _setAttributeFromTagText(self, m21El, xmlEl, tag, attributeName=None, transform=None):
+    def _getParent(self):
+        return common.unwrapWeakref(self._parent)
+
+    parent = property(_getParent)
+    
+    def parse(self):
+        self.parsePartInfo()
+        self.parseMeasures()
+        self.stream.atSoundingPitch = self.atSoundingPitch
+    
+    def parseMeasures(self):
+        part = self.stream
+        for mxMeasure in self.iterfind('measure'):
+            measure = self.xmlMeasureToMeasure(mxMeasure)
+            part._appendCore(measure)
+        part.elementsChanged()
+           
+    def xmlMeasureToMeasure(self, mxMeasure):
+        parser = MeasureParser(mxMeasure, parent=self)
+        parser.parse()
+        return parser.stream
+        
+    def parsePartInfo(self):
+        instrumentObj = self.getDefaultInstrument()
+        if instrumentObj.bestName() is not None:
+            self.stream.id = instrumentObj.bestName()
+        self.stream._insertCore(0, instrumentObj) # add instrument at zero offset
+        
+    def getDefaultInstrument(self):
+        def _clean(badStr):
+            # need to remove badly-formed strings
+            if badStr is None:
+                return None
+            badStr = badStr.strip()
+            goodStr = badStr.replace('\n', ' ')
+            return goodStr
+        
+        def _adjustMidiData(mc):
+            return int(mc) - 1
+        
+        seta = _setAttributeFromTagText
+
+        
+        mxInfo = self.mxPartInfo
+        i = instrument.Instrument()
+        i.partId = self.partId
+        i.groups.append(self.partId)
+
+        seta(i, mxInfo, 'partName', transform=_clean)
+        # TODO: partNameDisplay
+        seta(i, mxInfo, 'partAbbreviation', transform=_clean)
+        # TODO: partAbbreviationDisplay        
+        # TODO: groups
+        
+        # for now, just get first instrument
+        # TODO: get all instruments!
+        mxScoreInstrument = mxInfo.find('score-instrument')
+        seta(i, mxScoreInstrument, 'instrument-name', transform=_clean)
+        seta(i, mxScoreInstrument, 'instrument-abbreviation', transform=_clean)
+        # TODO: instrument-sound
+        # TODO: solo / ensemble
+        # TODO: virtual-instrument
+        # TODO: store id attribute somewhere
+        
+        # for now, just get first midi instrument
+        # TODO: get all
+        # TODO: midi-device
+        mxMIDIInstrument = mxInfo.find('midi-instrument')
+        # TODO: midi-name
+        # TODO: midi-bank transform=_adjustMidiData
+        # TODO: midi-unpitched
+        # TODO: midi-volume
+        # TODO: pan
+        # TODO: elevation
+        # TODO: store id attribute somewhere
+        seta(i, mxMIDIInstrument, 'midi-program', transform=_adjustMidiData)
+        seta(i, mxMIDIInstrument, 'midi-channel', transform=_adjustMidiData)
+
+        # TODO: reclassify 
+        return i
+#------------------------------------------------------------------------------
+class MeasureParser(object):
+    '''
+    parser to work with a single <measure> tag.
+    
+    called out for simplicity
+    '''
+    attributeTagsToMethods = {'time': 'handleTimeSignature',
+                     'clef': 'handleClef',
+                     'key': 'handleKeySignature',
+                     'staff-details': 'handleStaffDetails',
+                     }
+    # TODO: editorial, i.e., footnote and level
+    # TODO: staves (num staves)
+    # TODO: part-symbol
+    # TODO: instruments
+    # TODO: transpose
+    # TODO: directive DEPRECATED since MusicXML 2.0
+    # TODO: measure-style
+    # ignore divisions?    
+    def __init__(self, mxMeasure=None, parent=None):
+        self.mxMeasure = mxMeasure
+        self.parent = parent # PartParser
+        self.transposition = None
+        if parent is not None:
+            self.spannerBundle = parent.spannerBundle
+        else:
+            self.spannerBundle = spanner.SpannerBundle()
+            
+        self.staffReference = {}
+        self.activeAttributes = None
+        self.attributesAreInternal = True
+        
+        self.measureNumber = None
+        self.measureSuffix = None
+        
+        self.staffLayoutObjects = []
+        
+        self.stream = stream.Measure()
+        
+    def addToStaffReference(self, mxObjectOrNumber, m21Object):
+        staffReference = self.staffReference
+    
+    def insertCoreAndRef(self, offset, mxObjectOrNumber, m21Object):
+        self.addToStaffReference(mxObjectOrNumber, m21Object)
+        self.stream._insertCore(offset, m21Object)
+
+        
+    def parse(self):
+        self.parseAttributes()
+        
+    def parseAttributes(self):        
+        self.parseMeasureNumbers()        
+        # TODO: implicit
+        # TODO: non-controlling
+        # may need to do a format/unit conversion?
+        
+        self.layoutWidth = self.mxMeasure.get('width')
+        self.parseAttributesTags()
+        
+    def parseAttributesTags(self):
+        m = self.stream
+        mxMeasure = self.mxMeasure
+        
+        allAttributes = mxMeasure.findall('attributes')
+        if len(allAttributes) == 0:
+            self.attributesAreInternal = False
+            self.activeAttributes = self.parent.activeAttributes
+            if self.activeAttributes is None:
+                raise MusicXMLImportException(
+                            'no mxAttribues available for this measure: {0}'.format(mxMeasure)
+                                              )
+        # getting first for each of these for now
+        if self.attributesAreInternal:
+            mxAttributes = allAttributes[0]
+            for mxSub in mxAttributes:
+                meth = None
+                if mxSub.tag in self.attributeTagsToMethods:
+                    meth = getattr(self, self.attributeTagsToMethods[mxSub.tag])
+                if meth is not None:
+                    meth(self, mxSub)
+
+    def handleTimeSignature(self, mxTime):
+        # TODO: interchangeable
+        # TODO: senza-misura
+        # TODO: attr: separator
+        # TODO: attr: symbol
+        # TODO: attr: number (done?)
+        # TODO: print-style-align
+        # TODO: print-object
+        ts = self.xmlToTimeSignature(mxTime)
+        self.insertCoreAndRef(0, mxTime, ts)
+        
+    def xmlToTimeSignature(self, mxTime):
         '''
-        If xmlEl has a at least one element of tag==tag with some text. If
-        it does, set the attribute either with the same name (with "foo-bar" changed to
-        "fooBar") or with attributeName to the text contents.
+        >>> import xml.etree.ElementTree as ET
+        >>> mxTime = ET.fromstring('<time><time-signature><beats>3</beats><beat-type>8</beat-type></time-signature></time>')
         
-        Pass a function or lambda function as transform to transform the value before setting it
-        
-        >>> from xml.etree.ElementTree import Element, SubElement
-        >>> e = Element('accidental')
-        >>> a = SubElement(e, 'alter')
-        >>> a.text = '-2'
-
-        >>> MI = musicxml.xmlToM21.MusicXMLImporter()
-        >>> acc = pitch.Accidental()
-        >>> MI._setAttributeFromTagText(acc, e, 'alter')
-        >>> acc.alter
-        '-2'
-
-        Transform the alter text to an int.
-
-        >>> MI._setAttributeFromTagText(acc, e, 'alter', transform=int)
-        >>> acc.alter
-        -2
-        
-        >>> e2 = Element('score-partwise')
-        >>> a2 = SubElement(e2, 'movement-title')
-        >>> a2.text = "Trout"
-        >>> md = metadata.Metadata()
-        >>> MI._setAttributeFromTagText(md, e2, 'movement-title')
-        >>> md.movementTitle
-        'Trout'
-        
-        set a different attribute
-        
-        >>> MI._setAttributeFromTagText(md, e2, 'movement-title', 'composer')
-        >>> md.composer
-        'Trout'
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> MP.xmlToTimeSignature(mxTime)
+        <music21.meter.TimeSignature 3/8>      
         '''
-        matchEl = xmlEl.find(tag) # find first
-        if matchEl is None:
-            return
-        if matchEl.text in (None, ""):
-            return 
-        value = matchEl.text
+        ts = meter.TimeSignature()
+        n = []
+        d = []
+        # just get first one for now;
+        for beatOrType in mxTime.find('time-signature'):
+            if beatOrType.tag == 'beats':
+                n.append(beatOrType.text) # may be 3+2
+            elif beatOrType.tag == 'beat-type':
+                d.append(beatOrType.text)
+        # convert into a string
+        msg = []
+        for i in range(len(n)):
+            msg.append('%s/%s' % (n[i], d[i]))
+    
+        #environLocal.warn(['loading meter string:', '+'.join(msg)])
+        ts.load('+'.join(msg))
+        
+        return ts
+        
+    def handleClef(self, mxClef):
+        clef = self.xmlToClef(mxClef)
+        self.insertCoreAndRef(0, mxClef, clef)
+    
+    def xmlToClef(self, mxClef):
+        '''
+        >>> import xml.etree.ElementTree as ET
+        >>> mxClef = ET.fromstring('<clef><sign>G</sign><line>2</line></clef>')
+        
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> MP.xmlToClef(mxClef)
+        <music21.clef.TrebleClef>        
 
-        if transform is not None:
-            value = transform(value)
+        >>> mxClef = ET.fromstring('<clef><sign>TAB</sign></clef>')
+        >>> MP.xmlToClef(mxClef)
+        <music21.clef.TabClef>        
+        '''
+        sign = mxClef.find('sign').text.strip()
+        if sign.lower() in ('tab', 'percussion', 'none', 'jianpu'):
+            clefObj = clef.clefFromString(sign)
+        else:
+            line = mxClef.find('line').text.strip()
+            mxOctaveChange = mxClef.find('clef-octave-change')
+            if mxOctaveChange != None:
+                octaveChange = int(mxOctaveChange)
+            else:
+                octaveChange = 0
+            clefObj = clef.clefFromString(sign + line, octaveChange)
+    
+        # TODO: number
+        # TODO: additional
+        # TODO: size
+        # TODO: after-barline
+        # TODO: print-style
+        # TODO: print-object
+    
+        return clefObj
+        
+    def handleKeySignature(self, mxKey):
+        pass
+    def handleStaffDetails(self, mxDetails):
+        pass
+    
+    def parseMeasureNumbers(self):
+        m = self.stream
+        lastMNum = self.parent.lastMeasureNumber
+        lastMSuffix = self.parent.lastMeasureSuffix
+        
+        mNumRaw = self.mxMeasure.get('number')
+        if mNumRaw is None:
+            mNum = None
+            mSuffix = None
+        else:
+            mNum, mSuffix = common.getNumFromStr(mNumRaw)
+        
+        # assume that measure numbers are integers
+        if mNum not in (None, ''):
+            m.number = int(mNum)
+        if mSuffix not in (None, ''):
+            m.numberSuffix = mSuffix
+    
+        # fix for Finale which calls unnumbered measures X1, X2, etc. which
+        # we convert to 1.X, 2.X, etc. without this...
+        if lastMNum is not None:
+            if m.numberSuffix == 'X' and m.number != lastMNum + 1:
+                newSuffix = m.numberSuffix + str(m.number)
+                if lastMSuffix is not None:
+                    newSuffix = lastMSuffix + newSuffix
+                m.number = lastMNum
+                m.numberSuffix = newSuffix 
+                   
+        self.measureNumber = m.number
+        self.measureSuffix = m.numberSuffix
+#------------------------------------------------------------------------------
 
-        if attributeName is None:
-            attributeName = common.hyphenToCamelCase(tag)
-        setattr(m21El, attributeName, value)
+
+#------------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
