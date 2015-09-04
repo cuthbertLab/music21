@@ -2865,6 +2865,7 @@ def mxScoreToScore(mxScore, spannerBundle=None, inputM21=None):
         s = stream.Score()
     else:
         s = inputM21
+        
     if spannerBundle == None:
         spannerBundle = spanner.SpannerBundle()
 

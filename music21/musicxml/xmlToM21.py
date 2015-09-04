@@ -66,6 +66,16 @@ class MusicXMLImporter(object):
         self.etree = None
         self.xmlRoot = None
         self.stream = stream.Score()
+        
+        self.definesExplicitSystemBreaks = False # TODO -- set to score and parts
+        self.definesExplicitPageBreaks = False
+
+        self.spannerBundle = spanner.SpannerBundle()
+        self.partIdDict = {}
+        self.partGroupList = []
+        self.parts = []
+        
+        self.musicXmlVersion = "1.0"
     
     def scoreFromFile(self, filename, systemScore = False):
         '''
@@ -96,7 +106,12 @@ class MusicXMLImporter(object):
             s = stream.Score()
         else:
             s = inputM21
-            
+        
+        mxVersion = mxScore.get('version')
+        if mxVersion is None:
+            mxVersion = "1.0"
+        self.musicXmlVersion = mxVersion
+        
         md = self.xmlMetadata(mxScore)
         s._insertCore(0, md)
         
@@ -109,9 +124,26 @@ class MusicXMLImporter(object):
             credit = self.xmlCreditToTextBox(mxCredit)
             s._insertCore(0, credit)
 
-            
+        self.parsePartList(mxScore)
+        for p in mxScore.findall('part'):
+            pass
+        
+        
         if inputM21 is None:
             return s
+
+    def parsePartList(self, mxScore):
+        mxPartList = mxScore.find('part-list')
+        if mxPartList is None:
+            return
+
+        for mxScorePart in mxPartList.findall('score-part'):
+            partId = mxScorePart.get('id')
+            self.partIdDict[partId] = mxScorePart
+
+        for mxPartGroup in mxPartList.findall('part-group'):
+            self.partGroupList.append(mxPartGroup)
+            
         
     def xmlCreditToTextBox(self, mxCredit):
         '''Convert a MusicXML credit to a music21 TextBox
@@ -311,6 +343,16 @@ class MusicXMLImporter(object):
             for creator in identification.findall('creator'):
                 c = self.creatorToContributor(creator)
                 md.addContributor(c)
+            encoding = identification.find('encoding')
+            if encoding is not None:
+                for supports in encoding.findall('supports'):
+                    attr = supports.get('attribute')
+                    value = supports.get('value')
+                    if (attr, value) == ('new-system', 'yes'):
+                        self.definesExplicitSystemBreaks = True
+                    elif (attr, value) == ('new-page', 'yes'):
+                        self.definesExplicitPageBreaks = True
+        
         # TODO: rights
         # TODO: encoding (incl. supports)
         # TODO: source
