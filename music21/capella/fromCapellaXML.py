@@ -17,10 +17,11 @@ Slurs, Dynamics, Ornamentation, etc.
 Does not handle pickup notes, which are defined simply with an early barline
 (same as incomplete bars at the end).
 '''
-import xml.dom.minidom
-import sys
+import xml.etree.ElementTree
 import unittest
 import zipfile
+
+from music21.ext.six import StringIO, string_types
 
 from music21 import bar
 from music21 import chord
@@ -39,18 +40,6 @@ from music21 import tie
 #from music21 import environment
 #_MOD = 'capella/fromCapellaXML.py'
 #environLocal = environment.Environment(_MOD)
-
-currentStdOut = sys.stdout
-currentStdIn = sys.stdin
-currentStdErr = sys.stderr
-try:
-    reload(sys)
-    sys.setdefaultencoding('utf-8') # @UndefinedVariable
-except NameError:
-    pass  # python3
-sys.stdout = currentStdOut
-sys.stdin = currentStdIn
-sys.stderr = currentStdErr
 
 #capellaDynamics = {'r': 'ppp',
 #                   'q': 'pp',
@@ -115,7 +104,7 @@ class CapellaImporter(object):
                 #ci.readCapellaXMLFile(r'd:/desktop/achsorgd.capx')
         self.readCapellaXMLFile(filename)
         self.parseXMLText()
-        scoreObj = self.systemScoreFromScore(self.mainDom.documentElement)
+        scoreObj = self.systemScoreFromScore(self.mainDom)
         if systemScore is True:
             return scoreObj
         else:
@@ -142,61 +131,39 @@ class CapellaImporter(object):
         '''
         if xmlText is None:
             xmlText = self.xmlText
-        dom1 = xml.dom.minidom.parseString(xmlText)
-        self.mainDom = dom1
-        return dom1
+        if not isinstance(xmlText, string_types):
+            xmlText = xmlText.decode('utf-8')
+        it = xml.etree.ElementTree.iterparse(StringIO(xmlText))
+        for _, el in it:
+            if '}' in el.tag:
+                el.tag = el.tag.split('}', 1)[1]  # strip all namespaces
+        self.mainDom = it.root
+        return self.mainDom
 
     def domElementFromText(self, xmlText = None):
         '''
         Utility method, especially for the documentation examples/tests, which uses
-        `xml.dom.minidom` to parse the string and returns its `.documentElement` object.
+        `xml.etree.ElementTree` to parse the string and returns its root object.
         
+        Not used by the main parser
         
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> funnyTag = ci.domElementFromText('<funny yes="definitely"><greg/>hi<greg><ha>ha</ha><greg type="embedded"/></greg></funny>')
         >>> funnyTag
-        <DOM Element: funny at 0x...>
+        <Element 'funny' at 0x...>
         
-        All standard DOM methods can be called on this element.
-        N.B. this call returns 3 not 2 because getElementsByTagName searches recursively, hence, getChildrenByTag, below.
+        iter searches recursively
         
-        >>> len(funnyTag.getElementsByTagName('greg'))
+        >>> len(list(funnyTag.iter('greg')))
         3
+        
+        findall does not:
+        
+        >>> len(funnyTag.findall('greg'))
+        2
         '''
-        return xml.dom.minidom.parseString(xmlText).documentElement
+        return xml.etree.ElementTree.fromstring(xmlText)
         
-
-    def getChildrenByTag(self, documentElement, tag = None):
-        '''
-        NON-recursively walk the documentElement's child notes looking for ELEMENT_NODE object that match a certain tag.
-        
-        Returns a list, which might be empty.
-        
-        If you want to do it recursively, getElementsByTagName() will do it nicely, and faster!
-        
-        Note that this is NOT a method on a DOM Element, but a call on CapellaImporter, thus you
-        will need to specify the documentElement as the first element.
-        
-        If `tag` is omitted then all element nodes are returned.
-        
-        
-        >>> ci = capella.fromCapellaXML.CapellaImporter()
-        >>> funnyTag = ci.domElementFromText('<funny yes="definitely"><greg/>hi<greg><ha>ha</ha><greg type="embedded"/></greg></funny>')
-        >>> g = ci.getChildrenByTag(funnyTag, 'greg')
-        >>> g
-        [<DOM Element: greg at 0x...>, <DOM Element: greg at 0x...>]    
-        >>> h = ci.getChildrenByTag(g[1], 'ha')[0]
-        >>> h
-        <DOM Element: ha at 0x...>
-        '''
-        returnList = []
-        for d in documentElement.childNodes:
-            if d.nodeType == xml.dom.Node.ELEMENT_NODE:
-                if tag is None:
-                    returnList.append(d)
-                elif d.tagName == tag:
-                    returnList.append(d)
-        return returnList
 
     def partScoreFromSystemScore(self, systemScore):
         '''
@@ -276,14 +243,14 @@ class CapellaImporter(object):
         if scoreObj is None:
             scoreObj = stream.Score()
 
-        systemsList = self.getChildrenByTag(scoreElement, 'systems')
+        systemsList = scoreElement.findall('systems')
         if len(systemsList) == 0:
             raise CapellaImportException("Cannot find a <systems> tag in the <score> object")
         elif len(systemsList) > 1:
             raise CapellaImportException("Found more than one <systems> tag in the <score> object, what does this mean?")
         systemsElement = systemsList[0]
         
-        systemList = self.getChildrenByTag(systemsElement, 'system')
+        systemList = systemsElement.findall('system')
         if len(systemList) == 0:
             raise CapellaImportException('Cannot find any <system> tags in the <systems> tag in the <score> object')
         
@@ -306,33 +273,33 @@ class CapellaImporter(object):
         if systemObj is None:
             systemObj = stream.System()
             
-        stavesList = self.getChildrenByTag(systemElement, 'staves')
+        stavesList = systemElement.findall('staves')
         if len(stavesList) == 0:
             raise CapellaImportException("No <staves> tag found in this <system> element")
         elif len(stavesList) > 1:
             raise CapellaImportException("More than one <staves> tag found in this <system> element")
         stavesElement = stavesList[0]
-        staffList = self.getChildrenByTag(stavesElement, 'staff')
+        staffList = stavesElement.findall('staff')
         if len(stavesList) == 0:
             raise CapellaImportException("No <staff> tag found in the <staves> element for this <system> element")
         for thisStaffElement in staffList:
             # do something with defaultTime
             partId = "UnknownPart"
-            if 'layout' in thisStaffElement._attrs:
-                partId = thisStaffElement._attrs['layout'].value
+            if 'layout' in thisStaffElement.attrib:
+                partId = thisStaffElement.attrib['layout']
             partObj = stream.Part()
             partObj.id = partId
             
-            voicesList = self.getChildrenByTag(thisStaffElement, 'voices')
+            voicesList = thisStaffElement.findall('voices')
             if len(voicesList) == 0:
                 raise CapellaImportException("No <voices> tag found in the <staff> tag for the <staves> element for this <system> element")
             voicesElement = voicesList[0]
-            voiceList = self.getChildrenByTag(voicesElement, 'voice')
+            voiceList = voicesElement.findall('voice')
             if len(voiceList) == 0:
                 raise CapellaImportException("No <voice> tag found in the <voices> tag for the <staff> tag for the <staves> element for this <system> element")
             if len(voiceList) == 1: # single voice staff... perfect!
                 thisVoiceElement = voiceList[0]
-                noteObjectsList = self.getChildrenByTag(thisVoiceElement, 'noteObjects')
+                noteObjectsList = thisVoiceElement.findall('noteObjects')
                 if len(noteObjectsList) == 0:
                     raise CapellaImportException("No <noteObjects> tag found in the <voice> tag found in the <voices> tag for the <staff> tag for the <staves> element for this <system> element")
                 elif len(noteObjectsList) > 1:
@@ -403,21 +370,20 @@ class CapellaImporter(object):
                    'barline': self.barlineListFromBarline,
                    }
 
-        for d in noteObjectsElement.childNodes:
-            if d.nodeType == xml.dom.Node.ELEMENT_NODE:
-                el = None
-                t = d.tagName
-                if t not in mapping:
-                    print("Unknown tag type: %s" % t)
+        for d in noteObjectsElement:
+            el = None
+            t = d.tag
+            if t not in mapping:
+                print("Unknown tag type: %s" % t)
+            else:
+                el = mapping[t](d)
+                if isinstance(el, list): #barlineList returns a list
+                    for elSub in el:
+                        s._appendCore(elSub)
+                elif el is None:
+                    pass
                 else:
-                    el = mapping[t](d)
-                    if isinstance(el, list): #barlineList returns a list
-                        for elSub in el:
-                            s._appendCore(elSub)
-                    elif el is None:
-                        pass
-                    else:
-                        s._appendCore(el)
+                    s._appendCore(el)
                     
         s.elementsChanged()
         return s
@@ -436,7 +402,7 @@ class CapellaImporter(object):
         'half'
         '''
         r = note.Rest()
-        durationList = self.getChildrenByTag(restElement, 'duration')
+        durationList = restElement.findall('duration')
         r.duration = self.durationFromDuration(durationList[0])
         return r
     
@@ -466,8 +432,8 @@ class CapellaImporter(object):
         
         TODO: test Lyrics
         '''
-        durationList = self.getChildrenByTag(chordElement, 'duration')
-        headsList = self.getChildrenByTag(chordElement, 'heads')
+        durationList = chordElement.findall('duration')
+        headsList = chordElement.findall('heads')
         
         if len(durationList) != 1 or len(headsList) != 1:
             raise CapellaImportException("Malformed chord!")
@@ -484,7 +450,7 @@ class CapellaImporter(object):
         
         noteOrChord.duration = self.durationFromDuration(durationList[0])
 
-        lyricsList = self.getChildrenByTag(chordElement, 'lyric')
+        lyricsList = chordElement.findall('lyric')
         if len(lyricsList) > 0:
             lyricsList = self.lyricListFromLyric(lyricsList[0])
             noteOrChord.lyrics = lyricsList
@@ -502,7 +468,7 @@ class CapellaImporter(object):
         [<music21.note.Note B->, <music21.note.Note C>]
         '''
         notes = []
-        headDomList = self.getChildrenByTag(headsElement, 'head')
+        headDomList = headsElement.findall('head')
         for headElement in headDomList:
             notes.append(self.noteFromHead(headElement))            
         return notes
@@ -524,22 +490,22 @@ class CapellaImporter(object):
         >>> n.tie
         <music21.tie.Tie stop>
         '''
-        if 'pitch' not in headElement._attrs:
+        if 'pitch' not in headElement.attrib:
             raise CapellaImportException("Cannot deal with <head> element without pitch!")
     
-        noteNameWithOctave = headElement._attrs['pitch'].value
+        noteNameWithOctave = headElement.attrib['pitch']
         n = note.Note()
         n.nameWithOctave = noteNameWithOctave
         n.octave = n.octave - 1 # capella octaves are 1 off...
 
-        alters = self.getChildrenByTag(headElement, 'alter')
+        alters = headElement.findall('alter')
         if len(alters) > 1:
             raise CapellaImportException("Cannot deal with multiple <alter> elements!")
         elif len(alters) == 1:
             acc = self.accidentalFromAlter(alters[0])
             n.pitch.accidental = acc
 
-        ties = self.getChildrenByTag(headElement, 'tie')
+        ties = headElement.findall('tie')
         if len(ties) > 1:
             raise CapellaImportException("Cannot deal with multiple <tie> elements!")
         elif len(ties) == 1:
@@ -567,14 +533,14 @@ class CapellaImporter(object):
         >>> acc.displayType
         'never'
         '''
-        if 'step' in alterElement._attrs:
-            alteration = int(alterElement._attrs['step'].value)
+        if 'step' in alterElement.attrib:
+            alteration = int(alterElement.attrib['step'])
         else:
             print("No alteration...")
             alteration = 0
         acc = pitch.Accidental(alteration)
 
-        if 'display' in alterElement._attrs and alterElement._attrs['display'].value == 'suppress':
+        if 'display' in alterElement.attrib and alterElement.attrib['display'] == 'suppress':
             acc.displayType = 'never'
         return acc
         
@@ -604,9 +570,9 @@ class CapellaImporter(object):
         '''
         begin = False
         end = False
-        if 'begin' in tieElement._attrs and tieElement._attrs['begin'].value == 'true':
+        if 'begin' in tieElement.attrib and tieElement.attrib['begin'] == 'true':
             begin = True
-        if 'end' in tieElement._attrs and tieElement._attrs['end'].value == 'true':
+        if 'end' in tieElement.attrib and tieElement.attrib['end'] == 'true':
             end = True
         
         tieType = None
@@ -635,7 +601,7 @@ class CapellaImporter(object):
          <music21.note.Lyric number=3 syllabic=single text="frau,">]
         '''
         lyricList = []
-        verses = self.getChildrenByTag(lyricElement, 'verse')
+        verses = lyricElement.findall('verse')
         for d in verses:
             thisLyric = self.lyricFromVerse(d)
             if thisLyric is not None:
@@ -658,15 +624,12 @@ class CapellaImporter(object):
         '''
         verseNumber = 1
         syllabic = 'single'
-        text = None
-        if 'i' in verse._attrs:
-            verseNumber = int(verse._attrs['i'].value) + 1
-        if 'hyphen' in verse._attrs and verse._attrs['hyphen'].value == 'true':
+        if 'i' in verse.attrib:
+            verseNumber = int(verse.attrib['i']) + 1
+        if 'hyphen' in verse.attrib and verse.attrib['hyphen'] == 'true':
             syllabic = 'begin'
-        for d in verse.childNodes:
-            if d.nodeType == xml.dom.Node.TEXT_NODE:
-                text = d.nodeValue
-        if text is None:
+        text = verse.text
+        if text is None or text == "":
             return None
         else:
             lyric = note.Lyric(text=text, number=verseNumber, syllabic=syllabic, applyRaw=True)        
@@ -709,8 +672,8 @@ class CapellaImporter(object):
         >>> clefObject.octaveChange
         1
         '''
-        if 'clef' in clefSign._attrs:
-            clefValue = clefSign._attrs['clef'].value
+        if 'clef' in clefSign.attrib:
+            clefValue = clefSign.attrib['clef']
             if clefValue in self.clefMapping:
                 return self.clefMapping[clefValue]()
             elif clefValue[0] == 'p':
@@ -738,8 +701,8 @@ class CapellaImporter(object):
         >>> ci.keySignatureFromKeySign(keySign)
         <music21.key.KeySignature of 1 flat>
         '''
-        if 'fifths' in keySign._attrs:
-            keyFifths = int(keySign._attrs['fifths'].value)
+        if 'fifths' in keySign.attrib:
+            keyFifths = int(keySign.attrib['fifths'])
             return key.KeySignature(keyFifths)
     
     def timeSignatureFromTimeSign(self, timeSign):
@@ -751,9 +714,13 @@ class CapellaImporter(object):
         >>> timeSign = ci.domElementFromText('<timeSign time="4/4"/>')
         >>> ci.timeSignatureFromTimeSign(timeSign)
         <music21.meter.TimeSignature 4/4>
+
+        >>> timeSign = ci.domElementFromText('<timeSign time="infinite"/>')
+        >>> ci.timeSignatureFromTimeSign(timeSign) is None
+        True
         '''
-        if 'time' in timeSign._attrs:
-            timeString = timeSign._attrs['time'].value
+        if 'time' in timeSign.attrib:
+            timeString = timeSign.attrib['time']
             if timeString != 'infinite':
                 return meter.TimeSignature(timeString)
             else:
@@ -789,8 +756,8 @@ class CapellaImporter(object):
         '''
         dur = duration.Duration()
 
-        if 'base' in durationElement._attrs:
-            baseValue = durationElement._attrs['base'].value
+        if 'base' in durationElement.attrib:
+            baseValue = durationElement.attrib['base']
             slashIndex = baseValue.find("/")
             if slashIndex != -1:
                 firstNumber = int(baseValue[0:slashIndex])
@@ -798,11 +765,11 @@ class CapellaImporter(object):
                 quarterLength = (4.0 * firstNumber)/secondNumber
                 dur.quarterLength = quarterLength
 
-        if 'dots' in durationElement._attrs:
-            dotNumber = int(durationElement._attrs['dots'].value)
+        if 'dots' in durationElement.attrib:
+            dotNumber = int(durationElement.attrib['dots'])
             dur.dots = dotNumber
         
-        tuplets = self.getChildrenByTag(durationElement, 'tuplet')
+        tuplets = durationElement.findall('tuplet')
         for d in tuplets:
             tuplet = self.tupletFromTuplet(d)
             dur.appendTuplet(tuplet)
@@ -823,15 +790,15 @@ class CapellaImporter(object):
         '''
         numerator = 1
         denominator = 1
-        if 'count' in tupletElement._attrs:
-            numerator = int(tupletElement._attrs['count'].value)
+        if 'count' in tupletElement.attrib:
+            numerator = int(tupletElement.attrib['count'])
             denominator = 1
             while numerator > denominator * 2:
                 denominator *= 2
-        if 'prolong' in tupletElement._attrs and tupletElement._attrs['count'].value == 'true':
+        if 'prolong' in tupletElement.attrib and tupletElement.attrib['count'] == 'true':
             denominator *= 2
         
-        if 'tripartite' in tupletElement._attrs:
+        if 'tripartite' in tupletElement.attrib:
             print("WE DON'T HANDLE TRIPARTITE YET! Email the file and a pdf so I can figure it out")
         
         tup = duration.Tuplet(numerator, denominator)
@@ -868,8 +835,8 @@ class CapellaImporter(object):
         '''
         barlineList = []
         hasRepeatEnd = False
-        if barlineElement._attrs is not None and 'type' in barlineElement._attrs:
-            barlineType = barlineElement._attrs['type'].value
+        if 'type' in barlineElement.attrib:
+            barlineType = barlineElement.attrib['type']
             if barlineType.startswith('rep'): # begins with rep
                 if barlineType in self.barlineMap:
                     repeatType = self.barlineMap[barlineType]
