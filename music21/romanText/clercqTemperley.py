@@ -606,6 +606,7 @@ class CTRule(object):
                         rn = roman.RomanNumeral(atom, ks)
                         if self.isSame(rn, lastChord) and lastChordIsInSameMeasure:
                             lastChord.duration.quarterLength += atomLength
+                            m.elementsChanged()
                         else:
                             rn.duration.quarterLength = atomLength
                             self.addOptionalTieAndLyrics(rn, lastChord)
@@ -639,9 +640,16 @@ class CTRule(object):
          ('Vr', '$', 1), ('BP', '$', 3), ('I IV', '|', 1), ('I', '|', 1), 
          ('BP', '$', 3), ('I IV', '|', 1), ('I', '|', 1), ('I', '|', 1), 
          ('R', '|', 4), ('I', '|', 4)]
+         
+         
+        >>> r = romanText.clercqTemperley.CTRule('In: $IP*3 I | | | $BP*2')
+        >>> r._measureGroups()
+        [('IP', '$', 3), ('I', '|', 1), ('I', '|', 1), ('I', '|', 1), ('BP', '$', 2)]
+        
         '''
         measureGroups1 = []
         measureGroups2 = []
+        measureGroups3 = []
         measureGroupTemp = self.SPLITMEASURES.split(self.musicText)
         # first pass -- separate by | or |*3, etc.
         for i in range(0, len(measureGroupTemp), 2):
@@ -653,12 +661,7 @@ class CTRule(object):
             if content != "" or sep != "":
                 measureGroups1.append((content, sep))
         # second pass -- filter out expansions.
-        lastContent = ""
         for content, sep in measureGroups1:
-            if content == "":
-                content = lastContent
-            else:
-                lastContent = content
             contentList = content.split()
             contentOut = []
             
@@ -686,9 +689,19 @@ class CTRule(object):
             else:
                 numReps = 1
             
-            if len(contentOut) > 0:
+            if (len(contentOut) > 0 or sep == '|'):
                 measureGroups2.append((" ".join(contentOut), sep, numReps))
-        return measureGroups2
+
+        # third pass, make empty content duplicate previous content.
+        lastContent = ""
+        for content, sep, numReps in measureGroups2:
+            if content == "" and sep == "|":
+                content = lastContent
+            else:
+                lastContent = content
+            measureGroups3.append((content, sep, numReps))
+        
+        return measureGroups3
     
     #---------------------------------------------------------------------------
     def isSame(self, rn, lastChord):
