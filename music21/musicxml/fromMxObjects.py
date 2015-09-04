@@ -3356,7 +3356,7 @@ def mxScoreToMetadata(mxScore, inputM21 = None):
         for mxCreator in mxIdentification.get('creatorList'):
             # do an mx conversion for mxCreator to Contributor
             c = mxCreatorToContributor(mxCreator)
-            md._contributors.append(c)
+            md.addContributor(c)
 
     # not yet supported; an encoding is also found in identification obj
     # mxEncoding = mxScore.get('encodingObj')

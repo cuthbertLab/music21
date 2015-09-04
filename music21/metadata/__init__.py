@@ -165,7 +165,7 @@ class Metadata(base.Music21Object):
 
         # a list of Contributor objects
         # there can be more than one composer, or any other combination
-        self._contributors = []
+        self._contributors = [] # use addContributor to add.
         self._date = None
 
         # store one or more URLs from which this work came; this could

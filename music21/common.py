@@ -1157,6 +1157,70 @@ def numToIntOrFloat(value):
         return value
 
 
+
+
+def hyphenToCamelCase(usrStr, replacement='-'):
+    '''
+    given a hyphen-connected-string, change it to
+    a camelCaseConnectedString.  
+
+    The replacement can be specified to be something besides a hyphen.
+
+    code from http://stackoverflow.com/questions/4303492/how-can-i-simplify-this-conversion-from-underscore-to-camelcase-in-python
+
+    >>> common.hyphenToCamelCase('movement-name')
+    'movementName'
+
+    >>> common.hyphenToCamelCase('movement_name', replacement='_')
+    'movementName'
+
+    '''
+    PATTERN = re.compile(r'''
+    (?<!\A) # not at the start of the string
+    ''' + replacement + r'''
+    (?=[a-zA-Z]) # followed by a letter
+    ''', re.X)
+    
+    tokens = PATTERN.split(usrStr)
+    response = tokens.pop(0).lower()
+    for remain in tokens:
+        response += remain.capitalize()
+    return response
+    
+def camelCaseToHyphen(usrStr, replacement='-'):
+    '''
+    Given a camel-cased string, or a mixture of numbers and characters, create a space separated string.
+
+    The replacement can be specified to be something besides a hyphen, but only
+    a single character and not (for internal reasons) an uppercase character.
+
+    code from http://stackoverflow.com/questions/1175208/elegant-python-function-to-convert-camelcase-to-camel-case
+
+    >>> common.camelCaseToHyphen('movementName')
+    'movement-name'
+    >>> common.camelCaseToHyphen('movementNameName')
+    'movement-name-name'
+    
+    >>> common.camelCaseToHyphen('fileName', replacement='_')
+    'file_name'
+
+    Some things you cannot do:
+
+    >>> common.camelCaseToHyphen('fileName', replacement='NotFound')
+    Traceback (most recent call last):
+    Exception: Replacement must be a single character.
+    
+    >>> common.camelCaseToHyphen('fileName', replacement='A')
+    Traceback (most recent call last):
+    Exception: Replacement cannot be an uppercase character.
+    '''
+    if len(replacement) != 1:
+        raise Exception('Replacement must be a single character.')
+    elif replacement.lower() != replacement:
+        raise Exception('Replacement cannot be an uppercase character.')
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1' + replacement + r'\2', usrStr)
+    return re.sub('([a-z0-9])([A-Z])', r'\1' + replacement + r'\2', s1).lower()
+
 def spaceCamelCase(usrStr, replaceUnderscore=True):
     '''Given a camel-cased string, or a mixture of numbers and characters, create a space separated string.
 
