@@ -1625,8 +1625,6 @@ def mxOrnamentToExpressionOrArticulation(mxOrnament):
 def mxToChord(mxNoteList, inputM21=None, spannerBundle=None):
     '''
     Given an a list of mxNotes, fill the necessary parameters
-
-
     
     >>> a = musicxml.mxObjects.Note()
     >>> p = musicxml.mxObjects.Pitch()
@@ -1837,7 +1835,7 @@ def mxNoteToGeneralNoteHelper(n, mxNote, spannerBundle=None):
 
     if mxGrace is not None:
         #environLocal.printDebug(['mxGrace', mxGrace, mxNote, n.duration])
-        # in some casses grace notes may not have an assigned duration type
+        # in some cases grace notes may not have an assigned duration type
         # this default type is set here, before assigning to n.duration
         if mxNote.type is None:
             #environLocal.printDebug(['mxToNote', 'mxNote that is a grace missing duration type'])

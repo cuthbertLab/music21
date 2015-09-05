@@ -13,6 +13,7 @@
 
 # these single-entity tags are bundled together. 
 from music21 import articulations
+from music21 import expressions
 
 DYNAMIC_MARKS = ['p', 'pp', 'ppp', 'pppp', 'ppppp', 'pppppp',
         'f', 'ff', 'fff', 'ffff', 'fffff', 'ffffff',
@@ -58,3 +59,31 @@ TECHNICAL_MARKS = {'up-bow'          : articulations.UpBow,
                    'fingernails'     : articulations.HarpFingerNails,
                    'other-technical' : articulations.TechnicalIndication,
                    }
+
+# NON-spanner ornaments
+ORNAMENT_MARKS = {'trill-mark'       : expressions.Trill,
+                  'turn'             : expressions.Turn,
+                  # TODO: 'delayed-turn'
+                  'inverted-turn'    : expressions.InvertedTurn,
+                  # TODO: 'delayed-inverted-turn'
+                  # TODO: 'vertical-turn'
+                  'shake'            : expressions.Shake,
+                  'schleifer'        : expressions.Schleifer,
+                  'other-ornament'   : expressions.Ornament
+                  # TODO: 'accidental-mark' -- something else...
+                  }
+
+#-------------------------------------------------------------------------------
+# helpers
+
+def yesNoToBoolean(value):
+    if value in ('yes', True):
+        return True
+    return False
+
+def booleanToYesNo(value):
+    if value:
+        return 'yes'
+    return 'no'
+
+#-------------------------------------------------------------------------------

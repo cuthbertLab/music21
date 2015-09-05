@@ -87,7 +87,7 @@ TECHNICAL_MARKS = ['up-bow', 'down-bow', 'harmonic', 'open-string',
 
 #-------------------------------------------------------------------------------
 def yesNoToBoolean(value):
-    if value in ['yes', True]:
+    if value in ('yes', True):
         return True
     return False
 
