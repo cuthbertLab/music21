@@ -1288,7 +1288,10 @@ class Measure(MusicXMLElementList):
         self.external['divisions'] = attributes.get('divisions')
 
     def update(self):
-        '''This method looks at all note, forward, and backup objects and updates divisons and attributes references
+        '''
+        This method looks at all note, forward, and backup 
+        objects and updates divisons and attributes 
+        references.
         '''
         updateAttributes = False
         if len(self._attributesObjList) > 1:

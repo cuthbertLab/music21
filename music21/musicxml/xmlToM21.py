@@ -9,12 +9,25 @@
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-import xml.etree.ElementTree as ET
+import copy
+import pprint
+import sys
+import traceback
 import unittest
-
 from music21.ext import six
+
+if six.PY3:
+    import xml.etree.ElementTree as ET  # @UnusedImport
+else:
+    try:
+        import xml.etree.cElementTree as ET
+    except ImportError:
+        import xml.etree.ElementTree as ET
+        
+
 from music21 import common
 from music21 import exceptions21
+
 
 # modules that import this include converter.py.
 # thus, cannot import these here
@@ -492,6 +505,8 @@ class PartParser(object):
         self.stream = stream.Part()
         self.atSoundingPitch = True
         
+        self.staffReferenceList = []
+        
         self.lastTimeSignature = None
         self.lastTransposition = None  # may change at measure boundaries
         self.lastMeasureWasShort = False
@@ -500,7 +515,10 @@ class PartParser(object):
         self.lastMeasureNumber = 0
         self.lastMeasureSuffix = None
         
+        self.activeInstrument = None
+        self.firstMeasureParsed = False
         self.activeAttributes = None # divisions, clef, etc.        
+        self.lastDivisions = None
 
     def _getParent(self):
         return common.unwrapWeakref(self._parent)
@@ -515,17 +533,124 @@ class PartParser(object):
     def parseMeasures(self):
         part = self.stream
         for mxMeasure in self.iterfind('measure'):
-            measure = self.xmlMeasureToMeasure(mxMeasure)
-            part._appendCore(measure)
+            self.xmlMeasureToMeasure(mxMeasure)
         part.elementsChanged()
            
+    def measureParsingError(self, mxMeasure, e):
+        measureNumber = "unknown"
+        try:
+            measureNumber = mxMeasure.get('number')
+        except:
+            pass
+        # see http://stackoverflow.com/questions/6062576/adding-information-to-a-python-exception
+        execInfoTuple = sys.exc_info()
+        if hasattr(e, 'message'):
+            emessage = e.message
+        else:
+            emessage = execInfoTuple[0].__name__ + " : " #+ execInfoTuple[1].__name__
+        message = "In measure (" + measureNumber + "): " + emessage
+        raise type(e)(type(e)(message), pprint.pformat(traceback.extract_tb(execInfoTuple[2])))
+    
     def xmlMeasureToMeasure(self, mxMeasure):
         parser = MeasureParser(mxMeasure, parent=self)
-        parser.parse()
-        return parser.stream
+        try:
+            parser.parse()
+        except Exception as e:
+            self.measureParsingError(mxMeasure, e)
+        
+        if parser.transposition is not None:
+            if (self.lastTransposition is None 
+                and self.firstMeasureParsed is False
+                and self.activeInstrument is not None):
+                self.activeInstrument.transposition = parser.transposition
+            elif self.activeInstrument is not None:
+                newInst = copy.deepcopy(self.activeInstrument)
+                newInst.transposition = parser.transposition 
+                self.stream._insertCore()
+            self.lastTransposition = parser.transposition
+            self.atSoundingPitch = False
+        self.firstMeasureParsed = True
+        self.staffReferenceList.append(parser.staffReference)
+        if parser.measureNumber != self.lastMeasureNumber:
+            # we do this check so that we do not compound suffixes, i.e.:
+            # 23, 23.X1, 23.X1X2, 23.X1X2X3
+            # and instead just do:
+            # 23, 23.X1, 23.X2, etc.
+            self.lastMeasureNumber = parser.measureNumber
+            self.lastMeasureSuffix = parser.numberSuffix      
+        m = parser.stream
+        if m.timeSignature is not None:
+            self.lastTimeSignature = m.timeSignature
+        elif self.lastTimeSignature is None and m.timeSignature is None:
+            # if no time sigature is defined, need to get a default
+            ts = meter.TimeSignature
+            self.lastTimeSignature = ts
+        
+        if parser.fullMeasureRest is True:
+            r1 = m.getElementsByClass('Rest')[0]
+            if (r1.duration.quarterLength == 4.0 
+                    and r1.duration.quarterLength != self.lastTimeSignature.barDuration.quarterLength):
+                r1.duration.quarterLength = self.lastTimeSignature.barDuration.quarterLength
+                m.elementsChanged()            
+
+        self.stream._insertCore(self.lastMeasureOffset, m)
+        self.adjustTimeAttributesFromMeasure(m)
+        
+        return m
+        
+    def adjustTimeAttributesFromMeasure(self, m):
+        # note: we cannot assume that the time signature properly
+        # describes the offsets w/n this bar. need to look at 
+        # offsets within measure; if the .highestTime value is greater
+        # use this as the next offset
+
+        mHighestTime = m.highestTime
+        lastTimeSignatureQuarterLength = self.lastTimeSignature.barDuration.quarterLength
+
+        if mHighestTime >= lastTimeSignatureQuarterLength :
+            mOffsetShift = mHighestTime
+
+        elif mHighestTime == 0.0 and len(m.flat.notesAndRests) == 0:
+            ## this routine fixes a bug in PDFtoMusic and other MusicXML writers
+            ## that omit empty rests in a Measure.  It is a very quick test if
+            ## the measure has any notes.  Slower if it does not.
+            r = note.Rest()
+            r.duration.quarterLength = lastTimeSignatureQuarterLength
+            m.insert(0.0, r)
+            mOffsetShift = lastTimeSignatureQuarterLength
+
+        else: # use time signature
+            # for the first measure, this may be a pickup
+            # must detect this when writing, as next measures offsets will be 
+            # incorrect
+            if self.lastMeasureOffset == 0.0:
+                # cannot get bar duration proportion if cannot get a ts
+                if m.barDurationProportion() < 1.0:
+                    m.padAsAnacrusis()
+                    #environLocal.printDebug(['incompletely filled Measure found on musicxml import; interpreting as a anacrusis:', 'padingLeft:', m.paddingLeft])
+                mOffsetShift = mHighestTime
+            # assume that, even if measure is incomplete, the next bar should
+            # start at the duration given by the time signature, not highestTime
+
+            ### no...let's not do this...
+            else:
+                mOffsetShift = mHighestTime #lastTimeSignatureQuarterLength
+                if self.lastMeasureWasShort is True:
+                    if m.barDurationProportion() < 1.0:
+                        m.padAsAnacrusis() # probably a pickup after a repeat or phrase boundary or something
+                        self.lastMeasureWasShort = False
+                else:
+                    if mHighestTime < lastTimeSignatureQuarterLength:
+                        self.lastMeasureWasShort = True
+                    else:
+                        self.lastMeasureWasShort = False
+                        
+        self.lastMeasureOffset += mOffsetShift
+        
         
     def parsePartInfo(self):
         instrumentObj = self.getDefaultInstrument()
+        self.firstInstrumentObject = instrumentObj
         if instrumentObj.bestName() is not None:
             self.stream.id = instrumentObj.bestName()
         self.stream._insertCore(0, instrumentObj) # add instrument at zero offset
@@ -612,38 +737,67 @@ class MeasureParser(object):
             self.spannerBundle = spanner.SpannerBundle()
             
         self.staffReference = {}
+        self.useVoices = False
+        self.voiceIndices = set()
+        
         self.activeAttributes = None
         self.attributesAreInternal = True
         
         self.measureNumber = None
         self.measureSuffix = None
         
-        self.staffLayoutObjects = []
+        self.divisions = None
         
+        self.staffLayoutObjects = []
+        self.fullMeasureRest = False
         self.stream = stream.Measure()
         
     def addToStaffReference(self, mxObjectOrNumber, m21Object):
+        '''
+        Utility routine for importing musicXML objects; 
+        here, we store a reference to the music21 object in a dictionary, 
+        where keys are the staff values. Staff values may be None, 1, 2, etc.
+        '''
         staffReference = self.staffReference
+
+        #environLocal.printDebug(['addToStaffReference(): called with:', music21Object])
+        if common.isListLike(mxObjectOrNumber):
+            if len(mxObjectOrNumber) > 0:
+                mxObjectOrNumber = mxObjectOrNumber[0] # if a chord, get the first components
+            else: # if an empty list
+                environLocal.printDebug(['got an mxObject as an empty list', mxObjectOrNumber])
+                return
+        # add to staff reference
+        if hasattr(mxObjectOrNumber, 'staff'):
+            key = mxObjectOrNumber.staff
+        # some objects store staff assignment simply as number
+        else:
+            try:
+                key = mxObjectOrNumber.get('number')
+            except AttributeError: # a normal number
+                key = mxObjectOrNumber
+        if key not in staffReference:
+            staffReference[key] = []
+        staffReference[key].append(m21Object)
     
     def insertCoreAndRef(self, offset, mxObjectOrNumber, m21Object):
         self.addToStaffReference(mxObjectOrNumber, m21Object)
         self.stream._insertCore(offset, m21Object)
-
         
     def parse(self):
         self.parseAttributes()
+        self.updateVoiceInformation()
         
     def parseAttributes(self):        
         self.parseMeasureNumbers()        
         # TODO: implicit
-        # TODO: non-controlling
-        # may need to do a format/unit conversion?
-        
+        # TODO: non-controlling 
+        # may need to do a format/unit conversion?        
         self.layoutWidth = self.mxMeasure.get('width')
         self.parseAttributesTags()
         
     def parseAttributesTags(self):
-        m = self.stream
+        # TODO: keep track of where they occur in the measure...        
         mxMeasure = self.mxMeasure
         
         allAttributes = mxMeasure.findall('attributes')
@@ -659,10 +813,63 @@ class MeasureParser(object):
             mxAttributes = allAttributes[0]
             for mxSub in mxAttributes:
                 meth = None
+                # key, clef, time, details
                 if mxSub.tag in self.attributeTagsToMethods:
                     meth = getattr(self, self.attributeTagsToMethods[mxSub.tag])
                 if meth is not None:
                     meth(self, mxSub)
+            transposeTag = mxAttributes.find('transpose')
+            if transposeTag is not None:
+                self.transposition = self.xmlTransposeToInterval(transposeTag)
+            divisionsTag = mxAttributes.find('divisions')
+            if divisionsTag is not None:
+                self.parent.lastDivisions = common.opFrac(float(divisionsTag.text))
+        
+        self.divisions = self.parent.lastDivisions
+
+    def xmlTransposeToInterval(self, mxTranspose):
+        '''Convert a MusicXML Transpose object to a music21 Interval object.
+        >>> import xml.etree.ElementTree as ET        
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        
+        >>> t = ET.fromstring('<transpose><diatonic>-1</diatonic><chromatic>-2</chromatic></transpose>')
+        >>> MP.xmlTransposeToInterval(t)
+        <music21.interval.Interval M-2>
+    
+        >>> t = ET.fromstring('<transpose><diatonic>-5</diatonic><chromatic>-9</chromatic></transpose>')
+        >>> MP.xmlTransposeToInterval(t)
+        <music21.interval.Interval M-6>
+        '''
+        ds = None
+        
+        mxDiatonic = mxTranspose.find('diatonic')
+        if mxDiatonic is not None:
+            ds = int(mxDiatonic.text)
+            
+        cs = None
+        mxChromatic = mxTranspose.find('chromatic')
+        if mxChromatic is not None:
+            cs = int(mxChromatic.text)
+    
+        oc = 0
+        mxOctaveChange = mxTranspose.find('octave-change')
+        if mxOctaveChange is not None:
+            oc = int(mxOctaveChange) * 12
+    
+        # TODO: presently not dealing with <double>
+        # doubled one octave down from what is currently written 
+        # (as is the case for mixed cello / bass parts in orchestral literature)
+        #environLocal.printDebug(['ds', ds, 'cs', cs, 'oc', oc])
+        if ds is not None and ds != 0 and cs is not None and cs != 0:
+            # diatonic step can be used as a generic specifier here if 
+            # shifted 1 away from zero
+            if ds < 0:
+                post = interval.intervalFromGenericAndChromatic(ds - 1, cs + oc)
+            else:
+                post = interval.intervalFromGenericAndChromatic(ds + 1, cs + oc)
+        else: # assume we have chromatic; may not be correct spelling
+            post = interval.Interval(cs + oc)
+        return post
 
     def handleTimeSignature(self, mxTime):
         # TODO: interchangeable
@@ -798,6 +1005,7 @@ class MeasureParser(object):
         elif staffPrinted == 'yes' or staffPrinted is True:
             stl.hidden = False
         
+        # should this be 0.0 or current offset?
         self.insertCoreAndRef(0.0, mxDetails, stl)
         self.staffLayoutObjects.append(stl)
 
@@ -832,6 +1040,23 @@ class MeasureParser(object):
                    
         self.measureNumber = m.number
         self.measureSuffix = m.numberSuffix
+        
+    def updateVoiceInformation(self):
+        mxm = self.mxMeasure
+        for mxn in mxm.findall('note'):
+            voice = mxn.find('voice')
+            if voice is not None and voice.text is not None:
+                vIndex = voice.text.strip()
+                self.voiceIndices.add(vIndex)
+                # it is a set, so no need to check if already there
+                # additional time < 1 sec per ten million ops.
+        
+        if len(self.voiceIndices) > 1:
+            for vIndex in sorted(self.voiceIndices):
+                v = stream.Voice()
+                v.id = vIndex
+                self.stream._insertCore(0.0, v)
+            self.useVoices = True
 #------------------------------------------------------------------------------
 
 

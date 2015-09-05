@@ -24,6 +24,7 @@ import unittest
 from music21 import base
 from music21 import beam
 from music21 import common
+from music21 import defaults
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
@@ -2671,7 +2672,8 @@ class TimeSignature(base.Music21Object):
     if you have the '11/16' time above, you may want to have it displayed as
     '2/4+3/16' or '11/16 (2/4+3/16)'.  Or you might want the written
     TimeSignature to contradict what the notes imply.  All this can be done
-    with .displaySequence.  '''
+    with .displaySequence.  
+    '''
 
     classSortOrder = 4
 
@@ -2687,8 +2689,12 @@ class TimeSignature(base.Music21Object):
                                 'so don\'t expect proper output yet.',
         }
 
-    def __init__(self, value='4/4', partitionRequest=None):
+    def __init__(self, value=None, partitionRequest=None):
         base.Music21Object.__init__(self)
+        
+        if value is None:
+            value = '{0}/{1}'.format(defaults.meterNumerator, defaults.meterDenominatorBeatType)
+                
         self._overriddenBarDuration = None
         self.symbol = None
         self.displaySequence = None

@@ -150,7 +150,6 @@ def mxCreditToTextBox(mxCredit):
 
 def mxTransposeToInterval(mxTranspose):
     '''Convert a MusicXML Transpose object to a music21 Interval object.
-
     
     >>> t = musicxml.mxObjects.Transpose()
     >>> t.diatonic = -1
@@ -2157,7 +2156,7 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None, lastMeasureInfo=No
         for voiceId in mxMeasure.getVoiceIndices():
             v = stream.Voice()
             v.id = voiceId
-            m._insertCore(0, v)
+            m._insertCore(0.0, v)
     else:
         useVoices = False
 
