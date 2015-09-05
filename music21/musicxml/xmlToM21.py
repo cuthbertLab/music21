@@ -719,14 +719,26 @@ class MeasureParser(object):
                      'key': 'handleKeySignature',
                      'staff-details': 'handleStaffDetails',
                      }
+    musicDataMethods = {'note': 'xmlToNote',
+                        'backup': 'xmlBackup',
+                        'forward': 'xmlForward',
+                        'direction': 'xmlDirection',
+                        'attributes': None,
+                        'harmony': 'xmlHarmony',
+                        'figured-bass': None,
+                        'print': 'xmlPrint',
+                        'sound': None,
+                        'barline': 'xmlBarline',
+                        'grouping': None,
+                        'link': None,
+                        'bookmark': None,    
+                        # TODO: clefs???                    
+                        }
     # TODO: editorial, i.e., footnote and level
     # TODO: staves (num staves)
     # TODO: part-symbol
-    # TODO: instruments
-    # TODO: transpose
     # TODO: directive DEPRECATED since MusicXML 2.0
     # TODO: measure-style
-    # ignore divisions?    
     def __init__(self, mxMeasure=None, parent=None):
         self.mxMeasure = mxMeasure
         self.parent = parent # PartParser
@@ -749,8 +761,20 @@ class MeasureParser(object):
         self.divisions = None
         
         self.staffLayoutObjects = []
-        self.fullMeasureRest = False
         self.stream = stream.Measure()
+        
+        self.mxNoteList = [] # for accumulating notes in chords
+        self.mxLyricList = [] # for accumulating lyrics assigned to chords
+        self.nLast = None # for adding notes to spanners.
+        self.chordVoice = None # Sibelius 7.1 only puts a <voice> tag on the
+                        # first note of a chord, so we need to make sure
+                        # that we keep track of the last voice...
+        self.fullMeasureRest = False
+        self.restAndNoteCount = {'rest': 0, 'note': 0} # for keeping track
+                        # of full-measureRests.
+        
+        self.parseIndex = 0
+        self.offsetMeasureNote = 0.0
         
     def addToStaffReference(self, mxObjectOrNumber, m21Object):
         '''
@@ -788,6 +812,47 @@ class MeasureParser(object):
         self.parseAttributes()
         self.updateVoiceInformation()
         
+        for i, mxObj in enumerate(self.mxMeasure):
+            self.parseIndex = i
+            if mxObj.tag in self.attributeTagsToMethods:
+                methName = self.attributeTagsToMethods[mxObj.tag]
+                if methName is not None:
+                    meth = getattr(self, methName)
+                    meth(self, mxObj)
+        
+        if self.useVoices is True:
+            for v in self.stream.voices:
+                if len(v) > 0: # do not bother with empty voices
+                    v.makeRests(inPlace=True)
+                v.elementsChanged()
+        self.stream.elementsChanged()
+        
+        if (self.restAndNoteCount['rest'] == 1
+                and self.restAndNoteCount['note'] == 0):
+            # TODO: do this on a per voice basis.
+            self.fullMeasureRest = True 
+        
+    def xmlBackup(self, mxObj):
+        change = float(mxObj.find('duration').text.strip()) / self.divisions
+        self.offsetMeasureNote -= change     
+
+    def xmlForward(self, mxObj):
+        change = float(mxObj.find('duration').text.strip()) / self.divisions
+        self.offsetMeasureNote += change     
+
+    def xmlToNote(self, mxNote):
+        pass
+    
+    def xmlBarline(self, mxBarline):
+        pass
+    
+    def xmlHarmony(self, mxHarmony):
+        pass
+    
+    def xmlDirection(self, mxDirection):
+        pass
+    
+    
     def parseAttributes(self):        
         self.parseMeasureNumbers()        
         # TODO: implicit
