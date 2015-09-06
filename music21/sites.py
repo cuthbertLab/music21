@@ -181,6 +181,8 @@ class Sites(common.SlottedObject):
         new = self.__class__()
         #environLocal.printDebug(['Sites.__deepcopy__', 'self.siteDict.keys()', self.siteDict.keys()])
         for idKey in self.siteDict:
+            if idKey is None:
+                continue
             oldSite = self.siteDict[idKey]
             if oldSite.isDead:
                 continue  # do not copy dead references

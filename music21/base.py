@@ -28,7 +28,7 @@ available after importing music21.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'2.0.9'
+'2.0.10'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -409,6 +409,14 @@ class Music21Object(object):
         '''
         Subclassable __deepcopy__ helper so that the same attributes do not need to be called
         for each Music21Object subclass.
+        
+        ignoreAttributes is a set of attributes not to copy via the default deepcopy style.
+        More can be passed to it.
+        
+        removeFromIgnore can be a set of attributes to remove from ignoreAttributes of a
+        superclass.
+        
+        TODO: move to class attributes to cache.
         '''
         defaultIgnoreSet = {'_derivation', '_activeSite', 'id', 'sites', '_duration'}
         if ignoreAttributes is None:
@@ -420,7 +428,7 @@ class Music21Object(object):
             ignoreAttributes = ignoreAttributes - removeFromIgnore
         
         # call class to get a new, empty instance
-        new = self.__class__()
+        new = self.__class__() # TODO: this creates an extra duration object for notes... ugghhh...
         #environLocal.printDebug(['Music21Object.__deepcopy__', self, id(self)])
         #for name in dir(self):
         if '_duration' in ignoreAttributes:
