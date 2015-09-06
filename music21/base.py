@@ -380,10 +380,7 @@ class Music21Object(object):
         if "sites" in keywords:
             self.sites = keywords["sites"]
         else:
-            self.sites = Sites(containedById=id(self))
-            # set up a default location for self at zero
-            # use None as the name of the site
-            self.sites.add(None, 0.0)
+            self.sites = Sites()
 
         if "activeSite" in keywords:
             self.activeSite = keywords["activeSite"]
@@ -473,7 +470,6 @@ class Music21Object(object):
             # this calls __deepcopy__ in Sites
             newValue = copy.deepcopy(value, memo)
             #environLocal.printDebug(['copied definedContexts:', newValue._locationKeys])
-            newValue.containedById = id(new)
             setattr(new, 'sites', newValue)
 
 
@@ -1055,7 +1051,6 @@ class Music21Object(object):
         True
         '''
         if not self.sites.isSite(site):
-#             self.sites.isSite(site)
 #             for s in self.sites.siteDict:
 #                 # DEBUG!
 #                 print s,
@@ -3951,11 +3946,8 @@ class Test(unittest.TestCase):
         n2 = copy.deepcopy(n1)
         self.assertEqual(id(n2.derivation.origin), id(n1))
 
-    def testContainedById(self):
+    def testHasElement(self):
         from music21 import note, stream
-        n = note.Note()
-        self.assertEqual(id(n), n.sites.containedById)
-
         n1 = note.Note()
         s1 = stream.Stream()
         s1.append(n1)
@@ -3966,8 +3958,6 @@ class Test(unittest.TestCase):
 
         self.assertEqual(n2.hasSite(s1), False)
         self.assertEqual(n2.hasSite(s2), True)
-
-        self.assertEqual(n2.sites.containedById, id(n2))
 
     def testGetContextByClassA(self):
         from music21 import stream, note, tempo
