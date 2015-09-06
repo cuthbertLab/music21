@@ -872,18 +872,23 @@ class Music21Object(object):
 
     def setOffsetBySite(self, site, value):
         '''
-        Direct access to the Sites setOffsetBySite() method.
-        This should only be used for advanced processing of known site
-        that already has been added.
-
+        Change the offset for a site.  These are equivalent:
+        
+            n1.setOffsetBySite(stream1, 20)
+            
+        and
+        
+            stream1.setElementOffset(n1, 20)
+        
         >>> import music21
         >>> aSite = stream.Stream()
         >>> a = music21.Music21Object()
-        >>> a.sites.add(aSite, 20)
+        >>> a.sites.add(aSite)
         >>> aSite.setElementOffset(a, 20)
         >>> a.setOffsetBySite(aSite, 30)
         >>> a.getOffsetBySite(aSite)
         30.0
+
         '''
         if site is not None:
             site.setElementOffset(self, value)
@@ -1042,7 +1047,7 @@ class Music21Object(object):
 
         >>> s = stream.Stream()
         >>> n = note.Note()
-        >>> n.sites.add(s, 10)
+        >>> n.sites.add(s)
         >>> n.activeSite = s
         Traceback (most recent call last):
         SitesException: v2.1. -- you may not assign an activesite for an object <music21.note.Note C> not in the Stream <music21.stream.Stream 0x...>

@@ -606,9 +606,9 @@ class AbstractScale(Scale):
 
     def _getNetworkxGraph(self):
         '''
-        Create a networx graph from the stored network.
+        Create a networkx graph from the stored network.
         '''
-        return self._net._getNetworkxGraph()
+        return self._net.getNetworkxGraph()
 
     networkxGraph = property(_getNetworkxGraph, doc='''
         Return a networks Graph object representing a realized version of this :class:`~music21.intervalNetwork.IntervalNetwork`.

@@ -2149,7 +2149,7 @@ class IntervalNetwork(object):
         from music21 import graph
         # first ordered arg can be method type
         g = graph.GraphNetworxGraph( 
-            networkxGraph=self._getNetworkxGraph())
+            networkxGraph=self.getNetworkxGraph())
 
             #networkxGraph=self._getNetworkxRealizedGraph(pitchObj=pitchObj, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch))
         g.process()

@@ -392,13 +392,13 @@ class CTSong(object):
         >>> len(s.rules)
         6
         >>> for rule in s.rules:
-        ...   print(rule, s.rules[rule])
-        BP <music21.CTRule.CTRule text="BP: I | IV V | %THIS IS A COMMENT">
-        In <music21.CTRule.CTRule text="In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4">
-        Vr <music21.CTRule.CTRule text="Vr: $BP*3 I IV | I |">
-        Br <music21.CTRule.CTRule text="Br: IV | | I | IV I | IV | | ii | IV V |">
-        Co <music21.CTRule.CTRule text="Co: R |*4 I |*4">
-        S <music21.CTRule.CTRule text="S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co">
+        ...   (rule, s.rules[rule])
+        ('BP', <music21.CTRule.CTRule text="BP: I | IV V | %THIS IS A COMMENT">)
+        ('In', <music21.CTRule.CTRule text="In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4">)
+        ('Vr', <music21.CTRule.CTRule text="Vr: $BP*3 I IV | I |">)
+        ('Br', <music21.CTRule.CTRule text="Br: IV | | I | IV I | IV | | ii | IV V |">)
+        ('Co', <music21.CTRule.CTRule text="Co: R |*4 I |*4">)
+        ('S', <music21.CTRule.CTRule text="S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co">)
         ''')
     
     

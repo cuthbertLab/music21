@@ -236,7 +236,7 @@ class Sites(common.SlottedObject):
         >>> bObj = Mock()
         >>> cObj = Mock()
         >>> aSites = sites.Sites()
-        >>> aSites.add(cObj, 345)
+        >>> aSites.add(cObj)
         >>> aSites.add(aObj)
         >>> aSites.add(bObj)
         >>> k = aSites._keysByTime()
@@ -256,29 +256,8 @@ class Sites(common.SlottedObject):
 
     def add(self, obj, offset=None, timeValue=None, idKey=None, classString=None):
         '''
-        Add a reference to the `Sites` collection for this object.
-
-
-        OFFSET IS IGNORED NOW!
-
-        N.B. -- like all .sites operations, this is an advanced tool not for
-        standard music21 usage.  Instead of:
-
-            elObj.add(streamObj, 20.0)
-
-        use this command, which will take care of `.sites.add` as well as
-        putting `elObj` in `streamObj.elements`:
-
-            streamObj.insert(20.0, elObj)
-
-        If `offset` is `None`, then `obj` is interpreted as a Context (such as
-        a temperament, a time period, etc.)
-
-        If `offset` is not `None`, then `obj` is interpreted as location, i.e.,
-        a :class:`~music21.stream.Stream`.
-
-        `offset` can also be the term `highestTime` which is the highest
-        available time in the obj (used for ``streamObj.append(el)``)
+        Add a reference to the `Sites` collection for this object.  Automatically
+        called on stream.insert(n), etc.
 
         The `timeValue` argument is used to store the time as an int
         (in milliseconds after Jan 1, 1970) when this object was added to locations. 
@@ -291,6 +270,8 @@ class Sites(common.SlottedObject):
 
         TODO: Tests.  Including updates.
         '''
+        if offset is not None:
+            raise SitesException("No offsets in sites anymore!")
         # NOTE: this is a performance critical method
 
         # a None object will have a key of None
@@ -701,8 +682,8 @@ class Sites(common.SlottedObject):
         >>> aObj = Mock()
         >>> bObj = Mock()
         >>> aSites = sites.Sites()
-        >>> aSites.add(aObj, 234)
-        >>> aSites.add(bObj, 3000)
+        >>> aSites.add(aObj)
+        >>> aSites.add(bObj)
         >>> len(aSites.getSites())
         3
         >>> len(aSites.getSites(excludeNone=True))
@@ -789,7 +770,7 @@ class Sites(common.SlottedObject):
         >>> aSite = Mock()
         >>> bSite = Mock()
         >>> dc = sites.Sites()
-        >>> dc.add(aSite, 0)
+        >>> dc.add(aSite)
         >>> dc.hasSiteId(id(aSite))
         True
         >>> dc.hasSiteId(id(bSite))
@@ -932,15 +913,15 @@ class Sites(common.SlottedObject):
         >>> aSites = sites.Sites()
         >>> len(aSites)
         1
-        >>> aSites.add(aSite, 23)
+        >>> aSites.add(aSite)
         >>> len(aSites)
         2
 
-        >>> aSites.add(bSite, 233)
+        >>> aSites.add(bSite)
         >>> len(aSites)
         3
 
-        >>> aSites.add(cSite, 232223)
+        >>> aSites.add(cSite)
         >>> len(aSites)
         4
 
