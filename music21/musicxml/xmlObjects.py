@@ -17,7 +17,9 @@ from music21 import expressions
 
 DYNAMIC_MARKS = ['p', 'pp', 'ppp', 'pppp', 'ppppp', 'pppppp',
         'f', 'ff', 'fff', 'ffff', 'fffff', 'ffffff',
-        'mp', 'mf', 'sf', 'sfp', 'sfpp', 'fp', 'rf', 'rfz', 'sfz', 'sffz', 'fz']
+        'mp', 'mf', 'sf', 'sfp', 'sfpp', 'fp', 'rf', 'rfz', 'sfz', 'sffz', 'fz',
+        'other-dynamics' # non-empty...
+        ] 
 
 ARTICULATION_MARKS = {'accent'       : articulations.Accent,
                    'strong-accent'   : articulations.StrongAccent,
