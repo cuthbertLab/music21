@@ -333,20 +333,22 @@ class GeneralNote(base.Music21Object):
     }
     def __init__(self, *arguments, **keywords):
         if 'duration' not in keywords:
-            tempDuration = duration.Duration(**keywords)
+            # music21base does not automatically create a duration.
+            if len(keywords) == 0:
+                tempDuration = duration.Duration(1.0)
+            else:
+                tempDuration = duration.Duration(**keywords)
+                # only apply default if components are empty
+                # looking at currentComponents so as not to trigger
+                # _updateComponents
+                if (tempDuration.quarterLength == 0 and
+                    len(tempDuration.currentComponents()) == 0):
+                    tempDuration.quarterLength = 1.0                
         else:
             tempDuration = keywords['duration']
-        base.Music21Object.__init__(self, duration = tempDuration)
+        base.Music21Object.__init__(self, duration=tempDuration)
         # this sets the stored duration defined in Music21Object
-        self._duration = tempDuration
-
-        # only apply default if components are empty
-        # looking at currentComponents so as not to trigger
-        # _updateComponents
-
-        if (self.duration.quarterLength == 0 and
-            len(self.duration.currentComponents()) == 0):
-            self.duration.quarterLength = 1.0
+        #self._duration = tempDuration
 
         self.lyrics = [] # a list of lyric objects
         self.expressions = []

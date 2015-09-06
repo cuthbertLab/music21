@@ -1490,8 +1490,7 @@ class DurationUnit(DurationCommon):
         _dots is a list (so we can do weird things like dot groups)
         _getDotGroups lets you do the entire list (as a tuple)
 
-        >>> d1 = duration.DurationUnit()
-        >>> d1.type = 'half'
+        >>> d1 = duration.DurationUnit('half')
         >>> d1.dotGroups = [1, 1]  # dotted dotted half
         >>> d1.dots
         1
@@ -2323,13 +2322,18 @@ class Duration(DurationCommon):
         4.0
         >>> len(a.components)
         3
+        >>> a.type
+        'complex'
+        
+        After consolidate:
+        
         >>> a.consolidate()
         >>> a.quarterLength
         4.0
         >>> len(a.components)
         1
 
-        But it gains a type!
+        It gains a type!
 
         >>> a.type
         'whole'
@@ -2586,7 +2590,8 @@ class Duration(DurationCommon):
             self._cachedIsLinked = False
 
     def updateQuarterLength(self):
-        '''Look to components and determine quarter length.
+        '''
+        Look to components and determine quarter length.
         '''
         if self.isLinked:
             self._qtrLength = 0.0
@@ -2613,9 +2618,9 @@ class Duration(DurationCommon):
         if self._components is not value:
             self._componentsNeedUpdating = False
             self._components = value
-            # this is Ture b/c components are note the same
+            # this is True b/c components are not the same
             self._quarterLengthNeedsUpdating = True
-            # musst be cleared
+            # must be cleared
             self._cachedIsLinked = None
 
     @property
@@ -2650,7 +2655,7 @@ class Duration(DurationCommon):
             self.components[0].dotGroups = value
             self._quarterLengthNeedsUpdating = True
         elif len(self.components) > 1:
-            raise DurationException("setting dotGroups: Myke and Chris need to decide what that means")
+            raise DurationException("setting dotGroups for complex: Myke and Chris need to decide what that means")
         else: # there must be 1 or more components
             raise DurationException("zero DurationUnits in components")
 

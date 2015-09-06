@@ -28,7 +28,7 @@ available after importing music21.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'2.0.9'
+'2.0.10'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -372,7 +372,7 @@ class Music21Object(object):
         # a duration object is not created until the .duration property is
         # accessed with _getDuration(); this is a performance optimization
         if "duration" in keywords:
-            self.duration = keywords["duration"]
+            self._duration = keywords["duration"]
         if "groups" in keywords and keywords["groups"] is not None:
             self.groups = keywords["groups"]
         else:
@@ -380,10 +380,7 @@ class Music21Object(object):
         if "sites" in keywords:
             self.sites = keywords["sites"]
         else:
-            self.sites = Sites(containedById=id(self))
-            # set up a default location for self at zero
-            # use None as the name of the site
-            self.sites.add(None, 0.0)
+            self.sites = Sites()
 
         if "activeSite" in keywords:
             self.activeSite = keywords["activeSite"]
@@ -412,6 +409,14 @@ class Music21Object(object):
         '''
         Subclassable __deepcopy__ helper so that the same attributes do not need to be called
         for each Music21Object subclass.
+        
+        ignoreAttributes is a set of attributes not to copy via the default deepcopy style.
+        More can be passed to it.
+        
+        removeFromIgnore can be a set of attributes to remove from ignoreAttributes of a
+        superclass.
+        
+        TODO: move to class attributes to cache.
         '''
         defaultIgnoreSet = {'_derivation', '_activeSite', 'id', 'sites', '_duration'}
         if ignoreAttributes is None:
@@ -423,7 +428,7 @@ class Music21Object(object):
             ignoreAttributes = ignoreAttributes - removeFromIgnore
         
         # call class to get a new, empty instance
-        new = self.__class__()
+        new = self.__class__() # TODO: this creates an extra duration object for notes... ugghhh...
         #environLocal.printDebug(['Music21Object.__deepcopy__', self, id(self)])
         #for name in dir(self):
         if '_duration' in ignoreAttributes:
@@ -473,7 +478,6 @@ class Music21Object(object):
             # this calls __deepcopy__ in Sites
             newValue = copy.deepcopy(value, memo)
             #environLocal.printDebug(['copied definedContexts:', newValue._locationKeys])
-            newValue.containedById = id(new)
             setattr(new, 'sites', newValue)
 
 
@@ -876,18 +880,23 @@ class Music21Object(object):
 
     def setOffsetBySite(self, site, value):
         '''
-        Direct access to the Sites setOffsetBySite() method.
-        This should only be used for advanced processing of known site
-        that already has been added.
-
+        Change the offset for a site.  These are equivalent:
+        
+            n1.setOffsetBySite(stream1, 20)
+            
+        and
+        
+            stream1.setElementOffset(n1, 20)
+        
         >>> import music21
         >>> aSite = stream.Stream()
         >>> a = music21.Music21Object()
-        >>> a.sites.add(aSite, 20)
+        >>> a.sites.add(aSite)
         >>> aSite.setElementOffset(a, 20)
         >>> a.setOffsetBySite(aSite, 30)
         >>> a.getOffsetBySite(aSite)
         30.0
+
         '''
         if site is not None:
             site.setElementOffset(self, value)
@@ -1046,7 +1055,7 @@ class Music21Object(object):
 
         >>> s = stream.Stream()
         >>> n = note.Note()
-        >>> n.sites.add(s, 10)
+        >>> n.sites.add(s)
         >>> n.activeSite = s
         Traceback (most recent call last):
         SitesException: v2.1. -- you may not assign an activesite for an object <music21.note.Note C> not in the Stream <music21.stream.Stream 0x...>
@@ -1055,7 +1064,6 @@ class Music21Object(object):
         True
         '''
         if not self.sites.isSite(site):
-#             self.sites.isSite(site)
 #             for s in self.sites.siteDict:
 #                 # DEBUG!
 #                 print s,
@@ -3951,11 +3959,8 @@ class Test(unittest.TestCase):
         n2 = copy.deepcopy(n1)
         self.assertEqual(id(n2.derivation.origin), id(n1))
 
-    def testContainedById(self):
+    def testHasElement(self):
         from music21 import note, stream
-        n = note.Note()
-        self.assertEqual(id(n), n.sites.containedById)
-
         n1 = note.Note()
         s1 = stream.Stream()
         s1.append(n1)
@@ -3966,8 +3971,6 @@ class Test(unittest.TestCase):
 
         self.assertEqual(n2.hasSite(s1), False)
         self.assertEqual(n2.hasSite(s2), True)
-
-        self.assertEqual(n2.sites.containedById, id(n2))
 
     def testGetContextByClassA(self):
         from music21 import stream, note, tempo
