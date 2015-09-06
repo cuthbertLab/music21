@@ -739,8 +739,8 @@ class PartParser(XMLParserBase):
         else:
             emessage = execInfoTuple[0].__name__ + " : " #+ execInfoTuple[1].__name__
         message = "In measure (" + measureNumber + "): " + emessage
-        raise e
-        #raise type(e)(type(e)(message), pprint.pformat(traceback.extract_tb(execInfoTuple[2])))
+        raise(e)
+        #raise type(e)(pprint.pformat(traceback.extract_tb(execInfoTuple[2])))
     
     def xmlMeasureToMeasure(self, mxMeasure):
         parser = MeasureParser(mxMeasure, parent=self)
@@ -875,8 +875,9 @@ class PartParser(XMLParserBase):
         # for now, just get first instrument
         # TODO: get all instruments!
         mxScoreInstrument = mxInfo.find('score-instrument')
-        seta(i, mxScoreInstrument, 'instrument-name', transform=_clean)
-        seta(i, mxScoreInstrument, 'instrument-abbreviation', transform=_clean)
+        if mxScoreInstrument is not None:
+            seta(i, mxScoreInstrument, 'instrument-name', transform=_clean)
+            seta(i, mxScoreInstrument, 'instrument-abbreviation', transform=_clean)
         # TODO: instrument-sound
         # TODO: solo / ensemble
         # TODO: virtual-instrument
@@ -893,8 +894,9 @@ class PartParser(XMLParserBase):
         # TODO: pan
         # TODO: elevation
         # TODO: store id attribute somewhere
-        seta(i, mxMIDIInstrument, 'midi-program', transform=_adjustMidiData)
-        seta(i, mxMIDIInstrument, 'midi-channel', transform=_adjustMidiData)
+        if mxMIDIInstrument is not None:
+            seta(i, mxMIDIInstrument, 'midi-program', transform=_adjustMidiData)
+            seta(i, mxMIDIInstrument, 'midi-channel', transform=_adjustMidiData)
 
         # TODO: reclassify 
         return i
@@ -1227,7 +1229,7 @@ class MeasureParser(XMLParserBase):
         notes = []
         for mxNote in mxNoteList:
             notes.append(self.xmlToSimpleNote(mxNote))
-        c = chord.Chord([notes])
+        c = chord.Chord(notes)
         return c
     
     def xmlToSimpleNote(self, mxNote):
@@ -1714,6 +1716,16 @@ class MeasureParser(XMLParserBase):
         '''
         Convert an mxArticulationMark to a music21.articulations.Articulation
         object or one of its subclasses.
+        
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+
+        >>> mxTech = EL('<down-bow placement="below"/>')
+        >>> a = MP.xmlTechnicalToArticulation(mxTech)
+        >>> a
+        <music21.articulations.DownBow>
+        >>> a.placement
+        'below'
         '''    
         tag = mxObj.tag
         if tag in xmlObjects.TECHNICAL_MARKS:
@@ -1729,14 +1741,27 @@ class MeasureParser(XMLParserBase):
         
         
     def xmlToArticulation(self, mxObj):
+        '''
+        Return an articulation from an mxObj, setting placement
+        
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+
+        >>> mxArt = EL('<spiccato placement="above"/>')
+        >>> a = MP.xmlToArticulation(mxArt)
+        >>> a
+        <music21.articulations.Spiccato>
+        >>> a.placement
+        'above'
+        '''
         tag = mxObj.tag
         if tag in xmlObjects.ARTICULATION_MARKS:
-            tech = xmlObjects.ARTICULATION_MARKS[tag]()
+            artic = xmlObjects.ARTICULATION_MARKS[tag]()
             # print-style
             placement = mxObj.get('placement')
             if placement is not None:
-                tech.placement = placement
-            return tech
+                artic.placement = placement
+            return artic
         else:
             environLocal.printDebug("Cannot translate %s in %s." % (tag, mxObj))
             return None
@@ -1749,6 +1774,28 @@ class MeasureParser(XMLParserBase):
         Many mxOrnaments are spanners: these are handled elsewhere.
     
         Returns None if cannot be converted or not defined.
+
+        Return an articulation from an mxObj, setting placement
+        
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+
+        >>> mxOrn = EL('<inverted-turn placement="above"/>')
+        >>> a = MP.xmlOrnamentToExpressionOrArticulation(mxOrn)
+        >>> a
+        <music21.expressions.InvertedTurn>
+        >>> a.placement
+        'above'
+
+        If it can't be converted, return None
+
+        >>> mxOrn = EL('<crazy-slide placement="above"/>')
+        >>> a = MP.xmlOrnamentToExpressionOrArticulation(mxOrn)
+        >>> a is None
+        True
+        
+        Not supported currently: 'accidental-mark', 'vertical-turn', 
+        'delayed-turn', 'delayed-inverted-turn'
         '''
         tag = mxObj.tag
         if tag in xmlObjects.ORNAMENT_MARKS:
@@ -1762,7 +1809,31 @@ class MeasureParser(XMLParserBase):
         return None
 
     def xmlDirectionToSpanners(self, mxDirection):
-        '''Some spanners, such as MusicXML octave-shift, are encoded as MusicXML directions.
+        '''
+        Some spanners, such as MusicXML wedge, bracket, and dashes, 
+        are encoded as MusicXML directions.
+        
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> n1 = note.Note("D4")
+        >>> MP.nLast = n1
+
+        >>> len(MP.spannerBundle)
+        0
+        >>> mxDirection = EL('<direction><wedge type="crescendo" number="2"/></direction>')
+        >>> MP.xmlDirectionToSpanners(mxDirection)
+        >>> len(MP.spannerBundle)
+        1
+        >>> sp = MP.spannerBundle[0]
+        >>> sp
+        <music21.spanner.Crescendo >
+        >>> mxDirection2 = EL('<direction><wedge type="stop" number="2"/></direction>')
+        >>> MP.xmlDirectionToSpanners(mxDirection2)
+        >>> len(MP.spannerBundle)
+        1
+        >>> sp = MP.spannerBundle[0]
+        >>> sp
+        <music21.spanner.Crescendo <music21.note.Note D>>        
         '''    
         targetLast = self.nLast
         
@@ -1787,73 +1858,47 @@ class MeasureParser(XMLParserBase):
                 if targetLast is not None:
                     sp.addSpannedElements(targetLast)
 
-        for mxObj in mxDirection.findall('bracket'):
-            pass
-        
-
-
-    
-        mxBracket = mxDirection.getBracket()
-        if mxBracket is not None:
-            mxType = mxBracket.get('type')
-            idFound = mxBracket.get('number')
+        for mxObj in mxDirection:
+            if mxObj.tag not in ('bracket', 'dashes'):
+                continue
+            mxType = mxObj.get('type')
+            idFound = mxObj.get('number')
             #environLocal.printDebug(['mxDirectionToSpanners', 'found mxBracket', mxType, idFound])
             if mxType == 'start':
                 sp = spanner.Line()
                 sp.idLocal = idFound
-                sp.startTick = mxBracket.get('line-end')
-                sp.startHeight = mxBracket.get('end-length')
-                sp.lineType = mxBracket.get('line-type')
+                if mxObj.tag == 'dashes':
+                    sp.startTick = 'none'
+                    sp.lineType = 'dashed'
+                else:
+                    sp.startHeight = mxObj.get('end-length')
+                    sp.startTick = mxObj.get('line-end')
+                    sp.lineType = mxObj.get('line-type')
     
-                spannerBundle.append(sp)
+                self.spannerBundle.append(sp)
                 # define this spanner as needing component assignment from
                 # the next general note
-                spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
+                self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
             elif mxType == 'stop':
                 # need to retrieve an existing spanner
                 # try to get base class of both Crescendo and Decrescendo
-                sp = spannerBundle.getByClassIdLocalComplete('Line',
+                sp = self.spannerBundle.getByClassIdLocalComplete('Line',
                         idFound, False)[0] # get first
                 sp.completeStatus = True
-    
-                sp.endTick = mxBracket.get('line-end')
-                sp.endHeight = mxBracket.get('end-length')
-                sp.lineType = mxBracket.get('line-type')
+                
+                if mxObj.tag == 'dashes':
+                    sp.endTick = 'none'
+                else:
+                    sp.endTick = mxObj.get('line-end')
+                    sp.endHeight = mxObj.get('end-length')
+                    sp.lineType = mxObj.get('line-type')
     
                 # will only have a target if this follows the note
                 if targetLast is not None:
                     sp.addSpannedElements(targetLast)
             else:
-                raise FromMxObjectsException('unidentified mxType of mxBracket:', mxType)
+                raise MusicXMLImportException('unidentified mxType of mxBracket:', mxType)
     
-        mxDashes = mxDirection.getDashes()
-        # import mxDashes as m21 Line objects
-        if mxDashes is not None:
-            mxType = mxDashes.get('type')
-            idFound = mxDashes.get('number')
-            #environLocal.printDebug(['mxDirectionToSpanners', 'found mxDashes', mxType, idFound])
-            if mxType == 'start':
-                sp = spanner.Line()
-                sp.idLocal = idFound
-                sp.startTick = 'none'
-                sp.lineType = 'dashed'
-                spannerBundle.append(sp)
-                # define this spanner as needing component assignment from
-                # the next general note
-                spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
-            elif mxType == 'stop':
-                # need to retrieve an existing spanner
-                # try to get base class of both Crescendo and Decrescendo
-                sp = spannerBundle.getByClassIdLocalComplete('Line',
-                        idFound, False)[0] # get first
-                sp.completeStatus = True
-                sp.endTick = 'none'
-                # will only have a target if this follows the note
-                if targetLast is not None:
-                    sp.addSpannedElements(targetLast)
-            else:
-                raise FromMxObjectsException('unidentified mxType of mxBracket:', mxType)
-
         
     def xmlNotationsToSpanners(self, mxNotations, n):
         for mxObj in mxNotations.findall('slur'):
@@ -2089,13 +2134,15 @@ class MeasureParser(XMLParserBase):
                     useVoice = 1
             else:
                 useVoice = useVoice.text.strip()
-                try:
-                    useVoice = int(useVoice)
-                except ValueError:
-                    pass # no restriction on string voices...
-            thisVoice = m.voices[useVoice]
+            try:
+                thisVoice = m.voices[useVoice]
+            except stream.StreamException:
+                thisVoice = None
+                
             if thisVoice is None:
-                environLocal.warn('Cannot find voice %d for Note %r; putting outside of voices...' % (mxNote.voice, mxNote))
+                environLocal.warn('Cannot find voice %d for Note %r; putting outside of voices...' % (useVoice, mxNote))
+                environLocal.warn('Current voices: {0}'.format([v for v in m.voices]))
+
                 m._insertCore(self.offsetMeasureNote, n)
             else:
                 thisVoice._insertCore(self.offsetMeasureNote, n)
@@ -2112,9 +2159,9 @@ class MeasureParser(XMLParserBase):
 
         mxRepeatObj = mxBarline.find('repeat')
         if mxRepeatObj is not None:
-            barline = self.mxToRepeat(mxBarline)
+            barline = self.xmlToRepeat(mxBarline)
         else:
-            barline = self.mxToBarline(mxBarline)
+            barline = self.xmlToBarline(mxBarline)
 
         # barline objects also store ending objects, that mark begin
         # and end of repeat bracket designations
@@ -2158,7 +2205,7 @@ class MeasureParser(XMLParserBase):
         else:
             environLocal.printDebug(['not handling barline that is neither left nor right', barline, barline.location])
 
-    def mxToRepeat(self, mxBarline, inputM21=None):
+    def xmlToRepeat(self, mxBarline, inputM21=None):
         '''
         Given an mxBarline (not an mxRepeat object) with repeatObj as a parameter, 
         file the necessary parameters and return a bar.Repeat() object
@@ -2168,7 +2215,7 @@ class MeasureParser(XMLParserBase):
         
         >>> mxBarline = ET.fromstring('<barline><bar-style>light-heavy</bar-style>' + 
         ...       '<repeat direction="backward"/></barline>')
-        >>> r = MP.mxToRepeat(mxBarline)
+        >>> r = MP.xmlToRepeat(mxBarline)
         >>> r
         <music21.bar.Repeat direction=end>
     
@@ -2227,7 +2274,7 @@ class MeasureParser(XMLParserBase):
         if inputM21 is None:
             return r
 
-    def mxToBarline(self, mxBarline, inputM21=None):
+    def xmlToBarline(self, mxBarline, inputM21=None):
         '''
         Given an mxBarline, fill the necessary parameters
     
@@ -2235,7 +2282,7 @@ class MeasureParser(XMLParserBase):
         >>> MP = musicxml.xmlToM21.MeasureParser()
         
         >>> mxBarline = ET.fromstring('<barline location="right"><bar-style>light-light</bar-style></barline>')
-        >>> b = MP.mxToBarline(mxBarline)
+        >>> b = MP.xmlToBarline(mxBarline)
         >>> b
         <music21.bar.Barline style=double>
         >>> b.style  # different in music21 than musicxml
@@ -2532,7 +2579,7 @@ class MeasureParser(XMLParserBase):
     def xmlToOffset(self, mxObj):
         try:
             offset = float(mxObj.find('offset').text.strip())
-        except ValueError:
+        except (ValueError, AttributeError):
             return 0.0
         return offset/self.divisions
     
@@ -2853,8 +2900,627 @@ class Test(unittest.TestCase):
         MI.xmlText = r'''<score-timewise />'''
         self.assertRaises(MusicXMLImportException, MI.parseXMLText)
 
+    def EL(self, elText):
+        return ET.fromstring(elText)
+
+    def pitchOut(self, listIn):
+        '''
+        make it so that the tests that look for the old-style pitch.Pitch 
+        representation still work.
+        '''
+        out = "["
+        for p in listIn:
+            out += str(p) + ', '
+        out = out[0:len(out)-2]
+        out += "]"
+        return out
+
+
+    def testBarRepeatConversion(self):
+        from music21 import corpus
+        #a = converter.parse(testPrimitive.simpleRepeat45a)
+        # this is a good example with repeats
+        s = corpus.parse('k80/movement3')
+        for p in s.parts:
+            post = p.flat.getElementsByClass('Repeat')
+            self.assertEqual(len(post), 6)
+
+        #a = corpus.parse('opus41no1/movement3')
+        #s.show()
+
+    def testVoices(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.voiceDouble)
+        m1 = s.parts[0].getElementsByClass('Measure')[0]
+        self.assertEqual(m1.hasVoices(), True)
+
+        self.assertEqual([v.id for v in m1.voices], [u'1', u'2'])
+
+        self.assertEqual([e.offset for e in m1.voices[0]], [0.0, 1.0, 2.0, 3.0])
+        self.assertEqual([e.offset for e in m1.voices['1']], [0.0, 1.0, 2.0, 3.0])
+
+        self.assertEqual([e.offset for e in m1.voices[1]], [0.0, 2.0, 2.5, 3.0, 3.5])
+        self.assertEqual([e.offset for e in m1.voices['2']], [0.0, 2.0, 2.5, 3.0, 3.5])
+        #s.show()
+
+
+    def testSlurInputA(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.spannersSlurs33c)
+        # have 10 spanners
+        self.assertEqual(len(s.flat.getElementsByClass('Spanner')), 5)
+
+        # can get the same from a getAll search
+        self.assertEqual(len(s.getAllContextsByClass('Spanner')), 5)
+
+        # try to get all spanners from the first note
+        self.assertEqual(len(s.flat.notesAndRests[0].getAllContextsByClass('Spanner')), 5)
+        #s.show('t')
+        #s.show()
+
+
+    def testMultipleStavesPerPartA(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+        from music21.musicxml import xmlHandler
+
+        mxDoc = xmlHandler.Document()
+        mxDoc.read(testPrimitive.pianoStaff43a)
+
+        # parts are stored in component list
+        p1 = mxDoc.score.componentList[0]
+        self.assertEqual(p1.getStavesCount(), 2)
+
+        s = converter.parse(testPrimitive.pianoStaff43a)
+        self.assertEqual(len(s.parts), 2)
+        #s.show()
+        self.assertEqual(len(s.parts[0].flat.getElementsByClass('Note')), 1)
+        self.assertEqual(len(s.parts[1].flat.getElementsByClass('Note')), 1)
+
+        self.assertEqual(isinstance(s.parts[0], stream.PartStaff), True)
+        self.assertEqual(isinstance(s.parts[1], stream.PartStaff), True)
+
+
+    def testMultipleStavesPerPartB(self):
+        from music21 import converter
+        from music21.musicxml import testFiles
+
+        s = converter.parse(testFiles.moussorgskyPromenade) # @UndefinedVariable
+        self.assertEqual(len(s.parts), 2)
+
+        self.assertEqual(len(s.parts[0].flat.getElementsByClass('Note')), 19)
+        # only chords in the second part
+        self.assertEqual(len(s.parts[1].flat.getElementsByClass('Note')), 0)
+
+        self.assertEqual(len(s.parts[0].flat.getElementsByClass('Chord')), 11)
+        self.assertEqual(len(s.parts[1].flat.getElementsByClass('Chord')), 11)
+
+        #s.show()
+
+
+    def testMultipleStavesPerPartC(self):
+        from music21 import corpus
+        s = corpus.parse('schoenberg/opus19/movement2')
+        self.assertEqual(len(s.parts), 2)
+
+        s = corpus.parse('schoenberg/opus19/movement6')
+        self.assertEqual(len(s.parts), 2)
+
+        #s.show()
+
+
+    def testSpannersA(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.spanners33a)
+        # this number will change as more are being imported
+        self.assertEqual(len(s.flat.spanners) >= 2, True)
+
+
+        #environLocal.printDebug(['pre s.measures(2,3)', 's', s])
+        ex = s.measures(2, 3) # this needs to get all spanners too
+
+        # all spanners are referenced over; even ones that may not be relevant
+        self.assertEqual(len(ex.flat.spanners), 14)
+        #ex.show()
+
+        # slurs are on measures 2, 3
+        # crescendos are on measures 4, 5
+        # wavy lines on measures 6, 7
+        # brackets etc. on measures 10-14
+        # glissando on measure 16
+
+
+    def testTextExpressionsA(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.textExpressions)
+        #s.show() 
+        self.assertEqual(len(s.flat.getElementsByClass('TextExpression')), 3)
+
+        p1 = s.parts[0]
+        m1 = p1.getElementsByClass('Measure')[0]
+        self.assertEqual(len(m1.getElementsByClass('TextExpression')), 0)
+        # all in measure 2
+        m2 = p1.getElementsByClass('Measure')[1]
+        self.assertEqual(len(m2.getElementsByClass('TextExpression')), 3)
+
+        teStream = m2.getElementsByClass('TextExpression')
+        self.assertEqual([te.offset for te in teStream], [1.0, 1.5, 4.0])
+
+        #s.show()
+
+
+    def testTextExpressionsC(self):
+        from music21 import corpus
+        s = corpus.parse('bwv66.6')
+        p = s.parts[0]
+        for m in p.getElementsByClass('Measure'):
+            for n in m.flat.notes:
+                if n.pitch.name in ['B']:
+                    msg = '%s\n%s' % (n.pitch.nameWithOctave, n.duration.quarterLength)
+                    te = expressions.TextExpression(msg)
+                    te.size = 14
+                    te.style = 'bold'
+                    te.justify = 'center'
+                    te.enclosure = 'rectangle'
+                    te.positionVertical = -80
+                    m.insert(n.offset, te)
+        #p.show()        
+
+
+    def testTextExpressionsD(self):
+        from music21 import corpus
+        # test placing text expression in arbitrary locations
+        s = corpus.parse('bwv66.6')
+        p = s.parts[-1] # get bass
+        for m in p.getElementsByClass('Measure')[1:]:
+            for pos in [1.5, 2.5]:
+                te = expressions.TextExpression(pos)
+                te.style = 'bold'
+                te.justify = 'center'
+                te.enclosure = 'rectangle'
+                m.insert(pos, te)
+        #p.show()
+
+    def testTextExpressionsE(self):
+        import random
+        s = stream.Stream()
+        for i in range(6):
+            m = stream.Measure(number=i + 1)
+            m.append(layout.SystemLayout(isNew=True))
+            m.append(note.Rest(type='whole'))
+            s.append(m)
+        for m in s.getElementsByClass('Measure'):
+            offsets = [x * .25 for x in range(16)]
+            random.shuffle(offsets)
+            offsets = offsets[:4]
+            for o in offsets:
+                te = expressions.TextExpression(o)
+                te.style = 'bold'
+                te.justify = 'center'
+                te.enclosure = 'rectangle'
+                m.insert(o, te)
+        #s.show()      
+
+
+
+    def testImportRepeatExpressionsA(self):
+        # test importing from musicxml
+        from music21.musicxml import testPrimitive
+        from music21 import converter
+
+        # has one segno
+        s = converter.parse(testPrimitive.repeatExpressionsA)
+        self.assertEqual(len(s.flat.getElementsByClass(repeat.Segno)), 1)
+        self.assertEqual(len(s.flat.getElementsByClass(repeat.Fine)), 1)
+        self.assertEqual(len(s.flat.getElementsByClass(repeat.DalSegnoAlFine)), 1)
+
+        # has two codas
+        s = converter.parse(testPrimitive.repeatExpressionsB)
+        self.assertEqual(len(s.flat.getElementsByClass(repeat.Coda)), 2)
+        # has one d.c.al coda
+        self.assertEqual(len(s.flat.getElementsByClass(repeat.DaCapoAlCoda)), 1)
+
+    def testImportRepeatBracketA(self):
+        from music21 import corpus
+        # has repeats in it; start with single emasure
+        s = corpus.parse('opus74no1', 3)
+        # there are 2 for each part, totaling 8
+        self.assertEqual(len(s.flat.getElementsByClass('RepeatBracket')), 8)
+        # can get for each part as spanners are stored in Part now
+
+        # TODO: need to test getting repeat brackets after measure extraction
+        #s.parts[0].show() # 72 through 77
+        sSub = s.parts[0].measures(72, 77)
+        # 2 repeat brackets are gathered b/c they are stored at the Part by 
+        # default
+        rbSpanners = sSub.getElementsByClass('RepeatBracket')
+        self.assertEqual(len(rbSpanners), 2)
+
+
+    def testImportVoicesA(self):
+        # testing problematic voice imports
+
+        from music21.musicxml import testPrimitive
+        from music21 import converter
+        # this 2 part segments was importing multiple voices within
+        # a measure, even though there was no data in the second voice
+        s = converter.parse(testPrimitive.mixedVoices1a)
+        self.assertEqual(len(s.parts), 2)
+        # there are voices, but they have been removed
+        self.assertEqual(len(s.parts[0].getElementsByClass(
+            'Measure')[0].voices), 0)
+
+        #s.parts[0].show('t')
+        #self.assertEqual(len(s.parts[0].voices), 2)
+        s = converter.parse(testPrimitive.mixedVoices1b)
+        self.assertEqual(len(s.parts), 2)
+        self.assertEqual(len(s.parts[0].getElementsByClass(
+            'Measure')[0].voices), 0)
+        #s.parts[0].show('t')
+
+        # this case, there were 4, but there should be 2
+        s = converter.parse(testPrimitive.mixedVoices2)
+        self.assertEqual(len(s.parts), 2)
+        self.assertEqual(len(s.parts[0].getElementsByClass(
+            'Measure')[0].voices), 2)
+        self.assertEqual(len(s.parts[1].getElementsByClass(
+            'Measure')[0].voices), 2)
+
+        #s.parts[0].show('t')
+
+#         s = converter.parse(testPrimitive.mixedVoices1b)
+#         s = converter.parse(testPrimitive.mixedVoices2)
+
+
+    def testImportMetronomeMarksA(self):
+        from music21.musicxml import testPrimitive
+        from music21 import converter
+        # has metronome marks defined, not with sound tag
+        s = converter.parse(testPrimitive.metronomeMarks31c)
+        # get all tempo indications
+        mms = s.flat.getElementsByClass('TempoIndication')
+        self.assertEqual(len(mms) > 3, True)
+
+
+    def testImportMetronomeMarksB(self):
+        pass
+        # TODO: look for files that only have sound tags and create MetronomeMarks
+        # need to look for bundling of Words text expressions with tempo
+
+        # has only sound tempo=x tag
+        #s = converter.parse(testPrimitive.articulations01)
+        #s.show()
+
+    def testImportGraceNotesA(self):
+        # test importing from musicxml
+        from music21.musicxml import testPrimitive
+        from music21 import converter
+        unused_s = converter.parse(testPrimitive.graceNotes24a)
+
+        #s.show()
+
+    def testChordalStemDirImport(self):
+        #NB: Finale apparently will not display a pitch that is a member of a chord without a stem
+        #unless all chord members are without stems.
+        from music21.musicxml import m21ToString
+        from music21 import converter
+
+        n1 = note.Note('f3')
+        n1.notehead = 'diamond'
+        n1.stemDirection = 'down'
+        n2 = note.Note('c4')
+        n2.stemDirection = 'noStem'
+        c = chord.Chord([n1, n2])
+        c.quarterLength = 2
+        
+        xml = m21ToString.fromMusic21Object(c)
+        #print xml
+        #c.show()
+        inputStream = converter.parse(xml)
+        chordResult = inputStream.flat.notes[0]
+#         for n in chordResult:
+#             print n.stemDirection       
+
+        self.assertEqual(chordResult.getStemDirection(chordResult.pitches[0]), 'down')
+        self.assertEqual(chordResult.getStemDirection(chordResult.pitches[1]), 'noStem')
+
+
+    def testStaffGroupsA(self):
+        from music21.musicxml import testPrimitive
+        from music21 import converter
+
+        s = converter.parse(testPrimitive.staffGroupsNested41d)
+        self.assertEqual(len(s.getElementsByClass('StaffGroup')), 2)
+        #raw = s.musicxml
+        sg1 = s.getElementsByClass('StaffGroup')[0]
+        self.assertEqual(sg1.symbol, 'brace')
+        self.assertEqual(sg1.barTogether, True)
+
+        sg2 = s.getElementsByClass('StaffGroup')[1]
+        self.assertEqual(sg2.symbol, 'line')
+        self.assertEqual(sg2.barTogether, True)
+
+    def testInstrumentTranspositionA(self):
+        from music21.musicxml import testPrimitive
+        from music21 import converter
+
+        s = converter.parse(testPrimitive.transposingInstruments72a)
+        i1 = s.parts[0].flat.getElementsByClass('Instrument')[0]
+        i2 = s.parts[1].flat.getElementsByClass('Instrument')[0]
+        i3 = s.parts[2].flat.getElementsByClass('Instrument')[0]
+
+        self.assertEqual(str(i1.transposition), '<music21.interval.Interval M-2>')
+        self.assertEqual(str(i2.transposition), '<music21.interval.Interval M-6>')
+
+
+    def testInstrumentTranspositionB(self):
+        from music21.musicxml import testPrimitive
+        from music21 import converter
+
+        s = converter.parse(testPrimitive.transposing01)
+        iStream1 = s.parts[0].flat.getElementsByClass('Instrument')
+        # three instruments; one initial, and then one for each transposition
+        self.assertEqual(len(iStream1), 3)
+        # should be 3
+        iStream2 = s.parts[1].flat.getElementsByClass('Instrument')
+        self.assertEqual(len(iStream2), 3)
+        i2 = iStream2[0]
+
+        iStream3 = s.parts[2].flat.getElementsByClass('Instrument')
+        self.assertEqual(len(iStream3), 1)
+        i3 = iStream3[0]
+
+
+        self.assertEqual(str(iStream1[0].transposition), 'None')
+        self.assertEqual(str(iStream1[1].transposition), '<music21.interval.Interval P-5>')
+        self.assertEqual(str(iStream1[2].transposition), '<music21.interval.Interval P1>')
+
+        self.assertEqual(str(iStream2[0].transposition), '<music21.interval.Interval M-2>')
+        self.assertEqual(str(iStream2[1].transposition), '<music21.interval.Interval m3>')
+
+        self.assertEqual(str(i3.transposition), '<music21.interval.Interval P-5>')
+
+        self.assertEqual(self.pitchOut([p for p in s.parts[0].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, A4, A4, A4, A4]')
+        self.assertEqual(self.pitchOut([p for p in s.parts[1].flat.pitches]), '[B4, B4, B4, B4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, B4, B4, B4, B4, B4, B4]')
+        self.assertEqual(self.pitchOut([p for p in s.parts[2].flat.pitches]), '[E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5]')
+
+        sSounding = s.toSoundingPitch(inPlace=False)
+        self.assertEqual(self.pitchOut([p for p in sSounding.parts[0].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
+        self.assertEqual(self.pitchOut([p for p in sSounding.parts[1].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
+        self.assertEqual(self.pitchOut([p for p in sSounding.parts[2].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
+
+        # chordification by default places notes at sounding pitch
+        sChords = s.chordify()
+        self.assertEqual(self.pitchOut([p for p in sChords.flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
+        #sChords.show()
+
+
+    def testInstrumentTranspositionC(self):
+        # generate all transpositions on output
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.transposing01)
+        self.assertEqual(len(s.flat.getElementsByClass('Instrument')), 7)
+        #s.show()
+
+
+
+    def testHarmonyA(self):
+        from music21 import corpus
+
+        s = corpus.parse('leadSheet/berlinAlexandersRagtime.xml')
+        self.assertEqual(len(s.flat.getElementsByClass('ChordSymbol')), 19)
+
+        match = [h.chordKind for h in s.flat.getElementsByClass('ChordSymbol')]
+        self.assertEqual(match, [u'major', u'dominant', u'major', u'major', u'major', u'major', u'dominant', u'major', u'dominant', u'major', u'dominant', u'major', u'dominant', u'major', u'dominant', u'major', u'dominant', u'major', u'major'])
+
+        match = [str(h.root()) for h in s.flat.getElementsByClass('ChordSymbol')]
+        
+        self.assertEqual(match, ['F3', 'C3', 'F3', 'B-2', 'F3', 'C3', 'G2', 'C3', 'C3', 'F3', 'C3', 'F3', 'F2', 'B-2', 'F2', 'F3', 'C3', 'F3', 'C3'])
+
+        match = set([str(h.figure) for h in s.flat.getElementsByClass('ChordSymbol')])
+        
+        self.assertEqual(match, set(['F','F7','B-','C7','G7','C']))
+
+
+        s = corpus.parse('monteverdi/madrigal.3.12.xml')
+        self.assertEqual(len(s.flat.getElementsByClass('ChordSymbol')), 10)
+
+        s = corpus.parse('leadSheet/fosterBrownHair.xml')
+        self.assertEqual(len(s.flat.getElementsByClass('ChordSymbol')), 40)
+
+        #s.show()
+
+    def testOrnamentandTechnical(self):
+        from music21 import corpus
+
+        s = corpus.parse('opus133')
+        ex = s.parts[0]
+        countTrill = 0
+        for n in ex.flat.notes:
+            for e in n.expressions:
+                if 'Trill' in e.classes:
+                    countTrill += 1
+        self.assertEqual(countTrill, 54)
+        
+        # TODO: Get a better test... the single harmonic in the viola part, m. 482 is probably a mistake!
+        countTechnical = 0
+        for n in s.parts[2].flat.notes:
+            for a in n.articulations:
+                if 'TechnicalIndication' in a.classes:
+                    countTechnical += 1
+        self.assertEqual(countTechnical, 1)
+
+
+    def testOrnamentC(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        # has many ornaments
+        s = converter.parse(testPrimitive.notations32a)
+
+        #s.flat.show('t')
+        self.assertEqual(len(s.flat.getElementsByClass('TremoloSpanner')), 0) # no spanned tremolos
+        
+        count = 0
+        for n in s.flat.notes:
+            for e in n.expressions:
+                if 'Tremolo' in e.classes:
+                    count += 1
+        self.assertEqual(count, 1) # One single Tremolo
+
+
+        count = 0
+        for n in s.flat.notes:
+            for e in n.expressions:
+                if 'Turn' in e.classes:
+                    count += 1
+        self.assertEqual(count, 4) # include inverted turn
+
+        count = 0
+        for n in s.flat.notes:
+            for e in n.expressions:
+                if 'InvertedTurn' in e.classes:
+                    count += 1
+        self.assertEqual(count, 1)
+
+        count = 0
+        for n in s.flat.notes:
+            for e in n.expressions:
+                if 'Shake' in e.classes:
+                    count += 1
+        self.assertEqual(count, 1)
+
+        count = 0
+        for n in s.flat.notes:
+            for e in n.expressions:
+                if 'Schleifer' in e.classes:
+                    count += 1
+        self.assertEqual(count, 1)
+
+    def testTextBoxA(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.textBoxes01)
+        tbs = s.flat.getElementsByClass('TextBox')
+        self.assertEqual(len(tbs), 5)
+
+        msg = []
+        for tb in tbs:
+            msg.append(tb.content)
+        self.assertEqual(msg, [u'This is a text box!', u'pos 200/300 (lower left)', u'pos 1000/300 (lower right)', u'pos 200/1500 (upper left)', u'pos 1000/1500 (upper right)'])
+
+    def testImportSlursA(self):
+        from music21 import corpus
+        # this is a good test as this encoding uses staffs, not parts
+        # to encode both parts; this requires special spanner handling
+        s = corpus.parse('mozart/k545/movement1_exposition')
+        sf = s.flat       
+        slurs = sf.getElementsByClass(spanner.Slur)
+        # TODO: this value should be 2, but due to staff encoding we 
+        # have orphaned spanners that are not cleaned up
+        self.assertEqual(len(slurs), 4)
+
+        n1, n2 = s.parts[0].flat.notes[3], s.parts[0].flat.notes[5]
+        #environLocal.printDebug(['n1', n1, 'id(n1)', id(n1), slurs[0].getSpannedElementIds(), slurs[0].getSpannedElementIds()])
+        self.assertEqual(id(n1) == slurs[0].getSpannedElementIds()[0], True)
+        self.assertEqual(id(n2) == slurs[0].getSpannedElementIds()[1], True)
+
+        #environLocal.printDebug(['n2', n2, 'id(n2)', id(n2), slurs[0].getSpannedElementIds()])
+
+
+    def testImportWedgeA(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.spanners33a)
+        self.assertEqual(len(s.flat.getElementsByClass('Crescendo')), 1)
+        self.assertEqual(len(s.flat.getElementsByClass('Diminuendo')), 1)
+
+
+    def testImportWedgeB(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        # this produces a single component cresc
+        s = converter.parse(testPrimitive.directions31a)
+        self.assertEqual(len(s.flat.getElementsByClass('Crescendo')), 2)
+
+
+    def testBracketImportB(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.spanners33a)
+        #s.show()
+        self.assertEqual(len(s.flat.getElementsByClass('Line')), 6)
+
+
+    def testTrillExtensionImportA(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+        s = converter.parse(testPrimitive.notations32a)
+        #s.show()
+        self.assertEqual(len(s.flat.getElementsByClass('TrillExtension')), 2)
+
+
+    def testGlissandoImportA(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+        s = converter.parse(testPrimitive.spanners33a)
+        #s.show()
+        self.assertEqual(len(s.flat.getElementsByClass('Glissando')), 1)
+
+
+    def testImportDashes(self):
+        # dashes are imported as Lines (as are brackets)
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.spanners33a, format='oldmusicxml')
+        s.show('text')
+        self.assertEqual(len(s.flat.getElementsByClass('Line')), 6)
+
+
+    def testImportGraceA(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.graceNotes24a)
+        #s.show()        
+        match = [str(p) for p in s.pitches]
+        #print match
+        self.assertEqual(match, ['D5', 'C5', 'E5', 'D5', 'C5', 'D5', 'C5', 'D5', 'C5', 'D5', 'C5', 'E5', 'D5', 'C5', 'D5', 'C5', 'D5', 'C5', 'E5', 'E5', 'F4', 'C5', 'D#5', 'C5', 'D-5', 'A-4', 'C5', 'C5'])
+
+
+    def testBarException(self):
+        MP = MeasureParser()
+        mxBarline = self.EL('<barline><bar-style>light-heavy</bar-style></barline>')
+        #Rasing the BarException
+        self.assertRaises(bar.BarException, MP.xmlToRepeat, mxBarline)
+
+        mxBarline = self.EL('<barline><bar-style>light-heavy</bar-style><repeat direction="backward"/></barline>')
+
+        #all fine now, no exceptions here
+        MP.xmlToRepeat(mxBarline)
+
+        #Raising the BarException       
+        mxBarline = self.EL('<barline><bar-style>wunderbar</bar-style></barline>')
+        self.assertRaises(bar.BarException, MP.xmlToRepeat, mxBarline)
+
+
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test, runTest='testImportDashes')
     
     
