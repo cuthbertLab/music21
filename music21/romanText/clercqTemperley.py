@@ -622,7 +622,7 @@ class CTRule(object):
                 #pass
         if len(measures) > 0:
             for m in measures:
-                if len(m.flat.notes) > 0 and self.parent.labelSubsectionsOnScore and self.LHS != 'S':
+                if len(m.flat.notes) > 0 and (self.parent is None or self.parent.labelSubsectionsOnScore is True) and self.LHS != 'S':
                     rn = m.flat.notes[0]
                     lyricNum = len(rn.lyrics) + 1
                     rn.lyrics.append(note.Lyric(self.LHS, number=lyricNum))       
@@ -638,14 +638,37 @@ class CTRule(object):
         >>> s._measureGroups()
         [('[A] [4/4]', '|', 1), 
          ('Vr', '$', 1), ('BP', '$', 3), ('I IV', '|', 1), ('I', '|', 1), 
-         ('BP', '$', 3), ('I IV', '|', 1), ('I', '|', 1), ('I', '|', 1), 
+         ('BP', '$', 3), ('I IV', '|', 1), ('I', '|', 1), ('.', '|', 1), 
          ('R', '|', 4), ('I', '|', 4)]
          
          
         >>> r = romanText.clercqTemperley.CTRule('In: $IP*3 I | | | $BP*2')
         >>> r._measureGroups()
-        [('IP', '$', 3), ('I', '|', 1), ('I', '|', 1), ('I', '|', 1), ('BP', '$', 2)]
-        
+        [('IP', '$', 3), ('I', '|', 1), ('.', '|', 1), ('.', '|', 1), ('BP', '$', 2)]
+
+        >>> r = romanText.clercqTemperley.CTRule('In: [4/4] I V | | | IV |')
+        >>> r._measureGroups()
+        [('[4/4] I V', '|', 1), ('.', '|', 1), ('.', '|', 1), ('IV', '|', 1)]
+        >>> measures = r.expand()
+        >>> measures[2].show('text')
+        {0.0} <music21.key.Key of C major>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.roman.RomanNumeral V in C major>        
+
+        >>> r = romanText.clercqTemperley.CTRule('Vr: [4/4] bVII | IV | | [2/4] |')
+        >>> r._measureGroups()
+        [('[4/4] bVII', '|', 1), ('IV', '|', 1), ('.', '|', 1), ('[2/4] .', '|', 1)]
+        >>> measures = r.expand()
+        >>> measures[2].show('text')
+        {0.0} <music21.key.Key of C major>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.roman.RomanNumeral IV in C major>
+        >>> measures[3].show('text')
+        {0.0} <music21.key.Key of C major>
+        {0.0} <music21.meter.TimeSignature 2/4>
+        {0.0} <music21.roman.RomanNumeral IV in C major>
+        >>> measures[3][-1].quarterLength
+        2.0
         '''
         measureGroups1 = []
         measureGroups2 = []
@@ -668,7 +691,7 @@ class CTRule(object):
             for atom in contentList:
                 if atom.startswith('$'): # $BP or $Vr*3, etc.
                     if len(contentOut) > 0: # clear existing content
-                        measureGroups2.append((" ".join(contentOut), "|", 1))
+                        measureGroups2.append((" ".join(contentOut), "?", 1))
                         contentOut = []
                         
                     repetitions = self.REPETITION.search(atom)
@@ -693,12 +716,15 @@ class CTRule(object):
                 measureGroups2.append((" ".join(contentOut), sep, numReps))
 
         # third pass, make empty content duplicate previous content.
-        lastContent = ""
         for content, sep, numReps in measureGroups2:
-            if content == "" and sep == "|":
-                content = lastContent
-            else:
-                lastContent = content
+            contentSplit = content.split()
+            if sep == "|" and all([y.startswith('[') or y == "" for y in contentSplit]):
+                content = " ".join(contentSplit)
+                if len(content) > 0:
+                    content += " "
+                content += "."
+            elif sep == "?": # implied contnuation
+                sep = "|"
             measureGroups3.append((content, sep, numReps))
         
         return measureGroups3
@@ -723,7 +749,7 @@ class CTRule(object):
         same = self.isSame(rn, lastChord)
         if same is False and lastChord is not None and lastChord.tie is not None:
             lastChord.tie.type = 'stop'
-        if same is False and self.parent.labelRomanNumerals is True:
+        if same is False and (self.parent is None or self.parent.labelRomanNumerals is True):
             rn.lyrics.append(note.Lyric(rn.figure, number=1))
             
         if same is True and lastChord is not None and lastChord.tie is None:
@@ -740,6 +766,11 @@ class CTRule(object):
         insert a new time signature or key signature into measure m, if it's
         not already in the stream somewhere.
         '''
+        if self.parent is None:
+            m.timeSignature = ts
+            m.keySignature = ks
+            return 
+        
         if ts not in self.parent.tsList:
             m.timeSignature = ts
             self.parent.tsList.append(ts)
