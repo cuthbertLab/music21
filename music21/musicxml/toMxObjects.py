@@ -966,11 +966,25 @@ def chordSymbolToMx(cs):
     >>> mxF = musicxml.toMxObjects.chordSymbolToMx(f)
     >>> mxF
     <harmony <root root-step=G> <kind text= charData=suspended-fourth> inversion=3 <bass bass-step=F> <degree <degree-value charData=9> <degree-alter > <degree-type charData=add>>>
+    
+    MusicXML uses "dominant" for "dominant-seventh" so check aliases back...
+
+    >>> dom7 = harmony.ChordSymbol('C7')
+    >>> dom7.chordKind
+    'dominant-seventh'
+    >>> mxF = musicxml.toMxObjects.chordSymbolToMx(dom7)
+    >>> mxF
+    <harmony <root root-step=C> <kind text= charData=dominant> inversion=0>    
     '''
+    from music21 import harmony
     mxHarmony = mxObjects.Harmony()
 
     mxKind = mxObjects.Kind()
-    mxKind.set('charData', cs.chordKind)
+    cKind = cs.chordKind
+    for xmlAlias in harmony.CHORD_ALIASES:
+        if harmony.CHORD_ALIASES[xmlAlias] == cKind:
+            cKind = xmlAlias
+    mxKind.set('charData', cKind)
     mxKind.set('text', cs.chordKindStr)
     mxHarmony.set('kind', mxKind)
 
