@@ -770,6 +770,8 @@ class StreamThawer(StreamFreezeThawBase):
         StreamFreezeThawBase.__init__(self)
         self.stream = None
 
+    # TODO: Test that the _NoneSite singleton is restored properly after freezeThaw.
+
     def teardownSerializationScaffold(self, streamObj = None):
         '''
         After rebuilding this Stream from pickled storage, prepare this as a normal `Stream`.
@@ -798,7 +800,6 @@ class StreamThawer(StreamFreezeThawBase):
         streamObj.autoSort = False
 
         self.restoreElementsFromTuples(streamObj)
-        streamObj.sites.add(None, 0.0)
 
         self.restoreStreamStatusClient(streamObj) # removing seems to create problems for jsonPickle with Spanners
         allEls = self.findAllM21Objects(streamObj)
@@ -880,8 +881,6 @@ class StreamThawer(StreamFreezeThawBase):
                     streamObj._insertCore(offset, e)
                 else:
                     streamObj._storeAtEndCore(e)
-                # add a None site as well...
-                e.sites.add(None, 0.0)
             del(streamObj._storedElementOffsetTuples)
             streamObj.elementsChanged()
 
