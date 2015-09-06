@@ -372,7 +372,7 @@ class Music21Object(object):
         # a duration object is not created until the .duration property is
         # accessed with _getDuration(); this is a performance optimization
         if "duration" in keywords:
-            self.duration = keywords["duration"]
+            self._duration = keywords["duration"]
         if "groups" in keywords and keywords["groups"] is not None:
             self.groups = keywords["groups"]
         else:
