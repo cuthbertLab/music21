@@ -2326,9 +2326,9 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None, lastMeasureInfo=No
                 mxNoteNext = mxObjNext
             else:
                 mxNoteNext = None
-            if mxNote.get('print-object') == 'no':
-                #environLocal.printDebug(['got mxNote with printObject == no', 'measure number', m.number])
-                continue
+            #if mxNote.get('print-object') == 'no':
+            #    #environLocal.printDebug(['got mxNote with printObject == no', 'measure number', m.number])
+            #    continue
 
 #             mxGrace = mxNote.get('graceObj')
 #             if mxGrace is not None: # graces have a type but not a duration

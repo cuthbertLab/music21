@@ -749,7 +749,6 @@ class PartParser(XMLParserBase):
     
     def parseMeasures(self):
         part = self.stream
-        i = 0
         for mxMeasure in self.mxPart.iterfind('measure'):
             self.xmlMeasureToMeasure(mxMeasure)
         part.elementsChanged()
@@ -800,7 +799,7 @@ class PartParser(XMLParserBase):
         
         self.parent.stream.elementsChanged()
     
-    def _getStaffExclude(staffReference, targetKey):
+    def _getStaffExclude(self, staffReference, targetKey):
         '''
         Given a staff reference dictionary, remove and combine in a list all elements that 
         are not part of the given key. Thus, return a list of all entries to remove.
@@ -1182,7 +1181,7 @@ class MeasureParser(XMLParserBase):
         if addStaffLayout is True:
             # assumes addStaffLayout is there...
             slFunc = self.xmlStaffLayoutToStaffLayout
-            stlList = [slFunc(mx) for mx in mxPrint.findall('staff-layout')]
+            stlList = [slFunc(mx) for mx in mxPrint.iterfind('staff-layout')]
             # If bugs incorporate Ariza additional checks, but
             # I think that we don't want to add to an existing staffLayoutObject
             # so that staff distance can change.
@@ -1212,7 +1211,6 @@ class MeasureParser(XMLParserBase):
             #environLocal.printDebug(['got mxNote with printObject == no', 'measure number', m.number])
             pass # TODO: Hidden Notes
 
-        # TODO: Grace notes (no duration)
         # TODO: Cue notes (no sounding tie)
 
         # the first note of a chord is not identified directly; only
@@ -1957,14 +1955,18 @@ class MeasureParser(XMLParserBase):
                 spClass = dynamics.DynamicWedge # parent of Cresc/Dim
 
             if mType != 'stop':
-                sp = self.xmlOneSpanner(mxObj, None, spClass)
-                self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
+                sp = self.xmlOneSpanner(mxObj, None, spClass, allowDuplicateIds=True)
+                self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')                
             else:
                 idFound = mxObj.get('number')
-                if idFound is None:
-                    idFound = 1
-                sp = self.spannerBundle.getByClassIdLocalComplete(
-                    'DynamicWedge', idFound, False)[0] # get first
+                spb = self.spannerBundle.getByClassIdLocalComplete(
+                    'DynamicWedge', idFound, False) # get first
+                try:
+                    sp = spb[0]
+                except IndexError:
+                    raise MusicXMLImportException("Error in geting DynamicWedges..." + 
+                          "Measure no. " + str(self.measureNumber) + " " + str(self.parent.partId))
+                    return
                 sp.completeStatus = True
                 # will only have a target if this follows the note
                 if targetLast is not None:
@@ -2039,16 +2041,17 @@ class MeasureParser(XMLParserBase):
                 tremSpan = self.xmlOneSpanner(mxObj, n, expressions.TremoloSpanner())
                 tremSpan.numberOfMarks = numMarks
             
-    def xmlOneSpanner(self, mxObj, target, spannerClass):
-        idPossible = mxObj.get('number')
-        if idPossible is not None:
-            idFound = idPossible
-        else:
-            idFound = 1 # tremolo has no number...
-            
+    def xmlOneSpanner(self, mxObj, target, spannerClass, allowDuplicateIds=False):
+        '''
+        Some spanner types do not have an id necessarily, we allow duplicates of them
+        if allowDuplicateIds is True. Wedges are one.
+        '''
+        idFound = mxObj.get('number')
+
         # returns a new spanner bundle with just the result of the search
         sb = self.spannerBundle.getByClassIdLocalComplete(spannerClass, idFound, False)
-        if len(sb) > 0: # if we already have a spanner matching
+        if len(sb) > 0 and allowDuplicateIds is False: 
+            # if we already have a spanner matching
             #environLocal.printDebug(['found a match in SpannerBundle'])
             su = sb[0] # get the first
         else: # create a new slur
@@ -2803,7 +2806,6 @@ class MeasureParser(XMLParserBase):
         >>> MP.xmlToTimeSignature(mxTime)
         <music21.meter.TimeSignature 3/8>      
         '''
-        ts = meter.TimeSignature()
         n = []
         d = []
         # just get first one for now;
@@ -2818,7 +2820,10 @@ class MeasureParser(XMLParserBase):
             msg.append('%s/%s' % (n[i], d[i]))
     
         #environLocal.warn(['loading meter string:', '+'.join(msg)])
-        ts.load('+'.join(msg))
+        if len(msg) == 1: # normal
+            ts = meter.TimeSignature(msg[0])
+        else:
+            ts.load('+'.join(msg))
         
         return ts
         
@@ -3456,10 +3461,10 @@ class Test(unittest.TestCase):
         #s.show()
 
     def testOrnamentandTechnical(self):
-        from music21 import corpus
+        from music21 import converter
+        beeth = common.getCorpusFilePath() + '/beethoven/opus133.mxl'
 
-        s = corpus.parse('opus133')
-        #, format='oldmusicxml')
+        s = converter.parse(beeth, forceSource=True, format='oldmusicxml')
         ex = s.parts[0]
         countTrill = 0
         for n in ex.flat.notes:
@@ -3468,7 +3473,8 @@ class Test(unittest.TestCase):
                     countTrill += 1
         self.assertEqual(countTrill, 54)
         
-        # TODO: Get a better test... the single harmonic in the viola part, m. 482 is probably a mistake!
+        # TODO: Get a better test... the single harmonic in the viola part, 
+        # m. 482 is probably a mistake for an open string.
         countTechnical = 0
         for n in s.parts[2].flat.notes:
             for a in n.articulations:

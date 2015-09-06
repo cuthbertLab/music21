@@ -669,9 +669,17 @@ class CallGraph(object):
         config = pycallgraph.Config()
         config.trace_filter = gf
 
+        from music21 import meter
         from music21 import note
+        from music21 import converter
+        from music21 import common
+        beeth = common.getCorpusFilePath() + '/beethoven/opus133.mxl'
+        s = converter.parse(beeth, forceSource=True)
+        #beeth = common.getCorpusFilePath() + '/bach/bwv66.6.mxl'
+        
         with pycallgraph.PyCallGraph(output=graphviz, config=config):
             n = note.Note()
+            #meter.TimeSignature('4/4')
             #ct.testFocus() # run routine
 
         print('elapsed time: %s' % t)
