@@ -200,9 +200,9 @@ def _setAttributeFromTagText(m21El, xmlEl, tag, attributeName=None, transform=No
     matchEl = xmlEl.find(tag) # find first
     if matchEl is None:
         return
-    if matchEl.text in (None, ""):
-        return 
     value = matchEl.text
+    if value in (None, ""):
+        return 
 
     if transform is not None:
         value = transform(value)
@@ -902,7 +902,7 @@ class PartParser(XMLParserBase):
         mHighestTime = m.highestTime
         lastTimeSignatureQuarterLength = self.lastTimeSignature.barDuration.quarterLength
 
-        if mHighestTime >= lastTimeSignatureQuarterLength :
+        if mHighestTime >= lastTimeSignatureQuarterLength:
             mOffsetShift = mHighestTime
 
         elif mHighestTime == 0.0 and len(m.flat.notesAndRests) == 0:
@@ -924,9 +924,9 @@ class PartParser(XMLParserBase):
                     m.padAsAnacrusis()
                     #environLocal.printDebug(['incompletely filled Measure found on musicxml import; interpreting as a anacrusis:', 'padingLeft:', m.paddingLeft])
                 mOffsetShift = mHighestTime
+                
             # assume that, even if measure is incomplete, the next bar should
             # start at the duration given by the time signature, not highestTime
-
             ### no...let's not do this...
             else:
                 mOffsetShift = mHighestTime #lastTimeSignatureQuarterLength
@@ -1207,10 +1207,6 @@ class MeasureParser(XMLParserBase):
         except IndexError: # last note in measure
             nextNoteIsChord = False
 
-        if mxNote.get('print-object') == 'no':
-            #environLocal.printDebug(['got mxNote with printObject == no', 'measure number', m.number])
-            pass # TODO: Hidden Notes
-
         # TODO: Cue notes (no sounding tie)
 
         # the first note of a chord is not identified directly; only
@@ -1383,6 +1379,7 @@ class MeasureParser(XMLParserBase):
         'up'
         '''
         n = note.Note()
+        
         self.xmlToPitch(mxNote, n.pitch) # send whole note since accidental display not in <pitch> 
         
         beamList = mxNote.findall('beam')
@@ -2720,27 +2717,30 @@ class MeasureParser(XMLParserBase):
                                               )
         # getting first for each of these for now
         if self.attributesAreInternal:
-            mxAttributes = allAttributes[0]
-            self.activeAttributes = mxAttributes
-            self.parent.activeAttributes = self.activeAttributes
-            for mxSub in mxAttributes:
-                meth = None
-                # key, clef, time, details
-                if mxSub.tag in self.attributeTagsToMethods:
-                    meth = getattr(self, self.attributeTagsToMethods[mxSub.tag])
-                if meth is not None:
-                    meth(mxSub)
-                elif mxSub.tag == 'staves':
-                    self.staves = int(mxSub.text)
-            
-            transposeTag = mxAttributes.find('transpose')
-            if transposeTag is not None:
-                self.transposition = self.xmlTransposeToInterval(transposeTag)
-            divisionsTag = mxAttributes.find('divisions')
-            if divisionsTag is not None:
-                self.parent.lastDivisions = common.opFrac(float(divisionsTag.text))
-        
+            self.parseNewAttribute(allAttributes[0])
+                
         self.divisions = self.parent.lastDivisions
+
+    def parseNewAttribute(self, mxAttributes):
+        self.activeAttributes = mxAttributes
+        self.parent.activeAttributes = self.activeAttributes
+        for mxSub in mxAttributes:
+            meth = None
+            # key, clef, time, details
+            if mxSub.tag in self.attributeTagsToMethods:
+                meth = getattr(self, self.attributeTagsToMethods[mxSub.tag])
+            if meth is not None:
+                meth(mxSub)
+            elif mxSub.tag == 'staves':
+                self.staves = int(mxSub.text)
+        
+        transposeTag = mxAttributes.find('transpose')
+        if transposeTag is not None:
+            self.transposition = self.xmlTransposeToInterval(transposeTag)
+        divisionsTag = mxAttributes.find('divisions')
+        if divisionsTag is not None:
+            self.parent.lastDivisions = common.opFrac(float(divisionsTag.text))
+
 
     def xmlTransposeToInterval(self, mxTranspose):
         '''Convert a MusicXML Transpose object to a music21 Interval object.
@@ -3641,4 +3641,4 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test, runTest='testOrnamentandTechnical')
+    music21.mainTest('docTestOnly')
