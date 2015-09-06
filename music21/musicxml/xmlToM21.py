@@ -421,7 +421,7 @@ class MusicXMLImporter(XMLParserBase):
         self.definesExplicitSystemBreaks = False # TODO -- set to score and parts
         self.definesExplicitPageBreaks = False
 
-        self.spannerBundle = spanner.SpannerBundle()
+        self.spannerBundle = self.stream.spannerBundle
         self.partIdDict = {}
         self.partGroupList = []
         self.parts = []
@@ -691,7 +691,10 @@ class PartParser(XMLParserBase):
         self.mxPartInfo = mxPartInfo
         self.partId = mxPart.get('id')
         self._parent = common.wrapWeakref(parent)
-        self.spannerBundle = parent.spannerBundle
+        if parent is not None:
+            self.spannerBundle = parent.spannerBundle
+        else:
+            self.spannerBundle = spanner.SpannerBundle()
         self.stream = stream.Part()
         self.atSoundingPitch = True
         
@@ -701,6 +704,8 @@ class PartParser(XMLParserBase):
         self.lastTransposition = None  # may change at measure boundaries
         self.lastMeasureWasShort = False
         self.lastMeasureOffset = 0.0
+        
+        self.maxStaves = 1
         
         self.lastMeasureNumber = 0
         self.lastNumberSuffix = None
@@ -720,11 +725,108 @@ class PartParser(XMLParserBase):
         self.parseMeasures()
         self.stream.atSoundingPitch = self.atSoundingPitch
     
+        # TODO: this does not work with voices; there, Spanners 
+        # will be copied into the Score 
+
+        # copy spanners that are complete into the part, as this is the 
+        # highest level container that needs them
+        rm = []
+        for sp in self.spannerBundle.getByCompleteStatus(True):
+            self.stream._insertCore(0, sp)
+            rm.append(sp)
+        # remove from original spanner bundle
+        for sp in rm:
+            self.spannerBundle.remove(sp)
+        # s is the score; adding the part to the score
+        self.stream.elementsChanged()
+
+        
+        if self.maxStaves > 1:
+            self.separateOutPartStaves()
+        else:
+            self.stream.addGroupForElements(self.partId) # set group for components 
+            self.stream.groups.append(self.partId) # set group for stream itself
+    
     def parseMeasures(self):
         part = self.stream
+        i = 0
         for mxMeasure in self.mxPart.iterfind('measure'):
             self.xmlMeasureToMeasure(mxMeasure)
         part.elementsChanged()
+    
+    def separateOutPartStaves(self):
+        pass
+        # get staves will return a number, between 1 and count
+        #for staffCount in range(mxPart.getStavesCount()):
+        for staffNumber in self._getUniqueStaffKeys():
+            partStaffId = '%s-Staff%s' % (self.partId, staffNumber)
+            #environLocal.printDebug(['partIdStaff', partIdStaff, 'copying streamPart'])
+            # this deepcopy is necessary, as we will remove components
+            # in each staff that do not belong
+            
+            # TODO: Do n-1 deepcopies, instead of n, since the last PartStaff can just remove from the original Part
+            streamPartStaff = copy.deepcopy(self.stream)
+            # assign this as a PartStaff, a subclass of Part
+            streamPartStaff.__class__ = stream.PartStaff
+            streamPartStaff.id = partStaffId
+            # remove all elements that are not part of this staff
+            mStream = streamPartStaff.getElementsByClass('Measure')
+            for i, staffReference in enumerate(self.staffReferenceList):
+                staffExclude = self._getStaffExclude(staffReference, staffNumber)
+                if len(staffExclude) > 0:
+                    m = mStream[i]
+                    for eRemove in staffExclude:
+                        for eMeasure in m:
+                            if eMeasure.derivation.origin is eRemove and eMeasure.derivation.method == '__deepcopy__':
+                                m.remove(eMeasure)
+                                break
+                        for v in m.voices:
+                            v.remove(eRemove)
+                            for eVoice in v.elements:
+                                if eVoice.derivation.origin is eRemove and eVoice.derivation.method == '__deepcopy__':
+                                    v.remove(eVoice)
+                # after adjusting voices see if voices can be reduced or
+                # removed
+                #environLocal.printDebug(['calling flattenUnnecessaryVoices: voices before:', len(m.voices)])
+                m.flattenUnnecessaryVoices(force=False, inPlace=True)
+                #environLocal.printDebug(['calling flattenUnnecessaryVoices: voices after:', len(m.voices)])
+            # TODO: copying spanners may have created orphaned
+            # spanners that no longer have valid connections
+            # in this part; should be deleted
+            streamPartStaff.addGroupForElements(partStaffId)
+            streamPartStaff.groups.append(partStaffId)
+            streamPartStaff.elementsChanged()
+            self.parent.stream._insertCore(0, streamPartStaff)
+        
+        self.parent.stream.elementsChanged()
+    
+    def _getStaffExclude(staffReference, targetKey):
+        '''
+        Given a staff reference dictionary, remove and combine in a list all elements that 
+        are not part of the given key. Thus, return a list of all entries to remove.
+        It keeps those elements under staff key None (common to all) and 
+        those under given key. This then is the list of all elements that should be deleted.
+        '''
+        post = []
+        for key in staffReference:
+            if key is None or int(key) == int(targetKey):
+                continue
+            post += staffReference[key]
+        return post
+
+            
+    def _getUniqueStaffKeys(self):
+        '''
+        Given a list of staffReference dictionaries, 
+        collect and return a list of all unique keys except None
+        '''
+        post = []
+        for staffReference in self.staffReferenceList:
+            for key in staffReference:
+                if key is not None and key not in post:
+                    post.append(key)
+        post.sort()
+        return post
            
     def measureParsingError(self, mxMeasure, e):
         measureNumber = "unknown"
@@ -749,6 +851,9 @@ class PartParser(XMLParserBase):
         except Exception as e:
             self.measureParsingError(mxMeasure, e)
         
+        if parser.staves > self.maxStaves:
+            self.maxStaves = parser.staves
+            
         if parser.transposition is not None:
             if (self.lastTransposition is None 
                 and self.firstMeasureParsed is False
@@ -948,6 +1053,7 @@ class MeasureParser(XMLParserBase):
         self.staffReference = {}
         self.useVoices = False
         self.voiceIndices = set()
+        self.staves = 1
         
         self.activeAttributes = None
         self.attributesAreInternal = True
@@ -1228,11 +1334,12 @@ class MeasureParser(XMLParserBase):
         '''
         notes = []
         for mxNote in mxNoteList:
-            notes.append(self.xmlToSimpleNote(mxNote))
+            notes.append(self.xmlToSimpleNote(mxNote, freeSpanners=False))
         c = chord.Chord(notes)
+        self.spannerBundle.freePendingSpannedElementAssignment(c)
         return c
     
-    def xmlToSimpleNote(self, mxNote):
+    def xmlToSimpleNote(self, mxNote, freeSpanners=True):
         '''
         Translate a MusicXML <note> (without <chord/>) 
         to a :class:`~music21.note.Note`.
@@ -1242,6 +1349,8 @@ class MeasureParser(XMLParserBase):
         
         If inputM21 is not `None` then that object is used
         for translating. Otherwise a new Note is created.
+        
+        if freeSpanners is False then pending spanners will not be freed
         
         Returns a `note.Note` object.
 
@@ -1296,7 +1405,7 @@ class MeasureParser(XMLParserBase):
             self.xmlNotehead(n, mxNotehead)    
     
         # after this, use combined function for notes and rests...
-        return self.xmlNoteToGeneralNoteHelper(n, mxNote)
+        return self.xmlNoteToGeneralNoteHelper(n, mxNote, freeSpanners=freeSpanners)
     
 
     # beam and beams
@@ -1508,9 +1617,10 @@ class MeasureParser(XMLParserBase):
         r = note.Rest()
         return self.xmlNoteToGeneralNoteHelper(r, mxRest)
 
-    def xmlNoteToGeneralNoteHelper(self, n, mxNote):
+    def xmlNoteToGeneralNoteHelper(self, n, mxNote, freeSpanners=True):
         spannerBundle = self.spannerBundle
-        spannerBundle.freePendingSpannedElementAssignment(n)
+        if freeSpanners is True:
+            spannerBundle.freePendingSpannedElementAssignment(n)
 
         # print object == 'no' and grace notes may have a type but not
         # a duration. they may be filtered out at the level of Stream 
@@ -1808,7 +1918,7 @@ class MeasureParser(XMLParserBase):
             return orn
         return None
 
-    def xmlDirectionToSpanners(self, mxDirection):
+    def xmlDirectionTypeToSpanners(self, mxObj):
         '''
         Some spanners, such as MusicXML wedge, bracket, and dashes, 
         are encoded as MusicXML directions.
@@ -1820,15 +1930,15 @@ class MeasureParser(XMLParserBase):
 
         >>> len(MP.spannerBundle)
         0
-        >>> mxDirection = EL('<direction><wedge type="crescendo" number="2"/></direction>')
-        >>> MP.xmlDirectionToSpanners(mxDirection)
+        >>> mxDirectionType = EL('<wedge type="crescendo" number="2"/>')
+        >>> MP.xmlDirectionTypeToSpanners(mxDirectionType)
         >>> len(MP.spannerBundle)
         1
         >>> sp = MP.spannerBundle[0]
         >>> sp
         <music21.spanner.Crescendo >
-        >>> mxDirection2 = EL('<direction><wedge type="stop" number="2"/></direction>')
-        >>> MP.xmlDirectionToSpanners(mxDirection2)
+        >>> mxDirectionType2 = EL('<wedge type="stop" number="2"/>')
+        >>> MP.xmlDirectionTypeToSpanners(mxDirectionType2)
         >>> len(MP.spannerBundle)
         1
         >>> sp = MP.spannerBundle[0]
@@ -1837,7 +1947,7 @@ class MeasureParser(XMLParserBase):
         '''    
         targetLast = self.nLast
         
-        for mxObj in mxDirection.findall('wedge'):
+        if mxObj.tag == 'wedge':
             mType = mxObj.get('type')
             if mType == 'crescendo':
                 spClass = dynamics.Crescendo
@@ -1845,22 +1955,22 @@ class MeasureParser(XMLParserBase):
                 spClass = dynamics.Diminuendo
             elif mType == 'stop':
                 spClass = dynamics.DynamicWedge # parent of Cresc/Dim
+
             if mType != 'stop':
                 sp = self.xmlOneSpanner(mxObj, None, spClass)
                 self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
             else:
-                idFound = int(mxObj.get('number'))
+                idFound = mxObj.get('number')
+                if idFound is None:
+                    idFound = 1
                 sp = self.spannerBundle.getByClassIdLocalComplete(
-                    'DynamicWedge',
-                    idFound, False)[0] # get first
+                    'DynamicWedge', idFound, False)[0] # get first
                 sp.completeStatus = True
                 # will only have a target if this follows the note
                 if targetLast is not None:
                     sp.addSpannedElements(targetLast)
 
-        for mxObj in mxDirection:
-            if mxObj.tag not in ('bracket', 'dashes'):
-                continue
+        if mxObj.tag in ('bracket', 'dashes'):
             mxType = mxObj.get('type')
             idFound = mxObj.get('number')
             #environLocal.printDebug(['mxDirectionToSpanners', 'found mxBracket', mxType, idFound])
@@ -1932,7 +2042,7 @@ class MeasureParser(XMLParserBase):
     def xmlOneSpanner(self, mxObj, target, spannerClass):
         idPossible = mxObj.get('number')
         if idPossible is not None:
-            idFound = int(idPossible)
+            idFound = idPossible
         else:
             idFound = 1 # tremolo has no number...
             
@@ -1949,6 +2059,7 @@ class MeasureParser(XMLParserBase):
                 # not all spanners have placement
                 su.placement = placement
             self.spannerBundle.append(su)
+
         # add a reference of this note to this spanner
         if target is not None:
             su.addSpannedElements(target)
@@ -2415,60 +2526,61 @@ class MeasureParser(XMLParserBase):
         # TODO: editorial-voice-direction
         # TODO: staff
         # TODO: sound
-        for mxDir in mxDirection.findall('direction-type'):
-            # TODO: rehearsal
-            # TODO: pedal
-            # TODO: octave-shift
-            # TODO: harp-pedals
-            # TODO: damp
-            # TODO: damp-all
-            # TODO: eyeglasses
-            # TODO: string-mute
-            # TODO: scordatura
-            # TODO: image
-            # TODO: principal-voice
-            # TODO: accordion-registration
-            # TODO: percussion
-            # TODO: other-direction
-            tag = mxDir.tag
-            if tag == 'dynamics': #fp, mf, etc., each as a tag
-                # in rare cases there may be more than one dynamic in the same
-                # direction, so we iterate
-                for dyn in mxDir:
-                    # TODO: other-dynamic
-                    d = dynamics.Dynamic(dyn.tag)
-                    self.insertCoreAndRef(totalOffset, mxDir, d)
-
-            elif tag in ('wedge', 'bracket', 'dashes'):
-                self.xmlDirectionToSpanners(mxDir)
-
-            elif tag == 'segno':
-                rm = repeat.Segno()
-                rm._positionDefaultX = mxDir.get('default-x')
-                rm._positionDefaultY = mxDir.get('default-y')
-                self.insertCoreAndRef(totalOffset, mxDir, rm)
-            elif tag == 'coda':
-                rm = repeat.Coda()
-                rm._positionDefaultX = mxDir.get('default-x')
-                rm._positionDefaultY = mxDir.get('default-y')
-                self.insertCoreAndRef(totalOffset, mxDir, rm)
-
-            elif tag == 'metronome':
-                mm = self.xmlToTempoIndication(mxDir)
-                # SAX was offsetMeasureNote; bug? should be totalOffset???
-                self.insertCoreAndRef(totalOffset, mxDir, mm)
-            elif tag == 'words':
-                te = self.xmlToTextExpression(mxDir)
-                #environLocal.printDebug(['got TextExpression object', repr(te)])
-                # offset here is a combination of the current position
-                # (offsetMeasureNote) and and the direction's offset
-                re = te.getRepeatExpression()
-                if re is not None:
-                    # the repeat expression stores a copy of the text
-                    # expression within it; replace it here on insertion
-                    self.insertCoreAndRef(totalOffset, mxDir, re)
-                else:
-                    self.insertCoreAndRef(totalOffset, mxDir, te)
+        for mxDirType in mxDirection.findall('direction-type'):
+            for mxDir in mxDirType:
+                # TODO: rehearsal
+                # TODO: pedal
+                # TODO: octave-shift
+                # TODO: harp-pedals
+                # TODO: damp
+                # TODO: damp-all
+                # TODO: eyeglasses
+                # TODO: string-mute
+                # TODO: scordatura
+                # TODO: image
+                # TODO: principal-voice
+                # TODO: accordion-registration
+                # TODO: percussion
+                # TODO: other-direction
+                tag = mxDir.tag
+                if tag == 'dynamics': #fp, mf, etc., each as a tag
+                    # in rare cases there may be more than one dynamic in the same
+                    # direction, so we iterate
+                    for dyn in mxDir:
+                        # TODO: other-dynamic
+                        d = dynamics.Dynamic(dyn.tag)
+                        self.insertCoreAndRef(totalOffset, mxDir, d)
+    
+                elif tag in ('wedge', 'bracket', 'dashes'):
+                    self.xmlDirectionTypeToSpanners(mxDir)
+    
+                elif tag == 'segno':
+                    rm = repeat.Segno()
+                    rm._positionDefaultX = mxDir.get('default-x')
+                    rm._positionDefaultY = mxDir.get('default-y')
+                    self.insertCoreAndRef(totalOffset, mxDir, rm)
+                elif tag == 'coda':
+                    rm = repeat.Coda()
+                    rm._positionDefaultX = mxDir.get('default-x')
+                    rm._positionDefaultY = mxDir.get('default-y')
+                    self.insertCoreAndRef(totalOffset, mxDir, rm)
+    
+                elif tag == 'metronome':
+                    mm = self.xmlToTempoIndication(mxDir)
+                    # SAX was offsetMeasureNote; bug? should be totalOffset???
+                    self.insertCoreAndRef(totalOffset, mxDir, mm)
+                elif tag == 'words':
+                    te = self.xmlToTextExpression(mxDir)
+                    #environLocal.printDebug(['got TextExpression object', repr(te)])
+                    # offset here is a combination of the current position
+                    # (offsetMeasureNote) and and the direction's offset
+                    re = te.getRepeatExpression()
+                    if re is not None:
+                        # the repeat expression stores a copy of the text
+                        # expression within it; replace it here on insertion
+                        self.insertCoreAndRef(totalOffset, mxDir, re)
+                    else:
+                        self.insertCoreAndRef(totalOffset, mxDir, te)
 
     def xmlToTextExpression(self, mxWords):
         '''
@@ -2615,6 +2727,9 @@ class MeasureParser(XMLParserBase):
                     meth = getattr(self, self.attributeTagsToMethods[mxSub.tag])
                 if meth is not None:
                     meth(mxSub)
+                elif mxSub.tag == 'staves':
+                    self.staves = int(mxSub.text)
+            
             transposeTag = mxAttributes.find('transpose')
             if transposeTag is not None:
                 self.transposition = self.xmlTransposeToInterval(transposeTag)
@@ -3344,6 +3459,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
 
         s = corpus.parse('opus133')
+        #, format='oldmusicxml')
         ex = s.parts[0]
         countTrill = 0
         for n in ex.flat.notes:
@@ -3359,7 +3475,6 @@ class Test(unittest.TestCase):
                 if 'TechnicalIndication' in a.classes:
                     countTechnical += 1
         self.assertEqual(countTechnical, 1)
-
 
     def testOrnamentC(self):
         from music21 import converter
@@ -3487,8 +3602,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21.musicxml import testPrimitive
 
-        s = converter.parse(testPrimitive.spanners33a, format='oldmusicxml')
-        s.show('text')
+        s = converter.parse(testPrimitive.spanners33a, forceSource=True, format='musicxml')
         self.assertEqual(len(s.flat.getElementsByClass('Line')), 6)
 
 
@@ -3521,6 +3635,4 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test, runTest='testImportDashes')
-    
-    
+    music21.mainTest(Test, runTest='testOrnamentandTechnical')

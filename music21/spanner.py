@@ -689,7 +689,7 @@ class SpannerBundle(object):
     If a Stream or Stream subclass is provided as an argument, 
     all Spanners on this Stream will be accumulated herein. 
     
-    Not to be confused with SpannerStorage.
+    Not to be confused with SpannerStorage (which stores Elements that are spanned)
     '''
     def __init__(self, *arguments, **keywords):
         self._cache = {}     
@@ -1085,8 +1085,10 @@ class SpannerBundle(object):
 
     def setPendingSpannedElementAssignment(self, sp, className):
         '''
-        Sets that a particular spanner (sp) is looking for an element of
-        class (className) to complete it.
+        A SpannerBundle can be set up so that a particular spanner (sp) 
+        is looking for an element of class (className) to complete it. Any future
+        element that matches the className which is passed to the SpannerBundle
+        via freePendingSpannedElementAssignment() will get it.
         
         >>> n1 = note.Note('C')
         >>> r1 = note.Rest()
@@ -1106,7 +1108,8 @@ class SpannerBundle(object):
         >>> sb.setPendingSpannedElementAssignment(su1, 'Note')
 
         Call freePendingSpannedElementAssignment to attach.
-        Should not get a rest...
+
+        Should not get a rest... because it is not a 'Note'
     
         >>> sb.freePendingSpannedElementAssignment(r1)
         >>> su1.getSpannedElements()
@@ -1124,7 +1127,6 @@ class SpannerBundle(object):
         And now that the assignment has been made, the pending assignment
         has been cleared, so n3 will not get assigned to the slur:
         
-
         >>> sb.freePendingSpannedElementAssignment(n3)
         >>> su1.getSpannedElements()
         [<music21.note.Note C>, <music21.note.Note D>]        
@@ -1141,6 +1143,8 @@ class SpannerBundle(object):
         Assigns and frees up a pendingSpannedElementAssignment if one is
         active and the candidate matches the class.  See 
         setPendingSpannedElementAssignment for documentation and tests.
+        
+        It is set up via a first-in, first-out priority.
         '''
         
         if len(self._pendingSpannedElementAssignment) == 0:

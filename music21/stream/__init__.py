@@ -2376,8 +2376,6 @@ class Stream(base.Music21Object):
         belong to a certain class (or for Streams which are themselves of
         a certain class) are set.
 
-
-
         >>> a = stream.Stream()
         >>> a.repeatAppend(note.Note('A-'), 30)
         >>> a.repeatAppend(note.Rest(), 30)
