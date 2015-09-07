@@ -713,6 +713,32 @@ def roundToHalfInteger(num):
     >>> common.roundToHalfInteger(1.6234)
     1.5
     
+    .25 rounds up:
+    
+    >>> common.roundToHalfInteger(0.25)
+    0.5
+    
+    as does .75
+    
+    >>> common.roundToHalfInteger(0.75)
+    1
+    
+    unlike python round function, does the same for 1.25 and 1.75
+    
+    >>> common.roundToHalfInteger(1.25)
+    1.5
+    >>> common.roundToHalfInteger(1.75)
+    2
+    
+    negative numbers however, round up on the boundaries
+    
+    >>> common.roundToHalfInteger(-0.26)
+    -0.5
+    >>> common.roundToHalfInteger(-0.25)
+    0
+    
+    
+    
     :rtype: float
     '''
     intVal, floatVal = divmod(num, 1.0)
@@ -728,9 +754,9 @@ def roundToHalfInteger(num):
 
 def almostEquals(x, y = 0.0, grain=1e-7):
     '''
-    The following four routines work for comparisons between floats that are normally inconsistent.
+    almostEquals(x, y) -- returns True if x and y are within grain (default  0.0000001) of each other
 
-    almostEquals(x, y) -- returns True if x and y are within 0.0000001 of each other
+    Allows comparisons between floats that are normally inconsistent.
 
     >>> common.almostEquals(1.000000001, 1)
     True
@@ -738,6 +764,8 @@ def almostEquals(x, y = 0.0, grain=1e-7):
     False
     >>> common.almostEquals(1.001, 1, grain=0.1)
     True
+
+    For very small grains, just compare Fractions without converting...
 
     :rtype: bool
     '''
