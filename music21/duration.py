@@ -654,87 +654,6 @@ def quarterLengthToDurations(qLen):
 
     These examples use unitSpec() to get a concise summary of the contents
 
-
-    >>> duration.quarterLengthToDurations(2)
-    [<music21.duration.DurationUnit 2.0>]
-
-    Dots are supported
-
-    >>> duration.unitSpec(duration.quarterLengthToDurations(3))
-    [(3.0, 'half', 1, None, None, None)]
-    >>> duration.unitSpec(duration.quarterLengthToDurations(6.0))
-    [(6.0, 'whole', 1, None, None, None)]
-
-    Double and triple dotted half note.
-
-    >>> duration.unitSpec(duration.quarterLengthToDurations(3.5))
-    [(3.5, 'half', 2, None, None, None)]
-    >>> duration.unitSpec(duration.quarterLengthToDurations(3.75))
-    [(3.75, 'half', 3, None, None, None)]
-
-    A triplet quarter note, lasting .6666 qLen
-    Or, a quarter that is 1/3 of a half.
-    Or, a quarter that is 2/3 of a quarter.
-
-    >>> duration.unitSpec(duration.quarterLengthToDurations(2.0/3.0))
-    [(Fraction(2, 3), 'quarter', 0, 3, 2, 'quarter')]
-
-    A triplet eighth note, where 3 eights are in the place of 2.
-    Or, an eighth that is 1/3 of a quarter
-    Or, an eighth that is 2/3 of eighth
-
-    >>> post = duration.unitSpec(duration.quarterLengthToDurations(1.0/3))
-    >>> post[0]
-    (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')
-
-    A half that is 1/3 of a whole, or a triplet half note.
-    Or, a half that is 2/3 of a half
-
-    >>> duration.unitSpec(duration.quarterLengthToDurations(4.0/3.0))
-    [(Fraction(4, 3), 'half', 0, 3, 2, 'half')]
-
-    A sixteenth that is 1/5 of a quarter
-    Or, a sixteenth that is 4/5ths of a 16th
-
-    >>> duration.unitSpec(duration.quarterLengthToDurations(1.0/5.0))
-    [(Fraction(1, 5), '16th', 0, 5, 4, '16th')]
-
-    A 16th that is  1/7th of a quarter
-    Or, a 16th that is 4/7 of a 16th
-
-    >>> duration.unitSpec(duration.quarterLengthToDurations(1.0/7.0))
-    [(Fraction(1, 7), '16th', 0, 7, 4, '16th')]
-
-    A 4/7ths of a whole note, or
-    A quarter that is 4/7th of of a quarter
-
-    >>> duration.unitSpec(duration.quarterLengthToDurations(4.0/7.0))
-    [(Fraction(4, 7), 'quarter', 0, 7, 4, 'quarter')]
-
-    If a duration is not containable in a single unit, this method
-    will break off the largest type that fits within this type
-    and recurse, adding as my units as necessary.
-
-    >>> duration.unitSpec(duration.quarterLengthToDurations(2.5))
-    [(2.0, 'half', 0, None, None, None), (0.5, 'eighth', 0, None, None, None)]
-
-    >>> duration.unitSpec(duration.quarterLengthToDurations(2.3333333))
-    [(2.0, 'half', 0, None, None, None), (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')]
-
-
-    >>> duration.unitSpec(duration.quarterLengthToDurations(1.0/6.0))
-    [(Fraction(1, 6), '16th', 0, 3, 2, '16th')]
-    
-    This example doesn't fit exactly with an idea of a tuplet, so this method (perhaps incorrectly)
-    tries to approximate it with power of two notes (TODO: balance tuplet complexity with number of
-    duration units)
-    
-    >>> duration.quarterLengthToDurations(.18333333333333)
-    [<music21.duration.DurationUnit 0.125>, <music21.duration.DurationUnit 0.03125>, <music21.duration.DurationUnit 0.015625>, <music21.duration.DurationUnit 0.0078125>]
-
-    >>> duration.quarterLengthToDurations(0.0)
-    [<music21.duration.ZeroDuration>]
-
     '''
     post = []
     qLen = opFrac(qLen)
@@ -801,7 +720,7 @@ def quarterLengthToDurations(qLen):
 def partitionQuarterLength(qLen, qLenDiv=4):
     '''
     Given a `qLen` (quarterLength) and a `qLenDiv`, that is, a base quarterLength to divide the `qLen` into
-    (default = 4; i.e., into whole notes), returns a list of Durations that
+    (default = 4; i.e., into whole notes), returns a list of DurationsUnits that
     partition the given quarterLength so that there is no leftovers.
 
     This is a useful tool for partitioning a duration by Measures (i.e., take a long Duration and
@@ -2129,11 +2048,15 @@ class Duration(SlottedObject):
         # defer updating until necessary
         self._quarterLengthNeedsUpdating = False
         self._cachedIsLinked = None  # store for access w/o looking at components
-        if len(arguments) > 0:
-            if common.isNum(arguments[0]):
-                self.quarterLength = arguments[0]
+        for a in arguments:
+            if common.isNum(a) and 'quarterLength' not in keywords:
+                keywords['quarterLength'] = a
+            elif common.isStr(a) and 'type' not in keywords:
+                keywords['type'] = a
             else:
-                self.addDurationUnit(DurationUnit(arguments[0]))
+                raise DurationException("Cannot parse argument {0}".format(a))
+
+        
         if 'dots' in keywords:
             storeDots = keywords['dots']
         else:
@@ -2146,7 +2069,7 @@ class Duration(SlottedObject):
             du = DurationUnit(keywords['type'])
             if storeDots > 0:
                 du.dots = storeDots
-            self.addDurationUnit(du)
+            self.addDurationTuple(du)
         # permit as keyword so can be passed from notes
         if 'quarterLength' in keywords:
             self.quarterLength = keywords['quarterLength']
@@ -2233,7 +2156,7 @@ class Duration(SlottedObject):
 
     ### PUBLIC METHODS ###
 
-    def addDurationUnit(self, dur, link=True):
+    def addDurationTuple(self, dur, link=True):
         '''
         Add a DurationUnit or a Duration's components to this Duration.
         Does not simplify the Duration.  For instance, adding two
@@ -2242,7 +2165,7 @@ class Duration(SlottedObject):
 
         >>> a = duration.Duration('quarter')
         >>> b = duration.Duration('quarter')
-        >>> a.addDurationUnit(b)
+        >>> a.addDurationTuple(b)
         >>> a.quarterLength
         2.0
         >>> a.type
@@ -2517,7 +2440,7 @@ class Duration(SlottedObject):
         '''
         self.components = []
         for x in quarterLengthList:
-            self.addDurationUnit(Duration(x))
+            self.addDurationTuple(Duration(x))
 
     def getGraceDuration(self, appogiatura=False):
         '''
@@ -2601,7 +2524,7 @@ class Duration(SlottedObject):
             raise DurationException("cannot yet set type for a complex Duration")
         else: # permit creating a new comoponent
             # create a new duration unit; if link is True, will unlink
-            self.addDurationUnit(DurationUnit(value), link=False) # updates
+            self.addDurationTuple(DurationUnit(value), link=False) # updates
             #self._quarterLengthNeedsUpdating = True
         self._cachedIsLinked = False
 
@@ -2614,9 +2537,9 @@ class Duration(SlottedObject):
         >>> a.clear() # need to remove default
         >>> components = []
 
-        >>> a.addDurationUnit(duration.Duration('quarter'))
-        >>> a.addDurationUnit(duration.Duration('quarter'))
-        >>> a.addDurationUnit(duration.Duration('quarter'))
+        >>> a.addDurationTuple(duration.Duration('quarter'))
+        >>> a.addDurationTuple(duration.Duration('quarter'))
+        >>> a.addDurationTuple(duration.Duration('quarter'))
 
         >>> a.quarterLength
         3.0
@@ -2871,7 +2794,7 @@ class Duration(SlottedObject):
         >>> d.fullName
         'Quarter tied to 16th (1 1/4 total QL)'
 
-        >>> d.addDurationUnit(duration.DurationUnit(.3333333))
+        >>> d.addDurationTuple(duration.DurationUnit(.3333333))
         >>> d.fullName
         'Quarter tied to 16th tied to Eighth Triplet (1/3 QL) (1 7/12 total QL)'
 
@@ -3188,7 +3111,7 @@ class Duration(SlottedObject):
             # what do we do if we already have multiple DurationUnits
         else: # permit creating a new comoponent
             # create a new duration unit
-            self.addDurationUnit(DurationUnit(value)) # updates
+            self.addDurationTuple(DurationUnit(value)) # updates
             self._quarterLengthNeedsUpdating = True
 
 
