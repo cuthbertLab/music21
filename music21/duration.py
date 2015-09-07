@@ -142,7 +142,8 @@ ordinalTypeFromNum = [
     "2048th",
     ]
 
-defaultTupletNumerators = [3, 5, 7, 11, 13]
+defaultTupletNumerators = (3, 5, 7, 11, 13)
+extendedTupletNumerators = (3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199)
 
 
 def unitSpec(durationObjectOrObjects):
@@ -355,7 +356,55 @@ def dottedMatch(qLen, maxDots=4):
     return (False, False)
 
 
-def quarterLengthToTuplet(qLen, maxToReturn=4):
+def quarterLengthToNonPowerOf2Tuplet(qLen):
+    '''
+    Slow, last chance function that returns a tuple of a single tuplet, probably with a non
+    power of 2 denominator (such as 7:6) that represents the quarterLength and the 
+    DurationTuple that should be used to express the note.
+    
+    This could be a double dotted note, but also a tuplet...
+
+    >>> duration.quarterLengthToNonPowerOf2Tuplet(7)
+    (<music21.duration.Tuplet 8/7/quarter>, DurationTuple(type='breve', dots=0, quarterLength=8.0))
+    
+    >>> duration.quarterLengthToNonPowerOf2Tuplet(7/16)
+    (<music21.duration.Tuplet 8/7/64th>, DurationTuple(type='eighth', dots=0, quarterLength=0.5))
+    
+    >>> duration.quarterLengthToNonPowerOf2Tuplet(7/3)
+    (<music21.duration.Tuplet 12/7/16th>, DurationTuple(type='whole', dots=0, quarterLength=4.0))
+        
+    And of course...
+
+    >>> duration.quarterLengthToNonPowerOf2Tuplet(1)
+    (<music21.duration.Tuplet 1/1/quarter>, DurationTuple(type='quarter', dots=0, quarterLength=1.0))
+    '''    
+    qFrac = fractions.Fraction.from_float(1/qLen).limit_denominator(DENOM_LIMIT)
+    qFracOrg = qFrac
+    if qFrac.numerator < qFrac.denominator:
+        while qFrac.numerator < qFrac.denominator:
+            qFrac = qFrac * 2
+    elif qFrac.numerator > qFrac.denominator*2:
+        while qFrac.numerator > qFrac.denominator*2:
+            qFrac = qFrac / 2
+    # qFrac will always be in lowest terms
+
+    # TODO: DurationTuple
+    closestSmallerType, unused_match = quarterLengthToClosestType(qLen/qFrac.denominator)
+
+    tupletDuration = Duration(type=closestSmallerType)
+
+    representativeDuration = durationTupleFromQuarterLength(qFrac/qFracOrg)
+            
+    return (Tuplet(numberNotesActual=qFrac.numerator,
+                  numberNotesNormal=qFrac.denominator,
+           durationActual = tupletDuration,
+           durationNormal = tupletDuration,
+    ), representativeDuration)
+
+
+def quarterLengthToTuplet(qLen, 
+                          maxToReturn=4, 
+                          tupletNumerators=defaultTupletNumerators):
     '''
     Returns a list of possible Tuplet objects for a
     given `qLen` (quarterLength). As there may be more than one
@@ -395,12 +444,11 @@ def quarterLengthToTuplet(qLen, maxToReturn=4):
 
     for typeValue, typeKey in durationToType:
         # try tuplets
-        for i in defaultTupletNumerators:
+        for i in tupletNumerators:
             qLenBase = opFrac(typeValue / float(i))
             # try multiples of the tuplet division, from 1 to max-1
             for m in range(1, i):
                 qLenCandidate = qLenBase * m
-                # need to use a courser grain here
                 if qLenCandidate == qLen:
                     tupletDuration = Duration(typeKey)
                     newTuplet = Tuplet(numberNotesActual=i,
@@ -415,6 +463,7 @@ def quarterLengthToTuplet(qLen, maxToReturn=4):
                 break
         if len(post) >= maxToReturn: 
             break
+    
     return post
 
 QuarterLengthConversion = namedtuple('QuarterLengthConversion', 'components tuplet')
@@ -427,6 +476,114 @@ def quarterConversion(qLen):
     
     Tuplet is a single :class:`~music21.duration.Tuplet` that adjusts all of the components.
     
+    (All quarterLengths can, technically, be notated as a single unit
+    given a complex enough tuplet, as a last resort will look up to 199 as a tuplet type).
+
+
+
+    >>> duration.quarterConversion(2)
+    QuarterLengthConversion(components=(DurationTuple(type='half', dots=0, quarterLength=2.0),), 
+        tuplet=None)
+
+    Dots are supported
+
+    >>> duration.quarterConversion(3)
+    QuarterLengthConversion(components=(DurationTuple(type='half', dots=1, quarterLength=3.0),), 
+        tuplet=None)
+
+    >>> duration.quarterConversion(6.0)
+    QuarterLengthConversion(components=(DurationTuple(type='whole', dots=1, quarterLength=6.0),), 
+        tuplet=None)
+
+    Double and triple dotted half note.
+
+    >>> duration.quarterConversion(3.5)
+    QuarterLengthConversion(components=(DurationTuple(type='half', dots=2, quarterLength=3.5),), 
+        tuplet=None)
+
+    >>> duration.quarterConversion(3.75)
+    QuarterLengthConversion(components=(DurationTuple(type='half', dots=3, quarterLength=3.75),), 
+        tuplet=None)
+
+    A triplet quarter note, lasting .6666 qLen
+    Or, a quarter that is 1/3 of a half.
+    Or, a quarter that is 2/3 of a quarter.
+
+    >>> duration.quarterConversion(2.0/3.0)
+    QuarterLengthConversion(components=(DurationTuple(type='quarter', dots=0, quarterLength=1.0),), 
+        tuplet=<music21.duration.Tuplet 3/2/quarter>)
+
+    A triplet eighth note, where 3 eights are in the place of 2.
+    Or, an eighth that is 1/3 of a quarter
+    Or, an eighth that is 2/3 of eighth
+
+    >>> duration.quarterConversion(1.0/3)
+    QuarterLengthConversion(components=(DurationTuple(type='eighth', dots=0, quarterLength=0.5),), 
+        tuplet=<music21.duration.Tuplet 3/2/eighth>)
+
+    A half that is 1/3 of a whole, or a triplet half note.
+    Or, a half that is 2/3 of a half
+
+    >>> duration.quarterConversion(4.0/3.0)
+    QuarterLengthConversion(components=(DurationTuple(type='half', dots=0, quarterLength=2.0),), 
+        tuplet=<music21.duration.Tuplet 3/2/half>)
+
+    >>> duration.quarterConversion(1.0/6.0)
+    QuarterLengthConversion(components=(DurationTuple(type='16th', dots=0, quarterLength=0.25),), 
+        tuplet=<music21.duration.Tuplet 3/2/16th>)
+
+
+    A sixteenth that is 1/5 of a quarter
+    Or, a sixteenth that is 4/5ths of a 16th
+
+    >>> duration.quarterConversion(1.0/5.0)
+    QuarterLengthConversion(components=(DurationTuple(type='16th', dots=0, quarterLength=0.25),), 
+        tuplet=<music21.duration.Tuplet 5/4/16th>)
+        
+
+    A 16th that is  1/7th of a quarter
+    Or, a 16th that is 4/7 of a 16th
+
+    >>> duration.quarterConversion(1.0/7.0)
+    QuarterLengthConversion(components=(DurationTuple(type='16th', dots=0, quarterLength=0.25),), 
+        tuplet=<music21.duration.Tuplet 7/4/16th>)
+
+    A 4/7ths of a whole note, or
+    A quarter that is 4/7th of of a quarter
+
+    >>> duration.quarterConversion(4.0/7.0)
+    QuarterLengthConversion(components=(DurationTuple(type='quarter', dots=0, quarterLength=1.0),), 
+                            tuplet=<music21.duration.Tuplet 7/4/quarter>)
+
+    If a duration is not containable in a single unit, this method
+    will break off the largest type that fits within this type
+    and recurse, adding as my units as necessary.
+
+    >>> duration.quarterConversion(2.5)
+    QuarterLengthConversion(components=(DurationTuple(type='half', dots=0, quarterLength=2.0), 
+                                        DurationTuple(type='eighth', dots=0, quarterLength=0.5)), 
+                            tuplet=None)
+
+
+    Since tuplets now apply to the entire Duration, expect some odder tuplets for unusual
+    values that should probably be split generally...
+
+    >>> duration.quarterConversion(2.3333333)
+    QuarterLengthConversion(components=(DurationTuple(type='whole', dots=0, quarterLength=4.0),), 
+        tuplet=<music21.duration.Tuplet 12/7/16th>)
+
+    
+    This is a very close approximation:
+
+    
+    >>> duration.quarterConversion(.18333333333333)
+    QuarterLengthConversion(components=(DurationTuple(type='16th', dots=0, quarterLength=0.25),), 
+        tuplet=<music21.duration.Tuplet 15/11/256th>)
+
+    >>> duration.quarterConversion(0.0)
+    QuarterLengthConversion(components=(DurationTuple(type='zero', dots=0, quarterLength=0.0),), 
+        tuplet=None)
+
     '''
     # this is a performance-critical operation that has been highly optimized for speed
     # rather than legibility or logic.  Most commonly anticipated events appear first
@@ -441,7 +598,7 @@ def quarterConversion(qLen):
     
     dots, durType = dottedMatch(qLen)
     if durType is not False:
-        dt = durationTupleFromTypeDots(type, dots)
+        dt = durationTupleFromTypeDots(durType, dots)
         return QuarterLengthConversion((dt,), None)
         
     # Tuplets...
@@ -456,13 +613,25 @@ def quarterConversion(qLen):
     
     # now we're getting into some obscure cases.
     # is it built up of many small types? 
-    components = []
+    components = [durationTupleFromTypeDots(closestSmallerType, 0)]
     # remove the largest type out there and keep going.
     
-    tuplet = None
-    
-
-    return QuarterLengthConversion(tuple(components), tuplet)
+    qLenRemainder = qLen - typeToDuration[closestSmallerType]
+    # cannot recursively call, because tuplets are not possible at this stage.
+    for i in range(8): # max 8 iterations.
+        dots, durType = dottedMatch(qLenRemainder)
+        if durType is not False: # match!
+            dt = durationTupleFromTypeDots(durType, dots)
+            components.append(dt)
+            return QuarterLengthConversion(tuple(components), None)
+        closestSmallerType, unused_match = quarterLengthToClosestType(qLen)
+        qLenRemainder = qLenRemainder - typeToDuration[closestSmallerType]
+        components.append(durationTupleFromTypeDots(closestSmallerType, 0))
+        
+    # 8 tied components was not enough.
+    # last resort: put one giant tuplet over it.
+    tuplet, component = quarterLengthToNonPowerOf2Tuplet(qLen)
+    return QuarterLengthConversion((component,), tuplet)
 
 def quarterLengthToDurations(qLen):
     '''
@@ -3023,8 +3192,31 @@ class Duration(SlottedObject):
             self._quarterLengthNeedsUpdating = True
 
 
-def durationTupleFromTypeDots(type='quarter', dots=0):  # @ReservedAssignment
+def durationTupleFromQuarterLength(ql=1.0):
     '''
+    Returns a DurationTuple for a given quarter length
+    if the ql can be expressed as a type and number of dots
+    (no tuplets, no complex duration, etc.).  If it can't be expressed,
+    raises a DurationException
+    
+    '''
+    try:
+        return _durationTupleCacheQuarterLength[ql]
+    except KeyError:
+        ql = opFrac(ql)
+        dots, durType = dottedMatch(ql) 
+        if durType is not False:
+            nt = DurationTuple(durType, dots, ql)
+            _durationTupleCacheQuarterLength[ql] = nt
+            return nt
+        else:
+            raise DurationException("Untranslatable QL: {0}".format(ql))
+            
+
+def durationTupleFromTypeDots(durType='quarter', dots=0):
+    '''
+    Returns a DurationTuple (which knows its quarterLength) for
+    a given type and dots (no tuplets)
     
     >>> dt = duration.durationTupleFromTypeDots('quarter', 0)
     >>> dt
@@ -3032,21 +3224,26 @@ def durationTupleFromTypeDots(type='quarter', dots=0):  # @ReservedAssignment
     >>> dt2 = duration.durationTupleFromTypeDots('quarter', 0)
     >>> dt is dt2
     True
+
+    >>> dt = duration.durationTupleFromTypeDots('zero', 0)
+    >>> dt
+    DurationTuple(type='zero', dots=0, quarterLength=0.0)
+
     
     OMIT_FROM_DOCS
     
     >>> dt in duration._durationTupleCacheTypeDots.values()
     True
     '''
-    tp = (type, dots)
-    if tp in _durationTupleCacheTypeDots:
+    tp = (durType, dots)
+    try:
         return _durationTupleCacheTypeDots[tp]
-    else:
+    except KeyError:
         try:
-            ql = typeToDuration[type] * common.dotMultiplier(dots)
+            ql = typeToDuration[durType] * common.dotMultiplier(dots)
         except IndexError:
-            raise DurationException("Unknown type: {0}".format(type))
-        nt = DurationTuple(type, dots, ql)
+            raise DurationException("Unknown type: {0}".format(durType))
+        nt = DurationTuple(durType, dots, ql)
         _durationTupleCacheTypeDots[tp] = nt
         return nt
 
