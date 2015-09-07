@@ -633,89 +633,6 @@ def quarterConversion(qLen):
     tuplet, component = quarterLengthToNonPowerOf2Tuplet(qLen)
     return QuarterLengthConversion((component,), tuplet)
 
-def quarterLengthToDurations(qLen):
-    '''
-    Returns a List of new DurationTuples given a quarter length.
-
-    For many simple quarterLengths, the list will have only a
-    single element.  However, for more complex durations, the list
-    could contain several durations (presumably to be tied to each other).
-
-    (All quarterLengths can, technically, be notated as a single unit
-    given a complex enough tuplet, but we don't like doing that).
-
-    This is mainly a utility function. Much faster for many purposes
-    is something like::
-
-       d = duration.Duration()
-       d.quarterLength = 251.231312
-
-    and then let Duration automatically create Duration Components as necessary.
-
-    These examples use unitSpec() to get a concise summary of the contents
-
-    '''
-    post = []
-    qLen = opFrac(qLen)
-
-    if qLen < 0:
-        raise DurationException("qLen cannot be less than Zero.  Read Lewin, GMIT for more details...")
-
-    elif qLen == 0:
-        post.append(ZeroDuration()) # this is a DurationUnit subclass
-        return post
-
-    # try match to type, get next lowest
-    typeFound, match = quarterLengthToClosestType(qLen)
-    if match:
-        post.append(DurationUnit(typeFound))
-    else:
-        if typeFound is None :
-            raise DurationException('cannot find duration types near quarter length %s' % qLen)
-
-    # try dots
-    # using typeFound here is the largest type that is not greater than qLen
-    if not match:
-        dots, durType = dottedMatch(qLen)
-        if durType is not False:
-            dNew = DurationUnit(durType)
-            dNew.dots = dots
-            post.append(dNew)
-            match = True
-
-    typeNext = nextLargerType(typeFound)
-    # try tuplets
-    # using typeNext is the next type that is larger than then the qLen
-    if not match:
-        # just get the first candidate
-        tupleCandidates = quarterLengthToTuplet(qLen, 1)
-        if len(tupleCandidates) > 0:
-            # assume that the first, using the smallest type, is best
-            dNew = DurationUnit(typeNext)
-            dNew.tuplets = (tupleCandidates[0],)
-            post.append(dNew)
-            match = True
-
-    # if we do not have a match, remove the largest type not greater
-    # and recursively apply
-    if not match:
-        post.append(DurationUnit(typeFound))
-        qLenRemainder = qLen - typeToDuration[typeFound]
-        if qLenRemainder < 0:
-            raise DurationException('cannot reduce quarter length (%s)' % qLenRemainder)
-        # trying a fixed minimum limit
-        # this it do deal with common errors in processing
-        if qLenRemainder > .004: # 1e-4 grain almostEquals -- TODO: FIX
-            try:
-                if len(post) > 6: # we probably have a problem
-                    raise DurationException('duration exceeds 6 components, with %s qLen left' % (qLenRemainder))
-                else:
-                    post += quarterLengthToDurations(qLenRemainder)
-            except RuntimeError: # if recursion exceeded
-                msg = 'failed to find duration for qLen %s, qLenRemainder %s, post %s' % (qLen, qLenRemainder, post)
-                raise DurationException(msg)
-    return post
-
 
 def partitionQuarterLength(qLen, qLenDiv=4):
     '''
@@ -782,15 +699,18 @@ def partitionQuarterLength(qLen, qLenDiv=4):
     qLenDiv = opFrac(qLenDiv)
     post = []
 
+    # TODO: Tuplets.
     while qLen >= qLenDiv:
-        post += quarterLengthToDurations(qLenDiv)
+        qConversion = quarterConversion(qLenDiv)
+        post += list(qConversion.components)
         qLen = qLen - qLenDiv
         
     if qLen == 0:
         return post
     else:
         # leftovers...
-        post += quarterLengthToDurations(qLen)
+        qConversion = quarterConversion(qLen)
+        post += list(qConversion.components)
         return post
 
 
@@ -871,54 +791,6 @@ def convertTypeToNumber(dType):
         % dTypeFound)
     else:
         return dTypeFound
-
-
-def updateTupletType(durationList):
-    '''
-    N.B. -- DEPRECATED -- call stream.makeNotation.makeTupletBrackets
-    
-    Given a list of Durations or DurationUnits,
-    examine each Duration, and each component, and set Tuplet type to
-    start or stop, as necessary.
-
-    >>> a = duration.Duration(); a.quarterLength = 1.0/3
-    >>> b = duration.Duration(); b.quarterLength = 1.0/3
-    >>> c = duration.Duration(); c.quarterLength = 1.0/3
-    >>> d = duration.Duration(); d.quarterLength = 2
-    >>> e = duration.Duration(); e.quarterLength = 1.0/3
-    >>> f = duration.Duration(); f.quarterLength = 1.0/3
-    >>> g = duration.Duration(); g.quarterLength = 1.0/3
-
-    >>> a.tuplets[0].type is None
-    True
-    >>> duration.updateTupletType([a, b, c, d, e, f, g])
-    >>> a.tuplets[0].type == 'start'
-    True
-    >>> b.tuplets[0].type is None
-    True
-    >>> c.tuplets[0].type == 'stop'
-    True
-    >>> d.tuplets
-    ()
-    >>> e.tuplets[0].type == 'start'
-    True
-    >>> f.tuplets[0].type is None
-    True
-    >>> g.tuplets[0].type == 'stop'
-    True
-
-    A single duration with tuplet (automatically forces into a List):
-    
-    >>> dur = duration.Duration(1.0/3)
-    >>> duration.updateTupletType([dur] )
-    >>> dur.tuplets[0].type
-    'startStop'     
-    '''
-    if isinstance(durationList, Duration): # if a Duration object alone
-        durationList = [durationList] # put in list
-    
-    from music21 import stream
-    stream.makeNotation.makeTupletBrackets(durationList, inPlace = True)
 
 
 #-------------------------------------------------------------------------------
@@ -1317,644 +1189,6 @@ class Tuplet(object):
 #-------------------------------------------------------------------------------
 
 
-#------------------------------------------------------------------------------
-
-
-class DurationUnit(object):
-    '''
-    A DurationUnit is a duration notation that (generally) can be notated with
-    a single notation unit, such as one note head, without a tie.
-
-    DurationUnits are not usually instantiated by users of music21, but are
-    used within Duration objects to model the containment of numerous summed
-    components.
-
-    Like Durations, DurationUnits have the option of unlinking the
-    quarterLength and its representation on the page. For instance, in 12/16,
-    Brahms sometimes used a dotted half note to indicate the length of 11/16th
-    of a note. (see Don Byrd's Extreme Notation webpage for more information).
-    Since this duration can be expressed by a single graphical unit in Brahms's
-    shorthand, it can be modeled by a single DurationUnit of unliked
-    graphical/temporal representation.
-
-    Additional types are needed beyond those in Duration::
-
-        * 'zero' type for zero-length durations
-        * 'unexpressible' type for anything that cannot
-          be expressed as a single notation unit, and thus
-          needs a full Duration object (such as 2.5 quarterLengths.)
-
-    '''
-
-    ### CLASS VARIABLES ###
-
-
-
-    ### INITIALIZER ###
-
-    def __init__(self, prototype='quarter'):
-        self._link = True  # default is True
-        self._type = ""
-        # dots can be a float for expressing Crumb dots (1/2 dots)
-        # dots is a tuple for rarely used: dotted-dotted notes;
-        #  e.g. dotted-dotted half in 9/8 expressed as 1,1
-        self._dots = (0,)
-        self._tuplets = ()  # an empty tuple
-        if common.isNum(prototype):
-            self._qtrLength = opFrac(prototype)
-            self._typeNeedsUpdating = True
-            self._quarterLengthNeedsUpdating = False
-        else:
-            if prototype not in typeToDuration:
-                raise DurationException('type (%s) is not valid' % type)
-            self.type = prototype
-            self._qtrLength = 0.0
-            self._typeNeedsUpdating = False
-            self._quarterLengthNeedsUpdating = True
-
-    ### SPECIAL METHODS ###
-
-    def __eq__(self, other):
-        '''
-        Test equality. Based on type, dots, tuplets, and quarterLength
-
-        >>> aDur = duration.DurationUnit('quarter')
-        >>> bDur = duration.DurationUnit('16th')
-        >>> cDur = duration.DurationUnit('16th')
-        >>> aDur == bDur
-        False
-
-        >>> cDur == bDur
-        True
-        '''
-        if other is None or not isinstance(other, DurationUnit):
-            return False
-        if self.type == other.type:
-            if self.dots == other.dots:
-                if self.tuplets == other.tuplets:
-                    if self.quarterLength == other.quarterLength:
-                        return True
-        return False
-
-    def __ne__(self, other):
-        '''
-        Test not equality.
-
-        >>> aDur = duration.DurationUnit('quarter')
-        >>> bDur = duration.DurationUnit('16th')
-        >>> cDur = duration.DurationUnit('16th')
-        >>> aDur != bDur
-        True
-
-        >>> cDur != bDur
-        False
-        '''
-        return not self.__eq__(other)
-
-    def __repr__(self):
-        '''
-        Return a string representation.
-
-        >>> aDur = duration.DurationUnit('quarter')
-        >>> repr(aDur)
-        '<music21.duration.DurationUnit 1.0>'
-
-        '''
-        qlr = self.quarterLength
-        
-        return '<music21.duration.DurationUnit %s>' % qlr
-
-    ### PUBLIC METHODS ###
-
-    def appendTuplet(self, newTuplet):
-        newTuplet.frozen = True
-        self._tuplets = self._tuplets + (newTuplet,)
-        self._quarterLengthNeedsUpdating = True
-
-    def augmentOrDiminish(self, amountToScale, inPlace=True):
-        '''
-        Given a number greater than zero, multiplies the current quarterLength
-        of the duration by the number and resets the components for the
-        duration (by default).  Or if inPlace is set to False, returns a new
-        duration that has the new length.
-
-
-        Note that the default for inPlace is the opposite of what it is for
-        augmentOrDiminish on a Stream.  This is done purposely to reflect the
-        most common usage.
-
-        >>> bDur = duration.DurationUnit('16th')
-        >>> bDur
-        <music21.duration.DurationUnit 0.25>
-
-        >>> bDur.augmentOrDiminish(2)
-        >>> bDur.quarterLength
-        0.5
-        >>> bDur.type
-        'eighth'
-        >>> bDur
-        <music21.duration.DurationUnit 0.5>
-
-        >>> bDur.augmentOrDiminish(4)
-        >>> bDur.type
-        'half'
-        >>> bDur
-        <music21.duration.DurationUnit 2.0>
-
-        >>> bDur.augmentOrDiminish(.125)
-        >>> bDur.type
-        '16th'
-        >>> bDur
-        <music21.duration.DurationUnit 0.25>
-
-        >>> cDur = bDur.augmentOrDiminish(16, inPlace=False)
-        >>> cDur, bDur
-        (<music21.duration.DurationUnit 4.0>, <music21.duration.DurationUnit 0.25>)
-        '''
-        if not amountToScale > 0:
-            raise DurationException('amountToScale must be greater than zero')
-
-        if inPlace:
-            post = self
-        else:
-            post = DurationUnit()
-        # note: this is not yet necessary, as changes are configured
-        # by quarterLength, and this process generates new tuplets
-        # if alternative scaling methods are used for performance, this
-        # method can be used.
-#         for tup in post._tuplets:
-#             tup.augmentOrDiminish(amountToScale, inPlace=True)
-        # possible look for convenient optimizations for easy scaling
-        # not sure if _link should be altered?
-        post.quarterLength = self.quarterLength * amountToScale
-        if not inPlace:
-            return post
-        else:
-            return None
-
-    def link(self):
-        self._link = True
-
-    def setTypeFromNum(self, typeNum):
-        #numberFound = None
-        if str(typeNum) in typeFromNumDict:
-            self.type = typeFromNumDict[str(typeNum)]
-        else:
-            raise DurationException("cannot find number %s" % typeNum)
-
-    def unlink(self):
-        self._link = False
-
-    def updateQuarterLength(self):
-        '''
-        Updates the quarterLength if _link is True. Called by
-        self._getQuarterLength if _quarterLengthNeedsUpdating is set to True.
-
-        To set quarterLength, use self.quarterLength.
-
-        >>> bDur = duration.DurationUnit('16th')
-        >>> bDur.quarterLength
-        0.25
-
-        >>> bDur.unlink()
-        >>> bDur.quarterLength = 234
-        >>> bDur.quarterLength
-        234.0
-
-        >>> bDur.type
-        '16th'
-
-        >>> bDur.link() # if linking is restored, type is used to get qLen
-        >>> bDur.updateQuarterLength()
-        >>> bDur.quarterLength
-        0.25
-        '''
-        if self._link is True:
-            self._qtrLength = convertTypeToQuarterLength(
-                self.type,
-                self.dots,
-                self.tuplets,
-                self.dotGroups,
-                ) # add self.dotGroups
-        self._quarterLengthNeedsUpdating = False
-
-    def updateType(self):
-        if self._link is True:
-            # cant update both at same time
-            self._quarterLengthNeedsUpdating = False
-            tempDurations = quarterLengthToDurations(self.quarterLength)
-            if len(tempDurations) > 1:
-                self.type = 'unexpressible'
-                self.dots = 0
-                self.tuplets = ()
-            else:
-                self.type = tempDurations[0].type
-                self.dots = tempDurations[0].dots
-                self.tuplets = tempDurations[0].tuplets
-        self._typeNeedsUpdating = False
-
-    ### PUBLIC PROPERTIES ###
-
-    @property
-    def dotGroups(self):
-        '''
-        _dots is a list (so we can do weird things like dot groups)
-        _getDotGroups lets you do the entire list (as a tuple)
-
-        >>> d1 = duration.DurationUnit('half')
-        >>> d1.dotGroups = [1, 1]  # dotted dotted half
-        >>> d1.dots
-        1
-
-        >>> d1.dotGroups
-        (1, 1)
-
-        >>> d1.quarterLength
-        4.5
-        '''
-        if self._typeNeedsUpdating:
-            self.updateType()
-        return tuple(self._dots)
-
-    @dotGroups.setter
-    def dotGroups(self, listValue):
-        '''
-        Sets the number of dots in a dot group
-        '''
-        self._quarterLengthNeedsUpdating = True
-        if common.isListLike(listValue):
-            if not isinstance(listValue, list):
-                self._dots = list(listValue)
-            else:
-                self._dots = listValue
-        else:
-            raise DurationException("number of dots must be a number")
-
-    @property
-    def dots(self):
-        '''
-        _dots is a list (so we can do weird things like dot groups)
-        Normally we only want the first element.
-        So that's what dots returns...
-
-        >>> a = duration.DurationUnit()
-        >>> a.dots # dots is zero before assignment
-        0
-
-        >>> a.type = 'quarter'
-        >>> a.dots = 1
-        >>> a.quarterLength
-        1.5
-
-        >>> a.dots = 2
-        >>> a.quarterLength
-        1.75
-        '''
-        if self._typeNeedsUpdating:
-            self.updateType()
-        return self._dots[0]
-
-    @dots.setter
-    def dots(self, value):
-        if value != self._dots[0]:
-            self._quarterLengthNeedsUpdating = True
-        if common.isNum(value):
-            self._dots = (value,)
-        else:
-            raise DurationException("number of dots must be a number")
-
-    @property
-    def fullName(self):
-        '''
-        Return the most complete representation of this Duration, providing
-        dots, type, tuplet, and quarter length representation.
-
-        >>> d = duration.DurationUnit()
-        >>> d.quarterLength = 1.5
-        >>> d.fullName
-        'Dotted Quarter'
-
-        >>> d = duration.DurationUnit()
-        >>> d.quarterLength = 1.75
-        >>> d.fullName
-        'Double Dotted Quarter'
-
-        >>> d = duration.DurationUnit()
-        >>> d.type = 'half'
-        >>> d.fullName
-        'Half'
-
-        >>> d = duration.DurationUnit()
-        >>> d.type = 'longa'
-        >>> d.fullName
-        'Imperfect Longa'
-
-        >>> d.dots = 1
-        >>> d.fullName
-        'Perfect Longa'
-        '''
-        dots = self.dots
-        if dots == 1:
-            dotStr = 'Dotted'
-        elif dots == 2:
-            dotStr = 'Double Dotted'
-        elif dots == 3:
-            dotStr = 'Triple Dotted'
-        elif dots == 4:
-            dotStr = 'Quadruple Dotted'
-        elif dots > 4:
-            dotStr = ('%d-Times Dotted' % dots)
-        else:
-            dotStr = None
-
-        tuplets = self.tuplets
-        #environLocal.printDebug(['tuplets', tuplets])
-        tupletStr = None
-        if len(tuplets) > 0:
-            tupletStr = []
-            for tup in tuplets:
-                tupletStr.append(tup.fullName)
-            tupletStr = ' '.join(tupletStr)
-            #environLocal.printDebug(['tupletStr', tupletStr, tuplets])
-
-        msg = []
-        # type added here
-        typeStr = self.type
-        if dots >= 2 or (typeStr != 'longa' and typeStr != 'maxima'):
-            if dotStr is not None:
-                msg.append('%s ' % dotStr)
-        else:
-            if dots == 0:
-                msg.append('Imperfect ')
-            elif dots == 1:
-                msg.append('Perfect ')
-
-        if typeStr[0] in ('1', '2', '3', '5', '6'):
-            pass # do nothing with capitalization
-        else:
-            typeStr = typeStr.title()
-
-        if typeStr.lower() == 'complex':
-            pass
-        else:
-            msg.append('%s ' % typeStr)
-
-        if tupletStr is not None:
-            msg.append('%s ' % tupletStr)
-        # only add QL display if there are no dots or tuplets
-        if tupletStr is not None or dots >= 3 or typeStr.lower() == 'complex':
-            qlStr = common.mixedNumeral(self.quarterLength)
-            msg.append('(%s QL)' % (qlStr))
-
-        return ''.join(msg).strip() # avoid extra space
-
-    @property
-    def isLinked(self):
-        '''
-        Return a boolean describing this duration is linked or not.
-
-        >>> d = duration.DurationUnit()
-        >>> d.isLinked
-        True
-
-        >>> d.unlink()
-        >>> d.isLinked
-        False
-        '''
-        return self._link
-
-    @property
-    def ordinal(self):
-        '''
-        Converts type to an ordinal number where maxima = 1 and 1024th = 14;
-        whole = 4 and quarter = 6.  Based on duration.ordinalTypeFromNum
-
-        >>> a = duration.DurationUnit('whole')
-        >>> a.ordinal
-        4
-
-        >>> b = duration.DurationUnit('maxima')
-        >>> b.ordinal
-        1
-
-        >>> c = duration.DurationUnit('1024th')
-        >>> c.ordinal
-        14
-        '''
-        if self._typeNeedsUpdating:
-            self.updateType()
-        ordinalFound = None
-        for i in range(len(ordinalTypeFromNum)):
-            if self.type == ordinalTypeFromNum[i]:
-                ordinalFound = i
-                break
-        if ordinalFound is None:
-            raise DurationException(
-                "Could not determine durationNumber from %s" % ordinalFound)
-        else:
-            return ordinalFound
-
-    def _getQuarterLengthFloat(self):
-        '''
-        Property for getting or setting the quarterLength of a
-        DurationUnit.
-
-        >>> a = duration.DurationUnit()
-        >>> a.quarterLength = 3
-        >>> a.quarterLength
-        3.0
-
-        >>> a.type
-        'half'
-
-        >>> a.dots
-        1
-
-        >>> a.quarterLength = .5
-        >>> a.type
-        'eighth'
-
-        >>> a.quarterLength = .75
-        >>> a.type
-        'eighth'
-
-        >>> a.dots
-        1
-
-        >>> b = duration.DurationUnit()
-        >>> b.quarterLength = 16
-        >>> b.type
-        'longa'
-        '''
-        if self._quarterLengthNeedsUpdating:
-            self.updateQuarterLength()
-        return float(self._qtrLength)
-    
-    def _getQuarterLengthRational(self):
-        '''
-        Property for getting or setting the quarterLength of a
-        DurationUnit.
-
-        This will return a float if it's binary representable, or a fraction if not...
-
-        >>> a = duration.DurationUnit()
-        >>> a.quarterLength = 3
-        >>> a.quarterLength
-        3.0
-        >>> a.quarterLength = .75
-        >>> a.quarterLength
-        0.75
-        >>> a.quarterLength = 2.0/3
-        >>> a.type
-        'quarter'
-        >>> a.tuplets
-        (<music21.duration.Tuplet 3/2/quarter>,)
-        >>> a.quarterLength
-        Fraction(2, 3)            
-        '''
-        if self._quarterLengthNeedsUpdating:
-            self.updateQuarterLength()
-        return self._qtrLength
-        
-
-    def _setQuarterLength(self, value):
-        '''Set the quarter note length to the specified value.
-
-        (We no longer unlink if quarterLength is greater than a longa)
-
-        >>> a = duration.DurationUnit()
-        >>> a.quarterLength = 3
-        >>> a.type
-        'half'
-        >>> a.dots
-        1
-
-        >>> a.quarterLength = .5
-        >>> a.type
-        'eighth'
-
-        >>> a.quarterLength = .75
-        >>> a.type
-        'eighth'
-        >>> a.dots
-        1
-
-        >>> b = duration.DurationUnit()
-        >>> b.quarterLength = 16
-        >>> b.type
-        'longa'
-
-        >>> c = duration.DurationUnit()
-        >>> c.quarterLength = 129
-        >>> c.type
-        Traceback (most recent call last):
-        DurationException: cannot get the next larger of duplex-maxima        
-        '''
-        if not common.isNum(value):
-            raise DurationException(
-            "not a valid quarter length (%s)" % value)
-            
-        if self._link:
-            self._typeNeedsUpdating = True
-        
-        value = opFrac(value)
-        self._qtrLength = value
-
-    quarterLength      = property(_getQuarterLengthRational, _setQuarterLength)
-    quarterLengthFloat = property(_getQuarterLengthFloat, _setQuarterLength)
-
-    @property
-    def tuplets(self):
-        '''Return a tuple of Tuplet objects '''
-        if self._typeNeedsUpdating:
-            self.updateType()
-        return self._tuplets
-
-    @tuplets.setter
-    def tuplets(self, value):
-        '''Takes in a tuple of Tuplet objects
-        '''
-        if not isinstance(value, tuple):
-            raise DurationException(
-            "value submitted (%s) is not a tuple of tuplets" % value)
-        if self._tuplets != value:
-            self._quarterLengthNeedsUpdating = True
-        # note that in some cases this methods seems to be called more
-        # often than necessary
-        #environLocal.printDebug(['assigning tuplets in DurationUnit',
-        #                         value, id(value)])
-        for thisTuplet in value:
-            thisTuplet.frozen = True
-        self._tuplets = value
-
-    @property
-    def type(self):
-        '''
-        Property for getting or setting the type of a DurationUnit.
-
-        >>> a = duration.DurationUnit()
-        >>> a.quarterLength = 3
-        >>> a.type
-        'half'
-
-        >>> a.dots
-        1
-
-        >>> a.type = 'quarter'
-        >>> a.quarterLength
-        1.5
-
-        >>> a.type = '16th'
-        >>> a.quarterLength
-        0.375
-        '''
-        if self._typeNeedsUpdating:
-            self.updateType()
-        return self._type
-
-    @type.setter
-    def type(self, value):
-        if value not in typeToDuration:
-            raise DurationException("no such type exists: %s" % value)
-        if value != self._type:  # only update if different
-            # link status will be checked in quarterLengthNeeds updating
-            self._quarterLengthNeedsUpdating = True
-        self._type = value
-
-
-#-------------------------------------------------------------------------------
-
-
-class ZeroDuration(DurationUnit):
-    '''
-    Represents any Music21 element that does not last any length of time.
-    '''
-
-    ### CLASS VARIABLES ###
-
-    isGrace = False
-
-    __slots__ = ()
-
-    ### INITIALIZER ###
-
-    def __init__(self):
-        DurationUnit.__init__(self)
-        self.unlink()
-        self.type = 'zero'
-        self.quarterLength = 0.0
-
-    ### SPECIAL METHODS ###
-
-    def __repr__(self):
-        '''Return a string representation.
-
-        >>> zDur = duration.ZeroDuration()
-        >>> repr(zDur)
-        '<music21.duration.ZeroDuration>'
-        '''
-        return '<music21.duration.ZeroDuration>'
-
 
 #-------------------------------------------------------------------------------
 
@@ -2022,14 +1256,15 @@ class Duration(SlottedObject):
     isGrace = False
 
     __slots__ = (
-        'linkage',
-        '_cachedIsLinked',
+        'linked',
         '_components',
         '_qtrLength',
         '_tuplets',
         '_componentsNeedUpdating',
         '_quarterLengthNeedsUpdating',
         '_typeNeedsUpdating',
+        '_type',
+        '_dotGroups',
         )
 
     ### INITIALIZER ###
@@ -2042,17 +1277,22 @@ class Duration(SlottedObject):
         self._quarterLengthNeedsUpdating = False
         self._typeNeedsUpdating = False
 
+        self._type = None
+        self._dotGroups = (0,)
+        self._tuplets = ()  # an empty tuple
         self._qtrLength = 0.0
         # always have one DurationUnit object
         self._components = []
         # defer updating until necessary
         self._quarterLengthNeedsUpdating = False
-        self._cachedIsLinked = None  # store for access w/o looking at components
+        self.linked = True  
         for a in arguments:
             if common.isNum(a) and 'quarterLength' not in keywords:
                 keywords['quarterLength'] = a
             elif common.isStr(a) and 'type' not in keywords:
                 keywords['type'] = a
+            elif isinstance(a, DurationTuple):
+                self.addDurationTuple(a)
             else:
                 raise DurationException("Cannot parse argument {0}".format(a))
 
@@ -2066,21 +1306,11 @@ class Duration(SlottedObject):
             # this is set in _setComponents
             #self._quarterLengthNeedsUpdating = True
         if 'type' in keywords:
-            du = DurationUnit(keywords['type'])
-            if storeDots > 0:
-                du.dots = storeDots
-            self.addDurationTuple(du)
+            nt = durationTupleFromTypeDots(keywords['type'], storeDots)
+            self.addDurationTuple(nt)
         # permit as keyword so can be passed from notes
-        if 'quarterLength' in keywords:
+        elif 'quarterLength' in keywords:
             self.quarterLength = keywords['quarterLength']
-        # linkage specifies the thing used to connect durations.
-        # If undefined, nothing is used.  "tie" is the most common linkage
-        # Other sorts of things could be
-        # dotted-ties, arrows, none, etc. As of Sep. 2008 -- not used.
-        if "linkage" in keywords:
-            self.linkage = keywords["linkages"]
-        else:
-            self.linkage = None
 
     ### SPECIAL METHODS ###
 
@@ -2132,7 +1362,7 @@ class Duration(SlottedObject):
         return not self.__eq__(other)
 
     def __repr__(self):
-        if self.isLinked:
+        if self.linked is True:
             return '<music21.duration.Duration %s>' % self.quarterLength
         else:
             return '<music21.duration.Duration unlinked type:%s quarterLength:%s>' % (self.type, self.quarterLength)
@@ -2146,9 +1376,12 @@ class Duration(SlottedObject):
         '''
         # this update will not be necessary
         self._quarterLengthNeedsUpdating = False
-        if self.isLinked:
+        if self.linked is True:
             try:
-                self.components = quarterLengthToDurations(self.quarterLength)
+                qlc = quarterConversion(self.quarterLength)
+                self.components = list(qlc.components)
+                if qlc.tuplet is not None:
+                    self.tuplets = (qlc.tuplet,)
             except DurationException:
                 print("problem updating components of note with quarterLength %s, chokes quarterLengthToDurations\n" % self.quarterLength)
                 raise
@@ -2156,7 +1389,7 @@ class Duration(SlottedObject):
 
     ### PUBLIC METHODS ###
 
-    def addDurationTuple(self, dur, link=True):
+    def addDurationTuple(self, dur):
         '''
         Add a DurationUnit or a Duration's components to this Duration.
         Does not simplify the Duration.  For instance, adding two
@@ -2164,30 +1397,24 @@ class Duration(SlottedObject):
         See `consolidate` below for more info on how to do that.
 
         >>> a = duration.Duration('quarter')
-        >>> b = duration.Duration('quarter')
+        >>> b = duration.durationTupleFromTypeDots('quarter', 0)
         >>> a.addDurationTuple(b)
         >>> a.quarterLength
         2.0
         >>> a.type
         'complex'
         '''
-        if isinstance(dur, DurationUnit):
-            if not link:
-                dur.unlink()
+        if isinstance(dur, DurationTuple):
             self.components.append(dur)
         elif isinstance(dur, Duration): # its a Duration object
             for c in dur.components:
                 cNew = copy.deepcopy(c) # must copy as otherwise will unlink
-                if not link:
-                    cNew.unlink()
                 self.components.append(cNew)
         else: # its a number that may produce more than one component
             for c in Duration(dur).components:
-                if not link:
-                    c.unlink()
                 self.components.append(c)
-        if link:
-            self._quarterLengthNeedsUpdating = True
+        if self.linked:
+            self._quarterLengthNeedsUpdating
 
     def appendTuplet(self, newTuplet):
         self.tuplets = self.tuplets + (newTuplet,)
@@ -2467,22 +1694,9 @@ class Duration(SlottedObject):
         else:
             gd = GraceDuration()
         gd.components = components # set new components
-        gd.unlink()
+        gd.linked = False
         gd.quarterLength = 0.0
         return gd
-
-    def link(self):
-        '''
-        Set all components to be linked
-        '''
-        if len(self.components) >= 1:
-            for c in self.components:
-                c.link()
-            self._cachedIsLinked = True
-            # quarter length will be set based on component types
-            self._quarterLengthNeedsUpdating = True
-        else: # there may be components and still a zero type
-            raise DurationException("zero DurationUnits in components: cannt link or unlink")
 
     def setQuarterLengthUnlinked(self, value):
         '''
@@ -2497,36 +1711,8 @@ class Duration(SlottedObject):
                 self._components.append(ZeroDuration())
             else:
                 du = DurationUnit() # will get default quarter
-                du.unlink()
                 self._components.append(du)
-        # keep components, simply unlink; quarter lengths stored will
-        # not be included in this elements quater length
-        else:
-            for c in self._components:
-                c.unlink()
-        # reach ahead and set cached is linked: no need to check components
-        self._cachedIsLinked = False
 
-    def setTypeUnlinked(self, value):
-        '''
-        Make this Duration unlinked, and set the type. Quarter note length will not be adjusted.
-        '''
-        # need to check that type is valid
-        if value not in ordinalTypeFromNum:
-            raise DurationException("no such type exists: %s" % value)
-
-        if len(self.components) == 1:
-            # change the existing DurationUnit to the this type
-            self.components[0].unlink()
-            self.components[0].type = value
-            #self._quarterLengthNeedsUpdating = True
-        elif self.isComplex: # more than one component
-            raise DurationException("cannot yet set type for a complex Duration")
-        else: # permit creating a new comoponent
-            # create a new duration unit; if link is True, will unlink
-            self.addDurationTuple(DurationUnit(value), link=False) # updates
-            #self._quarterLengthNeedsUpdating = True
-        self._cachedIsLinked = False
 
     def sliceComponentAtPosition(self, quarterPosition):
         '''
@@ -2612,7 +1798,7 @@ class Duration(SlottedObject):
         Never seen one, so probably okay.
 
         >>> d1 = duration.Duration(type = 'half')
-        >>> d1.dotGroups = [1,1]
+        >>> d1.dotGroups = (1,1)
         >>> d1.quarterLength
         4.5
         >>> d2 = d1.splitDotGroups()
@@ -2657,27 +1843,19 @@ class Duration(SlottedObject):
                 newDuration.components.append(newComponent)
             return newDuration
 
-    def unlink(self):
-        '''
-        Unlink all components allowing the type, dots, etc., to not be the same as the
-        normal representation in quarterLength units.
-        '''
-        if len(self._components) >= 1:
-            for c in self._components: # these are Duration objects
-                c.unlink()
-            self._cachedIsLinked = False
 
     def updateQuarterLength(self):
         '''
         Look to components and determine quarter length.
         '''
-        if self.isLinked:
+        if self.linked is True:
             self._qtrLength = 0.0
             for dur in self.components:
                 # if components quarterLength needs to be updated, it will
                 # be updated when this property is called
                 qlr = dur.quarterLength
-                self._qtrLength = opFrac(self._qtrLength + qlr)
+                self._qtrLength += self._qtrLength + qlr
+            self._qtrLength = opFrac(self._qtrLength * self.aggregateTupletMultiplier())
         self._quarterLengthNeedsUpdating = False
 
     ### PUBLIC PROPERTIES ###
@@ -2699,7 +1877,6 @@ class Duration(SlottedObject):
             # this is True b/c components are not the same
             self._quarterLengthNeedsUpdating = True
             # must be cleared
-            self._cachedIsLinked = None
 
     @property
     def dotGroups(self):
@@ -2711,19 +1888,21 @@ class Duration(SlottedObject):
         >>> from music21 import duration
         >>> a = duration.Duration()
         >>> a.type = 'half'
+        >>> a.dotGroups
+        (0,)
+        >>> a.dots = 1
+        
+
         >>> a.dotGroups = [1,1]
         >>> a.quarterLength
         4.5
         '''
-        if self._componentsNeedUpdating is True:
-            self._updateComponents()
-
-        if len(self.components) == 1:
-            return self.components[0].dotGroups
-        elif len(self.components) > 1:
-            return None
-        else: # there must be 1 or more components
-            raise DurationException("Cannot get dotGroups on an object with zero DurationUnits in its duration.components (will cause problems later even if dotGroups are ignored)")
+        if self.dots == 0:
+            return self.dotGroups
+        elif self.dots != 0 and self._dotGroups == (0,):
+            return (self.dots,)
+        else:
+            return self._dotGroups
 
     @dotGroups.setter
     def dotGroups(self, value):
@@ -2866,53 +2045,9 @@ class Duration(SlottedObject):
         '''
         if len(self.components) > 1:
             return True
-#        for dur in self.components:
-            #environLocal.printDebug(['dur in components', dur])
-            # any one unlinked component means this is complex
-            #if self._link is False:
-            #    return True
         else: 
             return False
 
-    @property
-    def isLinked(self):
-        '''
-        Return a boolean describing this duration is linked or not.  The
-        `isLinked` of the first component in a complex duration determines the
-        link status for the entire Duration
-
-        >>> d = duration.Duration(2.0)
-        >>> d.type
-        'half'
-
-        >>> d.quarterLength
-        2.0
-
-        >>> d.isLinked
-        True
-
-        >>> d.unlink()
-        >>> d.quarterLength = 4.0
-        >>> d.type
-        'half'
-
-        >>> d.isLinked
-        False
-        '''
-        # reset _cachedIsLinked to None when components have changed
-        if self._cachedIsLinked is None:
-            if len(self._components) > 0:
-                # if there are components, determine linked status from them
-                for c in self._components:
-                    if c.isLinked:
-                        self._cachedIsLinked = True
-                        break
-                    else:
-                        self._cachedIsLinked = False
-                        break
-            else:  # there are no components, than it is linked (default)
-                self._cachedIsLinked = True
-        return self._cachedIsLinked
 
     @property
     def ordinal(self):
@@ -2953,7 +2088,7 @@ class Duration(SlottedObject):
     def _setQuarterLength(self, value):
         if self._qtrLength != value:
             value = opFrac(value)
-            if value == 0.0 and self.isLinked is True:
+            if value == 0.0 and self.linked is True:
                 self.clear()
             self._qtrLength = value
             self._componentsNeedUpdating = True
@@ -3003,30 +2138,15 @@ class Duration(SlottedObject):
     @property
     def tuplets(self):
         '''
-        When there are more than one component, each component may have its
-        own tuplet.
+        return a tuple of Tuplet objects
         '''
-        if self._componentsNeedUpdating:
-            self._updateComponents()
-        if len(self.components) > 1:
-            return None
-        elif len(self.components) == 1:
-            return self.components[0].tuplets
-        else: # there must be 1 or more components
-            raise DurationException("zero DurationUnits in components")
+        return self._tuplets
 
     @tuplets.setter
     def tuplets(self, tupletTuple):
         #environLocal.printDebug(['assigning tuplets in Duration', tupletTuple])
-        if len(self.components) > 1:
-            raise DurationException("setting tuplets on Complex note: Myke and Chris need to decide what that means")
-        elif len(self.components) == 1:
-            for thisTuplet in tupletTuple:
-                thisTuplet.frozen = True
-            self.components[0].tuplets = tupletTuple
-            self._quarterLengthNeedsUpdating = True
-        else: # there must be 1 or more components
-            raise DurationException("zero DurationUnits in components")
+        self._tuplets = tuple(tupletTuple)
+        self._quarterLengthNeedsUpdating = True
 
     def aggregateTupletMultiplier(self):
         '''
@@ -3193,7 +2313,7 @@ class GraceDuration(Duration):
     >>> gd.quarterLength
     0.0
 
-    >>> gd.isLinked
+    >>> gd.linked
     False
 
     >>> gd = duration.GraceDuration(1.25)
@@ -3236,7 +2356,7 @@ class GraceDuration(Duration):
         # will later be removed
         if self._componentsNeedUpdating:
             self._updateComponents()
-        self.unlink()
+        self.linked = False
         self.quarterLength = 0.0
         
         self._makeTime = None
@@ -3291,7 +2411,6 @@ class AppogiaturaDuration(GraceDuration):
 
     def __init__(self, *arguments, **keywords):
         GraceDuration.__init__(self, *arguments, **keywords)
-        #self.unlink()
         self.slash = False # can be True, False, or None; make None go to True?
         self.makeTime = True
 
@@ -3766,8 +2885,8 @@ class Test(unittest.TestCase):
     def testUnlinkedTypeA(self):
         from music21 import duration
 
-        du = duration.DurationUnit()
-        du.unlink()
+        du = duration.Duration()
+        du.linked = False
         du.quarterLength = 5.0
         du.type = 'quarter'
         self.assertEqual(du.quarterLength, 5.0)
@@ -3775,37 +2894,37 @@ class Test(unittest.TestCase):
         #print du.type, du.quarterLength
 
         d = duration.Duration()
-        self.assertEqual(d.isLinked, True) # note set
+        self.assertEqual(d.linked, True) # note set
         d.setTypeUnlinked('quarter')
         self.assertEqual(d.type, 'quarter')
         self.assertEqual(d.quarterLength, 0.0) # note set
-        self.assertEqual(d.isLinked, False) # note set
+        self.assertEqual(d.linked, False) # note set
 
         d.setQuarterLengthUnlinked(20)
         self.assertEqual(d.quarterLength, 20.0)
-        self.assertEqual(d.isLinked, False) # note set
+        self.assertEqual(d.linked, False) # note set
 
         # can set type  and will remain unlinked
         d.type = '16th'
         self.assertEqual(d.type, '16th')
         self.assertEqual(d.quarterLength, 20.0)
-        self.assertEqual(d.isLinked, False) # note set
+        self.assertEqual(d.linked, False) # note set
 
-        # can set quater length and will remain unlinked
+        # can set quarter length and will remain unlinked
         d.quarterLength = 0.0
         self.assertEqual(d.type, '16th')
-        self.assertEqual(d.isLinked, False) # note set
+        self.assertEqual(d.linked, False) # note set
 
 
 #         d = duration.Duration()
 #         d.setTypeUnlinked('quarter')
 #         self.assertEqual(d.type, 'quarter')
 #         self.assertEqual(d.quarterLength, 0.0) # note set
-#         self.assertEqual(d.isLinked, False) # note set
+#         self.assertEqual(d.linked, False) # note set
 #
 #         d.setQuarterLengthUnlinked(20)
 #         self.assertEqual(d.quarterLength, 20.0)
-#         self.assertEqual(d.isLinked, False) # note set
+#         self.assertEqual(d.linked, False) # note set
 
     def xtestStrangeMeasure(self):
         from music21 import corpus
@@ -3821,8 +2940,8 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(d.quarterLength), 'Fraction(1, 3)')
         self.assertEqual(d._components, [] )
         self.assertEqual(d._componentsNeedUpdating, True )
-        self.assertEqual(str(d.components), '[<music21.duration.DurationUnit 1/3>]')
-        self.assertEqual(d._componentsNeedUpdating, False )
+        self.assertEqual(str(d.components), "[DurationTuple(type='eighth', dots=0, quarterLength=0.5)]")
+        self.assertEqual(d._componentsNeedUpdating, False)
         self.assertEqual(str(d._qtrLength), '1/3')
         self.assertTrue(d._quarterLengthNeedsUpdating)
         self.assertEqual(repr(d.quarterLength), 'Fraction(1, 3)')
@@ -3830,7 +2949,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [Duration, Tuplet, DurationUnit, convertQuarterLengthToType, TupletFixer]
+_DOC_ORDER = [Duration, Tuplet, convertQuarterLengthToType, TupletFixer]
 
 if __name__ == "__main__":
     import music21

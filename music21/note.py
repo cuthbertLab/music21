@@ -677,7 +677,8 @@ class NotRest(GeneralNote):
         self._noteheadParenthesis = False
         self._stemDirection = 'unspecified'
         self._volume = None # created on demand
-        self.duration.linkage = 'tie'
+        #replace
+        self.linkage = 'tie'
         if "beams" in keywords:
             self.beams = keywords["beams"]
         else:

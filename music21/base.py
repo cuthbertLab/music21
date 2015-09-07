@@ -2734,7 +2734,11 @@ class Music21Object(object):
             raise Exception('cannot split an element that has a Duration of None')
 
         returnNotes = []
-        linkageType = self.duration.linkage
+        if hasattr(self, 'linkage'):
+            linkageType = self.linkage
+        else:
+            linkageType = None
+
         for i in range(len(self.duration.components)):
             tempNote = copy.deepcopy(self)
             if i != 0:
