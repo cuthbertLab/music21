@@ -1437,7 +1437,7 @@ class LilypondConverter(object):
 
     def lyMultipliedDurationFromDuration(self, durationObj):
         r'''
-        take a simple Duration (that is one with one DurationUnit
+        take a simple Duration (that is one with one DurationTuple
         object and return a LyMultipliedDuration object:
 
 

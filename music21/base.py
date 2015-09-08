@@ -2674,7 +2674,7 @@ class Music21Object(object):
     def splitAtDurations(self):
         '''
         Takes a Music21Object (e.g., a note.Note) and returns a list of similar
-        objects with only a single duration.DurationUnit in each.
+        objects with only a single duration.DurationTuple in each.
         Ties are added if the object supports ties.
 
         Articulations only appear on the first note.  Same with lyrics.
@@ -2691,12 +2691,18 @@ class Music21Object(object):
         >>> a.duration.quarterLength
         6.0
         >>> b = a.splitAtDurations()
+        >>> b
+        [<music21.note.Note C>, <music21.note.Note C>]
         >>> b[0].pitch == b[1].pitch
         True
+        >>> b[0].duration
+        <music21.duration.Duration 2.0>
         >>> b[0].duration.type
         'half'
         >>> b[1].duration.type
         'whole'
+        >>> b[0].quarterLength, b[1].quarterLength
+        (2.0, 4.0)
 
         >>> c = note.Note()
         >>> c.quarterLength = 2.5
@@ -2748,7 +2754,8 @@ class Music21Object(object):
                 if hasattr(tempNote, 'lyrics'):
                     tempNote.lyrics = []
 
-            tempNote.duration = self.duration.components[i]
+            tempNote.duration.clear()
+            tempNote.duration.addDurationTuple(self.duration.components[i])
             if i != (len(self.duration.components) - 1): # if not last note, use linkage
                 if linkageType is None:
                     pass

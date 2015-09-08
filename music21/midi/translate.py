@@ -4,8 +4,9 @@
 # Purpose:      Translate MIDI and music21 objects
 #
 # Authors:      Christopher Ariza
+#               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2010-2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
@@ -110,12 +111,14 @@ def midiToDuration(ticks, ticksPerQuarter=None, inputM21DurationObject=None):
     >>> d2reference = midi.translate.midiToDuration(1200, inputM21DurationObject=d2)
     >>> d2 is d2reference
     True
-    >>> d2.type
-    'complex'
     >>> d2.quarterLength
     1.171875
+    >>> d2.type
+    'complex'
     >>> d2.components
-    [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.125>, <music21.duration.DurationUnit 0.046875>]
+    [DurationTuple(type='quarter', dots=0, quarterLength=1.0), 
+     DurationTuple(type='32nd', dots=0, quarterLength=0.125), 
+     DurationTuple(type='128th', dots=1, quarterLength=0.046875)]
     >>> d2.components[2].type
     '128th'
     >>> d2.components[2].dots

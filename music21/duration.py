@@ -574,7 +574,7 @@ def quarterConversion(qLen):
     Since tuplets now apply to the entire Duration, expect some odder tuplets for unusual
     values that should probably be split generally...
 
-    >>> duration.quarterConversion(2.3333333)
+    >>> duration.quarterConversion(7.0/3)
     QuarterLengthConversion(components=(DurationTuple(type='whole', dots=0, quarterLength=4.0),), 
         tuplet=<music21.duration.Tuplet 12/7/16th>)
 
@@ -615,8 +615,9 @@ def quarterConversion(qLen):
         dt = durationTupleFromTypeDots('zero', 0)
         return QuarterLengthConversion((dt,), None)
 
-        
+    
     # Tuplets...
+    qLen = opFrac(qLen)
     # try match to type, get next lowest for next part...
     closestSmallerType, unused_match = quarterLengthToClosestType(qLen)
     typeNext = nextLargerType(closestSmallerType)
@@ -631,17 +632,24 @@ def quarterConversion(qLen):
     components = [durationTupleFromTypeDots(closestSmallerType, 0)]
     # remove the largest type out there and keep going.
     
-    qLenRemainder = qLen - typeToDuration[closestSmallerType]
+    qLenRemainder = opFrac(qLen - typeToDuration[closestSmallerType])
     # cannot recursively call, because tuplets are not possible at this stage.
+    #environLocal.warn(['starting remainder search for qLen:', qLen, 'remainder: ', qLenRemainder, 'components: ', components])
     for i in range(8): # max 8 iterations.
+        #environLocal.warn(['qlenRemainder is:', qLenRemainder])
         dots, durType = dottedMatch(qLenRemainder)
         if durType is not False: # match!
             dt = durationTupleFromTypeDots(durType, dots)
             components.append(dt)
             return QuarterLengthConversion(tuple(components), None)
-        closestSmallerType, unused_match = quarterLengthToClosestType(qLen)
+        try:
+            closestSmallerType, unused_match = quarterLengthToClosestType(qLenRemainder)
+        except DurationException:
+            break # already reached 2048th notes.
         qLenRemainder = qLenRemainder - typeToDuration[closestSmallerType]
-        components.append(durationTupleFromTypeDots(closestSmallerType, 0))
+        dt = durationTupleFromTypeDots(closestSmallerType, 0)
+        #environLocal.warn(['appending', dt, 'leaving ', qLenRemainder, ' of ', qLen])
+        components.append(dt)
         
     # 8 tied components was not enough.
     # last resort: put one giant tuplet over it.
@@ -2000,9 +2008,11 @@ class Duration(SlottedObject):
     @property
     def dotGroups(self):
         '''
-        See the explanation under :class:`~music21.duration.DurationUnit` about
-        what dotGroups (medieval dotted-dotted notes are).  In a complex
-        duration, only the dotGroups of the first component matter
+        Dot groups are medieval dotted-dotted notes (written one above another).
+        For instance a half note with dotGroups = (1,1) represents a dotted half note that
+        is itself dotted.  Worth 9 eighth notes (dotted-half tied to dotted-quarter).  It
+        is not the same as a double-dotted half note, which is only worth 7 eighth notes.
+        
 
         >>> from music21 import duration
         >>> a = duration.Duration()
@@ -2177,7 +2187,7 @@ class Duration(SlottedObject):
     @property
     def isComplex(self):
         '''
-        Returns True if this Duration has more than one DurationUnit object on
+        Returns True if this Duration has more than one DurationTuple object on
         the `component` list.  That is to say if it's a single Duration that
         need multiple tied noteheads to represent.
 
@@ -2363,7 +2373,7 @@ class Duration(SlottedObject):
         and going up the mro() for the object.  Very similar to Perl's @ISA
         array.  See music21.Music21Object.classes for more details.
         '''
-        return ['Duration', 'object']
+        return [x.__name__ for x in self.__class__.mro()]
 
 
     @property

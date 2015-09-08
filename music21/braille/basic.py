@@ -478,21 +478,27 @@ def noteToBraille(music21Note, showOctave = True, upperFirstInFingering = True):
     
     # note duration
     # -------------
-    try:
-        if beamStatus['beamContinue']: 
-            nameWithDuration = notesInStep['eighth']
-            music21Note._brailleEnglish.append(u"{0} beam {1}".format(music21Note.step, nameWithDuration))
-        else:
-            nameWithDuration = notesInStep[music21Note.duration.type]
-            music21Note._brailleEnglish.append(u"{0} {1} {2}".format(music21Note.step, music21Note.duration.type, nameWithDuration))
+    if 'GraceDuration' in music21Note.duration.classes:
+        # TODO: Short Appogiatura mark...
+        nameWithDuration = notesInStep['eighth']
         noteTrans.append(nameWithDuration)
-        for unused_counter_dot in range(music21Note.duration.dots):
-            noteTrans.append(symbols['dot'])
-            music21Note._brailleEnglish.append(u"Dot {0}".format(symbols['dot']))
-    except KeyError:
-        environRules.warn("Duration {0} of note {1} cannot be transcribed to braille.".format(music21Note.duration, music21Note))
-        music21Note._brailleEnglish.append("Duration {0} None".format(music21Note.duration))
-        return symbols['basic_exception']
+        music21Note._brailleEnglish.append(u"{0} {1} Gracenote--not supported {2}".format(music21Note.step, 'eighth', nameWithDuration))
+    else:
+        try:
+            if beamStatus['beamContinue']: 
+                nameWithDuration = notesInStep['eighth']
+                music21Note._brailleEnglish.append(u"{0} beam {1}".format(music21Note.step, nameWithDuration))
+            else:
+                nameWithDuration = notesInStep[music21Note.duration.type]
+                music21Note._brailleEnglish.append(u"{0} {1} {2}".format(music21Note.step, music21Note.duration.type, nameWithDuration))
+            noteTrans.append(nameWithDuration)
+            for unused_counter_dot in range(music21Note.duration.dots):
+                noteTrans.append(symbols['dot'])
+                music21Note._brailleEnglish.append(u"Dot {0}".format(symbols['dot']))
+        except KeyError:
+            environRules.warn("Duration {0} of note {1} cannot be transcribed to braille.".format(music21Note.duration, music21Note))
+            music21Note._brailleEnglish.append("Duration {0} None".format(music21Note.duration))
+            return symbols['basic_exception']
 
     # finger mark
     # -----------
