@@ -982,7 +982,12 @@ class Music21Object(object):
         tend to reside in modules closer to their musical function:
 
         >>> sp2 = dynamics.Crescendo(n2, n1)
-        >>> n2.getSpannerSites() == [sp1, sp2]
+        
+        The order that Spanners are returned is usually the order they
+        were created, but on fast computers there can be ties, so use
+        a set comparison if you expect multiple:
+        
+        >>> set(n2.getSpannerSites()) == set([sp1, sp2])
         True
 
         Optionally a class name or list of class names can be
@@ -4303,7 +4308,9 @@ class Test(unittest.TestCase):
 
         # test same for inherited classes and multiple sites, in order...
         sp2 = dynamics.Crescendo(n2, n1)
-        self.assertEqual(n2.getSpannerSites(), [sp1, sp2])
+        # can return in arbitrary order esp. if speed is fast... 
+        # TODO: use Ordered Dict.
+        self.assertEqual(set(n2.getSpannerSites()), set([sp1, sp2]))
 
         #Optionally a class name or list of class names can be
         #specified and only Spanners of that class will be returned
@@ -4313,8 +4320,8 @@ class Test(unittest.TestCase):
 
         # A larger class name can be used to get all subclasses:
 
-        self.assertEqual(n2.getSpannerSites('DynamicWedge'), [sp2, sp3])
-        self.assertEqual(n2.getSpannerSites(['Slur', 'Diminuendo']), [sp1, sp3])
+        self.assertEqual(set(n2.getSpannerSites('DynamicWedge')), set([sp2, sp3]))
+        self.assertEqual(set(n2.getSpannerSites(['Slur', 'Diminuendo'])), set([sp1, sp3]))
 
         #The order spanners are returned is generally the order that they were
         #added, but that is not guaranteed, so for safety sake, use set comparisons:
