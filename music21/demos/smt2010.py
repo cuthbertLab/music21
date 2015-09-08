@@ -157,8 +157,8 @@ def findHighestNotes(show=True, *arguments, **keywords):
                     # These two lines will keep the look of the original
                     # note values but make each note 1 4/4 measure long:
     
-                    highestNote.duration.components[0].unlink()
-                    highestNote.quarterLength = 4
+                    highestNote.duration.linked = False
+                    highestNote.quarterLength = 4.0
                     highestNote.lyric = '%s: M. %s: beat %s' % (
                         part.getInstrument().partName[0], m.number, ts.getBeat(n.offset))
         found.append(highestNote)
