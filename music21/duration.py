@@ -1341,14 +1341,14 @@ class Duration(SlottedObject):
     isGrace = False
 
     __slots__ = (
-        'linked',
+        '_linked',
         '_components',
         '_qtrLength',
         '_tuplets',
         '_componentsNeedUpdating',
         '_quarterLengthNeedsUpdating',
         '_typeNeedsUpdating',
-        '_type',
+        '_unlinkedType',
         '_dotGroups',
         )
 
@@ -1362,7 +1362,7 @@ class Duration(SlottedObject):
         self._quarterLengthNeedsUpdating = False
         self._typeNeedsUpdating = False
 
-        self._type = None
+        self._unlinkedType = None
         self._dotGroups = (0,)
         self._tuplets = ()  # an empty tuple
         self._qtrLength = 0.0
@@ -1370,7 +1370,7 @@ class Duration(SlottedObject):
         self._components = []
         # defer updating until necessary
         self._quarterLengthNeedsUpdating = False
-        self.linked = True  
+        self._linked = True  
         for a in arguments:
             if common.isNum(a) and 'quarterLength' not in keywords:
                 keywords['quarterLength'] = a
@@ -1413,8 +1413,8 @@ class Duration(SlottedObject):
         >>> cDur == bDur
         True
 
-        >>> dDur = duration.ZeroDuration()
-        >>> eDur = duration.ZeroDuration()
+        >>> dDur = duration.Duration(0.0)
+        >>> eDur = duration.Duration(0.0)
         >>> dDur == eDur
         True
         '''
@@ -1473,6 +1473,24 @@ class Duration(SlottedObject):
         self._componentsNeedUpdating = False
 
     ### PUBLIC METHODS ###
+    def _getLinked(self):
+        '''
+        Gets or sets the Linked property -- if linked (default) then type, dots, tuplets are
+        always coherent with quarterLength.  If not, then they are separate.
+        '''
+        return self._linked
+    
+    def _setLinked(self, value):
+        if value not in (True, False):
+            raise DurationException("Linked can only be True or False, not {0}".format(value))
+        if self._quarterLengthNeedsUpdating:
+            self.updateQuarterLength()
+        if value is False:
+            self._unlinkedType = self.type
+        self._linked = value
+
+    linked = property(_getLinked, _setLinked)
+        
 
     def addDurationTuple(self, dur):
         '''
@@ -1541,7 +1559,7 @@ class Duration(SlottedObject):
         >>> bDur.components
         [DurationTuple(type='half', dots=0, quarterLength=2.0), DurationTuple(type='32nd', dots=0, quarterLength=0.125)]
 \
-        >>> cDur = bDur.augmentOrDiminish(2, retainComponents=True, inPlace=False)
+        >>> cDur = bDur.augmentOrDiminish(2, retainComponents=True)
         >>> cDur.quarterLength
         4.25
         >>> cDur.components[0].tuplets
@@ -1568,8 +1586,10 @@ class Duration(SlottedObject):
             post = copy.deepcopy(self)
 
         if retainComponents:
+            newComponents = []
             for d in post.components:
-                d.augmentOrDiminish(amountToScale, inPlace=True)
+                newComponents.append(d.augmentOrDiminish(amountToScale))
+            post.components = newComponents
             self._typeNeedsUpdating = True
             self._quarterLengthNeedsUpdating = True
         else:
@@ -1680,7 +1700,7 @@ class Duration(SlottedObject):
         This does not handle fractional arguments.
 
         >>> components = []
-        >>> qdt = DurationTuple('quarter', 0, 1.0)
+        >>> qdt = duration.DurationTuple('quarter', 0, 1.0)
         >>> components.append(qdt)
         >>> components.append(qdt)
         >>> components.append(qdt)
@@ -1929,7 +1949,7 @@ class Duration(SlottedObject):
         2.25
         >>> #_DOCS_SHOW n2.show() # generates a dotted-quarter tied to dotted-eighth
         '''
-        return duration.Duration(quarterLength=self.quarterLength)
+        return Duration(quarterLength=self.quarterLength)
 #         dG = self.dotGroups
 #         if len(dG) < 2:
 #             return copy.deepcopy(self)
@@ -2074,10 +2094,6 @@ class Duration(SlottedObject):
         >>> d.fullName
         'Quarter tied to 16th (1 1/4 total QL)'
 
-        >>> d.addDurationTuple(duration.DurationUnit(.3333333))
-        >>> d.fullName
-        'Quarter tied to 16th tied to Eighth Triplet (1/3 QL) (1 7/12 total QL)'
-
         >>> d = duration.Duration(quarterLength=0.333333)
         >>> d.fullName
         'Eighth Triplet (1/3 QL)'
@@ -2153,7 +2169,7 @@ class Duration(SlottedObject):
         else:
             outMsg = totalMsg[0]
         
-        if len(self.components) > 1:
+        if len(self.components) != 1:
             qlStr = common.mixedNumeral(self.quarterLength)
             outMsg += ' (%s total QL)' % (qlStr)
 
@@ -2366,7 +2382,7 @@ class Duration(SlottedObject):
         0.25
         '''
         if self.linked is False:
-            return self._type
+            return self._unlinkedType
         elif len(self.components) == 1:
             return self.components[0].type
         elif len(self.components) > 1:
@@ -2380,12 +2396,12 @@ class Duration(SlottedObject):
         if value not in ordinalTypeFromNum and value not in ('inexpressible', 'complex'):
             raise DurationException("no such type exists: %s" % value)
         
-        self._type = value
         if self.linked is True:
             nt = durationTupleFromTypeDots(value, self.dots)
             self.components = [nt]
             self._quarterLengthNeedsUpdating = True
-
+        else:
+            self._unlinkedType = value
 
 def durationTupleFromQuarterLength(ql=1.0):
     '''
@@ -2499,7 +2515,6 @@ class GraceDuration(Duration):
         'stealTimeFollowing',
         '_makeTime',
         )
-
     ### INITIALIZER ###
 
     def __init__(self, *arguments, **keywords):
@@ -2510,6 +2525,11 @@ class GraceDuration(Duration):
             self._updateComponents()
         self.linked = False
         self.quarterLength = 0.0
+        newComponents = []
+        for c in self.components:
+            newComponents.append(DurationTuple(c.type, c.dots, 0.0))
+        self.components = newComponents # set new components
+        
         
         self._makeTime = None
         self._slash = None
