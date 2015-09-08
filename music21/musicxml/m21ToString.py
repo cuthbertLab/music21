@@ -269,11 +269,10 @@ def fromGeneralNote(n):
     # make a copy, as this process will change tuple types
     # this method is called infrequently, and only for display of a single 
     # note
-    from music21 import duration
-
     nCopy = copy.deepcopy(n)
-    duration.updateTupletType(nCopy.duration) # modifies in place
-
+    
+    # modifies in place
+    stream.makeNotation.makeTupletBrackets([nCopy.duration], inPlace=True) 
     out = stream.Stream()
     out.append(nCopy)
 

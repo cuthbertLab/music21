@@ -2684,10 +2684,10 @@ class Music21Object(object):
 
         >>> a = note.Note()
         >>> a.duration.clear() # remove defaults
-        >>> a.duration.addDurationUnit(duration.Duration('half'))
+        >>> a.duration.addDurationTuple(duration.durationTupleFromTypeDots('half', 0))
         >>> a.duration.quarterLength
         2.0
-        >>> a.duration.addDurationUnit(duration.Duration('whole'))
+        >>> a.duration.addDurationTuple(duration.durationTupleFromTypeDots('whole', 0))
         >>> a.duration.quarterLength
         6.0
         >>> b = a.splitAtDurations()

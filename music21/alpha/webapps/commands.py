@@ -312,7 +312,7 @@ def createMensuralCanon(sc):
     
     canonStream = stream.Score()
     for scalar, t in [(1, 'p1'), (2, 'p-5'), (.5, 'p-11'), (1.5, -24)]:
-        part = melody.augmentOrDiminish(scalar, inPlace=False)
+        part = melody.augmentOrDiminish(scalar)
         part.transpose(t, inPlace=True)
         canonStream.insert(0, part)
     

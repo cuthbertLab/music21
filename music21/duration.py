@@ -611,6 +611,11 @@ def quarterConversion(qLen):
         dt = durationTupleFromTypeDots(durType, dots)
         return QuarterLengthConversion((dt,), None)
         
+    if qLen == 0:
+        dt = durationTupleFromTypeDots('zero', 0)
+        return QuarterLengthConversion((dt,), None)
+
+        
     # Tuplets...
     # try match to type, get next lowest for next part...
     closestSmallerType, unused_match = quarterLengthToClosestType(qLen)
@@ -1009,7 +1014,7 @@ class Tuplet(object):
 
     ### PUBLIC METHODS ###
 
-    def augmentOrDiminish(self, amountToScale, inPlace=True):
+    def augmentOrDiminish(self, amountToScale):
         '''
         Given a number greater than zero,
         multiplies the current quarterLength of the
@@ -1030,22 +1035,19 @@ class Tuplet(object):
         >>> a.durationActual
         DurationTuple(type='eighth', dots=0, quarterLength=0.5)
 
-        >>> a.augmentOrDiminish(.5)
-        >>> a.durationActual
+        >>> c = a.augmentOrDiminish(.5)
+        >>> c.durationActual
         DurationTuple(type='16th', dots=0, quarterLength=0.25)
 
-        >>> a.tupletMultiplier()
+        >>> c.tupletMultiplier()
         Fraction(1, 3)
         '''
         if not amountToScale > 0:
             raise DurationException('amountToScale must be greater than zero')
         # TODO: scale the triplet in the same manner as Durations
 
-        if inPlace:
-            post = self
-            self.frozen = False # have to unfreeze
-        else:
-            post = copy.deepcopy(self)
+        post = copy.deepcopy(self)
+        post.frozen = False
 
         # duration units scale
         post.durationActual = post.durationActual.augmentOrDiminish(amountToScale)
@@ -1054,6 +1056,7 @@ class Tuplet(object):
         # ratios stay the same
         #self.numberNotesActual = actual
         #self.numberNotesNormal = normal
+        return post
 
     def setDurationType(self, durType):
         '''Set the Duration for both actual and normal.
@@ -1522,8 +1525,7 @@ class Duration(SlottedObject):
         newTuplet.frozen = True
         self.tuplets = self.tuplets + (newTuplet,)
 
-    def augmentOrDiminish(self, amountToScale,
-        retainComponents=False, inPlace=True):
+    def augmentOrDiminish(self, amountToScale, retainComponents=False):
         '''
         Given a number greater than zero,
         multiplies the current quarterLength of the
@@ -1539,12 +1541,12 @@ class Duration(SlottedObject):
 
         >>> aDur = duration.Duration()
         >>> aDur.quarterLength = 1.5 # dotted quarter
-        >>> aDur.augmentOrDiminish(2)
-        >>> aDur.quarterLength
+        >>> cDur = aDur.augmentOrDiminish(2)
+        >>> cDur.quarterLength
         3.0
-        >>> aDur.type
+        >>> cDur.type
         'half'
-        >>> aDur.dots
+        >>> cDur.dots
         1
 
 
@@ -1562,28 +1564,20 @@ class Duration(SlottedObject):
         >>> cDur = bDur.augmentOrDiminish(2, retainComponents=True)
         >>> cDur.quarterLength
         4.25
-        >>> cDur.components[0].tuplets
+        >>> cDur.tuplets
         ()
         >>> cDur.components
+        [DurationTuple(type='whole', dots=0, quarterLength=4.0), DurationTuple(type='16th', dots=0, quarterLength=0.25)]
 
 
-
-        [<music21.duration.DurationUnit 4.0>, <music21.duration.DurationUnit 0.25>]
-
-        >>> dDur = bDur.augmentOrDiminish(2, retainComponents=False, inPlace=False)
+        >>> dDur = bDur.augmentOrDiminish(2, retainComponents=False)
         >>> dDur.components
-
-
-
-        [<music21.duration.DurationUnit 4.0>, <music21.duration.DurationUnit 0.25>]
+        [DurationTuple(type='whole', dots=0, quarterLength=4.0), DurationTuple(type='16th', dots=0, quarterLength=0.25)]
         '''
         if not amountToScale > 0:
             raise DurationException('amountToScale must be greater than zero')
 
-        if inPlace:
-            post = self
-        else:
-            post = copy.deepcopy(self)
+        post = copy.deepcopy(self)
 
         if retainComponents:
             newComponents = []
@@ -1595,10 +1589,7 @@ class Duration(SlottedObject):
         else:
             post.quarterLength = post.quarterLength * amountToScale
 
-        if not inPlace:
-            return post
-        else:
-            return None
+        return post
 
     def clear(self):
         '''
@@ -1921,7 +1912,8 @@ class Duration(SlottedObject):
         4.5
         >>> d2 = d1.splitDotGroups()
         >>> d2.components
-        [<music21.duration.DurationUnit 3.0>, <music21.duration.DurationUnit 1.5>]
+        [DurationTuple(type='half', dots=1, quarterLength=3.0), 
+         DurationTuple(type='quarter', dots=1, quarterLength=1.5)]
         
         >>> d2.quarterLength
         4.5
@@ -1934,7 +1926,8 @@ class Duration(SlottedObject):
         >>> n1.duration = d1
         >>> n1.duration = n1.duration.splitDotGroups()
         >>> n1.duration.components
-        [<music21.duration.DurationUnit 3.0>, <music21.duration.DurationUnit 1.5>]
+        [DurationTuple(type='half', dots=1, quarterLength=3.0), 
+         DurationTuple(type='quarter', dots=1, quarterLength=1.5)]
         
         >>> s1 = stream.Stream()
         >>> s1.append(meter.TimeSignature('9/8'))
@@ -1944,12 +1937,18 @@ class Duration(SlottedObject):
 
         >>> n2 = note.Note()
         >>> n2.duration.type = 'quarter'
-        >>> n2.duration.dotGroups = [1,1]
+        >>> n2.duration.dotGroups = (1,1)
         >>> n2.quarterLength
         2.25
         >>> #_DOCS_SHOW n2.show() # generates a dotted-quarter tied to dotted-eighth
+
+        Does NOT handle tuplets etc.
         '''
-        return Duration(quarterLength=self.quarterLength)
+        d = Duration()
+        d.addDurationTuple(durationTupleFromTypeDots(self.type,1))
+        d.addDurationTuple(durationTupleFromTypeDots(nextSmallerType(self.type),1))
+        
+        return d
 #         dG = self.dotGroups
 #         if len(dG) < 2:
 #             return copy.deepcopy(self)
@@ -2069,7 +2068,7 @@ class Duration(SlottedObject):
         if not common.isNum(value):
             raise DurationException('only numeric dot values can be used with this method.')
         if len(self._components) == 1:
-            self._components[0] = durationTupleFromTypeDots(self.components[0], value)
+            self._components[0] = durationTupleFromTypeDots(self.components[0].type, value)
             self._quarterLengthNeedsUpdating = True
         elif len(self._components) > 1:
             raise DurationException("setting type on Complex note: Myke and Chris need to decide what that means")
@@ -2244,7 +2243,7 @@ class Duration(SlottedObject):
     
     
     def _getQuarterLengthFloat(self):
-        return float(self.auarterLengthRational)
+        return float(self._getQuarterLengthRational())
 
     def _getQuarterLengthRational(self):
         if self._quarterLengthNeedsUpdating:
@@ -2706,15 +2705,14 @@ class TupletFixer(object):
 
         requires a tuplet group from findTupletGroups() or TupletFixer.allTupletGroups
 
-
         >>> s = stream.Stream()
 
-        >>> n1 = note.Note()
+        >>> n1 = note.Note('C')
         >>> n1.duration.quarterLength = 2.0/3
         >>> n1.duration.quarterLength
         Fraction(2, 3)
         >>> s.append(n1)
-        >>> n2 = note.Note()
+        >>> n2 = note.Note('D')
         >>> n2.duration.quarterLength = 1.0/3
         >>> n2.duration.quarterLength
         Fraction(1, 3)
@@ -2727,6 +2725,8 @@ class TupletFixer(object):
 
         >>> tf = duration.TupletFixer(s) # no need to flatten this stream
         >>> tupletGroups = tf.findTupletGroups()
+        >>> tupletGroups
+        [[<music21.note.Note C>, <music21.note.Note D>]]
         >>> tf.fixBrokenTupletDuration(tupletGroups[0])
 
         >>> n1.duration.tuplets[0]
@@ -2745,7 +2745,7 @@ class TupletFixer(object):
 
         >>> m1 = s.parts[0].measure(1)
         >>> tf = duration.TupletFixer(m1)
-        >>> tupletGroups = tf.findTupletGroups(incorporateGroupings = True)
+        >>> tupletGroups = tf.findTupletGroups(incorporateGroupings=True)
         >>> tf.fixBrokenTupletDuration(tupletGroups[-1])
         >>> m1[-1].duration.tuplets[0]
         <music21.duration.Tuplet 3/2/whole>
@@ -2788,8 +2788,11 @@ class TupletFixer(object):
 
                 #print largestTupletTypeOrdinal, largestTupletType
                 for n in tupletGroup:
-                    n.duration.tuplets[0].durationNormal.type = largestTupletType
-                    n.duration.tuplets[0].durationActual.type = largestTupletType
+                    n.duration.tuplets[0].durationNormal = durationTupleFromTypeDots(
+                                    largestTupletType, n.duration.tuplets[0].durationNormal.dots)
+                    n.duration.tuplets[0].durationActual = durationTupleFromTypeDots(
+                                    largestTupletType, n.duration.tuplets[0].durationActual.dots)
+                 
 
             elif inverseExcessRatio == int(inverseExcessRatio): # redefine tuplets by GCD
                 smallestTupletType = ordinalTypeFromNum[smallestTupletTypeOrdinal]
@@ -2948,6 +2951,7 @@ class Test(unittest.TestCase):
         Test setting of tuplet type when durations sum to expected completion
         '''
         # default tuplets group into threes when possible
+        from music21 import stream
         test, match = ([.333333] * 3 + [.1666666] * 6,
             ['start', None, 'stop', 'start', None, 'stop', 'start', None, 'stop'])
         inputTuplets = []
@@ -2955,7 +2959,8 @@ class Test(unittest.TestCase):
             d = Duration()
             d.quarterLength = qLen
             inputTuplets.append(d)
-        updateTupletType(inputTuplets)
+            
+        stream.makeNotation.makeTupletBrackets(inputTuplets, inPlace=True)  
         output = []
         for d in inputTuplets:
             output.append(d.tuplets[0].type)
@@ -2978,7 +2983,7 @@ class Test(unittest.TestCase):
         match = ['start', None, None, None, None, 'stop',
                  'start', None, None, None, 'stop']
 
-        updateTupletType(inputTuplets)
+        stream.makeNotation.makeTupletBrackets(inputTuplets, inPlace=True)  
         output = []
         for d in inputTuplets:
             output.append(d.tuplets[0].type)
@@ -2991,7 +2996,7 @@ class Test(unittest.TestCase):
         Test setting of tuplet type when durations do not sum to expected
         completion.
         '''
-
+        from music21 import stream
         # the current match results here are a good compromise
         # for a difficult situation.
         test, match = ([.333333] * 2 + [.1666666] * 5,
@@ -3002,6 +3007,7 @@ class Test(unittest.TestCase):
             d = Duration()
             d.quarterLength = qLen
             inputDurations.append(d)
+        stream.makeNotation.makeTupletBrackets(inputDurations, inPlace=True)
         output = []
         for d in inputDurations:
             output.append(d.tuplets[0].type)
@@ -3018,10 +3024,10 @@ class Test(unittest.TestCase):
 
             d = Duration()
             d.quarterLength = ql
-            a = d.augmentOrDiminish(.5, inPlace=False)
+            a = d.augmentOrDiminish(.5)
             self.assertEqual(a.quarterLength, opFrac(half), 5)
 
-            b = d.augmentOrDiminish(2, inPlace=False)
+            b = d.augmentOrDiminish(2)
             self.assertEqual(b.quarterLength, opFrac(double), 5)
 
 
@@ -3032,13 +3038,13 @@ class Test(unittest.TestCase):
         self.assertEqual(a.aggregateTupletMultiplier(), opFrac(2/3.))
         self.assertEqual(repr(a.tuplets[0].durationNormal), "DurationTuple(type='eighth', dots=0, quarterLength=0.5)")
 
-        a.augmentOrDiminish(2)
-        self.assertEqual(a.aggregateTupletMultiplier(), opFrac(2/3.), 5)
-        self.assertEqual(repr(a.tuplets[0].durationNormal), "DurationTuple(type='quarter', dots=0, quarterLength=1.0)")
+        b = a.augmentOrDiminish(2)
+        self.assertEqual(b.aggregateTupletMultiplier(), opFrac(2/3.), 5)
+        self.assertEqual(repr(b.tuplets[0].durationNormal), "DurationTuple(type='quarter', dots=0, quarterLength=1.0)")
 
-        a.augmentOrDiminish(.25)
-        self.assertEqual(a.aggregateTupletMultiplier(), opFrac(2/3.), 5)
-        self.assertEqual(repr(a.tuplets[0].durationNormal), "DurationTuple(type='16th', dots=0, quarterLength=0.25)")
+        c = b.augmentOrDiminish(.25)
+        self.assertEqual(c.aggregateTupletMultiplier(), opFrac(2/3.), 5)
+        self.assertEqual(repr(c.tuplets[0].durationNormal), "DurationTuple(type='16th', dots=0, quarterLength=0.25)")
 
 
         # testing tuplets on Durations
@@ -3047,13 +3053,13 @@ class Test(unittest.TestCase):
         self.assertEqual(a.aggregateTupletMultiplier(), opFrac(2/3.), 5)
         self.assertEqual(repr(a.tuplets[0].durationNormal), "DurationTuple(type='eighth', dots=0, quarterLength=0.5)")
 
-        a.augmentOrDiminish(2)
-        self.assertEqual(a.aggregateTupletMultiplier(), opFrac(2/3.), 5)
-        self.assertEqual(repr(a.tuplets[0].durationNormal), "DurationTuple(type='quarter', dots=0, quarterLength=1.0)")
+        b = a.augmentOrDiminish(2)
+        self.assertEqual(b.aggregateTupletMultiplier(), opFrac(2/3.), 5)
+        self.assertEqual(repr(b.tuplets[0].durationNormal), "DurationTuple(type='quarter', dots=0, quarterLength=1.0)")
 
-        a.augmentOrDiminish(.25)
-        self.assertEqual(a.aggregateTupletMultiplier(), opFrac(2/3.), 5)
-        self.assertEqual(repr(a.tuplets[0].durationNormal), "DurationTuple(type='16th', dots=0, quarterLength=0.25)")
+        c = b.augmentOrDiminish(.25)
+        self.assertEqual(c.aggregateTupletMultiplier(), opFrac(2/3.), 5)
+        self.assertEqual(repr(c.tuplets[0].durationNormal), "DurationTuple(type='16th', dots=0, quarterLength=0.25)")
 
 
     def testUnlinkedTypeA(self):

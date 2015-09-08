@@ -7140,7 +7140,7 @@ class Stream(base.Music21Object):
 
         If set to None, then the default behavior of computing automatically from highestTime is reestablished.
         '''
-        if (isinstance(durationObj, duration.DurationCommon)):
+        if (isinstance(durationObj, duration.Duration)):
             self._unlinkedDuration = durationObj
         elif (durationObj is None):
             self._unlinkedDuration = None
@@ -7755,14 +7755,17 @@ class Stream(base.Music21Object):
         return returnObj
 
 
-    def scaleDurations(self, amountToScale, inPlace=True):
+    def scaleDurations(self, amountToScale, inPlace=False):
         '''
         Scale all durations by a provided scalar. Offsets are not modified.
 
         To augment or diminish a Stream, see the :meth:`~music21.stream.Stream.augmentOrDiminish` method.
 
+
+        We do not retain durations in any circumstance; if inPlace=True, two deepcopies are done
+        which can be quite slow.
+
         TODO: inPlace default should be False
-        TODO: if inPlace is True, return None
         '''
         if not amountToScale > 0:
             raise StreamException('amountToScale must be greater than zero')
@@ -7780,11 +7783,11 @@ class Stream(base.Music21Object):
             #elif hasattr(e, 'duration'):
             else:
                 if e.duration is not None:
-                    # inPlace is True as a  copy has already been made if nec
-                    e.duration.augmentOrDiminish(amountToScale, inPlace=True)
+                    e.duration = e.duration.augmentOrDiminish(amountToScale)
 
         returnObj.elementsChanged()
-        return returnObj
+        if inPlace is not True:
+            return returnObj
 
 
     def augmentOrDiminish(self, amountToScale, inPlace=False):
