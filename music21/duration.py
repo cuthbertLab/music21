@@ -372,7 +372,7 @@ def quarterLengthToNonPowerOf2Tuplet(qLen):
     >>> duration.quarterLengthToNonPowerOf2Tuplet(1)
     (<music21.duration.Tuplet 1/1/quarter>, DurationTuple(type='quarter', dots=0, quarterLength=1.0))
     '''    
-    qFrac = fractions.Fraction.from_float(1/qLen).limit_denominator(DENOM_LIMIT)
+    qFrac = fractions.Fraction.from_float(1/float(qLen)).limit_denominator(DENOM_LIMIT)
     qFracOrg = qFrac
     if qFrac.numerator < qFrac.denominator:
         while qFrac.numerator < qFrac.denominator:
@@ -1331,7 +1331,7 @@ class Duration(SlottedObject):
 
     Example 3: A Duration configured by keywords.
 
-    >>> d3 = duration.Duration(type = 'half', dots = 2)
+    >>> d3 = duration.Duration(type='half', dots=2)
     >>> d3.quarterLength
     3.5
     '''
@@ -1498,7 +1498,7 @@ class Duration(SlottedObject):
             for c in Duration(dur).components:
                 self.components.append(c)
         if self.linked:
-            self._quarterLengthNeedsUpdating
+            self._quarterLengthNeedsUpdating = True
 
     def appendTuplet(self, newTuplet):
         newTuplet.frozen = True
@@ -1539,11 +1539,8 @@ class Duration(SlottedObject):
         >>> len(bDur.components)
         2
         >>> bDur.components
-
-
-
-        [<music21.duration.DurationUnit 2.0>, <music21.duration.DurationUnit 0.125>]
-
+        [DurationTuple(type='half', dots=0, quarterLength=2.0), DurationTuple(type='32nd', dots=0, quarterLength=0.125)]
+\
         >>> cDur = bDur.augmentOrDiminish(2, retainComponents=True, inPlace=False)
         >>> cDur.quarterLength
         4.25
@@ -1683,13 +1680,13 @@ class Duration(SlottedObject):
         This does not handle fractional arguments.
 
         >>> components = []
-        >>> components.append(duration.Duration('quarter'))
-        >>> components.append(duration.Duration('quarter'))
-        >>> components.append(duration.Duration('quarter'))
+        >>> qdt = DurationTuple('quarter', 0, 1.0)
+        >>> components.append(qdt)
+        >>> components.append(qdt)
+        >>> components.append(qdt)
 
         >>> a = duration.Duration()
         >>> a.components = components
-        >>> a.updateQuarterLength()
         >>> a.quarterLength
         3.0
         >>> a.componentStartTime(0)
@@ -1799,16 +1796,17 @@ class Duration(SlottedObject):
         '''
         if self._componentsNeedUpdating:
             self._updateComponents()
-        # manually copy all components
-        components = []
-        for c in self.components:
-            components.append(copy.deepcopy(c))
+
         # create grace duration
         if appogiatura:
             gd = AppogiaturaDuration()
         else:
             gd = GraceDuration()
-        gd.components = components # set new components
+            
+        newComponents = []
+        for c in self.components:
+            newComponents.append(DurationTuple(c.type, c.dots, 0.0))
+        gd.components = newComponents # set new components
         gd.linked = False
         gd.quarterLength = 0.0
         return gd
@@ -1954,7 +1952,10 @@ class Duration(SlottedObject):
         if self.linked is True:
             self._qtrLength = opFrac(self.quarterLengthNoTuplets * self.aggregateTupletMultiplier())
             if self._dotGroups != (0,):
-                pass
+                for dots in self._dotGroups:
+                    if dots > 0:
+                        self._qtrLength *= common.dotMultiplier(dots)
+
         self._quarterLengthNeedsUpdating = False
 
     ### PUBLIC PROPERTIES ###
@@ -1992,7 +1993,7 @@ class Duration(SlottedObject):
         >>> a.dots = 1
         
 
-        >>> a.dotGroups = [1,1]
+        >>> a.dotGroups = (1,1)
         >>> a.quarterLength
         4.5
         '''
@@ -2005,8 +2006,12 @@ class Duration(SlottedObject):
 
     @dotGroups.setter
     def dotGroups(self, value):
-        if not common.isListLike(value):
-            raise DurationException('only list-like dotGroups values can be used with this method.')
+        if not isinstance(value, tuple):
+            raise DurationException('only tuple dotGroups values can be used with this method.')
+        # removes dots from all components...
+        for i in range(len(self._components)):
+            self._components[i] = durationTupleFromTypeDots(self._components[i].type, 0)
+        
         self._dotGroups = value
         self._quarterLengthNeedsUpdating
 
@@ -2132,9 +2137,9 @@ class Duration(SlottedObject):
             else:
                 msg.append('%s ' % typeStr)
                 
-            if tupletStr is not None:
-                    msg.append('%s ' % tupletStr)
-            if tupletStr is not None or dots >= 3 or typeStr.lower() == 'complex':
+            if tupletStr != "":
+                msg.append('%s ' % tupletStr)
+            if tupletStr != "" or dots >= 3 or typeStr.lower() == 'complex':
                 qlStr = common.mixedNumeral(self.quarterLength)
                 msg.append('(%s QL)' % (qlStr))
             totalMsg.append("".join(msg).strip())
@@ -2170,18 +2175,8 @@ class Duration(SlottedObject):
         2
 
         >>> aDur.components
-        [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 0.375>]
-
-        >>> bDur = duration.Duration()
-        >>> bDur.quarterLength = 1.6666666
-        >>> bDur.isComplex
-        True
-
-        >>> len(bDur.components)
-        2
-
-        >>> bDur.components
-        [<music21.duration.DurationUnit 1.0>, <music21.duration.DurationUnit 2/3>]
+        [DurationTuple(type='quarter', dots=0, quarterLength=1.0), 
+         DurationTuple(type='16th', dots=1, quarterLength=0.375)]
             
         >>> cDur = duration.Duration()
         >>> cDur.quarterLength = .25
@@ -2244,7 +2239,9 @@ class Duration(SlottedObject):
 
 
     def _setQuarterLength(self, value):
-        if self._qtrLength != value:
+        if self.linked is False:
+            self._qtrLength = value
+        elif self._qtrLength != value:
             value = opFrac(value)
             if value == 0.0 and self.linked is True:
                 self.clear()
@@ -2380,7 +2377,7 @@ class Duration(SlottedObject):
     @type.setter
     def type(self, value):
         # need to check that type is valid
-        if value not in ordinalTypeFromNum and value not in ('unexpressible', 'complex'):
+        if value not in ordinalTypeFromNum and value not in ('inexpressible', 'complex'):
             raise DurationException("no such type exists: %s" % value)
         
         self._type = value
@@ -2395,7 +2392,7 @@ def durationTupleFromQuarterLength(ql=1.0):
     Returns a DurationTuple for a given quarter length
     if the ql can be expressed as a type and number of dots
     (no tuplets, no complex duration, etc.).  If it can't be expressed,
-    returns an "unexpressible" DurationTuple.
+    returns an "inexpressible" DurationTuple.
     '''
     try:
         return _durationTupleCacheQuarterLength[ql]
@@ -2407,7 +2404,7 @@ def durationTupleFromQuarterLength(ql=1.0):
             _durationTupleCacheQuarterLength[ql] = nt
             return nt
         else:
-            return DurationTuple('unexpressible', 0, ql)
+            return DurationTuple('inexpressible', 0, ql)
         
             
 
