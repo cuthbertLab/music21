@@ -1,5 +1,5 @@
 
-from music21.duration import DurationException, typeToDuration, typeFromNumDict, convertTypeToQuarterLength, ordinalTypeFromNum, ZeroDuration, quarterLengthToClosestType, dottedMatch, nextLargerType, quarterLengthToTuplet
+from music21.duration import DurationException, typeToDuration, typeFromNumDict, convertTypeToQuarterLength, ordinalTypeFromNum, quarterLengthToClosestType, dottedMatch, nextLargerType, quarterLengthToTuplet
 from music21 import common
 from music21.common import opFrac
 

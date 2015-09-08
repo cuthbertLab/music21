@@ -249,8 +249,8 @@ class TupletState(State):
         '''
         super(TupletState, self).affectTokenAfterParse(n)
         newTup = duration.Tuplet()
-        newTup.durationActual.type = n.duration.type
-        newTup.durationNormal.type = n.duration.type
+        newTup.durationActual = duration.durationTupleFromTypeDots(n.duration.type, 0)
+        newTup.durationNormal = duration.durationTupleFromTypeDots(n.duration.type, 0)
         newTup.numberNotesActual = self.actual
         newTup.numberNotesNormal = self.normal
         n.duration.appendTuplet(newTup)
