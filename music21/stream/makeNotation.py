@@ -1042,9 +1042,6 @@ def makeTupletBrackets(s, inPlace=False):
     Given a Stream of mixed durations, designates the first and last tuplet of any group
     of tuplets as the start or end of the tuplet, respectively.
 
-    This plan looks not only at Durations, but components (DurationUnits) within Durations, 
-    as these might contain additional tuplets.
-
     Changed in 1.8::
     
         * `inPlace` is False by default
@@ -1082,8 +1079,8 @@ def makeTupletBrackets(s, inPlace=False):
         for n in notes:
             durationList.append(n.duration)
 
-    tupletMap = [] # a list of (tuplet obj / DurationUnit or Duration) pairs
-    for dur in durationList: # all DurationUnits
+    tupletMap = [] # a list of (tuplet obj / Duration) pairs
+    for dur in durationList: # all Duration objects
         tupletList = dur.tuplets
         if tupletList in [(), None]: # no tuplets, length is zero
             tupletMap.append([None, dur])
@@ -1094,16 +1091,16 @@ def makeTupletBrackets(s, inPlace=False):
         elif len(tupletList) == 1:
             tupletMap.append([tupletList[0], dur])
             if tupletList[0] != dur.tuplets[0]:
-                raise Exception('cannot access Tuplets object from within DurationUnit')
+                raise Exception('cannot access Tuplets object from within DurationTuple.')
         else:
             raise Exception('cannot handle these tuplets: %s' % tupletList)
 
 
-    # have a list of tuplet, DurationUnit pairs
+    # have a list of tuplet, Duration pairs
     completionCount = 0 # qLen currently filled
     completionTarget = None # qLen necessary to fill tuplet
     for i in range(len(tupletMap)):
-        tupletObj, durationUnit = tupletMap[i]
+        tupletObj, dur = tupletMap[i]
 
         if i > 0:
             tupletPrevious = tupletMap[i - 1][0]
@@ -1125,7 +1122,7 @@ def makeTupletBrackets(s, inPlace=False):
 
         if tupletObj is not None:
 #            thisNormalType = tuplet.durationNormal.type
-            completionCount = opFrac(completionCount + durationUnit.quarterLength)
+            completionCount = opFrac(completionCount + dur.quarterLength)
             # if previous tuplet is None, always start
             # always reset completion target
             if tupletPrevious is None or completionTarget is None:

@@ -2083,7 +2083,7 @@ class Duration(SlottedObject):
         elif len(self._components) > 1:
             raise DurationException("setting type on Complex note: Myke and Chris need to decide what that means")
         else:  # there must be 1 or more components
-            raise DurationException("Cannot set dots on an object with zero DurationUnits in its duration.components")
+            raise DurationException("Cannot set dots on an object with zero DurationTuples in its duration.components")
 
     @property
     def fullName(self):
