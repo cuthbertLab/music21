@@ -1032,9 +1032,7 @@ class Tuplet(object):
 
         >>> a.augmentOrDiminish(.5)
         >>> a.durationActual
-
-        <music21.duration.DurationUnit 0.25>
-
+        DurationTuple(type='16th', dots=0, quarterLength=0.25)
 
         >>> a.tupletMultiplier()
         Fraction(1, 3)
@@ -1050,8 +1048,8 @@ class Tuplet(object):
             post = copy.deepcopy(self)
 
         # duration units scale
-        post.durationActual.augmentOrDiminish(amountToScale, inPlace=True)
-        post.durationNormal.augmentOrDiminish(amountToScale, inPlace=True)
+        post.durationActual = post.durationActual.augmentOrDiminish(amountToScale)
+        post.durationNormal = post.durationNormal.augmentOrDiminish(amountToScale)
 
         # ratios stay the same
         #self.numberNotesActual = actual
@@ -1130,9 +1128,9 @@ class Tuplet(object):
         >>> a.totalTupletLength()
         1.0
         >>> a.numberNotesActual = 3
-        >>> a.durationActual = duration.Duration('half')
+        >>> a.durationActual = duration.durationTupleFromTypeDots('half', 0)
         >>> a.numberNotesNormal = 2
-        >>> a.durationNormal = duration.Duration('half')
+        >>> a.durationNormal = duration.durationTupleFromTypeDots('half', 0)
         >>> a.totalTupletLength()
         4.0
         >>> a.setRatio(5,4)
@@ -1933,19 +1931,20 @@ class Duration(SlottedObject):
         2.25
         >>> #_DOCS_SHOW n2.show() # generates a dotted-quarter tied to dotted-eighth
         '''
-        dG = self.dotGroups
-        if len(dG) < 2:
-            return copy.deepcopy(self)
-        else:
-            newDuration = copy.deepcopy(self)
-            newDuration.dotGroups = [0]
-            newDuration.components[0].dots = dG[0]
-            for i in range(1, len(dG)):
-                newComponent = copy.deepcopy(newDuration.components[i-1])
-                newComponent.type = nextSmallerType(newDuration.components[i-1].type)
-                newComponent.dots = dG[i]
-                newDuration.components.append(newComponent)
-            return newDuration
+        return duration.Duration(quarterLength=self.quarterLength)
+#         dG = self.dotGroups
+#         if len(dG) < 2:
+#             return copy.deepcopy(self)
+#         else:
+#             newDuration = copy.deepcopy(self)
+#             newDuration.dotGroups = [0]
+#             newDuration.components[0].dots = dG[0]
+#             for i in range(1, len(dG)):
+#                 newComponent = copy.deepcopy(newDuration.components[i-1])
+#                 newComponent.type = nextSmallerType(newDuration.components[i-1].type)
+#                 newComponent.dots = dG[i]
+#                 newDuration.components.append(newComponent)
+#             return newDuration
 
 
     def updateQuarterLength(self):
@@ -1954,6 +1953,8 @@ class Duration(SlottedObject):
         '''
         if self.linked is True:
             self._qtrLength = opFrac(self.quarterLengthNoTuplets * self.aggregateTupletMultiplier())
+            if self._dotGroups != (0,):
+                pass
         self._quarterLengthNeedsUpdating = False
 
     ### PUBLIC PROPERTIES ###
@@ -2006,13 +2007,8 @@ class Duration(SlottedObject):
     def dotGroups(self, value):
         if not common.isListLike(value):
             raise DurationException('only list-like dotGroups values can be used with this method.')
-        if len(self.components) == 1:
-            self.components[0].dotGroups = value
-            self._quarterLengthNeedsUpdating = True
-        elif len(self.components) > 1:
-            raise DurationException("setting dotGroups for complex: Myke and Chris need to decide what that means")
-        else: # there must be 1 or more components
-            raise DurationException("zero DurationUnits in components")
+        self._dotGroups = value
+        self._quarterLengthNeedsUpdating
 
     @property
     def dots(self):
@@ -2093,18 +2089,70 @@ class Duration(SlottedObject):
         >>> d.fullName
         'Zero Duration (0 total QL)'
         '''
-        if len(self.components) > 1:
+        totalMsg = []
+        if len(self.tuplets) > 0:
+            tupletStrList = []
+            for tup in self.tuplets:
+                tupletStrList.append(tup.fullName)
+            tupletStr = ' '.join(tupletStrList)
+        else:
+            tupletStr = ""
+        
+        for c in self.components:
+            dots = c.dots
+            if dots == 1:
+                dotStr = 'Dotted'
+            elif dots == 2:
+                dotStr = 'Double Dotted'
+            elif dots == 3:
+                dotStr = 'Triple Dotted'
+            elif dots == 4:
+                dotStr = 'Quadruple Dotted'
+            elif dots > 4:
+                dotStr = ('%d-Times Dotted' % dots)
+            else:
+                dotStr = ""
+            
             msg = []
-            for part in self.components:
-                msg.append(part.fullName)
-            msg = ' tied to '.join(msg)
+            typeStr = c.type
+            if dots >= 2 or (typeStr != 'longa' and typeStr != 'maxima'):
+                if dotStr is not None:
+                    msg.append('%s ' % dotStr)
+            else:
+                if dots == 0:
+                    msg.append('Imperfect ')
+                elif dots == 1:
+                    msg.append('Perfect ')
+            if typeStr[0] in ('1', '2', '3', '5', '6'):
+                pass # do nothing with capitalization
+            else:
+                typeStr = typeStr.title()
+            if typeStr.lower() == 'complex':
+                pass
+            else:
+                msg.append('%s ' % typeStr)
+                
+            if tupletStr is not None:
+                    msg.append('%s ' % tupletStr)
+            if tupletStr is not None or dots >= 3 or typeStr.lower() == 'complex':
+                qlStr = common.mixedNumeral(self.quarterLength)
+                msg.append('(%s QL)' % (qlStr))
+            totalMsg.append("".join(msg).strip())
+        
+        if len(self.components) == 0:
+            totalMsg.append('Zero Duration ')
+        
+        outMsg = ""
+        if len(totalMsg) > 1:
+            outMsg = ' tied to '.join(totalMsg)
+        else:
+            outMsg = totalMsg[0]
+        
+        if len(self.components) > 1:
             qlStr = common.mixedNumeral(self.quarterLength)
-            msg += ' (%s total QL)' % (qlStr)
-            return msg
-        if len(self.components) == 1:
-            return self.components[0].fullName
-        else: # zero components
-            return 'Zero Duration (0 total QL)'
+            outMsg += ' (%s total QL)' % (qlStr)
+
+        return outMsg
 
     @property
     def isComplex(self):
@@ -2729,8 +2777,11 @@ class TupletFixer(object):
             elif inverseExcessRatio == int(inverseExcessRatio): # redefine tuplets by GCD
                 smallestTupletType = ordinalTypeFromNum[smallestTupletTypeOrdinal]
                 for n in tupletGroup:
-                    n.duration.tuplets[0].durationNormal.type = smallestTupletType
-                    n.duration.tuplets[0].durationActual.type = smallestTupletType
+                    # TODO: this should be frozen!
+                    durt = durationTupleFromTypeDots(smallestTupletType, n.duration.tuplets[0].durationNormal.dots)
+                    n.duration.tuplets[0].durationNormal = durt
+                    durt = durationTupleFromTypeDots(smallestTupletType, n.duration.tuplets[0].durationActual.dots)
+                    n.duration.tuplets[0].durationActual = durt
             else:
                 pass
                 # print "Crazy!", currentTupletDuration, totalTupletDuration, excess
