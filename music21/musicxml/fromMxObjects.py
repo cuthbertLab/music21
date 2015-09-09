@@ -3414,23 +3414,23 @@ class Test(unittest.TestCase):
 
 
     def testBarRepeatConversion(self):
-        from music21 import corpus
+        from music21 import corpus, converter
 
         #a = converter.parse(testPrimitive.simpleRepeat45a)
         # this is a good example with repeats
-        s = corpus.parse('k80/movement3')
+        s = converter.parse(corpus.getWorkList('k80/movement3')[0], format='oldmusicxml')
         for p in s.parts:
             post = p.flat.getElementsByClass('Repeat')
             self.assertEqual(len(post), 6)
 
-        #a = corpus.parse('opus41no1/movement3')
+        #a = converter.parse(corpus.getWorkList('opus41no1/movement3')[0], format='oldmusicxml')
         #s.show()
 
     def testVoices(self):
         from music21 import converter
         from music21.musicxml import testPrimitive
 
-        s = converter.parse(testPrimitive.voiceDouble)
+        s = converter.parse(testPrimitive.voiceDouble, format='oldmusicxml')
         m1 = s.parts[0].getElementsByClass('Measure')[0]
         self.assertEqual(m1.hasVoices(), True)
 
@@ -3448,7 +3448,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21.musicxml import testPrimitive
 
-        s = converter.parse(testPrimitive.spannersSlurs33c)
+        s = converter.parse(testPrimitive.spannersSlurs33c, format='oldmusicxml')
         # have 10 spanners
         self.assertEqual(len(s.flat.getElementsByClass('Spanner')), 5)
 
@@ -3473,7 +3473,7 @@ class Test(unittest.TestCase):
         p1 = mxDoc.score.componentList[0]
         self.assertEqual(p1.getStavesCount(), 2)
 
-        s = converter.parse(testPrimitive.pianoStaff43a)
+        s = converter.parse(testPrimitive.pianoStaff43a, format='oldmusicxml')
         self.assertEqual(len(s.parts), 2)
         #s.show()
         self.assertEqual(len(s.parts[0].flat.getElementsByClass('Note')), 1)
@@ -3487,7 +3487,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21.musicxml import testFiles
 
-        s = converter.parse(testFiles.moussorgskyPromenade) # @UndefinedVariable
+        s = converter.parse(testFiles.moussorgskyPromenade, format='oldmusicxml') # @UndefinedVariable
         self.assertEqual(len(s.parts), 2)
 
         self.assertEqual(len(s.parts[0].flat.getElementsByClass('Note')), 19)
@@ -3501,11 +3501,11 @@ class Test(unittest.TestCase):
 
 
     def testMultipleStavesPerPartC(self):
-        from music21 import corpus
-        s = corpus.parse('schoenberg/opus19/movement2')
+        from music21 import corpus, converter
+        s = converter.parse(corpus.getWorkList('schoenberg/opus19/movement2')[0], format='oldmusicxml')
         self.assertEqual(len(s.parts), 2)
 
-        s = corpus.parse('schoenberg/opus19/movement6')
+        s = converter.parse(corpus.getWorkList('schoenberg/opus19/movement6')[0], format='oldmusicxml')
         self.assertEqual(len(s.parts), 2)
 
         #s.show()
@@ -3515,7 +3515,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21.musicxml import testPrimitive
 
-        s = converter.parse(testPrimitive.spanners33a)
+        s = converter.parse(testPrimitive.spanners33a, format='oldmusicxml')
         # this number will change as more are being imported
         self.assertEqual(len(s.flat.spanners) >= 2, True)
 
@@ -3538,7 +3538,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21.musicxml import testPrimitive
 
-        s = converter.parse(testPrimitive.textExpressions)
+        s = converter.parse(testPrimitive.textExpressions, format='oldmusicxml')
         #s.show() 
         self.assertEqual(len(s.flat.getElementsByClass('TextExpression')), 3)
 
@@ -3556,8 +3556,8 @@ class Test(unittest.TestCase):
 
 
     def testTextExpressionsC(self):
-        from music21 import corpus
-        s = corpus.parse('bwv66.6')
+        from music21 import corpus, converter
+        s = converter.parse(corpus.getWorkList('bwv66.6')[0], format='oldmusicxml')
         p = s.parts[0]
         for m in p.getElementsByClass('Measure'):
             for n in m.flat.notes:
@@ -3574,9 +3574,9 @@ class Test(unittest.TestCase):
 
 
     def testTextExpressionsD(self):
-        from music21 import corpus
+        from music21 import corpus, converter
         # test placing text expression in arbitrary locations
-        s = corpus.parse('bwv66.6')
+        s = converter.parse(corpus.getWorkList('bwv66.6')[0], format='oldmusicxml')
         p = s.parts[-1] # get bass
         for m in p.getElementsByClass('Measure')[1:]:
             for pos in [1.5, 2.5]:
@@ -3615,19 +3615,19 @@ class Test(unittest.TestCase):
         from music21 import converter
 
         # has one segno
-        s = converter.parse(testPrimitive.repeatExpressionsA)
+        s = converter.parse(testPrimitive.repeatExpressionsA, format='oldmusicxml')
         self.assertEqual(len(s.flat.getElementsByClass(repeat.Segno)), 1)
         self.assertEqual(len(s.flat.getElementsByClass(repeat.Fine)), 1)
         self.assertEqual(len(s.flat.getElementsByClass(repeat.DalSegnoAlFine)), 1)
 
         # has two codas
-        s = converter.parse(testPrimitive.repeatExpressionsB)
+        s = converter.parse(testPrimitive.repeatExpressionsB, format='oldmusicxml')
         self.assertEqual(len(s.flat.getElementsByClass(repeat.Coda)), 2)
         # has one d.c.al coda
         self.assertEqual(len(s.flat.getElementsByClass(repeat.DaCapoAlCoda)), 1)
 
     def testImportRepeatBracketA(self):
-        from music21 import corpus
+        from music21 import corpus, converter
         # has repeats in it; start with single emasure
         s = corpus.parse('opus74no1', 3)
         # there are 2 for each part, totaling 8
@@ -3650,7 +3650,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         # this 2 part segments was importing multiple voices within
         # a measure, even though there was no data in the second voice
-        s = converter.parse(testPrimitive.mixedVoices1a)
+        s = converter.parse(testPrimitive.mixedVoices1a, format='oldmusicxml')
         self.assertEqual(len(s.parts), 2)
         # there are voices, but they have been removed
         self.assertEqual(len(s.parts[0].getElementsByClass(
@@ -3658,14 +3658,14 @@ class Test(unittest.TestCase):
 
         #s.parts[0].show('t')
         #self.assertEqual(len(s.parts[0].voices), 2)
-        s = converter.parse(testPrimitive.mixedVoices1b)
+        s = converter.parse(testPrimitive.mixedVoices1b, format='oldmusicxml')
         self.assertEqual(len(s.parts), 2)
         self.assertEqual(len(s.parts[0].getElementsByClass(
             'Measure')[0].voices), 0)
         #s.parts[0].show('t')
 
         # this case, there were 4, but there should be 2
-        s = converter.parse(testPrimitive.mixedVoices2)
+        s = converter.parse(testPrimitive.mixedVoices2, format='oldmusicxml')
         self.assertEqual(len(s.parts), 2)
         self.assertEqual(len(s.parts[0].getElementsByClass(
             'Measure')[0].voices), 2)
@@ -3682,7 +3682,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
         from music21 import converter
         # has metronome marks defined, not with sound tag
-        s = converter.parse(testPrimitive.metronomeMarks31c)
+        s = converter.parse(testPrimitive.metronomeMarks31c, format='oldmusicxml')
         # get all tempo indications
         mms = s.flat.getElementsByClass('TempoIndication')
         self.assertEqual(len(mms) > 3, True)
@@ -3697,11 +3697,11 @@ class Test(unittest.TestCase):
         #s = converter.parse(testPrimitive.articulations01)
         #s.show()
 
-    def testImportGraceNotesA(self):
+    def xtestImportGraceNotesA(self):
         # test importing from musicxml
         from music21.musicxml import testPrimitive
         from music21 import converter
-        unused_s = converter.parse(testPrimitive.graceNotes24a)
+        unused_s = converter.parse(testPrimitive.graceNotes24a, format='oldmusicxml')
 
         #s.show()
 
@@ -3722,7 +3722,7 @@ class Test(unittest.TestCase):
         xml = m21ToString.fromMusic21Object(c)
         #print xml
         #c.show()
-        inputStream = converter.parse(xml)
+        inputStream = converter.parse(xml, format='oldmusicxml')
         chordResult = inputStream.flat.notes[0]
 #         for n in chordResult:
 #             print n.stemDirection       
@@ -3735,7 +3735,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
         from music21 import converter
 
-        s = converter.parse(testPrimitive.staffGroupsNested41d)
+        s = converter.parse(testPrimitive.staffGroupsNested41d, format='oldmusicxml')
         self.assertEqual(len(s.getElementsByClass('StaffGroup')), 2)
         #raw = s.musicxml
         sg1 = s.getElementsByClass('StaffGroup')[0]
@@ -3750,7 +3750,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
         from music21 import converter
 
-        s = converter.parse(testPrimitive.transposingInstruments72a)
+        s = converter.parse(testPrimitive.transposingInstruments72a, format='oldmusicxml')
         i1 = s.parts[0].flat.getElementsByClass('Instrument')[0]
         i2 = s.parts[1].flat.getElementsByClass('Instrument')[0]
         i3 = s.parts[2].flat.getElementsByClass('Instrument')[0]
@@ -3763,7 +3763,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
         from music21 import converter
 
-        s = converter.parse(testPrimitive.transposing01)
+        s = converter.parse(testPrimitive.transposing01, format='oldmusicxml')
         iStream1 = s.parts[0].flat.getElementsByClass('Instrument')
         # three instruments; one initial, and then one for each transposition
         self.assertEqual(len(iStream1), 3)
@@ -3806,16 +3806,16 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21.musicxml import testPrimitive
 
-        s = converter.parse(testPrimitive.transposing01)
+        s = converter.parse(testPrimitive.transposing01, format='oldmusicxml')
         self.assertEqual(len(s.flat.getElementsByClass('Instrument')), 7)
         #s.show()
 
 
 
     def testHarmonyA(self):
-        from music21 import corpus
+        from music21 import corpus, converter
 
-        s = corpus.parse('leadSheet/berlinAlexandersRagtime.xml')
+        s = converter.parse(corpus.getWorkList('leadSheet/berlinAlexandersRagtime')[0], format='oldmusicxml')
         self.assertEqual(len(s.flat.getElementsByClass('ChordSymbol')), 19)
 
         match = [h.chordKind for h in s.flat.getElementsByClass('ChordSymbol')]
@@ -3830,18 +3830,18 @@ class Test(unittest.TestCase):
         self.assertEqual(match, set(['F','F7','B-','C7','G7','C']))
 
 
-        s = corpus.parse('monteverdi/madrigal.3.12.xml')
+        s = converter.parse(corpus.getWorkList('monteverdi/madrigal.3.12')[0], format='oldmusicxml')
         self.assertEqual(len(s.flat.getElementsByClass('ChordSymbol')), 10)
 
-        s = corpus.parse('leadSheet/fosterBrownHair.xml')
+        s = converter.parse(corpus.getWorkList('leadSheet/fosterBrownHair')[0], format='oldmusicxml')
         self.assertEqual(len(s.flat.getElementsByClass('ChordSymbol')), 40)
 
         #s.show()
 
     def testOrnamentandTechnical(self):
-        from music21 import corpus
+        from music21 import corpus, converter
 
-        s = corpus.parse('opus133')
+        s = converter.parse(corpus.getWorkList('opus133')[0], format='oldmusicxml')
         ex = s.parts[0]
         countTrill = 0
         for n in ex.flat.notes:
@@ -3864,7 +3864,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
 
         # has many ornaments
-        s = converter.parse(testPrimitive.notations32a)
+        s = converter.parse(testPrimitive.notations32a, format='oldmusicxml')
 
         #s.flat.show('t')
         self.assertEqual(len(s.flat.getElementsByClass('TremoloSpanner')), 0) # no spanned tremolos
@@ -3909,7 +3909,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21.musicxml import testPrimitive
 
-        s = converter.parse(testPrimitive.textBoxes01)
+        s = converter.parse(testPrimitive.textBoxes01, format='oldmusicxml')
         tbs = s.flat.getElementsByClass('TextBox')
         self.assertEqual(len(tbs), 5)
 
@@ -3919,10 +3919,10 @@ class Test(unittest.TestCase):
         self.assertEqual(msg, [u'This is a text box!', u'pos 200/300 (lower left)', u'pos 1000/300 (lower right)', u'pos 200/1500 (upper left)', u'pos 1000/1500 (upper right)'])
 
     def testImportSlursA(self):
-        from music21 import corpus
+        from music21 import corpus, converter
         # this is a good test as this encoding uses staffs, not parts
         # to encode both parts; this requires special spanner handling
-        s = corpus.parse('mozart/k545/movement1_exposition')
+        s = converter.parse(corpus.getWorkList('mozart/k545/movement1_exposition')[0], format='oldmusicxml')
         sf = s.flat       
         slurs = sf.getElementsByClass(spanner.Slur)
         # TODO: this value should be 2, but due to staff encoding we 
@@ -3941,7 +3941,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21.musicxml import testPrimitive
 
-        s = converter.parse(testPrimitive.spanners33a)
+        s = converter.parse(testPrimitive.spanners33a, format='oldmusicxml')
         self.assertEqual(len(s.flat.getElementsByClass('Crescendo')), 1)
         self.assertEqual(len(s.flat.getElementsByClass('Diminuendo')), 1)
 
@@ -3951,7 +3951,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
 
         # this produces a single component cresc
-        s = converter.parse(testPrimitive.directions31a)
+        s = converter.parse(testPrimitive.directions31a, format='oldmusicxml')
         self.assertEqual(len(s.flat.getElementsByClass('Crescendo')), 2)
 
 
@@ -3959,7 +3959,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21.musicxml import testPrimitive
 
-        s = converter.parse(testPrimitive.spanners33a)
+        s = converter.parse(testPrimitive.spanners33a, format='oldmusicxml')
         #s.show()
         self.assertEqual(len(s.flat.getElementsByClass('Line')), 6)
 
@@ -3967,7 +3967,7 @@ class Test(unittest.TestCase):
     def testTrillExtensionImportA(self):
         from music21 import converter
         from music21.musicxml import testPrimitive
-        s = converter.parse(testPrimitive.notations32a)
+        s = converter.parse(testPrimitive.notations32a, format='oldmusicxml')
         #s.show()
         self.assertEqual(len(s.flat.getElementsByClass('TrillExtension')), 2)
 
@@ -3975,7 +3975,7 @@ class Test(unittest.TestCase):
     def testGlissandoImportA(self):
         from music21 import converter
         from music21.musicxml import testPrimitive
-        s = converter.parse(testPrimitive.spanners33a)
+        s = converter.parse(testPrimitive.spanners33a, format='oldmusicxml')
         #s.show()
         self.assertEqual(len(s.flat.getElementsByClass('Glissando')), 1)
 
@@ -3985,7 +3985,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21.musicxml import testPrimitive
 
-        s = converter.parse(testPrimitive.spanners33a)
+        s = converter.parse(testPrimitive.spanners33a, format='oldmusicxml')
         self.assertEqual(len(s.flat.getElementsByClass('Line')), 6)
 
 
@@ -3993,7 +3993,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21.musicxml import testPrimitive
 
-        s = converter.parse(testPrimitive.graceNotes24a)
+        s = converter.parse(testPrimitive.graceNotes24a, format='oldmusicxml')
         #s.show()        
         match = [str(p) for p in s.pitches]
         #print match
