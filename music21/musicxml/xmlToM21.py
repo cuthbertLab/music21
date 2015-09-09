@@ -1695,7 +1695,7 @@ class MeasureParser(XMLParserBase):
         1
         '''
         if inputM21 == None:
-            d = duration.Duration()
+            d = None
         else:
             d = inputM21
     
@@ -1732,27 +1732,33 @@ class MeasureParser(XMLParserBase):
             
         # two ways to create durations, raw (from qLen) and cooked (from type, time-mod, dots)
         if forceRaw:
-            #environLocal.printDebug(['forced to use raw duration', durRaw])
-            durRaw = duration.Duration() # raw just uses qLen
-            # the qLen set here may not be computable, but is not immediately
-            # computed until setting components
-            durRaw.quarterLength = qLen
-            try:
-                d.components = durRaw.components
-            except duration.DurationException:
-                environLocal.warn(['mxToDuration', 'supplying quarterLength of 1 as type is not ' +
-                                   'defined and raw quarterlength (%s) is not a computable duration' % qLen])
-                environLocal.printDebug(['mxToDuration', 'raw qLen', qLen, durationType, 
-                                         'mxNote.duration:', mxNote.duration, 
-                                         'last mxDivisions:', divisions])
-                durRaw.quarterLength = 1.
+            if d is not None:
+                #environLocal.printDebug(['forced to use raw duration', durRaw])
+                durRaw = duration.Duration() # raw just uses qLen
+                # the qLen set here may not be computable, but is not immediately
+                # computed until setting components
+                durRaw.quarterLength = qLen
+                try:
+                    d.components = durRaw.components
+                except duration.DurationException:
+                    environLocal.warn(['mxToDuration', 'supplying quarterLength of 1 as type is not ' +
+                                       'defined and raw quarterlength (%s) is not a computable duration' % qLen])
+                    environLocal.printDebug(['mxToDuration', 'raw qLen', qLen, durationType, 
+                                             'mxNote.duration:', mxNote.duration, 
+                                             'last mxDivisions:', divisions])
+                    durRaw.quarterLength = 1.
+            else:
+                d = duration.Duration(quarterLength=qLen)
         else: # a cooked version builds up from pieces
-            durUnit = duration.DurationUnit()
-            durUnit.type = durationType
-            durUnit.dots = numDots
-            if not tup == None:
-                durUnit.appendTuplet(tup)
-            d.components = [durUnit]
+            dt = duration.durationTupleFromTypeDots(durationType, numDots)
+            if d is not None:
+                d.clear()
+                d.addDurationTuple(dt)
+            else:
+                d = duration.Duration(durationTuple=dt)
+
+            if tup is not None:
+                d.appendTuplet(tup)
     
         if inputM21 is None:
             return d    

@@ -1393,6 +1393,9 @@ class Duration(SlottedObject):
                 raise DurationException("Cannot parse argument {0}".format(a))
 
         
+        if 'durationTuple' in keywords:
+            self.addDurationTuple(keywords['durationTuple'])
+        
         if 'dots' in keywords:
             storeDots = keywords['dots']
         else:
