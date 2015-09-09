@@ -384,7 +384,7 @@ dashes aren't allowed in variable names:
 ::
 
 
-      File "<ipython-input-18-d519b3e88921>", line 1
+      File "<ipython-input-17-d519b3e88921>", line 1
         b-flat = note.Note("B-2")
     SyntaxError: can't assign to operator
 
@@ -531,9 +531,10 @@ you try to access it, you'll get an error:
 
 
     ---------------------------------------------------------------------------
+
     AttributeError                            Traceback (most recent call last)
 
-    <ipython-input-26-3e7bfdcb790a> in <module>()
+    <ipython-input-25-3e7bfdcb790a> in <module>()
     ----> 1 bflat.wasWrittenByStockhausen
     
 
@@ -732,9 +733,10 @@ Since ``d.accidental`` is ``None`` does this mean that
 
 
     ---------------------------------------------------------------------------
+
     AttributeError                            Traceback (most recent call last)
 
-    <ipython-input-39-2b6769f305a4> in <module>()
+    <ipython-input-37-2b6769f305a4> in <module>()
     ----> 1 d.accidental.name
     
 

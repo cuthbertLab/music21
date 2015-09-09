@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         convertIPythonNotebooksToReST.py
+# Name:         documentation/library/iterators.py
 # Purpose:      music21 documentation IPython notebook to ReST converter
 #
 # Authors:      Josiah Wolf Oberholtzer
