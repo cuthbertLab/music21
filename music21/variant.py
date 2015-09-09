@@ -1585,7 +1585,7 @@ def _doVariantFixingOnStream(s, variantNames = None):
     '''
     
     for v in s.variants:
-        if type(variantNames) is list: #If variantNames are controlled
+        if isinstance(variantNames, list): #If variantNames are controlled
             if set(v.groups) & set(variantNames) is []: # and if this variant is not in the controlled list
                 continue # then skip it
         else: # otherwise, skip it unless it is a strict insertion of deletion
