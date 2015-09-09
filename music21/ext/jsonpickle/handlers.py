@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 Custom handlers may be created to handle other objects. Each custom handler
 must derive from :class:`jsonpickle.handlers.BaseHandler` and
@@ -20,35 +22,76 @@ objects that implement the reduce protocol::
 
 """
 
-import sys
-import datetime
-import time
 import collections
+import copy
+import datetime
 import decimal
+import re
+import sys
+import time
 
-from jsonpickle import util # @UnresolvedImport
-from jsonpickle.compat import unicode # @UnresolvedImport
+from jsonpickle import util
+from jsonpickle.compat import unicode
+from jsonpickle.compat import queue
 
 
 class Registry(object):
 
     def __init__(self):
         self._handlers = {}
+        self._base_handlers = {}
 
-    def register(self, cls, handler):
+    def get(self, cls_or_name, default=None):
+        """
+        :param cls_or_name: the type or its fully qualified name
+        :param default: default value, if a matching handler is not found
+
+        Looks up a handler by type reference or its fully qualified name. If a direct match
+        is not found, the search is performed over all handlers registered with base=True.
+        """
+        handler = self._handlers.get(cls_or_name)
+        if handler is None and util.is_type(cls_or_name):  # attempt to find a base class
+            for cls, base_handler in self._base_handlers.items():
+                if issubclass(cls_or_name, cls):
+                    return base_handler
+        return default if handler is None else handler
+
+    def register(self, cls, handler=None, base=False):
         """Register the a custom handler for a class
 
         :param cls: The custom object class to handle
-        :param handler: The custom handler class
+        :param handler: The custom handler class (if None, a decorator wrapper is returned)
+        :param base: Indicates whether the handler should be registered for all subclasses
 
+        This function can be also used as a decorator by omitting the `handler` argument:
+
+        @jsonpickle.handlers.register(Foo, base=True)
+        class FooHandler(jsonpickle.handlers.BaseHandler):
+            pass
         """
-        self._handlers[cls] = handler
+        if handler is None:
+            def _register(handler_cls):
+                self.register(cls, handler=handler_cls, base=base)
+                return handler_cls
+            return _register
+        if not util.is_type(cls):
+            raise TypeError('{0!r} is not a class/type'.format(cls))
+        # store both the name and the actual type for the ugly cases like
+        # _sre.SRE_Pattern that cannot be loaded back directly
+        self._handlers[util.importable_name(cls)] = self._handlers[cls] = handler
+        if base:
+            # only store the actual type for subclass checking
+            self._base_handlers[cls] = handler
 
-    def get(self, cls):
-        return self._handlers.get(cls)
+    def unregister(self, cls):
+        self._handlers.pop(cls, None)
+        self._handlers.pop(util.importable_name(cls), None)
+        self._base_handlers.pop(cls, None)
+
 
 registry = Registry()
 register = registry.register
+unregister = registry.unregister
 get = registry.get
 
 
@@ -65,12 +108,22 @@ class BaseHandler(object):
         self.context = context
 
     def flatten(self, obj, data):
-        """Flatten `obj` into a json-friendly form and write result in `data`"""
+        """
+        Flatten `obj` into a json-friendly form and write result to `data`.
+
+        :param object obj: The object to be serialized.
+        :param dict data: A partially filled dictionary which will contain the
+            json-friendly representation of `obj` once this method has
+            finished.
+        """
         raise NotImplementedError('You must implement flatten() in %s' %
                                   self.__class__)
 
     def restore(self, obj):
-        """Restore the json-friendly `obj` to the registered type"""
+        """
+        Restore an object of the registered type from the json-friendly
+        representation `obj` and return it.
+        """
         raise NotImplementedError('You must implement restore() in %s' %
                                   self.__class__)
 
@@ -109,8 +162,8 @@ class DatetimeHandler(BaseHandler):
         data['__reduce__'] = (flatten(cls, reset=False), args)
         return data
 
-    def restore(self, obj):
-        cls, args = obj['__reduce__']
+    def restore(self, data):
+        cls, args = data['__reduce__']
         unpickler = self.context
         restore = unpickler.restore
         cls = restore(cls, reset=False)
@@ -124,21 +177,34 @@ DatetimeHandler.handles(datetime.date)
 DatetimeHandler.handles(datetime.time)
 
 
-class SimpleReduceHandler(BaseHandler):
-    """
-    Follow the __reduce__ protocol to pickle an object. As long as the factory
-    and its arguments are pickleable, this should pickle any object that
-    implements the reduce protocol.
-    """
+class RegexHandler(BaseHandler):
+    """Flatten _sre.SRE_Pattern (compiled regex) objects"""
 
+    def flatten(self, obj, data):
+        data['pattern'] = obj.pattern
+        return data
+
+    def restore(self, data):
+        return re.compile(data['pattern'])
+
+RegexHandler.handles(type(re.compile('')))
+
+
+class SimpleReduceHandler(BaseHandler):
+    """Follow the __reduce__ protocol to pickle an object.
+
+    As long as the factory and its arguments are pickleable, this should
+    pickle any object that implements the reduce protocol.
+
+    """
     def flatten(self, obj, data):
         flatten = self.context.flatten
         data['__reduce__'] = [flatten(i, reset=False) for i in obj.__reduce__()]
         return data
 
-    def restore(self, obj):
+    def restore(self, data):
         restore = self.context.restore
-        factory, args = [restore(i, reset=False) for i in obj['__reduce__']]
+        factory, args = [restore(i, reset=False) for i in data['__reduce__']]
         return factory(*args)
 
 
@@ -166,6 +232,7 @@ class OrderedDictReduceHandler(SimpleReduceHandler):
 
 SimpleReduceHandler.handles(time.struct_time)
 SimpleReduceHandler.handles(datetime.timedelta)
+SimpleReduceHandler.handles(collections.deque)
 if sys.version_info >= (2, 7):
     SimpleReduceHandler.handles(collections.Counter)
     if sys.version_info >= (3, 4):
@@ -181,3 +248,33 @@ try:
     SimpleReduceHandler.handles(posix.stat_result)
 except ImportError:
     pass
+
+
+class QueueHandler(BaseHandler):
+    """Opaquely serializes Queue objects
+
+    Queues contains mutex and condition variables which cannot be serialized.
+    Construct a new Queue instance when restoring.
+
+    """
+    def flatten(self, obj, data):
+        return data
+
+    def restore(self, data):
+        return queue.Queue()
+
+QueueHandler.handles(queue.Queue)
+
+
+class CloneFactory(object):
+    """Serialization proxy for collections.defaultdict's default_factory"""
+
+    def __init__(self, exemplar):
+        self.exemplar = exemplar
+
+    def __call__(self, clone=copy.copy):
+        """Create new instances by making copies of the provided exemplar"""
+        return clone(self.exemplar)
+
+    def __repr__(self):
+        return ('<CloneFactory object at 0x%x (%s)>' % (id(self), self.exemplar))

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         smt2011.py
-# Purpose:      Demonstrations for the SMT 2011 poster session
+# Name:         icmc2011.py
+# Purpose:      Demonstrations for the ICMC 2011 poster session
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2009-10 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-11 Michael Scott Cuthbert and the music21 Project
 # License:      BSD or LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ import unittest
 from music21 import alpha, note, stream, clef, metadata, spanner, environment, converter, scale, corpus, common
 
 
-_MOD = 'demo/smt2010.py'
+_MOD = 'demo/icmc2011.py'
 environLocal = environment.Environment(_MOD)
 
 
@@ -105,7 +105,7 @@ class Test(unittest.TestCase):
         assert n2.getOffsetBySite(m1) == 2.0
         assert n2.getOffsetBySite(s2) == 10
         # the None site provides a default offset
-        assert n2.sites.getSites() == [None, m1, s2, s3]
+        assert set(n2.sites.getSites()) == set([None, m1, s2, s3])
         # the same instance is found in all Streams
         assert m1.hasElement(n2) == True
         assert s2.hasElement(n2) == True

@@ -982,7 +982,12 @@ class Music21Object(object):
         tend to reside in modules closer to their musical function:
 
         >>> sp2 = dynamics.Crescendo(n2, n1)
-        >>> n2.getSpannerSites() == [sp1, sp2]
+        
+        The order that Spanners are returned is usually the order they
+        were created, but on fast computers there can be ties, so use
+        a set comparison if you expect multiple:
+        
+        >>> set(n2.getSpannerSites()) == set([sp1, sp2])
         True
 
         Optionally a class name or list of class names can be
@@ -994,13 +999,11 @@ class Music21Object(object):
 
         A larger class name can be used to get all subclasses:
 
-        >>> n2.getSpannerSites('DynamicWedge') == [sp2, sp3]
+        >>> set(n2.getSpannerSites('DynamicWedge')) == set([sp2, sp3])
         True
-        >>> n2.getSpannerSites(['Slur','Diminuendo']) == [sp1, sp3]
+        >>> set(n2.getSpannerSites(['Slur','Diminuendo'])) == set([sp1, sp3])
         True
 
-        The order spanners are returned is generally the order that they were
-        added, but that is not guaranteed, so for safety sake, use set comparisons:
 
         >>> set(n2.getSpannerSites(['Slur','Diminuendo'])) == set([sp3, sp1])
         True
@@ -2674,7 +2677,7 @@ class Music21Object(object):
     def splitAtDurations(self):
         '''
         Takes a Music21Object (e.g., a note.Note) and returns a list of similar
-        objects with only a single duration.DurationUnit in each.
+        objects with only a single duration.DurationTuple in each.
         Ties are added if the object supports ties.
 
         Articulations only appear on the first note.  Same with lyrics.
@@ -2684,19 +2687,25 @@ class Music21Object(object):
 
         >>> a = note.Note()
         >>> a.duration.clear() # remove defaults
-        >>> a.duration.addDurationUnit(duration.Duration('half'))
+        >>> a.duration.addDurationTuple(duration.durationTupleFromTypeDots('half', 0))
         >>> a.duration.quarterLength
         2.0
-        >>> a.duration.addDurationUnit(duration.Duration('whole'))
+        >>> a.duration.addDurationTuple(duration.durationTupleFromTypeDots('whole', 0))
         >>> a.duration.quarterLength
         6.0
         >>> b = a.splitAtDurations()
+        >>> b
+        [<music21.note.Note C>, <music21.note.Note C>]
         >>> b[0].pitch == b[1].pitch
         True
+        >>> b[0].duration
+        <music21.duration.Duration 2.0>
         >>> b[0].duration.type
         'half'
         >>> b[1].duration.type
         'whole'
+        >>> b[0].quarterLength, b[1].quarterLength
+        (2.0, 4.0)
 
         >>> c = note.Note()
         >>> c.quarterLength = 2.5
@@ -2734,7 +2743,11 @@ class Music21Object(object):
             raise Exception('cannot split an element that has a Duration of None')
 
         returnNotes = []
-        linkageType = self.duration.linkage
+        if hasattr(self, 'linkage'):
+            linkageType = self.linkage
+        else:
+            linkageType = None
+
         for i in range(len(self.duration.components)):
             tempNote = copy.deepcopy(self)
             if i != 0:
@@ -2744,7 +2757,8 @@ class Music21Object(object):
                 if hasattr(tempNote, 'lyrics'):
                     tempNote.lyrics = []
 
-            tempNote.duration = self.duration.components[i]
+            tempNote.duration.clear()
+            tempNote.duration.addDurationTuple(self.duration.components[i])
             if i != (len(self.duration.components) - 1): # if not last note, use linkage
                 if linkageType is None:
                     pass
@@ -4292,7 +4306,9 @@ class Test(unittest.TestCase):
 
         # test same for inherited classes and multiple sites, in order...
         sp2 = dynamics.Crescendo(n2, n1)
-        self.assertEqual(n2.getSpannerSites(), [sp1, sp2])
+        # can return in arbitrary order esp. if speed is fast... 
+        # TODO: use Ordered Dict.
+        self.assertEqual(set(n2.getSpannerSites()), set([sp1, sp2]))
 
         #Optionally a class name or list of class names can be
         #specified and only Spanners of that class will be returned
@@ -4302,8 +4318,8 @@ class Test(unittest.TestCase):
 
         # A larger class name can be used to get all subclasses:
 
-        self.assertEqual(n2.getSpannerSites('DynamicWedge'), [sp2, sp3])
-        self.assertEqual(n2.getSpannerSites(['Slur', 'Diminuendo']), [sp1, sp3])
+        self.assertEqual(set(n2.getSpannerSites('DynamicWedge')), set([sp2, sp3]))
+        self.assertEqual(set(n2.getSpannerSites(['Slur', 'Diminuendo'])), set([sp1, sp3]))
 
         #The order spanners are returned is generally the order that they were
         #added, but that is not guaranteed, so for safety sake, use set comparisons:

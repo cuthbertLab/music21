@@ -1042,9 +1042,6 @@ def makeTupletBrackets(s, inPlace=False):
     Given a Stream of mixed durations, designates the first and last tuplet of any group
     of tuplets as the start or end of the tuplet, respectively.
 
-    This plan looks not only at Durations, but components (DurationUnits) within Durations, 
-    as these might contain additional tuplets.
-
     Changed in 1.8::
     
         * `inPlace` is False by default
@@ -1065,17 +1062,11 @@ def makeTupletBrackets(s, inPlace=False):
     >>> tupletTypes
     ['start', None, 'stop', 'start', None, 'stop']
     '''
-    durationUnitList = []
+    durationList = []
     
     # legacy -- works on lists not just streams...
     if isinstance(s, list) or isinstance(s, tuple):
-        for thisDuration in s:
-            if isinstance(thisDuration, duration.Duration):
-                for c in thisDuration.components:
-                    durationUnitList.append(c)
-            else:
-                durationUnitList.append(thisDuration) # emulate Duration.components
-
+        durationList = s
     else:
         # Stream, as it should be...
         if not inPlace:  # make a copy
@@ -1086,31 +1077,30 @@ def makeTupletBrackets(s, inPlace=False):
         # only want to look at notes
         notes = returnObj.notesAndRests
         for n in notes:
-            for d in n.duration.components:
-                durationUnitList.append(d)
+            durationList.append(n.duration)
 
-    tupletMap = [] # a list of (tuplet obj / DurationUnit or Duration) pairs
-    for durationUnit in durationUnitList: # all DurationUnits
-        tupletList = durationUnit.tuplets
+    tupletMap = [] # a list of (tuplet obj / Duration) pairs
+    for dur in durationList: # all Duration objects
+        tupletList = dur.tuplets
         if tupletList in [(), None]: # no tuplets, length is zero
-            tupletMap.append([None, durationUnit])
+            tupletMap.append([None, dur])
         elif len(tupletList) > 1:
             #for i in range(len(tuplets)):
             #    tupletMap.append([tuplets[i],dur])
-            environLocal.warn('got multi-tuplet DurationUnit; cannot yet handle this. %s' % repr(tupletList))
+            environLocal.warn('got multi-tuplet duration; cannot yet handle this. %s' % repr(tupletList))
         elif len(tupletList) == 1:
-            tupletMap.append([tupletList[0], durationUnit])
-            if tupletList[0] != durationUnit.tuplets[0]:
-                raise Exception('cannot access Tuplets object from within DurationUnit')
+            tupletMap.append([tupletList[0], dur])
+            if tupletList[0] != dur.tuplets[0]:
+                raise Exception('cannot access Tuplets object from within DurationTuple.')
         else:
             raise Exception('cannot handle these tuplets: %s' % tupletList)
 
 
-    # have a list of tuplet, DurationUnit pairs
+    # have a list of tuplet, Duration pairs
     completionCount = 0 # qLen currently filled
     completionTarget = None # qLen necessary to fill tuplet
     for i in range(len(tupletMap)):
-        tupletObj, durationUnit = tupletMap[i]
+        tupletObj, dur = tupletMap[i]
 
         if i > 0:
             tupletPrevious = tupletMap[i - 1][0]
@@ -1132,7 +1122,7 @@ def makeTupletBrackets(s, inPlace=False):
 
         if tupletObj is not None:
 #            thisNormalType = tuplet.durationNormal.type
-            completionCount = opFrac(completionCount + durationUnit.quarterLength)
+            completionCount = opFrac(completionCount + dur.quarterLength)
             # if previous tuplet is None, always start
             # always reset completion target
             if tupletPrevious is None or completionTarget is None:
@@ -1155,7 +1145,7 @@ def makeTupletBrackets(s, inPlace=False):
             # this, below, is optional:
             # if next normal type is not the same as this one, also stop
             elif (tupletNext is None or completionCount >= completionTarget):
-                tupletObj.type = 'stop'
+                tupletObj.type = 'stop' # should be impossible once frozen...
                 completionTarget = None # reset
                 completionCount = 0 # reset
                 #environLocal.printDebug(['stopping tuplet type, value:',

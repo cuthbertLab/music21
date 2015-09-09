@@ -3354,8 +3354,8 @@ class TimeSignature(base.Music21Object):
         post = []
         src = self._getBeatDivisionDurations()
         for d in src:
-            post.append(d.augmentOrDiminish(.5, inPlace=False))
-            post.append(d.augmentOrDiminish(.5, inPlace=False))
+            post.append(d.augmentOrDiminish(.5))
+            post.append(d.augmentOrDiminish(.5))
         return post
 
     beatSubDivisionDurations = property(_getBeatSubDivisionDurations,

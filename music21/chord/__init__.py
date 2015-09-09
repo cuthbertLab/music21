@@ -3456,7 +3456,6 @@ class Chord(note.NotRest):
         True
 
         '''
-        # TODO: this presently returns a DurationUnit, not a Duration
         if self._duration is None and len(self._notes) > 0:
             #pitchZeroDuration = self._notes[0]['pitch'].duration
             pitchZeroDuration = self._notes[0].duration

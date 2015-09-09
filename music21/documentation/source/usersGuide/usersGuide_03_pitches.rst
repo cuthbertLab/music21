@@ -16,7 +16,7 @@ little deeper into what makes a ``Note`` really a ``Note``, namely,
 :ref:`modulePitch`, and :ref:`moduleDuration` objects.
 
 The Pitch object
-----------------
+================
 
 Since we've already covered ``Note`` objects,
 :class:`~music21.pitch.Pitch` objects will be a breeze. Just like how
@@ -264,6 +264,7 @@ object, we could do with the ``note.Note.pitch`` object instead:
 
 
     ---------------------------------------------------------------------------
+
     AttributeError                            Traceback (most recent call last)
 
     <ipython-input-16-8c908c31b14e> in <module>()
@@ -288,7 +289,7 @@ section. Without a ``Duration`` attribute, you cannot put an object into
 a Measure or show it on your screen.
 
 Carving time with Duration objects
-----------------------------------
+==================================
 
 For a ``Note`` to occupy musical space, it has to last a certain amount
 of time. We call that time the ``Note``'s
@@ -546,6 +547,24 @@ The ``type`` for these odd values is called "complex":
 
 
 
+Complex types have multiple "DurationTuple" (v.2.1+) or
+"DurationUnit"(pre v.2.0.10) objects in ``.components`` that represent
+the smaller, simple durations that make up the entire Duration:
+
+.. code:: python
+
+    dottedQuarter.components
+
+
+
+
+.. parsed-literal::
+   :class: ipython-result
+
+    [<music21.duration.DurationUnit 2.0>, <music21.duration.DurationUnit 0.25>]
+
+
+
 *(There's one more strange* ``type`` *called "zero" for Durations that
 don't have any Duration at all. It's used for measuring the conceptual
 length of grace notes, spaceless objects like* ``Clefs``, *Kim
@@ -563,7 +582,7 @@ weird ``2.25`` Duration. We have to first assign it to a note:
 
 
 
-.. image:: usersGuide_03_pitches_files/usersGuide_03_pitches_57_0.png
+.. image:: usersGuide_03_pitches_files/usersGuide_03_pitches_59_0.png
 
 
 
@@ -638,7 +657,7 @@ You can go ahead and make a Triplet or other
 later.
 
 Back to Notes
--------------
+=============
 
 So now you can see the advantage of working with ``Note`` objects: they
 have both a ``.pitch`` attribute, which contains a ``Pitch`` object, and
@@ -852,7 +871,7 @@ As it should be becoming clear, we can always check our work with the
 
 
 
-.. image:: usersGuide_03_pitches_files/usersGuide_03_pitches_91_0.png
+.. image:: usersGuide_03_pitches_files/usersGuide_03_pitches_93_0.png
 
 
 
@@ -870,7 +889,7 @@ already set the lyric to show "``QL: 1.0``, it won't be changed when we
 
 
 
-.. image:: usersGuide_03_pitches_files/usersGuide_03_pitches_93_0.png
+.. image:: usersGuide_03_pitches_files/usersGuide_03_pitches_95_0.png
 
 
 

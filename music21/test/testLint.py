@@ -90,12 +90,26 @@ def main(fnAccept=None):
                 'import-self', # fix is either to get rid of it or move away many tests...
                ]
 
+    goodnameRx = {'argument-rgx': r'[a-z_][A-Za-z0-9_]{2,30}$',
+                  'attr-rgx': r'[a-z_][A-Za-z0-9_]{2,30}$',
+                  'class-rgx': r'[A-Z_][A-Za-z0-9_]{2,30}$',
+                  'function-rgx': r'[a-z_][A-Za-z0-9_]{2,30}$',
+                  'method-rgx': r'[a-z_][A-Za-z0-9_]{2,30}$',
+                  'module-rgx': r'(([a-z_][a-zA-Z0-9_]*)|([A-Z][a-zA-Z0-9]+))$',
+                  'variable-rgx': r'[a-z_][A-Za-z0-9_]{2,30}$',
+                  }
+
     cmd = ['/usr/bin/env pylint -f colorized ' +
            '--dummy-variables-rgx="_|dummy|unused|i|j|junk" ' + 
            '--docstring-min-length=3 ' +
            '--max-args=7 ' +  # should be 5 later, but baby steps
            '--bad-name="foo,shit,fuck,stuff" ' # definitely allow "bar" for barlines
            ]
+    for gn, gnv in goodnameRx.items():
+        cmd.append('--' + gn + '="' + gnv + '"')
+
+    print(cmd)
+    
     for pyLintId in disable:
         cmd.append('--disable=%s' % pyLintId)
 

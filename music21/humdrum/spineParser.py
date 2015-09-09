@@ -2151,8 +2151,8 @@ def hdStringToNote(contents):
             basevalue = 2**exponents
             thisObject.duration.type = duration.typeFromNumDict[int(basevalue)]
             newTup = duration.Tuplet()
-            newTup.durationActual.type = thisObject.duration.type
-            newTup.durationNormal.type = thisObject.duration.type
+            newTup.durationActual = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
+            newTup.durationNormal = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
 
             gcd = common.euclidGCD(int(dT), basevalue)
             newTup.numberNotesActual = int(dT/gcd)
@@ -2163,7 +2163,7 @@ def hdStringToNote(contents):
             # code that uses this other method...
             JRP = flavors['JRP']
             if JRP is False and contents.count('.'):
-                newTup.durationNormal.dots = contents.count('.')
+                newTup.durationNormal = duration.durationTupleFromTypeDots(newTup.durationNormal.type, contents.count('.'))
 
             thisObject.duration.appendTuplet(newTup)
             if JRP is True and contents.count('.'):
@@ -2642,11 +2642,13 @@ class Test(unittest.TestCase):
         dn = d.parts[0].measure(1).notes[1]
         self.assertEqual(cn.duration.fullName, 'Eighth Triplet (1/2 QL)')
         self.assertEqual(cn.duration.dots, 0)
-        self.assertEqual(repr(cn.duration.tuplets[0].durationNormal), '<music21.duration.DurationUnit 0.75>')
+        self.assertEqual(repr(cn.duration.tuplets[0].durationNormal), 
+                         "DurationTuple(type='eighth', dots=1, quarterLength=0.75)")
         self.assertEqual(cn.duration.tuplets[0].durationNormal.dots, 1)
         self.assertEqual(dn.duration.fullName, 'Dotted Eighth Triplet (1/2 QL)')
         self.assertEqual(dn.duration.dots, 1)
-        self.assertEqual(repr(dn.duration.tuplets[0].durationNormal), '<music21.duration.DurationUnit 0.5>')
+        self.assertEqual(repr(dn.duration.tuplets[0].durationNormal), 
+                         "DurationTuple(type='eighth', dots=0, quarterLength=0.5)")
         self.assertEqual(dn.duration.tuplets[0].durationNormal.dots, 0)
         
 class TestExternal(unittest.TestCase):
