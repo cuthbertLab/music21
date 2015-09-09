@@ -1808,7 +1808,7 @@ def setBarlineStyle(score, newStyle, oldStyle = 'regular', inPlace = True):
                     barline.style = newStyle
     return score
 
-def scaleDurations(score, scalingNum = 1, inPlace = True, scaleUnlinked = True):
+def scaleDurations(score, scalingNum=1, inPlace=False, scaleUnlinked=True):
     '''
     scale all notes and TimeSignatures by the scaling amount.
     
@@ -1821,7 +1821,7 @@ def scaleDurations(score, scalingNum = 1, inPlace = True, scaleUnlinked = True):
         el.offset = el.offset * scalingNum
         if el.duration is not None:
             el.duration.quarterLength = el.duration.quarterLength * scalingNum
-            if hasattr(el.duration, 'linkStatus') and el.duration.linkStatus is False and scaleUnlinked is True:
+            if hasattr(el.duration, 'linked') and el.duration.linked is False and scaleUnlinked is True:
                 raise MedRenException('scale unlinked is not yet supported')
         if isinstance(el, tempo.MetronomeMark):
             el.value = el.value * scalingNum
@@ -1920,11 +1920,11 @@ def convertHouseStyle(score, durationScale = 2, barlineStyle = 'tick', tieTransf
     if inPlace is False:
         score = copy.deepcopy(score)
     if durationScale != False:
-        scaleDurations(score, durationScale, inPlace = True)
+        scaleDurations(score, durationScale, inPlace=True)
     if barlineStyle != False:
-        setBarlineStyle(score, barlineStyle, inPlace = True)
+        setBarlineStyle(score, barlineStyle, inPlace=True)
     if tieTransfer != False:
-        transferTies(score, inPlace = True)
+        transferTies(score, inPlace=True)
     
     return score
 
@@ -1980,7 +1980,7 @@ class TestExternal(unittest.TestCase):
     def xtestScaling(self):
         from music21 import corpus
         testPiece = corpus.parse('luca/gloria')
-        scaleDurations(testPiece, .5)
+        scaleDurations(testPiece, .5, inPlace=True)
         testPiece.show()
 
     def xtestTransferTies(self):

@@ -511,7 +511,7 @@ def durationToMx(d):
 
     >>> a = duration.Duration()
     >>> a.type = 'half'
-    >>> a.dotGroups = [1,1]
+    >>> a.dotGroups = (1,1)
     >>> b = musicxml.toMxObjects.durationToMx(a)
     >>> len(b) == 2
     True
@@ -526,7 +526,7 @@ def durationToMx(d):
         d = d.splitDotGroups()
     # most common case...
     # a grace is not linked, but still needs to be processed as a grace
-    if (d.isLinked is True or len(d.components) > 1 or
+    if (d.linked is True or len(d.components) > 1 or
         (len(d.components) > 1 and d.isGrace)):
         for dur in d.components:
             mxDivisions = int(defaults.divisionsPerQuarter *
@@ -601,9 +601,9 @@ def durationToMx(d):
                     mxNotations.append(mxTied)
         if len(d.components) > 1:
             mxNote.set('tieList', mxTieList)
-        if len(dur.tuplets) > 0:
+        if len(d.tuplets) > 0:
             # only getting first tuplet here
-            mxTimeModification, mxTupletList = tupletToMx(dur.tuplets[0])
+            mxTimeModification, mxTupletList = tupletToMx(d.tuplets[0])
             mxNote.set('timemodification', mxTimeModification)
             if mxTupletList != []:
                 mxNotations.componentList += mxTupletList

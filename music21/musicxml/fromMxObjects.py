@@ -674,25 +674,19 @@ def mxToDuration(mxNote, inputM21=None):
                                          'last mxDivisions:', mxDivisions])
                 durRaw.quarterLength = 1.
         else: # a cooked version builds up from pieces
-            durUnit = duration.DurationUnit()
-            durUnit.type = durationType
-            durUnit.dots = len(mxDotList)
-            if not tup == None:
-                durUnit.appendTuplet(tup)
+            durUnit = duration.durationTupleFromTypeDots(durationType, len(mxDotList))
             durCooked = duration.Duration(components=[durUnit])
-            if durUnit.quarterLength != durCooked.quarterLength:
-                environLocal.printDebug(['error in stored MusicXML representaiton and ' +
-                                         'duration value', durCooked])
+            if not tup == None:
+                d.tuplets = (tup,)
             # old way just used qLen
             #self.quarterLength = qLen
             d.components = durCooked.components
     # if mxNote.duration is None, this is a grace note, and duration
     # is based entirely on type
     if mxNote.duration is None:
-        durUnit = duration.DurationUnit()
-        durUnit.type = musicXMLTypeToType(mxNote.get('type'))
-        durUnit.dots = len(mxNote.get('dotList'))
-        d.components = [durUnit]
+        d = duration.Duration()
+        d.type = musicXMLTypeToType(mxNote.get('type'))
+        d.dots = len(mxNote.get('dotList'))
         #environLocal.printDebug(['got mx duration of None', d])
 
     return d

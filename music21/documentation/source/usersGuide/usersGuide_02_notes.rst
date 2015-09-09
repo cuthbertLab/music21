@@ -21,7 +21,7 @@ Go ahead and start IDLE or type “python” at the command line (Terminal
 on the Mac or “run: cmd” on Windows) and let’s get started.
 
 Creating and working with Notes
--------------------------------
+===============================
 
 The music21 concept of a standard note is contained in the
 :class:`~music21.note.Note` object, which is found in the ``note``
@@ -52,12 +52,13 @@ then you'll now be able to access the ``note`` module just by typing
 
 
 | If you get something like this you'll have access to the music21
-``note`` module any time you type ``"note"``. The filename after "from
-'D:\\music21files...'" will differ for you. It will show you where you
-have music21 installed (if you ever forget where you have music21
-installed, this is an easy way to figure it out).
+  ``note`` module any time you type ``"note"``. The filename after "from
+  'D:\\music21files...'" will differ for you. It will show you where you
+  have music21 installed (if you ever forget where you have music21
+  installed, this is an easy way to figure it out).
+
 | As long as it ends in ``note.pyc`` or ``note.py`` or something like
-that you're fine.
+  that you're fine.
 
 If you want to know what else the ``note`` module contains besides the
 Note and Rest objects you can type "``dir(note)``\ " to find out:

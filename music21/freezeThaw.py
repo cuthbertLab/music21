@@ -203,7 +203,6 @@ class StreamFreezer(StreamFreezeThawBase):
     >>> len(s2.parts[0].measure(7).notes) == 6
     True
 
-
     >>> sf2 = freezeThaw.StreamFreezer(c) # do not reuse StreamFreezers
     >>> data2 = sf2.writeStr(fmt='jsonpickle')
     >>> st2 = freezeThaw.StreamThawer()
@@ -478,6 +477,7 @@ class StreamFreezer(StreamFreezeThawBase):
         streamObj._elements = []
         streamObj._endElements = []
         streamObj.elementsChanged()
+            
 
     def findActiveStreamIdsInHierarchy(self, hierarchyObject = None, getSpanners=True, getVariants=True):
         '''
@@ -1009,7 +1009,7 @@ class JSONFreezeThawBase(object):
         'music21.beam.Beams': [
             'beamsList', 'feathered',
             ],
-        'music21.duration.DurationUnit': [
+        'music21.duration.DurationTuple': [
             '__AUTO_GATHER__',
             ],
         'music21.duration.Duration': [
@@ -1175,16 +1175,16 @@ class JSONFreezeThawBase(object):
         this works on any object (such as Durations which aren't Music21Objects)
 
 
-        >>> d = duration.DurationUnit()
+        >>> d = duration.Duration()
         >>> jsbase = freezeThaw.JSONFreezeThawBase()
         >>> jsbase.fullyQualifiedClassFromObject(d)
-        'music21.duration.DurationUnit'
+        'music21.duration.Duration'
 
         Works on class objects as well:
 
-        >>> dclass = duration.DurationUnit
+        >>> dclass = duration.Duration
         >>> jsbase.fullyQualifiedClassFromObject(dclass)
-        'music21.duration.DurationUnit'
+        'music21.duration.Duration'
         '''
         if inspect.isclass(obj):
             return obj.__module__ + '.' + obj.__name__
@@ -1520,8 +1520,13 @@ class JSONFreezer(JSONFreezeThawBase):
               "__attr__": {
                 "_components": [],
                 "_componentsNeedUpdating": true, 
+                "_dotGroups": [
+                  0
+                ],
+                "_linked": true,
                 "_qtrLength": 1.0, 
                 "_quarterLengthNeedsUpdating": false, 
+                "_tuplets": [],
                 "_typeNeedsUpdating": false
               }, 
               "__class__": "music21.duration.Duration"
@@ -2002,20 +2007,6 @@ class Test(unittest.TestCase):
 
 #----------JSON Serialization------------------------------
 
-#    def testDurationJSONSerializationA(self):
-#        from music21 import duration
-#        d = duration.DurationUnit(1.5)
-#        self.assertEqual(str(d), '<music21.duration.DurationUnit 1.5>')
-#
-#        dAlt = duration.DurationUnit()
-#        dAlt.json = d.json
-#        self.assertEqual(str(dAlt), '<music21.duration.DurationUnit 1.5>')
-#
-#        d = duration.Duration(2.25)
-#        self.assertEqual(str(d), '<music21.duration.Duration 2.25>')
-#        dAlt = duration.Duration()
-#        dAlt.json = d.json
-#        self.assertEqual(str(dAlt), '<music21.duration.Duration 2.25>')
 
 #    def testJSONSerializationPitchA(self):
 #        from music21 import pitch

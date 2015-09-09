@@ -618,7 +618,7 @@ class GeneralNote(base.Music21Object):
             post = copy.deepcopy(self)
 
         # inPlace always True b/c we have already made a copy if necessary
-        post.duration.augmentOrDiminish(scalar, inPlace=True)
+        post.duration = post.duration.augmentOrDiminish(scalar)
 
         if not inPlace:
             return post
@@ -677,7 +677,8 @@ class NotRest(GeneralNote):
         self._noteheadParenthesis = False
         self._stemDirection = 'unspecified'
         self._volume = None # created on demand
-        self.duration.linkage = 'tie'
+        #replace
+        self.linkage = 'tie'
         if "beams" in keywords:
             self.beams = keywords["beams"]
         else:
@@ -1500,7 +1501,7 @@ class Rest(GeneralNote):
         >>> r2 = note.Rest()
         >>> r1 == r2
         True
-        >>> r2.duration.quarterLength = 1.3333
+        >>> r2.duration.quarterLength = 4.0/3
         >>> r1 == r2
         False
         >>> r1 == note.Note()
