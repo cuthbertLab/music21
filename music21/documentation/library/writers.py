@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         convertIPythonNotebooksToReST.py
+# Name:         documentation/library/writers.py
 # Purpose:      music21 documentation IPython notebook to ReST converter
 #
 # Authors:      Josiah Wolf Oberholtzer
@@ -16,6 +16,10 @@ import re
 from music21.ext import six
 from music21 import common
 from music21 import exceptions21
+
+from music21 import environment
+environLocal = environment.Environment('documentation.library.writers')
+
 
 class DocumentationWritersException(exceptions21.Music21Exception):
     pass
@@ -300,7 +304,11 @@ class IPythonNotebookReSTWriter(ReSTWriter):
 
     def runNBConvert(self, ipythonNotebookFilePath):
 #         import music21
-        from music21.ext.nbconvert import nbconvertapp as nb # @UnresolvedImport
+        try:
+            from nbconvert import nbconvertapp as nb
+        except ImportError:
+            environLocal.warn("Using music21.ext.nbconvert -- this will stop working in IPython4. use pip3 install nbconvert")        
+            from music21.ext.nbconvert import nbconvertapp as nb # @UnresolvedImport
         app = nb.NbConvertApp.instance() # @UndefinedVariable
         app.initialize(argv=['--to', 'rst', ipythonNotebookFilePath])
         app.writer.build_directory = os.path.dirname(ipythonNotebookFilePath)
