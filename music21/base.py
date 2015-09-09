@@ -999,13 +999,11 @@ class Music21Object(object):
 
         A larger class name can be used to get all subclasses:
 
-        >>> n2.getSpannerSites('DynamicWedge') == [sp2, sp3]
+        >>> set(n2.getSpannerSites('DynamicWedge')) == set([sp2, sp3])
         True
-        >>> n2.getSpannerSites(['Slur','Diminuendo']) == [sp1, sp3]
+        >>> set(n2.getSpannerSites(['Slur','Diminuendo'])) == set([sp1, sp3])
         True
 
-        The order spanners are returned is generally the order that they were
-        added, but that is not guaranteed, so for safety sake, use set comparisons:
 
         >>> set(n2.getSpannerSites(['Slur','Diminuendo'])) == set([sp3, sp1])
         True

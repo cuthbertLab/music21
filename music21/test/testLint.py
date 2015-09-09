@@ -78,7 +78,7 @@ def main(fnAccept=None):
                 'unpacking-non-sequence', # gets it wrong too often.
                 'too-many-instance-attributes', # maybe later
                 
-                #'invalid-name',      # never remove -- these are good music21 names; fix the regexp instead...
+                'invalid-name',      # never remove -- these are good music21 names; fix the regexp instead...
                 'no-self-use',       # maybe later
                 'too-few-public-methods', # never remove or set to 1
                 'trailing-whitespace',  # should ignore blank lines with tabs
