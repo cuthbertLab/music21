@@ -579,8 +579,8 @@ class Test(unittest.TestCase):
         self.assertEqual(mxClef.get('clefOctaveChange'), -1)
 
     def testConversionClassMatch(self):
-        from music21 import musicxml as musicxmlMod
-        from music21.musicxml import fromMxObjects
+        from xml.etree.ElementTree import fromstring as El
+        from music21.musicxml.xmlToM21 import MeasureParser
         from music21 import clef
         # need to get music21.clef.X, not X, because
         # we are comparing the result to a translation outside
@@ -604,13 +604,13 @@ class Test(unittest.TestCase):
             [('TAB', 5, 0), clef.TabClef]
         ]
 
+        MP = MeasureParser()
+        
         for params, className in src:
-            mxClef = musicxmlMod.mxObjects.Clef()
-            mxClef.set('sign', params[0])
-            mxClef.set('line', params[1])
-            mxClef.set('octaveChange', params[2])
-
-            c = fromMxObjects.mxClefToClef(mxClef)
+            sign, line, octaveChange = params
+            mxClef = El(r'<clef><sign>' + sign + '</sign><line>' + str(line) + '</line>' +
+                        '<clef-octave-change>' + str(octaveChange) + '</clef-octave-change></clef>')
+            c = MP.xmlToClef(mxClef)
 
             #environLocal.printDebug([type(c).__name__])
 
@@ -619,7 +619,7 @@ class Test(unittest.TestCase):
             self.assertEqual(c.octaveChange, params[2])
             self.assertEqual(isinstance(c, className), True, "Failed Conversion of classes: %s is not a %s" % (c, className))
 
-    def xtestContexts(self):
+    def testContexts(self):
         from music21 import stream
         from music21 import note
         from music21 import meter
@@ -646,7 +646,6 @@ class Test(unittest.TestCase):
         s2.append(n2)
         s2.append(n3)
         s2.makeMeasures()
-        self.assertFalse(n2.getContextByClass(stream.Measure) is n3.getContextByClass(stream.Measure))
         self.assertTrue(n2.getContextByClass(Clef) is c1)
 
         del(s2)

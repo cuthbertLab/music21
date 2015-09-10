@@ -13,14 +13,11 @@ class Test(unittest.TestCase):
         pass
 
     def testMetadataLoadCorpus(self):
-        from music21.musicxml import xmlHandler
+        from music21 import converter
         from music21.musicxml import testFiles as mTF
-        from music21.musicxml import fromMxObjects
 
-        document = xmlHandler.Document()
-        document.read(mTF.mozartTrioK581Excerpt)  # @UndefinedVariable
-        mxScore = document.score  # get the mx score directly
-        md = fromMxObjects.mxScoreToMetadata(mxScore)
+        c = converter.parse(mTF.mozartTrioK581Excerpt)  # @UndefinedVariable
+        md = c.metadata
 
         self.assertEqual(md.movementNumber, '3')
         self.assertEqual(
@@ -30,15 +27,13 @@ class Test(unittest.TestCase):
         # get contributors directly from Metadata interface
         self.assertEqual(md.composer, 'Wolfgang Amadeus Mozart')
 
-        document.read(mTF.binchoisMagnificat)  # @UndefinedVariable
-        mxScore = document.score  # get the mx score directly
-        md = fromMxObjects.mxScoreToMetadata(mxScore)
+        c = converter.parse(mTF.binchoisMagnificat)  # @UndefinedVariable
+        md = c.metadata
         self.assertEqual(md.composer, 'Gilles Binchois')
 
     def testJSONSerializationMetadata(self):
-        from music21.musicxml import xmlHandler
-        from music21.musicxml import fromMxObjects
-        from music21.musicxml import testFiles
+        from music21 import converter
+        from music21.musicxml import testFiles as mTF
         from music21 import metadata
 
         md = metadata.Metadata(
@@ -62,12 +57,8 @@ class Test(unittest.TestCase):
         self.assertEqual(mdNew.title, 'Concerto in F')
 
         # test getting meta data from an imported source
-
-        d = xmlHandler.Document()
-        d.read(testFiles.mozartTrioK581Excerpt)  # @UndefinedVariable
-        mxScore = d.score  # get the mx score directly
-
-        md = fromMxObjects.mxScoreToMetadata(mxScore)
+        c = converter.parse(mTF.mozartTrioK581Excerpt)  # @UndefinedVariable
+        md = c.metadata
 
         self.assertEqual(md.movementNumber, '3')
         self.assertEqual(

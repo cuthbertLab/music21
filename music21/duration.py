@@ -2947,18 +2947,6 @@ class Test(unittest.TestCase):
         self.assertEqual(myTuplet.tupletMultiplier(), opFrac(2/5.0))
 
 
-    def testMxLoading(self):
-        from music21.musicxml import fromMxObjects
-        from music21 import musicxml
-        a = musicxml.mxObjects.Note()
-        a.setDefaults()
-        m = musicxml.mxObjects.Measure()
-        m.setDefaults()
-        a.external['measure'] = m # assign measure for divisions ref
-        a.external['divisions'] = m.external['divisions']
-        c = fromMxObjects.mxToDuration(a)
-        self.assertEqual(c.quarterLength, 1.0)
-
     def testTupletTypeComplete(self):
         '''
         Test setting of tuplet type when durations sum to expected completion
