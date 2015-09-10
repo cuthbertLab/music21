@@ -1917,51 +1917,28 @@ class ChordSymbol(Harmony):
 
         OMIT_FROM_DOCS
 
-        >>> from music21 import musicxml
-        >>> mxHarmony = musicxml.mxObjects.Harmony()
-        >>> mxKind = musicxml.mxObjects.Kind()
-        >>> mxKind.charData = 'dominant'
-        >>> mxHarmony.kindObj = mxKind
-        >>> mxRoot = musicxml.mxObjects.Root()
-        >>> mxRoot.set('root-step', 'C')
-        >>> mxHarmony.rootObj = mxRoot
-        >>> mxDegree = musicxml.mxObjects.Degree()
-        >>> val = musicxml.mxObjects.DegreeValue()
-        >>> val.charData = 9
-        >>> alt = musicxml.mxObjects.DegreeAlter()
-        >>> alt.charData = -1
-        >>> modType = musicxml.mxObjects.DegreeType()
-        >>> modType.charData = 'add'
-        >>> mxDegree.componentList = [val,alt,modType]
-        >>> mxHarmony.degreeObj = mxDegree
-        >>> cs = musicxml.fromMxObjects.mxToChordSymbol(mxHarmony)
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        
+        >>> elStr = (r'<harmony><root><root-step>C</root-step></root><kind>dominant</kind>' +
+        ...           '<degree><degree-value>9</degree-value><degree-alter>-1</degree-alter>' +
+        ...           '        <degree-type>add</degree-type></degree></harmony>')
+        >>> mxHarmony = EL(elStr)
+
+        >>> cs = MP.xmlToChordSymbol(mxHarmony)
         >>> print(cs.figure)
         C7 add b9
 
         >>> cs.pitches
         (<music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G3>, <music21.pitch.Pitch B-3>, <music21.pitch.Pitch D-4>)
         
-        >>> mxHarmony = musicxml.mxObjects.Harmony()
-        >>> mxKind = musicxml.mxObjects.Kind()
-        >>> mxKind.charData = 'major'
-        >>> mxHarmony.kindObj = mxKind
-        >>> mxRoot = musicxml.mxObjects.Root()
-        >>> mxRoot.set('root-step', 'C')
-        >>> mxHarmony.rootObj = mxRoot
-        >>> mxBass = musicxml.mxObjects.Bass()
-        >>> mxBass.set('bass-step', 'B')
-        >>> mxBass.set('bass-alter', -1)
-        >>> mxHarmony.bassObj = mxBass
-        >>> mxDegree = musicxml.mxObjects.Degree()
-        >>> val = musicxml.mxObjects.DegreeValue()
-        >>> val.charData = 2
-        >>> alt = musicxml.mxObjects.DegreeAlter()
-        >>> alt.charData = 0
-        >>> modType = musicxml.mxObjects.DegreeType()
-        >>> modType.charData = 'add'
-        >>> mxDegree.componentList = [val,alt,modType]
-        >>> mxHarmony.degreeObj = mxDegree
-        >>> cs = musicxml.fromMxObjects.mxToChordSymbol(mxHarmony)
+        >>> elStr = (r'<harmony><root><root-step>C</root-step></root><kind>major</kind>' +
+        ...           '<bass><bass-step>B</bass-step><bass-alter>-1</bass-alter></bass>' +
+        ...           '<degree><degree-value>2</degree-value><degree-alter>0</degree-alter>' +
+        ...           '        <degree-type>add</degree-type></degree></harmony>')
+        >>> mxHarmony = EL(elStr)
+
+        >>> cs = MP.xmlToChordSymbol(mxHarmony)
         >>> print(cs.figure)
         C/B- add 2
 

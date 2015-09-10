@@ -2655,9 +2655,9 @@ class MeasureParser(XMLParserBase):
         mxBass = mxHarmony.find('bass')
         if mxBass is not None:
             # required
-            b = pitch.Pitch(mxBass.find('bassStep').text)
+            b = pitch.Pitch(mxBass.find('bass-step').text)
             # optional
-            mxBassAlter = mxBass.find('bassAlter')
+            mxBassAlter = mxBass.find('bass-alter')
             if mxBassAlter is not None:
                 # can provide integer to create accidental on pitch
                 b.accidental = pitch.Accidental(int(mxBassAlter.text))
@@ -3894,7 +3894,7 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test, runTest="testStaffLayout")
+    music21.mainTest(Test) #, runTest="testStaffLayout")
     
     
     
