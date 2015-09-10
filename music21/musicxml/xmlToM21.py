@@ -3927,7 +3927,6 @@ class Test(unittest.TestCase):
         for cc in allChords:
             pCount += len(cc.pitches)
         self.assertEqual(pCount, 97)
-        c.show('musicxml.png')
 
 if __name__ == '__main__':
     import music21
