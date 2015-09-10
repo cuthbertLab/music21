@@ -3118,7 +3118,6 @@ class TimeSignature(base.Music21Object):
     barDuration = property(_getBarDuration, _setBarDuration,
         doc = '''Return a :class:`~music21.duration.Duration` object equal to the total length of this TimeSignature.
 
-
         >>> ts = meter.TimeSignature('5/16')
         >>> ts.barDuration
         <music21.duration.Duration 1.25>

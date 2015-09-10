@@ -1481,8 +1481,8 @@ class Duration(SlottedObject):
                 self.components = list(qlc.components)
                 if qlc.tuplet is not None:
                     self.tuplets = (qlc.tuplet,)
-            except DurationException:
-                print("problem updating components of note with quarterLength %s, chokes quarterLengthToDurations\n" % self.quarterLength)
+            except DurationException:                
+                environLocal.printDebug("problem updating components of note with quarterLength %s, chokes quarterLengthToDurations\n" % self.quarterLength)
                 raise
         self._componentsNeedUpdating = False
 

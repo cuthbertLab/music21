@@ -173,10 +173,18 @@ class ArchiveManager(object):
                     if subFp.endswith('.xml'):
                         post = f.read(subFp)
                         if six.PY3 and isinstance(post, bytes):
+                            foundEncoding = re.match(br"encoding=[\'\"](\S*?)[\'\"]", post[:1000])
+                            if foundEncoding:
+                                defaultEncoding = foundEncoding.group(1).decode('ascii')
+                                print("FOUND ENCODING: ", defaultEncoding)
+                            else:
+                                defaultEncoding = 'UTF-8'
                             try:
-                                post = post.decode(encoding='UTF-8')
+                                post = post.decode(encoding=defaultEncoding)
                             except UnicodeDecodeError: # sometimes windows written...
                                 post = post.decode(encoding='utf-16-le')
+                                post = re.sub(r"encoding=([\'\"]\S*?[\'\"])", "encoding='UTF-8'", post)
+
                         break
 
             elif name == None and dataFormat == 'musedata':
@@ -678,6 +686,7 @@ class Converter(object):
         <class 'music21.converter.subConverters.ConverterMidi'>
         <class 'music21.converter.subConverters.ConverterMuseData'>
         <class 'music21.converter.subConverters.ConverterMusicXML'>
+        <class 'music21.converter.subConverters.ConverterMusicXMLET'>
         <class 'music21.converter.subConverters.ConverterNoteworthy'>
         <class 'music21.converter.subConverters.ConverterNoteworthyBinary'>
         <class 'music21.converter.subConverters.ConverterRomanText'>
@@ -686,7 +695,7 @@ class Converter(object):
         <class 'music21.converter.subConverters.ConverterTextLine'>
         <class 'music21.converter.subConverters.ConverterTinyNotation'>
         <class 'music21.converter.subConverters.ConverterVexflow'>
-        <class 'music21.converter.subConverters.SubConverter'>        
+        <class 'music21.converter.subConverters.SubConverter'>
         '''
         defaultSubconverters = []
         for i in sorted(list(subConverters.__dict__.keys())):
@@ -716,9 +725,11 @@ class Converter(object):
         ('mei', <class 'music21.converter.subConverters.ConverterMEI'>)
         ('midi', <class 'music21.converter.subConverters.ConverterMidi'>)
         ('musedata', <class 'music21.converter.subConverters.ConverterMuseData'>)
-        ('musicxml', <class 'music21.converter.subConverters.ConverterMusicXML'>)
+        ('musicxml', <class 'music21.converter.subConverters.ConverterMusicXMLET'>)
         ('noteworthy', <class 'music21.converter.subConverters.ConverterNoteworthyBinary'>)
         ('noteworthytext', <class 'music21.converter.subConverters.ConverterNoteworthy'>)
+        ('oldmusicxml', <class 'music21.converter.subConverters.ConverterMusicXML'>)
+        ('oldxml', <class 'music21.converter.subConverters.ConverterMusicXML'>)
         ('rntext', <class 'music21.converter.subConverters.ConverterRomanText'>)
         ('romantext', <class 'music21.converter.subConverters.ConverterRomanText'>)
         ('scala', <class 'music21.converter.subConverters.ConverterScala'>)
@@ -728,7 +739,7 @@ class Converter(object):
         ('tinynotation', <class 'music21.converter.subConverters.ConverterTinyNotation'>)
         ('txt', <class 'music21.converter.subConverters.ConverterText'>)
         ('vexflow', <class 'music21.converter.subConverters.ConverterVexflow'>)
-        ('xml', <class 'music21.converter.subConverters.ConverterMusicXML'>)       
+        ('xml', <class 'music21.converter.subConverters.ConverterMusicXMLET'>)       
         '''
         converterFormats = {}
         for name in self.subconvertersList():

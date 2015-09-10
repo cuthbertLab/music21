@@ -2895,7 +2895,7 @@ def mxScoreToScore(mxScore, spannerBundle=None, inputM21=None):
     #environLocal.printDebug(['partgroups:', mxScore.getPartGroupData()])
     partGroupData = mxScore.getPartGroupData()
     for partGroup in partGroupData: # a list of dictionaries
-        # create music21 spanner StaffGroup
+        # create music21 spanner np
         sg = layout.StaffGroup()
         for partId in partGroup['scorePartIds']:
             # get music21 part from partIdDictionary
@@ -3807,7 +3807,10 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.transposing01, format='oldmusicxml')
-        self.assertEqual(len(s.flat.getElementsByClass('Instrument')), 7)
+        instStream = s.flat.getElementsByClass('Instrument')
+        #for i in instStream:
+        #    print(i.offset, i, i.transposition)
+        self.assertEqual(len(instStream), 7)
         #s.show()
 
 
@@ -4025,7 +4028,7 @@ _DOC_ORDER = [mxScoreToScore]
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest="testInstrumentTranspositionC")
    
 #------------------------------------------------------------------------------
 # eof
