@@ -526,7 +526,7 @@ class MusicXMLImporter(XMLParserBase):
             return s
 
     def xmlPartToPart(self, mxPart, partIdDict):
-        parser = PartParser(mxPart, partIdDict, parent=self)
+        parser = PartParser(mxPart, mxPartInfo=partIdDict, parent=self)
         parser.parse()
         if parser.appendToScoreAfterParse is True:
             return parser.stream
@@ -1075,13 +1075,15 @@ class PartParser(XMLParserBase):
 
         
         mxInfo = self.mxPartInfo
+        #print(ET.tostring(mxInfo, encoding='unicode'))
         i = instrument.Instrument()
         i.partId = self.partId
         i.groups.append(self.partId)
 
-        seta(i, mxInfo, 'partName', transform=_clean)
+        # put part info into the instrument object and retrieve it later...
+        seta(i, mxInfo, 'part-name', transform=_clean)
         # TODO: partNameDisplay
-        seta(i, mxInfo, 'partAbbreviation', transform=_clean)
+        seta(i, mxInfo, 'part-abbreviation', transform=_clean)
         # TODO: partAbbreviationDisplay        
         # TODO: groups
         
