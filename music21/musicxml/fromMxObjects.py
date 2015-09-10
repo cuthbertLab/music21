@@ -4098,7 +4098,17 @@ class Test(unittest.TestCase):
             pCount += len(cc.pitches)
         self.assertEqual(pCount, 97)
         
-
+    def testLucaGloriaSpanners(self):
+        '''
+        lots of lines, including overlapping here
+        
+        problem in m. 99 of part 2 -- spanner seems to be in the score
+        but not being output to musicxml
+        '''
+        from music21 import  corpus, converter
+        c = converter.parse(corpus.getWorkList('luca/gloria.xml')[0], format='oldmusicxml', forceSource=True)
+        print(c.parts[1].measure(99).notes[0].getSpannerSites())
+        
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [mxScoreToScore]
@@ -4106,7 +4116,7 @@ _DOC_ORDER = [mxScoreToScore]
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
-    music21.mainTest(Test, runTest="testCountDynamics")
+    music21.mainTest(Test, runTest='testLucaGloriaSpanners')
    
 #------------------------------------------------------------------------------
 # eof

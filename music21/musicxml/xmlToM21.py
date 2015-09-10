@@ -112,6 +112,30 @@ def musicXMLTypeToType(value):
             raise MusicXMLImportException('found unknown MusicXML type: %s' % value)
     else:
         return value
+    
+def _floatOrIntStr(strObj):
+    '''
+    Convert a string to float or int if possible...
+    
+    >>> _f = musicxml.xmlToM21._floatOrIntStr
+    >>> _f("20.3")
+    20.3
+    >>> _f("20.0")
+    20
+    >>> _f(None) is None
+    True
+    >>> _f("hi")
+    'hi'
+    '''
+    if strObj is None:
+        return None
+    try:
+        val = float(strObj)
+        if val == int(val):
+            val = int(val)
+        return val
+    except ValueError:
+        return strObj
         
 def _setAttributeFromAttribute(m21El, xmlEl, xmlAttributeName, attributeName=None, transform=None):
     '''
@@ -254,20 +278,20 @@ class XMLParserBase(object):
         >>> mxPrint = El('<print new-page="yes" page-number="5">' +
         ...    '    <page-layout><page-height>4000</page-height>' + 
         ...    '        <page-margins><left-margin>20</left-margin>' + 
-        ...    '                 <right-margin>30.2</right-margin></page-margins>' + 
+        ...    '                 <right-margin>30.25</right-margin></page-margins>' + 
         ...    '</page-layout></print>')
     
         >>> pl = MP.xmlPrintToPageLayout(mxPrint)
         >>> pl.isNew
         True
-        >>> pl.rightMargin > 30.1 and pl.rightMargin < 30.3
-        True
+        >>> pl.rightMargin
+        30.25
         >>> pl.leftMargin
-        20.0
+        20
         >>> pl.pageNumber
         5    
         >>> pl.pageHeight
-        4000.0
+        4000
         '''
         if inputM21 is None:
             pageLayout = layout.PageLayout()
@@ -300,14 +324,14 @@ class XMLParserBase(object):
 
         seta = _setAttributeFromTagText
         
-        seta(pageLayout, mxPageLayout, 'page-height', transform=float)
-        seta(pageLayout, mxPageLayout, 'page-width', transform=float)
+        seta(pageLayout, mxPageLayout, 'page-height', transform=_floatOrIntStr)
+        seta(pageLayout, mxPageLayout, 'page-width', transform=_floatOrIntStr)
         
         #TODO -- record even, odd, both margins
         mxPageMargins = mxPageLayout.find('page-margins')
         if mxPageMargins is not None:
             for direction in ('top', 'bottom', 'left', 'right'):
-                seta(pageLayout, mxPageMargins, direction + '-margin', transform=float)    
+                seta(pageLayout, mxPageMargins, direction + '-margin', transform=_floatOrIntStr)    
     
         if inputM21 is None:
             return pageLayout
@@ -324,17 +348,17 @@ class XMLParserBase(object):
         >>> mxPrint = El('<print new-system="yes">' +
         ...    '    <system-layout><system-distance>55</system-distance>' + 
         ...    '        <system-margins><left-margin>20</left-margin>' + 
-        ...    '                 <right-margin>30.2</right-margin></system-margins>' + 
+        ...    '                 <right-margin>30.25</right-margin></system-margins>' + 
         ...    '</system-layout></print>')
         >>> sl = MP.xmlPrintToSystemLayout(mxPrint)
         >>> sl.isNew
         True
-        >>> sl.rightMargin > 30.1 and sl.rightMargin <= 30.2
-        True
+        >>> sl.rightMargin
+        30.25
         >>> sl.leftMargin
-        20.0
+        20
         >>> sl.distance
-        55.0
+        55
         '''
         if inputM21 is None:
             systemLayout = layout.SystemLayout()
@@ -372,10 +396,10 @@ class XMLParserBase(object):
         mxSystemMargins = mxSystemLayout.find('system-margins')
         if mxSystemMargins is not None:
             for direction in ('top', 'bottom', 'left', 'right'):
-                seta(systemLayout, mxSystemMargins, direction + '-margin', transform=float)    
+                seta(systemLayout, mxSystemMargins, direction + '-margin', transform=_floatOrIntStr)    
 
-        seta(systemLayout, mxSystemLayout, 'system-distance', 'distance', transform=float)
-        seta(systemLayout, mxSystemLayout, 'top-system-distance', 'topDistance', transform=float)
+        seta(systemLayout, mxSystemLayout, 'system-distance', 'distance', transform=_floatOrIntStr)
+        seta(systemLayout, mxSystemLayout, 'top-system-distance', 'topDistance', transform=_floatOrIntStr)
         
         # TODO: system-dividers
 
@@ -394,7 +418,7 @@ class XMLParserBase(object):
         else:
             staffLayout = inputM21
         seta = _setAttributeFromTagText
-        seta(staffLayout, mxStaffLayout, 'staff-distance', 'distance', transform=float)
+        seta(staffLayout, mxStaffLayout, 'staff-distance', 'distance', transform=_floatOrIntStr)
         #ET.dump(mxStaffLayout)
 
         data = mxStaffLayout.get('number')
@@ -437,7 +461,7 @@ class MusicXMLImporter(XMLParserBase):
         self.xmlRoot = None
         self.stream = stream.Score()
         
-        self.definesExplicitSystemBreaks = False # TODO -- set to score and parts
+        self.definesExplicitSystemBreaks = False
         self.definesExplicitPageBreaks = False
 
         self.spannerBundle = self.stream.spannerBundle
@@ -524,7 +548,11 @@ class MusicXMLImporter(XMLParserBase):
             self.spannerBundle.remove(sp)
 
         s.elementsChanged()
-
+        s.definesExplicitSystemBreaks = self.definesExplicitSystemBreaks
+        s.definesExplicitPageBreaks = self.definesExplicitPageBreaks
+        for p in s.parts:
+            p.definesExplicitSystemBreaks = self.definesExplicitSystemBreaks
+            p.definesExplicitPageBreaks = self.definesExplicitPageBreaks
         
         if inputM21 is None:
             return s
@@ -630,8 +658,8 @@ class MusicXMLImporter(XMLParserBase):
 
         mxScaling = mxDefaults.find('scaling')
         if mxScaling is not None:
-            seta(scoreLayout, mxScaling, 'millimeters', 'scalingMillimeters', transform=float)
-            seta(scoreLayout, mxScaling, 'tenths', 'scalingTenths', transform=float)
+            seta(scoreLayout, mxScaling, 'millimeters', 'scalingMillimeters', transform=_floatOrIntStr)
+            seta(scoreLayout, mxScaling, 'tenths', 'scalingTenths', transform=_floatOrIntStr)
     
         mxPageLayout = mxDefaults.find('page-layout')
         if mxPageLayout is not None:
@@ -2102,6 +2130,7 @@ class MeasureParser(XMLParserBase):
         >>> sp = MP.spannerBundle[0]
         >>> sp
         <music21.spanner.Crescendo >
+        
         >>> mxDirectionType2 = EL('<wedge type="stop" number="2"/>')
         >>> MP.xmlDirectionTypeToSpanners(mxDirectionType2)
         >>> len(MP.spannerBundle)
@@ -2109,6 +2138,7 @@ class MeasureParser(XMLParserBase):
         >>> sp = MP.spannerBundle[0]
         >>> sp
         <music21.spanner.Crescendo <music21.note.Note D>>        
+        
         '''    
         targetLast = self.nLast
         
@@ -2142,7 +2172,6 @@ class MeasureParser(XMLParserBase):
         if mxObj.tag in ('bracket', 'dashes'):
             mxType = mxObj.get('type')
             idFound = mxObj.get('number')
-            #environLocal.printDebug(['mxDirectionToSpanners', 'found mxBracket', mxType, idFound])
             if mxType == 'start':
                 sp = spanner.Line()
                 sp.idLocal = idFound
@@ -2177,7 +2206,10 @@ class MeasureParser(XMLParserBase):
                     sp.addSpannedElements(targetLast)
             else:
                 raise MusicXMLImportException('unidentified mxType of mxBracket:', mxType)
-    
+#             if self.measureNumber > 95 and self.measureNumber < 102:
+#                 environLocal.warn([sp, sp.completeStatus, self.measureNumber])
+#                 environLocal.warn(['mxDirectionToSpanners', 'found mxBracket', mxType, idFound])
+
         
     def xmlNotationsToSpanners(self, mxNotations, n):
         for mxObj in mxNotations.findall('slur'):
@@ -2769,10 +2801,10 @@ class MeasureParser(XMLParserBase):
 
         setb = _setAttributeFromAttribute
         setb(te, mxWords, 'justify')
-        setb(te, mxWords, 'font-size', 'size', float)
-        setb(te, mxWords, 'letter-spacing', transform=float)
+        setb(te, mxWords, 'font-size', 'size', transform=_floatOrIntStr)
+        setb(te, mxWords, 'letter-spacing', transform=_floatOrIntStr)
         setb(te, mxWords, 'enclosure')
-        setb(te, mxWords, 'default-y', 'positionVertical', float)
+        setb(te, mxWords, 'default-y', 'positionVertical', transform=_floatOrIntStr)
 
         # two parameters that are combined
         style = mxWords.get('font-style')
@@ -2892,7 +2924,7 @@ class MeasureParser(XMLParserBase):
         # may need to do a format/unit conversion?        
         width = self.mxMeasure.get('width')
         if width is not None:
-            width = float(width)
+            width = _floatOrIntStr(width)
             self.stream.layoutWidth = width
         self.parseAttributesTags()
         
@@ -3106,7 +3138,7 @@ class MeasureParser(XMLParserBase):
             for stl in self.staffLayoutObjects: # staff layout objects in this part
                 if stl.staffNumber == staffNumber:
                     try:
-                        seta(stl, mxDetails, 'staff-size', transform=float)
+                        seta(stl, mxDetails, 'staff-size', transform=_floatOrIntStr)
                     except TypeError:
                         staffSize = mxDetails.find('staff-size')
                         if staffSize is not None:
@@ -3118,7 +3150,7 @@ class MeasureParser(XMLParserBase):
             # applies to all staves...
             for stl in self.staffLayoutObjects: # staff layout objects in this part
                 if stl.staffSize is None: # override...
-                    seta(stl, mxDetails, 'staff-size', transform=float)
+                    seta(stl, mxDetails, 'staff-size', transform=_floatOrIntStr)
                     foundMatch = True
                 if stl.staffLines is None:
                     seta(stl, mxDetails, 'staff-lines', transform=int)
@@ -3146,7 +3178,7 @@ class MeasureParser(XMLParserBase):
         seta = _setAttributeFromTagText
         
         stl = layout.StaffLayout()
-        seta(stl, mxDetails, 'staff-size', transform=float)
+        seta(stl, mxDetails, 'staff-size', transform=_floatOrIntStr)
         seta(stl, mxDetails, 'staff-lines', transform=int)
         staffNumber = mxDetails.get('number')
         if staffNumber is not None:
@@ -3927,10 +3959,25 @@ class Test(unittest.TestCase):
         for cc in allChords:
             pCount += len(cc.pitches)
         self.assertEqual(pCount, 97)
+        
+    def xtestLucaGloriaSpanners(self):
+        '''
+        lots of lines, including overlapping here
+        
+        problem in m. 99 of part 2 -- spanner seems to be in the score
+        but not being output to musicxml -- REASON: toMxObjects cannot handle
+        spanners on rests! fix...
+        '''
+        from music21 import  corpus, converter
+        c = converter.parse(corpus.getWorkList('luca/gloria.xml')[0], format='musicxml', forceSource=True)
+        print(c.parts[1].measure(99).notesAndRests[0].getSpannerSites()[0].idLocal)
+        #c.show()
+        #c.parts[1].show('t')
+        
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test, runTest="testCountDynamics")
+    music21.mainTest(Test)
     
     
     

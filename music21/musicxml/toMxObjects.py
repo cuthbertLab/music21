@@ -2096,9 +2096,9 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
             elif 'GeneralNote' in classes: # this includes chords so caught before.
                 mxList = None
                 if 'Note' in classes:
-                    mxList = noteToMxNotes(obj)
+                    mxList = noteToMxNotes(obj, spannerBundle=spannerBundle)
                 elif 'Rest' in classes:
-                    mxList = restToMxNotes(obj)
+                    mxList = restToMxNotes(obj, spannerBundle=spannerBundle)
                 
                 mxMeasure.componentList += mxList
             elif 'Dynamic' in classes:
