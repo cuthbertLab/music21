@@ -1952,11 +1952,13 @@ class MeasureParser(XMLParserBase):
         
         for mxObj in flatten(mxNotations, 'technical'):
             technicalObj = self.xmlTechnicalToArticulation(mxObj)
-            n.articulations.append(technicalObj)
+            if technicalObj is not None:
+                n.articulations.append(technicalObj)
 
         for mxObj in flatten(mxNotations, 'articulations'):
             articulationObj = self.xmlToArticulation(mxObj)
-            n.articulations.append(articulationObj)
+            if articulationObj is not None:
+                n.articulations.append(articulationObj)
                 
         
         # get any fermatas, store on expressions
