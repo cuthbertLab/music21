@@ -2096,9 +2096,9 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
             elif 'GeneralNote' in classes: # this includes chords so caught before.
                 mxList = None
                 if 'Note' in classes:
-                    mxList = noteToMxNotes(obj)
+                    mxList = noteToMxNotes(obj, spannerBundle=spannerBundle)
                 elif 'Rest' in classes:
-                    mxList = restToMxNotes(obj)
+                    mxList = restToMxNotes(obj, spannerBundle=spannerBundle)
                 
                 mxMeasure.componentList += mxList
             elif 'Dynamic' in classes:
@@ -2786,19 +2786,8 @@ def systemLayoutToMxPrint(systemLayout):
     
     >>> sl = layout.SystemLayout(leftmargin=234, rightmargin=124, distance=3, isNew=True)
     >>> mxPrint = musicxml.toMxObjects.systemLayoutToMxPrint(sl)
-
-    Test conversion back using the parallel routine
-    
-    >>> slAlt = layout.SystemLayout()
-    >>> musicxml.fromMxObjects.mxPrintToSystemLayout(mxPrint, slAlt)
-    >>> slAlt.leftMargin
-    234.0
-    >>> slAlt.rightMargin
-    124.0
-    >>> slAlt.distance
-    3.0
-    >>> slAlt.isNew
-    True
+    >>> mxPrint
+    <print new-system=yes <system-layout <system-margins left-margin=234 right-margin=124> system-distance=3>>
     '''
     mxPrint = mxObjects.Print()
     if systemLayout.isNew:

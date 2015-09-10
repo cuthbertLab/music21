@@ -566,7 +566,7 @@ class TestRomantextParse(CallTest):
 class CallGraph(object):
 
     def __init__(self):
-        self.includeList = None
+        self.includeList = ['*xmlToM21*', '*meter*']
         #self.excludeList = ['pycallgraph.*','re.*','sre_*', 'copy*', '*xlrd*']
         self.excludeList = ['pycallgraph.*']
         self.excludeList += ['re.*','sre_*']
@@ -669,11 +669,20 @@ class CallGraph(object):
         config = pycallgraph.Config()
         config.trace_filter = gf
 
+        from music21 import meter
         from music21 import note
+        from music21 import converter
+        from music21 import common
+        beeth = common.getCorpusFilePath() + '/beethoven/opus133.mxl'
+        #s = converter.parse(beeth, forceSource=True)
+        #beeth = common.getCorpusFilePath() + '/bach/bwv66.6.mxl'
+        s = converter.parse(beeth, forceSource=True)
+            
         with pycallgraph.PyCallGraph(output=graphviz, config=config):
-            n = note.Note()
+            #n = note.Note()
+            #meter.TimeSignature('4/4')
             #ct.testFocus() # run routine
-
+            pass
         print('elapsed time: %s' % t)
         # open the completed file
         print('file path: ' + fp)

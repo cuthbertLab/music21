@@ -125,7 +125,8 @@ class ModuleGather(object):
         self.slowModules = ['graph', 'figuredBass/realizer', 
                             'features/jSymbolic', 'features/native', 'figuredBass/examples', 
                             'braille/test', 'test/testStream', 'analysis/windowed', 
-                            'converter/__init__', 'metadata/bundles', 'musicxml/fromMxObjects',
+                            'converter/__init__', 'metadata/bundles', 
+                            'musicxml/xmlToM21', 'musicxml/fromMxObjects',
                             'romanText/translate', 'musicxml/m21ToString', 'alpha/theoryAnalysis/theoryAnalyzer']
         # search on init
         self._walk()

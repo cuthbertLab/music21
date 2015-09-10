@@ -393,7 +393,7 @@ class ConverterTextLine(SubConverter):
     
     >>> s = corpus.parse('bwv66.6')
     >>> s.measures(1,4).show('textline')
-    u'{0.0} <music21.stream.Part Soprano> / {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>...' 
+    '{0.0} <music21.stream.Part Soprano> / {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>...' 
     '''
     registerFormats = ('textline',)
     registerOutputExtensions = ('txt',)
@@ -584,12 +584,126 @@ class ConverterNoteworthyBinary(SubConverter):
         self.stream = noteworthyBinary.NWCConverter().parseFile(fp)
 
 #-------------------------------------------------------------------------------
-class ConverterMusicXML(SubConverter):
+class ConverterMusicXMLET(SubConverter):
     '''Converter for MusicXML
     '''
     registerFormats = ('musicxml','xml')
     registerInputExtensions = ('xml', 'mxl', 'mx', 'musicxml')
     registerOutputExtensions = ('xml', 'mxl')
+    
+    def __init__(self):
+        self._mxScore = None # store the musicxml object representation
+        SubConverter.__init__(self)
+
+    #---------------------------------------------------------------------------
+    def parseData(self, xmlString, number=None):
+        '''
+        Open MusicXML data from a string.
+        '''
+        from music21.musicxml import xmlToM21
+
+        c = xmlToM21.MusicXMLImporter()
+        c.xmlText = xmlString
+        c.parseXMLText()
+        self.stream = c.stream
+
+    def parseFile(self, fp, number=None):
+        '''
+        Open from a file path; check to see if there is a pickled
+        version available and up to date; if so, open that, otherwise
+        open source.
+        '''
+        # return fp to load, if pickle needs to be written, fp pickle
+        # this should be able to work on a .mxl file, as all we are doing
+        # here is seeing which is more recent
+        from music21 import converter        
+        from music21.musicxml import xmlToM21
+
+        c = xmlToM21.MusicXMLImporter()
+
+        # here, we can see if this is a mxl or similar archive
+        arch = converter.ArchiveManager(fp)
+        if arch.isArchive():
+            archData = arch.getData()
+            c.xmlText = archData
+            c.parseXMLText()
+        else: # its a file path or a raw musicxml string
+            c.readFile(fp)
+
+        # movement titles can be stored in more than one place in musicxml
+        # manually insert file name as a movementName title if no titles are defined
+        if c.stream.metadata.movementName == None:
+            junk, fn = os.path.split(fp)
+            c.stream.metadata.movementName = fn
+        self.stream = c.stream
+
+    def runThroughMusescore(self, fp, **keywords):
+        musescorePath = environLocal['musescoreDirectPNGPath']
+        if musescorePath == "":
+            raise SubConverterException("To create PNG files directly from MusicXML you need to download MuseScore")
+        elif not os.path.exists(musescorePath):
+            raise SubConverterException("Cannot find a path to the 'mscore' file at %s -- download MuseScore" % musescorePath)
+
+        fpOut = fp[0:len(fp) - 3]
+        fpOut += "png"
+        musescoreRun = '"' + musescorePath + '" ' + fp + " -o " + fpOut + " -T 0 "
+        if 'dpi' in keywords:
+            musescoreRun += " -r " + str(keywords['dpi'])
+        if common.runningUnderIPython():
+            musescoreRun += " -r " + str(defaults.ipythonImageDpi)
+
+        storedStrErr = sys.stderr
+        if six.PY2:
+            from StringIO import StringIO # @UnusedImport @UnresolvedImport
+        else:
+            from io import StringIO # @Reimport
+        fileLikeOpen = StringIO()
+        sys.stderr = fileLikeOpen
+        os.system(musescoreRun)
+        fileLikeOpen.close()
+        sys.stderr = storedStrErr
+
+        fp = fpOut[0:len(fpOut) - 4] + "-1.png"
+        #common.cropImageFromPath(fp)       
+        return fp
+    
+    def write(self, obj, fmt, fp=None, subformats=None, **keywords):
+        from music21.musicxml import m21ToString
+        ### hack to make musescore excerpts -- fix with a converter class in MusicXML
+        if subformats is not None and 'png' in subformats:
+            savedDefaultTitle = defaults.title
+            savedDefaultAuthor = defaults.author
+            defaults.title = ''
+            defaults.author = ''
+
+        dataStr = m21ToString.fromMusic21Object(obj)
+        fp = self.writeDataStream(fp, dataStr)
+
+        if subformats is not None and 'png' in subformats:
+            defaults.title = savedDefaultTitle
+            defaults.author = savedDefaultAuthor
+
+        
+        if subformats is not None and 'png' in subformats:
+            fp = self.runThroughMusescore(fp, **keywords)
+        return fp
+
+    def show(self, obj, fmt, app=None, subformats=None, **keywords):
+        '''
+        Override to do something with png...
+        '''
+        returnedFilePath = self.write(obj, fmt, subformats=subformats, **keywords)
+        if subformats is not None and 'png' in subformats:
+            fmt = 'png'
+        self.launch(returnedFilePath, fmt=fmt, app=app)
+   
+
+class ConverterMusicXML(SubConverter):
+    '''Converter for MusicXML
+    '''
+    registerFormats = ('oldmusicxml','oldxml')
+    registerInputExtensions = ('oldxml', 'oldmxl', 'oldmx', 'oldmusicxml')
+    registerOutputExtensions = ('oldxml', 'oldmxl')
     
     def __init__(self):
         self._mxScore = None # store the musicxml object representation

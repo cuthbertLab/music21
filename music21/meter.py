@@ -24,6 +24,7 @@ import unittest
 from music21 import base
 from music21 import beam
 from music21 import common
+from music21 import defaults
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
@@ -2166,7 +2167,6 @@ class MeterSequence(MeterTerminal):
         '''
         For a given level, return the time span of each terminal or sequnece
 
-
         >>> b = meter.MeterSequence('4/4', 4)
         >>> b[1] = b[1].subdivide(2)
         >>> b[3] = b[3].subdivide(2)
@@ -2180,14 +2180,13 @@ class MeterSequence(MeterTerminal):
         >>> b.getLevelSpan(2)
         [(0.0, 1.0), (1.0, 1.5), (1.5, 2.0), (2.0, 3.0), (3.0, 3.25), (3.25, 3.5), (3.5, 4.0)]
         '''
-        optf = opFrac
         ms = self._getLevelList(level, flat=True)
         mapping = []
         pos = 0.0
 
         for i in range(len(ms)):
             start = pos
-            end = optf(pos + ms[i].duration.quarterLength)
+            end = opFrac(pos + ms[i].duration.quarterLength)
             mapping.append((start, end))
             pos = end
         return mapping
@@ -2472,14 +2471,18 @@ class MeterSequence(MeterTerminal):
         3
         >>> b.offsetToDepth(1.5)
         2
+
+        >>> b.offsetToDepth(-1)
+        Traceback (most recent call last):
+        MeterException: cannot access from qLenPos -1.0
         '''
         qLenPos = opFrac(qLenPos)
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
             raise MeterException('cannot access from qLenPos %s' % qLenPos)
 
         # need to quantize by lowest level
-        mapMin = self.getLevelSpan(self.depth-1)
-        msMin = self.getLevel(self.depth-1)
+        mapMin = self.getLevelSpan(self.depth - 1)
+        msMin = self.getLevel(self.depth - 1)
         qStart, unused_qEnd = mapMin[msMin.offsetToIndex(qLenPos)]
         if align == 'quantize':
             posMatch = opFrac(qStart)
@@ -2490,7 +2493,7 @@ class MeterSequence(MeterTerminal):
         for level in range(self.depth):
             mapping = self.getLevelSpan(level) # get mapping for each level
             for start, end in mapping:
-                if align in ['start', 'quantize']:
+                if align in ('start', 'quantize'):
                     srcMatch = start
                 elif align == 'end':
                     srcMatch = end
@@ -2671,7 +2674,8 @@ class TimeSignature(base.Music21Object):
     if you have the '11/16' time above, you may want to have it displayed as
     '2/4+3/16' or '11/16 (2/4+3/16)'.  Or you might want the written
     TimeSignature to contradict what the notes imply.  All this can be done
-    with .displaySequence.  '''
+    with .displaySequence.  
+    '''
 
     classSortOrder = 4
 
@@ -2687,8 +2691,12 @@ class TimeSignature(base.Music21Object):
                                 'so don\'t expect proper output yet.',
         }
 
-    def __init__(self, value='4/4', partitionRequest=None):
+    def __init__(self, value=None, partitionRequest=None):
         base.Music21Object.__init__(self)
+        
+        if value is None:
+            value = '{0}/{1}'.format(defaults.meterNumerator, defaults.meterDenominatorBeatType)
+                
         self._overriddenBarDuration = None
         self.symbol = None
         self.displaySequence = None
@@ -3109,7 +3117,6 @@ class TimeSignature(base.Music21Object):
 
     barDuration = property(_getBarDuration, _setBarDuration,
         doc = '''Return a :class:`~music21.duration.Duration` object equal to the total length of this TimeSignature.
-
 
         >>> ts = meter.TimeSignature('5/16')
         >>> ts.barDuration

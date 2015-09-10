@@ -39,11 +39,11 @@ class LyricSearcher(object):
         >>> p0 = corpus.parse('luca/gloria').parts[0]
         >>> ls = search.lyrics.LyricSearcher(p0)
         >>> pp(ls.index()[0:5]) 
-        [IndexedLyric(el=<music21.note.Note C>, start=0, end=2, measure=1, lyric=<music21.note.Lyric number=1 identifier="1" syllabic=single text="Et">, text=...'Et'),
-         IndexedLyric(el=<music21.note.Note D>, start=3, end=5, measure=2, lyric=<music21.note.Lyric number=1 identifier="1" syllabic=single text="in">, text=...'in'),
-         IndexedLyric(el=<music21.note.Note F>, start=6, end=9, measure=2, lyric=<music21.note.Lyric number=1 identifier="1" syllabic=begin text="ter">, text=...'ter'),
-         IndexedLyric(el=<music21.note.Note F>, start=9, end=11, measure=3, lyric=<music21.note.Lyric number=1 identifier="1" syllabic=end text="ra">, text=...'ra'),
-         IndexedLyric(el=<music21.note.Note A>, start=12, end=15, measure=3, lyric=<music21.note.Lyric number=1 identifier="1" syllabic=single text="pax">, text=...'pax')]        
+        [IndexedLyric(el=<music21.note.Note C>, start=0, end=2, measure=1, lyric=<music21.note.Lyric number=1 syllabic=single text="Et">, text=...'Et'),
+         IndexedLyric(el=<music21.note.Note D>, start=3, end=5, measure=2, lyric=<music21.note.Lyric number=1 syllabic=single text="in">, text=...'in'),
+         IndexedLyric(el=<music21.note.Note F>, start=6, end=9, measure=2, lyric=<music21.note.Lyric number=1 syllabic=begin text="ter">, text=...'ter'),
+         IndexedLyric(el=<music21.note.Note F>, start=9, end=11, measure=3, lyric=<music21.note.Lyric number=1 syllabic=end text="ra">, text=...'ra'),
+         IndexedLyric(el=<music21.note.Note A>, start=12, end=15, measure=3, lyric=<music21.note.Lyric number=1 syllabic=single text="pax">, text=...'pax')]        
         '''
         if s is None:
             s = self.stream

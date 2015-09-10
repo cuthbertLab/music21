@@ -30,16 +30,7 @@ from music21 import environment
 _MOD = 'musicxml.py'
 environLocal = environment.Environment(_MOD)
 
-
-#-------------------------------------------------------------------------------
-# store the highest version number of m21 that pickled mxl object files
-# are compatible; compatible pickles (always written with the m21 version)
-# are >= to this value
-# if changes are made here that are not compatible, the m21 version number
-# needs to be increased and this number needs to be set to that value
-VERSION_MINIMUM = (1, 9, 0) 
-
-
+ 
 # new objects to add: octave-shift, in direction-type
 # bracket, in direction-type
 # Notations -> ornaments, trill-mark/wavy-line
@@ -96,7 +87,7 @@ TECHNICAL_MARKS = ['up-bow', 'down-bow', 'harmonic', 'open-string',
 
 #-------------------------------------------------------------------------------
 def yesNoToBoolean(value):
-    if value in ['yes', True]:
+    if value in ('yes', True):
         return True
     return False
 
@@ -1297,7 +1288,10 @@ class Measure(MusicXMLElementList):
         self.external['divisions'] = attributes.get('divisions')
 
     def update(self):
-        '''This method looks at all note, forward, and backup objects and updates divisons and attributes references
+        '''
+        This method looks at all note, forward, and backup 
+        objects and updates divisons and attributes 
+        references.
         '''
         updateAttributes = False
         if len(self._attributesObjList) > 1:

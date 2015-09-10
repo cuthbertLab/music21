@@ -10,7 +10,10 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
-_all_ = ['mxObjects', 'm21ToString', 'toMxObjects', 'fromMxObjects', 'xmlHandler']
+_all_ = ['mxObjects', 'm21ToString', 'toMxObjects', 'xmlHandler',
+         'xmlObjects', 'xmlToM21',
+         'fromMxObjects'
+         ]
 
 import sys
 from music21.musicxml import mxObjects
@@ -18,6 +21,10 @@ from music21.musicxml import m21ToString
 from music21.musicxml import toMxObjects
 from music21.musicxml import fromMxObjects
 from music21.musicxml import xmlHandler
+
+from music21.musicxml import xmlObjects
+from music21.musicxml import xmlToM21
+
 #------------------------------------------------------------------------------
 # eof
 

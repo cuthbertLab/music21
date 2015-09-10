@@ -93,7 +93,7 @@ class CapellaImporter(object):
         self.zipFilename = None
         self.mainDom = None
 
-    def scoreFromFile(self, filename, systemScore = False):
+    def scoreFromFile(self, filename, systemScore=False):
         '''
         main program: opens a file given by filename and returns a complete
         music21 Score from it.
@@ -124,7 +124,7 @@ class CapellaImporter(object):
         self.xmlText = xmlText
         return xmlText
 
-    def parseXMLText(self, xmlText = None):
+    def parseXMLText(self, xmlText=None):
         '''
         Takes the string (or unicode string) in xmlText and parses it with `xml.dom.minidom`.
         Sets `self.mainDom` to the dom object and returns the dom object.
@@ -140,7 +140,7 @@ class CapellaImporter(object):
         self.mainDom = it.root
         return self.mainDom
 
-    def domElementFromText(self, xmlText = None):
+    def domElementFromText(self, xmlText=None):
         '''
         Utility method, especially for the documentation examples/tests, which uses
         `xml.etree.ElementTree` to parse the string and returns its root object.
@@ -231,7 +231,7 @@ class CapellaImporter(object):
         newScore.elementsChanged()
         return newScore
 
-    def systemScoreFromScore(self, scoreElement, scoreObj = None):
+    def systemScoreFromScore(self, scoreElement, scoreObj=None):
         '''
         returns an :class:`~music21.stream.Score` object from a <score> tag.
         
@@ -262,7 +262,7 @@ class CapellaImporter(object):
         scoreObj.elementsChanged()
         return scoreObj
 
-    def systemFromSystem(self, systemElement, systemObj = None):
+    def systemFromSystem(self, systemElement, systemObj=None):
         r'''
         returns a :class:`~music21.stream.System` object from a <system> tag.
         The System object will contain :class:`~music21.stream.Part` objects
@@ -309,7 +309,7 @@ class CapellaImporter(object):
             systemObj.insert(0, partObj)
         return systemObj
     
-    def streamFromNoteObjects(self, noteObjectsElement, streamObj = None):
+    def streamFromNoteObjects(self, noteObjectsElement, streamObj=None):
         r'''
         
         Converts a <noteObjects> tag into a :class:`~music21.stream.Stream` object which is returned.

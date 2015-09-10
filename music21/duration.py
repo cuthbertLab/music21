@@ -361,10 +361,10 @@ def quarterLengthToNonPowerOf2Tuplet(qLen):
     >>> duration.quarterLengthToNonPowerOf2Tuplet(7)
     (<music21.duration.Tuplet 8/7/quarter>, DurationTuple(type='breve', dots=0, quarterLength=8.0))
     
-    >>> duration.quarterLengthToNonPowerOf2Tuplet(7/16)
+    >>> duration.quarterLengthToNonPowerOf2Tuplet(7.0/16)
     (<music21.duration.Tuplet 8/7/64th>, DurationTuple(type='eighth', dots=0, quarterLength=0.5))
     
-    >>> duration.quarterLengthToNonPowerOf2Tuplet(7/3)
+    >>> duration.quarterLengthToNonPowerOf2Tuplet(7.0/3)
     (<music21.duration.Tuplet 12/7/16th>, DurationTuple(type='whole', dots=0, quarterLength=4.0))
         
     And of course...
@@ -1393,6 +1393,9 @@ class Duration(SlottedObject):
                 raise DurationException("Cannot parse argument {0}".format(a))
 
         
+        if 'durationTuple' in keywords:
+            self.addDurationTuple(keywords['durationTuple'])
+        
         if 'dots' in keywords:
             storeDots = keywords['dots']
         else:
@@ -1478,8 +1481,8 @@ class Duration(SlottedObject):
                 self.components = list(qlc.components)
                 if qlc.tuplet is not None:
                     self.tuplets = (qlc.tuplet,)
-            except DurationException:
-                print("problem updating components of note with quarterLength %s, chokes quarterLengthToDurations\n" % self.quarterLength)
+            except DurationException:                
+                environLocal.printDebug("problem updating components of note with quarterLength %s, chokes quarterLengthToDurations\n" % self.quarterLength)
                 raise
         self._componentsNeedUpdating = False
 
@@ -2943,18 +2946,6 @@ class Test(unittest.TestCase):
         myTuplet.tupletActual = [5, durationTupleFromTypeDots('eighth',0)]
         self.assertEqual(myTuplet.tupletMultiplier(), opFrac(2/5.0))
 
-
-    def testMxLoading(self):
-        from music21.musicxml import fromMxObjects
-        from music21 import musicxml
-        a = musicxml.mxObjects.Note()
-        a.setDefaults()
-        m = musicxml.mxObjects.Measure()
-        m.setDefaults()
-        a.external['measure'] = m # assign measure for divisions ref
-        a.external['divisions'] = m.external['divisions']
-        c = fromMxObjects.mxToDuration(a)
-        self.assertEqual(c.quarterLength, 1.0)
 
     def testTupletTypeComplete(self):
         '''
