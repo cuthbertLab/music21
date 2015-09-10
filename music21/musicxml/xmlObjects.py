@@ -62,7 +62,7 @@ TECHNICAL_MARKS = {'up-bow'          : articulations.UpBow,
                    'other-technical' : articulations.TechnicalIndication,
                    }
 
-# NON-spanner ornaments
+# NON-spanner ornaments that go into Expressions
 ORNAMENT_MARKS = {'trill-mark'       : expressions.Trill,
                   'turn'             : expressions.Turn,
                   # TODO: 'delayed-turn'
@@ -74,7 +74,6 @@ ORNAMENT_MARKS = {'trill-mark'       : expressions.Trill,
                   'other-ornament'   : expressions.Ornament
                   # TODO: 'accidental-mark' -- something else...
                   }
-
 #-------------------------------------------------------------------------------
 # helpers
 

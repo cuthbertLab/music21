@@ -176,7 +176,7 @@ class ArchiveManager(object):
                             foundEncoding = re.match(br"encoding=[\'\"](\S*?)[\'\"]", post[:1000])
                             if foundEncoding:
                                 defaultEncoding = foundEncoding.group(1).decode('ascii')
-                                print("FOUND ENCODING: ", defaultEncoding)
+                                #print("FOUND ENCODING: ", defaultEncoding)
                             else:
                                 defaultEncoding = 'UTF-8'
                             try:

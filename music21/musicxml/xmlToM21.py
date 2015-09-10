@@ -507,8 +507,20 @@ class MusicXMLImporter(XMLParserBase):
                 self.m21PartObjectsById[partId] = part
 
 
-        self.partGroups()        
+        self.partGroups()
+
+        # copy spanners that are complete into the Score. 
+        # basically just the StaffGroups for now.
+        rm = []
+        for sp in self.spannerBundle.getByCompleteStatus(True):
+            self.stream._insertCore(0, sp)
+            rm.append(sp)
+        # remove from original spanner bundle
+        for sp in rm:
+            self.spannerBundle.remove(sp)
+
         s.elementsChanged()
+
         
         if inputM21 is None:
             return s
@@ -522,6 +534,13 @@ class MusicXMLImporter(XMLParserBase):
             return None
 
     def parsePartList(self, mxScore):
+        '''
+        Parses the <part-list> tag and adds
+        <score-part> entries into self.partIdDict[partId]
+        and adds them to any open <part-group> entries,
+        stored as PartGroup objects in self.partGroupList
+        
+        '''
         mxPartList = mxScore.find('part-list')
         if mxPartList is None:
             return
@@ -630,6 +649,9 @@ class MusicXMLImporter(XMLParserBase):
 
 
     def partGroups(self):
+        '''
+        set StaffGroup objects from the <part-group> tags.
+        '''
         seta = _setAttributeFromTagText
         for pgObj in self.partGroupList:
             staffGroup = layout.StaffGroup()
@@ -640,17 +662,22 @@ class MusicXMLImporter(XMLParserBase):
                 except KeyError as ke:
                     raise MusicXMLImportException("Cannot find part in m21PartIdDictionary:"
                                 + " %s \n   Full Dict:\n   %r " % (ke, self.m21PartObjectsById))
-                partGroup = pgObj.mxPartGroup
-                seta(staffGroup, partGroup, 'group-name', 'name')
-                # TODO: group-name-display
-                seta(staffGroup, partGroup, 'group-abbreviation', 'abbreviation')
-                # TODO: group-abbreviation-display
+            partGroup = pgObj.mxPartGroup
+            seta(staffGroup, partGroup, 'group-name', 'name')
+            # TODO: group-name-display
+            seta(staffGroup, partGroup, 'group-abbreviation', 'abbreviation')
+            # TODO: group-abbreviation-display
+            if partGroup.find('group-symbol') is not None:            
                 seta(staffGroup, partGroup, 'group-symbol', 'symbol')
-                seta(staffGroup, partGroup, 'group-barline', 'barTogether')    
-                # TODO: group-time
-                # TODO: editorial
-                staffGroup.completeStatus = True
-                self.stream._insertCore(0, staffGroup)
+            else:
+                staffGroup.symbol = 'brace' # MusicXML default
+            
+            seta(staffGroup, partGroup, 'group-barline', 'barTogether')    
+            # TODO: group-time
+            # TODO: editorial
+            staffGroup.completeStatus = True
+            self.spannerBundle.append(staffGroup)
+            #self.stream._insertCore(0, staffGroup)
         self.stream.elementsChanged()
                 
 
@@ -1872,7 +1899,7 @@ class MeasureParser(XMLParserBase):
         # TODO: attr: print-object
         
         # TODO: adjust tie with tied
-        # TODO: tuplet
+        # TODO: tuplet -- look of time-modification.
         # TODO: slide
         # TODO: dynamics
         # TODO: arpeggiate
@@ -1902,11 +1929,17 @@ class MeasureParser(XMLParserBase):
             n.expressions.append(fermata)
 
         for mxObj in flatten(mxNotations, 'ornaments'):
-            post = self.xmlOrnamentToExpressionOrArticulation(mxObj)
-            if post is not None:
-                n.expressions.append(post)
+            if mxObj.tag in (xmlObjects.ORNAMENT_MARKS):
+                post = self.xmlOrnamentToExpression(mxObj)
+                if post is not None:
+                    n.expressions.append(post)
                 #environLocal.printDebug(['adding to epxressions', post])
-
+            elif mxObj.tag == 'wavy-line':
+                self.xmlOneSpanner(mxObj, n, expressions.TrillExtension)
+            elif mxObj.tag == 'tremolo':
+                self.xmlToTremolo(mxObj, n)
+        
+        
         # create spanners for rest
         self.xmlNotationsToSpanners(mxNotations, n)
 
@@ -1964,7 +1997,7 @@ class MeasureParser(XMLParserBase):
             environLocal.printDebug("Cannot translate %s in %s." % (tag, mxObj))
             return None
         
-    def xmlOrnamentToExpressionOrArticulation(self, mxObj):
+    def xmlOrnamentToExpression(self, mxObj):
         '''
         Convert mxOrnament into a music21 ornament. 
         
@@ -1979,7 +2012,7 @@ class MeasureParser(XMLParserBase):
         >>> MP = musicxml.xmlToM21.MeasureParser()
 
         >>> mxOrn = EL('<inverted-turn placement="above"/>')
-        >>> a = MP.xmlOrnamentToExpressionOrArticulation(mxOrn)
+        >>> a = MP.xmlOrnamentToExpression(mxOrn)
         >>> a
         <music21.expressions.InvertedTurn>
         >>> a.placement
@@ -1988,7 +2021,7 @@ class MeasureParser(XMLParserBase):
         If it can't be converted, return None
 
         >>> mxOrn = EL('<crazy-slide placement="above"/>')
-        >>> a = MP.xmlOrnamentToExpressionOrArticulation(mxOrn)
+        >>> a = MP.xmlOrnamentToExpression(mxOrn)
         >>> a is None
         True
         
@@ -1996,15 +2029,16 @@ class MeasureParser(XMLParserBase):
         'delayed-turn', 'delayed-inverted-turn'
         '''
         tag = mxObj.tag
-        if tag in xmlObjects.ORNAMENT_MARKS:
+        try:
             orn = xmlObjects.ORNAMENT_MARKS[tag]()
-            # print-style
-            # trill-sound?
-            placement = mxObj.get('placement')
-            if placement is not None:
-                orn.placement = placement
-            return orn
-        return None
+        except KeyError: # should already be checked...
+            return None
+        # print-style
+        # trill-sound?
+        placement = mxObj.get('placement')
+        if placement is not None:
+            orn.placement = placement
+        return orn
 
     def xmlDirectionTypeToSpanners(self, mxObj):
         '''
@@ -2105,32 +2139,29 @@ class MeasureParser(XMLParserBase):
     def xmlNotationsToSpanners(self, mxNotations, n):
         for mxObj in mxNotations.findall('slur'):
             self.xmlOneSpanner(mxObj, n, spanner.Slur)
-        for mxObj in mxNotations.findall('wavy-line'):
-            self.xmlOneSpanner(mxObj, n, expressions.TrillExtension)
         for mxObj in mxNotations.findall('glissando'):
             self.xmlOneSpanner(mxObj, n, spanner.Glissando)
         
-        for mxObj in mxNotations.findall('tremolo'):
-            # tremolo is tricky -- can be either an
-            # expression or spanner...
-            #environLocal.warn("Got A tremolo...")
-            tremoloType = mxObj.get('type')
-            isSingle = True
-            if tremoloType in ('start', 'stop'):
-                isSingle = False
-                
-            try:
-                numMarks = int(mxObj.text.strip())
-            except (ValueError, TypeError):
-                #environLocal.warn("could not convert ", dir(mxObj))
-                numMarks = 3
-            if isSingle is True:
-                ts = expressions.Tremolo()
-                ts.numberOfMarks = numMarks
-                n.expressions.append(ts)
-            else:
-                tremSpan = self.xmlOneSpanner(mxObj, n, expressions.TremoloSpanner())
-                tremSpan.numberOfMarks = numMarks
+    def xmlToTremolo(self, mxTremolo, n):
+        # tremolo is tricky -- can be either an
+        # expression or spanner...
+        tremoloType = mxTremolo.get('type')
+        isSingle = True
+        if tremoloType in ('start', 'stop'):
+            isSingle = False
+            
+        try:
+            numMarks = int(mxTremolo.text.strip())
+        except (ValueError, AttributeError):
+            #environLocal.warn("could not convert ", dir(mxObj))
+            numMarks = 3
+        if isSingle is True:
+            ts = expressions.Tremolo()
+            ts.numberOfMarks = numMarks
+            n.expressions.append(ts)
+        else:
+            tremSpan = self.xmlOneSpanner(mxTremolo, n, expressions.TremoloSpanner)
+            tremSpan.numberOfMarks = numMarks
             
     def xmlOneSpanner(self, mxObj, target, spannerClass, allowDuplicateIds=False):
         '''
@@ -2225,7 +2256,7 @@ class MeasureParser(XMLParserBase):
         #environLocal.printDebug(['got mxNotations', mxNotations])
     
         if mxNotations is not None:
-            # TODO: findall
+            # TODO: findall -- these are unbounded...
             mxTuplet = mxNotations.find('tuplet')
             if mxTuplet is not None:
                 # TODO: tuplet-actual
@@ -3455,15 +3486,20 @@ class Test(unittest.TestCase):
         from music21 import converter
 
         s = converter.parse(testPrimitive.staffGroupsNested41d)
-        self.assertEqual(len(s.getElementsByClass('StaffGroup')), 2)
-        #raw = s.musicxml
-        sg1 = s.getElementsByClass('StaffGroup')[0]
-        self.assertEqual(sg1.symbol, 'brace')
+        staffGroups = s.getElementsByClass('StaffGroup')
+        #staffGroups.show()
+        self.assertEqual(len(staffGroups), 2)
+        sgs = s.getElementsByClass('StaffGroup')
+
+        sg1 = sgs[0]
+        self.assertEqual(sg1.symbol, 'line')
         self.assertEqual(sg1.barTogether, True)
 
-        sg2 = s.getElementsByClass('StaffGroup')[1]
-        self.assertEqual(sg2.symbol, 'line')
+        
+        sg2 = sgs[1] # Order is right here, was wrong in fromMxObjects
+        self.assertEqual(sg2.symbol, 'brace')
         self.assertEqual(sg2.barTogether, True)
+
 
         # TODO: more tests about which parts are there...
 
@@ -3751,7 +3787,7 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test, verbose=True) #, runTest="testInstrumentTranspositionB")
+    music21.mainTest(Test) #, runTest="testInstrumentTranspositionB")
     
     
     
