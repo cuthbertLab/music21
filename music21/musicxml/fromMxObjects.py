@@ -4098,7 +4098,7 @@ class Test(unittest.TestCase):
             pCount += len(cc.pitches)
         self.assertEqual(pCount, 97)
         
-    def testLucaGloriaSpanners(self):
+    def xtestLucaGloriaSpanners(self):
         '''
         lots of lines, including overlapping here
         
@@ -4116,7 +4116,7 @@ _DOC_ORDER = [mxScoreToScore]
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
-    music21.mainTest(Test, runTest='testLucaGloriaSpanners')
+    music21.mainTest(Test)
    
 #------------------------------------------------------------------------------
 # eof

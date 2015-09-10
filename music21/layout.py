@@ -920,7 +920,7 @@ class LayoutScore(stream.Opus):
 
         top = previousDistance + bottomOfLastSystem
         bottom = top + systemHeight
-        dataTuple = Systemsize(top, leftMargin, rightMargin, bottom)
+        dataTuple = Systemsize(float(top), float(leftMargin), float(rightMargin), float(bottom))
         positionForSystemCache[cacheKey] = dataTuple
         return dataTuple
 
@@ -986,7 +986,7 @@ class LayoutScore(stream.Opus):
 
         >>> staffLayout031 = ls.pages[0].systems[3].staves[1].staffLayout
         >>> staffLayout031
-        <music21.layout.StaffLayout distance None, staffNumber None, staffSize 80.0, staffLines None>
+        <music21.layout.StaffLayout distance None, staffNumber None, staffSize 80, staffLines None>
         >>> staffLayout031.hidden
         True
 
@@ -1179,6 +1179,7 @@ class LayoutScore(stream.Opus):
             else:
                 staffSize = self.getStaffSizeFromLayout(previousPageId, previousSystemId, staffId)
 
+        staffSize = float(staffSize)
         staffSizeCache[cacheKey] = staffSize
         return staffSize
 
