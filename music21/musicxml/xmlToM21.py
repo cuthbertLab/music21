@@ -1724,7 +1724,7 @@ class MeasureParser(XMLParserBase):
                 p.accidental = pitch.Accidental(float(accAlter))
             except pitch.AccidentalException:
                 raise MusicXMLImportException('incorrect accidental {0} for pitch {1}' .format(accAlter, p))
-            p.accidental.displayStatus = True
+            p.accidental.displayStatus = False
 
         return p
     

@@ -1748,11 +1748,12 @@ class Test(unittest.TestCase):
         testConv = Converter()
         self.assertRaises(MeiElementError, testConv.parseData, meiString)
 
-        # The ConverterMusicXML raises a SubConverterException with "mxlString," so as long as
-        # that's raised, we know that parseData()... well at least that it didn't choose MEI.
-        from music21.converter.subConverters import SubConverterException
-        testConv = Converter()
-        self.assertRaises(SubConverterException, testConv.parseData, mxlString)
+        # TODO: another test -- score-partwise is good enough for new converter.
+        ## The ConverterMusicXML raises a SubConverterException with "mxlString," so as long as
+        ## that's raised, we know that parseData()... well at least that it didn't choose MEI.
+        #from music21.converter.subConverters import SubConverterException
+        #testConv = Converter()
+        #self.assertRaises(SubConverterException, testConv.parseData, mxlString)
 
 
 #-------------------------------------------------------------------------------

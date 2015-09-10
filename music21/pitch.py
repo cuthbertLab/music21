@@ -4481,7 +4481,7 @@ class Test(unittest.TestCase):
         pAltered = tenorMeasures[0].pitches[1]
         self.assertEqual(pAltered.accidental.name, 'flat')
         self.assertEqual(pAltered.accidental.displayType, 'normal')
-        # in key signature, so shuold not be shown
+        # in key signature, so should not be shown
         self.assertEqual(pAltered.accidental.displayStatus, False)
 
         altoMeasures = s.parts[1].getElementsByClass('Measure')
