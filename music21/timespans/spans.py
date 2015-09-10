@@ -109,7 +109,7 @@ class ElementTimespan(object):
     >>> elementTimespan.part
     <music21.stream.Part Tenor>
     >>> elementTimespan.partName
-    u'Tenor'
+    'Tenor'
 
     Find out what measure it's in:
 
@@ -487,7 +487,7 @@ class ElementTimespan(object):
         >>> verticality = tree.getVerticalityAt(1.0)
         >>> elementTimespan = verticality.startTimespans[0]
         >>> elementTimespan.partName
-        u'Soprano'
+        'Soprano'
 
         TODO: remove and see if something better can be done with elementTimespan.part's Part object
         

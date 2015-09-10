@@ -361,10 +361,10 @@ def quarterLengthToNonPowerOf2Tuplet(qLen):
     >>> duration.quarterLengthToNonPowerOf2Tuplet(7)
     (<music21.duration.Tuplet 8/7/quarter>, DurationTuple(type='breve', dots=0, quarterLength=8.0))
     
-    >>> duration.quarterLengthToNonPowerOf2Tuplet(7/16)
+    >>> duration.quarterLengthToNonPowerOf2Tuplet(7.0/16)
     (<music21.duration.Tuplet 8/7/64th>, DurationTuple(type='eighth', dots=0, quarterLength=0.5))
     
-    >>> duration.quarterLengthToNonPowerOf2Tuplet(7/3)
+    >>> duration.quarterLengthToNonPowerOf2Tuplet(7.0/3)
     (<music21.duration.Tuplet 12/7/16th>, DurationTuple(type='whole', dots=0, quarterLength=4.0))
         
     And of course...

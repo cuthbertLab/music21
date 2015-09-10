@@ -457,7 +457,6 @@ class MusicXMLImporter(XMLParserBase):
         XMLParserBase.__init__(self)
         self.xmlText = None
         self.xmlFilename = None
-        self.etree = None
         self.xmlRoot = None
         self.stream = stream.Score()
         
@@ -483,8 +482,8 @@ class MusicXMLImporter(XMLParserBase):
         return self.stream
     
     def readFile(self, filename):
-        self.etree = ET.parse(filename)
-        self.root = self.etree.getroot()
+        etree = ET.parse(filename)
+        self.root = etree.getroot()
         if self.root.tag != 'score-partwise':
             raise MusicXMLImportException("Cannot parse MusicXML files not in score-partwise. Root tag was '{0}'".format(self.root.tag))
         self.xmlRootToScore(self.root, self.stream)
@@ -492,10 +491,13 @@ class MusicXMLImporter(XMLParserBase):
     def parseXMLText(self):
         sio = six.StringIO(self.xmlText)
         try:
-            self.etree = ET.parse(sio)
+            etree = ET.parse(sio)
+            self.root = etree.getroot()
         except ET.ParseError:
-            raise # try to do something better here...
-        self.root = self.etree.getroot()
+            try:
+                self.root = ET.XML(self.xmlText)
+            except ET.ParseError:
+                raise # try to do something better here...
         if self.root.tag != 'score-partwise':
             raise MusicXMLImportException("Cannot parse MusicXML files not in score-partwise. Root tag was '{0}'".format(self.root.tag))
         self.xmlRootToScore(self.root, self.stream)
@@ -1193,7 +1195,7 @@ class MeasureParser(XMLParserBase):
                         'backup': 'xmlBackup',
                         'forward': 'xmlForward',
                         'direction': 'xmlDirection',
-                        'attributes': None,
+                        'attributes': 'parseAttributesTag',
                         'harmony': 'xmlHarmony',
                         'figured-bass': None,
                         'sound': None,
@@ -1307,7 +1309,7 @@ class MeasureParser(XMLParserBase):
         for mxPrint in self.mxMeasure.findall('print'):
             self.xmlPrint(mxPrint)
         
-        self.parseAttributes()
+        self.parseMeasureAttributes()
         self.updateVoiceInformation()
         self.mxMeasureElements = list(self.mxMeasure) # for grabbing next note
         for i, mxObj in enumerate(self.mxMeasureElements):
@@ -2917,7 +2919,7 @@ class MeasureParser(XMLParserBase):
             return 0.0
         return offset/self.divisions
     
-    def parseAttributes(self):        
+    def parseMeasureAttributes(self):        
         self.parseMeasureNumbers()        
         # TODO: implicit
         # TODO: non-controlling 
@@ -2926,27 +2928,11 @@ class MeasureParser(XMLParserBase):
         if width is not None:
             width = _floatOrIntStr(width)
             self.stream.layoutWidth = width
-        self.parseAttributesTags()
-        
-    def parseAttributesTags(self):
-        # TODO: keep track of where they occur in the measure...        
-        mxMeasure = self.mxMeasure
-        
-        allAttributes = mxMeasure.findall('attributes')
-        if len(allAttributes) == 0:
-            self.attributesAreInternal = False
-            self.activeAttributes = self.parent.activeAttributes
-            if self.activeAttributes is None:
-                raise MusicXMLImportException(
-                            'no mxAttribues available for this measure: {0}'.format(mxMeasure)
-                                              )
-        # getting first for each of these for now
-        if self.attributesAreInternal:
-            self.parseNewAttribute(allAttributes[0])
-                
         self.divisions = self.parent.lastDivisions
+             
 
-    def parseNewAttribute(self, mxAttributes):
+    def parseAttributesTag(self, mxAttributes):
+        self.attributesAreInternal = False
         self.activeAttributes = mxAttributes
         self.parent.activeAttributes = self.activeAttributes
         for mxSub in mxAttributes:
@@ -2965,7 +2951,8 @@ class MeasureParser(XMLParserBase):
             #environLocal.warn("Got a transposition of ", str(self.transposition) )
         divisionsTag = mxAttributes.find('divisions')
         if divisionsTag is not None:
-            self.parent.lastDivisions = common.opFrac(float(divisionsTag.text))
+            self.divisions = common.opFrac(float(divisionsTag.text))
+            self.parent.lastDivisions = self.divisions
 
 
     def xmlTransposeToInterval(self, mxTranspose):
@@ -3056,7 +3043,7 @@ class MeasureParser(XMLParserBase):
         
     def handleClef(self, mxClef):
         clef = self.xmlToClef(mxClef)
-        self.insertCoreAndRef(0, mxClef, clef)
+        self.insertCoreAndRef(self.offsetMeasureNote, mxClef, clef)
     
     def xmlToClef(self, mxClef):
         '''

@@ -17824,28 +17824,22 @@ tremoloTest = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
 
 
-ALL = [articulations01, pitches01a, directions31a, lyricsMelisma61d, notations32a, restsDurations02a, rhythmDurations03a, chordsThreeNotesDuration21c,
-beams01, timeSignatures11c, timeSignatures11d, clefs12a, beams02, tuplets23a, tuplets23b, tupletsNested23d, keySignatures13a,
-
-barlines46a, simpleRepeat45a, repeatMultipleTimes45c,
-spannersSlurs33c, metronomeMarks31c, 
-
-multipleAttributesPerMeasures, systemLayoutTwoPart, multiMeasureTies, chordIndependentTies, textExpressions, repeatExpressionsA, repeatExpressionsB, 
-
-repeatBracketsA,
-
-voiceDouble, pianoStaff43a, spanners33a, staffGroupsNested41d,
-
-graceNotes24a, transposingInstruments72a, transposing01, 
-
-
-mixedVoices1a, mixedVoices1b, mixedVoices2, 
-
-colors01, triplets01, textBoxes01, otaveShifts33d,
-
-unicodeStrNoNonAscii,
-unicodeStrWithNonAscii, 
-tremoloTest
+ALL = [
+       articulations01, pitches01a, directions31a, lyricsMelisma61d, notations32a, # 0
+       restsDurations02a, rhythmDurations03a, chordsThreeNotesDuration21c, # 5
+       beams01, timeSignatures11c, timeSignatures11d, clefs12a, beams02, # 8  
+       tuplets23a, tuplets23b, tupletsNested23d, keySignatures13a, #13
+       barlines46a, simpleRepeat45a, repeatMultipleTimes45c, # 17
+       spannersSlurs33c, metronomeMarks31c,  # 20
+       multipleAttributesPerMeasures, systemLayoutTwoPart, multiMeasureTies, #22
+       chordIndependentTies, textExpressions, repeatExpressionsA, repeatExpressionsB, # 25 
+       repeatBracketsA, # 29
+       voiceDouble, pianoStaff43a, spanners33a, staffGroupsNested41d, #30
+       graceNotes24a, transposingInstruments72a, transposing01,  #34
+       mixedVoices1a, mixedVoices1b, mixedVoices2, #37
+       colors01, triplets01, textBoxes01, otaveShifts33d, #40
+       unicodeStrNoNonAscii, unicodeStrWithNonAscii, #44
+       tremoloTest #46
 ]
 
 
@@ -17877,18 +17871,15 @@ class Test(unittest.TestCase):
     def testBasic(self):
         # a basic test to make sure each parse
         from music21 import converter
-        for testMaterial in ALL:
-            dummy = converter.parse(testMaterial)
+        for i,testMaterial in enumerate(ALL):
+            try:
+                dummy = converter.parse(testMaterial)
+            except Exception:
+                print("Failure in test ", i)
+                raise
 
-#-------------------------------------------------------------------------------
-
-class TestMidMeasureClef1(unittest.TestCase):
-    """ Tests if there are mid-mesure clefs clefs: single staff """
-
-    def runTest(self):
-        pass
-
-    def testBasic(self):
+    def testMidMeasureClef1(self):
+        """ Tests if there are mid-mesure clefs clefs: single staff """
         from music21 import stream, note, clef, musicxml, converter, meter
 
         orig_stream = stream.Stream()
@@ -17900,21 +17891,19 @@ class TestMidMeasureClef1(unittest.TestCase):
         orig_clefs = orig_stream.flat.getElementsByClass('Clef')
 
         xml = musicxml.m21ToString.fromStream(orig_stream)
+        self.assertEquals(xml.count('<clef>'), 2) # clefs got out
+        self.assertEquals(xml.count('<measure'), 1) # in one measure
         
         new_stream = converter.parse(xml)
         new_clefs = new_stream.flat.getElementsByClass('Clef')
 
-        assert len(new_clefs) == len(orig_clefs)
-        assert [c.offset for c in new_clefs] == [c.offset for c in orig_clefs]
-        assert [c.classes for c in new_clefs] == [c.classes for c in orig_clefs]
+        self.assertEqual(len(new_clefs), len(orig_clefs))
+        self.assertEqual([c.offset for c in new_clefs], [c.offset for c in orig_clefs])
+        self.assertEqual([c.classes for c in new_clefs], [c.classes for c in orig_clefs])
 
-class TestMidMeasureClef2(unittest.TestCase):
-    """ Tests if there are mid-mesure clefs clefs: multiple staves """
 
-    def runTest(self):
-        pass
-
-    def testBasic(self):
+    def testMidMeasureClefs2(self):
+        """ Tests if there are mid-mesure clefs clefs: multiple staves """
         from music21 import stream, note, clef, musicxml, converter, meter
 
         orig_stream = stream.Stream()
@@ -17922,11 +17911,11 @@ class TestMidMeasureClef2(unittest.TestCase):
         orig_stream.append(stream.Part())
         orig_stream.append(meter.TimeSignature("3/4"))
         
-        for item in [clef.TrebleClef(), note.Note("C4"), clef.BassClef(), \
+        for item in [clef.TrebleClef(), note.Note("C4"), clef.BassClef(),
             note.Note("C4"), note.Note("C4")]:
             orig_stream[0].append(item)
 
-        for item in [clef.BassClef(), note.Note("C4"), note.Note("C4"), \
+        for item in [clef.BassClef(), note.Note("C4"), note.Note("C4"),
             clef.TrebleClef(), note.Note("C4")]:
             orig_stream[1].append(item)
 
@@ -17939,12 +17928,12 @@ class TestMidMeasureClef2(unittest.TestCase):
         new_clefs = [staff.flat.getElementsByClass('Clef') for staff in
             new_stream.getElementsByClass('Part')]
 
-        assert [len(clefs) for clefs in new_clefs] == \
-          [len(clefs) for clefs in orig_clefs]
-        assert [c.offset for c in clefs for clefs in new_clefs] == \
-          [c.offset for c in clefs for clefs in orig_clefs]
-        assert [c.classes for c in clefs for clefs in new_clefs] == \
-          [c.classes for c in clefs for clefs in orig_clefs]
+        self.assertEqual([len(clefs) for clefs in new_clefs],
+          [len(clefs) for clefs in orig_clefs])
+        self.assertEqual([c.offset for c in new_clefs],
+          [c.offset for c in orig_clefs])
+        self.assertEqual([c.classes for c in new_clefs],
+          [c.classes for c in orig_clefs])
 
 #-------------------------------------------------------------------------------
 
@@ -17952,8 +17941,6 @@ if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)
-    music21.mainTest(TestMidMeasureClef1)
-    music21.mainTest(TestMidMeasureClef2)
 
 
 #------------------------------------------------------------------------------
