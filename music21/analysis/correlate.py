@@ -123,7 +123,7 @@ class ActivityMatch(object):
 
         Many dynamics
 
-        >>> s = corpus.parse('schoenberg')
+        >>> s = corpus.parse('schoenberg/opus19/movement2')
         >>> am = analysis.correlate.ActivityMatch(s.parts[0].flat)
         >>> data = am.pitchToDynamic()
         >>> len(data)

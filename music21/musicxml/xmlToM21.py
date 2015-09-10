@@ -880,12 +880,14 @@ class PartParser(XMLParserBase):
                     for eRemove in staffExclude:
                         for eMeasure in m:
                             if eMeasure.derivation.origin is eRemove and eMeasure.derivation.method == '__deepcopy__':
+                                #print("removing element", eMeasure, " from ", m)
                                 m.remove(eMeasure)
                                 break
                         for v in m.voices:
                             v.remove(eRemove)
                             for eVoice in v.elements:
                                 if eVoice.derivation.origin is eRemove and eVoice.derivation.method == '__deepcopy__':
+                                    #print("removing element", eRemove, " from ", m, ' voice', v)
                                     v.remove(eVoice)
                 # after adjusting voices see if voices can be reduced or
                 # removed
@@ -2693,6 +2695,9 @@ class MeasureParser(XMLParserBase):
         offsetDirection = self.xmlToOffset(mxDirection)
         totalOffset = offsetDirection + self.offsetMeasureNote
         
+        # staffKey is the staff that this direction applies to. not
+        # found in mxDir but in mxDirection itself.
+        staffKey = self.getStaffNumberStr(mxDirection)
         # TODO: editorial-voice-direction
         # TODO: staff
         # TODO: sound
@@ -2719,7 +2724,7 @@ class MeasureParser(XMLParserBase):
                     for dyn in mxDir:
                         # TODO: other-dynamic
                         d = dynamics.Dynamic(dyn.tag)
-                        self.insertCoreAndRef(totalOffset, mxDir, d)
+                        self.insertCoreAndRef(totalOffset, staffKey, d)
     
                 elif tag in ('wedge', 'bracket', 'dashes'):
                     self.xmlDirectionTypeToSpanners(mxDir)
@@ -2728,17 +2733,17 @@ class MeasureParser(XMLParserBase):
                     rm = repeat.Segno()
                     rm._positionDefaultX = mxDir.get('default-x')
                     rm._positionDefaultY = mxDir.get('default-y')
-                    self.insertCoreAndRef(totalOffset, mxDir, rm)
+                    self.insertCoreAndRef(totalOffset, staffKey, rm)
                 elif tag == 'coda':
                     rm = repeat.Coda()
                     rm._positionDefaultX = mxDir.get('default-x')
                     rm._positionDefaultY = mxDir.get('default-y')
-                    self.insertCoreAndRef(totalOffset, mxDir, rm)
+                    self.insertCoreAndRef(totalOffset, staffKey, rm)
     
                 elif tag == 'metronome':
                     mm = self.xmlToTempoIndication(mxDir)
                     # SAX was offsetMeasureNote; bug? should be totalOffset???
-                    self.insertCoreAndRef(totalOffset, mxDir, mm)
+                    self.insertCoreAndRef(totalOffset, staffKey, mm)
                 elif tag == 'words':
                     te = self.xmlToTextExpression(mxDir)
                     #environLocal.printDebug(['got TextExpression object', repr(te)])
@@ -2748,9 +2753,9 @@ class MeasureParser(XMLParserBase):
                     if re is not None:
                         # the repeat expression stores a copy of the text
                         # expression within it; replace it here on insertion
-                        self.insertCoreAndRef(totalOffset, mxDir, re)
+                        self.insertCoreAndRef(totalOffset, staffKey, re)
                     else:
-                        self.insertCoreAndRef(totalOffset, mxDir, te)
+                        self.insertCoreAndRef(totalOffset, staffKey, te)
 
     def xmlToTextExpression(self, mxWords):
         '''
@@ -3905,9 +3910,28 @@ class Test(unittest.TestCase):
         self.assertEqual(sizes, [80.0, 120.0, 80.0])
         
 
+    def testCountDynamics(self):
+        '''
+        good test of both dynamics and a partstaff...
+        '''
+        from music21 import  corpus, converter
+        c = converter.parse(corpus.getWorkList('schoenberg/opus19/movement2.mxl')[0], format='musicxml', forceSource=True)
+        dynAll = c.flat.getElementsByClass('Dynamic')
+        self.assertEqual(len(dynAll), 6)
+        notesOrChords = (note.Note, chord.Chord)
+        allNotesOrChords = c.flat.getElementsByClass(notesOrChords)
+        self.assertEqual(len(allNotesOrChords), 50)
+        allChords = c.flat.getElementsByClass('Chord')
+        self.assertEqual(len(allChords), 45)
+        pCount = 0
+        for cc in allChords:
+            pCount += len(cc.pitches)
+        self.assertEqual(pCount, 97)
+        c.show('musicxml.png')
+
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest="testStaffLayout")
+    music21.mainTest(Test, runTest="testCountDynamics")
     
     
     

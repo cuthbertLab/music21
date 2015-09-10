@@ -4082,6 +4082,21 @@ class Test(unittest.TestCase):
                 sizes.append(s.staffSize)
         self.assertEqual(sizes, [80.0, 120.0, 80.0])
         
+    def testCountDynamics(self):
+        from music21 import  corpus, converter
+        c = converter.parse(corpus.getWorkList('schoenberg/opus19/movement2.mxl')[0], format='oldmusicxml', forceSource=True)
+        #c.show('musicxml.png')
+        dynAll = c.flat.getElementsByClass('Dynamic')
+        self.assertEqual(len(dynAll), 6)
+        notesOrChords = (note.Note, chord.Chord)
+        allNotesOrChords = c.flat.getElementsByClass(notesOrChords)
+        self.assertEqual(len(allNotesOrChords), 50)
+        allChords = c.flat.getElementsByClass('Chord')
+        self.assertEqual(len(allChords), 45)
+        pCount = 0
+        for cc in allChords:
+            pCount += len(cc.pitches)
+        self.assertEqual(pCount, 97)
         
 
 #-------------------------------------------------------------------------------
@@ -4091,7 +4106,7 @@ _DOC_ORDER = [mxScoreToScore]
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
-    music21.mainTest(Test, runTest="testStaffLayout")
+    music21.mainTest(Test, runTest="testCountDynamics")
    
 #------------------------------------------------------------------------------
 # eof
