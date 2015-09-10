@@ -4038,9 +4038,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(pageLayouts), 10)
         scoreLayouts = layouts.getElementsByClass('ScoreLayout')
         self.assertEqual(len(scoreLayouts), 1)
-        score1 = scoreLayouts[0]
-        for sltemp in score1.staffLayoutList:
-            print(sltemp, sltemp.distance)
+        #score1 = scoreLayouts[0]
+        #for sltemp in score1.staffLayoutList:
+        #    print(sltemp, sltemp.distance)
 
 
         self.assertEqual(len(layouts), 73)

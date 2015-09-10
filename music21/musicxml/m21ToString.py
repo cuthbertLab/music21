@@ -400,6 +400,7 @@ spirit</words>
         match = '<beat-unit>quarter</beat-unit><beat-unit-dot/><beat-unit>half</beat-unit><beat-unit-dot/>'
         self.assertEqual(raw.find(match) > 0, True)
 
+        # this is <metronome parenthesis="yes"> with spaces removed...
         match = '<metronomeparentheses="yes">'
         self.assertEqual(raw.find(match) > 0, True)
 

@@ -1740,7 +1740,7 @@ class Test(unittest.TestCase):
         # These strings aren't valid documents, but they are enough to pass the detection we're
         # testing in parseData(). But it does mean we'll be testing in a strange way.
         meiString = '<?xml version="1.0" encoding="UTF-8"?><mei><note/></mei>'
-        mxlString = '<?xml version="1.0" encoding="UTF-8"?><score-partwise><note/></score-partwise>'
+        #mxlString = '<?xml version="1.0" encoding="UTF-8"?><score-partwise><note/></score-partwise>'
 
         # The "mei" module raises an MeiElementError with "meiString," so as long as that's raised,
         # we know that parseData() chose correctly.

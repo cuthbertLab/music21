@@ -188,8 +188,8 @@ def _setAttributeFromTagText(m21El, xmlEl, tag, attributeName=None, transform=No
     >>> a2 = SubElement(e2, 'movement-title')
     >>> a2.text = "Trout"
     >>> md = metadata.Metadata()
-    >>> seta(md, e2, 'movement-title')
-    >>> md.movementTitle
+    >>> seta(md, e2, 'movement-title', 'movementName')
+    >>> md.movementName
     'Trout'
     
     set a different attribute
@@ -2686,6 +2686,10 @@ class MeasureParser(XMLParserBase):
     
     
     def xmlDirection(self, mxDirection):
+        '''
+
+        
+        '''
         offsetDirection = self.xmlToOffset(mxDirection)
         totalOffset = offsetDirection + self.offsetMeasureNote
         
@@ -2795,6 +2799,12 @@ class MeasureParser(XMLParserBase):
         >>> m = EL(r'<metronome><per-minute>125</per-minute><beat-unit>half</beat-unit></metronome>')
         >>> MP.xmlToTempoIndication(m)
         <music21.tempo.MetronomeMark Half=125.0>
+
+        Metric modulation:
+
+        >>> m = EL(r'<metronome><beat-unit>long</beat-unit><beat-unit>32nd</beat-unit><beat-unit-dot/></metronome>')
+        >>> MP.xmlToTempoIndication(m)
+        <music21.tempo.MetricModulation <music21.tempo.MetronomeMark Imperfect Longa=None>=<music21.tempo.MetronomeMark Dotted 32nd=None>>
         '''
         # get lists of durations and texts
         durations = []
@@ -2821,8 +2831,9 @@ class MeasureParser(XMLParserBase):
                         numbers.append(float(perMin))
                     except ValueError:
                         pass # TODO: accept text per minute
-        metricMod = mxMetronome.find('metronome-relation')
-        if metricMod is not None:        
+        # TODO: metronome-relation -- specifies how to relate multiple beatunits
+        # metronomeRelations = mxMetronome.find('metronome-relation')
+        if len(durations) > 1: # Metric Modulation!        
             mm = tempo.MetricModulation()
             #environLocal.printDebug(['found metric modulaton:', 'durations', durations])
             if len(durations) < 2:
@@ -3851,9 +3862,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(pageLayouts), 10)
         scoreLayouts = layouts.getElementsByClass('ScoreLayout')
         self.assertEqual(len(scoreLayouts), 1)
-        score1 = scoreLayouts[0]
-        for sltemp in score1.staffLayoutList:
-            print(sltemp, sltemp.distance)
+        #score1 = scoreLayouts[0]
+        #for sltemp in score1.staffLayoutList:
+        #    print(sltemp, sltemp.distance)
         
         
         self.assertEqual(len(layouts), 73)

@@ -631,10 +631,10 @@ class ConverterMusicXMLET(SubConverter):
             c.readFile(fp)
 
         # movement titles can be stored in more than one place in musicxml
-        # manually insert file name as a title if no titles are defined
-        if c.stream.metadata.title == None:
+        # manually insert file name as a movementName title if no titles are defined
+        if c.stream.metadata.movementName == None:
             junk, fn = os.path.split(fp)
-            c.stream.metadata.title = fn
+            c.stream.metadata.movementName = fn
         self.stream = c.stream
 
     def runThroughMusescore(self, fp, **keywords):
