@@ -2320,9 +2320,9 @@ def mxToMeasure(mxMeasure, spannerBundle=None, inputM21=None, lastMeasureInfo=No
                 mxNoteNext = mxObjNext
             else:
                 mxNoteNext = None
-            #if mxNote.get('print-object') == 'no':
-            #    #environLocal.printDebug(['got mxNote with printObject == no', 'measure number', m.number])
-            #    continue
+            if mxNote.get('print-object') == 'no':
+                #environLocal.printDebug(['got mxNote with printObject == no', 'measure number', m.number])
+                continue
 
 #             mxGrace = mxNote.get('graceObj')
 #             if mxGrace is not None: # graces have a type but not a duration
@@ -4021,6 +4021,69 @@ class Test(unittest.TestCase):
         self.assertRaises(bar.BarException, mxToRepeat, mxBarline)
 
 
+    def testStaffLayout(self):
+        from music21 import corpus, converter
+        c = converter.parse(corpus.getWorkList('demos/layoutTest.xml')[0], format='oldmusicxml', forceSource=True)
+        #c = corpus.parse('demos/layoutTest.xml')        
+        layouts = c.flat.getElementsByClass('LayoutBase')
+        systemLayouts = layouts.getElementsByClass('SystemLayout')
+        self.assertEqual(len(systemLayouts), 42)
+        staffLayouts = layouts.getElementsByClass('StaffLayout')
+#         for i,p in enumerate(c.parts):
+#             print(i)
+#             for l in p.flat.getElementsByClass('StaffLayout'):
+#                 print(l.distance)        
+        self.assertEqual(len(staffLayouts), 20)
+        pageLayouts = layouts.getElementsByClass('PageLayout')
+        self.assertEqual(len(pageLayouts), 10)
+        scoreLayouts = layouts.getElementsByClass('ScoreLayout')
+        self.assertEqual(len(scoreLayouts), 1)
+        score1 = scoreLayouts[0]
+        for sltemp in score1.staffLayoutList:
+            print(sltemp, sltemp.distance)
+
+
+        self.assertEqual(len(layouts), 73)
+
+        
+        sl0 = systemLayouts[0]
+        self.assertEqual(sl0.distance, None)
+        self.assertEqual(sl0.topDistance, 211.0)
+        self.assertEqual(sl0.leftMargin, 70.0)
+        self.assertEqual(sl0.rightMargin, 0.0)
+
+                
+        sizes = []
+        for s in staffLayouts:
+            if s.staffSize is not None:
+                sizes.append(s.staffSize)
+        self.assertEqual(sizes, [80.0, 120.0, 80.0])
+
+    def testStaffLayoutMore(self):
+        from music21 import corpus, converter
+        c = converter.parse(corpus.getWorkList('demos/layoutTestMore.xml')[0], format='oldmusicxml', forceSource=True)
+        #c = corpus.parse('demos/layoutTest.xml')        
+        layouts = c.flat.getElementsByClass('LayoutBase')
+        self.assertEqual(len(layouts), 76)
+        systemLayouts = layouts.getElementsByClass('SystemLayout')
+        sl0 = systemLayouts[0]
+        self.assertEqual(sl0.distance, None)
+        self.assertEqual(sl0.topDistance, 211.0)
+        self.assertEqual(sl0.leftMargin, 70.0)
+        self.assertEqual(sl0.rightMargin, 0.0)
+#         for s in layouts:
+#             if hasattr(s, 'staffSize'):
+#                 print(s, s.staffSize)
+                
+        staffLayouts = layouts.getElementsByClass('StaffLayout')
+        sizes = []
+        for s in staffLayouts:
+            if s.staffSize is not None:
+                sizes.append(s.staffSize)
+        self.assertEqual(sizes, [80.0, 120.0, 80.0])
+        
+        
+
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [mxScoreToScore]
@@ -4028,7 +4091,7 @@ _DOC_ORDER = [mxScoreToScore]
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
-    music21.mainTest(Test) #, runTest="testInstrumentTranspositionC")
+    music21.mainTest(Test, runTest="testStaffLayout")
    
 #------------------------------------------------------------------------------
 # eof

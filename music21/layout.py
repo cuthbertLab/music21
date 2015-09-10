@@ -986,7 +986,7 @@ class LayoutScore(stream.Opus):
 
         >>> staffLayout031 = ls.pages[0].systems[3].staves[1].staffLayout
         >>> staffLayout031
-        <music21.layout.StaffLayout distance None, staffNumber None, staffSize 80.0, staffLines 5>
+        <music21.layout.StaffLayout distance None, staffNumber None, staffSize 80.0, staffLines None>
         >>> staffLayout031.hidden
         True
 

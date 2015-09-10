@@ -393,13 +393,17 @@ class XMLParserBase(object):
             staffLayout = layout.StaffLayout()
         else:
             staffLayout = inputM21
-        
         seta = _setAttributeFromTagText
         seta(staffLayout, mxStaffLayout, 'staff-distance', 'distance', transform=float)
+        #ET.dump(mxStaffLayout)
 
         data = mxStaffLayout.get('number')
         if data is not None:
             staffLayout.staffNumber = int(data)
+            
+        if hasattr(self, 'staffLayoutObjects'):
+            self.staffLayoutObjects.append(staffLayout)
+
         
         if inputM21 is None:
             return staffLayout
@@ -635,9 +639,9 @@ class MusicXMLImporter(XMLParserBase):
         mxSystemLayout = mxDefaults.find('system-layout')
         if mxSystemLayout is not None:
             scoreLayout.systemLayout = self.xmlSystemLayoutToSystemLayout(mxSystemLayout)
-        mxStaffLayout = mxDefaults.find('staff-layout')
-        if mxStaffLayout is not None:
-            scoreLayout.staffLayout = self.xmlStaffLayoutToStaffLayout(mxStaffLayout)
+        for mxStaffLayout in mxDefaults.findall('staff-layout'):
+            staffLayout = self.xmlStaffLayoutToStaffLayout(mxStaffLayout)
+            scoreLayout.staffLayoutList.append(staffLayout)
         
         # TODO: appearance
         # TODO: music-font
@@ -784,7 +788,10 @@ class PartParser(XMLParserBase):
         XMLParserBase.__init__(self)
         self.mxPart = mxPart
         self.mxPartInfo = mxPartInfo
-        self.partId = mxPart.get('id')
+        if mxPart is not None:
+            self.partId = mxPart.get('id')
+        else:
+            self.partId = ""
         self._parent = common.wrapWeakref(parent)
         if parent is not None:
             self.spannerBundle = parent.spannerBundle
@@ -1059,7 +1066,34 @@ class PartParser(XMLParserBase):
         self.activeInstrument = instrumentObj
         self.stream._insertCore(0.0, instrumentObj) # add instrument at zero offset
         
-    def getDefaultInstrument(self):
+    def getDefaultInstrument(self, mxPartInfo=None):
+        r'''
+        >>> scorePart = (r'<score-part id="P4"><part-name>Bass</part-name>' + 
+        ...     '<part-abbreviation>B.</part-abbreviation>' +
+        ...     '<score-instrument id="P4-I4">' +
+        ...     '    <instrument-name>Instrument 4</instrument-name>' +
+        ...     '</score-instrument>' +
+        ...     '<midi-instrument id="P4-I4">' +
+        ...     '   <midi-channel>4</midi-channel>' +
+        ...     '<midi-program>1</midi-program>' +
+        ...     '</midi-instrument>' +
+        ...     '</score-part>')
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> PP = musicxml.xmlToM21.PartParser()
+        
+        >>> mxPartInfo = EL(scorePart)
+        >>> i = PP.getDefaultInstrument(mxPartInfo)
+        >>> i.partName
+        'Bass'
+        >>> i.partAbbreviation
+        'B.'
+        
+        '''
+        if mxPartInfo is None:
+            mxInfo = self.mxPartInfo
+        else:
+            mxInfo = mxPartInfo
+        
         def _clean(badStr):
             # need to remove badly-formed strings
             if badStr is None:
@@ -1073,8 +1107,6 @@ class PartParser(XMLParserBase):
         
         seta = _setAttributeFromTagText
 
-        
-        mxInfo = self.mxPartInfo
         #print(ET.tostring(mxInfo, encoding='unicode'))
         i = instrument.Instrument()
         i.partId = self.partId
@@ -1134,13 +1166,13 @@ class MeasureParser(XMLParserBase):
                         'attributes': None,
                         'harmony': 'xmlHarmony',
                         'figured-bass': None,
-                        'print': 'xmlPrint',
                         'sound': None,
                         'barline': 'xmlBarline',
                         'grouping': None,
                         'link': None,
                         'bookmark': None,    
-                        # TODO: clefs???                    
+                        # TODO: clefs??? 
+                        # Note: <print> is handled separately...                   
                         }
     # TODO: editorial, i.e., footnote and level
     # TODO: staves (num staves)
@@ -1240,6 +1272,11 @@ class MeasureParser(XMLParserBase):
         self.stream._insertCore(offset, m21Object)
         
     def parse(self):
+        # handle <print> before anything else, because it can affect
+        # attributes!
+        for mxPrint in self.mxMeasure.findall('print'):
+            self.xmlPrint(mxPrint)
+        
         self.parseAttributes()
         self.updateVoiceInformation()
         self.mxMeasureElements = list(self.mxMeasure) # for grabbing next note
@@ -1316,7 +1353,7 @@ class MeasureParser(XMLParserBase):
             # so that staff distance can change.
             for stl in stlList:
                 self.insertCoreAndRef(0.0, str(stl.staffNumber), stl)
-        
+        m.elementsChanged()
         # TODO: measure-layout -- affect self.stream
         # TODO: measure-numbering
         # TODO: part-name-display
@@ -2835,7 +2872,10 @@ class MeasureParser(XMLParserBase):
         # TODO: implicit
         # TODO: non-controlling 
         # may need to do a format/unit conversion?        
-        self.layoutWidth = self.mxMeasure.get('width')
+        width = self.mxMeasure.get('width')
+        if width is not None:
+            width = float(width)
+            self.stream.layoutWidth = width
         self.parseAttributesTags()
         
     def parseAttributesTags(self):
@@ -3037,29 +3077,34 @@ class MeasureParser(XMLParserBase):
         StaffLayout object for this staff.
         '''
         seta = _setAttributeFromTagText
+        # staffNumber refers to the staff number for this Part -- i.e., usually None or 1
+        # except for a piano score, etc.
+        #ET.dump(mxDetails)
+
         staffNumber = mxDetails.get('number')
+        foundMatch = False
         if staffNumber is not None:
             staffNumber = int(staffNumber)
-            for stl in self.staffLayoutObjects:
+            for stl in self.staffLayoutObjects: # staff layout objects in this part
                 if stl.staffNumber == staffNumber:
                     try:
                         seta(stl, mxDetails, 'staff-size', transform=float)
                     except TypeError:
                         staffSize = mxDetails.find('staff-size')
-                        if staffSize is None:
+                        if staffSize is not None:
                             raise TypeError("Incorrect number for mxStaffDetails.staffSize: %s", staffSize)
-                    return
-        else: # defaults for all staves
-            foundMatch = False
-            for stl in self.staffLayoutObjects:
-                if stl.staffSize is None:
+                    # get staff-lines too?
+                    foundMatch = True
+                    break
+        else:
+            # applies to all staves...
+            for stl in self.staffLayoutObjects: # staff layout objects in this part
+                if stl.staffSize is None: # override...
                     seta(stl, mxDetails, 'staff-size', transform=float)
                     foundMatch = True
                 if stl.staffLines is None:
                     seta(stl, mxDetails, 'staff-lines', transform=int)
                     foundMatch = True
-            if foundMatch is True:
-                return # need foundMatch do not return prematurely
 
         # no staffLayoutObjects or none that match on number
         # TODO: staff-type (ossia, cue, editorial, regular, alternate)
@@ -3069,11 +3114,12 @@ class MeasureParser(XMLParserBase):
         # TODO: print-object
         # TODO: print-spacing
         
-        stl = self.xmlStaffLayoutFromStaffDetails(mxDetails)
-        
-        # should this be 0.0 or current offset?
-        self.insertCoreAndRef(0.0, mxDetails, stl)
-        self.staffLayoutObjects.append(stl)
+        if foundMatch is False:
+            stl = self.xmlStaffLayoutFromStaffDetails(mxDetails)
+            
+            # should this be 0.0 or current offset?
+            self.insertCoreAndRef(0.0, mxDetails, stl)
+            self.staffLayoutObjects.append(stl)
 
     def xmlStaffLayoutFromStaffDetails(self, mxDetails):
         '''
@@ -3786,10 +3832,69 @@ class Test(unittest.TestCase):
         mxBarline = self.EL('<barline><bar-style>wunderbar</bar-style></barline>')
         self.assertRaises(bar.BarException, MP.xmlToRepeat, mxBarline)
 
+    def testStaffLayout(self):
+        from music21 import corpus, converter
+        c = converter.parse(corpus.getWorkList('demos/layoutTest.xml')[0], format='musicxml', forceSource=True)
+        #c = corpus.parse('demos/layoutTest.xml')        
+        layouts = c.flat.getElementsByClass('LayoutBase')
+        systemLayouts = layouts.getElementsByClass('SystemLayout')
+        self.assertEqual(len(systemLayouts), 42)
+        staffLayouts = layouts.getElementsByClass('StaffLayout')
+#         for i,p in enumerate(c.parts):
+#             print(i)
+#             for l in p.flat.getElementsByClass('StaffLayout'):
+#                 print(l.distance)        
+        self.assertEqual(len(staffLayouts), 20)
+        pageLayouts = layouts.getElementsByClass('PageLayout')
+        self.assertEqual(len(pageLayouts), 10)
+        scoreLayouts = layouts.getElementsByClass('ScoreLayout')
+        self.assertEqual(len(scoreLayouts), 1)
+        score1 = scoreLayouts[0]
+        for sltemp in score1.staffLayoutList:
+            print(sltemp, sltemp.distance)
+        
+        
+        self.assertEqual(len(layouts), 73)
+
+        sl0 = systemLayouts[0]
+        self.assertEqual(sl0.distance, None)
+        self.assertEqual(sl0.topDistance, 211.0)
+        self.assertEqual(sl0.leftMargin, 70.0)
+        self.assertEqual(sl0.rightMargin, 0.0)
+
+        sizes = []
+        for s in staffLayouts:
+            if s.staffSize is not None:
+                sizes.append(s.staffSize)
+        self.assertEqual(sizes, [80.0, 120.0, 80.0])
+
+    def testStaffLayoutMore(self):
+        from music21 import corpus, converter
+        c = converter.parse(corpus.getWorkList('demos/layoutTestMore.xml')[0], format='musicxml', forceSource=True)
+        #c = corpus.parse('demos/layoutTest.xml')        
+        layouts = c.flat.getElementsByClass('LayoutBase')
+        self.assertEqual(len(layouts), 76)
+        systemLayouts = layouts.getElementsByClass('SystemLayout')
+        sl0 = systemLayouts[0]
+        self.assertEqual(sl0.distance, None)
+        self.assertEqual(sl0.topDistance, 211.0)
+        self.assertEqual(sl0.leftMargin, 70.0)
+        self.assertEqual(sl0.rightMargin, 0.0)
+#         for s in layouts:
+#             if hasattr(s, 'staffSize'):
+#                 print(s, s.staffSize)
+                
+        staffLayouts = layouts.getElementsByClass('StaffLayout')
+        sizes = []
+        for s in staffLayouts:
+            if s.staffSize is not None:
+                sizes.append(s.staffSize)
+        self.assertEqual(sizes, [80.0, 120.0, 80.0])
+        
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest="testInstrumentTranspositionB")
+    music21.mainTest(Test, runTest="testStaffLayout")
     
     
     
