@@ -21,7 +21,7 @@ To do a release,
 4. run test/testSingleCoreAll.py 
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest, 
      but should be done before making a release).  Done automatically by Travis-CI on GitHub commit
-5. then test/testDocumentation
+5. then python3 test/testDocumentation.py # only designed for Python 3...
 6. then test/testSerialization
 7. run documentation/make.py clean
 8. run documentation/make.py   [*]
@@ -32,7 +32,8 @@ To do a release,
 
 10. And finally this file ON PYTHON 2.7
 
-11. COMMIT to Github at this point, then don't change anything until the next step is done.
+11. COMMIT to Github at this point w/ commit comment of the new version, 
+    then don't change anything until the next step is done.
     (.gitignore SHOULD avoid uploading the large files created here...)
 
 12. Create a new release on GitHub and upload the FIVE files created here. Use tag v2.0.1 (etc.).
