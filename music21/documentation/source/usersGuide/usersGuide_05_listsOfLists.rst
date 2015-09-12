@@ -199,16 +199,18 @@ they'll appear automatically in Python's shell):
 
 
 | That did it! How does it work? Well we look at each "thing" in
-``listB`` -- we call it "thing" here, because we're not sure if it's a
-number of a list. Then in the next line ``if isinstance(thing, list):``
-checks if the thing is a list. If that is ``True`` then we get to an
-inner loop, where we look at "thing" (which in this case is ``listA``,
-but the program doesn't know that) and get the "number" from it. But if
-"thing" is not a list, that's where the ``else`` comes in, which is what
-we run if we don't have a list, which just says, print the number.
+  ``listB`` -- we call it "thing" here, because we're not sure if it's a
+  number of a list. Then in the next line
+  ``if isinstance(thing, list):`` checks if the thing is a list. If that
+  is ``True`` then we get to an inner loop, where we look at "thing"
+  (which in this case is ``listA``, but the program doesn't know that)
+  and get the "number" from it. But if "thing" is not a list, that's
+  where the ``else`` comes in, which is what we run if we don't have a
+  list, which just says, print the number.
+
 | (We're assuming in this case that there are only two types of things
-in ``listB``, numbers and other lists.) If you get an error, be sure not
-to forget the ending ":" or to indent the next line.
+  in ``listB``, numbers and other lists.) If you get an error, be sure
+  not to forget the ending ":" or to indent the next line.
 
 Functions and Recursion
 -----------------------
@@ -503,6 +505,7 @@ isn't a list, you'll get an error:
 
 
     ---------------------------------------------------------------------------
+
     TypeError                                 Traceback (most recent call last)
 
     <ipython-input-26-d6916f79680c> in <module>()

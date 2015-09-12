@@ -21,7 +21,7 @@ Go ahead and start IDLE or type “python” at the command line (Terminal
 on the Mac or “run: cmd” on Windows) and let’s get started.
 
 Creating and working with Notes
-===============================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The music21 concept of a standard note is contained in the
 :class:`~music21.note.Note` object, which is found in the ``note``
@@ -89,10 +89,13 @@ Note and Rest objects you can type "``dir(note)``\ " to find out:
      '_DOC_ORDER',
      '_MOD',
      '__builtins__',
+     '__cached__',
      '__doc__',
      '__file__',
+     '__loader__',
      '__name__',
      '__package__',
+     '__spec__',
      'base',
      'beam',
      'common',
@@ -387,6 +390,7 @@ dashes aren't allowed in variable names:
 
       File "<ipython-input-17-d519b3e88921>", line 1
         b-flat = note.Note("B-2")
+                                 ^
     SyntaxError: can't assign to operator
 
 
@@ -563,10 +567,9 @@ Then you can write an “if” statement to see if this is True or not:
     Hope you're enjoying Sirius!
 
 
-Just as you don’t type the “>>>” at the beginning of the line, don’t
-type the ”...” either. But you will need to put the spaces before the
-“print” command; Python uses spaces to keep track of what is inside of
-an if statement (or lots of other things) and what isn’t.
+Note that in the last line above you will need to put the spaces before
+the “print” command; Python uses spaces to keep track of what is inside
+of an if statement (or lots of other things) and what isn’t.
 
 (If you don’t get the Stockhausen joke, see: wikipedia . )
 
@@ -737,7 +740,7 @@ Since ``d.accidental`` is ``None`` does this mean that
 
     AttributeError                            Traceback (most recent call last)
 
-    <ipython-input-37-2b6769f305a4> in <module>()
+    <ipython-input-38-2b6769f305a4> in <module>()
     ----> 1 d.accidental.name
     
 

@@ -16,7 +16,7 @@ little deeper into what makes a ``Note`` really a ``Note``, namely,
 :ref:`modulePitch`, and :ref:`moduleDuration` objects.
 
 The Pitch object
-================
+----------------
 
 Since we've already covered ``Note`` objects,
 :class:`~music21.pitch.Pitch` objects will be a breeze. Just like how
@@ -27,7 +27,8 @@ Let's create a ``Pitch``. Like we did with ``Notes``, just class the
 class with a note name, such as ``B`` with the optional symbols for
 sharp or flat, (*#* or *-* respectively).
 
-You can put an octave number after the name, but you don't have to:
+You can put an octave number after the name (4 = low treble clef), but
+you don't have to:
 
 .. code:: python
 
@@ -289,7 +290,7 @@ section. Without a ``Duration`` attribute, you cannot put an object into
 a Measure or show it on your screen.
 
 Carving time with Duration objects
-==================================
+----------------------------------
 
 For a ``Note`` to occupy musical space, it has to last a certain amount
 of time. We call that time the ``Note``'s
@@ -547,9 +548,9 @@ The ``type`` for these odd values is called "complex":
 
 
 
-Complex types have multiple "DurationTuple" (v.2.1+) or
-"DurationUnit"(pre v.2.0.10) objects in ``.components`` that represent
-the smaller, simple durations that make up the entire Duration:
+Complex types have multiple "DurationTuple" objects in ``.components``
+that represent the smaller, simple durations that make up the entire
+Duration:
 
 .. code:: python
 
@@ -561,7 +562,8 @@ the smaller, simple durations that make up the entire Duration:
 .. parsed-literal::
    :class: ipython-result
 
-    [<music21.duration.DurationUnit 2.0>, <music21.duration.DurationUnit 0.25>]
+    [DurationTuple(type='half', dots=0, quarterLength=2.0),
+     DurationTuple(type='16th', dots=0, quarterLength=0.25)]
 
 
 
@@ -588,14 +590,17 @@ weird ``2.25`` Duration. We have to first assign it to a note:
 
 Music21 can also deal with other ``quarterLengths`` such as 0.8, which
 is 4/5ths of a quarter note, or 1/3 which is an eighth note triplet.
+
 Just be careful when creating triplets, because of a weird Python 2
-quirk that makes it so that if you divide two integers you always get
-back just the integer part of the number, so 8/3 is 2, since 8/3 is
-2.66666... and the integer part is 2:
+quirk that makes it so that if you divide two integers with "/" you
+always get back just the integer part of the number, so 8/3 is 2, since
+8/3 is 2.66666... and the integer part is 2. I will use "//" in this
+example, since "//" appears in both Python 2 and Python 3 and is
+equivalent to Python 2's "/"
 
 .. code:: python
 
-    8/3
+    8//3
 
 
 
@@ -609,7 +614,7 @@ back just the integer part of the number, so 8/3 is 2, since 8/3 is
 
 .. code:: python
 
-    1/3
+    1//3
 
 
 
@@ -657,7 +662,7 @@ You can go ahead and make a Triplet or other
 later.
 
 Back to Notes
-=============
+-------------
 
 So now you can see the advantage of working with ``Note`` objects: they
 have both a ``.pitch`` attribute, which contains a ``Pitch`` object, and

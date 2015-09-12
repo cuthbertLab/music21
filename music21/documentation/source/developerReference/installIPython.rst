@@ -35,13 +35,13 @@ Installing music21 for anaconda
 If you are running an ``anaconda`` version < 1.8.0, you may install
 music21 by entering:
 
-``$ conda pip3 music21``
+``$ conda pip music21``
 
 If you are running an ``anaconda`` version >= 1.8.0, the command
-``conda pip3`` is no longer allowed by ``anaconda``. Instead you may use
-``pip3 install`` to install ``music21``.
+``conda pip`` is no longer allowed by ``anaconda``. Instead you may use
+``pip install`` to install ``music21``.
 
-``$ pip3 install music21``
+``$ pip install music21``
 
 Here are sample outputs for the installation process:
 
