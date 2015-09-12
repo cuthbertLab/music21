@@ -834,7 +834,7 @@ class ClassDocumenter(ObjectDocumenter):
         result = []
         for baseDocumenter in self.baseClassDocumenters:
             if baseDocumenter in self.inheritedDocAttrMapping:
-                attrNames = self.inheritedDocAttrMapping[baseDocumenter].keys()
+                attrNames = sorted(list(self.inheritedDocAttrMapping[baseDocumenter].keys()))
                 if not attrNames:
                     continue
                 banner = 'Instance variables inherited from {0}:'.format(

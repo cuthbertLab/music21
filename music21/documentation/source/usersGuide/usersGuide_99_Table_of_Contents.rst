@@ -5,7 +5,7 @@
    PLEASE EDIT THE .py FILE DIRECTLY.
 
 
-User's Guide, Table of Contents
+User's Guide: Table of Contents
 ===============================
 
 This is the table of contents for the eventual User's Guide, where

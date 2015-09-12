@@ -32,7 +32,7 @@ the second note a G; we won't mind; we'll just call you Pope Gregory
 from now on). Lets create those notes:
 
 Working with multiple objects via Lists
----------------------------------------
+=======================================
 
 .. code:: python
 
@@ -124,14 +124,18 @@ We can check that ``noteList`` contains our Notes by printing it:
     [<music21.note.Note C>, <music21.note.Note F#>]
 
 
+The list is represented by the square brackets around the end with the
+comma in between them, just like how they were created originally. The
+act of creation is mirrored in the representation. That's nice. Medieval
+philosophers would approve.
+
 Now we can write a two-line program that will print the step of each
 note in noteList. Most modern languages have a way of doing some action
 for each member ("element") in a list (also called an "array" or
 sometimes "row"). In Python this is the "for" command. When you type
-these lines, don't type the ``"... "`` just like you're not typing the
-``">>> "`` line, but do type the spaces at the start of the second line.
-(When you're done typing ``print(thisNote.step)``, you'll probably have
-to hit enter twice to see the results.)
+these lines, make sure to type the spaces at the start of the second
+line. (When you're done typing ``print(thisNote.step)``, you'll probably
+have to hit enter twice to see the results.)
 
 .. code:: python
 
@@ -173,6 +177,10 @@ Then we'll append that note to the end of noteList:
 .. code:: python
 
     noteList.append(note3)
+
+Lists can be manipulated or changed. They are called "mutable" objects
+(we'll learn about immutable objects later). Streams, as we will see,
+can be manipulated the same way through ``.append()``.
 
 We can see that the length of noteList is now 3 using the ``len()``
 function:
@@ -301,7 +309,7 @@ need to know about a ``music21`` object similar to lists, called a
 :class:`~music21.stream.Stream`.
 
 Introduction to Streams
------------------------
+=======================
 
 The :class:`~music21.stream.Stream` object and its subclasses (Score,
 Part, Measure) are the fundamental containers for music21 objects such
@@ -356,7 +364,7 @@ details: just know that this feature lets music21 do some things that no
 other software package can do.
 
 Creating simple Streams
------------------------
+=======================
 
 Objects stored in Streams are called elements and must be some type of
 Music21Object (don’t worry, almost everything in music21 is a
@@ -378,13 +386,14 @@ to a variable using the equal sign. Let's call our Stream ``stream1``:
     stream1 = stream.Stream()
 
 | Notice that just like how the (capital) ``Note`` object lives in a
-module called (lowercase) ``note``, the (capital) ``Stream`` object
-lives in a module called (lowercase) ``stream``. Variable names, like
-``stream1`` can be either uppercase or lowercase, but I tend to use
-lowercase variable names (or camelCase like we did with ``noteList``).
+  module called (lowercase) ``note``, the (capital) ``Stream`` object
+  lives in a module called (lowercase) ``stream``. Variable names, like
+  ``stream1`` can be either uppercase or lowercase, but I tend to use
+  lowercase variable names (or camelCase like we did with ``noteList``).
+
 | The most common use of Streams is as places to store Notes. So let's
-do just that: we can add the three ``Note`` objects we created above by
-using the ``append`` method of ``Stream``:
+  do just that: we can add the three ``Note`` objects we created above
+  by using the ``append`` method of ``Stream``:
 
 .. code:: python
 
@@ -466,7 +475,7 @@ MuseScore or some music notation software and display the notes below.
 
 
 Accessing Streams
------------------
+=================
 
 We can also dive deeper into streams. Let's get the ``step`` of each
 ``Note`` using the ``for thisNote in ...:`` command. But now we'll use
@@ -618,7 +627,7 @@ returned.
 
 
 More Stream Features
---------------------
+====================
 
 Okay, so far we've seen that ``Streams`` can do the same things as
 lists, but can they do more? Let's call the analyze method on stream to
@@ -714,7 +723,7 @@ line, separated by a comma:
 .. code:: python
 
     for thisNote in stream1:
-        print thisNote.offset, thisNote.name
+        print(thisNote.offset, thisNote.name)
 
 
 .. parsed-literal::
@@ -885,15 +894,15 @@ By the way, Streams have a ``__repr__`` as well:
 .. parsed-literal::
    :class: ipython-result
 
-    <music21.stream.Stream 0x106fa4890>
+    <music21.stream.Stream 0x105373860>
 
 
 
-that number at the end is the ``.id`` of the ``Stream``, which is a way
-of identifying it. Often the ``.id`` of a Stream will be the name of the
-``Part`` ("Violin II"), but if it's undefined then a somewhat random
-number is used (actually the location of the Stream in your computer's
-memory). We can change the ``.id`` of a Stream:
+that number at the end is the hex form of the ``.id`` of the ``Stream``,
+which is a way of identifying it. Often the ``.id`` of a Stream will be
+the name of the ``Part`` ("Violin II"), but if it's undefined then a
+somewhat random number is used (actually the location of the Stream in
+your computer's memory). We can change the ``.id`` of a Stream:
 
 .. code:: python
 
@@ -982,7 +991,7 @@ is not the same as the duration. the ``len()`` of a Stream is the number
 of objects stored in it, so ``len(stream1)`` is 3).
 
 Streams within Streams
-----------------------
+======================
 
 And, as a ``Music21Object``, a ``Stream`` can be placed inside of
 another ``Stream`` object. Let's create a stream, called biggerStream
@@ -1072,8 +1081,9 @@ special name and its own class (:class:`~music21.stream.Score`,
 ``Streams``.
 
 | So how do we find ``note1`` inside ``biggerStream``? That's what the
-next two chapters are about.
+  next two chapters are about.
+
 | :ref:`Lists of Lists <usersGuide_05_listsOfLists>` are covered in
-Chapter 5. Those with programming experience who have familiarity with
-lists of lists and defining functions might want to skip to Chapter 6,
-:ref:`Streams of Streams <usersGuide_06_stream2>`.
+  Chapter 5. Those with programming experience who have familiarity with
+  lists of lists and defining functions might want to skip to Chapter 6,
+  :ref:`Streams of Streams <usersGuide_06_stream2>`.

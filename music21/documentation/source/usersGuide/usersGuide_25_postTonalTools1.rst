@@ -24,7 +24,7 @@ methods in :class:`~music21.chord.Chord` as well as the objects in
 :class:`~music21.serial.TwelveToneRow`.
 
 Pitches as Pitch Classes
-------------------------
+========================
 
 Any music21 :class:`~music21.pitch.Pitch`, or a
 :class:`~music21.note.Note` containing Pitch, can be expressed as
@@ -150,7 +150,7 @@ example:
 
 
 Chords as Forte Set Classes
----------------------------
+===========================
 
 Any music21 Chord can be interpreted as a Forte set class. Additional, a
 wide variety of analytical features, derived from the Forte set class,
@@ -332,7 +332,7 @@ trichord and see that all twelve of them are there:
 
 
 Creating and Processing Twelve-Tone Matrices
---------------------------------------------
+============================================
 
 The music21 :ref:`moduleSerial` module provides a Stream-based
 representation of a 12-Tone row, as well as the ability to view these

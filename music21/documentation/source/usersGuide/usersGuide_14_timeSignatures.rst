@@ -167,7 +167,7 @@ right...)
 
 
 Working with Beats in TimeSignatures
-------------------------------------
+====================================
 
 Beyond just getting nicely formed measures, TimeSignature objects let us
 figure out information about what beat each
@@ -383,7 +383,7 @@ of 6/8 with either beat count directly:
 
 
 Working with TimeSignatures in scores
--------------------------------------
+=====================================
 
 We have been dealing with TimeSignature objects that are in a single
 Stream. However, in general, :class:`~music21.meter.TimeSignature`
@@ -719,7 +719,7 @@ objects, run ``.makeNotation()`` and put it in the new score:
 
 
 Working with Beats in a score
------------------------------
+=============================
 
 If a Note is in a Measure, and that Measure or a preceding Measure has a
 TimeSignature, it is possible to find the beat, or the position of the

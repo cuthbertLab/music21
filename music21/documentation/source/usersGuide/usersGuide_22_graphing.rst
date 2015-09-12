@@ -36,7 +36,7 @@ There are a number of ways to visualize notes, scores, and measures in
 music21.
 
 Visualizing Streams in Plots
-----------------------------
+============================
 
 While the :meth:`~music21.base.Music21Object.show` method provides
 common musical views of a Stream, a visual plot a Stream's elements is

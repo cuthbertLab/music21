@@ -54,10 +54,248 @@ method using the ``('text')`` argument.
         {3.0} <music21.note.Note B->
 
 
-As Chapter 4 noted, there's
+As Chapter 4 noted, there's a way to reach the inner notes such as
+``F#`` via the ``biggerStream[1][2]`` format, but there's a better way
+to do that in music21, and for that we need to learn about subclasses of
+Streams and subclasses in general. (Skip this if you already know about
+such things from other programming experience)
+
+Classes and Subclasses
+======================
+
+An object, such as a note or pitch, is basically a collection of
+information along with some actions that can be performed on that
+information. A class is something that can make new objects of a certain
+type (sometimes this is called a factory). We've seen classes such as
+the ``note.Note`` class, where the lowercase ``note`` is the "module"
+that the class ``Note`` lives in:
+
+.. code:: python
+
+    #_DOCS_SHOW note
+    print("<module 'music21.note' from '/Users/cuthbert/music21/note.py'>") #_DOCS_HIDE
+
+
+.. parsed-literal::
+   :class: ipython-result
+
+    <module 'music21.note' from '/Users/cuthbert/music21/note.py'>
+
+
+.. code:: python
+
+    note.Note
+
+
+
+
+.. parsed-literal::
+   :class: ipython-result
+
+    music21.note.Note
+
+
+
+We create an object from a class by using the class name with ``()``
+after it:
+
+.. code:: python
+
+    n = note.Note()
+    n
+
+
+
+
+.. parsed-literal::
+   :class: ipython-result
+
+    <music21.note.Note C>
+
+
+
+As we've seen, we can sometimes put additional information into the
+``()``, such as a pitch name in the case of a ``Note``:
+
+.. code:: python
+
+    d = note.Note('D#5')
+    d
+
+
+
+
+.. parsed-literal::
+   :class: ipython-result
+
+    <music21.note.Note D#>
+
+
+
+The variable ``d`` is now a ``Note`` object created from the ``Note``
+class. It's all a bit confusing, I know. But we'll get to the point in a
+second. If you want to find out more about what a ``Note`` object can
+do, the best thing is to read the ``music21`` instruction manual. :-)
+But for any class in Python, you can use the function ``help(Class)`` to
+find out what it can do:
+
+.. code:: python
+
+    #_DOCS_SHOW help(note.Note)
+
+::
+
+    Help on class Note in module music21.note:
+    
+    class Note(NotRest)
+    |  One of the most important music21 classes, a Note
+    |  stores a single note (that is, not a rest or an unpitched element)
+    |  that can be represented by one or more notational units -- so
+    |  for instance a C quarter-note and a D# eighth-tied-to-32nd are both
+    |  a single Note object.
+    |  
+    |  *** ............ ***
+    |  
+    |  Method resolution order:
+    |      Note
+    |      NotRest
+    |      GeneralNote
+    |      music21.base.Music21Object
+    |      builtins.object
+
+
+Notice towards the very top there's the line ``class Note(NotRest)``.
+This says that the ``Note`` class is a "subclass" of a class called
+``NotRest`` which contains all the information for note-like things such
+as ``Note``, ``Unpitched`` percussion, and ``Chord`` that have stems,
+beams, etc. and are, well, not rests. (Chris Ariza and I spent over an
+hour trying to come up with a better name for these things, but in the
+end we couldn't come up with anything better than ``NotRest``, so it's
+stuck).
+
+What does it mean for ``Note`` to be a subclass of ``NotRest``? It means
+that everything that ``NotRest`` can do, ``Note`` can do, and more. For
+instance, ``NotRest`` has a ``.beams`` property, so so does ``Note``:
+
+.. code:: python
+
+    nr = note.NotRest()
+    n = note.Note()
+    print(nr.beams, n.beams)
+
+
+.. parsed-literal::
+   :class: ipython-result
+
+    <music21.beam.Beams > <music21.beam.Beams >
+
+
+But ``Rest`` is not a subclass of ``NotRest`` for obvious reasons. So a
+rest doesn't know anything about beams:
+
+.. code:: python
+
+    r = note.Rest()
+    r.beams
+
+
+::
+
+
+    ---------------------------------------------------------------------------
+
+    AttributeError                            Traceback (most recent call last)
+
+    <ipython-input-22-9c62a1bd1707> in <module>()
+          1 r = note.Rest()
+    ----> 2 r.beams
+    
+
+    AttributeError: 'Rest' object has no attribute 'beams'
+
+
+But ``Note`` has properties that ``NotRest`` does not, such as
+``.pitch``:
+
+.. code:: python
+
+    print(nr.pitch)
+
+
+::
+
+
+    ---------------------------------------------------------------------------
+
+    AttributeError                            Traceback (most recent call last)
+
+    <ipython-input-23-b4fa4feba8cd> in <module>()
+    ----> 1 print(nr.pitch)
+    
+
+    AttributeError: 'NotRest' object has no attribute 'pitch'
+
+
+So classes and subclasses are a great way of making sure that things
+that are mostly similar have many of the same properties, but that they
+can have their own distinct information (``attributes``) and actions
+(``methods``). Just FYI, here's how we create a subclass. We can create
+a Class called ``Japan`` and then a subclass called ``Okinawa`` (my
+ancestral home) which has an additional attribute.
+
+.. code:: python
+
+    class Japan:
+        food = "sushi"
+        drink = "sake"
+        
+    class Okinawa(Japan):
+        evenBetterFood = "spam_potstickers"
+
+The ``(Japan)`` in the class definition of ``Okinawa`` means that it
+inherits everything that Japan has and more:
+
+.. code:: python
+
+    o = Okinawa() 
+    print(o.food, o.drink, o.evenBetterFood)
+
+
+.. parsed-literal::
+   :class: ipython-result
+
+    sushi sake spam_potstickers
+
+
+But the joy of spam gyoza has not come to the mainland yet:
+
+.. code:: python
+
+    j = Japan()
+    print(j.evenBetterFood)
+
+
+::
+
+
+    ---------------------------------------------------------------------------
+
+    AttributeError                            Traceback (most recent call last)
+
+    <ipython-input-33-d5ba2e405b39> in <module>()
+          1 j = Japan()
+    ----> 2 print(j.evenBetterFood)
+    
+
+    AttributeError: 'Japan' object has no attribute 'evenBetterFood'
+
+
+So this is how subclasses work in a nutshell. The first subclasses we
+will be working with are the three fundamental subclasses of ``Stream``:
+``Score``, ``Part``, and ``Measure``.
 
 Accessing Scores, Parts, Measures, and Notes
---------------------------------------------
+============================================
 
 Streams provide a way to structure and position music21 objects both
 hierarchically and temporally. A Stream, or a Stream subclass such as
@@ -81,14 +319,15 @@ the corpus with the :func:`~music21.corpus.parse` function.
     sBach = corpus.parse('bach/bwv57.8')
 
 | We can access and examine elements at each level of this Score by
-using standard Python syntax for lists within lists. Thus, we can see
-the length of each component: first the Score which has five elements, a
-:class:`~music21.metadata.Metadata` object and four parts. Then we
-find the length of first Part at index one which indicates 19 objects
-(18 of them are measures).
+  using standard Python syntax for lists within lists. Thus, we can see
+  the length of each component: first the Score which has five elements,
+  a :class:`~music21.metadata.Metadata` object and four parts. Then we
+  find the length of first Part at index one which indicates 19 objects
+  (18 of them are measures).
+
 | Then within that part we find an object (a Measure) at index 1. All of
-these subprograms can be accessed from looking within the same score
-object ``sBach``.
+  these subprograms can be accessed from looking within the same score
+  object ``sBach``.
 
 .. code:: python
 
@@ -235,10 +474,10 @@ Measure). What is great about these methods is that they can work on a
 whole score and not just a single part.
 
 Recursion in Streams
---------------------
+====================
 
 Flattening a Stream
--------------------
+===================
 
 While nested Streams offer expressive flexibility, it is often useful to
 be able to flatten all Stream and Stream subclasses into a single Stream

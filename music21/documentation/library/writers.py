@@ -47,6 +47,13 @@ class ReSTWriter(object):
             oldRst = common.readFileEncodingSafe(filePath, firstGuess='utf-8')
             if rst == oldRst:
                 shouldWrite = False
+            else:
+                pass
+                ## uncomment for  help in figuring out why a file keeps being different...
+                #import difflib
+                #print(common.relativepath(filePath))
+                #print('\n'.join(difflib.ndiff(rst.split('\n'), oldRst.split('\n'))))
+                
         if shouldWrite:
             with codecs.open(filePath, 'w', 'utf-8') as f:
                 try:
@@ -62,33 +69,43 @@ class ModuleReferenceReSTWriter(ReSTWriter):
     '''
     Writes module reference ReST files, and their index.rst file.
     '''
-
-    def run(self):
+    def __init__(self):
         from music21 import documentation # @UnresolvedImport
-        moduleReferenceDirectoryPath = os.path.join(
+        super(ReSTWriter, self).__init__()
+        self.moduleReferenceDirectoryPath = os.path.join(
             documentation.__path__[0],
             'source',
             'moduleReference',
             )
+    
+    def run(self):
+        from music21 import documentation # @UnresolvedImport
+        moduleReferenceDirectoryPath = self.moduleReferenceDirectoryPath
         referenceNames = []
         for module in [x for x in documentation.ModuleIterator()]:
             moduleDocumenter = documentation.ModuleDocumenter(module)
             if not moduleDocumenter.classDocumenters \
-                and not moduleDocumenter.functionDocumenters:
+                   and not moduleDocumenter.functionDocumenters:
                 continue
             rst = '\n'.join(moduleDocumenter.run())
             referenceName = moduleDocumenter.referenceName
             referenceNames.append(referenceName)
             fileName = '{0}.rst'.format(referenceName)
-            filePath = os.path.join(
+            rstFilePath = os.path.join(
                 moduleReferenceDirectoryPath,
                 fileName,
                 )
             try:
-                self.write(filePath, rst)
+                self.write(rstFilePath, rst)
             except TypeError as te:
-                raise TypeError("File failed: " + filePath + ", reason: " + str(te))
+                raise TypeError("File failed: " + rstFilePath + ", reason: " + str(te))
 
+        self.writeIndexRst(referenceNames)
+
+    def writeIndexRst(self, referenceNames):
+        '''
+        Write the index.rst file from the list of reference names
+        '''
         lines = []
         lines.append('.. moduleReference:')
         lines.append('')
@@ -105,10 +122,11 @@ class ModuleReferenceReSTWriter(ReSTWriter):
             lines.append('   {0}'.format(referenceName))
         rst = '\n'.join(lines)
         indexFilePath = os.path.join(
-            moduleReferenceDirectoryPath,
+            self.moduleReferenceDirectoryPath,
             'index.rst',
             )
         self.write(indexFilePath, rst)
+        
 
 
 class CorpusReferenceReSTWriter(ReSTWriter):
@@ -303,7 +321,6 @@ class IPythonNotebookReSTWriter(ReSTWriter):
             prev = cur
 
     def runNBConvert(self, ipythonNotebookFilePath):
-#         import music21
         try:
             from nbconvert import nbconvertapp as nb
         except ImportError:
@@ -313,7 +330,6 @@ class IPythonNotebookReSTWriter(ReSTWriter):
         app.initialize(argv=['--to', 'rst', ipythonNotebookFilePath])
         app.writer.build_directory = os.path.dirname(ipythonNotebookFilePath)
         app.start()
-
 
 ## UNUSED
 #     def processNotebook(self, ipythonNotebookFilePath):

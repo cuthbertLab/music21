@@ -25,7 +25,7 @@ In this chapter we will work on how to exploit the power of nested
 probably want to skip to the following section.
 
 Lists of Lists
---------------
+==============
 
 Lists (similar to Arrays in other languages) can hold all sorts of other
 things inside them including other lists. So let's begin by creating two
@@ -199,19 +199,21 @@ they'll appear automatically in Python's shell):
 
 
 | That did it! How does it work? Well we look at each "thing" in
-``listB`` -- we call it "thing" here, because we're not sure if it's a
-number of a list. Then in the next line ``if isinstance(thing, list):``
-checks if the thing is a list. If that is ``True`` then we get to an
-inner loop, where we look at "thing" (which in this case is ``listA``,
-but the program doesn't know that) and get the "number" from it. But if
-"thing" is not a list, that's where the ``else`` comes in, which is what
-we run if we don't have a list, which just says, print the number.
+  ``listB`` -- we call it "thing" here, because we're not sure if it's a
+  number of a list. Then in the next line
+  ``if isinstance(thing, list):`` checks if the thing is a list. If that
+  is ``True`` then we get to an inner loop, where we look at "thing"
+  (which in this case is ``listA``, but the program doesn't know that)
+  and get the "number" from it. But if "thing" is not a list, that's
+  where the ``else`` comes in, which is what we run if we don't have a
+  list, which just says, print the number.
+
 | (We're assuming in this case that there are only two types of things
-in ``listB``, numbers and other lists.) If you get an error, be sure not
-to forget the ending ":" or to indent the next line.
+  in ``listB``, numbers and other lists.) If you get an error, be sure
+  not to forget the ending ":" or to indent the next line.
 
 Functions and Recursion
------------------------
+=======================
 
 But what if we did this:
 
@@ -503,6 +505,7 @@ isn't a list, you'll get an error:
 
 
     ---------------------------------------------------------------------------
+
     TypeError                                 Traceback (most recent call last)
 
     <ipython-input-26-d6916f79680c> in <module>()
@@ -525,7 +528,7 @@ things we didn't get to, I suggest watching Google's Python tutorial,
 especially class 2).
 
 Wrapup
-------
+======
 
 In this chapter we looked at how we can look inside lists of lists,
 which will be important when we consider how to work with ``Streams`` of

@@ -7,6 +7,7 @@
 
 .. code:: python
 
+    %matplotlib inline
 
 User's Guide: Introduction
 ==========================
@@ -72,7 +73,7 @@ Print the twelve-tone matrix for a tone row:
 .. code:: python
 
     schoenberg4thQuartet = [2, 1, 9, 10, 5, 3, 4, 0, 8, 7, 6, 11]
-    print serial.rowToMatrix(schoenberg4thQuartet)
+    print(serial.rowToMatrix(schoenberg4thQuartet))
 
 
 .. parsed-literal::
@@ -94,7 +95,7 @@ Print the twelve-tone matrix for a tone row:
 
 
 Get a quick graph showing how common various pitches are in a fourteenth
-century piece
+century piece:
 
 .. code:: python
 
