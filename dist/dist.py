@@ -39,16 +39,21 @@ To do a release,
 12. Create a new release on GitHub and upload the FIVE files created here. Use tag v2.0.1 (etc.).
     Don't forget the "v" in the release tag.
     Drag in this order: .egg, .tar.gz, .exe, no-corpus.egg, no-corpus.tar.gz
+    
+    Finish this before doing the next step, even though it looks like it could be done in parallel.
 
 13. then update PyPI by going to pypi.python.org and logging in and selecting music21 and clicking 
-    edit and augment the version number and the download URL. -- The URL will be printed when
+    edit at the top and augment the version number and the download URL. -- The URL will be printed when
     running dist.py -- it's important to cut and paste this, since it has the md5 tag.
 
-14. Delete the files in dist...
+14. Upload the .tar.gz file to PyPi by clicking "files" at the time.  Click Choose File.
+    File Type is Source.  Leave everything else blank, then click "upload new file"
 
-15. Immediately increment the number in _version.py and run tests on it here to prepare for next release.
+15. Delete the files in dist...
 
-16. Announce on the blog and to the list.
+16. Immediately increment the number in _version.py and run tests on it here to prepare for next release.
+
+17. Announce on the blog, to the list, and twitter.
 
 DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do.
 '''
