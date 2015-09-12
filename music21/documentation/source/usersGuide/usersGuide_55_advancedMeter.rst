@@ -12,7 +12,7 @@ User's Guide: Chapter 55: Advanced Meter Topics
 ===============================================
 
 Objects for Organizing Hierarchical Partitions
-==============================================
+----------------------------------------------
 
 Hierarchical metrical structures can be described as a type of
 fractional, space-preserving tree structure. With such a structure we
@@ -26,7 +26,7 @@ configuration. For basic data access about common meters, see the
 discussion of TimeSignature, below.
 
 Creating and Editing MeterTerminal Objects
-==========================================
+------------------------------------------
 
 A MeterTerminal is a node of the metrical tree structure, defined as a
 duration expressed as a fraction of a whole note. Thus, 1/4 is 1 quarter
@@ -141,7 +141,7 @@ fraction representations.
 
 
 Creating and Editing MeterSequence Objects
-==========================================
+------------------------------------------
 
 A MeterSequence object is a sub-class of a MeterTerminal. Like a
 MeterTerminal, a MeterSequence has a
@@ -511,7 +511,7 @@ a given QL, the maximum depth at this position.
 
 
 Advanced Time Signature Configuration
-=====================================
+-------------------------------------
 
 The music21 :class:`~music21.meter.TimeSignature` object contains four
 parallel MeterSequence objects, each assigned to the attributes
@@ -539,7 +539,7 @@ contained within a bar. Common meters are initialized with expected
 defaults; however, full MeterSequence customization is available.
 
 Configuring Display
-===================
+-------------------
 
 The TimeSignature
 :meth:`displaySequence <music21.meter.TimeSignature.displaySequence>`
@@ -592,7 +592,7 @@ a TimeSignature.
 
 
 Configuring Beam
-================
+----------------
 
 The TimeSignature
 :meth:`beamSequence <music21.meter.TimeSignature.beamSequence>`
@@ -668,7 +668,7 @@ partitions created.
     #_DOCS_HIDE i
 
 Configuring Beat
-================
+----------------
 
 The TimeSignature
 :meth:`beatSequence <music21.meter.TimeSignature.beatSequence>`
@@ -923,7 +923,7 @@ property.
 
 
 Annotating Found Notes with Beat Count
-======================================
+--------------------------------------
 
 The :meth:`~music21.meter.TimeSignature.getBeat` method returns the
 currently active beat given a quarter length position into the
@@ -957,7 +957,7 @@ a new Stream and displayed with annotations for part, measure, and beat.
     #_DOCS_HIDE i
 
 Using Beat Depth to Provide Metrical Analysis
-=============================================
+---------------------------------------------
 
 Another application of the
 :meth:`beatSequence <music21.meter.TimeSignature.beatSequence>`
@@ -1010,7 +1010,7 @@ Alternatively, this type of annotation can be applied to a Stream using
 the :func:`~music21.analysis.metrical.labelBeatDepth` function.
 
 Configuring Accent
-==================
+------------------
 
 The TimeSignature
 :meth:`accentSequence <music21.meter.TimeSignature.accentSequence>`
@@ -1020,7 +1020,7 @@ MeterSequence with a number assigned to the
 :meth:`weight <music21.meter.MeterTerminal.weight>` attribute.
 
 Applying Articulations Based on Accent
-======================================
+--------------------------------------
 
 The :meth:`~music21.meter.TimeSignature.getAccentWeight` method
 returns the currently active accent weight given a quarter length

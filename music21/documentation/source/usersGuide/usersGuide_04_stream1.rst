@@ -32,7 +32,7 @@ the second note a G; we won't mind; we'll just call you Pope Gregory
 from now on). Lets create those notes:
 
 Working with multiple objects via Lists
-=======================================
+---------------------------------------
 
 .. code:: python
 
@@ -309,7 +309,7 @@ need to know about a ``music21`` object similar to lists, called a
 :class:`~music21.stream.Stream`.
 
 Introduction to Streams
-=======================
+-----------------------
 
 The :class:`~music21.stream.Stream` object and its subclasses (Score,
 Part, Measure) are the fundamental containers for music21 objects such
@@ -364,7 +364,7 @@ details: just know that this feature lets music21 do some things that no
 other software package can do.
 
 Creating simple Streams
-=======================
+-----------------------
 
 Objects stored in Streams are called elements and must be some type of
 Music21Object (don’t worry, almost everything in music21 is a
@@ -475,7 +475,7 @@ MuseScore or some music notation software and display the notes below.
 
 
 Accessing Streams
-=================
+-----------------
 
 We can also dive deeper into streams. Let's get the ``step`` of each
 ``Note`` using the ``for thisNote in ...:`` command. But now we'll use
@@ -627,7 +627,7 @@ returned.
 
 
 More Stream Features
-====================
+--------------------
 
 Okay, so far we've seen that ``Streams`` can do the same things as
 lists, but can they do more? Let's call the analyze method on stream to
@@ -991,7 +991,7 @@ is not the same as the duration. the ``len()`` of a Stream is the number
 of objects stored in it, so ``len(stream1)`` is 3).
 
 Streams within Streams
-======================
+----------------------
 
 And, as a ``Music21Object``, a ``Stream`` can be placed inside of
 another ``Stream`` object. Let's create a stream, called biggerStream

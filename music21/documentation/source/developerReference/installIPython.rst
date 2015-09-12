@@ -9,7 +9,7 @@ Using ``music21`` with the iPython Notebook
 ===========================================
 
 Setting up the iPython environment
-==================================
+----------------------------------
 
 To get ``music21`` to work with iPython Notebook, first install
 ``anaconda``. Detailed instructions for installing ``anaconda`` on
@@ -30,7 +30,7 @@ Anaconda messes with your PATH, so I suggest opening your
 ``# added by Anaconda 1.5.1 installer export PATH="$PATH:/Users/cuthbert/anaconda/bin"``
 
 Installing music21 for anaconda
-===============================
+-------------------------------
 
 If you are running an ``anaconda`` version < 1.8.0, you may install
 music21 by entering:
@@ -81,7 +81,7 @@ Congrats. You should now be able to access iPython notebook in your
 browser
 
 Using the web-based IP Notebook
-===============================
+-------------------------------
 
 Now in the webbrowser you can type commands such as the ones below:
 
@@ -107,7 +107,7 @@ Now in the webbrowser you can type commands such as the ones below:
 All other normal ``music21`` commands will work as they should
 
 Displaying graphics inline
-==========================
+--------------------------
 
 By default, you cannot just call .show() because you'll open up your
 MusicXML reader locally...
@@ -243,7 +243,7 @@ any other iPython notebook
 
 
 Turn off pesky prompts. Run this and then hide it
-=================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 

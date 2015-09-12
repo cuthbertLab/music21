@@ -21,7 +21,7 @@ Go ahead and start IDLE or type “python” at the command line (Terminal
 on the Mac or “run: cmd” on Windows) and let’s get started.
 
 Creating and working with Notes
-===============================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The music21 concept of a standard note is contained in the
 :class:`~music21.note.Note` object, which is found in the ``note``

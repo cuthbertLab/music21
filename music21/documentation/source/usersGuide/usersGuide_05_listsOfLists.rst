@@ -25,7 +25,7 @@ In this chapter we will work on how to exploit the power of nested
 probably want to skip to the following section.
 
 Lists of Lists
-==============
+--------------
 
 Lists (similar to Arrays in other languages) can hold all sorts of other
 things inside them including other lists. So let's begin by creating two
@@ -213,7 +213,7 @@ they'll appear automatically in Python's shell):
   not to forget the ending ":" or to indent the next line.
 
 Functions and Recursion
-=======================
+-----------------------
 
 But what if we did this:
 
@@ -528,7 +528,7 @@ things we didn't get to, I suggest watching Google's Python tutorial,
 especially class 2).
 
 Wrapup
-======
+------
 
 In this chapter we looked at how we can look inside lists of lists,
 which will be important when we consider how to work with ``Streams`` of

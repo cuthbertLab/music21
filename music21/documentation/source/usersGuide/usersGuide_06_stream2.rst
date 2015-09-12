@@ -61,7 +61,7 @@ Streams and subclasses in general. (Skip this if you already know about
 such things from other programming experience)
 
 Classes and Subclasses
-======================
+----------------------
 
 An object, such as a note or pitch, is basically a collection of
 information along with some actions that can be performed on that
@@ -295,7 +295,7 @@ will be working with are the three fundamental subclasses of ``Stream``:
 ``Score``, ``Part``, and ``Measure``.
 
 Accessing Scores, Parts, Measures, and Notes
-============================================
+--------------------------------------------
 
 Streams provide a way to structure and position music21 objects both
 hierarchically and temporally. A Stream, or a Stream subclass such as
@@ -474,10 +474,10 @@ Measure). What is great about these methods is that they can work on a
 whole score and not just a single part.
 
 Recursion in Streams
-====================
+--------------------
 
 Flattening a Stream
-===================
+-------------------
 
 While nested Streams offer expressive flexibility, it is often useful to
 be able to flatten all Stream and Stream subclasses into a single Stream

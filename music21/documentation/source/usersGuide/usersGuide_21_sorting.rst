@@ -439,7 +439,7 @@ then forcing a re-sorting:
 
 
 Behind the scenes:
-==================
+------------------
 
 How does sorting actually work? ``Music21`` uses six attributes to
 determine which elements go before or after each other. The six-element

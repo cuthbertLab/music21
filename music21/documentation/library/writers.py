@@ -168,9 +168,10 @@ class IPythonNotebookReSTWriter(ReSTWriter):
                 print('\tWROTE   {0}'.format(common.relativepath(
                     ipythonNotebookFilePath)))
             else:
-                print('\tSKIPPED {0}'.format(common.relativepath(
-                    ipythonNotebookFilePath)))
-
+                if '-checkpoint' not in ipythonNotebookFilePath:
+                    print('\tSKIPPED {0}'.format(common.relativepath(
+                        ipythonNotebookFilePath)))
+                # do not print anything for skipped -checkpoint files
     ### PRIVATE METHODS ###
 
     def cleanupNotebookAssets(self, ipythonNotebookFilePath):

@@ -54,3 +54,8 @@ def processSource(app, name, lines):
 def setup(app):
     app.connect('autodoc-process-docstring', processDocstring)
     app.connect('source-read', processSource)
+    extension_metadata = {'version': '1.0',
+                          'parallel_read_safe': True,
+                          'parallel_write_safe': True,                          
+                          }
+    return extension_metadata

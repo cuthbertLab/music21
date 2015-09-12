@@ -21,7 +21,7 @@ formats. For complete documentation on file and data formats, see
 :ref:`moduleConverter`.
 
 Parsing MusicXML Files
-======================
+----------------------
 
 We can parse a MusicXML file by providing the
 :func:`music21.converter.parse` function with a local file path or an
@@ -58,14 +58,14 @@ Note that presently music21 offers limited support for compressed .mxl
 MusicXML files; this feature will be expanded in the future.
 
 Getting MusicXML Files
-======================
+----------------------
 
 Numerous MusicXML files can be found at the following URLs.
 
 http://kern.ccarh.org http://www.gutenberg.org
 
 Parsing Humdrum Files
-=====================
+---------------------
 
 Parsing Humdrum files is exactly as parsing other data formats. Simply
 call the music21.converter.parse() function on the desired file path or
@@ -76,14 +76,14 @@ URL.
     sBach = converter.parse('http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/bach/cello&file=bwv1007-01.krn&f=kern') 
 
 Getting Humdrum Files
-=====================
+---------------------
 
 Over one hundred thousand Kern files can be found at the following URL.
 
 http://kern.humdrum.org/
 
 Parsing ABC Files
-=================
+-----------------
 
 Parsing ABC files is exactly as parsing other data formats. Simply call
 the :func:`music21.converter.parse` function on the desired file path
@@ -180,7 +180,7 @@ single Score with the :meth:`music21.stream.Opus.mergeScores` method.
 
 
 Getting ABC Files
-=================
+-----------------
 
 Large collections of ABC are available from numerous on-line
 repositories. The following links are just a few of the many resources
@@ -191,7 +191,7 @@ http://abcnotation.com
 http://www.serpentpublications.org
 
 Parsing Musedata Files
-======================
+----------------------
 
 Both stage 1 and stage 2 Musedata file formats are supported by Music21.
 Multi-part Musedata (stage 2) files, zipped archives, and directories
@@ -202,7 +202,7 @@ desired file path or URL.
 Note that access restrictions prevent demonstrating Musedata conversion.
 
 Parsing MIDI Files
-==================
+------------------
 
 MIDI input and output is handled in the same was other formats. Simply
 call the :func:`music21.converter.parse` function on the desired file
