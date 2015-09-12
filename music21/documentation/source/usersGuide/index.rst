@@ -20,6 +20,7 @@ Users Guide
    usersGuide_17_derivations
    usersGuide_21_sorting
    usersGuide_22_graphing
+   usersGuide_23_advancedCorpus
    usersGuide_25_postTonalTools1
    usersGuide_54_extendingConverter
    usersGuide_55_advancedMeter
