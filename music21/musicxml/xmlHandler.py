@@ -1126,11 +1126,11 @@ class Document(object):
         print(('+'*20 + ' ' + bestTitle))
         print((self.score))
         print()
-        print((self.score.toxml(None, None, 1)))
+        print((self.score.toxml(None, None, True)))
 
     #---------------------------------------------------------------------------
     def write(self, fp):
-        msg = self.score.toxml(None, None, 1)
+        msg = self.score.toxml(None, None, True)
         f = open(fp, 'w')
         f.write(msg)
         f.close()

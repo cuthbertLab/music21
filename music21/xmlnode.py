@@ -550,10 +550,7 @@ class XMLNode(object):
         # append completed node to parent (from arg) or document
         parent.appendChild(node)
         if stringOut:
-            if six.PY2:
-                return parent.toprettyxml(indent=u"  ", encoding="utf-8")
-            else:
-                return parent.toprettyxml(indent="  ")
+            return parent.toprettyxml(indent=u"  ", encoding="utf-8")
             #return parent.toxml(encoding="utf-8")
 
         else:

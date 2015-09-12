@@ -1923,8 +1923,8 @@ class MeasureParser(XMLParserBase):
                 durRaw.quarterLength = qLen
                 try:
                     d.components = durRaw.components
-                except duration.DurationException:
-                    qLenRounded = 2.0**round(math.log2(qLen))
+                except duration.DurationException: # TODO: Test
+                    qLenRounded = 2.0**round(math.log(qLen, 2)) # math.log2 appears in py3.3
                     environLocal.printDebug(['mxToDuration', 
                             'rounding duration to {0} as type is not'.format(qLenRounded) + 
                             'defined and raw quarterlength ({0}) is not a computable duration'.format(qLen)])

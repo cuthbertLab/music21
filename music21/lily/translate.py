@@ -266,6 +266,7 @@ class LilypondConverter(object):
         Create a Lilypond object hierarchy in self.topLevelObject from an
         arbitrary music21 object.
 
+        TODO: make lilypond automatically run s.makeTupletBrackets()
         TODO: Add tests...
         '''
         from music21 import stream
@@ -1105,12 +1106,12 @@ class LilypondConverter(object):
 
 
         >>> n2 = note.Note("D#4")
-        >>> n2.duration.quarterLength = 0.3333333333333
+        >>> n2.duration.quarterLength = 1.0/3
         >>> n2.duration.tuplets[0].type = 'start'
         >>> n3 = note.Note("E4")
-        >>> n3.duration.quarterLength = 0.3333333333333
+        >>> n3.duration.quarterLength = 1.0/3
         >>> n4 = note.Note("F4")
-        >>> n4.duration.quarterLength = 0.3333333333333
+        >>> n4.duration.quarterLength = 1.0/3
         >>> n4.duration.tuplets[0].type = 'stop'
 
         >>> n5 = note.Note("F#4")

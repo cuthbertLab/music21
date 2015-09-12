@@ -323,9 +323,9 @@ class ConverterLilypond(SubConverter):
             return convertedFilePath
         
         else:
-            dataStr = conv.textFromMusic21Object(obj).encode('utf-8')
-            fp = self.writeDataStream(fp, dataStr)
-            return fp
+            conv.loadFromMusic21Object(obj)
+            convertedFilePath = conv.writeLyFile(ext='.ly', fp=fp)
+            return convertedFilePath
 
     def show(self, obj, fmt, app=None, subformats=None, **keywords):
         if subformats is None or len(subformats) == 0:
