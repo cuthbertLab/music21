@@ -63,6 +63,8 @@ class CorpusReferenceCleaner(Cleaner):
 class IPythonNotebookCleaner(Cleaner):
     '''
     Cleans rst files generated from IPython notebooks.
+    
+    TODO: clean .png files also...
     '''
 
     ### SPECIAL METHODS ###
