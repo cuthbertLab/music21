@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2009 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
 '''
@@ -349,16 +349,23 @@ def getWorkReferences(sort=True):
 
     This is used in the generation of corpus documentation
 
-    >>> post = corpus.getWorkReferences()
-
+    >>> workRefs = corpus.getWorkReferences(sort=True)
+    >>> for i,v in sorted(list(workRefs[0].items())):
+    ...     if i != 'works': # a dictionary that sorts differently each time
+    ...         print((i,v))
+    ('composer', "Aird's Airs")
+    ('composerDir', 'airdsAirs')
+    ('isComposer', False)
+    ('sortedWorkKeys', ['book1', 'book2', 'book3', 'book4', 'book5', 'book6'])
     '''
     # from music21 import corpus; corpus.getWorkReferences()
     # TODO: update this to use metadata
     results = []
-    for composerDirectory, composer in corpora.CoreCorpus._composers:
+    for composerDirectory, composer, isComposer in corpora.CoreCorpus._composers:
         ref = {}
         ref['composer'] = composer
         ref['composerDir'] = composerDirectory
+        ref['isComposer'] = isComposer
         ref['works'] = {}  # store by keys of name/dirname
         works = getComposer(composerDirectory)
         for path in works:

@@ -1379,6 +1379,7 @@ class CorpusDocumenter(Documenter):
         result.extend(self.makeHeading(self.headingText, 1))
         result.extend(self.rstEditingWarningFormat)
         result.extend(self.rstCorpusIntroductionFormat)
+        # TODO: use... common.getCorpusContentDirs to make sure nothing is missed.
         for composerDict in corpus.getWorkReferences(sort=True):
             result.extend(self.getRstComposerDictFormat(composerDict))
         return result

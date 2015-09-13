@@ -1981,12 +1981,12 @@ def getMetadataCacheFilePath():
     r'''Get the stored music21 directory that contains the corpus metadata cache.
 
     >>> fp = common.getMetadataCacheFilePath()
-    >>> fp.endswith('corpus/metadataCache') or fp.endswith(r'corpus\metadataCache')
+    >>> fp.endswith('corpus/_metadataCache') or fp.endswith(r'corpus\_metadataCache')
     True
     
     :rtype: str
     '''
-    return os.path.join(getSourceFilePath(), 'corpus', 'metadataCache')
+    return os.path.join(getSourceFilePath(), 'corpus', '_metadataCache')
 
 
 def getCorpusFilePath():
@@ -2019,7 +2019,7 @@ def getCorpusContentDirs():
     # dirs to exclude; all files will be retained
     excludedNames = (
         'license.txt',
-        'metadataCache',
+        '_metadataCache',
         '__pycache__',
         )
     for filename in os.listdir(directoryName):
