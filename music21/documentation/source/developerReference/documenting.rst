@@ -5,6 +5,7 @@ Documenting music21
 =============================================
 
 Music21's documentation system uses a combination of handwritten documentation pages (like this one),
+IPython notebooks, 
 and documentation automatically generated from the documentation found in modules.  
 
 For handwritten pages, the files can be found in the top-level /buildDoc/rst/ directories, outside
@@ -289,9 +290,9 @@ Here's an example from note.py::
         def __init__(self, *arguments, **keywords):
             pass
 
-If a `_DOC_ATTR` attribute is not defined, the most-recently inherited `_DOC_ATTR` attribute will be used. 
-To explicitly merge an inherited `_DOC_ATTR` attribute with a locally defined `_DOC_ATTR`, use the 
-dictionary's `update()` method.
+If a `_DOC_ATTR` attribute is not defined, the most-recently inherited `_DOC_ATTR` 
+attribute will be used.  To explicitly merge an inherited `_DOC_ATTR` attribute with 
+a locally defined `_DOC_ATTR`, use the dictionary's `update()` method.
 
 The following abbreviated example, showing the updating of the `_DOC_ATTR` inherited from NotRest, 
 is from chord.py::
@@ -322,8 +323,8 @@ is from chord.py::
 Documenting Class-Level Methods
 -----------------------------------------------------------------
 
-This is the most common type of documentation, and it ensures both excellent documentation and doctests. 
-A typical example of source code might look like this::
+This is the most common type of documentation, and it ensures both excellent 
+documentation and doctests. A typical example of source code might look like this::
 
 	class className():
 		[instance variables, __init__, etc.]
@@ -337,3 +338,13 @@ A typical example of source code might look like this::
 		    'value'
 		    '''
 			[method code]
+
+Documenting IPython Notebook
+-----------------------------------
+
+The only really important thing to note here is that if you want to raise an error, note
+on same line in a comment #_RAIZES_ERROR, well, except spell #_RAISES properly. (I can't
+write that in the docs, but hopefully you will figure it out).
+
+Addresses in the 0x3a324f etc. form will be accepted without problem.
+			

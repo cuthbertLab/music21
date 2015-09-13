@@ -27,6 +27,8 @@ def fixLines(lines):
         elif 'RESUME_DOCS' in line:
             omitting = False
             continue
+        elif '#_RAISES_ERROR' in line:
+            newLines.append(line.replace(' #_RAISES_ERROR', ' '))        
         elif omitting is True:
             continue
         else:
