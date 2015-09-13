@@ -720,9 +720,9 @@ def partitionQuarterLength(qLen, qLenDiv=4):
     DurationTuple(type='eighth', dots=0, quarterLength=0.5)
     DurationTuple(type='eighth', dots=0, quarterLength=0.5)
     [<music21.duration.Tuplet 3/2/eighth>, 
-     <music21.duration.Tuplet 3/2/eighth>, 
-     <music21.duration.Tuplet 3/2/eighth>, 
-     <music21.duration.Tuplet 3/2/eighth>]
+    <music21.duration.Tuplet 3/2/eighth>, 
+    <music21.duration.Tuplet 3/2/eighth>, 
+    <music21.duration.Tuplet 3/2/eighth>]
 
     Divide 1.5 into triplet eighths, with a triplet 16th leftover.
     >>> pql(1.5, 1.0/3)
@@ -732,10 +732,10 @@ def partitionQuarterLength(qLen, qLenDiv=4):
     DurationTuple(type='eighth', dots=0, quarterLength=0.5)
     DurationTuple(type='16th', dots=0, quarterLength=0.25)
     [<music21.duration.Tuplet 3/2/eighth>, 
-     <music21.duration.Tuplet 3/2/eighth>, 
-     <music21.duration.Tuplet 3/2/eighth>, 
-     <music21.duration.Tuplet 3/2/eighth>, 
-     <music21.duration.Tuplet 3/2/16th>]
+    <music21.duration.Tuplet 3/2/eighth>, 
+    <music21.duration.Tuplet 3/2/eighth>, 
+    <music21.duration.Tuplet 3/2/eighth>, 
+    <music21.duration.Tuplet 3/2/16th>]
      
     There is no problem if the division unit is larger then the source duration, it
     just will not be totally filled.
