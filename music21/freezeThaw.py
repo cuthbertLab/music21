@@ -570,9 +570,9 @@ class StreamFreezer(StreamFreezeThawBase):
             streamObj = self.stream
         else:
             streamObj = hierarchyObject
-        streamsFound = streamObj._yieldElementsDownward(streamsOnly=True,
+        streamsFoundGenerator = streamObj.recurse(streamsOnly=True,
                        restoreActiveSites=False)
-        streamIds = [id(s) for s in streamsFound]
+        streamIds = [id(s) for s in streamsFoundGenerator]
 
         if getSpanners is True:
             spannerBundle = streamObj.spannerBundle

@@ -2030,6 +2030,19 @@ def getCorpusContentDirs():
     'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'palestrina',
     'ryansMammoth', 'schoenberg', 'schumann', 'schumann_clara',
     'theoryExercises', 'trecento', 'verdi', 'weber']
+    
+    Make sure that all corpus data has a directoryInformation tag in
+    CoreCorpus.
+    
+    >>> cc = corpus.corpora.CoreCorpus()
+    >>> failed = []
+    >>> di = [d.directoryName for d in cc.directoryInformation]
+    >>> for f in fp:
+    ...     if f not in di:
+    ...         failed.append(f)
+    >>> failed
+    []
+    
     '''
     directoryName = getCorpusFilePath()
     result = []
