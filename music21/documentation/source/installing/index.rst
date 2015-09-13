@@ -8,5 +8,4 @@ Installation
    installMac
    installWindows
    installLinux
-   installAdvanced
    installAdditional

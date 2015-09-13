@@ -5,7 +5,6 @@ Users Guide
    :maxdepth: 1
 
    usersGuide_99_Table_of_Contents
-   usersGuide_00_introduction
    usersGuide_01_installing
    usersGuide_02_notes
    usersGuide_03_pitches

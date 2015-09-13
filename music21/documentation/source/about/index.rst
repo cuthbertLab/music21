@@ -5,7 +5,5 @@ About Music21
    :maxdepth: 1
 
    what
-   quickStart
-   examples
-   applications
    about
+   applications
