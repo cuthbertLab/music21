@@ -50,6 +50,8 @@ class IPythonNotebookIterator(Iterator):
             )
         for pathParts in os.walk(documentationPath):
             directoryPath, fileNames = pathParts[0], pathParts[2]
+            if directoryPath.endswith('.ipynb_checkpoints'):
+                continue
             for fileName in fileNames:
                 if fileName.endswith('.ipynb'):
                     filePath = os.path.join(

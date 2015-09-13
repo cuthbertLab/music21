@@ -3824,10 +3824,10 @@ class TimeSignature(base.Music21Object):
         '''
         Given an offset (quarterLength position), get the beat, where beats count from 1
 
-        If you want a floating point number for the beat, see `getBeatProportion`.
+        If you want a fractional number for the beat, see `getBeatProportion`.
 
-        In v.1.4 -- getBeat will probably do what getBeatProportion does now...
-
+        TODO: late: In v.1.4 -- getBeat will probably do what getBeatProportion does now...
+        
 
         >>> a = meter.TimeSignature('3/4', 3)
         >>> a.getBeat(0)
@@ -4017,11 +4017,10 @@ class TimeSignature(base.Music21Object):
     def getBeatProportion(self, qLenPos):
         '''
         Given a quarter length position into the meter, return a numerical progress
-        through the beat (where beats count from one) with a floating-point value
+        through the beat (where beats count from one) with a floating-point or fractional value
         between 0 and 1 appended to this value that gives the proportional progress into the beat.
 
         For faster, integer values, use simply `.getBeat()`
-
 
         >>> ts1 = meter.TimeSignature('3/4')
         >>> ts1.getBeatProportion(0.0)
@@ -4041,7 +4040,7 @@ class TimeSignature(base.Music21Object):
         start, end = self.beatSequence.offsetToSpan(qLenPos)
         totalRange = end - start
         progress = qLenPos - start # how far in QL
-        return beatIndex + 1 + (progress / totalRange)
+        return opFrac(beatIndex + 1 + (progress / totalRange))
 
     def getBeatProportionStr(self, qLenPos):
         '''Return a string presentation of the beat.
