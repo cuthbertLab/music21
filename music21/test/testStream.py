@@ -5709,10 +5709,10 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('bwv66.6')
         # default
-        rElements = s.recurse()
+        rElements = list(s.recurse())
         self.assertEqual(len(rElements), 240)
 
-        rElements = s.recurse(streamsOnly=True)
+        rElements = list(s.recurse(streamsOnly=True))
         self.assertEqual(len(rElements), 45)
 
         s1 = rElements[0]
@@ -5725,18 +5725,18 @@ class Test(unittest.TestCase):
         self.assertEqual(id(m2.activeSite), id(p1))
 
 
-        rElements = s.recurse(classFilter='KeySignature')
+        rElements = list(s.recurse(classFilter='KeySignature'))
         self.assertEqual(len(rElements), 4)
         # the first elements active site is the measure
         self.assertEqual(id(rElements[0].activeSite), id(m1))
 
-        rElements = s.recurse(classFilter=['TimeSignature'])
+        rElements = list(s.recurse(classFilter=['TimeSignature']))
         self.assertEqual(len(rElements), 4)
 
 
 #         s = corpus.parse('bwv66.6')
 #         m1 = s[2][1] # cannot use parts here as breaks active site
-#         rElements = m1.recurse(direction='upward')
+#         rElements = list(m1.recurse(direction='upward'))
 #         self.assertEqual([str(e.classes[0]) for e in rElements], ['Measure', 
 #                                                                   'Instrument', 
 #                                                                   'Part', 

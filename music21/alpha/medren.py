@@ -117,7 +117,7 @@ _validMensuralAbbr = [None, 'Mx', 'L', 'B', 'SB', 'M', 'SM']
 #    if len(tempSites) > 0:
 #        for s in tempSites:
 #            for i in range(int(s.lowestOffset), int(s.getOffsetByElement(music21Obj))+1):
-#                cList += s.getElementsByOffset(i, i+1, classList = targetClassList).recurse()[1:]
+#                cList += list(s.getElementsByOffset(i, i+1, classList = targetClassList).recurse())[1:]
 #        cList += music21.medren._getTargetBeforeOrAtObj(s, targetClassList)
 #    
 #    return list(set(cList))
@@ -536,7 +536,7 @@ class GeneralMensuralNote(base.Music21Object):
                 mList = [self]
                 currentIndex = 0
             else:
-                tempList = site.recurse()[1:]
+                tempList = list(site.recurse())[1:]
                 if site.isMeasure:
                     mList += tempList
                 else:                    

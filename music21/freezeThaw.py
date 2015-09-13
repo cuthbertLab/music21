@@ -276,7 +276,7 @@ class StreamFreezer(StreamFreezeThawBase):
             streamObj = self.stream
             if streamObj is None:
                 raise FreezeThawException("You need to pass in a stream when creating to work")
-        allEls = streamObj.recurse(restoreActiveSites=False) # might not work when recurse yields...
+        allEls = list(streamObj.recurse(restoreActiveSites=False)) # might not work when recurse yields...
         if self.topLevel is True:
             self.findActiveStreamIdsInHierarchy(streamObj)
 

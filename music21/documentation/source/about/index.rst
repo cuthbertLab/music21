@@ -7,3 +7,5 @@ About Music21
    what
    about
    applications
+   faq
+   referenceCorpus

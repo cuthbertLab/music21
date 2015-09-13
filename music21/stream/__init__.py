@@ -6857,20 +6857,23 @@ class Stream(base.Music21Object):
                             if skipDuplicates:
                                 memo.append(id(e))
 
-    # possible rename recurseList
     def recurse(self, streamsOnly=False,
-        restoreActiveSites=True, skipDuplicates=True, classFilter=()):
+        restoreActiveSites=True, skipDuplicates=True, classFilter=(), skipSelf=False):
         '''
         Iterate over a list of all Music21Objects contained in the Stream,
         starting with self, continuing with self's elements,
         and whenever finding a Stream subclass in self, that Stream subclass's elements.
+
+        
 
         TODO: WRITE DOCS AND TESTS ETC.!!!!
         '''
         return [e for e in
             self._yieldElementsDownward(streamsOnly=streamsOnly,
             restoreActiveSites=restoreActiveSites,
-            classFilter=classFilter)]
+            classFilter=classFilter,
+            skipSelf=True,
+            )]
 
     def restoreActiveSites(self):
         '''

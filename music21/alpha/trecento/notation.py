@@ -616,7 +616,7 @@ def convertBrevisLength(brevisLength, convertedStream, inpDiv = None, measureNum
     rem = None
     measureList = []
 
-    mList = brevisLength.recurse()[1:]
+    mList = list(brevisLength.recurse())[1:]
 
     tempTBL = BrevisLengthTranslator(div, mList)
 
@@ -1923,7 +1923,7 @@ class TestExternal(unittest.TestCase):
         print('''Length comparison
         normal: %s
         tiny: %s
-        ''' % (len(SePerDureca.recurse()), len(TinySePerDureca.recurse())))
+        ''' % (len(list(SePerDureca.recurse())), len(list(TinySePerDureca.recurse()))))
     
         for i in range(2):
             for j in range(len(SePerDureca[i+1])):

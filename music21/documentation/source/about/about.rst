@@ -96,12 +96,12 @@ Their contributions and generosity are greatly appreciated.
 
 * `Margaret Greentree`_ kindly gave permission for distribution of her edited collection of the Bach chorales in MusicXML format as part of the music21 corpus.  Her website contains all these chorales in additional formats.  Any discoveries we make regarding these chorales are done in her memory.
 
-* Walter B. Hewlett and Craig Sapp for support.
+* Walter B. Hewlett and Craig Sapp of Stanford's CCARH for support.
 
 * `Justin London`_ compiled and maintained the list of Second-Viennese row forms now available in serial.py.
 
 * `McGill University`_ ELVIS project for including the MEI parser. Special thanks to Julie
-Cumming, Andrew Hankinson, and Christopher Antila for contributing.
+Cumming, Andrew Hankinson, and especially Christopher Antila for contributing.
 
 * `Manuel Op de Coul`_ has kindly gave permission to use the Scala scale archive of nearly 4000 scales in music21.
 
