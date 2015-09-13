@@ -286,7 +286,7 @@ class Stream(base.Music21Object):
         }
 
     def __init__(self, givenElements=None, *args, **keywords):
-        base.Music21Object.__init__(self)
+        base.Music21Object.__init__(self, **keywords)
 
         self.streamStatus = streamStatus.StreamStatus(self)
                 
@@ -6410,14 +6410,18 @@ class Stream(base.Music21Object):
         # this copy will have a shared locations object
         # note that copy.copy() in some cases seems to not cause secondary
         # problems that self.__class__() does
+        if retainContainers:
+            method = 'semiFlat'
+        else:
+            method = 'flat'
+
         sNew = copy.copy(self)
+        if sNew.id != id(sNew):
+            sNew.id = str(sNew.id) + "_" + method
+        
         sNew._derivation = derivation.Derivation(sNew)
         sNew._derivation.origin = self
-        if retainContainers:
-            sNew.derivation.method = 'semiFlat'
-        else:
-            sNew.derivation.method = 'flat'
-
+        sNew.derivation.method = method
         # storing .elements in here necessitates
         # create a new, independent cache instance in the flat representation
         sNew._cache = {} 
@@ -6878,6 +6882,12 @@ class Stream(base.Music21Object):
         >>> for el in s.recurse(skipSelf=True, streamsOnly=True):
         ...     tup = (el, el.offset, el.activeSite)
         ...     print(tup)
+        (<music21.stream.Part part0>, 0.0, <music21.stream.Score mainScore>)
+        (<music21.stream.Measure 1 offset=0.0>, 0.0, <music21.stream.Part part0>)
+        (<music21.stream.Measure 2 offset=4.0>, 4.0, <music21.stream.Part part0>)
+        (<music21.stream.Part part1>, 0.0, <music21.stream.Score mainScore>)
+        (<music21.stream.Measure 1 offset=0.0>, 0.0, <music21.stream.Part part1>)
+        (<music21.stream.Measure 2 offset=4.0>, 4.0, <music21.stream.Part part1>)
 
         
         #TODO: change skipSelf by January 2016.
