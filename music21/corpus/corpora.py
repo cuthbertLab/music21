@@ -66,19 +66,21 @@ class DirectoryInformation(object):
         populate other information about the directory such as
         files and filenames.
         
+        Ellipses are for the difference between PY2 u'' strings and PY3 '' strings
+        
         >>> di = corpus.corpora.DirectoryInformation('schoenberg')
         >>> di.findWorks()
-        OrderedDict([('opus19', CorpusWork(title='Opus 19', 
-                                           files=[CorpusFile(path='schoenberg/opus19/movement2.mxl', 
-                                                             title='Movement 2', 
-                                                             filename='movement2.mxl', 
+        OrderedDict([(...'opus19', CorpusWork(title='Opus 19', 
+                                           files=[CorpusFile(path=...'schoenberg/opus19/movement2.mxl', 
+                                                             title=...'Movement 2', 
+                                                             filename=...'movement2.mxl', 
                                                              format='musicxml', 
-                                                             ext='.mxl'), 
-                                                  CorpusFile(path='schoenberg/opus19/movement6.mxl', 
-                                                             title='Movement 6', 
-                                                             filename='movement6.mxl', 
+                                                             ext=...'.mxl'), 
+                                                  CorpusFile(path=...'schoenberg/opus19/movement6.mxl', 
+                                                             title=...'Movement 6', 
+                                                             filename=...'movement6.mxl', 
                                                              format='musicxml', 
-                                                             ext='.mxl')],                                                             
+                                                             ext=...'.mxl')],                                                             
                                             virtual=False))])
         '''
         self.works.clear()

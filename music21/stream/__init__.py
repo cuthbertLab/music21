@@ -83,7 +83,7 @@ class StreamIterator(object):
     * StreamIterator.streamLength -- the len() of srcStream
     * StreamIterator.srcStreamElements -- srcStream.elements
     * StreamIterator.cleanupOnStop -- should the StreamIterator delete the
-      reference to srcStream and srcStreamElements before stopping? default
+      reference to srcStream and srcStreamElements when stopping? default
       True
 
     '''
