@@ -70,7 +70,7 @@ class DirectoryInformation(object):
         
         >>> di = corpus.corpora.DirectoryInformation('schoenberg')
         >>> di.findWorks()
-        OrderedDict([(...'opus19', CorpusWork(title='Opus 19', 
+        OrderedDict([(...'opus19', CorpusWork(title=...'Opus 19', 
                                            files=[CorpusFile(path=...'schoenberg/opus19/movement2.mxl', 
                                                              title=...'Movement 2', 
                                                              filename=...'movement2.mxl', 
