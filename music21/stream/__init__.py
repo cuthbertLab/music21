@@ -5687,7 +5687,7 @@ class Stream(base.Music21Object):
 
         # need to move through notes in order
         # NOTE: this may or may have sub-streams that are not being examined
-        noteStream = returnObj.sorted.notesAndRests
+        noteStream = returnObj.notesAndRests
 
         #environLocal.printDebug(['alteredPitches', alteredPitches])
         #environLocal.printDebug(['pitchPast', pitchPast])
@@ -5912,10 +5912,6 @@ class Stream(base.Music21Object):
             returnObj = copy.deepcopy(self)
         else:
             returnObj = self
-
-        # Should we do this?  or just return an exception if not there.
-        # this cannot work unless we use a sorted representation
-        returnObj = returnObj.sorted
 
         qLenTotal = returnObj.duration.quarterLength
         elements = []
@@ -9145,7 +9141,7 @@ class Stream(base.Music21Object):
 
 
 
-    def findGaps(self, minimumQuarterLength=None):
+    def findGaps(self):
         '''
         Returns either (1) a Stream containing Elements
         (that wrap the None object) whose offsets and durations
@@ -9154,9 +9150,6 @@ class Stream(base.Music21Object):
 
         N.B. there may be gaps in the flattened representation of the stream
         but not in the unflattened.  Hence why "isSequence" calls self.flat.isGapless
-        
-        minimumQuarterLength is now DEPRECATED and IGNORED (28 June 2014)
-        TODO: Remove
         '''
         if 'GapStream' in self._cache and self._cache["GapStream"] is not None:
             return self._cache["GapStream"]
@@ -9220,7 +9213,7 @@ class Stream(base.Music21Object):
         True
         '''
 #        checkOverlap = False
-        elementsSorted = self.flat.sorted
+        elementsSorted = self.flat
         simultaneityMap, unused_overlapMap = self._findLayering(elementsSorted,
                                                                 includeDurationless)
 
@@ -9286,7 +9279,7 @@ class Stream(base.Music21Object):
         7
 
         '''
-        elementsSorted = self.flat.sorted
+        elementsSorted = self.flat
         unused_simultaneityMap, overlapMap = self._findLayering(elementsSorted,
                                                                 includeDurationless, includeEndBoundary)
         #environLocal.printDebug(['simultaneityMap map', simultaneityMap])
@@ -9315,7 +9308,7 @@ class Stream(base.Music21Object):
         TODO: check that co-incident boundaries are properly handled
 
         '''
-        elementsSorted = self.flat.sorted
+        elementsSorted = self.flat
         unused_simultaneityMap, overlapMap = self._findLayering(elementsSorted,
                                                                 includeDurationless, includeEndBoundary)
         post = True
