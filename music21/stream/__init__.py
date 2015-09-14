@@ -6889,6 +6889,11 @@ class Stream(base.Music21Object):
         (<music21.stream.Measure 1 offset=0.0>, 0.0, <music21.stream.Part part1>)
         (<music21.stream.Measure 2 offset=4.0>, 4.0, <music21.stream.Part part1>)
 
+        .. warning::
+        
+            Remember that like all iterators, it is dangerous to alter
+            the components of the Stream being iterated over during iteration.
+            if you need to edit while recusing, list(s.recurse()) is safer.
         
         #TODO: change skipSelf by January 2016.
 

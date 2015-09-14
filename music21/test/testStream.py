@@ -6860,9 +6860,9 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('bwv66.6')
         ex = s.parts[0].measures(3,6)
-        for n in ex.recurse(classFilter=['Note']):
-            if n.name == 'B':
-                o = n.offset
+        for n in list(ex.recurse(classFilter=['Note'])):
+            if n.name == 'B':  # should do a list(recurse()) because manipulating
+                o = n.offset   # the stream while iterating.
                 site = n.activeSite
                 n.activeSite.remove(n)
                 r = note.Rest(quarterLength=n.quarterLength)
