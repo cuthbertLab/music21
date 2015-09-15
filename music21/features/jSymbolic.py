@@ -72,7 +72,7 @@ class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
     >>> fe = features.jSymbolic.MelodicIntervalHistogramFeature(s)
     >>> f = fe.extract()
     >>> f.vector[0:5]
-    [0.39..., 0.60..., 1.0,     0.17..., 0.13...]
+    [0.14..., 0.22..., 0.36..., 0.06..., 0.05...]
     '''
     id = 'M1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -82,14 +82,15 @@ class MelodicIntervalHistogramFeature(featuresModule.FeatureExtractor):
         self.description = 'A features array with bins corresponding to the values of the melodic interval histogram.'
         self.isSequential = True
         self.dimensions = 128
-        self.normalize = True
+        self.normalize = False
 
     def _process(self):
         '''Do processing necessary, storing result in _feature.
         '''
         histo = self.data['midiIntervalHistogram']
+        histo_sum = float(sum(histo))
         for i, value in enumerate(histo):
-            self._feature.vector[i] += value
+            self._feature.vector[i] += value/histo_sum
  
 
 class AverageMelodicIntervalFeature(featuresModule.FeatureExtractor):
