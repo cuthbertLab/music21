@@ -31,18 +31,6 @@ Music21 Documentation
 .. toctree::
    :maxdepth: 2
 
-   overview/index
-
-
-.. toctree::
-   :maxdepth: 2
-
-   systemReference/index
-
-
-.. toctree::
-   :maxdepth: 2
-
    developerReference/index
 
 

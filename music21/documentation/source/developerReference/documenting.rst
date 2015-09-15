@@ -43,8 +43,7 @@ as close to the relevant code as possible.
 
 If you're going to edit docs you'll need the latest version of Sphinx.  Go to the command line and Type::
 
-  sudo easy_install -U Sphinx
-  sudo easy_install rst2pdf
+  sudo pip install sphinx
  
 Sphinx uses special characters to identify formatting of documentation. For example, to write a heading you can write:
 Helpful tips on Sphinx formatting may be found here:  `Sphinx Documentation Formatting <http://sphinx.pocoo.org/rest.html>`_ 
@@ -339,12 +338,4 @@ documentation and doctests. A typical example of source code might look like thi
 		    '''
 			[method code]
 
-Documenting IPython Notebook
------------------------------------
-
-The only really important thing to note here is that if you want to raise an error, note
-on same line in a comment #_RAIZES_ERROR, well, except spell #_RAISES properly. (I can't
-write that in the docs, but hopefully you will figure it out).
-
-Addresses in the 0x3a324f etc. form will be accepted without problem.
 			

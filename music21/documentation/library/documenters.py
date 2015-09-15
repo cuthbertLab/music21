@@ -1379,8 +1379,9 @@ class CorpusDocumenter(Documenter):
         result.extend(self.makeHeading(self.headingText, 1))
         result.extend(self.rstEditingWarningFormat)
         result.extend(self.rstCorpusIntroductionFormat)
-        for composerDict in corpus.getWorkReferences(sort=True):
-            result.extend(self.getRstComposerDictFormat(composerDict))
+        # TODO: use... common.getCorpusContentDirs to make sure nothing is missed.
+        for directoryInformation in corpus.getWorkReferences():
+            result.extend(self.getRstComposerDictFormat(directoryInformation))
         return result
 
     def __repr__(self):
@@ -1418,79 +1419,83 @@ class CorpusDocumenter(Documenter):
 
     ### PUBLIC METHODS ###
 
-    def getRstComposerDictFormat(self, composerDict):
+    def getRstComposerDictFormat(self, directoryInformation):
         result = []
-        composerName = composerDict['composer']
-        composerDirectory = composerDict['composerDir']
-        result.extend(self.makeHeading(composerName, 2))
-        result.extend(self.getRstComposerIntroductionFormat(
-            composerName,
-            composerDirectory,
-            ))
-        for workKey in composerDict['sortedWorkKeys']:
-            workDict = composerDict['works'][workKey]
-            result.extend(self.getRstComposerWorksFormat(workDict))
+        result.extend(self.makeHeading(directoryInformation.directoryTitle, 2))
+        result.extend(self.getRstComposerIntroductionFormat(directoryInformation))
+        for corpusWork in directoryInformation.works.values():
+            result.extend(self.getRstComposerWorksFormat(corpusWork))
         return result
 
-    def getRstComposerIntroductionFormat(
-        self, composerName, composerDirectory):
+    def getRstComposerIntroductionFormat(self, directoryInformation):
+        name = directoryInformation.directoryTitle
+        directory = directoryInformation.directoryName
+        isComposer = directoryInformation.isComposer
+        
         result = []
-        result.append('To get all works by {0}, the'.format(composerName))
-        result.append(':meth:`~music21.corpus.getComposer` function can')
-        result.append('be used to get all file paths.')
+        result.append('To get all works ')
+        if isComposer:
+            result.append('composed by {0},'.format(name))
+        else:
+            result.append('collected in {0},'.format(name))
+        result.append('use :meth:`~music21.corpus.getComposer` ')
+        result.append('to get all file paths.')
         result.append('')
         result.append('For example:')
         result.append('')
         result.append('::')
         result.append('')
-        result.append('    >>> from music21 import corpus')
         result.append('    >>> paths = corpus.getComposer({!r})'.format(
-            composerDirectory))
+            directory))
         result.append('')
         return result
 
-    def getRstComposerWorksFormat(self, workDict):
+    def getRstComposerWorksFormat(self, corpusWork):
         result = []
+        isSingleWork = True if len(corpusWork.files) == 1 else False
         #workTitle = common.toUnicode(workDict['title'])
-        workTitle = unicode(workDict['title'])
-        worksAreVirtual = workDict['virtual']
+        workTitle = unicode(corpusWork.title)
+        worksAreVirtual = corpusWork.virtual
         if worksAreVirtual:
             workTitle += ' (*virtual*)'
-        result.append(workTitle)
-        result.append('')
+        if isSingleWork is False:
+            result.append(workTitle)
+            result.append('')
         procedure = self.getRstWorkFileDictFormat
         if worksAreVirtual:
             procedure = self.getRstVirtualWorkFileDictFormat
-        for fileDict in workDict['files']:
-            result.extend(procedure(fileDict))
+        if isSingleWork is False:
+            for corpusFile in corpusWork.files:
+                result.extend(["- " + procedure(corpusFile), ''])
+        else:
+            result.append(procedure(corpusWork.files[0]))
+            result.append('')
         return result
 
-    def getRstVirtualWorkFileDictFormat(self, fileDict):
+    def getRstVirtualWorkFileDictFormat(self, corpusFile):
         result = []
         result.append('- {0} *({1})*: `{2}`'.format(
-            unicode(fileDict['title']),
-            unicode(fileDict['format']),
-            unicode(fileDict['corpusPath']),
-            ))
+            unicode(corpusFile.title),
+            unicode(corpusFile.format),
+            unicode(corpusFile.path),
+            )) # TODO: does this actually work for a unicode title on Py2?
         result.append('')
         result.append('  Source: {0}'.format(
-            unicode(fileDict['url'])))
+            unicode(corpusFile.url)))
         result.append('')
         return result
 
-    def getRstWorkFileDictFormat(self, fileDict):
-        result = []
+    def getRstWorkFileDictFormat(self, corpusFile):
         corpusPathWithoutSlashes = re.sub(
             '\\\\',
             '/',
-            fileDict['corpusPath'],
+            corpusFile.path,
             )
-        result.append('- {0} *({1})*: `{2}`'.format(
-            fileDict['title'],
-            fileDict['format'],
+        result = '{0} *({1})*: `{2}`'.format(
+            corpusFile.title,
+            corpusFile.format,
             corpusPathWithoutSlashes,
-            ))
-        result.append('')
+            )
         return result
 
 

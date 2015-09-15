@@ -83,7 +83,7 @@ class StreamIterator(object):
     * StreamIterator.streamLength -- the len() of srcStream
     * StreamIterator.srcStreamElements -- srcStream.elements
     * StreamIterator.cleanupOnStop -- should the StreamIterator delete the
-      reference to srcStream and srcStreamElements before stopping? default
+      reference to srcStream and srcStreamElements when stopping? default
       True
 
     '''
@@ -286,7 +286,7 @@ class Stream(base.Music21Object):
         }
 
     def __init__(self, givenElements=None, *args, **keywords):
-        base.Music21Object.__init__(self)
+        base.Music21Object.__init__(self, **keywords)
 
         self.streamStatus = streamStatus.StreamStatus(self)
                 
@@ -5687,7 +5687,7 @@ class Stream(base.Music21Object):
 
         # need to move through notes in order
         # NOTE: this may or may have sub-streams that are not being examined
-        noteStream = returnObj.sorted.notesAndRests
+        noteStream = returnObj.notesAndRests
 
         #environLocal.printDebug(['alteredPitches', alteredPitches])
         #environLocal.printDebug(['pitchPast', pitchPast])
@@ -5912,10 +5912,6 @@ class Stream(base.Music21Object):
             returnObj = copy.deepcopy(self)
         else:
             returnObj = self
-
-        # Should we do this?  or just return an exception if not there.
-        # this cannot work unless we use a sorted representation
-        returnObj = returnObj.sorted
 
         qLenTotal = returnObj.duration.quarterLength
         elements = []
@@ -6410,14 +6406,18 @@ class Stream(base.Music21Object):
         # this copy will have a shared locations object
         # note that copy.copy() in some cases seems to not cause secondary
         # problems that self.__class__() does
+        if retainContainers:
+            method = 'semiFlat'
+        else:
+            method = 'flat'
+
         sNew = copy.copy(self)
+        if sNew.id != id(sNew):
+            sNew.id = str(sNew.id) + "_" + method
+        
         sNew._derivation = derivation.Derivation(sNew)
         sNew._derivation.origin = self
-        if retainContainers:
-            sNew.derivation.method = 'semiFlat'
-        else:
-            sNew.derivation.method = 'flat'
-
+        sNew.derivation.method = method
         # storing .elements in here necessitates
         # create a new, independent cache instance in the flat representation
         sNew._cache = {} 
@@ -6672,96 +6672,6 @@ class Stream(base.Music21Object):
 
         ''')
 
-
-    def _yieldElementsDownward(self, streamsOnly=False,
-            restoreActiveSites=True, classFilter=()):
-        '''
-        Yield all containers (Stream subclasses), including self,
-        and going downward.
-        '''
-        def isOfClass(e, classes):
-            if not common.isListLike(classes):
-                classes = [classes]
-            eClasses = e.classes  # store once, as this is property call
-            for className in classes:
-                if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
-                    return True
-            return False
-
-        #environLocal.printDebug(['_yieldElementsDownward', 'self', self, 'self.activeSite', self.activeSite])
-
-        # TODO: need to get _endElements too
-
-        if len(classFilter) > 0:
-            if isOfClass(self, classFilter):
-                yield self
-        else:
-            yield self
-        # using indices so as to not to create an iterator and new locations/activeSites
-        for i in range(len(self._elements)):
-            # not using __getitem__, also to avoid new locations/activeSites
-            try:
-                e = self._elements[i]
-            except IndexError:
-                # this may happen in the number of elements has changed
-                continue
-            if restoreActiveSites:
-                e.activeSite = self
-            #if hasattr(e, 'elements'):
-            if e.isStream:
-                # this returns a generator, so need to iterate over it
-                # to get results
-                for y in e._yieldElementsDownward(streamsOnly=streamsOnly, restoreActiveSites=restoreActiveSites, classFilter=classFilter):
-                    #yield y
-                    if len(classFilter) > 0:
-                        if isOfClass(y, classFilter):
-                            yield y
-                    else:
-                        yield y
-            # its an element on the Stream that is not a Stream
-            else:
-                if not streamsOnly:
-                    #environLocal.printDebug(['_yieldElementsDownward', 'e', e, 'e.activeSite', e.activeSite,]) #'e.getSites()', e.getSites()])
-                    #yield e
-                    if len(classFilter) > 0:
-                        if isOfClass(e, classFilter):
-                            yield e
-                    else:
-                        yield e
-
-        # do the same for _endElements
-        for i in range(len(self._endElements)):
-            # not using __getitem__, also to avoid new locations/activeSites
-            try:
-                e = self._endElements[i]
-            except IndexError:
-                # this may happen in the number of elements has changed
-                continue
-            if restoreActiveSites:
-                e.activeSite = self
-            #if hasattr(e, 'elements'):
-            if e.isStream:
-                # this returns a generator, so need to iterate over it
-                # to get results
-                for y in e._yieldElementsDownward(streamsOnly=streamsOnly, restoreActiveSites=restoreActiveSites, classFilter=classFilter):
-                    #yield y
-                    if len(classFilter) > 0:
-                        if isOfClass(y, classFilter):
-                            yield y
-                    else:
-                        yield y
-            # its an element on the Stream that is not a Stream
-            else:
-                if not streamsOnly:
-                    #environLocal.printDebug(['_yieldElementsDownward', 'e', e, 'e.activeSite', e.activeSite,]) #'e.getSites()', e.getSites()])
-                    #yield e
-                    if len(classFilter) > 0:
-                        if isOfClass(e, classFilter):
-                            yield e
-                    else:
-                        yield e
-
-
     def _yieldReverseUpwardsSearch(self, memo=None, streamsOnly=False,
                              skipDuplicates=True, classFilter=()):
         '''
@@ -6859,24 +6769,189 @@ class Stream(base.Music21Object):
 
     # possible rename recurseList
     def recurse(self, streamsOnly=False,
-        restoreActiveSites=True, skipDuplicates=True, classFilter=()):
+        restoreActiveSites=True, classFilter=(), skipSelf=False):
         '''
-        Iterate over a list of all Music21Objects contained in the Stream,
-        starting with self, continuing with self's elements,
-        and whenever finding a Stream subclass in self, that Stream subclass's elements.
+        Returns an iterator that iterates over a list of Music21Objects 
+        contained in the Stream, starting with self (unless skipSelf is True), 
+        continuing with self's elements,
+        and whenever finding a Stream subclass in self, 
+        that Stream subclass's elements.
 
-        TODO: WRITE DOCS AND TESTS ETC.!!!!
+        Here's an example. Let's create a simple score.
+        
+        >>> s = stream.Score()
+        >>> s.id = 'mainScore'
+        >>> p0 = stream.Part()
+        >>> p0.id = 'part0'
+        >>> p1 = stream.Part()
+        >>> p1.id = 'part1'
+        >>> m01 = stream.Measure(number=1)
+        >>> m01.append(note.Note('C', type="whole"))
+        >>> m02 = stream.Measure(number=2)
+        >>> m02.append(note.Note('D', type="whole"))
+        >>> m11 = stream.Measure(number=1)
+        >>> m11.append(note.Note('E', type="whole"))
+        >>> m12 = stream.Measure(number=2)
+        >>> m12.append(note.Note('F', type="whole"))
+        >>> p0.append([m01, m02])
+        >>> p1.append([m11, m12])
+        >>> s.insert(0, p0)
+        >>> s.insert(0, p1)
+        >>> s.show('text')
+        {0.0} <music21.stream.Part part0>
+            {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.note.Note C>
+            {4.0} <music21.stream.Measure 2 offset=4.0>
+                {0.0} <music21.note.Note D>
+        {0.0} <music21.stream.Part part1>
+            {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.note.Note E>
+            {4.0} <music21.stream.Measure 2 offset=4.0>
+                {0.0} <music21.note.Note F>
+                
+        Now we could assign the `.recurse()` method to something, but that won't have much effect:
+        
+        >>> sRecurse = s.recurse()
+        >>> sRecurse
+        <generator object recurse at 0x...>
+        
+        So, that's not how we use `.recurse()`.  Instead use it in a for loop:
+        
+        >>> for el in s.recurse():
+        ...     tup = (el, el.offset, el.activeSite)
+        ...     print(tup)
+        (<music21.stream.Score mainScore>, 0.0, None)
+        (<music21.stream.Part part0>, 0.0, <music21.stream.Score mainScore>)
+        (<music21.stream.Measure 1 offset=0.0>, 0.0, <music21.stream.Part part0>)
+        (<music21.note.Note C>, 0.0, <music21.stream.Measure 1 offset=0.0>)
+        (<music21.stream.Measure 2 offset=4.0>, 4.0, <music21.stream.Part part0>)
+        (<music21.note.Note D>, 0.0, <music21.stream.Measure 2 offset=4.0>)
+        (<music21.stream.Part part1>, 0.0, <music21.stream.Score mainScore>)
+        (<music21.stream.Measure 1 offset=0.0>, 0.0, <music21.stream.Part part1>)
+        (<music21.note.Note E>, 0.0, <music21.stream.Measure 1 offset=0.0>)
+        (<music21.stream.Measure 2 offset=4.0>, 4.0, <music21.stream.Part part1>)
+        (<music21.note.Note F>, 0.0, <music21.stream.Measure 2 offset=4.0>)        
+        
+        Notice that like calling `.show('text')`, the offsets are relative to their containers.
+        
+        Compare the difference between putting `classFilter='Note'` and `.flat.notes:
+        
+
+        >>> for el in s.recurse(classFilter='Note'):
+        ...     tup = (el, el.offset, el.activeSite)
+        ...     print(tup)
+        (<music21.note.Note C>, 0.0, <music21.stream.Measure 1 offset=0.0>)
+        (<music21.note.Note D>, 0.0, <music21.stream.Measure 2 offset=4.0>)
+        (<music21.note.Note E>, 0.0, <music21.stream.Measure 1 offset=0.0>)
+        (<music21.note.Note F>, 0.0, <music21.stream.Measure 2 offset=4.0>)
+
+        >>> for el in s.flat.notes:
+        ...     tup = (el, el.offset, el.activeSite)
+        ...     print(tup)
+        (<music21.note.Note C>, 0.0, <music21.stream.Stream 0x...>)
+        (<music21.note.Note E>, 0.0, <music21.stream.Stream 0x...>)
+        (<music21.note.Note D>, 4.0, <music21.stream.Stream 0x...>)
+        (<music21.note.Note F>, 4.0, <music21.stream.Stream 0x...>)
+
+        If you don't need correct offsets or activeSites, set `restoreActiveSites` to `False`.
+        Then the last offset/activeSite will be used.  It's a bit of a speedup, but leads to some
+        bad code, so use it only in highly optimized situations.
+        
+        We'll also test using multiple classes here... the Stream given is the same as the
+        s.flat.notes stream.
+        
+        >>> for el in s.recurse(classFilter=('Note','Rest'), restoreActiveSites=False):
+        ...     tup = (el, el.offset, el.activeSite)
+        ...     print(tup)
+        (<music21.note.Note C>, 0.0, <music21.stream.Stream 0x...>)
+        (<music21.note.Note D>, 4.0, <music21.stream.Stream 0x...>)
+        (<music21.note.Note E>, 0.0, <music21.stream.Stream 0x...>)
+        (<music21.note.Note F>, 4.0, <music21.stream.Stream 0x...>)        
+
+        So, this is pretty unreliable so don't use it unless the tiny speedup is worth it.
+        
+        The other two attributes are pretty self-explanatory: `streamsOnly` will put only Streams
+        in, while `skipSelf` will ignore the initial stream from recursion.  If the inclusion or
+        exclusion of `self` is important to you, put it in explicitly, because the default
+        will likely change in the future.
+        
+        >>> for el in s.recurse(skipSelf=True, streamsOnly=True):
+        ...     tup = (el, el.offset, el.activeSite)
+        ...     print(tup)
+        (<music21.stream.Part part0>, 0.0, <music21.stream.Score mainScore>)
+        (<music21.stream.Measure 1 offset=0.0>, 0.0, <music21.stream.Part part0>)
+        (<music21.stream.Measure 2 offset=4.0>, 4.0, <music21.stream.Part part0>)
+        (<music21.stream.Part part1>, 0.0, <music21.stream.Score mainScore>)
+        (<music21.stream.Measure 1 offset=0.0>, 0.0, <music21.stream.Part part1>)
+        (<music21.stream.Measure 2 offset=4.0>, 4.0, <music21.stream.Part part1>)
+
+        .. warning::
+        
+            Remember that like all iterators, it is dangerous to alter
+            the components of the Stream being iterated over during iteration.
+            if you need to edit while recusing, list(s.recurse()) is safer.
+        
+        #TODO: change skipSelf by January 2016.
+
         '''
-        return [e for e in
-            self._yieldElementsDownward(streamsOnly=streamsOnly,
-            restoreActiveSites=restoreActiveSites,
-            classFilter=classFilter)]
+        def isOfClass(e, classes):
+            eClasses = e.classes  # store once, as this is property call
+            for className in classes:
+                if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
+                    return True
+            return False
+
+        if not common.isListLike(classFilter):
+            classFilter = [classFilter]
+
+        #environLocal.printDebug(['recurse', 'self', self, 'self.activeSite', self.activeSite])
+        if skipSelf is False:
+            if len(classFilter) > 0:
+                if isOfClass(self, classFilter):
+                    yield self
+            else:
+                yield self
+        # using indices so as to not to create an iterator and new locations/activeSites
+        for attr in ('_elements', '_endElements'):
+            elementList = getattr(self, attr)
+            for i in range(len(elementList)):
+                # not using __getitem__, also to avoid new locations/activeSites
+                try:
+                    e = elementList[i]
+                except IndexError:
+                    # this may happen in the number of elements has changed
+                    continue
+                if restoreActiveSites:
+                    e.activeSite = self
+                #if hasattr(e, 'elements'):
+                if e.isStream:
+                    # this returns a generator, so need to iterate over it
+                    # to get results
+                    for y in e.recurse(streamsOnly=streamsOnly, 
+                                       restoreActiveSites=restoreActiveSites, 
+                                       classFilter=classFilter,
+                                       skipSelf=False):
+                        if len(classFilter) > 0:
+                            if isOfClass(y, classFilter):
+                                yield y
+                        else:
+                            yield y
+                # its an element on the Stream that is not a Stream
+                else:
+                    if not streamsOnly:
+                        #environLocal.printDebug(['recurse', 'e', e, 'e.activeSite', e.activeSite,]) #'e.getSites()', e.getSites()])
+                        #yield e
+                        if len(classFilter) > 0:
+                            if isOfClass(e, classFilter):
+                                yield e
+                        else:
+                            yield e
 
     def restoreActiveSites(self):
         '''
         Restore all active sites for all elements from this Stream downward.
         '''
-        for dummy in self._yieldElementsDownward(streamsOnly=False,
+        for dummy in self.recurse(streamsOnly=False,
             restoreActiveSites=True):
             pass
 
@@ -6887,7 +6962,7 @@ class Stream(base.Music21Object):
         '''
         self.sort() # must sort before making immutable
         self._mutable = False
-        for e in self._yieldElementsDownward(streamsOnly=False,
+        for e in self.recurse(streamsOnly=False,
             restoreActiveSites=True):
             #e.purgeLocations(rescanIsDead=True)
             # NOTE: calling this method was having the side effect of removing
@@ -6900,7 +6975,7 @@ class Stream(base.Music21Object):
     def makeMutable(self, recurse=True):
         self._mutable = True
         if recurse:
-            for e in self._yieldElementsDownward(streamsOnly=True,
+            for e in self.recurse(streamsOnly=True,
                 restoreActiveSites=True):
                 # do not recurse, as will get all Stream
                 e.makeMutable(recurse=False)
@@ -7659,7 +7734,7 @@ class Stream(base.Music21Object):
 #             e.transpose(value, inPlace=True)
 
         # this will get all elements at this level and downward.
-        for e in post._yieldElementsDownward(streamsOnly=False,
+        for e in post.recurse(streamsOnly=False,
                 restoreActiveSites=True,
                 classFilter=classFilterList):
             e.transpose(value, inPlace=True)
@@ -9066,7 +9141,7 @@ class Stream(base.Music21Object):
 
 
 
-    def findGaps(self, minimumQuarterLength=None):
+    def findGaps(self):
         '''
         Returns either (1) a Stream containing Elements
         (that wrap the None object) whose offsets and durations
@@ -9075,9 +9150,6 @@ class Stream(base.Music21Object):
 
         N.B. there may be gaps in the flattened representation of the stream
         but not in the unflattened.  Hence why "isSequence" calls self.flat.isGapless
-        
-        minimumQuarterLength is now DEPRECATED and IGNORED (28 June 2014)
-        TODO: Remove
         '''
         if 'GapStream' in self._cache and self._cache["GapStream"] is not None:
             return self._cache["GapStream"]
@@ -9141,7 +9213,7 @@ class Stream(base.Music21Object):
         True
         '''
 #        checkOverlap = False
-        elementsSorted = self.flat.sorted
+        elementsSorted = self.flat
         simultaneityMap, unused_overlapMap = self._findLayering(elementsSorted,
                                                                 includeDurationless)
 
@@ -9207,7 +9279,7 @@ class Stream(base.Music21Object):
         7
 
         '''
-        elementsSorted = self.flat.sorted
+        elementsSorted = self.flat
         unused_simultaneityMap, overlapMap = self._findLayering(elementsSorted,
                                                                 includeDurationless, includeEndBoundary)
         #environLocal.printDebug(['simultaneityMap map', simultaneityMap])
@@ -9236,7 +9308,7 @@ class Stream(base.Music21Object):
         TODO: check that co-incident boundaries are properly handled
 
         '''
-        elementsSorted = self.flat.sorted
+        elementsSorted = self.flat
         unused_simultaneityMap, overlapMap = self._findLayering(elementsSorted,
                                                                 includeDurationless, includeEndBoundary)
         post = True

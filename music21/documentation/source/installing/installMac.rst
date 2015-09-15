@@ -9,7 +9,19 @@ is probably the hardest part of the experience.
 Once you have that set, the rest should be much less painful.
 Trust us that it should work.
 
-Just follow the instructions below carefully and you shouldn't
+Simple install on OS X El Capitan
+--------------------------------------------
+
+If you're on the newest version of OS X, El Capitan (October 2015), then
+installation is very easy.  Open up "Terminal" in "Applications -> Utilities",
+then type at the prompt:
+
+     sudo pip install music21
+
+it will prompt you for your password.  TADA: you have `music21` for Python 2.7.
+
+If you're not on El Cap, or if you want Python 3 (much better!) or something else
+comes up, just follow the instructions below *carefully* and you shouldn't
 have any problems.
 
 

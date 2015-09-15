@@ -1904,7 +1904,7 @@ class Test(unittest.TestCase):
             len(s3.flat.getElementsByClass('KeySignature')),
             targetCount,
             )
-        for e in s3._yieldElementsDownward(streamsOnly=True):
+        for e in s3.recurse(streamsOnly=True):
             if 'KeySignature' in e.classes:
                 # all active sites are None because of deep-copying
                 if e.activeSite is not None:
@@ -1916,7 +1916,7 @@ class Test(unittest.TestCase):
             len(s4.flat.getElementsByClass('KeySignature')),
             targetCount,
             )
-        for c in s4._yieldElementsDownward(streamsOnly=False):
+        for c in s4.recurse(streamsOnly=False):
             if 'Stream' in c.classes:
                 for e in c.getElementsByClass('KeySignature'):
                     c.remove(e)

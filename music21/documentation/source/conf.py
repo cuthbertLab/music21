@@ -230,7 +230,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'music21', u'music21 Documentation',
-     ['Michael Scott Cuthbert and the music21 Project'], 1)
+     ['Michael Scott Cuthbert and cuthbertLab'], 1)
 ]
 
 # If true, show URL addresses after external links.

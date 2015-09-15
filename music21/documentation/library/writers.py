@@ -191,12 +191,13 @@ class ModuleReferenceReSTWriter(ReSTWriter):
 class CorpusReferenceReSTWriter(ReSTWriter):
     '''
     Write the corpus reference ReST file: referenceCorpus.rst
+    into about/
     '''
     def __init__(self):
         super(CorpusReferenceReSTWriter, self).__init__()
         self.outputDirectory = os.path.join(
             self.docGeneratedPath,
-            'systemReference',
+            'about',
             )
         self.setupOutputDirectory()
 
