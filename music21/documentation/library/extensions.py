@@ -27,6 +27,8 @@ def fixLines(lines):
         elif 'RESUME_DOCS' in line:
             omitting = False
             continue
+        elif '#_RAISES_ERROR' in line:
+            newLines.append(line.replace(' #_RAISES_ERROR', ' '))        
         elif omitting is True:
             continue
         else:
@@ -54,3 +56,8 @@ def processSource(app, name, lines):
 def setup(app):
     app.connect('autodoc-process-docstring', processDocstring)
     app.connect('source-read', processSource)
+    extension_metadata = {'version': '1.0',
+                          'parallel_read_safe': True,
+                          'parallel_write_safe': True,                          
+                          }
+    return extension_metadata

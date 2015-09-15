@@ -1249,8 +1249,10 @@ def camelCaseToHyphen(usrStr, replacement='-'):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1' + replacement + r'\2', usrStr)
     return re.sub('([a-z0-9])([A-Z])', r'\1' + replacement + r'\2', s1).lower()
 
-def spaceCamelCase(usrStr, replaceUnderscore=True):
-    '''Given a camel-cased string, or a mixture of numbers and characters, create a space separated string.
+def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
+    '''
+    Given a camel-cased string, or a mixture of numbers and characters, 
+    create a space separated string.
 
     If replaceUnderscore is True (default) then underscores also become spaces (but without the _)
 
@@ -1267,6 +1269,11 @@ def spaceCamelCase(usrStr, replaceUnderscore=True):
     'opus 23402 no 219235'
     >>> common.spaceCamelCase('opus23402no219235').title()
     'Opus 23402 No 219235'
+    
+    There is a small list called fixMeList that can fix mistakes.
+    
+    >>> common.spaceCamelCase('PMFC22')
+    'PMFC 22'
 
     >>> common.spaceCamelCase('hello_myke')
     'hello myke'
@@ -1281,6 +1288,12 @@ def spaceCamelCase(usrStr, replaceUnderscore=True):
     isNum = False
     lastIsNum = False
     post = []
+    
+    # do not split these...
+    if fixMeList is None:
+        fixupList = ('PMFC',)
+    else:
+        fixupList = fixMeList
 
     for char in usrStr:
         if char in numbers:
@@ -1311,6 +1324,10 @@ def spaceCamelCase(usrStr, replaceUnderscore=True):
         else:
             lastIsNum = False
     postStr = ''.join(post)
+    for fixMe in fixupList:
+        fixMeSpaced = ' '.join(fixMe)
+        postStr = postStr.replace(fixMeSpaced, fixMe)
+    
     if replaceUnderscore:
         postStr = postStr.replace('_', ' ')
     return postStr
@@ -1981,12 +1998,12 @@ def getMetadataCacheFilePath():
     r'''Get the stored music21 directory that contains the corpus metadata cache.
 
     >>> fp = common.getMetadataCacheFilePath()
-    >>> fp.endswith('corpus/metadataCache') or fp.endswith(r'corpus\metadataCache')
+    >>> fp.endswith('corpus/_metadataCache') or fp.endswith(r'corpus\_metadataCache')
     True
     
     :rtype: str
     '''
-    return os.path.join(getSourceFilePath(), 'corpus', 'metadataCache')
+    return os.path.join(getSourceFilePath(), 'corpus', '_metadataCache')
 
 
 def getCorpusFilePath():
@@ -2013,13 +2030,26 @@ def getCorpusContentDirs():
     'luca', 'miscFolk', 'monteverdi', 'mozart', 'oneills1850', 'palestrina',
     'ryansMammoth', 'schoenberg', 'schumann', 'schumann_clara',
     'theoryExercises', 'trecento', 'verdi', 'weber']
+    
+    Make sure that all corpus data has a directoryInformation tag in
+    CoreCorpus.
+    
+    >>> cc = corpus.corpora.CoreCorpus()
+    >>> failed = []
+    >>> di = [d.directoryName for d in cc.directoryInformation]
+    >>> for f in fp:
+    ...     if f not in di:
+    ...         failed.append(f)
+    >>> failed
+    []
+    
     '''
     directoryName = getCorpusFilePath()
     result = []
     # dirs to exclude; all files will be retained
     excludedNames = (
         'license.txt',
-        'metadataCache',
+        '_metadataCache',
         '__pycache__',
         )
     for filename in os.listdir(directoryName):

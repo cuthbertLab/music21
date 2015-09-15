@@ -74,9 +74,7 @@ Contributors
 Additionally, the following individuals have contributed materials or knowledge to this project.  
 Their contributions and generosity are greatly appreciated.
 
-* Thomas Bonte, Nicholas Froment, and Werner Schweer of `MuseScore`_ for their support
-   and for their contributions to the open source music notation projects, including the
-   Bach Goldberg Variations and the Handel Arias included.
+* Thomas Bonte, Nicholas Froment, and Werner Schweer of `MuseScore`_ for their support and for their contributions to the open source music notation projects, including the Bach Goldberg Variations and the Handel Arias included.
 
 * `Donald Byrd`_, researcher on University of Indiana who created a schema for computer-aided musicology 
   (along with the source of all sorts of examples of how music notation is difficult).
@@ -96,17 +94,14 @@ Their contributions and generosity are greatly appreciated.
 
 * `Michael Good`_ and Recordare.com for creating MusicXML and many discussions about the project.
 
-* `Margaret Greentree`_ kindly gave permission for distribution of her edited collection 
-  of the Bach chorales in MusicXML format as part of the music21 corpus. 
-  Her website contains all these chorales in additional formats.  Any discoveries we make 
-  regarding these chorales are done in her memory.
+* `Margaret Greentree`_ kindly gave permission for distribution of her edited collection of the Bach chorales in MusicXML format as part of the music21 corpus.  Her website contains all these chorales in additional formats.  Any discoveries we make regarding these chorales are done in her memory.
 
-* Walter B. Hewlett and Craig Sapp for support.
+* Walter B. Hewlett and Craig Sapp of Stanford's CCARH for support.
 
 * `Justin London`_ compiled and maintained the list of Second-Viennese row forms now available in serial.py.
 
 * `McGill University`_ ELVIS project for including the MEI parser. Special thanks to Julie
-Cumming, Andrew Hankinson, and Christopher Antila for contributing.
+Cumming, Andrew Hankinson, and especially Christopher Antila for contributing.
 
 * `Manuel Op de Coul`_ has kindly gave permission to use the Scala scale archive of nearly 4000 scales in music21.
 

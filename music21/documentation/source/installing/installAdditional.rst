@@ -5,7 +5,7 @@ Extending Music21 with Additional Software
 =======================================================
 
 
-Installing Additional Python Resources
+Installing Additional Python Modules
 -----------------------------------------------
 
 `Music21` can do more things, such as plotting graphs, if you

@@ -2939,7 +2939,6 @@ class Music21Object(object):
         Return a beat designation based on local
         Measure and TimeSignature
 
-
         >>> n = note.Note()
         >>> n.quarterLength = 2
         >>> m = stream.Measure()
@@ -2954,6 +2953,19 @@ class Music21Object(object):
         1.0
         >>> m.notes[1]._getBeat()
         3.0
+        
+        >>> m = stream.Measure()        
+        >>> m.timeSignature = meter.TimeSignature('4/4')
+        >>> n = note.Note()
+        >>> n.quarterLength = 1./3
+        >>> m.repeatAppend(n, 12)
+        >>> for i in range(5):
+        ...    print(m.notes[i].beat)
+        1.0
+        4/3
+        5/3
+        2.0
+        7/3
         '''
         ts = self.getContextByClass('TimeSignature')
         if ts is None:
@@ -2979,8 +2991,8 @@ class Music21Object(object):
 
         >>> m.timeSignature = meter.TimeSignature('6/8')
         >>> [m.notes[i].beat for i in range(6)]
-        [1.0, 1.3333333..., 1.666666666..., 2.0, 2.33333333..., 2.66666...]
-
+        [1.0, Fraction(4, 3), Fraction(5, 3), 2.0, Fraction(7, 3), Fraction(8, 3)]
+        
         >>> s = stream.Stream()
         >>> s.insert(0, meter.TimeSignature('3/4'))
         >>> s.repeatAppend(note.Note(), 8)

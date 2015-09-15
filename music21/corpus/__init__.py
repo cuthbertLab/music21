@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2009 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
 '''
@@ -340,126 +340,57 @@ def getVirtualWorkList(workName, movementNumber=None, fileExtensions=None):
 #------------------------------------------------------------------------------
 
 
-def getWorkReferences(sort=True):
+def getWorkReferences():
     '''
-    Return a data dictionary for all works in the corpus and (optionally) the
-    virtual corpus. Returns a list of reference dictionaries, each each
-    dictionary for a each composer. A 'works' dictionary for each composer
+    Return a data dictionary for all works in the corpus 
+    Returns a list of corpus.corpora.DirectoryInformation object, one
+    for each directory. A 'works' dictionary for each composer
     provides references to dictionaries for all associated works.
 
     This is used in the generation of corpus documentation
 
-    >>> post = corpus.getWorkReferences()
-
+    >>> workRefs = corpus.getWorkReferences()
+    >>> workRefs[1:3]
+    [<music21.corpus.corpora.DirectoryInformation bach>, 
+     <music21.corpus.corpora.DirectoryInformation beethoven>]
+     
+    No longer finds the VirtualCorpus. TODO: Reinstate when
+    that corpus becomes useful again...
     '''
-    # from music21 import corpus; corpus.getWorkReferences()
-    # TODO: update this to use metadata
-    results = []
-    for composerDirectory, composer in corpora.CoreCorpus._composers:
-        ref = {}
-        ref['composer'] = composer
-        ref['composerDir'] = composerDirectory
-        ref['works'] = {}  # store by keys of name/dirname
-        works = getComposer(composerDirectory)
-        for path in works:
-            # split by the composer dir to get relative path
-            #environLocal.printDebug(['dir composer', composerDirectory, path])
-            junk, fileStub = path.split(composerDirectory)
-            if fileStub.startswith(os.sep):
-                fileStub = fileStub[len(os.sep):]
-            # break into file components
-            fileComponents = fileStub.split(os.sep)
-            # the first is either a directory for containing components
-            # or a top-level name
-            m21Format, ext = common.findFormatExtFile(fileComponents[-1])
-            if ext is None:
-                #environLocal.printDebug([
-                #    'file that does not seem to have an extension',
-                #    ext, path])
-                continue
-            # if not a file w/ ext, we will get None for format
-            if m21Format is None:
-                workStub = fileComponents[0]
-            else:  # remove the extension
-                workStub = fileComponents[0].replace(ext, '')
-            # create list location if not already added
-            if workStub not in ref['works']:
-                ref['works'][workStub] = {}
-                ref['works'][workStub]['files'] = []
-                title = common.spaceCamelCase(workStub).title()
-                ref['works'][workStub]['title'] = title
-                ref['works'][workStub]['virtual'] = False
-            # last component is name
-            m21Format, ext = common.findFormatExtFile(fileComponents[-1])
-            fileDict = {}
-            fileDict['format'] = m21Format
-            fileDict['ext'] = ext
-            # all path parts after corpus
-            fileDict['corpusPath'] = os.path.join(composerDirectory, fileStub)
-            fileDict['fileName'] = fileComponents[-1]  # all after
-            title = None
-            # this works but takes a long time!
-#             if format == 'musicxml':
-#                 mxDocument = musicxml.Document()
-#                 mxDocument.open(path)
-#                 title = mxDocument.getBestTitle()
-            if title is None:
-                title = common.spaceCamelCase(
-                    fileComponents[-1].replace(ext, ''))
-                title = title.title()
-            fileDict['title'] = title
-            ref['works'][workStub]['files'].append(fileDict)
-            # add this path
-        results.append(ref)
-    # get each VirtualWork object
-    for vw in corpora.VirtualCorpus._virtual_works:
-        composerDir = vw.corpusPath.split('/')[0]
-        match = False
-        for ref in results:
-            # check composer reference or first part of corpusPath
-            if (ref['composer'] == vw.composer or
-                composerDir == ref['composerDir']):
-                match = True
-                break  # use this ref
-        if not match:  # new composers, create a new ref
-            ref = {}
-            ref['composer'] = vw.composer
-            ref['composerDir'] = composerDir
-            ref['works'] = {}  # store by keys of name/dirname
-        # work stub should be everything other than top-level
-        workStub = vw.corpusPath.replace(composerDir + '/', '')
-        ref['works'][workStub] = {}
-        ref['works'][workStub]['virtual'] = True
-        ref['works'][workStub]['files'] = []
-        ref['works'][workStub]['title'] = vw.title
-        for url in vw.urlList:
-            m21Format, ext = common.findFormatExtURL(url)
-            fileDict = {}
-            fileDict['format'] = m21Format
-            fileDict['ext'] = ext
-            # all path parts after corpus
-            fileDict['corpusPath'] = vw.corpusPath
-            fileDict['title'] = vw.title
-            fileDict['url'] = url
-            ref['works'][workStub]['files'].append(fileDict)
-        if not match:  # not found already, need to add
-            results.append(ref)
-    if sort:
-        sortGroup = []
-        for ref in results:
-            sortGroupSub = []
-            for workStub in ref['works']:
-                # add title first for sorting
-                sortGroupSub.append([
-                    ref['works'][workStub]['title'],
-                    workStub,
-                    ])
-            sortGroupSub.sort()
-            ref['sortedWorkKeys'] = [y for unused_x, y in sortGroupSub]
-            # prepare this sort group
-            sortGroup.append([ref['composerDir'], ref])
-        sortGroup.sort()
-        results = [ref for junk, ref in sortGroup]
+    results = [di for di in corpora.CoreCorpus().directoryInformation]
+
+#     for vw in corpora.VirtualCorpus._virtual_works:
+#         composerDir = vw.corpusPath.split('/')[0]
+#         match = False
+#         for ref in results:
+#             # check composer reference or first part of corpusPath
+#             if (ref['composer'] == vw.composer or
+#                 composerDir == ref['composerDir']):
+#                 match = True
+#                 break  # use this ref
+#         if not match:  # new composers, create a new ref
+#             ref = {}
+#             ref['composer'] = vw.composer
+#             ref['composerDir'] = composerDir
+#             ref['works'] = {}  # store by keys of name/dirname
+#         # work stub should be everything other than top-level
+#         workStub = vw.corpusPath.replace(composerDir + '/', '')
+#         ref['works'][workStub] = {}
+#         ref['works'][workStub]['virtual'] = True
+#         ref['works'][workStub]['files'] = []
+#         ref['works'][workStub]['title'] = vw.title
+#         for url in vw.urlList:
+#             m21Format, ext = common.findFormatExtURL(url)
+#             fileDict = {}
+#             fileDict['format'] = m21Format
+#             fileDict['ext'] = ext
+#             # all path parts after corpus
+#             fileDict['corpusPath'] = vw.corpusPath
+#             fileDict['title'] = vw.title
+#             fileDict['url'] = url
+#             ref['works'][workStub]['files'].append(fileDict)
+#         if not match:  # not found already, need to add
+#             results.append(ref)
     return results
 
 

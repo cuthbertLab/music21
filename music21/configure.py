@@ -62,7 +62,7 @@ reMuseScoreApp = re.compile('MuseScore\s?[0-9]*.app')
 urlMusic21 = 'http://web.mit.edu/music21'
 urlFinaleReader = 'http://www.finalemusic.com/Reader'
 urlMuseScore = 'http://musescore.org'
-urlGettingStarted = 'http://mit.edu/music21/doc/about/quickStart.html'
+urlGettingStarted = 'http://mit.edu/music21/doc/'
 urlMusic21List = 'http://groups.google.com/group/music21list'
 
 LINE_WIDTH = 78
@@ -792,7 +792,8 @@ class AskOpenInBrowser(YesOrNo):
 
 
 class AskInstall(YesOrNo):
-    '''Ask the user if they want to enable auto-downloading
+    '''
+    Ask the user if they want to move music21 to the normal place...
     '''
     def __init__(self, default=True, tryAgain=True,
         promptHeader=None):
@@ -1360,8 +1361,9 @@ class ConfigurationAssistant(object):
         self.getDialogs()
         
     def getDialogs(self):
-        d = AskInstall(default=1)
-        self._dialogs.append(d)
+        if 'site-packages' not in common.getSourceFilePath():
+            d = AskInstall(default=1)
+            self._dialogs.append(d)
 
         d = SelectMusicXMLReader(default=1)
         self._dialogs.append(d)
@@ -1381,7 +1383,7 @@ class ConfigurationAssistant(object):
         # note: this is the on-line URL: 
         # might be better to find local documentaiton
         d = AskOpenInBrowser(urlTarget=urlGettingStarted, 
-                             prompt='Would you like to view the music21 Quick Start in a web browser?')
+                             prompt='Would you like to view the music21 documentation in a web browser?')
         self._dialogs.append(d)
 
         d = AnyKey(promptHeader='The music21 Configuration Assistant is complete.')
@@ -1690,12 +1692,15 @@ class Test(unittest.TestCase):
 #         d.performAction()
 
 
+def run():
+    ca = ConfigurationAssistant()
+    ca.run()
+
 if __name__ == "__main__":
     # only if running tests
     if len(sys.argv) == 1: # normal conditions
         #music21.mainTest(Test)
-        ca = ConfigurationAssistant()
-        ca.run()
+        run()
 
     elif len(sys.argv) > 1:
         t = Test()

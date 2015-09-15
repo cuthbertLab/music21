@@ -3141,14 +3141,14 @@ class Test(unittest.TestCase):
         #environLocal.printDebug(['downward:'])
 
         match = []
-        for x in s1._yieldElementsDownward(streamsOnly=True):
+        for x in s1.recurse(streamsOnly=True):
             match.append(x.id)
             #environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         self.assertEqual(match, ['1a', '2a', '3a', '3b', '3c', '2b', '3d', '3e', '2c', '3f'])
 
         #environLocal.printDebug(['downward with elements:'])
         match = []
-        for x in s1._yieldElementsDownward(streamsOnly=False):
+        for x in s1.recurse(streamsOnly=False):
             match.append(x.id)
             #environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         self.assertEqual(match, ['1a', 'n(1a)', '2a', '3a', '3b', 'n3(3b)', 'n4(3b)', '3c', '2b', 'n2(2b)', '3d', '3e', '2c', '3f'])
@@ -3156,7 +3156,7 @@ class Test(unittest.TestCase):
 
         #environLocal.printDebug(['downward from non-topmost element:'])
         match = []
-        for x in s2._yieldElementsDownward(streamsOnly=False):
+        for x in s2.recurse(streamsOnly=False):
             match.append(x.id)
             #environLocal.printDebug([x, x.id, 'activeSite', x.activeSite])
         # test downward
@@ -5709,10 +5709,10 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('bwv66.6')
         # default
-        rElements = s.recurse()
+        rElements = list(s.recurse())
         self.assertEqual(len(rElements), 240)
 
-        rElements = s.recurse(streamsOnly=True)
+        rElements = list(s.recurse(streamsOnly=True))
         self.assertEqual(len(rElements), 45)
 
         s1 = rElements[0]
@@ -5725,18 +5725,18 @@ class Test(unittest.TestCase):
         self.assertEqual(id(m2.activeSite), id(p1))
 
 
-        rElements = s.recurse(classFilter='KeySignature')
+        rElements = list(s.recurse(classFilter='KeySignature'))
         self.assertEqual(len(rElements), 4)
         # the first elements active site is the measure
         self.assertEqual(id(rElements[0].activeSite), id(m1))
 
-        rElements = s.recurse(classFilter=['TimeSignature'])
+        rElements = list(s.recurse(classFilter=['TimeSignature']))
         self.assertEqual(len(rElements), 4)
 
 
 #         s = corpus.parse('bwv66.6')
 #         m1 = s[2][1] # cannot use parts here as breaks active site
-#         rElements = m1.recurse(direction='upward')
+#         rElements = list(m1.recurse(direction='upward'))
 #         self.assertEqual([str(e.classes[0]) for e in rElements], ['Measure', 
 #                                                                   'Instrument', 
 #                                                                   'Part', 
@@ -6860,9 +6860,9 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('bwv66.6')
         ex = s.parts[0].measures(3,6)
-        for n in ex.recurse(classFilter=['Note']):
-            if n.name == 'B':
-                o = n.offset
+        for n in list(ex.recurse(classFilter=['Note'])):
+            if n.name == 'B':  # should do a list(recurse()) because manipulating
+                o = n.offset   # the stream while iterating.
                 site = n.activeSite
                 n.activeSite.remove(n)
                 r = note.Rest(quarterLength=n.quarterLength)
