@@ -81,11 +81,13 @@ ORNAMENT_MARKS = {'trill-mark'       : expressions.Trill,
 def yesNoToBoolean(value):
     if value in ('yes', True):
         return True
-    return False
+    else:
+        return False
 
 def booleanToYesNo(value):
-    if value:
+    if value: # purposely not "is True"
         return 'yes'
-    return 'no'
+    else:
+        return 'no'
 
 #-------------------------------------------------------------------------------

@@ -11,7 +11,7 @@
 #-------------------------------------------------------------------------------
 
 _all_ = ['mxObjects', 'm21ToString', 'toMxObjects', 'xmlHandler',
-         'xmlObjects', 'xmlToM21',
+         'xmlObjects', 'xmlToM21', 'm21ToXML'
          'fromMxObjects'
          ]
 
@@ -24,6 +24,7 @@ from music21.musicxml import xmlHandler
 
 from music21.musicxml import xmlObjects
 from music21.musicxml import xmlToM21
+from music21.musicxml import m21ToXML
 
 #------------------------------------------------------------------------------
 # eof

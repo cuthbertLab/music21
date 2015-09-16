@@ -189,7 +189,7 @@ def _setAttributeFromTagText(m21El, xmlEl, tag, attributeName=None, transform=No
     it does, set the attribute either with the same name (with "foo-bar" changed to
     "fooBar") or with attributeName to the text contents.
     
-    Pass a function or lambda function as transform to transform the value before setting it
+    Pass a function or lambda function as `transform` to transform the value before setting it
     
     >>> from xml.etree.ElementTree import Element, SubElement
     >>> e = Element('accidental')
@@ -434,6 +434,10 @@ class XMLParserBase(object):
     
 
 class PartGroup():
+    '''
+    Small helper class for keeping track of part-groups from XML since they
+    are converted to StaffGroup spanners much later.
+    '''
     def __init__(self, mxPartGroup):
         self.mxPartGroup = mxPartGroup
         self.partGroupIds = []
