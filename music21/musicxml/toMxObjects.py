@@ -728,7 +728,7 @@ def timeSignatureToMx(ts):
 
 def keySignatureToMx(keySignature):
     '''
-    Returns a musicxml.mxObjects.KeySignature object from a music21
+    Returns a musicxml.mxObjects.Key object from a music21
     key.KeySignature or key.Key object
        
     
