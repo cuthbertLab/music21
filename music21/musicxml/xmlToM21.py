@@ -2665,13 +2665,28 @@ class MeasureParser(XMLParserBase):
         >>> cs.root()
         <music21.pitch.Pitch D-3>  
         '''
+        # TODO: frame
+        # TODO: offset
+        # TODO: editorial
+        # TODO: staff
+        # TODO: attrGroup: print-object
+        # TODO: attr: print-frame
+        # TODO: attrGroup: print-style
+        # TODO: attrGroup: placement
+        
         #environLocal.printDebug(['mxToChordSymbol():', mxHarmony])
         cs = harmony.ChordSymbol()
         seta = _setAttributeFromTagText
 
+        # TODO: root vs. function;  see group "harmony-chord")
         mxRoot = mxHarmony.find('root')
         if mxRoot is not None: # choice: <root> or <function>
-            r = pitch.Pitch(mxRoot.find('root-step').text)
+            mxRS = mxRoot.find('root-step')
+            rootText = mxRS.text
+            if rootText in (None, ""):
+                rootText = mxRS.get('text') # two ways to do it... this should do display even
+                    # if content is supported.
+            r = pitch.Pitch(rootText)
             mxRootAlter =  mxRoot.find('root-alter')
             if mxRootAlter is not None:
                 # can provide integer to create accidental on pitch
@@ -2684,15 +2699,23 @@ class MeasureParser(XMLParserBase):
             
             
         mxKind = mxHarmony.find('kind')
-        if mxKind is not None and mxKind.text is not None:
+        if mxKind is not None and mxKind.text is not None: # two ways of doing it...
             cs.chordKind = mxKind.text.strip()
             mxKindText = mxKind.get('text') # attribute
             if mxKindText is not None:
                 cs.chordKindStr = mxKindText
+        # TODO: attr: use-symbols
+        # TODO: attr: stack-degrees
+        # TODO: attr: parentheses-degrees
+        # TODO: attr: bracket-degrees
+        # TODO: attrGroup: print-style
+        # TODO: attrGroup: halign
+        # TODO: attrGroup: valign
     
         mxInversion = mxHarmony.find('inversion')
         if mxInversion is not None:
             cs.inversion(int(mxInversion.text.strip()), transposeOnSet=False) # must be an int
+        # TODO: print-style
     
         mxBass = mxHarmony.find('bass')
         if mxBass is not None:

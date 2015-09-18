@@ -910,8 +910,6 @@ def codaToMx(rm):
 def segnoToMx(rm):
     '''
     Returns a musicxml.mxObjects.Direction object with a musicxml.mxObjects.Segno mark in it
-
-    
     '''
     mxSegno = mxObjects.Segno()
     for src, dst in [(rm._positionDefaultX, 'default-x'),

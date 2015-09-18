@@ -724,7 +724,7 @@ class MeasureExporter(XMLExporterBase):
                [('Note', 'noteToXml'),
                 ('ChordSymbol', 'chordSymbolToXml'),
                 ('Chord', 'chordToXml'),
-                ('Rest', 'restToXml'),
+                ('Rest', 'noteToXml'),
                 # Skipping unpitched for now
                 ('Dynamic', 'dynamicToXml'),
                 ('Segno', 'segnoToXml'),
@@ -1018,7 +1018,7 @@ class MeasureExporter(XMLExporterBase):
 
     def noteToXml(self, n, addChordTag=False):
         '''
-        Translate a music21 :class:`~music21.note.Note` into a
+        Translate a music21 :class:`~music21.note.Note` or a Rest into a
         list of :class:`~music21.musicxml.mxObjects.Note` objects.
     
         Because of "complex" durations, the number of 
@@ -1031,9 +1031,22 @@ class MeasureExporter(XMLExporterBase):
         >>> n = note.Note('D#5')
         >>> n.quarterLength = 3
         >>> MEX = musicxml.m21ToXML.MeasureExporter()
+        >>> len(MEX.xmlRoot)
+        0
         >>> mxNote = MEX.noteToXml(n)
         >>> MEX.dump(mxNote)
         <note><pitch><step>D</step><alter>1</alter><octave>5</octave></pitch><duration>30240</duration><type>half</type><dot /><accidental>sharp</accidental></note>
+        >>> len(MEX.xmlRoot)
+        1
+
+        >>> r = note.Rest()
+        >>> r.quarterLength = 1.0/3
+        >>> r.duration.tuplets[0].type = 'start'
+        >>> mxRest = MEX.noteToXml(r)
+        >>> MEX.dump(mxRest)
+        <note><rest /><duration>3360</duration><type>eighth</type><time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes><normal-type>eighth</normal-type></time-modification><tuplet bracket="yes" placement="above" type="start" /></note>
+        >>> len(MEX.xmlRoot)
+        2
          
         TODO: Test with spanners...
         '''
@@ -1090,7 +1103,8 @@ class MeasureExporter(XMLExporterBase):
         for _ in range(n.duration.dots):
             SubElement(mxNote, 'dot')
             # TODO: dot placement...
-        if (n.pitch.accidental is not None and 
+        if (hasattr(n, 'pitch') and 
+                n.pitch.accidental is not None and 
                 n.pitch.accidental.displayStatus in (True, None)):
             mxAccidental = accidentalToMx(n.pitch.accidental)
             mxNote.append(mxAccidental)
@@ -1099,8 +1113,10 @@ class MeasureExporter(XMLExporterBase):
                 mxTimeModification = self.tupletToTimeModification(tup)
                 mxNote.append(mxTimeModification)
         # TODO: stem
-        if (n.notehead != 'normal' or n.noteheadFill is not None or
-                n.color not in (None, '')):
+        if (hasattr(n, 'notehead') and 
+                (n.notehead != 'normal' or n.noteheadFill is not None or
+                 n.color not in (None, ''))
+            ):
             mxNotehead = self.noteheadToXml(n)
             mxNote.append(mxNotehead)
         # TODO: notehead-text
@@ -1121,11 +1137,58 @@ class MeasureExporter(XMLExporterBase):
         self.xmlRoot.append(mxNote)
         return mxNote
 
-    def restToXml(self, r):
-        pass
-
     def chordToXml(self, c):
-        pass
+        '''
+        Returns a list of <note> tags, all but the first with a <chord/> tag on them.
+        And appends them to self.xmlRoot
+        
+        Attributes of notes are merged from different locations: first from the
+        duration objects, then from the pitch objects. Finally, GeneralNote
+        attributes are added.
+            
+        >>> ch = chord.Chord()
+        >>> ch.quarterLength = 2
+        >>> b = pitch.Pitch('A-2')
+        >>> c = pitch.Pitch('D3')
+        >>> d = pitch.Pitch('E4')
+        >>> e = [b,c,d]
+        >>> ch.pitches = e
+        
+        >>> len(ch.pitches)
+        3
+        >>> MEX = musicxml.m21ToXML.MeasureExporter()
+        >>> len(MEX.xmlRoot)
+        0
+        >>> mxNoteList = MEX.chordToXml(ch)
+        >>> len(mxNoteList) # get three mxNotes
+        3
+        >>> len(MEX.xmlRoot)
+        3
+        
+        >>> MEX.dump(mxNoteList[0])
+        <note><pitch><step>A</step><alter>-1</alter><octave>2</octave></pitch><duration>10080</duration><type>quarter</type><accidental>flat</accidental></note>
+        >>> MEX.dump(mxNoteList[1])
+        <note><chord /><pitch><step>D</step><octave>3</octave></pitch><duration>10080</duration><type>quarter</type></note>
+        >>> MEX.dump(mxNoteList[2])
+        <note><chord /><pitch><step>E</step><octave>4</octave></pitch><duration>10080</duration><type>quarter</type></note>
+            
+    
+        Test that notehead translation works:
+        
+        >>> g = pitch.Pitch('g3')
+        >>> h = note.Note('b4')
+        >>> h.notehead = 'diamond'
+        >>> ch2 = chord.Chord([g, h])
+        >>> ch2.quarterLength = 2.0
+        >>> mxNoteList = MEX.chordToXml(ch2)
+        >>> MEX.dump(mxNoteList[1])
+        <note><chord /><pitch><step>B</step><octave>4</octave></pitch><duration>20160</duration><type>half</type><notehead parentheses="no">diamond</notehead></note>
+        '''
+        mxNoteList = []
+        for i, n in enumerate(c):
+            addChordTag = True if i > 0 else False
+            mxNoteList.append(self.noteToXml(n, addChordTag=addChordTag)) 
+        return mxNoteList
 
             
     def durationXml(self, dur):
@@ -1144,6 +1207,15 @@ class MeasureExporter(XMLExporterBase):
         return mxDuration
     
     def pitchToXml(self, p):
+        '''
+        convert a pitch to xml... does not create the <accidental> tag...
+        
+        >>> p = pitch.Pitch('D#5')
+        >>> MEX = musicxml.m21ToXML.MeasureExporter()
+        >>> mxPitch = MEX.pitchToXml(p)
+        >>> MEX.dump(mxPitch)
+        <pitch><step>D</step><alter>1</alter><octave>5</octave></pitch>
+        '''
         mxPitch = Element('pitch')
         _setTagTextFromAttribute(p, mxPitch, 'step')
         if p.accidental is not None:
@@ -1445,25 +1517,393 @@ class MeasureExporter(XMLExporterBase):
     
     
     def chordSymbolToXml(self, cs):
-        pass
+        '''
+        Convert a ChordSymbol object to an mxHarmony object.
+           
+        >>> cs = harmony.ChordSymbol()
+        >>> cs.root('E-')
+        >>> cs.bass('B-')
+        >>> cs.inversion(2, transposeOnSet = False)
+        >>> cs.chordKind = 'major'
+        >>> cs.chordKindStr = 'M'
+        >>> cs
+        <music21.harmony.ChordSymbol E-/B->
+
+        >>> MEX = musicxml.m21ToXML.MeasureExporter()
+        >>> MEX.currentDivisions = 10
+
+        >>> mxHarmony = MEX.chordSymbolToXml(cs)
+        >>> MEX.dump(mxHarmony)
+        <harmony><root><root-step>E</root-step><root-alter>-1.0</root-alter></root><kind text="M">major</kind><inversion>2</inversion><bass><bass-step>B</bass-step><bass-alter>-1.0</bass-alter></bass></harmony>
+
+        Now give function...
+        
+        >>> cs.romanNumeral = 'I64'
+        >>> mxHarmony = MEX.chordSymbolToXml(cs)
+        >>> MEX.dump(mxHarmony)
+        <harmony><function>I64</function><kind text="M">major</kind><inversion>2</inversion><bass><bass-step>B</bass-step><bass-alter>-1.0</bass-alter></bass></harmony>
+     
+        >>> hd = harmony.ChordStepModification()
+        >>> hd.modType = 'alter'
+        >>> hd.interval = -1
+        >>> hd.degree = 3
+        >>> cs.addChordStepModification(hd)
+     
+        >>> mxHarmony = MEX.chordSymbolToXml(cs)
+        >>> MEX.dump(mxHarmony)
+        <harmony><function>I64</function><kind text="M">major</kind><inversion>2</inversion><bass><bass-step>B</bass-step><bass-alter>-1.0</bass-alter></bass><degree><degree-value>3</degree-value><degree-alter>-1</degree-alter><degree-type>alter</degree-type></degree></harmony>
     
-    def dynamicToXml(self, dyn):
-        pass
+        Test altered chords:
+        
+        Is this correct?
     
+        >>> f = harmony.ChordSymbol('F sus add 9')
+        >>> f
+        <music21.harmony.ChordSymbol F sus add 9>
+        >>> mxHarmony = MEX.chordSymbolToXml(f)
+        >>> MEX.dump(mxHarmony)
+        <harmony><root><root-step>G</root-step></root><kind>suspended-fourth</kind><inversion>3</inversion><degree><degree-value>9</degree-value><degree-alter /><degree-type>add</degree-type></degree></harmony>
+        
+        MusicXML uses "dominant" for "dominant-seventh" so check aliases back...
+    
+        >>> dom7 = harmony.ChordSymbol('C7')
+        >>> dom7.chordKind
+        'dominant-seventh'
+        >>> mxHarmony = MEX.chordSymbolToXml(dom7)
+        >>> MEX.dump(mxHarmony)
+        <harmony><root><root-step>C</root-step></root><kind>dominant</kind></harmony>
+        '''
+        # TODO: frame # fretboard
+        # TODO: offset
+        # TODO: editorial
+        # TODO: staff
+        # TODO: attrGroup: print-object
+        # TODO: attr: print-frame
+        # TODO: attrGroup: print-style
+        # TODO: attrGroup: placement
+                
+        if cs.writeAsChord is True:
+            return self.chordToXml(cs)
+
+        from music21 import harmony
+        mxHarmony = Element('harmony')
+
+        csRoot = cs.root()
+        csBass = cs.bass(find=False)
+        # TODO: do not look at ._attributes...
+        if cs._roman is not None:
+            mxFunction = SubElement(mxHarmony, 'function')
+            mxFunction.text = cs.romanNumeral.figure
+        elif csRoot is not None:
+            mxRoot = SubElement(mxHarmony, 'root')    
+            mxStep = SubElement(mxRoot, 'root-step')
+            mxStep.text = str(csRoot.step) 
+            # not a todo, text attribute; use element.
+            # TODO: attrGroup: print-style 
+                    
+            if csRoot.accidental is not None:
+                mxAlter = SubElement(mxRoot, 'root-alter')
+                mxAlter.text = str(csRoot.accidental.alter)
+                # TODO: attrGroup: print-object (why here)??
+                # TODO: attrGroup: print-style
+                # TODO: attr: location (left, right)
+        else:
+            environLocal.printDebug(['need either a root or a _roman to show'])
+            return
+        
+        mxKind = SubElement(mxHarmony, 'kind')
+        cKind = cs.chordKind
+        for xmlAlias in harmony.CHORD_ALIASES:
+            if harmony.CHORD_ALIASES[xmlAlias] == cKind:
+                cKind = xmlAlias
+
+        mxKind.text = str(cKind)
+        if cs.chordKindStr not in (None, ""):
+            mxKind.set('text', cs.chordKindStr)
+        # TODO: attr: use-symbols
+        # TODO: attr: stack-degrees
+        # TODO: attr: parentheses-degrees
+        # TODO: attr: bracket-degrees
+        # TODO: attrGroup: print-style
+        # TODO: attrGroup: halign
+        # TODO: attrGroup: valign
+        csInv = cs.inversion()
+        if csInv not in (None, 0):
+            mxInversion = SubElement(mxHarmony, 'inversion')
+            mxInversion.text = str(csInv)
+        
+        if csBass is not None and (csRoot is None or csRoot.name != csBass.name):
+            # TODO.. reuse above from Root...
+            mxBass = SubElement(mxHarmony, 'bass')
+            mxStep = SubElement(mxBass, 'bass-step')
+            mxStep.text = str(csBass.step) 
+            # not a todo, text attribute; use element.
+            # TODO: attrGroup: print-style 
+                    
+            if csBass.accidental is not None:
+                mxAlter = SubElement(mxBass, 'bass-alter')
+                mxAlter.text = str(csBass.accidental.alter)
+                # TODO: attrGroup: print-object (why here)??
+                # TODO: attrGroup: print-style
+                # TODO: attr: location (left, right)       
+
+        if len(cs.getChordStepModifications()) > 0:
+            for hd in cs.getChordStepModifications():
+                mxDegree = SubElement(mxHarmony, 'degree')
+                # types should be compatible
+                # TODO: print-object
+                mxDegreeValue = SubElement(mxDegree, 'degree-value')
+                mxDegreeValue.text = str(hd.degree)
+                mxDegreeAlter = SubElement(mxDegree, 'degree-alter')
+                if hd.interval is not None:
+                    # will return -1 for '-a1'
+                    mxDegreeAlter.text = str(hd.interval.chromatic.directed)
+                    # TODO: attrGroup: print-style
+                    # TODO: attr: plus-minus (yes, no)
+                mxDegreeType = SubElement(mxDegree, 'degree-type')
+                mxDegreeType.text = str(hd.modType)
+                # TODO: attr: text -- alternate display
+                # TODO: attrGroup: print-style
+            
+        self.xmlRoot.append(mxHarmony)
+        return mxHarmony
+
+    def setPrintStyleAlign(self, m21Obj, mxObj):
+        # print-style-align...
+        for src, dst in [(m21Obj._positionDefaultX, 'default-x'),
+                     (m21Obj._positionDefaultY, 'default-y'),
+                     (m21Obj._positionRelativeX, 'relative-x'),
+                     (m21Obj._positionRelativeY, 'relative-y')]:
+            if src is not None:
+                mxObj.set(dst, str(src))
+
+    def placeInDirection(self, mxObj, m21Obj=None):
+        '''
+        places the mxObj <element> inside <direction><direction-type>
+        '''
+        mxDirection = Element('direction')
+        mxDirectionType = SubElement(mxDirection, 'direction-type')
+        mxDirectionType.append(mxObj)
+        if (m21Obj is not None and 
+                hasattr(m21Obj, '_positionPlacement') and 
+                m21Obj._positionPlacement is not None):
+            mxDirectionType.set('placement', m21Obj._positionPlacement)
+                
+        return mxDirection
+    
+    def dynamicToXml(self, d):
+        '''
+        return a nested tag:
+        <direction><direction-type><dynamic><ff>
+        or whatever...
+        
+        >>> ppp = dynamics.Dynamic('ppp')
+        >>> print('%.2f' % ppp.volumeScalar)
+        0.15
+        >>> ppp._positionRelativeY = -10
+
+        >>> MEX = musicxml.m21ToXML.MeasureExporter()
+        >>> mxDirection = MEX.dynamicToXml(ppp)
+        >>> MEX.dump(mxDirection)
+        <direction><direction-type><dynamics default-x="-36" default-y="-80" relative-y="-10"><ppp /></dynamics></direction-type><sound><dynamics>19</dynamics></sound></direction>
+
+        appends to score
+
+        '''
+        mxDynamics = Element('dynamics')
+        if d.value in xmlObjects.DYNAMIC_MARKS:
+            mxThisDynamic = SubElement(mxDynamics, d.value)
+        else:
+            mxThisDynamic = SubElement(mxDynamics, 'other-dynamics')
+            mxThisDynamic.text = str(d.value)
+        
+        self.setPrintStyleAlign(d, mxDynamics)
+        # TODO: attrGroup: placement (but done for direction, so okay...
+        # TODO: attrGroup: text-decoration
+        # TODO: attrGroup: enclosure
+        
+        # direction todos
+        # TODO: offset
+        # TODO: editorial-voice-direction
+        # TODO: staff
+
+        mxDirection = self.placeInDirection(mxDynamics, d)        
+        # sound
+        vS = d.volumeScalar
+        if vS is not None:
+            mxSound = SubElement(mxDirection, 'sound')
+            mxSoundDynamics = SubElement(mxSound, 'dynamics')
+            dynamicVolume = int(vS * 127)
+            mxSoundDynamics.text = str(dynamicVolume)
+        
+        self.xmlRoot.append(mxDirection)
+        return mxDirection
+        
     def segnoToXml(self, segno):
-        pass
-    
+        '''
+        returns a segno inside a direction-type inside a direction.
+
+        appends to score
+
+        '''
+        mxSegno = Element('segno')
+        self.setPrintStyleAlign(segno, mxSegno)
+        mxDirection = self.placeInDirection(mxSegno, segno)
+        self.xmlRoot.append(mxDirection)
+        return mxDirection
+        
+        
     def codaToXml(self, coda):
-        pass
+        '''
+        returns a coda inside a direction-type inside a direction IF coda.useSymbol is
+        True; otherwise returns a textExpression...
+        
+        appends to score
+        '''
+        if coda.useSymbol:
+            mxCoda = Element('coda')
+            self.setPrintStyleAlign(coda, mxCoda)
+            mxDirection = self.placeInDirection(mxCoda, coda)
+            self.xmlRoot.append(mxDirection)
+            return mxDirection
+        else:
+            return self.textExpressionToXml(coda.getTextExpression())
     
     def tempoIndicationToXml(self, ti):
-        pass
+        '''
+        returns a <direction> tag for a single tempo indication.
+
+        note that TWO direction tags may be added to xmlroot, the second one
+        as a textExpression.... but only the first will be returned.
+
+        >>> mm = tempo.MetronomeMark("slow", 40, note.Note(type='half'))
+        
+        >>> MEX = musicxml.m21ToXML.MeasureExporter()
+        >>> mxDirection = MEX.tempoIndicationToXml(mm)
+        >>> MEX.dump(mxDirection)
+        <direction><direction-type><metronome parentheses="no"><beat-unit>half</beat-unit><per-minute>40</per-minute></metronome></direction-type><sound><tempo>80.0</tempo></sound></direction>
+
+        In this case, two directions were added to xmlRoot.  Here is the other one:
+        
+        >>> MEX.dump(MEX.xmlRoot.findall('direction')[1])
+        <direction><direction-type><words default-y="45.0" font-weight="bold" justify="left">slow</words></direction-type></direction>
+
+    
+        >>> mm = tempo.MetronomeMark("slow", 40, duration.Duration(quarterLength=1.5))
+        >>> mxDirection = MEX.tempoIndicationToXml(mm)
+        >>> MEX.dump(mxDirection)
+        <direction><direction-type><metronome parentheses="no"><beat-unit>quarter</beat-unit><beat-unit-dot /><per-minute>40</per-minute></metronome></direction-type><sound><tempo>60.0</tempo></sound></direction>
+
+        '''
+        # if writing just a sound tag, place an empty words tag in a direction type and then follow with sound declaration
+        # storing lists to accommodate metric modulations
+        durs = [] # duration objects
+        numbers = [] # tempi
+        hideNumericalMetro = False # if numbers implicit, hide metronome numbers
+        hideNumber = [] # hide the number after equal, e.g., quarter=120, hide 120
+        # store the last value necessary as a sounding tag in bpm
+        soundingQuarterBPM = False
+        if 'MetronomeMark' in ti.classes:
+            # will not show a number of implicit
+            if ti.numberImplicit or ti.number is None:
+                #environLocal.printDebug(['found numberImplict', ti.numberImplicit])
+                hideNumericalMetro = True
+            else:
+                durs.append(ti.referent)
+                numbers.append(ti.number)
+                hideNumber.append(False)
+            # determine number sounding; first, get from numberSounding, then
+            # number (if implicit, that is fine); get in terms of quarter bpm
+            soundingQuarterBPM = ti.getQuarterBPM()
+    
+        elif 'MetricModulation' in ti.classes:
+            # may need to reverse order if classical style or otherwise
+            # may want to show first number
+            hideNumericalMetro = False # must show for metric modulation
+            for sub in [ti.oldMetronome, ti.newMetronome]:
+                hideNumber.append(True) # cannot show numbers in a metric modulation
+                durs.append(sub.referent)
+                numbers.append(sub.number)
+            # soundingQuarterBPM should be obtained from the last MetronomeMark
+            soundingQuarterBPM = ti.newMetronome.getQuarterBPM()
+    
+            #environLocal.printDebug(['found metric modulation', ti, durs, numbers])
+        
+        mxMetro = Element('metronome')
+        for i, d in enumerate(durs):
+            # charData of BeatUnit is the type string
+            mxSub = Element('beat-unit')
+            mxSub.text = typeToMusicXMLType(d.type)
+            mxMetro.append(mxSub)
+            for _ in range(d.dots):
+                mxMetro.append(Element('beat-unit-dot'))
+            if len(numbers) > 0:
+                if not hideNumber[i]:
+                    mxPerMinute = SubElement(mxMetro, 'per-minute') # TODO: font.
+                    mxPerMinute.text = str(numbers[0])
+
+        if ti.parentheses:
+            mxMetro.set('parentheses', 'yes') # only attribute
+        else:
+            mxMetro.set('parentheses', 'no') # only attribute        
+
+        mxDirection = self.placeInDirection(mxMetro, ti)
+        if soundingQuarterBPM is not None:
+            mxSound = SubElement(mxDirection, 'sound')
+            mxSoundDynamics = SubElement(mxSound, 'tempo')
+            mxSoundDynamics.text = str(soundingQuarterBPM)
+        
+        if hideNumericalMetro is not None:
+            self.xmlRoot.append(mxDirection)
+        
+        if 'MetronomeMark' in ti.classes:
+            if ti.getTextExpression(returnImplicit=False) is not None:
+                unused_mxDirectionText = self.textExpressionToXml(
+                              ti.getTextExpression(returnImplicit=False))
+                
+        return mxDirection
     
     def textExpressionToXml(self, te):
-        pass
-    
+        '''Convert a TextExpression to a MusicXML mxDirection type.
+        returns a musicxml.mxObjects.Direction object
+        '''
+        mxWords = Element('words')
+        mxWords.text = str(te.content)
+        for src, dst in [#(te._positionDefaultX, 'default-x'), 
+                         (te.positionVertical, 'default-y'),
+    #                      (te._positionRelativeX, 'relative-x'),
+    #                      (te._positionRelativeY, 'relative-y')]:
+                          (te.enclosure, 'enclosure'),
+                          (te.justify, 'justify'),
+                          (te.size, 'font-size'),
+                          (te.letterSpacing, 'letter-spacing'),
+                        ]:
+            if src is not None:
+                mxWords.set(dst, str(src))
+        if te.style.lower() == 'bolditalic':
+            mxWords.set('font-style', 'italic')
+            mxWords.set('font-weight', 'bold')
+        elif te.style == 'italic':
+            mxWords.set('font-style', 'italic')
+        elif te.style == 'bold':
+            mxWords.set('font-weight', 'bold')
+            
+        mxDirection = self.placeInDirection(mxWords, te)
+        self.xmlRoot.append(mxDirection)
+        return mxDirection
+            
     def midmeasureClefToXml(self, clefObj):
-        pass
+        '''
+        given a clefObj which is in .elements insert it in self.xmlRoot as
+        an attribute if it is not at offset 0.0.
+        '''
+        if self.offsetInMeasure == 0:
+            return
+        mxAttributes = Element('attributes')
+        mxClef = self.clefToXml(clefObj)
+        mxAttributes.append(mxClef)
+        self.xmlRoot.append(mxAttributes)
+        return mxAttributes
     
     #------------------------------
     # note helpers...
@@ -1519,7 +1959,6 @@ class MeasureExporter(XMLExporterBase):
 
     def beamToXml(self, beamObject):
         '''
-    
         
         >>> a = beam.Beam()
         >>> a.type = 'start'
