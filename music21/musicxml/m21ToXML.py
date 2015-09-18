@@ -992,18 +992,28 @@ class MeasureExporter(XMLExporterBase):
         return mxNotehead
     
     def noteToNotations(self, n):
+        '''
+        Take information from .expressions,
+        .articulations, and spanners to
+        make the <notations> tag for a note.
+        '''
         mxArticulations = None
         mxTechnicalMark = None
         mxOrnaments = None
-        
+
         notations = []
 
         for expObj in n.expressions:
-            pass
-            # FINISH...
-            if mxOrnaments is None:
-                mxOrnaments = Element('ornaments')
-            
+            mxExpression = self.expressionToXml(expObj)
+            if mxExpression is None:
+                # TODO: should not!
+                continue
+            if 'Ornament' in expObj.classes:
+                if mxOrnaments is None:
+                    mxOrnaments = Element('ornaments')
+                mxOrnaments.append(mxExpression)
+            else:
+                notations.append(mxExpression)
 
         for artObj in n.articulations:
             if 'TechnicalIndication' in artObj.classes:
@@ -1016,14 +1026,16 @@ class MeasureExporter(XMLExporterBase):
                 mxArticulations.append(self.articulationToXmlArticulation(artObj))
         
         # TODO: attrGroup: print-object
-        # TODO: editorial
+        # TODO: editorial (hard!)
         
         # TODO: tied
         # TODO: slur
-        # TODO: tuplet
+        for tup in n.duration.tuplets:
+            tupTagList = self.tupletToXmlTuplet(tup)
+            notations.extend(tupTagList)
+            
         # TDOO: glissando
         # TODO: slide
-        # TODO: ornaments
                 
         for x in (mxArticulations, 
                   mxTechnicalMark, 
@@ -1031,8 +1043,7 @@ class MeasureExporter(XMLExporterBase):
             if x is not None and len(x) > 0:
                 notations.append(x)    
 
-        # TODO: dynamics
-        # TODO: fermata
+        # TODO: dynamics in notations
         # TODO: arpeggiate
         # TODO: non-arpeggiate
         # TODO: accidental-mark
@@ -1040,6 +1051,92 @@ class MeasureExporter(XMLExporterBase):
         
         return notations
 
+    def tupletToXmlTuplet(self, tuplet):
+        '''
+        In musicxml, a tuplet is represented by
+        a timeModification and visually by the
+        <notations><tuplet> tag.  This method
+        creates the latter.
+
+        Returns a list of them because a 
+        startStop type tuplet needs two tuplet
+        brackets.
+
+        TODO: make sure something happens if
+        makeTupletBrackets is not set.
+        '''
+        if tuplet.type in (None, ''):
+            return []
+        
+        if tuplet.type not in ('start', 'stop', 'startStop'):
+            raise ToMxObjectsException("Cannot create music XML from a tuplet of type " + tuplet.type)
+
+        if tuplet.type == 'startStop': # need two musicxml
+            localType = ['start', 'stop']
+        else:
+            localType = [tuplet.type] # place in list
+
+        retList = []
+        for tupletType in localType:
+            mxTuplet = Element('tuplet')
+            mxTuplet.set('type', tupletType)
+            # only provide other parameters if this tuplet is a start
+            if tupletType == 'start':
+                mxTuplet.set('bracket', 
+                             xmlObjects.booleanToYesNo(tuplet.bracket))
+                if tuplet.placement is not None:
+                    mxTuplet.set('placement', tuplet.placement)
+                if tuplet.tupletActualShow == 'none':
+                    mxTuplet.set('show-number', 'none')
+            retList.append(mxTuplet)
+        return retList
+
+    def expressionToXml(self, expression):
+        '''
+        Convert a music21 Expression (expression or ornament)
+        to a musicxml tag; 
+        return None if no conversion is possible.
+        '''
+        mapping = OrderedDict([
+                   ('Trill', 'trill-mark'),
+                   # TODO: delayed-inverted-turn
+                   # TODO: vertical-turn
+                   # TODO: 'delayed-turn'
+                   ('InvertedTurn', 'inverted-turn'),
+                   # last as others are subclasses
+                   ('Turn', 'turn'), 
+                   ('InvertedMordent', 'inverted-mordent'),
+                   ('Mordent', 'mordent'),
+                   ('Shake', 'shake'),
+                   ('Schleifer', 'schleifer'),
+                   # TODO: 'accidental-mark'
+                   ('Ornament', 'other-ornament'),
+                   # non-ornaments...
+                   ('Fermata', 'fermata'),
+                   ('Tremolo', 'tremolo'), # non-spanner
+                   ])
+        mx = None
+        classes = expression.classes
+        for k, v in mapping.items():
+            if k in classes:
+                mx = Element(v)
+        if mx is None:
+            environLocal.printDebug(['no musicxml conversion for:', expression])
+            return 
+        
+        # TODO: print-style
+        # TODO: trill-sound
+        if expression.placement is not None:
+            mx.set('placement', expression.placement)
+        
+        if 'Tremolo' in classes:
+            mx.set('type', 'single')
+            mx.text = str(expression.numberOfMarks)
+        
+        return mx
+        
+        
+        
     def articulationToXmlArticulation(self, articulationMark):
         '''
         Returns a class (mxArticulationMark) that represents the
@@ -1058,30 +1155,11 @@ class MeasureExporter(XMLExporterBase):
         # TODO: scoop/plop/doit/falloff - empty-line
         # TODO: breath-mark
         # TODO: other-articulation
-        mappingList = {'Accent'         : 'accent',
-                       'StrongAccent'   : 'strong-accent',
-                       'Staccato'       : 'staccato',
-                       'Staccatissimo'  : 'staccatissimo',
-                       'Spiccato'       : 'spiccato',
-                       'Tenuto'         : 'tenuto',
-                       'DetachedLegato' : 'detached-legato',
-                       'Scoop'          : 'scoop',
-                       'Plop'           : 'plop',
-                       'Doit'           : 'doit',
-                       'Falloff'        : 'falloff',
-                       'BreathMark'     : 'breath-mark',
-                       'Caesura'        : 'caesura',
-                       'Stress'         : 'stress',
-                       'Unstress'       : 'unstress',
-                       'Articulation'   : 'staccato', # WRONG, BUT NO GENERIC MARK EXISTS
-                       }
         
         musicXMLArticulationName = None
-        for c in articulationMark.classes:
-            # go in order of classes to get most specific first...
-            if c in mappingList:
-                musicXMLArticulationName = mappingList[c]
-                break
+        for c in xmlObjects.ARTICULATION_MARKS_REV:
+            if isinstance(articulationMark, c):
+                musicXMLArticulationName = xmlObjects.ARTICULATION_MARKS_REV[c]
         if musicXMLArticulationName is None:
             raise ToMxObjectsException("Cannot translate %s to musicxml" % articulationMark)
         mxArticulationMark = Element(musicXMLArticulationName)
@@ -1112,34 +1190,11 @@ class MeasureExporter(XMLExporterBase):
         # TODO: fret
         # TODO: fingering
         # TODO: harmonic
-        mappingList = {'UpBow': 'up-bow',
-                       'DownBow': 'down-bow',
-                       'Harmonic': 'harmonic',
-                       'OpenString': 'open-string',
-                       'StringThumbPosition': 'thumb-position',
-                       'StringFingering': 'fingering',
-                       'FrettedPluck': 'pluck',
-                       'DoubleTongue': 'double-tongue',
-                       'TripleTongue': 'triple-tongue',
-                       'Stopped': 'stopped',
-                       'SnapPizzicato': 'snap-pizzicato',
-                       'FretIndication': 'fret',
-                       'StringIndication': 'string',
-                       'HammerOn': 'hammer-on',
-                       'PullOff': 'pull-off',
-                       'FretBend': 'bend',
-                       'FretTap': 'tap',
-                       'OrganHeel': 'heel',
-                       'OrganToe': 'toe',
-                       'HarpFingerNails': 'fingernails',
-    #                   'TechnicalIndication': 'other-technical',
-                       }
         
         musicXMLTechnicalName = None
-        for c in articulationMark.classes:
-            # go in order of classes to get most specific first...
-            if c in mappingList:
-                musicXMLTechnicalName = mappingList[c]
+        for c in xmlObjects.TECHNICAL_MARKS_REV:
+            if isinstance(articulationMark, c):
+                musicXMLTechnicalName = xmlObjects.TECHNICAL_MARKS_REV[c]
                 break
         if musicXMLTechnicalName is None:
             raise ToMxObjectsException("Cannot translate technical indication %s to musicxml" % articulationMark)

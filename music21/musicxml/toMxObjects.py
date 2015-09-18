@@ -1512,9 +1512,6 @@ def expressionToMx(orn):
         mx = mxObjects.Mordent()
     elif 'InvertedMordent' in orn.classes:
         mx = mxObjects.InvertedMordent()
-    elif 'Trill' in orn.classes:
-        mx = mxObjects.TrillMark()
-        mx.set('placement', orn.placement)
     elif 'Turn' in orn.classes:
         mx = mxObjects.Turn()
     elif 'DelayedTurn' in orn.classes:
