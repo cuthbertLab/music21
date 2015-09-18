@@ -1470,6 +1470,7 @@ class MeasureParser(XMLParserBase):
         # note either does not exist or is not a chord, we 
         # have a complete chord
         if len(self.mxNoteList) > 0 and nextNoteIsChord is False:
+            # TODO: move spanners from first note to Chord.  See slur in m2 of schoenberg/op19 #2
             c = self.xmlToChord(self.mxNoteList)
             # add any accumulated lyrics
             self.updateLyricsFromList(c, self.mxLyricList)
@@ -2308,6 +2309,14 @@ class MeasureParser(XMLParserBase):
         Given an mxNote, based on mxTimeModification 
         and mxTuplet objects, return a Tuplet object
         (or alter the input object and then return it)
+        
+        >>> import xml.etree.ElementTree as ET        
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        
+        >>> mxNote = ET.fromstring('<note><type>16th</type><time-modification><actual-notes>5</actual-notes><normal-notes>4</normal-notes></time-modification></note>')
+        >>> t = MP.xmlToTuplet(mxNote)
+        >>> t
+        <music21.duration.Tuplet 5/4/16th>
         ''' 
         if inputM21 is None:
             t = duration.Tuplet()
@@ -2319,8 +2328,8 @@ class MeasureParser(XMLParserBase):
         mxTimeModification = mxNote.find('time-modification')
         #environLocal.printDebug(['got mxTimeModification', mxTimeModification])
         seta = _setAttributeFromTagText
-        seta(t, mxTimeModification, 'actualNotes', 'numberNotesActual', transform=int)
-        seta(t, mxTimeModification, 'normalNotes', 'numberNotesNormal', transform=int)
+        seta(t, mxTimeModification, 'actual-notes', 'numberNotesActual', transform=int)
+        seta(t, mxTimeModification, 'normal-notes', 'numberNotesNormal', transform=int)
         
         mxNormalType = mxTimeModification.get('normal-type')
         if mxNormalType is not None:
