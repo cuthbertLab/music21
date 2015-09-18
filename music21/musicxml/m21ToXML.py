@@ -21,12 +21,11 @@ from __future__ import print_function, division
 from collections import OrderedDict
 import unittest
 import datetime
-import copy
 from music21.ext import webcolors, six
 
 if six.PY3:
     import xml.etree.ElementTree as ET  # @UnusedImport
-    from xml.etree.ElementTree import Element, SubElement
+    from xml.etree.ElementTree import Element, SubElement # @UnusedImport
 
 else:
     try:
@@ -751,7 +750,6 @@ class ScoreExporter(XMLExporterBase):
         partGroupIndexRef = {} # have id be key
         partGroupIndex = 1 # start by 1 by convention
         for pex in self.partExporterList:
-            mxPart = pex.xmlRoot
             p = pex.stream
             # check for first
             for sg in staffGroups:
@@ -2325,13 +2323,15 @@ class MeasureExporter(XMLExporterBase):
         
         >>> a = beam.Beams()
         >>> a.fill(2, type='start')
-        >>> mxBeamList = musicxml.toMxObjects.beamsToMx(a)
+
+        >>> MEX = musicxml.m21ToXML.MeasureExporter()
+        >>> mxBeamList = MEX.beamsToXml(a)
         >>> len(mxBeamList)
         2
-        >>> mxBeamList[0]
-        <beam number=1 charData=begin>
-        >>> mxBeamList[1]
-        <beam number=2 charData=begin>
+        >>> for b in mxBeamList:
+        ...     MEX.dump(b)
+        <beam number="1">begin</beam>
+        <beam number="2">begin</beam>        
         '''
         mxBeamList = []
         for beamObj in beams.beamsList:
@@ -2344,42 +2344,40 @@ class MeasureExporter(XMLExporterBase):
         >>> a = beam.Beam()
         >>> a.type = 'start'
         >>> a.number = 1
-        >>> b = musicxml.toMxObjects.beamToMx(a)
-        >>> b.get('charData')
-        'begin'
-        >>> b.get('number')
-        1
-    
+        
+        >>> MEX = musicxml.m21ToXML.MeasureExporter()
+        >>> b = MEX.beamToXml(a)
+        >>> MEX.dump(b)
+        <beam number="1">begin</beam>
+
         >>> a.type = 'continue'
-        >>> b = musicxml.toMxObjects.beamToMx(a)
-        >>> b.get('charData')
-        'continue'
+        >>> b = MEX.beamToXml(a)
+        >>> MEX.dump(b)
+        <beam number="1">continue</beam>
     
         >>> a.type = 'stop'
-        >>> b = musicxml.toMxObjects.beamToMx(a)
-        >>> b
-        <beam number=1 charData=end>
-        >>> b.get('charData')
-        'end'
+        >>> b = MEX.beamToXml(a)
+        >>> MEX.dump(b)
+        <beam number="1">end</beam>
     
         >>> a.type = 'partial'
         >>> a.direction = 'left'
-        >>> b = musicxml.toMxObjects.beamToMx(a)
-        >>> b.get('charData')
-        'backward hook'
+        >>> b = MEX.beamToXml(a)
+        >>> MEX.dump(b)
+        <beam number="1">backward hook</beam>
     
         >>> a.direction = 'right'
-        >>> b = musicxml.toMxObjects.beamToMx(a)
-        >>> b.get('charData')
-        'forward hook'
+        >>> b = MEX.beamToXml(a)
+        >>> MEX.dump(b)
+        <beam number="1">forward hook</beam>
     
         >>> a.direction = None
-        >>> b = musicxml.toMxObjects.beamToMx(a)
+        >>> b = MEX.beamToXml(a)
         Traceback (most recent call last):
         ToMxObjectsException: partial beam defined without a proper direction set (set to None)
     
         >>> a.type = 'crazy'
-        >>> b = musicxml.toMxObjects.beamToMx(a)
+        >>> b = MEX.beamToXml(a)
         Traceback (most recent call last):
         ToMxObjectsException: unexpected beam type encountered (crazy)
         '''
@@ -2400,7 +2398,7 @@ class MeasureExporter(XMLExporterBase):
         else:
             raise ToMxObjectsException('unexpected beam type encountered (%s)' % beamObject.type)
     
-        mxBeam.set('number', beamObject.number)
+        mxBeam.set('number', str(beamObject.number))
         # not todo: repeater (deprecated)
         # TODO: attr: fan
         # TODO: attr: color group
