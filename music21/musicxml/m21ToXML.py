@@ -86,6 +86,51 @@ def dump(xmlEl):
     else:
         print(ET.tostring(xmlEl, encoding='unicode'))
 
+def typeToMusicXMLType(value):
+    '''Convert a music21 type to a MusicXML type.
+    
+    >>> musicxml.m21ToXML.typeToMusicXMLType('longa')
+    'long'
+    >>> musicxml.m21ToXML.typeToMusicXMLType('quarter')
+    'quarter'
+    '''
+    # MusicXML uses long instead of longa
+    if value == 'longa': 
+        return 'long'
+    elif value == '2048th':
+        raise ToMxObjectsException('Cannot convert "2048th" duration to MusicXML (too short).')
+    else:
+        return value
+
+def accidentalToMx(a):
+    '''
+    >>> a = pitch.Accidental()
+    >>> a.set('half-sharp')
+    >>> a.alter == .5
+    True
+    >>> mxAccidental = musicxml.m21ToXML.accidentalToMx(a)
+    >>> musicxml.m21ToXML.dump(mxAccidental)
+    <accidental>quarter-sharp</accidental>
+    '''
+    if a.name == "half-sharp": 
+        mxName = "quarter-sharp"
+    elif a.name == "one-and-a-half-sharp": 
+        mxName = "three-quarters-sharp"
+    elif a.name == "half-flat": 
+        mxName = "quarter-flat"
+    elif a.name == "one-and-a-half-flat": 
+        mxName = "three-quarters-flat"
+    else: # all others are the same
+        mxName = a.name
+
+    mxAccidental = Element('accidental')
+    # need to remove display in this case and return None
+    #         if self.displayStatus == False:
+    #             pass
+    mxAccidental.text = mxName
+    return mxAccidental
+    
+
 def normalizeColor(color):
     if color in (None, ''):
         return color
@@ -196,12 +241,6 @@ class XMLExporterBase(object):
     contains functions that could be called
     at multiple levels of exporting (Score, Part, Measure).
     '''
-    m21AccidentalToMx = {'half-sharp': 'quarter-sharp',
-                         'one-and-a-half-sharp': 'three-quarters-sharp',
-                         'half-flat': 'quarter-flat',
-                         'one-and-a-half-flat': 'three-quarters-flat',
-                         }
-
     
     def __init__(self):
         pass
@@ -707,7 +746,7 @@ class MeasureExporter(XMLExporterBase):
         
         self.parent = parent # PartExporter
         self.xmlRoot = Element('measure')
-        self.currentDivisions = None
+        self.currentDivisions = defaults.divisionsPerQuarter
 
         # TODO: allow for mid-measure transposition changes.
         self.transpositionInterval = None
@@ -765,15 +804,29 @@ class MeasureExporter(XMLExporterBase):
         
         self.currentVoiceId = voiceId
         for obj in m:
+            self.preObjectSpanners(obj)
+            
             classes = m.classes
             if 'GeneralNote' in classes:
                 offsetMeasureNote += obj.duration.quarterLength
+
+            # split at durations...
+            if 'GeneralNote' in classes and obj.duration.type == 'complex':
+                objList = obj.splitAtDurations()
+            else:
+                objList = [obj]
+            
+            
             for className, methName in self.classesToMethods:
                 if className in classes:
                     meth = getattr(self, methName)
-                    meth(obj)
+                    for o in objList:
+                        meth(o)
                     break
                 # TODO: print something for non-converted...
+
+            self.postObjectSpanners(obj)
+
         
         if voiceId is not None:
             mxBackup = Element('backup')
@@ -783,7 +836,16 @@ class MeasureExporter(XMLExporterBase):
             root.append(mxBackup)
         self.currentVoiceId = None
 
-    def noteToXml(self, n):
+    def preObjectSpanners(self, obj):
+        pass
+    
+    def postObjectSpanners(self, obj):
+        pass
+    
+    def objectAttachedSpanners(self, obj, mxObj):
+        pass
+
+    def noteToXml(self, n, addChordTag=False):
         '''
         Translate a music21 :class:`~music21.note.Note` into a
         list of :class:`~music21.musicxml.mxObjects.Note` objects.
@@ -797,23 +859,138 @@ class MeasureExporter(XMLExporterBase):
         
         
         >>> n = note.Note('D#5')
-        >>> n.quarterLength = 2.25
-        >>> musicxmlNoteList = musicxml.toMxObjects.noteToMxNotes(n)
-        >>> len(musicxmlNoteList)
-        2
-        >>> musicxmlHalf = musicxmlNoteList[0]
-        >>> musicxmlHalf
-        <note <pitch step=D alter=1 octave=5> duration=20160 <tie type=start> type=half <accidental charData=sharp> <notations <tied type=start>>>     
-        
+        >>> n.quarterLength = 3
+        >>> MEX = musicxml.m21ToXML.MeasureExporter()
+        >>> mxNote = MEX.noteToXml(n)
+        >>> MEX.dump(mxNote)
+        <note><pitch><step>D</step><alter>1</alter><octave>5</octave></pitch><duration>30240</duration><type>half</type><dot /><accidental>sharp</accidental></note>
+         
         TODO: Test with spanners...
         '''
-        spannerBundle = self.spannerBundle.getBySpannedElement(n)
+        # TODO: attrGroup x-position
+        # TODO: attrGroup font
+        # TODO: attr: dynamics
+        # TODO: attr: end-dynamics
+        # TODO: attr: attack
+        # TODO: attr: release
+        # TODO: attr: time-only
+        # TODO: attr: pizzicato
+        mxNote = Element('note')
+        if n.duration.isGrace is True:
+            SubElement(mxNote, 'grace')
 
-        mxNoteList = []
-        mxPitch = self.pitchToXml(n.pitch)
-        noteColor = normalizeColor(n.color)
+        # TODO: cue...
+        if n.color is not None:
+            mxNote.set('color', normalizeColor(n.color))
+        if n.hideObjectOnPrint is True:
+            mxNote.set('print-object', 'no')
+            mxNote.set('print-spacing', 'yes')
         
+        if addChordTag:
+            SubElement(mxNote, 'chord')
+        
+        if hasattr(n, 'pitch'):
+            mxPitch = self.pitchToXml(n.pitch)
+            mxNote.append(mxPitch)
+        else: 
+            # assume rest until unpitched works
+            # TODO: unpitched
+            SubElement(mxNote, 'rest')
 
+        if n.duration.isGrace is not True:
+            mxDuration = self.durationXml(n.duration)
+            mxNote.append(mxDuration)
+            # divisions only
+        # TODO: skip if cue:
+        if n.tie is not None:
+            mxTieList = self.tieToXmlTie(n.tie)
+            for t in mxTieList:
+                mxNote.append(t)
+        
+            
+        # TODO: instrument
+        # TODO: editorial-voice
+        mxType = Element('type')
+        mxType.text = typeToMusicXMLType(n.duration.type)
+        mxNote.append(mxType)
+        
+        for _ in range(n.duration.dots):
+            SubElement(mxNote, 'dot')
+            # TODO: dot placement...
+        if (n.pitch.accidental is not None and 
+                n.pitch.accidental.displayStatus in (True, None)):
+            mxAccidental = accidentalToMx(n.pitch.accidental)
+            mxNote.append(mxAccidental)
+        if len(n.duration.tuplets) > 0:
+            for tup in n.duration.tuplets:
+                mxTimeModification = self.tupletToTimeModification(tup)
+                mxNote.append(mxTimeModification)
+        # TODO: stem
+        if (n.notehead != 'normal' or n.noteheadFill is not None or
+                n.color not in (None, '')):
+            mxNotehead = self.noteheadToXml(n)
+            mxNote.append(mxNotehead)
+        # TODO: notehead-text
+        # TODO: staff
+        # TODO: beam
+        if hasattr(n, 'beams') and n.beams:
+            nBeamsList = self.beamsToXml(n.beams)
+            for mxB in nBeamsList:
+                mxNote.append(mxB)
+    
+        mxNotationsList = self.noteToNotations(n)
+        for mxN in mxNotationsList:
+            mxNote.append(mxN)
+
+        for lyricObj in n.lyrics:
+            mxNote.append(self.lyricToXml(lyricObj))
+        # TODO: play
+        self.xmlRoot.append(mxNote)
+        return mxNote
+            
+    def durationXml(self, dur):
+        mxDuration = Element('duration')
+        mxDuration.text = str(int(self.currentDivisions * dur.quarterLength))
+        return mxDuration
+    
+    def pitchToXml(self, p):
+        mxPitch = Element('pitch')
+        _setTagTextFromAttribute(p, mxPitch, 'step')
+        if p.accidental is not None:
+            mxAlter = SubElement(mxPitch, 'alter')
+            mxAlter.text = str(common.numToIntOrFloat(p.accidental.alter))
+        _setTagTextFromAttribute(p, mxPitch, 'octave', 'implicitOctave')
+        return mxPitch
+    
+    def tupletToTimeModification(self, tup):
+        mxTimeModification = Element('time-modification')
+        _setTagTextFromAttribute(tup, mxTimeModification, 'actual-notes', 'numberNotesActual')
+        _setTagTextFromAttribute(tup, mxTimeModification, 'normal-notes', 'numberNotesNormal')
+        mxNormalType = SubElement(mxTimeModification, 'normal-type')
+        mxNormalType.text = typeToMusicXMLType(tup.durationNormal.type)
+        if tup.durationNormal.dots > 0:
+            for i in range(tup.durationNormal.dots):
+                SubElement(mxTimeModification, 'normal-dot')
+                
+        return mxTimeModification
+    
+    def noteheadToXml(self, n):
+        mxNotehead = Element('notehead')
+        nh = n.notehead
+        if nh is None:
+            nh = 'none'
+        mxNotehead.text = nh 
+        setb = _setAttributeFromAttribute
+        setb(n, mxNotehead, 'filled', 'noteheadFill', transform=xmlObjects.booleanToYesNo)
+        setb(n, mxNotehead, 'parentheses', 'noteheadParenthesis', transform=xmlObjects.booleanToYesNo)
+        # TODO: font
+        if n.color not in (None, ''):
+            color = normalizeColor(n.color)
+            mxNotehead.set('color', color)
+        return mxNotehead
+    
+    def noteToNotations(self, n):
+        return []
     
     def chordToXml(self, c):
         pass
@@ -842,8 +1019,127 @@ class MeasureExporter(XMLExporterBase):
     def midmeasureClefToXml(self, clefObj):
         pass
     
+    #------------------------------
+    # note helpers...
+    def lyricToXml(self, l):
+        '''
+        Translate a music21 :class:`~music21.note.Lyric` object 
+        to a <lyric> tag.
+        '''
+        mxLyric = Element('lyric')
+        _setTagTextFromAttribute(l, mxLyric, 'syllabic')
+        _setTagTextFromAttribute(l, mxLyric, 'text')
+        # TODO: elision
+        # TODO: more syllabic
+        # TODO: more text
+        # TODO: extend
+        # TODO: laughing
+        # TODO: humming
+        # TODO: end-line
+        # TODO: end-paragraph
+        # TODO: editorial
+        if l.identifier is not None:
+            mxLyric.set('number', l.identifier)
+        else:
+            mxLyric.set('number', str(l.number))
+        # TODO: attr: name - alternate for lyric -- make identifier?
+        # TODO: attrGroup: justify
+        # TODO: attrGroup: position
+        # TODO: attrGroup: placement
+        # TODO: attrGroup: color
+        # TODO: attrGroup: print-object
+        return mxLyric
     
+    def beamsToXml(self, beams):
+        '''
+        Returns a list of <beam> tags 
+        from a :class:`~music21.beam.Beams` object
     
+        
+        >>> a = beam.Beams()
+        >>> a.fill(2, type='start')
+        >>> mxBeamList = musicxml.toMxObjects.beamsToMx(a)
+        >>> len(mxBeamList)
+        2
+        >>> mxBeamList[0]
+        <beam number=1 charData=begin>
+        >>> mxBeamList[1]
+        <beam number=2 charData=begin>
+        '''
+        mxBeamList = []
+        for beamObj in beams.beamsList:
+            mxBeamList.append(self.beamToXml(beamObj))
+        return mxBeamList
+
+    def beamToXml(self, beamObject):
+        '''
+    
+        
+        >>> a = beam.Beam()
+        >>> a.type = 'start'
+        >>> a.number = 1
+        >>> b = musicxml.toMxObjects.beamToMx(a)
+        >>> b.get('charData')
+        'begin'
+        >>> b.get('number')
+        1
+    
+        >>> a.type = 'continue'
+        >>> b = musicxml.toMxObjects.beamToMx(a)
+        >>> b.get('charData')
+        'continue'
+    
+        >>> a.type = 'stop'
+        >>> b = musicxml.toMxObjects.beamToMx(a)
+        >>> b
+        <beam number=1 charData=end>
+        >>> b.get('charData')
+        'end'
+    
+        >>> a.type = 'partial'
+        >>> a.direction = 'left'
+        >>> b = musicxml.toMxObjects.beamToMx(a)
+        >>> b.get('charData')
+        'backward hook'
+    
+        >>> a.direction = 'right'
+        >>> b = musicxml.toMxObjects.beamToMx(a)
+        >>> b.get('charData')
+        'forward hook'
+    
+        >>> a.direction = None
+        >>> b = musicxml.toMxObjects.beamToMx(a)
+        Traceback (most recent call last):
+        ToMxObjectsException: partial beam defined without a proper direction set (set to None)
+    
+        >>> a.type = 'crazy'
+        >>> b = musicxml.toMxObjects.beamToMx(a)
+        Traceback (most recent call last):
+        ToMxObjectsException: unexpected beam type encountered (crazy)
+        '''
+        mxBeam = Element('beam')
+        if beamObject.type == 'start':
+            mxBeam.text = 'begin'
+        elif beamObject.type == 'continue':
+            mxBeam.text = 'continue'
+        elif beamObject.type == 'stop':
+            mxBeam.text = 'end'
+        elif beamObject.type == 'partial':
+            if beamObject.direction == 'left':
+                mxBeam.text = 'backward hook'
+            elif beamObject.direction == 'right':
+                mxBeam.text = 'forward hook'
+            else:
+                raise ToMxObjectsException('partial beam defined without a proper direction set (set to %s)' % beamObject.direction)
+        else:
+            raise ToMxObjectsException('unexpected beam type encountered (%s)' % beamObject.type)
+    
+        mxBeam.set('number', beamObject.number)
+        # not todo: repeater (deprecated)
+        # TODO: attr: fan
+        # TODO: attr: color group
+        return mxBeam
+
     
     def setRightBarline(self):        
         m = self.stream
