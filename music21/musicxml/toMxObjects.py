@@ -76,7 +76,6 @@ def configureMxPartGroupFromStaffGroup(staffGroup):
 def textBoxToMxCredit(textBox):
     '''
     Convert a music21 TextBox to a MusicXML Credit.
-
     
     >>> tb = text.TextBox('testing')
     >>> tb.positionVertical = 500
