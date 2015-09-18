@@ -751,7 +751,8 @@ class MeasureExporter(XMLExporterBase):
         # TODO: allow for mid-measure transposition changes.
         self.transpositionInterval = None
         self.mxTranspose = None
-        self.offsetStart = 0.0
+        self.measureOffsetStart = 0.0
+        self.offsetInMeasure = 0.0
         self.currentVoiceId = None
         
         self.rbSpanners = [] # rightBarline repeat spanners
@@ -760,6 +761,8 @@ class MeasureExporter(XMLExporterBase):
             self.spannerBundle = spanner.SpannerBundle()
         else:
             self.spannerBundle = parent.spannerBundle
+
+        self.objectSpannerBundle = self.spannerBundle # will change for each element.
 
     def parse(self):
         self.setTranspose()
@@ -796,7 +799,7 @@ class MeasureExporter(XMLExporterBase):
         '''
         root = self.xmlRoot
         divisions = self.currentDivisions
-        offsetMeasureNote = 0
+        self.offsetInMeasure = 0.0
         if 'Voice' in m.classes:
             voiceId = m.id
         else:
@@ -804,46 +807,214 @@ class MeasureExporter(XMLExporterBase):
         
         self.currentVoiceId = voiceId
         for obj in m:
-            self.preObjectSpanners(obj)
-            
-            classes = m.classes
-            if 'GeneralNote' in classes:
-                offsetMeasureNote += obj.duration.quarterLength
-
-            # split at durations...
-            if 'GeneralNote' in classes and obj.duration.type == 'complex':
-                objList = obj.splitAtDurations()
-            else:
-                objList = [obj]
-            
-            
-            for className, methName in self.classesToMethods:
-                if className in classes:
-                    meth = getattr(self, methName)
-                    for o in objList:
-                        meth(o)
-                    break
-                # TODO: print something for non-converted...
-
-            self.postObjectSpanners(obj)
-
+            self.parseOneElement(obj, m)
         
         if voiceId is not None:
             mxBackup = Element('backup')
             mxDuration = SubElement(mxBackup, 'duration')
-            mxDuration.text = str(int(divisions * offsetMeasureNote))
+            mxDuration.text = str(int(divisions * self.offsetInMeasure))
             # TODO: editorial
             root.append(mxBackup)
         self.currentVoiceId = None
 
-    def preObjectSpanners(self, obj):
-        pass
+    def parseOneElement(self, obj, m):
+        '''
+        parse one element completely and add it to xmlRoot, updating
+        offsetInMeasure, etc.
+        
+        m is either a measure or a voice object.
+        '''
+        root = self.xmlRoot
+        self.objectSpannerBundle = self.spannerBundle.getBySpannedElement(obj)
+        preList, postList = self.prePostObjectSpanners(obj)
+        
+        for sp in preList: # directions that precede the element
+            root.append(sp)
+            
+        classes = m.classes
+        if 'GeneralNote' in classes:
+            self.offsetInMeasure += obj.duration.quarterLength
+
+        # split at durations...
+        if 'GeneralNote' in classes and obj.duration.type == 'complex':
+            objList = obj.splitAtDurations()
+        else:
+            objList = [obj]
+        
+        
+        for className, methName in self.classesToMethods:
+            if className in classes:
+                meth = getattr(self, methName)
+                for o in objList:
+                    meth(o)
+                break
+            environLocal.printDebug(['did not convert object', obj])
+            # TODO: print something for non-converted...
+
+        for sp in postList: # directions that follow the element
+            root.append(sp)
+
+    def prePostObjectSpanners(self, target):
+        '''
+        return two lists or empty tuples: 
+        (1) spanners related to the object that should appear before the object
+        to the <measure> tag. (2) spanners related to the object that should appear after the
+        object in the measure tag.
+        '''
+        def getProc(su, target):
+            if len(su) == 1: # have a one element wedge
+                proc = ('first', 'last')
+            else:
+                if su.isFirst(target):
+                    proc = ('first',)
+                elif su.isLast(target):
+                    proc = ('last',)
+                else:
+                    proc = ()
+            return proc
+        
+        spannerBundle = self.objectSpannerBundle
+        if len(spannerBundle) == 0:
+            return (), ()
+
+        preList = []
+        postList = []
+        
+        # number, type is assumed; 
+        # tuple: first is the elementType, 
+        #        second: tuple of parameters to set,
+        #        third: tuple of mappings: first musicxml attribute, then m21.
+        paramsSet = {'Ottava': ('octave-shift', ('size',), ()),
+                     # TODO: attrGroup: dashed-formatting, print-style
+                     'DynamicWedge': ('wedge', ('spread',), ()),
+                     # TODO: niente, attrGroups: line-type, dashed-formatting, position, color
+                     'Line': ('bracket', ('line-end', 'end-length'), (('line-type', 'lineType'),))
+                     # TODO: dashes???
+                     }
+
+        for m21spannerClass, infoTuple in paramsSet.items():
+            mxtag, parameterSet, attributeSet = infoTuple
+            for su in spannerBundle.getByClass(m21spannerClass):
+                for posSub in getProc(su, target):
+                    # create new tag
+                    mxElement = Element(mxtag)
+                    mxElement.set('number', str(su.idLocal))
+                    # set attributes by number...
+                    for mxAttr, m21Attr in attributeSet:
+                        try:
+                            v = getattr(target, m21Attr)
+                        except AttributeError:
+                            continue
+                        if v is None:
+                            continue
+                        mxElement.set(mxAttr, str(m21Attr))
+                    if posSub == 'first':
+                        pmtrs = su.getStartParameters()
+                    elif posSub == 'last':
+                        pmtrs = su.getEndParameters()
+                    else:
+                        pmtrs = None
+                        
+                    if pmtrs is not None:
+                        mxElement.set('type', pmtrs['type'])
+                        for attrName in parameterSet:
+                            if pmtrs[attrName] is not None:
+                                mxElement.set(attrName, pmtrs[attrName])
+                    mxDirection = Element('direction')
+                    if su.placement is not None:
+                        mxDirection.set('placement', str(su.placement))
+                    mxDirectionType = SubElement(mxDirection, 'direction-type')
+                    mxDirectionType.append(mxElement)
+                    
+                    if posSub == 'first':
+                        preList.append(mxDirection)
+                    else:
+                        postList.append(mxDirection)
+        
+        return preList, postList
     
-    def postObjectSpanners(self, obj):
-        pass
-    
-    def objectAttachedSpanners(self, obj, mxObj):
-        pass
+    def objectAttachedSpannersToNotations(self, obj):
+        '''
+        return a list of <notations> from spanners related to the object that should appear 
+        in the notations tag (slurs, slides, etc.)
+        '''
+        notations = []
+        sb = self.objectSpannerBundle
+        if len(sb) == 0:
+            return notations
+
+        ornaments = []
+        
+        for su in sb.getByClass('Slur'):
+            mxSlur = Element('slur')
+            if su.isFirst(obj):
+                mxSlur.set('type', 'start')
+            elif su.isLast(obj):
+                mxSlur.set('type', 'stop')
+            else:
+                continue # do not put a notation on mid-slur notes.
+            mxSlur.set('number', str(su.idLocal))
+            if su.placement is not None:
+                mxSlur.set('placement', str(su.placement))
+            notations.append(mxSlur)
+
+        for su in sb.getByClass('Glissando'):
+            mxGlissando = Element('glissando')
+            mxGlissando.set('number', str(su.idLocal))
+            if su.lineType is not None:
+                mxGlissando.set('line-type', str(su.lineType))
+            # is this note first in this spanner?
+            if su.isFirst(obj):
+                if su.label is not None:
+                    mxGlissando.text = str(su.label)
+                mxGlissando.set('type', 'start')
+            elif su.isLast(obj):
+                mxGlissando.set('type', 'stop')
+            else:
+                continue # do not put a notation on mid-gliss notes.
+            # placement???
+            notations.append(mxGlissando)
+
+        # These add to Ornaments...
+        
+        for su in sb.getByClass('TremoloSpanner'):
+            mxTrem = Element('tremolo')
+            mxTrem.text = str(su.numberOfMarks)
+            if su.isFirst(obj):
+                mxTrem.set('type', 'start')
+            elif su.isLast(obj):
+                mxTrem.set('type', 'stop')
+            else:
+                # this is always an error for tremolos
+                environLocal.printDebug(['spanner w/ a component that is neither a start nor an end.', su, obj])
+            if su.placement is not None:
+                mxTrem.set('placement', str(su.placement))
+            # Tremolos get in a separate ornaments tag...
+            ornaments.append(mxTrem)
+
+        for su in sb.getByClass('TrillExtension'):
+            mxWavyLine = Element('wavy-line')
+            mxWavyLine.set('number', str(su.idLocal))
+            # is this note first in this spanner?
+            if su.isFirst(obj):
+                mxWavyLine.set('type', 'start')
+            elif su.isLast(obj):
+                mxWavyLine.set('type', 'stop')
+            else:
+                continue # do not put a wavy-line tag on mid-trill notes
+            if su.placement is not None:
+                mxWavyLine.set('placement', su.placement)
+            ornaments.append(mxWavyLine)
+
+
+
+        if len(ornaments) > 0:
+            mxOrn = Element('ornaments')
+            for orn in ornaments:
+                mxOrn.append(orn)
+            notations.append(mxOrn)
+
+        return notations
 
     def noteToXml(self, n, addChordTag=False):
         '''
@@ -949,8 +1120,25 @@ class MeasureExporter(XMLExporterBase):
         # TODO: play
         self.xmlRoot.append(mxNote)
         return mxNote
+
+    def restToXml(self, r):
+        pass
+
+    def chordToXml(self, c):
+        pass
+
             
     def durationXml(self, dur):
+        '''
+        Convert a duration.Duration object to a <duration> tag using self.currentDivisions
+        
+        >>> d = duration.Duration(1.5)
+        >>> MEX = musicxml.m21ToXML.MeasureExporter()
+        >>> MEX.currentDivisions = 10
+        >>> mxDuration = MEX.durationXml(d)
+        >>> MEX.dump(mxDuration)
+        <duration>15</duration>
+        '''
         mxDuration = Element('duration')
         mxDuration.text = str(int(self.currentDivisions * dur.quarterLength))
         return mxDuration
@@ -1025,15 +1213,20 @@ class MeasureExporter(XMLExporterBase):
                     mxArticulations = Element('articulations')
                 mxArticulations.append(self.articulationToXmlArticulation(artObj))
         
-        # TODO: attrGroup: print-object
-        # TODO: editorial (hard!)
+        # TODO: attrGroup: print-object (for individual notations)
+        # TODO: editorial (hard! -- requires parsing again in order...)
         
-        # TODO: tied
-        # TODO: slur
+        # <tied>
+        if n.tie is not None:
+            tiedList = self.tieToXmlTied(n.tie)
+            notations.extend(tiedList)
+        # <tuplet>
         for tup in n.duration.tuplets:
             tupTagList = self.tupletToXmlTuplet(tup)
             notations.extend(tupTagList)
-            
+
+        notations.extend(self.objectAttachedSpannersToNotations(n))
+        # TODO: slur            
         # TDOO: glissando
         # TODO: slide
                 
@@ -1050,6 +1243,47 @@ class MeasureExporter(XMLExporterBase):
         # TODO: other-notation
         
         return notations
+
+    def tieToXmlTied(self, t):
+        '''
+        In musicxml, a tie is represented in sound
+        by the tie tag (near the pitch object), and
+        the <tied> tag in notations.  This
+        creates the <tied> tag.
+        
+        Returns a list since a music21
+        "continue" tie type needs two tags
+        in musicxml.  List may be empty
+        if tie.style == "hidden"
+        '''
+        if t.style == 'hidden':
+            return []
+
+        mxTiedList = []
+        if t.type == 'continue':
+            musicxmlTieType = 'stop'
+        else:
+            musicxmlTieType = t.type
+        
+        mxTied = Element('tied')
+        mxTied.set('type', musicxmlTieType)
+        mxTiedList.append(mxTied)
+        
+        if t.type == 'continue':            
+            mxTied = Element('tied')
+            mxTied.set('type', 'stop')
+            mxTiedList.append(mxTied)
+        
+        # TODO: attr: number (distinguishing ties on enharmonics)
+        # TODO: attrGroup: line-type
+        # TODO: attrGroup: dashed-formatting
+        # TODO: attrGroup: position
+        # TODO: attrGroup: placement
+        # TODO: attrGroup: orientation
+        # TODO: attrGroup: bezier
+        # TODO: attrGroup: color
+        
+        return mxTiedList
 
     def tupletToXmlTuplet(self, tuplet):
         '''
@@ -1077,6 +1311,12 @@ class MeasureExporter(XMLExporterBase):
             localType = [tuplet.type] # place in list
 
         retList = []
+        
+        # TODO: tuplet-actual different from time-modification
+        # TODO: tuplet-normal
+        # TODO: attr: show-type
+        # TODO: attrGroup: position
+        
         for tupletType in localType:
             mxTuplet = Element('tuplet')
             mxTuplet.set('type', tupletType)
@@ -1203,13 +1443,8 @@ class MeasureExporter(XMLExporterBase):
         #mxArticulations.append(mxArticulationMark)
         return mxTechnicalMark
     
-    def chordToXml(self, c):
-        pass
     
     def chordSymbolToXml(self, cs):
-        pass
-    
-    def restToXml(self, r):
         pass
     
     def dynamicToXml(self, dyn):
@@ -1756,11 +1991,11 @@ class MeasureExporter(XMLExporterBase):
             return
 
         m = self.stream()
-        self.offsetStart = m.getOffsetBySite(self.parent.stream)
+        self.measureOffsetStart = m.getOffsetBySite(self.parent.stream)
 
         instSubStream = self.parent.instrumentStream.getElementsByOffset(
-                    self.offsetStart,
-                    self.offsetStart + m.duration.quarterLength,
+                    self.measureOffsetStart,
+                    self.measureOffsetStart + m.duration.quarterLength,
                     includeEndBoundary=False)        
         if len(instSubStream) == 0:
             return
