@@ -1211,7 +1211,7 @@ class MeasureExporter(XMLExporterBase):
         if voiceId is not None:
             mxBackup = Element('backup')
             mxDuration = SubElement(mxBackup, 'duration')
-            mxDuration.text = str(round(divisions * self.offsetInMeasure))
+            mxDuration.text = str(int(round(divisions * self.offsetInMeasure)))
             # TODO: editorial
             root.append(mxBackup)
         self.currentVoiceId = None
@@ -1626,7 +1626,7 @@ class MeasureExporter(XMLExporterBase):
         <duration>15</duration>
         '''
         mxDuration = Element('duration')
-        mxDuration.text = str(round(self.currentDivisions * dur.quarterLength))
+        mxDuration.text = str(int(round(self.currentDivisions * dur.quarterLength)))
         return mxDuration
     
     def pitchToXml(self, p):
