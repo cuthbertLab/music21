@@ -761,6 +761,9 @@ class Contributor(object):
     # !!!LOR: Orchestrator.
     # !!!TRN: Translator of text.
 
+
+    # TODO: add editor...
+
     roleAbbreviationsDict = {
         'com': 'composer',
         'coa': 'attributedComposer',

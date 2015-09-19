@@ -546,7 +546,8 @@ class ScoreExporter(XMLExporterBase):
         self.postPartProcess()
         
         # clean up for circular references.
-        self.partExporterList.clear()
+        # self.partExporterList.clear() # PY3 only
+        del self.partExporterList[:]
         
         return self.xmlRoot
 
@@ -722,7 +723,7 @@ class ScoreExporter(XMLExporterBase):
         <music21.musicxml.m21ToXml.PartExporter object at 0x...>
         >>> SX.dump(SX.partExporterList[0].xmlRoot)
         <part id="..."><measure number="1">...</measure></part>
-        >>> SX.partExporterList.clear() # for garbage collection
+        >>> del SX.partExporterList[:] # for garbage collection
         '''
         s = self.stream
         pp = PartExporter(s, parent=self)
@@ -1038,6 +1039,32 @@ class ScoreExporter(XMLExporterBase):
 
 
     def setIdentification(self):
+        '''
+        Returns an identification object from self.scoreMetadata.  And appends to the score...
+        
+        For defaults:
+        
+        >>> SX = musicxml.m21ToXml.ScoreExporter()
+        >>> mxIdentification = SX.setIdentification()
+        >>> SX.dump(mxIdentification)
+        <identification><creator 
+            type="composer">Music21</creator><encoding><encoding-date>...</encoding-date><software>Music21</software></encoding></identification>
+        
+        More realistic:
+        
+        >>> md = metadata.Metadata()
+        >>> md.composer = 'Francesca Caccini'
+        >>> c = metadata.Contributor(role='arranger', name='Aliyah Shanti')
+        >>> md.addContributor(c)
+        
+        >>> SX = musicxml.m21ToXml.ScoreExporter()  # need a fresh one... otherwise appends to existing.
+        >>> SX.scoreMetadata = md
+        >>> mxIdentification = SX.setIdentification()
+        >>> SX.dump(mxIdentification)
+        <identification><creator 
+            type="composer">Francesca Caccini</creator><creator 
+            type="arranger">Aliyah Shanti</creator><encoding>...</encoding></identification>
+        '''
         if self.mxIdentification is not None:
             mxId = self.mxIdentification
         else:
@@ -1061,12 +1088,27 @@ class ScoreExporter(XMLExporterBase):
         # TODO: source
         # TODO: relation
         # TODO: miscellaneous
+        return mxId
         
         
     def setEncoding(self):
-        mxEncoding = SubElement(self.mxIdentification, 'encoding')
+        '''
+        Returns an encoding object that might have information about <supports> also.
+        and appends to mxIdentification (if any)
+        
+        Will use the date of generation as encoding-date.
+        
+        >>> SX = musicxml.m21ToXml.ScoreExporter()
+        >>> mxEncoding = SX.setEncoding()
+        >>> SX.dump(mxEncoding)
+        <encoding><encoding-date>...</encoding-date><software>Music21</software></encoding>
 
-        # TODO: uncomment this when all is perfect...like old toMxObjects
+        Encoding-date is in YYYY-MM-DD format.
+        '''
+        if self.mxIdentification is not None:
+            mxEncoding = SubElement(self.mxIdentification, 'encoding')
+        else:
+            mxEncoding = Element('encoding')
 
         mxEncodingDate = SubElement(mxEncoding, 'encoding-date')
         mxEncodingDate.text = str(datetime.date.today()) # right format...
@@ -1075,15 +1117,32 @@ class ScoreExporter(XMLExporterBase):
         mxSoftware.text = defaults.software
 
         # TODO: encoding-description
-        mxSupportsList = self.setSupports()
+        mxSupportsList = self.getSupports()
         for mxSupports in mxSupportsList:
             mxEncoding.append(mxSupports)
         
-    def setSupports(self):
-        '''
-        return a list of <supports> tags  for what this supports.
+        return mxEncoding # for testing...
         
-        Currently just 
+    def getSupports(self):
+        '''
+        return a list of <supports> tags  for what this supports.  Does not append
+        
+        Currently just supports new-system and new-page if s.definesExplicitSystemBreaks
+        and s.definesExplicitPageBreaks is True.
+        
+        >>> SX = musicxml.m21ToXml.ScoreExporter()
+        >>> SX.getSupports()
+        []
+        >>> SX.stream.definesExplicitSystemBreaks = True
+        >>> SX.getSupports()
+        [<Element 'supports' at 0x...>]
+        >>> SX.dump(SX.getSupports()[0])
+        <supports attribute="new-system" element="print" type="yes" value="yes" />
+        
+        >>> SX.stream.definesExplicitPageBreaks = True
+        >>> SX.dump(SX.getSupports()[1])
+        <supports attribute="new-page" element="print" type="yes" value="yes" />
+        
         '''
         def getSupport(attribute, type, value, element): # @ReservedAssignment
             su = Element('supports')
@@ -1105,7 +1164,7 @@ class ScoreExporter(XMLExporterBase):
 
     def setTitles(self):
         '''
-        puts work, movement-number, movement-title into the self.xmlRoot
+        puts work (with work-title), movement-number, movement-title into the self.xmlRoot
         '''
         mdObj = self.scoreMetadata
         if self.scoreMetadata is None:
