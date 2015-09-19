@@ -626,8 +626,8 @@ class GeneralNote(base.Music21Object):
             return None
 
     #---------------------------------------------------------------------------
-    def getGrace(self, appogiatura=False):
-        '''Return a grace version of this NotRest
+    def getGrace(self, appogiatura=False, inPlace=False):
+        '''Return a grace version of this GeneralNote
 
 
         >>> n = note.Note('G4', quarterLength=2)
@@ -635,21 +635,50 @@ class GeneralNote(base.Music21Object):
         2.0
         >>> n.isGrace
         False
+        >>> n.duration
+        <music21.duration.Duration 2.0>
+        >>> n.duration.type
+        'half'
+        >>> n.duration.components
+        [DurationTuple(type='half', dots=0, quarterLength=2.0)]
+        
         >>> ng = n.getGrace()
         >>> ng.duration.quarterLength
         0.0
         >>> ng.isGrace
         True
+        >>> ng.duration
+        <music21.duration.GraceDuration unlinked type:zero quarterLength:0.0>
+        >>> ng.duration.type
+        'zero'
+        >>> ng.duration.components
+        [DurationTuple(type='half', dots=0, quarterLength=0.0)]
 
-        >>> ng = n.getGrace(appogiatura=True)
-        >>> ng.duration.slash
+        Appogiaturas are still a work in progress...
+
+        >>> ng2 = n.getGrace(appogiatura=True)
+        >>> ng2.duration
+        <music21.duration.AppogiaturaDuration unlinked type:zero quarterLength:0.0>
+        >>> ng2.duration.slash
         False
+        
+        Set inPlace to True to change the duration element on the Note.  This can have
+        negative consequences if the Note is in a stream.
+        
+        >>> r = note.Rest(quarterLength = .5)
+        >>> r.getGrace(inPlace=True)
+        >>> r.duration
+        <music21.duration.GraceDuration unlinked type:zero quarterLength:0.0>
         '''
-        # NOTE: this means that we can not have grace rests
-        # move this to GeneralNote to permit grace rests
-        e = copy.deepcopy(self)
+        if inPlace is False:
+            e = copy.deepcopy(self)
+        else:
+            e = self
+            
         e.duration = e.duration.getGraceDuration(appogiatura=appogiatura)
-        return e
+        
+        if inPlace is False:
+            return e
 
 
 #-------------------------------------------------------------------------------

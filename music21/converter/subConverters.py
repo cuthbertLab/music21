@@ -585,7 +585,7 @@ class ConverterNoteworthyBinary(SubConverter):
 
 #-------------------------------------------------------------------------------
 class ConverterMusicXMLET(SubConverter):
-    '''Converter for MusicXML
+    '''Converter for MusicXML using the new ElementTree system
     '''
     registerFormats = ('musicxml','xml')
     registerInputExtensions = ('xml', 'mxl', 'mx', 'musicxml')
@@ -667,8 +667,20 @@ class ConverterMusicXMLET(SubConverter):
         #common.cropImageFromPath(fp)       
         return fp
     
+    def writeDataStream(self, fp, dataBytes):
+        if fp is None:
+            fp = self.getTemporaryFile()
+        
+        writeFlags = 'wb'
+
+        with open(fp, writeFlags) as f:
+            f.write(dataBytes)
+            
+        return fp
+
+    
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):
-        from music21.musicxml import m21ToString
+        from music21.musicxml import m21ToXml
         ### hack to make musescore excerpts -- fix with a converter class in MusicXML
         if subformats is not None and 'png' in subformats:
             savedDefaultTitle = defaults.title
@@ -676,8 +688,9 @@ class ConverterMusicXMLET(SubConverter):
             defaults.title = ''
             defaults.author = ''
 
-        dataStr = m21ToString.fromMusic21Object(obj)
-        fp = self.writeDataStream(fp, dataStr)
+        generalExporter = m21ToXml.GeneralObjectExporter(obj)
+        dataBytes = generalExporter.parse()
+        fp = self.writeDataStream(fp, dataBytes)
 
         if subformats is not None and 'png' in subformats:
             defaults.title = savedDefaultTitle
@@ -703,7 +716,7 @@ class ConverterMusicXML(SubConverter):
     '''
     registerFormats = ('oldmusicxml','oldxml')
     registerInputExtensions = ('oldxml', 'oldmxl', 'oldmx', 'oldmusicxml')
-    registerOutputExtensions = ('oldxml', 'oldmxl')
+    registerOutputExtensions = ('xml', 'mxl')
     
     def __init__(self):
         self._mxScore = None # store the musicxml object representation

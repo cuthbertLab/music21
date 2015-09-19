@@ -26,16 +26,16 @@ from music21.ext import webcolors, six
 
 if six.PY3:
     import xml.etree.ElementTree as ET  # @UnusedImport
-    from xml.etree.ElementTree import Element, SubElement # @UnusedImport
+    from xml.etree.ElementTree import Element, SubElement, ElementTree # @UnusedImport
 
 else:
     try:
         import xml.etree.cElementTree as ET
-        from xml.etree.cElementTree import Element, SubElement
+        from xml.etree.cElementTree import Element, SubElement, ElementTree
  
     except ImportError:
         import xml.etree.ElementTree as ET # @UnusedImport
-        from xml.etree.ElementTree import Element, SubElement
+        from xml.etree.ElementTree import Element, SubElement, ElementTree
 
 
 # modules that import this include converter.py.
@@ -259,6 +259,260 @@ def _setAttributeFromAttribute(m21El, xmlEl, xmlAttributeName, attributeName=Non
     xmlEl.set(xmlAttributeName, str(value))
 
 
+class GeneralObjectExporter():
+    classMapping = OrderedDict([
+        ('Measure', 'fromMeasure'),
+        ('Stream', 'fromScore'),
+        ('GeneralNote', 'fromGeneralNote'),
+        ('Pitch', 'fromPitch'),
+        ('Duration', 'fromDuration'), # not an m21 object
+        ('Dynamic', 'fromDynamic'),
+        ('DiatonicScale', 'fromDiatonicScale'),
+        ('Scale', 'fromScale'),
+        ('TimeSignature', 'fromTimeSignature'),
+    ])
+    
+    def __init__(self, obj=None):
+        self.generalObj = obj
+        
+    def parse(self):
+        r'''
+        return a bytes object representation of anything from a 
+        Score to a single pitch.
+        
+        >>> p = pitch.Pitch('D#4')
+        >>> GEX = musicxml.m21ToXml.GeneralObjectExporter(p)
+        >>> out = GEX.parse() # out is bytes in Py3, str in Py2
+        >>> outStr = out.decode('utf-8') # will be unicode in Py2
+        >>> print(outStr.strip())
+        <?xml version="1.0" encoding="utf-8"?>
+        <!DOCTYPE score-partwise
+          PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
+          'http://www.musicxml.org/dtds/partwise.dtd'>
+        <score-partwise>
+          <movement-title>Music21 Fragment</movement-title>
+          <identification>
+            <creator type="composer">Music21</creator>
+            <encoding>
+              <encoding-date>...</encoding-date>
+              <software>Music21</software>
+            </encoding>
+          </identification>
+          <defaults>
+            <scaling>
+              <millimeters>7</millimeters>
+              <tenths>40</tenths>
+            </scaling>
+          </defaults>
+          <part-list>
+            <score-part id="...">
+              <part-name />
+            </score-part>
+          </part-list>
+          <part id="...">
+            <measure number="1">
+              <attributes>
+                <divisions>10080</divisions>
+                <time>
+                  <beats>1</beats>
+                  <beat-type>4</beat-type>
+                </time>
+              </attributes>
+              <note>
+                <pitch>
+                  <step>D</step>
+                  <alter>1</alter>
+                  <octave>4</octave>
+                </pitch>
+                <duration>10080</duration>
+                <type>quarter</type>
+                <accidental>sharp</accidental>
+              </note>
+            </measure>
+          </part>
+        </score-partwise>
+        '''
+        outObj = self.fromGeneralObject(self.generalObj)
+        scoreExporter = ScoreExporter(outObj)
+        scoreExporter.parse()
+        return scoreExporter.asBytes()
+
+    def fromGeneralObject(self, obj):
+        '''
+        Converts any Music21Object (or a duration or a pitch) to something that
+        can be passed to ScoreExporter()
+        
+        >>> GEX = musicxml.m21ToXml.GeneralObjectExporter()
+        >>> s = GEX.fromGeneralObject(duration.Duration(3.0))
+        >>> s
+        <music21.stream.Score 0x...>
+        >>> s.show('t')
+        {0.0} <music21.stream.Part 0x...>
+            {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.meter.TimeSignature 6/8>
+                {0.0} <music21.note.Note C>
+        >>> s.flat.notes[0].duration
+        <music21.duration.Duration 3.0>
+        '''
+        classes = obj.classes
+        outObj = None
+        for cM, methName in self.classMapping.items():
+            if cM in classes:
+                meth = getattr(self, methName)
+                outObj = meth(obj)
+                break
+        if outObj is None:
+            raise ToMxObjectsException("Cannot translate the object %s to a complete musicXML document; put it in a Stream first!" % self.generalObj)
+        return outObj
+
+
+    def fromScore(self, streamObject):
+        '''
+        the best one of all -- a perfectly made Score (or something like that)
+        '''
+        post = copy.deepcopy(streamObject)
+        post.makeImmutable()
+        return post
+
+    def fromMeasure(self, m):
+        '''
+        Translate a music21 Measure into a 
+        complete MusicXML string representation.
+    
+        Note: this method is called for complete MusicXML 
+        representation of a Measure, not for partial 
+        solutions in Part or Stream production.
+        '''
+        m.makeNotation(inPlace=True)    
+       
+        out = stream.Score()
+        p = stream.Part()
+        p.append(m)
+        out.append(p)
+        return out
+    
+    
+    def fromDuration(self, d):
+        '''
+        Translate a music21 :class:`~music21.duration.Duration` into 
+        a complete MusicXML representation.
+        
+        Rarely rarely used.  Only if you call .show() on a duration object        
+        '''
+        # make a copy, as we this process will change tuple types
+        # not needed, since fromGeneralNote does it too.  but so
+        # rarely used, it doesn't matter, and the extra safety is nice.
+        dCopy = copy.deepcopy(d)
+        n = note.Note()
+        n.duration = dCopy
+        # call the musicxml property on Stream
+        return self.fromGeneralNote(n)
+    
+    def fromDynamic(self, dynamicObject):
+        '''
+        Provide a complete MusicXML string from a single dynamic by
+        putting it into a Stream first.
+        '''
+        dCopy = copy.deepcopy(dynamicObject)
+        out = stream.Stream()
+        out.append(dCopy)
+        # call the musicxml property on Stream
+        return self.fromStream(out)
+     
+    def fromScale(self, scaleObject):
+        '''
+        Generate the pitches from this scale
+        and put it into a stream.Measure, then call 
+        fromMeasure on it
+        '''
+        m = stream.Measure(number=1)
+        for i in range(1, scaleObject._abstract.getDegreeMaxUnique()+1):
+            p = scaleObject.pitchFromDegree(i)
+            n = note.Note()
+            n.pitch = p
+            if i == 1:
+                n.addLyric(scaleObject.name)
+    
+            if p.name == scaleObject.getTonic().name:
+                n.quarterLength = 4 # set longer
+            else:
+                n.quarterLength = 1
+            m.append(n)
+        m.timeSignature = m.bestTimeSignature()
+        return self.fromMeasure(m)
+    
+    def fromDiatonicScale(self, diatonicScaleObject):
+        '''
+        Return a complete musicxml of the DiatonicScale
+    
+        Overrides the general scale behavior to highlight
+        the tonic and dominant.
+        '''
+        m = stream.Measure(number=1)
+        for i in range(1, diatonicScaleObject._abstract.getDegreeMaxUnique()+1):
+            p = diatonicScaleObject.pitchFromDegree(i)
+            n = note.Note()
+            n.pitch = p
+            if i == 1:
+                n.addLyric(diatonicScaleObject.name)
+    
+            if p.name == diatonicScaleObject.getTonic().name:
+                n.quarterLength = 4 # set longer
+            elif p.name == diatonicScaleObject.getDominant().name:
+                n.quarterLength = 2 # set longer
+            else:
+                n.quarterLength = 1
+            m.append(n)
+        m.timeSignature = m.bestTimeSignature()
+        return self.fromMeasure(m)
+    
+    def fromTimeSignature(self, ts):
+        '''
+        return a single TimeSignature as a musicxml document
+        '''
+        
+        # return a complete musicxml representation
+        tsCopy = copy.deepcopy(ts)
+    #         m = stream.Measure()
+    #         m.timeSignature = tsCopy
+    #         m.append(note.Rest())
+        out = stream.Measure(number=1)
+        out.append(tsCopy)
+        return self.fromMeasure(out)
+    
+    def fromGeneralNote(self, n):
+        '''
+        Translate a music21 :class:`~music21.note.Note` into a 
+        complete MusicXML representation.
+    
+        
+        >>> n = note.Note('c3')
+        >>> n.quarterLength = 3
+        >>> post = musicxml.m21ToString.fromGeneralNote(n)
+        >>> #print post
+        
+        '''
+        # make a copy, as this process will change tuple types
+        # this method is called infrequently, and only for display of a single 
+        # note
+        nCopy = copy.deepcopy(n)
+        
+        # modifies in place
+        stream.makeNotation.makeTupletBrackets([nCopy.duration], inPlace=True) 
+        out = stream.Measure(number=1)
+        out.append(nCopy)
+    
+        # call the musicxml property on Stream
+        return self.fromMeasure(out)
+    
+    def fromPitch(self, p):
+        n = note.Note()
+        n.pitch = copy.deepcopy(p)
+        out = stream.Measure(number=1)
+        out.append(n)
+        # call the musicxml property on Stream
+        return self.fromMeasure(out)
+
 
 class XMLExporterBase(object):
     '''
@@ -267,8 +521,27 @@ class XMLExporterBase(object):
     '''
     
     def __init__(self):
-        pass
-    
+        self.xmlRoot = None
+
+    def asBytes(self, noCopy=True):
+        '''
+        returns the xmlRoot as a bytes object (str in Py2). If noCopy is True
+        (default), modifies the file for pretty-printing in place.  Otherwise, 
+        make a copy.
+        '''
+        sio = six.BytesIO()
+        sio.write(self.xmlHeader())
+        rootObj = self.xmlRoot
+        if noCopy is False:
+            rootObj = copy.deepcopy(rootObj)
+        self.indent(rootObj)
+        et = ElementTree(rootObj)
+        et.write(sio, encoding="utf-8", xml_declaration=False)
+        v = sio.getvalue()
+        sio.close()
+        return v
+
+    #-------------------------------------------------------------------------------
     def dump(self, obj):
         r'''
         wrapper around xml.etree.ElementTree as ET that returns a string
@@ -297,8 +570,7 @@ class XMLExporterBase(object):
             xStr = ET.tostring(xmlEl, encoding='unicode')
         xStr = xStr.rstrip()
         print(xStr)
-        
-    #-------------------------------------------------------------------------------
+    
     def indent(self, elem, level=0):
         '''
         helper method, indent an element in place:
@@ -542,7 +814,8 @@ class XMLExporterBase(object):
         setb(staffLayout, mxStaffLayout, 'number', 'staffNumber')
 
         if mxStaffLayoutIn is None:
-            return mxStaffLayout
+            return mxStaffLayout        
+        
 
 #----------
 
@@ -2034,10 +2307,17 @@ class MeasureExporter(XMLExporterBase):
             mxType = Element('type')
             mxType.text = typeToMusicXMLType(n.duration.type)
             mxNote.append(mxType)
+            for _ in range(n.duration.dots):
+                SubElement(mxNote, 'dot')
+                # TODO: dot placement...
+
+        elif len(n.duration.components) > 0:
+            mxType = Element('type')
+            mxType.text = typeToMusicXMLType(n.duration.components[0].type)
+            mxNote.append(mxType)
+            for _ in range(n.duration.components[0].dots):
+                SubElement(mxNote, 'dot')
         
-        for _ in range(n.duration.dots):
-            SubElement(mxNote, 'dot')
-            # TODO: dot placement...
         if (hasattr(n, 'pitch') and 
                 n.pitch.accidental is not None and 
                 n.pitch.accidental.displayStatus in (True, None)):
@@ -2861,7 +3141,7 @@ class MeasureExporter(XMLExporterBase):
         if (m21Obj is not None and 
                 hasattr(m21Obj, '_positionPlacement') and 
                 m21Obj._positionPlacement is not None):
-            mxDirectionType.set('placement', m21Obj._positionPlacement)
+            mxDirection.set('placement', m21Obj._positionPlacement)
                 
         return mxDirection
     
@@ -3107,7 +3387,7 @@ class MeasureExporter(XMLExporterBase):
             if len(numbers) > 0:
                 if not hideNumber[i]:
                     mxPerMinute = SubElement(mxMetro, 'per-minute') # TODO: font.
-                    mxPerMinute.text = str(numbers[0])
+                    mxPerMinute.text = str(common.numToIntOrFloat(numbers[0]))
 
         if ti.parentheses:
             mxMetro.set('parentheses', 'yes') # only attribute
@@ -3117,8 +3397,7 @@ class MeasureExporter(XMLExporterBase):
         mxDirection = self.placeInDirection(mxMetro, ti)
         if soundingQuarterBPM is not None:
             mxSound = SubElement(mxDirection, 'sound')
-            mxSoundDynamics = SubElement(mxSound, 'tempo')
-            mxSoundDynamics.text = str(soundingQuarterBPM)
+            mxSound.set('tempo', str(common.numToIntOrFloat(soundingQuarterBPM)))
         
         if hideNumericalMetro is not None:
             self.xmlRoot.append(mxDirection)
@@ -3858,10 +4137,10 @@ class TestExternal(unittest.TestCase):
         
         sio = six.BytesIO()
         
-        et = ElementTree(mxScore)
         sio.write(SX.xmlHeader())
-        et.write('/Users/Cuthbert/Desktop/s.xml', encoding="utf-8", xml_declaration=True)
+        et = ElementTree(mxScore)
         et.write(sio, encoding="utf-8", xml_declaration=False)
+        et.write('/Users/Cuthbert/Desktop/s.xml', encoding="utf-8", xml_declaration=True)
         v = sio.getvalue()
         sio.close()
 

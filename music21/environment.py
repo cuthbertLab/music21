@@ -534,7 +534,7 @@ class _EnvironmentCore(object):
             environmentKey = 'vectorPath'
         elif m21Format == 'pdf':
             environmentKey = 'pdfPath'
-        elif m21Format == 'musicxml':
+        elif m21Format in ('musicxml', 'oldmusicxml'):
             environmentKey = 'musicxmlPath'
         elif m21Format == 'midi':
             environmentKey = 'midiPath'

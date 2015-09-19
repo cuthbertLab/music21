@@ -1462,9 +1462,10 @@ class Duration(SlottedObject):
 
     def __repr__(self):
         if self.linked is True:
-            return '<music21.duration.Duration %s>' % self.quarterLength
+            return '<{0}.{1} {2}>'.format(self.__module__, self.__class__.__name__, self.quarterLength)
         else:
-            return '<music21.duration.Duration unlinked type:%s quarterLength:%s>' % (self.type, self.quarterLength)
+            return '<{0}.{1} unlinked type:{2} quarterLength:{3}>'.format(
+                        self.__module__, self.__class__.__name__, self.type, self.quarterLength)
 
     ### PRIVATE METHODS ###
 
@@ -1808,19 +1809,31 @@ class Duration(SlottedObject):
         Return a deepcopy of this Duration as a GraceDuration instance with the same types.
 
         >>> d = duration.Duration(1.25)
+        >>> d
+        <music21.duration.Duration 1.25>
+        >>> d.components
+        [DurationTuple(type='quarter', dots=0, quarterLength=1.0), DurationTuple(type='16th', dots=0, quarterLength=0.25)]
+
         >>> gd = d.getGraceDuration()
+        >>> gd
+        <music21.duration.GraceDuration unlinked type:zero quarterLength:0.0>
         >>> gd.quarterLength
         0.0
-        >>> [(x.quarterLength, x.type) for x in gd.components]
-        [(0.0, 'quarter'), (0.0, '16th')]
+        >>> gd.components
+        [DurationTuple(type='quarter', dots=0, quarterLength=0.0), DurationTuple(type='16th', dots=0, quarterLength=0.0)]
+
+        D is unchanged.
+
         >>> d.quarterLength
         1.25
+        
+        
         '''
         if self._componentsNeedUpdating:
             self._updateComponents()
 
         # create grace duration
-        if appogiatura:
+        if appogiatura is True:
             gd = AppogiaturaDuration()
         else:
             gd = GraceDuration()
