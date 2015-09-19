@@ -664,6 +664,10 @@ class MetronomeMark(TempoIndication):
         <music21.tempo.MetronomeMark larghetto Eighth=120.0>
         >>> mm1.getEquivalentByReferent(duration.Duration('half'))
         <music21.tempo.MetronomeMark larghetto Half=30.0>
+
+        >>> mm1.getEquivalentByReferent('longa')
+        <music21.tempo.MetronomeMark larghetto Imperfect Longa=3.75>        
+
         '''
         if common.isNum(referent): # assume quarter length
             quarterLength = referent 
@@ -672,9 +676,12 @@ class MetronomeMark(TempoIndication):
             quarterLength = d.quarterLength
         else: # TODO: test if a Duration
             quarterLength = referent.quarterLength
-            
-        newNumber = convertTempoByReferent(self.number, 
+        
+        if self.number is not None:
+            newNumber = convertTempoByReferent(self.number, 
                         self.referent.quarterLength, quarterLength)
+        else:
+            newNumber = None
 
         return MetronomeMark(text=self.text, number=newNumber, 
                              referent=duration.Duration(quarterLength))
@@ -762,14 +769,19 @@ class MetricModulationException(TempoException):
 
 #-------------------------------------------------------------------------------
 class MetricModulation(TempoIndication):
-    '''A class for representing the relationship between two MetronomeMarks. Generally this relationship is one of equality, where the number is maintained but the referent that number is applied to changes. 
+    '''A class for representing the relationship between two MetronomeMarks. 
+    Generally this relationship is one of equality, where the number is maintained but 
+    the referent that number is applied to changes. 
 
-    The basic definition of a MetricModulation is given by supplying two MetronomeMarks, one for the oldMetronome, the other for the newMetronome. High level properties, oldReferent and newReferent, and convenience methods permit only setting the referent. 
+    The basic definition of a MetricModulation is given by supplying two MetronomeMarks, 
+    one for the oldMetronome, the other for the newMetronome. High level properties, 
+    oldReferent and newReferent, and convenience methods permit only setting the referent. 
 
-    The `classicalStyle` attribute determines of the first MetronomeMark describes the new tempo, not the old (the reverse of expected usage).
+    The `classicalStyle` attribute determines of the first MetronomeMark describes the 
+    new tempo, not the old (the reverse of expected usage).
 
-    The `maintainBeat` attribute determines if, after an equality statement, the beat is maintained. This is relevant for moving from 3/4 to 6/8, for example. 
-
+    The `maintainBeat` attribute determines if, after an equality statement, 
+    the beat is maintained. This is relevant for moving from 3/4 to 6/8, for example. 
     
     >>> s = stream.Stream()
     >>> mm1 = tempo.MetronomeMark(number=60)
@@ -795,7 +807,30 @@ class MetricModulation(TempoIndication):
     >>> mmod2.newMetronome
     <music21.tempo.MetronomeMark animato Quarter=80.0>
 
-    >>> s.repeatAppend(note.Note(), 4)
+
+    Note that an initial metric modulation can set old and new referents and get None as
+    tempo numbers...
+    
+    >>> mmod3 = tempo.MetricModulation()
+    >>> mmod3.oldReferent = 'half'
+    >>> mmod3.newReferent = '16th'
+    >>> mmod3
+    <music21.tempo.MetricModulation <music21.tempo.MetronomeMark Half=None>=<music21.tempo.MetronomeMark 16th=None>>
+    
+    test w/ more sane referents that either the old or the new can change without a tempo number
+
+    >>> mmod3.oldReferent = 'quarter'
+    >>> mmod3.newReferent = 'eighth'
+    >>> mmod3
+    <music21.tempo.MetricModulation <music21.tempo.MetronomeMark Quarter=None>=<music21.tempo.MetronomeMark Eighth=None>>
+    >>> mmod3.oldMetronome
+    <music21.tempo.MetronomeMark Quarter=None>
+    >>> mmod3.oldMetronome.number = 60
+
+    New number automatically updates...
+
+    >>> mmod3
+    <music21.tempo.MetricModulation <music21.tempo.MetronomeMark larghetto Quarter=60>=<music21.tempo.MetronomeMark larghetto Eighth=60>>
 
     '''
     def __init__(self):
@@ -815,7 +850,7 @@ class MetricModulation(TempoIndication):
         self._newMetronome = None
 
     def __repr__(self):
-        return "<music21.tempo.MetricModulation %s=%s>" % (self._oldMetronome, self._newMetronome)
+        return "<music21.tempo.MetricModulation %s=%s>" % (self.oldMetronome, self.newMetronome)
 
 
     #---------------------------------------------------------------------------
@@ -1306,8 +1341,8 @@ class Test(unittest.TestCase):
         mmod1.oldMetronome = mm1
         mmod1.newMetronome = mm2
         
-        # this works, but the new value is set to None
-        self.assertEqual(str(mmod1), '<music21.tempo.MetricModulation <music21.tempo.MetronomeMark animato Eighth=120>=<music21.tempo.MetronomeMark 16th=None>>')
+        # this works, and new value is updated...
+        self.assertEqual(str(mmod1), '<music21.tempo.MetricModulation <music21.tempo.MetronomeMark animato Eighth=120>=<music21.tempo.MetronomeMark animato 16th=120>>')
 
         # we can get the same result by using setEqualityByReferent()
         mm1 = MetronomeMark(referent=.5, number=120)
