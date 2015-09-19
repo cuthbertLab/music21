@@ -3280,9 +3280,7 @@ class MeasureExporter(XMLExporterBase):
               <per-minute>40</per-minute>
             </metronome>
           </direction-type>
-          <sound>
-            <tempo>80.0</tempo>
-          </sound>
+          <sound tempo="80" />
         </direction>
 
         In this case, two directions were added to xmlRoot.  Here is the other one:
@@ -3307,9 +3305,7 @@ class MeasureExporter(XMLExporterBase):
               <per-minute>40</per-minute>
             </metronome>
           </direction-type>
-          <sound>
-            <tempo>60.0</tempo>
-          </sound>
+          <sound tempo="60" />
         </direction>
 
 
