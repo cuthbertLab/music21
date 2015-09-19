@@ -76,7 +76,6 @@ def configureMxPartGroupFromStaffGroup(staffGroup):
 def textBoxToMxCredit(textBox):
     '''
     Convert a music21 TextBox to a MusicXML Credit.
-
     
     >>> tb = text.TextBox('testing')
     >>> tb.positionVertical = 500
@@ -728,7 +727,7 @@ def timeSignatureToMx(ts):
 
 def keySignatureToMx(keySignature):
     '''
-    Returns a musicxml.mxObjects.KeySignature object from a music21
+    Returns a musicxml.mxObjects.Key object from a music21
     key.KeySignature or key.Key object
        
     
@@ -910,8 +909,6 @@ def codaToMx(rm):
 def segnoToMx(rm):
     '''
     Returns a musicxml.mxObjects.Direction object with a musicxml.mxObjects.Segno mark in it
-
-    
     '''
     mxSegno = mxObjects.Segno()
     for src, dst in [(rm._positionDefaultX, 'default-x'),
@@ -1512,9 +1509,6 @@ def expressionToMx(orn):
         mx = mxObjects.Mordent()
     elif 'InvertedMordent' in orn.classes:
         mx = mxObjects.InvertedMordent()
-    elif 'Trill' in orn.classes:
-        mx = mxObjects.TrillMark()
-        mx.set('placement', orn.placement)
     elif 'Turn' in orn.classes:
         mx = mxObjects.Turn()
     elif 'DelayedTurn' in orn.classes:

@@ -189,7 +189,7 @@ def _setAttributeFromTagText(m21El, xmlEl, tag, attributeName=None, transform=No
     it does, set the attribute either with the same name (with "foo-bar" changed to
     "fooBar") or with attributeName to the text contents.
     
-    Pass a function or lambda function as transform to transform the value before setting it
+    Pass a function or lambda function as `transform` to transform the value before setting it
     
     >>> from xml.etree.ElementTree import Element, SubElement
     >>> e = Element('accidental')
@@ -434,6 +434,10 @@ class XMLParserBase(object):
     
 
 class PartGroup():
+    '''
+    Small helper class for keeping track of part-groups from XML since they
+    are converted to StaffGroup spanners much later.
+    '''
     def __init__(self, mxPartGroup):
         self.mxPartGroup = mxPartGroup
         self.partGroupIds = []
@@ -1466,6 +1470,7 @@ class MeasureParser(XMLParserBase):
         # note either does not exist or is not a chord, we 
         # have a complete chord
         if len(self.mxNoteList) > 0 and nextNoteIsChord is False:
+            # TODO: move spanners from first note to Chord.  See slur in m2 of schoenberg/op19 #2
             c = self.xmlToChord(self.mxNoteList)
             # add any accumulated lyrics
             self.updateLyricsFromList(c, self.mxLyricList)
@@ -2304,6 +2309,14 @@ class MeasureParser(XMLParserBase):
         Given an mxNote, based on mxTimeModification 
         and mxTuplet objects, return a Tuplet object
         (or alter the input object and then return it)
+        
+        >>> import xml.etree.ElementTree as ET        
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        
+        >>> mxNote = ET.fromstring('<note><type>16th</type><time-modification><actual-notes>5</actual-notes><normal-notes>4</normal-notes></time-modification></note>')
+        >>> t = MP.xmlToTuplet(mxNote)
+        >>> t
+        <music21.duration.Tuplet 5/4/16th>
         ''' 
         if inputM21 is None:
             t = duration.Tuplet()
@@ -2315,8 +2328,8 @@ class MeasureParser(XMLParserBase):
         mxTimeModification = mxNote.find('time-modification')
         #environLocal.printDebug(['got mxTimeModification', mxTimeModification])
         seta = _setAttributeFromTagText
-        seta(t, mxTimeModification, 'actualNotes', 'numberNotesActual', transform=int)
-        seta(t, mxTimeModification, 'normalNotes', 'numberNotesNormal', transform=int)
+        seta(t, mxTimeModification, 'actual-notes', 'numberNotesActual', transform=int)
+        seta(t, mxTimeModification, 'normal-notes', 'numberNotesNormal', transform=int)
         
         mxNormalType = mxTimeModification.get('normal-type')
         if mxNormalType is not None:
@@ -2661,13 +2674,28 @@ class MeasureParser(XMLParserBase):
         >>> cs.root()
         <music21.pitch.Pitch D-3>  
         '''
+        # TODO: frame
+        # TODO: offset
+        # TODO: editorial
+        # TODO: staff
+        # TODO: attrGroup: print-object
+        # TODO: attr: print-frame
+        # TODO: attrGroup: print-style
+        # TODO: attrGroup: placement
+        
         #environLocal.printDebug(['mxToChordSymbol():', mxHarmony])
         cs = harmony.ChordSymbol()
         seta = _setAttributeFromTagText
 
+        # TODO: root vs. function;  see group "harmony-chord")
         mxRoot = mxHarmony.find('root')
         if mxRoot is not None: # choice: <root> or <function>
-            r = pitch.Pitch(mxRoot.find('root-step').text)
+            mxRS = mxRoot.find('root-step')
+            rootText = mxRS.text
+            if rootText in (None, ""):
+                rootText = mxRS.get('text') # two ways to do it... this should do display even
+                    # if content is supported.
+            r = pitch.Pitch(rootText)
             mxRootAlter =  mxRoot.find('root-alter')
             if mxRootAlter is not None:
                 # can provide integer to create accidental on pitch
@@ -2680,15 +2708,23 @@ class MeasureParser(XMLParserBase):
             
             
         mxKind = mxHarmony.find('kind')
-        if mxKind is not None and mxKind.text is not None:
+        if mxKind is not None and mxKind.text is not None: # two ways of doing it...
             cs.chordKind = mxKind.text.strip()
             mxKindText = mxKind.get('text') # attribute
             if mxKindText is not None:
                 cs.chordKindStr = mxKindText
+        # TODO: attr: use-symbols
+        # TODO: attr: stack-degrees
+        # TODO: attr: parentheses-degrees
+        # TODO: attr: bracket-degrees
+        # TODO: attrGroup: print-style
+        # TODO: attrGroup: halign
+        # TODO: attrGroup: valign
     
         mxInversion = mxHarmony.find('inversion')
         if mxInversion is not None:
             cs.inversion(int(mxInversion.text.strip()), transposeOnSet=False) # must be an int
+        # TODO: print-style
     
         mxBass = mxHarmony.find('bass')
         if mxBass is not None:

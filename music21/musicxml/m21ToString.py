@@ -374,6 +374,7 @@ spirit</words>
         s = corpus.parse('opus74no1', 3)
         raw = fromMusic21Object(s.parts[1])
 
+        # TODO: order of attributes is not assured; allow for either order.
         self.assertEqual(raw.find("""<ending number="1" type="start"/>""") > 1, True)
         self.assertEqual(raw.find("""<ending number="1" type="stop"/>""") > 1, True)
 
@@ -468,6 +469,7 @@ spirit</words>
         # default quarter assumed
         p.insert(0, tempo.MetronomeMark('super fast', number=222.2))
 
+        # TODO: order of attributes is not assured; allow for any order.
         match1 = '<words default-y="45.0" font-weight="bold" justify="left">super fast</words>'
         match2 = '<per-minute>222.2</per-minute>'
         raw = fromMusic21Object(p)
@@ -478,6 +480,7 @@ spirit</words>
         p.repeatAppend(note.Note('g#3'), 8)
         # text does not show when implicit
         p.insert(0, tempo.MetronomeMark(number=132))
+        # TODO: order of attributes is not assured; allow for any order.
         match1 = '<words default-y="45.0" font-weight="bold" justify="left">fast</words>'
         match2 = '<per-minute>132</per-minute>'
         raw = fromMusic21Object(p)
@@ -490,6 +493,7 @@ spirit</words>
         self.assertEqual(mm.number, None)
         p.insert(0, mm)
         # text but no number
+        # TODO: order of attributes is not assured; allow for any order.
         match1 = '<words default-y="45.0" font-weight="bold" justify="left">very slowly</words>'
         match2 = '<per-minute>'
         
@@ -747,6 +751,7 @@ spirit</words>
         self.assertEqual(raw.find(match) > 0, True)
         match = '<group-symbol>bracket</group-symbol>'
         self.assertEqual(raw.find(match) > 0, True)
+        # TODO: order of attributes is not assured; allow for any order.
         match = '<part-group number="1" type="start">'
         self.assertEqual(raw.find(match) > 0, True)
         match = '<part-group number="1" type="stop"/>'

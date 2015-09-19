@@ -10,7 +10,7 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
-
+from collections import OrderedDict
 # these single-entity tags are bundled together. 
 from music21 import articulations
 from music21 import expressions
@@ -38,6 +38,10 @@ ARTICULATION_MARKS = {'accent'       : articulations.Accent,
                    'unstress'        : articulations.Unstress,
                    'other-articulation': articulations.Articulation,
                    }
+ARTICULATION_MARKS_REV = OrderedDict([(v, k) for k, v in ARTICULATION_MARKS.items()])
+del ARTICULATION_MARKS_REV[articulations.Articulation]
+del ARTICULATION_MARKS_REV[articulations.Staccato]
+ARTICULATION_MARKS_REV[articulations.Staccato] = 'staccato' # py3: move_to_end
 
 TECHNICAL_MARKS = {'up-bow'          : articulations.UpBow,
                    'down-bow'        : articulations.DownBow,
@@ -62,7 +66,9 @@ TECHNICAL_MARKS = {'up-bow'          : articulations.UpBow,
                    'fingernails'     : articulations.HarpFingerNails,
                    'other-technical' : articulations.TechnicalIndication,
                    }
-
+TECHNICAL_MARKS_REV = OrderedDict([(v, k) for k, v in TECHNICAL_MARKS.items()])
+# too generic until we have an ordered dict.
+del TECHNICAL_MARKS_REV[articulations.TechnicalIndication]
 # NON-spanner ornaments that go into Expressions
 ORNAMENT_MARKS = {'trill-mark'       : expressions.Trill,
                   'turn'             : expressions.Turn,
@@ -71,21 +77,26 @@ ORNAMENT_MARKS = {'trill-mark'       : expressions.Trill,
                   # TODO: 'delayed-inverted-turn'
                   # TODO: 'vertical-turn'
                   'shake'            : expressions.Shake,
+                  'mordent'          : expressions.Mordent,
+                  'inverted-mordent' : expressions.InvertedMordent,
                   'schleifer'        : expressions.Schleifer,
                   'other-ornament'   : expressions.Ornament
                   # TODO: 'accidental-mark' -- something else...
                   }
+
 #-------------------------------------------------------------------------------
 # helpers
 
 def yesNoToBoolean(value):
     if value in ('yes', True):
         return True
-    return False
+    else:
+        return False
 
 def booleanToYesNo(value):
-    if value:
+    if value: # purposely not "is True"
         return 'yes'
-    return 'no'
+    else:
+        return 'no'
 
 #-------------------------------------------------------------------------------
