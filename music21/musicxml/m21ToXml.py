@@ -819,11 +819,11 @@ class ScoreExporter(XMLExporterBase):
 
         # TODO: uncomment this when all is perfect...like old toMxObjects
 
-#         mxEncodingDate = SubElement(mxEncoding, 'encoding-date')
-#         mxEncodingDate.text = str(datetime.date.today()) # right format...
-#         # TODO: encoder
-#         mxSoftware = SubElement(mxEncoding, 'software')
-#         mxSoftware.text = defaults.software
+        mxEncodingDate = SubElement(mxEncoding, 'encoding-date')
+        mxEncodingDate.text = str(datetime.date.today()) # right format...
+        # TODO: encoder
+        mxSoftware = SubElement(mxEncoding, 'software')
+        mxSoftware.text = defaults.software
 
         # TODO: encoding-description
         mxSupportsList = self.setSupports()
