@@ -111,6 +111,22 @@ def accidentalToMx(a):
     >>> mxAccidental = musicxml.m21ToXml.accidentalToMx(a)
     >>> musicxml.m21ToXml.dump(mxAccidental)
     <accidental>quarter-sharp</accidental>
+
+    >>> a.set('one-and-a-half-sharp')
+    >>> mxAccidental = musicxml.m21ToXml.accidentalToMx(a)
+    >>> musicxml.m21ToXml.dump(mxAccidental)
+    <accidental>three-quarters-sharp</accidental>
+
+    >>> a.set('half-flat')
+    >>> mxAccidental = musicxml.m21ToXml.accidentalToMx(a)
+    >>> musicxml.m21ToXml.dump(mxAccidental)
+    <accidental>quarter-flat</accidental>
+
+    >>> a.set('one-and-a-half-flat')
+    >>> mxAccidental = musicxml.m21ToXml.accidentalToMx(a)
+    >>> musicxml.m21ToXml.dump(mxAccidental)
+    <accidental>three-quarters-flat</accidental>
+
     '''
     if a.name == "half-sharp": 
         mxName = "quarter-sharp"
@@ -132,11 +148,22 @@ def accidentalToMx(a):
     
 
 def normalizeColor(color):
+    '''
+    Normalize a css3 name to hex or leave it alone...
+    
+    >>> musicxml.m21ToXml.normalizeColor('')
+    ''
+    >>> musicxml.m21ToXml.normalizeColor('red')
+    '#FF0000'
+    >>> musicxml.m21ToXml.normalizeColor('#00ff00')
+    '#00FF00'
+    '''
     if color in (None, ''):
         return color
     if '#' not in color:
         return (webcolors.css3_names_to_hex[color]).upper()
-    return color 
+    else:
+        return color.upper()
 
 
 def _setTagTextFromAttribute(m21El, xmlEl, tag, attributeName=None, 
@@ -165,6 +192,13 @@ def _setTagTextFromAttribute(m21El, xmlEl, tag, attributeName=None,
     True
     >>> musicxml.m21ToXml.dump(e)
     <accidental><alter>-2</alter></accidental>
+
+    add a transform
+
+    >>> subEl = seta(acc, e, 'alter', transform=float)
+    >>> subEl.text
+    '-2.0'
+
     '''
     if attributeName is None:
         attributeName = common.hyphenToCamelCase(tag)
@@ -471,9 +505,9 @@ class ScoreExporter(XMLExporterBase):
         self.scoreLayouts = None
         self.firstScoreLayout = None
         self.textBoxes = None
-        self.highestTime = 0
+        self.highestTime = 0.0
         
-        self.refStreamOrTimeRange = [0, self.highestTime]
+        self.refStreamOrTimeRange = [0.0, self.highestTime]
 
         self.partExporterList = []
 
@@ -482,7 +516,50 @@ class ScoreExporter(XMLExporterBase):
         
         self.parts = []
 
+    def parse(self):
+        '''
+        the main function to call.
+        
+        If self.stream is empty, call self.emptyObject().  Otherwise,
+        
+        set scorePreliminaries(), call parsePartlikeScore or parseFlatScore, then postPartProcess(),
+        clean up circular references for garbage collection, and returns the <score-partwise>
+        object.
+        
+        >>> b = corpus.parse('bwv66.6')
+        >>> SX = musicxml.m21ToXml.ScoreExporter(b)
+        >>> mxScore = SX.parse()
+        >>> SX.dump(mxScore)
+        <score-partwise>...</score-partwise>
+        '''
+        s = self.stream
+        if len(s) == 0:
+            return self.emptyObject()
+
+        self.scorePreliminaries()    
+
+        if s.hasPartLikeStreams():
+            self.parsePartlikeScore()
+        else:
+            self.parseFlatScore()
+            
+        self.postPartProcess()
+        
+        # clean up for circular references.
+        self.partExporterList.clear()
+        
+        return self.xmlRoot
+
+
     def emptyObject(self):
+        '''
+        Creates a cheeky "This Page Intentionally Left Blank" for a blank score
+        
+        >>> emptySX = musicxml.m21ToXml.ScoreExporter()
+        >>> mxScore = emptySX.parse() # will call emptyObject
+        >>> emptySX.dump(mxScore)
+        <score-partwise><work><work-title>This Page Intentionally Left Blank</work-title></work>...<note><rest /><duration>40320</duration><type>whole</type></note></measure></part></score-partwise>
+        '''
         out = stream.Stream()
         p = stream.Part()
         m = stream.Measure()
@@ -502,6 +579,14 @@ class ScoreExporter(XMLExporterBase):
         '''
         Populate the exporter object with
         `meterStream`, `scoreLayouts`, `spannerBundle`, and `textBoxes`
+        
+        >>> emptySX = musicxml.m21ToXml.ScoreExporter()
+        >>> emptySX.scorePreliminaries() # will call emptyObject
+        >>> len(emptySX.textBoxes)
+        0
+        >>> emptySX.spannerBundle
+        <music21.spanner.SpannerBundle of size 0>
+
         '''
         self.setScoreLayouts()
         self.setMeterStream()
@@ -510,12 +595,27 @@ class ScoreExporter(XMLExporterBase):
         self.textBoxes = self.stream.flat.getElementsByClass('TextBox')
     
         # we need independent sub-stream elements to shift in presentation
-        self.highestTime = 0 # redundant, but set here.
+        self.highestTime = 0.0 # redundant, but set here.
 
         if self.spannerBundle is None:
             self.spannerBundle = self.stream.spannerBundle
 
     def setPartsAndRefStream(self):
+        '''
+        Transfers the offset of the inner stream to elements and sets self.highestTime
+        
+        >>> b = corpus.parse('bwv66.6')
+        >>> SX = musicxml.m21ToXml.ScoreExporter(b)
+        >>> SX.highestTime
+        0.0
+        >>> SX.setPartsAndRefStream()
+        >>> SX.highestTime
+        36.0
+        >>> SX.refStreamOrTimeRange
+        [0.0, 36.0]
+        >>> len(SX.parts)
+        4
+        '''
         s = self.stream
         #environLocal.printDebug('streamToMx(): interpreting multipart')
         streamOfStreams = s.getElementsByClass('Stream')
@@ -526,12 +626,24 @@ class ScoreExporter(XMLExporterBase):
             ht = innerStream.highestTime
             if ht > self.highestTime:
                 self.highestTime = ht
-        self.refStreamOrTimeRange = [0, self.highestTime]
+        self.refStreamOrTimeRange = [0.0, self.highestTime]
         self.parts = streamOfStreams
 
     def setMeterStream(self):
         '''
         sets `self.meterStream` or uses a default.
+        
+        Used in makeNotation in Part later.
+        
+        >>> b = corpus.parse('bwv66.6')
+        >>> SX = musicxml.m21ToXml.ScoreExporter(b)
+        >>> SX.setMeterStream()
+        >>> SX.meterStream
+        <music21.stream.Score 0x...>
+        >>> len(SX.meterStream)
+        4
+        >>> SX.meterStream[0]
+        <music21.meter.TimeSignature 4/4>
         '''
         s = self.stream
         # search context probably should always be True here
@@ -545,11 +657,22 @@ class ScoreExporter(XMLExporterBase):
             # note: this will return a default if no meters are found
             meterStream = s.flat.getTimeSignatures(searchContext=False,
                         sortByCreationTime=True, returnDefault=True)
+        self.meterStream = meterStream
 
         
     def setScoreLayouts(self):
         '''
         sets `self.scoreLayouts` and `self.firstScoreLayout`
+
+        >>> b = corpus.parse('schoenberg/opus19', 2)
+        >>> SX = musicxml.m21ToXml.ScoreExporter(b)
+        >>> SX.setScoreLayouts()
+        >>> SX.scoreLayouts
+        <music21.stream.Score 0x...>
+        >>> len(SX.scoreLayouts)
+        1
+        >>> SX.firstScoreLayout
+        <music21.layout.ScoreLayout>
         '''
         s = self.stream
         scoreLayouts = s.getElementsByClass('ScoreLayout')
@@ -560,26 +683,14 @@ class ScoreExporter(XMLExporterBase):
         self.scoreLayouts = scoreLayouts
         self.firstScoreLayout = scoreLayout
     
-    def parse(self):
-        s = self.stream
-        if len(s) == 0:
-            return self.emptyObject()
-
-        self.scorePreliminaries()    
-
-        if s.hasPartLikeStreams():
-            self.parsePartlikeScore()
-        else:
-            self.parseFlatScore()
-            
-        self.postPartProcess()
-        
-        # clean up for circular references.
-        self.partExporterList.clear()
-        
-        return self.xmlRoot
         
     def parsePartlikeScore(self):
+        '''
+        called by .parse() if the score has individual parts.
+        
+        Calls makeRests() for the part, then creates a PartExporter for each part,
+        and runs .parse() on that part.  appends the PartExporter to self.partExporterList()
+        '''
         # would like to do something like this but cannot
         # replace object inside of the stream
         for innerStream in self.parts:
@@ -596,6 +707,23 @@ class ScoreExporter(XMLExporterBase):
             self.partExporterList.append(pp)
     
     def parseFlatScore(self):
+        '''
+        creates a single PartExporter for this Stream and parses it.
+        
+        Note that the Score does not need to be totally flat, it just cannot have Parts inside it;
+        measures are fine.
+        
+        >>> c = converter.parse('tinyNotation: 3/4 c2. d e')
+        >>> SX = musicxml.m21ToXml.ScoreExporter(c)
+        >>> SX.parseFlatScore()
+        >>> len(SX.partExporterList)
+        1
+        >>> SX.partExporterList[0]
+        <music21.musicxml.m21ToXml.PartExporter object at 0x...>
+        >>> SX.dump(SX.partExporterList[0].xmlRoot)
+        <part id="..."><measure number="1">...</measure></part>
+        >>> SX.partExporterList.clear() # for garbage collection
+        '''
         s = self.stream
         pp = PartExporter(s, parent=self)
         pp.parse()
@@ -603,12 +731,26 @@ class ScoreExporter(XMLExporterBase):
     
 
     def postPartProcess(self):
+        '''
+        calls .setScoreHeader() then appends each PartExporter's xmlRoot from
+        self.partExporterList to self.xmlRoot
+        
+        Called automatically by .parse()
+        '''
         self.setScoreHeader()
         for pex in self.partExporterList:
             self.xmlRoot.append(pex.xmlRoot)
 
 
     def setScoreHeader(self):
+        '''
+        Sets the group score-header in <score-partwise>.  Note that score-header is not
+        a separate tag, but just a way of crouping things from the tag.
+        
+        runs `setTitles()`, `setIdentification()`, `setDefaults()`, changes textBoxes
+        to `<credit>` and does the major task of setting up the part-list with `setPartList()`
+        
+        '''
         s = self.stream
         # create score and part list
         # set some score header information from metadata
@@ -637,6 +779,15 @@ class ScoreExporter(XMLExporterBase):
         >>> mxCredit = SX.textBoxToXmlCredit(tb)
         >>> SX.dump(mxCredit)
         <credit page="3"><credit-words default-x="300" default-y="500" halign="center" valign="top">testing</credit-words></credit>
+        
+        Default of page 1:
+        
+        >>> tb = text.TextBox('testing')
+        >>> tb.page
+        1
+        >>> mxCredit = SX.textBoxToXmlCredit(tb)
+        >>> SX.dump(mxCredit)
+        <credit page="1">...</credit>
         '''
         # use line carriages to separate messages
         mxCredit = Element('credit')
@@ -681,6 +832,50 @@ class ScoreExporter(XMLExporterBase):
         return mxCredit
     
     def setDefaults(self):
+        '''
+        Retuns a default object from self.firstScoreLayout or a very simple one if none exists.
+        
+        Simple:
+        
+        >>> SX = musicxml.m21ToXml.ScoreExporter()
+        >>> mxDefaults = SX.setDefaults()
+        >>> SX.dump(mxDefaults)
+        <defaults><scaling><millimeters>7</millimeters><tenths>40</tenths></scaling></defaults>
+
+        These numbers come from the `defaults` module:
+        
+        >>> defaults.scalingMillimeters
+        7
+        >>> defaults.scalingTenths
+        40
+        
+        More complex:
+        
+        >>> s = corpus.parse('schoenberg/opus19', 2)
+        >>> SX = musicxml.m21ToXml.ScoreExporter(s)
+        >>> SX.setScoreLayouts() # necessary to call before .setDefaults()
+        >>> mxDefaults = SX.setDefaults()
+        >>> mxDefaults.tag
+        'defaults'
+        >>> mxScaling = mxDefaults.find('scaling')
+        >>> SX.dump(mxScaling)
+        <scaling><millimeters>6.1472</millimeters><tenths>40</tenths></scaling>
+        >>> mxPageLayout = mxDefaults.find('page-layout')
+        >>> SX.dump(mxPageLayout)
+        <page-layout><page-height>1818</page-height><page-width>1405</page-width><page-margins>...
+        >>> mxPageMargins = mxPageLayout.find('page-margins')
+        >>> SX.dump(mxPageMargins)
+        <page-margins><left-margin>83</left-margin><right-margin>83</right-margin><top-margin>103</top-margin><bottom-margin>103</bottom-margin></page-margins>
+        >>> mxSystemLayout = mxDefaults.find('system-layout')
+        >>> SX.dump(mxSystemLayout)
+        <system-layout><system-margins>...</system-margins><system-distance>121</system-distance><top-system-distance>70</top-system-distance></system-layout>
+        >>> mxStaffLayoutList = mxDefaults.findall('staff-layout')
+        >>> len(mxStaffLayoutList)
+        1
+        >>> SX.dump(mxStaffLayoutList[0])
+        <staff-layout><staff-distance>98</staff-distance></staff-layout>
+        '''
+        
         # get score defaults if any:
         if self.firstScoreLayout is None:
             from music21 import layout
@@ -715,9 +910,41 @@ class ScoreExporter(XMLExporterBase):
         # TODO: word-font
         # TODO: lyric-font
         # TODO: lyric-language
+        return mxDefaults # mostly for testing...
     
 
     def setPartList(self):
+        '''
+        Returns a <part-list> and appends it to self.xmlRoot.
+        
+        This is harder than it looks because MusicXML and music21's idea of where to store
+        staff-groups are quite different.
+        
+        We find each stream in self.partExporterList, then look at the StaffGroup spanners in
+        self.spannerBundle.  If the part is the first element in a StaffGroup then we add a
+        <staff-group> object with 'start' as the starting point (and same for multiple StaffGroups)
+        this is in `staffGroupToXmlPartGroup(sg)`.
+        then we add the <score-part> descriptor of the part and its instruments, etc. (currently
+        just one!), then we iterate again through all StaffGroups and if this part is the last
+        element in a StaffGroup we add a <staff-group> descriptor with type="stop".
+        
+        This Bach example has four parts and one staff-group bracket linking them:
+        
+        >>> b = corpus.parse('bwv66.6')
+        >>> SX = musicxml.m21ToXml.ScoreExporter(b)
+        
+        Needs some strange setup to make this work in a demo.  `.parse()` takes care of all this.
+        
+        >>> SX.scorePreliminaries()    
+        >>> SX.parsePartlikeScore()
+        
+        >>> mxPartList = SX.setPartList()
+        >>> SX.dump(mxPartList)
+        <part-list><part-group number="1" type="start">...<score-part 
+           id="P1">...<score-part id="P2">...<score-part id="P3">...<score-part 
+           id="P4">...<part-group number="1" type="stop" /></part-list>
+        '''
+        
         spannerBundle = self.spannerBundle
         
         mxPartList = SubElement(self.xmlRoot, 'part-list')
@@ -763,9 +990,31 @@ class ScoreExporter(XMLExporterBase):
     
     def staffGroupToXmlPartGroup(self, staffGroup):
         '''
-        Create and configure an mxPartGroup object 
+        Create and configure an mxPartGroup object for the 'start' tag
         from a staff group spanner. Note that this object 
         is not completely formed by this procedure. (number isn't done...)
+        
+        >>> b = corpus.parse('bwv66.6')
+        >>> SX = musicxml.m21ToXml.ScoreExporter(b)
+        >>> firstStaffGroup = b.spannerBundle.getByClass('StaffGroup')[0]
+        >>> mxPartGroup = SX.staffGroupToXmlPartGroup(firstStaffGroup)
+        >>> SX.dump(mxPartGroup)
+        <part-group type="start"><group-symbol>bracket</group-symbol><group-barline>yes</group-barline></part-group>
+
+        At this point, you should set the number of the mxPartGroup, since it is required:
+        
+        >>> mxPartGroup.set('number', str(1))        
+
+
+        What can we do with it?
+
+        >>> firstStaffGroup.name = 'Voices'
+        >>> firstStaffGroup.abbreviation = 'Ch.'
+        >>> firstStaffGroup.symbol = 'brace' # 'none', 'brace', 'line', 'bracket', 'square'
+        >>> firstStaffGroup.barTogether = False  # True, False, or 'Mensurstrich'
+        >>> mxPartGroup = SX.staffGroupToXmlPartGroup(firstStaffGroup)
+        >>> SX.dump(mxPartGroup)
+        <part-group type="start"><group-name>Voices</group-name><group-abbreviation>Ch.</group-abbreviation><group-symbol>brace</group-symbol><group-barline>no</group-barline></part-group>
         '''
         mxPartGroup = Element('part-group')
         mxPartGroup.set('type', 'start')
@@ -832,7 +1081,9 @@ class ScoreExporter(XMLExporterBase):
         
     def setSupports(self):
         '''
-        return a list of <supports> tags  for what this supports...
+        return a list of <supports> tags  for what this supports.
+        
+        Currently just 
         '''
         def getSupport(attribute, type, value, element): # @ReservedAssignment
             su = Element('supports')
@@ -3040,7 +3291,7 @@ class MeasureExporter(XMLExporterBase):
         if self.parent.stream.atSoundingPitch is True:
             return
 
-        m = self.stream()
+        m = self.stream
         self.measureOffsetStart = m.getOffsetBySite(self.parent.stream)
 
         instSubStream = self.parent.instrumentStream.getElementsByOffset(
