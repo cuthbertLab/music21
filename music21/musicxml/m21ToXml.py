@@ -289,8 +289,8 @@ class XMLExporterBase(object):
     
         Output differs in Python2 vs 3.
         '''        
-        xmlEl = copy.deepcopy(obj)
-        self.indent(xmlEl)
+        xmlEl = copy.deepcopy(obj) # adds 5% overhead
+        self.indent(xmlEl) # adds 5% overhead
         if six.PY2:
             xStr = ET.tostring(xmlEl)
         else:
@@ -859,7 +859,8 @@ class ScoreExporter(XMLExporterBase):
         >>> mxCredit = SX.textBoxToXmlCredit(tb)
         >>> SX.dump(mxCredit)
         <credit page="3">
-          <credit-words default-x="300" default-y="500" halign="center" valign="top">testing</credit-words>
+          <credit-words default-x="300" default-y="500" 
+               halign="center" valign="top">testing</credit-words>
         </credit>
             
         Default of page 1:
@@ -1182,7 +1183,10 @@ class ScoreExporter(XMLExporterBase):
         >>> c = metadata.Contributor(role='arranger', name='Aliyah Shanti')
         >>> md.addContributor(c)
         
-        >>> SX = musicxml.m21ToXml.ScoreExporter()  # need a fresh one... otherwise appends to existing.
+        need a fresh ScoreExporter ...otherwise appends to existing mxIdentification
+        
+        
+        >>> SX = musicxml.m21ToXml.ScoreExporter()
         >>> SX.scoreMetadata = md
         >>> mxIdentification = SX.setIdentification()
         >>> SX.dump(mxIdentification)
