@@ -789,7 +789,10 @@ class Stream(base.Music21Object):
         <music21.stream.Stream hi>
         '''
         base.Music21Object.mergeAttributes(self, other)
-        self.autoSort = other.autoSort
+
+        for attr in 'autoSort'.split():
+            if hasattr(other, attr):
+                setattr(self, attr, getattr(other, attr))
 
 
     def hasElement(self, obj):
@@ -5746,8 +5749,12 @@ class Stream(base.Music21Object):
         '''
         return self.streamStatus.haveAccidentalsBeenMade()
 
-    def makeNotation(self, meterStream=None, refStreamOrTimeRange=None,
-                        inPlace=False, bestClef=False, **subroutineKeywords):
+    def makeNotation(self, 
+                     meterStream=None, 
+                     refStreamOrTimeRange=None,
+                     inPlace=False, 
+                     bestClef=False, 
+                     **subroutineKeywords):
         '''
         This method calls a sequence of Stream methods on this Stream to prepare
         notation, including creating voices for overlapped regions, Measures
@@ -5842,7 +5849,8 @@ class Stream(base.Music21Object):
         # check for tuplet brackets one measure at a time
         # this means that they will never extend beyond one measure
         for m in measureStream:
-            m.makeTupletBrackets(inPlace=True)
+            if m.streamStatus.haveTupletBracketsBeenMade() is False:
+                m.makeTupletBrackets(inPlace=True)
 
         if len(measureStream) == 0:
             raise StreamException('no measures found in stream with %s elements' % (self.__len__()))
@@ -11235,19 +11243,23 @@ class Measure(Stream):
         'MyMeasure'
         >>> m2
         <music21.stream.Measure 2b offset=0.0>
+        
+        Try with not another Measure...
+        
+        >>> m3 = stream.Stream()
+        >>> m3.id = 'hello'
+        >>> m2.mergeAttributes(m3)
+        >>> m2.id
+        'hello'
+        >>> m2.layoutWidth
+        200
         '''
         # calling bass class sets id, groups
         super(Measure, self).mergeAttributes(other)
 
-        self.timeSignatureIsNew = other.timeSignatureIsNew
-        self.clefIsNew = other.clefIsNew
-        self.keyIsNew = other.keyIsNew
-        self.filled = other.filled
-        self.paddingLeft = other.paddingLeft
-        self.paddingRight = other.paddingRight
-        self.number = other.number
-        self.numberSuffix = other.numberSuffix
-        self.layoutWidth = other.layoutWidth
+        for attr in 'timeSignatureIsNew clefIsNew keyIsNew filled paddingLeft paddingRight number numberSuffix layoutWidth'.split():
+            if hasattr(other, attr):
+                setattr(self, attr, getattr(other, attr))
 
     #--------------------------------------------------------------------------
     def makeNotation(self, inPlace=False, **subroutineKeywords):
@@ -11305,14 +11317,16 @@ class Measure(Stream):
             m.timeSignature = ts  # a Stream; get the first element
 
         #environLocal.printDebug(['have time signature', m.timeSignature])
-        try:
-            m.makeBeams(inPlace=True)
-        except StreamException:
-            # this is a result of makeMeaures not getting everything
-            # note to measure allocation right
-            pass
-            #environLocal.printDebug(['skipping makeBeams exception', StreamException])
-        m.makeTupletBrackets(inPlace=True)
+        if m.streamStatus.haveBeamsBeenMade() is False:
+            try:
+                m.makeBeams(inPlace=True)
+            except StreamException:
+                # this is a result of makeMeaures not getting everything
+                # note to measure allocation right
+                pass
+                #environLocal.printDebug(['skipping makeBeams exception', StreamException])
+        if m.streamStatus.haveTupletBracketsBeenMade() is False:
+            m.makeTupletBrackets(inPlace=True)
 
         if not inPlace:
             return m
@@ -12341,13 +12355,21 @@ class Score(Stream):
         if self.hasPartLikeStreams():
             for s in returnStream.getElementsByClass('Stream'):
                 # process all component Streams inPlace
-                s.makeNotation(meterStream=meterStream, refStreamOrTimeRange=refStreamOrTimeRange, inPlace=True, bestClef=bestClef, **subroutineKeywords)
+                s.makeNotation(meterStream=meterStream, 
+                               refStreamOrTimeRange=refStreamOrTimeRange, 
+                               inPlace=True, 
+                               bestClef=bestClef, 
+                               **subroutineKeywords)
             # note: while the local-streams have updated their caches, the
             # containing score has an out-of-date cache of flat.
             # this, must call elements changed
             returnStream.elementsChanged()
         else: # call the base method
-            Stream.makeNotation(self, meterStream=meterStream, refStreamOrTimeRange=refStreamOrTimeRange, inPlace=True, bestClef=bestClef, **subroutineKeywords)
+            super(Score, self).makeNotation(meterStream=meterStream, 
+                                            refStreamOrTimeRange=refStreamOrTimeRange, 
+                                            inPlace=True, 
+                                            bestClef=bestClef, 
+                                            **subroutineKeywords)
 
         if inPlace:
             return None

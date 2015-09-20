@@ -1719,27 +1719,6 @@ class Test(unittest.TestCase):
         a.name = 'D'
         b = copy.deepcopy(a)
         self.assertEqual(b.name, a.name)
-        self.assertEqual(b.quarterLength, a.quarterLength)
-
-
-    def testMusicXMLOutput(self):
-        from music21.musicxml import toMxObjects
-        mxNotes = []
-        for pitchName, durType in [('g#', 'quarter'), ('g#', 'half'),
-                ('g#', 'quarter'), ('g#', 'quarter'), ('g#', 'quarter')]:
-
-            dur = duration.Duration(durType)
-            p = pitch.Pitch(pitchName)
-
-            # a lost of one ore more notes (tied groups)
-            # returns a list of mxNote objs
-            for mxNote in toMxObjects.durationToMx(dur):
-            #for mxNote in dur.mx: # returns a list of mxNote objs
-                # merger returns a new object
-                mxNotes.append(mxNote.merge(toMxObjects.pitchToMx(p)))
-
-        self.assertEqual(len(mxNotes), 5)
-        self.assertEqual(mxNotes[0].get('pitch').get('alter'), 1)
 
 
     def testMusicXMLFermata(self):

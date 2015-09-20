@@ -261,8 +261,12 @@ def _setAttributeFromAttribute(m21El, xmlEl, xmlAttributeName, attributeName=Non
 
 class GeneralObjectExporter():
     classMapping = OrderedDict([
+        ('Score', 'fromScore'),
+        ('Part', 'fromPart'),       
         ('Measure', 'fromMeasure'),
-        ('Stream', 'fromScore'),
+        ('Voice', 'fromVoice'),
+        ('Stream', 'fromStream'),
+        ### individual parts
         ('GeneralNote', 'fromGeneralNote'),
         ('Pitch', 'fromPitch'),
         ('Duration', 'fromDuration'), # not an m21 object
@@ -275,7 +279,7 @@ class GeneralObjectExporter():
     def __init__(self, obj=None):
         self.generalObj = obj
         
-    def parse(self):
+    def parse(self, obj=None):
         r'''
         return a bytes object representation of anything from a 
         Score to a single pitch.
@@ -332,7 +336,9 @@ class GeneralObjectExporter():
           </part>
         </score-partwise>
         '''
-        outObj = self.fromGeneralObject(self.generalObj)
+        if obj is None:
+            obj = self.generalObj
+        outObj = self.fromGeneralObject(obj)
         scoreExporter = ScoreExporter(outObj)
         scoreExporter.parse()
         return scoreExporter.asBytes()
@@ -374,6 +380,15 @@ class GeneralObjectExporter():
         post.makeImmutable()
         return post
 
+    def fromPart(self, p):
+        '''
+        from a part, put it in a score...
+        '''
+        p.makeImmutable()
+        s = stream.Score()
+        s.insert(0, p)
+        return self.fromScore(s)
+
     def fromMeasure(self, m):
         '''
         Translate a music21 Measure into a 
@@ -384,13 +399,29 @@ class GeneralObjectExporter():
         solutions in Part or Stream production.
         '''
         m.makeNotation(inPlace=True)    
-       
-        out = stream.Score()
         p = stream.Part()
         p.append(m)
-        out.append(p)
-        return out
+        return self.fromPart(p)
     
+    def fromVoice(self, v):
+        m = stream.Measure()
+        m.insert(0, v)
+        return self.fromMeasure(m)
+    
+    def fromStream(self, st):
+        if st.isFlat:
+            st2 = stream.Measure()
+            st2.mergeAttributes(st)
+            st2.elements = st.elements
+            return self.fromMeasure(st2)
+        elif st.getElementsByClass('Stream')[0].isFlat:
+            st2 = stream.Part()
+            st2.mergeAttributes(st)
+            st2.elements = st.elements
+            return self.fromPart(st2)
+        else:
+            # probably a problem? or a voice...
+            return self.fromScore(st)
     
     def fromDuration(self, d):
         '''
@@ -1672,7 +1703,8 @@ class PartExporter(XMLExporterBase):
         self.instrumentSetup()
             
         self.xmlRoot.set('id', str(self.firstInstrumentObject.partId))
-        measureStream = self.stream.getElementsByClass('Measure')
+        measureStream = self.stream.getElementsByClass('Stream') # suppose that everything 
+            # below this is a measure
         if len(measureStream) == 0:
             self.fixupNotationFlat() 
         else:
@@ -1757,25 +1789,24 @@ class PartExporter(XMLExporterBase):
         Checks to see if there are any attributes in the part stream and moves 
         them into the first measure if necessary.
         
-        Checks if makeAccidentals is run, and haveBeamsBeenMade is done.
-        
-        Does not check for tupletBrackets yet.
+        Checks if makeAccidentals is run, and haveBeamsBeenMade is done, and
+        haveTupletBracketsBeenMade is done.
         '''
         part = self.stream
         # check that first measure has any attributes in outer Stream
         # this is for non-standard Stream formations (some kern imports)
         # that place key/clef information in the containing stream
-        if measureStream[0].clef is None:
+        if hasattr(measureStream[0], 'clef') and measureStream[0].clef is None:
             measureStream[0].makeMutable() # must mutate
             outerClefs = part.getElementsByClass('Clef')
             if len(outerClefs) > 0:
                 measureStream[0].clef = outerClefs[0]
-        if measureStream[0].keySignature is None:
+        if hasattr(measureStream[0], 'keySignature') and measureStream[0].keySignature is None:
             measureStream[0].makeMutable() # must mutate
             outerKeySignatures = part.getElementsByClass('KeySignature')
             if len(outerKeySignatures) > 0:
                 measureStream[0].keySignature = outerKeySignatures[0]
-        if measureStream[0].timeSignature is None:
+        if hasattr(measureStream[0], 'timeSignature') and measureStream[0].timeSignature is None:
             measureStream[0].makeMutable() # must mutate
             outerTimeSignatures = part.getElementsByClass('TimeSignature')
             if len(outerTimeSignatures) > 0:
@@ -1789,6 +1820,9 @@ class PartExporter(XMLExporterBase):
                 measureStream.makeBeams(inPlace=True)
             except exceptions21.StreamException: 
                 pass
+        if measureStream.streamStatus.haveTupletBracketsBeenMade() is False:
+            measureStream.makeTupletBrackets(inPlace=True)
+            
         # TODO: make tuplet brackets once haveTupletBracketsBeenMade is done...
             
         if len(self.spannerBundle) == 0:
@@ -2184,7 +2218,7 @@ class MeasureExporter(XMLExporterBase):
 
         return notations
 
-    def noteToXml(self, n, addChordTag=False):
+    def noteToXml(self, n, addChordTag=False, chordParent=None):
         '''
         Translate a music21 :class:`~music21.note.Note` or a Rest into a
         list of :class:`~music21.musicxml.mxObjects.Note` objects.
@@ -2257,7 +2291,12 @@ class MeasureExporter(XMLExporterBase):
         # TODO: attr: release
         # TODO: attr: time-only
         mxNote = Element('note')
-        if n.duration.isGrace is True:
+        if chordParent is not None:
+            d = chordParent.duration
+        else:
+            d = n.duration
+        
+        if d.isGrace is True:
             SubElement(mxNote, 'grace')
 
         # TODO: cue...
@@ -2282,8 +2321,8 @@ class MeasureExporter(XMLExporterBase):
             # TODO: unpitched
             SubElement(mxNote, 'rest')
 
-        if n.duration.isGrace is not True:
-            mxDuration = self.durationXml(n.duration)
+        if d.isGrace is not True:
+            mxDuration = self.durationXml(d)
             mxNote.append(mxDuration)
             # divisions only
         # TODO: skip if cue:
@@ -2303,19 +2342,19 @@ class MeasureExporter(XMLExporterBase):
             except TypeError:
                 mxVoice.text = str(self.currentVoiceId)
         
-        if n.duration.type != 'zero':
+        if d.type != 'zero':
             mxType = Element('type')
-            mxType.text = typeToMusicXMLType(n.duration.type)
+            mxType.text = typeToMusicXMLType(d.type)
             mxNote.append(mxType)
-            for _ in range(n.duration.dots):
+            for _ in range(d.dots):
                 SubElement(mxNote, 'dot')
                 # TODO: dot placement...
 
-        elif len(n.duration.components) > 0:
+        elif len(d.components) > 0:
             mxType = Element('type')
-            mxType.text = typeToMusicXMLType(n.duration.components[0].type)
+            mxType.text = typeToMusicXMLType(d.components[0].type)
             mxNote.append(mxType)
-            for _ in range(n.duration.components[0].dots):
+            for _ in range(d.components[0].dots):
                 SubElement(mxNote, 'dot')
         
         if (hasattr(n, 'pitch') and 
@@ -2323,8 +2362,9 @@ class MeasureExporter(XMLExporterBase):
                 n.pitch.accidental.displayStatus in (True, None)):
             mxAccidental = accidentalToMx(n.pitch.accidental)
             mxNote.append(mxAccidental)
-        if len(n.duration.tuplets) > 0:
-            for tup in n.duration.tuplets:
+            
+        if len(d.tuplets) > 0:
+            for tup in d.tuplets:
                 mxTimeModification = self.tupletToTimeModification(tup)
                 mxNote.append(mxTimeModification)
         # TODO: stem
@@ -2350,6 +2390,13 @@ class MeasureExporter(XMLExporterBase):
                 mxNote.append(mxB)
     
         mxNotationsList = self.noteToNotations(n)
+        # add tuplets if it's a note or the first <note> of a chord.
+        if addChordTag is False:
+            for tup in d.tuplets:
+                tupTagList = self.tupletToXmlTuplet(tup)
+                mxNotationsList.extend(tupTagList)
+
+        
         if len(mxNotationsList) > 0: # TODO: make to zero -- this is just for perfect old compat.
             mxNotations = SubElement(mxNote, 'notations')
             for mxN in mxNotationsList:
@@ -2396,8 +2443,8 @@ class MeasureExporter(XMLExporterBase):
             <alter>-1</alter>
             <octave>2</octave>
           </pitch>
-          <duration>10080</duration>
-          <type>quarter</type>
+          <duration>20160</duration>
+          <type>half</type>
           <accidental>flat</accidental>
         </note>
             
@@ -2408,7 +2455,8 @@ class MeasureExporter(XMLExporterBase):
             <step>D</step>
             <octave>3</octave>
           </pitch>
-          ...
+          <duration>20160</duration>
+          <type>half</type>
         </note>
 
         >>> MEX.dump(mxNoteList[2])
@@ -2418,7 +2466,8 @@ class MeasureExporter(XMLExporterBase):
             <step>E</step>
             <octave>4</octave>
           </pitch>
-          ...
+          <duration>20160</duration>
+          <type>half</type>
         </note>
             
     
@@ -2444,8 +2493,8 @@ class MeasureExporter(XMLExporterBase):
         '''
         mxNoteList = []
         for i, n in enumerate(c):
-            addChordTag = True if i > 0 else False
-            mxNoteList.append(self.noteToXml(n, addChordTag=addChordTag)) 
+            addChordTag = True if i != 0 else False
+            mxNoteList.append(self.noteToXml(n, addChordTag=addChordTag, chordParent=c))
         return mxNoteList
 
             
@@ -2588,10 +2637,7 @@ class MeasureExporter(XMLExporterBase):
         if n.tie is not None:
             tiedList = self.tieToXmlTied(n.tie)
             notations.extend(tiedList)
-        # <tuplet>
-        for tup in n.duration.tuplets:
-            tupTagList = self.tupletToXmlTuplet(tup)
-            notations.extend(tupTagList)
+        # <tuplet> handled elsewhere, because it's on the overall duration on chord...
 
         notations.extend(self.objectAttachedSpannersToNotations(n))
         # TODO: slur            
@@ -3575,6 +3621,9 @@ class MeasureExporter(XMLExporterBase):
     def setRightBarline(self):        
         m = self.stream
         rbSpanners = self.rbSpanners
+        if not hasattr(m, 'rightBarline'):
+            return
+
         rightBarline = self.stream.rightBarline
         if (rightBarline is None and 
                 (len(rbSpanners) == 0 or not rbSpanners[0].isLast(m))):
@@ -3584,7 +3633,9 @@ class MeasureExporter(XMLExporterBase):
     def setLeftBarline(self):
         m = self.stream
         rbSpanners = self.rbSpanners
-        leftBarline = self.stream.leftBarline
+        if not hasattr(m, 'leftBarline'):
+            return
+        leftBarline = m.leftBarline
         if (leftBarline is None and
                 (len(rbSpanners) == 0 or not rbSpanners[0].isFirst(m))):
             return
@@ -3699,12 +3750,13 @@ class MeasureExporter(XMLExporterBase):
         mxDivisions.text = str(self.currentDivisions)
         if self.transpositionInterval is not None:
             mxAttributes.append(self.intervalToXmlTranspose)
-        if m.keySignature is not None:
-            mxAttributes.append(self.keySignatureToXml(m.keySignature))
-        if m.timeSignature is not None:
-            mxAttributes.append(self.timeSignatureToXml(m.timeSignature))
-        if m.clef is not None:
-            mxAttributes.append(self.clefToXml(m.clef))
+        if 'Measure' in m.classes:
+            if m.keySignature is not None:
+                mxAttributes.append(self.keySignatureToXml(m.keySignature))
+            if m.timeSignature is not None:
+                mxAttributes.append(self.timeSignatureToXml(m.timeSignature))
+            if m.clef is not None:
+                mxAttributes.append(self.clefToXml(m.clef))
 
         # todo returnType = 'list'
         found = m.getElementsByClass('StaffLayout')
@@ -4019,10 +4071,11 @@ class MeasureExporter(XMLExporterBase):
         
         '''
         m = self.stream
-        self.xmlRoot.set('number', m.measureNumberWithSuffix())
+        if hasattr(m, 'measureNumberWithSuffix'):
+            self.xmlRoot.set('number', m.measureNumberWithSuffix())
         # TODO: attr: implicit
         # TODO: attr: non-controlling
-        if m.layoutWidth is not None:
+        if hasattr(m, 'layoutWidth') and m.layoutWidth is not None:
             _setAttributeFromAttribute(m, self.xmlRoot, 'width', 'layoutWidth')
         
     def setRbSpanners(self):

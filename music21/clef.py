@@ -563,20 +563,6 @@ class Test(unittest.TestCase):
                 unused_a = copy.copy(obj)
                 unused_b = copy.deepcopy(obj)
 
-    def testConversionMX(self):
-        from music21.musicxml import toMxObjects
-        # test basic creation
-        for clefObjName in [FrenchViolinClef, TrebleClef, Treble8vbClef, 
-                GSopranoClef, SopranoClef, MezzoSopranoClef,
-                TenorClef, CBaritoneClef, FBaritoneClef, BassClef, 
-                SubBassClef,TabClef]:
-            a = clefObjName()
-            unused_mxClef = toMxObjects.clefToMxClef(a)
-
-        # test specific clefs
-        a = Treble8vbClef()
-        mxClef = toMxObjects.clefToMxClef(a)
-        self.assertEqual(mxClef.get('clefOctaveChange'), -1)
 
     def testConversionClassMatch(self):
         from xml.etree.ElementTree import fromstring as El
