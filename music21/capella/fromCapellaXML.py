@@ -178,7 +178,7 @@ class CapellaImporter(object):
         for thisSystem in systemStream:
             # this line is redundant currently, since all we have in
             # thisSystem are Parts, but later there will be other things.
-            systemOffset = thisSystem.getOffsetBySite(systemScore)
+            systemOffset = systemScore.elementOffset(thisSystem)
             partStream = thisSystem.getElementsByClass('Part')
             for j, thisPart in enumerate(partStream):
                 if thisPart.id not in partDictById:

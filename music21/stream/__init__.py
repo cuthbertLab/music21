@@ -659,7 +659,7 @@ class Stream(base.Music21Object):
         for e in self._elements:
             s.insert(self.elementOffset(e), e)
         for e in other._elements:
-            s.insert(e.getOffsetBySite(other), e)
+            s.insert(other.elementOffset(e), e)
 
         for e in self._endElements:
             s.storeAtEnd(e)
@@ -825,9 +825,9 @@ class Stream(base.Music21Object):
             #self.insert(other.offset, e)
             if classFilterList is not None:
                 if e.isClassOrSubclass(classFilterList):
-                    self._insertCore(e.getOffsetBySite(other), e)
+                    self._insertCore(other.elementOffset(e), e)
             else:
-                self._insertCore(e.getOffsetBySite(other), e)
+                self._insertCore(other.elementOffset(e), e)
 
 #             for c in classFilterList:
 #                 if c in e.classes:
@@ -2081,7 +2081,7 @@ class Stream(base.Music21Object):
         # find all those that need to split v. those that need to be movewd
         for t in targets:
             # if target starts before the boundary, it needs to be split
-            if t.getOffsetBySite(sLeft) < quarterLength:
+            if sLeft.elementOffset(t) < quarterLength:
                 targetSplit.append(t)
             else:
                 targetMove.append(t)
@@ -2093,7 +2093,7 @@ class Stream(base.Music21Object):
             # already been made
 
             # the split point needs to be relative to this element's start
-            qlSplit = quarterLength - t.getOffsetBySite(sLeft)
+            qlSplit = quarterLength - sLeft.elementOffset(t)
             unused_eLeft, eRight = t.splitAtQuarterLength(qlSplit,
                 retainOrigin=True, addTies=addTies,
                 displayTiedAccidentals=displayTiedAccidentals, delta=delta)
@@ -7548,11 +7548,11 @@ class Stream(base.Music21Object):
 
         # this will get all elements at this level and downward.
         if recurse is True:
-            si = post.recurse()
+            siterator = post.recurse()
         else:
-            si = post.__iter__()
+            siterator = post.__iter__()
         
-        for e in si.getElementsByClass(classFilterList):
+        for e in siterator.getElementsByClass(classFilterList):
             e.transpose(value, inPlace=True)
         if not inPlace:
             return post
@@ -7623,7 +7623,7 @@ class Stream(base.Music21Object):
 
             # subtract the offset shift (and lowestOffset of 80 becomes 0)
             # then apply the amountToScale
-            o = (e.getOffsetBySite(returnObj) - offsetShift) * amountToScale
+            o = (returnObj.elementOffset(e) - offsetShift) * amountToScale
             # after scaling, return the shift taken away
             o += offsetShift
 
@@ -7840,7 +7840,7 @@ class Stream(base.Music21Object):
         for useStream in useStreams:
             for e in useStream._elements:
                 if processOffsets:
-                    o = e.getOffsetBySite(useStream)
+                    o = useStream.elementOffset(e)
                     sign = 1
                     if o < 0:
                         sign = -1

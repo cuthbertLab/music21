@@ -1830,7 +1830,7 @@ class LilypondConverter(object):
                 if "SpacerRest" in el.classes:
                     pass
                 else:
-                    return el.getOffsetBySite(inputStream)
+                    return inputStream.elementOffset(el)
 
         variantList.sort(key = lambda v: findOffsetOfFirstNonSpacerElement(v._stream))
 

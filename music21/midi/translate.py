@@ -1092,15 +1092,15 @@ def _streamToPackets(s, trackId=1):
             if midiEvent.type != 'NOTE_OFF':
                 # use offset
                 p = _getPacket(trackId, 
-                            offsetToMidi(obj.getOffsetBySite(s)), 
+                            offsetToMidi(s.elementOffset(obj)), 
                             midiEvent, obj=obj, lastInstrument=lastInstrument)
                 packets.append(p)
             # if its a note_off, use the duration to shift offset
             # midi events have already been created; 
             else: 
                 p = _getPacket(trackId, 
-                    offsetToMidi(obj.getOffsetBySite(s)) + durationToMidi(obj.duration), 
-                    midiEvent, obj=obj, lastInstrument=lastInstrument)
+                               offsetToMidi(s.elementOffset(obj)) + durationToMidi(obj.duration), 
+                               midiEvent, obj=obj, lastInstrument=lastInstrument)
                 packets.append(p)
         packetsByOffset += packets
 
@@ -1644,7 +1644,7 @@ def _prepareStreamForMidi(s):
         if len(mmTopLevel) > 0: # place in top part
             target = s.getElementsByClass('Stream')[0]
             for mm in mmTopLevel:
-                target.insert(mm.getOffsetBySite(mmTopLevel), mm)
+                target.insert(mmToplevel.elementOffset(mm), mm)
                 s.remove(mm) # remove from Score level
         # TODO: move any MetronomeMarks not in the top Part to the top Part
         
@@ -1715,7 +1715,7 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList = None):
         instrumentStream = s.getElementsByClass('Instrument')
         
         # if there is an Instrument object at the start, make instObj that instrument.
-        if len(instrumentStream) > 0 and instrumentStream[0].getOffsetBySite(s) == 0:
+        if len(instrumentStream) > 0 and s.elementOffset(instrumentStream[0]) == 0:
             instObj = instrumentStream[0]
         else:
             instObj = None
@@ -1852,7 +1852,7 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
             # create a deepcopy of the element so a flat does not cause
             # multiple references of the same
             eventCopy = copy.deepcopy(e)
-            p.insert(e.getOffsetBySite(conductorTrack), eventCopy)
+            p.insert(conductorTrack.elementOffset(e), eventCopy)
 
     # if there is a conductor track, add tempo only to the top-most part
     # MSC: WHY?
@@ -1862,7 +1862,7 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
         # create a deepcopy of the element so a flat does not cause
         # multiple references of the same
         eventCopy = copy.deepcopy(e)
-        p.insert(e.getOffsetBySite(conductorTrack), eventCopy)
+        p.insert(conductorTrack.elementOffset(e), eventCopy)
     return s
 
 

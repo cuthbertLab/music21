@@ -320,10 +320,10 @@ class FrontPaddedSnippet(PolyphonicSnippet):
                 oldFirstM = allM[0]
                 for m in allM:
                     m.number += shortMeasures
-                    m.setOffsetBySite(thisStream, m.getOffsetBySite(thisStream) + offsetShift)
+                    m.setOffsetBySite(thisStream, thisStream.elementOffset(m) + offsetShift)
             else:
-                for thisNote in thisStream.notesAndRests:
-                    thisNote.setOffsetBySite(thisStream, thisNote.getOffsetBySite(thisStream) + offsetShift) 
+                for thisNote in thisStream.iter.notesAndRests:
+                    thisNote.setOffsetBySite(thisStream, thisStream.elementOffset(m) + offsetShift) 
 
 
             for i in range(0, shortMeasures):

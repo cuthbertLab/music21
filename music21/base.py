@@ -1846,7 +1846,7 @@ class Music21Object(object):
             foundOffset = self.offset
         else:
             try:
-                foundOffset = self.getOffsetBySite(useSite, stringReturns=True)
+                foundOffset = useSite.elementOffset(self, stringReturns=True)
             except SitesException:
                 #environLocal.warn(r)  # activeSite may have vanished! or does not have the element
                 foundOffset = self._naiveOffset
@@ -2000,6 +2000,7 @@ class Music21Object(object):
             if 'SpannerStorage' in siteObj.classes:
                 continue
             try:
+                # do not change to siteObj.elementOffset(self)...
                 offsetInStream = self.getOffsetBySite(siteObj) + offsetAppend
             except SitesException:
                 continue # not a valid site any more.  Could be caught in derivationChain
@@ -2873,9 +2874,9 @@ class Music21Object(object):
                 #environLocal.printDebug(['using found Measure for offset access'])
                 try:
                     if includeMeasurePadding:
-                        offsetLocal = self.getOffsetBySite(m) + m.paddingLeft
+                        offsetLocal = m.elementOffset(self) + m.paddingLeft
                     else:
-                        offsetLocal = self.getOffsetBySite(m)
+                        offsetLocal = m.elementOffset(self)
                 except SitesException:
                     try:
                         offsetLocal = self.offset
