@@ -618,6 +618,15 @@ class MusicXMLImporter(XMLParserBase):
         2
         >>> tb.content
         'Testing'
+        
+        OMIT_FROM_DOCS
+        
+        Capella generates empty credit-words
+        
+        >>> credit = ET.fromstring('<credit><credit-words/></credit>')
+        >>> tb = MI.xmlCreditToTextBox(credit)
+        >>> tb
+        <music21.text.TextBox "">
         '''
         tb = text.TextBox()
         pageNum = mxCredit.get('page')
@@ -628,9 +637,12 @@ class MusicXMLImporter(XMLParserBase):
         tb.page = pageNum
         content = []
         for cw in mxCredit.findall('credit-words'):
-            content.append(cw.text)
+            if cw.text not in (None, ""):
+                content.append(cw.text)
         if len(content) == 0: # no text defined
-            raise MusicXMLImportException('no credit words defined for a credit tag')
+            tb.content = ""
+            return tb # capella generates empty credit-words
+            #raise MusicXMLImportException('no credit words defined for a credit tag')
         tb.content = '\n'.join(content) # join with \n
     
         cw1 = mxCredit.find('credit-words')

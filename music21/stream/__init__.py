@@ -7552,7 +7552,7 @@ class Stream(base.Music21Object):
         else:
             si = post.__iter__()
         
-        for e in si.iter.getElementsByClass(classFilterList):
+        for e in si.getElementsByClass(classFilterList):
             e.transpose(value, inPlace=True)
         if not inPlace:
             return post
