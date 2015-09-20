@@ -266,7 +266,7 @@ class LilypondConverter(object):
         Create a Lilypond object hierarchy in self.topLevelObject from an
         arbitrary music21 object.
 
-        TODO: make lilypond automatically run s.makeTupletBrackets()
+        TODO: make lilypond automatically run makeNotation.makeTupletBrackets(s)
         TODO: Add tests...
         '''
         from music21 import stream
@@ -869,7 +869,7 @@ class LilypondConverter(object):
             newContext = contextType
             optionalId = lyo.LyOptionalId(makeLettersOnlyId(streamIn.id))
 
-        if streamIn.haveBeamsBeenMade() is True:
+        if streamIn.streamStatus.haveBeamsBeenMade() is True:
             contextModList.append(r"\autoBeamOff ")
 
         if hasattr(streamIn, 'staffLines') and streamIn.staffLines != 5:

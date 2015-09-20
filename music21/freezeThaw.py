@@ -461,7 +461,8 @@ class StreamFreezer(StreamFreezeThawBase):
             storedElementOffsetTuples.append(elementTuple)
             if e.isStream:
                 self.setupStoredElementOffsetTuples(e)
-            e.removeLocationBySite(streamObj)            
+            e.sites.remove(streamObj)
+            e.activeSite = None
 #                e._preFreezeId = id(e)
 #                elementDict[id(e)] = e.getOffsetBySite(s)
         for e in streamObj._endElements:
@@ -469,7 +470,8 @@ class StreamFreezer(StreamFreezeThawBase):
             storedElementOffsetTuples.append(elementTuple)
             if e.isStream:
                 self.setupStoredElementOffsetTuples(e)
-            e.removeLocationBySite(streamObj)
+            e.sites.remove(streamObj)
+            e.activeSite = None
 
         streamObj._storedElementOffsetTuples = storedElementOffsetTuples
         #streamObj._elementTree = None

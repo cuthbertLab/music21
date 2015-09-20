@@ -43,6 +43,7 @@ import copy
 import sys
 import types
 import unittest
+import warnings
 #import uuid
 from music21.test.testRunner import mainTest
 from music21.ext import six
@@ -126,6 +127,12 @@ class Music21ObjectException(exceptions21.Music21Exception):
 
 class ElementException(exceptions21.Music21Exception):
     pass
+
+class Music21DeprecationWarning(UserWarning):
+    # Do not subclass Deprecation warning, because these
+    # warnings need to be passed to users...
+    pass
+
 
 #------------------------------------------------------------------------------
 # private metaclass...
@@ -789,7 +796,7 @@ class Music21Object(object):
         that container can be provided here, and the offset in that object
         can be returned.
 
-        Note that this is different than the getOffsetByElement() method on
+        Note that this is different than the elementOffset() method on
         Stream in that this can never access the flat representation of a Stream.
 
         >>> n = note.Note('A-4')  # a Music21Objecct
@@ -1048,24 +1055,17 @@ class Music21Object(object):
 
     def removeLocationBySite(self, site):
         '''
-        TO-BE DEPRECATED: use self.sites.remove() instead and set activeSite
+        DEPRECATED Feb 2016: use self.sites.remove() instead and set activeSite
         manually.
 
         Remove a location in the :class:`~music21.base.Sites` object.
 
         This is only for advanced location method and
         is not a complete or sufficient way to remove an object from a Stream.
-
-        >>> s = stream.Stream()
-        >>> n = note.Note()
-        >>> n.sites.add(s)
-        >>> n.activeSite = s
-        Traceback (most recent call last):
-        SitesException: v2.1. -- you may not assign an activesite for an object <music21.note.Note C> not in the Stream <music21.stream.Stream 0x...>
-        >>> n.removeLocationBySite(s)
-        >>> n.activeSite is None
-        True
         '''
+        warnings.warn('removeLocationBySite is disappearing; use self.sites.remove() and set activeSite to None manually',
+                      Music21DeprecationWarning)
+        
         if not self.sites.isSite(site):
 #             for s in self.sites.siteDict:
 #                 # DEBUG!
@@ -3615,7 +3615,7 @@ class Test(unittest.TestCase):
         self.assertEqual(n2.getOffsetBySite(s2.flat), 110)
 
         # this seems more idiomatic
-        self.assertEqual(s2.flat.getOffsetByElement(n2), 110)
+        self.assertEqual(s2.flat.elementOffset(n2), 110)
 
         # both notes can find the treble clef in the activeSite stream
         post = n1.getContextByClass(clef.TrebleClef)
@@ -3649,8 +3649,8 @@ class Test(unittest.TestCase):
         post = measures[0].getElementsByClass(clef.Clef)
         self.assertEqual(isinstance(post[0], clef.TrebleClef), True)
 
-        # make sure we can find offset in a flat representation
-        self.assertEqual(a.parts[0].flat.getOffsetByElement(a.parts[0][3]), None)
+        # make sure we can find offset in a flat representation        
+        self.assertRaises(SitesException, a.parts[0].flat.elementOffset, a.parts[0][3])
 
         # for the second measure
         post = a.parts[0][3].getContextByClass(clef.Clef)
@@ -4042,8 +4042,8 @@ class Test(unittest.TestCase):
         match = [e.getOffsetBySite(s) for e in storage]
         self.assertEqual(match, [0.0, 1.0])
 
-        self.assertEqual(s.getOffsetByElement(storage[0]), 0.0)
-        self.assertEqual(s.getOffsetByElement(storage[1]), 1.0)
+        self.assertEqual(s.elementOffset(storage[0]), 0.0)
+        self.assertEqual(s.elementOffset(storage[1]), 1.0)
 
     def testGetActiveSiteTimeSignature(self):
         from music21 import base

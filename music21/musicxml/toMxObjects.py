@@ -2273,7 +2273,7 @@ def streamPartToMx(part, instStream=None, meterStream=None,
         # see if accidentals/beams can be processed
         if not measureStream.haveAccidentalsBeenMade():
             measureStream.makeAccidentals(inPlace=True)
-        if not measureStream.haveBeamsBeenMade():
+        if not measureStream.streamStatus.haveBeamsBeenMade():
             # if making beams, have to make a deep copy, as modifying notes
             try:
                 measureStream.makeBeams(inPlace=True)

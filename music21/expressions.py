@@ -889,7 +889,8 @@ class Tremolo(Ornament):
         >>> s.append(n)
         >>> s.show('text')
         {0.0} <music21.note.Note C>
-        >>> y = s.realizeOrnaments()
+        
+        >>> y = stream.makeNotation.realizeOrnaments(s)
         >>> y.show('text')
         {0.0} <music21.note.Note C>
         {0.125} <music21.note.Note C>
@@ -902,7 +903,7 @@ class Tremolo(Ornament):
 
 
         >>> t.numberOfMarks = 1
-        >>> y = s.realizeOrnaments()
+        >>> y = stream.makeNotation.realizeOrnaments(s)
         >>> y.show('text')
         {0.0} <music21.note.Note C>
         {0.5} <music21.note.Note C>

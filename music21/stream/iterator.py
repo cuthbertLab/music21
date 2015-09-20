@@ -171,6 +171,9 @@ class StreamIterator(object):
         >>> s.insert(0, note.Note('C'))
         >>> s.append(note.Rest())
         >>> s.append(note.Note('D'))
+        >>> b = bar.Barline()
+        >>> s.storeAtEnd(b)
+        
         >>> s2 = s.iter.getElementsByClass('Note').stream()
         >>> s2.show('t')
         {0.0} <music21.note.Note C>
@@ -179,6 +182,25 @@ class StreamIterator(object):
         'getElementsByClass'
         >>> s2
         <music21.stream.Part ...>
+        
+        >>> s3 = s.iter.stream()
+        >>> s3.show('t')
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Rest rest>
+        {2.0} <music21.note.Note D>
+        {3.0} <music21.bar.Barline style=regular>
+        
+        >>> s3.elementOffset(b, stringReturns=True)
+        'highestTime'
+        
+        >>> s4 = s.iter.getElementsByClass('Barline').stream()
+        >>> s4.show('t')
+        {0.0} <music21.bar.Barline style=regular>
+        
+        OMIT_FROM_DOCS
+        
+        >>> s4._endElements[0] is b
+        True
         '''
         from music21 import stream
         if returnStreamSubClass is True:
@@ -196,8 +218,19 @@ class StreamIterator(object):
             derivationMethods.append(f.derivationStr)
         found.derivation.method = '.'.join(derivationMethods)
         for e in self:
-            found._insertCore(e.offset, e)
-        found.elementsChanged()
+            o = self.srcStream.elementOffset(e, stringReturns=True)
+            if not isinstance(o, str):                
+                found._insertCore(o, e, ignoreSort=True)
+            else:
+                if o == 'highestTime':
+                    found._storeAtEndCore(e)
+                else:
+                    # TODO: something different...
+                    found._storeAtEndCore(e)
+
+        # if this stream was sorted, the resultant stream is sorted        
+        found.elementsChanged(clearIsSorted=False)
+        found.isSorted = self.srcStream.isSorted
         
         return found
     
@@ -278,6 +311,33 @@ class StreamIterator(object):
         self.addFilter(filter.ClassNotFilter(classFilterList))
         return self
         
+    def getElementsByGroup(self, groupFilterList):
+        '''
+        >>> n1 = note.Note("C")
+        >>> n1.groups.append('trombone')
+        >>> n2 = note.Note("D")
+        >>> n2.groups.append('trombone')
+        >>> n2.groups.append('tuba')
+        >>> n3 = note.Note("E")
+        >>> n3.groups.append('tuba')
+        >>> s1 = stream.Stream()
+        >>> s1.append(n1)
+        >>> s1.append(n2)
+        >>> s1.append(n3)
+        
+        >>> tboneSubStream = s1.iter.getElementsByGroup("trombone")
+        >>> for thisNote in tboneSubStream:
+        ...     print(thisNote.name)
+        C
+        D
+        >>> tubaSubStream = s1.iter.getElementsByGroup("tuba")
+        >>> for thisNote in tubaSubStream:
+        ...     print(thisNote.name)
+        D
+        E
+        '''        
+        self.addFilter(filter.GroupFilter(groupFilterList))
+        return self
 
 
     def getElementsByOffset(self, offsetStart, offsetEnd=None,

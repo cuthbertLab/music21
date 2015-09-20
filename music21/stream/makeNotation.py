@@ -1193,7 +1193,7 @@ def realizeOrnaments(s):
     <music21.stream.Measure 2 offset=4.0>
     <music21.note.Note D>
 
-    >>> s2 = s1.realizeOrnaments()
+    >>> s2 = stream.makeNotation.realizeOrnaments(s1)
     >>> for x in s2.recurse():
     ...     x
     ...
@@ -1215,7 +1215,7 @@ def realizeOrnaments(s):
     # multiple measures):
     for element in s:
         if element.isStream:
-            newStream.append(element.realizeOrnaments())
+            newStream.append(realizeOrnaments(element))
         else:
             if hasattr(element, "expressions"):
                 elementHasBeenRealized = False

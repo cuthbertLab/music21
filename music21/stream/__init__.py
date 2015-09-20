@@ -23,6 +23,7 @@ this module.
 import collections
 import copy
 import unittest
+import warnings
 import sys
 
 from fractions import Fraction
@@ -61,6 +62,11 @@ _MOD = "stream.py"
 environLocal = environment.Environment(_MOD)
 
 StreamException = exceptions21.StreamException
+
+class StreamDeprecationWarning(UserWarning):
+    # Do not subclass Deprecation warning, because these
+    # warnings need to be passed to users...
+    pass
 
 #------------------------------------------------------------------------------
 # Metaclass
@@ -577,7 +583,8 @@ class Stream(base.Music21Object):
         '''
         # remove old value at this position
         oldValue = self._elements[k]
-        oldValue.removeLocationBySite(self)
+        oldValue.sites.remove(self)
+        oldValue.activeSite = None
 
         # assign in new position
         self._elements[k] = value
@@ -1044,7 +1051,8 @@ class Stream(base.Music21Object):
                         matchOffset = self.elementOffset(match)
 
                     self.elementsChanged(clearIsSorted=False)
-                    match.removeLocationBySite(self)
+                    match.sites.remove(self)
+                    match.activeSite = None
 
                 if shiftOffsets is True and matchedEndElement is False: 
                     matchDuration = match.duration.quarterLength
@@ -1092,7 +1100,8 @@ class Stream(base.Music21Object):
         self.elementsChanged(clearIsSorted=False)
         # remove self from locations here only if
         # there are no further locations
-        post.removeLocationBySite(self)
+        post.sites.remove(self)
+        post.activeSite = None
         return post
 
 
@@ -1126,7 +1135,8 @@ class Stream(base.Music21Object):
             count += 1
         for i in reversed(indexList):
             post = self._elements.pop(i)
-            post.removeLocationBySite(self)
+            post.sites.remove(self)
+            post.activeSite = None
 
         # process end elements
         indexList = []
@@ -1138,7 +1148,8 @@ class Stream(base.Music21Object):
             count += 1
         for i in reversed(indexList):
             post = self._endElements.pop(i)
-            post.removeLocationBySite(self)
+            post.sites.remove(self)
+            post.activeSite = None
 
         # call elements changed once; sorted arrangement has not changed
         self.elementsChanged(clearIsSorted=False)
@@ -1164,7 +1175,8 @@ class Stream(base.Music21Object):
             count += 1
         for i in reversed(indexList):
             post = self._elements.pop(i)
-            post.removeLocationBySite(self)
+            post.sites.remove(self)
+            post.activeSite = None
 
         # process end elements
         indexList = []
@@ -1176,7 +1188,8 @@ class Stream(base.Music21Object):
             count += 1
         for i in reversed(indexList):
             post = self._endElements.pop(i)
-            post.removeLocationBySite(self)
+            post.sites.remove(self)
+            post.activeSite = None
 
         # call elements changed once; sorted arrangement has not changed
         self.elementsChanged(clearIsSorted=False)
@@ -1360,8 +1373,24 @@ class Stream(base.Music21Object):
     def elementOffset(self, element, stringReturns=False):
         '''
         return the offset (opFrac) from the offsetMap.
-        
         highly optimized for speed.
+        
+        if stringReturns are allowed then returns like 'highestOffset' are allowed.
+        
+        
+        >>> s = stream.Stream()
+        >>> s.append(note.Note('C'))
+        >>> d = note.Note('D')
+        >>> s.append(d)
+        >>> s.elementOffset(d)
+        1.0
+        
+        >>> b = bar.Barline()
+        >>> s.storeAtEnd(b)
+        >>> s.elementOffset(b)
+        2.0
+        >>> s.elementOffset(b, stringReturns=True)
+        'highestTime' 
         '''
         try:
             o = self._offsetDict[id(element)][0] # 2.3 million times found in TestStream
@@ -1990,7 +2019,8 @@ class Stream(base.Music21Object):
             self.setElementOffset(replacement, 'highestTime')
             replacement.sites.add(self)
 
-        target.removeLocationBySite(self)
+        target.sites.remove(self)
+        target.activeSite = None
 
         updateIsFlat = False
         if replacement.isStream:
@@ -2482,7 +2512,7 @@ class Stream(base.Music21Object):
             found.elementsChanged()
         return found
 
-    def getElementsNotOfClass(self, classFilterList, returnStreamSubClass = True):
+    def getElementsNotOfClass(self, classFilterList, returnStreamSubClass=True):
         '''
         Return a list of all Elements that do not
         match the one or more classes in the `classFilterList`.
@@ -2513,36 +2543,8 @@ class Stream(base.Music21Object):
         
         :rtype: Stream
         '''
-        # should probably be whatever class the caller is
-        if returnStreamSubClass:
-            try:
-                found = self.__class__()
-            except TypeError:
-                found = Stream()
-        else:
-            found = Stream()
-        found.derivation.origin = self
-        found.derivation.method = 'getElementsNotOfClass'
-
-        # much faster in the most common case than calling common.isListLike
-        if not isinstance(classFilterList, list):
-            if not isinstance(classFilterList, tuple):
-                classFilterList = [classFilterList]
-
-        # appendedAlready fixes bug where if an element matches two
-        # classes it was appendedTwice
-        # need both _elements and _endElements
-        for e in self._elements:
-            if not e.isClassOrSubclass(classFilterList):
-                found._insertCore(self.elementOffset(e), e, ignoreSort=True)
-        for e in self._endElements:
-            if not e.isClassOrSubclass(classFilterList):
-                found._storeAtEndCore(e)
-
-        # if this stream was sorted, the resultant stream is sorted
-        found.elementsChanged(clearIsSorted=False)
-        found.isSorted = self.isSorted
-        return found
+        return self.iter.getElementsNotOfClass(
+                    classFilterList).stream(returnStreamSubClass=returnStreamSubClass)
 
     def getElementsByGroup(self, groupFilterList):
         '''
@@ -2572,105 +2574,24 @@ class Stream(base.Music21Object):
         OMIT_FROM_DOCS
         # TODO: group comparisons are not YET case insensitive.
         '''
-
-        if not common.isListLike(groupFilterList):
-            groupFilterList = [groupFilterList]
-
-        returnStream = self.__class__()
-        returnStream.derivation.origin = self
-        returnStream.derivation.method = 'getElementsByGroup'
-
-        # need both _elements and _endElements
-        # must handle independently b/c inserting
-        for e in self._elements:
-            for g in groupFilterList:
-                if hasattr(e, "groups") and g in e.groups:
-                    returnStream._insertCore(self.elementOffset(e),
-                                        e, ignoreSort=True)
-        for e in self._endElements:
-            for g in groupFilterList:
-                if hasattr(e, "groups") and g in e.groups:
-                    #returnStream.storeAtEnd(e, ignoreSort=True)
-                    returnStream._storeAtEndCore(e)
-
-        returnStream.elementsChanged(clearIsSorted=False)
-        returnStream.isSorted = self.isSorted
-        return returnStream
-
-### probably not needed...
-#    def groupCount(self):
-#        '''
-#        Get a dictionary for each groupId and the count of instances.
-#
-#
-#
-#        >>> a = stream.Stream()
-#        >>> n = note.Note()
-#        >>> a.repeatAppend(n, 30)
-#        >>> a.addGroupForElements('P1')
-#        >>> a.groupCount()
-#        {'P1': 30}
-#        >>> a[12].groups.append('green')
-#        >>> a.groupCount()
-#        {'P1': 30, 'green': 1}
-#        '''
-#
-#        # TODO: and related:
-#        #getStreamGroups which does the same but makes the value of the hash key be a stream with all the elements that match the group?
-#        # this is similar to what getElementsByGroup does
-#
-#        post = {}
-#        # need both _elements and _endElements
-#        for e in self._elements:
-#            for groupName in e.groups:
-#                if groupName not in post:
-#                    post[groupName] = 0
-#                post[groupName] += 1
-#        for e in self._endElements:
-#            for groupName in e.groups:
-#                if groupName not in post:
-#                    post[groupName] = 0
-#                post[groupName] += 1
-#        return post
+        return self.iter.getElementsByGroup(
+                    groupFilterList).stream()
+                    
 
     def getOffsetByElement(self, obj):
         '''
-        Given an object, return the offset of that object in the context of
-        this Stream. This method can be called on a flat representation to return the ultimate position of a nested structure.
-
-        If the object is not found in the Stream, None is returned.
-
-        >>> n1 = note.Note('A')
-        >>> n2 = note.Note('B')
-
-        >>> s1 = stream.Stream()
-        >>> s1.insert(10, n1)
-        >>> s1.insert(100, n2)
-
-        >>> s2 = stream.Stream()
-        >>> s2.insert(10, s1)
-
-        >>> s2.flat.getOffsetBySite(n1) # this will not work
-        Traceback (most recent call last):
-        SitesException: ...
-
-        >>> s2.flat.getOffsetByElement(n1)
-        20.0
-        >>> s2.flat.getOffsetByElement(n2)
-        110.0
+        DEPRECATED Sep 2015: use s.elementOffset(obj) and if it is possible that
+        obj is not in s, then do a try: except base.SitesException
+        
+        Remove in 2016 Feb.
         '''
+        warnings.warn("getOffsetByElement will be removed; use s.elementOffset() instead", 
+                      StreamDeprecationWarning)
         try:
             return self.elementOffset(obj)
         except base.SitesException:
             return None
 
-#         post = None
-        # the offset of end element is always highest time
-#         for e in self.elements:
-#             if id(e) == id(obj):
-#                 post = self.elementOffset(obj)
-#                 break
-#         return post
 
     def getElementById(self, elementId, classFilter=None):
         '''
@@ -3826,7 +3747,7 @@ class Stream(base.Music21Object):
         for className in classFilterList:
             if className in [Measure or 'Measure']: # do not redo
                 continue
-            for e in self.getElementsByClass(className, returnStreamSubClass='list'):
+            for e in self.iter.getElementsByClass(className):
                 #environLocal.printDebug(['calling measure offsetMap(); e:', e])
                 # NOTE: if this is done on Notes, this can take an extremely
                 # long time to process
@@ -5519,13 +5440,19 @@ class Stream(base.Music21Object):
         
         DEPRECATED: Use :meth:`~music21.stream.streamStatus.StreamStatus.haveBeamsBeenMade`
         instead.
+        
+        Remove in Feb 2016
         '''
+        warnings.warn("use s.streamStatus.haveBeamsBeenMade instead; will disappear soon", StreamDeprecationWarning)        
         return self.streamStatus.haveBeamsBeenMade()
 
     def makeTupletBrackets(self, inPlace=False):
         '''
         Calls :py:func:`~music21.stream.makeNotation.makeTupletBrackets`.
+        
+        Deprecated sep 2015; rem march 2016; call makeNotation.makeTupletBrackets directly.
         '''
+        warnings.warn("use stream.makeNotation.makeTupletBrackets(s) instead; will disappear soon", StreamDeprecationWarning)        
         return makeNotation.makeTupletBrackets(
             self,
             inPlace=inPlace,
@@ -5769,7 +5696,7 @@ class Stream(base.Music21Object):
         # this means that they will never extend beyond one measure
         for m in measureStream:
             if m.streamStatus.haveTupletBracketsBeenMade() is False:
-                m.makeTupletBrackets(inPlace=True)
+                makeNotation.makeTupletBrackets(m, inPlace=True)
 
         if len(measureStream) == 0:
             raise StreamException('no measures found in stream with %s elements' % (self.__len__()))
@@ -5780,7 +5707,11 @@ class Stream(base.Music21Object):
     def realizeOrnaments(self):
         '''
         Calls :py:func:`~music21.stream.makeNotation.realizeOrnaments`.
+        
+        DEPRECATED Sep 2015; will be removed by March 2016
         '''
+        warnings.warn("realizeOrnaments; use stream.makeNotation.realizeOrnaments() instead", 
+                      StreamDeprecationWarning)
         return makeNotation.realizeOrnaments(self)
 
     def extendDuration(self, objName, inPlace=True):
@@ -5842,7 +5773,7 @@ class Stream(base.Music21Object):
 
         qLenTotal = returnObj.duration.quarterLength
         elements = []
-        for element in returnObj.getElementsByClass(objName):
+        for element in returnObj.iter.getElementsByClass(objName):
 #             if not hasattr(element, 'duration'):
 #                 raise StreamException('can only process objects with duration attributes')
             if element.duration is None:
@@ -5883,6 +5814,7 @@ class Stream(base.Music21Object):
         else:
             returnObj = self
         returnObj.extendDuration(objName, inPlace=True)
+        # TODO: use iteration.
         elements = returnObj.getElementsByClass(objName)
         boundaries = {}
         if len(elements) == 0:
@@ -5944,7 +5876,7 @@ class Stream(base.Music21Object):
             returnObj = self
 
         if returnObj.hasPartLikeStreams():
-            for p in returnObj.getElementsByClass('Part'):
+            for p in returnObj.iter.getElementsByClass('Part'):
                 # already copied if necessary; edit in place
                 # when handling a score, retain containers should be true
                 p.stripTies(inPlace=True, matchByPitch=matchByPitch,
@@ -7620,7 +7552,7 @@ class Stream(base.Music21Object):
         else:
             si = post.__iter__()
         
-        for e in si.getElementsByClass(classFilterList):
+        for e in si.iter.getElementsByClass(classFilterList):
             e.transpose(value, inPlace=True)
         if not inPlace:
             return post
@@ -7999,14 +7931,14 @@ class Stream(base.Music21Object):
 
         if returnObj.hasMeasures():
             # call on component measures
-            for m in returnObj.getElementsByClass('Measure'):
+            for m in returnObj.iter.getElementsByClass('Measure'):
                 m.sliceByQuarterLengths(quarterLengthList,
                     target=target, addTies=addTies, inPlace=True)
             returnObj.elementsChanged()
             return returnObj # exit
 
         if returnObj.hasPartLikeStreams():
-            for p in returnObj.getElementsByClass('Part'):
+            for p in returnObj.iter.getElementsByClass('Part'):
                 p.sliceByQuarterLengths(quarterLengthList,
                     target=target, addTies=addTies, inPlace=True)
             returnObj.elementsChanged()
@@ -8073,7 +8005,7 @@ class Stream(base.Music21Object):
 
         if returnObj.hasMeasures():
             # call on component measures
-            for m in returnObj.getElementsByClass('Measure'):
+            for m in returnObj.iter.getElementsByClass('Measure'):
                 m.sliceByGreatestDivisor(addTies=addTies, inPlace=True)
             returnObj.elementsChanged()
             return returnObj # exit
@@ -8119,7 +8051,7 @@ class Stream(base.Music21Object):
 
         if returnObj.hasMeasures():
             # call on component measures
-            for m in returnObj.getElementsByClass('Measure', returnStreamSubClass='list'):
+            for m in returnObj.iter.getElementsByClass('Measure'):
                 # offset values are not relative to measure; need to
                 # shift by each measure's offset
                 offsetListLocal = [o - m.getOffsetBySite(returnObj) for o in offsetList]
@@ -8131,7 +8063,7 @@ class Stream(base.Music21Object):
 
         if returnObj.hasPartLikeStreams():
             # part-like requires getting Streams, not Parts
-            for p in returnObj.getElementsByClass('Stream', returnStreamSubClass='list'):
+            for p in returnObj.iter.getElementsByClass('Stream'):
                 offsetListLocal = [o - p.getOffsetBySite(returnObj) for o in offsetList]
                 p.sliceAtOffsets(offsetList=offsetListLocal,
                     addTies=addTies, 
@@ -11930,11 +11862,11 @@ class Score(Stream):
         post.mergeAttributes(self)
 
         # get all things in the score that are not Parts
-        for e in self.getElementsNotOfClass('Part'):
+        for e in self.iter.getElementsNotOfClass('Part'):
             eNew = copy.deepcopy(e) # assume that this is needed
-            post.insert( self.elementOffset(e), eNew)
+            post.insert(self.elementOffset(e), eNew)
 
-        for p in self.getElementsByClass('Part'):
+        for p in self.iter.getElementsByClass('Part'):
             # get spanners at highest level, not by Part
             post.insert(0, p.expandRepeats(copySpanners=False))
 
