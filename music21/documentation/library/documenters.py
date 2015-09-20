@@ -592,8 +592,8 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.stream.Stream.highestOffset
         - music21.stream.Stream.highestTime
         - music21.stream.Stream.isGapless
+        - music21.stream.Stream.iter
         - music21.stream.Stream.lowestOffset
-        - music21.stream.Stream.notes
 
         '''
 
@@ -722,6 +722,7 @@ class ClassDocumenter(ObjectDocumenter):
         <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.highestOffset>
         <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.highestTime>
         <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.isGapless>
+        <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.iter>
         <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.lowestOffset>
         <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.notes>
         <music21.documentation.library.documenters.AttributeDocumenter: music21.stream.Stream.notesAndRests>

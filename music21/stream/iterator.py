@@ -243,9 +243,41 @@ class StreamIterator(object):
         <music21.note.Rest rest>
         
         '''
-        # much faster in the most common case than calling common.isListLike
         self.addFilter(filter.ClassFilter(classFilterList))
         return self
+
+    def getElementsNotOfClass(self, classFilterList):
+        '''
+        Adds a filter, removing all Elements that do not
+        match the one or more classes in the `classFilterList`.
+
+        In lieu of a list, a single class can be used as the `classFilterList` parameter.
+
+        >>> a = stream.Stream()
+        >>> a.repeatInsert(note.Rest(), list(range(10)))
+        >>> for x in range(4):
+        ...     n = note.Note('G#')
+        ...     n.offset = x * 3
+        ...     a.insert(n)
+        >>> found = list(a.iter.getElementsNotOfClass(note.Note))
+        >>> len(found)
+        10
+
+        >>> b = stream.Stream()
+        >>> b.repeatInsert(note.Rest(), list(range(15)))
+        >>> a.insert(b)
+        >>> # here, it gets elements from within a stream
+        >>> # this probably should not do this, as it is one layer lower
+        >>> found = list(a.flat.iter.getElementsNotOfClass(note.Rest))
+        >>> len(found)
+        4
+        >>> found = list(a.flat.iter.getElementsNotOfClass(note.Note))
+        >>> len(found)
+        25
+        '''
+        self.addFilter(filter.ClassNotFilter(classFilterList))
+        return self
+        
 
 
     def getElementsByOffset(self, offsetStart, offsetEnd=None,
