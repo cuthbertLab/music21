@@ -51,6 +51,7 @@ from music21 import timespans
 
 from music21.stream import makeNotation
 from music21.stream import streamStatus
+from music21.stream import iterator
 
 from music21.common import opFrac
 
@@ -1324,7 +1325,7 @@ class Stream(base.Music21Object):
         if len(spannerBundle) > 0:
             # iterate over complete semi-flat (need containers); find
             # all new/old pairs
-            for e in new.semiFlat:
+            for e in new.recurse(skipSelf=True):
                 #if 'Spanner' in e.classes:
                 if e.isSpanner:
                     continue # we never update Spanners
@@ -4507,7 +4508,7 @@ class Stream(base.Music21Object):
             quickSearch = False
 
         inversionDNN = inversionNote.diatonicNoteNum
-        for n in returnStream.flat.notes:
+        for n in returnStream.recurse(classFilter=('Note','Chord')):
             n.pitch.diatonicNoteNum = (2*inversionDNN) - n.pitch.diatonicNoteNum
             if quickSearch: # use previously found
                 n.pitch.accidental = ourKey.accidentalByStep(n.pitch.step)
@@ -12073,7 +12074,7 @@ class Score(Stream):
         spannerBundle = post.spannerBundle # use property
         # iterate over complete semi flat (need containers); find
         # all new/old pairs
-        for e in post.semiFlat:
+        for e in post.recurse(skipSelf=True):
             # update based on last id, new object
             if e.sites.hasSpannerSite():
                 origin = e.derivation.origin
