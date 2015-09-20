@@ -52,6 +52,7 @@ from music21 import timespans
 from music21.stream import makeNotation
 from music21.stream import streamStatus
 from music21.stream import iterator
+from music21.stream import filter
 
 from music21.common import opFrac
 
@@ -2738,7 +2739,8 @@ class Stream(base.Music21Object):
 
     def getElementsByOffset(self, offsetStart, offsetEnd=None,
                     includeEndBoundary=True, mustFinishInSpan=False,
-                    mustBeginInSpan=True, includeElementsThatEndAtStart = True, classList=None ):
+                    mustBeginInSpan=True, includeElementsThatEndAtStart=True, 
+                    classList=None):
         '''
         Returns a Stream containing all Music21Objects that
         are found at a certain offset or within a certain
@@ -4411,7 +4413,7 @@ class Stream(base.Music21Object):
             quickSearch = False
 
         inversionDNN = inversionNote.diatonicNoteNum
-        for n in returnStream.recurse(classFilter=('Note','Chord')):
+        for n in returnStream.recurse(classFilter=('NotRest')):
             n.pitch.diatonicNoteNum = (2*inversionDNN) - n.pitch.diatonicNoteNum
             if quickSearch: # use previously found
                 n.pitch.accidental = ourKey.accidentalByStep(n.pitch.step)
@@ -6724,7 +6726,7 @@ class Stream(base.Music21Object):
         
         >>> sRecurse = s.recurse()
         >>> sRecurse
-        <generator object recurse at 0x...>
+        <music21.stream.iterator.RecursiveIterator object at 0x...>
         
         So, that's not how we use `.recurse()`.  Instead use it in a for loop:
         
@@ -6803,60 +6805,15 @@ class Stream(base.Music21Object):
             if you need to edit while recusing, list(s.recurse()) is safer.
         
         #TODO: change skipSelf by January 2016.
-
         '''
-        def isOfClass(e, classes):
-            eClasses = e.classes  # store once, as this is property call
-            for className in classes:
-                if className in eClasses or (not isinstance(className, str) and isinstance(e, className)):
-                    return True
-            return False
-
-        if not common.isListLike(classFilter):
-            classFilter = [classFilter]
-
-        #environLocal.printDebug(['recurse', 'self', self, 'self.activeSite', self.activeSite])
-        if skipSelf is False:
-            if len(classFilter) > 0:
-                if isOfClass(self, classFilter):
-                    yield self
-            else:
-                yield self
-        # using indices so as to not to create an iterator and new locations/activeSites
-        for attr in ('_elements', '_endElements'):
-            elementList = getattr(self, attr)
-            for i in range(len(elementList)):
-                # not using __getitem__, also to avoid new locations/activeSites
-                try:
-                    e = elementList[i]
-                except IndexError:
-                    # this may happen in the number of elements has changed
-                    continue
-                if restoreActiveSites:
-                    e.activeSite = self
-                #if hasattr(e, 'elements'):
-                if e.isStream:
-                    # this returns a generator, so need to iterate over it
-                    # to get results
-                    for y in e.recurse(streamsOnly=streamsOnly, 
-                                       restoreActiveSites=restoreActiveSites, 
-                                       classFilter=classFilter,
-                                       skipSelf=False):
-                        if len(classFilter) > 0:
-                            if isOfClass(y, classFilter):
-                                yield y
-                        else:
-                            yield y
-                # its an element on the Stream that is not a Stream
-                else:
-                    if not streamsOnly:
-                        #environLocal.printDebug(['recurse', 'e', e, 'e.activeSite', e.activeSite,]) #'e.getSites()', e.getSites()])
-                        #yield e
-                        if len(classFilter) > 0:
-                            if isOfClass(e, classFilter):
-                                yield e
-                        else:
-                            yield e
+        includeSelf = not skipSelf
+        ri = iterator.RecursiveIterator(self, streamsOnly=streamsOnly,
+                                        restoreActiveSites=restoreActiveSites,
+                                        includeSelf=includeSelf
+                                        )
+        if classFilter != ():
+            ri.addFilter(filter.ClassFilter(classFilter))
+        return ri        
 
     def restoreActiveSites(self):
         '''
