@@ -167,7 +167,10 @@ class OffsetFilter(StreamFilter):
     def __call__(self, e, iterator):
         dur = e.duration
         s = iterator.srcStream
+        if s is e:
+            return False
         offset = s.elementOffset(e)
+        
         #offset = common.cleanupFloat(offset)
 
         if offset > self.offsetEnd:  # anything that ends after the span is definitely out

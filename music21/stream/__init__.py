@@ -284,6 +284,18 @@ class Stream(base.Music21Object):
         '''
         return iterator.StreamIterator(self)
 
+    @property
+    def iter(self):
+        '''
+        The Stream iterator, used in all for
+        loops and similar iteration routines. This method returns the
+        specialized :class:`music21.stream.StreamIterator` class, which
+        adds necessary Stream-specific features.
+
+        Generally you don't need this, but it is necessary to add filters to an
+        iterative search.
+        '''
+        return self.__iter__()
 
     def __getitem__(self, k):
         '''
@@ -991,6 +1003,7 @@ class Stream(base.Music21Object):
         # TODO: Shift offsets if recurse is True
         if shiftOffsets is True and recurse is True:
             raise StreamException("Cannot do both shiftOffsets and recurse search at the same time...yet")
+        
         if type(targetOrList) not in (list, set, tuple):
             self.remove([targetOrList], firstMatchOnly=firstMatchOnly, shiftOffsets=shiftOffsets, recurse=recurse)
         else:
@@ -1351,10 +1364,10 @@ class Stream(base.Music21Object):
         highly optimized for speed.
         '''
         try:
-            o = self._offsetDict[id(element)][0] # 2.3 million in TestStream
+            o = self._offsetDict[id(element)][0] # 2.3 million times found in TestStream
             #if returnedElement is not element: # stale reference...   0 in TestStream -- not worth testing
             #    o = None                
-        except KeyError: #445 - 442,443 = 3k in TestStream
+        except KeyError: # 445k - 442,443 = 3k in TestStream
             for idElement in self._offsetDict: # slower search
                 o, returnedElement = self._offsetDict[idElement]
                 if element is returnedElement:
@@ -2386,7 +2399,7 @@ class Stream(base.Music21Object):
         ...except if `returnStreamSubClass` is False, which makes the method
         return a generic Stream:
 
-        >>> found = a.getElementsByClass(note.Rest, returnStreamSubClass = False)
+        >>> found = a.getElementsByClass(note.Rest, returnStreamSubClass=False)
         >>> found.__class__.__name__
         'Stream'
 
@@ -2395,7 +2408,7 @@ class Stream(base.Music21Object):
         Generally not to be used, but can help in certain speed-critical applications
         where say only the length of the returned list or the presence or absence of elements matters:
 
-        >>> foundList = a.flat.getElementsByClass(note.Rest, returnStreamSubClass = 'list')
+        >>> foundList = a.flat.getElementsByClass(note.Rest, returnStreamSubClass='list')
         >>> len(foundList)
         25
 
@@ -6830,8 +6843,7 @@ class Stream(base.Music21Object):
         '''
         self.sort() # must sort before making immutable
         self._mutable = False
-        for e in self.recurse(streamsOnly=False,
-            restoreActiveSites=True):
+        for e in self.recurse(streamsOnly=True):
             #e.purgeLocations(rescanIsDead=True)
             # NOTE: calling this method was having the side effect of removing
             # sites from locations when a Note was both in a Stream and in
@@ -6843,8 +6855,7 @@ class Stream(base.Music21Object):
     def makeMutable(self, recurse=True):
         self._mutable = True
         if recurse:
-            for e in self.recurse(streamsOnly=True,
-                restoreActiveSites=True):
+            for e in self.recurse(streamsOnly=True):
                 # do not recurse, as will get all Stream
                 e.makeMutable(recurse=False)
         self.elementsChanged()
@@ -7549,7 +7560,7 @@ class Stream(base.Music21Object):
     #---------------------------------------------------------------------------
     # transformations
 
-    def transpose(self, value, inPlace=False,
+    def transpose(self, value, inPlace=False, recurse=True,
         classFilterList=('Note', 'Chord')):
         '''
         Transpose all specified classes in the
@@ -7564,6 +7575,8 @@ class Stream(base.Music21Object):
         it modifies pitches in place.
         
         TODO: for generic interval set accidental by key signature.
+        TODO: set recurse = False? 
+        
 
         >>> aInterval = interval.Interval('d5')
 
@@ -7602,9 +7615,12 @@ class Stream(base.Music21Object):
 #             e.transpose(value, inPlace=True)
 
         # this will get all elements at this level and downward.
-        for e in post.recurse(streamsOnly=False,
-                restoreActiveSites=True,
-                classFilter=classFilterList):
+        if recurse is True:
+            si = post.recurse()
+        else:
+            si = post.__iter__()
+        
+        for e in si.getElementsByClass(classFilterList):
             e.transpose(value, inPlace=True)
         if not inPlace:
             return post
@@ -7702,29 +7718,20 @@ class Stream(base.Music21Object):
 
         To augment or diminish a Stream, see the :meth:`~music21.stream.Stream.augmentOrDiminish` method.
 
-
         We do not retain durations in any circumstance; if inPlace=True, two deepcopies are done
         which can be quite slow.
-
-        TODO: inPlace default should be False
         '''
         if not amountToScale > 0:
             raise StreamException('amountToScale must be greater than zero')
+
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
         else:
             returnObj = self
 
-        for e in returnObj._elements:
-            # check if its a Stream, first, as duration is dependent
-            # and do not want to override
-            #if hasattr(e, "elements"): # recurse time:
-            if e.isStream:
-                e.scaleDurations(amountToScale)
-            #elif hasattr(e, 'duration'):
-            else:
-                if e.duration is not None:
-                    e.duration = e.duration.augmentOrDiminish(amountToScale)
+        for e in returnObj.recurse().getElementsNotOfClass('Stream'):
+            if e.duration is not None:
+                e.duration = e.duration.augmentOrDiminish(amountToScale)
 
         returnObj.elementsChanged()
         if inPlace is not True:
@@ -7808,7 +7815,7 @@ class Stream(base.Music21Object):
         if `inPlace` is True then the quantization is done on the Stream itself.  If False
         (default) then a new quantized Stream of the same class is returned.
 
-        If `recurse` is True then all substreams are also quantized.  If False (default)
+        If `recurse` is True then all substreams are also quantized.  If False (TODO: MAKE default)
         then only the highest level of the Stream is quantized.
 
 
@@ -7885,6 +7892,8 @@ class Stream(base.Music21Object):
         # if we have a min of .25 (sixteenth)
         # quarterLengthMin = quarterLengthDivisors[0]
 
+
+        # TODO: Use new filters...
         if inPlace is False:
             returnStream = copy.deepcopy(self)
         else:
@@ -9721,7 +9730,7 @@ class Stream(base.Music21Object):
     #---------------------------------------------------------------------------
     # Lyric control
 
-    def lyrics(self, ignoreBarlines = True, recurse = False, skipTies = False):
+    def lyrics(self, ignoreBarlines=True, recurse=False, skipTies=False):
         '''
         Returns a dict of lists of lyric objects (with the keys being
         the lyric numbers) found in self. Each list will have an element for each
@@ -9797,7 +9806,7 @@ class Stream(base.Music21Object):
                     returnLists[k].append(None)
 
         #------------------------
-
+        # TODO: use new recurse
         for e in self:
             eclasses = e.classes
             if ignoreBarlines is True and "Measure" in eclasses:
