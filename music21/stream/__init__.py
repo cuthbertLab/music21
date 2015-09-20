@@ -6679,7 +6679,6 @@ class Stream(base.Music21Object):
                             if skipDuplicates:
                                 memo.append(id(e))
 
-    # possible rename recurseList
     def recurse(self, streamsOnly=False,
         restoreActiveSites=True, classFilter=(), skipSelf=False):
         '''

@@ -100,7 +100,7 @@ class StreamIterator(object):
         >>> s.repeatAppend(note.Note('C'), 2)
         >>> sI = s.__iter__()
         >>> sI
-        <music21.stream.StreamIterator object at 0x...>
+        <music21.stream.iterator.StreamIterator object at 0x...>
         >>> sI.srcStream is s
         True
 
@@ -134,7 +134,7 @@ class StreamIterator(object):
 
 #------------------------------------------------------------------------------
 class RecursiveIterator(StreamIterator):
-
+    pass
 
     
 
