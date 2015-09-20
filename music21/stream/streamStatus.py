@@ -132,10 +132,43 @@ class StreamStatus(SlottedObject):
         exist, this method returns True, regardless of if makeBeams has
         actually been run.
         '''
-        for n in self.client.flat.notes:
+        for n in self.client.recurse(classFilter=('Note','Chord'), restoreActiveSites=False):
             if n.beams is not None and len(n.beams.beamsList):
                 return True
         return False
+    
+    def haveTupletBracketsBeenMade(self):
+        '''
+        If any GeneralNote in this Stream is a tuplet, then check to
+        see if any of them have a first Tuplet with type besides None
+        return True. Otherwise return False if there is a tuplet. Return None if
+        no Tuplets.
+        
+        >>> s = stream.Stream()
+        >>> s.streamStatus.haveTupletBracketsBeenMade() is None
+        True
+        >>> s.append(note.Note())
+        >>> s.streamStatus.haveTupletBracketsBeenMade() is None
+        True
+        >>> n = note.Note(quarterLength=1./3)
+        >>> s.append(n)
+        >>> s.streamStatus.haveTupletBracketsBeenMade()
+        False
+        >>> n.duration.tuplets[0].type = 'start'
+        >>> s.streamStatus.haveTupletBracketsBeenMade()
+        True
+        
+        '''
+        foundTuplet = False
+        for n in self.client.recurse(classFilter='GeneralNote', restoreActiveSites=False):
+            if len(n.duration.tuplets) > 0:
+                foundTuplet = True
+                if n.duration.tuplets[0].type is not None:
+                    return True
+        if foundTuplet:
+            return False
+        else:
+            return None
 
     ### PUBLIC PROPERTIES ###
 

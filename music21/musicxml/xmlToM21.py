@@ -2794,6 +2794,8 @@ class MeasureParser(XMLParserBase):
                     for dyn in mxDir:
                         # TODO: other-dynamic
                         d = dynamics.Dynamic(dyn.tag)
+                        _setAttributeFromAttribute(d, mxDirection, 'placement', '_positionPlacement')
+                        
                         self.insertCoreAndRef(totalOffset, staffKey, d)
     
                 elif tag in ('wedge', 'bracket', 'dashes'):

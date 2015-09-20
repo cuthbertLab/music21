@@ -32,9 +32,9 @@ from music21 import meter
 from music21 import note
 from music21 import pitch
 
+from music21.musicxml import m21ToXml
+
 from music21.midi import translate as midiTranslate
-from music21.musicxml import m21ToString
-from music21.musicxml import toMxObjects
 
 from music21 import environment
 _MOD = "testStream.py"
@@ -792,11 +792,12 @@ class Test(unittest.TestCase):
         self.assertEqual(instObj.partName, defaults.partName)
 
         # test mx generation of parts
-        unused_mx = toMxObjects.streamToMx(q)
-        unused_mx = toMxObjects.streamToMx(r)
+        GEX = m21ToXml.GeneralObjectExporter()
+        unused_mx = GEX.parse(q).decode('utf-8')
+        unused_mx = GEX.parse(r).decode('utf-8')
 
         # test mx generation of score
-        unused_mx = toMxObjects.streamToMx(s)
+        unused_mx = GEX.parse(s).decode('utf-8')
 
     def testMeasureAndTieCreation(self):
         '''A test of the automatic partitioning of notes in a measure and the creation of ties.
@@ -812,7 +813,8 @@ class Test(unittest.TestCase):
         a.insert(20, meter.TimeSignature("9/8")  )
         a.insert(40, meter.TimeSignature("10/4") )
 
-        unused_mx = toMxObjects.streamToMx(a)
+        GEX = m21ToXml.GeneralObjectExporter()
+        unused_mx = GEX.parse(a).decode('utf-8')
 
     def testStreamCopy(self):
         '''Test copying a stream
@@ -1426,7 +1428,9 @@ class Test(unittest.TestCase):
 
         self.assertEqual(p.lowestOffset, 0)
         self.assertEqual(p.highestTime, 100.0)
-        unused_post = m21ToString.fromMusic21Object(p)
+
+        GEX = m21ToXml.GeneralObjectExporter()
+        unused_mx = GEX.parse(p).decode('utf-8')
 
 
         # can only recreate problem in the context of two Streams
@@ -1444,8 +1448,8 @@ class Test(unittest.TestCase):
             partOffset += partOffsetShift
 
         #s.show()
-        unused_post = m21ToString.fromMusic21Object(s)
-
+        unused_mx = GEX.parse(p).decode('utf-8')
+        
 
     def testMusicXMLGenerationViaPropertyB(self):
         '''Test output tests above just by calling the musicxml attribute
@@ -1460,7 +1464,9 @@ class Test(unittest.TestCase):
         a.insert( 3, meter.TimeSignature("3/16") )
         a.insert(20, meter.TimeSignature("9/8")  )
         a.insert(40, meter.TimeSignature("10/4") )
-        unused_post = m21ToString.fromMusic21Object(a)
+
+        GEX = m21ToXml.GeneralObjectExporter()
+        unused_mx = GEX.parse(a).decode('utf-8')
 
     def testMusicXMLGenerationViaPropertyC(self):
         '''Test output tests above just by calling the musicxml attribute
@@ -1481,7 +1487,8 @@ class Test(unittest.TestCase):
             s.insert(p)
             partOffset += partOffsetShift
         #s.show()
-        unused_post = m21ToString.fromMusic21Object(s)
+        GEX = m21ToXml.GeneralObjectExporter()
+        unused_mx = GEX.parse(p).decode('utf-8')
 
 
 
@@ -1828,7 +1835,8 @@ class Test(unittest.TestCase):
         match = str([(n, n.duration) for n in s.flat.notesAndRests])
         self.assertEqual(match, '[(<music21.note.Rest rest>, <music21.duration.Duration 2.0>), (<music21.note.Note C>, <music21.duration.Duration 1.0>), (<music21.note.Rest rest>, <music21.duration.Duration 1.0>), (<music21.note.Rest rest>, <music21.duration.Duration 1.0>), (<music21.note.Note C>, <music21.duration.Duration 1.0>), (<music21.note.Rest rest>, <music21.duration.Duration 2.0>)]')
 
-        unused_raw = m21ToString.fromMusic21Object(s)
+        GEX = m21ToXml.GeneralObjectExporter()
+        unused_mx = GEX.parse(s).decode('utf-8')
         #s.show('text')
         #s.show()
 
@@ -2803,8 +2811,10 @@ class Test(unittest.TestCase):
             for n in ex.augmentOrDiminish(scalar, inPlace=False):
                 part.append(n)
             s.insert(0, part)
-        junkTest = toMxObjects.streamToMx(s)
-    
+            
+        GEX = m21ToXml.GeneralObjectExporter()
+        unused_mx = GEX.parse(s).decode('utf-8')
+        
         # second method: getting flattened stream
         src = corpus.parse('bach/bwv323.xml')
         # get notes from one part
@@ -2814,7 +2824,7 @@ class Test(unittest.TestCase):
             part = ex.augmentOrDiminish(scalar, inPlace=False)
             s.insert(0, part)
         
-        junkTest = toMxObjects.streamToMx(s)
+        unused_mx = GEX.parse(s).decode('utf-8')
         #s.show()
 
 
@@ -3013,7 +3023,8 @@ class Test(unittest.TestCase):
         s.metadata.composer = 'Frank the Composer'
         s.metadata.title = 'work title' # will get as movement name if not set
         #s.metadata.movementName = 'movement name'
-        unused_post = m21ToString.fromMusic21Object(s)
+        GEX = m21ToXml.GeneralObjectExporter()
+        unused_mx = GEX.parse(s).decode('utf-8')
         #s.show()
 
 
@@ -3083,7 +3094,8 @@ class Test(unittest.TestCase):
             s.append(m)
 
         #s.show()
-        unused_post = m21ToString.fromMusic21Object(s)
+        GEX = m21ToXml.GeneralObjectExporter()
+        unused_mx = GEX.parse(s).decode('utf-8')
 
     def testYieldContainers(self):
         from music21 import stream
@@ -4978,7 +4990,7 @@ class Test(unittest.TestCase):
         n2.quarterLength = 1
         v2.repeatAppend(n2, 4)
         
-        s = Stream()
+        s = Measure()
         s.insert(0, v1)
         s.insert(0, v2)
 
@@ -5005,12 +5017,14 @@ class Test(unittest.TestCase):
 {'voiceIndex': 1, 'element': <music21.note.Note C>, 'endTime': 4.0, 'offset': 3.0},
 ]
 ''')
-        oMeasures = s.makeMeasures()
+        oMeasures = Part()
+        oMeasures.insert(0, s)
         self.assertEqual(len(oMeasures[0].voices), 2)
         self.assertEqual([e.offset for e in oMeasures[0].voices[0]], [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5])
         self.assertEqual([e.offset for e in oMeasures[0].voices[1]], [0.0, 1.0, 2.0, 3.0])
 
-        unused_post = m21ToString.fromMusic21Object(s)
+        GEX = m21ToXml.GeneralObjectExporter()
+        unused_mx = GEX.parse(s).decode('utf-8')
 
 
         # try version longer than 1 measure, more than 2 voices
@@ -5034,7 +5048,7 @@ class Test(unittest.TestCase):
         n4.quarterLength = 4
         v4.repeatAppend(n4, 4)
         
-        s = Stream()
+        s = Part()
         s.insert(0, v1)
         s.insert(0, v2)
         s.insert(0, v3)
@@ -5055,7 +5069,8 @@ class Test(unittest.TestCase):
             self.assertEqual(len(oMeasures[i].voices[2].notesAndRests), 16)
             self.assertEqual(len(oMeasures[i].voices[3].notesAndRests), 1)
 
-        unused_post = m21ToString.fromMusic21Object(s)
+        GEX = m21ToXml.GeneralObjectExporter()
+        unused_mx = GEX.parse(oMeasures).decode('utf-8')
         #s.show()
 
 
@@ -5379,7 +5394,8 @@ class Test(unittest.TestCase):
 
         self.assertEqual(s2.spanners[0].getSpannedElements(), [s2.notesAndRests[0], s2.notesAndRests[-1]])
 
-        unused_post = m21ToString.fromMusic21Object(s2)
+        GEX = m21ToXml.GeneralObjectExporter()
+        unused_mx = GEX.parse(s2).decode('utf-8')
         #s2.show('t')
         #s2.show()
 
@@ -5855,7 +5871,8 @@ class Test(unittest.TestCase):
                         ['<accidental sharp>', '<accidental sharp>', '<accidental sharp>', '<accidental sharp>', '<accidental natural>', 'None', 'None', 'None', 'None', 'None'])
         self.assertEqual([n.pitch.accidental.displayStatus for n in m.notes[:5]], [True, False, False, False, True])
         
-        raw = m21ToString.fromMusic21Object(m)
+        GEX = m21ToXml.GeneralObjectExporter()
+        raw = GEX.parse(m).decode('utf-8')
         self.assertTrue(raw.find('<tuplet bracket="yes" placement="above"') > 0, raw)
         self.assertTrue(raw.find('<beam number="1">begin</beam>') > 0, raw)
 
@@ -5864,7 +5881,8 @@ class Test(unittest.TestCase):
         m = stream.Measure()
         m.repeatAppend(note.Note('c#', quarterLength=.5), 4)
         m.repeatAppend(note.Note('c', quarterLength=1/3.), 6)
-        raw = m21ToString.fromMusic21Object(m)
+        GEX = m21ToXml.GeneralObjectExporter()
+        raw = GEX.parse(m).decode('utf-8')
         self.assertEqual(raw.find('<beam number="1">begin</beam>') > 0, True)
         self.assertEqual(raw.find('<tuplet bracket="yes" placement="above"') > 0, True)
 
@@ -5890,7 +5908,8 @@ class Test(unittest.TestCase):
         p.append([m1, m2])
         #p.show()
         # test result of xml output to make sure a natural has been hadded
-        raw = m21ToString.fromMusic21Object(p)
+        GEX = m21ToXml.GeneralObjectExporter()
+        raw = GEX.parse(p).decode('utf-8')
         self.assertEqual(raw.find('<accidental>natural</accidental>') > 0, True)
         # make sure original is not chagned
         self.assertEqual(p.haveAccidentalsBeenMade(), False)
@@ -5919,7 +5938,8 @@ class Test(unittest.TestCase):
         p = stream.Part()
         p.append([m1, m2])
         self.assertEqual(p.haveBeamsBeenMade(), False)
-        raw = m21ToString.fromMusic21Object(p)
+        GEX = m21ToXml.GeneralObjectExporter()
+        raw = GEX.parse(p).decode('utf-8')
         # after getting musicxml, make sure that we have not changed the source
         #p.show()
         self.assertEqual(p.haveBeamsBeenMade(), False)
@@ -6769,13 +6789,11 @@ class Test(unittest.TestCase):
         <type>eighth</type>
         <stem>up</stem>
         <beam number="1">begin</beam>
-        <notations/>
       </note>
       <note>
         <rest/>
         <duration>5040</duration>
         <type>eighth</type>
-        <notations/>
       </note>
       <note>
         <pitch>
@@ -6786,10 +6804,11 @@ class Test(unittest.TestCase):
         <duration>10080</duration>
         <type>quarter</type>
         <stem>up</stem>
-        <notations/>
       </note>
       <note>"""
-        raw = m21ToString.fromMusic21Object(p)
+
+        GEX = m21ToXml.GeneralObjectExporter()
+        raw = GEX.parse(p).decode('utf-8')
         match = match.replace(' ', '')
         match = match.replace('\n', '')
         raw = raw.replace(' ', '')
@@ -6842,7 +6861,9 @@ class Test(unittest.TestCase):
             y.parts[0].flat.getElementsByClass('TimeSignature')), 2)
         # make sure that ts is being found in musicxml score generation
         # as it is in the Part, and not the Measure, this req an extra check
-        raw = m21ToString.fromMusic21Object(y.parts[0])
+        GEX = m21ToXml.GeneralObjectExporter()
+        raw = GEX.parse(y.parts[0]).decode('utf-8')
+
         match = """        <time>
           <beats>2</beats>
           <beat-type>4</beat-type>
@@ -6913,7 +6934,8 @@ class Test(unittest.TestCase):
                                      "(['A4', 'B-2'], '2.0', '2.0')]")
 
         #chords.show()
-        raw = m21ToString.fromMusic21Object(m1)
+        GEX = m21ToXml.GeneralObjectExporter()
+        raw = GEX.parse(m1).decode('utf-8')
         # there should only be 2 tuplet indications in the produced chords: start and stop...
         self.assertEqual(raw.count('<tuplet'), 2, raw)
         # pitch grouping in measure index 1 was not allocated properly
@@ -7162,14 +7184,11 @@ class Test(unittest.TestCase):
         from music21 import stream
         s = stream.Stream()
         s.append(key.Key('G'))
-        raw = m21ToString.fromMusic21Object(s)
-        self.assertEqual(raw.find('<fifths>1</fifths>') > 0, True)
-        
-        s = stream.Score()
-        s.append(key.Key('G'))
-        raw = m21ToString.fromMusic21Object(s)
-        self.assertEqual(raw.find('<fifths>1</fifths>') > 0, True)
+        GEX = m21ToXml.GeneralObjectExporter()
+        raw = GEX.parse(s).decode('utf-8')
 
+        self.assertTrue(raw.find('<fifths>1</fifths>') > 0, raw)
+        
 
     def testGetVariantsA(self):
         from music21 import stream, variant
@@ -7446,7 +7465,7 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     import music21
     #'testContextNestedC'
-    music21.mainTest(Test, 'verbose')
+    music21.mainTest(Test, 'verbose') # , runTest='testGetInstrumentManual')
 
 #------------------------------------------------------------------------------
 # eof
