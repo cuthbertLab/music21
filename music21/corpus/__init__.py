@@ -218,7 +218,7 @@ def search(
     performance penalty during metadata loading.
     
     >>> corpus.search('china')
-    <music21.metadata.bundles.MetadataBundle {1235 entries}>
+    <music21.metadata.bundles.MetadataBundle {565 entries}>
 
     >>> corpus.search('bach', field='composer')
     <music21.metadata.bundles.MetadataBundle {21 entries}>

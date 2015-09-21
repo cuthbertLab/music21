@@ -130,6 +130,9 @@ class MetadataCachingJob(object):
     ((<music21.metadata.bundles.MetadataEntry: bach_bwv66_6>,), ())
     >>> results = job.getResults()
     >>> errors = job.getErrors()
+    
+    TODO: error list, nut just numbers needs to be reported back up.
+    
     '''
 
     ### INITIALIZER ###
@@ -200,7 +203,7 @@ class MetadataCachingJob(object):
                     )
                 self.results.append(metadataEntry)
         except Exception:
-            environLocal.printDebug('Had a problem with extracting metadata '
+            environLocal.warn('Had a problem with extracting metadata '
             'for {0}, piece ignored'.format(self.filePath))
             environLocal.printDebug(traceback.format_exc())
 
@@ -214,7 +217,7 @@ class MetadataCachingJob(object):
                 self.parseOpusScore(score, scoreNumber)
                 del score  # for memory conservation
         except Exception as exception:
-            environLocal.printDebug(
+            environLocal.warn(
                 'Had a problem with extracting metadata for score {0} '
                 'in {1}, whole opus ignored: {2}'.format(
                     scoreNumber, self.filePath, str(exception)))
@@ -259,7 +262,7 @@ class MetadataCachingJob(object):
                     )
                 self.results.append(metadataEntry)
         except Exception as exception:
-            environLocal.printDebug(
+            environLocal.warn(
                 'Had a problem with extracting metadata '
                 'for score {0} in {1}, whole opus ignored: '
                 '{2}'.format(
