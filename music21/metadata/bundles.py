@@ -1109,7 +1109,7 @@ class MetadataBundle(object):
             ])
         return self
 
-    def rebuild(self, useMultiprocessing=True):
+    def rebuild(self, useMultiprocessing=True, verbose=True):
         r'''
         Rebuild a named bundle from scratch.
 
@@ -1131,6 +1131,7 @@ class MetadataBundle(object):
             self.corpus.getPaths(),
             useCorpus=useCorpus,
             useMultiprocessing=useMultiprocessing,
+            verbose=verbose
             )
         return self
 
