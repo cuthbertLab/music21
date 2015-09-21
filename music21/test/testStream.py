@@ -1614,6 +1614,8 @@ class Test(unittest.TestCase):
     def testContextNestedC(self):
         '''Testing getting clefs from higher-level streams
         '''
+        from music21 import sites
+        
         s1 = Stream()
         s1.id = 's1'
         s2 = Stream()
@@ -1639,9 +1641,9 @@ class Test(unittest.TestCase):
         self.assertEqual(isinstance(post, clef.AltoClef), True)
 
         # s1 is in s2; but s1.flat is not in s2! -- not true if isFlat is true
-        self.assertEqual(s2.getOffsetByElement(s1), 0.0)
-        #  self.assertEqual(s2.getOffsetByElement(s1.flat), None)  == 0.0
-
+        self.assertEqual(s2.elementOffset(s1), 0.0)
+        self.assertRaises(sites.SitesException, s2.elementOffset, s1.flat)
+        
 
         # this did not work before; the clef is in s2; its not in a context of s2
         post = s2.getContextByClass(clef.Clef)
@@ -3518,6 +3520,7 @@ class Test(unittest.TestCase):
     def testMakeTupletBracketsA(self):
         '''Creating brackets
         '''
+        from music21.stream import makeNotation
         def collectType(s):
             post = []
             for e in s:
@@ -3544,7 +3547,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        s.makeTupletBrackets(inPlace = True)
+        makeNotation.makeTupletBrackets(s, inPlace = True)
         self.assertEqual(collectType(s), [None, None, None, 'startStop'])
         self.assertEqual(collectBracket(s), [None, None, None, False])
         #s.show()
@@ -3553,6 +3556,7 @@ class Test(unittest.TestCase):
     def testMakeTupletBracketsB(self):
         '''Creating brackets
         '''
+        from music21.stream import makeNotation
         def collectType(s):
             post = []
             for e in s:
@@ -3577,7 +3581,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        s.makeTupletBrackets(inPlace = True)
+        makeNotation.makeTupletBrackets(s, inPlace = True)
         self.assertEqual(collectType(s), [None, 'start', None, 'stop', None, None])
         #s.show()
 
@@ -3588,7 +3592,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        s.makeTupletBrackets(inPlace = True)
+        makeNotation.makeTupletBrackets(s, inPlace = True)
         # this is the correct type settings but this displays by dividing
         # into two brackets
         self.assertEqual(collectType(s), [None, 'start', None, 'stop', 'start', None, 'stop', None, None] )
@@ -3601,7 +3605,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        s.makeTupletBrackets(inPlace = True)
+        makeNotation.makeTupletBrackets(s, inPlace = True)
         self.assertEqual(collectType(s), [None, None, None, 'start', None, 'stop'] )
         #s.show()
 
@@ -3613,7 +3617,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        s.makeTupletBrackets(inPlace = True)
+        makeNotation.makeTupletBrackets(s, inPlace = True)
         self.assertEqual(collectType(s), [None, 'startStop', None,  'startStop', None,  'startStop'])
         self.assertEqual(collectBracket(s), [None, False, None, False, None, False])
         #s.show()
@@ -3625,7 +3629,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        s.makeTupletBrackets(inPlace = True)
+        makeNotation.makeTupletBrackets(s, inPlace = True)
         self.assertEqual(collectType(s), [None, 'start', 'stop','start', None, 'stop', None])
         #s.show()
 
@@ -3637,7 +3641,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        s.makeTupletBrackets(inPlace = True)
+        makeNotation.makeTupletBrackets(s, inPlace = True)
         self.assertEqual(collectType(s), [None, 'start', 'stop', None, 'start', 'stop', 'start', 'stop'] )
         self.assertEqual(collectBracket(s), [None, True, True, None, True, True, True, True])
         #s.show()
@@ -3650,7 +3654,7 @@ class Test(unittest.TestCase):
             n = note.Note()
             n.quarterLength = ql
             s.append(n)
-        s.makeTupletBrackets(inPlace = True)
+        makeNotation.makeTupletBrackets(s, inPlace = True)
         self.assertEqual(collectType(s), [None, 'start', None, None, None, None, 'stop', None]  )
         self.assertEqual(collectBracket(s), [None, True, True, True, True, True, True, None] )
         #s.show()
@@ -4262,8 +4266,8 @@ class Test(unittest.TestCase):
 
 
         # get offset by elements
-        self.assertEqual(s.getOffsetByElement(n1), 0.0)
-        self.assertEqual(s.getOffsetByElement(b1), 50)
+        self.assertEqual(s.elementOffset(n1), 0.0)
+        self.assertEqual(s.elementOffset(b1), 50)
 
 
         # get elements by offset
@@ -5923,9 +5927,9 @@ class Test(unittest.TestCase):
         m2.repeatAppend(note.Note('c', quarterLength=.5), 8)
         p = stream.Part()
         p.append([m1, m2])
-        self.assertEqual(p.haveBeamsBeenMade(), False)
+        self.assertEqual(p.streamStatus.haveBeamsBeenMade(), False)
         p.makeBeams(inPlace=True)
-        self.assertEqual(p.haveBeamsBeenMade(), True)
+        self.assertEqual(p.streamStatus.haveBeamsBeenMade(), True)
 
 
     def testHaveBeamsBeenMadeB(self):
@@ -5937,12 +5941,12 @@ class Test(unittest.TestCase):
         m2.repeatAppend(note.Note('c', quarterLength=.5), 8)
         p = stream.Part()
         p.append([m1, m2])
-        self.assertEqual(p.haveBeamsBeenMade(), False)
+        self.assertEqual(p.streamStatus.haveBeamsBeenMade(), False)
         GEX = m21ToXml.GeneralObjectExporter()
         raw = GEX.parse(p).decode('utf-8')
         # after getting musicxml, make sure that we have not changed the source
         #p.show()
-        self.assertEqual(p.haveBeamsBeenMade(), False)
+        self.assertEqual(p.streamStatus.haveBeamsBeenMade(), False)
         self.assertEqual(raw.find('<beam number="1">end</beam>') > 0, True)
 
 
@@ -6691,7 +6695,7 @@ class Test(unittest.TestCase):
         self.assertEqual([str(p) for p in s.parts[0].pitches], ['D4', 'E4', 'F#4', 'G4', 'A4', 'B4', 'C#5', 'D5'])
         self.assertEqual([str(p) for p in s.parts[1].pitches], ['A4', 'B4', 'C#5', 'D5', 'E5', 'F#5', 'G#5', 'A5'])
         
-        s.toSoundingPitch()
+        s.toSoundingPitch(inPlace=True)
         
         self.assertEqual([str(p) for p in s.parts[0].pitches], ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'] )
         self.assertEqual([str(p) for p in s.parts[1].pitches], ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'] )

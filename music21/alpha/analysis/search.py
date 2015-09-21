@@ -84,7 +84,7 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
 
         # just takes notes or pitches
         if 'Note' in e.classes or 'Pitch' in e.classes:
-            sourceClean.insert(e.getOffsetBySite(source), e)
+            sourceClean.insert(source.elementOffset(e), e)
     
     # not taking flat
     for eCount, e in enumerate(sourceClean):
@@ -189,7 +189,7 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
 
             for e in collElements:
                 # use source offset positions
-                post.insert(e.getOffsetBySite(source), e)
+                post.insert(source.elementOffset(e), e)
             dictionary = {}
             dictionary['stream'] = post
             dictionary['direction'] = directionLast

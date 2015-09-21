@@ -2129,13 +2129,13 @@ def realizeChordSymbolDurations(piece):
                 lastchord = cs
                 continue
             else:
-                lastchord.duration.quarterLength = cs.getOffsetBySite(pf) - lastchord.getOffsetBySite(pf)
+                lastchord.duration.quarterLength = pf.elementOffset(cs) - pf.elementOffset(lastchord)
                 if onlyChords.index(cs) == (len(onlyChords) - 1):
-                    cs.duration.quarterLength = pf.highestTime - cs.getOffsetBySite(pf)
+                    cs.duration.quarterLength = pf.highestTime - pf.elementOffset(cs)
                 lastchord = cs
         return pf
     elif len(onlyChords) == 1:
-        onlyChords[0].duration.quarterLength = pf.highestOffset - onlyChords[0].getOffsetBySite(pf)
+        onlyChords[0].duration.quarterLength = pf.highestOffset - pf.elementOffset(onlyChords[0])
         return pf
     else:
         return piece

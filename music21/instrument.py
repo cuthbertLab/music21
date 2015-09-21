@@ -1715,9 +1715,9 @@ def partitionByInstrument(streamObj):
     # add to corresponding part
     for sub in s:
         for i in sub.getElementsByClass('Instrument'):
-            start = i.getOffsetBySite(sub) 
+            start = i.offset 
             # duration will have been set with sub.extendDuration above
-            end = i.getOffsetBySite(sub) + i.duration.quarterLength
+            end = i.offset + i.duration.quarterLength
             # get destination Part
             p = names[i.instrumentName]['Part']
             coll = sub.getElementsByOffset(start, end, 
@@ -1727,7 +1727,7 @@ def partitionByInstrument(streamObj):
             # add to part at original offset
             # do not gather instrument
             for e in coll.getElementsNotOfClass('Instrument'):
-                p.insert(e.getOffsetBySite(sub), e)
+                p.insert(sub.elementOffset(e), e)
     return post
 
 

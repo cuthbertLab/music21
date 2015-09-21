@@ -618,6 +618,15 @@ class MusicXMLImporter(XMLParserBase):
         2
         >>> tb.content
         'Testing'
+        
+        OMIT_FROM_DOCS
+        
+        Capella generates empty credit-words
+        
+        >>> credit = ET.fromstring('<credit><credit-words/></credit>')
+        >>> tb = MI.xmlCreditToTextBox(credit)
+        >>> tb
+        <music21.text.TextBox "">
         '''
         tb = text.TextBox()
         pageNum = mxCredit.get('page')
@@ -628,9 +637,12 @@ class MusicXMLImporter(XMLParserBase):
         tb.page = pageNum
         content = []
         for cw in mxCredit.findall('credit-words'):
-            content.append(cw.text)
+            if cw.text not in (None, ""):
+                content.append(cw.text)
         if len(content) == 0: # no text defined
-            raise MusicXMLImportException('no credit words defined for a credit tag')
+            tb.content = ""
+            return tb # capella generates empty credit-words
+            #raise MusicXMLImportException('no credit words defined for a credit tag')
         tb.content = '\n'.join(content) # join with \n
     
         cw1 = mxCredit.find('credit-words')
@@ -1894,6 +1906,7 @@ class MeasureParser(XMLParserBase):
             qLen = float(noteDivisions) / divisions
         else:
             noteDivisions = None
+            qLen = 0.0
             
             
         mxType = mxNote.find('type')
@@ -3678,7 +3691,10 @@ class Test(unittest.TestCase):
         self.assertEqual(self.pitchOut([p for p in s.parts[1].flat.pitches]), '[B4, B4, B4, B4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, B4, B4, B4, B4, B4, B4]')
         self.assertEqual(self.pitchOut([p for p in s.parts[2].flat.pitches]), '[E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5]')
 
+        self.assertFalse(s.parts[0].flat.atSoundingPitch)
+
         sSounding = s.toSoundingPitch(inPlace=False)
+
         self.assertEqual(self.pitchOut([p for p in sSounding.parts[0].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
         self.assertEqual(self.pitchOut([p for p in sSounding.parts[1].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
         self.assertEqual(self.pitchOut([p for p in sSounding.parts[2].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')

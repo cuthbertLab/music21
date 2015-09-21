@@ -475,6 +475,9 @@ class _EnvironmentCore(object):
         '''
         # get the root dir, which may be the user-specified dir
         rootDir = self.getRootTempDir()
+        if len(suffix) > 0 and not suffix.startswith('.'):
+            suffix = '.' + suffix
+
 
         if common.getPlatform() != 'win':
             fileDescriptor, filePath = tempfile.mkstemp(

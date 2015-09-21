@@ -8,7 +8,6 @@
 # Copyright:    Copyright © 2007-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 '''
 music21 translates to Lilypond format and if Lilypond is installed on the
 local computer, can automatically generate .pdf, .png, and .svg versions
@@ -266,7 +265,7 @@ class LilypondConverter(object):
         Create a Lilypond object hierarchy in self.topLevelObject from an
         arbitrary music21 object.
 
-        TODO: make lilypond automatically run s.makeTupletBrackets()
+        TODO: make lilypond automatically run makeNotation.makeTupletBrackets(s)
         TODO: Add tests...
         '''
         from music21 import stream
@@ -869,7 +868,7 @@ class LilypondConverter(object):
             newContext = contextType
             optionalId = lyo.LyOptionalId(makeLettersOnlyId(streamIn.id))
 
-        if streamIn.haveBeamsBeenMade() is True:
+        if streamIn.streamStatus.haveBeamsBeenMade() is True:
             contextModList.append(r"\autoBeamOff ")
 
         if hasattr(streamIn, 'staffLines') and streamIn.staffLines != 5:
@@ -1830,7 +1829,7 @@ class LilypondConverter(object):
                 if "SpacerRest" in el.classes:
                     pass
                 else:
-                    return el.getOffsetBySite(inputStream)
+                    return inputStream.elementOffset(el)
 
         variantList.sort(key = lambda v: findOffsetOfFirstNonSpacerElement(v._stream))
 
@@ -2284,7 +2283,7 @@ class LilypondConverter(object):
         return lyObject
 
     #--------------display and converter routines ---------------------#
-    def writeLyFile(self, ext = '', fp = None):
+    def writeLyFile(self, ext='', fp=None):
         '''
         writes the contents of the self.topLevelObject to a file.
 
@@ -2306,7 +2305,7 @@ class LilypondConverter(object):
 
         return self.tempName
 
-    def runThroughLily(self, format = None, backend = None, fileName = None, skipWriting = False): #@ReservedAssignment
+    def runThroughLily(self, format=None, backend=None, fileName=None, skipWriting=False): #@ReservedAssignment
         '''
         creates a .ly file from self.topLevelObject via .writeLyFile
         then runs the file through Lilypond.
@@ -2318,10 +2317,10 @@ class LilypondConverter(object):
         '''
         LILYEXEC = self.findLilyExec()
         if fileName is None:
-            fileName = self.writeLyFile(ext = 'ly')
+            fileName = self.writeLyFile(ext='ly')
         else:
             if skipWriting is False:
-                fileName = self.writeLyFile(ext = 'ly', fp = fileName)
+                fileName = self.writeLyFile(ext='ly', fp=fileName)
 
 
         lilyCommand = '"' + LILYEXEC + '" '
@@ -2387,10 +2386,10 @@ class LilypondConverter(object):
 
         if PIL is installed then a small white border is created around the score
         '''
-        lilyFile = self.runThroughLily(backend='eps', format = 'png', fileName = fileName)
+        lilyFile = self.runThroughLily(backend='eps', format='png', fileName=fileName)
         if noPIL is False:
             try:
-                lilyImage = Image.open(lilyFile)
+                lilyImage = Image.open(lilyFile) # @UndefinedVariable
                 lilyImage2 = ImageOps.expand(lilyImage, 10, 'white')
                 lilyImage2.save(lilyFile)
             except:
@@ -2438,17 +2437,17 @@ class LilypondConverter(object):
 
         return lilyFile
 
-    def createSVG(self, fileName = None):
+    def createSVG(self, fileName=None):
         '''
         create an SVG file from self.topLevelObject and return the filepath of the file.
 
         most users will just call stream.Stream.write('lily.svg') on a stream.
         '''
         self.headerScheme.content = "" # clear header        
-        lilyFile = self.runThroughLily(format = 'svg', backend = 'svg', fileName = fileName)
+        lilyFile = self.runThroughLily(format='svg', backend='svg', fileName=fileName)
         return lilyFile
 
-    def showSVG(self, fileName = None):
+    def showSVG(self, fileName=None):
         '''
         create a SVG file from self.topLevelObject, show it with your svg reader (often Internet Explorer/
         WebBrowser on PC)

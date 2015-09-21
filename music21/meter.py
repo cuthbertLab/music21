@@ -3927,6 +3927,11 @@ class TimeSignature(base.Music21Object):
         2.5
         >>> ts1.getOffsetFromBeat(3.25)
         2.25
+        
+        >>> from fractions import Fraction
+        >>> ts1.getOffsetFromBeat(Fraction(8, 3)) # 2.66666
+        Fraction(5, 3)
+        
 
         >>> ts1 = meter.TimeSignature('6/8')
         >>> ts1.getOffsetFromBeat(1)
@@ -3970,9 +3975,9 @@ class TimeSignature(base.Music21Object):
         # divide into integer and floating point components
         beatInt, beatFraction = divmod(beat, 1)
         beatInt = int(beatInt) # convert to integer
-        # resolve .33 to .3333333
-        # TODO -- REMOVE -- require CORRECT beats as Fractions
-        beatFraction = common.nearestCommonFraction(beatFraction)
+
+        # resolve .33 to .3333333 (actually Fraction(1, 3). )
+        beatFraction = common.addFloatPrecision(beatFraction)
 
         if beatInt-1 > len(self.beatSequence)-1:
             raise TimeSignatureException('requested beat value (%s) not found in beat partitions (%s) of ts %s' % (beatInt, self.beatSequence, self))
@@ -3980,9 +3985,8 @@ class TimeSignature(base.Music21Object):
         # beat int counts from 1; subtrack 1 to get index
         beatDur = self.beatSequence[beatInt-1].duration
         oStart, unused_oEnd = self.beatSequence.getLevelSpan()[beatInt-1]
-        post = oStart + (beatDur.quarterLength * beatFraction)
-        # round to 3 values
-        return round(post, 4)
+        post = opFrac(oStart + (beatDur.quarterLength * beatFraction))
+        return post
 
     def getBeatProgress(self, qLenPos):
         '''

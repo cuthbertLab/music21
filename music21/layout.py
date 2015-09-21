@@ -590,7 +590,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
         if 'Part' not in el.classes:
             if 'ScoreLayout' in el.classes:
                 scoreLists.scoreLayout = el
-            scoreLists.insert(el.getOffsetBySite(scoreIn), el)
+            scoreLists.insert(scoreIn.elementOffset(el), el)
 
     pageNumber = 0
     systemNumber = 0
@@ -611,7 +611,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
         thisPage.systemStart = systemNumber + 1
         for el in thisPageAll:
             if 'Part' not in el.classes and 'StaffGroup' not in el.classes:
-                thisPage.insert(el.getOffsetBySite(thisPageAll), el)
+                thisPage.insert(thisPageAll.elementOffset(el), el)
         firstMeasureOfFirstPart = thisPageAll.parts[0].getElementsByClass('Measure', returnStreamSubClass='list')[0]
         for el in firstMeasureOfFirstPart:
             if 'PageLayout' in el.classes:

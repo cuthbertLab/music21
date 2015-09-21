@@ -116,7 +116,7 @@ _validMensuralAbbr = [None, 'Mx', 'L', 'B', 'SB', 'M', 'SM']
 #    tempSites = music21Obj.getSites()[1:]
 #    if len(tempSites) > 0:
 #        for s in tempSites:
-#            for i in range(int(s.lowestOffset), int(s.getOffsetByElement(music21Obj))+1):
+#            for i in range(int(s.lowestOffset), int(s.elementOffset(music21Obj))+1):
 #                cList += list(s.getElementsByOffset(i, i+1, classList = targetClassList).recurse())[1:]
 #        cList += music21.medren._getTargetBeforeOrAtObj(s, targetClassList)
 #    
