@@ -51,6 +51,9 @@ except:
 import unittest
 import math
 import re
+
+from music21.ext import six
+
 from music21 import articulations
 from music21 import chord
 from music21 import dynamics
@@ -717,8 +720,13 @@ class HumdrumFile(HumdrumDataCollection):
         self._storedStream = None
         if (filename is not None):
             try:
-                humFH = open(filename)
-                self.eventList = self.parseFH(humFH)
+                if six.PY3:
+                    with open(filename, encoding="latin-1") as humFH:
+                        self.eventList = self.parseFH(humFH)
+                else:
+                    with open(filename) as humFH:
+                        self.eventList = self.parseFH(humFH)
+                    
             except IOError:
                 raise
 
