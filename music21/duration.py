@@ -162,7 +162,7 @@ def unitSpec(durationObjectOrObjects):
     >>> bDur = duration.Duration()
     >>> bDur.quarterLength = 1.125
     >>> duration.unitSpec(bDur)
-    (1.125, 'complex', None, None, None, None)
+    (1.125, 'complex', 0, None, None, None)
 
     >>> cDur = duration.Duration()
     >>> cDur.quarterLength = 0.3333333
@@ -170,7 +170,7 @@ def unitSpec(durationObjectOrObjects):
     (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')
 
     >>> duration.unitSpec([aDur, bDur, cDur])
-    [(3.0, 'half', 1, None, None, None), (1.125, 'complex', None, None, None, None), (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')]
+    [(3.0, 'half', 1, None, None, None), (1.125, 'complex', 0, None, None, None), (Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')]
     '''
     if isinstance(durationObjectOrObjects, list):
         ret = []
@@ -263,7 +263,7 @@ def quarterLengthToClosestType(qLen):
     >>> qL = qL * .75
     >>> duration.quarterLengthToClosestType(qL)
     Traceback (most recent call last):
-    DurationException: Cannot return types smaller than 2048th
+    DurationException: Cannot return types smaller than 2048th; qLen was: 0.00146484375
     '''
     if (isinstance(qLen, fractions.Fraction)):
         noteLengthType = 4 / qLen  # divides right...

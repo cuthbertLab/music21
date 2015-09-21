@@ -1045,7 +1045,7 @@ class CoreCorpus(Corpus):
         Search the core corpus for metadata entries:
 
         >>> corpus.CoreCorpus().search('3/4')
-        <music21.metadata.bundles.MetadataBundle {1782 entries}>
+        <music21.metadata.bundles.MetadataBundle {1865 entries}>
 
         >>> corpus.CoreCorpus().search(
         ...      'bach',
@@ -1058,7 +1058,7 @@ class CoreCorpus(Corpus):
         ...     predicate,
         ...     field='noteCount',
         ...     )
-        <music21.metadata.bundles.MetadataBundle {131 entries}>
+        <music21.metadata.bundles.MetadataBundle {132 entries}>
 
         '''
         from music21 import metadata
