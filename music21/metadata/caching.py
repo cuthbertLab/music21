@@ -336,7 +336,7 @@ class JobProcessor(object):
         if processCount < 1:
             processCount = 1
         remainingJobs = len(jobs)
-        if remainingJobs > processCount: # do not start more processes than jobs...
+        if processCount > remainingJobs: # do not start more processes than jobs...
             processCount = remainingJobs
             
         environLocal.printDebug(
