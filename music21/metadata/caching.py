@@ -42,6 +42,7 @@ class MetadataCacheException(exceptions21.Music21Exception):
 def cacheMetadata(
     corpusNames=('local', 'core', 'virtual'),
     useMultiprocessing=True,
+    verbose=False
     ):
     '''
     Cache metadata from corpora in `corpusNames` as local cache files:
@@ -81,21 +82,35 @@ def cacheMetadata(
             raise MetadataCacheException(message)
         message = 'metadata cache: starting processing of paths: {0}'.format(
                 len(paths))
-        environLocal.printDebug(message)
+        if verbose is True:
+            environLocal.warn(message)
+        else:
+            environLocal.printDebug(message)
+
         failingFilePaths += metadataBundle.addFromPaths(
             paths,
             useCorpus=useCorpus,
             useMultiprocessing=useMultiprocessing,
+            verbose=verbose
             )
         message = 'cache: writing time: {0} md items: {1}'.format(
             timer, len(metadataBundle))
-        environLocal.printDebug(message)
+        if verbose is True:
+            environLocal.warn(message)
+        else:
+            environLocal.printDebug(message)
         del metadataBundle
     message = 'cache: final writing time: {0} seconds'.format(timer)
-    environLocal.printDebug(message)
+    if verbose is True:
+        environLocal.warn(message)
+    else:
+        environLocal.printDebug(message)
     for failingFilePath in failingFilePaths:
         message = 'path failed to parse: {0}'.format(failingFilePath)
-        environLocal.printDebug(message)
+        if verbose is True:
+            environLocal.warn(message)
+        else:
+            environLocal.printDebug(message)
             
 
 
@@ -130,7 +145,7 @@ class MetadataCachingJob(object):
         import gc
         self.results = []
         parsedObject = self.parseFilePath()
-        environLocal.printDebug('Got ParsedObject %r' % parsedObject)
+        environLocal.printDebug('Got ParsedObject from {0}: {1}'.format(self.filePath, parsedObject))
         if parsedObject is not None:
             if 'Opus' in parsedObject.classes:
                 self.parseOpus(parsedObject)
@@ -151,7 +166,7 @@ class MetadataCachingJob(object):
             else:
                 parsedObject = corpus.parse(
                     self.filePath, forceSource=True)
-        except corpus.CorpusException as e:
+        except Exception as e: # wide catch...
             environLocal.printDebug('parse failed: {0}, {1}'.format(
                 self.filePath, str(e)))
             environLocal.printDebug(traceback.format_exc())
@@ -317,7 +332,7 @@ class JobProcessor(object):
                 filePathErrorCount,
                 filePath,
                 )
-        environLocal.printDebug(message)
+        return message
 
     ### PUBLIC METHODS ###
 

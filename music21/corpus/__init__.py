@@ -189,7 +189,7 @@ def _updateMetadataBundle():
     corpora.Corpus._updateAllMetadataBundles()
 
 
-def cacheMetadata(corpusNames=('local',)):
+def cacheMetadata(corpusNames=('local',), verbose=True):
     '''
     Rebuild the metadata cache.
     '''
@@ -197,7 +197,7 @@ def cacheMetadata(corpusNames=('local',)):
         corpusNames = [corpusNames]
     for name in corpusNames:
         corpora.Corpus._metadataBundles[name] = None
-    metadata.cacheMetadata(corpusNames)
+    metadata.cacheMetadata(corpusNames, verbose=verbose)
 
 
 def search(

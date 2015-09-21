@@ -645,6 +645,7 @@ class MetadataBundle(object):
         useCorpus=False,
         useMultiprocessing=True,
         storeOnDisk=True,
+        verbose=False
         ):
         '''
         Parse and store metadata from numerous files.
@@ -667,6 +668,8 @@ class MetadataBundle(object):
         []
         >>> len(metadataBundle._metadataEntries)
         1
+
+        Set Verbose to True to get updates even if debug is off.
         '''
         from music21 import metadata
         jobs = []
@@ -676,10 +679,15 @@ class MetadataBundle(object):
             metadataBundleModificationTime = os.path.getctime(self.filePath)
         else:
             metadataBundleModificationTime = time.time()
-        environLocal.printDebug([
-            'MetadataBundle Modification Time: {0}'.format(
+
+        message = 'MetadataBundle Modification Time: {0}'.format(
                 metadataBundleModificationTime)
-            ])
+
+        if verbose is True:
+            environLocal.warn(message)
+        else:
+            environLocal.printDebug(message)
+
         currentJobNumber = 0
         skippedJobsCount = 0
         for path in paths:
@@ -699,19 +707,31 @@ class MetadataBundle(object):
                 )
             jobs.append(job)
         currentIteration = 0
-        environLocal.printDebug('Skipped {0} sources already in cache.'.format(
-            skippedJobsCount))
+        message = 'Skipped {0} sources already in cache.'.format(
+            skippedJobsCount)
+        if verbose is True:
+            environLocal.warn(message)
+        else:
+            environLocal.printDebug(message)
+
+        
         if useMultiprocessing:
             jobProcessor = metadata.JobProcessor.process_parallel
         else:
             jobProcessor = metadata.JobProcessor.process_serial
         for result in jobProcessor(jobs):
-            metadata.JobProcessor._report(
+            message = metadata.JobProcessor._report(
                 len(jobs),
                 result['remainingJobs'],
                 result['filePath'],
                 len(accumulatedErrors),
                 )
+            if verbose is True:
+                environLocal.warn(message)
+            else:
+                environLocal.printDebug(message)
+            
+            
             currentIteration += 1
             accumulatedResults.extend(result['metadataEntries'])
             accumulatedErrors.extend(result['errors'])

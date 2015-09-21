@@ -1408,9 +1408,15 @@ class ABCNote(ABCToken):
         self.chordSymbols, nonChordSymStr = self._splitChordSymbols(self.src)        
         # get pitch name form remaining string
         # rests will have a pitch name of None
-
-        a, b = self._getPitchName(nonChordSymStr,
-               forceKeySignature=forceKeySignature)
+        
+        try:
+            a, b = self._getPitchName(nonChordSymStr,
+                   forceKeySignature=forceKeySignature)
+        except ABCHandlerException:
+            environLocal.warn(["Could not get pitch information from note: {0}, assuming C".format(nonChordSymStr)])
+            a = "C"
+            b = False
+            
         self.pitchName, self.accidentalDisplayStatus = a, b
 
         if self.pitchName == None:
