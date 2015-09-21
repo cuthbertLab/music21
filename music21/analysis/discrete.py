@@ -1040,6 +1040,11 @@ class Ambitus(DiscreteAnalysis):
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p.getPitchRanges(s)
         (0, 34)
+        
+        
+        >>> s = stream.Stream()
+        >>> p.getPitchRanges(s)
+        (0, 0)
         '''
         ssfn = subStream.flat.notes
         
@@ -1060,8 +1065,11 @@ class Ambitus(DiscreteAnalysis):
                 p2 = psFound[j]
                 # p2 should always be equal or greater than p1
                 psRange.append(p2-p1)
-
-        return int(min(psRange)), int(max(psRange))
+        
+        if len(psRange) == 0:
+            return 0, 0
+        else:
+            return int(min(psRange)), int(max(psRange))
 
 
     def solutionLegend(self, compress=False):
