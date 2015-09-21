@@ -960,6 +960,8 @@ class Ambitus(DiscreteAnalysis):
             minPitch, maxPitch = 0, numColors
 
         valueRange = maxPitch - minPitch
+        if valueRange == 0:
+            valueRange = 1 # avoid float division by zero
         step = 0
         antiBlack = 25
         for i in range(minPitch, maxPitch+1):

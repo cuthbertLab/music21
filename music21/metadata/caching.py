@@ -328,11 +328,17 @@ class JobProcessor(object):
 
         If `processCount` is none, use 1 fewer process than the number of
         available cores.
+        
+        jobs is a list of :class:`~music21.metadata.MetadataCachingJob` objects.
+        
         '''
-        processCount = processCount or (multiprocessing.cpu_count() * 2) - 1  # @UndefinedVariable
+        processCount = processCount or multiprocessing.cpu_count() - 1  # @UndefinedVariable
         if processCount < 1:
             processCount = 1
         remainingJobs = len(jobs)
+        if remainingJobs > processCount: # do not start more processes than jobs...
+            processCount = remainingJobs
+            
         environLocal.printDebug(
             'Processing {0} jobs in parallel, with {1} processes.'.format(
                 remainingJobs, processCount))
@@ -345,7 +351,7 @@ class JobProcessor(object):
             worker.start()
         if jobs:
             for job in jobs:
-                job_queue.put(pickle.dumps(job, protocol=0))
+                job_queue.put(pickle.dumps(job, protocol=pickle.HIGHEST_PROTOCOL))
             for _ in range(len(jobs)):
                 job = pickle.loads(result_queue.get())
                 results = job.getResults()
