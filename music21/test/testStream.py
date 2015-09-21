@@ -6695,7 +6695,7 @@ class Test(unittest.TestCase):
         self.assertEqual([str(p) for p in s.parts[0].pitches], ['D4', 'E4', 'F#4', 'G4', 'A4', 'B4', 'C#5', 'D5'])
         self.assertEqual([str(p) for p in s.parts[1].pitches], ['A4', 'B4', 'C#5', 'D5', 'E5', 'F#5', 'G#5', 'A5'])
         
-        s.toSoundingPitch()
+        s.toSoundingPitch(inPlace=True)
         
         self.assertEqual([str(p) for p in s.parts[0].pitches], ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'] )
         self.assertEqual([str(p) for p in s.parts[1].pitches], ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'] )

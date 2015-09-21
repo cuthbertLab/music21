@@ -3934,30 +3934,29 @@ class Stream(base.Music21Object):
             classFilterList = ['Note', 'Chord']
 
         for k in boundaries:
-            start, end = k
             i = boundaries[k]
+            if i.transposition is None:
+                continue
+            start, end = k
             focus = returnObj.getElementsByOffset(start, end,
                 includeEndBoundary=False, mustFinishInSpan=False,
                 mustBeginInSpan=True)
-            if i.transposition is not None:
-                trans = i.transposition
-                if reverse:
-                    transInvert = trans.reverse()
-                    focus.transpose(transInvert, inPlace=True,
-                                    classFilterList=classFilterList)
-                else:
-                    focus.transpose(trans, inPlace=True,
-                                    classFilterList=classFilterList)
+            trans = i.transposition
+            if reverse:
+                trans = trans.reverse()
+            focus.transpose(trans, inPlace=True,
+                            classFilterList=classFilterList)
             #print(k, i.transposition)
         return returnObj
 
-    def toSoundingPitch(self, inPlace=True):
+    def toSoundingPitch(self, inPlace=False):
         '''
         If not at sounding pitch, transpose all Pitch
         elements to sounding pitch. The atSoundingPitch property
         is used to determine if transposition is necessary.
 
-        TODO -- inPlace should be False
+        v2.0.10 changes -- inPlace is False
+        
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)

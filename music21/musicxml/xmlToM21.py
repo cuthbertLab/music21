@@ -3691,7 +3691,10 @@ class Test(unittest.TestCase):
         self.assertEqual(self.pitchOut([p for p in s.parts[1].flat.pitches]), '[B4, B4, B4, B4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, B4, B4, B4, B4, B4, B4]')
         self.assertEqual(self.pitchOut([p for p in s.parts[2].flat.pitches]), '[E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5]')
 
+        self.assertFalse(s.parts[0].flat.atSoundingPitch)
+
         sSounding = s.toSoundingPitch(inPlace=False)
+
         self.assertEqual(self.pitchOut([p for p in sSounding.parts[0].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
         self.assertEqual(self.pitchOut([p for p in sSounding.parts[1].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')
         self.assertEqual(self.pitchOut([p for p in sSounding.parts[2].flat.pitches]), '[A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4, A4]')

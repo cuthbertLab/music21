@@ -628,16 +628,6 @@ class RecursiveIterator(StreamIterator):
         self.parentIterator = None
         
     def __next__(self):
-        if self.recursiveIterator is not None:
-            try:
-                return self.recursiveIterator.next()
-            except StopIteration:
-                self.recursiveIterator.parentIterator = None
-                self.recursiveIterator = None
-                
-        if self.index == 0 and self.includeSelf is True and self.matchesFilters(self.srcStream):
-            self.includeSelf = False
-            return self.srcStream
 
         while self.index < self.streamLength:
             # wrap this in a while loop instead of 
@@ -645,6 +635,17 @@ class RecursiveIterator(StreamIterator):
             # in a long score with a miserly filter
             # it is possible to exceed maximum recursion
             # depth
+            if self.recursiveIterator is not None:
+                try:
+                    return self.recursiveIterator.next()
+                except StopIteration:
+                    self.recursiveIterator.parentIterator = None
+                    self.recursiveIterator = None
+                    
+            if self.index == 0 and self.includeSelf is True and self.matchesFilters(self.srcStream):
+                self.includeSelf = False
+                return self.srcStream
+
             
             self.index += 1 # increment early in case of an error in the next try.
         
@@ -668,6 +669,15 @@ class RecursiveIterator(StreamIterator):
                 e.activeSite = self.srcStream
     
             return e
+
+        ### the last element can still set a recursive iterator, so make sure we handle it.
+        if self.recursiveIterator is not None:
+            try:
+                return self.recursiveIterator.next()
+            except StopIteration:
+                self.recursiveIterator.parentIterator = None
+                self.recursiveIterator = None
+        
         
         self.cleanup()
         raise StopIteration
