@@ -1201,6 +1201,29 @@ m3 NC b3 G: V
         unused_s = converter.parse(testFiles.mozartK283_2_opening, format='romanText')
         #s.show('text')
 
+    def testTuplets(self):
+        from music21 import converter
+        c = converter.parse("m1 C: I b2.66 V", format='romantext')
+        n1 = c.flat.notes[0]
+        n2 = c.flat.notes[1]
+        self.assertEqual(n1.duration.quarterLength, common.opFrac(5./3) )
+        self.assertEqual(n2.offset, common.opFrac(5./3) )        
+        self.assertEqual(n2.duration.quarterLength, common.opFrac(7./3) )
+
+        c = converter.parse("TimeSignature: 6/8\nm1 C: I b2.66 V", format='romantext')
+        n1 = c.flat.notes[0]
+        n2 = c.flat.notes[1]
+        self.assertEqual(n1.duration.quarterLength, common.opFrac(5./2) )
+        self.assertEqual(n2.offset, common.opFrac(5./2) )        
+        self.assertEqual(n2.duration.quarterLength, common.opFrac(1./2) )
+
+        c = converter.parse("m1 C: I b2.66.5 V", format='romantext')
+        n1 = c.flat.notes[0]
+        n2 = c.flat.notes[1]
+        self.assertEqual(n1.duration.quarterLength, common.opFrac(11./6) )
+        self.assertEqual(n2.offset, common.opFrac(11./6) )        
+        self.assertEqual(n2.duration.quarterLength, common.opFrac(13./6) )
+
 
 #-------------------------------------------------------------------------------
 
@@ -1217,7 +1240,7 @@ if __name__ == "__main__":
     #t = time.time()
     #import sys
     #sys.argv.append('PivotInCopyMultiple2')
-    # music21.mainTest(Test, runTest='testTimeSigChanges')
+    #music21.mainTest(Test, runTest='testTuplets')
     music21.mainTest(Test, TestSlow)
     #print(time.time() - t)
 

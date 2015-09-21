@@ -15,10 +15,10 @@ demonstrated by Dmitri Tymoczko.
 '''
 
 #from __future__ import unicode_literals
-
-import unittest
-import re
+from fractions import Fraction
 import codecs
+import re
+import unittest
 
 from music21 import common
 from music21 import exceptions21
@@ -611,6 +611,95 @@ class RTBeat(RTAtom):
     def __repr__(self):
         return '<RTBeat %r>' % self.src
 
+    def getBeatFloatOrFrac(self):
+        '''
+        Gets the beat number as a float or fraction. Time signature independent
+        
+        
+        >>> RTB = romanText.rtObjects.RTBeat
+        
+        Simple ones:
+        
+        >>> RTB('b1').getBeatFloatOrFrac()
+        1.0
+        >>> RTB('b2').getBeatFloatOrFrac()
+        2.0
+        
+        etc.
+        
+        with easy float:
+        
+        >>> RTB('b1.5').getBeatFloatOrFrac()
+        1.5
+        >>> RTB('b1.25').getBeatFloatOrFrac()
+        1.25
+        
+        with harder:
+        
+        >>> RTB('b1.33').getBeatFloatOrFrac()
+        Fraction(4, 3)
+        
+        >>> RTB('b2.66').getBeatFloatOrFrac()
+        Fraction(8, 3)
+                
+        >>> RTB('b1.2').getBeatFloatOrFrac()
+        Fraction(6, 5)
+
+
+        A third digit of .5 adds 1/2 of 1/DENOM of before.  Here DENOM is 3 (in 5/3) so
+        we add 1/6 to 5/3 to get 11/6:
+        
+
+        >>> RTB('b1.66').getBeatFloatOrFrac()
+        Fraction(5, 3)
+
+        >>> RTB('b1.66.5').getBeatFloatOrFrac()
+        Fraction(11, 6)
+
+
+        Similarly .25 adds 1/4 of 1/DENOM... to get 21/12 or 7/4 or 1.75
+
+        >>> RTB('b1.66.25').getBeatFloatOrFrac()
+        1.75
+
+        And .75 adds 3/4 of 1/DENOM to get 23/12
+        
+        >>> RTB('b1.66.75').getBeatFloatOrFrac()
+        Fraction(23, 12)
+
+
+        A weird way of writing 'b1.5'
+
+        >>> RTB('b1.33.5').getBeatFloatOrFrac()
+        1.5
+        '''
+        beatStr = self.src.replace('b', '')
+        # there may be more than one decimal in the number, such as
+        # 1.66.5, to show halfway through 2/3rd of a beat
+        parts = beatStr.split('.')
+        mainBeat = int(parts[0])
+        if len(parts) > 1: # 1.66
+            fracPart = common.nearestCommonFraction('.' + parts[1])
+        else:
+            fracPart = 0.0
+            
+        if len(parts) > 2: # 1.66.5 
+            fracPartDivisor = float('.' + parts[2]) # 0.5
+            if isinstance(fracPart, float):
+                fracPart = Fraction.from_float(fracPart)
+            denom = fracPart.denominator
+            fracBeatFrac = common.opFrac(1./(denom/fracPartDivisor))
+        else:
+            fracBeatFrac = 0.0
+
+        if len(parts) > 3:
+            environLocal.printDebug(['got unexpected beat: %s' % self.src])
+            raise RTTokenException('cannot handle specification: %s' %  self.src)
+            
+            
+        beat = common.opFrac(mainBeat + fracPart + fracBeatFrac)
+        return beat
+
     def getOffset(self, timeSignature):
         '''Given a time signature, return the offset position specified by this
         beat.
@@ -637,30 +726,8 @@ class RTBeat(RTAtom):
         1.25
         '''
         from music21 import meter
-        beatStr = self.src.replace('b', '')
-        # there may be more than one decimal in the number, such as
-        # 1.66.5, to show halfway through 2/3rd of a beat
-        if '.' in beatStr:
-            parts = beatStr.split('.')
-            if len(parts) == 2:
-                beat = int(parts[0]) + common.nearestCommonFraction(
-                                    '.' + parts[1])
-            # assume not more than 2 decimals are given
-            elif len(parts) == 3:
-                if parts[1] == '66' and parts[2] == '5':
-                    add = 5./6
-                elif parts[1] == '0' and parts[2] == '5':
-                    add = 1./6
-                else: 
-                    raise RTTokenException('cannot handle specification: %s' %  self.src)
-                beat = int(parts[0]) + add
-                # TODO: need to treat the third part as a fraction of the beat division that has just been specified
-                environLocal.printDebug(['discarding beat specification for beat indication: %s' % self.src])
-            else:
-                environLocal.printDebug(['got unexpected beat: %s' % self.src])
-                raise RTTokenException('cannot handle specification: %s' %  self.src)
-        else: # assume it is an integer
-            beat = int(beatStr)
+        beat = self.getBeatFloatOrFrac()
+
         #environLocal.printDebug(['using beat value:', beat])
         # TODO: check for exceptions/errors if this beat is bad
         try:

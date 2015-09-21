@@ -3927,6 +3927,11 @@ class TimeSignature(base.Music21Object):
         2.5
         >>> ts1.getOffsetFromBeat(3.25)
         2.25
+        
+        >>> from fractions import Fraction
+        >>> ts1.getOffsetFromBeat(Fraction(8, 3)) # 2.66666
+        Fraction(5, 3)
+        
 
         >>> ts1 = meter.TimeSignature('6/8')
         >>> ts1.getOffsetFromBeat(1)
@@ -3980,9 +3985,8 @@ class TimeSignature(base.Music21Object):
         # beat int counts from 1; subtrack 1 to get index
         beatDur = self.beatSequence[beatInt-1].duration
         oStart, unused_oEnd = self.beatSequence.getLevelSpan()[beatInt-1]
-        post = oStart + (beatDur.quarterLength * beatFraction)
-        # round to 3 values
-        return round(post, 4)
+        post = opFrac(oStart + (beatDur.quarterLength * beatFraction))
+        return post
 
     def getBeatProgress(self, qLenPos):
         '''
