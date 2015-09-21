@@ -3975,9 +3975,9 @@ class TimeSignature(base.Music21Object):
         # divide into integer and floating point components
         beatInt, beatFraction = divmod(beat, 1)
         beatInt = int(beatInt) # convert to integer
-        # resolve .33 to .3333333
-        # TODO -- REMOVE -- require CORRECT beats as Fractions
-        beatFraction = common.nearestCommonFraction(beatFraction)
+
+        # resolve .33 to .3333333 (actually Fraction(1, 3). )
+        beatFraction = common.addFloatPrecision(beatFraction)
 
         if beatInt-1 > len(self.beatSequence)-1:
             raise TimeSignatureException('requested beat value (%s) not found in beat partitions (%s) of ts %s' % (beatInt, self.beatSequence, self))

@@ -679,7 +679,7 @@ class RTBeat(RTAtom):
         parts = beatStr.split('.')
         mainBeat = int(parts[0])
         if len(parts) > 1: # 1.66
-            fracPart = common.nearestCommonFraction('.' + parts[1])
+            fracPart = common.addFloatPrecision('.' + parts[1])
         else:
             fracPart = 0.0
             

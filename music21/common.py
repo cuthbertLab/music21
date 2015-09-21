@@ -779,21 +779,26 @@ def almostEquals(x, y = 0.0, grain=1e-7):
     return False
 
 
-def nearestCommonFraction(x, grain=1e-2):
-    '''Given a value that suggests a floating point fraction, like .33,
+def addFloatPrecision(x, grain=1e-2):
+    '''
+    Given a value that suggests a floating point fraction, like .33,
     return a Fraction or float that provides greater specification, such as .333333333
 
+
+
     >>> import fractions
-    >>> common.nearestCommonFraction(.333)
+    >>> common.addFloatPrecision(.333)
     Fraction(1, 3)
-    >>> common.nearestCommonFraction(.33)
+    >>> common.addFloatPrecision(.33)
     Fraction(1, 3)
-    >>> common.nearestCommonFraction(.35) == fractions.Fraction(1, 3)
+    >>> common.addFloatPrecision(.35) == fractions.Fraction(1, 3)
     False
-    >>> common.nearestCommonFraction(.2) == 0.2
+    >>> common.addFloatPrecision(.2) == 0.2
     True
-    >>> common.nearestCommonFraction(.125)
+    >>> common.addFloatPrecision(.125)
     0.125
+    >>> common.addFloatPrecision(1./7) == 1./7
+    True
     
     :rtype: float
     '''
