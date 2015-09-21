@@ -1644,7 +1644,7 @@ def _prepareStreamForMidi(s):
         if len(mmTopLevel) > 0: # place in top part
             target = s.getElementsByClass('Stream')[0]
             for mm in mmTopLevel:
-                target.insert(mmToplevel.elementOffset(mm), mm)
+                target.insert(mmTopLevel.elementOffset(mm), mm)
                 s.remove(mm) # remove from Score level
         # TODO: move any MetronomeMarks not in the top Part to the top Part
         

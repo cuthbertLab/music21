@@ -639,33 +639,39 @@ class RecursiveIterator(StreamIterator):
             self.includeSelf = False
             return self.srcStream
 
-        if self.index >= self.streamLength:
-            self.cleanup()
-            raise StopIteration
+        while self.index < self.streamLength:
+            # wrap this in a while loop instead of 
+            # returning self.__next__() because
+            # in a long score with a miserly filter
+            # it is possible to exceed maximum recursion
+            # depth
+            
+            self.index += 1 # increment early in case of an error in the next try.
         
-        self.index += 1 # increment early in case of an error.
+            try:
+                e = self.srcStreamElements[self.index - 1]
+            except IndexError:
+                # this may happen in the number of elements has changed
+                continue
     
-        try:
-            e = self.srcStreamElements[self.index - 1]
-        except IndexError:
-            # this may happen in the number of elements has changed
-            return self.__next__()
-
-        if e.isStream:
-            self.recursiveIterator = RecursiveIterator(srcStream=e,
-                                           restoreActiveSites=self.restoreActiveSites,
-                                           filters=self.filters, # shared list...
-                                           includeSelf=False, # always for inner streams
-                                           parentIterator=self
-                                           )
-        if self.matchesFilters(e) is False:
-            return self.__next__()            
+            if e.isStream:
+                self.recursiveIterator = RecursiveIterator(srcStream=e,
+                                               restoreActiveSites=self.restoreActiveSites,
+                                               filters=self.filters, # shared list...
+                                               includeSelf=False, # always for inner streams
+                                               parentIterator=self
+                                               )
+            if self.matchesFilters(e) is False:
+                continue          
+            
+            if self.restoreActiveSites is True:
+                e.activeSite = self.srcStream
+    
+            return e
         
-        if self.restoreActiveSites is True:
-            e.activeSite = self.srcStream
-
-        return e
-
+        self.cleanup()
+        raise StopIteration
+        
     next = __next__
 
 

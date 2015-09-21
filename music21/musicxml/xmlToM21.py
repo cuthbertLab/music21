@@ -1906,6 +1906,7 @@ class MeasureParser(XMLParserBase):
             qLen = float(noteDivisions) / divisions
         else:
             noteDivisions = None
+            qLen = 0.0
             
             
         mxType = mxNote.find('type')

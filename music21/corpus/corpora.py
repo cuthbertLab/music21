@@ -356,6 +356,7 @@ class Corpus(object):
         number=None,
         fileExtensions=None,
         forceSource=False,
+        format=None # @ReservedAssignment
         ):
         '''
         The most important method call for corpus.
@@ -416,6 +417,7 @@ class Corpus(object):
                         number,
                         fileExtensions,
                         forceSource,
+                        format=format
                         )
                 except corpus.CorpusException:
                     # avoids having the name come back with .mxl instead of
@@ -442,6 +444,7 @@ class Corpus(object):
             filePath,
             forceSource=forceSource,
             number=number,
+            format=format
             )
         corpus._addCorpusFilepath(streamObject, filePath)
         return streamObject
