@@ -45,7 +45,7 @@ To do a release,
 
 13. then update PyPI by going to pypi.python.org and logging in and selecting music21 and clicking 
     edit at the top and augment the version number and the download URL. -- The URL will be printed when
-    running dist.py -- it's important to cut and paste this, since it has the md5 tag.
+    running dist.py -- (the md5 hash is no longer needed)
 
 14. Upload the .tar.gz file to PyPi by clicking "files" at the time.  Click Choose File.
     File Type is Source.  Leave everything else blank, then click "upload new file"
