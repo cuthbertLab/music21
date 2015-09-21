@@ -1680,7 +1680,7 @@ class LyStenoDuration(LyObject):
     2..
     
     '''
-    def __init__(self, durationNumber = None, numDots = 0):
+    def __init__(self, durationNumber=None, numDots=0):
         LyObject.__init__(self)
         self.durationNumber = durationNumber
         self.numDots = numDots

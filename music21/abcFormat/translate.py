@@ -894,9 +894,12 @@ class Test(unittest.TestCase):
 
             #s.show()
 
+    def testTranslateBrokenDuration(self):
+        from music21 import corpus
+        unused = corpus.parse('han2.abc', number=445)
+
 
 if __name__ == "__main__":
-    # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)
 

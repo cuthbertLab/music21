@@ -466,7 +466,7 @@ class Corpus(object):
         ...     'bach',
         ...     corpusNames=('core', 'virtual'),
         ...     )
-        <music21.metadata.bundles.MetadataBundle {148 entries}>
+        <music21.metadata.bundles.MetadataBundle {150 entries}>
 
         If ``names`` is None, all corpora known to music21 will be searched.
 
@@ -540,7 +540,7 @@ class Corpus(object):
 
         >>> from music21 import corpus
         >>> corpus.CoreCorpus().metadataBundle
-        <music21.metadata.bundles.MetadataBundle 'core': {133... entries}>
+        <music21.metadata.bundles.MetadataBundle 'core': {144... entries}>
 
         '''
         from music21 import metadata

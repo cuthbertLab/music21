@@ -15,7 +15,6 @@ ABC is a music format that, while being able to encode all sorts of scores, is e
 strong at representing monophonic music, and folk music in particular.
 
 Modules in the `music21.abcFormat` package deal with importing ABC into music21.  Most people
-working with ABC data won't need to use this package.  To convert ABC from a file or URL 
 to a :class:`~music21.stream.Stream` use the :func:`~music21.converter.parse` function of
 the `converter` module: 
 

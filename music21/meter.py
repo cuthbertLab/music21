@@ -350,6 +350,16 @@ def bestTimeSignature(meas):
     >>> ts6 = meter.bestTimeSignature(m6)
     >>> ts6
     <music21.meter.TimeSignature 11/32>
+    
+    
+    Complex durations (arose in han2.abc, number 445)
+    
+    >>> m7 = stream.Measure()
+    >>> m7.append(note.Note('D', quarterLength=3.5))
+    >>> m7.append(note.Note('E', quarterLength=5.5))    
+    >>> ts7 = meter.bestTimeSignature(m7)
+    >>> ts7
+    <music21.meter.TimeSignature 9/4>
     '''
 
     #TODO: set limit at 11/4?
@@ -397,6 +407,9 @@ def bestTimeSignature(meas):
         match = False
         i = 10
         while i>0:
+            if minDurTest < duration.typeToDuration[MIN_DENOMINATOR_TYPE]:
+                minDurTest = duration.typeToDuration[MIN_DENOMINATOR_TYPE]
+                break
             try:
                 dType, match = duration.quarterLengthToClosestType(minDurTest)
             except ZeroDivisionError:

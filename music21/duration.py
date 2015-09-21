@@ -284,7 +284,7 @@ def quarterLengthToClosestType(qLen):
         if qLen > 128:
             return ('duplex-maxima', False)
         
-        raise DurationException("Cannot return types smaller than 2048th")
+        raise DurationException("Cannot return types smaller than 2048th; qLen was: {0}".format(qLen))
 
 
 
@@ -1396,10 +1396,11 @@ class Duration(SlottedObject):
         if 'durationTuple' in keywords:
             self.addDurationTuple(keywords['durationTuple'])
         
-        if 'dots' in keywords:
-            storeDots = keywords['dots']
+        if 'dots' in keywords and keywords['dots'] is not None:
+            storeDots = int(keywords['dots'])
         else:
             storeDots = 0
+            
         if "components" in keywords:
             self.components = keywords["components"]
             # this is set in _setComponents
@@ -2064,14 +2065,17 @@ class Duration(SlottedObject):
     def dots(self):
         '''
         Returns the number of dots in the Duration
-        if it is a simple Duration.  Returns None if not a simple duration.  Otherwise returns 0
+        if it is a simple Duration.  Otherwise returns the number of dots on the first component
+
+        Previously it could return None if it was not a simple duration which led to some
+        terribly difficult to find errors.
         '''
         if self._componentsNeedUpdating:
             self._updateComponents()
         if len(self.components) == 1:
             return self.components[0].dots
         elif len(self.components) > 1:
-            return None
+            return self.components[0].dots
         else:  # there must be 1 or more components
             return 0
             

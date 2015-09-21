@@ -79,6 +79,7 @@ import zlib
 
 from music21 import base
 from music21 import common
+from music21 import defaults
 from music21 import derivation
 from music21 import exceptions21
 #from music21.timespans.trees import ElementTree
@@ -829,6 +830,8 @@ class StreamThawer(StreamFreezeThawBase):
         # restore to whatever it was
         streamObj.autoSort = storedAutoSort
         streamObj.elementsChanged()
+        if streamObj.id is not None and streamObj.id > defaults.minIdNumberToConsiderMemoryLocation:
+            streamObj.id = None
 
     def restoreElementsFromTuples(self, streamObj):
         '''

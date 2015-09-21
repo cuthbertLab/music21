@@ -103,6 +103,9 @@ scalingTenths = 40
 ipythonImageDpi = 100
 
 
+# id numbers above this number will be considered memory locations
+# and rewritten on thaw.
+minIdNumberToConsiderMemoryLocation = 100000001
 
 #-----------------------------------------------------------------||||||||||||--
 class Test(unittest.TestCase):

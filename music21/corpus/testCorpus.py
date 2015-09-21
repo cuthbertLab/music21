@@ -63,15 +63,15 @@ class Test(unittest.TestCase):
 
     def testSearch01(self):
         searchResults = corpus.search('china', field='locale')
-        self.assertEqual(len(searchResults) > 400, True)
+        self.assertEqual(len(searchResults) > 1200, True)
 
     def testSearch02(self):
         searchResults = corpus.search('Sichuan', field='locale')
-        self.assertEqual(len(searchResults), 27)
+        self.assertEqual(len(searchResults), 47)
 
     def testSearch03(self):
         searchResults = corpus.search('Taiwan', field='locale')
-        self.assertEqual(len(searchResults), 10)
+        self.assertEqual(len(searchResults), 27)
         pathInfo = sorted((searchResult.sourcePath, searchResult.number)
             for searchResult in searchResults)
         self.assertEqual(pathInfo, [
@@ -85,28 +85,28 @@ class Test(unittest.TestCase):
             (u'essenFolksong/han1.abc', u'528'),
             (u'essenFolksong/han1.abc', u'529'),
             (u'essenFolksong/han1.abc', u'530'),
-#             (u'essenFolksong/han2.abc', u'204'),
-#             (u'essenFolksong/han2.abc', u'205'),
-#             (u'essenFolksong/han2.abc', u'206'),
-#             (u'essenFolksong/han2.abc', u'207'),
-#             (u'essenFolksong/han2.abc', u'208'),
-#             (u'essenFolksong/han2.abc', u'209'),
-#             (u'essenFolksong/han2.abc', u'210'),
-#             (u'essenFolksong/han2.abc', u'211'),
-#             (u'essenFolksong/han2.abc', u'212'),
-#             (u'essenFolksong/han2.abc', u'213'),
-#             (u'essenFolksong/han2.abc', u'214'),
-#             (u'essenFolksong/han2.abc', u'215'),
-#             (u'essenFolksong/han2.abc', u'216'),
-#             (u'essenFolksong/han2.abc', u'217'),
-#             (u'essenFolksong/han2.abc', u'218'),
-#             (u'essenFolksong/han2.abc', u'219'),
-#             (u'essenFolksong/han2.abc', u'220'),
+             (u'essenFolksong/han2.abc', u'204'),
+             (u'essenFolksong/han2.abc', u'205'),
+             (u'essenFolksong/han2.abc', u'206'),
+             (u'essenFolksong/han2.abc', u'207'),
+             (u'essenFolksong/han2.abc', u'208'),
+             (u'essenFolksong/han2.abc', u'209'),
+             (u'essenFolksong/han2.abc', u'210'),
+             (u'essenFolksong/han2.abc', u'211'),
+             (u'essenFolksong/han2.abc', u'212'),
+             (u'essenFolksong/han2.abc', u'213'),
+             (u'essenFolksong/han2.abc', u'214'),
+             (u'essenFolksong/han2.abc', u'215'),
+             (u'essenFolksong/han2.abc', u'216'),
+             (u'essenFolksong/han2.abc', u'217'),
+             (u'essenFolksong/han2.abc', u'218'),
+             (u'essenFolksong/han2.abc', u'219'),
+             (u'essenFolksong/han2.abc', u'220'),
             ])
 
     def testSearch04(self):
         searchResults = corpus.search('Sichuan|Taiwan', field='locale')
-        self.assertEqual(len(searchResults), 37)
+        self.assertEqual(len(searchResults), 74)
 
     def testSearch05(self):
         searchResults = corpus.search('bach')

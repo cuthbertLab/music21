@@ -536,7 +536,7 @@ class MusicXMLImporter(XMLParserBase):
         for p in mxScore.findall('part'):
             partId = p.get('id')
             part = self.xmlPartToPart(p, self.partIdDict[partId])
-            if part is not None:     
+            if part is not None: # for instance, in partStreams
                 s._insertCore(0.0, part)
                 self.m21PartObjectsById[partId] = part
 
@@ -710,7 +710,14 @@ class MusicXMLImporter(XMLParserBase):
                 try:
                     staffGroup.addSpannedElements(self.m21PartObjectsById[partId])
                 except KeyError as ke:
-                    raise MusicXMLImportException("Cannot find part in m21PartIdDictionary:"
+                    foundOne = False
+                    for partIdTest in sorted(self.m21PartObjectsById):
+                        if partIdTest.startswith(partId + '-Staff'):
+                            staffGroup.addSpannedElements(self.m21PartObjectsById[partIdTest])
+                            foundOne = True
+                                                
+                    if foundOne is False:
+                        raise MusicXMLImportException("Cannot find part in m21PartIdDictionary:"
                                 + " %s \n   Full Dict:\n   %r " % (ke, self.m21PartObjectsById))
             partGroup = pgObj.mxPartGroup
             seta(staffGroup, partGroup, 'group-name', 'name')
@@ -904,6 +911,9 @@ class PartParser(XMLParserBase):
         part.elementsChanged()
     
     def separateOutPartStaves(self):
+        '''
+        Take a Part with multiple staves and make them a set of PartStaff objects.
+        '''
         # get staves will return a number, between 1 and count
         #for staffCount in range(mxPart.getStavesCount()):
         for staffNumber in self._getUniqueStaffKeys():
@@ -947,6 +957,7 @@ class PartParser(XMLParserBase):
             streamPartStaff.groups.append(partStaffId)
             streamPartStaff.elementsChanged()
             self.parent.stream._insertCore(0, streamPartStaff)
+            self.parent.m21PartObjectsById[partStaffId] = streamPartStaff
         
         self.appendToScoreAfterParse = False
         self.parent.stream.elementsChanged()
@@ -954,13 +965,15 @@ class PartParser(XMLParserBase):
     def _getStaffExclude(self, staffReference, targetKey):
         '''
         Given a staff reference dictionary, remove and combine in a list all elements that 
-        are not part of the given key. Thus, return a list of all entries to remove.
+        are NOT part of the given key. Thus, return a list of all entries to remove.
         It keeps those elements under staff key None (common to all) and 
         those under given key. This then is the list of all elements that should be deleted.
         '''
         post = []
         for key in staffReference:
-            if key is None or int(key) == int(targetKey):
+            if key in (None, 'None') or targetKey in (None, 'None'):
+                continue
+            elif int(key) == int(targetKey):
                 continue
             post += staffReference[key]
         return post
@@ -974,7 +987,7 @@ class PartParser(XMLParserBase):
         post = []
         for staffReference in self.staffReferenceList:
             for key in staffReference:
-                if key is not None and key not in post:
+                if key not in (None, 'None') and key not in post:
                     post.append(key)
         post.sort()
         return post
@@ -1400,6 +1413,8 @@ class MeasureParser(XMLParserBase):
             # I think that we don't want to add to an existing staffLayoutObject
             # so that staff distance can change.
             for stl in stlList:
+                if stl is None or stl.staffNumber is None:
+                    continue # sibelius likes to give empty staff layouts!
                 self.insertCoreAndRef(0.0, str(stl.staffNumber), stl)
         m.elementsChanged()
         # TODO: measure-layout -- affect self.stream
@@ -1757,7 +1772,9 @@ class MeasureParser(XMLParserBase):
                 
         mxAccidental = mxNote.find('accidental')
         mxAccidentalName = None
-        if mxAccidental is not None:
+        if mxAccidental is not None and mxAccidental.text is not None:
+            # MuseScore 0.9 made empty accidental tags for notes that did not
+            # need an accidental display.
             mxAccidentalName = mxAccidental.text.strip()
 
         if mxAccidentalName is not None:
