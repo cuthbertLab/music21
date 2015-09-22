@@ -232,9 +232,9 @@ def pitchesWithinLimit(possibA, maxPitch = pitch.Pitch('B5')):
         
     return True
 
-def limitPartToPitch(possibA, partPitchLimits = {}):
+def limitPartToPitch(possibA, partPitchLimits=None):
     '''
-    Takes in partPitchLimits containing (partNumber, partPitch) pairs, each
+    Takes in a dict, partPitchLimits containing (partNumber, partPitch) pairs, each
     of which limits a part in possibA to a certain :class:`~music21.pitch.Pitch`.
     Returns True if all limits are followed in possibA, False otherwise.
     
@@ -253,6 +253,8 @@ def limitPartToPitch(possibA, partPitchLimits = {}):
     >>> possibility.limitPartToPitch(possibA2, {1: sopranoPitch})
     True
     '''
+    if partPitchLimits is None:
+        partPitchLimits = {}
     for (partNumber, partPitch) in partPitchLimits.items():
         if not (possibA[partNumber - 1] == partPitch):
             return False
@@ -641,10 +643,10 @@ def voiceOverlap(possibA, possibB):
         
     return hasVoiceOverlap
 
-def partMovementsWithinLimits(possibA, possibB, partMovementLimits = []):
+def partMovementsWithinLimits(possibA, possibB, partMovementLimits=None):
     '''
     Returns True if all movements between shared parts of possibA and possibB
-    are within limits, as specified by partMovementLimits, which consists of
+    are within limits, as specified by list partMovementLimits, which consists of
     (partNumber, maxSeparation) tuples. 
     
     
@@ -680,6 +682,8 @@ def partMovementsWithinLimits(possibA, possibB, partMovementLimits = []):
     >>> possibility.partMovementsWithinLimits(possibA1, possibB2, partMovementLimits)
     False
     '''
+    if partMovementLimits is None:
+        partMovementLimits = []
     withinLimits = True
     for (partNumber, maxSeparation) in partMovementLimits:
         pitchA = possibA[partNumber - 1]
@@ -867,49 +871,47 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo = None, rest
             if not i.directedName == 'm-2':
                 return False
 
-    '''
-    # Part 1: Check if possibA is A6 chord, and if it is properly formed.
-    bass = possibA[-1]
-    root = None
-    rootIndex = 0
-    for pitchA in possibA[0:-1]:
-        if not (pitchA.ps - bass.ps) % 12 == 10:
-            rootIndex += 1
-            continue
-        br = interval.Interval(bass, pitchA)
-        isAugmentedSixth = (br.directedSimpleName == 'A6')
-        if isAugmentedSixth:
-            root = pitchA
-            break
-    tonic = bass.transpose('M3')
-    #Restrict doublings, It+6
-    for pitchIndex in range(len(possibA) - 1):
-        if pitchIndex == rootIndex:
-            continue
-        pitchA = possibA[pitchIndex]
-        if not pitchA.name == tonic.name:
-            return False
-
-    #Part 2: If possibA is Italian A6 chord, check that it resolves properly in possibB.
-    fifth = root.transpose('m2')
-    pairsList = partPairs(possibA, possibB)
-    (bassA, bassB) = pairsList[-1]
-    (rootA, rootB) = pairsList[rootIndex]
-    if not (bassB.name == fifth.name and rootB.name == fifth.name):
-        return False
-    if not (bassB.ps - bassA.ps == -1.0 and rootB.ps - rootA.ps == 1.0):
-        return False
-    allowedIntervalNames = ['M3','m3','M2','m-2']
-    for pitchIndex in range(len(pairsList) - 1):
-        if pitchIndex == rootIndex:
-            continue
-        (tonicA, tonicB) = pairsList[pitchIndex]
-        if tonicA == tonicB:
-            continue
-        tt = interval.Interval(tonicA, tonicB)
-        if not tt.directedSimpleName in allowedIntervalNames:
-            return False
-    '''
+#     # Part 1: Check if possibA is A6 chord, and if it is properly formed.
+#     bass = possibA[-1]
+#     root = None
+#     rootIndex = 0
+#     for pitchA in possibA[0:-1]:
+#         if not (pitchA.ps - bass.ps) % 12 == 10:
+#             rootIndex += 1
+#             continue
+#         br = interval.Interval(bass, pitchA)
+#         isAugmentedSixth = (br.directedSimpleName == 'A6')
+#         if isAugmentedSixth:
+#             root = pitchA
+#             break
+#     tonic = bass.transpose('M3')
+#     #Restrict doublings, It+6
+#     for pitchIndex in range(len(possibA) - 1):
+#         if pitchIndex == rootIndex:
+#             continue
+#         pitchA = possibA[pitchIndex]
+#         if not pitchA.name == tonic.name:
+#             return False
+# 
+#     #Part 2: If possibA is Italian A6 chord, check that it resolves properly in possibB.
+#     fifth = root.transpose('m2')
+#     pairsList = partPairs(possibA, possibB)
+#     (bassA, bassB) = pairsList[-1]
+#     (rootA, rootB) = pairsList[rootIndex]
+#     if not (bassB.name == fifth.name and rootB.name == fifth.name):
+#         return False
+#     if not (bassB.ps - bassA.ps == -1.0 and rootB.ps - rootA.ps == 1.0):
+#         return False
+#     allowedIntervalNames = ['M3','m3','M2','m-2']
+#     for pitchIndex in range(len(pairsList) - 1):
+#         if pitchIndex == rootIndex:
+#             continue
+#         (tonicA, tonicB) = pairsList[pitchIndex]
+#         if tonicA == tonicB:
+#             continue
+#         tt = interval.Interval(tonicA, tonicB)
+#         if not tt.directedSimpleName in allowedIntervalNames:
+#             return False
     
     return True
 

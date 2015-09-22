@@ -121,8 +121,8 @@ class TestExternal(unittest.TestCase):
         c = Stream()
         for dummy in range(4):
             b = Measure()
-            for pitch in ['a', 'g', 'c#', 'a#']:
-                a = note.Note(pitch)
+            for p in ['a', 'g', 'c#', 'a#']:
+                a = note.Note(p)
                 b.append(a)
             c.append(b)
         c.show()
@@ -1320,7 +1320,7 @@ class Test(unittest.TestCase):
         self.assertEqual(sorted(list(mOffsetMap.keys())), 
             [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0]  )
 
-        for key, value in mOffsetMap.items():
+        for unused_key, value in mOffsetMap.items():
             # each key contains 4 measures, one for each part
             self.assertEqual(len(value), 4)
 
@@ -2351,7 +2351,6 @@ class Test(unittest.TestCase):
             self.assertEqual(allNotes[i].accidental.displayStatus, ds[i], "%d failed, %s != %s" % (i, allNotes[i].accidental.displayStatus, ds[i]))
 
     def testMakeAccidentalsOctaveKS(self):
-        from music21 import key
         s = Stream()
         k = key.KeySignature(-3)
         s.append(k)

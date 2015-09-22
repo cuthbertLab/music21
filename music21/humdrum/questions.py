@@ -3,7 +3,7 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 #import os
 import unittest
-from music21 import analysis
+#from music21 import analysis
 #from music21 import common
 #from music21 import *  # doing this because it will simplify the examples
 
@@ -84,9 +84,10 @@ class Test(unittest.TestCase):
                                     offset + meterObj.denominator)
                     # get a stream of just dynamics
                     dynamics = subStream.filterClass(articulations.DynamicArticulation)
-                    for obj in dynamics:
+                    for unused_obj in dynamics:
                         # can we increment dynamics by dynamics?
-                        obj += 'pppp'
+                        #obj += 'pppp'
+                        pass
                     # will these changes be reflected in the source part stream?
 
     def xtest004(self):
@@ -213,8 +214,8 @@ class Test(unittest.TestCase):
         '''Are lower pitches likely to be shorter and higher pitches likely to be longer?'''
 
         partStream = music21.converter.parse("dichterliebe1.xml")
-        noteStream = partStream['notes']
-        unused_table = analysis.correlate(noteStream, 'pitchSpace', 'duration')
+        unused_noteStream = partStream['notes']
+        #unused_table = analysis.correlate(noteStream, 'pitchSpace', 'duration')
 
         # we must examine and interpoate the table in order to distinguish
         # trends

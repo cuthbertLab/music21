@@ -1000,6 +1000,13 @@ class Verticality(base.Music21Object):
     >>> vs1.getObjectsByPart(0, note.Note)
     <music21.note.Note A>
     '''
+    _DOC_ATTR = {
+    'contentDict': '''Dictionary representing contents of vertical slices. 
+        the keys of the dictionary
+        are the part numbers and the element at each key is a list of 
+        music21 objects (allows for multiple voices
+        in a single part)'''
+    }
 
     def __init__(self, contentDict):
         base.Music21Object.__init__(self)
@@ -1009,11 +1016,6 @@ class Verticality(base.Music21Object):
 
         self.contentDict = contentDict
         self._color = ''
-        _DOC_ATTR = {
-    'contentDict': 'Dictionary representing contents of vertical slices. the keys of the dictionary \
-    are the part numbers and the element at each key is a list of music21 objects (allows for multiple voices \
-    in a single part'
-    }
 
     def isConsonant(self):
         '''

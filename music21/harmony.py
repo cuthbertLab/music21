@@ -2330,7 +2330,7 @@ class TestExternal(unittest.TestCase):
         chorale (in response to a post to the music21 list asking if this is 
         possible).
         '''
-        from music21.theoryAnalysis import theoryAnalyzer
+        from music21.alpha.theoryAnalysis import theoryAnalyzer
         from music21 import harmony, corpus
         
         score = corpus.parse('bach/bwv380')

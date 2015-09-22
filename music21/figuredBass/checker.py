@@ -355,7 +355,7 @@ def voiceCrossing(possibA):
     for part1Index in range(len(possibA)):
         try:
             higherPitch = possibA[part1Index]
-            higherPitch.ps
+            higherPitch.ps 
         except AttributeError:
             continue
         for part2Index in range(part1Index + 1, len(possibA)):

@@ -24,10 +24,10 @@ class Documenter(object):
     Abstract base class for documenting classes.
     '''
     def run(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     def __repr__(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     ### PRIVATE PROPERTIES ###
 
@@ -82,10 +82,10 @@ class ObjectDocumenter(Documenter):
         return self._referent
 
     def referentPackagesystemPath(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     def rstAutodocDirectiveFormat(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     @property
     def rstCrossReferenceString(self):
@@ -95,7 +95,7 @@ class ObjectDocumenter(Documenter):
             )
 
     def sphinxCrossReferenceRole(self):
-        raise NotImplemented
+        raise NotImplementedError
 
 
 class FunctionDocumenter(ObjectDocumenter):

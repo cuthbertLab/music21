@@ -18,6 +18,12 @@ import os, sys
 from music21 import common
 from music21.test import testSingleCoreAll as test
 
+try:
+    from pylint.lint import Run as pylintRun
+except ImportError:
+    pylintRun = None
+
+
 
 # see feature list here:
 # http://docs.pylint.org/features.html
@@ -36,15 +42,18 @@ from music21.test import testSingleCoreAll as test
 
 def main(fnAccept=None):
     '''
-    `fnAccept` is a list of one or more files to test.
+    `fnAccept` is a list of one or more files to test.  Otherwise runs all.
     '''
+    if pylintRun is None:
+        print("make sure that 'sudo pip install pylint' is there. exiting.")
+        return 
+
     sourceFolder = common.getSourceFilePath()
     mg = test.ModuleGather()
-    print("If you get an error, make sure that 'sudo pip install pylint' is there")
 
     # only accept a few file names for now
     if fnAccept in (None, []):
-        fnAccept = ['stream']
+        fnAccept = ['harmony', 'clef', 'note', 'duration']
     fnPathReject = ['/ext/',
                     'bar.py',  # crashes pylint...
                     'repeat.py', # hangs pylint...
@@ -56,6 +65,7 @@ def main(fnAccept=None):
                 #'W0621', 'W0511', 
                 #'W0404', 'R0201', 'R0904', 'E1101', 'R0914', 'R0903',
                 #'R0911', 'R0902', 
+                'cyclic-import', # we use these inside functions when there's a deep problem.
                 'unnecessary-pass', # nice, but not really a problem...
                 'locally-disabled', # test for this later, but hopefully will know what they're doing
 
@@ -99,21 +109,23 @@ def main(fnAccept=None):
                   'variable-rgx': r'[a-z_][A-Za-z0-9_]{2,30}$',
                   }
 
-    cmd = ['/usr/bin/env pylint -f colorized ' +
-           '--dummy-variables-rgx="_|dummy|unused|i|j|junk" ' + 
-           '--docstring-min-length=3 ' +
-           '--max-args=7 ' +  # should be 5 later, but baby steps
-           '--bad-name="foo,shit,fuck,stuff" ' # definitely allow "bar" for barlines
+    cmd = ['--output-format=parseable',
+           '--dummy-variables-rgx="_|dummy|unused|i|j|junk"', 
+           '--docstring-min-length=3',
+           '--max-args=7',  # should be 5 later, but baby steps
+           '--bad-name="foo,shit,fuck,stuff"', # definitely allow "bar" for barlines
+           '--reports=n'
            ]
     for gn, gnv in goodnameRx.items():
         cmd.append('--' + gn + '="' + gnv + '"')
 
-    print(cmd)
+    #print(cmd)
     
     for pyLintId in disable:
         cmd.append('--disable=%s' % pyLintId)
 
     # add entire package
+    acceptable = []
     for fp in mg.modulePaths:
         rejectIt = False
         for rejectPath in fnPathReject:
@@ -122,15 +134,20 @@ def main(fnAccept=None):
                 break
         if rejectIt:
             continue
-        fpRelative = fp.replace(sourceFolder, '')
-        unused_dir, fn = os.path.split(fpRelative)
-        fnNoExt = fn.replace('.py', '')
-        fpRelativeNoSlash = fpRelative[1:]
-        if fn in fnAccept or fnNoExt in fnAccept or fpRelative in fnAccept or fpRelativeNoSlash in fnAccept:
-            cmdFile = cmd + [fp]
-            print(' '.join(cmdFile))
-            if common.getPlatform() != 'win':
-                os.system(' '.join(cmdFile))
+        #fpRelative = fp.replace(sourceFolder, '')
+        #unused_dir, fn = os.path.split(fpRelative)
+        #fnNoExt = fn.replace('.py', '')
+        #fpRelativeNoSlash = fpRelative[1:]
+#         if (fn in fnAccept or 
+#                 fnNoExt in fnAccept or 
+#                 fpRelative in fnAccept or 
+#                 fpRelativeNoSlash in fnAccept):
+        acceptable.append(fp)
+
+    cmdFile = cmd + acceptable
+    #print(' '.join(cmdFile))
+    #print(fp)
+    pylintRun(cmdFile, exit=False)
 
 
 if __name__ == '__main__':

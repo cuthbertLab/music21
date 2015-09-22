@@ -165,7 +165,7 @@ class VexflowPickler(object):
             defaults = self.defaults
         jsBody = self.getJSBody(dataSplit, defaults)
         jsBodyScript = self.jsBodyScript.format(jsBody = jsBody)
-        return jsBodyScript;
+        return jsBodyScript
 
     def getJSBody(self, dataSplit, defaults = None):
         '''
@@ -187,7 +187,7 @@ class VexflowPickler(object):
             d = defaults
         jsBody = self.jsBody.format(pickleOutput = dataSplit,
                                     callback = d['callback'])
-        return jsBody;
+        return jsBody
     
     def getHTML(self, dataSplit, title=None, defaults=None):
         '''
@@ -283,7 +283,7 @@ class TestExternal(unittest.TestCase):
         vfp = VexflowPickler()
         vfp.defaults['m21URI'] = 'file:///Users/Cuthbert/git/music21j/src/music21'
         vfp.defaults['requireURI'] = 'file:///Users/Cuthbert/git/music21j/ext/require/require.js'
-        data = vfp.fromObject(s);
+        data = vfp.fromObject(s)
         fp = environLocal.getTempFile('.html')
         with open(fp, 'w') as f:
             f.write(data)
@@ -294,15 +294,15 @@ if __name__ == "__main__":
     import music21
     music21.mainTest(Test)
     
-    from music21 import note, clef, meter
-    s = stream.Measure()
-    s.insert(0, clef.TrebleClef())
-    s.insert(0, meter.TimeSignature('1/4'))
-    n = note.Note()
-    n.duration.quarterLength = 1/3.
-    s.repeatAppend(n, 3)
-    p = stream.Part()
-    p.repeatAppend(s, 2)
-    p.show('vexflow', local=True)
-    
+#     from music21 import note, clef, meter
+#     s = stream.Measure()
+#     s.insert(0, clef.TrebleClef())
+#     s.insert(0, meter.TimeSignature('1/4'))
+#     n = note.Note()
+#     n.duration.quarterLength = 1/3.
+#     s.repeatAppend(n, 3)
+#     p = stream.Part()
+#     p.repeatAppend(s, 2)
+#     p.show('vexflow', local=True)
+#     
     #s.show('vexflow')

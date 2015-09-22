@@ -425,12 +425,12 @@ class XMLNode(object):
             sub.append(u'charData=%s' % fixBytes(self.charData))
         
         for component in self._getComponents():
-            if type(component) == tuple: # its a simple element
+            if isinstance(component, tuple): # its a simple element
                 name, value = component
                 if value == None: 
                     continue
                 # generally we do not need to see False boolean nodes
-                if type(value) == bool and value == False: 
+                if isinstance(value, bool) and value == False: 
                     continue 
                 sub.append(u'%s=%s' % (fixBytes(name), fixBytes(value)))
             else: # its a node subclass
@@ -499,13 +499,13 @@ class XMLNode(object):
 
                 # some elements are treated as boolean values; presence 
                 # of element, w/o text, is true
-                if type(content) == bool and content == False: 
+                if isinstance(content, bool) and content == False: 
                     continue 
                 content = fixBytes(content)
                 tag = fixBytes(tag)
                 
                 sub = doc.createElement(tag)
-                if type(content) == bool and content == True:
+                if isinstance(content, bool) and content == True:
                     pass # no text node needed
                 else:
                     # was the topline; trying to use replace for errors
@@ -517,7 +517,8 @@ class XMLNode(object):
 
                     if six.PY2:                       
                         try:
-                            entry = unicode(contentStr, errors='replace') # pylint: disable=undefined-variable @UndefinedVariable
+                            entry = unicode(contentStr, errors='replace') # @UndefinedVariable pylint: disable=undefined-variable 
+                            
                         except TypeError:
                             entry = u"%s" % contentStr
                             #entry = str(content)

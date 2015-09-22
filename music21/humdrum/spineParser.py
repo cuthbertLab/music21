@@ -45,7 +45,7 @@ SpineParsing consists of several steps.
 #python3
 try:
     basestring # @UndefinedVariable
-except:
+except NameError:
     basestring = str # @ReservedAssignment
 
 import unittest
@@ -70,7 +70,7 @@ from music21 import clef
 from music21 import stream
 from music21 import common
 from music21 import exceptions21
-from music21.humdrum import testFiles #, canonicalOutput
+from music21.humdrum import testFiles
 from music21.humdrum import instruments
 
 from music21 import environment
@@ -127,7 +127,9 @@ class HumdrumDataCollection(object):
     '''
     parsedLines = False
 
-    def __init__(self, dataStream = [], parseLines = True):
+    def __init__(self, dataStream=None, parseLines=True):
+        if dataStream is None:
+            dataStream = []
         # attributes
         self.eventList = None
         self.maxSpines = None
@@ -716,6 +718,7 @@ class HumdrumFile(HumdrumDataCollection):
     as a mandatory argument a filename to be opened and read.
     '''
     def __init__(self, filename = None):
+        super(HumdrumFile, self).__init__()
         self.dataStream = None
         self._storedStream = None
         if (filename is not None):
@@ -985,7 +988,8 @@ class HumdrumSpine(object):
         self.isFirstVoice = None
         self.iterIndex = None
         
-
+        self.humdrumPosition = None
+        self.humdrumSpineId = None
 
     def __repr__(self):
         representation = "Spine: " + str(self.id)
@@ -2547,7 +2551,6 @@ class Test(unittest.TestCase):
         self.assertEqual(b.duration.tuplets[0].durationNormal.dots, 2)
 
     def testMeasureBoundaries(self):
-        from music21 import stream # pylint: disable=reimported
         m0 = stream.Measure()
         m1 = hdStringToMeasure("=29a;:|:", m0)
         self.assertEqual(m1.number, 29)
@@ -2586,7 +2589,6 @@ class Test(unittest.TestCase):
 #        for spineX in hf1.spineCollection:
 #            spineX.stream.id = "spine %s" % str(spineX.id)
 #            masterStream.append(spineX.stream)
-        #expectedOutput = canonicalOutput.mazurka6repr
 #        self.assertTrue(common.basicallyEqual
 #                          (common.stripAddresses(expectedOutput),
 #                           common.stripAddresses(masterStream._reprText())))

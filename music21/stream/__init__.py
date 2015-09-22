@@ -1011,7 +1011,7 @@ class Stream(base.Music21Object):
         if shiftOffsets is True and recurse is True:
             raise StreamException("Cannot do both shiftOffsets and recurse search at the same time...yet")
         
-        if type(targetOrList) not in (list, set, tuple):
+        if not isinstance(targetOrList, (list, set, tuple)):
             self.remove([targetOrList], firstMatchOnly=firstMatchOnly, shiftOffsets=shiftOffsets, recurse=recurse)
         else:
             if len(targetOrList) > 1:

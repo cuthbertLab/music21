@@ -98,7 +98,6 @@ class ModuleGather(object):
             'musedata/testPrimitive/__init__.py',
             'mei/test_base.py',
             'humdrum/questions.py',
-            'humdrum/canonicalOutput.py',
             'documentation/upload.py',
             'documentation/source/conf.py',
             'documentation/library/extensions.py',

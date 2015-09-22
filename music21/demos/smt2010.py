@@ -64,8 +64,10 @@ def ex02(show=True, *arguments, **keywords):
     pitches = []
     for i in range(len(v2Part.pitches)):
         pn = v2Part.pitches[i].name
-        if i > 0 and pitches[-1] == pn: continue
-        else: pitches.append(pn)
+        if i > 0 and pitches[-1] == pn:
+            continue
+        else: 
+            pitches.append(pn)
     
     # Second, compare all adjacent four-note groups of pitch classes and determine which are dominant sevenths; store this in a list and display the results. 
     found = stream.Stream()
@@ -137,7 +139,6 @@ def ex01Alt(show=True, *arguments, **keywords):
 
 def findHighestNotes(show=True, *arguments, **keywords):
     import copy
-    import music21
     
     score = corpus.parse('bach/bwv366.xml')
     ts = score.flat.getElementsByClass(meter.TimeSignature)[0]
@@ -146,7 +147,7 @@ def findHighestNotes(show=True, *arguments, **keywords):
     
     found = stream.Stream()
     for part in score.getElementsByClass(stream.Part):
-        found.append(part.flat.getElementsByClass(music21.clef.Clef)[0])
+        found.append(part.flat.getElementsByClass('Clef')[0])
         highestNoteNum = 0
         for m in part.getElementsByClass('Measure'):
             for n in m.notes:
@@ -394,7 +395,8 @@ def chordifyAnalysisHandel():
     sExcerpt = corpus.parse('hwv56', '3-03')
     sExcerpt = sExcerpt.measures(0,10)
     display = stream.Score()
-    for p in sExcerpt.parts: display.insert(0, p)
+    for p in sExcerpt.parts: 
+        display.insert(0, p)
     reduction = sExcerpt.chordify()
     for c in reduction.flat.getElementsByClass('Chord'):
         c.annotateIntervals()

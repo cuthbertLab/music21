@@ -1,4 +1,13 @@
 # -*- coding: utf-8 -*-
+#-------------------------------------------------------------------------------
+# Name:         corpus/testCorpus.py
+# Purpose:      testing for the corpus
+#
+# Authors:      Chris Ariza 
+#
+# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL or BSD, see license.txt
+#-------------------------------------------------------------------------------
 from music21 import corpus
 import unittest
 import re

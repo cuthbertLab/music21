@@ -71,17 +71,17 @@ class DirectoryInformation(object):
         >>> di = corpus.corpora.DirectoryInformation('schoenberg')
         >>> di.findWorks()
         OrderedDict([(...'opus19', CorpusWork(title=...'Opus 19', 
-                                           files=[CorpusFile(path=...'schoenberg/opus19/movement2.mxl', 
-                                                             title=...'Movement 2', 
-                                                             filename=...'movement2.mxl', 
-                                                             format='musicxml', 
-                                                             ext=...'.mxl'), 
-                                                  CorpusFile(path=...'schoenberg/opus19/movement6.mxl', 
-                                                             title=...'Movement 6', 
-                                                             filename=...'movement6.mxl', 
-                                                             format='musicxml', 
-                                                             ext=...'.mxl')],                                                             
-                                            virtual=False))])
+                                       files=[CorpusFile(path=...'schoenberg/opus19/movement2.mxl', 
+                                                         title=...'Movement 2', 
+                                                         filename=...'movement2.mxl', 
+                                                         format='musicxml', 
+                                                         ext=...'.mxl'), 
+                                              CorpusFile(path=...'schoenberg/opus19/movement6.mxl', 
+                                                         title=...'Movement 6', 
+                                                         filename=...'movement6.mxl', 
+                                                         format='musicxml', 
+                                                         ext=...'.mxl')],                                                             
+                                        virtual=False))])
         '''
         self.works.clear()
         works = self.corpusObject.getComposer(self.directoryName) 
@@ -425,7 +425,8 @@ class Corpus(object):
                     raise corpus.CorpusException(
                         'Could not find an xml or mxl work that met this ' +
                         'criterion: {0}'.format(workName) + 
-                        '. If you are searching for a file on disk, use "converter" instead of "corpus".')
+                        '. If you are searching for a file on disk, ' + 
+                        'use "converter" instead of "corpus".')
             workList = corpus.getVirtualWorkList(
                 workName,
                 movementNumber,
@@ -1309,8 +1310,7 @@ class LocalCorpus(Corpus):
         if self.name is 'local':
             userSettings['localCorpusSettings'] = self.directoryPaths
         else:
-            userSettings['localCorporaSettings'][self.name] = \
-                self.directoryPaths
+            userSettings['localCorporaSettings'][self.name] = self.directoryPaths
         environment.Environment().write()
 
     def search(

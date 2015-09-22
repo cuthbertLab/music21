@@ -64,6 +64,7 @@ def chordsToAnalysis(chordStream, manifest, scale):
 
         pTarget = scale.pitchFromDegree(scaleDegree)
         match = False
+        p = None
         for p in c.pitches:
             if p.name == pTarget.name:
                 match = True
@@ -73,10 +74,10 @@ def chordsToAnalysis(chordStream, manifest, scale):
         pTarget.octave = octaveDisplay
         n = note.Note(pTarget)
         if durationTypeDisplay in ['whole']:
-            n.noteheadFill = False;
+            n.noteheadFill = False
         else:
-            n.noteheadFill = True;
-        n.stemDirection = 'noStem';
+            n.noteheadFill = True
+        n.stemDirection = 'noStem'
         n.addLyric(textDisplay)
         mPost.insert(c.getOffsetBySite(m), n)
 

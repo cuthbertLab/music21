@@ -867,7 +867,7 @@ class Music21Object(object):
                             if stringReturns is True:
                                 return 'highestTime'
                             else:
-                                site.highestTime
+                                return site.highestTime
                         
                         tryOrigin = self.derivation.origin
                         if id(tryOrigin) in originMemo:
@@ -2086,8 +2086,9 @@ class Music21Object(object):
             raise ElementException('priority values must be integers.')
         if self._priority != value:
             self._priority = value
-            for s in self.sites.getSites(excludeNone=True):
-                pass
+            # TODO: set priority in each site?
+            #for s in self.sites.getSites(excludeNone=True):
+            #    pass
 
     priority = property(_getPriority, _setPriority,
         doc = '''

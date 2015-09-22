@@ -2059,7 +2059,7 @@ class Duration(SlottedObject):
             self._components[i] = durationTupleFromTypeDots(self._components[i].type, 0)
         
         self._dotGroups = value
-        self._quarterLengthNeedsUpdating
+        self._quarterLengthNeedsUpdating = True
 
     @property
     def dots(self):

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from music21 import stream, converter, corpus, instrument, graph, note, meter, humdrum
-import music21.note
 import music21.pitch
 from collections import defaultdict
 
@@ -258,14 +257,14 @@ def simple4f(show=True):
         eventStream = part.flat.notesAndRests
         for i in range(len(eventStream)):
             e = eventStream[i]
-            if isinstance(e, music21.note.Rest) or i == len(eventStream)-1:
+            if isinstance(e, note.Rest) or i == len(eventStream)-1:
                 if len(candidateSet) > 0:
                     candidateSet.sort()
                     # this removes redundancies for simplicity
                     if candidateSet not in foundSets:
                         foundSets.append(candidateSet)
                     candidateSet = []
-            elif isinstance(e, music21.note.Note):      
+            elif isinstance(e, note.Note):      
                 if e.pitchClass not in candidateSet:
                     candidateSet.append(e.pitchClass)
     foundSets.sort()
@@ -282,7 +281,7 @@ def simple4g():
     s = converter.parse(movements[movementNumber-1])
     count = 0
     for part in s:
-        noteStream = part.flat.getElementsByClass(music21.note.Note)
+        noteStream = part.flat.getElementsByClass(note.Note)
         for i in range(len(noteStream)-1):
             # assuming spelling does not count
             if noteStream[i].midi == noteStream[i+1].midi:
@@ -360,19 +359,19 @@ def januaryThankYou():
             for i in range(len(notes) - 4):
 #                if (notes[i].name == 'E-' or notes[i].name == "D#") and notes[i+1].name == 'E' and notes[i+2].name == 'A':
                 if notes[i].name == 'E-' and notes[i+1].name == 'E' and notes[i+2].name == 'A':
-                        measureNumber = 0
-                        for site in notes[i].sites.getSites():
-                            if isinstance(site, stream.Measure):
-                                measureNumber = site.number
-                                display.append(site)
-                        notes[i].lyric = workName + " " + str(thisPart.id) + " " + str(measureNumber)
-                        m = stream.Measure()
-                        m.append(notes[i])
-                        m.append(notes[i+1])
-                        m.append(notes[i+2])
-                        m.append(notes[i+3])
-                        m.insert(0, m.bestClef())
-                        display.append(m)
+                    measureNumber = 0
+                    for site in notes[i].sites.getSites():
+                        if isinstance(site, stream.Measure):
+                            measureNumber = site.number
+                            display.append(site)
+                    notes[i].lyric = workName + " " + str(thisPart.id) + " " + str(measureNumber)
+                    m = stream.Measure()
+                    m.append(notes[i])
+                    m.append(notes[i+1])
+                    m.append(notes[i+2])
+                    m.append(notes[i+3])
+                    m.insert(0, m.bestClef())
+                    display.append(m)
             try:
                 display.show()
             except:

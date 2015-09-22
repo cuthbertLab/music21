@@ -32,7 +32,7 @@ def main():
             ambi = p.analyze('ambitus')
             distance = ambi.diatonic.generic.undirected
             if distance >= 15:
-                print ("************ GOT ONE!: %r ************".format(ambi))
+                print ("************ GOT ONE!: {0} ************".format(ambi))
             elif distance >= 9:
                 print (ambi)
             else:

@@ -15,8 +15,6 @@ import shutil
 import sys
 import webbrowser
 
-from music21 import common
-
 import multiprocessing
 cpus_to_use = max(1, multiprocessing.cpu_count() - 1)  # @UndefinedVariable
 
@@ -137,7 +135,7 @@ def main(target):
 if __name__ == '__main__':
     #sys.argv.append('clean')
     if len(sys.argv) > 1:
-        target = sys.argv[1]   # to rebuild everything run "make.py clean"
+        runMode = sys.argv[1]   # to rebuild everything run "make.py clean"
     else:
-        target = 'html'
-    main(target)
+        runMode = 'html'
+    main(runMode)
