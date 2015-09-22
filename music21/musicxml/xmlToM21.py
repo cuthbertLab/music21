@@ -11,9 +11,9 @@
 #-------------------------------------------------------------------------------
 import copy
 import math
-import pprint
+#import pprint
 import sys
-import traceback
+#import traceback
 import unittest
 from music21.ext import six
 
@@ -993,7 +993,7 @@ class PartParser(XMLParserBase):
             emessage = e.message
         else:
             emessage = execInfoTuple[0].__name__ + " : " #+ execInfoTuple[1].__name__
-        message = "In measure (" + measureNumber + "): " + emessage
+        unused_message = "In measure (" + measureNumber + "): " + emessage
         raise(e)
         #raise type(e)(pprint.pformat(traceback.extract_tb(execInfoTuple[2])))
     

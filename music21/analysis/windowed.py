@@ -22,7 +22,6 @@ and :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) classe
 
 
 import unittest
-import sys
 
 from music21 import exceptions21
 

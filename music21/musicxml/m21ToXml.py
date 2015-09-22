@@ -2353,7 +2353,7 @@ class MeasureExporter(XMLExporterBase):
             mxType = Element('type')
             mxType.text = typeToMusicXMLType(d.components[0].type)
             mxNote.append(mxType)
-            for _ in range(d.components[0].dots):
+            for unused_dotcounter in range(d.components[0].dots):
                 SubElement(mxNote, 'dot')
         
         if (hasattr(n, 'pitch') and 

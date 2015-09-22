@@ -1322,7 +1322,7 @@ class KernSpine(HumdrumSpine):
                     thisObject.humdrumPosition = event.position # pylint: disable=attribute-defined-outside-init
                     thisObject.priority = event.position
                     self.stream._appendCore(thisObject)
-            except Exception as e:
+            except Exception as e: # pylint: disable=broad-except
                 import traceback
                 environLocal.warn("Error in parsing event ('%s') at position %r for spine %r: %s" % (event.contents, event.position, event.spineId, str(e)))
                 tb = traceback.format_exc()
