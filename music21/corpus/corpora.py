@@ -220,7 +220,6 @@ class Corpus(object):
         Utility to get default extensions, or, optionally, expand extensions to
         all known formats.
 
-        >>> from music21 import corpus
         >>> coreCorpus = corpus.CoreCorpus()
         >>> for extension in coreCorpus._translateExtensions():
         ...     extension
@@ -286,7 +285,6 @@ class Corpus(object):
         '''
         Instantiate a specific corpus based on `name`:
 
-        >>> from music21 import corpus
         >>> corpus.Corpus.fromName('core')
         <music21.corpus.corpora.CoreCorpus>
 

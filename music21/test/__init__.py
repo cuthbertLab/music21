@@ -10,7 +10,6 @@ __all__ = [
     'testRunner',
     'timeGraphs', 
     'testStream',
-    'helpers',
     ]
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True

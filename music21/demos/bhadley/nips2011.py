@@ -38,7 +38,7 @@ def nipsBuild(useOurExtractors = True, buildSet = 1, evaluationMethod = 'coarse'
     
     entryDict = {}
     for d in entries: 
-        sid = d.keys()[0]; 
+        sid = d.keys()[0];
         entryDict[int(sid)] = d[sid]
     
     
@@ -167,16 +167,14 @@ def getLeadsheetDatesFromBillboard():
     except ImportError:
         from urllib.request import urlopen # python3
     import copy
-    DIR = 'C:\leadsheets'
+    DIR = r'C:\leadsheets'
 
-    '''
-    Code below scrapes this website: http://www.jamrockentertainment.com/billboard-music-top-100-songs-listed-by-year.html
-    for their listing of the Billboard 100 songs from 1950 to 2010.
-    
-    Generates an unordered dictionary with the corresponding data: each key in the dictionary is the year, each value is a list
-    of tuples, each tuple includes the song title at index 0 and group/artist at index 1. The list is ordered starting at
-    element 0 by rank, starting with number 1.
-    '''
+#     Code below scrapes this website: http://www.jamrockentertainment.com/billboard-music-top-100-songs-listed-by-year.html
+#     for their listing of the Billboard 100 songs from 1950 to 2010.
+#     
+#     Generates an unordered dictionary with the corresponding data: each key in the dictionary is the year, each value is a list
+#     of tuples, each tuple includes the song title at index 0 and group/artist at index 1. The list is ordered starting at
+#     element 0 by rank, starting with number 1.
     DICT = {}
     tempList = []
     LOWERLIMIT = 1950
@@ -288,36 +286,36 @@ def getLeadsheetDatesFromBillboard():
     
     
     for i in indexValues:
-            fn = 'wikifonia-%04s.mxl' % i
-            fn = fn.replace(' ', '0')
-            dst = os.path.join(DIR, fn)
-            dates = []
-            print (dst)
-            if os.path.exists(dst):
-                piece = converter.parse(dst)
-                for year in DICT:
-                        for title, group in DICT[year]:
-                            if piece.metadata.movementName.lower() == str(title).lower()   : #or piece.metadata.composer == str(a):
-                                #print "FOUND by title! Name", piece.metadata.movementName, "Composer", piece.metadata.composer, str(year)
-                                #print dst   
-                                dates.append(int(year))                    
-                    
-                if len(dates) > 0:
-                    date = min(dates) #date of entry
-                    tempList = DICT[str(date)]
-                    for x in tempList:
-                        for e in x:
-                            if e.lower() == piece.metadata.movementName.lower():
-                                rank =  (tempList.index(x) + 1 ) #position on Billboard 100
-               
-                    #print "Title:", piece.metadata.movementName, "  Composer:", piece.metadata.composer, "  Date:", date, "  Position on Billboard:", rank
-                    #print "Title:", piece.metadata.movementName, "  Date:", date
-                    matches = matches + 1
-                    outputjson = outputjson + '{\"%s":[%s,%s]}, ' % (i, date, rank)
-            if (i % 500) == 0:
-                j = ((i-1000) / (11938.00)) * 100.00
-                print ('%s %%' %round(j, 2))
-                print (outputjson)
+        fn = 'wikifonia-%04s.mxl' % i
+        fn = fn.replace(' ', '0')
+        dst = os.path.join(DIR, fn)
+        dates = []
+        print (dst)
+        if os.path.exists(dst):
+            piece = converter.parse(dst)
+            for year in DICT:
+                    for title, group in DICT[year]:
+                        if piece.metadata.movementName.lower() == str(title).lower()   : #or piece.metadata.composer == str(a):
+                            #print "FOUND by title! Name", piece.metadata.movementName, "Composer", piece.metadata.composer, str(year)
+                            #print dst   
+                            dates.append(int(year))                    
+                
+            if len(dates) > 0:
+                date = min(dates) #date of entry
+                tempList = DICT[str(date)]
+                for x in tempList:
+                    for e in x:
+                        if e.lower() == piece.metadata.movementName.lower():
+                            rank =  (tempList.index(x) + 1 ) #position on Billboard 100
+           
+                #print "Title:", piece.metadata.movementName, "  Composer:", piece.metadata.composer, "  Date:", date, "  Position on Billboard:", rank
+                #print "Title:", piece.metadata.movementName, "  Date:", date
+                matches = matches + 1
+                outputjson = outputjson + '{\"%s":[%s,%s]}, ' % (i, date, rank)
+        if (i % 500) == 0:
+            j = ((i-1000) / (11938.00)) * 100.00
+            print ('%s %%' %round(j, 2))
+            print (outputjson)
                 
                     
                     

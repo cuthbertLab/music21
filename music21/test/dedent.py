@@ -33,6 +33,7 @@ def dedent(string):
     if not splitLines[-1] or splitLines[-1].isspace():
         splitLines.pop(-1)
 
+    indentWidth = 0
     for indentWidth, character in enumerate(splitLines[0]):
         if character != ' ':
             break

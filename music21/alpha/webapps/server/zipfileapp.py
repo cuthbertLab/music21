@@ -34,10 +34,7 @@ from music21 import interval
 from music21 import exceptions21
 
 from music21.ext import six
-if six.PY2:
-    from StringIO import StringIO # @UnusedImport @UnresolvedImport
-else:
-    from io import StringIO # @Reimport
+StringIO = six.StringIO
 
 import zipfile
 import cgi
@@ -160,7 +157,7 @@ def reduction(sc):
     
 def idAndParseFile(fileToParse,filename):
     '''Takes in a file object and filename, identifies format, and returns parsed file'''
-    matchedFormat = re.sub('^.*\.', '', filename)
+    matchedFormat = re.sub(r'^.*\.', '', filename)
     if matchedFormat == "":
         pass
     else:

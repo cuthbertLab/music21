@@ -13,9 +13,8 @@
 # this requires pylint to be installed and available from the command line
 
 
-import os, sys
+import sys
 
-from music21 import common
 from music21.test import testSingleCoreAll as test
 
 try:
@@ -48,13 +47,10 @@ def main(fnAccept=None):
         print("make sure that 'sudo pip install pylint' is there. exiting.")
         return 
 
-    sourceFolder = common.getSourceFilePath()
     mg = test.ModuleGather()
 
-    # only accept a few file names for now
-    if fnAccept in (None, []):
-        fnAccept = ['bar', 'harmony', 'clef', 'note', 'duration']
-    fnPathReject = ['demos/',
+    fnPathReject = [
+                    'demos/',
                     'alpha/',
                     'test/',
                     'mxObjects.py',
@@ -138,14 +134,6 @@ def main(fnAccept=None):
                 break
         if rejectIt:
             continue
-        #fpRelative = fp.replace(sourceFolder, '')
-        #unused_dir, fn = os.path.split(fpRelative)
-        #fnNoExt = fn.replace('.py', '')
-        #fpRelativeNoSlash = fpRelative[1:]
-#         if (fn in fnAccept or 
-#                 fnNoExt in fnAccept or 
-#                 fpRelative in fnAccept or 
-#                 fpRelativeNoSlash in fnAccept):
         acceptable.append(fp)
 
     cmdFile = cmd + acceptable

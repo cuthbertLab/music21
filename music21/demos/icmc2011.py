@@ -24,8 +24,6 @@ environLocal = environment.Environment(_MOD)
 class Test(unittest.TestCase):
 
     def runTest(self):
-        ''' 
-        '''
         pass
     
 
@@ -288,7 +286,8 @@ class Test(unittest.TestCase):
         # based on Stream.testAddSlurByMelisma(self):
 
         #from music21 import corpus, spanner
-        nStart = None; nEnd = None
+        nStart = None
+        nEnd = None
         
         ex = corpus.parse('luca/gloria').parts['cantus'].measures(1,11)        
         exFlatNotes = ex.flat.notesAndRests
@@ -309,7 +308,8 @@ class Test(unittest.TestCase):
             if nStart is not None and nEnd is not None:
                 nStart.addLyric(nStart.beatStr)
                 ex.insert(spanner.Slur(nStart, nEnd))
-                nStart = None; nEnd = None
+                nStart = None
+                nEnd = None
         
         for sp in ex.spanners.getElementsByClass('Slur'):  
             #environLocal.printDebug(['sp', n.nameWithOctave, sp])
@@ -533,7 +533,7 @@ class Test(unittest.TestCase):
 
     def testScalesPy06(self):
         #from music21 import corpus, scale, note
-        from music21 import analysis
+        #from music21 import analysis
 
         scGMajor = scale.MajorScale('g4')
         scDMajor = scale.MajorScale('d4')

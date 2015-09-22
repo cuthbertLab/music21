@@ -222,9 +222,9 @@ def messiaen(show = True):
     #messiaen = #converter.parse('d:/docs/research/music21/ismir-2010/messiaen_valeurs_part2.xml')
     #messiaen = converter.parse('/Volumes/xdisc/_sync/_x/libMusicXML/messiaen/messiaen_valeurs_part2.xml')
     mall = converter.parse('/Users/cuthbert/desktop/messiaen_valeurs_2012.xml')
-    messiaen = mall[1]
+    messiaenP = mall[1]
     #messiaen.show()
-    notes = messiaen.flat.stripTies()
+    notes = messiaenP.flat.stripTies()
     g = graph.PlotScatterWeightedPitchSpaceQuarterLength(notes, 
         title='Messiaen, Mode de Valeurs', xLog=False)
     
@@ -290,14 +290,14 @@ def demoGettingWorks():
     
 
     # Can obtain works from an integrated corpus 
-    s1 = corpus.parse('bach/bwv103.6') # @UnusedVariable
-    s2 = corpus.parse('bach/bwv18.5-lz') # @UnusedVariable
+    unused_s1 = corpus.parse('bach/bwv103.6') # @UnusedVariable
+    unused_s2 = corpus.parse('bach/bwv18.5-lz') # @UnusedVariable
 
     # Can parse data stored in MusicXML files locally or online:
-    s = converter.parse('http://www.musicxml.org/xml/elite.xml') # @UnusedVariable
+    unused_s = converter.parse('http://www.musicxml.org/xml/elite.xml') # @UnusedVariable
 
     # Can parse data stored in MIDI files locally or online:
-    s = converter.parse('http://www.jsbchorales.net/down/midi/010306b_.mid') # @UnusedVariable
+    unused_s = converter.parse('http://www.jsbchorales.net/down/midi/010306b_.mid') # @UnusedVariable
 
 
 
@@ -326,7 +326,7 @@ def demoBasic():
 
     # A Part might contain numerous Measure Streams
     len(soprano.getElementsByClass('Measure'))
-    mRange = soprano.measures(14,16) # @UnusedVariable
+    unused_mRange = soprano.measures(14,16) # @UnusedVariable
     #mRange.show()
     # mRange.sorted.show('text') # here we can see this
 
@@ -631,42 +631,39 @@ class TestExternal(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    #if len(sys.argv) == 1: # normal conditions
-    #    music21.mainTest(Test)
-    #elif len(sys.argv) > 1:
-        pass
-        #newDots()
-        #altDots()
-        #pitchDensity()
-        #pitchQuarterLengthUsage()
-        #messiaen()
-        #pitchQuarterLengthUsage3D()
+    pass
+    #newDots()
+    #altDots()
+    #pitchDensity()
+    #pitchQuarterLengthUsage()
+    #messiaen()
+    #pitchQuarterLengthUsage3D()
 
 
-        #demoSearch()
+    #demoSearch()
 
-        #demoBasic()
-        #demoCombineTransform()
+    #demoBasic()
+    #demoCombineTransform()
 
-        #demoSearch()
+    #demoSearch()
 
-        #demoGraphMessiaen()
+    #demoGraphMessiaen()
 
-        #demoGraphBach()
+    #demoGraphBach()
 
 
 
-        #demoGraphMozartChopin()
+    #demoGraphMozartChopin()
 
 
-        #demoBeethoven133()
+    #demoBeethoven133()
 
-        #beethovenSearch()
+    #beethovenSearch()
 
-        #demoBachSearchBrief()
+    #demoBachSearchBrief()
 
-        #demoGraphMessiaenBrief()
-        demoGraphMessiaen()
+    #demoGraphMessiaenBrief()
+    demoGraphMessiaen()
 
 #------------------------------------------------------------------------------
 # eof

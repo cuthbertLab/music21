@@ -83,7 +83,7 @@ def getDocumentationFromAutoGen(fullModulePath):
     for child in doctree.traverse(is_code_or_literal_block):
         childText = child.astext()
         if '#_DOCS_SHOW' in childText:
-            next
+            continue
         if 'ipython-result' in child.attributes['classes']:
             childText = childText.strip()
             childText = testRunner.stripAddresses(childText, '...')
@@ -98,10 +98,10 @@ def getDocumentationFromAutoGen(fullModulePath):
             if len(childTextSplit) == 0:
                 continue
             childTextArray = [childTextSplit[0]]
-            matchesShow = re.search('\.show\((.*)\)', childTextSplit[0])
+            matchesShow = re.search(r'\.show\((.*)\)', childTextSplit[0])
             if matchesShow is not None and not matchesShow.group(1).startswith('t'):
                 childTextArray = []
-            if re.search('.plot\(.*\)', childTextSplit[0]):
+            if re.search(r'.plot\(.*\)', childTextSplit[0]):
                 childTextArray = []
                 
             if '#_RAISES_ERROR' in childTextSplit[0]:
@@ -112,12 +112,12 @@ def getDocumentationFromAutoGen(fullModulePath):
             for l in childTextSplit[1:]: # split into multiple examples unless indented
                 if '#_RAISES_ERROR' in childTextSplit[0]:
                     childTextArray = []
-                elif re.search('.plot\(.*\)', childTextSplit[0]):
+                elif re.search(r'.plot\(.*\)', childTextSplit[0]):
                     continue
                 elif l.startswith('%'):
                     childTextArray = []
                 elif l.startswith(' '):        
-                    matchesShow = re.search('\.show\((.*)\)', l)
+                    matchesShow = re.search(r'\.show\((.*)\)', l)
                     if matchesShow is not None and not matchesShow.group(1).startswith('t'):
                         continue
                     else:
@@ -185,7 +185,7 @@ def main(runOne=False):
     totalFailures = 0
     
     timeStart = time.time()
-    dtr = doctest.DocTestRunner(doctest.OutputChecker(), 
+    unused_dtr = doctest.DocTestRunner(doctest.OutputChecker(), 
                                 verbose=False, 
                                 optionflags=doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
     
@@ -204,10 +204,10 @@ def main(runOne=False):
                 ### it required too many compromises in how we'd like to write a user's
                 ### guide -- i.e., dicts can change order, etc.  better just to
                 ### monthly run through the User's Guide line by line and update.
-                examples = getDocumentationFromAutoGen(mt.fullModulePath)
-                dt = doctest.DocTest([doctest.Example(e[0], e[1]) for e in examples], {}, 
-                                     mt.moduleNoExtension, mt.fullModulePath, 0, None)
-                (failcount, testcount) = dtr.run(dt)
+#                 examples = getDocumentationFromAutoGen(mt.fullModulePath)
+#                 dt = doctest.DocTest([doctest.Example(e[0], e[1]) for e in examples], {}, 
+#                                      mt.moduleNoExtension, mt.fullModulePath, 0, None)
+#                 (failcount, testcount) = dtr.run(dt)
             
             
             if failcount > 0:
@@ -218,7 +218,7 @@ def main(runOne=False):
                 print("all %d tests ran successfully" % (testcount))
             totalTests += testcount
             totalFailures += failcount
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             print("failed miserably! %s" % str(e))
             import traceback
             tb = traceback.format_exc()

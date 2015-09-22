@@ -80,10 +80,10 @@ class ModalCounterpoint(object):
         for note1 in srcNotes:
             note2 = srcStream.getElementAfterElement(note1, [Note])
             if note2 is not None:
-                if note1.editorial.harmonicInterval.semiSimpleName == "P5" and \
-                   note2.editorial.harmonicInterval.semiSimpleName == "P5":
-                        numParallelFifths += 1
-                        note2.editorial.misc["Parallel Fifth"] = True
+                if (note1.editorial.harmonicInterval.semiSimpleName == "P5" and
+                        note2.editorial.harmonicInterval.semiSimpleName == "P5"):
+                    numParallelFifths += 1
+                    note2.editorial.misc["Parallel Fifth"] = True
         return numParallelFifths
 
     def findHiddenFifths(self, stream1, stream2):
@@ -984,10 +984,10 @@ class ModalCounterpoint(object):
         for i in range(maxNote):
             note1 = s1notes[i]
             if (note1.name == sixth and i < maxNote - 2):
-                    note2 = s1notes[i+1]
-                    note3 = s1notes[i+2]
-                    if (note2.name == seventh and note3.name == tonic):
-                        note1 = note1.transpose("A1")
+                note2 = s1notes[i+1]
+                note3 = s1notes[i+2]
+                if (note2.name == seventh and note3.name == tonic):
+                    note1 = note1.transpose("A1")
             elif (note1.name == seventh and i < maxNote - 1):
                 note2 = s1notes[i+1]
                 if note2.name == tonic:
@@ -1026,12 +1026,18 @@ class ModalCounterpoint(object):
 ##                    environLocal.printDebug(["rejected because lastInterval was not a second"])
              
                 environLocal.printDebug([note1.name + str(note1.octave) for note1 in cantusFirmus.notes])
-                if not goodHarmony: environLocal.printDebug(["bad harmony"])
-                else: environLocal.printDebug(["harmony good"])
-                if not goodMelody: environLocal.printDebug(["bad melody"])
-                else: environLocal.printDebug(["melody good"])
-                if not thirdsGood: environLocal.printDebug(["too many thirds"])
-                if not sixthsGood: environLocal.printDebug(["too many sixths"])
+                if not goodHarmony: 
+                    environLocal.printDebug(["bad harmony"])
+                else: 
+                    environLocal.printDebug(["harmony good"])
+                if not goodMelody: 
+                    environLocal.printDebug(["bad melody"])
+                else: 
+                    environLocal.printDebug(["melody good"])
+                if not thirdsGood: 
+                    environLocal.printDebug(["too many thirds"])
+                if not sixthsGood: 
+                    environLocal.printDebug(["too many sixths"])
             except ModalCounterpointException:
                 pass
             

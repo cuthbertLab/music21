@@ -63,58 +63,58 @@ def reverse(self, inPlace = False,
                 classesToMove = (key.KeySignature, meter.TimeSignature, clef.Clef, metadata.Metadata, instrument.Instrument, layout.SystemLayout), 
                 makeNotation = False,
                 ):
-        '''
-        synonym: retrograde()
-        
-        reverse the order of stream members both in the .elements list but also by offset, so that the piece
-        sounds properly backwards.  Automatically sorts the stream as well.  If inPlace is True (no by default)
-        the elements are reversed in the current stream.  if inPlace is False then a new stream is returned.
-
-        all elements of class classesToMove get moved to their current end locations before being reversed.  
-        This puts the clefs, TimeSignatures, etc. in their proper locations.  (THIS DOES NOT YET WORK)
-        
-        '''
-        highestTime = self.highestTime
-
-        if inPlace is True:
-            returnObj = self 
-            raise Exception("Whoops haven't written inPlace = True yet for reverse")
+    '''
+    synonym: retrograde()
+    
+    reverse the order of stream members both in the .elements list but also by offset, so that the piece
+    sounds properly backwards.  Automatically sorts the stream as well.  If inPlace is True (no by default)
+    the elements are reversed in the current stream.  if inPlace is False then a new stream is returned.
+    
+    all elements of class classesToMove get moved to their current end locations before being reversed.  
+    This puts the clefs, TimeSignatures, etc. in their proper locations.  (THIS DOES NOT YET WORK)
+    
+    '''
+    highestTime = self.highestTime
+    
+    if inPlace is True:
+        returnObj = self 
+        raise Exception("Whoops haven't written inPlace = True yet for reverse")
+    else:
+        returnObj = stream.Part()
+    
+    
+    sf = self.flat
+    for myEl in sf:
+        if isinstance(myEl, classesToMove):
+            continue
+    
+        if myEl.duration is not None:
+            releaseTime = myEl.getOffsetBySite(sf) + myEl.duration.quarterLength
         else:
-            returnObj = stream.Part()
-
-
-        sf = self.flat
-        for myEl in sf:
-            if isinstance(myEl, classesToMove):
-                continue
-
-            if myEl.duration is not None:
-                releaseTime = myEl.getOffsetBySite(sf) + myEl.duration.quarterLength
-            else:
-                releaseTime = myEl.getOffsetBySite(sf) 
-            newOffset = highestTime - releaseTime
-            
-#            for thisContext in classesToMove:
-#                curCon = myEl.getContextByClass(thisContext)
-#                if currentContexts[thisContext.__name__] is not curCon:
-#                    returnObj.insert(newOffset, curCon)
-#                    currentContexts[thisContext.__name__] = curCon
-            returnObj.insert(newOffset, myEl)
-
-            
-        returnObj.insert(0, sf.getElementsByClass(layout.SystemLayout)[0])
-        returnObj.insert(0, sf.getElementsByClass(clef.Clef)[0])
-        returnObj.insert(0, sf.getElementsByClass(key.KeySignature)[0])
-        returnObj.insert(0, sf.getElementsByClass(meter.TimeSignature)[0])
-        returnObj.insert(0, sf.getElementsByClass(instrument.Instrument)[0])
-        for thisP in returnObj.flat.pitches:
-            if thisP.accidental is not None:
-                thisP.accidental.displayStatus = None
- 
-        if makeNotation is True:
-            return returnObj.makeNotation()
-        else:
-            return returnObj
+            releaseTime = myEl.getOffsetBySite(sf) 
+        newOffset = highestTime - releaseTime
+        
+    #            for thisContext in classesToMove:
+    #                curCon = myEl.getContextByClass(thisContext)
+    #                if currentContexts[thisContext.__name__] is not curCon:
+    #                    returnObj.insert(newOffset, curCon)
+    #                    currentContexts[thisContext.__name__] = curCon
+        returnObj.insert(newOffset, myEl)
+    
+        
+    returnObj.insert(0, sf.getElementsByClass(layout.SystemLayout)[0])
+    returnObj.insert(0, sf.getElementsByClass(clef.Clef)[0])
+    returnObj.insert(0, sf.getElementsByClass(key.KeySignature)[0])
+    returnObj.insert(0, sf.getElementsByClass(meter.TimeSignature)[0])
+    returnObj.insert(0, sf.getElementsByClass(instrument.Instrument)[0])
+    for thisP in returnObj.flat.pitches:
+        if thisP.accidental is not None:
+            thisP.accidental.displayStatus = None
+    
+    if makeNotation is True:
+        return returnObj.makeNotation()
+    else:
+        return returnObj
 
 def prependBlankMeasures(myStream, measuresToAppend = 1, inPlace = True):
     '''
@@ -291,7 +291,8 @@ def prepareSolution(triplumTup, ctTup, tenorTup):
     startCounting = False
 
     for n in qjChords.flat.notes:
-        if not 'Chord' in n.classes: continue
+        if not 'Chord' in n.classes: 
+            continue
         if (startCounting is False or n.offset >= 70) and len(n.pitches) < 2:
             continue
         else:

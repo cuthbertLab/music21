@@ -49,7 +49,7 @@ def showAnalysis(book = 3, madrigal = 13):
     print (major)
     print (minor)
     
-def analyzeBooks(books = [3], start = 1, end = 20, show = False, strict = False):
+def analyzeBooks(books = (3,), start = 1, end = 20, show = False, strict = False):
     majorFig = ""
     minorFig = ""
     majorSt = ""
@@ -66,7 +66,7 @@ def analyzeBooks(books = [3], start = 1, end = 20, show = False, strict = False)
                 try:
                     analysis = corpus.parse(filename)
                     print(book,i)
-                except:
+                except Exception:
                     print("Cannot parse %s, maybe it does not exist..." % (filename))
                     continue
             if show == True:
@@ -180,7 +180,7 @@ def iqRootsAndPercentage(analysisStream):
                 minor += "\n" + element.tonic + " " + element.mode + " "
     return (major, minor)
 
-def monteverdiParallels(books = [3], start = 1, end = 20, show = True, strict = False):
+def monteverdiParallels(books = (3,), start = 1, end = 20, show = True, strict = False):
     '''
     find all instances of parallel fifths or octaves in Monteverdi madrigals.
     '''
@@ -199,7 +199,7 @@ def monteverdiParallels(books = [3], start = 1, end = 20, show = True, strict = 
                     continue
             displayMe = False
             for i in range(len(c.parts) - 1):
-                iName = c.parts[i].id
+                #iName = c.parts[i].id
                 ifn = c.parts[i].flat.notesAndRests
                 omi = ifn.offsetMap
                 for j in range(i+1, len(c.parts)):

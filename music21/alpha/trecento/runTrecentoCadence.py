@@ -20,7 +20,8 @@ def countTimeSig():
     for trecentoWork in ballataObj:
         thisTime = trecentoWork.timeSigBegin
         thisTime = thisTime.strip() # remove leading and trailing whitespace
-        if (thisTime == ""): pass
+        if (thisTime == ""): 
+            pass
         else:
             totalPieces += 1
             if (thisTime in timeSigCounter):
@@ -69,12 +70,9 @@ def makePDFfromPieces(start = 1, finish = 2):
 
     retrievedPieces = []
     for i in range(start, finish):  ## some random pieces
-#        try:
-            randomPiece = ballataObj.makeWork( i ) #
-            if randomPiece.incipit is not None:
-                retrievedPieces.append(randomPiece)
-#        except:
-#            pass #raise Exception("Ugg " + str(i))
+        randomPiece = ballataObj.makeWork( i ) #
+        if randomPiece.incipit is not None:
+            retrievedPieces.append(randomPiece)
 
     opus = stream.Opus()
     retrievedPieces.sort(key=sortByPMFC)

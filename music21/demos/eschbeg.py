@@ -31,14 +31,17 @@ def letterToNumber(letter):
     return number
 
 def numberToLetter(number):
-    if number == 11: letter = "E"
-    elif number == 10: letter = "T"
-    else: letter = str(number)
+    if number == 11: 
+        letter = "E"
+    elif number == 10: 
+        letter = "T"
+    else: 
+        letter = str(number)
     return letter
 
 
 def setupTranspositions():
-    eschbegTransposed = []
+    _eschbegTransposed = []
     for i in range(0, 12):
         thisTransposition = ""
         for letter in eschbeg:
@@ -46,8 +49,8 @@ def setupTranspositions():
             newnum = (number + i) % 12
             newletter = numberToLetter(newnum)
             thisTransposition += newletter
-        eschbegTransposed.append(thisTransposition)
-    return eschbegTransposed
+        _eschbegTransposed.append(thisTransposition)
+    return _eschbegTransposed
 
 eschbegTransposed = setupTranspositions()
 

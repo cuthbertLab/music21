@@ -245,7 +245,7 @@ application = music21ModWSGIFeatureApplication
     
 def idAndParseFile(fileToParse,filename):
     '''Takes in a file object and filename, identifies format, and returns parsed file'''
-    matchedFormat = re.sub('^.*\.', '', filename)
+    matchedFormat = re.sub(r'^.*\.', '', filename)
     if matchedFormat == "":
         pass
     else:
@@ -573,3 +573,4 @@ featureInfo['T']=[
     ['T13','Relative Note Density of Highest Line','Number of Note Ons in the channel with the highest average pitch divided by the average number of Note Ons in all channels that contain at least one note.','1'],
     ['T15','Melodic Intervals in Lowest Line','Average melodic interval in semitones of the channel with the lowest average pitch divided by the average melodic interval of all channels that contain at least two notes.','1'],
     ['T20','Voice Separation','Average separation in semi-tones between the average pitches of consecutive channels (after sorting based/non average pitch) that contain at least one note.','1']]
+

@@ -2045,7 +2045,7 @@ def getHTMLResultsString(score, typeList=None):
         if typeList is None or resultType in typeList:
             resultStr+="<b>"+resultType+"</B>: <br /><ul>"
             for result in score.analysisData['ResultDict'][resultType]:
-                resultStr += "<li style='color:"+result.currentColor+"'><b>"+string.replace(result.text,':',"</b>:<span style='color:black'>")+"</span></li>"
+                resultStr += "<li style='color:"+result.currentColor+"'><b>"+result.text.sub(':',"</b>:<span style='color:black'>")+"</span></li>"
             resultStr += "</ul><br />"
             
     return resultStr
@@ -2205,7 +2205,7 @@ class TestExternal(unittest.TestCase):
         theoryAnalyzer.removePassingTones(p)
         theoryAnalyzer.removeNeighborTones(p)
         p.show()
-        
+                
 if __name__ == "__main__":
     music21.mainTest(Test)
 

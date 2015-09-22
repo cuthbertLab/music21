@@ -27,6 +27,6 @@ For information on how to format requests to the application, see the documentat
 for music21.webapps.base
 '''
 
-from music21 import webapps
+from music21.alpha import webapps
 
 application = webapps.ModWSGIApplication

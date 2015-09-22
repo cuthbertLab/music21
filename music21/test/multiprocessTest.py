@@ -295,10 +295,10 @@ def runOneModuleWithoutImp(args):
             runTime = int(time.time() - timeStart)
             return ModuleResponse("TestsRun", fp, moduleName, testResult.wasSuccessful(), 
                                   str(testResult), errors, failures, testResult.testsRun, runTime)
-        except Exception as excp:
+        except Exception as excp: # pylint: disable=broad-except
             environLocal.printDebug('*** Exception in running %s: %s...\n' % (moduleName, excp))
             return ModuleResponse("TrappedException", fp, moduleName, None, str(excp))
-    except Exception as excp:
+    except Exception as excp: # pylint: disable=broad-except
         environLocal.printDebug('*** Large Exception in running %s: %s...\n' % (fp, excp))
         return ModuleResponse("LargeException", fp, None, None, str(excp))
 
@@ -323,7 +323,7 @@ def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOu
     maxTimeout = 200
     pathsToRun = modGather.modulePaths # [0:30]
 
-    pool = multiprocessing.Pool(processes=poolSize) # @UndefinedVariable
+    pool = multiprocessing.Pool(processes=poolSize) # @UndefinedVariable # pylint: disable=not-callable
     
     # imap returns the results as they are completed.  Since the number of files is small,
     # the overhead of returning is outweighed by the positive aspect of getting results immediately
@@ -364,7 +364,7 @@ def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOu
             continueIt = False
             pool.close()    
             pool.join()
-        except Exception as excp:
+        except Exception as excp: # pylint: disable=broad-except
             eventsProcessed += 1
             exceptionLog = ModuleResponse("UntrappedException", None, "%s" % excp)
             summaryOutput.append(exceptionLog)

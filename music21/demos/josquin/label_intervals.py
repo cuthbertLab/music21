@@ -8,7 +8,7 @@ def displayIntervals(file):
     of the intervals above the lowest notes in the score at each sonority 
     (after chordification).
     """
-    sJosquinPiece = converter.parse(file);
+    sJosquinPiece = converter.parse(file)
     #dissonant_intervals = ['m2','M2','M7','d5','m7','A4','P4']
     rJosquinPiece = sJosquinPiece.chordify()
     for c in rJosquinPiece.flat.getElementsByClass('Chord'):

@@ -47,8 +47,8 @@ if six.PY2:
             '*/trecento/tonality.py'
             ])
         exclude_lines=[
-            '\s*import music21\s*',
-            '\s*music21.mainTest\(\)\s*',
+            r'\s*import music21\s*',
+            r'\s*music21.mainTest\(\)\s*',
             ]
         for e in exclude_lines:
             cov.exclude(e, which='exclude')
@@ -189,7 +189,7 @@ class ModuleGather(object):
 
 
 
-def main(testGroup=['test'], restoreEnvironmentDefaults=False, limit=None):
+def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None):
     '''Run all tests. Group can be test and external
 
     >>> print(None)
@@ -283,7 +283,7 @@ if __name__ == '__main__':
     try:
         reload(sys) # @UndefinedVariable
         sys.setdefaultencoding("UTF-8") # @UndefinedVariable
-    except:
+    except (NameError, AttributeError):
         pass # no need in Python3
 
     # if optional command line arguments are given, assume they are  
