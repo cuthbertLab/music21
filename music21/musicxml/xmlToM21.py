@@ -70,19 +70,6 @@ class XMLBarException(MusicXMLImportException):
 #-------------------------------------------------------------------------------
 # Helpers...
 
-#     def _runIfTag(el, tag, func, inputM21=None):
-#         '''
-#         If an ElementTree.Element has a element of a certain tag, get it as
-#         mxObj, then call:
-#         
-#             return self.func(mxObj, inputM21)
-#             
-#         else, ret
-#         CRAP, needs more...
-#         '''
-#         
-#         mxObj = el.find('tag')
-#-------------------------------------------------------------------------------
 # Durations
 
 def musicXMLTypeToType(value):
@@ -489,7 +476,8 @@ class MusicXMLImporter(XMLParserBase):
         etree = ET.parse(filename)
         self.xmlRoot = etree.getroot()
         if self.xmlRoot.tag != 'score-partwise':
-            raise MusicXMLImportException("Cannot parse MusicXML files not in score-partwise. Root tag was '{0}'".format(self.xmlRoot.tag))
+            raise MusicXMLImportException("Cannot parse MusicXML files not in score-partwise. " + 
+                                          "Root tag was '{0}'".format(self.xmlRoot.tag))
         self.xmlRootToScore(self.xmlRoot, self.stream)
     
     def parseXMLText(self):
@@ -503,7 +491,8 @@ class MusicXMLImporter(XMLParserBase):
             except ET.ParseError:
                 raise # try to do something better here...
         if self.xmlRoot.tag != 'score-partwise':
-            raise MusicXMLImportException("Cannot parse MusicXML files not in score-partwise. Root tag was '{0}'".format(self.root.tag))
+            raise MusicXMLImportException("Cannot parse MusicXML files not in score-partwise. " + 
+                                          "Root tag was '{0}'".format(self.xmlRoot.tag))
         self.xmlRootToScore(self.xmlRoot, self.stream)
 
     def xmlRootToScore(self, mxScore, inputM21=None):
