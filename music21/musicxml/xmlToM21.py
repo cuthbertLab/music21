@@ -489,7 +489,7 @@ class MusicXMLImporter(XMLParserBase):
         etree = ET.parse(filename)
         self.xmlRoot = etree.getroot()
         if self.xmlRoot.tag != 'score-partwise':
-            raise MusicXMLImportException("Cannot parse MusicXML files not in score-partwise. Root tag was '{0}'".format(self.root.tag))
+            raise MusicXMLImportException("Cannot parse MusicXML files not in score-partwise. Root tag was '{0}'".format(self.xmlRoot.tag))
         self.xmlRootToScore(self.xmlRoot, self.stream)
     
     def parseXMLText(self):
