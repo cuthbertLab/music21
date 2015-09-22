@@ -174,12 +174,12 @@ class BrailleElementGrouping(list):
                 for obj2 in obj:
                     try:
                         allObjects.append(u"\n".join(obj2._brailleEnglish))
-                    except TypeError:
+                    except (AttributeError, TypeError):
                         allObjects.append(str(obj2))
             else:
                 try:
                     allObjects.append(u"\n".join(obj._brailleEnglish))
-                except TypeError:
+                except (AttributeError, TypeError):
                     allObjects.append(str(obj))
         if self.numRepeats > 0:
             allObjects.append(u"** Grouping x {0} **".format(self.numRepeats+1))
