@@ -44,15 +44,15 @@ environLocal = environment.Environment(_MOD)
 # users of 64-bit windows and 64-bit python should download the amd64 port
 # requires portaudio to be installed http://www.portaudio.com/download.html
 
-recordChannels = 1
-recordSampleRate = 44100
-recordChunkLength = 1024
+default_recordChannels = 1
+default_recordSampleRate = 44100
+default_recordChunkLength = 1024
 
 def samplesFromRecording(seconds=10.0, storeFile=True,
                 recordFormat=None,
-                recordChannels=recordChannels,
-                recordSampleRate=recordSampleRate,
-                recordChunkLength=1024):
+                recordChannels=default_recordChannels,     
+                recordSampleRate=default_recordSampleRate, 
+                recordChunkLength=default_recordChunkLength):
     '''
     records `seconds` length of sound in the given format (default Wave)
     and optionally stores it to disk using the filename of `storeFile`

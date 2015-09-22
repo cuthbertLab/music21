@@ -409,14 +409,8 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [WindowedAnalysis]
 
 if __name__ == "__main__":
-    if len(sys.argv) == 1: # normal conditions
-        import music21
-        music21.mainTest(Test)
-    elif len(sys.argv) > 1:
-        a = Test()
-
-        a.testWindowing()
-        #a.testVariableWindowing()
+    import music21
+    music21.mainTest(Test)
 
 
 #------------------------------------------------------------------------------

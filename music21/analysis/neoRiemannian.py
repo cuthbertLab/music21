@@ -28,12 +28,6 @@ environLocal = environment.Environment(_MOD)
 class LRPException(exceptions21.Music21Exception):
     pass
 
-class leftOrdered:
-    pass
-
-class simplifyEnharmonic:
-    pass
-
 def L(c, raiseException=False):
     '''
     L is a function that takes a major or minor triad and returns a chord that 
@@ -143,9 +137,9 @@ def LRP_transform(c, transposeInterval, changingPitch):
 
 def LRP_combinations(c, 
                      transformationString, 
-                     raiseException = False, 
-                     leftOrdered = False, 
-                     simplifyEnharmonic = False):
+                     raiseException=False, 
+                     leftOrdered=False, 
+                     simplifyEnharmonic=False):
     '''
     LRP_combinations is a function that takes a major or minor triad and a transformationString
     and returns a transformed triad, using the L, R, and P transformations. 

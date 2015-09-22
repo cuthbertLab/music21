@@ -370,7 +370,7 @@ class JobProcessor(object):
         if jobs:
             for job in jobs:
                 job_queue.put(pickle.dumps(job, protocol=pickle.HIGHEST_PROTOCOL))
-            for _ in range(len(jobs)):
+            for unused_jobCounter in range(len(jobs)):
                 job = pickle.loads(result_queue.get())
                 results = job.getResults()
                 errors = job.getErrors()

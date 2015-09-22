@@ -436,12 +436,14 @@ class LyAssignment(LyObject):
                 raise Exception()
             else:
                 return ''.join([str(self.assignmentId), ' ' ,
-                               self.propertyPath.stringOutput(), " = ", self.identifierInit.stringOutput()], ' ')
+                                self.propertyPath.stringOutput(), " = ", 
+                                self.identifierInit.stringOutput(), ' '])
         else:
             if self.assignmentId is None or self.identifierInit is None:
                 raise Exception()
             else:
-                return ' '.join([str(self.assignmentId), "=", self.identifierInit.stringOutput(), ' '])
+                return ' '.join([str(self.assignmentId), "=", 
+                                 self.identifierInit.stringOutput(), ' '])
 
 class LyIdentifierInit(LyObject):
     r'''
@@ -797,9 +799,12 @@ class LyTempoEvent(LyObject):
             if self.stenoDuration is None:
                 raise Exception("If tempoRange is defined then need a stenoDuration")
             elif self.scalar is not None:
-                return " ".join(base, self.scalar.stringOutput(), self.stenoDuration.stringOutput(), "=", self.tempoRange.stringOutput())
+                return " ".join([base, self.scalar.stringOutput(), 
+                                 self.stenoDuration.stringOutput(), "=", 
+                                 self.tempoRange.stringOutput()])
             else:
-                return " ".join(base, self.stenoDuration.stringOutput(), "=", self.tempoRange.stringOutput())
+                return " ".join([base, self.stenoDuration.stringOutput(), 
+                                 "=", self.tempoRange.stringOutput()])
         elif self.scalar is None:
             raise Exception("If tempoRange is not defined then need scalar")
             #return base + " " + self.scalar.stringOutput()

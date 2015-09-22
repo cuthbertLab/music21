@@ -92,7 +92,7 @@ def histogram(data, bins):
     return container, binsLimits
 
 
-def autocorrelationFunction(recordedSignal, recordSampleRate):
+def autocorrelationFunction(recordedSignal, recordSampleRateIn):
     '''
     Converts the temporal domain into a frequency domain. In order to do that, it
     uses the autocorrelation function, which finds periodicities in the signal
@@ -135,7 +135,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRate):
         beginning = positiveDifferences[0]
         peak = numpy.argmax(correlation[beginning:]) + beginning
         vertex = interpolation(correlation, peak)
-        finalResult = recordSampleRate / vertex
+        finalResult = recordSampleRateIn / vertex
     return finalResult
 
 def prepareThresholds(useScale=None):

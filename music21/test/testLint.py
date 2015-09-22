@@ -62,16 +62,11 @@ def main(fnAccept=None):
                     'toMxObjects.py',
                     'xmlHandler.py',
                     '/ext/',
-                    #'bar.py',  # crashes pylint...
+                    #'bar.py',  # used to crash pylint...
                     #'repeat.py', # used to hang pylint...
                     #'spanner.py', # used to hang pylint...
                     ]
-        #fnAccept = ['stream.py', 'note.py', 'chord.py']
     disable = [
-                #'C0301', 'C0302', 'C0103', 'C0330', 'C0324', 
-                #'W0621', 'W0511', 
-                #'W0404', 'R0201', 'R0904', 'E1101', 'R0914', 'R0903',
-                #'R0911', 'R0902', 
                 'cyclic-import', # we use these inside functions when there's a deep problem.
                 'unnecessary-pass', # nice, but not really a problem...
                 'locally-disabled', # test for this later, but hopefully will know what they're doing
@@ -97,7 +92,7 @@ def main(fnAccept=None):
                 'unpacking-non-sequence', # gets it wrong too often.
                 'too-many-instance-attributes', # maybe later
                 
-                'invalid-name',      # never remove -- these are good music21 names; fix the regexp instead...
+                'invalid-name',      # these are good music21 names; fix the regexp instead...
                 'no-self-use',       # maybe later
                 'too-few-public-methods', # never remove or set to 1
                 'trailing-whitespace',  # should ignore blank lines with tabs
@@ -119,7 +114,7 @@ def main(fnAccept=None):
                   }
 
     cmd = ['--output-format=parseable',
-           r'--dummy-variables-rgx="_$|dummy$|unused|i$|j$|junk|counter"', 
+           r'--dummy-variables-rgx="_$|dummy|unused|i$|j$|junk|counter"', 
            '--docstring-min-length=3',
            '--max-args=7',  # should be 5 later, but baby steps
            '--bad-names="foo,shit,fuck,stuff"', # definitely allow "bar" for barlines

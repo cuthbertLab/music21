@@ -2345,7 +2345,7 @@ class MeasureExporter(XMLExporterBase):
             mxType = Element('type')
             mxType.text = typeToMusicXMLType(d.type)
             mxNote.append(mxType)
-            for _ in range(d.dots):
+            for unused_dotcounter in range(d.dots):
                 SubElement(mxNote, 'dot')
                 # TODO: dot placement...
 
@@ -3423,7 +3423,7 @@ class MeasureExporter(XMLExporterBase):
             mxSub = Element('beat-unit')
             mxSub.text = typeToMusicXMLType(d.type)
             mxMetro.append(mxSub)
-            for _ in range(d.dots):
+            for unused_dotcounter in range(d.dots):
                 mxMetro.append(Element('beat-unit-dot'))
             if len(numbers) > 0:
                 if not hideNumber[i]:

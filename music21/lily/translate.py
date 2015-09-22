@@ -193,7 +193,7 @@ class LilypondConverter(object):
             raise LilyTranslateException("Cannot find a copy of Lilypond installed on your system. " +
                                          "Please be sure it is installed. And that your " +
                                          "environment.UserSettings()['lilypondPath'] is set to find it.")
-        stdout, _ = proc.communicate()
+        stdout, unused = proc.communicate()
         if six.PY3:
             stdout = stdout.decode(encoding='utf-8')
         versionString = stdout.split()[2]

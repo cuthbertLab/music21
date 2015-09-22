@@ -96,6 +96,9 @@ class KeyAnalyzer(object):
         return keyByMeasure
 
     def getInterpretationByMeasure(self, mNumber):
+        '''
+        Returns a dictionary of interpretations for the measure.
+        '''        
         if mNumber in self._interpretationMeasureDict:
             return self._interpretationMeasureDict[mNumber] # CACHE
         if self.rawKeyByMeasure == []:
@@ -127,7 +130,7 @@ class KeyAnalyzer(object):
                     for k in baseInterpretations:
                         coeff = algorithm(newInterpretations[k], j)
                         baseInterpretations[k] += coeff
-            bestName = max(baseInterpretations, key=lambda k: baseInterpretations[k])
+            bestName = max(baseInterpretations, key=baseInterpretations.get)
             smoothedKeysByMeasure.append(key.Key(bestName))
         
         return smoothedKeysByMeasure

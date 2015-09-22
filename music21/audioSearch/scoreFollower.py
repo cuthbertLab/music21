@@ -52,6 +52,13 @@ class ScoreFollower(object):
         self.notesCounter = 0
         self.begins = True
 
+        self.useScale = None
+        self.silencePeriod = None
+        self.result = None
+        self.useMic = None
+        self.processing_time = None
+        self.seconds_recording = None
+
     def runScoreFollower(
         self,
         plot=False,
@@ -488,9 +495,6 @@ class ScoreFollower(object):
         notePrediction,
         lastNotePosition,
         ):
-        '''
-
-        '''
         from music21 import audioSearch
 
         # Analyzing streams

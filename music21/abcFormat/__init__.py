@@ -2449,6 +2449,7 @@ class ABCHandler(object):
             raise ABCHandlerException('must process tokens before calling split')
         post = []
         pos = []
+        i = 0
         # barCount = 0 # not used
         # noteCount = 0 # not used
         for i in range(len(self._tokens)):
@@ -2746,7 +2747,7 @@ class ABCFile(object):
                     forcedNum = int(line.replace(' ', '').rstrip().replace('X:', ''))
                     if forcedNum == int(number):
                         gather = True
-                except:
+                except TypeError:
                     pass
             # if already gathering and find another ref number definition
             # stop gathering

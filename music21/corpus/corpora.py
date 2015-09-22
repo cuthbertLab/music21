@@ -1478,7 +1478,7 @@ class VirtualCorpus(Corpus):
         the interface is the same.
         '''
         from music21 import metadata
-        virtualCorpusBundle = metadata.MetadataBundle.fromVirtualCorpus(self.name)
+        virtualCorpusBundle = metadata.MetadataBundle.fromVirtualCorpus()
         return virtualCorpusBundle.search(
             query,
             field=field,

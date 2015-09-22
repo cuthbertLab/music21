@@ -1232,7 +1232,7 @@ class Test(unittest.TestCase):
                 from music21.ext import mock
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             from os import path
-            testPath = path.join(music21.__path__[0], 'mei', 'test', 'notes_in_utf16.mei')
+            testPath = path.join(common.getSourceFilePath(), 'mei', 'test', 'notes_in_utf16.mei')
             testConverter = ConverterMEI()
             testConverter.parseFile(testPath)
             self.assertEqual(1, mockConv.call_count)
@@ -1253,7 +1253,7 @@ class Test(unittest.TestCase):
                 from music21.ext import mock
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             from os import path
-            testPath = path.join(music21.__path__[0], 'mei', 'test', 'notes_in_utf8.mei')
+            testPath = path.join(common.getSourceFilePath(), 'mei', 'test', 'notes_in_utf8.mei')
             testConverter = ConverterMEI()
             testConverter.parseFile(testPath)
             self.assertEqual(1, mockConv.call_count)

@@ -99,8 +99,8 @@ affinityNames = {AFFINITY_SIGNATURE: "Signature Grouping",
 
 excludeFromBrailleElements = [spanner.Slur, layout.SystemLayout, layout.PageLayout, layout.StaffLayout]
 
-GROUPING_KEYSIG = 0 #key.KeySignature(0)
-GROUPING_TIMESIG = '4/4' #meter.TimeSignature("4/4")
+GROUPING_GLOBALS = {'keySignature': 0,
+                    'timeSignature': '4/4'}
 GROUPING_DESC_CHORDS = True
 GROUPING_SHOW_CLEFS = False
 GROUPING_UPPERFIRST_NOTEFINGERING = True
@@ -151,17 +151,16 @@ class BrailleElementGrouping(list):
         <music21.note.Rest rest>
         <music21.note.Note F>
         """
-        # TODO: remove globals... there are singletons instead.
-        global GROUPING_KEYSIG # pylint: disable=global-statement
-        global GROUPING_TIMESIG # pylint: disable=global-statement
-        if GROUPING_KEYSIG == 0:
-            GROUPING_KEYSIG = key.KeySignature(GROUPING_KEYSIG)
-        if GROUPING_TIMESIG == '4/4':
-            GROUPING_TIMESIG = meter.TimeSignature(GROUPING_TIMESIG)
+        list.__init__(self)
+
+        if GROUPING_GLOBALS['keySignature'] == None:
+            GROUPING_GLOBALS['keySignature'] = key.KeySignature(0)
+        if GROUPING_GLOBALS['timeSignature'] == None:
+            GROUPING_GLOBALS['timeSignature'] = meter.TimeSignature('4/4')
         
 
-        self.keySignature = GROUPING_KEYSIG
-        self.timeSignature = GROUPING_TIMESIG
+        self.keySignature = GROUPING_GLOBALS['keySignature']
+        self.timeSignature = GROUPING_GLOBALS['timeSignature']
         self.descendingChords = GROUPING_DESC_CHORDS
         self.showClefSigns = GROUPING_SHOW_CLEFS
         self.upperFirstInNoteFingering = GROUPING_UPPERFIRST_NOTEFINGERING
@@ -175,12 +174,12 @@ class BrailleElementGrouping(list):
                 for obj2 in obj:
                     try:
                         allObjects.append(u"\n".join(obj2._brailleEnglish))
-                    except Exception:
+                    except TypeError:
                         allObjects.append(str(obj2))
             else:
                 try:
                     allObjects.append(u"\n".join(obj._brailleEnglish))
-                except Exception:
+                except TypeError:
                     allObjects.append(str(obj))
         if self.numRepeats > 0:
             allObjects.append(u"** Grouping x {0} **".format(self.numRepeats+1))
@@ -434,7 +433,7 @@ class BrailleSegment(collections.defaultdict):
                     self[self._currentGroupingKey+0.5] = sngB
                     
         if noteGrouping.numRepeats > 0:
-            for n in range(noteGrouping.numRepeats):
+            for unused_repeatCounter in range(noteGrouping.numRepeats):
                 brailleText.addElement(keyOrTimeSig = symbols['repeat'])
 
     def extractSignatureGrouping(self, brailleText):
@@ -663,12 +662,12 @@ def splitNoteGrouping(noteGrouping, value = 2, beatDivisionOffset = 0):
     leftBrailleElements = BrailleElementGrouping()
     for brailleElement in newMeasures[0]:
         leftBrailleElements.append(brailleElement)
-    leftBrailleElements.__dict__ = noteGrouping.__dict__.copy()
+    leftBrailleElements.__dict__ = noteGrouping.__dict__.copy() # pylint: disable=attribute-defined-outside-init
 
     rightBrailleElements = BrailleElementGrouping()
     for brailleElement in newMeasures[1]:
         rightBrailleElements.append(brailleElement)
-    rightBrailleElements.__dict__ = noteGrouping.__dict__.copy()
+    rightBrailleElements.__dict__ = noteGrouping.__dict__.copy() # pylint: disable=attribute-defined-outside-init
 
     return leftBrailleElements, rightBrailleElements
 
@@ -990,7 +989,7 @@ def prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets = SEGMENT_SLURLO
                     allNotes[beginIndex + 1].beginLongDoubleSlur = True
                     allNotes[endIndex - 1].endLongDoubleSlur = True
 
-def getRawSegments(music21Part, segmentBreaks=SEGMENT_SEGMENTBREAKS):
+def getRawSegments(music21Part, segmentBreaks=None):
     """
     Takes in a :class:`~music21.stream.Part` and a segmentBreaks list which 
     contains (measureNumber, offsetStart) tuples. These tuples determine how
@@ -1105,8 +1104,11 @@ def getRawSegments(music21Part, segmentBreaks=SEGMENT_SEGMENTBREAKS):
     ===
     ---end segment---
     """
+    if segmentBreaks is None:
+        segmentBreaks = SEGMENT_SEGMENTBREAKS
+        
     allSegments = []
-    mnStart = 10E5
+    mnStart = 1000000.0
     offsetStart = 0.0
     segmentIndex = 0
     if len(segmentBreaks) > 0:

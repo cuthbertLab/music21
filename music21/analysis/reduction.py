@@ -545,7 +545,7 @@ class PartReduction(object):
                 #environLocal.printDebug(['partMeasures', partMeasures])
                 # assuming that all parts have same number of measures
                 # iterate over each measures
-                iLast = len(partMeasures[0]) - 1
+                # iLast = len(partMeasures[0]) - 1
                 for i in range(len(partMeasures[0])):
                     active = False
                     # check for activity in any part in the part group
