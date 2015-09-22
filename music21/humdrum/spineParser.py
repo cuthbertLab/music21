@@ -1200,7 +1200,7 @@ class HumdrumSpine(object):
                 thisObject = SpineComment(eventC)
             else:
                 thisObject = base.ElementWrapper(event)
-                thisObject.humdrumPosition = event.position
+                thisObject.humdrumPosition = event.position # pylint: disable=attribute-defined-outside-init
 
             if thisObject is not None:
                 self.stream._appendCore(thisObject)
@@ -1319,8 +1319,7 @@ class KernSpine(HumdrumSpine):
                     lastNote = thisObject
 
                 if thisObject is not None:
-                    thisObject.humdrumPosition = event.position
-                    thisObject.humdrumSpineId  = event.spineId
+                    thisObject.humdrumPosition = event.position # pylint: disable=attribute-defined-outside-init
                     thisObject.priority = event.position
                     self.stream._appendCore(thisObject)
             except Exception as e:
@@ -1368,8 +1367,7 @@ class DynamSpine(HumdrumSpine):
                 thisObject = dynamics.Dynamic(eventC)
 
             if thisObject is not None:
-                thisObject.humdrumPosition = event.position
-                thisObject.humdrumSpineId  = event.spineId
+                thisObject.humdrumPosition = event.position # pylint: disable=attribute-defined-outside-init
                 if thisContainer is None:
                     self.stream._appendCore(thisObject)
                 else:
@@ -1604,11 +1602,11 @@ class SpineCollection(object):
         firstStreamForEachInstrument = {}
         for thisSpine in self.spines:
             spineStream = thisSpine.stream
-            instruments = spineStream.getElementsByClass('Instrument')
-            if len(instruments) == 0:
+            instrumentsStream = spineStream.getElementsByClass('Instrument')
+            if len(instrumentsStream) == 0:
                 spineInstrument = None
             else:
-                spineInstrument = instruments[0].instrumentName
+                spineInstrument = instrumentsStream[0].instrumentName
             if spineInstrument not in usedIds:
                 firstStreamForEachInstrument[spineInstrument] = spineStream
                 usedIds[spineInstrument] = 1
@@ -1649,6 +1647,7 @@ class SpineCollection(object):
                         self.performSpineInsertion(thisSpine, newStream, i)
                         insertPoints.remove(i)
                     lastHumdrumPosition = humdrumPosition
+                    del el.humdrumPosition
                 except AttributeError: # no el.humdrumPosition
                     pass
                 newStream._appendCore(el)
@@ -2378,11 +2377,11 @@ def kernTandemToObject(tandem):
         except instruments.HumdrumInstrumentException:
             return MiscTandem(instrumentClass)
     elif tandem.startswith("*IG"):
-        instrumentGroup = tandem[3:]
+        #instrumentGroup = tandem[3:]
         return MiscTandem(tandem)
         # TODO: DO SOMETHING WITH INSTRUMENT GROUP; not in hum2xml
     elif tandem.startswith("*ITr"):
-        instrumentTransposing = True
+        #instrumentTransposing = True
         return MiscTandem(tandem)
         # TODO: DO SOMETHING WITH TRANSPOSING INSTRUMENTS; not in hum2xml
     elif tandem.startswith("*I"): # order has to be last

@@ -2939,7 +2939,17 @@ class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
 
 class UnpitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
     '''
+    Not yet implemented
     
+    Which unpitched MIDI Percussion Key Map instruments are present. 
+    There is one entry for each instrument, which is set to 1.0 if there is 
+    at least one Note On in the recording corresponding to the instrument and to 
+    0.0 if there is not. It should be noted that only instruments 35 to 81 are included here, 
+    as they are the ones that meet the official standard. They are numbered in this 
+    array from 0 to 46.
+        
+    
+    TODO: implement
     '''
     id = 'I2'
 

@@ -53,7 +53,7 @@ def main(fnAccept=None):
 
     # only accept a few file names for now
     if fnAccept in (None, []):
-        fnAccept = ['harmony', 'clef', 'note', 'duration']
+        fnAccept = ['bar', 'harmony', 'clef', 'note', 'duration']
     fnPathReject = ['demos/',
                     'alpha/',
                     'test/',
@@ -62,9 +62,9 @@ def main(fnAccept=None):
                     'toMxObjects.py',
                     'xmlHandler.py',
                     '/ext/',
-                    'bar.py',  # crashes pylint...
-                    'repeat.py', # hangs pylint...
-                    'spanner.py', # hangs pylint...
+                    #'bar.py',  # crashes pylint...
+                    #'repeat.py', # used to hang pylint...
+                    #'spanner.py', # used to hang pylint...
                     ]
         #fnAccept = ['stream.py', 'note.py', 'chord.py']
     disable = [
@@ -122,7 +122,7 @@ def main(fnAccept=None):
            r'--dummy-variables-rgx="_$|dummy$|unused|i$|j$|junk|counter"', 
            '--docstring-min-length=3',
            '--max-args=7',  # should be 5 later, but baby steps
-           '--bad-name="foo,shit,fuck,stuff"', # definitely allow "bar" for barlines
+           '--bad-names="foo,shit,fuck,stuff"', # definitely allow "bar" for barlines
            '--reports=n'
            ]
     for gn, gnv in goodnameRx.items():

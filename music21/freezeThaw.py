@@ -1883,7 +1883,7 @@ class Test(unittest.TestCase):
             #print idKey
             #print n2.sites.siteDict[idKey]['obj']
 
-        dummy_data = pickleMod.dumps(c, protocol=-1)
+        dummy = pickleMod.dumps(c, protocol=-1)
 
 
         #data = sf.writeStr(fmt='pickle')

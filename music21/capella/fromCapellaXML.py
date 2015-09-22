@@ -134,7 +134,7 @@ class CapellaImporter(object):
         if not isinstance(xmlText, string_types):
             xmlText = xmlText.decode('utf-8')
         it = xml.etree.ElementTree.iterparse(StringIO(xmlText))
-        for _, el in it:
+        for unused, el in it:
             if '}' in el.tag:
                 el.tag = el.tag.split('}', 1)[1]  # strip all namespaces
         self.mainDom = it.root

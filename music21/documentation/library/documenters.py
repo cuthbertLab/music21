@@ -218,6 +218,11 @@ class MemberDocumenter(ObjectDocumenter):
             ))
         return path.replace('.__init__', '')
 
+    def rstAutodocDirectiveFormat(self):
+        pass
+
+    def sphinxCrossReferenceRole(self):
+        pass
 
 class MethodDocumenter(MemberDocumenter):
     '''

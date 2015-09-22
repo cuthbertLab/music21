@@ -3651,7 +3651,7 @@ class Test(unittest.TestCase):
         s = converter.parse(testPrimitive.transposingInstruments72a)
         i1 = s.parts[0].flat.getElementsByClass('Instrument')[0]
         i2 = s.parts[1].flat.getElementsByClass('Instrument')[0]
-        i3 = s.parts[2].flat.getElementsByClass('Instrument')[0]
+        unused_i3 = s.parts[2].flat.getElementsByClass('Instrument')[0]
 
         self.assertEqual(str(i1.transposition), '<music21.interval.Interval M-2>')
         self.assertEqual(str(i2.transposition), '<music21.interval.Interval M-6>')
@@ -3676,7 +3676,7 @@ class Test(unittest.TestCase):
         # should be 3
         iStream2 = s.parts[1].flat.getElementsByClass('Instrument')
         self.assertEqual(len(iStream2), 3)
-        i2 = iStream2[0]
+        #i2 = iStream2[0]
 
         iStream3 = s.parts[2].flat.getElementsByClass('Instrument')
         self.assertEqual(len(iStream3), 1)

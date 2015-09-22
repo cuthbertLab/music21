@@ -137,19 +137,19 @@ def isIncomplete(possibA, pitchNamesToContain):
     >>> possibility.isIncomplete(possibA1, pitchNamesA2)
     False
     ''' 
-    isIncomplete = False
+    isIncompleteV = False
     pitchNamesContained = []
     for givenPitch in possibA:
         if givenPitch.name not in pitchNamesContained:
             pitchNamesContained.append(givenPitch.name)
     for pitchName in pitchNamesToContain:
         if pitchName not in pitchNamesContained:
-            isIncomplete = True
-    if not isIncomplete and (len(pitchNamesContained) > len(pitchNamesToContain)):
-        isIncomplete = False
+            isIncompleteV = True
+    if not isIncompleteV and (len(pitchNamesContained) > len(pitchNamesToContain)):
+        isIncompleteV = False
         #raise PossibilityException(str(possibA) + " contains pitch names not found in pitchNamesToContain.")
 
-    return isIncomplete
+    return isIncompleteV
 
 def upperPartsWithinLimit(possibA, maxSemitoneSeparation = 12):
     '''
@@ -182,7 +182,7 @@ def upperPartsWithinLimit(possibA, maxSemitoneSeparation = 12):
     >>> possibility.upperPartsWithinLimit(possibA2)
     False
     '''
-    upperPartsWithinLimit = True # pylint disable=redefined-outer-name
+    upperPartsWithinLimit = True # pylint: disable=redefined-outer-name
     if maxSemitoneSeparation == None:
         return upperPartsWithinLimit
     

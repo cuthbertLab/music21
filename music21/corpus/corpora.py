@@ -1394,14 +1394,18 @@ class VirtualCorpus(Corpus):
     ### CLASS VARIABLES ###
 
     _virtual_works = []
-    for name in dir(virtual):
-        className = getattr(virtual, name)
+    
+    corpusName = None
+    for corpusName in dir(virtual):
+        className = getattr(virtual, corpusName)
         if callable(className):
             obj = className()
             if isinstance(obj, virtual.VirtualWork): # @UndefinedVariable
                 if obj.corpusPath is not None:
                     _virtual_works.append(obj)
-
+    del corpusName
+    del className
+    del obj
     ### PRIVATE PROPERTIES ###
 
     @property
@@ -1474,7 +1478,8 @@ class VirtualCorpus(Corpus):
         the interface is the same.
         '''
         from music21 import metadata
-        return metadata.MetadataBundle.fromVirtualCorpus(self.name).search(
+        virtualCorpusBundle = metadata.MetadataBundle.fromVirtualCorpus(self.name)
+        return virtualCorpusBundle.search(
             query,
             field=field,
             fileExtensions=fileExtensions,

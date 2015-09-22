@@ -172,7 +172,7 @@ class FiguredBassScale(object):
         pitchNames = self.getPitchNames(bassPitch, notationString)
         iter1 = itertools.product(pitchNames, range(maxPitch.octave + 1))
         if six.PY3:
-            iter2 = map(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1)
+            iter2 = map(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1) # pylint: disable=bad-builtin
             iter3 = itertools.filterfalse(lambda samplePitch: bassPitch > samplePitch, iter2) # @UndefinedVariable
             iter4 = itertools.filterfalse(lambda samplePitch: samplePitch > maxPitch, iter3) # @UndefinedVariable
         else:

@@ -24,5 +24,6 @@ from music21.search import base
 from music21.search import lyrics
 from music21.search import segment
 
-from music21.search.base import *
+# __init__ can wildcard import base; it's how it is designed.
+from music21.search.base import * # pylint: disable=wildcard-import
 

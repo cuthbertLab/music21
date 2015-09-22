@@ -1592,7 +1592,7 @@ class Test(unittest.TestCase):
     def xtestOrangeBayesA(self):
         '''Using an already created test file with a BayesLearner.
         '''
-        import orange # @UnresolvedImport
+        import orange # @UnresolvedImport # pylint: disable=import-error
         data = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
         classifier = orange.BayesLearner(data)
         for i in range(len(data)):
@@ -1603,7 +1603,7 @@ class Test(unittest.TestCase):
     def xtestClassifiersA(self):
         '''Using an already created test file with a BayesLearner.
         '''
-        import orange, orngTree # @UnresolvedImport
+        import orange, orngTree # @UnresolvedImport  # pylint: disable=import-error
         data1 = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b1.tab')
         
         data2 = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b2.tab')
@@ -1640,7 +1640,7 @@ class Test(unittest.TestCase):
     def xtestClassifiersB(self):
         '''Using an already created test file with a BayesLearner.
         '''
-        import orange, orngTree # @UnresolvedImport
+        import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
         data1 = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b1.tab')
         
         data2 = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b2.tab', use = data1.domain)
@@ -1680,7 +1680,7 @@ class Test(unittest.TestCase):
     def xtestOrangeClassifiers(self):
         '''This test shows how to compare four classifiers; replace the file path with a path to the .tab data file. 
         '''
-        import orange, orngTree # @UnresolvedImport
+        import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
         data = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
 
         # setting up the classifiers
@@ -1711,7 +1711,7 @@ class Test(unittest.TestCase):
 
 
     def xtestOrangeClassifierTreeLearner(self):
-        import orange, orngTree # @UnresolvedImport
+        import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
         data = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
 
         tree = orngTree.TreeLearner(data, sameMajorityPruning=1, mForPruning=2)
@@ -1729,8 +1729,6 @@ _DOC_ORDER = [FeatureExtractor]
 
 
 if __name__ == "__main__":
-    #import sys
-    #sys.argv.append('StreamFormsA')
     import music21
     music21.mainTest(Test)
     

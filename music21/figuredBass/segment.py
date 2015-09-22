@@ -40,7 +40,7 @@ ifilterfalse = six.moves.filterfalse # @UndefinedVariable
 
 _MOD = 'segment.py'
 
-_defaultRealizerScale = None
+_defaultRealizerScale = {'scale': None} # singleton
 
 class Segment(object):
     _DOC_ORDER = ['allSinglePossibilities', 'singlePossibilityRules', 'allCorrectSinglePossibilities',
@@ -104,10 +104,9 @@ class Segment(object):
             maxPitch = pitch.Pitch(maxPitch)
         
         if fbScale is None:
-            global _defaultRealizerScale
-            if _defaultRealizerScale is None:
-                _defaultRealizerScale = realizerScale.FiguredBassScale()
-            fbScale = _defaultRealizerScale # save making it
+            if _defaultRealizerScale['scale'] is None:
+                _defaultRealizerScale['scale'] = realizerScale.FiguredBassScale()
+            fbScale = _defaultRealizerScale['scale'] # save making it
         
         if fbRules is None:
             self.fbRules = rules.Rules()
@@ -616,7 +615,7 @@ class Segment(object):
         '''
         self._singlePossibilityRuleChecking = _compileRules(self.singlePossibilityRules(self.fbRules))
         allA = self.allSinglePossibilities()
-        return ifilter(lambda possibA: self._isCorrectSinglePossibility(possibA), allA)
+        return [possibA for possibA in allA if self._isCorrectSinglePossibility(possibA)]
              
     def allCorrectConsecutivePossibilities(self, segmentB):
         '''
@@ -763,7 +762,7 @@ class OverlayedSegment(Segment):
     
 # HELPER METHODS
 # --------------
-def getPitches(pitchNames = ('C','E','G'), bassPitch = 'C3', maxPitch = 'C8'):
+def getPitches(pitchNames=('C','E','G'), bassPitch = 'C3', maxPitch = 'C8'):
     '''
     Given a list of pitchNames, a bassPitch, and a maxPitch, returns a sorted list of
     pitches between the two limits (inclusive) which correspond to items in pitchNames.

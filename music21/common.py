@@ -1290,7 +1290,7 @@ def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
     numbers = '0123456789.'
     firstNum = False
     firstChar = False
-    isNum = False
+    isNumber = False  
     lastIsNum = False
     post = []
     
@@ -1302,17 +1302,17 @@ def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
 
     for char in usrStr:
         if char in numbers:
-            isNum = True
+            isNumber = True
         else:
-            isNum = False
+            isNumber = False
 
-        if isNum and not firstNum and not lastIsNum:
+        if isNumber and not firstNum and not lastIsNum:
             firstNum = True
         else:
             firstNum = False
 
         # for chars
-        if not isNum and not firstChar and lastIsNum:
+        if not isNumber and not firstChar and lastIsNum:
             firstChar = True
         else:
             firstChar = False
@@ -1324,7 +1324,7 @@ def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
         else: # first character
             post.append(char)
 
-        if isNum:
+        if isNumber:
             lastIsNum = True
         else:
             lastIsNum = False
@@ -2225,7 +2225,8 @@ def unwrapWeakref(referent):
     >>> common.unwrapWeakref(a2.strong) is common.unwrapWeakref(a2.weak)
     True
     '''
-    if type(referent) is weakref.ref:
+    # faster than type checking if referent will usually be a weakref.ref.
+    if isinstance(referent, weakref.ref):
         return referent()
     else:
         return referent
@@ -2234,6 +2235,7 @@ def unwrapWeakref(referent):
 def isWeakref(referent):
     '''Test if an object is a weakref
 
+    just does isinstance, so DEPRECATED Sep 2015; to disappear soon as Dec 2015.
 
     >>> class Mock(object):
     ...     pass
@@ -2246,13 +2248,15 @@ def isWeakref(referent):
     >>> common.isWeakref(common.wrapWeakref(a1))
     True
     '''
-    if type(referent) is weakref.ref:
+    if isinstance(referent, weakref.ref):        
         return True
     return False
 
 
 def findWeakRef(target):
-    '''Given an object or composition of objects, find an attribute that is a weakref. This is a diagnostic tool.
+    '''
+    Given an object or composition of objects, find an attribute that is a weakref. 
+    This is a diagnostic tool.
     '''
     for attrName in dir(target):
         try:
@@ -2463,7 +2467,7 @@ class SlottedObject(object):
             slots.update(getattr(cls, '__slots__', ()))
         for slot in slots:
             sValue = getattr(self, slot, None)
-            if sValue is not None and type(sValue) is weakref.ref:
+            if isinstance(sValue, weakref.ref):
                 sValue = sValue()
                 print("Warning: uncaught weakref found in %r - %s, will not be rewrapped" % (self, slot))
             state[slot] = sValue

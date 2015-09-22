@@ -41,8 +41,7 @@ class IPythonNotebookIterator(Iterator):
     ### SPECIAL METHODS ###
 
     def __iter__(self):
-        import music21
-        rootFilesystemPath = music21.__path__[0]
+        rootFilesystemPath = common.getSourceFilePath()
         documentationPath = os.path.join(
             rootFilesystemPath,
             'documentation',
@@ -99,8 +98,7 @@ class ModuleIterator(Iterator):
     ### SPECIAL METHODS ###
 
     def __iter__(self):
-        import music21
-        rootFilesystemPath = music21.__path__[0]
+        rootFilesystemPath = common.getSourceFilePath()
         for directoryPath, directoryNames, fileNames in os.walk(
             rootFilesystemPath):
             directoryNamesToRemove = []

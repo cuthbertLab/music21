@@ -1030,9 +1030,7 @@ class Iterator(object):
         '''
         By default: numberingSystem = 'riemenschneider', currentNumber = 1, highestNumber = 371, iterationType = 'number',
         and returnType = 'stream'
-        '''
 
-        '''
         Notes:
         Two BachChoraleList objects are created. These should probably be consolidated, but they contain
         different information at this time. Also, there are problems with entries in BachChoraleListRKBWV
@@ -1260,7 +1258,7 @@ class Iterator(object):
                     analysis = corpus.parse(riemenschneiderName)
                     if analysis is not None:
                         chorale.insert(0, analysis.parts[0])
-                except: # fail silently
+                except Exception: # fail silently # pylint: disable=broad-except
                     pass
             # Store the correct title in metadata (replacing the chorale number as it is parsed)
             if chorale.metadata is None:
@@ -1377,10 +1375,11 @@ class Iterator(object):
         else:
             return self._titleList
 
-    def _setTitleList(self, value = []):
-        if value == []:
+    def _setTitleList(self, value=None):
+        if value is None:
             self._titleList = None
-        elif (type(value) is list) is False:
+            value = []
+        elif not isinstance(value, list):
             raise BachException("%s is not and must be a list." % value)
         else:
             self._titleList = []
@@ -1405,7 +1404,7 @@ class Iterator(object):
             return self._numberList
 
     def _setNumberList(self, value):
-        if (type(value) is list) is False:
+        if not isinstance(value, list):
             raise BachException("%s is not and must be a list." % value)
         if self._numberingSystem is 'title':
             self._numberList = None

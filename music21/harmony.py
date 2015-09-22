@@ -504,7 +504,7 @@ class ChordStepModification(object):
 
     ### INITIALIZER ###
 
-    def __init__(self, modType=None, degree=None, interval=None):
+    def __init__(self, modType=None, degree=None, intervalObj=None):
         self._modType = None # add, alter, subtract
         self._interval = None # alteration of degree, alter ints in mxl
         self._degree = None # the degree number, where 3 is the third
@@ -513,8 +513,8 @@ class ChordStepModification(object):
             self.modType = modType
         if degree is not None:
             self.degree = degree
-        if interval is not None:
-            self.interval = interval
+        if intervalObj is not None:
+            self.interval = intervalObj
 
     ### SPECIAL METHODS ###
 

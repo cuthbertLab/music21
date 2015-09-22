@@ -19,7 +19,7 @@ from music21 import base
 from music21 import exceptions21
 
 from music21 import expressions
-from music21 import repeat
+from music21.repeat import RepeatMark
 
 from music21 import environment
 _MOD = 'bar.py'
@@ -170,7 +170,8 @@ class Barline(base.Music21Object):
 
 # type <ending> in musicxml is used to mark different endings
 
-class Repeat(repeat.RepeatMark, Barline):
+
+class Repeat(RepeatMark, Barline):
     '''
     A Repeat barline.
 
@@ -229,11 +230,11 @@ class Repeat(repeat.RepeatMark, Barline):
 
 
     def __init__(self, direction='start', times=None):
+        RepeatMark.__init__(self)
         if direction == 'start':
             style = 'heavy-light'
         else:
             style = 'final'
-        
         Barline.__init__(self, style=style)
 
         self._direction = None # either start or end
@@ -316,9 +317,9 @@ class Test(unittest.TestCase):
    
 
     def testSortorder(self):
-        from music21 import stream, bar, clef, note, metadata
+        from music21 import stream, clef, note, metadata
         m = stream.Measure()
-        b = bar.Repeat()
+        b = Repeat()
         m.leftBarline = b
         c = clef.BassClef()
         m.append(c)

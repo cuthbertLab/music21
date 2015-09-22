@@ -10484,7 +10484,7 @@ class Stream(base.Music21Object):
             classList = None
         else:
             for e in returnObj.elements:
-                if type(e) not in classList: 
+                if type(e) not in classList: # pylint: disable=unidiomatic-typecheck
                     classList.append(type(e))
             for c in exemptClasses:
                 if c in classList:

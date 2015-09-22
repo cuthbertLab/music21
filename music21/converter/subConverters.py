@@ -419,6 +419,11 @@ class ConverterHumdrum(SubConverter):
     registerFormats = ('humdrum',)
     registerInputExtensions = ('krn',)
 
+    def __init__(self, **keywords):
+        SubConverter.__init__(self, **keywords)
+        self.data = None
+    
+
     #---------------------------------------------------------------------------
     def parseData(self, humdrumString, number=None):
         '''Open Humdrum data from a string -- calls humdrum.parseData()
@@ -476,6 +481,11 @@ class ConverterTinyNotation(SubConverter):
     '''
     registerFormats = ('tinynotation',)
     registerInputExtensions = ('tntxt', 'tinynotation')
+
+    def __init__(self, **keywords):
+        SubConverter.__init__(self, **keywords)
+        self.data = None
+
     #---------------------------------------------------------------------------
     def parseData(self, tnData, number=None):
         '''Open TinyNotation data from a string
@@ -591,9 +601,8 @@ class ConverterMusicXMLET(SubConverter):
     registerInputExtensions = ('xml', 'mxl', 'mx', 'musicxml')
     registerOutputExtensions = ('xml', 'mxl')
     
-    def __init__(self):
-        self._mxScore = None # store the musicxml object representation
-        SubConverter.__init__(self)
+    def __init__(self, **keywords):
+        SubConverter.__init__(self, **keywords)
 
     #---------------------------------------------------------------------------
     def parseData(self, xmlString, number=None):
@@ -653,11 +662,7 @@ class ConverterMusicXMLET(SubConverter):
             musescoreRun += " -r " + str(defaults.ipythonImageDpi)
 
         storedStrErr = sys.stderr
-        if six.PY2:
-            from StringIO import StringIO # @UnusedImport @UnresolvedImport
-        else:
-            from io import StringIO # @Reimport
-        fileLikeOpen = StringIO()
+        fileLikeOpen = six.StringIO()
         sys.stderr = fileLikeOpen
         os.system(musescoreRun)
         fileLikeOpen.close()
@@ -717,11 +722,11 @@ class ConverterMusicXML(SubConverter):
     registerFormats = ('oldmusicxml','oldxml')
     registerInputExtensions = ('oldxml', 'oldmxl', 'oldmx', 'oldmusicxml')
     registerOutputExtensions = ('xml', 'mxl')
-    
-    def __init__(self):
-        self._mxScore = None # store the musicxml object representation
-        SubConverter.__init__(self)
 
+    def __init__(self, **keywords):
+        SubConverter.__init__(self, **keywords)
+        self._mxScore = None
+    
     #---------------------------------------------------------------------------
     def load(self):
         '''Load all parts from a MusicXML object representation.
@@ -807,11 +812,7 @@ class ConverterMusicXML(SubConverter):
             musescoreRun += " -r " + str(defaults.ipythonImageDpi)
 
         storedStrErr = sys.stderr
-        if six.PY2:
-            from StringIO import StringIO # @UnusedImport @UnresolvedImport
-        else:
-            from io import StringIO # @Reimport
-        fileLikeOpen = StringIO()
+        fileLikeOpen = six.StringIO()
         sys.stderr = fileLikeOpen
         os.system(musescoreRun)
         fileLikeOpen.close()
@@ -1049,6 +1050,7 @@ class ConverterMuseData(SubConverter):
 
     def parseFile(self, fp, number=None):
         '''
+        parse fp and number
         '''
         from music21 import converter
         from music21 import musedata as musedataModule
@@ -1095,8 +1097,8 @@ class ConverterMEI(SubConverter):
     #registerShowFormats = ('mei',)
     #registerOutputExtensions = ('mei',)
 
-    def __init__(self):
-        SubConverter.__init__(self)
+    def __init__(self, **keywords):
+        SubConverter.__init__(self, **keywords)
 
     def parseData(self, dataString, number=None):
         '''
@@ -1169,7 +1171,7 @@ class Test(unittest.TestCase):
         pass
         
     def testSimpleTextShow(self):
-        from music21 import stream, note
+        from music21 import note
         n = note.Note()
         s = stream.Stream()
         s.append(n)
@@ -1218,7 +1220,6 @@ class Test(unittest.TestCase):
         When the file uses UTF-16 encoding rather than UTF-8 (which happens if it was exported from
         the "sibmei" plug-in for Sibelius.
         '''
-        import music21  # to make the pathname later
         try:
             # this works in Python 3.3+
             from unittest import mock  # pylint: disable=no-name-in-module
@@ -1240,7 +1241,6 @@ class Test(unittest.TestCase):
         '''
         For the sake of completeness, this is the same as testImportMei3() but with a UTF-8 file.
         '''
-        import music21  # to make the pathname later
         try:
             # this works in Python 3.3+
             from unittest import mock  # pylint: disable=no-name-in-module
@@ -1269,7 +1269,7 @@ class TestExternal(unittest.TestCase):
         c.show() # musicxml
 
     def testWriteLilypond(self):
-        from music21 import stream, note
+        from music21 import note
         n = note.Note()
         n.duration.type = 'whole'
         s = stream.Stream()
