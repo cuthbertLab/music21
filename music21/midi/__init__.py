@@ -332,11 +332,11 @@ class Enumeration(object):
         uniqueNames = [ ] 
         uniqueValues = [ ] 
         for x in enumList: 
-            if type(x) == tuple: 
+            if isinstance(x, tuple): 
                 x, i = x 
-            if type(x) != str: 
+            if not isinstance(x, str): 
                 raise EnumerationException("enum name is not a string: " + x)
-            if type(i) != int: 
+            if not isinstance(i, int): 
                 raise EnumerationException("enum value is not an integer: " + i)
             if x in uniqueNames: 
                 raise EnumerationException("enum name is not unique: " + x)

@@ -169,7 +169,7 @@ class MetadataCachingJob(object):
             else:
                 parsedObject = corpus.parse(
                     self.filePath, forceSource=True)
-        except Exception as e: # wide catch...
+        except Exception as e: # wide catch is fine. pylint: disable=broad-except
             environLocal.printDebug('parse failed: {0}, {1}'.format(
                 self.filePath, str(e)))
             environLocal.printDebug(traceback.format_exc())
@@ -202,7 +202,7 @@ class MetadataCachingJob(object):
                     metadataPayload=None,
                     )
                 self.results.append(metadataEntry)
-        except Exception:
+        except Exception: # wide catch is fine. pylint: disable=broad-except
             environLocal.warn('Had a problem with extracting metadata '
             'for {0}, piece ignored'.format(self.filePath))
             environLocal.printDebug(traceback.format_exc())
@@ -216,7 +216,7 @@ class MetadataCachingJob(object):
             for scoreNumber, score in enumerate(parsedObject.scores):
                 self.parseOpusScore(score, scoreNumber)
                 del score  # for memory conservation
-        except Exception as exception:
+        except Exception as exception: # wide catch is fine. pylint: disable=broad-except
             environLocal.warn(
                 'Had a problem with extracting metadata for score {0} '
                 'in {1}, whole opus ignored: {2}'.format(
@@ -261,7 +261,7 @@ class MetadataCachingJob(object):
                     metadataPayload=richMetadata,
                     )
                 self.results.append(metadataEntry)
-        except Exception as exception:
+        except Exception as exception: # pylint: disable=broad-except
             environLocal.warn(
                 'Had a problem with extracting metadata '
                 'for score {0} in {1}, whole opus ignored: '
@@ -412,7 +412,7 @@ class JobProcessor(object):
 #------------------------------------------------------------------------------
 
 
-class WorkerProcess(multiprocessing.Process): # @UndefinedVariable
+class WorkerProcess(multiprocessing.Process): # @UndefinedVariable pylint: disable=inherit-non-class
     '''
     A worker process for use by the multithreaded metadata-caching job
     processor.
@@ -421,7 +421,7 @@ class WorkerProcess(multiprocessing.Process): # @UndefinedVariable
     ### INITIALIZER ###
 
     def __init__(self, job_queue, result_queue):
-        multiprocessing.Process.__init__(self) # @UndefinedVariable
+        super(WorkerProcess, self).__init__()
         self.job_queue = job_queue
         self.result_queue = result_queue
 

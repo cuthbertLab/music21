@@ -597,7 +597,9 @@ class MuseDataMeasure(object):
 
     This needs to be an object to gracefully handle the following cases. Some Measures do not have any notes, for example, and the end of encoding where a final bar line is defined. Some measures do not have numbers or barlin definitions, such as pickup notes. Some measures define barline characteristics. Backup and forward presumably only is contained within a measure.
     '''
-    def __init__(self, src=[], parent=None):
+    def __init__(self, src=None, parent=None):
+        if src is None:
+            src = []
         #environLocal.printDebug(['creating MuseDataMeasure'])
         self.src = src # a list of character lines for this measure
         # store reference to parent Part
@@ -745,7 +747,9 @@ class MuseDataMeasureIterator(object):
 class MuseDataPart(object):
     '''A MuseData part is defined by collection of lines 
     '''
-    def __init__(self, src=[], stage=None):
+    def __init__(self, src=None, stage=None):
+        if src is None:
+            src = []
         #environLocal.printDebug(['creating MuseDataPart'])
         self.src = src # a list of character lines for this part
 

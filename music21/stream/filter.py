@@ -129,6 +129,8 @@ class GroupFilter(StreamFilter):
     derivationStr = 'getElementsByGroup'
     
     def __init__(self, groupFilterList):
+        super(GroupFilter, self).__init__()
+
         if not common.isListLike(groupFilterList):
             groupFilterList = [groupFilterList]
         self.groupFilterList = groupFilterList
@@ -147,6 +149,8 @@ class OffsetFilter(StreamFilter):
     def __init__(self, offsetStart, offsetEnd=None,
                     includeEndBoundary=True, mustFinishInSpan=False,
                     mustBeginInSpan=True, includeElementsThatEndAtStart=True):
+        super(OffsetFilter, self).__init__()
+
         self.offsetStart = opFrac(offsetStart)
         if offsetEnd is None:
             self.offsetEnd = offsetStart

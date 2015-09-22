@@ -8,44 +8,9 @@
 # Copyright:    Copyright © 2009-2010, 2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
-# MSC -- yes, it does work, as of May 2014!
-
-
-import getpass, os
-
-
-def getDirBuildHtml():
-    '''Return the html directory
-    '''
-    from music21 import common
-    cwdir = common.getSourceFilePath()
-    parentDir = os.path.dirname(cwdir)
-    dirBuild = os.path.join(parentDir, 'music21', 'documentation', 'build')
-    dirBuildHtml = os.path.join(dirBuild, 'html')
-    return dirBuildHtml
-
-if __name__ == '__main__':
-    
-    # this needs to be on level higher then the level of the source
-    #DST_MIT = 'athena.dialup.mit.edu:/afs/athena.mit.edu/org/m/music21/doc/'
-    remoteHost = 'athena.dialup.mit.edu'
-    remoteDir = '/afs/athena.mit.edu/org/m/music21/doc/'
-    #tar czpf - -C build/html/ . | ssh cuthbert@linux.mit.edu "tar xzpf - -C /afs/athena.mit.edu/org/m/music21/doc/"
-    
-    user = getpass.getpass('provide user name : ')
-    
-    
-    src = getDirBuildHtml()
-    # -r flag makes this recursive
-    cmdStr = 'tar czpf - -C %s . | ssh %s@%s "tar xzpf - -C %s"' % (src, user, remoteHost, remoteDir)
-    #cmdStr = 'scp -r "%s" %s@%s' % (src + "/*", user, DST_MIT)
-    print(cmdStr)
-    
-    os.system(cmdStr)
-    
 '''
-if you get a 'ssh_askpass' not found error, create this file in /usr/libexec/ssh-askpass and sudo chmod +x it afterwards:
+if you get a 'ssh_askpass' not found error, create this file in 
+/usr/libexec/ssh-askpass and sudo chmod +x it afterwards:
 
 #!/bin/bash
 # Script: ssh-askpass
@@ -81,4 +46,37 @@ for LINE in ${CODE[*]}; do
 done;
 eval "${SCRIPT}";
 '''    
+
+import getpass, os
+
+
+def getDirBuildHtml():
+    '''Return the html directory
+    '''
+    from music21 import common
+    cwdir = common.getSourceFilePath()
+    parentDir = os.path.dirname(cwdir)
+    dirBuild = os.path.join(parentDir, 'music21', 'documentation', 'build')
+    dirBuildHtml = os.path.join(dirBuild, 'html')
+    return dirBuildHtml
+
+if __name__ == '__main__':
+    
+    # this needs to be on level higher then the level of the source
+    #DST_MIT = 'athena.dialup.mit.edu:/afs/athena.mit.edu/org/m/music21/doc/'
+    remoteHost = 'athena.dialup.mit.edu'
+    remoteDir = '/afs/athena.mit.edu/org/m/music21/doc/'
+    #tar czpf - -C build/html/ . | ssh cuthbert@linux.mit.edu "tar xzpf - -C /afs/athena.mit.edu/org/m/music21/doc/"
+    
+    user = getpass.getpass('provide user name : ')
+    
+    
+    src = getDirBuildHtml()
+    # -r flag makes this recursive
+    cmdStr = 'tar czpf - -C %s . | ssh %s@%s "tar xzpf - -C %s"' % (src, user, remoteHost, remoteDir)
+    #cmdStr = 'scp -r "%s" %s@%s' % (src + "/*", user, DST_MIT)
+    print(cmdStr)
+    
+    os.system(cmdStr)
+    
     

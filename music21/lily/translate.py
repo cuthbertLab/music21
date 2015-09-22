@@ -171,11 +171,11 @@ class LilypondConverter(object):
                 if not os.path.exists(LILYEXEC):
                     LILYEXEC = 'lilypond'
             elif sys.platform == 'win32' and os.path.exists('c:/Program Files (x86)'):
-                LILYEXEC = 'c:/Program\ Files\ (x86)/lilypond/usr/bin/lilypond'
+                LILYEXEC = r'c:/Program\ Files\ (x86)/lilypond/usr/bin/lilypond'
                 if not os.path.exists(LILYEXEC) and not os.path.exists(LILYEXEC + '.exe'):
                     LILYEXEC = 'lilypond'
             elif sys.platform == 'win32':
-                LILYEXEC = 'c:/Program\ Files/lilypond/usr/bin/lilypond'
+                LILYEXEC = r'c:/Program\ Files/lilypond/usr/bin/lilypond'
                 if not os.path.exists(LILYEXEC) and not os.path.exists(LILYEXEC + '.exe'):
                     LILYEXEC = 'lilypond'
             else:
@@ -501,7 +501,7 @@ class LilypondConverter(object):
         lpMusicList = lyo.LyMusicList()
 
         musicList = []
-        lpMusic = '{ \stopStaff %s}'
+        lpMusic = r'{ \stopStaff %s}'
 
         for p in scoreIn.parts:
             partIdText = makeLettersOnlyId(p.id)
@@ -1633,6 +1633,7 @@ class LilypondConverter(object):
         >>> lpc.context.getParent().getParent().getParent() is lyTop
         True
         '''
+        # pylint: disable=undefined-variable
         if six.PY2:
             fraction = unicode(numerator) + '/' + unicode(denominator) # @UndefinedVariable
         else:
@@ -1666,20 +1667,22 @@ class LilypondConverter(object):
         else:
             return None
 
-    def appendContextFromVariant(self, variantObjectOrList, activeSite = None, coloredVariants = False):
+    def appendContextFromVariant(self, variantObjectOrList, activeSite=None, coloredVariants=False):
         '''
+        Create a new context from the variant object or a list of variants and append.
         '''
         musicList = []
 
         if isinstance(variantObjectOrList, variant.Variant):
             variantObject = variantObjectOrList
             replacedElements = variantObject.replacedElements(activeSite)
-            lpPrefixCompositeMusicVariant = self.lyPrefixCompositeMusicFromVariant(variantObject, replacedElements, coloredVariants = coloredVariants)
+            lpPrefixCompositeMusicVariant = self.lyPrefixCompositeMusicFromVariant(
+                                variantObject, replacedElements, coloredVariants=coloredVariants)
             lpSequentialMusicStandard = self.lySequentialMusicFromStream(replacedElements)
             musicList.append(lpPrefixCompositeMusicVariant)
             musicList.append(lpSequentialMusicStandard)
 
-        elif type(variantObjectOrList) is list:
+        elif isinstance(variantObjectOrList, list):
             longestReplacementLength = -1
             variantDict = {}
             for variantObject in variantObjectOrList:
@@ -1698,10 +1701,12 @@ class LilypondConverter(object):
                 if len(variantList) == 1:
                     variantObject = variantList[0]
                     replacedElements = variantObject.replacedElements(activeSite)
-                    lpPrefixCompositeMusicVariant = self.lyPrefixCompositeMusicFromVariant(variantObject, replacedElements, coloredVariants = coloredVariants)
+                    lpPrefixCompositeMusicVariant = self.lyPrefixCompositeMusicFromVariant(
+                                variantObject, replacedElements, coloredVariants=coloredVariants)
                     musicList.append(lpPrefixCompositeMusicVariant)
                 else:
-                    lpPrefixCompositeMusicVariant, replacedElements = self.lyPrefixCompositeMusicFromRelatedVariants(variantList, activeSite = activeSite, coloredVariants = coloredVariants)
+                    lpPrefixCompositeMusicVariant, replacedElements = self.lyPrefixCompositeMusicFromRelatedVariants(
+                            variantList, activeSite=activeSite, coloredVariants=coloredVariants)
                     musicList.append(lpPrefixCompositeMusicVariant)
 
                 if longestReplacementLength < replacedElements.duration.quarterLength:
@@ -1727,7 +1732,8 @@ class LilypondConverter(object):
         lp2GroupedMusicList.setParent(self.context)
 
 
-    def lyPrefixCompositeMusicFromRelatedVariants(self, variantList, activeSite = None, coloredVariants = False):
+    def lyPrefixCompositeMusicFromRelatedVariants(self, variantList, 
+                                                  activeSite=None, coloredVariants=False):
         r'''
 
 
@@ -2186,19 +2192,21 @@ class LilypondConverter(object):
         if metadataObject is not None:
             if metadataObject.title is not None:
                 lyTitleAssignment = lyo.LyAssignment(assignmentId = "title",
-                                                 identifierInit = lyo.LyIdentifierInit(string = metadataObject.title))
+                                                 identifierInit = lyo.LyIdentifierInit(
+                                                                    string=metadataObject.title))
                 lpHeaderBodyAssignments.append(lyTitleAssignment)
                 lyTitleAssignment.setParent(lpHeaderBody)
             if metadataObject.alternativeTitle is not None:
                 lySubtitleAssignment = lyo.LyAssignment(assignmentId = "subtitle",
-                                                    identifierInit = lyo.LyIdentifierInit(string = metadataObject.alternativeTitle))
+                                                    identifierInit = lyo.LyIdentifierInit(
+                                                        string=metadataObject.alternativeTitle))
                 lpHeaderBodyAssignments.append(lySubtitleAssignment)
                 lyTitleAssignment.setParent(lpHeaderBody)
 
         lpHeaderBody.assignments = lpHeaderBodyAssignments
         return lpHeader
 
-    def closeMeasure(self, barChecksOnly = False):
+    def closeMeasure(self, barChecksOnly=False):
         r'''
         return a LyObject or None for the end of the previous Measure
 
@@ -2235,7 +2243,8 @@ class LilypondConverter(object):
         elif m.rightBarline is None:
             barString = lpBarline.backslash + 'bar ' + lpBarline.quoteString("|")
         else:
-            barString = lpBarline.backslash + 'bar ' + lpBarline.quoteString(self.barlineDict[m.rightBarline.style])
+            barString = lpBarline.backslash + 'bar ' + lpBarline.quoteString(
+                                                            self.barlineDict[m.rightBarline.style])
 
         if m.number is not None:
             barString += lpBarline.comment("end measure %d" % m.number)
@@ -2312,7 +2321,8 @@ class LilypondConverter(object):
 
         Returns the full path of the file produced by lilypond including the format extension.
 
-        If skipWriting is True and a fileName is given then it will run that file through lilypond instead
+        If skipWriting is True and a fileName is given then it will run 
+        that file through lilypond instead
 
         '''
         LILYEXEC = self.findLilyExec()
@@ -2344,7 +2354,8 @@ class LilypondConverter(object):
             # cannot find full path; try current directory
             fileend = os.path.basename(fileform)
             if not os.path.exists(fileend):
-                raise LilyTranslateException("cannot find " + fileend + " or the full path " + fileform + " original file was " + fileName)
+                raise LilyTranslateException("cannot find " + fileend + 
+                                " or the full path " + fileform + " original file was " + fileName)
             else:
                 fileform = fileend
         return fileform
@@ -2361,7 +2372,8 @@ class LilypondConverter(object):
 
     def showPDF(self):
         '''
-        create a SVG file from self.topLevelObject, show it with your pdf reader (often Adobe Acrobat/Adobe Reader or Apple Preview)
+        create a SVG file from self.topLevelObject, show it with your pdf reader 
+        (often Adobe Acrobat/Adobe Reader or Apple Preview)
         and return the filepath of the file.
 
         most users will just call stream.Stream.show('lily.pdf') on a stream.
@@ -2392,7 +2404,7 @@ class LilypondConverter(object):
                 lilyImage = Image.open(lilyFile) # @UndefinedVariable
                 lilyImage2 = ImageOps.expand(lilyImage, 10, 'white')
                 lilyImage2.save(lilyFile)
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass # no big deal probably...
         return lilyFile
 

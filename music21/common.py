@@ -1768,7 +1768,7 @@ def toRoman(num):
     
     :rtype: str
     '''
-    if type(num) != type(1):
+    if not isinstance(num, int):
         raise TypeError("expected integer, got %s" % type(num))
     if not 0 < num < 4000:
         raise ValueError("Argument must be between 1 and 3999")

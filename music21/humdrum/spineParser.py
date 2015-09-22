@@ -961,7 +961,7 @@ class HumdrumSpine(object):
     >>> spine2.stream
     <music21.stream.Part ...>
     '''
-    def __init__(self, id=0, eventList = None, streamClass = stream.Stream): #@ReservedAssignment
+    def __init__(self, id=0, eventList=None, streamClass=stream.Stream): #@ReservedAssignment
         self.id = id
         if eventList is None:
             eventList = []
@@ -988,8 +988,6 @@ class HumdrumSpine(object):
         self.isFirstVoice = None
         self.iterIndex = None
         
-        self.humdrumPosition = None
-        self.humdrumSpineId = None
 
     def __repr__(self):
         representation = "Spine: " + str(self.id)

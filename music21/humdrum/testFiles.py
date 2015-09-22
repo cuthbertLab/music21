@@ -4,7 +4,7 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 import re
 
-splitLots = re.sub("\s\s\s\s+", "\t", \
+splitLots = re.sub(r"\s\s\s\s+", "\t", 
 r'''
 **kern        **kern
 *staff2       *staff1
@@ -26,7 +26,7 @@ r'''
 ''')
 
 
-fakeTest = re.sub("\s\s\s\s+", "\t", \
+fakeTest = re.sub(r"\s\s\s\s+", "\t", \
 r'''
 !! Global Comment
 !!!COM: Fake, Composer
@@ -57,7 +57,7 @@ r'''
 '''
 )
 
-ojibway =  re.sub("\s\s\s\s+", "\t", \
+ojibway =  re.sub(r"\s\s\s\s+", "\t", \
 r'''
 !! Ojibway Indian Song
 !! Transcribed by Frances Densmore
@@ -81,7 +81,7 @@ r'''
 )
 
 # Tests the two kinds of flavors of JRP
-dottedTuplet = re.sub('\s\s\s\s+', '\t', \
+dottedTuplet = re.sub(r'\s\s\s\s+', '\t', \
 r'''
 **kern
 *M2/2
@@ -99,7 +99,7 @@ r'''
 *-
 ''')
 
-splitSpines =  re.sub("\s\s\s\s+", "\t", \
+splitSpines =  re.sub(r"\s\s\s\s+", "\t", \
 r'''
 **kern
 *staff1
@@ -117,7 +117,7 @@ r'''
 '''
 )
 
-splitSpines2 =  re.sub("\s\s\s\s+", "\t", \
+splitSpines2 =  re.sub(r"\s\s\s\s+", "\t", \
 r'''
 **kern
 *staff1
@@ -147,7 +147,7 @@ r'''
 
 
   
-schubert = re.sub("\s\s\s\s", "\t", \
+schubert = re.sub(r"\s\s\s\s", "\t", \
 r'''
 !!!COM: Schubert, Franz Peter
 !!!CDT: 1797-1828
@@ -414,7 +414,7 @@ r'''
 )
     
     
-mazurka6 = re.sub("\s\s\s\s", "\t", \
+mazurka6 = re.sub(r"\s\s\s\s", "\t", \
 r'''
 !!!COM: Chopin, Frederic
 !!!CDT: 1810///-1849///
@@ -913,8 +913,8 @@ r'''
 '''\
 )
 
-ivesSpring = re.sub("\s\s\s\s", "\t", \
-'''
+ivesSpring = re.sub(r"\s\s\s\s", "\t", \
+r'''
 !!!COM: Ives, Charles
 !!!CDT: 1874/10/20/-1954/05/19/
 !!!OTL: Spring Song
@@ -1103,7 +1103,7 @@ ivesSpring = re.sub("\s\s\s\s", "\t", \
 '''
 )                    
 
-sousaStars = re.sub("\s\s\s\s","\t",
+sousaStars = re.sub(r"\s\s\s\s","\t",
 r'''
 !!!COM: Sousa, John Phillip
 !!!CDT: 1854/11/05/-1932/04/08/
@@ -1822,7 +1822,7 @@ r'''
 '''
 )
 
-multipartSanctus = re.sub("\s\s\s\s","\t",
+multipartSanctus = re.sub(r"\s\s\s\s","\t",
 r'''!!!COM: Palestrina, Giovanni Perluigi da
 **kern    **kern    **kern    **kern
 *Ibass    *Itenor    *Icalto    *Icant

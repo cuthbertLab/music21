@@ -77,7 +77,7 @@ class LyricSearcher(object):
         return index
 
     def search(self, textOrRe, s=None):
-        '''
+        r'''
         >>> from pprint import pprint as pp
         >>> import re
         
@@ -88,7 +88,7 @@ class LyricSearcher(object):
 
         Search a regular expression that takes into account non-word characters such as commas
 
-        >>> agnus = re.compile('agnus dei\W+filius patris', re.IGNORECASE)
+        >>> agnus = re.compile(r'agnus dei\W+filius patris', re.IGNORECASE)
         >>> sm = ls.search(agnus)
         >>> sm
         [SearchMatch(mStart=49, mEnd=55, matchText=...'Agnus Dei, Filius Patris', els=(<music21.note.Note G>,...<music21.note.Note G>), 
@@ -125,8 +125,8 @@ class LyricSearcher(object):
         for i in self._indexTuples:
             if pos >= i.start and pos <= i.end:
                 return i
-        else:
-            raise LyricSearcherException("Could not find position {0} in text".format(pos))
+
+        raise LyricSearcherException("Could not find position {0} in text".format(pos))
 
     def _findObjsInIndexByPos(self, posStart, posEnd=999999):
         '''

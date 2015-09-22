@@ -355,13 +355,13 @@ def voiceCrossing(possibA):
     for part1Index in range(len(possibA)):
         try:
             higherPitch = possibA[part1Index]
-            higherPitch.ps 
+            higherPitch.ps # pylint: disable=pointless-statement
         except AttributeError:
             continue
         for part2Index in range(part1Index + 1, len(possibA)):
             try:
                 lowerPitch = possibA[part2Index]
-                lowerPitch.ps
+                lowerPitch.ps # pylint: disable=pointless-statement
             except AttributeError:
                 continue
             if higherPitch < lowerPitch:

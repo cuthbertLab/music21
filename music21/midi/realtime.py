@@ -160,7 +160,7 @@ class TestExternal(unittest.TestCase):
             times = 0
         
         timeCounter = Mock()
-        timeCounter.updateTime = 500
+        timeCounter.updateTime = 500 # pylint: disable=attribute-defined-outside-init
         
         b = corpus.parse('bach/bwv66.6')
         keyDetune = []
@@ -188,7 +188,7 @@ class TestExternal(unittest.TestCase):
         '''
         doesn't work -- no matter what there's always at least a small lag, even with queues
         '''
-        
+        # pylint: disable=attribute-defined-outside-init
         from music21 import stream, note
         import random
         
@@ -227,11 +227,15 @@ class TestExternal(unittest.TestCase):
 
         b = getRandomStream()
         sp = StreamPlayer(b)
-        timeCounter.storedIOFile = sp.getStringIOFile()
+        timeCounter.storedIOFile = sp.getStringIOFile()  
         while timeCounter.times > 0:
             timeCounter.ready = False
-            sp.playStringIOFile(timeCounter.storedIOFile, busyFunction=restoreList, busyArgs=[timeCounter, sp], busyWaitMilliseconds = 30)
+            sp.playStringIOFile(timeCounter.storedIOFile, 
+                                busyFunction=restoreList, 
+                                busyArgs=[timeCounter, sp], 
+                                busyWaitMilliseconds = 30)
 
 if __name__ == '__main__':
     import music21
     music21.mainTest(TestExternal)
+

@@ -24,7 +24,7 @@ from __future__ import unicode_literals
 #python3
 try:
     basestring # @UndefinedVariable
-except:
+except NameError:
     basestring = str # @ReservedAssignment
 
 
@@ -392,7 +392,7 @@ class LyLilypondHeaderBody(LyObject):
 
 class LyAssignmentId(LyObject):
     
-    def __init__(self, content = None, isLyricString = False):
+    def __init__(self, content = None, isLyricString=False):
         LyObject.__init__(self)        
         self.content = content
         self.isLyricString = isLyricString
@@ -451,10 +451,15 @@ class LyIdentifierInit(LyObject):
     "hello" 
     '''
 
-    def __init__(self, scoreBlock = None, bookBlock = None, bookPartBlock = None, outputDef = None,
-                 contextDefSpecBlock = None, music = None, postEvent = None, numberExpression = None,
-                 string = None, embeddedScm = None, fullMarkup = None, fullMarkupList = None,
-                 digit = None, contextModification = None ):
+    def __init__(self, 
+                 scoreBlock=None, 
+                 bookBlock=None, 
+                 bookPartBlock=None, 
+                 outputDef=None,
+                 contextDefSpecBlock=None, 
+                 music=None, postEvent=None, numberExpression=None,
+                 string=None, embeddedScm=None, fullMarkup=None, fullMarkupList=None,
+                 digit=None, contextModification=None ):
         LyObject.__init__(self)
         self.scoreBlock = scoreBlock
         self.bookBlock = bookBlock
@@ -487,7 +492,7 @@ class LyIdentifierInit(LyObject):
 
 class LyContextDefSpecBlock(LyObject):
     
-    def __init__(self, contextDefSpecBody = None):
+    def __init__(self, contextDefSpecBody=None):
         LyObject.__init__(self)
         self.contextDefSpecBody = contextDefSpecBody
     
@@ -505,8 +510,8 @@ class LyContextDefSpecBody(LyObject):
     '''
     
     
-    def __init__(self, contextDefIdentifier = None, contextDefSpecBody = None,
-                          embeddedScm = None, contextMod = None, contextModification = None):
+    def __init__(self, contextDefIdentifier=None, contextDefSpecBody=None,
+                          embeddedScm=None, contextMod=None, contextModification=None):
         LyObject.__init__(self)
         self.contextDefIdentifier = contextDefIdentifier
         self.contextDefSpecBody = contextDefSpecBody
@@ -538,7 +543,7 @@ class LyContextDefSpecBody(LyObject):
 
 class LyBookBlock(LyObject):
     
-    def __init__(self, bookBody = None):
+    def __init__(self, bookBody=None):
         LyObject.__init__(self)
         self.bookBody = bookBody
         
@@ -561,7 +566,7 @@ class LyBookBody(LyObject):
     '''
     
     
-    def __init__(self, contents = None, bookIdentifier = None):
+    def __init__(self, contents=None, bookIdentifier=None):
         if contents is None:
             contents = []
         LyObject.__init__(self)
@@ -578,7 +583,7 @@ class LyBookBody(LyObject):
 
 class LyBookpartBlock(LyObject):
     
-    def __init__(self, bookpartBody = None):
+    def __init__(self, bookpartBody=None):
         LyObject.__init__(self)
         self.bookpartBody = bookpartBody
     
@@ -602,7 +607,7 @@ class LyBookpartBody(LyObject):
     '''
     
     
-    def __init__(self, contents = None, bookIdentifier = None):
+    def __init__(self, contents=None, bookIdentifier=None):
         if contents is None:
             contents = []
         LyObject.__init__(self)
@@ -628,7 +633,7 @@ class LyScoreBlock(LyObject):
     \score { hello }
     '''
 
-    def __init__(self, scoreBody = None):
+    def __init__(self, scoreBody=None):
         LyObject.__init__(self)
         self.scoreBody = scoreBody
     
@@ -649,8 +654,8 @@ class LyScoreBody(LyObject):
     '''
     
     
-    def __init__(self, music = None, scoreIdentifier = None, scoreBody = None, lilypondHeader = None,
-                 outputDef = None, error = None):
+    def __init__(self, music=None, scoreIdentifier=None, scoreBody=None, lilypondHeader=None,
+                 outputDef=None, error=None):
         LyObject.__init__(self)
         self.music = music
         self.scoreIdentifier = scoreIdentifier
@@ -677,7 +682,7 @@ class LyScoreBody(LyObject):
         
 class LyPaperBlock(LyObject):
     
-    def __init__(self, outputDef = None):
+    def __init__(self, outputDef=None):
         LyObject.__init__(self)
         self.outputDef = outputDef
         
@@ -702,7 +707,7 @@ class LyOutputDef(LyObject):
     ugly grammar since it doesnt close curly bracket...
     '''
     
-    def __init__(self, outputDefBody = None):
+    def __init__(self, outputDefBody=None):
         LyObject.__init__(self)
         self.outputDefBody = outputDefBody
     
@@ -723,7 +728,7 @@ class LyOutputDefHead(LyObject):
 
     According to Appendix C, is the same as LyOutputDefHeadWithModeSwitch
     '''
-    def __init__(self, defType = None):
+    def __init__(self, defType=None):
         LyObject.__init__(self)
         self.defType = defType
         
@@ -745,8 +750,8 @@ class LyOutputDefBody(LyObject):
                     | output_def_body error
     '''
     
-    def __init__(self, outputDefHead = None, outputDefIdentifier = None, outputDefBody = None,
-                 assignment = None, contextDefSpecBlock = None, error = None):
+    def __init__(self, outputDefHead=None, outputDefIdentifier=None, outputDefBody=None,
+                 assignment=None, contextDefSpecBlock=None, error=None):
         LyObject.__init__(self)
         self.outputDefHead = outputDefHead 
         self.outputDefIdentifier = outputDefIdentifier 
@@ -780,7 +785,7 @@ class LyTempoEvent(LyObject):
                | "\tempo" scalar
     '''
     
-    def __init__(self, tempoRange = None, stenoDuration = None, scalar = None):
+    def __init__(self, tempoRange=None, stenoDuration=None, scalar=None):
         LyObject.__init__(self)
         self.tempoRange = tempoRange 
         self.stenoDuration = stenoDuration 
@@ -797,14 +802,14 @@ class LyTempoEvent(LyObject):
                 return " ".join(base, self.stenoDuration.stringOutput(), "=", self.tempoRange.stringOutput())
         elif self.scalar is None:
             raise Exception("If tempoRange is not defined then need scalar")
-            return base + " " + self.scalar.stringOutput()
+            #return base + " " + self.scalar.stringOutput()
         
 class LyMusicList(LyObject):
     '''
     can take any number of LyMusic, LyEmbeddedScm, or LyError objects
     '''
     
-    def __init__(self, contents = None):
+    def __init__(self, contents=None):
         LyObject.__init__(self)
         if contents is None:
             contents = []
@@ -815,7 +820,7 @@ class LyMusicList(LyObject):
 
 class LyMusic(LyObject):
     
-    def __init__(self, simpleMusic = None, compositeMusic = None):
+    def __init__(self, simpleMusic=None, compositeMusic=None):
         LyObject.__init__(self)
         self.simpleMusic = simpleMusic
         self.compositeMusic = compositeMusic
@@ -830,7 +835,7 @@ class LyMusic(LyObject):
 
 class LyAlternativeMusic(LyObject):
     
-    def __init__(self, musicList = None):
+    def __init__(self, musicList=None):
         LyObject.__init__(self)
         self.musicList = musicList
         
@@ -843,7 +848,7 @@ class LyAlternativeMusic(LyObject):
         
 class LyRepeatedMusic(LyObject):
     
-    def __init__(self, simpleString = None, unsignedNumber = None, music = None, alternativeMusic = None):
+    def __init__(self, simpleString=None, unsignedNumber=None, music=None, alternativeMusic=None):
         LyObject.__init__(self)
         self.simpleString = simpleString
         self.unsignedNumber = unsignedNumber
@@ -851,7 +856,8 @@ class LyRepeatedMusic(LyObject):
         self.alternativeMusic = alternativeMusic
         
     def stringOutput(self):
-        out = self.backslash + "repeat " + self.simpleString.stringOutput() + self.unsignedNumber.stringOutput() + self.music.stringOutput()
+        out = (self.backslash + "repeat " + self.simpleString.stringOutput() + 
+               self.unsignedNumber.stringOutput() + self.music.stringOutput())
         if self.alternativeMusic is None:
             return out
         else:
@@ -864,7 +870,7 @@ class LySequentialMusic(LyObject):
     Can be explicitly tagged with "\sequential" if displayTag is True
     '''
     
-    def __init__(self, musicList = None, displayTag = False, beforeMatter = None):
+    def __init__(self, musicList=None, displayTag=False, beforeMatter=None):
         LyObject.__init__(self)
         self.musicList = musicList
         self.displayTag = displayTag
@@ -894,7 +900,7 @@ class LyOssiaMusic(LyObject):
     Can be tagged with \startStaff and \stopStaff if startstop is True
     '''
 
-    def __init__(self, musicList = None, startstop = True):
+    def __init__(self, musicList=None, startstop=True):
         LyObject.__init__(self)
         self.musicList = musicList
         self.startstop = startstop
@@ -923,7 +929,7 @@ class LySimultaneousMusic(LyObject):
     otherwise encloses in double angle brackets
     '''
     
-    def __init__(self, musicList = None, displayTag = False):
+    def __init__(self, musicList=None, displayTag=False):
         LyObject.__init__(self)
         self.musicList = musicList
         self.displayTag = displayTag
@@ -941,7 +947,7 @@ class LySimultaneousMusic(LyObject):
 
 class LySimpleMusic(LyObject):
     
-    def __init__(self, eventChord = None, musicIdentifier = None, musicPropertyDef = None, contextChange = None):
+    def __init__(self, eventChord=None, musicIdentifier=None, musicPropertyDef=None, contextChange=None):
         LyObject.__init__(self)
         self.eventChord = eventChord 
         self.musicIdentifier = musicIdentifier 
@@ -961,7 +967,7 @@ class LyContextModification(LyObject):
     
     but not context_mod!!!!!
     '''
-    def __init__(self, contextModList = None, contextModIdentifier = None, displayWith = True):
+    def __init__(self, contextModList=None, contextModIdentifier=None, displayWith=True):
         LyObject.__init__(self)
         self.contextModList = contextModList
         self.contextModIdentifier = contextModIdentifier # String?
@@ -979,7 +985,7 @@ class LyContextModList(LyObject):
     '''
     contains zero or more LyContextMod objects and an optional contextModIdentifier
     '''
-    def __init__(self, contents = None, contextModIdentifier = None):
+    def __init__(self, contents=None, contextModIdentifier=None):
         if contents is None:
             contents = []
         LyObject.__init__(self)
@@ -997,7 +1003,7 @@ class LyCompositeMusic(LyObject):
     '''
     one of LyPrefixCompositeMusic or LyGroupedMusicList stored in self.contents
     '''
-    def __init__(self, prefixCompositeMusic = None, groupedMusicList = None, newLyrics = None):
+    def __init__(self, prefixCompositeMusic=None, groupedMusicList=None, newLyrics=None):
         LyObject.__init__(self)
         self.prefixCompositeMusic = prefixCompositeMusic
         self.groupedMusicList = groupedMusicList 
@@ -1030,7 +1036,7 @@ class LyGroupedMusicList(LyObject):
     one of LySimultaneousMusic or LySequentialMusic
     '''
     
-    def __init__(self, simultaneousMusic = None, sequentialMusic = None):
+    def __init__(self, simultaneousMusic=None, sequentialMusic=None):
         LyObject.__init__(self)
         self.simultaneousMusic = simultaneousMusic
         self.sequentialMusic = sequentialMusic
@@ -1082,7 +1088,7 @@ class LySchemeFunction(LyObject):
     
     We have ususally been using LyEmbeddedScm for this
     '''
-    def __init__(self, content = None):
+    def __init__(self, content=None):
         LyObject.__init__(self)
         self.content = content
     
@@ -1096,7 +1102,7 @@ class LyOptionalId(LyObject):
     '''
     an optional id setting
     '''
-    def __init__(self, content = None):
+    def __init__(self, content=None):
         LyObject.__init__(self)
         self.content = content
     
@@ -1138,13 +1144,13 @@ class LyPrefixCompositeMusic(LyObject):
                        | relative_music
                        | re_rhythmed_music
     '''
-    def __init__(self, type = None, genericPrefixMusicScm = None, #@ReservedAssignment
-                 simpleString = None, optionalId = None, optionalContextMod = None,
-                 music = None, fraction = None, repeatedMusic = None,
-                 pitchAlsoInChords1 = None, pitchAlsoInChords2 = None,
-                 modeChangingHead = None, groupedMusicList = None,
-                 modeChangingHeadWithContext = None, relativeMusic = None,
-                 reRhythmedMusic = None
+    def __init__(self, type=None, genericPrefixMusicScm=None, #@ReservedAssignment
+                 simpleString=None, optionalId=None, optionalContextMod=None,
+                 music=None, fraction=None, repeatedMusic=None,
+                 pitchAlsoInChords1=None, pitchAlsoInChords2=None,
+                 modeChangingHead=None, groupedMusicList=None,
+                 modeChangingHeadWithContext=None, relativeMusic=None,
+                 reRhythmedMusic=None
                  ):
         LyObject.__init__(self)
         self.type = type
@@ -1204,17 +1210,17 @@ class LyModeChangingHead(LyObject):
     .hasContext = False
     .mode = ['note', 'drum', 'figure', 'chord', 'lyric']
     
-    >>> l = lily.lilyObjects.LyModeChangingHead(hasContext = True, mode = 'drum')
+    >>> l = lily.lilyObjects.LyModeChangingHead(hasContext=True, mode = 'drum')
     >>> print(l.stringOutput())
     \drummode
-    >>> l2 = lily.lilyObjects.LyModeChangingHead(hasContext = False, mode = 'chord')
+    >>> l2 = lily.lilyObjects.LyModeChangingHead(hasContext=False, mode = 'chord')
     >>> print(l2.stringOutput())
     \chords
     
     '''
     allowableModes = ['note', 'drum', 'figure', 'chord', 'lyric']
     
-    def __init__(self, hasContext = False, mode = None):
+    def __init__(self, hasContext=False, mode=None):
         LyObject.__init__(self)
         self.hasContext = hasContext
         self.mode = mode
@@ -1233,7 +1239,7 @@ class LyRelativeMusic(LyObject):
     '''
     relative music
     '''
-    def __init__(self, content = None):
+    def __init__(self, content=None):
         LyObject.__init__(self)
         self.content = content
     
@@ -1244,7 +1250,7 @@ class LyNewLyrics(LyObject):
     '''
     contains a list of LyGroupedMusicList objects or identifiers
     '''
-    def __init__(self, groupedMusicLists = None):
+    def __init__(self, groupedMusicLists=None):
         if groupedMusicLists is None:
             groupedMusicLists = []
         LyObject.__init__(self)
@@ -1262,7 +1268,7 @@ class LyNewLyrics(LyObject):
         return outputString
 
 class LyReRhythmedMusic(LyObject):
-    def __init__(self, groupedMusic = None, newLyrics = None):
+    def __init__(self, groupedMusic=None, newLyrics=None):
         LyObject.__init__(self)
         self.groupedMusic = groupedMusic
         self.newLyrics = newLyrics
@@ -1277,7 +1283,7 @@ class LyReRhythmedMusic(LyObject):
         return outputString # previously this did not return...
 
 class LyContextChange(LyObject):
-    def __init__(self, before = None, after = None):
+    def __init__(self, before=None, after=None):
         LyObject.__init__(self)
         self.before = before
         self.alter = after
@@ -1291,7 +1297,7 @@ class LyPropertyPath(LyObject):
     
     has one or more of LyEmbeddedScm objects
     '''
-    def __init__(self, embeddedScheme = None):
+    def __init__(self, embeddedScheme=None):
         if embeddedScheme is None:
             embeddedScheme = []
 
@@ -1316,7 +1322,7 @@ class LyPropertyOperation(LyObject):
     also represents simple_music_property_def which has the same forms
 
     '''
-    def __init__(self, mode = None, value1 = None, value2 = None, value3 = None):
+    def __init__(self, mode=None, value1=None, value2=None, value3=None):
         LyObject.__init__(self)
         self.mode = mode
         self.value1 = value1
@@ -1338,7 +1344,7 @@ class LyContextDefMod(LyObject):
     one of consists, remove, accepts, defaultchild, denies, alias, type, description, name
     '''
     
-    def __init__(self, contextDef = None):
+    def __init__(self, contextDef=None):
         LyObject.__init__(self)
         self.contextDef = contextDef
         
@@ -1347,7 +1353,7 @@ class LyContextDefMod(LyObject):
 
 class LyContextMod(LyObject):
     
-    def __init__(self, contextDefOrProperty = None, scalar = None):
+    def __init__(self, contextDefOrProperty=None, scalar=None):
         LyObject.__init__(self)
         self.contextDefOrProperty  = contextDefOrProperty 
         self.scalar = scalar
@@ -1363,7 +1369,7 @@ class LyContextMod(LyObject):
 
 class LyMusicPropertyDef(LyObject):
     
-    def __init__(self, isOnce = False, propertyDef = None):
+    def __init__(self, isOnce=False, propertyDef=None):
         LyObject.__init__(self)
         self.isOnce = isOnce
         self.propertyDef = propertyDef
@@ -1389,8 +1395,8 @@ class LyEventChord(LyObject):
     simple_chord_elements can be a LySimpleElement object.  Or it can be a LyNewChord or LyFigureSpec + Duration 
     once that is done.  But there is no LySimpleChordElements object yet.
     '''
-    def __init__(self, simpleChordElements = None, postEvents = None, chordRepetition = None,
-                 multiMeasureRest = None, duration = None, commandElement = None, noteChordElement = None):
+    def __init__(self, simpleChordElements=None, postEvents=None, chordRepetition=None,
+                 multiMeasureRest=None, duration=None, commandElement=None, noteChordElement=None):
         LyObject.__init__(self)
         self.simpleChordElements = simpleChordElements
         self.postEvents = postEvents 
@@ -1433,7 +1439,7 @@ class LyEventChord(LyObject):
 
     
 class LyNoteChordElement(LyObject):
-    def __init__(self, chordBody = None, optionalNoteModeDuration = None, postEvents = None):
+    def __init__(self, chordBody=None, optionalNoteModeDuration=None, postEvents=None):
         if postEvents is None:
             postEvents = []
         LyObject.__init__(self)
@@ -1451,7 +1457,7 @@ class LyNoteChordElement(LyObject):
 
 class LyChordBody(LyObject):
     
-    def __init__(self, chordBodyElements = None):
+    def __init__(self, chordBodyElements=None):
         if chordBodyElements is None:
             chordBodyElements = []
 
@@ -1476,7 +1482,7 @@ class LyChordBodyElement(LyObject):
     
     TODO: only the first form is currently supported in creation
     '''
-    def __init__(self, parts = None):
+    def __init__(self, parts=None):
         if parts is None:
             parts = []
         LyObject.__init__(self)
@@ -1503,7 +1509,7 @@ class LyChordBodyElement(LyObject):
 #                              function_arglist_nonmusic 
 
 class LyCommandElement(LyObject):
-    def __init__(self, commandType = None, argument = None):
+    def __init__(self, commandType=None, argument=None):
         LyObject.__init__(self)
         self.commandType = commandType
         self.argument = argument
@@ -1528,7 +1534,7 @@ class LyCommandElement(LyObject):
             return ct.stringOutput()
 
 class LyCommandEvent(LyObject):
-    def __init__(self, commandType = None, argument1 = None, argument2 = None):
+    def __init__(self, commandType=None, argument1=None, argument2=None):
         LyObject.__init__(self)
         self.commandType = commandType
         self.argument1 = argument1
@@ -1549,7 +1555,7 @@ class LyCommandEvent(LyObject):
             return ct.stringOutput()
 
 class LyPostEvents(LyObject):   
-    def __init__(self, eventList = None):
+    def __init__(self, eventList=None):
         if eventList is None:
             eventList = []
         LyObject.__init__(self)
@@ -1560,7 +1566,7 @@ class LyPostEvents(LyObject):
 
 class LyPostEvent(LyObject):
     
-    def __init__(self, arg1 = None, arg2 = None):
+    def __init__(self, arg1=None, arg2=None):
         LyObject.__init__(self)
         self.arg1 = arg1
         self.arg2 = arg2
@@ -1578,7 +1584,7 @@ class LyDirectionLessEvent(LyObject):
     
     '''
     
-    def __init__(self, event = None):
+    def __init__(self, event=None):
         LyObject.__init__(self)
         self.event = event
     
@@ -1586,7 +1592,7 @@ class LyDirectionLessEvent(LyObject):
         return str(self.event) + " "
 
 class LyDirectionReqdEvent(LyObject):
-    def __init__(self, event = None):
+    def __init__(self, event=None):
         LyObject.__init__(self)
         self.event = event
         
@@ -1595,7 +1601,7 @@ class LyDirectionReqdEvent(LyObject):
 
 class LyOctaveCheck(LyObject):
     
-    def __init__(self, equalOrQuotesOrNone = None):
+    def __init__(self, equalOrQuotesOrNone=None):
         LyObject.__init__(self)
         self.equalOrQuotesOrNone = equalOrQuotesOrNone
 
@@ -1613,7 +1619,7 @@ class LyPitch(LyObject):
     represents a pitch name and zero or more sup or sub quotes
     also used for steno_pitch and steno_tonic_pitch
     '''
-    def __init__(self, noteNamePitch = None, quotes = None):
+    def __init__(self, noteNamePitch=None, quotes=None):
         LyObject.__init__(self)
         self.noteNamePitch = noteNamePitch 
         self.quotes = quotes
@@ -1628,7 +1634,7 @@ class LyGenTextDef(LyObject):
     holds either full_markup, string, or DIGIT
     '''
     
-    def __init__(self, value = None):
+    def __init__(self, value=None):
         LyObject.__init__(self)
         self.value = value
     
@@ -1643,7 +1649,7 @@ class LyScriptAbbreviation(LyObject):
     
     '''
     
-    def __init__(self, value = None):
+    def __init__(self, value=None):
         LyObject.__init__(self)
         self.value = value
     
@@ -1658,7 +1664,7 @@ class LyScriptDir(LyObject):
     
     '''
     
-    def __init__(self, value = None):
+    def __init__(self, value=None):
         LyObject.__init__(self)
         self.value = value
     
@@ -1697,7 +1703,7 @@ class LyMultipliedDuration(LyObject):
     if stenoDur is None then output is None -- thus also represents
     optional_notemode_duration
     '''
-    def __init__(self, stenoDur = None, multiply = None):
+    def __init__(self, stenoDur=None, multiply=None):
         if multiply is None:
             multiply = []
         LyObject.__init__(self)
@@ -1715,7 +1721,7 @@ class LyMultipliedDuration(LyObject):
 
 class LyTremoloType(LyObject):
     
-    def __init__(self, tremTypeOrNone = None):
+    def __init__(self, tremTypeOrNone=None):
         LyObject.__init__(self)
         self.tremTypeOrNone = tremTypeOrNone
         
@@ -1728,7 +1734,7 @@ class LyTremoloType(LyObject):
 # SKIPPING figured bass objects (lines 305 - 325) for now
 
 class LyOptionalRest(LyObject):
-    def __init__(self, rest = False):
+    def __init__(self, rest=False):
         LyObject.__init__(self)
         self.rest = rest
     
@@ -1753,7 +1759,7 @@ class LySimpleElement(LyObject):
                     | lyric_element optional_notemode_duration
     '''
     
-    def __init__(self, parts = None):
+    def __init__(self, parts=None):
         if parts is None:
             parts = []
         LyObject.__init__(self)
@@ -1775,7 +1781,7 @@ class LyLyricElement(LyObject):
     >>> print(lle)
     hel_ 
     '''
-    def __init__(self, lyMarkupOrString = None):
+    def __init__(self, lyMarkupOrString=None):
         LyObject.__init__(self)
         self.lyMarkupOrString = lyMarkupOrString
         
@@ -1789,7 +1795,7 @@ class LyTempoRange(LyObject):
     '''
     defines either a single tempo or a range
     '''
-    def __init__(self, lowestOrOnlyTempo = None, highestTempoOrNone = None):
+    def __init__(self, lowestOrOnlyTempo=None, highestTempoOrNone=None):
         LyObject.__init__(self)
         self.lowestOrOnlyTempo = lowestOrOnlyTempo
         self.highestTempoOrNone = highestTempoOrNone
@@ -1805,7 +1811,7 @@ class LyNumberExpression(LyObject):
     '''
     any list of numbers or LyNumberTerms separated by '+' or '-' objects.
     '''
-    def __init__(self, numberAndSepList = None):
+    def __init__(self, numberAndSepList=None):
         if numberAndSepList is None:
             numberAndSepList = []
         LyObject.__init__(self)
@@ -1819,7 +1825,7 @@ class LyNumberTerm(LyObject):
     '''
     any list of numbers separated by '*' or '/' strings.
     '''
-    def __init__(self, numberAndSepList = None):
+    def __init__(self, numberAndSepList=None):
         if numberAndSepList is None:
             numberAndSepList = []
         LyObject.__init__(self)
@@ -1831,7 +1837,7 @@ class LyNumberTerm(LyObject):
     
 
 class LyLyricMarkup(LyObject):
-    def __init_(self, lyricMarkupOrIdentifier = None, markupTop = None):
+    def __init_(self, lyricMarkupOrIdentifier=None, markupTop=None):
         LyObject.__init__(self)
         self.lyricMarkupOrIdentifier = lyricMarkupOrIdentifier
         self.markupTop = markupTop
@@ -1843,7 +1849,7 @@ class LyLyricMarkup(LyObject):
             return str(self.lyricMarkupOrIdentifier) + " " + str(self.markupTop)
 
 class LyFullMarkupList(LyObject):
-    def __init_(self, markupListOrIdentifier = None):
+    def __init_(self, markupListOrIdentifier=None):
         LyObject.__init__(self)
         self.markupListOrIdentifier = markupListOrIdentifier
     
@@ -1854,7 +1860,7 @@ class LyFullMarkupList(LyObject):
             return self.backslash + "markuplines " + self.markupListOrIdentifier.stringOutput() 
             
 class LyFullMarkup(LyObject):
-    def __init_(self, markupTopOrIdentifier = None):
+    def __init_(self, markupTopOrIdentifier=None):
         LyObject.__init__(self)
         self.markupTopOrIdentifier = markupTopOrIdentifier
     
@@ -1865,7 +1871,7 @@ class LyFullMarkup(LyObject):
             return self.backslash + "markup " + self.markupTopOrIdentifier.stringOutput() 
 
 class LyMarkupTop(LyObject):
-    def __init__(self, argument1 = None, argument2 = None):
+    def __init__(self, argument1=None, argument2=None):
         LyObject.__init__(self)
         self.argument1 = argument1
         self.argument2 = argument2
@@ -1877,7 +1883,7 @@ class LyMarkupTop(LyObject):
             return ' '.join([self.argument1, self.argument2])
 
 class LyMarkupList(LyObject):
-    def __init__(self, markupIdentifierOrList = None):
+    def __init__(self, markupIdentifierOrList=None):
         LyObject.__init__(self)
         self.markupIdentifierOrList = markupIdentifierOrList
     
@@ -1885,7 +1891,7 @@ class LyMarkupList(LyObject):
         return str(self.markupIdentifierOrList)
 
 class LyMarkupComposedList(LyObject):
-    def __init__(self, markupHeadList = None, markupBracedList = None):
+    def __init__(self, markupHeadList=None, markupBracedList=None):
         LyObject.__init__(self)
         self.markupHeadList  = markupHeadList 
         self.markupBracedList = markupBracedList
@@ -1894,7 +1900,7 @@ class LyMarkupComposedList(LyObject):
         return ' '.join([self.markupHeadList, self.markupBracedList])
 
 class LyMarkupBracedList(LyObject):
-    def __init__(self, listBody = None):
+    def __init__(self, listBody=None):
         LyObject.__init__(self)
         self.listBody = listBody
         
@@ -1902,7 +1908,7 @@ class LyMarkupBracedList(LyObject):
         return ' '.join(['{', self.listBody, '}'])
 
 class LyMarkupBracedListBody(LyObject):
-    def __init__(self, markupOrMarkupList = None):
+    def __init__(self, markupOrMarkupList=None):
         if markupOrMarkupList is None:
             markupOrMarkupList = []
 
@@ -1929,7 +1935,7 @@ class LySimpleMarkup(LyObject):
     
     takes 1 required arg, 2nd for markup_function
     '''
-    def __init__(self, simpleType = 'string', argument1 = None, argument2 = None):
+    def __init__(self, simpleType = 'string', argument1=None, argument2=None):
         LyObject.__init__(self)
         self.simpleType = simpleType
         self.argument1 = argument1
@@ -1944,7 +1950,7 @@ class LySimpleMarkup(LyObject):
             return self.argument1 + ' ' + str(self.argument2) + ' '
             
 class LyMarkup(LyObject):
-    def __init__(self, simpleMarkup = None, optionalMarkupHeadList = None):
+    def __init__(self, simpleMarkup=None, optionalMarkupHeadList=None):
         LyObject.__init__(self)
         self.simpleMarkup = simpleMarkup 
         self.optionalMarkupHeadList = optionalMarkupHeadList 

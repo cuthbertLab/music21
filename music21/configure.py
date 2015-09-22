@@ -36,7 +36,7 @@ except ImportError:
     from io import StringIO # python3 (also in python 2.6+)
 
 try:
-    input = raw_input #  @ReservedAssignment # pylint: disable=undefined-variable @UndefinedVariable
+    input = raw_input #  @ReservedAssignment @UndefinedVariable # pylint: disable=undefined-variable 
 except NameError:
     pass
 
@@ -53,10 +53,10 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 #-------------------------------------------------------------------------------
 # match finale name, which may be directory or something else
-reFinaleApp = re.compile('Finale 20[0-1][0-9][a-z]*.app')
-reFinaleExe = re.compile('Finale 20[0-1][0-9][a-z]*.exe')
-reFinaleReaderApp = re.compile('Finale Reader.app')
-reMuseScoreApp = re.compile('MuseScore\s?[0-9]*.app')
+reFinaleApp = re.compile(r'Finale 20[0-1][0-9][a-z]*.app')
+reFinaleExe = re.compile(r'Finale 20[0-1][0-9][a-z]*.exe')
+reFinaleReaderApp = re.compile(r'Finale Reader.app')
+reMuseScoreApp = re.compile(r'MuseScore\s?[0-9]*.app')
 
 
 urlMusic21 = 'http://web.mit.edu/music21'

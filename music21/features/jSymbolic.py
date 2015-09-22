@@ -322,7 +322,7 @@ class AmountOfArpeggiationFeature(featuresModule.FeatureExtractor):
  
 class RepeatedNotesFeature(featuresModule.FeatureExtractor):
     '''
-    
+    Fraction of notes that are repeated melodically
     '''
     id = 'M9'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -351,7 +351,7 @@ class RepeatedNotesFeature(featuresModule.FeatureExtractor):
 
 class ChromaticMotionFeature(featuresModule.FeatureExtractor):
     '''
-    
+    Fraction of melodic intervals corresponding to a semitone.
     '''
     id = 'm10'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -380,7 +380,7 @@ class ChromaticMotionFeature(featuresModule.FeatureExtractor):
  
 class StepwiseMotionFeature(featuresModule.FeatureExtractor):
     '''
-    
+    Fraction of melodic intervals that corresponded to a minor or major second
     '''
     id = 'M11'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -409,7 +409,7 @@ class StepwiseMotionFeature(featuresModule.FeatureExtractor):
 
 class MelodicThirdsFeature(featuresModule.FeatureExtractor):
     '''
-    
+    Fraction of melodic intervals that are major or minor thirds
     '''
     id = 'M12'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -439,7 +439,7 @@ class MelodicThirdsFeature(featuresModule.FeatureExtractor):
  
 class MelodicFifthsFeature(featuresModule.FeatureExtractor):
     '''
-    
+    Fraction of melodic intervals that are perfect fifths
     '''
     id = 'M13'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -469,7 +469,7 @@ class MelodicFifthsFeature(featuresModule.FeatureExtractor):
 
 class MelodicTritonesFeature(featuresModule.FeatureExtractor):
     '''
-    
+    Fraction of melodic intervals that are tritones
     '''
     id = 'M14'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -499,7 +499,7 @@ class MelodicTritonesFeature(featuresModule.FeatureExtractor):
 
 class MelodicOctavesFeature(featuresModule.FeatureExtractor):
     '''
-    
+    Fraction of melodic intervals that are octaves
     '''
     id = 'M15'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1223,47 +1223,70 @@ class MostCommonPitchClassFeature(featuresModule.FeatureExtractor):
 
 class DominantSpreadFeature(featuresModule.FeatureExtractor):
     '''
-    
+    Largest number of consecutive pitch classes separated by perfect 
+    5ths that accounted for at least 9% each of the notes.
     '''
     id = 'P17'
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  
+                                                 *arguments, **keywords)
 
         self.name = 'Dominant Spread'
-        self.description = 'Largest number of consecutive pitch classes separated by perfect 5ths that accounted for at least 9% each of the notes.'
+        self.description = ('Largest number of consecutive pitch classes separated by ' + 
+                            'perfect 5ths that accounted for at least 9% each of the notes.')
         self.isSequential = True
         self.dimensions = 1
 
  
 class StrongTonalCentresFeature(featuresModule.FeatureExtractor):
     '''
-    
+    Number of peaks in the fifths pitch histogram that each account
+    for at least 9% of all Note Ons.
     '''
     id = 'P18'
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Strong Tonal Centres'
-        self.description = 'Number of peaks in the fifths pitch histogram that each account for at least 9% of all Note Ons.'
+        self.description = ('Number of peaks in the fifths pitch histogram that each account ' + 
+                            'for at least 9% of all Note Ons.')
         self.isSequential = True
         self.dimensions = 1
 
 
 class BasicPitchHistogramFeature(featuresModule.FeatureExtractor):
-    '''A feature exractor that finds a features array with bins corresponding to the values of the basic pitch histogram.
+    '''A feature exractor that finds a features array with bins corresponding 
+    to the values of the basic pitch histogram.
 
     
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.BasicPitchHistogramFeature(s)
     >>> f = fe.extract()
     >>> f.vector
-    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.052631578..., 0.0, 0.0, 0.052631578..., 0.05263157894..., 0.2631578..., 0.0, 0.3157894..., 0.1052631..., 0.0, 0.052631..., 0.157894736..., 0.5263157..., 0.0, 0.368421052..., 0.6315789473..., 0.105263157..., 0.78947368..., 0.0, 1.0, 0.52631578..., 0.052631578..., 0.736842105..., 0.1578947..., 0.9473684..., 0.0, 0.36842105..., 0.47368421..., 0.0, 0.42105263..., 0.0, 0.36842105..., 0.0, 0.0, 0.052631578..., 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+    0.0, 0.0, 0.0, 0.0, 0.052631578..., 0.0, 0.0, 0.052631578..., 
+    0.05263157894..., 0.2631578..., 0.0, 0.3157894..., 0.1052631..., 
+    0.0, 0.052631..., 0.157894736..., 0.5263157..., 0.0, 0.368421052..., 
+    0.6315789473..., 0.105263157..., 0.78947368..., 0.0, 1.0, 0.52631578..., 
+    0.052631578..., 0.736842105..., 0.1578947..., 0.9473684..., 0.0, 
+    0.36842105..., 0.47368421..., 0.0, 0.42105263..., 0.0, 0.36842105..., 
+    0.0, 0.0, 0.052631578..., 
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    
+    TODO: Better doctest...
     '''
     id = 'P19'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Basic Pitch Histogram'
         self.description = 'A features array with bins corresponding to the values of the basic pitch histogram.'
@@ -1279,10 +1302,20 @@ class BasicPitchHistogramFeature(featuresModule.FeatureExtractor):
             self._feature.vector[i] = count
 
 
-# The second histogram was called the 'pitch class histogram,' and had one bin for each of the twelve pitch classes. The magnitude of each bin corresponded to the number of times Note Ons occurred in a recording for a particular pitch class. Enharmonic equivalents were assigned the same pitch class number. This histogram gave insights into the types of scales used and the amount of transposition that was present.
+# The second histogram was called the 'pitch class histogram,' 
+# and had one bin for each of the twelve pitch classes. 
+# The magnitude of each bin corresponded to the number of times 
+# Note Ons occurred in a recording for a particular pitch class. 
+# Enharmonic equivalents were assigned the same pitch class number. 
+# This histogram gave insights into the types of scales used and the 
+# amount of transposition that was present.
  
 class PitchClassDistributionFeature(featuresModule.FeatureExtractor):
     '''
+    A feature array with 12 entries where the first holds the frequency 
+    of the bin of the pitch class histogram with the highest frequency, 
+    and the following entries holding the successive bins of the histogram, 
+    wrapping around if necessary.
     
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.PitchClassDistributionFeature(s)
@@ -1293,7 +1326,8 @@ class PitchClassDistributionFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P20'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Pitch Class Distribution'
         self.description = 'A feature array with 12 entries where the first holds the frequency of the bin of the pitch class histogram with the highest frequency, and the following entries holding the successive bins of the histogram, wrapping around if necessary.'
@@ -1324,7 +1358,8 @@ class FifthsPitchHistogramFeature(featuresModule.FeatureExtractor):
     '''
     id = 'P21'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Fifths Pitch Histogram'
         self.description = 'A feature array with bins corresponding to the values of the 5ths pitch class histogram.'
@@ -1401,6 +1436,8 @@ class GlissandoPrevalenceFeature(featuresModule.FeatureExtractor):
     Not yet implemented in music21
     
     
+    Number of Note Ons that have at least one MIDI Pitch Bend associated 
+    with them divided by total number of pitched Note Ons.
     '''
     id = 'P23'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1413,11 +1450,16 @@ class GlissandoPrevalenceFeature(featuresModule.FeatureExtractor):
 
     def _process(self):
         raise JSymbolicFeatureException('not yet implemented')
-
+        # TODO: implement
 
 class AverageRangeOfGlissandosFeature(featuresModule.FeatureExtractor):
     '''
-    
+    Not yet implemented in music21
+
+    Average range of MIDI Pitch Bends, where "range" is defined
+    as the greatest value of the absolute difference between 64 and the 
+    second data byte of all MIDI Pitch Bend messages falling between the 
+    Note On and Note Off messages of any note
     '''
     id = 'P24'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1430,11 +1472,16 @@ class AverageRangeOfGlissandosFeature(featuresModule.FeatureExtractor):
 
     def _process(self):
         raise JSymbolicFeatureException('not yet implemented')
+        # TODO: implement
 
 
 class VibratoPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
+    Not yet implemented in music21
     
+    Number of notes for which Pitch Bend messages change direction at least twice divided by 
+    total number of notes that have Pitch Bend messages associated with them.
+        
     '''
     id = 'P25'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1447,6 +1494,7 @@ class VibratoPrevalenceFeature(featuresModule.FeatureExtractor):
 
     def _process(self):
         raise JSymbolicFeatureException('not yet implemented')
+        # TODO: implement
 
 
 # class PrevalenceOfMicroTonesFeature(featuresModule.FeatureExtractor):
@@ -1471,7 +1519,9 @@ class VibratoPrevalenceFeature(featuresModule.FeatureExtractor):
  
 class StrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     '''
+    not yet implemented
     
+    Bin label of the beat bin with the highest frequency.
     '''
     id = 'R1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1484,10 +1534,14 @@ class StrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
 
     def _process(self):
         raise JSymbolicFeatureException('not yet implemented')
+        # TODO: implement
 
 
 class SecondStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     '''
+    not yet implemented
+    
+    Bin label of the beat bin of the peak with the second highest frequency.
     
     '''
     id = 'R2'
@@ -1501,13 +1555,17 @@ class SecondStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
 
     def _process(self):
         raise JSymbolicFeatureException('not yet implemented')
+        # TODO: implement
 
 
  
 class HarmonicityOfTwoStrongestRhythmicPulsesFeature(
         featuresModule.FeatureExtractor):
     '''
+    not yet implemented.
     
+    The bin label of the higher (in terms of bin label) of the two beat bins of the 
+    peaks with the highest frequency divided by the bin label of the lower.        
     '''
     id = 'R3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1524,7 +1582,9 @@ class HarmonicityOfTwoStrongestRhythmicPulsesFeature(
 
 class StrengthOfStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     '''
+    not yet implemented
     
+    Frequency of the beat bin with the highest frequency.
     '''
     id = 'R4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1537,11 +1597,15 @@ class StrengthOfStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
 
     def _process(self):
         raise JSymbolicFeatureException('not yet implemented')
+        # TODO: implement
 
 
 class StrengthOfSecondStrongestRhythmicPulseFeature(
     featuresModule.FeatureExtractor):
     '''
+    not yet implemented
+    
+    Frequency of the beat bin of the peak with the second highest frequency.
     
     '''
     id = 'R5'
@@ -1555,14 +1619,18 @@ class StrengthOfSecondStrongestRhythmicPulseFeature(
 
     def _process(self):
         raise JSymbolicFeatureException('not yet implemented')
- 
+        # TODO: implement
 
 
  
 class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(
     featuresModule.FeatureExtractor):
     '''
-    
+    Not yet implemented
+
+    The frequency of the higher (in terms of frequency) of the two beat bins 
+    corresponding to the peaks with the highest frequency divided by the frequency of the lower.
+        
     '''
     id = 'R6'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1575,12 +1643,15 @@ class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(
 
     def _process(self):
         raise JSymbolicFeatureException('not yet implemented')
+        # TODO: implement
 
 
 class CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(
     featuresModule.FeatureExtractor):
     '''
+    Not yet implemented
     
+    The sum of the frequencies of the two beat bins of the peaks with the highest frequencies.
     '''
     id = 'R7'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1593,10 +1664,15 @@ class CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(
 
     def _process(self):
         raise JSymbolicFeatureException('not yet implemented')
+        # TODO: implement
 
 
 class NumberOfStrongPulsesFeature(featuresModule.FeatureExtractor):
     '''
+    
+    Not yet implemented
+    
+    Number of beat peaks with normalized frequencies over 0.1.
     
     '''
     id = 'R8'
@@ -1610,11 +1686,14 @@ class NumberOfStrongPulsesFeature(featuresModule.FeatureExtractor):
 
     def _process(self):
         raise JSymbolicFeatureException('not yet implemented')
+        # TODO: implement
 
  
 class NumberOfModeratePulsesFeature(featuresModule.FeatureExtractor):
     '''
+    Not yet implemented
     
+    Number of beat peaks with normalized frequencies over 0.01.
     '''
     id = 'R9'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1627,12 +1706,16 @@ class NumberOfModeratePulsesFeature(featuresModule.FeatureExtractor):
 
     def _process(self):
         raise JSymbolicFeatureException('not yet implemented')
+        # TODO: implement
 
 
  
 class NumberOfRelativelyStrongPulsesFeature(featuresModule.FeatureExtractor):
     '''
+    not yet implemented
     
+    Number of beat peaks with frequencies at least 30% as high as the 
+    frequency of the bin with the highest frequency.        
     '''
     id = 'R10'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1646,7 +1729,12 @@ class NumberOfRelativelyStrongPulsesFeature(featuresModule.FeatureExtractor):
 
 class RhythmicLoosenessFeature(featuresModule.FeatureExtractor):
     '''
+    TODO: implement
     
+    Average width of beat histogram peaks (in beats per minute). 
+    Width is measured for all peaks with frequencies at least 30% as high as the highest peak, 
+    and is defined by the distance between the points on the peak in question that are 
+    30% of the height of the peak.        
     '''
     id = 'R11'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1659,15 +1747,25 @@ class RhythmicLoosenessFeature(featuresModule.FeatureExtractor):
 
     def _process(self):
         raise JSymbolicFeatureException('not yet implemented')
+        # TODO: implement
 
  
 class PolyrhythmsFeature(featuresModule.FeatureExtractor):
     '''
+    Not yet implemented
     
+    Number of beat peaks with frequencies at least 30% of the highest frequency 
+    whose bin labels are not integer multiples or factors 
+    (using only multipliers of 1, 2, 3, 4, 6 and 8) (with an accepted 
+    error of +/- 3 bins) of the bin label of the peak with the highest frequency. 
+    This number is then divided by the total number of beat bins with frequencies 
+    over 30% of the highest frequency.'        
     '''
     id = 'R12'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, 
+                                                 dataOrStream=dataOrStream,  
+                                                 *arguments, **keywords)
 
         self.name = 'Polyrhythms'
         self.description = 'Number of beat peaks with frequencies at least 30% of the highest frequency whose bin labels are not integer multiples or factors (using only multipliers of 1, 2, 3, 4, 6 and 8) (with an accepted error of +/- 3 bins) of the bin label of the peak with the highest frequency. This number is then divided by the total number of beat bins with frequencies over 30% of the highest frequency.'
@@ -1676,11 +1774,13 @@ class PolyrhythmsFeature(featuresModule.FeatureExtractor):
 
     def _process(self):
         raise JSymbolicFeatureException('not yet implemented')
-
+        # TODO: implement
  
 class RhythmicVariabilityFeature(featuresModule.FeatureExtractor):
     '''
+    Not yet implemented
     
+    Standard deviation of the bin values (except the first 40 empty ones).
     '''
     id = 'R13'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1693,10 +1793,14 @@ class RhythmicVariabilityFeature(featuresModule.FeatureExtractor):
 
     def _process(self):
         raise JSymbolicFeatureException('not yet implemented')
+        # TODO: implement
 
 
 class BeatHistogramFeature(featuresModule.FeatureExtractor):
-    '''A feature exractor that finds a feature array with entries corresponding to the frequency values of each of the bins of the beat histogram (except the first 40 empty ones).
+    '''
+    Not yet implemented
+    
+    A feature exractor that finds a feature array with entries corresponding to the frequency values of each of the bins of the beat histogram (except the first 40 empty ones).
 
     
     '''
@@ -1713,6 +1817,7 @@ class BeatHistogramFeature(featuresModule.FeatureExtractor):
 
     def _process(self):
         raise JSymbolicFeatureException('not yet implemented')
+        # TODO: implement
 
   
 
@@ -1778,6 +1883,7 @@ class NoteDensityFeature(featuresModule.FeatureExtractor):
 
 class AverageNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
+    Average duration of notes in seconds.
     
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.AverageNoteDurationFeature(s)
@@ -1810,6 +1916,10 @@ class AverageNoteDurationFeature(featuresModule.FeatureExtractor):
 class VariabilityOfNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     
+    Not yet implemented
+    
+    Standard deviation of note durations in seconds.
+    
     '''
     id = 'R18'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1822,10 +1932,12 @@ class VariabilityOfNoteDurationFeature(featuresModule.FeatureExtractor):
 
     def _process(self):
         pass
+        # TODO: implement
         # if using numpy, can use:>>> numpy.std([1,2,3])
  
 class MaximumNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
+    Duration of the longest note (in seconds).
     
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MaximumNoteDurationFeature(s)
@@ -1853,6 +1965,7 @@ class MaximumNoteDurationFeature(featuresModule.FeatureExtractor):
  
 class MinimumNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
+    Duration of the shortest note (in seconds).
     
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MinimumNoteDurationFeature(s)
@@ -1881,6 +1994,8 @@ class MinimumNoteDurationFeature(featuresModule.FeatureExtractor):
 
 class StaccatoIncidenceFeature(featuresModule.FeatureExtractor):
     '''
+    Number of notes with durations of less than a 10th of a second divided by 
+    the total number of notes in the recording.
     
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.StaccatoIncidenceFeature(s)
@@ -1909,6 +2024,9 @@ class StaccatoIncidenceFeature(featuresModule.FeatureExtractor):
 
 class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
     '''
+    
+    Average time in seconds between Note On events (regardless of channel).
+    
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.AverageTimeBetweenAttacksFeature(s)
     >>> f = fe.extract()
@@ -1943,6 +2061,7 @@ class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
  
 class VariabilityOfTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
     '''
+    Standard deviation of the times, in seconds, between Note On events (regardless of channel).
     
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.VariabilityOfTimeBetweenAttacksFeature(s)
@@ -1980,6 +2099,9 @@ class VariabilityOfTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
 class AverageTimeBetweenAttacksForEachVoiceFeature(
     featuresModule.FeatureExtractor):
     '''
+    Average of average times in seconds between Note On events on individual channels 
+    that contain at least one note.
+        
     
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.AverageTimeBetweenAttacksForEachVoiceFeature(s)
@@ -2028,7 +2150,9 @@ class AverageTimeBetweenAttacksForEachVoiceFeature(
 class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
     featuresModule.FeatureExtractor):
     '''
-    
+    Average standard deviation, in seconds, of time between Note On events on individual 
+    channels that contain at least one note.
+
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(s)
     >>> f = fe.extract()
@@ -2134,6 +2258,7 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
 
 class InitialTempoFeature(featuresModule.FeatureExtractor):
     '''
+    Tempo in beats per minute at the start of the recording.
     
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.InitialTempoFeature(s)
@@ -2160,7 +2285,10 @@ class InitialTempoFeature(featuresModule.FeatureExtractor):
  
 class InitialTimeSignatureFeature(featuresModule.FeatureExtractor):
     '''
-    
+    A feature array with two elements. The first is the numerator of the first occurring 
+    time signature and the second is the denominator of the first occurring time signature. 
+    Both are set to 0 if no time signature is present.
+
     >>> s1 = stream.Stream()
     >>> s1.append(meter.TimeSignature('3/4'))
     >>> fe = features.jSymbolic.InitialTimeSignatureFeature(s1)
@@ -2190,7 +2318,10 @@ class InitialTimeSignatureFeature(featuresModule.FeatureExtractor):
  
 class CompoundOrSimpleMeterFeature(featuresModule.FeatureExtractor):
     '''
-    
+    Set to 1 if the initial meter is compound (numerator of time signature 
+    is greater than or equal to 6 and is evenly divisible by 3) and to 0 if it is simple 
+    (if the above condition is not fulfilled).
+        
     >>> s1 = stream.Stream()
     >>> s1.append(meter.TimeSignature('3/4'))
     >>> s2 = stream.Stream()
@@ -2229,6 +2360,7 @@ class CompoundOrSimpleMeterFeature(featuresModule.FeatureExtractor):
 
 class TripleMeterFeature(featuresModule.FeatureExtractor):
     '''
+    Set to 1 if numerator of initial time signature is 3, set to 0 otherwise.
     
     >>> s1 = stream.Stream()
     >>> s1.append(meter.TimeSignature('5/4'))
@@ -2260,6 +2392,7 @@ class TripleMeterFeature(featuresModule.FeatureExtractor):
 
 class QuintupleMeterFeature(featuresModule.FeatureExtractor):
     '''
+    Set to 1 if numerator of initial time signature is 5, set to 0 otherwise.
     
     >>> s1 = stream.Stream()
     >>> s1.append(meter.TimeSignature('5/4'))
@@ -2290,7 +2423,8 @@ class QuintupleMeterFeature(featuresModule.FeatureExtractor):
 
 
 class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
-    '''A feature exractor that sets the feature to 1 if the time signature is changed one or more times during the recording.
+    '''A feature exractor that sets the feature to 1 if the time signature 
+    is changed one or more times during the recording.
 
     
     >>> s1 = stream.Stream()
@@ -2338,7 +2472,11 @@ class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
  
 class OverallDynamicRangeFeature(featuresModule.FeatureExtractor):
     '''
+    Not implemented
     
+    The maximum loudness minus the minimum loudness value.
+    
+    TODO: implement
     '''
     id = 'D1'
 
@@ -2353,6 +2491,12 @@ class OverallDynamicRangeFeature(featuresModule.FeatureExtractor):
 
 class VariationOfDynamicsFeature(featuresModule.FeatureExtractor):
     '''
+    Not implemented
+    
+    Standard deviation of loudness levels of all notes.
+    
+    
+    TODO: implement
     
     '''
     id = 'D2'
@@ -2368,6 +2512,12 @@ class VariationOfDynamicsFeature(featuresModule.FeatureExtractor):
  
 class VariationOfDynamicsInEachVoiceFeature(featuresModule.FeatureExtractor):
     '''
+    Not implemented
+    
+    The average of the standard deviations of loudness levels within each 
+    channel that contains at least one note.
+        
+    TODO: implement
     
     '''
     id = 'D3'
@@ -2383,6 +2533,13 @@ class VariationOfDynamicsInEachVoiceFeature(featuresModule.FeatureExtractor):
  
 class AverageNoteToNoteDynamicsChangeFeature(featuresModule.FeatureExtractor):
     '''
+    Not implemented
+    
+    Average change of loudness from one note to the next note in the 
+    same channel (in MIDI velocity units).
+       
+    
+    TODO: implement
     
     '''
     id = 'D4'
@@ -2403,7 +2560,10 @@ class AverageNoteToNoteDynamicsChangeFeature(featuresModule.FeatureExtractor):
 
 class MaximumNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     '''
-    
+    Maximum number of different channels in which notes have sounded simultaneously. 
+
+    Here, Parts are treated as channels.
+        
     >>> s = corpus.parse('handel/rinaldo/lascia_chio_pianga') 
     >>> fe = features.jSymbolic.MaximumNumberOfIndependentVoicesFeature(s)
     >>> f = fe.extract()
@@ -2443,7 +2603,8 @@ class MaximumNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
 
 class AverageNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     '''
-    Average number of different channels in which notes have sounded simultaneously. Rests are not included in this calculation. Here, Parts are treated as voices
+    Average number of different channels in which notes have sounded simultaneously. 
+    Rests are not included in this calculation. Here, Parts are treated as voices
     
     >>> s = corpus.parse('handel/rinaldo/lascia_chio_pianga')  
     >>> fe = features.jSymbolic.AverageNumberOfIndependentVoicesFeature(s)
@@ -2483,7 +2644,8 @@ class AverageNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
 class VariabilityOfNumberOfIndependentVoicesFeature(
     featuresModule.FeatureExtractor):
     '''
-    Standard deviation of number of different channels in which notes have sounded simultaneously. Rests are not included in this calculation.
+    Standard deviation of number of different channels in which notes have sounded simultaneously. 
+    Rests are not included in this calculation.
     
     
     >>> s = corpus.parse('bwv66.6')
@@ -2517,7 +2679,12 @@ class VariabilityOfNumberOfIndependentVoicesFeature(
 
 class VoiceEqualityNumberOfNotesFeature(featuresModule.FeatureExtractor):
     '''
+    Not implemented
     
+       
+    
+    TODO: implement
+    Standard deviation of the total number of Note Ons in each channel that contains at least one note.
     '''
     id = 'T4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2530,6 +2697,11 @@ class VoiceEqualityNumberOfNotesFeature(featuresModule.FeatureExtractor):
 
 class VoiceEqualityNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
+    Not implemented
+    
+       
+    
+    TODO: implement
     
     '''
     id = 'T5'
@@ -2544,6 +2716,11 @@ class VoiceEqualityNoteDurationFeature(featuresModule.FeatureExtractor):
 
 class VoiceEqualityDynamicsFeature(featuresModule.FeatureExtractor):
     '''
+    Not implemented
+    
+       
+    
+    TODO: implement
     
     '''
     id = 'T6'
@@ -2558,6 +2735,11 @@ class VoiceEqualityDynamicsFeature(featuresModule.FeatureExtractor):
 
 class VoiceEqualityMelodicLeapsFeature(featuresModule.FeatureExtractor):
     '''
+    Not implemented
+    
+       
+    
+    TODO: implement
     
     '''
     id = 'T7'
@@ -2572,6 +2754,11 @@ class VoiceEqualityMelodicLeapsFeature(featuresModule.FeatureExtractor):
  
 class VoiceEqualityRangeFeature(featuresModule.FeatureExtractor):
     '''
+    Not implemented
+    
+       
+    
+    TODO: implement
     
     '''
     id = 'T8'
@@ -2586,6 +2773,11 @@ class VoiceEqualityRangeFeature(featuresModule.FeatureExtractor):
  
 class ImportanceOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
     '''
+    Not implemented
+    
+       
+    
+    TODO: implement
     
     '''
     id = 'T9'
@@ -2602,6 +2794,11 @@ class ImportanceOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
  
 class RelativeRangeOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
     '''
+    Not implemented
+    
+       
+    
+    TODO: implement
     
     '''
     id = 'T10'
@@ -2617,6 +2814,11 @@ class RelativeRangeOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
 
 class RangeOfHighestLineFeature(featuresModule.FeatureExtractor):
     '''
+    Not implemented
+    
+       
+    
+    TODO: implement
     
     '''
     id = 'T12'
@@ -2632,6 +2834,11 @@ class RangeOfHighestLineFeature(featuresModule.FeatureExtractor):
  
 class RelativeNoteDensityOfHighestLineFeature(featuresModule.FeatureExtractor):
     '''
+    Not implemented
+    
+       
+    
+    TODO: implement
     
     '''
     id = 'T13'
@@ -2647,6 +2854,11 @@ class RelativeNoteDensityOfHighestLineFeature(featuresModule.FeatureExtractor):
 
 class MelodicIntervalsInLowestLineFeature(featuresModule.FeatureExtractor):
     '''
+    Not implemented
+    
+       
+    
+    TODO: implement
     
     '''
     id = 'T15'
@@ -2661,6 +2873,11 @@ class MelodicIntervalsInLowestLineFeature(featuresModule.FeatureExtractor):
 
 class VoiceSeparationFeature(featuresModule.FeatureExtractor):
     '''
+    Not implemented
+    
+       
+    
+    TODO: implement
     
     '''
     id = 'T20'
@@ -2779,6 +2996,11 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
 class NotePrevalenceOfUnpitchedInstrumentsFeature(
     featuresModule.FeatureExtractor):
     '''
+    Not implemented
+    
+       
+    
+    TODO: implement
     
     '''
     id = 'I4'
@@ -2796,6 +3018,11 @@ class NotePrevalenceOfUnpitchedInstrumentsFeature(
 class TimePrevalenceOfPitchedInstrumentsFeature(
     featuresModule.FeatureExtractor):
     '''
+    Not implemented
+    
+       
+    
+    TODO: implement
     
     '''
     id = 'I5'
@@ -2853,6 +3080,11 @@ class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(
 class VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature(
     featuresModule.FeatureExtractor):
     '''
+    Not implemented
+    
+       
+    
+    TODO: implement
     
     '''
     id = 'I7'
@@ -2905,6 +3137,11 @@ class NumberOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
 
 class NumberOfUnpitchedInstrumentsFeature(featuresModule.FeatureExtractor):
     '''
+    Not implemented
+    
+       
+    
+    TODO: implement
     
     '''
     id = 'I9'
@@ -2920,6 +3157,11 @@ class NumberOfUnpitchedInstrumentsFeature(featuresModule.FeatureExtractor):
 
 class PercussionPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
+    Not implemented
+    
+       
+    
+    TODO: implement
     
     '''
     id = 'I10'
@@ -3158,7 +3400,7 @@ class OrchestralStringsFractionFeature(InstrumentFractionFeature):
 
 class StringEnsembleFractionFeature(InstrumentFractionFeature):
     '''
-    
+    Fraction of all Note Ons belonging to string ensemble patches(General MIDI patches 49 to 52)
     '''
     # TODO: add tests, do not yet have instrument to model
     id = 'I19'

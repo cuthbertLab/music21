@@ -182,7 +182,7 @@ def upperPartsWithinLimit(possibA, maxSemitoneSeparation = 12):
     >>> possibility.upperPartsWithinLimit(possibA2)
     False
     '''
-    upperPartsWithinLimit = True
+    upperPartsWithinLimit = True # pylint disable=redefined-outer-name
     if maxSemitoneSeparation == None:
         return upperPartsWithinLimit
     

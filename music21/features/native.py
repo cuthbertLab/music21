@@ -16,10 +16,10 @@ import unittest
 import re
 import math
 
-try:
-    from urllib import FancyURLopener # @UnusedImport @UnresolvedImport
+try: # pylint: disable non-name-in-module
+    from urllib import FancyURLopener # @UnusedImport @UnresolvedImport 
     from urllib import urlencode # @UnusedImport @UnresolvedImport
-except: # python3
+except ImportError: # python3 # pylint: disable non-name-in-module
     from urllib.request import FancyURLopener # @UnresolvedImport @Reimport
     from urllib.parse import urlencode # @UnresolvedImport @Reimport
     

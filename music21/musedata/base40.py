@@ -246,7 +246,7 @@ def pitchToBase40(pitchToConvert):
     Traceback (most recent call last):
     Base40Exception: Base40 cannot handle this pitch F###4
     '''
-    if type(pitchToConvert) == str:
+    if isinstance(pitchToConvert, str):
         pitchToConvert = pitch.Pitch(pitchToConvert)
     if pitchToConvert.name in base40Representation:
         tableNum = base40Representation[pitchToConvert.name]

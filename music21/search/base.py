@@ -8,7 +8,6 @@
 # Copyright:    Copyright © 2011-2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-### end __init__.py #####
 
 
 
@@ -157,7 +156,7 @@ def rhythmicSearch(thisStream, searchStream):
         for j in range(searchLength):
             #x = searchStream[j].duration
             if "WildcardDuration" in searchStream[j].duration.classes:
-                next
+                continue
             elif searchStream[j].duration.quarterLength != thisStream[start + j].duration.quarterLength:
                 foundException = True
                 break

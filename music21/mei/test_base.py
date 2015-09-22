@@ -817,10 +817,10 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertEqual('D2', actual.nameWithOctave)
         self.assertEqual(0.0, actual.quarterLength)
         self.assertEqual('16th', actual.duration.type)
-        self.assertTrue(1, actual.beams.beamsList[0].number)
-        self.assertTrue('start', actual.beams.beamsList[0].type)
-        self.assertTrue(2, actual.beams.beamsList[1].number)
-        self.assertTrue('start', actual.beams.beamsList[1].type)
+        self.assertEqual(1, actual.beams.beamsList[0].number)
+        self.assertEqual('start', actual.beams.beamsList[0].type)
+        self.assertEqual(2, actual.beams.beamsList[1].number)
+        self.assertEqual('start', actual.beams.beamsList[1].type)
 
     # NOTE: consider adding to previous tests rather than making new ones
 
@@ -1223,10 +1223,10 @@ class TestChordFromElement(unittest.TestCase):
         self.assertEqual(expectedName, actual.fullName)
         self.assertEqual(0.0, actual.quarterLength)
         self.assertEqual('16th', actual.duration.type)
-        self.assertTrue(1, actual.beams.beamsList[0].number)
-        self.assertTrue('start', actual.beams.beamsList[0].type)
-        self.assertTrue(2, actual.beams.beamsList[1].number)
-        self.assertTrue('start', actual.beams.beamsList[1].type)
+        self.assertEqual(1, actual.beams.beamsList[0].number)
+        self.assertEqual('start', actual.beams.beamsList[0].type)
+        self.assertEqual(2, actual.beams.beamsList[1].number)
+        self.assertEqual('start', actual.beams.beamsList[1].type)
 
     # NOTE: consider adding to previous tests rather than making new ones
 

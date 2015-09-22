@@ -2158,9 +2158,12 @@ def getWrittenHigherNote(note1, note2):
     
     num1 = note1.diatonicNoteNum
     num2 = note2.diatonicNoteNum
-    if num1 > num2: return note1
-    elif num1 < num2: return note2
-    else: return getAbsoluteHigherNote(note1, note2)
+    if num1 > num2: 
+        return note1
+    elif num1 < num2: 
+        return note2
+    else: 
+        return getAbsoluteHigherNote(note1, note2)
 
 def getAbsoluteHigherNote(note1, note2):
     '''

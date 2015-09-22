@@ -531,8 +531,10 @@ class DateBetween(DateSingle):
 
     ### INITIALIZER ###
 
-    def __init__(self, data=[], relevance='between'):
-        DateSingle.__init__(self, data, relevance)
+    def __init__(self, data=None, relevance='between'):
+        if data is None:
+            data = []
+        super(DateBetween, self).__init__(data, relevance)
 
     ### SPECIAL METHODS ###
 
@@ -784,6 +786,7 @@ class Contributor(object):
     ### INITIALIZER ###
 
     def __init__(self, *args, **keywords):
+        self._role = None
         if 'role' in keywords:
             # stored in self._role
             self.role = keywords['role']  # validated with property

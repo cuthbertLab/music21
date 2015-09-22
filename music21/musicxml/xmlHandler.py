@@ -1353,7 +1353,7 @@ class Test(unittest.TestCase):
                             if isinstance(n, musicxmlMod.Ornaments):
                                 for o in n:
                                     if isinstance(o, musicxmlMod.WavyLine):
-                                        wavyCount += 1;
+                                        wavyCount += 1
         self.assertEqual(glissCount, 2)
         self.assertEqual(wavyCount, 4)
 

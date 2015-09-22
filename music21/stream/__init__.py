@@ -1015,7 +1015,7 @@ class Stream(base.Music21Object):
             self.remove([targetOrList], firstMatchOnly=firstMatchOnly, shiftOffsets=shiftOffsets, recurse=recurse)
         else:
             if len(targetOrList) > 1:
-                targetList = sorted(targetOrList, key=lambda target: self.elementOffset(target) )
+                targetList = sorted(targetOrList, key=self.elementOffset)
             else:
                 targetList = targetOrList
 
@@ -10426,12 +10426,16 @@ class Stream(base.Music21Object):
 
         return (highestMeasure, insertedMeasures), deletedMeasures
 
-    def _removeOrExpandGaps(self, listOffsetDurExemption, isRemove = True, inPlace = False, exemptClasses = None):
+    def _removeOrExpandGaps(self, listOffsetDurExemption, 
+                            isRemove=True, inPlace=False, exemptClasses=None):
         '''
-        Helper for activateVariants. Takes a list of tuples in the form (startoffset, duration, [list, of, exempt, objects]). If isRemove is True,
-        gaps with duration will be closed at each startOffset. Exempt objects are useful for gap-expansion with variants. The gap must push all objects
-        that occur after the insertion ahead, but the variant object itself should not be moved except by other gaps. This is poorly written
-        and should be re-written, but its difficult to describe.
+        Helper for activateVariants. Takes a list of tuples in the form 
+        (startoffset, duration, [list, of, exempt, objects]). If isRemove is True,
+        gaps with duration will be closed at each startOffset. 
+        Exempt objects are useful for gap-expansion with variants. The gap must push all objects
+        that occur after the insertion ahead, but the variant object 
+        itself should not be moved except by other gaps. This is poorly written
+        and should be re-written, but it is difficult to describe.
 
 
         >>> s = stream.Stream()
@@ -10480,7 +10484,7 @@ class Stream(base.Music21Object):
             classList = None
         else:
             for e in returnObj.elements:
-                if type(e) not in classList:
+                if type(e) not in classList: 
                     classList.append(type(e))
             for c in exemptClasses:
                 if c in classList:
@@ -10652,7 +10656,7 @@ class Stream(base.Music21Object):
             return
         
         def measureNumberSortRoutine(numOrNumTuple):
-            if type(numOrNumTuple) is tuple:
+            if isinstance(numOrNumTuple, tuple):
                 return measureNumberSortRoutine(numOrNumTuple[0])
             elif numOrNumTuple is None:
                 return -999
@@ -10674,7 +10678,7 @@ class Stream(base.Music21Object):
         # First collect dictionaries of shift boundaries and the amount of the shift.
         # at the same time, five un-numbered measures numbers that make sense.
         for measureNumber in allMeasures:
-            if type(measureNumber) is tuple: #tuple implies insertion
+            if isinstance(measureNumber, tuple): #tuple implies insertion
                 measurePrior, extendedMeasures = measureNumber
                 if len(extendedMeasures) is 0: #No measures were added, therefore no shift.
                     continue

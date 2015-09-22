@@ -45,7 +45,6 @@ from music21 import defaults
 from music21 import exceptions21
 
 from music21 import bar
-from music21 import key
 from music21 import metadata
 from music21 import note
 from music21 import meter
@@ -4144,7 +4143,7 @@ class TestExternal(unittest.TestCase):
 
 
     def testFindOneError(self):
-        from music21 import corpus, converter
+        from music21 import corpus
 
         b = corpus.parse('schoenberg')
 
@@ -4167,7 +4166,7 @@ class TestExternal(unittest.TestCase):
         
 
     def testSimple(self):
-        from xml.etree.ElementTree import ElementTree
+        from xml.etree.ElementTree import ElementTree as ETObj
         from music21 import corpus#, converter
         import codecs
         import difflib
@@ -4187,7 +4186,7 @@ class TestExternal(unittest.TestCase):
         sio = six.BytesIO()
         
         sio.write(SX.xmlHeader())
-        et = ElementTree(mxScore)
+        et = ETObj(mxScore)
         et.write(sio, encoding="utf-8", xml_declaration=False)
         et.write('/Users/Cuthbert/Desktop/s.xml', encoding="utf-8", xml_declaration=True)
         v = sio.getvalue()
@@ -4204,8 +4203,8 @@ class TestExternal(unittest.TestCase):
             v2 = f.read()
         differ = list(difflib.ndiff(v.splitlines(), v2.splitlines()))
         for i, l in enumerate(differ):
-                if l.startswith('-') or l.startswith('?') or l.startswith('+'):
-                    print(l)
+            if l.startswith('-') or l.startswith('?') or l.startswith('+'):
+                print(l)
                 #for j in range(i-1,i+1):
                 #    print(differ[j])
                 #print('------------------')
@@ -4215,3 +4214,4 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
     #music21.mainTest(TestExternal, runTest='testSimple')
+

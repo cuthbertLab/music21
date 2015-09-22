@@ -284,7 +284,7 @@ class MetadataBundle(object):
         False
 
         '''
-        if type(self) == type(other):
+        if hasattr(other, '_metadataEntries'):
             if self._metadataEntries == other._metadataEntries:
                 return True
         return False

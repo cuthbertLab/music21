@@ -277,6 +277,9 @@ class CTSong(object):
         self._scoreObj = None
         self.year = None
 
+        self._homeTimeSig = None
+        self._homeKeySig = None
+
         self.labelRomanNumerals = True
         self.labelSubsectionsOnScore = True
 
@@ -311,7 +314,7 @@ class CTSong(object):
             except Exception:
                 raise CTSongException('Invalid File Format; must be string or text file: %s' % textFile)
 
-        lines = list(filter(lambda e: len(e) != 0, lines))
+        lines = [e for e in lines if len(e) != 0]
         for i in range(len(lines)):
             lines[i] = lines[i].strip()
         self.lines = lines
@@ -507,8 +510,8 @@ class CTRule(object):
     _DOC_ORDER = ['LHS', 'sectionName','musicText', 'homeTimeSig', 'homeKeySig', 'comments']
     _DOC_ATTR = {'text': 'the full text of the CTRule, including the LHS, chords, and comments'}
     
-    SPLITMEASURES = re.compile('(\|\*?\d*)')
-    REPETITION = re.compile('\*(\d+)')
+    SPLITMEASURES = re.compile(r'(\|\*?\d*)')
+    REPETITION = re.compile(r'\*(\d+)')
     
     def __init__(self, text='', parent=None):
         self._parent = None
@@ -920,20 +923,10 @@ class TestExternal(unittest.TestCase):
     
     def testB(self):
         from music21.romanText import clercqTemperley
-        BlitzkriegBopCT = '''
-% Blitzkrieg Bop
-
-BP: I | IV V | %THIS IS A COMMENT
-In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4
-Vr: $BP*3 I IV | I |
-Br: IV | | I | IV I | IV | | ii | IV V |
-Co: R |*4 I |*4
-S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co
-'''
-
         s = clercqTemperley.CTSong(BlitzkriegBopCT)
         scoreObj = s.toScore()
         scoreObj.show()
+
     def xtestA(self):
         '''
         from music21.romanText import clercqTemperley

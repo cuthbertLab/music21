@@ -144,7 +144,7 @@ class PercussionMapper(object):
         
         '''
         
-        if type(midiPitch) == int:
+        if isinstance(midiPitch, int):
             midiNumber = midiPitch
         else:
             midiNumber = midiPitch.midi

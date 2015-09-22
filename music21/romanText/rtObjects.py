@@ -795,7 +795,7 @@ class RTKey(RTKeyTypeAtom):
         >>> eflatmajor.getKey()
         <music21.key.Key of E- major>
         '''
-        RTAtom.__init__(self, src, container)
+        super(RTKey, self).__init__(src, container)
 
     def __repr__(self):
         return '<RTKey %r>' % self.src
@@ -822,7 +822,7 @@ class RTAnalyticKey(RTKeyTypeAtom):
         <music21.key.Key of b- minor>
 
         '''
-        RTAtom.__init__(self, src, container)
+        super(RTAnalyticKey, self).__init__(src, container)
     
     def __repr__(self):
         return '<RTAnalyticKey %r>' % self.src
@@ -846,7 +846,7 @@ class RTKeySignature(RTAtom):
         >>> Amajor.getKeySignature()
         <music21.key.KeySignature of 3 sharps>
         '''
-        RTAtom.__init__(self, src, container)
+        super(RTKeySignature, self).__init__(src, container)
 
     def __repr__(self):
         return '<RTKeySignature %r>' % self.src

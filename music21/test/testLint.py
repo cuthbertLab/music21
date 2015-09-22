@@ -54,7 +54,14 @@ def main(fnAccept=None):
     # only accept a few file names for now
     if fnAccept in (None, []):
         fnAccept = ['harmony', 'clef', 'note', 'duration']
-    fnPathReject = ['/ext/',
+    fnPathReject = ['demos/',
+                    'alpha/',
+                    'test/',
+                    'mxObjects.py',
+                    'fromMxObjects.py',
+                    'toMxObjects.py',
+                    'xmlHandler.py',
+                    '/ext/',
                     'bar.py',  # crashes pylint...
                     'repeat.py', # hangs pylint...
                     'spanner.py', # hangs pylint...
@@ -68,6 +75,8 @@ def main(fnAccept=None):
                 'cyclic-import', # we use these inside functions when there's a deep problem.
                 'unnecessary-pass', # nice, but not really a problem...
                 'locally-disabled', # test for this later, but hopefully will know what they're doing
+
+                'duplicate-code', # needs to ignore strings -- keeps getting doctests...
 
                 'arguments-differ', # someday...
                 'abstract-class-instantiated', # this trips on the fractions.Fraction() class.
@@ -110,7 +119,7 @@ def main(fnAccept=None):
                   }
 
     cmd = ['--output-format=parseable',
-           '--dummy-variables-rgx="_|dummy|unused|i|j|junk"', 
+           r'--dummy-variables-rgx="_$|dummy$|unused|i$|j$|junk|counter"', 
            '--docstring-min-length=3',
            '--max-args=7',  # should be 5 later, but baby steps
            '--bad-name="foo,shit,fuck,stuff"', # definitely allow "bar" for barlines

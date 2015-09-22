@@ -151,9 +151,9 @@ class BrailleElementGrouping(list):
         <music21.note.Rest rest>
         <music21.note.Note F>
         """
-        super(list, self).__init__()
-        global GROUPING_KEYSIG # pylint: disable=global-usage
-        global GROUPING_TIMESIG # pylint: disable=global-usage
+        # TODO: remove globals... there are singletons instead.
+        global GROUPING_KEYSIG # pylint: disable=global-statement
+        global GROUPING_TIMESIG # pylint: disable=global-statement
         if GROUPING_KEYSIG == 0:
             GROUPING_KEYSIG = key.KeySignature(GROUPING_KEYSIG)
         if GROUPING_TIMESIG == '4/4':
@@ -175,12 +175,12 @@ class BrailleElementGrouping(list):
                 for obj2 in obj:
                     try:
                         allObjects.append(u"\n".join(obj2._brailleEnglish))
-                    except:
+                    except Exception:
                         allObjects.append(str(obj2))
             else:
                 try:
                     allObjects.append(u"\n".join(obj._brailleEnglish))
-                except:
+                except Exception:
                     allObjects.append(str(obj))
         if self.numRepeats > 0:
             allObjects.append(u"** Grouping x {0} **".format(self.numRepeats+1))

@@ -198,7 +198,7 @@ def indexScoreFilePaths(
         if 'failFast' not in kwds or kwds['failFast'] is False:        
             try:
                 scoreDict[shortfp] = indexOnePath(filePath, *args, **kwds)
-            except Exception as e:
+            except Exception as e: # pylint: disable=broad-except
                 print("Failed on parse for, %s: %s" % (filePath, str(e)))
         else:
             kwds2 = copy.copy(kwds)

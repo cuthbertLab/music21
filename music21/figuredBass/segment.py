@@ -11,7 +11,7 @@
 #python3
 try:
     basestring # @UndefinedVariable
-except:
+except NameError:
     basestring = str # @ReservedAssignment
 
 
@@ -58,23 +58,31 @@ class Segment(object):
                  'fbRules': 'A deepcopy of the :class:`~music21.figuredBass.rules.Rules` object provided.',
                  }
 
-    def __init__(self, bassNote = 'C3', notationString = None, fbScale = None, fbRules = rules.Rules(), numParts = 4, maxPitch = 'B5', listOfPitches = None):
+    def __init__(self, bassNote='C3', notationString=None, fbScale=None, fbRules=None, 
+                 numParts=4, maxPitch='B5', listOfPitches=None):
         ''' 
-        A Segment corresponds to a 1:1 realization of a bassNote and notationString of a :class:`~music21.figuredBass.realizer.FiguredBassLine`.
-        It is created by passing six arguments: a :class:`~music21.figuredBass.realizerScale.FiguredBassScale`, a bassNote, a notationString,
-        a :class:`~music21.figuredBass.rules.Rules` object, a number of parts and a maximum pitch. Realizations of a Segment are represented 
+        A Segment corresponds to a 1:1 realization of a bassNote and notationString 
+        of a :class:`~music21.figuredBass.realizer.FiguredBassLine`.
+        It is created by passing six arguments: a 
+        :class:`~music21.figuredBass.realizerScale.FiguredBassScale`, a bassNote, a notationString,
+        a :class:`~music21.figuredBass.rules.Rules` object, a number of parts and a maximum pitch. 
+        Realizations of a Segment are represented 
         as possibility tuples (see :mod:`~music21.figuredBass.possibility` for more details). 
         
-        Methods in Python's `itertools <http://docs.python.org/library/itertools.html>`_ module are used extensively. Methods 
-        which generate possibilities or possibility progressions return iterators, which are turned into lists in the examples 
+        Methods in Python's `itertools <http://docs.python.org/library/itertools.html>`_ 
+        module are used extensively. Methods 
+        which generate possibilities or possibility progressions return iterators, 
+        which are turned into lists in the examples 
         for display purposes only.
         
         if fbScale is None, a realizerScale.FiguredBassScale() is created
 
-        if fbRules is None, a rules.Rules() instance is created.  Each Segment gets its own deepcopy of the one given.
+        if fbRules is None, a rules.Rules() instance is created.  Each Segment gets 
+        its own deepcopy of the one given.
         
         
-        Here, a Segment is created using the default values: a FiguredBassScale in C, a bassNote of C3, an empty notationString, and a default
+        Here, a Segment is created using the default values: a FiguredBassScale in C, 
+        a bassNote of C3, an empty notationString, and a default
         Rules object.
         
         >>> from music21.figuredBass import segment
@@ -105,19 +113,25 @@ class Segment(object):
             self.fbRules = rules.Rules()
         else:
             self.fbRules = copy.deepcopy(fbRules)
+
+        self._specialResolutionRuleChecking = None
+        self._singlePossibilityRuleChecking = None
+        self._consecutivePossibilityRuleChecking = None
+
         
         self.bassNote = bassNote
         self.numParts = numParts
         self._maxPitch = maxPitch
-        if notationString == None and listOfPitches != None: #must be a chord symbol or roman numeral....
+        if notationString == None and listOfPitches != None: #must be a chord symbol or roman num.
             self.pitchNamesInChord = listOfPitches
-        #!---------- Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects --------!
+        #!------ Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects ------!
         else:
             self.pitchNamesInChord = fbScale.getPitchNames(self.bassNote.pitch, notationString)
         
         self.allPitchesAboveBass = getPitches(self.pitchNamesInChord, self.bassNote.pitch, self._maxPitch)
         self.segmentChord = chord.Chord(self.allPitchesAboveBass, quarterLength = bassNote.quarterLength)
         self._environRules = environment.Environment(_MOD)
+        
     
     #-------------------------------------------------------------------------------
     # EXTERNAL METHODS
@@ -135,8 +149,10 @@ class Segment(object):
         (willRunOnlyIfTrue, methodToRun, keepSolnsWhichReturn, optionalArgs)
 
 
-        These items are compiled internally when :meth:`~music21.figuredBass.segment.Segment.allCorrectSinglePossibilities`
-        is called on a Segment. Here, the compilation of rules and methods bases on a default fbRules is shown.
+        These items are compiled internally when 
+        :meth:`~music21.figuredBass.segment.Segment.allCorrectSinglePossibilities`
+        is called on a Segment. Here, the compilation of rules and 
+        methods bases on a default fbRules is shown.
         
         >>> from music21.figuredBass import segment
         >>> segmentA = segment.Segment()
@@ -732,15 +748,6 @@ class Segment(object):
 
         raise SegmentException("No standard resolution available.")
 
-'''
-class NonChordSegment(Segment):
-    def __init__(self, fbScale, bassNote = note.Note('D3'), pitchNamesAboveBass = ['C', 'E', 'G'], fbRules = rules.Rules()):
-        self.fbScale = fbScale
-        self.bassNote = bassNote
-        self.allPitchesAboveBass = getPitches(pitchNamesAboveBass, bassNote.pitch, fbRules.maxPitch)        
-        self.pitchNamesInChord = pitchNamesAboveBass + [self.bassNote.pitch.name]
-        self.compileAllRules(fbRules)
-'''
 
 class OverlayedSegment(Segment):
     '''
@@ -756,7 +763,7 @@ class OverlayedSegment(Segment):
     
 # HELPER METHODS
 # --------------
-def getPitches(pitchNames = ['C','E','G'], bassPitch = 'C3', maxPitch = 'C8'):
+def getPitches(pitchNames = ('C','E','G'), bassPitch = 'C3', maxPitch = 'C8'):
     '''
     Given a list of pitchNames, a bassPitch, and a maxPitch, returns a sorted list of
     pitches between the two limits (inclusive) which correspond to items in pitchNames.

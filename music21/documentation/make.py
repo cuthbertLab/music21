@@ -103,7 +103,7 @@ def main(target):
         # If the docs fail to build, we should not try to open a web browser.
         returnCode = 0
         try:
-            returnCode = sphinx.main(sphinxOptions)
+            returnCode = sphinx.main(sphinxOptions) # pylint: disable=assignment-from-no-return
         except SystemExit:
             returnCode = 0 
         

@@ -538,6 +538,7 @@ class FiguredBassLine(object):
             return True
         elif len(segmentList) >= 3:
             segmentList.reverse()
+            # gets this wrong... # pylint: disable=cell-var-from-loop
             for segmentIndex in range(1, len(segmentList) - 1):
                 movementsAB = segmentList[segmentIndex + 1].movements
                 movementsBC = segmentList[segmentIndex].movements

@@ -697,16 +697,6 @@ def diminishedSeventhToMinorSubdominant(dimPossib, dimChordInfo = None):
             
     return _resolvePitches(dimPossib, howToResolve)
 
-'''
-transpositionsTable = {}
-def transpose(samplePitch, intervalString):
-    args = (samplePitch, intervalString)
-    if transpositionsTable.has_key(args):
-        return transpositionsTable[args]
-    transposedPitch = samplePitch.transpose(intervalString)
-    transpositionsTable[(samplePitch, intervalString)] = transposedPitch
-    return transposedPitch
-'''
 
 def showResolutions(*allPossib):
     '''

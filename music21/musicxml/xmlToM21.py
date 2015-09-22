@@ -487,24 +487,24 @@ class MusicXMLImporter(XMLParserBase):
     
     def readFile(self, filename):
         etree = ET.parse(filename)
-        self.root = etree.getroot()
-        if self.root.tag != 'score-partwise':
+        self.xmlRoot = etree.getroot()
+        if self.xmlRoot.tag != 'score-partwise':
             raise MusicXMLImportException("Cannot parse MusicXML files not in score-partwise. Root tag was '{0}'".format(self.root.tag))
-        self.xmlRootToScore(self.root, self.stream)
+        self.xmlRootToScore(self.xmlRoot, self.stream)
     
     def parseXMLText(self):
         sio = six.StringIO(self.xmlText)
         try:
             etree = ET.parse(sio)
-            self.root = etree.getroot()
+            self.xmlRoot = etree.getroot()
         except ET.ParseError:
             try:
-                self.root = ET.XML(self.xmlText)
+                self.xmlRoot = ET.XML(self.xmlText)
             except ET.ParseError:
                 raise # try to do something better here...
-        if self.root.tag != 'score-partwise':
+        if self.xmlRoot.tag != 'score-partwise':
             raise MusicXMLImportException("Cannot parse MusicXML files not in score-partwise. Root tag was '{0}'".format(self.root.tag))
-        self.xmlRootToScore(self.root, self.stream)
+        self.xmlRootToScore(self.xmlRoot, self.stream)
 
     def xmlRootToScore(self, mxScore, inputM21=None):
         '''
@@ -970,12 +970,12 @@ class PartParser(XMLParserBase):
         those under given key. This then is the list of all elements that should be deleted.
         '''
         post = []
-        for key in staffReference:
-            if key in (None, 'None') or targetKey in (None, 'None'):
+        for k in staffReference:
+            if k in (None, 'None') or targetKey in (None, 'None'):
                 continue
-            elif int(key) == int(targetKey):
+            elif int(k) == int(targetKey):
                 continue
-            post += staffReference[key]
+            post += staffReference[k]
         return post
 
             
@@ -986,9 +986,9 @@ class PartParser(XMLParserBase):
         '''
         post = []
         for staffReference in self.staffReferenceList:
-            for key in staffReference:
-                if key not in (None, 'None') and key not in post:
-                    post.append(key)
+            for k in staffReference:
+                if k not in (None, 'None') and k not in post:
+                    post.append(k)
         post.sort()
         return post
            
@@ -996,7 +996,7 @@ class PartParser(XMLParserBase):
         measureNumber = "unknown"
         try:
             measureNumber = mxMeasure.get('number')
-        except:
+        except (AttributeError, NameError, ValueError):
             pass
         # see http://stackoverflow.com/questions/6062576/adding-information-to-a-python-exception
         execInfoTuple = sys.exc_info()
@@ -1012,7 +1012,7 @@ class PartParser(XMLParserBase):
         parser = MeasureParser(mxMeasure, parent=self)
         try:
             parser.parse()
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             self.measureParsingError(mxMeasure, e)
         
         if parser.staves > self.maxStaves:
@@ -1121,7 +1121,7 @@ class PartParser(XMLParserBase):
         
     def parsePartInfo(self):
         instrumentObj = self.getDefaultInstrument()
-        self.firstInstrumentObject = instrumentObj
+        #self.firstInstrumentObject = instrumentObj # not used.
         if instrumentObj.bestName() is not None:
             self.stream.id = instrumentObj.bestName()
         self.activeInstrument = instrumentObj
@@ -1302,19 +1302,19 @@ class MeasureParser(XMLParserBase):
             
         if staffObject is not None:
             try:
-                key = staffObject.text.strip()
+                k = staffObject.text.strip()
             except AttributeError:
-                key = None
+                k = None
         else:
-            key = None
+            k = None
         # some objects store staff assignment simply as number
-        if key is None:
+        if k is None:
             try:
-                key = mxObjectOrNumber.get('number')
+                k = mxObjectOrNumber.get('number')
             except AttributeError: # a normal number
-                key = mxObjectOrNumber
+                k = mxObjectOrNumber
 
-        return key
+        return k
         
     def addToStaffReference(self, mxObjectOrNumber, m21Object):
         '''
@@ -2200,7 +2200,6 @@ class MeasureParser(XMLParserBase):
                 except IndexError:
                     raise MusicXMLImportException("Error in geting DynamicWedges..." + 
                           "Measure no. " + str(self.measureNumber) + " " + str(self.parent.partId))
-                    return
                 sp.completeStatus = True
                 # will only have a target if this follows the note
                 if targetLast is not None:
@@ -2789,8 +2788,8 @@ class MeasureParser(XMLParserBase):
     
     def xmlDirection(self, mxDirection):
         '''
-
-        
+        convert a <direction> tag to an expression, metronome mark, etc.
+        and add it to the core and staff direction.
         '''
         offsetDirection = self.xmlToOffset(mxDirection)
         totalOffset = offsetDirection + self.offsetMeasureNote
@@ -3110,8 +3109,8 @@ class MeasureParser(XMLParserBase):
         return ts
         
     def handleClef(self, mxClef):
-        clef = self.xmlToClef(mxClef)
-        self.insertCoreAndRef(self.offsetMeasureNote, mxClef, clef)
+        clefObj = self.xmlToClef(mxClef)
+        self.insertCoreAndRef(self.offsetMeasureNote, mxClef, clefObj)
     
     def xmlToClef(self, mxClef):
         '''
