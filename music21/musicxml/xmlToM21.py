@@ -3023,6 +3023,21 @@ class MeasureParser(XMLParserBase):
         >>> t = ET.fromstring('<transpose><diatonic>-5</diatonic><chromatic>-9</chromatic></transpose>')
         >>> MP.xmlTransposeToInterval(t)
         <music21.interval.Interval M-6>
+        
+        It should be like this:
+        
+        >>> t = ET.fromstring('<transpose><diatonic>-8</diatonic><chromatic>-2</chromatic>' + 
+        ...         '<octave-change>-1</octave-change></transpose>')
+        >>> MP.xmlTransposeToInterval(t)
+        <music21.interval.Interval M-9>
+        
+        but it is sometimes encoded this way (Finale; MuseScore), so we will deal...
+
+        >>> t = ET.fromstring('<transpose><diatonic>-1</diatonic><chromatic>-2</chromatic>' + 
+        ...         '<octave-change>-1</octave-change></transpose>')
+        >>> MP.xmlTransposeToInterval(t)
+        <music21.interval.Interval M-9>
+        
         '''
         ds = None
         
@@ -3048,9 +3063,23 @@ class MeasureParser(XMLParserBase):
             # diatonic step can be used as a generic specifier here if 
             # shifted 1 away from zero
             if ds < 0:
-                post = interval.intervalFromGenericAndChromatic(ds - 1, cs + oc)
+                diatonicActual = ds - 1
             else:
-                post = interval.intervalFromGenericAndChromatic(ds + 1, cs + oc)
+                diatonicActual = ds + 1
+            
+            try:          
+                post = interval.intervalFromGenericAndChromatic(diatonicActual, cs + oc)
+            except interval.IntervalException:
+                # some people don't use -8 for diatonic for down a 9th, assuming
+                # that octave-change will take care of it.  So try again.
+                if ds < 0:
+                    diatonicActual = (ds + int(oc*7/12)) - 1
+                else:
+                    diatonicActual = (ds + int(oc*7/12)) + 1
+
+                post = interval.intervalFromGenericAndChromatic(diatonicActual, cs + oc)
+                
+                
         else: # assume we have chromatic; may not be correct spelling
             post = interval.Interval(cs + oc)
         return post
