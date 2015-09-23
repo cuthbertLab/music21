@@ -86,8 +86,8 @@ class StreamStatus(SlottedObject):
     ## SPECIAL METHODS ###
     def __deepcopy__(self, memo=None):
         '''
-        Manage deepcopying by creating a new reference to the same object. If
-        the origin no longer exists, than origin is set to None
+        Manage deepcopying by creating a new reference to the same object. 
+        leaving out the client
         '''
         new = type(self)()
         for x in self.__slots__:
