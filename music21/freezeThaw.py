@@ -222,6 +222,10 @@ class StreamFreezer(StreamFreezeThawBase):
         self.topLevel = topLevel
         self.streamIds = streamIds
 
+        self.subStreamFreezers = {} # this will keep track of sub freezers for spanners and
+        #
+
+
         if streamObj is not None and fastButUnsafe is False:
             # deepcopy necessary because we mangle sites in the objects
             # before serialization
@@ -240,8 +244,8 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> s.append(n)
         >>> sf = freezeThaw.StreamFreezer(s)
         >>> #_DOCS_SHOW sf.packStream()
-        >>> print("{'m21Version': (2, 0, 5), 'stream': <music21.stream.Stream 4391393680>}") #_DOCS_HIDE
-        {'m21Version': (2, 0, 5), 'stream': <music21.stream.Stream 4391393680>}
+        >>> print("{'m21Version': (2, 0, 5), 'stream': <music21.stream.Stream 0x1289212>}") #_DOCS_HIDE
+        {'m21Version': (2, 0, 5), 'stream': <music21.stream.Stream 0x1289212>}
         
         '''
         # do all things necessary to setup the stream

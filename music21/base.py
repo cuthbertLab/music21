@@ -48,6 +48,16 @@ import warnings
 from music21.test.testRunner import mainTest
 from music21.ext import six
 
+if six.PY2:
+    try:
+        import cPickle as pickle # much faster on Python 2
+    except ImportError:
+        import pickle as pickle # @UnusedImport
+else:
+    import pickle # @Reimport
+    # on python 3 -- do NOT import _pickle directly. it will be used if  it exists, and _pickle lacks HIGHEST_PROTOCOL constant.
+
+
 #------------------------------------------------------------------------------
 # version string and tuple must be the same
 
@@ -534,7 +544,7 @@ class Music21Object(object):
             
         return new
 
-    def __deepcopy__(self, memo=None):
+    def old__deepcopy__(self, memo=None):
         '''
         Helper method to copy.py's deepcopy function.  Call it from there.
 
@@ -580,6 +590,23 @@ class Music21Object(object):
         #environLocal.printDebug([self, 'end deepcopy', 'self._activeSite', self._activeSite])
         return new
 
+
+    def __deepcopy__(self, memo=None):
+        state = self.__getstate__()
+        saveSites = state['sites']
+        if state['_duration'] is not None:
+            state['_duration']._client = None
+        state['sites'] = None
+        newState = pickle.loads(pickle.dumps(state, protocol=pickle.HIGHEST_PROTOCOL))
+        newState['sites'] = copy.deepcopy(saveSites) # shallow copy is okay? but does not copy into weakrefs in any case
+
+        new = self.__class__.__new__(self.__class__)
+        new.__dict__ = newState
+        if new._duration is not None:
+            new._duration.client = new
+        new.purgeOrphans()
+        return new
+        
     
     def __getstate__(self):
         state = self.__dict__.copy()
