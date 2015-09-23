@@ -387,7 +387,7 @@ class Music21Object(object):
         # a duration object is not created until the .duration property is
         # accessed with _getDuration(); this is a performance optimization
         if "duration" in keywords:
-            self._duration = keywords["duration"]
+            self.duration = keywords["duration"]
         if "groups" in keywords and keywords["groups"] is not None:
             self.groups = keywords["groups"]
         else:
@@ -399,6 +399,7 @@ class Music21Object(object):
 
         if "activeSite" in keywords:
             self.activeSite = keywords["activeSite"]
+
 
     def mergeAttributes(self, other):
         '''
@@ -459,9 +460,13 @@ class Music21Object(object):
                           and len(d.components[0]._tuplets) == 0))): ## 99% of notes...
                         newValue = duration.Duration(d._qtrLength)
                     else:
-                        newValue = copy.deepcopy(self._duration, memo=memo)                        
+                        clientStore = self._duration._client
+                        self._duration._client = None
+                        newValue = copy.deepcopy(self._duration, memo=memo)
+                        self._duration._client = clientStore                      
                 except AttributeError:
                     newValue = copy.deepcopy(self._duration, memo=memo)
+                newValue.client = new
                 setattr(new, '_duration', newValue)
                 
         if '_derivation' in ignoreAttributes:
@@ -2043,12 +2048,17 @@ class Music21Object(object):
         '''
         Set the duration as a quarterNote length
         '''
-        if hasattr(durationObj, "quarterLength"):
-            # we cannot directly test to see isInstance(duration.DurationCommon) because of
-            # circular imports; so we instead just take any object with a quarterLength as a
-            # duration
+        
+        replacingDuration = False if self._duration is None else True
+            
+        try:
+            ql = durationObj.quarterLength
             self._duration = durationObj
-        else:
+            durationObj.client = self
+            if replacingDuration:
+                self.durationChanged(ql)
+                
+        except AttributeError:
             # need to permit Duration object assignment here
             raise Exception('this must be a Duration object, not %s' % durationObj)
 
@@ -2056,6 +2066,16 @@ class Music21Object(object):
         doc = '''
         Get and set the duration of this object as a Duration object.
         ''')
+
+    def durationChanged(self, newQuarterLength):
+        '''
+        trigger called whenever the duration has changed.
+        
+        subclass this to do very interesting things.
+        '''
+        for s in self.sites.get():
+            if hasattr(s, 'elementsChanged'):
+                s.elementsChanged(updateIsFlat=False, keepIndex=True)
 
     def _getIsGrace(self):
         return self.duration.isGrace

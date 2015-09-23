@@ -1019,7 +1019,15 @@ class JSONFreezeThawBase(object):
             '__AUTO_GATHER__',
             ],
         'music21.duration.Duration': [
-            '__AUTO_GATHER__',
+            '_linked',
+            '_components',
+            '_qtrLength',
+            '_tuplets',
+            '_componentsNeedUpdating',
+            '_quarterLengthNeedsUpdating',
+            '_typeNeedsUpdating',
+            '_unlinkedType',
+            '_dotGroups',
             ],
         'music21.editorial.NoteEditorial': [
             'color', 'misc', 'comment',
