@@ -19,7 +19,7 @@ any changes here for efficiency reasons while being considered
 backwards compatible so long as the public methods that call this
 remain stable.
 
-All attributes here begin with `.core`.
+All attributes here will eventually begin with `.core`.
 '''
 import unittest
 

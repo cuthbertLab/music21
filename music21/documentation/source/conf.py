@@ -28,7 +28,7 @@ import music21
 extensions = [
     'sphinx.ext.autodoc',
     #'sphinx.ext.viewcode',
-    'music21.documentation.library.extensions',
+    'music21.documentation.extensions',
     ]
 
 # Add any paths that contain templates here, relative to this directory.

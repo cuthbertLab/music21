@@ -64,7 +64,7 @@ class ModuleIterator(Iterator):
     '''
     Iterates over music21's package system, yielding module objects:
 
-    >>> iterator = documentation.ModuleIterator(verbose=False)
+    >>> iterator = documentation.iterators.ModuleIterator(verbose=False)
     >>> modules = [x for x in iterator]
     >>> for module in sorted(modules, key=lambda x: x.__name__)[:8]:
     ...     module.__name__
@@ -160,7 +160,7 @@ class CodebaseIterator(Iterator):
 
     Enums have a different repr: <enum 'MotionType'> not <class 'enum'>
     
-    >>> cbi = documentation.CodebaseIterator(verbose=False)
+    >>> cbi = documentation.iterators.CodebaseIterator(verbose=False)
     >>> firstTen = list(cbi)[:10]
     >>> for x in firstTen:
     ...     print(x)
@@ -196,7 +196,7 @@ class ClassIterator(Iterator):
     '''
     Iterates over music21's package system, yielding all classes discovered:
 
-    >>> citerator = documentation.ClassIterator(verbose=False)
+    >>> citerator = documentation.iterators.ClassIterator(verbose=False)
     >>> for x in citerator:
     ...     pass
     >>> allClasses = [x for x in citerator]
@@ -230,7 +230,7 @@ class FunctionIterator(Iterator):
     Iterates over music21's package system, yielding all functions discovered:
 
     >>> from music21 import documentation
-    >>> iterator = documentation.FunctionIterator(verbose=False)
+    >>> iterator = documentation.iterators.FunctionIterator(verbose=False)
     >>> functions = [x for x in iterator]
     >>> for function in sorted(functions,
     ...     key=lambda x: (x.__module__, x.__name__))[:10]:

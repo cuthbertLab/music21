@@ -77,7 +77,7 @@ _OffsetMap = collections.namedtuple('OffsetMap', ['element','offset', 'endTime',
 #------------------------------------------------------------------------------
 
 
-class Stream(base.Music21Object, core.StreamCoreMixin):
+class Stream(core.StreamCoreMixin, base.Music21Object):
     '''
     This is the fundamental container for Music21Objects;
     objects may be ordered and/or placed in time based on
@@ -11492,7 +11492,7 @@ class Score(Stream):
         >>> s = corpus.parse('bach/bwv66.6')
         >>> partStream = s.parts
         >>> partStream.classes
-        ['Score', 'Stream', 'Music21Object', 'StreamCoreMixin', 'object']
+        ['Score', 'Stream', 'StreamCoreMixin', 'Music21Object', 'object']
         >>> len(partStream)
         4
 

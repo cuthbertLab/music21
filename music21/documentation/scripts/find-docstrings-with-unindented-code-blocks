@@ -2,7 +2,7 @@
 
 import inspect
 import types
-from music21.documentation import CodebaseIterator
+from music21.documentation.iterators import CodebaseIterator
 
 
 def hasUnindentedCodeBlocks(docstring):
