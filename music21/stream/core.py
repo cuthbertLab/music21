@@ -188,11 +188,12 @@ class StreamCoreMixin(object):
         # resetting the cache removes lowest and highest time storage
         # a slight performance optimization: not creating unless needed
         if len(self._cache) > 0:
+            indexCache = None
             if keepIndex and 'index' in self._cache:
                 indexCache = self._cache['index']
             # alway clear cache when elements have changed
             self._cache = {}
-            if keepIndex:
+            if keepIndex and indexCache is not None:
                 self._cache['index'] = indexCache
 
 
