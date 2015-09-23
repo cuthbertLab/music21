@@ -408,8 +408,6 @@ class Microtone(SlottedObject):
         '_harmonicShift',
         )
 
-    _jsonFreezer = True
-
     ### INITIALIZER ###
 
     def __init__(self, centsOrString=0):

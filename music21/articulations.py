@@ -203,7 +203,8 @@ class Articulation(base.Music21Object):
         self._volumeShift = value
 
     volumeShift = property(_getVolumeShift, _setVolumeShift, doc='''
-        Get or set the volumeShift of this Articulation. This value, between -1 and 1, that is used to shift the final Volume of the object it is attached to.
+        Get or set the volumeShift of this Articulation. This value, between -1 and 1, 
+        that is used to shift the final Volume of the object it is attached to.
 
         
         >>> at1 = articulations.StrongAccent()

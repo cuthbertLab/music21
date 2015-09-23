@@ -9,12 +9,12 @@
 # Copyright:    Copyright © 2009-2010 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
-'''Simple storage for data defaults used throughout music21.
+'''
+Simple storage for data defaults used throughout music21.
 '''
 
 
-import unittest, doctest
+import unittest
 
 # note: this module should not import any higher level modules
 
@@ -122,11 +122,8 @@ class Test(unittest.TestCase):
 
 #-----------------------------------------------------------------||||||||||||--
 if __name__ == "__main__":
-    s1 = doctest.DocTestSuite(__name__)
-    s2 = unittest.defaultTestLoader.loadTestsFromTestCase(Test)
-    s1.addTests(s2)
-    runner = unittest.TextTestRunner()
-    runner.run(s1)  
+    import music21
+    music21.mainTest(Test)
 
 #------------------------------------------------------------------------------
 # eof

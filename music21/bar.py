@@ -183,7 +183,8 @@ class Repeat(RepeatMark, Barline):
     >>> rep
     <music21.bar.Repeat direction=end times=3>
 
-    To apply a repeat barline assign it to either the `.leftBarline` or `.rightBarline` attribute
+    To apply a repeat barline assign it to either the `.leftBarline` or 
+    `.rightBarline` attribute
     of a measure.
     
     >>> m = stream.Measure()
@@ -288,13 +289,21 @@ class Repeat(RepeatMark, Barline):
         return self._times
 
     times = property(_getTimes, _setTimes, 
-        doc = '''Get or set the times property of this barline. This defines how many times the repeat happens. A standard repeat repeats 2 times; values equal to or greater than 0 are permitted. A repeat of 0 skips the repeated passage. 
+        doc = '''
+        Get or set the times property of this barline. This 
+        defines how many times the repeat happens. A standard repeat 
+        repeats 2 times; values equal to or greater than 0 are permitted. 
+        A repeat of 0 skips the repeated passage. 
         
         >>> lb = bar.Repeat(direction='start')
         >>> rb = bar.Repeat(direction='end')
+        
+        Only end expressions can have times:
+        
         >>> lb.times = 3
         Traceback (most recent call last):
         BarException: cannot set repeat times on a start Repeat
+        
         >>> rb.times = 3
         >>> rb.times = -3
         Traceback (most recent call last):
@@ -303,7 +312,18 @@ class Repeat(RepeatMark, Barline):
 
 
     def getTextExpression(self, prefix='', postfix='x'):
-        '''Return a configured :class:`~music21.expressions.TextExpressions` object describing the repeat times. Append this to the stream for annotation of repeat times. 
+        '''
+        Return a configured :class:`~music21.expressions.TextExpressions` 
+        object describing the repeat times. Append this to the stream 
+        for annotation of repeat times. 
+        
+        >>> rb = bar.Repeat(direction='end')
+        >>> rb.times = 3
+        >>> rb.getTextExpression()
+        <music21.expressions.TextExpression "3x">
+        
+        >>> rb.getTextExpression(prefix='repeat', postfix=' times')
+        <music21.expressions.TextExpression "repeat 3 times">        
         '''
         value = '%s%s%s' % (prefix, self._times, postfix)
         return expressions.TextExpression(value)
