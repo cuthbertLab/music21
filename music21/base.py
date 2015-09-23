@@ -94,20 +94,11 @@ environLocal = environment.Environment(_MOD)
 # check external dependencies and display
 _missingImport = []
 import imp
-try:
-    imp.find_module('matplotlib')
-except ImportError:
-    _missingImport.append('matplotlib')
-
-try:
-    imp.find_module('numpy')
-except ImportError:
-    _missingImport.append('numpy')
-
-try:
-    imp.find_module('scipy')
-except ImportError:
-    _missingImport.append('scipy')
+for modName in ('matplotlib', 'numpy', 'scipy'):    
+    try:
+        imp.find_module(modName)
+    except ImportError:
+        _missingImport.append(modName)
 
 # used for better PNG processing in lily -- not very important
 #try:
@@ -759,67 +750,7 @@ class Music21Object(object):
         return self._derivation
 
     derivation = property(_getDerivation)
-    #--------------------------------------------------------------------------
-    # look at this object for an attribute; if not here
-    # look up to activeSite
 
-    def findAttributeInHierarchy(self, attrName):
-        '''
-        If this element is contained within a Stream (or other Music21 element),
-        findAttributeInHierarchy() searches the attributes of the activeSite for
-        this attribute and returns its value.
-
-        If the activeSite does not have this attribute then
-        we search its activeSite and up through the hierarchy until we find a value for
-        this attribute.  Or it Returns None if there is no match.
-
-
-        >>> m = stream.Measure()
-        >>> m.number = 12
-        >>> n = note.Note()
-        >>> m.append(n)
-        >>> n.activeSite is m
-        True
-        >>> n.findAttributeInHierarchy('number')
-        12
-        >>> print(n.findAttributeInHierarchy('elephant'))
-        None
-
-        Recursive searches also work.  Here, the Score object is the 
-        only one with a 'parts' attribute.
-
-        >>> p1 = stream.Part()
-        >>> p1.insert(0, m)
-        >>> p2 = stream.Part()
-        >>> s = stream.Score()
-        >>> s.insert(0, p1)
-        >>> s.insert(0, p2)
-        >>> n.activeSite.activeSite is p1
-        True
-        >>> n.activeSite.activeSite.activeSite is s
-        True
-
-        >>> parts = n.findAttributeInHierarchy('parts')
-        >>> (parts[0] is p1, parts[1] is p2)
-        (True, True)
-
-        OMIT_FROM_DOCS
-        this was formerly called SeachParent, then searchActiveSiteByAttr, 
-        but we might do other types
-        of searches
-        '''
-        found = None
-        if self.activeSite is not None:
-            #print "got activeSite for %r, %r" % (self, self.activeSite)
-            try:
-                found = getattr(self.activeSite, attrName)
-            except AttributeError:
-                # not sure of passing here is the best action
-                environLocal.printDebug(['findAttributeInHierarchy call raised ' + 
-                                         'attribute error for attribute:', attrName])
-            if found is None:
-                found = self.activeSite.findAttributeInHierarchy(attrName)
-        return found
 
     def getOffsetBySite(self, site, returnType='rational', stringReturns=False):
         '''
@@ -881,8 +812,6 @@ class Music21Object(object):
         
         >>> n3.getOffsetBySite(s3, stringReturns=True)
         0.0
-        
-
         '''
         try:
             if site is not None:
@@ -938,6 +867,13 @@ class Music21Object(object):
         >>> a.setOffsetBySite(aSite, 30)
         >>> a.getOffsetBySite(aSite)
         30.0
+        
+        And if it isn't there?
+        
+        >>> b = note.Note()
+        >>> b.setOffsetBySite(aSite, 40)
+        >>> b.offset
+        0.0
 
         '''
         if site is not None:

@@ -1366,6 +1366,11 @@ class Stream(base.Music21Object):
         return storeSorted
 
     def setElementOffset(self, element, offset):
+        '''
+        Sets the Offset for an element, very quickly.
+        
+        Too quickly.  TODO: check if the offset is actually in the stream!
+        '''
         try:
             offset = opFrac(offset)
         except TypeError:
