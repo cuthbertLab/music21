@@ -42,6 +42,26 @@ class Derivation(SlottedObject):
     '''
     A Derivation object keeps track of which Streams (or perhaps other Music21Objects)
     a Stream has come from and how.
+    
+    Derivation is automatically updated by many methods:
+    
+    >>> import copy
+    >>> sOrig = stream.Stream(id='orig')
+    >>> sNew = copy.deepcopy(sOrig)
+    >>> sNew.id = 'copy'
+    >>> sNew.derivation
+    <Derivation of <music21.stream.Stream copy> 
+        from <music21.stream.Stream orig> via "__deepcopy__">
+
+    >>> sNew.derivation.client
+    <music21.stream.Stream copy>
+    >>> sNew.derivation.client is sNew
+    True
+    >>> sNew.derivation.origin
+    <music21.stream.Stream orig>
+    >>> sNew.derivation.method
+    '__deepcopy__'
+    
 
     >>> s1 = stream.Stream()
     >>> s1.id = "DerivedStream"
@@ -75,14 +95,16 @@ class Derivation(SlottedObject):
     >>> del(s2)
     >>> unused = gc.collect()  # ensure Garbage collection is run
     >>> d1
-    <Derivation of <music21.stream.Stream DerivedStream> from <music21.stream.Stream OriginalStream> via "measure">
+    <Derivation of <music21.stream.Stream DerivedStream> 
+        from <music21.stream.Stream OriginalStream> via "measure">
 
-    But deleting the client stream changes the Derivation, since client is held by weak ref:
+    But deleting the client stream changes the Derivation, since client is held by weak ref,
+    and will also delete the origin (so long as client was ever set)
 
     >>> del(s1)
     >>> unused = gc.collect()  # ensure Garbage collection is run
     >>> d1
-    <Derivation of None from <music21.stream.Stream OriginalStream> via "measure">
+    <Derivation of None from None via "measure">
     '''
 
     ### CLASS VARIABLES ###
@@ -102,7 +124,7 @@ class Derivation(SlottedObject):
         self._client = None
         self._clientId = None  # store id to optimize w/o unwrapping
         self._method = None
-        # origin should be stored as a weak ref -- the place where it came from.
+        # origin should be stored as a weak ref -- the place where the client was derived from.
         self._origin = None
         self._originId = None  # store id to optimize w/o unwrapping
         # set client; can handle None
@@ -146,7 +168,13 @@ class Derivation(SlottedObject):
 
     @property
     def client(self):
-        return common.unwrapWeakref(self._client)
+        c = common.unwrapWeakref(self._client)
+        if c is None and self._clientId is not None:
+            self._clientId = None
+            self._client = None
+            self._origin = None
+            self._originId = None
+        return c
 
     @client.setter
     def client(self, client):
@@ -160,7 +188,7 @@ class Derivation(SlottedObject):
 
     def chain(self):
         '''
-        Iterator.
+        Iterator/Generator
         
         Returns Streams that this Derivation's client Stream was derived
         from. This provides a way to obtain all Streams that the client passed
@@ -184,12 +212,10 @@ class Derivation(SlottedObject):
         >>> list(s3.derivation.chain()) == [s2, s1]
         True
         '''
-        result = []
         origin = self.origin
         while origin is not None:
-            result.append(origin)
+            yield origin
             origin = origin.derivation.origin
-        return result
 
     @property
     def method(self):
@@ -264,7 +290,7 @@ class Derivation(SlottedObject):
         >>> s3.derivation.rootDerivation is s1
         True
         '''
-        derivationChain = self.chain()
+        derivationChain = list(self.chain())
         if len(derivationChain):
             return derivationChain[-1]
         else:

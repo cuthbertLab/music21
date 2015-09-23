@@ -116,9 +116,9 @@ def midiToDuration(ticks, ticksPerQuarter=None, inputM21DurationObject=None):
     >>> d2.type
     'complex'
     >>> d2.components
-    [DurationTuple(type='quarter', dots=0, quarterLength=1.0), 
+    (DurationTuple(type='quarter', dots=0, quarterLength=1.0), 
      DurationTuple(type='32nd', dots=0, quarterLength=0.125), 
-     DurationTuple(type='128th', dots=1, quarterLength=0.046875)]
+     DurationTuple(type='128th', dots=1, quarterLength=0.046875))
     >>> d2.components[2].type
     '128th'
     >>> d2.components[2].dots
