@@ -346,9 +346,8 @@ class GeneralNote(base.Music21Object):
                     tempDuration.quarterLength = 1.0                
         else:
             tempDuration = keywords['duration']
-        base.Music21Object.__init__(self, duration=tempDuration)
         # this sets the stored duration defined in Music21Object
-        #self._duration = tempDuration
+        base.Music21Object.__init__(self, duration=tempDuration)
 
         self.lyrics = [] # a list of lyric objects
         self.expressions = []

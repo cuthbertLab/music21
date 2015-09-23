@@ -474,7 +474,9 @@ class Stream(base.Music21Object):
         if len(self._cache) > 0:
             if keepIndex and 'index' in self._cache:
                 indexCache = self._cache['index']
-            # alway clear cache when elements have changed
+            else:
+                indexCache = None
+            # always clear cache when elements have changed
             self._cache = {}
             if keepIndex:
                 self._cache['index'] = indexCache
@@ -6880,15 +6882,15 @@ class Stream(base.Music21Object):
         47.0
         '''
 #         environLocal.printDebug(['_getHighestTime', 'isSorted', self.isSorted, self])
-        # remove cache -- durations might change...
         if 'HighestTime' in self._cache and self._cache["HighestTime"] is not None:
-            pass  # return cache unaltered
+            self._cache["HighestTime"]  # return cache unaltered
+            # assumes that durations are telling us when their offsets change
         elif len(self._elements) == 0:
         #if len(self._elements) == 0:
             self._cache["HighestTime"] = 0.0
             return 0.0
         else:
-            highestTimeSoFar = Fraction(0, 1)
+            highestTimeSoFar = 0.0
             # TODO: optimize for a faster way of doing this.
             # but cannot simply look at the last element because what if the penultimate element, with a
             # lower offset has a longer duration than the last?
@@ -6903,7 +6905,7 @@ class Stream(base.Music21Object):
                     raise
                 if candidateOffset > highestTimeSoFar:
                     highestTimeSoFar = candidateOffset
-            self._cache["HighestTime"] = float(highestTimeSoFar)
+            self._cache["HighestTime"] = opFrac(highestTimeSoFar)
         return self._cache["HighestTime"]
 
     highestTime = property(_getHighestTime, doc='''

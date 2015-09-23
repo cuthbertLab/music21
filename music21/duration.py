@@ -1361,6 +1361,8 @@ class Duration(SlottedObject):
         '_typeNeedsUpdating',
         '_unlinkedType',
         '_dotGroups',
+        
+        '_client'
         )
 
     ### INITIALIZER ###
@@ -1369,6 +1371,9 @@ class Duration(SlottedObject):
         '''
         First positional argument is assumed to be type string or a quarterLength.
         '''
+        # store a reference to the object that has this duration object as a property
+        self._client = None
+
         self._componentsNeedUpdating = False
         self._quarterLengthNeedsUpdating = False
         self._typeNeedsUpdating = False
@@ -1411,6 +1416,9 @@ class Duration(SlottedObject):
         # permit as keyword so can be passed from notes
         elif 'quarterLength' in keywords:
             self.quarterLength = keywords['quarterLength']
+            
+        if 'client' in keywords:
+            self.client = keywords['client']
 
     ### SPECIAL METHODS ###
 
@@ -1468,6 +1476,29 @@ class Duration(SlottedObject):
             return '<{0}.{1} unlinked type:{2} quarterLength:{3}>'.format(
                         self.__module__, self.__class__.__name__, self.type, self.quarterLength)
 
+    ## unwrap weakref for pickling
+
+    def __getstate__(self):
+        self._client = common.unwrapWeakref(self._client)
+        return SlottedObject.__getstate__(self)
+
+    def __setstate__(self, state):
+        SlottedObject.__setstate__(self, state)
+        self._client = common.wrapWeakref(self._client)
+
+    
+    
+    def _getClient(self):
+        return common.unwrapWeakref(self._client)
+
+    def _setClient(self, newClient):
+        self._client = common.wrapWeakref(newClient)
+
+    client = property(_getClient, _setClient, doc='''
+        A duration's "client" is the object that holds this
+        duration as a property.  It is informed whenever the duration changes.
+    ''')
+
     ### PRIVATE METHODS ###
 
     def _updateComponents(self):
@@ -1479,7 +1510,7 @@ class Duration(SlottedObject):
         self._quarterLengthNeedsUpdating = False
         if self.linked is True:
             try:
-                qlc = quarterConversion(self.quarterLength)
+                qlc = quarterConversion(self._qtrLength)
                 self.components = list(qlc.components)
                 if qlc.tuplet is not None:
                     self.tuplets = (qlc.tuplet,)
@@ -1531,12 +1562,18 @@ class Duration(SlottedObject):
         else: # its a number that may produce more than one component
             for c in Duration(dur).components:
                 self.components.append(c)
+                
         if self.linked:
             self._quarterLengthNeedsUpdating = True
+
+        self.informClient()
+
 
     def appendTuplet(self, newTuplet):
         newTuplet.frozen = True
         self.tuplets = self.tuplets + (newTuplet,)
+        self.informClient()
+
 
     def augmentOrDiminish(self, amountToScale, retainComponents=False):
         '''
@@ -1621,6 +1658,7 @@ class Duration(SlottedObject):
         '''
         self.components = []
         self._quarterLengthNeedsUpdating = True
+        self.informClient()
 
     def componentIndexAtQtrPosition(self, quarterPosition):
         '''returns the index number of the duration component sounding at
@@ -1804,6 +1842,8 @@ class Duration(SlottedObject):
         self.components = []
         for x in quarterLengthList:
             self.addDurationTuple(Duration(x))
+        self.informClient()
+            
 
     def getGraceDuration(self, appogiatura=False):
         '''
@@ -1844,9 +1884,29 @@ class Duration(SlottedObject):
             newComponents.append(DurationTuple(c.type, c.dots, 0.0))
         gd.components = newComponents # set new components
         gd.linked = False
-        gd.quarterLength = 0.0
+        gd.quarterLength = 0.0        
         return gd
 
+
+    def informClient(self):
+        '''
+        call durationChanged(quarterLength) on any call that changes
+        the quarterLength
+        
+        returns False if there was no need to inform or if client
+        was not set.  Otherwise returns True
+        '''
+        if self._quarterLengthNeedsUpdating is True:
+            old_qtrLength = self._qtrLength
+            self.updateQuarterLength()
+            if self._qtrLength == old_qtrLength:
+                return False
+        cl = self.client
+        if cl is None:
+            return False
+        cl.durationChanged(self._qtrLength)
+        return True
+            
 
     def sliceComponentAtPosition(self, quarterPosition):
         '''
@@ -1992,7 +2052,7 @@ class Duration(SlottedObject):
     def updateQuarterLength(self):
         '''
         Look to components and determine quarter length.
-        '''
+        '''        
         if self.linked is True:
             self._qtrLength = opFrac(self.quarterLengthNoTuplets * self.aggregateTupletMultiplier())
             if self._dotGroups != (0,):
@@ -2001,6 +2061,8 @@ class Duration(SlottedObject):
                         self._qtrLength *= common.dotMultiplier(dots)
 
         self._quarterLengthNeedsUpdating = False
+
+
 
     ### PUBLIC PROPERTIES ###
 
@@ -2100,6 +2162,7 @@ class Duration(SlottedObject):
         if len(self._components) == 1:
             self._components[0] = durationTupleFromTypeDots(self.components[0].type, value)
             self._quarterLengthNeedsUpdating = True
+            self.informClient()
         elif len(self._components) > 1:
             raise DurationException("setting type on Complex note: Myke and Chris need to decide what that means")
         else:  # there must be 1 or more components
@@ -2293,6 +2356,8 @@ class Duration(SlottedObject):
             self._qtrLength = value
             self._componentsNeedUpdating = True
             self._quarterLengthNeedsUpdating = False
+            
+            self.informClient()
 
     quarterLength      = property(_getQuarterLengthRational, _setQuarterLength)
     quarterLengthFloat = property(_getQuarterLengthFloat, _setQuarterLength,
@@ -2429,6 +2494,8 @@ class Duration(SlottedObject):
             nt = durationTupleFromTypeDots(value, self.dots)
             self.components = [nt]
             self._quarterLengthNeedsUpdating = True
+            self.informClient()
+
         else:
             self._unlinkedType = value
 
