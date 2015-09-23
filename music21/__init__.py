@@ -30,7 +30,8 @@ the PMusic (Perl) library, developed by Cuthbert prior to arriving at MIT.
 
 music21 outputs a subset of XML data defined by the  MusicXML 2.0 
 standard, Copyright © Recordare LLC;  License available at
-http://www.recordare.com/dtds/license.html, now transferred to MakeMusic
+http://www.recordare.com/dtds/license.html, transfered to MakeMusic
+now transferred to W3C
 
 music21 incorporates Microsoft Excel reading via the included 
 xlrd library:
@@ -145,14 +146,11 @@ from music21.base import SitesException
 from music21.base import Music21ObjectException
 from music21.base import ElementException
 from music21.base import Groups
-from music21.base import SiteRef
-from music21.base import Sites
 from music21.base import Music21Object
 from music21.base import ElementWrapper
-from music21.base import mainTest
 
-# todo maybe stop this one?
-from music21.base import * # pylint: disable=wildcard-import
+from music21.test.testRunner import mainTest
+
 #del(types)
 #del(sys)
 #del(imp)

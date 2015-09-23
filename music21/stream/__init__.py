@@ -924,7 +924,7 @@ class Stream(base.Music21Object):
     def remove(self, targetOrList, firstMatchOnly=True, shiftOffsets = False, recurse=False): 
         '''
         Remove an object from this Stream. Additionally, this Stream is
-        removed from the object's sites in :class:`~music21.base.Sites`.
+        removed from the object's sites in :class:`~music21.sites.Sites`.
 
         By default, only the first match is removed. This can be adjusted with the `firstMatchOnly` parameters.
         If a list of objects is passed, they will all be removed. If shiftOffsets is True, then offsets will be
@@ -1231,7 +1231,10 @@ class Stream(base.Music21Object):
         if '_elements' in ignoreAttributes:
             # must manually add elements to new Stream
             for e in self._elements:
-                #environLocal.printDebug(['deepcopy()', e, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new), 'old.hasElement(e)', old.hasElement(e), 'e.activeSite', e.activeSite, 'e.getSites()', e.getSites(), 'e.getSiteIds()', e.getSiteIds()], format='block')
+                #environLocal.printDebug(['deepcopy()', e, 'old', old, 'id(old)', id(old), 
+                # 'new', new, 'id(new)', id(new), 'old.hasElement(e)', old.hasElement(e), 
+                # 'e.activeSite', e.activeSite, 'e.getSites()', e.getSites(), 'e.getSiteIds()', 
+                # e.getSiteIds()], format='block')
                 # this will work for all with __deepcopy___
                 # get the old offset from the activeSite Stream
                 # user here to provide new offset
@@ -1306,7 +1309,7 @@ class Stream(base.Music21Object):
                     raise StreamException('the object (%s, id()=%s) is already found in this Stream (%s, id()=%s)' % (element, id(element), self, id(self)))
         # if we do not purge locations here, we may have ids() for
         # Stream that no longer exist stored in the locations entry
-        # note that dead locations are also purged from Sites during
+        # note that dead locations are also purged from .sites during
         # all get() calls.
         element.purgeLocations()
 
@@ -12431,7 +12434,7 @@ class SpannerStorage(Stream):
     of connected elements (things the Spanner spans).
 
     This subclass name can be used to search in an
-    object's Sites and find any and all
+    object's .sites and find any and all
     locations that are SpannerStorage objects.
 
     A `spannerParent` keyword argument must be
@@ -12462,7 +12465,7 @@ class VariantStorage(Stream):
     defines).
 
     This subclass name can be used to search in an
-    object's Sites and find any and all
+    object's .sites and find any and all
     locations that are VariantStorage objects.
 
     A `variantParent` keyword argument must be provided

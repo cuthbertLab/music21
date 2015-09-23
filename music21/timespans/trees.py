@@ -835,7 +835,7 @@ class ElementTree(AVLTree):
         r'''
         Gets index of `timespan` in tree.
         
-        Since timespans do not have Sites, there is only one offset to deal with...
+        Since timespans do not have .sites, there is only one offset to deal with...
 
         >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
         >>> ts = [timespans.Timespan(x, y) for x, y in tsList]

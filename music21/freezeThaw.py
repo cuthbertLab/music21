@@ -216,7 +216,7 @@ class StreamFreezer(StreamFreezeThawBase):
     '''
     def __init__(self, streamObj=None, fastButUnsafe=False, topLevel = True, streamIds = None):
         StreamFreezeThawBase.__init__(self)
-        # must make a deepcopy, as we will be altering Sites
+        # must make a deepcopy, as we will be altering .sites
         self.stream = None
         # clear all sites only if the top level.
         self.topLevel = topLevel
@@ -1379,10 +1379,13 @@ class JSONFreezer(JSONFreezeThawBase):
 
         >>> jsf.canBeFrozen([7,8])
         False
+        
+        >>> jsf.canBeFrozen(pitch.Microtone())
+        True
         '''
         if possiblyFreezeable is None:
             return False
-        if isinstance(possiblyFreezeable, (base.Music21Object, pitch.Pitch)):
+        if isinstance(possiblyFreezeable, (base.Music21Object, pitch.Microtone)):
             return True
         if isinstance(possiblyFreezeable, (list, tuple, dict)):
             return False
@@ -1394,7 +1397,8 @@ class JSONFreezer(JSONFreezeThawBase):
         if hasattr(possiblyFreezeable, 'fullyQualifiedClasses'):
             fqClassList = possiblyFreezeable.fullyQualifiedClasses
         else: # same thing...
-            fqClassList = [x.__module__ + '.' + x.__name__ for x in possiblyFreezeable.__class__.mro()]
+            fqClassList = [x.__module__ + '.' + x.__name__ 
+                                for x in possiblyFreezeable.__class__.mro()]
 
         for fqName in fqClassList:
             if fqName in self.storedClassAttributes:

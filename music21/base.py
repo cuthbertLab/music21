@@ -36,7 +36,7 @@ under the module "base":
 >>> base.Music21Object
 <class 'music21.base.Music21Object'>
 '''
-from __future__ import print_function
+from __future__ import (print_function, division)
 
 import collections
 import copy
@@ -44,7 +44,7 @@ import sys
 import types
 import unittest
 import warnings
-#import uuid
+
 from music21.test.testRunner import mainTest
 from music21.ext import six
 
@@ -55,10 +55,18 @@ from music21._version import __version__, __version_info__
 VERSION = __version_info__
 VERSION_STR = __version__
 #------------------------------------------------------------------------------
-__all__ = ['Music21Exception', 'VERSION', 'VERSION_STR', 'SitesException', 
+__all__ = ['Music21Exception', 
+           'SitesException', 
            'Music21ObjectException',
-           'ElementException', 'Groups', 'SiteRef', 'Sites',
-           'Music21Object','ElementWrapper','mainTest']
+           'ElementException', 
+           
+           'Groups',            
+           'Music21Object',
+           'ElementWrapper',
+           
+           'VERSION', 
+           'VERSION_STR',            
+           ]
 ## N.B. for eclipse "all" import working, we need to list this 
 #       separately in "music21/__init__.py"
 ##      so make sure to update in both places
@@ -68,8 +76,6 @@ from music21 import exceptions21
 
 Music21Exception = exceptions21.Music21Exception
 
-from music21.sites import SiteRef # @UnusedImport
-from music21.sites import Sites
 from music21.sites import SitesException
 
 from music21 import sites
@@ -398,7 +404,7 @@ class Music21Object(object):
         if "sites" in keywords:
             self.sites = keywords["sites"]
         else:
-            self.sites = Sites()
+            self.sites = sites.Sites()
 
         if "activeSite" in keywords:
             self.activeSite = keywords["activeSite"]
