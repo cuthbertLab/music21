@@ -618,6 +618,7 @@ class ClassDocumenter(ObjectDocumenter):
         ...
         music21.base.Music21Object:
         - music21.base.Music21Object.contextSites      
+        - music21.base.Music21Object.durationChanged
         - music21.base.Music21Object.getAllContextsByClass
         - music21.base.Music21Object.getContextAttr
         - music21.base.Music21Object.getContextByClass
@@ -626,7 +627,6 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.base.Music21Object.hasSite
         - music21.base.Music21Object.isClassOrSubclass
         - music21.base.Music21Object.next
-        - music21.base.Music21Object.previous
         music21.stream.Stream:
         - music21.stream.Stream.activateVariants
         - music21.stream.Stream.addGroupForElements
