@@ -639,7 +639,7 @@ class GeneralNote(base.Music21Object):
         >>> n.duration.type
         'half'
         >>> n.duration.components
-        [DurationTuple(type='half', dots=0, quarterLength=2.0)]
+        (DurationTuple(type='half', dots=0, quarterLength=2.0),)
         
         >>> ng = n.getGrace()
         >>> ng.duration.quarterLength
@@ -651,7 +651,7 @@ class GeneralNote(base.Music21Object):
         >>> ng.duration.type
         'zero'
         >>> ng.duration.components
-        [DurationTuple(type='half', dots=0, quarterLength=0.0)]
+        (DurationTuple(type='half', dots=0, quarterLength=0.0),)
 
         Appogiaturas are still a work in progress...
 
@@ -1656,12 +1656,10 @@ class Test(unittest.TestCase):
     def testComplex(self):
         note1 = Note()
         note1.duration.clear()
-        d1 = duration.Duration()
-        d1.type = "whole"
-        d2 = duration.Duration()
-        d2.type = "quarter"
-        note1.duration.components.append(d1)
-        note1.duration.components.append(d2)
+        d1 = duration.DurationTuple('whole', 0, 4.0)
+        d2 = duration.DurationTuple('quarter', 0, 1.0)
+        note1.duration.addDurationTuple(d1)
+        note1.duration.addDurationTuple(d2)
         self.assertEqual(note1.duration.quarterLength, 5.0)
         self.assertEqual(note1.duration.componentIndexAtQtrPosition(2), 0)
         self.assertEqual(note1.duration.componentIndexAtQtrPosition(4), 1)

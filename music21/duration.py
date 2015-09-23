@@ -1337,8 +1337,8 @@ class Duration(SlottedObject):
     'complex'
 
     >>> d2.components
-    [DurationTuple(type='eighth', dots=0, quarterLength=0.5), 
-     DurationTuple(type='32nd', dots=0, quarterLength=0.125)]
+    (DurationTuple(type='eighth', dots=0, quarterLength=0.5), 
+     DurationTuple(type='32nd', dots=0, quarterLength=0.125))
 
     Example 3: A Duration configured by keywords.
 
@@ -1555,13 +1555,13 @@ class Duration(SlottedObject):
         'complex'
         '''
         if isinstance(dur, DurationTuple):
-            self.components.append(dur)
+            self._components.append(dur)
         elif isinstance(dur, Duration): # its a Duration object
             for c in dur.components:
-                self.components.append(c)
+                self._components.append(c)
         else: # its a number that may produce more than one component
             for c in Duration(dur).components:
-                self.components.append(c)
+                self._components.append(c)
                 
         if self.linked:
             self._quarterLengthNeedsUpdating = True
@@ -1609,20 +1609,23 @@ class Duration(SlottedObject):
         >>> len(bDur.components)
         2
         >>> bDur.components
-        [DurationTuple(type='half', dots=0, quarterLength=2.0), DurationTuple(type='32nd', dots=0, quarterLength=0.125)]
-\
+        (DurationTuple(type='half', dots=0, quarterLength=2.0), 
+         DurationTuple(type='32nd', dots=0, quarterLength=0.125))
+
         >>> cDur = bDur.augmentOrDiminish(2, retainComponents=True)
         >>> cDur.quarterLength
         4.25
         >>> cDur.tuplets
         ()
         >>> cDur.components
-        [DurationTuple(type='whole', dots=0, quarterLength=4.0), DurationTuple(type='16th', dots=0, quarterLength=0.25)]
+        (DurationTuple(type='whole', dots=0, quarterLength=4.0), 
+         DurationTuple(type='16th', dots=0, quarterLength=0.25))
 
 
         >>> dDur = bDur.augmentOrDiminish(2, retainComponents=False)
         >>> dDur.components
-        [DurationTuple(type='whole', dots=0, quarterLength=4.0), DurationTuple(type='16th', dots=0, quarterLength=0.25)]
+        (DurationTuple(type='whole', dots=0, quarterLength=4.0), 
+         DurationTuple(type='16th', dots=0, quarterLength=0.25))
         '''
         if not amountToScale > 0:
             raise DurationException('amountToScale must be greater than zero')
@@ -1650,13 +1653,20 @@ class Duration(SlottedObject):
         >>> a.quarterLength = 4
         >>> a.type
         'whole'
+        >>> a.components
+        (DurationTuple(type='whole', dots=0, quarterLength=4.0),)
+
         >>> a.clear()
-        >>> a.quarterLength
-        0.0
+
+        >>> a.components
+        ()
         >>> a.type
         'zero'
+        >>> a.quarterLength
+        0.0
         '''
-        self.components = []
+        self._components = []
+        self._componentsNeedUpdating = False
         self._quarterLengthNeedsUpdating = True
         self.informClient()
 
@@ -1853,7 +1863,8 @@ class Duration(SlottedObject):
         >>> d
         <music21.duration.Duration 1.25>
         >>> d.components
-        [DurationTuple(type='quarter', dots=0, quarterLength=1.0), DurationTuple(type='16th', dots=0, quarterLength=0.25)]
+        (DurationTuple(type='quarter', dots=0, quarterLength=1.0), 
+         DurationTuple(type='16th', dots=0, quarterLength=0.25))
 
         >>> gd = d.getGraceDuration()
         >>> gd
@@ -1861,7 +1872,8 @@ class Duration(SlottedObject):
         >>> gd.quarterLength
         0.0
         >>> gd.components
-        [DurationTuple(type='quarter', dots=0, quarterLength=0.0), DurationTuple(type='16th', dots=0, quarterLength=0.0)]
+        (DurationTuple(type='quarter', dots=0, quarterLength=0.0), 
+         DurationTuple(type='16th', dots=0, quarterLength=0.0))
 
         D is unchanged.
 
@@ -1920,7 +1932,6 @@ class Duration(SlottedObject):
         >>> a.addDurationTuple(duration.Duration('quarter'))
         >>> a.addDurationTuple(duration.Duration('quarter'))
         >>> a.addDurationTuple(duration.Duration('quarter'))
-
         >>> a.quarterLength
         3.0
         >>> a.sliceComponentAtPosition(.5)
@@ -1959,13 +1970,10 @@ class Duration(SlottedObject):
             raise DurationException(
             "no slice is possible at this quarter position")
         else:
-            d1 = Duration()
-            d1.quarterLength = slicePoint
+            d1 = durationTupleFromQuarterLength(slicePoint)
+            d2 = durationTupleFromQuarterLength(remainder)
 
-            d2 = Duration()
-            d2.quarterLength = remainder
-
-            self.components[sliceIndex: (sliceIndex + 1)] = [d1, d2]
+            self._components[sliceIndex: (sliceIndex + 1)] = [d1, d2]
             # lengths should be the same as it was before
             self.updateQuarterLength()
 
@@ -1997,8 +2005,8 @@ class Duration(SlottedObject):
         4.5
         >>> d2 = d1.splitDotGroups()
         >>> d2.components
-        [DurationTuple(type='half', dots=1, quarterLength=3.0), 
-         DurationTuple(type='quarter', dots=1, quarterLength=1.5)]
+        (DurationTuple(type='half', dots=1, quarterLength=3.0), 
+         DurationTuple(type='quarter', dots=1, quarterLength=1.5))
         
         >>> d2.quarterLength
         4.5
@@ -2011,8 +2019,8 @@ class Duration(SlottedObject):
         >>> n1.duration = d1
         >>> n1.duration = n1.duration.splitDotGroups()
         >>> n1.duration.components
-        [DurationTuple(type='half', dots=1, quarterLength=3.0), 
-         DurationTuple(type='quarter', dots=1, quarterLength=1.5)]
+        (DurationTuple(type='half', dots=1, quarterLength=3.0), 
+         DurationTuple(type='quarter', dots=1, quarterLength=1.5))
         
         >>> s1 = stream.Stream()
         >>> s1.append(meter.TimeSignature('9/8'))
@@ -2070,7 +2078,7 @@ class Duration(SlottedObject):
     def components(self):
         if self._componentsNeedUpdating:
             self._updateComponents()
-        return self._components
+        return tuple(self._components)
 
     @components.setter
     def components(self, value):
@@ -2079,7 +2087,9 @@ class Duration(SlottedObject):
         # new components will be derived from quarterLength
         if self._components is not value:
             self._componentsNeedUpdating = False
-            self._components = value
+            self.clear()
+            for v in value:
+                self.addDurationTuple(v)
             # this is True b/c components are not the same
             self._quarterLengthNeedsUpdating = True
             # must be cleared
@@ -2283,8 +2293,8 @@ class Duration(SlottedObject):
         2
 
         >>> aDur.components
-        [DurationTuple(type='quarter', dots=0, quarterLength=1.0), 
-         DurationTuple(type='16th', dots=1, quarterLength=0.375)]
+        (DurationTuple(type='quarter', dots=0, quarterLength=1.0), 
+         DurationTuple(type='16th', dots=1, quarterLength=0.375))
             
         >>> cDur = duration.Duration()
         >>> cDur.quarterLength = .25
@@ -3208,9 +3218,9 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(d.quarterLength), 'Fraction(1, 3)')
         self.assertEqual(d._components, [] )
         self.assertEqual(d._componentsNeedUpdating, True )
-        self.assertEqual(str(d.components), "[DurationTuple(type='eighth', dots=0, quarterLength=0.5)]")
+        self.assertEqual(str(d.components), 
+                         "(DurationTuple(type='eighth', dots=0, quarterLength=0.5),)")
         self.assertEqual(d._componentsNeedUpdating, False)
-        self.assertEqual(str(d._qtrLength), '1/3')
         self.assertTrue(d._quarterLengthNeedsUpdating)
         self.assertEqual(repr(d.quarterLength), 'Fraction(1, 3)')
         self.assertEqual(str(unitSpec(d)), "(Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')")
