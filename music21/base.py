@@ -460,9 +460,13 @@ class Music21Object(object):
                           and len(d.components[0]._tuplets) == 0))): ## 99% of notes...
                         newValue = duration.Duration(d._qtrLength)
                     else:
-                        newValue = copy.deepcopy(self._duration, memo=memo)                        
+                        clientStore = self._duration._client
+                        self._duration._client = None
+                        newValue = copy.deepcopy(self._duration, memo=memo)
+                        self._duration._client = clientStore                      
                 except AttributeError:
                     newValue = copy.deepcopy(self._duration, memo=memo)
+                newValue.client = new
                 setattr(new, '_duration', newValue)
                 
         if '_derivation' in ignoreAttributes:
