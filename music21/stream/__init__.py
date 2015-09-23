@@ -1118,8 +1118,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # user here to provide new offset
                 new._storeAtEndCore(copy.deepcopy(e, memo))                
 
+        # caching this is CRUCIAL! using new.spannerBundle ever time below added
+        # 40% to the test suite time!
+        newSpannerBundle = new.spannerBundle
         # only proceed if there are spanners, otherwise creating semiFlat
-        if len(new.spannerBundle) > 0:
+        if len(newSpannerBundle) > 0:
             # iterate over complete semi-flat (need containers); find
             # all new/old pairs
             for e in new.recurse(skipSelf=True):
@@ -1133,7 +1136,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     # the SpannerStorage Stream
                     origin = e.derivation.origin
                     if (origin is not None and e.derivation.method == '__deepcopy__'):
-                        new.spannerBundle.replaceSpannedElement(id(origin), e)
+                        newSpannerBundle.replaceSpannedElement(id(origin), e)
                     # need to remove the old SpannerStorage Stream from this element; 
                     # however, all we have here is the new Spanner and new elements
                     # this must be done here, not when originally copying
