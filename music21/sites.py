@@ -124,10 +124,11 @@ class SiteRef(common.SlottedObject):
             siteIdValue = self.siteWeakref
             try:
                 currentSite = GLOBAL_SITE_STATE_DICT[siteIdValue]
+                del GLOBAL_SITE_STATE_DICT[siteIdValue]
             except KeyError:
-                return
+                currentSite = None
+                self.isDead = True
             self.site = currentSite
-            del GLOBAL_SITE_STATE_DICT[siteIdValue]
 
 _NoneSiteRef = SiteRef()
 _NoneSiteRef.globalSiteIndex = -2 # -1 is used elsewhere...
