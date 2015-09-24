@@ -1154,6 +1154,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         Deepcopy the stream from copy.deepcopy()
         '''
+        # does not purgeOrphans -- q: is that a bug or by design?
         return self._deepcopySubclassable(memo)
 
 
