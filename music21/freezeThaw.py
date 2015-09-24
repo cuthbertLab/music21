@@ -92,15 +92,7 @@ from music21 import environment
 _MOD = "freezeThaw.py"
 environLocal = environment.Environment(_MOD)
 
-if six.PY2:
-    try:
-        import cPickle as pickleMod # much faster on Python 2
-    except ImportError:
-        import pickle as pickleMod # @UnusedImport
-else:
-    import pickle as pickleMod # @Reimport
-    # on python 3 -- do NOT import _pickle directly. it will be used if  it exists, and _pickle lacks HIGHEST_PROTOCOL constant.
-
+from music21.common import pickleMod
 #------------------------------------------------------------------------------
 
 
