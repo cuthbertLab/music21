@@ -37,6 +37,9 @@ class AnalysisException(Music21Exception):
 class TimespanException(Music21Exception):
     pass
 
-
 class InstrumentException(Music21Exception):
     pass
+
+class Music21CommonException(Music21Exception):
+    pass
+
