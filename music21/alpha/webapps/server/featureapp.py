@@ -180,7 +180,7 @@ def music21ModWSGIFeatureApplication(environ, start_response):
             """
         return html
     
-    if common.isListLike(formFields['features']):
+    if common.isIterable(formFields['features']):
         print(formFields['features'])
         for featureId in formFields['features']:
             featureIDList.append(str(featureId.value))

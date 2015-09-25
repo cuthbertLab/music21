@@ -105,15 +105,15 @@ class FunctionDocumenter(ObjectDocumenter):
     >>> function = common.opFrac
     >>> documenter = documentation.documenters.FunctionDocumenter(function)
     >>> documenter
-    <music21.documentation.documenters.FunctionDocumenter: music21.common.opFrac>
+    <music21.documentation.documenters.FunctionDocumenter: music21.common.numberFunc.opFrac>
 
     >>> documenter.rstCrossReferenceString
-    ':func:`~music21.common.opFrac`'
+    ':func:`~music21.common.numberFunc.opFrac`'
 
     >>> for line in documenter.rstAutodocDirectiveFormat:
     ...     line
     ...
-    '.. autofunction:: music21.common.opFrac'
+    '.. autofunction:: music21.common.numberFunc.opFrac'
     ''
 
     Call the documenter to generate its ReStructuredText format:
