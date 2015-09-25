@@ -310,7 +310,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
                 return False
 
         self.runNBConvert(ipythonNotebookFilePath)
-        with open(rstFilePath, 'r') as f:
+        with open(rstFilePath, 'r', encoding='utf8') as f:
             oldLines = f.read().splitlines()
         lines = self.cleanConvertedNotebook(oldLines, ipythonNotebookFilePath)
         with open(rstFilePath, 'w') as f:
