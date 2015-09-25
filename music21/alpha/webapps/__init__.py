@@ -713,8 +713,9 @@ class CommandProcessor(object):
                         continue
                 elif fmt == 'list':
                     # in this case dataStr should actually be an list object.
-                    if not common.isListLike(dataStr):
-                        self.recordError("list format must actually be a list structure "+str(dataDictElement))
+                    if not common.isIterable(dataStr):
+                        self.recordError("list format must actually be a list structure " + 
+                                         str(dataDictElement))
                         continue
                     data = []
                     for elementStr in dataStr:
@@ -1110,7 +1111,7 @@ class CommandProcessor(object):
         if common.isNum(inpVal):
             return inpVal
         
-        if common.isListLike(inpVal):
+        if common.isIterable(inpVal):
             return [self.parseInputToPrimitive(element) for element in inpVal]
         
         if not common.isStr(inpVal):

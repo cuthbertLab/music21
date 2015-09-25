@@ -193,7 +193,7 @@ def cacheMetadata(corpusNames=('local',), verbose=True):
     '''
     Rebuild the metadata cache.
     '''
-    if not common.isListLike(corpusNames):
+    if not common.isIterable(corpusNames):
         corpusNames = [corpusNames]
     for name in corpusNames:
         corpora.Corpus._metadataBundles[name] = None

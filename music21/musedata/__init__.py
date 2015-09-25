@@ -1522,7 +1522,7 @@ class MuseDataWork(object):
     def addFile(self, fp):
         '''Open and read this file path as 
         '''
-        if not common.isListLike(fp):
+        if not common.isIterable(fp):
             fpList = [fp]
         else:
             fpList = fp
@@ -1545,7 +1545,7 @@ class MuseDataWork(object):
         #environLocal.printDebug(['addString str', str])
 #         if str.strip() == '':
 #             raise MuseDataException('passed in empty string to add string')
-        if not common.isListLike(input_str):
+        if not common.isIterable(input_str):
             strList = [input_str]
         else:
             strList = input_str

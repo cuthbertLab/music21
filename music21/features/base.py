@@ -896,7 +896,7 @@ class DataSet(object):
         '''
         # features are instantiated here
         # however, they do not have a data assignment
-        if not common.isListLike(values):
+        if not common.isIterable(values):
             values = [values]
         # need to create instances
         for sub in values:
@@ -1164,7 +1164,7 @@ def extractorsById(idOrList, library=('jSymbolic', 'native')):
     from music21.features import jSymbolic
     from music21.features import native
 
-    if not common.isListLike(library):
+    if not common.isIterable(library):
         library = [library]
 
     featureExtractors = []
@@ -1174,7 +1174,7 @@ def extractorsById(idOrList, library=('jSymbolic', 'native')):
         elif l.lower() in ['native', 'all']:
             featureExtractors += native.featureExtractors
 
-    if not common.isListLike(idOrList):
+    if not common.isIterable(idOrList):
         idOrList = [idOrList]
 
     flatIds = []

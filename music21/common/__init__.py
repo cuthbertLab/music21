@@ -16,6 +16,9 @@ throughout music21.
 functions in common/ can import from music21.defaults, music21.exceptions21, and music21.ext
 and that is all (except in tests and doctests).
 
+For historical reasons all the (non-private) functions etc. of the common/
+folder are available by importing common. 
+
 split according to function -- September 2015
 '''
 
@@ -36,6 +39,7 @@ from music21 import defaults
 from music21 import exceptions21
 from music21.ext import six
 
+# pylint: disable=wildcard-import
 from music21.common.formats import *
 from music21.common.numberFunc import * #including opFrac
 #python3
@@ -52,14 +56,6 @@ if six.PY2:
 else:
     import pickle as pickleMod # @Reimport
     # on python 3 -- do NOT import _pickle directly. it will be used if  it exists, and _pickle lacks HIGHEST_PROTOCOL constant.
-
-
-
-
-
-
-WHITESPACE = re.compile(r'\s+')
-LINEFEED = re.compile('\n+')
 
 DEBUG_OFF = 0
 DEBUG_USER = 1
@@ -91,6 +87,8 @@ def getMissingImportStr(modNameList):
         return 'Certain music21 functions might need these optional packages: %s; if you run into errors, install it by following the instructions at http://mit.edu/music21/doc/installing/installAdditional.html' % ', '.join(modNameList)
 
 #-------------------------------------------------------------------------------
+WHITESPACE = re.compile(r'\s+')
+LINEFEED = re.compile('\n+')
 
 
 def basicallyEqual(a, b):
@@ -118,80 +116,12 @@ basicallyEquals = basicallyEqual
 
 
 
-def isNum(usrData):
-    '''check if usrData is a number (float, int, long, Decimal), return boolean
-    TODO: consider using numbers class (wasn't available until 2.6)
-
-    >>> common.isNum(3.0)
-    True
-    >>> common.isNum(3)
-    True
-    >>> common.isNum('three')
-    False
-    
-    True and False are NOT numbers:
-    
-    >>> common.isNum(True)
-    False
-    >>> common.isNum(False)
-    False
-    >>> common.isNum(None)
-    False
-    
-    :rtype: bool
-    '''
-    try:
-        # TODO: this may have unexpected consequences: find
-        dummy = usrData + 0
-        if usrData is not True and usrData is not False:
-            return True
-        else:
-            return False
-    except Exception: # pylint: disable=broad-except
-        return False
-
-#     if (isinstance(usrData, int) or
-#         isinstance(usrData, float) or
-#         isinstance(usrData, long) or
-#         isinstance(usrData, decimal.Decimal)):
-#         return True
-#     else:
-#         return False
-
-def contiguousList(inputListOrTuple):
-    '''
-    returns bool True or False if a list containing ints contains only contiguous (increasing) values
-
-    requires the list to be sorted first
-
-
-    >>> l = [3, 4, 5, 6]
-    >>> common.contiguousList(l)
-    True
-    >>> l.append(8)
-    >>> common.contiguousList(l)
-    False
-
-    Sorting matters
-
-    >>> l.append(7)
-    >>> common.contiguousList(l)
-    False
-    >>> common.contiguousList(sorted(l))
-    True
-    
-    :rtype: bool
-    '''
-    currentMaxVal = inputListOrTuple[0]
-    for i in range(1, len(inputListOrTuple)):
-        newVal = inputListOrTuple[i]
-        if newVal != currentMaxVal + 1:
-            return False
-        currentMaxVal += 1
-    return True
 
 def isStr(usrData):
-    """Check of usrData is some form of string, including unicode.
+    """
+    DEPRECATED: September 2015 -- use isinstance(usrData, six.string_types)
+    
+    Check of usrData is some form of string, including unicode.
 
     >>> common.isStr(3)
     False
@@ -202,25 +132,19 @@ def isStr(usrData):
     
     :rtype: bool
     """
-    #python3 compatibility
-    try:
-        if isinstance(usrData, basestring):
-    #     if (isinstance(usrData, str) or
-    #         isinstance(usrData, unicode)):
-            return True
-        else:
-            return False
-    except NameError:
-        if isinstance(usrData, str):
-            return True
-        else:
-            return False
+    return isinstance(usrData, six.string_types)
 
 
 def isListLike(usrData):
     """
-    Returns True if is a List or a Set or a Tuple
-
+    Returns True if is a List or Tuple 
+    
+    Formerly allowed for set here, but that does not allow for
+    subscripting (`set([1, 2, 3])[0]` is undefined).
+    
+    Differs from isinstance(collections.abc.Sequence()) in that
+    we do not want Streams included even if __contains__, __reversed__,
+    and count are added.
 
     >>> common.isListLike([])
     True
@@ -228,25 +152,19 @@ def isListLike(usrData):
     False
     >>> common.isListLike((None, None))
     True
-    >>> common.isListLike( set(['a','b','c','c']) )
-    True
+    >>> common.isListLike(set(['a','b','c','c']))
+    False
     >>> common.isListLike(stream.Stream())
     False
     
     :rtype: bool
     """
-    #TODO: add immutable sets
-    if (isinstance(usrData, list) or
-        isinstance(usrData, tuple) or
-        isinstance(usrData, set)):
-        return True
-    else:
-        return False
+    return isinstance(usrData, (list, tuple))
 
 def isIterable(usrData):
     """
-    Returns True if is the object can be iter'd over and is NOT a string
-
+    Returns True if is the object can be iter'd over 
+    and is NOT a string
 
     >>> common.isIterable([5, 10])
     True
@@ -259,8 +177,8 @@ def isIterable(usrData):
     
     :rtype: bool
     """
-    if hasattr(usrData, "__iter__"):
-        if six.PY3:
+    if hasattr(usrData, "__iter__"): 
+        if six.PY3: # no __iter__ on strings in py2
             if isinstance(usrData, str) or isinstance(usrData, bytes):
                 return False
         return True

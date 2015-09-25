@@ -4258,9 +4258,9 @@ def fromForteClass(notation):
             elif 'b' in chars.lower():
                 inv = -1
         else:
-            raise ChordException('cannot extract set class representation from string: %s' % notation)
+            raise ChordException('cannot extract set-class representation from string: %s' % notation)
     elif common.isListLike(notation):
-        if len(notation) <= 3: # assume its a set class representation
+        if len(notation) <= 3: # assume its a set-class representation
             if len(notation) > 0:
                 card = notation[0]
             if len(notation) > 1:
