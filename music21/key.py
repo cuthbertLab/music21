@@ -344,7 +344,8 @@ class KeySignature(base.Music21Object):
 
     >>> illegal = key.KeySignature('c#')
     Traceback (most recent call last):
-    KeySignatureException: Cannot get a KeySignature from this "number" of sharps: "c#"; did you mean to use a key.Key() object instead?
+    KeySignatureException: Cannot get a KeySignature from this "number" of sharps: "c#"; 
+        did you mean to use a key.Key() object instead?
     
     >>> legal = key.Key('c#')
     >>> legal.sharps
@@ -362,6 +363,9 @@ class KeySignature(base.Music21Object):
     
     def __init__(self, sharps=None, mode=None):
         base.Music21Object.__init__(self)
+        if mode is not None:
+            self._mode_is_deprecated()
+        
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
 
         try:
@@ -382,6 +386,10 @@ class KeySignature(base.Music21Object):
 
         # cache altered pitches
         self._alteredPitchesCached = []
+
+    @common.deprecated("Jan 2014", "Jan 2016", "\n\nMode is deprecated in a KeySignature object. Use Key instead.")
+    def _mode_is_deprecated(self):
+        pass
 
     def __hash__(self):
         hashTuple = (self._sharps, self._mode, tuple(self._alteredPitches))

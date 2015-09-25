@@ -85,7 +85,6 @@ __all__ = ['Music21Exception',
 from music21 import exceptions21
 
 Music21Exception = exceptions21.Music21Exception
-Music21DeprecationWarning = exceptions21.Music21DeprecationWarning
 
 from music21.sites import SitesException
 
@@ -1031,10 +1030,10 @@ class Music21Object(object):
         return post
 
 
-    @common.deprecated('Summer 2015', 'February 2016', 'use self.sites.remove() instead and set activeSite manually.')
+    @common.deprecated('Summer 2015', 'Jan 2016', 'use self.sites.remove() instead and set activeSite manually.')
     def removeLocationBySite(self, site):
         '''
-        DEPRECATED Feb 2016: use self.sites.remove() instead and set activeSite
+        DEPRECATED Jan 2016: use self.sites.remove() instead and set activeSite
         manually.
 
         Remove a location in the :class:`~music21.base.Sites` object.
@@ -1243,6 +1242,7 @@ class Music21Object(object):
                     return el
 
 
+    @common.deprecated("May 2014","soonest possible","not sure that it works at all...")
     def getAllContextsByClass(self, className, found=None, idFound=None,
                              memo=None):
         '''

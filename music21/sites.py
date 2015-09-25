@@ -831,6 +831,7 @@ class Sites(common.SlottedObject):
                 return True
         return False
 
+    @common.deprecated("May 2015","Jan 2016","Not needed.  All sites are sites. :-)")
     def isSite(self, obj):
         '''
         DEPRECATED: TO be removed by v.2.1 -- used only by a long deprecated

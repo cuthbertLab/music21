@@ -2357,6 +2357,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     groupFilterList).stream()
                     
 
+    @common.deprecated("September 2015", "February 2016", "use s.elementOffset() instead w/ a try/except")
     def getOffsetByElement(self, obj):
         '''
         DEPRECATED Sep 2015: use s.elementOffset(obj) and if it is possible that
@@ -2364,8 +2365,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         
         Remove in 2016 Feb.
         '''
-        warnings.warn("getOffsetByElement will be removed; use s.elementOffset() instead", 
-                      StreamDeprecationWarning)
         try:
             return self.elementOffset(obj)
         except base.SitesException:

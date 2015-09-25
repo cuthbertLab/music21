@@ -13,6 +13,7 @@
 __all__ = ['wrapWeakref', 'unwrapWeakref', 'isWeakref', 'findWeakref']
 
 import weakref
+from music21.common.decorators import deprecated
 
 #-------------------------------------------------------------------------------
 def wrapWeakref(referent):
@@ -73,6 +74,7 @@ def unwrapWeakref(referent):
         return referent
 
 
+@deprecated("September 2015", "December 2015", "Use isinstance(obj, weakref.ref) instead")
 def isWeakref(referent):
     '''Test if an object is a weakref
 

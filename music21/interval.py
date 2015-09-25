@@ -248,6 +248,8 @@ def convertGeneric(value):
     '''Convert an interval specified in terms of its name (second, third) 
     into an integer. If integers are passed, assume the are correct.
 
+    # TODO: use common.numberFunc.musicOrdinals
+
     
     >>> interval.convertGeneric(3)
     3
@@ -327,7 +329,7 @@ def convertGeneric(value):
     return post
 
     
-
+@common.deprecated("2013 Oct", "January 2016", "Unused and not general enough.")
 def convertSemitoneToSpecifierGenericMicrotone(count):
     '''
     Given a number of semitones, return a default diatonic specifier and cent offset.

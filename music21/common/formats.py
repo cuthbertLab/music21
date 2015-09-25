@@ -24,40 +24,10 @@ VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png',
 VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'svg', 'lily.pdf', 'lily.png', 'lily.svg', 'braille', 'vexflow', 'vexflow.html', 'vexflow.js', 'ipython', 'ipython.png', 'musicxml.png']
 VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 
-
-
-# define file extensions for various formats
-# keys are assumed to be formats
-# fileExtensions = {
-#     'abc' : {'input': ['abc'], 'output': 'abc'},
-#     'text' : {'input': ['txt', 'text', 't'], 'output': 'txt'},
-#     'textline' : {'input': ['tl', 'textline'], 'output': 'txt'},
-#     'musicxml' : {'input': ['xml', 'mxl', 'mx'], 'output': 'xml'},
-#     'musicxml.png' : {'input': ['png'], 'output': 'png'},
-#     'midi' : {'input': ['mid', 'midi'], 'output': 'mid'},
-#     'tinynotation' : {'input': ['tntxt', 'tinynotation'], 'output': 'tntxt'},
-#      # note: this is setting .zip as default mapping to musedata
-#     'musedata' : {'input': ['md', 'musedata', 'zip'], 'output': 'md'},
-#     'noteworthy': {'input': ['nwc'], 'output': 'nwc'},
-#     'noteworthytext': {'input': ['nwctxt'], 'output': 'nwctxt'},
-#     'lilypond' : {'input': ['ly', 'lily'], 'output': 'ly'},
-#     'finale' : {'input': ['mus'], 'output': 'mus'},
-#     'humdrum' : {'input': ['krn'], 'output': 'krn'},
-#     'jpeg' : {'input': ['jpg', 'jpeg'], 'output': 'jpg'},
-#     'png'  : {'input': ['png', 'lily.png', 'lilypond.png'], 'output': 'png'},
-#     'pdf'  : {'input': ['pdf', 'lily.pdf', 'lilypond.pdf'], 'output': 'pdf'},
-#     'svg'  : {'input': ['svg', 'lily.svg', 'lilypond.svg'], 'output': 'svg'},
-#     'pickle' : {'input': ['p', 'pickle'], 'output': 'p'},
-#     'romantext' : {'input': ['rntxt', 'rntext', 'romantext', 'rtxt'], 'output': 'rntxt'},
-#     'scala' : {'input': ['scl'], 'output': 'scl'},
-#     'braille' : {'input' : ['brailleTextDoesNotWork'], 'output' : 'txt'},
-#     'vexflow' : {'input' : ['vexflowDoesNotWork'], 'output': 'html'},
-#     'capella' : {'input': ['capx'], 'output': 'capx'},
-#     'ipython' : {'input': ['ipython.png'], 'output': 'png'},
-# }
-
+from music21.common.decorators import deprecated 
 
 #-------------------------------------------------------------------------------
+@deprecated('May 2015', '[soonest possible]', 'Moved to converter')
 def subConverterList():
     '''
     returns a list of subconverter classes available to music21
@@ -87,12 +57,15 @@ def findSubConverterForFormat(fmt):
     
     '''
     fmt = fmt.lower().strip()
-    scl = subConverterList()
+    from music21 import converter
+    scl = converter.Converter().subconvertersList()
     for sc in scl:
         formats = sc.registerFormats
         if fmt in formats:
             return sc
 
+
+@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 def findFormat(fmt):
     '''
     Given a format defined either by a format name, abbreviation, or
@@ -192,10 +165,12 @@ def findFormat(fmt):
 #             return key, '.' + fileExtensions[key]['output']
 #     return None, None # if no match found
 
+#@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 
 def findInputExtension(fmt):
     '''
-    DEPRECATED May 2014 -- moving to converter
+    Will be fully deprecated when there's an exact equivalent in converter...
+    
     
     Given an input format or music21 format, find and return all possible 
     input extensions.
@@ -224,8 +199,6 @@ def findInputExtension(fmt):
     
     >>> common.findInputExtension('blah') is None
     True
-    
-    
     '''
     fmt = fmt.lower().strip()    
     if fmt.startswith('.'):
@@ -254,6 +227,7 @@ def findInputExtension(fmt):
             post.append(ext)
         return tuple(post)
 
+@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 def findFormatFile(fp):
     '''
     Given a file path (relative or absolute) return the format
@@ -275,7 +249,7 @@ def findFormatFile(fp):
     fmt, unused_ext = findFormat(fp.split('.')[-1])
     return fmt # may be None if no match
 
-
+@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 def findFormatExtFile(fp):
     '''Given a file path (relative or absolute) find format and extension used (not the output extension)
 
@@ -305,7 +279,7 @@ def findFormatExtFile(fp):
     else:
         return fileFormat, '.'+fp.split('.')[-1] # may be None if no match
 
-
+@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 def findFormatExtURL(url):
     '''Given a URL, attempt to find the extension. This may scrub arguments in a URL, or simply look at the last characters.
 
