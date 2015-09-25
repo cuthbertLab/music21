@@ -154,10 +154,10 @@ _SortTuple = collections.namedtuple('SortTuple', ['atEnd','offset','priority',
 # make subclass of set once that is defined properly
 
 
-class Groups(common.SlottedObject, list):
+class Groups(list): # no need to inherit from slotted object
     '''
-    Groups is a list of strings used to identify associations that an element
-    might have.
+    Groups is a list (subclass) of strings used to identify 
+    associations that an element might have.
 
     The Groups object enforces that all elements must be strings, and that
     the same element cannot be provided more than once.
@@ -176,27 +176,28 @@ class Groups(common.SlottedObject, list):
 
     >>> g.append(5)
     Traceback (most recent call last):
-    GroupException: Only strings can be used as list names
+    GroupException: Only strings can be used as group names
     '''
     # could be made into a set instance, but actually
     # timing: a subclassed list and a set are almost the same speed 
-    # and set does not allow calling but number
-
+    # and set does not allow calling by number
+    
+    # this speeds up creation slightly...
     __slots__ = ()
-
+    
     def append(self, value):
         if isinstance(value, six.string_types):
             # do not permit the same entry more than once
             if not list.__contains__(self, value):
                 list.append(self, value)
         else:
-            raise exceptions21.GroupException("Only strings can be used as list names")
+            raise exceptions21.GroupException("Only strings can be used as group names")
 
     def __setitem__(self, i, y):
         if isinstance(y, six.string_types):
             list.__setitem__(self, i, y)
         else:
-            raise exceptions21.GroupException("Only strings can be used as list names")
+            raise exceptions21.GroupException("Only strings can be used as group names")
 
     def __eq__(self, other):
         '''
@@ -229,11 +230,11 @@ class Groups(common.SlottedObject, list):
         if not isinstance(other, Groups):
             return False
         
-        sls = sorted(list(self))
-        slo = sorted(list(other))
-        
-        if len(sls) != len(slo):
+        if len(self) != len(other):
             return False
+        sls = sorted(self)
+        slo = sorted(other)
+        
         for x in range(len(sls)):
             if sls[x].lower() != slo[x].lower():
                 return False
@@ -255,7 +256,7 @@ class Groups(common.SlottedObject, list):
         >>> a != b
         True
         '''
-        return not self == other
+        return not (self == other)
 
 
 
@@ -669,7 +670,7 @@ class Music21Object(object):
         try:
             return self._classListFullyQualifiedCacheDict[self.__class__]
         except KeyError:
-            classList = [x.__module__ + '.' + x.__name__ for x in self.__class__.mro()]
+            classList = tuple([x.__module__ + '.' + x.__name__ for x in self.__class__.mro()])
             self._classListFullyQualifiedCacheDict[self.__class__] = classList
             return classList
 
@@ -683,8 +684,8 @@ class Music21Object(object):
 
         >>> q = note.Note()
         >>> q.fullyQualifiedClasses
-        ['music21.note.Note', 'music21.note.NotRest', 'music21.note.GeneralNote', 
-         'music21.base.Music21Object', '...builtin...object']
+        ('music21.note.Note', 'music21.note.NotRest', 'music21.note.GeneralNote', 
+         'music21.base.Music21Object', '...builtin...object')
         
         The last one (object) will be different in Py2 (__builtin__.object) and 
         Py3 (builtins.object)

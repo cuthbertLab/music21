@@ -1328,7 +1328,7 @@ class JSONFreezer(JSONFreezeThawBase):
 
         attributeList = []
         if hasattr(self.storedObject, 'fullyQualifiedClasses'):
-            fqClassList = self.storedObject.fullyQualifiedClasses
+            fqClassList = list(self.storedObject.fullyQualifiedClasses)
         else: # same thing...
             fqClassList = [self.fullyQualifiedClassFromObject(x) for x in self.storedObject.__class__.mro()]
 
@@ -1397,7 +1397,7 @@ class JSONFreezer(JSONFreezeThawBase):
             return False 
 
         if hasattr(possiblyFreezeable, 'fullyQualifiedClasses'):
-            fqClassList = possiblyFreezeable.fullyQualifiedClasses
+            fqClassList = list(possiblyFreezeable.fullyQualifiedClasses)
         else: # same thing...
             fqClassList = [x.__module__ + '.' + x.__name__ 
                                 for x in possiblyFreezeable.__class__.mro()]
