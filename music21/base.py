@@ -255,12 +255,7 @@ class Groups(common.SlottedObject, list):
         >>> a != b
         True
         '''
-        if other is None or not isinstance(other, Groups):
-            return True
-        if (sorted(list(self)) == sorted(list(other))):
-            return False
-        else:
-            return True
+        return not self == other
 
 
 
@@ -305,9 +300,9 @@ class Music21Object(object):
     isVariant = False
 
 
-    # this dictionary stores the _classes for each Class so that
+    # this dictionary stores as a tuple of strings for each Class so that
     # it only needs to be made once (11 microseconds per call, can be
-    # a big part of iteration)
+    # a big part of iteration; from cache just 1 microsecond)
     _classListCacheDict = {}
     
     # same with fully qualified names
@@ -389,9 +384,6 @@ class Music21Object(object):
         # pass a reference to this object
         self._derivation = None
         
-        # store classes once when called
-        self._classes = None
-        self._fullyQualifiedClasses = None
         # private duration storage; managed by property
         self._duration = None
         self._priority = 0 # default is zero
@@ -589,38 +581,6 @@ class Music21Object(object):
         #environLocal.printDebug([self, 'end deepcopy', 'self._activeSite', self._activeSite])
         return new
 
-
-    def _newBroken__deepcopy__(self, memo=None):
-        # this was an attempt to speed up deepcopying via object serialization.
-        # it still might work someday, but too many bugs for now.
-        if self._duration is not None:
-            self._duration._client = None
-        savedSites = self.sites
-        if self._derivation is not None:
-            savedDerivation = self._derivation
-            self._derivation = None
-        else:
-            savedDerivation = None
-
-        self.sites = None
-
-        new = pickle.loads(pickle.dumps(self, protocol=pickle.HIGHEST_PROTOCOL))
-        if new.id == id(self):
-            new.id = id(new)
-        
-        self.sites = savedSites
-
-        self._derivation = savedDerivation
-        new.sites = sites.Sites()
-        newDerivation = derivation.Derivation(client=new)
-        newDerivation.origin = self
-        newDerivation.method = '__deepcopy__'
-        new._derivation = newDerivation
-        if new._duration is not None:
-            new._duration.client = new
-            self._duration.client = self
-        return new
-        
     
     def __getstate__(self):
         state = self.__dict__.copy()

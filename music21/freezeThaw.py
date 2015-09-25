@@ -1248,8 +1248,6 @@ class JSONFreezer(JSONFreezeThawBase):
             return []
         # names that we always do not need
         excludedNames = [
-            '_classes',
-            '_fullyQualifiedClasses',
             '_derivation',
             '_DOC_ATTR',
             '_DOC_ORDER',
