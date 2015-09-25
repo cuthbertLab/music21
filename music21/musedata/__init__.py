@@ -1593,7 +1593,7 @@ class MuseDataDirectory(object):
         # these two were unusued variables.
         #sep = '/'
         #source = None # set where files are coming from
-        if common.isListLike(dirOrList):
+        if common.isIterable(dirOrList):
             # assume a flat list from a zip file
             #sep = '/' # sep is always backslash for zip files
             #source = 'zip'

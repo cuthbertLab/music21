@@ -1045,7 +1045,7 @@ class Music21Object(object):
         found = self.sites.getSitesByClass('SpannerStorage')
         post = []
         if spannerClassList is not None:
-            if not common.isListLike(spannerClassList):
+            if not common.isIterable(spannerClassList):
                 spannerClassList = [spannerClassList]
 
         for obj in found:

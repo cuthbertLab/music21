@@ -706,7 +706,7 @@ def makeRests(s, refStreamOrTimeRange=None, fillGaps=False,
         #    'refStream used in makeRests', oLowTarget, oHighTarget,
         #    len(refStreamOrTimeRange)])
     # treat as a list
-    elif common.isListLike(refStreamOrTimeRange):
+    elif common.isIterable(refStreamOrTimeRange):
         oLowTarget = min(refStreamOrTimeRange)
         oHighTarget = max(refStreamOrTimeRange)
         #environLocal.printDebug([

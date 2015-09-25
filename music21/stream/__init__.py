@@ -406,8 +406,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Removing the elements from the current Stream seems necessary.
         '''
-        if (not common.isListLike(value) and hasattr(value, 'isStream') and
-            value.isStream):
+        if (not common.isListLike(value) and 
+                hasattr(value, 'isStream') and
+                value.isStream):
             self._elements = list(value._elements)
             for e in self._elements:
                 self.setElementOffset(e, value.elementOffset(e))
@@ -2132,7 +2133,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         if classFilter is not None:
             if not common.isListLike(classFilter):
-                classFilter = [classFilter]
+                classFilter = (classFilter,)
 
         for e in self._elements:
             if classFilter is None:
@@ -2250,9 +2251,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # passing on auto sort status may or may not be what is needed here
             found.autoSort = self.autoSort
 
-        # much faster in the most common case than calling common.isListLike
-        if not isinstance(classFilterList, (list, tuple)):
-            classFilterList = tuple([classFilterList])
+        if not common.isListLike(classFilterList):
+            classFilterList = (classFilterList,)
 
         # if we are sure that this Stream does not have a class
         singleClassString = False
@@ -4291,8 +4291,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> a[10].offset
         10.0
         '''
-        if not common.isListLike(offsets):
-            raise StreamException('must provide a lost of offsets, not %s' % offsets)
+        if not common.isIterable(offsets):
+            raise StreamException('must provide an iterable of offsets, not %s' % offsets)
 
         try:
             unused = item.isStream
@@ -11751,7 +11751,7 @@ class Score(Stream):
             if sub != []: # get last
                 bundle.append(sub)
         # else, assume it is a list of groupings
-        elif common.isListLike(voiceAllocation):
+        elif common.isIterable(voiceAllocation):
             for group in voiceAllocation:
                 sub = []
                 # if a single entry

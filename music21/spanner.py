@@ -443,7 +443,7 @@ class Spanner(base.Music21Object):
 
         '''  
         # presently, this does not look for redundancies
-        if not common.isListLike(spannedElements):
+        if not common.isIterable(spannedElements):
             spannedElements = [spannedElements]
         # assume all other arguments
         spannedElements += arguments
@@ -695,7 +695,7 @@ class SpannerBundle(object):
         self._cache = {}     
         self._storage = [] # a simple List, not a Stream
         for arg in arguments:
-            if common.isListLike(arg):
+            if common.isIterable(arg):
                 for e in arg:
                     self._storage.append(e)    
             # take a Stream and use its .spanners property to get all spanners            
@@ -1265,7 +1265,7 @@ class RepeatBracket(Spanner):
             # assume this is 1 
             self._numberRange = [1]
             self._number = 1
-        elif common.isListLike(value):
+        elif common.isIterable(value):
             self._numberRange = [] # clear
             for x in value:
                 if common.isNum(x):
