@@ -20,7 +20,7 @@ from music21 import common
 from music21 import exceptions21
 
 from music21 import environment
-environLocal = environment.Environment('documentation.library.writers')
+environLocal = environment.Environment('documentation.writers')
 
 
 class DocumentationWritersException(exceptions21.Music21Exception):
@@ -33,9 +33,8 @@ class DocumentationWriter(object):
     Call .run() on the object to make it work.
     '''
     def __init__(self):
-        from music21 import documentation # @UnresolvedImport
         self.outputDirectory = None
-        self.docBasePath = documentation.__path__[0]
+        self.docBasePath = os.path.join(common.getSourceFilePath(), 'documentation')
         self.docSourcePath = os.path.join(self.docBasePath,
                                           'source')
         self.docGeneratedPath = os.path.join(self.docBasePath,
@@ -144,10 +143,10 @@ class ModuleReferenceReSTWriter(ReSTWriter):
         from music21 import documentation # @UnresolvedImport
         moduleReferenceDirectoryPath = self.outputDirectory
         referenceNames = []
-        for module in [x for x in documentation.ModuleIterator()]:
-            moduleDocumenter = documentation.ModuleDocumenter(module)
-            if not moduleDocumenter.classDocumenters \
-                   and not moduleDocumenter.functionDocumenters:
+        for module in [x for x in documentation.iterators.ModuleIterator()]:
+            moduleDocumenter = documentation.documenters.ModuleDocumenter(module)
+            if (not moduleDocumenter.classDocumenters and
+                   not moduleDocumenter.functionDocumenters):
                 continue
             rst = '\n'.join(moduleDocumenter.run())
             referenceName = moduleDocumenter.referenceName
@@ -211,7 +210,7 @@ class CorpusReferenceReSTWriter(ReSTWriter):
             self.outputDirectory,
             'referenceCorpus.rst',
             )
-        lines = documentation.CorpusDocumenter().run()
+        lines = documentation.documenters.CorpusDocumenter().run()
         rst = '\n'.join(lines)
         self.write(corpusReferenceFilePath, rst)
 
@@ -230,7 +229,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
     def run(self):
         from music21 import documentation # @UnresolvedImport
         ipythonNotebookFilePaths = [x for x in
-            documentation.IPythonNotebookIterator()]
+            documentation.iterators.IPythonNotebookIterator()]
         for ipythonNotebookFilePath in ipythonNotebookFilePaths:
             nbConvertReturnCode = self.convertOneNotebook(ipythonNotebookFilePath)
             if nbConvertReturnCode is True:

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
-# Name:         convertIPythonNotebooksToReST.py
+# Name:         extensions.py
 # Purpose:      Sphinx extension for hiding and showing lines in docs
 #
 # Authors:      Josiah Wolf Oberholtzer
@@ -9,6 +9,7 @@
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
 
+# loaded by source/conf.py
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 

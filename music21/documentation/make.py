@@ -45,9 +45,9 @@ Currently supported targets include:
 
 
 def main(target):
-    from music21 import documentation # @UnresolvedImport
-    documentationDirectoryPath = documentation.__path__[0]
-#     sourceDirectoryPath = os.path.join(
+    from music21 import common, documentation # @UnresolvedImport
+    documentationDirectoryPath = os.path.join(common.getSourceFilePath(), 'documentation')
+    #     sourceDirectoryPath = os.path.join(
 #         documentationDirectoryPath,
 #         'source',
 #         )
@@ -83,20 +83,20 @@ def main(target):
 
         
         print('WRITING DOCUMENTATION FILES')
-        documentation.StaticFileCopier().run()
+        documentation.writers.StaticFileCopier().run()
         try:
-            documentation.IPythonNotebookReSTWriter().run()
+            documentation.writers.IPythonNotebookReSTWriter().run()
         except OSError:
             raise ImportError('IPythonNotebookReSTWriter crashed; most likely cause: no pandoc installed: https://github.com/jgm/pandoc/releases')
         
-        documentation.ModuleReferenceReSTWriter().run()
-        documentation.CorpusReferenceReSTWriter().run()
+        documentation.writers.ModuleReferenceReSTWriter().run()
+        documentation.writers.CorpusReferenceReSTWriter().run()
+
+        # other options are in source/conf.py,
         sphinxOptions = ['sphinx']
         sphinxOptions.extend(('-b', target))
         sphinxOptions.extend(('-d', doctreesDirectoryPath))
         sphinxOptions.extend(('-j', str(cpus_to_use)))
-        #sphinxOptions.extend(('-D', 'source_parsers.md=recommonmark.parser.CommonMarkParser'))
-        #sphinxOptions.extend(('-D', 'source_suffix=.rst,.md'))
         sphinxOptions.append(autogenDirectoryPath)
         sphinxOptions.append(buildDirectories[target])
         # sphinx.main() returns 0 on success, 1 on failure.

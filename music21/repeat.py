@@ -1446,8 +1446,6 @@ class Expander(object):
                     # attached to bracket after this repeat segment
                     m = streamObj[i]
                     #environLocal.printDebug(['about to insert m into new', 'id(m)', id(m), 'new', id(new), 'all ids:', [id(e) for e in new]])
-                    #if new._hasElementByObjectId(id(m)):
-                    #    environLocal.printDebug(['stream already has measure that was not copied in this pass', m])
                         #m = copy.deepcopy(streamObj[i])
                         #new.show('t')
                     if stripFirstNextMeasure:

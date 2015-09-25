@@ -48,6 +48,16 @@ import warnings
 from music21.test.testRunner import mainTest
 from music21.ext import six
 
+if six.PY2:
+    try:
+        import cPickle as pickle # much faster on Python 2
+    except ImportError:
+        import pickle as pickle # @UnusedImport
+else:
+    import pickle # @Reimport
+    # on python 3 -- do NOT import _pickle directly. it will be used if  it exists, and _pickle lacks HIGHEST_PROTOCOL constant.
+
+
 #------------------------------------------------------------------------------
 # version string and tuple must be the same
 
@@ -387,7 +397,7 @@ class Music21Object(object):
         # a duration object is not created until the .duration property is
         # accessed with _getDuration(); this is a performance optimization
         if "duration" in keywords:
-            self._duration = keywords["duration"]
+            self.duration = keywords["duration"]
         if "groups" in keywords and keywords["groups"] is not None:
             self.groups = keywords["groups"]
         else:
@@ -399,6 +409,7 @@ class Music21Object(object):
 
         if "activeSite" in keywords:
             self.activeSite = keywords["activeSite"]
+
 
     def mergeAttributes(self, other):
         '''
@@ -450,18 +461,11 @@ class Music21Object(object):
             ## this can be done much faster in most cases...
             d = self._duration
             if d is not None:
-                try:
-                    if (d._componentsNeedUpdating is False and 
-                        d._quarterLengthNeedsUpdating is False and 
-                        d._qtrLength in (0, .25, .5, .75, 1, 1.5, 2, 3, 4) and
-                        (len(d.components) == 0 or 
-                         (len(d.components) == 1 and d.components[0]._link
-                          and len(d.components[0]._tuplets) == 0))): ## 99% of notes...
-                        newValue = duration.Duration(d._qtrLength)
-                    else:
-                        newValue = copy.deepcopy(self._duration, memo=memo)                        
-                except AttributeError:
-                    newValue = copy.deepcopy(self._duration, memo=memo)
+                clientStore = self._duration._client
+                self._duration._client = None
+                newValue = copy.deepcopy(self._duration, memo)
+                self._duration._client = clientStore
+                newValue.client = new
                 setattr(new, '_duration', newValue)
                 
         if '_derivation' in ignoreAttributes:
@@ -487,13 +491,13 @@ class Music21Object(object):
                 newValue = value
                 setattr(new, 'id', newValue)
         if 'sites' in ignoreAttributes:
-# restore jan 18
-#            pass
-            ## TODO: Fix This to get better sites value ?????
+            # we make a copy of the sites value even though it is obsolete because
+            # the spanners will need to be preserved and then set to the new value
+            # elsewhere.  The purgeOrphans call later will remove all but
+            # spanners and variants.
             value = getattr(self, 'sites')
             # this calls __deepcopy__ in Sites
             newValue = copy.deepcopy(value, memo)
-            #environLocal.printDebug(['copied definedContexts:', newValue._locationKeys])
             setattr(new, 'sites', newValue)
 
 
@@ -504,7 +508,7 @@ class Music21Object(object):
                 continue
 
             attrValue = getattr(self, name)
-            # attributes that require special handling
+            # attributes that do not require special handling
             try:
                 deeplyCopiedObject = copy.deepcopy(attrValue, memo)
                 setattr(new, name, deeplyCopiedObject)
@@ -575,6 +579,38 @@ class Music21Object(object):
         #environLocal.printDebug([self, 'end deepcopy', 'self._activeSite', self._activeSite])
         return new
 
+
+    def _newBroken__deepcopy__(self, memo=None):
+        # this was an attempt to speed up deepcopying via object serialization.
+        # it still might work someday, but too many bugs for now.
+        if self._duration is not None:
+            self._duration._client = None
+        savedSites = self.sites
+        if self._derivation is not None:
+            savedDerivation = self._derivation
+            self._derivation = None
+        else:
+            savedDerivation = None
+
+        self.sites = None
+
+        new = pickle.loads(pickle.dumps(self, protocol=pickle.HIGHEST_PROTOCOL))
+        if new.id == id(self):
+            new.id = id(new)
+        
+        self.sites = savedSites
+
+        self._derivation = savedDerivation
+        new.sites = sites.Sites()
+        newDerivation = derivation.Derivation(client=new)
+        newDerivation.origin = self
+        newDerivation.method = '__deepcopy__'
+        new._derivation = newDerivation
+        if new._duration is not None:
+            new._duration.client = new
+            self._duration.client = self
+        return new
+        
     
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -2043,12 +2079,17 @@ class Music21Object(object):
         '''
         Set the duration as a quarterNote length
         '''
-        if hasattr(durationObj, "quarterLength"):
-            # we cannot directly test to see isInstance(duration.DurationCommon) because of
-            # circular imports; so we instead just take any object with a quarterLength as a
-            # duration
+        
+        replacingDuration = False if self._duration is None else True
+            
+        try:
+            ql = durationObj.quarterLength
             self._duration = durationObj
-        else:
+            durationObj.client = self
+            if replacingDuration:
+                self.durationChanged(ql)
+                
+        except AttributeError:
             # need to permit Duration object assignment here
             raise Exception('this must be a Duration object, not %s' % durationObj)
 
@@ -2056,6 +2097,16 @@ class Music21Object(object):
         doc = '''
         Get and set the duration of this object as a Duration object.
         ''')
+
+    def durationChanged(self, newQuarterLength):
+        '''
+        trigger called whenever the duration has changed.
+        
+        subclass this to do very interesting things.
+        '''
+        for s in self.sites.get():
+            if hasattr(s, 'elementsChanged'):
+                s.elementsChanged(updateIsFlat=False, keepIndex=True)
 
     def _getIsGrace(self):
         return self.duration.isGrace
@@ -4389,6 +4440,12 @@ _DOC_ORDER = [Music21Object, ElementWrapper]
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
+#     from music21 import note, stream
+#     s = stream.Stream(id="hello")
+#     n = note.Note()
+#     s.insert(0, n)
+#     print(id(s))
+#     copy.deepcopy(n)
     mainTest(Test) #, runTest='testPreviousAfterDeepcopy')
 
 

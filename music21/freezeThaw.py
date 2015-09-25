@@ -92,15 +92,7 @@ from music21 import environment
 _MOD = "freezeThaw.py"
 environLocal = environment.Environment(_MOD)
 
-if six.PY2:
-    try:
-        import cPickle as pickleMod # much faster on Python 2
-    except ImportError:
-        import pickle as pickleMod # @UnusedImport
-else:
-    import pickle as pickleMod # @Reimport
-    # on python 3 -- do NOT import _pickle directly. it will be used if  it exists, and _pickle lacks HIGHEST_PROTOCOL constant.
-
+from music21.common import pickleMod
 #------------------------------------------------------------------------------
 
 
@@ -222,6 +214,10 @@ class StreamFreezer(StreamFreezeThawBase):
         self.topLevel = topLevel
         self.streamIds = streamIds
 
+        self.subStreamFreezers = {} # this will keep track of sub freezers for spanners and
+        #
+
+
         if streamObj is not None and fastButUnsafe is False:
             # deepcopy necessary because we mangle sites in the objects
             # before serialization
@@ -240,8 +236,8 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> s.append(n)
         >>> sf = freezeThaw.StreamFreezer(s)
         >>> #_DOCS_SHOW sf.packStream()
-        >>> print("{'m21Version': (2, 0, 5), 'stream': <music21.stream.Stream 4391393680>}") #_DOCS_HIDE
-        {'m21Version': (2, 0, 5), 'stream': <music21.stream.Stream 4391393680>}
+        >>> print("{'m21Version': (2, 0, 5), 'stream': <music21.stream.Stream 0x1289212>}") #_DOCS_HIDE
+        {'m21Version': (2, 0, 5), 'stream': <music21.stream.Stream 0x1289212>}
         
         '''
         # do all things necessary to setup the stream
@@ -1019,7 +1015,15 @@ class JSONFreezeThawBase(object):
             '__AUTO_GATHER__',
             ],
         'music21.duration.Duration': [
-            '__AUTO_GATHER__',
+            '_linked',
+            '_components',
+            '_qtrLength',
+            '_tuplets',
+            '_componentsNeedUpdating',
+            '_quarterLengthNeedsUpdating',
+            '_typeNeedsUpdating',
+            '_unlinkedType',
+            '_dotGroups',
             ],
         'music21.editorial.NoteEditorial': [
             'color', 'misc', 'comment',

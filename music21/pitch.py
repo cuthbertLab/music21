@@ -410,9 +410,9 @@ class Microtone(SlottedObject):
 
     ### INITIALIZER ###
 
-    def __init__(self, centsOrString=0):
+    def __init__(self, centsOrString=0, harmonicShift=1):
         self._centShift = 0
-        self._harmonicShift = 1 # the first harmonic is the start
+        self._harmonicShift = harmonicShift  # the first harmonic is the start
 
         if common.isNum(centsOrString):
             self._centShift = centsOrString # specify harmonic in cents
@@ -423,6 +423,11 @@ class Microtone(SlottedObject):
         # such as: A4(+69c [7thH/C3])?
 
     ### SPECIAL METHODS ###
+    def __deepcopy__(self, memo):
+        if type(self) is Microtone:
+            return Microtone(self._centShift, self._harmonicShift)
+        else:
+            return common.defaultDeepcopy(self, memo)
 
     def __eq__(self, other):
         '''Compare cents.
@@ -573,10 +578,6 @@ class Accidental(SlottedObject):
     ### INITIALIZER ###
 
     def __init__(self, specifier='natural'):
-        #base.Music21Object.__init__(self)
-
-        # since not a Music21Object
-
         # managed by properties
         self._displayType = "normal" # always, never, unless-repeated, even-tied
         self._displayStatus = None # None, True, False
@@ -590,12 +591,7 @@ class Accidental(SlottedObject):
         self._name = None
         self._modifier = ''
         self._alter = 0.0     # semitones to alter step
-        #alterFrac = [0,0]   # fractional alteration
-        # (e.g., 1/6); fraction class in 2.6
-        #alterExp  = [0,0,0] # exponental alteration
-        # (e.g., [2,3,19] = 2**(3/19))
-        #alterHarm = 0       # altered according to a harmonic
-        #environLocal.printDebug(['specifier', specifier])
+        # potentially can be a fraction... but not exponent...
         self.set(specifier)
 
     ### SPECIAL METHODS ###
@@ -611,6 +607,15 @@ class Accidental(SlottedObject):
         self.displayStyle,
         )
         return hash(hashValues)
+
+    def __deepcopy__(self, memo):
+        if type(self) is Accidental:
+            new = Accidental.__new__(Accidental)
+            for s in self.__slots__:
+                setattr(new, s, getattr(self, s))
+            return new
+        else:
+            return common.defaultDeepcopy(self, memo)
 
 
     def __eq__(self, other):
@@ -1206,8 +1211,8 @@ class Pitch(object):
     classes = ['Pitch', 'object'] # makes subclassing harder; was [x.__name__ for x in self.__class__.mro()] but 5% of creation time 
 
     def __init__(self, name=None, **keywords):
-        self.groups = base.Groups() # 1% of creation time time
-
+        self._groups = None
+        
         if isinstance(name, type(self)):
             name = name.nameWithOctave
 
@@ -1216,14 +1221,13 @@ class Pitch(object):
         # this should not be set, as will be updated when needed
         self._step = defaults.pitchStep # this is only the pitch step
         # keep an accidental object based on self._alter
-
         self._overridden_freq440 = None
 
         # store an Accidental and Microtone objects
         # note that creating an Accidental objects is much more time consuming
         # than a microtone
         self._accidental = None
-        self._microtone = Microtone() # 5% of pitch creation time.
+        self._microtone = Microtone() # 5% of pitch creation time; it'll be created in a sec anyhow
 
         # CA, Q: should this remain an attribute or only refer to value in defaults?
         # MSC A: no, it's a useful attribute for cases such as scales where if there are
@@ -1234,6 +1238,10 @@ class Pitch(object):
         # if True, accidental is not known; is determined algorithmically
         # likely due to pitch data from midi or pitch space/class numbers
         self.implicitAccidental = False
+        # the fundamental attribute stores an optional pitch
+        # that defines the fundamental used to create this Pitch
+        self.fundamental = None
+
 
         # name combines step, octave, and accidental
         if name is not None:
@@ -1246,9 +1254,6 @@ class Pitch(object):
                     self._setPitchClass(name)
                     self._octave = int(name/12) - 1
 
-        # the fundamental attribute stores an optional pitch
-        # that defines the fundamental used to create this Pitch
-        self.fundamental = None
 
         # override just about everything with keywords
         # necessary for ImmutablePitch objects
@@ -1323,6 +1328,24 @@ class Pitch(object):
             return True
         else:
             return False
+        
+    def __deepcopy__(self, memo):
+        '''
+        highly optimized -- it knows exactly what can only have a scalar value and
+        just sets that directly, only running deepcopy on the other bits.
+        '''
+        if type(self) is Pitch:
+            new = Pitch.__new__(Pitch)
+            for k in self.__dict__:
+                v = getattr(self, k, None)
+                if k in ('_step', '_overridden_freq440', 'defaultOctave', 
+                         '_octave', 'implicitAccidental'):
+                    setattr(new, k, v)
+                else:                   
+                    setattr(new, k, copy.deepcopy(v, memo))
+            return new
+        else:
+            return common.defaultDeepcopy(self, memo)
 
     def __hash__(self):
         hashValues = (
@@ -1425,6 +1448,17 @@ class Pitch(object):
         return self.__gt__(other) or self.__eq__(other)
 
     #---------------------------------------------------------------------------
+    def _getGroups(self):
+        if self._groups is None:
+            self._groups = base.Groups()
+        return self._groups
+    
+    def _setGroups(self, new):
+        self._groups = new
+        
+    groups = property(_getGroups, _setGroups)
+    
+    
     def _getAccidental(self):
         return self._accidental
 
