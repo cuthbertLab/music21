@@ -1477,6 +1477,27 @@ class Duration(SlottedObject):
                         self.__module__, self.__class__.__name__, self.type, self.quarterLength)
 
     ## unwrap weakref for pickling
+    def __deepcopy__(self, memo):
+        '''
+        Do some very fast creations...
+        '''
+        if (self._componentsNeedUpdating is False and 
+                len(self._components) == 1 and
+                self._dotGroups == (0,) and 
+                self._linked is True and 
+                len(self._tuplets) == 0): ## 99% of notes...
+            # ignore all but components
+            return self.__class__(durationTuple=self._components[0])
+        elif (self._componentsNeedUpdating is False and
+                len(self._components) == 0 and
+                self._dotGroups == (0,) and 
+                len(self._tuplets) == 0 and
+                self._linked is True):
+            # ignore all
+            return self.__class__()
+        else:
+            return common.defaultDeepcopy(self, memo)
+
 
     def __getstate__(self):
         self._client = common.unwrapWeakref(self._client)

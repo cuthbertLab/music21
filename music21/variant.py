@@ -1851,7 +1851,7 @@ class Variant(base.Music21Object):
 
     def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
         '''
-        see __deepcopy__ for tests and docs
+        see __deepcopy__ on Spanner for tests and docs
         '''
         # NOTE: this is a performance critical operation        
         defaultIgnoreSet = {'_cache'}

@@ -13,6 +13,7 @@
 sites.py -- Objects for keeping track of relationships among Music21Objects
 '''
 import unittest
+import weakref
 
 from music21 import common
 from music21 import defaults
@@ -27,12 +28,19 @@ WEAKREF_ACTIVE = True
 
 #DEBUG_CONTEXT = False
 
-DENOM_LIMIT = defaults.limitOffsetDenominator
+# Global site state dict is a weakValueDictionary -- meaning that the values
+# are weakrefs and the key, value pair disappears if the value
+# vanishes.  It is used to store siteRef.siteWeakRef values during a
+# __setstate__, __getstate__ instance within the same Python session.
+# if the object being pickled and then unpickled had a weakref to an object
+# that still exists, then restore it from the dictionary; otherwise, do not
+# sweat it.  Should make pickle deepcopies of music21 objects in Streams still
+# possible without needing to recreate the whole stream.
+GLOBAL_SITE_STATE_DICT = weakref.WeakValueDictionary()
 
 
 class SitesException(exceptions21.Music21Exception):
     pass
-
 
 #------------------------------------------------------------------------------
 class SiteRef(common.SlottedObject):
@@ -97,15 +105,30 @@ class SiteRef(common.SlottedObject):
 
     site = property(_getAndUnwrapSite, _setAndWrapSite)
 
+    ## called before pickling.
     def __getstate__(self):
         if WEAKREF_ACTIVE:
-            self.siteWeakref = common.unwrapWeakref(self.siteWeakref)
+            currentSite = self.site
+            if currentSite is None:
+                self.siteWeakref = None
+            else:
+                siteIdValue = str(id(currentSite)) + "_" + str(_singletonCounter())
+                GLOBAL_SITE_STATE_DICT[siteIdValue] = currentSite
+                self.siteWeakref = siteIdValue
         return common.SlottedObject.__getstate__(self)
 
+    ## called on unpickling
     def __setstate__(self, state):
         common.SlottedObject.__setstate__(self, state)
-        if WEAKREF_ACTIVE:
-            self.siteWeakref = common.wrapWeakref(self.siteWeakref)
+        if WEAKREF_ACTIVE and self.siteWeakref is not None:
+            siteIdValue = self.siteWeakref
+            try:
+                currentSite = GLOBAL_SITE_STATE_DICT[siteIdValue]
+                del GLOBAL_SITE_STATE_DICT[siteIdValue]
+            except KeyError:
+                currentSite = None
+                self.isDead = True
+            self.site = currentSite
 
 _NoneSiteRef = SiteRef()
 _NoneSiteRef.globalSiteIndex = -2 # -1 is used elsewhere...

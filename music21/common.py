@@ -36,6 +36,16 @@ try:
 except NameError:
     basestring = str # @ReservedAssignment
 
+if six.PY2:
+    try:
+        import cPickle as pickleMod # much faster on Python 2
+    except ImportError:
+        import pickle as pickleMod # @UnusedImport
+else:
+    import pickle as pickleMod # @Reimport
+    # on python 3 -- do NOT import _pickle directly. it will be used if  it exists, and _pickle lacks HIGHEST_PROTOCOL constant.
+
+
 
 # define file extensions for various formats
 # keys are assumed to be formats
@@ -2637,6 +2647,57 @@ class Music21CommonException(exceptions21.Music21Exception):
     pass
 
 # NB -- temp files (tempFile) etc. are in environment.py
+
+#-------------------------------------------------------------------------------
+def defaultDeepcopy(obj, memo, callInit=True):
+    '''
+    Unfortunately, it is not possible to do something like:
+    
+        def __deepcopy__(self, memo):
+            if self._noDeepcopy:
+                return self.__class__()
+            else:
+                copy.deepcopy(self, memo, ignore__deepcopy__=True)
+    
+    so that's what this is for:
+    
+        def __deepcopy__(self, memo):
+            if self._noDeepcopy:
+                return self.__class__()
+            else:
+                common.defaultDeepcopy(obj, memo)
+                
+    looks through both __slots__ and __dict__ and does a deepcopy
+    of anything in each of them and returns the new object.
+    
+    If callInit is False, then only __new__() is called.  This is
+    much faster if you're just going to overload every instance variable.    
+    '''
+    if callInit is False:
+        new = obj.__class__.__new__(obj.__class__)
+    else:
+        new = obj.__class__()
+
+    dictState = getattr(obj, '__dict__', None)
+    if dictState is not None:
+        for k in dictState:
+            setattr(new, k, copy.deepcopy(dictState[k], memo))
+    slots = set()
+    for cls in obj.__class__.mro(): # it is okay that it's in reverse order, since it's just names
+        slots.update(getattr(cls, '__slots__', ()))
+    for slot in slots:
+        slotValue = getattr(obj, slot, None) 
+            # might be none if slot was deleted; it will be recreated here
+        setattr(new, slot, copy.deepcopy(slotValue))
+
+    return new
+
+def pickleCopy(obj):
+    '''
+    use pickle to serialize/deserialize a copy of an object -- much faster than deepcopy,
+    but only works for things that are completely pickleable.
+    '''
+    return pickleMod.loads(pickleMod.dumps(obj, protocol=-1))
 
 
 #-------------------------------------------------------------------------------
