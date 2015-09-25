@@ -34,7 +34,7 @@ import inspect
 import warnings
 import weakref
 
-from functools import wraps, partial
+from functools import wraps
 
 from fractions import Fraction # speedup 50% below...
 
@@ -62,10 +62,34 @@ DEBUG_USER = 1
 DEBUG_DEVEL = 63
 DEBUG_ALL = 255
 
-
+# from Ryne Everett 
 # http://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments
+def optional_arg_decorator(fn):
+    def wrapped_decorator(*args, **kwargs):
+        is_bound_method = hasattr(args[0], fn.__name__) if args else False
 
-def deprecated(method_or_first_arg, *args):
+        if is_bound_method:
+            klass = args[0]
+            args = args[1:]
+
+        # If no arguments were passed...
+        if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
+            if is_bound_method:
+                return fn(klass, args[0])
+            else:
+                return fn(args[0])
+
+        else:
+            def real_decorator(decoratee):
+                if is_bound_method:
+                    return fn(klass, decoratee, *args, **kwargs)
+                else:
+                    return fn(decoratee, *args, **kwargs)
+            return real_decorator
+    return wrapped_decorator
+
+@optional_arg_decorator
+def deprecated(method, startDate=None, removeDate=None, message=None):
     '''
     Decorator that marks a function as deprecated and should not be called.
     
@@ -117,53 +141,41 @@ def deprecated(method_or_first_arg, *args):
     >>> sys.stderr = saveStdErr
     
     '''
-    def inner_decorator(func, args=None):
-        if args is None:
-            args = callInfo['storeArgs']
-
-        try:
-            startDate = " on " + args[0]
-        except IndexError:
-            startDate = ""
-
-        try:
-            removeDate = "at or after " + args[1]        
-        except IndexError:
-            removeDate = "soon"
-        
-
-        try:
-            message = args[2]
-        except IndexError:            
-            message = "Find alternative methods."
-        
-        if hasattr(func, '__qualname__'):
-            funcName = func.__qualname__
-        else:
-            funcName = func.__name__
-        
-        callInfo['message'] = '{0} was deprecated{1} and will disappear {2}. {3}'.format(
-                funcName, startDate, removeDate, message)
-        
-        
-        @wraps(func)
-        def func_wrapper(*args, **kwargs):
-            #global calledAlready
-            if callInfo['calledAlready'] is False:
-                warnings.warn(callInfo['message'], exceptions21.Music21DeprecationWarning)
-                callInfo['calledAlready'] = True
-            return func(*args, **kwargs)
-        return func_wrapper
-    
-    #print(method_or_first_arg, args)
-    callInfo = {'calledAlready': False,
-                'storeArgs': None}
-
-    if callable(method_or_first_arg):
-        return inner_decorator(method_or_first_arg, args)
+    if hasattr(method, '__qualname__'):
+        funcName = method.__qualname__
     else:
-        callInfo['storeArgs'] = [method_or_first_arg] + list(args)
-        return inner_decorator
+        funcName = method.__name__    
+
+    if startDate is not None:
+        startDate = " on " + startDate
+    else:
+        startDate = ""
+
+    if removeDate is not None:
+        removeDate = "at or after " + removeDate 
+    else:
+        removeDate = "soon"        
+
+    if message is None:
+        message = "Find alternative methods."
+
+
+    m = '{0} was deprecated{1} and will disappear {2}. {3}'.format(
+                funcName, startDate, removeDate, message)
+    callInfo = {'calledAlready': False,
+                'message': m}
+
+    @wraps(method)
+    def func_wrapper(*args, **kwargs):
+        #global calledAlready
+        if callInfo['calledAlready'] is False:
+            warnings.warn(callInfo['message'], exceptions21.Music21DeprecationWarning)
+            callInfo['calledAlready'] = True
+        return method(*args, **kwargs)
+
+    return func_wrapper
+    
+
 
 
 #-------------------------------------------------------------------------------
