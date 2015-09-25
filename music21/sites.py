@@ -650,8 +650,6 @@ class Sites(common.SlottedObject):
         True
         '''
         siteRef = self.siteDict[siteId]
-        # need to check if these is weakref
-        #if common.isWeakref(dict['obj']):
         return siteRef.site
 
     def getSiteCount(self):

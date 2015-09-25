@@ -1358,7 +1358,6 @@ class Note(NotRest):
         ''')
 
 
-
     def transpose(self, value, inPlace=False):
         '''
         Transpose the Note by the user-provided 

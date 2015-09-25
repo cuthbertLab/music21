@@ -2275,7 +2275,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #found.show('t')
         # need both _elements and _endElements
         for e in self._elements:
-            #eClasses = e.classes  # store once, as this is property call
             if e.isClassOrSubclass(classFilterList):
                 if returnList is False:
                     found._insertCore(self.elementOffset(e), e, ignoreSort=True)
@@ -2818,7 +2817,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # need both _elements and _endElements
         for e in self.elements:
-            #eClasses = e.classes  # store once, as this is property call
             if classList is not None:
                 if not e.isClassOrSubclass(classList):
                     continue
@@ -2919,7 +2917,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # need both _elements and _endElements
         for e in self.elements:
-            #eClasses = e.classes  # store once, as this is property call
             if classList is not None:
                 if not e.isClassOrSubclass(classList):
                     continue

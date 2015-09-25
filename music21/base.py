@@ -85,6 +85,7 @@ __all__ = ['Music21Exception',
 from music21 import exceptions21
 
 Music21Exception = exceptions21.Music21Exception
+Music21DeprecationWarning = exceptions21.Music21DeprecationWarning
 
 from music21.sites import SitesException
 
@@ -138,12 +139,6 @@ class Music21ObjectException(exceptions21.Music21Exception):
 
 class ElementException(exceptions21.Music21Exception):
     pass
-
-class Music21DeprecationWarning(UserWarning):
-    # Do not subclass Deprecation warning, because these
-    # warnings need to be passed to users...
-    pass
-
 
 #------------------------------------------------------------------------------
 # private metaclass...
@@ -1036,6 +1031,7 @@ class Music21Object(object):
         return post
 
 
+    @common.deprecated('Summer 2015', 'February 2016', 'use self.sites.remove() instead and set activeSite manually.')
     def removeLocationBySite(self, site):
         '''
         DEPRECATED Feb 2016: use self.sites.remove() instead and set activeSite
@@ -1046,11 +1042,6 @@ class Music21Object(object):
         This is only for advanced location method and
         is not a complete or sufficient way to remove an object from a Stream.
         '''
-        warnings.warn(
-            'removeLocationBySite is disappearing; use self.sites.remove() ' + 
-            'and set activeSite to None manually',
-            Music21DeprecationWarning)
-        
         if not self.sites.isSite(site):
 #             for s in self.sites.siteDict:
 #                 # DEBUG!

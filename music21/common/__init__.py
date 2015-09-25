@@ -31,7 +31,10 @@ import time
 import hashlib
 import random
 import inspect
+import warnings
 import weakref
+
+from functools import wraps, partial
 
 from fractions import Fraction # speedup 50% below...
 
@@ -43,12 +46,7 @@ from music21.ext import six
 from music21.common.formats import * # deprecated!
 from music21.common.numberFunc import * #including opFrac
 from music21.common.classTools import * #including isNum, isListLike 
-
-#python3
-try:
-    basestring # @UndefinedVariable 
-except NameError:
-    basestring = str # @ReservedAssignment
+from music21.common.weakrefTools import * # including wrapWeakref
 
 if six.PY2:
     try:
@@ -64,6 +62,108 @@ DEBUG_USER = 1
 DEBUG_DEVEL = 63
 DEBUG_ALL = 255
 
+
+# http://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments
+
+def deprecated(method_or_first_arg, *args):
+    '''
+    Decorator that marks a function as deprecated and should not be called.
+    
+    Because we're all developers, it does not use DeprecationWarning, which no
+    one would ever see, but UserWarning. 
+    
+    Warns once per session and never again.
+    
+    Use without arguments for a simple case:
+    
+    
+    For demonstrating I need to screw with stderr...
+    
+    >>> import sys
+    >>> saveStdErr = sys.stderr
+    >>> sys.stderr = sys.stdout
+    
+    >>> @common.deprecated
+    ... def hi(msg):
+    ...     print(msg)
+    
+    (I'm printing "/" at the beginning because message begins with the filename and that is
+    different on each system, but you can't use ellipses at the beginning of a doctest)
+    
+    >>> print("/"); hi("myke")
+    /...Music21DeprecationWarning: hi was deprecated 
+            and will disappear soon. Find alternative methods.
+      warnings.warn(callInfo['message'], exceptions21.Music21DeprecationWarning)
+    myke    
+    
+    A second call raises no warning:
+    
+    >>> hi("myke")
+    myke
+    
+    
+    Now a new function demonstrating the argument form.
+    
+    >>> @common.deprecated("February 1972", "September 2099", "You should be okay...")
+    ... def bye(msg):
+    ...     print(msg)
+
+    >>> print("/"); bye("world")
+    /...Music21DeprecationWarning: bye was deprecated on February 1972 
+            and will disappear at or after September 2099. You should be okay...
+      warnings.warn(callInfo['message'], exceptions21.Music21DeprecationWarning)
+    world
+    
+    >>> sys.stderr = saveStdErr
+    
+    '''
+    def inner_decorator(func, args=None):
+        if args is None:
+            args = callInfo['storeArgs']
+
+        try:
+            startDate = " on " + args[0]
+        except IndexError:
+            startDate = ""
+
+        try:
+            removeDate = "at or after " + args[1]        
+        except IndexError:
+            removeDate = "soon"
+        
+
+        try:
+            message = args[2]
+        except IndexError:            
+            message = "Find alternative methods."
+        
+        if hasattr(func, '__qualname__'):
+            funcName = func.__qualname__
+        else:
+            funcName = func.__name__
+        
+        callInfo['message'] = '{0} was deprecated{1} and will disappear {2}. {3}'.format(
+                funcName, startDate, removeDate, message)
+        
+        
+        @wraps(func)
+        def func_wrapper(*args, **kwargs):
+            #global calledAlready
+            if callInfo['calledAlready'] is False:
+                warnings.warn(callInfo['message'], exceptions21.Music21DeprecationWarning)
+                callInfo['calledAlready'] = True
+            return func(*args, **kwargs)
+        return func_wrapper
+    
+    #print(method_or_first_arg, args)
+    callInfo = {'calledAlready': False,
+                'storeArgs': None}
+
+    if callable(method_or_first_arg):
+        return inner_decorator(method_or_first_arg, args)
+    else:
+        callInfo['storeArgs'] = [method_or_first_arg] + list(args)
+        return inner_decorator
 
 
 #-------------------------------------------------------------------------------
@@ -539,7 +639,7 @@ def getSourceFilePath():
     
     :rtype: str
     '''
-    import music21 # pylint: disable=redefined-outer-name
+    import music21 # @Reimport # pylint: disable=redefined-outer-name 
     fpMusic21 = music21.__path__[0] # list, get first item 
     # use corpus as a test case
     if 'stream' not in os.listdir(fpMusic21):
@@ -628,7 +728,7 @@ def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
     If `packageOnly` is true, only directories with __init__.py files are colllected.
     '''
     if fpMusic21 == None:
-        import music21 # pylint: disable=redefined-outer-name
+        import music21 # @Reimport # pylint: disable=redefined-outer-name
         fpMusic21 = music21.__path__[0] # list, get first item
 
     # a test if this is the correct directory
@@ -695,104 +795,6 @@ def pitchList(pitchL):
     '''
     return '[' + ', '.join([x.nameWithOctave for x in pitchL]) + ']'
 
-#-------------------------------------------------------------------------------
-def wrapWeakref(referent):
-    '''
-    utility function that wraps objects as weakrefs but does not wrap
-    already wrapped objects; also prevents wrapping the unwrapable "None" type, etc.
-
-    >>> import weakref
-    >>> class Mock(object):
-    ...     pass
-    >>> a1 = Mock()
-    >>> ref1 = common.wrapWeakref(a1)
-    >>> ref1
-    <weakref at 0x101f29ae8; to 'Mock' at 0x101e45358>
-    >>> ref2 = common.wrapWeakref(ref1)
-    >>> ref2
-    <weakref at 0x101f299af; to 'Mock' at 0x101e45358>
-    >>> ref3 = common.wrapWeakref(5)
-    >>> ref3
-    5
-    '''
-    #if type(referent) is weakref.ref:
-#     if isinstance(referent, weakref.ref):
-#         return referent
-    try:
-        return weakref.ref(referent)
-    # if referent is None, will raise a TypeError
-    # if referent is a weakref, will also raise a TypeError
-    # will also raise a type error for string, ints, etc.
-    # slight performance boost rather than checking if None
-    except TypeError:
-        return referent
-
-def unwrapWeakref(referent):
-    '''
-    Utility function that gets an object that might be an object itself
-    or a weak reference to an object.  It returns obj() if it's a weakref.
-    and obj if it's not.
-
-
-    >>> class Mock(object):
-    ...     pass
-    >>> a1 = Mock()
-    >>> a2 = Mock()
-    >>> a2.strong = a1
-    >>> a2.weak = common.wrapWeakref(a1)
-    >>> common.unwrapWeakref(a2.strong) is a1
-    True
-    >>> common.unwrapWeakref(a2.weak) is a1
-    True
-    >>> common.unwrapWeakref(a2.strong) is common.unwrapWeakref(a2.weak)
-    True
-    '''
-    # faster than type checking if referent will usually be a weakref.ref.
-    if isinstance(referent, weakref.ref):
-        return referent()
-    else:
-        return referent
-
-
-def isWeakref(referent):
-    '''Test if an object is a weakref
-
-    just does isinstance, so DEPRECATED Sep 2015; to disappear soon as Dec 2015.
-
-    >>> class Mock(object):
-    ...     pass
-    >>> a1 = Mock()
-    >>> a2 = Mock()
-    >>> common.isWeakref(a1)
-    False
-    >>> common.isWeakref(3)
-    False
-    >>> common.isWeakref(common.wrapWeakref(a1))
-    True
-    '''
-    if isinstance(referent, weakref.ref):        
-        return True
-    return False
-
-
-def findWeakRef(target):
-    '''
-    Given an object or composition of objects, find an attribute that is a weakref. 
-    This is a diagnostic tool.
-    '''
-    for attrName in dir(target):
-        try:
-            attr = getattr(target, attrName)
-        except AttributeError:
-            print('exception on attribute access: %s' % attrName)
-        if isWeakref(attr):
-            print('found weakref', attr, attrName, 'of target:', target)
-        if isinstance(attr, (list, tuple)):
-            for x in attr:
-                findWeakRef(x)
-#         elif isinstance(attr, dict):
-#             for x in attr:
-#                 findWeakRef(attr[x])
 
 xlateAccents={0xc0:'A', 0xc1:'A', 0xc2:'A', 0xc3:'A', 0xc4:'A', 0xc5:'A',
     0xc6:'Ae', 0xc7:'C',
@@ -1358,9 +1360,8 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 1: # normal conditions
-        import music21
-        music21.mainTest(Test)
+    import music21 # @Reimport
+    music21.mainTest(Test)
 #------------------------------------------------------------------------------
 # eof
 
