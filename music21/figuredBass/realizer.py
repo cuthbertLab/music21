@@ -428,7 +428,8 @@ class FiguredBassLine(object):
             if 'Note' in c:
                 break
             #!---------- Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects --------!
-            if 'RomanNumeral' in c or 'ChordSymbol' in c: #and item.isClassOrSubclass(harmony.Harmony):
+            if ('RomanNumeral' in c or 
+                    'ChordSymbol' in c): #and item.isClassOrSubclass(harmony.Harmony):
                 listOfHarmonyObjects = True
                 break
             

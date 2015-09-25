@@ -612,7 +612,7 @@ class Music21Object(object):
 #                 return True
 #         except TypeError:
 #             pass
-        eClasses = self.classes # get cached from property
+        eClasses = self.classes # tiny speedup 73ns vs 400ns
         for className in classFilterList:
             # new method uses string matching of .classes attribute
             # temporarily check to see if this is a string
@@ -633,19 +633,19 @@ class Music21Object(object):
         try:
             return self._classListCacheDict[self.__class__]
         except KeyError:
-            classList = [x.__name__ for x in self.__class__.mro()]
+            classList = tuple([x.__name__ for x in self.__class__.mro()])
             self._classListCacheDict[self.__class__] = classList
             return classList
 
     classes = property(_getClasses,
-        doc='''Returns a list containing the names (strings, not objects) of classes that this
+        doc='''Returns a tuple containing the names (strings, not objects) of classes that this
         object belongs to -- starting with the object's class name and going up the mro()
         for the object.  Very similar to Perl's @ISA array:
 
 
         >>> q = note.Note()
         >>> q.classes
-        ['Note', 'NotRest', 'GeneralNote', 'Music21Object', 'object']
+        ('Note', 'NotRest', 'GeneralNote', 'Music21Object', 'object')
 
         Having quick access to these things as strings makes it easier to do comparisons:
 
@@ -664,6 +664,8 @@ class Music21Object(object):
         >>> s2.show('text')
         {10.0} <music21.clef.GClef>
         {30.0} <music21.clef.FrenchViolinClef>
+        
+        `Changed 2015 Sep`: returns a tuple, not a list.        
         ''')
 
     def _getFullyQualifiedClasses(self):
@@ -676,7 +678,7 @@ class Music21Object(object):
 
     fullyQualifiedClasses = property(_getFullyQualifiedClasses,
         doc='''
-        Similar to `.classes`, returns a list containing the names (strings, not objects) of
+        Similar to `.classes`, returns a tuple containing the names (strings, not objects) of
         classes with the full package name that this
         object belongs to -- starting with the object's class name and going up the mro()
         for the object.  Very similar to Perl's @ISA array:
@@ -689,6 +691,8 @@ class Music21Object(object):
         
         The last one (object) will be different in Py2 (__builtin__.object) and 
         Py3 (builtins.object)
+        
+        `Changed 2015 Sep`: returns a tuple, not a list.
         ''')
 
     #---------------------------

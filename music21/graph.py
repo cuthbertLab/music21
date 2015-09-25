@@ -3232,8 +3232,7 @@ class PlotHorizontalBar(PlotStream):
         else:
             sSrc = self.streamObj
         for obj in sSrc.getElementsByClass((note.Note, chord.Chord)):
-            classes = obj.classes       
-            if 'Chord' in classes:
+            if 'Chord' in obj.classes:
                 values = self._extractChordDataOneAxis(self.fy, obj)
                 valueObjPairs = [(v, obj) for v in values]
             else: # its a Note

@@ -1208,7 +1208,10 @@ class Pitch(object):
 
     # constants shared by all classes
     _twelfth_root_of_two = TWELFTH_ROOT_OF_TWO
-    classes = ['Pitch', 'object'] # makes subclassing harder; was [x.__name__ for x in self.__class__.mro()] but 5% of creation time 
+
+    # TODO: steal from Music21Object
+    classes = ('Pitch', 'object') # makes subclassing harder; was [x.__name__ for x in self.__class__.mro()] but 5% of creation time 
+
 
     def __init__(self, name=None, **keywords):
         self._groups = None
