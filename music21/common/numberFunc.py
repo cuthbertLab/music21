@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         common/formats.py
-# Purpose:      Utilities for formats
+# Name:         common/numberFunc.py
+# Purpose:      Utilities for working with numbers or number-like objects
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
@@ -38,7 +38,6 @@ __all__ = ['ordinals', 'musicOrdinals',
            'euclidGCD', 'approximateGCD',
            'lcm',
            
-           'isNum',
            'contiguousList',
            
            'groupContiguousIntegers',
@@ -871,50 +870,6 @@ def lcm(filterList):
         lcmVal = _lcm(lcmVal, filterList[i])
     return lcmVal
 
-def isNum(usrData):
-    '''
-    check if usrData is a number (float, int, long, Decimal),
-    return boolean
-     
-    unlike `isinstance(usrData, Number)` does not return True for
-    `True, False`. 
-    
-    Does not use `isinstance(usrData, Number) which is 6 times slower
-    than calling this function (except in the case of Fraction, when
-    it's 6 times faster, but that's rarer)
-    
-    Runs by adding 0 to the "number" -- so anything that implements
-    add to a scalar works
-    
-    >>> common.isNum(3.0)
-    True
-    >>> common.isNum(3)
-    True
-    >>> common.isNum('three')
-    False
-    >>> common.isNum([2, 3, 4])
-    False
-    
-    True and False are NOT numbers:
-    
-    >>> common.isNum(True)
-    False
-    >>> common.isNum(False)
-    False
-    >>> common.isNum(None)
-    False
-    
-    :rtype: bool
-    '''
-    try:
-        # TODO: this may have unexpected consequences: find
-        dummy = usrData + 0
-        if usrData is not True and usrData is not False:
-            return True
-        else:
-            return False
-    except Exception: # pylint: disable=broad-except
-        return False
 
 def contiguousList(inputListOrTuple):
     '''

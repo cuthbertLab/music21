@@ -40,8 +40,10 @@ from music21 import exceptions21
 from music21.ext import six
 
 # pylint: disable=wildcard-import
-from music21.common.formats import *
+from music21.common.formats import * # deprecated!
 from music21.common.numberFunc import * #including opFrac
+from music21.common.classTools import * #including isNum, isListLike 
+
 #python3
 try:
     basestring # @UndefinedVariable 
@@ -116,74 +118,6 @@ basicallyEquals = basicallyEqual
 
 
 
-
-def isStr(usrData):
-    """
-    DEPRECATED: September 2015 -- use isinstance(usrData, six.string_types)
-    
-    Check of usrData is some form of string, including unicode.
-
-    >>> common.isStr(3)
-    False
-    >>> common.isStr('sharp')
-    True
-    >>> common.isStr(u'flat')
-    True
-    
-    :rtype: bool
-    """
-    return isinstance(usrData, six.string_types)
-
-
-def isListLike(usrData):
-    """
-    Returns True if is a List or Tuple 
-    
-    Formerly allowed for set here, but that does not allow for
-    subscripting (`set([1, 2, 3])[0]` is undefined).
-    
-    Differs from isinstance(collections.abc.Sequence()) in that
-    we do not want Streams included even if __contains__, __reversed__,
-    and count are added.
-
-    >>> common.isListLike([])
-    True
-    >>> common.isListLike('sharp')
-    False
-    >>> common.isListLike((None, None))
-    True
-    >>> common.isListLike(set(['a','b','c','c']))
-    False
-    >>> common.isListLike(stream.Stream())
-    False
-    
-    :rtype: bool
-    """
-    return isinstance(usrData, (list, tuple))
-
-def isIterable(usrData):
-    """
-    Returns True if is the object can be iter'd over 
-    and is NOT a string
-
-    >>> common.isIterable([5, 10])
-    True
-    >>> common.isIterable('sharp')
-    False
-    >>> common.isIterable((None, None))
-    True
-    >>> common.isIterable(stream.Stream())
-    True
-    
-    :rtype: bool
-    """
-    if hasattr(usrData, "__iter__"): 
-        if six.PY3: # no __iter__ on strings in py2
-            if isinstance(usrData, str) or isinstance(usrData, bytes):
-                return False
-        return True
-    else:
-        return False
 
 
 def toUnicode(usrStr):
@@ -264,18 +198,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
     
 
 
-def classToClassStr(classObj):
-    '''Convert a class object to a class string.
 
-    >>> common.classToClassStr(note.Note)
-    'Note'
-    >>> common.classToClassStr(chord.Chord)
-    'Chord'
-    
-    :rtype: str
-    '''
-    # remove closing quotes
-    return str(classObj).split('.')[-1][:-2]
 
 def getNumFromStr(usrStr, numbers='0123456789'):
     '''Given a string, extract any numbers. Return two strings, the numbers (as strings) and the remaining characters.

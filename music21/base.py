@@ -304,6 +304,16 @@ class Music21Object(object):
     isSpanner = False
     isVariant = False
 
+
+    # this dictionary stores the _classes for each Class so that
+    # it only needs to be made once (11 microseconds per call, can be
+    # a big part of iteration)
+    _classListCacheDict = {}
+    
+    # same with fully qualified names
+    _classListFullyQualifiedCacheDict = {}
+
+
     # define order to present names in documentation; use strings
     _DOC_ORDER = [
         'classes',
@@ -659,11 +669,12 @@ class Music21Object(object):
         return False
 
     def _getClasses(self):
-        #environLocal.printDebug(['calling _getClasses'])
-        if self._classes is None:
-            #environLocal.printDebug(['setting self._classes', id(self), self])
-            self._classes = [x.__name__ for x in self.__class__.mro()]
-        return self._classes
+        try:
+            return self._classListCacheDict[self.__class__]
+        except KeyError:
+            classList = [x.__name__ for x in self.__class__.mro()]
+            self._classListCacheDict[self.__class__] = classList
+            return classList
 
     classes = property(_getClasses,
         doc='''Returns a list containing the names (strings, not objects) of classes that this
@@ -695,12 +706,12 @@ class Music21Object(object):
         ''')
 
     def _getFullyQualifiedClasses(self):
-        #environLocal.printDebug(['calling _getClasses'])
-        if self._fullyQualifiedClasses is None:
-            #environLocal.printDebug(['setting self._fullyQualifiedClasses', id(self), self])
-            self._fullyQualifiedClasses = [x.__module__ + 
-                                           '.' + x.__name__ for x in self.__class__.mro()]
-        return self._fullyQualifiedClasses
+        try:
+            return self._classListFullyQualifiedCacheDict[self.__class__]
+        except KeyError:
+            classList = [x.__module__ + '.' + x.__name__ for x in self.__class__.mro()]
+            self._classListFullyQualifiedCacheDict[self.__class__] = classList
+            return classList
 
     fullyQualifiedClasses = property(_getFullyQualifiedClasses,
         doc='''
