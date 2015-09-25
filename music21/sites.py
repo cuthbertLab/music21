@@ -840,15 +840,6 @@ class Sites(common.SlottedObject):
         Given an object, determine if it is an object in a Site stored in this 
         Sites's siteDict. This
         will return False if the object is simply a context and not a location.
-
-        >>> class Mock(base.Music21Object):
-        ...     pass
-        ...
-        >>> aSite = Mock()
-        >>> aLocations = sites.Sites()
-        >>> aLocations.add(aSite)
-        >>> aLocations.isSite(aSite)
-        True
         '''
         if id(obj) in self.siteDict:
             return True

@@ -80,10 +80,10 @@ class FiguredBassScale(object):
         if bassSD == None:
             bassPitchCopy = copy.deepcopy(bassPitch)
             bassNote = note.Note(bassPitchCopy)
-            if (self.keySig.accidentalByStep(bassNote.step)
-                    != bassNote.accidental):
-                bassNote.accidental = \
-                    self.keySig.accidentalByStep(bassNote.step)
+            if (self.keySig.accidentalByStep(bassNote.pitch.step)
+                    != bassNote.pitch.accidental):
+                bassNote.pitch.accidental = \
+                    self.keySig.accidentalByStep(bassNote.pitch.step)
             bassSD = self.realizerScale.getScaleDegreeFromPitch(bassNote.pitch)
 
         pitchNames = []

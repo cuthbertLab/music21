@@ -72,10 +72,9 @@ def convertKeyStringToMusic21KeyString(textString):
     return textString
 
 def sharpsToPitch(sharpCount):
-    '''Given a number a positive/negative number of sharps, return a Pitch 
+    '''
+    Given a number a positive/negative number of sharps, return a Pitch 
     object set to the appropriate major key value.
-
-    
 
     >>> key.sharpsToPitch(1)
     <music21.pitch.Pitch G>
@@ -161,8 +160,6 @@ def pitchToSharps(value, mode=None):
     (extra points to anyone who can find the earliest reference to
     the Locrian mode in print.  David Cohen and I (MSC) have been
     looking for this for years).
-
-    
 
     >>> key.pitchToSharps('c')
     0
@@ -323,6 +320,9 @@ class KeySignature(base.Music21Object):
     or if negative the number of flats.  The second argument (deprecated Jan 2014 -- do not use)
     specifies the mode of the piece ('major', 'minor', or None for unknown).
     
+    Mode will be deprecated fully once easier ways for MEI to store this information in a
+    key are given.
+    
     If you are starting with the name of a key, see the :class:`~music21.key.Key` object.
 
 
@@ -363,8 +363,8 @@ class KeySignature(base.Music21Object):
     
     def __init__(self, sharps=None, mode=None):
         base.Music21Object.__init__(self)
-        if mode is not None:
-            self._mode_is_deprecated()
+        #if mode is not None:
+        #    self._mode_is_deprecated()
         
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
 
@@ -387,9 +387,9 @@ class KeySignature(base.Music21Object):
         # cache altered pitches
         self._alteredPitchesCached = []
 
-    @common.deprecated("Jan 2014", "Jan 2016", "\n\nMode is deprecated in a KeySignature object. Use Key instead.")
-    def _mode_is_deprecated(self):
-        pass
+    #@common.deprecated("Jan 2014", "Jan 2016", "\n\nMode is deprecated in a KeySignature object. Use Key instead.")
+    #def _mode_is_deprecated(self):
+    #    pass
 
     def __hash__(self):
         hashTuple = (self._sharps, self._mode, tuple(self._alteredPitches))
@@ -441,7 +441,10 @@ class KeySignature(base.Music21Object):
         return self.__repr__()
 
     def _getPitchAndMode(self):
-        '''Returns a a two value list containing 
+        '''
+        DEPRECATED!
+        
+        Returns a a two value list containing 
         a :class:`music21.pitch.Pitch` object that 
         names this key and the value of :attr:`~music21.key.KeySignature.mode`.
 
@@ -838,7 +841,7 @@ class Key(KeySignature, scale.DiatonicScale):
     _mode = None
 
 
-    def __init__(self, tonic = None, mode = None):
+    def __init__(self, tonic=None, mode=None):
         if tonic is not None:
             if hasattr(tonic, 'classes') and ('Music21Object' in tonic.classes or 
                                               'Pitch' in tonic.classes):

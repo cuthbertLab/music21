@@ -901,7 +901,7 @@ class Test(unittest.TestCase):
         s = nwt.parseString(info)
         #s.show('text')
         n1 = s.parts[1].getElementsByClass('Measure')[0].notes[0]
-        self.assertEqual(n1.accidental.alter, -1.0)
+        self.assertEqual(n1.pitch.accidental.alter, -1.0)
         
 
 class TestExternal(unittest.TestCase):
@@ -909,7 +909,6 @@ class TestExternal(unittest.TestCase):
         pass
     def testPaert(self):
         import os
-        from music21 import common #pylint: disable=reimported, redefined-outer-name
         nwcTranslatePath = common.getSourceFilePath() + os.path.sep + 'noteworthy'
         paertPath = nwcTranslatePath + os.path.sep + 'NWCTEXT_Really_complete_example_file.nwctxt' #'Part_OWeisheit.nwctxt' #
         #paertPath = r'D:\docs\research\music21\elvis\Wegman Masses\01\Caput\01 Kyrie.nwctxt'

@@ -1658,14 +1658,14 @@ class Test(unittest.TestCase):
         note3.pitch.name = "B-"
         # not sure how to test not None
         #self.assertFalse (note3.pitch.accidental, None)
-        self.assertEqual (note3.accidental.name, "flat")
-        self.assertEqual (note3.pitchClass, 10)
+        self.assertEqual (note3.pitch.accidental.name, "flat")
+        self.assertEqual (note3.pitch.pitchClass, 10)
 
         a5 = Note()
         a5.name = "A"
         a5.octave = 5
-        self.assertAlmostEquals(a5.frequency, 880.0)
-        self.assertEqual(a5.pitchClass, 9)
+        self.assertAlmostEquals(a5.pitch.frequency, 880.0)
+        self.assertEqual(a5.pitch.pitchClass, 9)
 
 
 

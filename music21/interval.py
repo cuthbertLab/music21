@@ -329,7 +329,6 @@ def convertGeneric(value):
     return post
 
     
-@common.deprecated("2013 Oct", "January 2016", "Unused and not general enough.")
 def convertSemitoneToSpecifierGenericMicrotone(count):
     '''
     Given a number of semitones, return a default diatonic specifier and cent offset.
@@ -1372,7 +1371,17 @@ def notesToChromatic(n1, n2):
     <music21.interval.ChromaticInterval 15>
 
     '''
-    return ChromaticInterval(n2.ps - n1.ps)
+    if hasattr(n1, 'pitch'):
+        p1 = n1.pitch
+    else:
+        p1 = n1
+        
+    if hasattr(n2, 'pitch'):
+        p2 = n2.pitch
+    else:
+        p2 = n2
+
+    return ChromaticInterval(p2.ps - p1.ps)
 
 
 def _getSpecifierFromGenericChromatic(gInt, cInt):

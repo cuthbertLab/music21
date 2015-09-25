@@ -267,8 +267,8 @@ def parseTokens(mh, dst, p, useMeasures):
                 n = note.Rest()
             else:
                 n = note.Note(t.pitchName)
-                if n.accidental != None:
-                    n.accidental.displayStatus = t.accidentalDisplayStatus
+                if n.pitch.accidental != None:
+                    n.pitch.accidental.displayStatus = t.accidentalDisplayStatus
 
             n.quarterLength = t.quarterLength
 

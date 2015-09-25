@@ -4099,7 +4099,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         quickSearch = True
         if len(keySigSearch) == 0:
-            ourKey = key.KeySignature('C', 'major')
+            ourKey = key.Key('C')
         elif len(keySigSearch) == 1:
             ourKey = keySigSearch[0]
         else:
@@ -11492,7 +11492,7 @@ class Score(Stream):
         >>> s = corpus.parse('bach/bwv66.6')
         >>> partStream = s.parts
         >>> partStream.classes
-        ['Score', 'Stream', 'StreamCoreMixin', 'Music21Object', 'object']
+        ('Score', 'Stream', 'StreamCoreMixin', 'Music21Object', 'object')
         >>> len(partStream)
         4
 

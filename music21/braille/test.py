@@ -488,8 +488,8 @@ def example6_4():
     ⠟⠄
     """
     bm = converter.parse("tinynotation: 3/4 e4 e8 a8 c'8 e'8 f'2.", makeNotation=False)
-    bm.notes[0].accidental = pitch.Accidental()
-    bm.notes[4].accidental = pitch.Accidental()
+    bm.notes[0].pitch.accidental = pitch.Accidental()
+    bm.notes[4].pitch.accidental = pitch.Accidental()
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-1].rightBarline = None
     return bm
@@ -504,7 +504,7 @@ def example6_5():
     ⠓⠡⠚⠹⠱
     """
     bm = converter.parse("tinynotation: 3/4 c'8 b-8 a8 g8 f4 g8 bn8 c'4 d'4").flat
-    bm.notes[-3].accidental = pitch.Accidental()
+    bm.notes[-3].pitch.accidental = pitch.Accidental()
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-1].rightBarline = None
     return bm
@@ -534,8 +534,8 @@ def example6_7():
     """
     bm = converter.parse("tinynotation: g'4 f'#4 f'4 e'4 e'-4 d'4 d'-4 c'4 b4 b-4 a4 a-4 g4 f#4 f4 e4 e-4 d4 d-4 c4 B4 c4 d4 e4 c2 r2 c1", makeNotation=False).getElementsNotOfClass(['TimeSignature'])
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    bm[-3][2].accidental.displayStatus = False
-    bm[-3][3].accidental.displayStatus = False
+    bm[-3][2].pitch.accidental.displayStatus = False
+    bm[-3][3].pitch.accidental.displayStatus = False
     return bm
 
 def example6_8():
@@ -604,9 +604,9 @@ def example6_12():
     """
     bm = converter.parse("tinynotation: e'8 e'-8 d'8 d'-8 c'8 a8 a-8 g8 b--8 a-8 g8 g-8 f8 e8 d8 c8 d8 B8 B-8 Bn8 c8 d8 e8 f8 g8 g#8 a8 b8 c'4 r4").flat
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    bm.measure(2).notes[5].accidental.displayStatus = False
-    bm.measure(2).notes[6].accidental.displayStatus = False
-    bm.measure(3).notes[1].accidental.displayStatus = False
+    bm.measure(2).notes[5].pitch.accidental.displayStatus = False
+    bm.measure(2).notes[6].pitch.accidental.displayStatus = False
+    bm.measure(3).notes[1].pitch.accidental.displayStatus = False
     return bm
 
 #-------------------------------------------------------------------------------
@@ -737,9 +737,9 @@ def example7_6():
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠣⠨⠋⠋⠋⠋⠀⠑⠑⠣⠺⠀⠙⠙⠙⠙⠀⠣⠐⠋⠨⠙⠣⠺⠀⠛⠛⠨⠹⠀⠣⠚⠚⠨⠻
     ⠀⠀⠣⠨⠋⠑⠙⠣⠚⠀⠣⠨⠫⠣⠐⠫⠣⠅
-    >>> inPart.measure(7).notes[3].accidental
+    >>> inPart.measure(7).notes[3].pitch.accidental
     <accidental flat>
-    >>> inPart.measure(7).notes[3].accidental.displayStatus == True
+    >>> inPart.measure(7).notes[3].pitch.accidental.displayStatus == True
     True
     """
     bm = converter.parse("tinynotation: 4/8 e'-8 e'-8 e'-8 e'-8 d'8 d'8 b-4 c'8 c'8 c'8 c'8 e-8 c'8 b-4\
@@ -799,29 +799,29 @@ def example7_10():
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> inPart = test.example7_10()
-    >>> inPart.measure(2).notes[0].accidental.displayStatus == True
+    >>> inPart.measure(2).notes[0].pitch.accidental.displayStatus == True
     True
-    >>> inPart.measure(2).notes[1].accidental.displayStatus == True
+    >>> inPart.measure(2).notes[1].pitch.accidental.displayStatus == True
     True
-    >>> inPart.measure(3).notes[2].accidental.displayStatus == True
+    >>> inPart.measure(3).notes[2].pitch.accidental.displayStatus == True
     True
-    >>> inPart.measure(3).notes[4].accidental.displayStatus == True
+    >>> inPart.measure(3).notes[4].pitch.accidental.displayStatus == True
     True
-    >>> inPart.measure(3).notes[7].accidental.displayStatus == False
+    >>> inPart.measure(3).notes[7].pitch.accidental.displayStatus == False
     True
-    >>> inPart.measure(4).notes[1].accidental.displayStatus == True
+    >>> inPart.measure(4).notes[1].pitch.accidental.displayStatus == True
     True
-    >>> inPart.measure(4).notes[2].accidental.displayStatus == True
+    >>> inPart.measure(4).notes[2].pitch.accidental.displayStatus == True
     True
-    >>> inPart.measure(5).notes[2].accidental.displayStatus == True
+    >>> inPart.measure(5).notes[2].pitch.accidental.displayStatus == True
     True
-    >>> inPart.measure(7).notes[1].accidental.displayStatus == True
+    >>> inPart.measure(7).notes[1].pitch.accidental.displayStatus == True
     True
-    >>> inPart.measure(7).notes[2].accidental.displayStatus == True
+    >>> inPart.measure(7).notes[2].pitch.accidental.displayStatus == True
     True
-    >>> inPart.measure(7).notes[3].accidental.displayStatus == True
+    >>> inPart.measure(7).notes[3].pitch.accidental.displayStatus == True
     True
-    >>> inPart.measure(7).notes[6].accidental.displayStatus == False
+    >>> inPart.measure(7).notes[6].pitch.accidental.displayStatus == False
     True
 
 
@@ -841,17 +841,17 @@ def example7_11():
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> inPart = test.example7_11()
-    >>> inPart.measure(4).notes[0].accidental.displayStatus == True # A-3
+    >>> inPart.measure(4).notes[0].pitch.accidental.displayStatus == True # A-3
     True
-    >>> inPart.measure(4).notes[3].accidental.displayStatus == False # A-3
+    >>> inPart.measure(4).notes[3].pitch.accidental.displayStatus == False # A-3
     True
-    >>> inPart.measure(5).notes[1].accidental.displayStatus == True # E-3
+    >>> inPart.measure(5).notes[1].pitch.accidental.displayStatus == True # E-3
     True
-    >>> inPart.measure(5).notes[2].accidental.displayStatus == True # A-3
+    >>> inPart.measure(5).notes[2].pitch.accidental.displayStatus == True # A-3
     True
-    >>> inPart.measure(6).notes[0].accidental.displayStatus == True # E-3
+    >>> inPart.measure(6).notes[0].pitch.accidental.displayStatus == True # E-3
     True
-    >>> inPart.measure(6).notes[5].accidental.displayStatus == True # E-2
+    >>> inPart.measure(6).notes[5].pitch.accidental.displayStatus == True # E-2
     True
 
     >>> print(translate.partToBraille(inPart, inPlace=True))
@@ -867,7 +867,7 @@ def example7_11():
     bm[0].padAsAnacrusis()
     for measure in bm:
         measure.number -= 1
-    bm.measure(7).notes[3].accidental = pitch.Accidental()
+    bm.measure(7).notes[3].pitch.accidental = pitch.Accidental()
     return bm
 
 #-------------------------------------------------------------------------------
@@ -1067,8 +1067,8 @@ def drill8_2():
     bm.insert(0, tempo.TempoText("In strict time"))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-2].notes[-1].transpose('P-8', inPlace=True)
-    bm.measure(7).notes[-1].accidental.displayStatus = False # flat not strictly necessary
-    bm.measure(11).notes[-1].accidental.displayStatus = False # flat not necessary (never?)
+    bm.measure(7).notes[-1].pitch.accidental.displayStatus = False # flat not strictly necessary
+    bm.measure(11).notes[-1].pitch.accidental.displayStatus = False # flat not necessary (never?)
     return bm
 
 def drill8_3():
@@ -1515,7 +1515,7 @@ def drill9_5():
     bm.insert(0, key.KeySignature(-1))
     bm.insert(0, tempo.TempoText("Lightly, almost in one"))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    bm[1].notes[0].accidental.displayStatus = False
+    bm[1].notes[0].pitch.accidental.displayStatus = False
     # measure 1 fingerings
     bm[0].notes[0].fingering = '5'
     bm[0].notes[1].fingering = '1'
@@ -1641,7 +1641,7 @@ def example10_2():
     bm = converter.parse("tinynotation: 4/4 e8 f# g# a b- gn e c f a g c a2").flat
     bm.insert(0, key.KeySignature(-1))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    bm[1].notesAndRests[0].accidental.displayStatus = False
+    bm[1].notesAndRests[0].pitch.accidental.displayStatus = False
     return bm
 
 def example10_3():
@@ -1656,7 +1656,7 @@ def example10_3():
     bm = converter.parse("tinynotation: 6/8 e8 f# g# a b- g e c f a g c a2.").flat
     bm.insert(0, key.KeySignature(-1))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    bm[1].notesAndRests[2].accidental.displayStatus = False
+    bm[1].notesAndRests[2].pitch.accidental.displayStatus = False
     return bm
 
 def example10_4():
@@ -1671,7 +1671,7 @@ def example10_4():
     bm = converter.parse("tinynotation: 12/8 e2.~ e8 f# g# a b- gn c d e f4.~ f8 e f g f e f2.").flat
     bm.insert(0, key.KeySignature(-1))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-    bm[1].notesAndRests[3].accidental.displayStatus = False
+    bm[1].notesAndRests[3].pitch.accidental.displayStatus = False
     return bm
     
 def example10_5():
@@ -2510,7 +2510,7 @@ def example15_5():
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[0].pop(3)
     bm[0].padAsAnacrusis()
-    bm[3][1].accidental.displayStatus = False # remove cautionary accidental display
+    bm[3][1].pitch.accidental.displayStatus = False # remove cautionary accidental display
     for m in bm:
         m.number -= 1
     bm[-1].rightBarline = bar.Barline('double')
@@ -2611,8 +2611,8 @@ def example15_11():
         m.number -= 1
     for i in range(3):
         bm[0].pop(2)
-    bm[-1].notes[7].accidental = pitch.Accidental('natural')
-    bm[-1].notes[11].accidental = pitch.Accidental('natural')
+    bm[-1].notes[7].pitch.accidental = pitch.Accidental('natural')
+    bm[-1].notes[11].pitch.accidental = pitch.Accidental('natural')
     return bm
 
 #-------------------------------------------------------------------------------

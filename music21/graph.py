@@ -2808,7 +2808,7 @@ class PlotHistogramPitchSpace(PlotHistogram):
     def __init__(self, streamObj, *args, **keywords):
         PlotHistogram.__init__(self, streamObj, *args, **keywords)
 
-        self.fx = lambda n:n.midi
+        self.fx = lambda n: n.pitch.midi
         self.fxTick = lambda n: n.nameWithOctave
         # replace with self.ticksPitchSpaceUsage
 
@@ -2859,7 +2859,7 @@ class PlotHistogramPitchClass(PlotHistogram):
     def __init__(self, streamObj, *args, **keywords):
         PlotHistogram.__init__(self, streamObj, *args, **keywords)
 
-        self.fx = lambda n:n.pitchClass
+        self.fx = lambda n: n.pitch.pitchClass
         self.fxTick = lambda n: n.name
         # replace with self.ticksPitchClassUsage
 
@@ -2946,10 +2946,10 @@ class PlotScatter(PlotStream):
             self.xLog = keywords['xLog']
 
         # sample values; customize in subclass
-        self.fy = lambda n:n.ps
+        self.fy = lambda n: n.pitch.ps
         self.fyTicks = self.ticksPitchSpaceUsage
 
-        self.fx = lambda n:n.quarterLength
+        self.fx = lambda n: n.quarterLength
         self.fxTicks = self.ticksQuarterLength
 
 
@@ -3035,9 +3035,9 @@ class PlotScatterPitchSpaceQuarterLength(PlotScatter):
     def __init__(self, streamObj, *args, **keywords):
         PlotScatter.__init__(self, streamObj, *args, **keywords)
 
-        self.fy = lambda n:n.ps
+        self.fy = lambda n: sum([p.ps for p in n.pitches])/len(n.pitches)
         self.fyTicks = self.ticksPitchSpaceUsage
-        self.fx = lambda n:n.quarterLength
+        self.fx = lambda n: n.quarterLength
         self.fxTicks = self.ticksQuarterLength
 
         # will use self.fx and self.fxTick to extract data
@@ -3081,10 +3081,10 @@ class PlotScatterPitchClassQuarterLength(PlotScatter):
     def __init__(self, streamObj, *args, **keywords):
         PlotScatter.__init__(self, streamObj, *args, **keywords)
 
-        self.fy = lambda n:n.pitchClass
+        self.fy = lambda n: n.pitch.pitchClass
         self.fyTicks = self.ticksPitchClassUsage
 
-        self.fx = lambda n:n.quarterLength
+        self.fx = lambda n: n.quarterLength
         self.fxTicks = self.ticksQuarterLength
 
         # will use self.fx and self.fxTick to extract data
@@ -3127,10 +3127,10 @@ class PlotScatterPitchClassOffset(PlotScatter):
     def __init__(self, streamObj, *args, **keywords):
         PlotScatter.__init__(self, streamObj, *args, **keywords)
 
-        self.fy = lambda n:n.pitchClass
+        self.fy = lambda n: n.pitch.pitchClass
         self.fyTicks = self.ticksPitchClassUsage
 
-        self.fx = lambda n:n.offset
+        self.fx = lambda n: n.offset
         self.fxTicks = self.ticksOffset
 
         # will use self.fx and self.fxTick to extract data
@@ -3219,7 +3219,7 @@ class PlotHorizontalBar(PlotStream):
     def __init__(self, streamObj, *args, **keywords):
         PlotStream.__init__(self, streamObj, *args, **keywords)
 
-        self.fy = lambda n:n.ps
+        self.fy = lambda n: n.pitch.ps
         self.fyTicks = self.ticksPitchSpaceChromatic
         self.fxTicks = self.ticksOffset
 
@@ -3286,7 +3286,7 @@ class PlotHorizontalBarPitchClassOffset(PlotHorizontalBar):
     def __init__(self, streamObj, *args, **keywords):
         PlotHorizontalBar.__init__(self, streamObj, *args, **keywords)
 
-        self.fy = lambda n:n.pitchClass
+        self.fy = lambda n: n.pitch.pitchClass
         self.fyTicks = self.ticksPitchClassUsage
         self.fxTicks = self.ticksOffset # this a method
 
@@ -3329,7 +3329,7 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
     def __init__(self, streamObj, *args, **keywords):
         PlotHorizontalBar.__init__(self, streamObj, *args, **keywords)
        
-        self.fy = lambda n:n.ps
+        self.fy = lambda n: n.pitch.ps
         self.fxTicks = self.ticksOffset
 
         if self.streamObj.isTwelveTone():
@@ -3447,7 +3447,7 @@ class PlotDolan(PlotHorizontalBarWeighted):
     def __init__(self, streamObj, *args, **keywords):
         PlotHorizontalBarWeighted.__init__(self, streamObj, *args, **keywords)
 
-        #self.fy = lambda n:n.pitchClass
+        #self.fy = lambda n: n.pitch.pitchClass
         #self.fyTicks = self.ticksPitchClassUsage
         self.fxTicks = self.ticksOffset # this is a method
 
@@ -3541,8 +3541,8 @@ class PlotScatterWeighted(PlotStream):
             self.xLog = keywords['xLog']
 
         # specialize in sub-class
-        self.fx = lambda n:n.quarterLength
-        self.fy = lambda n: n.midi
+        self.fx = lambda n: n.quarterLength
+        self.fy = lambda n: n.pitch.midi
         self.fxTicks = self.ticksQuarterLength
         self.fyTicks = self.ticksPitchClassUsage
 
@@ -3650,7 +3650,7 @@ class PlotScatterWeightedPitchSpaceQuarterLength(PlotScatterWeighted):
         PlotScatterWeighted.__init__(self, streamObj, *args, **keywords)
 
         self.fx = lambda n: n.quarterLength
-        self.fy = lambda n: n.midi
+        self.fy = lambda n: n.pitch.midi
         self.fxTicks = self.ticksQuarterLength
         self.fyTicks = self.ticksPitchSpaceUsage
 
@@ -3694,8 +3694,8 @@ class PlotScatterWeightedPitchClassQuarterLength(PlotScatterWeighted):
     def __init__(self, streamObj, *args, **keywords):
         PlotScatterWeighted.__init__(self, streamObj, *args, **keywords)
 
-        self.fx = lambda n:n.quarterLength
-        self.fy = lambda n: n.pitchClass
+        self.fx = lambda n: n.quarterLength
+        self.fy = lambda n: n.pitch.pitchClass
         self.fxTicks = self.ticksQuarterLength
         self.fyTicks = self.ticksPitchClassUsage
 
@@ -3884,8 +3884,8 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
     def __init__(self, streamObj, *args, **keywords):
         Plot3DBars.__init__(self, streamObj, *args, **keywords)
 
-        self.fx = lambda n:n.quarterLength
-        self.fy = lambda n:n.ps
+        self.fx = lambda n: n.quarterLength
+        self.fy = lambda n: sum([p.ps for p in n.pitches])/len(n.pitches)
         self.fyTicks = self.ticksPitchSpaceUsage
 
         # will use self.fx and self.fxTick to extract data
@@ -4743,7 +4743,7 @@ class Test(unittest.TestCase):
 
         b = PlotHistogram(stream.Stream(), doneAction=None)
         c = chord.Chord(['b', 'c', 'd'])
-        fx = lambda n:n.midi
+        fx = lambda n: n.pitch.midi
         self.assertEqual(b._extractChordDataOneAxis(fx, c), [71, 60, 62])
 
 
@@ -4781,8 +4781,8 @@ class Test(unittest.TestCase):
 
         b = PlotScatter(stream.Stream(), doneAction=None)
         c = chord.Chord(['b', 'c', 'd'], quarterLength=.5)
-        fx = lambda n:n.midi
-        fy = lambda n:n.quarterLength
+        fx = lambda n: n.pitch.midi
+        fy = lambda n: n.quarterLength
         self.assertEqual(b._extractChordDataTwoAxis(fx, fy, c), ([71, 60, 62], [0.5]))
         c = chord.Chord(['b', 'c', 'd'], quarterLength=.5)
         # matching the number of pitches for each data point may be needed
@@ -4911,7 +4911,7 @@ class Test(unittest.TestCase):
         #s.append(note.Note('c3'))
         c = sc.getChord('e3','a3', quarterLength=.5)
         self.assertEqual(repr(c), '<music21.chord.Chord E3 F3 G3 A3>')
-        self.assertEqual([n.ps for n in c], [52.0, 53.0, 55.0, 57.0])
+        self.assertEqual([n.pitch.ps for n in c], [52.0, 53.0, 55.0, 57.0])
         s.append(c)
         #s.append(note.Note('c3', quarterLength=2))
         s.append(dynamics.Dynamic('mf'))
@@ -4936,7 +4936,9 @@ class Test(unittest.TestCase):
                                   (77.0, 7, 1), (77.0, 4, 2), (79.0, 7, 1), (79.0, 4, 2)])
         #b.write()
 
-
+    def testPlotChordsB3(self):
+        from music21 import stream, scale
+        sc = scale.MajorScale('c4')
 
 
         s = stream.Stream()

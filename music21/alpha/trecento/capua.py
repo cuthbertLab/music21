@@ -127,8 +127,8 @@ def capuaRuleOne(srcStream):
         i1 = interval.notesToInterval(n1,n2)
         i2 = interval.notesToInterval(n2,n3)
 
-        if n1.accidental is not None or \
-           n3.accidental is not None:
+        if n1.pitch.accidental is not None or \
+           n3.pitch.accidental is not None:
             continue
 
         ### never seems to improve things...
@@ -143,9 +143,9 @@ def capuaRuleOne(srcStream):
                 n2.editorial.misc['capua_rule_number'] += RULE_ONE
             else:
                 n2.editorial.misc['capua_rule_number'] = RULE_ONE
-            if (n2.accidental is not None and n2.accidental.name == "flat"):
-                n2.editorial.misc["saved-accidental"] = n2.accidental
-                n2.accidental = None
+            if (n2.pitch.accidental is not None and n2.pitch.accidental.name == "flat"):
+                n2.editorial.misc["saved-accidental"] = n2.pitch.accidental
+                n2.pitch.accidental = None
                 n2.editorial.ficta = pitch.Accidental("natural")
                 n2.editorial.misc["capua-ficta"] = pitch.Accidental("natural")
                 n1.editorial.color = "blue"
@@ -189,9 +189,9 @@ def capuaRuleTwo(srcStream):
         i2 = interval.notesToInterval(n2,n3)
         i3 = interval.notesToInterval(n3,n4)
 
-        if n1.accidental is not None or \
-           n2.accidental is not None or \
-           n4.accidental is not None:
+        if n1.pitch.accidental is not None or \
+           n2.pitch.accidental is not None or \
+           n4.pitch.accidental is not None:
             continue
 
         ### never seems to improve things...
@@ -209,9 +209,9 @@ def capuaRuleTwo(srcStream):
             else:
                 n3.editorial.misc['capua_rule_number'] = RULE_TWO
 
-            if (n3.accidental is not None and n3.accidental.name == "flat"):
-                n3.editorial.misc["saved-accidental"] = n3.accidental
-                n3.accidental = None
+            if (n3.pitch.accidental is not None and n3.pitch.accidental.name == "flat"):
+                n3.editorial.misc["saved-accidental"] = n3.pitch.accidental
+                n3.pitch.accidental = None
                 n3.editorial.ficta = pitch.Accidental("natural")
                 n3.editorial.misc["capua-ficta"] = pitch.Accidental("natural")
                 n1.editorial.color = "purple"
@@ -256,9 +256,9 @@ def capuaRuleThree(srcStream):
         i1 = interval.notesToInterval(n1,n2)
         i2 = interval.notesToInterval(n2,n3)
 
-        if n1.accidental is not None or \
-           n2.accidental is not None or \
-           n3.accidental is not None:
+        if n1.pitch.accidental is not None or \
+           n2.pitch.accidental is not None or \
+           n3.pitch.accidental is not None:
             continue
 
         ### never seems to improve things...
@@ -311,9 +311,9 @@ def capuaRuleFourA(srcStream):
         i1 = interval.notesToInterval(n1,n2)
         i2 = interval.notesToInterval(n2,n3)
 
-        if n1.accidental is not None or \
-           n2.accidental is not None or \
-           n3.accidental is not None:
+        if n1.pitch.accidental is not None or \
+           n2.pitch.accidental is not None or \
+           n3.pitch.accidental is not None:
             continue
 
         ### never seems to improve things...
@@ -364,8 +364,8 @@ def capuaRuleFourB(srcStream):
         i1 = interval.notesToInterval(n1,n2)
         i2 = interval.notesToInterval(n2,n3)
 
-        if n1.accidental is not None or \
-           n3.accidental is not None:
+        if n1.pitch.accidental is not None or \
+           n3.pitch.accidental is not None:
             continue
 
         ### never seems to improve things...
@@ -380,9 +380,9 @@ def capuaRuleFourB(srcStream):
                 n2.editorial.misc['capua_rule_number'] += RULE_FOUR_B
             else:
                 n2.editorial.misc['capua_rule_number'] = RULE_FOUR_B
-            if (n2.accidental is not None and n2.accidental.name == "flat"):
-                n2.editorial.misc["saved-accidental"] = n2.accidental
-                n2.accidental = None
+            if (n2.pitch.accidental is not None and n2.pitch.accidental.name == "flat"):
+                n2.editorial.misc["saved-accidental"] = n2.pitch.accidental
+                n2.pitch.accidental = None
                 n2.editorial.ficta = pitch.Accidental("natural")
                 n2.editorial.misc["capua-ficta"] = pitch.Accidental("natural")
                 n1.editorial.color = "orange"
@@ -422,16 +422,16 @@ def clearAccidental(note1):
     '''
     moves the accidental to `Note.editorial.misc['saved-accidental']` and clears `Note.pitch.accidental`
     '''
-    if note1.accidental is not None:
-        note1.editorial.misc["saved-accidental"] = note1.accidental
-        note1.accidental = None
+    if note1.pitch.accidental is not None:
+        note1.editorial.misc["saved-accidental"] = note1.pitch.accidental
+        note1.pitch.accidental = None
 
 def restoreAccidental(note1):
     '''
     takes `Note.editorial.music['saved-accidental']` and moves it back to the `Note.pitch.accidental`
     '''
     if  "saved-accidental" in note1.editorial.misc:
-        note1.accidental = note1.editorial.misc["saved-accidental"]
+        note1.pitch.accidental = note1.editorial.misc["saved-accidental"]
         note1.editorial.misc["saved-accidental"] = None
 
 def fictaToAccidental(note1):
@@ -439,9 +439,9 @@ def fictaToAccidental(note1):
     Moves the ficta (if any) in `Note.editorial.ficta` to the accidental
     '''
     if note1.editorial.ficta is not None:
-        if note1.accidental is not None:
+        if note1.pitch.accidental is not None:
             clearAccidental(note1)
-        note1.accidental = note1.editorial.ficta
+        note1.pitch.accidental = note1.editorial.ficta
 
 def pmfcFictaToAccidental(note1):
     '''
@@ -451,7 +451,7 @@ def pmfcFictaToAccidental(note1):
     if "pmfc-ficta" in note1.editorial.misc and \
             note1.editorial.misc["pmfc-ficta"] is not None:
         clearAccidental(note1)
-        note1.accidental = note1.editorial.misc["pmfc-ficta"]
+        note1.pitch.accidental = note1.editorial.misc["pmfc-ficta"]
         
 def capuaFictaToAccidental(note1):
     '''
@@ -462,7 +462,7 @@ def capuaFictaToAccidental(note1):
     if "capua-ficta" in note1.editorial.misc and \
             note1.editorial.misc["capua-ficta"] is not None:
         clearAccidental(note1)
-        note1.accidental = note1.editorial.misc["capua-ficta"]
+        note1.pitch.accidental = note1.editorial.misc["capua-ficta"]
 
 def evaluateRules(srcStream1, srcStream2):
     '''

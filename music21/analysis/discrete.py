@@ -338,7 +338,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                 for m in n.pitchClasses:
                     pcDist[m] = pcDist[m] + (1 * length)
             else:
-                pcDist[n.pitchClass] = pcDist[n.pitchClass] + (1 * length)
+                pcDist[n.pitch.pitchClass] = pcDist[n.pitch.pitchClass] + (1 * length)
         return pcDist
 
 

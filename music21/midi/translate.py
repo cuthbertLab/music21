@@ -392,7 +392,7 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
     me2.time = None #d
     #me2.pitch = n.midi
     me2.pitch = n.pitch.getMidiPreCentShift() # will shift later, do not round
-    me2.pitchSpace = n.ps
+    me2.pitchSpace = n.pitch.ps
     if not n.pitch.isTwelveTone():
         me2.centShift = n.pitch.getCentShiftFromMidi()
 
@@ -429,7 +429,14 @@ def noteToMidiFile(inputM21):
     >
     
     >>> mf.tracks[0].events
-    [<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=''>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=None, track=1, channel=1, pitch=60, velocity=90>, <MidiEvent DeltaTime, t=6144, track=1, channel=1>, <MidiEvent NOTE_OFF, t=None, track=1, channel=1, pitch=60, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]
+    [<MidiEvent DeltaTime, t=0, track=1, channel=1>, 
+     <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=''>, 
+     <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
+     <MidiEvent NOTE_ON, t=None, track=1, channel=1, pitch=60, velocity=90>, 
+     <MidiEvent DeltaTime, t=6144, track=1, channel=1>, 
+     <MidiEvent NOTE_OFF, t=None, track=1, channel=1, pitch=60, velocity=0>, 
+     <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
+     <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]
     '''
     from music21 import midi as midiModule
     

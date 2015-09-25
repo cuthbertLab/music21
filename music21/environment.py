@@ -197,7 +197,7 @@ class _EnvironmentCore(object):
                     value, key))
 
         # need to escape problematic characters for xml storage
-        if common.isStr(value):
+        if isinstance(value, six.string_types):
             value = saxutils.escape(value) #.encode('UTF-8')
         # set value
         if key == 'localCorpusPath':
@@ -924,7 +924,7 @@ class Environment(object):
         concatenated with common.formatStr().
         '''
         if _environStorage['instance'].__getitem__('debug') >= statusLevel:
-            if common.isStr(msg):
+            if isinstance(msg, six.string_types):
                 msg = [msg]  # make into a list
             if msg[0] != self.modNameParent and self.modNameParent is not None:
                 msg = [self.modNameParent + ':'] + msg
@@ -964,7 +964,7 @@ class Environment(object):
         To print a warning to the user, send a list of strings to this method.
         Similar to printDebug but even if debug is off.
         '''
-        if common.isStr(msg):
+        if isinstance(msg, six.string_types):
             msg = [msg]  # make into a list
         elif isinstance(msg, dict):
             msg = [repr(msg)]

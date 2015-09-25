@@ -65,7 +65,7 @@ def findSubConverterForFormat(fmt):
             return sc
 
 
-@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
+#@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 def findFormat(fmt):
     '''
     Given a format defined either by a format name, abbreviation, or
@@ -200,6 +200,7 @@ def findInputExtension(fmt):
     >>> common.findInputExtension('blah') is None
     True
     '''
+    from music21 import converter
     fmt = fmt.lower().strip()    
     if fmt.startswith('.'):
         fmt = fmt[1:] # strip .
@@ -208,7 +209,7 @@ def findInputExtension(fmt):
     if sc is None:
         # file extension
         post = []
-        for sc in subConverterList():
+        for sc in converter.Converter().subconvertersList():
             if fmt not in sc.registerInputExtensions:
                 continue
             for ext in sc.registerInputExtensions:
@@ -227,7 +228,7 @@ def findInputExtension(fmt):
             post.append(ext)
         return tuple(post)
 
-@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
+#@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 def findFormatFile(fp):
     '''
     Given a file path (relative or absolute) return the format
@@ -249,7 +250,7 @@ def findFormatFile(fp):
     fmt, unused_ext = findFormat(fp.split('.')[-1])
     return fmt # may be None if no match
 
-@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
+#@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 def findFormatExtFile(fp):
     '''Given a file path (relative or absolute) find format and extension used (not the output extension)
 
@@ -279,7 +280,7 @@ def findFormatExtFile(fp):
     else:
         return fileFormat, '.'+fp.split('.')[-1] # may be None if no match
 
-@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
+#@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 def findFormatExtURL(url):
     '''Given a URL, attempt to find the extension. This may scrub arguments in a URL, or simply look at the last characters.
 
@@ -300,6 +301,7 @@ def findFormatExtURL(url):
     >>> common.findFormatExtURL(urlF)
     (None, None)
     '''
+    from music21 import converter
     ext = None
     # first, look for cgi arguments
     if '=xml' in url:
@@ -310,7 +312,7 @@ def findFormatExtURL(url):
     elif 'format=stage2' in url or 'format=stage1' in url:
         ext = '.md'
     else: # check for file that ends in all known input extensions
-        for sc in subConverterList():
+        for sc in converter.Converter().subconvertersList():
             inputTypes = sc.registerInputExtensions            
             for extSample in inputTypes:
                 if url.endswith('.' + extSample):

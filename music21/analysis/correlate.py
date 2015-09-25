@@ -143,7 +143,7 @@ class ActivityMatch(object):
 
         self._findActive(objNameSrc, objNameDst)
 
-        fx = lambda e: e.ps
+        fx = lambda e: e.pitch.ps
         # get index value used for dynamics
         fy = lambda e: dynamics.shortNames.index(e.value)
 
@@ -155,7 +155,7 @@ class ActivityMatch(object):
 
             #if hasattr(entrySrc, 'pitches'): # a chord
             if entrySrc.isChord:
-                sub = entrySrc.pitches
+                sub = [n for n in entrySrc]
             else:   
                 sub = [entrySrc]
 

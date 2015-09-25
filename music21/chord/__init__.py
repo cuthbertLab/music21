@@ -304,8 +304,8 @@ class Chord(note.NotRest):
         Get item makes access pitch components for the Chord easier
         
         >>> c = chord.Chord('C#4 D-4')
-        >>> c['0.accidental'] 
-        <accidental sharp>
+        >>> c['0.step'] 
+        'C'
         >>> c['3.accidental']
         Traceback (most recent call last):
         KeyError: 'cannot access component with string: 3.accidental'

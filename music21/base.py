@@ -1041,7 +1041,7 @@ class Music21Object(object):
         This is only for advanced location method and
         is not a complete or sufficient way to remove an object from a Stream.
         '''
-        if not self.sites.isSite(site):
+        if not id(site) in self.sites.siteDict:
 #             for s in self.sites.siteDict:
 #                 # DEBUG!
 #                 print s,
@@ -1242,7 +1242,7 @@ class Music21Object(object):
                     return el
 
 
-    @common.deprecated("May 2014","soonest possible","not sure that it works at all...")
+    #@common.deprecated("May 2014","soonest possible","not sure that it works at all...")
     def getAllContextsByClass(self, className, found=None, idFound=None,
                              memo=None):
         '''
@@ -2483,14 +2483,16 @@ class Music21Object(object):
 
         # hide accidentals on tied notes where previous note
         # had an accidental that was shown
-        if hasattr(e, 'accidental') and e.accidental is not None:
-            if not displayTiedAccidentals: # if False
-                if (e.accidental.displayType not in
-                    ['even-tied']):
-                    eRemain.accidental.displayStatus = False
-            else: # display tied accidentals
-                eRemain.accidental.displayType = 'even-tied'
-                eRemain.accidental.displayStatus = True
+        # this is not general enough, for things like chords
+        if hasattr(e, 'pitch'):
+            if hasattr(e.pitch, 'accidental') and e.pitch.accidental is not None:
+                if not displayTiedAccidentals: # if False
+                    if (e.pitch.accidental.displayType not in
+                        ['even-tied']):
+                        eRemain.pitch.accidental.displayStatus = False
+                else: # display tied accidentals
+                    eRemain.pitch.accidental.displayType = 'even-tied'
+                    eRemain.pitch.accidental.displayStatus = True
 
         if eRemain.duration.quarterLength > 0.0:
             return [e, eRemain]
@@ -2576,15 +2578,15 @@ class Music21Object(object):
             # had an accidental that was shown
             if i != 0:
                 # look at self for characteristics of origin
-                if hasattr(self, 'accidental') and self.accidental is not None:
+                if hasattr(self, 'pitch') and self.pitch.accidental is not None:
                     if not displayTiedAccidentals: # if False
                         # do not show accidentals unless display type in 'even-tied'
-                        if (self.accidental.displayType not in
+                        if (self.pitch.accidental.displayType not in
                             ['even-tied']):
-                            e.accidental.displayStatus = False
+                            e.pitch.accidental.displayStatus = False
                     else: # display tied accidentals
-                        e.accidental.displayType = 'even-tied'
-                        e.accidental.displayStatus = True
+                        e.pitch.accidental.displayType = 'even-tied'
+                        e.pitch.accidental.displayStatus = True
 
             post.append(e)
 

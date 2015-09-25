@@ -62,12 +62,13 @@ def isNum(usrData):
         return False
 
 
-@deprecated("September 2015", "April 2016", "use isinstance(usrData, music21.ext.six.string_types)")
+#@deprecated("September 2015", "April 2016", "use isinstance(usrData, music21.ext.six.string_types)")
 def isStr(usrData):
     """
     DEPRECATED: September 2015 -- use isinstance(usrData, six.string_types)
     Remove April 2016
     
+    Will remove within six months of it not being used in music21.
     
     Check of usrData is some form of string, including unicode.
 

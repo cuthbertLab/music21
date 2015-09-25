@@ -10,7 +10,7 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
-__all__ = ['wrapWeakref', 'unwrapWeakref', 'isWeakref', 'findWeakref']
+__all__ = ['wrapWeakref', 'unwrapWeakref', 'isWeakref']
 
 import weakref
 from music21.common.decorators import deprecated
@@ -79,50 +79,10 @@ def isWeakref(referent):
     '''Test if an object is a weakref
 
     just does isinstance, so DEPRECATED Sep 2015; to disappear soon as Dec 2015.
-
-    >>> class Mock(object):
-    ...     pass
-    >>> a1 = Mock()
-    >>> a2 = Mock()
-    >>> common.isWeakref(a1)
-    False
-    >>> common.isWeakref(3)
-    False
-    >>> common.isWeakref(common.wrapWeakref(a1))
-    True
     '''
     if isinstance(referent, weakref.ref):        
         return True
     return False
-
-
-def findWeakref(target):
-    '''
-    Given an object or composition of objects, find an attribute that is a weakref. 
-    This is a diagnostic tool.  It does not work on all cases (slots, etc.), but it works okay.
-
-    Prints rather than returns
-
-    >>> n = note.Note()
-    >>> s = stream.Stream()
-    >>> s2 = stream.Stream()
-    >>> s.insert(0, n)
-    >>> s2.insert(0, n)
-    >>> common.findWeakref(s)
-    ('found weakref', <weakref at 0x...; to 'Stream' at 0x...>, 
-        '_activeSite', 'of target:', <music21.note.Note C>)
-    '''
-    for attrName in target.__dict__:
-        try:
-            attr = getattr(target, attrName)
-        except AttributeError:
-            print('exception on attribute access: %s' % attrName)
-        if isWeakref(attr):
-            print('found weakref', attr, attrName, 'of target:', target)
-        if isinstance(attr, (list, tuple)):
-            for x in attr:
-                findWeakref(x)
-
 
 
 if __name__ == "__main__":

@@ -423,7 +423,7 @@ class StreamForms(object):
                         iNext = i + 1
                         nNext = post[iNext]
                         try:
-                            histo[abs(n.midi - nNext.midi)] += 1
+                            histo[abs(n.pitch.midi - nNext.pitch.midi)] += 1
                         except AttributeError:
                             pass # problem with not having midi
             self._forms['midiIntervalHistogram'] = histo
@@ -457,11 +457,11 @@ class StreamForms(object):
                         if n.isChord:
                             ps = n.sortDiatonicAscending().pitches[-1].midi
                         else: # normal note
-                            ps = n.midi
+                            ps = n.pitch.midi
                         if nNext.isChord:
                             psNext = nNext.sortDiatonicAscending().pitches[-1].midi
                         else: # normal note
-                            psNext = nNext.midi
+                            psNext = nNext.pitch.midi
 
                         cList.append(psNext - ps)
             #environLocal.printDebug(['contourList', cList])
