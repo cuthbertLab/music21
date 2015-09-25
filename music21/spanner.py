@@ -443,7 +443,7 @@ class Spanner(base.Music21Object):
 
         '''  
         # presently, this does not look for redundancies
-        if not common.isIterable(spannedElements):
+        if not common.isListLike(spannedElements):
             spannedElements = [spannedElements]
         # assume all other arguments
         spannedElements += arguments
@@ -695,7 +695,7 @@ class SpannerBundle(object):
         self._cache = {}     
         self._storage = [] # a simple List, not a Stream
         for arg in arguments:
-            if common.isIterable(arg):
+            if common.isListLike(arg): # spannners are iterable but not listlike...
                 for e in arg:
                     self._storage.append(e)    
             # take a Stream and use its .spanners property to get all spanners            
