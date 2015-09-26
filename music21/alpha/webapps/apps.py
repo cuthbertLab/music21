@@ -117,7 +117,7 @@ def setupConverterApp(agenda):
       </defaults>
       <part-list>
     ...
-    >>> converter.parse(responseData).flat.notes[0].ps
+    >>> converter.parse(responseData).flat.notes[0].pitch.ps
     53.0
     '''
     if agenda.getData('format') == 'tinyNotation':
@@ -131,8 +131,7 @@ def setupConverterApp(agenda):
         outputTemplateName = templates.outputShortcuts[outputTypeShortcut]
         #print outputTemplateName 
         agenda.setOutputTemplate(outputTemplateName, ['outputStream'])
-    #else:
-    #    print "Hiiiiiiiiiiiiiiii!"
+
 
 def setupZipfileApp(agenda):
     pass

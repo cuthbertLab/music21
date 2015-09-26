@@ -1323,8 +1323,7 @@ class Pitch(object):
         '''
         if other is None:
             return False
-        elif (hasattr(other, 'octave') is False or hasattr(other, 'step') is False or
-              hasattr(other, 'step') is False):
+        elif not isinstance(other, Pitch):
             return False
         elif (self.octave == other.octave and self.step == other.step and
             self.accidental == other.accidental and self.microtone == other.microtone):

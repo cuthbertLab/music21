@@ -4963,9 +4963,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> stream1 = stream.Stream()
         >>> for x in range(30,81):
         ...     n = note.Note()
-        ...     n.midi = x
+        ...     n.pitch.midi = x
         ...     stream1.append(n)
-        >>> fx = lambda n: n.midi < 60
+        >>> fx = lambda n: n.pitch.midi < 60
         >>> b, c = stream1.splitByClass(note.Note, fx)
 
         Stream b now contains all the notes below middle C,
@@ -5153,6 +5153,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             inPlace=inPlace,
             )
 
+    @common.deprecated("September 2015", "Feb. 2016", "use stream.streamStatus.StreamStatus.haveBeamsBeenMade instead")
     def haveBeamsBeenMade(self):
         # could be called: hasAccidentalDisplayStatusSet
         '''
@@ -5166,16 +5167,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         
         Remove in Feb 2016
         '''
-        warnings.warn("use s.streamStatus.haveBeamsBeenMade instead; will disappear soon", StreamDeprecationWarning)        
         return self.streamStatus.haveBeamsBeenMade()
 
+    # @common.deprecated
     def makeTupletBrackets(self, inPlace=False):
         '''
         Calls :py:func:`~music21.stream.makeNotation.makeTupletBrackets`.
         
         Deprecated sep 2015; rem march 2016; call makeNotation.makeTupletBrackets directly.
         '''
-        warnings.warn("use stream.makeNotation.makeTupletBrackets(s) instead; will disappear soon", StreamDeprecationWarning)        
         return makeNotation.makeTupletBrackets(
             self,
             inPlace=inPlace,

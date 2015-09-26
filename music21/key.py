@@ -561,8 +561,8 @@ class KeySignature(base.Music21Object):
         Fix a wrong note in F-major:
         
         >>> wrongBNote = note.Note("B#4")
-        >>> if f.accidentalByStep(wrongBNote.step) != wrongBNote.accidental:
-        ...    wrongBNote.accidental = f.accidentalByStep(wrongBNote.step)
+        >>> if f.accidentalByStep(wrongBNote.step) != wrongBNote.pitch.accidental:
+        ...    wrongBNote.pitch.accidental = f.accidentalByStep(wrongBNote.step)
         >>> wrongBNote
         <music21.note.Note B->
 
@@ -585,7 +585,7 @@ class KeySignature(base.Music21Object):
         After:
 
         >>> for n in s1.notes:
-        ...    n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step)
+        ...    n.pitch.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step)
         >>> #_DOCS_SHOW s1.show()
 
         .. image:: images/keyAccidentalByStep.*
@@ -607,18 +607,18 @@ class KeySignature(base.Music21Object):
         >>> s1.append(nB1)
         >>> s1.append(nB2)
         >>> for n in s1.notes:
-        ...    n.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step)
-        >>> (nB1.accidental, nB2.accidental)
+        ...    n.pitch.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step)
+        >>> (nB1.pitch.accidental, nB2.pitch.accidental)
         (<accidental flat>, <accidental flat>)
-        >>> nB1.accidental.name = 'sharp'
-        >>> (nB1.accidental, nB2.accidental)
+        >>> nB1.pitch.accidental.name = 'sharp'
+        >>> (nB1.pitch.accidental, nB2.pitch.accidental)
         (<accidental sharp>, <accidental flat>)
-        
         '''
         # temp measure to fix dbl flats, etc.
         for thisAlteration in reversed(self.alteredPitches): 
             if thisAlteration.step.lower() == step.lower():
-                return copy.deepcopy(thisAlteration.accidental) # get a new one each time otherwise we have linked accidentals, YUK!
+                return copy.deepcopy(thisAlteration.accidental) 
+            # get a new one each time otherwise we have linked accidentals, YUK!
         
         return None
 
