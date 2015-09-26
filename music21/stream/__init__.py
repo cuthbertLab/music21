@@ -5371,9 +5371,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # if this is not inPlace, it will return a newStream; if
             # inPlace, this returns None
             # use inPlace=True, as already established above
-            returnStream.makeMeasures(meterStream=meterStream,
+            returnStream.makeMeasures(
+                meterStream=meterStream,
                 refStreamOrTimeRange=refStreamOrTimeRange,
-                inPlace=True, bestClef=bestClef)
+                inPlace=True, 
+                bestClef=bestClef)
 
         measureStream = returnStream.getElementsByClass('Measure')
         #environLocal.printDebug(['Stream.makeNotation(): post makeMeasures, length', len(returnStream)])
@@ -10806,7 +10808,9 @@ class Measure(Stream):
                 setattr(self, attr, getattr(other, attr))
 
     #--------------------------------------------------------------------------
-    def makeNotation(self, inPlace=False, **subroutineKeywords):
+    def makeNotation(self, 
+                     inPlace=False, 
+                     **subroutineKeywords):
         '''
         This method calls a sequence of Stream methods on this
         :class:`~music21.stream.Measure` to prepare notation.
@@ -10832,11 +10836,11 @@ class Measure(Stream):
             m = self
 
         srkCopy = subroutineKeywords.copy()
-        if 'meterStream' in srkCopy:
-            del(srkCopy['meterStream'])
-        if 'refStreamOrTimeRange' in srkCopy:
-            del(srkCopy['refStreamOrTimeRange'])
-
+        
+        for illegalKey in ('meterStream', 'refStreamOrTimeRange', 'bestClef'):
+            if illegalKey in srkCopy:
+                del(srkCopy[illegalKey])
+        
         m.makeAccidentals(searchKeySignatureByContext=True, inPlace=True, **srkCopy)
         # makeTies is for cross-bar associations, and cannot be used
         # at just the measure level

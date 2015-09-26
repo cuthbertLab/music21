@@ -45,6 +45,7 @@ from music21 import defaults
 from music21 import exceptions21
 
 from music21 import bar
+from music21 import clef
 from music21 import metadata
 from music21 import note
 from music21 import meter
@@ -383,6 +384,8 @@ class GeneralObjectExporter():
         '''
         from a part, put it in a score...
         '''
+        if p.isFlat:
+            p = p.makeMeasures()
         p.makeImmutable()
         s = stream.Score()
         s.insert(0, p)
@@ -409,17 +412,22 @@ class GeneralObjectExporter():
     
     def fromStream(self, st):
         if st.isFlat:
-            st2 = stream.Measure()
+            st2 = stream.Part()
             st2.mergeAttributes(st)
             st2.elements = st.elements
-            return self.fromMeasure(st2)
+            st2.clef = st2.bestClef()
+            st2.makeNotation(inPlace=True)
+            
+            return self.fromPart(st2)
         elif st.getElementsByClass('Stream')[0].isFlat:
             st2 = stream.Part()
             st2.mergeAttributes(st)
             st2.elements = st.elements
+            st2.makeNotation(inPlace=True, bestClef=True)
             return self.fromPart(st2)
         else:
             # probably a problem? or a voice...
+            st2 = st.makeNotation(inPlace=False, bestClef=True)
             return self.fromScore(st)
     
     def fromDuration(self, d):
