@@ -69,8 +69,8 @@ class TwelveToneMatrix(stream.Stream):
         ret = ""
         for rowForm in self.elements:
             msg = []
-            for p in rowForm:
-                msg.append(str(p.pitchClassString).rjust(3))
+            for n in rowForm:
+                msg.append(str(n.pitch.pitchClassString).rjust(3))
             ret += ''.join(msg) + "\n"
         return ret
 
@@ -228,7 +228,7 @@ class ToneRow(stream.Stream):
             tempsame = True
             for i in range(0,len(row)):
                 if tempsame == True:
-                    if self[i].pitchClass != row[i].pitchClass:
+                    if self[i].pitch.pitchClass != row[i].pitch.pitchClass:
                         tempsame = False
         
         return tempsame
@@ -1232,13 +1232,13 @@ def getContiguousSegmentsOfLength(inputStream, length, reps = 'skipConsecutive',
                         if includeChords == False:
                             if len(n.pitches) == 1:
                                 if len(pitchList) == length:
-                                    if n.pitchClass not in [m.pitchClass for m in pitchList[1:]]:
+                                    if n.pitch.pitchClass not in [m.pitch.pitchClass for m in pitchList[1:]]:
                                         pitchList.append(n)
                                         pitchList.remove(pitchList[0])
                                     else:
                                         pitchList = [n]
                                 else:
-                                    if n.pitchClass not in [m.pitchClass for m in pitchList]:
+                                    if n.pitch.pitchClass not in [m.pitch.pitchClass for m in pitchList]:
                                         pitchList.append(n)
                                     else:
                                         pitchList = [n]
@@ -1327,10 +1327,10 @@ def getContiguousSegmentsOfLength(inputStream, length, reps = 'skipConsecutive',
                                 for i in range(0, len(pitchList)):
                                     if donechecking == False:
                                         activePitchList = pitchList[i:len(pitchList)]
-                                        if len(set([p.pitchClass for p in activePitchList])) == length:
+                                        if len(set([n.pitch.pitchClass for n in activePitchList])) == length:
                                             listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(activePitchList), inputStream, None))
 #uncomment this line to get shortest        #numnotestodelete = numnotestodelete + 1
-                                        elif len(set([p.pitchClass for p in activePitchList])) > length:
+                                        elif len(set([n.pitch.pitchClass for n in activePitchList])) > length:
                                             numnotestodelete = numnotestodelete + 1
                                         else:
                                             donechecking = True

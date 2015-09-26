@@ -252,7 +252,7 @@ class Corpus(object):
         '''
         if not common.isListLike(fileExtensions):
             fileExtensions = [fileExtensions]
-        if fileExtensions == [None]:
+        if len(fileExtensions) == 1 and fileExtensions[0] is None:
             fileExtensions = Corpus._allExtensions
         elif expandExtensions:
             expandedExtensions = []
@@ -403,7 +403,7 @@ class Corpus(object):
         workList = corpus.getWorkList(
             workName, movementNumber, fileExtensions)
         if not workList:
-            if common.isListLike(workName):
+            if common.isIterable(workName):
                 workName = os.path.sep.join(workName)
             if workName.endswith(".xml"):
                 # might be compressed MXL file
@@ -967,7 +967,7 @@ class CoreCorpus(Corpus):
         paths = self.getPaths(fileExtensions)
         results = []
         # permit workName to be a list of paths/branches
-        if common.isListLike(workName):
+        if common.isIterable(workName):
             workName = os.path.sep.join(workName)
         workSlashes = workName.replace('/', os.path.sep)
         # find all matches for the work name
@@ -994,7 +994,7 @@ class CoreCorpus(Corpus):
             # store one ore more possible mappings of movement number
             movementStrList = []
             # see if this is a pair
-            if common.isListLike(movementNumber):
+            if common.isIterable(movementNumber):
                 movementStrList.append(
                     ''.join(str(x) for x in movementNumber))
                 movementStrList.append(

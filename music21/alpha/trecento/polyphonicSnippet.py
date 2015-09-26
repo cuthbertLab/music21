@@ -78,7 +78,6 @@ class PolyphonicSnippet(stream.Score):
             for part in fiveExcelCells[0:3]:
                 if part is not None and hasattr(part, 'isStream') and part.isStream == True:
                     part.__class__ = stream.Part
-                    part.classes.insert(0, 'Part')
             
             self.cadenceType = fiveExcelCells[3]
             self.timeSig = meter.TimeSignature(fiveExcelCells[4])

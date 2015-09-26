@@ -1208,7 +1208,10 @@ class Pitch(object):
 
     # constants shared by all classes
     _twelfth_root_of_two = TWELFTH_ROOT_OF_TWO
-    classes = ['Pitch', 'object'] # makes subclassing harder; was [x.__name__ for x in self.__class__.mro()] but 5% of creation time 
+
+    # TODO: steal from Music21Object
+    classes = ('Pitch', 'object') # makes subclassing harder; was [x.__name__ for x in self.__class__.mro()] but 5% of creation time 
+
 
     def __init__(self, name=None, **keywords):
         self._groups = None
@@ -1320,8 +1323,7 @@ class Pitch(object):
         '''
         if other is None:
             return False
-        elif (hasattr(other, 'octave') is False or hasattr(other, 'step') is False or
-              hasattr(other, 'step') is False):
+        elif not isinstance(other, Pitch):
             return False
         elif (self.octave == other.octave and self.step == other.step and
             self.accidental == other.accidental and self.microtone == other.microtone):
@@ -4809,22 +4811,22 @@ class Test(unittest.TestCase):
         bm = converter.parse("tinynotation: 4/4 fn1 fn1 e-8 e'-8 fn4 en4 e'n4").flat
         bm.insert(0, key.KeySignature(1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-        assert(bm.flat.notes[0].accidental.name == 'natural')     # Fn
-        assert(bm.flat.notes[0].accidental.displayStatus is True)
-        assert(bm.flat.notes[1].accidental.name == 'natural')     # Fn
-        assert(bm.flat.notes[1].accidental.displayStatus is True)
-        assert(bm.flat.notes[2].accidental.name == 'flat')        # E-4
-        assert(bm.flat.notes[2].accidental.displayStatus is True)
-        assert(bm.flat.notes[3].accidental.name == 'flat')        # E-5
-        assert(bm.flat.notes[3].accidental.displayStatus is True)
-        assert(bm.flat.notes[4].accidental.name == 'natural')     # En4
-        assert(bm.flat.notes[4].accidental.displayStatus is True)
-        assert(bm.flat.notes[5].accidental.name == 'natural')     # En4
-        assert(bm.flat.notes[5].accidental.displayStatus is True)
+        assert(bm.flat.notes[0].pitch.accidental.name == 'natural')     # Fn
+        assert(bm.flat.notes[0].pitch.accidental.displayStatus is True)
+        assert(bm.flat.notes[1].pitch.accidental.name == 'natural')     # Fn
+        assert(bm.flat.notes[1].pitch.accidental.displayStatus is True)
+        assert(bm.flat.notes[2].pitch.accidental.name == 'flat')        # E-4
+        assert(bm.flat.notes[2].pitch.accidental.displayStatus is True)
+        assert(bm.flat.notes[3].pitch.accidental.name == 'flat')        # E-5
+        assert(bm.flat.notes[3].pitch.accidental.displayStatus is True)
+        assert(bm.flat.notes[4].pitch.accidental.name == 'natural')     # En4
+        assert(bm.flat.notes[4].pitch.accidental.displayStatus is True)
+        assert(bm.flat.notes[5].pitch.accidental.name == 'natural')     # En4
+        assert(bm.flat.notes[5].pitch.accidental.displayStatus is True)
 
-        assert(bm.flat.notes[6].accidental is not None)               # En5
-        assert(bm.flat.notes[6].accidental.name == 'natural')
-        assert(bm.flat.notes[6].accidental.displayStatus is True)
+        assert(bm.flat.notes[6].pitch.accidental is not None)               # En5
+        assert(bm.flat.notes[6].pitch.accidental.name == 'natural')
+        assert(bm.flat.notes[6].pitch.accidental.displayStatus is True)
 
         return
 
@@ -4880,7 +4882,7 @@ class Test(unittest.TestCase):
             n.pitch = p
             s.append(n)
         self.assertEqual(len(s), 4)
-        match = [e.ps for e in s]
+        match = [e.pitch.ps for e in s]
         self.assertEqual(match, [69.5, 70.5, 68.5, 67.5] )
 
         s = stream.Stream()
@@ -4895,7 +4897,7 @@ class Test(unittest.TestCase):
         match = [str(n.pitch) for n in s.notes]
         self.assertEqual(match, ['C~4', 'D#~4', 'E-`4', 'F`4', 'G~4', 'A#~4', 'B`4', 'C-`4', 'D~4'])
 
-        match = [e.ps for e in s]
+        match = [e.pitch.ps for e in s]
         self.assertEqual(match, [60.5, 63.5, 62.5, 64.5, 67.5, 70.5, 70.5, 58.5, 62.5] )
 
     def testMicrotoneA(self):

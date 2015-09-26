@@ -2198,14 +2198,14 @@ class Test(unittest.TestCase):
         s.append(n3)
         s.makeAccidentals()
 
-        self.assertEqual(n2.accidental.displayStatus, True)
+        self.assertEqual(n2.pitch.accidental.displayStatus, True)
         # both a's in the chord now have naturals but are hidden
         self.assertEqual(c1.pitches[1].accidental, None)
         #self.assertEqual(c1.pitches[2].accidental.displayStatus, True)
 
         # not getting a natural here because of chord tones
-        #self.assertEqual(n3.accidental.displayStatus, True)
-        #self.assertEqual(n3.accidental, None)
+        #self.assertEqual(n3.pitch.accidental.displayStatus, True)
+        #self.assertEqual(n3.pitch.accidental, None)
         #s.show()
 
         s = Stream()
@@ -2332,23 +2332,33 @@ class Test(unittest.TestCase):
         tests to make sure that Accidental display status is correct after a tie.
         '''
         from music21 import converter
-        bm = converter.parse("tinynotation: 4/4 c#'2 b-2~ b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8", makeNotation=False)
+        bm = converter.parse(
+                "tinynotation: 4/4 c#'2 b-2~ b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8", 
+                makeNotation=False)
         bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
         allNotes = bm.flat.notes
         #      0C#  1B-~  | 2B-  3C#~  4C#    6B-     7C#    8B-~   9B-~   10B-
         ds = [True, True, False, True, False, True, False, False, False, False]
         for i in range(len(allNotes)):
-            self.assertEqual(allNotes[i].accidental.displayStatus, ds[i], "%d failed, %s != %s" % (i, allNotes[i].accidental.displayStatus, ds[i]))
+            self.assertEqual(allNotes[i].pitch.accidental.displayStatus, 
+                             ds[i], 
+                             "%d failed, %s != %s" % 
+                                (i, allNotes[i].pitch.accidental.displayStatus, ds[i]))
 
 
         # add another B-flat just after the tied one...
-        bm = converter.parse("tinynotation: 4/4 c#'2 b-2~ b-8 b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8", makeNotation=False)
+        bm = converter.parse(
+            "tinynotation: 4/4 c#'2 b-2~ b-8 b-8 c#'8~ c#'8 b-8 c#'8 b-8~ b-8~ b-8", 
+            makeNotation=False)
         bm.makeNotation(inPlace = True, cautionaryNotImmediateRepeat = False)
         allNotes = bm.flat.notes
         #      0C#  1B-~  | 2B-   3B-  4C#~  5C#    6B-     7C#    8B-~   9B-~  | 10B-
         ds = [True, True, False, True, True, False, False, False, False, False, False]
         for i in range(len(allNotes)):
-            self.assertEqual(allNotes[i].accidental.displayStatus, ds[i], "%d failed, %s != %s" % (i, allNotes[i].accidental.displayStatus, ds[i]))
+            self.assertEqual(allNotes[i].pitch.accidental.displayStatus, 
+                             ds[i], 
+                             "%d failed, %s != %s" % 
+                                (i, allNotes[i].pitch.accidental.displayStatus, ds[i]))
 
     def testMakeAccidentalsOctaveKS(self):
         s = Stream()
@@ -2357,11 +2367,11 @@ class Test(unittest.TestCase):
         s.append(note.Note('B-2'))
         s.append(note.Note('B-1'))
         for n in s.notes:
-            self.assertEqual(n.accidental.displayStatus, None)
+            self.assertEqual(n.pitch.accidental.displayStatus, None)
 
         s.makeAccidentals(inPlace = True)
         for n in s.notes:
-            self.assertEqual(n.accidental.displayStatus, False)
+            self.assertEqual(n.pitch.accidental.displayStatus, False)
 
 
 

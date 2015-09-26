@@ -248,6 +248,8 @@ def convertGeneric(value):
     '''Convert an interval specified in terms of its name (second, third) 
     into an integer. If integers are passed, assume the are correct.
 
+    # TODO: use common.numberFunc.musicOrdinals
+
     
     >>> interval.convertGeneric(3)
     3
@@ -327,7 +329,6 @@ def convertGeneric(value):
     return post
 
     
-
 def convertSemitoneToSpecifierGenericMicrotone(count):
     '''
     Given a number of semitones, return a default diatonic specifier and cent offset.
@@ -1370,7 +1371,17 @@ def notesToChromatic(n1, n2):
     <music21.interval.ChromaticInterval 15>
 
     '''
-    return ChromaticInterval(n2.ps - n1.ps)
+    if hasattr(n1, 'pitch'):
+        p1 = n1.pitch
+    else:
+        p1 = n1
+        
+    if hasattr(n2, 'pitch'):
+        p2 = n2.pitch
+    else:
+        p2 = n2
+
+    return ChromaticInterval(p2.ps - p1.ps)
 
 
 def _getSpecifierFromGenericChromatic(gInt, cInt):

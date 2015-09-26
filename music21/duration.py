@@ -2489,7 +2489,8 @@ class Duration(SlottedObject):
         and going up the mro() for the object.  Very similar to Perl's @ISA
         array.  See music21.Music21Object.classes for more details.
         '''
-        return [x.__name__ for x in self.__class__.mro()]
+        return tuple([x.__name__ for x in self.__class__.mro()])
+        # TODO: inherit from a protom21object...
 
 
     @property

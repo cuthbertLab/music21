@@ -1878,7 +1878,7 @@ class MeterSequence(MeterTerminal):
             # do not need to set weight, as based on terminal
             #environLocal.printDebug(['created MeterSequence from MeterTerminal; old weight, new weight', value.weight, self.weight])
 
-        elif common.isListLike(value): # a list of Terminals or Sequenc es
+        elif common.isIterable(value): # a list of Terminals or Sequenc es
             for obj in value:
                 #environLocal.printDebug('creating MeterSequence with %s' % obj)
                 self._addTerminal(obj)

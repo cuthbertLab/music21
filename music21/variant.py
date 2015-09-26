@@ -2322,7 +2322,7 @@ class Variant(base.Music21Object):
 #     def __init__(self, *arguments, **keywords):
 #         self._storage = [] # a simple list, not a Stream
 #         for arg in arguments:
-#             if common.isListLike(arg):
+#             if common.isIterable(arg):
 #                 for e in arg:
 #                     self._storage.append(e)    
 #             # take a Stream and use its .variants property to get all Variants            

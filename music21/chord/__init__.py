@@ -304,8 +304,8 @@ class Chord(note.NotRest):
         Get item makes access pitch components for the Chord easier
         
         >>> c = chord.Chord('C#4 D-4')
-        >>> c['0.accidental'] 
-        <accidental sharp>
+        >>> c['0.step'] 
+        'C'
         >>> c['3.accidental']
         Traceback (most recent call last):
         KeyError: 'cannot access component with string: 3.accidental'
@@ -1232,6 +1232,9 @@ class Chord(note.NotRest):
         >>> c1.getNotehead(note.Note('G4'))
         'diamond'
         '''
+        if hasattr(p, 'pitch'):
+            p = p.pitch
+        
         for d in self._notes:
             if d.pitch is p:
                 return d.notehead
@@ -1264,6 +1267,9 @@ class Chord(note.NotRest):
         >>> c1.getNoteheadFill(note.Note('G4'))
         True
         '''
+        if hasattr(p, 'pitch'):
+            p = p.pitch
+
         for d in self._notes:
             if d.pitch is p:
                 return d.noteheadFill
@@ -1294,6 +1300,9 @@ class Chord(note.NotRest):
         >>> c1.getStemDirection(pitch.Pitch('G4'))
         'double'
         '''
+        if hasattr(p, 'pitch'):
+            p = p.pitch
+
         for d in self._notes:
             if d.pitch is p: # compare by obj id first
                 return d.stemDirection
@@ -4258,9 +4267,9 @@ def fromForteClass(notation):
             elif 'b' in chars.lower():
                 inv = -1
         else:
-            raise ChordException('cannot extract set class representation from string: %s' % notation)
+            raise ChordException('cannot extract set-class representation from string: %s' % notation)
     elif common.isListLike(notation):
-        if len(notation) <= 3: # assume its a set class representation
+        if len(notation) <= 3: # assume its a set-class representation
             if len(notation) > 0:
                 card = notation[0]
             if len(notation) > 1:
@@ -4427,7 +4436,7 @@ class Test(unittest.TestCase):
         LowG.octave = 3
 
         chord1 = Chord([HighEFlat, MiddleC, LowG])
-        assert chord1.getChordStep(3, testRoot=MiddleC) is not False
+        self.assertIsNot(chord1.getChordStep(3, testRoot=MiddleC), False)
         chord1.root(MiddleC)
 
         HighAFlat = note.Note()
@@ -4435,48 +4444,48 @@ class Test(unittest.TestCase):
         HighAFlat.octave = 5
 
         chord2 = Chord([MiddleC, HighEFlat, LowG, HighAFlat])
-        assert chord1.third is not None
-        assert chord1.fifth is not None
-        assert chord1.containsTriad() == True
-        assert chord1.isTriad() == True
-        assert chord2.containsTriad() == True
-        assert chord2.isTriad() == False
+        self.assertIsNot(chord1.third, None)
+        self.assertIsNot(chord1.fifth, None)
+        self.assertEqual(chord1.containsTriad(),  True)
+        self.assertEqual(chord1.isTriad(),  True)
+        self.assertEqual(chord2.containsTriad(),  True)
+        self.assertEqual(chord2.isTriad(),  False)
 
         MiddleE = note.Note()
         MiddleE.name = 'E'
         MiddleE.octave = 4
 
         chord3 = Chord([MiddleC, HighEFlat, LowG, MiddleE])
-        assert chord3.isTriad() == False
+        self.assertEqual(chord3.isTriad(),  False)
 
         MiddleB = note.Note()
         MiddleB.name = 'B'
         MiddleB.octave = 4
 
         chord4 = Chord([MiddleC, HighEFlat, LowG, MiddleB])
-        assert chord4.containsSeventh() == True
-        assert chord3.containsSeventh() == False
-        assert chord4.isSeventh() == True
+        self.assertEqual(chord4.containsSeventh(),  True)
+        self.assertEqual(chord3.containsSeventh(),  False)
+        self.assertEqual(chord4.isSeventh(),  True)
 
         chord5 = Chord([MiddleC, HighEFlat, LowG, MiddleE, MiddleB])
-        assert chord5.isSeventh() == False
+        self.assertEqual(chord5.isSeventh(),  False)
 
         chord6 = Chord([MiddleC, MiddleE, LowG])
-        assert chord6.isMajorTriad() == True
-        assert chord3.isMajorTriad() == False
+        self.assertEqual(chord6.isMajorTriad(),  True)
+        self.assertEqual(chord3.isMajorTriad(),  False)
 
         chord7 = Chord([MiddleC, HighEFlat, LowG])
-        assert chord7.isMinorTriad() == True
-        assert chord6.isMinorTriad() == False
-        assert chord4.isMinorTriad() == False
+        self.assertEqual(chord7.isMinorTriad(),  True)
+        self.assertEqual(chord6.isMinorTriad(),  False)
+        self.assertEqual(chord4.isMinorTriad(),  False)
 
         LowGFlat = note.Note()
         LowGFlat.name = 'G-'
         LowGFlat.octave = 3
         chord8 = Chord([MiddleC, HighEFlat, LowGFlat])
 
-        assert chord8.isDiminishedTriad() == True
-        assert chord7.isDiminishedTriad() == False
+        self.assertEqual(chord8.isDiminishedTriad(),  True)
+        self.assertEqual(chord7.isDiminishedTriad(),  False)
 
         MiddleBFlat = note.Note()
         MiddleBFlat.name = 'B-'
@@ -4484,8 +4493,8 @@ class Test(unittest.TestCase):
 
         chord9 = Chord([MiddleC, MiddleE, LowG, MiddleBFlat])
 
-        assert chord9.isDominantSeventh() == True
-        assert chord5.isDominantSeventh() == False
+        self.assertEqual(chord9.isDominantSeventh(),  True)
+        self.assertEqual(chord5.isDominantSeventh(),  False)
 
         MiddleBDoubleFlat = note.Note()
         MiddleBDoubleFlat.name = 'B--'
@@ -4494,13 +4503,13 @@ class Test(unittest.TestCase):
         chord10 = Chord([MiddleC, HighEFlat, LowGFlat, MiddleBDoubleFlat])
     #    chord10.root(MiddleC)
 
-        assert chord10.isDiminishedSeventh() == True
-        assert chord9.isDiminishedSeventh() == False
+        self.assertEqual(chord10.isDiminishedSeventh(),  True)
+        self.assertEqual(chord9.isDiminishedSeventh(),  False)
 
         chord11 = Chord([MiddleC])
 
-        assert chord11.isTriad() == False
-        assert chord11.isSeventh() == False
+        self.assertEqual(chord11.isTriad(),  False)
+        self.assertEqual(chord11.isSeventh(),  False)
 
         MiddleCSharp = note.Note()
         MiddleCSharp.name = 'C#'
@@ -4509,17 +4518,17 @@ class Test(unittest.TestCase):
         chord12 = Chord([MiddleC, MiddleCSharp, LowG, MiddleE])
         chord12.root(MiddleC)
 
-        assert chord12.isTriad() == False
-        assert chord12.isDiminishedTriad() == False
+        self.assertEqual(chord12.isTriad(),  False)
+        self.assertEqual(chord12.isDiminishedTriad(),  False)
 
         chord13 = Chord([MiddleC, MiddleE, LowG, LowGFlat])
 
-        assert chord13.getChordStep(5) is not None
-        assert chord13.hasRepeatedChordStep(5) == True
-        assert chord13.hasAnyRepeatedDiatonicNote() == True
-        assert chord13.getChordStep(2) is None
-        assert chord13.containsTriad() == True
-        assert chord13.isTriad() == False
+        self.assertIsNot(chord13.getChordStep(5), None)
+        self.assertEqual(chord13.hasRepeatedChordStep(5),  True)
+        self.assertEqual(chord13.hasAnyRepeatedDiatonicNote(),  True)
+        self.assertIs(chord13.getChordStep(2),  None)
+        self.assertEqual(chord13.containsTriad(),  True)
+        self.assertEqual(chord13.isTriad(),  False)
 
         LowGSharp = note.Note()
         LowGSharp.name = 'G#'
@@ -4527,16 +4536,16 @@ class Test(unittest.TestCase):
 
         chord14 = Chord([MiddleC, MiddleE, LowGSharp])
 
-        assert chord14.isAugmentedTriad() == True
-        assert chord6.isAugmentedTriad() == False
+        self.assertEqual(chord14.isAugmentedTriad(),  True)
+        self.assertEqual(chord6.isAugmentedTriad(),  False)
 
         chord15 = Chord([MiddleC, HighEFlat, LowGFlat, MiddleBFlat])
 
-        assert chord15.isHalfDiminishedSeventh() == True
-        assert chord12.isHalfDiminishedSeventh() == False
-        assert chord15.bass().name == 'G-'
-        assert chord15.inversion() == 2
-        assert chord15.inversionName() == 43
+        self.assertEqual(chord15.isHalfDiminishedSeventh(),  True)
+        self.assertEqual(chord12.isHalfDiminishedSeventh(),  False)
+        self.assertEqual(chord15.bass().name,  'G-')
+        self.assertEqual(chord15.inversion(),  2)
+        self.assertEqual(chord15.inversionName(),  43)
 
         LowC = note.Note()
         LowC.name = 'C'
@@ -4544,12 +4553,12 @@ class Test(unittest.TestCase):
 
         chord16 = Chord([LowC, MiddleC, HighEFlat])
 
-        assert chord16.inversion() == 0
+        self.assertEqual(chord16.inversion(),  0)
 
         chord17 = Chord([LowC, MiddleC, HighEFlat])
         chord17.root(MiddleC)
 
-        assert chord17.inversion() == 0
+        self.assertEqual(chord17.inversion(),  0)
 
         LowE = note.Note()
         LowE.name = 'E'
@@ -4557,7 +4566,7 @@ class Test(unittest.TestCase):
 
         chord18 = Chord([MiddleC, LowE, LowGFlat])
 
-        assert chord18.inversion() == 1
+        self.assertEqual(chord18.inversion(),  1)
         self.assertEqual(chord18.inversionName(), 6)
 
         LowBFlat = note.Note()
@@ -4566,17 +4575,17 @@ class Test(unittest.TestCase):
 
 
         chord19 = Chord([MiddleC, HighEFlat, LowBFlat])
-        self.assertEqual(chord19.root(), MiddleC)
+        self.assertEqual(chord19.root().name, MiddleC.name)
         self.assertEqual(chord19.inversion(), 3)
         self.assertEqual(chord19.inversionName(), 42)
-        #assert chord20.inversion() == 4 #intentionally raises error
+        #self.assertEqual(chord20.inversion(),  4 #intentionally raises error)
 
         chord20 = Chord([LowC, LowBFlat])
         chord20.root(LowBFlat)
 
 
         chord21 = Chord([MiddleC, HighEFlat, LowGFlat])
-        assert chord21.root().name == 'C'
+        self.assertEqual(chord21.root().name, 'C')
 
         MiddleF = note.Note()
         MiddleF.name = 'F'
@@ -4587,11 +4596,11 @@ class Test(unittest.TestCase):
         LowA.octave = 3
 
         chord22 = Chord([MiddleC, MiddleF, LowA])
-        assert chord22.root().name == 'F'
+        self.assertEqual(chord22.root().name, 'F')
         self.assertEqual(chord22.inversionName(), 6)
 
         chord23 = Chord([MiddleC, MiddleF, LowA, HighEFlat])
-        assert chord23.root().name == 'F'
+        self.assertEqual(chord23.root().name,  'F')
 
         HighC = note.Note()
         HighC.name = 'C'
@@ -4602,23 +4611,23 @@ class Test(unittest.TestCase):
         HighE.octave = 5
 
         chord24 = Chord([MiddleC])
-        assert chord24.root().name == 'C'
+        self.assertEqual(chord24.root().name, 'C')
 
         chord25 = Chord([MiddleC, HighE])
-        assert chord25.root().name == 'C'
+        self.assertEqual(chord25.root().name, 'C')
 
         MiddleG = note.Note()
         MiddleG.name = 'G'
         MiddleG.octave = 4
 
         chord26 = Chord([MiddleC, MiddleE, MiddleG])
-        assert chord26.root().name == 'C'
+        self.assertEqual(chord26.root().name, 'C')
 
         chord27 = Chord([MiddleC, MiddleE, MiddleG, MiddleBFlat])
-        assert chord27.root().name == 'C'
+        self.assertEqual(chord27.root().name, 'C')
 
         chord28 = Chord([LowE, LowBFlat, MiddleG, HighC])
-        assert chord28.root().name == 'C'
+        self.assertEqual(chord28.root().name, 'C')
 
         HighD = note.Note()
         HighD.name = 'D'
@@ -4633,21 +4642,21 @@ class Test(unittest.TestCase):
         HighAFlat.octave = 5
 
         chord29 = Chord([MiddleC, MiddleE, MiddleG, MiddleBFlat, HighD])
-        assert chord29.root().name == 'C'
+        self.assertEqual(chord29.root().name, 'C')
 
         chord30 = Chord([MiddleC, MiddleE, MiddleG, MiddleBFlat, HighD, HighF])
-        assert chord30.root().name == 'C'
+        self.assertEqual(chord30.root().name, 'C')
 
 
         chord31 = Chord([MiddleC, MiddleE, MiddleG, MiddleBFlat, HighD, HighF, HighAFlat])
         # Used to raise an error; now should return middleC
         #self.assertRaises(ChordException, chord31.root)
-        self.assertEqual(chord31.root(), MiddleC)
+        self.assertEqual(chord31.root().name, MiddleC.name)
 
         chord32 = Chord([MiddleC, MiddleE, MiddleG, MiddleB])
-        assert chord32.bass().name == 'C'
-        assert chord32.root().name == 'C'
-        assert chord32.inversionName() == 7
+        self.assertEqual(chord32.bass().name, 'C')
+        self.assertEqual(chord32.root().name, 'C')
+        self.assertEqual(chord32.inversionName(), 7)
 
         MiddleFDbleFlat = note.Note()
         MiddleFDbleFlat.name = 'F--'
@@ -4664,34 +4673,34 @@ class Test(unittest.TestCase):
         chord33 = Chord([MiddleC, MiddleE, MiddleG, MiddleFDbleFlat, MiddleASharp, MiddleBDoubleFlat, MiddleFSharp])
         chord33.root(MiddleC)
 
-        assert chord33.isHalfDiminishedSeventh() == False
-        assert chord33.isDiminishedSeventh() == False
-        assert chord33.isFalseDiminishedSeventh() == False
+        self.assertEqual( chord33.isHalfDiminishedSeventh(), False )
+        self.assertEqual(chord33.isDiminishedSeventh() ,  False)
+        self.assertEqual(chord33.isFalseDiminishedSeventh(),  False)
 
         chord34 = Chord([MiddleC, MiddleFDbleFlat, MiddleFSharp, MiddleA])
-        assert chord34.isFalseDiminishedSeventh() == True
+        self.assertEqual(chord34.isFalseDiminishedSeventh(),  True)
 
         scrambledChord1 = Chord([HighAFlat, HighF, MiddleC, MiddleASharp, MiddleBDoubleFlat])
         unscrambledChord1 = scrambledChord1.sortAscending()
-        assert unscrambledChord1.pitches[0].name == "C"
-        assert unscrambledChord1.pitches[1].name == "A#"
-        assert unscrambledChord1.pitches[2].name == "B--"
-        assert unscrambledChord1.pitches[3].name == "F"
-        assert unscrambledChord1.pitches[4].name == "A-"
+        self.assertEqual(unscrambledChord1.pitches[0].name,  "C")
+        self.assertEqual(unscrambledChord1.pitches[1].name,  "A#")
+        self.assertEqual(unscrambledChord1.pitches[2].name,  "B--")
+        self.assertEqual(unscrambledChord1.pitches[3].name,  "F")
+        self.assertEqual(unscrambledChord1.pitches[4].name,  "A-")
 
         unscrambledChord2 = scrambledChord1.sortChromaticAscending()
-        assert unscrambledChord2.pitches[0].name == "C"
-        assert unscrambledChord2.pitches[1].name == "B--"
-        assert unscrambledChord2.pitches[2].name == "A#"
-        assert unscrambledChord2.pitches[3].name == "F"
-        assert unscrambledChord2.pitches[4].name == "A-"
+        self.assertEqual(unscrambledChord2.pitches[0].name,  "C")
+        self.assertEqual(unscrambledChord2.pitches[1].name,  "B--")
+        self.assertEqual(unscrambledChord2.pitches[2].name,  "A#")
+        self.assertEqual(unscrambledChord2.pitches[3].name,  "F")
+        self.assertEqual(unscrambledChord2.pitches[4].name,  "A-")
 
         unscrambledChord3 = scrambledChord1.sortFrequencyAscending()
-        assert unscrambledChord3.pitches[0].name == "C"
-        assert unscrambledChord3.pitches[1].name == "B--"
-        assert unscrambledChord3.pitches[2].name == "A#"
-        assert unscrambledChord3.pitches[3].name == "F"
-        assert unscrambledChord3.pitches[4].name == "A-"
+        self.assertEqual(unscrambledChord3.pitches[0].name,  "C")
+        self.assertEqual(unscrambledChord3.pitches[1].name,  "B--")
+        self.assertEqual(unscrambledChord3.pitches[2].name,  "A#")
+        self.assertEqual(unscrambledChord3.pitches[3].name,  "F")
+        self.assertEqual(unscrambledChord3.pitches[4].name,  "A-")
 
 
     #    for thisPitch in unscrambledChord2.pitches:
@@ -4722,7 +4731,7 @@ class Test(unittest.TestCase):
         self.assertTrue(chord1.isDiminishedTriad())
         self.assertFalse(chord1.isMajorTriad())
         # duration shold store a Duration object
-        #assert chord1.duration is None
+        #self.assertIs(chord1.duration,  None)
 
     def testClosedPosition(self):
         chord1 = Chord(["C#4", "G5", "E6"])

@@ -216,8 +216,8 @@ class Test(unittest.TestCase):
         self.assertEqual(getAccidentalCount(s, True), {'flat': 1, 'sharp': 1, 'natural': 1})
         
         note4 = note.Note("C4")
-        self.assertIsNone(note4.accidental)
-        note4.accidental = pitch.Accidental('natural')  # add a natural accidental
+        self.assertIsNone(note4.pitch.accidental)
+        note4.pitch.accidental = pitch.Accidental('natural')  # add a natural accidental
         s.append(note4)
         self.assertEqual(getAccidentalCount(s), {'flat': 1, 'sharp': 1, 'natural': 1})
         

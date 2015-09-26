@@ -148,7 +148,7 @@ class Scale(base.Music21Object):
         if hasattr(other, 'pitches'):
             pre = other.pitches
         # if a list
-        elif common.isListLike(other):
+        elif common.isIterable(other):
             # assume a list of pitches; possible permit conversions?
             pre = []
             for p in other:
@@ -1269,7 +1269,10 @@ class ConcreteScale(Scale):
         # determine whether this is a limited range
         self.boundRange = False
 
-        if tonic is None and pitches is not None and common.isListLike(pitches) and len(pitches) > 0:
+        if (tonic is None and 
+                pitches is not None and 
+                common.isListLike(pitches) and 
+                len(pitches) > 0):
             tonic = pitches[0]
 
         # here, tonic is a pitch
@@ -1285,7 +1288,9 @@ class ConcreteScale(Scale):
         else: # assume this is a pitch object
             self.tonic = tonic
 
-        if pitches is not None and common.isListLike(pitches) and len(pitches) > 0:
+        if (pitches is not None and 
+                common.isListLike(pitches) and 
+                len(pitches) > 0):
             self._abstract = AbstractScale()
             self._abstract.buildNetworkFromPitches(pitches)
             if tonic in pitches:

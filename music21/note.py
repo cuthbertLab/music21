@@ -1112,6 +1112,8 @@ class Note(NotRest):
         See `Pitch`'s attribute :attr:`~music21.pitch.Pitch.nameWithOctave`.
         ''')
 
+
+    @common.deprecated("May 2014", "Jan 2016", "use pitch.accidental instead")
     def _getAccidental(self):
         return self.pitch.accidental
 
@@ -1156,6 +1158,7 @@ class Note(NotRest):
         doc = '''Return or set the pitch step from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.step`.
         ''')
 
+    @common.deprecated("May 2014", "Jan 2016", "use pitch.frequency instead")
     def _getFrequency(self):
         return self.pitch.frequency
 
@@ -1181,18 +1184,8 @@ class Note(NotRest):
     octave = property(_getOctave, _setOctave,
         doc = '''Return or set the octave value from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.octave`.''')
 
+    @common.deprecated("May 2014", "Jan 2016", "use pitch.midi instead")
     def _getMidi(self):
-        '''
-        Returns the note's midi number.
-
-        C4 (middle C) = 60, C#4 = 61, D-4 = 61, D4 = 62; A4 = 69
-
-
-        >>> a = note.Note()
-        >>> a.pitch = pitch.Pitch('d-4')
-        >>> a.midi
-        61
-        '''
         return self.pitch.midi
 
     def _setMidi(self, value):
@@ -1209,21 +1202,8 @@ class Note(NotRest):
         DEPRECATED May 2014: use n.pitch.midi instead
         ''')
 
-
+    @common.deprecated("May 2014", "Jan 2016", "use pitch.ps instead")
     def _getPs(self):
-        '''
-        Returns the note's midi as a float number.
-
-        C4 (middle C) = 60, C#4 = 61, D-4 = 61, D4 = 62; A4 = 69
-
-
-        >>> a = note.Note()
-        >>> a.ps = 60.5
-        >>> a.midi
-        61
-        >>> a.ps
-        60.5
-        '''
         return self.pitch.ps
 
     def _setPs(self, value):
@@ -1238,10 +1218,9 @@ class Note(NotRest):
         See :attr:`music21.pitch.Pitch.ps`.
         
         DEPRECATED May 2014: use n.pitch.ps instead
-
         ''')
 
-
+    @common.deprecated("May 2014", "Jan 2016", "use pitch.microtone instead")
     def _getMicrotone(self):
         return self.pitch.microtone
 
@@ -1258,16 +1237,8 @@ class Note(NotRest):
         ''')
 
 
+    @common.deprecated("May 2014", "Jan 2016", "use pitch.pitchClass instead")
     def _getPitchClass(self):
-        '''Return pitch class
-
-
-        >>> d = note.Note()
-        >>> d.pitch = pitch.Pitch('d-4')
-        >>> d.pitchClass
-        1
-        >>>
-        '''
         return self.pitch.pitchClass
 
     def _setPitchClass(self, value):
@@ -1281,25 +1252,11 @@ class Note(NotRest):
         ''')
 
 
+    @common.deprecated("May 2014", "Jan 2016", "use pitch.pitchClassString instead")
     def _getPitchClassString(self):
-        '''
-        Return pitch class string, replacing 10 and 11 as needed.
-
-        >>> d = note.Note()
-        >>> d.pitch = pitch.Pitch('b')
-        >>> d.pitchClassString
-        'B'
-        '''
         return self.pitch.pitchClassString
 
     def _setPitchClassString(self, value):
-        '''
-        >>> d = note.Note()
-        >>> d.pitch = pitch.Pitch('b')
-        >>> d.pitchClassString = 'a'
-        >>> d.pitchClass
-        10
-        '''
         self.pitch.pitchClassString = value
 
     pitchClassString = property(_getPitchClassString, _setPitchClassString,
@@ -1322,7 +1279,10 @@ class Note(NotRest):
         return self.pitch.diatonicNoteNum
 
     diatonicNoteNum = property(_getDiatonicNoteNum,
-        doc = '''Return the diatonic note number from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.diatonicNoteNum`.
+        doc = '''Return the diatonic note number from the :class:`~music21.pitch.Pitch` object. 
+        See :attr:`~music21.pitch.Pitch.diatonicNoteNum`.
+        
+        Probably will be deprecated soon...
         ''')
 
 
@@ -1356,7 +1316,6 @@ class Note(NotRest):
         >>> n.pitches
         [<music21.pitch.Pitch C2>]
         ''')
-
 
 
     def transpose(self, value, inPlace=False):
@@ -1699,14 +1658,14 @@ class Test(unittest.TestCase):
         note3.pitch.name = "B-"
         # not sure how to test not None
         #self.assertFalse (note3.pitch.accidental, None)
-        self.assertEqual (note3.accidental.name, "flat")
-        self.assertEqual (note3.pitchClass, 10)
+        self.assertEqual (note3.pitch.accidental.name, "flat")
+        self.assertEqual (note3.pitch.pitchClass, 10)
 
         a5 = Note()
         a5.name = "A"
         a5.octave = 5
-        self.assertAlmostEquals(a5.frequency, 880.0)
-        self.assertEqual(a5.pitchClass, 9)
+        self.assertAlmostEquals(a5.pitch.frequency, 880.0)
+        self.assertEqual(a5.pitch.pitchClass, 9)
 
 
 

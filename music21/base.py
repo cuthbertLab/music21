@@ -139,12 +139,6 @@ class Music21ObjectException(exceptions21.Music21Exception):
 class ElementException(exceptions21.Music21Exception):
     pass
 
-class Music21DeprecationWarning(UserWarning):
-    # Do not subclass Deprecation warning, because these
-    # warnings need to be passed to users...
-    pass
-
-
 #------------------------------------------------------------------------------
 # private metaclass...
 _SortTuple = collections.namedtuple('SortTuple', ['atEnd','offset','priority',
@@ -154,10 +148,10 @@ _SortTuple = collections.namedtuple('SortTuple', ['atEnd','offset','priority',
 # make subclass of set once that is defined properly
 
 
-class Groups(common.SlottedObject, list):
+class Groups(list): # no need to inherit from slotted object
     '''
-    Groups is a list of strings used to identify associations that an element
-    might have.
+    Groups is a list (subclass) of strings used to identify 
+    associations that an element might have.
 
     The Groups object enforces that all elements must be strings, and that
     the same element cannot be provided more than once.
@@ -176,27 +170,28 @@ class Groups(common.SlottedObject, list):
 
     >>> g.append(5)
     Traceback (most recent call last):
-    GroupException: Only strings can be used as list names
+    GroupException: Only strings can be used as group names
     '''
     # could be made into a set instance, but actually
     # timing: a subclassed list and a set are almost the same speed 
-    # and set does not allow calling but number
-
+    # and set does not allow calling by number
+    
+    # this speeds up creation slightly...
     __slots__ = ()
-
+    
     def append(self, value):
         if isinstance(value, six.string_types):
             # do not permit the same entry more than once
             if not list.__contains__(self, value):
                 list.append(self, value)
         else:
-            raise exceptions21.GroupException("Only strings can be used as list names")
+            raise exceptions21.GroupException("Only strings can be used as group names")
 
     def __setitem__(self, i, y):
         if isinstance(y, six.string_types):
             list.__setitem__(self, i, y)
         else:
-            raise exceptions21.GroupException("Only strings can be used as list names")
+            raise exceptions21.GroupException("Only strings can be used as group names")
 
     def __eq__(self, other):
         '''
@@ -229,11 +224,11 @@ class Groups(common.SlottedObject, list):
         if not isinstance(other, Groups):
             return False
         
-        sls = sorted(list(self))
-        slo = sorted(list(other))
-        
-        if len(sls) != len(slo):
+        if len(self) != len(other):
             return False
+        sls = sorted(self)
+        slo = sorted(other)
+        
         for x in range(len(sls)):
             if sls[x].lower() != slo[x].lower():
                 return False
@@ -255,12 +250,7 @@ class Groups(common.SlottedObject, list):
         >>> a != b
         True
         '''
-        if other is None or not isinstance(other, Groups):
-            return True
-        if (sorted(list(self)) == sorted(list(other))):
-            return False
-        else:
-            return True
+        return not (self == other)
 
 
 
@@ -303,6 +293,16 @@ class Music21Object(object):
     isStream = False
     isSpanner = False
     isVariant = False
+
+
+    # this dictionary stores as a tuple of strings for each Class so that
+    # it only needs to be made once (11 microseconds per call, can be
+    # a big part of iteration; from cache just 1 microsecond)
+    _classListCacheDict = {}
+    
+    # same with fully qualified names
+    _classListFullyQualifiedCacheDict = {}
+
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = [
@@ -379,9 +379,6 @@ class Music21Object(object):
         # pass a reference to this object
         self._derivation = None
         
-        # store classes once when called
-        self._classes = None
-        self._fullyQualifiedClasses = None
         # private duration storage; managed by property
         self._duration = None
         self._priority = 0 # default is zero
@@ -579,38 +576,6 @@ class Music21Object(object):
         #environLocal.printDebug([self, 'end deepcopy', 'self._activeSite', self._activeSite])
         return new
 
-
-    def _newBroken__deepcopy__(self, memo=None):
-        # this was an attempt to speed up deepcopying via object serialization.
-        # it still might work someday, but too many bugs for now.
-        if self._duration is not None:
-            self._duration._client = None
-        savedSites = self.sites
-        if self._derivation is not None:
-            savedDerivation = self._derivation
-            self._derivation = None
-        else:
-            savedDerivation = None
-
-        self.sites = None
-
-        new = pickle.loads(pickle.dumps(self, protocol=pickle.HIGHEST_PROTOCOL))
-        if new.id == id(self):
-            new.id = id(new)
-        
-        self.sites = savedSites
-
-        self._derivation = savedDerivation
-        new.sites = sites.Sites()
-        newDerivation = derivation.Derivation(client=new)
-        newDerivation.origin = self
-        newDerivation.method = '__deepcopy__'
-        new._derivation = newDerivation
-        if new._duration is not None:
-            new._duration.client = new
-            self._duration.client = self
-        return new
-        
     
     def __getstate__(self):
         state = self.__dict__.copy()
@@ -641,7 +606,7 @@ class Music21Object(object):
 #                 return True
 #         except TypeError:
 #             pass
-        eClasses = self.classes # get cached from property
+        eClasses = self.classes # tiny speedup 73ns vs 400ns
         for className in classFilterList:
             # new method uses string matching of .classes attribute
             # temporarily check to see if this is a string
@@ -659,21 +624,22 @@ class Music21Object(object):
         return False
 
     def _getClasses(self):
-        #environLocal.printDebug(['calling _getClasses'])
-        if self._classes is None:
-            #environLocal.printDebug(['setting self._classes', id(self), self])
-            self._classes = [x.__name__ for x in self.__class__.mro()]
-        return self._classes
+        try:
+            return self._classListCacheDict[self.__class__]
+        except KeyError:
+            classList = tuple([x.__name__ for x in self.__class__.mro()])
+            self._classListCacheDict[self.__class__] = classList
+            return classList
 
     classes = property(_getClasses,
-        doc='''Returns a list containing the names (strings, not objects) of classes that this
+        doc='''Returns a tuple containing the names (strings, not objects) of classes that this
         object belongs to -- starting with the object's class name and going up the mro()
         for the object.  Very similar to Perl's @ISA array:
 
 
         >>> q = note.Note()
         >>> q.classes
-        ['Note', 'NotRest', 'GeneralNote', 'Music21Object', 'object']
+        ('Note', 'NotRest', 'GeneralNote', 'Music21Object', 'object')
 
         Having quick access to these things as strings makes it easier to do comparisons:
 
@@ -692,19 +658,21 @@ class Music21Object(object):
         >>> s2.show('text')
         {10.0} <music21.clef.GClef>
         {30.0} <music21.clef.FrenchViolinClef>
+        
+        `Changed 2015 Sep`: returns a tuple, not a list.        
         ''')
 
     def _getFullyQualifiedClasses(self):
-        #environLocal.printDebug(['calling _getClasses'])
-        if self._fullyQualifiedClasses is None:
-            #environLocal.printDebug(['setting self._fullyQualifiedClasses', id(self), self])
-            self._fullyQualifiedClasses = [x.__module__ + 
-                                           '.' + x.__name__ for x in self.__class__.mro()]
-        return self._fullyQualifiedClasses
+        try:
+            return self._classListFullyQualifiedCacheDict[self.__class__]
+        except KeyError:
+            classList = tuple([x.__module__ + '.' + x.__name__ for x in self.__class__.mro()])
+            self._classListFullyQualifiedCacheDict[self.__class__] = classList
+            return classList
 
     fullyQualifiedClasses = property(_getFullyQualifiedClasses,
         doc='''
-        Similar to `.classes`, returns a list containing the names (strings, not objects) of
+        Similar to `.classes`, returns a tuple containing the names (strings, not objects) of
         classes with the full package name that this
         object belongs to -- starting with the object's class name and going up the mro()
         for the object.  Very similar to Perl's @ISA array:
@@ -712,11 +680,13 @@ class Music21Object(object):
 
         >>> q = note.Note()
         >>> q.fullyQualifiedClasses
-        ['music21.note.Note', 'music21.note.NotRest', 'music21.note.GeneralNote', 
-         'music21.base.Music21Object', '...builtin...object']
+        ('music21.note.Note', 'music21.note.NotRest', 'music21.note.GeneralNote', 
+         'music21.base.Music21Object', '...builtin...object')
         
         The last one (object) will be different in Py2 (__builtin__.object) and 
         Py3 (builtins.object)
+        
+        `Changed 2015 Sep`: returns a tuple, not a list.
         ''')
 
     #---------------------------
@@ -1045,7 +1015,7 @@ class Music21Object(object):
         found = self.sites.getSitesByClass('SpannerStorage')
         post = []
         if spannerClassList is not None:
-            if not common.isListLike(spannerClassList):
+            if not common.isIterable(spannerClassList):
                 spannerClassList = [spannerClassList]
 
         for obj in found:
@@ -1060,9 +1030,10 @@ class Music21Object(object):
         return post
 
 
+    @common.deprecated('Summer 2015', 'Jan 2016', 'use self.sites.remove() instead and set activeSite manually.')
     def removeLocationBySite(self, site):
         '''
-        DEPRECATED Feb 2016: use self.sites.remove() instead and set activeSite
+        DEPRECATED Jan 2016: use self.sites.remove() instead and set activeSite
         manually.
 
         Remove a location in the :class:`~music21.base.Sites` object.
@@ -1070,12 +1041,7 @@ class Music21Object(object):
         This is only for advanced location method and
         is not a complete or sufficient way to remove an object from a Stream.
         '''
-        warnings.warn(
-            'removeLocationBySite is disappearing; use self.sites.remove() ' + 
-            'and set activeSite to None manually',
-            Music21DeprecationWarning)
-        
-        if not self.sites.isSite(site):
+        if not id(site) in self.sites.siteDict:
 #             for s in self.sites.siteDict:
 #                 # DEBUG!
 #                 print s,
@@ -1276,6 +1242,7 @@ class Music21Object(object):
                     return el
 
 
+    #@common.deprecated("May 2014","soonest possible","not sure that it works at all...")
     def getAllContextsByClass(self, className, found=None, idFound=None,
                              memo=None):
         '''
@@ -2516,14 +2483,16 @@ class Music21Object(object):
 
         # hide accidentals on tied notes where previous note
         # had an accidental that was shown
-        if hasattr(e, 'accidental') and e.accidental is not None:
-            if not displayTiedAccidentals: # if False
-                if (e.accidental.displayType not in
-                    ['even-tied']):
-                    eRemain.accidental.displayStatus = False
-            else: # display tied accidentals
-                eRemain.accidental.displayType = 'even-tied'
-                eRemain.accidental.displayStatus = True
+        # this is not general enough, for things like chords
+        if hasattr(e, 'pitch'):
+            if hasattr(e.pitch, 'accidental') and e.pitch.accidental is not None:
+                if not displayTiedAccidentals: # if False
+                    if (e.pitch.accidental.displayType not in
+                        ['even-tied']):
+                        eRemain.pitch.accidental.displayStatus = False
+                else: # display tied accidentals
+                    eRemain.pitch.accidental.displayType = 'even-tied'
+                    eRemain.pitch.accidental.displayStatus = True
 
         if eRemain.duration.quarterLength > 0.0:
             return [e, eRemain]
@@ -2609,15 +2578,15 @@ class Music21Object(object):
             # had an accidental that was shown
             if i != 0:
                 # look at self for characteristics of origin
-                if hasattr(self, 'accidental') and self.accidental is not None:
+                if hasattr(self, 'pitch') and self.pitch.accidental is not None:
                     if not displayTiedAccidentals: # if False
                         # do not show accidentals unless display type in 'even-tied'
-                        if (self.accidental.displayType not in
+                        if (self.pitch.accidental.displayType not in
                             ['even-tied']):
-                            e.accidental.displayStatus = False
+                            e.pitch.accidental.displayStatus = False
                     else: # display tied accidentals
-                        e.accidental.displayType = 'even-tied'
-                        e.accidental.displayStatus = True
+                        e.pitch.accidental.displayType = 'even-tied'
+                        e.pitch.accidental.displayStatus = True
 
             post.append(e)
 

@@ -690,42 +690,6 @@ class StreamFreezer(StreamFreezeThawBase):
         #self.teardownStream(self.stream)
         return out
 
-#    def findWeakRef(self, streamObj, memo=None):
-#        '''
-#        utility function for debugging.  Finds all weakrefs in the hierarchy and returns
-#        a list of tuples of the weakref and the name of the attribute, and the object
-#
-#
-#        >>> n = note.Note()
-#        >>> s = stream.Stream()
-#        >>> s2 = stream.Stream()
-#        >>> s.insert(0, n)
-#        >>> s2.insert(0, n)
-#        >>> ft = freezeThaw.StreamFreezer()
-#        >>> ft.findWeakRef(s)
-#        '''
-#        weakRefList = []
-#        if memo is None:
-#            memo = {}
-#        for x in dir(streamObj):
-#            xValue = getattr(streamObj, x)
-#            if id(xValue) in memo:
-#                continue
-#            else:
-#                memo[id(xValue)] = True
-#            if common.isWeakref(xValue):
-#                weakRefList.append(x, xValue, streamObj)
-#            if common.isIterable(xValue):
-#                for i in xValue:
-#                    if id(i) in memo:
-#                        pass
-#                    else:
-#                        memo[id(i)] = True
-#                        weakRefList.extend(self.findWeakRef(i), memo)
-#            else:
-#                weakRefList.extend(self.findWeakRef(xValue), memo)
-#        return weakRefList
-
 
 class StreamThawer(StreamFreezeThawBase):
     '''
@@ -1248,8 +1212,6 @@ class JSONFreezer(JSONFreezeThawBase):
             return []
         # names that we always do not need
         excludedNames = [
-            '_classes',
-            '_fullyQualifiedClasses',
             '_derivation',
             '_DOC_ATTR',
             '_DOC_ORDER',
@@ -1330,7 +1292,7 @@ class JSONFreezer(JSONFreezeThawBase):
 
         attributeList = []
         if hasattr(self.storedObject, 'fullyQualifiedClasses'):
-            fqClassList = self.storedObject.fullyQualifiedClasses
+            fqClassList = list(self.storedObject.fullyQualifiedClasses)
         else: # same thing...
             fqClassList = [self.fullyQualifiedClassFromObject(x) for x in self.storedObject.__class__.mro()]
 
@@ -1399,7 +1361,7 @@ class JSONFreezer(JSONFreezeThawBase):
             return False 
 
         if hasattr(possiblyFreezeable, 'fullyQualifiedClasses'):
-            fqClassList = possiblyFreezeable.fullyQualifiedClasses
+            fqClassList = list(possiblyFreezeable.fullyQualifiedClasses)
         else: # same thing...
             fqClassList = [x.__module__ + '.' + x.__name__ 
                                 for x in possiblyFreezeable.__class__.mro()]

@@ -450,13 +450,13 @@ def noteToBraille(music21Note, showOctave = True, upperFirstInFingering = True):
     # accidental
     # ----------
     try:
-        if music21Note.accidental is not None:
-            if music21Note.accidental.displayStatus is not False:
-                noteTrans.append(accidentals[music21Note.accidental.name])
+        if music21Note.pitch.accidental is not None:
+            if music21Note.pitch.accidental.displayStatus is not False:
+                noteTrans.append(accidentals[music21Note.pitch.accidental.name])
                 music21Note._brailleEnglish.append(u"Accidental {0} {1}".format\
-                                                   (music21Note.accidental.name, accidentals[music21Note.accidental.name]))              
+                                                   (music21Note.pitch.accidental.name, accidentals[music21Note.pitch.accidental.name]))              
     except KeyError:
-        environRules.warn("Accidental {0} of note {1} cannot be transcribed to braille.".format(music21Note.accidental, music21Note))
+        environRules.warn("Accidental {0} of note {1} cannot be transcribed to braille.".format(music21Note.pitch.accidental, music21Note))
                     
     # octave mark
     # -----------

@@ -37,6 +37,15 @@ class AnalysisException(Music21Exception):
 class TimespanException(Music21Exception):
     pass
 
-
 class InstrumentException(Music21Exception):
     pass
+
+class Music21CommonException(Music21Exception):
+    pass
+
+# warnings
+class Music21DeprecationWarning(UserWarning):
+    # Do not subclass Deprecation warning, because these
+    # warnings need to be passed to users...
+    pass
+

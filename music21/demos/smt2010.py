@@ -151,8 +151,8 @@ def findHighestNotes(show=True, *arguments, **keywords):
         highestNoteNum = 0
         for m in part.getElementsByClass('Measure'):
             for n in m.notes:
-                if n.midi > highestNoteNum:
-                    highestNoteNum = n.midi
+                if n.pitch.midi > highestNoteNum:
+                    highestNoteNum = n.pitch.midi
                     highestNote = copy.deepcopy(n) # optional
     
                     # These two lines will keep the look of the original

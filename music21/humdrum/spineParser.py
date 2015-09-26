@@ -2543,7 +2543,7 @@ class Test(unittest.TestCase):
     def testSingleNote(self):
         a = SpineEvent("40..ccccc##_wtLLK~v/")
         b = a.toNote()
-        self.assertEqual(b.accidental.name, "double-sharp")
+        self.assertEqual(b.pitch.accidental.name, "double-sharp")
         self.assertEqual(b.duration.dots, 0)
         self.assertEqual(b.duration.tuplets[0].durationNormal.dots, 2)
 

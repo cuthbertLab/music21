@@ -53,7 +53,7 @@ def cacheMetadata(
     from music21 import corpus
     from music21 import metadata
 
-    if not common.isListLike(corpusNames):
+    if not common.isIterable(corpusNames):
         corpusNames = (corpusNames,)
 
     timer = common.Timer()

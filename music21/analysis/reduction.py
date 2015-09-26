@@ -646,7 +646,7 @@ class PartReduction(object):
             # permit a stream
             if hasattr(targets, 'isStream') and targets.isStream:
                 pass
-            elif not common.isListLike(targets):
+            elif not common.isIterable(targets):
                 targets = [targets]
             summation = 0
             for e in targets: # a Stream

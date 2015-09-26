@@ -245,10 +245,10 @@ class Volume(SlottedObject):
             # as well as True/False
             if useArticulations is not False:
                 am = None
-                if common.isListLike(useArticulations):
+                if common.isIterable(useArticulations):
                     am = useArticulations
-                elif hasattr(useArticulations,
-                    'classes') and 'Articulation' in useArticulations.classes:
+                elif (hasattr(useArticulations, 'classes') and 
+                        'Articulation' in useArticulations.classes):
                     am = [useArticulations] # place in a list
                 elif self.parent is not None:
                     am = self.parent.articulations

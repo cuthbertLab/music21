@@ -467,7 +467,7 @@ def translateNoteToByte(n):
     '<'
     >>> ord(b) 
     60
-    >>> ord(b) == n.midi
+    >>> ord(b) == n.pitch.midi
     True
 
     Chords are currently just searched on the first note (or treated as a rest if none)
@@ -480,7 +480,7 @@ def translateNoteToByte(n):
         else:
             return chr(127)
     else:
-        return chr(n.midi)
+        return chr(n.pitch.midi)
 
 def translateNoteWithDurationToBytes(n, includeTieByte=True):
     '''
@@ -642,7 +642,7 @@ def mostCommonMeasureRythms(streamIn, transposeDiatonic = False):
             foundNote = False
             for i in range(len(measureNotes)):
                 if 'Note' in measureNotes[i].classes:
-                    distanceToTranspose = 72 - measureNotes[0].ps
+                    distanceToTranspose = 72 - measureNotes[0].pitch.ps
                     foundNote = True
                     break
             if foundNote == True:

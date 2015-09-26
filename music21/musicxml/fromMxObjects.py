@@ -908,7 +908,6 @@ def mxClefToClef(mxClefList, inputM21 = None):
     if inputM21 is None:
         return clefObj
     else:
-        inputM21._classes = None
         inputM21.__class__ = clefObj.__class__
         inputM21.sign = clefObj.sign
         inputM21.line = clefObj.line

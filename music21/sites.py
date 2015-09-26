@@ -16,7 +16,6 @@ import unittest
 import weakref
 
 from music21 import common
-from music21 import defaults
 from music21 import exceptions21
 from music21.ext import six
 
@@ -651,8 +650,6 @@ class Sites(common.SlottedObject):
         True
         '''
         siteRef = self.siteDict[siteId]
-        # need to check if these is weakref
-        #if common.isWeakref(dict['obj']):
         return siteRef.site
 
     def getSiteCount(self):
@@ -834,6 +831,7 @@ class Sites(common.SlottedObject):
                 return True
         return False
 
+    @common.deprecated("May 2015","Jan 2016","Not needed.  All sites are sites. :-)")
     def isSite(self, obj):
         '''
         DEPRECATED: TO be removed by v.2.1 -- used only by a long deprecated
@@ -842,15 +840,6 @@ class Sites(common.SlottedObject):
         Given an object, determine if it is an object in a Site stored in this 
         Sites's siteDict. This
         will return False if the object is simply a context and not a location.
-
-        >>> class Mock(base.Music21Object):
-        ...     pass
-        ...
-        >>> aSite = Mock()
-        >>> aLocations = sites.Sites()
-        >>> aLocations.add(aSite)
-        >>> aLocations.isSite(aSite)
-        True
         '''
         if id(obj) in self.siteDict:
             return True

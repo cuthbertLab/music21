@@ -406,8 +406,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Removing the elements from the current Stream seems necessary.
         '''
-        if (not common.isListLike(value) and hasattr(value, 'isStream') and
-            value.isStream):
+        if (not common.isListLike(value) and 
+                hasattr(value, 'isStream') and
+                value.isStream):
             self._elements = list(value._elements)
             for e in self._elements:
                 self.setElementOffset(e, value.elementOffset(e))
@@ -2132,7 +2133,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         if classFilter is not None:
             if not common.isListLike(classFilter):
-                classFilter = [classFilter]
+                classFilter = (classFilter,)
 
         for e in self._elements:
             if classFilter is None:
@@ -2250,9 +2251,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # passing on auto sort status may or may not be what is needed here
             found.autoSort = self.autoSort
 
-        # much faster in the most common case than calling common.isListLike
-        if not isinstance(classFilterList, (list, tuple)):
-            classFilterList = tuple([classFilterList])
+        if not common.isListLike(classFilterList):
+            classFilterList = (classFilterList,)
 
         # if we are sure that this Stream does not have a class
         singleClassString = False
@@ -2275,7 +2275,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #found.show('t')
         # need both _elements and _endElements
         for e in self._elements:
-            #eClasses = e.classes  # store once, as this is property call
             if e.isClassOrSubclass(classFilterList):
                 if returnList is False:
                     found._insertCore(self.elementOffset(e), e, ignoreSort=True)
@@ -2358,6 +2357,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     groupFilterList).stream()
                     
 
+    @common.deprecated("September 2015", "February 2016", "use s.elementOffset() instead w/ a try/except")
     def getOffsetByElement(self, obj):
         '''
         DEPRECATED Sep 2015: use s.elementOffset(obj) and if it is possible that
@@ -2365,8 +2365,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         
         Remove in 2016 Feb.
         '''
-        warnings.warn("getOffsetByElement will be removed; use s.elementOffset() instead", 
-                      StreamDeprecationWarning)
         try:
             return self.elementOffset(obj)
         except base.SitesException:
@@ -2818,7 +2816,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # need both _elements and _endElements
         for e in self.elements:
-            #eClasses = e.classes  # store once, as this is property call
             if classList is not None:
                 if not e.isClassOrSubclass(classList):
                     continue
@@ -2919,7 +2916,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # need both _elements and _endElements
         for e in self.elements:
-            #eClasses = e.classes  # store once, as this is property call
             if classList is not None:
                 if not e.isClassOrSubclass(classList):
                     continue
@@ -4103,7 +4099,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         quickSearch = True
         if len(keySigSearch) == 0:
-            ourKey = key.KeySignature('C', 'major')
+            ourKey = key.Key('C')
         elif len(keySigSearch) == 1:
             ourKey = keySigSearch[0]
         else:
@@ -4291,8 +4287,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> a[10].offset
         10.0
         '''
-        if not common.isListLike(offsets):
-            raise StreamException('must provide a lost of offsets, not %s' % offsets)
+        if not common.isIterable(offsets):
+            raise StreamException('must provide an iterable of offsets, not %s' % offsets)
 
         try:
             unused = item.isStream
@@ -4967,9 +4963,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> stream1 = stream.Stream()
         >>> for x in range(30,81):
         ...     n = note.Note()
-        ...     n.midi = x
+        ...     n.pitch.midi = x
         ...     stream1.append(n)
-        >>> fx = lambda n: n.midi < 60
+        >>> fx = lambda n: n.pitch.midi < 60
         >>> b, c = stream1.splitByClass(note.Note, fx)
 
         Stream b now contains all the notes below middle C,
@@ -5157,6 +5153,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             inPlace=inPlace,
             )
 
+    @common.deprecated("September 2015", "Feb. 2016", "use stream.streamStatus.StreamStatus.haveBeamsBeenMade instead")
     def haveBeamsBeenMade(self):
         # could be called: hasAccidentalDisplayStatusSet
         '''
@@ -5170,16 +5167,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         
         Remove in Feb 2016
         '''
-        warnings.warn("use s.streamStatus.haveBeamsBeenMade instead; will disappear soon", StreamDeprecationWarning)        
         return self.streamStatus.haveBeamsBeenMade()
 
+    # @common.deprecated
     def makeTupletBrackets(self, inPlace=False):
         '''
         Calls :py:func:`~music21.stream.makeNotation.makeTupletBrackets`.
         
         Deprecated sep 2015; rem march 2016; call makeNotation.makeTupletBrackets directly.
         '''
-        warnings.warn("use stream.makeNotation.makeTupletBrackets(s) instead; will disappear soon", StreamDeprecationWarning)        
         return makeNotation.makeTupletBrackets(
             self,
             inPlace=inPlace,
@@ -11496,7 +11492,7 @@ class Score(Stream):
         >>> s = corpus.parse('bach/bwv66.6')
         >>> partStream = s.parts
         >>> partStream.classes
-        ['Score', 'Stream', 'StreamCoreMixin', 'Music21Object', 'object']
+        ('Score', 'Stream', 'StreamCoreMixin', 'Music21Object', 'object')
         >>> len(partStream)
         4
 
@@ -11751,7 +11747,7 @@ class Score(Stream):
             if sub != []: # get last
                 bundle.append(sub)
         # else, assume it is a list of groupings
-        elif common.isListLike(voiceAllocation):
+        elif common.isIterable(voiceAllocation):
             for group in voiceAllocation:
                 sub = []
                 # if a single entry
