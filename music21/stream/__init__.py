@@ -6436,9 +6436,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         
         Notice that like calling `.show('text')`, the offsets are relative to their containers.
         
-        Compare the difference between putting `classFilter='Note'` and `.flat.notes:
+        Compare the difference between putting `classFilter='Note'` and `.flat.notes`:
         
-
         >>> for el in s.recurse(classFilter='Note'):
         ...     tup = (el, el.offset, el.activeSite)
         ...     print(tup)

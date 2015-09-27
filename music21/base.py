@@ -1279,7 +1279,10 @@ class Music21Object(object):
 
     #--------------------------------------------------------------------------
 
-    def _adjacentObject(self, site, classFilterList=None, ascend=True,
+    def _adjacentObject(self, 
+                        site, 
+                        classFilterList=None, 
+                        forward=True,
                         beginNearest=True):
         '''
         Core method for finding adjacent objects given a single site.
@@ -1288,7 +1291,7 @@ class Music21Object(object):
         element. The index of this element if sound in this site,
         and either the next or previous element, if found, is returned.
 
-        If `ascend` is True index values are
+        If `forward` is True index values are
         incremented; if False, index values are decremented.
 
         If `beginNearest` is True, index values are searched based
@@ -1309,7 +1312,7 @@ class Music21Object(object):
             if not site.hasElementOfClass(classFilterList[0]):
                 return None
         # go to right, start at nearest
-        if ascend and beginNearest:
+        if forward and beginNearest:
             currentIndex = site.index(self) + 1 # start with next
             while (currentIndex < siteLength):
                 nextObj = siteElements[currentIndex]
@@ -1320,7 +1323,7 @@ class Music21Object(object):
                     return nextObj
                 currentIndex += 1
         # go to right, start at rightmost
-        elif ascend and not beginNearest:
+        elif forward and not beginNearest:
             try:
                 lastIndex = site.index(self) + 1 # end with next
             except exceptions21.StreamException: 
@@ -1335,7 +1338,7 @@ class Music21Object(object):
                     return nextObj
                 currentIndex -= 1
         # go to left, start at nearest
-        elif not ascend and beginNearest:
+        elif not forward and beginNearest:
             try:
                 currentIndex = site.index(self) - 1 # start with next
             except exceptions21.StreamException: 
@@ -1352,7 +1355,7 @@ class Music21Object(object):
                     return nextObj
                 currentIndex -= 1
         # go to left, start at leftmost
-        elif not ascend and not beginNearest:
+        elif not forward and not beginNearest:
             try:
                 lastIndex = site.index(self) - 1 # start with next
             except exceptions21.StreamException:
@@ -1367,12 +1370,15 @@ class Music21Object(object):
                     return nextObj
                 currentIndex += 1
         else:
-            raise Music21ObjectException('bad organization of ascend and beginNearest parameters')
+            raise Music21ObjectException('bad organization of forward and beginNearest parameters')
         # if nothing found, return None
         return None
 
-    def _adjacencySearch(self, classFilterList=None, ascend=True,
-        beginNearest=True, flattenLocalSites=False):
+    def _adjacencySearch(self, 
+                         classFilterList=None, 
+                         forward=True,
+                         beginNearest=True, 
+                         flattenLocalSites=False):
         '''
         Get the next or previous element if this element is in a Stream.
 
@@ -1430,9 +1436,10 @@ class Music21Object(object):
                 target = s.semiFlat
             # use semiflat of site
             match = self._adjacentObject(target,
-                    classFilterList=classFilterList, ascend=ascend,
-                    beginNearest=beginNearest)
-            if match is not None:
+                                         classFilterList=classFilterList, 
+                                         forward=forward,
+                                         beginNearest=beginNearest)
+            if match is not None and match is not self:
                 return match
             # append new sites to end of queue
             # these are the sites of s, not target
@@ -1440,8 +1447,10 @@ class Music21Object(object):
         # if cannot be found, return None
         return None
 
-    def next(self, classFilterList=None, flattenLocalSites=False,
-        beginNearest=True):
+    def next(self, 
+             classFilterList=None, 
+             flattenLocalSites=False,
+             beginNearest=True):
         '''
         Get the next element found in the activeSite (or other Sites)
         of this Music21Object.
@@ -1455,13 +1464,103 @@ class Music21Object(object):
 
         >>> s = corpus.parse('bwv66.6')
         >>> m3 = s.parts[0].measure(3) 
-        >>> m3.next() == s.parts[0].measure(4)
+        >>> m3.next() is s.parts[0].measure(4)
         True
+        
+        Note that calling next() repeatedly gives...the same object.  You'll want to
+        call next on that object...
+        
+        >>> m3.next() is s.parts[0].measure(4)
+        True
+        >>> m3.next() is s.parts[0].measure(4)
+        True
+
+        So do this instead:
+        
+        >>> o = m3
+        >>> for i in range(4):
+        ...     print(o)
+        ...     o = o.next()
+        <music21.stream.Measure 3 offset=9.0>
+        <music21.stream.Measure 4 offset=13.0>
+        <music21.stream.Measure 5 offset=17.0>
+        <music21.stream.Measure 6 offset=21.0>        
+
+
+
+
+
+        We can find the next element given a certain class with the `classFilterList`:
+        
+        >>> n = m3.next('Note')
+        >>> n
+        <music21.note.Note A>
+        >>> n.measureNumber
+        3
+        >>> n is m3.notes[0]
+        True
+
+
+        ..note::
+        
+            There may be some unusual cases of using obj.next() in Python2 if obj
+            uses itself as an Iterator, because Py2 assumes that each iterable has
+            a .next() function.  In Python3 there will be no problem since the
+            `next()` function is renamed to `__next__()`.
+
+
+
+        OMIT_FROM_DOCS
+        
+        Add this back when it's explained what the difference from the previous is.
+        
         >>> m3.next('Note', flattenLocalSites=True) == s.parts[0].measure(3).notes[0]
         True
+        >>> n2 = m3.next('Note', flattenLocalSites=True)
+        >>> n2
+        <music21.note.Note A>
+        >>> n2 is n
+        True
+        
+
+
+        THIS IS OMITTED BECAUSE IT SOMETIMES GIVES SEMIFLATs etc.
+
+        Notice though that when we get to the end of the set of measures, something
+        interesting happens (maybe it shouldn't? don't count on this...): we descend
+        into the last measure and give its elements instead.
+        
+        We'll leave o where it is (m7 now) to demonstrate what happens, and also
+        print the its Part for more information...
+        
+        #>>> while o is not None:
+        #...     print(o, o.getContextByClass('Part'))
+        #...     o = o.next()
+        <music21.stream.Measure 7 offset=25.0> <music21.stream.Part Soprano>
+        <music21.stream.Measure 8 offset=29.0> <music21.stream.Part Soprano>
+        <music21.stream.Measure 9 offset=33.0> <music21.stream.Part Soprano>
+        <music21.note.Note F#> <music21.stream.Part Soprano>
+        <music21.note.Note F#> <music21.stream.Part Soprano>
+        <music21.note.Note E#> <music21.stream.Part Soprano>
+        <music21.note.Note F#> <music21.stream.Part Soprano>
+        <music21.bar.Barline style=final> <music21.stream.Part Soprano>
+        <music21.bar.Barline style=final> <music21.stream.Part Alto>
+        <music21.bar.Barline style=final> <music21.stream.Part Tenor>
+        <music21.bar.Barline style=final> <music21.stream.Part Bass>       
+        
+        So we get through all the measures in Soprano, then with nothing else to do,
+        it goes into the measure and gets all the notes in the measure and finally
+        the final barline.  Then, having nothing else to do, it backtracks out of the
+        Part to the Score object and finds the object that is at the same offset in
+        the next object, which is the final barline of the Alto part, and so on.
+        
+        Not particularly useful here for `next()`, but it'll be very useful for `prev()`.
+        
         '''
         return self._adjacencySearch(classFilterList=classFilterList,
-                    ascend=True, beginNearest=beginNearest, flattenLocalSites=flattenLocalSites)
+                                     forward=True, 
+                                     beginNearest=beginNearest, 
+                                     flattenLocalSites=flattenLocalSites)
 
     def previous(self, classFilterList=None, flattenLocalSites=False,
         beginNearest=True):
@@ -1487,11 +1586,11 @@ class Music21Object(object):
         TODO:  Try:  l = corpus.parse('luca/gloria'); 
         for el in l.recurse: print(el, el.previous('Note'))
         SLOWEST THING EVER! why????
-        
-        
         '''
         return self._adjacencySearch(classFilterList=classFilterList,
-                    ascend=False, beginNearest=beginNearest, flattenLocalSites=flattenLocalSites)
+                                     forward=False, 
+                                     beginNearest=beginNearest, 
+                                     flattenLocalSites=flattenLocalSites)
 
     #--------------------------------------------------------------------------
     # properties
@@ -1868,10 +1967,12 @@ class Music21Object(object):
         the method of searching that should be applied to search for a context.  These methods are:
 
             * 'flatten' -- flatten the stream and then look from this offset backwards.
+            
             * 'elementsOnly' -- only search the stream's personal 
-            elements from this offset backwards
+               elements from this offset backwards
+            
             * 'elementsFirst' -- search this stream backwards, 
-            and then flatten and search backwards
+               and then flatten and search backwards
             
         >>> c = corpus.parse('bwv66.6')
         >>> c.id = 'bach'

@@ -100,8 +100,8 @@ Their contributions and generosity are greatly appreciated.
 
 * `Justin London`_ compiled and maintained the list of Second-Viennese row forms now available in serial.py.
 
-* `McGill University`_ ELVIS project for including the MEI parser. Special thanks to Julie
-Cumming, Andrew Hankinson, and especially Christopher Antila for contributing.
+* `McGill University`_ ELVIS project for including the MEI parser. Special thanks to Julie 
+  Cumming, Andrew Hankinson, and especially Christopher Antila for contributing.
 
 * `Manuel Op de Coul`_ has kindly gave permission to use the Scala scale archive of nearly 4000 scales in music21.
 

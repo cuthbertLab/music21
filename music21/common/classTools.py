@@ -21,10 +21,9 @@ def isNum(usrData):
     check if usrData is a number (float, int, long, Decimal),
     return boolean
      
-    unlike `isinstance(usrData, Number)` does not return True for
-    `True, False`. 
+    unlike `isinstance(usrData, Number)` does not return True for `True, False`. 
     
-    Does not use `isinstance(usrData, Number) which is 6 times slower
+    Does not use `isinstance(usrData, Number)` which is 6 times slower
     than calling this function (except in the case of Fraction, when
     it's 6 times faster, but that's rarer)
     

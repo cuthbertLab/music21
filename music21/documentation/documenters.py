@@ -386,17 +386,6 @@ class ClassDocumenter(ObjectDocumenter):
        - :meth:`~music21.base.Music21Object.splitByQuarterLengths`
        - :meth:`~music21.base.Music21Object.write`
     .. rubric:: :class:`~music21.articulations.Caesura` instance variables
-    Instance variables inherited from :class:`~music21.articulations.Articulation`:
-    .. hlist::
-       :columns: 3
-       - :attr:`~music21.articulations.Articulation.classSortOrder`
-       - :attr:`~music21.articulations.Articulation.groups`
-       - :attr:`~music21.articulations.Articulation.hideObjectOnPrint`
-       - :attr:`~music21.articulations.Articulation.id`
-       - :attr:`~music21.articulations.Articulation.isSpanner`
-       - :attr:`~music21.articulations.Articulation.isStream`
-       - :attr:`~music21.articulations.Articulation.isVariant`
-       - :attr:`~music21.articulations.Articulation.xPosition`
     Instance variables inherited from :class:`~music21.base.Music21Object`:
     .. hlist::
        :columns: 3
@@ -573,7 +562,8 @@ class ClassDocumenter(ObjectDocumenter):
         '''
         >>> d = documentation.documenters.ClassDocumenter(articulations.Caesura)
         >>> d.baseClasses
-        (<class 'music21.articulations.Articulation'>, <class 'music21.base.Music21Object'>)
+        (<class 'music21.articulations.Articulation'>, 
+         <class 'music21.base.Music21Object'>)
         '''
         if self._baseClasses is None:
             self._baseClasses = tuple(
@@ -659,13 +649,20 @@ class ClassDocumenter(ObjectDocumenter):
         <music21.documentation.documenters.ClassDocumenter: music21.stream.Stream>
 
         '''
+        # if one of the _DOC_ATTRs is exactly the same as the previous base class,
+        # only show it once.
+        # TODO: do this on an attribute by attribute basis...
+        seenBaseClassDocAttrs = []
+
         if self._inheritedDocAttrMapping is None:
             inheritedDocAttr = {}
-            for baseClass in self.baseClasses:
+            for baseClass in reversed(self.baseClasses):
                 baseClassDocAttr = getattr(baseClass, '_DOC_ATTR', None)
-                if baseClassDocAttr is not None:
+                if (baseClassDocAttr is not None and 
+                        baseClassDocAttr not in seenBaseClassDocAttrs):
                     baseClassDocumenter = type(self).fromIdentityMap(baseClass)
                     inheritedDocAttr[baseClassDocumenter] = baseClassDocAttr
+                    seenBaseClassDocAttrs.append(baseClassDocAttr)
             self._inheritedDocAttrMapping = inheritedDocAttr
 
         return self._inheritedDocAttrMapping
