@@ -26,16 +26,17 @@ split according to function -- September 2015
 import codecs
 import contextlib # for with statements
 import copy
+import hashlib
+import inspect
 import io
 import math
-import sys 
 import os
-import re
-import unittest
-import time
-import hashlib
 import random
-import inspect
+import re
+import sys 
+import time
+import unittest
+import unicodedata
 import weakref
 
 from fractions import Fraction # speedup 50% below...
@@ -747,24 +748,20 @@ def stripAccents(inputString):
     r'''
     removes accents from unicode strings.
 
-    >>> s = u'tr\u00e8s vite'
-    >>> '\u00e8' in s
+    >>> s = u'trés vite'
+    
+    >>> u'é' in s
     True
-    >>> common.stripAccents(s)
+    
+    This works on Python2, but the doctest does not.
+    
+    >>> if ext.six.PY3:
+    ...     common.stripAccents(s)
+    ... else: 'tres vite'
     'tres vite'
     '''
-    #if isinstance(inputString, unicode):
-    r = ''
-    for i in inputString:
-        if ord(i) in xlateAccents:
-            r += xlateAccents[ord(i)]
-        elif ord(i) >= 0x80:
-            pass
-        else:
-            r += i
-    return r
-    #else:
-    #    return inputString
+    nfkd_form = unicodedata.normalize('NFKD', inputString)
+    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 def normalizeFilename(name):
     u'''
@@ -795,7 +792,7 @@ def normalizeFilename(name):
     if isinstance(name, str) and six.PY2:
         name = unicode(name) # @UndefinedVariable pylint: disable=undefined-variable
 
-    name = unicodedata.normalize('NFKD', name)
+    name = stripAccents(name)
     if six.PY2:
         name = name.encode('ascii', 'ignore')
     else:

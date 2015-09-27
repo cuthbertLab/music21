@@ -18,8 +18,11 @@ can run on any system, not just music21.
 from __future__ import (division, print_function, absolute_import)
 
 import __future__
+
+import io
 import doctest
 import inspect
+import os
 import re
 import sys
 import unittest
@@ -45,10 +48,9 @@ def _msc_extract_future_flags(globs):
             flags |= getattr(__future__, fname).compiler_flag
     return flags
 
-doctest._extract_future_flags = _msc_extract_future_flags
-
-
 if six.PY2:
+    doctest._extract_future_flags = _msc_extract_future_flags
+    
     naive_single_quote_re = re.compile(r"(^|.)'((\\'|[^'])*?)'")
     naive_double_quote_re = re.compile(r'(^|.)"((\\"|[^"])*?)"')
     
@@ -67,8 +69,7 @@ class Py3In2OutputChecker(doctest.OutputChecker):
     Py2 mean that we need to find certain differences
     and remove them.
     
-    It means adding a lot of ELLIPSIS so Py2 will
-    run slower. But that's okay by me
+    First version: removes bytes from the expected output (want) and unicode from received (got)
     '''
     def check_output(self, want, got, optionflags):
         '''
@@ -77,7 +78,6 @@ class Py3In2OutputChecker(doctest.OutputChecker):
         if six.PY3:
             return super(Py3In2OutputChecker, self).check_output(want, got, optionflags)
         else:
-            got = unicode(got) # @UndefinedVariable
             #x = [want, got]
             
             want = naive_single_quote_re.sub(sbquoteConv, want) # bytes in WANT disappear
@@ -363,6 +363,7 @@ def mainTest(*testClasses, **kwargs):
         runner = unittest.TextTestRunner()
         runner.verbosity = verbosity
         unused_testResult = runner.run(s1)
+        
         
 if __name__ == '__main__':
     mainTest()
