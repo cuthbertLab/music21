@@ -755,7 +755,10 @@ class Music21Object(object):
             self._derivation = derivation.Derivation(client=self)
         return self._derivation
 
-    derivation = property(_getDerivation)
+    def _setDerivation(self, newDerivation):
+        self._derivation = newDerivation
+
+    derivation = property(_getDerivation, _setDerivation)
 
 
     def getOffsetBySite(self, site, returnType='rational', stringReturns=False):
@@ -2706,9 +2709,10 @@ class Music21Object(object):
         else:
             # testing sortByCreationTime == true; this may be necessary
             # as we often want the most recent measure
-            m = self.getContextByClass('Measure', sortByCreationTime=True)
-            if m is not None:
-                mNumber = m.number
+            for cs in self.contextSites():
+                m = cs[0]
+                if 'Measure' in m.classes:
+                    mNumber = m.number
         return mNumber
 
     measureNumber = property(_getMeasureNumber,
@@ -2756,6 +2760,18 @@ class Music21Object(object):
         >>> n2.activeSite = m2
         >>> n2.measureNumber
         11
+        
+        Copies can retain measure numbers until set themselves:
+        
+        >>> import copy
+        >>> nCopy = copy.deepcopy(n2)
+        >>> nCopy.measureNumber
+        12
+        >>> m3 = stream.Measure()
+        >>> m3.number = 4
+        >>> m3.append(nCopy)
+        >>> nCopy.measureNumber
+        4
         ''')
 
     def _getMeasureOffset(self, includeMeasurePadding=True):

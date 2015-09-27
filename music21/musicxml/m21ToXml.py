@@ -321,6 +321,10 @@ class GeneralObjectExporter():
                   <beats>1</beats>
                   <beat-type>4</beat-type>
                 </time>
+                <clef>
+                  <sign>G</sign>
+                  <line>2</line>
+                </clef>
               </attributes>
               <note>
                 <pitch>
@@ -355,6 +359,7 @@ class GeneralObjectExporter():
         >>> s.show('t')
         {0.0} <music21.stream.Part 0x...>
             {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.clef.TrebleClef>
                 {0.0} <music21.meter.TimeSignature 6/8>
                 {0.0} <music21.note.Note C>
         >>> s.flat.notes[0].duration
@@ -372,13 +377,13 @@ class GeneralObjectExporter():
         return outObj
 
 
-    def fromScore(self, streamObject):
+    def fromScore(self, sc):
         '''
         the best one of all -- a perfectly made Score (or something like that)
         '''
-        post = copy.deepcopy(streamObject)
-        post.makeImmutable()
-        return post
+        scOut = sc.makeNotation(inPlace=False)
+        scOut.makeImmutable()
+        return scOut
 
     def fromPart(self, p):
         '''
@@ -400,6 +405,8 @@ class GeneralObjectExporter():
         representation of a Measure, not for partial 
         solutions in Part or Stream production.
         '''
+        if m.clef is None:
+            m.clef = m.bestClef()
         m.makeNotation(inPlace=True)    
         p = stream.Part()
         p.append(m)
@@ -2297,23 +2304,26 @@ class MeasureExporter(XMLExporterBase):
         # TODO: attr: attack
         # TODO: attr: release
         # TODO: attr: time-only
-        mxNote = Element('note')
-        if chordParent is not None:
-            d = chordParent.duration
+        if chordParent is None:
+            chordOrN = n
         else:
-            d = n.duration
+            chordOrN = chordParent
+        
+        mxNote = Element('note')
+        d = chordOrN.duration
         
         if d.isGrace is True:
             SubElement(mxNote, 'grace')
 
         # TODO: cue...
-        if n.color is not None:
-            mxNote.set('color', normalizeColor(n.color))
+        if chordOrN.color is not None:
+            mxNote.set('color', normalizeColor(chordOrN.color))
+        
         if n.hideObjectOnPrint is True:
             mxNote.set('print-object', 'no')
             mxNote.set('print-spacing', 'yes')
             
-        for art in n.articulations:
+        for art in chordOrN.articulations:
             if 'Pizzicato' in art.classes:
                 mxNote.set('pizzicato', 'yes')
         
@@ -2375,42 +2385,59 @@ class MeasureExporter(XMLExporterBase):
                 mxTimeModification = self.tupletToTimeModification(tup)
                 mxNote.append(mxTimeModification)
         # TODO: stem
+        foundANotehead = False
         if (hasattr(n, 'notehead') and 
                 (n.notehead != 'normal' or  # TODO: restore... needed for complete compatibility with toMxObjects...
                  n.noteheadFill is not None or
                  n.color not in (None, ''))
             ):
+            foundANotehead = True
             mxNotehead = self.noteheadToXml(n)
             mxNote.append(mxNotehead)
-        # TODO: notehead-text
-        if hasattr(n, 'stemDirection') and n.stemDirection != 'unspecified':
-            mxStem = SubElement(mxNote, 'stem')
-            sdtext = n.stemDirection
-            if sdtext == 'noStem':
-                sdtext = 'none'
-            mxStem.text = sdtext
+        if foundANotehead is False and chordParent is not None:
+            if (hasattr(chordParent, 'notehead') and 
+                    (chordParent.notehead != 'normal' or  # TODO: restore... needed for complete compatibility with toMxObjects...
+                     chordParent.noteheadFill is not None or
+                     chordParent.color not in (None, ''))
+                ):
+                mxNotehead = self.noteheadToXml(chordParent)
+                mxNote.append(mxNotehead)
         
-        # TODO: staff
-        if hasattr(n, 'beams') and n.beams:
-            nBeamsList = self.beamsToXml(n.beams)
-            for mxB in nBeamsList:
-                mxNote.append(mxB)
+        # TODO: notehead-text
+        
+        
+        if addChordTag is False:
+            if hasattr(chordOrN, 'stemDirection') and chordOrN.stemDirection != 'unspecified':
+                mxStem = SubElement(mxNote, 'stem')
+                sdtext = chordOrN.stemDirection
+                if sdtext == 'noStem':
+                    sdtext = 'none'
+                mxStem.text = sdtext
+            
+            # TODO: staff
+            if hasattr(chordOrN, 'beams') and chordOrN.beams is not None:
+                nBeamsList = self.beamsToXml(chordOrN.beams)
+                for mxB in nBeamsList:
+                    mxNote.append(mxB)
     
-        mxNotationsList = self.noteToNotations(n)
+    
+        mxNotationsList = self.noteToNotations(n, addChordTag, chordParent)
+            
         # add tuplets if it's a note or the first <note> of a chord.
         if addChordTag is False:
             for tup in d.tuplets:
                 tupTagList = self.tupletToXmlTuplet(tup)
                 mxNotationsList.extend(tupTagList)
-
-        
+    
+            
         if len(mxNotationsList) > 0: # TODO: make to zero -- this is just for perfect old compat.
             mxNotations = SubElement(mxNote, 'notations')
             for mxN in mxNotationsList:
                 mxNotations.append(mxN)
-
-        for lyricObj in n.lyrics:
-            mxNote.append(self.lyricToXml(lyricObj))
+    
+        if addChordTag is False:
+            for lyricObj in chordOrN.lyrics:
+                mxNote.append(self.lyricToXml(lyricObj))
         # TODO: play
         self.xmlRoot.append(mxNote)
         return mxNote
@@ -2601,7 +2628,7 @@ class MeasureExporter(XMLExporterBase):
             mxNotehead.set('color', color)
         return mxNotehead
     
-    def noteToNotations(self, n):
+    def noteToNotations(self, n, notFirstNoteOfChord=False, chordParent=None):
         '''
         Take information from .expressions,
         .articulations, and spanners to
@@ -2613,37 +2640,48 @@ class MeasureExporter(XMLExporterBase):
 
         notations = []
 
-        for expObj in n.expressions:
-            mxExpression = self.expressionToXml(expObj)
-            if mxExpression is None:
-                #print("Could not convert expression: ", mxExpression)
-                # TODO: should not!
-                continue
-            if 'Ornament' in expObj.classes:
-                if mxOrnaments is None:
-                    mxOrnaments = Element('ornaments')
-                mxOrnaments.append(mxExpression)
-                #print(mxExpression)
-            else:
-                notations.append(mxExpression)
-
-        for artObj in n.articulations:
-            if 'TechnicalIndication' in artObj.classes:
-                if mxTechnicalMark is None:
-                    mxTechnicalMark = Element('technical')
-                mxTechnicalMark.append(self.articulationToXmlTechnical(artObj))
-            else:
-                if mxArticulations is None:
-                    mxArticulations = Element('articulations')
-                mxArticulations.append(self.articulationToXmlArticulation(artObj))
+        if notFirstNoteOfChord is False:
+            # only apply expressions and articulations 
+            # to notes or the first note of a chord...
+            chordOrNote = n
+            if chordParent is not None:
+                # get expressions from first note of chord
+                chordOrNote = chordParent
+            
+            for expObj in chordOrNote.expressions:
+                mxExpression = self.expressionToXml(expObj)
+                if mxExpression is None:
+                    #print("Could not convert expression: ", mxExpression)
+                    # TODO: should not!
+                    continue
+                if 'Ornament' in expObj.classes:
+                    if mxOrnaments is None:
+                        mxOrnaments = Element('ornaments')
+                    mxOrnaments.append(mxExpression)
+                    #print(mxExpression)
+                else:
+                    notations.append(mxExpression)
+    
+            for artObj in chordOrNote.articulations:
+                if 'TechnicalIndication' in artObj.classes:
+                    if mxTechnicalMark is None:
+                        mxTechnicalMark = Element('technical')
+                    mxTechnicalMark.append(self.articulationToXmlTechnical(artObj))
+                else:
+                    if mxArticulations is None:
+                        mxArticulations = Element('articulations')
+                    mxArticulations.append(self.articulationToXmlArticulation(artObj))
         
         # TODO: attrGroup: print-object (for individual notations)
         # TODO: editorial (hard! -- requires parsing again in order...)
         
         # <tied>
+        # for ties get for each note...
         if n.tie is not None:
             tiedList = self.tieToXmlTied(n.tie)
             notations.extend(tiedList)
+            
+            
         # <tuplet> handled elsewhere, because it's on the overall duration on chord...
 
         notations.extend(self.objectAttachedSpannersToNotations(n))
@@ -2811,6 +2849,8 @@ class MeasureExporter(XMLExporterBase):
         Convert a music21 Expression (expression or ornament)
         to a musicxml tag; 
         return None if no conversion is possible.
+        
+        Expressions apply only to the first note of chord.
         
         >>> t = expressions.InvertedTurn()
         >>> MEX = musicxml.m21ToXml.MeasureExporter()

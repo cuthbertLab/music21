@@ -36,6 +36,16 @@ class Iterator(object):
 class IPythonNotebookIterator(Iterator):
     '''
     Iterates over music21's documentation directory, yielding .ipynb files.
+    
+    >>> sp = common.getSourceFilePath()
+    >>> ipnbi = documentation.iterators.IPythonNotebookIterator()
+    >>> for i, nb in enumerate(ipnbi):
+    ...     if i >= 3:
+    ...         break
+    ...     print(nb.replace(sp, 'SOURCE'))
+    SOURCE/documentation/source/about/what.ipynb
+    SOURCE/documentation/source/developerReference/installIPython.ipynb
+    SOURCE/documentation/source/usersGuide/usersGuide_01_installing.ipynb    
     '''
 
     ### SPECIAL METHODS ###

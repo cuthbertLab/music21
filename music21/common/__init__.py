@@ -24,6 +24,7 @@ split according to function -- September 2015
 
 # should NOT import music21 or anything like that, except in doctests.
 import re
+import contextlib # for with statements
 import copy
 import math, sys, os
 import unittest
@@ -525,7 +526,26 @@ def dirPartitioned(obj, skipLeading=('__',)):
             attributes.append(name)
     return methods, attributes, properties
 
+@contextlib.contextmanager
+def cd(targetDir):
+    '''
+    Useful for a temporary cd for use in a `with` statement:
+    
+         with cd('/Library/'):
+              os.system(make)
+              
+    will switch temporarily, and then switch back when leaving.
+    '''
+    try:
+        cwd = os.getcwdu() # unicode
+    except AttributeError:
+        cwd = os.getcwd() # non unicode
 
+    try:
+        os.chdir(targetDir)
+        yield
+    finally:
+        os.chdir(cwd)
 
 #-------------------------------------------------------------------------------
 # tools for setup.py

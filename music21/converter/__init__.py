@@ -629,14 +629,52 @@ class Converter(object):
 
     #------------------------------------------------------------------------#
     # Subconverters
-    def subconvertersList(self):
+    def subconvertersList(self, converterType='any'):
         '''
+        Gives a list of all the subconverters that are registered.
+        
+        If converterType is 'any' (true), then input or output
+        subconverters are listed.
+        
+        Otherwise, 'input', or 'output' can be used to filter.
+        
         >>> converter.resetSubconverters() #_DOCS_HIDE
         >>> c = converter.Converter()
         >>> scl = c.subconvertersList()
         >>> defaultScl = c.defaultSubconverters()
         >>> tuple(scl) == tuple(defaultScl)
         True
+        
+        >>> sclInput = c.subconvertersList('input')
+        >>> sclInput
+        [<class 'music21.converter.subConverters.ConverterABC'>, 
+         <class 'music21.converter.subConverters.ConverterCapella'>, 
+         <class 'music21.converter.subConverters.ConverterClercqTemperley'>, 
+         <class 'music21.converter.subConverters.ConverterHumdrum'>, 
+         <class 'music21.converter.subConverters.ConverterMEI'>, 
+         <class 'music21.converter.subConverters.ConverterMidi'>, 
+         <class 'music21.converter.subConverters.ConverterMuseData'>, 
+         <class 'music21.converter.subConverters.ConverterMusicXML'>, 
+         <class 'music21.converter.subConverters.ConverterMusicXMLET'>, 
+         <class 'music21.converter.subConverters.ConverterNoteworthy'>, 
+         <class 'music21.converter.subConverters.ConverterNoteworthyBinary'>, 
+         <class 'music21.converter.subConverters.ConverterRomanText'>, 
+         <class 'music21.converter.subConverters.ConverterScala'>, 
+         <class 'music21.converter.subConverters.ConverterTinyNotation'>]
+
+        >>> sclOutput = c.subconvertersList('output')
+        >>> sclOutput
+        [<class 'music21.converter.subConverters.ConverterBraille'>, 
+         <class 'music21.converter.subConverters.ConverterLilypond'>, 
+         <class 'music21.converter.subConverters.ConverterMidi'>, 
+         <class 'music21.converter.subConverters.ConverterMusicXML'>, 
+         <class 'music21.converter.subConverters.ConverterMusicXMLET'>, 
+         <class 'music21.converter.subConverters.ConverterScala'>, 
+         <class 'music21.converter.subConverters.ConverterText'>, 
+         <class 'music21.converter.subConverters.ConverterTextLine'>, 
+         <class 'music21.converter.subConverters.ConverterVexflow'>]
+
+        
         
         >>> class ConverterSonix(converter.subConverters.SubConverter):
         ...    registerFormats = ('sonix',)
@@ -663,7 +701,19 @@ class Converter(object):
                         subConverterList.remove(unreg)
                     except ValueError:
                         pass
-        return subConverterList
+        
+        if converterType == 'any':
+            return subConverterList
+        
+        filteredSubConvertersList = []
+        for sc in subConverterList:
+            if converterType == 'input' and len(sc.registerInputExtensions) == 0:
+                continue
+            if converterType == 'output' and len(sc.registerOutputExtensions) == 0:
+                continue
+            filteredSubConvertersList.append(sc)
+                     
+        return filteredSubConvertersList
 
     def defaultSubconverters(self):
         '''

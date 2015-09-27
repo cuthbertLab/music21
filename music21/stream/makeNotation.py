@@ -81,7 +81,7 @@ def makeBeams(s, inPlace=False):
         mColl = []  # store a list of measures for processing
         mColl.append(returnObj)
     elif len(s.getElementsByClass('Measure')) > 0:
-        mColl = returnObj.getElementsByClass('Measure')  # a stream of measures
+        mColl = list(returnObj.iter.getElementsByClass('Measure'))  # a list of measures
     else:
         raise stream.StreamException(
             'cannot process a stream that neither is a Measure nor has '
@@ -97,8 +97,9 @@ def makeBeams(s, inPlace=False):
         if lastTimeSignature is None:
             #environLocal.printDebug([
             #    'makeBeams(): lastTimeSignature is None: cannot process'])
+            # TODO: Reduce to warning...
             raise stream.StreamException(
-                'cannot proces beams in a Measure without a time signature')
+                'cannot process beams in a Measure without a time signature')
         noteGroups = []
         if m.hasVoices():
             for v in m.voices:

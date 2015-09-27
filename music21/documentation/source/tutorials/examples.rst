@@ -125,44 +125,6 @@ Folksong database, indexed and stored in the music21 corpus.
     locale: fujian: found 0.7654 percent melodic sevenths, out of 2613 intervals in 53 works 
 
 
-Finding Chords by Root and Collecting their Successors
-------------------------------------------------------
-
-This example creates a chordal reduction of a polyphonic work and then searches
-for all Chords that have a specific root. This chord, along with its successor,
-is then collected and displayed.
-
-::
-
-    >>> from music21 import *
-    >>> # Parse a work from the corpus
-    >>> s = corpus.parse('bwv66.6')    
-    >>> # Reduce the work to a series of simultaneities, then extract only
-    >>> # the resultant Chords
-    >>> chords = s.chordify().flat.getElementsByClass('Chord')
-    >>> # Create a Stream for display
-    >>> display = stream.Stream()
-    >>> # Iterate through the chords by index and a Chord
-    >>> for i, c1 in enumerate(chords):
-    ...     # Get the next Chord, or a Rest
-    ...     if i < len(chords) - 1:
-    ...         c2 = chords[i+1]
-    ...     else:
-    ...         c2 = note.Rest()
-    ...     # If the root of the Chord is A, collect and display this Chord
-    ...     # and the next Chord (the last bit eliminates some passing 9th chords that can
-    ...     # be analyzed as having an A root)
-    ...     if c1.findRoot().name == 'A' and (c1.isTriad() is True or c1.isSeventh() is True):
-    ...         m = stream.Measure()
-    ...         m.append(c1)
-    ...         m.append(c2)
-    ...         display.append(m)    
-    ... 
-    >>> display.show()  # doctest: +SKIP
-    
-.. image:: images/examples-03.*
-    :width: 600
-
 
 Pitch and Duration Transformations
 ----------------------------------

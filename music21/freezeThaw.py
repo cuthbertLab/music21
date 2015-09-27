@@ -755,6 +755,12 @@ class StreamThawer(StreamFreezeThawBase):
         >>> st = freezeThaw.StreamThawer()
         >>> st.teardownSerializationScaffold(a)
         '''
+        def _fixId(e):
+            if (e.id is not None and 
+                    common.isNum(e.id) and 
+                    e.id > defaults.minIdNumberToConsiderMemoryLocation):
+                e.id = id(e)
+
         if streamObj is None:
             streamObj = self.stream
             if streamObj is None:
@@ -785,14 +791,13 @@ class StreamThawer(StreamFreezeThawBase):
             elif e.isStream: 
                 self.restoreStreamStatusClient(e) # removing seems to create problems for jsonPickle with Spanners
 
-            #self.thawIds(e)
+            _fixId(e)
             #e.wrapWeakref()
 
         # restore to whatever it was
         streamObj.autoSort = storedAutoSort
         streamObj.elementsChanged()
-        if streamObj.id is not None and streamObj.id > defaults.minIdNumberToConsiderMemoryLocation:
-            streamObj.id = None
+        _fixId(streamObj)
 
     def restoreElementsFromTuples(self, streamObj):
         '''

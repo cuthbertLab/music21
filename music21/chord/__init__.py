@@ -24,6 +24,7 @@ import unittest
 
 from music21 import beam
 from music21 import common
+from music21 import derivation
 from music21 import duration
 from music21 import exceptions21
 from music21 import interval
@@ -846,6 +847,9 @@ class Chord(note.NotRest):
             returnObj = self
         else:
             returnObj = copy.deepcopy(self)
+            returnObj.derivation = derivation.Derivation(returnObj)
+            returnObj.derivation.origin = self
+            returnObj.derivation.method = 'closedPosition'
         #tempChordNotes = returnObj.pitches
 
         pBass = returnObj.bass() # returns a reference, not a copy

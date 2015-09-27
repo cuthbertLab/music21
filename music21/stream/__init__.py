@@ -6013,7 +6013,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         sNew = copy.copy(self)
         if sNew.id != id(sNew):
-            sNew.id = str(sNew.id) + "_" + method
+            sOldId = sNew.id
+            if common.isNum(sOldId) and sOldId > defaults.minIdNumberToConsiderMemoryLocation:
+                sOldId = hex(sOldId)
+            sNew.id = str(sOldId) + "_" + method
         
         sNew._derivation = derivation.Derivation(sNew)
         sNew._derivation.origin = self
@@ -12034,7 +12037,7 @@ class Opus(Stream):
         ['1', '2', '3']
         '''
         post = []
-        for s in self.getElementsByClass('Score'):
+        for s in self.iter.getElementsByClass('Score'):
             post.append(s.metadata.number)
         return post
 
@@ -12055,7 +12058,7 @@ class Opus(Stream):
         >>> s.metadata.alternativeTitle
         'Tenor'
         '''
-        for s in self.getElementsByClass('Score'):
+        for s in self.iter.getElementsByClass('Score'):
             match, unused_field = s.metadata.search(opusMatch, 'number')
             if match:
                 return s

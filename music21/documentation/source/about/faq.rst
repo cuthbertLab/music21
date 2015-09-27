@@ -11,12 +11,11 @@ How do I ask a question so that it becomes frequently asked?
     Don't you hate FAQs that are not based on anything anyone's ever asked?  
     To ask, post to http://groups.google.com/group/music21list.  But first read what we've already come up with below.
 
-
-What is the native music21 data format?
+What is the native `music21` data format?
 
     Quick answer: There is none, but it doesn't matter.
 
-    Longer answer: music21 is a toolkit for the manipulation and analysis of data 
+    Longer answer: `music21` is a toolkit for the manipulation and analysis of data 
     that you already have or are generating on the fly. As such, its strength is its (and python's) 
     ability to work with many common formats and easy extensibility to work with many more. 
     You will find that for the most part you will not need to preserve your 
@@ -24,7 +23,7 @@ What is the native music21 data format?
     with music21 makes it impossible for us to create formats for every possible use. 
     We work with music21 all the time for our work and have never needed one.
     
-    But if you must store your music21 data somehow, here are some suggestions:
+    But if you must store your `music21` data somehow, here are some suggestions:
     
     * For data that can quickly and exactly be recreated, use the script that generates as your data storage.  
       Then just rerun the script to get your data back.
@@ -58,11 +57,11 @@ Can I synthesize new sounds with music21?
     a large variety of synthesis packages. So you could create new
     music21 objects that control the synthesis package of your choosing.    
 
-I'm ready to give it a try, but how do I install music21?
+I'm ready to give it a try, but how do I install `music21`?
 
     Please see the complete install instructions: :ref:`install`.
 
-Music21 doesn't have some feature that I need, how do I get it added?
+`Music21` doesn't have some feature that I need, how do I get it added?
 
     It won't hurt to email the list (or us directly) and we'll consider it.
     However, we do have a priority list based on what we think the widest
@@ -72,6 +71,14 @@ Music21 doesn't have some feature that I need, how do I get it added?
     enable us to increase the number of student programming assistants we
     employ.  (Or side-step us and offer a cash bounty on the music21list
     itself).
+    
+No, you don't understand, I **really** need this feature!
+
+    If you really need something done in `music21`, we offer paid support
+    by the hour at standard consulting rates. Discounts are available for
+    academic researchers/composers who consider the feature so essential as to add
+    authorship credit to the development team. Contact `cuthbert@mit.edu`
+    for details and rates.
 
 
 3rd-Party Utilities
@@ -90,7 +97,7 @@ And this Humdrum about which you speak?
 
     It's another framework for studying music as symbolic data using 
     simple text files and UNIX scripting tools.  We're big fans of Humdrum 
-    here at music21, but we thought that it was time to take a 
+    here at `music21`, but we thought that it was time to take a 
     different approach. 
 
     Information on Humdrum can be found here at the following links:
