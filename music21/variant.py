@@ -2428,7 +2428,7 @@ class Test(unittest.TestCase):
         v1 = Variant()
         v1.append(m1)
 
-        self.assertEqual(v1.isClassOrSubclass(['Variant']), True)
+        self.assertEqual('Variant' in v1.classes, True)
 
         self.assertEqual(v1.hasElementOfClass('Variant'), False)
         self.assertEqual(v1.hasElementOfClass('Measure'), True)

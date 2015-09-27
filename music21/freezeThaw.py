@@ -1150,9 +1150,6 @@ class JSONFreezeThawBase(object):
         '''
         return a fullyQualified class name from an object.
 
-        for Music21Objects you can just do: ``obj.fullyQualifiedClasses[0]``, but
-        this works on any object (such as Durations which aren't Music21Objects)
-
 
         >>> d = duration.Duration()
         >>> jsbase = freezeThaw.JSONFreezeThawBase()
@@ -1296,10 +1293,7 @@ class JSONFreezer(JSONFreezeThawBase):
             return []
 
         attributeList = []
-        if hasattr(self.storedObject, 'fullyQualifiedClasses'):
-            fqClassList = list(self.storedObject.fullyQualifiedClasses)
-        else: # same thing...
-            fqClassList = [self.fullyQualifiedClassFromObject(x) for x in self.storedObject.__class__.mro()]
+        fqClassList = [self.fullyQualifiedClassFromObject(x) for x in self.storedObject.__class__.mro()]
 
         for i, thisClass in enumerate(fqClassList):
             inheritFrom = i + 1
@@ -1365,10 +1359,7 @@ class JSONFreezer(JSONFreezeThawBase):
         elif six.PY3 and isinstance(possiblyFreezeable, (int, str, bytes, float)):
             return False 
 
-        if hasattr(possiblyFreezeable, 'fullyQualifiedClasses'):
-            fqClassList = list(possiblyFreezeable.fullyQualifiedClasses)
-        else: # same thing...
-            fqClassList = [x.__module__ + '.' + x.__name__ 
+        fqClassList = [self.fullyQualifiedClassFromObject(x) 
                                 for x in possiblyFreezeable.__class__.mro()]
 
         for fqName in fqClassList:

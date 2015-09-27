@@ -220,7 +220,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             try:
                 for e in givenElements:
                     self._insertCore(e.offset, e) 
-            except AttributeError:
+            except (AttributeError, TypeError):
                 raise StreamException("Unable to insert {0}".format(e))
             self.elementsChanged()
 

@@ -290,7 +290,7 @@ class Music21Object(object):
     # it only needs to be made once (11 microseconds per call, can be
     # a big part of iteration; from cache just 1 microsecond)
     _classListCacheDict = {}
-    
+    _classSetCacheDict = {}
     # same with fully qualified names
     _classListFullyQualifiedCacheDict = {}
 
@@ -298,7 +298,7 @@ class Music21Object(object):
     # define order to present names in documentation; use strings
     _DOC_ORDER = [
         'classes',
-        'fullyQualifiedClasses',
+        'classSet',
         'findAttributeInHierarchy',
         'getContextAttr',
         'setContextAttr',
@@ -578,6 +578,7 @@ class Music21Object(object):
         # defining self.__dict__ upon initialization currently breaks everything
         self.__dict__ = state #pylint: disable=attribute-defined-outside-init
 
+    #@common.deprecated('Septermber 2015', 'March 2016', 'for most performance critical, iterate over classFilterList on .classSet')
     def isClassOrSubclass(self, classFilterList):
         '''
         Given a class filter list (a list or tuple must be submitted),
@@ -586,7 +587,12 @@ class Music21Object(object):
         
         NOTE: this is a performance critical operation
         for performance, only accept lists or tuples
+        
+        TO BE DEPRECATED -- slowest of all methods... only kept
+        because supporting a list of strings or classes is nice.
         '''
+        return not self.classSet.isdisjoint(classFilterList)
+        
         # NOTE: this is a performance critical operation
         # for performance, only accept lists or tuples
 
@@ -653,32 +659,48 @@ class Music21Object(object):
         `Changed 2015 Sep`: returns a tuple, not a list.        
         ''')
 
-    def _getFullyQualifiedClasses(self):
+    def _getClassSet(self):
         try:
-            return self._classListFullyQualifiedCacheDict[self.__class__]
+            return self._classSetCacheDict[self.__class__]
         except KeyError:
-            classList = tuple([x.__module__ + '.' + x.__name__ for x in self.__class__.mro()])
-            self._classListFullyQualifiedCacheDict[self.__class__] = classList
-            return classList
+            classNameList = list(self.classes)
+            classObjList = self.__class__.mro()
+            classListFQ = [x.__module__ + '.' + x.__name__ for x in self.__class__.mro()]
+            classList = classNameList + classObjList + classListFQ
+            classSet = set(classList)
+            self._classSetCacheDict[self.__class__] = classSet
+            return classSet
 
-    fullyQualifiedClasses = property(_getFullyQualifiedClasses,
-        doc='''
-        Similar to `.classes`, returns a tuple containing the names (strings, not objects) of
-        classes with the full package name that this
-        object belongs to -- starting with the object's class name and going up the mro()
-        for the object.  Very similar to Perl's @ISA array:
-
-
-        >>> q = note.Note()
-        >>> q.fullyQualifiedClasses
-        ('music21.note.Note', 'music21.note.NotRest', 'music21.note.GeneralNote', 
-         'music21.base.Music21Object', '...builtin...object')
+    classSet = property(_getClassSet, doc='''
+        Returns a set (that is, unordered, but indexed) of all of the classes that
+        this class belongs to, including
+        string names, fullyQualified string names, and objects themselves.
         
-        The last one (object) will be different in Py2 (__builtin__.object) and 
-        Py3 (builtins.object)
+        It's cached on a per class basis, so makes for a really fast way of checking to 
+        see if something belongs
+        to a particular class when you don't know if the user has given a string,
+        a fully qualified string name, or an object.
         
-        `Changed 2015 Sep`: returns a tuple, not a list.
-        ''')
+        Did I mention it's fast?  It's a drop in substitute for the deprecated
+        `.isClassOrSubClass`.  It's not as fast as x in n.classes or isinstance(n, x)
+        if you know whether it's a string or class, but this is good and safe.
+        
+        >>> n = note.Note()
+        >>> 'Note' in n.classSet
+        True
+        >>> 'music21.note.Note' in n.classSet
+        True
+        >>> note.Note in n.classSet
+        True
+        
+        >>> 'Rest' in n.classSet
+        False
+        >>> note.Rest in n.classSet
+        False
+        
+        >>> object in n.classSet
+        True
+    ''')
 
     #---------------------------
     # convienence.  used to be in note.Note, but belongs everywhere:
@@ -1094,10 +1116,13 @@ class Music21Object(object):
         # NOTE: this method is overridden on Spanner and Variant, so not an easy fix...
         self.sites.purgeLocations(rescanIsDead=rescanIsDead)
 
-    def getContextByClass(self, className,
-        callerFirst=None, getElementMethod='getElementAtOrBefore',
-        memo=None, serialReverseSearch=True,
-        sortByCreationTime=False):
+    def getContextByClass(self, 
+                          className,
+                          callerFirst=None, 
+                          getElementMethod='getElementAtOrBefore',
+                          memo=None, 
+                          serialReverseSearch=True,
+                          sortByCreationTime=False):
         '''
         A very powerful method in music21 of fundamental importance: Returns
         the element matching the className that is closest to this element in
@@ -1197,7 +1222,7 @@ class Music21Object(object):
                 verticality = ts.getVerticalityAt(offsetStart).previousVerticality
             if verticality is not None:
                 element = extractElementFromVerticality(verticality)
-                if element is not None and element.isClassOrSubclass(className):
+                if element is not None and any(c in element.classSet for c in className):
                     # latter should not be necessary...
                     return element
             return None
@@ -1222,7 +1247,7 @@ class Music21Object(object):
             className = (className,)
 
         for site, offsetStart, searchType in self.contextSites(sortByCreationTime=sortByCreationTime):
-            if site.isClassOrSubclass(className):
+            if any(c in site.classSet for c in className):
                 return site
             if searchType == 'elementsOnly' or searchType == 'elementsFirst':
                 tsNotFlat = site.asTimespans(classList=className, recurse=False)
@@ -1380,7 +1405,11 @@ class Music21Object(object):
                          beginNearest=True, 
                          flattenLocalSites=False):
         '''
-        Get the next or previous element if this element is in a Stream.
+        Get the next (if forward is True) or previous (if forward is False) element 
+        of this element, according to various definitions of forward and backwards.
+
+        It is pretty simple to define this for a simple object in one stream.  It's much
+        harder if a lot of other streams/sites have interfered.
 
         If this element is in multiple Streams, the first next element found in any
         site will be returned. If not found no next element is found in any site, the flat

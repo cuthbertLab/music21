@@ -687,7 +687,6 @@ class ClassDocumenter(ObjectDocumenter):
         music21.base.Music21Object:
         - music21.base.Music21Object.classes
         - music21.base.Music21Object.containerHierarchy
-        - music21.base.Music21Object.fullyQualifiedClasses
         - music21.base.Music21Object.isGrace
         - music21.base.Music21Object.measureNumber
         music21.stream.Stream:
@@ -1008,7 +1007,6 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.beatStrength`'
         '   - :attr:`~music21.base.Music21Object.classes`'
         '   - :attr:`~music21.base.Music21Object.containerHierarchy`'
-        '   - :attr:`~music21.base.Music21Object.fullyQualifiedClasses`'
         '   - :attr:`~music21.base.Music21Object.isGrace`'
         '   - :attr:`~music21.base.Music21Object.measureNumber`'
         ''
@@ -1156,7 +1154,6 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.beatStrength`'
         '   - :attr:`~music21.base.Music21Object.classes`'
         '   - :attr:`~music21.base.Music21Object.containerHierarchy`'
-        '   - :attr:`~music21.base.Music21Object.fullyQualifiedClasses`'
         '   - :attr:`~music21.base.Music21Object.isGrace`'
         '   - :attr:`~music21.base.Music21Object.measureNumber`'
         ''
