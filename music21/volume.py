@@ -47,7 +47,7 @@ class Volume(SlottedObject):
     ### CLASS VARIABLES ###
 
     __slots__ = (
-        '_parent',
+        '_client',
         '_velocity',
         '_cachedRealized',
         'velocityIsRelative',
@@ -57,15 +57,15 @@ class Volume(SlottedObject):
 
     def __init__(
         self,
-        parent=None,
+        client=None,
         velocity=None,
         velocityScalar=None,
         velocityIsRelative=True,
         ):
-        # store a reference to the parent, as we use this to do context
+        # store a reference to the client, as we use this to do context
         # will use property; if None will leave as None
-        self._parent = None
-        self.parent = parent
+        self._client = None
+        self.client = client
         self._velocity = None
         if velocity is not None:
             self.velocity = velocity
@@ -84,41 +84,41 @@ class Volume(SlottedObject):
         new = self.__class__()
         new.mergeAttributes(self) # will get all numerical values
         # keep same weak ref object
-        new._parent = self._parent
+        new._client = self._client
         return new
 
     def __repr__(self):
         return "<music21.volume.Volume realized=%s>" % round(self.realized, 2)
 
     def __getstate__(self):
-        self._parent = common.unwrapWeakref(self._parent)
+        self._client = common.unwrapWeakref(self._client)
         return SlottedObject.__getstate__(self)
 
     def __setstate__(self, state):
         SlottedObject.__setstate__(self, state)
-        self._parent = common.wrapWeakref(self._parent)
+        self._client = common.wrapWeakref(self._client)
 
     ### PUBLIC METHODS ###
 
 
     def getDynamicContext(self):
-        '''Return the dynamic context of this Volume, based on the position of the NotRest parent of this object.
+        '''Return the dynamic context of this Volume, based on the position of the NotRest client of this object.
         '''
         # TODO: find wedges and crescendi too
-        return self.parent.getContextByClass('Dynamic')
+        return self.client.getContextByClass('Dynamic')
 
     def mergeAttributes(self, other):
-        '''Given another Volume object, gather all attributes except parent. Values are always copied, not passed by reference.
+        '''Given another Volume object, gather all attributes except client. Values are always copied, not passed by reference.
 
 
         >>> n1 = note.Note()
         >>> v1 = volume.Volume()
         >>> v1.velocity = 111
-        >>> v1.parent = n1
+        >>> v1.client = n1
 
         >>> v2 = volume.Volume()
         >>> v2.mergeAttributes(v1)
-        >>> v2.parent == None
+        >>> v2.client == None
         True
         >>> v2.velocity
         111
@@ -168,10 +168,10 @@ class Volume(SlottedObject):
         may supply a Dynamic object that will be used instead of a context
         search.
 
-        If `useArticulations` is True and parent is not None, any articulations
-        found on that parent will be used to adjust the volume. Alternatively,
+        If `useArticulations` is True and client is not None, any articulations
+        found on that client will be used to adjust the volume. Alternatively,
         the `useArticulations` parameter may supply a list of articulations
-        that will be used instead of that available on a parent.
+        that will be used instead of that available on a client.
 
         The `velocityIsRelative` tag determines if the velocity value includes
         contextual values, such as dynamics and and accents, or not.
@@ -232,7 +232,7 @@ class Volume(SlottedObject):
                 if hasattr(useDynamicContext,
                     'classes') and 'Dynamic' in useDynamicContext.classes:
                     dm = useDynamicContext # it is a dynamic
-                elif self.parent is not None:
+                elif self.client is not None:
                     dm = self.getDynamicContext() # dm may be None
                 else:
                     environLocal.printDebug(['getRealized():',
@@ -250,8 +250,8 @@ class Volume(SlottedObject):
                 elif (hasattr(useArticulations, 'classes') and 
                         'Articulation' in useArticulations.classes):
                     am = [useArticulations] # place in a list
-                elif self.parent is not None:
-                    am = self.parent.articulations
+                elif self.client is not None:
+                    am = self.client.articulations
                 if am is not None:
                     for a in am:
                         # add in volume shift for all articulations
@@ -297,26 +297,26 @@ class Volume(SlottedObject):
         return str(round(self.cachedRealized, 2))
 
     @property
-    def parent(self):
+    def client(self):
         '''
-        Get or set the parent, which must be a note.NotRest subclass. The
-        parent is wrapped in a weak reference.
+        Get or set the client, which must be a note.NotRest subclass. The
+        client is wrapped in a weak reference.
         '''
-        if self._parent is None:
+        if self._client is None:
             return None
-        post = common.unwrapWeakref(self._parent)
+        post = common.unwrapWeakref(self._client)
         if post is None:
             # set attribute for speed
-            self._parent = None
+            self._client = None
         return post
 
-    @parent.setter
-    def parent(self, parent):
-        if parent is not None:
-            if hasattr(parent, 'classes') and 'NotRest' in parent.classes:
-                self._parent = common.wrapWeakref(parent)
+    @client.setter
+    def client(self, client):
+        if client is not None:
+            if hasattr(client, 'classes') and 'NotRest' in client.classes:
+                self._client = common.wrapWeakref(client)
         else:
-            self._parent = None
+            self._client = None
 
     @property
     def realized(self):
@@ -330,7 +330,7 @@ class Volume(SlottedObject):
 
         >>> n = note.Note()
         >>> n.volume.velocity = 20
-        >>> n.volume.parent == n
+        >>> n.volume.client == n
         True
 
         >>> n.volume.velocity
@@ -465,11 +465,11 @@ class Test(unittest.TestCase):
         from music21 import volume, note
 
         n1 = note.Note()
-        v = volume.Volume(parent=n1)
-        self.assertEqual(v.parent, n1)
+        v = volume.Volume(client=n1)
+        self.assertEqual(v.client, n1)
         del n1
         # weak ref does not exist
-        self.assertEqual(v.parent, None)
+        self.assertEqual(v.client, None)
 
 
     def testGetContextSearchA(self):
@@ -482,11 +482,11 @@ class Test(unittest.TestCase):
         s.insert(2, d2)
 
         n1 = note.Note('g')
-        v1 = volume.Volume(parent=n1)
+        v1 = volume.Volume(client=n1)
         s.insert(4, n1)
 
         # can get dynamics from volume object
-        self.assertEqual(v1.parent.getContextByClass('Dynamic'), d2)
+        self.assertEqual(v1.client.getContextByClass('Dynamic'), d2)
         self.assertEqual(v1.getDynamicContext(), d2)
 
 
@@ -513,14 +513,14 @@ class Test(unittest.TestCase):
 
         v1 = volume.Volume()
         v1.velocity = 111
-        v1.parent = n1
+        v1.client = n1
 
         v1Copy = copy.deepcopy(v1)
         self.assertEqual(v1.velocity, 111)
         self.assertEqual(v1Copy.velocity, 111)
 
-        self.assertEqual(v1.parent, n1)
-        self.assertEqual(v1Copy.parent, n1)
+        self.assertEqual(v1.client, n1)
+        self.assertEqual(v1Copy.client, n1)
 
 
     def testGetRealizedA(self):

@@ -16,6 +16,7 @@ Users Guide
    usersGuide_09_chordify
    usersGuide_10_examples1
    usersGuide_11_corpusSearching
+   usersGuide_12_music21object
    usersGuide_14_timeSignatures
    usersGuide_17_derivations
    usersGuide_21_sorting

@@ -733,19 +733,19 @@ class NotRest(GeneralNote):
         # after copying, if a Volume exists, it is linked to the old object
         # look at _volume so as not to create object if not already there
         if self._volume is not None:
-            new.volume.parent = new # update with new instance
+            new.volume.client = new # update with new instance
         return new
 
     def __getstate__(self):
         state = super(NotRest, self).__getstate__()
         if '_volume' in state and state['_volume'] is not None:
-            state['_volume'].parent = None
+            state['_volume'].client = None
         return state
  
     def __setstate__(self, state):
         super(NotRest, self).__setstate__(state)
         if self._volume is not None:
-            self._volume.parent = self
+            self._volume.client = self
     ####
 
     def _getStemDirection(self):
@@ -876,26 +876,27 @@ class NotRest(GeneralNote):
         ''')
 
     #---------------------------------------------------------------------------
-    def _getVolume(self, forceParent=None):
+    def _getVolume(self, forceClient=None):
         # lazy volume creation
         if self._volume is None:
-            if forceParent is None:
-                # when creating the volume object, set the parent as sellf
-                self._volume = volume.Volume(parent=self)
+            if forceClient is None:
+                # when creating the volume object, set the client as self
+                self._volume = volume.Volume(client=self)
             else:
-                self._volume = volume.Volume(parent=forceParent)
+                self._volume = volume.Volume(client=forceClient)
         return self._volume
 
-    def _setVolume(self, value, setParent=True):
+    def _setVolume(self, value, setClient=True):
         # setParent is only False when Chords bundling Notes
         # test by looking for method
         if hasattr(value, "getDynamicContext"):
-            if setParent:
+            if setClient:
                 if value.parent is not None:
-                    raise NotRestException('cannot set a volume object that has a defined parent: %s' % value.parent)
+                    raise NotRestException(
+                        'cannot set a volume object that has a defined client: %s' % value.client)
                 value.parent = self # set to self
             self._volume = value
-        elif common.isNum(value) and setParent:
+        elif common.isNum(value) and setClient:
             # if we can define the parent, we can set from numbers
             # call local getVolume will set parent appropriately
             vol = self._getVolume()
@@ -908,7 +909,9 @@ class NotRest(GeneralNote):
             raise Exception('this must be a Volume object, not %s' % value)
 
     volume = property(_getVolume, _setVolume,
-        doc = '''Get and set the :class:`~music21.volume.Volume` object of this object. Volume objects are created on demand.
+        doc = '''
+        Get and set the :class:`~music21.volume.Volume` object of this object. 
+        Volume objects are created on demand.
 
 
         >>> n1 = note.Note()
@@ -1923,9 +1926,9 @@ class Test(unittest.TestCase):
         n1 = Note()
         n2 = Note()
 
-        n1.volume = v1 # can set as v1 has no parent
+        n1.volume = v1 # can set as v1 has no client
         self.assertEqual(n1.volume, v1)
-        self.assertEqual(n1.volume.parent, n1)
+        self.assertEqual(n1.volume.client, n1)
 
         # object is created on demand
         self.assertEqual(n2.volume is not v1, True)
@@ -1938,11 +1941,11 @@ class Test(unittest.TestCase):
 
         n1.volume.velocity = 100
         self.assertEqual(n1.volume.velocity, 100)
-        self.assertEqual(n1.volume.parent, n1)
+        self.assertEqual(n1.volume.client, n1)
 
         n1Copy = copy.deepcopy(n1)
         self.assertEqual(n1Copy.volume.velocity, 100)
-        self.assertEqual(n1Copy.volume.parent, n1Copy)
+        self.assertEqual(n1Copy.volume.client, n1Copy)
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

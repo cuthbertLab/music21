@@ -283,7 +283,7 @@ class Chord(note.NotRest):
     ### SPECIAL METHODS ###
     def __deepcopy__(self, memo=None):
         '''As Chord objects have one or more Volume, objects, and Volume
-        objects store weak refs to the to parent object, need to specialize
+        objects store weak refs to the to client object, need to specialize
         deepcopy handling depending on if the chord has its own volume object.
         '''
         #environLocal.printDebug(['calling NotRest.__deepcopy__', self])
@@ -296,7 +296,7 @@ class Chord(note.NotRest):
         for d in new._notes:
             # if .volume is called, a new Volume obj will be created
             if d._volume is not None:
-                d.volume.parent = new # update with new instance
+                d.volume.client = new # update with new instance
         return new
 
 
@@ -324,8 +324,8 @@ class Chord(note.NotRest):
                 raise KeyError('cannot access component with string: %s' % key)
 
             # get by name of attribute on Note
-            if last == 'volume': # special handling to avoid setting parent
-                return component._getVolume(forceParent=self)
+            if last == 'volume': # special handling to avoid setting client
+                return component._getVolume(forceClient=self)
             else:
                 return getattr(component, last)
         else:
@@ -1370,8 +1370,8 @@ class Chord(note.NotRest):
 
         for d in self._notes:
             if d.pitch is p or d.pitch == p:
-                # will create if not set; will set parent to Note
-                return d._getVolume(forceParent=self)
+                # will create if not set; otherwise will set client to Note
+                return d._getVolume(forceClient=self)
         raise ChordException('the given pitch is not in the Chord: %s' % p)
 
     def getZRelation(self):
@@ -3249,8 +3249,8 @@ class Chord(note.NotRest):
         match = False
         for d in self._notes:
             if d.pitch is pitchTarget or d.pitch == pitchTarget:
-                vol.parent = self
-                d._setVolume(vol, setParent=False)
+                vol.client = self
+                d._setVolume(vol, setClient=False)
                 match = True
                 break
         if not match:
@@ -4182,7 +4182,7 @@ class Chord(note.NotRest):
         '''
         if not self.hasComponentVolumes() and self._volume is None:
             # create a single new Volume object for the chord
-            return note.NotRest._getVolume(self, forceParent=self)
+            return note.NotRest._getVolume(self, forceClient=self)
         elif self._volume is not None:
             # if we already have a Volume, use that
             return self._volume
@@ -4193,7 +4193,7 @@ class Chord(note.NotRest):
             for d in self._notes:
                 vels.append(d._volume.velocity)
             # create new local object
-            self._volume = volume.Volume(parent=self)
+            self._volume = volume.Volume(client=self)
             self._volume.velocity = int(round(sum(vels) / float(len(vels))))
             return self._volume
         else:
@@ -4202,11 +4202,11 @@ class Chord(note.NotRest):
     @volume.setter
     def volume(self, expr):
         if isinstance(expr, volume.Volume):
-            expr.parent = self
+            expr.client = self
             # remove any component volmes
             for c in self._notes:
                 c._volume = None
-            return note.NotRest._setVolume(self, expr, setParent=False)
+            return note.NotRest._setVolume(self, expr, setClient=False)
         elif common.isNum(expr):
             vol = self._getVolume()
             if expr < 1: # assume a scalar
@@ -4223,8 +4223,8 @@ class Chord(note.NotRest):
                         v = volume.Volume(velocityScalar=v)
                     else: # assume velocity
                         v = volume.Volume(velocity=v)
-                v.parent = self
-                c._setVolume(v, setParent=False)
+                v.client = self
+                c._setVolume(v, setClient=False)
         else:
             raise ChordException('unhandled setting expr: %s' % expr)
 
@@ -4907,20 +4907,20 @@ class Test(unittest.TestCase):
         self.assertEqual(c.getVolume('c4').velocity, 111)
         self.assertEqual(c.getVolume('d-4').velocity, 98)
         self.assertEqual(c.getVolume('g4').velocity, 73)
-        self.assertEqual(c.getVolume('c4').parent, c)
-        self.assertEqual(c.getVolume('d-4').parent, c)
-        self.assertEqual(c.getVolume('g4').parent, c)
+        self.assertEqual(c.getVolume('c4').client, c)
+        self.assertEqual(c.getVolume('d-4').client, c)
+        self.assertEqual(c.getVolume('g4').client, c)
         cCopy = copy.deepcopy(c)
         self.assertEqual(cCopy.getVolume('c4').velocity, 111)
         self.assertEqual(cCopy.getVolume('d-4').velocity, 98)
         self.assertEqual(cCopy.getVolume('g4').velocity, 73)
 #         environLocal.printDebug(['in test', 'id(c)', id(c)])
-#         environLocal.printDebug(['in test', "c.getVolume('g4').parent", id(c.getVolume('g4').parent)])
+#         environLocal.printDebug(['in test', "c.getVolume('g4').client", id(c.getVolume('g4').client)])
 #         environLocal.printDebug(['in test', 'id(cCopy)', id(cCopy)])
-#         environLocal.printDebug(['in test', "cCopy.getVolume('g4').parent", id(cCopy.getVolume('g4').parent)])
-        self.assertEqual(cCopy.getVolume('c4').parent, cCopy)
-        self.assertEqual(cCopy.getVolume('d-4').parent, cCopy)
-        self.assertEqual(cCopy.getVolume('g4').parent, cCopy)
+#         environLocal.printDebug(['in test', "cCopy.getVolume('g4').client", id(cCopy.getVolume('g4').client)])
+        self.assertEqual(cCopy.getVolume('c4').client, cCopy)
+        self.assertEqual(cCopy.getVolume('d-4').client, cCopy)
+        self.assertEqual(cCopy.getVolume('g4').client, cCopy)
 
     def testVolumePerPitchB(self):
         from music21 import stream
@@ -5029,9 +5029,9 @@ class Test(unittest.TestCase):
             x.volume.velocity = vals[i]
         self.assertEqual([x.volume.velocity for x in cCopy], [11, 22, 33])
         self.assertEqual([x.volume.velocity for x in c], [20, 80, 120])
-        self.assertEqual([x.volume.parent for x in cCopy], [cCopy, cCopy, cCopy])
+        self.assertEqual([x.volume.client for x in cCopy], [cCopy, cCopy, cCopy])
         # TODO: not yet working
-        #self.assertEqual([x.volume.parent for x in c], [c, c, c])
+        #self.assertEqual([x.volume.client for x in c], [c, c, c])
 
     def testChordComponentsA(self):
         from music21 import stream

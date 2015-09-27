@@ -126,7 +126,7 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
 
     @wraps(method)
     def func_wrapper(*args, **kwargs):
-        #global calledAlready
+        # TODO: look at sys.warnstatus.
         if callInfo['calledAlready'] is False:
             warnings.warn(callInfo['message'], 
                           exceptions21.Music21DeprecationWarning, 

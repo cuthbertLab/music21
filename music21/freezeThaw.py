@@ -2044,7 +2044,7 @@ class Test(unittest.TestCase):
         c = converter.parse(a)
         f = converter.freezeStr(c)
         d = converter.thawStr(f)
-        self.assertEqual(d[1][20].volume._parent.__class__.__name__, 'weakref')
+        self.assertEqual(d[1][20].volume._client.__class__.__name__, 'weakref')
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
