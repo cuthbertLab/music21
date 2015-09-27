@@ -781,7 +781,6 @@ def normalizeFilename(name):
     :rtype: str
 
     '''
-    import unicodedata
     extension = None
     lenName = len(name)
 

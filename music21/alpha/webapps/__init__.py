@@ -220,7 +220,7 @@ def ModWSGIApplication(environ, start_response):
     >>> environ['CONTENT_TYPE'] = "application/json"
     >>> start_response = lambda status, headers: None         # usually called by mod_wsgi server. Used to initiate response
     >>> alpha.webapps.ModWSGIApplication(environ, start_response)
-    ['{"dataDict": {"a": ...}, "errorList": [], "status": "success"}']    
+    [b'{"dataDict": {"a": {...}}, "errorList": [], "status": "success"}']
     '''    
 
     # Get content of request: is in a file-like object that will need to be .read() to get content
