@@ -19,10 +19,8 @@ from __future__ import (division, print_function, absolute_import)
 
 import __future__
 
-import io
 import doctest
 import inspect
-import os
 import re
 import sys
 import unittest

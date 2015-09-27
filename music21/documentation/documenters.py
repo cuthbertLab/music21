@@ -15,7 +15,9 @@ import re
 import types
 import unittest
 
+from music21.exceptions21 import Music21Exception
 from music21.ext import six
+
 if six.PY3:
     unicode = str # @ReservedAssignment
 
@@ -53,7 +55,8 @@ class Documenter(object):
 
     @staticmethod
     def makeHeading(text, heading_level):
-        assert isinstance(text, (str, unicode)) and len(text)
+        if not isinstance(text, six.string_types) or len(text) == 0:
+            raise Music21Exception("make heading requires text")
         heading_characters = ['=', '-', '^', '"']
         result = [text]
         result.append(heading_characters[heading_level - 1] * len(text))
@@ -67,19 +70,16 @@ class Documenter(object):
 
 class ObjectDocumenter(Documenter):
     '''
-    Base class for object documenting classes.
+    Base class for object documenting sub-classes. such as ClassDocumenter
     '''
 
+    _DOC_ATTR = {'referent': 'the object being documented'}
     ### INITIALIZER ###
 
     def __init__(self, referent):
-        self._referent = referent
+        self.referent = referent
 
     ### PUBLIC PROPERTIES ###
-
-    @property
-    def referent(self):
-        return self._referent
 
     def referentPackagesystemPath(self):
         raise NotImplementedError
@@ -112,20 +112,21 @@ class FunctionDocumenter(ObjectDocumenter):
 
     >>> for line in documenter.rstAutodocDirectiveFormat:
     ...     line
-    ...
     '.. autofunction:: music21.common.numberFunc.opFrac'
     ''
 
     Call the documenter to generate its ReStructuredText format:
 
     >>> restructuredText = documenter.run()
-
+    >>> restructuredText
+    ['.. autofunction:: music21.common.numberFunc.opFrac', '']
     '''
 
     ### INITIALIZER ###
 
-    def __init__(self, referent):
-        assert isinstance(referent, types.FunctionType)
+    def __init__(self, referent=None):
+        if not isinstance(referent, types.FunctionType):
+            raise Music21Exception("referent must be a function")
         ObjectDocumenter.__init__(self, referent)
 
     ### SPECIAL METHODS ###
@@ -145,6 +146,12 @@ class FunctionDocumenter(ObjectDocumenter):
 
     @property
     def referentPackagesystemPath(self):
+        '''
+        >>> function = common.opFrac
+        >>> documenter = documentation.documenters.FunctionDocumenter(function)
+        >>> documenter.referentPackagesystemPath
+        'music21.common.numberFunc.opFrac'
+        '''
         path = '.'.join((
             self.referent.__module__,
             self.referent.__name__,
@@ -153,6 +160,12 @@ class FunctionDocumenter(ObjectDocumenter):
 
     @property
     def rstAutodocDirectiveFormat(self):
+        '''
+        >>> function = common.opFrac
+        >>> documenter = documentation.documenters.FunctionDocumenter(function)
+        >>> documenter.rstAutodocDirectiveFormat
+        ['.. autofunction:: music21.common.numberFunc.opFrac', '']
+        '''
         result = []
         referentPackagesystemPath = self.referentPackagesystemPath.replace(
             '.__init__', '')
@@ -164,21 +177,33 @@ class FunctionDocumenter(ObjectDocumenter):
 
     @property
     def sphinxCrossReferenceRole(self):
+        '''
+        returns 'func'
+        '''
         return 'func'
 
 
 class MemberDocumenter(ObjectDocumenter):
     '''
-    Abstract base class for documenting class members.
+    Abstract base class for documenting class members such as Methods and Attributes and Properties    
+
     '''
+
+    _DOC_ATTR = {'memberName': 'the short name of the member, for instance "mode"',
+                 'referent': '''the attribute or method itself, such as (no quotes)
+                                key.KeySignature.mode''',
+                 'definingClass': '''the class the referent belongs to, such as (no quotes)
+                                key.KeySignature'''                
+                }
 
     ### INITIALIZER ###
 
     def __init__(self, referent, memberName, definingClass):
-        assert isinstance(definingClass, six.class_types)
+        if not isinstance(definingClass, six.class_types):
+            raise Music21Exception("referent must be a class, not {0}".format(referent))
         ObjectDocumenter.__init__(self, referent)
-        self._memberName = memberName
-        self._definingClass = definingClass
+        self.memberName = memberName
+        self.definingClass = definingClass
 
     ### SPECIAL METHODS ###
 
@@ -201,14 +226,6 @@ class MemberDocumenter(ObjectDocumenter):
     ### PUBLIC PROPERTIES ###
 
     @property
-    def definingClass(self):
-        return self._definingClass
-
-    @property
-    def memberName(self):
-        return self._memberName
-
-    @property
     def referentPackagesystemPath(self):
         path = '.'.join((
             self.definingClass.__module__,
@@ -222,6 +239,11 @@ class MemberDocumenter(ObjectDocumenter):
 
     def sphinxCrossReferenceRole(self):
         pass
+
+
+
+
+
 
 class MethodDocumenter(MemberDocumenter):
     '''
@@ -238,7 +260,6 @@ class MethodDocumenter(MemberDocumenter):
 
     >>> for line in documenter.rstAutodocDirectiveFormat:
     ...     line
-    ...
     '.. automethod:: music21.key.KeySignature.transpose'
     ''
 
@@ -275,7 +296,6 @@ class AttributeDocumenter(MemberDocumenter):
 
     >>> for line in documenter.rstAutodocDirectiveFormat:
     ...     line
-    ...
     '.. autoattribute:: music21.key.KeySignature.mode'
     ''
 
@@ -301,27 +321,93 @@ class ClassDocumenter(ObjectDocumenter):
     '''
     A documenter for one class:
 
-    >>> from music21 import documentation
-    >>> klass = documentation.documenters.ClassDocumenter
+    >>> klass = articulations.Caesura
     >>> documenter = documentation.documenters.ClassDocumenter(klass)
     >>> documenter
-    <music21.documentation.documenters.ClassDocumenter: 
-                music21.documentation.documenters.ClassDocumenter>
+    <music21.documentation.documenters.ClassDocumenter: music21.articulations.Caesura>
+    >>> documenter.referent
+    <class 'music21.articulations.Caesura'>
 
     >>> documenter.rstCrossReferenceString
-    ':class:`~music21.documentation.documenters.ClassDocumenter`'
+    ':class:`~music21.articulations.Caesura`'
 
 
     >>> for line in documenter.rstAutodocDirectiveFormat:
     ...     line
     ...
-    '.. autoclass:: music21.documentation.documenters.ClassDocumenter'
+    '.. autoclass:: music21.articulations.Caesura'
     ''
 
     Generate the ReST lines by calling `run` on the documenter:
 
-    >>> restructedText = documenter.run()
-    
+    >>> rstList = documenter.run()
+    >>> for l in rstList:
+    ...     if len(l) != 0:
+    ...         print(l)
+    Caesura
+    -------
+    .. autoclass:: music21.articulations.Caesura
+    .. rubric:: :class:`~music21.articulations.Caesura` bases
+    - :class:`~music21.articulations.Articulation`
+    - :class:`~music21.base.Music21Object`
+    .. rubric:: :class:`~music21.articulations.Caesura` read-only properties
+    Read-only properties inherited from :class:`~music21.base.Music21Object`:
+    .. hlist::
+       :columns: 3
+       - :attr:`~music21.base.Music21Object.beat`
+       - :attr:`~music21.base.Music21Object.beatDuration`
+                ...
+       - :attr:`~music21.base.Music21Object.measureNumber`
+    .. rubric:: :class:`~music21.articulations.Caesura` read/write properties
+    Read/write properties inherited from :class:`~music21.articulations.Articulation`:
+    .. hlist::
+       :columns: 3
+       - :attr:`~music21.articulations.Articulation.volumeShift`
+    Read/write properties inherited from :class:`~music21.base.Music21Object`:
+    .. hlist::
+       :columns: 3
+       - :attr:`~music21.base.Music21Object.activeSite`
+       - :attr:`~music21.base.Music21Object.derivation`
+                ...
+       - :attr:`~music21.base.Music21Object.quarterLengthFloat`
+       - :attr:`~music21.base.Music21Object.seconds`
+    .. rubric:: :class:`~music21.articulations.Caesura` methods
+    Methods inherited from :class:`~music21.base.Music21Object`:
+    .. hlist::
+       :columns: 3
+       - :meth:`~music21.base.Music21Object.contextSites`
+       - :meth:`~music21.base.Music21Object.durationChanged`
+       - :meth:`~music21.base.Music21Object.getAllContextsByClass`
+                ...
+       - :meth:`~music21.base.Music21Object.show`
+       - :meth:`~music21.base.Music21Object.sortTuple`
+       - :meth:`~music21.base.Music21Object.splitAtDurations`
+       - :meth:`~music21.base.Music21Object.splitAtQuarterLength`
+       - :meth:`~music21.base.Music21Object.splitByQuarterLengths`
+       - :meth:`~music21.base.Music21Object.write`
+    .. rubric:: :class:`~music21.articulations.Caesura` instance variables
+    Instance variables inherited from :class:`~music21.articulations.Articulation`:
+    .. hlist::
+       :columns: 3
+       - :attr:`~music21.articulations.Articulation.classSortOrder`
+       - :attr:`~music21.articulations.Articulation.groups`
+       - :attr:`~music21.articulations.Articulation.hideObjectOnPrint`
+       - :attr:`~music21.articulations.Articulation.id`
+       - :attr:`~music21.articulations.Articulation.isSpanner`
+       - :attr:`~music21.articulations.Articulation.isStream`
+       - :attr:`~music21.articulations.Articulation.isVariant`
+       - :attr:`~music21.articulations.Articulation.xPosition`
+    Instance variables inherited from :class:`~music21.base.Music21Object`:
+    .. hlist::
+       :columns: 3
+       - :attr:`~music21.base.Music21Object.classSortOrder`
+       - :attr:`~music21.base.Music21Object.groups`
+       - :attr:`~music21.base.Music21Object.hideObjectOnPrint`
+       - :attr:`~music21.base.Music21Object.id`
+       - :attr:`~music21.base.Music21Object.isSpanner`
+       - :attr:`~music21.base.Music21Object.isStream`
+       - :attr:`~music21.base.Music21Object.isVariant`
+       - :attr:`~music21.base.Music21Object.xPosition`    
     '''
 
     ### CLASS VARIABLES ###
@@ -330,106 +416,99 @@ class ClassDocumenter(ObjectDocumenter):
 
     ### INITIALIZER ###
 
-    def __init__(self, referent):
-        assert isinstance(referent, six.class_types), repr(referent)
+    def __init__(self, referent=None):
+        if not (isinstance(referent, six.class_types), repr(referent)):
+            raise Music21Exception("Need to pass in a class an instantiation time")
         ObjectDocumenter.__init__(self, referent)
 
-        self._baseClasses = tuple(
-            cls for cls in inspect.getmro(self.referent)[1:]
-            if cls.__module__.startswith('music21'))
-        self._baseClassDocumenters = tuple(
-            type(self).fromIdentityMap(cls) for cls in self.baseClasses)
 
+        self._baseClasses = None
+        self._baseClassDocumenters = None        
         self._docAttr = None
-        attrs = inspect.classify_class_attrs(self.referent)
-        docAttrAttr = [attr for attr in attrs if attr.name == '_DOC_ATTR']
-        if docAttrAttr:
-            docAttrAttr = docAttrAttr[0]
-            if docAttrAttr.defining_class is self.referent:
-                self._docAttr = self.referent._DOC_ATTR
-        self._docOrder = getattr(self.referent, '_DOC_ORDER', [])
-
-        inheritedDocAttr = {}
-        for baseClass in self.baseClasses:
-            baseClassDocAttr = getattr(baseClass, '_DOC_ATTR', None)
-            if baseClassDocAttr is not None:
-                baseClassDocumenter = type(self).fromIdentityMap(baseClass)
-                inheritedDocAttr[baseClassDocumenter] = baseClassDocAttr
-        self._inheritedDocAttrMapping = inheritedDocAttr
-
-        methods = []
-        inheritedMethods = {}
+        self._docOrder = None 
+        self._inheritedDocAttrMapping = None
+        
+        self._methods = []
+        self._inheritedMethodsMapping = {}
 
         # Read/Write
-        readwriteProperties = []
-        inheritedReadwriteProperties = {}
+        self._readwriteProperties = []
+        self._inheritedReadwritePropertiesMapping = {}
 
         # Read-only
-        readonlyProperties = []
-        inheritedReadonlyProperties = {}
-
-        attrs = inspect.classify_class_attrs(self.referent)
-        for attr in attrs:
-
-            # Ignore definitions derived directly from object
-            if attr.defining_class is object:
-                continue
-            # Ignore private members ('_') and special members ('__')
-            elif attr.name.startswith('_'):
-                continue
-
-            definingClass = attr.defining_class
-            if attr.kind in ('class method', 'method', 'static method'):
-                documenterClass = MethodDocumenter
-                localMembers = methods
-                inheritedMembers = inheritedMethods
-            elif attr.kind in ('property',) and attr.object.fset is not None:
-                documenterClass = AttributeDocumenter
-                localMembers = readwriteProperties
-                inheritedMembers = inheritedReadwriteProperties
-            elif attr.kind in ('property',) and attr.object.fset is None:
-                documenterClass = AttributeDocumenter
-                localMembers = readonlyProperties
-                inheritedMembers = inheritedReadonlyProperties
-            else:
-                continue
-
-            documenter = documenterClass(
-                attr.object,
-                attr.name,
-                definingClass,
-                )
-            if definingClass is self.referent:
-                localMembers.append(documenter)
-            else:
-                definingClassDocumenter = type(self).fromIdentityMap(
-                    definingClass)
-                if definingClassDocumenter not in inheritedMembers:
-                    inheritedMembers[definingClassDocumenter] = []
-                inheritedMembers[definingClassDocumenter].append(documenter)
-
-        keyLambda = lambda x: x.memberName
-        methods.sort(key=keyLambda)
-        readonlyProperties.sort(key=keyLambda)
-        readwriteProperties.sort(key=keyLambda)
-        for documenters in inheritedMethods.values():
-            documenters.sort(key=keyLambda)
-        for documenters in inheritedReadonlyProperties.values():
-            documenters.sort(key=keyLambda)
-        for documenters in inheritedReadwriteProperties.values():
-            documenters.sort(key=keyLambda)
-
-        self._methods = methods
-        self._readonlyProperties = readonlyProperties
-        self._readwriteProperties = readwriteProperties
-        self._inheritedDocAttrMapping = inheritedDocAttr
-        self._inheritedMethodsMapping = inheritedMethods
-        self._inheritedReadonlyPropertiesMapping = inheritedReadonlyProperties
-        self._inheritedReadwritePropertiesMapping = \
-            inheritedReadwriteProperties
+        self._readonlyProperties = []
+        self._inheritedReadonlyPropertiesMapping = {}
+        
+        self.findAttributes()
 
         if self.referent not in self._identityMap:
             self._identityMap[self.referent] = self
+
+
+    def findAttributes(self):
+        '''
+        find all attributes in self.referent and set classes appropriately.
+        '''
+        
+        attrs = inspect.classify_class_attrs(self.referent)
+        for attr in attrs:
+            self.findOneAttribute(attr)
+
+        self.sortMemberLists()
+        
+    def sortMemberLists(self):
+        '''
+        sort all the member lists by their member names.
+        '''
+        keyLambda = lambda x: x.memberName
+        self._methods.sort(key=keyLambda)
+        self._readonlyProperties.sort(key=keyLambda)
+        self._readwriteProperties.sort(key=keyLambda)
+        for documenters in self._inheritedMethodsMapping.values():
+            documenters.sort(key=keyLambda)
+        for documenters in self._inheritedReadonlyPropertiesMapping.values():
+            documenters.sort(key=keyLambda)
+        for documenters in self._inheritedReadwritePropertiesMapping.values():
+            documenters.sort(key=keyLambda)
+
+
+    def findOneAttribute(self, attr):
+        # Ignore definitions derived directly from object
+        if attr.defining_class is object:
+            return
+        # Ignore private members ('_') and special members ('__')
+        elif attr.name.startswith('_'):
+            return
+
+        definingClass = attr.defining_class
+        if attr.kind in ('class method', 'method', 'static method'):
+            documenterClass = MethodDocumenter
+            localMemberList = self._methods
+            inheritedMembersMapping = self._inheritedMethodsMapping
+        elif attr.kind in ('property',) and attr.object.fset is not None:
+            documenterClass = AttributeDocumenter
+            localMemberList = self._readwriteProperties
+            inheritedMembersMapping = self._inheritedReadwritePropertiesMapping
+        elif attr.kind in ('property',) and attr.object.fset is None:
+            documenterClass = AttributeDocumenter
+            localMemberList = self._readonlyProperties
+            inheritedMembersMapping = self._inheritedReadonlyPropertiesMapping
+        else: # do not support writeonlyProperties
+            return
+
+        documenter = documenterClass(
+            attr.object,
+            attr.name,
+            definingClass,
+            )
+        if definingClass is self.referent:
+            localMemberList.append(documenter)
+        else:
+            definingClassDocumenter = type(self).fromIdentityMap(
+                definingClass)
+            if definingClassDocumenter not in inheritedMembersMapping:
+                inheritedMembersMapping[definingClassDocumenter] = []
+            inheritedMembersMapping[definingClassDocumenter].append(documenter)
 
     ### SPECIAL METHODS ###
 
@@ -491,10 +570,24 @@ class ClassDocumenter(ObjectDocumenter):
 
     @property
     def baseClasses(self):
+        '''
+        >>> d = documentation.documenters.ClassDocumenter(articulations.Caesura)
+        >>> d.baseClasses
+        (<class 'music21.articulations.Articulation'>, <class 'music21.base.Music21Object'>)
+        '''
+        if self._baseClasses is None:
+            self._baseClasses = tuple(
+                cls for cls in inspect.getmro(self.referent)[1:]
+                if cls.__module__.startswith('music21'))
+            
         return self._baseClasses
 
     @property
     def baseClassDocumenters(self):
+        if self._baseClassDocumenters is None:
+            self._baseClassDocumenters = tuple(
+            type(self).fromIdentityMap(cls) for cls in self.baseClasses)
+
         return self._baseClassDocumenters
 
     @property
@@ -514,6 +607,14 @@ class ClassDocumenter(ObjectDocumenter):
         'isSorted'
         'recursionType'
         '''
+        if self._docAttr is None:
+            attrs = inspect.classify_class_attrs(self.referent)
+            docAttrAttr = [attr for attr in attrs if attr.name == '_DOC_ATTR']
+            if docAttrAttr:
+                docAttrAttr = docAttrAttr[0]
+                if docAttrAttr.defining_class is self.referent:
+                    self._docAttr = self.referent._DOC_ATTR
+
         return self._docAttr
 
     @property
@@ -537,7 +638,9 @@ class ClassDocumenter(ObjectDocumenter):
         'scaleDurations'
 
         '''
+        self._docOrder = getattr(self.referent, '_DOC_ORDER', [])
         return self._docOrder
+
 
     @property
     def inheritedDocAttrMapping(self):
@@ -556,6 +659,15 @@ class ClassDocumenter(ObjectDocumenter):
         <music21.documentation.documenters.ClassDocumenter: music21.stream.Stream>
 
         '''
+        if self._inheritedDocAttrMapping is None:
+            inheritedDocAttr = {}
+            for baseClass in self.baseClasses:
+                baseClassDocAttr = getattr(baseClass, '_DOC_ATTR', None)
+                if baseClassDocAttr is not None:
+                    baseClassDocumenter = type(self).fromIdentityMap(baseClass)
+                    inheritedDocAttr[baseClassDocumenter] = baseClassDocAttr
+            self._inheritedDocAttrMapping = inheritedDocAttr
+
         return self._inheritedDocAttrMapping
 
     @property
@@ -595,7 +707,6 @@ class ClassDocumenter(ObjectDocumenter):
         music21.stream.core.StreamCoreMixin:
         - music21.stream.core.StreamCoreMixin.spannerBundle
         '''
-
         return self._inheritedReadonlyPropertiesMapping
 
     @property
@@ -885,34 +996,24 @@ class ClassDocumenter(ObjectDocumenter):
         r'''
         The ReST format for inherited methods:
 
-        >>> klass = documentation.documenters.MethodDocumenter
+        >>> klass = note.Note
         >>> documenter = documentation.documenters.ClassDocumenter(klass)
         >>> for line in documenter.rstInheritedReadonlyPropertiesFormat:
         ...     line
-        ...
-        'Read-only properties inherited from :class:`~music21.documentation.documenters.MemberDocumenter`:'
+        'Read-only properties inherited from :class:`~music21.base.Music21Object`:'
         ''
         '.. hlist::'
         '   :columns: 3'
         ''
-        '   - :attr:`~music21.documentation.documenters.MemberDocumenter.definingClass`'
-        '   - :attr:`~music21.documentation.documenters.MemberDocumenter.memberName`'
-        '   - :attr:`~music21.documentation.documenters.MemberDocumenter.referentPackagesystemPath`'
-        ''
-        'Read-only properties inherited from :class:`~music21.documentation.documenters.ObjectDocumenter`:'
-        ''
-        '.. hlist::'
-        '   :columns: 3'
-        ''
-        '   - :attr:`~music21.documentation.documenters.ObjectDocumenter.referent`'
-        '   - :attr:`~music21.documentation.documenters.ObjectDocumenter.rstCrossReferenceString`'
-        ''
-        'Read-only properties inherited from :class:`~music21.documentation.documenters.Documenter`:'
-        ''
-        '.. hlist::'
-        '   :columns: 3'
-        ''
-        '   - :attr:`~music21.documentation.documenters.Documenter.rstEditingWarningFormat`'
+        '   - :attr:`~music21.base.Music21Object.beat`'
+        '   - :attr:`~music21.base.Music21Object.beatDuration`'
+        '   - :attr:`~music21.base.Music21Object.beatStr`'
+        '   - :attr:`~music21.base.Music21Object.beatStrength`'
+        '   - :attr:`~music21.base.Music21Object.classes`'
+        '   - :attr:`~music21.base.Music21Object.containerHierarchy`'
+        '   - :attr:`~music21.base.Music21Object.fullyQualifiedClasses`'
+        '   - :attr:`~music21.base.Music21Object.isGrace`'
+        '   - :attr:`~music21.base.Music21Object.measureNumber`'
         ''
 
         '''
@@ -925,14 +1026,46 @@ class ClassDocumenter(ObjectDocumenter):
         '''
         The ReST format for inherited methods:
 
-        >>> klass = documentation.documenters.MethodDocumenter
+        >>> klass = note.Unpitched
         >>> documenter = documentation.documenters.ClassDocumenter(klass)
         >>> for line in documenter.rstInheritedReadwritePropertiesFormat:
         ...     line
-        ...
-
-
-        # TODO: meaningless test....
+        'Read/write properties inherited from :class:`~music21.note.NotRest`:'
+        ''
+        '.. hlist::'
+        '   :columns: 3'
+        ''
+        '   - :attr:`~music21.note.NotRest.notehead`'
+        '   - :attr:`~music21.note.NotRest.noteheadFill`'
+        '   - :attr:`~music21.note.NotRest.noteheadParenthesis`'
+        '   - :attr:`~music21.note.NotRest.stemDirection`'
+        '   - :attr:`~music21.note.NotRest.volume`'
+        ''
+        'Read/write properties inherited from :class:`~music21.note.GeneralNote`:'
+        ''
+        '.. hlist::'
+        '   :columns: 3'
+        ''
+        '   - :attr:`~music21.note.GeneralNote.color`'
+        '   - :attr:`~music21.note.GeneralNote.editorial`'
+        '   - :attr:`~music21.note.GeneralNote.lyric`'
+        ''
+        'Read/write properties inherited from :class:`~music21.base.Music21Object`:'
+        ''
+        '.. hlist::'
+        '   :columns: 3'
+        ''
+        '   - :attr:`~music21.base.Music21Object.activeSite`'
+        '   - :attr:`~music21.base.Music21Object.derivation`'
+        '   - :attr:`~music21.base.Music21Object.duration`'
+        '   - :attr:`~music21.base.Music21Object.offset`'
+        '   - :attr:`~music21.base.Music21Object.offsetFloat`'
+        '   - :attr:`~music21.base.Music21Object.offsetRational`'
+        '   - :attr:`~music21.base.Music21Object.priority`'
+        '   - :attr:`~music21.base.Music21Object.quarterLength`'
+        '   - :attr:`~music21.base.Music21Object.quarterLengthFloat`'
+        '   - :attr:`~music21.base.Music21Object.seconds`'
+        ''
         '''
         mapping = self.inheritedReadwritePropertiesMapping
         banner = 'Read/write properties inherited from {0}:'
@@ -943,24 +1076,47 @@ class ClassDocumenter(ObjectDocumenter):
         r'''
         The ReST format for the documented class's methods:
 
-        >>> klass = documentation.documenters.ClassDocumenter
+        >>> klass = scale.MajorScale
         >>> documenter = documentation.documenters.ClassDocumenter(klass)
         >>> for line in documenter.rstMethodsFormat:
         ...     line
-        ...
-        '.. rubric:: :class:`~music21.documentation.documenters.ClassDocumenter` methods'
+        '.. rubric:: :class:`~music21.scale.MajorScale` methods'
         ''
-        '.. automethod:: music21.documentation.documenters.ClassDocumenter.fromIdentityMap'
-        ''
-        '.. automethod:: music21.documentation.documenters.ClassDocumenter.run'
-        ''
-        'Methods inherited from :class:`~music21.documentation.documenters.Documenter`:'
+        'Methods inherited from :class:`~music21.scale.DiatonicScale`:'
         ''
         '.. hlist::'
         '   :columns: 3'
         ''
-        '   - :meth:`~music21.documentation.documenters.Documenter.makeHeading`'
-        '   - :meth:`~music21.documentation.documenters.Documenter.makeRubric`'
+        '   - :meth:`~music21.scale.DiatonicScale.getDominant`'
+        ...
+        '   - :meth:`~music21.scale.DiatonicScale.getTonic`'
+        ''
+        'Methods inherited from :class:`~music21.scale.ConcreteScale`:'
+        ''
+        '.. hlist::'
+        '   :columns: 3'
+        ''
+        '   - :meth:`~music21.scale.ConcreteScale.derive`'
+        '   - :meth:`~music21.scale.ConcreteScale.deriveAll`'
+        ...
+        '   - :meth:`~music21.scale.ConcreteScale.write`'
+        ''
+        'Methods inherited from :class:`~music21.scale.Scale`:'
+        ''
+        '.. hlist::'
+        '   :columns: 3'
+        ''
+        '   - :meth:`~music21.scale.Scale.extractPitchList`'
+        ''
+        'Methods inherited from :class:`~music21.base.Music21Object`:'
+        ''
+        '.. hlist::'
+        '   :columns: 3'
+        ''
+        '   - :meth:`~music21.base.Music21Object.contextSites`'
+        '   - :meth:`~music21.base.Music21Object.durationChanged`'
+        ...
+        '   - :meth:`~music21.base.Music21Object.splitByQuarterLengths`'
         ''
 
         '''
@@ -982,73 +1138,30 @@ class ClassDocumenter(ObjectDocumenter):
         r'''
         The ReST format for the documented class's read-only properties:
 
-        >>> klass = documentation.documenters.ClassDocumenter
+        >>> klass = note.Note
         >>> documenter = documentation.documenters.ClassDocumenter(klass)
         >>> for line in documenter.rstReadonlyPropertiesFormat:
         ...     line
-        ...
-        '.. rubric:: :class:`~music21.documentation.documenters.ClassDocumenter` read-only properties'
+        '.. rubric:: :class:`~music21.note.Note` read-only properties'
         ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.baseClassDocumenters'
+        '.. autoattribute:: music21.note.Note.diatonicNoteNum'
         ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.baseClasses'
+        '.. autoattribute:: music21.note.Note.fullName'
         ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.docAttr'
-        ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.docOrder'
-        ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.inheritedDocAttrMapping'
-        ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.inheritedMethodsMapping'
-        ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.inheritedReadonlyPropertiesMapping'
-        ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.inheritedReadwritePropertiesMapping'
-        ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.methods'
-        ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.readonlyProperties'
-        ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.readwriteProperties'
-        ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.referentPackagesystemPath'
-        ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.rstAutodocDirectiveFormat'
-        ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.rstBasesFormat'
-        ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.rstDocAttrFormat'
-        ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.rstInheritedDocAttrFormat'
-        ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.rstInheritedMethodsFormat'
-        ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.rstInheritedReadonlyPropertiesFormat'
-        ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.rstInheritedReadwritePropertiesFormat'
-        ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.rstMethodsFormat'
-        ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.rstReadonlyPropertiesFormat'
-        ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.rstReadwritePropertiesFormat'
-        ''
-        '.. autoattribute:: music21.documentation.documenters.ClassDocumenter.sphinxCrossReferenceRole'
-        ''
-        'Read-only properties inherited from :class:`~music21.documentation.documenters.ObjectDocumenter`:'
+        'Read-only properties inherited from :class:`~music21.base.Music21Object`:'
         ''
         '.. hlist::'
         '   :columns: 3'
         ''
-        '   - :attr:`~music21.documentation.documenters.ObjectDocumenter.referent`'
-        '   - :attr:`~music21.documentation.documenters.ObjectDocumenter.rstCrossReferenceString`'
-        ''
-        'Read-only properties inherited from :class:`~music21.documentation.documenters.Documenter`:'
-        ''
-        '.. hlist::'
-        '   :columns: 3'
-        ''
-        '   - :attr:`~music21.documentation.documenters.Documenter.rstEditingWarningFormat`'
+        '   - :attr:`~music21.base.Music21Object.beat`'
+        '   - :attr:`~music21.base.Music21Object.beatDuration`'
+        '   - :attr:`~music21.base.Music21Object.beatStr`'
+        '   - :attr:`~music21.base.Music21Object.beatStrength`'
+        '   - :attr:`~music21.base.Music21Object.classes`'
+        '   - :attr:`~music21.base.Music21Object.containerHierarchy`'
+        '   - :attr:`~music21.base.Music21Object.fullyQualifiedClasses`'
+        '   - :attr:`~music21.base.Music21Object.isGrace`'
+        '   - :attr:`~music21.base.Music21Object.measureNumber`'
         ''
 
         '''
@@ -1070,13 +1183,28 @@ class ClassDocumenter(ObjectDocumenter):
         '''
         The ReST format for the documented class's read-only properties:
 
-        >>> klass = documentation.documenters.ClassDocumenter
+        >>> klass = scale.MajorScale
         >>> documenter = documentation.documenters.ClassDocumenter(klass)
         >>> for line in documenter.rstReadwritePropertiesFormat:
         ...     line
-        ...
-
-        # TODO: fix meaningless test.
+        '.. rubric:: :class:`~music21.scale.MajorScale` read/write properties'
+        ''
+        'Read/write properties inherited from :class:`~music21.base.Music21Object`:'
+        ''
+        '.. hlist::'
+        '   :columns: 3'
+        ''
+        '   - :attr:`~music21.base.Music21Object.activeSite`'
+        '   - :attr:`~music21.base.Music21Object.derivation`'
+        '   - :attr:`~music21.base.Music21Object.duration`'
+        '   - :attr:`~music21.base.Music21Object.offset`'
+        '   - :attr:`~music21.base.Music21Object.offsetFloat`'
+        '   - :attr:`~music21.base.Music21Object.offsetRational`'
+        '   - :attr:`~music21.base.Music21Object.priority`'
+        '   - :attr:`~music21.base.Music21Object.quarterLength`'
+        '   - :attr:`~music21.base.Music21Object.quarterLengthFloat`'
+        '   - :attr:`~music21.base.Music21Object.seconds`'
+        ''
         '''
         result = []
         if self.readwriteProperties:
@@ -1155,7 +1283,8 @@ class ModuleDocumenter(ObjectDocumenter):
     ### INITIALIZER ###
 
     def __init__(self, referent):
-        assert isinstance(referent, types.ModuleType)
+        if not isinstance(referent, types.ModuleType):
+            raise Music21Exception("referent must be a module")
         ObjectDocumenter.__init__(self, referent)
         namesMapping = self._examineModule()
         self._namesMapping = namesMapping
@@ -1323,7 +1452,6 @@ class ModuleDocumenter(ObjectDocumenter):
     def referenceName(self):
         '''The short name of the module:
 
-        >>> from music21 import documentation, serial
         >>> module = serial
         >>> documenter = documentation.documenters.ModuleDocumenter(module)
         >>> documenter.referenceName
