@@ -578,7 +578,6 @@ class ClassDocumenter(ObjectDocumenter):
         music21.base.Music21Object:
         - music21.base.Music21Object.classes
         - music21.base.Music21Object.containerHierarchy
-        - music21.base.Music21Object.derivation
         - music21.base.Music21Object.fullyQualifiedClasses
         - music21.base.Music21Object.isGrace
         - music21.base.Music21Object.measureNumber
@@ -661,6 +660,7 @@ class ClassDocumenter(ObjectDocumenter):
         ...
         music21.base.Music21Object:
         - music21.base.Music21Object.activeSite
+        - music21.base.Music21Object.derivation
         - music21.base.Music21Object.offset
         - music21.base.Music21Object.offsetFloat
         - music21.base.Music21Object.offsetRational

@@ -6793,6 +6793,8 @@ class Test(unittest.TestCase):
         # when we just call show(), we were not geting a sorted version;
         # this was due to making the stream immutable before sorting
         # this is now fixed
+        
+        # m. 3
         match = """      <note>
         <pitch>
           <step>A</step>
@@ -6801,7 +6803,6 @@ class Test(unittest.TestCase):
         <duration>5040</duration>
         <type>eighth</type>
         <stem>up</stem>
-        <beam number="1">begin</beam>
       </note>
       <note>
         <rest/>
@@ -6821,12 +6822,12 @@ class Test(unittest.TestCase):
       <note>"""
 
         GEX = m21ToXml.GeneralObjectExporter()
-        raw = GEX.parse(p).decode('utf-8')
+        originalRaw = GEX.parse(p).decode('utf-8')
         match = match.replace(' ', '')
         match = match.replace('\n', '')
-        raw = raw.replace(' ', '')
+        raw = originalRaw.replace(' ', '')
         raw = raw.replace('\n', '')
-        self.assertEqual(raw.find(match) > 0, True, (match, raw))
+        self.assertEqual(raw.find(match) > 0, True, (match, originalRaw))
 
 
     def testInvertDiatonicA(self):
@@ -7478,7 +7479,7 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     import music21
     #'testContextNestedC'
-    music21.mainTest(Test, 'verbose') # , runTest='testGetInstrumentManual')
+    music21.mainTest(Test, 'verbose') #, runTest='testSortingAfterInsertA')
 
 #------------------------------------------------------------------------------
 # eof

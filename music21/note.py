@@ -719,13 +719,13 @@ class NotRest(GeneralNote):
     def __deepcopy__(self, memo=None):
         '''
         As NotRest objects have a Volume, objects, and Volume objects
-        store weak refs to the to parent object, need to specialize deep copy handling
+        store weak refs to the to client object, need to specialize deep copy handling
         
         >>> import copy
         >>> n = note.NotRest()
         >>> n.volume = volume.Volume(50)
         >>> m = copy.deepcopy(n)
-        >>> m.volume.parent is m
+        >>> m.volume.client is m
         True
         '''
         #environLocal.printDebug(['calling NotRest.__deepcopy__', self])
@@ -891,14 +891,14 @@ class NotRest(GeneralNote):
         # test by looking for method
         if hasattr(value, "getDynamicContext"):
             if setClient:
-                if value.parent is not None:
+                if value.client is not None:
                     raise NotRestException(
                         'cannot set a volume object that has a defined client: %s' % value.client)
-                value.parent = self # set to self
+                value.client = self # set to self
             self._volume = value
         elif common.isNum(value) and setClient:
-            # if we can define the parent, we can set from numbers
-            # call local getVolume will set parent appropriately
+            # if we can define the client, we can set from numbers
+            # call local getVolume will set client appropriately
             vol = self._getVolume()
             if value < 1: # assume a scalar
                 vol.velocityScalar = value

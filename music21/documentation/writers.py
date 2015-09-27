@@ -240,6 +240,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
                     ipythonNotebookFilePath)))
         
                 # do not print anything for skipped -checkpoint files
+        self.writeIndexRst()
 
     def writeIndexRst(self):
         '''
