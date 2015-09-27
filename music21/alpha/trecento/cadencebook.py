@@ -366,7 +366,7 @@ class TrecentoCadenceWork(object):
         
         >>> deduto = alpha.trecento.cadencebook.BallataSheet().workByTitle('deduto')
         >>> deduto.title
-        u'Deduto sey a quel'
+        'Deduto sey a quel'
         >>> dedutoScore = deduto.asOpus()
         >>> dedutoScore
         <music21.stream.Opus ...>
@@ -426,7 +426,7 @@ class TrecentoCadenceWork(object):
         
         >>> deduto = alpha.trecento.cadencebook.BallataSheet().workByTitle('deduto')
         >>> deduto.title
-        u'Deduto sey a quel'
+        'Deduto sey a quel'
         >>> dedutoScore = deduto.asScore()
         >>> dedutoScore
         <music21.stream.Score ...>
@@ -708,7 +708,7 @@ class TrecentoCadenceWork(object):
         >>> bs = alpha.trecento.cadencebook.BallataSheet()
         >>> altroCheSospirar = bs.makeWork(4)
         >>> altroCheSospirar.title
-        u'Altro che sospirar'
+        'Altro che sospirar'
         >>> altroCheSospirar.pmfcVol
         11
         >>> altroCheSospirar.pmfcPageRange()

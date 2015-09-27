@@ -1641,7 +1641,7 @@ class JSONThawer(JSONFreezeThawBase):
         Notice that some normal strings come back as unicode:
 
         >>> tNew.language
-        u'en'
+        'en'
 
 
         Notes are more complex. Let's not even give an

@@ -220,7 +220,7 @@ def ModWSGIApplication(environ, start_response):
     >>> environ['CONTENT_TYPE'] = "application/json"
     >>> start_response = lambda status, headers: None         # usually called by mod_wsgi server. Used to initiate response
     >>> alpha.webapps.ModWSGIApplication(environ, start_response)
-    [...'{"dataDict": {"a": ...}, "errorList": [], "status": "success"}']    
+    ['{"dataDict": {"a": ...}, "errorList": [], "status": "success"}']    
     '''    
 
     # Get content of request: is in a file-like object that will need to be .read() to get content
@@ -276,7 +276,7 @@ def makeAgendaFromRequest(requestInput, environ, requestType = None):
     >>> from pprint import pprint as pp
     >>> pp(agenda)
     {'commandList': [],
-     'dataDict': {...'a': {...'data': 3}, 'b': {'data': '3'}},
+     'dataDict': {'a': {'data': 3}, 'b': {'data': '3'}},
      'returnDict': {}}
 
     (the ellipses above comment out the u unicode prefix in PY2)
@@ -288,7 +288,7 @@ def makeAgendaFromRequest(requestInput, environ, requestType = None):
     
     >>> pp(agenda2)
     {'commandList': [],
-     'dataDict': {...'a': {...'data': '2'}, 'b': {'data': ['3', '4']}},
+     'dataDict': {'a': {'data': '2'}, 'b': {'data': ['3', '4']}},
      'returnDict': {}}
     '''
     
@@ -588,8 +588,8 @@ class Agenda(dict):
         >>> agenda.loadJson(alpha.webapps.sampleJsonStringSimple)
         >>> pp(agenda)
         {'commandList': [],
-         'dataDict': {...'myNum': {...'data': ...'23', ...'fmt': ...'int'}},
-         'returnDict': {...'myNum': ...'int'}}
+         'dataDict': {'myNum': {'data': '23', 'fmt': 'int'}},
+         'returnDict': {'myNum': 'int'}}
         '''
         tempDict = json.loads(jsonRequestStr)
         for (key, value) in tempDict.items():

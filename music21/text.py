@@ -111,7 +111,7 @@ def assembleAllLyrics(streamIn, maxLyrics = 10, lyricSeparation='\n'):
     >>> f = corpus.parse('demos/multiple-verses.xml')
     >>> l = text.assembleAllLyrics(f)
     >>> l
-    u'\n1. First\n2. Second\n3. Third\n4. Fourth\n5. Fifth'
+    '\n1. First\n2. Second\n3. Third\n4. Fourth\n5. Fifth'
     '''
     lyrics = ''
     for i in range(1, maxLyrics):

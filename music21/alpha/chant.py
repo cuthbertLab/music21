@@ -60,7 +60,7 @@ class GregorianStream(stream.Stream):
     >>> n.oriscus = True
     >>> s.append(n)
     >>> s.toGABCText()
-    u'(c3) Po(ho)\n'
+    '(c3) Po(ho)\n'
     
     '''
     def toGABCText(self):
@@ -94,7 +94,7 @@ class GregorianStream(stream.Stream):
         >>> s = alpha.chant.GregorianStream()
         >>> c = clef.AltoClef()
         >>> s.clefToGABC(c)
-        u'(c3)'  
+        '(c3)'  
         '''
         return "(" + clefIn.sign.lower() + str(clefIn.line) + ")"
  
@@ -219,11 +219,11 @@ class GregorianNote(note.Note):
         >>> n = alpha.chant.GregorianNote("C4")
         >>> c = clef.AltoClef()
         >>> n.toBasicGABC(c)
-        u'h'
+        'h'
        
         >>> c2 = clef.SopranoClef()
         >>> n.toBasicGABC(c2)
-        u'd'
+        'd'
        
         '''
         inNote = self
@@ -283,7 +283,7 @@ class GregorianNote(note.Note):
     
     >>> n = alpha.chant.GregorianNote("D3")
     >>> n.fill
-    u'solid'
+    'solid'
     >>> n.fill = 'cavum'
     >>> n.fill
     'cavum'
@@ -333,9 +333,9 @@ class BaseScoreConverter(object):
         >>> bsc = alpha.chant.BaseScoreConverter()
         >>> filePath = bsc.writeFile('hello')
         >>> assert(filePath.endswith('.gabc')) #_DOCS_HIDE
-        >>> filePath = u'/var/folders/k9/85ztxmy53xg1qxvr0brw1zyr0000gn/T/music21/tmpekHFCr.gabc' #_DOCS_HIDE
+        >>> filePath = '/var/folders/k9/85ztxmy53xg1qxvr0brw1zyr0000gn/T/music21/tmpekHFCr.gabc' #_DOCS_HIDE
         >>> filePath 
-        u'/var/folders/k9/85ztxmy53xg1qxvr0brw1zyr0000gn/T/music21/tmpekHFCr.gabc'
+        '/var/folders/k9/85ztxmy53xg1qxvr0brw1zyr0000gn/T/music21/tmpekHFCr.gabc'
         
         '''
         
@@ -356,8 +356,8 @@ class BaseScoreConverter(object):
         >>> bsc = alpha.chant.BaseScoreConverter()
         >>> #_DOCS_SHOW newFp = bsc.launchGregorio('~cuthbert/Library/Gregorio/examples/Populas.gabc')
         >>> #_DOCS_SHOW bsc.gregorioCommand
-        >>> u'open -a"/usr/local/bin/gregorio"  ~cuthbert/Library/Gregorio/examples/Populas.gabc' #_DOCS_HIDE
-        u'open -a"/usr/local/bin/gregorio"  ~cuthbert/Library/Gregorio/examples/Populas.gabc'
+        >>> 'open -a"/usr/local/bin/gregorio"  ~cuthbert/Library/Gregorio/examples/Populas.gabc' #_DOCS_HIDE
+        'open -a"/usr/local/bin/gregorio"  ~cuthbert/Library/Gregorio/examples/Populas.gabc'
         
         
         More often, you'll want to write a textfile from writeFile:

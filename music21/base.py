@@ -43,19 +43,10 @@ import copy
 import sys
 import types
 import unittest
-import warnings
 
 from music21.test.testRunner import mainTest
 from music21.ext import six
 
-if six.PY2:
-    try:
-        import cPickle as pickle # much faster on Python 2
-    except ImportError:
-        import pickle as pickle # @UnusedImport
-else:
-    import pickle # @Reimport
-    # on python 3 -- do NOT import _pickle directly. it will be used if  it exists, and _pickle lacks HIGHEST_PROTOCOL constant.
 
 
 #------------------------------------------------------------------------------

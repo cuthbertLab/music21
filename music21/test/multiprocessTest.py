@@ -30,210 +30,20 @@ import multiprocessing
 import os
 import sys
 import time
-import types
 import unittest
 
-import music21
-from music21 import base
 from music21 import environment
 from music21.test import testRunner
+from music21.test import commonTest
 
 _MOD = 'multiprocessTest.py'
 environLocal = environment.Environment(_MOD)
 
-ModuleResponse = collections.namedtuple('ModuleResponse', 'returnCode fp moduleName success testRunner errors failures testsRun runTime')
+ModuleResponse = collections.namedtuple('ModuleResponse', 
+                    'returnCode fp moduleName success testRunner errors failures testsRun runTime')
 ModuleResponse.__new__.__defaults__ = (None,) * len(ModuleResponse._fields)
  
 #-------------------------------------------------------------------------------
-class ModuleGather(object):
-    r'''
-    Utility class for gathering and importing all modules in the music21
-    package. Puts them in self.modulePaths.
-    
-    
-    >>> from music21.test import testSingleCoreAll as testModule
-    >>> mg = testModule.ModuleGather()
-    >>> #_DOCS_SHOW print mg.modulePaths[0]
-    D:\Web\eclipse\music21base\music21\chord.py
-    '''
-    def __init__(self):
-        self.dirParent = os.path.dirname(base.__file__)
-
-        self.modulePaths = []
-    
-        self.moduleSkip = [
-            'testSingleCoreAll.py', 
-            'testExternal.py', 
-            'testDefault.py', 
-            'testInstallation.py', 
-            'testLint.py', 
-            'timeGraphImportStar.py',
-            'testSerialization.py',
-            'mptCurses.py',
-            'memoryUsage.py',
-            'dedent.py',
-            
-            'testPerformance.py',
-            'multiprocessTest.py',
-            'timeGraphs.py',
-            'exceldiff.py', 
-            'mrjobaws.py', # takes too long.
-            'configure.py', # runs oddly...
-            
-            'vexflow/testShow.py',
-            'vexflow/exporter.py',
-            'trecento/quodJactatur.py',
-            'trecento/find_vatican1790.py',
-            'trecento/findSevs.py',
-            'trecento/correlations.py',
-            'trecento/contenanceAngloise.py',
-            'trecento/capuaProbabilities.py',
-            'alpha/theoryAnalysis/wwnortonMGTA.py',
-            'test/treeYield.py',
-            'test/toggleDebug.py',
-            
-            'musicxml/testPrimitive.py',
-            'musicxml/testFiles.py',
-            'musedata/testPrimitive/test01/__init__.py',
-            'musedata/testPrimitive/__init__.py',
-            'mei/test_base.py',
-            'humdrum/questions.py',
-            'documentation/upload.py',
-            'documentation/source/conf.py',
-            'documentation/library/extensions.py',
-            'documentation/make.py',
-            'corpus/testCorpus.py',
-            'composition/seeger.py',
-            'composition/aug30.py',
-            'audioSearch/scores/__init__.py',
-            'audioSearch/scoreFollower.py',
-            'audioSearch/repetitionGame.py',
-            'audioSearch/omrfollow.py',
-            'audioSearch/humanVScomputer.py',
-            'audioSearch/graphicalInterfaceTranscriber.py',
-            'audioSearch/graphicalInterfaceSF.py',
-            'audioSearch/graphicalInterfaceGame.py',
-            'analysis/phrasing.py',
-            'abcFormat/testFiles.py',
-            ]
-        # skip any path that starts with this string
-        self.pathSkip = ['obsolete', 'ext', 'server', 'demos', 
-                         #temp... make fast...
-                         #'graph', 'figuredBass', 'braille', 'features', 'test', 'analysis', 'musicxml', 'metadata', 'stream',
-                         ]
-        self.slowModules = ['graph', 'figuredBass/realizer', 
-                            'features/jSymbolic', 'features/native', 'figuredBass/examples', 
-                            'braille/test', 'test/testStream', 'analysis/windowed', 
-                            'converter/__init__', 'metadata/bundles', 
-                            'musicxml/xmlToM21', 'musicxml/fromMxObjects',
-                            'romanText/translate', 'musicxml/m21ToString', 'alpha/theoryAnalysis/theoryAnalyzer']
-        # search on init
-        self._walk()
-
-    def _visitFunc(self, args, dirname, names):
-        '''
-        append all module paths from _walk() to self.modulePaths.
-        Utility function was called from os.path.walk() now called from os.walk
-        '''
-        for fileName in names:
-            if fileName.endswith('py'):
-                fp = os.path.join(dirname, fileName)
-                if not os.path.isdir(fp):
-                    self.modulePaths.append(fp)
-
-    def _walk(self):
-        '''
-        Get all the modules in reverse order, storing them in self.modulePaths
-        '''
-        def manyCoreSortFunc(name):
-            '''
-            for many core systems, like the MacPro, running slowest modules first
-            helps there be fewer idle cores later 
-            '''
-            name = name[len(self.dirParent) + 1:]
-            name = name.replace('.py', '')
-            return (name in self.slowModules, name)
-        
-        # the results of this are stored in self.curFiles, self.dirList        
-        for dirpath, unused_dirnames, filenames in os.walk(self.dirParent):
-            self._visitFunc(None, dirpath, filenames)
-        if multiprocessing.cpu_count() > 4:# @UndefinedVariable
-            self.modulePaths.sort(key=manyCoreSortFunc)
-        else:
-            self.modulePaths.sort()
-        self.modulePaths.reverse()
-        
-
-    def _getName(self, fp):
-        r'''
-        Given full file path, find a name for the module with : as the separator.
-        
-        >>> from music21.test import testSingleCoreAll as testModule
-        >>> mg = testModule.ModuleGather()
-        >>> #_DOCS_SHOW mg._getName(r'D:\Web\eclipse\music21base\music21\chord.py')
-        'chord'
-        '''
-        fn = fp.replace(self.dirParent, '') # remove parent
-        if fn.startswith(os.sep):
-            fn = fn[1:]
-        fn = fn.replace(os.sep, '_') # replace w/ colon
-        fn = fn.replace('.py', '')
-        return fn
-
-    def _getNamePeriod(self, fp):
-        r'''
-        Given full file path, find a name for the module with . as the separator.
-        
-        >>> from music21.test import testSingleCoreAll as testModule
-        >>> mg = testModule.ModuleGather()
-        >>> #_DOCS_SHOW mg._getName(r'D:\Web\eclipse\music21base\music21\trecento\findSevs.py')
-        'trecento.findSevs'
-        '''
-        fn = fp.replace(self.dirParent, '') # remove parent
-        parts = [x for x in fn.split(os.sep) if x]
-        if parts[-1] == '__init__.py':
-            parts.pop()
-        fn = '.'.join(parts) # replace w/ period
-        fn = fn.replace('.py', '')
-
-        return fn
-     
-
-    def getModuleWithoutImp(self, fp, restoreEnvironmentDefaults = False):
-        '''
-        gets one module object from the file path without using Imp
-        '''
-        skip = False
-        for fnSkip in self.moduleSkip:
-            if fp.endswith(fnSkip):
-                skip = True
-                break
-        if skip:
-            return "skip"
-        for dirSkip in self.pathSkip:
-            dirSkipSlash = os.sep + dirSkip + os.sep
-            if dirSkipSlash in fp:
-                skip = True  
-                break
-        if skip:
-            return "skip"
-        moduleName = self._getNamePeriod(fp)
-        moduleNames = moduleName.split('.')
-        currentModule = music21
-        for thisName in moduleNames:
-            if hasattr(currentModule, thisName):
-                currentModule = object.__getattribute__(currentModule, thisName)
-                if not isinstance(currentModule, types.ModuleType):
-                    return "notInTree"
-            else:
-                return "notInTree"
-        mod = currentModule
-        
-        if restoreEnvironmentDefaults:
-            if hasattr(mod, 'environLocal'):
-                mod.environLocal.restoreDefaults()
-        print('starting ' + moduleName)
-        return mod
 
 def runOneModuleWithoutImp(args):
     modGath = args[0] # modGather object
@@ -259,6 +69,7 @@ def runOneModuleWithoutImp(args):
         s1 = doctest.DocTestSuite(
             globs=globs,
             optionflags=docTestOptions,
+            checker=testRunner.Py3In2OutputChecker()
             )
         
         # get Test classes in moduleObject
@@ -271,6 +82,7 @@ def runOneModuleWithoutImp(args):
             s3 = doctest.DocTestSuite(moduleObject,
                 globs=globs,
                 optionflags=docTestOptions,
+                checker=testRunner.Py3In2OutputChecker()
                 )
             s1.addTests(s3)
         except ValueError:
@@ -303,7 +115,7 @@ def runOneModuleWithoutImp(args):
         return ModuleResponse("LargeException", fp, None, None, str(excp))
 
     
-def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOut = 1):
+def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveOut = 1):
     '''
     Run all tests. Group can be test and/or external
     '''    
@@ -318,10 +130,11 @@ def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOu
     print('Creating %d processes for multiprocessing (omitting %d processors)' % (poolSize, leaveOut))
     
 
-    modGather = ModuleGather()
+    modGather = commonTest.ModuleGather(useExtended=True)
 
     maxTimeout = 200
-    pathsToRun = modGather.modulePaths # [0:30]
+    pathsToRun = modGather.modulePaths # [30:60]
+
 
     pool = multiprocessing.Pool(processes=poolSize) # @UndefinedVariable # pylint: disable=not-callable
     
@@ -329,7 +142,8 @@ def mainPoolRunner(testGroup=['test'], restoreEnvironmentDefaults=False, leaveOu
     # the overhead of returning is outweighed by the positive aspect of getting results immediately
     # unordered says that results can RETURN in any order; not that they'd be pooled out in any
     # order.
-    res = pool.imap_unordered(runOneModuleWithoutImp, ((modGather, fp) for fp in pathsToRun))
+    res = pool.imap_unordered(runOneModuleWithoutImp, 
+                              ((modGather, fp) for fp in pathsToRun))
 
     continueIt = True
     timeouts = 0
@@ -460,7 +274,7 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
     print("Results at " + lastResults)
 
 if __name__ == '__main__':
-    #mg = ModuleGather()
+    #mg = ModuleGather(useExtended=True)
     #mm = mg.getModuleWithoutImp('trecento.capua')
     #print mm
     mainPoolRunner()

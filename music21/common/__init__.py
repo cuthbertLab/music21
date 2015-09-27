@@ -126,9 +126,9 @@ def toUnicode(usrStr):
     '''Convert this tring to a uncode string; if already a unicode string, do nothing.
 
     >>> common.toUnicode('test')
-    u'test'
+    'test'
     >>> common.toUnicode(u'test')
-    u'test'
+    'test'
     
     :rtype: str
     '''
@@ -168,14 +168,14 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
     
     >>> data = common.readFileEncodingSafe(c)
     >>> data[0:30]
-    u'#-*- coding: utf-8 -*-\n#------'
+    '#-*- coding: utf-8 -*-\n#------'
     
     Well, that's nothing, since the first guess here is utf-8 and it's right. So let's
     give a worse first guess:
     
     >>> data = common.readFileEncodingSafe(c, firstGuess='SHIFT_JIS') # old Japanese standard
     >>> data[0:30]
-    u'#-*- coding: utf-8 -*-\n#------'
+    '#-*- coding: utf-8 -*-\n#------'
     
     It worked!
     
@@ -747,12 +747,11 @@ def stripAccents(inputString):
     r'''
     removes accents from unicode strings.
 
-
     >>> s = u'tr\u00e8s vite'
-    >>> u'\u00e8' in s
+    >>> '\u00e8' in s
     True
     >>> common.stripAccents(s)
-    u'tres vite'
+    'tres vite'
     '''
     #if isinstance(inputString, unicode):
     r = ''

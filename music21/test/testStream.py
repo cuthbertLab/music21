@@ -3464,7 +3464,7 @@ class Test(unittest.TestCase):
 
 
     def testAnalyze(self):
-        from music21 import corpus, pitch
+        from music21 import corpus
 
         s = corpus.parse('bach/bwv66.6')
 
@@ -7479,7 +7479,7 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     import music21
     #'testContextNestedC'
-    music21.mainTest(Test, 'verbose') #, runTest='testSortingAfterInsertA')
+    music21.mainTest(Test, 'verbose') #, runTest='testAnalyze')
 
 #------------------------------------------------------------------------------
 # eof

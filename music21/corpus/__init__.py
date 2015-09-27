@@ -477,7 +477,7 @@ def parse(
     `.corpusFilePath`
 
     >>> bachChorale.corpusFilepath
-    u'bach/bwv66.6.mxl'
+    'bach/bwv66.6.mxl'
 
     '''
     return corpora.Corpus.parse(
@@ -640,8 +640,8 @@ def getBachChorales(fileExtensions='xml'):
     True
 
     >>> #_DOCS_SHOW a[0]
-    >>> u'/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl' #_DOCS_HIDE
-    u'/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl'
+    >>> '/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl' #_DOCS_HIDE
+    '/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl'
 
     '''
     cc = corpora.CoreCorpus()

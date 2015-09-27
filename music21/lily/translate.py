@@ -472,7 +472,7 @@ class LilypondConverter(object):
         \new Staff  = londonpb
                     \with {
                           \remove "Time_signature_engraver"
-                          alignAboveContext = #"pb"
+                          alignAboveContext = #"pb...
                           fontSize = #-3
                           \override StaffSymbol #'staff-space = #(magstep -3)
                           \override StaffSymbol #'thickness = #(magstep -3)
@@ -486,7 +486,7 @@ class LilypondConverter(object):
         \new Staff  = romepb
                     \with {
                           \remove "Time_signature_engraver"
-                          alignAboveContext = #"pb"
+                          alignAboveContext = #"pb...
                           fontSize = #-3
                           \override StaffSymbol #'staff-space = #(magstep -3)
                           \override StaffSymbol #'thickness = #(magstep -3)
@@ -621,12 +621,12 @@ class LilypondConverter(object):
                 cis'' 8 [
                 \set stemLeftBeamCount = #1
                 \once \override Stem #'direction = #DOWN
-                b' 8 ]
+                b... 8 ]
                 \bar "|"  %{ end measure 0 %}
                 \once \override Stem #'direction = #UP
                 a' 4
                 \once \override Stem #'direction = #DOWN
-                b' 4
+                b... 4
                 \once \override Stem #'direction = #DOWN
                 cis'' 4  \fermata
                 \once \override Stem #'direction = #DOWN
@@ -1625,9 +1625,9 @@ class LilypondConverter(object):
         >>> lpc.context.getParent().getParent()
         <music21.lily.lilyObjects.LyPrefixCompositeMusic object at 0x...>
         >>> lpc.context.getParent().getParent().fraction
-        u'5/4'
+        '5/4'
         >>> lpc.context.getParent().getParent().type
-        u'times'
+        'times'
         >>> lpc.context.getParent().getParent().getParent()
         <music21.lily.lilyObjects.LyLilypondTop object at 0x...>
         >>> lpc.context.getParent().getParent().getParent() is lyTop
@@ -1799,10 +1799,10 @@ class LilypondConverter(object):
                }
         <BLANKLINE>
           {\startStaff \clef "treble"
-            b' 4
-            b' 4
-            b' 4
-            b' 4
+            b... 4
+            b... 4
+            b... 4
+            b... 4
             | %{ end measure 1 %}
              \stopStaff}
         <BLANKLINE>
@@ -1983,10 +1983,10 @@ class LilypondConverter(object):
         >>> lpc = lily.translate.LilypondConverter()
         >>> replacedElements = v.replacedElements()
         >>> lpPrefixCompositeMusicVariant = lpc.lyPrefixCompositeMusicFromVariant(v, replacedElements)
-        >>> print(lpPrefixCompositeMusicVariant)
+        >>> print(lpPrefixCompositeMusicVariant) # ellipses are for non-byte fixups
         \new Staff  = londonpx { {\startStaff \clef "treble"
             a' 4.
-            b' 8
+            b...
             c' 4
             d' 4
             \clef "treble"

@@ -367,7 +367,7 @@ def parse(target):
 
     >>> ss = scale.scala.parse('balafon6')
     >>> ss.description
-    u'Observed balafon tuning from Burma, Helmholtz/Ellis p. 518, nr.84'
+    'Observed balafon tuning from Burma, Helmholtz/Ellis p. 518, nr.84'
     >>> [str(i) for i in ss.getIntervalSequence()]
     ['<music21.interval.Interval m2 (+14c)>', '<music21.interval.Interval M2 (+36c)>', '<music21.interval.Interval M2>', '<music21.interval.Interval m2 (+37c)>', '<music21.interval.Interval M2 (-49c)>', '<music21.interval.Interval M2 (-6c)>', '<music21.interval.Interval M2 (-36c)>']
 
@@ -385,7 +385,7 @@ def parse(target):
 
     >>> ss = scale.scala.parse('blackj_gws.scl')
     >>> ss.description
-    u'Detempered Blackjack in 1/4 kleismic marvel tuning'
+    'Detempered Blackjack in 1/4 kleismic marvel tuning'
     '''
     match = None
     # this may be a file path to a scala file

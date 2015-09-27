@@ -599,9 +599,9 @@ class MetronomeMark(TempoIndication):
         
         >>> mm = tempo.MetronomeMark()
         >>> mm._getDefaultText(92)
-        u'moderate'
+        'moderate'
         >>> mm._getDefaultText(208)
-        u'prestissimo'
+        'prestissimo'
         '''
         if common.isNum(number):
             tempoNumber = number

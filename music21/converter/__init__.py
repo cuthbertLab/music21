@@ -97,8 +97,8 @@ class ArchiveManager(object):
     This is likely a unicode string
     
     >>> #_DOCS_SHOW fnCorpus
-    >>> u'/Users/cuthbert/git/music21base/music21/corpus/bach/bwv66.6.mxl' #_DOCS_HIDE
-    u'/Users/cuthbert/git/music21base/music21/corpus/bach/bwv66.6.mxl'
+    >>> '/Users/cuthbert/git/music21base/music21/corpus/bach/bwv66.6.mxl' #_DOCS_HIDE
+    '/Users/cuthbert/git/music21base/music21/corpus/bach/bwv66.6.mxl'
     >>> am = converter.ArchiveManager(fnCorpus)
     >>> am.isArchive()
     True

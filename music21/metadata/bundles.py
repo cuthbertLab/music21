@@ -54,7 +54,7 @@ class MetadataEntry(object):
     score file is found:
 
     >>> metadataEntry.sourcePath
-    u'bach/bwv66.6.mxl'
+    'bach/bwv66.6.mxl'
 
     The metadata payload contains its metadata object:
 

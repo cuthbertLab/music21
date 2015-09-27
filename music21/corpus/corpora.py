@@ -66,21 +66,20 @@ class DirectoryInformation(object):
         populate other information about the directory such as
         files and filenames.
         
-        Ellipses are for the difference between PY2 u'' strings and PY3 '' strings
         
         >>> di = corpus.corpora.DirectoryInformation('schoenberg')
         >>> di.findWorks()
-        OrderedDict([(...'opus19', CorpusWork(title=...'Opus 19', 
-                                       files=[CorpusFile(path=...'schoenberg/opus19/movement2.mxl', 
-                                                         title=...'Movement 2', 
-                                                         filename=...'movement2.mxl', 
+        OrderedDict([(...'opus19', CorpusWork(title='Opus 19', 
+                                       files=[CorpusFile(path='schoenberg/opus19/movement2.mxl', 
+                                                         title='Movement 2', 
+                                                         filename='movement2.mxl', 
                                                          format='musicxml', 
-                                                         ext=...'.mxl'), 
-                                              CorpusFile(path=...'schoenberg/opus19/movement6.mxl', 
-                                                         title=...'Movement 6', 
-                                                         filename=...'movement6.mxl', 
+                                                         ext='.mxl'), 
+                                              CorpusFile(path='schoenberg/opus19/movement6.mxl', 
+                                                         title='Movement 6', 
+                                                         filename='movement6.mxl', 
                                                          format='musicxml', 
-                                                         ext=...'.mxl')],                                                             
+                                                         ext='.mxl')],                                                             
                                         virtual=False))])
         '''
         self.works.clear()
@@ -391,7 +390,7 @@ class Corpus(object):
         ``.corpusFilePath``
 
         >>> bachChorale.corpusFilepath
-        u'bach/bwv66.6.mxl'
+        'bach/bwv66.6.mxl'
 
         '''
         from music21 import corpus
@@ -632,8 +631,8 @@ class CoreCorpus(Corpus):
         True
 
         >>> #_DOCS_SHOW a[0]
-        >>> u'/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl' #_DOCS_HIDE
-        u'/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl'
+        >>> '/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl' #_DOCS_HIDE
+        '/Users/cuthbert/Documents/music21/corpus/bach/bwv1.6.mxl'
 
         '''
         names = ( 'bwv1.6.mxl', 'bwv10.7.mxl', 'bwv101.7.mxl', 'bwv102.7.mxl',

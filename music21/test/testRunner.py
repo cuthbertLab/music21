@@ -15,6 +15,9 @@ The testRunner module contains the all important "mainTest" function that runs t
 in a given module.  Except for the one instance of "defaultImports", everything here
 can run on any system, not just music21.
 '''
+from __future__ import (division, print_function, absolute_import)
+
+import __future__
 import doctest
 import inspect
 import re
@@ -26,12 +29,77 @@ from music21.ext import six
 defaultImports = ('music21',)
 
 
+###### monkey patch doctest...
+
+def _msc_extract_future_flags(globs):
+    '''
+    Pretend like no matter what, the PY2 code has
+    all __future__ flags set.
+    '''
+    flags = 0
+    for fname in __future__.all_feature_names:
+        if fname in ('absolute_import', 
+                     'print_function',
+                     'division',
+                     ):
+            flags |= getattr(__future__, fname).compiler_flag
+    return flags
+
+doctest._extract_future_flags = _msc_extract_future_flags
+
+
+if six.PY2:
+    naive_single_quote_re = re.compile(r"(^|.)'((\\'|[^'])*?)'")
+    naive_double_quote_re = re.compile(r'(^|.)"((\\"|[^"])*?)"')
+    
+    suquoteConv = lambda m: (m.group(1) if m.group(1) != "u" else "") + "'" + m.group(2) + "'"
+    duquoteConv = lambda m: (m.group(1) if m.group(1) != "u" else "") + '"' + m.group(2) + '"'
+
+    sbquoteConv = lambda m: (m.group(1) if m.group(1) != "b" else "") + "'" + m.group(2) + "'"
+    dbquoteConv = lambda m: (m.group(1) if m.group(1) != "b" else "") + '"' + m.group(2) + '"'
+    
+#ALL_OUTPUT = []
+
+class Py3In2OutputChecker(doctest.OutputChecker):
+    '''
+    In music21, we write all doctests for passing
+    under Python 3.  The differences between it and
+    Py2 mean that we need to find certain differences
+    and remove them.
+    
+    It means adding a lot of ELLIPSIS so Py2 will
+    run slower. But that's okay by me
+    '''
+    def check_output(self, want, got, optionflags):
+        '''
+        cannot use super with Py2 since we have old-style classes going on.
+        '''
+        if six.PY3:
+            return super(Py3In2OutputChecker, self).check_output(want, got, optionflags)
+        else:
+            got = unicode(got) # @UndefinedVariable
+            #x = [want, got]
+            
+            want = naive_single_quote_re.sub(sbquoteConv, want) # bytes in WANT disappear
+            want = naive_double_quote_re.sub(dbquoteConv, want) # bytes in WANT disappear
+
+            got = naive_single_quote_re.sub(suquoteConv, got) # unicode in GOT disappears
+            got = naive_double_quote_re.sub(duquoteConv, got) # unicode in GOT disappears
+            
+            #x.extend([want, got])
+            #ALL_OUTPUT.append(x)
+            return doctest.OutputChecker.check_output(self, want, got, optionflags)
+
 ###### test related functions
 
-def addDocAttrTestsToSuite(suite, moduleVariableLists, outerFilename=None, globs=False, optionflags=(
-            doctest.ELLIPSIS |
-            doctest.NORMALIZE_WHITESPACE
-            )):
+def addDocAttrTestsToSuite(suite, 
+                           moduleVariableLists, 
+                           outerFilename=None, 
+                           globs=False, 
+                           optionflags=(
+                                        doctest.ELLIPSIS |
+                                        doctest.NORMALIZE_WHITESPACE
+                                        )):
     '''
     takes a suite, such as a doctest.DocTestSuite and the list of variables
     in a module and adds from those classes that have a _DOC_ATTR dictionary
@@ -48,6 +116,9 @@ def addDocAttrTestsToSuite(suite, moduleVariableLists, outerFilename=None, globs
     >>> t = s1._tests[-1]
     >>> t
     isRest ()
+    
+    >>> 'hi'
+    'hi'
     '''
     dtp = doctest.DocTestParser()
     if globs is False:
@@ -64,7 +135,10 @@ def addDocAttrTestsToSuite(suite, moduleVariableLists, outerFilename=None, globs
             dt = dtp.get_doctest(documentation, globs, dockey, outerFilename, 0)
             if len(dt.examples) == 0:
                 continue
-            dtc = doctest.DocTestCase(dt, optionflags=optionflags)
+            dtc = doctest.DocTestCase(dt, 
+                                      optionflags=optionflags,
+                                      checker=Py3In2OutputChecker()
+                                      )
             #print(dtc)
             suite.addTest(dtc)
 
@@ -78,7 +152,7 @@ def fixTestsForPy2and3(doctestSuite):
     >>> s1 = doctest.DocTestSuite(chord)
     >>> test.testRunner.fixTestsForPy2and3(s1)
     '''
-    for dtc in doctestSuite: # Suite to DocTestCase
+    for dtc in doctestSuite: # Suite to DocTestCase -- undocumented.
         if not hasattr(dtc, '_dt_test'):
             continue
         dt = dtc._dt_test # DocTest
@@ -168,7 +242,7 @@ def mainTest(*testClasses, **kwargs):
     
     runAllTests = True
 
-
+    # default -- is fail fast.
     failFast = bool(kwargs.get('failFast', True))
     if failFast:
         optionflags = (
@@ -196,7 +270,9 @@ def mainTest(*testClasses, **kwargs):
     else:
         # create test suite derived from doc tests
         # here we use '__main__' instead of a module
-        if 'moduleRelative' in testClasses or 'moduleRelative' in sys.argv or bool(kwargs.get('moduleRelative', False)):
+        if ('moduleRelative' in testClasses or 
+                'moduleRelative' in sys.argv or 
+                bool(kwargs.get('moduleRelative', False))):
             pass
         else:
             for di in defaultImports:
@@ -206,32 +282,42 @@ def mainTest(*testClasses, **kwargs):
                 '__main__',
                 globs=globs,
                 optionflags=optionflags,
+                checker=Py3In2OutputChecker()
                 )
         except ValueError as ve: # no docstrings
-            print("Problem in docstrings [usually a missing r value before the quotes:] {0}".format(str(ve)))
+            print("Problem in docstrings [usually a missing r value before " + 
+                  "the quotes:] {0}".format(str(ve)))
             s1 = unittest.TestSuite()
 
 
     verbosity = 1
-    if 'verbose' in testClasses or 'verbose' in sys.argv or bool(kwargs.get('verbose', False)):
+    if ('verbose' in testClasses or 
+            'verbose' in sys.argv or 
+            bool(kwargs.get('verbose', False))):
         verbosity = 2 # this seems to hide most display
 
     displayNames = False
-    if 'list' in sys.argv or 'display' in sys.argv or bool(kwargs.get('display', False)) or bool(kwargs.get('list', False)):
+    if ('list' in sys.argv or 
+            'display' in sys.argv or 
+            bool(kwargs.get('display', False)) or 
+            bool(kwargs.get('list', False))):
         displayNames = True
         runAllTests = False
 
     runThisTest = None
     if len(sys.argv) == 2:
         arg = sys.argv[1].lower()
-        if arg not in ['list', 'display', 'verbose', 'nodoctest']:
+        if arg not in ('list', 'display', 'verbose', 'nodoctest'):
             # run a test directly named in this module
             runThisTest = sys.argv[1]
     if bool(kwargs.get('runTest', False)):
         runThisTest = kwargs.get('runTest', False)
 
     # -f, --failfast
-    if 'onlyDocTest' in sys.argv or 'onlyDocTest' in testClasses or bool(kwargs.get('onlyDocTest', False)):
+    if ('onlyDocTest' in sys.argv or 
+            'onlyDocTest' in testClasses or 
+            bool(kwargs.get('onlyDocTest', False))
+            ):
         testClasses = [] # remove cases
     for t in testClasses:
         if not isinstance(t, six.string_types):
@@ -242,9 +328,9 @@ def mainTest(*testClasses, **kwargs):
                 tObj = t() # call class
                 # search all names for case-insensitive match
                 for name in dir(tObj):
-                    if name.lower() == runThisTest.lower() or \
-                         name.lower() == ('test' + runThisTest.lower()) or \
-                         name.lower() == ('xtest' + runThisTest.lower()):
+                    if (name.lower() == runThisTest.lower() or
+                           name.lower() == ('test' + runThisTest.lower()) or
+                           name.lower() == ('xtest' + runThisTest.lower())):
                         runThisTest = name
                         break
                 if hasattr(tObj, runThisTest):
@@ -280,4 +366,6 @@ def mainTest(*testClasses, **kwargs):
         
 if __name__ == '__main__':
     mainTest()
+    #from pprint import pprint
+    #pprint(ALL_OUTPUT)
         
