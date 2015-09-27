@@ -67,10 +67,10 @@ seem possible.  In any event, I needed a name that wouldn't already
 exist in the Python namespace.
 '''
 
-import codecs
 import copy
 import fractions
 import inspect
+import io
 import json
 import os
 import time
@@ -1573,7 +1573,7 @@ class JSONFreezer(JSONFreezeThawBase):
         File extension should be .json. File is opened
         and closed within this method call.
         '''
-        with codecs.open(fp, mode='w', encoding='utf-8') as f:
+        with io.open(fp, mode='w', encoding='utf-8') as f:
             jsonDict = self.getJSONDict(includeVersion=True)
             if formatOutput is False:
                 jsonString = json.dumps(

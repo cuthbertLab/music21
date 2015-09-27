@@ -42,7 +42,8 @@ For most people you'll want to do something like this:
 
 import os
 import unittest
-import math, codecs
+import math
+import io
 
 
 from music21 import common
@@ -318,7 +319,7 @@ class ScalaFile(object):
     def open(self, fp, mode='r'): 
         '''Open a file for reading
         '''
-        self.file = codecs.open(fp, mode, encoding='utf-8')
+        self.file = io.open(fp, mode, encoding='utf-8')
         self.fileName = os.path.basename(fp)
 
     def openFileLike(self, fileLike):

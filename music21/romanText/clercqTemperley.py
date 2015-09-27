@@ -15,7 +15,7 @@ Parses the de Clercq-Temperley popular music flavor of RomanText.
 The Clercq-Temperley file format and additional rock corpus analysis
 information may be located at http://theory.esm.rochester.edu/rock_corpus/
 '''
-import codecs
+import io
 import re
 import copy
 import unittest
@@ -307,7 +307,7 @@ class CTSong(object):
             lines = textFile.split('\n') 
         else:
             try:
-                with codecs.open(textFile, 'r', 'utf-8', errors='replace') as fileOpened:
+                with io.open(textFile, 'r', 'utf-8', errors='replace') as fileOpened:
                     lines = fileOpened.readlines() 
             except FileNotFoundError:
                 raise CTSongException('Cannot find file: %s' % textFile)

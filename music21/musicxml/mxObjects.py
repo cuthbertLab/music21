@@ -17,7 +17,7 @@ import sys
 
 import copy
 import unittest
-#import codecs
+#import io
 
 from music21 import defaults
 from music21 import common

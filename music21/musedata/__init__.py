@@ -1442,7 +1442,7 @@ class MuseDataFile(object):
     
 
     def open(self, fp):
-        #self.file = codecs.open(filename, encoding='utf-8')
+        #self.file = io.open(filename, encoding='utf-8')
         if six.PY3:
             self.file = open(fp, 'rb')
         else:

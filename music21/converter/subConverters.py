@@ -17,7 +17,7 @@ parseData method that sets self.stream.
 '''
 #-------------------------------------------------------------------------------
 # Converters are associated classes; they are not subclasses, but most define a pareData() method, a parseFile() method, and a .stream attribute or property.
-import codecs
+import io
 import os
 import sys
 import unittest
@@ -52,7 +52,7 @@ class SubConverter(object):
         registerOutputExtensions = tuple of output extensions that can be written. Order matters:
             the first will be used in calls to .write()
         canBePickled = True or False (default True; does not do anything yet)
-        codecWrite = True or False (default False) if codecs need to be used to write
+        codecWrite = True or False (default False) if encodings need to be used to write
         stringEncoding = string (default 'utf-8'). If codecWrite is True, this specifies what encoding to use
 
 
@@ -197,14 +197,14 @@ class SubConverter(object):
                         f.write(dataStr)
                 except UnicodeEncodeError:
                     f.close()
-                    f = codecs.open(fp, mode=writeFlags, encoding=self.stringEncoding)
+                    f = io.open(fp, mode=writeFlags, encoding=self.stringEncoding)
                     f.write(dataStr)
                     f.close()
 
                 except TypeError as te:
                     raise SubConverterException("Could not convert %r : %r" % (dataStr, te))
         else:
-            f = codecs.open(fp, mode=writeFlags, encoding=self.stringEncoding)
+            f = io.open(fp, mode=writeFlags, encoding=self.stringEncoding)
             f.write(dataStr)
             f.close()
         return fp

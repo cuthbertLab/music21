@@ -23,10 +23,14 @@ split according to function -- September 2015
 '''
 
 # should NOT import music21 or anything like that, except in doctests.
-import re
+import codecs
 import contextlib # for with statements
 import copy
-import math, sys, os
+import io
+import math
+import sys 
+import os
+import re
 import unittest
 import time
 import hashlib
@@ -180,16 +184,15 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
     
     :rtype: str
     '''
-    import codecs
     from music21.ext import chardet # encoding detector... @UnresolvedImport
     try:
-        with codecs.open(filePath, 'r', encoding=firstGuess) as thisFile:
+        with io.open(filePath, 'r', encoding=firstGuess) as thisFile:
             data = thisFile.read()
             return data
     except OSError: # Python3 FileNotFoundError...
         raise
     except UnicodeDecodeError:
-        with codecs.open(filePath, 'rb') as thisFileBinary:
+        with io.open(filePath, 'rb') as thisFileBinary:
             dataBinary = thisFileBinary.read()
             encoding = chardet.detect(dataBinary)['encoding']
             return codecs.decode(dataBinary, encoding)

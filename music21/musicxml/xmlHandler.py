@@ -14,9 +14,9 @@ Converts musicxml xml text to the intermediate mxObjects format.
 '''
 from music21.musicxml import mxObjects as musicxmlMod
 
+import io
 import sys
 from music21.ext import six, chardet
-import codecs
 
 # in order for sax parsing to properly handle unicode strings w/ unicode chars
 # stored in StringIO.StringIO, this update is necessary
@@ -1042,7 +1042,7 @@ class Document(object):
 
         else: 
             
-            fileLikeOpen = codecs.open(fileLike, encoding='utf-8')
+            fileLikeOpen = io.open(fileLike, encoding='utf-8')
 
         # the file always needs to be closed, otherwise
         # subsequent parsing operations produce an unclosed token error
@@ -1053,10 +1053,10 @@ class Document(object):
             fileLikeOpen.close()
             if not isFile:
                 raise e
-            with codecs.open(fileLike, 'rb') as fileBinary:
+            with io.open(fileLike, 'rb') as fileBinary:
                 fileContentsBinary = fileBinary.read()
                 encodingGuess = chardet.detect(fileContentsBinary)['encoding']
-            fileLikeOpen2 = codecs.open(fileLike, encoding=encodingGuess)
+            fileLikeOpen2 = io.open(fileLike, encoding=encodingGuess)
             fileContentsUnicode = fileLikeOpen2.read()
             fileLikeOpen2.close()
             fileBytes = fileContentsUnicode.encode(encodingGuess)

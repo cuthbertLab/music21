@@ -62,6 +62,8 @@ class IPythonNotebookIterator(Iterator):
             if directoryPath.endswith('.ipynb_checkpoints'):
                 continue
             for fileName in fileNames:
+                if '-checkpoint' in fileName:
+                    continue
                 if fileName.endswith('.ipynb'):
                     filePath = os.path.join(
                         directoryPath,

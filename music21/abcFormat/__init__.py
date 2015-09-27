@@ -45,9 +45,10 @@ __all__ = (
 from music21.abcFormat import translate
 
 
-import unittest
-import re, codecs
 import copy
+import io
+import re
+import unittest
 
 from music21 import common
 from music21 import environment
@@ -2696,9 +2697,9 @@ class ABCFile(object):
         Open a file for reading
         '''
         #try:
-        self.file = codecs.open(filename, encoding='utf-8')
-        #exce[t
-        #self.file = open(filename, 'r') 
+        self.file = io.open(filename, encoding='utf-8')
+        #except
+        #self.file = io.open(filename, encoding='latin-1') 
         self.filename = filename
 
     def openFileLike(self, fileLike):

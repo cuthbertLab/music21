@@ -24,7 +24,7 @@ import re
 import os.path
 import sys
 import doctest
-import codecs
+import io
 from collections import namedtuple
 
 ModTuple = namedtuple('ModTuple', 'module fullModulePath moduleNoExtension autoGen')
@@ -72,7 +72,7 @@ def getDocumentationFromAutoGen(fullModulePath):
         return False
         
         
-    with codecs.open(fullModulePath, 'r', encoding='utf-8') as f:
+    with io.open(fullModulePath, 'r', encoding='utf-8') as f:
         contents = f.read()
     sys.stderr = NoOutput(sys.stderr)
     doctree = publish_doctree(contents)
@@ -168,7 +168,7 @@ def getDocumentationFiles(runOne=False):
                 if not module.endswith(runOne):
                     continue
             
-            with codecs.open(fullModulePath, 'r', encoding='utf-8') as f:
+            with io.open(fullModulePath, 'r', encoding='utf-8') as f:
                 incipit = f.read(1000)
                 if 'AUTOMATICALLY GENERATED' in incipit:
                     autoGen = True

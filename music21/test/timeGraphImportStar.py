@@ -107,7 +107,7 @@ class CallGraph:
         self.excludeList += ['FileDialog.*', 'Tk*', 'PIL*', 'tk*', 'pillow*']
         
         # these have been shown to be very fast
-        self.excludeList += ['*xmlnode*', 'xml.dom.*', 'xml.sax.*', 'codecs.*']
+        self.excludeList += ['*xmlnode*', 'xml.dom.*', 'xml.sax.*', 'codecs.*', 'io.*']
         #self.excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
 
         # these cloud up the graph... should be tested, but removed when you want to see

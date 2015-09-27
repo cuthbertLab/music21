@@ -572,7 +572,7 @@ class CallGraph(object):
         self.excludeList += ['re.*','sre_*']
         self.excludeList += ['*xlrd*']
         # these have been shown to be very fast
-        self.excludeList += ['*xmlnode*', 'xml.dom.*', 'codecs.*']
+        self.excludeList += ['*xmlnode*', 'xml.dom.*', 'codecs.*', 'io.*']
         #self.excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
 
         # set class  to test here

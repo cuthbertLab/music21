@@ -16,7 +16,7 @@ demonstrated by Dmitri Tymoczko.
 
 #from __future__ import unicode_literals
 from fractions import Fraction
-import codecs
+import io
 import re
 import unittest
 
@@ -1336,12 +1336,12 @@ class RTFile(object):
         self.filename = None
 
     def open(self, filename): 
-        '''Open a file for reading, trying a variety of codecs and then
+        '''Open a file for reading, trying a variety of encodings and then
         trying them again with an ignore if it is not possible.
         '''
         for encoding in ('utf-8', 'macintosh', 'latin-1', 'utf-16'):
             try:
-                self.file = codecs.open(filename, encoding=encoding)
+                self.file = io.open(filename, encoding=encoding)
                 if self.file is not None:
                     break
             except UnicodeDecodeError:
@@ -1349,7 +1349,7 @@ class RTFile(object):
         if self.file is None:
             for encoding in ('utf-8', 'macintosh', 'latin-1', 'utf-16', None):
                 try:
-                    self.file = codecs.open(filename, encoding=encoding, errors='ignore')
+                    self.file = io.open(filename, encoding=encoding, errors='ignore')
                     if self.file is not None:
                         break
                 except UnicodeDecodeError:

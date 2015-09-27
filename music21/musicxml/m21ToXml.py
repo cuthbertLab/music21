@@ -4216,7 +4216,7 @@ class TestExternal(unittest.TestCase):
     def testSimple(self):
         from xml.etree.ElementTree import ElementTree as ETObj
         from music21 import corpus#, converter
-        import codecs
+        import io
         import difflib
         
         #b = converter.parse(corpus.getWorkList('cpebach')[0], format='musicxml', forceSource=True)
@@ -4247,7 +4247,7 @@ class TestExternal(unittest.TestCase):
         fp = b.write('musicxml')
         print(fp)
         
-        with codecs.open(fp, encoding='utf-8') as f:
+        with io.open(fp, encoding='utf-8') as f:
             v2 = f.read()
         differ = list(difflib.ndiff(v.splitlines(), v2.splitlines()))
         for i, l in enumerate(differ):
