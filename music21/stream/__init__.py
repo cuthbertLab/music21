@@ -992,9 +992,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(s.notes)
         0
         '''
-        for el in reversed(self.iter.getElementsByClass(classFilterList)):
-            if el.sortTuple.atEnd == 0:
-                self._elements.pop(self._elements.index(el))
+#         for el in reversed(self.iter.getElementsByClass(classFilterList)):
+#             # this may be slow; O(n*k) where n is 
+#             if el.sortTuple().atEnd == 0:
+#                 self._elements.pop(self._elements.index(el))
+#             else:
+#                 self._endElements.pop(self._endElements.index(el))
         
         if not common.isListLike(classFilterList):
             classFilterList = [classFilterList]
@@ -2233,7 +2236,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         iterator = self.iter.getElementsByClass(classFilterList)
         if returnStreamSubClass == 'list':
-            return iterator.filterElements()
+            return iterator.matchingElements()
         else:
             return iterator.stream(returnStreamSubClass=returnStreamSubClass)
 
@@ -2278,7 +2281,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         iterator = self.iter.getElementsNotOfClass(classFilterList)
         if returnStreamSubClass == 'list':
-            return iterator.filterElements()
+            return iterator.matchingElements()
         else:
             return iterator.stream(returnStreamSubClass=returnStreamSubClass)
 

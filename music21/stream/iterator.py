@@ -45,16 +45,32 @@ class StreamIterator(object):
     * StreamIterator.cleanupOnStop -- should the StreamIterator delete the
       reference to srcStream and srcStreamElements when stopping? default
       False
+    * StreamIterator.activeInformation -- a dict that contains information
+      about where we are in the parse.  Especially useful for recursive
+      streams. 'stream' = the stream that is currently active, 'index'
+      where in `.elements` we are, `iterSection` is `_elements` or `_endElements`,
+      and `endElementsIndex` is where we are in the _endElements, or -1 if
+      we are not there. This dict is shared among all sub iterators.
 
     '''
-    def __init__(self, srcStream, filters=None, restoreActiveSites=True):
+    def __init__(self, 
+                 srcStream, 
+                 filters=None, 
+                 restoreActiveSites=True,
+                 activeInformation=None):
+
         self.srcStream = srcStream
         self.index = 0
         
         # use .elements instead of ._elements/etc. so that it is sorted...
         self.srcStreamElements = srcStream.elements
         self.streamLength = len(self.srcStreamElements)
-
+        
+        # this information can help a 
+        self.elementsLength = len(self.srcStream._elements)
+        self.endElementsIndex = -1
+        self.iterSection = '_elements'
+        
         self.cleanupOnStop = False
         self.restoreActiveSites = restoreActiveSites
 
@@ -69,17 +85,49 @@ class StreamIterator(object):
         # whether it should be yielded.
         self.filters = filters
         self._len = None
-        self._filterElements = None
+        self._matchingElements = None
+
+        # keep track of where we are in the parse. 
+        # esp important for recursive streams...
+        if activeInformation is not None:
+            self.activeInformation = activeInformation
+        else:
+            self.activeInformation = {}
+            self.updateActiveInformation()
+
+    def __repr__(self):
+        streamClass = self.srcStream.__class__.__name__
+        srcStreamId = self.srcStream.id
+        try:
+            srcStreamId = hex(srcStreamId)
+        except TypeError:
+            pass
+
+        if streamClass == 'Measure' and self.srcStream.number != 0:
+            srcStreamId = 'm.' + str(self.srcStream.number)
+        
+        return '<{0}.{1} for {2}:{3} @:{4}>'.format(
+                    self.__module__, self.__class__.__name__,
+                    streamClass,
+                    srcStreamId,
+                    self.index
+                )
 
     def __iter__(self):
-        self.index = 0
+        self._reset()
         return self
         
         
     def __next__(self):
         while self.index < self.streamLength:                    
+            if self.index >= self.elementsLength:
+                self.iterSection = '_endElements'
+                self.endElementsIndex = self.index - self.elementsLength
+            
             self.index += 1 # increment early in case of an error.
-    
+            
+            
+            
             try:
                 e = self.srcStreamElements[self.index - 1]
             except IndexError:
@@ -92,6 +140,7 @@ class StreamIterator(object):
             if self.restoreActiveSites is True:
                 e.activeSite = self.srcStream
     
+            self.updateActiveInformation()
             return e
 
         self.cleanup()
@@ -117,10 +166,63 @@ class StreamIterator(object):
         if self._len is not None:
             return self._len
         
-        self._len = len(self.filterElements())
+        self._len = len(self.matchingElements())
         return self._len
 
-    def filterElements(self):
+
+    #----------------------------------------------------------------
+    # start and stop
+    
+    def updateActiveInformation(self):
+        '''
+        Updates the (shared) activeInformation dictionary
+        with information about
+        where we are.
+        
+        Call before any element return
+        '''
+        ai = self.activeInformation
+        ai['stream'] = self.srcStream
+        ai['index'] = self.index - 1
+        ai['iterSection'] = self.iterSection
+        ai['endElementsIndex'] = self.endElementsIndex
+
+    def _reset(self):
+        '''
+        reset prior to iteration
+        '''
+        self.index = 0
+        self.endElementsIndex = -1
+        self.iterSection = '_elements'
+        self.updateActiveInformation()
+
+    def resetCaches(self):
+        '''
+        reset any cached data. -- do not use this at
+        the start of iteration since we might as well
+        save this information. But do call it if 
+        the filter changes.
+        '''
+        self._len = None
+        self._matchingElements = None
+    
+    def cleanup(self):
+        '''
+        stop iteration; and cleanup if need be.
+        '''
+        if self.cleanupOnStop is not False:
+            self._reset()
+
+            del self.srcStream
+            del self.srcStreamElements
+            self.srcStream = None
+            self.srcStreamElements = ()
+
+    #----------------------------------------------------------------
+    # getting items
+
+
+    def matchingElements(self):
         '''
         returns a list of elements that match the filter.
         
@@ -135,33 +237,39 @@ class StreamIterator(object):
         Cached for speed.
         
         >>> s = converter.parse('tinynotation: 3/4 c4 d e f g a', makeNotation=False)
+        >>> s.id = 'tn3/4'
         >>> sI = s.iter
         >>> sI
-        <music21.stream.iterator.StreamIterator object at 0x104b29f60>
-        >>> sI.filterElements()
+        <music21.stream.iterator.StreamIterator for Part:tn3/4 @:0>
+
+        >>> sI.matchingElements()
         [<music21.meter.TimeSignature 3/4>, <music21.note.Note C>, <music21.note.Note D>, 
          <music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>, 
          <music21.note.Note A>]
+
         >>> sI.notes
-        <music21.stream.iterator.StreamIterator object at 0x104b29f60>
-        >>> sI.filterElements()
+        <music21.stream.iterator.StreamIterator for Part:tn3/4 @:0>
+        >>> sI.notes is sI
+        True
+
+        >>> sI.matchingElements()
         [<music21.note.Note C>, <music21.note.Note D>, 
          <music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>, 
          <music21.note.Note A>]
         '''
-        if self._filterElements is not None:
-            return self._filterElements
+        if self._matchingElements is not None:
+            return self._matchingElements
         
         savedIndex = self.index
         savedRestoreActiveSites = self.restoreActiveSites
         self.restoreActiveSites = True
         
-        fe = [x for x in self]
+        me = [x for x in self]
         
         self.index = savedIndex
         self.restoreActiveSites = savedRestoreActiveSites        
-        self._filterElements = fe
-        return fe
+        self._matchingElements = me
+        return me
 
 
     def matchesFilters(self, e):
@@ -176,17 +284,8 @@ class StreamIterator(object):
                 raise
         return True
 
-    
-    def cleanup(self):
-        '''
-        stop iteration; and cleanup if need be.
-        '''
-        self.index = 0
-        if self.cleanupOnStop is not False:
-            del self.srcStream
-            del self.srcStreamElements
-            self.srcStream = None
-            self.srcStreamElements = ()
+
+
     
     def __getitem__(self, k):
         '''
@@ -198,7 +297,8 @@ class StreamIterator(object):
         >>> s.repeatAppend(note.Note('C'), 2)
         >>> sI = s.iter
         >>> sI
-        <music21.stream.iterator.StreamIterator object at 0x...>
+        <music21.stream.iterator.StreamIterator for Stream:0x104743be0 @:0>
+
         >>> sI.srcStream is s
         True
 
@@ -236,19 +336,11 @@ class StreamIterator(object):
 
         (nothing is printed)
         '''
-        fe = self.filterElements()
+        fe = self.matchingElements()
         e = fe[k]
 
         return e
-    
-    def resetCaches(self):
-        '''
-        reset any cached data.
-        '''
-        self._len = None
-        self._filterElements = None
-        self.index = 0
-    
+        
     
     def _newBaseStream(self):
         '''
@@ -343,7 +435,7 @@ class StreamIterator(object):
             derivationMethods.append(f.derivationStr)
         found.derivation.method = '.'.join(derivationMethods)
         
-        fe = self.filterElements()
+        fe = self.matchingElements()
         for e in fe:
             o = ss.elementOffset(e, stringReturns=True)
             if not isinstance(o, str):                
@@ -764,7 +856,7 @@ class RecursiveIterator(StreamIterator):
     >>> hasExpressions = lambda el, i: True if (hasattr(el, 'expressions') and len(el.expressions) > 0) else False
     >>> expressive = b.recurse().addFilter(hasExpressions)
     >>> expressive
-    <music21.stream.iterator.RecursiveIterator object at 0x1048d3da0>
+    <music21.stream.iterator.RecursiveIterator for Score:0x10487f550 @:0>
     
     >>> for el in expressive:
     ...     printer = (el, el.expressions)
@@ -786,9 +878,14 @@ class RecursiveIterator(StreamIterator):
                  srcStream, 
                  filters=None, 
                  restoreActiveSites=True, 
-                 streamsOnly=False, 
-                 includeSelf=False): #, parentIterator=None):
-        super(RecursiveIterator, self).__init__(srcStream, filters, restoreActiveSites)
+                 activeInformation=None,
+                 streamsOnly=False, # to be removed
+                 includeSelf=False, # to be removed
+                 ): #, parentIterator=None):
+        super(RecursiveIterator, self).__init__(srcStream, 
+                                                filters, 
+                                                restoreActiveSites,
+                                                activeInformation=activeInformation)
         self.includeSelf = includeSelf
         if streamsOnly is True:
             self.filters.append(filter.ClassFilter('Stream'))
@@ -813,7 +910,13 @@ class RecursiveIterator(StreamIterator):
                     
             if self.index == 0 and self.includeSelf is True and self.matchesFilters(self.srcStream):
                 self.includeSelf = False
+                self.activeInformation['stream'] = None
+                self.activeInformation['index'] = -1
                 return self.srcStream
+
+            if self.index >= self.elementsLength:
+                self.iterSection = '_endElements'
+                self.endElementsIndex = self.index - self.elementsLength
 
             
             self.index += 1 # increment early in case of an error in the next try.
@@ -824,19 +927,25 @@ class RecursiveIterator(StreamIterator):
                 # this may happen in the number of elements has changed
                 continue
     
+            # in a recursive filter, the stream does not need to match the filter,
+            # only the internal elements.
             if e.isStream:
-                self.recursiveIterator = RecursiveIterator(srcStream=e,
-                                               restoreActiveSites=self.restoreActiveSites,
-                                               filters=self.filters, # shared list...
-                                               includeSelf=False, # always for inner streams
-                                               #parentIterator=self
-                                               )
+                self.recursiveIterator = RecursiveIterator(
+                                            srcStream=e,
+                                            restoreActiveSites=self.restoreActiveSites,
+                                            filters=self.filters, # shared list...
+                                            activeInformation=self.activeInformation, # shared dict
+                                            includeSelf=False, # always for inner streams
+                                            #parentIterator=self
+                                            )
             if self.matchesFilters(e) is False:
                 continue          
             
             if self.restoreActiveSites is True:
                 e.activeSite = self.srcStream
     
+
+            self.updateActiveInformation()
             return e
 
         ### the last element can still set a recursive iterator, so make sure we handle it.
@@ -853,12 +962,54 @@ class RecursiveIterator(StreamIterator):
         
     next = __next__
 
-    def filterElements(self):
+    def matchingElements(self):
         # saved parent iterator later?
+        # will this work in mid-iteration? Test, or do not expose till then.
         savedRecursiveIterator = self.recursiveIterator
-        fe = super(RecursiveIterator, self).filterElements()
+        fe = super(RecursiveIterator, self).matchingElements()
         self.recursiveIterator = savedRecursiveIterator
         return fe
+
+    def iteratorStack(self):
+        '''
+        Returns a stack of Streams at this point in the iteration.  Last is most recent.
+        
+        >>> b = corpus.parse('bwv66.6')
+        >>> bRecurse = b.recurse()
+        >>> i = 0
+        >>> for x in bRecurse:
+        ...     i += 1
+        ...     if i > 12:
+        ...         break
+        >>> bRecurse.iteratorStack()
+        [<music21.stream.iterator.RecursiveIterator for Score:0x10475cdd8 @:2>, 
+         <music21.stream.iterator.RecursiveIterator for Part:Soprano @:3>, 
+         <music21.stream.iterator.RecursiveIterator for Measure:m.1 @:2>]
+        '''
+        iterStack = [self]
+        x = self
+        while x.recursiveIterator is not None:
+            x = x.recursiveIterator
+            iterStack.append(x)
+        return iterStack
+
+    def streamStack(self):
+        '''
+        Returns a stack of Streams at this point.  Last is most recent.
+        
+        >>> b = corpus.parse('bwv66.6')
+        >>> bRecurse = b.recurse()
+        >>> i = 0
+        >>> for x in bRecurse:
+        ...     i += 1
+        ...     if i > 12:
+        ...         break
+        >>> bRecurse.streamStack()
+        [<music21.stream.Score 0x1049a0710>, 
+         <music21.stream.Part Soprano>, 
+         <music21.stream.Measure 1 offset=1.0>]
+        '''
+        return [i.srcStream for i in self.iteratorStack()]
 
 class Test(unittest.TestCase):
     pass
