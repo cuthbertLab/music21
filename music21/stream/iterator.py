@@ -187,7 +187,7 @@ class StreamIterator(object):
         ai['stream'] = self.srcStream
         ai['index'] = self.index - 1
         ai['iterSection'] = self.iterSection
-        ai['sectionIndex'] = self.index - 1
+        ai['sectionIndex'] = self.sectionIndex
 
     def reset(self):
         '''

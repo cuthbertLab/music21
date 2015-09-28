@@ -1030,6 +1030,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         1
         >>> len(s.notes)
         0
+
+        Test that removing from end elements works.
+
+        >>> s = stream.Measure()
+        >>> s.append(meter.TimeSignature('4/4'))
+        >>> s.repeatAppend(note.Note("C"), 4)
+        >>> s.rightBarline = bar.Barline('final')
+        >>> len(s)
+        6
+        >>> s.removeByClass('Barline')
+        >>> len(s)
+        5
+        
         '''
         elFilter = self.iter.getElementsByClass(classFilterList)
         return self._removeIteration(elFilter)
@@ -1039,7 +1052,23 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         Remove all elements not of the specified
         class or subclass in the Steam in place.
+
+        >>> s = stream.Stream()
+        >>> s.append(meter.TimeSignature('4/4'))
+        >>> s.repeatAppend(note.Note("C"), 8)
+        >>> len(s)
+        9
+        >>> s.removeByNotOfClass('TimeSignature')
+        >>> len(s)
+        1
+        >>> len(s.notes)
+        0
         '''
+        #if classFilterList == []:
+        #    classFilterList = ['Music21Object']
+        elFilter = self.iter.getElementsNotOfClass(classFilterList)
+        return self._removeIteration(elFilter)
+    
         if not common.isListLike(classFilterList):
             classFilterList = [classFilterList]
         # process main elements
@@ -3366,7 +3395,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             ql = m.duration.quarterLength
             if customRemove is not None:
                 if customRemove is True:
-                    m.removeByNotOfClass([])
+                    m.removeByClass('Music21Object')
                 else:
                     m.removeByClass(customRemove)
             else:

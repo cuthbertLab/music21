@@ -7474,14 +7474,23 @@ class Test(unittest.TestCase):
             "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
         #s.show()
 
+    def testMeasureTemplateAll(self):
+        from music21 import corpus
+        b = corpus.parse('bwv66.6')
+        bass = b.parts[3]
+        bassEmpty = bass.measureTemplate(fillWithRests=False, customRemove=True)
+        for x in bassEmpty:
+            if 'Measure' in x.classes:
+                self.assertEqual(len(x), 0)
 
+        
 
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
     import music21
     #'testContextNestedC'
-    music21.mainTest(Test, 'verbose') #, runTest='testRecurseA')
+    music21.mainTest(Test, 'verbose', runTest='testMeasureTemplateAll')
 
 #------------------------------------------------------------------------------
 # eof
