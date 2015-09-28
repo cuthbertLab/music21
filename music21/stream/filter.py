@@ -10,7 +10,7 @@
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
 
-import inspect 
+#import inspect 
 import unittest
 from music21 import common
 from music21.common import opFrac
@@ -33,6 +33,28 @@ class StreamFilter(object):
     def __init__(self):
         pass # store streamIterator?
 
+class IdFilter(StreamFilter):
+    '''
+    filters on ids. used by stream.getElementById.
+    No corresponding iterator call.
+    '''
+    def __init__(self, searchId):
+        super(IdFilter, self).__init__()
+        try:
+            searchIdLower = searchId.lower()
+        except AttributeError: # not a string
+            searchIdLower = searchId
+        self.searchId = searchIdLower
+    
+    def __call__(self, item, iterator):
+        if item.id == self.searchId:
+            return True
+        else:
+            try:
+                return item.id.lower() == self.searchId
+            except AttributeError: # item.id is not a string
+                pass
+            return False
 
 class ClassFilter(StreamFilter):
     '''
@@ -63,28 +85,13 @@ class ClassFilter(StreamFilter):
     def __init__(self, classList=()):
         super(ClassFilter, self).__init__()
 
-
-        self._classListHasStrings = False
-        self._classListHasTypes = False
-
         if not common.isListLike(classList):
             classList = (classList,)
             
         self.classList = classList
-        for c in classList:
-            if isinstance(c, str):
-                self._classListHasStrings = True
-            elif inspect.isclass(c):
-                self._classListHasTypes = True
 
     def __call__(self, item, iterator):
-        eClasses = item.classes 
-        for className in self.classList:
-            if self._classListHasStrings and className in eClasses:
-                return True
-            elif self._classListHasTypes and isinstance(item, className):
-                return True
-        return False
+        return item.isClassOrSubclass(self.classList)
 
 
 class ClassNotFilter(ClassFilter):
@@ -107,7 +114,7 @@ class ClassNotFilter(ClassFilter):
     derivationStr = 'getElementsNotOfClass'
 
     def __call__(self, item, iterator):
-        return not super(ClassNotFilter, self).__call__(item, iterator)
+        return not item.isClassOrSubclass(self.classList)
 
 
 class GroupFilter(StreamFilter):
@@ -157,6 +164,8 @@ class OffsetFilter(StreamFilter):
     '''
     see iterator.getElementsByOffset()
     '''
+    derivationStr = 'getElementsByOffset'
+    
     def __init__(self, offsetStart, offsetEnd=None,
                     includeEndBoundary=True, mustFinishInSpan=False,
                     mustBeginInSpan=True, includeElementsThatEndAtStart=True):

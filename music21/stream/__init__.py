@@ -622,7 +622,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         base.Music21Object.mergeAttributes(self, other)
 
-        for attr in 'autoSort'.split():
+        for attr in ('autoSort','isSorted'):
             if hasattr(other, attr):
                 setattr(self, attr, getattr(other, attr))
 
@@ -669,12 +669,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.hasElementOfClass('Measure')
         False
         '''
+        clist = [className]
         #environLocal.printDebug(['calling hasElementOfClass()', className])
         for e in self._elements:
-            if e.isClassOrSubclass([className]):
+            if e.isClassOrSubclass(clist):
                 return True
         for e in self._endElements:
-            if e.isClassOrSubclass([className]):
+            if e.isClassOrSubclass(clist):
                 return True
         return False
 
@@ -878,69 +879,70 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if shiftOffsets is True and recurse is True:
             raise StreamException("Cannot do both shiftOffsets and recurse search at the same time...yet")
         
-        if not isinstance(targetOrList, (list, set, tuple)):
-            self.remove([targetOrList], firstMatchOnly=firstMatchOnly, shiftOffsets=shiftOffsets, recurse=recurse)
-        else:
-            if len(targetOrList) > 1:
+        if not common.isListLike(targetOrList):
+            targetList = [targetOrList]
+        elif len(targetOrList) > 1:
                 targetList = sorted(targetOrList, key=self.elementOffset)
+        else:
+            targetList = targetOrList
+
+        if shiftOffsets:
+            shiftDur = 0.0
+            
+        for i, target in enumerate(targetList):
+            try:
+                indexInStream = self.index(target)
+            except StreamException:
+                if recurse is True:
+                    for s in self.recurse(streamsOnly=True):
+                        if s is self:
+                            continue
+                        try:
+                            indexInStream = s.index(target)
+                            s.remove(target)
+                            break
+                        except StreamException:
+                            continue
+                continue # recursion matched or didn't or wasn't run. either way no need for rest...
+            
+            match = None
+            matchedEndElement = False
+            baseElementCount = len(self._elements)
+            if indexInStream < baseElementCount:
+                match = self._elements.pop(indexInStream)
             else:
-                targetList = targetOrList
+                match = self._endElements.pop(indexInStream-baseElementCount)
+                matchedEndElement = True
 
-            if shiftOffsets:
-                shiftDur = 0.0
-            for i, target in enumerate(targetList):
-                try:
-                    indexInStream = self.index(target)
-                except StreamException:
-                    if recurse is True:
-                        for s in self.recurse(streamsOnly=True):
-                            if s is self:
-                                continue
-                            try:
-                                indexInStream = s.index(target)
-                                s.remove(target)
-                                break
-                            except StreamException:
-                                continue
-                    continue # recursion matched or didn't or wasn't run. either way no need for rest...
-                
-                match = None
-                matchedEndElement = False
-                baseElementCount = len(self._elements)
-                if indexInStream < baseElementCount:
-                    match = self._elements.pop(indexInStream)
+            if match is not None:
+                if shiftOffsets is True:
+                    matchOffset = self.elementOffset(match)
+
+                self.elementsChanged(clearIsSorted=False)
+                match.sites.remove(self)
+                match.activeSite = None
+
+            if shiftOffsets is True and matchedEndElement is False: 
+                matchDuration = match.duration.quarterLength
+                shiftedRegionStart = matchOffset + matchDuration
+                if i+1 < len(targetList):
+                    shiftedRegionEnd = self.elementOffset(targetList[i+1])
                 else:
-                    match = self._endElements.pop(indexInStream-baseElementCount)
-                    matchedEndElement = True
+                    shiftedRegionEnd = self.duration.quarterLength
 
-                if match is not None:
-                    if shiftOffsets is True:
-                        matchOffset = self.elementOffset(match)
+                shiftDur = shiftDur + matchDuration
+                if shiftDur != 0.0:
+                    # can this be done with recurse???
+                    for e in self.iter.getElementsByOffset(shiftedRegionStart,
+                        shiftedRegionEnd,
+                        includeEndBoundary=False,
+                        mustFinishInSpan=False,
+                        mustBeginInSpan=True):
 
-                    self.elementsChanged(clearIsSorted=False)
-                    match.sites.remove(self)
-                    match.activeSite = None
-
-                if shiftOffsets is True and matchedEndElement is False: 
-                    matchDuration = match.duration.quarterLength
-                    shiftedRegionStart = matchOffset + matchDuration
-                    if i+1 < len(targetList):
-                        shiftedRegionEnd = self.elementOffset(targetList[i+1])
-                    else:
-                        shiftedRegionEnd = self.duration.quarterLength
-
-                    shiftDur = shiftDur + matchDuration
-                    if shiftDur != 0.0:
-                        for e in self.getElementsByOffset(shiftedRegionStart,
-                            shiftedRegionEnd,
-                            includeEndBoundary=False,
-                            mustFinishInSpan=False,
-                            mustBeginInSpan=True):
-
-                            elementOffset = self.elementOffset(e)
-                            self.setElementOffset(e, elementOffset-shiftDur)
-                #if renumberMeasures is True and matchedEndElement is False:
-                #   pass  # This should maybe just call a function renumberMeasures
+                        elementOffset = self.elementOffset(e)
+                        self.setElementOffset(e, elementOffset-shiftDur)
+            #if renumberMeasures is True and matchedEndElement is False:
+            #   pass  # This should maybe just call a function renumberMeasures
 
     def pop(self, index):
         '''
@@ -990,6 +992,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(s.notes)
         0
         '''
+        for el in reversed(self.iter.getElementsByClass(classFilterList)):
+            if el.sortTuple.atEnd == 0:
+                self._elements.pop(self._elements.index(el))
+        
         if not common.isListLike(classFilterList):
             classFilterList = [classFilterList]
         # process main elements
@@ -2225,71 +2231,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         :rtype: Stream
         '''
-        # TODO: could add `domain` parameter to allow searching only _elements,
-        # or _endElements, or both; possible performance hit
-        # NOTE: this is a performance critical operation
-        returnList = False
-
-        if returnStreamSubClass is True:
-            try:
-                found = self.__class__()
-                # Copy measure number if measure object...
-                # TODO: other attributes?
-                if ('Measure' in self.classes):
-                    found.number = self.number # pylint: disable=attribute-defined-outside-init
-            except TypeError:
-                found = Stream()
-        elif returnStreamSubClass == 'list':
-            found = []
-            returnList = True
+        iterator = self.iter.getElementsByClass(classFilterList)
+        if returnStreamSubClass == 'list':
+            return iterator.filterElements()
         else:
-            found = Stream()
+            return iterator.stream(returnStreamSubClass=returnStreamSubClass)
 
-        if returnList is False:
-            found.derivation.origin = self
-            found.derivation.method = 'getElementsByClass'
-            # passing on auto sort status may or may not be what is needed here
-            found.autoSort = self.autoSort
-
-        if not common.isListLike(classFilterList):
-            classFilterList = (classFilterList,)
-
-        # if we are sure that this Stream does not have a class
-        singleClassString = False
-        if (len(classFilterList) == 1 and
-            isinstance(classFilterList[0], str)):
-            singleClassString = True
-        if singleClassString:
-            if not self.hasElementOfClass(classFilterList[0]):
-                if returnList is False:
-                    found.isSorted = self.isSorted
-                return found
-
-        if ((self.isSorted is False) and (self.autoSort is True)):
-            self.sort() # will set isSorted to True
-        # if this stream was sorted, the resultant stream is sorted
-        if returnList is False:
-            found.isSorted = self.isSorted
-
-
-        #found.show('t')
-        # need both _elements and _endElements
-        for e in self._elements:
-            if e.isClassOrSubclass(classFilterList):
-                if returnList is False:
-                    found._insertCore(self.elementOffset(e), e, ignoreSort=True)
-                else:
-                    found.append(e)
-        for e in self._endElements:
-            if e.isClassOrSubclass(classFilterList):
-                if returnList is False:
-                    found._storeAtEndCore(e)
-                else:
-                    found.append(e)
-
-        if returnList is False:
-            found.elementsChanged()
-        return found
+        # this was 11 micro-sec for BWV 66.6, getElementsByClass('Part', 'list')
+        # and 85 w/o list before changing to .iter (and adding mergeAttributes, etc.)
+        # how close can we get?
+        
+        # mergeAttributes added 22 microseconds and should have been done before.  
+        # So fair comparison is
+        # 107 for old vs. 133 for new.  -- acceptable.
 
     def getElementsNotOfClass(self, classFilterList, returnStreamSubClass=True):
         '''
@@ -2322,12 +2276,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         
         :rtype: Stream
         '''
-        return self.iter.getElementsNotOfClass(
-                    classFilterList).stream(returnStreamSubClass=returnStreamSubClass)
+        iterator = self.iter.getElementsNotOfClass(classFilterList)
+        if returnStreamSubClass == 'list':
+            return iterator.filterElements()
+        else:
+            return iterator.stream(returnStreamSubClass=returnStreamSubClass)
+
 
     def getElementsByGroup(self, groupFilterList):
         '''
-
         >>> n1 = note.Note("C")
         >>> n1.groups.append('trombone')
         >>> n2 = note.Note("D")
@@ -2404,36 +2361,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         
         :rtype: base.Music21Object
         '''
-        for e in self._elements:
-            match = False
-            try:
-                if e.id.lower() == elementId.lower():
-                    match = True
-            except AttributeError: # not a string
-                if e.id == elementId:
-                    match = True
-            if match:
-                e.activeSite = self
-                if classFilter is not None:
-                    if e.isClassOrSubclass(classFilter):
-                        return e
-                else:
-                    return e
-        for e in self._endElements:
-            match = False
-            try:
-                if e.id.lower() == elementId.lower():
-                    match = True
-            except AttributeError: # not a string
-                if e.id == elementId:
-                    match = True
-            if match:
-                e.activeSite = self
-                if classFilter is not None:
-                    if e.isClassOrSubclass(classFilter):
-                        return e
-                else:
-                    return e
+        iterator = self.iter.addFilter(filter.IdFilter(elementId))
+        if classFilter is not None:
+            iterator.getElementsByClass(classFilter)
+        for e in iterator:
+            return e
         return None
 
 
@@ -2639,6 +2571,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         :rtype: Stream
         '''
+        iterator = self.iter.getElementsByOffset(
+                         offsetStart=offsetStart, 
+                         offsetEnd=offsetEnd,
+                         includeEndBoundary=includeEndBoundary, 
+                         mustFinishInSpan=mustFinishInSpan,
+                         mustBeginInSpan=mustBeginInSpan, 
+                         includeElementsThatEndAtStart=includeElementsThatEndAtStart)
+        if classList is not None:
+            iterator.getElementsByClass(classList)
+        return iterator.stream()
+
         offsetStart = opFrac(offsetStart)
         if offsetEnd is None:
             offsetEnd = offsetStart
@@ -6373,6 +6316,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def recurse(self, streamsOnly=False,
         restoreActiveSites=True, classFilter=(), skipSelf=False):
         '''
+        NOTE: skipSelf is going to become True by default soon -- make sure that you
+        are NOT relying on the default value.
+        
         Returns an iterator that iterates over a list of Music21Objects 
         contained in the Stream, starting with self (unless skipSelf is True), 
         continuing with self's elements,
@@ -6381,12 +6327,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Here's an example. Let's create a simple score.
         
-        >>> s = stream.Score()
-        >>> s.id = 'mainScore'
-        >>> p0 = stream.Part()
-        >>> p0.id = 'part0'
-        >>> p1 = stream.Part()
-        >>> p1.id = 'part1'
+        >>> s = stream.Score(id='mainScore')
+        >>> p0 = stream.Part(id='part0')
+        >>> p1 = stream.Part(id='part1')
+
         >>> m01 = stream.Measure(number=1)
         >>> m01.append(note.Note('C', type="whole"))
         >>> m02 = stream.Measure(number=2)
@@ -6395,8 +6339,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> m11.append(note.Note('E', type="whole"))
         >>> m12 = stream.Measure(number=2)
         >>> m12.append(note.Note('F', type="whole"))
+
         >>> p0.append([m01, m02])
         >>> p1.append([m11, m12])
+
         >>> s.insert(0, p0)
         >>> s.insert(0, p1)
         >>> s.show('text')
@@ -6449,10 +6395,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> for el in s.flat.notes:
         ...     tup = (el, el.offset, el.activeSite)
         ...     print(tup)
-        (<music21.note.Note C>, 0.0, <music21.stream.Stream 0x...>)
-        (<music21.note.Note E>, 0.0, <music21.stream.Stream 0x...>)
-        (<music21.note.Note D>, 4.0, <music21.stream.Stream 0x...>)
-        (<music21.note.Note F>, 4.0, <music21.stream.Stream 0x...>)
+        (<music21.note.Note C>, 0.0, <music21.stream.Stream mainScore_flat>)
+        (<music21.note.Note E>, 0.0, <music21.stream.Stream mainScore_flat>)
+        (<music21.note.Note D>, 4.0, <music21.stream.Stream mainScore_flat>)
+        (<music21.note.Note F>, 4.0, <music21.stream.Stream mainScore_flat>)
 
         If you don't need correct offsets or activeSites, set `restoreActiveSites` to `False`.
         Then the last offset/activeSite will be used.  It's a bit of a speedup, but leads to some
@@ -6464,10 +6410,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> for el in s.recurse(classFilter=('Note','Rest'), restoreActiveSites=False):
         ...     tup = (el, el.offset, el.activeSite)
         ...     print(tup)
-        (<music21.note.Note C>, 0.0, <music21.stream.Stream 0x...>)
-        (<music21.note.Note D>, 4.0, <music21.stream.Stream 0x...>)
-        (<music21.note.Note E>, 0.0, <music21.stream.Stream 0x...>)
-        (<music21.note.Note F>, 4.0, <music21.stream.Stream 0x...>)        
+        (<music21.note.Note C>, 0.0, <music21.stream.Stream mainScore_flat>)
+        (<music21.note.Note D>, 4.0, <music21.stream.Stream mainScore_flat>)
+        (<music21.note.Note E>, 0.0, <music21.stream.Stream mainScore_flat>)
+        (<music21.note.Note F>, 4.0, <music21.stream.Stream mainScore_flat>)        
 
         So, this is pretty unreliable so don't use it unless the tiny speedup is worth it.
         

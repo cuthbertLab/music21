@@ -413,7 +413,7 @@ class Music21Object(object):
         >>> "group1" in m2.groups
         True
         '''
-        if other.id != id(other.id):
+        if other.id != id(other):
             self.id = other.id
         self.groups = copy.deepcopy(other.groups)
 

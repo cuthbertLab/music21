@@ -18,7 +18,11 @@ import unittest
 
 from music21 import common
 from music21.stream import filter
-#from music21.exceptions21 import StreamException
+from music21.exceptions21 import StreamException
+
+#------------------------------------------------------------------------------
+class StreamIteratorException(StreamException):
+    pass
 
 #------------------------------------------------------------------------------
 
@@ -60,13 +64,12 @@ class StreamIterator(object):
             filters = [filters]
         elif isinstance(filters, tuple) or isinstance(filters, set):
             filters = list(filters) # mutable....
-        
         # self.filters is a list of expressions that
         # return True or False for an element for
         # whether it should be yielded.
         self.filters = filters
         self._len = None
-        self._filterElements = []
+        self._filterElements = None
 
     def __iter__(self):
         self.index = 0
@@ -74,25 +77,25 @@ class StreamIterator(object):
         
         
     def __next__(self):
-        if self.index >= self.streamLength:
-            self.cleanup()
-            raise StopIteration
-        
-        self.index += 1 # increment early in case of an error.
+        while self.index < self.streamLength:                    
+            self.index += 1 # increment early in case of an error.
     
-        try:
-            e = self.srcStreamElements[self.index - 1]
-        except IndexError:
-            # this may happen in the number of elements has changed
-            return self.__next__()
+            try:
+                e = self.srcStreamElements[self.index - 1]
+            except IndexError:
+                # this may happen in the number of elements has changed
+                continue
+    
+            if self.matchesFilters(e) is False:
+                continue
+            
+            if self.restoreActiveSites is True:
+                e.activeSite = self.srcStream
+    
+            return e
 
-        if self.matchesFilters(e) is False:
-            return self.__next__()            
-        
-        if self.restoreActiveSites is True:
-            e.activeSite = self.srcStream
-
-        return e
+        self.cleanup()
+        raise StopIteration
         
     next = __next__
 
@@ -146,7 +149,7 @@ class StreamIterator(object):
          <music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>, 
          <music21.note.Note A>]
         '''
-        if self._filterElements != []:
+        if self._filterElements is not None:
             return self._filterElements
         
         savedIndex = self.index
@@ -243,8 +246,39 @@ class StreamIterator(object):
         reset any cached data.
         '''
         self._len = None
-        self._filterElements = []
+        self._filterElements = None
         self.index = 0
+    
+    
+    def _newBaseStream(self):
+        '''
+        since we can't import "Stream" here, we will
+        look in srcStream.__class__.mro() for the Stream
+        object to import.
+        
+        
+        >>> p = stream.Part()
+        >>> pi = p.iter
+        >>> s = pi._newBaseStream()
+        >>> s
+        <music21.stream.Stream 0x1047eb2e8>
+        
+        >>> pi.srcStream = note.Note()
+        >>> pi._newBaseStream()
+        Traceback (most recent call last):
+        StreamIteratorException: ...
+        '''
+        StreamBase = None
+        for x in self.srcStream.__class__.mro():
+            if x.__name__ == 'Stream':
+                StreamBase = x
+                break
+
+        try:
+            return StreamBase()
+        except TypeError: # 'NoneType' object is not callable.
+            raise StreamIteratorException(
+                    "You've given a 'stream' that is not a stream! {0}".format(self.srcStream)) 
     
     def stream(self, returnStreamSubClass=True):
         '''
@@ -292,23 +326,26 @@ class StreamIterator(object):
         >>> s4._endElements[0] is b
         True
         '''
-        from music21 import stream
+        ss = self.srcStream
+
         if returnStreamSubClass is True:
             try:
-                found = self.srcStream.__class__()
+                found = ss.__class__()
             except TypeError:
-                found = stream.Stream()
+                found = self._newBaseStream()
         else:
-            found = stream.Stream()
+            found = self._newBaseStream()
             
-        found.mergeAttributes(self.srcStream)
-        found.derivation.origin = self.srcStream
+        found.mergeAttributes(ss)
+        found.derivation.origin = ss
         derivationMethods = []
         for f in self.filters:
             derivationMethods.append(f.derivationStr)
         found.derivation.method = '.'.join(derivationMethods)
-        for e in self:
-            o = self.srcStream.elementOffset(e, stringReturns=True)
+        
+        fe = self.filterElements()
+        for e in fe:
+            o = ss.elementOffset(e, stringReturns=True)
             if not isinstance(o, str):                
                 found._insertCore(o, e, ignoreSort=True)
             else:
@@ -319,8 +356,8 @@ class StreamIterator(object):
                     found._storeAtEndCore(e)
 
         # if this stream was sorted, the resultant stream is sorted        
-        found.elementsChanged(clearIsSorted=False)
-        found.isSorted = self.srcStream.isSorted
+        if len(fe) > 0:
+            found.elementsChanged(clearIsSorted=False)
         
         return found
     
