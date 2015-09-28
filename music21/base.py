@@ -578,7 +578,6 @@ class Music21Object(object):
         # defining self.__dict__ upon initialization currently breaks everything
         self.__dict__ = state #pylint: disable=attribute-defined-outside-init
 
-    #@common.deprecated('Septermber 2015', 'March 2016', 'for most performance critical, iterate over classFilterList on .classSet')
     def isClassOrSubclass(self, classFilterList):
         '''
         Given a class filter list (a list or tuple must be submitted),
@@ -587,9 +586,6 @@ class Music21Object(object):
         
         NOTE: this is a performance critical operation
         for performance, only accept lists or tuples
-        
-        TO BE DEPRECATED -- slowest of all methods... only kept
-        because supporting a list of strings or classes is nice.
         
         >>> n = note.Note()
         >>> n.isClassOrSubclass(('Note',))

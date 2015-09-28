@@ -685,6 +685,7 @@ class ClassDocumenter(ObjectDocumenter):
         ...             attributeDocumenter.referentPackagesystemPath))
         ...
         music21.base.Music21Object:
+        - music21.base.Music21Object.classSet
         - music21.base.Music21Object.classes
         - music21.base.Music21Object.containerHierarchy
         - music21.base.Music21Object.isGrace
@@ -1005,6 +1006,7 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.beatDuration`'
         '   - :attr:`~music21.base.Music21Object.beatStr`'
         '   - :attr:`~music21.base.Music21Object.beatStrength`'
+        '   - :attr:`~music21.base.Music21Object.classSet`'
         '   - :attr:`~music21.base.Music21Object.classes`'
         '   - :attr:`~music21.base.Music21Object.containerHierarchy`'
         '   - :attr:`~music21.base.Music21Object.isGrace`'
@@ -1152,6 +1154,7 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.beatDuration`'
         '   - :attr:`~music21.base.Music21Object.beatStr`'
         '   - :attr:`~music21.base.Music21Object.beatStrength`'
+        '   - :attr:`~music21.base.Music21Object.classSet`'
         '   - :attr:`~music21.base.Music21Object.classes`'
         '   - :attr:`~music21.base.Music21Object.containerHierarchy`'
         '   - :attr:`~music21.base.Music21Object.isGrace`'
