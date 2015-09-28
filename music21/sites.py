@@ -351,8 +351,10 @@ class Sites(common.SlottedObject):
         self.siteDict = {}
         self._lastID = -1  # cannot be None
 
-    def get(self, sortByCreationTime=False,
-            priorityTarget=None, excludeNone=False):
+    def get(self, 
+            sortByCreationTime=False,
+            priorityTarget=None, 
+            excludeNone=False):
         '''
         Get references; order, based on dictionary keys, is from most recently added to least recently added.
 
@@ -487,6 +489,8 @@ class Sites(common.SlottedObject):
         '''
         Given an attribute name, search all objects and find the first that
         matches this attribute name; then return a reference to this attribute.
+        
+        Works in reverse order, so most recent site is returned first.
 
         >>> class Mock(base.Music21Object):
         ...     attr1 = 234
@@ -517,7 +521,7 @@ class Sites(common.SlottedObject):
 
         '''
         post = None
-        for obj in self.get():
+        for obj in self.get(sortByCreationTime='reverse'):
             if obj is None:
                 continue # in case the reference is dead
             try:
@@ -1018,9 +1022,8 @@ class Test(unittest.TestCase):
         c = clef.Clef()
         c.sites.add(n)
         
-        self.assertEqual(n2.getContextAttr('number'), 34)
-        c.setContextAttr('lyric',
-                               n2.getContextAttr('number'))
+        self.assertEqual(n2.sites.getAttrByName('number'), 34)
+        c.sites.setAttrByName('lyric', n2.sites.getAttrByName('number'))
         # converted to a string now
         self.assertEqual(n.lyric, '34')
 

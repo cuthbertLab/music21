@@ -300,8 +300,6 @@ class Music21Object(object):
         'classes',
         'classSet',
         'findAttributeInHierarchy',
-        'getContextAttr',
-        'setContextAttr',
         ]
 
     # documentation for all attributes (not properties or methods)
@@ -527,7 +525,7 @@ class Music21Object(object):
 
         memo=None is the default as specified in copy.py
 
-        Problem: if an attribute is defined with an understscore (_priority) but
+        Problem: if an attribute is defined with an underscore (_priority) but
         is also made available through a property (e.g. priority)  using dir(self)
         results in the copy happening twice. Thus, __dict__.keys() is used.
 
@@ -602,33 +600,6 @@ class Music21Object(object):
         True
         '''
         return not self.classSet.isdisjoint(classFilterList)
-        
-        # NOTE: this is a performance critical operation
-        # for performance, only accept lists or tuples
-
-        # in case classFilterList is a tuple of classes, can try right away
-        # do not change, as performance critical
-#         try:
-#             if isinstance(self, classFilterList):
-#                 return True
-#         except TypeError:
-#             pass
-        eClasses = self.classes # tiny speedup 73ns vs 400ns
-        for className in classFilterList:
-            # new method uses string matching of .classes attribute
-            # temporarily check to see if this is a string
-            #if className in eClasses or 
-            #     (not isinstance(className, str) and isinstance(e, className)):
-            if className in eClasses:
-                return True
-            try: # className may be a string or a Class
-                if isinstance(self, className):
-                    return True
-            # catch TypeError: isinstance() arg 2 must 
-            # be a class, type, or tuple of classes and types
-            except TypeError:
-                continue
-        return False
 
     def _getClasses(self):
         try:
@@ -885,7 +856,7 @@ class Music21Object(object):
                         maxSearch -= 1
                         if tryOrigin is None or maxSearch < 0:
                             raise(e)
-                if returnType=='float':
+                if returnType == 'float':
                     a = float(a)
             else:
                 a = self._naiveOffset
@@ -913,7 +884,7 @@ class Music21Object(object):
         >>> a.getOffsetBySite(aSite)
         30.0
         
-        And if it isn't there?
+        And if it isn't there? Nothing changes.
         
         >>> b = note.Note()
         >>> b.setOffsetBySite(aSite, 40)
@@ -928,24 +899,35 @@ class Music21Object(object):
         else:
             self._naiveOffset = value
 
+    @common.deprecated("September 2015", "January 2016", "use self.sites.getAttrByName(attr)")
     def getContextAttr(self, attr):
         '''
         Given the name of an attribute, search the Sites object for
         contexts having this attribute and return
         the best match.
 
+        DEPRECATED
+
         >>> import music21
         >>> class Mock(music21.Music21Object):
         ...     attr1 = 234
-        >>> aObj = Mock()
+        >>> aObj = stream.Stream()
         >>> aObj.attr1 = 'test'
         >>> a = music21.Music21Object()
-        >>> a.sites.add(aObj)
-        >>> a.getContextAttr('attr1')
+        >>> aObj.insert(0, a)
+        >>> a.sites.getAttrByName('attr1')
         'test'
+
+        >>> bObj = stream.Stream()
+        >>> bObj.attr1 = 'came second'
+        >>> bObj.insert(0, a)
+        >>> a.sites.getAttrByName('attr1')
+        'test'
+
         '''
         return self.sites.getAttrByName(attr)
 
+    @common.deprecated("September 2015", "January 2016", "use self.sites.setAttrByName(attr, value)")
     def setContextAttr(self, attrName, value):
         '''
         Given the name of an attribute, search Contexts and return
@@ -958,10 +940,10 @@ class Music21Object(object):
         >>> aObj.attr1 = 'test'
         >>> a = music21.Music21Object()
         >>> a.sites.add(aObj)
-        >>> a.getContextAttr('attr1')
+        >>> a.sites.getAttrByName('attr1')
         'test'
-        >>> a.setContextAttr('attr1', 3000)
-        >>> a.getContextAttr('attr1')
+        >>> a.sites.setAttrByName('attr1', 3000)
+        >>> a.sites.getAttrByName('attr1')
         3000
         '''
         return self.sites.setAttrByName(attrName, value)
@@ -983,9 +965,8 @@ class Music21Object(object):
         return id(other) in self.sites.getSiteIds()
 
 
-    def getSpannerSites(self, spannerClassList = None):
+    def getSpannerSites(self, spannerClassList=None):
         '''
-
         Return a list of all :class:`~music21.spanner.Spanner` objects
         (or Spanner subclasses) that contain
         this element. This method provides a way for
@@ -1269,7 +1250,8 @@ class Music21Object(object):
         if not common.isListLike(className):
             className = (className,)
 
-        for site, offsetStart, searchType in self.contextSites(sortByCreationTime=sortByCreationTime):
+        for site, offsetStart, searchType in self.contextSites(
+                                                sortByCreationTime=sortByCreationTime):
             if site.isClassOrSubclass(className):
                 return site
             if searchType == 'elementsOnly' or searchType == 'elementsFirst':
@@ -1614,8 +1596,10 @@ class Music21Object(object):
                                      beginNearest=beginNearest, 
                                      flattenLocalSites=flattenLocalSites)
 
-    def previous(self, classFilterList=None, flattenLocalSites=False,
-        beginNearest=True):
+    def previous(self, 
+                 classFilterList=None, 
+                 flattenLocalSites=False,
+                 beginNearest=True):
         '''
         Get the previous element found in the activeSite or other .sites of this
         Music21Object.
@@ -1724,15 +1708,11 @@ class Music21Object(object):
         >>> m.insert(3.0, n)
         >>> n.activeSite is m
         True
-        >>> n.offsetFloat
-        3.0
         >>> n.offset
         3.0
         
         Still works...
 
-        >>> n.offsetFloat
-        3.0
         >>> n.offset
         3.0
 
@@ -1854,7 +1834,7 @@ class Music21Object(object):
         >>> n1.offset = 20/3.
         >>> n1.offset
         Fraction(20, 3)
-        >>> n1.offsetFloat
+        >>> float(n1.offset)
         6.666...
 
 
@@ -1890,6 +1870,8 @@ class Music21Object(object):
     
     def _getOffsetRational(self):
         return self._getOffsetFloatOrRational('rational')
+    
+    @common.deprecated("January 2015", "January 2016", "Use float(x.offset)")
     def _getOffsetFloat(self):
         return self._getOffsetFloatOrRational('float')
 
@@ -1913,7 +1895,8 @@ class Music21Object(object):
         has offset 0.0, while the note on beat 2 might have offset 1.0).
 
         3) priority = int; Priority is a
-        user-specified property (default 0) that can set the order of elements which have the same
+        user-specified property (default 0) that can set the order of 
+        elements which have the same
         offset (for instance, two Parts both at offset 0.0).
 
         4) classSortOrder = int or float; ClassSortOrder
@@ -2016,7 +1999,8 @@ class Music21Object(object):
         A generator that returns a list of tuples of sites to search for a context...
         
         Each tuple contains a Stream object, the offset of this element in that Stream, and
-        the method of searching that should be applied to search for a context.  These methods are:
+        the method of searching that should be applied to search for a context.  
+        These methods are:
 
             * 'flatten' -- flatten the stream and then look from this offset backwards.
             
@@ -2031,6 +2015,7 @@ class Music21Object(object):
         >>> n = c[2][4][2]
         >>> n
         <music21.note.Note G#>
+        
         >>> for y in n.contextSites():
         ...      print(y)
         (<music21.stream.Measure 3 offset=9.0>, 0.5, 'elementsFirst')
@@ -2193,7 +2178,6 @@ class Music21Object(object):
         '''
         Set the duration as a quarterNote length
         '''
-        
         replacingDuration = False if self._duration is None else True
             
         try:
@@ -2267,7 +2251,7 @@ class Music21Object(object):
         following notes (by being processed second).
 
         Default priority is 0; thus negative priorities are encouraged
-        to have Elements that appear non-priority set elements.
+        to have Elements that appear before non-priority set elements.
 
         In case of tie, there are defined class sort orders defined in
         `music21.base.classSortOrder`.  For instance, a key signature
@@ -2357,7 +2341,8 @@ class Music21Object(object):
         if fmt is None: # get setting in environment
             if common.runningUnderIPython():
                 try:
-                    # TODO: when everyone has updated, then remove these lines... do around January 2016
+                    # TODO: when everyone has updated, then remove these lines... 
+                    #       do around January 2016
                     if 'vexflow' in environLocal['ipythonShowFormat']:
                         environLocal['ipythonShowFormat'] = 'ipython.lilypond.png'
                         environLocal.write()
@@ -2379,7 +2364,11 @@ class Music21Object(object):
 
         scClass = common.findSubConverterForFormat(regularizedConverterFormat)
         formatWriter = scClass()
-        return formatWriter.show(self, regularizedConverterFormat, app=app, subformats=subformats, **keywords)
+        return formatWriter.show(self, 
+                                 regularizedConverterFormat, 
+                                 app=app, 
+                                 subformats=subformats, 
+                                 **keywords)
 
     #--------------------------------------------------------------------------
     # duration manipulation, processing, and splitting
@@ -2436,8 +2425,12 @@ class Music21Object(object):
 
 
 
-    def splitAtQuarterLength(self, quarterLength, retainOrigin=True,
-        addTies=True, displayTiedAccidentals=False, delta=1e-06):
+    def splitAtQuarterLength(self, 
+                             quarterLength, 
+                             retainOrigin=True,
+                             addTies=True, 
+                             displayTiedAccidentals=False, 
+                             delta=1e-06):
         '''
         Split an Element into two Elements at a provided
         `quarterLength` (offset) into the Element.
@@ -2646,8 +2639,10 @@ class Music21Object(object):
         else:
             return [e, None]
 
-    def splitByQuarterLengths(self, quarterLengthList, addTies=True,
-        displayTiedAccidentals=False):
+    def splitByQuarterLengths(self, 
+                              quarterLengthList, 
+                              addTies=True,
+                              displayTiedAccidentals=False):
         '''
         Given a list of quarter lengths, return a list of
         Music21Object objects, copied from this Music21Object,

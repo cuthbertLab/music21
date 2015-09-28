@@ -34,9 +34,6 @@ cov = coverageM21.getCoverage()
 
 
 
-
-
-
 def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None):
     '''Run all tests. Group can be test and external
 
@@ -49,7 +46,8 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None):
     s1 = doctest.DocTestSuite(
         __name__,
         globs=globs,
-        optionflags=docTestOptions
+        optionflags=docTestOptions,
+        checker=testRunner.Py3In2OutputChecker()
         )
 
     modGather = commonTest.ModuleGather()
@@ -92,6 +90,7 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None):
                 module,
                 globs=globs,
                 optionflags=docTestOptions,
+                checker=testRunner.Py3In2OutputChecker(),
                 )
             s1.addTests(s3)
         except ValueError:
@@ -99,7 +98,11 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None):
             continue
         
         allLocals = [getattr(module, x) for x in dir(module)]
-        testRunner.addDocAttrTestsToSuite(s1, allLocals, outerFilename=module.__file__, globs=globs, optionflags=docTestOptions)
+        testRunner.addDocAttrTestsToSuite(s1, 
+                                          allLocals, 
+                                          outerFilename=module.__file__, 
+                                          globs=globs, 
+                                          optionflags=docTestOptions)
     
     testRunner.fixTestsForPy2and3(s1)
     
