@@ -590,6 +590,20 @@ class Music21Object(object):
         
         TO BE DEPRECATED -- slowest of all methods... only kept
         because supporting a list of strings or classes is nice.
+        
+        >>> n = note.Note()
+        >>> n.isClassOrSubclass(('Note',))
+        True
+        >>> n.isClassOrSubclass(('GeneralNote',))
+        True
+        >>> n.isClassOrSubclass((note.Note,))
+        True
+        >>> n.isClassOrSubclass((note.Rest,))
+        False
+        >>> n.isClassOrSubclass((note.Note,note.Rest))
+        True
+        >>> n.isClassOrSubclass(('Rest','Note'))
+        True
         '''
         return not self.classSet.isdisjoint(classFilterList)
         
@@ -700,6 +714,19 @@ class Music21Object(object):
         
         >>> object in n.classSet
         True
+        
+        >>> sorted([s for s in n.classSet if isinstance(s, str)])
+        ['GeneralNote', 'Music21Object', 'NotRest', 'Note', '....object', 
+         'music21.base.Music21Object', 'music21.note.GeneralNote', 'music21.note.NotRest', 
+         'music21.note.Note', 'object']
+         
+        >>> sorted([s for s in n.classSet if not isinstance(s, str)], key=lambda x: x.__name__)
+        [<class 'music21.note.GeneralNote'>, 
+         <class 'music21.base.Music21Object'>, 
+         <class 'music21.note.NotRest'>, 
+         <class 'music21.note.Note'>, 
+         <... 'object'>]
+        
     ''')
 
     #---------------------------
@@ -1222,7 +1249,7 @@ class Music21Object(object):
                 verticality = ts.getVerticalityAt(offsetStart).previousVerticality
             if verticality is not None:
                 element = extractElementFromVerticality(verticality)
-                if element is not None and any(c in element.classSet for c in className):
+                if element is not None and element.isClassOrSubclass(className):
                     # latter should not be necessary...
                     return element
             return None
@@ -1247,7 +1274,7 @@ class Music21Object(object):
             className = (className,)
 
         for site, offsetStart, searchType in self.contextSites(sortByCreationTime=sortByCreationTime):
-            if any(c in site.classSet for c in className):
+            if site.isClassOrSubclass(className):
                 return site
             if searchType == 'elementsOnly' or searchType == 'elementsFirst':
                 tsNotFlat = site.asTimespans(classList=className, recurse=False)

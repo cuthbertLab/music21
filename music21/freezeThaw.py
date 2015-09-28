@@ -1150,7 +1150,6 @@ class JSONFreezeThawBase(object):
         '''
         return a fullyQualified class name from an object.
 
-
         >>> d = duration.Duration()
         >>> jsbase = freezeThaw.JSONFreezeThawBase()
         >>> jsbase.fullyQualifiedClassFromObject(d)

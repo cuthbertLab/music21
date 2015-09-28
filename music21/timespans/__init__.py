@@ -272,7 +272,7 @@ def streamToTimespanTree(
     True
     '''
     if classList is None:
-        classList = ((note.Note, chord.Chord), )
+        classList = (note.Note, chord.Chord)
     classLists = [classList]
     listOfTimespanTrees = listOfTimespanTreesByClass(inputStream, 
                                         initialOffset=0., 

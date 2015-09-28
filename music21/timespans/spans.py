@@ -312,6 +312,9 @@ class ElementTimespan(object):
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
         >>> verticality = tree.getVerticalityAt(0)
+        >>> verticality
+        <Verticality 0 {A3 E4 C#5}>
+        
         >>> timespan = verticality.startTimespans[0]
         >>> timespan
         <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
