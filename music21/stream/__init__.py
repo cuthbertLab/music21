@@ -918,6 +918,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if shiftOffsets is True:
                     matchOffset = self.elementOffset(match)
 
+                try:
+                    del self._offsetDict[id(match)]
+                except KeyError:
+                    pass
                 self.elementsChanged(clearIsSorted=False)
                 match.sites.remove(self)
                 match.activeSite = None
@@ -967,12 +971,47 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             post = self._endElements.pop(index - eLen)
 
         self.elementsChanged(clearIsSorted=False)
-        # remove self from locations here only if
-        # there are no further locations
+
+        try:
+            del self._offsetDict[id(post)]
+        except KeyError:
+            pass
+
         post.sites.remove(self)
         post.activeSite = None
         return post
 
+
+    def _removeIteration(self, streamIterator):
+        '''
+        helper method to remove different kinds of elements.
+        '''
+        popDict = {'_elements': [],
+                   '_endElements': []
+                   }
+        for unused_el in streamIterator:
+            ai = streamIterator.activeInformation
+            popDict[ai['iterSection']].append(ai['sectionIndex'])
+
+        # do not pop while iterating...
+        
+        for section in popDict:
+            sectionList = getattr(self, section) # _elements or _endElements
+            popList = popDict[section]
+            for popIndex in reversed(popList):
+                removeElement = sectionList.pop(popIndex)
+                try:
+                    del self._offsetDict[id(removeElement)]
+                except KeyError:
+                    pass
+
+                removeElement.sites.remove(self) # to-do to make recursive, store a tuple of
+                    # active sites and index
+                removeElement.activeSite = None
+
+        # call elements changed once; sorted arrangement has not changed
+        self.elementsChanged(clearIsSorted=False)
+        return  
 
     def removeByClass(self, classFilterList):
         '''
@@ -992,43 +1031,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(s.notes)
         0
         '''
-#         for el in reversed(self.iter.getElementsByClass(classFilterList)):
-#             # this may be slow; O(n*k) where n is 
-#             if el.sortTuple().atEnd == 0:
-#                 self._elements.pop(self._elements.index(el))
-#             else:
-#                 self._endElements.pop(self._endElements.index(el))
-        
-        if not common.isListLike(classFilterList):
-            classFilterList = [classFilterList]
-        # process main elements
-        indexList = []
-        count = 0
-        #for i, e in enumerate(self._elements):
-        for e in self._elements:
-            if e.isClassOrSubclass(classFilterList):
-                indexList.append(count)
-            count += 1
-        for i in reversed(indexList):
-            post = self._elements.pop(i)
-            post.sites.remove(self)
-            post.activeSite = None
-
-        # process end elements
-        indexList = []
-        count = 0
-        #for i, e in enumerate(self._endElements):
-        for e in self._endElements:
-            if e.isClassOrSubclass(classFilterList):
-                indexList.append(count)
-            count += 1
-        for i in reversed(indexList):
-            post = self._endElements.pop(i)
-            post.sites.remove(self)
-            post.activeSite = None
-
-        # call elements changed once; sorted arrangement has not changed
-        self.elementsChanged(clearIsSorted=False)
+        elFilter = self.iter.getElementsByClass(classFilterList)
+        return self._removeIteration(elFilter)
 
 
     def removeByNotOfClass(self, classFilterList):
@@ -6364,7 +6368,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         
         >>> sRecurse = s.recurse()
         >>> sRecurse
-        <music21.stream.iterator.RecursiveIterator object at 0x...>
+        <music21.stream.iterator.RecursiveIterator for Score:mainScore @:0>
         
         So, that's not how we use `.recurse()`.  Instead use it in a for loop:
         

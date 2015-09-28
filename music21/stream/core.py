@@ -157,10 +157,13 @@ class StreamCoreMixin(object):
         if memo is None:
             memo = []
         memo.append(id(self))
+        
         # if this Stream is a flat representation of something, and its
         # elements have changed, than we must clear the cache of that
         # ancestor; we can do that by calling elementsChanged on
         # the derivation.orgin
+        
+        # is this true???
         if self._derivation is not None and self._derivation.method in ('flat', 'semiflat'):
             origin = self._derivation.origin
             origin.elementsChanged(memo=memo)

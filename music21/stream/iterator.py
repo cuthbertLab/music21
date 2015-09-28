@@ -49,8 +49,8 @@ class StreamIterator(object):
       about where we are in the parse.  Especially useful for recursive
       streams. 'stream' = the stream that is currently active, 'index'
       where in `.elements` we are, `iterSection` is `_elements` or `_endElements`,
-      and `endElementsIndex` is where we are in the _endElements, or -1 if
-      we are not there. This dict is shared among all sub iterators.
+      and `sectionIndex` is where we are in the iterSection, or -1 if
+      we have not started. This dict is shared among all sub iterators.
 
     '''
     def __init__(self, 
@@ -68,7 +68,7 @@ class StreamIterator(object):
         
         # this information can help a 
         self.elementsLength = len(self.srcStream._elements)
-        self.endElementsIndex = -1
+        self.sectionIndex = -1
         self.iterSection = '_elements'
         
         self.cleanupOnStop = False
@@ -114,7 +114,7 @@ class StreamIterator(object):
                 )
 
     def __iter__(self):
-        self._reset()
+        self.reset()
         return self
         
         
@@ -122,7 +122,9 @@ class StreamIterator(object):
         while self.index < self.streamLength:                    
             if self.index >= self.elementsLength:
                 self.iterSection = '_endElements'
-                self.endElementsIndex = self.index - self.elementsLength
+                self.sectionIndex = self.index - self.elementsLength
+            else:
+                self.sectionIndex = self.index
             
             self.index += 1 # increment early in case of an error.
             
@@ -165,8 +167,8 @@ class StreamIterator(object):
         '''
         if self._len is not None:
             return self._len
-        
         self._len = len(self.matchingElements())
+        self.reset()
         return self._len
 
 
@@ -185,14 +187,13 @@ class StreamIterator(object):
         ai['stream'] = self.srcStream
         ai['index'] = self.index - 1
         ai['iterSection'] = self.iterSection
-        ai['endElementsIndex'] = self.endElementsIndex
+        ai['sectionIndex'] = self.index - 1
 
-    def _reset(self):
+    def reset(self):
         '''
         reset prior to iteration
         '''
         self.index = 0
-        self.endElementsIndex = -1
         self.iterSection = '_elements'
         self.updateActiveInformation()
 
@@ -211,7 +212,7 @@ class StreamIterator(object):
         stop iteration; and cleanup if need be.
         '''
         if self.cleanupOnStop is not False:
-            self._reset()
+            self.reset()
 
             del self.srcStream
             del self.srcStreamElements
@@ -266,9 +267,12 @@ class StreamIterator(object):
         
         me = [x for x in self]
         
+        self.reset()
+        
         self.index = savedIndex
         self.restoreActiveSites = savedRestoreActiveSites        
         self._matchingElements = me
+
         return me
 
 
@@ -886,13 +890,21 @@ class RecursiveIterator(StreamIterator):
                                                 filters, 
                                                 restoreActiveSites,
                                                 activeInformation=activeInformation)
+        self.returnSelf = includeSelf
         self.includeSelf = includeSelf
         if streamsOnly is True:
             self.filters.append(filter.ClassFilter('Stream'))
         self.recursiveIterator = None
         # not yet used.
         #self.parentIterator = None
-        
+
+    def reset(self):
+        '''
+        reset prior to iteration
+        '''
+        self.returnSelf = self.includeSelf
+        super(RecursiveIterator, self).reset()
+    
     def __next__(self):
 
         while self.index < self.streamLength:
@@ -908,16 +920,20 @@ class RecursiveIterator(StreamIterator):
                     #self.recursiveIterator.parentIterator = None
                     self.recursiveIterator = None
                     
-            if self.index == 0 and self.includeSelf is True and self.matchesFilters(self.srcStream):
-                self.includeSelf = False
+            if self.returnSelf is True and self.matchesFilters(self.srcStream):
                 self.activeInformation['stream'] = None
                 self.activeInformation['index'] = -1
+                self.returnSelf = False
                 return self.srcStream
+            elif self.returnSelf is True:
+                self.returnSelf = False
+                
 
             if self.index >= self.elementsLength:
                 self.iterSection = '_endElements'
-                self.endElementsIndex = self.index - self.elementsLength
-
+                self.sectionIndex = self.index - self.elementsLength
+            else:
+                self.sectionIndex = self.index
             
             self.index += 1 # increment early in case of an error in the next try.
         

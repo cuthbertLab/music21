@@ -5738,20 +5738,22 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('bwv66.6')
         # default
-        rElements = list(s.recurse())
+        rElements = list(s.recurse()) # NOTE: list(s.recurse()) 
+            # removes self, while [x for x in s.recurse()] does not.
+        self.assertTrue(s in rElements)
         self.assertEqual(len(rElements), 240)
+        return
 
         rElements = list(s.recurse(streamsOnly=True))
         self.assertEqual(len(rElements), 45)
 
-        s1 = rElements[0]
         p1 = rElements[1]
         m1 = rElements[2]
         #m2 = rElements[3]
         m2 = rElements[4]
-        self.assertEqual(id(p1.activeSite), id(s1))
-        self.assertEqual(id(m1.activeSite), id(p1))
-        self.assertEqual(id(m2.activeSite), id(p1))
+        self.assertIs(p1.activeSite, s)
+        self.assertIs(m1.activeSite, p1)
+        self.assertIs(m2.activeSite, p1)
 
 
         rElements = list(s.recurse(classFilter='KeySignature'))
@@ -7479,7 +7481,7 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     import music21
     #'testContextNestedC'
-    music21.mainTest(Test, 'verbose') #, runTest='testAnalyze')
+    music21.mainTest(Test, 'verbose') #, runTest='testRecurseA')
 
 #------------------------------------------------------------------------------
 # eof
