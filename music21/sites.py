@@ -245,6 +245,30 @@ class Sites(common.SlottedObject):
 
         '''
         return len(self.siteDict)
+    
+    def __contains__(self, checkSite):
+        '''
+        returns True if checkSite in Sites.
+        
+        >>> m1 = stream.Measure(number=1)
+        >>> m2 = stream.Measure(number=2)
+        >>> n = note.Note()
+        >>> m1.append(n)
+        >>> m1 in n.sites
+        True
+        >>> m2 in n.sites
+        False
+        
+        None is always in sites
+        
+        >>> None in n.sites
+        True
+        '''
+        for unused_siteRefId, siteRef in self.siteDict.items():
+            if siteRef.site is checkSite:
+                return True
+        return False
+            
 
     ### PRIVATE METHODS ###
 

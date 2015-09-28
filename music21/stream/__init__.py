@@ -1067,38 +1067,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #if classFilterList == []:
         #    classFilterList = ['Music21Object']
         elFilter = self.iter.getElementsNotOfClass(classFilterList)
-        return self._removeIteration(elFilter)
-    
-        if not common.isListLike(classFilterList):
-            classFilterList = [classFilterList]
-        # process main elements
-        indexList = []
-        count = 0
-        #for i, e in enumerate(self._elements):
-        for e in self._elements:
-            if not e.isClassOrSubclass(classFilterList):
-                indexList.append(count)
-            count += 1
-        for i in reversed(indexList):
-            post = self._elements.pop(i)
-            post.sites.remove(self)
-            post.activeSite = None
-
-        # process end elements
-        indexList = []
-        count = 0
-        #for i, e in enumerate(self._endElements):
-        for e in self._endElements:
-            if not e.isClassOrSubclass(classFilterList):
-                indexList.append(count)
-            count += 1
-        for i in reversed(indexList):
-            post = self._endElements.pop(i)
-            post.sites.remove(self)
-            post.activeSite = None
-
-        # call elements changed once; sorted arrangement has not changed
-        self.elementsChanged(clearIsSorted=False)
+        return self._removeIteration(elFilter)    
 
 
     def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
@@ -1812,15 +1781,29 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     #---------------------------------------------------------------------------
     # searching and replacing routines
 
-    def replace(self, target, replacement, firstMatchOnly=False,
-                 allTargetSites=True):
+    def replace(self, 
+                target, 
+                replacement, 
+                firstMatchOnly=False,
+                allDerived=True):
         '''
         Given a `target` object, replace all references of that object with
         references to the supplied `replacement` object.
 
-        If `allTargetSites` is True (as it is by default), all sites that
+        If `allDerived` is True (as it is by default), all sites that
         have a reference for the replacement will be similarly changed.
         This is useful for altering both a flat and nested representation.
+        
+        allTargetSites RENAMED to allDerived -- only searches in derivation chain.
+        
+        
+        >>> n = note.Note("C#4")
+        >>> s = stream.Stream()
+        >>> s.insert(0, n)
+        >>> m = note.Note("D-4")
+        >>> s.replace(n, m)
+        >>> s.show('t')
+        {0.0} <music21.note.Note D->
         '''
         if target is None:
             raise StreamException('received a target of None as a candidate for replacement.')
@@ -1852,12 +1835,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # elements have changed: sort order may change b/c have diff classes
         self.elementsChanged(updateIsFlat=updateIsFlat)
 
-        if allTargetSites:
-            for site in target.sites.getSites():
-                # each site must be a Stream
-                if site is None or site is self:
-                    continue
-                site.replace(target, replacement, firstMatchOnly=firstMatchOnly)
+        if allDerived:
+            for derivedSite in self.derivation.chain():
+                for subsite in derivedSite.recurse(streamsOnly=True, skipSelf=False):
+                    if subsite in target.sites:
+                        subsite.replace(target, 
+                                            replacement, 
+                                            firstMatchOnly=firstMatchOnly, 
+                                            allDerived=False)
 
     def splitAtQuarterLength(self, quarterLength, retainOrigin=True,
         addTies=True, displayTiedAccidentals=False, searchContext=True,
@@ -4035,6 +4020,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
         >>> qj = corpus.parse('ciconia/quod_jactatur').parts[0].measures(1,2)
+        >>> qj.id = 'measureExcerpt'
+
         >>> qj.show('text')
         {0.0} <music21.instrument.Instrument P1: MusicXML Part: Grand Piano>
         {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -4049,8 +4036,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             {0.5} <music21.note.Note D>
             {1.0} <music21.note.Note C>
             {1.5} <music21.note.Note D>
-        >>> k1 = qj.flat.getElementsByClass(key.KeySignature)[0]
-        >>> qj.flat.replace(k1, key.KeySignature(-3))
+        >>> qjflat = qj.flat
+        >>> k1 = qjflat.getElementsByClass(key.KeySignature)[0]
+        >>> k3flats = key.KeySignature(-3)
+        >>> qjflat.replace(k1, k3flats, allDerived=True)
         >>> qj.getElementsByClass(stream.Measure)[1].insert(0, key.KeySignature(5))
         >>> qj2 = qj.invertDiatonic(note.Note('F4'), inPlace=False)
         >>> qj2.show('text')

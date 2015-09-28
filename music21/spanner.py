@@ -503,10 +503,10 @@ class Spanner(base.Music21Object):
             if e is not None:
                 #environLocal.printDebug(['Spanner.replaceSpannedElement:', 'old', e, 'new', new])
                 # do not do all Sites: only care about this one
-                self.spannerStorage.replace(e, new, allTargetSites=False)
+                self.spannerStorage.replace(e, new, allDerived=False)
         else:
             # do not do all Sites: only care about this one
-            self.spannerStorage.replace(old, new, allTargetSites=False)
+            self.spannerStorage.replace(old, new, allDerived=False)
             #environLocal.printDebug(['Spanner.replaceSpannedElement:', 'old', e, 'new', new])
 
         # while this Spanner now has proper elements in its spannerStorage Stream, the element replaced likely has a site left-over from its previous Spanner

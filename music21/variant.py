@@ -1934,10 +1934,10 @@ class Variant(base.Music21Object):
             # this must be id(obj), not obj.id
             e = self._stream._getElementByObjectId(old)
             if e is not None:
-                self._stream.replace(e, new, allTargetSites=False)
+                self._stream.replace(e, new, allDerived=False)
         else:
             # do not do all Sites: only care about this one
-            self._stream.replace(old, new, allTargetSites=False)
+            self._stream.replace(old, new, allDerived=False)
 
 
     #---------------------------------------------------------------------------

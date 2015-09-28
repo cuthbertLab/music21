@@ -7483,14 +7483,43 @@ class Test(unittest.TestCase):
             if 'Measure' in x.classes:
                 self.assertEqual(len(x), 0)
 
+    def testReplaceDerivated(self):
+        from music21 import corpus
+        qj = corpus.parse('ciconia/quod_jactatur').parts[0].measures(1,2)
+        qj.id = 'measureExcerpt'
+
+        qjflat = qj.flat
+        dc = list(qjflat.derivation.chain())        
+        self.assertIs(dc[0], qj)
+
+        k1 = qjflat.getElementsByClass(key.KeySignature)[0]
+        self.assertEqual(k1.sharps, -1)
+        k3flats = key.KeySignature(-3)
+
+        # put k1 in an unrelated site:
+        mUnrelated = Measure()
+        mUnrelated.insert(0, k1)
+
+        # here's the big one
+        qjflat.replace(k1, k3flats, allDerived=True)
         
+        kWhich = qjflat.getElementsByClass(key.KeySignature)[0]
+        self.assertIs(kWhich, k3flats)
+        self.assertEqual(kWhich.sharps, -3)
+        
+        kWhich2 = qj.recurse().getElementsByClass(key.KeySignature)[0]
+        self.assertIs(kWhich2, k3flats)
+        self.assertEqual(kWhich2.sharps, -3)
+
+        # check that unrelated is untouched
+        self.assertIs(mUnrelated[0], k1)
 
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
     import music21
     #'testContextNestedC'
-    music21.mainTest(Test, 'verbose', runTest='testMeasureTemplateAll')
+    music21.mainTest(Test, 'verbose') #, runTest='testReplaceDerivated')
 
 #------------------------------------------------------------------------------
 # eof
