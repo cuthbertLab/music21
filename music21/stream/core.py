@@ -265,12 +265,10 @@ class StreamCoreMixin(object):
         if checkRedundancy:
             # TODO: might optimize this by storing a list of all obj ids with every insertion and deletion
             idElement = id(element)
-            for e in self._elements:
-                if idElement == id(e):
-                    raise StreamException('the object (%s, id()=%s) is already found in this Stream (%s, id()=%s)' % (element, id(element), self, id(self)))
-            for e in self._endElements:
-                if idElement == id(e):
-                    raise StreamException('the object (%s, id()=%s) is already found in this Stream (%s, id()=%s)' % (element, id(element), self, id(self)))
+            if idElement in self._offsetDict:
+                raise StreamException(
+                    'the object (%s, id()=%s) is already found in this Stream (%s, id()=%s)' % (
+                                                            element, id(element), self, id(self)))
         # if we do not purge locations here, we may have ids() for
         # Stream that no longer exist stored in the locations entry
         # note that dead locations are also purged from .sites during

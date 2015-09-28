@@ -457,6 +457,15 @@ class StreamIterator(object):
         
         return found
     
+    @property
+    def activeElementList(self):
+        '''
+        returns the element list ('_elements' or '_endElements')
+        for the current activeInformation
+        '''
+        return getattr(self.activeInformation['stream'], self.activeInformation['iterSection'])
+    
+    
     #-------------------------------------------------------------
     def addFilter(self, newFilter):
         '''
@@ -471,6 +480,16 @@ class StreamIterator(object):
             
         self.resetCaches()
         return self
+    
+    def removeFilter(self, oldFilter):
+        if oldFilter in self.filters:
+            self.filters.pop(self.filters.index(oldFilter))
+    
+        self.resetCaches()
+        return self
+    
+    
+    
     
     def getElementsByClass(self, classFilterList):
         '''

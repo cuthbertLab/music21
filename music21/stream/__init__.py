@@ -789,7 +789,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         raise StreamException('cannot find object (%s) in Stream' % obj)
 
 
-    def remove(self, targetOrList, firstMatchOnly=True, shiftOffsets=False, recurse=False): 
+    def remove(self, 
+               targetOrList, 
+               firstMatchOnly=True, 
+               shiftOffsets=False, 
+               recurse=False): 
         '''
         Remove an object from this Stream. Additionally, this Stream is
         removed from the object's sites in :class:`~music21.sites.Sites`.
@@ -874,6 +878,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             {0.0} <music21.note.Note C>
 
         '''
+        # TODO: Next to clean up... a doozy -- filter out all the different options.
+        
         # TODO: Add a renumber measures option
         # TODO: Shift offsets if recurse is True
         if shiftOffsets is True and recurse is True:
@@ -1393,12 +1399,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         '''
         # could use duration of Note to get end offset span
-        match = self.getElementsByOffset(offset,
+        targets = list(self.iter.getElementsByOffset(offset,
                 offset + noteOrChord.quarterLength, # set end to dur of supplied
                 includeEndBoundary=False,
                 mustFinishInSpan=False, 
-                mustBeginInSpan=True)
-        targets = match.notesAndRests
+                mustBeginInSpan=True).notesAndRests)
         removeTarget = None
         #environLocal.printDebug(['insertIntoNoteOrChord', [e for e in targets]])
         if len(targets) == 1:
@@ -1784,7 +1789,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def replace(self, 
                 target, 
                 replacement, 
-                firstMatchOnly=False,
+                recurse=False,
                 allDerived=True):
         '''
         Given a `target` object, replace all references of that object with
@@ -1794,55 +1799,94 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         have a reference for the replacement will be similarly changed.
         This is useful for altering both a flat and nested representation.
         
+        firstMatchOnly did NOTHING because each element can only be in a site ONCE.
+        Removed!
+        
         allTargetSites RENAMED to allDerived -- only searches in derivation chain.
         
         
-        >>> n = note.Note("C#4")
+        >>> csharp = note.Note("C#4")
         >>> s = stream.Stream()
-        >>> s.insert(0, n)
-        >>> m = note.Note("D-4")
-        >>> s.replace(n, m)
+        >>> s.insert(0, csharp)
+        >>> dflat = note.Note("D-4")
+        >>> s.replace(csharp, dflat)
         >>> s.show('t')
         {0.0} <music21.note.Note D->
+        
+        If allDerived is True then all streams that this stream comes from get changed 
+        (but not non-derived streams)
+        
+        >>> otherStream = stream.Stream()
+        >>> otherStream.insert(0, dflat)
+        >>> f = note.Note('F4')
+        >>> sf = s.flat
+        >>> sf is not s
+        True
+        >>> sf.replace(dflat, f, allDerived=True)
+        >>> sf[0] is f
+        True
+        >>> s[0] is f
+        True
+        >>> otherStream[0] is dflat
+        True
+        
+        OMIT_FROM_DOCS
+        
+        Yes, you can recurse, but not showing it yet... gotta find a good general form...
+        and figure out how to make it work properly with allDerived
+        
+        >>> s = stream.Score()
+        >>> p = stream.Part()
+        >>> s.append(p)
+        >>> m = stream.Measure()
+        >>> p.append(m)
+        >>> csharp = note.Note("C#4")
+        >>> m.append(csharp)
+        >>> s.show('t')
+        {0.0} <music21.stream.Part 0x109842f98>
+            {0.0} <music21.stream.Measure 0 offset=0.0>
+                {0.0} <music21.note.Note C#>
+                        
+        >>> dflat = note.Note("D-4")
+        >>> s.replace(csharp, dflat, recurse=True)
+        >>> s.show('t')
+        {0.0} <music21.stream.Part 0x109842f98>
+            {0.0} <music21.stream.Measure 0 offset=0.0>
+                {0.0} <music21.note.Note D->        
         '''
         if target is None:
             raise StreamException('received a target of None as a candidate for replacement.')
-        try:
-            i = self.index(target)
-        except StreamException:
-            return  # do nothing if no match
-
-        eLen = len(self._elements)
-        if i < eLen:
-            target = self._elements[i] # target may have been obj id; reclassing
-            self._elements[i] = replacement
-            # place the replacement at the old objects offset for this site
-            self.setElementOffset(replacement, self.elementOffset(target))
-            replacement.sites.add(self)
+        if recurse is False:
+            iterator = self.iter
         else:
-            # target may have been obj id; reassign
-            target = self._endElements[i - eLen]
-            self._endElements[i - eLen] = replacement
-            self.setElementOffset(replacement, 'highestTime')
-            replacement.sites.add(self)
+            iterator = self.recurse()
+        iterator.addFilter(filter.IsFilter(target))
 
-        target.sites.remove(self)
-        target.activeSite = None
+        for el in iterator:
+            # el should be target...
+            index = iterator.activeInformation['sectionIndex']
+            activeStream = iterator.activeInformation['stream']
+            elementList = iterator.activeElementList
+            elementList[index] = replacement
+            activeStream.setElementOffset(replacement, 
+                                          activeStream.elementOffset(el, stringReturns=True))
+            replacement.sites.add(activeStream)
+            el.sites.remove(activeStream)
+            el.activeSite = None
 
-        updateIsFlat = False
-        if replacement.isStream:
-            updateIsFlat = True
-        # elements have changed: sort order may change b/c have diff classes
-        self.elementsChanged(updateIsFlat=updateIsFlat)
+            updateIsFlat = False
+            if replacement.isStream:
+                updateIsFlat = True
+            # elements have changed: sort order may change b/c have diff classes
+            activeStream.elementsChanged(updateIsFlat=updateIsFlat)
 
         if allDerived:
             for derivedSite in self.derivation.chain():
                 for subsite in derivedSite.recurse(streamsOnly=True, skipSelf=False):
                     if subsite in target.sites:
                         subsite.replace(target, 
-                                            replacement, 
-                                            firstMatchOnly=firstMatchOnly, 
-                                            allDerived=False)
+                                        replacement, 
+                                        allDerived=False)
 
     def splitAtQuarterLength(self, quarterLength, retainOrigin=True,
         addTies=True, displayTiedAccidentals=False, searchContext=True,
@@ -2156,28 +2200,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         1
         >>> c[0].name
         'B-'
-
         '''
+        iterator = self.iter
         if classFilter is not None:
-            if not common.isListLike(classFilter):
-                classFilter = (classFilter,)
-
-        for e in self._elements:
-            if classFilter is None:
-                e.groups.append(group)
-            else:
-                if e.isClassOrSubclass(classFilter):
-                    e.groups.append(group)
-        for e in self._endElements:
-            if classFilter is None:
-                e.groups.append(group)
-            else:
-                if e.isClassOrSubclass(classFilter):
-                    e.groups.append(group)
+            iterator.addFilter(filter.ClassFilter(classFilter))
+        for el in iterator:
+            el.groups.append(group)
 
 
     #---------------------------------------------------------------------------
-    # getElementsByX(self): anything that returns a collection of Elements should return a Stream
+    # getElementsByX(self): anything that returns a collection of Elements 
+    #  formerly always returned a Stream; turning to Iterators in September 2015
 
     def getElementsByClass(self, classFilterList, returnStreamSubClass=True):
         '''
@@ -2334,20 +2367,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return self.iter.getElementsByGroup(
                     groupFilterList).stream()
                     
-
-    @common.deprecated("September 2015", "February 2016", "use s.elementOffset() instead w/ a try/except")
-    def getOffsetByElement(self, obj):
-        '''
-        DEPRECATED Sep 2015: use s.elementOffset(obj) and if it is possible that
-        obj is not in s, then do a try: except base.SitesException
-        
-        Remove in 2016 Feb.
-        '''
-        try:
-            return self.elementOffset(obj)
-        except base.SitesException:
-            return None
-
 
     def getElementById(self, elementId, classFilter=None):
         '''
@@ -2603,89 +2622,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             iterator.getElementsByClass(classList)
         return iterator.stream()
 
-        offsetStart = opFrac(offsetStart)
-        if offsetEnd is None:
-            offsetEnd = offsetStart
-            zeroLengthSearch = True
-        else:
-            offsetEnd = opFrac(offsetEnd)
-            if offsetEnd > offsetStart:
-                zeroLengthSearch = False
-            else:
-                zeroLengthSearch = True
-
-        found = self.__class__()
-        found.derivation.origin = self
-        found.derivation.method = 'getElementsByOffset'
-
-        # need both _elements and _endElements
-        for e in self.elements:
-            if classList is not None:
-                if not e.isClassOrSubclass(classList):
-                    continue
-                
-            dur = e.duration
-            offset = self.elementOffset(e)
-            #offset = common.cleanupFloat(offset)
-
-            if offset > offsetEnd:  # anything that ends after the span is definitely out
-                if self.isSorted:
-                    # if sorted, optimize by breaking after exceeding offsetEnd
-                    # eventually we could do a binary search to speed up...
-                    break
-                else:
-                    continue
-
-            elementEnd = opFrac(offset + dur.quarterLength)
-            if dur.quarterLength == 0:
-                elementIsZeroLength = True
-            else:
-                elementIsZeroLength = False
-
-            if elementEnd < offsetStart:  # anything that finishes before the span ends is definitely out
-                continue
-
-            # all the simple cases done! Now need to filter out those that are border cases depending on settings
-
-            if zeroLengthSearch is True and elementIsZeroLength is True:
-                # zero Length Searches -- include all zeroLengthElements
-                found._insertCore(offset, e)
-                continue
-
-
-            if mustFinishInSpan is True:
-                if elementEnd > offsetEnd:
-                    #environLocal.warn([elementEnd, offsetEnd, e])
-                    continue
-                if includeEndBoundary is False:
-                    # we include the end boundary if the search is zeroLength -- otherwise nothing can be retrieved
-                    if elementEnd == offsetEnd:
-                        continue
-
-            if mustBeginInSpan is True:
-                if offset < offsetStart:
-                    continue
-                if includeEndBoundary is False:
-                    if offset >= offsetEnd:
-                        # >= is unnecessary, should just be ==, but better safe than sorry
-                        continue
-
-            if mustBeginInSpan is False:
-                if elementIsZeroLength is False:
-                    if elementEnd == offsetEnd and zeroLengthSearch is True:
-                        continue
-            if includeEndBoundary is False:
-                if offset >= offsetEnd:
-                    continue
-
-            if includeElementsThatEndAtStart is False and elementEnd == offsetStart:
-                continue
-
-            found._insertCore(offset, e)
-
-        found.elementsChanged()
-        return found
-
 
     def getElementAtOrBefore(self, offset, classList=None):
         '''
@@ -2923,8 +2859,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         check to make sure that the element is an instance of the class list
 
         >>> st1 = stream.Stream()
-        >>> n1 = note.Note()
-        >>> n2 = note.Note()
+        >>> n1 = note.Note('C4')
+        >>> n2 = note.Note('D4')
         >>> r3 = note.Rest()
         >>> st1.append([n1, n2, r3])
         >>> t2 = st1.getElementAfterElement(n1)
@@ -2936,38 +2872,54 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> t4 = st1.getElementAfterElement(t3)
         >>> t4
 
-        >>> st1.getElementAfterElement("hi")
-        Traceback (most recent call last):
-        StreamException: ...
+        >>> st1.getElementAfterElement("hi") is None
+        True
+        
         >>> t5 = st1.getElementAfterElement(n1, [note.Rest])
+        >>> t5
+        <music21.note.Rest rest>
         >>> t5 is r3
         True
         >>> t6 = st1.getElementAfterElement(n1, [note.Rest, note.Note])
         >>> t6 is n2
         True
+
+        >>> t7 = st1.getElementAfterElement(r3)
+        >>> t7 is None
+        True
+        '''
+        iterator = self.iter
+        isFilter = filter.IsFilter(element)
+        iterator.addFilter(isFilter)
+
+        foundElement = False
+        for x in iterator:
+            if foundElement is True:
+                return x # it is the element after
+            else:
+                foundElement = True
+                iterator.removeFilter(isFilter)
+                # now add the filter...
+                if classList is not None:
+                    iterator.addFilter(filter.ClassFilter(classList))
+
+        return None
+
+    #-----------------------------------------------------
+    # end .getElement filters
+    
+    
+    @common.deprecated("September 2015", "February 2016", "use s.elementOffset() instead w/ a try/except")
+    def getOffsetByElement(self, obj):
+        '''
+        DEPRECATED Sep 2015: use s.elementOffset(obj) and if it is possible that
+        obj is not in s, then do a try: except base.SitesException
+        
+        Remove in 2016 Feb.
         '''
         try:
-            # index() ultimately does an autoSort check, so no check here or
-            # sorting is necessary
-            elPos = self.index(element)
-        except ValueError:
-            raise StreamException("Could not find element in index")
-
-        # store once as a property call concatenates
-        elements = self.elements
-        if classList is None:
-            if elPos == len(elements) - 1:
-                return None
-            else:
-                e = elements[elPos + 1]
-                e.activeSite = self
-                return e
-        else:
-            for i in range(elPos + 1, len(elements)):
-                if elements[i].isClassOrSubclass(classList):
-                    e = elements[i]
-                    e.activeSite = self
-                    return e
+            return self.elementOffset(obj)
+        except base.SitesException:
             return None
 
 

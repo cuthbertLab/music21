@@ -33,6 +33,53 @@ class StreamFilter(object):
     def __init__(self):
         pass # store streamIterator?
 
+
+class IsFilter(StreamFilter):
+    '''
+    filter on items where x IS y
+    
+    >>> s = stream.Stream()
+    >>> s.insert(0, key.KeySignature(-3))
+    >>> n = note.Note('C#')
+    >>> s.append(n)
+    >>> s.append(note.Rest())
+    >>> for el in s.iter.addFilter(stream.filter.IsFilter(n)):
+    ...     print(el is n)
+    True    
+
+    multiple...
+
+    >>> s = stream.Stream()
+    >>> s.insert(0, key.KeySignature(-3))
+    >>> n = note.Note('C#')
+    >>> s.append(n)
+    >>> r = note.Rest()
+    >>> s.append(r)
+    >>> for el in s.iter.addFilter(stream.filter.IsFilter([n, r])):
+    ...     print(el)
+    <music21.note.Note C#>
+    <music21.note.Rest rest>
+
+    '''
+    def __init__(self, target):
+        super(IsFilter, self).__init__()
+        if not common.isListLike(target):
+            target = (target,)
+
+        self.target = target
+        self.numToFind = len(target)
+    
+    def __call__(self, item, iterator):
+        if self.numToFind == 0:
+            raise StopIteration
+        
+        if item in self.target:
+            # would popping the item be faster?
+            self.numToFind -= 1
+            return True
+        else:
+            return False
+
 class IdFilter(StreamFilter):
     '''
     filters on ids. used by stream.getElementById.
@@ -64,7 +111,7 @@ class ClassFilter(StreamFilter):
     >>> s.append(note.Note('D'))
     >>> sI = s.__iter__()
     >>> sI
-    <music21.stream.iterator.StreamIterator object at 0x...>
+    <music21.stream.iterator.StreamIterator for Stream:0x104843828 @:0>
     >>> for x in sI:
     ...     print(x)
     <music21.note.Note C>
