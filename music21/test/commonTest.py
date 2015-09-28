@@ -12,6 +12,7 @@
 '''
 Things that are common to testing...
 '''
+import doctest
 import imp
 import multiprocessing
 import os
@@ -21,10 +22,25 @@ import warnings
 import music21
 from music21 import common
 from music21 import environment
+from music21.test import testRunner
 
 _MOD = 'commonTest.py'
 environLocal = environment.Environment(_MOD)
 
+def defaultDoctestSuite(name=None):
+    globs = __import__('music21').__dict__.copy()
+    docTestOptions = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
+    kwArgs = {
+              'globs': globs,
+              'optionflags': docTestOptions,
+              'checker': testRunner.Py3In2OutputChecker()              
+              }
+    # in case there are any tests here, get a suite to load up later
+    if name is not None:
+        s1 = doctest.DocTestSuite(name, **kwArgs)
+    else:
+        s1 = doctest.DocTestSuite(**kwArgs)
+    return s1
 
 #-------------------------------------------------------------------------------
 class ModuleGather(object):

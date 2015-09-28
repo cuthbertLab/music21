@@ -50,6 +50,7 @@ def runOneModuleWithoutImp(args):
     fp = args[1]
     verbosity = False
     timeStart = time.time()
+    
     moduleObject = modGath.getModuleWithoutImp(fp)
     environLocal.printDebug('running %s \n' % fp)
     if moduleObject == 'skip':
@@ -64,26 +65,18 @@ def runOneModuleWithoutImp(args):
     
     try:
         moduleName = modGath._getName(fp)
-        globs = __import__('music21').__dict__.copy()
-        docTestOptions = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
-        s1 = doctest.DocTestSuite(
-            globs=globs,
-            optionflags=docTestOptions,
-            checker=testRunner.Py3In2OutputChecker()
-            )
+        
+        s1 = commonTest.defaultDoctestSuite()
         
         # get Test classes in moduleObject
         if not hasattr(moduleObject, 'Test'):
             environLocal.printDebug('%s has no Test class' % moduleObject)
         else:
-            s1.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(moduleObject.Test))
+            s2 = unittest.defaultTestLoader.loadTestsFromTestCase(moduleObject.Test)
+            s1.addTests(s2)
+            
         try:
-            globs = __import__('music21').__dict__.copy()
-            s3 = doctest.DocTestSuite(moduleObject,
-                globs=globs,
-                optionflags=docTestOptions,
-                checker=testRunner.Py3In2OutputChecker()
-                )
+            s3 = commonTest.defaultDoctestSuite(moduleObject)
             s1.addTests(s3)
         except ValueError:
             environLocal.printDebug('%s cannot load Doctests' % moduleObject)

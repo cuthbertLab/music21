@@ -2744,7 +2744,6 @@ class Music21Object(object):
 
         Fermatas should be on last note, but not done yet.
 
-
         >>> a = note.Note()
         >>> a.duration.clear() # remove defaults
         >>> a.duration.addDurationTuple(duration.durationTupleFromTypeDots('half', 0))
@@ -2856,13 +2855,15 @@ class Music21Object(object):
 
     measureNumber = property(_getMeasureNumber,
         doc = '''
-        Return the measure number of a :class:`~music21.stream.Measure`  that contains this
+        Return the measure number of a :class:`~music21.stream.Measure` that contains this
         object if the object is in a measure.
 
-        Returns None if the object is not in a measure.  Also note that by default Measure objects
+        Returns None if the object is not in a measure.  Also note that by 
+        default Measure objects
         have measure number 0.
 
-        If an object belongs to multiple measures (not in the same hierarchy...) then it returns the
+        If an object belongs to multiple measures (not in the same hierarchy...) 
+        then it returns the
         measure number of the :meth:`~music21.base.Music21Object.activeSite` if that is a
         :class:`~music21.stream.Measure` object.  Otherwise it will use 
         :meth:`~music21.base.Music21Object.getContextByClass`
@@ -2971,7 +2972,6 @@ class Music21Object(object):
         Return the measure offset based on a Measure, if it exists,
         otherwise based on meter modulus of the TimeSignature.
         This assumes that a TimeSignature has already been found.
-
 
         >>> m = stream.Measure()
         >>> ts1 = meter.TimeSignature('3/4')
@@ -3098,7 +3098,8 @@ class Music21Object(object):
             self._getMeasureOffsetOrMeterModulusOffset(ts))
 
     beatStr = property(_getBeatStr,
-        doc = '''Return a string representation of the beat of
+        doc = '''
+        Return a string representation of the beat of
         this object as found in the most recently positioned
         Measure. Beat values count from 1 and contain a
         fractional designation to show progress through the beat.
@@ -3123,7 +3124,8 @@ class Music21Object(object):
         ''')
 
     def _getBeatDuration(self):
-        '''Return a :class:`~music21.duration.Duration` of the beat
+        '''
+        Return a :class:`~music21.duration.Duration` of the beat
         active for this object as found in the most recently
         positioned Measure.
 
@@ -3276,7 +3278,6 @@ class Music21Object(object):
         Get or set the duration of this object in seconds, assuming
         that this object has a :class:`~music21.tempo.MetronomeMark` 
         or :class:`~music21.tempo.MetricModulation` in its past context.
-
 
         >>> s = stream.Stream()
         >>> s.repeatAppend(note.Note(), 12)

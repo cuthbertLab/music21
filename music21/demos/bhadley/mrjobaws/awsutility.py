@@ -81,7 +81,10 @@ def unbundleOpus(opusStream):
     
     >>> #_DOCS_SHOW s = corpus.parse('book1') 
     >>> #_DOCS_SHOW unbundleOpus(s)[15:17] 
-    [(<music21.stream.Score ...>, '1ae57f04a11981d502dc93e230f3466b.16'), (<music21.stream.Score ...>, '1ae57f04a11981d502dc93e230f3466b.17')]
+    [(<music21.stream.Score ...>, 
+     '1ae57f04a11981d502dc93e230f3466b.16'), 
+     (<music21.stream.Score ...>, 
+     '1ae57f04a11981d502dc93e230f3466b.17')]
     '''
 
     results = []

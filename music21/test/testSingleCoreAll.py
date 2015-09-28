@@ -40,15 +40,7 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None):
     >>> print(None)
     None
     '''
-    globs = __import__('music21').__dict__.copy()
-    docTestOptions = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
-    # in case there are any tests here, get a suite to load up later
-    s1 = doctest.DocTestSuite(
-        __name__,
-        globs=globs,
-        optionflags=docTestOptions,
-        checker=testRunner.Py3In2OutputChecker()
-        )
+    s1 = commonTest.defaultDoctestSuite(__name__)
 
     modGather = commonTest.ModuleGather()
     modules = modGather.load(restoreEnvironmentDefaults)
@@ -61,48 +53,47 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None):
     # look over each module and gather doc tests and unittests
     totalModules = 0
     
-    for module in common.sortModules(modules):
+    for moduleObject in common.sortModules(modules):
         unitTestCases = []
         if limit is not None:
             if totalModules > limit:
                 break
         totalModules += 1
         # get Test classes in module
-        if not hasattr(module, 'Test'):
-            environLocal.printDebug('%s has no Test class' % module)
+        if not hasattr(moduleObject, 'Test'):
+            environLocal.printDebug('%s has no Test class' % moduleObject)
         else:
             if 'test' in testGroup:
-                unitTestCases.append(module.Test)
-        if not hasattr(module, 'TestExternal'):
+                unitTestCases.append(moduleObject.Test)
+        if not hasattr(moduleObject, 'TestExternal'):
             pass
             #environLocal.printDebug('%s has no TestExternal class\n' % module)
         else:
             if 'external' in testGroup or 'testExternal' in testGroup:
-                unitTestCases.append(module.TestExternal)
+                unitTestCases.append(moduleObject.TestExternal)
 
         # for each Test class, load this into a suite
         for testCase in unitTestCases:
             s2 = unittest.defaultTestLoader.loadTestsFromTestCase(testCase)
             s1.addTests(s2)
         try:
-            globs = __import__('music21').__dict__.copy()
-            s3 = doctest.DocTestSuite(
-                module,
-                globs=globs,
-                optionflags=docTestOptions,
-                checker=testRunner.Py3In2OutputChecker(),
-                )
+            s3 = commonTest.defaultDoctestSuite(moduleObject)
             s1.addTests(s3)
         except ValueError:
-            environLocal.printDebug('%s cannot load Doctests' % module)
+            environLocal.printDebug('%s cannot load Doctests' % moduleObject)
             continue
         
-        allLocals = [getattr(module, x) for x in dir(module)]
+        allLocals = [getattr(moduleObject, x) for x in dir(moduleObject)]
+
+        globs = __import__('music21').__dict__.copy()
+        docTestOptions = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
         testRunner.addDocAttrTestsToSuite(s1, 
                                           allLocals, 
-                                          outerFilename=module.__file__, 
+                                          outerFilename=moduleObject.__file__, 
                                           globs=globs, 
-                                          optionflags=docTestOptions)
+                                          optionflags=docTestOptions,
+                                          # no checker here
+                                          )
     
     testRunner.fixTestsForPy2and3(s1)
     
@@ -116,11 +107,11 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None):
     coverageM21.stopCoverage(cov)
         
     if (len(finalTestResults.errors) > 0 or
-        len(finalTestResults.failures) > 0 or
-        len(finalTestResults.unexpectedSuccesses) > 0):
-            exit(1)
+            len(finalTestResults.failures) > 0 or
+            len(finalTestResults.unexpectedSuccesses) > 0):
+        return 1
     else:
-        exit(0)
+        return 0
 
     # this should work but requires python 2.7 and the testRunner arg does not
     # seem to work properly
@@ -138,10 +129,11 @@ if __name__ == '__main__':
     # if optional command line arguments are given, assume they are  
     # test group arguments
     if len(sys.argv) >= 2:
-        main(sys.argv[1:])
+        returnCode = main(sys.argv[1:])
     else:
-        main()
+        returnCode = main()
 
+    exit(returnCode)
 
 #------------------------------------------------------------------------------
 # eof
