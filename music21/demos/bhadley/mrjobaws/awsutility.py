@@ -51,7 +51,7 @@ def md5OfCorpusFile(fileDir, scoreNumber=None):
     
     >>> s = corpus.parse('bwv431')
     >>> s.corpusFilepath
-    u'bach/bwv431.mxl'
+    'bach/bwv431.mxl'
     
     >>> b = md5OfCorpusFile(s.corpusFilepath)
     >>> b
