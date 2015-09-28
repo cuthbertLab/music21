@@ -78,8 +78,8 @@ and then restarting from scratch).
 After Installation
 -------------------------------
 
-After a successful installation, you may proceed to :ref:`usersGuide_01_Installing` to 
-begin using music21.
+After a successful installation, you may proceed to :ref:`Notes <usersGuide_02_notes>` 
+to begin using music21.
 
 
 

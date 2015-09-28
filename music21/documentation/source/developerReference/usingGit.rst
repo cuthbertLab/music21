@@ -329,7 +329,7 @@ packages, type ``no`` and press Enter.
     :width: 650
 
 See :ref:`environment` for more information on configuring user settings.
-Otherwise, head to: :ref:`usersGuide_00_introduction` for further demos and
+Otherwise, head to: :ref:`What is Music21? <what>` for further demos and
 tutorials on using music21.
 
 

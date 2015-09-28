@@ -321,8 +321,8 @@ and which notes are not::
     >>> majorScale = [0, 2, 4, 5, 7, 9, 11]
     >>> for pitchClass in range(12):
     ...     n = note.Note()
-    ...     n.pitchClass = pitchClass
-    ...     frequency = n.frequency
+    ...     n.pitch.pitchClass = pitchClass
+    ...     frequency = n.pitch.frequency
     ...     for scale in data.keys():
     ...         if (pitchClass - scale) % 12 in majorScale:
     ...             data[scale].append((pitchClass, frequency))

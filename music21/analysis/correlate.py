@@ -10,9 +10,6 @@
 #-------------------------------------------------------------------------------
 '''
 Various tools and utilities to find correlations between disparate objects in a Stream.
-
-See the chapter :ref:`overviewFormats` for more information and examples of 
-converting formats into and out of music21.
 '''
 
 

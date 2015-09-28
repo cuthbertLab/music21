@@ -2655,7 +2655,10 @@ class TimeSignature(base.Music21Object):
     >>> tsCut.symbol
     'cut'
 
-    For complete details on using this object, see :ref:`overviewMeters`.
+    For complete details on using this object, see  
+    :ref:`User's Guide Chapter 14: Time Signatures <usersGuide_14_timeSignatures>` and
+    :ref:`User's Guide Chapter 55: Advanced Meter <usersGuide_55_advancedMeter>` and
+    
 
     That's it for the simple aspects of `TimeSignature` objects.  You know
     enough to get started now!

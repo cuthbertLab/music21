@@ -12,14 +12,6 @@ maintainers can only help with music21-specific problems post installation or
 Mac/PC problems.
 
 
-Alternative Installation Methods
-----------------------------------------------
-
-The following instructions are for general users. If you are an advanced user 
-and have installed other Python packages before, or want to use an EGG, SVN, PIP3, 
-or setuptools, you should read :ref:`installAdvanced`.
-
-
 Check Your Version of Python
 ----------------------------------------------
 
@@ -61,7 +53,8 @@ Installing Music21 with setup.py
 
 First, uncompress the .tar.gz file. 
 
-Open a shell or terminal, enter the outer-most music21 directory, and use `python` to execute the setup.py file with the 'install' argument: ::
+Open a shell or terminal, enter the outer-most music21 directory, and use `python` 
+to execute the setup.py file with the 'install' argument: ::
 
     $ cd /path/to/dir/music21-version
     $ python setup.py install
@@ -93,7 +86,7 @@ http://docs.python.org/using/cmdline.html#envvar-PYTHONPATH
 After Installation
 -------------------------------
 
-After a successful installation, you may proceed to :ref:`usersGuide_01_Installing` to 
+After a successful installation, you may proceed to :ref:`Notes usersGuide_02_notes` to 
 begin using `music21`.
 
 

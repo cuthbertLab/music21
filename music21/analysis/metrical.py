@@ -12,7 +12,8 @@
 '''
 Various tools and utilities for doing metrical or rhythmic analysis. 
 
-See the chapter :ref:`overviewMeters` for more information on defining 
+See the chapter :ref:`User's Guide Chapter 14: Time Signatures <usersGuide_14_timeSignatures>` 
+for more information on defining 
 metrical structures in music21.
 '''
 from music21 import stream

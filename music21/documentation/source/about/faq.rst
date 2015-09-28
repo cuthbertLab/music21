@@ -59,7 +59,8 @@ Can I synthesize new sounds with music21?
 
 I'm ready to give it a try, but how do I install `music21`?
 
-    Please see the complete install instructions: :ref:`install`.
+    Please see the complete install instructions: 
+    :ref:`Installing music21 <usersGuide_01_installing>`.
 
 `Music21` doesn't have some feature that I need, how do I get it added?
 

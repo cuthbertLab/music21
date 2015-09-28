@@ -31,7 +31,7 @@ class DocBuilder(object):
         self.cpus_to_use = max(1, multiprocessing.cpu_count() - 1)  # @UndefinedVariable
         if self.cpus_to_use == 1:
             self.useMultiprocessing = False
-        
+        self.useMultiprocessing = False # too unstable still
         self.documentationDirectoryPath = None
         self.autogenDirectoryPath = None
         self.buildDirectoryPath = None

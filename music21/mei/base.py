@@ -344,10 +344,11 @@ def safePitch(name, accidental=None, octave=''):
 
 def makeDuration(base=0.0, dots=0):
     '''
-    Given a ``base`` duration and a number of ``dots``, create a :class:`Duration` instance with the
+    Given a ``base`` duration and a number of ``dots``, create a :class:`~music21.duration.Duration` 
+    instance with the
     appropriate ``quarterLength`` value.
 
-    :param number base: The base duration that will be augmented.
+    :param float base: The base duration that will be augmented.
     :param int dots: The number of dots with which to augment the ``base`` duration.
     :returns: A :class:`Duration` corresponding to the fully-augmented value.
     :rtype: :class:`music21.duration.Duration`
@@ -2706,8 +2707,8 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
 
     :param elem: The ``<measure>`` element to process.
     :type elem: :class:`~xml.etree.ElementTree.Element`
-    :param int backupNum: A fallback value for the resulting :class:`Measure` objects' ``number``
-        attribute.
+    :param int backupNum: A fallback value for the resulting :class:`~music21.measure.Measure` objects' 
+        number attribute.
     :param expectedNs: A list of the expected @n attributes for the <staff> tags in this <measure>.
         If an expected <staff> isn't in the <measure>, it will be created with a full-measure rest.
     :type expectedNs: iterable of str

@@ -25,6 +25,11 @@ comes up, just follow the instructions below *carefully* and you shouldn't
 have any problems.
 
 
+To upgrade later, just do
+
+    sudo pip install --upgrade music21
+
+
 Starting Python and Checking the Version
 ----------------------------------------------
 
@@ -179,7 +184,7 @@ and `music21-2.0.0` folder from your desktop now.
 Open up the Mac Terminal (under Applications/Utilities/Terminal). You might want
 to drag it to the dock.  You'll use it often.
 
-After a successful installation, you may proceed to :ref:`usersGuide_01_Installing` to 
+After a successful installation, you may proceed to :ref:`Notes <usersGuide_02_notes>` to 
 begin using music21.
 
 

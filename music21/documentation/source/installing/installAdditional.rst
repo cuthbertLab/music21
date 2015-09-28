@@ -164,4 +164,4 @@ as well.  In addition, the SVN features of Eclipse let you stay updated
 with the latest versions of music21.  Eclipse + PyDev + Git is the
 only supported method for developers to contribute to music21.  
 
-Details are at :ref:`usingEclipse` and :ref:`usingGit`
+Details are at :ref:`usingGit`

@@ -23,7 +23,7 @@ To do a release,
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest, 
      but should be done before making a release).  Done automatically by Travis-CI on GitHub commit
 5. then python3 test/testDocumentation.py # only designed for Python 3...
-6. then test/testSerialization
+6. WAS test/testSerialization -- covered in "all"
 7. run documentation/make.py clean
 8. run documentation/make.py   [*]
 
@@ -37,9 +37,9 @@ To do a release,
     then don't change anything until the next step is done.
     (.gitignore SHOULD avoid uploading the large files created here...)
 
-12. Create a new release on GitHub and upload the FIVE files created here. Use tag v2.0.1 (etc.).
+12. Create a new release on GitHub and upload the THREE files created here. Use tag v2.0.1 (etc.).
     Don't forget the "v" in the release tag.
-    Drag in this order: .egg, .tar.gz, .exe, no-corpus.egg, no-corpus.tar.gz
+    Drag in this order: .tar.gz, .exe, no-corpus.tar.gz
     
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
@@ -71,7 +71,7 @@ environLocal = environment.Environment(_MOD)
 
 
 '''
-Build and upload music21 in three formats: egg, exe, and tar.
+Build and upload music21 in two formats: exe, and tar.
 
 Simply call from the command line.
 '''
@@ -81,12 +81,12 @@ environLocal.warn("using python executable at %s" % PY)
 
 class Distributor(object):
     def __init__(self):
-        self.fpEgg = None
+        #self.fpEgg = None
         self.fpWin = None
         self.fpTar = None
 
         self.buildNoCorpus = True
-        self.fpEggNoCorpus = None
+        #self.fpEggNoCorpus = None
         self.fpTarNoCorpus = None
 
         self.version = base.VERSION_STR
@@ -107,7 +107,7 @@ class Distributor(object):
         self.fpDistDir = directory
         self.fpPackageDir = parentDir # dir with setup.py
         self.fpBuildDir = os.path.join(self.fpPackageDir, 'build')
-        self.fpEggInfo = os.path.join(self.fpPackageDir, 'music21.egg-info')
+        #self.fpEggInfo = os.path.join(self.fpPackageDir, 'music21.egg-info')
 
         sys.path.insert(0, parentDir)  # to get setup in as a possibility.
 
@@ -122,9 +122,9 @@ class Distributor(object):
         contents = os.listdir(self.fpDistDir)
         for fn in contents:
             fp = os.path.join(self.fpDistDir, fn)
-            if self.version in fn and fn.endswith('.egg'):
-                self.fpEgg = fp
-            elif self.version in fn and fn.endswith('.exe'):
+            #if self.version in fn and fn.endswith('.egg'):
+            #    self.fpEgg = fp
+            if self.version in fn and fn.endswith('.exe'):
                 fpNew = fp.replace('.macosx-10.8-intel.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.8-x86_64.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.5-x86_64.exe', '.win32.exe')
@@ -143,8 +143,8 @@ class Distributor(object):
             elif self.version in fn and fn.endswith('.tar.gz'):
                 self.fpTar = fp
 
-        environLocal.warn('giving paths for egg, exe, and tar.gz/zip, respectively:')
-        for fn in [self.fpEgg, self.fpWin, self.fpTar]:
+        environLocal.warn('giving paths for exe, and tar.gz/zip, respectively:')
+        for fn in [self.fpWin, self.fpTar]:
             if fn == None:
                 environLocal.warn('missing fn path')
             else:
@@ -152,7 +152,7 @@ class Distributor(object):
     
     def removeCorpus(self, fp):
         '''
-        Remove the corpus from a compressed file (.tar.gz or .egg) and 
+        Remove the corpus from a compressed file (.tar.gz) and 
         create a new music21-noCorpus version.
 
         Return the completed file path of the newly created edition.
@@ -160,13 +160,13 @@ class Distributor(object):
         NOTE: this function works only with Posix systems. 
         '''
         TAR = 'TAR'
-        EGG = 'EGG'
+        #EGG = 'EGG'
         if fp.endswith('.tar.gz'):
             mode = TAR
             modeExt = '.tar.gz'
-        elif fp.endswith('.egg'):
-            mode = EGG
-            modeExt = '.egg'
+        #elif fp.endswith('.egg'):
+        #    mode = EGG
+        #    modeExt = '.egg'
         else:
             raise Exception('incorrect source file path')
     
@@ -197,11 +197,11 @@ class Distributor(object):
             tf.extractall(path=fpDir)
             os.system('mv %s %s' % (fpSrcDir, fpDstDir))
     
-        elif mode == EGG:
-            os.system('mkdir %s' % fpDstDir)
-            # need to create dst dir to unzip into
-            tf = zipfile.ZipFile(fp, 'r')
-            tf.extractall(path=fpDstDir)
+        #elif mode == EGG:
+        #    os.system('mkdir %s' % fpDstDir)
+        #    # need to create dst dir to unzip into
+        #    tf = zipfile.ZipFile(fp, 'r')
+        #    tf.extractall(path=fpDstDir)
     
         tf.close() # done after extraction
     
@@ -210,15 +210,15 @@ class Distributor(object):
             fp = os.path.join(fpDstDir, 'music21', 'corpus', fn)
             os.system('rm -r %s' % fp)
         
-        fp = os.path.join(fpDstDir, 'music21', 'corpus', 'metadataCache')
+        fp = os.path.join(fpDstDir, 'music21', 'corpus', '_metadataCache')
         os.system('rm -r %s' % fp)
         
     
         # adjust the sources Txt file
         if mode == TAR:
             sourcesTxt = os.path.join(fpDstDir, 'music21.egg-info', 'SOURCES.txt')
-        elif mode == EGG:
-            sourcesTxt = os.path.join(fpDstDir, 'EGG-INFO', 'SOURCES.txt')
+        #elif mode == EGG:
+        #    sourcesTxt = os.path.join(fpDstDir, 'EGG-INFO', 'SOURCES.txt')
     
         # files will look like 'music21/corpus/haydn' in SOURCES.txt
         post = []
@@ -246,10 +246,10 @@ class Distributor(object):
             # just name of dir
             cmd = 'tar -C %s -czf %s %s/' % (fpDir, fpDst, fnDstDir) 
             os.system(cmd)
-        elif mode == EGG:
-            # zip and name with egg: give dst, then source
-            cmd = 'cd %s; zip -r %s %s' % (fpDir, fnDst, fnDstDir) 
-            os.system(cmd)
+        #elif mode == EGG:
+        #    # zip and name with egg: give dst, then source
+        #    cmd = 'cd %s; zip -r %s %s' % (fpDir, fnDst, fnDstDir) 
+        #    os.system(cmd)
     
         # remove directory that was compressed
         if os.path.exists(fpDstDir):
@@ -267,7 +267,7 @@ class Distributor(object):
         '''
         # call setup.py
         #import setup # -- for some reason does not work unless called from command line
-        for buildType in ['bdist_egg', 
+        for buildType in [#'bdist_egg', 
                           'bdist_wininst', 
                           'sdist --formats=gztar'
                           ]:    
@@ -291,26 +291,26 @@ class Distributor(object):
         self.updatePaths()
         #exit()
         # remove build dir, egg-info dir
-        environLocal.warn('removing %s (except on windows...do it yourself)' % self.fpEggInfo)
-        os.system('rm -r %s' % self.fpEggInfo)
+        #environLocal.warn('removing %s (except on windows...do it yourself)' % self.fpEggInfo)
+        #os.system('rm -r %s' % self.fpEggInfo)
         environLocal.warn('removing %s (except on windows...do it yourself)' % self.fpBuildDir)
         os.system('rm -r %s' % self.fpBuildDir)
 
         if self.buildNoCorpus is True:
             # create no corpus versions
             self.fpTarNoCorpus = self.removeCorpus(fp=self.fpTar)
-            self.fpEggNoCorpus = self.removeCorpus(fp=self.fpEgg)
+            #self.fpEggNoCorpus = self.removeCorpus(fp=self.fpEgg)
 
 
-    def uploadPyPi(self):
-        '''
-        Upload source package to PyPI -- currently source file is too big for PyPi...sigh...
-        '''
-        environLocal.warn('putting bdist_egg on pypi -- looks redundant, but we have to do it again')
-        savePath = os.getcwd()
-        os.chdir(self.fpPackageDir)
-        os.system('%s setup.py bdist_egg upload' % PY)
-        os.chdir(savePath)
+#     def uploadPyPi(self):
+#         '''
+#         Upload source package to PyPI -- currently source file is too big for PyPi...sigh...
+#         '''
+#         environLocal.warn('putting bdist_egg on pypi -- looks redundant, but we have to do it again')
+#         savePath = os.getcwd()
+#         os.chdir(self.fpPackageDir)
+#         os.system('%s setup.py bdist_egg upload' % PY)
+#         os.chdir(savePath)
 
         #os.system('cd %s; %s setup.py bdist_egg upload' % 
         #        (self.fpPackageDir, PY))
