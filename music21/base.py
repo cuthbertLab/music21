@@ -1655,11 +1655,11 @@ class Music21Object(object):
                                      "an object {} not in the Stream {}".format(self, site))
 
             self._activeSiteStoredOffset = storedOffset
-            siteId = id(site)
-            if not self.sites.hasSiteId(siteId): # This should raise a warning, should not happen
-                #environLocal.warn("Adding a siteDict entry for a " +
-                #                        "site that should already be there!")
-                self.sites.add(site, idKey=siteId)
+            #siteId = id(site)
+            #if not self.sites.hasSiteId(siteId): # This should raise a warning, should not happen
+            #    #environLocal.warn("Adding a siteDict entry for a " +
+            #    #                        "site that should already be there!")
+            #    self.sites.add(site, idKey=siteId)
         else:
             self._activeSiteStoredOffset = None
 

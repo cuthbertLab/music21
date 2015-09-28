@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
 # Name:         stream/iterator.py
-# Purpose:      classes for walking through streams and filtering...
+# Purpose:      classes for walking through streams...
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
@@ -47,7 +47,7 @@ class StreamIterator(object):
         self.srcStream = srcStream
         self.index = 0
         
-        # use this so that it is sorted...
+        # use .elements instead of ._elements/etc. so that it is sorted...
         self.srcStreamElements = srcStream.elements
         self.streamLength = len(self.srcStreamElements)
 
@@ -65,6 +65,8 @@ class StreamIterator(object):
         # return True or False for an element for
         # whether it should be yielded.
         self.filters = filters
+        self._len = None
+        self._filterElements = []
 
     def __iter__(self):
         self.index = 0
@@ -94,14 +96,81 @@ class StreamIterator(object):
         
     next = __next__
 
+    def __len__(self):
+        '''
+        returns the length of the elements that
+        match the filter set.
+        
+        >>> s = converter.parse('tinynotation: 3/4 c4 d e f g a', makeNotation=False)
+        >>> len(s)
+        7
+        >>> len(s.iter)
+        7
+        >>> len(s.iter.notes)
+        6
+        >>> [n.name for n in s.iter.notes]
+        ['C', 'D', 'E', 'F', 'G', 'A']
+        '''
+        if self._len is not None:
+            return self._len
+        
+        self._len = len(self.filterElements())
+        return self._len
+
+    def filterElements(self):
+        '''
+        returns a list of elements that match the filter.
+        
+        This sort of defeats the point of using a generator, so only used if 
+        it's requested by __len__ or __getitem__ etc.
+        
+        Subclasses should override to cache anything they need saved (index, 
+        recursion objects, etc.)
+        
+        activeSite will not be set.  
+        
+        Cached for speed.
+        
+        >>> s = converter.parse('tinynotation: 3/4 c4 d e f g a', makeNotation=False)
+        >>> sI = s.iter
+        >>> sI
+        <music21.stream.iterator.StreamIterator object at 0x104b29f60>
+        >>> sI.filterElements()
+        [<music21.meter.TimeSignature 3/4>, <music21.note.Note C>, <music21.note.Note D>, 
+         <music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>, 
+         <music21.note.Note A>]
+        >>> sI.notes
+        <music21.stream.iterator.StreamIterator object at 0x104b29f60>
+        >>> sI.filterElements()
+        [<music21.note.Note C>, <music21.note.Note D>, 
+         <music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>, 
+         <music21.note.Note A>]
+        '''
+        if self._filterElements != []:
+            return self._filterElements
+        
+        savedIndex = self.index
+        savedRestoreActiveSites = self.restoreActiveSites
+        self.restoreActiveSites = True
+        
+        fe = [x for x in self]
+        
+        self.index = savedIndex
+        self.restoreActiveSites = savedRestoreActiveSites        
+        self._filterElements = fe
+        return fe
+
 
     def matchesFilters(self, e):
         '''
         returns False if any filter returns False, True otherwise.
         '''
         for f in self.filters:
-            if f(e, self) is False:
-                return False
+            try:
+                if f(e, self) is False:
+                    return False
+            except StopIteration:
+                raise
         return True
 
     
@@ -109,6 +178,7 @@ class StreamIterator(object):
         '''
         stop iteration; and cleanup if need be.
         '''
+        self.index = 0
         if self.cleanupOnStop is not False:
             del self.srcStream
             del self.srcStreamElements
@@ -129,7 +199,6 @@ class StreamIterator(object):
         >>> sI.srcStream is s
         True
 
-
         >>> for n in sI:
         ...    printer = (repr(n), repr(sI[0]))
         ...    print(printer)
@@ -138,6 +207,14 @@ class StreamIterator(object):
         ('<music21.note.Note C>', '<music21.note.Note F#>')
         >>> sI.srcStream is s
         True
+        
+        Filters, such as "notes" apply.
+        
+        >>> s.insert(0, clef.TrebleClef())
+        >>> s[0]
+        <music21.clef.TrebleClef>
+        >>> s.iter.notes[0]
+        <music21.note.Note F#>
 
         Demo of cleanupOnStop = True
 
@@ -155,17 +232,30 @@ class StreamIterator(object):
         ...    print(printer)
 
         (nothing is printed)
-
         '''
-        # TODO: apply to filters!
-        return self.srcStream.__getitem__(k)
+        fe = self.filterElements()
+        e = fe[k]
+
+        return e
+    
+    def resetCaches(self):
+        '''
+        reset any cached data.
+        '''
+        self._len = None
+        self._filterElements = []
+        self.index = 0
     
     def stream(self, returnStreamSubClass=True):
         '''
-        return a stream from this iterator.
+        return a new stream from this iterator.
         
         Does nothing except copy if there are no filters, but a drop in
         replacement for the old .getElementsByClass() etc. if it does.
+        
+        In other words:
+        
+        `s.getElementsByClass()` == `s.iter.getElementsByClass().stream()`
         
         >>> s = stream.Part()
         >>> s.insert(0, note.Note('C'))
@@ -236,8 +326,17 @@ class StreamIterator(object):
     
     #-------------------------------------------------------------
     def addFilter(self, newFilter):
+        '''
+        adds a filter to the list.
+        
+        resets caches -- do not add filters any other way
+        
+        # TODO: support remove filter.
+        '''
         if newFilter not in self.filters:
             self.filters.append(newFilter)
+            
+        self.resetCaches()
         return self
     
     def getElementsByClass(self, classFilterList):
@@ -607,8 +706,30 @@ class RecursiveIterator(StreamIterator):
     <music21.stream.Part Bass>
     ...
     
+    But this is how you'll actually use it:
+    
+    >>> for x in b.recurse(streamsOnly=True):
+    ...     print(x)
+    <music21.stream.Score 0x10484fd68>
+    <music21.stream.Part Soprano>
+    <music21.stream.Measure 0 offset=0.0>
+    <music21.stream.Measure 1 offset=1.0>
+    <music21.stream.Measure 2 offset=5.0>
+    ...
+    <music21.stream.Part Alto>
+    <music21.stream.Measure 0 offset=0.0>
+    ...
+    <music21.stream.Part Tenor>
+    ...
+    <music21.stream.Part Bass>
+    ...
+    
     >>> hasExpressions = lambda el, i: True if (hasattr(el, 'expressions') and len(el.expressions) > 0) else False
-    >>> for el in stream.iterator.RecursiveIterator(b).addFilter(hasExpressions):
+    >>> expressive = b.recurse().addFilter(hasExpressions)
+    >>> expressive
+    <music21.stream.iterator.RecursiveIterator object at 0x1048d3da0>
+    
+    >>> for el in expressive:
     ...     printer = (el, el.expressions)
     ...     print(printer)
     (<music21.note.Note C#>, [<music21.expressions.Fermata>])
@@ -617,15 +738,26 @@ class RecursiveIterator(StreamIterator):
     (<music21.note.Note C#>, [<music21.expressions.Fermata>])
     (<music21.note.Note G#>, [<music21.expressions.Fermata>])
     (<music21.note.Note F#>, [<music21.expressions.Fermata>])
+    
+    >>> len(expressive)
+    6
+    >>> expressive[-1].measureNumber
+    9
+    
     '''
-    def __init__(self, srcStream, filters=None, restoreActiveSites=True, 
-                        streamsOnly=False, includeSelf=False, parentIterator=None):
+    def __init__(self, 
+                 srcStream, 
+                 filters=None, 
+                 restoreActiveSites=True, 
+                 streamsOnly=False, 
+                 includeSelf=False): #, parentIterator=None):
         super(RecursiveIterator, self).__init__(srcStream, filters, restoreActiveSites)
         self.includeSelf = includeSelf
         if streamsOnly is True:
             self.filters.append(filter.ClassFilter('Stream'))
         self.recursiveIterator = None
-        self.parentIterator = None
+        # not yet used.
+        #self.parentIterator = None
         
     def __next__(self):
 
@@ -639,7 +771,7 @@ class RecursiveIterator(StreamIterator):
                 try:
                     return self.recursiveIterator.next()
                 except StopIteration:
-                    self.recursiveIterator.parentIterator = None
+                    #self.recursiveIterator.parentIterator = None
                     self.recursiveIterator = None
                     
             if self.index == 0 and self.includeSelf is True and self.matchesFilters(self.srcStream):
@@ -660,7 +792,7 @@ class RecursiveIterator(StreamIterator):
                                                restoreActiveSites=self.restoreActiveSites,
                                                filters=self.filters, # shared list...
                                                includeSelf=False, # always for inner streams
-                                               parentIterator=self
+                                               #parentIterator=self
                                                )
             if self.matchesFilters(e) is False:
                 continue          
@@ -675,7 +807,7 @@ class RecursiveIterator(StreamIterator):
             try:
                 return self.recursiveIterator.next()
             except StopIteration:
-                self.recursiveIterator.parentIterator = None
+                #self.recursiveIterator.parentIterator = None
                 self.recursiveIterator = None
         
         
@@ -684,7 +816,12 @@ class RecursiveIterator(StreamIterator):
         
     next = __next__
 
-
+    def filterElements(self):
+        # saved parent iterator later?
+        savedRecursiveIterator = self.recursiveIterator
+        fe = super(RecursiveIterator, self).filterElements()
+        self.recursiveIterator = savedRecursiveIterator
+        return fe
 
 class Test(unittest.TestCase):
     pass

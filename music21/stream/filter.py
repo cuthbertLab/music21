@@ -1,3 +1,14 @@
+# -*- coding: utf-8 -*-
+#------------------------------------------------------------------------------
+# Name:         stream/filter.py
+# Purpose:      classes for filtering iterators of  streams...
+#
+# Authors:      Michael Scott Cuthbert
+#               Christopher Ariza
+#
+# Copyright:    Copyright © 2008-2015 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL or BSD, see license.txt
+#------------------------------------------------------------------------------
 
 import inspect 
 import unittest
