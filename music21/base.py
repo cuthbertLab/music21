@@ -667,7 +667,7 @@ class Music21Object(object):
             classObjList = self.__class__.mro()
             classListFQ = [x.__module__ + '.' + x.__name__ for x in self.__class__.mro()]
             classList = classNameList + classObjList + classListFQ
-            classSet = set(classList)
+            classSet = frozenset(classList)
             self._classSetCacheDict[self.__class__] = classSet
             return classSet
 
