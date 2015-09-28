@@ -33,8 +33,12 @@ class StreamFilter(object):
     def __init__(self):
         pass # store streamIterator?
 
+    # commented out to make faster, but will be called if exists.
+    #def reset(self):
+    #    pass
 
 class IsFilter(StreamFilter):
+    derivationStr = 'is'
     '''
     filter on items where x IS y
     
@@ -69,6 +73,10 @@ class IsFilter(StreamFilter):
         self.target = target
         self.numToFind = len(target)
     
+    def reset(self):
+        self.numToFind = len(self.target)
+    
+    
     def __call__(self, item, iterator):
         if self.numToFind == 0:
             raise StopIteration
@@ -85,6 +93,8 @@ class IdFilter(StreamFilter):
     filters on ids. used by stream.getElementById.
     No corresponding iterator call.
     '''
+    derivationStr = 'getElementById'
+
     def __init__(self, searchId):
         super(IdFilter, self).__init__()
         try:

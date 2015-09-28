@@ -196,6 +196,10 @@ class StreamIterator(object):
         self.index = 0
         self.iterSection = '_elements'
         self.updateActiveInformation()
+        for f in self.filters:
+            if hasattr(f, 'reset'):
+                f.reset()
+
 
     def resetCaches(self):
         '''

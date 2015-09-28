@@ -577,10 +577,27 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #s.elementsChanged()
         return s
 
+    #-------------------------------
+    # Temporary -- Remove in  2016
+    def stream(self, returnStreamSubclass=None):
+        '''
+        During the transition period to the new iteration system,
+        there may be times when someone thinks something is a StreamIterator
+        (which needs to have .stream() called on it to make a new Stream) but
+        actually already has a `Stream`.  
+        
+        So this is a temporary method.  It will eventually become deprecated
+        and then removed.
+        
+        TODO: 2016 May??? Remove.
+        '''
+        return self
+
+
     def cloneEmpty(self, derivationMethod=None):
         '''
-        Create a Stream that is identical to this one except that the measures are empty
-        and set derivation
+        Create a Stream that is identical to this one except that the elements are empty
+        and set derivation (Should this be deleted??? 
         
         >>> p = stream.Part()
         >>> p.autoSort = False
