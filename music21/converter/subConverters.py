@@ -188,23 +188,32 @@ class SubConverter(object):
             writeFlags = 'wb'
         
         if self.codecWrite is False:
-            with open(fp, writeFlags) as f:
-                try:
-                    if six.PY3 and isinstance(dataStr, bytes):
-                        f.write(dataStr.decode('utf-8'))
-                    
-                    else:
-                        f.write(dataStr)
-                except UnicodeEncodeError:
-                    f.close()
-                    f = io.open(fp, mode=writeFlags, encoding=self.stringEncoding)
-                    f.write(dataStr)
-                    f.close()
+            if hasattr(fp, 'write'): 
+                # is a filelike object
+                f = fp
+            else:
+                f = open(fp, writeFlags)
 
-                except TypeError as te:
-                    raise SubConverterException("Could not convert %r : %r" % (dataStr, te))
+            try:
+                if six.PY3 and isinstance(dataStr, bytes):
+                    f.write(dataStr.decode('utf-8'))
+                
+                else:
+                    f.write(dataStr)
+            except UnicodeEncodeError:
+                f.close()
+                f = io.open(fp, mode=writeFlags, encoding=self.stringEncoding)
+                f.write(dataStr)
+                f.close()
+
+            except TypeError as te:
+                raise SubConverterException("Could not convert %r : %r" % (dataStr, te))
         else:
-            f = io.open(fp, mode=writeFlags, encoding=self.stringEncoding)
+            if hasattr(fp, 'write'): 
+                # is a filelike object
+                f = fp
+            else:
+                f = io.open(fp, mode=writeFlags, encoding=self.stringEncoding)            
             f.write(dataStr)
             f.close()
         return fp
