@@ -525,6 +525,7 @@ class Test(unittest.TestCase):
 #     102.    Determine whether tonic pitches tend to be followed by a greater variety of melodic intervals than precedes it.
 #     103.    Determine whether two works have similar vocabularies for their vocal texts.
 #     104.    Determine which English translation of a Schubert text best preserves the vowel coloration.
+#                Use CMU Dict -- IPA dictionary.
 #     105.    Determine which of two MIDI performances exhibits more dynamic range.
 #     106.    Display lyrics with new lines indicated by punctuation.
 #     107.    Display the MIDI data while performing.

@@ -631,9 +631,12 @@ class TwelveToneRow(ToneRow):
     def getLinkClassification(self):
         
         '''
-        Gives the classification number of a Link Chord (as given in http://www.johnlinkmusic.com/LinkChords.pdf), 
-        that is, is an all-interval twelve-tone row containing a voicing of the all-trichord hexachord: [0, 1, 2, 4, 7, 8].
-        In addition, gives a list of sets of five contiguous intervals within the row representing a voicing
+        Gives the classification number of a Link Chord 
+        (as given in http://www.johnlinkmusic.com/LinkChords.pdf), 
+        that is, is an all-interval twelve-tone row containing a voicing of the 
+        all-trichord hexachord: [0, 1, 2, 4, 7, 8].
+        In addition, gives a list of sets of five contiguous intervals 
+        within the row representing a voicing
         of the all-trichord hexachord. Note that the interval sets may be transformed.
         
         Named for John Link who discovered them.
@@ -669,7 +672,10 @@ class TwelveToneRow(ToneRow):
         if self.isTwelveToneRow() == False:
             raise SerialException("A Link Chord must be a twelve-tone row.")
         else: 
-            rowchecklist = [self, self.zeroCenteredTransformation('I',0), self.zeroCenteredTransformation('R',0), self.zeroCenteredTransformation('RI',0)]
+            rowchecklist = [self, 
+                            self.zeroCenteredTransformation('I',0), 
+                            self.zeroCenteredTransformation('R',0), 
+                            self.zeroCenteredTransformation('RI',0)]
             specialintervals = []
             classification = None
             for row in rowchecklist:
@@ -766,7 +772,8 @@ class ContiguousSegmentOfNotes(base.Music21Object):
     
     '''
     Class whose instantiations represent contiguous segments of notes and chords appearing
-    within a :class:`~music21.stream.Stream`. Generally speaking, these objects are instantiated internally, though it is possible
+    within a :class:`~music21.stream.Stream`. Generally speaking, these objects are instantiated 
+    internally, though it is possible
     for the user to create them as well.
     
     '''
@@ -825,14 +832,20 @@ class ContiguousSegmentOfNotes(base.Music21Object):
         matchedRow = pcToToneRow(self.matchedSegment)
         return matchedRow.findZeroCenteredTransformations(activeRow)
     zeroCenteredTransformationsFromMatched = property(_getZeroCenteredTransformationsFromMatchedToActive, 
-        doc = '''The list of zero-centered transformations taking a segment being searched for to a found segment, for example, in :func:`~music21.serial.findTransformedSegments`. For an explanation of the zero-centered convention for serial transformations, see :meth:`music21.serial.ToneRow.zeroCenteredTransformation`.''')
+        doc = '''The list of zero-centered transformations taking a segment being searched 
+                    for to a found segment, for example, in :func:`~music21.serial.findTransformedSegments`. 
+                    For an explanation of the zero-centered convention for serial transformations, 
+                    see :meth:`music21.serial.ToneRow.zeroCenteredTransformation`.''')
         
     def _getOriginalCenteredTransformationsFromMatchedToActive(self):
         activeRow = pcToToneRow(self.activeSegment)
         matchedRow = pcToToneRow(self.matchedSegment)
         return matchedRow.findOriginalCenteredTransformations(activeRow)
     originalCenteredTransformationsFromMatched = property(_getOriginalCenteredTransformationsFromMatchedToActive, 
-        doc = '''The list of original-centered transformations taking a segment being searched for to a found segment, for example, in :func:`~music21.serial.findTransformedSegments`. For an explanation of the zero-centered convention for serial transformations, see :meth:`music21.serial.ToneRow.originalCenteredTransformation`.''')
+        doc = '''The list of original-centered transformations taking a segment being 
+                searched for to a found segment, for example, in 
+                :func:`~music21.serial.findTransformedSegments`. For an explanation of the 
+                zero-centered convention for serial transformations, see :meth:`music21.serial.ToneRow.originalCenteredTransformation`.''')
 
     def readPitchClassesFromBottom(self):
         
@@ -1165,7 +1178,7 @@ def getContiguousSegmentsOfLength(inputStream, length, reps = 'skipConsecutive',
     if len(scores) == 0:
         parts = inputStream.getElementsByClass(stream.Part)
     elif len(scores) == 1:
-        parts = scores[0].getElementsByClass(stream.Part)
+        parts = scores[0].parts
     else:
         raise SerialException("The inputStream can contain at most one score.")
     
