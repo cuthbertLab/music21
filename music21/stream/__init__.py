@@ -4371,10 +4371,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         uniqueOffsets.sort() # might be faster in-place
         return uniqueOffsets
 
-    def makeChords(self, minimumWindowSize=.125, includePostWindow=True,
-            removeRedundantPitches=True, useExactOffsets=False,
-            gatherArticulations=True, gatherExpressions=True, inPlace=False,
-            transferGroupsToPitches=False, makeRests=True):
+    def makeChords(self, 
+                   minimumWindowSize=.125, 
+                   includePostWindow=True,
+                   removeRedundantPitches=True, 
+                   useExactOffsets=False,
+                   gatherArticulations=True, 
+                   gatherExpressions=True, 
+                   inPlace=False,
+                   transferGroupsToPitches=False, 
+                   makeRests=True):
         '''
         Gathers simultaneously sounding :class:`~music21.note.Note` objects
         into :class:`~music21.chord.Chord` objects, each of which
@@ -4394,9 +4400,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
         >>> p1 = stream.Part()
-        >>> p1.append([note.Note('C4', type='quarter'), note.Note('D4', type='quarter'), note.Note('E4', type='quarter'), note.Note('B2', type='quarter')])
+        >>> p1.append([note.Note('C4', type='quarter'), 
+        ...            note.Note('D4', type='quarter'), 
+        ...            note.Note('E4', type='quarter'), 
+        ...            note.Note('B2', type='quarter')])
         >>> p2 = stream.Part()
-        >>> p2.append([note.Note('C#5', type='half'), note.Note('E#5', type='quarter'), chord.Chord(["E4","G5","C#7"])])
+        >>> p2.append([note.Note('C#5', type='half'), 
+        ...            note.Note('E#5', type='quarter'), 
+        ...            chord.Chord(["E4","G5","C#7"])])
         >>> sc1 = stream.Score()
         >>> sc1.insert(0, p1)
         >>> sc1.insert(0, p2)
@@ -4437,9 +4448,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         The resulting Stream, if not in-place, can also gather
         additional objects by placing class names in the `collect` list.
-        By default, TimeSignature and KeySignature objects are collected.
+        By default, TimeSignature and KeySignature objects are collected.     
         '''
-        #environLocal.printDebug(['makeChords():', 'transferGroupsToPitches', transferGroupsToPitches])
+        #environLocal.printDebug(['makeChords():', 
+        #              'transferGroupsToPitches', transferGroupsToPitches])
 
         if not inPlace: # make a copy
             # since we do not return Scores, this probably should always be
@@ -4457,25 +4469,31 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for m in returnObj.getElementsByClass('Measure'):
                 # offset values are not relative to measure; need to
                 # shift by each measure's offset
-                m.makeChords(minimumWindowSize=minimumWindowSize,
+                m.makeChords(
+                    minimumWindowSize=minimumWindowSize,
                     includePostWindow=includePostWindow,
                     removeRedundantPitches=removeRedundantPitches,
                     gatherArticulations=gatherArticulations,
                     gatherExpressions=gatherExpressions,
                     transferGroupsToPitches=transferGroupsToPitches,
-                    inPlace=True, makeRests=makeRests)
+                    inPlace=True, 
+                    makeRests=makeRests
+                    )
             return returnObj # exit
 
         if returnObj.hasPartLikeStreams():
             # must get Streams, not Parts here
             for p in returnObj.getElementsByClass('Stream'):
-                p.makeChords(minimumWindowSize=minimumWindowSize,
+                p.makeChords(
+                    minimumWindowSize=minimumWindowSize,
                     includePostWindow=includePostWindow,
                     removeRedundantPitches=removeRedundantPitches,
                     gatherArticulations=gatherArticulations,
                     gatherExpressions=gatherExpressions,
                     transferGroupsToPitches=transferGroupsToPitches,
-                    inPlace=True, makeRests=makeRests)
+                    inPlace=True, 
+                    makeRests=makeRests
+                    )
             return returnObj # exit
 
         # TODO: gather lyrics as an option
@@ -4484,6 +4502,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         matchClasses = ['Note', 'Chord']
         o = 0.0 # start at zero
         oTerminate = returnObj.highestOffset
+        removedPitches = []
 
         # get temporary boundaries for making rests
         preHighestTime = returnObj.highestTime
@@ -4494,8 +4513,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # get all notes within the start and the minwindow size
                 oStart = o
                 oEnd = oStart + minimumWindowSize
-                sub = returnObj.getElementsByOffset(oStart, oEnd,
-                        includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=True)
+                sub = returnObj.getElementsByOffset(
+                                    oStart, 
+                                    oEnd,
+                                    includeEndBoundary=False, 
+                                    mustFinishInSpan=False, 
+                                    mustBeginInSpan=True
+                                    )
                 subNotes = sub.getElementsByClass(matchClasses) # get once for speed
                 #environLocal.printDebug(['subNotes', subNotes])
                 qlMax = None
@@ -4514,9 +4538,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if (includePostWindow and qlMax is not None
                     and qlMax > minimumWindowSize):
                     subAdd = returnObj.getElementsByOffset(
-                            oStart+minimumWindowSize,
-                            oStart+qlMax,
-                            includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=True)
+                                            oStart + minimumWindowSize,
+                                            oStart + qlMax,
+                                            includeEndBoundary=False, 
+                                            mustFinishInSpan=False, 
+                                            mustBeginInSpan=True)
                     # concatenate any additional notes found
                     subNotes += subAdd.getElementsByClass(matchClasses)
 
@@ -4551,7 +4577,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     for r in returnObj.getElementsByClass('Rest'):
                         returnObj.remove(r)
                     if removeRedundantPitches:
-                        c.removeRedundantPitches(inPlace=True)
+                        removedPitches = c.removeRedundantPitches(inPlace=True)
+                        
+                        if transferGroupsToPitches:
+                            for rem_p in removedPitches:
+                                for cn in c:
+                                    if cn.pitch.nameWithOctave == rem_p.nameWithOctave:
+                                        #print(cn.pitch, rem_p)
+                                        #print(cn.pitch.groups, rem_p.groups)
+                                        cn.pitch.groups.extend(rem_p.groups)
                     # insert chord at start location
                     returnObj._insertCore(o, c)
                 #environLocal.printDebug(['len of returnObj', len(returnObj)])
@@ -4623,7 +4657,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         returnObj.remove(r)
 
                     if removeRedundantPitches:
-                        c.removeRedundantPitches(inPlace=True)
+                        removedPitches = c.removeRedundantPitches(inPlace=True)
+                        if transferGroupsToPitches:
+                            for rem_p in removedPitches:
+                                for cn in c:
+                                    if cn.pitch.nameWithOctave == rem_p.nameWithOctave:
+                                        cn.pitch.groups.extend(rem_p.groups)
+
+                    
                     # insert chord at start location
                     returnObj._insertCore(oStart, c)
 
@@ -4637,9 +4678,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return returnObj
 
 
-    def chordify(self, addTies=True, displayTiedAccidentals=False,
-        addPartIdAsGroup=False, removeRedundantPitches=True,
-        toSoundingPitch=True):
+    def chordify(self, 
+                 addTies=True, 
+                 displayTiedAccidentals=False,
+                 addPartIdAsGroup=False, 
+                 removeRedundantPitches=True,
+                 toSoundingPitch=True):
         '''
         Create a chordal reduction of polyphonic music, where each
         change to a new pitch results in a new chord. If a Score or
@@ -4746,6 +4790,24 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {4.0} <music21.chord.Chord D3 F#3 A3>
         {7.0} <music21.chord.Chord A D3 F#3 A3>
 
+        If addPartIdAsGroup is True, and there are redundant pitches,
+        ensure that the merged pitch has both groups
+
+        >>> s = stream.Score()
+        >>> p0 = stream.Part(id='p0')
+        >>> p0.insert(0, note.Note("C4"))
+        >>> p1 = stream.Part(id='p1')
+        >>> p1.insert(0, note.Note("C4"))
+        >>> s.insert(0, p0)
+        >>> s.insert(0, p1)
+        >>> s1 = s.chordify(addPartIdAsGroup=True)
+        >>> c = s1.recurse().notes[0]
+        >>> c
+        <music21.chord.Chord C4>
+        >>> c.pitches[0].groups
+        ['p0', 'p1']
+
+
         OMIT_FROM_DOCS
 
         Test that chordifying works on a single stream.
@@ -4828,10 +4890,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # make chords from flat version of sliced parts
         # do in place as already a copy has been made
         post = returnObj.flat.makeChords(includePostWindow=True,
-            useExactOffsets=True,
-            removeRedundantPitches=removeRedundantPitches,
-            gatherArticulations=True, gatherExpressions=True, inPlace=True,
-            transferGroupsToPitches=transferGroupsToPitches)
+                                         useExactOffsets=True,
+                                         removeRedundantPitches=removeRedundantPitches,
+                                         gatherArticulations=True, 
+                                         gatherExpressions=True, 
+                                         inPlace=True,
+                                         transferGroupsToPitches=transferGroupsToPitches)
 
         # re-populate a measure stream with the new chords
         # get a measure stream from the top voice
