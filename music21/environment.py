@@ -280,7 +280,7 @@ class _EnvironmentCore(object):
         self._ref['musescoreDirectPNGPath'] = None
         self._ref['showFormat'] = 'musicxml'
         self._ref['writeFormat'] = 'musicxml'
-        self._ref['ipythonShowFormat'] = 'ipython.lilypond.png'
+        self._ref['ipythonShowFormat'] = 'ipython.musicxml.png'
 
         self._ref['autoDownload'] = 'ask'
         self._ref['debug'] = 0
@@ -303,6 +303,7 @@ class _EnvironmentCore(object):
         if platform == 'win':
             for name, value in [
                 ('lilypondPath', 'lilypond'),
+                ('musescoreDirectPNGPath', r'%PROGRAMFILES(x86)%\MuseScore 2\MuseScore.exe'),
                 ]:
                 self.__setitem__(name, value)  # use for key checking
         elif platform == 'nix':
@@ -1220,7 +1221,6 @@ def get(key):
 
 #------------------------------------------------------------------------------
 
-
 class Test(unittest.TestCase):
 
     def stringFromTree(self, settingsTree):
@@ -1248,7 +1248,7 @@ class Test(unittest.TestCase):
   <preference name="debug" value="0" />
   <preference name="directoryScratch" />
   <preference name="graphicsPath" value="/Applications/Preview.app" />
-  <preference name="ipythonShowFormat" value="ipython.lilypond.png" />
+  <preference name="ipythonShowFormat" value="ipython.musicxml.png" />
   <preference name="lilypondBackend" value="ps" />
   <preference name="lilypondFormat" value="pdf" />
   <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond" />
@@ -1285,7 +1285,7 @@ class Test(unittest.TestCase):
   <preference name="debug" value="0" />
   <preference name="directoryScratch" />
   <preference name="graphicsPath" value="/Applications/Preview.app" />
-  <preference name="ipythonShowFormat" value="ipython.lilypond.png" />
+  <preference name="ipythonShowFormat" value="ipython.musicxml.png" />
   <preference name="lilypondBackend" value="ps" />
   <preference name="lilypondFormat" value="pdf" />
   <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond" />
@@ -1342,7 +1342,7 @@ class Test(unittest.TestCase):
   <preference name="debug" value="0" />
   <preference name="directoryScratch" />
   <preference name="graphicsPath" value="/Applications/Preview.app" />
-  <preference name="ipythonShowFormat" value="ipython.lilypond.png" />
+  <preference name="ipythonShowFormat" value="ipython.musicxml.png" />
   <preference name="lilypondBackend" value="ps" />
   <preference name="lilypondFormat" value="pdf" />
   <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond" />

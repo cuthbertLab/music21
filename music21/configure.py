@@ -1223,7 +1223,9 @@ class SelectMusicXMLReader(SelectFilePath):
     def _rawIntroduction(self):
         '''Return a multiline presentation of an introduction.
         '''
-        return ['Defining an XML Reader permits automatically opening music21-generated MusicXML in an editor for display and manipulation when calling the show() method. Setting this option is highly recommended.', ' ']
+        return ['''Defining an XML Reader permits automatically opening 
+            music21-generated MusicXML in an editor for display and manipulation when calling 
+            the show() method. Setting this option is highly recommended.''', ' ']
 
     def _getMusicXMLReaderDarwin(self):
         '''Get all possible Finale or MuseScore paths on Darwin
