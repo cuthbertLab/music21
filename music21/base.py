@@ -28,7 +28,7 @@ available after importing music21.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'2.1.0'
+'3.0.0'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -2344,12 +2344,12 @@ class Music21Object(object):
                     # TODO: when everyone has updated, then remove these lines... 
                     #       do around January 2016
                     if 'vexflow' in environLocal['ipythonShowFormat']:
-                        environLocal['ipythonShowFormat'] = 'ipython.lilypond.png'
+                        environLocal['ipythonShowFormat'] = 'ipython.musicxml.png'
                         environLocal.write()
                     # end delete
                     fmt = environLocal['ipythonShowFormat']
                 except environment.EnvironmentException:
-                    fmt = 'ipython.lilypond.png'
+                    fmt = 'ipython.musicxml.png'
             else:
                 fmt = environLocal['showFormat']
         elif fmt.startswith('.'):

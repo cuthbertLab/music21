@@ -524,16 +524,22 @@ class Chord(note.NotRest):
 
         #environLocal.printDebug(['unique, delete', self, unique, delete])
         altered = returnObj._notes
-        for p in deleteComponents:
-            altered.remove(p)
+        alteredId = [id(n) for n in altered]
+        for n in deleteComponents:
+            nIndex = alteredId.index(id(n))
+            altered.pop(nIndex)
+            alteredId.pop(nIndex)
 
         returnObj._notes = altered
         if len(deleteComponents) > 0:
             returnObj._chordTablesAddressNeedsUpdating = True
             returnObj._bass = None
             returnObj._root = None
+            
         if not inPlace:
             return returnObj
+        else:
+            return [n.pitch for n in deleteComponents]
 
     def _updateChordTablesAddress(self):
         if self._chordTablesAddressNeedsUpdating:
@@ -2628,16 +2634,18 @@ class Chord(note.NotRest):
         It removes based on the name of the note and the octave, so the same
         note name in two different octaves is retained.
 
-        If `inPlace` is True, a copy is not made and None is returned;
+        If `inPlace` is True, a copy is not made and a list of deleted pitches is returned;
         otherwise a copy is made and that copy is returned.
 
         >>> c1 = chord.Chord(['c2', 'e3', 'g4', 'e3'])
         >>> c1
         <music21.chord.Chord C2 E3 G4 E3>
 
-        >>> c1.removeRedundantPitches(inPlace=True)
+        >>> removedList = c1.removeRedundantPitches(inPlace=True)
         >>> c1
-        <music21.chord.Chord C2 G4 E3>
+        <music21.chord.Chord C2 E3 G4>
+        >>> removedList
+        [<music21.pitch.Pitch E3>]
 
         >>> c1.forteClass
         '3-11B'
@@ -2658,9 +2666,20 @@ class Chord(note.NotRest):
         >>> p2 = pitch.Pitch('B')
         >>> p2.octave = -1
         >>> c3 = chord.Chord([p1, p2])
-        >>> c3.removeRedundantPitches(inPlace=True)
+        >>> removedPitches = c3.removeRedundantPitches(inPlace=True)
         >>> c3.pitches
         (<music21.pitch.Pitch B-1>,)
+        
+        >>> c3.pitches[0].name
+        'B-'
+        >>> c3.pitches[0].octave
+        1
+        >>> removedPitches
+        [<music21.pitch.Pitch B-1>]
+        >>> removedPitches[0].name
+        'B'
+        >>> removedPitches[0].octave
+        -1
 
         The first pitch survives:
 
@@ -2672,7 +2691,7 @@ class Chord(note.NotRest):
 
         '''
         return self._removePitchByRedundantAttribute('nameWithOctave',
-              inPlace=inPlace)
+                                                     inPlace=inPlace)
 
     def removeRedundantPitchClasses(self, inPlace=True):
         '''
@@ -2683,14 +2702,14 @@ class Chord(note.NotRest):
         otherwise a copy is made and that copy is returned.
 
         >>> c1 = chord.Chord(['c2', 'e3', 'g4', 'e3'])
-        >>> c1.removeRedundantPitchClasses(inPlace=True)
+        >>> removed = c1.removeRedundantPitchClasses(inPlace=True)
         >>> c1.pitches
-        (<music21.pitch.Pitch C2>, <music21.pitch.Pitch G4>, <music21.pitch.Pitch E3>)
+        (<music21.pitch.Pitch C2>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G4>)
 
         >>> c2 = chord.Chord(['c5', 'e3', 'g4', 'c2', 'e3', 'f-4'])
-        >>> c2.removeRedundantPitchClasses(inPlace=True)
+        >>> removed = c2.removeRedundantPitchClasses(inPlace=True)
         >>> c2.pitches
-        (<music21.pitch.Pitch C5>, <music21.pitch.Pitch G4>, <music21.pitch.Pitch E3>)
+        (<music21.pitch.Pitch C5>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G4>)
 
         '''
         return self._removePitchByRedundantAttribute('pitchClass',
@@ -2710,10 +2729,11 @@ class Chord(note.NotRest):
         >>> c2
         <music21.chord.Chord C5 E3 G4 C2 E3 F-4>
 
-        >>> c2.removeRedundantPitchNames(inPlace = True)
+        >>> rem = c2.removeRedundantPitchNames(inPlace = True)
         >>> c2
-        <music21.chord.Chord C5 G4 E3 F-4>
-
+        <music21.chord.Chord C5 E3 G4 F-4>
+        >>> rem
+        [<music21.pitch.Pitch C2>, <music21.pitch.Pitch E3>]
         '''
         return self._removePitchByRedundantAttribute('name',
               inPlace=inPlace)

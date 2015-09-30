@@ -308,7 +308,8 @@ dodecachord = (None, t1)
 
 
 #-------------------------------------------------------------------------------
-FORTE = (None, monad, diad, trichord, tetrachord, pentachord, hexachord, septachord, octachord, nonachord, decachord, undecachord, dodecachord)
+FORTE = (None, monad, diad, trichord, tetrachord, pentachord, hexachord, septachord, octachord, 
+         nonachord, decachord, undecachord, dodecachord)
 
 # to access the data for a single form, use:
 # forte   [size(tetra)] = 4
