@@ -409,7 +409,7 @@ def realizeVolume(srcStream, setAbsoluteVelocity=False,
 
     # check for any dynamics
     dynamicsAvailable = False
-    if len(flatSrc.getElementsByClass('Dynamic')) > 0:
+    if flatSrc.iter.getElementsByClass('Dynamic'):
         dynamicsAvailable = True
     else: # no dynamics available
         if useDynamicContext is True: # only if True, and non avail, override

@@ -3533,7 +3533,7 @@ class Test(unittest.TestCase):
         def collectType(s):
             post = []
             for e in s:
-                if len(e.duration.tuplets) > 0:
+                if e.duration.tuplets:
                     post.append(e.duration.tuplets[0].type)
                 else:
                     post.append(None)
@@ -3542,7 +3542,7 @@ class Test(unittest.TestCase):
         def collectBracket(s):
             post = []
             for e in s:
-                if len(e.duration.tuplets) > 0:
+                if e.duration.tuplets:
                     post.append(e.duration.tuplets[0].bracket)
                 else:
                     post.append(None)
@@ -3569,7 +3569,7 @@ class Test(unittest.TestCase):
         def collectType(s):
             post = []
             for e in s:
-                if len(e.duration.tuplets) > 0:
+                if e.duration.tuplets:
                     post.append(e.duration.tuplets[0].type)
                 else:
                     post.append(None)
@@ -3578,7 +3578,7 @@ class Test(unittest.TestCase):
         def collectBracket(s):
             post = []
             for e in s:
-                if len(e.duration.tuplets) > 0:
+                if e.duration.tuplets:
                     post.append(e.duration.tuplets[0].bracket)
                 else:
                     post.append(None)
@@ -3677,7 +3677,7 @@ class Test(unittest.TestCase):
         def collectTupletType(s):
             post = []
             for e in s:
-                if len(e.duration.tuplets) > 0:
+                if e.duration.tuplets:
                     post.append(e.duration.tuplets[0].type)
                 else:
                     post.append(None)
@@ -3686,7 +3686,7 @@ class Test(unittest.TestCase):
         def collectTupletBracket(s):
             post = []
             for e in s:
-                if len(e.duration.tuplets) > 0:
+                if e.duration.tuplets:
                     post.append(e.duration.tuplets[0].bracket)
                 else:
                     post.append(None)
@@ -5429,10 +5429,10 @@ class Test(unittest.TestCase):
             else:
                 continue
         
-            if len(n.lyrics) > 0:
+            if n.lyrics:
                 nStart = n
             # if next is a begin, then this is an end
-            elif nStart is not None and len(nNext.lyrics) > 0 and n.tie is None:
+            elif nStart is not None and nNext.lyrics and n.tie is None:
                 nEnd = n
             elif nNext is nLast:
                 nEnd = n

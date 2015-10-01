@@ -367,11 +367,11 @@ class ScoreReduction(object):
             for i, m in enumerate(g.getElementsByClass('Measure')):
                 # only make rests if there are notes in the measure
                 for v in m.voices:
-                    if len(v.flat.notes) > 0:
+                    if v.recurse().notes:
                         v.makeRests(fillGaps=True, inPlace=True) 
                 m.flattenUnnecessaryVoices(inPlace=True)
                 # hide all rests in all containers
-                for r in m.flat.getElementsByClass('Rest'):
+                for r in m.recurse().getElementsByClass('Rest'):
                     r.hideObjectOnPrint = True
                 #m.show('t')
             # add to score
@@ -551,7 +551,7 @@ class PartReduction(object):
                     # check for activity in any part in the part group
                     for p in partMeasures: # iter of parts containing measures
                         #print p, i, p[i], len(p[i].flat.notes)
-                        if len(p[i].flat.notes) > 0:
+                        if p[i].iter.notes:
                             active = True
                             break
                     #environLocal.printDebug([i, 'active', active])

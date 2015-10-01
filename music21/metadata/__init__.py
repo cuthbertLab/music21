@@ -326,7 +326,7 @@ class Metadata(base.Music21Object):
         for c in self._contributors:
             if c.role == value:
                 result.append(c)
-        if len(result) > 0:
+        if result:
             return result
         else:
             return None

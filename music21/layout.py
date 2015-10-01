@@ -632,14 +632,14 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
 
             for p in thisSystem.parts:
                 p.__class__ = Staff
-                allStaffLayouts = p.flat.getElementsByClass('StaffLayout',returnStreamSubClass='list')
-                if len(allStaffLayouts) > 0:
+                allStaffLayouts = p.iter.getElementsByClass('StaffLayout')
+                if allStaffLayouts:
                     #if len(allStaffLayouts) > 1:
                     #    print("Got many staffLayouts")
                     p.staffLayout = allStaffLayouts[0]
 
-            allSystemLayouts = thisSystem.flat.getElementsByClass('SystemLayout', returnStreamSubClass='list')
-            if len(allSystemLayouts) > 1:
+            allSystemLayouts = thisSystem.recurse().getElementsByClass('SystemLayout')
+            if allSystemLayouts:
                 richestSystemLayout = copy.deepcopy(allSystemLayouts[0])
                 for sl in allSystemLayouts[1:]:
                     for attribute in ('distance', 'topDistance', 'leftMargin', 'rightMargin'):

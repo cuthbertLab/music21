@@ -3348,7 +3348,7 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
         # only need to add x ticks; y ticks added from data labels
         self.graph.setTicks('x', xTicks)  
 
-        if len(self.streamObj.getElementsByClass('Measure')) > 0 or len(self.streamObj.semiFlat.getElementsByClass('Measure')) > 0:
+        if self.streamObj.recurse().getElementsByClass('Measure'):
             self.graph.setAxisLabel('x', 'Measure Number')
         else:
             self.graph.setAxisLabel('x', 'Offset')

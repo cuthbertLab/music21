@@ -1272,7 +1272,7 @@ class ConcreteScale(Scale):
         if (tonic is None and 
                 pitches is not None and 
                 common.isListLike(pitches) and 
-                len(pitches) > 0):
+                pitches):
             tonic = pitches[0]
 
         # here, tonic is a pitch
@@ -1290,7 +1290,7 @@ class ConcreteScale(Scale):
 
         if (pitches is not None and 
                 common.isListLike(pitches) and 
-                len(pitches) > 0):
+                pitches):
             self._abstract = AbstractScale()
             self._abstract.buildNetworkFromPitches(pitches)
             if tonic in pitches:
@@ -1509,7 +1509,7 @@ class ConcreteScale(Scale):
                         else:
                             dst.append(match)
             # reassign the changed pitch
-            if len(dst) > 0:
+            if dst:
                 if e.isChord:
                     # note: we may not have matched all pitches
                     e.pitches = dst

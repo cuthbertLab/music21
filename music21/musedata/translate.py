@@ -283,7 +283,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
             eLast = _processPending(hasVoices, pendingRecords, eLast, m, vActive)
 
         # may be bending elements in a voice to append to a measure
-        if vActive is not None and len(vActive) > 0:
+        if vActive is not None and vActive:
             vActive.elementsChanged()
             m._insertCore(0, vActive)
 
