@@ -622,7 +622,7 @@ def quarterConversion(qLen):
     closestSmallerType, unused_match = quarterLengthToClosestType(qLen)
     typeNext = nextLargerType(closestSmallerType)
     tupleCandidates = quarterLengthToTuplet(qLen, 1)
-    if len(tupleCandidates) > 0:
+    if tupleCandidates:
         # assume that the first tuplet candidate, using the smallest type, is best
         dt = durationTupleFromTypeDots(typeNext)
         return QuarterLengthConversion((dt,), tupleCandidates[0])
@@ -812,7 +812,7 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=None, dotGroups=None):
     else:
         qtrLength *= common.dotMultiplier(dots)
 
-    if tuplets is not None and len(tuplets) > 0:
+    if tuplets is not None and tuplets:
         qtrLength = opFrac(qtrLength)
         for tup in tuplets:
             qtrLength = opFrac(qtrLength * tup.tupletMultiplier())
@@ -2234,7 +2234,7 @@ class Duration(SlottedObject):
         'Zero Duration (0 total QL)'
         '''
         totalMsg = []
-        if len(self.tuplets) > 0:
+        if self.tuplets:
             tupletStrList = []
             for tup in self.tuplets:
                 tupletStrList.append(tup.fullName)

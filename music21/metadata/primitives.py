@@ -276,7 +276,7 @@ class Date(object):
             post.append(value)
             postError.append(error)
         # as error is stripped, we can now convert to numbers
-        if len(post) > 0 and post[0] != '':
+        if post and post[0] != '':
             post = [int(x) for x in post]
         # assume in order in post list
         for i in range(len(self.attrNames)):

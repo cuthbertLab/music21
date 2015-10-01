@@ -122,7 +122,7 @@ def figuredBassFromStream(streamPart):
             fb._paddingLeft = paddingLeft
     
     for n in sfn:
-        if len(n.lyrics) > 0:
+        if n.lyrics:
             annotationString = ", ".join([x.text for x in n.lyrics])
             fb.addElement(n, annotationString)
         else:

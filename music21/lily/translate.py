@@ -271,7 +271,7 @@ class LilypondConverter(object):
         from music21 import stream
         c = m21ObjectIn.classes
         if 'Stream' in c:
-            if len(m21ObjectIn.flat.variants) > 0:
+            if m21ObjectIn.recurse().variants:
                 ## has variants so we need to make a deepcopy...
                 m21ObjectIn = variant.makeAllVariantsReplacements(m21ObjectIn, recurse = True)
                 m21ObjectIn.makeVariantBlocks()
@@ -384,12 +384,14 @@ class LilypondConverter(object):
         lpCompositeMusic = lyo.LyCompositeMusic()
         self.newContext(lpCompositeMusic)
 
-        # Also get the variants, and the total number of measures here and make start each staff context with { \stopStaff s1*n} where n is the number of measures.
-        if hasattr(scoreIn, 'parts') and len(scoreIn.parts) > 0: # or has variants
-            scoreInFlatVariants = scoreIn.flat.variants
-            if len(scoreInFlatVariants) > 0:
+        # Also get the variants, and the total number of measures here and make start each 
+        # staff context with { \stopStaff s1*n} where n is the number of measures.
+        if hasattr(scoreIn, 'parts') and scoreIn.iter.parts: # or has variants
+            if scoreIn.recurse().variants:
                 lpPartsAndOssiaInit = self.lyPartsAndOssiaInitFromScore(scoreIn)
-                lpGroupedMusicList = self.lyGroupedMusicListFromScoreWithParts(scoreIn, scoreInit = lpPartsAndOssiaInit)
+                lpGroupedMusicList = self.lyGroupedMusicListFromScoreWithParts(
+                                                       scoreIn, 
+                                                       scoreInit=lpPartsAndOssiaInit)
             else:
                 lpGroupedMusicList = self.lyGroupedMusicListFromScoreWithParts(scoreIn)
             lpCompositeMusic.groupedMusicList = lpGroupedMusicList
@@ -887,7 +889,7 @@ class LilypondConverter(object):
         if compositeMusicType is None:
             compositeMusicType = 'new'
 
-        if len(contextModList) > 0:
+        if contextModList:
             contextMod = lyo.LyContextModification(contextModList)
         else:
             contextMod = None
@@ -1686,7 +1688,7 @@ class LilypondConverter(object):
             longestReplacementLength = -1
             variantDict = {}
             for variantObject in variantObjectOrList:
-                if len(variantObject.groups) > 0:
+                if variantObject.groups:
                     variantName = variantObject.groups[0]
                 else:
                     variantName = "variant"
@@ -2017,7 +2019,7 @@ class LilypondConverter(object):
             if not replacedElementsClef in variantObject.elements:
                 variantObject.insert(0, replacedElementsClef)
 
-        if len(variantObject.groups) > 0:
+        if variantObject.groups:
             variantName = variantObject.groups[0]
         else:
             variantName = 'variant'
@@ -2039,8 +2041,9 @@ class LilypondConverter(object):
 
         musicList = []
 
-        if len(variantObject.getElementsByClass("SpacerRest")) > 0:
-            spacer = variantObject.getElementsByClass("SpacerRest")[0]
+        varFilter = variantObject.getElementsByClass("SpacerRest")
+        if varFilter:
+            spacer = varFilter[0]
             spacerDur = spacer.duration.quarterLength
             if spacer.duration.quarterLength > 0.0:
                 lySpacer = self.lySimpleMusicFromNoteOrRest(spacer)

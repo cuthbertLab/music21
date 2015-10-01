@@ -475,7 +475,7 @@ def translateNoteToByte(n):
     if n.isRest:
         return chr(127)
     elif n.isChord:
-        if len(n.pitches) > 0:
+        if n.pitches:
             return chr(n.pitches[0].midi)
         else:
             return chr(127)

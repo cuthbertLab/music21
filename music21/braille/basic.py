@@ -418,18 +418,17 @@ def noteToBraille(music21Note, showOctave = True, upperFirstInFingering = True):
     # Triplet
     # -------
     allTuplets = music21Note.duration.tuplets
-    if len(allTuplets) > 0:
-        if allTuplets[0].fullName == 'Triplet':
-            if beamStatus['beamStart']: 
-                noteTrans.append(symbols['triplet'])
-                music21Note._brailleEnglish.append(u"Triplet {0}".format(symbols['triplet']))
-            elif beamStatus['beamContinue']: 
-                beamStatus['beamContinue'] = False
+    if allTuplets and allTuplets[0].fullName == 'Triplet':
+        if beamStatus['beamStart']: 
+            noteTrans.append(symbols['triplet'])
+            music21Note._brailleEnglish.append(u"Triplet {0}".format(symbols['triplet']))
+        elif beamStatus['beamContinue']: 
+            beamStatus['beamContinue'] = False
     
     # signs of expression or execution that precede a note
     # articulations
     # -------------
-    if not len(music21Note.articulations) == 0:
+    if music21Note.articulations:
         # "When a staccato or staccatissimo is shown with any of the other [before note expressions]
         # it is brailled first."
         for artc in music21Note.articulations:

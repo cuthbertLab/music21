@@ -106,9 +106,9 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None):
     
     coverageM21.stopCoverage(cov)
         
-    if (len(finalTestResults.errors) > 0 or
-            len(finalTestResults.failures) > 0 or
-            len(finalTestResults.unexpectedSuccesses) > 0):
+    if (finalTestResults.errors or
+            finalTestResults.failures or
+            finalTestResults.unexpectedSuccesses):
         return 1
     else:
         return 0
