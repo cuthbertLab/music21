@@ -119,8 +119,8 @@ for modName in ('matplotlib', 'numpy', 'scipy'):
     #sys.stderr.write('pyaudio is installed but PortAudio is not -- ' + 
     #                 're-download pyaudio at http://people.csail.mit.edu/hubert/pyaudio/')
 
-if len(_missingImport) > 0:
-    if environLocal['warnings'] in [1, '1', True]:
+if _missingImport:
+    if environLocal['warnings'] in (1, '1', True):
         environLocal.warn(common.getMissingImportStr(_missingImport),
         header='music21:')
 

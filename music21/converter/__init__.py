@@ -686,21 +686,19 @@ class Converter(object):
         >>> converter.resetSubconverters() #_DOCS_HIDE
         '''
         subConverterList = []
-        if len(_registeredSubconverters) > 0:
-            for reg in _registeredSubconverters:
-                #print reg
-                subConverterList.append(reg)
+        for reg in _registeredSubconverters:
+            #print reg
+            subConverterList.append(reg)
 
-        if len(_deregisteredSubconverters) > 0 and _deregisteredSubconverters[0] == 'all':
+        if _deregisteredSubconverters and _deregisteredSubconverters[0] == 'all':
             pass
         else:
             subConverterList.extend(self.defaultSubconverters())
-            if len(_deregisteredSubconverters) > 0:
-                for unreg in _deregisteredSubconverters:
-                    try:
-                        subConverterList.remove(unreg)
-                    except ValueError:
-                        pass
+            for unreg in _deregisteredSubconverters:
+                try:
+                    subConverterList.remove(unreg)
+                except ValueError:
+                    pass
         
         if converterType == 'any':
             return subConverterList
@@ -927,7 +925,7 @@ class Converter(object):
                 if foundSc is not None:
                     break
 
-        if len(sc.registerFormats) > 0:
+        if sc.registerFormats:
             return sc.registerFormats[0]
         else:
             return None
@@ -1060,8 +1058,8 @@ def parse(value, *args, **keywords):
         isinstance(value[1], int) and os.path.exists(value[0])):
         # corpus or other file with movement number
         return parseFile(value[0], format=m21Format, **keywords).getScoreByNumber(value[1])
-    elif common.isListLike(value) or len(args) > 0: # tiny notation list # TODO: Remove.
-        if len(args) > 0: # add additional args to a list
+    elif common.isListLike(value) or args: # tiny notation list # TODO: Remove.
+        if args: # add additional args to a list
             value = [value] + list(args)
         return parseData(value, number=number, **keywords)
     # a midi string, must come before os.path.exists test

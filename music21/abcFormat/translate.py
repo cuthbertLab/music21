@@ -137,7 +137,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                     # to close it now.
                     # presently, now r bar conditions start a repeat bracket
                     rbSpanners = spannerBundle.getByClass('RepeatBracket').getByCompleteStatus(False)
-                    if len(rbSpanners) > 0:
+                    if any(rbSpanners):
                         rb = rbSpanners[0] # get RepeatBracket
                         rb.addSpannedElements(dst)
                         rb.completeStatus = True
@@ -289,19 +289,19 @@ def parseTokens(mh, dst, p, useMeasures):
                 n = n.getGrace()
 
             n.articulations = []
-            while len(t.artic) > 0:
+            while any(t.artic):
                 tmp = t.artic.pop()
                 if tmp == "staccato":
                     n.articulations.append(articulations.Staccato())
-                if tmp == "upbow":
+                elif tmp == "upbow":
                     n.articulations.append(articulations.UpBow())
-                if tmp == "downbow":
+                elif tmp == "downbow":
                     n.articulations.append(articulations.DownBow())
-                if tmp == "accent":
+                elif tmp == "accent":
                     n.articulations.append(articulations.Accent())
-                if tmp == "strongaccent":
+                elif tmp == "strongaccent":
                     n.articulations.append(articulations.StrongAccent())
-                if tmp == "tenuto":
+                elif tmp == "tenuto":
                     n.articulations.append(articulations.Tenuto())
 
             dst._appendCore(n)

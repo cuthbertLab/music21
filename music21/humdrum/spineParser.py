@@ -681,11 +681,11 @@ class HumdrumDataCollection(object):
 
         for offset, el in insertList:
             self.stream._insertCore(offset, el)
-        if len(insertList) > 0:
+        if insertList:
             self.stream.elementsChanged()
         for el in appendList:
             self.stream._appendCore(el)
-        if len(appendList) > 0:
+        if appendList:
             self.stream.elementsChanged()
 
     def _getStream(self):
@@ -1132,7 +1132,7 @@ class HumdrumSpine(object):
         hasMeasureOne = False
         for el in streamIn:
             if 'Stream' in el.classes:
-                if currentMeasureNumber != 0 or len(currentMeasure) > 0:
+                if currentMeasureNumber != 0 or currentMeasure:
                     currentMeasure.elementsChanged()
                     #streamOut.append(currentMeasure)
                     streamOut._appendCore(currentMeasure)
@@ -1151,12 +1151,12 @@ class HumdrumSpine(object):
         # update the most recent measure and the surrounding stream, then append the last
         currentMeasure.elementsChanged()
         streamOut.elementsChanged()
-        if len(currentMeasure) > 0:
+        if currentMeasure:
             streamOut.append(currentMeasure)
 
         # move beginning stuff (Clefs, KeySig, etc.) to first measure...
         measureElements = streamOut.getElementsByClass('Measure')
-        if len(measureElements) > 0:
+        if measureElements:
             m1 = measureElements[0]
             if hasMeasureOne == False: # pickup measure is not measure1
                 m1.number = 1
@@ -1250,7 +1250,7 @@ class KernSpine(HumdrumSpine):
                     if currentBeamNumbers != 0 and len(thisObject.beams.beamsList) == 0:
                         for i in range(currentBeamNumbers):
                             thisObject.beams.append('continue')
-                    elif len(thisObject.beams.beamsList) > 0:
+                    elif thisObject.beams.beamsList:
                         if thisObject.beams.beamsList[0].type == 'stop':
                             currentBeamNumbers = 0
                         else:
@@ -1259,7 +1259,7 @@ class KernSpine(HumdrumSpine):
                                     currentBeamNumbers += 1
 
                     # nested tuplets not supported by humdrum...
-                    if inTuplet is False and len(thisObject.duration.tuplets) > 0:
+                    if inTuplet is False and thisObject.duration.tuplets:
                         inTuplet = True
                         desiredTupletDuration = thisObject.duration.tuplets[0].totalTupletLength()
                         currentTupletDuration = thisObject.duration.quarterLength
@@ -1287,7 +1287,7 @@ class KernSpine(HumdrumSpine):
                         if currentBeamNumbers != 0 and len(thisObject.beams.beamsList) == 0:
                             for i in range(currentBeamNumbers):
                                 thisObject.beams.append('continue')
-                        elif len(thisObject.beams.beamsList) > 0:
+                        elif thisObject.beams.beamsList:
                             if thisObject.beams.beamsList[0].type == 'stop':
                                 currentBeamNumbers = 0
                             else:
@@ -1295,12 +1295,12 @@ class KernSpine(HumdrumSpine):
                                     if thisObject.beams.beamsList[i].type != 'stop':
                                         currentBeamNumbers += 1
                     # nested tuplets not supported by humdrum...
-                    if inTuplet is False and len(thisObject.duration.tuplets) > 0:
+                    if inTuplet is False and thisObject.duration.tuplets:
                         inTuplet = True
                         desiredTupletDuration = thisObject.duration.tuplets[0].totalTupletLength()
                         currentTupletDuration = thisObject.duration.quarterLength
                         thisObject.duration.tuplets[0].type = 'start'
-                    elif inTuplet is True and len(thisObject.duration.tuplets) == 0:
+                    elif inTuplet is True and not thisObject.duration.tuplets:
                         inTuplet = False
                         desiredTupletDuration = 0.0
                         currentTupletDuration = 0.0
@@ -1655,11 +1655,10 @@ class SpineCollection(object):
             newStream.elementsChanged()
             thisSpine.stream = newStream
 
-            if len(insertPoints) > 0:
-                # some spines were not inserted because the insertion point was at the end of the parent spine
-                # happens in some musedata conversions, such as beethoven 5, movement 1.
-                for i in insertPoints:
-                    self.performSpineInsertion(thisSpine, newStream, i)
+            # some spines were not inserted because the insertion point was at the end of the parent spine
+            # happens in some musedata conversions, such as beethoven 5, movement 1.
+            for i in insertPoints:
+                self.performSpineInsertion(thisSpine, newStream, i)
             #for removeMe in removeSpines:
             #    #needed for some tests
             #    self.removeSpineById(removeMe)

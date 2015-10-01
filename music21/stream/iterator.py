@@ -20,6 +20,8 @@ from music21 import common
 from music21.stream import filter
 from music21.exceptions21 import StreamException
 
+from music21.ext import six
+
 #------------------------------------------------------------------------------
 class StreamIteratorException(StreamException):
     pass
@@ -148,7 +150,8 @@ class StreamIterator(object):
         self.cleanup()
         raise StopIteration
         
-    next = __next__
+    if six.PY2:
+        next = __next__
 
     def __len__(self):
         '''
@@ -171,6 +174,49 @@ class StreamIterator(object):
         self.reset()
         return self._len
 
+
+    def __bool__(self):
+        '''
+        return True if anything matches the filter
+        otherwise, return False
+        
+        >>> s = converter.parse('tinyNotation: 2/4 c4 r4')
+        >>> bool(s)
+        True
+        >>> iterator = s.recurse()
+        >>> bool(iterator)
+        True
+        >>> bool(iterator.notesAndRests)
+        True
+        >>> bool(iterator.notes)
+        True
+
+        test cache
+
+        >>> len(iterator.notes)
+        1
+        >>> bool(iterator.notes)
+        True
+
+        >>> bool(iterator.getElementsByClass('Chord'))
+        False
+        
+        test false cache:
+        
+        >>> len(iterator.getElementsByClass('Chord'))
+        0
+        >>> bool(iterator.getElementsByClass('Chord'))
+        False
+        
+        '''
+        if self._len is not None:
+            return bool(self._len)
+        for unused in self:
+            return True
+        return False
+
+    if six.PY2:
+        __nonzero__ = __bool__
 
     #----------------------------------------------------------------
     # start and stop
@@ -319,6 +365,14 @@ class StreamIterator(object):
         >>> sI.srcStream is s
         True
         
+        Slices work:
+        
+        >>> nSlice = sI[1:]
+        >>> for n in nSlice:
+        ...     print(n)
+        <music21.note.Note C>
+        <music21.note.Note C>        
+        
         Filters, such as "notes" apply.
         
         >>> s.insert(0, clef.TrebleClef())
@@ -456,7 +510,7 @@ class StreamIterator(object):
                     found._storeAtEndCore(e)
 
         # if this stream was sorted, the resultant stream is sorted        
-        if len(fe) > 0:
+        if fe:
             found.elementsChanged(clearIsSorted=False)
         
         return found
@@ -799,6 +853,7 @@ class StreamIterator(object):
         return self
     
     #-------------------------------------------------------------
+    # properties -- historical...
     
     @property
     def notes(self):
@@ -841,6 +896,26 @@ class StreamIterator(object):
         self.addFilter(filter.ClassFilter('GeneralNote'))
         return self
 
+    @property
+    def parts(self):
+        self.addFilter(filter.ClassFilter('Part'))
+        return self
+
+
+    @property
+    def spanners(self):
+        self.addFilter(filter.ClassFilter('Spanner'))
+        return self
+
+    @property
+    def variants(self):
+        self.addFilter(filter.ClassFilter('Variant'))
+        return self
+
+    @property
+    def voices(self):
+        self.addFilter(filter.ClassFilter('Voice'))
+        return self
 
 #------------------------------------------------------------------------------
 class RecursiveIterator(StreamIterator):
@@ -880,7 +955,7 @@ class RecursiveIterator(StreamIterator):
     <music21.stream.Part Bass>
     ...
     
-    >>> hasExpressions = lambda el, i: True if (hasattr(el, 'expressions') and len(el.expressions) > 0) else False
+    >>> hasExpressions = lambda el, i: True if (hasattr(el, 'expressions') and el.expressions) else False
     >>> expressive = b.recurse().addFilter(hasExpressions)
     >>> expressive
     <music21.stream.iterator.RecursiveIterator for Score:0x10487f550 @:0>

@@ -1339,8 +1339,8 @@ class MeasureParser(XMLParserBase):
                     meth(mxObj)
         
         if self.useVoices is True:
-            for v in self.stream.voices:
-                if len(v) > 0: # do not bother with empty voices
+            for v in self.stream.iter.voices:
+                if v: # do not bother with empty voices
                     v.makeRests(inPlace=True)
                 v.elementsChanged()
         self.stream.elementsChanged()
@@ -1587,7 +1587,7 @@ class MeasureParser(XMLParserBase):
         self.xmlToPitch(mxNote, n.pitch) # send whole note since accidental display not in <pitch> 
         
         beamList = mxNote.findall('beam')
-        if len(beamList) > 0:
+        if beamList:
             n.beams = self.xmlToBeams(beamList)
     
         mxStem = mxNote.find('stem')
@@ -2941,9 +2941,9 @@ class MeasureParser(XMLParserBase):
         else:
             #environLocal.printDebug(['found metronome mark:', 'numbers', numbers])
             mm = tempo.MetronomeMark()
-            if len(numbers) > 0:
+            if numbers:
                 mm.number = numbers[0]
-            if len(durations) > 0:
+            if durations:
                 mm.referent = durations[0]
             # TODO: set text if defined in words
             if mxWords is not None:

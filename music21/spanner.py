@@ -460,7 +460,7 @@ class Spanner(base.Music21Object):
 
         self.spannerStorage.elementsChanged()
         # always clear cache
-        if len(self._cache) > 0:
+        if self._cache:
             self._cache = {} 
 
     def hasSpannedElement(self, spannedElement):  
@@ -512,7 +512,7 @@ class Spanner(base.Music21Object):
         # while this Spanner now has proper elements in its spannerStorage Stream, the element replaced likely has a site left-over from its previous Spanner
 
         # always clear cache
-        if len(self._cache) > 0:
+        if self._cache:
             self._cache = {} 
 
         #environLocal.printDebug(['replaceSpannedElement()', 'id(old)', id(old), 'id(new)', id(new)])
@@ -719,7 +719,7 @@ class SpannerBundle(object):
         to a Stream.
         '''
         self._storage.append(other)
-        if len(self._cache) > 0:
+        if self._cache:
             self._cache = {} 
 
     def __len__(self):
@@ -754,7 +754,7 @@ class SpannerBundle(object):
             self._storage.remove(item)
         else:
             raise SpannerBundleException('cannot match object for removal: %s' % item)
-        if len(self._cache) > 0:
+        if self._cache:
             self._cache = {} 
 
     def __repr__(self):
@@ -936,7 +936,7 @@ class SpannerBundle(object):
                 #post.append(sp)
                 #environLocal.printDebug(['replaceSpannedElement()', sp, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new)])
 
-        if len(self._cache) > 0:
+        if self._cache:
             self._cache = {} 
 
     def getByClass(self, className):

@@ -1206,7 +1206,7 @@ def extractorById(idOrList, library=('jSymbolic', 'native')):
 
     '''
     ebi = extractorsById(idOrList=idOrList, library=library)
-    if len(ebi) > 0:
+    if ebi:
         return ebi[0]
     return None # no match
 

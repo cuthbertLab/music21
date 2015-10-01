@@ -80,7 +80,7 @@ def makeBeams(s, inPlace=False):
     #if s.isClassOrSubclass('Measure'):
         mColl = []  # store a list of measures for processing
         mColl.append(returnObj)
-    elif len(s.getElementsByClass('Measure')) > 0:
+    elif s.iter.getElementsByClass('Measure'):
         mColl = list(returnObj.iter.getElementsByClass('Measure'))  # a list of measures
     else:
         raise stream.StreamException(
@@ -103,9 +103,9 @@ def makeBeams(s, inPlace=False):
         noteGroups = []
         if m.hasVoices():
             for v in m.voices:
-                noteGroups.append(v.notesAndRests)
+                noteGroups.append(v.iter.notesAndRests.stream())
         else:
-            noteGroups.append(m.notesAndRests)
+            noteGroups.append(m.iter.notesAndRests.stream())
 
         #environLocal.printDebug([
         #    'noteGroups', noteGroups, 'len(noteGroups[0])',

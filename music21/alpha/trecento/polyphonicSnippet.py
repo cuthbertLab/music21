@@ -115,7 +115,7 @@ class PolyphonicSnippet(stream.Score):
             # thisVoice is a type of stream.Stream()
             
             if thisVoice is not None:
-                if foundTs == False and len(thisVoice.getElementsByClass(meter.TimeSignature)) > 0:
+                if foundTs == False and any(thisVoice.getElementsByClass(meter.TimeSignature)):
                     foundTs = True
                 thisVoice.makeNotation(inPlace = True)
                 self.insert(0, thisVoice)

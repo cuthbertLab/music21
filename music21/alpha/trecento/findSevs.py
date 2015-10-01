@@ -28,7 +28,7 @@ def find(startRow = 2, endRow = 469, searchInterval = 7):
         if findInWork(ballata, searchInterval):                
             print(ballata.title + ' has a generic interval of %d somewhere' % searchInterval)
             opus.insert(0, ballata.asScore())
-    if len(opus) > 0:
+    if any(opus):
         opus.show('lily.pdf')
 
 def findInWork(work, searchInterval = 7):

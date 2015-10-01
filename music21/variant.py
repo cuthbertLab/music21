@@ -50,7 +50,7 @@ def mergeVariants(streamX, streamY, variantName='variant', inPlace=False):
     >>> streamX = converter.parse("tinynotation: 4/4 a4 b  c d", makeNotation=False)
     >>> streamY = converter.parse("tinynotation: 4/4 a4 b- c e", makeNotation=False)
 
-    >>> mergedStream = variant.mergeVariants(streamX, streamY, variantName = 'docvariant', inPlace = False)
+    >>> mergedStream = variant.mergeVariants(streamX, streamY, variantName='docvariant', inPlace=False)
     >>> mergedStream.show('text')
     {0.0} <music21.meter.TimeSignature 4/4>
     {0.0} <music21.note.Note A>
@@ -67,7 +67,7 @@ def mergeVariants(streamX, streamY, variantName='variant', inPlace=False):
     <music21.note.Note B->   
     
     >>> streamZ = converter.parse("tinynotation: 4/4 a4 b c d e f g a", makeNotation=False)
-    >>> variant.mergeVariants(streamX, streamZ, variantName = 'docvariant', inPlace=False)
+    >>> variant.mergeVariants(streamX, streamZ, variantName='docvariant', inPlace=False)
     Traceback (most recent call last):
     ...
     VariantException: Could not determine what merging method to use. Try using a more specific merging function.
@@ -136,7 +136,7 @@ def mergeVariants(streamX, streamY, variantName='variant', inPlace=False):
             {4.0} <music21.bar.Barline style=final>
     
     
-    >>> mergedPart = variant.mergeVariants(ap2, vp2, variantName = 'docvariant', inPlace = False)
+    >>> mergedPart = variant.mergeVariants(ap2, vp2, variantName='docvariant', inPlace=False)
     >>> mergedPart.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
     ...
@@ -149,15 +149,16 @@ def mergeVariants(streamX, streamY, variantName='variant', inPlace=False):
     '''
     classesX = streamX.classes
     if "Score" in classesX:
-        return mergeVariantScores(streamX, streamY, variantName, inPlace = inPlace)
-    elif len(streamX.getElementsByClass("Measure")) > 0:
-        return mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace = inPlace)
-    elif len(streamX.notesAndRests) > 0 and streamX.duration.quarterLength == streamY.duration.quarterLength:
-        return mergeVariantsEqualDuration([streamX, streamY], [variantName], inPlace = inPlace)
+        return mergeVariantScores(streamX, streamY, variantName, inPlace=inPlace)
+    elif streamX.iter.getElementsByClass("Measure"):
+        return mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace=inPlace)
+    elif (streamX.iter.notesAndRests and 
+            streamX.duration.quarterLength == streamY.duration.quarterLength):
+        return mergeVariantsEqualDuration([streamX, streamY], [variantName], inPlace=inPlace)
     else:
         raise VariantException("Could not determine what merging method to use. Try using a more specific merging function.")
 
-def mergeVariantScores(aScore, vScore, variantName = 'variant', inPlace = False):
+def mergeVariantScores(aScore, vScore, variantName='variant', inPlace=False):
     '''
     Takes two scores and merges them with mergeVariantMeasureStreams, part-by-part.
     
@@ -175,7 +176,7 @@ def mergeVariantScores(aScore, vScore, variantName = 'variant', inPlace = False)
     >>> vScore.insert(0.0, vp1)
     >>> vScore.insert(0.0, vp2)
     
-    >>> mergedScores = variant.mergeVariantScores(aScore, vScore, variantName = 'docvariant', inPlace = False)
+    >>> mergedScores = variant.mergeVariantScores(aScore, vScore, variantName='docvariant', inPlace=False)
     >>> mergedScores.show('text')
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.variant.Variant object of length 4.0>
@@ -214,7 +215,7 @@ def mergeVariantScores(aScore, vScore, variantName = 'variant', inPlace = False)
             {4.0} <music21.bar.Barline style=final>
     
     '''
-    if len(aScore.parts) != len(vScore.parts):
+    if len(aScore.iter.parts) != len(vScore.iter.parts):
         raise VariantException("These scores do not have the same number of parts and cannot be merged.")
     
     if inPlace is True:
@@ -223,13 +224,13 @@ def mergeVariantScores(aScore, vScore, variantName = 'variant', inPlace = False)
         returnObj = copy.deepcopy(aScore)
     
     for returnPart, vPart in zip(returnObj.parts, vScore.parts):
-        mergeVariantMeasureStreams(returnPart, vPart, variantName, inPlace = True)
+        mergeVariantMeasureStreams(returnPart, vPart, variantName, inPlace=True)
     
     if inPlace is False:
         return returnObj
     
 
-def mergeVariantMeasureStreams(streamX, streamY, variantName = 'variant', inPlace = False):
+def mergeVariantMeasureStreams(streamX, streamY, variantName='variant', inPlace=False):
     '''
     Takes two streams of measures and returns a stream (new if inPlace is False) with the second
     merged with the first as variants. This function differs from mergeVariantsEqualDuration by
@@ -290,7 +291,7 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName = 'variant', inPlac
     .. image:: images/variant_measuresStreamMergeStream2.*
         :width: 600
 
-    >>> mergedStream = variant.mergeVariantMeasureStreams(stream1, stream2, 'paris', inPlace = False)
+    >>> mergedStream = variant.mergeVariantMeasureStreams(stream1, stream2, 'paris', inPlace=False)
     >>> mergedStream.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
         {0.0} <music21.note.Note A>
@@ -324,7 +325,7 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName = 'variant', inPlac
     >>> mergedStream.variants[1].replacementDuration
     0.0
     
-    >>> parisStream = mergedStream.activateVariants('paris', inPlace = False)
+    >>> parisStream = mergedStream.activateVariants('paris', inPlace=False)
     >>> parisStream.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
         {0.0} <music21.note.Note A>
@@ -377,7 +378,8 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName = 'variant', inPlac
         returnObj = copy.deepcopy(streamX)
     
     regions = _getRegionsFromStreams(returnObj,streamY)
-    for regionType, xRegionStartMeasure, xRegionEndMeasure, yRegionStartMeasure, yRegionEndMeasure in regions: # Note that the 'end' measure indices are 1 greater than the 0-indexed number of the measure.
+    for (regionType, xRegionStartMeasure, xRegionEndMeasure, 
+            yRegionStartMeasure, yRegionEndMeasure) in regions: # Note that the 'end' measure indices are 1 greater than the 0-indexed number of the measure.
         if xRegionStartMeasure >= len(returnObj.getElementsByClass('Measure')):
             startOffset = returnObj.duration.quarterLength #This deals with insertion at the end case where returnObj.measure(xRegionStartMeasure+1) does not exist.
         else:
@@ -402,7 +404,8 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName = 'variant', inPlac
             replacementDuration = 0.0
         else:
             raise VariantException("Unknown regionType %r" % regionType)
-        addVariant(returnObj, startOffset, yRegion, variantName = variantName, replacementDuration = replacementDuration)
+        addVariant(returnObj, startOffset, yRegion, 
+                   variantName=variantName, replacementDuration = replacementDuration)
     
     if inPlace is True:
         return
@@ -410,7 +413,7 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName = 'variant', inPlac
         return returnObj
 
 
-def mergeVariantsEqualDuration(streams, variantNames, inPlace = False):
+def mergeVariantsEqualDuration(streams, variantNames, inPlace=False):
     '''
     Pass this function a list of streams (they must be of the same length or a VariantException will be raised).
     It will return a stream which merges the differences between the streams into variant objects keeping the
@@ -550,7 +553,7 @@ def mergeVariantsEqualDuration(streams, variantNames, inPlace = False):
     
     >>> for p in mergedStreams.getElementsByClass('Part'):
     ...    for m in p.getElementsByClass('Measure'):
-    ...        m.activateVariants('paris', inPlace = True)
+    ...        m.activateVariants('paris', inPlace=True)
     >>> mergedStreams.show('t')
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 0 offset=0.0>
@@ -633,23 +636,24 @@ def mergeVariantsEqualDuration(streams, variantNames, inPlace = False):
                     for j in range(len(returnObjMeasures)):
                         returnObjMeasure = returnObjMeasures[j]
                         sMeasure = sPart.getElementsByClass('Measure')[j]
-                        _mergeVariants(returnObjMeasure,sMeasure,variantName = variantName, inPlace = True)
+                        _mergeVariants(
+                            returnObjMeasure, sMeasure, variantName=variantName, inPlace=True)
                 
                 else: # If parts exist but no measures.
-                    _mergeVariants(returnObjPart,sPart,variantName = variantName, inPlace = True)
+                    _mergeVariants(returnObjPart, sPart, variantName=variantName, inPlace=True)
         else:
             returnObjMeasures = returnObj.getElementsByClass('Measure')
             if len(returnObjMeasures) != 0: #If no parts, but still measures, iterate through them.
                 for j in range(len(returnObjMeasures)):
                     returnObjMeasure = returnObjMeasures[j]
                     sMeasure = s.getElementsByClass('Measure')[j]
-                    _mergeVariants(returnObjMeasure,sMeasure, variantName = variantName, inPlace = True)
+                    _mergeVariants(returnObjMeasure, sMeasure, variantName=variantName, inPlace=True)
             else: # If no parts and no measures.
-                _mergeVariants(returnObj,s,variantName = variantName, inPlace = True)
+                _mergeVariants(returnObj, s, variantName=variantName, inPlace=True)
            
     return returnObj
 
-def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace = False, compareByMeasureNumber = False, recurseInMeasures = False):
+def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace=False, compareByMeasureNumber = False, recurseInMeasures = False):
     '''
     Some MusicXML files are generated with full parts that have only a few non-rest measures 
     instead of ossia parts, such as those
@@ -671,8 +675,8 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace = False, compareByM
     
     >>> mainstream = converter.parse("tinynotation: 4/4   A4 B4 C4 D4   E1    F2 E2     E8 F8 F4 G2   G2 G4 F4   F4 F4 F4 F4   G1      ")
     >>> ossiastream = converter.parse("tinynotation: 4/4  r1            r1    r1        E4 E4 F4 G4   r1         F2    F2      r1      ")
-    >>> mainstream.makeMeasures(inPlace = True)
-    >>> ossiastream.makeMeasures(inPlace = True)
+    >>> mainstream.makeMeasures(inPlace=True)
+    >>> ossiastream.makeMeasures(inPlace=True)
     
     >>> # mainstream.__class__ = stream.Part
     >>> mainpart = stream.Part()
@@ -689,22 +693,22 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace = False, compareByM
     
     >>> mainpartWithOssiaVariantsFT = variant.mergePartAsOssia(mainpart, ossiapart,
     ...                                                            ossiaName = 'Parisian Variant',
-    ...                                                            inPlace = False,
+    ...                                                            inPlace=False,
     ...                                                            compareByMeasureNumber = False,
     ...                                                            recurseInMeasures = True)
     >>> mainpartWithOssiaVariantsTT = variant.mergePartAsOssia(mainpart, ossiapart,
     ...                                                            ossiaName = 'Parisian Variant',
-    ...                                                            inPlace = False,
+    ...                                                            inPlace=False,
     ...                                                            compareByMeasureNumber = True,
     ...                                                            recurseInMeasures = True)
     >>> mainpartWithOssiaVariantsFF = variant.mergePartAsOssia(mainpart, ossiapart,
     ...                                                            ossiaName = 'Parisian Variant',
-    ...                                                            inPlace = False,
+    ...                                                            inPlace=False,
     ...                                                            compareByMeasureNumber = False,
     ...                                                            recurseInMeasures = False)
     >>> mainpartWithOssiaVariantsTF = variant.mergePartAsOssia(mainpart, ossiapart,
     ...                                                            ossiaName = 'Parisian Variant',
-    ...                                                            inPlace = False,
+    ...                                                            inPlace=False,
     ...                                                            compareByMeasureNumber = True,
     ...                                                            recurseInMeasures = False)
                                                                 
@@ -764,19 +768,19 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace = False, compareByM
                 ossiaNumber = ossiaMeasure.number
                 returnMeasure = returnObj.measure(ossiaNumber)
                 if recurseInMeasures is True: 
-                    mergeVariantsEqualDuration([returnMeasure, ossiaMeasure], [ossiaName], inPlace = True)
+                    mergeVariantsEqualDuration([returnMeasure, ossiaMeasure], [ossiaName], inPlace=True)
                 else:
                     ossiaOffset = returnMeasure.getOffsetBySite(returnObj)
-                    addVariant(returnObj, ossiaOffset, ossiaMeasure, variantName = ossiaName, variantGroups = None, replacementDuration = None)
+                    addVariant(returnObj, ossiaOffset, ossiaMeasure, variantName=ossiaName, variantGroups=None, replacementDuration=None)
     else:
         for ossiaMeasure in ossiapart.getElementsByClass("Measure"):
             if len(ossiaMeasure.notes) > 0: #If the measure is not just rests
                 ossiaOffset = ossiaMeasure.getOffsetBySite(ossiapart)
                 if recurseInMeasures is True:
                     returnMeasure = returnObj.getElementsByOffset(ossiaOffset, classList = [stream.Measure])[0]
-                    mergeVariantsEqualDuration([returnMeasure, ossiaMeasure], [ossiaName], inPlace = True)
+                    mergeVariantsEqualDuration([returnMeasure, ossiaMeasure], [ossiaName], inPlace=True)
                 else:
-                    addVariant(returnObj, ossiaOffset, ossiaMeasure, variantName = ossiaName, variantGroups = None, replacementDuration = None)
+                    addVariant(returnObj, ossiaOffset, ossiaMeasure, variantName=ossiaName, variantGroups=None, replacementDuration=None)
         
     if inPlace is True:
         return
@@ -817,7 +821,7 @@ def addVariant(s, startOffset, sVariant, variantName=None, variantGroups=None, r
     ...    n.duration.type = durType
     ...    m.append(n)
     >>> stream2.append(m)
-    >>> variant.addVariant(stream1, 4.0, stream2, variantName = 'rhythmic switch', replacementDuration = 4.0)
+    >>> variant.addVariant(stream1, 4.0, stream2, variantName='rhythmic switch', replacementDuration=4.0)
     >>> stream1.show('text')
     {0.0} <music21.stream.Measure 0 offset=0.0>
         {0.0} <music21.note.Note A>
@@ -843,7 +847,7 @@ def addVariant(s, startOffset, sVariant, variantName=None, variantGroups=None, r
     >>> variant1 = variant.Variant()
     >>> variant1.repeatAppend(note.Note('f'), 3)
     >>> startOffset = 3.0
-    >>> variant.addVariant(stream1, startOffset, variant1, variantName = 'paris', replacementDuration = 3.0)
+    >>> variant.addVariant(stream1, startOffset, variant1, variantName='paris', replacementDuration=3.0)
     >>> stream1.show('text')
     {0.0} <music21.note.Note E>
     {1.0} <music21.note.Note E>
@@ -881,7 +885,7 @@ def addVariant(s, startOffset, sVariant, variantName=None, variantGroups=None, r
 
 
 
-def refineVariant(s, sVariant, inPlace = False):
+def refineVariant(s, sVariant, inPlace=False):
     '''
     Given a stream and variant contained in that stream, returns a stream with that variant 'refined.'
     
@@ -929,7 +933,7 @@ def refineVariant(s, sVariant, inPlace = False):
     ...    s.append(m)
     >>> s.insert(4.0, v)
 
-    >>> variant.refineVariant(s, v, inPlace = True)
+    >>> variant.refineVariant(s, v, inPlace=True)
     >>> s.show('text')
     {0.0} <music21.stream.Measure 0 offset=0.0>
         {0.0} <music21.note.Note A>
@@ -983,7 +987,10 @@ def refineVariant(s, sVariant, inPlace = False):
     returnRegionMeasureList = [i for i in range(len(returnRegion))]
     badnessDict = {}
     listDict = {}
-    variantMeasureList, unused_badness = _getBestListandScore(returnRegion, variantRegion, badnessDict, listDict)
+    variantMeasureList, unused_badness = _getBestListandScore(returnRegion, 
+                                                              variantRegion, 
+                                                              badnessDict, 
+                                                              listDict)
     
     # badness is a measure of how different the streams are. The list returned, variantMeasureList, minimizes that quantity.
     
@@ -1000,7 +1007,8 @@ def refineVariant(s, sVariant, inPlace = False):
         if regionType is 'equal':
             returnSubRegion = returnRegion.measures(returnStart+1, returnEnd)
             variantSubRegion = variantRegion.measures(variantStart+1, variantEnd)
-            mergeVariantsEqualDuration([returnSubRegion, variantSubRegion], variantGroups, inPlace = True)
+            mergeVariantsEqualDuration(
+                    [returnSubRegion, variantSubRegion], variantGroups, inPlace=True)
             continue        
         elif regionType is 'replace':
             returnSubRegion = returnRegion.measures(returnStart+1, returnEnd)
@@ -1016,7 +1024,9 @@ def refineVariant(s, sVariant, inPlace = False):
         else:
             raise VariantException("Unknown regionType %r" % regionType)
 
-        addVariant(returnRegion, startOffset, variantSubRegion, variantGroups = variantGroups, replacementDuration = replacementDuration)
+        addVariant(returnRegion, startOffset, 
+                   variantSubRegion, variantGroups=variantGroups, 
+                   replacementDuration=replacementDuration)
             
     returnObject.remove(variantRegion) # The original variant object has been replaced by more refined variant objects and so should be deleted.
     if inPlace:
@@ -1025,7 +1035,7 @@ def refineVariant(s, sVariant, inPlace = False):
         return returnObject
 
 
-def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, inPlace = False):
+def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, inPlace=False):
     '''
     There seem to be some problems with this function and it isn't well tested.
     It is not recommended to use it at this time.
@@ -1038,15 +1048,16 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, inPlace 
     else:
         returnObject = copy.deepcopy(streamX)
         variantObject = copy.deepcopy(streamY)
-        
-
-    
 
     # associating measures in variantRegion to those in returnRegion -> This is done via 0 indexed lists corresponding to measures
     returnObjectMeasureList = [i for i in range(len(returnObject.getElementsByClass("Measure")))]
     badnessDict = {}
     listDict = {}
-    variantObjectMeasureList, unused_badness = _getBestListandScore(returnObject.getElementsByClass("Measure"), variantObject.getElementsByClass("Measure"), badnessDict, listDict)
+    variantObjectMeasureList, unused_badness = _getBestListandScore(
+            returnObject.getElementsByClass("Measure"), 
+            variantObject.getElementsByClass("Measure"), 
+            badnessDict, 
+            listDict)
     
     # badness is a measure of how different the streams are. The list returned, variantMeasureList, minimizes that quantity.
     
@@ -1062,9 +1073,8 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, inPlace 
         if regionType is 'equal':
             returnSubRegion = returnObject.measures(returnStart+1, returnEnd)
             variantSubRegion = variantObject.measures(variantStart+1, variantEnd)
-            mergeVariantMeasureStreams(returnSubRegion, variantSubRegion, [variantName], inPlace = True)
+            mergeVariantMeasureStreams(returnSubRegion, variantSubRegion, [variantName], inPlace=True)
             continue
-        
         elif regionType is 'replace':
             returnSubRegion = returnObject.measures(returnStart+1, returnEnd)
             replacementDuration = returnSubRegion.duration.quarterLength
@@ -1076,7 +1086,8 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, inPlace 
         elif regionType is 'insert':
             variantSubRegion = variantObject.measures(variantStart+1, variantEnd)
             replacementDuration = 0.0
-        addVariant(returnObject, startOffset, variantSubRegion, variantGroups = [variantName], replacementDuration = replacementDuration)
+        addVariant(returnObject, startOffset, variantSubRegion, 
+                   variantGroups=[variantName], replacementDuration=replacementDuration)
             
     if inPlace:
         return
@@ -1085,9 +1096,9 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, inPlace 
 
 def getMeasureHashes(s):
     '''
-    Takes in a stream containing measures and returns a list of hashes, one for each measure. Currently
+    Takes in a stream containing measures and returns a list of hashes, 
+    one for each measure. Currently
     implemented with search.translateStreamToString()
-    
     
     >>> s = converter.parse("tinynotation: 2/4 c4 d8. e16 FF4 a'4 b-2")
     >>> sm = s.makeMeasures()
@@ -1108,7 +1119,8 @@ def getMeasureHashes(s):
 
 #----- Private Helper Functions
 
-def _getBestListandScore(streamX, streamY, badnessDict, listDict, isNone = False, streamXindex = -1, streamYindex = -1):
+def _getBestListandScore(streamX, streamY, badnessDict, listDict, 
+                         isNone=False, streamXindex=-1, streamYindex=-1):
     '''
     This is a recursive function which makes a map between two related streams of measures.
     It is designed for streams of measures that contain few if any measures that are actually
@@ -1156,7 +1168,7 @@ def _getBestListandScore(streamX, streamY, badnessDict, listDict, isNone = False
     ...        n.duration.type = durType
     ...        m.append(n)
     ...    stream2.append(m)
-    >>> kList, kBadness = variant._getBestListandScore(stream1, stream2, badnessDict, listDict, isNone = False)
+    >>> kList, kBadness = variant._getBestListandScore(stream1, stream2, badnessDict, listDict, isNone=False)
     >>> kList
     [0, 1, 2, 'addedBar']
     '''
@@ -1187,7 +1199,7 @@ def _getBestListandScore(streamX, streamY, badnessDict, listDict, isNone = False
     
 
     # Check the added bar case:
-    kList, kBadness = _getBestListandScore(streamX, streamY, badnessDict, listDict, isNone = True, streamXindex = streamXindex, streamYindex = streamYindex+1)
+    kList, kBadness = _getBestListandScore(streamX, streamY, badnessDict, listDict, isNone=True, streamXindex=streamXindex, streamYindex=streamYindex+1)
     if kList is None:
         kList = []
     if len(kList) is not 0:
@@ -1201,7 +1213,9 @@ def _getBestListandScore(streamX, streamY, badnessDict, listDict, isNone = False
     
     # Check the other cases
     for k in range(streamXindex+1,len(streamX)):
-        kList, kBadness = _getBestListandScore(streamX, streamY, badnessDict, listDict, isNone = False, streamXindex = k, streamYindex = streamYindex+1)
+        kList, kBadness = _getBestListandScore(streamX, streamY, badnessDict, 
+                                               listDict, isNone=False, 
+                                               streamXindex=k, streamYindex=streamYindex+1)
         if kList is None:
             kList = []
         if len(kList) is not 0:
@@ -1281,9 +1295,10 @@ def _getRegionsFromStreams(streamX,streamY):
     return regions
 
 
-def _mergeVariants(streamA, streamB, containsVariants = False, variantName = None, inPlace = False):
+def _mergeVariants(streamA, streamB, containsVariants = False, variantName=None, inPlace=False):
     '''
-    This is a helper function for mergeVariantsEqualDuration which takes two streams (which cannot contain container
+    This is a helper function for mergeVariantsEqualDuration which takes two streams 
+    (which cannot contain container
     streams like measures and parts) and merges the second into the first via variant objects.
     If the first already contains variant objects, containsVariants should be set to true and the
     function will compare streamB to the streamA as well as the variant streams contained in streamA.
@@ -1306,7 +1321,7 @@ def _mergeVariants(streamA, streamB, containsVariants = False, variantName = Non
     ...    n = note.Note(pitchName)
     ...    n.duration.type = durType
     ...    stream2.append(n)
-    >>> mergedStreams = variant._mergeVariants(stream1, stream2, variantName = 'paris')
+    >>> mergedStreams = variant._mergeVariants(stream1, stream2, variantName='paris')
     >>> mergedStreams.show('t')
     {0.0} <music21.note.Note A>
     {1.0} <music21.variant.Variant object of length 1.0>
@@ -1345,16 +1360,16 @@ def _mergeVariants(streamA, streamB, containsVariants = False, variantName = Non
     {10.0} <music21.note.Note A>
     
     >>> stream1.append(note.Note('e'))
-    >>> mergedStreams = variant._mergeVariants(stream1, stream2, variantName = ['paris'])
+    >>> mergedStreams = variant._mergeVariants(stream1, stream2, variantName=['paris'])
     Traceback (most recent call last):
     ...
     VariantException: _mergeVariants cannot merge streams which are of different lengths
     '''
     # TODO: Add the feature for merging a stream to a stream with existing variants (it has to compare against both the stream and the contained variant)
-    if (len(streamA.getElementsByClass('Measure')) is not 0) or \
-    (len(streamA.getElementsByClass('Part')) is not 0) or \
-    (len(streamB.getElementsByClass('Measure')) is not 0) or \
-    (len(streamB.getElementsByClass('Part')) is not 0):
+    if ((len(streamA.getElementsByClass('Measure')) is not 0) or
+            (len(streamA.getElementsByClass('Part')) is not 0) or
+            (len(streamB.getElementsByClass('Measure')) is not 0) or
+            (len(streamB.getElementsByClass('Part')) is not 0)):
         raise VariantException('_mergeVariants cannot merge streams which contain measures or parts.')
     
     if streamA.highestTime != streamB.highestTime:
@@ -1412,7 +1427,8 @@ def _mergeVariants(streamA, streamB, containsVariants = False, variantName = Non
             continue
     
     if inVariant is True: #insert final variant if exists
-        returnObj.insert(variantStart,_generateVariant(noteBuffer,streamB,variantStart,variantName))
+        returnObj.insert(variantStart, _generateVariant(
+                                    noteBuffer, streamB, variantStart, variantName))
         inVariant = False
         noteBuffer = []
     
@@ -1421,10 +1437,12 @@ def _mergeVariants(streamA, streamB, containsVariants = False, variantName = Non
     else:
         return returnObj
 
-def _generateVariant(noteList, originStream, start, variantName = None):
+def _generateVariant(noteList, originStream, start, variantName=None):
     '''
-    Helper function for mergeVariantsEqualDuration which takes a list of consecutive notes from a stream and returns
-    a variant object containing the notes from the list at the offsets derived from their original context.
+    Helper function for mergeVariantsEqualDuration which takes a list of 
+    consecutive notes from a stream and returns
+    a variant object containing the notes from the list at the offsets 
+    derived from their original context.
     
     >>> originStream = stream.Stream()
     >>> data = [('a', 'quarter'), ('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'), ('a', 'quarter'),
@@ -1438,7 +1456,7 @@ def _generateVariant(noteList, originStream, start, variantName = None):
     >>> for n in originStream.notes[2:5]:
     ...    noteList.append(n)
     >>> start = originStream.notes[2].offset
-    >>> variantName = 'paris'
+    >>> variantName='paris'
     >>> v = variant._generateVariant(noteList, originStream, start, variantName)
     >>> v.show('text')
     {0.0} <music21.note.Note C>
@@ -1459,13 +1477,18 @@ def _generateVariant(noteList, originStream, start, variantName = None):
 
 
 #------- Variant Manipulation Methods
-def makeAllVariantsReplacements(streamWithVariants, variantNames = None, inPlace = False, recurse = False):
+def makeAllVariantsReplacements(streamWithVariants, variantNames=None, inPlace=False, recurse=False):
     '''
-    This function takes a stream and a list of variantNames (default works on all variants), and changes all insertion (elongations with replacementDuration 0)
-    and deletion variants (with containedHighestTime 0) into variants with non-zero replacementDuration and non-null elements
+    This function takes a stream and a list of variantNames 
+    (default works on all variants), and changes all insertion 
+    (elongations with replacementDuration 0)
+    and deletion variants (with containedHighestTime 0) into variants with non-zero 
+    replacementDuration and non-null elements
     by adding measures on the front of insertions and measures on the end
-    of deletions. This is designed to make it possible to format all variants in a readable way as a graphical ossia (via lilypond). If inPlace is True
-    it will perform this action on the stream itself; otherwise it will return a modified copy. If recurse is True, this
+    of deletions. This is designed to make it possible to format all variants in a 
+    readable way as a graphical ossia (via lilypond). If inPlace is True
+    it will perform this action on the stream itself; otherwise it will return a 
+    modified copy. If recurse is True, this
     method will work on variants within container objects within the stream (like parts).
     
     >>> from __future__ import print_function
@@ -1473,9 +1496,9 @@ def makeAllVariantsReplacements(streamWithVariants, variantNames = None, inPlace
     >>> s = converter.parse("tinynotation: 4/4       d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                        d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1")
     >>> s2 = converter.parse("tinynotation: 4/4      d4 e4 f4 g4   a2. b-8 a8   g4 a8 g8 f4 e4    d2 a2   d4 f4 a2  d4 f4 AA2  d4 e4 f4 g4                 g4 a8 b-8 c'4 c4    f1")
     >>> #                                                          replacement                            insertion                            deletion
-    >>> s.makeMeasures(inPlace = True)
-    >>> s2.makeMeasures(inPlace = True)
-    >>> variant.mergeVariants(s, s2, variantName = 'london', inPlace = True)
+    >>> s.makeMeasures(inPlace=True)
+    >>> s2.makeMeasures(inPlace=True)
+    >>> variant.mergeVariants(s, s2, variantName='london', inPlace=True)
     
     >>> newPart = stream.Part(s)
     >>> newStream = stream.Score()
@@ -1495,7 +1518,7 @@ def makeAllVariantsReplacements(streamWithVariants, variantNames = None, inPlace
     (16.0, 'elongation', 0.0)
     (20.0, 'deletion', 4.0)
     
-    >>> variant.makeAllVariantsReplacements(newStream, recurse = True, inPlace = True)
+    >>> variant.makeAllVariantsReplacements(newStream, recurse = True, inPlace=True)
     >>> for v in newStream.parts[0].variants:
     ...     (v.offset, v.lengthType, v.replacementDuration, v.containedHighestTime)
     (4.0, 'replacement', 4.0, 4.0)
@@ -1521,9 +1544,10 @@ def makeAllVariantsReplacements(streamWithVariants, variantNames = None, inPlace
     else:
         return returnStream
    
-def _doVariantFixingOnStream(s, variantNames = None):
+def _doVariantFixingOnStream(s, variantNames=None):
     '''
-    This is a helper function for makeAllVariantsReplacements. It iterates through the appropriate variants
+    This is a helper function for makeAllVariantsReplacements. 
+    It iterates through the appropriate variants
     and performs the variant changing operation to eliminate strict deletion and insertion variants.
     
     
@@ -1531,9 +1555,9 @@ def _doVariantFixingOnStream(s, variantNames = None):
     >>> s = converter.parse("tinynotation: 4/4                    d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                        d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1    ", makeNotation=False)
     >>> s2 = converter.parse("tinynotation: 4/4      a4 b c d     d4 e4 f4 g4   a2. b-8 a8   g4 a8 g8 f4 e4    d2 a2   d4 f4 a2  d4 f4 AA2  d4 e4 f4 g4                 g4 a8 b-8 c'4 c4          ", makeNotation=False)
     >>> #                                        initial insertion              replacement                            insertion                            deletion                        final deletion
-    >>> s.makeMeasures(inPlace = True)
-    >>> s2.makeMeasures(inPlace = True)
-    >>> variant.mergeVariants(s, s2, variantName = 'london', inPlace = True)
+    >>> s.makeMeasures(inPlace=True)
+    >>> s2.makeMeasures(inPlace=True)
+    >>> variant.mergeVariants(s, s2, variantName='london', inPlace=True)
     
     >>> variant._doVariantFixingOnStream(s, 'london')
     >>> s.show('text')
@@ -1640,7 +1664,7 @@ def _doVariantFixingOnStream(s, variantNames = None):
             v.replacementDuration = oldReplacementDuration + targetElement.duration.quarterLength
 
 
-def _getNextElements(s, v, numberOfElements = 1):
+def _getNextElements(s, v, numberOfElements=1):
     '''
     This is a helper function for makeAllVariantsReplacements() which returns the next element in s
     of the type of elements found in the variant v so that if can be added to v.
@@ -1650,8 +1674,8 @@ def _getNextElements(s, v, numberOfElements = 1):
     >>> s1 = converter.parse('tinyNotation: 4/4             b4 c d e    f4 g a b   d4 e f g   ', makeNotation=False)
     >>> s2 = converter.parse('tinyNotation: 4/4 e4 f g a    b4 c d e               d4 e f g   ', makeNotation=False)
     >>> #                                       insertion               deletion
-    >>> s1.makeMeasures(inPlace = True)
-    >>> s2.makeMeasures(inPlace = True)
+    >>> s1.makeMeasures(inPlace=True)
+    >>> s2.makeMeasures(inPlace=True)
     >>> mergedStream = variant.mergeVariants(s1, s2, 'london')
     >>> for v in mergedStream.variants:
     ...     returnElement = variant._getNextElements(mergedStream, v)
@@ -1717,7 +1741,7 @@ def _getNextElements(s, v, numberOfElements = 1):
     return returnElement
                 
 
-def _getPreviousElements(s, v, numberOfElements = 1):
+def _getPreviousElements(s, v, numberOfElements=1):
     '''
     This is a helper function for makeAllVariantsReplacements() which returns the previous element in s
     of the type of elements found in the variant v so that if can be added to v.
@@ -1727,8 +1751,8 @@ def _getPreviousElements(s, v, numberOfElements = 1):
     >>> s1 = converter.parse('tinyNotation: 4/4 a4 b c d                b4 c d e    f4 g a b    ')
     >>> s2 = converter.parse('tinyNotation: 4/4 a4 b c d    e4 f g a    b4 c d e                ')
     >>> #                                                   insertion               deletion
-    >>> s1.makeMeasures(inPlace = True)
-    >>> s2.makeMeasures(inPlace = True)
+    >>> s1.makeMeasures(inPlace=True)
+    >>> s2.makeMeasures(inPlace=True)
     >>> mergedStream = variant.mergeVariants(s1, s2, 'london')
     >>> for v in mergedStream.variants:
     ...     returnElement = variant._getPreviousElements(mergedStream, v)
@@ -1762,11 +1786,11 @@ def _getPreviousElements(s, v, numberOfElements = 1):
     # Get class of elements in variant or replaced Region
     foundStream = None
     if lengthType is 'elongation':
-        foundStream = v.getElementsByClass(['Measure', 'Note', 'Rest'])
+        foundStream = v.iter.getElementsByClass(['Measure', 'Note', 'Rest'])
     else:
-        foundStream = replacedElements.getElementsByClass(['Measure', 'Note', 'Rest'])
+        foundStream = replacedElements.iter.getElementsByClass(['Measure', 'Note', 'Rest'])
 
-    if len(foundStream) == 0:
+    if not foundStream:
         raise VariantException("Cannot find any Measures, Notes, or Rests in variant")
     vClass = type(foundStream[0])
     if isinstance(vClass, note.GeneralNote):
@@ -1774,12 +1798,12 @@ def _getPreviousElements(s, v, numberOfElements = 1):
     
     # Get next element in s after v which is of type vClass
     variantOffset = v.getOffsetBySite(s)
-    potentialTargets = s.getElementsByOffset(0.0,
+    potentialTargets = s.iter.getElementsByOffset(0.0,
                                       offsetEnd = variantOffset,
                                       includeEndBoundary = False,
                                       mustFinishInSpan = False,
                                       mustBeginInSpan = True,
-                                      classList = [vClass])
+                            ).getElementsByClass(vClass)
     returnElement = potentialTargets[-1]
     
     return returnElement
@@ -1795,7 +1819,9 @@ class VariantException(exceptions21.Music21Exception):
     pass
 
 class Variant(base.Music21Object):
-    '''A Music21Object that stores elements like a Stream, but does not represent itself externally to a Stream; i.e., the contents of a Variant are not flattened.
+    '''
+    A Music21Object that stores elements like a Stream, but does not 
+    represent itself externally to a Stream; i.e., the contents of a Variant are not flattened.
 
     This is accomplished not by subclassing, but by object composition: similar to the Spanner, 
     the Variant contains a Stream as a private attribute. Calls to this Stream, for the Variant, 
@@ -1950,7 +1976,8 @@ class Variant(base.Music21Object):
             return 0.0
 
     highestTime = property(_getHighestTime, doc='''
-        This property masks calls to Stream.highestTime. Assuming `exposeTime` is False, this always returns zero, making the Variant always take zero time. 
+        This property masks calls to Stream.highestTime. Assuming `exposeTime` 
+        is False, this always returns zero, making the Variant always take zero time. 
 
         
         >>> v = variant.Variant()
@@ -1967,7 +1994,8 @@ class Variant(base.Music21Object):
             return 0.0
 
     highestOffset = property(_getHighestOffset, doc='''
-        This property masks calls to Stream.highestOffset. Assuming `exposeTime` is False, this always returns zero, making the Variant always take zero time. 
+        This property masks calls to Stream.highestOffset. Assuming `exposeTime` 
+        is False, this always returns zero, making the Variant always take zero time. 
 
         
         >>> v = variant.Variant()
@@ -2071,7 +2099,8 @@ class Variant(base.Music21Object):
         the same length.
         ''')
     
-    def replacedElements(self, contextStream = None, classList = None, keepOriginalOffsets = False, includeSpacers = False):
+    def replacedElements(self, contextStream=None, classList=None, 
+                         keepOriginalOffsets=False, includeSpacers=False):
         '''
         Returns a Stream containing the elements which this variant replaces in a given context stream. 
         This Stream will have length self.replacementDuration.
@@ -2081,7 +2110,7 @@ class Variant(base.Music21Object):
         
         
         >>> s = converter.parse("tinynotation: 4/4 d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                  d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1", makeNotation=False)
-        >>> s.makeMeasures(inPlace = True)
+        >>> s.makeMeasures(inPlace=True)
         >>> v1stream = converter.parse("tinynotation: 4/4        a2. b-8 a8", makeNotation=False)
         >>> v2stream1 = converter.parse("tinynotation: 4/4                                       d4 f4 a2", makeNotation=False)
         >>> v2stream2 = converter.parse("tinynotation: 4/4                                                  d4 f4 AA2", makeNotation=False)
@@ -2316,7 +2345,8 @@ class Variant(base.Music21Object):
 # class VariantBundle(object):
 #     '''A utility object for processing collections of Varaints. 
 # 
-#     This object serves a very similar purpose as the SpannerBundle; Variants and Spanners are similar in design and both require special handling in copying. 
+#     This object serves a very similar purpose as the SpannerBundle; 
+#        Variants and Spanners are similar in design and both require special handling in copying. 
 #     '''
 # 
 #     def __init__(self, *arguments, **keywords):

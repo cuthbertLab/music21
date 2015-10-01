@@ -431,7 +431,7 @@ class GeneralNote(base.Music21Object):
 
         TODO: should return a \\n separated string of lyrics.  See text.assembleAllLyrics
         '''
-        if len(self.lyrics) > 0:
+        if self.lyrics:
             return self.lyrics[0].text
         else:
             return None
@@ -575,9 +575,12 @@ class GeneralNote(base.Music21Object):
         self.lyrics.insert(index, Lyric(text, (index+ 1), applyRaw=applyRaw, identifier=identifier ))
 
     def hasLyrics(self):
-        '''Return True if this object has any lyrics defined
         '''
-        if len(self.lyrics) > 0:
+        Return True if this object has any lyrics defined
+        
+        TODO: Delete: just do: ``if self.lyrics``...
+        '''
+        if self.lyrics:
             return True
         else:
             return False

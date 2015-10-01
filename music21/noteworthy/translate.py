@@ -468,7 +468,7 @@ class NoteworthyTranslator(object):
         n.pitch = self.getPitchFromPositionInfo(pitchInfo)
         
         # if Lyrics
-        if len(self.lyrics) > 0 and self.lyricPosition < len(self.lyrics):
+        if self.lyrics and self.lyricPosition < len(self.lyrics):
             n.addLyric(self.lyrics[self.lyricPosition])  
                     
         self.currentMeasure.append(n)
@@ -505,7 +505,7 @@ class NoteworthyTranslator(object):
         c.pitches = self.getMultiplePitchesFromPositionInfo(pitchInfo)
         
         # if Lyrics
-        if len(self.lyrics) > 0 and self.lyricPosition < len(self.lyrics):
+        if self.lyrics and self.lyricPosition < len(self.lyrics):
             c.addLyric(self.lyrics[self.lyricPosition])  
                     
         self.currentMeasure.append(c)
