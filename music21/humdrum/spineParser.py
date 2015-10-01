@@ -2586,7 +2586,7 @@ class Test(unittest.TestCase):
 #        for spineX in hf1.spineCollection:
 #            spineX.stream.id = "spine %s" % str(spineX.id)
 #            masterStream.append(spineX.stream)
-#        self.assertTrue(common.basicallyEqual
+#        self.assertTrue(common.whitespaceEqual
 #                          (common.stripAddresses(expectedOutput),
 #                           common.stripAddresses(masterStream._reprText())))
 #        print common.stripAddresses(expectedOutput)

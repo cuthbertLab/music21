@@ -12,7 +12,7 @@
 
 #from music21 import exceptions21
 from music21.ext import six
-from music21.common.decorators import deprecated
+#from music21.common.decorators import deprecated
 
 __all__ = ['isNum', 'isStr', 'isListLike', 'isIterable', 'classToClassStr']
 

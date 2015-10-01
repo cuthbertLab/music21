@@ -24,32 +24,26 @@ split according to function -- September 2015
 
 # should NOT import music21 or anything like that, except in doctests.
 import codecs
-import contextlib # for with statements
 import copy
-import hashlib
 import inspect
-import io
-import math
 import os
-import random
-import re
-import sys 
+import sys
+import textwrap
 import time
 import unittest
-import unicodedata
 import weakref
-
-from fractions import Fraction # speedup 50% below...
 
 from music21 import defaults
 from music21 import exceptions21
 from music21.ext import six
 
 # pylint: disable=wildcard-import
-from music21.common.formats import * # most are deprecated!
-from music21.common.decorators import * # gives the deprecated decorator
-from music21.common.numberFunc import * #including opFrac
 from music21.common.classTools import * #including isNum, isListLike 
+from music21.common.decorators import * # gives the deprecated decorator
+from music21.common.fileTools import * # file tools.
+from music21.common.formats import * # most are deprecated!
+from music21.common.numberFunc import * #including opFrac
+from music21.common.stringTools import * 
 from music21.common.weakrefTools import * # including wrapWeakref
 
 if six.PY2:
@@ -78,300 +72,30 @@ def getMissingImportStr(modNameList):
     that gives instructions on how to expand music21 with optional packages.
 
 
-    >>> common.getMissingImportStr(['matplotlib'])
-    'Certain music21 functions might need the optional package matplotlib; if you run into errors, install it by following the instructions at http://mit.edu/music21/doc/installing/installAdditional.html'
-    >>> common.getMissingImportStr(['matplotlib', 'numpy'])
-    'Certain music21 functions might need these optional packages: matplotlib, numpy; if you run into errors, install it by following the instructions at http://mit.edu/music21/doc/installing/installAdditional.html'
-
+    >>> print(common.getMissingImportStr(['matplotlib']))
+    Certain music21 functions might need the optional package matplotlib;
+    if you run into errors, install it by following the instructions at
+    http://mit.edu/music21/doc/installing/installAdditional.html
+    
+    >>> print(common.getMissingImportStr(['matplotlib', 'numpy']))
+    Certain music21 functions might need these optional packages: matplotlib, numpy;
+    if you run into errors, install them by following the instructions at
+    http://mit.edu/music21/doc/installing/installAdditional.html    
     '''
     if len(modNameList) == 0:
         return None
     elif len(modNameList) == 1:
-        return 'Certain music21 functions might need the optional package %s; if you run into errors, install it by following the instructions at http://mit.edu/music21/doc/installing/installAdditional.html' % modNameList[0]
+        return textwrap.dedent('''\
+                  Certain music21 functions might need the optional package %s;
+                  if you run into errors, install it by following the instructions at
+                  http://mit.edu/music21/doc/installing/installAdditional.html''' % 
+                  modNameList[0])
     else:
-        return 'Certain music21 functions might need these optional packages: %s; if you run into errors, install it by following the instructions at http://mit.edu/music21/doc/installing/installAdditional.html' % ', '.join(modNameList)
-
-#-------------------------------------------------------------------------------
-WHITESPACE = re.compile(r'\s+')
-LINEFEED = re.compile('\n+')
-
-
-def basicallyEqual(a, b):
-    '''
-    returns true if a and b are equal except for whitespace differences
-
-
-    >>> a = " hello there "
-    >>> b = "hello there"
-    >>> c = " bye there "
-    >>> common.basicallyEqual(a,b)
-    True
-    >>> common.basicallyEqual(a,c)
-    False
-    '''
-    a = WHITESPACE.sub('', a)
-    b = WHITESPACE.sub('', b)
-    a = LINEFEED.sub('', a)
-    b = LINEFEED.sub('', b)
-    if (a == b):
-        return True
-    else: return False
-
-basicallyEquals = basicallyEqual
-
-
-
-
-
-def toUnicode(usrStr):
-    '''Convert this tring to a uncode string; if already a unicode string, do nothing.
-
-    >>> common.toUnicode('test')
-    'test'
-    >>> common.toUnicode(u'test')
-    'test'
-    
-    :rtype: str
-    '''
-    if six.PY3:
-        if not isinstance(usrStr, str):
-            try:
-                return usrStr.decode('utf-8')
-            except TypeError:
-                return usrStr
-        else:
-            return usrStr
-    else:
-        try:
-            usrStr = unicode(usrStr, 'utf-8') # @UndefinedVariable  pylint: disable=undefined-variable
-        # some documentation may already be in unicode; if so, a TypeException will be raised
-        except TypeError: #TypeError: decoding Unicode is not supported
-            pass
-        return usrStr
-
-def readFileEncodingSafe(filePath, firstGuess='utf-8'):
-    r'''
-    Slow, but will read a file of unknown encoding as safely as possible using
-    the LGPL chardet package in music21.ext.  
-    
-    Let's try to load this file as ascii -- it has a copyright symbol at the top
-    so it won't load in Python3:
-    
-    >>> import os 
-    >>> c = os.path.join(common.getSourceFilePath(), 'common', '__init__.py')
-    >>> f = open(c)
-    >>> #_DOCS_SHOW data = f.read()
-    Traceback (most recent call last):
-    UnicodeDecodeError: 'ascii' codec can't decode byte 0xc2 in position ...: ordinal not in range(128)
-
-    That won't do! now I know that it is in utf-8, but maybe you don't. Or it could
-    be an old humdrum or Noteworthy file with unknown encoding.  This will load it safely.
-    
-    >>> data = common.readFileEncodingSafe(c)
-    >>> data[0:30]
-    '#-*- coding: utf-8 -*-\n#------'
-    
-    Well, that's nothing, since the first guess here is utf-8 and it's right. So let's
-    give a worse first guess:
-    
-    >>> data = common.readFileEncodingSafe(c, firstGuess='SHIFT_JIS') # old Japanese standard
-    >>> data[0:30]
-    '#-*- coding: utf-8 -*-\n#------'
-    
-    It worked!
-    
-    Note that this is slow enough if it gets it wrong that the firstGuess should be set
-    to something reasonable like 'ascii' or 'utf-8'.
-    
-    :rtype: str
-    '''
-    from music21.ext import chardet # encoding detector... @UnresolvedImport
-    try:
-        with io.open(filePath, 'r', encoding=firstGuess) as thisFile:
-            data = thisFile.read()
-            return data
-    except OSError: # Python3 FileNotFoundError...
-        raise
-    except UnicodeDecodeError:
-        with io.open(filePath, 'rb') as thisFileBinary:
-            dataBinary = thisFileBinary.read()
-            encoding = chardet.detect(dataBinary)['encoding']
-            return codecs.decode(dataBinary, encoding)
-    
-
-
-
-
-def getNumFromStr(usrStr, numbers='0123456789'):
-    '''Given a string, extract any numbers. Return two strings, the numbers (as strings) and the remaining characters.
-
-    >>> common.getNumFromStr('23a')
-    ('23', 'a')
-    >>> common.getNumFromStr('23a954sdfwer')
-    ('23954', 'asdfwer')
-    >>> common.getNumFromStr('')
-    ('', '')
-    
-    :rtype: tuple(str)
-    '''
-    found = []
-    remain = []
-    for char in usrStr:
-        if char in numbers:
-            found.append(char)
-        else:
-            remain.append(char)
-    # returns numbers, and then characters
-    return ''.join(found), ''.join(remain)
-
-
-
-
-
-def hyphenToCamelCase(usrStr, replacement='-'):
-    '''
-    given a hyphen-connected-string, change it to
-    a camelCaseConnectedString.  
-
-    The replacement can be specified to be something besides a hyphen.
-
-    code from http://stackoverflow.com/questions/4303492/how-can-i-simplify-this-conversion-from-underscore-to-camelcase-in-python
-
-    >>> common.hyphenToCamelCase('movement-name')
-    'movementName'
-
-    >>> common.hyphenToCamelCase('movement_name', replacement='_')
-    'movementName'
-
-    '''
-    PATTERN = re.compile(r'''
-    (?<!\A) # not at the start of the string
-    ''' + replacement + r'''
-    (?=[a-zA-Z]) # followed by a letter
-    ''', re.X)
-    
-    tokens = PATTERN.split(usrStr)
-    response = tokens.pop(0).lower()
-    for remain in tokens:
-        response += remain.capitalize()
-    return response
-    
-def camelCaseToHyphen(usrStr, replacement='-'):
-    '''
-    Given a camel-cased string, or a mixture of numbers and characters, create a space separated string.
-
-    The replacement can be specified to be something besides a hyphen, but only
-    a single character and not (for internal reasons) an uppercase character.
-
-    code from http://stackoverflow.com/questions/1175208/elegant-python-function-to-convert-camelcase-to-camel-case
-
-    >>> common.camelCaseToHyphen('movementName')
-    'movement-name'
-    >>> common.camelCaseToHyphen('movementNameName')
-    'movement-name-name'
-    
-    >>> common.camelCaseToHyphen('fileName', replacement='_')
-    'file_name'
-
-    Some things you cannot do:
-
-    >>> common.camelCaseToHyphen('fileName', replacement='NotFound')
-    Traceback (most recent call last):
-    Exception: Replacement must be a single character.
-    
-    >>> common.camelCaseToHyphen('fileName', replacement='A')
-    Traceback (most recent call last):
-    Exception: Replacement cannot be an uppercase character.
-    '''
-    if len(replacement) != 1:
-        raise Exception('Replacement must be a single character.')
-    elif replacement.lower() != replacement:
-        raise Exception('Replacement cannot be an uppercase character.')
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1' + replacement + r'\2', usrStr)
-    return re.sub('([a-z0-9])([A-Z])', r'\1' + replacement + r'\2', s1).lower()
-
-def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
-    '''
-    Given a camel-cased string, or a mixture of numbers and characters, 
-    create a space separated string.
-
-    If replaceUnderscore is True (default) then underscores also become spaces (but without the _)
-
-
-    >>> common.spaceCamelCase('thisIsATest')
-    'this Is A Test'
-    >>> common.spaceCamelCase('ThisIsATest')
-    'This Is A Test'
-    >>> common.spaceCamelCase('movement3')
-    'movement 3'
-    >>> common.spaceCamelCase('opus41no1')
-    'opus 41 no 1'
-    >>> common.spaceCamelCase('opus23402no219235')
-    'opus 23402 no 219235'
-    >>> common.spaceCamelCase('opus23402no219235').title()
-    'Opus 23402 No 219235'
-    
-    There is a small list called fixMeList that can fix mistakes.
-    
-    >>> common.spaceCamelCase('PMFC22')
-    'PMFC 22'
-
-    >>> common.spaceCamelCase('hello_myke')
-    'hello myke'
-    >>> common.spaceCamelCase('hello_myke', replaceUnderscore = False)
-    'hello_myke'
-
-    :rtype: str
-    '''
-    numbers = '0123456789.'
-    firstNum = False
-    firstChar = False
-    isNumber = False  
-    lastIsNum = False
-    post = []
-    
-    # do not split these...
-    if fixMeList is None:
-        fixupList = ('PMFC',)
-    else:
-        fixupList = fixMeList
-
-    for char in usrStr:
-        if char in numbers:
-            isNumber = True
-        else:
-            isNumber = False
-
-        if isNumber and not firstNum and not lastIsNum:
-            firstNum = True
-        else:
-            firstNum = False
-
-        # for chars
-        if not isNumber and not firstChar and lastIsNum:
-            firstChar = True
-        else:
-            firstChar = False
-
-        if len(post) > 0:
-            if char.isupper() or firstNum or firstChar:
-                post.append(' ')
-            post.append(char)
-        else: # first character
-            post.append(char)
-
-        if isNumber:
-            lastIsNum = True
-        else:
-            lastIsNum = False
-    postStr = ''.join(post)
-    for fixMe in fixupList:
-        fixMeSpaced = ' '.join(fixMe)
-        postStr = postStr.replace(fixMeSpaced, fixMe)
-    
-    if replaceUnderscore:
-        postStr = postStr.replace('_', ' ')
-    return postStr
+        return textwrap.dedent('''\
+                   Certain music21 functions might need these optional packages: %s;
+                   if you run into errors, install them by following the instructions at
+                   http://mit.edu/music21/doc/installing/installAdditional.html''' % 
+                   ', '.join(modNameList))
 
 
 def getPlatform():
@@ -416,91 +140,18 @@ def sortModules(moduleList):
     return [modNameToMod[modName] for lastmod, asctime, modName in sort]
 
 
-def sortFilesRecent(fileList):
-    '''Given two files, sort by most recent. Return only the file
-    paths.
 
 
-    >>> import os
-    >>> a = os.listdir(os.curdir)
-    >>> b = common.sortFilesRecent(a)
-
-    :rtype: list(str)
-    '''
-    sort = []
-    for fp in fileList:
-        lastmod = time.localtime(os.stat(fp)[8])
-        sort.append([lastmod, fp])
-    sort.sort()
-    sort.reverse()
-    # just return
-    return [y for dummy, y in sort]
-
-
-def getMd5(value=None):
-    '''
-    Return an md5 hash from a string.  If no value is given then
-    the current time plus a random number is encoded.
-
-    >>> common.getMd5('test')
-    '098f6bcd4621d373cade4e832627b4f6'
-
-    :rtype: str
-    '''
-    if value == None:
-        value = str(time.time()) + str(random.random())
-    m = hashlib.md5()
-    try:
-        m.update(value)
-    except TypeError: # unicode...
-        m.update(value.encode('UTF-8'))
-    
-    return m.hexdigest()
-
-
-def formatStr(msg, *arguments, **keywords):
-    '''Format one or more data elements into string suitable for printing
-    straight to stderr or other outputs
-
-    >>> a = common.formatStr('test', '1', 2, 3)
-    >>> print(a)
-    test 1 2 3
-    <BLANKLINE>
-    '''
-    if 'format' in keywords:
-        formatType = keywords['format']
-    else:
-        formatType = None
-
-    msg = [msg] + list(arguments)
-    if six.PY3:
-        for i in range(len(msg)):
-            x = msg[i]
-            if isinstance(x, bytes): 
-                msg[i] = x.decode('utf-8')
-            if not isinstance(x, str):
-                try:
-                    msg[i] = repr(x)
-                except TypeError:
-                    try:
-                        msg[i] = x.decode('utf-8')
-                    except AttributeError:
-                        msg[i] = ""
-    else:
-        msg = [str(x) for x in msg]
-    if formatType == 'block':
-        return '\n*** '.join(msg)+'\n'
-    else: # catch all others
-        return ' '.join(msg)+'\n'
 
 
 def dirPartitioned(obj, skipLeading=('__',)):
-    '''Given an object, return three lists of names: methods, attributes, and properties.
+    '''
+    Given an object, return three lists of names: methods, attributes, and properties.
 
     Note that if a name/attribute is dynamically created by a property it
     cannot be found until that attribute is created.
 
-    TODO: this cannot properly partiton properties from methods
+    TODO: this cannot properly partition properties from methods
     '''
     names = dir(obj)
     methods = []
@@ -530,26 +181,6 @@ def dirPartitioned(obj, skipLeading=('__',)):
             attributes.append(name)
     return methods, attributes, properties
 
-@contextlib.contextmanager
-def cd(targetDir):
-    '''
-    Useful for a temporary cd for use in a `with` statement:
-    
-         with cd('/Library/'):
-              os.system(make)
-              
-    will switch temporarily, and then switch back when leaving.
-    '''
-    try:
-        cwd = os.getcwdu() # unicode
-    except AttributeError:
-        cwd = os.getcwd() # non unicode
-
-    try:
-        os.chdir(targetDir)
-        yield
-    finally:
-        os.chdir(cwd)
 
 #-------------------------------------------------------------------------------
 # tools for setup.py
@@ -640,7 +271,8 @@ def getCorpusContentDirs():
 
 def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
      packageOnly=True):
-    '''Manually get all directories in the music21 package, including the top level directory. This is used in setup.py.
+    '''Manually get all directories in the music21 package, 
+    including the top level directory. This is used in setup.py.
 
     If `relative` is True, relative paths will be returned.
 
@@ -682,7 +314,9 @@ def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
 
 
 def getPackageData():
-    '''Return a list of package data in the format specified by setup.py. This creates a very inclusive list of all data types.
+    '''
+    Return a list of package data in 
+    the format specified by setup.py. This creates a very inclusive list of all data types.
     '''
     # include these extensions for all directories, even if they are not normally there.
     # also need to update writeManifestTemplate() in setup.py when adding
@@ -717,89 +351,6 @@ def pitchList(pitchL):
     return '[' + ', '.join([x.nameWithOctave for x in pitchL]) + ']'
 
 
-xlateAccents={0xc0:'A', 0xc1:'A', 0xc2:'A', 0xc3:'A', 0xc4:'A', 0xc5:'A',
-    0xc6:'Ae', 0xc7:'C',
-    0xc8:'E', 0xc9:'E', 0xca:'E', 0xcb:'E',
-    0xcc:'I', 0xcd:'I', 0xce:'I', 0xcf:'I',
-    0xd0:'Th', 0xd1:'N',
-    0xd2:'O', 0xd3:'O', 0xd4:'O', 0xd5:'O', 0xd6:'O', 0xd8:'O',
-    0xd9:'U', 0xda:'U', 0xdb:'U', 0xdc:'U',
-    0xdd:'Y', 0xde:'th', 0xdf:'ss',
-    0xe0:'a', 0xe1:'a', 0xe2:'a', 0xe3:'a', 0xe4:'a', 0xe5:'a',
-    0xe6:'ae', 0xe7:'c',
-    0xe8:'e', 0xe9:'e', 0xea:'e', 0xeb:'e',
-    0xec:'i', 0xed:'i', 0xee:'i', 0xef:'i',
-    0xf0:'th', 0xf1:'n',
-    0xf2:'o', 0xf3:'o', 0xf4:'o', 0xf5:'o', 0xf6:'o', 0xf8:'o',
-    0xf9:'u', 0xfa:'u', 0xfb:'u', 0xfc:'u',
-    0xfd:'y', 0xfe:'th', 0xff:'y',
-    0xa1:'!', 0xa2:'{cent}', 0xa3:'{pound}', 0xa4:'{currency}',
-    0xa5:'{yen}', 0xa6:'|', 0xa7:'{section}', 0xa8:'{umlaut}',
-    0xa9:'{C}', 0xaa:'{^a}', 0xab:'<<', 0xac:'{not}',
-    0xad:'-', 0xae:'{R}', 0xaf:'_', 0xb0:'{degrees}',
-    0xb1:'{+/-}', 0xb2:'{^2}', 0xb3:'{^3}', 0xb4:"'",
-    0xb5:'{micro}', 0xb6:'{paragraph}', 0xb7:'*', 0xb8:'{cedilla}',
-    0xb9:'{^1}', 0xba:'{^o}', 0xbb:'>>',
-    0xbc:'{1/4}', 0xbd:'{1/2}', 0xbe:'{3/4}', 0xbf:'?',
-    0xd7:'*', 0xf7:'/'
-    }
-
-def stripAccents(inputString):
-    r'''
-    removes accents from unicode strings.
-
-    >>> s = u'trés vite'
-    
-    >>> u'é' in s
-    True
-    
-    This works on Python2, but the doctest does not.
-    
-    >>> if ext.six.PY3:
-    ...     common.stripAccents(s)
-    ... else: 'tres vite'
-    'tres vite'
-    '''
-    nfkd_form = unicodedata.normalize('NFKD', inputString)
-    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
-
-def normalizeFilename(name):
-    u'''
-    take a name that might contain unicode characters, punctuation,
-    or spaces and
-    normalize it so that it is POSIX compliant (except for the limit
-    on length).
-
-    Takes in a string or unicode string and returns a string (unicode in Py3)
-    without any accented characters.
-
-    >>> common.normalizeFilename(u'03-Niccolò all’lessandra.not really.xml')
-    '03-Niccolo_alllessandra_not_really.xml'
-
-
-    :type name: str
-    :rtype: str
-
-    '''
-    extension = None
-    lenName = len(name)
-
-    if lenName > 5 and name[-4] == '.':
-        extension = str(name[lenName - 4:])
-        name = name[:lenName -4]
-
-    if isinstance(name, str) and six.PY2:
-        name = unicode(name) # @UndefinedVariable pylint: disable=undefined-variable
-
-    name = stripAccents(name)
-    if six.PY2:
-        name = name.encode('ascii', 'ignore')
-    else:
-        name = name.encode('ascii', 'ignore').decode('UTF-8')
-    name = re.sub(r'[^\w-]', '_', name).strip()
-    if extension is not None:
-        name += extension
-    return name
 
 
 def runningUnderIPython():
@@ -1042,62 +593,6 @@ class Timer(object):
             t = self._tDif
         return str(round(t,3))
 
-
-
-#===============================================================================
-# Image functions 
-#===============================================================================
-### Removed because only used by MuseScore and newest versions have -T option...
-# try:
-#     imp.find_module('Image')
-#     hasPIL = True
-# except ImportError:
-#     imp.find_module('PIL')
-#     except ImportError:
-#         hasPIL = False
-# 
-# def cropImageFromPath(fp, newPath=None):
-#     '''
-#     Autocrop an image in place (or at new path) from Path, if PIL is installed and return True,
-#     otherwise return False.  leave a border of size (
-#     
-#     Code from
-#     https://gist.github.com/mattjmorrison/932345
-#     '''
-#     if newPath is None:
-#         newPath = fp
-#     if hasPIL:
-#         try: 
-#             from PIL import Image, ImageChops # overhead of reimporting is low compared to imageops
-#         except ImportError:
-#             import Image, ImageChops
-#         imageObj = Image.open(fp)
-#         imageBox = imageObj.getbbox()
-#         if imageBox:
-#             croppedImg = imageObj.crop(imageBox)
-#         options = {}
-#         if 'transparency' in imageObj.info:
-#             options['transparency'] = imageObj.info["transparency"]
-# #         border = 255 # white border...
-# #         tempBgImage = Image.new(imageObj.mode, imageObj.size, border)
-# #         differenceObj = ImageChops.difference(imageObj, tempBgImage)
-# #         boundingBox = differenceObj.getbbox()
-# #         if boundingBox: # empty images return None...
-# #             croppedImg = imageObj.crop(boundingBox)
-#         croppedImg.save(newPath, **options)
-#         return True
-#         
-# 
-#     else:
-#         from music21 import environment
-#         if six.PY3:
-#             pip = 'pip3'
-#         else:
-#             pip = 'pip'
-#         environLocal = environment.Environment('common.py')        
-#         environLocal.warn('PIL/Pillow is not installed -- "sudo ' + pip + ' install Pillow"')
-#         return False
-#         
 
 
 
