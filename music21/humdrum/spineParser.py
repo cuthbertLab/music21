@@ -83,6 +83,12 @@ import os
 
 spinePathIndicators = ["*+", "*-", "*^", "*v", "*x", "*"]
 
+class HumdrumException(exceptions21.Music21Exception):
+    '''
+    General Exception class for problems relating to Humdrum
+    '''
+    pass
+
 
 class HumdrumDataCollection(object):
     r'''
@@ -640,10 +646,11 @@ class HumdrumDataCollection(object):
         place in the outer Stream.
 
 
-        Run after self.spineCollection.createMusic21Streams().  Is run automatically by self.parseLines().
+        Run after self.spineCollection.createMusic21Streams().  
+        Is run automatically by self.parseLines().
         uses self.spineCollection.getOffsetsAndPrioritiesByPosition()
         '''
-        if hasattr(self, 'globalEventsInserted') and self.globalEventsInserted is True:
+        if self.globalEventsInserted is True:
             return
         self.globalEventsInserted = True
         positionDict = self.spineCollection.getOffsetsAndPrioritiesByPosition()
@@ -697,9 +704,9 @@ class HumdrumDataCollection(object):
         if self.spineCollection is None:
             raise HumdrumException("parsing got no spine collections!")
         elif self.spineCollection.spines is None:
-            raise HumdrumException("really? not a single spine in your data? um, not my problem! (well, maybe it is...file a bug report if you have doubled checked your data)")
+            raise HumdrumException("not a single spine in your data... um,not my problem! (well, maybe it is...file a bug report if you have doubled checked your data)")
         elif self.spineCollection.spines[0].stream is None:
-            raise HumdrumException("okay, you got at least one spine, but it aint got a stream in it; have you thought of taking up kindergarten teaching? (just kidding, check your data or file a bug report)")
+            raise HumdrumException("okay, you got at least one spine, but it aint got a stream in it; (check your data or file a bug report)")
         else:
             masterStream = stream.Score()
             for thisSpine in self.spineCollection:
@@ -1923,11 +1930,6 @@ class EventCollection(object):
             retEvents.append(self.getSpineOccurring(i))
         return retEvents
 
-class HumdrumException(exceptions21.Music21Exception):
-    '''
-    General Exception class for problems relating to Humdrum
-    '''
-    pass
 
 def hdStringToNote(contents):
     '''

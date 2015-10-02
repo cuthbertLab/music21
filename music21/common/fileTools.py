@@ -13,12 +13,14 @@
 Tools for working with files
 '''
 
-from music21.ext import chardet
 import codecs
 import contextlib # for with statements
 import io
 import os
 import time
+
+from music21.ext import chardet
+from music21.common.pathTools import cleanpath
 
 __all__ = ['readFileEncodingSafe',
            'sortFilesRecent',
@@ -50,7 +52,6 @@ def cd(targetDir):
 def sortFilesRecent(fileList):
     '''Given two files, sort by most recent. Return only the file
     paths.
-
 
     >>> import os
     >>> a = os.listdir(os.curdir)
@@ -103,6 +104,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
     
     :rtype: str
     '''
+    filePath = cleanpath(filePath)
     try:
         with io.open(filePath, 'r', encoding=firstGuess) as thisFile:
             data = thisFile.read()
