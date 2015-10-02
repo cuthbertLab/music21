@@ -1753,11 +1753,6 @@ class Test(unittest.TestCase):
         # perhaps need to return more than one;
         # or getElementAtOrBefore needs to return a list
 
-#         s1Measures = s3copy.getElementsByClass('Stream')[0].makeMeasures(searchContext=True)
-#         environLocal.printDebug(['s1Measures[0].clef', s1Measures[0].clef])
-#         self.assertEqual(isinstance(s1Measures[0].clef, clef.AltoClef), True)
-        #s1Measures.show() # these show the proper clefs
-
         s2Measures = s3copy.getElementsByClass('Stream')[1].makeMeasures()
         self.assertEqual(isinstance(s2Measures[0].clef, clef.TenorClef), True)
         #s2Measures.show() # this shows the proper clef

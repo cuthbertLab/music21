@@ -3045,25 +3045,29 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                  numberEnd,
                  collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'), 
                  gatherSpanners=True, 
-                 searchContext=False, 
                  ignoreNumbers=False):
         '''
         Get a region of Measures based on a start and end Measure number, 
         where the boundary numbers are both included. 
         That is, a request for measures 4 through 10 will return 7 Measures, numbers 4 through 10.
-        It is allowed to pass `numberEnd=None`, which will be interpreted as the last measure of the stream.
+        It is allowed to pass `numberEnd=None`, which will be 
+        interpreted as the last measure of the stream.
 
         Additionally, any number of associated classes can be gathered as well. 
         Associated classes are the last found class relevant to this Stream or Part.
 
-        While all elements in the source are made available in the extracted region, 
+        While all elements in the source are the original elements in the extracted region, 
         new Measure objects are created and returned.
 
-
         >>> a = corpus.parse('bach/bwv324.xml')
-        >>> b = a.parts[0].measures(4,6)
+        >>> b = a.parts[0].measures(1,3)
         >>> len(b.getElementsByClass('Measure'))
         3
+        >>> b.getElementsByClass('Measure')[0].notes[0] is a.parts[0].flat.notes[0]
+        True
+
+        if gatherSpanners is True or the string 'all' then all spanners in the score are gathered and
+        included.  TODO: make True only return spanners from the region.
 
         if ignoreNumbers is True, then it ignores defined measureNumbers and 
         uses 0-indexed measure objects
@@ -3208,12 +3212,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #             if found is not None:
 #                 startMeasureNew._insertCore(0, found)
 #
-#             # if still not found
-#             # do a context search for the class, searching all stored
-#             # locations: this is very time consuming on large scores
-#             if found is not None and searchContext:
-#                 found = startMeasure.getContextByClass(className)
-#                 startMeasureNew._insertCore(0, found)
 #
 #         # as we have inserted elements, need to call
 #         startMeasureNew.elementsChanged()
@@ -3238,7 +3236,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def measure(self, 
                 measureNumber,
                 collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
-                searchContext=False, 
                 ignoreNumbers=False):
         '''
         Given a measure number, return a single
@@ -3264,8 +3261,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # representation (e.g., this is a Stream or Part, not a Score)
         if len(self.getElementsByClass('Measure', returnStreamSubClass='list')) >= 1:
             #environLocal.printDebug(['got measures from getElementsByClass'])
-            s = self.measures(measureNumber, measureNumber, collect=collect,
-                              searchContext=searchContext, ignoreNumbers=ignoreNumbers)
+            s = self.measures(measureNumber, 
+                              measureNumber, 
+                              collect=collect,
+                              ignoreNumbers=ignoreNumbers)
             if len(s) == 0:
                 return None
             else:
@@ -3737,8 +3736,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return returnObj
 
     #---------------------------------------------------------------------------
-    def getTimeSignatures(self, searchContext=True, returnDefault=True,
-        sortByCreationTime=True):
+    def getTimeSignatures(self, 
+                          searchContext=True, 
+                          returnDefault=True,
+                          sortByCreationTime=True):
         '''
         Collect all :class:`~music21.meter.TimeSignature` objects in this stream.
         If no TimeSignature objects are defined, get a default (4/4 or whatever

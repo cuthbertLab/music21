@@ -11,10 +11,6 @@
 #-------------------------------------------------------------------------------
 '''
 Converters for music21 objects to musicxml.
-
-Does not handle the entire string architecture, that's what m21ToString is for.
-
-Assumes that the outermost object is a score.
 '''
 from __future__ import print_function, division
 
@@ -49,6 +45,7 @@ from music21 import clef
 from music21 import metadata
 from music21 import note
 from music21 import meter
+from music21 import pitch
 from music21 import spanner
 from music21 import stream
 
@@ -343,7 +340,14 @@ class GeneralObjectExporter():
         if obj is None:
             obj = self.generalObj
         outObj = self.fromGeneralObject(obj)
-        scoreExporter = ScoreExporter(outObj)
+        return self.parseWellformedObject(outObj)
+    
+    def parseWellformedObject(self, sc):
+        '''
+        parse an object that has already gone through the
+        `.fromGeneralObject` conversion.  Returns bytes.
+        '''
+        scoreExporter = ScoreExporter(sc)
         scoreExporter.parse()
         return scoreExporter.asBytes()
 
@@ -527,15 +531,19 @@ class GeneralObjectExporter():
     
     def fromGeneralNote(self, n):
         '''
-        Translate a music21 :class:`~music21.note.Note` into a 
-        complete MusicXML representation.
-    
+        Translate a music21 :class:`~music21.note.Note` into an object
+        ready to be parsed.
         
         >>> n = note.Note('c3')
         >>> n.quarterLength = 3
-        >>> post = musicxml.m21ToString.fromGeneralNote(n)
-        >>> #print post
-        
+        >>> GEX = musicxml.m21ToXml.GeneralObjectExporter()
+        >>> sc = GEX.fromGeneralNote(n)
+        >>> sc.show('t')
+        {0.0} <music21.stream.Part 0x1046afa90>
+            {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.clef.BassClef>
+                {0.0} <music21.meter.TimeSignature 6/8>
+                {0.0} <music21.note.Note C>
         '''
         # make a copy, as this process will change tuple types
         # this method is called infrequently, and only for display of a single 
@@ -551,6 +559,20 @@ class GeneralObjectExporter():
         return self.fromMeasure(out)
     
     def fromPitch(self, p):
+        '''
+        Translate a music21 :class:`~music21.pitch.Pitch` into an object
+        ready to be parsed.
+        
+        >>> p = pitch.Pitch('c#3')
+        >>> GEX = musicxml.m21ToXml.GeneralObjectExporter()
+        >>> sc = GEX.fromPitch(p)
+        >>> sc.show('t')
+        {0.0} <music21.stream.Part 0x1046afa90>
+            {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.clef.BassClef>
+                {0.0} <music21.meter.TimeSignature 1/4>
+                {0.0} <music21.note.Note C#>
+        '''
         n = note.Note()
         n.pitch = copy.deepcopy(p)
         out = stream.Measure(number=1)
@@ -1922,7 +1944,7 @@ class MeasureExporter(XMLExporterBase):
                [('Note', 'noteToXml'),
                 ('ChordSymbol', 'chordSymbolToXml'),
                 ('Chord', 'chordToXml'),
-                ('Rest', 'noteToXml'),
+                ('Rest', 'restToXml'),
                 # Skipping unpitched for now
                 ('Dynamic', 'dynamicToXml'),
                 ('Segno', 'segnoToXml'),
@@ -2149,13 +2171,16 @@ class MeasureExporter(XMLExporterBase):
         
         return preList, postList
     
-    def objectAttachedSpannersToNotations(self, obj):
+    def objectAttachedSpannersToNotations(self, obj, objectSpannerBundle=None):
         '''
         return a list of <notations> from spanners related to the object that should appear 
         in the notations tag (slurs, slides, etc.)
         '''
         notations = []
-        sb = self.objectSpannerBundle
+        if objectSpannerBundle is not None:
+            sb = objectSpannerBundle
+        else:        
+            sb = self.objectSpannerBundle
         if len(sb) == 0:
             return notations
 
@@ -2430,7 +2455,7 @@ class MeasureExporter(XMLExporterBase):
                 mxNotationsList.extend(tupTagList)
     
             
-        if len(mxNotationsList) > 0: # TODO: make to zero -- this is just for perfect old compat.
+        if len(mxNotationsList) > 0: 
             mxNotations = SubElement(mxNote, 'notations')
             for mxN in mxNotationsList:
                 mxNotations.append(mxN)
@@ -2441,6 +2466,133 @@ class MeasureExporter(XMLExporterBase):
         # TODO: play
         self.xmlRoot.append(mxNote)
         return mxNote
+
+    def restToXml(self, r):
+        '''
+        Convert a rest object to a <note> with a <rest> tag undeneath it.
+        
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> r = note.Rest(quarterLength=2.0)
+
+        Give the rest some context:
+        
+        >>> m = stream.Measure()
+        >>> m.timeSignature = meter.TimeSignature('4/4')
+        >>> m.append(r)
+        >>> mxNoteRest = MEX.restToXml(r)
+        >>> MEX.dump(mxNoteRest)
+        <note>
+          <rest />
+          <duration>20160</duration>
+          <type>half</type>
+        </note>
+
+        Now it is a full measure:
+
+        >>> m.timeSignature = meter.TimeSignature('2/4')        
+        >>> mxNoteRest = MEX.restToXml(r)
+        >>> MEX.dump(mxNoteRest)
+        <note>
+          <rest measure="yes" />
+          <duration>20160</duration>
+        </note>        
+
+        Unless we specify that it should not be converted to a full measure:
+        
+        >>> r.fullMeasure = False
+        >>> mxNoteRest = MEX.restToXml(r)
+        >>> MEX.dump(mxNoteRest)
+        <note>
+          <rest />
+          <duration>20160</duration>
+          <type>half</type>
+        </note>
+
+        With True or "always" it will be converted to full measure even if
+        it does not match:
+
+        >>> m.timeSignature = meter.TimeSignature('4/4')
+        >>> r.duration.dots = 1
+        >>> r.fullMeasure = True
+        >>> mxNoteRest = MEX.restToXml(r)
+        >>> MEX.dump(mxNoteRest)
+        <note>
+          <rest measure="yes" />
+          <duration>30240</duration>
+        </note>  
+        
+        
+        display-step and display-octave should work:
+        
+        >>> r = note.Rest()
+        >>> r.stepShift = 1
+        >>> mxNoteRest = MEX.restToXml(r)
+        >>> MEX.dump(mxNoteRest)
+        <note>
+          <rest>
+            <display-step>C</display-step>
+            <display-octave>5</display-octave>
+          </rest>
+          <duration>10080</duration>
+          <type>quarter</type>
+        </note>
+
+        Clef context matters:
+        
+        >>> m = stream.Measure()
+        >>> m.clef = clef.BassClef()
+        >>> m.append(r)
+        >>> mxNoteRest = MEX.restToXml(r)
+        >>> MEX.dump(mxNoteRest)
+        <note>
+          <rest>
+            <display-step>E</display-step>
+            <display-octave>3</display-octave>
+          </rest>
+          <duration>10080</duration>
+          <type>quarter</type>
+        </note>
+        '''
+        mxNote = self.noteToXml(r)
+        mxRestTag = mxNote.find('rest')
+        if mxRestTag is None:
+            raise ToMxObjectsException("Something went wrong -- converted rest w/o rest tag")
+
+        isFullMeasure = False
+        if r.fullMeasure in (True, "always"):
+            isFullMeasure = True
+            mxRestTag.set('measure', 'yes')
+        elif r.fullMeasure == 'auto':
+            tsContext = r.getContextByClass('TimeSignature')
+            if tsContext and tsContext.barDuration.quarterLength == r.duration.quarterLength:
+                isFullMeasure = True
+        
+        if isFullMeasure:
+            mxRestTag.set('measure', 'yes')
+            mxType = mxNote.find('type')                
+            if mxType is not None:
+                mxNote.remove(mxType)
+            mxDots = mxNote.findall('dot')                
+            for mxDot in mxDots:
+                mxNote.remove(mxDot)
+            # should tuplet, etc. be removed? hard to think of a full measure with one.
+                
+        if r.stepShift != 0:
+            mxDisplayStep = SubElement(mxRestTag, "display-step")
+            mxDisplayOctave = SubElement(mxRestTag, "display-octave")
+            currentClef = r.getContextByClass('Clef')
+            if currentClef is None or not hasattr(currentClef, 'lowestLine'):
+                currentClef = clef.TrebleClef() # this should not be common enough to
+                # worry about the overhead
+            midLineDNN = currentClef.lowestLine + 4
+            restObjectPseudoDNN = midLineDNN + r.stepShift
+            tempPitch = pitch.Pitch()
+            tempPitch.diatonicNoteNum = restObjectPseudoDNN
+            mxDisplayStep.text = tempPitch.step
+            mxDisplayOctave.text = str(tempPitch.octave)
+        
+        return mxNote
+
 
     def chordToXml(self, c):
         '''
@@ -2676,7 +2828,7 @@ class MeasureExporter(XMLExporterBase):
         # TODO: editorial (hard! -- requires parsing again in order...)
         
         # <tied>
-        # for ties get for each note...
+        # for ties get for each note of chord too...
         if n.tie is not None:
             tiedList = self.tieToXmlTied(n.tie)
             notations.extend(tiedList)
@@ -2684,7 +2836,12 @@ class MeasureExporter(XMLExporterBase):
             
         # <tuplet> handled elsewhere, because it's on the overall duration on chord...
 
-        notations.extend(self.objectAttachedSpannersToNotations(n))
+        if notFirstNoteOfChord is False and chordParent is not None:
+            notations.extend(self.objectAttachedSpannersToNotations(chordParent))
+        elif chordParent is not None:
+            pass
+        else:
+            notations.extend(self.objectAttachedSpannersToNotations(n))
         # TODO: slur            
         # TDOO: glissando
         # TODO: slide
@@ -3121,7 +3278,7 @@ class MeasureExporter(XMLExporterBase):
         </note>
         '''
         # TODO: frame # fretboard
-        # TODO: offset
+        # TODO: offset # IMPORTANT
         # TODO: editorial
         # TODO: staff
         # TODO: attrGroup: print-object
@@ -3277,7 +3434,7 @@ class MeasureExporter(XMLExporterBase):
         # TODO: attrGroup: enclosure
         
         # direction todos
-        # TODO: offset
+        # TODO: offset # IMPORTANT
         # TODO: editorial-voice-direction
         # TODO: staff
 

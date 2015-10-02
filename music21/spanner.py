@@ -480,7 +480,6 @@ class Spanner(base.Music21Object):
 
         The `old` parameter can be either an object or object id. 
 
-        
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> c1 = clef.AltoClef()
@@ -489,6 +488,8 @@ class Spanner(base.Music21Object):
         >>> sl.replaceSpannedElement(c1, c2)
         >>> sl[-1] == c2
         True
+        
+        :rtype: None
         '''
         if old is None:
             return None # do nothing
