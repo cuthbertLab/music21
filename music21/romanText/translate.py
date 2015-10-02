@@ -403,8 +403,8 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                     p._appendCore(m)
                     lastMeasureNumber = m.number
                     lastMeasureToken = t
-                    romans = m.getElementsByClass(roman.RomanNumeral, returnStreamSubClass='list')
-                    if len(romans) > 0:
+                    romans = m.iter.getElementsByClass(roman.RomanNumeral)
+                    if romans:
                         previousRn = romans[-1] 
 
                 elif len(t.number) > 1:
@@ -413,8 +413,8 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                     p.append(measures) # appendCore does not work with list
                     lastMeasureNumber = measures[-1].number
                     lastMeasureToken = t
-                    romans = measures[-1].getElementsByClass(roman.RomanNumeral, returnStreamSubClass='list')
-                    if len(romans) > 0:
+                    romans = measures[-1].iter.getElementsByClass(roman.RomanNumeral)
+                    if romans > 0:
                         previousRn = romans[-1]
 
                 else:       

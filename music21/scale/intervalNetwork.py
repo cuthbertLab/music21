@@ -2796,7 +2796,7 @@ class Test(unittest.TestCase):
         out = "["
         for p in listIn:
             out += str(p) + ', '
-        if len(listIn) > 0:
+        if listIn:
             out = out[0:len(out)-2]
         out += "]"
         return out

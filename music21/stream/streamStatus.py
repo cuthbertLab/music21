@@ -161,7 +161,7 @@ class StreamStatus(SlottedObject):
         '''
         foundTuplet = False
         for n in self.client.recurse(classFilter='GeneralNote', restoreActiveSites=False):
-            if len(n.duration.tuplets) > 0:
+            if n.duration.tuplets:
                 foundTuplet = True
                 if n.duration.tuplets[0].type is not None:
                     return True

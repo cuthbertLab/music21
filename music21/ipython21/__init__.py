@@ -20,3 +20,19 @@ __all__ = ['ipExtension', 'objects']
 from music21.ipython21 import ipExtension
 from music21.ipython21 import objects
 from music21.ipython21.ipExtension import load_ipython_extension
+
+from music21 import common
+localIP = None
+
+def loadNoMagic():
+    if common.runningUnderIPython():
+        from IPython.core.interactiveshell import InteractiveShell
+        if InteractiveShell.initialized():        
+            localIP = InteractiveShell.instance()    
+            load_ipython_extension(localIP)
+            
+if common.runningUnderIPython(): # @UndefinedVariable
+    from threading import Timer
+    t = Timer(0.5, loadNoMagic)
+    t.start()
+    #ipython21.load_no_magic() # @UndefinedVariable

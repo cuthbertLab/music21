@@ -106,7 +106,7 @@ def searchForNotes(notesStr):
 #                            "\n \\new Staff {" + str(thisCadence.parts[i].lily) + "} >>" + \
 #                            thisCadence.header() + "\n}\n"
                     print(u"In piece %r found in stream %d: %s" % (thisWork.title, i, notesStr))
-    if len(streamOpus) > 0:
+    if any(streamOpus):
         streamOpus.show('lily.png')
 
 def searchForIntervals(notesStr):
@@ -154,7 +154,7 @@ def searchForIntervals(notesStr):
 #                            "\n \\new Staff {" + str(thisCadence.parts[i].lily) + "} >>" + \
 #                            thisCadence.header() + "\n}\n"
                     print(u"In piece %r found in stream %d: %s" % (thisWork.title, i, notesStr))
-    if len(streamOpus) > 0:
+    if any(streamOpus):
         streamOpus.show('lily.png')
 
 def findRandomVerona():

@@ -847,7 +847,7 @@ class Key(KeySignature, scale.DiatonicScale):
                                               'Pitch' in tonic.classes):
                 if hasattr(tonic, 'name'):
                     tonic = tonic.name
-                elif hasattr(tonic, 'pitches') and len(tonic.pitches) > 0: # chord
+                elif hasattr(tonic, 'pitches') and tonic.pitches: # chord w/ >= 1 pitch
                     if mode is None:
                         if tonic.isMinorTriad() is True:
                             mode = 'minor'

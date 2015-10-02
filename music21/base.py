@@ -28,7 +28,7 @@ available after importing music21.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'2.2.0'
+'2.2.1'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -119,8 +119,8 @@ for modName in ('matplotlib', 'numpy', 'scipy'):
     #sys.stderr.write('pyaudio is installed but PortAudio is not -- ' + 
     #                 're-download pyaudio at http://people.csail.mit.edu/hubert/pyaudio/')
 
-if len(_missingImport) > 0:
-    if environLocal['warnings'] in [1, '1', True]:
+if _missingImport:
+    if environLocal['warnings'] in (1, '1', True):
         environLocal.warn(common.getMissingImportStr(_missingImport),
         header='music21:')
 
@@ -1031,6 +1031,8 @@ class Music21Object(object):
         C shares a slur with E
         D shares a slur with C
         E shares a slur with C
+        
+        :rtype: list(spanner.Spanner)
         '''
         found = self.sites.getSitesByClass('SpannerStorage')
         post = []

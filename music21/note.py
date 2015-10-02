@@ -431,7 +431,7 @@ class GeneralNote(base.Music21Object):
 
         TODO: should return a \\n separated string of lyrics.  See text.assembleAllLyrics
         '''
-        if len(self.lyrics) > 0:
+        if self.lyrics:
             return self.lyrics[0].text
         else:
             return None
@@ -575,9 +575,12 @@ class GeneralNote(base.Music21Object):
         self.lyrics.insert(index, Lyric(text, (index+ 1), applyRaw=applyRaw, identifier=identifier ))
 
     def hasLyrics(self):
-        '''Return True if this object has any lyrics defined
         '''
-        if len(self.lyrics) > 0:
+        Return True if this object has any lyrics defined
+        
+        TODO: Delete: just do: ``if self.lyrics``...
+        '''
+        if self.lyrics:
             return True
         else:
             return False
@@ -964,7 +967,6 @@ class Note(NotRest):
 
     '''
     isNote = True
-    isUnpitched = False
     isRest = False
 
     # define order to present names in documentation; use strings
@@ -972,7 +974,6 @@ class Note(NotRest):
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
     'isNote': 'Boolean read-only value describing if this Note is a Note (True).',
-    'isUnpitched': 'Boolean read-only value describing if this Note is Unpitched (False).',
     'isRest': 'Boolean read-only value describing if this Note is a Rest (False).',
     'pitch': 'A :class:`~music21.pitch.Pitch` object containing all the information about the note\'s pitch.  Many `.pitch` properties and methods are also made `Note` properties also',
     }
@@ -1410,7 +1411,6 @@ class Unpitched(NotRest):
     displayStep = "C"
     displayOctave = 4
     isNote = False
-    isUnpitched = True
     isRest = False
 
     def __init__(self):
@@ -1462,21 +1462,38 @@ class Rest(GeneralNote):
     'rest'
     '''
     isNote = False
-    isUnpitched = False
     isRest = True
     name = "rest"
 
     _DOC_ATTR = {
     'isNote': 'Boolean read-only value describing if this Rest is a Note (False).',
-    'isUnpitched': 'Boolean read-only value describing if this Rest is Unpitched (False -- only Unpitched objects are True).',
     'isRest': 'Boolean read-only value describing if this Rest is a Rest (True, obviously).',
-    'name': 'returns "rest" always.  It is here so that you can get `x.name` on all `.notesAndRests` objects',
-    'lineShift': 'number of lines/spaces to shift the note upwards or downwards for display.',
+    'name': '''returns "rest" always.  It is here so that you can get 
+               `x.name` on all `.notesAndRests` objects''',
+    'stepShift': 'number of lines/spaces to shift the note upwards or downwards for display.',
+    'fullMeasure': '''does this rest last a full measure (thus display as whole, center, etc.)
+                Options are False, True, "always", "auto" (default)
+                
+                False means do not set as full measure, no matter what.
+                
+                True keeps the set duration, but will always display as a full measure rest.
+                
+                "always" means the duration will (EVENTUALLY, not yet!)
+                update automatically to match the time signature context; and is True. 
+                Does not work yet -- functions as True. # TODO: get it to work.
+                
+                "auto" is the default, where if the rest value happens to match the current
+                time signature context, then display it as a whole note, centered, etc.
+                otherwise will display normally.            
+                
+                See examples in :meth:`music21.musicxml.m21ToXml.MeasureExporter.restToXml`
+                ''',
     }
 
     def __init__(self, *arguments, **keywords):
         GeneralNote.__init__(self, **keywords)
-        self.lineShift = 0 # display line
+        self.stepShift = 0 # display line
+        self.fullMeasure = "auto" # see docs; True, False, 'always', 
 
     def __repr__(self):
         return "<music21.note.Rest %s>" % self.name
@@ -1542,6 +1559,8 @@ class SpacerRest(Rest):
     '''
     This is exactly the same as a rest, but it is a SpacerRest.
     This object should only be used for making hidden space in a score in lilypond.
+    
+    This may become deprecated at some point...
     '''
     def __init__(self, *arguments, **keywords):
         Rest.__init__(self, **keywords)

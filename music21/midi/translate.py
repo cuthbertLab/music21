@@ -1217,7 +1217,7 @@ def _processPackets(packets, channelForInstrument=None, channelsDynamic=None,
                 # if there is a cent shift active in the already used channel
                 #environLocal.printDebug(['matchedOffset overlap'])
                 centShiftList = uniqueChannelEvents[key]
-                if len(centShiftList) > 0:
+                if centShiftList:
                     # only add if unique
                     if usedChannel not in channelExclude:
                         channelExclude.append(usedChannel)
@@ -1230,7 +1230,7 @@ def _processPackets(packets, channelForInstrument=None, channelsDynamic=None,
 
         # if no channels are excluded, get a new channel
         #environLocal.printDebug(['post process channelExclude', channelExclude])
-        if len(channelExclude) > 0: # only change if necessary
+        if channelExclude: # only change if necessary
             ch = None       
             # iterate in order over all channels: lower will be added first
             for x in channelsDynamic:
@@ -1647,9 +1647,9 @@ def _prepareStreamForMidi(s):
     s = copy.deepcopy(s)
     if s.hasPartLikeStreams():
         # check for tempo indications in the score
-        mmTopLevel = s.getElementsByClass('MetronomeMark')
-        if len(mmTopLevel) > 0: # place in top part
-            target = s.getElementsByClass('Stream')[0]
+        mmTopLevel = s.iter.getElementsByClass('MetronomeMark')
+        if mmTopLevel: # place in top part
+            target = s.iter.getElementsByClass('Stream')[0]
             for mm in mmTopLevel:
                 target.insert(mmTopLevel.elementOffset(mm), mm)
                 s.remove(mm) # remove from Score level
@@ -1659,7 +1659,7 @@ def _prepareStreamForMidi(s):
         # this assumes that dynamics in a part/stream apply to all components
         # of that part stream
         # this sets the cachedRealized value for each Volume
-        for p in s.getElementsByClass('Stream'):
+        for p in s.iter.getElementsByClass('Stream'):
             volume.realizeVolume(p)
 
     else: # just a single Stream
@@ -1719,16 +1719,16 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList = None):
         s = s.flat.sorted
 
         # get a first instrument; iterate over rest
-        instrumentStream = s.getElementsByClass('Instrument')
+        instrumentStream = s.iter.getElementsByClass('Instrument')
         
         # if there is an Instrument object at the start, make instObj that instrument.
-        if len(instrumentStream) > 0 and s.elementOffset(instrumentStream[0]) == 0:
+        if instrumentStream and s.elementOffset(instrumentStream[0]) == 0:
             instObj = instrumentStream[0]
         else:
             instObj = None
             
         # get all unique instrument ids
-        if len(instrumentStream) > 0:
+        if instrumentStream:
             for i in instrumentStream:
                 if i.midiProgram not in allUniqueInstruments:
                     allUniqueInstruments.append(i.midiProgram)

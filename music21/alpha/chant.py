@@ -69,7 +69,7 @@ class GregorianStream(stream.Stream):
         startedSyllable = False
         for e in self:
             if hasattr(e, 'isNote') and e.isNote is True:
-                if len(e.lyrics) > 0 and e.lyrics[0] != "":
+                if self.lyrics and e.lyrics[0] != "":
                     if startedSyllable == True:
                         outLine += ")"
                         startedSyllable = False

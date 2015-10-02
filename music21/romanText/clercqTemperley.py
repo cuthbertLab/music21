@@ -375,12 +375,12 @@ class CTSong(object):
             
 
     def _getRules(self):
-        if len(self._rules) > 0:
+        if self._rules:
             return self._rules
 
         for line in self.lines:
             ls = line.split()
-            if len(ls) > 0 and ls[0].endswith(':'):
+            if ls and ls[0].endswith(':'):
                 rule = CTRule(line, parent=self)
                 self._rules[rule.LHS] = rule
 
@@ -625,8 +625,9 @@ class CTRule(object):
                 #pass
         if len(measures) > 0:
             for m in measures:
-                if len(m.flat.notes) > 0 and (self.parent is None or self.parent.labelSubsectionsOnScore is True) and self.LHS != 'S':
-                    rn = m.flat.notes[0]
+                noteIter = m.recurse().notes
+                if noteIter and (self.parent is None or self.parent.labelSubsectionsOnScore is True) and self.LHS != 'S':
+                    rn = noteIter[0]
                     lyricNum = len(rn.lyrics) + 1
                     rn.lyrics.append(note.Lyric(self.LHS, number=lyricNum))       
                     break                 

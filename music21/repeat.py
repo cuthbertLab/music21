@@ -51,8 +51,8 @@ class RepeatMark(object):
     >>> s = stream.Stream()
     >>> s.append(note.Note())
     >>> s.append(PartialRepeat())
-    >>> repeats = s.getElementsByClass(repeat.RepeatMark)
-    >>> if len(repeats) > 0:
+    >>> repeats = s.iter.getElementsByClass(repeat.RepeatMark)
+    >>> if repeats:
     ...    print("Stream has %d repeat(s) in it" % (len(repeats)))
     Stream has 1 repeat(s) in it
     '''
@@ -1628,12 +1628,12 @@ class Expander(object):
         '''
         post = []
         for i, m in enumerate(streamObj):
-            for e in m.getElementsByClass('RepeatExpression'):
+            for e in m.iter.getElementsByClass('RepeatExpression'):
                 if target in e.classes or (
                         not isinstance(target, str) and isinstance(e, target)):
                     post.append(i)
         # if not found
-        if len(post) > 0: 
+        if post: 
             return post            
         return None
             

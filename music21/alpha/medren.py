@@ -416,7 +416,7 @@ class GeneralMensuralNote(base.Music21Object):
             
         index = self._getTranslator(mensurationOrDivisione = mOrD, surroundingStream = surroundingStream)
         
-        if len(self.lenList) > 0:
+        if self.lenList:
             if mOrD.standardSymbol in ['.q.', '.p.', '.i.', '.n.']:
                 mDur = 0.5
             else:
@@ -436,7 +436,7 @@ class GeneralMensuralNote(base.Music21Object):
         measure, index = self._getSurroundingMeasure(mensurationOrDivisione = mOrD, activeSite = surroundingStream)
         
         self._gettingDuration = True
-        if len(measure) > 0 and 'Divisione' in mOrD.classes:
+        if self.measure and 'Divisione' in mOrD.classes:
             if index == 0:
                 self.lenList = trecento.notation.BrevisLengthTranslator(mOrD, measure).getKnownLengths()
             elif index != -1:
@@ -591,7 +591,7 @@ class MensuralRest(GeneralMensuralNote, note.Rest):
         self._gettingDuration = False
         self._mensuralType = 'brevis'
         
-        if len(arguments) > 0:
+        if self.arguments:
             tOrA = arguments[0]
             if tOrA in _validMensuralTypes:
                 self._mensuralType = tOrA
@@ -1726,8 +1726,8 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None, printUpdates
             return hierarchy.index(lclass0) <= hierarchy.index(uclass0)
     
     tempStream_1, tempStream_2 = inpStream_copy.splitByClass(None, lambda x: x.isStream)
-    if len(tempStream_1) > 0:
-        if len(tempStream_2) > 0 and tempStream_2.hasElementOfClass(GeneralMensuralNote):
+    if tempStream_1:
+        if tempStream_2 and tempStream_2.hasElementOfClass(GeneralMensuralNote):
             raise MedRenException('cannot combine objects of type %s, %s within stream' % (tempStream_1[0].__class__, tempStream_2[0].__class__))
         else:
             for item in tempStream_2:
@@ -1740,9 +1740,9 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None, printUpdates
                         raise MedRenException('Mensuration or divisione %s not consistent within hierarchy' % item)
                     
             tempStream_1_1, tempStream_1_2 = tempStream_1.splitByClass(None, lambda x: isHigherInhierarchy(x, tempStream_1))
-            if len(tempStream_1_1) > 0:
+            if tempStream_1_1:
                 raise MedRenException('Hierarchy of %s violated by %s' % (tempStream_1.__class__, tempStream_1_1[0].__class__))
-            elif len(tempStream_1_2) > 0:
+            elif tempStream_1_2:
                 for e in tempStream_1_2:
                     
                     if e.isMeasure:

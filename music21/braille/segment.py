@@ -266,7 +266,7 @@ class BrailleSegment(collections.defaultdict):
         if self.dummyRestLength is not None:
             self.addDummyRests(bt) # Dummy Rests
 
-        while len(self._allGroupingKeys) > 0:
+        while self._allGroupingKeys0:
             self._previousGroupingKey = self._currentGroupingKey
             self._currentGroupingKey = self._allGroupingKeys.pop(0)
 
@@ -382,7 +382,7 @@ class BrailleSegment(collections.defaultdict):
             if (self._currentGroupingKey - self._previousGroupingKey) == 10 or self._previousGroupingKey % 10 != AFFINITY_NOTEGROUP:
                 self._lastNote = None
         showLeadingOctave = True
-        if len(allNotes) > 0:
+        if allNotes:
             if not self.suppressOctaveMarks:
                 if self._lastNote is not None:
                     firstNote = allNotes[0]
@@ -508,7 +508,7 @@ class BrailleGrandSegment():
         groupingKeysLeft = sorted(leftSegment.keys())
         combinedGroupingKeys = []
         
-        while len(groupingKeysRight) > 0:
+        while groupingKeysRight:
             gkRight = groupingKeysRight.pop(0)
             try:
                 groupingKeysLeft.remove(gkRight)
@@ -532,7 +532,7 @@ class BrailleGrandSegment():
                         raise BrailleSegmentException("Misaligned braille groupings could not append combinedGroupingKeys")
 
         
-        while len(groupingKeysLeft) > 0:
+        while groupingKeysLeft:
             gkLeft = groupingKeysLeft.pop(0)
             combinedGroupingKeys.append((None, gkLeft))
         
@@ -548,7 +548,7 @@ class BrailleGrandSegment():
 
         self.extractHeading(bk) # Heading
     
-        while len(self.allKeyPairs) > 0:
+        while self.allKeyPairs:
             self.previousGroupingPair = self.currentGroupingPair
             self.currentGroupingPair = self.allKeyPairs.pop(0)
             (rightKey, leftKey) = self.currentGroupingPair
@@ -957,7 +957,7 @@ def prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets = SEGMENT_SLURLO
     >>> shortC.flat.notes[0].tie
     <music21.tie.Tie start>
     """
-    if len(music21Part.spannerBundle) > 0:
+    if music21Part.spannerBundle:
         allNotes = music21Part.flat.notes
         for slur in music21Part.spannerBundle.getByClass(spanner.Slur):
             try:
@@ -1111,7 +1111,7 @@ def getRawSegments(music21Part, segmentBreaks=None):
     mnStart = 1000000.0
     offsetStart = 0.0
     segmentIndex = 0
-    if len(segmentBreaks) > 0:
+    if segmentBreaks:
         (mnStart, offsetStart) = segmentBreaks[segmentIndex]
     currentSegment = BrailleSegment()
     for music21Measure in music21Part.getElementsByClass(stream.Measure, stream.Voice):

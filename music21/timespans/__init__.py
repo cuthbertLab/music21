@@ -328,8 +328,8 @@ def timespansToChordifiedStream(timespans, templateStream=None):
     if isinstance(templateStream, stream.Stream):
         templateOffsets = sorted(templateStream.measureOffsetMap())
         templateOffsets.append(templateStream.duration.quarterLength)
-        if hasattr(templateStream, 'parts') and len(templateStream.parts) > 0:
-            outputStream = templateStream.parts[0].measureTemplate(
+        if hasattr(templateStream, 'parts') and templateStream.iter.parts:
+            outputStream = templateStream.iter.parts[0].measureTemplate(
                 fillWithRests=False)
         else:
             outputStream = templateStream.measureTemplate(

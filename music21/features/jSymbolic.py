@@ -2348,7 +2348,7 @@ class CompoundOrSimpleMeterFeature(featuresModule.FeatureExtractor):
 
         elements = self.data['flat.getElementsByClass.TimeSignature']
 
-        if len(elements) > 0:
+        if elements:
             try:
                 countName = elements[0].beatDivisionCountName
             except meter.TimeSignatureException:
@@ -2386,7 +2386,7 @@ class TripleMeterFeature(featuresModule.FeatureExtractor):
     def _process(self):
         elements = self.data['flat.getElementsByClass.TimeSignature']
         # not: not looking at other triple meters
-        if len(elements) > 0 and elements[0].numerator == 3:
+        if elements and elements[0].numerator == 3:
             self._feature.vector[0] = 1
 
 
@@ -2417,7 +2417,7 @@ class QuintupleMeterFeature(featuresModule.FeatureExtractor):
 
     def _process(self):
         elements = self.data['flat.getElementsByClass.TimeSignature']
-        if len(elements) > 0 and elements[0].numerator == 5:
+        if elements and elements[0].numerator == 5:
             self._feature.vector[0] = 1
 
 
@@ -2927,9 +2927,9 @@ class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
             for p in s.parts:
                 # always one instrument
                 x = p.getElementsByClass('Instrument')
-                if len(x) > 0 :
+                if x:
                     i = x[0]
-                    if len(p.flat.notes) > 0:
+                    if p.recurse().notes:
                         self._feature.vector[i.midiProgram] = 1
                 else:
                     pass
@@ -2999,8 +2999,9 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
         for p in s.parts:
             # always one instrument
             i = p.getElementsByClass('Instrument')[0]
-            if len(p.flat.notes) > 0:
-                self._feature.vector[i.midiProgram] = len(p.flat.notes) / float(total)
+            pNotes = p.recurse().notes
+            if pNotes:
+                self._feature.vector[i.midiProgram] = len(pNotes) / float(total)
 
 
 class NotePrevalenceOfUnpitchedInstrumentsFeature(
@@ -3076,9 +3077,10 @@ class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(
         coll = []
         for p in s.parts:
             # always one instrument
-            i = p.getElementsByClass('Instrument')[0]
-            if len(p.flat.notes) > 0:
-                coll.append(len(p.flat.notes) / float(total))
+            i = p.iter.getElementsByClass('Instrument')[0]
+            pNotes = p.recurse().notes
+            if pNotes:
+                coll.append(len(pNotes) / float(total))
         # would be faster to use numpy
         #numpy.std(coll)
         mean = sum(coll) / len(coll)
@@ -3137,7 +3139,7 @@ class NumberOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
         # each part has content for each instrument
         count = 0
         for p in s.parts:
-            if len(p.flat.notes) > 0:
+            if p.recurse().notes:
                 count += 1
         self._feature.vector[0] = count
 

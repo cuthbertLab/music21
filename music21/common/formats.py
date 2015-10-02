@@ -148,9 +148,9 @@ def findFormat(fmt):
     sc = scf[fileformat]
 
         
-    if len(sc.registerOutputExtensions) > 0:
+    if sc.registerOutputExtensions:
         firstOutput = '.' + sc.registerOutputExtensions[0]
-    elif len(sc.registerInputExtensions) > 0:
+    elif sc.registerInputExtensions:
         firstOutput = '.' + sc.registerInputExtensions[0]
     else:
         firstOutput = None
@@ -216,7 +216,7 @@ def findInputExtension(fmt):
                 if not ext.startswith('.'):
                     ext = '.' + ext
                 post.append(ext)
-            if len(post) > 0:
+            if post:
                 return tuple(post)
         return None
     else:

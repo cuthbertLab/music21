@@ -1753,11 +1753,6 @@ class Test(unittest.TestCase):
         # perhaps need to return more than one;
         # or getElementAtOrBefore needs to return a list
 
-#         s1Measures = s3copy.getElementsByClass('Stream')[0].makeMeasures(searchContext=True)
-#         environLocal.printDebug(['s1Measures[0].clef', s1Measures[0].clef])
-#         self.assertEqual(isinstance(s1Measures[0].clef, clef.AltoClef), True)
-        #s1Measures.show() # these show the proper clefs
-
         s2Measures = s3copy.getElementsByClass('Stream')[1].makeMeasures()
         self.assertEqual(isinstance(s2Measures[0].clef, clef.TenorClef), True)
         #s2Measures.show() # this shows the proper clef
@@ -3533,7 +3528,7 @@ class Test(unittest.TestCase):
         def collectType(s):
             post = []
             for e in s:
-                if len(e.duration.tuplets) > 0:
+                if e.duration.tuplets:
                     post.append(e.duration.tuplets[0].type)
                 else:
                     post.append(None)
@@ -3542,7 +3537,7 @@ class Test(unittest.TestCase):
         def collectBracket(s):
             post = []
             for e in s:
-                if len(e.duration.tuplets) > 0:
+                if e.duration.tuplets:
                     post.append(e.duration.tuplets[0].bracket)
                 else:
                     post.append(None)
@@ -3569,7 +3564,7 @@ class Test(unittest.TestCase):
         def collectType(s):
             post = []
             for e in s:
-                if len(e.duration.tuplets) > 0:
+                if e.duration.tuplets:
                     post.append(e.duration.tuplets[0].type)
                 else:
                     post.append(None)
@@ -3578,7 +3573,7 @@ class Test(unittest.TestCase):
         def collectBracket(s):
             post = []
             for e in s:
-                if len(e.duration.tuplets) > 0:
+                if e.duration.tuplets:
                     post.append(e.duration.tuplets[0].bracket)
                 else:
                     post.append(None)
@@ -3677,7 +3672,7 @@ class Test(unittest.TestCase):
         def collectTupletType(s):
             post = []
             for e in s:
-                if len(e.duration.tuplets) > 0:
+                if e.duration.tuplets:
                     post.append(e.duration.tuplets[0].type)
                 else:
                     post.append(None)
@@ -3686,7 +3681,7 @@ class Test(unittest.TestCase):
         def collectTupletBracket(s):
             post = []
             for e in s:
-                if len(e.duration.tuplets) > 0:
+                if e.duration.tuplets:
                     post.append(e.duration.tuplets[0].bracket)
                 else:
                     post.append(None)
@@ -5429,10 +5424,10 @@ class Test(unittest.TestCase):
             else:
                 continue
         
-            if len(n.lyrics) > 0:
+            if n.lyrics:
                 nStart = n
             # if next is a begin, then this is an end
-            elif nStart is not None and len(nNext.lyrics) > 0 and n.tie is None:
+            elif nStart is not None and nNext.lyrics and n.tie is None:
                 nEnd = n
             elif nNext is nLast:
                 nEnd = n

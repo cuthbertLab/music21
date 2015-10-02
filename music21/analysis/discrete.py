@@ -1334,7 +1334,7 @@ def analyzeStream(streamObj, *args, **keywords):
 
     if 'method' in keywords:
         method = keywords['method']
-    if len(args) > 0:
+    if args:
         method = args[0]
     match = None
     for analysisClassName in analysisClasses:    

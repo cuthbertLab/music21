@@ -827,8 +827,8 @@ class BrevisLengthTranslator(object):
             curBeat += lengthI
 
         lastSBLen = div.minimaPerBrevis
-        if  (len(self.unknownLengthsDict['semibrevis']) > 0) and \
-            (self.unknownLengthsDict['semibrevis'][-1] == len(self.brevisLength) - 1):
+        if  ((any(self.unknownLengthsDict['semibrevis'])) and
+                (self.unknownLengthsDict['semibrevis'][-1] == len(self.brevisLength) - 1)):
             lastSBLen = lengths[ self.unknownLengthsDict['semibrevis'][-1] ]
 
         strength -= abs(div.minimaPerBrevis - curBeat)
@@ -840,7 +840,14 @@ class BrevisLengthTranslator(object):
 
         return strength
 
-    def determineStrongestMeasureLengths(self, lengths, change_tup, num_tup, diff_tup, lenRem, shrinkable_indices = (), multi = None):
+    def determineStrongestMeasureLengths(self, 
+                                         lengths, 
+                                         change_tup, 
+                                         num_tup, 
+                                         diff_tup, 
+                                         lenRem, 
+                                         shrinkable_indices=(), 
+                                         multi=None):
         '''
         Gets all possible length combinations. Returns the lengths combination of the "strongest" list,
         along with the remaining length.
@@ -871,7 +878,7 @@ class BrevisLengthTranslator(object):
         diff = diff_tup[0]
         release = None
 
-        if len(shrinkable_indices) > 0:
+        if shrinkable_indices:
             release = shrinkable_indices[0]
 
         if multi is None:
@@ -1731,7 +1738,7 @@ class BrevisLengthTranslator(object):
                         minRem_changeable -= knownLengthsList_changeable[semibrevis_downstem_index]
 
                         shrink_tup += semibrevis_downstem_index,
-                        if len(extend_list_2) > 0:
+                        if extend_list_2:
                             shrink_tup += semibrevis_downstem_index,
 
                     else: #downstems >= 2
@@ -1756,7 +1763,7 @@ class BrevisLengthTranslator(object):
                             minRem_changeable -= knownLengthsList_changeable[semibrevis_list[-1]]
 
                             shrink_tup += -1,
-                            if len(extend_list_2) > 0:
+                            if extend_list_2:
                                 shrink_tup += -1,
 
                         else:
