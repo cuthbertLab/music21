@@ -21,7 +21,6 @@ __all__ = [
            ]
 
 import os
-from music21 import _version
 
 #-------------------------------------------------------------------------------
 def getSourceFilePath():
@@ -124,6 +123,7 @@ def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
     '''
     if fpMusic21 == None:
         fpMusic21 = getSourceFilePath()
+
     #fpCorpus = os.path.join(fpMusic21, 'corpus')
     fpParent = os.path.dirname(fpMusic21)
     match = []

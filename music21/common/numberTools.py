@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         common/numberFunc.py
+# Name:         common/numberTools.py
 # Purpose:      Utilities for working with numbers or number-like objects
 #
 # Authors:      Michael Scott Cuthbert
@@ -129,7 +129,7 @@ def _preFracLimitDenominator(n, d):
     
     returns a new n, d...
     
-    >>> common.numberFunc._preFracLimitDenominator(100001, 300001)
+    >>> common.numberTools._preFracLimitDenominator(100001, 300001)
     (1, 3)
     
     >>> from fractions import Fraction
@@ -142,7 +142,7 @@ def _preFracLimitDenominator(n, d):
 
     t is timeit.timeit
     
-    t('Fraction(*common.numberFunc._preFracLimitDenominator(*x.as_integer_ratio()))', 
+    t('Fraction(*common.numberTools._preFracLimitDenominator(*x.as_integer_ratio()))', 
        setup='x = 1000001/3000001.; from music21 import common;from fractions import Fraction', 
        number=100000)
     1.0814228057861328
@@ -155,7 +155,7 @@ def _preFracLimitDenominator(n, d):
     Proof of working...
     
     >>> import random
-    >>> myWay = lambda x: Fraction(*common.numberFunc._preFracLimitDenominator(*x.as_integer_ratio()))
+    >>> myWay = lambda x: Fraction(*common.numberTools._preFracLimitDenominator(*x.as_integer_ratio()))
     >>> theirWay = lambda x: Fraction(x).limit_denominator(65535)
 
     >>> for i in range(50):

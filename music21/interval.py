@@ -248,7 +248,7 @@ def convertGeneric(value):
     '''Convert an interval specified in terms of its name (second, third) 
     into an integer. If integers are passed, assume the are correct.
 
-    # TODO: use common.numberFunc.musicOrdinals
+    # TODO: use common.numberTools.musicOrdinals
 
     
     >>> interval.convertGeneric(3)
