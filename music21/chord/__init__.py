@@ -243,10 +243,6 @@ class Chord(note.NotRest):
                     self.duration = n.duration
                     del keywords['duration']
                     quickDuration = False
-                # TODO: transfer all attributes from _notes of other
-#                 for p in n.pitches:
-#                     # this might better make a deepcopy of the pitch
-#                     self._notes.append({'pitch':p})
             elif isinstance(n, six.string_types) or isinstance(n, int):
                 if 'duration' in keywords:
                     self._notes.append(note.Note(n, duration=keywords['duration']))
@@ -556,9 +552,11 @@ class Chord(note.NotRest):
         By default we show only the generic interval:
 
         >>> c1 = chord.Chord(['C2','E2','G2','C3'])
-        >>> c2 = c1.annotateIntervals(inPlace = False)
+        >>> c2 = c1.annotateIntervals(inPlace=False)
         >>> c2.lyrics
-        [<music21.note.Lyric number=1 syllabic=single text="8">, <music21.note.Lyric number=2 syllabic=single text="5">, <music21.note.Lyric number=3 syllabic=single text="3">]
+        [<music21.note.Lyric number=1 syllabic=single text="8">, 
+         <music21.note.Lyric number=2 syllabic=single text="5">, 
+         <music21.note.Lyric number=3 syllabic=single text="3">]
 
         >>> [l.text for l in c2.lyrics]
         ['8', '5', '3']
@@ -566,9 +564,11 @@ class Chord(note.NotRest):
         The `stripSpecifiers` parameter can be used to show only the intervals size (3, 5, etc)
         or the complete interval specification (m3, P5, etc.)
 
-        >>> c3 = c1.annotateIntervals(inPlace = False, stripSpecifiers = False)
+        >>> c3 = c1.annotateIntervals(inPlace=False, stripSpecifiers=False)
         >>> c3.lyrics
-        [<music21.note.Lyric number=1 syllabic=single text="P8">, <music21.note.Lyric number=2 syllabic=single text="P5">, <music21.note.Lyric number=3 syllabic=single text="M3">]
+        [<music21.note.Lyric number=1 syllabic=single text="P8">, 
+         <music21.note.Lyric number=2 syllabic=single text="P5">, 
+         <music21.note.Lyric number=3 syllabic=single text="M3">]
 
         >>> [l.text for l in c3.lyrics]
         ['P8', 'P5', 'M3']
@@ -576,36 +576,36 @@ class Chord(note.NotRest):
         This chord was giving us problems:
 
         >>> c4 = chord.Chord(['G4', 'E4', 'B3', 'E3'])
-        >>> c4.annotateIntervals(stripSpecifiers = False)
+        >>> c4.annotateIntervals(stripSpecifiers=False)
         >>> [l.text for l in c4.lyrics]
         ['m3', 'P8', 'P5']
-        >>> c4.annotateIntervals(stripSpecifiers = False, returnList = True)
+        >>> c4.annotateIntervals(inPlace=True, stripSpecifiers=False, returnList=True)
         ['m3', 'P8', 'P5']
 
         If sortPitches is false it still gives problems...
 
         >>> c4 = chord.Chord(['G4', 'E4', 'B3', 'E3'])
-        >>> c4.annotateIntervals(stripSpecifiers = False, sortPitches = False)
+        >>> c4.annotateIntervals(inPlace=True, stripSpecifiers=False, sortPitches=False)
         >>> [l.text for l in c4.lyrics]
         ['m3', 'm6', 'm3']
 
         >>> c = chord.Chord(['c4', 'd-4', 'g4'])
-        >>> c.annotateIntervals()
+        >>> c.annotateIntervals(inPlace=True)
         >>> [l.text for l in c.lyrics]
         ['5', '2']
 
         >>> c = chord.Chord(['c4', 'd-4', 'g4'])
-        >>> c.annotateIntervals(stripSpecifiers=False)
+        >>> c.annotateIntervals(inPlace=True, stripSpecifiers=False)
         >>> [l.text for l in c.lyrics]
         ['P5', 'm2']
 
         >>> c = chord.Chord(['c4', 'd---4', 'g4'])
-        >>> c.annotateIntervals(stripSpecifiers=False)
+        >>> c.annotateIntervals(inPlace=True, stripSpecifiers=False)
         >>> [l.text for l in c.lyrics]
         ['P5', 'dd2']
 
         >>> c = chord.Chord(['c4', 'g5', 'e6'])
-        >>> c.annotateIntervals()
+        >>> c.annotateIntervals(inPlace=True)
         >>> [l.text for l in c.lyrics]
         ['5', '3']
 
@@ -773,7 +773,8 @@ class Chord(note.NotRest):
             return False
 
     def closedPosition(self, forceOctave=None, inPlace=False, leaveRedundantPitches=False):
-        '''Returns a new Chord object with the same pitch classes,
+        '''
+        Returns a new Chord object with the same pitch classes,
         but now in closed position.
 
         If `forcedOctave` is provided, the bass of the chord will
@@ -799,18 +800,18 @@ class Chord(note.NotRest):
         Redundant pitches are removed by default, but can be retained...
 
         >>> c4 = chord.Chord(["C#4", "C5", "F7", "F8"])
-        >>> c5 = c4.closedPosition(4, inPlace = False)
+        >>> c5 = c4.closedPosition(4, inPlace=False)
         >>> c5
         <music21.chord.Chord C#4 F4 C5>
 
-        >>> c6 = c4.closedPosition(4, inPlace = False, leaveRedundantPitches=True)
+        >>> c6 = c4.closedPosition(4, inPlace=False, leaveRedundantPitches=True)
         >>> c6
         <music21.chord.Chord C#4 F4 F4 C5>
 
         Implicit octaves work fine...
 
         >>> c7 = chord.Chord(["A4", "B4", "A"])
-        >>> c7.closedPosition(4, inPlace = True)
+        >>> c7.closedPosition(4, inPlace=True)
         >>> c7
         <music21.chord.Chord A4 B4>
 
@@ -820,14 +821,14 @@ class Chord(note.NotRest):
         Duplicate octaves were not working
 
         >>> c7b = chord.Chord(["A4", "B4", "A5"])
-        >>> c7b.closedPosition(inPlace = True)
+        >>> c7b.closedPosition(inPlace=True)
         >>> c7b
         <music21.chord.Chord A4 B4>
 
         but the bass must remain A4:
 
         >>> c7c = chord.Chord(["A4", "B4", "A5", "G##6"])
-        >>> c7c.closedPosition(inPlace = True)
+        >>> c7c.closedPosition(inPlace=True)
         >>> c7c
         <music21.chord.Chord A4 B4 G##5>
 
@@ -1355,7 +1356,8 @@ class Chord(note.NotRest):
         For a given Pitch in this Chord, return the
         :class:`~music21.volume.Volume` object.
         
-        Raises an exception if the pitch isn't in the chord (TODO: consider changing to be like notehead, etc.)
+        Raises an exception if the pitch isn't in the chord 
+        (TODO: consider changing to be like notehead, etc.)
         
         >>> c = chord.Chord('C4 F4')
         >>> c[0].volume = 2
@@ -1738,7 +1740,7 @@ class Chord(note.NotRest):
 
         Spelling matters
 
-        >>> c.pitches[3].getEnharmonic(inPlace = True)
+        >>> c.pitches[3].getEnharmonic(inPlace=True)
         >>> c
         <music21.chord.Chord A-3 C4 E-4 G-4>
         >>> c.isAugmentedSixth()
@@ -1878,7 +1880,7 @@ class Chord(note.NotRest):
         Weird things used to happen when some notes have octaves and some don't:
 
         >>> c13 = chord.Chord(['A4','B4','A'])
-        >>> c14 = c13.removeRedundantPitchNames(inPlace = False)
+        >>> c14 = c13.removeRedundantPitchNames(inPlace=False)
         >>> c14
         <music21.chord.Chord A4 B4>
 
@@ -2114,11 +2116,14 @@ class Chord(note.NotRest):
         augFourthInterval = interval.Interval(bass, supertonic)
         if supertonic is None:
             return False
-        if not (augFourthInterval.diatonic.specificName == 'Augmented' and augFourthInterval.generic.simpleDirected == 4):
+        if (not (augFourthInterval.diatonic.specificName == 'Augmented' and 
+                 augFourthInterval.generic.simpleDirected == 4)):
             return False
-        ### No other pitches may be present that aren't the m6 scale step, raised 4th, tonic, or supertonic.
+        ### No other pitches may be present that aren't the m6 scale step, 
+        ### raised 4th, tonic, or supertonic.
         for samplePitch in augSixthChord.pitches:
-            if not (samplePitch == bass or samplePitch == root or samplePitch == tonic or samplePitch == supertonic):
+            if (not (samplePitch == bass or samplePitch == root or 
+                     samplePitch == tonic or samplePitch == supertonic)):
                 return False
         return True
 
@@ -2128,39 +2133,51 @@ class Chord(note.NotRest):
         if not augSixthChord.inversion() == 1:
             return False
 
-        ### Augmented sixth interval (simple or compound) must be present between bass and raised 4th (root of chord)
+        ### Augmented sixth interval (simple or compound) must be present 
+        ### between bass and raised 4th (root of chord)
         bass = augSixthChord.bass()
         root = augSixthChord.root()
         if bass is None or root is None:
             return False
         augSixthInterval = interval.Interval(bass, root)
-        if not (augSixthInterval.diatonic.specificName == 'Augmented' and augSixthInterval.generic.simpleDirected == 6):
+        if (not (augSixthInterval.diatonic.specificName == 'Augmented' and 
+                 augSixthInterval.generic.simpleDirected == 6)):
             return False
 
-        ### The fifth of the chord must be the tonic. The fifth of the chord is the tonic if and only if
-        ### there is a M3 (simple or compound) between the bass (m6 scale step) and the fifth of the chord.
+        ### The fifth of the chord must be the tonic. 
+        ### The fifth of the chord is the tonic if and only if
+        ### there is a M3 (simple or compound) between the bass (m6 scale step) 
+        ### and the fifth of the chord.
         tonic = augSixthChord.getChordStep(5)
         if tonic is None:
             return False
         majThirdInterval = interval.Interval(bass, tonic)
-        if not (majThirdInterval.diatonic.specificName == 'Major' and majThirdInterval.generic.simpleDirected == 3):
+        if (not (majThirdInterval.diatonic.specificName == 'Major' and 
+                 majThirdInterval.generic.simpleDirected == 3)):
             return False
 
-        ### The seventh of the chord must be the mediant. The seventh of the chord is the mediant if and only if
-        ### there is a P5 (simple or compound) between the bass (m6 scale step) and the fifth of the chord.
+        ### The seventh of the chord must be the mediant. 
+        ### The seventh of the chord is the mediant if and only if
+        ### there is a P5 (simple or compound) between the bass 
+        ### (m6 scale step) and the fifth of the chord.
         mediant = augSixthChord.getChordStep(7)
         if mediant is None:
             return False
         perfectFifthInterval = interval.Interval(bass, mediant)
-        if not (perfectFifthInterval.diatonic.specificName == 'Perfect' and perfectFifthInterval.generic.simpleDirected == 5):
+        if (not (perfectFifthInterval.diatonic.specificName == 'Perfect' and 
+                 perfectFifthInterval.generic.simpleDirected == 5)):
             return False
 
         return True
 
     def isHalfDiminishedSeventh(self):
-        '''Returns True if chord is a Half Diminished Seventh, that is, if it contains only notes that are
-        either in unison with the root, a minor third above the root, a diminished fifth, or a major seventh
-        above the root. Additionally, must contain at least one of each third, fifth, and seventh above the root.
+        '''
+        Returns True if chord is a Half Diminished Seventh, that is, 
+        if it contains only notes that are
+        either in unison with the root, a minor third above the root, a 
+        diminished fifth, or a major seventh
+        above the root. Additionally, must contain at least one of each third, 
+        fifth, and seventh above the root.
         Chord must be spelled correctly. Otherwise returns false.
 
 
@@ -2192,7 +2209,10 @@ class Chord(note.NotRest):
             return False
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(self.root(), thisPitch)
-            if (thisInterval.chromatic.mod12 != 0) and (thisInterval.chromatic.mod12 != 3) and (thisInterval.chromatic.mod12 != 6) and (thisInterval.chromatic.mod12 != 10):
+            if ((thisInterval.chromatic.mod12 != 0) and 
+                    (thisInterval.chromatic.mod12 != 3) and 
+                    (thisInterval.chromatic.mod12 != 6) and 
+                    (thisInterval.chromatic.mod12 != 10)):
                 return False
 
         return True
@@ -2336,22 +2356,27 @@ class Chord(note.NotRest):
         if not augSixthChord.inversion() == 1:
             return False
 
-        ### Augmented sixth interval (simple or compound) must be present between bass and raised 4th (root of chord)
+        ### Augmented sixth interval (simple or compound) must 
+        # be present between bass and raised 4th (root of chord)
         bass = augSixthChord.bass()
         root = augSixthChord.root()
         if bass is None or root is None:
             return False
         augSixthInterval = interval.Interval(bass, root)
-        if not (augSixthInterval.diatonic.specificName == 'Augmented' and augSixthInterval.generic.simpleDirected == 6):
+        if (not (augSixthInterval.diatonic.specificName == 'Augmented' and 
+                 augSixthInterval.generic.simpleDirected == 6)):
             return False
 
-        ### The fifth of the chord must be the tonic. The fifth of the chord is the tonic if and only if
-        ### there is a M3 (simple or compound) between the bass (m6 scale step) and the fifth of the chord.
+        ### The fifth of the chord must be the tonic. 
+        ### The fifth of the chord is the tonic if and only if
+        ### there is a M3 (simple or compound) between the bass (m6 scale step) 
+        ### and the fifth of the chord.
         tonic = augSixthChord.getChordStep(5)
         if tonic is None:
             return False
         majThirdInterval = interval.Interval(bass, tonic)
-        if not (majThirdInterval.diatonic.specificName == 'Major' and majThirdInterval.generic.simpleDirected == 3):
+        if (not (majThirdInterval.diatonic.specificName == 'Major' and 
+                 majThirdInterval.generic.simpleDirected == 3)):
             return False
 
         ### No other pitches may be present that aren't the m6 scale step, raised 4th, or tonic.
@@ -2514,7 +2539,10 @@ class Chord(note.NotRest):
 
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(self.root(), thisPitch)
-            if (thisInterval.diatonic.generic.mod7 != 1) and (thisInterval.diatonic.generic.mod7 != 3) and (thisInterval.diatonic.generic.mod7 != 5) and (thisInterval.diatonic.generic.mod7 != 7):
+            if ((thisInterval.diatonic.generic.mod7 != 1) and 
+                    (thisInterval.diatonic.generic.mod7 != 3) and 
+                    (thisInterval.diatonic.generic.mod7 != 5) and 
+                    (thisInterval.diatonic.generic.mod7 != 7)):
                 return False
 
         return True
@@ -2531,12 +2559,12 @@ class Chord(note.NotRest):
         ### Sw+6 => Minor sixth scale step in bass, tonic, raised 4th + raised 2nd scale degree.
         augSixthChord = self.removeRedundantPitchNames(inPlace=False)
 
-        ### The findRoot() method of music21.chord Chord determines the root based on the note with
-        ### the most thirds above it. However, under this definition, a Swiss augmented sixth chord
-        ### resembles a second inversion chord, not the first inversion subdominant chord it is based
-        ### upon. We fix this by adjusting the root. First, however, we check to see if the chord is
-        ### in second inversion to begin with, otherwise its not a Sw+6 chord. This is to avoid
-        ### ChordException errors.
+        # The findRoot() method of music21.chord Chord determines the root based on the note with
+        # the most thirds above it. However, under this definition, a Swiss augmented sixth chord
+        # resembles a second inversion chord, not the first inversion subdominant chord it is based
+        # upon. We fix this by adjusting the root. First, however, we check to see if the chord is
+        # in second inversion to begin with, otherwise its not a Sw+6 chord. This is to avoid
+        # ChordException errors.
         if not augSixthChord.inversion() == 2:
             return False
         augSixthChord.root(augSixthChord.getChordStep(3))
@@ -2545,36 +2573,48 @@ class Chord(note.NotRest):
         if not augSixthChord.inversion() == 1:
             return False
 
-        ### Augmented sixth interval (simple or compound) must be present between bass and raised 4th (root of chord)
+        ### Augmented sixth interval (simple or compound) 
+        ### must be present between bass and raised 4th (root of chord)
         bass = augSixthChord.bass()
         root = augSixthChord.root()
         if bass is None or root is None:
             return False
         augSixthInterval = interval.Interval(bass, root)
-        if not (augSixthInterval.diatonic.specificName == 'Augmented' and augSixthInterval.generic.simpleDirected == 6):
+        if (not (augSixthInterval.diatonic.specificName == 'Augmented' and 
+                 augSixthInterval.generic.simpleDirected == 6)):
             return False
 
-        ### The fifth of the chord must be the tonic. The fifth of the chord is the tonic if and only if
-        ### there is a M3 (simple or compound) between the bass (m6 scale step) and the fifth of the chord.
+        ### The fifth of the chord must be the tonic. 
+        ### The fifth of the chord is the tonic if and only if
+        ### there is a M3 (simple or compound) between the bass 
+        ### (m6 scale step) and the fifth of the chord.
         tonic = augSixthChord.getChordStep(5)
         if tonic is None:
             return False
         majThirdInterval = interval.Interval(bass, tonic)
-        if not (majThirdInterval.diatonic.specificName == 'Major' and majThirdInterval.generic.simpleDirected == 3):
+        if (not (majThirdInterval.diatonic.specificName == 'Major' and 
+                 majThirdInterval.generic.simpleDirected == 3)):
             return False
 
-        ### The sixth of the chord must be the supertonic. The sixth of the chord is the supertonic if and only if
-        ### there is a A4 (simple or compound) between the bass (m6 scale step) and the sixth of the chord.
+        ### The sixth of the chord must be the supertonic. The sixth of the chord 
+        ### is the supertonic if and only if
+        ### there is a A4 (simple or compound) between the bass (m6 scale step) 
+        ### and the sixth of the chord.
         supertonic = augSixthChord.getChordStep(6)
         augFourthInterval = interval.Interval(bass, supertonic)
         if supertonic is None:
             return False
-        if not (augFourthInterval.diatonic.specificName == 'Doubly-Augmented' and augFourthInterval.generic.simpleDirected == 4):
+        if (not (augFourthInterval.diatonic.specificName == 'Doubly-Augmented' and 
+                 augFourthInterval.generic.simpleDirected == 4)):
             return False
 
-        ### No other pitches may be present that aren't the m6 scale step, raised 4th, tonic, or supertonic.
+        ### No other pitches may be present that aren't the m6 scale step, raised 4th,
+        ### tonic, or supertonic.
         for samplePitch in augSixthChord.pitches:
-            if not (samplePitch == bass or samplePitch == root or samplePitch == tonic or samplePitch == supertonic):
+            if (not (samplePitch == bass or 
+                     samplePitch == root or 
+                     samplePitch == tonic or 
+                     samplePitch == supertonic)):
                 return False
 
         return True
@@ -2599,7 +2639,7 @@ class Chord(note.NotRest):
         >>> incorrectlySpelled.isTriad()
         False
 
-        >>> incorrectlySpelled.pitches[1].getEnharmonic(inPlace = True)
+        >>> incorrectlySpelled.pitches[1].getEnharmonic(inPlace=True)
         >>> incorrectlySpelled.isTriad()
         True
 
@@ -2621,7 +2661,9 @@ class Chord(note.NotRest):
                 thisInterval = interval.notesToInterval(self.root(), thisPitch)
             except ChordException:
                 return False
-            if (thisInterval.diatonic.generic.mod7 != 1) and (thisInterval.diatonic.generic.mod7 != 3) and (thisInterval.diatonic.generic.mod7 != 5):
+            if ((thisInterval.diatonic.generic.mod7 != 1) and 
+                    (thisInterval.diatonic.generic.mod7 != 3) and 
+                    (thisInterval.diatonic.generic.mod7 != 5)):
                 return False
             if self.hasAnyRepeatedDiatonicNote():
                 return False
@@ -2729,7 +2771,7 @@ class Chord(note.NotRest):
         >>> c2
         <music21.chord.Chord C5 E3 G4 C2 E3 F-4>
 
-        >>> rem = c2.removeRedundantPitchNames(inPlace = True)
+        >>> rem = c2.removeRedundantPitchNames(inPlace=True)
         >>> c2
         <music21.chord.Chord C5 E3 G4 F-4>
         >>> rem
@@ -3277,7 +3319,6 @@ class Chord(note.NotRest):
             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
 
     def sortAscending(self, inPlace=False):
-        # TODO: Check context
         return self.sortDiatonicAscending(inPlace=inPlace)
 
     def sortChromaticAscending(self):
@@ -4070,7 +4111,8 @@ class Chord(note.NotRest):
         >>> chord2 = chord.Chord(["C4","C#4","D4","E-4","E4","F4"])  # 1st 1/2 of chromatic
         >>> st3.append(chord2)
         >>> chord2.scaleDegrees
-        [(1, None), (1, <accidental sharp>), (2, None), (3, <accidental flat>), (3, None), (4, None)]
+        [(1, None), (1, <accidental sharp>), (2, None), 
+         (3, <accidental flat>), (3, None), (4, None)]
 
         '''
         from music21 import scale
@@ -4081,7 +4123,8 @@ class Chord(note.NotRest):
         else:
             sc = self.getContextByClass(scale.Scale, sortByCreationTime=True)
             if sc is None:
-                raise ChordException("Cannot find a Key or Scale context for this chord, so cannot find what scale degrees the pitches correspond to!")
+                raise ChordException("Cannot find a Key or Scale context for this chord, " + 
+                                "so cannot find what scale degrees the pitches correspond to!")
 #        if hasattr(sc, 'mode'):
 #            mode = sc.mode       ### POSSIBLY USE to describe #7 etc. properly in minor -- not sure...
 #        else:
@@ -4291,7 +4334,8 @@ def fromForteClass(notation):
             elif 'b' in chars.lower():
                 inv = -1
         else:
-            raise ChordException('cannot extract set-class representation from string: %s' % notation)
+            raise ChordException(
+                        'cannot extract set-class representation from string: %s' % notation)
     elif common.isListLike(notation):
         if len(notation) <= 3: # assume its a set-class representation
             if len(notation) > 0:
@@ -4437,7 +4481,8 @@ class Test(unittest.TestCase):
         stream2 = copy.deepcopy(stream1)
         self.assertTrue(stream1 is not stream2)
         self.assertTrue(stream1.notes[0].pitches[0] is not stream2.notes[0].pitches[0])
-        self.assertTrue(stream1.notes[0].pitches[0].accidental is not stream2.notes[0].pitches[0].accidental)
+        self.assertTrue(stream1.notes[0].pitches[0].accidental is not 
+                        stream2.notes[0].pitches[0].accidental)
 
     def testConstruction(self):
         HighEFlat = note.Note()
@@ -4694,7 +4739,8 @@ class Test(unittest.TestCase):
         MiddleFSharp = note.Note()
         MiddleFSharp.name = 'F#'
 
-        chord33 = Chord([MiddleC, MiddleE, MiddleG, MiddleFDbleFlat, MiddleASharp, MiddleBDoubleFlat, MiddleFSharp])
+        chord33 = Chord([MiddleC, MiddleE, MiddleG, MiddleFDbleFlat,
+                        MiddleASharp, MiddleBDoubleFlat, MiddleFSharp])
         chord33.root(MiddleC)
 
         self.assertEqual( chord33.isHalfDiminishedSeventh(), False )
@@ -4725,10 +4771,6 @@ class Test(unittest.TestCase):
         self.assertEqual(unscrambledChord3.pitches[2].name,  "A#")
         self.assertEqual(unscrambledChord3.pitches[3].name,  "F")
         self.assertEqual(unscrambledChord3.pitches[4].name,  "A-")
-
-
-    #    for thisPitch in unscrambledChord2.pitches:
-    #        print thisPitch.name + str(thisPitch.octave) + '  ' + str(thisPitch.diatonicNoteNum()) + "  " + str(thisPitch.midiNote())
 
     def testDurations(self):
 
@@ -4791,13 +4833,15 @@ class Test(unittest.TestCase):
         st1 = stream.Stream()
         st1.append(key.Key('c#'))   # c-sharp minor
         st1.append(chord1)
-        self.assertEqual(repr(chord1.scaleDegrees), "[(1, None), (3, <accidental sharp>), (5, None)]")
+        self.assertEqual(repr(chord1.scaleDegrees), 
+                         "[(1, None), (3, <accidental sharp>), (5, None)]")
 
         st2 = stream.Stream()
         st2.append(key.Key('c'))    # c minor
         st2.append(chord1)          # same pitches as before gives different scaleDegrees
         sd2 = chord1.scaleDegrees
-        self.assertEqual(repr(sd2), "[(1, <accidental sharp>), (3, <accidental double-sharp>), (5, <accidental sharp>)]")
+        self.assertEqual(repr(sd2), "[(1, <accidental sharp>), " + 
+                         "(3, <accidental double-sharp>), (5, <accidental sharp>)]")
 
 
         st3 = stream.Stream()
@@ -4805,7 +4849,9 @@ class Test(unittest.TestCase):
         chord2 = Chord(["C4", "C#4", "D4", "E-4", "E4", "F4"])  # 1st 1/2 of chromatic
         st3.append(chord2)
         sd3 = chord2.scaleDegrees
-        self.assertEqual(repr(sd3), '[(1, None), (1, <accidental sharp>), (2, None), (3, <accidental flat>), (3, None), (4, None)]')
+        self.assertEqual(repr(sd3), 
+            '[(1, None), (1, <accidental sharp>), (2, None), ' + 
+            '(3, <accidental flat>), (3, None), (4, None)]')
 
 
     def testScaleDegreesB(self):
@@ -4891,7 +4937,11 @@ class Test(unittest.TestCase):
         out = out.replace(' ', '')
         out = out.replace('\n', '')
         #print out
-        self.assertTrue(out.find('''<pitch><step>A</step><octave>4</octave></pitch><duration>15120</duration><tietype="start"/><type>quarter</type><dot/><stem>up</stem><notehead>normal</notehead><notations><tiedtype="start"/></notations>''') != -1, out)
+        self.assertTrue(out.find('<pitch><step>A</step><octave>4</octave></pitch>' + 
+                                 '<duration>15120</duration><tietype="start"/>' + 
+                                 '<type>quarter</type><dot/><stem>up</stem>' + 
+                                 '<notehead>normal</notehead><notations>' + 
+                                 '<tiedtype="start"/></notations>') != -1, out)
 
     def testTiesB(self):
         from music21 import stream, scale
@@ -4934,10 +4984,13 @@ class Test(unittest.TestCase):
         self.assertEqual(cCopy.getVolume('c4').velocity, 111)
         self.assertEqual(cCopy.getVolume('d-4').velocity, 98)
         self.assertEqual(cCopy.getVolume('g4').velocity, 73)
-#         environLocal.printDebug(['in test', 'id(c)', id(c)])
-#         environLocal.printDebug(['in test', "c.getVolume('g4').client", id(c.getVolume('g4').client)])
+#         environLocal.printDebug(['in test', 
+#                'id(c)', id(c)])
+#         environLocal.printDebug(['in test', 
+#                "c.getVolume('g4').client", id(c.getVolume('g4').client)])
 #         environLocal.printDebug(['in test', 'id(cCopy)', id(cCopy)])
-#         environLocal.printDebug(['in test', "cCopy.getVolume('g4').client", id(cCopy.getVolume('g4').client)])
+#         environLocal.printDebug(['in test', 
+#                "cCopy.getVolume('g4').client", id(cCopy.getVolume('g4').client)])
         self.assertEqual(cCopy.getVolume('c4').client, cCopy)
         self.assertEqual(cCopy.getVolume('d-4').client, cCopy)
         self.assertEqual(cCopy.getVolume('g4').client, cCopy)
@@ -5061,7 +5114,8 @@ class Test(unittest.TestCase):
             s.append(n)
         self.assertEqual(len(s.notes), 3)
         self.assertEqual(s.highestOffset, 2.0)
-        self.assertEqual(str(s.pitches), '[<music21.pitch.Pitch D2>, <music21.pitch.Pitch E-1>, <music21.pitch.Pitch B-6>]')
+        self.assertEqual(str(s.pitches), 
+            '[<music21.pitch.Pitch D2>, <music21.pitch.Pitch E-1>, <music21.pitch.Pitch B-6>]')
 
 
 #-------------------------------------------------------------------------------
