@@ -1922,6 +1922,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             replacement.sites.add(activeStream)
             el.sites.remove(activeStream)
             el.activeSite = None
+            if id(el) in activeStream._offsetDict:
+                del(activeStream._offsetDict[id(el)])
 
             updateIsFlat = False
             if replacement.isStream:
@@ -9911,14 +9913,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # get target offset relative to Stream
                 oInStream = vStart + e.getOffsetBySite(v.containedSite)
                 # get all elements at this offset, force a class match
-                targets = self.iter.getElementsByOffset(oInStream).getElementsByClass(
-                                                        classList=[e.classes[0]])
+                targets = self.iter.getElementsByOffset(oInStream).getElementsByClass(e.classes[0])
                 # only replace if we match the start
                 if targets:
                     targetsMatched += 1
                     # always assume we just want the first one?
                     targetToReplace = targets[0]
-                    #environLocal.printDebug(['matchBySpan', matchBySpan, 'found target to replace:', targetToReplace])
+                    #environLocal.printDebug(['matchBySpan', matchBySpan, 
+                    #     'found target to replace:', targetToReplace])
                     # remove the target, place in removed Variant
                     removed.append(targetToReplace)
                     self.remove(targetToReplace)

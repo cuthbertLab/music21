@@ -1996,40 +1996,84 @@ class Test(unittest.TestCase):
         s.replace(n4, n1)
         self.assertEqual([s[0], s[1]], [n3, n1])
 
-
+    def testReplaceA1(self):
         from music21 import corpus
         sBach = corpus.parse('bach/bwv324.xml')
         partSoprano = sBach.parts[0]
+
 
         c1 = partSoprano.flat.getElementsByClass('Clef')[0]
         self.assertEqual(isinstance(c1, clef.TrebleClef), True)
 
         # now, replace with a different clef
         c2 = clef.AltoClef()
-        partSoprano.flat.replace(c1, c2)
+        partSoprano.flat.replace(c1, c2, allDerived=True)
 
         # all views of the Stream have been updated
         cTest = sBach.parts[0].flat.getElementsByClass('Clef')[0]
         self.assertEqual(isinstance(cTest, clef.AltoClef), True)
 
-        s1 = Stream()
-        s1.insert(10, n1)
-        s2 = Stream()
-        s2.insert(20, n1)
+    def testReplaceB(self):
+        n1 = note.Note('g')
+        n2 = note.Note('g#')
+
+        s0 = Stream()
+        s1 = copy.deepcopy(s0)
+        s2 = copy.deepcopy(s1)
         s3 = Stream()
+        s0.insert( 0, n1)
+        s1.insert(10, n1)
+        s2.insert(20, n1)
         s3.insert(30, n1)
         
-        s1.replace(n1, n2)
-        self.assertEqual(s1[0], n2)
+        s1.replace(n1, n2, allDerived=True)
+
+        # s1 is derived from s0 so n1 is replaced
+        self.assertIs(s0[0], n2) 
+        self.assertEqual(s0[0].getOffsetBySite(s0), 0)
+        
+        # s1 was the replacement stream, so definitely n1 becomes n2
+        self.assertIs(s1[0], n2)
         self.assertEqual(s1[0].getOffsetBySite(s1), 10)
         
-        self.assertEqual(s2[0], n2)
+        # s2 was derived from s0, not vice versa, so n1 is left alone.
+        self.assertIs(s2[0], n1)
         self.assertEqual(s2[0].getOffsetBySite(s2), 20)
         
-        self.assertEqual(s3[0], n2)
+        # s3 is completely out of any derivation chain, so left alone
+        self.assertIs(s3[0], n1)
         self.assertEqual(s3[0].getOffsetBySite(s3), 30)
 
+    def testReplaceDerivated(self):
+        from music21 import corpus
+        qj = corpus.parse('ciconia/quod_jactatur').parts[0].measures(1,2)
+        qj.id = 'measureExcerpt'
 
+        qjflat = qj.flat
+        dc = list(qjflat.derivation.chain())        
+        self.assertIs(dc[0], qj)
+
+        k1 = qjflat.getElementsByClass(key.KeySignature)[0]
+        self.assertEqual(k1.sharps, -1)
+        k3flats = key.KeySignature(-3)
+
+        # put k1 in an unrelated site:
+        mUnrelated = Measure()
+        mUnrelated.insert(0, k1)
+
+        # here's the big one
+        qjflat.replace(k1, k3flats, allDerived=True)
+        
+        kWhich = qjflat.getElementsByClass(key.KeySignature)[0]
+        self.assertIs(kWhich, k3flats)
+        self.assertEqual(kWhich.sharps, -3)
+        
+        kWhich2 = qj.recurse().getElementsByClass(key.KeySignature)[0]
+        self.assertIs(kWhich2, k3flats)
+        self.assertEqual(kWhich2.sharps, -3)
+
+        # check that unrelated is untouched
+        self.assertIs(mUnrelated[0], k1)
 
     def testDoubleStreamPlacement(self):
         n1 = note.Note()
@@ -7478,43 +7522,13 @@ class Test(unittest.TestCase):
             if 'Measure' in x.classes:
                 self.assertEqual(len(x), 0)
 
-    def testReplaceDerivated(self):
-        from music21 import corpus
-        qj = corpus.parse('ciconia/quod_jactatur').parts[0].measures(1,2)
-        qj.id = 'measureExcerpt'
 
-        qjflat = qj.flat
-        dc = list(qjflat.derivation.chain())        
-        self.assertIs(dc[0], qj)
-
-        k1 = qjflat.getElementsByClass(key.KeySignature)[0]
-        self.assertEqual(k1.sharps, -1)
-        k3flats = key.KeySignature(-3)
-
-        # put k1 in an unrelated site:
-        mUnrelated = Measure()
-        mUnrelated.insert(0, k1)
-
-        # here's the big one
-        qjflat.replace(k1, k3flats, allDerived=True)
-        
-        kWhich = qjflat.getElementsByClass(key.KeySignature)[0]
-        self.assertIs(kWhich, k3flats)
-        self.assertEqual(kWhich.sharps, -3)
-        
-        kWhich2 = qj.recurse().getElementsByClass(key.KeySignature)[0]
-        self.assertIs(kWhich2, k3flats)
-        self.assertEqual(kWhich2.sharps, -3)
-
-        # check that unrelated is untouched
-        self.assertIs(mUnrelated[0], k1)
 
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
     import music21
-    #'testContextNestedC'
-    music21.mainTest(Test, 'verbose') #, runTest='testReplaceDerivated')
+    music21.mainTest(Test, 'verbose') #, runTest='testReplaceB')
 
 #------------------------------------------------------------------------------
 # eof
