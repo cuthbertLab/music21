@@ -392,25 +392,41 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         Combines the two storage lists, _elements and _endElements, such that
         they appear as a single list.
+
+        We no longer cache elements list, since we want to make sure that every
+        element in the list has the current stream as an active site.
         '''
         if not self.isSorted and self.autoSort:
             self.sort() # will set isSorted to True
-        if 'elements' not in self._cache or self._cache["elements"] is None:
-            # this list concatenation may take time; thus, only do when
-            # elementsChanged has been called
-            self._cache["elements"] = self._elements + self._endElements
-        return tuple(self._cache["elements"])
+        eList = self._elements + self._endElements
+        for e in eList:
+            e.activeSite = self
+        return tuple(eList)
 
     def _setElements(self, value):
         '''
-        TODO: this should be tested thoroughly, as this is a bad way to add elements,
-        as locations are not necessarily set properly.
-
-        Removing the elements from the current Stream seems necessary.
+        Sets this streams elements to the elements in another stream (just give
+        the stream, not the stream's .elements), or to a list of elements.
+        
+        Safe:
+        
+        newStream.elements = oldStream
+        
+        Unsafe:
+        
+        newStream.elements = oldStream.elements
+        
+        Why?
+        
+        The activeSites of some elements may have changed between retrieving
+        and setting (esp. if a lot else has happened in the meantime). Where
+        are we going to get the new stream's elements' offsets from? why
+        from their active sites.
         '''
         if (not common.isListLike(value) and 
                 hasattr(value, 'isStream') and
                 value.isStream):
+            # set from a Stream.
             self._elements = list(value._elements)
             for e in self._elements:
                 self.setElementOffset(e, value.elementOffset(e))
@@ -1903,70 +1919,70 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.note.Note D->        
         '''
-#         try:
-#             i = self.index(target)
-#         except StreamException:
-#             return  # do nothing if no match
-# 
-#         eLen = len(self._elements)
-#         if i < eLen:
-#             target = self._elements[i] # target may have been obj id; reclassing
-#             self._elements[i] = replacement
-#             # place the replacement at the old objects offset for this site
-#             self.setElementOffset(replacement, self.elementOffset(target))
-#             replacement.sites.add(self)
-#         else:
-#             # target may have been obj id; reassign
-#             target = self._endElements[i - eLen]
-#             self._endElements[i - eLen] = replacement
-#             self.setElementOffset(replacement, 'highestTime')
-#             replacement.sites.add(self)
-# 
-#         target.sites.remove(self)
-#         target.activeSite = None
-# 
-#         updateIsFlat = False
-#         if replacement.isStream:
-#             updateIsFlat = True
-#         # elements have changed: sort order may change b/c have diff classes
-#         self.elementsChanged(updateIsFlat=updateIsFlat)            
-        
-        if target is None:
-            raise StreamException('received a target of None as a candidate for replacement.')
-        if recurse is False:
-            iterator = self.iter
+        try:
+            i = self.index(target)
+        except StreamException:
+            return  # do nothing if no match
+ 
+        eLen = len(self._elements)
+        if i < eLen:
+            target = self._elements[i] # target may have been obj id; reclassing
+            self._elements[i] = replacement
+            # place the replacement at the old objects offset for this site
+            self.setElementOffset(replacement, self.elementOffset(target))
+            replacement.sites.add(self)
         else:
-            iterator = self.recurse()
-        iterator.addFilter(filter.IsFilter(target))
+            # target may have been obj id; reassign
+            target = self._endElements[i - eLen]
+            self._endElements[i - eLen] = replacement
+            self.setElementOffset(replacement, 'highestTime')
+            replacement.sites.add(self)
  
+        target.sites.remove(self)
+        target.activeSite = None
  
-        found = False
-        for el in iterator:
-            # el should be target...
-            index = iterator.activeInformation['sectionIndex']
-            # containingStream will be self for non-recursive
-            containingStream = iterator.activeInformation['stream']
-            elementList = iterator.activeElementList
-            found = True
-            break
-
-        if found:
-            elementList[index] = replacement
-            
-            containingStream.setElementOffset(
-                                        replacement, 
-                                        containingStream.elementOffset(el, stringReturns=True))
-            replacement.sites.add(containingStream)
-            target.sites.remove(containingStream)
-            target.activeSite = None
-            #if id(target) in containingStream._offsetDict:
-            #    del(containingStream._offsetDict[id(target)])
-            
-            updateIsFlat = False
-            if replacement.isStream:
-                updateIsFlat = True
-            # elements have changed: sort order may change b/c have diff classes
-            containingStream.elementsChanged(updateIsFlat=updateIsFlat)
+        updateIsFlat = False
+        if replacement.isStream:
+            updateIsFlat = True
+        # elements have changed: sort order may change b/c have diff classes
+        self.elementsChanged(updateIsFlat=updateIsFlat)            
+        
+#         if target is None:
+#             raise StreamException('received a target of None as a candidate for replacement.')
+#         if recurse is False:
+#             iterator = self.iter
+#         else:
+#             iterator = self.recurse()
+#         iterator.addFilter(filter.IsFilter(target))
+#  
+#  
+#         found = False
+#         for el in iterator:
+#             # el should be target...
+#             index = iterator.activeInformation['sectionIndex']
+#             # containingStream will be self for non-recursive
+#             containingStream = iterator.activeInformation['stream']
+#             elementList = iterator.activeElementList
+#             found = True
+#             break
+# 
+#         if found:
+#             elementList[index] = replacement
+#             
+#             containingStream.setElementOffset(
+#                                         replacement, 
+#                                         containingStream.elementOffset(el, stringReturns=True))
+#             replacement.sites.add(containingStream)
+#             target.sites.remove(containingStream)
+#             target.activeSite = None
+#             #if id(target) in containingStream._offsetDict:
+#             #    del(containingStream._offsetDict[id(target)])
+#             
+#             updateIsFlat = False
+#             if replacement.isStream:
+#                 updateIsFlat = True
+#             # elements have changed: sort order may change b/c have diff classes
+#             containingStream.elementsChanged(updateIsFlat=updateIsFlat)
 
         if allDerived:
             for derivedSite in self.derivation.chain():
@@ -2049,8 +2065,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return sLeft, sRight
 
     #---------------------------------------------------------------------------
-    def _recurseRepr(self, thisStream, prefixSpaces=0,
-                    addBreaks=True, addIndent=True, addEndTimes=False, useMixedNumerals=False):
+    def _recurseRepr(self, 
+                     thisStream, 
+                     prefixSpaces=0,
+                     addBreaks=True, 
+                     addIndent=True, 
+                     addEndTimes=False, 
+                     useMixedNumerals=False):
         '''
         Used by .show('text')
 
@@ -2123,6 +2144,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             useMixedNumerals = keywords['useMixedNumerals']
         else:
             useMixedNumerals = False
+        
         return self._recurseRepr(self, 
                                  addEndTimes=addEndTimes, 
                                  useMixedNumerals=useMixedNumerals)

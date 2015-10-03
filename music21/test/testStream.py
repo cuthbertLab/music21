@@ -2957,7 +2957,6 @@ class Test(unittest.TestCase):
             nAlter = note.Note()
             nAlter.quarterLength = qL
             sProc.insertAndShift(insertOffset, nAlter)
-            sProc.elements = sProc.sorted.elements
             self.assertEqual(sProc.highestOffset, newHighOffset)
             self.assertEqual(sProc.highestTime, newHighTime)
             self.assertEqual(len(sProc), len(s)+1)
@@ -2972,7 +2971,6 @@ class Test(unittest.TestCase):
             nAlter = note.Note()
             nAlter.quarterLength = qL
             sProc.insertAndShift(insertOffset, nAlter)
-            sProc.elements = sProc.sorted.elements
             self.assertEqual(sProc.highestOffset, newHighOffset)
             self.assertEqual(sProc.highestTime, newHighTime)
             self.assertEqual(len(sProc), len(s)+1)
@@ -3003,7 +3001,6 @@ class Test(unittest.TestCase):
 
             c = clef.Clef()
             sProc.insertAndShift(insertOffset, c)
-            #sProc.elements = sProc.sorted.elements
             self.assertEqual(sProc.highestOffset, newHighOffset)
             self.assertEqual(sProc.highestTime, newHighTime)
             self.assertEqual(len(sProc), len(s)+1)
@@ -3057,7 +3054,6 @@ class Test(unittest.TestCase):
             #environLocal.printDebug(['itemList', itemList])            
 
             sProc.insertAndShift(itemList)
-            sProc.elements = sProc.sorted.elements
             self.assertEqual(sProc.highestOffset, newHighOffset)
             self.assertEqual(sProc.highestTime, newHighTime)
             self.assertEqual(len(sProc), len(s)+len(itemList) / 2)
@@ -6309,7 +6305,7 @@ class Test(unittest.TestCase):
         s1.append(n1)
 
         s2 = stream.Stream()
-        s2.elements = s1.elements
+        s2.elements = s1
         match = []
         for e in s2.elements:
             match.append(e.getOffsetBySite(s2))
@@ -6330,7 +6326,7 @@ class Test(unittest.TestCase):
         # before elements assignment
         self.assertEqual(match, [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 25.0])
 
-        #s3.elements = s1[:].elements
+        #s3.elements = s1
         s3 = s1[:]
         match = []
         for e in s3.elements:
@@ -6339,7 +6335,7 @@ class Test(unittest.TestCase):
 
         # this resets active site, so we get the right offsets on element 
         # assignment
-        s3.elements = s1[:].elements
+        s3.elements = s1
         match = []
         for e in s3.elements:
             match.append(e.getOffsetBySite(s3))
@@ -7522,13 +7518,31 @@ class Test(unittest.TestCase):
             if 'Measure' in x.classes:
                 self.assertEqual(len(x), 0)
 
-
+    def testSetElements(self):
+        from music21 import dynamics
+        s = Stream()
+        s.append(note.Note('C', type='half'))
+        s.append(note.Note('D', type='half'))
+        s.append(note.Note('E', type='half'))
+        s.append(note.Note('F', type='half'))
+        n1 = s.notes[0]
+        n2 = s.notes[len(s.notes) // 2]
+        n3 = s.notes[-1]
+        sp1 = dynamics.Diminuendo(n1, n2)
+        sp2 = dynamics.Crescendo(n2, n3)
+        s.append(sp1)
+        s.append(sp2)
+        s2 = Stream()
+        s2.elements = s.elements
+        for el in s2:
+            self.assertEqual(el.getOffsetBySite(s2),
+                             el.getOffsetBySite(s))
 
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test, 'verbose') #, runTest='testReplaceB')
+    music21.mainTest(Test, 'verbose', runTest='testSetElements')
 
 #------------------------------------------------------------------------------
 # eof

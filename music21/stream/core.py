@@ -285,7 +285,6 @@ class StreamCoreMixin(object):
         element.sites.add(self)
         # need to explicitly set the activeSite of the element
         element.activeSite = self
-        # could also do self.elements = self.elements + [element]
         #self._elements.append(element)
         self._endElements.append(element)
 
