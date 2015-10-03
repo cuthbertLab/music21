@@ -54,6 +54,8 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None):
     totalModules = 0
     
     for moduleObject in common.sortModules(modules):
+        if 'scala' not in moduleObject.__name__:
+            continue
         unitTestCases = []
         if limit is not None:
             if totalModules > limit:
@@ -132,7 +134,7 @@ if __name__ == '__main__':
         returnCode = main(sys.argv[1:])
     else:
         returnCode = main()
-
+    print("ReturnCode {0}".format(returnCode))
     exit(returnCode)
 
 #------------------------------------------------------------------------------

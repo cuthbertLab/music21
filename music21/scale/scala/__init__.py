@@ -29,7 +29,7 @@ provide a root pitch and the name of the scale. Scale names are given as a the s
 
 >>> mbiraScales = scale.scala.search('mbira')
 >>> mbiraScales
-['mbira_banda.scl', 'mbira_banda2.scl', 'mbira_gondo.scl', 'mbira_kunaka.scl', 'mbira_kunaka2.scl', 'mbira_mude.scl', 'mbira_mujuru.scl', 'mbira_zimb.scl']
+['zmbira_banda.scl', 'mbira_banda2.scl', 'mbira_gondo.scl', 'mbira_kunaka.scl', 'mbira_kunaka2.scl', 'mbira_mude.scl', 'mbira_mujuru.scl', 'mbira_zimb.scl']
 
 
 For most people you'll want to do something like this:

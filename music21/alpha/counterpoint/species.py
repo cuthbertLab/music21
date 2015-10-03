@@ -276,7 +276,7 @@ class ModalCounterpoint(object):
         >>> bass.append([n1, n2, n3, n4])
         >>> sop = stream.Stream()
         >>> sop.append([m1, m2, m3, m4])
-        >>> cp = alpha.counterpoint.species.ModalCounterpoint(stream1 = bass, stream2 = sop)
+        >>> cp = alpha.counterpoint.species.ModalCounterpoint(stream1=bass, stream2=sop)
         >>> cp.findHiddenOctaves(cp.stream1, cp.stream2)
         2
         >>> n2.editorial.misc['Hidden Octave']
