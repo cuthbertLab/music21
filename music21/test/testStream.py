@@ -7538,11 +7538,37 @@ class Test(unittest.TestCase):
             self.assertEqual(el.getOffsetBySite(s2),
                              el.getOffsetBySite(s))
 
+    def testGetElementAfterElement(self):
+        n1 = note.Note('A3')
+        n2 = note.Note('B3')
+        n2.id = 'firstB'
+        n3 = note.Note('B3')
+        n3.id = 'secondB'
+        n4 = note.Note('D4')
+        
+        m1 = note.Note('E4')
+        m2 = note.Note('F4')
+        m3 = note.Note('G4')
+        m4 = note.Note('A-5')
+        
+        bass = Stream()
+        bass.append([n1, n2, n3, n4])
+        sop = Stream()
+        sop.append([m1, m2, m3, m4])
+        for i in range(len(bass.notes)-1):
+            note1 = bass.notes[i]
+            note2 = bass.getElementAfterElement(note1, ['Note'])
+            note3 = sop.playingWhenAttacked(note1)
+            note4 = sop.playingWhenAttacked(note2)
+            #print(note1, note2, note3, note4)
+            #print(note1.id, note2.id, note3.id, note4.id)
+        # TEST???
+
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test, 'verbose', runTest='testElementsHighestTimeA')
+    music21.mainTest(Test, 'verbose') #, runTest='testGetElementAfterElement')
 
 #------------------------------------------------------------------------------
 # eof

@@ -37,6 +37,7 @@ class StreamFilter(object):
     #def reset(self):
     #    pass
 
+    
 class IsFilter(StreamFilter):
     derivationStr = 'is'
     '''
@@ -87,6 +88,13 @@ class IsFilter(StreamFilter):
             return True
         else:
             return False
+
+class IsNotFilter(IsFilter):
+    derivationStr = 'isNot'
+
+    def __call__(self, item, iterator):
+        return not super(IsNotFilter, self).__call__(item, iterator)
+
 
 class IdFilter(StreamFilter):
     '''

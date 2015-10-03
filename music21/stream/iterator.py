@@ -535,8 +535,7 @@ class StreamIterator(object):
         '''
         if newFilter not in self.filters:
             self.filters.append(newFilter)
-            
-        self.resetCaches()
+        
         return self
     
     def removeFilter(self, oldFilter):

@@ -3000,7 +3000,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> t4 = st1.getElementAfterElement(t3)
         >>> t4
 
-        >>> st1.getElementAfterElement("hi") is None
+        st1.getElementAfterElement("hi") is None
         True
         
         >>> t5 = st1.getElementAfterElement(n1, [note.Rest])
@@ -3016,22 +3016,45 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> t7 is None
         True
         '''
-        iterator = self.iter
-        isFilter = filter.IsFilter(element)
-        iterator.addFilter(isFilter)
-
-        foundElement = False
-        for x in iterator:
-            if foundElement is True:
-                return x # it is the element after
+        try:
+            # index() ultimately does an autoSort check, so no check here or
+            # sorting is necessary
+            elPos = self.index(element)
+        except ValueError:
+            raise StreamException("Could not find element in index")
+        # store once as a property call concatenates
+        elements = self.elements
+        if classList is None:
+            if elPos == len(elements) - 1:
+                return None        
             else:
-                foundElement = True
-                iterator.removeFilter(isFilter)
-                # now add the filter...
-                if classList is not None:
-                    iterator.addFilter(filter.ClassFilter(classList))
+                e = elements[elPos + 1]
+                e.activeSite = self
+                return e                
+        else:
+            for i in range(elPos + 1, len(elements)):
+                if elements[i].isClassOrSubclass(classList):
+                    e = elements[i]
+                    e.activeSite = self
+                    return e
 
-        return None
+#         iterator = self.iter
+#         isFilter = filter.IsFilter(element)
+#         iterator.addFilter(isFilter)
+# 
+#         foundElement = False
+#         for x in iterator:
+#             if foundElement is True:
+#                 return x # it is the element after
+#             else:
+#                 foundElement = True
+#                 iterator.removeFilter(isFilter)
+#                 # now add the filter... 
+#                 iterator.addFilter(filter.IsNotFilter(element))
+#                 if classList is not None:
+#                     iterator.addFilter(filter.ClassFilter(classList))
+# 
+#         return None
 
     #-----------------------------------------------------
     # end .getElement filters
