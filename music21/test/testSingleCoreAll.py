@@ -34,7 +34,7 @@ cov = coverageM21.getCoverage()
 
 
 
-def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, exitReturn=True):
+def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None):
     '''Run all tests. Group can be test and external
 
     >>> print(None)
@@ -113,13 +113,17 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, exit
             finalTestResults.unexpectedSuccesses):
         returnCode = 1
     else:
-        returnCode = 1
+        returnCode = 0
+        
+    return returnCode
 
-    if exitReturn:
-        exit(returnCode)
-    else:
-        return returnCode
 
+
+def travisMain():
+    # exits with the returnCode
+    returnCode = main()
+    exit(returnCode)
+    
     # this should work but requires python 2.7 and the testRunner arg does not
     # seem to work properly
     #unittest.main(testRunner=runner, failfast=True)
