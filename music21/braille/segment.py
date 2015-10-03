@@ -266,7 +266,7 @@ class BrailleSegment(collections.defaultdict):
         if self.dummyRestLength is not None:
             self.addDummyRests(bt) # Dummy Rests
 
-        while self._allGroupingKeys0:
+        while self._allGroupingKeys:
             self._previousGroupingKey = self._currentGroupingKey
             self._currentGroupingKey = self._allGroupingKeys.pop(0)
 
