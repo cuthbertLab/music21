@@ -1647,7 +1647,7 @@ def _prepareStreamForMidi(s):
     s = copy.deepcopy(s)
     if s.hasPartLikeStreams():
         # check for tempo indications in the score
-        mmTopLevel = s.iter.getElementsByClass('MetronomeMark')
+        mmTopLevel = s.iter.getElementsByClass('MetronomeMark').stream()
         if mmTopLevel: # place in top part
             target = s.iter.getElementsByClass('Stream')[0]
             for mm in mmTopLevel:

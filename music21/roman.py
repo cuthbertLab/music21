@@ -1916,7 +1916,8 @@ class Test(unittest.TestCase):
             len(s4.flat.getElementsByClass('KeySignature')),
             targetCount,
             )
-        for c in s4.recurse(streamsOnly=False):
+        # do not remove in iteration.
+        for c in list(s4.recurse(streamsOnly=False)):
             if 'Stream' in c.classes:
                 for e in c.getElementsByClass('KeySignature'):
                     c.remove(e)

@@ -2279,12 +2279,25 @@ class Test(unittest.TestCase):
         from music21.musicxml import m21ToString
 
         s = stream.Stream()
+#         n1 = note.Note('C')
+#         n2 = note.Note('D')
+#         n3 = note.Note('E')
+#          
+#         s.append(n1)
+#         s.append(note.Note('A'))
+#         s.append(n2)
+#         s.append(note.Note('B'))
+#         s.append(n3)
+         
         #s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
-        s.repeatAppend(note.Note(), 12)
+        s.repeatAppend(note.Note(), 4)
+#        n1 = s._elements[0]
         n1 = s.notes[0]
         #s.insert(n1.offset, dynamics.Dynamic('fff'))
+        #n2 = s._elements[2]
         n2 = s.notes[len(s.notes) // 2]
         #s.insert(n2.offset, dynamics.Dynamic('ppp'))
+        #n3 = s._elements[-1]
         n3 = s.notes[-1]
         #s.insert(n3.offset, dynamics.Dynamic('ff'))
         sp1 = dynamics.Diminuendo(n1, n2)
@@ -2293,6 +2306,7 @@ class Test(unittest.TestCase):
         s.append(sp2)
         #s.show()
         raw = m21ToString.fromMusic21Object(s)
+        print(raw)
         self.assertEqual(raw.count('<wedge'), 4)
 
         #self.assertEqual(raw.count('octave-shift'), 2)

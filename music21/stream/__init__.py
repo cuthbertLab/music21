@@ -1903,6 +1903,34 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.note.Note D->        
         '''
+#         try:
+#             i = self.index(target)
+#         except StreamException:
+#             return  # do nothing if no match
+# 
+#         eLen = len(self._elements)
+#         if i < eLen:
+#             target = self._elements[i] # target may have been obj id; reclassing
+#             self._elements[i] = replacement
+#             # place the replacement at the old objects offset for this site
+#             self.setElementOffset(replacement, self.elementOffset(target))
+#             replacement.sites.add(self)
+#         else:
+#             # target may have been obj id; reassign
+#             target = self._endElements[i - eLen]
+#             self._endElements[i - eLen] = replacement
+#             self.setElementOffset(replacement, 'highestTime')
+#             replacement.sites.add(self)
+# 
+#         target.sites.remove(self)
+#         target.activeSite = None
+# 
+#         updateIsFlat = False
+#         if replacement.isStream:
+#             updateIsFlat = True
+#         # elements have changed: sort order may change b/c have diff classes
+#         self.elementsChanged(updateIsFlat=updateIsFlat)            
+        
         if target is None:
             raise StreamException('received a target of None as a candidate for replacement.')
         if recurse is False:
@@ -1910,26 +1938,35 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             iterator = self.recurse()
         iterator.addFilter(filter.IsFilter(target))
-
+ 
+ 
+        found = False
         for el in iterator:
             # el should be target...
             index = iterator.activeInformation['sectionIndex']
-            activeStream = iterator.activeInformation['stream']
+            # containingStream will be self for non-recursive
+            containingStream = iterator.activeInformation['stream']
             elementList = iterator.activeElementList
-            elementList[index] = replacement
-            activeStream.setElementOffset(replacement, 
-                                          activeStream.elementOffset(el, stringReturns=True))
-            replacement.sites.add(activeStream)
-            el.sites.remove(activeStream)
-            el.activeSite = None
-            if id(el) in activeStream._offsetDict:
-                del(activeStream._offsetDict[id(el)])
+            found = True
+            break
 
+        if found:
+            elementList[index] = replacement
+            
+            containingStream.setElementOffset(
+                                        replacement, 
+                                        containingStream.elementOffset(el, stringReturns=True))
+            replacement.sites.add(containingStream)
+            target.sites.remove(containingStream)
+            target.activeSite = None
+            #if id(target) in containingStream._offsetDict:
+            #    del(containingStream._offsetDict[id(target)])
+            
             updateIsFlat = False
             if replacement.isStream:
                 updateIsFlat = True
             # elements have changed: sort order may change b/c have diff classes
-            activeStream.elementsChanged(updateIsFlat=updateIsFlat)
+            containingStream.elementsChanged(updateIsFlat=updateIsFlat)
 
         if allDerived:
             for derivedSite in self.derivation.chain():
