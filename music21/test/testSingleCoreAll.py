@@ -34,7 +34,7 @@ cov = coverageM21.getCoverage()
 
 
 
-def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None):
+def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, exitReturn=True):
     '''Run all tests. Group can be test and external
 
     >>> print(None)
@@ -111,9 +111,14 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None):
     if (finalTestResults.errors or
             finalTestResults.failures or
             finalTestResults.unexpectedSuccesses):
-        return 1
+        returnCode = 1
     else:
-        return 0
+        returnCode = 1
+
+    if exitReturn:
+        exit(returnCode)
+    else:
+        return returnCode
 
     # this should work but requires python 2.7 and the testRunner arg does not
     # seem to work properly
@@ -134,8 +139,6 @@ if __name__ == '__main__':
         returnCode = main(sys.argv[1:])
     else:
         returnCode = main()
-    print("ReturnCode {0}".format(returnCode))
-    exit(returnCode)
 
 #------------------------------------------------------------------------------
 # eof
