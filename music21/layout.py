@@ -374,7 +374,8 @@ class StaffLayout(LayoutBase):
                     self.hidden = True
 
     def __repr__(self):
-        return "<music21.layout.StaffLayout distance %r, staffNumber %r, staffSize %r, staffLines %r>" % (self.distance, self.staffNumber, self.staffSize, self.staffLines)            
+        return "<music21.layout.StaffLayout distance %r, staffNumber %r, staffSize %r, staffLines %r>" % (
+                self.distance, self.staffNumber, self.staffSize, self.staffLines)            
 
 #-------------------------------------------------------------------------------
 class LayoutException(exceptions21.Music21Exception):
@@ -594,12 +595,12 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
 
     pageNumber = 0
     systemNumber = 0
+    scoreStaffNumber = 0 
+    
     for pageStartM, pageEndM in pageMeasureTuples:
         pageNumber += 1
         if printUpdates is True:
             print("updating page", pageNumber)
-        #thisPage = scoreIn.measures(pageStartM, pageEndM)
-        #thisPage.__class__ = Page
         thisPage = Page()
         thisPage.measureStart = pageStartM
         thisPage.measureEnd = pageEndM
@@ -617,26 +618,45 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
             if 'PageLayout' in el.classes:
                 thisPage.pageLayout = el
 
-
+        pageSystemNumber = 0
         for systemStartM, systemEndM in systemMeasureTuples:
             if systemStartM < pageStartM or systemEndM > pageEndM:
                 continue
-            systemNumber += 1
+            systemNumber += 1 # global, not on this page...
+            pageSystemNumber += 1
             if fastMeasures is True:
-                thisSystem = scoreIn.measures(systemStartM, systemEndM, collect=[], gatherSpanners=False)
+                measureStacks = scoreIn.measures(systemStartM, systemEndM, collect=[], gatherSpanners=False)
             else:
-                thisSystem = scoreIn.measures(systemStartM, systemEndM)
-            thisSystem.__class__ = System
+                measureStacks = scoreIn.measures(systemStartM, systemEndM)
+            thisSystem = System()
+            thisSystem.systemNumber = systemNumber
+            thisSystem.pageNumber = pageNumber
+            thisSystem.pageSystemNumber = pageSystemNumber
+            thisSystem.mergeAttributes(measureStacks)
+            thisSystem.elements = measureStacks
             thisSystem.measureStart = systemStartM
             thisSystem.measureEnd = systemEndM
 
-            for p in thisSystem.parts:
-                p.__class__ = Staff
-                allStaffLayouts = p.iter.getElementsByClass('StaffLayout')
-                if allStaffLayouts:
+            systemStaffNumber = 0
+            
+            for p in list(thisSystem.parts):
+                scoreStaffNumber += 1
+                systemStaffNumber += 1
+                
+                staffObject = Staff()
+                staffObject.mergeAttributes(p)
+                staffObject.scoreStaffNumber = scoreStaffNumber
+                staffObject.staffNumber = systemStaffNumber
+                staffObject.pageNumber = pageNumber
+                staffObject.pageSystemNumber = pageSystemNumber
+                                
+                staffObject.elements = p
+                thisSystem.replace(p, staffObject)
+                allStaffLayouts = p.recurse().getElementsByClass('StaffLayout')
+                if len(allStaffLayouts) > 0:
                     #if len(allStaffLayouts) > 1:
                     #    print("Got many staffLayouts")
-                    p.staffLayout = allStaffLayouts[0]
+                    staffObject.staffLayout = allStaffLayouts[0]
 
             allSystemLayouts = thisSystem.recurse().getElementsByClass('SystemLayout')
             if allSystemLayouts:
@@ -937,9 +957,8 @@ class LayoutScore(stream.Opus):
         is always of height 40 (4 spaces of 10-tenths each)
 
 
-        >>> lt = corpus.parse('demos/layoutTest.xml', forceSource=True)
+        >>> lt = corpus.parse('demos/layoutTest.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures=True)
-        >>> staffObj = ls.pages[0].systems[3].staves[1]
 
         The first staff (staff 0) of each page/system always begins at height 0 and should end at
         height 40 if it is a 5-line staff (not taken into account) with no staffSize changes
@@ -1464,10 +1483,19 @@ class System(stream.Score):
     '''
     def __init__(self, *args, **keywords):
         super(System, self).__init__(*args, **keywords)
-        self.systemNumber = 1
+        self.systemNumber = 0
+
+        self.pageNumber = 0
+        self.pageSystemNumber = 0
+
         self.systemLayout = None
         self.measureStart = None
         self.measureEnd = None
+
+    def __repr__(self):
+        return "<{0}.{1} {2}: p.{3}, sys.{4}>".format(self.__module__, self.__class__.__name__,
+                                                        self.systemNumber, 
+                                                        self.pageNumber, self.pageSystemNumber)
 
     def _getStaves(self):
         return self.getElementsByClass(Staff)
@@ -1482,19 +1510,25 @@ class Staff(stream.Part):
     '''
     def __init__(self, *args, **keywords):
         super(Staff, self).__init__(*args, **keywords)
-        self.staffNumber = 1
+        self.staffNumber = 1 # number in this system NOT GLOBAL
+
+        self.scoreStaffNumber = 0 
+        self.pageNumber = 0
+        self.pageSystemNumber = 0
+        
         self.optimized = 0
         self.height = None # None = undefined
         self.inheritedHeight = None
-#         self._staffLayout = None
-# 
-#     def _getStaffLayout(self):
-#         return self._staffLayout
-#     def _setStaffLayout(self, x):
-#         self._staffLayout = x
-#     def _delStaffLayout(self):
-#         raise Exception("GOT YOU!!!!")
-#     staffLayout = property(_getStaffLayout, _setStaffLayout, _delStaffLayout)
+        self.staffLayout = None
+
+    def __repr__(self):
+        return "<{0}.{1} {2}: p.{3}, sys.{4}, st.{5}>".format(
+                                                        self.__module__, 
+                                                        self.__class__.__name__,
+                                                        self.scoreStaffNumber,
+                                                        self.pageNumber, self.pageSystemNumber,
+                                                        self.staffNumber)
+
 
 _DOC_ORDER = [ScoreLayout, PageLayout, SystemLayout, StaffLayout, LayoutBase,
               LayoutScore, Page, System, Staff]
@@ -1565,10 +1599,22 @@ class Test(unittest.TestCase):
 #        print(retStr)
         self.assertEqual(retStr, '1: 1, 2: 23, 3: 50, 4: 80, 5: 103, ')
 
+    def testGetStaffLayoutFromStaff(self):
+        '''
+        we have had problems with attributes disappearing.
+        '''
+        from music21 import corpus
+        lt = corpus.parse('demos/layoutTest.xml')
+        ls = divideByPages(lt, fastMeasures=True)
+
+        hiddenStaff = ls.pages[0].systems[3].staves[1]
+        self.assertTrue(hiddenStaff.__repr__().endswith('Staff 11: p.1, sys.4, st.2>'))
+        self.assertIsNotNone(hiddenStaff.staffLayout)
+
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest='getStaffLayoutFromStaff')
 
 
 

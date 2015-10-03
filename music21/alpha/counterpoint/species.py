@@ -268,10 +268,12 @@ class ModalCounterpoint(object):
         >>> n2 = note.Note('A3')
         >>> n3 = note.Note('A3')
         >>> n4 = note.Note('C4')
+        
         >>> m1 = note.Note('G4')
         >>> m2 = note.Note('A4')
         >>> m3 = note.Note('B4')
         >>> m4 = note.Note('C5')
+        
         >>> bass = stream.Stream()
         >>> bass.append([n1, n2, n3, n4])
         >>> sop = stream.Stream()
