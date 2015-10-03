@@ -393,15 +393,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Combines the two storage lists, _elements and _endElements, such that
         they appear as a single list.
 
-        We no longer cache elements list, since we want to make sure that every
-        element in the list has the current stream as an active site.
+        Note that by the time you call .elements
+        the offsets 
         '''
-        if not self.isSorted and self.autoSort:
-            self.sort() # will set isSorted to True
-        eList = self._elements + self._endElements
-        for e in eList:
-            e.activeSite = self
-        return tuple(eList)
+        if 'elements' not in self._cache or self._cache["elements"] is None:
+            # this list concatenation may take time; thus, only do when
+            # elementsChanged has been called
+            if not self.isSorted and self.autoSort:
+                self.sort() # will set isSorted to True
+            self._cache["elements"] = self._elements + self._endElements
+        return tuple(self._cache["elements"])
 
     def _setElements(self, value):
         '''
@@ -451,11 +452,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     elements = property(_getElements, _setElements,
         doc='''
+        Don't use unless you really know what you're doing.
+        
+        Treat a Stream like a list!
+        
+        
+        
+        
         A list representing the elements contained in the Stream.
 
         Directly getting, setting, and manipulating this list is
         reserved for advanced usage. Instead, use the the
-        provided high-level methods. When setting .elements, a
+        provided high-level methods. 
+        
+        When setting .elements, a
         list of Music21Objects can be provided, or a complete Stream.
         If a complete Stream is provided, elements are extracted
         from that Stream. This has the advantage of transferring
@@ -1912,9 +1922,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.note.Note C#>
                         
+        OMIT_FROM_DOCS
+        
+        Recurse temporarily turned off.
+        
         >>> dflat = note.Note("D-4")
         >>> s.replace(csharp, dflat, recurse=True)
-        >>> s.show('t')
+        >>> # s.show('t')
+        
         {0.0} <music21.stream.Part 0x109842f98>
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.note.Note D->        
@@ -1940,6 +1955,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
  
         target.sites.remove(self)
         target.activeSite = None
+        if id(target) in self._offsetDict:
+            del(self._offsetDict[id(target)])
+             
  
         updateIsFlat = False
         if replacement.isStream:
@@ -1975,8 +1993,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #             replacement.sites.add(containingStream)
 #             target.sites.remove(containingStream)
 #             target.activeSite = None
-#             #if id(target) in containingStream._offsetDict:
-#             #    del(containingStream._offsetDict[id(target)])
+#             if id(target) in containingStream._offsetDict:
+#                 del(containingStream._offsetDict[id(target)])
 #             
 #             updateIsFlat = False
 #             if replacement.isStream:

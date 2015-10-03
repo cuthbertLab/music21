@@ -7533,7 +7533,7 @@ class Test(unittest.TestCase):
         s.append(sp1)
         s.append(sp2)
         s2 = Stream()
-        s2.elements = s.elements
+        s2.elements = s # do not set elements to s.elements, use s instead.
         for el in s2:
             self.assertEqual(el.getOffsetBySite(s2),
                              el.getOffsetBySite(s))
@@ -7542,7 +7542,7 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test, 'verbose', runTest='testSetElements')
+    music21.mainTest(Test, 'verbose', runTest='testElementsHighestTimeA')
 
 #------------------------------------------------------------------------------
 # eof

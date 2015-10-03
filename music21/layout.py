@@ -105,7 +105,7 @@ Pagesize = namedtuple("Pagesize", "top left right bottom width height")
 class LayoutBase(base.Music21Object):
     classSortOrder = -10
     def __init__(self, *args, **keywords):
-        base.Music21Object.__init__(self)
+        super(LayoutBase, self).__init__()
 
 
 #-------------------------------------------------------------------------------
@@ -133,7 +133,7 @@ class ScoreLayout(LayoutBase):
 
     '''
     def __init__(self, *args, **keywords):
-        LayoutBase.__init__(self)
+        super(ScoreLayout, self).__init__()
 
         self.scalingMillimeters = None
         self.scalingTenths = None
@@ -213,7 +213,7 @@ class PageLayout(LayoutBase):
 
     '''
     def __init__(self, *args, **keywords):
-        LayoutBase.__init__(self)
+        super(PageLayout, self).__init__()
 
         self.pageNumber = None
         self.leftMargin = None
@@ -271,7 +271,7 @@ class SystemLayout(LayoutBase):
     True
     '''
     def __init__(self, *args, **keywords):
-        LayoutBase.__init__(self)
+        super(SystemLayout, self).__init__()
 
         self.leftMargin = None
         self.rightMargin = None
@@ -350,7 +350,7 @@ class StaffLayout(LayoutBase):
 
     '''
     def __init__(self, *args, **keywords):
-        LayoutBase.__init__(self)
+        super(StaffLayout, self).__init__()
 
         # this is the distance between adjacent staves
         self.distance = None
@@ -419,7 +419,7 @@ class StaffGroup(spanner.Spanner):
 
     '''
     def __init__(self, *arguments, **keywords):
-        spanner.Spanner.__init__(self, *arguments, **keywords)
+        super(StaffGroup, self).__init__(*arguments, **keywords)
 
         self.name = None # if this group has a name
         self.abbreviation = None
@@ -707,7 +707,7 @@ class LayoutScore(stream.Opus):
     If the score does not change between calls to the various getPosition calls, it is much faster as it uses a cache.
     '''
     def __init__(self, *args, **keywords):
-        stream.Opus.__init__(self, *args, **keywords)
+        super(LayoutScore, self).__init__(*args, **keywords)
         self.scoreLayout = None
         self.measureStart = None
         self.measureEnd = None
@@ -937,8 +937,9 @@ class LayoutScore(stream.Opus):
         is always of height 40 (4 spaces of 10-tenths each)
 
 
-        >>> lt = corpus.parse('demos/layoutTest.xml')
-        >>> ls = layout.divideByPages(lt, fastMeasures = True)
+        >>> lt = corpus.parse('demos/layoutTest.xml', forceSource=True)
+        >>> ls = layout.divideByPages(lt, fastMeasures=True)
+        >>> staffObj = ls.pages[0].systems[3].staves[1]
 
         The first staff (staff 0) of each page/system always begins at height 0 and should end at
         height 40 if it is a 5-line staff (not taken into account) with no staffSize changes
@@ -1104,12 +1105,12 @@ class LayoutScore(stream.Opus):
         # override global information with staff specific pageLayout
         thisStaff = self.pages[pageId].systems[systemId].staves[staffId]
         try:
-            firstMeasureOfStaff = thisStaff.getElementsByClass('Measure', returnStreamSubClass='list')[0]
+            firstMeasureOfStaff = thisStaff.iter.getElementsByClass('Measure')[0]
         except IndexError:
             firstMeasureOfStaff = stream.Stream()
             environLocal.warn("No measures found in pageId %d, systemId %d, staffId %d" % (pageId, systemId, staffId))
 
-        allStaffLayouts = firstMeasureOfStaff.getElementsByClass('StaffLayout', returnStreamSubClass='list')
+        allStaffLayouts = firstMeasureOfStaff.iter.getElementsByClass('StaffLayout')
         if len(allStaffLayouts) > 0:
             #print("Got staffLayouts: ")
             for sltemp in allStaffLayouts:
@@ -1442,7 +1443,7 @@ class Page(stream.Opus):
     belongs on a single notated page.
     '''
     def __init__(self, *args, **keywords):
-        stream.Opus.__init__(self, *args, **keywords)
+        super(Page, self).__init__(*args, **keywords)
         self.pageNumber = 1
         self.measureStart = None
         self.measureEnd = None
@@ -1462,7 +1463,7 @@ class System(stream.Score):
     belongs on a single notated system.
     '''
     def __init__(self, *args, **keywords):
-        stream.Score.__init__(self, *args, **keywords)
+        super(System, self).__init__(*args, **keywords)
         self.systemNumber = 1
         self.systemLayout = None
         self.measureStart = None
@@ -1480,12 +1481,20 @@ class Staff(stream.Part):
     belongs on a single Staff.
     '''
     def __init__(self, *args, **keywords):
-        stream.Part.__init__(self, *args, **keywords)
+        super(Staff, self).__init__(*args, **keywords)
         self.staffNumber = 1
         self.optimized = 0
         self.height = None # None = undefined
         self.inheritedHeight = None
-        self.staffLayout = None
+#         self._staffLayout = None
+# 
+#     def _getStaffLayout(self):
+#         return self._staffLayout
+#     def _setStaffLayout(self, x):
+#         self._staffLayout = x
+#     def _delStaffLayout(self):
+#         raise Exception("GOT YOU!!!!")
+#     staffLayout = property(_getStaffLayout, _setStaffLayout, _delStaffLayout)
 
 _DOC_ORDER = [ScoreLayout, PageLayout, SystemLayout, StaffLayout, LayoutBase,
               LayoutScore, Page, System, Staff]

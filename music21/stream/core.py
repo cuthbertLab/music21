@@ -266,9 +266,17 @@ class StreamCoreMixin(object):
             # TODO: might optimize this by storing a list of all obj ids with every insertion and deletion
             idElement = id(element)
             if idElement in self._offsetDict:
-                raise StreamException(
-                    'the object (%s, id()=%s) is already found in this Stream (%s, id()=%s)' % (
-                                                            element, id(element), self, id(self)))
+                # now go slow for safety -- maybe something is amiss in the index.
+                # this should not happen, but we have slipped many times in not clearing out
+                # old _offsetDict entries.
+                for eInStream in self:
+                    if eInStream is element:
+                        raise StreamException(
+                            'the object (%s, id()=%s) is already found in this Stream (%s, id()=%s)' % (
+                                                                    element, id(element), self, id(self)))
+                # something was old... delete from _offsetDict
+                # environLocal.warn('stale object')
+                del self._offsetDict[idElement]
         # if we do not purge locations here, we may have ids() for
         # Stream that no longer exist stored in the locations entry
         # note that dead locations are also purged from .sites during
