@@ -302,7 +302,9 @@ class StreamIterator(object):
         <music21.stream.iterator.StreamIterator for Part:tn3/4 @:0>
         >>> sI.notes is sI
         True
-
+        >>> sI.filters
+        [<music21.stream.filter.ClassFilter NotRest>]
+        
         >>> sI.matchingElements()
         [<music21.note.Note C>, <music21.note.Note D>, 
          <music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>, 
@@ -529,13 +531,14 @@ class StreamIterator(object):
         '''
         adds a filter to the list.
         
-        resets caches -- do not add filters any other way
-        
-        # TODO: support remove filter.
+        resets caches -- do not add filters any other way        
         '''
-        if newFilter not in self.filters:
-            self.filters.append(newFilter)
+        for f in self.filters:
+            if newFilter == f:
+                return self
+        self.filters.append(newFilter)
         
+        self.resetCaches()
         return self
     
     def removeFilter(self, oldFilter):
