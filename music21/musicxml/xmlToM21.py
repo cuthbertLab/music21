@@ -914,7 +914,10 @@ class PartParser(XMLParserBase):
             # this deepcopy is necessary, as we will remove components
             # in each staff that do not belong
             
-            # TODO: Do n-1 deepcopies, instead of n, since the last PartStaff can just remove from the original Part
+            # TODO: Do n-1 deepcopies, instead of n, since the 
+            # last PartStaff can just remove from the original Part
+            # then skip the deepcopies and just do a measureTemplate
+            # thus eliminating the __class__ setting (yuk!)
             streamPartStaff = copy.deepcopy(self.stream)
             # assign this as a PartStaff, a subclass of Part
             streamPartStaff.__class__ = stream.PartStaff

@@ -678,7 +678,6 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace=False, compareByMea
     >>> mainstream.makeMeasures(inPlace=True)
     >>> ossiastream.makeMeasures(inPlace=True)
     
-    >>> # mainstream.__class__ = stream.Part
     >>> mainpart = stream.Part()
     >>> for m in mainstream:
     ...    mainpart.insert(m.offset, m)

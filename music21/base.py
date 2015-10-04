@@ -1137,7 +1137,9 @@ class Music21Object(object):
 
         >>> s1 = converter.parse('tinynotation: 3/4 C4 D E 2/4 F G A B 1/4 c')
         >>> s2 = s1.makeMeasures()
-        >>> s2.__class__ = stream.Part
+        >>> s2
+        <music21.stream.Part 0x104ce64e0>
+        
         >>> s2.show('t')
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.BassClef>

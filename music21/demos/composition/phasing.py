@@ -87,7 +87,6 @@ def partPari(show = True):
     
     # fake Paert
     #main = converter.parse("E-1 F G A- G F c d e- G A- F E- D d e- c B- A- c d A- G F G F A- B- A- c d A- B- c B- A- G F G F E-~ E-", '4/4')
-    main.__class__ = stream.Part
     main.transpose('P8', inPlace=True)
     main.insert(0, cminor)
     main.insert(0, instrument.Recorder())
