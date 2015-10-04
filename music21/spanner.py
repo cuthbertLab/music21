@@ -29,6 +29,8 @@ from music21 import base
 from music21 import common
 from music21 import duration
 
+from music21.ext import six
+
 from music21 import environment
 _MOD = "spanner.py"  
 environLocal = environment.Environment(_MOD)
@@ -1750,6 +1752,21 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+    def setUp(self):
+        from music21.musicxml.m21ToXml import GeneralObjectExporter
+        self.GEX = GeneralObjectExporter()
+
+    def xmlStr(self, obj):
+        xmlBytes = self.GEX.parse(obj)
+        if six.PY2:
+            return xmlBytes
+        else:
+            return xmlBytes.decode('utf-8')
+        
+    def xmlStrOld(self, obj):
+        from music21.musicxml.m21ToString import fromMusic21Object
+        return fromMusic21Object(obj)
+
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
@@ -1990,7 +2007,6 @@ class Test(unittest.TestCase):
 
     def testRepeatBracketC(self):
         from music21 import note, spanner, stream, bar
-        from music21.musicxml import m21ToString
 
         p = stream.Part()
         m1 = stream.Measure()
@@ -2028,14 +2044,13 @@ class Test(unittest.TestCase):
         self.assertEqual(rb1.getDurationBySite(p).quarterLength, 8.0)
 
         #p.show()
-        raw = m21ToString.fromMusic21Object(p)
+        raw = self.xmlStrOld(p)
         self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
 
     def testRepeatBracketD(self):
         from music21 import note, spanner, stream, bar
-        from music21.musicxml import m21ToString
 
         p = stream.Part()
         m1 = stream.Measure()
@@ -2121,19 +2136,19 @@ class Test(unittest.TestCase):
         # have the offsets of the start of each measure
         self.assertEqual(rb4.getOffsetsBySite(p), [32.0, 36.0, 40.0, 44.0])
         self.assertEqual(rb4.getDurationBySite(p).quarterLength, 16.0)
-        raw = m21ToString.fromMusic21Object(p)
+        raw = self.xmlStrOld(p)
         self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
         
         p1 = copy.deepcopy(p)
-        raw = m21ToString.fromMusic21Object(p1)
+        raw = self.xmlStrOld(p1)
         self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
 
         p2 = copy.deepcopy(p1)
-        raw = m21ToString.fromMusic21Object(p2)
+        raw = self.xmlStrOld(p2)
         self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
@@ -2207,7 +2222,6 @@ class Test(unittest.TestCase):
         objects through make measure calls. 
         '''
         from music21 import stream, note, spanner, chord
-        from music21.musicxml import m21ToString
 
         s = stream.Stream()
         s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
@@ -2216,7 +2230,7 @@ class Test(unittest.TestCase):
         n2 = s.notes[-1]
         sp1 = spanner.Ottava(n1, n2) # default is 8va
         s.append(sp1)
-        raw = m21ToString.fromMusic21Object(s)
+        raw = self.xmlStrOld(s)
         self.assertEqual(raw.count('octave-shift'), 2)
         self.assertEqual(raw.count('type="down"'), 1)
         #s.show()
@@ -2228,7 +2242,7 @@ class Test(unittest.TestCase):
         sp1 = spanner.Ottava(n1, n2, type='8vb')
         s.append(sp1)
         #s.show()
-        raw = m21ToString.fromMusic21Object(s)
+        raw = self.xmlStrOld(s)
         self.assertEqual(raw.count('octave-shift'), 2)
         self.assertEqual(raw.count('type="up"'), 1)
 
@@ -2239,7 +2253,7 @@ class Test(unittest.TestCase):
         sp1 = spanner.Ottava(n1, n2, type='15ma')
         s.append(sp1)
         #s.show()
-        raw = m21ToString.fromMusic21Object(s)
+        raw = self.xmlStrOld(s)
         self.assertEqual(raw.count('octave-shift'), 2)
         self.assertEqual(raw.count('type="down"'), 1)
 
@@ -2250,7 +2264,7 @@ class Test(unittest.TestCase):
         sp1 = spanner.Ottava(n1, n2, type='15mb')
         s.append(sp1)
         #s.show()
-        raw = m21ToString.fromMusic21Object(s)
+        raw = self.xmlStrOld(s)
         self.assertEqual(raw.count('octave-shift'), 2)
         self.assertEqual(raw.count('type="up"'), 1)
 
@@ -2260,14 +2274,13 @@ class Test(unittest.TestCase):
         '''Test a single note octave
         '''
         from music21 import stream, note, spanner
-        from music21.musicxml import m21ToString
         s = stream.Stream()
         n = note.Note('c4')
         sp = spanner.Ottava(n)
         s.append(n)
         s.append(sp)
         #s.show()
-        raw = m21ToString.fromMusic21Object(s)
+        raw = self.xmlStrOld(s)
         self.assertEqual(raw.count('octave-shift'), 2)
         self.assertEqual(raw.count('type="down"'), 1)
 
@@ -2276,23 +2289,39 @@ class Test(unittest.TestCase):
 
     def testCrescendoA(self):
         from music21 import stream, note, dynamics
-        from music21.musicxml import m21ToString
-
         s = stream.Stream()
+#         n1 = note.Note('C')
+#         n2 = note.Note('D')
+#         n3 = note.Note('E')
+#          
+#         s.append(n1)
+#         s.append(note.Note('A'))
+#         s.append(n2)
+#         s.append(note.Note('B'))
+#         s.append(n3)
+         
         #s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
-        s.repeatAppend(note.Note(), 12)
+        s.repeatAppend(note.Note(type='half'), 4)
+#        n1 = s._elements[0]
         n1 = s.notes[0]
+        n1.pitch.step = 'D'
         #s.insert(n1.offset, dynamics.Dynamic('fff'))
+        #n2 = s._elements[2]
         n2 = s.notes[len(s.notes) // 2]
+        n2.pitch.step = 'E'
         #s.insert(n2.offset, dynamics.Dynamic('ppp'))
+        #n3 = s._elements[-1]
         n3 = s.notes[-1]
+        n3.pitch.step = 'F'
         #s.insert(n3.offset, dynamics.Dynamic('ff'))
         sp1 = dynamics.Diminuendo(n1, n2)
         sp2 = dynamics.Crescendo(n2, n3)
         s.append(sp1)
         s.append(sp2)
-        #s.show()
-        raw = m21ToString.fromMusic21Object(s)
+        #s._reprText()
+        #s.show('t')
+        raw = self.xmlStr(s)
+        #print(raw)
         self.assertEqual(raw.count('<wedge'), 4)
 
         #self.assertEqual(raw.count('octave-shift'), 2)
@@ -2300,7 +2329,6 @@ class Test(unittest.TestCase):
 
     def testLineA(self):
         from music21 import stream, note, spanner
-        from music21.musicxml import m21ToString
 
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
@@ -2312,14 +2340,14 @@ class Test(unittest.TestCase):
                                     endHeight=40)
         s.append(sp1)
         s.append(sp2)
-        #s.show()
-        raw = m21ToString.fromMusic21Object(s)
+        #s.show('t')
+        raw = self.xmlStr(s)
+        #print(raw)
         self.assertEqual(raw.count('<bracket'), 4)
 
 
     def testLineB(self):
         from music21 import stream, note, spanner
-        from music21.musicxml import m21ToString
 
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
@@ -2336,7 +2364,7 @@ class Test(unittest.TestCase):
         s.append(sp2)
 
         #s.show()
-        raw = m21ToString.fromMusic21Object(s)
+        raw = self.xmlStr(s)
         self.assertEqual(raw.count('<bracket'), 4)
         self.assertEqual(raw.count('line-end="arrow"'), 1)
         self.assertEqual(raw.count('line-end="none"'), 1)
@@ -2346,10 +2374,9 @@ class Test(unittest.TestCase):
 
     def testGlissandoA(self):
         from music21 import stream, note, spanner
-        from music21.musicxml import m21ToString
 
         s = stream.Stream()
-        s.repeatAppend(note.Note(), 12)
+        s.repeatAppend(note.Note(), 3)
         for i, n in enumerate(s.notes):
             n.transpose(i + (i%2*12), inPlace=True)
 
@@ -2362,15 +2389,16 @@ class Test(unittest.TestCase):
         sp2.lineType = 'dashed'
         s.append(sp1)
         s.append(sp2)
-        #s.show()
-        raw = m21ToString.fromMusic21Object(s)
+        s = s.makeNotation()
+        #s.show('t')
+        raw = self.xmlStr(s)
+        #print(raw)
         self.assertEqual(raw.count('<glissando'), 4)
         self.assertEqual(raw.count('line-type="dashed"'), 2)        
 
 
     def testGlissandoB(self):
         from music21 import stream, note, spanner
-        from music21.musicxml import m21ToString
 
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
@@ -2386,7 +2414,7 @@ class Test(unittest.TestCase):
         s.append(sp1)
 
         #s.show()
-        raw = m21ToString.fromMusic21Object(s)
+        raw = self.xmlStr(s)
         self.assertEqual(raw.count('<glissando'), 2)
         self.assertEqual(raw.count('line-type="solid"'), 2)        
         self.assertEqual(raw.count('>gliss.<'), 1)        

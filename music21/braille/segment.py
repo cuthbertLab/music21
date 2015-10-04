@@ -38,9 +38,9 @@ from music21.braille import text
 
 from music21.common import opFrac
 
-try:
+try:  # gives Py2 the zip of Py3
     from future_builtins import zip
-except ImportError: # not 2.6+ or is 3.x
+except ImportError:
     pass
 
 import collections

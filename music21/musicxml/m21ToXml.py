@@ -425,15 +425,14 @@ class GeneralObjectExporter():
         if st.isFlat:
             st2 = stream.Part()
             st2.mergeAttributes(st)
-            st2.elements = st.elements
+            st2.elements = st
             st2.clef = st2.bestClef()
             st2.makeNotation(inPlace=True)
-            
             return self.fromPart(st2)
         elif st.getElementsByClass('Stream')[0].isFlat:
             st2 = stream.Part()
             st2.mergeAttributes(st)
-            st2.elements = st.elements
+            st2.elements = st
             st2.makeNotation(inPlace=True, bestClef=True)
             return self.fromPart(st2)
         else:
@@ -1976,7 +1975,7 @@ class MeasureExporter(XMLExporterBase):
         self.offsetInMeasure = 0.0
         self.currentVoiceId = None
         
-        self.rbSpanners = [] # rightBarline repeat spanners
+        self.rbSpanners = [] # repeatBracket spanners
         
         if parent is None:
             self.spannerBundle = spanner.SpannerBundle()
@@ -3824,26 +3823,31 @@ class MeasureExporter(XMLExporterBase):
     
     def setRightBarline(self):        
         m = self.stream
-        rbSpanners = self.rbSpanners
         if not hasattr(m, 'rightBarline'):
             return
-
+        # rb = repeatbracket
+        rbSpanners = self.rbSpanners
         rightBarline = self.stream.rightBarline
-        if (rightBarline is None and 
+        if (rightBarline is None and
                 (len(rbSpanners) == 0 or not rbSpanners[0].isLast(m))):
             return
-        self.setBarline(rightBarline, 'right')
+        else:
+            # rightBarline may be None
+            self.setBarline(rightBarline, 'right')
         
     def setLeftBarline(self):
         m = self.stream
-        rbSpanners = self.rbSpanners
         if not hasattr(m, 'leftBarline'):
             return
+        # rb = repeatbracket
+        rbSpanners = self.rbSpanners
         leftBarline = m.leftBarline
         if (leftBarline is None and
                 (len(rbSpanners) == 0 or not rbSpanners[0].isFirst(m))):
             return
-        self.setBarline(leftBarline, 'left')
+        else:
+            # leftBarline may be None. that's okay
+            self.setBarline(leftBarline, 'left')
 
     def setBarline(self, barline, position):
         '''
@@ -3853,7 +3857,12 @@ class MeasureExporter(XMLExporterBase):
         if barline is None:
             mxBarline = Element('barline')
         else:
-            mxBarline = self.barlineToXml(barline)
+            if 'Repeat' in barline.classes:
+                mxBarline = Element('barline')
+                mxRepeat = self.repeatToXml(barline)
+                mxBarline.append(mxRepeat)
+            else:
+                mxBarline = self.barlineToXml(barline)
         
         mxBarline.set('location', position)
         # TODO: editorial
@@ -3872,9 +3881,6 @@ class MeasureExporter(XMLExporterBase):
             mxEnding.set('type', endingType)
             mxBarline.append(mxEnding) # make sure it is after fermata but before repeat.
 
-        if 'Repeat' in barline.classes:
-            mxRepeat = self.repeatToXml(barline)
-            mxBarline.append(mxRepeat)
         
         # TODO: attr: segno
         # TODO: attr: coda
@@ -4283,6 +4289,9 @@ class MeasureExporter(XMLExporterBase):
             _setAttributeFromAttribute(m, self.xmlRoot, 'width', 'layoutWidth')
         
     def setRbSpanners(self):
+        '''
+        Makes a set of spanners from repeat brackets
+        '''
         self.rbSpanners = self.spannerBundle.getBySpannedElement(
                                 self.stream).getByClass('RepeatBracket')
         

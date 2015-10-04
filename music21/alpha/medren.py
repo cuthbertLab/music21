@@ -436,7 +436,7 @@ class GeneralMensuralNote(base.Music21Object):
         measure, index = self._getSurroundingMeasure(mensurationOrDivisione = mOrD, activeSite = surroundingStream)
         
         self._gettingDuration = True
-        if self.measure and 'Divisione' in mOrD.classes:
+        if measure and 'Divisione' in mOrD.classes:
             if index == 0:
                 self.lenList = trecento.notation.BrevisLengthTranslator(mOrD, measure).getKnownLengths()
             elif index != -1:
@@ -591,7 +591,7 @@ class MensuralRest(GeneralMensuralNote, note.Rest):
         self._gettingDuration = False
         self._mensuralType = 'brevis'
         
-        if self.arguments:
+        if arguments:
             tOrA = arguments[0]
             if tOrA in _validMensuralTypes:
                 self._mensuralType = tOrA

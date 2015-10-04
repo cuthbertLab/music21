@@ -220,7 +220,7 @@ def ModWSGIApplication(environ, start_response):
     >>> environ['CONTENT_TYPE'] = "application/json"
     >>> start_response = lambda status, headers: None         # usually called by mod_wsgi server. Used to initiate response
     >>> alpha.webapps.ModWSGIApplication(environ, start_response)
-    [b'{"dataDict": {"a": {...}}, "errorList": [], "status": "success"}']
+    [...'{"dataDict": {"a": ...}, "errorList": [], "status": "success"}']    
     '''    
 
     # Get content of request: is in a file-like object that will need to be .read() to get content
@@ -1015,12 +1015,12 @@ class CommandProcessor(object):
         return_obj['dataDict'] = {}
         return_obj['errorList'] = []
         
-        if self.errorList:
+        if len(self.errorList) > 0:
             return_obj['status'] = "error"
             return_obj['errorList'] = self.errorList
             return return_obj
         
-        if self.returnDict:
+        if len(self.returnDict) == 0:
             iterItems = [(k, 'str') for k in sorted(list(self.parsedDataDict.items()))]
         else:
             iterItems = sorted(list(self.returnDict.items()))
@@ -1047,7 +1047,7 @@ class CommandProcessor(object):
             return_obj['dataDict'][dataName] = {"fmt":fmt, "data":dataStr}
             
         
-        if self.errorList:
+        if len(self.errorList) > 0:
             return_obj['status'] = "error"
             return_obj['errorList'] = self.errorList
             return return_obj
@@ -1164,7 +1164,7 @@ class CommandProcessor(object):
         to the server:
         "text/plain", "application/json", "text/html", etc.
         '''
-        if self.errorList:
+        if len(self.errorList) > 0:
             output = "<br />".join([":".join(e) for e in self.errorList])
             outputType = 'text/html'
         
