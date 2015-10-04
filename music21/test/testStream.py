@@ -1753,11 +1753,6 @@ class Test(unittest.TestCase):
         # perhaps need to return more than one;
         # or getElementAtOrBefore needs to return a list
 
-#         s1Measures = s3copy.getElementsByClass('Stream')[0].makeMeasures(searchContext=True)
-#         environLocal.printDebug(['s1Measures[0].clef', s1Measures[0].clef])
-#         self.assertEqual(isinstance(s1Measures[0].clef, clef.AltoClef), True)
-        #s1Measures.show() # these show the proper clefs
-
         s2Measures = s3copy.getElementsByClass('Stream')[1].makeMeasures()
         self.assertEqual(isinstance(s2Measures[0].clef, clef.TenorClef), True)
         #s2Measures.show() # this shows the proper clef
@@ -2001,40 +1996,84 @@ class Test(unittest.TestCase):
         s.replace(n4, n1)
         self.assertEqual([s[0], s[1]], [n3, n1])
 
-
+    def testReplaceA1(self):
         from music21 import corpus
         sBach = corpus.parse('bach/bwv324.xml')
         partSoprano = sBach.parts[0]
+
 
         c1 = partSoprano.flat.getElementsByClass('Clef')[0]
         self.assertEqual(isinstance(c1, clef.TrebleClef), True)
 
         # now, replace with a different clef
         c2 = clef.AltoClef()
-        partSoprano.flat.replace(c1, c2)
+        partSoprano.flat.replace(c1, c2, allDerived=True)
 
         # all views of the Stream have been updated
         cTest = sBach.parts[0].flat.getElementsByClass('Clef')[0]
         self.assertEqual(isinstance(cTest, clef.AltoClef), True)
 
-        s1 = Stream()
-        s1.insert(10, n1)
-        s2 = Stream()
-        s2.insert(20, n1)
+    def testReplaceB(self):
+        n1 = note.Note('g')
+        n2 = note.Note('g#')
+
+        s0 = Stream()
+        s1 = copy.deepcopy(s0)
+        s2 = copy.deepcopy(s1)
         s3 = Stream()
+        s0.insert( 0, n1)
+        s1.insert(10, n1)
+        s2.insert(20, n1)
         s3.insert(30, n1)
         
-        s1.replace(n1, n2)
-        self.assertEqual(s1[0], n2)
+        s1.replace(n1, n2, allDerived=True)
+
+        # s1 is derived from s0 so n1 is replaced
+        self.assertIs(s0[0], n2) 
+        self.assertEqual(s0[0].getOffsetBySite(s0), 0)
+        
+        # s1 was the replacement stream, so definitely n1 becomes n2
+        self.assertIs(s1[0], n2)
         self.assertEqual(s1[0].getOffsetBySite(s1), 10)
         
-        self.assertEqual(s2[0], n2)
+        # s2 was derived from s0, not vice versa, so n1 is left alone.
+        self.assertIs(s2[0], n1)
         self.assertEqual(s2[0].getOffsetBySite(s2), 20)
         
-        self.assertEqual(s3[0], n2)
+        # s3 is completely out of any derivation chain, so left alone
+        self.assertIs(s3[0], n1)
         self.assertEqual(s3[0].getOffsetBySite(s3), 30)
 
+    def testReplaceDerivated(self):
+        from music21 import corpus
+        qj = corpus.parse('ciconia/quod_jactatur').parts[0].measures(1,2)
+        qj.id = 'measureExcerpt'
 
+        qjflat = qj.flat
+        dc = list(qjflat.derivation.chain())        
+        self.assertIs(dc[0], qj)
+
+        k1 = qjflat.getElementsByClass(key.KeySignature)[0]
+        self.assertEqual(k1.sharps, -1)
+        k3flats = key.KeySignature(-3)
+
+        # put k1 in an unrelated site:
+        mUnrelated = Measure()
+        mUnrelated.insert(0, k1)
+
+        # here's the big one
+        qjflat.replace(k1, k3flats, allDerived=True)
+        
+        kWhich = qjflat.getElementsByClass(key.KeySignature)[0]
+        self.assertIs(kWhich, k3flats)
+        self.assertEqual(kWhich.sharps, -3)
+        
+        kWhich2 = qj.recurse().getElementsByClass(key.KeySignature)[0]
+        self.assertIs(kWhich2, k3flats)
+        self.assertEqual(kWhich2.sharps, -3)
+
+        # check that unrelated is untouched
+        self.assertIs(mUnrelated[0], k1)
 
     def testDoubleStreamPlacement(self):
         n1 = note.Note()
@@ -2918,7 +2957,6 @@ class Test(unittest.TestCase):
             nAlter = note.Note()
             nAlter.quarterLength = qL
             sProc.insertAndShift(insertOffset, nAlter)
-            sProc.elements = sProc.sorted.elements
             self.assertEqual(sProc.highestOffset, newHighOffset)
             self.assertEqual(sProc.highestTime, newHighTime)
             self.assertEqual(len(sProc), len(s)+1)
@@ -2933,7 +2971,6 @@ class Test(unittest.TestCase):
             nAlter = note.Note()
             nAlter.quarterLength = qL
             sProc.insertAndShift(insertOffset, nAlter)
-            sProc.elements = sProc.sorted.elements
             self.assertEqual(sProc.highestOffset, newHighOffset)
             self.assertEqual(sProc.highestTime, newHighTime)
             self.assertEqual(len(sProc), len(s)+1)
@@ -2964,7 +3001,6 @@ class Test(unittest.TestCase):
 
             c = clef.Clef()
             sProc.insertAndShift(insertOffset, c)
-            #sProc.elements = sProc.sorted.elements
             self.assertEqual(sProc.highestOffset, newHighOffset)
             self.assertEqual(sProc.highestTime, newHighTime)
             self.assertEqual(len(sProc), len(s)+1)
@@ -3018,7 +3054,6 @@ class Test(unittest.TestCase):
             #environLocal.printDebug(['itemList', itemList])            
 
             sProc.insertAndShift(itemList)
-            sProc.elements = sProc.sorted.elements
             self.assertEqual(sProc.highestOffset, newHighOffset)
             self.assertEqual(sProc.highestTime, newHighTime)
             self.assertEqual(len(sProc), len(s)+len(itemList) / 2)
@@ -6270,7 +6305,7 @@ class Test(unittest.TestCase):
         s1.append(n1)
 
         s2 = stream.Stream()
-        s2.elements = s1.elements
+        s2.elements = s1
         match = []
         for e in s2.elements:
             match.append(e.getOffsetBySite(s2))
@@ -6291,7 +6326,7 @@ class Test(unittest.TestCase):
         # before elements assignment
         self.assertEqual(match, [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 25.0])
 
-        #s3.elements = s1[:].elements
+        #s3.elements = s1
         s3 = s1[:]
         match = []
         for e in s3.elements:
@@ -6300,7 +6335,7 @@ class Test(unittest.TestCase):
 
         # this resets active site, so we get the right offsets on element 
         # assignment
-        s3.elements = s1[:].elements
+        s3.elements = s1
         match = []
         for e in s3.elements:
             match.append(e.getOffsetBySite(s3))
@@ -7483,43 +7518,57 @@ class Test(unittest.TestCase):
             if 'Measure' in x.classes:
                 self.assertEqual(len(x), 0)
 
-    def testReplaceDerivated(self):
-        from music21 import corpus
-        qj = corpus.parse('ciconia/quod_jactatur').parts[0].measures(1,2)
-        qj.id = 'measureExcerpt'
+    def testSetElements(self):
+        from music21 import dynamics
+        s = Stream()
+        s.append(note.Note('C', type='half'))
+        s.append(note.Note('D', type='half'))
+        s.append(note.Note('E', type='half'))
+        s.append(note.Note('F', type='half'))
+        n1 = s.notes[0]
+        n2 = s.notes[len(s.notes) // 2]
+        n3 = s.notes[-1]
+        sp1 = dynamics.Diminuendo(n1, n2)
+        sp2 = dynamics.Crescendo(n2, n3)
+        s.append(sp1)
+        s.append(sp2)
+        s2 = Stream()
+        s2.elements = s # do not set elements to s.elements, use s instead.
+        for el in s2:
+            self.assertEqual(el.getOffsetBySite(s2),
+                             el.getOffsetBySite(s))
 
-        qjflat = qj.flat
-        dc = list(qjflat.derivation.chain())        
-        self.assertIs(dc[0], qj)
-
-        k1 = qjflat.getElementsByClass(key.KeySignature)[0]
-        self.assertEqual(k1.sharps, -1)
-        k3flats = key.KeySignature(-3)
-
-        # put k1 in an unrelated site:
-        mUnrelated = Measure()
-        mUnrelated.insert(0, k1)
-
-        # here's the big one
-        qjflat.replace(k1, k3flats, allDerived=True)
+    def testGetElementAfterElement(self):
+        n1 = note.Note('A3')
+        n2 = note.Note('B3')
+        n2.id = 'firstB'
+        n3 = note.Note('B3')
+        n3.id = 'secondB'
+        n4 = note.Note('D4')
         
-        kWhich = qjflat.getElementsByClass(key.KeySignature)[0]
-        self.assertIs(kWhich, k3flats)
-        self.assertEqual(kWhich.sharps, -3)
+        m1 = note.Note('E4')
+        m2 = note.Note('F4')
+        m3 = note.Note('G4')
+        m4 = note.Note('A-5')
         
-        kWhich2 = qj.recurse().getElementsByClass(key.KeySignature)[0]
-        self.assertIs(kWhich2, k3flats)
-        self.assertEqual(kWhich2.sharps, -3)
-
-        # check that unrelated is untouched
-        self.assertIs(mUnrelated[0], k1)
+        bass = Stream()
+        bass.append([n1, n2, n3, n4])
+        sop = Stream()
+        sop.append([m1, m2, m3, m4])
+        for i in range(len(bass.notes)-1):
+            note1 = bass.notes[i]
+            note2 = bass.getElementAfterElement(note1, ['Note'])
+            note3 = sop.playingWhenAttacked(note1)
+            note4 = sop.playingWhenAttacked(note2)
+            #print(note1, note2, note3, note4)
+            #print(note1.id, note2.id, note3.id, note4.id)
+        # TEST???
 
 #------------------------------------------------------------------------------
 
 if __name__ == "__main__":
     import music21
-    #'testContextNestedC'
-    music21.mainTest(Test, 'verbose') #, runTest='testReplaceDerivated')
+    music21.mainTest(Test, 'verbose') #, runTest='testGetElementAfterElement')
 
 #------------------------------------------------------------------------------
 # eof

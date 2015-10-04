@@ -38,9 +38,9 @@ from music21.braille import text
 
 from music21.common import opFrac
 
-try:
+try:  # gives Py2 the zip of Py3
     from future_builtins import zip
-except ImportError: # not 2.6+ or is 3.x
+except ImportError:
     pass
 
 import collections
@@ -266,7 +266,7 @@ class BrailleSegment(collections.defaultdict):
         if self.dummyRestLength is not None:
             self.addDummyRests(bt) # Dummy Rests
 
-        while self._allGroupingKeys0:
+        while self._allGroupingKeys:
             self._previousGroupingKey = self._currentGroupingKey
             self._currentGroupingKey = self._allGroupingKeys.pop(0)
 

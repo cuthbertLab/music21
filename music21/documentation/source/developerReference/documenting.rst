@@ -271,7 +271,6 @@ Here's an example from note.py::
         Class doc string goes here.
         '''
         isNote = True
-        isUnpitched = False
         isRest = False
         
         # define order to present names in documentation; use strings
@@ -280,7 +279,6 @@ Here's an example from note.py::
         # documentation for all attributes (that are not properties or methods)
         _DOC_ATTR = {
         'isNote': 'Boolean read-only value describing if this object is a Note.',
-        'isUnpitched': 'Boolean read-only value describing if this is Unpitched.',
         'isRest': 'Boolean read-only value describing if this is a Rest.',
         'beams': 'A :class:`music21.note.Beams` object.',
         'pitch': 'A :class:`music21.pitch.Pitch` object.',

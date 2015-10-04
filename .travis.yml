@@ -30,7 +30,7 @@ install:
     - python -m compileall music21
 
 script:
-    - python -c 'from music21.test.testSingleCoreAll import main as tm; tm()'
+    - python -c 'from music21.test.testSingleCoreAll import travisMain as tm; tm()'
     
 after_success:
       coveralls

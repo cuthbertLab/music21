@@ -109,10 +109,19 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None):
     if (finalTestResults.errors or
             finalTestResults.failures or
             finalTestResults.unexpectedSuccesses):
-        return 1
+        returnCode = 1
     else:
-        return 0
+        returnCode = 0
+        
+    return returnCode
 
+
+
+def travisMain():
+    # exits with the returnCode
+    returnCode = main()
+    exit(returnCode)
+    
     # this should work but requires python 2.7 and the testRunner arg does not
     # seem to work properly
     #unittest.main(testRunner=runner, failfast=True)
@@ -132,8 +141,6 @@ if __name__ == '__main__':
         returnCode = main(sys.argv[1:])
     else:
         returnCode = main()
-
-    exit(returnCode)
 
 #------------------------------------------------------------------------------
 # eof

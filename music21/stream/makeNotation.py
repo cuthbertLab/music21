@@ -759,7 +759,6 @@ def makeRests(s, refStreamOrTimeRange=None, fillGaps=False,
 
     # with auto sort no longer necessary.
 
-    #returnObj.elements = returnObj.sorted.elements
     #s.isSorted = False
     # changes elements
 #         returnObj.elementsChanged()

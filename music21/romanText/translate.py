@@ -414,7 +414,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                     lastMeasureNumber = measures[-1].number
                     lastMeasureToken = t
                     romans = measures[-1].iter.getElementsByClass(roman.RomanNumeral)
-                    if romans > 0:
+                    if romans:
                         previousRn = romans[-1]
 
                 else:       
