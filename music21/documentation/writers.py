@@ -364,7 +364,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
         with open(rstFilePath, 'r', encoding='utf8') as f:
             oldLines = f.read().splitlines()
         lines = self.cleanConvertedNotebook(oldLines, ipythonNotebookFilePath)
-        with open(rstFilePath, 'w') as f:
+        with open(rstFilePath, 'w', encoding='utf8') as f:
             f.write('\n'.join(lines))
 
         return True
