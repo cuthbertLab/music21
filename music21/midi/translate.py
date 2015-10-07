@@ -241,7 +241,7 @@ def music21ObjectToMidiFile(music21Object):
     else:
         s = stream.Stream()
         s.insert(0, music21Object)
-        return streamToMidiFile(music21Object)
+        return streamToMidiFile(s)
    
 
 #-------------------------------------------------------------------------------
@@ -2796,7 +2796,59 @@ class Test(unittest.TestCase):
         #s.show('t')
         self.assertEqual(len(s.flat.getElementsByClass('Chord')), 4)
         
+    def testMidiEventsImported(self):
 
+        from music21 import corpus
+
+        def procCompare(mf, match):
+            triples = []
+            for i in range(0, len(mf.tracks[0].events), 2):
+                d  = mf.tracks[0].events[i] # delta
+                e  = mf.tracks[0].events[i+1] # events
+                triples.append((d.time, e.type, e.pitch))
+            self.assertEqual(triples, match)
+        
+
+        s = corpus.parse('bach/bwv66.6')
+        part = s.parts[0].measures(6,9) # last meausres
+        #part.show('musicxml')
+        #part.show('midi')
+
+        mf = streamToMidiFile(part)
+        match = [(0, 'SEQUENCE_TRACK_NAME', None), 
+                 (0, 'PROGRAM_CHANGE', None), 
+                 (0, 'PITCH_BEND', None),
+                 (0, 'PROGRAM_CHANGE', None), 
+                 (0, 'KEY_SIGNATURE', None), 
+                 (0, 'TIME_SIGNATURE', None), 
+                 (1024, 'NOTE_ON', 69), 
+                 (1024, 'NOTE_OFF', 69), 
+                 (0, 'NOTE_ON', 71), 
+                 (1024, 'NOTE_OFF', 71), 
+                 (0, 'NOTE_ON', 73), 
+                 (1024, 'NOTE_OFF', 73), 
+                 (0, 'NOTE_ON', 69), 
+                 (1024, 'NOTE_OFF', 69),
+                 (0, 'NOTE_ON', 68), 
+                 (1024, 'NOTE_OFF', 68), 
+                 (0, 'NOTE_ON', 66), 
+                 (1024, 'NOTE_OFF', 66), 
+                 (0, 'NOTE_ON', 68), 
+                 (2048, 'NOTE_OFF', 68), 
+                 (0, 'NOTE_ON', 66), 
+                 (2048, 'NOTE_OFF', 66), 
+                 (0, 'NOTE_ON', 66), 
+                 (1024, 'NOTE_OFF', 66), 
+                 (0, 'NOTE_ON', 66), 
+                 (2048, 'NOTE_OFF', 66), 
+                 (0, 'NOTE_ON', 66), 
+                 (512, 'NOTE_OFF', 66), 
+                 (0, 'NOTE_ON', 65), 
+                 (512, 'NOTE_OFF', 65), 
+                 (0, 'NOTE_ON', 66), 
+                 (1024, 'NOTE_OFF', 66), 
+                 (1024, 'END_OF_TRACK', None)]
+        procCompare(mf, match)
 #-------------------------------------------------------------------------------
 _DOC_ORDER = [streamToMidiFile, midiFileToStream]
 

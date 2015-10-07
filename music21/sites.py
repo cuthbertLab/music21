@@ -12,6 +12,7 @@
 '''
 sites.py -- Objects for keeping track of relationships among Music21Objects
 '''
+import collections
 import unittest
 import weakref
 
@@ -159,7 +160,7 @@ class Sites(common.SlottedObject):
 
     def __init__(self):
         # .siteDict is a dictionary of siteRefs.  None is a singleton.
-        self.siteDict = {None: _NoneSiteRef}
+        self.siteDict = collections.OrderedDict([(None, _NoneSiteRef),])
 
         # store an index of numbers for tagging the order of creation of defined contexts;
         # this is used to be able to discern the order of context as added
@@ -269,6 +270,21 @@ class Sites(common.SlottedObject):
                 return True
         return False
             
+    def __iter__(self):
+        '''
+        Returns all non-None sites.  Order is oldest first.
+        
+        >>> n = note.Note()
+        >>> m = stream.Measure(number=1)
+        >>> s = stream.Stream(id='thisStream')
+        >>> m.insert(10, n)
+        >>> s.insert(20, n)
+        >>> for site in n.sites:
+        ...     print(site, n.getOffsetBySite(site))
+        <music21.stream.Measure 1 offset=0.0> 10.0
+        <music21.stream.Stream thisStream> 20.0
+        '''
+        return self.yieldSites(excludeNone=True)
 
     ### PRIVATE METHODS ###
 
@@ -288,7 +304,9 @@ class Sites(common.SlottedObject):
         >>> aSites.add(aObj)
         >>> aSites.add(bObj)
         >>> k = aSites._keysByTime()
-        >>> aSites.siteDict[k[0]].siteIndex > aSites.siteDict[k[1]].siteIndex > aSites.siteDict[k[2]].siteIndex
+        >>> aSites.siteDict[k[0]].siteIndex > aSites.siteDict[k[1]].siteIndex
+        True
+        >>> aSites.siteDict[k[1]].siteIndex > aSites.siteDict[k[2]].siteIndex
         True
 
         '''
@@ -298,7 +316,7 @@ class Sites(common.SlottedObject):
         post.sort()
         if newFirst:
             post.reverse()
-        return [k for unused_time, k in post]
+        return [k for (unused_time, k) in post]
 
     ### PUBLIC METHODS ###
 
@@ -372,7 +390,7 @@ class Sites(common.SlottedObject):
         '''
         Clear all stored data.
         '''
-        self.siteDict = {}
+        self.siteDict = collections.OrderedDict([(None, _NoneSiteRef),])
         self._lastID = -1  # cannot be None
 
     def get(self, 
@@ -726,6 +744,8 @@ class Sites(common.SlottedObject):
         Get all Site objects in .siteDict that are locations (that is, generally, Streams). 
         Note that this unwraps all sites from weakrefs and is thus an expensive operation.
 
+        Order is newest site first.
+
         >>> class Mock(base.Music21Object):
         ...     pass
         ...
@@ -746,11 +766,16 @@ class Sites(common.SlottedObject):
         
         :rtype: list(music21.stream.Stream)
         '''
+        return list(self.yieldSites(idExclude, excludeNone))
+
+    def yieldSites(self, idExclude=None, excludeNone=False):
+        '''
+        Same as getSites() but returns a generator.
+        '''
         if excludeNone is False:
-            post = [None]
-        else:
-            post = []
+            yield None
         
+        # orderedDict oldest first...
         for idKey in self.siteDict:
             if idKey is None:
                 continue
@@ -769,8 +794,7 @@ class Sites(common.SlottedObject):
             if objRef is None:
                 siteRef.isDead = True
                 continue
-            post.append(objRef)
-        return post
+            yield objRef
 
     def getSitesByClass(self, className):
         '''

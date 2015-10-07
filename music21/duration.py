@@ -1923,8 +1923,8 @@ class Duration(SlottedObject):
 
     def informClient(self):
         '''
-        call durationChanged(quarterLength) on any call that changes
-        the quarterLength
+        call informSites({'changedAttribute': 'duration', 'quarterLength': quarterLength}) 
+        on any call that changes the quarterLength
         
         returns False if there was no need to inform or if client
         was not set.  Otherwise returns True
@@ -1937,7 +1937,7 @@ class Duration(SlottedObject):
         cl = self.client
         if cl is None:
             return False
-        cl.durationChanged(self._qtrLength)
+        cl.informSites({'changedAttribute': 'duration', 'quarterLength': self._qtrLength})
         return True
             
 

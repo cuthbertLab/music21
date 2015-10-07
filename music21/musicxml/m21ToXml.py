@@ -425,14 +425,14 @@ class GeneralObjectExporter():
         if st.isFlat:
             st2 = stream.Part()
             st2.mergeAttributes(st)
-            st2.elements = st
+            st2.elements = copy.deepcopy(st)
             st2.clef = st2.bestClef()
             st2.makeNotation(inPlace=True)
             return self.fromPart(st2)
         elif st.getElementsByClass('Stream')[0].isFlat:
             st2 = stream.Part()
             st2.mergeAttributes(st)
-            st2.elements = st
+            st2.elements = copy.deepcopy(st)
             st2.makeNotation(inPlace=True, bestClef=True)
             return self.fromPart(st2)
         else:

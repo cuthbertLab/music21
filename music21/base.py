@@ -254,24 +254,20 @@ class Music21Object(object):
 
     All music21 objects have seven pieces of information:
 
-    1.  id: identification string unique to the objects container (optional)
+    1.  id: identification string unique to the objects container (optional).  Defaults to the
+        `id()` of the element.
     2.  groups: a Groups object: which is a list of strings identifying
         internal subcollections (voices, parts, selections) to which this
         element belongs
     3.  duration: Duration object representing the length of the object
-    4.  activeSite: a weakreference to the currently active Location
+    4.  activeSite: a reference to the currently active Stream or None
     5.  offset: a floating point value, generally in quarter lengths,
         specifying the position of the object in a site.
     6.  priority: int representing the position of an object among all
         objects at the same offset.
-    7.  sites: a Sites object that stores all the Streams and Contexts that an
+    7.  sites: a :class:`~music21.base.Sites` object that stores all 
+        the Streams and Contexts that an
         object is in.
-
-    Contexts, locations, and offsets are stored in a
-    :class:`~music21.base.Sites` object.  Locations specify connections of this
-    object to one location in a Stream subclass.  Contexts are weakrefs for
-    current objects that are associated with this object (similar to locations
-    but without an offset)
 
     Each of these may be passed in as a named keyword to any music21 object.
 
@@ -299,7 +295,6 @@ class Music21Object(object):
     _DOC_ORDER = [
         'classes',
         'classSet',
-        'findAttributeInHierarchy',
         ]
 
     # documentation for all attributes (not properties or methods)
@@ -309,11 +304,11 @@ class Music21Object(object):
         'groups': '''An instance of a :class:`~music21.base.Group` object which describes 
             arbitrary `Groups` that this object belongs to.''',
         'isStream': '''Boolean value for quickly identifying 
-            :class:`~music21.stream.Stream` objects (False by default).''',
+            :class:`~music21.stream.Stream` objects (False by default). Deprecated''',
         'isSpanner': '''Boolean value for quickly identifying
-             :class:`~music21.spanner.Spanner` objects (False by default).''',
+             :class:`~music21.spanner.Spanner` objects (False by default). Deprecated''',
         'isVariant': '''Boolean value for quickly identifying 
-            :class:`~music21.variant.Variant` objects (False by default).''',
+            :class:`~music21.variant.Variant` objects (False by default). Deprecated''',
         'classSortOrder' : '''Property which returns an number (int or otherwise)
             depending on the class of the Music21Object that
             represents a priority for an object based on its class alone --
@@ -1433,7 +1428,7 @@ class Music21Object(object):
         selfSites = self.sites.getSites(excludeNone=True)
         match = None
 
-        # store ids of of first sites; might need to take flattened version
+        # store ids of first sites; might need to take flattened version
         firstSites = []
         for s in selfSites:
             firstSites.append(id(s))
@@ -2189,7 +2184,7 @@ class Music21Object(object):
             self._duration = durationObj
             durationObj.client = self
             if replacingDuration:
-                self.durationChanged(ql)
+                self.informSites({'changedElement': 'duration', 'quarterLength': ql})
                 
         except AttributeError:
             # need to permit Duration object assignment here
@@ -2200,9 +2195,13 @@ class Music21Object(object):
         Get and set the duration of this object as a Duration object.
         ''')
 
-    def durationChanged(self, newQuarterLength):
+    def informSites(self, changedInformation=None):
         '''
-        trigger called whenever the duration has changed.
+        trigger called whenever sites need to be informed of a change
+        in the parameters of this object.
+        
+        `changedInformation` is not used now, but it can be a dictionary
+        of what has changed.
         
         subclass this to do very interesting things.
         '''
@@ -2230,14 +2229,14 @@ class Music21Object(object):
     def _setPriority(self, value):
         '''
         value is an int.
+        
+        Informs all sites of the change.
         '''
         if not isinstance(value, int):
             raise ElementException('priority values must be integers.')
         if self._priority != value:
             self._priority = value
-            # TODO: set priority in each site?
-            #for s in self.sites.getSites(excludeNone=True):
-            #    pass
+            self.informSites({'changedElement': 'priority', 'priority': value})
 
     priority = property(_getPriority, _setPriority,
         doc = '''
@@ -4377,8 +4376,15 @@ class Test(unittest.TestCase):
         self.assertEqual(measures[3].previous(), measures[2])
         self.assertEqual(measures[3].previous(flattenLocalSites=True), measures[2][-1])
 
-        self.assertEqual(measures[3].next(), measures[4])
+        m3n = measures[3].next()
+        self.assertEqual(m3n, measures[4])
         self.assertEqual(measures[3].next('Note', flattenLocalSites=True), measures[3].notes[0])
+
+        m3nn = m3n.next()
+        self.assertEqual(m3nn, measures[5])
+        m3nnn = m3nn.next()
+        self.assertEqual(m3nnn, measures[6])
+
 
         self.assertEqual(measures[3].previous().previous(), measures[1])
         self.assertEqual(measures[3].previous().previous().previous(), measures[0])
