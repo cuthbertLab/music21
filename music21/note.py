@@ -1361,6 +1361,7 @@ class Note(NotRest):
         post.pitch.transpose(intervalObj, inPlace=True)
 
         if not inPlace:
+            post.derivation.method = 'transpose'
             return post
         else:
             return None

@@ -182,7 +182,7 @@ class Groups(list): # no need to inherit from slotted object
             list.append(self, value)
 
     def __setitem__(self, i, y):
-        self._validName(value)
+        self._validName(y)
         list.__setitem__(self, i, y)
 
     def __eq__(self, other):
@@ -946,19 +946,13 @@ class Music21Object(object):
         '''
         return self.sites.setAttrByName(attrName, value)
 
+    @common.deprecated('October 2015', 'February 2016', 
+                       'use `site in n.sites` or `n.sites.hasSiteId(id(site))` instead')
     def hasSite(self, other):
         '''
         Return True if other is a site in this Music21Object
 
         Matches on id(other)
-
-        >>> s = stream.Stream()
-        >>> n = note.Note()
-        >>> s.append(n)
-        >>> n.hasSite(s)
-        True
-        >>> n.hasSite(stream.Stream())
-        False
         '''
         return id(other) in self.sites.getSiteIds()
 
@@ -3739,7 +3733,7 @@ class Test(unittest.TestCase):
         # the activeSite of measures[1] is set to the new output stream
         self.assertEqual(measures[1].activeSite, measures)
         # the source Part should still be a context of this measure
-        self.assertEqual(measures[1].hasSite(a.parts[0]), True)
+        self.assertEqual(a.parts[0] in measures[1].sites, True)
 
         # from the first measure, we can get the clef by using
         # getElementsByClass
@@ -3762,9 +3756,9 @@ class Test(unittest.TestCase):
         newStream = stream.Stream()
         newStream.insert(0, measures[3])
         # all previous locations are still available as a context
-        self.assertEqual(measures[3].hasSite(newStream), True)
-        self.assertEqual(measures[3].hasSite(measures), True)
-        self.assertEqual(measures[3].hasSite(a.parts[0]), True)
+        self.assertTrue(newStream in measures[3].sites)
+        self.assertTrue(measures in measures[3].sites)
+        self.assertTrue(a.parts[0] in measures[3].sites)
         # we can still access the clef through this measure on this
         # new stream
         post = newStream[0].getContextByClass(clef.Clef)
@@ -4104,8 +4098,8 @@ class Test(unittest.TestCase):
         self.assertEqual(s2.hasElement(n1), False)
         self.assertEqual(s2.hasElement(n2), True)
 
-        self.assertEqual(n2.hasSite(s1), False)
-        self.assertEqual(n2.hasSite(s2), True)
+        self.assertFalse(s1 in n2.sites)
+        self.assertTrue(s2 in n2.sites)
 
     def testGetContextByClassA(self):
         from music21 import stream, note, tempo

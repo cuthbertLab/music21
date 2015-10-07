@@ -834,6 +834,7 @@ class Sites(common.SlottedObject):
                 found.append(objRef)
         return found
 
+
     def hasSiteId(self, siteId):
         '''
         Return True or False if this Sites object already has this site id.
