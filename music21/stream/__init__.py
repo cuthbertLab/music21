@@ -5022,7 +5022,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if addPartIdAsGroup:
                     for e in m: # add to all elements
                         # some ids may not be strings; must convert
-                        e.groups.append(str(p.id))
+                        pidStr = str(p.id)
+                        pidStr = pidStr.replace(' ', '_') # spaces are not allowed as group names
+                        # they should not be as id names either...but not yet enforced.
+                        e.groups.append(pidStr)
 
         # make chords from flat version of sliced parts
         # do in place as already a copy has been made

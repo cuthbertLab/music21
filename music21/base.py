@@ -170,23 +170,24 @@ class Groups(list): # no need to inherit from slotted object
     # this speeds up creation slightly...
     __slots__ = ()
     
-    def append(self, value):
-        if isinstance(value, six.string_types):
-            # do not permit the same entry more than once
-            if not list.__contains__(self, value):
-                list.append(self, value)
-        else:
+    def _validName(self, value):
+        if not isinstance(value, six.string_types):
             raise exceptions21.GroupException("Only strings can be used as group names")
+        if ' ' in value:
+            raise exceptions21.GroupException("Spaces are not allowed as group names")
+    
+    def append(self, value):
+        self._validName(value)
+        if not list.__contains__(self, value):
+            list.append(self, value)
 
     def __setitem__(self, i, y):
-        if isinstance(y, six.string_types):
-            list.__setitem__(self, i, y)
-        else:
-            raise exceptions21.GroupException("Only strings can be used as group names")
+        self._validName(value)
+        list.__setitem__(self, i, y)
 
     def __eq__(self, other):
         '''
-        Test Group equality. In normal lists, order matters; here it does not.
+        Test Group equality. In normal lists, order matters; here it does not. More like a set.
 
         >>> a = base.Groups()
         >>> a.append('red')
@@ -252,7 +253,7 @@ class Music21Object(object):
     '''
     Base class for all music21 objects.
 
-    All music21 objects have seven pieces of information:
+    All music21 objects have these pieces of information:
 
     1.  id: identification string unique to the objects container (optional).  Defaults to the
         `id()` of the element.
@@ -268,6 +269,8 @@ class Music21Object(object):
     7.  sites: a :class:`~music21.base.Sites` object that stores all 
         the Streams and Contexts that an
         object is in.
+    8.  derivation: a :class:`~music21.derivation.Derivation` object, or None, that shows
+        where the object came from.
 
     Each of these may be passed in as a named keyword to any music21 object.
 
