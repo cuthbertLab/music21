@@ -14,19 +14,6 @@ def load_ipython_extension(ip):
                           music21.ipython21.objects.IPythonPNGObject.getData)
     # also get matplotlib going inline for free...
     ip.run_line_magic('matplotlib', 'inline')
-#     from IPython.display import display, HTML # @UnresolvedImport
-#     display(HTML('''
-#      <script src='http://web.mit.edu/music21/music21j/ext/require/require.js'></script>
-#      <script>
-#     require.config(
-#        { baseUrl: "http://web.mit.edu/music21/music21j/src/",
-#          paths: {'music21': 'http://web.mit.edu/music21/music21j/src/music21',}
-#         });
-#     require(['music21'], function () {
-#           var n = new music21.note.Note("D#4");
-#           var s = new music21.stream.Stream();
-#           s.append(n);
-#           console.log('music21 loaded fine');
-#     });
-#     </script>
-#     '''))
+
+
+    

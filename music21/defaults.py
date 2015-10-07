@@ -87,6 +87,9 @@ divisionsPerQuarter = 32*3*3*5*7 # 10080
 # while a supposedly 16 bit unsigned value
 # midi.py gives an error with 10080
 ticksPerQuarter = 1024
+# how many ticks to pad as a rest at the beginning of a MIDI file.
+# also used to pad the end...
+ticksAtStart = 1024
 
 # quantizationQuarterLengthDivisors
 # what to snap MIDI quantization to.  (4, 3) indicates sixteenth notes and triplets.

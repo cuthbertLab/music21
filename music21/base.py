@@ -2358,6 +2358,9 @@ class Music21Object(object):
                 fmt = environLocal['showFormat']
         elif fmt.startswith('.'):
             fmt = fmt[1:]
+        elif common.runningUnderIPython() and fmt.startswith('midi'):
+            fmt = 'ipython.' + fmt 
+        
         regularizedConverterFormat, unused_ext = common.findFormat(fmt)
         if regularizedConverterFormat is None:
             raise Music21ObjectException('cannot support showing in this format yet: %s' % fmt)
