@@ -12,7 +12,7 @@
 
 # this requires pylint to be installed and available from the command line
 
-
+import multiprocessing
 import sys
 
 from music21.test import commonTest
@@ -49,6 +49,10 @@ def main(fnAccept=None):
     '''
     `fnAccept` is a list of one or more files to test.  Otherwise runs all.
     '''
+    poolSize = multiprocessing.cpu_count() # @UndefinedVariable
+    if poolSize > 2:
+        poolSize = poolSize - 1
+
     if pylintRun is None:
         print("make sure that 'sudo pip install pylint' is there. exiting.")
         return 
@@ -123,6 +127,7 @@ def main(fnAccept=None):
            '--max-args=7',  # should be 5 later, but baby steps
            '--bad-names="foo,shit,fuck,stuff"', # definitely allow "bar" for barlines
            '--reports=n',
+           '-j ' + str(poolSize), # multiprocessing!
            '--ignore-long-lines="converter\.parse"', # some tiny notation...
            '--max-line-length=400', # start small...
            ]
