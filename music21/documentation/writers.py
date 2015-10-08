@@ -361,7 +361,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
                 return False
 
         self.runNBConvert(ipythonNotebookFilePath)
-        # 'encoding' is an invalid keyword argument for the built-in 'open'.
+        # 'encoding' is an invalid keyword argument for the built-in 'open' in python 2.
         with io.open(rstFilePath, 'r', encoding='utf8') as f:
             oldLines = f.read().splitlines()
         lines = self.cleanConvertedNotebook(oldLines, ipythonNotebookFilePath)
