@@ -2133,8 +2133,19 @@ class Test(unittest.TestCase):
         # get and compare just the time signatures
         mtAlt = streamHierarchyToMidiTracks(s.getElementsByClass('TimeSignature'))[0]
 
-        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=''>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x03\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=3072, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x05\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=5120, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x02\\x18\\x08'>, <MidiEvent DeltaTime, t=1024, track=1, channel=1>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
-        self.assertEqual(str(mtAlt.events), match)
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, 
+        <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=''>, 
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
+        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>, 
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
+        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x03\\x02\\x18\\x08'>, 
+        <MidiEvent DeltaTime, t=3072, track=1, channel=1>, 
+        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x05\\x02\\x18\\x08'>, 
+        <MidiEvent DeltaTime, t=5120, track=1, channel=1>, 
+        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x02\\x18\\x08'>, 
+        <MidiEvent DeltaTime, t=1024, track=1, channel=1>,
+        <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
+        self.assertTrue(common.basicallyEqual(str(mtAlt.events), match))
 
     def testKeySignature(self):
         from music21 import meter, key
@@ -2209,11 +2220,22 @@ class Test(unittest.TestCase):
         self.assertEqual(len(mtList), 1)
 
         # its the same as before
-        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data='Soprano'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x01'>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x04\\x02\\x18\\x08'>]"""
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, 
+        <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data='Soprano'>, 
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
+        <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, 
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
+        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>, 
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
+        <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, 
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
+        <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x01'>, 
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
+        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x04\\x02\\x18\\x08'>]"""
         if six.PY2:
             mtList[0].events[1].data = mtList[0].events[1].data.encode('ascii') # unicode fix
 
-        self.assertEqual(str(mtList[0].events[:12]), match)
+        self.assertTrue(common.basicallyEqual(str(mtList[0].events[:12]), match))
 
     def testMidiProgramChangeA(self):
         from music21 import instrument
@@ -2243,7 +2265,12 @@ class Test(unittest.TestCase):
         from music21 import instrument, scale
         import random
 
-        iList = [instrument.Harpsichord, instrument.Clavichord, instrument.Accordion, instrument.Celesta, instrument.Contrabass, instrument.Viola, instrument.Harp, instrument.ElectricGuitar, instrument.Ukulele, instrument.Banjo, instrument.Piccolo, instrument.AltoSaxophone, instrument.Trumpet]
+        iList = [instrument.Harpsichord, 
+                 instrument.Clavichord, instrument.Accordion, 
+                 instrument.Celesta, instrument.Contrabass, instrument.Viola, 
+                 instrument.Harp, instrument.ElectricGuitar, instrument.Ukulele, 
+                 instrument.Banjo, instrument.Piccolo, instrument.AltoSaxophone,
+                 instrument.Trumpet]
 
         sc = scale.MinorScale()
         pitches = sc.getPitches('c2', 'c5')
@@ -2269,9 +2296,28 @@ class Test(unittest.TestCase):
         self.assertEqual(len(mtList), 1)
 
         # its the same as before
-        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=65, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=66, velocity=90>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=61, velocity=90>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=58, velocity=90>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=54, velocity=90>, <MidiEvent DeltaTime, t=1024, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=66, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=61, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=58, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=54, velocity=0>, <MidiEvent DeltaTime, t=1024, track=1, channel=1>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
+        match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, 
+        <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=65, velocity=0>, 
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
+        <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=66, velocity=90>,
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
+        <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=61, velocity=90>, 
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
+        <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=58, velocity=90>, 
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
+        <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=54, velocity=90>, 
+        <MidiEvent DeltaTime, t=1024, track=1, channel=1>, 
+        <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=66, velocity=0>, 
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
+        <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=61, velocity=0>, 
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
+        <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=58, velocity=0>, 
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
+        <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=54, velocity=0>, 
+        <MidiEvent DeltaTime, t=1024, track=1, channel=1>, 
+        <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
 
-        self.assertEqual(str(mtList[0].events[-20:]), match)
+        self.assertTrue(common.basicallyEqual(str(mtList[0].events[-20:]), match))
 
     def testOverlappedEventsB(self):
         from music21 import scale
@@ -2364,10 +2410,6 @@ class Test(unittest.TestCase):
         s.insert(0, note.Note('g3', quarterLength=10)) 
         unused_mts = streamHierarchyToMidiTracks(s)
 
-#         match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=61, velocity=90>, <MidiEvent DeltaTime, t=2048, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=61, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=2>, <MidiEvent PITCH_BEND, t=0, track=1, channel=2, _parameter1=0, _parameter2=80>, <MidiEvent DeltaTime, t=0, track=1, channel=2>, <MidiEvent NOTE_ON, t=0, track=1, channel=2, pitch=61, velocity=90>, <MidiEvent DeltaTime, t=2048, track=1, channel=2>, <MidiEvent NOTE_OFF, t=0, track=1, channel=2, pitch=61, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=2>, <MidiEvent PITCH_BEND, t=0, track=1, channel=2, _parameter1=0, _parameter2=64>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=62, velocity=90>, <MidiEvent DeltaTime, t=2048, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=55, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=62, velocity=0>, <MidiEvent DeltaTime, t=0, track=1, channel=1>, <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
-#         self.assertEqual(str(mts[0].events[-20:]), match)
-# 
-# 
 #         #s.show('midi', app='Logic Express')
 #         s.show('midi')
 

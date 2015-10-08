@@ -1075,11 +1075,26 @@ class AskAutoDownload(SelectFromList):
     def _rawIntroduction(self):
         '''Return a multiline presentation of an introduction.
         '''
-        return ['The LGPL music21 software is distributed with a corpus of encoded compositions which are distributed with the permission of the encoders (and, where needed, the composers or arrangers) and where permitted under United States copyright law. Some encodings included in the corpus may not be used for commercial uses or have other restrictions: please see the licenses embedded in individual compositions or directories for more details.', 
+        return ['The BSD/LGPL licensed music21 software is distributed with a corpus of encoded ' + 
+                'compositions which are distributed with the permission of the encoders ' + 
+                '(and, where needed, the composers or arrangers) and where permitted under ' + 
+                'United States copyright law. Some encodings included in the corpus may not ' + 
+                'be used for commercial uses or have other restrictions: please see the ' + 
+                'licenses embedded in individual compositions or directories for more details.', 
         ' ',
-        'In addition to the corpus distributed with music21, other pieces are not included in this distribution, but are indexed as links to other web sites where they can be downloaded (the "virtual corpus"). If you would like, music21 can help your computer automatically resolve these links and bring them to your hard drive for analysis. See corpus/virtual.py for a list of sites that music21 might index.',
+        'In addition to the corpus distributed with music21, other pieces are not ' + 
+        'included in this distribution, but are indexed as links to other web sites ' + 
+        'where they can be downloaded (the "virtual corpus"). If you would like, music21 ' + 
+        'can help your computer automatically resolve these links and bring them to your ' + 
+        'hard drive for analysis. See corpus/virtual.py for a list of sites that music21 ' + 
+        'might index.',
         ' ',
-        'To the best of our knowledge, the music (if not the encodings) in the corpus are either out of copyright in the United States and/or are licensed for non-commercial use. These works, along with any works linked to in the virtual corpus, may or may not be free in your jurisdiction. If you believe this message to be in error regarding one or more works please contact Michael Cuthbert at cuthbert@mit.edu.',
+        'To the best of our knowledge, the music (if not the encodings) in the corpus are ' + 
+            'either out of copyright in the United States and/or are licensed for ' + 
+            'non-commercial use. These works, along with any works linked to in the virtual ' + 
+            'corpus, may or may not be free in your jurisdiction. If you believe this message ' + 
+            'to be in error regarding one or more works please contact ' + 
+            'Michael Cuthbert at cuthbert@mit.edu.',
         ' ',
         'Would you like to:'
         ]
@@ -1092,10 +1107,12 @@ class AskAutoDownload(SelectFromList):
         else:
             return ['Acknowledge these terms and allow music21 to aid in finding pieces in the corpus',
             'Acknowledge these terms and block the virtual corpus',
-            'Do not agree to these terms and will not use music21 (agreeing to the terms of the corpus is mandatory for using the system).']
+            'Do not agree to these terms and will not use music21 (agreeing to the terms of ' + 
+                 'the corpus is mandatory for using the system).']
 
     def _evaluateUserInput(self, raw):
-        '''Evaluate the user's string entry after persing; do not return None: either return a valid response, default if available, IncompleteInput, NoInput objects. 
+        '''Evaluate the user's string entry after parsing; do not return None: 
+        either return a valid response, default if available, IncompleteInput, NoInput objects. 
         '''
         rawParsed = self._parseUserInput(raw)
         # if NoInput: and a default, return default
@@ -1149,7 +1166,8 @@ class SelectFilePath(SelectFromList):
         SelectFromList.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
 
     def _getDarwinApp(self, comparisonFunction):
-        '''Provide a comparison function that returns True or False based on the file name. This looks at everything in Applications, as well as every directory in Applications
+        '''Provide a comparison function that returns True or False based on the file name. 
+        This looks at everything in Applications, as well as every directory in Applications
         '''
         post = []
         path0 = '/Applications'
@@ -1183,7 +1201,9 @@ class SelectFilePath(SelectFromList):
 
 
     def _evaluateUserInput(self, raw):
-        '''Evaluate the user's string entry after persing; do not return None: either return a valid response, default if available, IncompleteInput, NoInput objects. 
+        '''Evaluate the user's string entry after parsing; 
+        do not return None: either return a valid response, 
+        default if available, IncompleteInput, NoInput objects. 
     
         Here, we convert the user-selected number into a file path
         
@@ -1215,7 +1235,8 @@ class SelectMusicXMLReader(SelectFilePath):
     Select a MusicXML Reader by presenting a user a list of options. 
     '''
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
-        SelectFilePath.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
+        SelectFilePath.__init__(self, default=default, tryAgain=tryAgain, 
+                                promptHeader=promptHeader) 
 
         # define platforms that this will run on
         self._platforms = ['darwin']
@@ -1272,7 +1293,8 @@ class SelectMusicXMLReader(SelectFilePath):
         return []
 
     def _getValidResults(self, force=None):
-        '''Return a list of valid results that are possible and should be displayed to the user. These will be processed by _formatResultForUser before usage.
+        '''Return a list of valid results that are possible and should be 
+        displayed to the user. These will be processed by _formatResultForUser before usage.
         '''
         # customize in subclass
         if force is not None:
@@ -1302,7 +1324,8 @@ class SelectMusicXMLReader(SelectFilePath):
         
         # this does not do anything: customize in subclass
         d = AskOpenInBrowser(urlTarget=urlTarget, default=True, tryAgain=False, 
-            promptHeader='No available MusicXML readers are found on your system. It is recomended to download and install a reader before continuing.')
+            promptHeader='No available MusicXML readers are found on your system. ' + 
+            'We recommend downloading and installing a reader before continuing.')
         d.askUser(force=force)
         post = d.getResult()
         # can call regardless of result; will only function if result is True
@@ -1379,13 +1402,16 @@ class ConfigurationAssistant(object):
         self._dialogs.append(d)
 
 
-        d = AskOpenInBrowser(urlTarget=urlMusic21List, prompt='The music21 discussion group provides a forum for asking questions and getting help. Would you like to see the music21 discussion list or sign up for updates?')
+        d = AskOpenInBrowser(urlTarget=urlMusic21List, 
+                             prompt='The music21 discussion group provides a forum for ' + 
+                             'asking questions and getting help. Would you like to see the ' + 
+                             'music21 discussion list or sign up for updates?')
         self._dialogs.append(d)
 
         # note: this is the on-line URL: 
         # might be better to find local documentaiton
         d = AskOpenInBrowser(urlTarget=urlGettingStarted, 
-                             prompt='Would you like to view the music21 documentation in a web browser?')
+                    prompt='Would you like to view the music21 documentation in a web browser?')
         self._dialogs.append(d)
 
         d = AnyKey(promptHeader='The music21 Configuration Assistant is complete.')
