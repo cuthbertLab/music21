@@ -691,22 +691,22 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace=False, compareByMea
     >>> #_DOCS_SHOW s.show()
     
     >>> mainpartWithOssiaVariantsFT = variant.mergePartAsOssia(mainpart, ossiapart,
-    ...                                                            ossiaName = 'Parisian Variant',
+    ...                                                            ossiaName = 'Parisian_Variant',
     ...                                                            inPlace=False,
     ...                                                            compareByMeasureNumber = False,
     ...                                                            recurseInMeasures = True)
     >>> mainpartWithOssiaVariantsTT = variant.mergePartAsOssia(mainpart, ossiapart,
-    ...                                                            ossiaName = 'Parisian Variant',
+    ...                                                            ossiaName = 'Parisian_Variant',
     ...                                                            inPlace=False,
     ...                                                            compareByMeasureNumber = True,
     ...                                                            recurseInMeasures = True)
     >>> mainpartWithOssiaVariantsFF = variant.mergePartAsOssia(mainpart, ossiapart,
-    ...                                                            ossiaName = 'Parisian Variant',
+    ...                                                            ossiaName = 'Parisian_Variant',
     ...                                                            inPlace=False,
     ...                                                            compareByMeasureNumber = False,
     ...                                                            recurseInMeasures = False)
     >>> mainpartWithOssiaVariantsTF = variant.mergePartAsOssia(mainpart, ossiapart,
-    ...                                                            ossiaName = 'Parisian Variant',
+    ...                                                            ossiaName = 'Parisian_Variant',
     ...                                                            inPlace=False,
     ...                                                            compareByMeasureNumber = True,
     ...                                                            recurseInMeasures = False)
@@ -738,7 +738,7 @@ def mergePartAsOssia(mainpart, ossiapart, ossiaName, inPlace=False, compareByMea
         {3.0} <music21.note.Note F>
     ...
     
-    >>> mainpartWithOssiaVariantsFF.activateVariants('Parisian Variant').show('text')
+    >>> mainpartWithOssiaVariantsFF.activateVariants('Parisian_Variant').show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
     ...
     {12.0} <music21.variant.Variant object of length 4.0>
@@ -820,7 +820,7 @@ def addVariant(s, startOffset, sVariant, variantName=None, variantGroups=None, r
     ...    n.duration.type = durType
     ...    m.append(n)
     >>> stream2.append(m)
-    >>> variant.addVariant(stream1, 4.0, stream2, variantName='rhythmic switch', replacementDuration=4.0)
+    >>> variant.addVariant(stream1, 4.0, stream2, variantName='rhythmic_switch', replacementDuration=4.0)
     >>> stream1.show('text')
     {0.0} <music21.stream.Measure 0 offset=0.0>
         {0.0} <music21.note.Note A>
