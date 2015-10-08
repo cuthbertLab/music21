@@ -22,7 +22,6 @@ from music21.ipython21 import objects
 from music21.ipython21.ipExtension import load_ipython_extension
 
 from music21 import common
-localIP = None
 
 def loadNoMagic():
     '''

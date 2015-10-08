@@ -504,7 +504,7 @@ class Music21Object(object):
                         setattr(new, name, shallowlyCopiedObject)
                         environLocal.printDebug(
                             '__deepcopy__: Could not deepcopy ' + 
-                            '{0} in {0}, not a music21Object'.format(name, self) +
+                            '{0} in {1}, not a music21Object'.format(name, self) +
                             'so making a shallow copy')
                     except TypeError:
                         # just link...

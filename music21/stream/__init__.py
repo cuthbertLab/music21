@@ -977,7 +977,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if not common.isListLike(targetOrList):
             targetList = [targetOrList]
         elif len(targetOrList) > 1:
-                targetList = sorted(targetOrList, key=self.elementOffset)
+            targetList = sorted(targetOrList, key=self.elementOffset)
         else:
             targetList = targetOrList
 
@@ -1983,19 +1983,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #         if target is None:
 #             raise StreamException('received a target of None as a candidate for replacement.')
 #         if recurse is False:
-#             iterator = self.iter
+#             siterator = self.iter
 #         else:
-#             iterator = self.recurse()
-#         iterator.addFilter(filter.IsFilter(target))
+#             siterator = self.recurse()
+#         siterator.addFilter(filter.IsFilter(target))
 #  
 #  
 #         found = False
-#         for el in iterator:
+#         for el in siterator:
 #             # el should be target...
-#             index = iterator.activeInformation['sectionIndex']
+#             index = siterator.activeInformation['sectionIndex']
 #             # containingStream will be self for non-recursive
-#             containingStream = iterator.activeInformation['stream']
-#             elementList = iterator.activeElementList
+#             containingStream = siterator.activeInformation['stream']
+#             elementList = siterator.activeElementList
 #             found = True
 #             break
 # 
@@ -2350,10 +2350,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> c[0].name
         'B-'
         '''
-        iterator = self.iter
+        siterator = self.iter
         if classFilter is not None:
-            iterator.addFilter(filter.ClassFilter(classFilter))
-        for el in iterator:
+            siterator.addFilter(filter.ClassFilter(classFilter))
+        for el in siterator:
             el.groups.append(group)
 
 
@@ -2435,11 +2435,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         :rtype: Stream
         '''
-        iterator = self.iter.getElementsByClass(classFilterList)
+        siterator = self.iter.getElementsByClass(classFilterList)
         if returnStreamSubClass == 'list':
-            return iterator.matchingElements()
+            return siterator.matchingElements()
         else:
-            return iterator.stream(returnStreamSubClass=returnStreamSubClass)
+            return siterator.stream(returnStreamSubClass=returnStreamSubClass)
 
         # this was 11 micro-sec for BWV 66.6, getElementsByClass('Part', 'list')
         # and 85 w/o list before changing to .iter (and adding mergeAttributes, etc.)
@@ -2480,11 +2480,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         
         :rtype: Stream
         '''
-        iterator = self.iter.getElementsNotOfClass(classFilterList)
+        siterator = self.iter.getElementsNotOfClass(classFilterList)
         if returnStreamSubClass == 'list':
-            return iterator.matchingElements()
+            return siterator.matchingElements()
         else:
-            return iterator.stream(returnStreamSubClass=returnStreamSubClass)
+            return siterator.stream(returnStreamSubClass=returnStreamSubClass)
 
 
     def getElementsByGroup(self, groupFilterList):
@@ -2551,10 +2551,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         
         :rtype: base.Music21Object
         '''
-        iterator = self.iter.addFilter(filter.IdFilter(elementId))
+        siterator = self.iter.addFilter(filter.IdFilter(elementId))
         if classFilter is not None:
-            iterator.getElementsByClass(classFilter)
-        for e in iterator:
+            siterator.getElementsByClass(classFilter)
+        for e in siterator:
             return e
         return None
 
@@ -2764,7 +2764,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         :rtype: Stream
         '''
-        iterator = self.iter.getElementsByOffset(
+        siterator = self.iter.getElementsByOffset(
                          offsetStart=offsetStart, 
                          offsetEnd=offsetEnd,
                          includeEndBoundary=includeEndBoundary, 
@@ -2772,8 +2772,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                          mustBeginInSpan=mustBeginInSpan, 
                          includeElementsThatEndAtStart=includeElementsThatEndAtStart)
         if classList is not None:
-            iterator.getElementsByClass(classList)
-        return iterator.stream()
+            siterator.getElementsByClass(classList)
+        return siterator.stream()
 
 
     def getElementAtOrBefore(self, offset, classList=None):
@@ -10856,7 +10856,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     newPart.remove(e)
                     r = note.Rest()
                     r.hideObjectOnPrint = True
-                    r.duration.quarterLenght = nQuarterLength
+                    r.duration.quarterLength = nQuarterLength
                     newPart.insert(nOffset, r)
                 elif "Measure" in eclasses: #Recurse if measure
                     measureDuration = e.duration.quarterLength

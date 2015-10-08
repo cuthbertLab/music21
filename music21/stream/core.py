@@ -21,11 +21,10 @@ remain stable.
 
 All attributes here will eventually begin with `.core`.
 '''
+#pylint: disable=attribute-defined-outside-init
+
 import unittest
 
-import copy
-
-from music21 import base
 from music21 import spanner 
 from music21 import timespans
 from music21.exceptions21 import StreamException

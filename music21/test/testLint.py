@@ -114,7 +114,8 @@ def main(fnAccept=None):
            '--docstring-min-length=3',
            '--max-args=7',  # should be 5 later, but baby steps
            '--bad-names="foo,shit,fuck,stuff"', # definitely allow "bar" for barlines
-           '--reports=n'
+           '--reports=n',
+           '--max-line-length=200', # start small...
            ]
     for gn, gnv in goodnameRx.items():
         cmd.append('--' + gn + '="' + gnv + '"')
