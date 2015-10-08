@@ -156,18 +156,21 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
                     mn = mn.replace('_', '.')
                 else:
                     mn = ""
-                if not newResult.errors and not newResult.failures:
-                    print("\t\t\t\t{0}: {1} tests in {2} secs".format(
-                                        mn,
-                                        newResult.testsRun,
-                                        round(newResult.runTime * 10)/10.0))
-                else:
-                    print("\t\t\t\t{0}: {1} tests, {2} errors {3} failures in {4} secs".format(
-                                        mn,
-                                        newResult.testsRun,
-                                        len(newResult.errors),
-                                        len(newResult.failures),
-                                        round(newResult.runTime * 10)/10.0))
+                rt = newResult.runTime
+                if rt is not None:
+                    rt = round(newResult.runTime * 10)/10.0
+                    if not newResult.errors and not newResult.failures:
+                        print("\t\t\t\t{0}: {1} tests in {2} secs".format(
+                                            mn,
+                                            newResult.testsRun,
+                                            rt))
+                    else:
+                        print("\t\t\t\t{0}: {1} tests, {2} errors {3} failures in {4} secs".format(
+                                            mn,
+                                            newResult.testsRun,
+                                            len(newResult.errors),
+                                            len(newResult.failures),
+                                            rt))
             timeouts = 0
             eventsProcessed += 1
             summaryOutput.append(newResult)
@@ -190,7 +193,6 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
             pool.close()    
             pool.join()
         except Exception as excp: # pylint: disable=broad-except
-            print(excp)
             eventsProcessed += 1
             exceptionLog = ModuleResponse("UntrappedException", None, "%s" % excp)
             summaryOutput.append(exceptionLog)
