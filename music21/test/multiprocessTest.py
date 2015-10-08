@@ -150,9 +150,12 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
             if timeouts >= 5:
                 print("")
             if newResult is not None:
-                mn = newResult.moduleName
-                mn = mn.replace('___init__', '')
-                mn = mn.replace('_', '.')
+                if newResult.moduleName is not None:
+                    mn = newResult.moduleName
+                    mn = mn.replace('___init__', '')
+                    mn = mn.replace('_', '.')
+                else:
+                    mn = ""
                 if not newResult.errors and not newResult.failures:
                     print("\t\t\t\t{0}: {1} tests in {2} secs".format(
                                         mn,
@@ -187,6 +190,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
             pool.close()    
             pool.join()
         except Exception as excp: # pylint: disable=broad-except
+            print(excp)
             eventsProcessed += 1
             exceptionLog = ModuleResponse("UntrappedException", None, "%s" % excp)
             summaryOutput.append(exceptionLog)

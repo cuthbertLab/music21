@@ -16,7 +16,7 @@ import time
 import sys
 import unittest
 import textwrap
-
+from textwrap import dedent as dd
 
 try:
     reload  # python2 @UndefinedVariable
@@ -70,7 +70,8 @@ LINE_WIDTH = 78
 #-------------------------------------------------------------------------------
 # class Action(threading.Thread):
 #     '''
-#     A thread-based action for performing remote actions, like downloading or opening in a webbrowser. 
+#     A thread-based action for performing remote actions, like downloading
+#     or opening in a webbrowser. 
 #     '''
 #     def __init__ (self, prompt, timeOutTime):
 #         threading.Thread.__init__(self)
@@ -107,6 +108,7 @@ def writeToUser(msg, wrap=True, linesPerPage=20):
                 post += textwrap.wrap(sub, LINE_WIDTH)
     else:
         post = lines
+    
     #print post
     lineCount = 0
     for i, l in enumerate(post):
@@ -137,7 +139,8 @@ def getSitePackages():
 
 
 def findInstallations():
-    '''Find all music21 references found in site packages, or possibly look at the running code as well.
+    '''Find all music21 references found in site packages, or possibly 
+    look at the running code as well.
     '''
     found = []
     sitePackages = getSitePackages()
@@ -153,7 +156,8 @@ def findInstallations():
     return found
 
 def findInstallationsEggInfo():
-    '''Find all music21 references found in site packages, or possibly look at the running code as well.
+    '''Find all music21 references found in site packages, or possibly 
+    look at the running code as well.
     '''
     found = findInstallations()
     # only get those that end w/ egg-info
@@ -312,13 +316,18 @@ class DialogException(exceptions21.Music21Exception):
 #-------------------------------------------------------------------------------
 class Dialog(object):
     '''
-    Model a dialog as a question and response. Have different subclases for different types of questions. Store all in a Conversation, or multiple dialog passes.
+    Model a dialog as a question and response. Have different 
+    subclases for different types of questions. Store all in a Conversation, 
+    or multiple dialog passes.
 
     A `default`, if provided, is returned if the users provides no input and just enters return. 
 
-    The `tryAgain` option determines if, if a user provides incomplete or no response, and there is no default (for no response), whether the user is given another chance to provide valid input. 
+    The `tryAgain` option determines if, if a user provides incomplete or no response,
+    and there is no default (for no response), whether the user is given another 
+    chance to provide valid input. 
 
-    The `promptHeader` is a string header that is placed in front of any common header for this dialog.
+    The `promptHeader` is a string header that is placed in front of any common 
+    header for this dialog.
     '''
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         # store the result obtained from the user
@@ -479,30 +488,36 @@ class Dialog(object):
         pass
 
     def _formatResultForUser(self, result):
-        '''For various result options, we may need to at times convert the internal representation of the result into something else. For example, we might present the user with 'Yes' or 'No' but store the result as True or False.
+        '''For various result options, we may need to at times convert the internal 
+        representation of the result into something else. For example, we might 
+        present the user with 'Yes' or 'No' but store the result as True or False.
         '''
         # override in subclass
         return result
 
     def _parseUserInput(self, raw):
-        '''Translate string to desired output. Pass None through (as no input), convert '' to None, and pass all other outputs as IncompleteInput objects. 
+        '''Translate string to desired output. Pass None through (as no input), 
+        convert '' to None, and pass all other outputs as IncompleteInput objects. 
         '''
         return raw
 
     def _evaluateUserInput(self, raw):
-        '''Evaluate the user's string entry after persing; do not return None: either return a valid response, default if available, or IncompleteInput object. 
+        '''Evaluate the user's string entry after persing; do not return None: 
+        either return a valid response, default if available, or IncompleteInput object. 
         '''
         pass
         # define in subclass
 
     def _preAskUser(self, force=None):
-        '''Call this method immediately before calling askUser. Can be used for configuration getting additional information. 
+        '''Call this method immediately before calling askUser. Can be used for 
+        configuration getting additional information. 
         '''
         pass
         # define in subclass
 
     def askUser(self, force=None):
-        '''Ask the user, display the query. The force argument can be provided to test. Sets self._result; does not return a value.
+        '''Ask the user, display the query. The force argument can be provided to 
+        test. Sets self._result; does not return a value.
         '''
         # if an introduction is defined, try to use it
         intro = self._rawIntroduction()
@@ -568,7 +583,8 @@ class Dialog(object):
         # self._result may still be None
 
     def getResult(self, simulate=True):
-        '''Return the result, or None if not set. This may also do a processing routine that is part of the desired result. 
+        '''Return the result, or None if not set. This may also do a processing 
+        routine that is part of the desired result. 
         '''
         return self._result 
 
@@ -579,17 +595,20 @@ class Dialog(object):
         pass 
 
     def performAction(self, simulate=False):
-        '''After getting a result, the query might require an action to be performed. If result is None, this will use whatever value is found in _result. 
+        '''After getting a result, the query might require an action to be performed. 
+        If result is None, this will use whatever value is found in _result. 
 
         If simulate is True, no action will be taken.
         '''
         dummy = self.getResult()
         if isinstance(self._result, DialogError):
-            environLocal.printDebug('performAction() called, but result is an error: %s' % self._result)
+            environLocal.printDebug(
+                        'performAction() called, but result is an error: %s' % self._result)
             self._writeToUser(['No action taken.', ' '])
 
         elif simulate: # do not operate
-            environLocal.printDebug('performAction() called, but in simulation mode: %s' % self._result)
+            environLocal.printDebug(
+                        'performAction() called, but in simulation mode: %s' % self._result)
         else:
             try:
                 self._performAction(simulate=simulate)
@@ -646,7 +665,10 @@ class YesOrNo(Dialog):
     
 
     def _formatResultForUser(self, result):
-        '''For various result options, we may need to at times convert the internal representation of the result into something else. For example, we might present the user with 'Yes' or 'No' but store the result as True or False.
+        '''For various result options, we may need to at times convert 
+        the internal representation of the result into something else. 
+        For example, we might present the user with 'Yes' or 'No' but 
+        store the result as True or False.
         '''
         if result is True:
             return 'Yes'
@@ -679,7 +701,8 @@ class YesOrNo(Dialog):
         return msg
 
     def _parseUserInput(self, raw):
-        '''Translate string to desired output. Pass None and '' (as no input), as NoInput objects, and pass all other outputs as IncompleteInput objects. 
+        '''Translate string to desired output. Pass None and '' (as no input), 
+        as NoInput objects, and pass all other outputs as IncompleteInput objects. 
 
         
         >>> d = configure.YesOrNo()
@@ -707,7 +730,8 @@ class YesOrNo(Dialog):
         return IncompleteInput(raw)
 
     def _evaluateUserInput(self, raw):
-        '''Evaluate the user's string entry after persing; do not return None: either return a valid response, default if available, IncompleteInput, NoInput objects. 
+        '''Evaluate the user's string entry after persing; do not return None: 
+        either return a valid response, default if available, IncompleteInput, NoInput objects. 
     
         
         >>> d = configure.YesOrNo()
@@ -802,7 +826,8 @@ class AskInstall(YesOrNo):
         # define platforms that this will run on
         self._platforms = ['darwin', 'nix']
 
-        msg = 'Would you like to install music21 in the normal place for Python packages (i.e., site-packages)?'
+        msg = ('Would you like to install music21 in the normal place ' + 
+                'for Python packages (i.e., site-packages)?')
         self.appendPromptHeader(msg)
 
 
@@ -810,7 +835,10 @@ class AskInstall(YesOrNo):
         fp = findSetup()
         if fp is not None:
 
-            self._writeToUser(['You must authorize writing in the following directory:', getSitePackages(), ' ', 'Please provide your user password to complete this operation.', ''])
+            self._writeToUser(['You must authorize writing in the following directory:', 
+                               getSitePackages(), ' ', 
+                               'Please provide your user password to complete this operation.', 
+                               ''])
 
             stdoutSrc = sys.stdout
             #stderrSrc = sys.stderr
@@ -858,7 +886,8 @@ class AskSendInstallationReport(YesOrNo):
             additionalEntries = {}
         self._additionalEntries = additionalEntries
         
-        msg = 'Would you like to send a pre-formatted email to music21 regarding your installation? Installation reports help us make music21 work better for you'
+        msg = dd('''Would you like to send a pre-formatted email to music21 regarding 
+            your installation? Installation reports help us make music21 work better for you''')
         self.appendPromptHeader(msg)
 
     def _getMailToStr(self):
@@ -931,7 +960,8 @@ class SelectFromList(Dialog):
         Dialog.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
 
     def _getValidResults(self, force=None):
-        '''Return a list of valid results that are possible and should be displayed to the user. These will be processed by _formatResultForUser before usage.
+        '''Return a list of valid results that are possible and should be displayed to the user. 
+        These will be processed by _formatResultForUser before usage.
         '''
         # this might need to be cached
         # customize in subclass
@@ -947,7 +977,8 @@ class SelectFromList(Dialog):
 
 
     def _askFillEmptyList(self, default=None, force=None):
-        '''What to do if the selection list is empty. Only return True or False: if we should continue or not.
+        '''What to do if the selection list is empty. Only return True or False: 
+        if we should continue or not.
 
         
         >>> d = configure.SelectFromList(default=True)
@@ -1007,7 +1038,8 @@ class SelectFromList(Dialog):
         >>> d._default
         1
         >>> d._rawQuery(['a', 'b', 'c'])
-        ['[1] a', '[2] b', '[3] c', ' ', 'Select a number from the preceding options (default is 1): ']
+        ['[1] a', '[2] b', '[3] c', ' ', 
+        'Select a number from the preceding options (default is 1): ']
         '''
         head = []
         i = 1
@@ -1027,7 +1059,8 @@ class SelectFromList(Dialog):
         return head + [' ', tail]
 
     def _parseUserInput(self, raw):
-        '''Convert all values to an integer, or return NoInput or IncompleteInput. Do not yet evaluate whether the number is valid in the context of the selection choices. 
+        '''Convert all values to an integer, or return NoInput or IncompleteInput. 
+        Do not yet evaluate whether the number is valid in the context of the selection choices. 
 
         
         >>> d = configure.SelectFromList()
@@ -1051,7 +1084,8 @@ class SelectFromList(Dialog):
 
     
     def _evaluateUserInput(self, raw):
-        '''Evaluate the user's string entry after persing; do not return None: either return a valid response, default if available, IncompleteInput, NoInput objects. 
+        '''Evaluate the user's string entry after persing; do not return None: either 
+        return a valid response, default if available, IncompleteInput, NoInput objects. 
     
         
         '''
@@ -1244,9 +1278,9 @@ class SelectMusicXMLReader(SelectFilePath):
     def _rawIntroduction(self):
         '''Return a multiline presentation of an introduction.
         '''
-        return ['''Defining an XML Reader permits automatically opening 
-            music21-generated MusicXML in an editor for display and manipulation when calling 
-            the show() method. Setting this option is highly recommended.''', ' ']
+        return ['Defining an XML Reader permits automatically opening ' +
+            'music21-generated MusicXML in an editor for display and manipulation when calling ' +
+            'the show() method. Setting this option is highly recommended.', ' ']
 
     def _getMusicXMLReaderDarwin(self):
         '''Get all possible Finale or MuseScore paths on Darwin
