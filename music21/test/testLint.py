@@ -15,7 +15,7 @@
 
 import sys
 
-from music21.test import testSingleCoreAll as test
+from music21.test import commonTest
 
 try:
     from pylint.lint import Run as pylintRun
@@ -47,7 +47,7 @@ def main(fnAccept=None):
         print("make sure that 'sudo pip install pylint' is there. exiting.")
         return 
 
-    mg = test.ModuleGather()
+    mg = commonTest.ModuleGather()
 
     fnPathReject = [
                     'demos/',
