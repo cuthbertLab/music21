@@ -8083,12 +8083,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self._cache['hasVoices'] = post
         return self._cache['hasVoices']
 
-
     def hasPartLikeStreams(self):
         '''
-        Return a boolean value showing if this Stream contains multiple Parts, or Part-like sub-Streams.
+        Return a boolean value showing if this Stream contains multiple Parts, 
+        or Part-like sub-Streams.
+        
         Part-like sub-streams are Streams that contain Measures or Notes.
-
+        And where no sub-stream begins at an offset besides zero.
 
         >>> s = stream.Score()
         >>> s.hasPartLikeStreams()
@@ -8098,6 +8099,34 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.insert(0, p1)
         >>> s.hasPartLikeStreams()
         True
+        
+        A stream that has a measure in it is not a partlike stream.
+        
+        >>> s = stream.Score()
+        >>> m1 = stream.Measure()
+        >>> m1.repeatAppend(note.Note(), 4)
+        >>> s.append(m1)
+        >>> s.hasPartLikeStreams()
+        False
+        
+        
+        A stream with a single generic Stream substream at the beginning has partlike Streams...
+        
+        >>> s = stream.Score()
+        >>> m1 = stream.Stream()
+        >>> m1.repeatAppend(note.Note(), 4)
+        >>> s.append(m1)
+        >>> s.hasPartLikeStreams()
+        True
+
+
+        Adding another though makes it not partlike.
+
+        >>> m2 = stream.Stream()
+        >>> m2.repeatAppend(note.Note(), 4)
+        >>> s.append(m2)
+        >>> s.hasPartLikeStreams()
+        False
 
         Flat objects do not have part-like Streams:
 
@@ -8109,24 +8138,27 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             multiPart = False
             if not self.isFlat: # if flat, does not have parts!
                 # do not need to look in endElements
-                for obj in self._elements:
+                for obj in self.iter.getElementsByClass('Stream'):
                     # if obj is a Part, we have multi-parts
                     if obj.isClassOrSubclass(['Part']):
                         multiPart = True
                         break
-                    if obj.isClassOrSubclass(['Measure', 'Voice']):
+                    
+                    elif obj.isClassOrSubclass(['Measure', 'Voice']):
                         multiPart = False
                         break
+                    
+                    elif obj.offset != 0.0:
+                        multiPart = False
+                        break
+                    
                     # if components are streams of Notes or Measures,
                     # than assume this is like a Part
-                    elif obj.isStream and (
-                                obj.iter.getElementsByClass('Measure') or 
-                                obj.iter.notesAndRests):
+                    elif (obj.iter.getElementsByClass('Measure') or 
+                          obj.iter.notesAndRests):
                         multiPart = True
-                        break # only need one
             self._cache['hasPartLikeStreams'] = multiPart
         return self._cache['hasPartLikeStreams']
-
 
     def isTwelveTone(self):
         '''
@@ -8152,7 +8184,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Return True if, given the context of this Stream or Stream subclass,
         contains what appears to be well-formed notation. This often means
         the formation of Measures, or a Score that contains Part with Measures.
-
 
         >>> s = corpus.parse('bwv66.6')
         >>> s.isWellFormedNotation()
