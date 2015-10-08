@@ -196,7 +196,7 @@ def cacheMetadata(corpusNames=('local',), verbose=True):
         corpusNames = [corpusNames]
     for name in corpusNames:
         corpora.Corpus._metadataBundles[name] = None
-    metadata.cacheMetadata(corpusNames, verbose=verbose)
+    metadata.caching.cacheMetadata(corpusNames, verbose=verbose)
 
 
 def search(
@@ -226,7 +226,7 @@ def search(
     <music21.metadata.bundles.MetadataBundle {1 entry}>
 
     '''
-    return corpora.Corpus.search(
+    return corpora.search(
         query,
         field=field,
         corpusNames=corpusNames,

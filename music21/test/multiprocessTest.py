@@ -25,7 +25,6 @@ Run test/testDocumentation after this.
 from __future__ import print_function
 
 import collections
-import doctest
 import multiprocessing
 import os
 import sys
