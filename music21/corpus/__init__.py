@@ -34,7 +34,6 @@ from music21 import metadata
 from music21.corpus import chorales
 from music21.corpus import virtual
 from music21.corpus import corpora
-from music21.corpus.corpora import *
 
 from music21 import environment
 _MOD = "corpus.base.py"

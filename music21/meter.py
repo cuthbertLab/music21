@@ -4360,7 +4360,7 @@ class Test(unittest.TestCase):
         <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>, 
         <music21.beam.Beams <music21.beam.Beam 1/stop>>]'''
 
-        self.assertEqual(common.basicallyEqual(str(c), match))
+        self.assertTrue(common.basicallyEqual(str(c), match))
 
     def testoffsetToDepth(self):
         # get a maximally divided 4/4 to the level of 1/8
