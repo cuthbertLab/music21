@@ -910,7 +910,13 @@ class DataSet(object):
         >>> f = [features.jSymbolic.PitchClassDistributionFeature, features.jSymbolic.ChangesOfMeterFeature]
         >>> ds = features.DataSet(classLabel='Composer', featureExtractors=f)
         >>> ds.getAttributeLabels(includeId=False)
-        ['Pitch_Class_Distribution_0', 'Pitch_Class_Distribution_1', 'Pitch_Class_Distribution_2', 'Pitch_Class_Distribution_3', 'Pitch_Class_Distribution_4', 'Pitch_Class_Distribution_5', 'Pitch_Class_Distribution_6', 'Pitch_Class_Distribution_7', 'Pitch_Class_Distribution_8', 'Pitch_Class_Distribution_9', 'Pitch_Class_Distribution_10', 'Pitch_Class_Distribution_11', 'Changes_of_Meter', 'Composer']
+        ['Pitch_Class_Distribution_0', 
+         'Pitch_Class_Distribution_1', 
+         ...
+         ...
+         'Pitch_Class_Distribution_11', 
+         'Changes_of_Meter', 
+         'Composer']
         '''
         post = []
         # place ids first
@@ -992,7 +998,8 @@ class DataSet(object):
         self.streams.append(s)
 
     def process(self):
-        '''Process all Data with all FeatureExtractors. Processed data is stored internally as numerous Feature objects. 
+        '''Process all Data with all FeatureExtractors. 
+        Processed data is stored internally as numerous Feature objects. 
         '''
         # clear features
         self._features = []
