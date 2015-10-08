@@ -429,6 +429,12 @@ class GeneralObjectExporter():
             st2.clef = st2.bestClef()
             st2.makeNotation(inPlace=True)
             return self.fromPart(st2)
+        elif st.hasPartLikeStreams():
+            st2 = stream.Score()
+            st2.mergeAttributes(st)
+            st2.elements = copy.deepcopy(st)
+            st2.makeNotation(inPlace=True)
+            return self.fromScore(st2)
         elif st.getElementsByClass('Stream')[0].isFlat:
             st2 = stream.Part()
             st2.mergeAttributes(st)
