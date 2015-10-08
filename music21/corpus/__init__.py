@@ -224,14 +224,11 @@ def search(
    
     >>> corpus.search('coltrane', corpusNames=('virtual',))
     <music21.metadata.bundles.MetadataBundle {1 entry}>
-
     '''
-    return corpora.search(
-        query,
-        field=field,
-        corpusNames=corpusNames,
-        fileExtensions=fileExtensions,
-        )
+    return corpora.search(query,
+                        field=field,
+                        corpusNames=corpusNames,
+                        fileExtensions=fileExtensions)
 
 
 #------------------------------------------------------------------------------

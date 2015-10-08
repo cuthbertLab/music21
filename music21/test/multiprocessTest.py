@@ -41,6 +41,7 @@ environLocal = environment.Environment(_MOD)
 ModuleResponse = collections.namedtuple('ModuleResponse', 
                     'returnCode fp moduleName success testRunner errors failures testsRun runTime')
 ModuleResponse.__new__.__defaults__ = (None,) * len(ModuleResponse._fields)
+
  
 #-------------------------------------------------------------------------------
 
@@ -85,7 +86,7 @@ def runOneModuleWithoutImp(args):
         
         
         environLocal.printDebug('running Tests...\n')
-        runner = unittest.TextTestRunner(verbosity=verbosity)
+        runner = commonTest.Music21TestRunner(verbosity=verbosity)
         try:
             testResult = runner.run(s1)  
             
@@ -96,7 +97,7 @@ def runOneModuleWithoutImp(args):
             failures = []
             for f in testResult.failures:
                 failures.append(f[1])
-            runTime = int(time.time() - timeStart)
+            runTime = round(10*(time.time() - timeStart))/10.0
             return ModuleResponse("TestsRun", fp, moduleName, testResult.wasSuccessful(), 
                                   str(testResult), errors, failures, testResult.testsRun, runTime)
         except Exception as excp: # pylint: disable=broad-except
@@ -111,6 +112,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
     '''
     Run all tests. Group can be test and/or external
     '''    
+    normalStdError = sys.stderr
     
     timeStart = time.time()
     poolSize = multiprocessing.cpu_count() # @UndefinedVariable
@@ -147,8 +149,22 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
             newResult = res.next(timeout=1)
             if timeouts >= 5:
                 print("")
-            if newResult.testRunner is not None:
-                print("%s: %s" % (newResult.moduleName, newResult.testRunner))
+            if newResult is not None:
+                mn = newResult.moduleName
+                mn = mn.replace('___init__', '')
+                mn = mn.replace('_', '.')
+                if not newResult.errors and not newResult.failures:
+                    print("\t\t\t\t{0}: {1} tests in {2} secs".format(
+                                        mn,
+                                        newResult.testsRun,
+                                        round(newResult.runTime * 10)/10.0))
+                else:
+                    print("\t\t\t\t{0}: {1} tests, {2} errors {3} failures in {4} secs".format(
+                                        mn,
+                                        newResult.testsRun,
+                                        len(newResult.errors),
+                                        len(newResult.failures),
+                                        round(newResult.runTime * 10)/10.0))
             timeouts = 0
             eventsProcessed += 1
             summaryOutput.append(newResult)
@@ -175,6 +191,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
             exceptionLog = ModuleResponse("UntrappedException", None, "%s" % excp)
             summaryOutput.append(exceptionLog)
 
+    sys.stderr = normalStdError
     printSummary(summaryOutput, timeStart, pathsToRun)
 
 def printSummary(summaryOutput, timeStart, pathsToRun):
