@@ -25,7 +25,6 @@ from music21 import duration
 from music21 import exceptions21
 from music21 import interval
 from music21 import editorial
-#from music21 import midi as midiModule
 from music21 import expressions
 from music21 import pitch
 from music21 import beam
@@ -1362,6 +1361,7 @@ class Note(NotRest):
         post.pitch.transpose(intervalObj, inPlace=True)
 
         if not inPlace:
+            post.derivation.method = 'transpose'
             return post
         else:
             return None

@@ -170,23 +170,24 @@ class Groups(list): # no need to inherit from slotted object
     # this speeds up creation slightly...
     __slots__ = ()
     
-    def append(self, value):
-        if isinstance(value, six.string_types):
-            # do not permit the same entry more than once
-            if not list.__contains__(self, value):
-                list.append(self, value)
-        else:
+    def _validName(self, value):
+        if not isinstance(value, six.string_types):
             raise exceptions21.GroupException("Only strings can be used as group names")
+        if ' ' in value:
+            raise exceptions21.GroupException("Spaces are not allowed as group names")
+    
+    def append(self, value):
+        self._validName(value)
+        if not list.__contains__(self, value):
+            list.append(self, value)
 
     def __setitem__(self, i, y):
-        if isinstance(y, six.string_types):
-            list.__setitem__(self, i, y)
-        else:
-            raise exceptions21.GroupException("Only strings can be used as group names")
+        self._validName(y)
+        list.__setitem__(self, i, y)
 
     def __eq__(self, other):
         '''
-        Test Group equality. In normal lists, order matters; here it does not.
+        Test Group equality. In normal lists, order matters; here it does not. More like a set.
 
         >>> a = base.Groups()
         >>> a.append('red')
@@ -252,26 +253,24 @@ class Music21Object(object):
     '''
     Base class for all music21 objects.
 
-    All music21 objects have seven pieces of information:
+    All music21 objects have these pieces of information:
 
-    1.  id: identification string unique to the objects container (optional)
+    1.  id: identification string unique to the objects container (optional).  Defaults to the
+        `id()` of the element.
     2.  groups: a Groups object: which is a list of strings identifying
         internal subcollections (voices, parts, selections) to which this
         element belongs
     3.  duration: Duration object representing the length of the object
-    4.  activeSite: a weakreference to the currently active Location
+    4.  activeSite: a reference to the currently active Stream or None
     5.  offset: a floating point value, generally in quarter lengths,
         specifying the position of the object in a site.
     6.  priority: int representing the position of an object among all
         objects at the same offset.
-    7.  sites: a Sites object that stores all the Streams and Contexts that an
+    7.  sites: a :class:`~music21.base.Sites` object that stores all 
+        the Streams and Contexts that an
         object is in.
-
-    Contexts, locations, and offsets are stored in a
-    :class:`~music21.base.Sites` object.  Locations specify connections of this
-    object to one location in a Stream subclass.  Contexts are weakrefs for
-    current objects that are associated with this object (similar to locations
-    but without an offset)
+    8.  derivation: a :class:`~music21.derivation.Derivation` object, or None, that shows
+        where the object came from.
 
     Each of these may be passed in as a named keyword to any music21 object.
 
@@ -299,7 +298,6 @@ class Music21Object(object):
     _DOC_ORDER = [
         'classes',
         'classSet',
-        'findAttributeInHierarchy',
         ]
 
     # documentation for all attributes (not properties or methods)
@@ -309,11 +307,11 @@ class Music21Object(object):
         'groups': '''An instance of a :class:`~music21.base.Group` object which describes 
             arbitrary `Groups` that this object belongs to.''',
         'isStream': '''Boolean value for quickly identifying 
-            :class:`~music21.stream.Stream` objects (False by default).''',
+            :class:`~music21.stream.Stream` objects (False by default). Deprecated''',
         'isSpanner': '''Boolean value for quickly identifying
-             :class:`~music21.spanner.Spanner` objects (False by default).''',
+             :class:`~music21.spanner.Spanner` objects (False by default). Deprecated''',
         'isVariant': '''Boolean value for quickly identifying 
-            :class:`~music21.variant.Variant` objects (False by default).''',
+            :class:`~music21.variant.Variant` objects (False by default). Deprecated''',
         'classSortOrder' : '''Property which returns an number (int or otherwise)
             depending on the class of the Music21Object that
             represents a priority for an object based on its class alone --
@@ -948,19 +946,13 @@ class Music21Object(object):
         '''
         return self.sites.setAttrByName(attrName, value)
 
+    @common.deprecated('October 2015', 'February 2016', 
+                       'use `site in n.sites` or `n.sites.hasSiteId(id(site))` instead')
     def hasSite(self, other):
         '''
         Return True if other is a site in this Music21Object
 
         Matches on id(other)
-
-        >>> s = stream.Stream()
-        >>> n = note.Note()
-        >>> s.append(n)
-        >>> n.hasSite(s)
-        True
-        >>> n.hasSite(stream.Stream())
-        False
         '''
         return id(other) in self.sites.getSiteIds()
 
@@ -1433,7 +1425,7 @@ class Music21Object(object):
         selfSites = self.sites.getSites(excludeNone=True)
         match = None
 
-        # store ids of of first sites; might need to take flattened version
+        # store ids of first sites; might need to take flattened version
         firstSites = []
         for s in selfSites:
             firstSites.append(id(s))
@@ -2189,7 +2181,7 @@ class Music21Object(object):
             self._duration = durationObj
             durationObj.client = self
             if replacingDuration:
-                self.durationChanged(ql)
+                self.informSites({'changedElement': 'duration', 'quarterLength': ql})
                 
         except AttributeError:
             # need to permit Duration object assignment here
@@ -2200,9 +2192,13 @@ class Music21Object(object):
         Get and set the duration of this object as a Duration object.
         ''')
 
-    def durationChanged(self, newQuarterLength):
+    def informSites(self, changedInformation=None):
         '''
-        trigger called whenever the duration has changed.
+        trigger called whenever sites need to be informed of a change
+        in the parameters of this object.
+        
+        `changedInformation` is not used now, but it can be a dictionary
+        of what has changed.
         
         subclass this to do very interesting things.
         '''
@@ -2230,14 +2226,14 @@ class Music21Object(object):
     def _setPriority(self, value):
         '''
         value is an int.
+        
+        Informs all sites of the change.
         '''
         if not isinstance(value, int):
             raise ElementException('priority values must be integers.')
         if self._priority != value:
             self._priority = value
-            # TODO: set priority in each site?
-            #for s in self.sites.getSites(excludeNone=True):
-            #    pass
+            self.informSites({'changedElement': 'priority', 'priority': value})
 
     priority = property(_getPriority, _setPriority,
         doc = '''
@@ -2358,6 +2354,9 @@ class Music21Object(object):
                 fmt = environLocal['showFormat']
         elif fmt.startswith('.'):
             fmt = fmt[1:]
+        elif common.runningUnderIPython() and fmt.startswith('midi'):
+            fmt = 'ipython.' + fmt 
+        
         regularizedConverterFormat, unused_ext = common.findFormat(fmt)
         if regularizedConverterFormat is None:
             raise Music21ObjectException('cannot support showing in this format yet: %s' % fmt)
@@ -3734,7 +3733,7 @@ class Test(unittest.TestCase):
         # the activeSite of measures[1] is set to the new output stream
         self.assertEqual(measures[1].activeSite, measures)
         # the source Part should still be a context of this measure
-        self.assertEqual(measures[1].hasSite(a.parts[0]), True)
+        self.assertEqual(a.parts[0] in measures[1].sites, True)
 
         # from the first measure, we can get the clef by using
         # getElementsByClass
@@ -3757,9 +3756,9 @@ class Test(unittest.TestCase):
         newStream = stream.Stream()
         newStream.insert(0, measures[3])
         # all previous locations are still available as a context
-        self.assertEqual(measures[3].hasSite(newStream), True)
-        self.assertEqual(measures[3].hasSite(measures), True)
-        self.assertEqual(measures[3].hasSite(a.parts[0]), True)
+        self.assertTrue(newStream in measures[3].sites)
+        self.assertTrue(measures in measures[3].sites)
+        self.assertTrue(a.parts[0] in measures[3].sites)
         # we can still access the clef through this measure on this
         # new stream
         post = newStream[0].getContextByClass(clef.Clef)
@@ -4099,8 +4098,8 @@ class Test(unittest.TestCase):
         self.assertEqual(s2.hasElement(n1), False)
         self.assertEqual(s2.hasElement(n2), True)
 
-        self.assertEqual(n2.hasSite(s1), False)
-        self.assertEqual(n2.hasSite(s2), True)
+        self.assertFalse(s1 in n2.sites)
+        self.assertTrue(s2 in n2.sites)
 
     def testGetContextByClassA(self):
         from music21 import stream, note, tempo
@@ -4374,8 +4373,15 @@ class Test(unittest.TestCase):
         self.assertEqual(measures[3].previous(), measures[2])
         self.assertEqual(measures[3].previous(flattenLocalSites=True), measures[2][-1])
 
-        self.assertEqual(measures[3].next(), measures[4])
+        m3n = measures[3].next()
+        self.assertEqual(m3n, measures[4])
         self.assertEqual(measures[3].next('Note', flattenLocalSites=True), measures[3].notes[0])
+
+        m3nn = m3n.next()
+        self.assertEqual(m3nn, measures[5])
+        m3nnn = m3nn.next()
+        self.assertEqual(m3nnn, measures[6])
+
 
         self.assertEqual(measures[3].previous().previous(), measures[1])
         self.assertEqual(measures[3].previous().previous().previous(), measures[0])

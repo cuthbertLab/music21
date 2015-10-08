@@ -1529,8 +1529,8 @@ class Test(unittest.TestCase):
         self.assertEqual(isinstance(post, clef.TrebleClef), True)
 
         # s1 has both streams as sites
-        self.assertEqual(s1.hasSite(s3), True)
-        self.assertEqual(s1.hasSite(s2), True)
+        self.assertEqual(s3 in s1.sites, True)
+        self.assertEqual(s2 in s1.sites, True)
 
         # but if we search s1, shuold not it find an alto clef?
         post = s1.getClefs()
@@ -1585,12 +1585,12 @@ class Test(unittest.TestCase):
         sInnerFlat.id = 'sInnerFlat'
 
 #         # but it has sOuter has a context
-#         self.assertEqual(sInnerFlat.hasSite(sOuter), True)
+#         self.assertEqual(sOuter in sInnerFlat.sites, True)
 #         #environLocal.printDebug(['sites.get() of sInnerFlat', sInnerFlat.sites.get()])
 #         #environLocal.printDebug(['sites.siteDict of sInnerFlat', sInnerFlat.sites.siteDict])
 # 
 # 
-#         self.assertEqual(sInnerFlat.hasSite(sOuter), True)
+#         self.assertEqual(sOuter in sInnerFlat.sites, True)
 # 
 #         # this returns the proper dictionary entry
 #         #environLocal.printDebug(
@@ -2894,7 +2894,7 @@ class Test(unittest.TestCase):
 
 # temporarily commented out
 #         m.shiftElementsAsAnacrusis()
-#         self.assertEqual(m.notesAndRests[0].hasSite(m), True)
+#         self.assertEqual(m in m.notesAndRests[0].sites, True)
 #         self.assertEqual(m.notesAndRests[0].offset, 2.0)
 #         # now the duration is full
 #         self.assertAlmostEqual(m.barDurationProportion(), 1.0, 4)
@@ -3400,29 +3400,6 @@ class Test(unittest.TestCase):
 
 
 
-
-
-    def testMidiEventsImported(self):
-
-        from music21 import corpus
-
-        def procCompare(mf, match):
-            triples = []
-            for i in range(0, len(mf.tracks[0].events), 2):
-                d  = mf.tracks[0].events[i] # delta
-                e  = mf.tracks[0].events[i+1] # events
-                triples.append((d.time, e.type, e.pitch))
-            self.assertEqual(triples, match)
-        
-
-        s = corpus.parse('bach/bwv66.6')
-        part = s.parts[0].measures(6,9) # last meausres
-        #part.show('musicxml')
-        #part.show('midi')
-
-        mf = midiTranslate.streamToMidiFile(part)
-        match = [(0, 'SEQUENCE_TRACK_NAME', None), (0, 'PROGRAM_CHANGE', None), (0, 'PITCH_BEND', None), (0, 'PROGRAM_CHANGE', None), (0, 'KEY_SIGNATURE', None), (0, 'TIME_SIGNATURE', None), (0, 'NOTE_ON', 69), (1024, 'NOTE_OFF', 69), (0, 'NOTE_ON', 71), (1024, 'NOTE_OFF', 71), (0, 'NOTE_ON', 73), (1024, 'NOTE_OFF', 73), (0, 'NOTE_ON', 69), (1024, 'NOTE_OFF', 69), (0, 'NOTE_ON', 68), (1024, 'NOTE_OFF', 68), (0, 'NOTE_ON', 66), (1024, 'NOTE_OFF', 66), (0, 'NOTE_ON', 68), (2048, 'NOTE_OFF', 68), (0, 'NOTE_ON', 66), (2048, 'NOTE_OFF', 66), (0, 'NOTE_ON', 66), (1024, 'NOTE_OFF', 66), (0, 'NOTE_ON', 66), (2048, 'NOTE_OFF', 66), (0, 'NOTE_ON', 66), (512, 'NOTE_OFF', 66), (0, 'NOTE_ON', 65), (512, 'NOTE_OFF', 65), (0, 'NOTE_ON', 66), (1024, 'NOTE_OFF', 66), (0, 'END_OF_TRACK', None)]
-        procCompare(mf, match)
 
 
     def testFindGaps(self):

@@ -228,29 +228,29 @@ class ConverterIPython(SubConverter):
     registerFormats = ('ipython',)
     registerOutputExtensions = ()
     registerOutputSubformatExtensions = {'lilypond': 'ly'}
-    def vfshow(self, s):
-        '''
-        pickle this object and send it to Vexflow
-        
-        Alpha -- does not work too well.
-        '''
-        import random
-        from music21.vexflow import toMusic21j
-        from IPython.display import HTML # @UnresolvedImport
-        vfp = toMusic21j.VexflowPickler()
-        vfp.mode = 'jsonSplit'
-        outputCode = vfp.fromObject(s)
-        idName = 'canvasDiv' + str(random.randint(0, 10000))
-        htmlBlock = '<div id="' + idName + '"><canvas/></div>'
-        js = '''
-        <script>
-             data = ''' + outputCode + ''';       
-             var jpc = new music21.jsonPickle.Converter();
-             var streamObj = jpc.run(data);
-             streamObj.replaceCanvas("#''' + idName + '''");
-        </script>
-        '''
-        return HTML(htmlBlock + js)
+#     def vfshow(self, s):
+#         '''
+#         pickle this object and send it to Vexflow
+#         
+#         Alpha -- does not work too well.
+#         '''
+#         import random
+#         from music21.vexflow import toMusic21j
+#         from IPython.display import HTML # @UnresolvedImport
+#         vfp = toMusic21j.VexflowPickler()
+#         vfp.mode = 'jsonSplit'
+#         outputCode = vfp.fromObject(s)
+#         idName = 'canvasDiv' + str(random.randint(0, 10000))
+#         htmlBlock = '<div id="' + idName + '"><canvas/></div>'
+#         js = '''
+#         <script>
+#              data = ''' + outputCode + ''';       
+#              var jpc = new music21.jsonPickle.Converter();
+#              var streamObj = jpc.run(data);
+#              streamObj.replaceCanvas("#''' + idName + '''");
+#         </script>
+#         '''
+#         return HTML(htmlBlock + js)
     
     def show(self, obj, fmt, app=None, subformats=None, **keywords):
         '''
@@ -266,36 +266,61 @@ class ConverterIPython(SubConverter):
         helperSubformats = subformats[1:]
         
         from music21 import converter
+        
         helperConverter = converter.Converter()
         helperConverter.setSubconverterFromFormat(helperFormat)
         helperSubConverter = helperConverter.subConverter
-        ### hack to make musescore excerpts -- fix with a converter class in MusicXML
-        savedDefaultTitle = defaults.title
-        savedDefaultAuthor = defaults.author
-        defaults.title = ''
-        defaults.author = ''
+
+        if helperFormat == 'musicxml':        
+            ### hack to make musescore excerpts -- fix with a converter class in MusicXML
+            savedDefaultTitle = defaults.title
+            savedDefaultAuthor = defaults.author
+            defaults.title = ''
+            defaults.author = ''
+            
+            if 'Opus' not in obj.classes:
+                fp = helperSubConverter.write(obj, helperFormat, subformats=helperSubformats)
         
-        if 'Opus' not in obj.classes:
-            fp = helperSubConverter.write(obj, helperFormat, subformats=helperSubformats)
-    
-            defaults.title = savedDefaultTitle
-            defaults.author = savedDefaultAuthor
-            if helperSubformats[0] == 'png':
-                from music21.ipython21 import objects as ipythonObjects
-                ipo = ipythonObjects.IPythonPNGObject(fp)
-                return ipo
-        else:
-            from IPython.display import Image, display # @UnresolvedImport
-            for s in obj.scores:
-                fp = helperSubConverter.write(s, helperFormat, subformats=helperSubformats)
-        
+                defaults.title = savedDefaultTitle
+                defaults.author = savedDefaultAuthor
                 if helperSubformats[0] == 'png':
-                    from music21.ipython21 import objects as ipythonObjects # @Reimport
+                    from music21.ipython21 import objects as ipythonObjects
                     ipo = ipythonObjects.IPythonPNGObject(fp)
-                    display(Image(filename=ipo.fp, retina=True))
-            defaults.title = savedDefaultTitle
-            defaults.author = savedDefaultAuthor
-            return None
+                    return ipo
+            else:
+                from IPython.display import Image, display # @UnresolvedImport
+                for s in obj.scores:
+                    fp = helperSubConverter.write(s, helperFormat, subformats=helperSubformats)
+            
+                    if helperSubformats[0] == 'png':
+                        from music21.ipython21 import objects as ipythonObjects # @Reimport
+                        ipo = ipythonObjects.IPythonPNGObject(fp)
+                        display(Image(filename=ipo.fp, retina=True))
+                defaults.title = savedDefaultTitle
+                defaults.author = savedDefaultAuthor
+                return None
+        elif helperFormat == 'midi':
+            import base64
+            from IPython.display import HTML, display # @UnresolvedImport @Reimport
+            fp = helperSubConverter.write(obj, helperFormat, subformats=helperSubformats)
+            with open(fp, 'rb') as f:
+                binaryMidiData = f.read()
+            binaryBase64 = base64.b64encode(binaryMidiData)
+            s = common.SingletonCounter()
+            outputId = "midiPlayerDiv" + str(s())
+            display(HTML("""
+                <div id='""" + outputId + """'></div>
+                <link rel="stylesheet" href="http://artusi.xyz/music21j/css/m21.css" type="text/css" />
+                <script>
+                require.config({
+                    paths: {'music21': 'http://artusi.xyz/music21j/src/music21'} 
+                }); 
+                require(['music21'], function() { 
+                               mp = new music21.miditools.MidiPlayer();
+                               mp.addPlayer('#""" + outputId + """'); 
+                               mp.base64Load('data:audio/midi;base64,""" + binaryBase64.decode('utf-8') + """'); 
+                        });
+                </script>"""))
                 
 class ConverterLilypond(SubConverter):
     registerFormats = ('lilypond', 'lily')
