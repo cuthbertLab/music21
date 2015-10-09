@@ -198,13 +198,7 @@ class Spanner(base.Music21Object):
     When we're done adding elements:
     
     >>> sp1.completeStatus = True
-    
-    
-
     '''
-    # this class attribute provides performance optimized class selection
-    isSpanner = True 
-
     def __init__(self, *arguments, **keywords):
         base.Music21Object.__init__(self)
 

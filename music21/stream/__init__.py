@@ -1234,11 +1234,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # iterate over complete semi-flat (need containers); find
             # all new/old pairs
             for e in new.recurse(skipSelf=True):
-                #if 'Spanner' in e.classes:
-                if e.isSpanner:
-                    continue # we never update Spanners
                 # update based on id of old object, and ref to new object
-                if e.sites.hasSpannerSite():
+                if e.sites.hasSpannerSite() and 'Spanner' not in e.classes:
                     #environLocal.printDebug(['Stream.__deepcopy__', 'replacing component to', e])
                     # this will clear and replace the proper locations on
                     # the SpannerStorage Stream

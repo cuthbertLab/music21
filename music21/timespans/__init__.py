@@ -180,9 +180,9 @@ def listOfTimespanTreesByClass(
         offset = element.getOffsetBySite(lastParentage) + initialOffset
         wasStream = False
         
-        if element.isStream and \
-                not element.isSpanner and \
-                not element.isVariant:
+        if (element.isStream and
+                'Spanner' not in element.classes and
+                'Variant' not in element.classes): # is this redundant? are variants streams?
             localParentage = currentParentage + (element,)
             containedTimespanTrees = listOfTimespanTreesByClass(
                 element,

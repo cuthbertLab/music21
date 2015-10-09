@@ -1954,7 +1954,6 @@ class Variant(base.Music21Object):
     '''
 
     classSortOrder = stream.Stream.classSortOrder - 2  # variants should always come first?
-    isVariant = True
 
     # this copies the init of Streams
     def __init__(self, givenElements=None, *args, **keywords):

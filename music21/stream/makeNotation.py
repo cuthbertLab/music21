@@ -490,7 +490,7 @@ def makeMeasures(
         # can contain this element
 
         # collect all spanners and move to outer Stream
-        if e.isSpanner:
+        if 'Spanner' in e.classes:
             spannerBundleAccum.append(e)
             continue
 

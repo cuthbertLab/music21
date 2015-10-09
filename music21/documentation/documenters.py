@@ -393,9 +393,7 @@ class ClassDocumenter(ObjectDocumenter):
        - :attr:`~music21.base.Music21Object.groups`
        - :attr:`~music21.base.Music21Object.hideObjectOnPrint`
        - :attr:`~music21.base.Music21Object.id`
-       - :attr:`~music21.base.Music21Object.isSpanner`
        - :attr:`~music21.base.Music21Object.isStream`
-       - :attr:`~music21.base.Music21Object.isVariant`
        - :attr:`~music21.base.Music21Object.xPosition`    
     '''
 

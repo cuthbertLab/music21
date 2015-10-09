@@ -283,7 +283,7 @@ class StreamFreezer(StreamFreezeThawBase):
             self.findActiveStreamIdsInHierarchy(streamObj)
 
         for el in allEls:
-            if el.isVariant:
+            if 'Variant' in el.classes:
                 # works like a whole new hierarchy... # no need for deepcopy
                 subSF = StreamFreezer(
                     el._stream,
@@ -292,7 +292,7 @@ class StreamFreezer(StreamFreezeThawBase):
                     topLevel=False,
                     )
                 subSF.setupSerializationScaffold()
-            elif el.isSpanner:
+            elif 'Spanner' in el.classes:
                 # works like a whole new hierarchy... # no need for deepcopy
                 subSF = StreamFreezer(
                     el.spannerStorage,
@@ -389,9 +389,9 @@ class StreamFreezer(StreamFreezeThawBase):
             for el, unused_offset in seot:
                 if el.isStream:
                     self.recursiveClearSites(el)
-                if el.isSpanner:
+                if 'Spanner' in el.classes:
                     self.recursiveClearSites(el.spannerStorage)
-                if el.isVariant:
+                if 'Variant' in el.classes:
                     self.recursiveClearSites(el._stream)
                 if hasattr(el, '_derivation'):
                     el._derivation = derivation.Derivation() #reset
@@ -596,7 +596,7 @@ class StreamFreezer(StreamFreezeThawBase):
 
         if getVariants is True:
             for el in streamObj.recurse():
-                if el.isVariant is True:
+                if 'Variant' in el.classes:
                     streamIds += self.findActiveStreamIdsInHierarchy(el._stream)
 
         # should not happen that there are duplicates, but possible with spanners...
@@ -792,7 +792,7 @@ class StreamThawer(StreamFreezeThawBase):
         allEls = self.findAllM21Objects(streamObj)
 
         for e in allEls:
-            if e.isVariant:
+            if 'Variant' in e.classes:
 #                # works like a whole new hierarchy... # no need for deepcopy
                 subSF = StreamThawer()
                 subSF.teardownSerializationScaffold(e._stream)
@@ -800,7 +800,7 @@ class StreamThawer(StreamFreezeThawBase):
                 e._cache = {}
                 #for el in e._stream.flat:
                 #    print el, el.offset, el.sites.siteDict
-            elif e.isSpanner:
+            elif 'Spanner' in e.classes:
                 subSF = StreamThawer()
                 subSF.teardownSerializationScaffold(e.spannerStorage)
                 e.spannerStorage.elementsChanged()

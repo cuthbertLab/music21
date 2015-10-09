@@ -281,8 +281,6 @@ class Music21Object(object):
     classSortOrder = 20  # default classSortOrder
     # these values permit fast class comparisons for performance critical cases
     isStream = False
-    isSpanner = False
-    isVariant = False
 
 
     # this dictionary stores as a tuple of strings for each Class so that
@@ -308,10 +306,6 @@ class Music21Object(object):
             arbitrary `Groups` that this object belongs to.''',
         'isStream': '''Boolean value for quickly identifying 
             :class:`~music21.stream.Stream` objects (False by default). Deprecated''',
-        'isSpanner': '''Boolean value for quickly identifying
-             :class:`~music21.spanner.Spanner` objects (False by default). Deprecated''',
-        'isVariant': '''Boolean value for quickly identifying 
-            :class:`~music21.variant.Variant` objects (False by default). Deprecated''',
         'classSortOrder' : '''Property which returns an number (int or otherwise)
             depending on the class of the Music21Object that
             represents a priority for an object based on its class alone --
