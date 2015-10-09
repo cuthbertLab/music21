@@ -7539,8 +7539,8 @@ class Test(unittest.TestCase):
         for i in range(len(bass.notes)-1):
             note1 = bass.notes[i]
             note2 = bass.getElementAfterElement(note1, ['Note'])
-            note3 = sop.playingWhenAttacked(note1)
-            note4 = sop.playingWhenAttacked(note2)
+            unused_note3 = sop.playingWhenAttacked(note1)
+            unused_note4 = sop.playingWhenAttacked(note2)
             #print(note1, note2, note3, note4)
             #print(note1.id, note2.id, note3.id, note4.id)
         # TEST???

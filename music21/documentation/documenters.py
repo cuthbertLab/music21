@@ -375,6 +375,7 @@ class ClassDocumenter(ObjectDocumenter):
     Methods inherited from :class:`~music21.base.Music21Object`:
     .. hlist::
        :columns: 3
+       - :meth:`~music21.base.Music21Object.containerHierarchy`
        - :meth:`~music21.base.Music21Object.contextSites`
        - :meth:`~music21.base.Music21Object.getAllContextsByClass`
                 ...
@@ -686,7 +687,6 @@ class ClassDocumenter(ObjectDocumenter):
         music21.base.Music21Object:
         - music21.base.Music21Object.classSet
         - music21.base.Music21Object.classes
-        - music21.base.Music21Object.containerHierarchy
         - music21.base.Music21Object.isGrace
         - music21.base.Music21Object.measureNumber
         music21.stream.Stream:
@@ -723,6 +723,7 @@ class ClassDocumenter(ObjectDocumenter):
         ...             attributeDocumenter.referentPackagesystemPath))
         ...
         music21.base.Music21Object:
+        - music21.base.Music21Object.containerHierarchy
         - music21.base.Music21Object.contextSites      
         - music21.base.Music21Object.getAllContextsByClass
         - music21.base.Music21Object.getContextAttr
@@ -732,7 +733,6 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.base.Music21Object.hasSite
         - music21.base.Music21Object.informSites
         - music21.base.Music21Object.isClassOrSubclass
-        - music21.base.Music21Object.next
         music21.stream.Stream:
         - music21.stream.Stream.activateVariants
         - music21.stream.Stream.addGroupForElements
@@ -1007,7 +1007,6 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.beatStrength`'
         '   - :attr:`~music21.base.Music21Object.classSet`'
         '   - :attr:`~music21.base.Music21Object.classes`'
-        '   - :attr:`~music21.base.Music21Object.containerHierarchy`'
         '   - :attr:`~music21.base.Music21Object.isGrace`'
         '   - :attr:`~music21.base.Music21Object.measureNumber`'
         ''
@@ -1109,7 +1108,7 @@ class ClassDocumenter(ObjectDocumenter):
         '.. hlist::'
         '   :columns: 3'
         ''
-        '   - :meth:`~music21.base.Music21Object.contextSites`'
+        '   - :meth:`~music21.base.Music21Object.containerHierarchy`'
         ...
         '   - :meth:`~music21.base.Music21Object.splitByQuarterLengths`'
         ''
@@ -1154,7 +1153,6 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.beatStrength`'
         '   - :attr:`~music21.base.Music21Object.classSet`'
         '   - :attr:`~music21.base.Music21Object.classes`'
-        '   - :attr:`~music21.base.Music21Object.containerHierarchy`'
         '   - :attr:`~music21.base.Music21Object.isGrace`'
         '   - :attr:`~music21.base.Music21Object.measureNumber`'
         ''
