@@ -21,7 +21,6 @@ users won't need to worry about.
 from music21.timespans import node as nodeModule
 from music21.exceptions21 import TimespanException
 
-
 class AVLTree(object):
     r'''
     Data structure for working with timespans.node.AVLNode objects.
@@ -72,14 +71,6 @@ class AVLTree(object):
                         
         return recurse(self.rootNode)
 
-    def insert(self, node, offset):
-        '''
-        Insert a node at `offset` and rebalance the tree
-        setting the new rootNode.
-        
-        Returns None
-        '''
-        self.rootNode = self._insertNode(node, offset)
 
     def _insertNode(self, node, offset):
         r'''
@@ -88,9 +79,40 @@ class AVLTree(object):
         Used internally by TimespanTree.
 
         Returns a node which should be set to the new rootNode
+        
+        Note that if a node already exists at that place, nothing happens.
+        
+        
+        >>> avl = timespans.core.AVLTree()
+        >>> avl.rootNode = avl._insertNode(avl.rootNode, 20)
+        >>> avl.rootNode
+        <Node: Start:20 Height:0 L:None R:None>        
+        
+        >>> avl.rootNode = avl._insertNode(avl.rootNode, 10)
+        >>> avl.rootNode
+        <Node: Start:20 Height:1 L:0 R:None>
+
+        >>> avl.rootNode = avl._insertNode(avl.rootNode, 5)
+        >>> avl.rootNode
+        <Node: Start:10 Height:1 L:0 R:0>
+        
+        >>> avl.rootNode = avl._insertNode(avl.rootNode, 30)
+        >>> avl.rootNode
+        <Node: Start:10 Height:2 L:0 R:1>
+        >>> avl.rootNode.leftChild
+        <Node: Start:5 Height:0 L:None R:None>
+        >>> avl.rootNode.rightChild
+        <Node: Start:20 Height:1 L:None R:0>
+        
+        >>> avl.rootNode.rightChild.rightChild
+        <Node: Start:30 Height:0 L:None R:None>
+
         '''
         if node is None:
+            # if we get to the point where a node does not have a
+            # left or right child, make a new node at this offset...
             return self.nodeClass(offset)
+        
         if offset < node.offset:
             node.leftChild = self._insertNode(node.leftChild, offset)
             node.update()

@@ -215,11 +215,11 @@ class AVLNode(common.SlottedObject):
     
     ### INITIALIZER ###
 
-    def __init__(self, offset):
+    def __init__(self, offset, payload=None):
         self.balance = 0
         self.height = 0        
         self.offset = offset
-        self.payload = None
+        self.payload = payload
 
         self.leftChild = None
         self.rightChild = None
