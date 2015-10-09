@@ -21,7 +21,6 @@ users won't need to worry about.
 from music21.timespans import node as nodeModule
 from music21.exceptions21 import TimespanException
 
-
 class AVLTree(object):
     r'''
     Data structure for working with timespans.node.AVLNode objects.
@@ -71,17 +70,7 @@ class AVLTree(object):
                 if node.rightChild is not None:
                     for n in recurse(node.rightChild):
                         yield n
-                        
         return recurse(self.rootNode)
-
-    def insert(self, node, offset):
-        '''
-        Insert a node at `offset` and rebalance the tree
-        setting the new rootNode.
-        
-        Returns None
-        '''
-        self.rootNode = self._insertNode(node, offset)
 
     def _insertNode(self, node, offset):
         r'''
@@ -95,10 +84,8 @@ class AVLTree(object):
             return self.nodeClass(offset)
         if offset < node.offset:
             node.leftChild = self._insertNode(node.leftChild, offset)
-            node.update()
         elif node.offset < offset:
             node.rightChild = self._insertNode(node.rightChild, offset)
-            node.update()
         return self._rebalance(node)
 
 
@@ -158,10 +145,7 @@ class AVLTree(object):
         '''
         nextNode = node.leftChild
         node.leftChild = nextNode.rightChild
-        node.update()
         nextNode.rightChild = node
-        nextNode.update()
-
         return nextNode
 
     def _rotateLeftRight(self, node):
@@ -173,7 +157,6 @@ class AVLTree(object):
         Returns a node.
         '''
         node.leftChild = self._rotateRightRight(node.leftChild)
-        node.update()
         nextNode = self._rotateLeftLeft(node)
         return nextNode
 
@@ -186,7 +169,6 @@ class AVLTree(object):
         Returns a node.
         '''
         node.rightChild = self._rotateLeftLeft(node.rightChild)
-        node.update()
         nextNode = self._rotateRightRight(node)
         return nextNode
 
@@ -200,9 +182,7 @@ class AVLTree(object):
         '''
         nextNode = node.rightChild
         node.rightChild = nextNode.leftChild
-        node.update()
         nextNode.leftChild = node
-        nextNode.update()
         return nextNode
 
     def _getNodeByOffset(self, node, offset):
@@ -337,15 +317,17 @@ class AVLTree(object):
                     node.offset = nextNode.offset
                     node.payload = nextNode.payload
                     node.rightChild = self._remove(node.rightChild, nextNode.offset)
-                    node.update()
                 else:
                     node = node.leftChild or node.rightChild
             elif node.offset > offset:
                 node.leftChild = self._remove(node.leftChild, offset)
-                node.update()
             elif node.offset < offset:
                 node.rightChild = self._remove(node.rightChild, offset)
-                node.update()
         return self._rebalance(node)
+    
+#------------------------------------------------------------------------------
 
-#-------------------------------#
+
+if __name__ == "__main__":
+    import music21
+    music21.mainTest()
