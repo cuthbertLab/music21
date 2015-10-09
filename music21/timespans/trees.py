@@ -891,7 +891,8 @@ class TimespanTree(ElementTree):
     score at once:
 
     >>> bach = corpus.parse('bwv66.6')
-    >>> tree = timespans.streamToTimespanTree(bach, flatten=True, classList=(note.Note, chord.Chord))
+    >>> tree = timespans.streamToTimespanTree(bach, flatten=True, 
+    ...            classList=(note.Note, chord.Chord))
     >>> print(tree.getVerticalityAt(17.0))
     <Verticality 17.0 {F#3 C#4 A4}>
 
@@ -1031,7 +1032,8 @@ class TimespanTree(ElementTree):
             if verticality is None:
                 return None
             for nextElementTimespan in verticality.startTimespans:
-                if nextElementTimespan.getParentageByClass(classList) is elementTimespan.getParentageByClass(classList):
+                if (nextElementTimespan.getParentageByClass(classList) is 
+                        elementTimespan.getParentageByClass(classList)):
                     return nextElementTimespan
 
     def findPreviousElementTimespanInSameStreamByClass(self, elementTimespan, classList=None):
@@ -1072,7 +1074,8 @@ class TimespanTree(ElementTree):
             if verticality is None:
                 return None
             for previousElementTimespan in verticality.startTimespans:
-                if previousElementTimespan.getParentageByClass(classList) is elementTimespan.getParentageByClass(classList):
+                if (previousElementTimespan.getParentageByClass(classList) is 
+                        elementTimespan.getParentageByClass(classList)):
                     return previousElementTimespan
 
     def getVerticalityAt(self, offset):
