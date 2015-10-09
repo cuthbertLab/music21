@@ -649,7 +649,9 @@ class ElementTree(core.AVLTree):
             if not common.isListLike(offsets):
                 offsets = [offsets]
         
-        if not common.isListLike(elements): # not a list. a single element or timespan
+        if (not common.isListLike(elements) and
+                not isinstance(elements, (set, frozenset))
+                ): # not a list. a single element or timespan
             elements = [elements]
         if offsets is None:
             offsets = [el.offset for el in elements]
