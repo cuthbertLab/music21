@@ -3566,8 +3566,6 @@ class Test(unittest.TestCase):
         # can get the same from a recurse search
         self.assertEqual(len(s.recurse().getElementsByClass('Spanner')), 5)
 
-        # try to get all spanners from the first note
-        self.assertEqual(len(s.flat.notesAndRests[0].getAllContextsByClass('Spanner')), 5)
         #s.show('t')
         #s.show()
 

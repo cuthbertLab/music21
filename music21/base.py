@@ -1154,10 +1154,26 @@ class Music21Object(object):
         not its Sites reference.
 
         The `getElementMethod` is a string that selects which Stream method is
-        used to get elements for searching. The strings 'getElementAtOrBefore'
-        and 'getElementBeforeOffset' are currently accepted.
-
+        used to get elements for searching. These strings are accepted:
+        
+        *    'getElementAtOrBefore'
+        *    'getElementBeforeOffset'
+        *    'getElementAtOrAfter'
+        *    'getElementAfterOffset'
+        
+        Use at or before to avoid getting the same element over and over again
+        in a recursive context search.
+        
+        The latter two do forward contexts -- looking ahead.
+        
+        
+        
         OMIT_FROM_DOCS
+
+        TODO: these should actually be sort tuples, so that we can avoid the case of 
+        skipping elements that are at the same offset...
+
+
 
         >>> s = corpus.parse('bwv66.6')
         >>> noteA = s[1][2][0]
@@ -1167,16 +1183,28 @@ class Music21Object(object):
         def extractElementFromVerticality(verticality):
             if verticality is None:
                 return None
-            if len(verticality.startTimespans) > 0:
-                return verticality.startTimespans[0].element
-            elif len(verticality.overlapTimespans) > 0:
-                return verticality.overlapTimespans[0].element
+            for prop in ('startTimespans', 'overlapTimespans'):
+                vst = getattr(verticality, prop)
+                if len(vst) == 0:
+                    continue
+                if 'Before' in getElementMethod:
+                    vst = reversed(vst)
+                for timespanPart in vst:
+                    element = timespanPart.element
+                    if element is not self and element.isClassOrSubclass(className):
+                        return element
+            return None
 
         def findElInTimespanTree(ts, offsetStart):
             if getElementMethod == 'getElementAtOrBefore':
                 verticality = ts.getVerticalityAtOrBefore(offsetStart)
             elif getElementMethod == 'getElementBeforeOffset':
                 verticality = ts.getVerticalityAt(offsetStart).previousVerticality
+            elif getElementMethod == 'getElementAfterOffset':
+                verticality = ts.getVerticalityAt(offsetStart).nextVerticality                
+            elif getElementMethod == 'getElementAtOrAfter':
+                verticality = ts.getVerticalityAtOrAfter(offsetStart)                
+
             if verticality is not None:
                 element = extractElementFromVerticality(verticality)
                 if element is not None and element.isClassOrSubclass(className):
@@ -1189,7 +1217,11 @@ class Music21Object(object):
             # only contains containers and elements with the
             # proper classes...
             if getElementMethod == 'getElementAtOrBefore':
-                offsetStart += 0.0001
+                offsetStart += 0.000001
+            elif getElementMethod == 'getElementAtOrAfter':
+                offsetStart -= 0.000001
+
+            
             while offsetStart is not None: # redundant, but useful...
                 offsetStart = ts.getOffsetBefore(offsetStart)
                 if offsetStart is None:
@@ -1200,12 +1232,12 @@ class Music21Object(object):
                         continue
                     return element.element
 
-        if className is not None and not common.isListLike(className):
+        if not common.isListLike(className):
             className = (className,)
 
         for site, offsetStart, searchType in self.contextSites(
                                                 sortByCreationTime=sortByCreationTime):
-            if className is None or site.isClassOrSubclass(className):
+            if site.isClassOrSubclass(className):
                 return site
             if searchType == 'elementsOnly' or searchType == 'elementsFirst':
                 tsNotFlat = site.asTimespans(classList=className, recurse=False)
@@ -1218,8 +1250,13 @@ class Music21Object(object):
                 if el is not None:
                     return el
 
-    def contextSites(self, callerFirst=None, memo=None, 
-                     offsetAppend=0.0, sortByCreationTime=False, priorityTarget=None):
+    def contextSites(self, 
+                     callerFirst=None, 
+                     memo=None, 
+                     offsetAppend=0.0, 
+                     sortByCreationTime=False, 
+                     priorityTarget=None,
+                     followDerivation=True):
         '''
         A generator that returns a list of tuples of sites to search for a context...
         
@@ -1373,33 +1410,48 @@ class Music21Object(object):
                     yield x
                     memo.append(x[0])
 
-        for derivedObject in topLevel.derivation.chain():
-            environLocal.printDebug("looking now in derivedObject, {} with offsetAppend {}".format(
-                                                        derivedObject, offsetAppend))
-            for z in derivedObject.contextSites(callerFirst=None,
-                                          memo=memo,
-                                          offsetAppend=0.0,
-                                          sortByCreationTime=sortByCreationTime,
-                                          priorityTarget=None): 
-                                        # get activeSite unless sortByCreationTime
-                if z[0] not in memo:
-                    environLocal.printDebug("Yielding {} from derivedObject contextSites".format(z))
-                    zz = (z[0], z[1] + offsetAppend, z[2])
-                    yield zz
-                    memo.append(z[0])
+        if followDerivation:
+            for derivedObject in topLevel.derivation.chain():
+                environLocal.printDebug(
+                        "looking now in derivedObject, {} with offsetAppend {}".format(
+                                                            derivedObject, offsetAppend))
+                for z in derivedObject.contextSites(callerFirst=None,
+                                              memo=memo,
+                                              offsetAppend=0.0,
+                                              sortByCreationTime=sortByCreationTime,
+                                              priorityTarget=None): 
+                                            # get activeSite unless sortByCreationTime
+                    if z[0] not in memo:
+                        environLocal.printDebug(
+                                "Yielding {} from derivedObject contextSites".format(z))
+                        zz = (z[0], z[1] + offsetAppend, z[2])
+                        yield zz
+                        memo.append(z[0])
 
         environLocal.printDebug("--returning from derivedObject search")    
 
 
 
-    #@common.deprecated("May 2014","soonest possible","not sure that it works at all...")
     def getAllContextsByClass(self, className):
         '''
-        Search both Sites as well as associated
-        objects to find all matching classes.
-        Returns [] if not match is found.
+        Returns a generator that yields elements found by `.getContextByClass` and
+        then finds the previous contexts for that element.
+        
+        >>> s = stream.Stream()
+        >>> s.append(meter.TimeSignature('2/4'))
+        >>> s.append(note.Note('C'))
+        >>> s.append(meter.TimeSignature('3/4'))
+        >>> n = note.Note('D')
+        >>> s.append(n)
+        >>> for ts in n.getAllContextsByClass('TimeSignature'):
+        ...     print(ts, ts.offset)
+        <music21.meter.TimeSignature 3/4> 1.0
+        <music21.meter.TimeSignature 2/4> 0.0
 
-        DEPRECATED possibly May 2014: Not sure if it works well...
+
+        TODO: make it so that it does not skip over multiple matching classes
+        at the same offset.
+    
         '''
         el = self.getContextByClass(className)
         while el is not None:

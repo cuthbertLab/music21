@@ -520,8 +520,7 @@ class Sites(common.SlottedObject):
                 memo[id(obj)] = obj
                 # will add values to found
                 #environLocal.printDebug(['getAllByClass()', 'about to call getAllContextsByClass', 'found', found, 'obj', obj])
-                obj.getAllContextsByClass(className, found=found,
-                    idFound=idFound, memo=memo)
+                obj.getAllContextsByClass(className)
         # returning found, but not necessary
         return found
 
@@ -664,22 +663,12 @@ class Sites(common.SlottedObject):
                 #if hasattr(obj, 'getContextByClass'):
                 # store this object as having been searched
                 memo[id(obj)] = obj
-                post = obj.getContextByClass(className,
-                       callerFirst=callerFirst,
-                       sortByCreationTime=sortByCreationTime,
-                       getElementMethod=getElementMethod,
-                       memo=memo)
+                post = obj.getContextByClass(
+                                className,
+                                sortByCreationTime=sortByCreationTime,
+                                getElementMethod=getElementMethod)
                 if post is not None:
                     break
-#                 else: # this is not a music21 object
-#                     pass
-                    #environLocal.printDebug[
-                    #  'cannot call getContextByClass on obj stored in DefinedContext:', obj]
-#             else: # object has already been searched
-#                 pass
-                #environLocal.printDebug['skipping searching of object already searched:', obj]
-#             else: # post is not None
-#                 break
         return post
 
     def getById(self, siteId):

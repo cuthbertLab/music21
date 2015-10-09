@@ -1426,13 +1426,35 @@ class TimespanTree(ElementTree):
         >>> tree.getVerticalityAtOrBefore(0.125)
         <Verticality 0.0 {A3 E4 C#5}>
 
-        >>> tree.getVerticalityAtOrBefore(0.)
+        >>> tree.getVerticalityAtOrBefore(0.0)
         <Verticality 0.0 {A3 E4 C#5}>
         '''
         verticality = self.getVerticalityAt(offset)
         if not verticality.startTimespans:
             verticality = verticality.previousVerticality
         return verticality
+
+    def getVerticalityAtOrAfter(self, offset):
+        r'''
+        Gets the verticality in this offset-tree which starts at `offset`.
+
+        If the found verticality has no start timespans, the function returns
+        the next following verticality with start timespans.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> tree.getVerticalityAtOrAfter(0.125)
+        <Verticality 0.5 {G#3 B3 E4 B4}>
+
+        >>> tree.getVerticalityAtOrAfter(0.0)
+        <Verticality 0.0 {A3 E4 C#5}>
+        '''
+        verticality = self.getVerticalityAt(offset)
+        if not verticality.startTimespans:
+            verticality = verticality.nextVerticality
+        return verticality
+
+
     
     def iterateConsonanceBoundedVerticalities(self):
         r'''
