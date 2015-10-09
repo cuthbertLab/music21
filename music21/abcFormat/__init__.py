@@ -241,7 +241,8 @@ class ABCMetadata(ABCToken):
         return False
 
     def isOrigin(self):
-        '''Returns True if the tag is "O" for origin, False otherwise. This value is set in the Metadata `localOfComposition` of field. 
+        '''Returns True if the tag is "O" for origin, False otherwise. 
+        This value is set in the Metadata `localOfComposition` of field. 
         '''
         if self.tag == 'O': 
             return True
@@ -255,7 +256,8 @@ class ABCMetadata(ABCToken):
         return False
 
     def isKey(self):
-        '''Returns True if the tag is "K", False otherwise. Note that in some cases a Key will encode clef information. 
+        '''Returns True if the tag is "K", False otherwise. 
+        Note that in some cases a Key will encode clef information. 
         '''
         if self.tag == 'K': 
             return True
@@ -270,7 +272,9 @@ class ABCMetadata(ABCToken):
 
     def _getTimeSignatureParameters(self):
         '''If there is a time signature representation available, 
-        get a numerator, denominator and an abbreviation symbol. To get a music21 :class:`~music21.meter.TimeSignature` object, use the :meth:`~music21.abcFormat.ABCMetadata.getTimeSignatureObject` method.
+        get a numerator, denominator and an abbreviation symbol. 
+        To get a music21 :class:`~music21.meter.TimeSignature` object, use 
+        the :meth:`~music21.abcFormat.ABCMetadata.getTimeSignatureObject` method.
 
         
         >>> am = abcFormat.ABCMetadata('M:2/2')

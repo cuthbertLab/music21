@@ -74,10 +74,6 @@ class PolyphonicSnippet(stream.Score):
         if fiveExcelCells != []:        
             if len(fiveExcelCells) != 5:
                 raise Exception("Need five Excel Cells to make a PolyphonicSnippet object")
-    
-            for part in fiveExcelCells[0:3]:
-                if part is not None and hasattr(part, 'isStream') and part.isStream == True:
-                    part.__class__ = stream.Part
             
             self.cadenceType = fiveExcelCells[3]
             self.timeSig = meter.TimeSignature(fiveExcelCells[4])

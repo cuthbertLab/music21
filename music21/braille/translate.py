@@ -86,9 +86,9 @@ import unittest
 if six.PY3:
     unicode = str # @ReservedAssignment
 
-try:
+try: # gives Py2 the zip of Py3
     from future_builtins import zip
-except ImportError: # not 2.6+ or is 3.x
+except ImportError:
     pass
 
 

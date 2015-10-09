@@ -22,17 +22,20 @@ from music21.ipython21 import objects
 from music21.ipython21.ipExtension import load_ipython_extension
 
 from music21 import common
-localIP = None
 
 def loadNoMagic():
+    '''
+    Load the magic functions when running iPython
+    '''
     if common.runningUnderIPython():
         from IPython.core.interactiveshell import InteractiveShell
         if InteractiveShell.initialized():        
             localIP = InteractiveShell.instance()    
             load_ipython_extension(localIP)
             
+# if we are imported in an IPython environment, then load magic after half a second
 if common.runningUnderIPython(): # @UndefinedVariable
     from threading import Timer
-    t = Timer(0.5, loadNoMagic)
+    t = Timer(2, loadNoMagic)
     t.start()
     #ipython21.load_no_magic() # @UndefinedVariable

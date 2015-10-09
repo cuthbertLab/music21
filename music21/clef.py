@@ -51,8 +51,9 @@ class Clef(base.Music21Object):
     >>> tc.line
     2
         
-    Most clefs also have a "lowest note" function which represents the
-    :attr:`~music21.pitch.Pitch.diatonicNoteNum` of the note. (Where C4,C#4,C##4,C-4
+    Most clefs also have a "lowestLine" function which represents the
+    :attr:`~music21.pitch.Pitch.diatonicNoteNum` of the note that would fall on the
+    lowest line if the Clef were put on a five-line staff. (Where C4,C#4,C##4,C-4
     etc. = 29, all types of D4 = 30, etc.)
     
     >>> tc.lowestLine
@@ -105,7 +106,7 @@ class Clef(base.Music21Object):
 #-------------------------------------------------------------------------------
 class PitchClef(Clef):
     '''
-    superclass for all other clef subclasses. 
+    superclass for all other clef subclasses that use pitches...
     '''
     def __init__(self):
         Clef.__init__(self)
@@ -120,10 +121,19 @@ class PercussionClef(Clef):
     'percussion'
     >>> pc.line is None
     True
+
+    Percussion clefs should not, technically. have a
+    lowest line, but it is a common usage to assume that
+    in pitch-centric contexts to use the pitch numbers
+    from treble clef for percussion clefs.  Thus:
+    
+    >>> pc.lowestLine == clef.TrebleClef().lowestLine
+    True
     '''    
     def __init__(self):
         Clef.__init__(self)
         self.sign = 'percussion'
+        self.lowestLine = (7*4) + 3  # 4 octaves + 3 notes = e4
         
 class NoClef(Clef):
     '''

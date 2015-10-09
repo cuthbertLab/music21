@@ -34,7 +34,6 @@ from music21 import metadata
 from music21.corpus import chorales
 from music21.corpus import virtual
 from music21.corpus import corpora
-from music21.corpus.corpora import *
 
 from music21 import environment
 _MOD = "corpus.base.py"
@@ -197,7 +196,7 @@ def cacheMetadata(corpusNames=('local',), verbose=True):
         corpusNames = [corpusNames]
     for name in corpusNames:
         corpora.Corpus._metadataBundles[name] = None
-    metadata.cacheMetadata(corpusNames, verbose=verbose)
+    metadata.caching.cacheMetadata(corpusNames, verbose=verbose)
 
 
 def search(
@@ -225,14 +224,11 @@ def search(
    
     >>> corpus.search('coltrane', corpusNames=('virtual',))
     <music21.metadata.bundles.MetadataBundle {1 entry}>
-
     '''
-    return corpora.Corpus.search(
-        query,
-        field=field,
-        corpusNames=corpusNames,
-        fileExtensions=fileExtensions,
-        )
+    return corpora.search(query,
+                        field=field,
+                        corpusNames=corpusNames,
+                        fileExtensions=fileExtensions)
 
 
 #------------------------------------------------------------------------------

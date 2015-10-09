@@ -37,6 +37,17 @@ class StreamFilter(object):
     #def reset(self):
     #    pass
 
+    def _reprHead(self):
+        '''
+        returns a head that can be used with .format() to add additional
+        elements.
+        
+        >>> stream.filter.StreamFilter()._reprHead()
+        '<music21.stream.filter.StreamFilter {0}>'
+        '''
+        return '<{0}.{1} '.format(self.__module__, self.__class__.__name__) + '{0}>'
+
+    
 class IsFilter(StreamFilter):
     derivationStr = 'is'
     '''
@@ -88,6 +99,13 @@ class IsFilter(StreamFilter):
         else:
             return False
 
+class IsNotFilter(IsFilter):
+    derivationStr = 'isNot'
+
+    def __call__(self, item, iterator):
+        return not super(IsNotFilter, self).__call__(item, iterator)
+
+
 class IdFilter(StreamFilter):
     '''
     filters on ids. used by stream.getElementById.
@@ -130,7 +148,8 @@ class ClassFilter(StreamFilter):
 
     >>> sI.filters.append(stream.filter.ClassFilter('Note'))
     >>> sI.filters
-    [<music21.stream.filter.ClassFilter object at 0x...>]
+    [<music21.stream.filter.ClassFilter Note>]
+    
     >>> for x in sI:
     ...     print(x)
     <music21.note.Note C>
@@ -146,9 +165,22 @@ class ClassFilter(StreamFilter):
             classList = (classList,)
             
         self.classList = classList
+        
+    def __eq__(self, other):
+        if other.__class__ is not self.__class__:
+            return False
+        if self.classList != other.classList:
+            return False
+        return True
 
     def __call__(self, item, iterator):
         return item.isClassOrSubclass(self.classList)
+
+    def __repr__(self):
+        if len(self.classList) == 1:
+            return self._reprHead().format(str(self.classList[0]))
+        else:
+            return self._reprHead().format(str(self.classList))
 
 
 class ClassNotFilter(ClassFilter):
@@ -163,7 +195,8 @@ class ClassNotFilter(ClassFilter):
 
     >>> sI.filters.append(stream.filter.ClassNotFilter('Note'))
     >>> sI.filters
-    [<music21.stream.filter.ClassNotFilter object at 0x...>]
+    [<music21.stream.filter.ClassNotFilter Note>]
+    
     >>> for x in sI:
     ...     print(x)
     <music21.note.Rest rest>

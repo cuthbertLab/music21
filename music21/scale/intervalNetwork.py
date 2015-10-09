@@ -3026,22 +3026,26 @@ class Test(unittest.TestCase):
         net = IntervalNetwork()
         net.fillDirectedEdges(ascendingEdgeList, descendingEdgeList)
 
-        self.assertEqual(repr(net._edges), "OrderedDict([(0, <music21.scale.intervalNetwork.Edge ascending M2 [(\'terminusLow\',0)]>), (1, <music21.scale.intervalNetwork.Edge ascending m2 [(0,1)]>), (2, <music21.scale.intervalNetwork.Edge ascending M2 [(1,2)]>), (3, <music21.scale.intervalNetwork.Edge ascending M2 [(2,3)]>), (4, <music21.scale.intervalNetwork.Edge ascending M2 [(3,4)]>), (5, <music21.scale.intervalNetwork.Edge ascending M2 [(4,5)]>), (6, <music21.scale.intervalNetwork.Edge ascending m2 [(5,'terminusHigh')]>), (7, <music21.scale.intervalNetwork.Edge descending M2 [(6,'terminusLow')]>), (8, <music21.scale.intervalNetwork.Edge descending m2 [(7,6)]>), (9, <music21.scale.intervalNetwork.Edge descending M2 [(8,7)]>), (10, <music21.scale.intervalNetwork.Edge descending M2 [(9,8)]>), (11, <music21.scale.intervalNetwork.Edge descending m2 [(10,9)]>), (12, <music21.scale.intervalNetwork.Edge descending M2 [(11,10)]>), (13, <music21.scale.intervalNetwork.Edge descending M2 [('terminusHigh',11)]>)])")
-                         
         # returns a list of edges and notes
-        self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_LOW], 'ascending')), "([<music21.scale.intervalNetwork.Edge ascending M2 [('terminusLow',0)]>], [<music21.scale.intervalNetwork.Node id=0>])")
+        self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_LOW], 'ascending')), 
+                         "([<music21.scale.intervalNetwork.Edge ascending M2 [('terminusLow',0)]>], [<music21.scale.intervalNetwork.Node id=0>])")
 
-        self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_LOW], 'descending')), "([<music21.scale.intervalNetwork.Edge descending M2 [('terminusHigh',11)]>], [<music21.scale.intervalNetwork.Node id=11>])")
+        self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_LOW], 'descending')), 
+                         "([<music21.scale.intervalNetwork.Edge descending M2 [('terminusHigh',11)]>], [<music21.scale.intervalNetwork.Node id=11>])")
 
         # high terminus gets the same result, as this is the wrapping point
-        self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_HIGH], 'ascending')), "([<music21.scale.intervalNetwork.Edge ascending M2 [('terminusLow',0)]>], [<music21.scale.intervalNetwork.Node id=0>])")
+        self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_HIGH], 'ascending')), 
+                         "([<music21.scale.intervalNetwork.Edge ascending M2 [('terminusLow',0)]>], [<music21.scale.intervalNetwork.Node id=0>])")
 
-        self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_LOW], 'descending')), "([<music21.scale.intervalNetwork.Edge descending M2 [('terminusHigh',11)]>], [<music21.scale.intervalNetwork.Node id=11>])")
+        self.assertEqual(repr(net._getNext(net._nodes[TERMINUS_LOW], 'descending')), 
+                         "([<music21.scale.intervalNetwork.Edge descending M2 [('terminusHigh',11)]>], [<music21.scale.intervalNetwork.Node id=11>])")
 
 
         # this is ascending from a4 to a5, then descending from a4 to a3
         # this seems like the right thing to do
-        self.assertEqual(self.realizePitchOut(net.realize('a4', 1, 'a3', 'a5')), "([A3, B3, C4, D4, E4, F4, G4, A4, B4, C5, D5, E5, F#5, G#5, A5], ['terminusLow', 6, 7, 8, 9, 10, 11, 'terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])")
+        self.assertEqual(self.realizePitchOut(net.realize('a4', 1, 'a3', 'a5')), 
+                "([A3, B3, C4, D4, E4, F4, G4, A4, B4, C5, D5, E5, F#5, G#5, A5], " + 
+                "['terminusLow', 6, 7, 8, 9, 10, 11, 'terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])")
 
 
         # can get a descending form by setting reference pitch to top of range

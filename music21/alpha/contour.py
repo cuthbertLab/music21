@@ -39,7 +39,8 @@ def _getExtendedModules():
     Returns a tuple: (plt, numpy, sp = None)
     '''
     if 'matplotlib' in base._missingImport:
-        raise ContourException('could not find matplotlib, contour mapping is not allowed (numpy is also required)')
+        raise ContourException(
+            'could not find matplotlib, contour mapping is not allowed (numpy is also required)')
     if 'numpy' in base._missingImport:
         raise ContourException('could not find numpy, contour mapping is not allowed')    
     import matplotlib.pyplot as plt # @UnresolvedImport
@@ -51,7 +52,8 @@ def _getExtendedModules():
 class ContourFinder(object):
     def __init__(self, s=None):
         '''
-        ContourFinder is a class for finding 2-dimensional contours of a piece based on different metrics.  
+        ContourFinder is a class for finding 2-dimensional contours 
+        of a piece based on different metrics.  
         
         Predefined metrics are 'dissonance', 'tonality', and 'spacing'.  
         To get a contour, use ContourFinder(myStream).getContour('dissonance'), for example.
@@ -59,7 +61,8 @@ class ContourFinder(object):
         If you wish to create your own metric for giving a numerical score to a stream, you can call 
         ContourFinder(myStream).getContour('myMetricName', metric=myMetric)
         
-        ContourFinder looks at a moving window of m measures, and moves that window by n measures each time.  
+        ContourFinder looks at a moving window of m measures, and moves that window by 
+        n measures each time.  
         M and n are specified by 'window' and 'slide', which are both 1 by default.    
         
         
@@ -75,9 +78,11 @@ class ContourFinder(object):
         
         self._contours = { } #A dictionary mapping a contour type to a normalized contour dictionary
         
-        #self.metrics contains a dictionary mapping the name of a metric to a tuple (x,y) where x=metric function and y=needsChordify
+        #self.metrics contains a dictionary mapping the name of a metric to a tuple (x,y) 
+        # where x=metric function and y=needsChordify
         
-        self._metrics = {"dissonance": (self.dissonanceMetric, True), "spacing": (self.spacingMetric, True), 
+        self._metrics = {"dissonance": (self.dissonanceMetric, True), 
+                         "spacing": (self.spacingMetric, True), 
                         "tonality": (self.tonalDistanceMetric, False) }
         self.isContourFinder = True
         
@@ -92,14 +97,19 @@ class ContourFinder(object):
         
     def getContourValuesForMetric(self, metric, window=1, slide=1, needChordified=False):
         '''
-        Returns a dictionary mapping measure numbers to that measure's score under the provided metric.
+        Returns a dictionary mapping measure numbers to that measure's score under 
+        the provided metric.
         Ignores pickup measures entirely.
         
-        Window is a positive integer indicating how many measure the metric should look at at once, and slide is 
-        a positive integer indicating by how many measures the window should slide over each time the metric is measured.
+        Window is a positive integer indicating how many measure the metric should 
+        look at at once, and slide is 
+        a positive integer indicating by how many measures the window should slide 
+        over each time the metric is measured.
                 
         e.g. if window=4 and slide=2, metric = f, the result will be of the form:
-        { measures 1-4: f(measures 1-4), measures 3-6: f(measures 3-6), measures 5-8: f( measures5-8), ...}
+        { measures 1-4: f(measures 1-4), 
+        measures 3-6: f(measures 3-6), 
+        measures 5-8: f( measures5-8), ...}
         
         >>> metric = lambda s: len(s.measureOffsetMap())
         >>> c = corpus.parse('bwv10.7')
@@ -145,29 +155,38 @@ class ContourFinder(object):
     
     #TODO: tests that use simple 4-bar pieces that we have to create...
     #ALSO: Need pictures or something! Need a clear demonstration!
-    def getContour(self, cType, window=None, slide=None, overwrite=False, metric=None, needsChordify=False, normalized=False):
+    def getContour(self, cType, window=None, slide=None, overwrite=False, 
+                   metric=None, needsChordify=False, normalized=False):
         '''
         Stores and then returns a normalized contour of the type cType.  
         cType can be either 'spacing', 'tonality', or 'dissonance'.
         
-        If using a metric that is not predefined, cType is any string that signifies what your metric measures.  
-        In this case, you must pass getContour a metric function which takes in a music21 stream and outputs a score.
-        If passing a metric that requires the music21 stream be just chords, specify needsChordify=True.  
+        If using a metric that is not predefined, cType is any string that 
+        signifies what your metric measures.  
+        In this case, you must pass getContour a metric function which takes 
+        in a music21 stream and outputs a score.
+        If passing a metric that requires the music21 stream be just chords, 
+        specify needsChordify=True.  
         
-        Window is how many measures are considered at a time and slide is the number of measures the window moves
+        Window is how many measures are considered at a time and slide is the 
+        number of measures the window moves
         over each time.  By default, measure and slide are both 1. 
                 
-        Each time you call getContour for a cType, the result is cached.  If you wish to get the contour 
-        for the same cType more than once, with different parameters (with a different window and slide, for example)
+        Each time you call getContour for a cType, the result is cached.  
+        If you wish to get the contour 
+        for the same cType more than once, with different parameters 
+        (with a different window and slide, for example)
         then specify overwrite=True
         
-        To get a contour where measures map to the metric values, use normalized=False (the default), but to get a contour
+        To get a contour where measures map to the metric values, 
+        use normalized=False (the default), but to get a contour
         which evenly divides time between 1.0 and 100.0, use normalized=True
         
         >>> cf = alpha.contour.ContourFinder( corpus.parse('bwv10.7'))
         >>> mycontour = cf.getContour('dissonance')
         >>> [mycontour[x] for x in sorted(mycontour.keys())]
-        [0.0, 0.25, 0.5, 0.5, 0.0, 0.0, 0.25, 0.75, 0.0, 0.0, 0.5, 0.75, 0.75, 0.0, 0.5, 0.5, 0.5, 0.5, 0.75, 0.75, 0.75, 0.0]
+        [0.0, 0.25, 0.5, 0.5, 0.0, 0.0, 0.25, 0.75, 0.0, 0.0, 0.5, 0.75, 0.75, 
+         0.0, 0.5, 0.5, 0.5, 0.5, 0.75, 0.75, 0.75, 0.0]
         
         >>> mycontour = cf.getContour('always one', 2, 2, metric= lambda x: 1.0)
         >>> [mycontour[x] for x in sorted(mycontour.keys())]
@@ -175,7 +194,8 @@ class ContourFinder(object):
         
         >>> mycontour = cf.getContour('spacing', metric = lambda x: 2, overwrite=False)
         Traceback (most recent call last):
-        OverwriteException: Attempted to overwrite 'spacing' metric but did not specify overwrite=True
+        OverwriteException: Attempted to overwrite 'spacing' metric but did 
+                not specify overwrite=True
         
         >>> mycontour = cf.getContour('spacing', slide=3, metric = lambda x: 2.0, overwrite=True)
         >>> [mycontour[x] for x in sorted(mycontour.keys())]
@@ -189,12 +209,15 @@ class ContourFinder(object):
         if overwrite is False:
             if cType in self._contours:
                 if window is not None or slide is not None:
-                    raise OverwriteException("Attempted to overwrite cached contour of type %s but did not specify overwrite=True" % cType)
+                    raise OverwriteException(
+                        "Attempted to overwrite cached contour of type {0}".format(cType) + 
+                        " but did not specify overwrite=True")
                 else:
                     return self._contours[cType]
             elif cType in self._metrics:
                 if metric is not None:
-                    raise OverwriteException("Attempted to overwrite '%s' metric but did not specify overwrite=True" % cType)
+                    raise OverwriteException("Attempted to overwrite '{0}' ".format(cType) + 
+                                             "metric but did not specify overwrite=True")
                 else:
                     metric, needsChordify = self._metrics[cType]
             else:
@@ -213,30 +236,6 @@ class ContourFinder(object):
         if window is None:
             window = 1
             
-                
-#         
-#         if cType in self._contours:
-#             if overwrite is False:
-#                 if metric is not None:
-#                     raise OverwriteException("Attempted to calculate a different value for metric %s but did not specify overwrite=True" % cType)
-#                 else:
-#                     return self._contours[cType] #already calculated!
-#             else: #overwrite something we already have cached
-#                 
-#         elif cType in self._metrics:
-#             if metric is not None:
-#                 if overwrite is False:
-#                     #trying to overwrite something... raise an exception
-#                     raise OverwriteException("Attempted to overwrite metric for %s but did not specify overwrite=True" % cType)
-#                 else:
-#                     self._metrics[cType] = (metric, needsChordify)
-#             elif overwrite: #overwrite is true, we are not given a metric, but we have one stored.  
-#                 pass
-#             else:
-#                 metric, needsChordify = self._metrics[cType]
-#         else:
-#             self._metrics[cType] = (metric, needsChordify) 
-#         
         contour = self.getContourValuesForMetric(metric, window, slide, needsChordify)
         
         if normalized:
@@ -287,7 +286,8 @@ class ContourFinder(object):
         return res
         
     #TODO: give same args as getContour, maybe? Also, test this.
-    def plot(self, cType, contourIn=None, regression=True, order=4, title='Contour Plot', fileName=None):
+    def plot(self, cType, contourIn=None, regression=True, order=4, 
+             title='Contour Plot', fileName=None):
         (plt, numpy) = _getExtendedModules()
 
         if contourIn is None:
@@ -457,15 +457,20 @@ class AggregateContour(object):
         An AggragateContour object is an object that stores and consolidates contour information for a large group 
         of pieces.  
         
-        To add a piece to the aggregate contour, use AggregateContour.addPieceToContour(piece, cType), where cType is
-        the type of contour (the default possibilities are 'tonality', 'spacing', and 'dissonance'), and piece is either
+        To add a piece to the aggregate contour, use 
+        AggregateContour.addPieceToContour(piece, cType), where cType is
+        the type of contour (the default possibilities are 
+        'tonality', 'spacing', and 'dissonance'), and piece is either
         a parsed music21 stream or a ContourFinder object.  
         
-        To get the combined contour as list of ordered pairs, use AggragateContour.getCombinedContour(), and to 
-        get the combined contour as a polynomial approximation, use AggragateContour.getCombinedContourPoly().
+        To get the combined contour as list of ordered pairs, use 
+        AggragateContour.getCombinedContour(), and to 
+        get the combined contour as a polynomial approximation, use 
+        AggragateContour.getCombinedContourPoly().
         You can plot contours with AggragateContour.plotAggragateContour(cType).  
         
-        To compare a normalized contour to the aggragate, use AggragateContour.dissimilarityScore(cType, contour).
+        To compare a normalized contour to the aggragate, use 
+        AggragateContour.dissimilarityScore(cType, contour).
         
         '''
         if aggContours is None:
@@ -475,31 +480,34 @@ class AggregateContour(object):
         self._aggContoursAsList = {}
         self._aggContoursPoly = {}
     
-    def addPieceToContour(self, piece, cType, metric=None, window=1, slide=1, order=8, needsChordify=False):
+    def addPieceToContour(self, piece, cType, metric=None, window=1, 
+                          slide=1, order=8, needsChordify=False):
         '''
         Adds a piece to the aggregate contour.  
         
-        piece is either a music21 stream, or a ContourFinder object (which should have a stream wrapped inside of it).
+        piece is either a music21 stream, or a ContourFinder object (which 
+        should have a stream wrapped inside of it).
         
         cType is the contour type.  
         
-        If using a metric that is not predefined, cType is any string that signifies what your metric measures.  
-        In this case, you must pass getContour a metric function which takes in a music21 stream and outputs a score.
-        If passing a metric that requires the music21 stream be just chords, specify needsChordify=True.  
+        If using a metric that is not predefined, cType is any string 
+        that signifies what your metric measures.  
+        In this case, you must pass getContour a metric function 
+        which takes in a music21 stream and outputs a score.
+        If passing a metric that requires the music21 stream be 
+        just chords, specify needsChordify=True.  
         
-        Window is how many measures are considered at a time and slide is the number of measures the window moves
+        Window is how many measures are considered at a time and 
+        slide is the number of measures the window moves
         over each time.  By default, measure and slide are both 1. 
-          
-        
-        
         '''
-        
         if hasattr(piece, 'isContourFinder') and piece.isContourFinder:
             pass
         else: 
             piece = ContourFinder(piece)
             
-        contour = piece.getContour(cType, window=window, slide=slide, overwrite=False, metric=metric, 
+        contour = piece.getContour(cType, window=window, slide=slide, 
+                                   overwrite=False, metric=metric, 
                                    needsChordify=needsChordify, normalized=True)
         
         
@@ -517,7 +525,8 @@ class AggregateContour(object):
     def getCombinedContour(self, cType): #, metric=None, window=1, slide=1, order=8):
         '''
         Returns the combined contour of the type specified by cType.  Instead of a dictionary,
-        this contour is just a list of ordered pairs (tuples) with the first value being time and the
+        this contour is just a list of ordered pairs (tuples) with the 
+        first value being time and the
         second value being the score.  
         
         '''
@@ -647,7 +656,74 @@ def _runExperiment():
     ac = AggregateContour()
     #unresolved problem numbers: 88 (repeatFinder fails!)
     
-    goodChorales = ['bach/bwv330', 'bach/bwv245.22', 'bach/bwv431', 'bach/bwv324', 'bach/bwv384', 'bach/bwv379', 'bach/bwv365', 'bach/bwv298', 'bach/bwv351', 'bach/bwv341', 'bach/bwv421', 'bach/bwv420', 'bach/bwv331', 'bach/bwv84.5', 'bach/bwv253', 'bach/bwv434', 'bach/bwv26.6', 'bach/bwv64.2', 'bach/bwv313', 'bach/bwv314', 'bach/bwv166.6', 'bach/bwv414', 'bach/bwv264', 'bach/bwv179.6', 'bach/bwv67.7', 'bach/bwv273', 'bach/bwv373', 'bach/bwv376', 'bach/bwv375', 'bach/bwv151.5', 'bach/bwv47.5', 'bach/bwv197.10', 'bach/bwv48.3', 'bach/bwv88.7', 'bach/bwv310', 'bach/bwv244.46', 'bach/bwv153.1', 'bach/bwv69.6', 'bach/bwv333', 'bach/bwv104.6', 'bach/bwv338', 'bach/bwv155.5', 'bach/bwv345', 'bach/bwv435', 'bach/bwv323', 'bach/bwv245.3', 'bach/bwv144.3', 'bach/bwv405', 'bach/bwv406', 'bach/bwv316', 'bach/bwv258', 'bach/bwv254', 'bach/bwv256', 'bach/bwv257', 'bach/bwv69.6-a', 'bach/bwv86.6', 'bach/bwv388', 'bach/bwv308', 'bach/bwv307', 'bach/bwv244.32', 'bach/bwv268', 'bach/bwv260', 'bach/bwv110.7', 'bach/bwv40.3', 'bach/bwv164.6', 'bach/bwv9.7', 'bach/bwv114.7', 'bach/bwv364', 'bach/bwv291', 'bach/bwv245.17', 'bach/bwv297', 'bach/bwv20.11', 'bach/bwv319', 'bach/bwv244.3', 'bach/bwv248.35-3', 'bach/bwv96.6', 'bach/bwv48.7', 'bach/bwv337', 'bach/bwv334', 'bach/bwv101.7', 'bach/bwv168.6', 'bach/bwv55.5', 'bach/bwv154.3', 'bach/bwv89.6', 'bach/bwv2.6', 'bach/bwv392', 'bach/bwv395', 'bach/bwv401', 'bach/bwv408', 'bach/bwv259', 'bach/bwv382', 'bach/bwv244.37', 'bach/bwv127.5', 'bach/bwv44.7', 'bach/bwv303', 'bach/bwv263', 'bach/bwv262', 'bach/bwv248.46-5', 'bach/bwv13.6', 'bach/bwv377', 'bach/bwv416', 'bach/bwv354', 'bach/bwv244.10', 'bach/bwv288', 'bach/bwv285', 'bach/bwv113.8', 'bach/bwv393', 'bach/bwv360', 'bach/bwv363', 'bach/bwv367', 'bach/bwv90.5', 'bach/bwv245.11', 'bach/bwv5.7', 'bach/bwv289', 'bach/bwv83.5', 'bach/bwv359', 'bach/bwv352', 'bach/bwv102.7', 'bach/bwv394', 'bach/bwv227.11', 'bach/bwv244.40', 'bach/bwv244.44', 'bach/bwv424', 'bach/bwv244.25', 'bach/bwv80.8', 'bach/bwv244.54', 'bach/bwv78.7', 'bach/bwv57.8', 'bach/bwv194.6', 'bach/bwv397', 'bach/bwv64.8', 'bach/bwv318', 'bach/bwv315', 'bach/bwv153.5', 'bach/bwv39.7', 'bach/bwv108.6', 'bach/bwv386', 'bach/bwv25.6', 'bach/bwv417', 'bach/bwv415', 'bach/bwv302', 'bach/bwv380', 'bach/bwv74.8', 'bach/bwv422', 'bach/bwv133.6', 'bach/bwv270', 'bach/bwv272', 'bach/bwv38.6', 'bach/bwv271', 'bach/bwv183.5', 'bach/bwv103.6', 'bach/bwv287', 'bach/bwv32.6', 'bach/bwv245.26', 'bach/bwv248.5', 'bach/bwv411', 'bach/bwv369', 'bach/bwv339', 'bach/bwv361', 'bach/bwv399', 'bach/bwv16.6', 'bach/bwv419', 'bach/bwv87.7', 'bach/bwv4.8', 'bach/bwv358', 'bach/bwv154.8', 'bach/bwv278', 'bach/bwv156.6', 'bach/bwv248.33-3', 'bach/bwv81.7', 'bach/bwv227.7', 'bach/bwv427', 'bach/bwv77.6', 'bach/bwv410', 'bach/bwv329', 'bach/bwv85.6', 'bach/bwv385', 'bach/bwv309', 'bach/bwv305', 'bach/bwv18.5-l', 'bach/bwv18.5-w', 'bach/bwv197.5', 'bach/bwv30.6', 'bach/bwv296', 'bach/bwv292', 'bach/bwv353', 'bach/bwv301', 'bach/bwv347', 'bach/bwv284', 'bach/bwv429', 'bach/bwv436', 'bach/bwv430', 'bach/bwv381', 'bach/bwv36.4-2', 'bach/bwv412', 'bach/bwv65.7', 'bach/bwv280', 'bach/bwv169.7', 'bach/bwv428', 'bach/bwv346', 'bach/bwv248.12-2', 'bach/bwv426', 'bach/bwv159.5', 'bach/bwv121.6', 'bach/bwv418', 'bach/bwv28.6', 'bach/bwv326', 'bach/bwv327', 'bach/bwv321', 'bach/bwv65.2', 'bach/bwv144.6', 'bach/bwv194.12', 'bach/bwv398', 'bach/bwv317', 'bach/bwv153.9', 'bach/bwv300', 'bach/bwv56.5', 'bach/bwv423', 'bach/bwv306', 'bach/bwv40.6', 'bach/bwv123.6', 'bach/bwv245.28', 'bach/bwv279', 'bach/bwv378', 'bach/bwv366', 'bach/bwv45.7', 'bach/bwv295', 'bach/bwv245.14', 'bach/bwv122.6', 'bach/bwv355', 'bach/bwv357', 'bach/bwv94.8', 'bach/bwv348', 'bach/bwv349', 'bach/bwv312', 'bach/bwv325', 'bach/bwv245.37', 'bach/bwv37.6', 'bach/bwv283', 'bach/bwv299', 'bach/bwv294', 'bach/bwv245.15', 'bach/bwv176.6', 'bach/bwv391', 'bach/bwv350', 'bach/bwv400', 'bach/bwv372', 'bach/bwv402', 'bach/bwv282', 'bach/bwv374', 'bach/bwv60.5', 'bach/bwv356', 'bach/bwv389', 'bach/bwv40.8', 'bach/bwv174.5', 'bach/bwv340', 'bach/bwv433', 'bach/bwv322', 'bach/bwv403', 'bach/bwv267', 'bach/bwv261', 'bach/bwv245.40', 'bach/bwv33.6', 'bach/bwv269', 'bach/bwv266', 'bach/bwv43.11', 'bach/bwv10.7', 'bach/bwv343', 'bach/bwv311']
+    goodChorales = ['bach/bwv330', 'bach/bwv245.22', 'bach/bwv431', 
+                    'bach/bwv324', 'bach/bwv384', 'bach/bwv379', 'bach/bwv365', 
+                    'bach/bwv298', 'bach/bwv351', 'bach/bwv341', 'bach/bwv421', 
+                    'bach/bwv420', 'bach/bwv331', 'bach/bwv84.5', 'bach/bwv253', 
+                    'bach/bwv434', 'bach/bwv26.6', 'bach/bwv64.2', 'bach/bwv313', 
+                    'bach/bwv314', 'bach/bwv166.6', 'bach/bwv414', 'bach/bwv264', 
+                    'bach/bwv179.6', 'bach/bwv67.7', 'bach/bwv273', 'bach/bwv373', 
+                    'bach/bwv376', 'bach/bwv375', 'bach/bwv151.5', 'bach/bwv47.5', 
+                    'bach/bwv197.10', 'bach/bwv48.3', 'bach/bwv88.7', 'bach/bwv310', 
+                    'bach/bwv244.46', 'bach/bwv153.1', 'bach/bwv69.6', 'bach/bwv333', 
+                    'bach/bwv104.6', 'bach/bwv338', 'bach/bwv155.5', 'bach/bwv345', 
+                    'bach/bwv435', 'bach/bwv323', 'bach/bwv245.3', 'bach/bwv144.3', 'bach/bwv405', 
+                    'bach/bwv406', 'bach/bwv316', 'bach/bwv258', 'bach/bwv254', 
+                    'bach/bwv256', 'bach/bwv257', 'bach/bwv69.6-a', 'bach/bwv86.6', 
+                    'bach/bwv388', 'bach/bwv308', 'bach/bwv307', 'bach/bwv244.32', 
+                    'bach/bwv268', 'bach/bwv260', 'bach/bwv110.7', 'bach/bwv40.3', 
+                    'bach/bwv164.6', 'bach/bwv9.7', 'bach/bwv114.7', 'bach/bwv364', 
+                    'bach/bwv291', 'bach/bwv245.17', 'bach/bwv297', 'bach/bwv20.11', 
+                    'bach/bwv319', 'bach/bwv244.3', 'bach/bwv248.35-3', 'bach/bwv96.6', 
+                    'bach/bwv48.7', 'bach/bwv337', 'bach/bwv334', 'bach/bwv101.7', 
+                    'bach/bwv168.6', 'bach/bwv55.5', 'bach/bwv154.3', 'bach/bwv89.6', 
+                    'bach/bwv2.6', 'bach/bwv392', 'bach/bwv395', 'bach/bwv401', 'bach/bwv408', 
+                    'bach/bwv259', 'bach/bwv382', 'bach/bwv244.37', 'bach/bwv127.5', 
+                    'bach/bwv44.7', 'bach/bwv303', 'bach/bwv263', 'bach/bwv262', 
+                    'bach/bwv248.46-5', 'bach/bwv13.6', 'bach/bwv377', 'bach/bwv416', 
+                    'bach/bwv354', 'bach/bwv244.10', 'bach/bwv288', 'bach/bwv285', 
+                    'bach/bwv113.8', 'bach/bwv393', 'bach/bwv360', 'bach/bwv363', 
+                    'bach/bwv367', 'bach/bwv90.5', 'bach/bwv245.11', 'bach/bwv5.7', 
+                    'bach/bwv289', 'bach/bwv83.5', 'bach/bwv359', 'bach/bwv352', 
+                    'bach/bwv102.7', 'bach/bwv394', 'bach/bwv227.11', 'bach/bwv244.40', 
+                    'bach/bwv244.44', 'bach/bwv424', 'bach/bwv244.25', 'bach/bwv80.8', 
+                    'bach/bwv244.54', 'bach/bwv78.7', 'bach/bwv57.8', 'bach/bwv194.6', 
+                    'bach/bwv397', 'bach/bwv64.8', 'bach/bwv318', 'bach/bwv315', 
+                    'bach/bwv153.5', 'bach/bwv39.7', 'bach/bwv108.6', 'bach/bwv386', 
+                    'bach/bwv25.6', 'bach/bwv417', 'bach/bwv415', 'bach/bwv302', 
+                    'bach/bwv380', 'bach/bwv74.8', 'bach/bwv422', 'bach/bwv133.6', 
+                    'bach/bwv270', 'bach/bwv272', 'bach/bwv38.6', 'bach/bwv271', 'bach/bwv183.5', 
+                    'bach/bwv103.6', 'bach/bwv287', 'bach/bwv32.6', 'bach/bwv245.26', 
+                    'bach/bwv248.5', 'bach/bwv411', 'bach/bwv369', 'bach/bwv339', 
+                    'bach/bwv361', 'bach/bwv399', 'bach/bwv16.6', 'bach/bwv419', 
+                    'bach/bwv87.7', 'bach/bwv4.8', 'bach/bwv358', 'bach/bwv154.8', 
+                    'bach/bwv278', 'bach/bwv156.6', 'bach/bwv248.33-3', 'bach/bwv81.7', 
+                    'bach/bwv227.7', 'bach/bwv427', 'bach/bwv77.6', 'bach/bwv410', 
+                    'bach/bwv329', 'bach/bwv85.6', 'bach/bwv385', 'bach/bwv309', 
+                    'bach/bwv305', 'bach/bwv18.5-l', 'bach/bwv18.5-w', 'bach/bwv197.5', 
+                    'bach/bwv30.6', 'bach/bwv296', 'bach/bwv292', 'bach/bwv353', 
+                    'bach/bwv301', 'bach/bwv347', 
+                    'bach/bwv284', 'bach/bwv429', 'bach/bwv436', 'bach/bwv430', 
+                    'bach/bwv381', 'bach/bwv36.4-2', 'bach/bwv412', 'bach/bwv65.7', 'bach/bwv280', 
+                    'bach/bwv169.7', 'bach/bwv428', 'bach/bwv346', 'bach/bwv248.12-2', 
+                    'bach/bwv426', 
+                    'bach/bwv159.5', 'bach/bwv121.6', 'bach/bwv418', 'bach/bwv28.6', 
+                    'bach/bwv326', 'bach/bwv327', 'bach/bwv321', 'bach/bwv65.2', 
+                    'bach/bwv144.6', 'bach/bwv194.12', 'bach/bwv398', 'bach/bwv317', 
+                    'bach/bwv153.9', 'bach/bwv300', 'bach/bwv56.5', 'bach/bwv423',
+                    'bach/bwv306', 'bach/bwv40.6', 'bach/bwv123.6', 'bach/bwv245.28', 
+                    'bach/bwv279', 'bach/bwv378', 'bach/bwv366', 'bach/bwv45.7', 'bach/bwv295', 
+                    'bach/bwv245.14', 'bach/bwv122.6', 'bach/bwv355', 'bach/bwv357', 
+                    'bach/bwv94.8', 'bach/bwv348', 'bach/bwv349', 'bach/bwv312', 
+                    'bach/bwv325', 'bach/bwv245.37', 'bach/bwv37.6', 'bach/bwv283', 
+                    'bach/bwv299', 'bach/bwv294', 'bach/bwv245.15', 'bach/bwv176.6', 
+                    'bach/bwv391', 'bach/bwv350', 'bach/bwv400', 'bach/bwv372', 
+                    'bach/bwv402', 'bach/bwv282', 'bach/bwv374', 'bach/bwv60.5', 
+                    'bach/bwv356', 'bach/bwv389', 'bach/bwv40.8', 'bach/bwv174.5', 
+                    'bach/bwv340', 'bach/bwv433', 'bach/bwv322', 'bach/bwv403', 
+                    'bach/bwv267', 'bach/bwv261', 'bach/bwv245.40', 'bach/bwv33.6', 
+                    'bach/bwv269', 'bach/bwv266', 'bach/bwv43.11', 'bach/bwv10.7',
+                    'bach/bwv343', 'bach/bwv311']
     currentNum = 1
     
     #BCI = corpus.chorales.Iterator(1, 371, returnType='filename') #highest number is 371

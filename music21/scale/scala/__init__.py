@@ -24,12 +24,14 @@ scales in the Scala scale archive. File names can be found
 with the :func:`~music21.scala.search` function.
 
 To create a :class:`~music21.scale.ScalaScale` instance, simply 
-provide a root pitch and the name of the scale. Scale names are given as a the scala .scl file name. 
+provide a root pitch and the name of the scale. Scale names are given as 
+the scala .scl filename. 
 
 
 >>> mbiraScales = scale.scala.search('mbira')
 >>> mbiraScales
-['mbira_banda.scl', 'mbira_banda2.scl', 'mbira_gondo.scl', 'mbira_kunaka.scl', 'mbira_kunaka2.scl', 'mbira_mude.scl', 'mbira_mujuru.scl', 'mbira_zimb.scl']
+['mbira_banda.scl', 'mbira_banda2.scl', 'mbira_gondo.scl', 'mbira_kunaka.scl', 
+ 'mbira_kunaka2.scl', 'mbira_mude.scl', 'mbira_mujuru.scl', 'mbira_zimb.scl']
 
 
 For most people you'll want to do something like this:
@@ -60,21 +62,19 @@ environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------
 # global variable to cache the paths returned from getPaths()
-SCALA_PATHS = None
+SCALA_PATHS = {'allPaths': None}
 
 def getPaths():    
-    '''Get all scala scale paths. This is called once or the module and cached as SCALA_PATHS, which should be used instead of calls to this function. 
+    '''
+    Get all scala scale paths. This is called once or the module and 
+    cached as SCALA_PATHS, which should be used instead of calls to this function. 
 
     >>> a = scale.scala.getPaths()
     >>> len(a) >= 3800
     True
     '''
-    # declare that the copy of SCALA_PATHS here is the same
-    # as the outer scope.  See 
-    # http://stackoverflow.com/questions/423379/using-global-variables-in-a-function-other-than-the-one-that-created-them
-    global SCALA_PATHS # pylint: disable=global-statement
-    if SCALA_PATHS is not None:
-        return SCALA_PATHS
+    if SCALA_PATHS['allPaths'] is not None:
+        return SCALA_PATHS['allPaths']
     moduleName = scl
     if not hasattr(moduleName, '__path__'):
         # when importing a package name (a directory) the moduleName        
@@ -104,7 +104,7 @@ def getPaths():
             fn = fn.replace('_', '')
             fn = fn.replace('-', '')
             paths[fp].append(fn)
-    SCALA_PATHS = paths
+    SCALA_PATHS['allPaths'] = paths
     return paths
 
 
@@ -126,8 +126,11 @@ class ScalaPitch(object):
     1200.0
     >>> sp.parse('100.0 C#')
     100.0
-    >>> [sp.parse(x) for x in ['89/84', '55/49', '44/37', '63/50', '4/3', '99/70', '442/295', '27/17', '37/22', '98/55', '15/8', '2/1']]
-    [100.09920982..., 199.9798432913..., 299.973903610..., 400.108480470..., 498.044999134..., 600.08832376157..., 699.9976981706..., 800.90959309..., 900.02609638..., 1000.020156708..., 1088.268714730..., 1200.0]
+    >>> [sp.parse(x) for x in ['89/84', '55/49', '44/37', '63/50', '4/3', '99/70', '442/295', 
+    ...     '27/17', '37/22', '98/55', '15/8', '2/1']]
+    [100.09920982..., 199.9798432913..., 299.973903610..., 400.108480470..., 498.044999134..., 
+     600.08832376157..., 699.9976981706..., 800.90959309..., 900.02609638..., 
+     1000.020156708..., 1088.268714730..., 1200.0]
     '''
 
     # pitch values; if has a period, is cents, otherwise a ratio
@@ -237,7 +240,9 @@ class ScalaData(object):
         return post
 
     def setAdjacentCents(self, centList):
-        '''Given a list of adjacent cent values, create the necessary ScalaPitch  objects and update the 
+        '''
+        Given a list of adjacent cent values, create the necessary ScalaPitch 
+        objects and update them
         '''
         self.pitchValues = []
         location = 0
@@ -369,7 +374,10 @@ def parse(target):
     >>> ss.description
     'Observed balafon tuning from Burma, Helmholtz/Ellis p. 518, nr.84'
     >>> [str(i) for i in ss.getIntervalSequence()]
-    ['<music21.interval.Interval m2 (+14c)>', '<music21.interval.Interval M2 (+36c)>', '<music21.interval.Interval M2>', '<music21.interval.Interval m2 (+37c)>', '<music21.interval.Interval M2 (-49c)>', '<music21.interval.Interval M2 (-6c)>', '<music21.interval.Interval M2 (-36c)>']
+    ['<music21.interval.Interval m2 (+14c)>', '<music21.interval.Interval M2 (+36c)>', 
+    '<music21.interval.Interval M2>', '<music21.interval.Interval m2 (+37c)>', 
+    '<music21.interval.Interval M2 (-49c)>', '<music21.interval.Interval M2 (-6c)>', 
+    '<music21.interval.Interval M2 (-36c)>']
 
 
     >>> scale.scala.parse('incorrectFileName.scl') == None
@@ -435,7 +443,8 @@ def search(target):
     
     >>> mbiraScales = scale.scala.search('mbira')
     >>> mbiraScales
-    ['mbira_banda.scl', 'mbira_banda2.scl', 'mbira_gondo.scl', 'mbira_kunaka.scl', 'mbira_kunaka2.scl', 'mbira_mude.scl', 'mbira_mujuru.scl', 'mbira_zimb.scl']
+    ['mbira_banda.scl', 'mbira_banda2.scl', 'mbira_gondo.scl', 'mbira_kunaka.scl', 
+     'mbira_kunaka2.scl', 'mbira_mude.scl', 'mbira_mujuru.scl', 'mbira_zimb.scl']
     '''
     match = []
     # try from stored collections
@@ -493,13 +502,24 @@ A slendro type pentatonic which is based on intervals of 7, no. 2
         self.assertEqual(ss.pitchCount, 5)
         self.assertEqual(ss.fileName, 'slendro5_2.scl')
         self.assertEqual(len(ss.pitchValues), 5)
-        self.assertEqual(["%.9f" % x.cents for x in ss.pitchValues], ['266.870905604', '498.044999135', '701.955000865', '968.825906469', '1200.000000000'])
+        self.assertEqual(["%.9f" % x.cents for x in ss.pitchValues], 
+                         ['266.870905604', '498.044999135', '701.955000865', 
+                          '968.825906469', '1200.000000000'])
 
-        self.assertEqual(["%.9f" % x for x in ss.getCentsAboveTonic()], ['266.870905604', '498.044999135', '701.955000865', '968.825906469', '1200.000000000'])
+        self.assertEqual(["%.9f" % x for x in ss.getCentsAboveTonic()], 
+                         ['266.870905604', '498.044999135', '701.955000865', 
+                          '968.825906469', '1200.000000000'])
         # sent values between scale degrees
-        self.assertEqual(["%.9f" % x for x in ss.getAdjacentCents()], ['266.870905604', '231.174093531', '203.910001731', '266.870905604', '231.174093531'] )
+        self.assertEqual(["%.9f" % x for x in ss.getAdjacentCents()], 
+                         ['266.870905604', '231.174093531', '203.910001731', 
+                          '266.870905604', '231.174093531'] )
 
-        self.assertEqual([str(x) for x in ss.getIntervalSequence()], ['<music21.interval.Interval m3 (-33c)>', '<music21.interval.Interval M2 (+31c)>', '<music21.interval.Interval M2 (+4c)>', '<music21.interval.Interval m3 (-33c)>', '<music21.interval.Interval M2 (+31c)>'])
+        self.assertEqual([str(x) for x in ss.getIntervalSequence()], 
+                         ['<music21.interval.Interval m3 (-33c)>', 
+                          '<music21.interval.Interval M2 (+31c)>', 
+                          '<music21.interval.Interval M2 (+4c)>', 
+                          '<music21.interval.Interval m3 (-33c)>', 
+                          '<music21.interval.Interval M2 (+31c)>'])
 
     def testScalaScaleB(self):
         msg = '''! fj-12tet.scl
@@ -553,7 +573,19 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
                                                                         '88.248558022',
                                                                        '111.731285270'])
 
-        self.assertEqual([str(x) for x in ss.getIntervalSequence()], ['<music21.interval.Interval m2 (+0c)>', '<music21.interval.Interval m2 (0c)>', '<music21.interval.Interval m2 (0c)>', '<music21.interval.Interval m2 (+0c)>', '<music21.interval.Interval m2 (-2c)>', '<music21.interval.Interval m2 (+2c)>', '<music21.interval.Interval m2 (0c)>', '<music21.interval.Interval m2 (+1c)>', '<music21.interval.Interval m2 (-1c)>', '<music21.interval.Interval m2 (0c)>', '<music21.interval.Interval m2 (-12c)>', '<music21.interval.Interval m2 (+12c)>'])
+        self.assertEqual([str(x) for x in ss.getIntervalSequence()], 
+                         ['<music21.interval.Interval m2 (+0c)>', 
+                          '<music21.interval.Interval m2 (0c)>', 
+                          '<music21.interval.Interval m2 (0c)>', 
+                          '<music21.interval.Interval m2 (+0c)>', 
+                          '<music21.interval.Interval m2 (-2c)>', 
+                          '<music21.interval.Interval m2 (+2c)>', 
+                          '<music21.interval.Interval m2 (0c)>', 
+                          '<music21.interval.Interval m2 (+1c)>', 
+                          '<music21.interval.Interval m2 (-1c)>', 
+                          '<music21.interval.Interval m2 (0c)>',
+                          '<music21.interval.Interval m2 (-12c)>', 
+                          '<music21.interval.Interval m2 (+12c)>'])
 
 
         # test loading a new scala object from adjacent sets
@@ -597,7 +629,14 @@ Aristoxenos' Chromatic/Enharmonic, 3 + 9 + 18 parts
         #print ss.getFileString()
         self.assertEqual(ss.getFileString()[:1], msg[:1])
 
-        self.assertEqual([str(x) for x in ss.getIntervalSequence()], ['<music21.interval.Interval P1 (+50c)>', '<music21.interval.Interval m2 (+50c)>', '<music21.interval.Interval m3>', '<music21.interval.Interval M2>', '<music21.interval.Interval P1 (+50c)>', '<music21.interval.Interval m2 (+50c)>', '<music21.interval.Interval m3>'])
+        self.assertEqual([str(x) for x in ss.getIntervalSequence()], 
+                         ['<music21.interval.Interval P1 (+50c)>', 
+                          '<music21.interval.Interval m2 (+50c)>', 
+                          '<music21.interval.Interval m3>', 
+                          '<music21.interval.Interval M2>', 
+                          '<music21.interval.Interval P1 (+50c)>', 
+                          '<music21.interval.Interval m2 (+50c)>', 
+                          '<music21.interval.Interval m3>'])
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation

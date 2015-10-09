@@ -361,10 +361,11 @@ class IPythonNotebookReSTWriter(ReSTWriter):
                 return False
 
         self.runNBConvert(ipythonNotebookFilePath)
-        with open(rstFilePath, 'r', encoding='utf8') as f:
+        # 'encoding' is an invalid keyword argument for the built-in 'open' in python 2.
+        with io.open(rstFilePath, 'r', encoding='utf8') as f:
             oldLines = f.read().splitlines()
         lines = self.cleanConvertedNotebook(oldLines, ipythonNotebookFilePath)
-        with open(rstFilePath, 'w') as f:
+        with io.open(rstFilePath, 'w', encoding='utf8') as f:
             f.write('\n'.join(lines))
 
         return True

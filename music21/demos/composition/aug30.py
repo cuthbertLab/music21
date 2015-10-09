@@ -94,9 +94,12 @@ def addPart(minLength=80, maxProbability=0.7, instrument=None):
         s1.insert(0, instrument)
     s1.makeAccidentals()
     s1.makeMeasures(inPlace = True)
-    for n in s1.flat.notesAndRests:
+    sf = s1.flat.notesAndRests
+    for n in sf:
         if n.tie is not None and n.tie.type != 'start':
-            n.__class__ = note.Rest
+            r = note.Rest()
+            r.quarterLength = n.quarterLength
+            s1.replace(n, r, allDerived=True)
     
     return s1
     

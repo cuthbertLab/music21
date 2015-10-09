@@ -47,8 +47,8 @@ from music21 import common
 from music21 import freezeThaw
 from music21 import exceptions21
 
-from music21.metadata.bundles import *
-from music21.metadata.caching import *
+from music21.metadata import bundles
+from music21.metadata import caching
 from music21.metadata.primitives import * # pylint: disable=wildcard-import
 
 from music21.metadata import testMetadata 

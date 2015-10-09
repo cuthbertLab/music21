@@ -438,7 +438,6 @@ def ch1_writing_I_B_3(show=True, *arguments, **keywords):
 
 #     purcellScore = music21.parseData("Music_for_a_while.musicxml")
 #     thisClef = purcellScore.getElementsByClass(clef.Clef)[0]
-#     thisClef.__class__ = clef.TenorClef
 #     purcellScore.insert(0, instrument.Instrument('bassoon'))
 #     assert purcellScore.allInRange() is True
 #     purcellScore.playMidi()   ## will play on bassoon

@@ -22,7 +22,8 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler`
 (for algorithmic key detection) and 
 :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) provide examples.
 '''
-#TODO: make an analysis.base for the Discrete and analyzeStream aspects, then create range and key modules in analysis
+#TODO: make an analysis.base for the Discrete and analyzeStream aspects, then create
+# range and key modules in analysis
 
 import unittest
 
@@ -1540,19 +1541,22 @@ class Test(unittest.TestCase):
         
         k = s.analyze('KrumhanslSchmuckler')
         self.assertEqual(str(k), 'C major')
-        self.assertEqual(str(k.alternateInterpretations), '[<music21.key.Key of c minor>, <music21.key.Key of G major>, <music21.key.Key of a minor>, <music21.key.Key of F major>, <music21.key.Key of g minor>, <music21.key.Key of e minor>, <music21.key.Key of f minor>, <music21.key.Key of E- major>, <music21.key.Key of A- major>, <music21.key.Key of B- major>, <music21.key.Key of d minor>, <music21.key.Key of D major>, <music21.key.Key of A major>, <music21.key.Key of b minor>, <music21.key.Key of b- minor>, <music21.key.Key of c# minor>, <music21.key.Key of f# minor>, <music21.key.Key of C# major>, <music21.key.Key of E major>, <music21.key.Key of g# minor>, <music21.key.Key of F# major>, <music21.key.Key of B major>, <music21.key.Key of e- minor>]')
+        self.assertEqual(" ".join(kp.tonicPitchNameWithCase for kp in k.alternateInterpretations), 
+                         'c G a F g e f E- A- B- d D A b b- c# f# C# E g# F# B e-')
 
         k = s.analyze('AardenEssen')
         self.assertEqual(str(k), 'F major')
-        self.assertEqual(str(k.alternateInterpretations), 
-                         '[<music21.key.Key of C major>, <music21.key.Key of c minor>, <music21.key.Key of g minor>, <music21.key.Key of f minor>, <music21.key.Key of a minor>, <music21.key.Key of G major>, <music21.key.Key of d minor>, <music21.key.Key of A- major>, <music21.key.Key of B- major>, <music21.key.Key of E- major>, <music21.key.Key of e minor>, <music21.key.Key of b- minor>, <music21.key.Key of D major>, <music21.key.Key of A major>, <music21.key.Key of f# minor>, <music21.key.Key of C# major>, <music21.key.Key of b minor>, <music21.key.Key of E major>, <music21.key.Key of c# minor>, <music21.key.Key of e- minor>, <music21.key.Key of F# major>, <music21.key.Key of B major>, <music21.key.Key of g# minor>]')
+        self.assertEqual(" ".join(kp.tonicPitchNameWithCase for kp in k.alternateInterpretations),
+                         'C c g f a G d A- B- E- e b- D A f# C# b E c# e- F# B g#') 
         
         #s.plot('grid', 'KrumhanslSchmuckler')
         #s.plot('windowed', 'aarden')
 
 
 # define presented order in documentation
-_DOC_ORDER = [analyzeStream, DiscreteAnalysis, Ambitus, MelodicIntervalDiversity, KeyWeightKeyAnalysis, SimpleWeights, AardenEssen, BellmanBudge, KrumhanslSchmuckler, KrumhanslKessler, TemperleyKostkaPayne]
+_DOC_ORDER = [analyzeStream, DiscreteAnalysis, Ambitus, MelodicIntervalDiversity, 
+              KeyWeightKeyAnalysis, SimpleWeights, AardenEssen, BellmanBudge, 
+              KrumhanslSchmuckler, KrumhanslKessler, TemperleyKostkaPayne]
 
 #------------------------------------------------------------------------------
 

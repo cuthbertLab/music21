@@ -122,7 +122,7 @@ class MetadataCachingJob(object):
     Parses one corpus path, and attempts to extract metadata from it:
 
     >>> from music21 import metadata
-    >>> job = metadata.MetadataCachingJob(
+    >>> job = metadata.caching.MetadataCachingJob(
     ...     'bach/bwv66.6',
     ...     useCorpus=True,
     ...     )
@@ -179,7 +179,7 @@ class MetadataCachingJob(object):
     def parseNonOpus(self, parsedObject):
         from music21 import metadata
         try:
-            corpusPath = metadata.MetadataBundle.corpusPathToKey(
+            corpusPath = metadata.bundles.MetadataBundle.corpusPathToKey(
                 self.cleanFilePath)
             if parsedObject.metadata is not None:
                 richMetadata = metadata.RichMetadata()
@@ -187,7 +187,7 @@ class MetadataCachingJob(object):
                 richMetadata.update(parsedObject)  # update based on Stream
                 environLocal.printDebug(
                     'updateMetadataCache: storing: {0}'.format(corpusPath))
-                metadataEntry = metadata.MetadataEntry(
+                metadataEntry = metadata.bundles.MetadataEntry(
                     sourcePath=self.cleanFilePath,
                     metadataPayload=richMetadata,
                     )
@@ -197,7 +197,7 @@ class MetadataCachingJob(object):
                     'addFromPaths: got stream without metadata, '
                     'creating stub: {0}'.format(
                         common.relativepath(self.cleanFilePath)))
-                metadataEntry = metadata.MetadataEntry(
+                metadataEntry = metadata.bundles.MetadataEntry(
                     sourcePath=self.cleanFilePath,
                     metadataPayload=None,
                     )
@@ -205,7 +205,7 @@ class MetadataCachingJob(object):
         except Exception: # wide catch is fine. pylint: disable=broad-except
             environLocal.warn('Had a problem with extracting metadata '
             'for {0}, piece ignored'.format(self.filePath))
-            environLocal.printDebug(traceback.format_exc())
+            environLocal.warn(traceback.format_exc())
 
     def parseOpus(self, parsedObject):
         from music21 import metadata
@@ -225,7 +225,7 @@ class MetadataCachingJob(object):
         # Create a dummy metadata entry, representing the entire opus.
         # This lets the metadata bundle know it has already processed this
         # entire opus on the next cache update.
-        metadataEntry = metadata.MetadataEntry(
+        metadataEntry = metadata.bundles.MetadataEntry(
             sourcePath=self.cleanFilePath,
             metadataPayload=None,
             )
@@ -248,14 +248,14 @@ class MetadataCachingJob(object):
                     '{0}'.format(self.filePath))
             else:
                 # update path to include work number
-                corpusPath = metadata.MetadataBundle.corpusPathToKey(
+                corpusPath = metadata.bundles.MetadataBundle.corpusPathToKey(
                     self.cleanFilePath,
                     number=score.metadata.number,
                     )
                 environLocal.printDebug(
                     'addFromPaths: storing: {0}'.format(
                         corpusPath))
-                metadataEntry = metadata.MetadataEntry(
+                metadataEntry = metadata.bundles.MetadataEntry(
                     sourcePath=self.cleanFilePath,
                     number=score.metadata.number,
                     metadataPayload=richMetadata,
@@ -304,15 +304,14 @@ class JobProcessor(object):
     * the last processed file path
     * the number of remaining jobs
 
-    >>> from music21 import corpus, metadata
     >>> jobs = []
     >>> for corpusPath in corpus.getMonteverdiMadrigals()[:3]:
-    ...     job = metadata.MetadataCachingJob(
+    ...     job = metadata.caching.MetadataCachingJob(
     ...         corpusPath,
     ...         useCorpus=True,
     ...         )
     ...     jobs.append(job)
-    >>> jobGenerator = metadata.JobProcessor.process_serial(jobs)
+    >>> jobGenerator = metadata.caching.JobProcessor.process_serial(jobs)
     >>> for result in jobGenerator:
     ...     print(result['remainingJobs'])
     ...

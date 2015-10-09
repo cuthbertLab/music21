@@ -1655,7 +1655,8 @@ class CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(
     '''
     id = 'R7'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  
+                                                 *arguments, **keywords)
 
         self.name = 'Combined Strength of Two Strongest Rhythmic Pulses'
         self.description = 'The sum of the frequencies of the two beat bins of the peaks with the highest frequencies.'
@@ -1677,7 +1678,8 @@ class NumberOfStrongPulsesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R8'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  
+                                                 *arguments, **keywords)
 
         self.name = 'Number of Strong Pulses'
         self.description = 'Number of beat peaks with normalized frequencies over 0.1.'
@@ -1697,7 +1699,8 @@ class NumberOfModeratePulsesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R9'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  
+                                                 *arguments, **keywords)
 
         self.name = 'Number of Moderate Pulses'
         self.description = 'Number of beat peaks with normalized frequencies over 0.01.'
@@ -1719,10 +1722,12 @@ class NumberOfRelativelyStrongPulsesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R10'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  
+                                                 *arguments, **keywords)
 
         self.name = 'Number of Relatively Strong Pulses'
-        self.description = 'Number of beat peaks with frequencies at least 30% as high as the frequency of the bin with the highest frequency.'
+        self.description = '''Number of beat peaks with frequencies at least 30% as high as 
+                'the frequency of the bin with the highest frequency.'''
         self.isSequential = True
         self.dimensions = 1
 
@@ -1738,10 +1743,14 @@ class RhythmicLoosenessFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R11'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  
+                                                 *arguments, **keywords)
 
         self.name = 'Rhythmic Looseness'
-        self.description = 'Average width of beat histogram peaks (in beats per minute). Width is measured for all peaks with frequencies at least 30% as high as the highest peak, and is defined by the distance between the points on the peak in question that are 30% of the height of the peak.'
+        self.description = '''Average width of beat histogram peaks (in beats per minute). 
+        Width is measured for all peaks with frequencies at least 30% as high as the 
+        highest peak, and is defined by the distance between the points on the peak in 
+        question that are 30% of the height of the peak.'''
         self.isSequential = True
         self.dimensions = 1
 
@@ -1759,7 +1768,7 @@ class PolyrhythmsFeature(featuresModule.FeatureExtractor):
     (using only multipliers of 1, 2, 3, 4, 6 and 8) (with an accepted 
     error of +/- 3 bins) of the bin label of the peak with the highest frequency. 
     This number is then divided by the total number of beat bins with frequencies 
-    over 30% of the highest frequency.'        
+    over 30% of the highest frequency.       
     '''
     id = 'R12'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -1768,7 +1777,13 @@ class PolyrhythmsFeature(featuresModule.FeatureExtractor):
                                                  *arguments, **keywords)
 
         self.name = 'Polyrhythms'
-        self.description = 'Number of beat peaks with frequencies at least 30% of the highest frequency whose bin labels are not integer multiples or factors (using only multipliers of 1, 2, 3, 4, 6 and 8) (with an accepted error of +/- 3 bins) of the bin label of the peak with the highest frequency. This number is then divided by the total number of beat bins with frequencies over 30% of the highest frequency.'
+        self.description = '''
+        Number of beat peaks with frequencies at least 30% of the highest frequency 
+        whose bin labels are not integer multiples or factors 
+        (using only multipliers of 1, 2, 3, 4, 6 and 8) (with an accepted 
+        error of +/- 3 bins) of the bin label of the peak with the highest frequency. 
+        This number is then divided by the total number of beat bins with frequencies 
+        over 30% of the highest frequency.'''
         self.isSequential = True
         self.dimensions = 1
 
@@ -2744,10 +2759,12 @@ class VoiceEqualityMelodicLeapsFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T7'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  
+                                                 *arguments, **keywords)
  
         self.name = 'Voice Equality - Melodic Leaps'
-        self.description = 'Standard deviation of the average melodic leap in MIDI pitches for each channel that contains at least one note.'
+        self.description = '''Standard deviation of the average melodic leap in MIDI pitches 
+        for each channel that contains at least one note.'''
         self.isSequential = True
         self.dimensions = 1
 
@@ -2763,10 +2780,12 @@ class VoiceEqualityRangeFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T8'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
  
         self.name = 'Voice Equality - Range'
-        self.description = 'Standard deviation of the differences between the highest and lowest pitches in each channel that contains at least one note.'
+        self.description = '''Standard deviation of the differences between the 
+        highest and lowest pitches in each channel that contains at least one note.'''
         self.isSequential = True
         self.dimensions = 1
 
@@ -2782,10 +2801,12 @@ class ImportanceOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T9'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  
+                                                 *arguments, **keywords)
 
         self.name = 'Importance of Loudest Voice'
-        self.description = 'Difference between the average loudness of the loudest channel and the average loudness of the other channels that contain at least one note.'
+        self.description = '''Difference between the average loudness of the loudest channel 
+        and the average loudness of the other channels that contain at least one note.'''
         self.isSequential = True
         self.dimensions = 1
 
@@ -2803,10 +2824,13 @@ class RelativeRangeOfLoudestVoiceFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T10'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  
+                                                 *arguments, **keywords)
 
         self.name = 'Relative Range of Loudest Voice'
-        self.description = 'Difference between the highest note and the lowest note played in the channel with the highest average loudness divided by the difference between the highest note and the lowest note overall in the piece.'
+        self.description = '''Difference between the highest note and the lowest note 
+        played in the channel with the highest average loudness divided by the difference 
+        between the highest note and the lowest note overall in the piece.'''
         self.isSequential = True
         self.dimensions = 1
 
@@ -2823,10 +2847,13 @@ class RangeOfHighestLineFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T12'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  
+                                                 *arguments, **keywords)
 
         self.name = 'Range of Highest Line'
-        self.description = 'Difference between the highest note and the lowest note played in the channel with the highest average pitch divided by the difference between the highest note and the lowest note in the piece.'
+        self.description = '''Difference between the highest note and the lowest note 
+        played in the channel with the highest average pitch divided by the difference 
+        between the highest note and the lowest note in the piece.'''
         self.isSequential = True
         self.dimensions = 1
 
@@ -2844,10 +2871,13 @@ class RelativeNoteDensityOfHighestLineFeature(featuresModule.FeatureExtractor):
     id = 'T13'
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  
+                                                 *arguments, **keywords)
 
         self.name = 'Relative Note Density of Highest Line'
-        self.description = 'Number of Note Ons in the channel with the highest average pitch divided by the average number of Note Ons in all channels that contain at least one note.'
+        self.description = '''Number of Note Ons in the channel with the highest average 
+        pitch divided by the average number of Note Ons in all channels that contain at 
+        least one note.'''
         self.isSequential = True
         self.dimensions = 1
 
@@ -2863,10 +2893,13 @@ class MelodicIntervalsInLowestLineFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T15'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  
+                                                 *arguments, **keywords)
  
         self.name = 'Melodic Intervals in Lowest Line'
-        self.description = 'Average melodic interval in semitones of the channel with the lowest average pitch divided by the average melodic interval of all channels that contain at least two notes.'
+        self.description = '''Average melodic interval in semitones of the channel 
+        with the lowest average pitch divided by the average melodic interval of all 
+        channels that contain at least two notes.'''
         self.isSequential = True
         self.dimensions = 1
 
@@ -2882,10 +2915,13 @@ class VoiceSeparationFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T20'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  
+                                                 *arguments, **keywords)
  
         self.name = 'Voice Separation'
-        self.description = 'Average separation in semi-tones between the average pitches of consecutive channels (after sorting based/non average pitch) that contain at least one note.'
+        self.description = '''Average separation in semi-tones between the average pitches of 
+        consecutive channels (after sorting based/non average pitch) that contain at 
+        least one note.'''
         self.isSequential = True
         self.dimensions = 1
 
@@ -2906,14 +2942,23 @@ class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
     >>> s1.append(note.Note())
     >>> fe = features.jSymbolic.PitchedInstrumentsPresentFeature(s1)
     >>> fe.extract().vector
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+     1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+     1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     '''
     id = 'I1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  
+                                                 *arguments, **keywords)
 
         self.name = 'Pitched Instruments Present'
-        self.description = 'Which pitched General MIDI Instruments are present. There is one entry for each instrument, which is set to 1.0 if there is at least one Note On in the recording corresponding to the instrument and to 0.0 if there is not.'
+        self.description = '''Which pitched General MIDI Instruments are present. 
+        There is one entry for each instrument, which is set to 1.0 if there is at 
+        least one Note On in the recording corresponding to the instrument and to 
+        0.0 if there is not.'''
         self.isSequential = True
         self.dimensions = 128
 
@@ -2957,7 +3002,11 @@ class UnpitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
         self.name = 'Unpitched Instruments Present'
-        self.description = 'Which unpitched MIDI Percussion Key Map instruments are present. There is one entry for each instrument, which is set to 1.0 if there is at least one Note On in the recording corresponding to the instrument and to 0.0 if there is not. It should be noted that only instruments 35 to 81 are included here, as they are the ones that meet the official standard. They are numbered in this array from 0 to 46.'
+        self.description = '''Which unpitched MIDI Percussion Key Map instruments are present. 
+        There is one entry for each instrument, which is set to 1.0 if there is at least one 
+        Note On in the recording corresponding to the instrument and to 0.0 if there is not. 
+        It should be noted that only instruments 35 to 81 are included here, as they are the 
+        ones that meet the official standard. They are numbered in this array from 0 to 46.'''
         self.isSequential = True
         self.dimensions = 47
 
@@ -2976,7 +3025,13 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
     >>> s1.append(note.Note())
     >>> fe = features.jSymbolic.NotePrevalenceOfPitchedInstrumentsFeature(s1)
     >>> fe.extract().vector
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.8..., 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.2..., 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+     0.8..., 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.2..., 
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
     '''
     id = 'I3'
@@ -3019,7 +3074,12 @@ class NotePrevalenceOfUnpitchedInstrumentsFeature(
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
 
         self.name = 'Note Prevalence of Unpitched Instruments'
-        self.description = 'The fraction of (unpitched) notes played by each General MIDI Percussion Key Map Instrument. There is one entry for each instrument, which is set to the number of Note Ons played using the corresponding MIDI note value divided by the total number of Note Ons in the recording. It should be noted that only instruments 35 to 81 are included here, as they are the ones that meet the official standard. They are numbered in this array from 0 to 46.'
+        self.description = '''The fraction of (unpitched) notes played by each General MIDI 
+        Percussion Key Map Instrument. There is one entry for each instrument, which is set 
+        to the number of Note Ons played using the corresponding MIDI note value divided by 
+        the total number of Note Ons in the recording. It should be noted that only instruments 
+        35 to 81 are included here, as they are the ones that meet the official standard. 
+        They are numbered in this array from 0 to 46.'''
         self.isSequential = True
         self.dimensions = 47
 
@@ -3189,7 +3249,9 @@ class PercussionPrevalenceFeature(featuresModule.FeatureExtractor):
 
 
 class InstrumentFractionFeature(featuresModule.FeatureExtractor):
-    '''This subclass is in-turn subclassed by all FeatureExtractors that look at the proportional usage of an Insutrment
+    '''
+    This subclass is in-turn subclassed by all FeatureExtractors that 
+    look at the proportional usage of an Insutrment
     '''
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream,  *arguments, **keywords)
@@ -3236,7 +3298,9 @@ class StringKeyboardFractionFeature(InstrumentFractionFeature):
 
 
 class AcousticGuitarFractionFeature(InstrumentFractionFeature):
-    '''A feature exractor that extracts the fraction of all Note Ons belonging to acoustic guitar patches (General MIDI patches 25 to 26).
+    '''
+    A feature exractor that extracts the fraction of all Note Ons belonging to 
+    acoustic guitar patches (General MIDI patches 25 to 26).
 
     
     >>> s1 = stream.Stream()
@@ -3335,7 +3399,9 @@ class SaxophoneFractionFeature(InstrumentFractionFeature):
         self._targetPrograms = [64, 65, 66, 67]
 
 class BrassFractionFeature(InstrumentFractionFeature):
-    '''A feature exractor that extracts the fraction of all Note Ons belonging to brass patches (General MIDI patches 57 or 68).
+    '''
+    A feature exractor that extracts the fraction of all Note Ons 
+    belonging to brass patches (General MIDI patches 57 or 68).
 
     
     >>> s1 = stream.Stream()
