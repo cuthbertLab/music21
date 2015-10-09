@@ -5663,14 +5663,18 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('bach/bwv66.6')
         # the part is not derived from anything yet
-        self.assertEqual([str(e.__class__) for e in s[1][2][3].containerHierarchy], ["<class 'music21.stream.Measure'>", "<class 'music21.stream.Part'>", "<class 'music21.stream.Score'>"])
+        self.assertEqual([str(e.__class__) for e in s[1][2][3].containerHierarchy()], 
+                         ["<class 'music21.stream.Measure'>", 
+                          "<class 'music21.stream.Part'>", 
+                          "<class 'music21.stream.Score'>"])
         
         # after extraction and changing activeSite, cannot find
         n = s.flat.notesAndRests[0]
-        self.assertEqual([common.classToClassStr(e.__class__) for e in n.containerHierarchy], ['Score', 'Score']  )
+        self.assertEqual([common.classToClassStr(e.__class__) for e in n.containerHierarchy()], 
+                         ['Score', 'Score']  )
         
         # still cannot get hierarchy
-        #self.assertEqual([str(e.__class__) for e in s.parts[0].containerHierarchy], [])
+        #self.assertEqual([str(e.__class__) for e in s.parts[0].containerHierarchy()], [])
 
 
     def testMakeMeasuresTimeSignatures(self):

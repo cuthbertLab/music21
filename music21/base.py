@@ -2376,7 +2376,62 @@ class Music21Object(object):
     #--------------------------------------------------------------------------
     # duration manipulation, processing, and splitting
 
-    def _getContainerHierarchy(self):
+    def containerHierarchy(self, followDerivation=True, includeNonStreamDerivations=False):
+        '''
+        Return a list of Stream subclasses that this object
+        is contained within or (if followDerivation is set) is derived from. 
+        
+        This gives access to the hierarchy that contained or
+        created this object.
+        
+        >>> s = corpus.parse('bach/bwv66.6')
+        >>> noteE = s[1][2][3]
+        >>> noteE
+        <music21.note.Note E>
+        >>> [e for e in noteE.containerHierarchy()]
+        [<music21.stream.Measure 1 offset=1.0>, 
+         <music21.stream.Part Soprano>, 
+         <music21.stream.Score 0x1049a5668>]
+         
+        
+        Note that derived objects also can follow the container hierarchy:
+        
+        >>> import copy
+        >>> n2 = copy.deepcopy(noteE)
+        >>> [e for e in n2.containerHierarchy()]
+        [<music21.stream.Measure 1 offset=1.0>, 
+         <music21.stream.Part Soprano>, 
+         <music21.stream.Score 0x1049a5668>]
+         
+        Unless followDerivation is False:
+
+        >>> [e for e in n2.containerHierarchy(followDerivation=False)]
+        []
+        
+        if includeNonStreamDerivations is True then n2's containerHierarchy will include
+        n even though it's not a container.  It gives a good idea of how the hierarchy is being
+        constructed.
+        
+        >>> [e for e in n2.containerHierarchy(includeNonStreamDerivations=True)]
+        [<music21.note.Note E>,
+         <music21.stream.Measure 1 offset=1.0>, 
+         <music21.stream.Part Soprano>, 
+         <music21.stream.Score 0x1049a5668>]
+        
+        
+        
+        The method follows activeSites, so set the activeSite as necessary.
+        
+        >>> p = stream.Part(id="newPart")
+        >>> m = stream.Measure(number=20)
+        >>> p.insert(0, m)
+        >>> m.insert(0, noteE)
+        >>> noteE.activeSite
+        <music21.stream.Measure 20 offset=0.0>
+        >>> noteE.containerHierarchy()
+        [<music21.stream.Measure 20 offset=0.0>, 
+         <music21.stream.Part newPart>]         
+        '''
         post = []
         focus = self
         endMe = 200
@@ -2385,11 +2440,11 @@ class Music21Object(object):
             # collect activeSite unless activeSite is None;
             # if so, try to get rootDerivation
             candidate = focus.activeSite
-            #environLocal.printDebug(['_getContainerHierarchy(): activeSite found:', candidate])
+            #environLocal.printDebug(['containerHierarchy(): activeSite found:', candidate])
             if candidate is None: # nothing more to derive
                 # if this is a Stream, we might find a root derivation
-                if hasattr(focus, 'derivation'):
-                    #environLocal.printDebug(['_getContainerHierarchy(): 
+                if followDerivation is True and hasattr(focus, 'derivation'):
+                    #environLocal.printDebug(['containerHierarchy(): 
                     # found rootDerivation:', focus.rootDerivation])
                     alt = focus.derivation.rootDerivation
                     if alt is None:
@@ -2398,33 +2453,10 @@ class Music21Object(object):
                         candidate = alt
                 else:
                     return post
-            post.append(candidate)
+            if includeNonStreamDerivations is True or 'Stream' in candidate.classes:
+                post.append(candidate)
             focus = candidate
         return post
-
-    containerHierarchy = property(_getContainerHierarchy,
-        doc = '''
-        Return a list of Stream subclasses that this Stream
-        is contained within or derived from. This provides a way of seeing
-        Streams contained within Streams.
-
-        >>> s = corpus.parse('bach/bwv66.6')
-        >>> [e for e in s[1][2][3].containerHierarchy]
-        [<music21.stream.Measure 1 offset=1.0>, 
-         <music21.stream.Part Soprano>, 
-         <music21.stream.Score ...>]
-        
-        
-        Note that derived objects also can follow the container hierarchy:
-        
-        >>> import copy
-        >>> n2 = copy.deepcopy(s[1][2][3])
-        >>> [e for e in s[1][2][3].containerHierarchy]
-        [<music21.stream.Measure 1 offset=1.0>, 
-         <music21.stream.Part Soprano>, 
-         <music21.stream.Score ...>]
-        ''')
-
 
 
 

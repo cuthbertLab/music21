@@ -10,8 +10,9 @@
 #-------------------------------------------------------------------------------
 '''
 if you get a 'ssh_askpass' not found error, create this file in 
-/usr/libexec/ssh-askpass and sudo chmod +x it afterwards::
+/usr/libexec/ssh-askpass and sudo chmod +x it afterwards:
 
+..raw::
     #!/bin/bash
     # Script: ssh-askpass
     # Author: Mark Carver
@@ -21,14 +22,12 @@ if you get a 'ssh_askpass' not found error, create this file in
     # A ssh-askpass command for Mac OS X
     # Based from author: Joseph Mocker, Sun Microsystems
     # http://blogs.oracle.com/mock/entry/and_now_chicken_of_the
-    
     # To use this script:
     #   Install this script running INSTALL as root
     #
     # If you plan on manually installing this script, please note that you will have
     # to set the following variable for SSH to recognize where the script is located:
     #   export SSH_ASKPASS="/path/to/ssh-askpass"
-    
     TITLE="${SSH_ASKPASS_TITLE:-SSH}";
     TEXT="$(whoami)'s password:";
     IFS=$(printf "\n");
@@ -42,9 +41,12 @@ if you get a 'ssh_askpass' not found error, create this file in
     CODE=(${CODE[*]} "end tell");
     SCRIPT="/usr/bin/osascript"
     for LINE in ${CODE[*]}; do
-        SCRIPT="${SCRIPT} -e $(printf "%q" "${LINE}")";
+    SCRIPT="${SCRIPT} -e $(printf "%q" "${LINE}")";
     done;
     eval "${SCRIPT}";
+
+
+Otherwise just contact MSC...
 '''    
 
 import getpass, os
