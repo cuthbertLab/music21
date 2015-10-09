@@ -674,7 +674,7 @@ class ElementTree(core.AVLTree):
                     return x.source.sortTuple()[2:]
                 else:
                     return x.endTime  # ElementTimespan with no Element!
-        self.insertNode(self.rootNode, offset)
+        self.insert(self.rootNode, offset)
         node = self._getNodeByOffset(self.rootNode, offset)
         node.payload.append(el)
         node.payload.sort(key=key)
