@@ -427,7 +427,7 @@ class ElementTree(core.AVLTree):
         if element in node.payload:
             node.payload.remove(element)
         if not node.payload:
-            self.rootNode = self._remove(self.rootNode, offset)
+            self.removeNode(offset)
         if isinstance(element, ElementTree): # represents an embedded Stream
             element._parents.remove(self)
 

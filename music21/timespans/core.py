@@ -321,7 +321,7 @@ class AVLNode(common.SlottedObject):
         self.height = max(leftHeight, rightHeight) + 1
         self.balance = rightHeight - leftHeight
 
-    def _rotateLeftLeft(self):
+    def rotateLeftLeft(self):
         r'''
         Rotates a node left twice.
 
@@ -337,7 +337,7 @@ class AVLNode(common.SlottedObject):
 
         return nextNode
 
-    def _rotateLeftRight(self):
+    def rotateLeftRight(self):
         r'''
         Rotates a node right twice.
 
@@ -345,12 +345,12 @@ class AVLNode(common.SlottedObject):
 
         Returns a node, the new central node.
         '''
-        self.leftChild = self.leftChild._rotateRightRight()
+        self.leftChild = self.leftChild.rotateRightRight()
         self.update()
-        nextNode = self._rotateLeftLeft()
+        nextNode = self.rotateLeftLeft()
         return nextNode
 
-    def _rotateRightLeft(self):
+    def rotateRightLeft(self):
         r'''
         Rotates a node right, then left.
 
@@ -358,12 +358,12 @@ class AVLNode(common.SlottedObject):
 
         Returns a node, the new central node.
         '''
-        self.rightChild = self.rightChild._rotateLeftLeft()
+        self.rightChild = self.rightChild.rotateLeftLeft()
         self.update()
-        nextNode = self._rotateRightRight()
+        nextNode = self.rotateRightRight()
         return nextNode
 
-    def _rotateRightRight(self):
+    def rotateRightRight(self):
         r'''
         Rotates a node left, then right.
 
@@ -378,7 +378,7 @@ class AVLNode(common.SlottedObject):
         nextNode.update()
         return nextNode
 
-    def _rebalance(self):
+    def rebalance(self):
         r'''
         Rebalances the subtree rooted on this node.
 
@@ -387,14 +387,14 @@ class AVLNode(common.SlottedObject):
         node = self
         if node.balance > 1:
             if 0 <= node.rightChild.balance:
-                node = node._rotateRightRight()
+                node = node.rotateRightRight()
             else:
-                node = node._rotateRightLeft()
+                node = node.rotateRightLeft()
         elif node.balance < -1:
             if node.leftChild.balance <= 0:
-                node = node._rotateLeftLeft()
+                node = node.rotateLeftLeft()
             else:
-                node = node._rotateLeftRight()
+                node = node.rotateLeftRight()
         if node.balance < -1 or node.balance > 1:
             raise TimespanException(
                 'Somehow Nodes are still not balanced. node.balance %r must be between -1 and 1')
@@ -503,7 +503,7 @@ class AVLTree(object):
                 node.rightChild = recurse(node.rightChild, offset)
                 node.update()
             if node is not None:
-                return node._rebalance()            
+                return node.rebalance()            
         
         self.rootNode = recurse(self.rootNode, offset)
 
@@ -555,16 +555,16 @@ class AVLTree(object):
         return recurse(offset, self.rootNode)
 
 
-    def _getNodeAfter(self, offset):
+    def getNodeAfter(self, offset):
         r'''
         Gets the first node after `offset`.
 
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
-        >>> n1 = tree._getNodeAfter(0.5)
+        >>> n1 = tree.getNodeAfter(0.5)
         >>> n1
         <Node: Start:1.0 Indices:(7:7:11:11) Length:{4}>
-        >>> n2 = tree._getNodeAfter(0.6)
+        >>> n2 = tree.getNodeAfter(0.6)
         >>> n2 is n1
         True
         '''
@@ -601,19 +601,19 @@ class AVLTree(object):
         >>> tree.getOffsetAfter(-999)
         0.0
         '''
-        node = self._getNodeAfter(offset)
+        node = self.getNodeAfter(offset)
         if node:            
             return node.offset
         else:
             return None
 
-    def _getNodeBefore(self, offset):
+    def getNodeBefore(self, offset):
         '''
         Finds the node immediately before offset.
         
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
-        >>> tree._getNodeBefore(100)  # last node in piece
+        >>> tree.getNodeBefore(100)  # last node in piece
         <Node: Start:35.0 Indices:(161:161:165:165) Length:{4}>
         '''
         def recurse(node, offset):
@@ -646,40 +646,79 @@ class AVLTree(object):
         >>> tree.getOffsetBefore(0) is None
         True
         '''
-        node = self._getNodeBefore(offset)
+        node = self.getNodeBefore(offset)
         if node is None:
             return None
         return node.offset
 
-    def _remove(self, node, offset):
+    def removeNode(self, offset):
         r'''
         Removes a node at `offset` in the subtree rooted on `node`.
 
         Used internally by TimespanTree.
 
-        Returns a node which represents the new rootNote.
+        >>> avl = timespans.core.AVLTree()
+        >>> avl.insertAtOffset(20)
+        >>> avl.insertAtOffset(10)
+        >>> avl.insertAtOffset(5)
+        >>> avl.insertAtOffset(30)
+        >>> avl.rootNode
+        <Node: Start:10 Height:2 L:0 R:1>
+
+        Remove node at 30
+
+        >>> avl.removeNode(30)
+        >>> avl.rootNode
+        <Node: Start:10 Height:1 L:0 R:0>
+        
+        Removing a node eliminates its payload:
+        
+        >>> ten = avl.getNodeByOffset(10)
+        >>> ten.payload = 'ten'
+        >>> twenty = avl.getNodeByOffset(20)
+        >>> twenty.payload = 'twenty'
+        
+        >>> avl.removeNode(10)
+        >>> avl.rootNode
+        <Node: Start:20 Height:1 L:0 R:None>
+        >>> avl.rootNode.payload
+        'twenty'
+        
+        Removing a non-existent node does nothing.
+        
+        >>> avl.removeNode(9.5)
+        >>> avl.rootNode
+        <Node: Start:20 Height:1 L:0 R:None>
+        
+        >>> for n in avl:
+        ...     print(n, n.payload)
+        <Node: Start:5 Height:0 L:None R:None> None
+        <Node: Start:20 Height:1 L:0 R:None> twenty        
         '''
-        if node is not None:
-            if node.offset == offset:
-                ### got the right node!
-                if node.leftChild and node.rightChild:
-                    nextNode = node.rightChild
-                    while nextNode.leftChild: # farthest left child of the right child.
-                        nextNode = nextNode.leftChild
-                    node.offset = nextNode.offset
-                    node.payload = nextNode.payload
-                    node.rightChild = self._remove(node.rightChild, nextNode.offset)
+        def recurseRemove(node, offset):
+            if node is not None:
+                if node.offset == offset:
+                    ### got the right node!
+                    if node.leftChild and node.rightChild:
+                        nextNode = node.rightChild
+                        while nextNode.leftChild: # farthest left child of the right child.
+                            nextNode = nextNode.leftChild
+                        node.offset = nextNode.offset
+                        node.payload = nextNode.payload
+                        node.rightChild = recurseRemove(node.rightChild, nextNode.offset)
+                        node.update()
+                    else:
+                        node = node.leftChild or node.rightChild
+                elif node.offset > offset:
+                    node.leftChild = recurseRemove(node.leftChild, offset)
                     node.update()
-                else:
-                    node = node.leftChild or node.rightChild
-            elif node.offset > offset:
-                node.leftChild = self._remove(node.leftChild, offset)
-                node.update()
-            elif node.offset < offset:
-                node.rightChild = self._remove(node.rightChild, offset)
-                node.update()
-        if node is not None:
-            return node._rebalance()
+                elif node.offset < offset:
+                    node.rightChild = recurseRemove(node.rightChild, offset)
+                    node.update()
+            if node is not None:
+                return node.rebalance()
+
+        self.rootNode = recurseRemove(self.rootNode, offset)
 
 #-------------------------------#
 if __name__ == '__main__':
