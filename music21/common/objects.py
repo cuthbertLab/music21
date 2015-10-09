@@ -54,12 +54,12 @@ class SingletonCounter(object):
     
     Instantiate and then call it.
     
-    >>> sc = SingletonCounter()
+    >>> sc = common.SingletonCounter()
     >>> v0 = sc()
     >>> v1 = sc()
     >>> v1 > v0
     True
-    >>> sc2 = SingletonCounter()
+    >>> sc2 = common.SingletonCounter()
     >>> v2 = sc2()
     >>> v2 > v1
     True

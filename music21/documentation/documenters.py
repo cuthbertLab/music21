@@ -105,21 +105,21 @@ class FunctionDocumenter(ObjectDocumenter):
     >>> function = common.opFrac
     >>> documenter = documentation.documenters.FunctionDocumenter(function)
     >>> documenter
-    <music21.documentation.documenters.FunctionDocumenter: music21.common.numberFunc.opFrac>
+    <music21.documentation.documenters.FunctionDocumenter: music21.common.numberTools.opFrac>
 
     >>> documenter.rstCrossReferenceString
-    ':func:`~music21.common.numberFunc.opFrac`'
+    ':func:`~music21.common.numberTools.opFrac`'
 
     >>> for line in documenter.rstAutodocDirectiveFormat:
     ...     line
-    '.. autofunction:: music21.common.numberFunc.opFrac'
+    '.. autofunction:: music21.common.numberTools.opFrac'
     ''
 
     Call the documenter to generate its ReStructuredText format:
 
     >>> restructuredText = documenter.run()
     >>> restructuredText
-    ['.. autofunction:: music21.common.numberFunc.opFrac', '']
+    ['.. autofunction:: music21.common.numberTools.opFrac', '']
     '''
 
     ### INITIALIZER ###
@@ -150,7 +150,7 @@ class FunctionDocumenter(ObjectDocumenter):
         >>> function = common.opFrac
         >>> documenter = documentation.documenters.FunctionDocumenter(function)
         >>> documenter.referentPackagesystemPath
-        'music21.common.numberFunc.opFrac'
+        'music21.common.numberTools.opFrac'
         '''
         path = '.'.join((
             self.referent.__module__,
@@ -164,7 +164,7 @@ class FunctionDocumenter(ObjectDocumenter):
         >>> function = common.opFrac
         >>> documenter = documentation.documenters.FunctionDocumenter(function)
         >>> documenter.rstAutodocDirectiveFormat
-        ['.. autofunction:: music21.common.numberFunc.opFrac', '']
+        ['.. autofunction:: music21.common.numberTools.opFrac', '']
         '''
         result = []
         referentPackagesystemPath = self.referentPackagesystemPath.replace(
