@@ -766,8 +766,6 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.base.Music21Object.activeSite
         - music21.base.Music21Object.derivation
         - music21.base.Music21Object.offset
-        - music21.base.Music21Object.offsetFloat
-        - music21.base.Music21Object.offsetRational
         - music21.base.Music21Object.priority
         - music21.base.Music21Object.quarterLength
         music21.stream.Stream:
@@ -1050,8 +1048,6 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.derivation`'
         '   - :attr:`~music21.base.Music21Object.duration`'
         '   - :attr:`~music21.base.Music21Object.offset`'
-        '   - :attr:`~music21.base.Music21Object.offsetFloat`'
-        '   - :attr:`~music21.base.Music21Object.offsetRational`'
         '   - :attr:`~music21.base.Music21Object.priority`'
         '   - :attr:`~music21.base.Music21Object.quarterLength`'
         '   - :attr:`~music21.base.Music21Object.seconds`'
@@ -1186,7 +1182,6 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.derivation`'
         '   - :attr:`~music21.base.Music21Object.duration`'
         '   - :attr:`~music21.base.Music21Object.offset`'
-        '   - :attr:`~music21.base.Music21Object.offsetFloat`'
         '   - :attr:`~music21.base.Music21Object.priority`'
         '   - :attr:`~music21.base.Music21Object.quarterLength`'
         '   - :attr:`~music21.base.Music21Object.seconds`'

@@ -1672,7 +1672,7 @@ class Music21Object(object):
         20.0
         ''')
 
-    def _getOffsetFloatOrRational(self, returnType):
+    def _getOffset(self):
         '''Get the offset for the activeSite.
 
         >>> n = note.Note()
@@ -1715,10 +1715,7 @@ class Music21Object(object):
         else:
             o = self._naiveOffset
         
-        if returnType != 'float':
-            return o
-        else:
-            return float(o)
+        return o
 
     def _setOffset(self, value):
         '''
@@ -1739,9 +1736,6 @@ class Music21Object(object):
             self.activeSite.setElementOffset(self, offset)
         else:
             self._naiveOffset = offset
-
-    def _getOffset(self):
-        return self._getOffsetFloatOrRational('rational')
 
     offset = property(_getOffset, _setOffset,
         doc = '''
@@ -1841,17 +1835,6 @@ class Music21Object(object):
         which is safer.
         ''')
     
-    def _getOffsetRational(self):
-        return self._getOffsetFloatOrRational('rational')
-    
-    @common.deprecated("January 2015", "January 2016", "Use float(x.offset)")
-    def _getOffsetFloat(self):
-        return self._getOffsetFloatOrRational('float')
-
-    offsetFloat = property(_getOffsetFloat, _setOffset, 
-                           doc='''old style: always returns a float''')
-    offsetRational = property(_getOffsetRational, _setOffset, doc='''synonym for .offset''')
-
     def sortTuple(self, useSite=False):
         '''
         Returns a collections.namedtuple called SortTuple(atEnd, offset, priority, classSortOrder,

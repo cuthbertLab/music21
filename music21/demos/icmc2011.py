@@ -11,7 +11,8 @@
 #-------------------------------------------------------------------------------
 
 import unittest
-from music21 import alpha, note, stream, clef, metadata, spanner, environment, converter, scale, corpus, common
+from music21 import alpha, note, stream, clef, metadata, spanner, environment
+from music21 import converter, scale, corpus, common
 
 
 _MOD = 'demo/icmc2011.py'
@@ -420,7 +421,7 @@ class Test(unittest.TestCase):
         
         s = stream.Stream()
         p = None
-        for i in range(16):
+        for i in range(8): # was 16, but sometimes exceeded scale length.
             direction = random.choice([-1, 1])
             for j in range(2):
                 p = sc1.next(p, direction)
