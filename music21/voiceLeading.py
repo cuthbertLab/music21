@@ -1241,7 +1241,6 @@ class Verticality(base.Music21Object):
         >>> len(vs1.getStream().flat.getElementsByClass('Harmony'))
         1
         '''
-        #scoreFromNote1 = music21Obj.getAllContextsByClass(stream.Score) #EXTREMELY UNRELIABLE AND VERY PRONE TO ERROR>>>>GRRRRR
         from music21 import stream
         retStream = stream.Score()
         for unused_partNum, elementList in self.contentDict.items():

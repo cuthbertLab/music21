@@ -634,7 +634,7 @@ class GeneralNote(base.Music21Object):
         >>> n = note.Note('G4', quarterLength=2)
         >>> n.duration.quarterLength
         2.0
-        >>> n.isGrace
+        >>> n.duration.isGrace
         False
         >>> n.duration
         <music21.duration.Duration 2.0>
@@ -646,7 +646,7 @@ class GeneralNote(base.Music21Object):
         >>> ng = n.getGrace()
         >>> ng.duration.quarterLength
         0.0
-        >>> ng.isGrace
+        >>> ng.duration.isGrace
         True
         >>> ng.duration
         <music21.duration.GraceDuration unlinked type:zero quarterLength:0.0>

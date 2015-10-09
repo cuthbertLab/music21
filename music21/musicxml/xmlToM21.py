@@ -3560,14 +3560,12 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.spannersSlurs33c)
-        # have 10 spanners
+        # have 5 spanners
         self.assertEqual(len(s.flat.getElementsByClass('Spanner')), 5)
 
-        # can get the same from a getAll search
-        self.assertEqual(len(s.getAllContextsByClass('Spanner')), 5)
+        # can get the same from a recurse search
+        self.assertEqual(len(s.recurse().getElementsByClass('Spanner')), 5)
 
-        # try to get all spanners from the first note
-        self.assertEqual(len(s.flat.notesAndRests[0].getAllContextsByClass('Spanner')), 5)
         #s.show('t')
         #s.show()
 
