@@ -35,8 +35,7 @@ class AVLNode(common.SlottedObject):
     >>> node
     <Node: Start:1.0 Height:1 L:None R:0>
     
-    Note that nodes cannot rebalance themselves, that's what a Tree is for.
-    
+    Nodes can rebalance themselves, but they work best in a Tree...
 
     Please consult the Wikipedia entry on AVL trees
     (https://en.wikipedia.org/wiki/AVL_tree) for a very detailed
@@ -144,7 +143,8 @@ class AVLNode(common.SlottedObject):
         The offset of this node.
 
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        ...            classList=(note.Note, chord.Chord))
         >>> print(tree.rootNode.debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
             L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
@@ -170,7 +170,8 @@ class AVLNode(common.SlottedObject):
         After setting the left child you need to do a node update. with node.update()
 
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        ...           classList=(note.Note, chord.Chord))
         >>> print(tree.rootNode.debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
             L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
@@ -192,7 +193,8 @@ class AVLNode(common.SlottedObject):
         After setting the right child you need to do a node update. with node.update()
 
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        ...             classList=(note.Note, chord.Chord))
         >>> print(tree.rootNode.debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
             L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
@@ -255,7 +257,8 @@ class AVLNode(common.SlottedObject):
         Get a debug of the Node:
         
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        ...              classList=(note.Note, chord.Chord))
         >>> rn = tree.rootNode        
         >>> print(rn.debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
@@ -274,7 +277,8 @@ class AVLNode(common.SlottedObject):
         Return a list of the debugging information of the tree (used for debug):
         
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        ...            classList=(note.Note, chord.Chord))
         >>> rn = tree.rootNode
         >>> rn._getDebugPieces()
         ['<Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>', 
@@ -304,7 +308,7 @@ class AVLNode(common.SlottedObject):
         
         Must be called whenever .leftChild or .rightChild are changed.
         
-        Does not balance itself! just used for the next balancing operation.
+        Used for the next balancing operation -- does not rebalance itself
         
         Returns None
         '''        
@@ -316,6 +320,86 @@ class AVLNode(common.SlottedObject):
             rightHeight = self.rightChild.height
         self.height = max(leftHeight, rightHeight) + 1
         self.balance = rightHeight - leftHeight
+
+    def _rotateLeftLeft(self):
+        r'''
+        Rotates a node left twice.
+
+        Used during tree rebalancing.
+
+        Returns a node, the new central node.
+        '''
+        nextNode = self.leftChild
+        self.leftChild = nextNode.rightChild
+        self.update()
+        nextNode.rightChild = self
+        nextNode.update()
+
+        return nextNode
+
+    def _rotateLeftRight(self):
+        r'''
+        Rotates a node right twice.
+
+        Used during tree rebalancing.
+
+        Returns a node, the new central node.
+        '''
+        self.leftChild = self.leftChild._rotateRightRight()
+        self.update()
+        nextNode = self._rotateLeftLeft()
+        return nextNode
+
+    def _rotateRightLeft(self):
+        r'''
+        Rotates a node right, then left.
+
+        Used during tree rebalancing.
+
+        Returns a node, the new central node.
+        '''
+        self.rightChild = self.rightChild._rotateLeftLeft()
+        self.update()
+        nextNode = self._rotateRightRight()
+        return nextNode
+
+    def _rotateRightRight(self):
+        r'''
+        Rotates a node left, then right.
+
+        Used during tree rebalancing.
+
+        Returns a node, the new central node.
+        '''
+        nextNode = self.rightChild
+        self.rightChild = nextNode.leftChild
+        self.update()
+        nextNode.leftChild = self
+        nextNode.update()
+        return nextNode
+
+    def _rebalance(self):
+        r'''
+        Rebalances the subtree rooted on this node.
+
+        Returns the new central node.
+        '''
+        node = self
+        if node.balance > 1:
+            if 0 <= node.rightChild.balance:
+                node = node._rotateRightRight()
+            else:
+                node = node._rotateRightLeft()
+        elif node.balance < -1:
+            if node.leftChild.balance <= 0:
+                node = node._rotateLeftLeft()
+            else:
+                node = node._rotateLeftRight()
+        if node.balance < -1 or node.balance > 1:
+            raise TimespanException(
+                'Somehow Nodes are still not balanced. node.balance %r must be between -1 and 1')
+
+        return node
 
 
 #----------------------------------------------------------------------------
@@ -418,7 +502,8 @@ class AVLTree(object):
             elif node.offset < offset:
                 node.rightChild = recurse(node.rightChild, offset)
                 node.update()
-            return self._rebalance(node)            
+            if node is not None:
+                return node._rebalance()            
         
         self.rootNode = recurse(self.rootNode, offset)
 
@@ -446,85 +531,7 @@ class AVLTree(object):
         '''
         if self.rootNode is not None:
             return self.rootNode.debug()
-        return ''
-
-    def _rebalance(self, node):
-        r'''
-        Rebalances the subtree rooted on`node`.
-
-        Returns the original node.
-        '''
-        if node is not None:
-            if node.balance > 1:
-                if 0 <= node.rightChild.balance:
-                    node = self._rotateRightRight(node)
-                else:
-                    node = self._rotateRightLeft(node)
-            elif node.balance < -1:
-                if node.leftChild.balance <= 0:
-                    node = self._rotateLeftLeft(node)
-                else:
-                    node = self._rotateLeftRight(node)
-            if node.balance < -1 or node.balance > 1:
-                raise TimespanException('Somehow Nodes are still not balanced. node.balance %r must be between -1 and 1')
-        return node
-    
-    def _rotateLeftLeft(self, node):
-        r'''
-        Rotates a node left twice.
-
-        Used internally by TimespanTree during tree rebalancing.
-
-        Returns a node.
-        '''
-        nextNode = node.leftChild
-        node.leftChild = nextNode.rightChild
-        node.update()
-        nextNode.rightChild = node
-        nextNode.update()
-
-        return nextNode
-
-    def _rotateLeftRight(self, node):
-        r'''
-        Rotates a node right twice.
-
-        Used internally by TimespanTree during tree rebalancing.
-
-        Returns a node.
-        '''
-        node.leftChild = self._rotateRightRight(node.leftChild)
-        node.update()
-        nextNode = self._rotateLeftLeft(node)
-        return nextNode
-
-    def _rotateRightLeft(self, node):
-        r'''
-        Rotates a node right, then left.
-
-        Used internally by TimespanTree during tree rebalancing.
-
-        Returns a node.
-        '''
-        node.rightChild = self._rotateLeftLeft(node.rightChild)
-        node.update()
-        nextNode = self._rotateRightRight(node)
-        return nextNode
-
-    def _rotateRightRight(self, node):
-        r'''
-        Rotates a node left, then right.
-
-        Used internally by TimespanTree during tree rebalancing.
-
-        Returns a node.
-        '''
-        nextNode = node.rightChild
-        node.rightChild = nextNode.leftChild
-        node.update()
-        nextNode.leftChild = node
-        nextNode.update()
-        return nextNode
+        return ''    
 
     def getNodeByOffset(self, offset):
         r'''
@@ -609,7 +616,6 @@ class AVLTree(object):
         >>> tree._getNodeBefore(100)  # last node in piece
         <Node: Start:35.0 Indices:(161:161:165:165) Length:{4}>
         '''
-        
         def recurse(node, offset):
             if node is None:
                 return None
@@ -619,6 +625,7 @@ class AVLTree(object):
             elif offset <= node.offset and node.leftChild:
                 result = recurse(node.leftChild, offset)
             return result
+        
         result = recurse(self.rootNode, offset)
         if result is None:
             return None
@@ -671,7 +678,8 @@ class AVLTree(object):
             elif node.offset < offset:
                 node.rightChild = self._remove(node.rightChild, offset)
                 node.update()
-        return self._rebalance(node)
+        if node is not None:
+            return node._rebalance()
 
 #-------------------------------#
 if __name__ == '__main__':

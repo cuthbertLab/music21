@@ -626,7 +626,7 @@ class ElementTree(core.AVLTree):
 # 
 #         self._updateIndices(self.rootNode)
 #         self._updateEndTimes(self.rootNode)
-#         self.rootNode = self._rebalance(self.rootNode)
+#         self.rootNode = self.rootNode._reblance()
         
 
     def insert(self, offsetsOrElements, elements=None):
