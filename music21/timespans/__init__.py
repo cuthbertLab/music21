@@ -18,7 +18,7 @@ organized by start and stop offsets.
 This is a lower-level tool that for now at least normal music21
 users won't need to worry about.
 '''
-__all__ = ['core', 'trees', 'spans', 'analysis', 'node', 'verticality']
+__all__ = ['trees', 'spans', 'analysis', 'node', 'verticality']
 
 
 import random
@@ -32,7 +32,6 @@ from music21 import note
 
 from music21.ext import six
 
-from music21.timespans import core
 from music21.timespans import trees 
 from music21.timespans import spans 
 from music21.timespans import analysis 
@@ -326,7 +325,6 @@ def timespansToChordifiedStream(timespans, templateStream=None):
     from music21 import stream
     if not isinstance(timespans, trees.TimespanTree):
         raise trees.TimespanTreeException('Needs a TimespanTree to run')
-    
     if isinstance(templateStream, stream.Stream):
         templateOffsets = sorted(templateStream.measureOffsetMap())
         templateOffsets.append(templateStream.duration.quarterLength)

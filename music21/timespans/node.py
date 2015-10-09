@@ -56,8 +56,8 @@ class AVLNode(common.SlottedObject):
         'offset',
         'payload',
 
-        'leftChild',
-        'rightChild',
+        '_leftChild',
+        '_rightChild',
         )
 
     _DOC_ATTR = {
@@ -157,59 +157,6 @@ class AVLNode(common.SlottedObject):
         >>> tree.rootNode.rightChild.offset
         5.0
         ''',
-    'leftChild': r'''
-        The left child of this node.
-
-        After setting the left child you need to do a node update. with node.update()
-
-        >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
-        >>> print(tree.rootNode.debug())
-        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
-
-        >>> print(tree.rootNode.leftChild.debug())
-        <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-            L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-            R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-        ''',
-    'rightChild':   r'''
-        The right child of this node.
-
-        After setting the right child you need to do a node update. with node.update()
-
-        >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
-        >>> print(tree.rootNode.debug())
-        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
-
-        >>> print(tree.rootNode.rightChild.debug())
-        <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-            L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-            R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
-
-        >>> print(tree.rootNode.rightChild.rightChild.debug())
-        <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-            R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
-
-        >>> print(tree.rootNode.rightChild.rightChild.rightChild.debug())
-        <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
-        '''
-
     }
     
     ### INITIALIZER ###
@@ -220,8 +167,8 @@ class AVLNode(common.SlottedObject):
         self.offset = offset
         self.payload = None
 
-        self.leftChild = None
-        self.rightChild = None
+        self._leftChild = None
+        self._rightChild = None
 
 
     ### SPECIAL METHODS ###
@@ -303,11 +250,82 @@ class AVLNode(common.SlottedObject):
         rightHeight = -1
         if self.leftChild is not None:
             leftHeight = self.leftChild.height
-        if self._rightChild is not None:
-            rightHeight = self._rightChild.height
+        if self.rightChild is not None:
+            rightHeight = self.rightChild.height
         self.height = max(leftHeight, rightHeight) + 1
         self.balance = rightHeight - leftHeight
 
+    ### PUBLIC PROPERTIES ###
+
+    @property
+    def leftChild(self):
+        r'''
+        The left child of this node.
+
+        Setting the left child triggers a node update.
+
+        >>> score = timespans.makeExampleScore()
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> print(tree.rootNode.debug())
+        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+
+        >>> print(tree.rootNode.leftChild.debug())
+        <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+            L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+            R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+        '''
+        return self._leftChild
+
+    @leftChild.setter
+    def leftChild(self, node):
+        self._leftChild = node
+        self.update()
+
+    @property
+    def rightChild(self):
+        r'''
+        The right child of this node.
+
+        Setting the right child triggers a node update.
+
+        >>> score = timespans.makeExampleScore()
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> print(tree.rootNode.debug())
+        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+
+        >>> print(tree.rootNode.rightChild.debug())
+        <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+            L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+            R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+
+        >>> print(tree.rootNode.rightChild.rightChild.debug())
+        <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+            R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+
+        >>> print(tree.rootNode.rightChild.rightChild.rightChild.debug())
+        <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        '''
+        return self._rightChild
+
+    @rightChild.setter
+    def rightChild(self, node):
+        self._rightChild = node
+        self.update()
         
 #------------------------------------------------------------------------------
 class TimespanTreeNode(AVLNode):
