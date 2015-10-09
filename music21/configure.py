@@ -16,7 +16,6 @@ import time
 import sys
 import unittest
 import textwrap
-from textwrap import dedent as dd
 
 try:
     reload  # python2 @UndefinedVariable
@@ -139,14 +138,9 @@ def getSitePackages():
 
 
 def findInstallations():
-<<<<<<< HEAD
     '''
     Find all music21 references found in site packages, or 
     possibly look at the running code as well.
-=======
-    '''Find all music21 references found in site packages, or possibly 
-    look at the running code as well.
->>>>>>> master
     '''
     found = []
     sitePackages = getSitePackages()
@@ -162,14 +156,9 @@ def findInstallations():
     return found
 
 def findInstallationsEggInfo():
-<<<<<<< HEAD
     '''
     Find all music21 eggs found in site packages, or possibly look 
     at the running code as well.
-=======
-    '''Find all music21 references found in site packages, or possibly 
-    look at the running code as well.
->>>>>>> master
     '''
     found = findInstallations()
     # only get those that end w/ egg-info
@@ -329,7 +318,6 @@ class DialogException(exceptions21.Music21Exception):
 #-------------------------------------------------------------------------------
 class Dialog(object):
     '''
-<<<<<<< HEAD
     Model a dialog as a question and response. Have different subclases for 
     different types of questions. Store all in a Conversation, or multiple dialog passes.
 
@@ -341,20 +329,6 @@ class Dialog(object):
 
     The `promptHeader` is a string header that is placed in front of any common header 
     for this dialog.
-=======
-    Model a dialog as a question and response. Have different 
-    subclases for different types of questions. Store all in a Conversation, 
-    or multiple dialog passes.
-
-    A `default`, if provided, is returned if the users provides no input and just enters return. 
-
-    The `tryAgain` option determines if, if a user provides incomplete or no response,
-    and there is no default (for no response), whether the user is given another 
-    chance to provide valid input. 
-
-    The `promptHeader` is a string header that is placed in front of any common 
-    header for this dialog.
->>>>>>> master
     '''
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         # store the result obtained from the user
@@ -515,67 +489,42 @@ class Dialog(object):
         pass
 
     def _formatResultForUser(self, result):
-<<<<<<< HEAD
         '''
         For various result options, we may need to at times convert the internal 
         representation of the result into something else. For example, we might present 
         the user with 'Yes' or 'No' but store the result as True or False.
-=======
-        '''For various result options, we may need to at times convert the internal 
-        representation of the result into something else. For example, we might 
-        present the user with 'Yes' or 'No' but store the result as True or False.
->>>>>>> master
         '''
         # override in subclass
         return result
 
     def _parseUserInput(self, raw):
-<<<<<<< HEAD
         '''
         Translate string to desired output. Pass None through 
         (as no input), convert '' to None, and pass all other 
         outputs as IncompleteInput objects. 
-=======
-        '''Translate string to desired output. Pass None through (as no input), 
-        convert '' to None, and pass all other outputs as IncompleteInput objects. 
->>>>>>> master
         '''
         return raw
 
     def _evaluateUserInput(self, raw):
-<<<<<<< HEAD
         '''
         Evaluate the user's string entry after parsing; do not return None: 
-=======
-        '''Evaluate the user's string entry after persing; do not return None: 
->>>>>>> master
         either return a valid response, default if available, or IncompleteInput object. 
         '''
         pass
         # define in subclass
 
     def _preAskUser(self, force=None):
-<<<<<<< HEAD
         '''
         Call this method immediately before calling askUser. 
         Can be used for configuration getting additional information. 
-=======
-        '''Call this method immediately before calling askUser. Can be used for 
-        configuration getting additional information. 
->>>>>>> master
         '''
         pass
         # define in subclass
 
     def askUser(self, force=None):
-<<<<<<< HEAD
         '''
         Ask the user, display the query. The force argument can 
         be provided to test. Sets self._result; does not return a value.
-=======
-        '''Ask the user, display the query. The force argument can be provided to 
-        test. Sets self._result; does not return a value.
->>>>>>> master
         '''
         # if an introduction is defined, try to use it
         intro = self._rawIntroduction()
@@ -641,14 +590,9 @@ class Dialog(object):
         # self._result may still be None
 
     def getResult(self, simulate=True):
-<<<<<<< HEAD
         '''
         Return the result, or None if not set. This may also do a 
         processing routine that is part of the desired result. 
-=======
-        '''Return the result, or None if not set. This may also do a processing 
-        routine that is part of the desired result. 
->>>>>>> master
         '''
         return self._result 
 
@@ -659,15 +603,10 @@ class Dialog(object):
         pass 
 
     def performAction(self, simulate=False):
-<<<<<<< HEAD
         '''
         After getting a result, the query might require an action 
         to be performed. If result is None, this will use whatever 
         value is found in _result. 
-=======
-        '''After getting a result, the query might require an action to be performed. 
-        If result is None, this will use whatever value is found in _result. 
->>>>>>> master
 
         If simulate is True, no action will be taken.
         '''
@@ -738,16 +677,11 @@ class YesOrNo(Dialog):
     
 
     def _formatResultForUser(self, result):
-<<<<<<< HEAD
         '''
-        True to 'Yes'
-        False to 'No'
-=======
-        '''For various result options, we may need to at times convert 
+        For various result options, we may need to at times convert 
         the internal representation of the result into something else. 
         For example, we might present the user with 'Yes' or 'No' but 
         store the result as True or False.
->>>>>>> master
         '''
         if result is True:
             return 'Yes'
@@ -779,15 +713,9 @@ class YesOrNo(Dialog):
         return msg
 
     def _parseUserInput(self, raw):
-<<<<<<< HEAD
         '''
         Translate string to desired output. Pass None and '' (as no input), as 
         NoInput objects, and pass all other outputs as IncompleteInput objects. 
-=======
-        '''Translate string to desired output. Pass None and '' (as no input), 
-        as NoInput objects, and pass all other outputs as IncompleteInput objects. 
->>>>>>> master
-
         
         >>> d = configure.YesOrNo()
         >>> d._parseUserInput('y')
@@ -814,16 +742,10 @@ class YesOrNo(Dialog):
         return IncompleteInput(raw)
 
     def _evaluateUserInput(self, raw):
-<<<<<<< HEAD
         '''
         Evaluate the user's string entry after parsing; 
         do not return None: either return a valid response, 
-        default if available, IncompleteInput, NoInput objects. 
-=======
-        '''Evaluate the user's string entry after persing; do not return None: 
-        either return a valid response, default if available, IncompleteInput, NoInput objects. 
->>>>>>> master
-    
+        default if available, IncompleteInput, NoInput objects.     
         
         >>> d = configure.YesOrNo()
         >>> d._evaluateUserInput('y')
@@ -918,13 +840,8 @@ class AskInstall(YesOrNo):
         # define platforms that this will run on
         self._platforms = ['darwin', 'nix']
 
-<<<<<<< HEAD
         msg = ('Would you like to install music21 in the normal ' + 
                 'place for Python packages (i.e., site-packages)?')
-=======
-        msg = ('Would you like to install music21 in the normal place ' + 
-                'for Python packages (i.e., site-packages)?')
->>>>>>> master
         self.appendPromptHeader(msg)
 
 
@@ -933,12 +850,8 @@ class AskInstall(YesOrNo):
         if fp is not None:
 
             self._writeToUser(['You must authorize writing in the following directory:', 
-<<<<<<< HEAD
                                getSitePackages(), 
                                ' ', 
-=======
-                               getSitePackages(), ' ', 
->>>>>>> master
                                'Please provide your user password to complete this operation.', 
                                ''])
 
@@ -988,13 +901,8 @@ class AskSendInstallationReport(YesOrNo):
             additionalEntries = {}
         self._additionalEntries = additionalEntries
         
-<<<<<<< HEAD
         msg = ('Would you like to send a pre-formatted email to music21 regarding your ' + 
                'installation? Installation reports help us make music21 work better for you')
-=======
-        msg = dd('''Would you like to send a pre-formatted email to music21 regarding 
-            your installation? Installation reports help us make music21 work better for you''')
->>>>>>> master
         self.appendPromptHeader(msg)
 
     def _getMailToStr(self):
@@ -1069,13 +977,8 @@ class SelectFromList(Dialog):
         Dialog.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
 
     def _getValidResults(self, force=None):
-<<<<<<< HEAD
         '''
         Return a list of valid results that are possible and should be displayed to the user. 
-=======
-        '''Return a list of valid results that are possible and should be displayed to the user. 
->>>>>>> master
-        These will be processed by _formatResultForUser before usage.
         '''
         # this might need to be cached
         # customize in subclass
@@ -1091,15 +994,9 @@ class SelectFromList(Dialog):
 
 
     def _askFillEmptyList(self, default=None, force=None):
-<<<<<<< HEAD
         '''
         What to do if the selection list is empty. Only return True or False: 
         if we should continue or not.
-=======
-        '''What to do if the selection list is empty. Only return True or False: 
-        if we should continue or not.
-
->>>>>>> master
         
         >>> d = configure.SelectFromList(default=True)
         >>> d._askFillEmptyList(force='yes')
@@ -1159,11 +1056,7 @@ class SelectFromList(Dialog):
         1
         >>> d._rawQuery(['a', 'b', 'c'])
         ['[1] a', '[2] b', '[3] c', ' ', 
-<<<<<<< HEAD
          'Select a number from the preceding options (default is 1): ']
-=======
-        'Select a number from the preceding options (default is 1): ']
->>>>>>> master
         '''
         head = []
         i = 1
@@ -1183,15 +1076,9 @@ class SelectFromList(Dialog):
         return head + [' ', tail]
 
     def _parseUserInput(self, raw):
-<<<<<<< HEAD
         '''
         Convert all values to an integer, or return NoInput or IncompleteInput. 
         Do not yet evaluate whether the number is valid in the context of the selection choices. 
-=======
-        '''Convert all values to an integer, or return NoInput or IncompleteInput. 
-        Do not yet evaluate whether the number is valid in the context of the selection choices. 
-
->>>>>>> master
         
         >>> d = configure.SelectFromList()
         '''
@@ -1214,14 +1101,6 @@ class SelectFromList(Dialog):
 
     
     def _evaluateUserInput(self, raw):
-<<<<<<< HEAD
-=======
-        '''Evaluate the user's string entry after persing; do not return None: either 
-        return a valid response, default if available, IncompleteInput, NoInput objects. 
-    
-        
-        '''
->>>>>>> master
         rawParsed = self._parseUserInput(raw)
         # means no answer: return default
         if isinstance(rawParsed, NoInput): 
@@ -1369,13 +1248,8 @@ class SelectFilePath(SelectFromList):
 
     def _evaluateUserInput(self, raw):
         '''Evaluate the user's string entry after parsing; 
-<<<<<<< HEAD
         do not return None: either return a valid response, default if available, 
         IncompleteInput, NoInput objects. 
-=======
-        do not return None: either return a valid response, 
-        default if available, IncompleteInput, NoInput objects. 
->>>>>>> master
     
         Here, we convert the user-selected number into a file path
         
@@ -1407,13 +1281,9 @@ class SelectMusicXMLReader(SelectFilePath):
     Select a MusicXML Reader by presenting a user a list of options. 
     '''
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
-<<<<<<< HEAD
         SelectFilePath.__init__(self, 
                                 default=default, 
                                 tryAgain=tryAgain, 
-=======
-        SelectFilePath.__init__(self, default=default, tryAgain=tryAgain, 
->>>>>>> master
                                 promptHeader=promptHeader) 
 
         # define platforms that this will run on
@@ -1421,19 +1291,11 @@ class SelectMusicXMLReader(SelectFilePath):
 
     def _rawIntroduction(self):
         '''
-<<<<<<< HEAD
         Return a multiline presentation of an introduction.
         '''
-        return [
-            '''Defining an XML Reader permits automatically opening 
-            music21-generated MusicXML in an editor for display and manipulation when calling 
-            the show() method. Setting this option is highly recommended.''', 
-            ' ' ]
-=======
         return ['Defining an XML Reader permits automatically opening ' +
             'music21-generated MusicXML in an editor for display and manipulation when calling ' +
             'the show() method. Setting this option is highly recommended.', ' ']
->>>>>>> master
 
     def _getMusicXMLReaderDarwin(self):
         '''
@@ -1483,15 +1345,10 @@ class SelectMusicXMLReader(SelectFilePath):
         return []
 
     def _getValidResults(self, force=None):
-<<<<<<< HEAD
         '''
         Return a list of valid results that are possible and 
         should be displayed to the user. 
         These will be processed by _formatResultForUser before usage.
-=======
-        '''Return a list of valid results that are possible and should be 
-        displayed to the user. These will be processed by _formatResultForUser before usage.
->>>>>>> master
         '''
         # customize in subclass
         if force is not None:
@@ -1521,12 +1378,8 @@ class SelectMusicXMLReader(SelectFilePath):
         
         # this does not do anything: customize in subclass
         d = AskOpenInBrowser(urlTarget=urlTarget, default=True, tryAgain=False, 
-<<<<<<< HEAD
-            promptHeader='No available MusicXML readers are found on your system. We recommend downloading and installing a reader before continuing.')
-=======
             promptHeader='No available MusicXML readers are found on your system. ' + 
             'We recommend downloading and installing a reader before continuing.')
->>>>>>> master
         d.askUser(force=force)
         post = d.getResult()
         # can call regardless of result; will only function if result is True
@@ -1604,13 +1457,9 @@ class ConfigurationAssistant(object):
 
 
         d = AskOpenInBrowser(urlTarget=urlMusic21List, 
-<<<<<<< HEAD
-                             prompt='The music21 discussion group provides a forum for asking questions and getting help. Would you like to see the music21 discussion list or sign up for updates?')
-=======
                              prompt='The music21 discussion group provides a forum for ' + 
                              'asking questions and getting help. Would you like to see the ' + 
                              'music21 discussion list or sign up for updates?')
->>>>>>> master
         self._dialogs.append(d)
 
         # note: this is the on-line URL: 
