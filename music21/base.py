@@ -1191,7 +1191,8 @@ class Music21Object(object):
                     vst = reversed(vst)
                 for timespanPart in vst:
                     element = timespanPart.element
-                    if element is not self and element.isClassOrSubclass(className):
+                    if element is not self: # not necessary because of how TS was created. 
+                                            #   and element.isClassOrSubclass(className):
                         return element
             return None
 
@@ -1207,8 +1208,7 @@ class Music21Object(object):
 
             if verticality is not None:
                 element = extractElementFromVerticality(verticality)
-                if element is not None and element.isClassOrSubclass(className):
-                    # latter should not be necessary...
+                if element is not None:
                     return element
             return None
 
