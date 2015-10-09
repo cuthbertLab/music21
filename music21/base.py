@@ -948,6 +948,8 @@ class Music21Object(object):
         '''
         return self.sites.setAttrByName(attrName, value)
 
+    @common.deprecated('October 2015', 'February 2016', 
+                       'use `site in n.sites` or `n.sites.hasSiteId(id(site))` instead')
     def hasSite(self, other):
         '''
         Return True if other is a site in this Music21Object
@@ -1979,7 +1981,7 @@ class Music21Object(object):
             offset = foundOffset
             atEnd = 0
 
-        if self.isGrace:
+        if self.duration is not None and self.duration.isGrace:
             isNotGrace = 0
         else:
             isNotGrace = 1
@@ -2208,6 +2210,7 @@ class Music21Object(object):
             if hasattr(s, 'elementsChanged'):
                 s.elementsChanged(updateIsFlat=False, keepIndex=True)
 
+    @common.deprecated("October 2015", "January 2016", "use self.duration.isGrace instead")
     def _getIsGrace(self):
         return self.duration.isGrace
 
