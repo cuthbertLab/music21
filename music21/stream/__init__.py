@@ -6051,19 +6051,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # trust if this is sorted: do not sort again
         # experimental
         if (not self.isSorted and self._mutable) or force:
-            #environLocal.printDebug(['sorting _elements, _endElements'])
-#             self._elements.sort(
-#                 cmp=lambda x, y: cmp(
-#                     self.elementOffset(x), self.elementOffset(y))
-#                     or cmp(x.priority, y.priority)
-#                     or cmp(x.classSortOrder, y.classSortOrder)
-#                     or cmp(not x.isGrace, not y.isGrace) # sort graces first
-#                     #or cmp(random.randint(1,30), random.randint(1,30))
-#                 )
-#             self._endElements.sort(
-#                 cmp=lambda x, y: cmp(x.priority, y.priority) or
-#                     cmp(x.classSortOrder, y.classSortOrder)
-#                 )
             self._elements.sort(key=lambda x: x.sortTuple(self))
             self._endElements.sort(key=lambda x: x.sortTuple(self))
 

@@ -923,17 +923,6 @@ class Music21Object(object):
         '''
         return self.sites.setAttrByName(attrName, value)
 
-    @common.deprecated('October 2015', 'February 2016', 
-                       'use `site in n.sites` or `n.sites.hasSiteId(id(site))` instead')
-    def hasSite(self, other):
-        '''
-        Return True if other is a site in this Music21Object
-
-        Matches on id(other)
-        '''
-        return id(other) in self.sites.getSiteIds()
-
-
     def getSpannerSites(self, spannerClassList=None):
         '''
         Return a list of all :class:`~music21.spanner.Spanner` objects
@@ -1933,7 +1922,7 @@ class Music21Object(object):
             offset = foundOffset
             atEnd = 0
 
-        if self.isGrace:
+        if self.duration is not None and self.duration.isGrace:
             isNotGrace = 0
         else:
             isNotGrace = 1
@@ -2165,20 +2154,6 @@ class Music21Object(object):
         for s in self.sites.get():
             if hasattr(s, 'elementsChanged'):
                 s.elementsChanged(updateIsFlat=False, keepIndex=True)
-
-    def _getIsGrace(self):
-        return self.duration.isGrace
-
-    isGrace = property(_getIsGrace, doc='''
-        Return True or False if this music21 object has a GraceDuration.
-
-        >>> n = note.Note()
-        >>> n.isGrace
-        False
-        >>> ng = n.getGrace()
-        >>> ng.isGrace
-        True
-        ''')
 
     def _getPriority(self):
         return self._priority
