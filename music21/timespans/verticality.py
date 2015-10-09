@@ -347,7 +347,7 @@ class Verticality(object):
         tree = self.timespanTree
         if tree is None:
             return None
-        offset = tree.getOffsetAfter(self.offset)
+        offset = tree.getPositionAfter(self.offset)
         return offset
 
     @property
@@ -378,7 +378,7 @@ class Verticality(object):
         tree = self.timespanTree
         if tree is None:
             return None
-        offset = tree.getOffsetAfter(self.offset)
+        offset = tree.getPositionAfter(self.offset)
         if offset is None:
             return None
         return tree.getVerticalityAt(offset)
@@ -472,7 +472,7 @@ class Verticality(object):
         tree = self.timespanTree
         if tree is None:
             return None
-        offset = tree.getOffsetBefore(self.offset)
+        offset = tree.getPositionBefore(self.offset)
         if offset is None:
             return None
         return tree.getVerticalityAt(offset)

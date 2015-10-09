@@ -196,7 +196,7 @@ class TimespanTreeNode(core.AVLNode):
 
     def __repr__(self):
         return '<Node: Start:{} Indices:({}:{}:{}:{}) Length:{{{}}}>'.format(
-            self.offset,
+            self.position,
             self.subtreeStartIndex,
             self.nodeStartIndex,
             self.nodeStopIndex,

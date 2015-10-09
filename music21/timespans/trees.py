@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
-# Name:         timespans/collections.py
+# Name:         timespans/trees.py
 # Purpose:      Tools for grouping notes and chords into a searchable tree
 #               organized by start and stop offsets
 #
@@ -60,7 +60,7 @@ class ElementTree(core.AVLTree):
 
     >>> et.index(n2, 101.0)
     100
-    >>> et.getOffsetAfter(100.5)
+    >>> et.getPositionAfter(100.5)
     101.0
 
     '''
@@ -383,8 +383,8 @@ class ElementTree(core.AVLTree):
             endTimeLow = min(x.endTime for x in node.payload)
             endTimeHigh = max(x.endTime for x in node.payload)
         except AttributeError: # elements do not have endTimes.  do NOT mix elements and timespans...
-            endTimeLow = node.offset + min(x.duration.quarterLength for x in node.payload)
-            endTimeHigh = node.offset + max(x.duration.quarterLength for x in node.payload)            
+            endTimeLow = node.position + min(x.duration.quarterLength for x in node.payload)
+            endTimeHigh = node.position + max(x.duration.quarterLength for x in node.payload)            
         if node.leftChild:
             leftChild = self._updateEndTimes(node.leftChild)
             if leftChild.endTimeLow < endTimeLow:
@@ -401,27 +401,27 @@ class ElementTree(core.AVLTree):
         node.endTimeHigh = endTimeHigh
         return node
 
-    def _updateParents(self, oldOffset, visitedParents=None):
+    def _updateParents(self, oldPosition, visitedParents=None):
         if visitedParents is None:
             visitedParents = set()
         for parent in self._parents:
             if parent is None or parent in visitedParents:
                 continue
             visitedParents.add(parent)
-            parentOffset = parent.offset
-            parent._removeElement(self, oldOffset=oldOffset)
+            parentPosition = parent.offset
+            parent._removeElement(self, oldPosition=oldPosition)
             parent._insertCore(self.offset, self)
             parent._updateIndices(parent.rootNode)
             parent._updateEndTimes(parent.rootNode)
-            parent._updateParents(parentOffset, visitedParents=visitedParents)
+            parent._updateParents(parentPosition, visitedParents=visitedParents)
 
-    def _removeElement(self, element, oldOffset=None):
-        if oldOffset is not None:
-            offset = oldOffset
+    def _removeElement(self, element, oldPosition=None):
+        if oldPosition is not None:
+            offset = oldPosition
         else:
             offset = element.offset
 
-        node = self.getNodeByOffset(offset)
+        node = self.getNodeByPosition(offset)
         if node is None:
             return
         if element in node.payload:
@@ -461,7 +461,7 @@ class ElementTree(core.AVLTree):
         <ElementTimespan (0.5 to 1.0) <music21.note.Note G#>>
         '''
         results = []
-        node = self.getNodeByOffset(offset)
+        node = self.getNodeByPosition(offset)
         if node is not None:
             results.extend(node.payload)
         return tuple(results)
@@ -510,13 +510,13 @@ class ElementTree(core.AVLTree):
         def recurse(node, offset, indent=0):
             result = []
             if node is not None:
-                if node.offset < offset < node.endTimeHigh:
+                if node.position < offset < node.endTimeHigh:
                     result.extend(recurse(node.leftChild, offset, indent + 1))
                     for timespan in node.payload:
                         if offset < timespan.endTime:
                             result.append(timespan)
                     result.extend(recurse(node.rightChild, offset, indent + 1))
-                elif offset <= node.offset:
+                elif offset <= node.position:
                     result.extend(recurse(node.leftChild, offset, indent + 1))
             return result
         results = recurse(self.rootNode, offset)
@@ -557,13 +557,13 @@ class ElementTree(core.AVLTree):
         '''
         if offset is None:
             offset = element.offset
-        node = self.getNodeByOffset(offset)
+        node = self.getNodeByPosition(offset)
         if node is None or element not in node.payload:
             raise ValueError('{} not in Tree at offset {}.'.format(element, offset))
         index = node.payload.index(element) + node.nodeStartIndex
         return index
 
-    def remove(self, elements, offsets=None): #, shiftOffsets=False):
+    def remove(self, elements, offsets=None): #, shiftPositions=False):
         r'''
         Removes `elements` or timespans (a single one or a list) from this Tree.
         
@@ -571,7 +571,7 @@ class ElementTree(core.AVLTree):
         
         TODO: raise exception if elements length and offsets length differ
         '''
-        initialOffset = self.offset
+        initialPosition = self.offset
         initialEndTime = self.endTime
         if hasattr(elements, 'offset'):
             elements = [elements]
@@ -584,17 +584,17 @@ class ElementTree(core.AVLTree):
                 self._removeElement(el, offsets[i]) # + shiftAmount)
             else:
                 self._removeElement(el)
-#           if shiftOffsets:
-#               self.shiftOffsets(shiftAmount, offsets[i] + shiftAmount)
+#           if shiftPositions:
+#               self.shiftPositions(shiftAmount, offsets[i] + shiftAmount)
 #               shiftAmount = common.opFrac(shiftAmount - el.quarterLength)
                 
         self._updateIndices(self.rootNode)
         self._updateEndTimes(self.rootNode)
-        if (self.offset != initialOffset) or \
+        if (self.offset != initialPosition) or \
             (self.endTime != initialEndTime):
-            self._updateParents(initialOffset)
+            self._updateParents(initialPosition)
 
-#     def shiftOffsets(self, amountToShift, startingOffset=0.0, endingOffset=None, updateParents=True):
+#     def shiftPositions(self, amountToShift, startingPosition=0.0, endingPosition=None, updateParents=True):
 #         '''
 #         >>> n = note.Note()
 #         >>> n2 = note.Note()
@@ -603,24 +603,24 @@ class ElementTree(core.AVLTree):
 #         >>> et.insert(20.0, n)
 #         >>> et
 #         <ElementTree {2} (10.0 to 21.0)>
-#         >>> et.shiftOffsets(5.0, startingOffset=0.0)
+#         >>> et.shiftPositions(5.0, startingPosition=0.0)
 #         >>> et
 #         <ElementTree {2} (15.0 to 26.0)>
 #         '''
-#         initialOffset = 0.0
-#         if endingOffset is None:
-#             endingOffset = INFINITY
+#         initialPosition = 0.0
+#         if endingPosition is None:
+#             endingPosition = INFINITY
 #         if updateParents:
-#             initialOffset = self.offset
+#             initialPosition = self.offset
 #             
 #         raise TimespanTreeException("This was a dumb idea; rewrite without ever changing a node's offset...")
 # #         
-# #         node = self._getNodeAfter(startingOffset)
+# #         node = self._getNodeAfter(startingPosition)
 # #         nodeList = []
-# #         while node is not None and node.offset < endingOffset:
-# #             newOffset = node.offset
+# #         while node is not None and node.offset < endingPosition:
+# #             newPosition = node.offset
 # #             nodeList.append(node)
-# #             node = self._getNodeAfter(newOffset)
+# #             node = self._getNodeAfter(newPosition)
 # #         for n in nodeList:
 # #             n.offset += amountToShift
 # 
@@ -639,7 +639,7 @@ class ElementTree(core.AVLTree):
         >>> et
         <ElementTree {1} (10.0 to 11.0)>
         '''
-        initialOffset = self.offset
+        initialPosition = self.offset
         initialEndTime = self.endTime
         if elements is None:
             elements = offsetsOrElements
@@ -659,9 +659,9 @@ class ElementTree(core.AVLTree):
             self._insertCore(offsets[i], el)
         self._updateIndices(self.rootNode)
         self._updateEndTimes(self.rootNode)
-        if (self.offset != initialOffset) or \
+        if (self.offset != initialPosition) or \
             (self.endTime != initialEndTime):
-            self._updateParents(initialOffset)
+            self._updateParents(initialPosition)
 
     def _insertCore(self, offset, el):
         def key(x):
@@ -675,22 +675,22 @@ class ElementTree(core.AVLTree):
                 else:
                     return x.endTime  # ElementTimespan with no Element!
                 
-        self.insertAtOffset(offset)
-        node = self.getNodeByOffset(offset)
+        self.insertAtPosition(offset)
+        node = self.getNodeByPosition(offset)
         node.payload.append(el)
         node.payload.sort(key=key)
         if isinstance(el, TimespanTree):
             el._parents.add(self)
 
     def append(self, el):
-        initialOffset = self.offset # will only change if is empty
+        initialPosition = self.offset # will only change if is empty
         endTime = self.latestEndTime
         if endTime == INFINITY:
             endTime = 0
         self._insertCore(endTime, el)
         self._updateIndices(self.rootNode)
         self._updateEndTimes(self.rootNode)
-        self._updateParents(initialOffset)
+        self._updateParents(initialPosition)
 
     ### PROPERTIES ###
     @property
@@ -727,7 +727,7 @@ class ElementTree(core.AVLTree):
         def recurse(node):
             if node.leftChild is not None:
                 return recurse(node.leftChild)
-            return node.offset
+            return node.position
         if self.rootNode is not None:
             return recurse(self.rootNode)
         return NEGATIVE_INFINITY
@@ -759,7 +759,7 @@ class ElementTree(core.AVLTree):
         def recurse(node):
             if node.rightChild is not None:
                 return recurse(node.rightChild)
-            return node.offset
+            return node.position
         if self.rootNode is not None:
             return recurse(self.rootNode)
         return NEGATIVE_INFINITY
@@ -805,7 +805,7 @@ class ElementTree(core.AVLTree):
             if node is not None:
                 if node.leftChild is not None:
                     result.extend(recurse(node.leftChild))
-                result.append(node.offset)
+                result.append(node.position)
                 if node.rightChild is not None:
                     result.extend(recurse(node.rightChild))
             return result
@@ -838,7 +838,7 @@ class ElementTree(core.AVLTree):
             if node is not None:
                 if node.leftChild is not None:
                     result.update(recurse(node.leftChild))
-                result.add(node.offset)
+                result.add(node.position)
                 result.add(node.endTimeLow)
                 result.add(node.endTimeHigh)
                 if node.rightChild is not None:
@@ -1590,7 +1590,7 @@ class Test(unittest.TestCase):
                 currentTimespansInList = list(sorted(tss[:i + 1],
                     key=lambda x: (x.offset, x.endTime)))
                 currentTimespansInTree = [x for x in tree]
-                currentOffset = min(
+                currentPosition = min(
                     x.offset for x in currentTimespansInList)
                 currentEndTime = max(
                     x.endTime for x in currentTimespansInList)
@@ -1602,7 +1602,7 @@ class Test(unittest.TestCase):
                                  min(x.endTime for x in currentTimespansInList))
                 self.assertEqual(tree.rootNode.endTimeHigh,
                                  max(x.endTime for x in currentTimespansInList))
-                self.assertEqual(tree.offset, currentOffset)
+                self.assertEqual(tree.offset, currentPosition)
                 self.assertEqual(tree.endTime, currentEndTime)
                 for i in range(len(currentTimespansInTree)):
                     self.assertEqual(currentTimespansInList[i], currentTimespansInTree[i])
@@ -1618,7 +1618,7 @@ class Test(unittest.TestCase):
                                  currentTimespansInList, 
                                  (attempt, currentTimespansInTree, currentTimespansInList))
                 if tree.rootNode is not None:
-                    currentOffset = min(
+                    currentPosition = min(
                         x.offset for x in currentTimespansInList)
                     currentEndTime = max(
                         x.endTime for x in currentTimespansInList)
@@ -1626,7 +1626,7 @@ class Test(unittest.TestCase):
                                      min(x.endTime for x in currentTimespansInList))
                     self.assertEqual(tree.rootNode.endTimeHigh,
                                      max(x.endTime for x in currentTimespansInList))
-                    self.assertEqual(tree.offset, currentOffset)
+                    self.assertEqual(tree.offset, currentPosition)
                     self.assertEqual(tree.endTime, currentEndTime)
 
                     for i in range(len(currentTimespansInTree)):

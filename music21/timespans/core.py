@@ -23,10 +23,10 @@ from music21 import common
 #------------------------------------------------------------------------------
 class AVLNode(common.SlottedObject):
     r'''
-    An AVL Tree Node, not specialized in any way, just contains offsets.
+    An AVL Tree Node, not specialized in any way, just contains positions.
 
-    >>> offset = 1.0
-    >>> node = timespans.core.AVLNode(offset)
+    >>> position = 1.0
+    >>> node = timespans.core.AVLNode(position)
     >>> node
     <Node: Start:1.0 Height:0 L:None R:None>
     >>> n2 = timespans.core.AVLNode(2.0)
@@ -48,7 +48,7 @@ class AVLNode(common.SlottedObject):
         '__weakref__',
         'balance',
         'height',
-        'offset',
+        'position',
         'payload',
 
         'leftChild',
@@ -139,8 +139,8 @@ class AVLNode(common.SlottedObject):
         None
         ''',
         
-    'offset': r'''
-        The offset of this node.
+    'position': r'''
+        The position of this node.
 
         >>> score = timespans.makeExampleScore()
         >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
@@ -155,13 +155,13 @@ class AVLNode(common.SlottedObject):
                 R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
                     R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
 
-        >>> tree.rootNode.offset
+        >>> tree.rootNode.position
         3.0
 
-        >>> tree.rootNode.leftChild.offset
+        >>> tree.rootNode.leftChild.position
         1.0
 
-        >>> tree.rootNode.rightChild.offset
+        >>> tree.rootNode.rightChild.position
         5.0
         ''',
     'leftChild': r'''
@@ -223,10 +223,10 @@ class AVLNode(common.SlottedObject):
     
     ### INITIALIZER ###
 
-    def __init__(self, offset, payload=None):
+    def __init__(self, position, payload=None):
         self.balance = 0
         self.height = 0        
-        self.offset = offset
+        self.position = position
         self.payload = payload
 
         self.leftChild = None
@@ -244,13 +244,26 @@ class AVLNode(common.SlottedObject):
             rcHeight = self.rightChild.height
             
         return '<Node: Start:{} Height:{} L:{} R:{}>'.format(
-            self.offset,
+            self.position,
             self.height,
             lcHeight,
             rcHeight
             )
 
     ### PRIVATE METHODS ###
+    
+    def moveAttributes(self, other):
+        '''
+        move attributes from this node to another in case "removal" actually
+        means substituting one node for another in the tree.
+        
+        Subclass this in derived classes
+        
+        Do not copy anything about height, balance, left or right
+        children, etc.  By default just moves position and payload.
+        '''
+        other.position = self.position
+        other.payload = self.payload
 
     def debug(self):
         '''
@@ -421,7 +434,7 @@ class AVLTree(object):
 
     def __iter__(self):
         r'''
-        Iterates through all the nodes in the offset tree in left to right order.
+        Iterates through all the nodes in the position tree in left to right order.
 
         >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
         >>> tss = [timespans.Timespan(x, y) for x, y in tsList]
@@ -455,25 +468,25 @@ class AVLTree(object):
         return recurse(self.rootNode)
 
 
-    def insertAtOffset(self, offset):
+    def insertAtPosition(self, position):
         '''
-        creates a new node at offset and sets the rootNode
+        creates a new node at position and sets the rootNode
         appropriately
         
         >>> avl = timespans.core.AVLTree()
-        >>> avl.insertAtOffset(20)
+        >>> avl.insertAtPosition(20)
         >>> avl.rootNode
         <Node: Start:20 Height:0 L:None R:None>        
         
-        >>> avl.insertAtOffset(10)
+        >>> avl.insertAtPosition(10)
         >>> avl.rootNode
         <Node: Start:20 Height:1 L:0 R:None>
 
-        >>> avl.insertAtOffset(5)
+        >>> avl.insertAtPosition(5)
         >>> avl.rootNode
         <Node: Start:10 Height:1 L:0 R:0>
         
-        >>> avl.insertAtOffset(30)
+        >>> avl.insertAtPosition(30)
         >>> avl.rootNode
         <Node: Start:10 Height:2 L:0 R:1>
         >>> avl.rootNode.leftChild
@@ -484,7 +497,7 @@ class AVLTree(object):
         >>> avl.rootNode.rightChild.rightChild
         <Node: Start:30 Height:0 L:None R:None>
         '''
-        def recurse(node, offset):
+        def recurse(node, position):
             '''
             this recursively finds the right place for the new node
             and either creates a new node (if it is in the right place)
@@ -493,19 +506,19 @@ class AVLTree(object):
             '''
             if node is None:
                 # if we get to the point where a node does not have a
-                # left or right child, make a new node at this offset...
-                return self.nodeClass(offset)
+                # left or right child, make a new node at this position...
+                return self.nodeClass(position)
             
-            if offset < node.offset:
-                node.leftChild = recurse(node.leftChild, offset)
+            if position < node.position:
+                node.leftChild = recurse(node.leftChild, position)
                 node.update()
-            elif node.offset < offset:
-                node.rightChild = recurse(node.rightChild, offset)
+            elif node.position < position:
+                node.rightChild = recurse(node.rightChild, position)
                 node.update()
             if node is not None:
                 return node.rebalance()            
         
-        self.rootNode = recurse(self.rootNode, offset)
+        self.rootNode = recurse(self.rootNode, position)
 
 
     def debug(self):
@@ -533,31 +546,31 @@ class AVLTree(object):
             return self.rootNode.debug()
         return ''    
 
-    def getNodeByOffset(self, offset):
+    def getNodeByPosition(self, position):
         r'''
-        Searches for a node whose offset is `offset` in the subtree
+        Searches for a node whose position is `position` in the subtree
         rooted on `node`.
 
         Used internally by TimespanTree.
 
         Returns a Node object or None
         '''
-        def recurse(offset, node):
+        def recurse(position, node):
             if node is not None:
-                if node.offset == offset:
+                if node.position == position:
                     return node
-                elif node.leftChild and offset < node.offset:
-                    return recurse(offset, node.leftChild)
-                elif node.rightChild and node.offset < offset:
-                    return recurse(offset, node.rightChild)
+                elif node.leftChild and position < node.position:
+                    return recurse(position, node.leftChild)
+                elif node.rightChild and node.position < position:
+                    return recurse(position, node.rightChild)
             return None
     
-        return recurse(offset, self.rootNode)
+        return recurse(position, self.rootNode)
 
 
-    def getNodeAfter(self, offset):
+    def getNodeAfter(self, position):
         r'''
-        Gets the first node after `offset`.
+        Gets the first node after `position`.
 
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
@@ -568,100 +581,100 @@ class AVLTree(object):
         >>> n2 is n1
         True
         '''
-        def recurse(node, offset):
+        def recurse(node, position):
             if node is None:
                 return None
             result = None
-            if node.offset <= offset and node.rightChild:
-                result = recurse(node.rightChild, offset)
-            elif offset < node.offset:
-                result = recurse(node.leftChild, offset) or node
+            if node.position <= position and node.rightChild:
+                result = recurse(node.rightChild, position)
+            elif position < node.position:
+                result = recurse(node.leftChild, position) or node
             return result
-        result = recurse(self.rootNode, offset)
+        result = recurse(self.rootNode, position)
         if result is None:
             return None
         return result
     
-    def getOffsetAfter(self, offset):
+    def getPositionAfter(self, position):
         r'''
-        Gets start offset after `offset`.
+        Gets start position after `position`.
 
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
-        >>> tree.getOffsetAfter(0.5)
+        >>> tree.getPositionAfter(0.5)
         1.0
 
-        Returns None if no succeeding offset exists.
+        Returns None if no succeeding position exists.
 
-        >>> tree.getOffsetAfter(35) is None
+        >>> tree.getPositionAfter(35) is None
         True
 
-        Generally speaking, negative offsets will usually return 0.0
+        Generally speaking, negative positions will usually return 0.0
 
-        >>> tree.getOffsetAfter(-999)
+        >>> tree.getPositionAfter(-999)
         0.0
         '''
-        node = self.getNodeAfter(offset)
+        node = self.getNodeAfter(position)
         if node:            
-            return node.offset
+            return node.position
         else:
             return None
 
-    def getNodeBefore(self, offset):
+    def getNodeBefore(self, position):
         '''
-        Finds the node immediately before offset.
+        Finds the node immediately before position.
         
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
         >>> tree.getNodeBefore(100)  # last node in piece
         <Node: Start:35.0 Indices:(161:161:165:165) Length:{4}>
         '''
-        def recurse(node, offset):
+        def recurse(node, position):
             if node is None:
                 return None
             result = None
-            if node.offset < offset:
-                result = recurse(node.rightChild, offset) or node
-            elif offset <= node.offset and node.leftChild:
-                result = recurse(node.leftChild, offset)
+            if node.position < position:
+                result = recurse(node.rightChild, position) or node
+            elif position <= node.position and node.leftChild:
+                result = recurse(node.leftChild, position)
             return result
         
-        result = recurse(self.rootNode, offset)
+        result = recurse(self.rootNode, position)
         if result is None:
             return None
         return result
     
-    def getOffsetBefore(self, offset):
+    def getPositionBefore(self, position):
         r'''
-        Gets the start offset immediately preceding `offset` in this
-        offset-tree.
+        Gets the start position immediately preceding `position` in this
+        position-tree.
 
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
-        >>> tree.getOffsetBefore(100)
+        >>> tree.getPositionBefore(100)
         35.0
 
-        Return None if no preceding offset exists.
+        Return None if no preceding position exists.
 
-        >>> tree.getOffsetBefore(0) is None
+        >>> tree.getPositionBefore(0) is None
         True
         '''
-        node = self.getNodeBefore(offset)
+        node = self.getNodeBefore(position)
         if node is None:
             return None
-        return node.offset
+        return node.position
 
-    def removeNode(self, offset):
+    def removeNode(self, position):
         r'''
-        Removes a node at `offset` in the subtree rooted on `node`.
+        Removes a node at `position` in the subtree rooted on `node`.
 
         Used internally by TimespanTree.
 
         >>> avl = timespans.core.AVLTree()
-        >>> avl.insertAtOffset(20)
-        >>> avl.insertAtOffset(10)
-        >>> avl.insertAtOffset(5)
-        >>> avl.insertAtOffset(30)
+        >>> avl.insertAtPosition(20)
+        >>> avl.insertAtPosition(10)
+        >>> avl.insertAtPosition(5)
+        >>> avl.insertAtPosition(30)
         >>> avl.rootNode
         <Node: Start:10 Height:2 L:0 R:1>
 
@@ -673,9 +686,9 @@ class AVLTree(object):
         
         Removing a node eliminates its payload:
         
-        >>> ten = avl.getNodeByOffset(10)
+        >>> ten = avl.getNodeByPosition(10)
         >>> ten.payload = 'ten'
-        >>> twenty = avl.getNodeByOffset(20)
+        >>> twenty = avl.getNodeByPosition(20)
         >>> twenty.payload = 'twenty'
         
         >>> avl.removeNode(10)
@@ -695,30 +708,29 @@ class AVLTree(object):
         <Node: Start:5 Height:0 L:None R:None> None
         <Node: Start:20 Height:1 L:0 R:None> twenty        
         '''
-        def recurseRemove(node, offset):
+        def recurseRemove(node, position):
             if node is not None:
-                if node.offset == offset:
+                if node.position == position:
                     ### got the right node!
                     if node.leftChild and node.rightChild:
                         nextNode = node.rightChild
                         while nextNode.leftChild: # farthest left child of the right child.
                             nextNode = nextNode.leftChild
-                        node.offset = nextNode.offset
-                        node.payload = nextNode.payload
-                        node.rightChild = recurseRemove(node.rightChild, nextNode.offset)
+                        nextNode.moveAttributes(node)
+                        node.rightChild = recurseRemove(node.rightChild, nextNode.position)
                         node.update()
                     else:
                         node = node.leftChild or node.rightChild
-                elif node.offset > offset:
-                    node.leftChild = recurseRemove(node.leftChild, offset)
+                elif node.position > position:
+                    node.leftChild = recurseRemove(node.leftChild, position)
                     node.update()
-                elif node.offset < offset:
-                    node.rightChild = recurseRemove(node.rightChild, offset)
+                elif node.position < position:
+                    node.rightChild = recurseRemove(node.rightChild, position)
                     node.update()
             if node is not None:
                 return node.rebalance()
 
-        self.rootNode = recurseRemove(self.rootNode, offset)
+        self.rootNode = recurseRemove(self.rootNode, position)
 
 #-------------------------------#
 if __name__ == '__main__':
