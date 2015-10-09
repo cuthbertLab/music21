@@ -2145,7 +2145,7 @@ class Test(unittest.TestCase):
         <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x02\\x18\\x08'>, 
         <MidiEvent DeltaTime, t=1024, track=1, channel=1>,
         <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
-        self.assertTrue(common.basicallyEqual(str(mtAlt.events), match))
+        self.assertTrue(common.whitespaceEqual(str(mtAlt.events), match))
 
     def testKeySignature(self):
         from music21 import meter, key
@@ -2190,7 +2190,7 @@ class Test(unittest.TestCase):
         self.maxDiff = None
         if six.PY2:
             mts.events[1].data = mts.events[1].data.encode('ascii') # unicode fix
-        self.assertTrue(common.basicallyEqual(str(mts.events[:5]), match))
+        self.assertTrue(common.whitespaceEqual(str(mts.events[:5]), match))
 
         # first note-on is not delayed, even w anacrusis
         match = """
@@ -2211,7 +2211,7 @@ class Test(unittest.TestCase):
         if six.PY2:
             mta.events[1].data = mta.events[1].data.encode('ascii') # unicode fix
 
-        self.assertTrue(common.basicallyEqual(str(mta.events[:10]), match))
+        self.assertTrue(common.whitespaceEqual(str(mta.events[:10]), match))
 
         # try streams to midi tracks
         # get just the soprano part
@@ -2235,7 +2235,7 @@ class Test(unittest.TestCase):
         if six.PY2:
             mtList[0].events[1].data = mtList[0].events[1].data.encode('ascii') # unicode fix
 
-        self.assertTrue(common.basicallyEqual(str(mtList[0].events[:12]), match))
+        self.assertTrue(common.whitespaceEqual(str(mtList[0].events[:12]), match))
 
     def testMidiProgramChangeA(self):
         from music21 import instrument
@@ -2317,7 +2317,7 @@ class Test(unittest.TestCase):
         <MidiEvent DeltaTime, t=1024, track=1, channel=1>, 
         <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
 
-        self.assertTrue(common.basicallyEqual(str(mtList[0].events[-20:]), match))
+        self.assertTrue(common.whitespaceEqual(str(mtList[0].events[-20:]), match))
 
     def testOverlappedEventsB(self):
         from music21 import scale
