@@ -690,19 +690,14 @@ class Music21Object(object):
 
     #---------------------------
     # convienence.  used to be in note.Note, but belongs everywhere:
-    def _getQuarterLengthFloat(self):
-        return self.duration.quarterLengthFloat
-
-    def _getQuarterLengthRational(self):
+    def _getQuarterLength(self):
         return self.duration.quarterLength
     
     def _setQuarterLength(self, value):
         self.duration.quarterLength = value
 
-    quarterLength = property(_getQuarterLengthRational, _setQuarterLength, doc='''
+    quarterLength = property(_getQuarterLength, _setQuarterLength, doc='''
         Set or Return the Duration as represented in Quarter Length, possibly as a fraction
-
-        note: the setter is identical to .quarterLengthFloat
 
         >>> n = note.Note()
         >>> n.quarterLength = 2.0
@@ -712,18 +707,6 @@ class Music21Object(object):
         >>> n.quarterLength
         Fraction(1, 3)
     ''')
-    quarterLengthFloat = property(_getQuarterLengthFloat, _setQuarterLength,
-        doc = '''Set or Return the Duration as represented in Quarter Length as a float
-
-        >>> n = note.Note()
-        >>> n.quarterLengthFloat = 2.0
-        >>> n.quarterLengthFloat
-        2.0
-        >>> n.quarterLengthFloat = 1.0/3
-        >>> n.quarterLengthFloat
-        0.333...
-        ''')
-
 
     def _getDerivation(self):
         '''

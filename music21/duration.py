@@ -2366,10 +2366,7 @@ class Duration(SlottedObject):
         return sum([c.quarterLength for c in self._components])
     
     
-    def _getQuarterLengthFloat(self):
-        return float(self._getQuarterLengthRational())
-
-    def _getQuarterLengthRational(self):
+    def _getQuarterLength(self):
         if self._quarterLengthNeedsUpdating:
             self.updateQuarterLength()
         # this is set in updateQuarterLength
@@ -2390,9 +2387,7 @@ class Duration(SlottedObject):
             
             self.informClient()
 
-    quarterLength      = property(_getQuarterLengthRational, _setQuarterLength)
-    quarterLengthFloat = property(_getQuarterLengthFloat, _setQuarterLength,
-                             doc='''
+    quarterLength = property(_getQuarterLength, _setQuarterLength, doc='''
         Returns the quarter note length or Sets the quarter note length to
         the specified value.
 
@@ -2429,6 +2424,15 @@ class Duration(SlottedObject):
         5.0
         >>> b.type  # complex because 5qL cannot be expressed as a single note.
         'complex'
+        
+        Float values will be converted to fractions if they are inexpressible exactly
+        as floats:
+        
+        >>> b = duration.Duration()
+        >>> b.quarterLength = 1.0/3
+        >>> b.quarterLength
+        Fraction(1, 3)
+        
         ''')
 
     @property

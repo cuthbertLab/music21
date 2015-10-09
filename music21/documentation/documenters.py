@@ -369,7 +369,6 @@ class ClassDocumenter(ObjectDocumenter):
        - :attr:`~music21.base.Music21Object.activeSite`
        - :attr:`~music21.base.Music21Object.derivation`
                 ...
-       - :attr:`~music21.base.Music21Object.quarterLengthFloat`
        - :attr:`~music21.base.Music21Object.seconds`
     .. rubric:: :class:`~music21.articulations.Caesura` methods
     Methods inherited from :class:`~music21.base.Music21Object`:
@@ -771,7 +770,6 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.base.Music21Object.offsetRational
         - music21.base.Music21Object.priority
         - music21.base.Music21Object.quarterLength
-        - music21.base.Music21Object.quarterLengthFloat
         music21.stream.Stream:
         - music21.stream.Stream.atSoundingPitch
         - music21.stream.Stream.duration
@@ -1056,7 +1054,6 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.offsetRational`'
         '   - :attr:`~music21.base.Music21Object.priority`'
         '   - :attr:`~music21.base.Music21Object.quarterLength`'
-        '   - :attr:`~music21.base.Music21Object.quarterLengthFloat`'
         '   - :attr:`~music21.base.Music21Object.seconds`'
         ''
         '''
@@ -1190,10 +1187,8 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.duration`'
         '   - :attr:`~music21.base.Music21Object.offset`'
         '   - :attr:`~music21.base.Music21Object.offsetFloat`'
-        '   - :attr:`~music21.base.Music21Object.offsetRational`'
         '   - :attr:`~music21.base.Music21Object.priority`'
         '   - :attr:`~music21.base.Music21Object.quarterLength`'
-        '   - :attr:`~music21.base.Music21Object.quarterLengthFloat`'
         '   - :attr:`~music21.base.Music21Object.seconds`'
         ''
         '''
