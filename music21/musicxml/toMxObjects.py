@@ -2241,12 +2241,6 @@ def streamPartToMx(part, instStream=None, meterStream=None,
 
         #environLocal.printDebug(['Stream.streamPartToMx: post makeNotation, length', len(measureStream)])
 
-        # after calling measuresStream, need to update Spanners, as a deepcopy
-        # has been made
-        # might need to getAll b/c might need spanners 
-        # from a higher level container
-        #spannerBundle = spanner.SpannerBundle(
-        #                measureStream.flat.getAllContextsByClass('Spanner'))
         # only getting spanners at this level
         #spannerBundle = spanner.SpannerBundle(measureStream.flat)
         spannerBundle = part.spannerBundle

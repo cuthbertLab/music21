@@ -488,8 +488,6 @@ class Sites(common.SlottedObject):
         
         >>> dc.getAllByClass("mock") == [aObj, bObj]
         True
-
-
         '''
         if memo is None:
             memo = {} # intialize
@@ -572,7 +570,7 @@ class Sites(common.SlottedObject):
             except AttributeError:
                 pass
 
-    def getObjByClass(self, className, serialReverseSearch=True, callerFirst=None,
+    def getObjByClass(self, className, callerFirst=None,
              sortByCreationTime=False, 
              priorityTarget=None, getElementMethod='getElementAtOrBefore',
              memo=None):
@@ -649,9 +647,9 @@ class Sites(common.SlottedObject):
         # if we could be sure that these objs do not have their own locations
         # and do not have the target class, we can skip
         for obj in objs:
-            #if DEBUG_CONTEXT: print '\tY: getObjByClass: iterating objs:', id(obj), obj
+            #if DEBUG_CONTEXT: print('\tY: getObjByClass: iterating objs:', id(obj), obj)
             if (classNameIsStr and obj.isFlat):
-                #if DEBUG_CONTEXT: print '\tY: skipping flat stream that does not contain object:', id(obj), obj
+                #if DEBUG_CONTEXT: print('\tY: skipping flat stream that does not contain object:', id(obj), obj)
                 #environLocal.printDebug(['\tY: skipping flat stream that does not contain object:'])
                 if obj.sites.getSiteCount() == 0: # is top level; no more to search...
                     if not obj.hasElementOfClass(className, forceFlat=True):
@@ -667,7 +665,6 @@ class Sites(common.SlottedObject):
                 # store this object as having been searched
                 memo[id(obj)] = obj
                 post = obj.getContextByClass(className,
-                       serialReverseSearch=serialReverseSearch,
                        callerFirst=callerFirst,
                        sortByCreationTime=sortByCreationTime,
                        getElementMethod=getElementMethod,
@@ -676,8 +673,9 @@ class Sites(common.SlottedObject):
                     break
 #                 else: # this is not a music21 object
 #                     pass
-                    #environLocal.printDebug['cannot call getContextByClass on obj stored in DefinedContext:', obj]
-#             else: # objec has already been searched
+                    #environLocal.printDebug[
+                    #  'cannot call getContextByClass on obj stored in DefinedContext:', obj]
+#             else: # object has already been searched
 #                 pass
                 #environLocal.printDebug['skipping searching of object already searched:', obj]
 #             else: # post is not None
