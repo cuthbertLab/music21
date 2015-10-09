@@ -42,7 +42,8 @@ class TimespanTreeNode(core.AVLNode):
     {6.0 - 8.0} <music21.note.Note D>
     {7.0 - 8.0} <music21.note.Note C>
     
-    >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+    >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+    ...              classList=(note.Note, chord.Chord))
     >>> rn = tree.rootNode
     
     The RootNode here represents the starting position of the Note F at 3.0; It is the center
@@ -117,10 +118,11 @@ class TimespanTreeNode(core.AVLNode):
 
     _DOC_ATTR = {
     'payload': r'''
-        A list of Timespans starting at this node's start offset.
+        The contents of the node at this point.  Usually ElementTimespans.
 
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        ...                  classList=(note.Note, chord.Chord))
         >>> print(tree.rootNode.debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
             L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>

@@ -437,23 +437,25 @@ class AVLTree(object):
         Iterates through all the nodes in the position tree in left to right order.
 
         >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> tss = [timespans.Timespan(x, y) for x, y in tsList]
+        >>> import random
+        >>> random.shuffle(tsList)
+        >>> tss = [timespans.spans.Timespan(x, y) for x, y in tsList]
         >>> tree = timespans.trees.TimespanTree()
         >>> tree.insert(tss)
 
         >>> for x in tree:
         ...     x
         ...
-        <Timespan 0 2>
-        <Timespan 0 9>
-        <Timespan 1 1>
-        <Timespan 2 3>
-        <Timespan 3 4>
-        <Timespan 4 9>
-        <Timespan 5 6>
-        <Timespan 5 8>
-        <Timespan 6 8>
-        <Timespan 7 7>
+        <Timespan 0.0 2.0>
+        <Timespan 0.0 9.0>
+        <Timespan 1.0 1.0>
+        <Timespan 2.0 3.0>
+        <Timespan 3.0 4.0>
+        <Timespan 4.0 9.0>
+        <Timespan 5.0 6.0>
+        <Timespan 5.0 8.0>
+        <Timespan 6.0 8.0>
+        <Timespan 7.0 7.0>
         '''
         def recurse(node):
             if node is not None:
@@ -528,19 +530,19 @@ class AVLTree(object):
         Useful only for debugging its internal node structure.
 
         >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> tss = [timespans.Timespan(x, y) for x, y in tsList]
+        >>> tss = [timespans.spans.Timespan(x, y) for x, y in tsList]
         >>> tree = timespans.trees.TimespanTree()
         >>> tree.insert(tss)
 
         >>> print(tree.debug())
-        <Node: Start:3 Indices:(0:4:5:10) Length:{1}>
-            L: <Node: Start:1 Indices:(0:2:3:4) Length:{1}>
-                L: <Node: Start:0 Indices:(0:0:2:2) Length:{2}>
-                R: <Node: Start:2 Indices:(3:3:4:4) Length:{1}>
-            R: <Node: Start:5 Indices:(5:6:8:10) Length:{2}>
-                L: <Node: Start:4 Indices:(5:5:6:6) Length:{1}>
-                R: <Node: Start:6 Indices:(8:8:9:10) Length:{1}>
-                    R: <Node: Start:7 Indices:(9:9:10:10) Length:{1}>
+        <Node: Start:3.0 Indices:(0:4:5:10) Length:{1}>
+            L: <Node: Start:1.0 Indices:(0:2:3:4) Length:{1}>
+                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                R: <Node: Start:2.0 Indices:(3:3:4:4) Length:{1}>
+            R: <Node: Start:5.0 Indices:(5:6:8:10) Length:{2}>
+                L: <Node: Start:4.0 Indices:(5:5:6:6) Length:{1}>
+                R: <Node: Start:6.0 Indices:(8:8:9:10) Length:{1}>
+                    R: <Node: Start:7.0 Indices:(9:9:10:10) Length:{1}>
         '''
         if self.rootNode is not None:
             return self.rootNode.debug()
