@@ -36,6 +36,7 @@ class AVLNode(common.SlottedObject):
     <Node: Start:1.0 Height:0 L:None R:None>
     >>> n2 = timespans.node.AVLNode(2.0)
     >>> node.rightChild = n2
+    >>> node.update()
     >>> node
     <Node: Start:1.0 Height:1 L:None R:0>
     
@@ -303,8 +304,8 @@ class AVLNode(common.SlottedObject):
         rightHeight = -1
         if self.leftChild is not None:
             leftHeight = self.leftChild.height
-        if self._rightChild is not None:
-            rightHeight = self._rightChild.height
+        if self.rightChild is not None:
+            rightHeight = self.rightChild.height
         self.height = max(leftHeight, rightHeight) + 1
         self.balance = rightHeight - leftHeight
 

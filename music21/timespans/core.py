@@ -347,3 +347,6 @@ class AVLTree(object):
         return self._rebalance(node)
 
 #-------------------------------#
+if __name__ == '__main__':
+    import music21
+    music21.mainTest()

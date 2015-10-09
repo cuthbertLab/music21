@@ -421,7 +421,7 @@ class ElementTree(core.AVLTree):
         else:
             offset = element.offset
 
-        node = self.getNodeByOffset(offset)
+        node = self.getNodeByOffset(offset, self.rootNode)
         if node is None:
             return
         if element in node.payload:
@@ -461,7 +461,7 @@ class ElementTree(core.AVLTree):
         <ElementTimespan (0.5 to 1.0) <music21.note.Note G#>>
         '''
         results = []
-        node = self.getNodeByOffset(offset)
+        node = self.getNodeByOffset(offset, self.rootNode)
         if node is not None:
             results.extend(node.payload)
         return tuple(results)
@@ -557,7 +557,7 @@ class ElementTree(core.AVLTree):
         '''
         if offset is None:
             offset = element.offset
-        node = self.getNodeByOffset(offset)
+        node = self.getNodeByOffset(offset, self.rootNode)
         if node is None or element not in node.payload:
             raise ValueError('{} not in Tree at offset {}.'.format(element, offset))
         index = node.payload.index(element) + node.nodeStartIndex
@@ -674,8 +674,8 @@ class ElementTree(core.AVLTree):
                     return x.source.sortTuple()[2:]
                 else:
                     return x.endTime  # ElementTimespan with no Element!
-        self.insert(self.rootNode, offset)
-        node = self.getNodeByOffset(offset)
+        self.rootNode = self._insertNode(self.rootNode, offset)
+        node = self.getNodeByOffset(offset, self.rootNode)
         node.payload.append(el)
         node.payload.sort(key=key)
         if isinstance(el, TimespanTree):
@@ -757,7 +757,7 @@ class ElementTree(core.AVLTree):
         '''
         def recurse(node):
             if node.rightChild is not None:
-                return recurse(node._rightChild)
+                return recurse(node.rightChild)
             return node.offset
         if self.rootNode is not None:
             return recurse(self.rootNode)
