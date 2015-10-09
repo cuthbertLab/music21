@@ -60,7 +60,7 @@ def getCorpusFilePath():
     True
     '''
     from music21 import corpus
-    coreCorpus = corpus.CoreCorpus()
+    coreCorpus = corpus.corpora.CoreCorpus()
     if coreCorpus.manualCoreCorpusPath is None:
         return os.path.join(getSourceFilePath(), 'corpus')
     return coreCorpus.manualCoreCorpusPath
