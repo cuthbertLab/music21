@@ -34,9 +34,7 @@ class AVLTree(object):
         )
     nodeClass = nodeModule.AVLNode
     
-    def __init__(
-        self,
-        ):
+    def __init__(self):
         self.rootNode = None
 
     def __iter__(self):
@@ -205,7 +203,7 @@ class AVLTree(object):
         nextNode.update()
         return nextNode
 
-    def _getNodeByOffset(self, node, offset):
+    def getNodeByOffset(self, offset, node=None):
         r'''
         Searches for a node whose offset is `offset` in the subtree
         rooted on `node`.
@@ -218,9 +216,9 @@ class AVLTree(object):
             if node.offset == offset:
                 return node
             elif node.leftChild and offset < node.offset:
-                return self._getNodeByOffset(node.leftChild, offset)
+                return self.getNodeByOffset(offset, node.leftChild)
             elif node.rightChild and node.offset < offset:
-                return self._getNodeByOffset(node.rightChild, offset)
+                return self.getNodeByOffset(offset, node.rightChild)
         return None
 
     def _getNodeAfter(self, offset):
