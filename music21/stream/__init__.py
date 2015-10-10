@@ -9521,7 +9521,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return s
 
         # need to find maximum voice count
-        partCount = 0
+        partCount = 1
         #partId = []
         if self.hasMeasures():
             for m in self.getElementsByClass('Measure'):
@@ -9564,7 +9564,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     # get all elements
                     mNew.mergeElements(m)
                     # always place in top-part
-                    s[0].insert( self.elementOffset(m), mNew)
+                    s.parts[0].insert(self.elementOffset(m), mNew)
         # if no measures but voices, contents of each voice go into the part
         elif self.hasVoices():
             for vIndex, v in enumerate(self.voices):
