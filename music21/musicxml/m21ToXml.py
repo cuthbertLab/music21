@@ -2414,7 +2414,17 @@ class MeasureExporter(XMLExporterBase):
             for tup in d.tuplets:
                 mxTimeModification = self.tupletToTimeModification(tup)
                 mxNote.append(mxTimeModification)
-        # TODO: stem
+        
+        # stem...        
+        if addChordTag is False:
+            if hasattr(chordOrN, 'stemDirection') and chordOrN.stemDirection != 'unspecified':
+                mxStem = SubElement(mxNote, 'stem')
+                sdtext = chordOrN.stemDirection
+                if sdtext == 'noStem':
+                    sdtext = 'none'
+                mxStem.text = sdtext
+            
+        # notehead
         foundANotehead = False
         if (hasattr(n, 'notehead') and 
                 (n.notehead != 'normal' or  # TODO: restore... needed for complete compatibility with toMxObjects...
@@ -2434,22 +2444,15 @@ class MeasureExporter(XMLExporterBase):
                 mxNote.append(mxNotehead)
         
         # TODO: notehead-text
-        
-        
+    
+        # beam
         if addChordTag is False:
-            if hasattr(chordOrN, 'stemDirection') and chordOrN.stemDirection != 'unspecified':
-                mxStem = SubElement(mxNote, 'stem')
-                sdtext = chordOrN.stemDirection
-                if sdtext == 'noStem':
-                    sdtext = 'none'
-                mxStem.text = sdtext
-            
-            # TODO: staff
             if hasattr(chordOrN, 'beams') and chordOrN.beams is not None:
                 nBeamsList = self.beamsToXml(chordOrN.beams)
                 for mxB in nBeamsList:
                     mxNote.append(mxB)
-    
+
+        # TODO: staff
     
         mxNotationsList = self.noteToNotations(n, addChordTag, chordParent)
             
@@ -2465,6 +2468,7 @@ class MeasureExporter(XMLExporterBase):
             for mxN in mxNotationsList:
                 mxNotations.append(mxN)
     
+        # lyric
         if addChordTag is False:
             for lyricObj in chordOrN.lyrics:
                 mxNote.append(self.lyricToXml(lyricObj))
