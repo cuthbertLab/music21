@@ -1915,6 +1915,32 @@ class Test(unittest.TestCase):
                         self.assertEqual(currentTimespansInList[i], currentTimespansInTree[i])
                         
 
+#     def testBachDoctest(self):
+#         from music21 import corpus, note, chord, timespans
+#         bach = corpus.parse('bwv66.6')
+#         tree = timespans.streamToTimespanTree(bach, flatten=True, 
+#                                               classList=(note.Note, chord.Chord))
+#         print(tree)
+#         for verticalities in tree.iterateVerticalitiesNwise(n=3):
+#             if verticalities[-1].offset == 25:
+#                 pass
+#             horizontalities = tree.unwrapVerticalities(verticalities)
+#             for unused_part, horizontality in horizontalities.items():
+#                 if horizontality.hasNeighborTone:
+#                     merged = horizontality[0].new(endTime=horizontality[2].endTime,)
+#                     tree.remove(horizontality[0])
+#                     tree.remove(horizontality[1])
+#                     tree.remove(horizontality[2])
+#                     tree.insert(merged)
+#      
+#     
+#         newBach = timespans.timespansToPartwiseStream(tree, templateStream=bach,)
+#         newBach.show()
+#         newBach.parts[1].measure(7).show('text')
+# #     {0.0} <music21.chord.Chord F#4>
+# #     {1.5} <music21.chord.Chord F#3>
+# #     {2.0} <music21.chord.Chord C#4>
+
 #------------------------------------------------------------------------------
 
 
