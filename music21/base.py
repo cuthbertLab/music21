@@ -147,6 +147,9 @@ class Groups(list): # no need to inherit from slotted object
     The Groups object enforces that all elements must be strings, and that
     the same element cannot be provided more than once.
 
+    NOTE: In the future spaces will not be allowed in group names.
+
+
     >>> g = Groups()
     >>> g.append("hello")
     >>> g[0]
@@ -173,8 +176,8 @@ class Groups(list): # no need to inherit from slotted object
     def _validName(self, value):
         if not isinstance(value, six.string_types):
             raise exceptions21.GroupException("Only strings can be used as group names")
-        if ' ' in value:
-            raise exceptions21.GroupException("Spaces are not allowed as group names")
+        #if ' ' in value:
+        #    raise exceptions21.GroupException("Spaces are not allowed as group names")
     
     def append(self, value):
         self._validName(value)
@@ -1170,6 +1173,18 @@ class Music21Object(object):
         
         OMIT_FROM_DOCS
 
+        TODO: these should not be the same objects!
+        
+        >>> a = b.getContextByClass('Note', 'getElementBeforeOffset')
+        >>> a
+        <music21.note.Note A>
+        >>> a2 = b.getContextByClass('Note', 'getElementAfterOffset')
+        >>> a2
+        <music21.note.Note A>
+        >>> a is a2
+        True
+
+
         TODO: these should actually be sort tuples, so that we can avoid the case of 
         skipping elements that are at the same offset...
 
@@ -1227,10 +1242,10 @@ class Music21Object(object):
                 if offsetStart is None:
                     return None
                 startTimespans = ts.elementsStartingAt(offsetStart)
-                for element in startTimespans:
-                    if hasattr(element, 'source'):
+                for timeSpan in startTimespans:
+                    if hasattr(timeSpan, 'source'): # this is a stream...
                         continue
-                    return element.element
+                    return timeSpan.element
 
         if not common.isListLike(className):
             className = (className,)
@@ -1363,7 +1378,7 @@ class Music21Object(object):
         <music21.stream.Measure 1 offset=0.0>
         <music21.stream.Part p1>
         <music21.stream.Measure 2 offset=0.0>
-        <music21.stream.Part p2>
+        <music21.stream.Part p2>        
         '''
         if memo is None:
             memo = []
