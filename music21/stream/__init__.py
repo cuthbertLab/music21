@@ -9507,6 +9507,65 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         extract each into a Part, returning a Score.
 
         If this Stream has no voices, return the Stream as a Part within a Score.
+        
+        >>> c = corpus.parse('demos/two-voices')
+        >>> c.show('t')
+        {0.0} <music21.text.TextBox "Music21 Fr...">
+        {0.0} <music21.text.TextBox "Music21">
+        {0.0} <music21.metadata.Metadata object at 0x109ce1630>
+        {0.0} <music21.stream.Part Piano>
+            {0.0} <music21.instrument.Instrument P1: Piano: >
+            {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.stream.Voice 3>
+                    {0.0} <music21.note.Note E>
+                    ...
+                    {3.0} <music21.note.Rest rest>
+                {0.0} <music21.stream.Voice 4>
+                    {0.0} <music21.note.Note F#>
+                    ...
+                    {3.5} <music21.note.Note B>
+                {0.0} <music21.layout.PageLayout>
+                ...
+            {4.0} <music21.stream.Measure 2 offset=4.0>
+                {0.0} <music21.stream.Voice 3>
+                    {0.0} <music21.note.Note E>
+                    ...
+                    {3.0} <music21.note.Rest rest>
+                {0.0} <music21.stream.Voice 4>
+                    {0.0} <music21.note.Note E>
+                    ...
+                    {3.5} <music21.note.Note A>
+            {8.0} <music21.stream.Measure 3 offset=8.0>
+                {0.0} <music21.note.Rest rest>
+        {0.0} <music21.layout.ScoreLayout>        
+        >>> ce = c.voicesToParts()
+        >>> ce.show('t')
+        {0.0} <music21.stream.Part 0x109bbb828>
+            {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.clef.TrebleClef>
+                {0.0} <music21.key.KeySignature of 2 sharps, mode major>
+                {0.0} <music21.meter.TimeSignature 4/4>
+                {0.0} <music21.note.Note E>
+                ...
+                {3.0} <music21.note.Rest rest>
+            {4.0} <music21.stream.Measure 2 offset=4.0>
+                {0.0} <music21.note.Note E>
+                ...
+                {3.0} <music21.note.Rest rest>
+            {8.0} <music21.stream.Measure 3 offset=8.0>
+                {0.0} <music21.note.Rest rest>
+        {0.0} <music21.stream.Part 0x109bbbcf8>
+            {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.clef.BassClef>
+                {0.0} <music21.key.KeySignature of 2 sharps, mode major>
+                ...
+                {3.5} <music21.note.Note B>
+            {4.0} <music21.stream.Measure 2 offset=4.0>
+                {0.0} <music21.note.Note E>
+                ...
+                {3.5} <music21.note.Note A>
+            {8.0} <music21.stream.Measure 3 offset=8.0>
+        <BLANKLINE>        
         '''
         s = Score()
         #s.metadata = self.metadata
@@ -9514,7 +9573,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # if this is a Score, call this recursively on each Part, then
         # add all parts to one Score
         if self.hasPartLikeStreams():
-            for p in self.parts:
+            for p in self.iter.parts:
                 sSub = p.voicesToParts()
                 for pSub in sSub:
                     s.insert(0, pSub)
@@ -9524,7 +9583,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         partCount = 1
         #partId = []
         if self.hasMeasures():
-            for m in self.getElementsByClass('Measure'):
+            for m in self.iter.getElementsByClass('Measure'):
                 vCount = len(m.voices)
                 if vCount > partCount:
                     partCount = vCount
@@ -9541,7 +9600,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             s.insert(0, p)
 
         if self.hasMeasures():
-            for m in self.getElementsByClass('Measure'):
+            for m in self.iter.getElementsByClass('Measure'):
                 if m.hasVoices():
                     mActive = Measure()
                     mActive.mergeAttributes(m) # get groups, optional id
@@ -9555,7 +9614,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         # merge all elements from the voice
                         mNew.mergeElements(v)
                         # insert in the appropriate part
-                        s[vIndex].insert( self.elementOffset(m), mNew)
+                        s.parts[vIndex].insert( self.elementOffset(m), mNew)
+                        
+                    for emptyIndex in range(vIndex+1, partCount):
+                        s.parts[emptyIndex].insert(self.elementOffset(m), copy.deepcopy(mActive))
                 # if a measure does not have voices, simply populate
                 # with elements and append
                 else:
@@ -9565,13 +9627,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     mNew.mergeElements(m)
                     # always place in top-part
                     s.parts[0].insert(self.elementOffset(m), mNew)
-        # if no measures but voices, contents of each voice go into the part
+                    for i in range(1, partCount):
+                        mEmpty = Measure()
+                        mEmpty.mergeAttributes(m)
+                        s.parts[i].insert(self.elementOffset(m), mEmpty)
+        # if part has no measures but has voices, contents of each voice go into the part
         elif self.hasVoices():
             for vIndex, v in enumerate(self.voices):
-                s[vIndex].mergeElements(v)
+                s.parts[vIndex].mergeElements(v)
         # if just a Stream of elements, add to a part
         else:
-            s[0].mergeElements(self)
+            s.parts[0].mergeElements(self)
 
         # there is no way to assure proper clef information, so using
         # best clef here is desirable.
@@ -10948,6 +11014,9 @@ class Voice(Stream):
 
     Note that both Finale's Layers and Voices as concepts are
     considered Voices here.
+    
+    Voices have a sort order of 1 greater than time signatures
+    
     '''
     recursionType = 'elementsFirst'
 
