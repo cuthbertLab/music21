@@ -924,6 +924,48 @@ class TimespanTree(ElementTree):
     >>> (totalConsonanceDuration, totalDissonanceDuration)
     (25.5, 9.5)
 
+    Remove neighbor tones from the Bach chorale.  (It's actually quite viscous
+    in its pruning...)
+ 
+    Here in Alto, measure 7, there's a neighbor tone E#.
+ 
+    >>> bach.parts['Alto'].measure(7).show('text')
+    {0.0} <music21.note.Note F#>
+    {0.5} <music21.note.Note E#>
+    {1.0} <music21.note.Note F#>
+    {1.5} <music21.note.Note F#>
+    {2.0} <music21.note.Note C#>
+ 
+    We'll get rid of it and a lot of other neighbor tones.
+ 
+    >>> for verticalities in tree.iterateVerticalitiesNwise(n=3):
+    ...     horizontalities = tree.unwrapVerticalities(verticalities)
+    ...     for unused_part, horizontality in horizontalities.items():
+    ...         if horizontality.hasNeighborTone:
+    ...             merged = horizontality[0].new(
+    ...                endTime=horizontality[2].endTime,
+    ...             ) # merged is a new ElementTimespan
+    ...             tree.remove(horizontality[0])
+    ...             tree.remove(horizontality[1])
+    ...             tree.remove(horizontality[2])
+    ...             tree.insert(merged)
+     
+     
+    >>> newBach = timespans.timespansToPartwiseStream(
+    ...     tree,
+    ...     templateStream=bach,
+    ...     )
+    >>> newBach.parts[1].measure(7).show('text')
+    {0.0} <music21.chord.Chord F#4>
+    {1.5} <music21.chord.Chord F#3>
+    {2.0} <music21.chord.Chord C#4>
+ 
+    The second F# is an octave lower, so it wouldn't get merged even if
+    adjacent notes were fused together (which they're not).
+    
+    
+    TODO: newBach.parts['Alto'].measure(7).show('text') should work.
+    KeyError: 'provided key (Alto) does not match any id or group'
 
     ..  note::
 
@@ -942,49 +984,6 @@ class TimespanTree(ElementTree):
 
     OMIT_FROM_DOCS
     
-#     Apparently this was never working -- it was removing tons of verticalities,
-#     
-#     Remove neighbor tones from the Bach chorale:
-# 
-#     Here in Alto, measure 7, there's a neighbor tone E#.
-# 
-#     >>> bach.parts['Alto'].measure(7).show('text')
-#     {0.0} <music21.note.Note F#>
-#     {0.5} <music21.note.Note E#>
-#     {1.0} <music21.note.Note F#>
-#     {1.5} <music21.note.Note F#>
-#     {2.0} <music21.note.Note C#>
-# 
-#     We'll get rid of it and a lot of other neighbor tones.
-# 
-#     >>> for verticalities in tree.iterateVerticalitiesNwise(n=3):
-#     ...     horizontalities = tree.unwrapVerticalities(verticalities)
-#     ...     for unused_part, horizontality in horizontalities.items():
-#     ...         if horizontality.hasNeighborTone:
-#     ...             merged = horizontality[0].new(
-#     ...                endTime=horizontality[2].endTime,
-#     ...             ) # merged is a new ElementTimespan
-#     ...             tree.remove(horizontality[0])
-#     ...             tree.remove(horizontality[1])
-#     ...             tree.remove(horizontality[2])
-#     ...             tree.insert(merged)
-#     
-#     
-#     >>> newBach = timespans.timespansToPartwiseStream(
-#     ...     tree,
-#     ...     templateStream=bach,
-#     ...     )
-#     >>> newBach.parts[1].measure(7).show('text')
-#     {0.0} <music21.chord.Chord F#4>
-#     {1.5} <music21.chord.Chord F#3>
-#     {2.0} <music21.chord.Chord C#4>
-# 
-#     The second F# is an octave lower, so it wouldn't get merged even if
-#     adjacent notes were fused together (which they're not).
-    
-    
-    TODO: newBach.parts['Alto'].measure(7).show('text') should work.
-    KeyError: 'provided key (Alto) does not match any id or group'
 
     TODO: Doc examples for all functions, including privates.
     '''

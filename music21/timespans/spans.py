@@ -367,6 +367,11 @@ class ElementTimespan(Timespan):
                     'offset %r must be after parentEndTime %r' % (parentOffset, parentEndTime))
 
     ### SPECIAL METHODS ###
+    def __eq__(self, other):
+        if self is other:
+            return True
+        else:
+            return False
 
     def __repr__(self):
         return '<{} ({} to {}) {!r}>'.format(
