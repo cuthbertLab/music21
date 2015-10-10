@@ -409,7 +409,8 @@ class GeneralObjectExporter():
         representation of a Measure, not for partial 
         solutions in Part or Stream production.
         '''
-        mCopy = m.makeNotation()    
+        mCopy = m.makeNotation()  
+        mCopy.clef = mCopy.bestClef()  
         p = stream.Part()
         p.append(mCopy)
         return self.fromPart(p)

@@ -921,8 +921,8 @@ class CoreCorpus(Corpus):
         >>> from music21 import corpus
         >>> coreCorpus = corpus.corpora.CoreCorpus()
         >>> corpusFilePaths = coreCorpus.getPaths()
-        >>> len(corpusFilePaths)
-        2567
+        >>> 2500 < len(corpusFilePaths) < 2600
+        True
 
         >>> kernFilePaths = coreCorpus.getPaths('krn')
         >>> len(kernFilePaths) >= 500

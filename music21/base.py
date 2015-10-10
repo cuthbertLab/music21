@@ -2475,7 +2475,10 @@ class Music21Object(object):
         [<music21.articulations.Staccato>]
         >>> c.lyric
         >>> c.expressions
-        [<music21.expressions.Trill>, <music21.expressions.Fermata>]
+        [<music21.expressions.Fermata>]
+        >>> c.getSpannerSites()
+        [<music21.expressions.TrillExtension <music21.note.Note C#><music21.note.Note C#>>]
+        
 
         Make sure that ties remain as they should be:
 
