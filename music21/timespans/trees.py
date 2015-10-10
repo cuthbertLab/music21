@@ -69,14 +69,14 @@ class ElementTree(core.AVLTree):
 
     __slots__ = (
         '_source',
-        '_parents',
+        'parentTrees',
         )
 
     ### INITIALIZER ###
 
     def __init__(self, elements=None, source=None):
         super(ElementTree, self).__init__()
-        self._parents = weakref.WeakSet()
+        self.parentTrees = weakref.WeakSet()
         self._source = None
         if elements and elements is not None:
             self.insert(elements)
@@ -156,9 +156,6 @@ class ElementTree(core.AVLTree):
         <Timespan 7.0 7.0>
         '''
         def recurseByIndex(node, index):
-            '''
-            TODO: tests...
-            '''
             if node.nodeStartIndex <= index < node.nodeStopIndex:
                 return node.payload[index - node.nodeStartIndex]
             elif node.leftChild and index < node.nodeStartIndex:
@@ -167,9 +164,6 @@ class ElementTree(core.AVLTree):
                 return recurseByIndex(node.rightChild, index)
 
         def recurseBySlice(node, start, stop):
-            '''
-            TODO: tests...
-            '''
             result = []
             if node is None:
                 return result
@@ -207,7 +201,7 @@ class ElementTree(core.AVLTree):
 
     def __iter__(self):
         r'''
-        Iterates through all the elements in the offset tree.
+        Iterates through all the nodes in the offset tree and returns the payload.
 
         >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
         >>> tss = [timespans.spans.Timespan(x, y) for x, y in tsList]
@@ -397,7 +391,7 @@ class ElementTree(core.AVLTree):
     def _updateParents(self, oldPosition, visitedParents=None):
         if visitedParents is None:
             visitedParents = set()
-        for parent in self._parents:
+        for parent in self.parentTrees:
             if parent is None or parent in visitedParents:
                 continue
             visitedParents.add(parent)
@@ -422,15 +416,18 @@ class ElementTree(core.AVLTree):
         if not node.payload:
             self.removeNode(offset)
         if isinstance(element, ElementTree): # represents an embedded Stream
-            element._parents.remove(self)
+            element.parentTrees.remove(self)
 
     ### PUBLIC METHODS ###
 
     def copy(self):
         r'''
-        Creates a new offset-tree with the same timespans as this offset-tree.
+        Creates a new offset-tree with the same payload as this offset-tree.
+        
+        ???
+        Does this work.  this is a bogus test.
 
-        This is analogous to `dict.copy()`.
+        This is analogous to `dict.copy()`.  
 
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
@@ -556,7 +553,7 @@ class ElementTree(core.AVLTree):
         index = node.payload.index(element) + node.nodeStartIndex
         return index
 
-    def remove(self, elements, offsets=None): #, shiftPositions=False):
+    def remove(self, elements, offsets=None): 
         r'''
         Removes `elements` or timespans (a single one or a list) from this Tree.
         
@@ -571,56 +568,17 @@ class ElementTree(core.AVLTree):
         if offsets is not None and not common.isListLike(offsets):
             offsets = [offsets]
         
-#        shiftAmount = 0.0
         for i, el in enumerate(elements):
             if offsets is not None:
-                self._removeElement(el, offsets[i]) # + shiftAmount)
+                self._removeElement(el, offsets[i]) 
             else:
                 self._removeElement(el)
-#           if shiftPositions:
-#               self.shiftPositions(shiftAmount, offsets[i] + shiftAmount)
-#               shiftAmount = common.opFrac(shiftAmount - el.quarterLength)
                 
         self._updateIndices(self.rootNode)
         self._updateEndTimes(self.rootNode)
         if (self.offset != initialPosition) or \
             (self.endTime != initialEndTime):
             self._updateParents(initialPosition)
-
-#     def shiftPositions(self, amountToShift, startingPosition=0.0, endingPosition=None, updateParents=True):
-#         '''
-#         >>> n = note.Note()
-#         >>> n2 = note.Note()
-#         >>> et = timespans.trees.ElementTree()
-#         >>> et.insert(10.0, n)
-#         >>> et.insert(20.0, n)
-#         >>> et
-#         <ElementTree {2} (10.0 to 21.0)>
-#         >>> et.shiftPositions(5.0, startingPosition=0.0)
-#         >>> et
-#         <ElementTree {2} (15.0 to 26.0)>
-#         '''
-#         initialPosition = 0.0
-#         if endingPosition is None:
-#             endingPosition = INFINITY
-#         if updateParents:
-#             initialPosition = self.offset
-#             
-#         raise TimespanTreeException("This was a dumb idea; rewrite without ever changing a node's offset...")
-# #         
-# #         node = self._getNodeAfter(startingPosition)
-# #         nodeList = []
-# #         while node is not None and node.offset < endingPosition:
-# #             newPosition = node.offset
-# #             nodeList.append(node)
-# #             node = self._getNodeAfter(newPosition)
-# #         for n in nodeList:
-# #             n.offset += amountToShift
-# 
-#         self._updateIndices(self.rootNode)
-#         self._updateEndTimes(self.rootNode)
-#         self.rootNode = self.rootNode._reblance()
-        
 
     def insert(self, offsetsOrElements, elements=None):
         r'''
@@ -675,7 +633,7 @@ class ElementTree(core.AVLTree):
         node.payload.append(el)
         node.payload.sort(key=key)
         if isinstance(el, TimespanTree):
-            el._parents.add(self)
+            el.parentTrees.add(self)
 
     def append(self, el):
         initialPosition = self.offset # will only change if is empty
@@ -877,7 +835,7 @@ class ElementTree(core.AVLTree):
 
 class TimespanTree(ElementTree):
     r'''
-    A data structure for efficiently slicing a score.
+    A data structure for efficiently slicing a score for pitches.
 
     While you can construct an TimespanTree by hand, inserting timespans one at
     a time, the common use-case is to construct the offset-tree from an entire
@@ -1667,6 +1625,7 @@ class Test(unittest.TestCase):
 
 
 _DOC_ORDER = (
+    ElementTree,
     TimespanTree,
     )
 

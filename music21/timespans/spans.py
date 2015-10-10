@@ -406,6 +406,9 @@ class ElementTimespan(Timespan):
         endTime=None,
         ):
         '''
+        Create a new object that is identical to the calling object
+        but with some of the parameters overridden.
+        
         TODO: Docs and Tests
         '''
         if beatStrength is None:
@@ -607,6 +610,7 @@ class ElementTimespan(Timespan):
         This treats notes as chords.
         
         TODO: tests, examples of usage.
+        TODO: by sorting are we losing information about overlaps?
         '''
         result = []
         if hasattr(self.element, 'pitches'):
