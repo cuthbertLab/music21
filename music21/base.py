@@ -997,6 +997,8 @@ class Music21Object(object):
                 spannerClassList = [spannerClassList]
 
         for obj in found:
+            if obj is None:
+                continue
             if spannerClassList is None:
                 post.append(obj.spannerParent)
             else:
@@ -2443,6 +2445,8 @@ class Music21Object(object):
         `quarterLength` (offset) into the Element.
 
 
+        TODO: unit into a "split" function -- document obscure uses.
+
         >>> a = note.Note('C#5')
         >>> a.duration.type = 'whole'
         >>> a.articulations = [articulations.Staccato()]
@@ -2456,7 +2460,7 @@ class Music21Object(object):
         >>> b.duration.quarterLength
         3.0
         >>> b.articulations
-        [<music21.articulations.Staccato>]
+        []
         >>> b.lyric
         'hi'
         >>> b.expressions
@@ -2468,7 +2472,7 @@ class Music21Object(object):
         >>> c.duration.quarterLength
         1.0
         >>> c.articulations
-        []
+        [<music21.articulations.Staccato>]
         >>> c.lyric
         >>> c.expressions
         [<music21.expressions.Trill>, <music21.expressions.Fermata>]
@@ -2539,28 +2543,35 @@ class Music21Object(object):
             e = copy.deepcopy(self)
         eRemain = copy.deepcopy(self)
 
-        # clear articulations from remaining parts
-        if hasattr(eRemain, 'articulations'):
-            eRemain.articulations = []
+        # clear lyrics from remaining parts
         if hasattr(eRemain, 'lyrics'):
             eRemain.lyrics = []
 
-        if hasattr(e, 'expressions'):
-            tempExpressions = e.expressions
-            e.expressions = [] # pylint: disable=attribute-defined-outside-init
-            eRemain.expressions = []
-            for thisExpression in tempExpressions:
-                if hasattr(thisExpression, 'tieAttach'):
-                    if thisExpression.tieAttach == 'first':
-                        e.expressions.append(thisExpression)
-                    elif thisExpression.tieAttach == 'last':
-                        eRemain.expressions.append(thisExpression)
-                    else:  # default = 'all'
-                        e.expressions.append(thisExpression)
-                        eRemain.expressions.append(thisExpression)
-                else: # default = 'all'
-                    e.expressions.append(thisExpression)
-                    eRemain.expressions.append(thisExpression)
+        for listType in ('expressions', 'articulations'):
+            if hasattr(e, listType):
+                temp = getattr(e, listType)
+                setattr(e, listType, []) # pylint: disable=attribute-defined-outside-init
+                setattr(eRemain, listType, [])
+                for thisExpression in temp: # using thisExpression as a shortcut for expr or art.
+                    if hasattr(thisExpression, 'splitClient'): # special method (see Trill)
+                        thisExpression.splitClient([e, eRemain])
+                    elif hasattr(thisExpression, 'tieAttach'):
+                        if thisExpression.tieAttach == 'first':
+                            eList = getattr(e, listType)
+                            eList.append(thisExpression)
+                        elif thisExpression.tieAttach == 'last':
+                            eRemainList = getattr(eRemain, listType)
+                            eRemainList.append(thisExpression)
+                        else:  # default = 'all'
+                            eList = getattr(e, listType)
+                            eList.append(thisExpression)
+                            eRemainList = getattr(eRemain, listType)
+                            eRemainList.append(thisExpression)
+                    else: # default = 'all'
+                        eList = getattr(e, listType)
+                        eList.append(thisExpression)
+                        eRemainList = getattr(eRemain, listType)
+                        eRemainList.append(thisExpression)
 
         if quarterLength < delta:
             quarterLength = 0
@@ -2655,6 +2666,8 @@ class Music21Object(object):
         Music21Object objects, copied from this Music21Object,
         that are partitioned and tied with the specified quarter
         length list durations.
+
+        TODO: unit into a "split" function -- document obscure uses.
 
 
         >>> n = note.Note()
@@ -2801,6 +2814,9 @@ class Music21Object(object):
         ('half', 'eighth')
         >>> g.tie is None
         True
+        
+        TODO: unit into a "split" function -- document obscure uses.
+        
         '''
         # needed for temporal manipulations; not music21 objects
         from music21 import tie

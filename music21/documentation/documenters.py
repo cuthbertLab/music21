@@ -15,6 +15,7 @@ import re
 import types
 import unittest
 
+from music21 import common
 from music21.exceptions21 import Music21Exception
 from music21.ext import six
 
@@ -1266,8 +1267,10 @@ class ModuleDocumenter(ObjectDocumenter):
         ObjectDocumenter.__init__(self, referent)
         namesMapping = self._examineModule()
         self._namesMapping = namesMapping
-        self._memberOrder = tuple(
-            self.referent.__dict__.get('_DOC_ORDER') or ())
+        docOrder = self.referent.__dict__.get('_DOC_ORDER')
+        if docOrder is not None and not common.isListLike(docOrder):
+            print("Doc order for ", self.referent, " has problems")
+        self._memberOrder = tuple(docOrder or ())
 
     ### SPECIAL METHODS ###
 

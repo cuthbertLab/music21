@@ -1241,10 +1241,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     # the SpannerStorage Stream
                     origin = e.derivation.origin
                     if (origin is not None and e.derivation.method == '__deepcopy__'):
-                        newSpannerBundle.replaceSpannedElement(id(origin), e)
+                        newSpannerBundle.replaceSpannedElement(origin, e)
                     # need to remove the old SpannerStorage Stream from this element; 
                     # however, all we have here is the new Spanner and new elements
                     # this must be done here, not when originally copying
+
+                            
                     e.purgeOrphans(excludeStorageStreams=False)
 
         # purging these orphans works in nearly all cases, but there are a few
@@ -5547,6 +5549,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #             lastBarlineType = subroutineKeywords['finalBarline']
 #         else:
 #             lastBarlineType = 'final'
+        returnStream.coreGatherMissingSpanners() # get spanners needed but not here!
 
         # only use inPlace arg on first usage
         if not self.hasMeasures():
@@ -5624,7 +5627,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             raise StreamException(
                     'no measures found in stream with %s elements' % (self.__len__()))
         #environLocal.printDebug(['Stream.makeNotation(): created measures:', len(measureStream)])
-
+        
         return returnStream
 
     def realizeOrnaments(self):
@@ -11141,6 +11144,9 @@ class Measure(Stream):
         # TODO: this probably needs to look to see what processes need to be done; 
         # for example, existing beaming may be destroyed.
 
+
+        # do this before deepcopy...
+        
         # assuming we are not trying to get context of previous measure
         if not inPlace: # make a copy
             m = copy.deepcopy(self)
@@ -12217,10 +12223,11 @@ class Score(Stream):
             returnStream = self
         else:
             returnStream = copy.deepcopy(self)
-
+        returnStream.coreGatherMissingSpanners() # get spanners needed but not here!
+        
         # do not assume that we have parts here
         if self.hasPartLikeStreams():
-            for s in returnStream.getElementsByClass('Stream'):
+            for s in returnStream.iter.getElementsByClass('Stream'):
                 # process all component Streams inPlace
                 s.makeNotation(meterStream=meterStream, 
                                refStreamOrTimeRange=refStreamOrTimeRange, 
@@ -12232,7 +12239,7 @@ class Score(Stream):
             # this, must call elements changed
             returnStream.elementsChanged()
         else: # call the base method
-            super(Score, self).makeNotation(meterStream=meterStream, 
+            super(Score, returnStream).makeNotation(meterStream=meterStream, 
                                             refStreamOrTimeRange=refStreamOrTimeRange, 
                                             inPlace=True, 
                                             bestClef=bestClef, 

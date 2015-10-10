@@ -409,11 +409,9 @@ class GeneralObjectExporter():
         representation of a Measure, not for partial 
         solutions in Part or Stream production.
         '''
-        if m.clef is None:
-            m.clef = m.bestClef()
-        m.makeNotation(inPlace=True)    
+        mCopy = m.makeNotation()    
         p = stream.Part()
-        p.append(m)
+        p.append(mCopy)
         return self.fromPart(p)
     
     def fromVoice(self, v):
