@@ -9516,6 +9516,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {0.0} <music21.stream.Part Piano>
             {0.0} <music21.instrument.Instrument P1: Piano: >
             {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.layout.PageLayout>
+                {0.0} <music21.layout.SystemLayout>
+                ...
+                {0.0} <music21.clef.BassClef>
+                {0.0} <music21.key.KeySignature of 2 sharps, mode major>
+                {0.0} <music21.meter.TimeSignature 4/4>
                 {0.0} <music21.stream.Voice 3>
                     {0.0} <music21.note.Note E>
                     ...
@@ -9524,8 +9530,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     {0.0} <music21.note.Note F#>
                     ...
                     {3.5} <music21.note.Note B>
-                {0.0} <music21.layout.PageLayout>
-                ...
             {4.0} <music21.stream.Measure 2 offset=4.0>
                 {0.0} <music21.stream.Voice 3>
                     {0.0} <music21.note.Note E>
@@ -11016,9 +11020,9 @@ class Voice(Stream):
     considered Voices here.
     
     Voices have a sort order of 1 greater than time signatures
-    
     '''
     recursionType = 'elementsFirst'
+    classSortOrder = 5
 
 
 
