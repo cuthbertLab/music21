@@ -152,7 +152,7 @@ class Timespan(object):
         >>> ts4 = timespans.spans.Timespan(6, 10)
         >>> ts3.mergeWith(ts4)
         Traceback (most recent call last):
-        music21.exceptions21.TimespanException: Cannot merge <Timespan 0.0 7.0> with 
+        TimespanException: Cannot merge <Timespan 0.0 7.0> with 
             <Timespan 6.0 10.0>: not contiguous        
         
         
@@ -194,7 +194,6 @@ class Timespan(object):
 
         >>> tree[0].mergeWith(tree[50])
         Traceback (most recent call last):
-        ...
         TimespanException: Cannot merge <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>> 
                 with <ElementTimespan (9.5 to 10.0) <music21.note.Note B>>: not contiguous
 
