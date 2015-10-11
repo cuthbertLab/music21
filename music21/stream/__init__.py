@@ -2025,8 +2025,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                         allDerived=False)
 
     def splitAtQuarterLength(self, quarterLength, retainOrigin=True,
-        addTies=True, displayTiedAccidentals=False, searchContext=True,
-        delta=1e-06):
+        addTies=True, displayTiedAccidentals=False, searchContext=True):
         '''
         This method overrides the method on Music21Object to provide
         similar functionality for Streams.
@@ -2085,7 +2084,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             qlSplit = quarterLength - sLeft.elementOffset(t)
             unused_eLeft, eRight = t.splitAtQuarterLength(qlSplit,
                 retainOrigin=True, addTies=addTies,
-                displayTiedAccidentals=displayTiedAccidentals, delta=delta)
+                displayTiedAccidentals=displayTiedAccidentals)
             # do not need to insert eLeft, as already positioned and
             # altered in-place above
             # it is assumed that anything cut will start at zero
