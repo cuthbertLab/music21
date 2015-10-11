@@ -147,6 +147,9 @@ class Groups(list): # no need to inherit from slotted object
     The Groups object enforces that all elements must be strings, and that
     the same element cannot be provided more than once.
 
+    NOTE: In the future spaces will not be allowed in group names.
+
+
     >>> g = Groups()
     >>> g.append("hello")
     >>> g[0]
@@ -173,8 +176,8 @@ class Groups(list): # no need to inherit from slotted object
     def _validName(self, value):
         if not isinstance(value, six.string_types):
             raise exceptions21.GroupException("Only strings can be used as group names")
-        if ' ' in value:
-            raise exceptions21.GroupException("Spaces are not allowed as group names")
+        #if ' ' in value:
+        #    raise exceptions21.GroupException("Spaces are not allowed as group names")
     
     def append(self, value):
         self._validName(value)
@@ -994,6 +997,8 @@ class Music21Object(object):
                 spannerClassList = [spannerClassList]
 
         for obj in found:
+            if obj is None:
+                continue
             if spannerClassList is None:
                 post.append(obj.spannerParent)
             else:
@@ -1170,6 +1175,18 @@ class Music21Object(object):
         
         OMIT_FROM_DOCS
 
+        TODO: these should not be the same objects!
+        
+        >>> a = b.getContextByClass('Note', 'getElementBeforeOffset')
+        >>> a
+        <music21.note.Note A>
+        >>> a2 = b.getContextByClass('Note', 'getElementAfterOffset')
+        >>> a2
+        <music21.note.Note A>
+        >>> a is a2
+        True
+
+
         TODO: these should actually be sort tuples, so that we can avoid the case of 
         skipping elements that are at the same offset...
 
@@ -1227,10 +1244,10 @@ class Music21Object(object):
                 if offsetStart is None:
                     return None
                 startTimespans = ts.elementsStartingAt(offsetStart)
-                for element in startTimespans:
-                    if hasattr(element, 'source'):
+                for timeSpan in startTimespans:
+                    if hasattr(timeSpan, 'source'): # this is a stream...
                         continue
-                    return element.element
+                    return timeSpan.element
 
         if not common.isListLike(className):
             className = (className,)
@@ -1363,7 +1380,7 @@ class Music21Object(object):
         <music21.stream.Measure 1 offset=0.0>
         <music21.stream.Part p1>
         <music21.stream.Measure 2 offset=0.0>
-        <music21.stream.Part p2>
+        <music21.stream.Part p2>        
         '''
         if memo is None:
             memo = []
@@ -2428,6 +2445,8 @@ class Music21Object(object):
         `quarterLength` (offset) into the Element.
 
 
+        TODO: unit into a "split" function -- document obscure uses.
+
         >>> a = note.Note('C#5')
         >>> a.duration.type = 'whole'
         >>> a.articulations = [articulations.Staccato()]
@@ -2441,7 +2460,7 @@ class Music21Object(object):
         >>> b.duration.quarterLength
         3.0
         >>> b.articulations
-        [<music21.articulations.Staccato>]
+        []
         >>> b.lyric
         'hi'
         >>> b.expressions
@@ -2453,10 +2472,13 @@ class Music21Object(object):
         >>> c.duration.quarterLength
         1.0
         >>> c.articulations
-        []
+        [<music21.articulations.Staccato>]
         >>> c.lyric
         >>> c.expressions
-        [<music21.expressions.Trill>, <music21.expressions.Fermata>]
+        [<music21.expressions.Fermata>]
+        >>> c.getSpannerSites()
+        [<music21.expressions.TrillExtension <music21.note.Note C#><music21.note.Note C#>>]
+        
 
         Make sure that ties remain as they should be:
 
@@ -2524,28 +2546,35 @@ class Music21Object(object):
             e = copy.deepcopy(self)
         eRemain = copy.deepcopy(self)
 
-        # clear articulations from remaining parts
-        if hasattr(eRemain, 'articulations'):
-            eRemain.articulations = []
+        # clear lyrics from remaining parts
         if hasattr(eRemain, 'lyrics'):
             eRemain.lyrics = []
 
-        if hasattr(e, 'expressions'):
-            tempExpressions = e.expressions
-            e.expressions = [] # pylint: disable=attribute-defined-outside-init
-            eRemain.expressions = []
-            for thisExpression in tempExpressions:
-                if hasattr(thisExpression, 'tieAttach'):
-                    if thisExpression.tieAttach == 'first':
-                        e.expressions.append(thisExpression)
-                    elif thisExpression.tieAttach == 'last':
-                        eRemain.expressions.append(thisExpression)
-                    else:  # default = 'all'
-                        e.expressions.append(thisExpression)
-                        eRemain.expressions.append(thisExpression)
-                else: # default = 'all'
-                    e.expressions.append(thisExpression)
-                    eRemain.expressions.append(thisExpression)
+        for listType in ('expressions', 'articulations'):
+            if hasattr(e, listType):
+                temp = getattr(e, listType)
+                setattr(e, listType, []) # pylint: disable=attribute-defined-outside-init
+                setattr(eRemain, listType, [])
+                for thisExpression in temp: # using thisExpression as a shortcut for expr or art.
+                    if hasattr(thisExpression, 'splitClient'): # special method (see Trill)
+                        thisExpression.splitClient([e, eRemain])
+                    elif hasattr(thisExpression, 'tieAttach'):
+                        if thisExpression.tieAttach == 'first':
+                            eList = getattr(e, listType)
+                            eList.append(thisExpression)
+                        elif thisExpression.tieAttach == 'last':
+                            eRemainList = getattr(eRemain, listType)
+                            eRemainList.append(thisExpression)
+                        else:  # default = 'all'
+                            eList = getattr(e, listType)
+                            eList.append(thisExpression)
+                            eRemainList = getattr(eRemain, listType)
+                            eRemainList.append(thisExpression)
+                    else: # default = 'all'
+                        eList = getattr(e, listType)
+                        eList.append(thisExpression)
+                        eRemainList = getattr(eRemain, listType)
+                        eRemainList.append(thisExpression)
 
         if quarterLength < delta:
             quarterLength = 0
@@ -2640,6 +2669,8 @@ class Music21Object(object):
         Music21Object objects, copied from this Music21Object,
         that are partitioned and tied with the specified quarter
         length list durations.
+
+        TODO: unit into a "split" function -- document obscure uses.
 
 
         >>> n = note.Note()
@@ -2786,6 +2817,9 @@ class Music21Object(object):
         ('half', 'eighth')
         >>> g.tie is None
         True
+        
+        TODO: unit into a "split" function -- document obscure uses.
+        
         '''
         # needed for temporal manipulations; not music21 objects
         from music21 import tie

@@ -482,6 +482,24 @@ class Trill(Ornament):
         self.tieAttach = 'all'
         self.quarterLength = 0.125
 
+    def splitClient(self, noteList):
+        '''
+        splitClient is called by base.splitAtQuarterLength() to support splitting trills.
+        
+        >>> n = note.Note(type='whole')
+        >>> n.expressions.append(expressions.Trill())
+        >>> n1, n2 = n.splitAtQuarterLength(3.0)
+        >>> n1.getSpannerSites()
+        [<music21.expressions.TrillExtension <music21.note.Note C><music21.note.Note C>>]
+        '''
+        if len(noteList) > 0:
+            noteList[0].expressions.append(self)
+        if len(noteList) > 1 and not noteList[0].getSpannerSites('TrillExtension'):
+            unused_te = TrillExtension(noteList)
+            # the TrillExtension object will be in the noteList spanner sites
+            # and can be retrieved using stream.coreGatherMissingSpanners()
+            
+    
     def realize(self, srcObj):
         '''
         realize a trill.
@@ -972,7 +990,7 @@ class TrillExtension(spanner.Spanner):
     # musicxml defines a start, stop, and a continue; will try to avoid continue
     # note that this always includes a trill symbol
     def __init__(self, *arguments, **keywords):
-        spanner.Spanner.__init__(self, *arguments, **keywords)
+        super(TrillExtension, self).__init__(*arguments, **keywords)
         self._placement = 'below' # can above or below, after musicxml
     
     def _getPlacement(self):

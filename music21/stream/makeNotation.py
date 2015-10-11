@@ -319,13 +319,13 @@ def makeMeasures(
 
     >>> allNotes = partWithMeasures.flat.notes
     >>> allNotes[0].articulations
-    [<music21.articulations.Staccato>]
+    []
 
     >>> allNotes[1].articulations
     []
 
     >>> allNotes[2].articulations
-    []
+    [<music21.articulations.Staccato>]
 
     >>> [allNotes[0].lyric, allNotes[1].lyric, allNotes[2].lyric]
     ['hi', None, None]
