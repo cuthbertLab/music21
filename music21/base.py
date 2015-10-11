@@ -135,6 +135,29 @@ class ElementException(exceptions21.Music21Exception):
 _SortTuple = collections.namedtuple('SortTuple', ['atEnd','offset','priority',
                                                   'classSortOrder','isNotGrace','insertIndex'])
 
+# pseudo class for returning split()
+class _SplitTuple(tuple):
+    '''
+    >>> st = base._SplitTuple([1, 2])
+    >>> st.spannerList = [3]
+    >>> st
+    (1, 2)
+    >>> st.spannerList
+    [3]
+    >>> a, b = st
+    >>> a
+    1
+    >>> b
+    2
+    >>> st.__class__
+    <... 'music21.base._SplitTuple'>
+    '''
+    def __new__(cls, tupEls):
+        return super(_SplitTuple, cls).__new__(cls, tuple(tupEls))
+
+    def __init__(self, tupEls):
+        self.spannerList = []
+
 #------------------------------------------------------------------------------
 # make subclass of set once that is defined properly
 
@@ -2438,11 +2461,14 @@ class Music21Object(object):
                              quarterLength, 
                              retainOrigin=True,
                              addTies=True, 
-                             displayTiedAccidentals=False, 
-                             delta=1e-06):
+                             displayTiedAccidentals=False):
         '''
         Split an Element into two Elements at a provided
         `quarterLength` (offset) into the Element.
+        
+        Returns a specialized tuple called a SplitTuple that also has
+        a .spannerList element which is a list of spanners
+        that were created during the split, such as by 
 
 
         TODO: unit into a "split" function -- document obscure uses.
@@ -2452,7 +2478,8 @@ class Music21Object(object):
         >>> a.articulations = [articulations.Staccato()]
         >>> a.lyric = 'hi'
         >>> a.expressions = [expressions.Mordent(), expressions.Trill(), expressions.Fermata()]
-        >>> b, c = a.splitAtQuarterLength(3)
+        >>> st = a.splitAtQuarterLength(3)
+        >>> b, c = st
         >>> b.duration.type
         'half'
         >>> b.duration.dots
@@ -2478,6 +2505,12 @@ class Music21Object(object):
         [<music21.expressions.Fermata>]
         >>> c.getSpannerSites()
         [<music21.expressions.TrillExtension <music21.note.Note C#><music21.note.Note C#>>]
+        
+        st is a _SplitTuple which can get the spanners from it for inserting into a Stream.
+        
+        >>> st.spannerList
+        [<music21.expressions.TrillExtension <music21.note.Note C#><music21.note.Note C#>>]
+        
         
 
         Make sure that ties remain as they should be:
@@ -2527,15 +2560,16 @@ class Music21Object(object):
         >>> n.quarterLength = 0.5
         >>> a, b = n.splitAtQuarterLength(0.7)
         Traceback (most recent call last):
-        DurationException: cannot split a duration (0.5) at this quarterLength (0.7)
+        DurationException: cannot split a duration (0.5) at this quarterLength (7/10)
         '''
         # needed for temporal manipulations; not music21 objects
         from music21 import tie
+        quarterLength = opFrac(quarterLength)
 
         if self.duration is None:
             raise Exception('cannot split an element that has a Duration of None')
 
-        if quarterLength - delta > self.duration.quarterLength:
+        if quarterLength > self.duration.quarterLength:
             raise duration.DurationException(
             "cannot split a duration (%s) at this quarterLength (%s)" % (
             self.duration.quarterLength, quarterLength))
@@ -2550,6 +2584,7 @@ class Music21Object(object):
         if hasattr(eRemain, 'lyrics'):
             eRemain.lyrics = []
 
+        spannerList = []
         for listType in ('expressions', 'articulations'):
             if hasattr(e, listType):
                 temp = getattr(e, listType)
@@ -2557,7 +2592,9 @@ class Music21Object(object):
                 setattr(eRemain, listType, [])
                 for thisExpression in temp: # using thisExpression as a shortcut for expr or art.
                     if hasattr(thisExpression, 'splitClient'): # special method (see Trill)
-                        thisExpression.splitClient([e, eRemain])
+                        spanners = thisExpression.splitClient([e, eRemain])
+                        for s in spanners:
+                            spannerList.append(s)
                     elif hasattr(thisExpression, 'tieAttach'):
                         if thisExpression.tieAttach == 'first':
                             eList = getattr(e, listType)
@@ -2576,9 +2613,7 @@ class Music21Object(object):
                         eRemainList = getattr(eRemain, listType)
                         eRemainList.append(thisExpression)
 
-        if quarterLength < delta:
-            quarterLength = 0
-        elif abs(quarterLength - self.duration.quarterLength) < delta:
+        if abs(quarterLength - self.duration.quarterLength) < 0:
             quarterLength = self.duration.quarterLength
 
         lenEnd = self.duration.quarterLength - quarterLength
@@ -2656,9 +2691,14 @@ class Music21Object(object):
                     eRemain.pitch.accidental.displayStatus = True
 
         if eRemain.duration.quarterLength > 0.0:
-            return [e, eRemain]
+            st = _SplitTuple([e, eRemain])
         else:
-            return [e, None]
+            st = _SplitTuple([e, None])
+            
+        if spannerList:
+            st.spannerList = spannerList
+        
+        return st
 
     def splitByQuarterLengths(self, 
                               quarterLengthList, 
@@ -2679,9 +2719,6 @@ class Music21Object(object):
         >>> [n.quarterLength for n in post]
         [1.0, 1.0, 1.0]
         '''
-        # needed for temporal manipulations; not music21 objects
-        from music21 import tie
-
         if self.duration is None:
             raise Music21ObjectException('cannot split an element that has a Duration of None')
 
@@ -2690,72 +2727,31 @@ class Music21Object(object):
                                          'equal to the duration of the source: %s, %s' % 
                                          (quarterLengthList, self.duration.quarterLength))
         # if nothing to do
-        elif (len(quarterLengthList) == 1 and opFrac(quarterLengthList[0]) ==
-            self.duration.quarterLength):
+        elif len(quarterLengthList) == 1:
             # return a copy of self in a list
-            return [copy.deepcopy(self)]
+            return _SplitTuple([copy.deepcopy(self)])
         elif len(quarterLengthList) <= 1:
             raise Music21ObjectException('cannot split by this quarter length list: %s.' % 
                                          (quarterLengthList,))
 
-        post = []
-        forceEndTieType = 'stop'
-        for i in range(len(quarterLengthList)):
-            ql = opFrac(quarterLengthList[i])
-            e = copy.deepcopy(self)
-            e.quarterLength = ql
+        eList = []
+        spannerList = []  # this does not fully work with trills over multiple splits yet.
+        eRemain = copy.deepcopy(self)
+        for qlIndex in range(len(quarterLengthList) - 1):
+            qlSplit = quarterLengthList[qlIndex]
+            st = eRemain.splitAtQuarterLength(qlSplit, 
+                                           addTies=addTies, 
+                                           displayTiedAccidentals=displayTiedAccidentals)
+            newEl, eRemain = st
+            eList.append(newEl)
+            spannerList.extend(st.spannerList)
 
-            if i != 0:
-                # clear articulations from remaining parts
-                if hasattr(e, 'articulations'):
-                    e.articulations = []
-
-
-            if addTies:
-                # if not last
-                if i == 0:
-                    # if the first elements has a Tie, then the status
-                    # of that Tie needs to be continued here and, at the
-                    # end of all durations in this block.
-                    if e.tie is not None:
-                        # the last tie of what was formally a start should
-                        # continue
-                        if e.tie.type == 'start':
-                            # keep start  if already set
-                            forceEndTieType = 'continue'
-                        # a stop was ending a previous tie; we know that
-                        # the first is now a continue
-                        elif e.tie.type == 'stop':
-                            forceEndTieType = 'stop'
-                            e.tie.type = 'continue'
-                        elif e.tie.type == 'continue':
-                            forceEndTieType = 'continue'
-                            # keep continue if already set
-                    else:
-                        e.tie = tie.Tie('start') # need a tie objects
-                elif i < (len(quarterLengthList) - 1):
-                    e.tie = tie.Tie('continue') # need a tie objects
-                else: # if last
-                    # last note just gets the tie of the original Note
-                    e.tie = tie.Tie(forceEndTieType)
-
-            # hide accidentals on tied notes where previous note
-            # had an accidental that was shown
-            if i != 0:
-                # look at self for characteristics of origin
-                if hasattr(self, 'pitch') and self.pitch.accidental is not None:
-                    if not displayTiedAccidentals: # if False
-                        # do not show accidentals unless display type in 'even-tied'
-                        if (self.pitch.accidental.displayType not in
-                            ['even-tied']):
-                            e.pitch.accidental.displayStatus = False
-                    else: # display tied accidentals
-                        e.pitch.accidental.displayType = 'even-tied'
-                        e.pitch.accidental.displayStatus = True
-
-            post.append(e)
-
-        return post
+        if eRemain is not None:
+            eList.append(eRemain)
+        
+        stOut = _SplitTuple(eList)
+        stOut.spannerList = spannerList
+        return stOut
 
     def splitAtDurations(self):
         '''
@@ -2777,7 +2773,7 @@ class Music21Object(object):
         6.0
         >>> b = a.splitAtDurations()
         >>> b
-        [<music21.note.Note C>, <music21.note.Note C>]
+        (<music21.note.Note C>, <music21.note.Note C>)
         >>> b[0].pitch == b[1].pitch
         True
         >>> b[0].duration
@@ -2803,10 +2799,12 @@ class Music21Object(object):
 
         Assume c is tied to the next note.  Then the last split note should also be tied
 
-        >>> c.tie = tie.Tie()
+        >>> c.tie = tie.Tie('start')
         >>> d, e = c.splitAtDurations()
-        >>> e.tie.type
+        >>> d.tie.type
         'start'
+        >>> e.tie.type
+        'continue'
 
         Rests have no ties:
 
@@ -2815,50 +2813,16 @@ class Music21Object(object):
         >>> g, h = f.splitAtDurations()
         >>> (g.duration.type, h.duration.type)
         ('half', 'eighth')
+        >>> f.tie is None
+        True
         >>> g.tie is None
         True
         
         TODO: unit into a "split" function -- document obscure uses.
         
         '''
-        # needed for temporal manipulations; not music21 objects
-        from music21 import tie
-
-        if self.duration is None:
-            raise Exception('cannot split an element that has a Duration of None')
-
-        returnNotes = []
-        if hasattr(self, 'linkage'):
-            linkageType = self.linkage
-        else:
-            linkageType = None
-
-        for i in range(len(self.duration.components)):
-            tempNote = copy.deepcopy(self)
-            if i != 0:
-                # clear articulations from remaining parts
-                if hasattr(tempNote, 'articulations'):
-                    tempNote.articulations = []
-                if hasattr(tempNote, 'lyrics'):
-                    tempNote.lyrics = []
-
-            tempNote.duration.clear()
-            tempNote.duration.addDurationTuple(self.duration.components[i])
-            if i != (len(self.duration.components) - 1): # if not last note, use linkage
-                if linkageType is None:
-                    pass
-                elif linkageType == 'tie':
-                    tempNote.tie = tie.Tie()
-            else:
-                # last note just gets the tie of the original Note
-                if hasattr(self, 'tie') and self.tie is None:
-                    tempNote.tie = tie.Tie("stop")
-                elif hasattr(self, 'tie') and self.tie is not None and self.tie.type == 'stop':
-                    tempNote.tie = tie.Tie("stop")
-                elif hasattr(self, 'tie'):
-                    tempNote.tie = copy.deepcopy(self.tie)
-            returnNotes.append(tempNote)
-        return returnNotes
+        quarterLengthList = [c.quarterLength for c in self.duration.components]
+        return self.splitByQuarterLengths(quarterLengthList)
 
     #--------------------------------------------------------------------------
     # temporal and beat based positioning

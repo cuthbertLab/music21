@@ -488,16 +488,21 @@ class Trill(Ornament):
         
         >>> n = note.Note(type='whole')
         >>> n.expressions.append(expressions.Trill())
-        >>> n1, n2 = n.splitAtQuarterLength(3.0)
+        >>> st = n.splitAtQuarterLength(3.0)
+        >>> n1, n2 = st
+        >>> st.spannerList
+        [<music21.expressions.TrillExtension <music21.note.Note C><music21.note.Note C>>]
         >>> n1.getSpannerSites()
         [<music21.expressions.TrillExtension <music21.note.Note C><music21.note.Note C>>]
         '''
+        returnSpanners = []
         if len(noteList) > 0:
             noteList[0].expressions.append(self)
         if len(noteList) > 1 and not noteList[0].getSpannerSites('TrillExtension'):
-            unused_te = TrillExtension(noteList)
-            # the TrillExtension object will be in the noteList spanner sites
-            # and can be retrieved using stream.coreGatherMissingSpanners()
+            te = TrillExtension(noteList)
+            returnSpanners.append(te)
+        
+        return returnSpanners
             
     
     def realize(self, srcObj):
