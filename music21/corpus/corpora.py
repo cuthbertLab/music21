@@ -903,7 +903,7 @@ class CoreCorpus(Corpus):
         >>> coreCorpus = corpus.CoreCorpus()
         >>> corpusFilePaths = coreCorpus.getPaths()
         >>> len(corpusFilePaths)
-        2567
+        2569
 
         >>> kernFilePaths = coreCorpus.getPaths('krn')
         >>> len(kernFilePaths) >= 500
