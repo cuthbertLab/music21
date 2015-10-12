@@ -164,7 +164,9 @@ class _EnvironmentCore(object):
         # add local corpus path as a key
         #if six.PY3 and isinstance(value, bytes):
         #    value = value.decode(errors='replace')
-            
+        if 'path' in key.lower() and value is not None:
+            value = common.cleanpath(value)
+        
         if key not in self._ref:
             if key != 'localCorpusPath':
                 raise EnvironmentException('no preference: %s' % key)
@@ -303,7 +305,8 @@ class _EnvironmentCore(object):
         if platform == 'win':
             for name, value in [
                 ('lilypondPath', 'lilypond'),
-                ('musescoreDirectPNGPath', r'%PROGRAMFILES(x86)%\MuseScore 2\MuseScore.exe'),
+                ('musescoreDirectPNGPath', 
+                    common.cleanpath(r'%PROGRAMFILES(x86)%\MuseScore 2\MuseScore.exe')),
                 ]:
                 self.__setitem__(name, value)  # use for key checking
         elif platform == 'nix':
@@ -1251,13 +1254,15 @@ class Test(unittest.TestCase):
   <preference name="ipythonShowFormat" value="ipython.musicxml.png" />
   <preference name="lilypondBackend" value="ps" />
   <preference name="lilypondFormat" value="pdf" />
-  <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond" />
+  <preference name="lilypondPath" 
+      value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond" />
   <preference name="lilypondVersion" />
   <localCorporaSettings />
   <localCorpusSettings />
   <preference name="manualCoreCorpusPath" />
   <preference name="midiPath" value="/Applications/QuickTime Player.app" />
-  <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore 2.app/Contents/MacOS/mscore" />
+  <preference name="musescoreDirectPNGPath" 
+      value="/Applications/MuseScore 2.app/Contents/MacOS/mscore" />
   <preference name="musicxmlPath" value="/Applications/Finale Notepad 2014.app" />
   <preference name="pdfPath" value="/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
@@ -1266,7 +1271,7 @@ class Test(unittest.TestCase):
   <preference name="writeFormat" value="musicxml" />
 </settings>
 """
-        self.assertEqual(canonic.split('\n'), match.split('\n'))
+        self.assertTrue(common.whitespaceEqual(canonic, match))
 
         # try adding some local corpus settings
         env['localCorpusSettings'] = ['a', 'b', 'c']
@@ -1288,7 +1293,8 @@ class Test(unittest.TestCase):
   <preference name="ipythonShowFormat" value="ipython.musicxml.png" />
   <preference name="lilypondBackend" value="ps" />
   <preference name="lilypondFormat" value="pdf" />
-  <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond" />
+  <preference name="lilypondPath" 
+      value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond" />
   <preference name="lilypondVersion" />
   <localCorporaSettings>
     <localCorpusSettings name="foo">
@@ -1304,7 +1310,8 @@ class Test(unittest.TestCase):
   </localCorpusSettings>
   <preference name="manualCoreCorpusPath" />
   <preference name="midiPath" value="/Applications/QuickTime Player.app" />
-  <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore 2.app/Contents/MacOS/mscore" />
+  <preference name="musescoreDirectPNGPath" 
+      value="/Applications/MuseScore 2.app/Contents/MacOS/mscore" />
   <preference name="musicxmlPath" value="/Applications/Finale Notepad 2014.app" />
   <preference name="pdfPath" value="/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
@@ -1313,7 +1320,7 @@ class Test(unittest.TestCase):
   <preference name="writeFormat" value="musicxml" />
 </settings>
 """
-        self.assertEqual(canonic.split('\n'), match.split('\n'))
+        self.assertTrue(common.whitespaceEqual(canonic, match))
 
     def testFromSettings(self):
 
@@ -1345,7 +1352,8 @@ class Test(unittest.TestCase):
   <preference name="ipythonShowFormat" value="ipython.musicxml.png" />
   <preference name="lilypondBackend" value="ps" />
   <preference name="lilypondFormat" value="pdf" />
-  <preference name="lilypondPath" value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond" />
+  <preference name="lilypondPath" 
+      value="/Applications/Lilypond.app/Contents/Resources/bin/lilypond" />
   <preference name="lilypondVersion" />
   <localCorporaSettings />
   <localCorpusSettings>
@@ -1355,7 +1363,8 @@ class Test(unittest.TestCase):
   </localCorpusSettings>
   <preference name="manualCoreCorpusPath" />
   <preference name="midiPath" value="w" />
-  <preference name="musescoreDirectPNGPath" value="/Applications/MuseScore 2.app/Contents/MacOS/mscore" />
+  <preference name="musescoreDirectPNGPath" 
+      value="/Applications/MuseScore 2.app/Contents/MacOS/mscore" />
   <preference name="musicxmlPath" value="/Applications/Finale Notepad 2014.app" />
   <preference name="pdfPath" value="/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
@@ -1364,17 +1373,17 @@ class Test(unittest.TestCase):
   <preference name="writeFormat" value="musicxml" />
 </settings>
 """
-        self.assertEqual(canonic.split(), match.split())
+        self.assertTrue(common.whitespaceEqual(canonic, match))
 
     def testEnvironmentA(self):
         env = Environment(forcePlatform='darwin')
 
         # setting the local corpus path pref is like adding a path
-        env['localCorpusPath'] = 'a'
-        self.assertEqual(env['localCorpusSettings'], ['a'])
+        env['localCorpusPath'] = '/a'
+        self.assertEqual(env['localCorpusSettings'], ['/a'])
 
-        env['localCorpusPath'] = 'b'
-        self.assertEqual(env['localCorpusSettings'], ['a', 'b'])
+        env['localCorpusPath'] = '/b'
+        self.assertEqual(env['localCorpusSettings'], ['/a', '/b'])
 
 
 #------------------------------------------------------------------------------

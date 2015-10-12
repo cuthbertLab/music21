@@ -35,7 +35,7 @@ except ImportError:
     from io import StringIO # python3 (also in python 2.6+)
 
 try:
-    input = raw_input #  @ReservedAssignment @UndefinedVariable # pylint: disable=undefined-variable 
+    input = raw_input # @ReservedAssignment @UndefinedVariable # pylint: disable=undefined-variable 
 except NameError:
     pass
 
