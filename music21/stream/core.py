@@ -357,6 +357,7 @@ class StreamCoreMixin(object):
         ...    n = note.Note('C')
         ...    m = note.Note('D')
         ...    sl = spanner.Slur(n, m)
+        ...    n.bogusAttributeNotWeakref = sl # prevent garbage collecting sl
         ...    s.append([n, m])
         ...    return s
         
