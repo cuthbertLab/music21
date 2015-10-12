@@ -350,6 +350,11 @@ class StreamCoreMixin(object):
         If requireAllPresent is True (default) then only those spanners whose complete
         spanned elements are in the Stream are returned.
         
+        Because spanners are stored weakly in .sites this is only guaranteed to find
+        the spanners in cases where the spanner is in another stream that is still active.
+        
+        TODO: use this to not require gathering all spanners in a .measure call.
+        
         A little helper function since we'll make the same Stream several times:
         
         >>> def getStream():
