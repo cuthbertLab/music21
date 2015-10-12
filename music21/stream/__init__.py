@@ -47,6 +47,7 @@ from music21 import note
 from music21 import spanner
 from music21 import tie
 from music21 import repeat
+from music21 import sites
 from music21 import tempo
 from music21 import timespans
 
@@ -940,31 +941,54 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         does not work with recurse=True yet.
         
         >>> p1 = stream.Part()
-        >>> m1 = stream.Measure()
+        >>> m1 = stream.Measure(number=1)
         >>> c = clef.BassClef()
         >>> m1.insert(0, c)
-        >>> m1.append(note.Note())
+        >>> m1.append(note.Note(type='whole'))
         >>> p1.append(m1)
+        >>> m2 = stream.Measure(number=2)
+        >>> n2 = note.Note('D', type='half')
+        >>> m2.append(n2)
+        >>> n3 = note.Note(type='half')
+        >>> m2.append(n3)
+        >>> p1.append(m2)
         >>> p1.show('text')
-        {0.0} <music21.stream.Measure 0 offset=0.0>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.BassClef>
             {0.0} <music21.note.Note C>
+        {4.0} <music21.stream.Measure 2 offset=4.0>
+            {0.0} <music21.note.Note D>
+            {2.0} <music21.note.Note C>
 
         Without recurse=True:
         
-        >>> p1.remove(c)
+        >>> p1.remove(n2)
         >>> p1.show('text')
-        {0.0} <music21.stream.Measure 0 offset=0.0>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.BassClef>
             {0.0} <music21.note.Note C>
+        {4.0} <music21.stream.Measure 2 offset=4.0>
+            {0.0} <music21.note.Note D>
+            {2.0} <music21.note.Note C>
 
         With recurse=True:
         
-        >>> p1.remove(c, recurse=True)
+        >>> p1.remove(n2, recurse=True)
         >>> p1.show('text')
-        {0.0} <music21.stream.Measure 0 offset=0.0>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.BassClef>
             {0.0} <music21.note.Note C>
+        {4.0} <music21.stream.Measure 2 offset=4.0>
+            {2.0} <music21.note.Note C>
 
+        With recurse=True and a list to remove:
+        
+        >>> p1.remove([c, n3], recurse=True)
+        >>> p1.show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.note.Note C>
+        {4.0} <music21.stream.Measure 2 offset=4.0>
+        <BLANKLINE>
         '''
         # TODO: Next to clean up... a doozy -- filter out all the different options.
         
@@ -977,7 +1001,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if not common.isListLike(targetOrList):
             targetList = [targetOrList]
         elif len(targetOrList) > 1:
-            targetList = sorted(targetOrList, key=self.elementOffset)
+            try:
+                targetList = sorted(targetOrList, key=self.elementOffset)
+            except sites.SitesException:
+                # if recurse, it's not such a big deal...
+                targetList = targetOrList
+
         else:
             targetList = targetOrList
 
@@ -996,7 +1025,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             indexInStream = s.index(target)
                             s.remove(target)
                             break
-                        except StreamException:
+                        except (StreamException, sites.SitesException):
                             continue
                 # recursion matched or didn't or wasn't run. either way no need for rest...
                 continue 
