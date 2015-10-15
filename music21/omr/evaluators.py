@@ -163,7 +163,6 @@ class OmrGroundTruthPair(object):
         '''
         Computes the min edit distance from target to source. Figure 3.25 
         '''
-        
         n = len(target)
         m = len(source)
     
@@ -208,7 +207,8 @@ class OmrGroundTruthPair(object):
         return self.numberOfDifferences
 
 
-def evaluateCorrectingModel(omrPath, groundTruthPath, debug = None, originalDifferences = None, runOnePart=False):
+def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None, 
+                            originalDifferences=None, runOnePart=False):
     '''
     Get a dictionary showing the efficacy of the omr.correctors.ScoreCorrector on an OMR Score
     by comparing it to the GroundTruth.
@@ -266,7 +266,8 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug = None, originalDiff
             numberOfTotalMeasures += len(s.singleParts[temppn].hashedNotes)
     if debug:
         print("for each entry in the array below, we have ")
-        print("[flagged measure part, flagged measure index, source measure part, source measure index, source measure probability]")
+        print("[flagged measure part, flagged measure index, source measure part, " + 
+              "source measure index, source measure probability]")
         print("HORIZONTAL CORRECTING ARRAY", correctingArrayHorAllPart)
         print("**********************************")
         
@@ -276,12 +277,14 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug = None, originalDiff
     
     if debug:
         print("for each entry in the array below, we have ")
-        print("[flagged measure part, flagged measure index, source measure part, source measure index, source measure probability]")
+        print("[flagged measure part, flagged measure index, source measure part," + 
+              " source measure index, source measure probability]")
         print("VERTICAL CORRECTING MEASURES", correctingArrayVertAllPart)
         print("**********************************")
 
-        print('Finding best from Horizontal and Vertical and replacing flagged measures with source measures')
-    priorScore = s.generateCorrectedScore(correctingArrayHorAllPart,correctingArrayVertAllPart)            
+        print('Finding best from Horizontal and Vertical and replacing flagged ' + 
+              'measures with source measures')
+    priorScore = s.generateCorrectedScore(correctingArrayHorAllPart, correctingArrayVertAllPart)            
 
     if debug:
         print('done replacing flagged measures with source measures')
