@@ -45,8 +45,10 @@ JSON was originally created to pass
 JavaScript objects from a web server to a web browser, but its utility
 (combining the power of XML with the ease of use of objects) has made it a
 growing standard for other languages.  (see
-http://docs.python.org/library/json.html).  Music21 has two implementations of JSON (confusing, no?)
-because we weren't sure and are still not sure which will be best in the long-run: the first approach
+http://docs.python.org/library/json.html).  
+Music21 has two implementations of JSON (confusing, no?)
+because we weren't sure and are still not sure which will be best in the long-run: 
+the first approach
 uses explicit lists of attributes that need to be stored and just saves those. This uses a
 homemade set of methods that are specifically tailored for music21; but it misses some things that
 may be important to you.  The second approach uses the the freely distributable
@@ -206,7 +208,7 @@ class StreamFreezer(StreamFreezeThawBase):
     True
 
     '''
-    def __init__(self, streamObj=None, fastButUnsafe=False, topLevel = True, streamIds = None):
+    def __init__(self, streamObj=None, fastButUnsafe=False, topLevel=True, streamIds=None):
         StreamFreezeThawBase.__init__(self)
         # must make a deepcopy, as we will be altering .sites
         self.stream = None
@@ -231,13 +233,13 @@ class StreamFreezer(StreamFreezeThawBase):
         Prepare the passed in Stream in place, return storage
         dictionary format.
 
+        >>> from pprint import pprint
         >>> s = stream.Stream()
         >>> n = note.Note('D#4')
         >>> s.append(n)
         >>> sf = freezeThaw.StreamFreezer(s)
-        >>> #_DOCS_SHOW sf.packStream()
-        >>> print("{'m21Version': (2, 0, 5), 'stream': <music21.stream.Stream 0x1289212>}") #_DOCS_HIDE
-        {'m21Version': (2, 0, 5), 'stream': <music21.stream.Stream 0x1289212>}
+        >>> pprint(sf.packStream())
+        {'m21Version': (...), 'stream': <music21.stream.Stream 0x1289212>}
         
         '''
         # do all things necessary to setup the stream
@@ -274,12 +276,14 @@ class StreamFreezer(StreamFreezeThawBase):
             streamObj = self.stream
             if streamObj is None:
                 raise FreezeThawException("You need to pass in a stream when creating to work")
-        allEls = list(streamObj.recurse(restoreActiveSites=False)) # might not work when recurse yields...
+        allEls = list(streamObj.recurse(restoreActiveSites=False)) 
+                # might not work when recurse yields...
+                
         if self.topLevel is True:
             self.findActiveStreamIdsInHierarchy(streamObj)
 
         for el in allEls:
-            if el.isVariant:
+            if 'Variant' in el.classes:
                 # works like a whole new hierarchy... # no need for deepcopy
                 subSF = StreamFreezer(
                     el._stream,
@@ -288,7 +292,7 @@ class StreamFreezer(StreamFreezeThawBase):
                     topLevel=False,
                     )
                 subSF.setupSerializationScaffold()
-            elif el.isSpanner:
+            elif 'Spanner' in el.classes:
                 # works like a whole new hierarchy... # no need for deepcopy
                 subSF = StreamFreezer(
                     el.spannerStorage,
@@ -298,9 +302,11 @@ class StreamFreezer(StreamFreezeThawBase):
                     )
                 subSF.setupSerializationScaffold()
             elif el.isStream:
-                self.removeStreamStatusClient(el)  # removing seems to create problems for jsonPickle with Spanners
+                self.removeStreamStatusClient(el)  
+                # removing seems to create problems for jsonPickle with Spanners
 
-        self.removeStreamStatusClient(streamObj) # removing seems to create problems for jsonPickle with Spanners
+        self.removeStreamStatusClient(streamObj) 
+        # removing seems to create problems for jsonPickle with Spanners
         self.setupStoredElementOffsetTuples(streamObj)
 
         if self.topLevel is True:
@@ -356,7 +362,8 @@ class StreamFreezer(StreamFreezeThawBase):
         2
         >>> n.getOffsetBySite(s)
         Traceback (most recent call last):
-        SitesException: an entry for this object <music21.note.Note D#> is not stored in stream <music21.stream.Stream stream s>
+        SitesException: an entry for this object <music21.note.Note D#> 
+               is not stored in stream <music21.stream.Stream stream s>
         >>> n.getOffsetBySite(t)
         20.0
         
@@ -364,8 +371,8 @@ class StreamFreezer(StreamFreezeThawBase):
         After recursiveClearSites n will be not know its location anywhere...
         
         >>> sf.recursiveClearSites(s)
-        >>> len(n.sites)
-        0
+        >>> len(n.sites)  # just the None site
+        1
 
         This leaves n and t in strange positions, because n is in t.elements still....
         
@@ -382,9 +389,9 @@ class StreamFreezer(StreamFreezeThawBase):
             for el, unused_offset in seot:
                 if el.isStream:
                     self.recursiveClearSites(el)
-                if el.isSpanner:
+                if 'Spanner' in el.classes:
                     self.recursiveClearSites(el.spannerStorage)
-                if el.isVariant:
+                if 'Variant' in el.classes:
                     self.recursiveClearSites(el._stream)
                 if hasattr(el, '_derivation'):
                     el._derivation = derivation.Derivation() #reset
@@ -419,10 +426,13 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> s._elements, s._endElements
         ([], [])
         >>> s._storedElementOffsetTuples
-        [(<music21.note.Note C#>, 0.0), (<music21.note.Note E->, 1.0), (<music21.bar.Barline style=regular>, 'end')]
+        [(<music21.note.Note C#>, 0.0), 
+         (<music21.note.Note E->, 1.0), 
+         (<music21.bar.Barline style=regular>, 'end')]
         >>> n1.getOffsetBySite(s)
         Traceback (most recent call last):
-        SitesException: an entry for this object <music21.note.Note C#> is not stored in stream <music21.stream.Measure 0 offset=0.0>
+        SitesException: an entry for this object <music21.note.Note C#> is 
+             not stored in stream <music21.stream.Measure 0 offset=0.0>
 
         Trying it again, but now with substreams:
 
@@ -442,7 +452,10 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> v1._storedElementOffsetTuples
         [(<music21.note.Note F#>, 2.0)]
         >>> s2._storedElementOffsetTuples
-        [(<music21.note.Note C#>, 0.0), (<music21.note.Note E->, 1.0), (<music21.stream.Voice ...>, 2.0), (<music21.bar.Barline style=regular>, 'end')]
+        [(<music21.note.Note C#>, 0.0), 
+         (<music21.note.Note E->, 1.0), 
+         (<music21.stream.Voice ...>, 2.0), 
+         (<music21.bar.Barline style=regular>, 'end')]
         >>> s2._storedElementOffsetTuples[2][0] is v1
         True
 
@@ -479,7 +492,10 @@ class StreamFreezer(StreamFreezeThawBase):
         streamObj.elementsChanged()
             
 
-    def findActiveStreamIdsInHierarchy(self, hierarchyObject = None, getSpanners=True, getVariants=True):
+    def findActiveStreamIdsInHierarchy(self, 
+                                       hierarchyObject=None, 
+                                       getSpanners=True, 
+                                       getVariants=True):
         '''
         Return a list of all Stream ids anywhere in the hierarchy.
 
@@ -580,7 +596,7 @@ class StreamFreezer(StreamFreezeThawBase):
 
         if getVariants is True:
             for el in streamObj.recurse():
-                if el.isVariant is True:
+                if 'Variant' in el.classes:
                     streamIds += self.findActiveStreamIdsInHierarchy(el._stream)
 
         # should not happen that there are duplicates, but possible with spanners...
@@ -771,11 +787,12 @@ class StreamThawer(StreamFreezeThawBase):
 
         self.restoreElementsFromTuples(streamObj)
 
-        self.restoreStreamStatusClient(streamObj) # removing seems to create problems for jsonPickle with Spanners
+        self.restoreStreamStatusClient(streamObj) 
+        # removing seems to create problems for jsonPickle with Spanners
         allEls = self.findAllM21Objects(streamObj)
 
         for e in allEls:
-            if e.isVariant:
+            if 'Variant' in e.classes:
 #                # works like a whole new hierarchy... # no need for deepcopy
                 subSF = StreamThawer()
                 subSF.teardownSerializationScaffold(e._stream)
@@ -783,13 +800,14 @@ class StreamThawer(StreamFreezeThawBase):
                 e._cache = {}
                 #for el in e._stream.flat:
                 #    print el, el.offset, el.sites.siteDict
-            elif e.isSpanner:
+            elif 'Spanner' in e.classes:
                 subSF = StreamThawer()
                 subSF.teardownSerializationScaffold(e.spannerStorage)
                 e.spannerStorage.elementsChanged()
                 e._cache = {}
             elif e.isStream: 
-                self.restoreStreamStatusClient(e) # removing seems to create problems for jsonPickle with Spanners
+                self.restoreStreamStatusClient(e) 
+                # removing seems to create problems for jsonPickle with Spanners
 
             _fixId(e)
             #e.wrapWeakref()
@@ -884,12 +902,14 @@ class StreamThawer(StreamFreezeThawBase):
         Look at the file and determine the format
         '''
         if (six.PY3 and isinstance(storage, bytes)):
-            if storage.startswith(b'{"'): # was m21Version": {"py/tuple" but order of dict may change
+            if storage.startswith(b'{"'): 
+                # was m21Version": {"py/tuple" but order of dict may change
                 return 'jsonpickle'
             else:
                 return 'pickle'
         else:            
-            if storage.startswith('{"'): # was m21Version": {"py/tuple" but order of dict may change
+            if storage.startswith('{"'):
+                # was m21Version": {"py/tuple" but order of dict may change
                 return 'jsonpickle'
             else:
                 return 'pickle'
@@ -1142,7 +1162,8 @@ class JSONFreezeThawBase(object):
             elif inspect.ismodule(nextMod) is True:
                 lastInspect = nextMod
             else:
-                raise JSONFreezerException("All the parts of %s must refer to modules or classes" % idStrOrig)
+                raise JSONFreezerException(
+                    "All the parts of %s must refer to modules or classes" % idStrOrig)
 
         return lastInspect
 
@@ -1263,9 +1284,11 @@ class JSONFreezer(JSONFreezeThawBase):
 
     def jsonAttributes(self, autoGather=True):
         '''
-        Define all attributes of this object that should be JSON serialized for storage and re-instantiation. Attributes that name basic
+        Define all attributes of this object that should be JSON serialized 
+        for storage and re-instantiation. Attributes that name basic
         Python objects or :class:`~music21.freezeThaw.JSONFreezer` subclasses,
-        or dictionaries or lists that contain Python objects or :class:`~music21.freezeThaw.JSONFreezer` subclasses, can be provided.
+        or dictionaries or lists that contain Python objects or 
+        :class:`~music21.freezeThaw.JSONFreezer` subclasses, can be provided.
 
         Should be overridden in subclasses.
 
@@ -1286,13 +1309,15 @@ class JSONFreezer(JSONFreezeThawBase):
         >>> gn = note.GeneralNote()
         >>> jsf = freezeThaw.JSONFreezer(gn)
         >>> jsf.jsonAttributes()
-        ['_duration', '_priority', 'offset', '_editorial', 'lyrics', 'expressions', 'articulations', 'tie']
+        ['_duration', '_priority', 'offset', 
+         '_editorial', 'lyrics', 'expressions', 'articulations', 'tie']
         '''
         if self.storedObject is None:
             return []
 
         attributeList = []
-        fqClassList = [self.fullyQualifiedClassFromObject(x) for x in self.storedObject.__class__.mro()]
+        fqClassList = [self.fullyQualifiedClassFromObject(x) 
+                       for x in self.storedObject.__class__.mro()]
 
         for i, thisClass in enumerate(fqClassList):
             inheritFrom = i + 1
@@ -1353,7 +1378,8 @@ class JSONFreezer(JSONFreezeThawBase):
             return True
         if isinstance(possiblyFreezeable, (list, tuple, dict)):
             return False
-        if six.PY2 and isinstance(possiblyFreezeable, (int, str, unicode, float)): # @UndefinedVariable pylint: disable=undefined-variable
+        if six.PY2 and isinstance(possiblyFreezeable, 
+                (int, str, unicode, float)): # @UndefinedVariable pylint: disable=undefined-variable
             return False
         elif six.PY3 and isinstance(possiblyFreezeable, (int, str, bytes, float)):
             return False 
@@ -1407,7 +1433,8 @@ class JSONFreezer(JSONFreezeThawBase):
             attrValue = getattr(self.storedObject, attr)
             if isinstance(attrValue, fractions.Fraction):
                 attrValue = float(attrValue)
-            #environLocal.printDebug(['_getJSON', attr, "hasattr(attrValue, 'json')", hasattr(attrValue, 'json')])
+            #environLocal.printDebug(['_getJSON', attr, 
+            #   "hasattr(attrValue, 'json')", hasattr(attrValue, 'json')])
 
             # do not store None values; assume initial/unset state
             if attrValue is None:
@@ -1543,7 +1570,7 @@ class JSONFreezer(JSONFreezeThawBase):
           }, 
           "__class__": "music21.note.Note", 
           "__version__": [
-            2, 
+            3, 
             ..., 
             ...
           ]
@@ -1670,7 +1697,9 @@ class JSONThawer(JSONFreezeThawBase):
             obj = self.music21ObjectFromString(d['__class__'])
             self.storedObject = obj
         else:
-            raise JSONThawerException("Cannot find an object class definition in the jsonStr; you must provide an input object")
+            raise JSONThawerException(
+                    "Cannot find an object class definition in the jsonStr; " + 
+                    "you must provide an input object")
 
         for attr in d:
             #environLocal.printDebug(['_setJSON: attr', attr, d[attr]])
@@ -1686,7 +1715,9 @@ class JSONThawer(JSONFreezeThawBase):
                         try:
                             setattr(obj, key, attrValue)
                         except AttributeError:
-                            raise JSONThawerException("Cannot set attribute '%s' to %s for obj %r" % (key, attrValue, obj))
+                            raise JSONThawerException(
+                                "Cannot set attribute '%s' to %s for obj %r" % (
+                                                                key, attrValue, obj))
                     # handle a list or tuple, looking for dicts that define objs
                     elif isinstance(attrValue, (list, tuple)):
                         subList = []
@@ -1725,7 +1756,8 @@ class JSONThawer(JSONFreezeThawBase):
                                 if key == "_storage": # changed name; help older .json files...
                                     dst = getattr(obj, "storage")
                                 else:
-                                    raise JSONFreezerException("Problem with key: %s for object %s: %s" % (key, obj, ae))
+                                    raise JSONFreezerException(
+                                        "Problem with key: %s for object %s: %s" % (key, obj, ae))
 
                             # updating the dictionary preserves default
                             # values created at init
@@ -1935,7 +1967,8 @@ class Test(unittest.TestCase):
 #            stream2.append(n)
         stream2.append(m)
         #c.show('t')
-        variant.addVariant(c.parts[0], 6.0, stream2, variantName = 'rhythmic switch', replacementDuration = 3.0)
+        variant.addVariant(c.parts[0], 6.0, stream2, 
+                           variantName='rhythmic_switch', replacementDuration=3.0)
 
         #test Variant is in stream
         unused_v1 = c.parts[0].getElementsByClass('Variant')[0]
@@ -2005,7 +2038,8 @@ class Test(unittest.TestCase):
 #        from music21 import derivation
 #
 #        d = derivation.Derivation()
-#        self.assertEqual(d.jsonAttributes(), ['_ancestor', '_ancestorId', '_container', '_containerId', '_method'])
+#        self.assertEqual(d.jsonAttributes(), ['_ancestor', '_ancestorId', 
+#                    '_container', '_containerId', '_method'])
 #
 #        self.assertEqual(hasattr(d, 'json'), True)
 
@@ -2039,8 +2073,6 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
     import music21
-    #import sys
-    #sys.argv.append('testFreezeThawWithSpanner')
     music21.mainTest(Test)
     
 

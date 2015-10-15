@@ -1094,7 +1094,8 @@ class MeterSequence(MeterTerminal):
 
         >>> ms = meter.MeterSequence()
         >>> ms._divisionOptionsAdditiveMultiplesDownward(1, 16)
-        [['1/32', '1/32'], ['1/64', '1/64', '1/64', '1/64'], ['1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128']]
+        [['1/32', '1/32'], ['1/64', '1/64', '1/64', '1/64'], 
+         ['1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128']]
         '''
         if opts is None:
             opts = []
@@ -1177,9 +1178,14 @@ class MeterSequence(MeterTerminal):
 
         >>> ms = meter.MeterSequence()
         >>> ms._divisionOptionsAdditiveMultiplesUpward(4, 16)
-        [['1/16', '1/16', '1/16', '1/16'], ['1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32'], ['1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64']]
+        [['1/16', '1/16', '1/16', '1/16'], 
+         ['1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32'], 
+         ['1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', 
+          '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64']]
         >>> ms._divisionOptionsAdditiveMultiplesUpward(3, 4)
-        [['1/4', '1/4', '1/4'], ['1/8', '1/8', '1/8', '1/8', '1/8', '1/8'], ['1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16']]
+        [['1/4', '1/4', '1/4'], ['1/8', '1/8', '1/8', '1/8', '1/8', '1/8'], 
+        ['1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', 
+         '1/16', '1/16', '1/16', '1/16']]
         '''
         if opts is None:
             opts = []
@@ -1213,30 +1219,85 @@ class MeterSequence(MeterTerminal):
 
 
         >>> a = meter.MeterSequence()
-        >>> a._divisionOptionsAlgo(4,4)
-        [['1/4', '1/4', '1/4', '1/4'], ['1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8'], ['1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16'], ['1/2', '1/2'], ['4/4'], ['2/4', '2/4'], ['2/2'], ['1/1'], ['8/8'], ['16/16'], ['32/32'], ['64/64'], ['128/128']]
+        >>> a._divisionOptionsAlgo(4, 4)
+        [['1/4', '1/4', '1/4', '1/4'], 
+         ['1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8'], 
+         ['1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', 
+          '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16'], 
+         ['1/2', '1/2'], 
+         ['4/4'], 
+         ['2/4', '2/4'], 
+         ['2/2'], 
+         ['1/1'], 
+         ['8/8'], 
+         ['16/16'], 
+         ['32/32'], 
+         ['64/64'], 
+         ['128/128']]
 
-        >>> a._divisionOptionsAlgo(1,4)
-        [['1/4'], ['1/8', '1/8'], ['1/16', '1/16', '1/16', '1/16'], ['1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32'], ['1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64'], ['1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128'], ['2/8'], ['4/16'], ['8/32'], ['16/64'], ['32/128']]
+        >>> a._divisionOptionsAlgo(1, 4)
+        [['1/4'], 
+         ['1/8', '1/8'], 
+         ['1/16', '1/16', '1/16', '1/16'], 
+         ['1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32'], 
+         ['1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', 
+          '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64', '1/64'], 
+         ['1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', 
+          '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', 
+          '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', 
+          '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128', '1/128'], 
+         ['2/8'], ['4/16'], ['8/32'], ['16/64'], ['32/128']]
 
-        >>> a._divisionOptionsAlgo(2,2)
-        [['1/2', '1/2'], ['1/4', '1/4', '1/4', '1/4'], ['1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8'], ['1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16'], ['2/2'], ['1/1'], ['4/4'], ['8/8'], ['16/16'], ['32/32'], ['64/64'], ['128/128']]
+        >>> a._divisionOptionsAlgo(2, 2)
+        [['1/2', '1/2'], 
+         ['1/4', '1/4', '1/4', '1/4'], 
+         ['1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8'], 
+         ['1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', 
+          '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16'], 
+          ['2/2'], ['1/1'], ['4/4'], ['8/8'], ['16/16'], ['32/32'], ['64/64'], ['128/128']]
 
-        >>> a._divisionOptionsAlgo(3,8)
-        [['1/8', '1/8', '1/8'], ['1/16', '1/16', '1/16', '1/16', '1/16', '1/16'], ['1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32', '1/32'], ['3/8'], ['6/16'], ['12/32'], ['24/64'], ['48/128']]
+        >>> a._divisionOptionsAlgo(3, 8)
+        [['1/8', '1/8', '1/8'], ['1/16', '1/16', '1/16', '1/16', '1/16', '1/16'], 
+         ['1/32', '1/32', '1/32', '1/32', '1/32', '1/32', 
+          '1/32', '1/32', '1/32', '1/32', '1/32', '1/32'], 
+         ['3/8'], ['6/16'], ['12/32'], ['24/64'], ['48/128']]
 
-        >>> a._divisionOptionsAlgo(6,8)
-        [['3/8', '3/8'], ['1/8', '1/8', '1/8', '1/8', '1/8', '1/8'], ['1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16'], ['1/4', '1/4', '1/4'], ['6/8'], ['3/4'], ['12/16'], ['24/32'], ['48/64'], ['96/128']]
+        >>> a._divisionOptionsAlgo(6, 8)
+        [['3/8', '3/8'], 
+         ['1/8', '1/8', '1/8', '1/8', '1/8', '1/8'], 
+         ['1/16', '1/16', '1/16', '1/16', '1/16', '1/16', 
+          '1/16', '1/16', '1/16', '1/16', '1/16', '1/16'], 
+         ['1/4', '1/4', '1/4'], ['6/8'], ['3/4'], ['12/16'], 
+         ['24/32'], ['48/64'], ['96/128']]
 
-        >>> a._divisionOptionsAlgo(12,8)
-        [['3/8', '3/8', '3/8', '3/8'], ['1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8'], ['1/4', '1/4', '1/4', '1/4', '1/4', '1/4'], ['1/2', '1/2', '1/2'], ['12/8'], ['6/8', '6/8'], ['6/4'], ['3/2'], ['24/16'], ['48/32'], ['96/64'], ['192/128']]
+        >>> a._divisionOptionsAlgo(12, 8)
+        [['3/8', '3/8', '3/8', '3/8'], 
+         ['1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8', '1/8'], 
+         ['1/4', '1/4', '1/4', '1/4', '1/4', '1/4'], 
+         ['1/2', '1/2', '1/2'], 
+         ['12/8'], ['6/8', '6/8'], 
+         ['6/4'], ['3/2'], ['24/16'], ['48/32'], ['96/64'], ['192/128']]
 
-        >>> a._divisionOptionsAlgo(5,8)
-        [['2/8', '3/8'], ['3/8', '2/8'], ['1/8', '1/8', '1/8', '1/8', '1/8'], ['1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16'], ['5/8'], ['10/16'], ['20/32'], ['40/64'], ['80/128']]
+        >>> a._divisionOptionsAlgo(5, 8)
+        [['2/8', '3/8'], ['3/8', '2/8'], ['1/8', '1/8', '1/8', '1/8', '1/8'], 
+         ['1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16'], 
+         ['5/8'], ['10/16'], ['20/32'], ['40/64'], ['80/128']]
 
-        >>> a._divisionOptionsAlgo(18,4)
-        [['3/4', '3/4', '3/4', '3/4', '3/4', '3/4'], ['1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4'], ['1/2', '1/2', '1/2', '1/2', '1/2', '1/2', '1/2', '1/2', '1/2'], ['18/4'], ['9/4', '9/4'], ['4/4', '4/4', '4/4', '4/4'], ['2/4', '2/4', '2/4', '2/4', '2/4', '2/4', '2/4', '2/4'], ['9/2'], ['36/8'], ['72/16'], ['144/32'], ['288/64'], ['576/128']]
-
+        >>> a._divisionOptionsAlgo(18, 4)
+        [['3/4', '3/4', '3/4', '3/4', '3/4', '3/4'], 
+         ['1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', 
+          '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4', '1/4'], 
+         ['1/2', '1/2', '1/2', '1/2', '1/2', '1/2', '1/2', '1/2', '1/2'], 
+         ['18/4'], 
+         ['9/4', '9/4'], 
+         ['4/4', '4/4', '4/4', '4/4'], 
+         ['2/4', '2/4', '2/4', '2/4', '2/4', '2/4', '2/4', '2/4'], 
+         ['9/2'], 
+         ['36/8'], 
+         ['72/16'], 
+         ['144/32'], 
+         ['288/64'], 
+         ['576/128']]
         '''
         opts = []
 
@@ -3432,13 +3493,25 @@ class TimeSignature(base.Music21Object):
         >>> len(c) == len(b)
         True
         >>> print(c)
-        [<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>, <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>, <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>, <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>, <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>, <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>, <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>, <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>]
+        [<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>, 
+         <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>, 
+         <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>, 
+         <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>, 
+         <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>, 
+         <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>, 
+         <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>, 
+         <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>]
 
         >>> a = meter.TimeSignature('6/8')
         >>> b = [duration.Duration('eighth')] * 6
         >>> c = a.getBeams(b)
         >>> print(c)
-        [<music21.beam.Beams <music21.beam.Beam 1/start>>, <music21.beam.Beams <music21.beam.Beam 1/continue>>, <music21.beam.Beams <music21.beam.Beam 1/stop>>, <music21.beam.Beams <music21.beam.Beam 1/start>>, <music21.beam.Beams <music21.beam.Beam 1/continue>>, <music21.beam.Beams <music21.beam.Beam 1/stop>>]
+        [<music21.beam.Beams <music21.beam.Beam 1/start>>, 
+         <music21.beam.Beams <music21.beam.Beam 1/continue>>, 
+         <music21.beam.Beams <music21.beam.Beam 1/stop>>, 
+         <music21.beam.Beams <music21.beam.Beam 1/start>>, 
+         <music21.beam.Beams <music21.beam.Beam 1/continue>>, 
+         <music21.beam.Beams <music21.beam.Beam 1/stop>>]
 
 
         >>> fourFour = meter.TimeSignature('4/4')
@@ -3456,7 +3529,9 @@ class TimeSignature(base.Music21Object):
         >>> dList = [d('eighth'), d('eighth'), d('eighth')]
         >>> beamList = threeFour.getBeams(dList, measureStartOffset=1.5)
         >>> print(beamList)
-        [<music21.beam.Beams <music21.beam.Beam 1/start>>, <music21.beam.Beams <music21.beam.Beam 1/continue>>, <music21.beam.Beams <music21.beam.Beam 1/stop>>]
+        [<music21.beam.Beams <music21.beam.Beam 1/start>>, 
+         <music21.beam.Beams <music21.beam.Beam 1/continue>>, 
+         <music21.beam.Beams <music21.beam.Beam 1/stop>>]
         '''
 
         if isinstance(srcList, base.Music21Object):
@@ -3571,7 +3646,8 @@ class TimeSignature(base.Music21Object):
                     # get a partial beam if we cannot come form a beam
                     if (beamPrevious is None or
                         beamNumber not in beamPrevious.getNumbers()):
-                        #environLocal.printDebug(['triggering partial left where a stop normally falls'])
+                        #environLocal.printDebug(
+                        #   ['triggering partial left where a stop normally falls'])
                         beamType = 'partial-left'
 
                 # here on we know that it is neither the first nor last
@@ -3606,15 +3682,18 @@ class TimeSignature(base.Music21Object):
                 # last beams was active, last beamNumber was active,
                 # and it was stopped or was a partial-left
                 elif (beamPrevious is not None and
-                      beamNumber in beamPrevious.getNumbers() and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left'] and
+                      beamNumber in beamPrevious.getNumbers() and 
+                      beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left'] and
                       beamNext is not None):
                     beamType = 'start'
 
 
-                # last note had beams but stopped, next note cannot be beamed to  was active, last beamNumber was active,
+                # last note had beams but stopped, next note cannot be beamed to  
+                # was active, last beamNumber was active,
                 # and it was stopped or was a partial-left
                 elif (beamPrevious is not None and
-                      beamNumber in beamPrevious.getNumbers() and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left'] and
+                      beamNumber in beamPrevious.getNumbers() and 
+                      beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left'] and
                       beamNext is None):
                     beamType = 'partial-left'  # will be deleted later in the script
                     
@@ -3632,7 +3711,8 @@ class TimeSignature(base.Music21Object):
                 # if endNext is outside of the archetype span,
                 # not sure what to do
                 elif startNext < archetypeSpan[1]:
-                    #environLocal.printDebug(['continue match: durtype, startNext, archetypeSpan', dur.type, startNext, archetypeSpan])
+                    #environLocal.printDebug(['continue match: durtype, startNext, archetypeSpan', 
+                    #   dur.type, startNext, archetypeSpan])
                     beamType = 'continue'
 
                 # we stop if the next beam is not in the same beaming archetype
@@ -3645,11 +3725,16 @@ class TimeSignature(base.Music21Object):
 
                 # debugging information displays:
 #                 if beamPrevious is not None:
-#                     environLocal.printDebug(['beamPrevious', beamPrevious, 'beamPrevious.getNumbers()', beamPrevious.getNumbers(), 'beamPrevious.getByNumber(beamNumber).type'])
+#                     environLocal.printDebug(['beamPrevious', beamPrevious, 
+#                     'beamPrevious.getNumbers()', beamPrevious.getNumbers(), 
+#                        'beamPrevious.getByNumber(beamNumber).type'])
+#
 #                     if beamNumber in beamPrevious.getNumbers():
-#                         environLocal.printDebug(['beamPrevious type', beamPrevious.getByNumber(beamNumber).type])
+#                         environLocal.printDebug(['beamPrevious type', 
+#                            beamPrevious.getByNumber(beamNumber).type])
 
-                #environLocal.printDebug(['beamNumber, start, archetypeSpan, beamType', beamNumber, start, dur.type, archetypeSpan, beamType])
+                #environLocal.printDebug(['beamNumber, start, archetypeSpan, beamType', 
+                # beamNumber, start, dur.type, archetypeSpan, beamType])
 
                 beams.setByNumber(beamNumber, beamType)
 
@@ -3721,9 +3806,12 @@ class TimeSignature(base.Music21Object):
         return False
 
     def setAccentWeight(self, weightList, level=0):
-        '''Set accent weight, or floating point scalars, for the accent MeterSequence. Provide a list of values; if this list is shorter than the length of the MeterSequence, it will be looped; if this list is longer, only the first relevant value will be used.
+        '''Set accent weight, or floating point scalars, for the accent MeterSequence. 
+        Provide a list of values; if this list is shorter than the length of the MeterSequence, 
+        it will be looped; if this list is longer, only the first relevant value will be used.
 
-        If the accent MeterSequence is subdivided, the level of depth to set is given by the optional level argument.
+        If the accent MeterSequence is subdivided, the level of depth to set is given by the 
+        optional level argument.
 
 
         >>> a = meter.TimeSignature('4/4', 4)
@@ -3792,7 +3880,8 @@ class TimeSignature(base.Music21Object):
         define only a first-level weight.
 
         If `forcePositionMatch` is True, an accent will only be returned if the 
-        provided qLenPos is a near exact match to the provided quarter length. Otherwise, half of the minimum quarter length will be provided.
+        provided qLenPos is a near exact match to the provided quarter length. Otherwise, 
+        half of the minimum quarter length will be provided.
 
         If `permitMeterModulus` is True, quarter length positions greater than 
         the duration of the Meter will be accepted as the modulus of the total meter duration.
@@ -3823,7 +3912,8 @@ class TimeSignature(base.Music21Object):
         msLevel = self.accentSequence.getLevel(level)
 
         if permitMeterModulus:
-            environLocal.printDebug([' self.duration.quarterLength',  self.duration.quarterLength, 'self.barDuration.quar', self.barDuration.quarterLength])
+            environLocal.printDebug([' self.duration.quarterLength',  self.duration.quarterLength, 
+                                     'self.barDuration.quar', self.barDuration.quarterLength])
             qLenPos = qLenPos % self.barDuration.quarterLength
 
         if forcePositionMatch:
@@ -3857,7 +3947,8 @@ class TimeSignature(base.Music21Object):
         return self.beatSequence.offsetToIndex(offset) + 1
 
     def getBeatOffsets(self):
-        '''Return offset positions in a list for the start of each beat, assuming this object is found at offset zero.
+        '''Return offset positions in a list for the start of each beat, 
+        assuming this object is found at offset zero.
 
         >>> a = meter.TimeSignature('3/4')
         >>> a.getBeatOffsets()
@@ -4093,9 +4184,11 @@ class TimeSignature(base.Music21Object):
         return post
 
     def getBeatDepth(self, qLenPos, align='quantize'):
-        '''Return the number of levels of beat partitioning given a QL into the TimeSignature. Note that by default beat partitioning always has a single, top-level partition.
+        '''Return the number of levels of beat partitioning given a QL into the TimeSignature. 
+        Note that by default beat partitioning always has a single, top-level partition.
 
-        The `align` parameter is passed to the :meth:`~music21.meter.MeterSequence.offsetToDepth` method, and can be used to find depths based on start position overlaps.
+        The `align` parameter is passed to the :meth:`~music21.meter.MeterSequence.offsetToDepth` 
+        method, and can be used to find depths based on start position overlaps.
 
         >>> a = meter.TimeSignature('3/4', 3)
         >>> a.getBeatDepth(0)
@@ -4256,9 +4349,18 @@ class Test(unittest.TestCase):
         b = ([duration.Duration('16th')] * 4  +
              [duration.Duration('eighth')] * 1) * 2
         c = a.getBeams(b)
-        match = '''[<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>, <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>, <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>, <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>, <music21.beam.Beams <music21.beam.Beam 1/stop>>, <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>, <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>, <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>, <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>, <music21.beam.Beams <music21.beam.Beam 1/stop>>]'''
+        match = '''[<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>, 
+        <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>, 
+        <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>, 
+        <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>, 
+        <music21.beam.Beams <music21.beam.Beam 1/stop>>, 
+        <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>,
+        <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>, 
+        <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>, 
+        <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>, 
+        <music21.beam.Beams <music21.beam.Beam 1/stop>>]'''
 
-        self.assertEqual(str(c), match)
+        self.assertTrue(common.whitespaceEqual(str(c), match))
 
     def testoffsetToDepth(self):
         # get a maximally divided 4/4 to the level of 1/8

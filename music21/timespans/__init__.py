@@ -180,9 +180,9 @@ def listOfTimespanTreesByClass(
         offset = element.getOffsetBySite(lastParentage) + initialOffset
         wasStream = False
         
-        if element.isStream and \
-                not element.isSpanner and \
-                not element.isVariant:
+        if (element.isStream and
+                'Spanner' not in element.classes and
+                'Variant' not in element.classes): # is this redundant? are variants streams?
             localParentage = currentParentage + (element,)
             containedTimespanTrees = listOfTimespanTreesByClass(
                 element,
@@ -249,8 +249,6 @@ def streamToTimespanTree(
 
     Each of these has 11 elements -- mainly the Measures
 
-    TODO: Fix -- why is StaffGroup between Soprano and Alto?
-
     >>> for x in tree:
     ...     x
     ...
@@ -259,7 +257,7 @@ def streamToTimespanTree(
     <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Alto>>
     <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
     <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Bass>>
-    <ElementTimespan (0.0 to 0.0) <music21.layout.StaffGroup <music21.stream.Part Soprano><music21.stream.Part Alto><music21.stream.Part Tenor><music21.stream.Part Bass>>>
+    <ElementTimespan (0.0 to 0.0) <music21.layout.StaffGroup ...>>
 
     >>> tenorElements = tree[3]
     >>> tenorElements
@@ -381,43 +379,6 @@ def timespansToPartwiseStream(timespans, templateStream=None):
         outputPart = timespansToChordifiedStream(partwiseTimespans, part)
         outputScore.append(outputPart)
     return outputScore
-
-
-#------------------------------------------------------------------------------
-
-
-class Timespan(object):
-    r'''
-    A span of time, with a start offset and stop offset.
-
-    Useful for demonstrating various properties of the timespan-collection class
-    family.
-
-    >>> timespan = timespans.Timespan(-1.5, 3.25)
-    >>> print(timespan)
-    <Timespan -1.5 3.25>
-    '''
-
-    def __init__(self, offset=float('-inf'), endTime=float('inf')):
-        offset, endTime = sorted((offset, endTime))
-        self.offset = offset
-        self.endTime = endTime
-
-    def __eq__(self, expr):
-        if type(self) is type(expr):
-            if self.offset == expr.offset:
-                if self.endTime == expr.endTime:
-                    return True
-        return False
-
-    def __repr__(self):
-        return '<{} {} {}>'.format(
-            type(self).__name__,
-            self.offset,
-            self.endTime,
-            )
-
-
 
 
 #------------------------------------------------------------------------------

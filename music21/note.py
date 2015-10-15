@@ -25,7 +25,6 @@ from music21 import duration
 from music21 import exceptions21
 from music21 import interval
 from music21 import editorial
-#from music21 import midi as midiModule
 from music21 import expressions
 from music21 import pitch
 from music21 import beam
@@ -635,7 +634,7 @@ class GeneralNote(base.Music21Object):
         >>> n = note.Note('G4', quarterLength=2)
         >>> n.duration.quarterLength
         2.0
-        >>> n.isGrace
+        >>> n.duration.isGrace
         False
         >>> n.duration
         <music21.duration.Duration 2.0>
@@ -647,7 +646,7 @@ class GeneralNote(base.Music21Object):
         >>> ng = n.getGrace()
         >>> ng.duration.quarterLength
         0.0
-        >>> ng.isGrace
+        >>> ng.duration.isGrace
         True
         >>> ng.duration
         <music21.duration.GraceDuration unlinked type:zero quarterLength:0.0>
@@ -1362,6 +1361,7 @@ class Note(NotRest):
         post.pitch.transpose(intervalObj, inPlace=True)
 
         if not inPlace:
+            post.derivation.method = 'transpose'
             return post
         else:
             return None

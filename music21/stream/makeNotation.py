@@ -319,13 +319,13 @@ def makeMeasures(
 
     >>> allNotes = partWithMeasures.flat.notes
     >>> allNotes[0].articulations
-    [<music21.articulations.Staccato>]
+    []
 
     >>> allNotes[1].articulations
     []
 
     >>> allNotes[2].articulations
-    []
+    [<music21.articulations.Staccato>]
 
     >>> [allNotes[0].lyric, allNotes[1].lyric, allNotes[2].lyric]
     ['hi', None, None]
@@ -490,7 +490,7 @@ def makeMeasures(
         # can contain this element
 
         # collect all spanners and move to outer Stream
-        if e.isSpanner:
+        if 'Spanner' in e.classes:
             spannerBundleAccum.append(e)
             continue
 

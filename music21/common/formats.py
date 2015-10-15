@@ -20,8 +20,19 @@ __all__ = ['subConverterList', 'findSubConverterForFormat', 'findFormat',
            'VALID_SHOW_FORMATS', 'VALID_WRITE_FORMATS', 'VALID_AUTO_DOWNLOAD']
 
 # used for checking preferences, and for setting environment variables
-VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'svg', 'lily.pdf', 'lily.png', 'lily.svg', 'braille', 'vexflow', 'vexflow.html', 'vexflow.js', 'ipython', 'ipython.png', 'musicxml.png']
-VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 'png', 'pdf', 'svg', 'lily.pdf', 'lily.png', 'lily.svg', 'braille', 'vexflow', 'vexflow.html', 'vexflow.js', 'ipython', 'ipython.png', 'musicxml.png']
+# TODO: only check top-level.  Let subconverters check sub formats.
+VALID_SHOW_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 
+                      'png', 'pdf', 'svg', 
+                      'lily.pdf', 'lily.png', 'lily.svg', 'braille', 
+                      'vexflow', 'vexflow.html', 'vexflow.js', 
+                      'ipython', 'ipython.png', 'ipython.midi',
+                      'musicxml.png']
+VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi', 
+                       'png', 'pdf', 'svg', 
+                       'lily.pdf', 'lily.png', 'lily.svg', 'braille', 
+                       'vexflow', 'vexflow.html', 'vexflow.js', 
+                       'ipython', 'ipython.png', 'ipython.midi', 
+                       'musicxml.png']
 VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 
 from music21.common.decorators import deprecated 

@@ -38,11 +38,22 @@ class Timespan(object):
     >>> print(timespan)
     <Timespan -1.5 3.25>
     '''
+    __slots__ = (
+        '_offset',
+        '_endTime',
+        )
+
 
     def __init__(self, offset=float('-inf'), endTime=float('inf')):
-        offset, endTime = sorted((offset, endTime))
-        self.offset = offset
-        self.endTime = endTime
+        if offset is not None:
+            offset = float(offset)
+        self._offset = offset
+        if endTime is not None:
+            endTime = float(endTime)
+        self._endTime = endTime
+        if offset is not None and endTime is not None:
+            if offset > endTime:
+                raise TimespanException('offset %r must be after endTime %r' % (offset, endTime))
 
     def __eq__(self, expr):
         if type(self) is type(expr):
@@ -58,10 +69,189 @@ class Timespan(object):
             self.endTime,
             )
 
+
+    @property
+    def offset(self):
+        r'''
+        The start offset of the elementTimespan's element, relative to its
+        containing score.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> verticality = tree.getVerticalityAt(1.0)
+        >>> elementTimespan = verticality.startTimespans[0]
+        >>> elementTimespan.offset
+        1.0
+        '''
+        return self._offset
+
+    @property
+    def endTime(self):
+        r'''
+        The stop offset of the elementTimespan's element, relative to its
+        containing score.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> verticality = tree.getVerticalityAt(1.0)
+        >>> elementTimespan = verticality.startTimespans[0]
+        >>> elementTimespan.endTime
+        2.0
+        '''
+        return self._endTime
+
+    def new(self, offset=None, endTime=None):
+        '''
+        return a new object with the given offset and endTime
+        '''
+        if offset is None:
+            offset = self.offset
+        if endTime is None:
+            endTime = self.endTime
+
+        return type(self)(offset=offset, endTime=endTime)
+        
+
+    def canMerge(self, other):
+        '''
+        returns a tuple of (True or False) if these timespans can be merged
+        with the second element being a message or None.
+        
+        >>> ts1 = timespans.spans.Timespan(0, 5)
+        >>> ts2 = timespans.spans.Timespan(5, 7)
+        >>> ts1.canMerge(ts2)
+        (True, '')
+        >>> ts3 = timespans.spans.Timespan(6, 10)
+        >>> ts1.canMerge(ts3)
+        (False, 'Cannot merge <Timespan 0.0 5.0> with <Timespan 6.0 10.0>: not contiguous')
+        '''
+        if not isinstance(other, type(self)):
+            message = 'Cannot merge {} with {}: wrong types'.format(
+                self, other)
+            return (False, message)
+        if not ((self.endTime == other.offset) or
+                (other.endTime == self.offset)):
+            message = 'Cannot merge {} with {}: not contiguous'.format(
+                self, other)
+            return (False, message)
+        return (True, "")
+
+    def mergeWith(self, other):
+        r'''
+        Merges two consecutive/contiguous timespans, keeping the
+        information from the former of the two.
+        
+        >>> ts1 = timespans.spans.Timespan(0, 5)
+        >>> ts2 = timespans.spans.Timespan(5, 7)
+        >>> ts3 = ts1.mergeWith(ts2)
+        >>> ts3
+        <Timespan 0.0 7.0>
+
+        Note that (for now), overlapping timespans cannot be merged:
+        
+        >>> ts4 = timespans.spans.Timespan(6, 10)
+        >>> ts3.mergeWith(ts4)
+        Traceback (most recent call last):
+        TimespanException: Cannot merge <Timespan 0.0 7.0> with 
+            <Timespan 6.0 10.0>: not contiguous        
+        
+        
+        Merges two consecutive like-pitched element timespans, keeping
+        score-relevant information from the first of the two, such as its
+        Music21 Element, and any beatstrength information.
+
+        This is useful when using timespans to perform score reduction.
+
+        Let's demonstrate merging some contiguous E's in the alto part of a Bach
+        chorale:
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> timespan_one = tree[12]
+        >>> print(timespan_one)
+        <ElementTimespan (2.0 to 3.0) <music21.note.Note E>>
+
+        >>> print(timespan_one.part)
+        <music21.stream.Part Alto>
+
+        >>> timespan_two = tree.findNextElementTimespanInSameStreamByClass(
+        ...     timespan_one)
+        >>> print(timespan_two)
+        <ElementTimespan (3.0 to 4.0) <music21.note.Note E>>
+            
+        >>> merged = timespan_one.mergeWith(timespan_two)
+        >>> print(merged)
+        <ElementTimespan (2.0 to 4.0) <music21.note.Note E>>
+
+        >>> merged.part is timespan_one.part
+        True
+
+        >>> merged.beatStrength == timespan_one.beatStrength
+        True
+
+        Attempting to merge timespans which are not contiguous, or which do not
+        have identical pitches will result in error:
+
+        >>> tree[0].mergeWith(tree[50])
+        Traceback (most recent call last):
+        TimespanException: Cannot merge <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>> 
+                with <ElementTimespan (9.5 to 10.0) <music21.note.Note B>>: not contiguous
+
+        This is probably not what you want to do: get the next element timespan in
+        the same score:
+
+        >>> timespan_twoWrong = tree.findNextElementTimespanInSameStreamByClass(
+        ...     timespan_one, classList=(stream.Score,))
+        >>> print(timespan_twoWrong)
+        <ElementTimespan (3.0 to 4.0) <music21.note.Note C#>>
+        >>> print(timespan_twoWrong.part)
+        <music21.stream.Part Soprano>
+        '''
+        can, message = self.canMerge(other)
+        if can is False:
+            raise TimespanException(message)
+        
+        if self.offset < other.offset:
+            mergedTimespan = self.new(endTime=other.endTime)
+        else:
+            mergedTimespan = other.new(endTime=self.endTime)
+        return mergedTimespan
+    
+    def splitAt(self, offset):
+        r'''
+        Split elementTimespan at `offset`.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> verticality = tree.getVerticalityAt(0)
+        >>> verticality
+        <Verticality 0 {A3 E4 C#5}>
+        
+        >>> timespan = verticality.startTimespans[0]
+        >>> timespan
+        <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
+
+        >>> for shard in timespan.splitAt(0.25):
+        ...     shard
+        ...
+        <ElementTimespan (0.0 to 0.25) <music21.note.Note C#>>
+        <ElementTimespan (0.25 to 0.5) <music21.note.Note C#>>
+
+        >>> timespan.splitAt(1000)
+        (<ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>,)
+        '''
+
+        if offset < self.offset or self.endTime < offset:
+            return (self,)
+        left = self.new(endTime=offset)
+        right = self.new(offset=offset)
+        return left, right
+    
+    
 #------------------------------------------------------------------------------
 
 
-class ElementTimespan(object):
+class ElementTimespan(Timespan):
     r'''
     A span of time anchored to an element in a score.  The span of time may
     be the same length as the element in the score.  It may be shorter (a
@@ -141,8 +331,6 @@ class ElementTimespan(object):
         '_parentOffset',
         '_parentEndTime',
         '_parentage',
-        '_offset',
-        '_endTime',
         )
 
     ### INITIALIZER ###
@@ -157,6 +345,8 @@ class ElementTimespan(object):
         offset=None,
         endTime=None,
         ):
+        super(ElementTimespan, self).__init__(offset=offset, endTime=endTime)
+        
         self._element = element
         if parentage is not None:
             parentage = tuple(parentage)
@@ -164,15 +354,6 @@ class ElementTimespan(object):
         if beatStrength is not None:
             beatStrength = float(beatStrength)
         self._beatStrength = beatStrength
-        if offset is not None:
-            offset = float(offset)
-        self._offset = offset
-        if endTime is not None:
-            endTime = float(endTime)
-        self._endTime = endTime
-        if offset is not None and endTime is not None:
-            if offset > endTime:
-                raise TimespanException('offset %r must be after endTime %r' % (offset, endTime))
         if parentOffset is not None:
             parentOffset = float(parentOffset)
         self._parentOffset = parentOffset
@@ -181,9 +362,15 @@ class ElementTimespan(object):
         self._parentEndTime = parentEndTime
         if parentOffset is not None and parentEndTime is not None:
             if parentOffset > parentEndTime:
-                raise TimespanException('offset %r must be after parentEndTime %r' % (parentOffset, parentEndTime))
+                raise TimespanException(
+                    'offset %r must be after parentEndTime %r' % (parentOffset, parentEndTime))
 
     ### SPECIAL METHODS ###
+    def __eq__(self, other):
+        if self is other:
+            return True
+        else:
+            return False
 
     def __repr__(self):
         return '<{} ({} to {}) {!r}>'.format(
@@ -194,82 +381,19 @@ class ElementTimespan(object):
             )
 
     ### PUBLIC METHODS ###
-
-    def mergeWith(self, elementTimespan):
-        r'''
-        Merges two consecutive like-pitched element timespans, keeping
-        score-relevant information from the first of the two, such as its
-        Music21 Element, and any beatstrength information.
-
-        This is useful when using timespans to perform score reduction.
-
-        Let's demonstrate merging some contiguous E's in the alto part of a Bach
-        chorale:
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> timespan_one = tree[12]
-        >>> print(timespan_one)
-        <ElementTimespan (2.0 to 3.0) <music21.note.Note E>>
-
-        >>> print(timespan_one.part)
-        <music21.stream.Part Alto>
-
-        >>> timespan_two = tree.findNextElementTimespanInSameStreamByClass(
-        ...     timespan_one)
-        >>> print(timespan_two)
-        <ElementTimespan (3.0 to 4.0) <music21.note.Note E>>
-            
-        >>> merged = timespan_one.mergeWith(timespan_two)
-        >>> print(merged)
-        <ElementTimespan (2.0 to 4.0) <music21.note.Note E>>
-
-        >>> merged.part is timespan_one.part
-        True
-
-        >>> merged.beatStrength == timespan_one.beatStrength
-        True
-
-        Attempting to merge timespans which are not contiguous, or which do not
-        have identical pitches will result in error:
-
-        >>> tree[0].mergeWith(tree[50])
-        Traceback (most recent call last):
-        ...
-        TimespanException: Cannot merge <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>> with <ElementTimespan (9.5 to 10.0) <music21.note.Note B>>: not contiguous
-
-        This is probably not what you want to do: get the next element timespan in
-        the same score:
-
-        >>> timespan_twoWrong = tree.findNextElementTimespanInSameStreamByClass(
-        ...     timespan_one, classList=(stream.Score,))
-        >>> print(timespan_twoWrong)
-        <ElementTimespan (3.0 to 4.0) <music21.note.Note C#>>
-        >>> print(timespan_twoWrong.part)
-        <music21.stream.Part Soprano>
+    
+    def canMerge(self, other):
         '''
-        if not isinstance(elementTimespan, type(self)):
-            message = 'Cannot merge {} with {}: wrong types'.format(
-                self, elementTimespan)
-            raise TimespanException(message)
-        if not ((self.endTime == elementTimespan.offset) or
-            (elementTimespan.endTime == self.offset)):
-            message = 'Cannot merge {} with {}: not contiguous'.format(
-                self, elementTimespan)
-            raise TimespanException(message)
-        if self.pitches != elementTimespan.pitches:
-            message = 'Cannot merge {} with {}: different pitches'.format(
-                self, elementTimespan)
-            raise TimespanException(message)
-        if self.offset < elementTimespan.offset:
-            mergedElementTimespan = self.new(
-                endTime=elementTimespan.endTime,
-                )
-        else:
-            mergedElementTimespan = elementTimespan.new(
-                endTime=self.endTime,
-                )
-        return mergedElementTimespan
+        submethod of base canMerge that checks to see if the pitches are the same.
+        '''
+        can, message = super(ElementTimespan, self).canMerge(other)
+        if can is True:
+            if self.pitches != other.pitches:
+                message = 'Cannot merge {} with {}: different pitches'.format(
+                    self, other)
+                can = False                
+        return (can, message)
+
 
     def new(
         self,
@@ -281,6 +405,9 @@ class ElementTimespan(object):
         endTime=None,
         ):
         '''
+        Create a new object that is identical to the calling object
+        but with some of the parameters overridden.
+        
         TODO: Docs and Tests
         '''
         if beatStrength is None:
@@ -305,35 +432,6 @@ class ElementTimespan(object):
             endTime=endTime,
             )
 
-    def splitAt(self, offset):
-        r'''
-        Split elementTimespan at `offset`.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> verticality = tree.getVerticalityAt(0)
-        >>> verticality
-        <Verticality 0 {A3 E4 C#5}>
-        
-        >>> timespan = verticality.startTimespans[0]
-        >>> timespan
-        <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
-
-        >>> for shard in timespan.splitAt(0.25):
-        ...     shard
-        ...
-        <ElementTimespan (0.0 to 0.25) <music21.note.Note C#>>
-        <ElementTimespan (0.25 to 0.5) <music21.note.Note C#>>
-
-        >>> timespan.splitAt(1000)
-        (<ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>,)
-        '''
-
-        if offset < self.offset or self.endTime < offset:
-            return (self,)
-        left = self.new(endTime=offset)
-        right = self.new(offset=offset)
-        return left, right
 
     ### PUBLIC PROPERTIES ###
 
@@ -511,6 +609,7 @@ class ElementTimespan(object):
         This treats notes as chords.
         
         TODO: tests, examples of usage.
+        TODO: by sorting are we losing information about overlaps?
         '''
         result = []
         if hasattr(self.element, 'pitches'):
@@ -518,35 +617,6 @@ class ElementTimespan(object):
         result.sort()
         return tuple(result)
 
-    @property
-    def offset(self):
-        r'''
-        The start offset of the elementTimespan's element, relative to its
-        containing score.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> verticality = tree.getVerticalityAt(1.0)
-        >>> elementTimespan = verticality.startTimespans[0]
-        >>> elementTimespan.offset
-        1.0
-        '''
-        return self._offset
-
-    @property
-    def endTime(self):
-        r'''
-        The stop offset of the elementTimespan's element, relative to its
-        containing score.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> verticality = tree.getVerticalityAt(1.0)
-        >>> elementTimespan = verticality.startTimespans[0]
-        >>> elementTimespan.endTime
-        2.0
-        '''
-        return self._endTime
 
 
 #------------------------------------------------------------------------------

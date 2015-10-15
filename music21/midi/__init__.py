@@ -187,7 +187,8 @@ def getVariableLengthNumber(midiStr):
     IndexError: ...index out of range
     '''
     # from http://faydoc.tripod.com/formats/mid.htm
-    # This allows the number to be read one byte at a time, and when you see a msb of 0, you know that it was the last (least significant) byte of the number.
+    # This allows the number to be read one byte at a time, and when you see
+    # a msb of 0, you know that it was the last (least significant) byte of the number.
     summation = 0 
     i = 0 
     if six.PY3 and isinstance(midiStr, str):
@@ -198,7 +199,8 @@ def getVariableLengthNumber(midiStr):
             x = midiStr[i]
         else:
             x = ord(midiStr[i]) 
-        #environLocal.printDebug(['getVariableLengthNumber: examined char:', charToBinary(midiStr[i])])
+        #environLocal.printDebug(['getVariableLengthNumber: examined char:',
+        # charToBinary(midiStr[i])])
         summation = (summation << 7) + (x & 0x7F) 
         i += 1 
         if not (x & 0x80): 
@@ -405,7 +407,11 @@ metaEvents = Enumeration([("SEQUENCE_NUMBER", 0x00),
                           ("LYRIC", 0x05), 
                           ("MARKER", 0x06), 
                           ("CUE_POINT", 0x07), 
-                          ("PROGRAM_NAME", 0x08), #optional event is used to embed the patch/program name that is called up by the immediately subsequent Bank Select and Program Change messages. It serves to aid the end user in making an intelligent program choice when using different hardware.
+                          ("PROGRAM_NAME", 0x08), #optional event is used to embed the 
+                          #    patch/program name that is called up by the immediately 
+                          #    subsequent Bank Select and Program Change messages. 
+                          #    It serves to aid the end user in making an intelligent
+                          #  program choice when using different hardware.
                           ("SOUND_SET_UNSUPPORTED", 0x09),
                           ("MIDI_CHANNEL_PREFIX", 0x20), 
                           ("MIDI_PORT", 0x21), 
@@ -482,6 +488,8 @@ class MidiEvent(object):
     
         # store a reference to a corresponding event
         # if a noteOn, store the note off, and vice versa
+        # TODO: We should make sure that we garbage collect this -- otherwise it's a memory
+        # leak from a circular reference.
         self.correspondingEvent = None
 
         # store and pass on a running status if found
@@ -554,7 +562,9 @@ class MidiEvent(object):
 
 
     def setPitchBend(self, cents, bendRange=2):
-        '''Treat this event as a pitch bend value, and set the ._parameter1 and ._parameter2 fields appropriately given a specified bend value in cents.
+        '''
+        Treat this event as a pitch bend value, and set the ._parameter1 and
+         ._parameter2 fields appropriately given a specified bend value in cents.
     
         The `bendRange` parameter gives the number of half steps in the bend range.
 
@@ -605,7 +615,9 @@ class MidiEvent(object):
         else:
             d2 = 0
 
-        #environLocal.printDebug(['got target char value', charValue, 'getVariableLengthNumber(charValue)', getVariableLengthNumber(charValue)[0], 'd1', d1, 'd2', d2,])
+        #environLocal.printDebug(['got target char value', charValue,
+        # 'getVariableLengthNumber(charValue)', getVariableLengthNumber(charValue)[0],
+        # 'd1', d1, 'd2', d2,])
 
         self._parameter1 = d2
         self._parameter2 = d1 # d1 is msb here
@@ -629,7 +641,8 @@ class MidiEvent(object):
         120
         '''
         # x, y, and z define characteristics of the first two chars
-        # for x: The left nybble (4 bits) contains the actual command, and the right nibble contains the midi channel number on which the command will be executed.
+        # for x: The left nybble (4 bits) contains the actual command, and the right nibble
+        # contains the midi channel number on which the command will be executed.
         if common.isNum(midiStr[0]):
             x = midiStr[0]
         else:
@@ -691,11 +704,13 @@ class MidiEvent(object):
         if len(midiStr) < 2:
             # often what we have here are null events:
             # the string is simply: 0x00
-            environLocal.printDebug(['MidiEvent.read(): got bad data string', 'time', time, 'str', repr(midiStr)])
+            environLocal.printDebug(
+                ['MidiEvent.read(): got bad data string', 'time', time, 'str', repr(midiStr)])
             return ''
 
         # x, y, and z define characteristics of the first two chars
-        # for x: The left nybble (4 bits) contains the actual command, and the right nibble contains the midi channel number on which the command will be executed.
+        # for x: The left nybble (4 bits) contains the actual command, and the right nibble
+        # contains the midi channel number on which the command will be executed.
         if common.isNum(midiStr[0]):
             x = midiStr[0]
         else:
@@ -704,7 +719,8 @@ class MidiEvent(object):
         # detect running status: if the status byte is less than 128, its 
         # not a status byte, but a data byte
         if x < 128:
-            # environLocal.printDebug(['MidiEvent.read(): found running status even data', 'self.lastStatusByte:', self.lastStatusByte])
+            # environLocal.printDebug(['MidiEvent.read(): found running status even data',
+            # 'self.lastStatusByte:', self.lastStatusByte])
 
             if self.lastStatusByte is not None:
                 rsb = self.lastStatusByte
@@ -735,7 +751,10 @@ class MidiEvent(object):
         else:
             z = ord(midiStr[1])  # given a string representation, get decimal number
 
-        #environLocal.printDebug(['MidiEvent.read(): trying to parse a MIDI event, looking at first two chars:', 'repr(x)', repr(x), 'charToBinary(str[0])', charToBinary(str[0]), 'charToBinary(str[1])', charToBinary(str[1])])
+        #environLocal.printDebug([
+        #    'MidiEvent.read(): trying to parse a MIDI event, looking at first two chars:', 
+        #    'repr(x)', repr(x), 'charToBinary(str[0])', charToBinary(str[0]), 
+        #    'charToBinary(str[1])', charToBinary(str[1])])
 
         if channelVoiceMessages.hasValue(y): 
             return self._parseChannelVoiceMessage(midiStr)
@@ -760,7 +779,8 @@ class MidiEvent(object):
 
         # SEQUENCE_TRACK_NAME and other MetaEvents are here
         elif x == 0xFF: 
-            #environLocal.printDebug(['MidiEvent.read(): got a variable length meta event', charToBinary(str[0])])
+            #environLocal.printDebug(['MidiEvent.read(): got a variable length meta event',
+            # charToBinary(str[0])])
             if not metaEvents.hasValue(z): 
                 environLocal.printDebug(["unknown meta event: FF %02X" % z])
                 sys.stdout.flush() 
@@ -772,7 +792,9 @@ class MidiEvent(object):
             return midiStr[length:] 
         else:
             # an uncaught message
-            environLocal.printDebug(['got unknown midi event type', repr(x), 'charToBinary(midiStr[0])', charToBinary(midiStr[0]), 'charToBinary(midiStr[1])', charToBinary(midiStr[1])])
+            environLocal.printDebug(['got unknown midi event type', repr(x), 
+                                     'charToBinary(midiStr[0])', charToBinary(midiStr[0]), 
+                                     'charToBinary(midiStr[1])', charToBinary(midiStr[1])])
             raise MidiException("Unknown midi event type")
 
 
@@ -793,18 +815,23 @@ class MidiEvent(object):
                 try:
                     data = chr(self._parameter1) + chr(self._parameter2) 
                 except ValueError:
-                    raise MidiException("Problem with representing either %d or %d" % (self._parameter1, self._parameter2))
+                    raise MidiException(
+                        "Problem with representing either %d or %d" % (
+                                                    self._parameter1, self._parameter2))
             elif self.type in ['PROGRAM_CHANGE']:
                 #environLocal.printDebug(['trying to add program change data: %s' % self.data])
                 try:
                     data = chr(self.data) 
                 except TypeError:
-                    raise MidiException("Got incorrect data for %s in .data: %s, cannot parse Program Change" % (self, self.data))
+                    raise MidiException("Got incorrect data for %s in .data: %s," % 
+                                        (self, self.data) + "cannot parse Program Change")
             else:  # all other messages
                 try:
                     data = chr(self.data) 
                 except TypeError:
-                    raise MidiException("Got incorrect data for %s in .data: %s, cannot parse Miscellaneous Message" % (self, self.data))
+                    raise MidiException(
+                        "Got incorrect data for %s in .data: %s, " % (self, self.data) + 
+                        "cannot parse Miscellaneous Message")
             return x + data 
 
         elif channelModeMessages.hasattr(self.type): 
@@ -1230,7 +1257,9 @@ class MidiFile(object):
         else: 
             self.ticksPerQuarterNote = division & 0x7FFF 
 
-        #environLocal.printDebug(['MidiFile.readstr(): got midi file format:', self.format, 'with specified number of tracks:', numTracks, 'ticksPerSecond:', self.ticksPerSecond, 'ticksPerQuarterNote:', self.ticksPerQuarterNote])
+        #environLocal.printDebug(['MidiFile.readstr(): got midi file format:', self.format, 
+        #'with specified number of tracks:', numTracks, 'ticksPerSecond:', self.ticksPerSecond,
+        # 'ticksPerQuarterNote:', self.ticksPerQuarterNote])
 
         for i in range(numTracks): 
             trk = MidiTrack(i) # sets the MidiTrack index parameters
@@ -1263,7 +1292,8 @@ class MidiFile(object):
         division = self.ticksPerQuarterNote 
         # Don't handle ticksPerSecond yet, too confusing 
         if (division & 0x8000) != 0:
-            raise MidiException('Cannot write midi string unless self.ticksPerQuarterNote is a multiple of 1024')
+            raise MidiException(
+                'Cannot write midi string unless self.ticksPerQuarterNote is a multiple of 1024')
         midiStr = b"MThd" + putNumber(6, 4) + putNumber(self.format, 2) 
         midiStr = midiStr + putNumber(len(self.tracks), 2) 
         midiStr = midiStr + putNumber(division, 2) 

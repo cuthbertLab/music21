@@ -145,10 +145,12 @@ from music21.base import Music21Exception
 from music21.base import SitesException
 from music21.base import Music21ObjectException
 from music21.base import ElementException
+
 from music21.base import Groups
 from music21.base import Music21Object
 from music21.base import ElementWrapper
 
+# legacy reason why it's here...
 from music21.test.testRunner import mainTest
 
 #del(types)

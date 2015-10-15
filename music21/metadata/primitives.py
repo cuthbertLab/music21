@@ -9,7 +9,13 @@
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
 # Project License:      LGPL, see license.txt
 #------------------------------------------------------------------------------
-
+__all__ = ['Date', 'DateSingle', 'DateRelative', 'DateBetween',
+           'DateSelection',
+           'Text',
+           'Contributor',
+           'Creator',
+           'Imprint',
+           'Copyright']
 
 import datetime
 import os

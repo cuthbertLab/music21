@@ -38,7 +38,8 @@ class Verticality(object):
     Create a timespan-stream from a score:
 
     >>> score = corpus.parse('bwv66.6')
-    >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+    >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+    ...        classList=(note.Note, chord.Chord))
 
 
     Find the verticality at offset 6.5, or beat 2.5 of measure 2 (there's a one
@@ -347,7 +348,7 @@ class Verticality(object):
         tree = self.timespanTree
         if tree is None:
             return None
-        offset = tree.getOffsetAfter(self.offset)
+        offset = tree.getPositionAfter(self.offset)
         return offset
 
     @property
@@ -378,7 +379,7 @@ class Verticality(object):
         tree = self.timespanTree
         if tree is None:
             return None
-        offset = tree.getOffsetAfter(self.offset)
+        offset = tree.getPositionAfter(self.offset)
         if offset is None:
             return None
         return tree.getVerticalityAt(offset)
@@ -472,7 +473,7 @@ class Verticality(object):
         tree = self.timespanTree
         if tree is None:
             return None
-        offset = tree.getOffsetBefore(self.offset)
+        offset = tree.getPositionBefore(self.offset)
         if offset is None:
             return None
         return tree.getVerticalityAt(offset)

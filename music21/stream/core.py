@@ -21,11 +21,10 @@ remain stable.
 
 All attributes here will eventually begin with `.core`.
 '''
+#pylint: disable=attribute-defined-outside-init
+
 import unittest
 
-import copy
-
-from music21 import base
 from music21 import spanner 
 from music21 import timespans
 from music21.exceptions21 import StreamException
@@ -342,7 +341,135 @@ class StreamCoreMixin(object):
             self._cache[cacheKey] = hashedTSC
         return self._cache[cacheKey]
     
-       
+    def coreGatherMissingSpanners(self, recurse=True, requireAllPresent=True, insert=True):
+        '''
+        find all spanners that are referenced by elements in the
+        (recursed if recurse=True) stream and either inserts them in the Stream
+        (if insert is True) or returns them if insert is False.
+        
+        If requireAllPresent is True (default) then only those spanners whose complete
+        spanned elements are in the Stream are returned.
+        
+        A little helper function since we'll make the same Stream several times:
+        
+        >>> def getStream():
+        ...    s = stream.Stream()
+        ...    n = note.Note('C')
+        ...    m = note.Note('D')
+        ...    sl = spanner.Slur(n, m)
+        ...    n.bogusAttributeNotWeakref = sl # prevent garbage collecting sl
+        ...    s.append([n, m])
+        ...    return s
+        
+        >>> s = getStream()
+        >>> s.show('text')
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note D>
+        >>> s.coreGatherMissingSpanners()
+        >>> s.show('text')
+        {0.0} <music21.note.Note C>
+        {0.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>
+        {1.0} <music21.note.Note D>
+        
+        Insert is False:
+        
+        >>> s = getStream()
+        >>> spList = s.coreGatherMissingSpanners(insert=False)
+        >>> spList
+        [<music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>]
+        >>> s.show('text')
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note D>
+
+        Not all elements are present:
+        
+        >>> s = getStream()
+        >>> s.remove(s[-1])
+        >>> s.show('text')
+        {0.0} <music21.note.Note C>
+        >>> s.coreGatherMissingSpanners()
+        >>> s.show('text')
+        {0.0} <music21.note.Note C>
+        >>> s.coreGatherMissingSpanners(requireAllPresent=False)
+        >>> s.show('text')
+        {0.0} <music21.note.Note C>
+        {0.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>
+
+        Test recursion:
+        
+        >>> t = stream.Part()
+        >>> s = getStream()
+        >>> t.insert(0, s)
+        >>> t.coreGatherMissingSpanners(recurse=False)
+        >>> t.show('text')
+        {0.0} <music21.stream.Stream 0x104935b00>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note D>
+
+        Default: with recursion:
+        
+        >>> t.coreGatherMissingSpanners()
+        >>> t.show('text')
+        {0.0} <music21.stream.Stream 0x104935b00>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note D>
+        {0.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>
+
+
+        Make sure that spanners already in the stream are not put there twice:
+        
+        >>> s = getStream()
+        >>> sl = s[0].getSpannerSites()[0]
+        >>> s.insert(0, sl)
+        >>> s.coreGatherMissingSpanners()
+        >>> s.show('text')
+        {0.0} <music21.note.Note C>
+        {0.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>
+        {1.0} <music21.note.Note D>
+        
+        And with recursion?
+        
+        >>> t = stream.Part()
+        >>> s = getStream()
+        >>> sl = s[0].getSpannerSites()[0]
+        >>> s.insert(0, sl)
+        >>> t.insert(0, s)
+        >>> t.coreGatherMissingSpanners()
+        >>> t.show('text')
+        {0.0} <music21.stream.Stream 0x104935b00>
+            {0.0} <music21.note.Note C>
+            {0.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>
+            {1.0} <music21.note.Note D>            
+        '''
+        sb = self.spannerBundle
+        if recurse is True:
+            sIter = self.recurse()
+        else:
+            sIter = self.iter
+        
+        collectList = []
+        for el in list(sIter):
+            for sp in el.getSpannerSites():
+                if sp in sb:
+                    continue
+                if sp in collectList:
+                    continue
+                if requireAllPresent:
+                    allFound = True
+                    for spannedElement in sp.getSpannedElements():
+                        if spannedElement not in sIter:
+                            allFound = False
+                            break
+                    if allFound is False:
+                        continue
+                collectList.append(sp)
+        
+        if insert is False:
+            return collectList
+        else:
+            for sp in collectList:
+                self._insertCore(0, sp)
+            self.elementsChanged(updateIsFlat=False)
     
 # timing before: Macbook Air 2012, i7
 # In [3]: timeit('s = stream.Stream()', setup='from music21 import stream', number=100000)

@@ -424,7 +424,7 @@ class Microtone(SlottedObject):
 
     ### SPECIAL METHODS ###
     def __deepcopy__(self, memo):
-        if type(self) is Microtone:
+        if type(self) is Microtone: # pylint: disable=unidiomatic-typecheck
             return Microtone(self._centShift, self._harmonicShift)
         else:
             return common.defaultDeepcopy(self, memo)
@@ -609,7 +609,7 @@ class Accidental(SlottedObject):
         return hash(hashValues)
 
     def __deepcopy__(self, memo):
-        if type(self) is Accidental:
+        if type(self) is Accidental: # pylint: disable=unidiomatic-typecheck
             new = Accidental.__new__(Accidental)
             for s in self.__slots__:
                 setattr(new, s, getattr(self, s))
@@ -1336,7 +1336,7 @@ class Pitch(object):
         highly optimized -- it knows exactly what can only have a scalar value and
         just sets that directly, only running deepcopy on the other bits.
         '''
-        if type(self) is Pitch:
+        if type(self) is Pitch: # pylint: disable=unidiomatic-typecheck
             new = Pitch.__new__(Pitch)
             for k in self.__dict__:
                 v = getattr(self, k, None)

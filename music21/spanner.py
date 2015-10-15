@@ -50,7 +50,8 @@ class Spanner(base.Music21Object):
     but represent and store connections between one or more other Music21Objects.
 
     Commonly used Spanner subclasses include the :class:`~music21.spanner.Slur`, 
-    :class:`~music21.spanner.RepeatBracket`, :class:`~music21.spanner.Crescendo`, and :class:`~music21.spanner.Diminuendo`
+    :class:`~music21.spanner.RepeatBracket`, :class:`~music21.spanner.Crescendo`, 
+    and :class:`~music21.spanner.Diminuendo`
     objects.
 
     In some cases you will want to subclass Spanner
@@ -105,7 +106,8 @@ class Spanner(base.Music21Object):
     <music21.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>
 
 
-    (3) we can get the spanner by looking at the list getSpannerSites() on any object that has a spanner:
+    (3) we can get the spanner by looking at the list getSpannerSites() on 
+    any object that has a spanner:
     
     >>> n2.getSpannerSites()
     [<music21.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>]
@@ -198,13 +200,7 @@ class Spanner(base.Music21Object):
     When we're done adding elements:
     
     >>> sp1.completeStatus = True
-    
-    
-
     '''
-    # this class attribute provides performance optimized class selection
-    isSpanner = True 
-
     def __init__(self, *arguments, **keywords):
         base.Music21Object.__init__(self)
 
@@ -898,6 +894,8 @@ class SpannerBundle(object):
         The `old` parameter can be either an object or object id. 
 
         If no replacements are found, no errors are raised.
+        
+        Returns a list of spanners that had elements replaced.
 
         >>> n1 = note.Note('C')
         >>> n2 = note.Note('D')
@@ -913,7 +911,9 @@ class SpannerBundle(object):
         <music21.spanner.Glissando <music21.note.Note D><music21.note.Note C>>
 
         >>> n3 = note.Note('E')
-        >>> sb.replaceSpannedElement(n2, n3)
+        >>> replacedSpanners = sb.replaceSpannedElement(n2, n3)
+        >>> replacedSpanners == [su1, su2]
+        True
 
         >>> su1
         <music21.spanner.Line <music21.note.Note C><music21.note.Note E>>
@@ -929,6 +929,7 @@ class SpannerBundle(object):
         else:
             idTarget = id(old)
 
+        replacedSpanners = []
         #post = self.__class__() # return a bundle of spanners that had changes
         for sp in self._storage: # Spanners in a list
             #environLocal.printDebug(['looking at spanner', sp, sp.getSpannedElementIds()])
@@ -936,11 +937,14 @@ class SpannerBundle(object):
             # must check to see if this id is in this spanner
             if idTarget in sp.getSpannedElementIds():
                 sp.replaceSpannedElement(old, new)
+                replacedSpanners.append(sp)
                 #post.append(sp)
                 #environLocal.printDebug(['replaceSpannedElement()', sp, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new)])
 
         if self._cache:
             self._cache = {} 
+
+        return replacedSpanners
 
     def getByClass(self, className):
         '''

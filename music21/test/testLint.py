@@ -12,10 +12,10 @@
 
 # this requires pylint to be installed and available from the command line
 
-
+import multiprocessing
 import sys
 
-from music21.test import testSingleCoreAll as test
+from music21.test import commonTest
 
 try:
     from pylint.lint import Run as pylintRun
@@ -29,25 +29,35 @@ except ImportError:
 
 # W0511:	Used when a warning note as FIXME or XXX is detected.
 # W0404:	Reimport %r (imported line %s) Used when a module is reimported multiple times.
+
 # we do this all the time in unit tests
-# R0201:	Method could be a function Used when a method doesn't use its bound instance, and so could be written as a function.
-# R0904:	Too many public methods (%s/%s) Used when class has too many public methods, try to reduce this to get a more simple (and so easier to use) class.
-# E1101:	%s %r has no %r member Used when a variable is accessed for an unexistant member.
-# R0914:	Too many local variables (%s/%s) Used when a function or method has too many local variables.
+# R0201:	Method could be a function Used when a method doesn't 
+#           use its bound instance, and so could be written as a function.
+# R0904:	Too many public methods (%s/%s) Used when class has too many public methods, 
+#            try to reduce this to get a more simple (and so easier to use) class.
+# E1101:	%s %r has no %r member Used when a variable is accessed for an non-existent member.
+# R0914:	Too many local variables (%s/%s) Used when a function or method has 
+#           too many local variables.
 # many of our test use many local variables
-# R0903:	Too few public methods (%s/%s) Used when class has too few public methods, so be sure it's really worth it.
-# R0911:	Too many return statements (%s/%s) Used when a function or method has too many return statement, making it hard to follow.
+# R0903:	Too few public methods (%s/%s) Used when class has too few public methods,
+#                  so be sure it's really worth it.
+# R0911:	Too many return statements (%s/%s) Used when a function or method has
+#                  too many return statement, making it hard to follow.
 
 
 def main(fnAccept=None):
     '''
     `fnAccept` is a list of one or more files to test.  Otherwise runs all.
     '''
+    poolSize = multiprocessing.cpu_count() # @UndefinedVariable
+    if poolSize > 2:
+        poolSize = poolSize - 1
+
     if pylintRun is None:
         print("make sure that 'sudo pip install pylint' is there. exiting.")
         return 
 
-    mg = test.ModuleGather()
+    mg = commonTest.ModuleGather()
 
     fnPathReject = [
                     'demos/',
@@ -65,13 +75,15 @@ def main(fnAccept=None):
     disable = [
                 'cyclic-import', # we use these inside functions when there's a deep problem.
                 'unnecessary-pass', # nice, but not really a problem...
-                'locally-disabled', # test for this later, but hopefully will know what they're doing
+                'locally-disabled', # test for this later, but hopefully will know what 
+                            # they're doing
 
                 'duplicate-code', # needs to ignore strings -- keeps getting doctests...
 
                 'arguments-differ', # someday...
                 'abstract-class-instantiated', # this trips on the fractions.Fraction() class.
-                'redefined-builtin', # remove when Eclipse tags are parsed @ReservedAssignment = pylint: disable=W0622
+                'redefined-builtin', # remove when Eclipse tags are parsed 
+                            # @ReservedAssignment = pylint: disable=W0622
                 'fixme', # known...
                 'superfluous-parens', # next...
                 'too-many-statements', # someday
@@ -81,9 +93,9 @@ def main(fnAccept=None):
                 'too-many-branches', # yes, someday
                 'too-many-locals',   # no
                 'too-many-lines',    # yes, someday.
-                'bad-whitespace',    # maybe later, but "bad" isn't something I necessarily agree with
+                'bad-whitespace', # maybe later, but "bad" isn't something I necessarily agree with
                 'bad-continuation',  # never remove -- this is a good thing many times.
-                'line-too-long',     # maybe later
+                #'line-too-long',     # maybe later
                 'too-many-return-statements', # we'll see
                 'unpacking-non-sequence', # gets it wrong too often.
                 'too-many-instance-attributes', # maybe later
@@ -114,7 +126,10 @@ def main(fnAccept=None):
            '--docstring-min-length=3',
            '--max-args=7',  # should be 5 later, but baby steps
            '--bad-names="foo,shit,fuck,stuff"', # definitely allow "bar" for barlines
-           '--reports=n'
+           '--reports=n',
+           '-j ' + str(poolSize), # multiprocessing!
+           '--ignore-long-lines="converter\.parse"', # some tiny notation...
+           '--max-line-length=400', # start small...
            ]
     for gn, gnv in goodnameRx.items():
         cmd.append('--' + gn + '="' + gnv + '"')

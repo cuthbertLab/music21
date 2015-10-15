@@ -33,7 +33,9 @@ environLocal = environment.Environment(_MOD)
 
 #-------------------------------------------------------------------------------
 class RepeatMark(object):
-    '''Base class of all repeat objects, including RepeatExpression objects and Repeat (Barline) objects. 
+    '''
+    Base class of all repeat objects, including RepeatExpression objects and 
+    Repeat (Barline) objects. 
 
     This object is used to for multiple-inheritance of such objects and to filter by class in order
     to get all things that mark repeats.
@@ -3287,8 +3289,14 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s), 8)
         self.assertEqual(str(s.flat.pitches[0]), 'A2')
             
-        self.assertEqual(features.vectorById(s, 'p20'), [1.0, 0.333333333333333333333, 0.0, 1.0, 0.3333333333333333333, 0.0, 1.0, 0.3333333333333333, 0.0, 1.0, 0.333333333333333333333, 0.0])
-        self.assertEqual([x.nameWithOctave for x in s.flat.pitches], ['A2', 'B-3', 'A2', 'A2', 'C3', 'D-4', 'C3', 'C3', 'E-3', 'F-4', 'E-3', 'E-3', 'F#3', 'G4', 'F#3', 'F#3', 'A3', 'B-4', 'A3', 'A3', 'C4', 'D-5', 'C4', 'C4', 'E-4', 'F-5', 'E-4', 'E-4', 'F#4', 'G5', 'F#4', 'F#4'])
+        self.assertEqual(features.vectorById(s, 'p20'), 
+                         [1.0, 0.333333333333333333333, 0.0, 1.0, 0.3333333333333333333, 
+                          0.0, 1.0, 0.3333333333333333, 0.0, 1.0, 0.333333333333333333333, 0.0])
+        self.assertEqual([x.nameWithOctave for x in s.flat.pitches], 
+                         ['A2', 'B-3', 'A2', 'A2', 'C3', 'D-4', 'C3', 'C3', 'E-3', 
+                          'F-4', 'E-3', 'E-3', 'F#3', 'G4', 'F#3', 'F#3', 'A3', 
+                          'B-4', 'A3', 'A3', 'C4', 'D-5', 'C4', 'C4', 'E-4', 'F-5', 
+                          'E-4', 'E-4', 'F#4', 'G5', 'F#4', 'F#4'])
         #s.show()    
         
         s1 = s.expandRepeats()
@@ -3298,9 +3306,20 @@ class Test(unittest.TestCase):
         # first bar is an A, but repeat is zero, will be removed
         self.assertEqual(str(s1.flat.pitches[0]), 'C3')
         
-        self.assertEqual(features.vectorById(s1, 'p20'), [0.2, 0.06666666666666666, 0.0, 0.6, 0.2, 0.0, 1.0, 0.3333333333333333333333, 0.0, 0.0, 0.0, 0.0])
+        self.assertEqual(features.vectorById(s1, 'p20'), 
+                         [0.2, 0.06666666666666666, 0.0, 0.6, 0.2, 0.0, 
+                          1.0, 0.3333333333333333333333, 0.0, 0.0, 0.0, 0.0])
         
-        self.assertEqual([x.nameWithOctave for x in s1.flat.pitches], ['C3', 'D-4', 'C3', 'C3', 'E-3', 'F-4', 'E-3', 'E-3', 'E-3', 'F-4', 'E-3', 'E-3', 'E-3', 'F-4', 'E-3', 'E-3', 'F#3', 'G4', 'F#3', 'F#3', 'F#3', 'G4', 'F#3', 'F#3', 'F#3', 'G4', 'F#3', 'F#3', 'F#3', 'G4', 'F#3', 'F#3', 'F#3', 'G4', 'F#3', 'F#3', 'C4', 'D-5', 'C4', 'C4', 'E-4', 'F-5', 'E-4', 'E-4', 'E-4', 'F-5', 'E-4', 'E-4', 'E-4', 'F-5', 'E-4', 'E-4', 'F#4', 'G5', 'F#4', 'F#4', 'F#4', 'G5', 'F#4', 'F#4', 'F#4', 'G5', 'F#4', 'F#4', 'F#4', 'G5', 'F#4', 'F#4', 'F#4', 'G5', 'F#4', 'F#4'])
+        self.assertEqual([x.nameWithOctave for x in s1.flat.pitches], 
+                         ['C3', 'D-4', 'C3', 'C3', 'E-3', 'F-4', 'E-3', 
+                          'E-3', 'E-3', 'F-4', 'E-3', 'E-3', 'E-3', 'F-4', 
+                          'E-3', 'E-3', 'F#3', 'G4', 'F#3', 'F#3', 'F#3', 
+                          'G4', 'F#3', 'F#3', 'F#3', 'G4', 'F#3', 'F#3', 
+                          'F#3', 'G4', 'F#3', 'F#3', 'F#3', 'G4', 'F#3', 'F#3', 
+                          'C4', 'D-5', 'C4', 'C4', 'E-4', 'F-5', 'E-4', 'E-4', 'E-4', 
+                          'F-5', 'E-4', 'E-4', 'E-4', 'F-5', 'E-4', 'E-4', 'F#4', 'G5', 
+                          'F#4', 'F#4', 'F#4', 'G5', 'F#4', 'F#4', 'F#4', 'G5', 'F#4', 
+                          'F#4', 'F#4', 'G5', 'F#4', 'F#4', 'F#4', 'G5', 'F#4', 'F#4'])
 
         
         #s1.show()
@@ -3572,7 +3591,9 @@ class Test(unittest.TestCase):
         post = ex.process()
         # three measure repeat
         self.assertEqual(len(post.getElementsByClass('Measure')), 7)
-        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'A4', 'A4'])
+        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], 
+                         ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4', 
+                          'E4', 'E4', 'G4', 'G4', 'A4', 'A4'])
 
     def testExpandRepeatExpressionC(self):
         from music21 import stream, note
@@ -3597,7 +3618,8 @@ class Test(unittest.TestCase):
         #post.show()
         # three measure repeat
         self.assertEqual(len(post.getElementsByClass('Measure')), 5)
-        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4', 'E4', 'E4'] )
+        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], 
+                         ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4', 'E4', 'E4'] )
 
 
 
@@ -3628,7 +3650,9 @@ class Test(unittest.TestCase):
         #post.show()
         # three measure repeat
         self.assertEqual(len(post.getElementsByClass('Measure')), 7)
-        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4', 'E4', 'E4', 'A4', 'A4', 'B4', 'B4'])
+        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], 
+                         ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4', 
+                          'E4', 'E4', 'A4', 'A4', 'B4', 'B4'])
 
     def testExpandRepeatExpressionE(self):
         from music21 import repeat, stream, note
@@ -3654,7 +3678,9 @@ class Test(unittest.TestCase):
         #post.show()
         # three measure repeat
         self.assertEqual(len(post.getElementsByClass('Measure')), 6)
-        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'E4', 'E4', 'G4', 'G4', 'A4', 'A4'])
+        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], 
+                         ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'E4', 'E4', 
+                          'G4', 'G4', 'A4', 'A4'])
 
 
     def testExpandRepeatExpressionF(self):
@@ -3684,7 +3710,9 @@ class Test(unittest.TestCase):
         #post.show()
         # three measure repeat
         self.assertEqual(len(post.getElementsByClass('Measure')), 6)
-        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'A4', 'A4', 'E4', 'E4', 'G4', 'G4'])
+        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], 
+                         ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'A4', 'A4', 
+                          'E4', 'E4', 'G4', 'G4'])
 
 
     def testExpandRepeatExpressionG(self):
@@ -3720,7 +3748,9 @@ class Test(unittest.TestCase):
         #post.show()
         # three measure repeat
         self.assertEqual(len(post.getElementsByClass('Measure')), 7)
-        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'E4', 'E4', 'G4', 'G4', 'E4', 'E4', 'A4', 'A4', 'B4', 'B4'] )
+        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], 
+                         ['C4', 'C4', 'E4', 'E4', 'E4', 'E4', 'G4', 'G4', 
+                          'E4', 'E4', 'A4', 'A4', 'B4', 'B4'] )
 
     def testExpandRepeatExpressionH(self):        
         # test one back repeat at end of a measure
@@ -3755,7 +3785,10 @@ class Test(unittest.TestCase):
         #post.show()
         # three measure repeat
         self.assertEqual(len(post.getElementsByClass('Measure')), 10)
-        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4', 'A4', 'A4', 'C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'A4', 'A4', 'B4', 'B4'])
+        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], 
+                         ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4', 'A4', 
+                          'A4', 'C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'A4', 'A4', 
+                          'B4', 'B4'])
 
         # test changing repeat after jump
         dcHandle.repeatAfterJump = True
@@ -3764,7 +3797,10 @@ class Test(unittest.TestCase):
         #post.show()
         # three measure repeat
         self.assertEqual(len(post.getElementsByClass('Measure')), 11)
-        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4', 'A4', 'A4', 'C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4', 'A4', 'A4', 'B4', 'B4'])
+        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], 
+                         ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4', 'A4', 
+                          'A4', 'C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4', 
+                          'A4', 'A4', 'B4', 'B4'])
 
 
 

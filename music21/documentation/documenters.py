@@ -15,6 +15,7 @@ import re
 import types
 import unittest
 
+from music21 import common
 from music21.exceptions21 import Music21Exception
 from music21.ext import six
 
@@ -105,21 +106,21 @@ class FunctionDocumenter(ObjectDocumenter):
     >>> function = common.opFrac
     >>> documenter = documentation.documenters.FunctionDocumenter(function)
     >>> documenter
-    <music21.documentation.documenters.FunctionDocumenter: music21.common.numberFunc.opFrac>
+    <music21.documentation.documenters.FunctionDocumenter: music21.common.numberTools.opFrac>
 
     >>> documenter.rstCrossReferenceString
-    ':func:`~music21.common.numberFunc.opFrac`'
+    ':func:`~music21.common.numberTools.opFrac`'
 
     >>> for line in documenter.rstAutodocDirectiveFormat:
     ...     line
-    '.. autofunction:: music21.common.numberFunc.opFrac'
+    '.. autofunction:: music21.common.numberTools.opFrac'
     ''
 
     Call the documenter to generate its ReStructuredText format:
 
     >>> restructuredText = documenter.run()
     >>> restructuredText
-    ['.. autofunction:: music21.common.numberFunc.opFrac', '']
+    ['.. autofunction:: music21.common.numberTools.opFrac', '']
     '''
 
     ### INITIALIZER ###
@@ -150,7 +151,7 @@ class FunctionDocumenter(ObjectDocumenter):
         >>> function = common.opFrac
         >>> documenter = documentation.documenters.FunctionDocumenter(function)
         >>> documenter.referentPackagesystemPath
-        'music21.common.numberFunc.opFrac'
+        'music21.common.numberTools.opFrac'
         '''
         path = '.'.join((
             self.referent.__module__,
@@ -164,7 +165,7 @@ class FunctionDocumenter(ObjectDocumenter):
         >>> function = common.opFrac
         >>> documenter = documentation.documenters.FunctionDocumenter(function)
         >>> documenter.rstAutodocDirectiveFormat
-        ['.. autofunction:: music21.common.numberFunc.opFrac', '']
+        ['.. autofunction:: music21.common.numberTools.opFrac', '']
         '''
         result = []
         referentPackagesystemPath = self.referentPackagesystemPath.replace(
@@ -369,14 +370,13 @@ class ClassDocumenter(ObjectDocumenter):
        - :attr:`~music21.base.Music21Object.activeSite`
        - :attr:`~music21.base.Music21Object.derivation`
                 ...
-       - :attr:`~music21.base.Music21Object.quarterLengthFloat`
        - :attr:`~music21.base.Music21Object.seconds`
     .. rubric:: :class:`~music21.articulations.Caesura` methods
     Methods inherited from :class:`~music21.base.Music21Object`:
     .. hlist::
        :columns: 3
+       - :meth:`~music21.base.Music21Object.containerHierarchy`
        - :meth:`~music21.base.Music21Object.contextSites`
-       - :meth:`~music21.base.Music21Object.durationChanged`
        - :meth:`~music21.base.Music21Object.getAllContextsByClass`
                 ...
        - :meth:`~music21.base.Music21Object.show`
@@ -393,9 +393,7 @@ class ClassDocumenter(ObjectDocumenter):
        - :attr:`~music21.base.Music21Object.groups`
        - :attr:`~music21.base.Music21Object.hideObjectOnPrint`
        - :attr:`~music21.base.Music21Object.id`
-       - :attr:`~music21.base.Music21Object.isSpanner`
        - :attr:`~music21.base.Music21Object.isStream`
-       - :attr:`~music21.base.Music21Object.isVariant`
        - :attr:`~music21.base.Music21Object.xPosition`    
     '''
 
@@ -687,8 +685,6 @@ class ClassDocumenter(ObjectDocumenter):
         music21.base.Music21Object:
         - music21.base.Music21Object.classSet
         - music21.base.Music21Object.classes
-        - music21.base.Music21Object.containerHierarchy
-        - music21.base.Music21Object.isGrace
         - music21.base.Music21Object.measureNumber
         music21.stream.Stream:
         - music21.stream.Stream.beat
@@ -724,16 +720,16 @@ class ClassDocumenter(ObjectDocumenter):
         ...             attributeDocumenter.referentPackagesystemPath))
         ...
         music21.base.Music21Object:
+        - music21.base.Music21Object.containerHierarchy
         - music21.base.Music21Object.contextSites      
-        - music21.base.Music21Object.durationChanged
         - music21.base.Music21Object.getAllContextsByClass
         - music21.base.Music21Object.getContextAttr
         - music21.base.Music21Object.getContextByClass
         - music21.base.Music21Object.getOffsetBySite
         - music21.base.Music21Object.getSpannerSites
-        - music21.base.Music21Object.hasSite
+        - music21.base.Music21Object.informSites
         - music21.base.Music21Object.isClassOrSubclass
-        - music21.base.Music21Object.next
+        - music21.base.Music21Object.next        
         music21.stream.Stream:
         - music21.stream.Stream.activateVariants
         - music21.stream.Stream.addGroupForElements
@@ -747,6 +743,7 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.stream.Stream.beatAndMeasureFromOffset
         music21.stream.core.StreamCoreMixin:
         - music21.stream.core.StreamCoreMixin.asTimespans
+        - music21.stream.core.StreamCoreMixin.coreGatherMissingSpanners
         - music21.stream.core.StreamCoreMixin.elementsChanged        
         '''
         return self._inheritedMethodsMapping
@@ -770,11 +767,8 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.base.Music21Object.activeSite
         - music21.base.Music21Object.derivation
         - music21.base.Music21Object.offset
-        - music21.base.Music21Object.offsetFloat
-        - music21.base.Music21Object.offsetRational
         - music21.base.Music21Object.priority
         - music21.base.Music21Object.quarterLength
-        - music21.base.Music21Object.quarterLengthFloat
         music21.stream.Stream:
         - music21.stream.Stream.atSoundingPitch
         - music21.stream.Stream.duration
@@ -1008,8 +1002,6 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.beatStrength`'
         '   - :attr:`~music21.base.Music21Object.classSet`'
         '   - :attr:`~music21.base.Music21Object.classes`'
-        '   - :attr:`~music21.base.Music21Object.containerHierarchy`'
-        '   - :attr:`~music21.base.Music21Object.isGrace`'
         '   - :attr:`~music21.base.Music21Object.measureNumber`'
         ''
 
@@ -1056,11 +1048,8 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.derivation`'
         '   - :attr:`~music21.base.Music21Object.duration`'
         '   - :attr:`~music21.base.Music21Object.offset`'
-        '   - :attr:`~music21.base.Music21Object.offsetFloat`'
-        '   - :attr:`~music21.base.Music21Object.offsetRational`'
         '   - :attr:`~music21.base.Music21Object.priority`'
         '   - :attr:`~music21.base.Music21Object.quarterLength`'
-        '   - :attr:`~music21.base.Music21Object.quarterLengthFloat`'
         '   - :attr:`~music21.base.Music21Object.seconds`'
         ''
         '''
@@ -1110,8 +1099,7 @@ class ClassDocumenter(ObjectDocumenter):
         '.. hlist::'
         '   :columns: 3'
         ''
-        '   - :meth:`~music21.base.Music21Object.contextSites`'
-        '   - :meth:`~music21.base.Music21Object.durationChanged`'
+        '   - :meth:`~music21.base.Music21Object.containerHierarchy`'
         ...
         '   - :meth:`~music21.base.Music21Object.splitByQuarterLengths`'
         ''
@@ -1156,8 +1144,6 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.beatStrength`'
         '   - :attr:`~music21.base.Music21Object.classSet`'
         '   - :attr:`~music21.base.Music21Object.classes`'
-        '   - :attr:`~music21.base.Music21Object.containerHierarchy`'
-        '   - :attr:`~music21.base.Music21Object.isGrace`'
         '   - :attr:`~music21.base.Music21Object.measureNumber`'
         ''
 
@@ -1195,11 +1181,8 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.derivation`'
         '   - :attr:`~music21.base.Music21Object.duration`'
         '   - :attr:`~music21.base.Music21Object.offset`'
-        '   - :attr:`~music21.base.Music21Object.offsetFloat`'
-        '   - :attr:`~music21.base.Music21Object.offsetRational`'
         '   - :attr:`~music21.base.Music21Object.priority`'
         '   - :attr:`~music21.base.Music21Object.quarterLength`'
-        '   - :attr:`~music21.base.Music21Object.quarterLengthFloat`'
         '   - :attr:`~music21.base.Music21Object.seconds`'
         ''
         '''
@@ -1285,8 +1268,10 @@ class ModuleDocumenter(ObjectDocumenter):
         ObjectDocumenter.__init__(self, referent)
         namesMapping = self._examineModule()
         self._namesMapping = namesMapping
-        self._memberOrder = tuple(
-            self.referent.__dict__.get('_DOC_ORDER') or ())
+        docOrder = self.referent.__dict__.get('_DOC_ORDER')
+        if docOrder is not None and not common.isListLike(docOrder):
+            print("Doc order for ", self.referent, " has problems")
+        self._memberOrder = tuple(docOrder or ())
 
     ### SPECIAL METHODS ###
 

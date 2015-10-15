@@ -16,8 +16,12 @@ import doctest
 import imp
 import multiprocessing
 import os
+#import time
 import types
 import warnings
+
+from unittest.signals import registerResult
+import unittest.runner
 
 import music21
 from music21 import common
@@ -41,6 +45,75 @@ def defaultDoctestSuite(name=None):
     else:
         s1 = doctest.DocTestSuite(**kwArgs)
     return s1
+
+# from testRunner...
+# more silent type...
+
+class Music21TestRunner(unittest.runner.TextTestRunner):
+    def run(self, test):
+        "Run the given test case or test suite."
+        result = self._makeResult()
+        registerResult(result)
+        result.failfast = self.failfast
+        result.buffer = self.buffer
+        with warnings.catch_warnings():
+            if self.warnings:
+                # if self.warnings is set, use it to filter all the warnings
+                warnings.simplefilter(self.warnings)
+                # if the filter is 'default' or 'always', special-case the
+                # warnings from the deprecated unittest methods to show them
+                # no more than once per module, because they can be fairly
+                # noisy.  The -Wd and -Wa flags can be used to bypass this
+                # only when self.warnings is None.
+                if self.warnings in ['default', 'always']:
+                    warnings.filterwarnings('module',
+                            category=DeprecationWarning,
+                            message='Please use assert\w+ instead.')
+            #startTime = time.time()
+            startTestRun = getattr(result, 'startTestRun', None)
+            if startTestRun is not None:
+                startTestRun()
+            try:
+                test(result)
+            finally:
+                stopTestRun = getattr(result, 'stopTestRun', None)
+                if stopTestRun is not None:
+                    stopTestRun()
+            #stopTime = time.time()
+        #timeTaken = stopTime - startTime
+        result.printErrors()
+
+        expectedFails = unexpectedSuccesses = skipped = 0
+        try:
+            results = map(len, (result.expectedFailures,
+                                result.unexpectedSuccesses,
+                                result.skipped))
+        except AttributeError:
+            pass
+        else:
+            expectedFails, unexpectedSuccesses, skipped = results
+
+        infos = []
+        if not result.wasSuccessful():
+            self.stream.write("FAILED")
+            failed, errored = len(result.failures), len(result.errors)
+            if failed:
+                infos.append("failures=%d" % failed)
+            if errored:
+                infos.append("errors=%d" % errored)
+        else:
+            pass
+        if skipped:
+            infos.append("skipped=%d" % skipped)
+        if expectedFails:
+            infos.append("expected failures=%d" % expectedFails)
+        if unexpectedSuccesses:
+            infos.append("unexpected successes=%d" % unexpectedSuccesses)
+        if infos:
+            self.stream.writeln(" (%s)" % (", ".join(infos),))
+        else:
+            pass
+        return result
 
 #-------------------------------------------------------------------------------
 class ModuleGather(object):

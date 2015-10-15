@@ -4425,7 +4425,9 @@ class TestExternal(unittest.TestCase):
         # pair data with class name
         graphClasses = [
         (GraphHorizontalBar, 
-            [('Chopin', [(1810, 1849-1810)]), ('Schumanns', [(1810, 1856-1810), (1819, 1896-1819)]), ('Brahms', [(1833, 1897-1833)])]
+            [('Chopin', [(1810, 1849-1810)]), 
+             ('Schumanns', [(1810, 1856-1810), (1819, 1896-1819)]), 
+             ('Brahms', [(1833, 1897-1833)])]
         ),
         (GraphScatterWeighted, 
             [(23, 15, 234), (10, 23, 12), (4, 23, 5), (15, 18, 120)]),
@@ -4459,7 +4461,25 @@ class TestExternal(unittest.TestCase):
     def writeGraphColorGrid(self):
         # this is temporary
         a = GraphColorGrid(doneAction=None)
-        data = [['#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c', '#8c8c8c', '#8c8c8c', '#6c6c6c', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#525252', '#464646', '#3f3f3f', '#3f3f3f', '#4c4c4c', '#4c4c4c', '#797979', '#797979', '#4c4c4c', '#4c4c4c', '#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#797979', '#6c6c6c', '#5f5f5f', '#5f5f5f', '#858585', '#797979', '#797979', '#797979', '#797979', '#797979', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#8c8c8c', '#8c8c8c', '#858585', '#797979', '#858585', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#8c8c8c', '#929292', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', '#999999'], ['#999999', '#999999', '#999999', '#999999', '#999999']]
+        data = [['#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c', 
+                 '#8c8c8c', '#8c8c8c', '#6c6c6c', '#999999', '#999999', '#797979', 
+                 '#6c6c6c', '#5f5f5f', '#525252', '#464646', '#3f3f3f', '#3f3f3f', 
+                 '#4c4c4c', '#4c4c4c', '#797979', '#797979', '#4c4c4c', '#4c4c4c', 
+                 '#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c'], 
+                ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', 
+                 '#999999', '#999999', '#999999', '#999999', '#999999', '#797979', 
+                 '#6c6c6c', '#5f5f5f', '#5f5f5f', '#858585', '#797979', '#797979', 
+                 '#797979', '#797979', '#797979', '#797979', '#858585', '#929292', '#999999'], 
+                ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', 
+                 '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', 
+                 '#8c8c8c', '#8c8c8c', '#8c8c8c', '#858585', '#797979', '#858585', 
+                 '#929292', '#999999'], 
+                ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', 
+                 '#999999', '#999999', '#999999', '#999999', '#999999', '#999999', 
+                 '#8c8c8c', '#929292', '#999999'], 
+                ['#999999', '#999999', '#999999', '#999999', '#999999', '#999999', 
+                 '#999999', '#999999', '#999999', '#999999'], 
+                ['#999999', '#999999', '#999999', '#999999', '#999999']]
         a.setData(data)
         a.process()
         fn = a.__class__.__name__ + '.png'
@@ -4471,7 +4491,9 @@ class TestExternal(unittest.TestCase):
 
 
     def writeAllPlots(self):
-        '''Write a graphic file for all graphs, naming them after the appropriate class. This is used to generate documentation samples.
+        '''
+        Write a graphic file for all graphs, naming them after the appropriate class. 
+        This is used to generate documentation samples.
         '''
         # TODO: need to add strip() ties here; but need stripTies on Score
         from music21.musicxml import testFiles 
@@ -4485,18 +4507,22 @@ class TestExternal(unittest.TestCase):
         (PlotScatterPitchSpaceQuarterLength, None, None), 
         (PlotScatterPitchClassQuarterLength, None, None), 
         (PlotScatterPitchClassOffset, None, None),
-        (PlotScatterPitchSpaceDynamicSymbol, corpus.getWork('schumann/opus41no1', 2), 'Schumann Opus 41 No 1'),
+        (PlotScatterPitchSpaceDynamicSymbol, 
+            corpus.getWork('schumann/opus41no1', 2), 'Schumann Opus 41 No 1'),
 
         # offset based horizontal
         (PlotHorizontalBarPitchSpaceOffset, None, None), 
         (PlotHorizontalBarPitchClassOffset, None, None),
         # weighted scatter
-        (PlotScatterWeightedPitchSpaceQuarterLength, None, None), (PlotScatterWeightedPitchClassQuarterLength, None, None),
-        (PlotScatterWeightedPitchSpaceDynamicSymbol, corpus.getWork('schumann/opus41no1', 2), 'Schumann Opus 41 No 1'),
+        (PlotScatterWeightedPitchSpaceQuarterLength, None, None), 
+        (PlotScatterWeightedPitchClassQuarterLength, None, None),
+        (PlotScatterWeightedPitchSpaceDynamicSymbol, 
+            corpus.getWork('schumann/opus41no1', 2), 'Schumann Opus 41 No 1'),
 
 
         # 3d graphs
-        (Plot3DBarsPitchSpaceQuarterLength, testFiles.mozartTrioK581Excerpt, 'Mozart Trio K581 Excerpt'), # @UndefinedVariable
+        (Plot3DBarsPitchSpaceQuarterLength, 
+            testFiles.mozartTrioK581Excerpt, 'Mozart Trio K581 Excerpt'), # @UndefinedVariable
 
         (PlotWindowedKrumhanslSchmuckler, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
         (PlotWindowedAmbitus, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
@@ -4615,7 +4641,9 @@ class Test(unittest.TestCase):
         del a
 
 
-        a = Graph3DPolygonBars(doneAction=None, title='50 x with random values increase by 10 per x', alpha=.8, colors=['b', 'g'])
+        a = Graph3DPolygonBars(doneAction=None, 
+                               title='50 x with random values increase by 10 per x', 
+                               alpha=.8, colors=['b', 'g'])
         data = {1:[], 2:[], 3:[], 4:[], 5:[]}
         for i in range(len(data.keys())):
             q = [(x, random.choice(range(10*i, 10*(i+1)))) for x in range(50)]
@@ -4658,23 +4686,27 @@ class Test(unittest.TestCase):
 
     def testPlotPitchClass(self):
         a = corpus.parse('bach/bwv57.8')
-        b = PlotHistogramPitchClass(a.parts[0].flat, doneAction=None, title='Bach (soprano voice)')
+        b = PlotHistogramPitchClass(a.parts[0].flat, 
+                                    doneAction=None, title='Bach (soprano voice)')
         b.process()
         
 
     def testPlotQuarterLength(self):
         a = corpus.parse('bach/bwv57.8')
-        b = PlotHistogramQuarterLength(a.parts[0].flat, doneAction=None, title='Bach (soprano voice)')
+        b = PlotHistogramQuarterLength(a.parts[0].flat, 
+                                       doneAction=None, title='Bach (soprano voice)')
         b.process()
         
 
     def testPitchDuration(self):
         a = corpus.parse('schoenberg/opus19', 2)
-        b = PlotScatterPitchSpaceDynamicSymbol(a.parts[0].flat, doneAction=None, title='Schoenberg (piano)')
+        b = PlotScatterPitchSpaceDynamicSymbol(a.parts[0].flat, 
+                                               doneAction=None, title='Schoenberg (piano)')
         b.process()
         
 
-        b = PlotScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flat, doneAction=None, title='Schoenberg (piano)')
+        b = PlotScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flat, 
+                                                       doneAction=None, title='Schoenberg (piano)')
         b.process()
         
 
@@ -4789,7 +4821,8 @@ class Test(unittest.TestCase):
         self.assertEqual(b._extractChordDataTwoAxis(fx, fy, c), ([71, 60, 62], [0.5]))
         c = chord.Chord(['b', 'c', 'd'], quarterLength=.5)
         # matching the number of pitches for each data point may be needed
-        self.assertEqual(b._extractChordDataTwoAxis(fx, fy, c, matchPitchCount=True), ([71, 60, 62], [0.5, 0.5, 0.5]) )
+        self.assertEqual(b._extractChordDataTwoAxis(fx, fy, c, matchPitchCount=True), 
+                         ([71, 60, 62], [0.5, 0.5, 0.5]) )
 
     def testPlotChordsA2(self):
         from music21 import stream, scale
@@ -4912,7 +4945,8 @@ class Test(unittest.TestCase):
         b = PlotScatterWeightedPitchSpaceQuarterLength(s, doneAction=None, xLog=False)
         b.process()
         
-        self.assertEqual(b.data, [[0.5, 48, 0], [1.0, 48, 1], [1.5, 48, 0], [3, 48, 0], [0.5, 49, 0], [1.0, 49, 0], [1.5, 49, 0], [3, 49, 0], [0.5, 50, 0], [1.0, 50, 0], [1.5, 50, 0], [3, 50, 0], [0.5, 51, 0], [1.0, 51, 0], [1.5, 51, 0], [3, 51, 0], [0.5, 52, 1], [1.0, 52, 0], [1.5, 52, 0], [3, 52, 0], [0.5, 53, 1], [1.0, 53, 0], [1.5, 53, 0], [3, 53, 0], [0.5, 54, 0], [1.0, 54, 0], [1.5, 54, 0], [3, 54, 0], [0.5, 55, 1], [1.0, 55, 0], [1.5, 55, 0], [3, 55, 0], [0.5, 56, 0], [1.0, 56, 0], [1.5, 56, 0], [3, 56, 0], [0.5, 57, 1], [1.0, 57, 0], [1.5, 57, 0], [3, 57, 0], [0.5, 58, 0], [1.0, 58, 0], [1.5, 58, 0], [3, 58, 0], [0.5, 59, 0], [1.0, 59, 0], [1.5, 59, 1], [3, 59, 0], [0.5, 60, 0], [1.0, 60, 0], [1.5, 60, 1], [3, 60, 0], [0.5, 61, 0], [1.0, 61, 0], [1.5, 61, 0], [3, 61, 0], [0.5, 62, 0], [1.0, 62, 0], [1.5, 62, 1], [3, 62, 0], [0.5, 63, 0], [1.0, 63, 0], [1.5, 63, 0], [3, 63, 0], [0.5, 64, 0], [1.0, 64, 0], [1.5, 64, 1], [3, 64, 0], [0.5, 65, 0], [1.0, 65, 0], [1.5, 65, 0], [3, 65, 2], [0.5, 66, 0], [1.0, 66, 0], [1.5, 66, 0], [3, 66, 0], [0.5, 67, 0], [1.0, 67, 0], [1.5, 67, 0], [3, 67, 2], [0.5, 68, 0], [1.0, 68, 0], [1.5, 68, 0], [3, 68, 0], [0.5, 69, 0], [1.0, 69, 0], [1.5, 69, 0], [3, 69, 2], [0.5, 70, 0], [1.0, 70, 0], [1.5, 70, 0], [3, 70, 0], [0.5, 71, 0], [1.0, 71, 0], [1.5, 71, 0], [3, 71, 2], [0.5, 72, 0], [1.0, 72, 0], [1.5, 72, 0], [3, 72, 3], [0.5, 73, 0], [1.0, 73, 0], [1.5, 73, 0], [3, 73, 0], [0.5, 74, 0], [1.0, 74, 0], [1.5, 74, 0], [3, 74, 2], [0.5, 75, 0], [1.0, 75, 0], [1.5, 75, 0], [3, 75, 0], [0.5, 76, 0], [1.0, 76, 0], [1.5, 76, 0], [3, 76, 2], [0.5, 77, 0], [1.0, 77, 0], [1.5, 77, 0], [3, 77, 2], [0.5, 78, 0], [1.0, 78, 0], [1.5, 78, 0], [3, 78, 0], [0.5, 79, 0], [1.0, 79, 0], [1.5, 79, 0], [3, 79, 2]] )
+        self.assertEqual(b.data[0:7], [[0.5, 48, 0], [1.0, 48, 1], [1.5, 48, 0], 
+                                       [3, 48, 0], [0.5, 49, 0], [1.0, 49, 0], [1.5, 49, 0]])
         #b.write()
 
 
@@ -4929,7 +4963,9 @@ class Test(unittest.TestCase):
         b = PlotScatterWeightedPitchClassQuarterLength(s, doneAction=None, xLog=False)
         b.process()
         
-        self.assertEqual(b.data, [[0.5, 0, 0], [1.0, 0, 1], [1.5, 0, 1], [3, 0, 3], [0.5, 1, 0], [1.0, 1, 0], [1.5, 1, 0], [3, 1, 0], [0.5, 2, 0], [1.0, 2, 0], [1.5, 2, 1], [3, 2, 2], [0.5, 3, 0], [1.0, 3, 0], [1.5, 3, 0], [3, 3, 0], [0.5, 4, 1], [1.0, 4, 0], [1.5, 4, 1], [3, 4, 2], [0.5, 5, 1], [1.0, 5, 0], [1.5, 5, 0], [3, 5, 4], [0.5, 6, 0], [1.0, 6, 0], [1.5, 6, 0], [3, 6, 0], [0.5, 7, 1], [1.0, 7, 0], [1.5, 7, 0], [3, 7, 4], [0.5, 8, 0], [1.0, 8, 0], [1.5, 8, 0], [3, 8, 0], [0.5, 9, 1], [1.0, 9, 0], [1.5, 9, 0], [3, 9, 2], [0.5, 10, 0], [1.0, 10, 0], [1.5, 10, 0], [3, 10, 0], [0.5, 11, 0], [1.0, 11, 0], [1.5, 11, 1], [3, 11, 2]])
+        self.assertEqual(b.data[0:8], [[0.5, 0, 0], [1.0, 0, 1], [1.5, 0, 1], 
+                                       [3, 0, 3], [0.5, 1, 0], [1.0, 1, 0], 
+                                       [1.5, 1, 0], [3, 1, 0]])
         #b.write()
 
     def testPlotChordsB2(self):
@@ -4984,7 +5020,7 @@ class Test(unittest.TestCase):
         b = Plot3DBarsPitchSpaceQuarterLength(s, doneAction=None, xLog=False)
         b.process()
         
-        self.assertEqual(b.data, {48: [[0.5, 0], [1.0, 1], [1.5, 0], [3, 0]], 49: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 50: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 51: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 52: [[0.5, 1], [1.0, 0], [1.5, 0], [3, 0]], 53: [[0.5, 1], [1.0, 0], [1.5, 0], [3, 0]], 54: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 55: [[0.5, 1], [1.0, 0], [1.5, 0], [3, 0]], 56: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 57: [[0.5, 1], [1.0, 0], [1.5, 0], [3, 0]], 58: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 59: [[0.5, 0], [1.0, 0], [1.5, 1], [3, 0]], 60: [[0.5, 0], [1.0, 0], [1.5, 1], [3, 0]], 61: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 62: [[0.5, 0], [1.0, 0], [1.5, 1], [3, 0]], 63: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 64: [[0.5, 0], [1.0, 0], [1.5, 1], [3, 0]], 65: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]], 66: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 67: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]], 68: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 69: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]], 70: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 71: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]], 72: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 2]], 73: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 74: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]], 75: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 76: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]], 77: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]], 78: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 0]], 79: [[0.5, 0], [1.0, 0], [1.5, 0], [3, 1]]})
+        self.assertEqual(b.data[48], [[0.5, 0], [1.0, 1], [1.5, 0], [3, 0]])
         #b.write()
 
 
@@ -5151,7 +5187,8 @@ _DOC_ORDER = [
         # windowed
         PlotWindowedKrumhanslSchmuckler, PlotWindowedAmbitus,
         # scatters
-        PlotScatterPitchSpaceQuarterLength, PlotScatterPitchClassQuarterLength, PlotScatterPitchClassOffset,
+        PlotScatterPitchSpaceQuarterLength, PlotScatterPitchClassQuarterLength, 
+        PlotScatterPitchClassOffset,
         PlotScatterPitchSpaceDynamicSymbol,
         # offset based horizontal
         PlotHorizontalBarPitchSpaceOffset, PlotHorizontalBarPitchClassOffset,

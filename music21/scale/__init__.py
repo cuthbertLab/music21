@@ -2749,7 +2749,10 @@ class HarmonicMinorScale(DiatonicScale):
 
     >>> sc = scale.HarmonicMinorScale()
     >>> sc.deriveRanked(['C', 'E', 'G'], comparisonAttribute='name')
-    [(3, <music21.scale.HarmonicMinorScale F harmonic minor>), (3, <music21.scale.HarmonicMinorScale E harmonic minor>), (2, <music21.scale.HarmonicMinorScale B harmonic minor>), (2, <music21.scale.HarmonicMinorScale A harmonic minor>)]    
+    [(3, <music21.scale.HarmonicMinorScale F harmonic minor>), 
+     (3, <music21.scale.HarmonicMinorScale E harmonic minor>), 
+     (2, <music21.scale.HarmonicMinorScale B harmonic minor>), 
+     (2, <music21.scale.HarmonicMinorScale A harmonic minor>)]    
     '''
     def __init__(self, tonic=None):
         DiatonicScale.__init__(self, tonic=tonic)
@@ -2794,7 +2797,8 @@ class OctatonicScale(ConcreteScale):
 
 
 class OctaveRepeatingScale(ConcreteScale):
-    '''A concrete cyclical scale, based on a cycle of intervals. These intervals do not have to be octave completing, and thus may produce scales that do no
+    '''
+    A concrete cyclical scale, based on a cycle of intervals. 
 
     
     >>> sc = scale.OctaveRepeatingScale('c4', ['m3', 'M3']) #
@@ -2819,8 +2823,8 @@ class OctaveRepeatingScale(ConcreteScale):
 
 
 class CyclicalScale(ConcreteScale):
-    '''A concrete cyclical scale, based on a cycle of intervals. These intervals do not have to be octave completing, and thus may produce scales that do no
-
+    '''
+    A concrete cyclical scale, based on a cycle of intervals. 
     
     >>> sc = scale.CyclicalScale('c4', 'p5') # can give one list
     >>> sc.pitches
@@ -2841,7 +2845,8 @@ class CyclicalScale(ConcreteScale):
 
 
 class ChromaticScale(ConcreteScale):
-    '''A concrete cyclical scale, based on a cycle of half steps. These intervals do not have to be octave completing, and thus may produce scales that do no
+    '''
+    A concrete cyclical scale, based on a cycle of half steps. 
 
     
     >>> sc = scale.ChromaticScale('g2') 
@@ -2883,7 +2888,8 @@ class WholeToneScale(ConcreteScale):
     >>> [str(p) for p in sc.pitches]
     ['G2', 'A2', 'B2', 'C#3', 'D#3', 'E#3', 'G3']
     >>> [str(p) for p in sc.getPitches('g2', 'g5')] 
-    ['G2', 'A2', 'B2', 'C#3', 'D#3', 'E#3', 'G3', 'A3', 'B3', 'C#4', 'D#4', 'E#4', 'G4', 'A4', 'B4', 'C#5', 'D#5', 'E#5', 'G5']
+    ['G2', 'A2', 'B2', 'C#3', 'D#3', 'E#3', 'G3', 'A3', 'B3', 'C#4', 
+     'D#4', 'E#4', 'G4', 'A4', 'B4', 'C#5', 'D#5', 'E#5', 'G5']
     >>> sc.abstract.getDegreeMaxUnique()
     6
     >>> sc.pitchFromDegree(1) 
@@ -2907,7 +2913,10 @@ class WholeToneScale(ConcreteScale):
 
 
 class SieveScale(ConcreteScale):
-    '''A scale created from a Xenakis sieve logical string, based on the :class:`~music21.sieve.Sieve` object definition. The complete period of the sieve is realized as intervals and used to create a scale. 
+    '''
+    A scale created from a Xenakis sieve logical string, based on the 
+    :class:`~music21.sieve.Sieve` object definition. The complete period of the 
+    sieve is realized as intervals and used to create a scale. 
 
     
     >>> sc = scale.SieveScale('c4', '3@0') 
@@ -2940,7 +2949,8 @@ class SieveScale(ConcreteScale):
             pitchUpper=str(tonic.transpose(48)), eld=eld) 
             # four octave default
 
-        #environLocal.printDebug([self._pitchSieve.sieveObject.represent(), self._pitchSieve.getIntervalSequence()])
+        #environLocal.printDebug([self._pitchSieve.sieveObject.represent(),
+        #      self._pitchSieve.getIntervalSequence()])
         # mode here is a list of intervals
         self._abstract = AbstractCyclicalScale(
                          mode=self._pitchSieve.getIntervalSequence())
@@ -3186,19 +3196,22 @@ class Test(unittest.TestCase):
         sc2 = MinorScale()
 
         # we can get a range of pitches
-        self.assertEqual(self.pitchOut(sc2.getPitches('c2', 'c5')), '[C2, D2, E-2, F2, G2, A-2, B-2, C3, D3, E-3, F3, G3, A-3, B-3, C4, D4, E-4, F4, G4, A-4, B-4, C5]')
+        self.assertEqual(self.pitchOut(sc2.getPitches('c2', 'c5')), 
+                         '[C2, D2, E-2, F2, G2, A-2, B-2, C3, D3, E-3, F3, G3, A-3, B-3, C4, D4, E-4, F4, G4, A-4, B-4, C5]')
 
 
 
         # we can transpose the Scale
         sc3 = sc2.transpose('-m3')
-        self.assertEqual(self.pitchOut(sc3.getPitches('c2', 'c5')), '[C2, D2, E2, F2, G2, A2, B2, C3, D3, E3, F3, G3, A3, B3, C4, D4, E4, F4, G4, A4, B4, C5]')
+        self.assertEqual(self.pitchOut(sc3.getPitches('c2', 'c5')), 
+                         '[C2, D2, E2, F2, G2, A2, B2, C3, D3, E3, F3, G3, A3, B3, C4, D4, E4, F4, G4, A4, B4, C5]')
         
         # getting pitches from scale degrees
         self.assertEqual(str(sc3.pitchFromDegree(3)), 'C4')
         self.assertEqual(str(sc3.pitchFromDegree(7)), 'G4')
         self.assertEqual(self.pitchOut(sc3.pitchesFromScaleDegrees([1,5,6])), '[A3, E4, F4, A4]')
-        self.assertEqual(self.pitchOut(sc3.pitchesFromScaleDegrees([2,3], minPitch='c6', maxPitch='c9')), '[C6, B6, C7, B7, C8, B8, C9]')
+        self.assertEqual(self.pitchOut(sc3.pitchesFromScaleDegrees([2,3], minPitch='c6', maxPitch='c9')), 
+                         '[C6, B6, C7, B7, C8, B8, C9]')
 
 
         # given a pitch, get the scale degree
@@ -3248,7 +3261,11 @@ class Test(unittest.TestCase):
                 n = note.Note(p)
                 n.quarterLength = y
                 s.append(n)
-        self.assertEqual(self.pitchOut(s.pitches), '[E4, F#4, G#4, A4, B4, C#5, D#5, B4, G#4, E4, C#4, A3, F#3, D#3, G#3, C#4, F#4, B4, E5, A5, D#6, G#5, C#5, F#4, B3, E3, A2, D#2, G#2, C#3, F#3, B3, E4, A4, D#5, B4, G#4, E4, C#4, A3, F#3, D#3, E3, F#3, G#3, A3, B3, C#4, D#4]')
+        self.assertEqual(self.pitchOut(s.pitches), 
+                         '[E4, F#4, G#4, A4, B4, C#5, D#5, B4, G#4, E4, C#4, A3, F#3, D#3, ' + 
+                         'G#3, C#4, F#4, B4, E5, A5, D#6, G#5, C#5, F#4, B3, E3, A2, D#2, G#2, ' + 
+                         'C#3, F#3, B3, E4, A4, D#5, B4, G#4, E4, C#4, A3, F#3, D#3, E3, F#3, ' + 
+                         'G#3, A3, B3, C#4, D#4]')
         #s.show()
 
 
@@ -3303,7 +3320,9 @@ class Test(unittest.TestCase):
         sc = CyclicalScale('c4', ['m2', 'm2']) 
 
         # we get speling based on maxAccidental paramete
-        self.assertEqual(self.pitchOut(sc.getPitches('g4', 'g6')), '[G4, A-4, A4, B-4, C-5, C5, D-5, D5, E-5, F-5, F5, G-5, G5, A-5, A5, B-5, C-6, C6, D-6, D6, E-6, F-6, F6, G-6, G6]')
+        self.assertEqual(self.pitchOut(sc.getPitches('g4', 'g6')), 
+                         '[G4, A-4, A4, B-4, C-5, C5, D-5, D5, E-5, F-5, F5, G-5, ' + 
+                          'G5, A-5, A5, B-5, C-6, C6, D-6, D6, E-6, F-6, F6, G-6, G6]')
 
         # these values are different because scale degree 1 has different 
         # pitches in different registers, as this is a non-octave repeating
@@ -3354,22 +3373,28 @@ class Test(unittest.TestCase):
         mm = MelodicMinorScale('a')
         self.assertEqual(self.pitchOut(mm.pitches), '[A4, B4, C5, D5, E5, F#5, G#5, A5]')
 
-        self.assertEqual(self.pitchOut(mm.getPitches(direction='ascending')), '[A4, B4, C5, D5, E5, F#5, G#5, A5]')
+        self.assertEqual(self.pitchOut(mm.getPitches(direction='ascending')), 
+                         '[A4, B4, C5, D5, E5, F#5, G#5, A5]')
 
-        self.assertEqual(self.pitchOut(mm.getPitches('c1', 'c3', direction='descending')), '[C3, B2, A2, G2, F2, E2, D2, C2, B1, A1, G1, F1, E1, D1, C1]')
+        self.assertEqual(self.pitchOut(mm.getPitches('c1', 'c3', direction='descending')), 
+                         '[C3, B2, A2, G2, F2, E2, D2, C2, B1, A1, G1, F1, E1, D1, C1]')
 
 
         # TODO: this shows a problem with a bidirectional scale: we are 
         # always starting at the tonic and moving up or down; so this is still
         # giving a descended portion, even though an asecnding portion was requested
-        self.assertEqual(self.pitchOut(mm.getPitches('c1', 'c3', direction='ascending')), '[C1, D1, E1, F#1, G#1, A1, B1, C2, D2, E2, F#2, G#2, A2, B2, C3]')
+        self.assertEqual(self.pitchOut(mm.getPitches('c1', 'c3', direction='ascending')), 
+                         '[C1, D1, E1, F#1, G#1, A1, B1, C2, D2, E2, F#2, G#2, A2, B2, C3]')
 
-        self.assertEqual(self.pitchOut(mm.getPitches('c1', 'c3', direction='descending')), '[C1, D1, E1, F1, G1, A1, B1, C2, D2, E2, F2, G2, A2, B2, C3]')
+        self.assertEqual(self.pitchOut(mm.getPitches('c1', 'c3', direction='descending')), 
+                         '[C1, D1, E1, F1, G1, A1, B1, C2, D2, E2, F2, G2, A2, B2, C3]')
 
 
-        self.assertEqual(self.pitchOut(mm.getPitches('a5', 'a6', direction='ascending')), '[A5, B5, C6, D6, E6, F#6, G#6, A6]')
+        self.assertEqual(self.pitchOut(mm.getPitches('a5', 'a6', direction='ascending')), 
+                         '[A5, B5, C6, D6, E6, F#6, G#6, A6]')
 
-        self.assertEqual(self.pitchOut(mm.getPitches('a5', 'a6', direction='descending')), '[A6, G6, F6, E6, D6, C6, B5, A5]')
+        self.assertEqual(self.pitchOut(mm.getPitches('a5', 'a6', direction='descending')), 
+                         '[A6, G6, F6, E6, D6, C6, B5, A5]')
 
 
         self.assertEqual(mm.getScaleDegreeFromPitch('a3'), 1)
@@ -3386,7 +3411,8 @@ class Test(unittest.TestCase):
 
         # the bi directional representation has a version of each instance
         # merged
-        self.assertEqual(self.pitchOut(mm.getPitches('a4', 'a5', direction='bi')), '[A4, B4, C5, D5, E5, F#5, F5, G#5, G5, A5]')
+        self.assertEqual(self.pitchOut(mm.getPitches('a4', 'a5', direction='bi')), 
+                         '[A4, B4, C5, D5, E5, F#5, F5, G#5, G5, A5]')
 
         # in a bi-directional representation, both g and g# are will return
         # scale degree 7
@@ -3423,8 +3449,10 @@ class Test(unittest.TestCase):
         # todo: this is ambiguous case
         #self.assertEqual(mm.pitchFromDegree(6, direction='bi').nameWithOctave, 'F5')
 
-        self.assertEqual(self.pitchOut(mm.getPitches(None, None, direction='descending')), '[A5, G5, F5, E5, D5, C5, B4, A4]')
-        self.assertEqual(self.pitchOut(mm.getPitches(None, None, direction='ascending')), '[A4, B4, C5, D5, E5, F#5, G#5, A5]')
+        self.assertEqual(self.pitchOut(mm.getPitches(None, None, direction='descending')), 
+                         '[A5, G5, F5, E5, D5, C5, B4, A4]')
+        self.assertEqual(self.pitchOut(mm.getPitches(None, None, direction='ascending')), 
+                         '[A4, B4, C5, D5, E5, F#5, G#5, A5]')
 
 
 
@@ -3468,7 +3496,10 @@ class Test(unittest.TestCase):
                 s.append(n)
         s.makeAccidentals()
 
-        self.assertEqual(self.pitchOut(s.pitches), '[G3, A3, B-3, C4, D4, E4, F#4, G4, F4, E-4, D4, C4, B-3, C4, D4, E4, F#4, G4, A4, B-4, C5, B-4, A4, G4, F4, E-4, E4, F#4, G4, A4, B-4, C5, D5, E5, E-5, D5, C5, B-4, A4, B-4, C5, D5, E5, F#5, G5, A5, B-5, A5, G5, F5, E-5, D5]')
+        self.assertEqual(self.pitchOut(s.pitches), 
+            '[G3, A3, B-3, C4, D4, E4, F#4, G4, F4, E-4, D4, C4, B-3, C4, D4, E4, F#4, ' + 
+             'G4, A4, B-4, C5, B-4, A4, G4, F4, E-4, E4, F#4, G4, A4, B-4, C5, D5, E5, ' + 
+             'E-5, D5, C5, B-4, A4, B-4, C5, D5, E5, F#5, G5, A5, B-5, A5, G5, F5, E-5, D5]')
 
 
         #s.show()
@@ -3509,9 +3540,11 @@ class Test(unittest.TestCase):
 # 
 #         self.assertEqual(str(hs.pitchFromDegree(1)), 'G3')
 
-        self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c4', direction='ascending')), '[C2, D2, F2, G2, A-2, C3, D3, F3, G3, A-3, C4]')
+        self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c4', direction='ascending')), 
+                         '[C2, D2, F2, G2, A-2, C3, D3, F3, G3, A-3, C4]')
 
-        self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c4', direction='descending')), '[C4, B-3, A-3, G3, F3, E-3, D3, C3, B-2, A-2, G2, F2, E-2, D2, C2]')
+        self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c4', direction='descending')), 
+                         '[C4, B-3, A-3, G3, F3, E-3, D3, C3, B-2, A-2, G2, F2, E-2, D2, C2]')
 
         self.assertEqual(str(sc.next('c1', 'ascending')), 'D1')
         self.assertEqual(str(sc.next('d1', 'ascending')), 'F1')
@@ -3540,15 +3573,19 @@ class Test(unittest.TestCase):
 
         self.assertEqual(self.pitchOut(sc.pitches), '[C4, D-4, E4, F#4, A4, B4, A4, C5, D-5]')
 
-        self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c3', direction='ascending')), '[C2, D-2, E2, F#2, A2, B2, A2, C3]')
+        self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c3', direction='ascending')), 
+                         '[C2, D-2, E2, F#2, A2, B2, A2, C3]')
 
 
-        self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c4', direction='ascending')), '[C2, D-2, E2, F#2, A2, B2, A2, C3, D-3, E3, F#3, A3, B3, A3, C4]')
+        self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c4', direction='ascending')), 
+                         '[C2, D-2, E2, F#2, A2, B2, A2, C3, D-3, E3, F#3, A3, B3, A3, C4]')
 
-        self.assertEqual(self.pitchOut(sc.getPitches('c3', 'd-4', direction='descending')), '[D-4, C4, D-4, B3, A3, F#3, E3, D-3, C3]')
+        self.assertEqual(self.pitchOut(sc.getPitches('c3', 'd-4', direction='descending')), 
+                         '[D-4, C4, D-4, B3, A3, F#3, E3, D-3, C3]')
  
         # is this correct: this cuts off the d-4, as it is outside of the range
-        self.assertEqual(self.pitchOut(sc.getPitches('c3', 'c4', direction='descending')), '[C4, B3, A3, F#3, E3, D-3, C3]')
+        self.assertEqual(self.pitchOut(sc.getPitches('c3', 'c4', direction='descending')), 
+                         '[C4, B3, A3, F#3, E3, D-3, C3]')
  
 
         self.assertEqual(str(sc.next('c1', 'ascending')), 'D-1')
@@ -3760,29 +3797,39 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
         sc = ScalaScale('e2', 'fj 12tet')
         # this is showing that there are slight microtonal adjustments but they are less than one cent large
-        self.assertEqual(self.pitchOut(sc.pitches), '[E2, F2(+0c), F#2(0c), G2(0c), A-2(+0c), G##2(-2c), B-2(+0c), B2(0c), C3(+1c), D-3(+0c), D3(+0c), D#3(-12c), E3]')
+        self.assertEqual(self.pitchOut(sc.pitches), 
+                         '[E2, F2(+0c), F#2(0c), G2(0c), A-2(+0c), G##2(-2c), B-2(+0c), B2(0c), ' + 
+                         'C3(+1c), D-3(+0c), D3(+0c), D#3(-12c), E3]')
 
         # 7 tone scale
         sc = ScalaScale('c2', 'mbira zimb')
-        self.assertEqual(self.pitchOut(sc.pitches), '[C2, C#2(-2c), D~2(+21c), E~2(+22c), F#~2(-8c), G~2(+21c), A~2(+2c), B~2(-2c)]')
+        self.assertEqual(self.pitchOut(sc.pitches), 
+            '[C2, C#2(-2c), D~2(+21c), E~2(+22c), F#~2(-8c), G~2(+21c), A~2(+2c), B~2(-2c)]')
 
         # 21 tone scale
         sc = ScalaScale('c2', 'mbira_mude')
-        self.assertEqual(self.pitchOut(sc.pitches), '[C2, D`2(+24c), D#2(-11c), F#2(-25c), F#2(+12c), G~2(+20c), B~2(-4c), A#2(-24c), E#3(-22c), D~3(+17c), F#~3(-2c), G#3(-13c), A3(+15c), C#~3(-24c), A3(+17c), B~3(-2c), C#~4(-22c), D~4(-4c), E~4(+10c), F#~4(-18c), G#4(+5c), B`4(+15c)]')
+        self.assertEqual(self.pitchOut(sc.pitches), 
+            '[C2, D`2(+24c), D#2(-11c), F#2(-25c), F#2(+12c), G~2(+20c), B~2(-4c), A#2(-24c), ' + 
+             'E#3(-22c), D~3(+17c), F#~3(-2c), G#3(-13c), A3(+15c), C#~3(-24c), A3(+17c), ' + 
+             'B~3(-2c), C#~4(-22c), D~4(-4c), E~4(+10c), F#~4(-18c), G#4(+5c), B`4(+15c)]')
         #sc.show()
 
         # two octave slendro scale
         sc = ScalaScale('c2', 'slendro_pliat')
-        self.assertEqual(self.pitchOut(sc.pitches), '[C2, D~2(-15c), E~2(+4c), G2(+5c), A~2(-23c), C3, D~3(-15c), E~3(+4c), G3(+5c), A~3(-23c)]')
+        self.assertEqual(self.pitchOut(sc.pitches), 
+            '[C2, D~2(-15c), E~2(+4c), G2(+5c), A~2(-23c), C3, D~3(-15c), E~3(+4c), ' + 
+            'G3(+5c), A~3(-23c)]')
 
 
         # 5 note slendro scale
         sc = ScalaScale('c2', 'slendro_ang2')
-        self.assertEqual(self.pitchOut(sc.pitches), '[C2, D#2(-22c), F~2(+19c), G~2(-10c), B`2(-8c), C3]')
+        self.assertEqual(self.pitchOut(sc.pitches), 
+                         '[C2, D#2(-22c), F~2(+19c), G~2(-10c), B`2(-8c), C3]')
 
         # 5 note slendro scale
         sc = ScalaScale('c2', 'slendroc5.scl')
-        self.assertEqual(self.pitchOut(sc.pitches), '[C2, D~2(-14c), E~2(+4c), G2(+5c), A~2(-22c), C3]')
+        self.assertEqual(self.pitchOut(sc.pitches), 
+                         '[C2, D~2(-14c), E~2(+4c), G2(+5c), A~2(-22c), C3]')
 
         s = stream.Stream()
         s.append(meter.TimeSignature('6/4'))
@@ -3838,15 +3885,20 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         p1 = s.parts[0]
         #p1.show('midi')
 
-        self.assertEqual(self.pitchOut(p1.pitches), '[C#5, B4, A4, B4, C#5, E5, C#5, B4, A4, C#5, A4, B4, G#4, F#4, A4, B4, B4, F#4, E4, A4, B4, C#5, C#5, A4, B4, C#5, A4, G#4, F#4, G#4, F#4, F#4, F#4, F#4, F#4, E#4, F#4]')
+        self.assertEqual(self.pitchOut(p1.pitches[0:10]), 
+                         '[C#5, B4, A4, B4, C#5, E5, C#5, B4, A4, C#5]')
 
         sc = ScalaScale('C4', 'fokker_12.scl')
-        self.assertEqual(self.pitchOut(sc.pitches), '[C4, D-4(+19c), D4(+4c), D~4(+17c), E4(-14c), F4(-2c), F#4(-10c), G4(+2c), A-4(+21c), G##4(-16c), A~4(+19c), B4(-12c), C5]')
+        self.assertEqual(self.pitchOut(sc.pitches), 
+            '[C4, D-4(+19c), D4(+4c), D~4(+17c), E4(-14c), F4(-2c), F#4(-10c), G4(+2c), ' + 
+            'A-4(+21c), G##4(-16c), A~4(+19c), B4(-12c), C5]')
         sc.tune(s)
 
         p1 = s.parts[0]
         # problem of not matching enhamronics
-        self.assertEqual(self.pitchOut(p1.pitches), '[C#5(+19c), B4(-12c), A4(-16c), B4(-12c), C#5(+19c), E5(-14c), C#5(+19c), B4(-12c), A4(-16c), C#5(+19c), A4(-16c), B4(-12c), G#4(+21c), F#4(-10c), A4(-16c), B4(-12c), B4(-12c), F#4(-10c), E4(-14c), A4(-16c), B4(-12c), C#5(+19c), C#5(+19c), A4(-16c), B4(-12c), C#5(+19c), A4(-16c), G#4(+21c), F#4(-10c), G#4(+21c), F#4(-10c), F#4(-10c), F#4(-10c), F#4(-10c), F#4(-10c), E#4(-2c), F#4(-10c)]')
+        self.assertEqual(self.pitchOut(p1.pitches[0:10]), 
+            '[C#5(+19c), B4(-12c), A4(-16c), B4(-12c), C#5(+19c), E5(-14c), C#5(+19c), ' + 
+             'B4(-12c), A4(-16c), C#5(+19c)]')
         #p1.show('midi')
 
 
@@ -3858,14 +3910,20 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
         s = corpus.parse('bwv66.6')
         sc = ScalaScale('C4', 'fokker_12.scl')
-        self.assertEqual(self.pitchOut(sc.pitches), '[C4, D-4(+19c), D4(+4c), D~4(+17c), E4(-14c), F4(-2c), F#4(-10c), G4(+2c), A-4(+21c), G##4(-16c), A~4(+19c), B4(-12c), C5]')
+        self.assertEqual(self.pitchOut(sc.pitches), 
+                '[C4, D-4(+19c), D4(+4c), D~4(+17c), E4(-14c), F4(-2c), F#4(-10c), G4(+2c), ' + 
+                'A-4(+21c), G##4(-16c), A~4(+19c), B4(-12c), C5]')
 
         sc.tune(s)
         #s.show('midi')
-        self.assertEqual(self.pitchOut(s.parts[0].pitches), '[C#5(+19c), B4(-12c), A4(-16c), B4(-12c), C#5(+19c), E5(-14c), C#5(+19c), B4(-12c), A4(-16c), C#5(+19c), A4(-16c), B4(-12c), G#4(+21c), F#4(-10c), A4(-16c), B4(-12c), B4(-12c), F#4(-10c), E4(-14c), A4(-16c), B4(-12c), C#5(+19c), C#5(+19c), A4(-16c), B4(-12c), C#5(+19c), A4(-16c), G#4(+21c), F#4(-10c), G#4(+21c), F#4(-10c), F#4(-10c), F#4(-10c), F#4(-10c), F#4(-10c), E#4(-2c), F#4(-10c)]')
-
-        self.assertEqual(self.pitchOut(s.parts[1].pitches), '[E4(-14c), F#4(-10c), E4(-14c), E4(-14c), E4(-14c), E4(-14c), A4(-16c), G#4(+21c), E4(-14c), G#4(+21c), F#4(-10c), G#4(+21c), E#4(-2c), C#4(+19c), F#4(-10c), F#4(-10c), E4(-14c), D#4, C#4(+19c), C#4(+19c), F#4(-10c), E4(-14c), E4(-14c), A4(-16c), F#4(-10c), F#4(-10c), G#4(+21c), F#4(-10c), F#4(-10c), E#4(-2c), F#4(-10c), F#3(-10c), C#4(+19c), C#4(+19c), D4(+4c), E4(-14c), D4(+4c), C#4(+19c), B3(-12c), C#4(+19c), D4(+4c), C#4(+19c)]')
-
+        self.assertEqual(self.pitchOut(s.parts[0].pitches[0:10]), 
+                '[C#5(+19c), B4(-12c), A4(-16c), B4(-12c), C#5(+19c), E5(-14c), C#5(+19c), ' + 
+                 'B4(-12c), A4(-16c), C#5(+19c)]')
+        
+        self.assertEqual(self.pitchOut(s.parts[1].pitches[0:10]), 
+                '[E4(-14c), F#4(-10c), E4(-14c), E4(-14c), E4(-14c), ' + 
+                 'E4(-14c), A4(-16c), G#4(+21c), E4(-14c), G#4(+21c)]')
+        
     def testTunePythag(self):
         '''
         Applies a pythagorean tuning to a section of D. Luca's Gloria
@@ -3898,7 +3956,8 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
     def testChromaticScaleA(self):
 
         cs = ChromaticScale('c4')
-        self.assertEqual(self.pitchOut(cs.pitches), '[C4, C#4, D4, E-4, E4, F4, F#4, G4, A-4, A4, B-4, B4, C5]')
+        self.assertEqual(self.pitchOut(cs.pitches), 
+                         '[C4, C#4, D4, E-4, E4, F4, F#4, G4, A-4, A4, B-4, B4, C5]')
         
 
 
@@ -3908,16 +3967,27 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
 
         sc = SieveScale('d4', '1@0', eld=2)
-        self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c4')), '[C2, D2, F-2, G-2, A-2, B-2, C3, D3, F-3, G-3, A-3, B-3, C4]') 
+        self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c4')), 
+                         '[C2, D2, F-2, G-2, A-2, B-2, C3, D3, F-3, G-3, A-3, B-3, C4]') 
 
 
         sc = SieveScale('d4', '1@0', eld=.5)
-        self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c4')), '[C2, C~2, D-2, D`2, D2, D~2, E-2, E`2, F-2, F`2, F2, F~2, G-2, G`2, G2, G~2, A-2, A`2, A2, A~2, B-2, B`2, C-3, C`3, C3, C~3, D-3, D`3, D3, D~3, E-3, E`3, F-3, F`3, F3, F~3, G-3, G`3, G3, G~3, A-3, A`3, A3, A~3, B-3, B`3, C-4, C`4, C4]') 
+        self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c4')), 
+                '[C2, C~2, D-2, D`2, D2, D~2, E-2, E`2, F-2, F`2, F2, F~2, G-2, ' + 
+                 'G`2, G2, G~2, A-2, A`2, A2, A~2, B-2, B`2, C-3, C`3, C3, C~3, D-3, ' + 
+                 'D`3, D3, D~3, E-3, E`3, F-3, F`3, F3, F~3, G-3, G`3, G3, G~3, A-3, ' + 
+                 'A`3, A3, A~3, B-3, B`3, C-4, C`4, C4]') 
 
 
         sc = SieveScale('d4', '1@0', eld=.25)
-        self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c4')), '[C2, C2(+25c), C~2, C#2(-25c), D-2, D`2(-25c), D`2, D2(-25c), D2, D2(+25c), D~2, D#2(-25c), E-2, E`2(-25c), E`2, E2(-25c), F-2, F`2(-25c), F`2, F2(-25c), F2, F2(+25c), F~2, F#2(-25c), G-2, G`2(-25c), G`2, G2(-25c), G2, G2(+25c), G~2, G#2(-25c), A-2, A`2(-25c), A`2, A2(-25c), A2, A2(+25c), A~2, A#2(-25c), B-2, B`2(-25c), B`2, B2(-25c), C-3, C`3(-25c), C`3, C3(-25c), C3, C3(+25c), C~3, C#3(-25c), D-3, D`3(-25c), D`3, D3(-25c), D3, D3(+25c), D~3, D#3(-25c), E-3, E`3(-25c), E`3, E3(-25c), F-3, F`3(-25c), F`3, F3(-25c), F3, F3(+25c), F~3, F#3(-25c), G-3, G`3(-25c), G`3, G3(-25c), G3, G3(+25c), G~3, G#3(-25c), A-3, A`3(-25c), A`3, A3(-25c), A3, A3(+25c), A~3, A#3(-25c), B-3, B`3(-25c), B`3, B3(-25c), C-4, C`4(-25c), C`4, C4(-25c), C4]') 
-
+        self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c3')), 
+                '[C2, C2(+25c), C~2, C#2(-25c), D-2, D`2(-25c), D`2, D2(-25c), D2, ' + 
+                 'D2(+25c), D~2, D#2(-25c), E-2, E`2(-25c), E`2, E2(-25c), F-2, F`2(-25c), ' + 
+                 'F`2, F2(-25c), F2, F2(+25c), F~2, F#2(-25c), G-2, G`2(-25c), G`2, G2(-25c), ' + 
+                 'G2, G2(+25c), G~2, G#2(-25c), A-2, A`2(-25c), A`2, A2(-25c), A2, A2(+25c), ' + 
+                 'A~2, A#2(-25c), B-2, B`2(-25c), B`2, B2(-25c), C-3, C`3(-25c), C`3, ' + 
+                 'C3(-25c), C3]')
+        
 
     def testDerivedScaleNoOctaves(self):
         d = ConcreteScale(pitches = ['a', 'b', 'c', 'd', 'e', 'f', 'g#', 'a'])

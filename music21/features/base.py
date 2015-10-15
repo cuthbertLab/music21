@@ -910,7 +910,13 @@ class DataSet(object):
         >>> f = [features.jSymbolic.PitchClassDistributionFeature, features.jSymbolic.ChangesOfMeterFeature]
         >>> ds = features.DataSet(classLabel='Composer', featureExtractors=f)
         >>> ds.getAttributeLabels(includeId=False)
-        ['Pitch_Class_Distribution_0', 'Pitch_Class_Distribution_1', 'Pitch_Class_Distribution_2', 'Pitch_Class_Distribution_3', 'Pitch_Class_Distribution_4', 'Pitch_Class_Distribution_5', 'Pitch_Class_Distribution_6', 'Pitch_Class_Distribution_7', 'Pitch_Class_Distribution_8', 'Pitch_Class_Distribution_9', 'Pitch_Class_Distribution_10', 'Pitch_Class_Distribution_11', 'Changes_of_Meter', 'Composer']
+        ['Pitch_Class_Distribution_0', 
+         'Pitch_Class_Distribution_1', 
+         ...
+         ...
+         'Pitch_Class_Distribution_11', 
+         'Changes_of_Meter', 
+         'Composer']
         '''
         post = []
         # place ids first
@@ -992,7 +998,8 @@ class DataSet(object):
         self.streams.append(s)
 
     def process(self):
-        '''Process all Data with all FeatureExtractors. Processed data is stored internally as numerous Feature objects. 
+        '''Process all Data with all FeatureExtractors. 
+        Processed data is stored internally as numerous Feature objects. 
         '''
         # clear features
         self._features = []
@@ -1333,17 +1340,18 @@ class Test(unittest.TestCase):
         from music21 import features, note
 
         s = stream.Stream()
-        for p in ['c4', 'c4', 'd-4', 'd#4', 'f#4', 'a#4', 'd#5', 'a5']:
+        for p in ['c4', 'c4', 'd-4', 'd#4', 'f#4', 'a#4', 'd#5', 'a5', 'a5']:
             s.append(note.Note(p))
         di = features.DataInstance(s)
-        self.assertEqual(di['midiIntervalHistogram'], [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        self.assertEqual(di['midiIntervalHistogram'], 
+                         [2, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+                          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+                          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+                          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+                          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+                          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
-#         # in most cases will want to get a vector for each part
-#         s = corpus.parse('corelli/opus3no1/1grave')
-#         di = features.DataInstance(s)
-#         self.assertEqual(di['parts'][0]['midiIntervalHistogram'], [9, 1, 4, 3, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-# 
-#         self.assertEqual(di['parts'][1]['midiIntervalHistogram'], [0, 1, 3, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 
     def testStreamFormsC(self):
