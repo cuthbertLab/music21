@@ -89,16 +89,21 @@ class Metadata(base.Music21Object):
     >>> md.title
     'Rhapsody in Blue'
 
+
+    These are used by .search() methods to determine what attributes are
+    made available by default.
+
+    >>> md.searchAttributes
+    ('alternativeTitle', 'composer', 'date', 'localeOfComposition', 
+     'movementName', 'movementNumber', 'number', 'opusNumber', 'title')
     '''
 
     ### CLASS VARIABLES ###
 
     classSortOrder = -30
 
-    # used for the search() methods to determine what attributes
-    # are made available by default; add more as properties/import
-    # exists
-    _searchAttributes = (
+    # add more as properties/import exists
+    searchAttributes = (
         'alternativeTitle',
         'composer',
         'date',
@@ -396,7 +401,7 @@ class Metadata(base.Music21Object):
             except AttributeError:
                 pass
             if not match:
-                for searchAttribute in self._searchAttributes:
+                for searchAttribute in self.searchAttributes:
                     #environLocal.printDebug(['comparing fields:', f, field])
                     # look for partial match in all fields
                     if field.lower() in searchAttribute.lower():
@@ -408,7 +413,7 @@ class Metadata(base.Music21Object):
             if not match:
                 return False, None
         else:  # get all fields
-            for field in self._searchAttributes:
+            for field in self.searchAttributes:
                 value = getattr(self, field)
                 valueFieldPairs.append((value, field))
         # for now, make all queries strings
@@ -744,14 +749,21 @@ class RichMetadata(Metadata):
     'Concerto in F'
 
     >>> richMetadata.keySignatureFirst = key.KeySignature(-1)
-    >>> 'keySignatureFirst' in richMetadata._searchAttributes
+    >>> 'keySignatureFirst' in richMetadata.searchAttributes
     True
+    >>> richMetadata.searchAttributes
+    ('alternativeTitle', 'ambitus', 'composer', 'date', 
+     'keySignatureFirst', 'keySignatures', 'localeOfComposition', 
+     'movementName', 'movementNumber', 'noteCount', 'number', 
+     'opusNumber', 'pitchHighest', 'pitchLowest', 'quarterLength', 
+     'tempoFirst', 'tempos', 'timeSignatureFirst', 'timeSignatures', 'title')
+
 
     '''
 
     ### CLASS VARIABLES ###
 
-    _searchAttributes = tuple(sorted(Metadata._searchAttributes + (
+    searchAttributes = tuple(sorted(Metadata.searchAttributes + (
         'ambitus',
         'keySignatureFirst',
         'keySignatures',

@@ -1067,7 +1067,7 @@ class MetadataBundle(object):
         'title'
         '''
         from music21 import metadata
-        return tuple(sorted(metadata.RichMetadata._searchAttributes))
+        return tuple(sorted(metadata.RichMetadata.searchAttributes))
 
     def read(self, filePath=None):
         r'''
