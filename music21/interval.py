@@ -1056,6 +1056,17 @@ class DiatonicInterval(IntervalBase):
         return ChromaticInterval(semitones)
 
 
+    @property
+    def specifierAbbreviation(self):
+        '''
+        Returns the abbreviation for the specifier.
+        
+        >>> i = interval.Interval('M-10')
+        >>> d = i.diatonic
+        >>> d.specifierAbbreviation
+        'M'
+        '''
+        return prefixSpecs[self.specifier]
 
     def _getCents(self):
         c = self.getChromatic()
