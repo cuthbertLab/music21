@@ -240,9 +240,7 @@ class Timer(object):
         return str(round(t,3))
 
 
-
-
-
 if __name__ == '__main__':
     import music21
     music21.mainTest()
+

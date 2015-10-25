@@ -9640,15 +9640,18 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     # clefs
                     mActive.mergeElements(m, classFilterList=(
                                                 'Bar', 'TimeSignature', 'Clef', 'KeySignature'))
+                    vIndex = 0  # should not be necessary, but pylint warns on loop variables
+                                # that could possibly be undefined used out of the loop.
                     for vIndex, v in enumerate(m.voices):
                         # make an independent copy
                         mNew = copy.deepcopy(mActive)
                         # merge all elements from the voice
                         mNew.mergeElements(v)
                         # insert in the appropriate part
-                        s.parts[vIndex].insert( self.elementOffset(m), mNew)
-                        
-                    for emptyIndex in range(vIndex+1, partCount):
+                        s.parts[vIndex].insert(self.elementOffset(m), mNew)
+                    
+                    # vIndex is now the number of voices - 1.  Fill empty voices 
+                    for emptyIndex in range(vIndex + 1, partCount):
                         s.parts[emptyIndex].insert(self.elementOffset(m), copy.deepcopy(mActive))
                 # if a measure does not have voices, simply populate
                 # with elements and append

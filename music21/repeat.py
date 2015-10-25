@@ -9,15 +9,14 @@
 # Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
-
 '''
 This module provides the base class for all RepeatMark objects: entities that denote repeats.
 
 Some RepeatMark objects are Expression objects; others are Bar objects. See for instance,
-:class:`~music21.bar.Repeat` which represents a normal barline repeat.
-
+the :class:`~music21.bar.Repeat` which represents a normal barline repeat.
 '''
+from __future__ import division, print_function
+
 import copy
 import unittest
 
@@ -2780,7 +2779,7 @@ class RepeatFinder(object):
         else:
             mGroups = self._mGroups
             
-        mGroups = [x for x in mGroups if len(x[0]) >= threshold]    #only want long enough measure groups
+        mGroups = [x for x in mGroups if len(x[0]) >= threshold] #only want long enough measure groups
             
         #sort them giving first priority to larger groups, then to groups that occur earlier
 #         def aGoodOrder(x,y):
@@ -2902,9 +2901,15 @@ class Test(unittest.TestCase):
         #post.show()
         self.assertEqual(len(post.getElementsByClass('Measure')), 12)
         self.assertEqual(len(post.flat.notesAndRests), 48)
-        self.assertEqual([m.offset for m in post.getElementsByClass('Measure')], [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0, 36.0, 40.0, 44.0])
+        self.assertEqual([m.offset for m in post.getElementsByClass('Measure')], 
+                         [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0, 36.0, 40.0, 44.0])
 
-        self.assertEqual([n.nameWithOctave for n in post.flat.getElementsByClass('Note')], ['G3', 'G3', 'G3', 'G3', 'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4', 'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4', 'F4', 'F4', 'F4', 'F4', 'G3', 'G3', 'G3', 'G3', 'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4', 'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4', 'F4', 'F4', 'F4', 'F4'])
+        self.assertEqual([n.nameWithOctave for n in post.flat.getElementsByClass('Note')], 
+                         ['G3', 'G3', 'G3', 'G3', 'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4', 
+                          'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4', 
+                          'F4', 'F4', 'F4', 'F4', 'G3', 'G3', 'G3', 'G3', 'B3', 'B3', 'B3', 'B3', 
+                          'D4', 'D4', 'D4', 'D4', 'B3', 'B3', 'B3', 'B3', 
+                          'D4', 'D4', 'D4', 'D4', 'F4', 'F4', 'F4', 'F4'])
 
 
 
@@ -3290,8 +3295,8 @@ class Test(unittest.TestCase):
         self.assertEqual(str(s.flat.pitches[0]), 'A2')
             
         self.assertEqual(features.vectorById(s, 'p20'), 
-                         [1.0, 0.333333333333333333333, 0.0, 1.0, 0.3333333333333333333, 
-                          0.0, 1.0, 0.3333333333333333, 0.0, 1.0, 0.333333333333333333333, 0.0])
+                         [1.0, 1/3, 0.0, 1.0, 1/3, 
+                          0.0, 1.0, 1/3, 0.0, 1.0, 1/3, 0.0])
         self.assertEqual([x.nameWithOctave for x in s.flat.pitches], 
                          ['A2', 'B-3', 'A2', 'A2', 'C3', 'D-4', 'C3', 'C3', 'E-3', 
                           'F-4', 'E-3', 'E-3', 'F#3', 'G4', 'F#3', 'F#3', 'A3', 
@@ -3839,7 +3844,9 @@ class Test(unittest.TestCase):
         post = ex.process()
         #post.show()
         self.assertEqual(len(post.getElementsByClass('Measure')), 7)
-        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4', 'C4', 'C4', 'E4', 'E4', 'B4', 'B4'] )
+        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], 
+                         ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4', 
+                          'C4', 'C4', 'E4', 'E4', 'B4', 'B4'] )
 
 
     def testExpandRepeatExpressionJ(self):        
@@ -3883,7 +3890,9 @@ class Test(unittest.TestCase):
         post = s.expandRepeats()
         #post.show()
         self.assertEqual(len(post.getElementsByClass('Measure')), 7)
-        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4', 'C4', 'C4', 'E4', 'E4', 'B4', 'B4'] )
+        self.assertEqual([x.nameWithOctave for x in post.flat.pitches], 
+                         ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4', 
+                          'C4', 'C4', 'E4', 'E4', 'B4', 'B4'] )
         
         # instrument is copied in Stream
         self.assertEqual(post.getElementsByClass(
@@ -4397,7 +4406,8 @@ class Test(unittest.TestCase):
 # 
         self.assertEqual(len(post), 18)
         self.assertEqual([n.name for n in post.flat.notes], 
-            ['C', 'D', 'E', 'C', 'D', 'E', 'C', 'F', 'G', 'A', 'G', 'A', 'G', 'A', 'G', 'B', 'G', 'C'])
+            ['C', 'D', 'E', 'C', 'D', 'E', 'C', 'F', 'G', 'A', 
+             'G', 'A', 'G', 'A', 'G', 'B', 'G', 'C'])
  
 
     def testRepeatEndingsJ(self):
@@ -4474,18 +4484,20 @@ class Test(unittest.TestCase):
 # # 
 #         self.assertEqual(len(post), 18)
 #         self.assertEqual([n.name for n in post.flat.notes], 
-#             ['C', 'D', 'E', 'C', 'D', 'E', 'C', 'F', 'G', 'A', 'G', 'A', 'G', 'A', 'G', 'B', 'G', 'C'])
+#             ['C', 'D', 'E', 'C', 'D', 'E', 'C', 'F', 'G', 'A', 'G', 'A', 'G', 
+#              'A', 'G', 'B', 'G', 'C'])
  
 
 
     def testRepeatEndingsImportedA(self):
-
         from music21 import corpus
         s = corpus.parse('ryansMammoth/BanjoReel')
         #s.show()
         firstNotesList = s.flat.notes.elements
         #[0:16][16:22][0:16][22:27][27:58][27:58]
-        expandedByHandList = firstNotesList[0:16] + firstNotesList[16:22] + firstNotesList[0:16] + firstNotesList[22:27] + firstNotesList[27:58] + firstNotesList[27:58]
+        expandedByHandList = (firstNotesList[0:16] + firstNotesList[16:22] + 
+                              firstNotesList[0:16] + firstNotesList[22:27] + 
+                              firstNotesList[27:58] + firstNotesList[27:58])
         expandedByHandNoteNames = [n.nameWithOctave for n in expandedByHandList]
         ex = Expander(s.parts[0])
         post = ex.process()
@@ -4535,7 +4547,8 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [RepeatExpression, RepeatExpressionMarker, Coda, Segno, Fine, RepeatExpressionCommand, DaCapo, DaCapoAlFine, 
+_DOC_ORDER = [RepeatExpression, RepeatExpressionMarker, Coda, Segno, Fine, 
+              RepeatExpressionCommand, DaCapo, DaCapoAlFine, 
               DaCapoAlCoda, AlSegno, DalSegno, DalSegnoAlFine, DalSegnoAlCoda, RepeatFinder]
 
 if __name__ == "__main__":

@@ -192,10 +192,6 @@ def defaultDeepcopy(obj, memo, callInit=True):
 #     return pickleMod.loads(pickleMod.dumps(obj, protocol=-1))
 
 
-
-
-
-
 if __name__ == '__main__':
     import music21
     music21.mainTest()

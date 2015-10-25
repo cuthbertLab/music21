@@ -135,7 +135,7 @@ class ElementException(exceptions21.Music21Exception):
 _SortTuple = collections.namedtuple('SortTuple', ['atEnd','offset','priority',
                                                   'classSortOrder','isNotGrace','insertIndex'])
 
-# pseudo class for returning split()
+# pseudo class for returning splitAtX() type commands.
 class _SplitTuple(tuple):
     '''
     >>> st = base._SplitTuple([1, 2])
@@ -155,7 +155,7 @@ class _SplitTuple(tuple):
     def __new__(cls, tupEls):
         return super(_SplitTuple, cls).__new__(cls, tuple(tupEls))
 
-    def __init__(self, tupEls):
+    def __init__(self, tupEls): # pylint: disable=super-init-not-called
         self.spannerList = []
 
 #------------------------------------------------------------------------------
