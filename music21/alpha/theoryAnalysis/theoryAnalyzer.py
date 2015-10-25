@@ -10,7 +10,6 @@
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 '''
 ===========================================
 Module Introduction
@@ -259,8 +258,8 @@ def getVerticalities(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest']
     >>> sc.insert(part0)
     >>> sc.insert(part1)
     >>> alpha.theoryAnalysis.theoryAnalyzer.getVerticalities(sc)
-    [<music21.voiceLeading.Verticality contentDict=... >, 
-     <music21.voiceLeading.Verticality contentDict=... >]
+    [<music21.voiceLeading.Verticality contentDict=...>, 
+     <music21.voiceLeading.Verticality contentDict=...>]
     >>> len(alpha.theoryAnalysis.theoryAnalyzer.getVerticalities(sc))
     2
 
@@ -271,9 +270,9 @@ def getVerticalities(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest']
     >>> part4.append(chord.Chord(['A','B','C']))
     >>> sc4.insert(part4)
     >>> alpha.theoryAnalysis.theoryAnalyzer.getVerticalities(sc4)
-    [<music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.chord.Chord A B C>]}) >, 
-     <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.chord.Chord A B C>]}) >, 
-     <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.chord.Chord A B C>]}) >]
+    [<music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.chord.Chord A B C>]})>, 
+     <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.chord.Chord A B C>]})>, 
+     <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.chord.Chord A B C>]})>]
 
     >>> sc3 = stream.Score()
     >>> p1 = stream.Part()
@@ -282,9 +281,9 @@ def getVerticalities(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest']
     >>> p1.append(harmony.ChordSymbol('E7', quarterLength = 4))
     >>> sc3.append(p1)
     >>> alpha.theoryAnalysis.theoryAnalyzer.getVerticalities(sc3)
-    [<music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.harmony.ChordSymbol C>]}) >, 
-     <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.harmony.ChordSymbol D>]}) >, 
-     <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.harmony.ChordSymbol E7>]}) >]
+    [<music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.harmony.ChordSymbol C>]})>, 
+     <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.harmony.ChordSymbol D>]})>, 
+     <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.harmony.ChordSymbol E7>]})>]
     '''   
     
     vsList = []
