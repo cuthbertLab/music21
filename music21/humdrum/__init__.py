@@ -8,7 +8,6 @@
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 '''
 Files in this package deal specifically with making life easier for
 people who have previously used humdrum or need to import
@@ -23,27 +22,27 @@ Humdrum       music21                                            notes
 ============  =================================================  =========================================================================================================================================================================
 assemble_     None                                               Use python commands to unite objects and `s.insert(0, p)` to put a part at the beginning of a multipart score.
 census_       None                                               Use python to create census equivalents
-cents_        `interval.ChromaticInterval.cents`                 (tuning will eventually affect this; produces cents w.r.t. interval not middle C)
+cents_        `interval.ChromaticInterval.cents`                 
 cleave_       None                                               kern specific, not needed
-context_      None                                               Not needed.  Use object.next and object.prev to get some context for many objects and :meth:`~music21.stream.Stream.getContextByClass` to find the most recent object of a given type
+context_      None                                               Not needed.  Use object.next and object.prev to get some context for many objects and :meth:`~music21.base.Music21Object.getContextByClass` to find the most recent object of a given type
 correl_       None                                               Use numpy.corrcoef() or other, more sophisticated code
 deg_          Several tools, see Notes                           Closest is :meth:`~music21.scale.Scale.getScaleDegreeAndAccidentalFromPitch`. See also `stream.Stream.analyze('key')`
 degree_       see above for "`deg`"
-diss_         To-Do                                              Will be "analysis.kkdiss".
-ditto_        see Notes                                          :meth:`~music21.stream.Stream.choridfy` and the offsetTree objects accomplish similar things. Use `copy.copy(object)` or `copy.deepcopy(object)` to get another copy of an object
+diss_         TODO:                                              Will be "analysis.kkdiss".
+ditto_        see Notes                                          :meth:`~music21.stream.Stream.chordify` and the offsetTree objects accomplish similar things. Use `copy.copy(object)` or `copy.deepcopy(object)` to get another copy of an object
 encode_       `midi.(severaltools)`                              Multifunction humdrum program.  See the midi directory for some replacements.  Or for simple conversion, `converter.parse` and `show('midi')` do this automatically
 extract_      None                                               Use python commands to extract objects with certain properties
 fields_       None                                               Not needed.
-fin2hum_      `music21.converter.parse` (filename)               Currently we only parse MusicXML files; as far as I know, Enigma Transport Format did not take off and is rarely used. An Enigma to music21 converter is very low priority.  Software to convert Enigma to MusicXML is available from recordare
+fin2hum_      `music21.converter.parse` (filename)               Enigma Transport Format did not take off and is rarely used. An Enigma to music21 converter is very low priority. Software to convert Enigma to MusicXML is available from recordare
 freq_         see :meth:`~music21.pitch.Pitch.frequency` 
-hint_         see Notes                                          :meth:`~music21.stream.Stream.attachIntervalsBetweenStreams` See trecento.capua demo to show how it can be done.
+hint_         see Notes                                          :meth:`~music21.stream.Stream.attachIntervalsBetweenStreams` See alpha.trecento.capua demo to show how it can be done.
 hum2fin_      `.write('musicxml')`                               Writes to musicXML.  A music21 to Enigma converter will not be written (obsolete format)
 humdrum_      None                                               Not needed.  The `spineParser` will report errors when parsing.
 humsed_       None                                               Not needed.
 humver_       None                                               Not needed.
 infot_        None                                               Use general purpose python information theory models
 iv_           :meth:`~music21.chord.Chord.intervalVector` 
-kern_         To-Do                                              Not needed for general work, but a `myScore.write('kern')` call for outputting to kern is a priority.
+kern_         None                                               Output to Humdrum is not supported
 key_          :meth:`~music21.stream.Stream.analyze` ('key')
 melac_        see Notes                                          :meth:`~music21.analysis.metrical.thomassenMelodicAccent`.  incorporates humdrum additions for giving accent of the first and last notes.
 metpos_       `1.0/obj.beatStrength()`                           the beatStrength of an object is essentially something similar but inverted.  beatStrength handles irregular meters.
@@ -162,13 +161,15 @@ from music21.humdrum import testFiles
 
 def parseFile(filename):
     '''
-    shortcut to :class:`~music21.humdrum.spineParser.HumdrumFile`.  Most users will call `converter.parse()` instead.
+    shortcut to :class:`~music21.humdrum.spineParser.HumdrumFile`.  
+    Most users will call `converter.parse()` instead.
     '''
     return spineParser.HumdrumFile(filename)
 
 def parseData(data):
     '''
-    shortcut to :class:`~music21.humdrum.spineParser.HumdrumDataCollection`. Most users will call `converter.parse()` instead.
+    shortcut to :class:`~music21.humdrum.spineParser.HumdrumDataCollection`. 
+    Most users will call `converter.parse()` instead.
     '''
     return spineParser.HumdrumDataCollection(data)
 

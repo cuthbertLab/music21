@@ -54,17 +54,20 @@ class Feature(object):
         self.discrete = None # is discrete or continuous
 
     def _getVectors(self):
-        '''Prepare a vector of appropriate size and return
+        '''
+        Prepare a vector of appropriate size and return
         '''
         return [0] * self.dimensions
 
     def prepareVectors(self):
-        '''Prepare the vector stored in this feature.
+        '''
+        Prepare the vector stored in this feature.
         '''
         self.vector = self._getVectors()
 
     def normalize(self):
-        '''Normalize the vector between 0 and 1, assuming there is more than one value.
+        '''
+        Normalize the vector between 0 and 1, assuming there is more than one value.
         '''
         if self.dimensions == 1:
             return # do nothing
@@ -78,19 +81,19 @@ class Feature(object):
         self.vector = temp
 
 
-
-
-
-
 #-------------------------------------------------------------------------------
 class FeatureExtractorException(exceptions21.Music21Exception):
     pass
 
 class FeatureExtractor(object):
-    '''A model of process that extracts a feature from a Music21 Stream. The main public interface is the extract() method. 
+    '''
+    A model of process that extracts a feature from a Music21 Stream. 
+    The main public interface is the extract() method. 
 
-    The extractor can be passed a Stream or a reference to a DataInstance. All Stream's are internally converted to a DataInstance if necessary. Usage of a DataInstance offers significant performance advantages, as common forms of the Stream are cached for easy processing. 
-
+    The extractor can be passed a Stream or a reference to a DataInstance. 
+    All Streams are internally converted to a DataInstance if necessary. 
+    Usage of a DataInstance offers significant performance advantages, as common forms of 
+    the Stream are cached for easy processing. 
     '''
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         self.stream = None # the original Stream, or None
@@ -113,12 +116,15 @@ class FeatureExtractor(object):
             self.normalize = False # default is no
 
     def setData(self, dataOrStream):
-        '''Set the data that this FeatureExtractor will process. Either a Stream or a DataInstance object can be provided. 
+        '''
+        Set the data that this FeatureExtractor will process. 
+        Either a Stream or a DataInstance object can be provided. 
         '''
         if dataOrStream is not None:
             if (hasattr(dataOrStream, 'classes') and 'Stream' in         
                 dataOrStream.classes):
-                #environLocal.printDebug(['creating new DataInstance: this should be a Stream:', dataOrStream])
+                #environLocal.printDebug(['creating new DataInstance: this should be a Stream:', 
+                #     dataOrStream])
                 # if we are passed a stream, create a DataInstrance to 
                 # manage the
                 # its data; this is less efficient but is good for testing
@@ -139,7 +145,10 @@ class FeatureExtractor(object):
 
         >>> fe = features.jSymbolic.FifthsPitchHistogramFeature()
         >>> fe.getAttributeLabels()
-        ['Fifths_Pitch_Histogram_0', 'Fifths_Pitch_Histogram_1', 'Fifths_Pitch_Histogram_2', 'Fifths_Pitch_Histogram_3', 'Fifths_Pitch_Histogram_4', 'Fifths_Pitch_Histogram_5', 'Fifths_Pitch_Histogram_6', 'Fifths_Pitch_Histogram_7', 'Fifths_Pitch_Histogram_8', 'Fifths_Pitch_Histogram_9', 'Fifths_Pitch_Histogram_10', 'Fifths_Pitch_Histogram_11']
+        ['Fifths_Pitch_Histogram_0', 'Fifths_Pitch_Histogram_1', 'Fifths_Pitch_Histogram_2', 
+         'Fifths_Pitch_Histogram_3', 'Fifths_Pitch_Histogram_4', 'Fifths_Pitch_Histogram_5', 
+         'Fifths_Pitch_Histogram_6', 'Fifths_Pitch_Histogram_7', 'Fifths_Pitch_Histogram_8', 
+         'Fifths_Pitch_Histogram_9', 'Fifths_Pitch_Histogram_10', 'Fifths_Pitch_Histogram_11']
 
         '''
         post = []
@@ -288,15 +297,18 @@ class StreamForms(object):
             return self._forms['getElementsByClass.Measure']
 
         elif key in ['flat.getElementsByClass.TimeSignature']:
-            self._forms['flat.getElementsByClass.TimeSignature'] = self._base.flat.getElementsByClass('TimeSignature')
+            self._forms['flat.getElementsByClass.TimeSignature'
+                        ] = self._base.flat.getElementsByClass('TimeSignature')
             return self._forms['flat.getElementsByClass.TimeSignature']
 
         elif key in ['flat.getElementsByClass.KeySignature']:
-            self._forms['flat.getElementsByClass.KeySignature'] = self._base.flat.getElementsByClass('KeySignature')
+            self._forms['flat.getElementsByClass.KeySignature'
+                        ] = self._base.flat.getElementsByClass('KeySignature')
             return self._forms['flat.getElementsByClass.KeySignature']
 
         elif key in ['flat.getElementsByClass.Harmony']:
-            self._forms['flat.getElementsByClass.Harmony'] = self._base.flat.getElementsByClass('Harmony')
+            self._forms['flat.getElementsByClass.Harmony'
+                        ] = self._base.flat.getElementsByClass('Harmony')
             return self._forms['flat.getElementsByClass.Harmony']
 
 
@@ -354,7 +366,10 @@ class StreamForms(object):
         elif key in ['chordifyTypesHistogram']:  
             histo = {}
             # keys are methods on Chord 
-            keys = ['isTriad', 'isSeventh', 'isMajorTriad', 'isMinorTriad', 'isIncompleteMajorTriad', 'isIncompleteMinorTriad', 'isDiminishedTriad', 'isAugmentedTriad', 'isDominantSeventh', 'isDiminishedSeventh', 'isHalfDiminishedSeventh']
+            keys = ['isTriad', 'isSeventh', 'isMajorTriad', 'isMinorTriad', 
+                    'isIncompleteMajorTriad', 'isIncompleteMinorTriad', 'isDiminishedTriad', 
+                    'isAugmentedTriad', 'isDominantSeventh', 'isDiminishedSeventh', 
+                    'isHalfDiminishedSeventh']
 
             for c in self.__getitem__('chordify.getElementsByClass.Chord'):
                 for key in keys:
@@ -553,7 +568,9 @@ class DataInstance(object):
                 self._formsByPart.append(StreamForms(v))
   
     def setClassLabel(self, classLabel, classValue=None):
-        '''Set the class label, as well as the class value if known. The class label is the attribute name used to define the class of this data instance.
+        '''
+        Set the class label, as well as the class value if known. 
+        The class label is the attribute name used to define the class of this data instance.
 
         
         >>> #_DOCS_SHOW s = corpus.parse('bwv66.6')
@@ -852,15 +869,19 @@ class DataSet(object):
 
     
     >>> ds = features.DataSet(classLabel='Composer')
-    >>> f = [features.jSymbolic.PitchClassDistributionFeature, features.jSymbolic.ChangesOfMeterFeature, features.jSymbolic.InitialTimeSignatureFeature]
+    >>> f = [features.jSymbolic.PitchClassDistributionFeature, 
+    ...      features.jSymbolic.ChangesOfMeterFeature, 
+    ...      features.jSymbolic.InitialTimeSignatureFeature]
     >>> ds.addFeatureExtractors(f)
     >>> ds.addData('bwv66.6', classValue='Bach')
     >>> ds.addData('bach/bwv324.xml', classValue='Bach')
     >>> ds.process()
     >>> ds.getFeaturesAsList()[0]
-    ['bwv66.6', 0.0, 1.0, 0.375, 0.03125, 0.5, 0.1875, 0.90625, 0.0, 0.4375, 0.6875, 0.09375, 0.875, 0, 4, 4, 'Bach']
+    ['bwv66.6', 0.0, 1.0, 0.375, 0.03125, 0.5, 0.1875, 0.90625, 0.0, 0.4375,
+     0.6875, 0.09375, 0.875, 0, 4, 4, 'Bach']
     >>> ds.getFeaturesAsList()[1]
-    ['bach/bwv324.xml', 0.12, 0.0, 1.0, 0.12, 0.56..., 0.0, ..., 0.52..., 0.0, 0.68..., 0.0, 0.56..., 0, 4, 4, 'Bach']
+    ['bach/bwv324.xml', 0.12, 0.0, 1.0, 0.12, 0.56..., 0.0, ..., 0.52..., 
+     0.0, 0.68..., 0.0, 0.56..., 0, 4, 4, 'Bach']
     >>> ds = ds.getString()
     
     
@@ -892,7 +913,8 @@ class DataSet(object):
         return self._classLabel
 
     def addFeatureExtractors(self, values):
-        '''Add one or more FeatureExtractor objects, either as a list or as an individual object. 
+        '''
+        Add one or more FeatureExtractor objects, either as a list or as an individual object. 
         '''
         # features are instantiated here
         # however, they do not have a data assignment
@@ -904,10 +926,13 @@ class DataSet(object):
 
     def getAttributeLabels(self, includeClassLabel=True, 
         includeId=True):
-        '''Return a list of all attribute labels. Optionally add a class label field and/or an id field.
+        '''
+        Return a list of all attribute labels. Optionally add a class 
+        label field and/or an id field.
 
         
-        >>> f = [features.jSymbolic.PitchClassDistributionFeature, features.jSymbolic.ChangesOfMeterFeature]
+        >>> f = [features.jSymbolic.PitchClassDistributionFeature, 
+        ...      features.jSymbolic.ChangesOfMeterFeature]
         >>> ds = features.DataSet(classLabel='Composer', featureExtractors=f)
         >>> ds.getAttributeLabels(includeId=False)
         ['Pitch_Class_Distribution_0', 
@@ -932,10 +957,12 @@ class DataSet(object):
         '''Return column labels for discrete status.
 
         
-        >>> f = [features.jSymbolic.PitchClassDistributionFeature, features.jSymbolic.ChangesOfMeterFeature]
+        >>> f = [features.jSymbolic.PitchClassDistributionFeature, 
+        ...      features.jSymbolic.ChangesOfMeterFeature]
         >>> ds = features.DataSet(classLabel='Composer', featureExtractors=f)
         >>> ds.getDiscreteLabels()
-        [None, False, False, False, False, False, False, False, False, False, False, False, False, True, True]
+        [None, False, False, False, False, False, False, False, False, False, 
+         False, False, False, True, True]
         '''
         post = []
         if includeId:
@@ -951,11 +978,12 @@ class DataSet(object):
     def getClassPositionLabels(self, includeId=True):
         '''Return column labels for the presence of a class definition
 
-        
-        >>> f = [features.jSymbolic.PitchClassDistributionFeature, features.jSymbolic.ChangesOfMeterFeature]
+        >>> f = [features.jSymbolic.PitchClassDistributionFeature, 
+        ...      features.jSymbolic.ChangesOfMeterFeature]
         >>> ds = features.DataSet(classLabel='Composer', featureExtractors=f)
         >>> ds.getClassPositionLabels()
-        [None, False, False, False, False, False, False, False, False, False, False, False, False, False, True]
+        [None, False, False, False, False, False, False, False, False, 
+         False, False, False, False, False, True]
         '''
         post = []
         if includeId:
@@ -971,10 +999,12 @@ class DataSet(object):
     def addData(self, dataOrStreamOrPath, classValue=None, id=None): #@ReservedAssignment
         '''Add a Stream, DataInstance, or path to a corpus or local file to this data set.
 
-        The class value passed here is assumed to be the same as the classLable assigned at startup. 
+        The class value passed here is assumed to be the same as 
+        the classLabel assigned at startup. 
         '''
         if self._classLabel is None:
-            raise DataSetException('cannot add data unless a class label for this DataSet has been set.')
+            raise DataSetException(
+                    'cannot add data unless a class label for this DataSet has been set.')
 
         s = None
         if isinstance(dataOrStreamOrPath, DataInstance):
@@ -998,7 +1028,8 @@ class DataSet(object):
         self.streams.append(s)
 
     def process(self):
-        '''Process all Data with all FeatureExtractors. 
+        '''
+        Process all Data with all FeatureExtractors. 
         Processed data is stored internally as numerous Feature objects. 
         '''
         # clear features
@@ -1011,14 +1042,14 @@ class DataSet(object):
                 try:
                     fReturned = fe.extract()
                 except Exception as e: # for now take any error  # pylint: disable=broad-except
-                    fList = ['failed feature extactor:', fe, str(e)]
+                    fList = ['failed feature extractor:', fe, str(e)]
                     if self.quiet is True:                   
                         environLocal.printDebug(fList)
                     else:
                         environLocal.warn(fList)
                     if self.failFast is True:
                         raise e
-                    # provide a blank feature extactor
+                    # provide a blank feature extractor
                     fReturned = fe.getBlankFeature()
 
                 row.append(fReturned) # get feature and store
@@ -1026,7 +1057,9 @@ class DataSet(object):
             self._features.append(row)
 
     def getFeaturesAsList(self, includeClassLabel=True, includeId=True, concatenateLists=True):
-        '''Get processed data as a list of lists, merging any sub-lists in multi-dimensional features. 
+        '''
+        Get processed data as a list of lists, merging any sub-lists 
+        in multi-dimensional features. 
         '''
         post = []
         for i, row in enumerate(self._features):
@@ -1049,7 +1082,8 @@ class DataSet(object):
             return post
 
     def getUniqueClassValues(self):
-        '''Return a list of unique class values.
+        '''
+        Return a list of unique class values.
         '''
         post = []
         for di in self.dataInstances:
@@ -1070,8 +1104,8 @@ class DataSet(object):
         return outputFormat
 
     def _getOutputFormatFromFilePath(self, fp):
-        '''Get an output format from a file path if possible, otherwise return None.
-
+        '''
+        Get an output format from a file path if possible, otherwise return None.
         
         >>> ds = features.DataSet()
         >>> ds._getOutputFormatFromFilePath('test.tab')
@@ -1107,7 +1141,8 @@ class DataSet(object):
         else:
             outputFormat = self._getOutputFormat(format)
         if OutputFormat is None:
-            raise DataSetException('no output format could be defined from file path %s or format %s' % (fp, format))
+            raise DataSetException('no output format could be defined from file path ' + 
+                                   '%s or format %s' % (fp, format))
 
         outputFormat.write(fp=fp, includeClassLabel=includeClassLabel)
         
@@ -1116,7 +1151,8 @@ def allFeaturesAsList(streamInput):
     returns a tuple containing ALL currentingly implemented feature extractors. The first
     in the tuple are jsymbolic vectors, and the second native vectors. Vectors are NOT nested
     
-    streamInput can be Add a Stream, DataInstance, or path to a corpus or local file to this data set.
+    streamInput can be Add a Stream, DataInstance, or path to a corpus or local 
+    file to this data set.
     
     
     >>> #_DOCS_SHOW s = corpus.parse('bwv66.6')
@@ -1148,20 +1184,26 @@ def allFeaturesAsList(streamInput):
 
 #-------------------------------------------------------------------------------
 def extractorsById(idOrList, library=('jSymbolic', 'native')):
-    '''Given one or more :class:`~music21.features.FeatureExtractor` ids, return the appropriate  subclass. An optional `library` argument can be added to define which module is used. Current options are jSymbolic and native.
-
+    '''
+    Given one or more :class:`~music21.features.FeatureExtractor` ids, return the 
+    appropriate  subclass. An optional `library` argument can be added to define which 
+    module is used. Current options are jSymbolic and native.
+    
+    >>> features.extractorsById('p20')
+    [<class 'music21.features.jSymbolic.PitchClassDistributionFeature'>]
     
     >>> [x.id for x in features.extractorsById('p20')]
     ['P20']
     >>> [x.id for x in features.extractorsById(['p19', 'p20'])]
     ['P19', 'P20']
 
-    >>> [x.id for x in features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21'])]
-    ['R31', 'R32', 'R33', 'R34', 'R35', 'P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10', 'P11', 'P12', 'P13', 'P14', 'P15', 'P16', 'P19', 'P20', 'P21']
 
+    Normalizes case...
+
+    >>> [x.id for x in features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2'])]
+    ['R31', 'R32', 'R33', 'R34', 'R35', 'P1', 'P2']
     
-    Get all feature extractors from all libraries
-    
+    Get all feature extractors from all libraries   
     
     >>> y = [x.id for x in features.extractorsById('all')]
     >>> y[0:3], y[-3:-1]
@@ -1202,9 +1244,9 @@ def extractorsById(idOrList, library=('jSymbolic', 'native')):
 
 
 def extractorById(idOrList, library=('jSymbolic', 'native')):
-    '''Get the first feature matched by extractorsById().
+    '''
+    Get the first feature matched by extractorsById().
 
-    
     >>> s = stream.Stream()
     >>> s.append(note.Note('A4'))
     >>> fe = features.extractorById('p20')(s) # call class
@@ -1219,7 +1261,8 @@ def extractorById(idOrList, library=('jSymbolic', 'native')):
 
 
 def vectorById(streamObj, vectorId, library=('jSymbolic', 'native')):
-    '''Utility function to get a vector from an extractor
+    '''
+    Utility function to get a vector from an extractor
 
     >>> s = stream.Stream()
     >>> s.append(note.Note('A4'))
@@ -1233,11 +1276,11 @@ def vectorById(streamObj, vectorId, library=('jSymbolic', 'native')):
 
 def getIndex(featureString, extractorType=None):
     '''
-    returns the list index of the given feature extractor and the feature extractor
+    Returns the list index of the given feature extractor and the feature extractor
     category (jsymbolic or native). If feature extractor string is not in either 
     jsymbolic or native feature extractors, returns None
     
-    optionally include the extractorType ('jsymbolic' or 'native' if known
+    optionally include the extractorType ('jsymbolic' or 'native') if known
     and searching will be made more efficient
     
     
@@ -1303,20 +1346,23 @@ class Test(unittest.TestCase):
         self.assertEqual(len(di['chordify.getElementsByClass.Chord']), 144)
 
 
-        self.assertEqual(di['chordifySetClassHistogram'], {'2-2': 6, '2-3': 12, '2-4': 21, '2-5': 5, 
-                                                           '3-10': 4, '3-11': 33, '3-2': 3, '3-4': 7,
-                                                           '3-6': 7, '3-7': 9, '3-8': 6, '3-9': 16,
-                                                           '1-1': 15})
+        self.assertEqual(di['chordifySetClassHistogram'], 
+                         {'2-2': 6, '2-3': 12, '2-4': 21, '2-5': 5, 
+                          '3-10': 4, '3-11': 33, '3-2': 3, '3-4': 7,
+                          '3-6': 7, '3-7': 9, '3-8': 6, '3-9': 16,
+                          '1-1': 15})
 
         self.maxDiff = None
-        self.assertEqual(di['chordifyTypesHistogram'], {'isMinorTriad': 8, 'isAugmentedTriad': 0, 
-                                                        'isTriad': 37, 'isSeventh': 0, 'isDiminishedTriad': 4, 
-                                                        'isDiminishedSeventh': 0, 'isIncompleteMajorTriad': 21, 
-                                                        'isHalfDiminishedSeventh': 0, 'isMajorTriad': 25, 
-                                                        'isDominantSeventh': 0, 'isIncompleteMinorTriad': 12})
+        self.assertEqual(di['chordifyTypesHistogram'], 
+                           {'isMinorTriad': 8, 'isAugmentedTriad': 0, 
+                            'isTriad': 37, 'isSeventh': 0, 'isDiminishedTriad': 4, 
+                            'isDiminishedSeventh': 0, 'isIncompleteMajorTriad': 21, 
+                            'isHalfDiminishedSeventh': 0, 'isMajorTriad': 25, 
+                            'isDominantSeventh': 0, 'isIncompleteMinorTriad': 12})
 
-        self.assertEqual(di['noteQuarterLengthHistogram'], {0.5: 116, 1.0: 39, 1.5: 27, 2.0: 31, 3.0: 2, 4.0: 3, 
-                                                            0.75: 4, 0.25: 16})
+        self.assertEqual(di['noteQuarterLengthHistogram'], 
+                         {0.5: 116, 1.0: 39, 1.5: 27, 2.0: 31, 3.0: 2, 4.0: 3, 
+                          0.75: 4, 0.25: 16})
 
 
         # can access parts by index
@@ -1329,10 +1375,12 @@ class Test(unittest.TestCase):
         self.assertEqual(len(di['parts'][0]['getElementsByClass.Measure']), 19)
         self.assertEqual(len(di['parts'][1]['getElementsByClass.Measure']), 19)
 
-        self.assertEqual(di['parts'][0]['pitchClassHistogram'], [9, 1, 11, 0, 9, 13, 0, 11, 0, 12, 5, 0])
+        self.assertEqual(di['parts'][0]['pitchClassHistogram'], 
+                         [9, 1, 11, 0, 9, 13, 0, 11, 0, 12, 5, 0])
         # the sum of the two arrays is the pitch class histogram of the complete
         # work
-        self.assertEqual(di['pitchClassHistogram'], [47, 2, 25, 0, 25, 42, 0, 33, 0, 38, 22, 4])
+        self.assertEqual(di['pitchClassHistogram'], 
+                         [47, 2, 25, 0, 25, 42, 0, 33, 0, 38, 22, 4])
 
 
     def testStreamFormsB(self):
@@ -1423,11 +1471,14 @@ class Test(unittest.TestCase):
         # manually create an output format and get output
         of = OutputCSV(ds)
         post = of.getString(lineBreak='//')
-        self.assertEqual(post, 'Identifier,Unique_Note_Quarter_Lengths,Most_Common_Note_Quarter_Length,Range_of_Note_Quarter_Lengths,Composer//bwv66.6,3,1.0,1.5,Bach//corelli/opus3no1/1grave,8,0.5,3.75,Corelli')
+        self.assertEqual(post, 'Identifier,Unique_Note_Quarter_Lengths,' + 
+                'Most_Common_Note_Quarter_Length,Range_of_Note_Quarter_Lengths,' + 
+                'Composer//bwv66.6,3,1.0,1.5,Bach//corelli/opus3no1/1grave,8,0.5,3.75,Corelli')
 
         # without id
         post = of.getString(lineBreak='//', includeId=False)
-        self.assertEqual(post, 'Unique_Note_Quarter_Lengths,Most_Common_Note_Quarter_Length,Range_of_Note_Quarter_Lengths,Composer//3,1.0,1.5,Bach//8,0.5,3.75,Corelli')
+        self.assertEqual(post, 'Unique_Note_Quarter_Lengths,Most_Common_Note_Quarter_Length,' + 
+                'Range_of_Note_Quarter_Lengths,Composer//3,1.0,1.5,Bach//8,0.5,3.75,Corelli')
 
         ds.write(format='tab')
         ds.write(format='csv')
@@ -1465,11 +1516,15 @@ class Test(unittest.TestCase):
 
 
     def xtestComposerClassificationJSymbolic(self):
-        '''Demonstrating writing out data files for feature extraction. Here, features are used from the jSymbolic library.
+        '''
+        Demonstrating writing out data files for feature extraction. Here, 
+        features are used from the jSymbolic library.
         '''
         from music21 import features
                 
-        featureExtractors = ['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21']
+        featureExtractors = ['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 
+                             'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 
+                             'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21']
         
         # will return a list
         featureExtractors = features.extractorsById(featureExtractors, 
@@ -1503,12 +1558,17 @@ class Test(unittest.TestCase):
 
 
     def xtestRegionClassificationJSymbolicA(self):
-        '''Demonstrating writing out data files for feature extraction. Here, features are used from the jSymbolic library.
+        '''
+        Demonstrating writing out data files for feature extraction. Here, 
+        features are used from the jSymbolic library.
         '''
         from music21 import features
 
-        featureExtractors = features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21'], 
-                            'jSymbolic')
+        featureExtractors = features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 
+                                                     'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 
+                                                     'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 
+                                                     'p13', 'p14', 'p15', 'p16', 'p19', 
+                                                     'p20', 'p21'], 'jSymbolic')
 
         oChina1 = corpus.parse('essenFolksong/han1')
         oChina2 = corpus.parse('essenFolksong/han2')
@@ -1541,13 +1601,17 @@ class Test(unittest.TestCase):
 
 
     def xtestRegionClassificationJSymbolicB(self):
-        '''Demonstrating writing out data files for feature extraction. Here, features are used from the jSymbolic library.
+        '''
+        Demonstrating writing out data files for feature extraction. 
+        Here, features are used from the jSymbolic library.
         '''
         from music21 import features
 
         # features common to both collections
-        featureExtractors = features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16', 'p19', 'p20', 'p21'], 
-                            'jSymbolic')
+        featureExtractors = features.extractorsById(
+                            ['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4', 
+                             'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 
+                             'p14', 'p15', 'p16', 'p19', 'p20', 'p21'], 'jSymbolic')
 
         # first bundle
         ds = features.DataSet(classLabel='Region')
@@ -1601,7 +1665,8 @@ class Test(unittest.TestCase):
         '''Using an already created test file with a BayesLearner.
         '''
         import orange # @UnresolvedImport # pylint: disable=import-error
-        data = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
+        data = orange.ExampleTable(
+            '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
         classifier = orange.BayesLearner(data)
         for i in range(len(data)):
             c = classifier(data[i])
@@ -1612,9 +1677,11 @@ class Test(unittest.TestCase):
         '''Using an already created test file with a BayesLearner.
         '''
         import orange, orngTree # @UnresolvedImport  # pylint: disable=import-error
-        data1 = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b1.tab')
+        data1 = orange.ExampleTable(
+                '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b1.tab')
         
-        data2 = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b2.tab')
+        data2 = orange.ExampleTable(
+                '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b2.tab')
         
         majority = orange.MajorityLearner
         bayes = orange.BayesLearner
@@ -1638,7 +1705,8 @@ class Test(unittest.TestCase):
                     if c != matchData[i].getclass():
                         mismatch += 1
         
-                print('%s %s: misclassified %s/%s of %s' % (classifierStr, classifierType, mismatch, len(matchData), matchStr))
+                print('%s %s: misclassified %s/%s of %s' % (
+                        classifierStr, classifierType, mismatch, len(matchData), matchStr))
 
 #             if classifierType == orngTree.TreeLearner:
 #                 orngTree.printTxt(classifier)
@@ -1649,9 +1717,12 @@ class Test(unittest.TestCase):
         '''Using an already created test file with a BayesLearner.
         '''
         import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
-        data1 = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b1.tab')
+        data1 = orange.ExampleTable(
+                '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b1.tab')
         
-        data2 = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b2.tab', use = data1.domain)
+        data2 = orange.ExampleTable(
+                '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b2.tab', 
+                use=data1.domain)
         
         data1.extend(data2)
         data = data1
@@ -1682,14 +1753,17 @@ class Test(unittest.TestCase):
                         if c != matchData[i].getclass():
                             mismatch += 1
             
-                    print('%s %s: misclassified %s/%s of %s' % (classifierStr, classifierType, mismatch, len(matchData), matchStr))
+                    print('%s %s: misclassified %s/%s of %s' % (
+                            classifierStr, classifierType, mismatch, len(matchData), matchStr))
 
 
     def xtestOrangeClassifiers(self):
-        '''This test shows how to compare four classifiers; replace the file path with a path to the .tab data file. 
+        '''
+        This test shows how to compare four classifiers; replace the file path 
+        with a path to the .tab data file. 
         '''
         import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
-        data = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
+        data = orange.ExampleTable('~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
 
         # setting up the classifiers
         majority = orange.MajorityLearner(data)
@@ -1720,7 +1794,7 @@ class Test(unittest.TestCase):
 
     def xtestOrangeClassifierTreeLearner(self):
         import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
-        data = orange.ExampleTable('/Volumes/xdisc/_sync/_x/src/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
+        data = orange.ExampleTable('~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
 
         tree = orngTree.TreeLearner(data, sameMajorityPruning=1, mForPruning=2)
         #tree = orngTree.TreeLearner(data)
