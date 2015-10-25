@@ -2365,7 +2365,8 @@ class InitialTempoFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R30'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Initial Tempo'
         self.description = 'Tempo in beats per minute at the start of the recording.'
@@ -2395,10 +2396,14 @@ class InitialTimeSignatureFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R31'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Initial Time Signature'
-        self.description = 'A feature array with two elements. The first is the numerator of the first occurring time signature and the second is the denominator of the first occurring time signature. Both are set to 0 if no time signature is present.'
+        self.description = ('A feature array with two elements. ' + 
+                            'The first is the numerator of the first occurring time signature ' + 
+                            'and the second is the denominator of the first occurring time ' + 
+                            'signature. Both are set to 0 if no time signature is present.')
         self.isSequential = True
         self.dimensions = 2
 
@@ -2433,10 +2438,14 @@ class CompoundOrSimpleMeterFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R32'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Compound Or Simple Meter'
-        self.description = 'Set to 1 if the initial meter is compound (numerator of time signature is greater than or equal to 6 and is evenly divisible by 3) and to 0 if it is simple (if the above condition is not fulfilled).'
+        self.description = ('Set to 1 if the initial meter is compound ' + 
+                            '(numerator of time signature is greater than or equal to 6 ' + 
+                            'and is evenly divisible by 3) and to 0 if it is simple ' + 
+                            '(if the above condition is not fulfilled).')
         self.isSequential = True
         self.dimensions = 1
 
@@ -2473,10 +2482,12 @@ class TripleMeterFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R33'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Triple Meter'
-        self.description = 'Set to 1 if numerator of initial time signature is 3, set to 0 otherwise.'
+        self.description = ('Set to 1 if numerator of initial time signature is 3, ' + 
+                            'set to 0 otherwise.')
         self.isSequential = True
         self.dimensions = 1
 
@@ -2505,10 +2516,12 @@ class QuintupleMeterFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R34'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Quintuple Meter'
-        self.description = 'Set to 1 if numerator of initial time signature is 5, set to 0 otherwise.'
+        self.description = ('Set to 1 if numerator of initial time signature is 5, ' + 
+                            'set to 0 otherwise.')
         self.isSequential = True
         self.dimensions = 1
 
@@ -2540,10 +2553,12 @@ class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R35'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Changes of Meter'
-        self.description = 'Set to 1 if the time signature is changed one or more times during the recording'
+        self.description = ('Set to 1 if the time signature is changed one or more ' + 
+                            'times during the recording')
         self.isSequential = True
         self.dimensions = 1
         self.normalize = False
@@ -2557,10 +2572,6 @@ class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
             if not first.ratioEqual(e):
                 self._feature.vector[0] = 1
                 return 
- 
- 
-
-
 
 
 #-------------------------------------------------------------------------------
@@ -2578,7 +2589,8 @@ class OverallDynamicRangeFeature(featuresModule.FeatureExtractor):
     id = 'D1'
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Overall Dynamic Range'
         self.description = 'The maximum loudness minus the minimum loudness value.'
@@ -2598,7 +2610,8 @@ class VariationOfDynamicsFeature(featuresModule.FeatureExtractor):
     '''
     id = 'D2'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Variation of Dynamics'
         self.description = 'Standard deviation of loudness levels of all notes.'
@@ -2620,10 +2633,12 @@ class VariationOfDynamicsInEachVoiceFeature(featuresModule.FeatureExtractor):
     id = 'D3'
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Variation of Dynamics In Each Voice'
-        self.description = 'The average of the standard deviations of loudness levels within each channel that contains at least one note.'
+        self.description = ('The average of the standard deviations of loudness ' + 
+                            'levels within each channel that contains at least one note.')
         self.isSequential = True
         self.dimensions = 1
 
@@ -2641,10 +2656,12 @@ class AverageNoteToNoteDynamicsChangeFeature(featuresModule.FeatureExtractor):
     '''
     id = 'D4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Average Note To Note Dynamics Change'
-        self.description = 'Average change of loudness from one note to the next note in the same channel (in MIDI velocity units).'
+        self.description = ('Average change of loudness from one note to the next note ' + 
+                            'in the same channel (in MIDI velocity units).')
         self.isSequential = True
         self.dimensions = 1
 
@@ -2676,10 +2693,12 @@ class MaximumNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Maximum Number of Independent Voices'
-        self.description = 'Maximum number of different channels in which notes have sounded simultaneously. Here, Parts are treated as channels.'
+        self.description = ('Maximum number of different channels in which notes ' + 
+                            'have sounded simultaneously. Here, Parts are treated as channels.')
         self.isSequential = True
         self.dimensions = 1
 

@@ -338,7 +338,8 @@ class ScoreReduction(object):
             # TODO: insert into note or chord
             for unused_key, rn in self._reductiveNotes.items():
                 if oneGroup or rn['group'] == gName:
-                    #environLocal.printDebug(['_createReduction(): found reductive note, rn', rn, 'group', gName])
+                    #environLocal.printDebug([
+                    #  '_createReduction(): found reductive note, rn', rn, 'group', gName])
                     gMeasure = gMeasures[rn.measureIndex]
                     if len(gMeasure.voices) == 0: # common setup routines
                         # if no voices, start by removing rests
@@ -473,7 +474,7 @@ class PartReduction(object):
         for p in self._score.parts:
             if not p.hasMeasures():
                 self._fillByMeasure = False         
-                #environLocal.printDebug(['overrdding fillByMeasure as no measures are defined'])
+                #environLocal.printDebug(['overriding fillByMeasure as no measures are defined'])
                 break
 
     def _createPartBundles(self):
@@ -630,7 +631,7 @@ class PartReduction(object):
 
 
     def _getValueForSpan(self, target='Dynamic', splitSpans=True, 
-        targetToWeight=None):
+                         targetToWeight=None):
         '''
         For each span, determine the measured parameter value. This is translated 
         as the height of the bar graph.
@@ -756,7 +757,8 @@ class PartReduction(object):
                 if i == 0: # cannot extend first
                     if ds['weight'] is None: # this is an error in the rep
                         ds['weight'] = minValue
-                        #environLocal.printDebug(['cannnot extend a weight: no previous weight defined'])
+                        #environLocal.printDebug([
+                        #  'cannnot extend a weight: no previous weight defined'])
                     else:
                         lastWeight = ds['weight']
                 else: # not first
@@ -767,7 +769,8 @@ class PartReduction(object):
                     # do not have a list; mist set to min
                     elif ds['weight'] is None and lastWeight is None: 
                         ds['weight'] = minValue
-                        #environLocal.printDebug(['cannnot extend a weight: no previous weight defined'])
+                        #environLocal.printDebug([
+                        #  'cannnot extend a weight: no previous weight defined'])
 #         environLocal.printDebug(['_extendSpans: post'])    
 #         for partBundle in self._partBundles:
 #             for i, ds in enumerate(self._eventSpans[partBundle['pGroupId']]):
@@ -854,10 +857,15 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.parts[0].flat.notes), 3)
         #post.parts[0].show('t')
 
-        match = [(e, e.offset, e.duration.quarterLength) 
+        match = [(repr(e), e.offset, e.duration.quarterLength) 
                   for e in post.parts[0].getElementsByClass('Measure')[0:3].flat.notesAndRests]
-        self.assertEqual(str(match), 
-                         '''[(<music21.note.Rest rest>, 0.0, 1.0), (<music21.note.Note F#>, 1.0, 1.0), (<music21.note.Rest rest>, 2.0, 1.0), (<music21.note.Note C#>, 3.0, 1.0), (<music21.note.Rest rest>, 5.0, 1.0), (<music21.note.Note G#>, 6.0, 1.0)]''')
+        self.assertEqual(match, 
+                         [('<music21.note.Rest rest>', 0.0, 1.0), 
+                          ('<music21.note.Note F#>', 1.0, 1.0), 
+                          ('<music21.note.Rest rest>', 2.0, 1.0), 
+                          ('<music21.note.Note C#>', 3.0, 1.0), 
+                          ('<music21.note.Rest rest>', 5.0, 1.0), 
+                          ('<music21.note.Note G#>', 6.0, 1.0)])
 
         # test that lyric is found
         self.assertEqual(post.parts[0].flat.notes[0].lyric, 'fromBass')
