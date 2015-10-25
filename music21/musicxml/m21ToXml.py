@@ -3968,7 +3968,7 @@ class MeasureExporter(XMLExporterBase):
         mxDivisions = SubElement(mxAttributes, 'divisions')
         mxDivisions.text = str(self.currentDivisions)
         if self.transpositionInterval is not None:
-            mxAttributes.append(self.intervalToXmlTranspose)
+            mxAttributes.append(self.intervalToXmlTranspose(self.transpositionInterval))
         if 'Measure' in m.classes:
             if m.keySignature is not None:
                 mxAttributes.append(self.keySignatureToXml(m.keySignature))

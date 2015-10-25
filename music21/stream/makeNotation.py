@@ -983,9 +983,10 @@ def makeTies(
                     # 1/64 is 0.015625
                     if overshot > .001:
                         if eOffset >= mEnd:
-                            raise stream.StreamException(
-                                'element (%s) has offset %s within a measure '
-                                'that ends at offset %s' % (e, eOffset, mEnd))
+                            continue # skip elements that extend past measure boundary.
+#                             raise stream.StreamException(
+#                                 'element (%s) has offset %s within a measure '
+#                                 'that ends at offset %s' % (e, eOffset, mEnd))
 
                         qLenBegin = mEnd - eOffset
                         e, eRemain = e.splitAtQuarterLength(qLenBegin,
