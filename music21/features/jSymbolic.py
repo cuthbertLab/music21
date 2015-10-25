@@ -2717,10 +2717,13 @@ class AverageNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T2'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Average Number of Independent Voices'
-        self.description = 'Average number of different channels in which notes have sounded simultaneously. Rests are not included in this calculation. Here, Parts are treated as voices'
+        self.description = ('Average number of different channels in which notes have ' + 
+                            'sounded simultaneously. Rests are not included in this ' + 
+                            'calculation. Here, Parts are treated as voices')
         self.isSequential = True
         self.dimensions = 1
 
@@ -2753,10 +2756,13 @@ class VariabilityOfNumberOfIndependentVoicesFeature(
     '''
     id = 'T3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Variability of Number of Independent Voices'
-        self.description = 'Standard deviation of number of different channels in which notes have sounded simultaneously. Rests are not included in this calculation.'
+        self.description = ('Standard deviation of number of different channels ' + 
+                            'in which notes have sounded simultaneously. Rests are ' + 
+                            'not included in this calculation.')
         self.isSequential = True
         self.dimensions = 1
 
@@ -2781,14 +2787,18 @@ class VoiceEqualityNumberOfNotesFeature(featuresModule.FeatureExtractor):
        
     
     TODO: implement
-    Standard deviation of the total number of Note Ons in each channel that contains at least one note.
+    
+    Standard deviation of the total number of Note Ons in each channel 
+    that contains at least one note.
     '''
     id = 'T4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
  
         self.name = 'Voice Equality - Number of Notes'
-        self.description = 'Standard deviation of the total number of Note Ons in each channel that contains at least one note.'
+        self.description = ('Standard deviation of the total number of Note Ons ' + 
+                            'in each channel that contains at least one note.')
         self.isSequential = True
         self.dimensions = 1
 
@@ -2803,10 +2813,12 @@ class VoiceEqualityNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T5'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
  
         self.name = 'Voice Equality - Note Duration'
-        self.description = 'Standard deviation of the total duration of notes in seconds in each channel that contains at least one note.'
+        self.description = ('Standard deviation of the total duration of notes in seconds ' + 
+                            'in each channel that contains at least one note.')
         self.isSequential = True
         self.dimensions = 1
 
@@ -2822,10 +2834,12 @@ class VoiceEqualityDynamicsFeature(featuresModule.FeatureExtractor):
     '''
     id = 'T6'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
  
         self.name = 'Voice Equality - Dynamics'
-        self.description = 'Standard deviation of the average volume of notes in each channel that contains at least one note.'
+        self.description = ('Standard deviation of the average volume of notes ' + 
+                            'in each channel that contains at least one note.')
         self.isSequential = True
         self.dimensions = 1
 
@@ -3081,7 +3095,8 @@ class UnpitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
     id = 'I2'
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Unpitched Instruments Present'
         self.description = '''Which unpitched MIDI Percussion Key Map instruments are present. 
@@ -3122,7 +3137,11 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
                                                  *arguments, **keywords)
 
         self.name = 'Note Prevalence of Pitched Instruments'
-        self.description = 'The fraction of (pitched) notes played by each General MIDI Instrument. There is one entry for each instrument, which is set to the number of Note Ons played using the corresponding MIDI patch divided by the total number of Note Ons in the recording.'
+        self.description = ('The fraction of (pitched) notes played by each ' + 
+                            'General MIDI Instrument. There is one entry for ' + 
+                            'each instrument, which is set to the number of ' + 
+                            'Note Ons played using the corresponding MIDI patch ' + 
+                            'divided by the total number of Note Ons in the recording.')
         self.isSequential = True
         self.dimensions = 128
  

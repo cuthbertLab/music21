@@ -182,7 +182,6 @@ def rabinMiller(n):
     False
     >>> sieve.rabinMiller(123986234193)
     False
-
     """
     n = abs(n)
     if n in [2,3]: 
@@ -190,8 +189,9 @@ def rabinMiller(n):
     m = n % 6 # if n (except 2 and 3) mod 6 is not 1 or 5, then n isn't prime
     if m != 1 and m != 5: 
         return False
-    # first hundred primes, 2, 3 handled by mod 6
-    primes = [5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97] 
+    # primes up to 100;  2, 3 handled by mod 6
+    primes = [5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 
+              47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97] 
     if n <= 100:
         if n in primes: 
             return True # must include 2,3
@@ -337,8 +337,10 @@ def unitNormEqual(parts):
 
 
 def unitNormStep(step, a=0, b=1, normalized=True):
-    """Given a step size and an a/b min/max range, calculate number of parts
-    to fill step through inclusive a,b, then return a unit interval list of values necessary to cover region.
+    """
+    Given a step size and an a/b min/max range, calculate number of parts
+    to fill step through inclusive a,b, then return a unit interval list of values 
+    necessary to cover region.
 
     Note that returned values are by default normalized within the unit interval.
 
@@ -385,10 +387,12 @@ def unitNormStep(step, a=0, b=1, normalized=True):
 
 
 #-------------------------------------------------------------------------------
-# note: some of these methods are in common, though they are slightly different algorithms; need to test for compatibility
+# note: some of these methods are in common, though they are slightly different algorithms; 
+# need to test for compatibility
 
 def _gcd(a, b):
-    """find the greatest common divisor of a,b
+    """
+    find the greatest common divisor of a,b
     i.e., greatest number that is a factor of both numbers
     euclides algorithm
 
@@ -426,7 +430,9 @@ def _lcm(a, b):
     return abs(a*b) // _gcd(a,b) 
 
 def _lcmRecurse(filterList):
-    '''Given a list of values, find the LCM of all the values by iteratively looking doing an LCM comparison to the values in the list.
+    '''
+    Given a list of values, find the LCM of all the values by iteratively 
+    looking doing an LCM comparison to the values in the list.
 
     >>> from music21 import sieve
     >>> sieve._lcmRecurse([2, 3])
@@ -629,7 +635,8 @@ class Residual(object):
         
         >>> a = sieve.Residual(3, 2)
         >>> a.segment(3)
-        [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35, 38, 41, 44, 47, 50, 53, 56, 59, 62, 65, 68, 71, 74, 77, 80, 83, 86, 89, 92, 95, 98]
+        [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35, 38, 41, 44, 47, 50, 53, 56, 59, 
+         62, 65, 68, 71, 74, 77, 80, 83, 86, 89, 92, 95, 98]
         >>> a.segment(3, range(3,15))
         [5, 8, 11, 14]
         """
@@ -692,7 +699,8 @@ class Residual(object):
         
         >>> a = sieve.Residual(3, 2)
         >>> a()
-        [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35, 38, 41, 44, 47, 50, 53, 56, 59, 62, 65, 68, 71, 74, 77, 80, 83, 86, 89, 92, 95, 98]
+        [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35, 38, 41, 44, 47, 
+         50, 53, 56, 59, 62, 65, 68, 71, 74, 77, 80, 83, 86, 89, 92, 95, 98]
         """ # if z is None, uses self._z
         return self.segment(n, z, segmentFormat)
 
@@ -846,22 +854,28 @@ class Residual(object):
 
 #-------------------------------------------------------------------------------
 class CompressionSegment(object):
-    """Utility to convert from a point sequence to sieve.
+    """
+    Utility to convert from a point sequence to sieve.
 
-    A z range can be supplied to explicitly provide the complete sieve segment, both positive and negative values. all values in the z range not in the segment are interepreted as negative values. thus, there is an essential dependency on the z range and the realized sieve.
+    A z range can be supplied to explicitly provide the complete sieve segment, 
+    both positive and negative values. all values in the z range not in the 
+    segment are interepreted as negative values. thus, there is an essential 
+    dependency on the z range and the realized sieve.
 
-    No matter the size of the z range, there is a modulus at which one point in the segment can be found. As such, any segment can be reduced to, at a mimimum, a residual for each point in the segment, each, for the supplied z, providing a segment with one point.
+    No matter the size of the z range, there is a modulus at which one point 
+    in the segment can be found. As such, any segment can be reduced to, at a 
+    mimimum, a residual for each point in the segment, each, for the supplied z, 
+    providing a segment with one point.
 
     The same segment can then have multipled logical string representations,
     depending on the provided z.
 
     """
-
-    #The supplied list of values is only the positive values of a sieve segment we do not know what the negative values are; we can assume they are between   the min and max of the list, but this may not be true in all cases. 
-
+    #The supplied list of values is only the positive values of a sieve segment 
+    # we do not know what the negative values are; we can assume they are between 
+    # the min and max of the list, but this may not be true in all cases. 
     def __init__(self, src, z=None):
-        """
-        
+        """  
         >>> a = sieve.CompressionSegment([3,4,5,6,7,8,13,19])
         >>> str(a)
         '6@1|7@6|8@5|9@4|10@3|11@8'
@@ -1149,7 +1163,9 @@ class Sieve(object):
     #---------------------------------------------------------------------------
     # utility functions
     def setZ(self, z):
-        """Set the z as a list. The z is the range of integers to use when generating a sieve segment.
+        """
+        Set the z as a list. The z is the range of integers to use when 
+        generating a sieve segment.
         """
         self._z = z
 
@@ -1356,7 +1372,10 @@ class Sieve(object):
             return libKeys
 
     def _resPeriodList(self, state):
-        """For all residual classes, get the period, or the value of M, and return these in a list. Remove any redundant values and sort. """
+        """
+        For all residual classes, get the period, or the value of M, 
+        and return these in a list. Remove any redundant values and sort.
+        """
         mList = []
         for key in self._resKeys(state):
             p = self._resLib[key].period()
@@ -1400,9 +1419,11 @@ class Sieve(object):
         self._resId = self._resId + 1
 
     def _resResetId(self):
-        """reset self._resId to the next available number
+        """
+        reset self._resId to the next available number
         may need to re-label some residual classes if gaps develop
-        ids should be coniguous integer sequence"""
+        ids should be coniguous integer sequence
+        """
         iVals = range(0, len(self._resLib.keys()))
         for i in iVals:
             testKey = self._resKeyStr(i)
@@ -1445,7 +1466,8 @@ class Sieve(object):
 
 
     def _initParse(self, z=None):
-        """process usrStr string into proper argument dictionaries for Residual
+        """
+        process usrStr string into proper argument dictionaries for Residual
         """
         # clear first
         self._resLib = {} # store id and object
@@ -1535,7 +1557,8 @@ class Sieve(object):
     #---------------------------------------------------------------------------
     # compression methods
     def _cmpIntersection(self):
-        """an unbound sieve, interesect Residual
+        """
+        an unbound sieve, interesect Residual
         """
         self._cmpTree = []    #clear first
         logStr = copy.copy(self._expTree) # create scratch copy
@@ -1589,7 +1612,8 @@ class Sieve(object):
         
         >>> a = sieve.Sieve('3@11')
         >>> a.segment('exp')
-        [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35, 38, 41, 44, 47, 50, 53, 56, 59, 62, 65, 68, 71, 74, 77, 80, 83, 86, 89, 92, 95, 98]
+        [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35, 38, 41, 44, 47, 
+         50, 53, 56, 59, 62, 65, 68, 71, 74, 77, 80, 83, 86, 89, 92, 95, 98]
 
         >>> c = sieve.Sieve('(5|2)&4&8')
         >>> c.segment('cmp', segmentFormat='wid')
@@ -1704,9 +1728,11 @@ class Sieve(object):
 
             # must collect non width formats as integer values; then convert
             if segmentFormat in ['wid', 'width']:
-                segmentPartial = self.segment(self._state, n, list(range(zMin, zMax)), segmentFormat)
+                segmentPartial = self.segment(self._state, n, 
+                                              list(range(zMin, zMax)), segmentFormat)
             else: # if a unit, need to start with integers
-                segmentPartial = self.segment(self._state, n, list(range(zMin, zMax)), 'int')
+                segmentPartial = self.segment(self._state, n, 
+                                              list(range(zMin, zMax)), 'int')
 
             found = found + segmentPartial[:]
             p = p + zStep # increment start value
@@ -1733,8 +1759,10 @@ class Sieve(object):
 
 
     def represent(self, state=None, style=None):
-        """style of None is use for users; adds | to singel residuals
-        style abs (absolute) does not add | tos single residual class"""
+        """
+        style of None is use for users; adds | to singel residuals
+        style abs (absolute) does not add | tos single residual class
+        """
         if state == None:
             state = self._state
         if state == 'exp':
@@ -1758,14 +1786,15 @@ class Sieve(object):
 # high level utility obj
 
 class PitchSieve(object):
-    """Quick utility generation of :class:`music21.pitch.Pitch` lists from :class:`music21.sieve.Sieve` objects.
+    """
+    Quick utility generator of :class:`music21.pitch.Pitch` lists 
+    from :class:`music21.sieve.Sieve` objects.
 
     
     >>> ps = sieve.PitchSieve('6@0', 'c4', 'c8')
     >>> [str(p) for p in ps()]
     ['C4', 'F#4', 'C5', 'F#5', 'C6', 'F#6', 'C7', 'F#7', 'C8']
     """
-    
     def __init__(self, sieveString, pitchLower=None, 
                 pitchUpper=None, pitchOrigin=None, eld=1):
         """
@@ -1805,8 +1834,9 @@ class PitchSieve(object):
 
 
     def __call__(self):
-        """Return a sieve segment as a list of :class:`music21.pitch.Pitch` objects, mapped to the range between pitchLower and pitchUpper.
-
+        """
+        Return a sieve segment as a list of :class:`music21.pitch.Pitch` objects, 
+        mapped to the range between pitchLower and pitchUpper.
         
         >>> a = sieve.PitchSieve('4@7&5@4')
         >>> a()
@@ -1814,7 +1844,8 @@ class PitchSieve(object):
 
         >>> a = sieve.PitchSieve('13@3|13@6|13@9', 'c1', 'c10')
         >>> ', '.join([str(p) for p in a()])
-        'E-1, F#1, A1, E2, G2, B-2, F3, G#3, B3, F#4, A4, C5, G5, B-5, C#6, G#6, B6, D7, A7, C8, E-8, B-8, C#9, E9, B9'
+        'E-1, F#1, A1, E2, G2, B-2, F3, G#3, B3, F#4, A4, C5, G5, B-5, C#6, G#6, B6, 
+         D7, A7, C8, E-8, B-8, C#9, E9, B9'
 
         >>> a = sieve.PitchSieve('3@0', 'c4', 'c5', 'c4', .5)
         >>> a.eld
@@ -1867,8 +1898,9 @@ class PitchSieve(object):
 
 
     def getIntervalSequence(self):
-        '''Return a list of Interval objects that defines the complete structure of this :class:`music21.sieve.Sieve`.  
-
+        '''
+        Return a list of Interval objects that defines the complete structure 
+        of this :class:`music21.sieve.Sieve`.  
         
         >>> a = sieve.PitchSieve('3@0')
         >>> a.getIntervalSequence()
@@ -1876,25 +1908,39 @@ class PitchSieve(object):
 
         >>> a = sieve.PitchSieve('3@0|7@0')
         >>> a.sieveObject.segment()
-        [0, 3, 6, 7, 9, 12, 14, 15, 18, 21, 24, 27, 28, 30, 33, 35, 36, 39, 42, 45, 48, 49, 51, 54, 56, 57, 60, 63, 66, 69, 70, 72, 75, 77, 78, 81, 84, 87, 90, 91, 93, 96, 98, 99]
+        [0, 3, 6, 7, 9, 12, 14, 15, 18, 21, 24, 27, 28, 30, 33, 35, 36, 39, 42, 45, 48, 49, 
+         51, 54, 56, 57, 60, 63, 66, 69, 70, 72, 75, 77, 78, 81, 84, 87, 90, 91, 93, 96, 98, 99]
         >>> a.sieveObject.period()
         21
         >>> a.getIntervalSequence()
-        [<music21.interval.Interval m3>, <music21.interval.Interval m3>, <music21.interval.Interval m2>, <music21.interval.Interval M2>, <music21.interval.Interval m3>, <music21.interval.Interval M2>, <music21.interval.Interval m2>, <music21.interval.Interval m3>, <music21.interval.Interval m3>]
+        [<music21.interval.Interval m3>, <music21.interval.Interval m3>, 
+         <music21.interval.Interval m2>, <music21.interval.Interval M2>, 
+         <music21.interval.Interval m3>, <music21.interval.Interval M2>, 
+         <music21.interval.Interval m2>, <music21.interval.Interval m3>, 
+         <music21.interval.Interval m3>]
+         
+        This is the PitchSieve for a major scale:
 
-        >>> b = sieve.PitchSieve('(-3@2 & 4) | (-3@1 & 4@1) | (3@2 & 4@2) | (-3 & 4@3)') # major scale
+        >>> b = sieve.PitchSieve('(-3@2 & 4) | (-3@1 & 4@1) | (3@2 & 4@2) | (-3 & 4@3)') 
         >>> b.getIntervalSequence()
-        [<music21.interval.Interval M2>, <music21.interval.Interval M2>, <music21.interval.Interval m2>, <music21.interval.Interval M2>, <music21.interval.Interval M2>, <music21.interval.Interval M2>, <music21.interval.Interval m2>]
+        [<music21.interval.Interval M2>, 
+         <music21.interval.Interval M2>, 
+         <music21.interval.Interval m2>, 
+         <music21.interval.Interval M2>, 
+         <music21.interval.Interval M2>, 
+         <music21.interval.Interval M2>, 
+         <music21.interval.Interval m2>]
         '''
         # get a z for the complete period
 #         try:
 #             z = range(self.sieveObject.period()+1)
 #         except (OverflowError, MemoryError):
-#             environLocal.printDebug('failed to generates a z with period:', self.sieveObject.period())
+#             environLocal.printDebug('failed to generates a z with period:', 
+#                    self.sieveObject.period())
         p = self.sieveObject.period()
         if p < 999999999:
             z = list(range(p+1))
-        else: # to big to get z as list of values
+        else: # too big to get z as list of values
             z = None
 
         # get widths, then scale by eld
@@ -1930,11 +1976,6 @@ class PitchSieve(object):
 #         if len(post) == 0:
 #             raise PitchSieveException('interval segment has no values')
 #         return post
-
-
-
-
-
 
 
 
@@ -2030,9 +2071,11 @@ class Test(unittest.TestCase):
         self.assertEqual(str(a), '{-3@2&4@0}|{-3@1&4@1}|{3@2&4@2}|{-3@0&4@3}')
 
         # 'nomos alpha sieve'
-        usrStr = '(-(13@3 | 13@5 | 13@7 | 13@9) & 11@2) | (-(11@4 | 11@8) & 13@9) | (13@0 | 13@1 | 13@6)'
+        usrStr = ('(-(13@3 | 13@5 | 13@7 | 13@9) & 11@2) | (-(11@4 | 11@8) & 13@9) | ' + 
+                  '(13@0 | 13@1 | 13@6)')
         a = Sieve(usrStr, z)
-        self.assertEqual(str(a), '{-{13@3|13@5|13@7|13@9}&11@2}|{-{11@4|11@8}&13@9}|{13@0|13@1|13@6}')
+        self.assertEqual(str(a), 
+                         '{-{13@3|13@5|13@7|13@9}&11@2}|{-{11@4|11@8}&13@9}|{13@0|13@1|13@6}')
 
 
     def testPitchSieveA(self):
@@ -2044,7 +2087,8 @@ class Test(unittest.TestCase):
             'E4, F#4, A4, B4, C5, E-5, F#5, A5, C6]')
 
         s1 = sieve.PitchSieve('3@0|7@0', 'c2', 'c6', eld=2)
-        self.assertEqual(self.pitchOut(s1()), '[C2, D2, F#2, C3, E3, F#3, C4, F#4, C5, F#5, G#5, C6]')
+        self.assertEqual(self.pitchOut(s1()), 
+                         '[C2, D2, F#2, C3, E3, F#3, C4, F#4, C5, F#5, G#5, C6]')
 
     def testPitchSieveB(self):
         from music21 import sieve
