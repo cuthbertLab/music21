@@ -243,19 +243,17 @@ class Chord(note.NotRest):
                     self.duration = n.duration
                     del keywords['duration']
                     quickDuration = False
-            elif isinstance(n, six.string_types):
+            elif isinstance(n, six.string_types) or isinstance(n, int):
                 if 'duration' in keywords:
                     self._notes.append(note.Note(n, duration=keywords['duration']))
                 else:
                     self._notes.append(note.Note(n))
                 #self._notes.append({'pitch':music21.pitch.Pitch(n)})
-            elif isinstance(n, int):
-                if 'duration' in keywords:
-                    self._notes.append(note.Note(n, duration=keywords['duration'], context=self._notes))
-                else:
-                    self._notes.append(note.Note(n), context=self._notes)
             else:
                 raise ChordException("Could not process input argument %s" % n)
+
+        if all(isinstance(n, int) for n in notes):
+            self.simplifyEnharmonics(inPlace=True)
 
         if quickDuration is True:
             del keywords['duration']
@@ -3322,6 +3320,32 @@ class Chord(note.NotRest):
                 break
         if not match:
             raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
+
+    def simplifyEnharmonics(self, inPlace=False):
+        '''
+        Calls `pitch.simplifyMultipleEnharmonics` on the pitches of the chord.
+
+        >>> c = chord.Chord('C# F G#')
+        >>> c.pitches
+        (<music21.pitch.Pitch C#>, <music21.pitch.Pitch F>, <music21.pitch.Pitch G#>)
+
+        >>> c.simplifyEnharmonics(inPlace=True)
+        >>> c.pitches
+        (<music21.pitch.Pitch C#>, <music21.pitch.Pitch E#>, <music21.pitch.Pitch G#>)
+        '''
+        newPitches = pitch.simplifyMultipleEnharmonics(self.pitches, criterion='maximizeConsonance', key=None)
+        if inPlace:
+            changes = 0
+            for i, newPitch in enumerate(newPitches):
+                if newPitch != self._notes[i].pitch:
+                    self._notes[i].pitch = newPitch
+                    changes += 1
+            if changes > 0:
+                self._chordTablesAddressNeedsUpdating = True
+                self._bass = None
+                self._root = None
+        else:
+            return Chord(newPitches)
 
     def sortAscending(self, inPlace=False):
         return self.sortDiatonicAscending(inPlace=inPlace)

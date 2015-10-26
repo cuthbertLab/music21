@@ -337,35 +337,55 @@ def _convertHarmonicToCents(value):
         value = 1.0/(abs(value))
     return int(round(1200*math.log(value, 2), 0))
 
-def _getProbableName(n, context):
-    r'''Tries to find the most probable note name for a midi or pitchclass
-    number by maximizing the consonant intervals in some given context
 
-    >>> pitch._getProbableName(3, context=[])
-    'E-'
-    >>> pitch._getProbableName(3, context=[note.Note("B"), note.Note("F#")])
-    'D#'
+def simplifyMultipleEnharmonics(pitches, criterion='maximizeConsonance', key=None):
+    r'''Tries to simplify the enharmonic spelling of a list of pitches, pitch-
+    or pitch-class numbers according to a given criterion. 
+
+    Currently `maximizeConsonance` is the only criterion, that tries to
+    maximize the consonances in a greedy left-to-right fashion.
+
+    >>> pitch.simplifyMultipleEnharmonics([11, 3, 6])
+    [<music21.pitch.Pitch B>, <music21.pitch.Pitch D#>, <music21.pitch.Pitch F#>]
+
+    >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('G3'), pitch.Pitch('C-4'), pitch.Pitch('D4')])
+    [<music21.pitch.Pitch G3>, <music21.pitch.Pitch B3>, <music21.pitch.Pitch D4>]
+
+    >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('A3'), pitch.Pitch('B#3'), pitch.Pitch('E4')])
+    [<music21.pitch.Pitch A3>, <music21.pitch.Pitch C4>, <music21.pitch.Pitch E4>] 
     '''
 
-    tmp_pitch = Pitch(n)
-    name1 = tmp_pitch.name
-    name2 = tmp_pitch.getEnharmonic().name
-    consonant_counter = [0, 0]
+    from music21 import key as keyModule
 
-    for cn in context:
-        if cn != n:
-            interval1 = interval.Interval(noteStart=Pitch(name1), noteEnd=cn)
-            interval2 = interval.Interval(noteStart=Pitch(name2), noteEnd=cn)
+    oldPitches = [p if isinstance(p, Pitch) else Pitch(p) for p in pitches]
+    simplifiedPitches = []
 
-            if interval1.isConsonant():
-                consonant_counter[0] += 1
-            if interval2.isConsonant():
-                consonant_counter[1] += 1
+    if criterion == 'maximizeConsonance':
 
-    if consonant_counter[1] > consonant_counter[0]:
-        return name2
-    else:
-        return name1
+        if isinstance(key, keyModule.KeySignature):
+            simplifiedPitches.append(key.pitchAndMode[0])
+            remove_first = True
+        elif isinstance(key, keyModule.Key):
+            simplifiedPitches.append(key.tonic)
+            remove_first = True
+        else:
+            remove_first = False
+
+        for i, p in enumerate(oldPitches):
+            candidates = [p] + p.getAllCommonEnharmonics()
+            consonant_counter = [0] * len(candidates)
+            for context_pitch in simplifiedPitches[::-1]:
+                intervals = [interval.Interval(noteStart=candidate, noteEnd=context_pitch) for candidate in candidates]
+                for j, interval_candidate in enumerate(intervals):
+                    if interval_candidate.isConsonant():
+                        consonant_counter[j] += 1
+
+            simplifiedPitches.append(sorted(zip(consonant_counter, candidates), key=lambda x: x[0], reverse=True)[0][1])
+
+        if remove_first:
+            simplifiedPitches = simplifiedPitches[1:]
+
+    return simplifiedPitches
 
 
 #------------------------------------------------------------------------------
@@ -1306,14 +1326,11 @@ class Pitch(object):
             if not common.isNum(name):
                 self._setName(name) # set based on string
             else: # is a number
-                if 'context' in keywords:
-                    self._setName(_getProbableName(name, context=keywords['context']))
-                else:
-                    if name < 12: # is a pitchClass
-                        self._setPitchClass(name)
-                    else: # is a midiNumber
-                        self._setPitchClass(name)
-                        self._octave = int(name/12) - 1
+                if name < 12: # is a pitchClass
+                    self._setPitchClass(name)
+                else: # is a midiNumber
+                    self._setPitchClass(name)
+                    self._octave = int(name/12) - 1
 
         # override just about everything with keywords
         # necessary for ImmutablePitch objects
