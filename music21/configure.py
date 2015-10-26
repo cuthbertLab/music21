@@ -625,7 +625,8 @@ class Dialog(object):
             except DialogError: # pylint: disable=catching-non-exception
                 # in some cases, the action selected requires exciting the 
                 # configuration assistant
-                raise DialogError('perform action raised a dialog exception') # pylint: disable=raising-non-exception
+                # pylint: disable=raising-non-exception
+                raise DialogError('perform action raised a dialog exception') 
 
 
 #-------------------------------------------------------------------------------
@@ -1475,9 +1476,12 @@ class ConfigurationAssistant(object):
 
     def _introduction(self):
         msg = []
-        msg.append('''Welcome the music21 Configuration Assistant. You will be guided through a number of questions to install and setup music21. Simply pressing return at a prompt will select a default, if available.''')
+        msg.append('Welcome the music21 Configuration Assistant. You will be guided ' + 
+                   'through a number of questions to install and setup music21. ' + 
+                   'Simply pressing return at a prompt will select a default, if available.')
         msg.append('') # will cause a line break
-        msg.append('''You may run this configuration again at a later time by running music21/configure.py.''')
+        msg.append('You may run this configuration again at a later time ' + 
+                   'by running music21/configure.py.')
         msg.append(' ') # will cause a blank line
 
         writeToUser(msg)

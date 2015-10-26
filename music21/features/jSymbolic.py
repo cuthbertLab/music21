@@ -498,7 +498,8 @@ class MelodicTritonesFeature(featuresModule.FeatureExtractor):
     '''
     id = 'M14'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Melodic Tritones'
         self.description = 'Fraction of melodic intervals that are tritones.'
@@ -1579,11 +1580,12 @@ class VibratoPrevalenceFeature(featuresModule.FeatureExtractor):
 #     '''
 #     id = 'P26'
 #     def __init__(self, dataOrStream=None, *arguments, **keywords):
-#         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+#         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+#                    *arguments, **keywords)
 # 
 #         self.name = 'Prevalence Of Micro-tones'
-#         self.description = 'Number of Note Ons that are preceded by isolated MIDI Pitch 
-#                            Bend messages as a fraction of the total number of Note Ons.'
+#         self.description = ('Number of Note Ons that are preceded by isolated MIDI Pitch ' + 
+#                            'Bend messages as a fraction of the total number of Note Ons.')
 #         self.isSequential = True
 #         self.dimensions = 1
 
@@ -1627,7 +1629,8 @@ class SecondStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
                                                  *arguments, **keywords)
  
         self.name = 'Second Strongest Rhythmic Pulse'
-        self.description = 'Bin label of the beat bin of the peak with the second highest frequency.'
+        self.description = ('Bin label of the beat bin of the peak ' + 
+                            'with the second highest frequency.')
         self.isSequential = True
         self.dimensions = 1
 
@@ -1647,10 +1650,13 @@ class HarmonicityOfTwoStrongestRhythmicPulsesFeature(
     '''
     id = 'R3'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Harmonicity of Two Strongest Rhythmic Pulses'
-        self.description = 'The bin label of the higher (in terms of bin label) of the two beat bins of the peaks with the highest frequency divided by the bin label of the lower.'
+        self.description = ('The bin label of the higher (in terms of bin label) of the ' + 
+                            'two beat bins of the peaks with the highest frequency ' + 
+                            'divided by the bin label of the lower.')
         self.isSequential = True
         self.dimensions = 1
 
@@ -1666,7 +1672,8 @@ class StrengthOfStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R4'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Strength of Strongest Rhythmic Pulse'
         self.description = 'Frequency of the beat bin with the highest frequency.'
@@ -1692,7 +1699,8 @@ class StrengthOfSecondStrongestRhythmicPulseFeature(
                                                  *arguments, **keywords)
  
         self.name = 'Strength of Second Strongest Rhythmic Pulse'
-        self.description = 'Frequency of the beat bin of the peak with the second highest frequency.'
+        self.description = ('Frequency of the beat bin of the peak ' + 
+                            'with the second highest frequency.')
         self.isSequential = True
         self.dimensions = 1
 
@@ -1717,7 +1725,9 @@ class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(
                                                  *arguments, **keywords)
 
         self.name = 'Strength Ratio of Two Strongest Rhythmic Pulses'
-        self.description = 'The frequency of the higher (in terms of frequency) of the two beat bins corresponding to the peaks with the highest frequency divided by the frequency of the lower.'
+        self.description = ('The frequency of the higher (in terms of frequency) of the two ' + 
+                            'beat bins corresponding to the peaks with the highest ' + 
+                            'frequency divided by the frequency of the lower.')
         self.isSequential = True
         self.dimensions = 1
 
@@ -1739,7 +1749,8 @@ class CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(
                                                  *arguments, **keywords)
 
         self.name = 'Combined Strength of Two Strongest Rhythmic Pulses'
-        self.description = 'The sum of the frequencies of the two beat bins of the peaks with the highest frequencies.'
+        self.description = ('The sum of the frequencies of the two beat bins ' + 
+                            'of the peaks with the highest frequencies.')
         self.isSequential = True
         self.dimensions = 1
 
@@ -1879,7 +1890,8 @@ class RhythmicVariabilityFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R13'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Rhythmic Variability'
         self.description = 'Standard deviation of the bin values (except the first 40 empty ones).'
@@ -1895,7 +1907,8 @@ class BeatHistogramFeature(featuresModule.FeatureExtractor):
     '''
     Not yet implemented
     
-    A feature exractor that finds a feature array with entries corresponding to the frequency values of each of the bins of the beat histogram (except the first 40 empty ones).
+    A feature exractor that finds a feature array with entries corresponding to the frequency 
+    values of each of the bins of the beat histogram (except the first 40 empty ones).
 
     
     '''
@@ -1904,7 +1917,9 @@ class BeatHistogramFeature(featuresModule.FeatureExtractor):
         featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Beat Histogram'
-        self.description = 'A feature array with entries corresponding to the frequency values of each of the bins of the beat histogram (except the first 40 empty ones).'
+        self.description = ('A feature array with entries corresponding to the ' + 
+                            'frequency values of each of the bins of the beat histogram ' + 
+                            '(except the first 40 empty ones).')
         self.isSequential = True
         self.dimensions = 161
         self.discrete = False
@@ -1994,7 +2009,8 @@ class AverageNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R17'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Average Note Duration'
         self.description = 'Average duration of notes in seconds.'
@@ -2044,7 +2060,8 @@ class MaximumNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R19'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Maximum Note Duration'
         self.description = 'Duration of the longest note (in seconds).'
@@ -2072,7 +2089,8 @@ class MinimumNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R20'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
  
         self.name = 'Minimum Note Duration'
         self.description = 'Duration of the shortest note (in seconds).'
@@ -2102,10 +2120,12 @@ class StaccatoIncidenceFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R21'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Staccato Incidence'
-        self.description = 'Number of notes with durations of less than a 10th of a second divided by the total number of notes in the recording.'
+        self.description = ('Number of notes with durations of less than a 10th ' + 
+                            'of a second divided by the total number of notes in the recording.')
         self.isSequential = True
         self.dimensions = 1
 
@@ -2132,7 +2152,8 @@ class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R22'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Average Time Between Attacks'
         self.description = 'Average time in seconds between Note On events (regardless of channel).'
@@ -2168,10 +2189,12 @@ class VariabilityOfTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
     '''
     id = 'R23'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
  
         self.name = 'Variability of Time Between Attacks'
-        self.description = 'Standard deviation of the times, in seconds, between Note On events (regardless of channel).'
+        self.description = ('Standard deviation of the times, in seconds, ' + 
+                            'between Note On events (regardless of channel).')
         self.isSequential = True
         self.dimensions = 1
  
@@ -2208,10 +2231,12 @@ class AverageTimeBetweenAttacksForEachVoiceFeature(
     '''
     id = 'R24'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Average Time Between Attacks For Each Voice'
-        self.description = 'Average of average times in seconds between Note On events on individual channels that contain at least one note.'
+        self.description = ('Average of average times in seconds between Note On events ' + 
+                            'on individual channels that contain at least one note.')
         self.isSequential = True
         self.dimensions = 1
 
@@ -2258,10 +2283,13 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
     '''
     id = 'R25'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
-        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+                                                 *arguments, **keywords)
 
         self.name = 'Average Variability of Time Between Attacks For Each Voice'
-        self.description = 'Average standard deviation, in seconds, of time between Note On events on individual channels that contain at least one note.'
+        self.description = ('Average standard deviation, in seconds, of time between ' + 
+                            'Note On events on individual channels that contain ' + 
+                            'at least one note.')
         self.isSequential = True
         self.dimensions = 1
 
@@ -2303,10 +2331,12 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
 #    
 #    '''
 #    def __init__(self, dataOrStream=None, *arguments, **keywords):
-#        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+#        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+#                    *arguments, **keywords)
 #
 #        self.name = 'Incidence Of Complete Rests'
-#        self.description = 'Total amount of time in seconds in which no notes are sounding on any channel divided by the total length of the recording'
+#        self.description = ('Total amount of time in seconds in which no notes are sounding' + 
+#                    ' on any channel divided by the total length of the recording')
 #        self.isSequential = True
 #        self.dimensions = 1
 #
@@ -2316,10 +2346,12 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
 #    
 #    '''
 #    def __init__(self, dataOrStream=None, *arguments, **keywords):
-#        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+#        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+#                        *arguments, **keywords)
 #
 #        self.name = 'Maximumm Complete Rest Duration'
-#        self.description = 'Maximum amount of time in seconds in which no notes are sounding on any channel.'
+#        self.description = ('Maximum amount of time in seconds in which no notes ' + 
+#                'are sounding on any channel.')
 #        self.isSequential = True
 #        self.dimensions = 1
 #
@@ -2329,10 +2361,13 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
 #    
 #    '''
 #    def __init__(self, dataOrStream=None, *arguments, **keywords):
-#        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+#        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+#                        *arguments, **keywords)
 #
 #        self.name = 'Average Rest Duration Per Voice'
-#        self.description = 'Average, in seconds, of the average amounts of time in each channel in which no note is sounding (counting only channels with at least one note), divided by the total duration of the recording'
+#        self.description = ('Average, in seconds, of the average amounts of time in each ' + 
+#                'channel in which no note is sounding (counting only channels with at least ' + 
+#                'one note), divided by the total duration of the recording')
 #        self.isSequential = True
 #        self.dimensions = 1
 #
@@ -2342,10 +2377,13 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
 #    
 #    '''
 #    def __init__(self, dataOrStream=None, *arguments, **keywords):
-#        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, *arguments, **keywords)
+#        featuresModule.FeatureExtractor.__init__(self, dataOrStream=dataOrStream, 
+#                    *arguments, **keywords)
 #
 #        self.name = 'Average Variability Of Rest Durations Across Voices'
-#        self.description = ' Standard deviation, in seconds, of the average amounts of time in each channel in which no note is sounding (counting only channels with at least one note)'
+#        self.description = ('Standard deviation, in seconds, of the average amounts of time ' + 
+#                    'in each channel in which no note is sounding (counting only ' + 
+#                    'channels with at least one note)'
 #        self.isSequential = True
 #        self.dimensions = 1
 

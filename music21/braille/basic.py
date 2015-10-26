@@ -1041,7 +1041,7 @@ def transcribeSignatures(music21KeySignature, music21TimeSignature, outgoingKeyS
 # Translation between braille unicode and ASCII/other symbols.
 
 def brailleUnicodeToBrailleAscii(brailleUnicode):
-    """
+    r"""
     translates a braille UTF-8 unicode string into braille ASCII,
     which is the format compatible with most braille embossers.
 

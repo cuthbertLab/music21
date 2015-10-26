@@ -97,7 +97,10 @@ affinityNames = {AFFINITY_SIGNATURE: "Signature Grouping",
                  AFFINITY_SPLIT1_NOTEGROUP: "Split Note Grouping",
                  AFFINITY_SPLIT2_NOTEGROUP: "Split Note Grouping"}
 
-excludeFromBrailleElements = [spanner.Slur, layout.SystemLayout, layout.PageLayout, layout.StaffLayout]
+excludeFromBrailleElements = [spanner.Slur, 
+                              layout.SystemLayout, 
+                              layout.PageLayout, 
+                              layout.StaffLayout]
 
 GROUPING_GLOBALS = {'keySignature': 0,
                     'timeSignature': '4/4'}
@@ -125,15 +128,20 @@ SEGMENT_SEGMENTBREAKS=[]
 #-------------------------------------------------------------------------------
 
 class BrailleElementGrouping(list):
-    _DOC_ATTR = {'keySignature': 'The last :class:`~music21.key.KeySignature` preceding the grouping.',
-                 'timeSignature': 'The last :class:`~music21.meter.TimeSignature` preceding the grouping.',
-                 'descendingChords': 'True if a :class:`~music21.chord.Chord` should be spelled from highest to lowest pitch\
-                 in braille, False if the opposite is the case.',
-                 'showClefSigns' : 'If true, clef signs are shown in braille. Representation of music in braille is not\
-                 dependent upon clefs and staves, so the clef signs would be displayed for referential or historical purposes.',
-                 'upperFirstInNoteFingering' : 'No documentation.',
-                 'withHyphen': 'If True, this grouping will end with a music hyphen.',
-                 'numRepeats': 'The number of times this grouping is repeated.'}
+    _DOC_ATTR = {
+         'keySignature': 'The last :class:`~music21.key.KeySignature` preceding the grouping.',
+         'timeSignature': 'The last :class:`~music21.meter.TimeSignature` preceding the grouping.',
+         'descendingChords': '''True if a :class:`~music21.chord.Chord` should be spelled 
+             from highest to lowest pitch
+             in braille, False if the opposite is the case.''',
+         'showClefSigns' : '''If true, clef signs are shown in braille. 
+             Representation of music in braille is not
+             dependent upon clefs and staves, so the clef signs would be displayed 
+             for referential or historical purposes.''',
+#         'upperFirstInNoteFingering' : 'No documentation.',
+         'withHyphen': 'If True, this grouping will end with a music hyphen.',
+         'numRepeats': 'The number of times this grouping is repeated.'
+    }
     def __init__(self):
         """
         Intended to be a list of objects which should be displayed
@@ -191,19 +199,34 @@ class BrailleElementGrouping(list):
         return str(self)
     
 class BrailleSegment(collections.defaultdict):
-    _DOC_ATTR = {'cancelOutgoingKeySig': 'If True, the previous key signature should be cancelled immediately before a new key signature is encountered.',
-                 'dummyRestLength': 'For a given positive integer n, adds n "dummy rests" near the beginning of a segment. Designed for test purposes, as they\
-                 are used to demonstrate measure division at the end of braille lines.',
-                 'maxLineLength': 'The maximum amount of braille characters that should be present in a line. The standard is 40 characters.',
-                 'showFirstMeasureNumber': 'If True, then a measure number is shown following the heading (if applicable) and preceding the music.',
-                 'showHand': 'If set to "right" or "left", shows the corresponding hand sign at the beginning of the first line.',
-                 'showHeading': 'If True, then a braille heading is displayed. See :meth:`~music21.braille.basic.transcribeHeading` for more details on headings.',
-                 'suppressOctaveMarks': 'If True, then all octave marks are suppressed. Designed for test purposes, as octave marks were not presented\
-                 until Chapter 7 of BMTM.',
-                 'endHyphen': 'If True, then the last :class:`~music21.braille.segment.BrailleElementGrouping` of this segment will be followed by a music hyphen.\
-                 The last grouping is incomplete, because a segment break occured in the middle of a measure.',
-                 'measureNumberWithDot': 'If True, then the initial measure number of this segment should be followed by a dot. This segment\
-                 is starting in the middle of a measure.'}
+    _DOC_ATTR = {
+         'cancelOutgoingKeySig': '''If True, the previous key signature should be 
+                 cancelled immediately before a new key signature is encountered.''',
+         'dummyRestLength': '''For a given positive integer n, adds n "dummy rests" 
+                 near the beginning of a segment. Designed for test purposes, as they
+                 are used to demonstrate measure division at the end of braille lines.''',
+         'maxLineLength': '''The maximum amount of braille characters that should be 
+                 present in a line. The standard is 40 characters.''',
+         'showFirstMeasureNumber': '''If True, then a measure number is shown 
+                 following the heading (if applicable) and preceding the music.''',
+         'showHand': '''If set to "right" or "left", shows the corresponding 
+                 hand sign at the beginning of the first line.''',
+         'showHeading': '''If True, then a braille heading is displayed. 
+                 See :meth:`~music21.braille.basic.transcribeHeading` 
+                 for more details on headings.''',
+         'suppressOctaveMarks': '''If True, then all octave marks are suppressed. 
+                 Designed for test purposes, as octave marks were not presented
+                 until Chapter 7 of BMTM.''',
+         'endHyphen': '''If True, then the last 
+                 :class:`~music21.braille.segment.BrailleElementGrouping` of this 
+                 segment will be followed by a music hyphen.
+                 The last grouping is incomplete, because a segment 
+                 break occured in the middle of a measure.''',
+         'measureNumberWithDot': '''If True, then the initial measure number of this 
+                 segment should be followed by a dot. This segment
+                 is starting in the middle of a measure.'''
+    }
+
     def __init__(self):
         """
         A segment is "a group of measures occupying more than one braille line." 
@@ -379,7 +402,8 @@ class BrailleSegment(collections.defaultdict):
         noteGrouping = self.get(self._currentGroupingKey)
         allNotes = [n for n in noteGrouping if isinstance(n, note.Note)]
         if self._previousGroupingKey is not None:
-            if (self._currentGroupingKey - self._previousGroupingKey) == 10 or self._previousGroupingKey % 10 != AFFINITY_NOTEGROUP:
+            if ((self._currentGroupingKey - self._previousGroupingKey) == 10 or 
+                    self._previousGroupingKey % 10 != AFFINITY_NOTEGROUP):
                 self._lastNote = None
         showLeadingOctave = True
         if allNotes:
@@ -422,11 +446,17 @@ class BrailleSegment(collections.defaultdict):
                         showLeadingOctave = False
                     brailleNoteGroupingB = basic.transcribeNoteGrouping(sngB, showLeadingOctave)
                     try:
-                        brailleText.addElement(noteGrouping = brailleNoteGroupingB,
-                            showLeadingOctave = True, withHyphen = noteGrouping.withHyphen, forceHyphen = True)
+                        brailleText.addElement(
+                            noteGrouping=brailleNoteGroupingB,
+                            showLeadingOctave=True, 
+                            withHyphen=noteGrouping.withHyphen, 
+                            forceHyphen=True)
                     except text.BrailleTextException as bte:
-                        brailleText.addElement(noteGrouping = brailleNoteGroupingB,
-                            showLeadingOctave = True, withHyphen = noteGrouping.withHyphen, forceHyphen = True,
+                        brailleText.addElement(
+                            noteGrouping=brailleNoteGroupingB,
+                            showLeadingOctave=True, 
+                            withHyphen=noteGrouping.withHyphen, 
+                            forceHyphen=True,
                             forceNewline=True)
                     isSolved = True
                     self[self._currentGroupingKey-0.5] = sngA
@@ -478,7 +508,7 @@ class BrailleSegment(collections.defaultdict):
         else:
             return u"".join([brailleNumber, symbols['dot']])
 
-class BrailleGrandSegment():
+class BrailleGrandSegment(object):
     def __init__(self, rightSegment, leftSegment):
         self.rightSegment = rightSegment
         self.leftSegment = leftSegment
@@ -501,7 +531,8 @@ class BrailleGrandSegment():
             ab = u"".join([a,b]) 
             cd = u"".join([c,d])
             allPairs.append(u"\n".join([ab, cd, "====\n"]))
-        return u"\n".join(["---begin grand segment---", name, u"".join(allPairs), "---end grand segment---"])
+        return u"\n".join(["---begin grand segment---", name, u"".join(allPairs), 
+                           "---end grand segment---"])
 
     def combineGroupingKeys(self, rightSegment, leftSegment):
         groupingKeysRight = sorted(rightSegment.keys())
@@ -524,7 +555,11 @@ class BrailleGrandSegment():
                     try:
                         groupingKeysLeft.remove(gkLeft)
                     except ValueError:
-                        raise BrailleSegmentException("Misaligned braille groupings: groupingKeyLeft was %s, groupingKeyRight was %s, rightSegment was %s, leftSegment was %s" % (gkLeft, gkRight, rightSegment, leftSegment))
+                        raise BrailleSegmentException(
+                            "Misaligned braille groupings: " + 
+                            "groupingKeyLeft was %s" % gkLeft + 
+                            "groupingKeyRight was %s" % gkRight + 
+                            "rightSegment was %s, leftSegment was %s" % (rightSegment, leftSegment))
 
                     try:
                         combinedGroupingKeys.append((gkRight,gkLeft))
@@ -648,26 +683,30 @@ class BrailleGrandSegment():
     def extractTempoTextGrouping(self, brailleKeyboard):
         pass
             
-def splitNoteGrouping(noteGrouping, value = 2, beatDivisionOffset = 0):
+def splitNoteGrouping(noteGrouping, value=2, beatDivisionOffset=0):
     """
     Almost identical to :meth:`~music21.braille.segment.splitMeasure`, but
     functions on a :class:`~music21.braille.segment.BrailleElementGrouping`
     instead.
     """
+    # pylint: disable=attribute-defined-outside-init
     music21Measure = stream.Measure()
     for brailleElement in noteGrouping:
         music21Measure.insert(brailleElement.offset, brailleElement)
-    newMeasures = splitMeasure(music21Measure, value, beatDivisionOffset, noteGrouping.timeSignature)
+    newMeasures = splitMeasure(music21Measure, 
+                               value, 
+                               beatDivisionOffset, 
+                               noteGrouping.timeSignature)
     
     leftBrailleElements = BrailleElementGrouping()
     for brailleElement in newMeasures[0]:
         leftBrailleElements.append(brailleElement)
-    leftBrailleElements.__dict__ = noteGrouping.__dict__.copy() # pylint: disable=attribute-defined-outside-init
+    leftBrailleElements.__dict__ = noteGrouping.__dict__.copy() 
 
     rightBrailleElements = BrailleElementGrouping()
     for brailleElement in newMeasures[1]:
         rightBrailleElements.append(brailleElement)
-    rightBrailleElements.__dict__ = noteGrouping.__dict__.copy() # pylint: disable=attribute-defined-outside-init
+    rightBrailleElements.__dict__ = noteGrouping.__dict__.copy() 
 
     return leftBrailleElements, rightBrailleElements
 
@@ -838,9 +877,9 @@ def findSegments(music21Part, **partKeywords):
     return allSegments
 
 
-def prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets = SEGMENT_SLURLONGPHRASEWITHBRACKETS,
-                        showShortSlursAndTiesTogether = SEGMENT_SHOWSHORTSLURSANDTIESTOGETHER, 
-                        showLongSlursAndTiesTogether = SEGMENT_SHOWLONGSLURSANDTIESTOGETHER):
+def prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets=SEGMENT_SLURLONGPHRASEWITHBRACKETS,
+                        showShortSlursAndTiesTogether=SEGMENT_SHOWSHORTSLURSANDTIESTOGETHER, 
+                        showLongSlursAndTiesTogether=SEGMENT_SHOWLONGSLURSANDTIESTOGETHER):
     """
     Takes in a :class:`~music21.stream.Part` and three keywords:
     
@@ -969,12 +1008,14 @@ def prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets = SEGMENT_SLURLO
             endIndex = slur[1].index
             delta = abs(endIndex - beginIndex) + 1
             if not showShortSlursAndTiesTogether and delta <= 4:
-                if allNotes[beginIndex].tie is not None and allNotes[beginIndex].tie.type == 'start':
+                if (allNotes[beginIndex].tie is not None and 
+                        allNotes[beginIndex].tie.type == 'start'):
                     beginIndex += 1
                 if allNotes[endIndex].tie is not None and allNotes[endIndex].tie.type == 'stop':
                     endIndex -= 1
             if not showLongSlursAndTiesTogether and delta > 4:
-                if allNotes[beginIndex].tie is not None and allNotes[beginIndex].tie.type == 'start':
+                if (allNotes[beginIndex].tie is not None and 
+                        allNotes[beginIndex].tie.type == 'start'):
                     beginIndex += 1
                 if allNotes[endIndex].tie is not None and allNotes[endIndex].tie.type == 'stop':
                     endIndex -= 1
@@ -1137,7 +1178,9 @@ def getRawSegments(music21Part, segmentBreaks=None):
                     (mnStart, offsetStart) = (10E5, 0.0)
             if brailleElement.affinityCode < previousCode:
                 offsetFactor += 1
-            bucketNumber = music21Measure.number * 100 +  offsetFactor * 10 + int(brailleElement.affinityCode)
+            bucketNumber = ((music21Measure.number * 100) + 
+                            (offsetFactor * 10) + 
+                            int(brailleElement.affinityCode))
             currentSegment[bucketNumber].append(brailleElement)
             previousCode = brailleElement.affinityCode
     allSegments.append(currentSegment)
@@ -1198,7 +1241,8 @@ def extractBrailleElements(music21Measure):
             music21Object._brailleEnglish = [str(music21Object)]
             allElements.append(music21Object)
         except BrailleSegmentException as notSupportedException:
-            isExempt = [isinstance(music21Object, music21Class) for music21Class in excludeFromBrailleElements]
+            isExempt = [isinstance(music21Object, music21Class) 
+                        for music21Class in excludeFromBrailleElements]
             if not isExempt.count(True):
                 environRules.warn("{0}".format(notSupportedException))
 
@@ -1287,14 +1331,16 @@ def prepareBeamedNotes(music21Measure):
                 break
         try:
             afterStopNote = allNotesAndRests[stopIndex+1]
-            if isinstance(afterStopNote, note.Rest) and (int(afterStopNote.beat) == int(stopNote.beat)):
+            if (isinstance(afterStopNote, note.Rest) and 
+                    (int(afterStopNote.beat) == int(stopNote.beat))):
                 allNotesOfSameValue = False
         except exceptions21.StreamException: # stopNote is last note of measure.
             pass
         if not allNotesOfSameValue:
             continue
         try:
-            # 4. If the notes in the group are followed immediately by a true eighth note or by an eighth rest, 
+            # 4. If the notes in the group are followed immediately by a 
+            # true eighth note or by an eighth rest, 
             # grouping may not be used, unless the eighth is located in a new measure.
             if allNotesAndRests[stopIndex+1].quarterLength == 0.5:
                 continue
@@ -1303,8 +1349,9 @@ def prepareBeamedNotes(music21Measure):
         startNote.beamStart = True
         try:
             beforeStartNote = allNotesAndRests[startIndex - 1]
-            if isinstance(beforeStartNote, note.Rest) and (int(beforeStartNote.beat) == int(startNote.beat)) and \
-                (beforeStartNote.duration.type == startNote.duration.type):
+            if (isinstance(beforeStartNote, note.Rest) and 
+                    (int(beforeStartNote.beat) == int(startNote.beat)) and
+                    (beforeStartNote.duration.type == startNote.duration.type)):
                 startNote.beamContinue = True
         except IndexError: # startNote is first note of measure.
             pass
@@ -1387,7 +1434,8 @@ def addGroupingAttributes(allSegments, **partKeywords):
             if previousKey is not None:
                 if groupingKey % 100 >= 10:
                     previousList.withHyphen = True
-                if previousKey % 100 == AFFINITY_NOTEGROUP and groupingKey % 100 == AFFINITY_NOTEGROUP:
+                if (previousKey % 100 == AFFINITY_NOTEGROUP and 
+                        groupingKey % 100 == AFFINITY_NOTEGROUP):
                     if isinstance(previousList[0], clef.Clef):
                         measureRepeats = compareNoteGroupings(previousList[1:], groupingList)
                     else:
@@ -1405,9 +1453,9 @@ def addGroupingAttributes(allSegments, **partKeywords):
                         currentKeySig = brailleElement
             elif groupingKey % 10 == AFFINITY_NOTEGROUP:
                 if isinstance(groupingList[0], clef.Clef):
-                    if isinstance(groupingList[0], clef.TrebleClef) or isinstance(groupingList[0], clef.AltoClef):
+                    if isinstance(groupingList[0], (clef.TrebleClef, clef.AltoClef)):
                         descendingChords = True
-                    elif isinstance(groupingList[0], clef.BassClef) or isinstance(groupingList[0], clef.TenorClef):
+                    elif isinstance(groupingList[0], (clef.BassClef, clef.TenorClef)):
                         descendingChords = False
                 allGeneralNotes = [n for n in groupingList if isinstance(n, note.GeneralNote)]
                 if len(allGeneralNotes) == 1 and isinstance(allGeneralNotes[0], note.Rest):
@@ -1470,13 +1518,15 @@ def fixArticulations(allSegments):
     from music21 import articulations
     for brailleSegment in allSegments:
         newSegment = brailleSegment.consolidate()
-        for noteGrouping in [newSegment[gpKey] for gpKey in newSegment.keys() if gpKey % 10 == AFFINITY_NOTEGROUP]:
+        for noteGrouping in [newSegment[gpKey] 
+                             for gpKey in newSegment.keys() if gpKey % 10 == AFFINITY_NOTEGROUP]:
             allNotes = [n for n in noteGrouping if isinstance(n,note.Note)]
             for noteIndexStart in range(len(allNotes)):
                 music21NoteStart = allNotes[noteIndexStart]
                 for artc in music21NoteStart.articulations:
                     artcName = artc.name
-                    if isinstance(artc, articulations.Staccato) or isinstance(artc, articulations.Tenuto):
+                    if (isinstance(artc, articulations.Staccato) or 
+                            isinstance(artc, articulations.Tenuto)):
                         if not music21NoteStart.tie is None:
                             if music21NoteStart.tie.type == 'stop':
                                 allNotes[noteIndexStart-1].tie = None
@@ -1495,7 +1545,8 @@ def fixArticulations(allSegments):
                     if numSequential >= 3:
                         # double the articulation on the first note and remove from the next...
                         music21NoteStart.articulations.append(artc)
-                        for noteIndexContinue in range(noteIndexStart+1, noteIndexStart+numSequential):
+                        for noteIndexContinue in range(noteIndexStart+1, 
+                                                       noteIndexStart+numSequential):
                             music21NoteContinue = allNotes[noteIndexContinue]
                             for artOther in music21NoteContinue.articulations:
                                 if artOther.name == artcName:
@@ -1504,7 +1555,7 @@ def fixArticulations(allSegments):
 #-------------------------------------------------------------------------------
 # Helper Methods
 
-def splitMeasure(music21Measure, value = 2, beatDivisionOffset = 0, useTimeSignature = None):
+def splitMeasure(music21Measure, value=2, beatDivisionOffset=0, useTimeSignature=None):
     """
     Takes a :class:`~music21.stream.Measure`, divides it in two parts, and returns a
     :class:`~music21.stream.Part` containing the two halves. The parameters are as
@@ -1517,7 +1568,8 @@ def splitMeasure(music21Measure, value = 2, beatDivisionOffset = 0, useTimeSigna
       of beats to the left.
     * useTimeSignature => In the event that the Measure comes from the middle of a Part
       and thus does not define an explicit :class:`~music21.meter.TimeSignature`. If not
-      provided, a TimeSignature is retrieved by using :meth:`~music21.stream.Measure.bestTimeSignature`.
+      provided, a TimeSignature is retrieved by 
+      using :meth:`~music21.stream.Measure.bestTimeSignature`.
     """
     if not useTimeSignature is None:
         ts = useTimeSignature
@@ -1532,7 +1584,8 @@ def splitMeasure(music21Measure, value = 2, beatDivisionOffset = 0, useTimeSigna
         try:
             offset += opFrac(ts.beatDivisionDurations[i].quarterLength)
         except IndexError:
-            environRules.warn('Problem in converting a time signature in measure %d, offset may be wrong' % music21Measure.number)
+            environRules.warn('Problem in converting a time signature in measure ' + 
+                              '%d, offset may be wrong' % music21Measure.number)
     bs = copy.deepcopy(ts.beatSequence)
     try:  
         bs.partitionByCount(value, loadDefault = False)

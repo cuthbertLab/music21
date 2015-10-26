@@ -35,6 +35,10 @@ from music21 import metadata
 from music21 import environment
 environLocal = environment.Environment()
 
+try:
+    FileNotFoundError
+except NameError: # python2
+    FileNotFoundError = IOError # @ReservedAssignment
 
 #clercqTemperley test files used as tests throughout this module
 BlitzkriegBopCT = '''

@@ -16,12 +16,15 @@ import unittest
 import re
 import math
 
+# pylint: disable=no-name-in-module,import-error
 try: 
-    from urllib import FancyURLopener # @UnusedImport @UnresolvedImport  # pylint: disable=no-name-in-module
-    from urllib import urlencode # @UnusedImport @UnresolvedImport # pylint: disable=no-name-in-module
+    from urllib import FancyURLopener # @UnusedImport @UnresolvedImport  
+    from urllib import urlencode # @UnusedImport @UnresolvedImport 
 except ImportError: # python3 
     from urllib.request import FancyURLopener # @UnresolvedImport @Reimport
     from urllib.parse import urlencode # @UnresolvedImport @Reimport
+# pylint: enable=no-name-in-module,import-error
+
     
 from music21.features import base as featuresModule
 from music21.ext import six
@@ -33,27 +36,27 @@ environLocal = environment.Environment(_MOD)
 #from music21.ext import six
 
 #-------------------------------------------------------------------------------
-# ideas for other music21 features extactors
+# ideas for other music21 features extractors
 
 # notation features: clef usage, enharmonic usage
 # chromatic alteration related to beat position
 
 # key signature histogram
-# array of circle of fiths
+# array of circle of fifths
 
 # lyrics
-# luca gloria:
+# Luca Gloria:
 # searching for numbers of hits
-# vowel metrical postiion
+# vowel metrical position
 # idea of language/text specific # DONE
 
-# essen locale and elevation
+# Essen locale and elevation
 
 # automatic key analysis
 # as a method of feature extraction
 
 # key detection on windowed segments
-# prevalence m/M over 4 bar windwows
+# prevalence m/M over 4 bar windows
 
 # key ambiguity list
 # correlation coefficient

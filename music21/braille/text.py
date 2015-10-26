@@ -19,7 +19,7 @@ binary_dots = lookup.binary_dots
 if six.PY3:
     unicode = str # @ReservedAssignment
 
-class BrailleText():
+class BrailleText(object):
     """
     Object that handles all the formatting associated with braille music notation.
     """
@@ -220,7 +220,7 @@ class BrailleText():
         self.recenterHeadings()
         return u"\n".join([unicode(l) for l in self.allLines])
 
-class BrailleKeyboard():
+class BrailleKeyboard(object):
     def __init__(self, lineLength = 40):
         self.lineLength = lineLength
         self.allLines = []
@@ -340,7 +340,7 @@ class BrailleKeyboard():
         return u"\n".join([unicode(l) for l in self.allLines])
             
     
-class BrailleTextLine():
+class BrailleTextLine(object):
     def __init__(self, lineLength):
         self.isHeading = False
         self.containsNoteGrouping = False

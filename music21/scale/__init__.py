@@ -4033,7 +4033,10 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
     def testDerivedScaleNoOctaves(self):
         d = ConcreteScale(pitches = ['a', 'b', 'c', 'd', 'e', 'f', 'g#', 'a'])
         e = d.deriveRanked(['C', 'E', 'G'], comparisonAttribute='name')
-        self.assertEqual(str(e), "[(3, <music21.scale.ConcreteScale F Concrete>), (3, <music21.scale.ConcreteScale E Concrete>), (2, <music21.scale.ConcreteScale B Concrete>), (2, <music21.scale.ConcreteScale A Concrete>)]")
+        self.assertEqual(str(e), ''.join(["[(3, <music21.scale.ConcreteScale F Concrete>), ", 
+                                          "(3, <music21.scale.ConcreteScale E Concrete>), ", 
+                                          "(2, <music21.scale.ConcreteScale B Concrete>), ", 
+                                          "(2, <music21.scale.ConcreteScale A Concrete>)]"]))
 
     def testDerivedScaleAbsurdOctaves(self):
         e = ConcreteScale(pitches=['A4', 'B4', 'C4', 'D4', 'E4', 'F4', 'G4', 'A4'])

@@ -424,7 +424,7 @@ class XMLParserBase(object):
             return staffLayout
     
 
-class PartGroup():
+class PartGroup(object):
     '''
     Small helper class for keeping track of part-groups from XML since they
     are converted to StaffGroup spanners much later.
