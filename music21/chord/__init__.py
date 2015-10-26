@@ -243,12 +243,17 @@ class Chord(note.NotRest):
                     self.duration = n.duration
                     del keywords['duration']
                     quickDuration = False
-            elif isinstance(n, six.string_types) or isinstance(n, int):
+            elif isinstance(n, six.string_types):
                 if 'duration' in keywords:
                     self._notes.append(note.Note(n, duration=keywords['duration']))
                 else:
                     self._notes.append(note.Note(n))
                 #self._notes.append({'pitch':music21.pitch.Pitch(n)})
+            elif isinstance(n, int):
+                if 'duration' in keywords:
+                    self._notes.append(note.Note(n, duration=keywords['duration'], context=self._notes))
+                else:
+                    self._notes.append(note.Note(n), context=self._notes)
             else:
                 raise ChordException("Could not process input argument %s" % n)
 

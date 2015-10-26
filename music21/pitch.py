@@ -337,6 +337,36 @@ def _convertHarmonicToCents(value):
         value = 1.0/(abs(value))
     return int(round(1200*math.log(value, 2), 0))
 
+def _getProbableName(n, context):
+    r'''Tries to find the most probable note name for a midi or pitchclass
+    number by maximizing the consonant intervals in some given context
+
+    >>> pitch._getProbableName(3, context=[])
+    'E-'
+    >>> pitch._getProbableName(3, context=[note.Note("B"), note.Note("F#")])
+    'D#'
+    '''
+
+    tmp_pitch = Pitch(n)
+    name1 = tmp_pitch.name
+    name2 = tmp_pitch.getEnharmonic().name
+    consonant_counter = [0, 0]
+
+    for cn in context:
+        if cn != n:
+            interval1 = interval.Interval(noteStart=Pitch(name1), noteEnd=cn)
+            interval2 = interval.Interval(noteStart=Pitch(name2), noteEnd=cn)
+
+            if interval1.isConsonant():
+                consonant_counter[0] += 1
+            if interval2.isConsonant():
+                consonant_counter[1] += 1
+
+    if consonant_counter[1] > consonant_counter[0]:
+        return name2
+    else:
+        return name1
+
 
 #------------------------------------------------------------------------------
 
@@ -1276,12 +1306,14 @@ class Pitch(object):
             if not common.isNum(name):
                 self._setName(name) # set based on string
             else: # is a number
-                if name < 12: # is a pitchClass
-                    self._setPitchClass(name)
-                else: # is a midiNumber
-                    self._setPitchClass(name)
-                    self._octave = int(name/12) - 1
-
+                if 'context' in keywords:
+                    self._setName(_getProbableName(name, context=keywords['context']))
+                else:
+                    if name < 12: # is a pitchClass
+                        self._setPitchClass(name)
+                    else: # is a midiNumber
+                        self._setPitchClass(name)
+                        self._octave = int(name/12) - 1
 
         # override just about everything with keywords
         # necessary for ImmutablePitch objects
