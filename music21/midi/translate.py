@@ -544,7 +544,8 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     if (tOff - tOn) != 0:
         midiToDuration(tOff - tOn, ticksPerQuarter, c.duration)
     else:
-        #environLocal.printDebug(['cannot translate found midi event with zero duration:', eventList, c])
+        #environLocal.printDebug(['cannot translate found midi event with zero duration:', 
+        #                         eventList, c])
         # for now, substitute 1
         c.quarterLength = 1    
     return c
@@ -1657,7 +1658,7 @@ def _prepareStreamForMidi(s):
 
     return s
 
-def streamHierarchyToMidiTracks(inputM21, acceptableChannelList = None):
+def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
     '''
     Given a Stream, Score, Part, etc., that may have substreams (i.e.,
     a hierarchy), return a list of :class:`~music21.midi.base.MidiTrack` objects. 
@@ -1753,7 +1754,9 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList = None):
         if ch not in channelsAssigned:
             channelsDynamic.append(ch)
 
-    #environLocal.printDebug(['channelForInstrument', channelForInstrument, 'channelsDynamic', channelsDynamic, 'allChannels', allChannels, 'allUniqueInstruments', allUniqueInstruments])
+    #environLocal.printDebug(['channelForInstrument', channelForInstrument, 
+    #    'channelsDynamic', channelsDynamic, 'allChannels', allChannels, 
+    #    'allUniqueInstruments', allUniqueInstruments])
 
     initChannelForTrack = {}
     # update packets with first channel
@@ -1787,7 +1790,8 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList = None):
         channelsDynamic=channelsDynamic, 
         initChannelForTrack=initChannelForTrack)
 
-    #environLocal.printDebug(['got netPackets:', len(netPackets), 'packetStorage keys (tracks)', packetStorage.keys()])
+    #environLocal.printDebug(['got netPackets:', len(netPackets), 
+    #    'packetStorage keys (tracks)', packetStorage.keys()])
     # build each track, sorting out the appropriate packets based on track
     # ids
     for trackId in packetStorage:   
@@ -1811,7 +1815,7 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList = None):
 
 
 def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
-    inputM21=None):
+                        inputM21=None):
     '''
     Given a list of midiTracks, populate this Stream with a Part for each track. 
     '''
@@ -1915,7 +1919,8 @@ def midiFilePathToStream(filePath, inputM21=None):
     use that object instead).
     
     >>> import os #_DOCS_HIDE
-    >>> fp = os.path.join(common.getSourceFilePath(), 'midi', 'testPrimitive',  'test05.mid') #_DOCS_HIDE
+    >>> sfp = common.getSourceFilePath() #_DOCS_HIDE
+    >>> fp = os.path.join(sfp, 'midi', 'testPrimitive', 'test05.mid') #_DOCS_HIDE
     >>> #_DOCS_SHOW fp = '/Users/test/music21/midi/testPrimitive/test05.mid'
     >>> streamScore = midi.translate.midiFilePathToStream(fp)
     >>> streamScore
@@ -1929,7 +1934,7 @@ def midiFilePathToStream(filePath, inputM21=None):
     return midiFileToStream(mf, inputM21)
 
 
-def midiAsciiStringToBinaryString(midiFormat = 1, ticksPerQuarterNote = 960, tracksEventsList = None):
+def midiAsciiStringToBinaryString(midiFormat=1, ticksPerQuarterNote=960, tracksEventsList=None):
     r'''
     Convert Ascii midi data to a binary midi string.
     
@@ -2013,14 +2018,16 @@ def midiStringToStream(strData):
 
     TODO: NOT WORKING AS IT SHOULD 
          
-#     >>> midiBinStr = 'MThd\x00\x00\x00\x06\x00\x01\x00\x01\x03\xc0MTrk\x00\x00\x00\x04\x00\x901\x0f'
+    '''
+#   midiBinStr='MThd\x00\x00\x00\x06\x00\x01\x00\x01\x03\xc0MTrk\x00\x00\x00\x04\x00\x901\x0f'
 # 
 #     >>> s = midi.translate.midiStringToStream(midiBinStr)
 #     >>> s.show('text')
 #     {0.0} <music21.stream.Part ...>
 #         {0.0} <music21.note.Note G>                
 # 
-    '''
+
+    
     from music21 import midi as midiModule
      
     mf = midiModule.MidiFile()
@@ -2083,8 +2090,12 @@ class Test(unittest.TestCase):
         #asciiMidiEventList.append('0 b0 7b 00')
         
         #asciiMidiEventList = ['0 90 27 66', '3840 80 27 00']
-        #asciiMidiEventList = ['0 90 27 66', '0 90 3e 60', '3840 80 27 00', '0 80 3e 00', '0 90 3b 60', '960 80 3b 00', '0 90 41 60', '960 80 41 00', '0 90 3e 60', '1920 80 3e 00', '0 b0 7b 00', '0 90 24 60', '3840 80 24 00', '0 b0 7b 00']
-        #asciiMidiEventList = ['0 90 27 66', '0 90 3e 60', '3840 80 27 00', '0 80 3e 00', '0 90 3b 60', '960 80 3b 00', '0 90 41 60', '960 80 41 00', '0 90 3e 60', '1920 80 3e 00', '0 90 24 60', '3840 80 24 00']
+        #asciiMidiEventList = ['0 90 27 66', '0 90 3e 60', '3840 80 27 00', '0 80 3e 00', 
+        #    '0 90 3b 60', '960 80 3b 00', '0 90 41 60', '960 80 41 00', '0 90 3e 60', 
+        #    '1920 80 3e 00', '0 b0 7b 00', '0 90 24 60', '3840 80 24 00', '0 b0 7b 00']
+        #asciiMidiEventList = ['0 90 27 66', '0 90 3e 60', '3840 80 27 00', '0 80 3e 00', 
+        #    '0 90 3b 60', '960 80 3b 00', '0 90 41 60', '960 80 41 00', 
+        #    '0 90 3e 60', '1920 80 3e 00', '0 90 24 60', '3840 80 24 00']
         
         midiTrack = []
         midiTrack.append(asciiMidiEventList)
@@ -2093,7 +2104,8 @@ class Test(unittest.TestCase):
         
         midiBinStr = midiAsciiStringToBinaryString(tracksEventsList = midiTrack)
         
-        self.assertEqual(midiBinStr, b"MThd"+ a2b_hex("000000060001000103c0") + b"MTrk" + a2b_hex("0000000400901f0f")) 
+        self.assertEqual(midiBinStr, b"MThd" + a2b_hex("000000060001000103c0") +
+                                     b"MTrk" + a2b_hex("0000000400901f0f")) 
 
     def testNote(self):
         from music21 import midi as midiModule

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# pylint disable=line-too-long
+# pylint: disable=line-too-long
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 

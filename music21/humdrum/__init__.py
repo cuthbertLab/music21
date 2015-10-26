@@ -8,7 +8,7 @@
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-# pylint disable=line-too-long
+# pylint: disable=line-too-long
 '''
 Files in this package deal specifically with making life easier for
 people who have previously used humdrum or need to import
