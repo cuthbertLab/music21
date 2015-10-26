@@ -10,7 +10,6 @@
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 '''
 This module provides object representations of expressions, that is
 notational symbols such as Fermatas, Mordents, Trills, Turns, etc.
@@ -69,7 +68,8 @@ def realizeOrnaments(srcObject):
                     preExpandList.append(i)
                 for i in postExpand:
                     postExpandList.append(i)
-                if newSrcObject is None: # some ornaments eat up the entire source object. Trills for instance
+                if newSrcObject is None: 
+                    # some ornaments eat up the entire source object. Trills for instance
                     break
                 newSrcObject.expressions = srcObject.expressions[1:]            
                 srcObject = newSrcObject
@@ -155,7 +155,8 @@ class TextExpression(Expression, text.TextFormat):
 
     def __repr__(self):
         if self._content is not None and len(self._content) > 10:
-            return '<music21.expressions.%s "%s...">' % (self.__class__.__name__, self._content[:10])
+            return '<music21.expressions.%s "%s...">' % (self.__class__.__name__, 
+                                                         self._content[:10])
         elif self._content is not None:
             return '<music21.expressions.%s "%s">' % (self.__class__.__name__, self._content)
         else:
@@ -286,8 +287,10 @@ class Ornament(Expression):
     def realize(self, srcObj):
         '''
         subclassible method call that takes a sourceObject
-        and returns a three-element tuple of a list of notes before the "main note" or the result of the expression if it gobbles up the entire note,
-        the "main note" itself (or None) to keep processing for ornaments, and a list of notes after the "main note"
+        and returns a three-element tuple of a list of notes before the 
+        "main note" or the result of the expression if it gobbles up the entire note,
+        the "main note" itself (or None) to keep processing for ornaments, 
+        and a list of notes after the "main note"
         '''
         return ([], srcObj, [])
 
@@ -519,7 +522,10 @@ class Trill(Ornament):
         >>> n1.quarterLength = 0.5
         >>> t1 = expressions.Trill()
         >>> t1.realize(n1)
-        ([<music21.note.Note C>, <music21.note.Note D>, <music21.note.Note C>, <music21.note.Note D>], None, [])
+        ([<music21.note.Note C>, 
+          <music21.note.Note D>, 
+          <music21.note.Note C>, 
+          <music21.note.Note D>], None, [])
         
         
         >>> n2 = note.Note("D4")
@@ -575,14 +581,16 @@ class Trill(Ornament):
             firstNoteNachschlag = copy.deepcopy(srcObj)
             #TODO: remove expressions
             firstNoteNachschlag.duration.quarterLength = self.quarterLength
-            firstNoteNachschlag.accidental = currentKeySig.accidentalByStep(firstNoteNachschlag.step)
+            firstNoteNachschlag.accidental = currentKeySig.accidentalByStep(
+                                                        firstNoteNachschlag.step)
             
             secondNoteNachschlag = copy.deepcopy(srcObj)
             #TODO: remove expressions
             secondNoteNachschlag.duration.quarterLength = self.quarterLength
             secondNoteNachschlag.transpose(transposeIntervalReverse, 
                 inPlace = True)
-            secondNoteNachschlag.accidental = currentKeySig.accidentalByStep(secondNoteNachschlag.step)
+            secondNoteNachschlag.accidental = currentKeySig.accidentalByStep(
+                                                        secondNoteNachschlag.step)
             
             nachschlag = [firstNoteNachschlag, secondNoteNachschlag]
             
@@ -666,7 +674,10 @@ class Turn(Ornament):
         >>> m1.append(n1)
         >>> t1 = expressions.Turn()
         >>> t1.realize(n1)
-        ([], <music21.note.Note C>, [<music21.note.Note D>, <music21.note.Note C>, <music21.note.Note B->, <music21.note.Note C>])
+        ([], <music21.note.Note C>, [<music21.note.Note D>, 
+                                     <music21.note.Note C>, 
+                                     <music21.note.Note B->, 
+                                     <music21.note.Note C>])
         
         
         >>> m2 = stream.Measure()
@@ -675,7 +686,10 @@ class Turn(Ornament):
         >>> m2.append(n2)
         >>> t2 = expressions.InvertedTurn()
         >>> t2.realize(n2)
-        ([], <music21.note.Note B>, [<music21.note.Note A#>, <music21.note.Note B>, <music21.note.Note C#>, <music21.note.Note B>])
+        ([], <music21.note.Note B>, [<music21.note.Note A#>, 
+                                     <music21.note.Note B>, 
+                                     <music21.note.Note C#>, 
+                                     <music21.note.Note B>])
 
         
         
@@ -783,9 +797,11 @@ class GeneralAppoggiatura(Ornament):
         '''
         from music21 import key
         if self.direction != 'up' and self.direction != 'down':
-            raise ExpressionException("Cannot realize an Appoggiatura if I do not know its direction")
+            raise ExpressionException(
+                    "Cannot realize an Appoggiatura if I do not know its direction")
         if self.size == "":
-            raise ExpressionException("Cannot realize an Appoggiatura if there is no size given")
+            raise ExpressionException(
+                    "Cannot realize an Appoggiatura if there is no size given")
         if srcObj.duration == None or srcObj.duration.quarterLength == 0:
             raise ExpressionException("Cannot steal time from an object with no duration")
 
@@ -898,7 +914,9 @@ class Tremolo(Ornament):
         >>> t.measured = True # default
         >>> t.numberOfMarks = 3 # default
         >>> t.realize(n)
-        ([<music21.note.Note C>, <music21.note.Note C>, <music21.note.Note C>, <music21.note.Note C>, <music21.note.Note C>, <music21.note.Note C>, <music21.note.Note C>, <music21.note.Note C>], None, [])
+        ([<music21.note.Note C>, <music21.note.Note C>, <music21.note.Note C>, 
+          <music21.note.Note C>, <music21.note.Note C>, <music21.note.Note C>, 
+          <music21.note.Note C>, <music21.note.Note C>], None, [])
         >>> c2 = t.realize(n)[0]
         >>> [ts.quarterLength for ts in c2]
         [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125]
@@ -968,7 +986,9 @@ class Fermata(Expression):
          :width: 193
     '''
     shape = "normal"
-    type  = "inverted" # for musicmxml, can be upright or inverted, but Finale's idea of an inverted fermata is ass backwards.
+    # for musicmxml, can be upright or inverted, but Finale's idea of an 
+    # inverted fermata is ass backwards.
+    type  = "inverted" 
     tieAttach = 'last'
 
 
@@ -979,7 +999,9 @@ class TrillExtensionException(exceptions21.Music21Exception):
     pass
 
 class TrillExtension(spanner.Spanner):
-    '''A wavy line trill extension, placed between two notes. Note that some MusicXML readers include a trill symbol with the wavy line.
+    '''
+    A wavy line trill extension, placed between two notes. N
+    ote that some MusicXML readers include a trill symbol with the wavy line.
 
     
     >>> s = stream.Stream()
@@ -1103,28 +1125,33 @@ class Test(unittest.TestCase):
         
 
         te = expressions.TextExpression('d.c.')
-        self.assertEqual(str(te.getRepeatExpression()), '<music21.repeat.DaCapo "d.c.">')
+        self.assertEqual(str(te.getRepeatExpression()), 
+                         '<music21.repeat.DaCapo "d.c.">')
         re = te.getRepeatExpression()
         self.assertEqual(re.getTextExpression().content, 'd.c.')
 
         te = expressions.TextExpression('DC al coda')
-        self.assertEqual(str(te.getRepeatExpression()), '<music21.repeat.DaCapoAlCoda "DC al coda">')
+        self.assertEqual(str(te.getRepeatExpression()), 
+                         '<music21.repeat.DaCapoAlCoda "DC al coda">')
         re = te.getRepeatExpression()
         self.assertEqual(re.getTextExpression().content, 'DC al coda')
 
         te = expressions.TextExpression('DC al fine')
-        self.assertEqual(str(te.getRepeatExpression()), '<music21.repeat.DaCapoAlFine "DC al fine">')
+        self.assertEqual(str(te.getRepeatExpression()), 
+                         '<music21.repeat.DaCapoAlFine "DC al fine">')
         re = te.getRepeatExpression()
         self.assertEqual(re.getTextExpression().content, 'DC al fine')
 
 
         te = expressions.TextExpression('ds al coda')
-        self.assertEqual(str(te.getRepeatExpression()), '<music21.repeat.DalSegnoAlCoda "ds al coda">')
+        self.assertEqual(str(te.getRepeatExpression()), 
+                         '<music21.repeat.DalSegnoAlCoda "ds al coda">')
         re = te.getRepeatExpression()
         self.assertEqual(re.getTextExpression().content, 'ds al coda')
 
         te = expressions.TextExpression('d.s. al fine')
-        self.assertEqual(str(te.getRepeatExpression()), '<music21.repeat.DalSegnoAlFine "d.s. al fine">')
+        self.assertEqual(str(te.getRepeatExpression()), 
+                         '<music21.repeat.DalSegnoAlFine "d.s. al fine">')
         re = te.getRepeatExpression()
         self.assertEqual(re.getTextExpression().content, 'd.s. al fine')
 

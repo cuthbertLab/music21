@@ -50,7 +50,9 @@ directionTerms = {DESCENDING:"Descending",
 # specifiers are derived from these two lists; 
 # perhaps better represented with a dictionary
 # perhaps the first entry, below, should be None, like in prefixSpecs?
-niceSpecNames = ['ERROR', 'Perfect', 'Major', 'Minor', 'Augmented', 'Diminished', 'Doubly-Augmented', 'Doubly-Diminished', 'Triply-Augmented', 'Triply-Diminished', "Quadruply-Augmented", "Quadruply-Diminished"]
+niceSpecNames = ['ERROR', 'Perfect', 'Major', 'Minor', 'Augmented', 'Diminished', 
+                 'Doubly-Augmented', 'Doubly-Diminished', 'Triply-Augmented', 
+                 'Triply-Diminished', "Quadruply-Augmented", "Quadruply-Diminished"]
 prefixSpecs = [None, 'P', 'M', 'm', 'A', 'd', 'AA', 'dd', 'AAA', 'ddd', 'AAAA', 'dddd']
 
 # constants provide the common numerical representation of an interval. 
@@ -454,7 +456,8 @@ class GenericInterval(IntervalBase):
     A GenericInterval is an interval such as Third, Seventh, Octave, or Tenth.
     Constructor takes an integer or string specifying the interval and direction. 
 
-    The interval is not specified in half-steps, but in numeric values derived from interval names: 
+    The interval is not specified in half-steps, but in numeric values 
+    derived from interval names: 
     a Third is 3; a Seventh is 7, etc. String values for interval names ('3rd' or 'third') 
     are generally accepted, but discouraged since not every one will work.
     
@@ -869,7 +872,9 @@ class DiatonicInterval(IntervalBase):
         self.specifier, unused_specifierStr = convertSpecifier(specifier)
         if self.generic.undirected != 1 or specifier == PERFECT:
             self.direction = self.generic.direction
-        else: # assume in the absence of other evidence, that augmented unisons are ascending and dim are descending 
+        else: 
+            # assume in the absence of other evidence, 
+            # that augmented unisons are ascending and dim are descending 
             if perfSpecifiers.index(self.specifier) <= perfSpecifiers.index(DIMINISHED):
                 self.direction = DESCENDING
             else:
@@ -899,8 +904,10 @@ class DiatonicInterval(IntervalBase):
                                      str(self.generic.simpleDirected))
             self.directedSemiSimpleName = (prefixSpecs[self.specifier] +
                                  str(self.generic.semiSimpleDirected))
-            self.directedSimpleNiceName = (diatonicDirectionNiceName + " " + self.simpleNiceName)
-            self.directedSemiSimpleNiceName = (diatonicDirectionNiceName + " " + self.semiSimpleNiceName)
+            self.directedSimpleNiceName = (diatonicDirectionNiceName + " " + 
+                                           self.simpleNiceName)
+            self.directedSemiSimpleNiceName = (diatonicDirectionNiceName + " " + 
+                                               self.semiSimpleNiceName)
 
             self.specificName = niceSpecNames[self.specifier]
             self.prefectable = self.generic.perfectable
@@ -1398,7 +1405,8 @@ def notesToChromatic(n1, n2):
 def _getSpecifierFromGenericChromatic(gInt, cInt):
     '''
     Given a :class:`~music21.interval.GenericInterval` and 
-    a :class:`~music21.interval.ChromaticInterval` object, return a specifier (i.e. MAJOR, MINOR, etc...).
+    a :class:`~music21.interval.ChromaticInterval` object, return a specifier 
+    (i.e. MAJOR, MINOR, etc...).
 
     >>> aInterval = interval.GenericInterval('seventh')
     >>> bInterval = interval.ChromaticInterval(11)
@@ -1420,7 +1428,8 @@ def _getSpecifierFromGenericChromatic(gInt, cInt):
 
     if (gInt.direction != cInt.direction and 
         gInt.direction != OBLIQUE and cInt.direction != OBLIQUE):
-        # intervals like d2 and dd2 etc. (the last test doesn't matter, since -1*0 == 0, but in theory it should be there)
+        # intervals like d2 and dd2 etc. 
+        # (the last test doesn't matter, since -1*0 == 0, but in theory it should be there)
         theseSemis = -1 * cInt.undirected
     elif gInt.undirected == 1:
         theseSemis = cInt.directed # matters for unison
@@ -1604,7 +1613,8 @@ class Interval(IntervalBase):
     
     >>> aInterval = interval.Interval(noteStart=n1, noteEnd=None)
     Traceback (most recent call last):
-    IntervalException: either both the starting and the ending note.Note must be given or neither can be given.  You cannot have one without the other.
+    IntervalException: either both the starting and the ending note.Note must 
+        be given or neither can be given.  You cannot have one without the other.
 
     An Interval can be constructed from a Diatonic and Chromatic Interval object
 
@@ -1616,7 +1626,8 @@ class Interval(IntervalBase):
 
     >>> cInterval = interval.Interval(diatonic=aInterval, chromatic=None)
     Traceback (most recent call last):
-    IntervalException: either both a DiatonicInterval and a ChromaticInterval object have to be given or neither can be given.  You cannot have one without the other.
+    IntervalException: either both a DiatonicInterval and a ChromaticInterval object have 
+       to be given or neither can be given.  You cannot have one without the other.
 
     Two Intervals are the same if their Chromatic and Diatonic intervals
     are the same.  N.B. that interval.Interval('a4') != 'a4' -- maybe it should...
@@ -1785,8 +1796,7 @@ class Interval(IntervalBase):
         >>> i1.isConsonant()
         False
         ''' 
-        if self.simpleName == 'P5' or self.simpleName == 'm3' or self.simpleName == 'M3' or \
-        self.simpleName == 'm6' or self.simpleName == 'M6' or self.simpleName == 'P1':
+        if self.simpleName in ('P5', 'm3', 'M3', 'm6', 'M6', 'P1'):
             return True
         else:
             return False
@@ -1977,7 +1987,8 @@ class Interval(IntervalBase):
             halfStepsToFix = (-self.chromatic.semitones -
                           interval2.chromatic.semitones)
 
-        #environLocal.printDebug(['self', self, 'halfStepsToFix', halfStepsToFix, 'centsOrigin', centsOrigin, 'interval2', interval2])
+        #environLocal.printDebug(['self', self, 'halfStepsToFix', halfStepsToFix, 
+        #    'centsOrigin', centsOrigin, 'interval2', interval2])
 
         if halfStepsToFix != 0:
             while halfStepsToFix >= 12:
@@ -1990,7 +2001,9 @@ class Interval(IntervalBase):
                 # just create new pitch, directly setting the pitch space value
                 #pitchAlt = copy.deepcopy(pitch2)
                 #pitchAlt.ps = pitch2.ps + halfStepsToFix
-                #environLocal.printDebug('coercing pitch due to a transposition that requires a, extreme accidental: %s -> %s' % (pitch2, pitchAlt) )
+                #environLocal.printDebug(
+                #    'coercing pitch due to a transposition that requires an extreme ' + 
+                #    'accidental: %s -> %s' % (pitch2, pitchAlt) )
                 #pitch2 = pitchAlt
                 pitch2.ps = pitch2.ps + halfStepsToFix
             else:
@@ -2516,7 +2529,7 @@ class Test(unittest.TestCase):
         
         #int1 = interval.notesToInterval(n1, n2)   # returns music21.interval.Interval object
         int1  = Interval(noteStart = n1, noteEnd = n2)
-        dInt1 = int1.diatonic   # returns same as gInt1 -- just a different way of thinking of things
+        dInt1 = int1.diatonic # returns same as gInt1 -- just a different way of thinking of things
         gInt1 = dInt1.generic
     
         self.assertEqual(gInt1.isDiatonicStep, False)
@@ -2526,7 +2539,7 @@ class Test(unittest.TestCase):
         int1.reinit()
         
         cInt1 = notesToChromatic(n1,n2) # returns music21.interval.ChromaticInterval object
-        cInt2 = int1.chromatic        # returns same as cInt1 -- just a different way of thinking of things
+        cInt2 = int1.chromatic # returns same as cInt1 -- a different way of thinking of things
         self.assertEqual(cInt1.semitones, cInt2.semitones)
         
         self.assertEqual(int1.simpleNiceName, "Diminished Seventh")
@@ -2668,8 +2681,10 @@ class Test(unittest.TestCase):
         lowerC  = Note()
         lowerC.octave = 3
         descendingOctave = notesToInterval(middleC, lowerC)
-        self.assertEqual(descendingOctave.generic.simpleDirected, 1)  # no descending unisons ever
-        self.assertEqual(descendingOctave.generic.semiSimpleDirected, -8)  # no descending unisons ever
+        self.assertEqual(descendingOctave.generic.simpleDirected, 1)  
+        # no descending unisons ever
+        self.assertEqual(descendingOctave.generic.semiSimpleDirected, -8)  
+        # no descending unisons ever
         self.assertEqual(descendingOctave.directedName, "P-8")
         self.assertEqual(descendingOctave.directedSimpleName, "P1")
     

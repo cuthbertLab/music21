@@ -23,7 +23,6 @@ try:
 except ImportError: # python3 
     from urllib.request import FancyURLopener # @UnresolvedImport @Reimport
     from urllib.parse import urlencode # @UnresolvedImport @Reimport
-# pylint: enable=no-name-in-module,import-error
 
     
 from music21.features import base as featuresModule
