@@ -347,12 +347,17 @@ def simplifyMultipleEnharmonics(pitches, criterion='maximizeConsonance', keyCont
 
     >>> pitch.simplifyMultipleEnharmonics([11, 3, 6])
     [<music21.pitch.Pitch B>, <music21.pitch.Pitch D#>, <music21.pitch.Pitch F#>]
-
     >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('G3'), pitch.Pitch('C-4'), pitch.Pitch('D4')])
     [<music21.pitch.Pitch G3>, <music21.pitch.Pitch B3>, <music21.pitch.Pitch D4>]
-
     >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('A3'), pitch.Pitch('B#3'), pitch.Pitch('E4')])
     [<music21.pitch.Pitch A3>, <music21.pitch.Pitch C4>, <music21.pitch.Pitch E4>] 
+
+    The attribute `keyContext` is for supplying a KeySignature or a Key which is used in the simplification:
+
+    >>> pitch.simplifyMultipleEnharmonics([6, 10, 1], keyContext=key.Key('B'))
+    [<music21.pitch.Pitch F#>, <music21.pitch.Pitch A#>, <music21.pitch.Pitch C#>]
+    >>> pitch.simplifyMultipleEnharmonics([6, 10, 1], keyContext=key.Key('C-'))
+    [<music21.pitch.Pitch G->, <music21.pitch.Pitch B->, <music21.pitch.Pitch D->]
     '''
 
     oldPitches = [p if isinstance(p, Pitch) else Pitch(p) for p in pitches]

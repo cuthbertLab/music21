@@ -3330,6 +3330,7 @@ class Chord(note.NotRest):
         (<music21.pitch.Pitch C#>, <music21.pitch.Pitch F>, <music21.pitch.Pitch G#>)
 
         >>> c.simplifyEnharmonics(inPlace=True)
+        <music21.chord.Chord C# E# G#>
         >>> c.pitches
         (<music21.pitch.Pitch C#>, <music21.pitch.Pitch E#>, <music21.pitch.Pitch G#>)
         '''
