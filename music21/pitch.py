@@ -338,7 +338,7 @@ def _convertHarmonicToCents(value):
     return int(round(1200*math.log(value, 2), 0))
 
 
-def simplifyMultipleEnharmonics(pitches, criterion='maximizeConsonance', key=None):
+def simplifyMultipleEnharmonics(pitches, criterion='maximizeConsonance', keyContext=None):
     r'''Tries to simplify the enharmonic spelling of a list of pitches, pitch-
     or pitch-class numbers according to a given criterion. 
 
@@ -355,18 +355,13 @@ def simplifyMultipleEnharmonics(pitches, criterion='maximizeConsonance', key=Non
     [<music21.pitch.Pitch A3>, <music21.pitch.Pitch C4>, <music21.pitch.Pitch E4>] 
     '''
 
-    from music21 import key as keyModule
-
     oldPitches = [p if isinstance(p, Pitch) else Pitch(p) for p in pitches]
     simplifiedPitches = []
 
     if criterion == 'maximizeConsonance':
 
-        if isinstance(key, keyModule.KeySignature):
-            simplifiedPitches.append(key.pitchAndMode[0])
-            remove_first = True
-        elif isinstance(key, keyModule.Key):
-            simplifiedPitches.append(key.tonic)
+        if keyContext:
+            simplifiedPitches.append(keyContext.pitchAndMode[0])
             remove_first = True
         else:
             remove_first = False
@@ -380,7 +375,10 @@ def simplifyMultipleEnharmonics(pitches, criterion='maximizeConsonance', key=Non
                     if interval_candidate.isConsonant():
                         consonant_counter[j] += 1
 
-            simplifiedPitches.append(sorted(zip(consonant_counter, candidates), key=lambda x: x[0], reverse=True)[0][1])
+            # order the candidates by their consonant count
+            candidates_by_consonants = sorted(zip(consonant_counter, candidates), key=lambda x: x[0], reverse=True)
+            # append the candidate with the maximum consonant count
+            simplifiedPitches.append(candidates_by_consonants[0][1])
 
         if remove_first:
             simplifiedPitches = simplifiedPitches[1:]

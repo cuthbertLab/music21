@@ -3333,19 +3333,15 @@ class Chord(note.NotRest):
         >>> c.pitches
         (<music21.pitch.Pitch C#>, <music21.pitch.Pitch E#>, <music21.pitch.Pitch G#>)
         '''
-        newPitches = pitch.simplifyMultipleEnharmonics(self.pitches, criterion='maximizeConsonance', key=None)
         if inPlace:
-            changes = 0
-            for i, newPitch in enumerate(newPitches):
-                if newPitch != self._notes[i].pitch:
-                    self._notes[i].pitch = newPitch
-                    changes += 1
-            if changes > 0:
-                self._chordTablesAddressNeedsUpdating = True
-                self._bass = None
-                self._root = None
+            returnObj = self
         else:
-            return Chord(newPitches)
+            returnObj = copy.deepcopy(self)
+
+        pitches = pitch.simplifyMultipleEnharmonics(self.pitches, criterion='maximizeConsonance', keyContext=None)
+        returnObj.pitches = pitches
+
+        return returnObj
 
     def sortAscending(self, inPlace=False):
         return self.sortDiatonicAscending(inPlace=inPlace)
