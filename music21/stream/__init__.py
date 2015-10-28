@@ -9132,7 +9132,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         elementsSorted = self.flat
         unused_simultaneityMap, overlapMap = self._findLayering(elementsSorted,
-                                                                includeDurationless, includeEndBoundary)
+                                                        includeDurationless, includeEndBoundary)
         #environLocal.printDebug(['simultaneityMap map', simultaneityMap])
         #environLocal.printDebug(['overlapMap', overlapMap])
 
@@ -9161,7 +9161,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         elementsSorted = self.flat
         unused_simultaneityMap, overlapMap = self._findLayering(elementsSorted,
-                                                                includeDurationless, includeEndBoundary)
+                                                    includeDurationless, includeEndBoundary)
         post = True
         for indexList in overlapMap:
             if indexList:
@@ -9923,11 +9923,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         elements will be swapped in when a match is found between an element
         in the variant and an element in the replcement region of the string.
 
-        >>> s = converter.parse("tinynotation: 4/4 d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                  d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1", makeNotation=False)
-        >>> s.makeMeasures(inPlace=True)
-        >>> v1stream = converter.parse("tinynotation: 4/4        a2. b-8 a8", makeNotation=False)
-        >>> v2stream1 = converter.parse("tinynotation: 4/4                                      d4 f4 a2", makeNotation=False)
-        >>> v2stream2 = converter.parse("tinynotation: 4/4                                                  d4 f4 AA2", makeNotation=False)
+        >>> sStr   = "d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2              "
+        >>> v1Str  = "              a2. b-8 a8 "
+        >>> v2Str1 = "                                             d4 f4 a2 "
+        >>> v2Str2 = "                                                      d4 f4 AA2 "
+
+        >>> sStr += "d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1"
+
+        >>> s = converter.parse("tinynotation: 4/4 " + sPartStr, makeNotation=False)
+        >>> s.makeMeasures(inPlace=True) # maybe not necessary?
+        >>> v1stream = converter.parse("tinynotation: 4/4 " + v1Str, makeNotation=False)
+        >>> v2stream1 = converter.parse("tinynotation: 4/4 " + v2Str1, makeNotation=False)
+        >>> v2stream2 = converter.parse("tinynotation: 4/4 " + v2Str2, makeNotation=False)
+
 
         >>> v1 = variant.Variant()
         >>> v1measure = stream.Measure()
@@ -10700,7 +10708,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         that have been deleted and a
         list of tuples (highest measure number below insertion, number of inserted measures).
 
-        >>> s = converter.parse("tinynotation: 4/4 d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    g1")
+        >>> s = converter.parse("tinynotation: 4/4 d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4  g1")
         >>> s.makeMeasures(inPlace=True)
         >>> s[-1].offset = 20.0
         >>> s.show('text')
@@ -10867,12 +10875,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         'elongation' and 'deletion' as there is no good way to represent ossia staves like those
         by this method.
 
+        >>> sPartStr = "d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2 "
+        >>> v1Str =    "              a2. b-8 a8 "
+        >>> v2Str =    "                                             d4 f4 a2 "
 
-        >>> sPartStream = converter.parse("tinynotation: 4/4      d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                  d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1")
-        >>> sPartStream.makeMeasures(inPlace=True)
-        >>> v1stream = converter.parse("tinynotation: 4/4                       a2. b-8 a8")
-        >>> v2stream = converter.parse("tinynotation: 4/4                                                     d4 f4 a2")
+        >>> sPartStr += "d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1"
 
+        >>> sPartStream = converter.parse("tinynotation: 4/4 " + sPartStr)
+        >>> sPartStream.makeMeasures(inPlace=True) # maybe not necessary?
+        >>> v1stream = converter.parse("tinynotation: 4/4 " + v1Str)
+        >>> v2stream = converter.parse("tinynotation: 4/4 " + v2Str)
+        
         >>> v1 = variant.Variant()
         >>> v1measure = stream.Measure()
         >>> v1.insert(0.0, v1measure)

@@ -129,7 +129,7 @@ def main(fnAccept=None):
            '--reports=n',
            '-j ' + str(poolSize), # multiprocessing!
            '--ignore-long-lines="converter\.parse"', # some tiny notation...
-           '--max-line-length=190', # eventually at 100
+           '--max-line-length=180', # eventually at 100
            ]
     for gn, gnv in goodnameRx.items():
         cmd.append('--' + gn + '="' + gnv + '"')
