@@ -173,8 +173,10 @@ def correlateHarmonies(currentMapping, music21Part):
     
     for offsets in sorted(currentMapping.keys()):
         (initOffset, endTime) = offsets
-        notesInRange = music21Part.flat.getElementsByClass('GeneralNote').getElementsByOffset(initOffset, offsetEnd=endTime, \
-                        includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=False, includeElementsThatEndAtStart=False)
+        notesInRange = music21Part.flat.iter.getElementsByClass('GeneralNote').getElementsByOffset(
+                            initOffset, offsetEnd=endTime, 
+                            includeEndBoundary=False, mustFinishInSpan=False, 
+                            mustBeginInSpan=False, includeElementsThatEndAtStart=False)
         allNotesSoFar = currentMapping[offsets]
         for music21GeneralNote in notesInRange:
             newInitOffset = initOffset
@@ -241,7 +243,10 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
         for partNumberTuple in vlm_violations:
             for partNumber in partNumberTuple:
                 if color is not None:
-                    noteA = allParts[partNumber - 1].getElementsByOffset(initOffset, initOffset, mustBeginInSpan=False)[0]
+                    noteA = allParts[partNumber - 1].iter.getElementsByOffset(
+                                                            initOffset, 
+                                                            initOffset, 
+                                                            mustBeginInSpan=False)[0]
                     noteA.color = color
             if debug is True:
                 debugInfo.append("{0!s:25}{1!s}".format(offsets, partNumberTuple))
@@ -272,7 +277,7 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
 
     >>> from music21.figuredBass import checker
     >>> functionToApply = checker.parallelOctaves    
-    >>> checker.checkConsecutivePossibilities(music21Stream, functionToApply, debug = True)
+    >>> checker.checkConsecutivePossibilities(music21Stream, functionToApply, debug=True)
     Function To Apply: parallelOctaves
     (Offset A, End Time A):  (Offset B, End Time B):  Part Numbers:
     (1.0, 2.0)               (2.0, 3.0)               (2, 4)
@@ -292,7 +297,8 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
     if debug is True:
         debugInfo = []
         debugInfo.append("Function To Apply: " + functionToApply.__name__)
-        debugInfo.append("{0!s:25}{1!s:25}{2!s}".format("(Offset A, End Time A):", "(Offset B, End Time B):", "Part Numbers:"))
+        debugInfo.append("{0!s:25}{1!s:25}{2!s}".format(
+                        "(Offset A, End Time A):", "(Offset B, End Time B):", "Part Numbers:"))
 
     allHarmonies = sorted(extractHarmonies(music21Stream).items())
     allParts = [p.flat for p in music21Stream.getElementsByClass('Part')]    
@@ -307,12 +313,16 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
         for partNumberTuple in vlm_violations:
             for partNumber in partNumberTuple:
                 if color is not None:
-                    noteA = allParts[partNumber - 1].getElementsByOffset(initOffsetA, initOffsetA, mustBeginInSpan=False)[0]
-                    noteB = allParts[partNumber - 1].getElementsByOffset(initOffsetB, initOffsetB, mustBeginInSpan=False)[0]
+                    noteA = allParts[partNumber - 1].iter.getElementsByOffset(
+                                initOffsetA, initOffsetA, mustBeginInSpan=False)[0]
+                    noteB = allParts[partNumber - 1].iter.getElementsByOffset(
+                                initOffsetB, initOffsetB, mustBeginInSpan=False)[0]
                     noteA.color = color
                     noteB.color = color
             if debug is True:
-                debugInfo.append("{0!s:25}{1!s:25}{2!s}".format(previousOffsets, offsets, partNumberTuple))
+                debugInfo.append("{0!s:25}{1!s:25}{2!s}".format(previousOffsets, 
+                                                                offsets, 
+                                                                partNumberTuple))
         # Current vlm becomes previous
         previousOffsets = offsets
         vlmA = vlmB
@@ -703,7 +713,8 @@ def generalNoteToPitch(music21GeneralNote):
     else:
         return "RT"
 
-_DOC_ORDER = [extractHarmonies, getVoiceLeadingMoments, checkConsecutivePossibilities, checkSinglePossibilities]
+_DOC_ORDER = [extractHarmonies, getVoiceLeadingMoments, 
+              checkConsecutivePossibilities, checkSinglePossibilities]
 #------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 

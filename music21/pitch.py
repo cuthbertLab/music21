@@ -347,15 +347,23 @@ def simplifyMultipleEnharmonics(pitches, criterion='maximizeConsonance', keyCont
 
     >>> pitch.simplifyMultipleEnharmonics([11, 3, 6])
     [<music21.pitch.Pitch B>, <music21.pitch.Pitch D#>, <music21.pitch.Pitch F#>]
-    >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('G3'), pitch.Pitch('C-4'), pitch.Pitch('D4')])
+    
+    >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('G3'), 
+    ...                                    pitch.Pitch('C-4'), 
+    ...                                    pitch.Pitch('D4')])
     [<music21.pitch.Pitch G3>, <music21.pitch.Pitch B3>, <music21.pitch.Pitch D4>]
-    >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('A3'), pitch.Pitch('B#3'), pitch.Pitch('E4')])
+    
+    >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('A3'), 
+    ...                                    pitch.Pitch('B#3'), 
+    ...                                    pitch.Pitch('E4')])
     [<music21.pitch.Pitch A3>, <music21.pitch.Pitch C4>, <music21.pitch.Pitch E4>] 
 
-    The attribute `keyContext` is for supplying a KeySignature or a Key which is used in the simplification:
+    The attribute `keyContext` is for supplying a KeySignature or a Key 
+    which is used in the simplification:
 
     >>> pitch.simplifyMultipleEnharmonics([6, 10, 1], keyContext=key.Key('B'))
     [<music21.pitch.Pitch F#>, <music21.pitch.Pitch A#>, <music21.pitch.Pitch C#>]
+    
     >>> pitch.simplifyMultipleEnharmonics([6, 10, 1], keyContext=key.Key('C-'))
     [<music21.pitch.Pitch G->, <music21.pitch.Pitch B->, <music21.pitch.Pitch D->]
     '''
@@ -375,13 +383,15 @@ def simplifyMultipleEnharmonics(pitches, criterion='maximizeConsonance', keyCont
             candidates = [p] + p.getAllCommonEnharmonics()
             consonant_counter = [0] * len(candidates)
             for context_pitch in simplifiedPitches[::-1]:
-                intervals = [interval.Interval(noteStart=candidate, noteEnd=context_pitch) for candidate in candidates]
+                intervals = [interval.Interval(noteStart=candidate, 
+                                               noteEnd=context_pitch) for candidate in candidates]
                 for j, interval_candidate in enumerate(intervals):
                     if interval_candidate.isConsonant():
                         consonant_counter[j] += 1
 
             # order the candidates by their consonant count
-            candidates_by_consonants = sorted(zip(consonant_counter, candidates), key=lambda x: x[0], reverse=True)
+            candidates_by_consonants = sorted(zip(consonant_counter, 
+                                                  candidates), key=lambda x: x[0], reverse=True)
             # append the candidate with the maximum consonant count
             simplifiedPitches.append(candidates_by_consonants[0][1])
 
@@ -1288,7 +1298,9 @@ class Pitch(object):
     _twelfth_root_of_two = TWELFTH_ROOT_OF_TWO
 
     # TODO: steal from Music21Object
-    classes = ('Pitch', 'object') # makes subclassing harder; was [x.__name__ for x in self.__class__.mro()] but 5% of creation time 
+    classes = ('Pitch', 'object') 
+    # makes subclassing harder; 
+    # it was [x.__name__ for x in self.__class__.mro()] but that was 5% of creation time 
 
 
     def __init__(self, name=None, **keywords):
@@ -4345,7 +4357,8 @@ class Pitch(object):
                 and pSelf.accidental is not None
                 and pPast.accidental.name == pSelf.accidental.name):
 
-                ### BUG! what about C#4 C#5 C#4 C#5 -- last C#4 and C#5 should not show accidental if cautionaryNotImmediateRepeat is False
+                ### BUG! what about C#4 C#5 C#4 C#5 -- last C#4 and C#5 
+                #   should not show accidental if cautionaryNotImmediateRepeat is False
 
                 # if not in the same octave, and not in the key sig, do show accidental
                 if (self._nameInKeySignature(alteredPitches) is False

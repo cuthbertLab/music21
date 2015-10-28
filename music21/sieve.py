@@ -227,7 +227,8 @@ def rabinMiller(n):
 
 def discreteBinaryPad(series, fixRange=None):
     """
-    Treat a sequence of integers as defining contiguous binary integers, where provided values are 1's and excluded values are zero.
+    Treat a sequence of integers as defining contiguous binary integers, 
+    where provided values are 1's and excluded values are zero.
 
     For instance, running [3,10,12] through this method gives a 1 for 
     the first entry (signifying 3), 0s for the next six entries (signifying 
