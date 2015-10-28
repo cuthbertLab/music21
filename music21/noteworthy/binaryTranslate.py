@@ -31,7 +31,8 @@ convert the file into .xml or .nwctxt first.
     >>> from music21 import *
     >>> #_DOCS_SHOW c = converter.parse('/Users/cuthbert/desktop/cuthbert_test1.nwc')
     >>> import os #_DOCS_HIDE
-    >>> c = converter.parse(common.getSourceFilePath() + os.path.sep + 'noteworthy' + os.path.sep + r'cuthbert_test1.nwc', forceSource=True) #_DOCS_HIDE
+    >>> p = os.path.join(common.getSourceFilePath(), 'noteworthy', 'cuthbert_test1.nwc') #_DOCS_HIDE
+    >>> c = converter.parse(p, forceSource=True) #_DOCS_HIDE
     >>> c.show('text')
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 0 offset=0.0>
@@ -148,15 +149,16 @@ class NWCConverter(object):
         Parse a file (calls .toStream)
         
         >>> #_DOCS_SHOW fp = '/Users/cuthbert/desktop/cuthbert_test1.nwc'
-        >>> import os #_DOCS_HIDE
-        >>> fp = common.getSourceFilePath() + os.path.sep + 'noteworthy' + os.path.sep + r'cuthbert_test1.nwc' #_DOCS_HIDE
+        >>> from os.path import join as j #_DOCS_HIDE
+        >>> fp = j(common.getSourceFilePath(), 'noteworthy', 'cuthbert_test1.nwc') #_DOCS_HIDE
         >>> nwcc = noteworthy.binaryTranslate.NWCConverter(fp=fp)
         >>> nwcc.fileContents
         >>> streamObj = nwcc.parseFile()
         >>> len(nwcc.fileContents) # binary
         1139
         >>> nwcc.fileContents[0:80]
-        b'[NoteWorthy ArtWare]\x00\x00\x00[NoteWorthy Composer]\x00\x01\x02\x02\x00\x00\x00N/A\x000_JldRQMSKq6M5a3FQqK_g\x00\x00\x00'
+        b'[NoteWorthy ArtWare]\x00\x00\x00[NoteWorthy 
+                 Composer]\x00\x01\x02\x02\x00\x00\x00N/A\x000_JldRQMSKq6M5a3FQqK_g\x00\x00\x00'
         >>> streamObj
         <music21.stream.Score ...>
         '''
@@ -211,7 +213,8 @@ class NWCConverter(object):
 
     def byteToInt(self, updateParsePosition = True):
         '''
-        changes a byte into an unsigned int (i.e., if the byte is > 127 then it's subtracted from 256)
+        changes a byte into an unsigned int 
+        (i.e., if the byte is > 127 then it's subtracted from 256)
         '''
         fc = self.fileContents
         pp = self.parsePosition
@@ -223,7 +226,8 @@ class NWCConverter(object):
         
     def byteToSignedInt(self, updateParsePosition = True):
         '''
-        changes a byte into a signed int (i.e., if the byte is > 127 then it's subtracted from 256)
+        changes a byte into a signed int 
+        (i.e., if the byte is > 127 then it's subtracted from 256)
         '''
         val = self.byteToInt(updateParsePosition)
         if val > 127:
@@ -255,7 +259,8 @@ class NWCConverter(object):
                 nulPosition = fc.index(0, self.parsePosition)
             except ValueError:
                 nulPosition = -1
-                #raise NoteworthyBinaryTranslateException(fc[self.parsePosition:], self.parsePosition)
+                #raise NoteworthyBinaryTranslateException(fc[self.parsePosition:], 
+                #            self.parsePosition)
         #print(self.parsePosition, nulPosition)
         ret = None
         if nulPosition == -1:
@@ -419,7 +424,9 @@ class NWCConverter(object):
             # ansi charset is default; but we don't use
         #print self.fonts
         self.titlePageInfo = self.byteToInt()
-        self.staffLables = self.byteToInt() # index of [None, First Systems, Top Systems, All Systems]
+        
+        # index of [None, First Systems, Top Systems, All Systems]
+        self.staffLables = self.byteToInt() 
         self.pageNumberStart = self.readLEShort()
         if self.version >= 200:
             self.skipBytes(1)
@@ -651,7 +658,8 @@ class NWCObject(object):
         p = self.parserParent
         objectType = p.readLEShort() # a number -- an index in the objMethods list
         if objectType >= len(self.objMethods):
-            raise NoteworthyBinaryTranslateException("Cannot translate objectType: %d; max is %d" % (objectType, len(self.objMethods) ))
+            raise NoteworthyBinaryTranslateException(
+                "Cannot translate objectType: %d; max is %d" % (objectType, len(self.objMethods)))
         if p.version >= 170:
             self.visible = p.byteToInt()
         else:

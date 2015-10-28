@@ -148,7 +148,8 @@ def listOfTimespanTreesByClass(
         <TimespanTree {0} (-inf to inf) <music21.stream.Measure 3 offset=4.0>>
         <TimespanTree {0} (-inf to inf) <music21.stream.Measure 4 offset=6.0>>
     
-    Now filter the Notes and the Clefs & TimeSignatures of the score (flattened) into a list of two timespans
+    Now filter the Notes and the Clefs & TimeSignatures of the score 
+    (flattened) into a list of two timespans
     
     >>> classLists = ['Note', ('Clef', 'TimeSignature')]
     >>> trees = timespans.listOfTimespanTreesByClass(score, classLists=classLists, flatten=True)
@@ -229,7 +230,8 @@ def streamToTimespanTree(
     since that caches the TimespanTree.
 
     >>> score = corpus.parse('bwv66.6')
-    >>> tree = timespans.streamToTimespanTree(score, flatten=True, classList=(note.Note, chord.Chord))
+    >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+    ...                classList=(note.Note, chord.Chord))
     >>> tree
     <TimespanTree {165} (0.0 to 36.0) <music21.stream.Score ...>>
     >>> for x in tree[:5]:
@@ -344,7 +346,8 @@ def timespansToChordifiedStream(timespans, templateStream=None):
             vert = timespans.getVerticalityAt(offset)
             quarterLength = endTime - offset
             if (quarterLength < 0):
-                raise TimespanException("Something is wrong with the verticality %r its endTime %f is less than its offset %f" % 
+                raise TimespanException("Something is wrong with the verticality " + 
+                        "%r its endTime %f is less than its offset %f" % 
                                          (vert, endTime, offset))
             element = vert.makeElement(quarterLength)
             outputStream[measureIndex].append(element)
@@ -356,7 +359,8 @@ def timespansToChordifiedStream(timespans, templateStream=None):
             vert = timespans.getVerticalityAt(offset)
             quarterLength = endTime - offset
             if (quarterLength < 0):
-                raise TimespanException("Something is wrong with the verticality %r, its endTime %f is less than its offset %f" % (vert, endTime, offset))
+                raise TimespanException("Something is wrong with the verticality " + 
+                    "%r, its endTime %f is less than its offset %f" % (vert, endTime, offset))
             element = vert.makeElement(quarterLength)
             elements.append(element)
         outputStream = stream.Score()
