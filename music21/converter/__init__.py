@@ -588,7 +588,8 @@ class Converter(object):
         Note that this checks the user Environment
         `autoDownlaad` setting before downloading.
 
-        >>> #_DOCS_SHOW jeanieLightBrownURL = 'https://github.com/cuthbertLab/music21/raw/master/music21/corpus/leadSheet/fosterBrownHair.mxl'
+        >>> jeanieLightBrownURL = ('https://github.com/cuthbertLab/music21/raw/master' + 
+        ...        '/music21/corpus/leadSheet/fosterBrownHair.mxl')
         >>> c = converter.Converter()
         >>> #_DOCS_SHOW c.parseURL(jeanieLightBrownURL)
         >>> #_DOCS_SHOW jeanieStream = c.stream
@@ -1819,7 +1820,8 @@ class Test(unittest.TestCase):
         # These strings aren't valid documents, but they are enough to pass the detection we're
         # testing in parseData(). But it does mean we'll be testing in a strange way.
         meiString = '<?xml version="1.0" encoding="UTF-8"?><mei><note/></mei>'
-        #mxlString = '<?xml version="1.0" encoding="UTF-8"?><score-partwise><note/></score-partwise>'
+        #mxlString = ('<?xml version="1.0" encoding="UTF-8"?>' + 
+        #                '<score-partwise><note/></score-partwise>')
 
         # The "mei" module raises an MeiElementError with "meiString," so as long as that's raised,
         # we know that parseData() chose correctly.

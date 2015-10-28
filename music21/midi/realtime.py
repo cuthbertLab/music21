@@ -14,8 +14,10 @@ Objects for realtime playback of Music21 Streams as MIDI.
 
 From an idea of Joe "Codeswell":
 
-  http://joecodeswell.wordpress.com/2012/06/13/how-to-produce-python-controlled-audio-output-from-music-made-with-music21
-  http://stackoverflow.com/questions/10983462/how-can-i-produce-real-time-audio-output-from-music-made-with-music21
+  http://joecodeswell.wordpress.com/2012/06/13/
+      how-to-produce-python-controlled-audio-output-from-music-made-with-music21
+  http://stackoverflow.com/questions/10983462/
+      how-can-i-produce-real-time-audio-output-from-music-made-with-music21
 
 Requires pygame: http://www.pygame.org/download.shtml
 '''
@@ -39,7 +41,8 @@ class StreamPlayer(object):
     '''
     Create a player for a stream that plays its midi version in realtime using pygame.
 
-    Set up a detuned piano (where each key has a random but consistent detuning from 30 cents flat to sharp)
+    Set up a detuned piano (where each key has a random but 
+    consistent detuning from 30 cents flat to sharp)
     and play a Bach Chorale on it in real time.
     
     
@@ -63,7 +66,8 @@ class StreamPlayer(object):
     A number of mixer controls can be passed in with keywords:
     
       mixerFreq (default 44100 -- CD quality)
-      mixerBitSize (default -16 (=unsigned 16bit) -- really, are you going to do 24bit audio with Python?? :-)  )
+      mixerBitSize (default -16 (=unsigned 16bit) -- 
+        really, are you going to do 24bit audio with Python?? :-)  )
       mixerChannels (default 2 = stereo)
       mixerBuffer (default 1024 = number of samples)
     '''
@@ -75,7 +79,8 @@ class StreamPlayer(object):
             self.pygame = pygame
         except ImportError:
             raise StreamPlayerException("StreamPlayer requires pygame.  Install first")
-        if self.mixerInitialized is False or ("reinitMixer" in keywords and keywords["reinitMixer"] != False):
+        if (self.mixerInitialized is False or 
+                ("reinitMixer" in keywords and keywords["reinitMixer"] != False)):
             if "mixerFreq" in keywords:
                 mixerFreq = keywords["mixerFreq"]
             else:
@@ -100,21 +105,26 @@ class StreamPlayer(object):
         
         self.streamIn = streamIn
     
-    def play(self, busyFunction = None, busyArgs = None, endFunction = None, endArgs = None, busyWaitMilliseconds = 50):
+    def play(self, busyFunction=None, busyArgs=None, 
+             endFunction=None, endArgs=None, busyWaitMilliseconds=50):
         streamStringIOFile = self.getStringIOFile()
-        self.playStringIOFile(streamStringIOFile, busyFunction, busyArgs, endFunction, endArgs, busyWaitMilliseconds)
+        self.playStringIOFile(streamStringIOFile, busyFunction, busyArgs, 
+                              endFunction, endArgs, busyWaitMilliseconds)
 
     def getStringIOFile(self):
         streamMidiFile = midiTranslate.streamToMidiFile(self.streamIn)
         streamMidiWritten = streamMidiFile.writestr()
         return stringIOModule.StringIO(streamMidiWritten)
     
-    def playStringIOFile(self, stringIOFile, busyFunction = None, busyArgs = None, endFunction = None, endArgs = None, busyWaitMilliseconds = 50):
+    def playStringIOFile(self, stringIOFile, busyFunction=None, busyArgs=None, 
+                         endFunction=None, endArgs=None, busyWaitMilliseconds=50):
         pygameClock = self.pygame.time.Clock()
         try:
             self.pygame.mixer.music.load(stringIOFile)
         except self.pygame.error:
-            raise StreamPlayerException("Could not play music file %s because: %s" % (stringIOFile, self.pygame.get_error()))
+            raise StreamPlayerException(
+                "Could not play music file %s because: %s" % (stringIOFile, 
+                                                              self.pygame.get_error()))
         self.pygame.mixer.music.play()
         framerate = int(1000/busyWaitMilliseconds) # coerce into int even if given a float.
         
@@ -169,7 +179,7 @@ class TestExternal(unittest.TestCase):
         for n in b.flat.notes:
             n.microtone = keyDetune[n.midi]
         sp = StreamPlayer(b)
-        sp.play(busyFunction=busyCounter, busyArgs=[timeCounter], busyWaitMilliseconds = 500)
+        sp.play(busyFunction=busyCounter, busyArgs=[timeCounter], busyWaitMilliseconds=500)
             
     def xtestPlayOneMeasureAtATime(self):
         from music21 import corpus

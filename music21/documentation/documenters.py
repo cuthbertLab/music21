@@ -790,16 +790,26 @@ class ClassDocumenter(ObjectDocumenter):
         >>> for method in documenter.methods[:10]:
         ...     method
         ...
-        <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.activateVariants>
-        <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.addGroupForElements>
-        <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.allPlayingWhileSounding>
-        <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.analyze>
-        <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.append>
-        <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.attachIntervalsBetweenStreams>
-        <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.attachMelodicIntervals>
-        <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.attributeCount>
-        <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.augmentOrDiminish>
-        <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.beatAndMeasureFromOffset>
+        <music21.documentation.documenters.MethodDocumenter: 
+            music21.stream.Stream.activateVariants>
+        <music21.documentation.documenters.MethodDocumenter: 
+            music21.stream.Stream.addGroupForElements>
+        <music21.documentation.documenters.MethodDocumenter: 
+            music21.stream.Stream.allPlayingWhileSounding>
+        <music21.documentation.documenters.MethodDocumenter: 
+            music21.stream.Stream.analyze>
+        <music21.documentation.documenters.MethodDocumenter: 
+            music21.stream.Stream.append>
+        <music21.documentation.documenters.MethodDocumenter: 
+            music21.stream.Stream.attachIntervalsBetweenStreams>
+        <music21.documentation.documenters.MethodDocumenter: 
+            music21.stream.Stream.attachMelodicIntervals>
+        <music21.documentation.documenters.MethodDocumenter: 
+            music21.stream.Stream.attributeCount>
+        <music21.documentation.documenters.MethodDocumenter: 
+            music21.stream.Stream.augmentOrDiminish>
+        <music21.documentation.documenters.MethodDocumenter: 
+            music21.stream.Stream.beatAndMeasureFromOffset>
         '''
         return self._methods
 
@@ -847,7 +857,8 @@ class ClassDocumenter(ObjectDocumenter):
         >>> for prop in documenter.readwriteProperties:
         ...     prop
         ...
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.atSoundingPitch>
+        <music21.documentation.documenters.AttributeDocumenter: 
+            music21.stream.Stream.atSoundingPitch>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.duration>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.elements>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.finalBarline>
@@ -1216,27 +1227,30 @@ class ModuleDocumenter(ObjectDocumenter):
     ...     documenter.namesMapping.items())):
     ...     print("%s %s" % (reference, referent))
     ...
-    ContiguousSegmentOfNotes <music21.documentation.documenters.ClassDocumenter: music21.serial.ContiguousSegmentOfNotes>
-    HistoricalTwelveToneRow <music21.documentation.documenters.ClassDocumenter: music21.serial.HistoricalTwelveToneRow>
-    ToneRow <music21.documentation.documenters.ClassDocumenter: music21.serial.ToneRow>
-    TwelveToneMatrix <music21.documentation.documenters.ClassDocumenter: music21.serial.TwelveToneMatrix>
-    TwelveToneRow <music21.documentation.documenters.ClassDocumenter: music21.serial.TwelveToneRow>
-    findMultisets <music21.documentation.documenters.FunctionDocumenter: music21.serial.findMultisets>
-    findSegments <music21.documentation.documenters.FunctionDocumenter: music21.serial.findSegments>
-    findTransformedSegments <music21.documentation.documenters.FunctionDocumenter: music21.serial.findTransformedSegments>
-    findTransposedAndInvertedMultisets <music21.documentation.documenters.FunctionDocumenter: music21.serial.findTransposedAndInvertedMultisets>
-    findTransposedMultisets <music21.documentation.documenters.FunctionDocumenter: music21.serial.findTransposedMultisets>
-    findTransposedSegments <music21.documentation.documenters.FunctionDocumenter: music21.serial.findTransposedSegments>
-    getContiguousSegmentsOfLength <music21.documentation.documenters.FunctionDocumenter: music21.serial.getContiguousSegmentsOfLength>
-    getHistoricalRowByName <music21.documentation.documenters.FunctionDocumenter: music21.serial.getHistoricalRowByName>
-    labelMultisets <music21.documentation.documenters.FunctionDocumenter: music21.serial.labelMultisets>
-    labelSegments <music21.documentation.documenters.FunctionDocumenter: music21.serial.labelSegments>
-    labelTransformedSegments <music21.documentation.documenters.FunctionDocumenter: music21.serial.labelTransformedSegments>
-    labelTransposedAndInvertedMultisets <music21.documentation.documenters.FunctionDocumenter: music21.serial.labelTransposedAndInvertedMultisets>
-    labelTransposedMultisets <music21.documentation.documenters.FunctionDocumenter: music21.serial.labelTransposedMultisets>
-    labelTransposedSegments <music21.documentation.documenters.FunctionDocumenter: music21.serial.labelTransposedSegments>
-    pcToToneRow <music21.documentation.documenters.FunctionDocumenter: music21.serial.pcToToneRow>
-    rowToMatrix <music21.documentation.documenters.FunctionDocumenter: music21.serial.rowToMatrix>
+    ContiguousSegmentOfNotes <....ClassDocumenter: music21.serial.ContiguousSegmentOfNotes>
+    HistoricalTwelveToneRow <...ClassDocumenter: music21.serial.HistoricalTwelveToneRow>
+    ToneRow <...ClassDocumenter: music21.serial.ToneRow>
+    TwelveToneMatrix <...ClassDocumenter: music21.serial.TwelveToneMatrix>
+    TwelveToneRow <...ClassDocumenter: music21.serial.TwelveToneRow>
+    findMultisets <...FunctionDocumenter: music21.serial.findMultisets>
+    findSegments <...FunctionDocumenter: music21.serial.findSegments>
+    findTransformedSegments <...FunctionDocumenter: music21.serial.findTransformedSegments>
+    findTransposedAndInvertedMultisets <...FunctionDocumenter: 
+        music21.serial.findTransposedAndInvertedMultisets>
+    findTransposedMultisets <...FunctionDocumenter: music21.serial.findTransposedMultisets>
+    findTransposedSegments <...FunctionDocumenter: music21.serial.findTransposedSegments>
+    getContiguousSegmentsOfLength <...FunctionDocumenter: 
+        music21.serial.getContiguousSegmentsOfLength>
+    getHistoricalRowByName <...FunctionDocumenter: music21.serial.getHistoricalRowByName>
+    labelMultisets <...FunctionDocumenter: music21.serial.labelMultisets>
+    labelSegments <...FunctionDocumenter: music21.serial.labelSegments>
+    labelTransformedSegments <...FunctionDocumenter: music21.serial.labelTransformedSegments>
+    labelTransposedAndInvertedMultisets <...FunctionDocumenter: 
+        music21.serial.labelTransposedAndInvertedMultisets>
+    labelTransposedMultisets <...FunctionDocumenter: music21.serial.labelTransposedMultisets>
+    labelTransposedSegments <...FunctionDocumenter: music21.serial.labelTransposedSegments>
+    pcToToneRow <...FunctionDocumenter: music21.serial.pcToToneRow>
+    rowToMatrix <...FunctionDocumenter: music21.serial.rowToMatrix>
 
     >>> documenter.rstCrossReferenceString
     ':mod:`~music21.serial`'

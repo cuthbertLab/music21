@@ -79,22 +79,26 @@ exampleClercqTemperley =  '''
 
 VP: I | IV | I | V |
 In: $VP*2
-Vr: $VP*4 IV | V | I | vi | IV | V | I | V |       % Second part of verse could be called chorus
+Vr: $VP*4 IV | V | I | vi | IV | V | I | V |       % Second half could be called chorus
 Ch: V | | $VP*2 I |*4 
 Ch2: V | | $VP*3     % Fadeout
 S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2
 '''
-RingFireCT = '''
+RingFireCT = ('''
 % Ring Of Fire
 
 In: [3/4] I . IV | [4/4] I | [3/4] . . V7 | [4/4] I |
-Vr: I . . IV | [3/4] I . IV | [4/4] I | . . . V | [3/4] I . V | [4/4] I | I . . IV | [3/4] I . IV | [4/4] I | [3/4] . . V | [4/4] I |
-Vr2: I . . IV | [3/4] I . IV | [4/4] I | . . . V | [3/4] I . V | [4/4] I | I . IV I | . . . IV | I | . . . V | I | % Or (alternate barring) | [3/4] I . IV | [2/4] I | [3/4] . . IV | [4/4] I | . . . V | I |
-Ch: V | IV I | V | IV I | [2/4] | [4/4] . . . V | I . . V | I |       % Or the 2/4 measure could be one measure later
+Vr: I . . IV | [3/4] I . IV | [4/4] I | . . . V | [3/4] I . V | [4/4] I | ''' + 
+'I . . IV | [3/4] I . IV | [4/4] I | [3/4] . . V | [4/4] I |\n' +
+'Vr2: I . . IV | [3/4] I . IV | [4/4] I | . . . V | [3/4] I . V | ' + 
+'[4/4] I | I . IV I | . . . IV | I | . . . V | I | % Or (alternate barring) ' + 
+'| [3/4] I . IV | [2/4] I | [3/4] . . IV | [4/4] I | . . . V | I |\n' + 
+'Ch: V | IV I | V | IV I | [2/4] | [4/4] . . . V | I . . V | I |       ' + 
+'''% Or the 2/4 measure could be one measure later
 Fadeout: I . . V | I . . V | I . . V |
 Co: [2/4] I | [4/4] . . . V | I . . V | $Fadeout
 S: [G] $In $Vr $Ch $In*2 $Ch $Vr2 $Ch $Ch $Co
-'''
+''')
 
 class CTSongException(exceptions21.Music21Exception):
     pass
@@ -106,20 +110,22 @@ class CTSong(object):
     Create a CTSong object one of two ways:
     1) by passing in the string, with newline characters (\\n) at the end of each line
     2) by passing in the text file as a string, and have python open the file and read the text
-    #_DOCS_HIDE Please note: the backslashes included in the file below are for sphinx documentation
+    #_DOCS_HIDE Please note: the backslashes included in the 
+    file below are for sphinx documentation
     #_DOCS_HIDE purposes only. They are not permitted in the clercq-temperley file format   
 
     >>> exampleClercqTemperley = '''
     ... % Brown-Eyed Girl
     ... VP: I \| IV \| I \| V \|
     ... In: $VP\*2
-    ... Vr: $VP\*4 IV \| V \| I \| vi \| IV \| V \| I \| V \|  % Second part of verse could be called chorus
+    ... Vr: $VP\*4 IV \| V \| I \| vi \| IV \| V \| I \| V \| % Second half could be called chorus
     ... Ch: V \| \| $VP\*2 I \|\*4 
     ... Ch2: V \| \| $VP\*3     % Fadeout
     ... S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2
     ... '''
         
-    >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.exampleClercqTemperley) #_DOCS_HIDE
+    >>> exCT = romanText.clercqTemperley.exampleClercqTemperley
+    >>> s = romanText.clercqTemperley.CTSong(exCT) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = romanText.clercqTemperley.CTSong('C:/Brown-Eyed_Girl.txt')
     
     When you call the .toScore() method on the newly created CTSong object,
@@ -131,7 +137,8 @@ class CTSong(object):
     labelSubsectionsOnScore. Both are set to True by default. Thus, the created score
     will have labels (on the chord's lyric) for each roman numeral as well as for each 
     section in the song (LHS). In case of a recursive definition (a rule contains a reference
-    to another rule), both labels are printed, with the deepest reference on the smallest lyric line.
+    to another rule), both labels are printed, with the deepest 
+    reference on the smallest lyric line.
 
     >>> #_DOCS_SHOW s.toScore().show()
         
@@ -148,7 +155,7 @@ class CTSong(object):
     <music21.key.Key of G major>
 
     >>> s.comments
-    [['Vr:', 'Second part of verse could be called chorus'], ['Ch2:', 'Fadeout']]
+    [['Vr:', 'Second half could be called chorus'], ['Ch2:', 'Fadeout']]
         
     Year is not defined as part of the Clercq-Temperley format, but it will be helpful
     to have it as a property. So let's assign a year to this song:
@@ -163,7 +170,9 @@ class CTSong(object):
     >>> s.rules
     OrderedDict([('VP', <music21.CTRule.CTRule text="VP: I | IV | I | V |">), 
                  ('In', <music21.CTRule.CTRule text="In: $VP*2">), 
-                 ('Vr', <music21.CTRule.CTRule text="Vr: $VP*4 IV | V | I | vi | IV | V | I | V |  % Second part of verse could be called chorus">), 
+                 ('Vr', <music21.CTRule.CTRule 
+                         text="Vr: $VP*4 IV | V | I | vi | IV | V | I | V |  
+                                     % Second half could be called chorus">), 
                  ('Ch', <music21.CTRule.CTRule text="Ch: V | | $VP*2 I |*4">), 
                  ('Ch2', <music21.CTRule.CTRule text="Ch2: V | | $VP*3     % Fadeout">), 
                  ('S', <music21.CTRule.CTRule text="S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2">)])
@@ -192,7 +201,8 @@ class CTSong(object):
     
     Examples used throughout this class utilize the following Clercq-Temperley text file
     
-    #_DOCS_HIDE Please note: the backslashes included in the file below are for sphinx documentation
+    #_DOCS_HIDE Please note: the backslashes included in 
+    #_DOCS_HIDE the file below are for sphinx documentation
     #_DOCS_HIDE purposes only. They are not permitted in the clercq-temperley file format   
 
     >>> BlitzkriegBopCT = '''
@@ -232,7 +242,9 @@ class CTSong(object):
     <music21.key.Key of A major>
 
     >>> s.comments
-    [['just a general comment'], ['Vr:', 'a comment on verse'], ['S:', '3rd and 6th verses are instrumental']]
+    [['just a general comment'], 
+     ['Vr:', 'a comment on verse'], 
+     ['S:', '3rd and 6th verses are instrumental']]
 
     >>> s.year = 1952
     >>> s.year
@@ -240,9 +252,13 @@ class CTSong(object):
 
     >>> s.rules
     OrderedDict([('In', <music21.CTRule.CTRule text="In: I | | | | | | V | |">), 
-                 ('Vr', <music21.CTRule.CTRule text="Vr: I | | | | IVd7 | | I | | V7 | | I | | %a comment on verse">), 
-                 ('Vrf', <music21.CTRule.CTRule text="Vrf: I | | | | IVd7 | | I | | V7 | | I | IV iv | V | . I |">), 
-                 ('S', <music21.CTRule.CTRule text="S: [A] $In $Vr $Vr $Vr $Vr $Vr $Vr $Vrf    % 3rd and 6th verses are instrumental">)])
+                 ('Vr', <music21.CTRule.CTRule 
+                         text="Vr: I | | | | IVd7 | | I | | V7 | | I | | %a comment on verse">), 
+                 ('Vrf', <music21.CTRule.CTRule 
+                         text="Vrf: I | | | | IVd7 | | I | | V7 | | I | IV iv | V | . I |">), 
+                 ('S', <music21.CTRule.CTRule 
+                         text="S: [A] $In $Vr $Vr $Vr $Vr $Vr $Vr $Vrf    
+                                     % 3rd and 6th verses are instrumental">)])
 
 
     >>> rule = s.rules['In']
@@ -257,10 +273,14 @@ class CTSong(object):
         % Ring Of Fire
         
         In: [3/4] I . IV | [4/4] I | [3/4] . . V7 | [4/4] I |
-        Vr: I . . IV | [3/4] I . IV | [4/4] I | . . . V | [3/4] I . V | [4/4] I | I . . IV | [3/4] I . IV | [4/4] I | [3/4] . . V | [4/4] I |
-        Vr2: I . . IV | [3/4] I . IV | [4/4] I | . . . V | [3/4] I . V | [4/4] I | I . IV I | . . . IV | I | . . . V | I |
-                                                % Or (alternate barring) | [3/4] I . IV | [2/4] I | [3/4] . . IV | [4/4] I | . . . V | I |
-        Ch: V | IV I | V | IV I | [2/4] | [4/4] . . . V | I . . V | I |       % Or the 2/4 measure could be one measure later
+        Vr: I . . IV | [3/4] I . IV | [4/4] I | . . . V | [3/4] I . V | [4/4] I | 
+                    I . . IV | [3/4] I . IV | [4/4] I | [3/4] . . V | [4/4] I |
+        Vr2: I . . IV | [3/4] I . IV | [4/4] I | . . . V | [3/4] I . V | [4/4] I | 
+                    I . IV I | . . . IV | I | . . . V | I |
+                    % Or (alternate barring) | [3/4] I . IV | [2/4] I | 
+                    [3/4] . . IV | [4/4] I | . . . V | I |
+        Ch: V | IV I | V | IV I | [2/4] | [4/4] . . . V | 
+                    I . . V | I |       % Or the 2/4 measure could be one measure later
         Fadeout: I . . V | I . . V | I . . V |
         Co: [2/4] I | [4/4] . . . V | I . . V | $Fadeout
         S: [G] $In $Vr $Ch $In*2 $Ch $Vr2 $Ch $Ch $Co
@@ -268,14 +288,15 @@ class CTSong(object):
 
     """
     _DOC_ORDER = ['text', 'toScore', 'title', 'homeTimeSig', 'homeKeySig', 'comments', 'rules']
-    _DOC_ATTR = {'year': 'the year of the CTSong; not formally defined by the Clercq-Temperley format'}
+    _DOC_ATTR = {'year': 'the year of the CTSong; not formally defined ' + 
+                                'by the Clercq-Temperley format'}
                  
     def __init__(self, textFile, **keywords):
         self._title = None
         self.text = "" 
         self.lines = []
         self._rules = OrderedDict() # Dictionary of all component rules of the type CTRule
-        self.ksList = [] # keeps a list of all key signatures in the Score -- for avoiding duplicates
+        self.ksList = [] # keeps a list of all key signatures in the Score -- avoids duplicates
         self.tsList = [] # same for time signatures
 
         self._scoreObj = None
@@ -297,7 +318,10 @@ class CTSong(object):
 
     
     def __repr__(self):
-        return '<music21.CTSong.%s title=%s year=%s text=%s>' % (self.__class__.__name__, self.text, self.title, self.year)
+        return '<music21.CTSong.%s title=%s year=%s text=%s>' % (self.__class__.__name__, 
+                                                                 self.text, 
+                                                                 self.title, 
+                                                                 self.year)
 
     #---------------------------------------------------------------------------
     def parse(self, textFile):
@@ -316,7 +340,8 @@ class CTSong(object):
             except FileNotFoundError:
                 raise CTSongException('Cannot find file: %s' % textFile)
             except Exception:
-                raise CTSongException('Invalid File Format; must be string or text file: %s' % textFile)
+                raise CTSongException(
+                    'Invalid File Format; must be string or text file: %s' % textFile)
 
         lines = [e for e in lines if len(e) != 0]
         for i in range(len(lines)):
@@ -336,7 +361,8 @@ class CTSong(object):
         return title
 
     title = property(_getTitle, doc= '''
-        Get or set the title of the CTSong. If not specified explicitly but the clercq-Temperley text exists, 
+        Get or set the title of the CTSong. If not specified 
+        explicitly but the clercq-Temperley text exists, 
         this attribute searches first few lines of text file for title (a string preceded by a '%') 
         if found, sets title attribute to this string and returns this title)
         
@@ -360,10 +386,13 @@ class CTSong(object):
     
         comments are stored as a list of comments, each comment on a line as a list. If the
         comment is on a rule line, the list contains both the line's LHS (like In:) and the comment
-        if the comment is on a line of its own, only the comment is appended as a list of length one.
+        if the comment is on a line of its own, only the comment is 
+        appended as a list of length one.
         
         The title is not a comment. The title is stored under self.title
-        #_DOCS_HIDE Please note: the backslashes included in the file below are for sphinx documentation
+        
+        #_DOCS_HIDE Please note: the backslashes included in the file 
+        #_DOCS_HIDE below are for sphinx documentation
         #_DOCS_HIDE purposes only. They are not permitted in the clercq-temperley file format   
 
             | textString = '''
@@ -391,8 +420,10 @@ class CTSong(object):
         return self._rules
 
     rules = property(_getRules, doc= '''
-        Get the rules of a CTSong. the Rules is an OrderedDict of objects of type CTRule. If only a textfile
-        provided, this goes through text file and creates the rule object out of each line containing
+        Get the rules of a CTSong. the Rules is an OrderedDict of 
+        objects of type CTRule. If only a textfile
+        provided, this goes through text file and creates the 
+        rule object out of each line containing
         a LHS including the Song line, which should always be last.
         
         >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.BlitzkriegBopCT)
@@ -563,11 +594,12 @@ class CTRule(object):
                     returnedMeasures = rule.expand(ts, ks)
                     self.insertKsTs(returnedMeasures[0], ts, ks)
                     for m in returnedMeasures:
-                        tsEs = m.getElementsByClass('TimeSignature', returnStreamSubClass='list')
+                        tsEs = m.iter.getElementsByClass('TimeSignature')
                         for returnedTs in tsEs:
                             if returnedTs is not ts:
-                                ts = copy.deepcopy(ts) # the TS changed mid-rule; create a new one for return.
-                    
+                                # the TS changed mid-rule; create a new one for return.
+                                ts = copy.deepcopy(ts) 
+                                
                     measures.extend(returnedMeasures)
             elif sep == "|":
                 m = stream.Measure()
@@ -578,7 +610,8 @@ class CTRule(object):
                     if atom.startswith('['):
                         atomContent = atom[1:-1]
                         if atomContent == '0':
-                            ts = meter.TimeSignature('4/4') # irregular meter.  Cannot fully represent; 
+                            ts = meter.TimeSignature('4/4') 
+                            # irregular meter.  Cannot fully represent; 
                             #TODO: replace w/ senza misura when possible. 
                                                         
                         elif '/' in atomContent: # only one key / ts per measure.
@@ -630,7 +663,10 @@ class CTRule(object):
         if len(measures) > 0:
             for m in measures:
                 noteIter = m.recurse().notes
-                if noteIter and (self.parent is None or self.parent.labelSubsectionsOnScore is True) and self.LHS != 'S':
+                if (noteIter and 
+                        (self.parent is None or 
+                            self.parent.labelSubsectionsOnScore is True) and 
+                        self.LHS != 'S'):
                     rn = noteIter[0]
                     lyricNum = len(rn.lyrics) + 1
                     rn.lyrics.append(note.Lyric(self.LHS, number=lyricNum))       
@@ -642,7 +678,9 @@ class CTRule(object):
         '''
         Returns content, "|" (normal) or "$" (expansion), and number of repetitions.
         
-        >>> s = romanText.clercqTemperley.CTRule('In: [A] [4/4] $Vr $BP*3 I IV | I | $BP*3 I IV | I | | R |*4 I |*4 % This is a comment')
+        >>> rs = ('In: [A] [4/4] $Vr $BP*3 I IV | I | ' + 
+        ...          '$BP*3 I IV | I | | R |*4 I |*4 % This is a comment')
+        >>> s = romanText.clercqTemperley.CTRule(rs)
         >>> s._measureGroups()
         [('[A] [4/4]', '|', 1), 
          ('Vr', '$', 1), ('BP', '$', 3), ('I IV', '|', 1), ('I', '|', 1), 
@@ -829,7 +867,8 @@ class CTRule(object):
     musicText = property(_getMusicText, _setMusicText, doc= '''
         Gets just the music text of the CTRule, excluding the left hand side and comments
         
-        >>> s = romanText.clercqTemperley.CTRule('In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment')
+        >>> rs = 'In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment'
+        >>> s = romanText.clercqTemperley.CTRule(rs)
         >>> s.text
         'In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment'
         >>> s.musicText
@@ -845,7 +884,8 @@ class CTRule(object):
     comment = property(_getComment,  doc= '''
         Get the comment of a CTRule object.
         
-        >>> s = romanText.clercqTemperley.CTRule('In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment')
+        >>> rs = 'In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment'
+        >>> s = romanText.clercqTemperley.CTRule(rs)
         >>> s.comment
         'This is a comment'
         ''')
@@ -868,10 +908,12 @@ class CTRule(object):
             return ""
 
     LHS = property(_getLHS, _setLHS, doc= '''
-        Get the LHS (Left Hand Side) of the CTRule. If not specified explicitly but CTtext present, searches
+        Get the LHS (Left Hand Side) of the CTRule. 
+        If not specified explicitly but CTtext present, searches
         first characters up until ':' for rule and returns string)
 
-        >>> s = romanText.clercqTemperley.CTRule('In: $BP*3 I IV | R |*4 I |*4 % This is a comment')
+        >>> rs = 'In: $BP*3 I IV | R |*4 I |*4 % This is a comment'
+        >>> s = romanText.clercqTemperley.CTRule(rs)
         >>> s.LHS
         'In'
         ''')
@@ -898,7 +940,8 @@ class CTRule(object):
         return sectionName
 
     sectionName = property(_getSectionName, doc= '''
-        Stores the expanded version of the Left hand side (LHS) such as Introduction, Verse, etc. if
+        Stores the expanded version of the Left hand side (LHS) such as 
+        Introduction, Verse, etc. if
         text present uses LHS to expand)
         
         Currently supported abbreviations: 

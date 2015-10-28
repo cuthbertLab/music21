@@ -261,7 +261,9 @@ class Dynamic(base.Music21Object):
             self.englishName = None
 
     value = property(_getValue, _setValue,
-        doc='''Get or set the value of this dynamic, which sets the long and english names of this Dynamic. The value is a string specification. 
+        doc='''
+        Get or set the value of this dynamic, which sets the long and 
+        English names of this Dynamic. The value is a string specification. 
         ''')
 
 
@@ -281,9 +283,12 @@ class Dynamic(base.Music21Object):
             raise DynamicException('cannot set as volume scalar to: %s', value)
 
     volumeScalar = property(_getVolumeScalar, _setVolumeScalar, doc=r'''
-        Get or set the volume scalar for this dynamic. If not explicitly set, a default volume scalar will be provided. Any number between 0 and 1 can be used to set the volume scalar, overriding the expected behavior. 
+        Get or set the volume scalar for this dynamic. If not explicitly set, a 
+        default volume scalar will be provided. Any number between 0 and 1 can be 
+        used to set the volume scalar, overriding the expected behavior. 
 
-        As mezzo is at .5, the unit interval range is doubled for generating final output. The default output is .5.
+        As mezzo is at .5, the unit interval range is doubled for 
+        generating final output. The default output is .5.
 
         
         >>> d = dynamics.Dynamic('mf')
@@ -327,7 +332,9 @@ class Dynamic(base.Music21Object):
             self._positionDefaultY = value
     
     positionVertical = property(_getPositionVertical, _setPositionVertical,
-        doc='''Get or set the vertical position, where 0 is the top line of the staff and units are in 10ths of a staff space.
+        doc='''
+        Get or set the vertical position, where 0 is the top line 
+        of the staff and units are in 10ths of a staff space.
 
         
         >>> te = expressions.TextExpression()
@@ -559,7 +566,6 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [Dynamic, dynamicStrFromDecimal]
 
 if __name__ == "__main__":
-    # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)
 
