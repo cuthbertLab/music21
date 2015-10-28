@@ -263,7 +263,9 @@ def findFormatFile(fp):
 
 #@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 def findFormatExtFile(fp):
-    '''Given a file path (relative or absolute) find format and extension used (not the output extension)
+    '''
+    Given a file path (relative or absolute) 
+    find format and extension used (not the output extension)
 
     DEPRECATED May 2014 -- moving to converter
 
@@ -293,13 +295,15 @@ def findFormatExtFile(fp):
 
 #@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 def findFormatExtURL(url):
-    '''Given a URL, attempt to find the extension. This may scrub arguments in a URL, or simply look at the last characters.
+    '''
+    Given a URL, attempt to find the extension. 
+    This may scrub arguments in a URL, or simply look at the last characters.
 
     DEPRECATED May 2014 -- moving to converter
 
 
     >>> urlA = 'http://somesite.com/?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=xml'
-    >>> urlB = 'http://somesite.com/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=kern'
+    >>> urlB = 'http://somesite.com/cgi-bin/ksdata?l=cc/schubert/d0576&file=d0576-06.krn&f=kern'
     >>> urlC = 'http://somesite.com/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml'
     >>> urlF = 'http://junk'
 

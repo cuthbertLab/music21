@@ -67,7 +67,9 @@ def getCorpusFilePath():
 
 
 def getCorpusContentDirs():
-    '''Get all dirs that are found in the corpus that contain content; that is, exclude dirst that have code or other resoures.
+    '''
+    Get all dirs that are found in the corpus that contain content; 
+    that is, exclude dirs that have code or other resources.
 
     >>> fp = common.getCorpusContentDirs()
     >>> fp # this test will be fragile, depending on composition of dirs
@@ -110,7 +112,7 @@ def getCorpusContentDirs():
 
 
 def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
-     packageOnly=True):
+                  packageOnly=True):
     '''
     Manually get all directories in the music21 package, 
     including the top level directory. This is used in setup.py.
@@ -119,7 +121,7 @@ def getPackageDir(fpMusic21=None, relative=True, remapSep='.',
 
     If `remapSep` is set to anything other than None, the path separator will be replaced.
 
-    If `packageOnly` is true, only directories with __init__.py files are colllected.
+    If `packageOnly` is true, only directories with __init__.py files are collected.
     '''
     if fpMusic21 == None:
         fpMusic21 = getSourceFilePath()

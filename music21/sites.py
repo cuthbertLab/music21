@@ -202,7 +202,8 @@ class Sites(common.SlottedObject):
         #copies; this functionality is used at times in context searches, but
         # may be a performance hog.
         new = self.__class__()
-        #environLocal.printDebug(['Sites.__deepcopy__', 'self.siteDict.keys()', self.siteDict.keys()])
+        #environLocal.printDebug(['Sites.__deepcopy__', 
+        #    'self.siteDict.keys()', self.siteDict.keys()])
         for idKey in self.siteDict:
             if idKey is None:
                 continue
@@ -398,11 +399,12 @@ class Sites(common.SlottedObject):
             priorityTarget=None, 
             excludeNone=False):
         '''
-        Get references; order, based on dictionary keys, is from most recently added to least recently added.
+        Get references; order, based on dictionary keys, is from most 
+        recently added to least recently added.
 
         The `sortByCreationTime` option will sort objects by creation time,
-        where most-recently assigned objects are returned first. Can be [False, other], [True, 1] or
-        ['reverse', -1]
+        where most-recently assigned objects are returned first. 
+        Can be [False, other], [True, 1] or ['reverse', -1]
 
         If `priorityTarget` is defined, this object will be placed first in the list of objects.
 
@@ -519,7 +521,8 @@ class Sites(common.SlottedObject):
                 # store this object as having been searched
                 memo[id(obj)] = obj
                 # will add values to found
-                #environLocal.printDebug(['getAllByClass()', 'about to call getAllContextsByClass', 'found', found, 'obj', obj])
+                #environLocal.printDebug(['getAllByClass()', 
+                #    'about to call getAllContextsByClass', 'found', found, 'obj', obj])
                 obj.getAllContextsByClass(className)
         # returning found, but not necessary
         return found
@@ -648,8 +651,10 @@ class Sites(common.SlottedObject):
         for obj in objs:
             #if DEBUG_CONTEXT: print('\tY: getObjByClass: iterating objs:', id(obj), obj)
             if (classNameIsStr and obj.isFlat):
-                #if DEBUG_CONTEXT: print('\tY: skipping flat stream that does not contain object:', id(obj), obj)
-                #environLocal.printDebug(['\tY: skipping flat stream that does not contain object:'])
+                #if DEBUG_CONTEXT: 
+                #    print('\tY: skipping flat stream that does not contain object:', id(obj), obj)
+                #environLocal.printDebug(
+                #    ['\tY: skipping flat stream that does not contain object:'])
                 if obj.sites.getSiteCount() == 0: # is top level; no more to search...
                     if not obj.hasElementOfClass(className, forceFlat=True):
                         continue # skip, not in this stream
@@ -992,9 +997,11 @@ class Sites(common.SlottedObject):
             siteId = id(site)
         try:
             del self.siteDict[siteId]
-            #environLocal.printDebug(['removed site w/o exception:', siteId, 'self.siteDict.keys()', self.siteDict.keys()])
+            #environLocal.printDebug(['removed site w/o exception:', siteId, 
+            #    'self.siteDict.keys()', self.siteDict.keys()])
         except:
-            raise SitesException('an entry for this object (%s) is not stored in this Sites object' % site)
+            raise SitesException('an entry for this object ' + 
+                                 '(%s) is not stored in this Sites object' % site)
 
     def removeById(self, idKey):
         '''
@@ -1007,7 +1014,8 @@ class Sites(common.SlottedObject):
         if idKey is None:
             raise SitesException('trying to remove None idKey is not allowed')
 
-        #environLocal.printDebug(['removeById', idKey, 'self.siteDict.keys()', self.siteDict.keys()])
+        #environLocal.printDebug(['removeById', idKey, 
+        #    'self.siteDict.keys()', self.siteDict.keys()])
         try:
             del self.siteDict[idKey]
         except KeyError:

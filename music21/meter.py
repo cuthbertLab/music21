@@ -2034,7 +2034,8 @@ class MeterSequence(MeterTerminal):
                 partRatio = mt._numerator / float(mt._denominator)
                 mt.weight = value * (partRatio/totalRatio)
                 #mt.weight = (partRatio/totalRatio) #* totalRatio
-                #environLocal.printDebug(['setting weight based on part, total, weight', partRatio, totalRatio, mt.weight])
+                #environLocal.printDebug(['setting weight based on part, total, weight', 
+                #    partRatio, totalRatio, mt.weight])
 
     weight = property(_getWeight, _setWeight)
 

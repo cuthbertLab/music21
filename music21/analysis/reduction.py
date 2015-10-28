@@ -77,7 +77,8 @@ class ReductiveNote(object):
         '''
         A specification must be created when access the Measure that the source note 
         is found in. Storing the measure and index position provides significant 
-        performance optimization, as we do no have to search every note when generated the reduction. 
+        performance optimization, as we do no have to search 
+        every note when generated the reduction. 
 
         The `measureIndex` is the index of measure where this is found, not
         the measure number. The `measureOffset` is the position in the measure
@@ -135,7 +136,9 @@ class ReductiveNote(object):
         return self._isParsed
 
     def getNoteAndTextExpression(self):
-        '''Produce a new note, a deep copy of the supplied note and with the specified modifications.
+        '''
+        Produce a new note, a deep copy of the supplied note 
+        and with the specified modifications.
         '''
         n = None
         if self._note.isChord:
@@ -153,7 +156,9 @@ class ReductiveNote(object):
             n = copy.deepcopy(self._note)
         # always clear certain parameters
         if (n is None):
-            raise ReductiveEventException('Could not find pitch, %r in self._note: %r' % (self._parameters['pitch'], self._note))
+            raise ReductiveEventException(
+                'Could not find pitch, %r in self._note: %r' % (self._parameters['pitch'], 
+                                                                self._note))
         n.lyrics = []
         n.tie = None
         n.expressions = []

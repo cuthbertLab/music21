@@ -4073,9 +4073,11 @@ def getExtractorByTypeAndNumber(type, number): #@ReservedAssignment
     try:
         return extractorsById[type][number]
     except KeyError:
-        raise JSymbolicFeatureException('Could not find any jSymbolic features of type %s' % (type))
+        raise JSymbolicFeatureException(                            
+            'Could not find any jSymbolic features of type %s' % (type))
     except IndexError:
-        raise JSymbolicFeatureException('jSymbolic features of type %s do not have number %d' % (type, number))
+        raise JSymbolicFeatureException(
+            'jSymbolic features of type %s do not have number %d' % (type, number))
 
 
 
@@ -4187,7 +4189,8 @@ def getCompletionStats():
                 countTotal += 1
                 if group[i] in featureExtractors:
                     countComplete += 1
-    print('completion stats: %s/%s (%s)' % (countComplete, countTotal, (float(countComplete)/countTotal)))
+    print('completion stats: %s/%s (%s)' % (
+            countComplete, countTotal, (float(countComplete)/countTotal)))
 
 
 
@@ -4535,7 +4538,8 @@ class Test(unittest.TestCase):
                     feTotal += 1
                     if fs[k][i] in features.jSymbolic.featureExtractors:
                         feImplemented += 1
-        environLocal.printDebug(['fe total:', feTotal, 'fe implemented', feImplemented, 'pcent', feImplemented/float(feTotal)])
+        environLocal.printDebug(['fe total:', feTotal, 'fe implemented', 
+                                 feImplemented, 'pcent', feImplemented/float(feTotal)])
 
 
 if __name__ == "__main__":

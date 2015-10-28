@@ -13,7 +13,8 @@
 
 These are the public methods for the MEI module.
 
-To convert a string with MEI markup into music21 objects, use :meth:`MeiToM21Converter.convertFromString`.
+To convert a string with MEI markup into music21 objects, 
+use :meth:`MeiToM21Converter.convertFromString`.
 
 In the future, most of the functions in this module should be moved to a separate, import-only
 module, so that functions for writing music21-to-MEI will fit nicely.
@@ -86,9 +87,11 @@ The following elements are not yet imported, though you might expect they would 
 
 Most elements are processed in functions called :func:`tagFromElement`, where "tag" is replaced by
 the element's tag name (e.g., :func:`staffDefFromElement` for <staffDef> elements). These functions
-convert from a Python :class:`xml.etree.ElementTree.Element` object to the appropriate music21 object.
+convert from a Python :class:`xml.etree.ElementTree.Element` 
+object to the appropriate music21 object.
 
-However, certain elements are processed primarily in another way, by "private" functions that are not
+However, certain elements are processed primarily in 
+another way, by "private" functions that are not
 documented in this API. Rather than converting an :class:`Element` object into a music21 object,
 these functions modify the MEI document tree by adding instructions for the :func:`tagFromElement`
 functions. The elements processed by private functions include:
@@ -98,20 +101,24 @@ functions. The elements processed by private functions include:
 * <beamSpan>
 * <tupletSpan>
 
-Whereas you can expect functions like :func:`clefFromElement` to convert a <clef> into a :class:`Clef`
+Whereas you can expect functions like :func:`clefFromElement` 
+to convert a <clef> into a :class:`Clef`
 with no loss of information. Because we cannot provide a simple one-to-one conversion for  slurs,
-ties, and tuplets, we have kept their conversion functions "private," to emphasize the fact that you
+ties, and tuplets, we have kept their conversion functions "private," 
+to emphasize the fact that you
 must use the :class:`MeiToM21Converter` to process them properly.
 
 **Guidelines for Encoders**
 
-While we aim for the best possible compatibility, the MEI specification is very large. The following
+While we aim for the best possible compatibility, the MEI 
+specification is very large. The following
 guidelines will help you produce a file that this MEI-to-music21 module will import correctly and
 in the most efficient way. These should not necessarily be considered recommendations when using
 MEI in any other context.
 
 * Tuplets indicated only in a @tuplet attribute do not work.
-* For elements that allow @startid, @endid, and @plist attributes, use all three for faster importing.
+* For elements that allow @startid, @endid, and @plist attributes, 
+  use all three for faster importing.
 * For a <tupletSpan> that does not specify a @plist attribute, a tuplet spanning more than two
   measures will always and unavoidably be imported incorrectly.
 * For any tuplet, specify at least @num and @numbase. The module refuses to import a tuplet that
@@ -191,15 +198,16 @@ from music21.ext import six
 _XMLID = '{http://www.w3.org/XML/1998/namespace}id'
 _MEINS = '{http://www.music-encoding.org/ns/mei}'
 # when these tags aren't processed, we won't worry about them (at least for now)
-_IGNORE_UNPROCESSED = ('{}sb'.format(_MEINS),  # system break
-                       '{}lb'.format(_MEINS),  # line break
-                       '{}pb'.format(_MEINS),  # page break
-                       '{}slur'.format(_MEINS),  # slurs; handled in convertFromString()
-                       '{}tie'.format(_MEINS),  # ties; handled in convertFromString()
-                       '{}tupletSpan'.format(_MEINS),  # tuplets; handled in convertFromString()
-                       '{}beamSpan'.format(_MEINS),  # beams; handled in convertFromString()
-                       '{}instrDef'.format(_MEINS),  # instrument; handled separately by staffDefFromElement()
-                      )
+_IGNORE_UNPROCESSED = (
+   '{}sb'.format(_MEINS),  # system break
+   '{}lb'.format(_MEINS),  # line break
+   '{}pb'.format(_MEINS),  # page break
+   '{}slur'.format(_MEINS),  # slurs; handled in convertFromString()
+   '{}tie'.format(_MEINS),  # ties; handled in convertFromString()
+   '{}tupletSpan'.format(_MEINS),  # tuplets; handled in convertFromString()
+   '{}beamSpan'.format(_MEINS),  # beams; handled in convertFromString()
+   '{}instrDef'.format(_MEINS),  # instrument; handled separately by staffDefFromElement()
+  )
 
 
 # Exceptions
@@ -265,7 +273,8 @@ class MeiToM21Converter(object):
             try:
                 self.documentRoot = ETree.fromstring(theDocument)
             except ETree.ParseError as parseErr:
-                environLocal.printDebug('\n\nERROR: Parsing the MEI document with ElementTree failed.')
+                environLocal.printDebug(
+                        '\n\nERROR: Parsing the MEI document with ElementTree failed.')
                 environLocal.printDebug('We got the following error:\n{}'.format(parseErr))
                 raise MeiValidityError(_INVALID_XML_DOC)
 
@@ -279,7 +288,8 @@ class MeiToM21Converter(object):
 
         # This defaultdict stores extra, music21-specific attributes that we add to elements to help
         # importing. The key is an element's @xml:id, and the value is a regular dict with keys
-        # corresponding to attributes we'll add and values corresponding to those attributes's values.
+        # corresponding to attributes we'll add and values 
+        # corresponding to those attributes's values.
         self.m21Attr = defaultdict(lambda: {})
 
         # This SpannerBundle holds the slurs that will be created by _ppSlurs() and used while
@@ -302,8 +312,9 @@ class MeiToM21Converter(object):
         _ppConclude(self)
 
         environLocal.printDebug('*** processing <score> elements')
-        theScore = scoreFromElement(self.documentRoot.find('.//{mei}music//{mei}score'.format(mei=_MEINS)),
-                                    self.slurBundle)
+        theScore = scoreFromElement(
+                    self.documentRoot.find('.//{mei}music//{mei}score'.format(mei=_MEINS)),
+                    self.slurBundle)
 
         environLocal.printDebug('*** preparing metadata')
         theScore.metadata = makeMetadata(self.documentRoot)
@@ -487,12 +498,6 @@ def _attrTranslator(attr, name, mapping):
     '#'
     >>> _attrTranslator('9', 'dur', _DUR_ATTR_DICT)
     Traceback (most recent call last):
-      File "/usr/lib64/python2.7/doctest.py", line 1289, in __run
-        compileflags, 1) in test.globs
-      File "<doctest base._attrTranslator[2]>", line 1, in <module>
-        _attrTranslator('9', 'dur', _DUR_ATTR_DICT)
-      File "/home/crantila/Documents/DDMAL/programs/music21/music21/mei/base.py", line 131, in _attrTranslator
-        raise MeiValueError('Unexpected value for "{}" attribute: {}'.format(name, attr))
     MeiValueError: Unexpected value for "dur" attribute: 9
     '''
     try:
@@ -514,7 +519,8 @@ def _accidentalFromAttr(attr):
 
 def _accidGesFromAttr(attr):
     '''
-    Use :func:`_attrTranslator` to convert the value of an @accid.ges attribute to its music21 string.
+    Use :func:`_attrTranslator` to convert the value of an @accid.ges 
+    attribute to its music21 string.
 
     >>> from music21 import *
     >>> mei.base._accidGesFromAttr('s')
@@ -683,7 +689,8 @@ def _ppSlurs(theConverter):
     # for readability, we use a single-letter variable
     c = theConverter  # pylint: disable=invalid-name
     # pre-processing for <slur> tags
-    for eachSlur in c.documentRoot.iterfind('.//{mei}music//{mei}score//{mei}slur'.format(mei=_MEINS)):
+    for eachSlur in c.documentRoot.iterfind(
+                            './/{mei}music//{mei}score//{mei}slur'.format(mei=_MEINS)):
         if eachSlur.get('startid') is not None and eachSlur.get('endid') is not None:
             thisIdLocal = str(uuid4())
             thisSlur = spanner.Slur()
@@ -725,7 +732,8 @@ def _ppTies(theConverter):
     # for readability, we use a single-letter variable
     c = theConverter  # pylint: disable=invalid-name
 
-    for eachTie in c.documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)):
+    for eachTie in c.documentRoot.iterfind(
+                        './/{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)):
         if eachTie.get('startid') is not None and eachTie.get('endid') is not None:
             c.m21Attr[removeOctothorpe(eachTie.get('startid'))]['tie'] = 'i'
             c.m21Attr[removeOctothorpe(eachTie.get('endid'))]['tie'] = 't'
@@ -765,7 +773,8 @@ def _ppBeams(theConverter):
     c = theConverter  # pylint: disable=invalid-name
 
     # pre-processing for <beamSpan> elements
-    for eachBeam in c.documentRoot.iterfind('.//{mei}music//{mei}score//{mei}beamSpan'.format(mei=_MEINS)):
+    for eachBeam in c.documentRoot.iterfind(
+                        './/{mei}music//{mei}score//{mei}beamSpan'.format(mei=_MEINS)):
         if eachBeam.get('startid') is None or eachBeam.get('endid') is None:
             environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<beamSpan>', '@startid and @endid'))
             continue
@@ -818,10 +827,12 @@ def _ppTuplets(theConverter):
     c = theConverter  # pylint: disable=invalid-name
 
     # pre-processing <tupletSpan> tags
-    for eachTuplet in c.documentRoot.iterfind('.//{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)):
+    for eachTuplet in c.documentRoot.iterfind(
+                            './/{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)):
         if ((eachTuplet.get('startid') is None or eachTuplet.get('endid') is None) and
                 eachTuplet.get('plist') is None):
-            environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<tupletSpan>', '@startid and @endid or @plist'))
+            environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<tupletSpan>', 
+                                                           '@startid and @endid or @plist'))
         elif eachTuplet.get('plist') is not None:
             # Ideally (for us) <tupletSpan> elements will have a @plist that enumerates the
             # @xml:id of every affected element. In this case, tupletSpanFromElement() can use the
@@ -1187,7 +1198,8 @@ def makeMetadata(fromThis):
     :param fromThis: The MEI file's root tag.
     :type fromThis: :class:`~xml.etree.ElementTree.Element`
     :returns: Metadata objects that hold the metadata stored in the MEI header.
-    :rtype: sequence of :class:`music21.metadata.Metadata` and :class:`~music21.metadata.RichMetadata`.
+    :rtype: sequence of :class:`music21.metadata.Metadata` and 
+       :class:`~music21.metadata.RichMetadata`.
     '''
     fromThis = fromThis.find('.//{}work'.format(_MEINS))
     if fromThis is None:
@@ -1201,7 +1213,8 @@ def makeMetadata(fromThis):
             for subTag in eachTag.iterfind('*'):
                 if subTag.tag == '{}title'.format(_MEINS):
                     if subTag.get('type', '') == 'subtitle':
-                        # TODO: this is meaningless because m21's Metadata doesn't do anything with it
+                        # TODO: this is meaningless because m21's 
+                        #    Metadata doesn't do anything with it
                         meta.subtitle = subTag.text
                     elif meta.title is None:
                         meta.title = subTag.text
@@ -1307,10 +1320,11 @@ def scaleToTuplet(objs, elem):
             obj.m21TupletNumbase = elem.get('m21TupletNumbase')
 
         else:
-            obj.duration.appendTuplet(duration.Tuplet(numberNotesActual=int(elem.get('m21TupletNum')),
-                                                      numberNotesNormal=int(elem.get('m21TupletNumbase')),
-                                                      durationNormal=obj.duration.type,
-                                                      durationActual=obj.duration.type))
+            obj.duration.appendTuplet(duration.Tuplet(
+                                          numberNotesActual=int(elem.get('m21TupletNum')),
+                                          numberNotesNormal=int(elem.get('m21TupletNumbase')),
+                                          durationNormal=obj.duration.type,
+                                          durationActual=obj.duration.type))
 
             if elem.get('m21TupletType') is not None:
                 obj.duration.tuplets[0].type = elem.get('m21TupletType')
@@ -1400,7 +1414,8 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 
     * ``'whole-score objects'``, it applies to the entire score (e.g., page size);
     * ``'all-part objects'``, it applies to all parts at the moment this <scoreDef> appears;
-    * the @n attribute of a part, it applies only to that part at the moment this <scoreDef> appears.
+    * the @n attribute of a part, it applies only to 
+      that part at the moment this <scoreDef> appears.
 
     While the multi-part objects will be held in a list, the single-part objects will be in a dict
     like that returned by :func:`staffDefFromElement`.
@@ -1454,7 +1469,8 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
         - (att.scoreDef.log.cmn (att.beaming.log (@beam.group, @beam.rests)))
         - (att.scoreDef.log.mensural
 
-            - (att.mensural.log (@mensur.dot, @mensur.sign, @mensur.slash, @proport.num, @proport.numbase)
+            - (att.mensural.log (@mensur.dot, @mensur.sign, 
+                 @mensur.slash, @proport.num, @proport.numbase)
             - (att.mensural.shared (@modusmaior, @modusminor, @prolatio, @tempus))))
 
     - att.scoreDef.vis (all)
@@ -1604,7 +1620,8 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     - @n (att.common) as Instrument.partId
     - (att.keySigDefault.log (@key.accid, @key.mode, @key.pname, @key.sig))
     - (att.meterSigDefault.log (@meter.count, @meter.unit))
-    - (att.cleffing.log (@clef.shape, @clef.line, @clef.dis, @clef.dis.place)) (via :func:`clefFromElement`)
+    - (att.cleffing.log (@clef.shape, @clef.line, @clef.dis, @clef.dis.place)) 
+      (via :func:`clefFromElement`)
     - @trans.diat and @trans.demi (att.transposition)
     - <instrDef> held within
     - <clef> held within
@@ -1626,7 +1643,8 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
         - (att.staffDef.log.cmn (att.beaming.log (@beam.group, @beam.rests)))
         - (att.staffDef.log.mensural
 
-            - (att.mensural.log (@mensur.dot, @mensur.sign, @mensur.slash, @proport.num, @proport.numbase)
+            - (att.mensural.log (@mensur.dot, @mensur.sign, @mensur.slash, 
+                                 @proport.num, @proport.numbase)
             - (att.mensural.shared (@modusmaior, @modusminor, @prolatio, @tempus))))
 
     - att.staffDef.vis (all)
@@ -1674,10 +1692,11 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 
     # --> clef
     if elem.get('clef.shape') is not None:
-        post['clef'] = clefFromElement(ETree.Element('clef', {'shape': elem.get('clef.shape'),
-                                                              'line': elem.get('clef.line'),
-                                                              'dis': elem.get('clef.dis'),
-                                                              'dis.place': elem.get('clef.dis.place')}))
+        post['clef'] = clefFromElement(ETree.Element('clef', {
+                                                      'shape': elem.get('clef.shape'),
+                                                      'line': elem.get('clef.line'),
+                                                      'dis': elem.get('clef.dis'),
+                                                      'dis.place': elem.get('clef.dis.place')}))
 
     embeddedItems = _processEmbeddedElements(elem.findall('*'), tagToFunction, elem.tag, slurBundle)
     for eachItem in embeddedItems:
@@ -1915,7 +1934,10 @@ def noteFromElement(elem, slurBundle=None):
 
     # iterate all immediate children
     dotElements = 0  # count the number of <dot> elements
-    for subElement in _processEmbeddedElements(elem.findall('*'), tagToFunction, elem.tag, slurBundle):
+    for subElement in _processEmbeddedElements(elem.findall('*'),
+                                               tagToFunction, 
+                                               elem.tag, 
+                                               slurBundle):
         if isinstance(subElement, six.integer_types):
             dotElements += subElement
         elif isinstance(subElement, articulations.Articulation):
@@ -2087,7 +2109,8 @@ def mSpaceFromElement(elem, slurBundle=None):
 def chordFromElement(elem, slurBundle=None):
     # NOTE: this function should stay in sync with noteFromElement() where sensible
     '''
-    <chord> is a simultaneous sounding of two or more notes in the same layer with the same duration.
+    <chord> is a simultaneous sounding of two or 
+    more notes in the same layer with the same duration.
 
     In MEI 2013: pg.280 (294 in PDF) (MEI.shared module)
 
@@ -2155,10 +2178,12 @@ def chordFromElement(elem, slurBundle=None):
     theDuration = makeDuration(theDuration, int(elem.get('dots', 0)))
     theChord.duration = theDuration
 
-    #theChord.duration = makeDuration(_qlDurationFromAttr(elem.get('dur')), int(elem.get('dots', 0)))
 
     # iterate all immediate children
-    for subElement in _processEmbeddedElements(elem.findall('*'), tagToFunction, elem.tag, slurBundle):
+    for subElement in _processEmbeddedElements(elem.findall('*'), 
+                                               tagToFunction, 
+                                               elem.tag, 
+                                               slurBundle):
         if isinstance(subElement, articulations.Articulation):
             theChord.articulations.append(subElement)
 
@@ -2286,8 +2311,6 @@ def instrDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 
 
 def beamFromElement(elem, slurBundle=None):
-    # NB: The doctest is a sufficient integration test. Since there is no logic, I don't think we
-    #     need to bother with unit testing.
     '''
     <beam> A container for a series of explicitly beamed events that begins and ends entirely
            within a measure.
@@ -2366,6 +2389,8 @@ def beamFromElement(elem, slurBundle=None):
     - MEI.mensural: ligature mensur proport
     - MEI.shared: barLine clefGrp custos keySig pad
     '''
+    # NB: The doctest is a sufficient integration test. Since there is no logic, I don't think we
+    #     need to bother with unit testing.
 
     # mapping from tag name to our converter function
     tagToFunction = {'{http://www.music-encoding.org/ns/mei}clef': clefFromElement,
@@ -2493,7 +2518,8 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
 
     :param elem: The ``<layer>`` element to process.
     :type elem: :class:`~xml.etree.ElementTree.Element`
-    :param str overrideN: The value to be set as the ``id`` attribute in the outputted :class:`Voice`.
+    :param str overrideN: The value to be set as the ``id`` 
+        attribute in the outputted :class:`Voice`.
     :returns: A :class:`Voice` with the objects found in the provided :class:`Element`.
     :rtype: :class:`music21.stream.Voice`
     :raises: :exc:`MeiAttributeError` if neither ``overrideN`` nor @n are specified.
@@ -2520,8 +2546,8 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
 
     **Contained Elements not Implemented:**
 
-    - MEI.cmn: arpeg bTrem beamSpan beatRpt bend breath fTrem fermata gliss hairpin halfmRpt \
-               harpPedal mRpt mRpt2 meterSig meterSigGrp multiRest multiRpt octave pedal \
+    - MEI.cmn: arpeg bTrem beamSpan beatRpt bend breath fTrem fermata gliss hairpin halfmRpt
+               harpPedal mRpt mRpt2 meterSig meterSigGrp multiRest multiRpt octave pedal
                reh slur tie tuplet tupletSpan
     - MEI.cmnOrnaments: mordent trill turn
     - MEI.critapp: app
@@ -2531,7 +2557,7 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
     - MEI.mensural: ligature mensur proport
     - MEI.midi: midi
     - MEI.neumes: ineume syllable uneume
-    - MEI.shared: accid annot artic barLine clefGrp custos dir dot dynam keySig pad pb phrase sb \
+    - MEI.shared: accid annot artic barLine clefGrp custos dir dot dynam keySig pad pb phrase sb
                   scoreDef staffDef tempo
     - MEI.text: div
     - MEI.usersymbols: anchoredText curve line symbol
@@ -2707,8 +2733,8 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
 
     :param elem: The ``<measure>`` element to process.
     :type elem: :class:`~xml.etree.ElementTree.Element`
-    :param int backupNum: A fallback value for the resulting :class:`~music21.measure.Measure` objects' 
-        number attribute.
+    :param int backupNum: A fallback value for the resulting 
+        :class:`~music21.measure.Measure` objects' number attribute.
     :param expectedNs: A list of the expected @n attributes for the <staff> tags in this <measure>.
         If an expected <staff> isn't in the <measure>, it will be created with a full-measure rest.
     :type expectedNs: iterable of str
@@ -2754,11 +2780,11 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
 
     **Contained Elements not Implemented:**
 
-    - MEI.cmn: arpeg beamSpan bend breath fermata gliss hairpin harpPedal octave ossia pedal reh \
+    - MEI.cmn: arpeg beamSpan bend breath fermata gliss hairpin harpPedal octave ossia pedal reh
                tupletSpan
     - MEI.cmnOrnaments: mordent trill turn
     - MEI.critapp: app
-    - MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied \
+    - MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied
                      unclear
     - MEI.harmony: harm
     - MEI.lyrics: lyrics
@@ -2780,7 +2806,8 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
     # iterate all immediate children
     for eachElem in elem.iterfind('*'):
         if staffTag == eachElem.tag:
-            staves[eachElem.get('n')] = stream.Measure(staffFromElement(eachElem, slurBundle=slurBundle),
+            staves[eachElem.get('n')] = stream.Measure(staffFromElement(eachElem, 
+                                                                        slurBundle=slurBundle),
                                                        number=int(elem.get('n', backupNum)))
             thisBarDuration = staves[eachElem.get('n')].duration.quarterLength
             if maxBarDuration is None or maxBarDuration < thisBarDuration:
@@ -2808,7 +2835,8 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
         if eachN not in staves:
             restVoice = stream.Voice([note.Rest(quarterLength=maxBarDuration)])
             restVoice.id = '1'
-            restVoice[0].m21wasMRest = True  # just in case (e.g., when all the other voices are <mRest>)
+            # just in case (e.g., when all the other voices are <mRest>)
+            restVoice[0].m21wasMRest = True  
             staves[eachN] = stream.Measure([restVoice], number=int(elem.get('n', backupNum)))
 
     # First search for Rest objects created by an <mRest> element that didn't have @dur set. This
@@ -2833,7 +2861,8 @@ def sectionScoreCore(elem, allPartNs, slurBundle, **kwargs):
     '''
     This function is the "core" of both :func:`sectionFromElement` and :func:`scoreFromElement`,
     since both elements are treated quite similarly (though not identically). It's a separate and
-    shared function to reduce code duplication and increase ease of testing. It's a "public" function
+    shared function to reduce code duplication and 
+    increase ease of testing. It's a "public" function
     to help spread the burden of API documentation complexity: while the parameters and return
     values are described in this function, the compliance with the MEI Guidelines is described in
     both :func:`sectionFromElement` and :func:`scoreFromElement`, as expected.
@@ -2883,7 +2912,8 @@ def sectionScoreCore(elem, allPartNs, slurBundle, **kwargs):
         <score>.
     - ``'activeMeter'`` is the :class:`~music21.meter.TimeSignature` in effect at the end of this
         <section> or <score>.
-    - ``'nextMeasureLeft'`` is the value that should be assigned to the :attr:`leftBarline` attribute
+    - ``'nextMeasureLeft'`` is the value that should be 
+        assigned to the :attr:`leftBarline` attribute
         of the first :class:`Measure` found in the next <section>. This will almost always be None.
     - ``'backupMeasureNum'`` is equal to the ``backupMeasureNum`` argument plus the number of
         <measure> elements found in this <score> or <section>.
@@ -2968,12 +2998,13 @@ def sectionScoreCore(elem, allPartNs, slurBundle, **kwargs):
 
         elif sectionTag == eachElem.tag:
             # NOTE: same as scoreFE() (except the name of "inNextThing")
-            localParsed, activeMeter, nextMeasureLeft, backupMeasureNum = sectionFromElement(eachElem,
-                                                                                             allPartNs,
-                                                                                             activeMeter=activeMeter,
-                                                                                             nextMeasureLeft=nextMeasureLeft,
-                                                                                             backupMeasureNum=backupMeasureNum,
-                                                                                             slurBundle=slurBundle)
+            localParsed, activeMeter, nextMeasureLeft, backupMeasureNum = sectionFromElement(
+                                                                 eachElem,
+                                                                 allPartNs,
+                                                                 activeMeter=activeMeter,
+                                                                 nextMeasureLeft=nextMeasureLeft,
+                                                                 backupMeasureNum=backupMeasureNum,
+                                                                 slurBundle=slurBundle)
             for eachN, eachList in six.iteritems(localParsed):
                 # first: if there were objects from a previous <scoreDef> or <staffDef>, we need to
                 #        put those into the first Measure object we encounter in this Part
@@ -3039,7 +3070,8 @@ def sectionFromElement(elem, allPartNs, activeMeter, nextMeasureLeft, backupMeas
     **Contained Elements not Implemented:**
 
     - MEI.critapp: app
-    - MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
+    - MEI.edittrans: add choice corr damage del gap handShift orig reg 
+                     restore sic subst supplied unclear
     - MEI.shared: annot ending expansion pb sb section staff
     - MEI.text: div
     - MEI.usersymbols: anchoredText curve line symbol
@@ -3085,7 +3117,8 @@ def scoreFromElement(elem, slurBundle):
     **Contained Elements not Implemented:**
 
     - MEI.critapp: app
-    - MEI.edittrans: add choice corr damage del gap handShift orig reg restore sic subst supplied unclear
+    - MEI.edittrans: add choice corr damage del gap handShift orig 
+                     reg restore sic subst supplied unclear
     - MEI.shared: annot ending pb sb
     - MEI.text: div
     - MEI.usersymbols: anchoredText curve line symbol
@@ -3164,7 +3197,8 @@ class Test(unittest.TestCase):
         testResult = unittest.main(module='music21.mei.test_base',
                                    exit=False,  # don't raise SystemExit
                                    buffer=True)  # don't print things from successful tests
-        testResult = testResult.result  # unittest.main() actually returns a TestProgram; we want a TestResult
+        testResult = testResult.result  
+        # unittest.main() actually returns a TestProgram; we want a TestResult
         if not testResult.wasSuccessful():
             self.fail(_TEST_FAILS.format(len(testResult.failures), len(testResult.errors)))
 

@@ -83,8 +83,9 @@ def toUnicode(usrStr):
         else:
             return usrStr
     else:
+        # pylint: disable=undefined-variable
         try:
-            usrStr = unicode(usrStr, 'utf-8') # @UndefinedVariable  pylint: disable=undefined-variable
+            usrStr = unicode(usrStr, 'utf-8') # @UndefinedVariable  
         # some documentation may already be in unicode; if so, a TypeException will be raised
         except TypeError: #TypeError: decoding Unicode is not supported
             pass
@@ -92,7 +93,9 @@ def toUnicode(usrStr):
 
 
 def getNumFromStr(usrStr, numbers='0123456789'):
-    '''Given a string, extract any numbers. Return two strings, the numbers (as strings) and the remaining characters.
+    '''
+    Given a string, extract any numbers. 
+    Return two strings, the numbers (as strings) and the remaining characters.
 
     >>> common.getNumFromStr('23a')
     ('23', 'a')
@@ -124,7 +127,9 @@ def hyphenToCamelCase(usrStr, replacement='-'):
 
     The replacement can be specified to be something besides a hyphen.
 
-    code from http://stackoverflow.com/questions/4303492/how-can-i-simplify-this-conversion-from-underscore-to-camelcase-in-python
+    code from 
+    http://stackoverflow.com/questions/4303492/
+       how-can-i-simplify-this-conversion-from-underscore-to-camelcase-in-python
 
     >>> common.hyphenToCamelCase('movement-name')
     'movementName'
@@ -147,12 +152,14 @@ def hyphenToCamelCase(usrStr, replacement='-'):
     
 def camelCaseToHyphen(usrStr, replacement='-'):
     '''
-    Given a camel-cased string, or a mixture of numbers and characters, create a space separated string.
+    Given a camel-cased string, or a mixture of numbers and characters, 
+    create a space separated string.
 
     The replacement can be specified to be something besides a hyphen, but only
     a single character and not (for internal reasons) an uppercase character.
 
-    code from http://stackoverflow.com/questions/1175208/elegant-python-function-to-convert-camelcase-to-camel-case
+    code from http://stackoverflow.com/questions/1175208/
+        elegant-python-function-to-convert-camelcase-to-camel-case
 
     >>> common.camelCaseToHyphen('movementName')
     'movement-name'

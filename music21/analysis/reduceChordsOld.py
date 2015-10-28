@@ -49,16 +49,19 @@ class ChordReducer(object):
         self.positionInMeasure = None
         self.numberOfElementsInMeasure = None
 
-    def reduceMeasureToNChords(self, measureObj, numChords = 1, weightAlgorithm=None, trimBelow=0.25):
+    def reduceMeasureToNChords(self, measureObj, numChords = 1, 
+                               weightAlgorithm=None, trimBelow=0.25):
         '''
         
         >>> s = analysis.reduceChords.testMeasureStream1()     
         >>> cr = analysis.reduceChords.ChordReducer()
         
-        Reduce to a maximum of 3 chords; though here we will only get one because the other chord is
+        Reduce to a maximum of 3 chords; though here we will 
+        only get one because the other chord is
         below the trimBelow threshold.
         
-        >>> newS = cr.reduceMeasureToNChords(s, 3, weightAlgorithm=cr.qlbsmpConsonance, trimBelow = 0.3)
+        >>> newS = cr.reduceMeasureToNChords(s, 3, 
+        ...    weightAlgorithm=cr.qlbsmpConsonance, trimBelow = 0.3)
         >>> newS.show('text')
         {0.0} <music21.meter.TimeSignature 4/4>
         {0.0} <music21.chord.Chord C4 E4 G4 C5>
@@ -140,7 +143,7 @@ class ChordReducer(object):
         return mObj
         # closed position
     
-    def computeMeasureChordWeights(self, measureObj, weightAlgorithm = None):
+    def computeMeasureChordWeights(self, measureObj, weightAlgorithm=None):
         '''
         
         >>> s = analysis.reduceChords.testMeasureStream1().notes      
@@ -153,7 +156,7 @@ class ChordReducer(object):
 
         Add beatStrength:
 
-        >>> cws = cr.computeMeasureChordWeights(s, weightAlgorithm = cr.quarterLengthBeatStrength)
+        >>> cws = cr.computeMeasureChordWeights(s, weightAlgorithm=cr.quarterLengthBeatStrength)
         >>> for pcs in sorted(cws):
         ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
              (0, 4, 7)  2.2
@@ -161,7 +164,8 @@ class ChordReducer(object):
 
         Give extra weight to the last element in a measure:
         
-        >>> cws = cr.computeMeasureChordWeights(s, weightAlgorithm = cr.quarterLengthBeatStrengthMeasurePosition)
+        >>> cws = cr.computeMeasureChordWeights(s, 
+        ...              weightAlgorithm=cr.quarterLengthBeatStrengthMeasurePosition)
         >>> for pcs in sorted(cws):
         ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
              (0, 4, 7)  3.0
@@ -169,7 +173,7 @@ class ChordReducer(object):
 
         Make consonance count a lot:
         
-        >>> cws = cr.computeMeasureChordWeights(s, weightAlgorithm = cr.qlbsmpConsonance)
+        >>> cws = cr.computeMeasureChordWeights(s, weightAlgorithm=cr.qlbsmpConsonance)
         >>> for pcs in sorted(cws):
         ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
              (0, 4, 7)  3.0
@@ -216,7 +220,7 @@ class ChordReducer(object):
         consonanceScore = 1.0# if c.isConsonant() else 0.1
         return self.quarterLengthBeatStrengthMeasurePosition(c) * consonanceScore
 
-    def multiPartReduction(self, inStream, maxChords = 2, closedPosition = False, forceOctave = False):
+    def multiPartReduction(self, inStream, maxChords=2, closedPosition=False, forceOctave=False):
         '''
         Return a multipart reduction of a stream.
         '''
@@ -238,7 +242,9 @@ class ChordReducer(object):
                 m.number = i
 
                 mIchord = mI.chordify()
-                newPart = self.reduceMeasureToNChords(mIchord, maxChords, weightAlgorithm=self.qlbsmpConsonance, trimBelow = 0.3)
+                newPart = self.reduceMeasureToNChords(mIchord, maxChords, 
+                                                      weightAlgorithm=self.qlbsmpConsonance, 
+                                                      trimBelow=0.3)
                 #newPart.show('text')
                 cLast = None
                 cLastEnd = 0.0
@@ -247,7 +253,7 @@ class ChordReducer(object):
                     if 'Chord' in cEl.classes:
                         if closedPosition is not False:
                             if forceOctave is not False:
-                                cElCopy.closedPosition(forceOctave = forceOctave, inPlace = True)
+                                cElCopy.closedPosition(forceOctave=forceOctave, inPlace=True)
                             else:
                                 cElCopy.closedPosition(inPlace=True)
                             cElCopy.removeRedundantPitches(inPlace=True)
@@ -279,7 +285,8 @@ class ChordReducer(object):
                         if len(lastPitchedObject) == len(firstPitched):
                             allSame = True
                             for pitchI in range(len(lastPitchedObject)):
-                                if lastPitchedObject.pitches[pitchI] != firstPitched.pitches[pitchI]:
+                                if (lastPitchedObject.pitches[pitchI] != 
+                                        firstPitched.pitches[pitchI]):
                                     allSame = False
                             if allSame is True:
                                 lastPitchedObject.tie = tie.Tie('start')

@@ -470,8 +470,8 @@ class BrailleSegment(collections.defaultdict):
         keySignature = None
         timeSignature = None
         try:
-            keySignature, timeSignature = self.get(self._currentGroupingKey)[0], \
-                                          self.get(self._currentGroupingKey)[1]
+            keySignature, timeSignature = (self.get(self._currentGroupingKey)[0],
+                                           self.get(self._currentGroupingKey)[1])
         except IndexError:
             keyOrTimeSig = self.get(self._currentGroupingKey)[0]
             if isinstance(keyOrTimeSig, key.KeySignature):
@@ -523,10 +523,10 @@ class BrailleGrandSegment(object):
         allKeyPairs = self.combineGroupingKeys(self.rightSegment, self.leftSegment)
         for (rightKey, leftKey) in allKeyPairs:
             a = "Measure {0} Right, {1} {2}:\n".format(
-                int(rightKey//100), affinityNames[rightKey%10], int(rightKey%100)//10 + 1)
+                int(rightKey // 100), affinityNames[rightKey % 10], int(rightKey % 100) // 10 + 1)
             b = str(self.rightSegment[rightKey])
-            c = "\nMeasure {0} Left, {1} {2}:\n".format(int(leftKey//100),
-                affinityNames[leftKey%10], int(leftKey%100)//10 + 1)
+            c = "\nMeasure {0} Left, {1} {2}:\n".format(int(leftKey // 100),
+                affinityNames[leftKey % 10], int(leftKey % 100) // 10 + 1)
             d = str(self.leftSegment[leftKey])
             ab = u"".join([a,b]) 
             cd = u"".join([c,d])
@@ -564,7 +564,8 @@ class BrailleGrandSegment(object):
                     try:
                         combinedGroupingKeys.append((gkRight,gkLeft))
                     except ValueError:
-                        raise BrailleSegmentException("Misaligned braille groupings could not append combinedGroupingKeys")
+                        raise BrailleSegmentException(
+                            "Misaligned braille groupings could not append combinedGroupingKeys")
 
         
         while groupingKeysLeft:
@@ -716,7 +717,9 @@ def splitNoteGrouping(noteGrouping, value=2, beatDivisionOffset=0):
 def findSegments(music21Part, **partKeywords):
     """
     Takes in a :class:`~music21.stream.Part`
-    and a list of partKeywords. Returns a list of :class:`~music21.segment.BrailleSegment` instances.
+    and a list of partKeywords. 
+    
+    Returns a list of :class:`~music21.segment.BrailleSegment` instances.
     
     
     Five methods get called in the generation of segments:
@@ -877,7 +880,8 @@ def findSegments(music21Part, **partKeywords):
     return allSegments
 
 
-def prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets=SEGMENT_SLURLONGPHRASEWITHBRACKETS,
+def prepareSlurredNotes(music21Part, 
+                        slurLongPhraseWithBrackets=SEGMENT_SLURLONGPHRASEWITHBRACKETS,
                         showShortSlursAndTiesTogether=SEGMENT_SHOWSHORTSLURSANDTIESTOGETHER, 
                         showLongSlursAndTiesTogether=SEGMENT_SHOWLONGSLURSANDTIESTOGETHER):
     """

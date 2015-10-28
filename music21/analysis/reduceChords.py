@@ -84,7 +84,8 @@ class ChordReducer(object):
         if 'Score' not in inputScore.classes:
             raise ChordReducerException("Must be called on a stream.Score")
 
-        tree = timespans.streamToTimespanTree(inputScore, flatten=True, classList=(note.Note, chord.Chord))
+        tree = timespans.streamToTimespanTree(inputScore, flatten=True, 
+                                              classList=(note.Note, chord.Chord))
 
         if allowableChords is not None:
             assert all(isinstance(x, chord.Chord) for x in allowableChords)
@@ -345,10 +346,11 @@ class ChordReducer(object):
                     if previousTimespan is not None:
                         if previousTimespan.endTime > group[0].offset:
                             msg = ('Timespan offset errors: previousTimespan.endTime, ' + 
-                                                        str(previousTimespan.endTime) + ' should be before ' +
-                                                        str(group[0].offset) + ' previousTimespan: ' + repr(previousTimespan) +
-                                                        ' groups: ' + repr(group) + ' group[0]: ' + repr(group[0])
-                                                        )
+                                    str(previousTimespan.endTime) + ' should be before ' +
+                                    str(group[0].offset) + 
+                                    ' previousTimespan: ' + repr(previousTimespan) +
+                                    ' groups: ' + repr(group) + ' group[0]: ' + repr(group[0])
+                                    )
                             print(msg)
                             #raise ChordReducerException(msg)
                         if offset < previousTimespan.endTime:
@@ -376,8 +378,8 @@ class ChordReducer(object):
 
                 for i in range(len(group) - 1):
                     timespanOne, timespanTwo = group[i], group[i + 1]
-                    if timespanOne.pitches == timespanTwo.pitches or \
-                        timespanOne.endTime != timespanTwo.offset:
+                    if (timespanOne.pitches == timespanTwo.pitches or
+                            timespanOne.endTime != timespanTwo.offset):
                         newTimespan = timespanOne.new(
                             endTime=timespanTwo.endTime,
                             )
@@ -400,8 +402,8 @@ class ChordReducer(object):
                 group = list(group)
                 for i in range(len(group) - 1):
                     timespanOne, timespanTwo = group[i], group[i + 1]
-                    if timespanOne.pitches == timespanTwo.pitches or \
-                        timespanOne.endTime != timespanTwo.offset:
+                    if (timespanOne.pitches == timespanTwo.pitches or 
+                            timespanOne.endTime != timespanTwo.offset):
                         newTimespan = timespanOne.new(
                             endTime=timespanTwo.endTime,
                             )
@@ -586,11 +588,11 @@ class ChordReducer(object):
         for verticalities in tree.iterateVerticalitiesNwise(n=3):
             horizontalities = tree.unwrapVerticalities(verticalities)
             for unused_part, horizontality in horizontalities.items():
-                if not horizontality.hasPassingTone and \
-                    not horizontality.hasNeighborTone:
+                if (not horizontality.hasPassingTone and 
+                        not horizontality.hasNeighborTone):
                     continue
-                elif horizontality[0].measureNumber != \
-                    horizontality[1].measureNumber:
+                elif (horizontality[0].measureNumber != 
+                        horizontality[1].measureNumber):
                     continue
                 merged = horizontality[0].new(
                     endTime=horizontality[1].endTime,

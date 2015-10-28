@@ -56,7 +56,8 @@ class BrailleText(object):
                 forceHyphen = elementKeywords['forceHyphen']
             if 'forceNewline' in elementKeywords:
                 forceNewline = elementKeywords['forceNewline']
-            self.addNoteGrouping(noteGrouping, showLeadingOctave, withHyphen, forceHyphen, forceNewline)
+            self.addNoteGrouping(noteGrouping, showLeadingOctave, 
+                                 withHyphen, forceHyphen, forceNewline)
         elif 'inaccord' in elementKeywords:
             inaccord = elementKeywords['inaccord']
             self.addInaccord(inaccord)
@@ -73,14 +74,14 @@ class BrailleText(object):
         indexFinal = indexStart
         for line in heading.splitlines():
             self.currentLine.isHeading = True
-            self.currentLine.append(line, addSpace = False)
+            self.currentLine.append(line, addSpace=False)
             self.makeNewLine()
             indexFinal += 1
         self.allHeadings.append((indexStart, indexFinal))
         
-    def addLongExpression(self, longExpr, withHyphen = False):
+    def addLongExpression(self, longExpr, withHyphen=False):
         if withHyphen:
-            self.currentLine.append(symbols['music_hyphen'], addSpace = False)
+            self.currentLine.append(symbols['music_hyphen'], addSpace=False)
         for brailleExpr in longExpr.split(symbols['space']):
             try:
                 self.currentLine.append(brailleExpr)
@@ -96,17 +97,17 @@ class BrailleText(object):
                 if not self.currentLine.textLocation:
                     addSpace = False
                 if self.rightHandSymbol:
-                    self.currentLine.append(symbols['rh_keyboard'], addSpace = addSpace)
+                    self.currentLine.append(symbols['rh_keyboard'], addSpace=addSpace)
                 elif self.leftHandSymbol:
-                    self.currentLine.append(symbols['lh_keyboard'], addSpace = addSpace)
+                    self.currentLine.append(symbols['lh_keyboard'], addSpace=addSpace)
                 for dots in binary_dots[inaccord[0]]:
                     if dots == '10' or dots == '11':
-                        self.currentLine.append(symbols['dot'], addSpace = False)
+                        self.currentLine.append(symbols['dot'], addSpace=False)
                 addSpace = False
         try:
             if not self.currentLine.textLocation:
                 addSpace = False
-            self.currentLine.append(inaccord, addSpace = addSpace)
+            self.currentLine.append(inaccord, addSpace=addSpace)
         except BrailleTextException:
             self.makeNewLine()
             if self.rightHandSymbol or self.leftHandSymbol:
@@ -116,44 +117,48 @@ class BrailleText(object):
                     self.currentLine.insert(2, symbols['lh_keyboard'])
                 for dots in binary_dots[inaccord[0]]:
                     if dots == '10' or dots == '11':
-                        self.currentLine.append(symbols['dot'], addSpace = False)
-                self.currentLine.append(inaccord, addSpace = False)
+                        self.currentLine.append(symbols['dot'], addSpace=False)
+                self.currentLine.append(inaccord, addSpace=False)
             else:
                 self.currentLine.insert(2, inaccord)
         self.currentLine.containsNoteGrouping = True
     
-    def addMeasureNumber(self, measureNumber, withHyphen = False):
+    def addMeasureNumber(self, measureNumber, withHyphen=False):
         if withHyphen:
-            self.currentLine.append(symbols['music_hyphen'], addSpace = False)
+            self.currentLine.append(symbols['music_hyphen'], addSpace=False)
             self.makeNewLine()
         elif not self.currentLine.textLocation == 0:
             self.makeNewLine()
-        self.currentLine.append(measureNumber, addSpace = False)
+        self.currentLine.append(measureNumber, addSpace=False)
 
-    def addNoteGrouping(self, noteGrouping, showLeadingOctave = False, withHyphen = False,
-                         forceHyphen = False, forceNewline = False):
+    def addNoteGrouping(self, noteGrouping, showLeadingOctave=False, withHyphen=False,
+                         forceHyphen=False, forceNewline=False):
         addSpace = True
         if not self.currentLine.containsNoteGrouping:
             if self.rightHandSymbol or self.leftHandSymbol:
                 if not self.currentLine.textLocation:
                     addSpace = False
                 if self.rightHandSymbol:
-                    self.currentLine.append(symbols['rh_keyboard'], addSpace = addSpace)
+                    self.currentLine.append(symbols['rh_keyboard'], addSpace=addSpace)
                 elif self.leftHandSymbol:
-                    self.currentLine.append(symbols['lh_keyboard'], addSpace = addSpace)
+                    self.currentLine.append(symbols['lh_keyboard'], addSpace=addSpace)
                 for dots in binary_dots[noteGrouping[0]]:
                     if dots == '10' or dots == '11':
-                        self.currentLine.append(symbols['dot'], addSpace = False)
+                        self.currentLine.append(symbols['dot'], addSpace=False)
                 addSpace = False
         try:
             if not self.currentLine.textLocation:
                 addSpace = False
             if withHyphen:
-                self.currentLine.append(u"".join([noteGrouping, symbols['music_hyphen']]), addSpace = addSpace)
+                self.currentLine.append(u"".join([noteGrouping, symbols['music_hyphen']]), 
+                                        addSpace=addSpace)
             else:
-                self.currentLine.append(noteGrouping, addSpace = addSpace)
+                self.currentLine.append(noteGrouping, addSpace=addSpace)
         except BrailleTextException:
-            if not forceNewline and self.lineLength - self.currentLine.textLocation > self.lineLength / 4 <= len(noteGrouping):
+            ll4 = self.lineLength / 4
+            if (not forceNewline and 
+                    self.lineLength - self.currentLine.textLocation > ll4 and 
+                    ll4 <= len(noteGrouping)):
                 raise BrailleTextException("Split Note Grouping")
             elif not showLeadingOctave:
                 raise BrailleTextException("Recalculate Note Grouping With Leading Octave")
@@ -161,7 +166,8 @@ class BrailleText(object):
                 if not forceHyphen:
                     prevChar = self.currentLine.allChars[self.currentLine.textLocation - 1]
                     if prevChar == symbols['music_hyphen']:
-                        self.currentLine.allChars[self.currentLine.textLocation - 1] = symbols['space']
+                        self.currentLine.allChars[self.currentLine.textLocation - 1
+                                                  ] = symbols['space']
                         self.currentLine.textLocation -= 1
                 self.makeNewLine()
                 if self.rightHandSymbol or self.leftHandSymbol:
@@ -171,22 +177,22 @@ class BrailleText(object):
                         self.currentLine.insert(2, symbols['lh_keyboard'])
                     for dots in binary_dots[noteGrouping[0]]:
                         if dots == '10' or dots == '11':
-                            self.currentLine.append(symbols['dot'], addSpace = False)
-                    self.currentLine.append(noteGrouping, addSpace = False)
+                            self.currentLine.append(symbols['dot'], addSpace=False)
+                    self.currentLine.append(noteGrouping, addSpace=False)
                 else:
                     self.currentLine.insert(2, noteGrouping)
                 if withHyphen:
-                    self.currentLine.append(symbols['music_hyphen'], addSpace = False)
+                    self.currentLine.append(symbols['music_hyphen'], addSpace=False)
         self.currentLine.containsNoteGrouping = True
 
-    def addSignatures(self, signatures, withHyphen = False):
+    def addSignatures(self, signatures, withHyphen=False):
         if withHyphen:
-            self.currentLine.append(symbols['music_hyphen'], addSpace = False)
+            self.currentLine.append(symbols['music_hyphen'], addSpace=False)
         try:
             addSpace = True
             if not self.currentLine.textLocation:
                 addSpace = False
-            self.currentLine.append(signatures, addSpace = addSpace)
+            self.currentLine.append(signatures, addSpace=addSpace)
         except BrailleTextException:
             self.makeNewLine()
             self.currentLine.insert(2, signatures)
@@ -245,7 +251,7 @@ class BrailleKeyboard(object):
         indexFinal = indexStart
         for line in heading.splitlines():
             self.currentLine.isHeading = True
-            self.currentLine.append(line, addSpace = False)
+            self.currentLine.append(line, addSpace=False)
             self.makeNewLine()
             indexFinal += 1
         self.allHeadings.append((indexStart, indexFinal))
@@ -274,7 +280,8 @@ class BrailleKeyboard(object):
         if self.rightHand is None and self.leftHand is None:
             self.makeNewLines()
         if not self.rightHand.textLocation:
-            self.rightHand.insert(self.highestMeasureNumberLength - len(measureNumber), measureNumber)
+            self.rightHand.insert(self.highestMeasureNumberLength - len(measureNumber), 
+                                  measureNumber)
             self.leftHand.textLocation = self.rightHand.textLocation
         addSpace = True
         if not self.rightHand.containsNoteGrouping:
@@ -283,32 +290,33 @@ class BrailleKeyboard(object):
             self.leftHand.append(symbols['lh_keyboard'], addSpace = True)
             for dots in binary_dots[noteGroupingR[0]]:
                 if dots == '10' or dots == '11':
-                    self.rightHand.append(symbols['dot'], addSpace = False)
+                    self.rightHand.append(symbols['dot'], addSpace=False)
             for dots in binary_dots[noteGroupingL[0]]:
                 if dots == '10' or dots == '11':
-                    self.leftHand.append(symbols['dot'], addSpace = False)
-        if self.rightHand.canAppend(noteGroupingR, addSpace = addSpace) and \
-             self.leftHand.canAppend(noteGroupingL, addSpace = addSpace):
-            self.leftHand.append(noteGroupingL, addSpace = addSpace)
-            self.rightHand.append(noteGroupingR, addSpace = addSpace)
+                    self.leftHand.append(symbols['dot'], addSpace=False)
+        if (self.rightHand.canAppend(noteGroupingR, addSpace=addSpace) and
+                self.leftHand.canAppend(noteGroupingL, addSpace=addSpace)):
+            self.leftHand.append(noteGroupingL, addSpace=addSpace)
+            self.rightHand.append(noteGroupingR, addSpace=addSpace)
             if self.rightHand.textLocation > self.leftHand.textLocation:
                 self.leftHand.textLocation = self.rightHand.textLocation
             else:
                 self.rightHand.textLocation = self.leftHand.textLocation
         else:   
             self.makeNewLines()
-            self.rightHand.insert(self.highestMeasureNumberLength - len(measureNumber), measureNumber)
+            self.rightHand.insert(self.highestMeasureNumberLength - len(measureNumber), 
+                                  measureNumber)
             self.leftHand.textLocation = self.rightHand.textLocation
             self.rightHand.append(symbols['rh_keyboard'], addSpace = True)
             self.leftHand.append(symbols['lh_keyboard'], addSpace = True)
             for dots in binary_dots[noteGroupingR[0]]:
                 if dots == '10' or dots == '11':
-                    self.rightHand.append(symbols['dot'], addSpace = False)
+                    self.rightHand.append(symbols['dot'], addSpace=False)
             for dots in binary_dots[noteGroupingL[0]]:
                 if dots == '10' or dots == '11':
-                    self.leftHand.append(symbols['dot'], addSpace = False)
-            self.leftHand.append(noteGroupingL, addSpace = False)
-            self.rightHand.append(noteGroupingR, addSpace = False)
+                    self.leftHand.append(symbols['dot'], addSpace=False)
+            self.leftHand.append(noteGroupingL, addSpace=False)
+            self.rightHand.append(noteGroupingR, addSpace=False)
             if self.rightHand.textLocation > self.leftHand.textLocation:
                 self.leftHand.textLocation = self.rightHand.textLocation
             else:
