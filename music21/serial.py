@@ -533,7 +533,8 @@ class ToneRow(stream.Stream):
         >>> chromatic.findZeroCenteredTransformations(reversechromatic)
         [('I', 8), ('R', 9)]
         >>> schoenberg25 = serial.getHistoricalRowByName('RowSchoenbergOp25')
-        >>> schoenberg26 = serial.pcToToneRow(serial.getHistoricalRowByName('RowSchoenbergOp26').row)
+        >>> schoenberg26 = serial.pcToToneRow(serial.getHistoricalRowByName(
+        ...                                        'RowSchoenbergOp26').row)
         >>> schoenberg25.findZeroCenteredTransformations(schoenberg26)
         []
         >>> schoenberg26.findZeroCenteredTransformations(
@@ -2623,11 +2624,15 @@ def findTransformedSegments(inputStream, searchList,
     [[('R', 3)], 
      [('RI', 3)]]
     
-    Pitch classes are extracted from segments in order of appearance, with pitches in chords being read from bottom to top.
+    Pitch classes are extracted from segments in order of appearance, with 
+    pitches in chords being read from bottom to top.
     However, only the first instance of each pitch class is considered, as seen in the
-    :attr:`~music21.serial.ContiguousSegmentOfNotes.activeSegment` calls. As long as the first and last pitch classes in the
-    active segment first appear in the first and last elements of the found segment, respectively, the segment will be matched to the
-    segment being searched for. To make this more clear, consider the following example in the same stream s:
+    :attr:`~music21.serial.ContiguousSegmentOfNotes.activeSegment` calls. 
+    As long as the first and last pitch classes in the
+    active segment first appear in the first and last elements of 
+    the found segment, respectively, the segment will be matched to the
+    segment being searched for. To make this more clear, consider the 
+    following example in the same stream s:
     
     >>> found = serial.findTransformedSegments(s, [[4, 0, 4]], 'includeAll')
     >>> [(seg.segment, seg.activeSegment) for seg in found]
@@ -2644,7 +2649,8 @@ def findTransformedSegments(inputStream, searchList,
     
     >>> s = stream.Stream()
     >>> s.repeatAppend(part, 2)
-    >>> testNegativePitchClass = serial.findTransformedSegments(s, [[2, -7, 4]], includeChords=False)
+    >>> testNegativePitchClass = serial.findTransformedSegments(s, [[2, -7, 4]], 
+    ...                                    includeChords=False)
     >>> len(testNegativePitchClass)
     4
     >>> testNegativePitchClass[0].matchedSegment
@@ -3385,7 +3391,8 @@ def findTransposedAndInvertedMultisets(inputStream, searchList,
     .. image:: images/serial-findTransposedAndInvertedMultisets.png
         :width: 150
         
-    >>> majTriads = serial.findTransposedAndInvertedMultisets(s, [[0, 4, 7], [0, 3, 7]], 'ignoreAll', includeChords=False)
+    >>> majTriads = serial.findTransposedAndInvertedMultisets(s, [[0, 4, 7], [0, 3, 7]], 
+    ...                                                    'ignoreAll', includeChords=False)
     >>> [(maj.segment, maj.startOffset) for maj in majTriads]
     [([<music21.note.Note G>, <music21.note.Note E>, <music21.note.Note C>], 2.0), 
     ([<music21.note.Note C>, <music21.note.Note E->, <music21.note.Note G>], 0.0)]
@@ -3393,14 +3400,18 @@ def findTransposedAndInvertedMultisets(inputStream, searchList,
     [[0, 4, 7], [0, 4, 7]]
         
     Note that when we search for both [0, 4, 7] and [0, 3, 7], which are related to each other
-    by the composition of an inversion and a transposition, each found segment is only matched to one
-    of the multisets in the searchList; thus each found segment appears still appears at most once in the returned list
-    of contiguous segments. Accordingly, calling :attr:`~music21.serial.ContiguousSegmentOfNotes.matchedSegment`
+    by the composition of an inversion and a transposition, each 
+    found segment is only matched to one
+    of the multisets in the searchList; thus each found segment appears 
+    still appears at most once in the returned list
+    of contiguous segments. Accordingly, calling 
+    :attr:`~music21.serial.ContiguousSegmentOfNotes.matchedSegment`
     returns only one element of the searchList for each found segment.
     
     OMIT_FROM_DOCS
     
-    >>> majAndMinTriads = serial.findTransposedAndInvertedMultisets(s, [[0, 4, 7]], 'rowsOnly', includeChords=True)
+    >>> majAndMinTriads = serial.findTransposedAndInvertedMultisets(s, [[0, 4, 7]], 
+    ...                        'rowsOnly', includeChords=True)
     >>> [maj.segment for maj in majAndMinTriads]
     [[<music21.note.Note G>, <music21.note.Note E>, <music21.note.Note C>], 
     [<music21.note.Note C>, <music21.note.Note E->, <music21.note.Note G>]]
@@ -3415,7 +3426,8 @@ def findTransposedAndInvertedMultisets(inputStream, searchList,
     for k in range(0, numMultisets):
         baseMultiset = searchList[k]
         baseMultisetPitchClasses = pcToToneRow(baseMultiset).pitchClasses()
-        baseMultisetInversion = pcToToneRow(baseMultiset).zeroCenteredTransformation('I', 0).pitchClasses()
+        baseMultisetInversion = pcToToneRow(baseMultiset).zeroCenteredTransformation('I', 0
+                                                                        ).pitchClasses()
         for l in range(0, 12):
             multiset = [(l + x) % 12 for x in baseMultisetPitchClasses]
             length = len(multiset)

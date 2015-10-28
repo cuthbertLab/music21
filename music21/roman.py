@@ -1038,7 +1038,8 @@ class RomanNumeral(harmony.Harmony):
         it could be either diminished triad or diminished seventh. We return for diminished
         seventh since a missing chordStep for the 7th degree doesn't affect the processing.
         
-        Returns a tuple of 2 or 3 length showing the number of semitones for third, fifth, [seventh]
+        Returns a tuple of 2 or 3 length showing the number of 
+        semitones for third, fifth, [seventh]
         or the empty tuple () if not found.
         
         >>> r = roman.RomanNumeral()
@@ -1127,7 +1128,8 @@ class RomanNumeral(harmony.Harmony):
                     
                 faultyPitch = self.getChordStep(thisChordStep)
                 if faultyPitch is None:
-                    raise RomanException("this is very odd... should have been caught in semitonesFromChordStep")
+                    raise RomanException(
+                        "this is very odd... should have been caught in semitonesFromChordStep")
                 if faultyPitch.accidental is None:
                     faultyPitch.accidental = pitch.Accidental(correctedSemis)
                 else:
@@ -1278,8 +1280,7 @@ class RomanNumeral(harmony.Harmony):
             alteration = len(group)
             if group[0] in ('b', '-'):
                 alteration *= -1  # else sharp...
-            frontAlterationTransposeInterval = \
-                interval.intervalFromGenericAndChromatic(
+            frontAlterationTransposeInterval = interval.intervalFromGenericAndChromatic(
                     interval.GenericInterval(1),
                     interval.ChromaticInterval(alteration),
                     )
@@ -1287,12 +1288,12 @@ class RomanNumeral(harmony.Harmony):
             frontAlterationString = group
             workingFigure = self._alterationRegex.sub('', workingFigure)
         self.frontAlterationString = frontAlterationString
-        self.frontAlterationTransposeInterval = \
-            frontAlterationTransposeInterval
+        self.frontAlterationTransposeInterval = frontAlterationTransposeInterval
         self.frontAlterationAccidental = frontAlterationAccidental
 
         romanNumeralAlone = ''
-        if not self._romanNumeralAloneRegex.match(workingFigure) and not self._augmentedSixthRegex.match(workingFigure):
+        if (not self._romanNumeralAloneRegex.match(workingFigure) and 
+            not self._augmentedSixthRegex.match(workingFigure)):
             raise RomanException('No roman numeral found in {!r}'.format(
                 workingFigure))
         elif self._augmentedSixthRegex.match(workingFigure):
@@ -1328,14 +1329,15 @@ class RomanNumeral(harmony.Harmony):
         workingFigure = self._setImpliedQualityFromString(workingFigure)
 
         # Make vii always #vii and vi always #vi.
-        if getattr(useScale, 'mode', None) == 'minor' \
-            and self.caseMatters:
-            if (self.scaleDegree == 6 or self.scaleDegree == 7) and self.impliedQuality in (
-                'minor', 'diminished', 'half-diminished'):
+        if (getattr(useScale, 'mode', None) == 'minor' and
+                self.caseMatters):
+            if ((self.scaleDegree == 6 or self.scaleDegree == 7) and 
+                    self.impliedQuality in ('minor', 'diminished', 'half-diminished')):
                 if (self.frontAlterationTransposeInterval):
-                    self.frontAlterationTransposeInterval = interval.add([self.frontAlterationTransposeInterval,
-                                                                          interval.Interval('A1')
-                                                                          ])
+                    self.frontAlterationTransposeInterval = interval.add(
+                                                             [self.frontAlterationTransposeInterval,
+                                                              interval.Interval('A1')
+                                                              ])
                     self.frontAlterationAccidental.alter = self.frontAlterationAccidental.alter + 1
                 else:
                     self.frontAlterationTransposeInterval = interval.Interval('A1')
@@ -1817,7 +1819,9 @@ class Test(unittest.TestCase):
     def testBracketedAlterations(self):
         r1 = RomanNumeral('V9[b7][b5]')
         self.assertEqual(str(r1.bracketedAlterations), "[('b', 7), ('b', 5)]")
-        self.assertEqual(str(r1.pitches), '(<music21.pitch.Pitch G4>, <music21.pitch.Pitch B4>, <music21.pitch.Pitch D-5>, <music21.pitch.Pitch F-5>, <music21.pitch.Pitch A5>)')
+        self.assertEqual(str(r1.pitches), 
+            '(<music21.pitch.Pitch G4>, <music21.pitch.Pitch B4>, <music21.pitch.Pitch D-5>, ' + 
+            '<music21.pitch.Pitch F-5>, <music21.pitch.Pitch A5>)')
 
 #    def xtestFirst(self):
 #         # associating a harmony with a scale

@@ -9930,7 +9930,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> sStr += "d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1"
 
-        >>> s = converter.parse("tinynotation: 4/4 " + sPartStr, makeNotation=False)
+        >>> s = converter.parse("tinynotation: 4/4 " + sStr, makeNotation=False)
         >>> s.makeMeasures(inPlace=True) # maybe not necessary?
         >>> v1stream = converter.parse("tinynotation: 4/4 " + v1Str, makeNotation=False)
         >>> v2stream1 = converter.parse("tinynotation: 4/4 " + v2Str1, makeNotation=False)
