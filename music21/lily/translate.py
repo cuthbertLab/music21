@@ -207,7 +207,7 @@ class LilypondConverter(object):
         #self.minorVersion = 13
         self.versionString = (self.topLevelObject.backslash + "version " + 
                               self.topLevelObject.quoteString(str(self.majorVersion) + 
-                                                              '.' + str(self.minorVersion))
+                                                              '.' + str(self.minorVersion)))
         self.versionScheme = lyo.LyEmbeddedScm(self.versionString)
         self.headerScheme  = lyo.LyEmbeddedScm(self.bookHeader)
 
