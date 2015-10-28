@@ -1568,8 +1568,8 @@ class ConcreteScale(Scale):
             if common.isStr(maxPitch):
                 maxPitch = pitch.Pitch(maxPitch)
             
-            if minPitch is not None and maxPitch is not None and \
-                   minPitch > maxPitch and direction is None:
+            if (minPitch is not None and maxPitch is not None and 
+                   minPitch > maxPitch and direction is None):
                 reverse = True
                 (minPitch, maxPitch) = (maxPitch, minPitch)
             elif direction == DIRECTION_DESCENDING:
@@ -1801,9 +1801,13 @@ class ConcreteScale(Scale):
         if scaleStep is not None:
             return (scaleStep, None)
         else:
-            scaleStepNormal = self.getScaleDegreeFromPitch(pitchTarget, direction, comparisonAttribute='step')
+            scaleStepNormal = self.getScaleDegreeFromPitch(pitchTarget, 
+                                                           direction, 
+                                                           comparisonAttribute='step')
             if scaleStepNormal is None:
-                raise ScaleException("Cannot get any scale degree from getScaleDegreeFromPitch for pitchTarget %s, direction %s, comparisonAttribute='step'" % (pitchTarget, direction))
+                raise ScaleException(
+                    "Cannot get any scale degree from getScaleDegreeFromPitch for pitchTarget  " + 
+                    "%s, direction %s, comparisonAttribute='step'" % (pitchTarget, direction))
             pitchesFound = self.pitchesFromScaleDegrees([scaleStepNormal])
             
             if len(pitchesFound) == 0:
@@ -2256,7 +2260,8 @@ class ConcreteScale(Scale):
     def derive(self, other, comparisonAttribute='pitchClass'):
         '''
         Return the closest-matching :class:`~music21.scale.ConcreteScale` 
-        based on the pitch collection provided as a :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, 
+        based on the pitch collection provided as a 
+        :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, 
         or a list of :class:`~music21.pitch.Pitch` objects.
 
         How the "closest-matching" scale is defined still needs to be
@@ -3192,7 +3197,7 @@ class Test(unittest.TestCase):
         
 #         melodic = bFlatMinor.getConcreteMelodicMinorScale()
 #         niceMelodic = [note1.name for note1 in melodic]
-#         assert niceMelodic == ["B-", "C", "D-", "E-", "F", "G", "A", "B-", "A-", "G-", \
+#         assert niceMelodic == ["B-", "C", "D-", "E-", "F", "G", "A", "B-", "A-", "G-", 
 #                                "F", "E-", "D-", "C", "B-"]
         
 #         melodic2 = bFlatMinor.getAbstractMelodicMinorScale()
@@ -3837,7 +3842,8 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         from music21 import stream, meter, note
 
         sc = ScalaScale('e2', 'fj 12tet')
-        # this is showing that there are slight microtonal adjustments but they are less than one cent large
+        # this is showing that there are slight microtonal adjustments 
+        # but they are less than one cent large
         self.assertEqual(self.pitchOut(sc.pitches), 
                          '[E2, F2(+0c), F#2(0c), G2(0c), A-2(+0c), G##2(-2c), B-2(+0c), B2(0c), ' + 
                          'C3(+1c), D-3(+0c), D3(+0c), D#3(-12c), E3]')

@@ -110,7 +110,8 @@ class Spanner(base.Music21Object):
     any object that has a spanner:
     
     >>> n2.getSpannerSites()
-    [<music21.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>]
+    [<music21.CarterAccelerandoSign 
+            <music21.note.Note C><music21.note.Note D><music21.note.Note E>>]
     
     In this example we will slur a few notes and then iterate over the stream to
     see which are slurred:
@@ -208,10 +209,7 @@ class Spanner(base.Music21Object):
 
         # store this so subclasses can replace
         if self.__module__ != '__main__':
-            if self.__module__.startswith('music21') == False:
-                self._reprHead = '<music21.' + self.__module__ + '.' + self.__class__.__name__ + ' '
-            else:
-                self._reprHead = '<' + self.__module__ + '.' + self.__class__.__name__ + ' '
+            self._reprHead = '<' + self.__module__ + '.' + self.__class__.__name__ + ' '
         else:
             self._reprHead = '<music21.spanner.' + self.__class__.__name__ + ' '
         # store a Stream inside of Spanner
@@ -454,7 +452,9 @@ class Spanner(base.Music21Object):
             else:
                 pass
                 # it makes sense to not have multiple copies
-                #environLocal.printDebug(['attempting to add an object (%s) that is already found in the SpannerStorage stream of spaner %s; this may not be an error.' % (c, self)])
+                #environLocal.printDebug(['''attempting to add an object (%s) that is 
+                #    already found in the SpannerStorage stream of spaner %s; 
+                #    this may not be an error.''' % (c, self)])
 
         self.spannerStorage.elementsChanged()
         # always clear cache
@@ -497,8 +497,10 @@ class Spanner(base.Music21Object):
             # e here is the old element that was spanned by this Spanner
             
 
-            #environLocal.printDebug(['current Spanner.getSpannedElementIdsIds()', self.getSpannedElementIds()])
-            #environLocal.printDebug(['Spanner.replaceSpannedElement:', 'getElementById result', e, 'old target', old])
+            #environLocal.printDebug(['current Spanner.getSpannedElementIdsIds()', 
+            #    self.getSpannedElementIds()])
+            #environLocal.printDebug(['Spanner.replaceSpannedElement:', 'getElementById result', 
+            #    e, 'old target', old])
             if e is not None:
                 #environLocal.printDebug(['Spanner.replaceSpannedElement:', 'old', e, 'new', new])
                 # do not do all Sites: only care about this one
@@ -508,13 +510,15 @@ class Spanner(base.Music21Object):
             self.spannerStorage.replace(old, new, allDerived=False)
             #environLocal.printDebug(['Spanner.replaceSpannedElement:', 'old', e, 'new', new])
 
-        # while this Spanner now has proper elements in its spannerStorage Stream, the element replaced likely has a site left-over from its previous Spanner
+        # while this Spanner now has proper elements in its spannerStorage Stream, 
+        # the element replaced likely has a site left-over from its previous Spanner
 
         # always clear cache
         if self._cache:
             self._cache = {} 
 
-        #environLocal.printDebug(['replaceSpannedElement()', 'id(old)', id(old), 'id(new)', id(new)])
+        #environLocal.printDebug(['replaceSpannedElement()', 'id(old)', id(old), 
+        #    'id(new)', id(new)])
 
 
     def isFirst(self, spannedElement):
@@ -731,7 +735,9 @@ class SpannerBundle(object):
         return self._storage[key]
 
     def remove(self, item):
-        '''Remove a stored Spanner from the bundle with an instance. Each reference must have a matching id() value.
+        '''
+        Remove a stored Spanner from the bundle with an instance. 
+        Each reference must have a matching id() value.
         
         >>> su1 = spanner.Slur()
         >>> su1.idLocal = 1
@@ -922,7 +928,8 @@ class SpannerBundle(object):
 
 
         '''
-        #environLocal.printDebug(['SpannerBundle.replaceSpannedElement()', 'old', old, 'new', new, 'len(self._storage)', len(self._storage)])
+        #environLocal.printDebug(['SpannerBundle.replaceSpannedElement()', 'old', old, 
+        #    'new', new, 'len(self._storage)', len(self._storage)])
 
         if common.isNum(old): # assume this is an id
             idTarget = old
@@ -939,7 +946,8 @@ class SpannerBundle(object):
                 sp.replaceSpannedElement(old, new)
                 replacedSpanners.append(sp)
                 #post.append(sp)
-                #environLocal.printDebug(['replaceSpannedElement()', sp, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new)])
+                #environLocal.printDebug(['replaceSpannedElement()', sp, 'old', old, 
+                #    'id(old)', id(old), 'new', new, 'id(new)', id(new)])
 
         if self._cache:
             self._cache = {} 
@@ -1060,7 +1068,9 @@ class SpannerBundle(object):
         [None, None]
         >>> sb.setIdLocals()
         >>> [(sp, sp.idLocal) for sp in sb]
-        [(<music21.spanner.Slur >, 1), (<music21.layout.StaffGroup >, 1), (<music21.spanner.Slur >, 2)]
+        [(<music21.spanner.Slur >, 1), 
+         (<music21.layout.StaffGroup >, 1), 
+         (<music21.spanner.Slur >, 2)]
         '''
         classes = []
         for sp in self._storage:
@@ -1159,11 +1169,13 @@ class SpannerBundle(object):
 
         remove = None
         for i, ref in enumerate(self._pendingSpannedElementAssignment):
-            #environLocal.printDebug(['calling freePendingSpannedElementAssignment()', self._pendingSpannedElementAssignment])
+            #environLocal.printDebug(['calling freePendingSpannedElementAssignment()', 
+            #    self._pendingSpannedElementAssignment])
             if spannedElementCandidate.isClassOrSubclass([ref['className']]):
                 ref['spanner'].addSpannedElements(spannedElementCandidate)
                 remove = i      
-                #environLocal.printDebug(['freePendingSpannedElementAssignment()', 'added spannedElement', ref['spanner']])
+                #environLocal.printDebug(['freePendingSpannedElementAssignment()', 
+                #    'added spannedElement', ref['spanner']])
                 break
         if remove is not None:
             self._pendingSpannedElementAssignment.pop(remove)
@@ -1176,7 +1188,8 @@ class SpannerBundle(object):
 class Slur(Spanner):
     '''A slur represented as a spanner between two Notes. 
 
-    The `idLocal` attribute, defined in the Spanner base class, is used to mark start and end tags of potentially overlapping indicators.
+    The `idLocal` attribute, defined in the Spanner base class, 
+    is used to mark start and end tags of potentially overlapping indicators.
     '''
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)
@@ -1195,11 +1208,13 @@ class Slur(Spanner):
 #-------------------------------------------------------------------------------
 # first/second repeat bracket
 class RepeatBracket(Spanner):
-    '''A grouping of one or more measures, presumably in sequence, that mark an alternate repeat. 
+    '''
+    A grouping of one or more measures, presumably in sequence, that mark an alternate repeat. 
 
     These gather what are sometimes called first-time bars and second-time bars.
 
-    It is assumed that numbering starts from 1. Numberings above 2 are permitted. The `number` keyword argument can be used to pass in the desired number. 
+    It is assumed that numbering starts from 1. Numberings above 2 are permitted. 
+    The `number` keyword argument can be used to pass in the desired number. 
 
     
     >>> m = stream.Measure()
@@ -1252,7 +1267,9 @@ class RepeatBracket(Spanner):
 
     # property to enforce numerical numbers
     def _getNumber(self):
-        '''This must return a string, as we may have single numbers or lists. For a raw numerical list, use getNumberList() below.
+        '''
+        This must return a string, as we may have single numbers or lists. 
+        For a raw numerical list, use getNumberList() below.
         '''
         if len(self._numberRange) == 1:
             return str(self._number)
@@ -1278,7 +1295,8 @@ class RepeatBracket(Spanner):
                 if common.isNum(x):
                     self._numberRange.append(x)
                 else:
-                    raise SpannerException('number for RepeatBracket must be a number, not %r' % value)
+                    raise SpannerException(
+                        'number for RepeatBracket must be a number, not %r' % value)
             self._number = min(self._numberRange)
             self._numberSpanIsContiguous = common.contiguousList(self._numberRange)
             if (len(self._numberRange) == 2) and (self._numberRange[0] == self._numberRange[1] - 1):
@@ -1661,7 +1679,9 @@ class Line(Spanner):
 
 
 class Glissando(Spanner):
-    '''A between two Notes specifying a glissando or similar alteration. Different line types can be specified. 
+    '''
+    A between two Notes specifying a glissando or similar alteration. 
+    Different line types can be specified. 
     '''
     validLineTypes = ('solid', 'dashed', 'dotted', 'wavy')
     

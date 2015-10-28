@@ -663,8 +663,8 @@ class XMLExporterBase(object):
                 
     def xmlHeader(self):
         return (b'''<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE score-partwise\n  ''' + 
-                '''PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'\n  ''' + 
-                ''''http://www.musicxml.org/dtds/partwise.dtd'>\n''')
+                b'''PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'\n  ''' + 
+                b''''http://www.musicxml.org/dtds/partwise.dtd'>\n''')
     
     def setPosition(self, m21Object, mxObject):
         if hasattr(m21Object, 'xPosition') and m21Object.xPosition is not None:
