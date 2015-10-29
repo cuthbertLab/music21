@@ -983,7 +983,8 @@ class Ambitus(DiscreteAnalysis):
     
     def getPitchSpan(self, subStream):
         '''
-        For a given subStream, return the pitch with the minimum and maximum pitch space value found. 
+        For a given subStream, return the pitch with the minimum and 
+        maximum pitch space value found. 
 
         This public method may be used by other classes. 
 
@@ -1235,7 +1236,8 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
         and counts of Intervals already found will be incremented.
         '''
         # note that Stream.findConsecutiveNotes() and Stream.melodicIntervals()
-        # offer similar approaches, but return Streams and manage offsets and durations, components not needed here
+        # offer similar approaches, but return Streams and manage offsets and durations, 
+        # components not needed here
     
         if found == None:
             found = {}
@@ -1386,9 +1388,11 @@ class Test(unittest.TestCase):
         p = KrumhanslSchmuckler()
         s1 = converter.parse('tinynotation: 4/4 c4 d e f g a b c   c#4 d# e# f#')
         s2 = converter.parse('tinynotation: 4/4 c#4 d# e# f#  f g a b- c d e f')
-        s3 = converter.parse('tinynotation: 4/4 c4 d e f g a b c   c#4 d# e# f#  c#4 d# e# f#  f g a b- c d e f')
+        s3 = converter.parse('tinynotation: 4/4 c4 d e f g a b c   c#4 d# e# f#  ' + 
+                             'c#4 d# e# f#  f g a b- c d e f')
 
-        #self.assertEqual(p._getPitchClassDistribution(s1), [1.0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        #self.assertEqual(p._getPitchClassDistribution(s1), 
+        #            [1.0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
         p.process(s1.flat)
         likelyKeysMajor1, likelyKeysMinor1 = p._likelyKeys(s1.flat)

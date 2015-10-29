@@ -376,7 +376,8 @@ def abcToStreamScore(abcHandler, inputM21=None):
     if len(tokenCollections) == 1:
         partHandlers.append(tokenCollections[0])
     else:
-        # add metadata -- stored in tokenCollections[0] -- to each Part (stored in tokenCollections[i])
+        # add metadata -- stored in tokenCollections[0] -- 
+        #            to each Part (stored in tokenCollections[i])
         for i in range(1, len(tokenCollections)):
             # concatenate abc handler instances
             newABCHandler = tokenCollections[0] + tokenCollections[i]

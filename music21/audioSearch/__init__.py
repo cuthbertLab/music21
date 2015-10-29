@@ -328,7 +328,8 @@ def getFrequenciesFromMicrophone(length=10.0, storeWaveFilename=None):
     TODO -- find a way to test... or at least demo
     '''
     if "numpy" in base._missingImport:
-        raise AudioSearchException("Cannot run getFrequenciesFromMicrophone without numpy installed")
+        raise AudioSearchException(
+                "Cannot run getFrequenciesFromMicrophone without numpy installed")
 
     import numpy
     environLocal.printDebug("* start recording")
