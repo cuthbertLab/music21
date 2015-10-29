@@ -1175,6 +1175,7 @@ class ContiguousSegmentOfNotes(base.Music21Object):
         Returns a list of distinct pitch classes in the segment, in order of appearance,
         where pitches in a chord are read from bottom to top.
         
+        Does not sort or order.
         
         >>> sc = stream.Score()
         >>> n1 = note.Note('d4')
@@ -1187,9 +1188,7 @@ class ContiguousSegmentOfNotes(base.Music21Object):
         >>> allNotes = serial.getContiguousSegmentsOfLength(sc, 5)
         >>> allNotes[0].getDistinctPitchClasses()
         [2, 4, 7]
-        
         '''
-        
         seg = self.segment
         pitchClasses = []
         for noteOrChord in seg:
@@ -1197,6 +1196,122 @@ class ContiguousSegmentOfNotes(base.Music21Object):
                 if p.pitchClass not in pitchClasses:
                     pitchClasses.append(p.pitchClass)
         return pitchClasses
+
+# 
+# 
+# class ContiguousSegmentSearcher(object):
+#     def __init__(self, inputStream=None, reps='skipConsecutive', includeChords=True):
+#         self.stream = inputStream
+#         self.reps = reps
+#         self.includeChords = includeChords
+#         self.searchLength = 1
+#         self.currentNote = None
+#         self.partNumber = None
+#         self.pitchList = []
+#         self.activePitchList = []
+#         self.totalLength = 0
+#         self.listOfContiguousSegments = []
+# 
+#     def getSearchBoundMethod(self):
+#         reps = self.reps
+#         if self.includeChords is True:
+#             if reps == 'skipConsecutive':
+#                 return self.searchSkipConsecutiveInclude
+#             elif reps == 'rowsOnly':
+#                 return self.searchRowsOnlyInclude
+#             elif reps == 'includeAll':
+#                 return self.searchIncludeAllInclude
+#             elif reps == 'ignoreAll':
+#                 return self.searchIgnoreAllInclude
+#         else:
+#             if reps == 'skipConsecutive':
+#                 return self.searchSkipConsecutiveExclude
+#             elif reps == 'rowsOnly':
+#                 return self.searchRowsOnlyExclude
+#             elif reps == 'includeAll':
+#                 return self.searchIncludeAllExclude
+#             elif reps == 'ignoreAll':
+#                 return self.searchIgnoreAllExclude                   
+# 
+#          
+#     def byLength(self, length):
+#         scores = self.stream.getElementsByClass(stream.Score)
+#         if len(scores) == 0:
+#             parts = self.stream.getElementsByClass(stream.Part)
+#         elif len(scores) == 1:
+#             parts = scores[0].parts
+#         else:
+#             raise SerialException("The inputStream can contain at most one score.")
+#         
+#         partList = parts
+#         if len(parts) == 0:
+#             if len(scores) == 0:            
+#                 partList = [self.stream]
+#             else:
+#                 partList = [scores[0]]
+#             hasParts = False
+#         else:
+#             hasParts = True
+#          
+#         searchMethod = self.getSearchBoundMethod()   
+#         
+#         for p, partObj in enumerate(partList):
+#             measures = partObj.getElementsByClass(stream.Measure)
+#             if hasParts is False:
+#                 p = None  # 
+#                 
+#             self.pitchList = []
+#             self.totalLength = 0 # counts each pitch within a chord once
+#             self.listOfContiguousSegments = []
+#             for m in measures:
+#                 for n in m.flat.notes:
+#                     if n.tie is not None and n.tie.type != 'start':
+#                         continue
+#                     addActivePitches = searchMethod(n, p)
+#                     if addActivePitches:
+#                         csn = ContiguousSegmentOfNotes(self.activePitchList, self.stream, p)
+#                         self.listOfContiguousSegments.append(csn)
+# 
+#     def searchSkipConsecutiveInclude(self, n, p):
+#         if len(n.pitches) > 1:
+#             self.pitchList = []
+#             return False
+# 
+#         pitchList = self.pitchList            
+#         if pitchList != [] and pitchList[-1].pitch == n.pitch:
+#             return False
+#             
+#         pitchList.append(n)
+#         if len(pitchList) == self.searchLength + 1:
+#             pitchList.remove(pitchList[0])
+#         
+#         if len(pitchList) == self.searchLength:
+#             self.activePitchList = pitchList[:]
+#             return True
+#             
+#     def searchSkipConsecutiveExclude(self, n, p):
+#         if len(n.pitches) > 1:
+#             self.pitchList = []
+#             return False
+# 
+#         pitchList = self.pitchList            
+#         if pitchList != [] and pitchList[-1].pitch == n.pitch:
+#             return False
+#             
+#         self.totalLength = self.totalLength + len(n.pitches)
+#         self.lengthOfActive = self.totalLength
+#         doneChecking = False
+#         numNotesToDelete = 0
+#             
+# 
+#         pitchList.append(n)
+#         if len(pitchList) == self.searchLength + 1:
+#             pitchList.remove(pitchList[0])
+#         
+#         if len(pitchList) == self.searchLength:
+#             self.activePitchList = pitchList[:]
+#             return True
+
 
 
 def getContiguousSegmentsOfLength(inputStream, 
@@ -1301,7 +1416,7 @@ def getContiguousSegmentsOfLength(inputStream,
     [<music21.serial.ContiguousSegmentOfNotes object ...]
     >>> [instance.segment for instance in skipConsecutiveList]
     [[<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 
-    [<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>]]
+     [<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>]]
         
     In order to be considered repetition, the spellings of the notes 
     in question must be exactly the same:
@@ -1553,7 +1668,6 @@ def getContiguousSegmentsOfLength(inputStream,
     [<music21.note.Note E>, <music21.chord.Chord C5 D5>], 
     [<music21.note.Note E>, <music21.chord.Chord C5 D5>, <music21.chord.Chord C4 D4>]]
     '''
-    
     listOfContiguousSegments = []
     
     scores = inputStream.getElementsByClass(stream.Score)
@@ -1564,66 +1678,74 @@ def getContiguousSegmentsOfLength(inputStream,
     else:
         raise SerialException("The inputStream can contain at most one score.")
     
+    partList = parts
     if len(parts) == 0:
-        if len(scores) == 0:
-            measures = inputStream.getElementsByClass(stream.Measure)
-        elif len(scores) == 1:
-            measures = scores[0].getElementsByClass(stream.Measure)
-        if reps == 'skipConsecutive':
-            pitchList = []
-            totallength = 0 #counts each pitch within a chord once
-            for m in measures:
-                for n in m.getElementsByClass([note.Note, chord.Chord], returnStreamSubClass=False):
-                    if n.tie == None or n.tie.type == 'start':
-                        add = False
-                        if includeChords == False:
-                            if len(n.pitches) == 1:
-                                if pitchList == []:
-                                    add = True
-                                else:
-                                    if pitchList[-1].pitch != n.pitch:
-                                        add = True
-                                if add == True:
-                                    pitchList.append(n)
-                                    if len(pitchList) == length + 1:
-                                        pitchList.remove(pitchList[0])
-                                    if len(pitchList) == length:
-                                        listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(pitchList), inputStream, None))
-                            elif len(n.pitches) > 1:
-                                pitchList = []
-                        else:
+        if len(scores) == 0:            
+            partList = [inputStream]
+        else:
+            partList = [scores[0]]
+        hasParts = False
+    else:
+        hasParts = True
+        
+    for p, partObj in enumerate(partList):
+        measures = partObj.getElementsByClass(stream.Measure)
+        if hasParts is False:
+            p = None  # 
+            
+        pitchList = []
+        totalLength = 0 # counts each pitch within a chord once
+        for m in measures:
+            for n in m.flat.notes:
+                if n.tie is not None and n.tie.type != 'start':
+                    continue
+                
+                if reps == 'skipConsecutive':
+                    add = False
+                    if includeChords == False:
+                        if len(n.pitches) == 1:
                             if pitchList == []:
                                 add = True
                             else:
-                                if pitchList[-1].pitches != n.pitches:
+                                if pitchList[-1].pitch != n.pitch:
                                     add = True
                             if add == True:
                                 pitchList.append(n)
-                                totallength = totallength + len(n.pitches)
-                                lengthofactive = totallength
-                                donechecking = False
-                                numnotestodelete = 0
-                                for i in range(0, len(pitchList)):
-                                    if donechecking == False:
-                                        activePitchList = pitchList[i:len(pitchList)]
-                                        if i != 0:
-                                            lengthofactive = lengthofactive - len(pitchList[i-1].pitches)
-                                        if lengthofactive >= length:
-                                            if lengthofactive - len(activePitchList[0].pitches) - len(activePitchList[-1].pitches) <= length - 2:
-                                                listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(activePitchList), inputStream, None))
-                                            else:
-                                                numnotestodelete = numnotestodelete + 1
-                                        else:
-                                            donechecking = True
-                                for i in range(0, numnotestodelete):
-                                    totallength = totallength - len(pitchList[0].pitches)
+                                if len(pitchList) == length + 1:
                                     pitchList.remove(pitchList[0])
-        elif reps == 'rowsOnly':
-            pitchList = []
-            totallength = 0     
-            for m in measures:
-                for n in m.getElementsByClass([note.Note, chord.Chord], returnStreamSubClass=False):
-                    if n.tie == None or n.tie.type == 'start':
+                                if len(pitchList) == length:
+                                    listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(pitchList), inputStream, p))
+                        elif len(n.pitches) > 1:
+                            pitchList = []
+                        
+                        
+                    else:
+                        if pitchList == []:
+                            add = True
+                        elif pitchList[-1].pitches != n.pitches:
+                            add = True
+                        if add is True:
+                            pitchList.append(n)
+                            totalLength = totalLength + len(n.pitches)
+                            lengthOfActive = totalLength
+                            doneChecking = False
+                            numNotesToDelete = 0
+                            for i in range(0, len(pitchList)):
+                                if doneChecking is False:
+                                    activePitchList = pitchList[i:len(pitchList)]
+                                    if i != 0:
+                                        lengthOfActive = lengthOfActive - len(pitchList[i-1].pitches)
+                                    if lengthOfActive >= length:
+                                        if lengthOfActive - len(activePitchList[0].pitches) - len(activePitchList[-1].pitches) <= length - 2:
+                                            listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(activePitchList), inputStream, p))
+                                        else:
+                                            numNotesToDelete = numNotesToDelete + 1
+                                    else:
+                                        doneChecking = True
+                            for i in range(0, numNotesToDelete):
+                                totalLength = totalLength - len(pitchList[0].pitches)
+                                pitchList.remove(pitchList[0])
+                elif reps == 'rowsOnly':
                         if includeChords == False:
                             if len(n.pitches) == 1:
                                 if len(pitchList) == length:
@@ -1638,23 +1760,23 @@ def getContiguousSegmentsOfLength(inputStream,
                                     else:
                                         pitchList = [n]
                                 if len(pitchList) == length:
-                                    listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(pitchList), inputStream, None))
+                                    listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(pitchList), inputStream, p))
                             else:
                                 pitchList = []
                         else:
                             pitchList.append(n)
-                            totallength = totallength + len(n.pitches)
-                            lengthofactive = totallength
-                            donechecking = False
-                            numnotestodelete = 0
+                            totalLength = totalLength + len(n.pitches)
+                            lengthOfActive = totalLength
+                            doneChecking = False
+                            numNotesToDelete = 0
                             for i in range(0, len(pitchList)):
-                                if donechecking == False:
+                                if doneChecking == False:
                                     activePitchList = pitchList[i:len(pitchList)]
                                     if i != 0:
-                                        lengthofactive = lengthofactive - len(pitchList[i-1].pitches)
-                                    if lengthofactive >= length:
-                                        if lengthofactive - len(activePitchList[0].pitches) - len(activePitchList[-1].pitches) <= length - 2:
-                                            contigObj = ContiguousSegmentOfNotes(list(activePitchList), inputStream, None)
+                                        lengthOfActive = lengthOfActive - len(pitchList[i-1].pitches)
+                                    if lengthOfActive >= length:
+                                        if lengthOfActive - len(activePitchList[0].pitches) - len(activePitchList[-1].pitches) <= length - 2:
+                                            contigObj = ContiguousSegmentOfNotes(list(activePitchList), inputStream, p)
                                             rowSuperset = contigObj.readPitchClassesFromBottom()
                                             lowerBound = max([0, len(rowSuperset) - length - len(activePitchList[-1].pitches) + 1])
                                             upperBound = min([len(activePitchList[0].pitches) - 1, len(rowSuperset) - length])
@@ -1665,293 +1787,89 @@ def getContiguousSegmentsOfLength(inputStream,
                                                         listOfContiguousSegments.append(contigObj)
                                                         added = True
                                         else:
-                                            numnotestodelete = numnotestodelete + 1
+                                            numNotesToDelete = numNotesToDelete + 1
                                     else:
-                                        donechecking = True
-                            for i in range(0, numnotestodelete):
-                                totallength = totallength - len(pitchList[0].pitches)
+                                        doneChecking = True
+                            for i in range(0, numNotesToDelete):
+                                totalLength = totalLength - len(pitchList[0].pitches)
                                 pitchList.remove(pitchList[0])
-        elif reps == 'includeAll':
-            pitchList = []
-            totallength = 0
-            for m in measures:
-                for n in m.getElementsByClass([note.Note, chord.Chord], returnStreamSubClass=False):
-                    #environLocal.warn(str(n.measureNumber))
-                    if n.tie == None or n.tie.type == 'start':
+                elif reps == 'includeAll':
                         if includeChords == False:
                             if len(n.pitches) == 1:
                                 pitchList.append(n)
                                 if len(pitchList) == length + 1:
                                     pitchList.remove(pitchList[0])
                                 if len(pitchList) == length:
-                                    listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(pitchList), inputStream, None))
+                                    listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(pitchList), inputStream, p))
                             else:
                                 pitchList = []                            
                         else:
                             pitchList.append(n)
-                            totallength = totallength + len(n.pitches)
-                            lengthofactive = totallength
-                            donechecking = False
-                            numnotestodelete = 0
+                            totalLength = totalLength + len(n.pitches)
+                            lengthOfActive = totalLength
+                            doneChecking = False
+                            numNotesToDelete = 0
                             for i in range(0, len(pitchList)):
-                                if donechecking == False:
+                                if doneChecking == False:
                                     activePitchList = pitchList[i:len(pitchList)]
                                     if i != 0:
-                                        lengthofactive = lengthofactive - len(pitchList[i-1].pitches)
-                                    if lengthofactive >= length:
-                                        if lengthofactive - len(activePitchList[0].pitches) - len(activePitchList[-1].pitches) <= length - 2:
-                                            listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(activePitchList), inputStream, None))
+                                        lengthOfActive = lengthOfActive - len(pitchList[i-1].pitches)
+                                    if lengthOfActive >= length:
+                                        if lengthOfActive - len(activePitchList[0].pitches) - len(activePitchList[-1].pitches) <= length - 2:
+                                            listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(activePitchList), inputStream, p))
                                         else:
-                                            numnotestodelete = numnotestodelete + 1
+                                            numNotesToDelete = numNotesToDelete + 1
                                     else:
-                                        donechecking = True
-                            for i in range(0, numnotestodelete):
-                                totallength = totallength - len(pitchList[0].pitches)
+                                        doneChecking = True
+                            for i in range(0, numNotesToDelete):
+                                totalLength = totalLength - len(pitchList[0].pitches)
                                 pitchList.remove(pitchList[0])
-        elif reps == 'ignoreAll':
-            pitchList = []
-            totallength = 0
-            for m in measures:
-                for n in m.getElementsByClass([note.Note, chord.Chord], returnStreamSubClass=False):
-                    if n.tie == None or n.tie.type == 'start':
+                elif reps == 'ignoreAll':
                         if includeChords == False:
                             if len(n.pitches) == 1:
                                 pitchList.append(n)
-                                donechecking = False
-                                numnotestodelete = 0
+                                doneChecking = False
+                                numNotesToDelete = 0
                                 for i in range(0, len(pitchList)):
-                                    if donechecking == False:
+                                    if doneChecking == False:
                                         activePitchList = pitchList[i:len(pitchList)]
                                         if len(set([n.pitch.pitchClass for n in activePitchList])) == length:
-                                            listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(activePitchList), inputStream, None))
-#uncomment this line to get shortest        #numnotestodelete = numnotestodelete + 1
+                                            listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(activePitchList), inputStream, p))
+#uncomment this line to get shortest        #numNotesToDelete = numNotesToDelete + 1
                                         elif len(set([n.pitch.pitchClass for n in activePitchList])) > length:
-                                            numnotestodelete = numnotestodelete + 1
+                                            numNotesToDelete = numNotesToDelete + 1
                                         else:
-                                            donechecking = True
-                                for i in range(0, numnotestodelete):
-                                    totallength = totallength - len(pitchList[0].pitches)
+                                            doneChecking = True
+                                for i in range(0, numNotesToDelete):
+                                    totalLength = totalLength - len(pitchList[0].pitches)
                                     pitchList.remove(pitchList[0])
                                                                                 
                             else:
                                 pitchList = []                            
                         else:
                             pitchList.append(n)
-                            donechecking = False
-                            numnotestodelete = 0
+                            doneChecking = False
+                            numNotesToDelete = 0
                             for i in range(0, len(pitchList)):
-                                if donechecking == False:
+                                if doneChecking == False:
                                     activePitchList = pitchList[i:len(pitchList)]
-                                    activeseg = ContiguousSegmentOfNotes(list(activePitchList), inputStream, None)
-                                    if len(set(activeseg.readPitchClassesFromBottom())) >= length:
-                                        middleseg = ContiguousSegmentOfNotes(list(activePitchList[1:len(activePitchList)-1]), None, None)
-                                        middlePitchClassSet = set(middleseg.readPitchClassesFromBottom())
+                                    activeSeg = ContiguousSegmentOfNotes(list(activePitchList), inputStream, p)
+                                    if len(set(activeSeg.readPitchClassesFromBottom())) >= length:
+                                        middleSegment = ContiguousSegmentOfNotes(list(activePitchList[1:len(activePitchList)-1]), None, None)
+                                        middlePitchClassSet = set(middleSegment.readPitchClassesFromBottom())
                                         setToCheck = middlePitchClassSet.union([activePitchList[0].pitches[-1].pitchClass]).union([activePitchList[-1].pitches[0].pitchClass])
                                         if len(setToCheck) <= length:
-                                            listOfContiguousSegments.append(activeseg)
-#uncomment this line to get shortest        #numnotestodelete = numnotestodelete + 1                                            
+                                            listOfContiguousSegments.append(activeSeg)
+#uncomment this line to get shortest        #numNotesToDelete = numNotesToDelete + 1                                            
                                         else:
-                                            numnotestodelete = numnotestodelete + 1
+                                            numNotesToDelete = numNotesToDelete + 1
                                     else:
-                                        donechecking = True
-                            for i in range(0, numnotestodelete):
-                                totallength = totallength - len(pitchList[0].pitches)
+                                        doneChecking = True
+                            for i in range(0, numNotesToDelete):
+                                totalLength = totalLength - len(pitchList[0].pitches)
                                 pitchList.remove(pitchList[0])
-        else:
-            raise SerialException("Invalid repeated pitch setting.")
-    else:
-        for p in range(0, len(parts)):
-            measures = parts[p].getElementsByClass(stream.Measure)
-            if reps == 'skipConsecutive':
-                pitchList = []
-                totallength = 0 #counts each pitch within a chord once
-                for m in measures:
-                    for n in m.flat.notes:
-                        if n.tie == None or n.tie.type == 'start':
-                            add = False
-                            if includeChords == False:
-                                if len(n.pitches) == 1:
-                                    if pitchList == []:
-                                        add = True
-                                    else:
-                                        if pitchList[-1].pitch != n.pitch:
-                                            add = True
-                                    if add == True:
-                                        pitchList.append(n)
-                                        if len(pitchList) == length + 1:
-                                            pitchList.remove(pitchList[0])
-                                        if len(pitchList) == length:
-                                            listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(pitchList), inputStream, p))
-                                elif len(n.pitches) > 1:
-                                    pitchList = []
-                            else:
-                                if pitchList == []:
-                                    add = True
-                                else:
-                                    if pitchList[-1].pitches != n.pitches:
-                                        add = True
-                                if add == True:
-                                    pitchList.append(n)
-                                    totallength = totallength + len(n.pitches)
-                                    lengthofactive = totallength
-                                    donechecking = False
-                                    numnotestodelete = 0
-                                    for i in range(0, len(pitchList)):
-                                        if donechecking == False:
-                                            activePitchList = pitchList[i:len(pitchList)]
-                                            if i != 0:
-                                                lengthofactive = lengthofactive - len(pitchList[i-1].pitches)
-                                            if lengthofactive >= length:
-                                                if lengthofactive - len(activePitchList[0].pitches) - len(activePitchList[-1].pitches) <= length - 2:
-                                                    listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(activePitchList), inputStream, p))
-                                                else:
-                                                    numnotestodelete = numnotestodelete + 1
-                                            else:
-                                                donechecking = True
-                                    for i in range(0, numnotestodelete):
-                                        totallength = totallength - len(pitchList[0].pitches)
-                                        pitchList.remove(pitchList[0])
-            elif reps == 'rowsOnly':
-                pitchList = []
-                totallength = 0
-                for m in measures:
-                    for n in m.flat.notes:
-                        if n.tie == None or n.tie.type == 'start':
-                            if includeChords == False:
-                                if len(n.pitches) == 1:
-                                    if len(pitchList) == length:
-                                        if n.pitchClass not in [m.pitchClass for m in pitchList[1:]]:
-                                            pitchList.append(n)
-                                            pitchList.remove(pitchList[0])
-                                        else:
-                                            pitchList = [n]
-                                    else:
-                                        if n.pitchClass not in [m.pitchClass for m in pitchList]:
-                                            pitchList.append(n)
-                                        else:
-                                            pitchList = [n]
-                                    if len(pitchList) == length:
-                                        listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(pitchList), inputStream, p))
-                                else:
-                                    pitchList = []
-                            else:
-                                pitchList.append(n)
-                                totallength = totallength + len(n.pitches)
-                                lengthofactive = totallength
-                                donechecking = False
-                                numnotestodelete = 0
-                                for i in range(0, len(pitchList)):
-                                    if donechecking == False:
-                                        activePitchList = pitchList[i:len(pitchList)]
-                                        if i != 0:
-                                            lengthofactive = lengthofactive - len(pitchList[i-1].pitches)
-                                        if lengthofactive >= length:
-                                            if lengthofactive - len(activePitchList[0].pitches) - len(activePitchList[-1].pitches) <= length - 2:
-                                                contigObj = ContiguousSegmentOfNotes(list(activePitchList), inputStream, p)
-                                                rowSuperset = contigObj.readPitchClassesFromBottom()
-                                                lowerBound = max([0, len(rowSuperset) - length - len(activePitchList[-1].pitches) + 1])
-                                                upperBound = min([len(activePitchList[0].pitches) - 1, len(rowSuperset) - length])
-                                                added = False
-                                                for j in range(lowerBound, upperBound + 1):
-                                                    if added == False:   
-                                                        if len(set(rowSuperset[j:j+length])) == length:
-                                                            listOfContiguousSegments.append(contigObj)
-                                                            added = True
-                                            else:
-                                                numnotestodelete = numnotestodelete + 1
-                                        else:
-                                            donechecking = True
-                                for i in range(0, numnotestodelete):
-                                    totallength = totallength - len(pitchList[0].pitches)
-                                    pitchList.remove(pitchList[0])
-            elif reps == 'includeAll':
-                pitchList = []
-                totallength = 0
-                for m in measures:
-                    for n in m.flat.notes:
-                        if n.tie == None or n.tie.type == 'start':
-                            if includeChords == False:
-                                if len(n.pitches) == 1:
-                                    pitchList.append(n)
-                                    if len(pitchList) == length + 1:
-                                        pitchList.remove(pitchList[0])
-                                    if len(pitchList) == length:
-                                        listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(pitchList), inputStream, p))
-                                else:
-                                    pitchList = []
-                            else:
-                                pitchList.append(n)
-                                totallength = totallength + len(n.pitches)
-                                lengthofactive = totallength
-                                donechecking = False
-                                numnotestodelete = 0
-                                for i in range(0, len(pitchList)):
-                                    if donechecking == False:
-                                        activePitchList = pitchList[i:len(pitchList)]
-                                        if i != 0:
-                                            lengthofactive = lengthofactive - len(pitchList[i-1].pitches)
-                                        if lengthofactive >= length:
-                                            if lengthofactive - len(activePitchList[0].pitches) - len(activePitchList[-1].pitches) <= length - 2:
-                                                listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(activePitchList), inputStream, p))
-                                            else:
-                                                numnotestodelete = numnotestodelete + 1
-                                        else:
-                                            donechecking = True
-                                for i in range(0, numnotestodelete):
-                                    totallength = totallength - len(pitchList[0].pitches)
-                                    pitchList.remove(pitchList[0])
-            elif reps == 'ignoreAll':
-                pitchList = []
-                totallength = 0
-                for m in measures:
-                    for n in m.getElementsByClass([note.Note, chord.Chord], returnStreamSubClass=False):
-                        if n.tie == None or n.tie.type == 'start':
-                            if includeChords == False:
-                                if len(n.pitches) == 1:
-                                    pitchList.append(n)
-                                    donechecking = False
-                                    numnotestodelete = 0
-                                    for i in range(0, len(pitchList)):
-                                        if donechecking == False:
-                                            activePitchList = pitchList[i:len(pitchList)]
-                                            if len(set([p.pitchClass for p in activePitchList])) == length:
-                                                listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(activePitchList), inputStream, p))
-#uncomment this line to get shortest            #numnotestodelete = numnotestodelete + 1                                                
-                                            elif len(set([p.pitchClass for p in activePitchList])) > length:
-                                                numnotestodelete = numnotestodelete + 1
-                                            else:
-                                                donechecking = True
-                                    for i in range(0, numnotestodelete):
-                                        totallength = totallength - len(pitchList[0].pitches)
-                                        pitchList.remove(pitchList[0])                                                 
-                                else:
-                                    pitchList = []                            
-                            else:
-                                pitchList.append(n)
-                                donechecking = False
-                                numnotestodelete = 0
-                                for i in range(0, len(pitchList)):
-                                    if donechecking == False:
-                                        activePitchList = pitchList[i:len(pitchList)]
-                                        activeseg = ContiguousSegmentOfNotes(list(activePitchList), inputStream, p)
-                                        if len(set(activeseg.readPitchClassesFromBottom())) >= length:
-                                            middleseg = ContiguousSegmentOfNotes(list(activePitchList[1:len(activePitchList)-1]), None, None)
-                                            middlePitchClassSet = set(middleseg.readPitchClassesFromBottom())
-                                            setToCheck = middlePitchClassSet.union([activePitchList[0].pitches[-1].pitchClass]).union([activePitchList[-1].pitches[0].pitchClass])
-                                            if len(setToCheck) <= length:
-                                                listOfContiguousSegments.append(activeseg)
-#uncomment this line to get shortest            #numnotestodelete = numnotestodelete + 1                                                
-                                            else:
-                                                numnotestodelete = numnotestodelete + 1                                                
-                                        else:
-                                            donechecking = True
-                                for i in range(0, numnotestodelete):
-                                    totallength = totallength - len(pitchList[0].pitches)
-                                    pitchList.remove(pitchList[0])
-                
-
-            else:
-                raise SerialException("Invalid repeated pitch setting.")
+                else:
+                    raise SerialException("Invalid repeated pitch setting.")
             
         
     return listOfContiguousSegments
@@ -3015,9 +2933,9 @@ def findMultisets(inputStream, searchList, reps='skipConsecutive', includeChords
                                     multiset = pcToToneRow(multiset).pitchClasses()
                                     if segment[0].pitches[-1].pitchClass in multiset:
                                         if segment[-1].pitches[0].pitchClass in multiset:
-                                            middleseg = ContiguousSegmentOfNotes(list(segment[1:len(segment)-1]), None, None)
-                                            # environLocal.warn("" + str(middleseg.startMeasureNumber))
-                                            listOfPitchClasses = middleseg.readPitchClassesFromBottom()
+                                            middleSegment = ContiguousSegmentOfNotes(list(segment[1:len(segment)-1]), None, None)
+                                            # environLocal.warn("" + str(middleSegment.startMeasureNumber))
+                                            listOfPitchClasses = middleSegment.readPitchClassesFromBottom()
                                             doneAddingFirst = False
                                             firstChordPitches = segment[0].pitches
                                             for j in range(1, len(firstChordPitches) + 1):
@@ -3244,9 +3162,9 @@ def findTransposedMultisets(inputStream, searchList, reps='skipConsecutive', inc
                                         multiset = pcToToneRow(multiset).pitchClasses()
                                         if segment[0].pitches[-1].pitchClass in multiset:
                                             if segment[-1].pitches[0].pitchClass in multiset:
-                                                middleseg = ContiguousSegmentOfNotes(
+                                                middleSegment = ContiguousSegmentOfNotes(
                                                     list(segment[1:len(segment)-1]), None, None)
-                                                listOfPitchClasses = middleseg.readPitchClassesFromBottom()
+                                                listOfPitchClasses = middleSegment.readPitchClassesFromBottom()
                                                 doneAddingFirst = False
                                                 firstChordPitches = segment[0].pitches
                                                 for j in range(1, len(firstChordPitches) + 1):
@@ -3464,8 +3382,8 @@ def findTransposedAndInvertedMultisets(inputStream, searchList,
                                         multiset = pcToToneRow(multiset).pitchClasses()
                                         if segment[0].pitches[-1].pitchClass in multiset:
                                             if segment[-1].pitches[0].pitchClass in multiset:
-                                                middleseg = ContiguousSegmentOfNotes(list(segment[1:len(segment)-1]), None, None)
-                                                listOfPitchClasses = middleseg.readPitchClassesFromBottom()
+                                                middleSegment = ContiguousSegmentOfNotes(list(segment[1:len(segment)-1]), None, None)
+                                                listOfPitchClasses = middleSegment.readPitchClassesFromBottom()
                                                 doneAddingFirst = False
                                                 firstChordPitches = segment[0].pitches
                                                 for j in range(1, len(firstChordPitches) + 1):
@@ -3537,8 +3455,8 @@ def findTransposedAndInvertedMultisets(inputStream, searchList,
                                         multiset = pcToToneRow(multiset).pitchClasses()
                                         if segment[0].pitches[-1].pitchClass in multiset:
                                             if segment[-1].pitches[0].pitchClass in multiset:
-                                                middleseg = ContiguousSegmentOfNotes(list(segment[1:len(segment)-1]), None, None)
-                                                listOfPitchClasses = middleseg.readPitchClassesFromBottom()
+                                                middleSegment = ContiguousSegmentOfNotes(list(segment[1:len(segment)-1]), None, None)
+                                                listOfPitchClasses = middleSegment.readPitchClassesFromBottom()
                                                 doneAddingFirst = False
                                                 firstChordPitches = segment[0].pitches
                                                 for j in range(1, len(firstChordPitches) + 1):
@@ -3948,8 +3866,8 @@ class Test(unittest.TestCase):
         aRow = getHistoricalRowByName('RowBergViolinConcerto')
         #aMatrix = aRow.matrix()
         bStream = stream.Stream()
-        for i in range(0,12,3):
-            aRow2 = aRow[i:i+3]
+        for i in range(0, 12, 3):
+            aRow2 = aRow[i:i + 3]
             c = chord.Chord(aRow2)
             c.addLyric(c.primeFormString)
             c.addLyric(c.forteClass)

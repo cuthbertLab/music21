@@ -149,6 +149,15 @@ def main(fnAccept=None):
                 break
         if rejectIt:
             continue
+        if fnAccept:
+            rejectIt = True
+            for acceptableName in fnAccept:
+                if acceptableName in fp:
+                    rejectIt = False
+                    break
+            if rejectIt:
+                continue
+
         acceptable.append(fp)
 
     cmdFile = cmd + acceptable
