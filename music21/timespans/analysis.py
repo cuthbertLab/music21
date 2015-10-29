@@ -52,7 +52,8 @@ class Horizontality(collections.Sequence):
         if not isinstance(timespans, collections.Sequence):
             raise HorizontalityException("timespans must be a sequence, not %r" % timespans)
         if len(timespans) == 0:
-            raise HorizontalityException("there must be at least one timespan in the timespans list")
+            raise HorizontalityException(
+                "there must be at least one timespan in the timespans list")
         if not all(hasattr(x, 'offset') and hasattr(x, 'endTime') for x in timespans):
             raise HorizontalityException("only Timespan objects can be added to a horizontality")
         self.timespans = tuple(timespans)

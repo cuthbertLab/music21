@@ -1091,7 +1091,9 @@ class MuseDataPart(object):
                 return int(raw)
 
     def _getAttributesRecord(self):
-        '''The attributes record is not in a fixed position, but is the first line that starts with a $.
+        '''
+        The attributes record is not in a fixed position, 
+        but is the first line that starts with a $.
 
         
         >>> import os

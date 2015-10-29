@@ -585,7 +585,8 @@ class GeneralNote(base.Music21Object):
             text = str(text)
         for lyric in self.lyrics[index:]:
             lyric.number += 1
-        self.lyrics.insert(index, Lyric(text, (index+ 1), applyRaw=applyRaw, identifier=identifier ))
+        self.lyrics.insert(index, Lyric(text, (index + 1), 
+                                        applyRaw=applyRaw, identifier=identifier))
 
     def hasLyrics(self):
         '''

@@ -1087,7 +1087,8 @@ def makeTupletBrackets(s, inPlace=False):
         elif len(tupletList) > 1:
             #for i in range(len(tuplets)):
             #    tupletMap.append([tuplets[i],dur])
-            environLocal.warn('got multi-tuplet duration; cannot yet handle this. %s' % repr(tupletList))
+            environLocal.warn('got multi-tuplet duration; cannot yet handle this. %s' % 
+                              repr(tupletList))
         elif len(tupletList) == 1:
             tupletMap.append([tupletList[0], dur])
             if tupletList[0] != dur.tuplets[0]:
@@ -1207,7 +1208,8 @@ def realizeOrnaments(s):
     <music21.stream.Measure 2 offset=4.0>
     <music21.note.Note D>
 
-    TODO: does not work for Gapful streams because it uses append rather than the offset of the original
+    TODO: does not work for Gapful streams because it uses append rather 
+    than the offset of the original
     '''
     newStream = s.cloneEmpty()
     newStream.offset = s.offset

@@ -11,8 +11,8 @@
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 
-from music21 import articulations, bar, chord, clef, dynamics, \
-    expressions, key, meter, note, pitch, spanner, stream, tempo, converter
+from music21 import articulations, bar, chord, clef, dynamics
+from music21 import expressions, key, meter, note, pitch, spanner, stream, tempo, converter
 import unittest
 
 
@@ -1725,7 +1725,8 @@ def example10_4():
     ⠼⠁⠀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠀⠐⠏⠄⠈⠉⠋⠩⠛⠩⠓⠊⠚⠡⠓⠀⠙⠑⠋⠻⠄⠈⠉⠛⠐
     ⠀⠀⠐⠋⠛⠓⠛⠋⠀⠟⠄⠣⠅
     """
-    bm = converter.parse("tinynotation: 12/8 e2.~ e8 f# g# a b- gn c d e f4.~ f8 e f g f e f2.").flat
+    bm = converter.parse(
+        "tinynotation: 12/8 e2.~ e8 f# g# a b- gn c d e f4.~ f8 e f g f e f2.").flat
     bm.insert(0, key.KeySignature(-1))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[1].notesAndRests[3].pitch.accidental.displayStatus = False
@@ -2678,7 +2679,8 @@ def example15_9():
     u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.example15_9(), inPlace=True, showFirstMeasureNumber=False))
+    >>> print(translate.partToBraille(test.example15_9(), 
+    ...                               inPlace=True, showFirstMeasureNumber=False))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠍⠨⠑⠙⠚⠽⠑⠋⠙⠀⠾⠙⠚⠊⠷⠿⠷⠍⠀⠨⠷⠛⠋⠑⠽⠍⠾⠮⠀⠗
     """

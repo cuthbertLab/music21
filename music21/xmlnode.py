@@ -358,7 +358,8 @@ class XMLNode(object):
                 match = True
                 break
         if not match:
-            raise XMLNodeException('this object (%r) does not have a "%s" (or %s) attribute' % (self, name, candidates))
+            raise XMLNodeException('this object (%r) does not have a "%s" (or %s) attribute' % 
+                                   (self, name, candidates))
         
     def get(self, name):
         '''
@@ -398,7 +399,8 @@ class XMLNode(object):
                 match = True
                 return fixBytes(getattr(self, candidate))
         if not match:
-            raise XMLNodeException('this object (%r) does not have a "%s" (or %r) attribute' % (self, name, candidate))
+            raise XMLNodeException('this object (%r) does not have a "%s" (or %r) attribute' % 
+                                   (self, name, candidate))
         
 
     def setDefaults(self):

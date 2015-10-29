@@ -566,8 +566,9 @@ class MetadataBundle(object):
                 metadataEntry = metadataBundle._metadataEntries[key]
             resultBundle._metadataEntries[key] = metadataEntry
             
-        resultBundle._metadataEntries = OrderedDict(sorted(list(resultBundle._metadataEntries.items()), 
-                                                        key=lambda mde: mde[1].sourcePath))
+        mdbItems = list(resultBundle._metadataEntries.items())
+        resultBundle._metadataEntries = OrderedDict(sorted(mdbItems, 
+                                                           key=lambda mde: mde[1].sourcePath))
         return resultBundle
 
     def _apply_set_predicate(self, metadataBundle, predicate):

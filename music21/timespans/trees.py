@@ -370,7 +370,7 @@ class ElementTree(core.AVLTree):
         try:
             endTimeLow = min(x.endTime for x in node.payload)
             endTimeHigh = max(x.endTime for x in node.payload)
-        except AttributeError: # elements do not have endTimes.  do NOT mix elements and timespans...
+        except AttributeError: # elements do not have endTimes. do NOT mix elements and timespans.
             endTimeLow = node.position + min(x.duration.quarterLength for x in node.payload)
             endTimeHigh = node.position + max(x.duration.quarterLength for x in node.payload)            
         if node.leftChild:

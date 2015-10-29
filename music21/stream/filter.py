@@ -296,7 +296,8 @@ class OffsetFilter(StreamFilter):
                 return False
 
         elementEnd = opFrac(offset + dur.quarterLength)
-        if elementEnd < self.offsetStart:  # anything that finishes before the span ends is definitely out
+        if elementEnd < self.offsetStart:  
+            # anything that finishes before the span ends is definitely out
             return False
 
         if dur.quarterLength == 0:
@@ -305,7 +306,8 @@ class OffsetFilter(StreamFilter):
             elementIsZeroLength = False
 
 
-        # all the simple cases done! Now need to filter out those that are border cases depending on settings
+        # all the simple cases done! Now need to filter out those that 
+        # are border cases depending on settings
 
         if self.zeroLengthSearch is True and elementIsZeroLength is True:
             # zero Length Searches -- include all zeroLengthElements
@@ -317,7 +319,8 @@ class OffsetFilter(StreamFilter):
                 #environLocal.warn([elementEnd, offsetEnd, e])
                 return False
             if self.includeEndBoundary is False:
-                # we include the end boundary if the search is zeroLength -- otherwise nothing can be retrieved
+                # we include the end boundary if the search is zeroLength -- 
+                # otherwise nothing can be retrieved
                 if elementEnd == self.offsetEnd:
                     return False
 

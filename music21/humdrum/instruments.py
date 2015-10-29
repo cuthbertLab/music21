@@ -208,7 +208,8 @@ humdrumInstruments = {
 'clest':    'Celesta', #; céleste (Fr.)
 ## dup *Iforte    fortepiano
 'hammd':    'ElectricOrgan', #Hammond electronic organ
-## dup *Iorgan    pipe organ; orgue (Fr.); Orgel (Ger.); organo (It.); organo (Span.); organum (Lat.)
+## dup *Iorgan    pipe organ; orgue (Fr.); Orgel (Ger.); 
+##                   organo (It.); organo (Span.); organum (Lat.)
 ## dup *Ipiano    pianoforte
 ## dup *Iporta    portative organ
 ## dup *Ireedo    reed organ
@@ -231,7 +232,8 @@ def fromHumdrumClass(hdclass):
         iObj = getattr(instrument, i)()
         return iObj
     except:
-        raise HumdrumInstrumentException('Cannot get an instrument from this humdrum class *IC%s' % hdclass)
+        raise HumdrumInstrumentException(
+            'Cannot get an instrument from this humdrum class *IC%s' % hdclass)
 
 def fromHumdrumInstrument(hdinst):
     '''
@@ -245,7 +247,8 @@ def fromHumdrumInstrument(hdinst):
         iObj = getattr(instrument, i)()
         return iObj
     except:
-        raise HumdrumInstrumentException('Cannot get an instrument from this humdrum class: *I%s' % hdinst)
+        raise HumdrumInstrumentException(
+            'Cannot get an instrument from this humdrum class: *I%s' % hdinst)
 
 
 class Test(unittest.TestCase):
@@ -272,7 +275,8 @@ class Test(unittest.TestCase):
         for x in c.recurse():
             if 'Instrument' in x.classes:
                 foundInstruments.append(str(x))
-        self.assertEqual(foundInstruments, ['Alto', 'Alto', 'Alto', 'Tenor', 'Alto', 'Bass', 'Tenor'])
+        self.assertEqual(foundInstruments, 
+                         ['Alto', 'Alto', 'Alto', 'Tenor', 'Alto', 'Bass', 'Tenor'])
         print(c.parts[1].flat.getInstrument())
 
 if __name__ == '__main__':

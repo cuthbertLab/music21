@@ -60,7 +60,8 @@ class StreamCoreMixin(object):
         
         Returns boolean if the Stream is now sorted.
         '''
-        #environLocal.printDebug(['_insertCore', 'self', self, 'offset', offset, 'element', element])
+        #environLocal.printDebug(['_insertCore', 'self', self, 
+        #    'offset', offset, 'element', element])
         # need to compare highest time before inserting the element in
         # the elements list
         storeSorted = False
@@ -200,7 +201,8 @@ class StreamCoreMixin(object):
 
 
     def _hasElementByObjectId(self, objId):
-        '''Return True if an element object id, provided as an argument, is contained in this Stream.
+        '''
+        Return True if an element object id, provided as an argument, is contained in this Stream.
 
         >>> s = stream.Stream()
         >>> n1 = note.Note('g')
@@ -262,7 +264,8 @@ class StreamCoreMixin(object):
         if element is self: # cannot add this Stream into itself
             raise StreamException("this Stream cannot be contained within itself")
         if checkRedundancy:
-            # TODO: might optimize this by storing a list of all obj ids with every insertion and deletion
+            # TODO: might optimize this by storing a list of all obj ids 
+            #   with every insertion and deletion
             idElement = id(element)
             if idElement in self._offsetDict:
                 # now go slow for safety -- maybe something is amiss in the index.
@@ -271,8 +274,9 @@ class StreamCoreMixin(object):
                 for eInStream in self:
                     if eInStream is element:
                         raise StreamException(
-                            'the object (%s, id()=%s) is already found in this Stream (%s, id()=%s)' % (
-                                                                    element, id(element), self, id(self)))
+                            'the object ' + 
+                            '(%s, id()=%s) is already found in this Stream (%s, id()=%s)' %
+                                                    (element, id(element), self, id(self)))
                 # something was old... delete from _offsetDict
                 # environLocal.warn('stale object')
                 del self._offsetDict[idElement]

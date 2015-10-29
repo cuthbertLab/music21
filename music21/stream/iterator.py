@@ -741,7 +741,8 @@ class StreamIterator(object):
         >>> out5 = list(st1.iter.getElementsByOffset(1, 2, includeEndBoundary=False))
         >>> len(out5)
         0
-        >>> out6 = list(st1.iter.getElementsByOffset(1, 2, includeEndBoundary=False, mustBeginInSpan=False))
+        >>> out6 = list(st1.iter.getElementsByOffset(1, 2, includeEndBoundary=False,
+        ...                                          mustBeginInSpan=False))
         >>> len(out6)
         1
         >>> out6[0].step
@@ -763,7 +764,8 @@ class StreamIterator(object):
 
         To change this behavior set includeElementsThatEndAtStart=False
 
-        >>> out9 = list(st1.iter.getElementsByOffset(2, 4, mustBeginInSpan=False, includeElementsThatEndAtStart=False))
+        >>> out9 = list(st1.iter.getElementsByOffset(2, 4, mustBeginInSpan=False, 
+        ...                                          includeElementsThatEndAtStart=False))
         >>> len(out9)
         1
         >>> [el.step for el in out9]
@@ -821,7 +823,8 @@ class StreamIterator(object):
         1
         >>> out3b[0].step
         'C'
-        >>> out3b = list(st1.iter.getElementsByOffset(1.0, 3.001, mustFinishInSpan=True, mustBeginInSpan=False))
+        >>> out3b = list(st1.iter.getElementsByOffset(1.0, 3.001, mustFinishInSpan=True, 
+        ...                                           mustBeginInSpan=False))
         >>> len(out3b)
         1
         >>> out3b[0].step
@@ -836,7 +839,8 @@ class StreamIterator(object):
         >>> out5 = list(st1.iter.getElementsByOffset(1.0, 2.0, includeEndBoundary=False))
         >>> len(out5)
         0
-        >>> out6 = list(st1.iter.getElementsByOffset(1.0, 2.0, includeEndBoundary=False, mustBeginInSpan=False))
+        >>> out6 = list(st1.iter.getElementsByOffset(1.0, 2.0, includeEndBoundary=False, 
+        ...                                          mustBeginInSpan=False))
         >>> len(out6)
         1
         >>> out6[0].step
@@ -957,7 +961,8 @@ class RecursiveIterator(StreamIterator):
     <music21.stream.Part Bass>
     ...
     
-    >>> hasExpressions = lambda el, i: True if (hasattr(el, 'expressions') and el.expressions) else False
+    >>> hasExpressions = lambda el, i: True if (hasattr(el, 'expressions') 
+    ...       and el.expressions) else False
     >>> expressive = b.recurse().addFilter(hasExpressions)
     >>> expressive
     <music21.stream.iterator.RecursiveIterator for Score:0x10487f550 @:0>

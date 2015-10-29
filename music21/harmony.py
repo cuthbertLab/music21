@@ -2000,7 +2000,8 @@ class ChordSymbol(Harmony):
          <music21.pitch.Pitch E3>, 
          <music21.pitch.Pitch G3>)
         '''
-        if self.chordStepModifications or self.chordKind: #there is no hope to determine the chord from pitches
+        if self.chordStepModifications or self.chordKind: 
+            #there is no hope to determine the chord from pitches
             # if it's been modified, so we'll just have to try this route....
             
             if self.root() == None:

@@ -1073,7 +1073,8 @@ class Verticality(base.Music21Object):
 
     def isConsonant(self):
         '''
-        evaluates whether this vertical slice moment is consonant or dissonant according to the common-practice
+        evaluates whether this vertical slice moment is consonant or dissonant 
+        according to the common-practice
         consonance rules. Method generates chord of all simultaneously sounding pitches, then calls
         :meth:`~music21.chord.isConsonant`
 
@@ -1926,7 +1927,8 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
             self.iLeft.isChromaticStep and self.iRight.isChromaticStep and 
             (self.iLeft.direction * self.iRight.direction ==  -1)))
 
-### Below: beginnings of an implementation for any object segments, such as two chord linear segments
+### Below: beginnings of an implementation for any object segments, 
+### such as two chord linear segments
 ### currently only used by theoryAnalyzer
 
 class NChordLinearSegmentException(exceptions21.Music21Exception):

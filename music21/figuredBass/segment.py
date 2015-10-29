@@ -718,7 +718,8 @@ class Segment(object):
         ['C5', 'G4', 'E4', 'C3']
         ['G5', 'G5', 'E5', 'C3']
         '''
-        self._singlePossibilityRuleChecking = _compileRules(self.singlePossibilityRules(self.fbRules))
+        self._singlePossibilityRuleChecking = _compileRules(
+                                                self.singlePossibilityRules(self.fbRules))
         allA = self.allSinglePossibilities()
         return [possibA for possibA in allA if self._isCorrectSinglePossibility(possibA)]
              

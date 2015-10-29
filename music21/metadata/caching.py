@@ -39,11 +39,9 @@ class MetadataCacheException(exceptions21.Music21Exception):
 #------------------------------------------------------------------------------
 
 
-def cacheMetadata(
-    corpusNames=('local', 'core', 'virtual'),
-    useMultiprocessing=True,
-    verbose=False
-    ):
+def cacheMetadata(corpusNames=('local', 'core', 'virtual'),
+                  useMultiprocessing=True,
+                  verbose=False):
     '''
     Cache metadata from corpora in `corpusNames` as local cache files:
 
@@ -66,15 +64,15 @@ def cacheMetadata(
     # virtual is on-line
     for corpusName in corpusNames:
         if corpusName == 'core':
-            metadataBundle = metadata.MetadataBundle.fromCoreCorpus()
+            metadataBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
             paths = corpus.getCorePaths()
             useCorpus = True
         elif corpusName == 'local':
-            metadataBundle = metadata.MetadataBundle.fromLocalCorpus()
+            metadataBundle = metadata.bundles.MetadataBundle.fromLocalCorpus()
             paths = corpus.getLocalPaths()
             useCorpus = False
         elif corpusName == 'virtual':
-            metadataBundle = metadata.MetadataBundle.fromVirtualCorpus()
+            metadataBundle = metadata.bundles.MetadataBundle.fromVirtualCorpus()
             paths = corpus.getVirtualPaths()
             useCorpus = False
         else:
@@ -148,7 +146,8 @@ class MetadataCachingJob(object):
         import gc
         self.results = []
         parsedObject = self.parseFilePath()
-        environLocal.printDebug('Got ParsedObject from {0}: {1}'.format(self.filePath, parsedObject))
+        environLocal.printDebug(
+            'Got ParsedObject from {0}: {1}'.format(self.filePath, parsedObject))
         if parsedObject is not None:
             if 'Opus' in parsedObject.classes:
                 self.parseOpus(parsedObject)
