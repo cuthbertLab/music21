@@ -33,9 +33,11 @@ When adding files here, update documentation.library.iterators
 __all__ = [ #dirs
            'analysis',  
            'counterpoint',
+           'search'
            'theoryAnalysis', 
            'trecento', 
            'webapps',
+           
            #files
            'chant', 
            'contour',
@@ -43,6 +45,7 @@ __all__ = [ #dirs
 
 from music21.alpha import analysis
 from music21.alpha import counterpoint
+from music21.alpha import search
 from music21.alpha import theoryAnalysis
 from music21.alpha import trecento
 from music21.alpha import webapps
