@@ -923,7 +923,8 @@ class Music21Object(object):
         '''
         return self.sites.getAttrByName(attr)
 
-    @common.deprecated("September 2015", "January 2016", "use self.sites.setAttrByName(attr, value)")
+    @common.deprecated("September 2015", "January 2016", 
+                       "use self.sites.setAttrByName(attr, value)")
     def setContextAttr(self, attrName, value):
         '''
         Given the name of an attribute, search Contexts and return
@@ -1033,7 +1034,8 @@ class Music21Object(object):
         return post
 
 
-    @common.deprecated('Summer 2015', 'Jan 2016', 'use self.sites.remove() instead and set activeSite manually.')
+    @common.deprecated('Summer 2015', 'Jan 2016', 
+                       'use self.sites.remove() instead and set activeSite manually.')
     def removeLocationBySite(self, site):
         '''
         DEPRECATED Jan 2016: use self.sites.remove() instead and set activeSite

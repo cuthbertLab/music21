@@ -119,8 +119,11 @@ def runningUnderIPython():
     (no tests, since will be different)
 
     This post:
-    http://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook
-    says not to do this, but really, I can't think of another way to have different output as default.
+    http://stackoverflow.com/questions/15411967/
+        how-can-i-check-if-code-is-executed-in-the-ipython-notebook
+    
+    says not to do this, but really, I can't think of another way 
+    to have different output as default.
     
     :rtype: bool
     '''

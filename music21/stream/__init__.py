@@ -3224,7 +3224,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> b.getElementsByClass('Measure')[0].notes[0] is a.parts[0].flat.notes[0]
         True
 
-        if gatherSpanners is True or the string 'all' then all spanners in the score are gathered and
+        if gatherSpanners is True or the string 'all' then all spanners in 
+        the score are gathered and
         included.  TODO: make True only return spanners from the region.
 
         if ignoreNumbers is True, then it ignores defined measureNumbers and 

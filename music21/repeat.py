@@ -450,8 +450,10 @@ def insertRepeatEnding(s, start, end, endingNumber=1, inPlace=False):
     
     measures = [ s.measure(i) for i in range(start, end+1) ]
     rb = spanner.RepeatBracket(measures, number=endingNumber)
-    rbOffset = measures[0].getOffsetBySite(s)   #adding repeat bracket to stream at beginning of repeated section.  
-                                                #Maybe better at end?
+    
+    #adding repeat bracket to stream at beginning of repeated section.  
+    #Maybe better at end?
+    rbOffset = measures[0].getOffsetBySite(s)   
     s.insert(rbOffset, rb)
     
     if inPlace is True:
@@ -938,7 +940,8 @@ class Expander(object):
             environLocal.printDebug(['start count not the same as end count: %s / %s' % (
                                                                     startCount, endCount)])
             return False
-        #environLocal.printDebug(['matched start and end repeat barline count of: %s/%s' % (startCount, endCount)])
+        #environLocal.printDebug(['matched start and end repeat barline count of: ', 
+        #    '%s/%s' % (startCount, endCount)])
         return True
 
 

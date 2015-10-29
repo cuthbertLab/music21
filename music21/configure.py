@@ -1152,10 +1152,12 @@ class AskAutoDownload(SelectFromList):
         if force is not None:
             return force
         else:
-            return ['Acknowledge these terms and allow music21 to aid in finding pieces in the corpus',
-            'Acknowledge these terms and block the virtual corpus',
-            'Do not agree to these terms and will not use music21 (agreeing to the terms of ' + 
-                 'the corpus is mandatory for using the system).']
+            return [
+                'Acknowledge these terms and allow music21 to aid in finding pieces in the corpus',
+                'Acknowledge these terms and block the virtual corpus',
+                'Do not agree to these terms and will not use music21 (agreeing to the terms of ' + 
+                    'the corpus is mandatory for using the system).'
+                 ]
 
     def _evaluateUserInput(self, raw):
         '''Evaluate the user's string entry after parsing; do not return None: 

@@ -180,7 +180,8 @@ class Beams(SlottedObject):
         )
 
     _DOC_ATTR = {
-        'feathered': 'Boolean determining if this is a feathered beam or not (does nothing for now).',
+        'feathered': 'Boolean determining if this is a feathered beam or not ' + 
+            '(does nothing for now).',
         }
 
     ### INITIALIZER ###

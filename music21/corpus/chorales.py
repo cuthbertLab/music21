@@ -510,7 +510,8 @@ class ChoraleListRKBWV(object):
 
     More fully:
 
-    >>> b = corpus.parse('bwv' + str(corpus.chorales.ChoraleListRKBWV().byRiemenschneider[2]['bwv']))
+    >>> theNumber = corpus.chorales.ChoraleListRKBWV().byRiemenschneider[2]['bwv']
+    >>> b = corpus.parse('bwv' + str(theNumber))
     >>> b
     <music21.stream.Score ...>
 

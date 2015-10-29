@@ -73,7 +73,8 @@ class Derivation(SlottedObject):
     >>> d1.method = 'manual'
     >>> d1.origin = s2
     >>> d1
-    <Derivation of <music21.stream.Stream DerivedStream> from <music21.stream.Stream OriginalStream> via "manual">
+    <Derivation of <music21.stream.Stream DerivedStream> from 
+        <music21.stream.Stream OriginalStream> via "manual">
     >>> d1.origin is s2
     True
 

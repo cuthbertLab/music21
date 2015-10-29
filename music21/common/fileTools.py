@@ -81,7 +81,8 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
     >>> f = open(c)
     >>> #_DOCS_SHOW data = f.read()
     Traceback (most recent call last):
-    UnicodeDecodeError: 'ascii' codec can't decode byte 0xc2 in position ...: ordinal not in range(128)
+    UnicodeDecodeError: 'ascii' codec can't decode byte 0xc2 in position ...: 
+        ordinal not in range(128)
 
     That won't do! now I know that it is in utf-8, but maybe you don't. Or it could
     be an old humdrum or Noteworthy file with unknown encoding.  This will load it safely.
@@ -142,7 +143,8 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
 #         newPath = fp
 #     if hasPIL:
 #         try: 
-#             from PIL import Image, ImageChops # overhead of reimporting is low compared to imageops
+#             from PIL import Image, ImageChops 
+#             # overhead of reimporting is low compared to imageops
 #         except ImportError:
 #             import Image, ImageChops
 #         imageObj = Image.open(fp)

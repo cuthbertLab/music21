@@ -83,8 +83,8 @@ def toUnicode(usrStr):
         else:
             return usrStr
     else:
-        # pylint: disable=undefined-variable
         try:
+            # pylint: disable=undefined-variable
             usrStr = unicode(usrStr, 'utf-8') # @UndefinedVariable  
         # some documentation may already be in unicode; if so, a TypeException will be raised
         except TypeError: #TypeError: decoding Unicode is not supported
