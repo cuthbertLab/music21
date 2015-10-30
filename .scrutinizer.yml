@@ -16,5 +16,3 @@ tools:
     pylint:
         python_version: 3     # Possible values: 2, 3
         config_file: '.pylintrc'
-
-timeout: 1800
