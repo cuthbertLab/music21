@@ -1227,28 +1227,11 @@ class ModuleDocumenter(ObjectDocumenter):
     ...     documenter.namesMapping.items())):
     ...     print("%s %s" % (reference, referent))
     ...
-    ContiguousSegmentOfNotes <....ClassDocumenter: music21.serial.ContiguousSegmentOfNotes>
     HistoricalTwelveToneRow <...ClassDocumenter: music21.serial.HistoricalTwelveToneRow>
     ToneRow <...ClassDocumenter: music21.serial.ToneRow>
     TwelveToneMatrix <...ClassDocumenter: music21.serial.TwelveToneMatrix>
     TwelveToneRow <...ClassDocumenter: music21.serial.TwelveToneRow>
-    findMultisets <...FunctionDocumenter: music21.serial.findMultisets>
-    findSegments <...FunctionDocumenter: music21.serial.findSegments>
-    findTransformedSegments <...FunctionDocumenter: music21.serial.findTransformedSegments>
-    findTransposedAndInvertedMultisets <...FunctionDocumenter: 
-        music21.serial.findTransposedAndInvertedMultisets>
-    findTransposedMultisets <...FunctionDocumenter: music21.serial.findTransposedMultisets>
-    findTransposedSegments <...FunctionDocumenter: music21.serial.findTransposedSegments>
-    getContiguousSegmentsOfLength <...FunctionDocumenter: 
-        music21.serial.getContiguousSegmentsOfLength>
     getHistoricalRowByName <...FunctionDocumenter: music21.serial.getHistoricalRowByName>
-    labelMultisets <...FunctionDocumenter: music21.serial.labelMultisets>
-    labelSegments <...FunctionDocumenter: music21.serial.labelSegments>
-    labelTransformedSegments <...FunctionDocumenter: music21.serial.labelTransformedSegments>
-    labelTransposedAndInvertedMultisets <...FunctionDocumenter: 
-        music21.serial.labelTransposedAndInvertedMultisets>
-    labelTransposedMultisets <...FunctionDocumenter: music21.serial.labelTransposedMultisets>
-    labelTransposedSegments <...FunctionDocumenter: music21.serial.labelTransposedSegments>
     pcToToneRow <...FunctionDocumenter: music21.serial.pcToToneRow>
     rowToMatrix <...FunctionDocumenter: music21.serial.rowToMatrix>
 
@@ -1347,7 +1330,6 @@ class ModuleDocumenter(ObjectDocumenter):
         >>> for classDocumenter in documenter.classDocumenters:
         ...     print(classDocumenter.referentPackagesystemPath)
         ...
-        music21.serial.ContiguousSegmentOfNotes
         music21.serial.HistoricalTwelveToneRow
         music21.serial.ToneRow
         music21.serial.TwelveToneMatrix
@@ -1380,20 +1362,7 @@ class ModuleDocumenter(ObjectDocumenter):
         >>> for functionDocumenter in documenter.functionDocumenters:
         ...     print(functionDocumenter.referentPackagesystemPath)
         ...
-        music21.serial.findMultisets
-        music21.serial.findSegments
-        music21.serial.findTransformedSegments
-        music21.serial.findTransposedAndInvertedMultisets
-        music21.serial.findTransposedMultisets
-        music21.serial.findTransposedSegments
-        music21.serial.getContiguousSegmentsOfLength
         music21.serial.getHistoricalRowByName
-        music21.serial.labelMultisets
-        music21.serial.labelSegments
-        music21.serial.labelTransformedSegments
-        music21.serial.labelTransposedAndInvertedMultisets
-        music21.serial.labelTransposedMultisets
-        music21.serial.labelTransposedSegments
         music21.serial.pcToToneRow
         music21.serial.rowToMatrix
 
