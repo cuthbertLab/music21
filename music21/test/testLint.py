@@ -126,7 +126,7 @@ def main(fnAccept=None):
            '--reports=n',
            '--max-branches=20',
            '-j ' + str(poolSize), # multiprocessing!
-           '--ignore-long-lines="converter\.parse"', # some tiny notation...
+           r'--ignore-long-lines="converter\.parse"', # some tiny notation...
            '--max-line-length=100', # tada
            ]
     for gn, gnv in goodnameRx.items():

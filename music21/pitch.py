@@ -77,11 +77,12 @@ accidentalNameToModifier = {
 
 # sort modifiers by length, from longest to shortest
 accidentalModifiersSorted = []
+i = 0
 for i in (4, 3, 2, 1):
     for sym in accidentalNameToModifier.values():
         if len(sym) == i:
             accidentalModifiersSorted.append(sym)
-
+del i
 
 #-------------------------------------------------------------------------------
 # utility functions
