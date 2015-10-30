@@ -477,9 +477,8 @@ class XMLNode(object):
 
         # if attributes are defined, add to tag
         for name, value in self._getAttributes():
-            if value in [None, '']: 
-                continue
-            node.setAttribute(name, str(value))
+            if value not in [None, '']: 
+                node.setAttribute(name, str(value))
 
         # if self.charData is defined, this is a text component of this tag
         if self.charData != None:

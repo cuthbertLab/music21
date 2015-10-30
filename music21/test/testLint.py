@@ -85,7 +85,7 @@ def main(fnAccept=None):
                 'redefined-builtin', # remove when Eclipse tags are parsed 
                             # @ReservedAssignment = pylint: disable=W0622
                 'fixme', # known...
-                'superfluous-parens', # next...
+                'superfluous-parens', # nope -- if they make things clearer...
                 'too-many-statements', # someday
                 'no-member', # important, but too many false positives
                 'too-many-arguments', # definitely! but takes too long to get a fix now...
@@ -95,7 +95,6 @@ def main(fnAccept=None):
                 'too-many-lines',    # yes, someday.
                 'bad-whitespace', # maybe later, but "bad" isn't something I necessarily agree with
                 'bad-continuation',  # never remove -- this is a good thing many times.
-                #'line-too-long',     # maybe later
                 'too-many-return-statements', # we'll see
                 'unpacking-non-sequence', # gets it wrong too often.
                 'too-many-instance-attributes', # maybe later
@@ -127,9 +126,10 @@ def main(fnAccept=None):
            '--max-args=7',  # should be 5 later, but baby steps
            '--bad-names="foo,shit,fuck,stuff"', # definitely allow "bar" for barlines
            '--reports=n',
+           '--max-branches=20',
            '-j ' + str(poolSize), # multiprocessing!
            '--ignore-long-lines="converter\.parse"', # some tiny notation...
-           '--max-line-length=100', # eventually at 100
+           '--max-line-length=100', # tada
            ]
     for gn, gnv in goodnameRx.items():
         cmd.append('--' + gn + '="' + gnv + '"')
