@@ -38,6 +38,7 @@ from music21.braille import text
 
 from music21.common import opFrac
 
+# pylint: disable=redefined-builtin
 try:  # gives Py2 the zip of Py3
     from future_builtins import zip
 except ImportError:

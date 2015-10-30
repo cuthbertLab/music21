@@ -392,6 +392,8 @@ class Corpus(object):
         from music21 import metadata
         return tuple(sorted(metadata.RichMetadata.searchAttributes))
 
+    # pylint: disable=redefined-builtin    
+
     @staticmethod
     def parse(
         workName,

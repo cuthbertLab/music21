@@ -833,6 +833,7 @@ class LilypondConverter(object):
         self.restoreContext()
         return lpSequentialMusic
 
+    # pylint: disable=redefined-builtin
     def lyPrefixCompositeMusicFromStream(self, streamIn, contextType=None, 
                                          type=None, beforeMatter=None): #@ReservedAssignment
         r'''

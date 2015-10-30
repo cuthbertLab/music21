@@ -63,7 +63,7 @@ class Tie(SlottedObject):
         )
 
     ### INITIALIZER ###
-
+    # pylint: disable=redefined-builtin
     def __init__(self, type='start'): #@ReservedAssignment
         #music21.Music21Object.__init__(self)
         if type not in ('start', 'stop', 'continue'):

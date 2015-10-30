@@ -17,7 +17,7 @@ StreamIterators are explicitly allowed to access private methods on streams.
 import unittest
 
 from music21 import common
-from music21.stream import filter
+from music21.stream import filter as streamFilter
 from music21.exceptions21 import StreamException
 
 from music21.ext import six
@@ -587,7 +587,7 @@ class StreamIterator(object):
         <music21.note.Rest rest>
         
         '''
-        self.addFilter(filter.ClassFilter(classFilterList))
+        self.addFilter(streamFilter.ClassFilter(classFilterList))
         return self
 
     def getElementsNotOfClass(self, classFilterList):
@@ -619,7 +619,7 @@ class StreamIterator(object):
         >>> len(found)
         25
         '''
-        self.addFilter(filter.ClassNotFilter(classFilterList))
+        self.addFilter(streamFilter.ClassNotFilter(classFilterList))
         return self
         
     def getElementsByGroup(self, groupFilterList):
@@ -647,7 +647,7 @@ class StreamIterator(object):
         D
         E
         '''        
-        self.addFilter(filter.GroupFilter(groupFilterList))
+        self.addFilter(streamFilter.GroupFilter(groupFilterList))
         return self
 
 
@@ -853,7 +853,7 @@ class StreamIterator(object):
 
         :rtype: StreamIterator
         '''        
-        self.addFilter(filter.OffsetFilter(offsetStart, offsetEnd, includeEndBoundary,
+        self.addFilter(streamFilter.OffsetFilter(offsetStart, offsetEnd, includeEndBoundary,
                                            mustFinishInSpan, mustBeginInSpan,
                                            includeElementsThatEndAtStart))
         return self
@@ -873,7 +873,7 @@ class StreamIterator(object):
         <music21.note.Note C>
         <music21.note.Note D>
         '''
-        self.addFilter(filter.ClassFilter('NotRest'))
+        self.addFilter(streamFilter.ClassFilter('NotRest'))
         return self
 
     @property
@@ -899,28 +899,28 @@ class StreamIterator(object):
         <music21.note.Note C>
         <music21.note.Note D>        
         '''
-        self.addFilter(filter.ClassFilter('GeneralNote'))
+        self.addFilter(streamFilter.ClassFilter('GeneralNote'))
         return self
 
     @property
     def parts(self):
-        self.addFilter(filter.ClassFilter('Part'))
+        self.addFilter(streamFilter.ClassFilter('Part'))
         return self
 
 
     @property
     def spanners(self):
-        self.addFilter(filter.ClassFilter('Spanner'))
+        self.addFilter(streamFilter.ClassFilter('Spanner'))
         return self
 
     @property
     def variants(self):
-        self.addFilter(filter.ClassFilter('Variant'))
+        self.addFilter(streamFilter.ClassFilter('Variant'))
         return self
 
     @property
     def voices(self):
-        self.addFilter(filter.ClassFilter('Voice'))
+        self.addFilter(streamFilter.ClassFilter('Voice'))
         return self
 
 #------------------------------------------------------------------------------
@@ -998,7 +998,7 @@ class RecursiveIterator(StreamIterator):
         self.returnSelf = includeSelf
         self.includeSelf = includeSelf
         if streamsOnly is True:
-            self.filters.append(filter.ClassFilter('Stream'))
+            self.filters.append(streamFilter.ClassFilter('Stream'))
         self.recursiveIterator = None
         # not yet used.
         #self.parentIterator = None

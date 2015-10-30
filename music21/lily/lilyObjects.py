@@ -1177,6 +1177,7 @@ class LyPrefixCompositeMusic(LyObject):
                        | relative_music
                        | re_rhythmed_music
     '''
+    # pylint: disable=redefined-builtin
     def __init__(self, type=None, genericPrefixMusicScm=None, #@ReservedAssignment
                  simpleString=None, optionalId=None, optionalContextMod=None,
                  music=None, fraction=None, repeatedMusic=None,

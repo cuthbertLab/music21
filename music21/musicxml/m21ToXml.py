@@ -10,7 +10,7 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
-Converters for music21 objects to musicxml.
+Converters for music21 objects to musicxml using ElementTree
 '''
 from __future__ import print_function, division
 
@@ -1630,6 +1630,7 @@ class ScoreExporter(XMLExporterBase):
         <supports attribute="new-page" element="print" type="yes" value="yes" />
         
         '''
+        # pylint: disable=redefined-builtin
         def getSupport(attribute, type, value, element): # @ReservedAssignment
             su = Element('supports')
             su.set('attribute', attribute)

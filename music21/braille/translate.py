@@ -7,7 +7,6 @@
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
-
 """
 Methods for exporting music21 data as braille.
 
@@ -92,6 +91,7 @@ from music21.ext import six
 import re
 import unittest
 
+# pylint: disable=redefined-builtin    
 if six.PY3:
     unicode = str # @ReservedAssignment
 

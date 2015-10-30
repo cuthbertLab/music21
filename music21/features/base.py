@@ -528,6 +528,7 @@ class DataInstance(object):
     (by stripping ties, etc.) and stores 
     multiple commonly-used stream representations once, providing rapid processing. 
     '''
+    # pylint: disable=redefined-builtin
     def __init__(self, streamObj=None, id=None): #@ReservedAssignment
         self.stream = streamObj
 
@@ -996,6 +997,7 @@ class DataSet(object):
             post.append(True)
         return post
 
+    # pylint: disable=redefined-builtin    
     def addData(self, dataOrStreamOrPath, classValue=None, id=None): #@ReservedAssignment
         '''Add a Stream, DataInstance, or path to a corpus or local file to this data set.
 
@@ -1131,7 +1133,7 @@ class DataSet(object):
         outputFormat = self._getOutputFormat(outputFmt)
         return outputFormat.getString()
 
-
+    # pylint: disable=redefined-builtin
     def write(self, fp=None, format=None, includeClassLabel=True): #@ReservedAssignment
         '''
         Set the output format object. 

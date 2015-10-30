@@ -104,6 +104,7 @@ class Edge(object):
     >>> e.direction
     'bi'
     '''
+    # pylint: disable=redefined-builtin
     def __init__(self, intervalData=None, id=None, # id is okay: @ReservedAssignment
                  direction=DIRECTION_BI): 
         if common.isStr(intervalData):
@@ -312,6 +313,8 @@ class Node(common.SlottedObject):
     or a request for a degree. 
     '''
     __slots__ = ('id', 'degree', 'weight')
+    
+    # pylint: disable=redefined-builtin
     def __init__(self, id=None, degree=None, weight=1.0): # id is okay: @ReservedAssignment
         # store id, either as string, such as terminusLow, or a number. 
         # ids are unique to any node in the network
@@ -979,7 +982,7 @@ class IntervalNetwork(object):
 
         return ((degree-1) % spanCount) + sMin
 
-    def _nodeNameToNodes(self, id,  # id is okay: @ReservedAssignment
+    def _nodeNameToNodes(self, nodeId,
                          equateTermini=True, permitDegreeModuli=True): 
         '''
         The `nodeName` parameter may be a :class:`~music21.scale.intervalNetwork.Node` object, 
@@ -1022,34 +1025,34 @@ class IntervalNetwork(object):
          <music21.scale.intervalNetwork.Node id='terminusHigh'>]
         '''
         # if a number, this is interpreted as a node degree
-        if common.isNum(id):
+        if common.isNum(nodeId):
             post = []
             nodeStep = self._getNodeDegreeDictionary(
                 equateTermini=equateTermini)
             for nId, nStep in nodeStep.items():
-                if id == nStep:
+                if nodeId == nStep:
                     post.append(self._nodes[nId])
             # if no matches, and moduli comparisons are permitted
             if post == [] and permitDegreeModuli:
                 for nId, nStep in nodeStep.items():
-                    if self._degreeModulus(id) == nStep:
+                    if self._degreeModulus(nodeId) == nStep:
                         post.append(self._nodes[nId])
             return post
-        elif common.isStr(id):
-            if id.lower() in ['terminuslow', 'low']:
+        elif common.isStr(nodeId):
+            if nodeId.lower() in ['terminuslow', 'low']:
                 return self._getTerminusLowNodes() # returns a list
-            elif id.lower() in ['terminushigh', 'high']:
+            elif nodeId.lower() in ['terminushigh', 'high']:
                 return self._getTerminusHighNodes()# returns a list
             else:
-                raise IntervalNetworkException('got a strin that has no match:', id)
-        elif isinstance(id, Node):
+                raise IntervalNetworkException('got a strin that has no match:', nodeId)
+        elif isinstance(nodeId, Node):
             # look for direct match     
             for nId in self._nodes:
                 n = self._nodes[nId]
-                if n is id: # could be a == comparison?
+                if n is nodeId: # could be a == comparison?
                     return [n] # return only one
         else: # match coords
-            raise IntervalNetworkException('cannot filter by: %s', id)
+            raise IntervalNetworkException('cannot filter by: %s', nodeId)
 
 
     def _getNext(self, nodeStart, direction):

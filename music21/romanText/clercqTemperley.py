@@ -38,6 +38,7 @@ environLocal = environment.Environment()
 try:
     FileNotFoundError
 except NameError: # python2
+    # pylint: disable=redefined-builtin    
     FileNotFoundError = IOError # @ReservedAssignment
 
 #clercqTemperley test files used as tests throughout this module

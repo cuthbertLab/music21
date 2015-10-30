@@ -1188,6 +1188,7 @@ def keys():
     return us.keys()
 
 
+# pylint: disable=redefined-builtin    
 def set(key, value):  # okay to override set here: @ReservedAssignment
     '''
     Directly set a single UserSettings key, by providing a key and the

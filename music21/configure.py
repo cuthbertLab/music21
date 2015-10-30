@@ -8,8 +8,6 @@
 # Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
-
 import os
 import re
 import time
@@ -34,6 +32,7 @@ try:
 except ImportError:
     from io import StringIO # python3 (also in python 2.6+)
 
+# pylint: disable=redefined-builtin
 try:
     input = raw_input # @ReservedAssignment @UndefinedVariable # pylint: disable=undefined-variable 
 except NameError:

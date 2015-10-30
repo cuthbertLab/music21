@@ -8,7 +8,6 @@
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 '''
 The features implemented here are based on those found in jSymbolic and 
 defined in Cory McKay's MA Thesis, "Automatic Genre Classification of MIDI Recordings"
@@ -3916,7 +3915,7 @@ extractorsById = OrderedDict( [
                   
                   ])
 
-def getExtractorByTypeAndNumber(type, number): #@ReservedAssignment
+def getExtractorByTypeAndNumber(extractorType, number):
     '''
     Typical usage:
     
@@ -4072,13 +4071,13 @@ def getExtractorByTypeAndNumber(type, number): #@ReservedAssignment
     T 20 VoiceSeparationFeature (not implemented)    
     '''   
     try:
-        return extractorsById[type][number]
+        return extractorsById[extractorType][number]
     except KeyError:
         raise JSymbolicFeatureException(                            
-            'Could not find any jSymbolic features of type %s' % (type))
+            'Could not find any jSymbolic features of type %s' % (extractorType))
     except IndexError:
         raise JSymbolicFeatureException(
-            'jSymbolic features of type %s do not have number %d' % (type, number))
+            'jSymbolic features of type %s do not have number %d' % (extractorType, number))
 
 
 

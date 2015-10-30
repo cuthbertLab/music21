@@ -30,9 +30,11 @@ from music21 import environment
 _MOD = "pitch.py"
 environLocal = environment.Environment(_MOD)
 
+
 try:
     basestring # @UndefinedVariable
 except NameError:
+    # pylint: disable=redefined-builtin
     basestring = str # @ReservedAssignment
 
 STEPREF = {

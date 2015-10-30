@@ -47,6 +47,7 @@ SpineParsing consists of several steps.
 * Measures are searched for elements with voice groups and Voice objects are created
 
 '''
+# pylint: disable=redefined-builtin
 #python3
 try:
     basestring # @UndefinedVariable

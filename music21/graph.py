@@ -2393,6 +2393,7 @@ class PlotStream(object):
             raise GraphException('cannot take log of x value: %s' %  x)
         #return pow(x, .5)
 
+    # pylint: disable=redefined-builtin
     def ticksQuarterLength(self, min=None, max=None, remap=True): #@ReservedAssignment
         '''
         Get ticks for quarterLength. 
