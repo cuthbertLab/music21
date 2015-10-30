@@ -10,9 +10,7 @@ filter:
         - music21/musicxml/xmlHandler.py
         - music21/xmlNode.py
 
-tools:
-    external_code_coverage:
-        timeout: 3600
-    pylint:
-        python_version: 3     # Possible values: 2, 3
-        config_file: '.pylintrc'
+#tools:
+#    pylint:
+#        python_version: 3     # Possible values: 2, 3
+#        config_file: '.pylintrc'
