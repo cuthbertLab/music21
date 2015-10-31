@@ -33,7 +33,7 @@ When adding files here, update documentation.library.iterators
 __all__ = [ #dirs
            'analysis',  
            'counterpoint',
-           'search'
+           'search',
            'theoryAnalysis', 
            'trecento', 
            'webapps',

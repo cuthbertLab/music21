@@ -30,7 +30,7 @@ _MOD = "counterpoint/species.py"
 environLocal = environment.Environment(_MOD)
 
 
-# pylint: disable:duplicate-code
+# pylint: disable=duplicate-code
 
 class ModalCounterpointException(exceptions21.Music21Exception):
     pass
