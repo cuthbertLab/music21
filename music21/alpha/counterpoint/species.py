@@ -30,7 +30,7 @@ _MOD = "counterpoint/species.py"
 environLocal = environment.Environment(_MOD)
 
 
-
+# pylint: disable:duplicate-code
 
 class ModalCounterpointException(exceptions21.Music21Exception):
     pass
@@ -88,7 +88,8 @@ class ModalCounterpoint(object):
         return numParallelFifths
 
     def findHiddenFifths(self, stream1, stream2):
-        '''Given two streams, returns the number of hidden fifths and also
+        '''
+        Given two streams, returns the number of hidden fifths and also
         assigns a flag under note.editorial.misc under "Hidden Fifth" for
         any note that has harmonic interval of a fifth where it creates a
         hidden parallel fifth. Note: a hidden fifth here is defined as anything
