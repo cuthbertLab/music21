@@ -43,6 +43,7 @@ class ModalCounterpoint(object):
         self.legalMelodicIntervals = ['P4', 'P5', 'P8', 'm2', 'M2', 'm3', 'M3', 'm6']
         self.legalMiddleHarmonicIntervals = ['P1', 'P4', 'P5', 'P8', 'm3', 'M3', 'm6', 'M6']
 
+    # pylint: disable=duplicate-code
     def findParallelFifths(self, srcStream, cmpStream):
         '''Given two streams, returns the number of parallel fifths and also
         assigns a flag under note.editorial.misc["Parallel Fifth"] for

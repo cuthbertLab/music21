@@ -99,22 +99,25 @@ def searchForNotes(notesStr):
             if thisCadence is None:
                 continue
             for i in range(len(thisCadence.parts)):
-                if searcher1.compareToStream(thisCadence.parts[i].flat) is True:
-                    notesStr = ""
-                    for thisNote in thisCadence.parts[i].flat.notesAndRests:
-                        #thisNote.editorial.color = "blue"
-                        if thisNote.isRest is False:
-                            notesStr += thisNote.nameWithOctave + " "
-                        else:
-                            notesStr += "r "
-                    streamOpus.insert(0, thisCadence)
+                colorFound(searcher1, thisCadence, streamOpus, thisWork, i)
+    if any(streamOpus):
+        streamOpus.show('lily.png')
+
+def colorFound(searcher1, thisCadence, streamOpus, thisWork, i):
+    if searcher1.compareToStream(thisCadence.parts[i].flat) is True:
+        notesStr = ""
+        for thisNote in thisCadence.parts[i].flat.notesAndRests:
+            #thisNote.editorial.color = "blue"
+            if thisNote.isRest is False:
+                notesStr += thisNote.nameWithOctave + " "
+            else:
+                notesStr += "r "
+        streamOpus.insert(0, thisCadence)
 #                    streamLily += "\\score {" + \
 #                            "<< \\time " + str(thisCadence.timeSig) + \
 #                            "\n \\new Staff {" + str(thisCadence.parts[i].lily) + "} >>" + \
 #                            thisCadence.header() + "\n}\n"
-                    print(u"In piece %r found in stream %d: %s" % (thisWork.title, i, notesStr))
-    if any(streamOpus):
-        streamOpus.show('lily.png')
+        print(u"In piece %r found in stream %d: %s" % (thisWork.title, i, notesStr))
 
 def searchForIntervals(notesStr):
     '''
@@ -147,20 +150,8 @@ def searchForIntervals(notesStr):
             if thisCadence is None:
                 continue
             for i in range(len(thisCadence.parts)):
-                if searcher1.compareToStream(thisCadence.parts[i].flat) is True:
-                    notesStr = ""
-                    for thisNote in thisCadence.parts[i].flat.notesAndRests:
-                        #thisNote.editorial.color = "blue"
-                        if thisNote.isRest is False:
-                            notesStr += thisNote.nameWithOctave + " "
-                        else:
-                            notesStr += "r "
-                    streamOpus.insert(0, thisCadence)
-#                    streamLily += "\\score {" + \
-#                            "<< \\time " + str(thisCadence.timeSig) + \
-#                            "\n \\new Staff {" + str(thisCadence.parts[i].lily) + "} >>" + \
-#                            thisCadence.header() + "\n}\n"
-                    print(u"In piece %r found in stream %d: %s" % (thisWork.title, i, notesStr))
+                colorFound(searcher1, thisCadence, streamOpus, thisWork, i)
+
     if any(streamOpus):
         streamOpus.show('lily.png')
 

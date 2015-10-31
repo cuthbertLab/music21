@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 __all__ = ['cadencebook', 'capua', 'findTrecentoFragments', 'notation', 'tonality']
- 
+
 # this is necessary to get these names available with a 
 # from music21 import * import statement
 import sys
