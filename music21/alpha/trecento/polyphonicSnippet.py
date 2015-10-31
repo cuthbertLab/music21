@@ -29,9 +29,12 @@ class PolyphonicSnippet(stream.Score):
     The fourth is the cadence type (optional), the fifth is the time signature 
     if not the same as the time signature of the parentPiece.
     
-    >>> cantus = alpha.trecento.trecentoCadence.CadenceConverter("6/8 c'2. d'8 c'4 a8 f4 f8 a4 c'4 c'8").parse().stream
+    >>> cantus = alpha.trecento.trecentoCadence.CadenceConverter(
+    ...         "6/8 c'2. d'8 c'4 a8 f4 f8 a4 c'4 c'8").parse().stream
     >>> tenor = alpha.trecento.trecentoCadence.CadenceConverter("6/8 F1. f2. e4. d").parse().stream
-    >>> ps = alpha.trecento.polyphonicSnippet.PolyphonicSnippet([cantus, tenor, None, "8-8", "6/8"], parentPiece = alpha.trecento.cadencebook.BallataSheet().makeWork(3))
+    >>> ps = alpha.trecento.polyphonicSnippet.PolyphonicSnippet(
+    ...         [cantus, tenor, None, "8-8", "6/8"], 
+    ...         parentPiece=alpha.trecento.cadencebook.BallataSheet().makeWork(3))
     >>> ps.elements
     (<music21.metadata.Metadata object at 0x...>, <music21.stream.Part C>, <music21.stream.Part T>)
 
@@ -81,6 +84,8 @@ class PolyphonicSnippet(stream.Score):
             self.cantus = fiveExcelCells[0]
             self.tenor  = fiveExcelCells[1]
             self.contratenor = fiveExcelCells[2]
+            
+            self.longestLineLength = 0
             
             if self.contratenor == "" or self.contratenor is None: 
                 self.contratenor = None
@@ -140,7 +145,8 @@ class PolyphonicSnippet(stream.Score):
                 if parentPiece.title:
                     headOut += parentPiece.title
                 if (parentPiece.pmfcVol and parentPiece.pmfcPageRange()):
-                    headOut += " PMFC " + str(parentPiece.pmfcVol) + " " + parentPiece.pmfcPageRange()
+                    headOut += " PMFC " + str(parentPiece.pmfcVol) + " " 
+                    headOut += parentPiece.pmfcPageRange()
                 return headOut
             else:
                 return ""
@@ -384,9 +390,11 @@ class TestExternal(unittest.TestCase):
         pass
     def testLily(self):
         from music21.alpha import trecento
-        cantus = trecento.trecentoCadence.CadenceConverter("6/8 c'2. d'8 c'4 a8 f4 f8 a4 c'4 c'8").parse().stream
+        cantus = trecento.trecentoCadence.CadenceConverter(
+                            "6/8 c'2. d'8 c'4 a8 f4 f8 a4 c'4 c'8").parse().stream
         tenor = trecento.trecentoCadence.CadenceConverter("6/8 F1. f2. e4. d").parse().stream
-        ps = PolyphonicSnippet([cantus, tenor, None, "8-8", "6/8"], parentPiece = trecento.cadencebook.BallataSheet().makeWork(3) )
+        ps = PolyphonicSnippet([cantus, tenor, None, "8-8", "6/8"], 
+                               parentPiece=trecento.cadencebook.BallataSheet().makeWork(3) )
         ps.show('musicxml.png')
 
 if __name__ == "__main__":

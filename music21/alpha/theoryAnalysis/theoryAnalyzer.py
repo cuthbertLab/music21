@@ -11,7 +11,6 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
-===========================================
 Module Introduction
 ===========================================
 
@@ -166,7 +165,6 @@ from music21 import chord
 from music21 import key
 from music21.alpha.theoryAnalysis import theoryResult
 
-import string
 import unittest
     
 from collections import defaultdict
@@ -236,7 +234,7 @@ def addAnalysisData(score):
 # The little pieces are all from voiceLeading.py, such as
 # Vertical Slices, VoiceLeadingQuartet, ThreeNoteLinearSegment, and VerticalityNTuplet       
     
-def getVerticalities(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest']):
+def getVerticalities(score, classFilterList=('Note', 'Chord', 'Harmony', 'Rest')):
     '''
     returns a list of :class:`~music21.voiceLeading.Verticality` objects in
     by parsing the score. Note that it uses the combined rhythm of the parts 
@@ -270,9 +268,12 @@ def getVerticalities(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest']
     >>> part4.append(chord.Chord(['A','B','C']))
     >>> sc4.insert(part4)
     >>> alpha.theoryAnalysis.theoryAnalyzer.getVerticalities(sc4)
-    [<music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.chord.Chord A B C>]})>, 
-     <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.chord.Chord A B C>]})>, 
-     <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.chord.Chord A B C>]})>]
+    [<music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, 
+             {0: [<music21.chord.Chord A B C>]})>, 
+     <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, 
+             {0: [<music21.chord.Chord A B C>]})>, 
+     <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, 
+             {0: [<music21.chord.Chord A B C>]})>]
 
     >>> sc3 = stream.Score()
     >>> p1 = stream.Part()
@@ -281,9 +282,12 @@ def getVerticalities(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest']
     >>> p1.append(harmony.ChordSymbol('E7', quarterLength = 4))
     >>> sc3.append(p1)
     >>> alpha.theoryAnalysis.theoryAnalyzer.getVerticalities(sc3)
-    [<music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.harmony.ChordSymbol C>]})>, 
-     <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.harmony.ChordSymbol D>]})>, 
-     <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, {0: [<music21.harmony.ChordSymbol E7>]})>]
+    [<music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, 
+             {0: [<music21.harmony.ChordSymbol C>]})>, 
+     <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, 
+             {0: [<music21.harmony.ChordSymbol D>]})>, 
+     <music21.voiceLeading.Verticality contentDict=defaultdict(<... 'list'>, 
+             {0: [<music21.harmony.ChordSymbol E7>]})>]
     '''   
     
     vsList = []
@@ -306,7 +310,8 @@ def getVerticalities(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest']
                 elementStream = part.flat.getElementsByOffset(c.offset, 
                                                               mustBeginInSpan=False, 
                                                               classList=classFilterList)
-                #el = part.flat.getElementAtOrBefore(c.offset,classList=['Note','Rest', 'Chord', 'Harmony'])
+                #el = part.flat.getElementAtOrBefore(c.offset,classList=[
+                #            'Note','Rest', 'Chord', 'Harmony'])
                 for el in elementStream.elements:
                     contentDict[partNum].append(el)    
                 partNum +=1
@@ -314,7 +319,8 @@ def getVerticalities(score, classFilterList=['Note', 'Chord', 'Harmony', 'Rest']
             elementStream = score.flat.getElementsByOffset(c.offset, 
                                                            mustBeginInSpan=False, 
                                                            classList=classFilterList)
-            #el = part.flat.getElementAtOrBefore(c.offset,classList=['Note','Rest', 'Chord', 'Harmony'])
+            #el = part.flat.getElementAtOrBefore(c.offset,
+            #            classList=['Note','Rest', 'Chord', 'Harmony'])
             for el in elementStream.elements:
                 contentDict[partNum].append(el)    
             partNum +=1
@@ -343,8 +349,14 @@ def getVLQs(score, partNum1, partNum2):
     >>> part1.append(note.Note('f5'))
     >>> sc.insert(part1)
     >>> alpha.theoryAnalysis.theoryAnalyzer.getVLQs(sc, 0, 1)
-    [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note C>, v1n2=<music21.note.Note G>, v2n1=<music21.note.Note D>, v2n2=<music21.note.Note E> >,
-     <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note G>, v1n2=<music21.note.Note C>, v2n1=<music21.note.Note E>, v2n2=<music21.note.Note F> >]
+    [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note C>, 
+                                               v1n2=<music21.note.Note G>, 
+                                               v2n1=<music21.note.Note D>, 
+                                               v2n2=<music21.note.Note E> >,
+     <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note G>, 
+                                               v1n2=<music21.note.Note C>, 
+                                               v2n1=<music21.note.Note E>, 
+                                               v2n2=<music21.note.Note F> >]
     >>> len(alpha.theoryAnalysis.theoryAnalyzer.getVLQs(sc, 0, 1))
     2
     '''
@@ -365,41 +377,41 @@ def getVLQs(score, partNum1, partNum2):
             #vlq.key = getKeyAtMeasure(score, vlq.v1n1.measureNumber)
         allVLQs.extend(vlqs)
     return allVLQs
-    # Caches the list of VLQs once they have been computed
-    # for a specified set of partNums
-    vlqCacheKey = str(partNum1) + "," + str(partNum2)
-
-    addAnalysisData(score)    
-    if 'vlqs' in score.analysisData and vlqCacheKey in score.analysisData['vlqs']:
-        return score.analysisData['vlqs'][vlqCacheKey]
-    
-    vlqList = []
-    
-    verticalities = getVerticalities(score)
-    
-    for (i, verticality) in enumerate(verticalities[:-1]):
-        nextVerticality = verticalities[i + 1]
-        
-        v1n1 = verticality.getObjectsByPart(partNum1, classFilterList=['Note'])
-        v1n2 = nextVerticality.getObjectsByPart(partNum1, classFilterList=['Note'])
-         
-        v2n1 = verticality.getObjectsByPart(partNum2, classFilterList=['Note'])
-        v2n2 = nextVerticality.getObjectsByPart(partNum2, classFilterList=['Note'])
-        
-        if v1n1 != None and v1n2 != None and v2n1 != None and v2n2 != None:
-            getKeyAtMeasure(score, v1n1.measureNumber)
-            
-            vlq = voiceLeading.VoiceLeadingQuartet(v1n1, v1n2, v2n1, v2n2, 
-                                                   key=getKeyAtMeasure(score, v1n1.measureNumber))
-            
-            vlqList.append(vlq)
-        
-    if 'vlqs' not in score.analysisData:
-        score.analysisData['vlqs'] = {vlqCacheKey: vlqList}
-    else:
-        score.analysisData['vlqs'][vlqCacheKey] = vlqList
- 
-    return vlqList
+#     # Caches the list of VLQs once they have been computed
+#     # for a specified set of partNums
+#     vlqCacheKey = str(partNum1) + "," + str(partNum2)
+# 
+#     addAnalysisData(score)    
+#     if 'vlqs' in score.analysisData and vlqCacheKey in score.analysisData['vlqs']:
+#         return score.analysisData['vlqs'][vlqCacheKey]
+#     
+#     vlqList = []
+#     
+#     verticalities = getVerticalities(score)
+#     
+#     for (i, verticality) in enumerate(verticalities[:-1]):
+#         nextVerticality = verticalities[i + 1]
+#         
+#         v1n1 = verticality.getObjectsByPart(partNum1, classFilterList=['Note'])
+#         v1n2 = nextVerticality.getObjectsByPart(partNum1, classFilterList=['Note'])
+#          
+#         v2n1 = verticality.getObjectsByPart(partNum2, classFilterList=['Note'])
+#         v2n2 = nextVerticality.getObjectsByPart(partNum2, classFilterList=['Note'])
+#         
+#         if v1n1 != None and v1n2 != None and v2n1 != None and v2n2 != None:
+#             getKeyAtMeasure(score, v1n1.measureNumber)
+#             
+#             vlq = voiceLeading.VoiceLeadingQuartet(v1n1, v1n2, v2n1, v2n2, 
+#                                                    key=getKeyAtMeasure(score, v1n1.measureNumber))
+#             
+#             vlqList.append(vlq)
+#         
+#     if 'vlqs' not in score.analysisData:
+#         score.analysisData['vlqs'] = {vlqCacheKey: vlqList}
+#     else:
+#         score.analysisData['vlqs'][vlqCacheKey] = vlqList
+#  
+#     return vlqList
     
 def getThreeNoteLinearSegments(score, partNum):
     '''
@@ -415,12 +427,15 @@ def getThreeNoteLinearSegments(score, partNum):
     >>> part0.append(note.Note('c6'))
     >>> sc.insert(part0)
     >>> alpha.theoryAnalysis.theoryAnalyzer.getThreeNoteLinearSegments(sc, 0)
-    [<music21.voiceLeading.ThreeNoteLinearSegment n1=<music21.note.Note C> n2=<music21.note.Note G> n3=<music21.note.Note C> >, 
-     <music21.voiceLeading.ThreeNoteLinearSegment n1=<music21.note.Note G> n2=<music21.note.Note C> n3=<music21.note.Note C> >]
+    [<music21.voiceLeading.ThreeNoteLinearSegment n1=<music21.note.Note C> 
+        n2=<music21.note.Note G> n3=<music21.note.Note C> >, 
+     <music21.voiceLeading.ThreeNoteLinearSegment n1=<music21.note.Note G> 
+        n2=<music21.note.Note C> n3=<music21.note.Note C> >]
     >>> len(alpha.theoryAnalysis.theoryAnalyzer.getThreeNoteLinearSegments(sc, 0))
     2
     >>> alpha.theoryAnalysis.theoryAnalyzer.getThreeNoteLinearSegments(sc, 0)[1]
-    <music21.voiceLeading.ThreeNoteLinearSegment n1=<music21.note.Note G> n2=<music21.note.Note C> n3=<music21.note.Note C> >
+    <music21.voiceLeading.ThreeNoteLinearSegment n1=<music21.note.Note G> 
+        n2=<music21.note.Note C> n3=<music21.note.Note C> >
     '''
     # Caches the list of TNLS once they have been computed
     # for a specified partNum
@@ -428,13 +443,16 @@ def getThreeNoteLinearSegments(score, partNum):
     tnlsCacheKey = str(partNum)
     addAnalysisData(score)
 
-    if 'ThreeNoteLinearSegments' in score.analysisData and tnlsCacheKey in score.analysisData['ThreeNoteLinearSegments']:
+    if ('ThreeNoteLinearSegments' in score.analysisData and 
+            tnlsCacheKey in score.analysisData['ThreeNoteLinearSegments']):
         return score.analysisData['ThreeNoteLinearSegments'][tnlsCacheKey]
     else:
         if 'ThreeNoteLinearSegments' not in score.analysisData:
-            score.analysisData['ThreeNoteLinearSegments'] = {tnlsCacheKey: getLinearSegments(score, partNum, 3, ['Note'])}
+            score.analysisData['ThreeNoteLinearSegments'] = {tnlsCacheKey: getLinearSegments(
+                                                                score, partNum, 3, ['Note'])}
         else:
-            score.analysisData['ThreeNoteLinearSegments'][tnlsCacheKey] = getLinearSegments(score, partNum, 3, ['Note'])
+            score.analysisData['ThreeNoteLinearSegments'][tnlsCacheKey] = getLinearSegments(
+                                                                score, partNum, 3, ['Note'])
     return score.analysisData['ThreeNoteLinearSegments'][tnlsCacheKey]
 
 def getLinearSegments(score, partNum, lengthLinearSegment, classFilterList=None):
@@ -455,8 +473,10 @@ def getLinearSegments(score, partNum, lengthLinearSegment, classFilterList=None)
     >>> len(alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc, 0,3, ['Note']))
     2
     >>> alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc, 0,3, ['Note'])
-    [<music21.voiceLeading.ThreeNoteLinearSegment n1=<music21.note.Note C> n2=<music21.note.Note G> n3=<music21.note.Note C> >,
-     <music21.voiceLeading.ThreeNoteLinearSegment n1=<music21.note.Note G> n2=<music21.note.Note C> n3=<music21.note.Note C> >]
+    [<music21.voiceLeading.ThreeNoteLinearSegment n1=<music21.note.Note C> 
+        n2=<music21.note.Note G> n3=<music21.note.Note C> >,
+     <music21.voiceLeading.ThreeNoteLinearSegment n1=<music21.note.Note G> 
+         n2=<music21.note.Note C> n3=<music21.note.Note C> >]
 
     >>> sc2 = stream.Score()
     >>> part1 = stream.Part()
@@ -466,9 +486,12 @@ def getLinearSegments(score, partNum, lengthLinearSegment, classFilterList=None)
     >>> part1.append(chord.Chord(['F','A','C']))
     >>> sc2.insert(part1)
     >>> alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc2, 0,2, ['Chord'])
-    [<music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.chord.Chord C E G>, <music21.chord.Chord G B D>]  >,
-     <music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.chord.Chord G B D>, <music21.chord.Chord E G C>]  >,
-     <music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.chord.Chord E G C>, <music21.chord.Chord F A C>]  >]
+    [<music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.chord.Chord C E G>, 
+        <music21.chord.Chord G B D>]  >,
+     <music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.chord.Chord G B D>, 
+         <music21.chord.Chord E G C>]  >,
+     <music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.chord.Chord E G C>, 
+         <music21.chord.Chord F A C>]  >]
     >>> len(alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc2, 0,2, ['Chord']))
     3
     >>> for x in alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc2, 0,2, ['Chord']):
@@ -486,8 +509,10 @@ def getLinearSegments(score, partNum, lengthLinearSegment, classFilterList=None)
     >>> len(alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc3, 0,2, ['Harmony']))
     2
     >>> alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc3,0,2, ['Harmony'])
-    [<music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.harmony.ChordSymbol D->, <music21.harmony.ChordSymbol C11>]  >,
-     <music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.harmony.ChordSymbol C11>, <music21.harmony.ChordSymbol C7>]  >]
+    [<music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.harmony.ChordSymbol D->, 
+        <music21.harmony.ChordSymbol C11>]  >,
+     <music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.harmony.ChordSymbol C11>, 
+         <music21.harmony.ChordSymbol C7>]  >]
     '''
     
     linearSegments = []
@@ -502,7 +527,8 @@ def getLinearSegments(score, partNum, lengthLinearSegment, classFilterList=None)
         if lengthLinearSegment == 3 and 'Note' in _getTypeOfAllObjects(objects):
             tnls = voiceLeading.ThreeNoteLinearSegment(objects[0], objects[1], objects[2])
             linearSegments.append(tnls)
-        elif lengthLinearSegment == 2 and ('Chord' in _getTypeOfAllObjects(objects)) and None not in objects:
+        elif (lengthLinearSegment == 2 and 
+                ('Chord' in _getTypeOfAllObjects(objects)) and None not in objects):
             tcls = voiceLeading.TwoChordLinearSegment(objects[0], objects[1])
             linearSegments.append(tcls)
         else:
@@ -720,20 +746,20 @@ def _updateScoreResultDict(score, dictKey, tr):
 # Analysis of the score occurs based on the little segments that the score 
 # can be divided up into. Each little segment has its own template from which the methods
 # can be tested. Each identify method accepts a long list of parameters, as indicated here:
-'''
-- partNum1 is the first part in the VLQ, partNum2 is the second
-- color is the color to mark the VLQ theory result object
-- dictKey is the dictionary key in the resultDict to assign the result objects found to
-- testFunction is the function to test (if not False is returned, a theory Result object is created)
-- textFunction is the function that returns the text as a string to be set as the 
-  theory result object's text parameter   
-- startIndex is the first VLQ in the list to start with (0 is default). endIndex 
-  is the first VLQ in list not to search (length of VLQ list is default), meaning default 
-  values are to search the entire vlqList
-- if editorialDictKey is specified, the elements in the VLQ as specified by editorialMarkList 
-  are assigned the editorialValue
 
-'''
+# - partNum1 is the first part in the VLQ, partNum2 is the second
+# - color is the color to mark the VLQ theory result object
+# - dictKey is the dictionary key in the resultDict to assign the result objects found to
+# - testFunction is the function to test (if not False is returned, 
+#   a theory Result object is created)
+# - textFunction is the function that returns the text as a string to be set as the 
+#   theory result object's text parameter   
+# - startIndex is the first VLQ in the list to start with (0 is default). endIndex 
+#   is the first VLQ in list not to search (length of VLQ list is default), meaning default 
+#   values are to search the entire vlqList
+# - if editorialDictKey is specified, the elements in the VLQ as specified by editorialMarkList 
+#   are assigned the editorialValue
+
 # Template for analysis based on VLQs   
 
 def _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction=None, 
@@ -911,12 +937,15 @@ def _identifyBasedOnThreeNoteLinearSegment(score, partNum, color, dictKey,
 #-------------------------------------------------------------------------------           
 # Theory Errors using VLQ template
 
-def identifyParallelFifths(score, partNum1=None, partNum2=None, color=None, dictKey='parallelFifths'):
+def identifyParallelFifths(score, partNum1=None, partNum2=None, color=None, 
+                           dictKey='parallelFifths'):
     '''
     
-    Identifies parallel fifths (calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.parallelFifth`) between 
+    Identifies parallel fifths (calls 
+    :meth:`~music21.voiceLeading.VoiceLeadingQuartet.parallelFifth`) between 
     two parts (if specified) or between all possible pairs of parts (if not specified) 
-    and stores the resulting list of VLQTheoryResult objects in ``score.analysisData['ResultDict']['parallelFifths']``. 
+    and stores the resulting list of VLQTheoryResult objects in 
+    ``score.analysisData['ResultDict']['parallelFifths']``. 
     Optionally, a color attribute may be specified to color all corresponding notes in the score.
     
     
@@ -945,14 +974,18 @@ def identifyParallelFifths(score, partNum1=None, partNum2=None, color=None, dict
     'Parallel fifth in measure 1: Part 1 moves from D to E while part 2 moves from G to A'
     '''
     testFunction = lambda vlq: vlq.parallelFifth()
-    textFunction = lambda vlq, pn1, pn2: "Parallel fifth in measure " + str(vlq.v1n1.measureNumber) +": "\
-                 + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
-                 + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
+    textFunction = lambda vlq, pn1, pn2: ("Parallel fifth in measure " + 
+                                          str(vlq.v1n1.measureNumber) +": "\
+                                          + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name 
+                                          + " to " + vlq.v1n2.name + " "\
+                                          + "while part " + str(pn2 + 1) + " moves from " + 
+                                          vlq.v2n1.name+ " to " + vlq.v2n2.name)
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey,testFunction,textFunction, color)
 
 def getParallelFifths(score, partNum1=None, partNum2=None):
     '''
-    Identifies all parallel fifths in score, or only the parallel fifths found between partNum1 and partNum2, and
+    Identifies all parallel fifths in score, or only the parallel fifths found between 
+    partNum1 and partNum2, and
     returns these as instances of :class:`~music21.voiceLeading.VoiceLeadingQuartet`
     
     
@@ -975,13 +1008,16 @@ def getParallelFifths(score, partNum1=None, partNum2=None):
     >>> sc.insert(part0)
     >>> sc.insert(part1)
     >>> alpha.theoryAnalysis.theoryAnalyzer.getParallelFifths(sc)
-    [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note D>, v1n2=<music21.note.Note E>, v2n1=<music21.note.Note G>, v2n2=<music21.note.Note A>  >, 
-     <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note E>, v1n2=<music21.note.Note G>, v2n1=<music21.note.Note A>, v2n2=<music21.note.Note C>  >]
+    [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note D>, 
+        v1n2=<music21.note.Note E>, v2n1=<music21.note.Note G>, v2n2=<music21.note.Note A>  >, 
+     <music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note E>, 
+        v1n2=<music21.note.Note G>, v2n1=<music21.note.Note A>, v2n2=<music21.note.Note C>  >]
     >>> len(sc.analysisData['ResultDict']['parallelFifths'])
     2
     '''
     testFunction = lambda vlq: vlq.parallelFifth()
-    _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey='parallelFifths', testFunction=testFunction)
+    _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey='parallelFifths', 
+                        testFunction=testFunction)
 
     if score.analysisData['ResultDict'] and 'parallelFifths' in score.analysisData['ResultDict']:
         return [tr.vlq for tr in score.analysisData['ResultDict']['parallelFifths']]
@@ -991,9 +1027,11 @@ def getParallelFifths(score, partNum1=None, partNum2=None):
 def identifyParallelOctaves(score, partNum1=None, partNum2=None, 
                             color=None, dictKey='parallelOctaves'):
     '''
-    Identifies parallel octaves (calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.parallelOctave`) between 
+    Identifies parallel octaves (calls 
+    :meth:`~music21.voiceLeading.VoiceLeadingQuartet.parallelOctave`) between 
     two parts (if specified) or between all possible pairs of parts (if not specified) 
-    and stores the resulting list of ``VLQTheoryResult`` objects in ``score.analysisData['ResultDict']['parallelOctaves']``. 
+    and stores the resulting list of ``VLQTheoryResult`` objects in 
+    ``score.analysisData['ResultDict']['parallelOctaves']``. 
     Optionally, a color attribute may be specified to color all corresponding notes in the score.
     
     
@@ -1019,9 +1057,12 @@ def identifyParallelOctaves(score, partNum1=None, partNum2=None,
     '''
     
     testFunction = lambda vlq: vlq.parallelOctave()
-    textFunction = lambda vlq, pn1, pn2: "Parallel octave in measure " + str(vlq.v1n1.measureNumber) +": "\
-                 + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
-                 + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
+    textFunction = lambda vlq, pn1, pn2: ("Parallel octave in measure " + 
+                                          str(vlq.v1n1.measureNumber) +": "\
+                                          + "Part " + str(pn1 + 1) + " moves from " + 
+                                          vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
+                                          + "while part " + str(pn2 + 1) + " moves from " + 
+                                          vlq.v2n1.name+ " to " + vlq.v2n2.name)
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color)
     
 def getParallelOctaves(score, partNum1=None, partNum2=None):    
@@ -1046,20 +1087,25 @@ def getParallelOctaves(score, partNum1=None, partNum2=None):
     >>> sc.insert(part0)
     >>> sc.insert(part1)
     >>> alpha.theoryAnalysis.theoryAnalyzer.getParallelOctaves(sc)
-    [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note C>, v1n2=<music21.note.Note G>, v2n1=<music21.note.Note C>, v2n2=<music21.note.Note G>  >]
+    [<music21.voiceLeading.VoiceLeadingQuartet v1n1=<music21.note.Note C>, 
+          v1n2=<music21.note.Note G>, v2n1=<music21.note.Note C>, v2n2=<music21.note.Note G>  >]
     '''
     testFunction = lambda vlq: vlq.parallelOctave()
-    _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey='parallelOctaves', testFunction=testFunction)
+    _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey='parallelOctaves', 
+                        testFunction=testFunction)
     if score.analysisData['ResultDict'] and 'parallelOctaves' in score.analysisData['ResultDict']:
         return [tr.vlq for tr in score.analysisData['ResultDict']['parallelOctaves']]
     else:
         return None
        
-def identifyParallelUnisons(score, partNum1=None, partNum2=None, color=None, dictKey='parallelUnisons'):
+def identifyParallelUnisons(score, partNum1=None, partNum2=None, color=None, 
+                            dictKey='parallelUnisons'):
     '''
-    Identifies parallel unisons (calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.parallelUnison`) between 
+    Identifies parallel unisons (calls 
+    :meth:`~music21.voiceLeading.VoiceLeadingQuartet.parallelUnison`) between 
     two parts (if specified) or between all possible pairs of parts (if not specified) 
-    and stores the resulting list of VLQTheoryResult objects in ``score.analysisData['ResultDict']['parallelUnisons']``. 
+    and stores the resulting list of VLQTheoryResult objects in 
+    ``score.analysisData['ResultDict']['parallelUnisons']``. 
     Optionally, a color attribute may be specified to color all corresponding notes in the score.
     
     
@@ -1091,14 +1137,18 @@ def identifyParallelUnisons(score, partNum1=None, partNum2=None, color=None, dic
     '''
     
     testFunction = lambda vlq: vlq.parallelUnison()
-    textFunction = lambda vlq, pn1, pn2: "Parallel unison in measure " + str(vlq.v1n1.measureNumber) +": "\
-                 + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
-                 + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
+    textFunction = lambda vlq, pn1, pn2: ("Parallel unison in measure " + 
+                                          str(vlq.v1n1.measureNumber) +": "\
+                                          + "Part " + str(pn1 + 1) + " moves from " + 
+                                          vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
+                                          + "while part " + str(pn2 + 1) + " moves from " + 
+                                          vlq.v2n1.name+ " to " + vlq.v2n2.name)
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color)
     
 def identifyHiddenFifths(score, partNum1=None, partNum2=None, color=None, dictKey='hiddenFifths'):
     '''
-    Identifies hidden fifths (calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.hiddenFifth`) between 
+    Identifies hidden fifths (calls 
+    :meth:`~music21.voiceLeading.VoiceLeadingQuartet.hiddenFifth`) between 
     two parts (if specified) or between all possible pairs of parts (if not specified) 
     and stores the resulting list of VLQTheoryResult objects in ``self.resultDict['hiddenFifths']``. 
     Optionally, a color attribute may be specified to color all corresponding notes in the score.
@@ -1126,16 +1176,22 @@ def identifyHiddenFifths(score, partNum1=None, partNum2=None, color=None, dictKe
     '''
     
     testFunction = lambda vlq: vlq.hiddenFifth()
-    textFunction = lambda vlq, pn1, pn2: "Hidden fifth in measure " + str(vlq.v1n1.measureNumber) +": "\
-                 + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
-                 + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
+    textFunction = lambda vlq, pn1, pn2: ("Hidden fifth in measure " + 
+                                          str(vlq.v1n1.measureNumber) +": "\
+                                          + "Part " + str(pn1 + 1) + " moves from " + 
+                                          vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
+                                          + "while part " + str(pn2 + 1) + " moves from " + 
+                                          vlq.v2n1.name+ " to " + vlq.v2n2.name)
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color)
     
-def identifyHiddenOctaves(score, partNum1 = None, partNum2 = None, color = None,dictKey = 'hiddenOctaves'):
+def identifyHiddenOctaves(score, partNum1 = None, partNum2 = None, color = None, 
+                          dictKey = 'hiddenOctaves'):
     '''
-    Identifies hidden octaves (calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.hiddenOctave`) between 
+    Identifies hidden octaves (calls 
+    :meth:`~music21.voiceLeading.VoiceLeadingQuartet.hiddenOctave`) between 
     two parts (if specified) or between all possible pairs of parts (if not specified) 
-    and stores the resulting list of VLQTheoryResult objects in ``score.analysisData['ResultDict']['hiddenOctaves']``. 
+    and stores the resulting list of VLQTheoryResult objects in 
+    ``score.analysisData['ResultDict']['hiddenOctaves']``. 
     Optionally, a color attribute may be specified to color all corresponding notes in the score.
     
     
@@ -1161,17 +1217,22 @@ def identifyHiddenOctaves(score, partNum1 = None, partNum2 = None, color = None,
     '''
     
     testFunction = lambda vlq: vlq.hiddenOctave()
-    textFunction = lambda vlq, pn1, pn2: "Hidden octave in measure " + str(vlq.v1n1.measureNumber) +": "\
-                 + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
-                 + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
+    textFunction = lambda vlq, pn1, pn2: ("Hidden octave in measure " + str(vlq.v1n1.measureNumber) 
+                                          +": "\
+                                          + "Part " + str(pn1 + 1) + " moves from " + 
+                                          vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
+                                          + "while part " + str(pn2 + 1) + " moves from " + 
+                                          vlq.v2n1.name + " to " + vlq.v2n2.name)
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color)
     
 def identifyImproperResolutions(score, partNum1 = None, partNum2 = None, color = None, 
-                                dictKey = 'improperResolution', editorialMarkList=[]):
+                                dictKey = 'improperResolution', editorialMarkList=None):
     '''
-    Identifies improper resolutions of dissonant intervals (calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.improperResolution`) 
+    Identifies improper resolutions of dissonant intervals (calls 
+    :meth:`~music21.voiceLeading.VoiceLeadingQuartet.improperResolution`) 
     between two parts (if specified) or between all possible pairs of parts (if not specified) 
-    and stores the resulting list of VLQTheoryResult objects in ``self.resultDict['improperResolution']``. 
+    and stores the resulting list of VLQTheoryResult objects in 
+    ``self.resultDict['improperResolution']``. 
     Optionally, a color attribute may be specified to color all corresponding notes in the score.
     
     
@@ -1193,14 +1254,21 @@ def identifyImproperResolutions(score, partNum1 = None, partNum2 = None, color =
     >>> len(sc.analysisData['ResultDict']['improperResolution'])
     1
     >>> sc.analysisData['ResultDict']['improperResolution'][0].text
-    'Improper resolution of Augmented Fourth in measure 1: Part 1 moves from F# to A while part 2 moves from C to B'
+    'Improper resolution of Augmented Fourth in measure 1: Part 1 moves from 
+        F# to A while part 2 moves from C to B'
 
     '''
+    if editorialMarkList is None:
+        editorialMarkList = []
     #TODO: incorporate Jose's resolution rules into this method (italian6, etc.)
     testFunction = lambda vlq: vlq.improperResolution()
-    textFunction = lambda vlq, pn1, pn2: "Improper resolution of " + vlq.vIntervals[0].simpleNiceName +" in measure " + str(vlq.v1n1.measureNumber) +": "\
-             + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
-             + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name + " to " + vlq.v2n2.name
+    textFunction = lambda vlq, pn1, pn2: ("Improper resolution of " + 
+                                          vlq.vIntervals[0].simpleNiceName +
+                                          " in measure " + str(vlq.v1n1.measureNumber) + ": " +
+                                          "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + 
+                                          " to " + vlq.v1n2.name + " " +
+                                          "while part " + str(pn2 + 1) + " moves from " + 
+                                          vlq.v2n1.name + " to " + vlq.v2n2.name)
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, 
                         textFunction, color, editorialDictKey='isImproperResolution', 
                         editorialValue=True, editorialMarkList=editorialMarkList)
@@ -1211,7 +1279,8 @@ def identifyLeapNotSetWithStep(score, partNum1 = None, partNum2 = None,
     Identifies a leap/skip in one voice not set with a step in the other voice 
     (calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.leapNotSetWithStep`) 
     between two parts (if specified) or between all possible pairs of parts (if not specified) 
-    and stores the resulting list of VLQTheoryResult objects in ``self.resultDict['leapNotSetWithStep']``. 
+    and stores the resulting list of VLQTheoryResult objects in `
+    `self.resultDict['leapNotSetWithStep']``. 
     Optionally, a color attribute may be specified to color all corresponding notes in the score.
     
     
@@ -1237,15 +1306,19 @@ def identifyLeapNotSetWithStep(score, partNum1 = None, partNum2 = None,
     '''
     
     testFunction = lambda vlq: vlq.leapNotSetWithStep()
-    textFunction = lambda vlq, pn1, pn2: "Leap not set with step in measure " + str(vlq.v1n1.measureNumber) +": "\
-             + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
-             + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name + " to " + vlq.v2n2.name
+    textFunction = lambda vlq, pn1, pn2: ("Leap not set with step in measure " + 
+                                          str(vlq.v1n1.measureNumber) +": "\
+                                          + "Part " + str(pn1 + 1) + " moves from " + 
+                                          vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
+                                          + "while part " + str(pn2 + 1) + " moves from " + 
+                                          vlq.v2n1.name + " to " + vlq.v2n2.name)
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color)
 
 def identifyOpensIncorrectly(score, partNum1=None, partNum2=None, 
                              color=None, dictKey = 'opensIncorrectly'):
     '''
-    Identifies if the piece opens correctly; calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.opensIncorrectly`
+    Identifies if the piece opens correctly; calls 
+    :meth:`~music21.voiceLeading.VoiceLeadingQuartet.opensIncorrectly`
     
     
 
@@ -1275,9 +1348,11 @@ def identifyOpensIncorrectly(score, partNum1=None, partNum2=None,
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, 
                         textFunction, color, startIndex = 0, endIndex = 1)
     
-def identifyClosesIncorrectly(score, partNum1 = None, partNum2 = None, color = None, dictKey = 'closesIncorrectly'):
+def identifyClosesIncorrectly(score, partNum1 = None, partNum2 = None, color = None, 
+                              dictKey = 'closesIncorrectly'):
     '''
-    Identifies if the piece closes correctly; calls :meth:`~music21.voiceLeading.VoiceLeadingQuartet.closesIncorrectly`
+    Identifies if the piece closes correctly; calls 
+    :meth:`~music21.voiceLeading.VoiceLeadingQuartet.closesIncorrectly`
     
     
 
@@ -1307,7 +1382,8 @@ def identifyClosesIncorrectly(score, partNum1 = None, partNum2 = None, color = N
     '''
     testFunction = lambda vlq: vlq.closesIncorrectly() 
     textFunction = lambda vlq, pn1, pn2: "Closing harmony is not in style"
-    _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color, startIndex=-1)    
+    _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, 
+                        color, startIndex=-1)    
 
 # Using the Vertical Slice N Tuplet Template
 
@@ -1315,11 +1391,14 @@ def identifyPassingTones(score, partNumToIdentify = None, color = None, dictKey 
                          unaccentedOnly=True, 
                          editorialDictKey=None, editorialValue=True):
     '''
-    Identifies the passing tones in the piece by looking at the vertical and horizontal cross-sections. Optionally
-    specify unaccentedOnly to identify only unaccented passing tones (passing tones on weak beats). unaccentedOnly
+    Identifies the passing tones in the piece by looking at the vertical and horizontal 
+    cross-sections. Optionally
+    specify unaccentedOnly to identify only unaccented passing tones (passing tones 
+    on weak beats). unaccentedOnly
     by default set to True
     
-    Optionally label each identified passing tone with an editorial :class:`~music21.editorial.NoteEditorial` value of 
+    Optionally label each identified passing tone with an editorial 
+    :class:`~music21.editorial.NoteEditorial` value of 
     editorialValue at ``note.editorial.misc[editorialDictKey]``
     
     
@@ -1351,8 +1430,11 @@ def identifyPassingTones(score, partNumToIdentify = None, color = None, dictKey 
     elif dictKey == None:
         dictKey = 'accentedPassingTones'
     testFunction = lambda vst, pn: vst.hasPassingTone(pn, unaccentedOnly)
-    textFunction = lambda vsnt, pn:  vsnt.tnlsDict[pn].n2.name + ' identified as a passing tone in part ' + str(pn+1)
-    _identifyBasedOnVerticalityNTuplet(score, partNumToIdentify, dictKey, testFunction, textFunction, color, editorialDictKey, editorialValue, editorialMarkDict={1:[partNumToIdentify]}, nTupletNum=3)
+    textFunction = lambda vsnt, pn: (vsnt.tnlsDict[pn].n2.name + 
+                                     ' identified as a passing tone in part ' + str(pn+1))
+    _identifyBasedOnVerticalityNTuplet(score, partNumToIdentify, dictKey, testFunction, 
+                                       textFunction, color, editorialDictKey, editorialValue, 
+                                       editorialMarkDict={1:[partNumToIdentify]}, nTupletNum=3)
 
 def getPassingTones(score, dictKey=None, partNumToIdentify=None, unaccentedOnly=True):
     '''
@@ -1384,15 +1466,18 @@ def getPassingTones(score, dictKey=None, partNumToIdentify=None, unaccentedOnly=
     elif dictKey == None:
         dictKey = 'accentedPassingTones'
     testFunction = lambda vst, pn: vst.hasPassingTone(pn, unaccentedOnly)
-    _identifyBasedOnVerticalityNTuplet(score, partNumToIdentify, dictKey=dictKey, testFunction=testFunction, nTupletNum=3)
+    _identifyBasedOnVerticalityNTuplet(score, partNumToIdentify, dictKey=dictKey, 
+                                       testFunction=testFunction, nTupletNum=3)
     if dictKey in score.analysisData['ResultDict']:
-        return [tr.vsnt.tnlsDict[tr.partNumIdentified].n2 for tr in score.analysisData['ResultDict'][dictKey]]
+        return [tr.vsnt.tnlsDict[tr.partNumIdentified].n2 for tr in 
+                    score.analysisData['ResultDict'][dictKey]]
     else:
         return None
 
 def getNeighborTones(score, dictKey=None, partNumToIdentify=None, unaccentedOnly=True):
     '''
-    returns a list of all passing tones present in the score, as identified by :meth:`~music21.voiceLeading.VerticalityTriplet.hasNeighborTone`
+    returns a list of all passing tones present in the score, as identified 
+    by :meth:`~music21.voiceLeading.VerticalityTriplet.hasNeighborTone`
     
     
 
@@ -1419,15 +1504,18 @@ def getNeighborTones(score, dictKey=None, partNumToIdentify=None, unaccentedOnly
     elif dictKey == None:
         dictKey = 'accentedNeighborTones'
     testFunction = lambda vst, pn: vst.hasNeighborTone(pn, unaccentedOnly)
-    _identifyBasedOnVerticalityNTuplet(score, partNumToIdentify, dictKey=dictKey, testFunction=testFunction, nTupletNum=3)
+    _identifyBasedOnVerticalityNTuplet(score, partNumToIdentify, dictKey=dictKey, 
+                                       testFunction=testFunction, nTupletNum=3)
     if dictKey in score.analysisData['ResultDict']:
-        return [tr.vsnt.tnlsDict[tr.partNumIdentified].n2 for tr in score.analysisData['ResultDict'][dictKey]]
+        return [tr.vsnt.tnlsDict[tr.partNumIdentified].n2 for tr in 
+                    score.analysisData['ResultDict'][dictKey]]
     else:
         return None
 
 def removePassingTones(score, dictKey='unaccentedPassingTones'):
     '''
-    primitively removes the passing tones found in a piece and fills the gap by extending note duraitons 
+    primitively removes the passing tones found in a piece and fills the gap by 
+    extending note duraitons 
     (method under development)
 
     
@@ -1468,7 +1556,8 @@ def removePassingTones(score, dictKey='unaccentedPassingTones'):
     
 def removeNeighborTones(score, dictKey='unaccentedNeighborTones'):
     '''
-    primitively removes the neighbor tones found in a piece and fills the gap by extending note duraitons 
+    primitively removes the neighbor tones found in a piece and fills the gap by 
+    extending note duraitons 
     (method under development)
     
     
@@ -1513,8 +1602,10 @@ def identifyNeighborTones(score, partNumToIdentify = None, color = None, dictKey
                           unaccentedOnly=True,
                           editorialDictKey='isNeighborTone', editorialValue=True):
     '''
-    Identifies the neighbor tones in the piece by looking at the vertical and horizontal cross-sections. Optionally
-    specify unaccentedOnly to identify only unaccented neighbor tones (neighbor tones on weak beats). unaccentedOnly
+    Identifies the neighbor tones in the piece by looking at the vertical and horizontal 
+    cross-sections. Optionally
+    specify unaccentedOnly to identify only unaccented neighbor tones (neighbor tones 
+    on weak beats). unaccentedOnly
     by default set to True
     
     
@@ -1546,15 +1637,19 @@ def identifyNeighborTones(score, partNumToIdentify = None, color = None, dictKey
         dictKey = 'accentedNeighborTones'
         
     testFunction = lambda vst, pn: vst.hasNeighborTone(pn, unaccentedOnly)
-    textFunction = lambda vsnt, pn:  vsnt.tnlsDict[pn].n2.name + ' identified as a neighbor tone in part ' + str(pn+1)
-    _identifyBasedOnVerticalityNTuplet(score, partNumToIdentify,  dictKey, testFunction, textFunction, color, editorialDictKey, editorialValue, editorialMarkDict={1:[partNumToIdentify]}, nTupletNum=3)
+    textFunction = lambda vsnt, pn: (vsnt.tnlsDict[pn].n2.name + 
+                                     ' identified as a neighbor tone in part ' + str(pn+1))
+    _identifyBasedOnVerticalityNTuplet(score, partNumToIdentify,  dictKey, testFunction, 
+                                       textFunction, color, editorialDictKey, editorialValue, 
+                                       editorialMarkDict={1:[partNumToIdentify]}, nTupletNum=3)
 
 def identifyDissonantHarmonicIntervals(score, partNum1 = None, partNum2 = None, color = None, 
                                        dictKey = 'dissonantHarmonicIntervals'):
     '''
     Identifies dissonant harmonic intervals (calls :meth:`~music21.interval.Interval.isConsonant`) 
     between the two parts (if specified) or between all possible pairs of parts (if not specified) 
-    and stores the resulting list of IntervalTheoryResultObject objects in ``self.resultDict['dissonantHarmonicIntervals']``. 
+    and stores the resulting list of IntervalTheoryResultObject objects in 
+    ``self.resultDict['dissonantHarmonicIntervals']``. 
     Optionally, a color attribute may be specified to color all corresponding notes in the score.
             
     
@@ -1580,18 +1675,25 @@ def identifyDissonantHarmonicIntervals(score, partNum1 = None, partNum2 = None, 
     >>> len(sc.analysisData['ResultDict']['dissonantHarmonicIntervals'])
     3
     >>> sc.analysisData['ResultDict']['dissonantHarmonicIntervals'][2].text
-    'Dissonant harmonic interval in measure 1: Augmented Fourth from F to B between part 1 and part 2'
+    'Dissonant harmonic interval in measure 1: Augmented Fourth 
+        from F to B between part 1 and part 2'
     '''
     testFunction = lambda hIntv: hIntv is not None and not hIntv.isConsonant()
-    textFunction = lambda hIntv, pn1, pn2: "Dissonant harmonic interval in measure " + str(hIntv.noteStart.measureNumber) +": " \
-                 + str(hIntv.simpleNiceName) + " from " + str(hIntv.noteStart.name) + " to " + str(hIntv.noteEnd.name) \
-                 + " between part " + str(pn1 + 1) + " and part " + str(pn2 + 1)
-    _identifyBasedOnHarmonicInterval(score, partNum1, partNum2, color, dictKey, testFunction, textFunction)
+    textFunction = lambda hIntv, pn1, pn2: ("Dissonant harmonic interval in measure " + 
+                                            str(hIntv.noteStart.measureNumber) +": " \
+                                            + str(hIntv.simpleNiceName) + " from " + 
+                                            str(hIntv.noteStart.name) + " to " + 
+                                            str(hIntv.noteEnd.name) \
+                                            + " between part " + str(pn1 + 1) + 
+                                            " and part " + str(pn2 + 1))
+    _identifyBasedOnHarmonicInterval(score, partNum1, partNum2, color, dictKey, testFunction, 
+                                     textFunction)
 
 def identifyImproperDissonantIntervals(score, partNum1 = None, partNum2 = None, color = None, 
                                        dictKey = 'improperDissonantIntervals', unaccentedOnly=True):
     '''
-    Identifies dissonant harmonic intervals that are not passing tones or neighbor tones or don't resolve correctly
+    Identifies dissonant harmonic intervals that are not passing tones or neighbor tones or 
+    don't resolve correctly
     
     
 
@@ -1616,33 +1718,39 @@ def identifyImproperDissonantIntervals(score, partNum1 = None, partNum2 = None, 
     >>> len(sc.analysisData['ResultDict']['improperDissonantIntervals'])
     2
     >>> sc.analysisData['ResultDict']['improperDissonantIntervals'][1].text
-    'Improper dissonant harmonic interval in measure 1: Perfect Fourth from C to F between part 1 and part 2'
+    'Improper dissonant harmonic interval in measure 1: Perfect Fourth from C to F 
+        between part 1 and part 2'
 
     '''
    
     if partNum1 == None or partNum2 == None:
         for (partNum1,partNum2) in getAllPartNumPairs(score):
-            identifyImproperDissonantIntervals(score, partNum1, partNum2, color, dictKey, unaccentedOnly)
+            identifyImproperDissonantIntervals(score, partNum1, partNum2, color, dictKey, 
+                                               unaccentedOnly)
     else:
         identifyDissonantHarmonicIntervals(score, partNum1, partNum2, dictKey='h1')
         identifyPassingTones(score, partNum1, dictKey='pt1', unaccentedOnly=unaccentedOnly)
         identifyPassingTones(score, partNum2, dictKey='pt2', unaccentedOnly=unaccentedOnly)
         identifyNeighborTones(score, partNum1, dictKey='nt1', unaccentedOnly=unaccentedOnly)
         identifyNeighborTones(score, partNum1, dictKey='nt2', unaccentedOnly=unaccentedOnly)
-        identifyImproperResolutions(score, partNum1, partNum2, dictKey='res', editorialMarkList=[1,2,3,4])
+        identifyImproperResolutions(score, partNum1, partNum2, dictKey='res', 
+                                    editorialMarkList=[1,2,3,4])
         if 'ResultDict' in score.analysisData and 'h1' in score.analysisData['ResultDict']:
             for resultTheoryObject in score.analysisData['ResultDict']['h1'] :
-                if  (resultTheoryObject.hasEditorial('isPassingTone', True) or 
-                     resultTheoryObject.hasEditorial('isNeigborTone', True)) or \
-                     not resultTheoryObject.hasEditorial('isImproperResolution', True):
+                if ((resultTheoryObject.hasEditorial('isPassingTone', True) or 
+                            resultTheoryObject.hasEditorial('isNeigborTone', True)) or
+                        not resultTheoryObject.hasEditorial('isImproperResolution', True)):
                     continue
                 else:
                     intv = resultTheoryObject.intv
                     tr = theoryResult.IntervalTheoryResult(intv)
                     #tr.value = valueFunction(hIntv)
-                    tr.text = "Improper dissonant harmonic interval in measure " + str(intv.noteStart.measureNumber) +": " \
-                     + str(intv.niceName) + " from " + str(intv.noteStart.name) + " to " + str(intv.noteEnd.name) \
-                     + " between part " + str(partNum1 + 1) + " and part " + str(partNum2 + 1)
+                    tr.text = ("Improper dissonant harmonic interval in measure " + 
+                               str(intv.noteStart.measureNumber) +": " \
+                               + str(intv.niceName) + " from " + str(intv.noteStart.name) + 
+                               " to " + str(intv.noteEnd.name) \
+                               + " between part " + str(partNum1 + 1) + 
+                               " and part " + str(partNum2 + 1))
                     if color is not None:
                         tr.color(color)
                     _updateScoreResultDict(score, dictKey, tr)
@@ -1681,81 +1789,110 @@ def identifyDissonantMelodicIntervals(score, partNum = None, color = None,
     'Dissonant melodic interval in part 2 measure 1: Diminished Fifth from D to A-'
 
     '''
-    testFunction = lambda mIntv: mIntv is not None and mIntv.simpleName in ["A2","A4","d5","m7","M7"]
-    textFunction = lambda mIntv, pn: "Dissonant melodic interval in part " + str(pn + 1) + " measure " + str(mIntv.noteStart.measureNumber) +": "\
-                 + str(mIntv.simpleNiceName) + " from " + str(mIntv.noteStart.name) + " to " + str(mIntv.noteEnd.name)
+    testFunction = lambda mIntv: mIntv is not None and mIntv.simpleName in [
+                                                                    "A2","A4","d5","m7","M7"]
+    textFunction = lambda mIntv, pn: ("Dissonant melodic interval in part " + str(pn + 1) + 
+                                      " measure " + str(mIntv.noteStart.measureNumber) +": "\
+                                      + str(mIntv.simpleNiceName) + " from " + 
+                                      str(mIntv.noteStart.name) + " to " + str(mIntv.noteEnd.name))
     _identifyBasedOnMelodicInterval(score, partNum, color, dictKey, testFunction, textFunction)                
 
 #-------------------------------------------------------------------------------           
-# Other Theory Properties to Identify (not specifically checking errors in a counterpoint assignment)
+# Other Theory Properties to Identify (not specifically checking errors 
+# in a counterpoint assignment)
 
 # Theory Properties using VLQ template - No doc tests needed
     
 def identifyObliqueMotion(score, partNum1 = None, partNum2 = None, color = None):
     dictKey = 'obliqueMotion'
     testFunction = lambda vlq: vlq.obliqueMotion()
-    textFunction = lambda vlq, pn1, pn2: "Oblique motion in measure " + str(vlq.v1n1.measureNumber) +": "\
-                 + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
-                 + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
+    textFunction = lambda vlq, pn1, pn2: ("Oblique motion in measure " + 
+                                          str(vlq.v1n1.measureNumber) +": "\
+                                          + "Part " + str(pn1 + 1) + " moves from " + 
+                                          vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
+                                          + "while part " + str(pn2 + 1) + " moves from " + 
+                                          vlq.v2n1.name+ " to " + vlq.v2n2.name)
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color)
     
 def identifySimilarMotion(score, partNum1 = None, partNum2 = None, color = None):
     dictKey = 'similarMotion'
     testFunction = lambda vlq: vlq.similarMotion()
-    textFunction = lambda vlq, pn1, pn2: "Similar motion in measure " + str(vlq.v1n1.measureNumber) +": "\
-                 + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
-                 + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
+    textFunction = lambda vlq, pn1, pn2: ("Similar motion in measure " + 
+                                          str(vlq.v1n1.measureNumber) +": "\
+                                          + "Part " + str(pn1 + 1) + " moves from " + 
+                                          vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
+                                          + "while part " + str(pn2 + 1) + " moves from " + 
+                                          vlq.v2n1.name+ " to " + vlq.v2n2.name)
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color)
     
 def identifyParallelMotion(score, partNum1 = None, partNum2 = None, color = None):
     dictKey = 'parallelMotion'
     testFunction = lambda vlq: vlq.parallelMotion()
-    textFunction = lambda vlq, pn1, pn2: "Parallel motion in measure " + str(vlq.v1n1.measureNumber) +": "\
-                 + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
-                 + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
+    textFunction = lambda vlq, pn1, pn2: ("Parallel motion in measure " + 
+                                          str(vlq.v1n1.measureNumber) +": "\
+                                          + "Part " + str(pn1 + 1) + " moves from " + 
+                                          vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
+                                          + "while part " + str(pn2 + 1) + " moves from " + 
+                                          vlq.v2n1.name+ " to " + vlq.v2n2.name)
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color)
     
 def identifyContraryMotion(score, partNum1 = None, partNum2 = None, color = None):
     dictKey = 'contraryMotion'
     testFunction = lambda vlq: vlq.contraryMotion()
-    textFunction = lambda vlq, pn1, pn2: "Contrary motion in measure " + str(vlq.v1n1.measureNumber) +": "\
-                 + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
-                 + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
+    textFunction = lambda vlq, pn1, pn2: ("Contrary motion in measure " + 
+                                          str(vlq.v1n1.measureNumber) + ": " +
+                                          "Part " + str(pn1 + 1) + " moves from " + 
+                                          vlq.v1n1.name + " to " + vlq.v1n2.name + " " +
+                                          "while part " + str(pn2 + 1) + " moves from " + 
+                                          vlq.v2n1.name+ " to " + vlq.v2n2.name)
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color)
     
 def identifyOutwardContraryMotion(score, partNum1 = None, partNum2 = None, color = None):
     dictKey = 'outwardContraryMotion'
     testFunction = lambda vlq: vlq.outwardContraryMotion()
-    textFunction = lambda vlq, pn1, pn2: "Outward contrary motion in measure " + str(vlq.v1n1.measureNumber) +": "\
-                 + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
-                 + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
+    textFunction = lambda vlq, pn1, pn2: ("Outward contrary motion in measure " + 
+                                          str(vlq.v1n1.measureNumber) + ": " +
+                                          "Part " + str(pn1 + 1) + " moves from " + 
+                                          vlq.v1n1.name + " to " + 
+                                          vlq.v1n2.name + " " +
+                                          "while part " + str(pn2 + 1) + " moves from " + 
+                                          vlq.v2n1.name+ " to " + vlq.v2n2.name)
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color)
     
 def identifyInwardContraryMotion(score, partNum1 = None, partNum2 = None, color = None):
     dictKey = 'inwardContraryMotion'
     testFunction = lambda vlq: vlq.inwardContraryMotion()
-    textFunction = lambda vlq, pn1, pn2: "Inward contrary motion in measure " + str(vlq.v1n1.measureNumber) +": "\
-                 + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
-                 + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
+    textFunction = lambda vlq, pn1, pn2: ("Inward contrary motion in measure " + 
+                                          str(vlq.v1n1.measureNumber) + ": " +
+                                          "Part " + str(pn1 + 1) + " moves from " + 
+                                          vlq.v1n1.name + " to " + vlq.v1n2.name + " " +
+                                          "while part " + str(pn2 + 1) + " moves from " + 
+                                          vlq.v2n1.name+ " to " + vlq.v2n2.name)
     _identifyBasedOnVLQ(score, partNum1, partNum2, color, dictKey, testFunction, textFunction)
     
 def identifyAntiParallelMotion(score, partNum1 = None, partNum2 = None, color = None):
     dictKey = 'antiParallelMotion'
     testFunction = lambda vlq: vlq.antiParallelMotion()
-    textFunction = lambda vlq, pn1, pn2: "Anti-parallel motion in measure " + str(vlq.v1n1.measureNumber) +": "\
-                 + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
-                 + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name
+    textFunction = lambda vlq, pn1, pn2: ("Anti-parallel motion in measure " + 
+                                        str(vlq.v1n1.measureNumber) +": " +
+                                        "Part " + str(pn1 + 1) + " moves from " + 
+                                        vlq.v1n1.name + " to " + vlq.v1n2.name + " " +
+                                        "while part " + str(pn2 + 1) + " moves from " + 
+                                        vlq.v2n1.name+ " to " + vlq.v2n2.name)
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color)
 
 # More Properties, not using VLQ template
 
-def identifyTonicAndDominantRomanNumerals(score, color = None, 
-                                          dictKey = 'romanNumeralsVandI', responseOffsetMap = []):
+def identifyTonicAndDominantRomanNumerals(score, color=None, 
+                                          dictKey='romanNumeralsVandI', responseOffsetMap=None):
     '''
     Identifies the roman numerals in the piece by iterating throgh the vertical slices and figuring
-    out which roman numeral best corresponds to that vertical slice. Optionally specify the responseOffsetMap
-    which limits the resultObjects returned to only those with ``verticality's.offset(leftAlign=True)`` included
-    in the list. For example, if only roman numerals were to be written for the vertical slice at offset 0, 6, and 7
+    out which roman numeral best corresponds to that vertical slice. Optionally 
+    specify the responseOffsetMap
+    which limits the resultObjects returned to only those with 
+    ``verticality's.offset(leftAlign=True)`` included
+    in the list. For example, if only roman numerals were to be written for the vertical 
+    slice at offset 0, 6, and 7
     in the piece, pass ``responseOffsetMap = [0,6,7]``
     
     >>> sc = stream.Score()
@@ -1781,6 +1918,8 @@ def identifyTonicAndDominantRomanNumerals(score, color = None,
     'Roman Numeral of B-,G is I'
     
     '''
+    if responseOffsetMap is None:
+        responseOffsetMap = []
     def testFunction(vs, score):
         noteList = vs.getObjectsByClass('Note')
         if not None in noteList:
@@ -1801,18 +1940,23 @@ def identifyTonicAndDominantRomanNumerals(score, color = None,
     _identifyBasedOnVerticality(score, color, dictKey, testFunction, textFunction, 
                                 responseOffsetMap=responseOffsetMap)                
 
-# TODO: improve this method...it's the beginnings of a harmonic analysis system for music21, but not developed well enough
-# for general use - it was used briefly as a proof-of-concept for some music theory homework assignments
+# TODO: improve this method...it's the beginnings of a harmonic analysis system for music21, 
+# but not developed well enough
+# for general use - it was used briefly as a proof-of-concept for some music theory 
+# homework assignments
 
 #
 #def identifyRomanNumerals(score, color = None, dictKey = 'romanNumerals', responseOffsetMap = []):
 #    '''
 #    Identifies the roman numerals in the piece by iterating throgh the vertical slices and figuring
-#    out which roman numeral best corresponds to that vertical slice. (calls :meth:`~music21.roman.romanNumeralFromChord`)
+#    out which roman numeral best corresponds to that vertical slice. 
+#    (calls :meth:`~music21.roman.romanNumeralFromChord`)
 #    
-#    Optionally specify the responseOffsetMap which limits the resultObjects returned to only those with 
+#    Optionally specify the responseOffsetMap which limits the resultObjects returned 
+#    to only those with 
 #    verticality's.offset(leftAlign=True) included in the list. For example, if only roman numerals
-#    were to be written for the vertical slice at offset 0, 6, and 7 in the piece, pass responseOffsetMap = [0,6,7]
+#    were to be written for the vertical slice at offset 0, 6, and 7 in the piece, pass 
+#    responseOffsetMap = [0,6,7]
 #    
 #    '''
 #    def testFunction(vs, score, responseOffsetMap=[]):
@@ -1833,15 +1977,18 @@ def identifyTonicAndDominantRomanNumerals(score, color = None,
 #            notes+= n.name + ','
 #        notes = notes[:-1]
 #        return "Roman Numeral of " + notes + ' is ' + rn
-#    _identifyBasedOnVerticality(score, color, dictKey, testFunction, textFunction, responseOffsetMap=responseOffsetMap)                
+#    _identifyBasedOnVerticality(score, color, dictKey, testFunction, textFunction, 
+#                responseOffsetMap=responseOffsetMap)                
     
 def identifyHarmonicIntervals(score, partNum1 = None, partNum2 = None, 
                               color = None, dictKey = 'harmonicIntervals'):
     '''
-    identify all the harmonic intervals in the score between partNum1 or partNum2, or if not specified ALL
+    identify all the harmonic intervals in the score between partNum1 or partNum2, or 
+    if not specified ALL
     possible combinations
     
-    :class:`~music21.alpha.theoryAnalysis.theoryAnalyzerIntervalTheoryResult` created with ``.value`` set to the string most commonly
+    :class:`~music21.alpha.theoryAnalysis.theoryAnalyzerIntervalTheoryResult` 
+    created with ``.value`` set to the string most commonly
     used to identify the interval (0 through 9, with A4 and d5)
 
     >>> sc = stream.Score()
@@ -1871,8 +2018,9 @@ def identifyHarmonicIntervals(score, partNum1 = None, partNum2 = None,
 
     '''
     testFunction = lambda hIntv: hIntv.generic.undirected if hIntv is not None else False
-    textFunction = lambda hIntv, pn1, pn2: "harmonic interval between " + hIntv.noteStart.name + ' and ' + hIntv.noteEnd.name + \
-                 ' between parts ' + str(pn1 + 1) + ' and ' + str(pn2 + 1) + ' is a ' + str(hIntv.niceName)
+    textFunction = lambda hIntv, pn1, pn2: ("harmonic interval between " + hIntv.noteStart.name + 
+                        ' and ' + hIntv.noteEnd.name + ' between parts ' + str(pn1 + 1) + 
+                        ' and ' + str(pn2 + 1) + ' is a ' + str(hIntv.niceName))
     def valueFunction(hIntv):
         augordimIntervals = ['A4','d5']
         if hIntv.simpleName in augordimIntervals:
@@ -1882,7 +2030,8 @@ def identifyHarmonicIntervals(score, partNum1 = None, partNum2 = None,
             while value > 9:
                 value -= 7
             return value
-    _identifyBasedOnHarmonicInterval(score, partNum1, partNum2, color, dictKey, testFunction, textFunction, valueFunction=valueFunction)
+    _identifyBasedOnHarmonicInterval(score, partNum1, partNum2, color, dictKey, 
+                                     testFunction, textFunction, valueFunction=valueFunction)
     
 def identifyScaleDegrees(score, partNum = None, color = None, dictKey = 'scaleDegrees'):
     '''
@@ -1915,18 +2064,24 @@ def identifyScaleDegrees(score, partNum = None, color = None, dictKey = 'scaleDe
     'scale degree of F# in part 1 is 7'
     '''
     
-    testFunction = lambda sc, n:  (str(getKeyAtMeasure(sc, n.measureNumber).getScale().getScaleDegreeFromPitch(n.pitch)) ) if n is not None else False
-    textFunction = lambda n, pn, scaleDegree: "scale degree of " + n.name + ' in part ' + str(pn+ 1) + ' is ' + str(scaleDegree) 
+    testFunction = lambda sc, n:  (str(getKeyAtMeasure(sc, 
+                                        n.measureNumber).getScale().getScaleDegreeFromPitch(
+                                            n.pitch)) ) if n is not None else False
+    textFunction = lambda n, pn, scaleDegree: ("scale degree of " + n.name + ' in part ' + 
+                                               str(pn+ 1) + ' is ' + str(scaleDegree))
     _identifyBasedOnNote(score, partNum, color, dictKey, testFunction, textFunction)
         
 def identifyMotionType(score, partNum1 = None, partNum2 = None, 
                        color = None, dictKey = 'motionType'):
     '''
-    Identifies the motion types in the score by analyzing each voice leading quartet between partNum1 and
+    Identifies the motion types in the score by analyzing each voice leading quartet 
+    between partNum1 and
     partNum2, or all possible voiceLeadingQuartets if not specified
     
-    :class:`~music21.theoryResult.VLQTheoryResult` by calling :meth:`~music21.voiceLeading.VoiceLeadingQuartet.motionType`
-    Possible values for VLQTheoryResult are 'Oblique', 'Parallel', 'Similar', 'Contrary', 'Anti-Parallel', 'No Motion'
+    :class:`~music21.theoryResult.VLQTheoryResult` by calling 
+    :meth:`~music21.voiceLeading.VoiceLeadingQuartet.motionType`
+    Possible values for VLQTheoryResult are 'Oblique', 'Parallel', 'Similar', 'Contrary', 
+    'Anti-Parallel', 'No Motion'
     
     
 
@@ -1957,9 +2112,13 @@ def identifyMotionType(score, partNum1 = None, partNum2 = None,
     '''
     
     testFunction = lambda vlq: vlq.motionType().value
-    textFunction = lambda vlq, pn1, pn2: (vlq.motionType().value + ' Motion in measure '+ str(vlq.v1n1.measureNumber) +": " \
-                 + "Part " + str(pn1 + 1) + " moves from " + vlq.v1n1.name + " to " + vlq.v1n2.name + " "\
-                 + "while part " + str(pn2 + 1) + " moves from " + vlq.v2n1.name+ " to " + vlq.v2n2.name)  if vlq.motionType() != "No Motion" else 'No motion'
+    textFunction = lambda vlq, pn1, pn2: (vlq.motionType().value + ' Motion in measure '+ 
+                                          str(vlq.v1n1.measureNumber) + ": " +
+                                          "Part " + str(pn1 + 1) + " moves from " + 
+                                          vlq.v1n1.name + " to " + vlq.v1n2.name + " " + 
+                                          "while part " + str(pn2 + 1) + " moves from " + 
+                                          vlq.v2n1.name+ " to " + vlq.v2n2.name) if (
+                                            vlq.motionType() != "No Motion") else 'No motion'
     _identifyBasedOnVLQ(score, partNum1, partNum2, dictKey, testFunction, textFunction, color)
     
 #-------------------------------------------------------------------------------
@@ -1983,7 +2142,8 @@ def identifyCommonPracticeErrors(score, partNum1=None, partNum2=None,
     identifyParallelUnisons(score, partNum1, partNum2, 'blue', dictKey)
     identifyImproperResolutions(score, partNum1, partNum2, 'purple', dictKey)
     #identifyLeapNotSetWithStep(score, partNum1, partNum2, 'white', dictKey)
-    identifyImproperDissonantIntervals(score, partNum1, partNum2, 'white', dictKey, unaccentedOnly = True)
+    identifyImproperDissonantIntervals(score, partNum1, partNum2, 'white', dictKey, 
+                                       unaccentedOnly = True)
     identifyDissonantMelodicIntervals(score, partNum1,'cyan', dictKey)  
     identifyOpensIncorrectly(score, partNum1, partNum2, 'brown', dictKey)
     identifyClosesIncorrectly(score, partNum1, partNum2, 'gray', dictKey)              
@@ -2044,14 +2204,17 @@ def getHTMLResultsString(score, typeList=None):
         if typeList is None or resultType in typeList:
             resultStr+="<b>"+resultType+"</B>: <br /><ul>"
             for result in score.analysisData['ResultDict'][resultType]:
-                resultStr += "<li style='color:"+result.currentColor+"'><b>"+result.text.sub(':',"</b>:<span style='color:black'>")+"</span></li>"
+                resultStr += ("<li style='color:" + result.currentColor + "'><b>" + 
+                              result.text.sub(':',"</b>:<span style='color:black'>") + 
+                              "</span></li>")
             resultStr += "</ul><br />"
             
     return resultStr
         
 def colorResults(score, color='red', typeList=None):
     '''
-    colors the notes of all results found in typeList by calling all identify methods on Theory Analyzer.
+    colors the notes of all results found in typeList by calling all identify 
+    methods on Theory Analyzer.
     '''
     addAnalysisData(score)
     for resultType in score.analysisData['ResultDict']:
@@ -2061,13 +2224,15 @@ def colorResults(score, color='red', typeList=None):
 
 def removeFromAnalysisData(score, dictKeys):  
     '''
-    remove a result entry or entries from the resultDict by specifying which key or keys in the dictionary
+    remove a result entry or entries from the resultDict by specifying which key or keys 
+    in the dictionary
     you'd like removed. Pass in a list of dictKeys or just a single dictionary key.
     
     
     >>> sc = stream.Score()
     >>> alpha.theoryAnalysis.theoryAnalyzer.addAnalysisData(sc)
-    >>> sc.analysisData['ResultDict'] = {'sampleDictKey': 'sample response', 'h1':'another sample response', '5':'third sample response'}
+    >>> sc.analysisData['ResultDict'] = {'sampleDictKey': 'sample response', 
+    ...        'h1':'another sample response', '5':'third sample response'}
     >>> alpha.theoryAnalysis.theoryAnalyzer.removeFromAnalysisData(sc, 'sampleDictKey')
     >>> for k in sorted(list(sc.analysisData['ResultDict'].keys())):
     ...     print("{0}\t{1}".format(k, sc.analysisData['ResultDict'][k]))
@@ -2078,19 +2243,22 @@ def removeFromAnalysisData(score, dictKeys):
     {}
     '''  
     addAnalysisData(score)
+    # pylint: disable=broad-except
     if isinstance(dictKeys, list):
         for dictKey in dictKeys:
             try:
                 del score.analysisData['ResultDict'][dictKey]
-            except:
+            except Exception:
                 pass
-                #raise TheoryAnalyzerException('got a dictKey to remove from resultDictionary that wasnt in the dictionary: %s', dictKey)
+                #raise TheoryAnalyzerException('got a dictKey to remove from 
+                #    resultDictionary that wasnt in the dictionary: %s', dictKey)
     else:
         try:
             del score.analysisData['ResultDict'][dictKeys] 
-        except:
+        except Exception:
             pass
-            #raise TheoryAnalyzerException('got a dictKey to remove from resultDictionary that wasn''t in the dictionary: %s', dictKeys)
+            #raise TheoryAnalyzerException('got a dictKey to remove from resultDictionary 
+            #    that wasn''t in the dictionary: %s', dictKeys)
 #        
 def getKeyMeasureMap(score):
     '''
@@ -2104,8 +2272,10 @@ def getKeyMeasureMap(score):
 
 def setKeyMeasureMap(score, keyMeasureMap):
     '''
-    easily specify the key of the score by measure in a dictionary correlating measure number to key, such as
-    {1:'C', 2:'D', 3:'B-',5:'g'}. optionally pass in the music21 key object or the key string. This is used
+    easily specify the key of the score by measure in a dictionary correlating measure number 
+    to key, such as
+    {1:'C', 2:'D', 3:'B-',5:'g'}. optionally pass in the music21 key object or the key string. 
+    This is used
     for analysis purposes only - no key object is actually added to the score.
     Check the music xml to verify measure numbers; pickup measures are usually 0.
     
@@ -2193,7 +2363,8 @@ class TestExternal(unittest.TestCase):
     
     def demo(self):
         from music21 import converter
-        sc = converter.parse('/Users/bhadley/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
+        sc = converter.parse(
+            '/Users/bhadley/Dropbox/Music21Theory/TestFiles/TheoryAnalyzer/TATest.xml')
         identifyCommonPracticeErrors(sc)
         
         #sc.show()
@@ -2204,10 +2375,6 @@ class TestExternal(unittest.TestCase):
         theoryAnalyzer.removePassingTones(p)
         theoryAnalyzer.removeNeighborTones(p)
         p.show()
-                
+        
 if __name__ == "__main__":
-    music21.mainTest(Test)
-
-    
-    
-    
+    music21.mainTest(Test)    

@@ -61,7 +61,7 @@ def main(fnAccept=None):
 
     fnPathReject = [
                     'demos/',
-                    'alpha/',
+                    'alpha/webapps/server',
                     'test/',
                     'mxObjects.py',
                     'fromMxObjects.py',

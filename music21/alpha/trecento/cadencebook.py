@@ -13,7 +13,6 @@ The file trecento/cadences.xls contains (in a modified TinyNotation format) inci
 and cadences for hundreds of trecento ballatas (in a sheet called "fischer_ballata")
 and several other works (sanctus, etc.).  This module contains methods and classes
 for working with this encoding, including transforming it into music21 Streams.
-
 '''
 
 import unittest
@@ -21,6 +20,7 @@ import re
 import os
 import copy
 
+from music21 import common
 from music21 import duration
 from music21 import expressions
 from music21 import metadata
@@ -56,14 +56,16 @@ class TrecentoSheet(object):
     sheetname = "fischer_caccia"
     
     def __init__(self, **keywords):
+        self.iterIndex = 2
         if ("filename" in keywords): 
             self.filename = keywords["filename"]
         if self.filename:
             try:
                 xbook = xlrd.open_workbook(self.filename)        
             except IOError:
-                import music21.alpha.trecento
-                xbook = xlrd.open_workbook(music21.alpha.trecento.__path__[0] + os.sep + self.filename)
+                xbook = xlrd.open_workbook(os.path.join(common.getSourceFilePath(), 
+                                                        'alpha', 'trecento',
+                                                        self.filename))
 
             
             if ("sheetname" in keywords): 
@@ -280,11 +282,14 @@ class TrecentoCadenceWork(object):
     
     contains the following attributes::
     
-        fisherNum     -- the work number assigned by Kurt von Fischer (only applies to pieces discovered before 1956)
+        fisherNum     -- the work number assigned by Kurt von Fischer 
+            (only applies to pieces discovered before 1956)
         title         -- may contain unicode characters
         composer      -- "." = anonymous
-        encodedVoices -- a string representing the number of voices, a period, then the number of texted voices
-        pmfcVol       -- the volume of Polyphonic Music of the Fourteenth Century where the piece might be found (if any)
+        encodedVoices -- a string representing the number of voices, a period, 
+            then the number of texted voices
+        pmfcVol       -- the volume of Polyphonic Music of the Fourteenth Century 
+            where the piece might be found (if any)
         pmfcPageStart -- the initial page number in that PMFC volume 
         pmfcPageEnd   -- the final page number
         timeSignBegin -- the starting time signature (as a string) for the piece
@@ -292,8 +297,10 @@ class TrecentoCadenceWork(object):
 
     attributes shared with all members of the class::
     
-        beginSnippetPositions -- a list of the excel spreadsheet columns in which an incipit of some section can be found. (default = [8])
-        endSnippetPositions   -- a list of the excel spreadsheet columns in which an cadence of some section can be found. (default = [])
+        beginSnippetPositions -- a list of the excel 
+            spreadsheet columns in which an incipit of some section can be found. (default = [8])
+        endSnippetPositions   -- a list of the excel 
+            spreadsheet columns in which an cadence of some section can be found. (default = [])
     
     OMIT_FROM_DOCS
     
@@ -309,7 +316,10 @@ class TrecentoCadenceWork(object):
         if rowvalues == None:
             rowvalues = ["", "", "", "", "", "", "", "", "", "", "", "", ""]
         if rowDescriptions == None:
-            rowDescriptions = ["Catalog Number", "Title", "Composer", "EncodedVoices", "PMFC/CMM Vol.", "PMFC Page Start", "PMFC Page End", "Time Signature Beginning", "Incipit C", "Incipit T", "Incipit Ct", "Incipit Type", "Notes"]
+            rowDescriptions = ["Catalog Number", "Title", "Composer", "EncodedVoices", 
+                               "PMFC/CMM Vol.", "PMFC Page Start", "PMFC Page End", 
+                               "Time Signature Beginning", "Incipit C", "Incipit T", 
+                               "Incipit Ct", "Incipit Type", "Notes"]
         self.rowvalues     = rowvalues
         self.rowDescriptions = rowDescriptions
         self.fischerNum    = rowvalues[0]
@@ -336,7 +346,7 @@ class TrecentoCadenceWork(object):
         if self.pmfcVol:
             try:
                 self.pmfcVol = int(self.pmfcVol)
-            except:
+            except ValueError:
                 self.pmfcVol = 0
         if self.pmfcPageStart:
             self.pmfcPageStart = int(self.pmfcPageStart)
@@ -383,13 +393,16 @@ class TrecentoCadenceWork(object):
         for thisSnippet in bs:
             if thisSnippet is None:
                 continue
-            if thisSnippet.tenor is None and thisSnippet.cantus is None and thisSnippet.contratenor is None:
+            if (thisSnippet.tenor is None and 
+                    thisSnippet.cantus is None and 
+                    thisSnippet.contratenor is None):
                 continue
             s = stream.Score()
             for dummy in range(self.totalVoices):
                 s.insert(0, stream.Part())
 
-            for partNumber, snippetPart in enumerate(thisSnippet.getElementsByClass('TrecentoCadenceStream')):
+            for partNumber, snippetPart in enumerate(
+                        thisSnippet.getElementsByClass('TrecentoCadenceStream')):
                 if thisSnippet.snippetName != "" and partNumber == self.totalVoices - 1:
                     textEx = expressions.TextExpression(thisSnippet.snippetName)
                     textEx.positionVertical = 'below'
@@ -450,7 +463,9 @@ class TrecentoCadenceWork(object):
         for thisSnippet in bs:
             if thisSnippet is None:
                 continue
-            if thisSnippet.tenor is None and thisSnippet.cantus is None and thisSnippet.contratenor is None:
+            if (thisSnippet.tenor is None and 
+                    thisSnippet.cantus is None and 
+                    thisSnippet.contratenor is None):
                 continue
             for partNumber, snippetPart in enumerate(thisSnippet.getElementsByClass('Stream')):
                 if thisSnippet.snippetName != "" and partNumber == self.totalVoices - 1:
@@ -539,15 +554,15 @@ class TrecentoCadenceWork(object):
             thisSnippet = self.getSnippetAtPosition(i, snippetType="begin")
             if thisSnippet is not None:
                 thisSnippet.snippetName = self.rowDescriptions[i]
-                thisSnippet.snippetName = re.sub('cad\b','cadence', thisSnippet.snippetName)
-                thisSnippet.snippetName = re.sub('\s*C$','', thisSnippet.snippetName)
+                thisSnippet.snippetName = re.sub(r'cad\b', 'cadence', thisSnippet.snippetName)
+                thisSnippet.snippetName = re.sub(r'\s*C$', '', thisSnippet.snippetName)
                 returnSnips.append(thisSnippet)
         for i in endSnippetPositions:
             thisSnippet = self.getSnippetAtPosition(i, snippetType="end")
             if thisSnippet is not None:
                 thisSnippet.snippetName = self.rowDescriptions[i]
-                thisSnippet.snippetName = re.sub('cad ','cadence ', thisSnippet.snippetName)
-                thisSnippet.snippetName = re.sub('\s*C$','', thisSnippet.snippetName)
+                thisSnippet.snippetName = re.sub('cad ', 'cadence ', thisSnippet.snippetName)
+                thisSnippet.snippetName = re.sub(r'\s*C$', '', thisSnippet.snippetName)
                 returnSnips.append(thisSnippet)
         return returnSnips
 
@@ -577,7 +592,8 @@ class TrecentoCadenceWork(object):
 
     def convertBlockToStreams(self, thisBlock):
         '''
-        Takes a block of music information (in :class:`~music21.alpha.trecento.trecentoCadence.TrecentoCadenceStream` notation)
+        Takes a block of music information (in 
+        :class:`~music21.alpha.trecento.trecentoCadence.TrecentoCadenceStream` notation)
         and returns a list of Streams and other information
         
         
@@ -615,11 +631,14 @@ class TrecentoCadenceWork(object):
             thisVoice = thisVoice.strip()
             if (thisVoice):
                 try:
-                    returnBlock[i] = trecentoCadence.CadenceConverter(currentTimeSig + " " + thisVoice).parse().stream
+                    returnBlock[i] = trecentoCadence.CadenceConverter(currentTimeSig + " " + 
+                                                                      thisVoice).parse().stream
                 except duration.DurationException as value:
-                    raise duration.DurationException("Problems in line %s: specifically %s" % (thisVoice,  value))
+                    raise duration.DurationException("Problems in line %s: specifically %s" % 
+                                                     (thisVoice,  value))
 #                except Exception, (value):
-#                    raise Exception("Unknown Problems in line %s: specifically %s" % (thisVoice,  value))
+#                    raise Exception("Unknown Problems in line %s: specifically %s" % 
+#                    (thisVoice,  value))
 
         return returnBlock
 

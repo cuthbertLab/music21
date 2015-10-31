@@ -12,11 +12,16 @@ from collections import defaultdict
 
 def getLandiniRandomStart(i):
     '''according to distribution of starting tenor notes of Landini cadences'''
-    if i < 16: return "A"
-    if i < 35: return "C"
-    if i < 67: return "D"
-    if i < 69: return "E"
-    if i < 85: return "F"
+    if i < 16: 
+        return "A"
+    if i < 35: 
+        return "C"
+    if i < 67: 
+        return "D"
+    if i < 69: 
+        return "E"
+    if i < 85: 
+        return "F"
     return "G"
 
 # def findsame(total = 1000):

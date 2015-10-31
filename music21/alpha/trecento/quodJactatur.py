@@ -60,19 +60,24 @@ import copy
 import unittest
 
 def reverse(self, inPlace = False, 
-                classesToMove = (key.KeySignature, meter.TimeSignature, clef.Clef, metadata.Metadata, instrument.Instrument, layout.SystemLayout), 
+                classesToMove = (key.KeySignature, meter.TimeSignature, clef.Clef, 
+                                 metadata.Metadata, instrument.Instrument, layout.SystemLayout), 
                 makeNotation = False,
                 ):
     '''
     synonym: retrograde()
     
-    reverse the order of stream members both in the .elements list but also by offset, so that the piece
-    sounds properly backwards.  Automatically sorts the stream as well.  If inPlace is True (no by default)
-    the elements are reversed in the current stream.  if inPlace is False then a new stream is returned.
+    reverse the order of stream members both in the .elements list but also by offset, 
+    so that the piece
+    sounds properly backwards.  Automatically sorts the stream as well.  
+    If inPlace is True (no by default)
+    the elements are reversed in the current stream.  
+    if inPlace is False then a new stream is returned.
     
-    all elements of class classesToMove get moved to their current end locations before being reversed.  
-    This puts the clefs, TimeSignatures, etc. in their proper locations.  (THIS DOES NOT YET WORK)
-    
+    all elements of class classesToMove get moved to their current end 
+    locations before being reversed.  
+    This puts the clefs, TimeSignatures, etc. in their proper locations. 
+    (THIS DOES NOT YET WORK)
     '''
     highestTime = self.highestTime
     
@@ -116,7 +121,7 @@ def reverse(self, inPlace = False,
     else:
         return returnObj
 
-def prependBlankMeasures(myStream, measuresToAppend = 1, inPlace = True):
+def prependBlankMeasures(myStream, measuresToAppend=1, inPlace=True):
     '''
     adds one (default) or more blank measures (filled with
     rests) to be beginning of myStream
@@ -137,9 +142,9 @@ def prependBlankMeasures(myStream, measuresToAppend = 1, inPlace = True):
     <music21.note.Rest rest>
     >>> len(qj2.getElementsByClass(stream.Measure))
     45
-    '''
-    
-    measureDuration = myStream.flat.getElementsByClass(meter.TimeSignature)[0].barDuration.quarterLength
+    '''    
+    measureDuration = myStream.flat.getElementsByClass(meter.TimeSignature
+                                        )[0].barDuration.quarterLength
     
     if inPlace == True:
         ms = myStream
@@ -172,7 +177,8 @@ def transposeStreamDiatonic(myStream, diatonicInterval = 1):
                 n.pitch.name = n.pitch.step
                 n.pitch.accidental = None
                 
-#            n.pitch.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.pitch.step)
+#            n.pitch.accidental = n.getContextByClass(key.KeySignature
+#                ).accidentalByStep(n.pitch.step)
     return myStream    
 
 
@@ -391,31 +397,77 @@ def multipleSolve():
                             for lowestInvert in [False, True]:
                                 for middleInvert in [False, True]:
                                     for highestInvert in [False, True]:
-                                        if lowestInvert is True and middleInvert is True and highestInvert is True:
+                                        if (lowestInvert is True and 
+                                                middleInvert is True and 
+                                                highestInvert is True):
                                             continue  # very low probability
                                         for lowestRetro in [False, True]:
                                             for middleRetro in [False, True]:
                                                 for highestRetro in [False, True]:
-                                                    if lowestRetro is True and middleRetro is True and highestRetro is True:
+                                                    if (lowestRetro is True and 
+                                                            middleRetro is True and 
+                                                            highestRetro is True):
                                                         continue
-                                                    if ((delayLowest == delayMiddle and lowestInvert == middleInvert and lowestRetro == middleRetro) or
-                                                        (delayLowest == delayHighest and lowestInvert == highestInvert and lowestRetro == highestRetro) or
-                                                        (delayMiddle == delayHighest and middleInvert == highestInvert and middleRetro == highestRetro)):
-                                                            continue # no continuous parallel motion            
-                                                    if (transLowest == transMiddle and delayLowest == delayMiddle and lowestRetro == False and middleRetro == True):
-                                                        continue # same as lowestRetro == True and middleRetro == False
-                                                    if (transLowest == transMiddle and delayLowest == delayMiddle and lowestInvert == False and middleInvert == True):
-                                                        continue # same as lowestInvert == True and middleInvert == False
+                                                    if ((delayLowest == delayMiddle and 
+                                                            lowestInvert == middleInvert and 
+                                                            lowestRetro == middleRetro) or
+                                                        (delayLowest == delayHighest and 
+                                                            lowestInvert == highestInvert and 
+                                                            lowestRetro == highestRetro) or
+                                                        (delayMiddle == delayHighest and 
+                                                            middleInvert == highestInvert and 
+                                                            middleRetro == highestRetro)):
+                                                        continue # no continuous parallel motion            
+                                                    if (transLowest == transMiddle and 
+                                                            delayLowest == delayMiddle and 
+                                                            lowestRetro == False and 
+                                                            middleRetro == True):
+                                                        continue 
+                                                        # same as lowestRetro == True and 
+                                                        #    middleRetro == False
+                                                    if (transLowest == transMiddle and 
+                                                            delayLowest == delayMiddle and 
+                                                            lowestInvert == False and 
+                                                            middleInvert == True):
+                                                        continue 
+                                                        # same as lowestInvert == True and 
+                                                        #    middleInvert == False
                                                     if (transLowest == 1 and transMiddle == 1):
-                                                        continue # if transHighest == 4 then it's the same as (-4, -4, 1) except for a few tritones
-                                                                    # if transHighest == 5 then it's the same as (-5, -5, 1) except for a few tritones 
+                                                        continue 
+                                                        # if transHighest == 4 then it's the same 
+                                                        # as (-4, -4, 1) except for a few tritones
+                                                        # if transHighest == 5 then it's the 
+                                                        # same as (-5, -5, 1) except for 
+                                                        # a few tritones 
                                                     i += 1
-                                                    triplum = (transHighest, delayHighest, highestInvert, highestRetro)
-                                                    ct = (transMiddle, delayMiddle, middleInvert, middleRetro)
-                                                    tenor = (transLowest, delayLowest, lowestInvert, lowestRetro)
-                                                    unused_qjSolved, avgScore, unused_fullScore = prepareSolution(triplum, ct, tenor)
-                                                    #writeLine = (tripT, ctT, tenT, tripDelay, ctDelay, tenDelay, tripInvert, ctInvert, tenInvert, tripRetro, ctRetro, tenRetro, avgScore)
-                                                    writeLine = (transHighest, delayHighest, highestInvert, highestRetro, transMiddle, delayMiddle, middleInvert, middleRetro, transLowest, delayLowest, lowestInvert, lowestRetro, avgScore)
+                                                    triplum = (transHighest, delayHighest, 
+                                                               highestInvert, highestRetro)
+                                                    ct = (transMiddle, delayMiddle, 
+                                                          middleInvert, middleRetro)
+                                                    tenor = (transLowest, delayLowest, 
+                                                             lowestInvert, lowestRetro)
+                                                    (unused_qjSolved, 
+                                                     avgScore, 
+                                                     unused_fullScore) = prepareSolution(triplum, 
+                                                                                         ct, 
+                                                                                         tenor)
+                                                    #writeLine = (tripT, ctT, tenT, tripDelay, 
+                                                    #   ctDelay, tenDelay, tripInvert, ctInvert, 
+                                                    #   tenInvert, tripRetro, ctRetro, tenRetro, 
+                                                    #    avgScore)
+                                                    writeLine = (transHighest, 
+                                                                 delayHighest, 
+                                                                 highestInvert, 
+                                                                 highestRetro, 
+                                                                 transMiddle, 
+                                                                 delayMiddle, 
+                                                                 middleInvert, 
+                                                                 middleRetro, 
+                                                                 transLowest, 
+                                                                 delayLowest, 
+                                                                 lowestInvert, 
+                                                                 lowestRetro, 
+                                                                 avgScore)
                                                     if avgScore > 0:
                                                         print("")
                                                         if avgScore > maxScore:

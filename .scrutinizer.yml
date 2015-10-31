@@ -1,6 +1,6 @@
 filter:
     excluded_paths:
-        - music21/alpha/*
+        - music21/alpha/webapps/server/*
         - music21/demos/*
         - music21/test/*
         - music21/ext/*

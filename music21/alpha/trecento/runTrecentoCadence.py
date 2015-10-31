@@ -30,7 +30,8 @@ def countTimeSig():
                 timeSigCounter[thisTime] = 1
                 
     for thisKey in sorted(timeSigCounter.keys()):
-        print(thisKey, ":", timeSigCounter[thisKey], str(int(timeSigCounter[thisKey]*100/totalPieces)) + "%")
+        print(thisKey, ":", timeSigCounter[thisKey], 
+              str(int(timeSigCounter[thisKey]*100/totalPieces)) + "%")
 
 def sortByPMFC(work):
     '''
@@ -156,7 +157,7 @@ def checkValidity():
     for i in range(1,378):
         randomPiece = ballataObj.makeWork(i) #random.randint(231, 312)
         try:
-            incipitStreams = randomPiece.incipitStreams()
+            unused_incipitStreams = randomPiece.incipitStreams()
         except music21.tinyNotation.TinyNotationException as inst:
             raise Exception(randomPiece.title + " had problem " + inst.args)
 
@@ -174,7 +175,7 @@ class Test(unittest.TestCase):
         pass
 
     def testA(self):
-        self.assertEqual(5,5) ## something really wrong!??
+        self.assertEqual(5, 5) ## something really wrong!??
 
 if __name__ == "__main__":    
     #makePDFfromPiecesWithCapua()

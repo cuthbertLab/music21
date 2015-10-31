@@ -94,8 +94,6 @@ class ModalCounterpoint(object):
         where the two streams reach a fifth through parallel motion, but is
         not a parallel fifth.
 
-
-        
         >>> n1 = note.Note('G3')
         >>> n2 = note.Note('A3')
         >>> n3 = note.Note('B3')
@@ -557,12 +555,14 @@ class ModalCounterpoint(object):
             if note2.editorial.harmonicInterval.semiSimpleName not in self.legalHarmonicIntervals:
                 return False
         if stream1.notes[-1].editorial.harmonicInterval.specificName != "Perfect":
-            environLocal.printDebug([stream1.notes[-1].editorial.harmonicInterval.specificName + " ending, yuk!"])
+            environLocal.printDebug([stream1.notes[-1].editorial.harmonicInterval.specificName + 
+                                     " ending, yuk!"])
             return False
         if abs(stream1.notes[-1].editorial.harmonicInterval.generic.value) == 5:
             environLocal.printDebug(["Ends on a fifth, yuk!"])
             return False
-        if stream1.notes[-1].editorial.harmonicInterval.semiSimpleName == 'P8' and stream1.notes[-2].editorial.harmonicInterval.simpleName == 'M6':
+        if (stream1.notes[-1].editorial.harmonicInterval.semiSimpleName == 'P8' and 
+                stream1.notes[-2].editorial.harmonicInterval.simpleName == 'M6'):
             return True
         else:
             environLocal.printDebug(['Not ending on M6 to P8'])
@@ -600,13 +600,16 @@ class ModalCounterpoint(object):
         stream1.attachIntervalsBetweenStreams(stream2)
         stream2.attachIntervalsBetweenStreams(stream1)
         for note1 in stream1.notes:
-            if note1.editorial.harmonicInterval.semiSimpleName not in self.legalMiddleHarmonicIntervals:
+            if (note1.editorial.harmonicInterval.semiSimpleName not in 
+                    self.legalMiddleHarmonicIntervals):
                 return False
         for note2 in stream2.notes:
-            if note2.editorial.harmonicInterval.semiSimpleName not in self.legalMiddleHarmonicIntervals:
+            if (note2.editorial.harmonicInterval.semiSimpleName not in 
+                    self.legalMiddleHarmonicIntervals):
                 return False
         if stream1.notes[-1].editorial.harmonicInterval.specificName != "Perfect":
-            environLocal.printDebug([stream1.notes[-1].editorial.harmonicInterval.specificName + " ending, yuk!"])
+            environLocal.printDebug([stream1.notes[-1].editorial.harmonicInterval.specificName + 
+                                     " ending, yuk!"])
             return False
         return True
 
@@ -1008,7 +1011,8 @@ class ModalCounterpoint(object):
         thirdsGood = False
         sixthsGood = False
     
-        while (goodHarmony == False or goodMelody == False or thirdsGood == False or sixthsGood == False):
+        while (goodHarmony == False or goodMelody == False or thirdsGood == False or 
+               sixthsGood == False):
             environLocal.printDebug([''])
             environLocal.printDebug(['-------------------------------------'])
             environLocal.printDebug(['STARTING OVER NOW'])
@@ -1022,12 +1026,14 @@ class ModalCounterpoint(object):
                 thirdsGood = not self.tooManyThirds(top, cantusFirmus)
                 sixthsGood = not self.tooManySixths(top, cantusFirmus)
     
-##                lastInterval = interval.notesToInterval(hopeThisWorks2.notes[-2], hopeThisWorks2.notes[-1])
+##                lastInterval = interval.notesToInterval(hopeThisWorks2.notes[-2], 
+#                    hopeThisWorks2.notes[-1])
 ##                if lastInterval.generic.undirected != 2:
 ##                    goodMelody = False
 ##                    environLocal.printDebug(["rejected because lastInterval was not a second"])
              
-                environLocal.printDebug([note1.name + str(note1.octave) for note1 in cantusFirmus.notes])
+                environLocal.printDebug([note1.name + str(note1.octave) for 
+                                            note1 in cantusFirmus.notes])
                 if not goodHarmony: 
                     environLocal.printDebug(["bad harmony"])
                 else: 
@@ -1077,7 +1083,8 @@ class ModalCounterpoint(object):
             prevFirmus = stream1.notes[i-1]
             currFirmus = stream1.notes[i]
             prevNote = stream2.notes[i-1]
-            choices = self.generateValidNotes(prevFirmus, currFirmus, prevNote, afterLeap, minorScale)
+            choices = self.generateValidNotes(prevFirmus, currFirmus, prevNote, 
+                                              afterLeap, minorScale)
             if len(choices) == 0:
                 raise ModalCounterpointException("Sorry, please try again")
             if choice == 'random':
@@ -1146,20 +1153,34 @@ class ModalCounterpoint(object):
         goodNames = [note2.name for note2 in goodNotes]
         
         for note1 in possibleNotes:
-            if note1.name in goodNames:
-                if self.isValidHarmony(note1, currFirmus):
-                    if not self.isParallelUnison(prevNote, note1, prevFirmus, currFirmus):
-                        if not self.isParallelFifth(prevNote, note1, prevFirmus, currFirmus):
-                            if not self.isParallelOctave(prevNote, note1, prevFirmus, currFirmus):
-                                if not self.isHiddenFifth(prevNote, note1, prevFirmus, currFirmus):
-                                    if not self.isHiddenOctave(prevNote, note1, prevFirmus, currFirmus):
-                                        if interval.Interval(currFirmus, note1).direction >= 0:
-                                            if interval.Interval(currFirmus, note1).generic.value <= 10:
-                                                environLocal.printDebug(["adding: ", note1.name, note1.octave])
-                                                valid.append(note1)
+            if note1.name not in goodNames:
+                continue
+            if not self.isValidHarmony(note1, currFirmus):
+                continue
+            if self.isParallelUnison(prevNote, note1, prevFirmus, currFirmus):
+                continue
+            
+            if self.isParallelFifth(prevNote, note1, prevFirmus, currFirmus):
+                continue
+            
+            if self.isParallelOctave(prevNote, note1, prevFirmus, currFirmus):
+                continue
+            if self.isHiddenFifth(prevNote, note1, prevFirmus, currFirmus):
+                continue
+            
+            if self.isHiddenOctave(prevNote, note1, prevFirmus, currFirmus):
+                continue
+            
+            if interval.Interval(currFirmus, note1).direction < 0:
+                continue
+            if interval.Interval(currFirmus, note1).generic.value > 10:
+                continue
+            environLocal.printDebug(["adding: ", note1.name, note1.octave])
+            valid.append(note1)
         return valid
 
-    def generateValidLastNotes(self, prevFirmus, currFirmus, prevNote, afterLeap, minorScale, topVoice = True):
+    def generateValidLastNotes(self, prevFirmus, currFirmus, prevNote, afterLeap, minorScale, 
+                               topVoice = True):
         '''Helper function for generateFirstSpecies; gets a list of possible
         next notes based on valid melodic intervals, then checks each one so
         that parallel/hidden fifths/octaves, voice crossing, and invalid
@@ -1212,18 +1233,33 @@ class ModalCounterpoint(object):
         goodNames = [note2.name for note2 in goodNotes]
         
         for note1 in possibleNotes:
-            if note1.name in goodNames:
-                if self.isValidHarmony(note1, currFirmus):
-                    if not self.isParallelUnison(prevNote, note1, prevFirmus, currFirmus):
-                        if not self.isParallelFifth(prevNote, note1, prevFirmus, currFirmus):
-                            if not self.isParallelOctave(prevNote, note1, prevFirmus, currFirmus):
-                                if not self.isHiddenFifth(prevNote, note1, prevFirmus, currFirmus):
-                                    if not self.isHiddenOctave(prevNote, note1, prevFirmus, currFirmus):
-                                        if interval.Interval(currFirmus, note1).direction >= 0:
-                                            if interval.Interval(currFirmus, note1).generic.value <= 10:
-                                                if interval.Interval(currFirmus, note1).simpleName == 1 or interval.Interval(currFirmus, note1).simpleName == 5:
-                                                    environLocal.printDebug(["adding: ", note1.name, note1.octave])
-                                                    valid.append(note1)
+            if note1.name not in goodNames:
+                continue
+            if not self.isValidHarmony(note1, currFirmus):
+                continue
+            if self.isParallelUnison(prevNote, note1, prevFirmus, currFirmus):
+                continue
+            
+            if self.isParallelFifth(prevNote, note1, prevFirmus, currFirmus):
+                continue
+            
+            if self.isParallelOctave(prevNote, note1, prevFirmus, currFirmus):
+                continue
+            if self.isHiddenFifth(prevNote, note1, prevFirmus, currFirmus):
+                continue
+            
+            if self.isHiddenOctave(prevNote, note1, prevFirmus, currFirmus):
+                continue
+            
+            if interval.Interval(currFirmus, note1).direction < 0:
+                continue
+            if interval.Interval(currFirmus, note1).generic.value > 10:
+                continue
+            
+            if (interval.Interval(currFirmus, note1).simpleName == 1 or 
+                    interval.Interval(currFirmus, note1).simpleName == 5):
+                environLocal.printDebug(["adding: ", note1.name, note1.octave])
+                valid.append(note1)
         return valid
 
 
@@ -1371,7 +1407,8 @@ class Test(unittest.TestCase):
 #         consecutive3 = counterpoint1.thirdCounter(list3, 0)
 #         assert consecutive3 == 0
 #     
-#         (n41, n42, n43, n44, n45, n46, n47) = (Note(), Note(), Note(), Note(), Note(), Note(), Note())
+#         (n41, n42, n43, n44, n45, n46, n47) = (
+#                Note(), Note(), Note(), Note(), Note(), Note(), Note())
 #         n41.duration.type = "whole"
 #         n42.duration.type = "whole"
 #         n43.duration.type = "whole"
@@ -1380,7 +1417,8 @@ class Test(unittest.TestCase):
 #         n46.duration.type = "whole"
 #         n47.duration.type = "whole"
 #     
-#         (n51, n52, n53, n54, n55, n56, n57) = (Note(), Note(), Note(), Note(), Note(), Note(), Note())
+#         (n51, n52, n53, n54, n55, n56, n57) = (
+#            Note(), Note(), Note(), Note(), Note(), Note(), Note())
 #         n51.duration.type = "whole"
 #         n52.duration.type = "whole"
 #         n53.duration.type = "whole"
@@ -1405,7 +1443,8 @@ class Test(unittest.TestCase):
 #         assert too3 == False
 #         assert too32 == True
 #     
-#         (n61, n62, n63, n64, n65, n66, n67) = (Note(), Note(), Note(), Note(), Note(), Note(), Note())
+#         (n61, n62, n63, n64, n65, n66, n67) = (
+#            Note(), Note(), Note(), Note(), Note(), Note(), Note())
 #         n61.duration.type = "whole"
 #         n62.duration.type = "whole"
 #         n63.duration.type = "whole"
@@ -1539,7 +1578,8 @@ class Test(unittest.TestCase):
 #         assert hidden8 == True
 #         assert hidden82 == False
 #     
-#         (n100, n101, n102, n103, n104, n105, n106, n107) = (Note(), Note(), Note(), Note(), Note(), Note(), Note(), Note())
+#         (n100, n101, n102, n103, n104, n105, n106, n107) = (
+#            Note(), Note(), Note(), Note(), Note(), Note(), Note(), Note())
 #         n100.duration.type = "whole"
 #         n101.duration.type = "whole"
 #         n102.duration.type = "whole"
@@ -1632,7 +1672,8 @@ class TestExternal(unittest.TestCase):
 
     def xtestGenerateFirstSpeciesThreeVoices(self):
         '''
-        A First Species, Three-Voice Counterpoint Generator by Jackie Rogoff (MIT 2010) written as continuation of 
+        A First Species, Three-Voice Counterpoint Generator by Jackie Rogoff (MIT 2010) 
+        written as continuation of 
         a UROP (Undergraduate Research Opportunities Program) project at M.I.T. summer 2010.
         '''
 
@@ -1645,7 +1686,8 @@ class TestExternal(unittest.TestCase):
         baseNote = Note(cf['mode'])
         thisScale = scale.MinorScale(baseNote)
             
-        (middleVoice, topVoice) = counterpoint1.generateFirstSpeciesThreeVoices(cantusFirmus, thisScale, 'random')
+        (middleVoice, topVoice) = counterpoint1.generateFirstSpeciesThreeVoices(
+                                                        cantusFirmus, thisScale, 'random')
             
         score = stream.Score()
         score.insert(0, meter.TimeSignature('4/4'))

@@ -27,8 +27,8 @@ def reduction(sc):
 
 #---------------
 
-def generateIntervals(numIntervals,kind = None, octaveSpacing = None):
-    if kind in ['anyChords','majorChords','diatonicTriads','diatonicTriadInversions']:
+def generateIntervals(numIntervals, kind=None, octaveSpacing=None):
+    if kind in ['anyChords', 'majorChords', 'diatonicTriads', 'diatonicTriadInversions']:
         return generateChords(numIntervals,kind)
     
     sc = stream.Stream()
@@ -40,13 +40,13 @@ def generateIntervals(numIntervals,kind = None, octaveSpacing = None):
         numHalfSteps = random.randrange(-19,20)
         intv = interval.ChromaticInterval(numHalfSteps)
         if kind == 'consonant':
-            invType = random.choice(['m3','M3','P5','m6','M6','P8'])
+            invType = random.choice(['m3', 'M3', 'P5', 'm6', 'M6', 'P8'])
             intv = interval.Interval(invType)
         elif kind == 'noAugDim':
-            invType = random.choice(['m2','M2','m3','M3','P4','P5','m6','M6','m7','M7'])
+            invType = random.choice(['m2', 'M2', 'm3', 'M3', 'P4', 'P5', 'm6', 'M6', 'm7', 'M7'])
             intv = interval.Interval(invType)
         elif kind == 'dissonant':
-            invType = random.choice(['m2','M2','m3','M3','P4','P5','m6','M6','m7','M7'])
+            invType = random.choice(['m2', 'M2', 'm3', 'M3', 'P4', 'P5', 'm6', 'M6', 'm7', 'M7'])
             intv = interval.Interval(invType)
         endPitch = intv.transposePitch(startPitch)
         
@@ -60,14 +60,14 @@ def generateIntervals(numIntervals,kind = None, octaveSpacing = None):
         
         c = chord.Chord([startPitch,endPitch])
         c.volume.velocity = 127
-        c.quarterLength=2
+        c.quarterLength = 2
         sc.append(c)
-    c = chord.Chord(['C','G'])
-    c.quarterLength=2
+    c = chord.Chord(['C', 'G'])
+    c.quarterLength = 2
     sc.append(c)
     return sc
 
-traidInversions = [[1,3,5],[1,3,6],[1,4,6]]
+traidInversions = [[1, 3, 5], [1, 3, 6], [1, 4, 6]]
 
 def generateChords(numChords,kind=''):
     '''
@@ -103,17 +103,18 @@ def generateChords(numChords,kind=''):
     p = stream.Part()
     scl = scale.MajorScale('C')
     #possibleChordTypes = [l[0] for l in harmony.CHORD_TYPES.values()]
-    possibleChordTypes =['53','63','64']
+    possibleChordTypes =['53', '63', '64']
     if kind == 'diatonicTriads':
         for i in range(numChords):
-            startDegree = random.randrange(0,8)
-            inversion = random.randrange(0,3)
+            startDegree = random.randrange(0, 8)
+            inversion = random.randrange(0, 3)
             chordPitches = []
             #testDegrees = [d+startDegree-1 for d in traidInversions[inversion] ]
-            chordPitches = [scl.pitchFromDegree(d+startDegree-1) for d in traidInversions[inversion] ]
-            chordType = possibleChordTypes[random.randrange(0,len(possibleChordTypes))]
+            chordPitches = [scl.pitchFromDegree(d+startDegree-1) for d in 
+                                traidInversions[inversion]]
+            chordType = possibleChordTypes[random.randrange(0, len(possibleChordTypes))]
             c = chord.Chord(chordPitches)
-            c.quarterLength=2
+            c.quarterLength = 2
             p.append(c)
         p.makeMeasures(inPlace=True)
         sc.append(p)
@@ -125,8 +126,8 @@ def generateChords(numChords,kind=''):
             startPs = random.randrange(loPs,hiPs)
             startPitch = pitch.Pitch(ps=startPs)
             startPitchName = startPitch.name
-            chordType = possibleChordTypes[random.randrange(0,len(possibleChordTypes))]
-            c = harmony.ChordSymbol(startPitchName+','+chordType)
+            chordType = possibleChordTypes[random.randrange(0, len(possibleChordTypes))]
+            c = harmony.ChordSymbol(startPitchName + ',' + chordType)
             c.writeAsChord = True
             c.quarterLength=2
             c.volume.velocity = 127
@@ -142,20 +143,25 @@ def runPerceivedDissonanceAnalysis(scoreIn, offsetList, keyStr=None):
 
     webapp for determining the accuracy of aural identification of dissonances
     the user listens to a piece of music and clicks when they think they hear a dissonance. this
-    information is then passed to this method, which compares the score to the list of offsets corresponding
-    to when the user clicked. Music21 then identifies the dissonant vertical slices, and outputs results as a
+    information is then passed to this method, which compares the score to the list of offsets 
+    corresponding
+    to when the user clicked. Music21 then identifies the dissonant vertical slices, and 
+    outputs results as a
     dictionary including the score, colored by vertical slices of interest as below:
     
     Green: both music21 and the user identified as dissonant
     Blue: only the user identified as dissonant
     Red: only music21 identified as dissonant
     
-    This example runs two analysis, the first is a comparison with the unmodified score and user's offsets, the second
-    with the passing tones and neighbor tones of the score removed. Results are returned as nested dictionaries of the
+    This example runs two analysis, the first is a comparison with the unmodified score and
+    user's offsets, the second
+    with the passing tones and neighbor tones of the score removed. Results are returned as 
+    nested dictionaries of the
     following form:
     {fullScore , nonharmonicTonesRemovedScore}
     each of which is a dictionary containing these keys:
-    {'stream', 'numUserIdentified', 'numMusic21Identified', 'numBothIdentified', 'accuracy', 'romans', 'key'}
+    {'stream', 'numUserIdentified', 'numMusic21Identified', 'numBothIdentified', 
+     'accuracy', 'romans', 'key'}
 
     >>> piece = corpus.parse('bwv7.7').measures(0,3)
     >>> offsetList = [
@@ -200,8 +206,12 @@ def runPerceivedDissonanceAnalysis(scoreIn, offsetList, keyStr=None):
     theoryAnalyzer.removeNeighborTones(withoutNonharmonictonesScore)
     withoutNonharmonictonesScore.sliceByGreatestDivisor(addTies=True, inPlace=True)
     withoutNonharmonictonesScore.stripTies(inPlace=True, matchByPitch=True, retainContainers=False)
-    dissonanceAnalysisDict = {'fullScore': determineDissonantIdentificationAccuracy(scoreIn, offsetList,keyStr), \
-                              'nonharmonicTonesRemovedScore':determineDissonantIdentificationAccuracy(withoutNonharmonictonesScore, offsetList,keyStr)}
+
+    nhtRemoved = determineDissonantIdentificationAccuracy(
+                    withoutNonharmonictonesScore, offsetList, keyStr)
+    dissonanceAnalysisDict = {'fullScore': determineDissonantIdentificationAccuracy(
+                                                scoreIn, offsetList,keyStr), 
+                              'nonharmonicTonesRemovedScore': nhtRemoved}
     return dissonanceAnalysisDict
 
 
@@ -209,21 +219,23 @@ def _withinRange(dataList, lowLim, upperLim):
     '''helper function: returns true if there exists a number in dataList 
     for which the inequality lowLim <= number < upperLim
     
-    >>> alpha.webapps.commands._withinRange([1,5.5,8], 2,3)
+    >>> alpha.webapps.commands._withinRange([1, 5.5, 8], 2, 3)
     False
-    >>> alpha.webapps.commands._withinRange([1,5.5,8], 4,6)
+    >>> alpha.webapps.commands._withinRange([1, 5.5, 8], 4, 6)
     True
     '''
     dataList.sort()
-    for index, offset in enumerate(dataList):
+    for offset in dataList:
         if lowLim <= offset and offset < upperLim:
             return True
     return False
 
 def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
     '''
-    runs comparison on score to identify dissonances, then compares to the user's offsetList of identified
-    dissonances. The score is colored according to the results, and appropriate information is returned
+    runs comparison on score to identify dissonances, then compares to the user's 
+    offsetList of identified
+    dissonances. The score is colored according to the results, and appropriate 
+    information is returned
     as a dictionary. See runPerceivedDissonanceAnalysis for full details and an example.
     
     *Color key*
@@ -234,19 +246,19 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
     
     >>> s = stream.Score()
     >>> p = stream.Part()
-    >>> c1 = chord.Chord(['C3','E3','G3'])
+    >>> c1 = chord.Chord(['C3', 'E3', 'G3'])
     >>> c1.isConsonant()
     True
     >>> p.append(c1)
-    >>> c2 = chord.Chord(['C3','B3','D#'])
+    >>> c2 = chord.Chord(['C3', 'B3', 'D#'])
     >>> c2.isConsonant()
     False
     >>> p.append(c2)
-    >>> c3 = chord.Chord(['D3','F#3','A'])
+    >>> c3 = chord.Chord(['D3', 'F#3', 'A'])
     >>> c3.isConsonant()
     True
     >>> p.append(c3)
-    >>> c4 = chord.Chord(['B-4','F#4','A-3'])
+    >>> c4 = chord.Chord(['B-4', 'F#4', 'A-3'])
     >>> c4.isConsonant()
     False
     >>> p.append(c4)
@@ -275,33 +287,44 @@ def determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr=None):
         pieceKey = scoreIn.analyze('key')
     else:
         pieceKey = key.Key(keyStr)
+        
     for (vsNum, vs) in enumerate(vsList):
-            currentVSOffset = vs.offset(leftAlign=False)
-            if vsNum + 1 == len(vsList):
-                nextVSOffset = scoreIn.highestTime
+        currentVSOffset = vs.offset(leftAlign=False)
+        if vsNum + 1 == len(vsList):
+            nextVSOffset = scoreIn.highestTime
+        else:
+            nextVSOffset = vsList[vsNum + 1].offset(leftAlign=False)
+        if not vs.isConsonant(): #music21 recognizes this as a dissonant vertical slice
+            music21VS+=1
+            if _withinRange(offsetList, currentVSOffset, nextVSOffset):
+                vs.color = '#00cc33' 
+                # the user also recognizes this as a dissonant vertical slice GREEN
+                both += 1
+                c = vs.getChord()
+                romanFigureList.append(roman.romanNumeralFromChord(c, pieceKey).figure)
             else:
-                nextVSOffset = vsList[vsNum+1].offset(leftAlign=False)
-            if not vs.isConsonant(): #music21 recognizes this as a dissonant vertical slice
-                music21VS+=1
-                if _withinRange(offsetList, currentVSOffset, nextVSOffset):
-                    vs.color = '#00cc33' # the user also recognizes this as a dissonant vertical slice GREEN
-                    both+=1
-                    c = vs.getChord()
-                    romanFigureList.append(roman.romanNumeralFromChord(c, pieceKey).figure)
-                else:
-                    vs.color = '#cc3300'  #the user did not recognize as a dissonant vertical slice RED
-            else: #music21 did not recognize this as a dissonant vertical slice
-                if _withinRange(offsetList, currentVSOffset, nextVSOffset):
-                    vs.color = '#0033cc' #the user recognized it as a dissonant vertical slice BLUE
+                vs.color = '#cc3300'  
+                #the user did not recognize as a dissonant vertical slice RED
+        else: #music21 did not recognize this as a dissonant vertical slice
+            if _withinRange(offsetList, currentVSOffset, nextVSOffset):
+                vs.color = '#0033cc' 
+                #the user recognized it as a dissonant vertical slice BLUE
     
     score.insert(metadata.Metadata())
     score.metadata.composer = scoreIn.metadata.composer
     score.metadata.movementName = scoreIn.metadata.movementName
-    analysisData = {'stream': score, 'numUserIdentified': user, 'numMusic21Identified':music21VS, 'numBothIdentified':both, 'accuracy': both*100.0/music21VS if music21VS!= 0 else 100, 'romans': romanFigureList, 'key': pieceKey}
+    analysisData = {'stream': score, 
+                    'numUserIdentified': user, 
+                    'numMusic21Identified': music21VS, 
+                    'numBothIdentified': both, 
+                    'accuracy': both * 100.0 / music21VS if music21VS != 0 else 100, 
+                    'romans': romanFigureList, 
+                    'key': pieceKey}
     return analysisData
 
 ## Shortcuts - temporary procedures used for re-implementation of hackday demo. Will be moved 
-## to new home or removed when commandList can accommodate more complex structures (arrays, for loops...)
+## to new home or removed when commandList can accommodate more complex structures 
+## (arrays, for loops...)
 
 def createMensuralCanon(sc):
     '''
@@ -331,7 +354,7 @@ def correctChordSymbols(worksheet, studentResponse):
     >>> studentResponse = stream.Stream()
     >>> studentResponse.append(clef.TrebleClef())
 
-    >>> studentResponse.append(chord.Chord(['C','E','G']))
+    >>> studentResponse.append(chord.Chord(['C', 'E', 'G']))
     >>> studentResponse.append(chord.Chord(['G', 'B', 'D5', 'F5']))
     >>> studentResponse.append(chord.Chord(['B-', 'C']))
     >>> studentResponse.append(chord.Chord(['D4', 'F#4', 'A4', 'C5']))
@@ -363,9 +386,8 @@ def correctChordSymbols(worksheet, studentResponse):
         newPitches = []
         for x in chord2.pitches:
             newPitches.append(str(x.name))
-        for pitch in chord1:
-           
-            if pitch.name in newPitches:
+        for p in chord1:
+            if p.name in newPitches:
                 isCorrect = True
             else:
                 isCorrect = False
@@ -375,7 +397,7 @@ def correctChordSymbols(worksheet, studentResponse):
             for y in chord1.pitches:
                 newPitches1.append(str(y.name))
             p = chord1.sortDiatonicAscending()
-            o =  chord2.sortDiatonicAscending()
+            o = chord2.sortDiatonicAscending()
            
             a = []
             b = []
@@ -407,7 +429,7 @@ def checkLeadSheetPitches(worksheet, returnType=''):
     >>> worksheet.append(harmony.ChordSymbol('B'))
     >>> worksheet.append(harmony.ChordSymbol('D7/A')) 
 
-    >>> answerKey = alpha.webapps.commands.checkLeadSheetPitches( worksheet, returnType = 'answerkey' )
+    >>> answerKey = alpha.webapps.commands.checkLeadSheetPitches( worksheet, returnType='answerkey')
     >>> for x in answerKey.notes:
     ...     [str(p) for p in x.pitches]
     ['C3', 'E3', 'G3']
