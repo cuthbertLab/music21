@@ -425,6 +425,7 @@ class Converter(object):
         return os.path.join(directory, 'm21-' + _version.__version__ + '-' + 
                                             common.getMd5(url) + ext)
 
+    # pylint: disable=redefined-builtin
     def parseFileNoPickle(self, fp, number=None, 
                           format=None, forceSource=False, **keywords): # @ReservedAssignment
         '''
@@ -975,7 +976,7 @@ class Converter(object):
 #-------------------------------------------------------------------------------
 # module level convenience methods
 
-
+# pylint: disable=redefined-builtin
 def parseFile(fp, number=None, format=None, forceSource=False, **keywords):  #@ReservedAssignment
     '''
     Given a file path, attempt to parse the file into a Stream.
@@ -985,6 +986,7 @@ def parseFile(fp, number=None, format=None, forceSource=False, **keywords):  #@R
     v.parseFile(fp, number=number, format=format, forceSource=forceSource, **keywords)
     return v.stream
 
+# pylint: disable=redefined-builtin
 def parseData(dataStr, number=None, format=None, **keywords): # @ReservedAssignment
     '''
     Given musical data represented within a Python string, attempt to parse the
@@ -994,6 +996,7 @@ def parseData(dataStr, number=None, format=None, **keywords): # @ReservedAssignm
     v.parseData(dataStr, number=number, format=format, **keywords)
     return v.stream
 
+# pylint: disable=redefined-builtin
 def parseURL(url, number=None, format=None, forceSource=False, **keywords): # @ReservedAssignment
     '''
     Given a URL, attempt to download and parse the file into a Stream. Note:

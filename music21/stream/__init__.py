@@ -57,7 +57,7 @@ from music21.stream import core
 from music21.stream import makeNotation
 from music21.stream import streamStatus
 from music21.stream import iterator
-from music21.stream import filter
+from music21.stream import filters
 
 from music21.common import opFrac
 
@@ -2014,7 +2014,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #             siterator = self.iter
 #         else:
 #             siterator = self.recurse()
-#         siterator.addFilter(filter.IsFilter(target))
+#         siterator.addFilter(filters.IsFilter(target))
 #  
 #  
 #         found = False
@@ -2379,7 +2379,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         siterator = self.iter
         if classFilter is not None:
-            siterator.addFilter(filter.ClassFilter(classFilter))
+            siterator.addFilter(filters.ClassFilter(classFilter))
         for el in siterator:
             el.groups.append(group)
 
@@ -2578,7 +2578,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         
         :rtype: base.Music21Object
         '''
-        siterator = self.iter.addFilter(filter.IdFilter(elementId))
+        siterator = self.iter.addFilter(filters.IdFilter(elementId))
         if classFilter is not None:
             siterator.getElementsByClass(classFilter)
         for e in siterator:
@@ -3094,7 +3094,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     return e
 
 #         iterator = self.iter
-#         isFilter = filter.IsFilter(element)
+#         isFilter = filters.IsFilter(element)
 #         iterator.addFilter(isFilter)
 # 
 #         foundElement = False
@@ -3105,9 +3105,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #                 foundElement = True
 #                 iterator.removeFilter(isFilter)
 #                 # now add the filter... 
-#                 iterator.addFilter(filter.IsNotFilter(element))
+#                 iterator.addFilter(filters.IsNotFilter(element))
 #                 if classList is not None:
-#                     iterator.addFilter(filter.ClassFilter(classList))
+#                     iterator.addFilter(filters.ClassFilter(classList))
 # 
 #         return None
 
@@ -6723,7 +6723,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                         includeSelf=includeSelf
                                         )
         if classFilter != ():
-            ri.addFilter(filter.ClassFilter(classFilter))
+            ri.addFilter(filters.ClassFilter(classFilter))
         return ri        
 
     def restoreActiveSites(self):

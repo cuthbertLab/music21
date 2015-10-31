@@ -470,7 +470,7 @@ class MidiEvent(object):
     >>> me2
     <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data='guitar'>
     '''
-    
+    # pylint: disable=redefined-builtin    
     def __init__(self, track, type=None, time=None, channel=None): #@ReservedAssignment
         self.track = track  # a MidiTrack object
         self.type = type

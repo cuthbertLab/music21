@@ -431,7 +431,7 @@ def getWork(workName, movementNumber=None, fileExtensions=None):
             'Could not find a file/url that met these criteria')
     return results
 
-
+# pylint: disable=redefined-builtin
 def parse(
     workName,
     movementNumber=None,
