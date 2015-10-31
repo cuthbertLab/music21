@@ -78,11 +78,11 @@ accidentalNameToModifier = {
 # sort modifiers by length, from longest to shortest
 def _sortModifiers():
     for i in (4, 3, 2, 1):
-        accidentalModifiersSorted = []
+        ams = []
         for sym in accidentalNameToModifier.values():
             if len(sym) == i:
-                accidentalModifiersSorted.append(sym)
-        return accidentalModifiersSorted
+                ams.append(sym)
+        return ams
 accidentalModifiersSorted = _sortModifiers()
 
 
