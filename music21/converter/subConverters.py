@@ -691,9 +691,10 @@ class ConverterMusicXMLET(SubConverter):
 
     def runThroughMusescore(self, fp, **keywords):
         musescorePath = environLocal['musescoreDirectPNGPath']
-        if musescorePath == "":
+        if not musescorePath:
             raise SubConverterException(
-                "To create PNG files directly from MusicXML you need to download MuseScore")
+                "To create PNG files directly from MusicXML you need to download MuseScore and " +
+                "put a link to it in your .music21rc via Environment.")
         elif not os.path.exists(musescorePath):
             raise SubConverterException(
                         "Cannot find a path to the 'mscore' file at " + 
