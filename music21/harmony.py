@@ -162,6 +162,8 @@ class Harmony(chord.Chord):
     >>> [str(p) for p in h.pitches]
     ['E3', 'G3', 'B-3', 'C4']
 
+    Accepts a keyword 'updatePitches'. By default it
+    is True, but can be set to False to initialize faster if pitches are not needed.
     '''
     
     ### INITIALIZER ###
@@ -194,7 +196,9 @@ class Harmony(chord.Chord):
         # assign the values accordingly
         if self._bass == None:
             self.bass(self._root)
-        if self._figure is not None or self._root or self._bass:            
+            
+        updatePitches = keywords.get('updatePitches', True)
+        if updatePitches and self._figure is not None or self._root or self._bass:            
             self._updatePitches()
         self._updateBasedOnXMLInput(keywords)
 

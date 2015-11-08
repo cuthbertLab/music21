@@ -44,6 +44,21 @@ ENDWITHFLAT_RE = re.compile(r'[b\-]$')
 _scaleCache = {}
 _keyCache = {}
 
+def _getKeyFromCache(keyStr):
+    '''
+    get a key from the cache if it is there; otherwise
+    create a new key and put it in the cache and return it.
+
+    :param keyStr: str
+    :rtype: key.Key
+    '''
+    if keyStr in _keyCache:
+        keyObj = _keyCache[keyStr]
+    else:
+        keyObj = key.Key(keyStr)
+        _keyCache[keyObj.tonicPitchNameWithCase] = keyObj
+    return keyObj
+
 
 figureShorthands = {
     '53': '',
@@ -576,9 +591,9 @@ def romanNumeralFromChord(
         isMajorThird = False
 
     if isMajorThird:
-        rootkeyObj = key.Key(root.name, mode='major')
+        rootkeyObj = _getKeyFromCache(root.name.upper())
     else:
-        rootkeyObj = key.Key(root.name.lower(), mode='minor')
+        rootkeyObj = _getKeyFromCache(root.name.lower())
 
     if keyObj is None:
         keyObj = rootkeyObj
@@ -609,17 +624,24 @@ def romanNumeralFromChord(
             rootAlterationString = 'b' + rootAlterationString
 
     if alter == 0:
-        alteredKeyObj = key.Key(keyObj.tonic, rootkeyObj.mode)
+        tonicPitch = keyObj.tonic
     else:
         # Altered scale degrees, such as #V require a different hypothetical
         # tonic:
+        
+        # not worth caching yet -- 150 microseconds; we're trying to lower milliseconds
         transposeInterval = interval.intervalFromGenericAndChromatic(
             interval.GenericInterval(1),
             interval.ChromaticInterval(alter))
-        alteredKeyObj = key.Key(
-            transposeInterval.transposePitch(keyObj.tonic),
-            rootkeyObj.mode,
-            )
+        tonicPitch = transposeInterval.transposePitch(keyObj.tonic)
+
+    if rootkeyObj.mode == 'major':
+        tonicPitchName = tonicPitch.name.upper()
+    else:
+        tonicPitchName = tonicPitch.name.lower()
+        
+        
+    alteredKeyObj = _getKeyFromCache(tonicPitchName)
 
     stepRoman = common.toRoman(stepNumber)
     if isMajorThird:
@@ -634,7 +656,7 @@ def romanNumeralFromChord(
     #print (inversionString, fifthName)
     rnString = rootAlterationString + stepRoman + fifthName + inversionString
     try:
-        rn = RomanNumeral(rnString, keyObj)
+        rn = RomanNumeral(rnString, keyObj, updatePitches=False)
     except fbNotation.ModifierException as strerror:
         raise RomanNumeralException(
             'Could not parse {0} from chord {1} as an RN '
@@ -943,6 +965,13 @@ class RomanNumeral(harmony.Harmony):
     >>> [str(pitch) for pitch in r.pitches]
     ['G4']
 
+
+    Accepts a keyword 'updatePitches' which is passed to harmony.Harmony. By default it
+    is True, but can be set to False to initialize faster if pitches are not needed.
+
+    >>> r = roman.RomanNumeral('vio', em, updatePitches=False)
+    >>> r.pitches
+    ()
     '''
     # TODO: document better! what is inherited and what is new?
 
@@ -950,8 +979,7 @@ class RomanNumeral(harmony.Harmony):
     _omittedStepsRegex = re.compile(r'(\[(no[1-9])+\]\s*)+')
     _bracketedAlterationRegex =  re.compile(r'\[(b+|\-+|\#+)(\d+)\]')
     _augmentedSixthRegex = re.compile(r'(It|Ger|Fr|Sw)')
-    _romanNumeralAloneRegex = \
-        re.compile(r'(IV|I{1,3}|VI{0,2}|iv|i{1,3}|vi{0,2}|N)')
+    _romanNumeralAloneRegex = re.compile(r'(IV|I{1,3}|VI{0,2}|iv|i{1,3}|vi{0,2}|N)')
     _secondarySlashRegex = re.compile(r'(.*?)\/([\#a-np-zA-NP-Z].*)')
 
     _DOC_ATTR = {
@@ -972,7 +1000,7 @@ class RomanNumeral(harmony.Harmony):
 
     ### INITIALIZER ###
 
-    def __init__(self, figure=None, keyOrScale=None, caseMatters=True):
+    def __init__(self, figure=None, keyOrScale=None, caseMatters=True, **keywords):
         self.primaryFigure = None
         self.secondaryRomanNumeral = None
         self.secondaryRomanNumeralKey = None
@@ -996,10 +1024,13 @@ class RomanNumeral(harmony.Harmony):
         self.useImpliedScale = False
         self.bracketedAlterations = None
 
+        # do not update pitches...
         self._parsingComplete = False
         self.key = keyOrScale
 
-        harmony.Harmony.__init__(self, figure)
+        updatePitches = keywords.get('updatePitches', True)
+        harmony.Harmony.__init__(self, figure, updatePitches=updatePitches)
+    
         self._correctBracketedPitches()
         self._parsingComplete = True
         self._functionalityScore = None
@@ -1018,16 +1049,17 @@ class RomanNumeral(harmony.Harmony):
     ### PRIVATE METHODS ###
     def _correctBracketedPitches(self):
         # correct bracketed figures
-        if (self.bracketedAlterations is not None):
-            for (alterNotation, chordStep) in self.bracketedAlterations:
-                alterNotation = re.sub('b','-', alterNotation)
-                alterPitch = self.getChordStep(chordStep)
-                if alterPitch is not None:
-                    newAccidental = pitch.Accidental(alterNotation)
-                    if alterPitch.accidental is None:
-                        alterPitch.accidental = newAccidental
-                    else:
-                        alterPitch.accidental.set(alterPitch.accidental.alter + newAccidental.alter)
+        if self.bracketedAlterations is None:
+            return
+        for (alterNotation, chordStep) in self.bracketedAlterations:
+            alterNotation = re.sub('b','-', alterNotation)
+            alterPitch = self.getChordStep(chordStep)
+            if alterPitch is not None:
+                newAccidental = pitch.Accidental(alterNotation)
+                if alterPitch.accidental is None:
+                    alterPitch.accidental = newAccidental
+                else:
+                    alterPitch.accidental.set(alterPitch.accidental.alter + newAccidental.alter)
 
     def _findSemitoneSizeForQuality(self, impliedQuality):
         '''
@@ -1529,6 +1561,9 @@ class RomanNumeral(harmony.Harmony):
 
         (No key means an implicit C-major)
 
+        >>> r1.key is None
+        True
+        
         >>> [str(p) for p in r1.pitches]
         ['G4', 'B4', 'D5']
 
@@ -1559,14 +1594,13 @@ class RomanNumeral(harmony.Harmony):
         Provide a new key or scale, and re-configure the RN with the
         existing figure.
         '''
+        if keyOrScale == self._scale and keyOrScale is not None:
+            return # skip...
+        
         # try to get Scale or Key object from cache: this will offer
         # performance boost as Scale stores cached pitch segments
         if common.isStr(keyOrScale):
-            if keyOrScale in _keyCache:
-                keyOrScale = _keyCache[keyOrScale]
-            else:
-                keyOrScale = key.Key(keyOrScale)
-                _keyCache[keyOrScale.name] = keyOrScale
+            keyOrScale = _getKeyFromCache(keyOrScale)
         elif keyOrScale is not None:
             #environLocal.printDebug(['got keyOrScale', keyOrScale])
             try:
@@ -1576,11 +1610,10 @@ class RomanNumeral(harmony.Harmony):
                     'Cannot call classes on object {0!r}, send only Key '
                     'or Scale Music21Objects'.format(keyOrScale))
             if 'Key' in keyClasses:
-                if keyOrScale.name in _keyCache:
-                    # use stored scale as already has cache
-                    keyOrScale = _keyCache[keyOrScale.name]
-                else:
-                    _keyCache[keyOrScale.name] = keyOrScale
+                # good to go...                
+                if keyOrScale.tonicPitchNameWithCase not in _keyCache:
+                    # store for later
+                    _keyCache[keyOrScale.tonicPitchNameWithCase] = keyOrScale
             elif 'Scale' in keyClasses:
                 if keyOrScale.name in _scaleCache:
                     # use stored scale as already has cache
@@ -1592,11 +1625,12 @@ class RomanNumeral(harmony.Harmony):
                     'Cannot get a key from this object {0!r}, send only '
                     'Key or Scale objects'.format(keyOrScale))
         else:
-            pass
+            pass # None
             # cache object if passed directly
         self._scale = keyOrScale
-        if keyOrScale is None or (hasattr(keyOrScale, "isConcrete") and
-            not keyOrScale.isConcrete):
+        if (keyOrScale is None or 
+                (hasattr(keyOrScale, "isConcrete") and
+                 not keyOrScale.isConcrete)):
             self.useImpliedScale = True
             if self._scale is not None:
                 self.impliedScale = self._scale.derive(1, 'C')
