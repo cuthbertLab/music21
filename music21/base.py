@@ -2714,7 +2714,7 @@ class Music21Object(object):
 
         TODO: unit into a "split" function -- document obscure uses.
 
-
+        
         >>> n = note.Note()
         >>> n.quarterLength = 3
         >>> post = n.splitByQuarterLengths([1,1,1])
@@ -3415,8 +3415,6 @@ class ElementWrapper(Music21Object):
             return False
 
     def __ne__(self, other):
-        '''
-        '''
         return not self.__eq__(other)
 
     def __setattr__(self, name, value):
@@ -3442,7 +3440,6 @@ class ElementWrapper(Music21Object):
 
         see: http://stackoverflow.com/questions/371753/python-using-getattribute-method 
         for examples
-
         '''
         storedobj = Music21Object.__getattribute__(self, "obj")
         if storedobj is None:

@@ -27,7 +27,7 @@ import unittest
 from music21.ext import six
 
 
-defaultImports = ('music21',)
+defaultImports = ['music21']
 
 
 ###### monkey patch doctest...
@@ -196,7 +196,8 @@ def stripAddresses(textString, replacement = "ADDRESS"):
 
     For doctests, can strip to '...' to make it work fine with doctest.ELLIPSIS
     
-    >>> test.testRunner.stripAddresses("{0.0} <music21.base.Music21Object object at 0x102a0ff10>", '0x...')
+    >>> test.testRunner.stripAddresses(
+    ...     "{0.0} <music21.base.Music21Object object at 0x102a0ff10>", '0x...')
     '{0.0} <music21.base.Music21Object object at 0x...>'
 
     :rtype: str

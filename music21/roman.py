@@ -119,8 +119,8 @@ functionalityScores = {
 
 
 def expandShortHand(shorthand):
-    '''Expands shorthand notation into a list with all figures expanded:
-
+    '''
+    Expands shorthand notation into a list with all figures expanded:
 
     >>> roman.expandShortHand("64")
     ['6', '4']
@@ -136,7 +136,6 @@ def expandShortHand(shorthand):
 
     >>> roman.expandShortHand("-")
     ['5', '-3']
-
 
 
     Slashes don't matter
@@ -439,9 +438,9 @@ def romanInversionName(inChord):
             return '42'
         else:
             return ''
-    elif inChord.isTriad() \
-        or inChord.isIncompleteMajorTriad() \
-        or inChord.isIncompleteMinorTriad():
+    elif (inChord.isTriad() or
+            inChord.isIncompleteMajorTriad() or
+            inChord.isIncompleteMinorTriad()):
         if inv == 0:
             return ''  # not 53
         elif inv == 1:
@@ -569,9 +568,8 @@ def romanNumeralFromChord(
     #                   'half-diminished': {3: -1, 5: -1, 6: -1, 7: -1},
     #                   'augmented': {5: 1},
     #                   }
-    chordObjSemiclosed = chordObj.semiClosedPosition(inPlace=False)
     root = chordObj.root()
-    thirdType = chordObjSemiclosed.semitonesFromChordStep(3)
+    thirdType = chordObj.semitonesFromChordStep(3)
     if thirdType == 4:
         isMajorThird = True
     else:
@@ -585,7 +583,7 @@ def romanNumeralFromChord(
     if keyObj is None:
         keyObj = rootkeyObj
 
-    fifthType = chordObjSemiclosed.semitonesFromChordStep(5)
+    fifthType = chordObj.semitonesFromChordStep(5)
     if fifthType == 6:
         fifthName = 'o'
     elif fifthType == 8:
@@ -642,6 +640,7 @@ def romanNumeralFromChord(
             'Could not parse {0} from chord {1} as an RN '
             'in key {2}: {3}'.format(rnString, chordObj, keyObj, strerror))
 
+    # Is this linking them in an unsafe way?
     rn.pitches = chordObj.pitches
     return rn
 
