@@ -200,7 +200,7 @@ def figureFromChordAndKey(chordObj, keyObj=None):
 
     >>> from music21 import roman
     >>> roman.figureFromChordAndKey(
-    ...     chord.Chord(['F#2','D3','A-3','C#4']),
+    ...     chord.Chord(['F#2', 'D3', 'A-3', 'C#4']),
     ...     key.Key('C'),
     ...     )
     '6#5b3'
@@ -208,13 +208,13 @@ def figureFromChordAndKey(chordObj, keyObj=None):
     The method substitutes shorthand (e.g., '6' not '63')
 
     >>> roman.figureFromChordAndKey(
-    ...     chord.Chord(['E3','C4','G4']),
+    ...     chord.Chord(['E3', 'C4', 'G4']),
     ...     key.Key('C'),
     ...     )
     '6'
 
     >>> roman.figureFromChordAndKey(
-    ...     chord.Chord(['E3','C4','G4','B-5']),
+    ...     chord.Chord(['E3', 'C4', 'G4', 'B-5']),
     ...     key.Key('F'),
     ...     )
     '65'
@@ -229,7 +229,7 @@ def figureFromChordAndKey(chordObj, keyObj=None):
     of '75', '73', etc.
 
     >>> roman.figureFromChordAndKey(
-    ...     chord.Chord(['A3','E-4','G-4']),
+    ...     chord.Chord(['A3', 'E-4', 'G-4']),
     ...     key.Key('b-'),
     ...     )
     '7'
@@ -239,37 +239,39 @@ def figureFromChordAndKey(chordObj, keyObj=None):
     if keyObj is None:
         keyObj = key.Key(chordObj.root())
     chordFigureTuplets = figureTuplets(chordObj, keyObj)
-    rootFigureAlter = chordFigureTuplets[0][1]
+    bassFigureAlter = chordFigureTuplets[0][1]
 
     allFigureStringList = []
 
     third = chordObj.third
     fifth = chordObj.fifth
     #seventh = chordObj.seventh
-    for figureTuplet in sorted(
-        chordFigureTuplets,
-        key=lambda tup: tup[0],
-        reverse=True,
-        ):
+    for figureTuplet in sorted(chordFigureTuplets,
+                               key=lambda tup: tup[0],
+                               reverse=True):
         (diatonicIntervalNum, alter, alterStr, pitchObj) = figureTuplet
         if diatonicIntervalNum != 1 and pitchObj is third:
             if chordObj.isMajorTriad() or chordObj.isMinorTriad():
                 alterStr = ''  # alterStr[1:]
             elif chordObj.isMinorTriad() and alter > 0:
                 alterStr = ''  # alterStr[1:]
-        elif diatonicIntervalNum != 1 and pitchObj is fifth:
-            if chordObj.isDiminishedTriad() or chordObj.isAugmentedTriad() or \
-                chordObj.isMajorTriad() or chordObj.isMinorTriad():
-                alterStr = ''  # alterStr[1:]
+        elif (diatonicIntervalNum != 1 and 
+              pitchObj is fifth and
+              chordObj.isDiminishedTriad() or 
+              chordObj.isAugmentedTriad() or
+              chordObj.isMajorTriad() or 
+              chordObj.isMinorTriad()):
+            alterStr = ''  # alterStr[1:]
 
         if diatonicIntervalNum == 1:
-            if alter != rootFigureAlter and alterStr != '':
-                pass
-                #diatonicIntervalNum = 8 # mark altered octaves as 8 not 1
-                #figureString = alterStr + str(diatonicIntervalNum)
-                #if figureString not in allFigureStringList:
-                #    filter duplicates and put at beginning
-                #    allFigureStringList.insert(0, figureString)
+            pass
+            # COMMENTED OUT BECAUSE OF SOME PROBLEM
+#             if alter != bassFigureAlter and alterStr != '':
+#                 diatonicIntervalNum = 8 # mark altered octaves as 8 not 1
+#                 figureString = alterStr + str(diatonicIntervalNum)
+#                 if figureString not in allFigureStringList:
+#                     # filter duplicates and put at beginning
+#                     allFigureStringList.insert(0, figureString)
         else:
             figureString = alterStr + str(diatonicIntervalNum)
             # filter out duplicates...
@@ -304,18 +306,27 @@ def figureTuplets(chordObject, keyObject):
     ...     key.Key('C'),
     ...     )
     [(1, 1.0, '#', <music21.pitch.Pitch F#2>),
-    (6, 0.0, '', <music21.pitch.Pitch D3>),
-    (3, -1.0, 'b', <music21.pitch.Pitch A-3>),
-    (5, 1.0, '#', <music21.pitch.Pitch C#4>)]
+     (6, 0.0, '', <music21.pitch.Pitch D3>),
+     (3, -1.0, 'b', <music21.pitch.Pitch A-3>),
+     (5, 1.0, '#', <music21.pitch.Pitch C#4>)]
 
     >>> roman.figureTuplets(
     ...     chord.Chord(['E3','C4','G4','B-5']),
     ...     key.Key('C'),
     ...     )
     [(1, 0.0, '', <music21.pitch.Pitch E3>),
-    (6, 0.0, '', <music21.pitch.Pitch C4>),
-    (3, 0.0, '', <music21.pitch.Pitch G4>),
-    (5, -1.0, 'b', <music21.pitch.Pitch B-5>)]
+     (6, 0.0, '', <music21.pitch.Pitch C4>),
+     (3, 0.0, '', <music21.pitch.Pitch G4>),
+     (5, -1.0, 'b', <music21.pitch.Pitch B-5>)]
+          
+    >>> roman.figureTuplets(
+    ...     chord.Chord(['C4', 'E4', 'G4', 'C#4']),
+    ...     key.Key('C'),
+    ...     ) 
+    [(1, 0.0, '', <music21.pitch.Pitch C4>), 
+     (3, 0.0, '', <music21.pitch.Pitch E4>), 
+     (5, 0.0, '', <music21.pitch.Pitch G4>), 
+     (1, 1.0, '#', <music21.pitch.Pitch C#4>)]
     '''
     result = []
     bass = chordObject.bass()
@@ -341,11 +352,10 @@ def figureTupletSolo(pitchObj, keyObj, bass):
     ...     )
     (3, -1.0, 'b', <music21.pitch.Pitch A-3>)
 
-    Return tuple.
+    Returns tuple.
     '''
     #TODO: Return namedtuple
-    unused_scaleStep, scaleAccidental = \
-        keyObj.getScaleDegreeAndAccidentalFromPitch(pitchObj)
+    unused_scaleStep, scaleAccidental = keyObj.getScaleDegreeAndAccidentalFromPitch(pitchObj)
 
     thisInterval = interval.notesToInterval(bass, pitchObj)
     aboveBass = thisInterval.diatonic.generic.mod7
@@ -468,11 +478,9 @@ def romanInversionName(inChord):
         return ''
 
 
-def romanNumeralFromChord(
-    chordObj,
-    keyObj=None,
-    preferSecondaryDominants=False,
-    ):
+def romanNumeralFromChord(chordObj,
+                          keyObj=None,
+                          preferSecondaryDominants=False):
     '''
     Takes a chord object and returns an appropriate chord name.  If keyObj is
     omitted, the root of the chord is considered the key (if the chord has a
@@ -496,7 +504,7 @@ def romanNumeralFromChord(
     <music21.pitch.Pitch G-6>
 
     >>> romanNumeral2 = roman.romanNumeralFromChord(
-    ...     chord.Chord(['E3','C4','G4','B-4','E5','G5']),
+    ...     chord.Chord(['E3', 'C4', 'G4', 'B-4', 'E5', 'G5']),
     ...     key.Key('F'),
     ...     )
     >>> romanNumeral2
@@ -506,28 +514,28 @@ def romanNumeralFromChord(
     alternatively as #vi and #vii:
 
     >>> romanNumeral3 = roman.romanNumeralFromChord(
-    ...     chord.Chord(['A4','C5','E-5']),
+    ...     chord.Chord(['A4', 'C5', 'E-5']),
     ...     key.Key('c'),
     ...     )
     >>> romanNumeral3
     <music21.roman.RomanNumeral vio in c minor>
 
     >>> romanNumeral4 = roman.romanNumeralFromChord(
-    ...     chord.Chord(['A-4','C5','E-5']),
+    ...     chord.Chord(['A-4', 'C5', 'E-5']),
     ...     key.Key('c'),
     ...     )
     >>> romanNumeral4
     <music21.roman.RomanNumeral bVI in c minor>
 
     >>> romanNumeral5 = roman.romanNumeralFromChord(
-    ...     chord.Chord(['B4','D5','F5']),
+    ...     chord.Chord(['B4', 'D5', 'F5']),
     ...     key.Key('c'),
     ...     )
     >>> romanNumeral5
     <music21.roman.RomanNumeral viio in c minor>
 
     >>> romanNumeral6 = roman.romanNumeralFromChord(
-    ...     chord.Chord(['B-4','D5','F5']),
+    ...     chord.Chord(['B-4', 'D5', 'F5']),
     ...     key.Key('c'),
     ...     )
     >>> romanNumeral6
@@ -547,7 +555,7 @@ def romanNumeralFromChord(
     For reference, odder notes:
 
     >>> romanNumeral7 = roman.romanNumeralFromChord(
-    ...     chord.Chord(['A--4','C-5','E--5']),
+    ...     chord.Chord(['A--4', 'C-5', 'E--5']),
     ...     key.Key('c'),
     ...     )
     >>> romanNumeral7
@@ -560,24 +568,23 @@ def romanNumeralFromChord(
     >>> romanNumeral8
     <music21.roman.RomanNumeral #vi in c minor>
 
+    >>> romanNumeral10 = roman.romanNumeralFromChord(
+    ...     chord.Chord(['F#3', 'A3', 'E4', 'C5']),
+    ...     key.Key('d'),
+    ...     )
+    >>> romanNumeral10
+    <music21.roman.RomanNumeral #iiio/7 in d minor>
+
     OMIT_FROM_DOCS
 
-#    >>> romanNumeral9 = roman.romanNumeralFromChord(
-#    ...     chord.Chord(['C4','E5','G5', 'C#6', 'C7', 'C#8']),
-#    ...     key.Key('C'),
-#    ...     )
-#    >>> romanNumeral9
-#    <music21.roman.RomanNumeral I#853 in C major>
-#
-#    >>> romanNumeral10 = roman.romanNumeralFromChord(
-#    ...     chord.Chord(['F#3', 'A3', 'E4', 'C5']),
-#    ...     key.Key('d'),
-#    ...     )
-#    >>> romanNumeral10
-#    <music21.roman.RomanNumeral #iiio/7 in d minor>
-
+#     >>> romanNumeral9 = roman.romanNumeralFromChord(
+#     ...     chord.Chord(['C4', 'E5', 'G5', 'C#6']),
+#     ...     key.Key('C'),
+#     ...     )
+#     >>> romanNumeral9
+#     <music21.roman.RomanNumeral I#853 in C major>
     '''
-    #TODO: Make sure 9 and 10 work
+    #TODO: Make sure 9 works
     #stepAdjustments = {'minor' : {3: -1, 6: -1, 7: -1},
     #                   'diminished' : {3: -1, 5: -1, 6: -1, 7: -2},
     #                   'half-diminished': {3: -1, 5: -1, 6: -1, 7: -1},
@@ -606,8 +613,7 @@ def romanNumeralFromChord(
     else:
         fifthName = ''
 
-    stepNumber, alter, rootAlterationString, unused = figureTupletSolo(
-        root, keyObj, keyObj.tonic)
+    stepNumber, alter, rootAlterationString, unused = figureTupletSolo(root, keyObj, keyObj.tonic)
 
     if keyObj.mode == 'minor' and stepNumber in [6, 7]:
         if alter == 1.0:
