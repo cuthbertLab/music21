@@ -346,6 +346,18 @@ def _convertHarmonicToCents(value):
         value = 1.0/(abs(value))
     return int(round(1200*math.log(value, 2), 0))
 
+def _simple_consonance_value(interval):
+    r'''Simple consonance value for an interval.
+    '''
+    simpleName = interval.simpleName
+    if simpleName in ['P1', 'P4', 'P5']:
+        return 3
+    elif simpleName in ['m3', 'M3', 'm6', 'M6']:
+        return 2
+    elif simpleName in ['m2', 'M2', 'm7', 'M7']:
+        return 1
+    else:
+        return 0
 
 def simplifyMultipleEnharmonics(pitches, criterion='maximizeConsonance', keyContext=None):
     r'''Tries to simplify the enharmonic spelling of a list of pitches, pitch-
@@ -375,6 +387,9 @@ def simplifyMultipleEnharmonics(pitches, criterion='maximizeConsonance', keyCont
     
     >>> pitch.simplifyMultipleEnharmonics([6, 10, 1], keyContext=key.Key('C-'))
     [<music21.pitch.Pitch G->, <music21.pitch.Pitch B->, <music21.pitch.Pitch D->]
+
+    >>> pitch.simplifyMultipleEnharmonics([3, 8, 0])
+    [<music21.pitch.Pitch E->, <music21.pitch.Pitch A->, <music21.pitch.Pitch C>]
     '''
 
     oldPitches = [p if isinstance(p, Pitch) else Pitch(p) for p in pitches]
@@ -394,9 +409,9 @@ def simplifyMultipleEnharmonics(pitches, criterion='maximizeConsonance', keyCont
             for context_pitch in simplifiedPitches[::-1]:
                 intervals = [interval.Interval(noteStart=candidate, 
                                                noteEnd=context_pitch) for candidate in candidates]
+
                 for j, interval_candidate in enumerate(intervals):
-                    if interval_candidate.isConsonant():
-                        consonant_counter[j] += 1
+                    consonant_counter[j] += _simple_consonance_value(interval_candidate)
 
             # order the candidates by their consonant count
             candidates_by_consonants = sorted(zip(consonant_counter, 
