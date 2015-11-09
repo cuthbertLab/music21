@@ -19,6 +19,7 @@ and :class:`~music21.interval.ChromaticInterval`.
 '''
 
 import copy
+from fractions import Fraction
 import math
 import unittest
 
@@ -26,8 +27,7 @@ from music21 import base
 from music21 import common 
 from music21 import exceptions21
 
-
-#from music21 import pitch # SHOULD NOT, b/c of enharmonics
+from music21 import pitch # SHOULD NOT, b/c of enharmonics
 
 from music21 import environment
 _MOD = "interval.py"
@@ -442,7 +442,49 @@ def convertSemitoneToSpecifierGeneric(count):
     # strip off microtone
     return convertSemitoneToSpecifierGenericMicrotone(count)[:2]
 
+def intervalToPythagoreanRatio(intervalObj):
+    r''' Returns the interval ratio in pythagorean tuning.
 
+    >>> [interval.intervalToPythagoreanRatio(interval.Interval(name)) for name in ['P4', 'P5', 'M7']]
+    [Fraction(4, 3), Fraction(3, 2), Fraction(243, 128)]
+    '''
+
+    from music21 import pitch
+
+    if intervalObj.name == 'P1':
+        return Fraction(1, 1)
+
+    start_note = pitch.Pitch('C1')
+    end_note = start_note.transpose(intervalObj)
+
+    upwards =   {'transpose_interval1': Interval('P5'),
+                 'transpose_interval2': Interval('-P8'),
+                 'transpose_ratio1': Fraction(3, 2),
+                 'transpose_ratio2': Fraction(1, 2),
+                 'note': start_note,
+                 'ratio': Fraction(1, 1)}
+    downwards = {'transpose_interval1': Interval('-P5'),
+                 'transpose_interval2': Interval('P8'),
+                 'transpose_ratio1': Fraction(2, 3),
+                 'transpose_ratio2': Fraction(2, 1),
+                 'note': start_note,
+                 'ratio': Fraction(1, 1)}
+
+    not_found_direction = True
+
+    while not_found_direction:
+        for direction in (upwards, downwards):
+            direction['note'] = direction['note'].transpose(direction['transpose_interval1'])
+            direction['ratio'] *= direction['transpose_ratio1']
+            if direction['note'].name == end_note.name:
+                return_direction = direction
+                not_found_direction = False
+
+    while return_direction['note'].octave != end_note.octave:
+        return_direction['note'] = return_direction['note'].transpose(return_direction['transpose_interval2'])
+        return_direction['ratio'] *= return_direction['transpose_ratio2']
+
+    return return_direction['ratio']    
 
 #-------------------------------------------------------------------------------
 class IntervalBase(base.Music21Object):
