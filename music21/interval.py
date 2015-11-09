@@ -27,7 +27,7 @@ from music21 import base
 from music21 import common 
 from music21 import exceptions21
 
-from music21 import pitch # SHOULD NOT, b/c of enharmonics
+#from music21 import pitch # SHOULD NOT, b/c of enharmonics
 
 from music21 import environment
 _MOD = "interval.py"
@@ -445,7 +445,8 @@ def convertSemitoneToSpecifierGeneric(count):
 def intervalToPythagoreanRatio(intervalObj):
     r''' Returns the interval ratio in pythagorean tuning.
 
-    >>> [interval.intervalToPythagoreanRatio(interval.Interval(name)) for name in ['P4', 'P5', 'M7']]
+    >>> [interval.intervalToPythagoreanRatio(interval.Interval(name))
+    ... for name in ['P4', 'P5', 'M7']]
     [Fraction(4, 3), Fraction(3, 2), Fraction(243, 128)]
     '''
 
@@ -481,7 +482,8 @@ def intervalToPythagoreanRatio(intervalObj):
                 not_found_direction = False
 
     while return_direction['note'].octave != end_note.octave:
-        return_direction['note'] = return_direction['note'].transpose(return_direction['transpose_interval2'])
+        return_direction['note'] = \
+            return_direction['note'].transpose(return_direction['transpose_interval2']) 
         return_direction['ratio'] *= return_direction['transpose_ratio2']
 
     return return_direction['ratio']    
