@@ -400,7 +400,8 @@ def simplifyMultipleEnharmonics(pitches, criterion='maximizeConsonance', keyCont
 
                 for j, interval_candidate in enumerate(intervals):
                     ratio_candidate = interval.intervalToPythagoreanRatio(interval_candidate)
-                    consonant_counter[j] += 1./(ratio_candidate.numerator * ratio_candidate.denominator)
+                    consonant_counter[j] += \
+                         1./(ratio_candidate.numerator * ratio_candidate.denominator)
 
             # order the candidates by their consonant count
             candidates_by_consonants = sorted(zip(consonant_counter, 
