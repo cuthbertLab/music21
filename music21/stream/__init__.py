@@ -74,7 +74,7 @@ class StreamDeprecationWarning(UserWarning):
 
 #------------------------------------------------------------------------------
 # Metaclass
-_OffsetMap = collections.namedtuple('OffsetMap', ['element','offset', 'endTime', 'voiceIndex'])
+_OffsetMap = collections.namedtuple('OffsetMap', ['element', 'offset', 'endTime', 'voiceIndex'])
 
 
 #------------------------------------------------------------------------------
@@ -154,7 +154,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {0.0} <music21.note.Rest rest>
     {1.0} <music21.note.Note E->
     '''
-
     # this static attributes offer a performance boost over other
     # forms of checking class
     isStream = True
@@ -163,16 +162,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     recursionType = 'elementsFirst'
 
     # define order to present names in documentation; use strings
-    _DOC_ORDER = ['append', 'insert', 'insertAndShift',
-        'notes', 'pitches',
-        'transpose',
-        'augmentOrDiminish', 'scaleOffsets', 'scaleDurations']
+    _DOC_ORDER = ['append', 'insert', 'storeAtEnd', 'insertAndShift',
+                  'recurse', 'flat',
+                  'notes', 'pitches',
+                  'transpose',
+                  'augmentOrDiminish', 'scaleOffsets', 'scaleDurations']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
         'recursionType': '''
+            Class variable: 
+            
             String of ('elementsFirst' (default), 'flatten', 'elementsOnly)
             that decides whether the stream likely holds relevant
             contexts for the elements in it.  
+            
+            Define this for a stream class, not an individual object.
             
             see :meth:`~music21.base.Music21Object.contextSites` 
             ''',
@@ -245,9 +249,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     # sequence like operations
 
     def __len__(self):
-        '''Get the total number of elements in the Stream.
+        '''
+        Get the total number of elements in the Stream.
         This method does not recurse into and count elements in contained Streams.
-
 
         >>> import copy
         >>> a = stream.Stream()
@@ -265,6 +269,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         4
         >>> len(b.flat)
         16
+
+        Includes end elements:
+        
+        >>> b.storeAtEnd(bar.Barline('double'))
+        >>> len(b)
+        5
         '''
         return len(self._elements) + len(self._endElements)
 
@@ -305,23 +315,51 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         (if no results are found) :meth:`~music21.stream.Stream.getElementsByGroup` is used to 
         collect and return elements as a Stream.
 
-        >>> a = stream.Stream()
+        >>> a = stream.Part(id='hello')
         >>> a.repeatInsert(note.Rest(), [0, 1, 2, 3, 4, 5])
         >>> subslice = a[2:5]
+        >>> subslice
+        <music21.stream.Part hello>
+        >>> subslice.derivation
+        <Derivation of <music21.stream.Part hello> from 
+            <music21.stream.Part hello> via "__getitem__">
         >>> len(subslice)
         3
         >>> a[1].offset
         1.0
+        >>> subslice[1].offset
+        3.0
+        
         >>> b = note.Note()
         >>> b.id = 'green'
         >>> b.groups.append('violin')
         >>> a.insert(b)
 
-        >>> a[note.Note][0] == b
+        Get an item by class
+
+        >>> allNotes = a[note.Note]
+        >>> allNotes
+        <music21.stream.Part hello>
+        >>> allNotes.derivation
+        <Derivation of <music21.stream.Part hello> from 
+            <music21.stream.Part hello> via "getElementsByClass">
+        >>> allNotes[0] is b
         True
-        >>> a['violin'][0] == b
+        
+        Get items by groups:
+        
+        >>> violinGroup = a['violin']
+        >>> violinGroup
+        <music21.stream.Part hello>
+        >>> violinGroup.derivation
+        <Derivation of <music21.stream.Part hello> from 
+            <music21.stream.Part hello> via "getElementsByGroup">
+        >>> violinGroup[0] is b
         True
-        >>> a['green'] == b
+        
+        Get a single element by id:
+        
+        >>> a['green'] is b
         True
         '''
 
@@ -357,9 +395,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                 "Stream subclasses and Music21Objects cannot have required " +
                                 "arguments in __init__" )
             for e in self.elements[k]:
-                found.insert(self.elementOffset(e), e)
-            # each insert calls this; does not need to be done here
-            #found.elementsChanged()
+                found._insertCore(self.elementOffset(e), e)
+            
+            found.elementsChanged(clearIsSorted=False)
             return found
 
         elif common.isStr(k):
@@ -426,18 +464,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         The activeSites of some elements may have changed between retrieving
         and setting (esp. if a lot else has happened in the meantime). Where
         are we going to get the new stream's elements' offsets from? why
-        from their active sites.
+        from their active sites! So don't do this!
         '''
         if (not common.isListLike(value) and 
                 hasattr(value, 'isStream') and
                 value.isStream):
-            # set from a Stream.
-            self._elements = list(value._elements)
+            # set from a Stream. Best way to do it
+            self._offsetDict = {}
+            self._elements = list(value._elements) # copy list.
             for e in self._elements:
                 self.setElementOffset(e, value.elementOffset(e))
                 e.sites.add(self)
                 e.activeSite = self
-            self._endElements = value._endElements
+            self._endElements = list(value._endElements)
             for e in self._endElements:
                 self.setElementOffset(e, value.elementOffset(e, stringReturn=True))
                 e.sites.add(self)
@@ -456,18 +495,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     elements = property(_getElements, _setElements,
         doc='''
-        Don't use unless you really know what you're doing.
-        
-        Treat a Stream like a list!
-        
-        
-        
-        
-        A list representing the elements contained in the Stream.
+        .elements is a list representing the elements contained in the Stream.
 
         Directly getting, setting, and manipulating this list is
         reserved for advanced usage. Instead, use the the
         provided high-level methods. 
+        
+        In other words:  Don't use unless you really know what you're doing.
+        Treat a Stream like a list!
+        
         
         When setting .elements, a
         list of Music21Objects can be provided, or a complete Stream.

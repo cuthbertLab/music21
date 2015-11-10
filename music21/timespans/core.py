@@ -140,7 +140,8 @@ class AVLNode(common.SlottedObject):
         ''',
         
     'position': r'''
-        The position of this node.
+        The position of this node -- this is often the same as the offset of
+        the node in a containing score, but does not need to be.
 
         >>> score = timespans.makeExampleScore()
         >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
@@ -224,10 +225,11 @@ class AVLNode(common.SlottedObject):
     ### INITIALIZER ###
 
     def __init__(self, position, payload=None):
-        self.balance = 0
-        self.height = 0        
         self.position = position
         self.payload = payload
+
+        self.balance = 0
+        self.height = 0        
 
         self.leftChild = None
         self.rightChild = None
@@ -251,7 +253,6 @@ class AVLNode(common.SlottedObject):
             )
 
     ### PRIVATE METHODS ###
-    
     def moveAttributes(self, other):
         '''
         move attributes from this node to another in case "removal" actually
@@ -324,23 +325,61 @@ class AVLNode(common.SlottedObject):
         Used for the next balancing operation -- does not rebalance itself
         
         Returns None
+
+        We create a score with everything correct.
+
+        >>> score = timespans.makeExampleScore()
+        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        ...             classList=(note.Note, chord.Chord))
+        >>> n = tree.rootNode
+        >>> n
+        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+        >>> n.height, n.balance
+        (3, 1)
+        
+        Now let's screw up the height and balance
+        
+        >>> n.height = 100
+        >>> n.balance = -2
+        >>> n.height, n.balance
+        (100, -2)
+        
+        But we can fix it with `.update()`
+        
+        >>> n.update()
+        >>> n.height, n.balance
+        (3, 1)
+        
+        Note that if we were to screw up the balance/height of one of the
+        child notes of `n` then this would not fix that node's balance/height.
+        This method assumes that children have the correct information and only
+        updates the information for this node.
+
         '''        
-        leftHeight = -1
-        rightHeight = -1
         if self.leftChild is not None:
             leftHeight = self.leftChild.height
+        else:
+            leftHeight = -1
+        
         if self.rightChild is not None:
             rightHeight = self.rightChild.height
+        else:
+            rightHeight = -1
+        
         self.height = max(leftHeight, rightHeight) + 1
         self.balance = rightHeight - leftHeight
 
     def rotateLeftLeft(self):
         r'''
-        Rotates a node left twice.
+        Rotates a node left twice. 
+        
+        Makes this node the rightChild of
+        the former leftChild and makes the former leftChild's rightChild
+        be the leftChild of this node.
 
         Used during tree rebalancing.
 
-        Returns a node, the new central node.
+        Returns the prior leftChild node as the new central node.
         '''
         nextNode = self.leftChild
         self.leftChild = nextNode.rightChild
@@ -352,11 +391,13 @@ class AVLNode(common.SlottedObject):
 
     def rotateLeftRight(self):
         r'''
-        Rotates a node right twice.
+        Rotates a node left, then right.
+
+        Makes this note the rightChild of the former rightChild of the former leftChild node
 
         Used during tree rebalancing.
 
-        Returns a node, the new central node.
+        Returns the former rightChild of the former leftChild node as the new central node.
         '''
         self.leftChild = self.leftChild.rotateRightRight()
         self.update()
@@ -367,9 +408,11 @@ class AVLNode(common.SlottedObject):
         r'''
         Rotates a node right, then left.
 
+        Makes this note the leftChild of the former leftChild of the former rightChild node
+
         Used during tree rebalancing.
 
-        Returns a node, the new central node.
+        Returns the former leftChild of the former rightChild node as the new central node.
         '''
         self.rightChild = self.rightChild.rotateLeftLeft()
         self.update()
@@ -378,11 +421,15 @@ class AVLNode(common.SlottedObject):
 
     def rotateRightRight(self):
         r'''
-        Rotates a node left, then right.
+        Rotates a node right twice.
+
+        Makes this node the leftChild of
+        the former rightChild and makes the former rightChild's leftChild
+        be the rightChild of this node.
 
         Used during tree rebalancing.
 
-        Returns a node, the new central node.
+        Returns the prior rightChild node as the new central node.
         '''
         nextNode = self.rightChild
         self.rightChild = nextNode.leftChild

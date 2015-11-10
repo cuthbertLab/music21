@@ -556,18 +556,24 @@ class ElementTree(core.AVLTree):
 
     def remove(self, elements, offsets=None): 
         r'''
-        Removes `elements` or timespans (a single one or a list) from this Tree.
+        Removes `elements` which can be Music21Objects or Timespans 
+        (a single one or a list) from this Tree.
         
-        Much safer (for non-timespans) if a list of offsets is used 
+        Much safer (for non-timespans) if a list of offsets is used but it is optional
         
         TODO: raise exception if elements length and offsets length differ
         '''
         initialPosition = self.offset
         initialEndTime = self.endTime
-        if hasattr(elements, 'offset'):
+        if hasattr(elements, 'offset'): # a music21 object or an ElementTimespan
             elements = [elements]
         if offsets is not None and not common.isListLike(offsets):
             offsets = [offsets]
+        
+        if offsets is not None and len(elements) != len(offsets):
+            raise TimespanTreeException(
+                "Number of elements and number of offsets must be the same")
+
         
         for i, el in enumerate(elements):
             if offsets is not None:
@@ -577,8 +583,8 @@ class ElementTree(core.AVLTree):
                 
         self._updateIndices(self.rootNode)
         self._updateEndTimes(self.rootNode)
-        if (self.offset != initialPosition) or \
-            (self.endTime != initialEndTime):
+        if (self.offset != initialPosition or
+                self.endTime != initialEndTime):
             self._updateParents(initialPosition)
 
     def insert(self, offsetsOrElements, elements=None):
@@ -613,8 +619,8 @@ class ElementTree(core.AVLTree):
             self._insertCore(offsets[i], el)
         self._updateIndices(self.rootNode)
         self._updateEndTimes(self.rootNode)
-        if (self.offset != initialPosition) or \
-            (self.endTime != initialEndTime):
+        if (self.offset != initialPosition or 
+                self.endTime != initialEndTime):
             self._updateParents(initialPosition)
 
     def _insertCore(self, offset, el):

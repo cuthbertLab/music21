@@ -123,7 +123,7 @@ class StreamCoreMixin(object):
     # most will set isSorted to False
 
     def elementsChanged(self, updateIsFlat=True, clearIsSorted=True,
-        memo=None, keepIndex=False):
+                        memo=None, keepIndex=False):
         '''
         An advanced stream method that is not necessary for most users.
         

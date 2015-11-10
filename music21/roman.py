@@ -575,14 +575,44 @@ def romanNumeralFromChord(chordObj,
     >>> romanNumeral10
     <music21.roman.RomanNumeral #iiio/7 in d minor>
 
-    OMIT_FROM_DOCS
 
-#     >>> romanNumeral9 = roman.romanNumeralFromChord(
-#     ...     chord.Chord(['C4', 'E5', 'G5', 'C#6']),
-#     ...     key.Key('C'),
-#     ...     )
-#     >>> romanNumeral9
-#     <music21.roman.RomanNumeral I#853 in C major>
+    Known bugs:
+
+    Should be I#853
+
+    #>>> romanNumeral9 = roman.romanNumeralFromChord(
+    #...     chord.Chord(['C4', 'E5', 'G5', 'C#6']),
+    #...     key.Key('C'),
+    #...     )
+    #>>> romanNumeral9
+    #<music21.roman.RomanNumeral I in C major>
+    
+    
+    
+    Should be vi/o7
+    
+    #>>> roman.romanNumeralFromChord(chord.Chord("A3 C4 E-4 G4"), key.Key('c'))
+    #<music21.roman.RomanNumeral vio7 in c minor>
+
+    Should be vii/o753
+
+    #>>> roman.romanNumeralFromChord(chord.Chord("A3 C4 E-4 G4"), key.Key('B-'))
+    #<music21.roman.RomanNumeral viio#753 in B- major>
+
+
+    b before 2 is unnecessary here
+
+    #>>> roman.romanNumeralFromChord(chord.Chord("E-3 G3 B3 D3"), key.Key('c'))
+    #<music21.roman.RomanNumeral III+64b2 in c minor>
+
+
+    These two are debatable -- is the harmonic minor or the natural minor used as the basis?
+
+    #>>> roman.romanNumeralFromChord(chord.Chord("F4 A4 C5 E-5"), key.Key('c'))
+    #<music21.roman.RomanNumeral IVb753 in c minor>
+
+    #>>> roman.romanNumeralFromChord(chord.Chord("F4 A4 C5 E5"), key.Key('c'))
+    #<music21.roman.RomanNumeral IV7 in c minor>
     '''
     #TODO: Make sure 9 works
     #stepAdjustments = {'minor' : {3: -1, 6: -1, 7: -1},
