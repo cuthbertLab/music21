@@ -610,21 +610,12 @@ class ClassDocumenter(ObjectDocumenter):
         '''
         The music21 _DOC_ORDER definition for a documented class:
 
-        >>> klass = stream.Stream
+        >>> klass = dynamics.Dynamic
         >>> documenter = documentation.documenters.ClassDocumenter(klass)
         >>> for name in documenter.docOrder:
         ...     name
-        ...
-        'append'
-        'insert'
-        'insertAndShift'
-        'notes'
-        'pitches'
-        'transpose'
-        'augmentOrDiminish'
-        'scaleOffsets'
-        'scaleDurations'
-
+        'longName'
+        'englishName'
         '''
         self._docOrder = getattr(self.referent, '_DOC_ORDER', [])
         return self._docOrder
