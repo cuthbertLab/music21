@@ -471,12 +471,11 @@ def intervalToPythagoreanRatio(intervalObj):
     else:
         end_pitch_up = start_pitch
         end_pitch_down = start_pitch
-        counter = 0
         not_found_flag = True
 
         # when counter == 36, it wraps back to 'C' because of
         # music21's limiting of accidentals
-        while counter < 37:
+        for counter in range(37):
             if end_pitch_up.name == end_pitch_wanted.name:
                 ratio = Fraction(3, 2) ** counter
                 end_pitch = end_pitch_up
@@ -490,7 +489,6 @@ def intervalToPythagoreanRatio(intervalObj):
             else:
                 end_pitch_up = end_pitch_up.transpose('P5')
                 end_pitch_down = end_pitch_down.transpose('-P5')
-                counter += 1
         else:
             print('Could not find a pythagorean ratio for {}.'.format(intervalObj))
             return float('Nan')
