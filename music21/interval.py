@@ -448,7 +448,8 @@ _pythagorean_cache = {}
 def intervalToPythagoreanRatio(intervalObj):
     r''' Returns the interval ratio in pythagorean tuning.
 
-    >>> [interval.intervalToPythagoreanRatio(interval.Interval(name)) for name in ['P4', 'P5', 'M7']]
+    >>> [interval.intervalToPythagoreanRatio(interval.Interval(name))
+    ... for name in ['P4', 'P5', 'M7']]
     [Fraction(4, 3), Fraction(3, 2), Fraction(243, 128)]
     '''
     from music21.pitch import Pitch
