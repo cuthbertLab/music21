@@ -351,7 +351,9 @@ def simplifyMultipleEnharmonics(pitches, criterion='maximizeConsonance', keyCont
     or pitch-class numbers according to a given criterion. 
 
     Currently `maximizeConsonance` is the only criterion, that tries to
-    maximize the consonances in a greedy left-to-right fashion.
+    maximize the consonances in a greedy left-to-right fashion. The dissonance
+    of an interval is quantified by the product of numerator and denominator of its
+    pythagorean ratio (see :func:`~music21.interval.intervalToPythagoreanRatio`).
 
     >>> pitch.simplifyMultipleEnharmonics([11, 3, 6])
     [<music21.pitch.Pitch B>, <music21.pitch.Pitch D#>, <music21.pitch.Pitch F#>]
@@ -400,8 +402,9 @@ def simplifyMultipleEnharmonics(pitches, criterion='maximizeConsonance', keyCont
 
                 for j, interval_candidate in enumerate(intervals):
                     ratio_candidate = interval.intervalToPythagoreanRatio(interval_candidate)
-                    consonant_counter[j] += \
-                         1./(ratio_candidate.numerator * ratio_candidate.denominator)
+                    if ratio_candidate is not float('nan'):
+                        consonant_counter[j] += \
+                            1./(ratio_candidate.numerator * ratio_candidate.denominator)
 
             # order the candidates by their consonant count
             candidates_by_consonants = sorted(zip(consonant_counter, 
