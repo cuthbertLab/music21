@@ -1394,7 +1394,7 @@ class Chord(note.NotRest):
         '''Return a Z relation if it exists, otherwise return None.
 
         >>> chord.fromIntervalVector((1,1,1,1,1,1))
-         <music21.chord.Chord C D- F- G->
+        <music21.chord.Chord C D- F- G->
 
         >>> chord.fromIntervalVector((1,1,1,1,1,1)).getZRelation()
         <music21.chord.Chord C D- E- G>
@@ -4905,7 +4905,7 @@ class Test(unittest.TestCase):
     def testPostTonalChordsB(self):
         c1 = Chord([1, 4, 7, 10])
         self.assertEqual(c1.commonName, 'diminished seventh chord')
-        self.assertEqual(c1.pitchedCommonName, 'C#-diminished seventh chord')
+        self.assertEqual(c1.pitchedCommonName, 'A#-diminished seventh chord')
 
     def testScaleDegreesA(self):
         from music21 import key

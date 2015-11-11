@@ -442,51 +442,49 @@ def convertSemitoneToSpecifierGeneric(count):
     # strip off microtone
     return convertSemitoneToSpecifierGenericMicrotone(count)[:2]
 
+
+_pythagorean_cache = {}
+
 def intervalToPythagoreanRatio(intervalObj):
     r''' Returns the interval ratio in pythagorean tuning.
 
-    >>> [interval.intervalToPythagoreanRatio(interval.Interval(name))
-    ... for name in ['P4', 'P5', 'M7']]
+    >>> [interval.intervalToPythagoreanRatio(interval.Interval(name)) for name in ['P4', 'P5', 'M7']]
     [Fraction(4, 3), Fraction(3, 2), Fraction(243, 128)]
     '''
+    from music21.pitch import Pitch
 
-    from music21 import pitch
+    start_pitch = Pitch('C1')
+    end_pitch_wanted = start_pitch.transpose(intervalObj)
 
-    if intervalObj.name == 'P1':
-        return Fraction(1, 1)
+    if end_pitch_wanted.name in _pythagorean_cache:
+        end_pitch, ratio = _pythagorean_cache[end_pitch_wanted.name]
 
-    start_note = pitch.Pitch('C1')
-    end_note = start_note.transpose(intervalObj)
+    else:
+        end_pitch_up = start_pitch
+        end_pitch_down = start_pitch
+        counter = 0
+        not_found_flag = True
 
-    upwards =   {'transpose_interval1': Interval('P5'),
-                 'transpose_interval2': Interval('-P8'),
-                 'transpose_ratio1': Fraction(3, 2),
-                 'transpose_ratio2': Fraction(1, 2),
-                 'note': start_note,
-                 'ratio': Fraction(1, 1)}
-    downwards = {'transpose_interval1': Interval('-P5'),
-                 'transpose_interval2': Interval('P8'),
-                 'transpose_ratio1': Fraction(2, 3),
-                 'transpose_ratio2': Fraction(2, 1),
-                 'note': start_note,
-                 'ratio': Fraction(1, 1)}
+        while not_found_flag:
+            if end_pitch_up.name == end_pitch_wanted.name:
+                ratio = Fraction(3, 2) ** counter
+                end_pitch = end_pitch_up
+                not_found_flag = False
+                
+            elif end_pitch_down.name == end_pitch_wanted.name:
+                ratio = Fraction(2, 3) ** counter
+                end_pitch = end_pitch_down
+                not_found_flag = False
 
-    not_found_direction = True
+            else:
+                end_pitch_up = end_pitch_up.transpose('P5')
+                end_pitch_down = end_pitch_down.transpose('-P5')
+                counter += 1
 
-    while not_found_direction:
-        for direction in (upwards, downwards):
-            direction['note'] = direction['note'].transpose(direction['transpose_interval1'])
-            direction['ratio'] *= direction['transpose_ratio1']
-            if direction['note'].name == end_note.name:
-                return_direction = direction
-                not_found_direction = False
+        _pythagorean_cache[end_pitch_wanted.name] = end_pitch, ratio
 
-    while return_direction['note'].octave != end_note.octave:
-        return_direction['note'] = \
-            return_direction['note'].transpose(return_direction['transpose_interval2']) 
-        return_direction['ratio'] *= return_direction['transpose_ratio2']
-
-    return return_direction['ratio']    
+    octaves = int((end_pitch_wanted.midi - end_pitch.midi)/12)
+    return ratio * Fraction(2, 1) ** octaves
 
 #-------------------------------------------------------------------------------
 class IntervalBase(base.Music21Object):
