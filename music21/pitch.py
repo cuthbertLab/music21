@@ -401,10 +401,12 @@ def simplifyMultipleEnharmonics(pitches, criterion='maximizeConsonance', keyCont
                                                noteEnd=context_pitch) for candidate in candidates]
 
                 for j, interval_candidate in enumerate(intervals):
-                    ratio_candidate = interval.intervalToPythagoreanRatio(interval_candidate)
-                    if ratio_candidate is not float('nan'):
+                    try:
+                        ratio_candidate = interval.intervalToPythagoreanRatio(interval_candidate)
                         consonant_counter[j] += \
                             1./(ratio_candidate.numerator * ratio_candidate.denominator)
+                    except IntervalException:
+                        pass
 
             # order the candidates by their consonant count
             candidates_by_consonants = sorted(zip(consonant_counter, 

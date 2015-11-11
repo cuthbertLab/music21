@@ -452,13 +452,13 @@ def intervalToPythagoreanRatio(intervalObj):
     ... for name in ['P4', 'P5', 'M7']]
     [Fraction(4, 3), Fraction(3, 2), Fraction(243, 128)]
 
-    Returns `nan` if no ratio could be found:
+    Throws an exception if no ratio can be found:
 
     >>> p1, p2 = pitch.Pitch('C1'), pitch.Pitch('C1')
     >>> p2.accidental = 'half-sharp'
     >>> interval.intervalToPythagoreanRatio(interval.Interval(p1, p2))
-    Could not find a pythagorean ratio for <music21.interval.Interval A1 (-50c)>.
-    nan
+    Traceback (most recent call last):
+    IntervalException: Could not find a pythagorean ratio for <music21.interval.Interval A1 (-50c)>.
     '''
     from music21.pitch import Pitch
 
@@ -490,8 +490,8 @@ def intervalToPythagoreanRatio(intervalObj):
                 end_pitch_up = end_pitch_up.transpose('P5')
                 end_pitch_down = end_pitch_down.transpose('-P5')
         else:
-            print('Could not find a pythagorean ratio for {}.'.format(intervalObj))
-            return float('Nan')
+            raise IntervalException(
+                'Could not find a pythagorean ratio for {}.'.format(intervalObj))
 
         _pythagorean_cache[end_pitch_wanted.name] = end_pitch, ratio
 
