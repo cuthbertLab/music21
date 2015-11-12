@@ -19,13 +19,13 @@ and :class:`~music21.interval.ChromaticInterval`.
 '''
 
 import copy
+from fractions import Fraction
 import math
 import unittest
 
 from music21 import base
 from music21 import common 
 from music21 import exceptions21
-
 
 #from music21 import pitch # SHOULD NOT, b/c of enharmonics
 
@@ -443,6 +443,60 @@ def convertSemitoneToSpecifierGeneric(count):
     return convertSemitoneToSpecifierGenericMicrotone(count)[:2]
 
 
+_pythagorean_cache = {}
+
+def intervalToPythagoreanRatio(intervalObj):
+    r''' Returns the interval ratio in pythagorean tuning.
+
+    >>> [interval.intervalToPythagoreanRatio(interval.Interval(name))
+    ... for name in ['P4', 'P5', 'M7']]
+    [Fraction(4, 3), Fraction(3, 2), Fraction(243, 128)]
+
+    Throws an exception if no ratio can be found:
+
+    >>> p1, p2 = pitch.Pitch('C1'), pitch.Pitch('C1')
+    >>> p2.accidental = 'half-sharp'
+    >>> interval.intervalToPythagoreanRatio(interval.Interval(p1, p2))
+    Traceback (most recent call last):
+    IntervalException: Could not find a pythagorean ratio for <music21.interval.Interval A1 (-50c)>.
+    '''
+    from music21.pitch import Pitch
+
+    start_pitch = Pitch('C1')
+    end_pitch_wanted = start_pitch.transpose(intervalObj)
+
+    if end_pitch_wanted.name in _pythagorean_cache:
+        end_pitch, ratio = _pythagorean_cache[end_pitch_wanted.name]
+
+    else:
+        end_pitch_up = start_pitch
+        end_pitch_down = start_pitch
+        not_found_flag = True
+
+        # when counter == 36, it wraps back to 'C' because of
+        # music21's limiting of accidentals
+        for counter in range(37):
+            if end_pitch_up.name == end_pitch_wanted.name:
+                ratio = Fraction(3, 2) ** counter
+                end_pitch = end_pitch_up
+                break
+                
+            elif end_pitch_down.name == end_pitch_wanted.name:
+                ratio = Fraction(2, 3) ** counter
+                end_pitch = end_pitch_down
+                break
+
+            else:
+                end_pitch_up = end_pitch_up.transpose('P5')
+                end_pitch_down = end_pitch_down.transpose('-P5')
+        else:
+            raise IntervalException(
+                'Could not find a pythagorean ratio for {}.'.format(intervalObj))
+
+        _pythagorean_cache[end_pitch_wanted.name] = end_pitch, ratio
+
+    octaves = int((end_pitch_wanted.midi - end_pitch.midi)/12)
+    return ratio * Fraction(2, 1) ** octaves
 
 #-------------------------------------------------------------------------------
 class IntervalBase(base.Music21Object):
