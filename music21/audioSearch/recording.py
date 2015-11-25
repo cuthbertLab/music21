@@ -100,7 +100,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
         else:
             waveFilename = environLocal.getRootTempDir() + os.path.sep + 'recordingTemp.wav'
         ### write recording to disk
-        data = ''.join(storedWaveSampleList)
+        data = b''.join(storedWaveSampleList)
         try:
             wf = wave.open(waveFilename, 'wb')
             wf.setnchannels(recordChannels)
