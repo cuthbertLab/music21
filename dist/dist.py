@@ -17,8 +17,9 @@ To do a release,
 1. update the VERSION in _version.py and the single test cases in base.py and 
      in case of major version changes freezeThaw.JSONFreezer.jsonPrint if this wasn't done already.
 2. run test/multiprocessTest.py  for Python2 AND Python3
-3. If all tests pass, for a major change, run `corpus.cacheMetadata(['core', 'virtual'], verbose=True)`.
-     every once in a while run metadata.MetadataBundle.fromCoreCorpus().rebuild() (40 min on MacPro)
+3. If all tests pass, for a major change, run 
+    `corpus.cacheMetadata(['core', 'virtual'], verbose=True)`.
+    every once in a while run metadata.MetadataBundle.fromCoreCorpus().rebuild() (40 min on MacPro)
 4. run test/testSingleCoreAll.py 
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest, 
      but should be done before making a release).  Done automatically by Travis-CI on GitHub commit
@@ -44,7 +45,8 @@ To do a release,
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
 13. then update PyPI by going to pypi.python.org and logging in and selecting music21 and clicking 
-    edit at the top and augment the version number and the download URL. -- The URL will be printed when
+    edit at the top and augment the version number and the download URL. 
+    The URL will be printed when
     running dist.py -- (the md5 hash is no longer needed)
 
 14. Upload the .tar.gz file to PyPi by clicking "files" at the time.  Click Choose File.
@@ -52,7 +54,8 @@ To do a release,
 
 15. Delete the files in dist...
 
-16. Immediately increment the number in _version.py and run tests on it here to prepare for next release.
+16. Immediately increment the number in _version.py and run tests on it here 
+    to prepare for next release.
 
 17. Announce on the blog, to the list, and twitter.
 
@@ -60,7 +63,7 @@ DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do
 '''
 
 
-import hashlib, os, sys, tarfile, zipfile
+import hashlib, os, sys, tarfile
 
 from music21 import base
 from music21 import common
@@ -271,15 +274,15 @@ class Distributor(object):
                           'bdist_wininst', 
                           'sdist --formats=gztar'
                           ]:    
-                environLocal.warn('making %s' % buildType)
+            environLocal.warn('making %s' % buildType)
 
-                #setup.writeManifestTemplate(self.fpPackageDir)
-                #setup.runDisutils(type)
-                savePath = os.getcwd()
-                os.chdir(self.fpPackageDir)
-                os.system('%s setup.py %s' % 
-                            (PY, buildType))
-                os.chdir(savePath)
+            #setup.writeManifestTemplate(self.fpPackageDir)
+            #setup.runDisutils(type)
+            savePath = os.getcwd()
+            os.chdir(self.fpPackageDir)
+            os.system('%s setup.py %s' % 
+                        (PY, buildType))
+            os.chdir(savePath)
 
 #        os.system('cd %s; %s setup.py bdist_egg' % (self.fpPackageDir, PY))
 #        os.system('cd %s; %s setup.py bdist_wininst' % 
@@ -306,7 +309,8 @@ class Distributor(object):
 #         '''
 #         Upload source package to PyPI -- currently source file is too big for PyPi...sigh...
 #         '''
-#         environLocal.warn('putting bdist_egg on pypi -- looks redundant, but we have to do it again')
+#         environLocal.warn(
+#                'putting bdist_egg on pypi -- looks redundant, but we have to do it again')
 #         savePath = os.getcwd()
 #         os.chdir(self.fpPackageDir)
 #         os.system('%s setup.py bdist_egg upload' % PY)
