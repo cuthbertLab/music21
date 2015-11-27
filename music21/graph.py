@@ -1030,13 +1030,14 @@ class GraphHorizontalBar(Graph):
             # then start y position, bar height
             faceColor = getColor(self.colors[i % len(self.colors)])            
             
-            yrange = (yPos + self._margin, self._barHeight)
-            ax.broken_barh(points, yrange, facecolors=faceColor, alpha=self.alpha)
-            for xStart, xLen in points:
-                xEnd = xStart + xLen
-                for x in [xStart, xEnd]:
-                    if x not in xPoints:
-                        xPoints.append(x)
+            if len(points) > 0:
+                yrange = (yPos + self._margin, self._barHeight)
+                ax.broken_barh(points, yrange, facecolors=faceColor, alpha=self.alpha)
+                for xStart, xLen in points:
+                    xEnd = xStart + xLen
+                    for x in [xStart, xEnd]:
+                        if x not in xPoints:
+                            xPoints.append(x)
             # ticks are value, label
             yTicks.append([yPos + self._barSpace * .5, key])
             #yTicks.append([key, yPos + self._barSpace * .5])
