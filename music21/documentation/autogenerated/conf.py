@@ -35,7 +35,15 @@ if os.environ.get('READTHEDOCS', ''):
     from music21.documentation import make as docMaker
     db = docMaker.DocBuilder('html')
     db.runBuild(runSphinx=False)
-
+    for dirname, dirnames, filenames in os.walk(os.path.dirname(__file__)):
+        # print path to all subdirectories first.
+        for subdirname in dirnames:
+            print(os.path.join(dirname, subdirname))
+    
+        # print path to all filenames.
+        for filename in filenames:
+            print(os.path.join(dirname, filename))
+    
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
