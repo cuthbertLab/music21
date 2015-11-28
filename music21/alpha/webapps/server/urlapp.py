@@ -51,7 +51,7 @@ def music21ModWSGICorpusURLApplication(environ, start_response):
     resultStr = ""
     
     if len(pathParts) > 1 and pathParts[1] in ['corpusParse','corpusReduce']:
-        workList = corpus.getWorkList(pathParts[2])
+        workList = corpus.corpora.CoreCorpus().getWorkList(pathParts[2])
         if len(workList) >1:
             resultStr = "Multiple choices for query "+pathParts[2]+". Please try one of the following\n"
             for p in workList:

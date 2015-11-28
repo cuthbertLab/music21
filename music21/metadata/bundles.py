@@ -676,7 +676,7 @@ class MetadataBundle(object):
 
         >>> from music21 import corpus, metadata
         >>> metadataBundle = metadata.bundles.MetadataBundle()
-        >>> p = corpus.getWorkList('bach/bwv66.6')
+        >>> p = corpus.corpora.CoreCorpus().getWorkList('bach/bwv66.6')
         >>> metadataBundle.addFromPaths(
         ...     p,
         ...     useCorpus=False,
@@ -1084,7 +1084,7 @@ class MetadataBundle(object):
         matching.
 
         >>> from music21 import corpus, metadata
-        >>> workList = corpus.getWorkList('ciconia')
+        >>> workList = corpus.corpora.CoreCorpus().getWorkList('ciconia')
         >>> metadataBundle = metadata.bundles.MetadataBundle()
         >>> failedPaths = metadataBundle.addFromPaths(
         ...     workList,

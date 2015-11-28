@@ -4410,7 +4410,8 @@ class TestExternal(unittest.TestCase):
         import io
         import difflib
         
-        #b = converter.parse(corpus.getWorkList('cpebach')[0], format='musicxml', forceSource=True)
+        #b = converter.parse(corpus.corpora.CoreCorpus().getWorkList('cpebach')[0], 
+        #    format='musicxml', forceSource=True)
         b = corpus.parse('cpebach')
         #b.show('text')
         #n = b.flat.notes[0]

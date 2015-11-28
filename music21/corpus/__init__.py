@@ -271,55 +271,6 @@ def noCorpus():
     '''
     return corpora.CoreCorpus().noCorpus
 
-#------------------------------------------------------------------------------
-
-
-def getWorkList(workName, movementNumber=None, fileExtensions=None):
-    '''
-    Search the corpus and return a list of filenames of works, always in a
-    list.
-
-    If no matches are found, an empty list is returned.
-
-    >>> len(corpus.getWorkList('schumann_clara', 3, '.xml'))
-    1
-
-    Make sure that 'verdi' just gets the single Verdi piece and not the
-    Monteverdi pieces:
-
-    >>> len(corpus.getWorkList('verdi'))
-    1
-
-    '''
-    return corpora.CoreCorpus().getWorkList(
-        workName,
-        movementNumber=movementNumber,
-        fileExtensions=fileExtensions,
-        )
-
-
-def getVirtualWorkList(workName, movementNumber=None, fileExtensions=None):
-    '''
-    Given a work name, search all virtual works and return a list of URLs for
-    any matches.
-
-
-    >>> corpus.getVirtualWorkList('bach/bwv1007/prelude')
-    ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
-
-    >>> corpus.getVirtualWorkList('junk')
-    []
-
-    '''
-    return corpora.VirtualCorpus().getWorkList(
-        workName,
-        movementNumber=movementNumber,
-        fileExtensions=fileExtensions,
-        )
-
-
-#------------------------------------------------------------------------------
-
 
 #------------------------------------------------------------------------------
 

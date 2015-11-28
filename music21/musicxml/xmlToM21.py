@@ -4207,7 +4207,8 @@ class Test(unittest.TestCase):
     def testStaffLayout(self):
         from music21 import corpus, converter
         # NB using getWorkList to change format to oldmusicxml as necessary for testing.
-        c = converter.parse(corpus.getWorkList('demos/layoutTest.xml')[0], format='musicxml', 
+        c = converter.parse(corpus.corpora.CoreCorpus().getWorkList('demos/layoutTest.xml')[0], 
+                            format='musicxml', 
                             #forceSource=True
                             )
         #c = corpus.parse('demos/layoutTest.xml')        
@@ -4246,7 +4247,7 @@ class Test(unittest.TestCase):
     def testStaffLayoutMore(self):
         from music21 import corpus, converter
         # NB using getWorkList to change format to oldmusicxml as necessary for testing.
-        c = converter.parse(corpus.getWorkList('demos/layoutTestMore.xml')[0], 
+        c = converter.parse(corpus.corpora.CoreCorpus().getWorkList('demos/layoutTestMore.xml')[0], 
                             format='musicxml', 
                             #forceSource=True
                             )
@@ -4277,7 +4278,8 @@ class Test(unittest.TestCase):
         '''
         from music21 import  corpus, converter
         # NB using getWorkList to change format to oldmusicxml as necessary for testing.
-        c = converter.parse(corpus.getWorkList('schoenberg/opus19/movement2.mxl')[0], 
+        c = converter.parse(corpus.corpora.CoreCorpus().getWorkList(
+                                                    'schoenberg/opus19/movement2.mxl')[0], 
                             format='musicxml', 
                             #forceSource=True
                             )
@@ -4302,7 +4304,7 @@ class Test(unittest.TestCase):
         spanners on rests! fix...
         '''
         from music21 import  corpus, converter
-        c = converter.parse(corpus.getWorkList('luca/gloria.xml')[0], 
+        c = converter.parse(corpus.corpora.CoreCorpus().getWorkList('luca/gloria.xml')[0], 
                             format='musicxml', 
                             #forceSource=True
                             )

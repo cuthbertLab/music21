@@ -3417,12 +3417,14 @@ class Test(unittest.TestCase):
 
         #a = converter.parse(testPrimitive.simpleRepeat45a)
         # this is a good example with repeats
-        s = converter.parse(corpus.getWorkList('k80/movement3')[0], format='oldmusicxml')
+        s = converter.parse(corpus.corpora.CoreCorpus().getWorkList('k80/movement3')[0], 
+                            format='oldmusicxml')
         for p in s.parts:
             post = p.flat.getElementsByClass('Repeat')
             self.assertEqual(len(post), 6)
 
-        #a = converter.parse(corpus.getWorkList('opus41no1/movement3')[0], format='oldmusicxml')
+        #a = converter.parse(corpus.corpora.CoreCorpus().getWorkList('opus41no1/movement3')[0], 
+        #        format='oldmusicxml')
         #s.show()
 
     def testVoices(self):
@@ -3495,10 +3497,14 @@ class Test(unittest.TestCase):
 
     def testMultipleStavesPerPartC(self):
         from music21 import corpus, converter
-        s = converter.parse(corpus.getWorkList('schoenberg/opus19/movement2')[0], format='oldmusicxml')
+        s = converter.parse(
+            corpus.corpora.CoreCorpus().getWorkList('schoenberg/opus19/movement2')[0], 
+            format='oldmusicxml')
         self.assertEqual(len(s.parts), 2)
 
-        s = converter.parse(corpus.getWorkList('schoenberg/opus19/movement6')[0], format='oldmusicxml')
+        s = converter.parse(
+            corpus.corpora.CoreCorpus().getWorkList('schoenberg/opus19/movement6')[0], 
+            format='oldmusicxml')
         self.assertEqual(len(s.parts), 2)
 
         #s.show()
@@ -3550,7 +3556,8 @@ class Test(unittest.TestCase):
 
     def testTextExpressionsC(self):
         from music21 import corpus, converter
-        s = converter.parse(corpus.getWorkList('bwv66.6')[0], format='oldmusicxml')
+        s = converter.parse(corpus.corpora.CoreCorpus().getWorkList('bwv66.6')[0], 
+                            format='oldmusicxml')
         p = s.parts[0]
         for m in p.getElementsByClass('Measure'):
             for n in m.flat.notes:
@@ -3569,7 +3576,8 @@ class Test(unittest.TestCase):
     def testTextExpressionsD(self):
         from music21 import corpus, converter
         # test placing text expression in arbitrary locations
-        s = converter.parse(corpus.getWorkList('bwv66.6')[0], format='oldmusicxml')
+        s = converter.parse(corpus.corpora.CoreCorpus().getWorkList('bwv66.6')[0], 
+                            format='oldmusicxml')
         p = s.parts[-1] # get bass
         for m in p.getElementsByClass('Measure')[1:]:
             for pos in [1.5, 2.5]:
@@ -3811,7 +3819,7 @@ class Test(unittest.TestCase):
     def testHarmonyA(self):
         from music21 import corpus, converter
 
-        s = converter.parse(corpus.getWorkList('leadSheet/berlinAlexandersRagtime')[0], format='oldmusicxml')
+        s = converter.parse(corpus.corpora.CoreCorpus().getWorkList('leadSheet/berlinAlexandersRagtime')[0], format='oldmusicxml')
         self.assertEqual(len(s.flat.getElementsByClass('ChordSymbol')), 19)
 
         match = [h.chordKind for h in s.flat.getElementsByClass('ChordSymbol')]
@@ -3826,10 +3834,10 @@ class Test(unittest.TestCase):
         self.assertEqual(match, set(['F','F7','B-','C7','G7','C']))
 
 
-        s = converter.parse(corpus.getWorkList('monteverdi/madrigal.3.12')[0], format='oldmusicxml')
+        s = converter.parse(corpus.corpora.CoreCorpus().getWorkList('monteverdi/madrigal.3.12')[0], format='oldmusicxml')
         self.assertEqual(len(s.flat.getElementsByClass('ChordSymbol')), 10)
 
-        s = converter.parse(corpus.getWorkList('leadSheet/fosterBrownHair')[0], format='oldmusicxml')
+        s = converter.parse(corpus.corpora.CoreCorpus().getWorkList('leadSheet/fosterBrownHair')[0], format='oldmusicxml')
         self.assertEqual(len(s.flat.getElementsByClass('ChordSymbol')), 40)
 
         #s.show()
@@ -3837,7 +3845,7 @@ class Test(unittest.TestCase):
     def testOrnamentandTechnical(self):
         from music21 import corpus, converter
 
-        s = converter.parse(corpus.getWorkList('opus133')[0], format='oldmusicxml')
+        s = converter.parse(corpus.corpora.CoreCorpus().getWorkList('opus133')[0], format='oldmusicxml')
         ex = s.parts[0]
         countTrill = 0
         for n in ex.flat.notes:
@@ -3918,7 +3926,7 @@ class Test(unittest.TestCase):
         from music21 import corpus, converter
         # this is a good test as this encoding uses staffs, not parts
         # to encode both parts; this requires special spanner handling
-        s = converter.parse(corpus.getWorkList('mozart/k545/movement1_exposition')[0], format='oldmusicxml')
+        s = converter.parse(corpus.corpora.CoreCorpus().getWorkList('mozart/k545/movement1_exposition')[0], format='oldmusicxml')
         sf = s.flat       
         slurs = sf.getElementsByClass(spanner.Slur)
         # TODO: this value should be 2, but due to staff encoding we 
@@ -4016,7 +4024,7 @@ class Test(unittest.TestCase):
 
     def testStaffLayout(self):
         from music21 import corpus, converter
-        c = converter.parse(corpus.getWorkList('demos/layoutTest.xml')[0], format='oldmusicxml', forceSource=True)
+        c = converter.parse(corpus.corpora.CoreCorpus().getWorkList('demos/layoutTest.xml')[0], format='oldmusicxml', forceSource=True)
         #c = corpus.parse('demos/layoutTest.xml')        
         layouts = c.flat.getElementsByClass('LayoutBase')
         systemLayouts = layouts.getElementsByClass('SystemLayout')
@@ -4054,7 +4062,7 @@ class Test(unittest.TestCase):
 
     def testStaffLayoutMore(self):
         from music21 import corpus, converter
-        c = converter.parse(corpus.getWorkList('demos/layoutTestMore.xml')[0], format='oldmusicxml', forceSource=True)
+        c = converter.parse(corpus.corpora.CoreCorpus().getWorkList('demos/layoutTestMore.xml')[0], format='oldmusicxml', forceSource=True)
         #c = corpus.parse('demos/layoutTest.xml')        
         layouts = c.flat.getElementsByClass('LayoutBase')
         self.assertEqual(len(layouts), 76)
@@ -4077,7 +4085,7 @@ class Test(unittest.TestCase):
         
     def testCountDynamics(self):
         from music21 import  corpus, converter
-        c = converter.parse(corpus.getWorkList('schoenberg/opus19/movement2.mxl')[0], format='oldmusicxml', forceSource=True)
+        c = converter.parse(corpus.corpora.CoreCorpus().getWorkList('schoenberg/opus19/movement2.mxl')[0], format='oldmusicxml', forceSource=True)
         #c.show('musicxml.png')
         dynAll = c.flat.getElementsByClass('Dynamic')
         self.assertEqual(len(dynAll), 6)
@@ -4099,7 +4107,7 @@ class Test(unittest.TestCase):
         but not being output to musicxml
         '''
         from music21 import  corpus, converter
-        c = converter.parse(corpus.getWorkList('luca/gloria.xml')[0], format='oldmusicxml', forceSource=True)
+        c = converter.parse(corpus.corpora.CoreCorpus().getWorkList('luca/gloria.xml')[0], format='oldmusicxml', forceSource=True)
         print(c.parts[1].measure(99).notes[0].getSpannerSites())
         
 #-------------------------------------------------------------------------------
