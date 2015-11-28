@@ -50,7 +50,8 @@ _singletonCounter['value'] = 0
 
 class SingletonCounter(object):
     '''
-    A simple counter that can produce unique numbers regardless of how many instances exist.
+    A simple counter that can produce unique numbers (in ascending order) 
+    regardless of how many instances exist.
     
     Instantiate and then call it.
     

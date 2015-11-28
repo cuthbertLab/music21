@@ -857,13 +857,7 @@ class MetadataBundle(object):
         True
         '''
         from music21.corpus import corpora
-        corpusName = 'core'
-        if corpusName in corpora.Corpus._metadataBundles \
-            and corpora.Corpus._metadataBundles[corpusName]:
-            return corpora.Corpus._metadataBundles[corpusName]
-        bundle = cls(corpusName).read()
-        corpora.Corpus._metadataBundles[corpusName] = bundle
-        return bundle
+        return corpora.CoreCorpus().metadataBundle
 
     @classmethod
     def fromLocalCorpus(cls, name=None):
@@ -878,19 +872,9 @@ class MetadataBundle(object):
         >>> localCorpusB = metadata.bundles.MetadataBundle.fromLocalCorpus()
         >>> localCorpusA is localCorpusB
         True
-
         '''
         from music21.corpus import corpora
-        if name is None or name == 'local':
-            corpusName = 'local'
-        else:
-            corpusName = 'local-{0}'.format(name)
-        if corpusName in corpora.Corpus._metadataBundles and \
-            corpora.Corpus._metadataBundles[corpusName] is not None:
-            return corpora.Corpus._metadataBundles[corpusName]
-        bundle = cls(corpusName).read()
-        corpora.Corpus._metadataBundles[corpusName] = bundle
-        return bundle
+        return corpora.LocalCorpus(name).metadataBundle
 
     @classmethod
     def fromVirtualCorpus(cls):
@@ -905,16 +889,9 @@ class MetadataBundle(object):
         >>> virtualCorpusB = metadata.bundles.MetadataBundle.fromVirtualCorpus()
         >>> virtualCorpusA is virtualCorpusB
         True
-
         '''
         from music21.corpus import corpora
-        corpusName = 'virtual'
-        if corpusName in corpora.Corpus._metadataBundles and \
-            corpora.Corpus._metadataBundles[corpusName]:
-            return corpora.Corpus._metadataBundles[corpusName]
-        bundle = cls(corpusName).read()
-        corpora.Corpus._metadataBundles[corpusName] = bundle
-        return bundle
+        return corpora.VirtualCorpus().metadataBundle
 
     def intersection(self, metadataBundle):
         r'''

@@ -31,22 +31,17 @@ from music21 import common
 from music21 import converter
 from music21 import exceptions21
 from music21 import metadata
+
 from music21.corpus import chorales
-from music21.corpus import virtual
 from music21.corpus import corpora
+from music21.corpus import manager
+from music21.corpus import virtual
 
 from music21 import environment
 _MOD = "corpus.base.py"
 environLocal = environment.Environment(_MOD)
 
-
-#------------------------------------------------------------------------------
-
-
-class CorpusException(exceptions21.Music21Exception):
-    pass
-
-
+from music21.exceptions21 import CorpusException
 #------------------------------------------------------------------------------
 
 
@@ -110,7 +105,7 @@ def getLocalPaths(fileExtensions=None, expandExtensions=True):
         )
 
 
-def addPath(filePath):
+def addPath(filePath, corpusName=None):
     '''
     Add a directory path to the Local Corpus on a *temporary* basis, i.e., just
     for the current Python session.
@@ -137,7 +132,7 @@ def addPath(filePath):
 
     Restart music21 after adding paths.
     '''
-    corpora.LocalCorpus().addPath(filePath)
+    corpora.LocalCorpus(corpusName).addPath(filePath)
 
 
 def getPaths(
@@ -173,21 +168,6 @@ def getPaths(
 # metadata routines
 
 
-def _updateMetadataBundle():
-    '''
-    Load the metadata bundle from JSON and store it in the module global
-    variable _METADATA_BUNDLES, unless the _METADATA_BUNDLES have already been
-    built, in which case, don't do it.
-
-    This relies on the functions `getCorePaths()`, `getVirtualPaths()`, and
-    `getLocalPaths()`.
-
-    Note that this updates the in-memory cached metdata bundles not the disk
-    caches (that's MUCH slower!) to do that run corpus.metadata.metadata.py
-    '''
-    corpora.Corpus._updateAllMetadataBundles()
-
-
 def cacheMetadata(corpusNames=('local',), verbose=True):
     '''
     Rebuild the metadata cache.
@@ -195,7 +175,8 @@ def cacheMetadata(corpusNames=('local',), verbose=True):
     if not common.isIterable(corpusNames):
         corpusNames = [corpusNames]
     for name in corpusNames:
-        corpora.Corpus._metadataBundles[name] = None
+        # todo -- create cache names for local corpora
+        manager._metadataBundles[name] = None
     metadata.caching.cacheMetadata(corpusNames, verbose=verbose)
 
 
@@ -225,7 +206,7 @@ def search(
     >>> corpus.search('coltrane', corpusNames=('virtual',))
     <music21.metadata.bundles.MetadataBundle {1 entry}>
     '''
-    return corpora.search(query,
+    return manager.search(query,
                         field=field,
                         corpusNames=corpusNames,
                         fileExtensions=fileExtensions)
@@ -284,7 +265,7 @@ def noCorpus():
     False
 
     '''
-    return corpora.CoreCorpus.noCorpus
+    return corpora.CoreCorpus().noCorpus
 
 #------------------------------------------------------------------------------
 

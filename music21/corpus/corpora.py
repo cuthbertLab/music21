@@ -31,44 +31,6 @@ CorpusWork = namedtuple('CorpusWork', 'title files virtual')
 CorpusFile = namedtuple('CorpusFile', 'path title filename format ext')
 VirtualCorpusFile = namedtuple('VirtualCorpusFile', 'path title url format')
 
-def search(
-    query,
-    field=None,
-    corpusNames=None,
-    fileExtensions=None,
-    ):
-    '''
-    Search all stored metadata bundles and return a list of file paths.
-
-    The ``names`` parameter can be used to specify which corpora to search,
-    for example:
-
-    >>> corpus.corpora.search(
-    ...     'bach',
-    ...     corpusNames=('core', 'virtual'),
-    ...     )
-    <music21.metadata.bundles.MetadataBundle {150 entries}>
-
-    If ``names`` is None, all corpora known to music21 will be searched.
-
-    This method uses stored metadata and thus, on first usage, will incur a
-    performance penalty during metadata loading.
-    '''
-    from music21 import metadata
-    Corpus._updateAllMetadataBundles()
-    allSearchResults = metadata.bundles.MetadataBundle()
-    if corpusNames is None:
-        corpusNames = []
-        corpusNames.append(CoreCorpus()._cacheName)
-        corpusNames.append(VirtualCorpus()._cacheName)
-        for corpusName in LocalCorpus.listLocalCorporacorpusNames():
-            corpusNames.append(LocalCorpus(corpusName)._cacheName)
-    for corpusName in corpusNames:
-        if corpusName in Corpus._metadataBundles:
-            searchResults = Corpus._metadataBundles[corpusName].search(
-                query, field, fileExtensions=fileExtensions)
-            allSearchResults = allSearchResults.union(searchResults)
-    return allSearchResults
 
 
 class DirectoryInformation(object):
@@ -97,11 +59,7 @@ class DirectoryInformation(object):
         return '<{0}.{1} {2}>'.format(self.__module__, 
                                       self.__class__.__name__, 
                                       self.directoryName)
-    
-    def _getCorpusObject(self):
-        return common.unwrapWeakref(self._corpusObject)
-    def _setCorpusObject(self, newCorpusObject):
-        self._corpusObject = common.wrapWeakref(newCorpusObject)
+
     
     def findWorks(self):
         '''
@@ -171,7 +129,6 @@ class DirectoryInformation(object):
             # add this path
         return self.works
         
-
 #------------------------------------------------------------------------------
 
 class Corpus(object):
@@ -194,12 +151,6 @@ class Corpus(object):
         common.findInputExtension('noteworthytext') +
         common.findInputExtension('noteworthy')
         )
-
-    _metadataBundles = {
-        'core': None,
-        'local': None,
-        'virtual': None,
-        }
 
     _pathsCache = {}
 
@@ -306,17 +257,10 @@ class Corpus(object):
             return expandedExtensions
         return fileExtensions
 
-    @staticmethod
-    def _updateAllMetadataBundles():
-        CoreCorpus().updateMetadataBundle()
-        VirtualCorpus().updateMetadataBundle()
-        for name in LocalCorpus.listLocalCorporaNames():
-            LocalCorpus(name).updateMetadataBundle()
-
     ### PRIVATE PROPERTIES ###
 
     @abc.abstractproperty
-    def _cacheName(self):
+    def cacheName(self):
         raise NotImplementedError
 
     ### PUBLIC METHODS ###
@@ -507,20 +451,6 @@ class Corpus(object):
         '''
         raise NotImplementedError
 
-
-    def updateMetadataBundle(self):
-        r'''
-        Update a corpus' metadata bundle from its stored JSON file on disk.
-        '''
-        from music21 import metadata
-        corpusName = self._cacheName
-        if (corpusName not in Corpus._metadataBundles or
-                Corpus._metadataBundles[corpusName] is None):
-            metadataBundle = metadata.bundles.MetadataBundle(corpusName)
-            metadataBundle.read()
-            metadataBundle.validate()
-            Corpus._metadataBundles[corpusName] = metadataBundle
-
     ### PUBLIC PROPERTIES ###
 
     @property
@@ -561,16 +491,62 @@ class Corpus(object):
         >>> corpus.corpora.CoreCorpus().metadataBundle
         <music21.metadata.bundles.MetadataBundle 'core': {144... entries}>
 
+        As a technical aside, the metadata bundle for a corpus is actually
+        stored in corpus.manager, in order to cache most effectively over
+        multiple calls. There might be good reasons to eventually move them
+        to each Corpus object, so long as its cached across instances of the
+        class.
         '''
-        from music21 import metadata
-        corpusName = self._cacheName
-        if (corpusName in Corpus._metadataBundles and
-                Corpus._metadataBundles[corpusName]):
-            return Corpus._metadataBundles[corpusName]
-        bundle = metadata.bundles.MetadataBundle(corpusName).read()
-        Corpus._metadataBundles[corpusName] = bundle
-        return bundle
+        from music21.corpus import manager
+        return manager.getMetadataBundleByCorpus(self)
 
+    def getComposer(
+        self,
+        composerName,
+        fileExtensions=None,
+        ):
+        '''
+        Return all filenames in the corpus that match a composer's or a
+        collection's name. An `fileExtensions`, if provided, defines which
+        extensions are returned. An `fileExtensions` of None (default) returns
+        all extensions.
+
+        Note that xml and mxl are treated equivalently.
+
+        >>> from music21 import corpus
+        >>> coreCorpus = corpus.corpora.CoreCorpus()
+        >>> a = coreCorpus.getComposer('bach')
+        >>> len(a) > 100
+        True
+
+        >>> a = coreCorpus.getComposer('bach', 'krn')
+        >>> len(a) < 10
+        True
+
+        >>> a = coreCorpus.getComposer('bach', 'xml')
+        >>> len(a) > 10
+        True
+        '''
+        paths = self.getPaths(fileExtensions)
+        results = []
+        for path in paths:
+            # iterate through path components; cannot match entire string
+            # composer name may be at any level
+            stubs = path.split(os.sep)
+            for stub in stubs:
+                # need to remove extension if found
+                if composerName.lower() == stub.lower():
+                    results.append(path)
+                    break
+                # get all but the last dot group
+                # this is done for file names that function like composer names
+                elif '.' in stub:
+                    newStub = '.'.join(stub.split('.')[:-1]).lower()
+                    if newStub == composerName.lower():
+                        results.append(path)
+                        break
+        results.sort()
+        return results
 
 #------------------------------------------------------------------------------
 
@@ -619,7 +595,7 @@ class CoreCorpus(Corpus):
     ### PRIVATE PROPERTIES ###
 
     @property
-    def _cacheName(self):
+    def cacheName(self):
         return 'core'
 
     ### PUBLIC METHODS ###
@@ -772,60 +748,13 @@ class CoreCorpus(Corpus):
                 results.append(candidate)
         return results
 
-
-    def getComposer(
-        self,
-        composerName,
-        fileExtensions=None,
-        ):
-        '''
-        Return all filenames in the corpus that match a composer's or a
-        collection's name. An `fileExtensions`, if provided, defines which
-        extensions are returned. An `fileExtensions` of None (default) returns
-        all extensions.
-
-        Note that xml and mxl are treated equivalently.
-
-        >>> from music21 import corpus
-        >>> coreCorpus = corpus.corpora.CoreCorpus()
-        >>> a = coreCorpus.getComposer('bach')
-        >>> len(a) > 100
-        True
-
-        >>> a = coreCorpus.getComposer('bach', 'krn')
-        >>> len(a) < 10
-        True
-
-        >>> a = coreCorpus.getComposer('bach', 'xml')
-        >>> len(a) > 10
-        True
-        '''
-        paths = self.getPaths(fileExtensions)
-        results = []
-        for path in paths:
-            # iterate through path components; cannot match entire string
-            # composer name may be at any level
-            stubs = path.split(os.sep)
-            for stub in stubs:
-                # need to remove extension if found
-                if composerName.lower() == stub.lower():
-                    results.append(path)
-                    break
-                # get all but the last dot group
-                # this is done for file names that function like composer names
-                elif '.' in stub:
-                    newStub = '.'.join(stub.split('.')[:-1]).lower()
-                    if newStub == composerName.lower():
-                        results.append(path)
-                        break
-        results.sort()
-        return results
-
     def getComposerDirectoryPath(
         self,
         composerName,
         ):
         '''
+        DEPRECATED 
+        
         Given the name of a composer, get the path to the top-level directory
         of that composer:
 
@@ -1144,10 +1073,12 @@ class CoreCorpus(Corpus):
 
         '''
         if CoreCorpus._noCorpus is None:
+            # assume that there will always be a 'bach' dir
             if self.getComposerDirectoryPath('bach') is None:
                 CoreCorpus._noCorpus = True
             else:
                 CoreCorpus._noCorpus = False
+        
         return CoreCorpus._noCorpus
 
 
@@ -1207,7 +1138,7 @@ class LocalCorpus(Corpus):
     ### PRIVATE PROPERTIES ###
 
     @property
-    def _cacheName(self):
+    def cacheName(self):
         cacheName = 'local'
         if self.name is not None and self.name != 'local':
             cacheName += '-{0}'.format(self.name)
@@ -1236,10 +1167,10 @@ class LocalCorpus(Corpus):
             raise corpus.CorpusException(
                 'an invalid file path has been provided: {0!r}'.format(
                     directoryPath))
-        if self._cacheName not in LocalCorpus._temporaryLocalPaths:
-            LocalCorpus._temporaryLocalPaths[self._cacheName] = set()
-        LocalCorpus._temporaryLocalPaths[self._cacheName].add(directoryPath)
-        self._removeNameFromCache(self._cacheName)
+        if self.cacheName not in LocalCorpus._temporaryLocalPaths:
+            LocalCorpus._temporaryLocalPaths[self.cacheName] = set()
+        LocalCorpus._temporaryLocalPaths[self.cacheName].add(directoryPath)
+        self._removeNameFromCache(self.cacheName)
 
     def delete(self):
         r'''
@@ -1270,7 +1201,7 @@ class LocalCorpus(Corpus):
             fileExtensions=fileExtensions,
             expandExtensions=expandExtensions,
             )
-        cacheKey = (self._cacheName, tuple(fileExtensions))
+        cacheKey = (self.cacheName, tuple(fileExtensions))
         # not cached, fetch and reset
         if True:
         #if cacheKey not in Corpus._pathsCache:
@@ -1290,18 +1221,6 @@ class LocalCorpus(Corpus):
             Corpus._pathsCache[cacheKey] = matches
         return Corpus._pathsCache[cacheKey]
 
-    @staticmethod
-    def listLocalCorporaNames():
-        '''
-        List the names of all user-defined local corpora.
-
-        The entry for None refers to the default local corpus.
-        '''
-        userSettings = environment.UserSettings()
-        result = [None]
-        result.extend(userSettings['localCorporaSettings'].keys())
-        return result
-
     def removePath(self, directoryPath):
         r'''
         Remove a directory path from a local corpus.
@@ -1310,7 +1229,7 @@ class LocalCorpus(Corpus):
         corpus, it will be removed permanently.
         '''
         temporaryPaths = LocalCorpus._temporaryLocalPaths.get(
-            self._cacheName, [])
+            self.cacheName, [])
         directoryPath = os.path.abspath(os.path.expanduser(directoryPath))
         if directoryPath in temporaryPaths:
             temporaryPaths.remove(directoryPath)
@@ -1319,7 +1238,7 @@ class LocalCorpus(Corpus):
             if settings is not None and directoryPath in settings:
                 settings.remove(directoryPath)
             self.save()
-        self._removeNameFromCache(self._cacheName)
+        self._removeNameFromCache(self.cacheName)
 
     def save(self):
         r'''
@@ -1366,7 +1285,7 @@ class LocalCorpus(Corpus):
             else:
                 candidatePaths = environLocal['localCorporaSettings'][self.name]
         temporaryPaths = LocalCorpus._temporaryLocalPaths.get(
-            self._cacheName, [])
+            self.cacheName, [])
         allPaths = tuple(sorted(set(candidatePaths).union(temporaryPaths)))
         return allPaths
 
@@ -1428,7 +1347,7 @@ class VirtualCorpus(Corpus):
     ### PRIVATE PROPERTIES ###
 
     @property
-    def _cacheName(self):
+    def cacheName(self):
         return 'virtual'
 
     ### PUBLIC METHODS ###
@@ -1516,8 +1435,6 @@ class VirtualCorpus(Corpus):
         '''
         return 'virtual'
 
-
-#------------------------------------------------------------------------------
 
 
 __all__ = (

@@ -43,6 +43,9 @@ class InstrumentException(Music21Exception):
 class Music21CommonException(Music21Exception):
     pass
 
+class CorpusException(Music21Exception):
+    pass
+
 # warnings
 class Music21DeprecationWarning(UserWarning):
     # Do not subclass Deprecation warning, because these
