@@ -16,7 +16,6 @@ import os
 from music21.ext import six
 
 from music21 import common
-from music21 import converter
 from music21.corpus import virtual
 from music21.corpus import work
 
