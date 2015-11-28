@@ -35,7 +35,6 @@ import shutil
 def setupOutputDirectory(outputDirectory):
     if os.path.exists(outputDirectory):
         return 
-    
     os.makedirs(outputDirectory)
 
 if os.environ.get('READTHEDOCS', ''):
@@ -49,16 +48,18 @@ if os.environ.get('READTHEDOCS', ''):
     autogenOut = os.path.dirname(__file__)
 
     for directoryPath, unused, fileNames in os.walk(autogenBuild):
+        print(directoryPath, "--DIRECT!")
         setupOutputDirectory(directoryPath.replace(autogenBuild, autogenOut))
         for fileName in fileNames:
             inputFilePath = os.path.join(directoryPath, fileName)
             outputFilePath = inputFilePath.replace(autogenBuild, autogenOut)
+            print(inputFilePath, "->", outputFilePath)
             if (os.path.exists(outputFilePath) and 
                     os.path.getmtime(outputFilePath) > os.path.getmtime(inputFilePath)):
-                print('\tSKIPPED {0}'.format(outputFilePath))
+                print('\tSKIPPED ha ha {0}'.format(outputFilePath))
             else:
                 shutil.copyfile(inputFilePath, outputFilePath)
-                print('\tWROTE   {0}'.format(outputFilePath))
+                print('\tWROTE  ho ho {0}'.format(outputFilePath))
 
 
     
