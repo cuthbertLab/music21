@@ -1,4 +1,3 @@
-global-include *.py *.txt *.xml *.krn *.mxl *.pdf *.html *.ipynb *.css *.js *.png *.tiff *.jpg *.xls *.mid *.abc *.json *.md *.zip *.rntxt *.command *.scl *nwc *.nwctxt *.wav *.mei LICENSE
+global-include *.py *.txt *.xml *.krn *.mxl *.pdf *.html *.ipynb *.css *.js *.png *.tiff *.jpg *.xls *.mid *.abc *.json *.md *.rst *.zip *.rntxt *.command *.scl *nwc *.nwctxt *.wav *.mei LICENSE
 prune dist
-prune buildDoc
 prune obsolete
