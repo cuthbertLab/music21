@@ -183,7 +183,7 @@ def cacheMetadata(corpusNames=('local',), verbose=True):
 def search(
     query,
     field=None,
-    corpusNames=('core', 'virtual', 'local'),
+    corpusNames=None,
     fileExtensions=None,
     ):
     r'''
@@ -199,6 +199,9 @@ def search(
     
     >>> corpus.search('china')
     <music21.metadata.bundles.MetadataBundle {1235 entries}>
+
+    >>> corpus.search('china', fileExtensions='.mid')
+    <music21.metadata.bundles.MetadataBundle {0 entries}>
 
     >>> corpus.search('bach', field='composer')
     <music21.metadata.bundles.MetadataBundle {21 entries}>
@@ -315,60 +318,6 @@ def getVirtualWorkList(workName, movementNumber=None, fileExtensions=None):
 
 
 #------------------------------------------------------------------------------
-
-
-def getWorkReferences():
-    '''
-    Return a data dictionary for all works in the corpus 
-    Returns a list of corpus.corpora.DirectoryInformation object, one
-    for each directory. A 'works' dictionary for each composer
-    provides references to dictionaries for all associated works.
-
-    This is used in the generation of corpus documentation
-
-    >>> workRefs = corpus.getWorkReferences()
-    >>> workRefs[1:3]
-    [<music21.corpus.corpora.DirectoryInformation bach>, 
-     <music21.corpus.corpora.DirectoryInformation beethoven>]
-     
-    No longer finds the VirtualCorpus. TODO: Reinstate when
-    that corpus becomes useful again...
-    '''
-    results = [di for di in corpora.CoreCorpus().directoryInformation]
-
-#     for vw in corpora.VirtualCorpus._virtual_works:
-#         composerDir = vw.corpusPath.split('/')[0]
-#         match = False
-#         for ref in results:
-#             # check composer reference or first part of corpusPath
-#             if (ref['composer'] == vw.composer or
-#                 composerDir == ref['composerDir']):
-#                 match = True
-#                 break  # use this ref
-#         if not match:  # new composers, create a new ref
-#             ref = {}
-#             ref['composer'] = vw.composer
-#             ref['composerDir'] = composerDir
-#             ref['works'] = {}  # store by keys of name/dirname
-#         # work stub should be everything other than top-level
-#         workStub = vw.corpusPath.replace(composerDir + '/', '')
-#         ref['works'][workStub] = {}
-#         ref['works'][workStub]['virtual'] = True
-#         ref['works'][workStub]['files'] = []
-#         ref['works'][workStub]['title'] = vw.title
-#         for url in vw.urlList:
-#             m21Format, ext = common.findFormatExtURL(url)
-#             fileDict = {}
-#             fileDict['format'] = m21Format
-#             fileDict['ext'] = ext
-#             # all path parts after corpus
-#             fileDict['corpusPath'] = vw.corpusPath
-#             fileDict['title'] = vw.title
-#             fileDict['url'] = url
-#             ref['works'][workStub]['files'].append(fileDict)
-#         if not match:  # not found already, need to add
-#             results.append(ref)
-    return results
 
 
 #------------------------------------------------------------------------------

@@ -19,7 +19,8 @@ To do a release,
 2. run test/multiprocessTest.py  for Python2 AND Python3
 3. If all tests pass, for a major change, run 
     `corpus.cacheMetadata(['core', 'virtual'], verbose=True)`.
-    every once in a while run metadata.MetadataBundle.fromCoreCorpus().rebuild() (40 min on MacPro)
+    every once in a while run corpus.corpora.CoreCorpus().metadataBundle.rebuild() 
+    (40 min on MacPro)
 4. run test/testSingleCoreAll.py 
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest, 
      but should be done before making a release).  Done automatically by Travis-CI on GitHub commit

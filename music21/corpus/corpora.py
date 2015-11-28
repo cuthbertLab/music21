@@ -264,36 +264,6 @@ class Corpus(object):
         raise NotImplementedError
 
     ### PUBLIC METHODS ###
-
-    @staticmethod
-    def fromName(name):
-        '''
-        Instantiate a specific corpus based on `name`:
-
-        TODO: Down with staticmethods!!!
-
-        >>> corpus.corpora.Corpus.fromName('core')
-        <music21.corpus.corpora.CoreCorpus>
-
-        >>> corpus.corpora.Corpus.fromName('virtual')
-        <music21.corpus.corpora.VirtualCorpus>
-
-        >>> corpus.corpora.Corpus.fromName('local')
-        <music21.corpus.corpora.LocalCorpus: 'local'>
-
-        >>> corpus.corpora.Corpus.fromName('test')
-        <music21.corpus.corpora.LocalCorpus: 'test'>
-
-        '''
-        if name == 'core':
-            return CoreCorpus()
-        elif name == 'virtual':
-            return VirtualCorpus()
-        elif name == 'local':
-            return LocalCorpus()
-        else:
-            return LocalCorpus(name=name)
-
     @abc.abstractmethod
     def getPaths(self):
         r'''
@@ -301,43 +271,8 @@ class Corpus(object):
         '''
         raise NotImplementedError
 
-    @staticmethod
-    def listSearchFields():
-        r'''
-        List all available search field names:
 
-        TODO: remove from Corpus and make a function.
-
-        >>> for field in corpus.corpora.Corpus.listSearchFields():
-        ...     field
-        ...
-        'alternativeTitle'
-        'ambitus'
-        'composer'
-        'date'
-        'keySignatureFirst'
-        'keySignatures'
-        'localeOfComposition'
-        'movementName'
-        'movementNumber'
-        'noteCount'
-        'number'
-        'opusNumber'
-        'pitchHighest'
-        'pitchLowest'
-        'quarterLength'
-        'tempoFirst'
-        'tempos'
-        'timeSignatureFirst'
-        'timeSignatures'
-        'title'
-
-        '''
-        from music21 import metadata
-        return tuple(sorted(metadata.RichMetadata.searchAttributes))
-
-    # pylint: disable=redefined-builtin    
-
+    # pylint: disable=redefined-builtin
     @staticmethod
     def parse(
         workName,
@@ -393,8 +328,7 @@ class Corpus(object):
                 'a work name must be provided as an argument')
         if not common.isListLike(fileExtensions):
             fileExtensions = [fileExtensions]
-        workList = corpus.getWorkList(
-            workName, movementNumber, fileExtensions)
+        workList = corpus.getWorkList(workName, movementNumber, fileExtensions)
         if not workList:
             if common.isIterable(workName):
                 workName = os.path.sep.join(workName)
@@ -546,6 +480,24 @@ class Corpus(object):
                         results.append(path)
                         break
         results.sort()
+        return results
+
+    def getWorkReferences(self):
+        '''
+        Return a data dictionary for all works in this corpus 
+        Returns a list of corpus.corpora.DirectoryInformation objects, one
+        for each directory. A 'works' dictionary for each composer
+        provides references to dictionaries for all associated works.
+    
+        This is used in the generation of corpus documentation
+    
+        >>> workRefs = corpus.corpora.CoreCorpus().getWorkReferences()
+        >>> workRefs[1:3]
+        [<music21.corpus.corpora.DirectoryInformation bach>, 
+         <music21.corpus.corpora.DirectoryInformation beethoven>]
+                 '''
+        results = [di for di in self.directoryInformation]
+    
         return results
 
 #------------------------------------------------------------------------------
@@ -1012,7 +964,7 @@ class CoreCorpus(Corpus):
 
         '''
         from music21 import metadata
-        return metadata.bundles.MetadataBundle.fromCoreCorpus().search(
+        return CoreCorpus().metadataBundle.search(
             query,
             field=field,
             fileExtensions=fileExtensions,
@@ -1265,7 +1217,7 @@ class LocalCorpus(Corpus):
         the interface is the same.
         '''
         from music21 import metadata
-        return metadata.bundles.MetadataBundle.fromLocalCorpus(self.name).search(
+        return self.metadataBundle.search(
             query,
             field=field,
             fileExtensions=fileExtensions,

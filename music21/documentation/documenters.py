@@ -1452,7 +1452,7 @@ class CorpusDocumenter(Documenter):
         result.extend(self.rstEditingWarningFormat)
         result.extend(self.rstCorpusIntroductionFormat)
         # TODO: use... common.getCorpusContentDirs to make sure nothing is missed.
-        for directoryInformation in corpus.getWorkReferences():
+        for directoryInformation in corpus.corpora.CoreCorpus().getWorkReferences():
             result.extend(self.getRstComposerDictFormat(directoryInformation))
         return result
 

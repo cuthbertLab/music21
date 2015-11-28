@@ -10,11 +10,18 @@
 # Copyright:    Copyright © 2009, 2013, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
+'''
+The manager module handles requests across multiple corpora.  It should be the default
+interface to searching corpora.
 
+New in v3 -- previously most were static methods on corpus.corpora.Corpus, but that
+seemed inappropriate since these work across corpora.
+'''
 from music21 import environment
 from music21 import metadata
 
 from music21.corpus import corpora
+from music21.exceptions21 import CorpusException
 
 _metadataBundles = {
     'core': None,
@@ -23,6 +30,80 @@ _metadataBundles = {
     }
 
 #------------------------------------------------------------------------------
+def fromName(name):
+    '''
+    Instantiate a specific corpus based on `name`:
+
+    >>> corpus.manager.fromName('core')
+    <music21.corpus.corpora.CoreCorpus>
+
+    >>> corpus.manager.fromName('virtual')
+    <music21.corpus.corpora.VirtualCorpus>
+
+    >>> corpus.manager.fromName('local')
+    <music21.corpus.corpora.LocalCorpus: 'local'>
+
+    >>> corpus.manager.fromName(None)
+    <music21.corpus.corpora.LocalCorpus: 'local'>
+
+
+    Note that this corpus probably does not exist on disk, but it's ready to have
+    paths added to it and to be stored on disk.
+
+    >>> corpus.manager.fromName('testDummy')
+    <music21.corpus.corpora.LocalCorpus: 'testDummy'>
+    '''
+    if name == 'core':
+        return corpora.CoreCorpus()
+    elif name == 'virtual':
+        return corpora.VirtualCorpus()
+    elif name == 'local':
+        return corpora.LocalCorpus()
+    else:
+        return corpora.LocalCorpus(name=name)
+
+def fromCacheName(name):
+    '''
+    Instantiate a specific corpus based on its `cacheName`:
+
+    These are the same as `fromName`.
+
+    >>> corpus.manager.fromCacheName('core')
+    <music21.corpus.corpora.CoreCorpus>
+
+    >>> corpus.manager.fromCacheName('virtual')
+    <music21.corpus.corpora.VirtualCorpus>
+
+    >>> corpus.manager.fromCacheName('local')
+    <music21.corpus.corpora.LocalCorpus: 'local'>
+
+    >>> corpus.manager.fromCacheName(None)
+    <music21.corpus.corpora.LocalCorpus: 'local'>
+
+    Other local corpora are different and prefaced by "local-":
+
+    >>> corpus.manager.fromCacheName('local-testDummy')
+    <music21.corpus.corpora.LocalCorpus: 'testDummy'>
+
+    Raises a corpus exception if
+    it is not an allowable cache name.
+
+    >>> corpus.manager.fromCacheName('testDummy')
+    Traceback (most recent call last):
+    CorpusException: Cannot parse a cacheName of 'testDummy'
+    '''
+    if name == 'core':
+        return corpora.CoreCorpus()
+    elif name == 'virtual':
+        return corpora.VirtualCorpus()
+    elif name == 'local' or name is None:
+        return corpora.LocalCorpus()
+    elif name.startswith('local-'):
+        return corpora.LocalCorpus(name=name[6:])
+    else:
+        raise CorpusException("Cannot parse a cacheName of '{0}'".format(name))
+
+
 def iterateCorpora(returnObjects=True):
     '''
     a generator that iterates over the corpora (either as objects or as names)
@@ -89,17 +170,17 @@ def search(
     This method uses stored metadata and thus, on first usage, will incur a
     performance penalty during metadata loading.
     '''
-    updateAllMetadataBundles()
+    readAllMetadataBundlesFromDisk()
     allSearchResults = metadata.bundles.MetadataBundle()
     
     if corpusNames is None:
         corpusNames = list(iterateCorpora(returnObjects=False))
     
     for corpusName in corpusNames:
-        if corpusName in _metadataBundles:
-            searchResults = _metadataBundles[corpusName].search(
+        c = fromName(corpusName)
+        searchResults = c.metadataBundle.search(
                 query, field, fileExtensions=fileExtensions)
-            allSearchResults = allSearchResults.union(searchResults)
+        allSearchResults = allSearchResults.union(searchResults)
     
     return allSearchResults
 
@@ -114,20 +195,19 @@ def getMetadataBundleByCorpus(corpusObject):
     <music21.metadata.bundles.MetadataBundle 'virtual': {11 entries}>
     
     This is the same as calling `metadataBundle` on the corpus itself,
-    but this is the routine that actually does the work:
+    but this is the routine that actually does the work. In other words,
+    it's the call on the object that is redundant, not this routine.
     
     >>> mdb1 is vc.metadataBundle
     True
     '''
-    updateMetadataBundle(corpusObject)
+    cacheMetadataBundleFromDisk(corpusObject)
     cacheName = corpusObject.cacheName
     return _metadataBundles[cacheName]
 
-def updateMetadataBundle(corpusObject):
+def cacheMetadataBundleFromDisk(corpusObject):
     r'''
     Update a corpus' metadata bundle from its stored JSON file on disk.
-
-
     '''
     corpusCacheName = corpusObject.cacheName
     if (corpusCacheName not in _metadataBundles or
@@ -138,12 +218,12 @@ def updateMetadataBundle(corpusObject):
         _metadataBundles[corpusCacheName] = metadataBundle
 
 
-def updateAllMetadataBundles():
+def readAllMetadataBundlesFromDisk():
     '''
-    Update each corpus's metadata bundle.
+    Read each corpus's metadata bundle and store it in memory.
     '''
     for corpusObject in iterateCorpora():
-        updateMetadataBundle(corpusObject)
+        cacheMetadataBundleFromDisk(corpusObject)
 
 def listLocalCorporaNames():
     '''
@@ -156,6 +236,36 @@ def listLocalCorporaNames():
     result.extend(userSettings['localCorporaSettings'].keys())
     return result
 
+def listSearchFields():
+    r'''
+    List all available search field names:
+
+    >>> for field in corpus.manager.listSearchFields():
+    ...     field
+    ...
+    'alternativeTitle'
+    'ambitus'
+    'composer'
+    'date'
+    'keySignatureFirst'
+    'keySignatures'
+    'localeOfComposition'
+    'movementName'
+    'movementNumber'
+    'noteCount'
+    'number'
+    'opusNumber'
+    'pitchHighest'
+    'pitchLowest'
+    'quarterLength'
+    'tempoFirst'
+    'tempos'
+    'timeSignatureFirst'
+    'timeSignatures'
+    'title'
+
+    '''
+    return tuple(sorted(metadata.RichMetadata.searchAttributes))
 
 #------------------------------------------------------------------------------
 

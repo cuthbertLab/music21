@@ -33,6 +33,9 @@ from music21 import environment
 environLocal = environment.Environment(os.path.basename(__file__))
 
 
+class MetadataBundleException(exceptions21.Music21Exception):
+    pass
+
 #------------------------------------------------------------------------------
 
 
@@ -45,7 +48,7 @@ class MetadataEntry(object):
     derived from:
 
     >>> from music21 import metadata
-    >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+    >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
     >>> metadataEntry = coreBundle.search('bwv66.6')[0]
     >>> metadataEntry
     <music21.metadata.bundles.MetadataEntry: bach_bwv66_6_mxl>
@@ -138,7 +141,7 @@ class MetadataBundle(object):
     multiple Metadata objects.
 
     >>> from music21 import corpus, metadata
-    >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+    >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
     >>> coreBundle
     <music21.metadata.bundles.MetadataBundle 'core': {144... entries}>
 
@@ -161,18 +164,10 @@ class MetadataBundle(object):
     >>> resultsEntries[0].parse()
     <music21.stream.Score ...>
 
-    A metadata bundle can be instantiated via its static methods
-    ``fromCoreCorpus()``, ``fromLocalCorpus()`` and ``fromVirtualCorpus()``, as
-    well as from a ``Corpus`` instance, or a string indicating which corpus to
-    draw from:
+    A metadata bundle can be instantiated in three ways, (1) from a ``Corpus`` instance, 
+    or (2) a string indicating which corpus cacheName to draw from:
 
     Method 1:
-
-    >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
-    >>> localBundle = metadata.bundles.MetadataBundle.fromLocalCorpus()
-    >>> virtualBundle = metadata.bundles.MetadataBundle.fromVirtualCorpus()
-
-    Method 2:
 
     >>> coreCorpus = corpus.corpora.CoreCorpus()
     >>> coreBundle = metadata.bundles.MetadataBundle(coreCorpus)
@@ -181,25 +176,39 @@ class MetadataBundle(object):
     >>> virtualCorpus = corpus.corpora.VirtualCorpus()
     >>> virtualBundle = metadata.bundles.MetadataBundle(virtualCorpus)
 
-    Method 3:
+    Method 2:
 
     >>> coreBundle = metadata.bundles.MetadataBundle('core')
     >>> localBundle = metadata.bundles.MetadataBundle('local')
     >>> virtualBundle = metadata.bundles.MetadataBundle('virtual')
 
-    The static methods above take the additional step of reading the
-    persisted-to-disk metadata bundle file, and caching the result in memory as
-    necessary.
+    After calling these you'll need to call ``read()``:
 
-    For the others, you'll need to call ``read()``:
-
+    >>> coreBundle
+    <music21.metadata.bundles.MetadataBundle 'core': {0 entries}>
     >>> coreBundle.read()
     <music21.metadata.bundles.MetadataBundle 'core': {144... entries}>
+    >>> coreBundle
+    <music21.metadata.bundles.MetadataBundle 'core': {144... entries}>
+
+    The third method is to call `.metadataBundle` on the corpus itself. This
+    calls `.read()` automatically:
+    
+    Method 3:
+
+    >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
+    >>> localBundle = corpus.corpora.LocalCorpus().metadataBundle
+    >>> virtualBundle = corpus.corpora.VirtualCorpus().metadataBundle
+
+    >>> coreBundle
+    <music21.metadata.bundles.MetadataBundle 'core': {144... entries}>
+
+
 
     Additionally, any two metadata bundles can be operated on together as
     though they were sets, allowing us to build up more complex searches:
 
-    >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+    >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
     >>> bachBundle = coreBundle.search(
     ...     'bach',
     ...     field='composer',
@@ -230,7 +239,8 @@ class MetadataBundle(object):
     def __init__(self, expr=None):
         from music21 import corpus
         self._metadataEntries = OrderedDict()
-        assert isinstance(expr, (str, corpus.corpora.Corpus, type(None)))
+        if not isinstance(expr, (str, corpus.corpora.Corpus, type(None))):
+            raise MetadataBundleException("Need to take a string, corpus, or None as expression")
         if isinstance(expr, corpus.corpora.Corpus):
             self._name = expr.name
         else:
@@ -243,7 +253,7 @@ class MetadataBundle(object):
         Compute the set-wise `and` of two metadata bundles:
 
         >>> from music21 import metadata
-        >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
         ...     field='composer',
@@ -269,7 +279,7 @@ class MetadataBundle(object):
         entries, otherwise false:
 
         >>> from music21 import metadata
-        >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
         ...     field='composer',
@@ -300,7 +310,7 @@ class MetadataBundle(object):
         to another bundle:
 
         >>> from music21 import metadata
-        >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
         ...     field='composer',
@@ -341,7 +351,7 @@ class MetadataBundle(object):
         another bundle:
 
         >>> from music21 import metadata
-        >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
         ...     field='composer',
@@ -380,7 +390,7 @@ class MetadataBundle(object):
         another bundle:
 
         >>> from music21 import metadata
-        >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
         ...     field='composer',
@@ -421,7 +431,7 @@ class MetadataBundle(object):
         True when one metadata bundle is a subset of another bundle:
 
         >>> from music21 import metadata
-        >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
         ...     field='composer',
@@ -461,7 +471,7 @@ class MetadataBundle(object):
         Compute the set-wise `or` of two metadata bundles:
 
         >>> from music21 import metadata
-        >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
         ...     field='composer',
@@ -502,7 +512,7 @@ class MetadataBundle(object):
         Compute the set-wise `subtraction` of two metadata bundles:
 
         >>> from music21 import metadata
-        >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
         ...     field='composer',
@@ -530,7 +540,7 @@ class MetadataBundle(object):
         Compute the set-wise `exclusive or` of two metadata bundles:
 
         >>> from music21 import metadata
-        >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
         ...     field='composer',
@@ -586,16 +596,16 @@ class MetadataBundle(object):
         bundle's name.
 
         >>> from music21 import metadata
-        >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> coreBundle
         <music21.metadata.bundles.MetadataBundle 'core': {144... entries}>
         >>> coreBundle.corpus
         <music21.corpus.corpora.CoreCorpus>
         '''
-        from music21 import corpus
+        from music21.corpus import manager
         if self.name is None:
             return None
-        return corpus.corpora.Corpus.fromName(self.name)
+        return manager.fromName(self.name)
 
     @property
     def filePath(self):
@@ -636,7 +646,7 @@ class MetadataBundle(object):
         >>> from music21 import metadata
         >>> metadata.bundles.MetadataBundle().name is None
         True
-        >>> metadata.bundles.MetadataBundle.fromCoreCorpus().name == 'core'
+        >>> corpus.corpora.CoreCorpus().metadataBundle.name == 'core'
         True
 
         Return string or None.
@@ -755,7 +765,7 @@ class MetadataBundle(object):
         Clear all keys in a metadata bundle:
 
         >>> from music21 import metadata
-        >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
         ...     field='composer',
@@ -819,7 +829,7 @@ class MetadataBundle(object):
         Compute the set-wise difference of two metadata bundles:
 
         >>> from music21 import metadata
-        >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
 
         >>> bachBundle = coreBundle.search(
         ...     'bach',
@@ -842,63 +852,12 @@ class MetadataBundle(object):
             'difference',
             )
 
-    @classmethod
-    def fromCoreCorpus(cls):
-        r'''
-        Return a metadata bundle for the core corpus.
-
-        Read from disk and cache it in memory if the bundle doesn't already
-        exist, otherwise pull from memory:
-
-        >>> from music21 import metadata
-        >>> coreCorpusA = metadata.bundles.MetadataBundle.fromCoreCorpus()
-        >>> coreCorpusB = metadata.bundles.MetadataBundle.fromCoreCorpus()
-        >>> coreCorpusA is coreCorpusB
-        True
-        '''
-        from music21.corpus import corpora
-        return corpora.CoreCorpus().metadataBundle
-
-    @classmethod
-    def fromLocalCorpus(cls, name=None):
-        r'''
-        Return a metadata bundle for the local corpus.
-
-        Read from disk and cache it in memory if the bundle doesn't already
-        exist, otherwise pull from memory:
-
-        >>> from music21 import metadata
-        >>> localCorpusA = metadata.bundles.MetadataBundle.fromLocalCorpus()
-        >>> localCorpusB = metadata.bundles.MetadataBundle.fromLocalCorpus()
-        >>> localCorpusA is localCorpusB
-        True
-        '''
-        from music21.corpus import corpora
-        return corpora.LocalCorpus(name).metadataBundle
-
-    @classmethod
-    def fromVirtualCorpus(cls):
-        r'''
-        Return a metadata bundle for the virtual corpus.
-
-        Read from disk and cache it in memory if the bundle doesn't already
-        exist, otherwise pull from memory:
-
-        >>> from music21 import metadata
-        >>> virtualCorpusA = metadata.bundles.MetadataBundle.fromVirtualCorpus()
-        >>> virtualCorpusB = metadata.bundles.MetadataBundle.fromVirtualCorpus()
-        >>> virtualCorpusA is virtualCorpusB
-        True
-        '''
-        from music21.corpus import corpora
-        return corpora.VirtualCorpus().metadataBundle
-
     def intersection(self, metadataBundle):
         r'''
         Compute the set-wise intersection of two metadata bundles:
 
         >>> from music21 import metadata
-        >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
 
         >>> bachBundle = coreBundle.search(
         ...     'bach',
@@ -927,7 +886,7 @@ class MetadataBundle(object):
         the set of keys in another:
 
         >>> from music21 import metadata
-        >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
 
         >>> bachBundle = coreBundle.search(
         ...     'bach',
@@ -963,7 +922,7 @@ class MetadataBundle(object):
         the keys in another:
 
         >>> from music21 import metadata
-        >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
 
         >>> bachBundle = coreBundle.search(
         ...     'bach',
@@ -992,7 +951,7 @@ class MetadataBundle(object):
         the keys in another:
 
         >>> from music21 import metadata
-        >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
 
         >>> bachBundle = coreBundle.search(
         ...     'bach',
@@ -1193,7 +1152,7 @@ class MetadataBundle(object):
         Compute the set-wise symmetric differnce of two metadata bundles:
 
         >>> from music21 import metadata
-        >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
         ...     field='composer',
@@ -1217,7 +1176,7 @@ class MetadataBundle(object):
         r'''
         Compute the set-wise union of two metadata bundles:
 
-        >>> coreBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+        >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
         ...     field='composer',
@@ -1292,7 +1251,7 @@ class MetadataBundle(object):
         Returns the metadata bundle.
 
         >>> from music21 import metadata
-        >>> bachBundle = metadata.bundles.MetadataBundle.fromCoreCorpus().search(
+        >>> bachBundle = corpus.corpora.CoreCorpus().metadataBundle.search(
         ...     'bach',
         ...     'composer',
         ...     )
