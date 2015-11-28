@@ -55,7 +55,7 @@ class DocBuilder(object):
         shutil.rmtree(self.autogenDirectoryPath)
         os.mkdir(self.autogenDirectoryPath)
 
-    def runBuild(self):        
+    def runBuild(self, runSphinx=True):        
         if self.command not in self.buildDirectories:
             self.print_usage()
             raise DocBuilderException(
@@ -75,7 +75,8 @@ class DocBuilder(object):
         documentation.writers.ModuleReferenceReSTWriter().run()
         documentation.writers.CorpusReferenceReSTWriter().run()
         
-        self.runSphinx()
+        if runSphinx:
+            self.runSphinx()
 
     def runSphinx(self):
         try:
