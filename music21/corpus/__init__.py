@@ -31,22 +31,18 @@ from music21 import common
 from music21 import converter
 from music21 import exceptions21
 from music21 import metadata
+
 from music21.corpus import chorales
-from music21.corpus import virtual
 from music21.corpus import corpora
+from music21.corpus import manager
+from music21.corpus import virtual
+from music21.corpus import work
 
 from music21 import environment
 _MOD = "corpus.base.py"
 environLocal = environment.Environment(_MOD)
 
-
-#------------------------------------------------------------------------------
-
-
-class CorpusException(exceptions21.Music21Exception):
-    pass
-
-
+from music21.exceptions21 import CorpusException
 #------------------------------------------------------------------------------
 
 
@@ -110,7 +106,7 @@ def getLocalPaths(fileExtensions=None, expandExtensions=True):
         )
 
 
-def addPath(filePath):
+def addPath(filePath, corpusName=None):
     '''
     Add a directory path to the Local Corpus on a *temporary* basis, i.e., just
     for the current Python session.
@@ -137,7 +133,7 @@ def addPath(filePath):
 
     Restart music21 after adding paths.
     '''
-    corpora.LocalCorpus().addPath(filePath)
+    corpora.LocalCorpus(corpusName).addPath(filePath)
 
 
 def getPaths(
@@ -173,21 +169,6 @@ def getPaths(
 # metadata routines
 
 
-def _updateMetadataBundle():
-    '''
-    Load the metadata bundle from JSON and store it in the module global
-    variable _METADATA_BUNDLES, unless the _METADATA_BUNDLES have already been
-    built, in which case, don't do it.
-
-    This relies on the functions `getCorePaths()`, `getVirtualPaths()`, and
-    `getLocalPaths()`.
-
-    Note that this updates the in-memory cached metdata bundles not the disk
-    caches (that's MUCH slower!) to do that run corpus.metadata.metadata.py
-    '''
-    corpora.Corpus._updateAllMetadataBundles()
-
-
 def cacheMetadata(corpusNames=('local',), verbose=True):
     '''
     Rebuild the metadata cache.
@@ -195,14 +176,15 @@ def cacheMetadata(corpusNames=('local',), verbose=True):
     if not common.isIterable(corpusNames):
         corpusNames = [corpusNames]
     for name in corpusNames:
-        corpora.Corpus._metadataBundles[name] = None
+        # todo -- create cache names for local corpora
+        manager._metadataBundles[name] = None
     metadata.caching.cacheMetadata(corpusNames, verbose=verbose)
 
 
 def search(
     query,
     field=None,
-    corpusNames=('core', 'virtual', 'local'),
+    corpusNames=None,
     fileExtensions=None,
     ):
     r'''
@@ -219,13 +201,16 @@ def search(
     >>> corpus.search('china')
     <music21.metadata.bundles.MetadataBundle {1235 entries}>
 
+    >>> corpus.search('china', fileExtensions='.mid')
+    <music21.metadata.bundles.MetadataBundle {0 entries}>
+
     >>> corpus.search('bach', field='composer')
     <music21.metadata.bundles.MetadataBundle {21 entries}>
    
     >>> corpus.search('coltrane', corpusNames=('virtual',))
     <music21.metadata.bundles.MetadataBundle {1 entry}>
     '''
-    return corpora.search(query,
+    return manager.search(query,
                         field=field,
                         corpusNames=corpusNames,
                         fileExtensions=fileExtensions)
@@ -284,110 +269,7 @@ def noCorpus():
     False
 
     '''
-    return corpora.CoreCorpus.noCorpus
-
-#------------------------------------------------------------------------------
-
-
-def getWorkList(workName, movementNumber=None, fileExtensions=None):
-    '''
-    Search the corpus and return a list of filenames of works, always in a
-    list.
-
-    If no matches are found, an empty list is returned.
-
-    >>> len(corpus.getWorkList('schumann_clara', 3, '.xml'))
-    1
-
-    Make sure that 'verdi' just gets the single Verdi piece and not the
-    Monteverdi pieces:
-
-    >>> len(corpus.getWorkList('verdi'))
-    1
-
-    '''
-    return corpora.CoreCorpus().getWorkList(
-        workName,
-        movementNumber=movementNumber,
-        fileExtensions=fileExtensions,
-        )
-
-
-def getVirtualWorkList(workName, movementNumber=None, fileExtensions=None):
-    '''
-    Given a work name, search all virtual works and return a list of URLs for
-    any matches.
-
-
-    >>> corpus.getVirtualWorkList('bach/bwv1007/prelude')
-    ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
-
-    >>> corpus.getVirtualWorkList('junk')
-    []
-
-    '''
-    return corpora.VirtualCorpus().getWorkList(
-        workName,
-        movementNumber=movementNumber,
-        fileExtensions=fileExtensions,
-        )
-
-
-#------------------------------------------------------------------------------
-
-
-def getWorkReferences():
-    '''
-    Return a data dictionary for all works in the corpus 
-    Returns a list of corpus.corpora.DirectoryInformation object, one
-    for each directory. A 'works' dictionary for each composer
-    provides references to dictionaries for all associated works.
-
-    This is used in the generation of corpus documentation
-
-    >>> workRefs = corpus.getWorkReferences()
-    >>> workRefs[1:3]
-    [<music21.corpus.corpora.DirectoryInformation bach>, 
-     <music21.corpus.corpora.DirectoryInformation beethoven>]
-     
-    No longer finds the VirtualCorpus. TODO: Reinstate when
-    that corpus becomes useful again...
-    '''
-    results = [di for di in corpora.CoreCorpus().directoryInformation]
-
-#     for vw in corpora.VirtualCorpus._virtual_works:
-#         composerDir = vw.corpusPath.split('/')[0]
-#         match = False
-#         for ref in results:
-#             # check composer reference or first part of corpusPath
-#             if (ref['composer'] == vw.composer or
-#                 composerDir == ref['composerDir']):
-#                 match = True
-#                 break  # use this ref
-#         if not match:  # new composers, create a new ref
-#             ref = {}
-#             ref['composer'] = vw.composer
-#             ref['composerDir'] = composerDir
-#             ref['works'] = {}  # store by keys of name/dirname
-#         # work stub should be everything other than top-level
-#         workStub = vw.corpusPath.replace(composerDir + '/', '')
-#         ref['works'][workStub] = {}
-#         ref['works'][workStub]['virtual'] = True
-#         ref['works'][workStub]['files'] = []
-#         ref['works'][workStub]['title'] = vw.title
-#         for url in vw.urlList:
-#             m21Format, ext = common.findFormatExtURL(url)
-#             fileDict = {}
-#             fileDict['format'] = m21Format
-#             fileDict['ext'] = ext
-#             # all path parts after corpus
-#             fileDict['corpusPath'] = vw.corpusPath
-#             fileDict['title'] = vw.title
-#             fileDict['url'] = url
-#             ref['works'][workStub]['files'].append(fileDict)
-#         if not match:  # not found already, need to add
-#             results.append(ref)
-    return results
+    return corpora.CoreCorpus().noCorpus
 
 
 #------------------------------------------------------------------------------
@@ -395,7 +277,7 @@ def getWorkReferences():
 
 def getWork(workName, movementNumber=None, fileExtensions=None):
     '''
-    Search the corpus, then the virtual corpus, for a work, and return a file
+    Search all Corpora for a work, and return a file
     path or URL.  N.B. does not parse the work: but it's suitable for passing
     to converter.parse.
 
@@ -412,33 +294,16 @@ def getWork(workName, movementNumber=None, fileExtensions=None):
     >>> trecentoFiles = corpus.getWork('trecento')
     >>> len(trecentoFiles) > 100 and len(trecentoFiles) < 200
     True
-
     '''
-    if not common.isListLike(fileExtensions):
-        fileExtensions = [fileExtensions]
-    results = getWorkList(workName, movementNumber, fileExtensions)
-    if len(results) == 0:
-        if common.isListLike(workName):
-            workName = os.path.sep.join(workName)
-        if workName.endswith(".xml"):  # might be compressed MXL file
-            newWorkName = workName[0:len(workName) - 4] + ".mxl"
-            return getWork(newWorkName, movementNumber, fileExtensions)
-        results = getVirtualWorkList(workName, movementNumber, fileExtensions)
-    if len(results) == 1:
-        return results[0]
-    elif len(results) == 0:
-        raise CorpusException(
-            'Could not find a file/url that met these criteria')
-    return results
+    return manager.getWork(workName, movementNumber, fileExtensions)
 
 # pylint: disable=redefined-builtin
-def parse(
-    workName,
-    movementNumber=None,
-    number=None,
-    fileExtensions=None,
-    forceSource=False,
-    format=None # @ReservedAssignment
+def parse(workName,
+            movementNumber=None,
+            number=None,
+            fileExtensions=None,
+            forceSource=False,
+            format=None # @ReservedAssignment
     ):
     '''
     The most important method call for corpus.
@@ -474,33 +339,16 @@ def parse(
 
     >>> bachChorale.corpusFilepath
     'bach/bwv66.6.mxl'
-
     '''
-    return corpora.Corpus.parse(
-        workName,
+    return manager.parse(
+        workName=workName,
         movementNumber=movementNumber,
         number=number,
         fileExtensions=fileExtensions,
         forceSource=forceSource,
-        format=format
+        format=format # @ReservedAssignment
         )
 
-
-def _addCorpusFilepath(streamObj, filePath):
-    # metadata attribute added to store the file path,
-    # for use later in identifying the score
-    #if streamObj.metadata == None:
-    #    streamObj.insert(metadata.Metadata())
-    corpusFilePath = common.getCorpusFilePath()
-    lenCFP = len(corpusFilePath) + len(os.sep)
-    if filePath.startswith(corpusFilePath):
-        fp2 = filePath[lenCFP:]
-        ### corpus fix for windows
-        dirsEtc = fp2.split(os.sep)
-        fp3 = '/'.join(dirsEtc)
-        streamObj.corpusFilepath = fp3
-    else:
-        streamObj.corpusFilepath = filePath
 
 
 @common.deprecated("1999?","by early 2016", "Use corpus.parse() instead.")

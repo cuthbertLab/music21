@@ -242,16 +242,6 @@ class TestABCImport(M21CallTest):
         self.s = music21.corpus.parse('essenFolksong/erk20.abc', forceSource=True)
 
 
-class TestMetadataBundle(CallTest):
-
-    def __init__(self):
-        from music21 import corpus
-        self.base = corpus
-
-    def testFocus(self):
-        # this opens and instantiates the metad
-        self.base._updateMetadataBundle()
-
 
 
 

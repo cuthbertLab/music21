@@ -959,7 +959,7 @@ class CompressionSegment(object):
         """given a point, and seiveSegment, find a modulus and shift that
         match"""
         m = 1 # could start at one, but only pertains to the single case of 1@0
-        while 1: # search m for max
+        while m < self._maxMod: # search m for max
             obj = Residual(m, n, 0, self._z)
             seg = obj() # n, z is set already
             # check first to see if it is a member of the part
@@ -969,8 +969,9 @@ class CompressionSegment(object):
                 return obj, seg
             m = m + 1
             # a mod will always be found, at least 1 point; should never happen
-            assert m <= self._maxMod
-        #print 'error, no mod found', n, part
+
+        raise SieveException("a mod was not found less than {0}".format(self._maxMod))
+
 
     def _process(self):
         """take a copy of match; move through each value of this list as if it
@@ -1358,7 +1359,8 @@ class Sieve(object):
 
     def _resKeys(self, state):
         """get residual keys based on library"""
-        assert state in ['cmp', 'exp']
+        if state not in ('cmp', 'exp'):
+            raise SieveException("state must be 'cmp' or 'exp'")
         if state == 'cmp':
             libKeys = []
             for key in self._resLib:

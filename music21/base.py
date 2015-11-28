@@ -3529,11 +3529,11 @@ class Test(unittest.TestCase):
         a.offset = 3.0
         c = ElementWrapper(n)
         c.offset = 3.0
-        assert (a == c)
-        assert (a is not c)
+        self.assertEqual(a, c)
+        self.assertIsNot(a, c)
         b = ElementWrapper(n)
         b.offset = 2.0
-        assert (a != b)
+        self.assertNotEqual(a, b)
 
     def testNoteCreation(self):
         from music21 import note

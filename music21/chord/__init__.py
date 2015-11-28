@@ -4573,10 +4573,8 @@ class Test(unittest.TestCase):
 
         a = note.Note()
         b = note.Note()
-        assert isinstance(a, note.Note)
-        assert isinstance(a, note.Note)
-        assert isinstance(b, note.Note)
-        assert isinstance(b, note.Note)
+        self.assertTrue(isinstance(a, note.Note))
+        self.assertTrue(isinstance(b, note.Note))
 
         MiddleC = note.Note()
         MiddleC.name = 'C'

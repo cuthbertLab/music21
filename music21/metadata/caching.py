@@ -49,6 +49,7 @@ def cacheMetadata(corpusNames=('local', 'core', 'virtual'),
 
     '''
     from music21 import corpus
+    from music21.corpus import corpora
     from music21 import metadata
 
     if not common.isIterable(corpusNames):
@@ -64,15 +65,15 @@ def cacheMetadata(corpusNames=('local', 'core', 'virtual'),
     # virtual is on-line
     for corpusName in corpusNames:
         if corpusName == 'core':
-            metadataBundle = metadata.bundles.MetadataBundle.fromCoreCorpus()
+            metadataBundle = corpora.CoreCorpus()
             paths = corpus.getCorePaths()
             useCorpus = True
         elif corpusName == 'local':
-            metadataBundle = metadata.bundles.MetadataBundle.fromLocalCorpus()
+            metadataBundle = corpora.LocalCorpus()
             paths = corpus.getLocalPaths()
             useCorpus = False
         elif corpusName == 'virtual':
-            metadataBundle = metadata.bundles.MetadataBundle.fromVirtualCorpus()
+            metadataBundle = corpora.VirtualCorpus()
             paths = corpus.getVirtualPaths()
             useCorpus = False
         else:
