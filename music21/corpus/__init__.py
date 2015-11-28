@@ -36,6 +36,7 @@ from music21.corpus import chorales
 from music21.corpus import corpora
 from music21.corpus import manager
 from music21.corpus import virtual
+from music21.corpus import work
 
 from music21 import environment
 _MOD = "corpus.base.py"
@@ -325,7 +326,7 @@ def getVirtualWorkList(workName, movementNumber=None, fileExtensions=None):
 
 def getWork(workName, movementNumber=None, fileExtensions=None):
     '''
-    Search the corpus, then the virtual corpus, for a work, and return a file
+    Search all Corpora for a work, and return a file
     path or URL.  N.B. does not parse the work: but it's suitable for passing
     to converter.parse.
 
@@ -342,33 +343,16 @@ def getWork(workName, movementNumber=None, fileExtensions=None):
     >>> trecentoFiles = corpus.getWork('trecento')
     >>> len(trecentoFiles) > 100 and len(trecentoFiles) < 200
     True
-
     '''
-    if not common.isListLike(fileExtensions):
-        fileExtensions = [fileExtensions]
-    results = getWorkList(workName, movementNumber, fileExtensions)
-    if len(results) == 0:
-        if common.isListLike(workName):
-            workName = os.path.sep.join(workName)
-        if workName.endswith(".xml"):  # might be compressed MXL file
-            newWorkName = workName[0:len(workName) - 4] + ".mxl"
-            return getWork(newWorkName, movementNumber, fileExtensions)
-        results = getVirtualWorkList(workName, movementNumber, fileExtensions)
-    if len(results) == 1:
-        return results[0]
-    elif len(results) == 0:
-        raise CorpusException(
-            'Could not find a file/url that met these criteria')
-    return results
+    return manager.getWork(workName, movementNumber, fileExtensions)
 
 # pylint: disable=redefined-builtin
-def parse(
-    workName,
-    movementNumber=None,
-    number=None,
-    fileExtensions=None,
-    forceSource=False,
-    format=None # @ReservedAssignment
+def parse(workName,
+            movementNumber=None,
+            number=None,
+            fileExtensions=None,
+            forceSource=False,
+            format=None # @ReservedAssignment
     ):
     '''
     The most important method call for corpus.
@@ -404,33 +388,16 @@ def parse(
 
     >>> bachChorale.corpusFilepath
     'bach/bwv66.6.mxl'
-
     '''
-    return corpora.Corpus.parse(
-        workName,
+    return manager.parse(
+        workName=workName,
         movementNumber=movementNumber,
         number=number,
         fileExtensions=fileExtensions,
         forceSource=forceSource,
-        format=format
+        format=format # @ReservedAssignment
         )
 
-
-def _addCorpusFilepath(streamObj, filePath):
-    # metadata attribute added to store the file path,
-    # for use later in identifying the score
-    #if streamObj.metadata == None:
-    #    streamObj.insert(metadata.Metadata())
-    corpusFilePath = common.getCorpusFilePath()
-    lenCFP = len(corpusFilePath) + len(os.sep)
-    if filePath.startswith(corpusFilePath):
-        fp2 = filePath[lenCFP:]
-        ### corpus fix for windows
-        dirsEtc = fp2.split(os.sep)
-        fp3 = '/'.join(dirsEtc)
-        streamObj.corpusFilepath = fp3
-    else:
-        streamObj.corpusFilepath = filePath
 
 
 @common.deprecated("1999?","by early 2016", "Use corpus.parse() instead.")

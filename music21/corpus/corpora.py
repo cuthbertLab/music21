@@ -12,13 +12,13 @@
 
 
 import abc
-from collections import OrderedDict, namedtuple
 import os
 from music21.ext import six
 
 from music21 import common
 from music21 import converter
 from music21.corpus import virtual
+from music21.corpus import work
 
 from music21 import environment
 environLocal = environment.Environment(__file__)
@@ -28,109 +28,6 @@ from music21.exceptions21 import CorpusException
 if six.PY3:
     unicode = str # @ReservedAssignment
 
-#------------------------------------------------------------------------------
-CorpusWork = namedtuple('CorpusWork', 'title files virtual')
-CorpusFile = namedtuple('CorpusFile', 'path title filename format ext')
-VirtualCorpusFile = namedtuple('VirtualCorpusFile', 'path title url format')
-
-
-
-class DirectoryInformation(object):
-    '''
-    returns information about a directory in a Corpus.  Called from 
-    
-    only tested with CoreCorpus so far.
-    '''
-    
-    def __init__(self, dirName="", dirTitle="", isComposer=True, corpusObject=None):
-        self.directoryName = dirName
-        self.directoryTitle = dirTitle
-        self.isComposer = isComposer
-        self.works = OrderedDict()
-        
-        self._corpusObject = None # weakref
-        
-        if corpusObject is None:
-            self.corpusObject = CoreCorpus()
-        else:
-            self.corpusObject = corpusObject
-        
-        self.findWorks()
-    
-    def __repr__(self):
-        return '<{0}.{1} {2}>'.format(self.__module__, 
-                                      self.__class__.__name__, 
-                                      self.directoryName)
-
-    
-    def findWorks(self):
-        '''
-        populate other information about the directory such as
-        files and filenames.
-        
-        
-        >>> di = corpus.corpora.DirectoryInformation('schoenberg')
-        >>> di.findWorks()
-        OrderedDict([(...'opus19', CorpusWork(title='Opus 19', 
-                                       files=[CorpusFile(path='schoenberg/opus19/movement2.mxl', 
-                                                         title='Movement 2', 
-                                                         filename='movement2.mxl', 
-                                                         format='musicxml', 
-                                                         ext='.mxl'), 
-                                              CorpusFile(path='schoenberg/opus19/movement6.mxl', 
-                                                         title='Movement 6', 
-                                                         filename='movement6.mxl', 
-                                                         format='musicxml', 
-                                                         ext='.mxl')],                                                             
-                                        virtual=False))])
-        '''
-        self.works.clear()
-        works = self.corpusObject.getComposer(self.directoryName) 
-                # TODO: this should be renamed since not all are composers
-        for path in works:
-            # split by the composer dir to get relative path
-            #environLocal.printDebug(['dir composer', composerDirectory, path])
-            junk, fileStub = path.split(self.directoryName)
-            if fileStub.startswith(os.sep):
-                fileStub = fileStub[len(os.sep):]
-            # break into file components
-            fileComponents = fileStub.split(os.sep)
-            # the first is either a directory for containing components
-            # or a top-level name
-            m21Format, ext = common.findFormatExtFile(fileComponents[-1])
-            if ext is None:
-                #environLocal.printDebug([
-                #    'file that does not seem to have an extension',
-                #    ext, path])
-                continue
-            # if not a file w/ ext, we will get None for format
-            if m21Format is None:
-                workStub = fileComponents[0]
-            else:  # remove the extension
-                workStub = fileComponents[0].replace(ext, '')
-            # create list location if not already added
-            if workStub not in self.works:
-                title = common.spaceCamelCase(workStub).title()                
-                self.works[workStub] = CorpusWork(title=title, files=[], virtual=False)
-            # last component is name
-            m21Format, ext = common.findFormatExtFile(fileComponents[-1])
-            # all path parts after corpus
-            corpusPath = os.path.join(self.directoryName, fileStub)
-            corpusFileName = fileComponents[-1]  # all after
-            title = None
-            # this works but takes a long time!
-            # title = converter.parse(path).metadata.title
-            ## TODO: get from RichMetadataBundle!
-            if title is None:
-                title = common.spaceCamelCase(
-                    fileComponents[-1].replace(ext, ''))
-                title = title.title()
-            fileTuple = CorpusFile(path=corpusPath, title=title, filename=corpusFileName, 
-                                   format=m21Format, ext=ext)
-            self.works[workStub].files.append(fileTuple)
-            # add this path
-        return self.works
-        
 #------------------------------------------------------------------------------
 
 class Corpus(object):
@@ -274,108 +171,115 @@ class Corpus(object):
         raise NotImplementedError
 
 
-    # pylint: disable=redefined-builtin
-    @staticmethod
-    def parse(
+    def getWorkList(
+        self,
         workName,
         movementNumber=None,
-        number=None,
         fileExtensions=None,
-        forceSource=False,
-        format=None # @ReservedAssignment
         ):
-        '''
-        # TODO: Remove from static method -- make a function for the module.
-        
-        The most important method call for corpus.
+        r'''
+        Search the corpus and return a list of filenames of works, always in a
+        list.
 
-        Similar to the :meth:`~music21.converter.parse` method of converter
-        (which takes in a filepath on the local hard drive), this method
-        searches the corpus (including the virtual corpus) for a work fitting
-        the workName description and returns a :class:`music21.stream.Stream`.
-
-        If `movementNumber` is defined, and a movement is included in the
-        corpus, that movement will be returned.
-
-        If `number` is defined, and the work is a collection with multiple
-        components, that work number will be returned.  For instance, some of
-        our ABC documents contain dozens of folk songs within a single file.
-
-        Advanced: if `forceSource` is True, the original file will always be
-        loaded freshly and pickled (e.g., pre-parsed) files will be ignored.
-        This should not be needed if the file has been changed, since the
-        filetime of the file and the filetime of the pickled version are
-        compared.  But it might be needed if the music21 parsing routine has
-        changed.
-
-        Example, get a chorale by Bach.  Note that the source type does not
-        need to be specified, nor does the name Bach even (since it's the only
-        piece with the title BWV 66.6)
+        If no matches are found, an empty list is returned.
 
         >>> from music21 import corpus
-        >>> bachChorale = corpus.corpora.Corpus.parse('bwv66.6')
-        >>> len(bachChorale.parts)
-        4
+        >>> coreCorpus = corpus.corpora.CoreCorpus()
+        
+        # returns 1 even though there is a '.mus' file, which cannot be read...
+        
+        >>> len(coreCorpus.getWorkList('cpebach/h186'))
+        1
+        >>> len(coreCorpus.getWorkList('cpebach/h186', None, '.xml'))
+        1
 
-        After parsing, the file path within the corpus is stored as
-        ``.corpusFilePath``
+        >>> len(coreCorpus.getWorkList('schumann_clara/opus17', 3))
+        1
+        >>> len(coreCorpus.getWorkList('schumann_clara/opus17', 2))
+        0
 
-        >>> bachChorale.corpusFilepath
-        'bach/bwv66.6.mxl'
+        Make sure that 'verdi' just gets the single Verdi piece and not the
+        Monteverdi pieces:
+
+        >>> len(coreCorpus.getWorkList('verdi'))
+        1
 
         '''
-        from music21 import corpus
-        if workName in (None, ''):
-            raise corpus.CorpusException(
-                'a work name must be provided as an argument')
         if not common.isListLike(fileExtensions):
             fileExtensions = [fileExtensions]
-        workList = corpus.getWorkList(workName, movementNumber, fileExtensions)
-        if not workList:
-            if common.isIterable(workName):
-                workName = os.path.sep.join(workName)
-            if workName.endswith(".xml"):
-                # might be compressed MXL file
-                newWorkName = os.path.splitext(workName)[0] + ".mxl"
-                try:
-                    return Corpus.parse(
-                        newWorkName,
-                        movementNumber,
-                        number,
-                        fileExtensions,
-                        forceSource,
-                        format=format
-                        )
-                except corpus.CorpusException:
-                    # avoids having the name come back with .mxl instead of
-                    # .xmlrle
-                    raise corpus.CorpusException(
-                        'Could not find an xml or mxl work that met this ' +
-                        'criterion: {0}'.format(workName) + 
-                        '. If you are searching for a file on disk, ' + 
-                        'use "converter" instead of "corpus".')
-            workList = corpus.getVirtualWorkList(
-                workName,
-                movementNumber,
-                fileExtensions,
-                )
-        if len(workList) == 1:
-            filePath = workList[0]
-        elif not len(workList):
-            raise corpus.CorpusException(
-                'Could not find a work that met this criterion: {0};'.format(
-                    workName) + 
-                'if you are searching for a file on disk, use "converter" instead of "corpus".')
+        paths = self.getPaths(fileExtensions)
+        results = []
+        # permit workName to be a list of paths/branches
+        if common.isIterable(workName):
+            workName = os.path.sep.join(workName)
+        workSlashes = workName.replace('/', os.path.sep)
+        # find all matches for the work name
+        # TODO: this should match by path component, not just
+        # substring
+        for path in paths:
+            if workName.lower() in path.lower():
+                results.append(path)
+            elif workSlashes.lower() in path.lower():
+                results.append(path)
+        if len(results):
+            # more than one matched...use more stringent criterion:
+            # must have a slash before the name
+            previousResults = results
+            results = []
+            longName = os.sep + workSlashes.lower()
+            for path in previousResults:
+                if longName in path.lower():
+                    results.append(path)
+            if not len(results):
+                results = previousResults
+        movementResults = []
+        if movementNumber is not None and len(results):
+            # store one ore more possible mappings of movement number
+            movementStrList = []
+            # see if this is a pair
+            if common.isIterable(movementNumber):
+                movementStrList.append(
+                    ''.join(str(x) for x in movementNumber))
+                movementStrList.append(
+                    '-'.join(str(x) for x in movementNumber))
+                movementStrList.append('movement' +
+                    '-'.join(str(x) for x in movementNumber))
+                movementStrList.append('movement' +
+                    '-0'.join(str(x) for x in movementNumber))
+            else:
+                movementStrList += [
+                    '0{0}'.format(movementNumber),
+                    str(movementNumber),
+                    'movement{0}'.format(movementNumber),
+                    ]
+            for filePath in sorted(results):
+                filename = os.path.split(filePath)[1]
+                if '.' in filename:
+                    filenameWithoutExtension = os.path.splitext(filename)[0]
+                else:
+                    filenameWithoutExtension = None
+                searchPartialMatch = True
+                if filenameWithoutExtension is not None:
+                    # look for direct matches first
+                    for movementStr in movementStrList:
+                        #if movementStr.lower() in filePath.lower():
+                        if filenameWithoutExtension.lower() == movementStr.lower():
+                            movementResults.append(filePath)
+                            searchPartialMatch = False
+                # if we have one direct match, all other matches must
+                # be direct. this will match multiple files with different
+                # file extensions
+                if len(movementResults):
+                    continue
+                if searchPartialMatch:
+                    for movementStr in movementStrList:
+                        if filename.startswith(movementStr.lower()):
+                            movementResults.append(filePath)
+            if not len(movementResults):
+                pass
         else:
-            filePath = workList[0]
-        streamObject = converter.parse(
-            filePath,
-            forceSource=forceSource,
-            number=number,
-            format=format
-            )
-        corpus._addCorpusFilepath(streamObject, filePath)
-        return streamObject
+            movementResults = results
+        return sorted(set(movementResults))
 
     def search(self, 
                query, 
@@ -418,16 +322,16 @@ class Corpus(object):
         >>> core = corpus.corpora.CoreCorpus()
         >>> diBrief = core.directoryInformation[0:4]
         >>> diBrief
-        (<music21.corpus.corpora.DirectoryInformation airdsAirs>,
-         <music21.corpus.corpora.DirectoryInformation bach>, 
-         <music21.corpus.corpora.DirectoryInformation beethoven>, 
-         <music21.corpus.corpora.DirectoryInformation ciconia>)
+        (<music21.corpus.work.DirectoryInformation airdsAirs>,
+         <music21.corpus.work.DirectoryInformation bach>, 
+         <music21.corpus.work.DirectoryInformation beethoven>, 
+         <music21.corpus.work.DirectoryInformation ciconia>)
         >>> diBrief[3].directoryTitle
         'Johannes Ciconia'
         '''
         dirInfo = []
         for infoTriple in self._directoryInformation:
-            dirInfo.append(DirectoryInformation(*infoTriple))
+            dirInfo.append(work.DirectoryInformation(*infoTriple, corpusObject=self))
         return tuple(dirInfo)
 
 
@@ -507,7 +411,7 @@ class Corpus(object):
     def getWorkReferences(self):
         '''
         Return a data dictionary for all works in this corpus 
-        Returns a list of corpus.corpora.DirectoryInformation objects, one
+        Returns a list of corpus.work.DirectoryInformation objects, one
         for each directory. A 'works' dictionary for each composer
         provides references to dictionaries for all associated works.
     
@@ -515,8 +419,8 @@ class Corpus(object):
     
         >>> workRefs = corpus.corpora.CoreCorpus().getWorkReferences()
         >>> workRefs[1:3]
-        [<music21.corpus.corpora.DirectoryInformation bach>, 
-         <music21.corpus.corpora.DirectoryInformation beethoven>]
+        [<music21.corpus.work.DirectoryInformation bach>, 
+         <music21.corpus.work.DirectoryInformation beethoven>]
                  '''
         results = [di for di in self.directoryInformation]
     
@@ -850,116 +754,6 @@ class CoreCorpus(Corpus):
                 fileExtensions,
                 )
         return Corpus._pathsCache[cacheKey]
-
-    def getWorkList(
-        self,
-        workName,
-        movementNumber=None,
-        fileExtensions=None,
-        ):
-        r'''
-        Search the corpus and return a list of filenames of works, always in a
-        list.
-
-        If no matches are found, an empty list is returned.
-
-        >>> from music21 import corpus
-        >>> coreCorpus = corpus.corpora.CoreCorpus()
-        
-        # returns 1 even though there is a '.mus' file, which cannot be read...
-        
-        >>> len(coreCorpus.getWorkList('cpebach/h186'))
-        1
-        >>> len(coreCorpus.getWorkList('cpebach/h186', None, '.xml'))
-        1
-
-        >>> len(coreCorpus.getWorkList('schumann_clara/opus17', 3))
-        1
-        >>> len(coreCorpus.getWorkList('schumann_clara/opus17', 2))
-        0
-
-        Make sure that 'verdi' just gets the single Verdi piece and not the
-        Monteverdi pieces:
-
-        >>> len(coreCorpus.getWorkList('verdi'))
-        1
-
-        '''
-        if not common.isListLike(fileExtensions):
-            fileExtensions = [fileExtensions]
-        paths = self.getPaths(fileExtensions)
-        results = []
-        # permit workName to be a list of paths/branches
-        if common.isIterable(workName):
-            workName = os.path.sep.join(workName)
-        workSlashes = workName.replace('/', os.path.sep)
-        # find all matches for the work name
-        # TODO: this should match by path component, not just
-        # substring
-        for path in paths:
-            if workName.lower() in path.lower():
-                results.append(path)
-            elif workSlashes.lower() in path.lower():
-                results.append(path)
-        if len(results):
-            # more than one matched...use more stringent criterion:
-            # must have a slash before the name
-            previousResults = results
-            results = []
-            longName = os.sep + workSlashes.lower()
-            for path in previousResults:
-                if longName in path.lower():
-                    results.append(path)
-            if not len(results):
-                results = previousResults
-        movementResults = []
-        if movementNumber is not None and len(results):
-            # store one ore more possible mappings of movement number
-            movementStrList = []
-            # see if this is a pair
-            if common.isIterable(movementNumber):
-                movementStrList.append(
-                    ''.join(str(x) for x in movementNumber))
-                movementStrList.append(
-                    '-'.join(str(x) for x in movementNumber))
-                movementStrList.append('movement' +
-                    '-'.join(str(x) for x in movementNumber))
-                movementStrList.append('movement' +
-                    '-0'.join(str(x) for x in movementNumber))
-            else:
-                movementStrList += [
-                    '0{0}'.format(movementNumber),
-                    str(movementNumber),
-                    'movement{0}'.format(movementNumber),
-                    ]
-            for filePath in sorted(results):
-                filename = os.path.split(filePath)[1]
-                if '.' in filename:
-                    filenameWithoutExtension = os.path.splitext(filename)[0]
-                else:
-                    filenameWithoutExtension = None
-                searchPartialMatch = True
-                if filenameWithoutExtension is not None:
-                    # look for direct matches first
-                    for movementStr in movementStrList:
-                        #if movementStr.lower() in filePath.lower():
-                        if filenameWithoutExtension.lower() == movementStr.lower():
-                            movementResults.append(filePath)
-                            searchPartialMatch = False
-                # if we have one direct match, all other matches must
-                # be direct. this will match multiple files with different
-                # file extensions
-                if len(movementResults):
-                    continue
-                if searchPartialMatch:
-                    for movementStr in movementStrList:
-                        if filename.startswith(movementStr.lower()):
-                            movementResults.append(filePath)
-            if not len(movementResults):
-                pass
-        else:
-            movementResults = results
-        return sorted(set(movementResults))
 
     ### PUBLIC PROPERTIES ###
 
