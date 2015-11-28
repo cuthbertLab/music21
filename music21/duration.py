@@ -2711,7 +2711,8 @@ class GraceDuration(Duration):
 
     @makeTime.setter
     def makeTime(self, expr):
-        assert expr in (True, False, None)
+        if expr not in (True, False, None):
+            raise DurationException("expr must be True, False, or None")
         self._makeTime = bool(expr)
 
     @property
@@ -2720,12 +2721,12 @@ class GraceDuration(Duration):
         True, False, or None (=unknown) whether the grace note should have a slash
         through it. Default True.
         '''
-
         return self._slash
 
     @slash.setter
     def slash(self, expr):
-        assert expr in (True, False, None)
+        if expr not in (True, False, None):
+            raise DurationException("expr must be True, False, or None")
         self._slash = bool(expr)
 
 

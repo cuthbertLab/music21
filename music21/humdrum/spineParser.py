@@ -2589,8 +2589,8 @@ class Test(unittest.TestCase):
         self.assertEqual(m1.numberSuffix, "a")
         self.assertEqual(m0.rightBarline.style, "regular")
         self.assertEqual(m0.rightBarline.repeat_dots, "both")
-        assert m0.rightBarline.pause is not None
-        assert isinstance(m0.rightBarline.pause, expressions.Fermata)
+        self.assertTrue(m0.rightBarline.pause is not None)
+        self.assertTrue(isinstance(m0.rightBarline.pause, expressions.Fermata))
 
     def testMeterBreve(self):
         m = kernTandemToObject("*M3/1")

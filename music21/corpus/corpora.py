@@ -23,6 +23,8 @@ from music21.corpus import virtual
 from music21 import environment
 environLocal = environment.Environment(__file__)
 
+from music21.exceptions21 import CorpusException
+
 if six.PY3:
     unicode = str # @ReservedAssignment
 
@@ -375,15 +377,35 @@ class Corpus(object):
         corpus._addCorpusFilepath(streamObject, filePath)
         return streamObject
 
-    @abc.abstractmethod
     def search(self, 
                query, 
                field=None, 
                fileExtensions=None):
         r'''
-        Search the corpus.
+        Search this corpus for metadata entries, returning a metadataBundle
+
+        >>> corpus.corpora.CoreCorpus().search('3/4')
+        <music21.metadata.bundles.MetadataBundle {1866 entries}>
+
+        >>> corpus.corpora.CoreCorpus().search(
+        ...      'bach',
+        ...      field='composer',
+        ...      )
+        <music21.metadata.bundles.MetadataBundle {21 entries}>
+
+        >>> predicate = lambda noteCount: noteCount < 20
+        >>> corpus.corpora.CoreCorpus().search(
+        ...     predicate,
+        ...     field='noteCount',
+        ...     )
+        <music21.metadata.bundles.MetadataBundle {132 entries}>
+
         '''
-        raise NotImplementedError
+        return self.metadataBundle.search(
+            query,
+            field=field,
+            fileExtensions=fileExtensions,
+            )
 
     ### PUBLIC PROPERTIES ###
 
@@ -939,37 +961,6 @@ class CoreCorpus(Corpus):
             movementResults = results
         return sorted(set(movementResults))
 
-    def search(self, 
-               query, 
-               field=None, 
-               fileExtensions=None):
-        r'''
-        Search the core corpus for metadata entries:
-
-        >>> corpus.corpora.CoreCorpus().search('3/4')
-        <music21.metadata.bundles.MetadataBundle {1866 entries}>
-
-        >>> corpus.corpora.CoreCorpus().search(
-        ...      'bach',
-        ...      field='composer',
-        ...      )
-        <music21.metadata.bundles.MetadataBundle {21 entries}>
-
-        >>> predicate = lambda noteCount: noteCount < 20
-        >>> corpus.corpora.CoreCorpus().search(
-        ...     predicate,
-        ...     field='noteCount',
-        ...     )
-        <music21.metadata.bundles.MetadataBundle {132 entries}>
-
-        '''
-        from music21 import metadata
-        return CoreCorpus().metadataBundle.search(
-            query,
-            field=field,
-            fileExtensions=fileExtensions,
-            )
-
     ### PUBLIC PROPERTIES ###
 
     @property
@@ -1003,8 +994,9 @@ class CoreCorpus(Corpus):
     def manualCoreCorpusPath(self, expr):
         userSettings = environment.UserSettings() 
         if expr is not None:
-            path = os.path.expanduser(expr)
-            assert os.path.isdir(path) and os.path.exists(path)
+            path = common.cleanpath(expr)
+            if not os.path.isdir(path) or not os.path.exists(path):
+                raise CorpusException("path needs to be a path to an existing directory")
             userSettings['manualCoreCorpusPath'] = path
         else:
             userSettings['manualCoreCorpusPath'] = None
@@ -1043,11 +1035,10 @@ class LocalCorpus(Corpus):
 
     >>> localCorpus = corpus.corpora.LocalCorpus()
 
-    The default local corpus is unnamed, but an arbitrary number of
+    The default local corpus is unnamed (or called "local" or None), but an arbitrary number of
     independent, named local corpora can be defined and persisted:
 
     >>> namedLocalCorpus = corpus.corpora.LocalCorpus('with a name')
-
     '''
 
     ### CLASS VARIABLES ###
@@ -1057,9 +1048,10 @@ class LocalCorpus(Corpus):
     ### INITIALIZER ###
 
     def __init__(self, name=None):
-        assert isinstance(name, (str, unicode, type(None)))
-        if name is not None:
-            assert len(name)
+        if not isinstance(name, (str, unicode, type(None))):
+            raise CorpusException("Name must be a string or None")
+        if name is not None and len(name) == 0:
+            raise CorpusException("Name cannot be blank")
         if name == 'local':
             self._name = None
         else:
@@ -1204,24 +1196,6 @@ class LocalCorpus(Corpus):
             userSettings['localCorporaSettings'][self.name] = self.directoryPaths
         environment.Environment().write()
 
-    def search(
-        self,
-        query,
-        field=None,
-        fileExtensions=None,
-        ):
-        r'''
-        Search a local corpus.
-
-        See :py:class:`music21.corpus.corpora.Corpus.search` for examples, as
-        the interface is the same.
-        '''
-        from music21 import metadata
-        return self.metadataBundle.search(
-            query,
-            field=field,
-            fileExtensions=fileExtensions,
-            )
 
     ### PUBLIC PROPERTIES ###
 
@@ -1356,24 +1330,6 @@ class VirtualCorpus(Corpus):
             if obj.corpusPath is not None and workName.lower() in obj.corpusPath.lower():
                 return obj.getUrlByExt(fileExtensions)
         return []
-
-    def search(self, 
-               query, 
-               field=None, 
-               fileExtensions=None):
-        r'''
-        Search the virtual corpus.
-
-        See :py:class:`music21.corpus.corpora.Corpus.search` for examples, as
-        the interface is the same.
-        '''
-        from music21 import metadata
-        virtualCorpusBundle = metadata.bundles.MetadataBundle.fromVirtualCorpus()
-        return virtualCorpusBundle.search(
-            query,
-            field=field,
-            fileExtensions=fileExtensions,
-            )
 
 
     @property

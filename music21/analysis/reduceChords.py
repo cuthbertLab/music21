@@ -88,7 +88,8 @@ class ChordReducer(object):
                                               classList=(note.Note, chord.Chord))
 
         if allowableChords is not None:
-            assert all(isinstance(x, chord.Chord) for x in allowableChords)
+            if not all(isinstance(x, chord.Chord) for x in allowableChords):
+                raise ChordReducerException("All allowableChords must be Chords")                
             intervalClassSets = []
             for x in allowableChords:
                 intervalClassSet = self._getIntervalClassSet(x.pitches)
@@ -96,7 +97,8 @@ class ChordReducer(object):
             allowableChords = frozenset(intervalClassSets)
 
         if forbiddenChords is not None:
-            assert all(isinstance(x, chord.Chord) for x in forbiddenChords)
+            if not all(isinstance(x, chord.Chord) for x in forbiddenChords):
+                raise ChordReducerException("All forbiddenChords must be Chords")                
             intervalClassSets = []
             for x in allowableChords:
                 intervalClassSet = self._getIntervalClassSet(x.pitches)

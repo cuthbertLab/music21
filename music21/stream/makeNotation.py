@@ -370,8 +370,6 @@ def makeMeasures(
         meterStream = stream.Stream()
         meterStream.insert(0, ts)
 
-    #assert len(meterStream), 1
-
     #environLocal.printDebug([
     #    'makeMeasures(): meterStream', 'meterStream[0]', meterStream[0],
     #    'meterStream[0].offset',  meterStream[0].offset,

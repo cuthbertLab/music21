@@ -564,7 +564,8 @@ class MetadataBundle(object):
     ### PRIVATE METHODS ###
 
     def _apply_set_operation(self, metadataBundle, operator):
-        assert isinstance(metadataBundle, type(self))
+        if not isinstance(metadataBundle, type(self)):
+            raise MetadataBundleException("metadataBundle must be a MetadataBundle")
         selfKeys = set(self._metadataEntries.keys())
         otherKeys = set(metadataBundle._metadataEntries.keys())
         resultKeys = getattr(selfKeys, operator)(otherKeys)
@@ -582,7 +583,8 @@ class MetadataBundle(object):
         return resultBundle
 
     def _apply_set_predicate(self, metadataBundle, predicate):
-        assert isinstance(metadataBundle, type(self))
+        if not isinstance(metadataBundle, type(self)):
+            raise MetadataBundleException("metadataBundle must be a MetadataBundle")
         selfKeys = set(self._metadataEntries.keys())
         otherKeys = set(metadataBundle._metadataEntries.keys())
         return getattr(selfKeys, predicate)(otherKeys)
