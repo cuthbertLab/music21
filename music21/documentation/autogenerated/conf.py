@@ -51,6 +51,9 @@ if os.environ.get('READTHEDOCS', ''):
     print(autogenOut)
     print(os.path.dirname(__file__))
     print(os.getcwd())
+    print("********ENVIRONMENT*******")
+    for x in os.environ:
+        print(x, os.environ[x])
 
 
     print("*******************MOVING FILES*********************")
