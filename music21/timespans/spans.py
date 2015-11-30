@@ -124,6 +124,12 @@ class Timespan(object):
         >>> ts3 = timespans.spans.Timespan(6, 10)
         >>> ts1.canMerge(ts3)
         (False, 'Cannot merge <Timespan 0.0 5.0> with <Timespan 6.0 10.0>: not contiguous')
+
+        Overlapping Timespans cannot be merged, just contiguous ones.
+
+        >>> ts4 = timespans.spans.Timespan(3, 4)
+        >>> ts1.canMerge(ts4)
+        (False, 'Cannot merge <Timespan 0.0 5.0> with <Timespan 3.0 4.0>: not contiguous')
         '''
         if not isinstance(other, type(self)):
             message = 'Cannot merge {} with {}: wrong types'.format(

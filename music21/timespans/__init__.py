@@ -20,17 +20,12 @@ users won't need to worry about.
 '''
 __all__ = ['trees', 'spans', 'analysis', 'node', 'verticality']
 
-
-import random
 import unittest
-import weakref
 
 from music21 import chord
 from music21 import common
 from music21 import exceptions21
 from music21 import note
-
-from music21.ext import six
 
 from music21.timespans import trees 
 from music21.timespans import spans 
