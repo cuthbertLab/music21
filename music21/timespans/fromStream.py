@@ -26,7 +26,7 @@ def listOfTimespanTreesByClass(inputStream,
                                classLists=None):
     r'''
     Recurses through `inputStream`, and constructs TimespanTrees for each
-    encountered substream and ElementTimespans for each encountered non-stream
+    encountered substream and PitchedTimespan for each encountered non-stream
     element.
 
     `classLists` should be a sequence of valid inputs for `isClassOrSubclass()`. One
@@ -113,13 +113,13 @@ def listOfTimespanTreesByClass(inputStream,
             for classBasedTimespanCollection, classList in zip(outputCollections, classLists):
                 if classList and not element.isClassOrSubclass(classList):
                     continue
-                elementTimespan = spans.ElementTimespan(element=element,
+                pitchedTimespan = spans.PitchedTimespan(element=element,
                                                         parentage=tuple(reversed(currentParentage)),
                                                         parentOffset=parentOffset,
                                                         parentEndTime=parentEndTime,
                                                         offset=offset,
                                                         endTime=endTime)
-                classBasedTimespanCollection.insert(elementTimespan)
+                classBasedTimespanCollection.insert(pitchedTimespan)
 
     return outputCollections
 
@@ -137,11 +137,11 @@ def convert(inputStream, flatten, classList):
     >>> for x in tree[:5]:
     ...     x
     ...
-    <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
-    <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>
-    <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
-    <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
-    <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
+    <PitchedTimespan (0.0 to 0.5) <music21.note.Note C#>>
+    <PitchedTimespan (0.0 to 1.0) <music21.note.Note E>>
+    <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>
+    <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>
+    <PitchedTimespan (0.5 to 1.0) <music21.note.Note B>>
 
     >>> tree = timespans.fromStream.convert(score, flatten=False, classList=())
 
@@ -150,12 +150,12 @@ def convert(inputStream, flatten, classList):
     >>> for x in tree:
     ...     x
     ...
-    <ElementTimespan (0.0 to 0.0) <music21.metadata.Metadata object at 0x...>>
+    <PitchedTimespan (0.0 to 0.0) <music21.metadata.Metadata object at 0x...>>
     <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Soprano>>
     <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Alto>>
     <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
     <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Bass>>
-    <ElementTimespan (0.0 to 0.0) <music21.layout.StaffGroup ...>>
+    <PitchedTimespan (0.0 to 0.0) <music21.layout.StaffGroup ...>>
 
     >>> tenorElements = tree[3]
     >>> tenorElements

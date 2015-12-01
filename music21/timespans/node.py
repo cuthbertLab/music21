@@ -20,9 +20,11 @@ import unittest
 from music21.timespans import core
         
 #------------------------------------------------------------------------------
-class TimespanTreeNode(core.AVLNode):
+class ElementNode(core.AVLNode):
     r'''
-    A node in an TimespanTree.
+    A node containing an element, which is aware of the element's
+    endTime and index within a stream, as well as the endTimes and indices of the
+    elements to the left and right of it. 
 
     Here's an example of what it means and does:
     
@@ -64,10 +66,10 @@ class TimespanTreeNode(core.AVLNode):
     The `Length: {1}` indicates that there is exactly one element at this location, that is,
     the F.
     
-    The "payload" of the node, is just that note wrapped in a list wrapped in an ElementTimeSpan:
+    The "payload" of the node, is just that note wrapped in a list wrapped in an PitchedTimespan:
     
     >>> rn.payload
-    [<ElementTimespan (3.0 to 4.0) <music21.note.Note F>>]
+    [<PitchedTimespan (3.0 to 4.0) <music21.note.Note F>>]
     >>> rn.payload[0].element
     <music21.note.Note F>
     >>> rn.payload[0].element is sfn[5]
@@ -87,8 +89,8 @@ class TimespanTreeNode(core.AVLNode):
     begin on offset 0.0:
     
     >>> leftLeft.payload
-    [<ElementTimespan (0.0 to 1.0) <music21.note.Note C>>, 
-     <ElementTimespan (0.0 to 2.0) <music21.note.Note C>>]
+    [<PitchedTimespan (0.0 to 1.0) <music21.note.Note C>>, 
+     <PitchedTimespan (0.0 to 2.0) <music21.note.Note C>>]
     
     The Indices:(0:0:2:2) indicates that `leftLeft` has neither left nor right children
     >>> leftLeft.leftChild is None
@@ -118,7 +120,7 @@ class TimespanTreeNode(core.AVLNode):
 
     _DOC_ATTR = {
     'payload': r'''
-        The contents of the node at this point.  Usually ElementTimespans.
+        The contents of the node at this point.  Usually PitchedTimespans.
 
         >>> score = timespans.makeExampleScore()
         >>> tree = timespans.fromStream.convert(score, flatten=True, 
@@ -134,19 +136,19 @@ class TimespanTreeNode(core.AVLNode):
                     R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
 
         >>> tree.rootNode.payload
-        [<ElementTimespan (3.0 to 4.0) <music21.note.Note F>>]
+        [<PitchedTimespan (3.0 to 4.0) <music21.note.Note F>>]
 
         >>> tree.rootNode.leftChild.payload
-        [<ElementTimespan (1.0 to 2.0) <music21.note.Note D>>]
+        [<PitchedTimespan (1.0 to 2.0) <music21.note.Note D>>]
 
         >>> for x in tree.rootNode.leftChild.rightChild.payload:
         ...     x
         ...
-        <ElementTimespan (2.0 to 3.0) <music21.note.Note E>>
-        <ElementTimespan (2.0 to 4.0) <music21.note.Note G>>
+        <PitchedTimespan (2.0 to 3.0) <music21.note.Note E>>
+        <PitchedTimespan (2.0 to 4.0) <music21.note.Note G>>
 
         >>> tree.rootNode.rightChild.payload
-        [<ElementTimespan (5.0 to 6.0) <music21.note.Note A>>]
+        [<PitchedTimespan (5.0 to 6.0) <music21.note.Note A>>]
         ''',
         
     'payloadElementsStartIndex': r'''
@@ -180,7 +182,7 @@ class TimespanTreeNode(core.AVLNode):
     ### INITIALIZER ###
 
     def __init__(self, offset):
-        super(TimespanTreeNode, self).__init__(offset)
+        super(ElementNode, self).__init__(offset)
         self.payload = []
         self.payloadElementsStartIndex = -1
         self.payloadElementsStopIndex = -1
@@ -219,7 +221,7 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 
 
-_DOC_ORDER = (TimespanTreeNode,)
+_DOC_ORDER = (ElementNode,)
 
 
 #------------------------------------------------------------------------------

@@ -97,14 +97,14 @@ class Timespan(object):
     @property
     def offset(self):
         r'''
-        The start offset of the elementTimespan's element, relative to its
+        The start offset of the Timespan, relative to its
         containing score.
 
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
         >>> verticality = tree.getVerticalityAt(1.0)
-        >>> elementTimespan = verticality.startTimespans[0]
-        >>> elementTimespan.offset
+        >>> timespan = verticality.startTimespans[0]
+        >>> timespan.offset
         1.0
         '''
         # this is a property to make it immutable.
@@ -113,14 +113,14 @@ class Timespan(object):
     @property
     def endTime(self):
         r'''
-        The stop offset of the elementTimespan's element, relative to its
+        The stop offset of the Timespan, relative to its
         containing score.
 
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
         >>> verticality = tree.getVerticalityAt(1.0)
-        >>> elementTimespan = verticality.startTimespans[0]
-        >>> elementTimespan.endTime
+        >>> timespan = verticality.startTimespans[0]
+        >>> timespan.endTime
         2.0
         '''
         # this is a property to make it immutable.
@@ -199,7 +199,7 @@ class Timespan(object):
     
     def splitAt(self, offset):
         r'''
-        Split elementTimespan at `offset`.
+        Split Timespan at `offset`.
 
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
@@ -209,16 +209,16 @@ class Timespan(object):
         
         >>> timespan = verticality.startTimespans[0]
         >>> timespan
-        <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
+        <PitchedTimespan (0.0 to 0.5) <music21.note.Note C#>>
 
         >>> for shard in timespan.splitAt(0.25):
         ...     shard
         ...
-        <ElementTimespan (0.0 to 0.25) <music21.note.Note C#>>
-        <ElementTimespan (0.25 to 0.5) <music21.note.Note C#>>
+        <PitchedTimespan (0.0 to 0.25) <music21.note.Note C#>>
+        <PitchedTimespan (0.25 to 0.5) <music21.note.Note C#>>
 
         >>> timespan.splitAt(1000)
-        (<ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>,)
+        (<PitchedTimespan (0.0 to 0.5) <music21.note.Note C#>>,)
         '''
 
         if offset < self.offset or self.endTime < offset:
@@ -231,7 +231,7 @@ class Timespan(object):
 #------------------------------------------------------------------------------
 
 
-class ElementTimespan(Timespan):
+class PitchedTimespan(Timespan):
     r'''
     A span of time anchored to an element in a score.  The span of time may
     be the same length as the element in the score.  It may be shorter (a
@@ -239,7 +239,7 @@ class ElementTimespan(Timespan):
     that is anchored to a single element but extends over rests or other
     notes following a note)
 
-    ElementTimespans give information about an element (such as a Note).  It knows
+    PitchedTimespans give information about an element (such as a Note).  It knows
     its absolute position with respect to the element passed into TimespanTree.  
     It contains information about what measure it's in, what part it's in, etc.
 
@@ -259,44 +259,44 @@ class ElementTimespan(Timespan):
     >>> verticality
     <Verticality 6.5 {E3 D4 G#4 B4}>
 
-    There are four elementTimespans in the verticality -- each representing
+    There are four PitchedTimespans in the verticality -- each representing
     a note.  The notes are arranged from lowest to highest.
 
 
-    We can find all the elementTimespans that start exactly at 6.5. There's
+    We can find all the PitchedTimespans that start exactly at 6.5. There's
     one.
 
     >>> verticality.startTimespans
-    (<ElementTimespan (6.5 to 7.0) <music21.note.Note D>>,)
+    (<PitchedTimespan (6.5 to 7.0) <music21.note.Note D>>,)
 
-    >>> elementTimespan = verticality.startTimespans[0]
-    >>> elementTimespan
-    <ElementTimespan (6.5 to 7.0) <music21.note.Note D>>
+    >>> pitchedTimespan = verticality.startTimespans[0]
+    >>> pitchedTimespan
+    <PitchedTimespan (6.5 to 7.0) <music21.note.Note D>>
 
-    What can we do with a elementTimespan? We can get its Part object or the
+    What can we do with a PitchedTimespan? We can get its Part object and from there the
     Part object name
 
-    >>> elementTimespan.part
+    >>> pitchedTimespan.part
     <music21.stream.Part Tenor>
-    >>> elementTimespan.part.partName
+    >>> pitchedTimespan.part.partName
     'Tenor'
 
     Find out what measure it's in:
 
-    >>> elementTimespan.measureNumber
+    >>> pitchedTimespan.measureNumber
     2
-    >>> elementTimespan.parentOffset
+    >>> pitchedTimespan.parentOffset
     5.0
 
     The position in the measure is given by subtracting that from the
     .offset:
 
-    >>> elementTimespan.offset - elementTimespan.parentOffset
+    >>> pitchedTimespan.offset - pitchedTimespan.parentOffset
     1.5
 
-    >>> elementTimespan.beatStrength
+    >>> pitchedTimespan.beatStrength
     0.125
-    >>> elementTimespan.element
+    >>> pitchedTimespan.element
     <music21.note.Note D>
 
     These are not dynamic, so changing the Score object does not change the
@@ -324,7 +324,7 @@ class ElementTimespan(Timespan):
                  offset=None,
                  endTime=None,
                  ):
-        super(ElementTimespan, self).__init__(offset=offset, endTime=endTime)
+        super(PitchedTimespan, self).__init__(offset=offset, endTime=endTime)
         
         self._element = element
         if parentage is not None:
@@ -379,21 +379,21 @@ class ElementTimespan(Timespan):
         >>> tree = score.asTimespans()
         >>> timespan_one = tree[12]
         >>> print(timespan_one)
-        <ElementTimespan (2.0 to 3.0) <music21.note.Note E>>
+        <PitchedTimespan (2.0 to 3.0) <music21.note.Note E>>
     
         >>> print(timespan_one.part)
         <music21.stream.Part Alto>
     
-        >>> timespan_two = tree.findNextElementTimespanInSameStreamByClass(timespan_one)
+        >>> timespan_two = tree.findNextPitchedTimespanInSameStreamByClass(timespan_one)
         >>> print(timespan_two)
-        <ElementTimespan (3.0 to 4.0) <music21.note.Note E>>
+        <PitchedTimespan (3.0 to 4.0) <music21.note.Note E>>
         
         >>> timespan_one.canMerge(timespan_two)
         (True, '')
         
         >>> merged = timespan_one.mergeWith(timespan_two)
         >>> print(merged)
-        <ElementTimespan (2.0 to 4.0) <music21.note.Note E>>
+        <PitchedTimespan (2.0 to 4.0) <music21.note.Note E>>
     
         >>> merged.part is timespan_one.part
         True
@@ -405,28 +405,28 @@ class ElementTimespan(Timespan):
         have identical pitches will result in error:
     
         >>> tree[0].canMerge(tree[50])
-        (False, 'Cannot merge <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>> 
-             with <ElementTimespan (9.5 to 10.0) <music21.note.Note B>>: not contiguous')
+        (False, 'Cannot merge <PitchedTimespan (0.0 to 0.5) <music21.note.Note C#>> 
+             with <PitchedTimespan (9.5 to 10.0) <music21.note.Note B>>: not contiguous')
 
         
         >>> tree[0].mergeWith(tree[50])
         Traceback (most recent call last):
-        TimespanException: Cannot merge <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>> 
-                with <ElementTimespan (9.5 to 10.0) <music21.note.Note B>>: not contiguous
+        TimespanException: Cannot merge <PitchedTimespan (0.0 to 0.5) <music21.note.Note C#>> 
+                with <PitchedTimespan (9.5 to 10.0) <music21.note.Note B>>: not contiguous
     
         
         This is probably not what you want to do: get the next element timespan in
         the same score:
     
-        >>> timespan_twoWrong = tree.findNextElementTimespanInSameStreamByClass(
+        >>> timespan_twoWrong = tree.findNextPitchedTimespanInSameStreamByClass(
         ...     timespan_one, classList=(stream.Score,))
         >>> print(timespan_twoWrong)
-        <ElementTimespan (3.0 to 4.0) <music21.note.Note C#>>
+        <PitchedTimespan (3.0 to 4.0) <music21.note.Note C#>>
         >>> print(timespan_twoWrong.part)
         <music21.stream.Part Soprano>
 
         '''
-        can, message = super(ElementTimespan, self).canMerge(other)
+        can, message = super(PitchedTimespan, self).canMerge(other)
         if can is True:
             if self.pitches != other.pitches:
                 message = 'Cannot merge {} with {}: different pitches'.format(
@@ -477,12 +477,12 @@ class ElementTimespan(Timespan):
     @property
     def beatStrength(self):
         r'''
-        The elementTimespan's element's beat-strength.
+        The PitchedTimespan's element's beat-strength.
 
         This may be overriden during instantiation by passing in a custom
         beat-strength. That can be useful when you are generating new
-        elementTimespans based on old ones, and want to maintain pitch
-        information from the old elementTimespan but change the start offset to
+        PitchedTimespans based on old ones, and want to maintain pitch
+        information from the old PitchedTimespan but change the start offset to
         reflect that of another timespan.
         
         TODO: Tests
@@ -509,13 +509,13 @@ class ElementTimespan(Timespan):
     @property
     def element(self):
         r'''
-        The elementTimespan's element.
+        The PitchedTimespan's element.
 
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
         >>> verticality = tree.getVerticalityAt(1.0)
-        >>> elementTimespan = verticality.startTimespans[0]
-        >>> elementTimespan.element
+        >>> pitchedTimespan = verticality.startTimespans[0]
+        >>> pitchedTimespan.element
         <music21.note.Note A>
         '''
         return self._element
@@ -528,8 +528,8 @@ class ElementTimespan(Timespan):
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
         >>> verticality = tree.getVerticalityAt(1.0)
-        >>> elementTimespan = verticality.startTimespans[0]
-        >>> elementTimespan.measureNumber
+        >>> pitchedTimespan = verticality.startTimespans[0]
+        >>> pitchedTimespan.measureNumber
         1
         '''
         return self.element.measureNumber
@@ -551,13 +551,13 @@ class ElementTimespan(Timespan):
     @property
     def parentage(self):
         r'''
-        The Stream hierarchy above the elementTimespan's element.
+        The Stream hierarchy above the PitchedTimespan's element.
 
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
         >>> verticality = tree.getVerticalityAt(1.0)
-        >>> elementTimespan = verticality.startTimespans[0]
-        >>> for streamSite in elementTimespan.parentage:
+        >>> pitchedTimespan = verticality.startTimespans[0]
+        >>> for streamSite in pitchedTimespan.parentage:
         ...     streamSite
         <music21.stream.Measure 1 offset=1.0>
         <music21.stream.Part Soprano>
@@ -574,20 +574,20 @@ class ElementTimespan(Timespan):
         >>> score.id = 'bach'
         >>> tree = score.asTimespans()
         >>> verticality = tree.getVerticalityAt(1.0)
-        >>> elementTimespan = verticality.startTimespans[2]
-        >>> elementTimespan
-        <ElementTimespan (1.0 to 2.0) <music21.note.Note C#>>
-        >>> elementTimespan.getParentageByClass(classList=(stream.Part,))
+        >>> pitchedTimespan = verticality.startTimespans[2]
+        >>> pitchedTimespan
+        <PitchedTimespan (1.0 to 2.0) <music21.note.Note C#>>
+        >>> pitchedTimespan.getParentageByClass(classList=(stream.Part,))
         <music21.stream.Part Tenor>
-        >>> elementTimespan.getParentageByClass(classList=(stream.Measure,))
+        >>> pitchedTimespan.getParentageByClass(classList=(stream.Measure,))
         <music21.stream.Measure 1 offset=1.0>
-        >>> elementTimespan.getParentageByClass(classList=(stream.Score,))
+        >>> pitchedTimespan.getParentageByClass(classList=(stream.Score,))
         <music21.stream.Score bach>
 
         The closest parent is returned in case of a multiple list...
 
         >>> searchTuple = (stream.Voice, stream.Measure, stream.Part)
-        >>> elementTimespan.getParentageByClass(classList=searchTuple)
+        >>> pitchedTimespan.getParentageByClass(classList=searchTuple)
         <music21.stream.Measure 1 offset=1.0>
 
         '''
@@ -608,10 +608,10 @@ class ElementTimespan(Timespan):
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
         >>> verticality = tree.getVerticalityAt(1.0)
-        >>> elementTimespan = verticality.startTimespans[2]
-        >>> elementTimespan
-        <ElementTimespan (1.0 to 2.0) <music21.note.Note C#>>
-        >>> elementTimespan.part
+        >>> pitchedTimespan = verticality.startTimespans[2]
+        >>> pitchedTimespan
+        <PitchedTimespan (1.0 to 2.0) <music21.note.Note C#>>
+        >>> pitchedTimespan.part
         <music21.stream.Part Tenor>
         '''
         from music21 import stream
@@ -621,7 +621,7 @@ class ElementTimespan(Timespan):
     @property
     def pitches(self):
         r'''
-        Gets the pitches of the element wrapped by this elementTimespan.
+        Gets the pitches of the element wrapped by this PitchedTimespan.
 
         This treats notes as chords.
         

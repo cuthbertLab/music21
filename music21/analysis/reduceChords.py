@@ -343,7 +343,7 @@ class ChordReducer(object):
                 if bassTimespan.offset < group[0].offset:
                     beatStrength = bassTimespan.beatStrength
                     offset = bassTimespan.offset
-                    previousTimespan = tree.findPreviousElementTimespanInSameStreamByClass(group[0])
+                    previousTimespan = tree.findPreviousPitchedTimespanInSameStreamByClass(group[0])
                     if previousTimespan is not None:
                         if previousTimespan.endTime > group[0].offset:
                             msg = ('Timespan offset errors: previousTimespan.endTime, ' + 

@@ -321,18 +321,18 @@ class StreamCoreMixin(object):
         >>> timespanColl = score.asTimespans()
         >>> print(timespanColl)
         <TimespanTree {12} (0.0 to 8.0) <music21.stream.Score ...>>
-            <ElementTimespan (0.0 to 1.0) <music21.note.Note C>>
-            <ElementTimespan (0.0 to 2.0) <music21.note.Note C>>
-            <ElementTimespan (1.0 to 2.0) <music21.note.Note D>>
-            <ElementTimespan (2.0 to 3.0) <music21.note.Note E>>
-            <ElementTimespan (2.0 to 4.0) <music21.note.Note G>>
-            <ElementTimespan (3.0 to 4.0) <music21.note.Note F>>
-            <ElementTimespan (4.0 to 5.0) <music21.note.Note G>>
-            <ElementTimespan (4.0 to 6.0) <music21.note.Note E>>
-            <ElementTimespan (5.0 to 6.0) <music21.note.Note A>>
-            <ElementTimespan (6.0 to 7.0) <music21.note.Note B>>
-            <ElementTimespan (6.0 to 8.0) <music21.note.Note D>>
-            <ElementTimespan (7.0 to 8.0) <music21.note.Note C>>
+            <PitchedTimespan (0.0 to 1.0) <music21.note.Note C>>
+            <PitchedTimespan (0.0 to 2.0) <music21.note.Note C>>
+            <PitchedTimespan (1.0 to 2.0) <music21.note.Note D>>
+            <PitchedTimespan (2.0 to 3.0) <music21.note.Note E>>
+            <PitchedTimespan (2.0 to 4.0) <music21.note.Note G>>
+            <PitchedTimespan (3.0 to 4.0) <music21.note.Note F>>
+            <PitchedTimespan (4.0 to 5.0) <music21.note.Note G>>
+            <PitchedTimespan (4.0 to 6.0) <music21.note.Note E>>
+            <PitchedTimespan (5.0 to 6.0) <music21.note.Note A>>
+            <PitchedTimespan (6.0 to 7.0) <music21.note.Note B>>
+            <PitchedTimespan (6.0 to 8.0) <music21.note.Note D>>
+            <PitchedTimespan (7.0 to 8.0) <music21.note.Note C>>
         '''
         hashedAttributes = hash( (tuple(classList or () ), recurse) ) 
         cacheKey = "timespanTree" + str(hashedAttributes)

@@ -66,7 +66,7 @@ class ElementTree(core.AVLTree):
 
     '''
     ### CLASS VARIABLES ###
-    nodeClass = nodeModule.TimespanTreeNode
+    nodeClass = nodeModule.ElementNode
 
     __slots__ = (
         '_source',
@@ -454,9 +454,9 @@ class ElementTree(core.AVLTree):
         <TimespanTree {12} (0.0 to 8.0)>
 
         >>> tree[4]
-        <ElementTimespan (2.0 to 4.0) <music21.note.Note G>>
+        <PitchedTimespan (2.0 to 4.0) <music21.note.Note G>>
         >>> newTree[4]
-        <ElementTimespan (2.0 to 4.0) <music21.note.Note G>>
+        <PitchedTimespan (2.0 to 4.0) <music21.note.Note G>>
         
         >>> tree[4] is newTree[4]
         True
@@ -475,9 +475,9 @@ class ElementTree(core.AVLTree):
         >>> for timespan in tree.elementsStartingAt(0.5):
         ...     timespan
         ...
-        <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
-        <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
-        <ElementTimespan (0.5 to 1.0) <music21.note.Note G#>>
+        <PitchedTimespan (0.5 to 1.0) <music21.note.Note B>>
+        <PitchedTimespan (0.5 to 1.0) <music21.note.Note B>>
+        <PitchedTimespan (0.5 to 1.0) <music21.note.Note G#>>
         '''
         results = []
         node = self.getNodeByPosition(offset)
@@ -494,9 +494,9 @@ class ElementTree(core.AVLTree):
         >>> for timespan in tree.elementsStoppingAt(0.5):
         ...     timespan
         ...
-        <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
-        <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
-        <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
+        <PitchedTimespan (0.0 to 0.5) <music21.note.Note C#>>
+        <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>
+        <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>
         '''
         def recurse(node, offset):
             result = []
@@ -524,7 +524,7 @@ class ElementTree(core.AVLTree):
         >>> for el in tree.elementsOverlappingOffset(0.5):
         ...     el
         ...
-        <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>
+        <PitchedTimespan (0.0 to 1.0) <music21.note.Note E>>
         '''
         def recurse(node, offset, indent=0):
             result = []
@@ -595,7 +595,7 @@ class ElementTree(core.AVLTree):
         '''
         initialPosition = self.offset
         initialEndTime = self.endTime
-        if hasattr(elements, 'offset'): # a music21 object or an ElementTimespan
+        if hasattr(elements, 'offset'): # a music21 object or an PitchedTimespan
             elements = [elements]
         if offsets is not None and not common.isListLike(offsets):
             offsets = [offsets]
@@ -676,7 +676,7 @@ class ElementTree(core.AVLTree):
                 elif isinstance(x, TimespanTree) and x.source is not None:
                     return x.source.sortTuple()[2:]
                 else:
-                    return x.endTime  # ElementTimespan with no Element!
+                    return x.endTime  # PitchedTimespan with no Element!
                 
         self.createNodeAtPosition(offset)
         node = self.getNodeByPosition(offset)
@@ -953,7 +953,7 @@ class TimespanTree(ElementTree):
     ...         if horizontality.hasNeighborTone:
     ...             merged = horizontality[0].new(
     ...                endTime=horizontality[2].endTime,
-    ...             ) # merged is a new ElementTimespan
+    ...             ) # merged is a new PitchedTimespan
     ...             tree.remove(horizontality[0])
     ...             tree.remove(horizontality[1])
     ...             tree.remove(horizontality[2])
@@ -983,10 +983,10 @@ class TimespanTree(ElementTree):
         very efficient at insertion when the objects being inserted are already
         sorted - which is usually the case with data extracted from a score.
         TimespanTree is an extended AVL tree because each node in the
-        tree keeps track of not just the start offsets of ElementTimespans
+        tree keeps track of not just the start offsets of PitchedTimespans
         stored at that node, but also the earliest and latest stop offset of
-        all ElementTimespans stores at both that node and all nodes which are
-        children of that node. This lets us quickly located ElementTimespans
+        all PitchedTimespans stores at both that node and all nodes which are
+        children of that node. This lets us quickly located PitchedTimespans
         which overlap offsets or which are contained within ranges of offsets.
         This also means that the contents of a TimespanTree are always
         sorted.
@@ -1002,9 +1002,9 @@ class TimespanTree(ElementTree):
         super(TimespanTree, self).__init__(elements, source)
     
     
-    def findNextElementTimespanInSameStreamByClass(self, elementTimespan, classList=None):
+    def findNextPitchedTimespanInSameStreamByClass(self, pitchedTimespan, classList=None):
         r'''
-        Finds next element timespan in the same stream class as `elementTimespan`.
+        Finds next element timespan in the same stream class as `PitchedTimespan`.
         
         Default classList is (stream.Part, )
 
@@ -1012,80 +1012,79 @@ class TimespanTree(ElementTree):
         >>> tree = score.asTimespans()
         >>> timespan = tree[0]
         >>> timespan
-        <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
+        <PitchedTimespan (0.0 to 0.5) <music21.note.Note C#>>
 
         >>> timespan.part
         <music21.stream.Part Soprano>
 
-        >>> timespan = tree.findNextElementTimespanInSameStreamByClass(timespan)
+        >>> timespan = tree.findNextPitchedTimespanInSameStreamByClass(timespan)
         >>> timespan
-        <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
+        <PitchedTimespan (0.5 to 1.0) <music21.note.Note B>>
 
         >>> timespan.part
         <music21.stream.Part Soprano>
 
-        >>> timespan = tree.findNextElementTimespanInSameStreamByClass(timespan)
+        >>> timespan = tree.findNextPitchedTimespanInSameStreamByClass(timespan)
         >>> timespan
-        <ElementTimespan (1.0 to 2.0) <music21.note.Note A>>
+        <PitchedTimespan (1.0 to 2.0) <music21.note.Note A>>
 
         >>> timespan.part
         <music21.stream.Part Soprano>
         '''
-        if not isinstance(elementTimespan, spans.ElementTimespan):
-            message = 'ElementTimespan {!r}, must be an ElementTimespan'.format(
-                elementTimespan)
+        if not isinstance(pitchedTimespan, spans.PitchedTimespan):
+            message = 'PitchedTimespan {!r}, must be an PitchedTimespan'.format(pitchedTimespan)
             raise TimespanTreeException(message)
-        verticality = self.getVerticalityAt(elementTimespan.offset)
+        verticality = self.getVerticalityAt(pitchedTimespan.offset)
         while verticality is not None:
             verticality = verticality.nextVerticality
             if verticality is None:
                 return None
-            for nextElementTimespan in verticality.startTimespans:
-                if (nextElementTimespan.getParentageByClass(classList) is 
-                        elementTimespan.getParentageByClass(classList)):
-                    return nextElementTimespan
+            for nextPitchedTimespan in verticality.startTimespans:
+                if (nextPitchedTimespan.getParentageByClass(classList) is 
+                        pitchedTimespan.getParentageByClass(classList)):
+                    return nextPitchedTimespan
 
-    def findPreviousElementTimespanInSameStreamByClass(self, elementTimespan, classList=None):
+    def findPreviousPitchedTimespanInSameStreamByClass(self, pitchedTimespan, classList=None):
         r'''
         Finds next element timespan in the same Part/Measure, etc. (specify in classList) as 
-        the `elementTimespan`.
+        the `pitchedTimespan`.
 
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
         >>> timespan = tree[-1]
         >>> timespan
-        <ElementTimespan (35.0 to 36.0) <music21.note.Note F#>>
+        <PitchedTimespan (35.0 to 36.0) <music21.note.Note F#>>
 
         >>> timespan.part
         <music21.stream.Part Bass>
 
-        >>> timespan = tree.findPreviousElementTimespanInSameStreamByClass(timespan)
+        >>> timespan = tree.findPreviousPitchedTimespanInSameStreamByClass(timespan)
         >>> timespan
-        <ElementTimespan (34.0 to 35.0) <music21.note.Note B>>
+        <PitchedTimespan (34.0 to 35.0) <music21.note.Note B>>
 
         >>> timespan.part
         <music21.stream.Part Bass>
 
-        >>> timespan = tree.findPreviousElementTimespanInSameStreamByClass(timespan)
+        >>> timespan = tree.findPreviousPitchedTimespanInSameStreamByClass(timespan)
         >>> timespan
-        <ElementTimespan (33.0 to 34.0) <music21.note.Note D>>
+        <PitchedTimespan (33.0 to 34.0) <music21.note.Note D>>
 
         >>> timespan.part
         <music21.stream.Part Bass>
         '''
-        if not isinstance(elementTimespan, spans.ElementTimespan):
-            message = 'ElementTimespan {!r}, must be an ElementTimespan'.format(
-                elementTimespan)
+        if not isinstance(pitchedTimespan, spans.PitchedTimespan):
+            message = 'PitchedTimespan {!r}, must be an PitchedTimespan'.format(
+                pitchedTimespan)
             raise TimespanTreeException(message)
-        verticality = self.getVerticalityAt(elementTimespan.offset)
+        verticality = self.getVerticalityAt(pitchedTimespan.offset)
         while verticality is not None:
             verticality = verticality.previousVerticality
             if verticality is None:
                 return None
-            for previousElementTimespan in verticality.startTimespans:
-                if (previousElementTimespan.getParentageByClass(classList) is 
-                        elementTimespan.getParentageByClass(classList)):
-                    return previousElementTimespan
+            for previousPitchedTimespan in verticality.startTimespans:
+                if (previousPitchedTimespan.getParentageByClass(classList) is 
+                        pitchedTimespan.getParentageByClass(classList)):
+                    return previousPitchedTimespan
 
     def getVerticalityAt(self, offset):
         r'''
@@ -1387,22 +1386,22 @@ class TimespanTree(ElementTree):
         >>> tree.elementsStartingAt(0.1)
         ()
 
-        >>> for elementTimespan in tree.elementsOverlappingOffset(0.1):
-        ...     print("%r, %s" % (elementTimespan, elementTimespan.part.id))
+        >>> for timespan in tree.elementsOverlappingOffset(0.1):
+        ...     print("%r, %s" % (timespan, timespan.part.id))
         ...
-        <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>, Soprano
-        <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>, Tenor
-        <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>, Bass
-        <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>, Alto
+        <PitchedTimespan (0.0 to 0.5) <music21.note.Note C#>>, Soprano
+        <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>, Tenor
+        <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>, Bass
+        <PitchedTimespan (0.0 to 1.0) <music21.note.Note E>>, Alto
 
         >>> tree.splitAt(0.1)
-        >>> for elementTimespan in tree.elementsStartingAt(0.1):
-        ...     print("%r, %s" % (elementTimespan, elementTimespan.part.id))
+        >>> for timespan in tree.elementsStartingAt(0.1):
+        ...     print("%r, %s" % (timespan, timespan.part.id))
         ...
-        <ElementTimespan (0.1 to 0.5) <music21.note.Note C#>>, Soprano
-        <ElementTimespan (0.1 to 1.0) <music21.note.Note E>>, Alto
-        <ElementTimespan (0.1 to 0.5) <music21.note.Note A>>, Tenor
-        <ElementTimespan (0.1 to 0.5) <music21.note.Note A>>, Bass
+        <PitchedTimespan (0.1 to 0.5) <music21.note.Note C#>>, Soprano
+        <PitchedTimespan (0.1 to 1.0) <music21.note.Note E>>, Alto
+        <PitchedTimespan (0.1 to 0.5) <music21.note.Note A>>, Tenor
+        <PitchedTimespan (0.1 to 0.5) <music21.note.Note A>>, Bass
 
         >>> tree.elementsOverlappingOffset(0.1)
         ()
@@ -1430,9 +1429,9 @@ class TimespanTree(ElementTree):
         partwiseTimespanTrees = {}
         for part in self.allParts:
             partwiseTimespanTrees[part] = TimespanTree()
-        for elementTimespan in self:
-            partwiseTimespanTree = partwiseTimespanTrees[elementTimespan.part]
-            partwiseTimespanTree.insert(elementTimespan)
+        for timespan in self:
+            partwiseTimespanTree = partwiseTimespanTrees[timespan.part]
+            partwiseTimespanTree.insert(timespan)
         return partwiseTimespanTrees
 
     @staticmethod
@@ -1455,20 +1454,20 @@ class TimespanTree(ElementTree):
         ...         print('\t%r' % timespan)
         ...
         <music21.stream.Part Alto>
-            <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>
-            <ElementTimespan (1.0 to 2.0) <music21.note.Note F#>>
+            <PitchedTimespan (0.0 to 1.0) <music21.note.Note E>>
+            <PitchedTimespan (1.0 to 2.0) <music21.note.Note F#>>
         <music21.stream.Part Bass>
-            <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
-            <ElementTimespan (0.5 to 1.0) <music21.note.Note G#>>
-            <ElementTimespan (1.0 to 2.0) <music21.note.Note F#>>
+            <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>
+            <PitchedTimespan (0.5 to 1.0) <music21.note.Note G#>>
+            <PitchedTimespan (1.0 to 2.0) <music21.note.Note F#>>
         <music21.stream.Part Soprano>
-            <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>>
-            <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
-            <ElementTimespan (1.0 to 2.0) <music21.note.Note A>>
+            <PitchedTimespan (0.0 to 0.5) <music21.note.Note C#>>
+            <PitchedTimespan (0.5 to 1.0) <music21.note.Note B>>
+            <PitchedTimespan (1.0 to 2.0) <music21.note.Note A>>
         <music21.stream.Part Tenor>
-            <ElementTimespan (0.0 to 0.5) <music21.note.Note A>>
-            <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
-            <ElementTimespan (1.0 to 2.0) <music21.note.Note C#>>
+            <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>
+            <PitchedTimespan (0.5 to 1.0) <music21.note.Note B>>
+            <PitchedTimespan (1.0 to 2.0) <music21.note.Note C#>>
         '''
         from music21.timespans.verticality import VerticalitySequence 
         sequence = VerticalitySequence(verticalities)
@@ -1540,7 +1539,7 @@ class TimespanTree(ElementTree):
     @property
     def element(self):
         '''
-        defined so a TimespanTree can be used like an ElementTimespan
+        defined so a TimespanTree can be used like an PitchedTimespan
         
         TODO: Look at subclassing or at least deriving from a common base...
         '''

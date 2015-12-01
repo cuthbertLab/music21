@@ -12,6 +12,8 @@
 #------------------------------------------------------------------------------
 '''
 Tools for generating new Streams from timespans (fast, manipulatable objects)
+
+None of these things work acceptably yet.  This is super beta.
 '''
 
 from music21.exceptions21 import TimespanException
@@ -19,7 +21,7 @@ from music21.timespans import trees
 
 def chordified(timespans, templateStream=None):
     r'''
-    Creates a score from the ElementTimespan objects stored in this
+    Creates a score from the PitchedTimespan objects stored in this
     offset-tree.
 
     A "template" score may be used to provide measure and time-signature
@@ -105,12 +107,12 @@ def chordified(timespans, templateStream=None):
         return outputStream
 
 
-def partwise(timespans, templateStream=None):
+def partwise(timespanTree, templateStream=None):
     '''
     todo docs
     '''
     from music21 import stream
-    treeMapping = timespans.toPartwiseTimespanTrees()
+    treeMapping = timespanTree.toPartwiseTimespanTrees()
     outputScore = stream.Score()
     for part in templateStream.parts:
         partwiseTimespans = treeMapping.get(part, None)
