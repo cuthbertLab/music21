@@ -202,7 +202,7 @@ class Timespan(object):
         Split Timespan at `offset`.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
+        >>> tree = score.asTimespans(classList=(note.Note,))
         >>> verticality = tree.getVerticalityAt(0)
         >>> verticality
         <Verticality 0 {A3 E4 C#5}>
@@ -250,7 +250,7 @@ class PitchedTimespan(Timespan):
     >>> score = corpus.parse('bwv66.6')
     >>> tree = score.asTimespans()
     >>> tree
-    <TimespanTree {165} (0.0 to 36.0) <music21.stream.Score ...>>
+    <TimespanTree {195} (0.0 to 36.0) <music21.stream.Score ...>>
 
     Then get the verticality from offset 6.5, which is beat two-and-a-half of
     measure 2 (the piece is in 4/4 with a quarter-note pickup)
@@ -376,7 +376,7 @@ class PitchedTimespan(Timespan):
         chorale:
     
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
+        >>> tree = score.asTimespans(classList=(note.Note,))
         >>> timespan_one = tree[12]
         >>> print(timespan_one)
         <PitchedTimespan (2.0 to 3.0) <music21.note.Note E>>

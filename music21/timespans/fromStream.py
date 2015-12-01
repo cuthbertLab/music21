@@ -13,17 +13,18 @@
 '''
 Tools for creating timespans (fast, manipulatable objects) from Streams
 '''
+from music21.base import Music21Object
 from music21 import common
-from music21 import chord
-from music21 import note
 from music21.timespans import spans
 from music21.timespans import trees
 
-def listOfTimespanTreesByClass(inputStream,
-                               currentParentage=None,
-                               initialOffset=0,
-                               flatten=False,
-                               classLists=None):
+
+def listOfTreesByClass(inputStream,
+                       currentParentage=None,
+                       initialOffset=0.0,
+                       flatten=False,
+                       classLists=None,
+                       useTimespans=False):
     r'''
     Recurses through `inputStream`, and constructs TimespanTrees for each
     encountered substream and PitchedTimespan for each encountered non-stream
@@ -77,13 +78,17 @@ def listOfTimespanTreesByClass(inputStream,
 
             
     lastParentage = currentParentage[-1]
+    
+    if useTimespans:
+        treeClass = trees.TimespanTree
+    else:
+        treeClass = trees.ElementTree
+    
     if classLists is None or len(classLists) == 0:
-        outputCollections = [trees.TimespanTree(origin=lastParentage)]
+        outputTrees = [treeClass(origin=lastParentage)]
         classLists = []
     else:
-        outputCollections = [
-            trees.TimespanTree(origin=lastParentage) for _ in classLists
-            ]
+        outputTrees = [treeClass(origin=lastParentage) for _ in classLists]
     # do this to avoid munging activeSites
     inputStreamElements = inputStream._elements[:] + inputStream._endElements
     for element in inputStreamElements:
@@ -92,17 +97,17 @@ def listOfTimespanTreesByClass(inputStream,
         
         if element.isStream:
             localParentage = currentParentage + (element,)
-            containedTimespanTrees = listOfTimespanTreesByClass(element,
-                                                                currentParentage=localParentage,
-                                                                initialOffset=offset,
-                                                                flatten=flatten,
-                                                                classLists=classLists)
-            for outputTimespanCollection, subTimespanCollection in zip(
-                                    outputCollections, containedTimespanTrees):
+            containedTrees = listOfTreesByClass(element,
+                                                currentParentage=localParentage,
+                                                initialOffset=offset,
+                                                flatten=flatten,
+                                                classLists=classLists,
+                                                useTimespans=useTimespans)
+            for outputTree, subTree in zip(outputTrees, containedTrees):
                 if flatten is not False: # True or semiFlat
-                    outputTimespanCollection.insert(subTimespanCollection[:])
+                    outputTree.insert(subTree[:])
                 else:
-                    outputTimespanCollection.insert(subTimespanCollection)
+                    outputTree.insert(subTree)
             wasStream = True
             
         if not wasStream or flatten == 'semiFlat':
@@ -110,19 +115,39 @@ def listOfTimespanTreesByClass(inputStream,
             parentEndTime = initialOffset + lastParentage.duration.quarterLength
             endTime = offset + element.duration.quarterLength
             
-            for classBasedTimespanCollection, classList in zip(outputCollections, classLists):
+            for classBasedTree, classList in zip(outputTrees, classLists):
                 if classList and not element.isClassOrSubclass(classList):
                     continue
-                pitchedTimespan = spans.PitchedTimespan(element=element,
+                if useTimespans:
+                    pitchedTimespan = spans.PitchedTimespan(element=element,
                                                         parentage=tuple(reversed(currentParentage)),
                                                         parentOffset=parentOffset,
                                                         parentEndTime=parentEndTime,
                                                         offset=offset,
                                                         endTime=endTime)
-                classBasedTimespanCollection.insert(pitchedTimespan)
+                    classBasedTree.insert(pitchedTimespan)
+                else:
+                    classBasedTree.insert(offset, element)
 
-    return outputCollections
+    return outputTrees
 
+
+def listOfTimespanTreesByClass(inputStream,
+                               currentParentage=None,
+                               initialOffset=0,
+                               flatten=False,
+                               classLists=None):
+    '''
+    same as listOfTreesByClass but ensures that each element is wrapped in a PitchedTimespan
+    
+    To be removed... it's a temporary bridge gap...
+    '''
+    return listOfTreesByClass(inputStream,
+                               currentParentage=currentParentage,
+                               initialOffset=initialOffset,
+                               flatten=flatten,
+                               classLists=classLists,
+                               useTimespans=True)
 
 def convert(inputStream, flatten, classList):
     r'''
@@ -168,7 +193,7 @@ def convert(inputStream, flatten, classList):
     True
     '''
     if classList is None:
-        classList = (note.Note, chord.Chord)
+        classList = Music21Object
     classLists = [classList]
     listOfTimespanTrees = listOfTimespanTreesByClass(inputStream, 
                                         initialOffset=0.0, 
@@ -176,6 +201,25 @@ def convert(inputStream, flatten, classList):
                                         classLists=classLists)
     return listOfTimespanTrees[0]
 
+def flat(inputStream):
+    '''
+    Returns a timespan tree corresponding to a flat representation of the score.
+    
+    TODO: BUG: Why are these not flat offsets?
+    
+    >>> ex = timespans.makeExampleScore()
+    >>> ts = timespans.fromStream.flat(ex)
+    >>> ts
+    <ElementTree {20} (0.0 to 2.0) <music21.stream.Score 0x104a94d68>>
+    >>> ts[15], ts[15].offset
+    (<music21.note.Note F>, 1.0)
+    '''
+    classLists = [Music21Object]
+    listOfTimespanTrees = listOfTreesByClass(inputStream, 
+                                        initialOffset=0.0, 
+                                        flatten=True, 
+                                        classLists=classLists)
+    return listOfTimespanTrees[0]
 
 
 if __name__ == '__main__':
