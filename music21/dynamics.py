@@ -271,8 +271,11 @@ class Dynamic(base.Music21Object):
         if self._volumeScalar is not None:
             return self._volumeScalar
         # use default
-        if self._value in dynamicStrToScalar:
+        elif self._value in dynamicStrToScalar:
             return dynamicStrToScalar[self._value]
+        # ignore subito
+        elif self._value[0] == 's' and self._value[1:] in dynamicStrToScalar:
+            return dynamicStrToScalar[self._value[1:]]
         return 
 
     def _setVolumeScalar(self, value):
