@@ -41,7 +41,7 @@ class StreamCoreMixin(object):
         self._endElements = []
         self.isSorted = True
         ### v3!
-        #self._elementTree = timespans.trees.ElementTree(source=self)
+        #self._elementTree = timespans.trees.ElementTree(origin=self)
 
         
     def _insertCore(self, offset, element, ignoreSort=False,

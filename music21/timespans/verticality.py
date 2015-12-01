@@ -625,7 +625,7 @@ class Verticality(object):
         allQuartets = itertools.combinations(pairedMotionList, 2)
         filteredList = []
         
-        verticalityStreamParts = self.timespanTree.source.parts
+        verticalityStreamParts = self.timespanTree.origin.parts
         
         for thisQuartet in allQuartets:
             if includeNoMotion is False:

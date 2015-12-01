@@ -69,25 +69,26 @@ class ElementTree(core.AVLTree):
     nodeClass = nodeModule.ElementNode
 
     __slots__ = (
-        '_source',
+        '_origin',
         'parentTrees',
         )
 
     ### INITIALIZER ###
 
-    def __init__(self, elements=None, source=None):
+    def __init__(self, elements=None, origin=None):
         super(ElementTree, self).__init__()
         self.parentTrees = weakref.WeakSet()
-        self._source = None
+        self._origin = None
         if elements and elements is not None:
             self.insert(elements)
             
-        self.source = source
+        self.origin = origin
     
     ## Special Methods ##
     def __contains__(self, element):
         r'''
-        Is true when the ElementTree contains the object within it.
+        Is true when the ElementTree contains the object within it; if and only if the
+        .offset of the element matches the position in the tree.
 
         >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
         >>> tss = [timespans.spans.Timespan(x, y) for x, y in tsList]
@@ -263,7 +264,8 @@ class ElementTree(core.AVLTree):
         return not self == expr
 
     def __repr__(self):
-        if self._source is None:
+        o = self.origin
+        if o is None:
             return '<{} {{{}}} ({!r} to {!r})>'.format(
                 type(self).__name__,
                 len(self),
@@ -276,7 +278,7 @@ class ElementTree(core.AVLTree):
                 len(self),
                 self.offset,
                 self.endTime,
-                repr(self.source),
+                repr(o),
                 )
 
     def __setitem__(self, i, new):
@@ -673,8 +675,8 @@ class ElementTree(core.AVLTree):
             except AttributeError:
                 if hasattr(x, 'element'):
                     return x.element.sortTuple()[2:]
-                elif isinstance(x, TimespanTree) and x.source is not None:
-                    return x.source.sortTuple()[2:]
+                elif isinstance(x, TimespanTree) and x.origin is not None:
+                    return x.origin.sortTuple()[2:]
                 else:
                     return x.endTime  # PitchedTimespan with no Element!
                 
@@ -705,16 +707,16 @@ class ElementTree(core.AVLTree):
         return self.latestEndTime
 
     @property
-    def source(self):
+    def origin(self):
         '''
-        the original stream.
+        the original stream. (stored as a weakref)
         '''
-        return common.unwrapWeakref(self._source)
+        return common.unwrapWeakref(self._origin)
         
-    @source.setter
-    def source(self, expr):
+    @origin.setter
+    def origin(self, expr):
         # uses weakrefs so that garbage collection on the stream cache is possible...
-        self._source = common.wrapWeakref(expr)
+        self._origin = common.wrapWeakref(expr)
 
 
     @property
@@ -998,8 +1000,8 @@ class TimespanTree(ElementTree):
     '''
     __slots__ = ()
     ### PUBLIC METHODS ###
-    def __init__(self, elements=None, source=None):
-        super(TimespanTree, self).__init__(elements, source)
+    def __init__(self, elements=None, origin=None):
+        super(TimespanTree, self).__init__(elements, origin=origin)
     
     
     def findNextPitchedTimespanInSameStreamByClass(self, pitchedTimespan, classList=None):
@@ -1543,12 +1545,11 @@ class TimespanTree(ElementTree):
         
         TODO: Look at subclassing or at least deriving from a common base...
         '''
-        return common.unwrapWeakref(self._source)
+        return common.unwrapWeakref(self._origin)
         
     @element.setter
     def element(self, expr):
-        # uses weakrefs so that garbage collection on the stream cache is possible...
-        self._source = common.wrapWeakref(expr)
+        self._origin = common.wrapWeakref(expr)
 
 
 
