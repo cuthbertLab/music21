@@ -300,59 +300,7 @@ class ElementTimespan(Timespan):
     <music21.note.Note D>
 
     These are not dynamic, so changing the Score object does not change the
-    measureNumber, beatStrength, etc.
-    
-    
-    For quick score reductions, we can merge two consecutive 
-    like-pitched element timespans, keeping
-    score-relevant information from the first of the two, such as its
-    Music21 Element, and any beatstrength information.
-
-    This is useful when using timespans to perform score reduction.
-
-    Let's demonstrate merging some contiguous E's in the alto part of a Bach
-    chorale:
-
-    >>> score = corpus.parse('bwv66.6')
-    >>> tree = score.asTimespans()
-    >>> timespan_one = tree[12]
-    >>> print(timespan_one)
-    <ElementTimespan (2.0 to 3.0) <music21.note.Note E>>
-
-    >>> print(timespan_one.part)
-    <music21.stream.Part Alto>
-
-    >>> timespan_two = tree.findNextElementTimespanInSameStreamByClass(timespan_one)
-    >>> print(timespan_two)
-    <ElementTimespan (3.0 to 4.0) <music21.note.Note E>>
-        
-    >>> merged = timespan_one.mergeWith(timespan_two)
-    >>> print(merged)
-    <ElementTimespan (2.0 to 4.0) <music21.note.Note E>>
-
-    >>> merged.part is timespan_one.part
-    True
-
-    >>> merged.beatStrength == timespan_one.beatStrength
-    True
-
-    Attempting to merge timespans which are not contiguous, or which do not
-    have identical pitches will result in error:
-
-    >>> tree[0].mergeWith(tree[50])
-    Traceback (most recent call last):
-    TimespanException: Cannot merge <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>> 
-            with <ElementTimespan (9.5 to 10.0) <music21.note.Note B>>: not contiguous
-
-    This is probably not what you want to do: get the next element timespan in
-    the same score:
-
-    >>> timespan_twoWrong = tree.findNextElementTimespanInSameStreamByClass(
-    ...     timespan_one, classList=(stream.Score,))
-    >>> print(timespan_twoWrong)
-    <ElementTimespan (3.0 to 4.0) <music21.note.Note C#>>
-    >>> print(timespan_twoWrong.part)
-    <music21.stream.Part Soprano>        
+    measureNumber, beatStrength, etc.    
     '''
 
     ### CLASS VARIABLES ###
@@ -417,6 +365,67 @@ class ElementTimespan(Timespan):
     def canMerge(self, other):
         '''
         submethod of base canMerge that checks to see if the pitches are the same.
+
+        For quick score reductions, we can merge two consecutive 
+        like-pitched element timespans, keeping
+        score-relevant information from the first of the two, such as its
+        Music21 Element, and any beatstrength information.
+    
+        This is useful when using timespans to perform score reduction.
+    
+        Let's demonstrate merging some contiguous E's in the alto part of a Bach
+        chorale:
+    
+        >>> score = corpus.parse('bwv66.6')
+        >>> tree = score.asTimespans()
+        >>> timespan_one = tree[12]
+        >>> print(timespan_one)
+        <ElementTimespan (2.0 to 3.0) <music21.note.Note E>>
+    
+        >>> print(timespan_one.part)
+        <music21.stream.Part Alto>
+    
+        >>> timespan_two = tree.findNextElementTimespanInSameStreamByClass(timespan_one)
+        >>> print(timespan_two)
+        <ElementTimespan (3.0 to 4.0) <music21.note.Note E>>
+        
+        >>> timespan_one.canMerge(timespan_two)
+        (True, '')
+        
+        >>> merged = timespan_one.mergeWith(timespan_two)
+        >>> print(merged)
+        <ElementTimespan (2.0 to 4.0) <music21.note.Note E>>
+    
+        >>> merged.part is timespan_one.part
+        True
+    
+        >>> merged.beatStrength == timespan_one.beatStrength
+        True
+    
+        Attempting to merge timespans which are not contiguous, or which do not
+        have identical pitches will result in error:
+    
+        >>> tree[0].canMerge(tree[50])
+        (False, 'Cannot merge <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>> 
+             with <ElementTimespan (9.5 to 10.0) <music21.note.Note B>>: not contiguous')
+
+        
+        >>> tree[0].mergeWith(tree[50])
+        Traceback (most recent call last):
+        TimespanException: Cannot merge <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>> 
+                with <ElementTimespan (9.5 to 10.0) <music21.note.Note B>>: not contiguous
+    
+        
+        This is probably not what you want to do: get the next element timespan in
+        the same score:
+    
+        >>> timespan_twoWrong = tree.findNextElementTimespanInSameStreamByClass(
+        ...     timespan_one, classList=(stream.Score,))
+        >>> print(timespan_twoWrong)
+        <ElementTimespan (3.0 to 4.0) <music21.note.Note C#>>
+        >>> print(timespan_twoWrong.part)
+        <music21.stream.Part Soprano>
+
         '''
         can, message = super(ElementTimespan, self).canMerge(other)
         if can is True:
@@ -427,14 +436,13 @@ class ElementTimespan(Timespan):
         return (can, message)
 
 
-    def new(
-        self,
-        beatStrength=None,
-        element=None,
-        parentOffset=None,
-        parentEndTime=None,
-        offset=None,
-        endTime=None,
+    def new(self,
+            beatStrength=None,
+            element=None,
+            parentOffset=None,
+            parentEndTime=None,
+            offset=None,
+            endTime=None,
         ):
         '''
         Create a new object that is identical to the calling object

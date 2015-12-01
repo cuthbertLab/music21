@@ -110,10 +110,10 @@ class TimespanTreeNode(core.AVLNode):
     __slots__ = (
         'endTimeHigh',
         'endTimeLow',
-        'nodeStartIndex',
-        'nodeStopIndex',
-        'subtreeStartIndex',
-        'subtreeStopIndex',
+        'payloadElementsStartIndex',
+        'payloadElementsStopIndex',
+        'subtreeElementsStartIndex',
+        'subtreeElementsStopIndex',
         )
 
     _DOC_ATTR = {
@@ -149,32 +149,30 @@ class TimespanTreeNode(core.AVLNode):
         [<ElementTimespan (5.0 to 6.0) <music21.note.Note A>>]
         ''',
         
-    'nodeStartIndex': r'''
+    'payloadElementsStartIndex': r'''
         The timespan start index (i.e., the first x where s[x] is found in this Node's payload) 
         of only those timespans stored in the payload of this node.
         ''',
         
-    'nodeStopIndex': r'''
+    'payloadElementsStopIndex': r'''
         The timespan stop index (i.e., the last x where s[x] is found in this Node's payload) 
         of only those timespans stored in the payload of this node.
         ''',
     'endTimeHigh': r'''
-        The highest stop offset of any timespan in any node of the subtree
-        rooted on this node.
+        The highest endTime of any node in the subtree rooted on this node.
         ''',
         
     'endTimeLow': r'''
-        The lowest stop offset of any timespan in any node of the subtree
-        rooted on this node.
+        The lowest endTime of any node in the subtree rooted on this node.
         ''',               
         
-    'subTreeStartIndex': r'''
-        The lowest timespan start index of any timespan in any node of the
+    'subtreeElementsStartIndex': r'''
+        The lowest element index of an element in the payload of any node of the
         subtree rooted on this node.
         ''',
         
-    'subtreeStopIndex': r'''
-        The highest timespan stop index of any timespan in any node of the
+    'subtreeElementsStopIndex': r'''
+        The highest element index of an element in the payload of any node of the
         subtree rooted on this node.
         ''',
     }
@@ -184,14 +182,14 @@ class TimespanTreeNode(core.AVLNode):
     def __init__(self, offset):
         super(TimespanTreeNode, self).__init__(offset)
         self.payload = []
-        self.nodeStartIndex = -1
-        self.nodeStopIndex = -1
+        self.payloadElementsStartIndex = -1
+        self.payloadElementsStopIndex = -1
         
         self.endTimeHigh = None
         self.endTimeLow = None
         
-        self.subtreeStartIndex = -1
-        self.subtreeStopIndex = -1
+        self.subtreeElementsStartIndex = -1
+        self.subtreeElementsStopIndex = -1
 
 
     ### SPECIAL METHODS ###
@@ -199,10 +197,10 @@ class TimespanTreeNode(core.AVLNode):
     def __repr__(self):
         return '<Node: Start:{} Indices:({}:{}:{}:{}) Length:{{{}}}>'.format(
             self.position,
-            self.subtreeStartIndex,
-            self.nodeStartIndex,
-            self.nodeStopIndex,
-            self.subtreeStopIndex,
+            self.subtreeElementsStartIndex,
+            self.payloadElementsStartIndex,
+            self.payloadElementsStopIndex,
+            self.subtreeElementsStopIndex,
             len(self.payload),
             )
 

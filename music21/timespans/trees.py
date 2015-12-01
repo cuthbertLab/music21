@@ -157,26 +157,32 @@ class ElementTree(core.AVLTree):
         <Timespan 7.0 7.0>
         '''
         def recurseByIndex(node, index):
-            if node.nodeStartIndex <= index < node.nodeStopIndex:
-                return node.payload[index - node.nodeStartIndex]
-            elif node.leftChild and index < node.nodeStartIndex:
+            '''
+            Return the payload element at a given index
+            '''
+            if node.payloadElementsStartIndex <= index < node.payloadElementsStopIndex:
+                return node.payload[index - node.payloadElementsStartIndex]
+            elif node.leftChild and index < node.payloadElementsStartIndex:
                 return recurseByIndex(node.leftChild, index)
-            elif node.rightChild and node.nodeStopIndex <= index:
+            elif node.rightChild and node.payloadElementsStopIndex <= index:
                 return recurseByIndex(node.rightChild, index)
 
         def recurseBySlice(node, start, stop):
+            '''
+            Return a slice of the payload elements (plural) where start <= index < stop.
+            '''
             result = []
             if node is None:
                 return result
-            if start < node.nodeStartIndex and node.leftChild:
+            if start < node.payloadElementsStartIndex and node.leftChild:
                 result.extend(recurseBySlice(node.leftChild, start, stop))
-            if start < node.nodeStopIndex and node.nodeStartIndex < stop:
-                nodeStart = start - node.nodeStartIndex
-                if nodeStart < 0:
-                    nodeStart = 0
-                nodeStop = stop - node.nodeStartIndex
-                result.extend(node.payload[nodeStart:nodeStop])
-            if node.nodeStopIndex <= stop and node.rightChild:
+            if start < node.payloadElementsStopIndex and node.payloadElementsStartIndex < stop:
+                indexStart = start - node.payloadElementsStartIndex
+                if indexStart < 0:
+                    indexStart = 0
+                indexStop = stop - node.payloadElementsStartIndex
+                result.extend(node.payload[indexStart:indexStop])
+            if node.payloadElementsStopIndex <= stop and node.rightChild:
                 result.extend(recurseBySlice(node.rightChild, start, stop))
             return result
         
@@ -184,14 +190,14 @@ class ElementTree(core.AVLTree):
             if self.rootNode is None:
                 raise IndexError
             if i < 0:
-                i = self.rootNode.subtreeStopIndex + i
-            if i < 0 or self.rootNode.subtreeStopIndex <= i:
+                i = self.rootNode.subtreeElementsStopIndex + i
+            if i < 0 or self.rootNode.subtreeElementsStopIndex <= i:
                 raise IndexError
             return recurseByIndex(self.rootNode, i)
         elif isinstance(i, slice):
             if self.rootNode is None:
                 return []
-            indices = i.indices(self.rootNode.subtreeStopIndex)
+            indices = i.indices(self.rootNode.subtreeElementsStopIndex)
             start, stop = indices[0], indices[1]
             return recurseBySlice(self.rootNode, start, stop)
         else:
@@ -251,7 +257,7 @@ class ElementTree(core.AVLTree):
         '''
         if self.rootNode is None:
             return 0
-        return self.rootNode.subtreeStopIndex
+        return self.rootNode.subtreeElementsStopIndex
 
     def __ne__(self, expr):
         return not self == expr
@@ -339,22 +345,22 @@ class ElementTree(core.AVLTree):
                     node.leftChild,
                     parentStopIndex=parentStopIndex,
                     )
-                node.nodeStartIndex = node.leftChild.subtreeStopIndex
-                node.subtreeStartIndex = node.leftChild.subtreeStartIndex
+                node.payloadElementsStartIndex = node.leftChild.subtreeElementsStopIndex
+                node.subtreeElementsStartIndex = node.leftChild.subtreeElementsStartIndex
             elif parentStopIndex is None:
-                node.nodeStartIndex = 0
-                node.subtreeStartIndex = 0
+                node.payloadElementsStartIndex = 0
+                node.subtreeElementsStartIndex = 0
             else:
-                node.nodeStartIndex = parentStopIndex
-                node.subtreeStartIndex = parentStopIndex
-            node.nodeStopIndex = node.nodeStartIndex + len(node.payload)
-            node.subtreeStopIndex = node.nodeStopIndex
+                node.payloadElementsStartIndex = parentStopIndex
+                node.subtreeElementsStartIndex = parentStopIndex
+            node.payloadElementsStopIndex = node.payloadElementsStartIndex + len(node.payload)
+            node.subtreeElementsStopIndex = node.payloadElementsStopIndex
             if node.rightChild is not None:
                 recurseUpdateIndices(
                     node.rightChild,
-                    parentStopIndex=node.nodeStopIndex,
+                    parentStopIndex=node.payloadElementsStopIndex,
                     )
-                node.subtreeStopIndex = node.rightChild.subtreeStopIndex
+                node.subtreeElementsStopIndex = node.rightChild.subtreeElementsStopIndex
         recurseUpdateIndices(node)
 
     def _updateEndTimes(self, node):
@@ -573,7 +579,7 @@ class ElementTree(core.AVLTree):
         node = self.getNodeByPosition(offset)
         if node is None or element not in node.payload:
             raise ValueError('{} not in Tree at offset {}.'.format(element, offset))
-        index = node.payload.index(element) + node.nodeStartIndex
+        index = node.payload.index(element) + node.payloadElementsStartIndex
         return index
 
     def remove(self, elements, offsets=None, runUpdate=True): 
