@@ -84,28 +84,28 @@ class Verticality(object):
     record of exactly where it is in the timespanTree -- scores can be
     recreated with this information.
 
-    Getting back to the task at hand, we can find all the elementTimespans (and
+    Getting back to the task at hand, we can find all the PitchedTimespans (and
     from there the elements) that start at exactly 6.5.  There's one, it's a
     passing tone D in the tenor and it lastes from offset 6.5 to offset 7.0,
     with respect to the beginning of the score, not to the beginning of the
     measure.  That is to say, it's an eighth note
 
     >>> verticality.startTimespans
-    (<ElementTimespan (6.5 to 7.0) <music21.note.Note D>>,)
+    (<PitchedTimespan (6.5 to 7.0) <music21.note.Note D>>,)
 
-    And we can get all the elementTimespans that were already sounding at the
+    And we can get all the PitchedTimespans that were already sounding at the
     moment (that is to say, the non-passing tones):
 
     >>> verticality.overlapTimespans
-    (<ElementTimespan (6.0 to 7.0) <music21.note.Note B>>,
-     <ElementTimespan (6.0 to 7.0) <music21.note.Note G#>>,
-     <ElementTimespan (6.0 to 7.0) <music21.note.Note E>>)
+    (<PitchedTimespan (6.0 to 7.0) <music21.note.Note B>>,
+     <PitchedTimespan (6.0 to 7.0) <music21.note.Note G#>>,
+     <PitchedTimespan (6.0 to 7.0) <music21.note.Note E>>)
 
     And we can get all the things that stop right at this moment.  It's the E
     in the tenor preceding the passing tone D:
 
     >>> verticality.stopTimespans
-    (<ElementTimespan (6.0 to 6.5) <music21.note.Note E>>,)
+    (<PitchedTimespan (6.0 to 6.5) <music21.note.Note E>>,)
     '''
 
     ### CLASS VARIABLES ###
@@ -132,7 +132,7 @@ class Verticality(object):
             >>> verticality
             <Verticality 0.5 {G#3 B3 E4 B4}>
             >>> verticality.overlapTimespans
-            (<ElementTimespan (0.0 to 1.0) <music21.note.Note E>>,)        
+            (<PitchedTimespan (0.0 to 1.0) <music21.note.Note E>>,)        
             ''',
         'startTimespans': r'''
             Gets the timespans starting at a verticality's start offset.
@@ -146,10 +146,10 @@ class Verticality(object):
             >>> for timespan in verticality.startTimespans:
             ...     timespan
             ...
-            <ElementTimespan (1.0 to 2.0) <music21.note.Note A>>
-            <ElementTimespan (1.0 to 2.0) <music21.note.Note F#>>
-            <ElementTimespan (1.0 to 2.0) <music21.note.Note C#>>
-            <ElementTimespan (1.0 to 2.0) <music21.note.Note F#>>        
+            <PitchedTimespan (1.0 to 2.0) <music21.note.Note A>>
+            <PitchedTimespan (1.0 to 2.0) <music21.note.Note F#>>
+            <PitchedTimespan (1.0 to 2.0) <music21.note.Note C#>>
+            <PitchedTimespan (1.0 to 2.0) <music21.note.Note F#>>        
             ''',
         'offset': r'''
             Gets the start offset of a verticality.
@@ -179,10 +179,10 @@ class Verticality(object):
             >>> for timespan in verticality.stopTimespans:
             ...     timespan
             ...
-            <ElementTimespan (0.0 to 1.0) <music21.note.Note E>>
-            <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
-            <ElementTimespan (0.5 to 1.0) <music21.note.Note B>>
-            <ElementTimespan (0.5 to 1.0) <music21.note.Note G#>>
+            <PitchedTimespan (0.0 to 1.0) <music21.note.Note E>>
+            <PitchedTimespan (0.5 to 1.0) <music21.note.Note B>>
+            <PitchedTimespan (0.5 to 1.0) <music21.note.Note B>>
+            <PitchedTimespan (0.5 to 1.0) <music21.note.Note G#>>
             ''', 
     }
 
@@ -246,7 +246,7 @@ class Verticality(object):
         <Verticality 1.0 {F#3 C#4 F#4 A4}>
 
         >>> verticality.bassTimespan
-        <ElementTimespan (1.0 to 2.0) <music21.note.Note F#>>
+        <PitchedTimespan (1.0 to 2.0) <music21.note.Note F#>>
         '''
         pitches = sorted(self.pitchSet)
         lowestPitch = pitches[0]
@@ -288,10 +288,10 @@ class Verticality(object):
         True
         '''
         try:
-            thisElementTimespan = self.startTimespans[0]
+            thisPitchedTimespan = self.startTimespans[0]
         except IndexError:
             return None        
-        return thisElementTimespan.beatStrength
+        return thisPitchedTimespan.beatStrength
 
 
     def toChord(self):
@@ -416,13 +416,13 @@ class Verticality(object):
         <music21.pitch.Pitch A4>
         '''
         pitchSet = set()
-        for elementTimespan in self.startTimespans:
-            element = elementTimespan.element
+        for timespan in self.startTimespans:
+            element = timespan.element
             if hasattr(element, 'pitches'):
                 pitches = [x.nameWithOctave for x in element.pitches]
                 pitchSet.update(pitches)
-        for elementTimespan in self.overlapTimespans:
-            element = elementTimespan.element
+        for timespan in self.overlapTimespans:
+            element = timespan.element
             if hasattr(element, 'pitches'):
                 pitches = [x.nameWithOctave for x in element.pitches]
                 pitchSet.update(pitches)
@@ -590,18 +590,18 @@ class Verticality(object):
         
         >>> for vlqRaw in verticality22.getAllVoiceLeadingQuartets(returnObjects=False):
         ...     pp(vlqRaw)
-        ((<ElementTimespan (21.0 to 22.0) <music21.note.Note E>>,
-          <ElementTimespan (22.0 to 23.0) <music21.note.Note F>>),
-         (<ElementTimespan (19.5 to 21.0) <music21.note.Note G>>,
-          <ElementTimespan (22.0 to 22.5) <music21.note.Note C>>))
-        ((<ElementTimespan (21.0 to 22.0) <music21.note.Note E>>,
-          <ElementTimespan (22.0 to 23.0) <music21.note.Note F>>),
-         (<ElementTimespan (21.5 to 22.5) <music21.note.Note A>>,
-          <ElementTimespan (21.5 to 22.5) <music21.note.Note A>>))
-        ((<ElementTimespan (19.5 to 21.0) <music21.note.Note G>>,
-          <ElementTimespan (22.0 to 22.5) <music21.note.Note C>>),
-         (<ElementTimespan (21.5 to 22.5) <music21.note.Note A>>,
-          <ElementTimespan (21.5 to 22.5) <music21.note.Note A>>))
+        ((<PitchedTimespan (21.0 to 22.0) <music21.note.Note E>>,
+          <PitchedTimespan (22.0 to 23.0) <music21.note.Note F>>),
+         (<PitchedTimespan (19.5 to 21.0) <music21.note.Note G>>,
+          <PitchedTimespan (22.0 to 22.5) <music21.note.Note C>>))
+        ((<PitchedTimespan (21.0 to 22.0) <music21.note.Note E>>,
+          <PitchedTimespan (22.0 to 23.0) <music21.note.Note F>>),
+         (<PitchedTimespan (21.5 to 22.5) <music21.note.Note A>>,
+          <PitchedTimespan (21.5 to 22.5) <music21.note.Note A>>))
+        ((<PitchedTimespan (19.5 to 21.0) <music21.note.Note G>>,
+          <PitchedTimespan (22.0 to 22.5) <music21.note.Note C>>),
+         (<PitchedTimespan (21.5 to 22.5) <music21.note.Note A>>,
+          <PitchedTimespan (21.5 to 22.5) <music21.note.Note A>>))
           
         >>> for vlq in verticality22.getAllVoiceLeadingQuartets(partPairNumbers=[(0,1)]):
         ...     pp(vlq)
@@ -673,22 +673,22 @@ class Verticality(object):
         >>> verticality22 = tsCol.getVerticalityAt(22.0)
         >>> for pm in verticality22.getPairedMotion():
         ...     print(pm)
-        (<ElementTimespan (21.0 to 22.0) <music21.note.Note E>>, 
-         <ElementTimespan (22.0 to 23.0) <music21.note.Note F>>)
-        (<ElementTimespan (19.5 to 21.0) <music21.note.Note G>>, 
-         <ElementTimespan (22.0 to 22.5) <music21.note.Note C>>)
-        (<ElementTimespan (21.5 to 22.5) <music21.note.Note A>>, 
-         <ElementTimespan (21.5 to 22.5) <music21.note.Note A>>)
+        (<PitchedTimespan (21.0 to 22.0) <music21.note.Note E>>, 
+         <PitchedTimespan (22.0 to 23.0) <music21.note.Note F>>)
+        (<PitchedTimespan (19.5 to 21.0) <music21.note.Note G>>, 
+         <PitchedTimespan (22.0 to 22.5) <music21.note.Note C>>)
+        (<PitchedTimespan (21.5 to 22.5) <music21.note.Note A>>, 
+         <PitchedTimespan (21.5 to 22.5) <music21.note.Note A>>)
         
         Note that the second one contains a one-beat rest at 21.0-22.0; so includeRests = False will
         get rid of that:
         
         >>> for pm in verticality22.getPairedMotion(includeRests=False):
         ...     print(pm)
-        (<ElementTimespan (21.0 to 22.0) <music21.note.Note E>>, 
-         <ElementTimespan (22.0 to 23.0) <music21.note.Note F>>)
-        (<ElementTimespan (21.5 to 22.5) <music21.note.Note A>>, 
-         <ElementTimespan (21.5 to 22.5) <music21.note.Note A>>)
+        (<PitchedTimespan (21.0 to 22.0) <music21.note.Note E>>, 
+         <PitchedTimespan (22.0 to 23.0) <music21.note.Note F>>)
+        (<PitchedTimespan (21.5 to 22.5) <music21.note.Note A>>, 
+         <PitchedTimespan (21.5 to 22.5) <music21.note.Note A>>)
         
         
         Oblique here means a pair that does not move (it could be called noMotion, 
@@ -698,15 +698,15 @@ class Verticality(object):
         
         >>> for pm in verticality22.getPairedMotion(includeOblique=False):
         ...     print(pm)
-        (<ElementTimespan (21.0 to 22.0) <music21.note.Note E>>, 
-         <ElementTimespan (22.0 to 23.0) <music21.note.Note F>>)
-        (<ElementTimespan (19.5 to 21.0) <music21.note.Note G>>, 
-         <ElementTimespan (22.0 to 22.5) <music21.note.Note C>>)
+        (<PitchedTimespan (21.0 to 22.0) <music21.note.Note E>>, 
+         <PitchedTimespan (22.0 to 23.0) <music21.note.Note F>>)
+        (<PitchedTimespan (19.5 to 21.0) <music21.note.Note G>>, 
+         <PitchedTimespan (22.0 to 22.5) <music21.note.Note C>>)
 
         >>> for pm in verticality22.getPairedMotion(includeOblique=False, includeRests=False):
         ...     print(pm)
-        (<ElementTimespan (21.0 to 22.0) <music21.note.Note E>>, 
-         <ElementTimespan (22.0 to 23.0) <music21.note.Note F>>)
+        (<PitchedTimespan (21.0 to 22.0) <music21.note.Note E>>, 
+         <PitchedTimespan (22.0 to 23.0) <music21.note.Note F>>)
         '''
         stopTss = self.stopTimespans
         startTss = self.startTimespans
@@ -714,7 +714,7 @@ class Verticality(object):
         allPairedMotions = []
                 
         for startingTs in startTss:
-            previousTs = self.timespanTree.findPreviousElementTimespanInSameStreamByClass(
+            previousTs = self.timespanTree.findPreviousPitchedTimespanInSameStreamByClass(
                                                                                         startingTs)
             if previousTs is None:
                 continue  # first not in piece in this part...
