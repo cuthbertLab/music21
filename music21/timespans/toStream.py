@@ -105,7 +105,7 @@ def chordified(timespans, templateStream=None):
         return outputStream
 
 
-def toPartwise(timespans, templateStream=None):
+def partwise(timespans, templateStream=None):
     '''
     todo docs
     '''
