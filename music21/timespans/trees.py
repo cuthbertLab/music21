@@ -893,7 +893,7 @@ class TimespanTree(ElementTree):
     score at once:
 
     >>> bach = corpus.parse('bwv66.6')
-    >>> tree = timespans.streamToTimespanTree(bach, flatten=True, 
+    >>> tree = timespans.fromStream.convert(bach, flatten=True, 
     ...            classList=(note.Note, chord.Chord))
     >>> print(tree.getVerticalityAt(17.0))
     <Verticality 17.0 {F#3 C#4 A4}>
@@ -960,7 +960,7 @@ class TimespanTree(ElementTree):
     ...             tree.insert(merged)
      
      
-    >>> newBach = timespans.timespansToPartwiseStream(
+    >>> newBach = timespans.toStream.partwise(
     ...     tree,
     ...     templateStream=bach,
     ...     )
@@ -1520,7 +1520,7 @@ class TimespanTree(ElementTree):
         probably be either zero or one.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = timespans.streamToTimespanTree(
+        >>> tree = timespans.fromStream.convert(
         ...     score, flatten=False, classList=(note.Note, chord.Chord))
         >>> tree[0].minimumOverlap
         1
@@ -1572,7 +1572,7 @@ class Test(unittest.TestCase):
 #     def testBachDoctest(self):
 #         from music21 import corpus, note, chord, timespans
 #         bach = corpus.parse('bwv66.6')
-#         tree = timespans.streamToTimespanTree(bach, flatten=True, 
+#         tree = timespans.fromStream.convert(bach, flatten=True, 
 #                                               classList=(note.Note, chord.Chord))
 #         for verticalities in tree.iterateVerticalitiesNwise(n=3):
 #             print(verticalities)
@@ -1588,7 +1588,7 @@ class Test(unittest.TestCase):
 #                     #tree.insert(merged)
 #      
 #     
-#         newBach = timespans.timespansToPartwiseStream(tree, templateStream=bach,)
+#         newBach = timespans.toStream.partwise(tree, templateStream=bach,)
 #         newBach.parts[1].measure(7).show('text')
 # #     {0.0} <music21.chord.Chord F#4>
 # #     {1.5} <music21.chord.Chord F#3>
@@ -1660,7 +1660,7 @@ class Test(unittest.TestCase):
 #     def testBachDoctest(self):
 #         from music21 import corpus, note, chord, timespans
 #         bach = corpus.parse('bwv66.6')
-#         tree = timespans.streamToTimespanTree(bach, flatten=True, 
+#         tree = timespans.fromStream.convert(bach, flatten=True, 
 #                                               classList=(note.Note, chord.Chord))
 #         print(tree)
 #         for verticalities in tree.iterateVerticalitiesNwise(n=3):
@@ -1676,7 +1676,7 @@ class Test(unittest.TestCase):
 #                     tree.insert(merged)
 #      
 #     
-#         newBach = timespans.timespansToPartwiseStream(tree, templateStream=bach,)
+#         newBach = timespans.toStream.partwise(tree, templateStream=bach,)
 #         newBach.show()
 #         newBach.parts[1].measure(7).show('text')
 # #     {0.0} <music21.chord.Chord F#4>

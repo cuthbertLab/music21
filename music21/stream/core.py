@@ -337,12 +337,10 @@ class StreamCoreMixin(object):
         hashedAttributes = hash( (tuple(classList or () ), recurse) ) 
         cacheKey = "timespanTree" + str(hashedAttributes)
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
-            hashedTSC = timespans.streamToTimespanTree(
-                self,
-                flatten=recurse,
-                classList=classList,
-                )
-            self._cache[cacheKey] = hashedTSC
+            hashedTimespanCollection = timespans.fromStream.convert(self,
+                                                     flatten=recurse,
+                                                     classList=classList)
+            self._cache[cacheKey] = hashedTimespanCollection
         return self._cache[cacheKey]
     
     def coreGatherMissingSpanners(self, recurse=True, requireAllPresent=True, insert=True):

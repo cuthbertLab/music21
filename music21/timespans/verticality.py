@@ -38,7 +38,7 @@ class Verticality(object):
     Create a timespan-stream from a score:
 
     >>> score = corpus.parse('bwv66.6')
-    >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+    >>> tree = timespans.fromStream.convert(score, flatten=True, 
     ...        classList=(note.Note, chord.Chord))
 
 
@@ -126,7 +126,7 @@ class Verticality(object):
             Gets timespans overlapping the start offset of a verticality.
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+            >>> tree = timespans.fromStream.convert(score, flatten=True, 
             ...            classList=(note.Note, chord.Chord))
             >>> verticality = tree.getVerticalityAt(0.5)
             >>> verticality
@@ -138,7 +138,7 @@ class Verticality(object):
             Gets the timespans starting at a verticality's start offset.
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+            >>> tree = timespans.fromStream.convert(score, flatten=True, 
             ...            classList=(note.Note, chord.Chord))
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> verticality
@@ -155,7 +155,7 @@ class Verticality(object):
             Gets the start offset of a verticality.
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+            >>> tree = timespans.fromStream.convert(score, flatten=True, 
             ...            classList=(note.Note, chord.Chord))
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> verticality
@@ -167,7 +167,7 @@ class Verticality(object):
             Gets the timespans stopping at a verticality's start offset.
 
             >>> score = corpus.parse('bwv66.6')
-            >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+            >>> tree = timespans.fromStream.convert(score, flatten=True, 
             ...                classList=(note.Note, chord.Chord))
             >>> verticality = tree.getVerticalityAt(1.0)
             >>> verticality
@@ -239,7 +239,7 @@ class Verticality(object):
         TODO: Fix this!
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...            classList=(note.Note, chord.Chord))
         >>> verticality = tree.getVerticalityAt(1.0)
         >>> verticality
@@ -270,7 +270,7 @@ class Verticality(object):
         Gets the beat strength of a verticality.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...            classList=(note.Note, chord.Chord))
         >>> verticality = tree.getVerticalityAt(1.0)
         >>> verticality.beatStrength
@@ -310,7 +310,7 @@ class Verticality(object):
         TODO: remove, and use toChord.isConsonant() instead.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...            classList=(note.Note, chord.Chord))
         >>> verticalities = list(tree.iterateVerticalities())
         >>> for verticality in verticalities[:10]:
@@ -335,7 +335,7 @@ class Verticality(object):
         Gets the measure number of the verticality's starting elements.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...            classList=(note.Note, chord.Chord))
         >>> verticality = tree.getVerticalityAt(7.0)
         >>> verticality.measureNumber
@@ -349,7 +349,7 @@ class Verticality(object):
         Gets the next start-offset in the verticality's offset-tree.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...            classList=(note.Note, chord.Chord))
         >>> verticality = tree.getVerticalityAt(1.0)
         >>> verticality.nextStartOffset
@@ -370,7 +370,7 @@ class Verticality(object):
         Gets the next verticality after a verticality.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...            classList=(note.Note, chord.Chord))
         >>> verticality = tree.getVerticalityAt(1.0)
         >>> print(verticality)
@@ -404,7 +404,7 @@ class Verticality(object):
         Gets the pitch set of all elements in a verticality.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...            classList=(note.Note, chord.Chord))
         >>> verticality = tree.getVerticalityAt(1.0)
         >>> for pitch in sorted(verticality.pitchSet):
@@ -435,7 +435,7 @@ class Verticality(object):
         Gets the pitch-class set of all elements in a verticality.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...            classList=(note.Note, chord.Chord))
         >>> verticality = tree.getVerticalityAt(1.0)
         >>> for pitchClass in sorted(verticality.pitchClassSet):
@@ -457,7 +457,7 @@ class Verticality(object):
         Gets the previous verticality before a verticality.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...            classList=(note.Note, chord.Chord))
         >>> verticality = tree.getVerticalityAt(1.0)
         >>> print(verticality)
@@ -504,7 +504,7 @@ class Verticality(object):
         Makes a Chord or Rest from this verticality and quarterLength.
         
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...            classList=(note.Note, chord.Chord))
         >>> verticality = tree.getVerticalityAt(4.0)
         >>> verticality
@@ -553,7 +553,7 @@ class Verticality(object):
                                    includeNoMotion=False, returnObjects=True, partPairNumbers=None):
         '''
         >>> c = corpus.parse('luca/gloria').measures(1,8)
-        >>> tsCol = timespans.streamToTimespanTree(c, flatten=True, 
+        >>> tsCol = timespans.fromStream.convert(c, flatten=True, 
         ...            classList=(note.Note, chord.Chord))
         >>> verticality22 = tsCol.getVerticalityAt(22.0)
         
@@ -668,7 +668,7 @@ class Verticality(object):
         and which move here.
         
         >>> c = corpus.parse('luca/gloria').measures(1,8)
-        >>> tsCol = timespans.streamToTimespanTree(c, flatten=True, 
+        >>> tsCol = timespans.fromStream.convert(c, flatten=True, 
         ...            classList=(note.Note, chord.Chord))
         >>> verticality22 = tsCol.getVerticalityAt(22.0)
         >>> for pm in verticality22.getPairedMotion():

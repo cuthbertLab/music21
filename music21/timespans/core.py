@@ -63,7 +63,7 @@ class AVLNode(common.SlottedObject):
         This attribute is used to help balance the AVL tree.
 
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...                    classList=(note.Note, chord.Chord))
         >>> print(tree.debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
@@ -109,7 +109,7 @@ class AVLNode(common.SlottedObject):
         This property is used to help balance the AVL tree.
 
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...              classList=(note.Note, chord.Chord))
         >>> print(tree.debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
@@ -144,7 +144,7 @@ class AVLNode(common.SlottedObject):
         the node in a containing score, but does not need to be.
 
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...            classList=(note.Note, chord.Chord))
         >>> print(tree.rootNode.debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
@@ -171,7 +171,7 @@ class AVLNode(common.SlottedObject):
         After setting the left child you need to do a node update. with node.update()
 
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...           classList=(note.Note, chord.Chord))
         >>> print(tree.rootNode.debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
@@ -194,7 +194,7 @@ class AVLNode(common.SlottedObject):
         After setting the right child you need to do a node update. with node.update()
 
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...             classList=(note.Note, chord.Chord))
         >>> print(tree.rootNode.debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
@@ -271,7 +271,7 @@ class AVLNode(common.SlottedObject):
         Get a debug of the Node:
         
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...              classList=(note.Note, chord.Chord))
         >>> rn = tree.rootNode        
         >>> print(rn.debug())
@@ -291,7 +291,7 @@ class AVLNode(common.SlottedObject):
         Return a list of the debugging information of the tree (used for debug):
         
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...            classList=(note.Note, chord.Chord))
         >>> rn = tree.rootNode
         >>> rn._getDebugPieces()
@@ -329,7 +329,7 @@ class AVLNode(common.SlottedObject):
         We create a score with everything correct.
 
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...             classList=(note.Note, chord.Chord))
         >>> n = tree.rootNode
         >>> n

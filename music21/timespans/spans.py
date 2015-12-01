@@ -315,16 +315,15 @@ class ElementTimespan(Timespan):
 
     ### INITIALIZER ###
 
-    def __init__(
-        self,
-        element=None,
-        beatStrength=None,
-        parentOffset=None,
-        parentEndTime=None,
-        parentage=None,
-        offset=None,
-        endTime=None,
-        ):
+    def __init__(self,
+                 element=None,
+                 beatStrength=None,
+                 parentOffset=None,
+                 parentEndTime=None,
+                 parentage=None,
+                 offset=None,
+                 endTime=None,
+                 ):
         super(ElementTimespan, self).__init__(offset=offset, endTime=endTime)
         
         self._element = element

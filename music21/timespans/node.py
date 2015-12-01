@@ -42,7 +42,7 @@ class TimespanTreeNode(core.AVLNode):
     {6.0 - 8.0} <music21.note.Note D>
     {7.0 - 8.0} <music21.note.Note C>
     
-    >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+    >>> tree = timespans.fromStream.convert(score, flatten=True, 
     ...              classList=(note.Note, chord.Chord))
     >>> rn = tree.rootNode
     
@@ -121,7 +121,7 @@ class TimespanTreeNode(core.AVLNode):
         The contents of the node at this point.  Usually ElementTimespans.
 
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...                  classList=(note.Note, chord.Chord))
         >>> print(tree.rootNode.debug())
         <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
