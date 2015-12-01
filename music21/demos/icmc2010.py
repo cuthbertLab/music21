@@ -114,19 +114,14 @@ def findRaisedSevenths(show=True):
 
     found = stream.Stream()
     count = 0
-    for part in score.getElementsByClass(stream.Part):
+    for part in score.iter.getElementsByClass(stream.Part):
         found.insert(count, 
-            part.flat.getElementsByClass(
-            clef.Clef)[0])
-        for i in range(len(part.getElementsByClass('Measure'))):
-            m = part.getElementsByClass('Measure')[i]
-            for n in m.notes:
+                     part.flat.iter.getElementsByClass(clef.Clef)[0])
+        for i, m in enumerate(part.iter.getElementsByClass('Measure')):
+            for n in m.iter.notes:
                 if n.name == 'C#': 
-                    n.addLyric('%s, m. %s' % (          
-        part.getInstrument().partName[0], 
-        m.number))
-                    n.addLyric('beat %s' %
-        ts.getBeat(n.offset))
+                    n.addLyric('%s, m. %s' % (part.partName[0], m.number))
+                    n.addLyric('beat %s' % ts.getBeat(n.offset))
                     found.insert(count, n)
                     count += 4
     if show:

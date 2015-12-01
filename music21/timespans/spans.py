@@ -18,7 +18,6 @@ organized by start and stop offsets.
 import unittest
 
 from music21 import exceptions21
-from music21 import instrument
 
 from music21.exceptions21 import TimespanException
 from music21 import environment
@@ -37,6 +36,31 @@ class Timespan(object):
     >>> timespan = timespans.spans.Timespan(-1.5, 3.25)
     >>> print(timespan)
     <Timespan -1.5 3.25>
+    
+    A timespan has two attributes, its offset and its endTime.  They are immutable...
+    
+    >>> timespan.offset
+    -1.5
+    >>> timespan.endTime
+    3.25
+    
+    To create a changed timespan, call the .new() method on the timespan.
+    
+    >>> ts2 = timespan.new(offset=0.0)
+    >>> ts2
+    <Timespan 0.0 3.25>
+
+    >>> ts3 = timespan.new(endTime=5.0)
+    >>> ts3
+    <Timespan -1.5 5.0>
+    
+    Two timespans are equal if they have the same offset and endTime
+    
+    >>> ts4 = timespans.spans.Timespan(-1.5, 5.0)
+    >>> ts3 == ts4
+    True
+    >>> ts4 == ts2
+    False
     '''
     __slots__ = (
         '_offset',
@@ -83,6 +107,7 @@ class Timespan(object):
         >>> elementTimespan.offset
         1.0
         '''
+        # this is a property to make it immutable.
         return self._offset
 
     @property
@@ -98,6 +123,7 @@ class Timespan(object):
         >>> elementTimespan.endTime
         2.0
         '''
+        # this is a property to make it immutable.
         return self._endTime
 
     def new(self, offset=None, endTime=None):
@@ -160,58 +186,6 @@ class Timespan(object):
         Traceback (most recent call last):
         TimespanException: Cannot merge <Timespan 0.0 7.0> with 
             <Timespan 6.0 10.0>: not contiguous        
-        
-        
-        Merges two consecutive like-pitched element timespans, keeping
-        score-relevant information from the first of the two, such as its
-        Music21 Element, and any beatstrength information.
-
-        This is useful when using timespans to perform score reduction.
-
-        Let's demonstrate merging some contiguous E's in the alto part of a Bach
-        chorale:
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> timespan_one = tree[12]
-        >>> print(timespan_one)
-        <ElementTimespan (2.0 to 3.0) <music21.note.Note E>>
-
-        >>> print(timespan_one.part)
-        <music21.stream.Part Alto>
-
-        >>> timespan_two = tree.findNextElementTimespanInSameStreamByClass(
-        ...     timespan_one)
-        >>> print(timespan_two)
-        <ElementTimespan (3.0 to 4.0) <music21.note.Note E>>
-            
-        >>> merged = timespan_one.mergeWith(timespan_two)
-        >>> print(merged)
-        <ElementTimespan (2.0 to 4.0) <music21.note.Note E>>
-
-        >>> merged.part is timespan_one.part
-        True
-
-        >>> merged.beatStrength == timespan_one.beatStrength
-        True
-
-        Attempting to merge timespans which are not contiguous, or which do not
-        have identical pitches will result in error:
-
-        >>> tree[0].mergeWith(tree[50])
-        Traceback (most recent call last):
-        TimespanException: Cannot merge <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>> 
-                with <ElementTimespan (9.5 to 10.0) <music21.note.Note B>>: not contiguous
-
-        This is probably not what you want to do: get the next element timespan in
-        the same score:
-
-        >>> timespan_twoWrong = tree.findNextElementTimespanInSameStreamByClass(
-        ...     timespan_one, classList=(stream.Score,))
-        >>> print(timespan_twoWrong)
-        <ElementTimespan (3.0 to 4.0) <music21.note.Note C#>>
-        >>> print(timespan_twoWrong.part)
-        <music21.stream.Part Soprano>
         '''
         can, message = self.canMerge(other)
         if can is False:
@@ -304,7 +278,7 @@ class ElementTimespan(Timespan):
 
     >>> elementTimespan.part
     <music21.stream.Part Tenor>
-    >>> elementTimespan.partName
+    >>> elementTimespan.part.partName
     'Tenor'
 
     Find out what measure it's in:
@@ -327,6 +301,58 @@ class ElementTimespan(Timespan):
 
     These are not dynamic, so changing the Score object does not change the
     measureNumber, beatStrength, etc.
+    
+    
+    For quick score reductions, we can merge two consecutive 
+    like-pitched element timespans, keeping
+    score-relevant information from the first of the two, such as its
+    Music21 Element, and any beatstrength information.
+
+    This is useful when using timespans to perform score reduction.
+
+    Let's demonstrate merging some contiguous E's in the alto part of a Bach
+    chorale:
+
+    >>> score = corpus.parse('bwv66.6')
+    >>> tree = score.asTimespans()
+    >>> timespan_one = tree[12]
+    >>> print(timespan_one)
+    <ElementTimespan (2.0 to 3.0) <music21.note.Note E>>
+
+    >>> print(timespan_one.part)
+    <music21.stream.Part Alto>
+
+    >>> timespan_two = tree.findNextElementTimespanInSameStreamByClass(timespan_one)
+    >>> print(timespan_two)
+    <ElementTimespan (3.0 to 4.0) <music21.note.Note E>>
+        
+    >>> merged = timespan_one.mergeWith(timespan_two)
+    >>> print(merged)
+    <ElementTimespan (2.0 to 4.0) <music21.note.Note E>>
+
+    >>> merged.part is timespan_one.part
+    True
+
+    >>> merged.beatStrength == timespan_one.beatStrength
+    True
+
+    Attempting to merge timespans which are not contiguous, or which do not
+    have identical pitches will result in error:
+
+    >>> tree[0].mergeWith(tree[50])
+    Traceback (most recent call last):
+    TimespanException: Cannot merge <ElementTimespan (0.0 to 0.5) <music21.note.Note C#>> 
+            with <ElementTimespan (9.5 to 10.0) <music21.note.Note B>>: not contiguous
+
+    This is probably not what you want to do: get the next element timespan in
+    the same score:
+
+    >>> timespan_twoWrong = tree.findNextElementTimespanInSameStreamByClass(
+    ...     timespan_one, classList=(stream.Score,))
+    >>> print(timespan_twoWrong)
+    <ElementTimespan (3.0 to 4.0) <music21.note.Note C#>>
+    >>> print(timespan_twoWrong.part)
+    <music21.stream.Part Soprano>        
     '''
 
     ### CLASS VARIABLES ###
@@ -584,28 +610,6 @@ class ElementTimespan(Timespan):
         from music21 import stream
         return self.getParentageByClass(classList=(stream.Part,))
 
-    @property
-    def partName(self):
-        r'''
-        The part name of the part containing the elementTimespan's element.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> verticality = tree.getVerticalityAt(1.0)
-        >>> elementTimespan = verticality.startTimespans[0]
-        >>> elementTimespan.partName
-        'Soprano'
-
-        TODO: remove and see if something better can be done with elementTimespan.part's Part object
-        
-        '''
-        part = self.part
-        if part is None:
-            return None
-        for element in part:
-            if isinstance(element, instrument.Instrument):
-                return element.partName
-        return None
 
     @property
     def pitches(self):

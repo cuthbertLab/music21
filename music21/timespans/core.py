@@ -476,9 +476,7 @@ class AVLTree(object):
         )
     nodeClass = AVLNode
     
-    def __init__(
-        self,
-        ):
+    def __init__(self):
         self.rootNode = None
 
     def __iter__(self):
@@ -517,25 +515,25 @@ class AVLTree(object):
                         yield n
         return recurse(self.rootNode)
 
-    def insertAtPosition(self, position):
+    def createNodeAtPosition(self, position):
         '''
         creates a new node at position and sets the rootNode
         appropriately
         
         >>> avl = timespans.core.AVLTree()
-        >>> avl.insertAtPosition(20)
+        >>> avl.createNodeAtPosition(20)
         >>> avl.rootNode
         <Node: Start:20 Height:0 L:None R:None>        
         
-        >>> avl.insertAtPosition(10)
+        >>> avl.createNodeAtPosition(10)
         >>> avl.rootNode
         <Node: Start:20 Height:1 L:0 R:None>
 
-        >>> avl.insertAtPosition(5)
+        >>> avl.createNodeAtPosition(5)
         >>> avl.rootNode
         <Node: Start:10 Height:1 L:0 R:0>
         
-        >>> avl.insertAtPosition(30)
+        >>> avl.createNodeAtPosition(30)
         >>> avl.rootNode
         <Node: Start:10 Height:2 L:0 R:1>
         >>> avl.rootNode.leftChild
@@ -629,6 +627,9 @@ class AVLTree(object):
         >>> n2 = tree.getNodeAfter(0.6)
         >>> n2 is n1
         True
+        
+        >>> tree.getNodeAfter(9999) is None
+        True
         '''
         def recurse(node, position):
             if node is None:
@@ -675,8 +676,14 @@ class AVLTree(object):
         
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
-        >>> tree.getNodeBefore(100)  # last node in piece
+
+        100 is beyond the end so it will get the last node in piece
+        
+        >>> tree.getNodeBefore(100)
         <Node: Start:35.0 Indices:(161:161:165:165) Length:{4}>
+        
+        >>> tree.getNodeBefore(0) is None
+        True
         '''
         def recurse(node, position):
             if node is None:
@@ -715,15 +722,15 @@ class AVLTree(object):
 
     def removeNode(self, position):
         r'''
-        Removes a node at `position` in the subtree rooted on `node`.
+        Removes a node at `position` and rebalances the tree
 
         Used internally by TimespanTree.
 
         >>> avl = timespans.core.AVLTree()
-        >>> avl.insertAtPosition(20)
-        >>> avl.insertAtPosition(10)
-        >>> avl.insertAtPosition(5)
-        >>> avl.insertAtPosition(30)
+        >>> avl.createNodeAtPosition(20)
+        >>> avl.createNodeAtPosition(10)
+        >>> avl.createNodeAtPosition(5)
+        >>> avl.createNodeAtPosition(30)
         >>> avl.rootNode
         <Node: Start:10 Height:2 L:0 R:1>
 

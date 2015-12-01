@@ -1162,6 +1162,9 @@ class PartParser(XMLParserBase):
         if instrumentObj.bestName() is not None:
             self.stream.id = instrumentObj.bestName()
         self.activeInstrument = instrumentObj
+        
+        self.stream.partName = instrumentObj.partName
+        self.stream.partAbbreviation = instrumentObj.partAbbreviation
         self.stream._insertCore(0.0, instrumentObj) # add instrument at zero offset
         
     def getDefaultInstrument(self, mxPartInfo=None):
@@ -1212,8 +1215,12 @@ class PartParser(XMLParserBase):
 
         # put part info into the instrument object and retrieve it later...
         seta(i, mxInfo, 'part-name', transform=_clean)
+        # This will later be put in part.partName also...
+        
         # TODO: partNameDisplay
         seta(i, mxInfo, 'part-abbreviation', transform=_clean)
+        # This will later be put in part.partAbbreviation also...
+        
         # TODO: partAbbreviationDisplay        
         # TODO: groups
         

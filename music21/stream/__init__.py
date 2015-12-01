@@ -3985,27 +3985,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Search this stream or activeSite streams for
         :class:`~music21.instrument.Instrument` objects, otherwise
         return a default Instrument
-
-
-        >>> s = stream.Score()
-        >>> p1 = stream.Part()
-        >>> p1.insert(instrument.Violin())
-        >>> m1p1 = stream.Measure()
-        >>> m1p1.append(note.Note('g'))
-        >>> p1.append(m1p1)
-
-        >>> p2 = stream.Part()
-        >>> p2.insert(instrument.Viola())
-        >>> m1p2 = stream.Measure()
-        >>> m1p2.append(note.Note('f#'))
-        >>> p2.append(m1p2)
-
-        >>> s.insert(0, p1)
-        >>> s.insert(0, p2)
-        >>> p1.getInstrument(returnDefault=False).instrumentName
-        'Violin'
-        >>> p2.getInstrument(returnDefault=False).instrumentName
-        'Viola'
         '''
         #environLocal.printDebug(['searching for instrument, called from:',
         #                        self])
@@ -4034,6 +4013,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if returnDefault and instObj is None:
             instObj = instrument.Instrument()
             #instObj.partId = defaults.partId # give a default id
+            # TODO: should this be changed to None? MSC 2015-12
             instObj.partName = defaults.partName # give a default id
             post.insert(0, instObj)
 
@@ -4044,6 +4024,26 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def getInstrument(self, searchActiveSite=True, returnDefault=True):
         '''
         Return the first Instrument found in this Stream.
+
+        >>> s = stream.Score()
+        >>> p1 = stream.Part()
+        >>> p1.insert(instrument.Violin())
+        >>> m1p1 = stream.Measure()
+        >>> m1p1.append(note.Note('g'))
+        >>> p1.append(m1p1)
+
+        >>> p2 = stream.Part()
+        >>> p2.insert(instrument.Viola())
+        >>> m1p2 = stream.Measure()
+        >>> m1p2.append(note.Note('f#'))
+        >>> p2.append(m1p2)
+
+        >>> s.insert(0, p1)
+        >>> s.insert(0, p2)
+        >>> p1.getInstrument(returnDefault=False).instrumentName
+        'Violin'
+        >>> p2.getInstrument(returnDefault=False).instrumentName
+        'Viola'
         '''
         post = self.getInstruments(searchActiveSite=searchActiveSite,
                                 returnDefault=returnDefault)
@@ -11827,6 +11827,117 @@ class Part(Stream):
     def __init__(self, *args, **keywords):
         Stream.__init__(self, *args, **keywords)
         self.staffLines = 5
+        self._partName = None
+        self._partAbbreviation = None
+        
+    def _getPartName(self):
+        if self._partName is not None:
+            return self._partName
+        elif '_partName' in self._cache:
+            return self._cache['_partName']
+        else:
+            pn = None
+            for e in self.recurse().getElementsByClass('Instrument'):
+                pn = e.partName
+                if pn is None:
+                    pn = e.instrumentName
+                if pn is not None:
+                    break
+            self._cache['_partName'] = pn
+            return pn
+    
+    def _setPartName(self, newName):
+        self._partName = newName
+
+    partName = property(_getPartName, _setPartName, doc='''
+        Gets or sets a string representing the name of this part
+        as a whole (not counting instrument changes, etc.).
+        
+        It can be set explicitly (or set on parsing) or it
+        can take its name from the first :class:`~music21.instrument.Instrument` object
+        encountered in the stream (or within a substream), 
+        first checking its .partName, then checking its .instrumentName
+        
+        Can also return None.
+        
+        >>> p = stream.Part()
+        >>> p.partName is None
+        True
+        >>> cl = instrument.Clarinet()
+        >>> p.insert(0, cl)
+        >>> p.partName
+        'Clarinet'
+        >>> p.remove(cl)
+        >>> p.partName is None
+        True
+        >>> p.insert(0, instrument.Flute())
+        >>> p.partName
+        'Flute'
+        >>> p.partName = 'Reed 1'
+        >>> p.partName
+        'Reed 1'
+        
+        Note that changing an instrument's .partName or .instrumentName while it
+        is already in the Stream will not automatically update this unless 
+        .elementsChanged() is called or this Stream's elements are otherwise altered.
+        This is because the value is cached so that O(n) searches through the Stream
+        do not need to be done every time.
+    ''')
+
+    def _getPartAbbreviation(self):
+        if self._partAbbreviation is not None:
+            return self._partAbbreviation
+        elif '_partAbbreviation' in self._cache:
+            return self._cache['_partAbbreviation']
+        else:
+            pn = None
+            for e in self.recurse().getElementsByClass('Instrument'):
+                pn = e.partAbbreviation
+                if pn is None:
+                    pn = e.instrumentAbbreviation
+                if pn is not None:
+                    break
+            self._cache['_partAbbreviation'] = pn
+            return pn
+    
+    def _setPartAbbreviation(self, newName):
+        self._partAbbreviation = newName
+
+    partAbbreviation = property(_getPartAbbreviation, _setPartAbbreviation, doc='''
+        Gets or sets a string representing the abbreviated name of this part
+        as a whole (not counting instrument changes, etc.).
+        
+        It can be set explicitly (or set on parsing) or it
+        can take its name from the first :class:`~music21.instrument.Instrument` object
+        encountered in the stream (or within a substream), 
+        first checking its .partAbbreviation, then checking its .instrumentAbbreviation
+        
+        Can also return None.
+        
+        >>> p = stream.Part()
+        >>> p.partAbbreviation is None
+        True
+        >>> cl = instrument.Clarinet()
+        >>> p.insert(0, cl)
+        >>> p.partAbbreviation
+        'Cl'
+        >>> p.remove(cl)
+        >>> p.partAbbreviation is None
+        True
+        >>> p.insert(0, instrument.Flute())
+        >>> p.partAbbreviation
+        'Fl'
+        >>> p.partAbbreviation = 'Rd 1'
+        >>> p.partAbbreviation
+        'Rd 1'
+        
+        Note that changing an instrument's .partAbbreviation or .instrumentAbbreviation while it
+        is already in the Stream will not automatically update this unless 
+        .elementsChanged() is called or this Stream's elements are otherwise altered.
+        This is because the value is cached so that O(n) searches through the Stream
+        do not need to be done every time.
+    ''')
+
 
     def makeAccidentals(self, alteredPitches=None,
          cautionaryPitchClass=True,

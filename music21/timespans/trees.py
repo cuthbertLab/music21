@@ -121,8 +121,8 @@ class ElementTree(core.AVLTree):
         r'''
         Two ElementTrees are equal only if their ids are equal.
         
-        (TODO: make it true only if the two have exactly identical elements unless this interferes
-        with hashing. Use "is" for this)
+        (TODO: make it true only if the two have exactly identical elements 
+        unless this interferes with hashing. Use "is" for this)
         '''
         return id(self) == id(expr)
 
@@ -202,7 +202,8 @@ class ElementTree(core.AVLTree):
 
     def __iter__(self):
         r'''
-        Iterates through all the nodes in the offset tree and returns the payload.
+        Iterates through all the nodes in the offset tree and returns each thing
+        in the payload.
 
         >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
         >>> tss = [timespans.spans.Timespan(x, y) for x, y in tsList]
@@ -390,6 +391,12 @@ class ElementTree(core.AVLTree):
         return node
 
     def _updateParents(self, oldPosition, visitedParents=None):
+        '''
+        Tells all parents that the position of this tree has
+        changed.
+        
+        Not currently used.
+        '''
         if visitedParents is None:
             visitedParents = set()
         for parent in self.parentTrees:
@@ -404,20 +411,27 @@ class ElementTree(core.AVLTree):
             parent._updateParents(parentPosition, visitedParents=visitedParents)
 
     def _removeElement(self, element, oldPosition=None):
+        '''
+        removes an element or ElementTree from a position 
+        (either its current .offset or its oldPosition) without updating
+        the indices, endTimes, etc.  
+        '''
         if oldPosition is not None:
-            offset = oldPosition
+            position = oldPosition
         else:
-            offset = element.offset
+            position = element.offset
 
-        node = self.getNodeByPosition(offset)
+        node = self.getNodeByPosition(position)
         if node is None:
             return
         if element in node.payload:
             node.payload.remove(element)
         if not node.payload:
-            self.removeNode(offset)
+            self.removeNode(position)
+
         if isinstance(element, ElementTree): # represents an embedded Stream
-            element.parentTrees.remove(self)
+            for pt in element.parentTrees:
+                pt.remove(self)
 
     ### PUBLIC METHODS ###
 
@@ -425,16 +439,24 @@ class ElementTree(core.AVLTree):
         r'''
         Creates a new offset-tree with the same payload as this offset-tree.
         
-        ???
-        Does this work.  this is a bogus test.
-
         This is analogous to `dict.copy()`.  
 
-        >>> score = corpus.parse('bwv66.6')
+        >>> score = timespans.makeExampleScore()
         >>> tree = score.asTimespans()
         >>> newTree = tree.copy()
+        >>> newTree
+        <TimespanTree {12} (0.0 to 8.0)>
+
+        >>> tree[4]
+        <ElementTimespan (2.0 to 4.0) <music21.note.Note G>>
+        >>> newTree[4]
+        <ElementTimespan (2.0 to 4.0) <music21.note.Note G>>
+        
+        >>> tree[4] is newTree[4]
+        True
         '''
         newTree = type(self)()
+        # this is just as efficient as ._insertCore, since it's given a list.
         newTree.insert([x for x in self])
         return newTree
 
@@ -554,14 +576,16 @@ class ElementTree(core.AVLTree):
         index = node.payload.index(element) + node.nodeStartIndex
         return index
 
-    def remove(self, elements, offsets=None): 
+    def remove(self, elements, offsets=None, runUpdate=True): 
         r'''
         Removes `elements` which can be Music21Objects or Timespans 
         (a single one or a list) from this Tree.
         
         Much safer (for non-timespans) if a list of offsets is used but it is optional
         
-        TODO: raise exception if elements length and offsets length differ
+        If runUpdate is False then the tree will be left with incorrect indices and
+        endTimes; but it can speed up operations where an element is going to be removed
+        and then immediately replaced: i.e., where the position of an element has changed        
         '''
         initialPosition = self.offset
         initialEndTime = self.endTime
@@ -580,12 +604,13 @@ class ElementTree(core.AVLTree):
                 self._removeElement(el, offsets[i]) 
             else:
                 self._removeElement(el)
-                
-        self._updateIndices(self.rootNode)
-        self._updateEndTimes(self.rootNode)
-        if (self.offset != initialPosition or
-                self.endTime != initialEndTime):
-            self._updateParents(initialPosition)
+        
+        if runUpdate:
+            self._updateIndices(self.rootNode)
+            self._updateEndTimes(self.rootNode)
+            if (self.offset != initialPosition or
+                    self.endTime != initialEndTime):
+                self._updateParents(initialPosition)
 
     def insert(self, offsetsOrElements, elements=None):
         r'''
@@ -596,6 +621,14 @@ class ElementTree(core.AVLTree):
         >>> et.insert(10.0, n)
         >>> et
         <ElementTree {1} (10.0 to 11.0)>
+        
+        >>> n2 = note.Note('D')
+        >>> n2.offset = 20
+        >>> n3 = note.Note('E')
+        >>> n3.offset = 5
+        >>> et.insert([n2, n3])
+        >>> et
+        <ElementTree {3} (5.0 to 21.0)>
         '''
         initialPosition = self.offset
         initialEndTime = self.endTime
@@ -624,6 +657,10 @@ class ElementTree(core.AVLTree):
             self._updateParents(initialPosition)
 
     def _insertCore(self, offset, el):
+        '''
+        Inserts a single element at an offset, creating new nodes as necessary,
+        but does not updateIndices or updateEndTimes or updateParents
+        '''
         def key(x):
             try:
                 return x.sortTuple()[2:] # cut off atEnd and offset
@@ -635,7 +672,7 @@ class ElementTree(core.AVLTree):
                 else:
                     return x.endTime  # ElementTimespan with no Element!
                 
-        self.insertAtPosition(offset)
+        self.createNodeAtPosition(offset)
         node = self.getNodeByPosition(offset)
         node.payload.append(el)
         node.payload.sort(key=key)
@@ -839,6 +876,7 @@ class ElementTree(core.AVLTree):
             return result
         return tuple(sorted(recurse(self.rootNode)))
 
+#----------------------------------------------------------------
 
 class TimespanTree(ElementTree):
     r'''
@@ -1375,12 +1413,19 @@ class TimespanTree(ElementTree):
                 self.insert(shards)
 
     def toPartwiseTimespanTrees(self):
+        '''
+        Returns a dictionary of TimespanTrees where each entry
+        is indexed by a Part object (TODO: Don't use mutable objects as hash keys!)
+        and each key is a TimeSpan tree containing only element timespans belonging
+        to that part.
+        
+        Used by reduceChords.  May disappear.
+        '''
         partwiseTimespanTrees = {}
         for part in self.allParts:
             partwiseTimespanTrees[part] = TimespanTree()
         for elementTimespan in self:
-            partwiseTimespanTree = partwiseTimespanTrees[
-                elementTimespan.part]
+            partwiseTimespanTree = partwiseTimespanTrees[elementTimespan.part]
             partwiseTimespanTree.insert(elementTimespan)
         return partwiseTimespanTrees
 
@@ -1396,7 +1441,7 @@ class TimespanTree(ElementTree):
         >>> verticalities = next(iterator)
         >>> unwrapped = tree.unwrapVerticalities(verticalities)
         >>> for part in sorted(unwrapped,
-        ...     key=lambda x: x.getInstrument().partName,
+        ...     key=lambda x: x.partName,
         ...     ):
         ...     print(part)
         ...     horizontality = unwrapped[part]

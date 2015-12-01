@@ -20,15 +20,20 @@ environLocal = environment.Environment(_MOD)
 
 
 def ex01(show=True, *arguments, **keywords):
-    # This example extracts first a part, then a measure from a complete score. Next, pitches are isolated from this score as pitch classes. Finally, consecutive pitches from this measure are extracted, made into a chord, and shown to be a dominant seventh chord. 
-    
+    '''
+    This example extracts first a part, then a measure from a complete score. 
+    Next, pitches are isolated from this score as pitch classes. 
+    Finally, consecutive pitches from this measure are extracted, made into a chord, 
+    and shown to be a dominant seventh chord. 
+    '''
 
     if 'op133' in keywords.keys():
         sStream = keywords['op133']
     else:
         sStream = corpus.parse('opus133.xml') # load a MusicXML file
 
-    v2Part = sStream[1].getElementsByClass('Measure') # get all measures from the second violin
+    v2Part = sStream.parts[1].getElementsByClass('Measure') 
+    # get all measures from the second violin
     if show:
         v2Part[48].show() # render the 48th measure as notation
     
@@ -49,18 +54,21 @@ def ex01(show=True, *arguments, **keywords):
 
 
 def ex02(show=True, *arguments, **keywords):
+    '''
+    This example searches the second violin part for adjacent non-redundant 
+    pitch classes that form dominant seventh chords.
+    '''
 
-    
-    # This example searches the second violin part for adjacent non-redundant pitch classes that form dominant seventh chords.
-    
     if 'op133' in keywords.keys():
         sStream = keywords['op133']
     else:
         sStream = corpus.parse('opus133.xml') # load a MusicXML file
 
-    v2Part = sStream[1].getElementsByClass('Measure') # get all measures from the first violin
+    v2Part = sStream.parts[1].getElementsByClass('Measure') 
+        # get all measures from the second violin
     
-    # First, collect all non-redundant adjacent pitch classes, and store these pitch classes in a list. 
+    # First, collect all non-redundant adjacent pitch classes, and 
+    # store these pitch classes in a list. 
     pitches = []
     for i in range(len(v2Part.pitches)):
         pn = v2Part.pitches[i].name
@@ -69,7 +77,8 @@ def ex02(show=True, *arguments, **keywords):
         else: 
             pitches.append(pn)
     
-    # Second, compare all adjacent four-note groups of pitch classes and determine which are dominant sevenths; store this in a list and display the results. 
+    # Second, compare all adjacent four-note groups of pitch classes and 
+    # determine which are dominant sevenths; store this in a list and display the results. 
     found = stream.Stream()
     for i in range(len(pitches)-3):
         testChord = chord.Chord(pitches[i:i+4])
@@ -91,7 +100,7 @@ def ex03(show=True, *arguments, **keywords):
 
     # Create a graph of pitch class for the first and second part
     for part in [sStream[0], sStream[1]]:
-        g = graph.PlotHistogramPitchClass(part, title=part.getInstrument().partName)
+        g = graph.PlotHistogramPitchClass(part, title=part.partName)
         if show:
             g.process()
 
@@ -100,21 +109,23 @@ def ex03(show=True, *arguments, **keywords):
 
 
 def ex04(show=True, *arguments, **keywords):
-    
-    # This example, by graphing pitch class over note offset, shows the usage of pitch classes in the violoncello part over the duration of the composition. While the display is coarse, it is clear that the part gets less chromatic towards the end of the work.
-    
+    '''
+    This example, by graphing pitch class over note offset, 
+    shows the usage of pitch classes in the violoncello part 
+    over the duration of the composition. While the display is coarse, 
+    it is clear that the part gets less chromatic towards the end of the work.
+    '''
     if 'op133' in keywords.keys():
         sStream = keywords['op133']
     else:
         sStream = corpus.parse('opus133.xml') # load a MusicXML file
 
-    # note: measure numbers are not being shown correcntly
+    # note: measure numbers are not being shown correctly
     # need to investigate
-    part = sStream[3]
+    part = sStream.parts[3]
 
 
-    g = graph.PlotScatterPitchClassOffset(part.flat,
-                 title=part.getInstrument().partName)
+    g = graph.PlotScatterPitchClassOffset(part.flat, title=part.partName)
     if show:
         g.process()
 
@@ -130,7 +141,8 @@ def ex01Alt(show=True, *arguments, **keywords):
         sStream = keywords['op133']
     else:
         sStream = corpus.parse('opus133.xml') # load a MusicXML file
-    v2Part = sStream[1].getElementsByClass('Measure') # get all measures from the second violin
+    v2Part = sStream.parts[1].getElementsByClass('Measure') 
+        # get all measures from the second violin
 
     if show:
         v2Part[45].show() # render the 48th measure as notation
@@ -161,7 +173,7 @@ def findHighestNotes(show=True, *arguments, **keywords):
                     highestNote.duration.linked = False
                     highestNote.quarterLength = 4.0
                     highestNote.lyric = '%s: M. %s: beat %s' % (
-                        part.getInstrument().partName[0], m.number, ts.getBeat(n.offset))
+                        part.partName[0], m.number, ts.getBeat(n.offset))
         found.append(highestNote)
 
     if show:
@@ -178,15 +190,18 @@ def ex1_revised(show=True, *arguments, **keywords):
     #  so part 0 = violin 1, part 1 = violin 2, etc.
     display = stream.Stream() # an empty container for filling with found notes
     for thisMeasure in violin2.getElementsByClass('Measure'):
-        notes = thisMeasure.findConsecutiveNotes(skipUnisons = True, 
-                      skipChords = True,
-                       skipOctaves = True, skipRests = True, noNone = True )
+        notes = thisMeasure.findConsecutiveNotes(skipUnisons=True, 
+                                                 skipChords=True,
+                                                 skipOctaves=True, 
+                                                 skipRests=True, 
+                                                 noNone=True )
         pitches = [n.pitch for n in notes]
         for i in range(len(pitches) - 3):
             testChord = chord.Chord(pitches[i:i+4])
             testChord.duration.type = "whole"
             if testChord.isDominantSeventh() is True:
-                # since a chord was found in this measure, append the found pitches in closed position
+                # since a chord was found in this measure, 
+                # append the found pitches in closed position
                 testChord.lyric = "m. " + str(thisMeasure.number)
                 emptyMeasure = stream.Measure()
                 emptyMeasure.append(testChord.closedPosition())
@@ -203,7 +218,7 @@ def ex1_revised(show=True, *arguments, **keywords):
     if show:
         display.show('musicxml')
     
-def findPotentialPassingTones(show = True):
+def findPotentialPassingTones(show=True):
     g = corpus.parse('gloria')
     gcn = g.parts['cantus'].measures(1,126).flat.notesAndRests
 
@@ -212,26 +227,27 @@ def findPotentialPassingTones(show = True):
     for i in range(1, len(gcn) - 1):
         prev = gcn[i-1]
         cur  = gcn[i]
-        next = gcn[i+1]  # @ReservedAssignment
+        nextN = gcn[i+1]  
         
         cur.lyric = ""
         
-        if "Rest" in prev.classes or "Rest" in cur.classes \
-            or "Rest" in next.classes:
+        if ("Rest" in prev.classes or 
+            "Rest" in cur.classes or 
+            "Rest" in nextN.classes):
             continue
         
         int1 = interval.notesToInterval(prev, cur)
         if int1.isStep is False:
             continue
         
-        int2 = interval.notesToInterval(cur, next)
+        int2 = interval.notesToInterval(cur, nextN)
         if int2.isStep is False:
             continue
             
         cma = cur.beatStrength 
-        if cma < 1 and \
-            cma <= prev.beatStrength and \
-            cma <= next.beatStrength: 
+        if (cma < 1 and 
+            cma <= prev.beatStrength and
+            cma <= nextN.beatStrength): 
 
             if int1.direction == int2.direction:
                 cur.lyric = 'pt' # neighbor tone
@@ -278,7 +294,9 @@ def corpusMelodicIntervalSearch(show = True):
                 seventhCount += intervalDict[key][1] 
 
         pcentSevenths = round(((seventhCount / float(intervalCount)) * 100), 4)
-        msg.append('locale: %s: found %s percent melodic sevenths, out of %s intervals in %s works' % (name, pcentSevenths, intervalCount, workCount))
+        msg.append(
+            'locale: %s: found %s percent melodic sevenths, out of %s intervals in %s works' % (
+                                                name, pcentSevenths, intervalCount, workCount))
 #         for key in sorted(intervalDict.keys()):
 #             print intervalDict[key]
 
@@ -317,7 +335,9 @@ def corpusMelodicIntervalSearchBrief(show=False):
             if key in ['m7', 'M7']:
                 seventhCount += intervalDict[key][1]
         pcentSevenths = round((seventhCount / float(intervalCount) * 100), 4)
-        message.append('locale: %s: found %s percent melodic sevenths, out of %s intervals in %s works' % (region, pcentSevenths, intervalCount, workCount))
+        message.append(
+            'locale: %s: found %s percent melodic sevenths, out of %s intervals in %s works' % (
+                        region, pcentSevenths, intervalCount, workCount))
     if show == True:
         for sub in message: 
             print (sub)
@@ -441,7 +461,8 @@ class Test(unittest.TestCase):
         #sStream = corpus.parse('opus133.xml') # load a MusicXML file
         # ex03, ex01, ex02, ex04, ex01Alt, findHighestNotes,ex1_revised
         #for func in [findPotentialPassingTones]:
-        for func in [findHighestNotes, demoJesse, corpusMelodicIntervalSearchBrief, findPotentialPassingTones]:
+        for func in [findHighestNotes, demoJesse, 
+                     corpusMelodicIntervalSearchBrief, findPotentialPassingTones]:
 
             #func(show=False, op133=sStream)
             func(show=False)

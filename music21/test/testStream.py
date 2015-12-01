@@ -757,6 +757,7 @@ class Test(unittest.TestCase):
         # self.assertEqual(b.activeSite, None)
         instObj = b.getInstrument()
         self.assertEqual(instObj.partName, u'Violone e Organo')
+        self.assertEqual(b.partName, u'Violone e Organo')
 
 
 

@@ -76,7 +76,7 @@ class wwnortonExercise(object):
             el.offset = 0
         #self.modifiedExercise.show('text')
 
-    def _updatepn(self,newPartNum,direction):
+    def _updatepn(self, newPartNum, direction):
         for partName in self.pn:
             existingPartNum = self.pn[partName]
             if existingPartNum > newPartNum:
@@ -88,7 +88,7 @@ class wwnortonExercise(object):
             self.pn[partName] = shiftedPartNum   
 
     def addMarkerPartFromExisting(self, existingPartName, newPartName, newPartTitle="", 
-                                  direction = "below", rhythmType="copy", color=None):
+                                  direction="below", rhythmType="copy", color=None):
         partNum = self.pn[existingPartName]
         
         self._partOffsetsToPartIndecies()

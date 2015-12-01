@@ -3,7 +3,8 @@
 # Name:         reduceChords.py
 # Purpose:      Tools for eliminating passing chords, etc.
 #
-# Authors:      Michael Scott Cuthbert, Josiah Wolf Oberholtzer
+# Authors:      Josiah Wolf Oberholtzer
+#               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
@@ -23,6 +24,8 @@ from music21 import meter
 from music21 import note
 from music21 import pitch
 from music21 import stream
+from music21 import timespans
+
 #from music21 import tie
 
 environLocal = environment.Environment('reduceChords')
@@ -72,20 +75,14 @@ class ChordReducer(object):
         self.positionInMeasure = None
         self.numberOfElementsInMeasure = None
 
-    def run(
-        self,
-        inputScore,
-        allowableChords=None,
-        closedPosition=False,
-        forbiddenChords=None,
-        maximumNumberOfChords=3,
-        ):
-        from music21.stream import timespans
+    def run(self,
+            inputScore,
+            allowableChords=None,
+            closedPosition=False,
+            forbiddenChords=None,
+            maximumNumberOfChords=3):
         if 'Score' not in inputScore.classes:
             raise ChordReducerException("Must be called on a stream.Score")
-
-        tree = timespans.streamToTimespanTree(inputScore, flatten=True, 
-                                              classList=(note.Note, chord.Chord))
 
         if allowableChords is not None:
             if not all(isinstance(x, chord.Chord) for x in allowableChords):
@@ -105,13 +102,15 @@ class ChordReducer(object):
                 intervalClassSets.append(intervalClassSet)
             forbiddenChords = frozenset(intervalClassSets)
 
+        tree = timespans.streamToTimespanTree(inputScore, 
+                                              flatten=True, 
+                                              classList=(note.Note, chord.Chord))
+
         self.removeZeroDurationTimespans(tree)
         self.splitByBass(tree)
-        self.removeVerticalDissonances(
-            tree=tree,
-            allowableChords=allowableChords,
-            forbiddenChords=forbiddenChords,
-            )
+        self.removeVerticalDissonances(tree=tree,
+                                       allowableChords=allowableChords,
+                                       forbiddenChords=forbiddenChords)
 
         partwiseTrees = tree.toPartwiseTimespanTrees()
 
