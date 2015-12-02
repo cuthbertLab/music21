@@ -122,12 +122,8 @@ class ElementTree(core.AVLTree):
 
     def __eq__(self, expr):
         r'''
-        Two ElementTrees are equal only if their ids are equal.
-        
-        (TODO: make it true only if the two have exactly identical elements 
-        unless this interferes with hashing. Use "is" for this)
-        '''
-        return id(self) == id(expr)
+        Two ElementTrees are equal only if they are the same object'''
+        return self is expr
 
     def __getitem__(self, i):
         r'''
@@ -328,6 +324,23 @@ class ElementTree(core.AVLTree):
         return result
 
     ### PRIVATE METHODS ###
+    def _updateNodes(self, initialPosition=None, initialEndTime=None, visitedParents=None):
+        '''
+        runs updateIndices and updateEndTimes on the rootNode
+        and if the offset or endTime of the tree differs from
+        `initialPosition` or `initialEndTime` will run _updateParents()
+        as well.
+        
+        Called by insert() and remove().
+        '''
+        if self.rootNode is not None:
+            self.rootNode.updateIndices()
+            self.rootNode.updateEndTimes()
+        
+        if (self.offset != initialPosition or
+                self.endTime != initialEndTime):
+            self._updateParents(initialPosition, visitedParents=visitedParents)
+    
     def _updateParents(self, oldPosition, visitedParents=None):
         '''
         Tells all parents that the position of this tree has
@@ -345,11 +358,7 @@ class ElementTree(core.AVLTree):
             parent._removeElement(self, oldPosition=oldPosition)
             parent._insertCore(self.offset, self)
             
-            if parent.rootNode is not None:
-                parent.rootNode.updateIndices()
-                parent.rootNode.updateEndTimes()
-
-            parent._updateParents(parentPosition, visitedParents=visitedParents)
+            parent._updateNodes(parentPosition, visitedParents=visitedParents)
 
     def _removeElement(self, element, oldPosition=None):
         '''
@@ -560,13 +569,8 @@ class ElementTree(core.AVLTree):
                 self._removeElement(el)
         
         if runUpdate:
-            if self.rootNode is not None:
-                self.rootNode.updateIndices()
-                self.rootNode.updateEndTimes()
-            
-            if (self.offset != initialPosition or
-                    self.endTime != initialEndTime):
-                self._updateParents(initialPosition)
+            self._updateNodes(initialPosition, initialEndTime)
+
 
     def insert(self, offsetsOrElements, elements=None):
         r'''
@@ -609,13 +613,7 @@ class ElementTree(core.AVLTree):
         for i, el in enumerate(elements):
             self._insertCore(offsets[i], el)
         
-        if self.rootNode is not None:
-            self.rootNode.updateIndices()
-            self.rootNode.updateEndTimes()
-        
-        if (self.offset != initialPosition or 
-                self.endTime != initialEndTime):
-            self._updateParents(initialPosition)
+        self._updateNodes(initialPosition, initialEndTime)
 
     def _insertCore(self, offset, el):
         '''
@@ -644,18 +642,17 @@ class ElementTree(core.AVLTree):
             el.parentTrees.add(self)
 
     def append(self, el):
+        '''
+        Add an element to the end, making certain speed savings.
+        '''
         initialPosition = self.offset # will only change if is empty
         endTime = self.latestEndTime
         if endTime == INFINITY:
             endTime = 0
         self._insertCore(endTime, el)
         
-        if self.rootNode is not None:
-            self.rootNode.updateIndices()
-            self.rootNode.updateEndTimes()
-
-        self._updateParents(initialPosition)
-
+        self._updateNodes(initialPosition, initialEndTime=None)
+        
     ### PROPERTIES ###
     @property
     def offset(self):
@@ -958,7 +955,7 @@ class TimespanTree(OffsetTree):
     ...     tree,
     ...     templateStream=bach,
     ...     )
-    >>> newBach.parts[1].measure(7).show('text')
+    >>> newBach.parts['Alto'].measure(7).show('text')
     {0.0} <music21.chord.Chord F#4>
     {1.5} <music21.chord.Chord F#3>
     {2.0} <music21.chord.Chord C#4>
@@ -966,10 +963,6 @@ class TimespanTree(OffsetTree):
     The second F# is an octave lower, so it wouldn't get merged even if
     adjacent notes were fused together (which they're not).
     
-    
-    TODO: newBach.parts['Alto'].measure(7).show('text') should work.
-    KeyError: 'provided key (Alto) does not match any id or group'
-
     ..  note::
 
         TimespanTree is an implementation of an extended AVL tree. AVL

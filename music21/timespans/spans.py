@@ -18,6 +18,7 @@ organized by start and stop offsets.
 import unittest
 
 from music21 import exceptions21
+from music21 import meter
 
 from music21.exceptions21 import TimespanException
 from music21 import environment
@@ -447,10 +448,21 @@ class PitchedTimespan(Timespan):
         Create a new object that is identical to the calling object
         but with some of the parameters overridden.
         
-        TODO: Docs and Tests
+        >>> n = note.Note("C#")
+        >>> pts = timespans.spans.PitchedTimespan(n, offset=11.0, endTime=12.0)
+        >>> pts
+        <PitchedTimespan (11.0 to 12.0) <music21.note.Note C#>>
+        >>> pts2 = pts.new(endTime=13.0)
+        >>> pts2
+        <PitchedTimespan (11.0 to 13.0) <music21.note.Note C#>>
+        >>> pts.element is pts2.element
+        True
         '''
         if beatStrength is None:
-            beatStrength = self.beatStrength
+            try:
+                beatStrength = self.beatStrength
+            except exceptions21.Music21Exception:
+                beatStrength = None
         element = element or self.element
         if parentOffset is None:
             parentOffset = self.parentOffset
@@ -485,24 +497,62 @@ class PitchedTimespan(Timespan):
         information from the old PitchedTimespan but change the start offset to
         reflect that of another timespan.
         
-        TODO: Tests
+        >>> n = note.Note('D-')
+        >>> ts = meter.TimeSignature('4/4')
+        >>> s = stream.Stream()
+        >>> s.insert(0.0, ts)
+        >>> s.insert(1.0, n)
+        >>> pts = timespans.spans.PitchedTimespan(n, offset=1.0, endTime=2.0)
+        >>> pts
+        <PitchedTimespan (1.0 to 2.0) <music21.note.Note D->>
+        >>> pts.beatStrength
+        0.25
+        >>> n.beatStrength
+        0.25
+        
+        >>> pts2 = pts.new(beatStrength=1.0, offset=0.0)
+        >>> pts2
+        <PitchedTimespan (0.0 to 2.0) <music21.note.Note D->>
+        >>> pts2.beatStrength
+        1.0
+        >>> pts2.element.beatStrength
+        0.25
         '''
-        from music21 import meter
         if self._beatStrength is not None:
             return self._beatStrength
         elif self._element is None:
             return None
         try:
             return self._element.beatStrength
-        except meter.MeterException as e:
-            environLocal.warn("Could not get a beatStrength from %r: %s" % (self._element, e))
+        except meter.MeterException:
+            #environLocal.warn("Could not get a beatStrength from %r: %s" % (self._element, e))
             return None
 
     @property
     def quarterLength(self):
         '''
-        TODO: Tests that show a case where this might be different from the quarterLength
-        of the element.
+        The quarterLength of the Timespan, which, due to manipulation, may be different
+        from that of the element.
+        
+        >>> n = note.Note('D-')
+        >>> n.offset = 1.0
+        >>> n.duration.quarterLength = 2.0
+
+        >>> pts = timespans.spans.PitchedTimespan(n, offset=n.offset, endTime=3.0)
+        >>> pts
+        <PitchedTimespan (1.0 to 3.0) <music21.note.Note D->>
+        >>> pts.quarterLength
+        2.0
+        >>> n.duration.quarterLength
+        2.0
+        
+        >>> pts2 = pts.new(offset=0.0)
+        >>> pts2
+        <PitchedTimespan (0.0 to 3.0) <music21.note.Note D->>
+        >>> pts2.quarterLength
+        3.0
+        >>> pts2.element.duration.quarterLength
+        2.0
         '''
         return self.endTime - self.offset
 
@@ -625,8 +675,17 @@ class PitchedTimespan(Timespan):
 
         This treats notes as chords.
         
-        TODO: tests, examples of usage.
-        TODO: by sorting are we losing information about overlaps?
+        >>> c = chord.Chord('C4 E4 G4')
+        >>> pts = timespans.spans.PitchedTimespan(c, offset=0.0, endTime=1.0)
+        >>> pts.pitches
+        (<music21.pitch.Pitch C4>, <music21.pitch.Pitch E4>, <music21.pitch.Pitch G4>)
+        
+        Perhaps remove? except for this case:
+        
+        >>> d = dynamics.Dynamic('f')
+        >>> pts2 = timespans.spans.PitchedTimespan(d, offset=0.0, endTime=10.0)
+        >>> pts2.pitches
+        ()
         '''
         result = []
         if hasattr(self.element, 'pitches'):
