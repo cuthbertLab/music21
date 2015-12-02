@@ -328,46 +328,6 @@ class ElementTree(core.AVLTree):
         return result
 
     ### PRIVATE METHODS ###
-    def _updateIndices(self, node):
-        r'''
-        Traverses the tree structure and updates cached indices which keep
-        track of the index of the element stored at each node, and of the
-        maximum and minimum indices of the subtrees rooted at each node.
-
-        Used internally by ElementTree.
-
-        Returns None.
-        '''
-        def recurseUpdateIndices(node, parentStopIndex=None):
-            if node is None:
-                return None
-            if node.leftChild is not None:
-                recurseUpdateIndices(
-                    node.leftChild,
-                    parentStopIndex=parentStopIndex,
-                    )
-                node.payloadElementIndex = node.leftChild.subtreeElementsStopIndex
-                node.subtreeElementsStartIndex = node.leftChild.subtreeElementsStartIndex
-            elif parentStopIndex is None:
-                node.payloadElementIndex = 0
-                node.subtreeElementsStartIndex = 0
-            else:
-                node.payloadElementIndex = parentStopIndex
-                node.subtreeElementsStartIndex = parentStopIndex
-            
-            if node.payload is None:
-                payloadLen = 0
-            else:
-                payloadLen = 1 
-            node.subtreeElementsStopIndex = node.payloadElementIndex + payloadLen
-            if node.rightChild is not None:
-                recurseUpdateIndices(
-                    node.rightChild,
-                    parentStopIndex=node.payloadElementIndex + payloadLen,
-                    )
-                node.subtreeElementsStopIndex = node.rightChild.subtreeElementsStopIndex
-        recurseUpdateIndices(node)
-
     def _updateEndTimes(self, node):
         r'''
         Traverses the tree structure and updates cached maximum and minimum
@@ -422,7 +382,10 @@ class ElementTree(core.AVLTree):
             parentPosition = parent.offset
             parent._removeElement(self, oldPosition=oldPosition)
             parent._insertCore(self.offset, self)
-            parent._updateIndices(parent.rootNode)
+            
+            if parent.rootNode is not None:
+                parent.rootNode.updateIndices()
+            
             parent._updateEndTimes(parent.rootNode)
             parent._updateParents(parentPosition, visitedParents=visitedParents)
 
@@ -635,7 +598,9 @@ class ElementTree(core.AVLTree):
                 self._removeElement(el)
         
         if runUpdate:
-            self._updateIndices(self.rootNode)
+            if self.rootNode is not None:
+                self.rootNode.updateIndices()
+
             self._updateEndTimes(self.rootNode)
             if (self.offset != initialPosition or
                     self.endTime != initialEndTime):
@@ -681,7 +646,10 @@ class ElementTree(core.AVLTree):
         
         for i, el in enumerate(elements):
             self._insertCore(offsets[i], el)
-        self._updateIndices(self.rootNode)
+        
+        if self.rootNode is not None:
+            self.rootNode.updateIndices()
+
         self._updateEndTimes(self.rootNode)
         if (self.offset != initialPosition or 
                 self.endTime != initialEndTime):
@@ -719,7 +687,10 @@ class ElementTree(core.AVLTree):
         if endTime == INFINITY:
             endTime = 0
         self._insertCore(endTime, el)
-        self._updateIndices(self.rootNode)
+        
+        if self.rootNode is not None:
+            self.rootNode.updateIndices()
+
         self._updateEndTimes(self.rootNode)
         self._updateParents(initialPosition)
 
@@ -902,45 +873,6 @@ class OffsetTree(ElementTree):
         super(OffsetTree, self).__init__(elements, source)
 
     ### PRIVATE METHODS ###
-    def _updateIndices(self, node):
-        r'''
-        Traverses the tree structure and updates cached indices which keep
-        track of the index of the elements stored at each node, and of the
-        maximum and minimum indices of the subtrees rooted at each node.
-
-        Indices keep track of the order of the elements in the Payload, not the
-        order of nodes.
-
-        Used internally by OffsetTree.
-
-        Returns None.
-        '''
-        def recurseUpdateIndices(node, parentStopIndex=None):
-            if node is None:
-                return
-            if node.leftChild is not None:
-                recurseUpdateIndices(
-                    node.leftChild,
-                    parentStopIndex=parentStopIndex,
-                    )
-                node.payloadElementsStartIndex = node.leftChild.subtreeElementsStopIndex
-                node.subtreeElementsStartIndex = node.leftChild.subtreeElementsStartIndex
-            elif parentStopIndex is None:
-                node.payloadElementsStartIndex = 0
-                node.subtreeElementsStartIndex = 0
-            else:
-                node.payloadElementsStartIndex = parentStopIndex
-                node.subtreeElementsStartIndex = parentStopIndex
-            node.payloadElementsStopIndex = node.payloadElementsStartIndex + len(node.payload)
-            node.subtreeElementsStopIndex = node.payloadElementsStopIndex
-            if node.rightChild is not None:
-                recurseUpdateIndices(
-                    node.rightChild,
-                    parentStopIndex=node.payloadElementsStopIndex,
-                    )
-                node.subtreeElementsStopIndex = node.rightChild.subtreeElementsStopIndex
-        recurseUpdateIndices(node)
-
     def _updateEndTimes(self, node):
         r'''
         Traverses the tree structure and updates cached maximum and minimum

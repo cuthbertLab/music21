@@ -119,6 +119,41 @@ class ElementNode(core.AVLNode):
             self.payload,
             )
 
+    def updateIndices(self, parentStopIndex=None):
+        r'''
+        Updates the payloadElementIndex, and the subtreeElementsStartIndex and 
+        subtreeElementsStopIndex (and does so for all child nodes) by traversing 
+        the tree structure.
+        
+        Updates cached indices which keep
+        track of the index of the element stored at each node, and of the
+        minimum and maximum indices of the subtrees rooted at each node.
+
+        Called on rootNode of a tree that uses ElementNodes, such as ElementTree
+
+        Returns None.
+        '''
+        if self.leftChild is not None:
+            self.leftChild.updateIndices(parentStopIndex=parentStopIndex)
+            self.payloadElementIndex = self.leftChild.subtreeElementsStopIndex
+            self.subtreeElementsStartIndex = self.leftChild.subtreeElementsStartIndex
+        elif parentStopIndex is None:
+            self.payloadElementIndex = 0
+            self.subtreeElementsStartIndex = 0
+        else:
+            self.payloadElementIndex = parentStopIndex
+            self.subtreeElementsStartIndex = parentStopIndex
+        
+        if self.payload is None:
+            payloadLen = 0
+        else:
+            payloadLen = 1 
+        self.subtreeElementsStopIndex = self.payloadElementIndex + payloadLen
+        if self.rightChild is not None:
+            self.rightChild.updateIndices(parentStopIndex=self.subtreeElementsStopIndex)
+            self.subtreeElementsStopIndex = self.rightChild.subtreeElementsStopIndex
+
+
 #------------------------------------------------------------------------------
 class OffsetNode(ElementNode):
     r'''
@@ -312,6 +347,40 @@ class OffsetNode(ElementNode):
             self.subtreeElementsStopIndex,
             len(self.payload),
             )
+
+    ### PUBLIC METHODS ###
+
+    def updateIndices(self, parentStopIndex=None):
+        r'''
+        Updates the payloadElementsStartIndex, the paylodElementsStopIndex 
+        and the subtreeElementsStartIndex and 
+        subtreeElementsStopIndex (and does so for all child nodes) by traversing 
+        the tree structure.
+        
+        Updates cached indices which keep
+        track of the index of the element stored at each node, and of the
+        minimum and maximum indices of the subtrees rooted at each node.
+
+        Called on rootNode of a tree that uses OffsetNodes, such as OffsetTree
+        or TimespanTree
+
+        Returns None.
+        '''
+        if self.leftChild is not None:
+            self.leftChild.updateIndices(parentStopIndex=parentStopIndex)
+            self.payloadElementsStartIndex = self.leftChild.subtreeElementsStopIndex
+            self.subtreeElementsStartIndex = self.leftChild.subtreeElementsStartIndex
+        elif parentStopIndex is None:
+            self.payloadElementsStartIndex = 0
+            self.subtreeElementsStartIndex = 0
+        else:
+            self.payloadElementsStartIndex = parentStopIndex
+            self.subtreeElementsStartIndex = parentStopIndex
+        self.payloadElementsStopIndex = self.payloadElementsStartIndex + len(self.payload)
+        self.subtreeElementsStopIndex = self.payloadElementsStopIndex
+        if self.rightChild is not None:
+            self.rightChild.updateIndices(parentStopIndex=self.payloadElementsStopIndex)
+            self.subtreeElementsStopIndex = self.rightChild.subtreeElementsStopIndex
 
     def payloadEndTimes(self):
         '''
