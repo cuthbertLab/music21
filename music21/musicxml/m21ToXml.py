@@ -1887,7 +1887,7 @@ class PartExporter(XMLExporterBase):
 
         
         mxPartName = SubElement(mxScorePart, 'part-name')
-        if self.stream.partName is not None:
+        if hasattr(self.stream, 'partName') and self.stream.partName is not None:
             mxPartName.text = self.stream.partName
         else:
             mxPartName.text = defaults.partName

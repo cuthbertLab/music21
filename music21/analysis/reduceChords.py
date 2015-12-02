@@ -155,8 +155,8 @@ class ChordReducer(object):
     def _debug(tree):
         for part, subtree in tree.toPartwiseTimespanTrees().items():
             print(part)
-            timespans = [x for x in subtree]
-            for timespan in timespans:
+            timespanList = [x for x in subtree]
+            for timespan in timespanList:
                 print('\t', timespan)
             overlap = subtree.maximumOverlap
             if 1 < overlap:
@@ -253,17 +253,17 @@ class ChordReducer(object):
             #        ):
             #        continue
             horizontalities = tree.unwrapVerticalities(verticalities)
-            for unused_part, timespans in horizontalities.items():
-                if len(timespans) < 2:
+            for unused_part, timespanList in horizontalities.items():
+                if len(timespanList) < 2:
                     continue
-                elif timespans[0].pitches == timespans[1].pitches:
+                elif timespanList[0].pitches == timespanList[1].pitches:
                     continue
-                bothPitches = timespans[0].pitches + timespans[1].pitches
+                bothPitches = timespanList[0].pitches + timespanList[1].pitches
                 sumChord = chord.Chord(bothPitches)
-                tree.remove(timespans)
-                merged = timespans[0].new(
+                tree.remove(timespanList)
+                merged = timespanList[0].new(
                     element=sumChord,
-                    endTime=timespans[1].endTime,
+                    endTime=timespanList[1].endTime,
                     )
                 tree.insert(merged)
 
@@ -333,8 +333,8 @@ class ChordReducer(object):
             verticality = tree.getVerticalityAt(timespan.offset)
             return verticality.bassTimespan
         for unused_part, subtree in partwiseTrees.items():
-            timespans = [x for x in subtree]
-            for bassTimespan, group in itertools.groupby(timespans, procedure):
+            timespanList = [x for x in subtree]
+            for bassTimespan, group in itertools.groupby(timespanList, procedure):
                 group = list(group)
 
                 if bassTimespan is None:
@@ -443,8 +443,8 @@ class ChordReducer(object):
             return measureNumber, pitches
         mapping = tree.toPartwiseTimespanTrees()
         subtree = mapping[part]
-        timespans = [x for x in subtree]
-        for unused_key, group in itertools.groupby(timespans, procedure):
+        timespanList = [x for x in subtree]
+        for unused_key, group in itertools.groupby(timespanList, procedure):
             #measureNumber, pitches = key
             group = list(group)
             if len(group) == 1:

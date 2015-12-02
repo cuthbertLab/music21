@@ -69,20 +69,20 @@ class ElementTree(core.AVLTree):
     nodeClass = nodeModule.OffsetNode
 
     __slots__ = (
-        '_origin',
+        '_source',
         'parentTrees',
         )
 
     ### INITIALIZER ###
 
-    def __init__(self, elements=None, origin=None):
+    def __init__(self, elements=None, source=None):
         super(ElementTree, self).__init__()
         self.parentTrees = weakref.WeakSet()
-        self._origin = None
+        self._source = None
         if elements and elements is not None:
             self.insert(elements)
             
-        self.origin = origin
+        self.source = source
     
     ## Special Methods ##
     def __contains__(self, element):
@@ -264,7 +264,7 @@ class ElementTree(core.AVLTree):
         return not self == expr
 
     def __repr__(self):
-        o = self.origin
+        o = self.source
         if o is None:
             return '<{} {{{}}} ({!r} to {!r})>'.format(
                 type(self).__name__,
@@ -675,8 +675,8 @@ class ElementTree(core.AVLTree):
             except AttributeError:
                 if hasattr(x, 'element'):
                     return x.element.sortTuple()[2:]
-                elif isinstance(x, TimespanTree) and x.origin is not None:
-                    return x.origin.sortTuple()[2:]
+                elif isinstance(x, TimespanTree) and x.source is not None:
+                    return x.source.sortTuple()[2:]
                 else:
                     return x.endTime  # PitchedTimespan with no Element!
                 
@@ -707,16 +707,16 @@ class ElementTree(core.AVLTree):
         return self.latestEndTime
 
     @property
-    def origin(self):
+    def source(self):
         '''
         the original stream. (stored as a weakref)
         '''
-        return common.unwrapWeakref(self._origin)
+        return common.unwrapWeakref(self._source)
         
-    @origin.setter
-    def origin(self, expr):
+    @source.setter
+    def source(self, expr):
         # uses weakrefs so that garbage collection on the stream cache is possible...
-        self._origin = common.wrapWeakref(expr)
+        self._source = common.wrapWeakref(expr)
 
 
     @property
@@ -867,7 +867,7 @@ class TimespanTree(ElementTree):
     >>> print(tree.getVerticalityAt(17.0))
     <Verticality 17.0 {F#3 C#4 A4}>
 
-    All offsets are assumed to be relative to the score's origin if flatten is True
+    All offsets are assumed to be relative to the score's source if flatten is True
 
     Example: How many moments in Bach are consonant and how many are dissonant:
 
@@ -967,8 +967,8 @@ class TimespanTree(ElementTree):
     '''
     __slots__ = ()
     ### PUBLIC METHODS ###
-    def __init__(self, elements=None, origin=None):
-        super(TimespanTree, self).__init__(elements, origin=origin)
+    def __init__(self, elements=None, source=None):
+        super(TimespanTree, self).__init__(elements, source)
     
     
     def findNextPitchedTimespanInSameStreamByClass(self, pitchedTimespan, classList=None):
@@ -1410,13 +1410,11 @@ class TimespanTree(ElementTree):
         `Part`:`Horizontality` key/value pairs.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
+        >>> tree = score.asTimespans(classList=(note.Note,))
         >>> iterator = tree.iterateVerticalitiesNwise()
         >>> verticalities = next(iterator)
         >>> unwrapped = tree.unwrapVerticalities(verticalities)
-        >>> for part in sorted(unwrapped,
-        ...     key=lambda x: x.partName,
-        ...     ):
+        >>> for part in sorted(unwrapped, key=lambda x: x.partName):
         ...     print(part)
         ...     horizontality = unwrapped[part]
         ...     for timespan in horizontality:
@@ -1512,11 +1510,11 @@ class TimespanTree(ElementTree):
         
         TODO: Look at subclassing or at least deriving from a common base...
         '''
-        return common.unwrapWeakref(self._origin)
+        return common.unwrapWeakref(self._source)
         
     @element.setter
     def element(self, expr):
-        self._origin = common.wrapWeakref(expr)
+        self._source = common.wrapWeakref(expr)
 
 
 

@@ -3667,14 +3667,15 @@ class Test(unittest.TestCase):
 
         n1 = note.Note('A')
         n2 = note.Note('B')
-        c1 = clef.TrebleClef()
-        c2 = clef.BassClef()
 
-        s1 = stream.Stream()
+        s1 = stream.Stream(id='s1')
         s1.insert(10, n1)
         s1.insert(100, n2)
 
-        s2 = stream.Stream()
+        c1 = clef.TrebleClef()
+        c2 = clef.BassClef()
+
+        s2 = stream.Stream(id='s2')
         s2.insert(0, c1)
         s2.insert(100, c2)
         s2.insert(10, s1) # placing s1 here should result in c2 being before n2
@@ -3696,18 +3697,18 @@ class Test(unittest.TestCase):
 
         # both notes can find the treble clef in the activeSite stream
         post = n1.getContextByClass(clef.TrebleClef)
-        self.assertEqual(isinstance(post, clef.TrebleClef), True)
+        self.assertTrue(isinstance(post, clef.TrebleClef))
 
         post = n2.getContextByClass(clef.TrebleClef)
-        self.assertEqual(isinstance(post, clef.TrebleClef), True)
+        self.assertTrue(isinstance(post, clef.TrebleClef))
 
-        # n1 cannot find a bass clef
+        # n1 cannot find a bass clef because it is before the bass clef
         post = n1.getContextByClass(clef.BassClef)
         self.assertEqual(post, None)
 
         # n2 can find a bass clef, due to its shifted position in s2
         post = n2.getContextByClass(clef.BassClef)
-        self.assertEqual(isinstance(post, clef.BassClef), True)
+        self.assertTrue(isinstance(post, clef.BassClef))
 
     def testSitesMeasures(self):
         '''Can a measure determine the last Clef used?

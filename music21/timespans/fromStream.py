@@ -85,10 +85,10 @@ def listOfTreesByClass(inputStream,
         treeClass = trees.ElementTree
     
     if classLists is None or len(classLists) == 0:
-        outputTrees = [treeClass(origin=lastParentage)]
+        outputTrees = [treeClass(source=lastParentage)]
         classLists = []
     else:
-        outputTrees = [treeClass(origin=lastParentage) for _ in classLists]
+        outputTrees = [treeClass(source=lastParentage) for _ in classLists]
     # do this to avoid munging activeSites
     inputStreamElements = inputStream._elements[:] + inputStream._endElements
     for element in inputStreamElements:
@@ -186,10 +186,10 @@ def convert(inputStream, flatten, classList):
     >>> tenorElements
     <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
 
-    >>> tenorElements.origin
+    >>> tenorElements.source
     <music21.stream.Part Tenor>
 
-    >>> tenorElements.origin is score[3]
+    >>> tenorElements.source is score[3]
     True
     '''
     if classList is None:
