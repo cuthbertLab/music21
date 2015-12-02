@@ -24,6 +24,8 @@ import weakref
 from music21 import common
 from music21 import exceptions21
 
+from music21.base import _SortTuple
+
 from music21.timespans import spans, core
 from music21.timespans import node as nodeModule
 
@@ -40,7 +42,7 @@ class ElementTree(core.AVLTree):
     r'''
     A data structure for efficiently storing a score: flat or recursed or normal.
     
-    This data structure stores TimespanNodes: objects which implement both a
+    This data structure stores OffsetNodes: objects which implement both a
     `offset` and `endTime` property. It provides fast lookups of such
     objects and can quickly locate vertical overlaps.
 
@@ -66,7 +68,7 @@ class ElementTree(core.AVLTree):
 
     '''
     ### CLASS VARIABLES ###
-    nodeClass = nodeModule.OffsetNode
+    nodeClass = nodeModule.ElementNode
 
     __slots__ = (
         '_source',
@@ -238,7 +240,7 @@ class ElementTree(core.AVLTree):
         r'''
         Gets the length of the ElementTree collection, i.e., the number of elements enclosed.
 
-        >>> tree = timespans.trees.ElementTree()
+        >>> tree = timespans.trees.OffsetTree()
         >>> len(tree)
         0
 
@@ -329,11 +331,8 @@ class ElementTree(core.AVLTree):
     def _updateIndices(self, node):
         r'''
         Traverses the tree structure and updates cached indices which keep
-        track of the index of the elements stored at each node, and of the
+        track of the index of the element stored at each node, and of the
         maximum and minimum indices of the subtrees rooted at each node.
-
-        Indices keep track of the order of the elements in the Payload, not the
-        order of nodes.
 
         Used internally by ElementTree.
 
@@ -341,26 +340,30 @@ class ElementTree(core.AVLTree):
         '''
         def recurseUpdateIndices(node, parentStopIndex=None):
             if node is None:
-                return
+                return None
             if node.leftChild is not None:
                 recurseUpdateIndices(
                     node.leftChild,
                     parentStopIndex=parentStopIndex,
                     )
-                node.payloadElementsStartIndex = node.leftChild.subtreeElementsStopIndex
+                node.payloadElementIndex = node.leftChild.subtreeElementsStopIndex
                 node.subtreeElementsStartIndex = node.leftChild.subtreeElementsStartIndex
             elif parentStopIndex is None:
-                node.payloadElementsStartIndex = 0
+                node.payloadElementIndex = 0
                 node.subtreeElementsStartIndex = 0
             else:
-                node.payloadElementsStartIndex = parentStopIndex
+                node.payloadElementIndex = parentStopIndex
                 node.subtreeElementsStartIndex = parentStopIndex
-            node.payloadElementsStopIndex = node.payloadElementsStartIndex + len(node.payload)
-            node.subtreeElementsStopIndex = node.payloadElementsStopIndex
+            
+            if node.payload is None:
+                payloadLen = 0
+            else:
+                payloadLen = 1 
+            node.subtreeElementsStopIndex = node.payloadElementIndex + payloadLen
             if node.rightChild is not None:
                 recurseUpdateIndices(
                     node.rightChild,
-                    parentStopIndex=node.payloadElementsStopIndex,
+                    parentStopIndex=node.payloadElementIndex + payloadLen,
                     )
                 node.subtreeElementsStopIndex = node.rightChild.subtreeElementsStopIndex
         recurseUpdateIndices(node)
@@ -370,18 +373,23 @@ class ElementTree(core.AVLTree):
         Traverses the tree structure and updates cached maximum and minimum
         endTime values for the subtrees rooted at each node.
 
-        Used internally by TimespanTree.
+        Used internally by ElementTree.
 
         Returns a node.
         '''
         if node is None:
             return
+        
+        pos = node.position
+        if isinstance(pos, _SortTuple):
+            pos = pos.offset
+            
         try:
-            endTimeLow = min(x.endTime for x in node.payload)
-            endTimeHigh = max(x.endTime for x in node.payload)
+            endTimeLow = node.payload.endTime
+            endTimeHigh = endTimeLow
         except AttributeError: # elements do not have endTimes. do NOT mix elements and timespans.
-            endTimeLow = node.position + min(x.duration.quarterLength for x in node.payload)
-            endTimeHigh = node.position + max(x.duration.quarterLength for x in node.payload)            
+            endTimeLow = pos + node.payload.duration.quarterLength
+            endTimeHigh = endTimeLow
         if node.leftChild:
             leftChild = self._updateEndTimes(node.leftChild)
             if leftChild.endTimeLow < endTimeLow:
@@ -432,10 +440,17 @@ class ElementTree(core.AVLTree):
         node = self.getNodeByPosition(position)
         if node is None:
             return
-        if element in node.payload:
-            node.payload.remove(element)
-        if not node.payload:
-            self.removeNode(position)
+
+        if isinstance(node.payload, list):
+            if element in node.payload:
+                node.payload.remove(element)
+            if not node.payload:
+                self.removeNode(position)
+        else:
+            if node.payload is element:
+                node.payload = None
+            if node.payload is None:
+                self.removeNode(position)
 
         if isinstance(element, ElementTree): # represents an embedded Stream
             for pt in element.parentTrees:
@@ -579,10 +594,9 @@ class ElementTree(core.AVLTree):
         if offset is None:
             offset = element.offset
         node = self.getNodeByPosition(offset)
-        if node is None or element not in node.payload:
+        if node is None or node.payload is not element:
             raise ValueError('{} not in Tree at offset {}.'.format(element, offset))
-        index = node.payload.index(element) + node.payloadElementsStartIndex
-        return index
+        return node.payloadElementIndex
 
     def remove(self, elements, offsets=None, runUpdate=True): 
         r'''
@@ -625,10 +639,12 @@ class ElementTree(core.AVLTree):
         Inserts elements or `timespans` into this offset-tree.
         
         >>> n = note.Note()
-        >>> et = timespans.trees.ElementTree()
+        >>> et = timespans.trees.OffsetTree()
+        >>> et
+        <OffsetTree {0} (-inf to inf)>
         >>> et.insert(10.0, n)
         >>> et
-        <ElementTree {1} (10.0 to 11.0)>
+        <OffsetTree {1} (10.0 to 11.0)>
         
         >>> n2 = note.Note('D')
         >>> n2.offset = 20
@@ -636,7 +652,7 @@ class ElementTree(core.AVLTree):
         >>> n3.offset = 5
         >>> et.insert([n2, n3])
         >>> et
-        <ElementTree {3} (5.0 to 21.0)>
+        <OffsetTree {3} (5.0 to 21.0)>
         '''
         initialPosition = self.offset
         initialEndTime = self.endTime
@@ -682,8 +698,11 @@ class ElementTree(core.AVLTree):
                 
         self.createNodeAtPosition(offset)
         node = self.getNodeByPosition(offset)
-        node.payload.append(el)
-        node.payload.sort(key=key)
+        if isinstance(node.payload, list): # OffsetNode
+            node.payload.append(el)
+            node.payload.sort(key=key)
+        else: # ElementNode
+            node.payload = el
         if isinstance(el, TimespanTree):
             el.parentTrees.add(self)
 
@@ -764,6 +783,11 @@ class ElementTree(core.AVLTree):
         def recurse(node):
             if node.rightChild is not None:
                 return recurse(node.rightChild)
+            pos = node.position
+            if isinstance(pos, _SortTuple):
+                return pos.offset
+            else:
+                return pos
             return node.position
         if self.rootNode is not None:
             return recurse(self.rootNode)
@@ -810,7 +834,11 @@ class ElementTree(core.AVLTree):
             if node is not None:
                 if node.leftChild is not None:
                     result.extend(recurse(node.leftChild))
-                result.append(node.position)
+                pos = node.position
+                if isinstance(pos, _SortTuple):
+                    result.append(pos.offset)
+                else:
+                    result.append(pos)
                 if node.rightChild is not None:
                     result.extend(recurse(node.rightChild))
             return result
@@ -852,8 +880,136 @@ class ElementTree(core.AVLTree):
 
 
 #----------------------------------------------------------------
+class OffsetTree(ElementTree):
+    '''
+    A tree representation where positions are offsets in the score
+    and each node has a payload which is a list of elements at
+    that offset (unsorted by sort order).
+    '''
+    __slots__ = ()
 
-class TimespanTree(ElementTree):
+    nodeClass = nodeModule.OffsetNode
+
+    ### PUBLIC METHODS ###
+    def __init__(self, elements=None, source=None):
+        super(OffsetTree, self).__init__(elements, source)
+
+    ### PRIVATE METHODS ###
+    def _updateIndices(self, node):
+        r'''
+        Traverses the tree structure and updates cached indices which keep
+        track of the index of the elements stored at each node, and of the
+        maximum and minimum indices of the subtrees rooted at each node.
+
+        Indices keep track of the order of the elements in the Payload, not the
+        order of nodes.
+
+        Used internally by OffsetTree.
+
+        Returns None.
+        '''
+        def recurseUpdateIndices(node, parentStopIndex=None):
+            if node is None:
+                return
+            if node.leftChild is not None:
+                recurseUpdateIndices(
+                    node.leftChild,
+                    parentStopIndex=parentStopIndex,
+                    )
+                node.payloadElementsStartIndex = node.leftChild.subtreeElementsStopIndex
+                node.subtreeElementsStartIndex = node.leftChild.subtreeElementsStartIndex
+            elif parentStopIndex is None:
+                node.payloadElementsStartIndex = 0
+                node.subtreeElementsStartIndex = 0
+            else:
+                node.payloadElementsStartIndex = parentStopIndex
+                node.subtreeElementsStartIndex = parentStopIndex
+            node.payloadElementsStopIndex = node.payloadElementsStartIndex + len(node.payload)
+            node.subtreeElementsStopIndex = node.payloadElementsStopIndex
+            if node.rightChild is not None:
+                recurseUpdateIndices(
+                    node.rightChild,
+                    parentStopIndex=node.payloadElementsStopIndex,
+                    )
+                node.subtreeElementsStopIndex = node.rightChild.subtreeElementsStopIndex
+        recurseUpdateIndices(node)
+
+    def _updateEndTimes(self, node):
+        r'''
+        Traverses the tree structure and updates cached maximum and minimum
+        endTime values for the subtrees rooted at each node.
+
+        Used internally by OffsetTree.
+
+        Returns a node.
+        '''
+        if node is None:
+            return
+        try:
+            endTimeLow = min(x.endTime for x in node.payload)
+            endTimeHigh = max(x.endTime for x in node.payload)
+        except AttributeError: # elements do not have endTimes. do NOT mix elements and timespans.
+            endTimeLow = node.position + min(x.duration.quarterLength for x in node.payload)
+            endTimeHigh = node.position + max(x.duration.quarterLength for x in node.payload)            
+        if node.leftChild:
+            leftChild = self._updateEndTimes(node.leftChild)
+            if leftChild.endTimeLow < endTimeLow:
+                endTimeLow = leftChild.endTimeLow
+            if endTimeHigh < leftChild.endTimeHigh:
+                endTimeHigh = leftChild.endTimeHigh
+        if node.rightChild:
+            rightChild = self._updateEndTimes(node.rightChild)
+            if rightChild.endTimeLow < endTimeLow:
+                endTimeLow = rightChild.endTimeLow
+            if endTimeHigh < rightChild.endTimeHigh:
+                endTimeHigh = rightChild.endTimeHigh
+        node.endTimeLow = endTimeLow
+        node.endTimeHigh = endTimeHigh
+        return node
+
+    #----------public methods ------------------------
+    def index(self, element, offset=None):
+        r'''
+        Gets index of `timespan` in tree.
+        
+        Since timespans do not have .sites, there is only one offset to deal with...
+
+        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> ts = [timespans.spans.Timespan(x, y) for x, y in tsList]
+        >>> tree = timespans.trees.TimespanTree()
+        >>> tree.insert(ts)
+
+        >>> for timespan in ts:
+        ...     print("%r %d" % (timespan, tree.index(timespan)))
+        ...
+        <Timespan 0.0 2.0> 0
+        <Timespan 0.0 9.0> 1
+        <Timespan 1.0 1.0> 2
+        <Timespan 2.0 3.0> 3
+        <Timespan 3.0 4.0> 4
+        <Timespan 4.0 9.0> 5
+        <Timespan 5.0 6.0> 6
+        <Timespan 5.0 8.0> 7
+        <Timespan 6.0 8.0> 8
+        <Timespan 7.0 7.0> 9
+
+        >>> tree.index(timespans.spans.Timespan(-100, 100))
+        Traceback (most recent call last):
+        ValueError: <Timespan -100.0 100.0> not in Tree at offset -100.0.
+        '''
+        if offset is None:
+            offset = element.offset
+        node = self.getNodeByPosition(offset)
+        if node is None or element not in node.payload:
+            raise ValueError('{} not in Tree at offset {}.'.format(element, offset))
+        index = node.payload.index(element) + node.payloadElementsStartIndex
+        return index
+
+
+
+#----------------------------------------------------------------
+
+class TimespanTree(OffsetTree):
     r'''
     A data structure for efficiently slicing a score for pitches.
 

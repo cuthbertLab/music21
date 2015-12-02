@@ -141,7 +141,7 @@ class AVLNode(common.SlottedObject):
         
     'position': r'''
         The position of this node -- this is often the same as the offset of
-        the node in a containing score, but does not need to be.
+        the node in a containing score, but does not need to be. It could be the .sortTuple
 
         >>> score = timespans.makeExampleScore()
         >>> tree = timespans.fromStream.convert(score, flatten=True, 

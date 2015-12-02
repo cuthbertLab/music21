@@ -82,7 +82,7 @@ def listOfTreesByClass(inputStream,
     if useTimespans:
         treeClass = trees.TimespanTree
     else:
-        treeClass = trees.ElementTree
+        treeClass = trees.OffsetTree
     
     if classLists is None or len(classLists) == 0:
         outputTrees = [treeClass(source=lastParentage)]
@@ -210,7 +210,7 @@ def flat(inputStream):
     >>> ex = timespans.makeExampleScore()
     >>> ts = timespans.fromStream.flat(ex)
     >>> ts
-    <ElementTree {20} (0.0 to 2.0) <music21.stream.Score 0x104a94d68>>
+    <OffsetTree {20} (0.0 to 2.0) <music21.stream.Score 0x104a94d68>>
     >>> ts[15], ts[15].offset
     (<music21.note.Note F>, 1.0)
     '''
