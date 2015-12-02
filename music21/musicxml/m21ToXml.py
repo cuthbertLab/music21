@@ -1893,7 +1893,7 @@ class PartExporter(XMLExporterBase):
             mxPartName.text = defaults.partName
         # TODO: part-name-display
             
-        if self.stream.partAbbreviation is not None:
+        if hasattr(self.stream, 'partAbbreviation') and self.stream.partAbbreviation is not None:
             mxPartAbbreviation = SubElement(mxScorePart, 'part-abbreviation')
             mxPartAbbreviation.text = self.stream.partAbbreviation
 

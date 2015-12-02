@@ -499,7 +499,10 @@ class ElementTree(core.AVLTree):
         results = []
         node = self.getNodeByPosition(offset)
         if node is not None:
-            results.extend(node.payload)
+            if isinstance(node.payload, list):
+                results.extend(node.payload)
+            elif node.payload is not None:
+                results.append(node.payload)
         return tuple(results)
 
     def elementsStoppingAt(self, offset):
@@ -519,6 +522,8 @@ class ElementTree(core.AVLTree):
             result = []
             if node is not None: # could happen in an empty TimespanTree
                 if node.endTimeLow <= offset <= node.endTimeHigh:
+                    # This currently requires timespans not elements, and list payloads...
+                    # TODO: Fix/disambiguate.
                     for timespan in node.payload:
                         if timespan.endTime == offset:
                             result.append(timespan)
@@ -548,6 +553,8 @@ class ElementTree(core.AVLTree):
             if node is not None:
                 if node.position < offset < node.endTimeHigh:
                     result.extend(recurse(node.leftChild, offset, indent + 1))
+                    # This currently requires timespans not elements, and list payloads...
+                    # TODO: Fix/disambiguate.
                     for timespan in node.payload:
                         if offset < timespan.endTime:
                             result.append(timespan)
