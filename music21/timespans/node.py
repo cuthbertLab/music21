@@ -160,7 +160,7 @@ class ElementNode(core.AVLNode):
 
         Used internally by ElementTree.
 
-        Returns a node.
+        Returns None.
         '''
         pos = self.position
         if isinstance(pos, _SortTuple):
@@ -172,22 +172,24 @@ class ElementNode(core.AVLNode):
         except AttributeError: # elements do not have endTimes. do NOT mix elements and timespans.
             endTimeLow = pos + self.payload.duration.quarterLength
             endTimeHigh = endTimeLow
-        if self.leftChild:
-            leftChild = self.leftChild.updateEndTimes()
+
+        leftChild = self.leftChild
+        if leftChild:
+            leftChild.updateEndTimes()
             if leftChild.endTimeLow < endTimeLow:
                 endTimeLow = leftChild.endTimeLow
             if endTimeHigh < leftChild.endTimeHigh:
                 endTimeHigh = leftChild.endTimeHigh
-        if self.rightChild:
-            rightChild = self.rightChild.updateEndTimes()
+        
+        rightChild = self.rightChild
+        if rightChild:
+            rightChild.updateEndTimes()
             if rightChild.endTimeLow < endTimeLow:
                 endTimeLow = rightChild.endTimeLow
             if endTimeHigh < rightChild.endTimeHigh:
                 endTimeHigh = rightChild.endTimeHigh
         self.endTimeLow = endTimeLow
         self.endTimeHigh = endTimeHigh
-        return self
-
 
 #------------------------------------------------------------------------------
 class OffsetNode(ElementNode):
@@ -424,7 +426,7 @@ class OffsetNode(ElementNode):
 
         Used internally by OffsetTree.
 
-        Returns a node.
+        Returns None
         '''
         try:
             endTimeLow = min(x.endTime for x in self.payload)
@@ -432,21 +434,24 @@ class OffsetNode(ElementNode):
         except AttributeError: # elements do not have endTimes. do NOT mix elements and timespans.
             endTimeLow = self.position + min(x.duration.quarterLength for x in self.payload)
             endTimeHigh = self.position + max(x.duration.quarterLength for x in self.payload)            
-        if self.leftChild:
-            leftChild = self.leftChild.updateEndTimes()
+        
+        leftChild = self.leftChild
+        if leftChild:
+            leftChild.updateEndTimes()
             if leftChild.endTimeLow < endTimeLow:
                 endTimeLow = leftChild.endTimeLow
             if endTimeHigh < leftChild.endTimeHigh:
                 endTimeHigh = leftChild.endTimeHigh
-        if self.rightChild:
-            rightChild = self.rightChild.updateEndTimes()
+                
+        rightChild = self.rightChild
+        if rightChild:
+            rightChild.updateEndTimes()
             if rightChild.endTimeLow < endTimeLow:
                 endTimeLow = rightChild.endTimeLow
             if endTimeHigh < rightChild.endTimeHigh:
                 endTimeHigh = rightChild.endTimeHigh
         self.endTimeLow = endTimeLow
         self.endTimeHigh = endTimeHigh
-        return self
 
 
 
