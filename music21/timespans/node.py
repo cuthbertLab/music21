@@ -18,7 +18,7 @@ This is an implementation detail of the TimespanTree class.
 
 import unittest
 from music21.timespans import core
-from music21.base import Music21Object
+from music21.base import Music21Object, _SortTuple
 #------------------------------------------------------------------------------
 class ElementNode(core.AVLNode):
     r'''
@@ -152,6 +152,41 @@ class ElementNode(core.AVLNode):
         if self.rightChild is not None:
             self.rightChild.updateIndices(parentStopIndex=self.subtreeElementsStopIndex)
             self.subtreeElementsStopIndex = self.rightChild.subtreeElementsStopIndex
+
+    def updateEndTimes(self):
+        r'''
+        Traverses the tree structure and updates cached maximum and minimum
+        endTime values for the subtrees rooted at each node.
+
+        Used internally by ElementTree.
+
+        Returns a node.
+        '''
+        pos = self.position
+        if isinstance(pos, _SortTuple):
+            pos = pos.offset
+            
+        try:
+            endTimeLow = self.payload.endTime
+            endTimeHigh = endTimeLow
+        except AttributeError: # elements do not have endTimes. do NOT mix elements and timespans.
+            endTimeLow = pos + self.payload.duration.quarterLength
+            endTimeHigh = endTimeLow
+        if self.leftChild:
+            leftChild = self.leftChild.updateEndTimes()
+            if leftChild.endTimeLow < endTimeLow:
+                endTimeLow = leftChild.endTimeLow
+            if endTimeHigh < leftChild.endTimeHigh:
+                endTimeHigh = leftChild.endTimeHigh
+        if self.rightChild:
+            rightChild = self.rightChild.updateEndTimes()
+            if rightChild.endTimeLow < endTimeLow:
+                endTimeLow = rightChild.endTimeLow
+            if endTimeHigh < rightChild.endTimeHigh:
+                endTimeHigh = rightChild.endTimeHigh
+        self.endTimeLow = endTimeLow
+        self.endTimeHigh = endTimeHigh
+        return self
 
 
 #------------------------------------------------------------------------------
@@ -381,6 +416,40 @@ class OffsetNode(ElementNode):
         if self.rightChild is not None:
             self.rightChild.updateIndices(parentStopIndex=self.payloadElementsStopIndex)
             self.subtreeElementsStopIndex = self.rightChild.subtreeElementsStopIndex
+
+    def updateEndTimes(self):
+        r'''
+        Traverses the tree structure and updates cached maximum and minimum
+        endTime values for the subtrees rooted at each node.
+
+        Used internally by OffsetTree.
+
+        Returns a node.
+        '''
+        try:
+            endTimeLow = min(x.endTime for x in self.payload)
+            endTimeHigh = max(x.endTime for x in self.payload)
+        except AttributeError: # elements do not have endTimes. do NOT mix elements and timespans.
+            endTimeLow = self.position + min(x.duration.quarterLength for x in self.payload)
+            endTimeHigh = self.position + max(x.duration.quarterLength for x in self.payload)            
+        if self.leftChild:
+            leftChild = self.leftChild.updateEndTimes()
+            if leftChild.endTimeLow < endTimeLow:
+                endTimeLow = leftChild.endTimeLow
+            if endTimeHigh < leftChild.endTimeHigh:
+                endTimeHigh = leftChild.endTimeHigh
+        if self.rightChild:
+            rightChild = self.rightChild.updateEndTimes()
+            if rightChild.endTimeLow < endTimeLow:
+                endTimeLow = rightChild.endTimeLow
+            if endTimeHigh < rightChild.endTimeHigh:
+                endTimeHigh = rightChild.endTimeHigh
+        self.endTimeLow = endTimeLow
+        self.endTimeHigh = endTimeHigh
+        return self
+
+
+
 
     def payloadEndTimes(self):
         '''

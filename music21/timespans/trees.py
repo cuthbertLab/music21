@@ -328,44 +328,6 @@ class ElementTree(core.AVLTree):
         return result
 
     ### PRIVATE METHODS ###
-    def _updateEndTimes(self, node):
-        r'''
-        Traverses the tree structure and updates cached maximum and minimum
-        endTime values for the subtrees rooted at each node.
-
-        Used internally by ElementTree.
-
-        Returns a node.
-        '''
-        if node is None:
-            return
-        
-        pos = node.position
-        if isinstance(pos, _SortTuple):
-            pos = pos.offset
-            
-        try:
-            endTimeLow = node.payload.endTime
-            endTimeHigh = endTimeLow
-        except AttributeError: # elements do not have endTimes. do NOT mix elements and timespans.
-            endTimeLow = pos + node.payload.duration.quarterLength
-            endTimeHigh = endTimeLow
-        if node.leftChild:
-            leftChild = self._updateEndTimes(node.leftChild)
-            if leftChild.endTimeLow < endTimeLow:
-                endTimeLow = leftChild.endTimeLow
-            if endTimeHigh < leftChild.endTimeHigh:
-                endTimeHigh = leftChild.endTimeHigh
-        if node.rightChild:
-            rightChild = self._updateEndTimes(node.rightChild)
-            if rightChild.endTimeLow < endTimeLow:
-                endTimeLow = rightChild.endTimeLow
-            if endTimeHigh < rightChild.endTimeHigh:
-                endTimeHigh = rightChild.endTimeHigh
-        node.endTimeLow = endTimeLow
-        node.endTimeHigh = endTimeHigh
-        return node
-
     def _updateParents(self, oldPosition, visitedParents=None):
         '''
         Tells all parents that the position of this tree has
@@ -385,8 +347,8 @@ class ElementTree(core.AVLTree):
             
             if parent.rootNode is not None:
                 parent.rootNode.updateIndices()
-            
-            parent._updateEndTimes(parent.rootNode)
+                parent.rootNode.updateEndTimes()
+
             parent._updateParents(parentPosition, visitedParents=visitedParents)
 
     def _removeElement(self, element, oldPosition=None):
@@ -600,8 +562,8 @@ class ElementTree(core.AVLTree):
         if runUpdate:
             if self.rootNode is not None:
                 self.rootNode.updateIndices()
-
-            self._updateEndTimes(self.rootNode)
+                self.rootNode.updateEndTimes()
+            
             if (self.offset != initialPosition or
                     self.endTime != initialEndTime):
                 self._updateParents(initialPosition)
@@ -649,8 +611,8 @@ class ElementTree(core.AVLTree):
         
         if self.rootNode is not None:
             self.rootNode.updateIndices()
-
-        self._updateEndTimes(self.rootNode)
+            self.rootNode.updateEndTimes()
+        
         if (self.offset != initialPosition or 
                 self.endTime != initialEndTime):
             self._updateParents(initialPosition)
@@ -690,8 +652,8 @@ class ElementTree(core.AVLTree):
         
         if self.rootNode is not None:
             self.rootNode.updateIndices()
+            self.rootNode.updateEndTimes()
 
-        self._updateEndTimes(self.rootNode)
         self._updateParents(initialPosition)
 
     ### PROPERTIES ###
@@ -868,43 +830,11 @@ class OffsetTree(ElementTree):
 
     nodeClass = nodeModule.OffsetNode
 
-    ### PUBLIC METHODS ###
+    ### SPECIAL METHODS ###
     def __init__(self, elements=None, source=None):
         super(OffsetTree, self).__init__(elements, source)
 
     ### PRIVATE METHODS ###
-    def _updateEndTimes(self, node):
-        r'''
-        Traverses the tree structure and updates cached maximum and minimum
-        endTime values for the subtrees rooted at each node.
-
-        Used internally by OffsetTree.
-
-        Returns a node.
-        '''
-        if node is None:
-            return
-        try:
-            endTimeLow = min(x.endTime for x in node.payload)
-            endTimeHigh = max(x.endTime for x in node.payload)
-        except AttributeError: # elements do not have endTimes. do NOT mix elements and timespans.
-            endTimeLow = node.position + min(x.duration.quarterLength for x in node.payload)
-            endTimeHigh = node.position + max(x.duration.quarterLength for x in node.payload)            
-        if node.leftChild:
-            leftChild = self._updateEndTimes(node.leftChild)
-            if leftChild.endTimeLow < endTimeLow:
-                endTimeLow = leftChild.endTimeLow
-            if endTimeHigh < leftChild.endTimeHigh:
-                endTimeHigh = leftChild.endTimeHigh
-        if node.rightChild:
-            rightChild = self._updateEndTimes(node.rightChild)
-            if rightChild.endTimeLow < endTimeLow:
-                endTimeLow = rightChild.endTimeLow
-            if endTimeHigh < rightChild.endTimeHigh:
-                endTimeHigh = rightChild.endTimeHigh
-        node.endTimeLow = endTimeLow
-        node.endTimeHigh = endTimeHigh
-        return node
 
     #----------public methods ------------------------
     def index(self, element, offset=None):
