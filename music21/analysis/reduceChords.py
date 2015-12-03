@@ -3,7 +3,8 @@
 # Name:         reduceChords.py
 # Purpose:      Tools for eliminating passing chords, etc.
 #
-# Authors:      Michael Scott Cuthbert, Josiah Wolf Oberholtzer
+# Authors:      Josiah Wolf Oberholtzer
+#               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
@@ -23,6 +24,8 @@ from music21 import meter
 from music21 import note
 from music21 import pitch
 from music21 import stream
+from music21 import timespans
+
 #from music21 import tie
 
 environLocal = environment.Environment('reduceChords')
@@ -72,20 +75,14 @@ class ChordReducer(object):
         self.positionInMeasure = None
         self.numberOfElementsInMeasure = None
 
-    def run(
-        self,
-        inputScore,
-        allowableChords=None,
-        closedPosition=False,
-        forbiddenChords=None,
-        maximumNumberOfChords=3,
-        ):
-        from music21.stream import timespans
+    def run(self,
+            inputScore,
+            allowableChords=None,
+            closedPosition=False,
+            forbiddenChords=None,
+            maximumNumberOfChords=3):
         if 'Score' not in inputScore.classes:
             raise ChordReducerException("Must be called on a stream.Score")
-
-        tree = timespans.streamToTimespanTree(inputScore, flatten=True, 
-                                              classList=(note.Note, chord.Chord))
 
         if allowableChords is not None:
             if not all(isinstance(x, chord.Chord) for x in allowableChords):
@@ -105,13 +102,15 @@ class ChordReducer(object):
                 intervalClassSets.append(intervalClassSet)
             forbiddenChords = frozenset(intervalClassSets)
 
+        tree = timespans.fromStream.convert(inputScore, 
+                                              flatten=True, 
+                                              classList=(note.Note, chord.Chord))
+
         self.removeZeroDurationTimespans(tree)
         self.splitByBass(tree)
-        self.removeVerticalDissonances(
-            tree=tree,
-            allowableChords=allowableChords,
-            forbiddenChords=forbiddenChords,
-            )
+        self.removeVerticalDissonances(tree=tree,
+                                       allowableChords=allowableChords,
+                                       forbiddenChords=forbiddenChords)
 
         partwiseTrees = tree.toPartwiseTimespanTrees()
 
@@ -129,7 +128,7 @@ class ChordReducer(object):
         #partwiseReduction = tree.toPartwiseScore()
         #for part in partwiseReduction:
         #    reduction.append(part)
-        chordifiedReduction = timespans.timespansToChordifiedStream(
+        chordifiedReduction = timespans.toStream.chordified(
             tree,
             templateStream=inputScore,
             )
@@ -156,8 +155,8 @@ class ChordReducer(object):
     def _debug(tree):
         for part, subtree in tree.toPartwiseTimespanTrees().items():
             print(part)
-            timespans = [x for x in subtree]
-            for timespan in timespans:
+            timespanList = [x for x in subtree]
+            for timespan in timespanList:
                 print('\t', timespan)
             overlap = subtree.maximumOverlap
             if 1 < overlap:
@@ -254,17 +253,17 @@ class ChordReducer(object):
             #        ):
             #        continue
             horizontalities = tree.unwrapVerticalities(verticalities)
-            for unused_part, timespans in horizontalities.items():
-                if len(timespans) < 2:
+            for unused_part, timespanList in horizontalities.items():
+                if len(timespanList) < 2:
                     continue
-                elif timespans[0].pitches == timespans[1].pitches:
+                elif timespanList[0].pitches == timespanList[1].pitches:
                     continue
-                bothPitches = timespans[0].pitches + timespans[1].pitches
+                bothPitches = timespanList[0].pitches + timespanList[1].pitches
                 sumChord = chord.Chord(bothPitches)
-                tree.remove(timespans)
-                merged = timespans[0].new(
+                tree.remove(timespanList)
+                merged = timespanList[0].new(
                     element=sumChord,
-                    endTime=timespans[1].endTime,
+                    endTime=timespanList[1].endTime,
                     )
                 tree.insert(merged)
 
@@ -334,8 +333,8 @@ class ChordReducer(object):
             verticality = tree.getVerticalityAt(timespan.offset)
             return verticality.bassTimespan
         for unused_part, subtree in partwiseTrees.items():
-            timespans = [x for x in subtree]
-            for bassTimespan, group in itertools.groupby(timespans, procedure):
+            timespanList = [x for x in subtree]
+            for bassTimespan, group in itertools.groupby(timespanList, procedure):
                 group = list(group)
 
                 if bassTimespan is None:
@@ -344,7 +343,7 @@ class ChordReducer(object):
                 if bassTimespan.offset < group[0].offset:
                     beatStrength = bassTimespan.beatStrength
                     offset = bassTimespan.offset
-                    previousTimespan = tree.findPreviousElementTimespanInSameStreamByClass(group[0])
+                    previousTimespan = tree.findPreviousPitchedTimespanInSameStreamByClass(group[0])
                     if previousTimespan is not None:
                         if previousTimespan.endTime > group[0].offset:
                             msg = ('Timespan offset errors: previousTimespan.endTime, ' + 
@@ -444,8 +443,8 @@ class ChordReducer(object):
             return measureNumber, pitches
         mapping = tree.toPartwiseTimespanTrees()
         subtree = mapping[part]
-        timespans = [x for x in subtree]
-        for unused_key, group in itertools.groupby(timespans, procedure):
+        timespanList = [x for x in subtree]
+        for unused_key, group in itertools.groupby(timespanList, procedure):
             #measureNumber, pitches = key
             group = list(group)
             if len(group) == 1:

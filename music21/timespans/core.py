@@ -28,12 +28,12 @@ class AVLNode(common.SlottedObject):
     >>> position = 1.0
     >>> node = timespans.core.AVLNode(position)
     >>> node
-    <Node: Start:1.0 Height:0 L:None R:None>
+    <OffsetNode: Start:1.0 Height:0 L:None R:None>
     >>> n2 = timespans.core.AVLNode(2.0)
     >>> node.rightChild = n2
     >>> node.update()
     >>> node
-    <Node: Start:1.0 Height:1 L:None R:0>
+    <OffsetNode: Start:1.0 Height:1 L:None R:0>
     
     Nodes can rebalance themselves, but they work best in a Tree...
 
@@ -63,17 +63,17 @@ class AVLNode(common.SlottedObject):
         This attribute is used to help balance the AVL tree.
 
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...                    classList=(note.Note, chord.Chord))
         >>> print(tree.debug())
-        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+            L: <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+                L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                R: <OffsetNode: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+            R: <OffsetNode: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+                L: <OffsetNode: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+                R: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                    R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
 
 
         This tree has one more depth on the right than on the left
@@ -109,17 +109,17 @@ class AVLNode(common.SlottedObject):
         This property is used to help balance the AVL tree.
 
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...              classList=(note.Note, chord.Chord))
         >>> print(tree.debug())
-        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+            L: <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+                L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                R: <OffsetNode: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+            R: <OffsetNode: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+                L: <OffsetNode: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+                R: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                    R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
 
         >>> tree.rootNode.height
         3
@@ -141,20 +141,20 @@ class AVLNode(common.SlottedObject):
         
     'position': r'''
         The position of this node -- this is often the same as the offset of
-        the node in a containing score, but does not need to be.
+        the node in a containing score, but does not need to be. It could be the .sortTuple
 
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...            classList=(note.Note, chord.Chord))
         >>> print(tree.rootNode.debug())
-        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+            L: <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+                L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                R: <OffsetNode: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+            R: <OffsetNode: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+                L: <OffsetNode: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+                R: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                    R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
 
         >>> tree.rootNode.position
         3.0
@@ -171,22 +171,22 @@ class AVLNode(common.SlottedObject):
         After setting the left child you need to do a node update. with node.update()
 
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...           classList=(note.Note, chord.Chord))
         >>> print(tree.rootNode.debug())
-        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+            L: <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+                L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                R: <OffsetNode: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+            R: <OffsetNode: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+                L: <OffsetNode: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+                R: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                    R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
 
         >>> print(tree.rootNode.leftChild.debug())
-        <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-            L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-            R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+        <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+            L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+            R: <OffsetNode: Start:2.0 Indices:(3:3:5:5) Length:{2}>
         ''',
     'rightChild':   r'''
         The right child of this node.
@@ -194,30 +194,30 @@ class AVLNode(common.SlottedObject):
         After setting the right child you need to do a node update. with node.update()
 
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...             classList=(note.Note, chord.Chord))
         >>> print(tree.rootNode.debug())
-        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+            L: <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+                L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                R: <OffsetNode: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+            R: <OffsetNode: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+                L: <OffsetNode: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+                R: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                    R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
 
         >>> print(tree.rootNode.rightChild.debug())
-        <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-            L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-            R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        <OffsetNode: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+            L: <OffsetNode: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+            R: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
 
         >>> print(tree.rootNode.rightChild.rightChild.debug())
-        <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-            R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+            R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
 
         >>> print(tree.rootNode.rightChild.rightChild.rightChild.debug())
-        <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
         '''
 
     }
@@ -245,7 +245,7 @@ class AVLNode(common.SlottedObject):
         if self.rightChild:
             rcHeight = self.rightChild.height
             
-        return '<Node: Start:{} Height:{} L:{} R:{}>'.format(
+        return '<OffsetNode: Start:{} Height:{} L:{} R:{}>'.format(
             self.position,
             self.height,
             lcHeight,
@@ -271,18 +271,18 @@ class AVLNode(common.SlottedObject):
         Get a debug of the Node:
         
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...              classList=(note.Note, chord.Chord))
         >>> rn = tree.rootNode        
         >>> print(rn.debug())
-        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+            L: <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+                L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                R: <OffsetNode: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+            R: <OffsetNode: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+                L: <OffsetNode: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+                R: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                    R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
         '''
         return '\n'.join(self._getDebugPieces())
 
@@ -291,18 +291,18 @@ class AVLNode(common.SlottedObject):
         Return a list of the debugging information of the tree (used for debug):
         
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...            classList=(note.Note, chord.Chord))
         >>> rn = tree.rootNode
         >>> rn._getDebugPieces()
-        ['<Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>', 
-        '\tL: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>',
-        '\t\tL: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>', 
-        '\t\tR: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>', 
-        '\tR: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>', 
-        '\t\tL: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>', 
-        '\t\tR: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>', 
-        '\t\t\tR: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>']        
+        ['<OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>', 
+        '\tL: <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>',
+        '\t\tL: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>', 
+        '\t\tR: <OffsetNode: Start:2.0 Indices:(3:3:5:5) Length:{2}>', 
+        '\tR: <OffsetNode: Start:5.0 Indices:(6:8:9:12) Length:{1}>', 
+        '\t\tL: <OffsetNode: Start:4.0 Indices:(6:6:8:8) Length:{2}>', 
+        '\t\tR: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>', 
+        '\t\t\tR: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>']        
         '''        
         result = []
         result.append(repr(self))
@@ -329,11 +329,11 @@ class AVLNode(common.SlottedObject):
         We create a score with everything correct.
 
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...             classList=(note.Note, chord.Chord))
         >>> n = tree.rootNode
         >>> n
-        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+        <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
         >>> n.height, n.balance
         (3, 1)
         
@@ -476,9 +476,7 @@ class AVLTree(object):
         )
     nodeClass = AVLNode
     
-    def __init__(
-        self,
-        ):
+    def __init__(self):
         self.rootNode = None
 
     def __iter__(self):
@@ -517,34 +515,34 @@ class AVLTree(object):
                         yield n
         return recurse(self.rootNode)
 
-    def insertAtPosition(self, position):
+    def createNodeAtPosition(self, position):
         '''
         creates a new node at position and sets the rootNode
         appropriately
         
         >>> avl = timespans.core.AVLTree()
-        >>> avl.insertAtPosition(20)
+        >>> avl.createNodeAtPosition(20)
         >>> avl.rootNode
-        <Node: Start:20 Height:0 L:None R:None>        
+        <OffsetNode: Start:20 Height:0 L:None R:None>        
         
-        >>> avl.insertAtPosition(10)
+        >>> avl.createNodeAtPosition(10)
         >>> avl.rootNode
-        <Node: Start:20 Height:1 L:0 R:None>
+        <OffsetNode: Start:20 Height:1 L:0 R:None>
 
-        >>> avl.insertAtPosition(5)
+        >>> avl.createNodeAtPosition(5)
         >>> avl.rootNode
-        <Node: Start:10 Height:1 L:0 R:0>
+        <OffsetNode: Start:10 Height:1 L:0 R:0>
         
-        >>> avl.insertAtPosition(30)
+        >>> avl.createNodeAtPosition(30)
         >>> avl.rootNode
-        <Node: Start:10 Height:2 L:0 R:1>
+        <OffsetNode: Start:10 Height:2 L:0 R:1>
         >>> avl.rootNode.leftChild
-        <Node: Start:5 Height:0 L:None R:None>
+        <OffsetNode: Start:5 Height:0 L:None R:None>
         >>> avl.rootNode.rightChild
-        <Node: Start:20 Height:1 L:None R:0>
+        <OffsetNode: Start:20 Height:1 L:None R:0>
         
         >>> avl.rootNode.rightChild.rightChild
-        <Node: Start:30 Height:0 L:None R:None>
+        <OffsetNode: Start:30 Height:0 L:None R:None>
         '''
         def recurse(node, position):
             '''
@@ -572,7 +570,7 @@ class AVLTree(object):
 
     def debug(self):
         r'''
-        Gets string representation of the timespan collection.
+        Gets string representation of the node tree.
 
         Useful only for debugging its internal node structure.
 
@@ -582,14 +580,14 @@ class AVLTree(object):
         >>> tree.insert(tss)
 
         >>> print(tree.debug())
-        <Node: Start:3.0 Indices:(0:4:5:10) Length:{1}>
-            L: <Node: Start:1.0 Indices:(0:2:3:4) Length:{1}>
-                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <Node: Start:2.0 Indices:(3:3:4:4) Length:{1}>
-            R: <Node: Start:5.0 Indices:(5:6:8:10) Length:{2}>
-                L: <Node: Start:4.0 Indices:(5:5:6:6) Length:{1}>
-                R: <Node: Start:6.0 Indices:(8:8:9:10) Length:{1}>
-                    R: <Node: Start:7.0 Indices:(9:9:10:10) Length:{1}>
+        <OffsetNode: Start:3.0 Indices:(0:4:5:10) Length:{1}>
+            L: <OffsetNode: Start:1.0 Indices:(0:2:3:4) Length:{1}>
+                L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                R: <OffsetNode: Start:2.0 Indices:(3:3:4:4) Length:{1}>
+            R: <OffsetNode: Start:5.0 Indices:(5:6:8:10) Length:{2}>
+                L: <OffsetNode: Start:4.0 Indices:(5:5:6:6) Length:{1}>
+                R: <OffsetNode: Start:6.0 Indices:(8:8:9:10) Length:{1}>
+                    R: <OffsetNode: Start:7.0 Indices:(9:9:10:10) Length:{1}>
         '''
         if self.rootNode is not None:
             return self.rootNode.debug()
@@ -625,9 +623,12 @@ class AVLTree(object):
         >>> tree = score.asTimespans()
         >>> n1 = tree.getNodeAfter(0.5)
         >>> n1
-        <Node: Start:1.0 Indices:(7:7:11:11) Length:{4}>
+        <OffsetNode: Start:1.0 Indices:(25:25:29:29) Length:{4}>
         >>> n2 = tree.getNodeAfter(0.6)
         >>> n2 is n1
+        True
+        
+        >>> tree.getNodeAfter(9999) is None
         True
         '''
         def recurse(node, position):
@@ -655,7 +656,7 @@ class AVLTree(object):
 
         Returns None if no succeeding position exists.
 
-        >>> tree.getPositionAfter(35) is None
+        >>> tree.getPositionAfter(36) is None
         True
 
         Generally speaking, negative positions will usually return 0.0
@@ -675,8 +676,14 @@ class AVLTree(object):
         
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
-        >>> tree.getNodeBefore(100)  # last node in piece
-        <Node: Start:35.0 Indices:(161:161:165:165) Length:{4}>
+
+        100 is beyond the end so it will get the last node in piece
+        
+        >>> tree.getNodeBefore(100)
+        <OffsetNode: Start:36.0 Indices:(191:191:195:195) Length:{4}>
+        
+        >>> tree.getNodeBefore(0) is None
+        True
         '''
         def recurse(node, position):
             if node is None:
@@ -701,7 +708,7 @@ class AVLTree(object):
         >>> score = corpus.parse('bwv66.6')
         >>> tree = score.asTimespans()
         >>> tree.getPositionBefore(100)
-        35.0
+        36.0
 
         Return None if no preceding position exists.
 
@@ -715,23 +722,23 @@ class AVLTree(object):
 
     def removeNode(self, position):
         r'''
-        Removes a node at `position` in the subtree rooted on `node`.
+        Removes a node at `position` and rebalances the tree
 
         Used internally by TimespanTree.
 
         >>> avl = timespans.core.AVLTree()
-        >>> avl.insertAtPosition(20)
-        >>> avl.insertAtPosition(10)
-        >>> avl.insertAtPosition(5)
-        >>> avl.insertAtPosition(30)
+        >>> avl.createNodeAtPosition(20)
+        >>> avl.createNodeAtPosition(10)
+        >>> avl.createNodeAtPosition(5)
+        >>> avl.createNodeAtPosition(30)
         >>> avl.rootNode
-        <Node: Start:10 Height:2 L:0 R:1>
+        <OffsetNode: Start:10 Height:2 L:0 R:1>
 
         Remove node at 30
 
         >>> avl.removeNode(30)
         >>> avl.rootNode
-        <Node: Start:10 Height:1 L:0 R:0>
+        <OffsetNode: Start:10 Height:1 L:0 R:0>
         
         Removing a node eliminates its payload:
         
@@ -742,7 +749,7 @@ class AVLTree(object):
         
         >>> avl.removeNode(10)
         >>> avl.rootNode
-        <Node: Start:20 Height:1 L:0 R:None>
+        <OffsetNode: Start:20 Height:1 L:0 R:None>
         >>> avl.rootNode.payload
         'twenty'
         
@@ -750,12 +757,12 @@ class AVLTree(object):
         
         >>> avl.removeNode(9.5)
         >>> avl.rootNode
-        <Node: Start:20 Height:1 L:0 R:None>
+        <OffsetNode: Start:20 Height:1 L:0 R:None>
         
         >>> for n in avl:
         ...     print(n, n.payload)
-        <Node: Start:5 Height:0 L:None R:None> None
-        <Node: Start:20 Height:1 L:0 R:None> twenty        
+        <OffsetNode: Start:5 Height:0 L:None R:None> None
+        <OffsetNode: Start:20 Height:1 L:0 R:None> twenty        
         '''
         def recurseRemove(node, position):
             if node is not None:

@@ -1710,8 +1710,6 @@ class ScoreExporter(XMLExporterBase):
 class PartExporter(XMLExporterBase):
     '''
     Object to convert one Part stream to a <part> tag on .parse() 
-    
-    
     '''
     
     def __init__(self, partObj=None, parent=None):
@@ -1887,23 +1885,24 @@ class PartExporter(XMLExporterBase):
         # TODO: identification -- specific metadata... could go here...
         mxScorePart.set('id', self.xmlRoot.get('id'))
 
-        i = self.firstInstrumentObject
         
         mxPartName = SubElement(mxScorePart, 'part-name')
-        if i.partName is not None:
-            mxPartName.text = i.partName
+        if hasattr(self.stream, 'partName') and self.stream.partName is not None:
+            mxPartName.text = self.stream.partName
         else:
             mxPartName.text = defaults.partName
         # TODO: part-name-display
             
-        if i.partAbbreviation is not None:
+        if hasattr(self.stream, 'partAbbreviation') and self.stream.partAbbreviation is not None:
             mxPartAbbreviation = SubElement(mxScorePart, 'part-abbreviation')
-            mxPartAbbreviation.text = i.partAbbreviation
+            mxPartAbbreviation.text = self.stream.partAbbreviation
 
         # TODO: part-abbreviation-display
         # TODO: group    
         
         # TODO: unbounded...
+        i = self.firstInstrumentObject
+
         if i.instrumentName is not None or i.instrumentAbbreviation is not None:
             mxScorePart.append(self.instrumentToXmlScoreInstrument(i))
 

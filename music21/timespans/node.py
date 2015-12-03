@@ -18,17 +18,195 @@ This is an implementation detail of the TimespanTree class.
 
 import unittest
 from music21.timespans import core
-        
+from music21.base import Music21Object, _SortTuple
 #------------------------------------------------------------------------------
-class TimespanTreeNode(core.AVLNode):
+class ElementNode(core.AVLNode):
     r'''
-    A node in an TimespanTree.
+    A node containing an element, which is aware of the element's
+    endTime and index within a stream, as well as the endTimes and indices of the
+    elements to the left and right of it. 
+
+    '''
+
+    ### CLASS VARIABLES ###
+
+    __slots__ = (
+        'endTimeHigh',
+        'endTimeLow',
+        'payloadElementIndex',
+        'subtreeElementsStartIndex',
+        'subtreeElementsStopIndex',
+        )
+
+    _DOC_ATTR = {
+    'payload': r'''
+        The contents of the node at this point.  Usually PitchedTimespans.
+
+        >>> score = timespans.makeExampleScore()
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
+        ...                  classList=(note.Note, chord.Chord))
+        >>> print(tree.rootNode.debug())
+        <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+            L: <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+                L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                R: <OffsetNode: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+            R: <OffsetNode: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+                L: <OffsetNode: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+                R: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                    R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+
+        >>> tree.rootNode.payload
+        [<PitchedTimespan (3.0 to 4.0) <music21.note.Note F>>]
+
+        >>> tree.rootNode.leftChild.payload
+        [<PitchedTimespan (1.0 to 2.0) <music21.note.Note D>>]
+
+        >>> for x in tree.rootNode.leftChild.rightChild.payload:
+        ...     x
+        ...
+        <PitchedTimespan (2.0 to 3.0) <music21.note.Note E>>
+        <PitchedTimespan (2.0 to 4.0) <music21.note.Note G>>
+
+        >>> tree.rootNode.rightChild.payload
+        [<PitchedTimespan (5.0 to 6.0) <music21.note.Note A>>]
+        ''',
+        
+    'payloadElementIndex': r'''
+        The index in a stream of the element stored in the payload of this node.
+        ''',
+
+    'endTimeHigh': r'''
+        The highest endTime of any node in the subtree rooted on this node.
+        ''',
+        
+    'endTimeLow': r'''
+        The lowest endTime of any node in the subtree rooted on this node.
+        ''',               
+        
+    'subtreeElementsStartIndex': r'''
+        The lowest element index of an element in the payload of any node of the
+        subtree rooted on this node.
+        ''',
+        
+    'subtreeElementsStopIndex': r'''
+        The highest element index of an element in the payload of any node of the
+        subtree rooted on this node.
+        ''',
+    }
+    
+    ### INITIALIZER ###
+
+    def __init__(self, offset):
+        super(ElementNode, self).__init__(offset)
+        self.payload = None
+        self.payloadElementIndex = -1
+        
+        self.endTimeHigh = None
+        self.endTimeLow = None
+        
+        self.subtreeElementsStartIndex = -1
+        self.subtreeElementsStopIndex = -1
+
+
+    ### SPECIAL METHODS ###
+
+    def __repr__(self):
+        return '<ElementNode: Start:{} Indices:({}--{}--{}) Payload:>'.format(
+            self.position,
+            self.subtreeElementsStartIndex,
+            self.payloadElementIndex,
+            self.subtreeElementsStopIndex,
+            self.payload,
+            )
+
+    def updateIndices(self, parentStopIndex=None):
+        r'''
+        Updates the payloadElementIndex, and the subtreeElementsStartIndex and 
+        subtreeElementsStopIndex (and does so for all child nodes) by traversing 
+        the tree structure.
+        
+        Updates cached indices which keep
+        track of the index of the element stored at each node, and of the
+        minimum and maximum indices of the subtrees rooted at each node.
+
+        Called on rootNode of a tree that uses ElementNodes, such as ElementTree
+
+        Returns None.
+        '''
+        if self.leftChild is not None:
+            self.leftChild.updateIndices(parentStopIndex=parentStopIndex)
+            self.payloadElementIndex = self.leftChild.subtreeElementsStopIndex
+            self.subtreeElementsStartIndex = self.leftChild.subtreeElementsStartIndex
+        elif parentStopIndex is None:
+            self.payloadElementIndex = 0
+            self.subtreeElementsStartIndex = 0
+        else:
+            self.payloadElementIndex = parentStopIndex
+            self.subtreeElementsStartIndex = parentStopIndex
+        
+        if self.payload is None:
+            payloadLen = 0
+        else:
+            payloadLen = 1 
+        self.subtreeElementsStopIndex = self.payloadElementIndex + payloadLen
+        if self.rightChild is not None:
+            self.rightChild.updateIndices(parentStopIndex=self.subtreeElementsStopIndex)
+            self.subtreeElementsStopIndex = self.rightChild.subtreeElementsStopIndex
+
+    def updateEndTimes(self):
+        r'''
+        Traverses the tree structure and updates cached maximum and minimum
+        endTime values for the subtrees rooted at each node.
+
+        Used internally by ElementTree.
+
+        Returns None.
+        '''
+        pos = self.position
+        if isinstance(pos, _SortTuple):
+            pos = pos.offset
+            
+        try:
+            endTimeLow = self.payload.endTime
+            endTimeHigh = endTimeLow
+        except AttributeError: # elements do not have endTimes. do NOT mix elements and timespans.
+            endTimeLow = pos + self.payload.duration.quarterLength
+            endTimeHigh = endTimeLow
+
+        leftChild = self.leftChild
+        if leftChild:
+            leftChild.updateEndTimes()
+            if leftChild.endTimeLow < endTimeLow:
+                endTimeLow = leftChild.endTimeLow
+            if endTimeHigh < leftChild.endTimeHigh:
+                endTimeHigh = leftChild.endTimeHigh
+        
+        rightChild = self.rightChild
+        if rightChild:
+            rightChild.updateEndTimes()
+            if rightChild.endTimeLow < endTimeLow:
+                endTimeLow = rightChild.endTimeLow
+            if endTimeHigh < rightChild.endTimeHigh:
+                endTimeHigh = rightChild.endTimeHigh
+        self.endTimeLow = endTimeLow
+        self.endTimeHigh = endTimeHigh
+
+#------------------------------------------------------------------------------
+class OffsetNode(ElementNode):
+    r'''
+    A node representing zero, one, or more elements or timespans at an offset.
 
     Here's an example of what it means and does:
     
     >>> score = timespans.makeExampleScore()
-    >>> sfn = score.flat.notes
-    >>> sfn.show('text', addEndTimes=True)
+    >>> sf = score.flat
+    >>> sf.show('text', addEndTimes=True)
+    {0.0 - 0.0} <music21.instrument.Instrument PartA: : >
+    {0.0 - 0.0} <music21.instrument.Instrument PartB: : >
+    {0.0 - 0.0} <music21.clef.BassClef>
+    {0.0 - 0.0} <music21.clef.BassClef>
+    {0.0 - 0.0} <music21.meter.TimeSignature 2/4>
+    {0.0 - 0.0} <music21.meter.TimeSignature 2/4>
     {0.0 - 1.0} <music21.note.Note C>
     {0.0 - 2.0} <music21.note.Note C>
     {1.0 - 2.0} <music21.note.Note D>
@@ -41,9 +219,10 @@ class TimespanTreeNode(core.AVLNode):
     {6.0 - 7.0} <music21.note.Note B>
     {6.0 - 8.0} <music21.note.Note D>
     {7.0 - 8.0} <music21.note.Note C>
+    {8.0 - 8.0} <music21.bar.Barline style=final>
+    {8.0 - 8.0} <music21.bar.Barline style=final>
     
-    >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
-    ...              classList=(note.Note, chord.Chord))
+    >>> tree = timespans.fromStream.convert(sf, flatten=False, classList=None)
     >>> rn = tree.rootNode
     
     The RootNode here represents the starting position of the Note F at 3.0; It is the center
@@ -51,10 +230,10 @@ class TimespanTreeNode(core.AVLNode):
     element list) and its offset is 3.0
     
     >>> rn
-    <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-    >>> sfn[5]
+    <OffsetNode: Start:3.0 Indices:(0:11:12:20) Length:{1}>
+    >>> sf[11]
     <music21.note.Note F>
-    >>> sfn[5].offset
+    >>> sf[11].offset
     3.0
 
     Thus, the indices of 0:5:6:12 indicate that the left-side of the node handles indices
@@ -64,13 +243,13 @@ class TimespanTreeNode(core.AVLNode):
     The `Length: {1}` indicates that there is exactly one element at this location, that is,
     the F.
     
-    The "payload" of the node, is just that note wrapped in a list wrapped in an ElementTimeSpan:
+    The "payload" of the node, is just that note wrapped in a list wrapped in an PitchedTimespan:
     
     >>> rn.payload
-    [<ElementTimespan (3.0 to 4.0) <music21.note.Note F>>]
+    [<PitchedTimespan (3.0 to 4.0) <music21.note.Note F>>]
     >>> rn.payload[0].element
     <music21.note.Note F>
-    >>> rn.payload[0].element is sfn[5]
+    >>> rn.payload[0].element is sf[11]
     True
     
     
@@ -78,29 +257,38 @@ class TimespanTreeNode(core.AVLNode):
     
     >>> left = rn.leftChild
     >>> left
-    <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+    <OffsetNode: Start:1.0 Indices:(0:8:9:11) Length:{1}>
+    
+    In the leftNode of the leftNode of the rootNode there are eight elements: 
+    metadata and both notes that begin on offset 0.0:
+
     >>> leftLeft = left.leftChild
     >>> leftLeft
-    <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-    
-    In the leftNode of the leftNode of the rootNode there are two elements: both notes that
-    begin on offset 0.0:
+    <OffsetNode: Start:0.0 Indices:(0:0:8:8) Length:{8}>
     
     >>> leftLeft.payload
-    [<ElementTimespan (0.0 to 1.0) <music21.note.Note C>>, 
-     <ElementTimespan (0.0 to 2.0) <music21.note.Note C>>]
+    [<PitchedTimespan (0.0 to 0.0) <music21.instrument.Instrument PartA: : >>, 
+     <PitchedTimespan (0.0 to 0.0) <music21.instrument.Instrument PartB: : >>, 
+     <PitchedTimespan (0.0 to 0.0) <music21.clef.BassClef>>, 
+     <PitchedTimespan (0.0 to 0.0) <music21.clef.BassClef>>, 
+     <PitchedTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>, 
+     <PitchedTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>, 
+     <PitchedTimespan (0.0 to 1.0) <music21.note.Note C>>, 
+     <PitchedTimespan (0.0 to 2.0) <music21.note.Note C>>]
     
-    The Indices:(0:0:2:2) indicates that `leftLeft` has neither left nor right children
+    The Indices:(0:0:8:8) indicates that `leftLeft` has neither left nor right children
+    
     >>> leftLeft.leftChild is None
     True
     >>> leftLeft.rightChild is None
     True
     
-    What makes a TimespanNode more interesting than other AWL Nodes is that it is aware of
-    the fact that it might have objects that end at different times:
+    What makes an OffsetNode more interesting than other AWL Nodes is that it is aware of
+    the fact that it might have objects that end at different times, such as the zero-length
+    metadata and the 2.0 length half note
     
     >>> leftLeft.endTimeLow
-    1.0
+    0.0
     >>> leftLeft.endTimeHigh
     2.0   
     '''
@@ -110,71 +298,69 @@ class TimespanTreeNode(core.AVLNode):
     __slots__ = (
         'endTimeHigh',
         'endTimeLow',
-        'nodeStartIndex',
-        'nodeStopIndex',
-        'subtreeStartIndex',
-        'subtreeStopIndex',
+        'payloadElementsStartIndex',
+        'payloadElementsStopIndex',
+        'subtreeElementsStartIndex',
+        'subtreeElementsStopIndex',
         )
 
     _DOC_ATTR = {
     'payload': r'''
-        The contents of the node at this point.  Usually ElementTimespans.
+        The contents of the node at this point.  Usually PitchedTimespans.
 
         >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.streamToTimespanTree(score, flatten=True, 
+        >>> tree = timespans.fromStream.convert(score, flatten=True, 
         ...                  classList=(note.Note, chord.Chord))
         >>> print(tree.rootNode.debug())
-        <Node: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <Node: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <Node: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <Node: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <Node: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <Node: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <Node: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <Node: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+            L: <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>
+                L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
+                R: <OffsetNode: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+            R: <OffsetNode: Start:5.0 Indices:(6:8:9:12) Length:{1}>
+                L: <OffsetNode: Start:4.0 Indices:(6:6:8:8) Length:{2}>
+                R: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
+                    R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
 
         >>> tree.rootNode.payload
-        [<ElementTimespan (3.0 to 4.0) <music21.note.Note F>>]
+        [<PitchedTimespan (3.0 to 4.0) <music21.note.Note F>>]
 
         >>> tree.rootNode.leftChild.payload
-        [<ElementTimespan (1.0 to 2.0) <music21.note.Note D>>]
+        [<PitchedTimespan (1.0 to 2.0) <music21.note.Note D>>]
 
         >>> for x in tree.rootNode.leftChild.rightChild.payload:
         ...     x
         ...
-        <ElementTimespan (2.0 to 3.0) <music21.note.Note E>>
-        <ElementTimespan (2.0 to 4.0) <music21.note.Note G>>
+        <PitchedTimespan (2.0 to 3.0) <music21.note.Note E>>
+        <PitchedTimespan (2.0 to 4.0) <music21.note.Note G>>
 
         >>> tree.rootNode.rightChild.payload
-        [<ElementTimespan (5.0 to 6.0) <music21.note.Note A>>]
+        [<PitchedTimespan (5.0 to 6.0) <music21.note.Note A>>]
         ''',
         
-    'nodeStartIndex': r'''
+    'payloadElementsStartIndex': r'''
         The timespan start index (i.e., the first x where s[x] is found in this Node's payload) 
         of only those timespans stored in the payload of this node.
         ''',
         
-    'nodeStopIndex': r'''
+    'payloadElementsStopIndex': r'''
         The timespan stop index (i.e., the last x where s[x] is found in this Node's payload) 
         of only those timespans stored in the payload of this node.
         ''',
     'endTimeHigh': r'''
-        The highest stop offset of any timespan in any node of the subtree
-        rooted on this node.
+        The highest endTime of any node in the subtree rooted on this node.
         ''',
         
     'endTimeLow': r'''
-        The lowest stop offset of any timespan in any node of the subtree
-        rooted on this node.
+        The lowest endTime of any node in the subtree rooted on this node.
         ''',               
         
-    'subTreeStartIndex': r'''
-        The lowest timespan start index of any timespan in any node of the
+    'subtreeElementsStartIndex': r'''
+        The lowest element index of an element in the payload of any node of the
         subtree rooted on this node.
         ''',
         
-    'subtreeStopIndex': r'''
-        The highest timespan stop index of any timespan in any node of the
+    'subtreeElementsStopIndex': r'''
+        The highest element index of an element in the payload of any node of the
         subtree rooted on this node.
         ''',
     }
@@ -182,34 +368,119 @@ class TimespanTreeNode(core.AVLNode):
     ### INITIALIZER ###
 
     def __init__(self, offset):
-        super(TimespanTreeNode, self).__init__(offset)
+        super(OffsetNode, self).__init__(offset)
         self.payload = []
-        self.nodeStartIndex = -1
-        self.nodeStopIndex = -1
-        
-        self.endTimeHigh = None
-        self.endTimeLow = None
-        
-        self.subtreeStartIndex = -1
-        self.subtreeStopIndex = -1
-
+        self.payloadElementsStartIndex = -1
+        self.payloadElementsStopIndex = -1
 
     ### SPECIAL METHODS ###
 
     def __repr__(self):
-        return '<Node: Start:{} Indices:({}:{}:{}:{}) Length:{{{}}}>'.format(
+        return '<OffsetNode: Start:{} Indices:({}:{}:{}:{}) Length:{{{}}}>'.format(
             self.position,
-            self.subtreeStartIndex,
-            self.nodeStartIndex,
-            self.nodeStopIndex,
-            self.subtreeStopIndex,
+            self.subtreeElementsStartIndex,
+            self.payloadElementsStartIndex,
+            self.payloadElementsStopIndex,
+            self.subtreeElementsStopIndex,
             len(self.payload),
             )
 
+    ### PUBLIC METHODS ###
+
+    def updateIndices(self, parentStopIndex=None):
+        r'''
+        Updates the payloadElementsStartIndex, the paylodElementsStopIndex 
+        and the subtreeElementsStartIndex and 
+        subtreeElementsStopIndex (and does so for all child nodes) by traversing 
+        the tree structure.
+        
+        Updates cached indices which keep
+        track of the index of the element stored at each node, and of the
+        minimum and maximum indices of the subtrees rooted at each node.
+
+        Called on rootNode of a tree that uses OffsetNodes, such as OffsetTree
+        or TimespanTree
+
+        Returns None.
+        '''
+        if self.leftChild is not None:
+            self.leftChild.updateIndices(parentStopIndex=parentStopIndex)
+            self.payloadElementsStartIndex = self.leftChild.subtreeElementsStopIndex
+            self.subtreeElementsStartIndex = self.leftChild.subtreeElementsStartIndex
+        elif parentStopIndex is None:
+            self.payloadElementsStartIndex = 0
+            self.subtreeElementsStartIndex = 0
+        else:
+            self.payloadElementsStartIndex = parentStopIndex
+            self.subtreeElementsStartIndex = parentStopIndex
+        self.payloadElementsStopIndex = self.payloadElementsStartIndex + len(self.payload)
+        self.subtreeElementsStopIndex = self.payloadElementsStopIndex
+        if self.rightChild is not None:
+            self.rightChild.updateIndices(parentStopIndex=self.payloadElementsStopIndex)
+            self.subtreeElementsStopIndex = self.rightChild.subtreeElementsStopIndex
+
+    def updateEndTimes(self):
+        r'''
+        Traverses the tree structure and updates cached maximum and minimum
+        endTime values for the subtrees rooted at each node.
+
+        Used internally by OffsetTree.
+
+        Returns None
+        '''
+        try:
+            endTimeLow = min(x.endTime for x in self.payload)
+            endTimeHigh = max(x.endTime for x in self.payload)
+        except AttributeError: # elements do not have endTimes. do NOT mix elements and timespans.
+            endTimeLow = self.position + min(x.duration.quarterLength for x in self.payload)
+            endTimeHigh = self.position + max(x.duration.quarterLength for x in self.payload)            
+        
+        leftChild = self.leftChild
+        if leftChild:
+            leftChild.updateEndTimes()
+            if leftChild.endTimeLow < endTimeLow:
+                endTimeLow = leftChild.endTimeLow
+            if endTimeHigh < leftChild.endTimeHigh:
+                endTimeHigh = leftChild.endTimeHigh
+                
+        rightChild = self.rightChild
+        if rightChild:
+            rightChild.updateEndTimes()
+            if rightChild.endTimeLow < endTimeLow:
+                endTimeLow = rightChild.endTimeLow
+            if endTimeHigh < rightChild.endTimeHigh:
+                endTimeHigh = rightChild.endTimeHigh
+        self.endTimeLow = endTimeLow
+        self.endTimeHigh = endTimeHigh
 
 
+
+
+    def payloadEndTimes(self):
+        '''
+        returns a (potentially unsorted) list of all the end times for all TimeSpans or
+        Elements in the payload.  Does not trust el.endTime because it might refer to a
+        different offset.  Rather, it takes the position and adds it to the 
+        duration.quarterLength.
+        
+        >>> offsetNode = timespans.node.OffsetNode(40)
+        >>> n = note.Note()
+        >>> offsetNode.payload.append(n)
+        >>> ts = timespans.spans.Timespan(40, 44)
+        >>> offsetNode.payload.append(ts)
+        >>> offsetNode.payloadEndTimes()
+        [41.0, 44.0]
+        '''
+        outEndTimes = []
+        for tsOrEl in self.payload:
+            if isinstance(tsOrEl, Music21Object):
+                outEndTimes.append(self.position + tsOrEl.duration.quarterLength)
+            else:
+                outEndTimes.append(tsOrEl.endTime)
+        return outEndTimes
 
 #------------------------------------------------------------------------------
+
 
 
 class Test(unittest.TestCase):
@@ -221,7 +492,7 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 
 
-_DOC_ORDER = (TimespanTreeNode,)
+_DOC_ORDER = (ElementNode,)
 
 
 #------------------------------------------------------------------------------

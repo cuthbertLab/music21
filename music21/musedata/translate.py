@@ -172,6 +172,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
 
     p = stream.Part()
     p.id = museDataPart.getPartName()
+    p.partName = p.id
 
     # create and store objects
     mdmObjs = museDataPart.getMeasures()

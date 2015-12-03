@@ -2365,7 +2365,9 @@ class PlotStream(object):
                 i = 0 # always start with first
                 while i < len(mNoToUse):
                     offset = mNoToUse[i]
-                    mNumber = offsetMap[offset][0].number
+                    # this should be a measure object
+                    foundMeasure = offsetMap[offset][0]
+                    mNumber = foundMeasure.number
                     ticks.append([offset, '%s' % mNumber])
                     i += mNoStepSize
         else: # generate numeric ticks

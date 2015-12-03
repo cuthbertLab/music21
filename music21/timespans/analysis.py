@@ -33,7 +33,7 @@ class HorizontalityException(exceptions21.TimespanException):
 
 class Horizontality(collections.Sequence):
     r'''
-    A horizontality of consecutive elementTimespan objects.
+    A horizontality of consecutive PitchedTimespan objects.
     
     It must be initiated with a list or tuple of Timespan objects.
     '''
@@ -260,8 +260,7 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 
 
-_DOC_ORDER = (
-    )
+_DOC_ORDER = ()
 
 
 #------------------------------------------------------------------------------

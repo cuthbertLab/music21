@@ -317,32 +317,40 @@ class StreamCoreMixin(object):
         highly optimized data structure for searching through elements and
         offsets.
 
+        TODO: these should not all be PitchedTimespans...
+
         >>> score = timespans.makeExampleScore()
         >>> timespanColl = score.asTimespans()
         >>> print(timespanColl)
-        <TimespanTree {12} (0.0 to 8.0) <music21.stream.Score ...>>
-            <ElementTimespan (0.0 to 1.0) <music21.note.Note C>>
-            <ElementTimespan (0.0 to 2.0) <music21.note.Note C>>
-            <ElementTimespan (1.0 to 2.0) <music21.note.Note D>>
-            <ElementTimespan (2.0 to 3.0) <music21.note.Note E>>
-            <ElementTimespan (2.0 to 4.0) <music21.note.Note G>>
-            <ElementTimespan (3.0 to 4.0) <music21.note.Note F>>
-            <ElementTimespan (4.0 to 5.0) <music21.note.Note G>>
-            <ElementTimespan (4.0 to 6.0) <music21.note.Note E>>
-            <ElementTimespan (5.0 to 6.0) <music21.note.Note A>>
-            <ElementTimespan (6.0 to 7.0) <music21.note.Note B>>
-            <ElementTimespan (6.0 to 8.0) <music21.note.Note D>>
-            <ElementTimespan (7.0 to 8.0) <music21.note.Note C>>
+        <TimespanTree {20} (0.0 to 8.0) <music21.stream.Score 0x104840438>>
+            <PitchedTimespan (0.0 to 0.0) <music21.instrument.Instrument PartA: : >>
+            <PitchedTimespan (0.0 to 0.0) <music21.instrument.Instrument PartB: : >>
+            <PitchedTimespan (0.0 to 0.0) <music21.clef.BassClef>>
+            <PitchedTimespan (0.0 to 0.0) <music21.clef.BassClef>>
+            <PitchedTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
+            <PitchedTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
+            <PitchedTimespan (0.0 to 1.0) <music21.note.Note C>>
+            <PitchedTimespan (0.0 to 2.0) <music21.note.Note C>>
+            <PitchedTimespan (1.0 to 2.0) <music21.note.Note D>>
+            <PitchedTimespan (2.0 to 3.0) <music21.note.Note E>>
+            <PitchedTimespan (2.0 to 4.0) <music21.note.Note G>>
+            <PitchedTimespan (3.0 to 4.0) <music21.note.Note F>>
+            <PitchedTimespan (4.0 to 5.0) <music21.note.Note G>>
+            <PitchedTimespan (4.0 to 6.0) <music21.note.Note E>>
+            <PitchedTimespan (5.0 to 6.0) <music21.note.Note A>>
+            <PitchedTimespan (6.0 to 7.0) <music21.note.Note B>>
+            <PitchedTimespan (6.0 to 8.0) <music21.note.Note D>>
+            <PitchedTimespan (7.0 to 8.0) <music21.note.Note C>>
+            <PitchedTimespan (8.0 to 8.0) <music21.bar.Barline style=final>>
+            <PitchedTimespan (8.0 to 8.0) <music21.bar.Barline style=final>>
         '''
         hashedAttributes = hash( (tuple(classList or () ), recurse) ) 
         cacheKey = "timespanTree" + str(hashedAttributes)
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
-            hashedTSC = timespans.streamToTimespanTree(
-                self,
-                flatten=recurse,
-                classList=classList,
-                )
-            self._cache[cacheKey] = hashedTSC
+            hashedTimespanCollection = timespans.fromStream.convert(self,
+                                                     flatten=recurse,
+                                                     classList=classList)
+            self._cache[cacheKey] = hashedTimespanCollection
         return self._cache[cacheKey]
     
     def coreGatherMissingSpanners(self, recurse=True, requireAllPresent=True, insert=True):
