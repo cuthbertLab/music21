@@ -500,7 +500,7 @@ def makeMeasures(
                 lastTimeSignature = m.timeSignature
             # get start and end offsets for each measure
             # seems like should be able to use m.duration.quarterLengths
-            mStart = m.getOffsetBySite(post)
+            mStart = post.elementOffset(m)
             mEnd = mStart + lastTimeSignature.barDuration.quarterLength
             # if elements start fits within this measure, break and use
             # offset cannot start on end
@@ -509,6 +509,7 @@ def makeMeasures(
                 #environLocal.printDebug([
                 #    'found measure match', i, mStart, mEnd, start, end, e])
                 break
+
         if not match:
             raise stream.StreamException(
                 'cannot place element %s with start/end %s/%s '
@@ -570,7 +571,7 @@ def makeMeasures(
         s.elementsChanged()
         for e in post.sorted:
             # may need to handle spanners; already have s as site
-            s.insert(e.getOffsetBySite(post), e)
+            s.insert(post.elementOffset(e), e)
 
 
 def makeRests(s, refStreamOrTimeRange=None, fillGaps=False,
@@ -916,7 +917,7 @@ def makeTies(
         else:  # create a new measure
             mNext = stream.Measure()
             # set offset to last offset plus total length
-            moffset = m.getOffsetBySite(measureStream)
+            moffset = measureStream.elementOffset(m)
             if lastTimeSignature is not None:
                 mNext.offset = (moffset +
                                 lastTimeSignature.barDuration.quarterLength)
@@ -929,8 +930,8 @@ def makeTies(
             else:  # get the last encountered meter
                 ts = meterStream.getElementAtOrBefore(mNext.offset)
             # only copy and assign if not the same as the last
-            if lastTimeSignature is not None \
-                and not lastTimeSignature.ratioEqual(ts):
+            if (lastTimeSignature is not None and
+                    not lastTimeSignature.ratioEqual(ts)):
                 mNext.timeSignature = copy.deepcopy(ts)
             # increment measure number
             mNext.number = m.number + 1
@@ -973,13 +974,12 @@ def makeTies(
                 #if hasattr(e, 'duration') and e.duration is not None:
                 if e.duration is not None:
                     # check to see if duration is within Measure
-                    eOffset = e.getOffsetBySite(v)
-                    eEnd = eOffset + e.duration.quarterLength
+                    eOffset = v.elementOffset(e)
+                    eEnd = opFrac(eOffset + e.duration.quarterLength)
                     # assume end can be at boundary of end of measure
                     overshot = eEnd - mEnd
-                    # only process if overshot is greater than a minimum
-                    # 1/64 is 0.015625
-                    if overshot > .001:
+
+                    if overshot > 0:
                         if eOffset >= mEnd:
                             continue # skip elements that extend past measure boundary.
 #                             raise stream.StreamException(

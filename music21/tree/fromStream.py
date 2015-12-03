@@ -18,7 +18,6 @@ from music21 import common
 from music21.tree import spans
 from music21.tree import trees
 
-
 def listOfTreesByClass(inputStream,
                        currentParentage=None,
                        initialOffset=0.0,
@@ -92,7 +91,7 @@ def listOfTreesByClass(inputStream,
     # do this to avoid munging activeSites
     inputStreamElements = inputStream._elements[:] + inputStream._endElements
     for element in inputStreamElements:
-        offset = element.getOffsetBySite(lastParentage) + initialOffset
+        offset = lastParentage.elementOffset(element) + initialOffset
         wasStream = False
         
         if element.isStream:

@@ -2056,7 +2056,7 @@ class Music21Object(object):
         30.5
 
         When in doubt, use `.getOffsetBySite(streamObj)`
-        which is safer.
+        which is safer or streamObj.elementOffset(self) which is 3x faster.
         ''')
     
     def sortTuple(self, useSite=False):
@@ -2921,16 +2921,24 @@ class Music21Object(object):
         >>> n._getMeasureOffset() # returns zero when not assigned
         0.0
         >>> n.quarterLength = .5
+        
         >>> m = stream.Measure()
         >>> m.repeatAppend(n, 4)
         >>> [n._getMeasureOffset() for n in m.notes]
         [0.0, 0.5, 1.0, 1.5]
+        
+        >>> m.paddingLeft = 2
+        >>> [n._getMeasureOffset() for n in m.notes]
+        [2.0, 2.5, 3.0, 3.5]
+        >>> [n._getMeasureOffset(includeMeasurePadding=False) for n in m.notes]
+        [0.0, 0.5, 1.0, 1.5]
         '''
-        if self.activeSite is not None and self.activeSite.isMeasure:
+        activeS = self.activeSite
+        if activeS is not None and activeS.isMeasure:
             #environLocal.printDebug(['found activeSite as Measure, using for offset'])
-            offsetLocal = self.getOffsetBySite(self.activeSite)
+            offsetLocal = activeS.elementOffset(self)
             if includeMeasurePadding:
-                offsetLocal += self.activeSite.paddingLeft
+                offsetLocal += activeS.paddingLeft
         else:
             #environLocal.printDebug(['did not find activeSite as Measure, 
             #    doing context search', 'self.activeSite', self.activeSite])

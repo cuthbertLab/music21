@@ -1364,6 +1364,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         2.0
         >>> s.elementOffset(b, stringReturns=True)
         'highestTime' 
+        
+        Performance note: this should usually be about 3x faster than
+        element.getOffsetBySite(self) -- currently 600ns instead of 1.5 microseconds.
         '''
         try:
             o = self._offsetDict[id(element)][0] # 2.3 million times found in TestStream
@@ -3414,11 +3417,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnObj.elementsChanged()
             
         if gatherSpanners:
+            sf = srcObj.flat
             for sp in spannerBundle:
                 # can use old offsets of spanners, even though components
                 # have been updated
                 #returnObj.insert(sp.getOffsetBySite(mStreamSpanners), sp)
-                returnObj._insertCore(sp.getOffsetBySite(srcObj.flat), sp)
+                returnObj._insertCore(sf.elementOffset(sp), sp)
 
                 #environLocal.printDebug(['Stream.measrues: copying spanners:', sp])
 
@@ -5160,7 +5164,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # TODO: this iterates over all notes at each iteration; can be faster
                 for e in post.iter.notesAndRests:
                     # these are flat offset values
-                    o = e.getOffsetBySite(post)
+                    o = post.elementOffset(e)
                     #environLocal.printDebug(['iterating elements', o, e])
                     if o >= mOffsetStart and o < mOffsetEnd:
                         # get offset in relation to inside of Measure
@@ -5236,9 +5240,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             found = self
         for e in found._elements:
             if fx(e):
-                a._insertCore(e.getOffsetBySite(found), e) # provide an offset here
+                a._insertCore(found.elementOffset(e), e) # provide an offset here
             else:
-                b._insertCore(e.getOffsetBySite(found), e)
+                b._insertCore(found.elementOffset(e), e)
         for e in found._endElements:
             if fx(e):
                 #a.storeAtEnd(e)
@@ -5293,8 +5297,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     dur = e.duration.quarterLength
                 else:
                     dur = 0
-                # NOTE: rounding here may cause secondary problems
-                offset = e.getOffsetBySite(group) #round(e.getOffsetBySite(group), 8)
+                offset = group.elementOffset(e)
                 endTime = opFrac(offset + dur)
                 # NOTE: used to make a copy.copy of elements here;
                 # this is not necssary b/c making deepcopy of entire Stream

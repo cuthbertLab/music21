@@ -613,7 +613,7 @@ class Spanner(base.Music21Object):
         for c in self.spannerStorage._elements:
             # getting site ids is fast, as weakrefs do not have to be unpacked
             if idSite in c.sites.getSiteIds():
-                o = c.getOffsetBySite(site)
+                o = site.elementOffset(c)
                 post.append(o)
         return post
 
@@ -641,7 +641,7 @@ class Spanner(base.Music21Object):
 
         # special handling for case of a single spannedElement spanner
         if len(self.spannerStorage) == 1:
-            o = self.spannerStorage[0].getOffsetBySite(site)
+            o = site.elementOffset(self.spannerStorage[0])
             return o, o + self.spannerStorage[0].duration.quarterLength
 
         offsetSpannedElement = [] # store pairs
@@ -649,7 +649,7 @@ class Spanner(base.Music21Object):
         #for c in self.getSpannedElements():
             objRef = c
             if idSite in objRef.sites.getSiteIds():
-                o = objRef.getOffsetBySite(site)
+                o = site.elementOffset(objRef)
                 offsetSpannedElement.append([o, objRef])
         offsetSpannedElement.sort() # sort by offset
         minOffset = offsetSpannedElement[0][0]
