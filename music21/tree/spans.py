@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
-# Name:         timespans/spans.py
-# Purpose:      Tools for grouping notes and chords into a searchable tree
-#               organized by start and stop offsets
+# Name:         tree/spans.py
+# Purpose:      Tools for marking off spans of time that optionally contain 
+#               elements and which can be manipulated quickly in a tree
 #
 # Authors:      Josiah Wolf Oberholtzer
 #               Michael Scott Cuthbert
@@ -22,7 +22,7 @@ from music21 import meter
 
 from music21.exceptions21 import TimespanException
 from music21 import environment
-environLocal = environment.Environment("timespans.spans")
+environLocal = environment.Environment("tree.spans")
 #------------------------------------------------------------------------------
 class TimespanSpanException(exceptions21.TimespanException):
     pass
@@ -34,7 +34,7 @@ class Timespan(object):
     Useful for demonstrating various properties of the timespan-collection class
     family.
 
-    >>> timespan = timespans.spans.Timespan(-1.5, 3.25)
+    >>> timespan = tree.spans.Timespan(-1.5, 3.25)
     >>> print(timespan)
     <Timespan -1.5 3.25>
     
@@ -57,7 +57,7 @@ class Timespan(object):
     
     Two timespans are equal if they have the same offset and endTime
     
-    >>> ts4 = timespans.spans.Timespan(-1.5, 5.0)
+    >>> ts4 = tree.spans.Timespan(-1.5, 5.0)
     >>> ts3 == ts4
     True
     >>> ts4 == ts2
@@ -102,8 +102,8 @@ class Timespan(object):
         containing score.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> verticality = tree.getVerticalityAt(1.0)
+        >>> scoreTree = score.asTimespans()
+        >>> verticality = scoreTree.getVerticalityAt(1.0)
         >>> timespan = verticality.startTimespans[0]
         >>> timespan.offset
         1.0
@@ -118,8 +118,8 @@ class Timespan(object):
         containing score.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> verticality = tree.getVerticalityAt(1.0)
+        >>> scoreTree = score.asTimespans()
+        >>> verticality = scoreTree.getVerticalityAt(1.0)
         >>> timespan = verticality.startTimespans[0]
         >>> timespan.endTime
         2.0
@@ -144,17 +144,17 @@ class Timespan(object):
         returns a tuple of (True or False) if these timespans can be merged
         with the second element being a message or None.
         
-        >>> ts1 = timespans.spans.Timespan(0, 5)
-        >>> ts2 = timespans.spans.Timespan(5, 7)
+        >>> ts1 = tree.spans.Timespan(0, 5)
+        >>> ts2 = tree.spans.Timespan(5, 7)
         >>> ts1.canMerge(ts2)
         (True, '')
-        >>> ts3 = timespans.spans.Timespan(6, 10)
+        >>> ts3 = tree.spans.Timespan(6, 10)
         >>> ts1.canMerge(ts3)
         (False, 'Cannot merge <Timespan 0.0 5.0> with <Timespan 6.0 10.0>: not contiguous')
 
         Overlapping Timespans cannot be merged, just contiguous ones.
 
-        >>> ts4 = timespans.spans.Timespan(3, 4)
+        >>> ts4 = tree.spans.Timespan(3, 4)
         >>> ts1.canMerge(ts4)
         (False, 'Cannot merge <Timespan 0.0 5.0> with <Timespan 3.0 4.0>: not contiguous')
         '''
@@ -174,15 +174,15 @@ class Timespan(object):
         Merges two consecutive/contiguous timespans, keeping the
         information from the former of the two.
         
-        >>> ts1 = timespans.spans.Timespan(0, 5)
-        >>> ts2 = timespans.spans.Timespan(5, 7)
+        >>> ts1 = tree.spans.Timespan(0, 5)
+        >>> ts2 = tree.spans.Timespan(5, 7)
         >>> ts3 = ts1.mergeWith(ts2)
         >>> ts3
         <Timespan 0.0 7.0>
 
         Note that (for now), overlapping timespans cannot be merged:
         
-        >>> ts4 = timespans.spans.Timespan(6, 10)
+        >>> ts4 = tree.spans.Timespan(6, 10)
         >>> ts3.mergeWith(ts4)
         Traceback (most recent call last):
         TimespanException: Cannot merge <Timespan 0.0 7.0> with 
@@ -203,8 +203,8 @@ class Timespan(object):
         Split Timespan at `offset`.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans(classList=(note.Note,))
-        >>> verticality = tree.getVerticalityAt(0)
+        >>> scoreTree = score.asTimespans(classList=(note.Note,))
+        >>> verticality = scoreTree.getVerticalityAt(0)
         >>> verticality
         <Verticality 0 {A3 E4 C#5}>
         
@@ -249,14 +249,14 @@ class PitchedTimespan(Timespan):
     First we create an Offset tree:
 
     >>> score = corpus.parse('bwv66.6')
-    >>> tree = score.asTimespans()
-    >>> tree
+    >>> scoreTree = score.asTimespans()
+    >>> scoreTree
     <TimespanTree {195} (0.0 to 36.0) <music21.stream.Score ...>>
 
     Then get the verticality from offset 6.5, which is beat two-and-a-half of
     measure 2 (the piece is in 4/4 with a quarter-note pickup)
 
-    >>> verticality = tree.getVerticalityAt(6.5)
+    >>> verticality = scoreTree.getVerticalityAt(6.5)
     >>> verticality
     <Verticality 6.5 {E3 D4 G#4 B4}>
 
@@ -377,15 +377,15 @@ class PitchedTimespan(Timespan):
         chorale:
     
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans(classList=(note.Note,))
-        >>> timespan_one = tree[12]
+        >>> scoreTree = score.asTimespans(classList=(note.Note,))
+        >>> timespan_one = scoreTree[12]
         >>> print(timespan_one)
         <PitchedTimespan (2.0 to 3.0) <music21.note.Note E>>
     
         >>> print(timespan_one.part)
         <music21.stream.Part Alto>
     
-        >>> timespan_two = tree.findNextPitchedTimespanInSameStreamByClass(timespan_one)
+        >>> timespan_two = scoreTree.findNextPitchedTimespanInSameStreamByClass(timespan_one)
         >>> print(timespan_two)
         <PitchedTimespan (3.0 to 4.0) <music21.note.Note E>>
         
@@ -405,12 +405,12 @@ class PitchedTimespan(Timespan):
         Attempting to merge timespans which are not contiguous, or which do not
         have identical pitches will result in error:
     
-        >>> tree[0].canMerge(tree[50])
+        >>> scoreTree[0].canMerge(scoreTree[50])
         (False, 'Cannot merge <PitchedTimespan (0.0 to 0.5) <music21.note.Note C#>> 
              with <PitchedTimespan (9.5 to 10.0) <music21.note.Note B>>: not contiguous')
 
         
-        >>> tree[0].mergeWith(tree[50])
+        >>> scoreTree[0].mergeWith(scoreTree[50])
         Traceback (most recent call last):
         TimespanException: Cannot merge <PitchedTimespan (0.0 to 0.5) <music21.note.Note C#>> 
                 with <PitchedTimespan (9.5 to 10.0) <music21.note.Note B>>: not contiguous
@@ -419,7 +419,7 @@ class PitchedTimespan(Timespan):
         This is probably not what you want to do: get the next element timespan in
         the same score:
     
-        >>> timespan_twoWrong = tree.findNextPitchedTimespanInSameStreamByClass(
+        >>> timespan_twoWrong = scoreTree.findNextPitchedTimespanInSameStreamByClass(
         ...     timespan_one, classList=(stream.Score,))
         >>> print(timespan_twoWrong)
         <PitchedTimespan (3.0 to 4.0) <music21.note.Note C#>>
@@ -449,7 +449,7 @@ class PitchedTimespan(Timespan):
         but with some of the parameters overridden.
         
         >>> n = note.Note("C#")
-        >>> pts = timespans.spans.PitchedTimespan(n, offset=11.0, endTime=12.0)
+        >>> pts = tree.spans.PitchedTimespan(n, offset=11.0, endTime=12.0)
         >>> pts
         <PitchedTimespan (11.0 to 12.0) <music21.note.Note C#>>
         >>> pts2 = pts.new(endTime=13.0)
@@ -502,7 +502,7 @@ class PitchedTimespan(Timespan):
         >>> s = stream.Stream()
         >>> s.insert(0.0, ts)
         >>> s.insert(1.0, n)
-        >>> pts = timespans.spans.PitchedTimespan(n, offset=1.0, endTime=2.0)
+        >>> pts = tree.spans.PitchedTimespan(n, offset=1.0, endTime=2.0)
         >>> pts
         <PitchedTimespan (1.0 to 2.0) <music21.note.Note D->>
         >>> pts.beatStrength
@@ -538,7 +538,7 @@ class PitchedTimespan(Timespan):
         >>> n.offset = 1.0
         >>> n.duration.quarterLength = 2.0
 
-        >>> pts = timespans.spans.PitchedTimespan(n, offset=n.offset, endTime=3.0)
+        >>> pts = tree.spans.PitchedTimespan(n, offset=n.offset, endTime=3.0)
         >>> pts
         <PitchedTimespan (1.0 to 3.0) <music21.note.Note D->>
         >>> pts.quarterLength
@@ -562,8 +562,8 @@ class PitchedTimespan(Timespan):
         The PitchedTimespan's element.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> verticality = tree.getVerticalityAt(1.0)
+        >>> scoreTree = score.asTimespans()
+        >>> verticality = scoreTree.getVerticalityAt(1.0)
         >>> pitchedTimespan = verticality.startTimespans[0]
         >>> pitchedTimespan.element
         <music21.note.Note A>
@@ -576,8 +576,8 @@ class PitchedTimespan(Timespan):
         The measure number of the measure containing the element.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> verticality = tree.getVerticalityAt(1.0)
+        >>> scoreTree = score.asTimespans()
+        >>> verticality = scoreTree.getVerticalityAt(1.0)
         >>> pitchedTimespan = verticality.startTimespans[0]
         >>> pitchedTimespan.measureNumber
         1
@@ -604,8 +604,8 @@ class PitchedTimespan(Timespan):
         The Stream hierarchy above the PitchedTimespan's element.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> verticality = tree.getVerticalityAt(1.0)
+        >>> scoreTree = score.asTimespans()
+        >>> verticality = scoreTree.getVerticalityAt(1.0)
         >>> pitchedTimespan = verticality.startTimespans[0]
         >>> for streamSite in pitchedTimespan.parentage:
         ...     streamSite
@@ -622,8 +622,8 @@ class PitchedTimespan(Timespan):
 
         >>> score = corpus.parse('bwv66.6')
         >>> score.id = 'bach'
-        >>> tree = score.asTimespans()
-        >>> verticality = tree.getVerticalityAt(1.0)
+        >>> scoreTree = score.asTimespans()
+        >>> verticality = scoreTree.getVerticalityAt(1.0)
         >>> pitchedTimespan = verticality.startTimespans[2]
         >>> pitchedTimespan
         <PitchedTimespan (1.0 to 2.0) <music21.note.Note C#>>
@@ -656,8 +656,8 @@ class PitchedTimespan(Timespan):
         find the object in the parentage that is a Part object:
         
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> verticality = tree.getVerticalityAt(1.0)
+        >>> scoreTree = score.asTimespans()
+        >>> verticality = scoreTree.getVerticalityAt(1.0)
         >>> pitchedTimespan = verticality.startTimespans[2]
         >>> pitchedTimespan
         <PitchedTimespan (1.0 to 2.0) <music21.note.Note C#>>
@@ -676,14 +676,14 @@ class PitchedTimespan(Timespan):
         This treats notes as chords.
         
         >>> c = chord.Chord('C4 E4 G4')
-        >>> pts = timespans.spans.PitchedTimespan(c, offset=0.0, endTime=1.0)
+        >>> pts = tree.spans.PitchedTimespan(c, offset=0.0, endTime=1.0)
         >>> pts.pitches
         (<music21.pitch.Pitch C4>, <music21.pitch.Pitch E4>, <music21.pitch.Pitch G4>)
         
         Perhaps remove? except for this case:
         
         >>> d = dynamics.Dynamic('f')
-        >>> pts2 = timespans.spans.PitchedTimespan(d, offset=0.0, endTime=10.0)
+        >>> pts2 = tree.spans.PitchedTimespan(d, offset=0.0, endTime=10.0)
         >>> pts2.pitches
         ()
         '''

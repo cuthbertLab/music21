@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
-# Name:         timespans/analysis.py
-# Purpose:      Tools for grouping notes and chords into a searchable tree
-#               organized by start and stop offsets
+# Name:         tree/analysis.py
+# Purpose:      horizontal analysis tools on timespan trees
 #
 # Authors:      Josiah Wolf Oberholtzer
 #
@@ -11,7 +10,7 @@
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
 '''
-Tools for performing voice-leading analysis with timespans.
+Tools for performing voice-leading analysis with trees.
 '''
 import collections
 import unittest
@@ -21,7 +20,7 @@ from music21 import environment
 from music21 import exceptions21
 #from music21 import key
 
-environLocal = environment.Environment("timespans.analysis")
+environLocal = environment.Environment("tree.analysis")
 
 
 class HorizontalityException(exceptions21.TimespanException):

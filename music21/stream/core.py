@@ -26,7 +26,7 @@ All attributes here will eventually begin with `.core`.
 import unittest
 
 from music21 import spanner 
-from music21 import timespans
+from music21 import tree
 from music21.exceptions21 import StreamException
 
 class StreamCoreMixin(object):
@@ -40,8 +40,8 @@ class StreamCoreMixin(object):
         # the highestTime of this Stream.
         self._endElements = []
         self.isSorted = True
-        ### v3!
-        #self._elementTree = timespans.trees.ElementTree(source=self)
+        ### v4!
+        #self._elementTree = tree.trees.ElementTree(source=self)
 
         
     def _insertCore(self, offset, element, ignoreSort=False,
@@ -313,15 +313,15 @@ class StreamCoreMixin(object):
 
     def asTimespans(self, classList=None, recurse=True):
         r'''
-        Convert stream to a :class:`~music21.timespans.trees.TimespanTree` instance, a
+        Convert stream to a :class:`~music21.tree.trees.TimespanTree` instance, a
         highly optimized data structure for searching through elements and
         offsets.
 
         TODO: these should not all be PitchedTimespans...
 
-        >>> score = timespans.makeExampleScore()
-        >>> timespanColl = score.asTimespans()
-        >>> print(timespanColl)
+        >>> score = tree.makeExampleScore()
+        >>> scoreTree = score.asTimespans()
+        >>> print(scoreTree)
         <TimespanTree {20} (0.0 to 8.0) <music21.stream.Score 0x104840438>>
             <PitchedTimespan (0.0 to 0.0) <music21.instrument.Instrument PartA: : >>
             <PitchedTimespan (0.0 to 0.0) <music21.instrument.Instrument PartB: : >>
@@ -347,10 +347,10 @@ class StreamCoreMixin(object):
         hashedAttributes = hash( (tuple(classList or () ), recurse) ) 
         cacheKey = "timespanTree" + str(hashedAttributes)
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
-            hashedTimespanCollection = timespans.fromStream.convert(self,
+            hashedTimespanTree = tree.fromStream.convert(self,
                                                      flatten=recurse,
                                                      classList=classList)
-            self._cache[cacheKey] = hashedTimespanCollection
+            self._cache[cacheKey] = hashedTimespanTree
         return self._cache[cacheKey]
     
     def coreGatherMissingSpanners(self, recurse=True, requireAllPresent=True, insert=True):

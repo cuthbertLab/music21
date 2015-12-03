@@ -49,7 +49,6 @@ from music21 import tie
 from music21 import repeat
 from music21 import sites
 from music21 import tempo
-from music21 import timespans
 
 from music21.ext import six
 
@@ -2925,7 +2924,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # TODO: need to deal with more than on object the same
         # offset and span from the source
         
-        # TODO: switch to timespans
+        # TODO: switch to trees
         candidates = []
         offset = opFrac(offset)
         nearestTrailSpan = offset # start with max time

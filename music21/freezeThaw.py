@@ -85,7 +85,7 @@ from music21 import defaults
 from music21 import derivation
 from music21 import exceptions21
 from music21 import pitch
-#from music21.timespans.trees import ElementTree
+#from music21.tree.trees import ElementTree
 
 from music21.ext import jsonpickle
 from music21.ext import six

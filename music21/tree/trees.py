@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
-# Name:         timespans/trees.py
-# Purpose:      Tools for grouping notes and chords into a searchable tree
-#               organized by start and stop offsets
+# Name:         tree/trees.py
+# Purpose:      Subclasses of tree.core.AVLTree for different purposes
 #
 # Authors:      Josiah Wolf Oberholtzer
 #               Michael Scott Cuthbert
@@ -12,8 +11,9 @@
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
 '''
-Tools for grouping notes and chords into a searchable tree
-organized by start and stop offsets.
+Tools for grouping elements, timespans, and especially
+pitched elements into kinds of searchable tree organized by start and stop offsets
+and other positions.
 '''
 
 import collections
@@ -26,12 +26,12 @@ from music21 import exceptions21
 
 from music21.base import _SortTuple
 
-from music21.timespans import spans, core
-from music21.timespans import node as nodeModule
+from music21.tree import spans, core
+from music21.tree import node as nodeModule
 
 from music21.exceptions21 import TimespanException
 from music21 import environment
-environLocal = environment.Environment("timespans")
+environLocal = environment.Environment("tree.trees")
 
 INFINITY = float('inf')
 NEGATIVE_INFINITY = float('-inf')
@@ -46,7 +46,7 @@ class ElementTree(core.AVLTree):
     `offset` and `endTime` property. It provides fast lookups of such
     objects and can quickly locate vertical overlaps.
 
-    >>> et = timespans.trees.ElementTree()
+    >>> et = tree.trees.ElementTree()
     >>> et
     <ElementTree {0} (-inf to inf)>
     
@@ -93,21 +93,21 @@ class ElementTree(core.AVLTree):
         .offset of the element matches the position in the tree.
 
         >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> tss = [timespans.spans.Timespan(x, y) for x, y in tsList]
-        >>> tree = timespans.trees.TimespanTree()
-        >>> tree.insert(tss)
+        >>> tss = [tree.spans.Timespan(x, y) for x, y in tsList]
+        >>> tsTree = tree.trees.TimespanTree()
+        >>> tsTree.insert(tss)
 
-        >>> tss[0] in tree
+        >>> tss[0] in tsTree
         True
 
-        >>> timespans.spans.Timespan(-200, 1000) in tree
+        >>> tree.spans.Timespan(-200, 1000) in tsTree
         False
         
         The exact Timespan object does not have to be in the tree, just one with the same offset
         and endTime:
         
-        >>> tsDuplicate = timespans.spans.Timespan(0, 2)
-        >>> tsDuplicate in tree
+        >>> tsDuplicate = tree.spans.Timespan(0, 2)
+        >>> tsDuplicate in tsTree
         True
         '''
         try:
@@ -130,26 +130,26 @@ class ElementTree(core.AVLTree):
         Gets elements by integer index or slice.
 
         >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> tss = [timespans.spans.Timespan(x, y) for x, y in tsList]
-        >>> tree = timespans.trees.TimespanTree()
-        >>> tree.insert(tss)
+        >>> tss = [tree.spans.Timespan(x, y) for x, y in tsList]
+        >>> tsTree = tree.trees.TimespanTree()
+        >>> tsTree.insert(tss)
 
-        >>> tree[0]
+        >>> tsTree[0]
         <Timespan 0.0 2.0>
 
-        >>> tree[-1]
+        >>> tsTree[-1]
         <Timespan 7.0 7.0>
 
-        >>> tree[2:5]
+        >>> tsTree[2:5]
         [<Timespan 1.0 1.0>, <Timespan 2.0 3.0>, <Timespan 3.0 4.0>]
 
-        >>> tree[-6:-3]
+        >>> tsTree[-6:-3]
         [<Timespan 3.0 4.0>, <Timespan 4.0 9.0>, <Timespan 5.0 6.0>]
 
-        >>> tree[-100:-200]
+        >>> tsTree[-100:-200]
         []
 
-        >>> for x in tree[:]:
+        >>> for x in tsTree[:]:
         ...     x
         <Timespan 0.0 2.0>
         ...
@@ -211,11 +211,11 @@ class ElementTree(core.AVLTree):
         in the payload.
 
         >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> tss = [timespans.spans.Timespan(x, y) for x, y in tsList]
-        >>> tree = timespans.trees.TimespanTree()
-        >>> tree.insert(tss)
+        >>> tss = [tree.spans.Timespan(x, y) for x, y in tsList]
+        >>> tsTree = tree.trees.TimespanTree()
+        >>> tsTree.insert(tss)
 
-        >>> for x in tree:
+        >>> for x in tsTree:
         ...     x
         <Timespan 0.0 2.0>
         <Timespan 0.0 9.0>
@@ -236,22 +236,22 @@ class ElementTree(core.AVLTree):
         r'''
         Gets the length of the ElementTree collection, i.e., the number of elements enclosed.
 
-        >>> tree = timespans.trees.OffsetTree()
-        >>> len(tree)
+        >>> offTree = tree.trees.OffsetTree()
+        >>> len(offTree)
         0
 
         >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
         >>> tss = [note.Note() for _ in tsList]
         >>> for i,n in enumerate(tss):
         ...     n.offset, n.quarterLength = tsList[i]
-        >>> tree.insert(tss)
-        >>> len(tree)
+        >>> offTree.insert(tss)
+        >>> len(offTree)
         10
-        >>> len(tree) == len(tss)
+        >>> len(offTree) == len(tss)
         True
 
-        >>> tree.remove(tss)
-        >>> len(tree)
+        >>> offTree.remove(tss)
+        >>> len(offTree)
         0
         '''
         if self.rootNode is None:
@@ -281,17 +281,17 @@ class ElementTree(core.AVLTree):
 
     def __setitem__(self, i, new):
         r'''
-        Sets timespans at index `i` to `new`.
+        Sets elements or timespans at index `i` to `new`.
 
         >>> tss = [
-        ...     timespans.spans.Timespan(0, 2),
-        ...     timespans.spans.Timespan(0, 9),
-        ...     timespans.spans.Timespan(1, 1),
+        ...     tree.spans.Timespan(0, 2),
+        ...     tree.spans.Timespan(0, 9),
+        ...     tree.spans.Timespan(1, 1),
         ...     ]
-        >>> tree = timespans.trees.TimespanTree()
-        >>> tree.insert(tss)
-        >>> tree[0] = timespans.spans.Timespan(-1, 6)
-        >>> for x in tree:
+        >>> tsTree = tree.trees.TimespanTree()
+        >>> tsTree.insert(tss)
+        >>> tsTree[0] = tree.spans.Timespan(-1, 6)
+        >>> for x in tsTree:
         ...     x
         <Timespan -1.0 6.0>
         <Timespan 0.0 9.0>
@@ -299,8 +299,8 @@ class ElementTree(core.AVLTree):
 
         Works with slices too.
 
-        >>> tree[1:] = [timespans.spans.Timespan(10, 20)]
-        >>> for x in tree:
+        >>> tsTree[1:] = [tree.spans.Timespan(10, 20)]
+        >>> for x in tsTree:
         ...     x
         <Timespan -1.0 6.0>
         <Timespan 10.0 20.0>
@@ -398,18 +398,18 @@ class ElementTree(core.AVLTree):
         
         This is analogous to `dict.copy()`.  
 
-        >>> score = timespans.makeExampleScore()
-        >>> tree = score.asTimespans()
-        >>> newTree = tree.copy()
+        >>> score = tree.makeExampleScore()
+        >>> scoreTree = score.asTimespans()
+        >>> newTree = scoreTree.copy()
         >>> newTree
         <TimespanTree {20} (0.0 to 8.0)>
 
-        >>> tree[16]
+        >>> scoreTree[16]
         <PitchedTimespan (6.0 to 8.0) <music21.note.Note D>>
         >>> newTree[16]
         <PitchedTimespan (6.0 to 8.0) <music21.note.Note D>>
         
-        >>> tree[16] is newTree[16]
+        >>> scoreTree[16] is newTree[16]
         True
         '''
         newTree = type(self)()
@@ -419,11 +419,11 @@ class ElementTree(core.AVLTree):
 
     def elementsStartingAt(self, offset):
         r'''
-        Finds timespans in this offset-tree which start at `offset`.
+        Finds elements or timespans in this offset-tree which start at `offset`.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> for timespan in tree.elementsStartingAt(0.5):
+        >>> scoreTree = score.asTimespans()
+        >>> for timespan in scoreTree.elementsStartingAt(0.5):
         ...     timespan
         ...
         <PitchedTimespan (0.5 to 1.0) <music21.note.Note B>>
@@ -441,11 +441,11 @@ class ElementTree(core.AVLTree):
 
     def elementsStoppingAt(self, offset):
         r'''
-        Finds timespans in this offset-tree which stop at `offset`.
+        Finds elements or timespans in this offset-tree which stop at `offset`.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> for timespan in tree.elementsStoppingAt(0.5):
+        >>> scoreTree = score.asTimespans()
+        >>> for timespan in scoreTree.elementsStoppingAt(0.5):
         ...     timespan
         ...
         <PitchedTimespan (0.0 to 0.5) <music21.note.Note C#>>
@@ -476,8 +476,8 @@ class ElementTree(core.AVLTree):
         Finds elements or timespans in this ElementTree which overlap `offset`.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> for el in tree.elementsOverlappingOffset(0.5):
+        >>> scoreTree = score.asTimespans()
+        >>> for el in scoreTree.elementsOverlappingOffset(0.5):
         ...     el
         ...
         <PitchedTimespan (0.0 to 1.0) <music21.note.Note E>>
@@ -505,17 +505,17 @@ class ElementTree(core.AVLTree):
 
     def index(self, element, offset=None):
         r'''
-        Gets index of `timespan` in tree.
+        Gets index of `element` in tree (can be a Timespan).
         
-        Since timespans do not have .sites, there is only one offset to deal with...
+        Since Timespans do not have .sites, there is only one offset to deal with...
 
         >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> ts = [timespans.spans.Timespan(x, y) for x, y in tsList]
-        >>> tree = timespans.trees.TimespanTree()
-        >>> tree.insert(ts)
+        >>> ts = [tree.spans.Timespan(x, y) for x, y in tsList]
+        >>> tsTree = tree.trees.TimespanTree()
+        >>> tsTree.insert(ts)
 
         >>> for timespan in ts:
-        ...     print("%r %d" % (timespan, tree.index(timespan)))
+        ...     print("%r %d" % (timespan, tsTree.index(timespan)))
         ...
         <Timespan 0.0 2.0> 0
         <Timespan 0.0 9.0> 1
@@ -528,7 +528,7 @@ class ElementTree(core.AVLTree):
         <Timespan 6.0 8.0> 8
         <Timespan 7.0 7.0> 9
 
-        >>> tree.index(timespans.spans.Timespan(-100, 100))
+        >>> tsTree.index(tree.spans.Timespan(-100, 100))
         Traceback (most recent call last):
         ValueError: <Timespan -100.0 100.0> not in Tree at offset -100.0.
         '''
@@ -574,22 +574,22 @@ class ElementTree(core.AVLTree):
 
     def insert(self, offsetsOrElements, elements=None):
         r'''
-        Inserts elements or `timespans` into this offset-tree.
+        Inserts elements or `Timespans` into this offset-tree.
         
         >>> n = note.Note()
-        >>> et = timespans.trees.OffsetTree()
-        >>> et
+        >>> ot = tree.trees.OffsetTree()
+        >>> ot
         <OffsetTree {0} (-inf to inf)>
-        >>> et.insert(10.0, n)
-        >>> et
+        >>> ot.insert(10.0, n)
+        >>> ot
         <OffsetTree {1} (10.0 to 11.0)>
         
         >>> n2 = note.Note('D')
         >>> n2.offset = 20
         >>> n3 = note.Note('E')
         >>> n3.offset = 5
-        >>> et.insert([n2, n3])
-        >>> et
+        >>> ot.insert([n2, n3])
+        >>> ot
         <OffsetTree {3} (5.0 to 21.0)>
         '''
         initialPosition = self.offset
@@ -665,7 +665,7 @@ class ElementTree(core.AVLTree):
     @property
     def source(self):
         '''
-        the original stream. (stored as a weakref)
+        the original stream. (stored as a weakref but returned unwrapped)
         '''
         return common.unwrapWeakref(self._source)
         
@@ -681,8 +681,8 @@ class ElementTree(core.AVLTree):
         Gets the earliest start offset in this offset-tree.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> tree.lowestOffset
+        >>> tsTree = score.asTimespans()
+        >>> tsTree.lowestOffset
         0.0
         '''
         def recurse(node):
@@ -699,8 +699,8 @@ class ElementTree(core.AVLTree):
         Gets the earliest stop offset in this offset-tree.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans(classList=(note.Note,))
-        >>> tree.earliestEndTime
+        >>> tsTree = score.asTimespans(classList=(note.Note,))
+        >>> tsTree.earliestEndTime
         0.5
         '''
         if self.rootNode is not None:
@@ -713,8 +713,8 @@ class ElementTree(core.AVLTree):
         Gets the latest start offset in this offset-tree.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans(classList=(note.Note,))
-        >>> tree.highestOffset
+        >>> tsTree = score.asTimespans(classList=(note.Note,))
+        >>> tsTree.highestOffset
         35.0
         '''
         def recurse(node):
@@ -736,8 +736,8 @@ class ElementTree(core.AVLTree):
         Gets the latest stop offset in this offset-tree.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> tree.latestEndTime
+        >>> tsTree = score.asTimespans()
+        >>> tsTree.latestEndTime
         36.0
         '''
         if self.rootNode is not None:
@@ -751,8 +751,8 @@ class ElementTree(core.AVLTree):
         Gets all unique offsets of all timespans in this offset-tree.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> for offset in tree.allOffsets[:10]:
+        >>> tsTree = score.asTimespans()
+        >>> for offset in tsTree.allOffsets[:10]:
         ...     offset
         ...
         0.0
@@ -788,8 +788,8 @@ class ElementTree(core.AVLTree):
         in this offset-tree.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> for offset in tree.allTimePoints[:10]:
+        >>> scoreTree = score.asTimespans()
+        >>> for offset in scoreTree.allTimePoints[:10]:
         ...     offset
         ...
         0.0
@@ -836,17 +836,17 @@ class OffsetTree(ElementTree):
     #----------public methods ------------------------
     def index(self, element, offset=None):
         r'''
-        Gets index of `timespan` in tree.
+        Gets index of and element or `Timespan` in tree.
         
-        Since timespans do not have .sites, there is only one offset to deal with...
+        Since Timespans do not have .sites, there is only one offset to deal with...
 
         >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> ts = [timespans.spans.Timespan(x, y) for x, y in tsList]
-        >>> tree = timespans.trees.TimespanTree()
-        >>> tree.insert(ts)
+        >>> ts = [tree.spans.Timespan(x, y) for x, y in tsList]
+        >>> tsTree = tree.trees.TimespanTree()
+        >>> tsTree.insert(ts)
 
         >>> for timespan in ts:
-        ...     print("%r %d" % (timespan, tree.index(timespan)))
+        ...     print("%r %d" % (timespan, tsTree.index(timespan)))
         ...
         <Timespan 0.0 2.0> 0
         <Timespan 0.0 9.0> 1
@@ -859,7 +859,7 @@ class OffsetTree(ElementTree):
         <Timespan 6.0 8.0> 8
         <Timespan 7.0 7.0> 9
 
-        >>> tree.index(timespans.spans.Timespan(-100, 100))
+        >>> tsTree.index(tree.spans.Timespan(-100, 100))
         Traceback (most recent call last):
         ValueError: <Timespan -100.0 100.0> not in Tree at offset -100.0.
         '''
@@ -884,9 +884,9 @@ class TimespanTree(OffsetTree):
     score at once:
 
     >>> bach = corpus.parse('bwv66.6')
-    >>> tree = timespans.fromStream.convert(bach, flatten=True, 
+    >>> scoreTree = tree.fromStream.convert(bach, flatten=True, 
     ...            classList=(note.Note, chord.Chord))
-    >>> print(tree.getVerticalityAt(17.0))
+    >>> print(scoreTree.getVerticalityAt(17.0))
     <Verticality 17.0 {F#3 C#4 A4}>
 
     All offsets are assumed to be relative to the score's source if flatten is True
@@ -895,7 +895,7 @@ class TimespanTree(OffsetTree):
 
     >>> totalConsonances = 0
     >>> totalDissonances = 0
-    >>> for v in tree.iterateVerticalities():
+    >>> for v in scoreTree.iterateVerticalities():
     ...     if v.toChord().isConsonant():
     ...        totalConsonances += 1
     ...     else:
@@ -912,7 +912,7 @@ class TimespanTree(OffsetTree):
 
     >>> totalConsonanceDuration = 0
     >>> totalDissonanceDuration = 0
-    >>> iterator = tree.iterateVerticalitiesNwise(n=2)
+    >>> iterator = scoreTree.iterateVerticalitiesNwise(n=2)
     >>> for verticality1, verticality2 in iterator:
     ...     offset1 = verticality1.offset
     ...     offset2 = verticality2.offset
@@ -938,21 +938,21 @@ class TimespanTree(OffsetTree):
  
     We'll get rid of it and a lot of other neighbor tones.
  
-    >>> for verticalities in tree.iterateVerticalitiesNwise(n=3):
-    ...     horizontalities = tree.unwrapVerticalities(verticalities)
+    >>> for verticalities in scoreTree.iterateVerticalitiesNwise(n=3):
+    ...     horizontalities = scoreTree.unwrapVerticalities(verticalities)
     ...     for unused_part, horizontality in horizontalities.items():
     ...         if horizontality.hasNeighborTone:
     ...             merged = horizontality[0].new(
     ...                endTime=horizontality[2].endTime,
     ...             ) # merged is a new PitchedTimespan
-    ...             tree.remove(horizontality[0])
-    ...             tree.remove(horizontality[1])
-    ...             tree.remove(horizontality[2])
-    ...             tree.insert(merged)
+    ...             scoreTree.remove(horizontality[0])
+    ...             scoreTree.remove(horizontality[1])
+    ...             scoreTree.remove(horizontality[2])
+    ...             scoreTree.insert(merged)
      
      
-    >>> newBach = timespans.toStream.partwise(
-    ...     tree,
+    >>> newBach = tree.toStream.partwise(
+    ...     scoreTree,
     ...     templateStream=bach,
     ...     )
     >>> newBach.parts['Alto'].measure(7).show('text')
@@ -996,22 +996,22 @@ class TimespanTree(OffsetTree):
         Default classList is (stream.Part, )
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans(classList=(note.Note,))
-        >>> timespan = tree[0]
+        >>> scoreTree = score.asTimespans(classList=(note.Note,))
+        >>> timespan = scoreTree[0]
         >>> timespan
         <PitchedTimespan (0.0 to 0.5) <music21.note.Note C#>>
 
         >>> timespan.part
         <music21.stream.Part Soprano>
 
-        >>> timespan = tree.findNextPitchedTimespanInSameStreamByClass(timespan)
+        >>> timespan = scoreTree.findNextPitchedTimespanInSameStreamByClass(timespan)
         >>> timespan
         <PitchedTimespan (0.5 to 1.0) <music21.note.Note B>>
 
         >>> timespan.part
         <music21.stream.Part Soprano>
 
-        >>> timespan = tree.findNextPitchedTimespanInSameStreamByClass(timespan)
+        >>> timespan = scoreTree.findNextPitchedTimespanInSameStreamByClass(timespan)
         >>> timespan
         <PitchedTimespan (1.0 to 2.0) <music21.note.Note A>>
 
@@ -1037,22 +1037,22 @@ class TimespanTree(OffsetTree):
         the `pitchedTimespan`.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans(classList=(note.Note,))
-        >>> timespan = tree[-1]
+        >>> scoreTree = score.asTimespans(classList=(note.Note,))
+        >>> timespan = scoreTree[-1]
         >>> timespan
         <PitchedTimespan (35.0 to 36.0) <music21.note.Note F#>>
 
         >>> timespan.part
         <music21.stream.Part Bass>
 
-        >>> timespan = tree.findPreviousPitchedTimespanInSameStreamByClass(timespan)
+        >>> timespan = scoreTree.findPreviousPitchedTimespanInSameStreamByClass(timespan)
         >>> timespan
         <PitchedTimespan (34.0 to 35.0) <music21.note.Note B>>
 
         >>> timespan.part
         <music21.stream.Part Bass>
 
-        >>> timespan = tree.findPreviousPitchedTimespanInSameStreamByClass(timespan)
+        >>> timespan = scoreTree.findPreviousPitchedTimespanInSameStreamByClass(timespan)
         >>> timespan
         <PitchedTimespan (33.0 to 34.0) <music21.note.Note D>>
 
@@ -1078,26 +1078,26 @@ class TimespanTree(OffsetTree):
         Gets the verticality in this offset-tree which starts at `offset`.
 
         >>> bach = corpus.parse('bwv66.6')
-        >>> tree = bach.asTimespans()
-        >>> tree.getVerticalityAt(2.5)
+        >>> scoreTree = bach.asTimespans()
+        >>> scoreTree.getVerticalityAt(2.5)
         <Verticality 2.5 {G#3 B3 E4 B4}>
 
         Verticalities outside the range still return a Verticality, but it might be empty...
 
-        >>> tree.getVerticalityAt(2000)
+        >>> scoreTree.getVerticalityAt(2000)
         <Verticality 2000 {}>
             
         Test that it still works if the tree is empty...
             
-        >>> tree = bach.asTimespans(classList=(instrument.Tuba,))
-        >>> tree
+        >>> scoreTree = bach.asTimespans(classList=(instrument.Tuba,))
+        >>> scoreTree
         <TimespanTree {0} (-inf to inf) <music21.stream.Score ...>>
-        >>> tree.getVerticalityAt(5.0)
+        >>> scoreTree.getVerticalityAt(5.0)
         <Verticality 5.0 {}>           
 
         Returns a verticality.Verticality object.
         '''
-        from music21.timespans.verticality import Verticality
+        from music21.tree.verticality import Verticality
         startTimespans = self.elementsStartingAt(offset)
         stopTimespans = self.elementsStoppingAt(offset)
         overlapTimespans = self.elementsOverlappingOffset(offset)
@@ -1118,11 +1118,11 @@ class TimespanTree(OffsetTree):
         the next previous verticality with start timespans.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> tree.getVerticalityAtOrBefore(0.125)
+        >>> scoreTree = score.asTimespans()
+        >>> scoreTree.getVerticalityAtOrBefore(0.125)
         <Verticality 0.0 {A3 E4 C#5}>
 
-        >>> tree.getVerticalityAtOrBefore(0.)
+        >>> scoreTree.getVerticalityAtOrBefore(0.)
         <Verticality 0.0 {A3 E4 C#5}>
         '''
         verticality = self.getVerticalityAt(offset)
@@ -1136,8 +1136,8 @@ class TimespanTree(OffsetTree):
         offset-tree.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> for subsequence in tree.iterateConsonanceBoundedVerticalities():
+        >>> scoreTree = score.asTimespans()
+        >>> for subsequence in scoreTree.iterateConsonanceBoundedVerticalities():
         ...     print('Subequence:')
         ...     for verticality in subsequence:
         ...         print('\t[{}] {}: {} [{}]'.format(
@@ -1228,8 +1228,8 @@ class TimespanTree(OffsetTree):
             next verticality will reflect those changes.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans(classList=(note.Note,))
-        >>> iterator = tree.iterateVerticalities()
+        >>> scoreTree = score.asTimespans(classList=(note.Note,))
+        >>> iterator = scoreTree.iterateVerticalities()
         >>> for _ in range(10):
         ...     next(iterator)
         ...
@@ -1246,7 +1246,7 @@ class TimespanTree(OffsetTree):
 
         Verticalities can also be iterated in reverse:
 
-        >>> iterator = tree.iterateVerticalities(reverse=True)
+        >>> iterator = scoreTree.iterateVerticalities(reverse=True)
         >>> for _ in range(10):
         ...     next(iterator)
         ...
@@ -1291,8 +1291,8 @@ class TimespanTree(OffsetTree):
             next verticality will reflect those changes.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans(classList=(note.Note,))
-        >>> iterator = tree.iterateVerticalitiesNwise(n=2)
+        >>> scoreTree = score.asTimespans(classList=(note.Note,))
+        >>> iterator = scoreTree.iterateVerticalitiesNwise(n=2)
         >>> for _ in range(4):
         ...     print(next(iterator))
         ...
@@ -1315,7 +1315,7 @@ class TimespanTree(OffsetTree):
 
         Grouped verticalities can also be iterated in reverse:
 
-        >>> iterator = tree.iterateVerticalitiesNwise(n=2, reverse=True)
+        >>> iterator = scoreTree.iterateVerticalitiesNwise(n=2, reverse=True)
         >>> for _ in range(4):
         ...     print(next(iterator))
         ...
@@ -1336,7 +1336,7 @@ class TimespanTree(OffsetTree):
             <Verticality 33.5 {D3 B3 C#4 F#4}>
             ]>
         '''
-        from music21.timespans.verticality import VerticalitySequence 
+        from music21.tree.verticality import VerticalitySequence 
         n = int(n)
         if (n<=0):
             message = "The number of verticalities in the group must be at "
@@ -1369,11 +1369,11 @@ class TimespanTree(OffsetTree):
         place.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans()
-        >>> tree.elementsStartingAt(0.1)
+        >>> scoreTree = score.asTimespans()
+        >>> scoreTree.elementsStartingAt(0.1)
         ()
 
-        >>> for timespan in tree.elementsOverlappingOffset(0.1):
+        >>> for timespan in scoreTree.elementsOverlappingOffset(0.1):
         ...     print("%r, %s" % (timespan, timespan.part.id))
         ...
         <PitchedTimespan (0.0 to 0.5) <music21.note.Note C#>>, Soprano
@@ -1381,8 +1381,8 @@ class TimespanTree(OffsetTree):
         <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>, Bass
         <PitchedTimespan (0.0 to 1.0) <music21.note.Note E>>, Alto
 
-        >>> tree.splitAt(0.1)
-        >>> for timespan in tree.elementsStartingAt(0.1):
+        >>> scoreTree.splitAt(0.1)
+        >>> for timespan in scoreTree.elementsStartingAt(0.1):
         ...     print("%r, %s" % (timespan, timespan.part.id))
         ...
         <PitchedTimespan (0.1 to 0.5) <music21.note.Note C#>>, Soprano
@@ -1390,7 +1390,7 @@ class TimespanTree(OffsetTree):
         <PitchedTimespan (0.1 to 0.5) <music21.note.Note A>>, Tenor
         <PitchedTimespan (0.1 to 0.5) <music21.note.Note A>>, Bass
 
-        >>> tree.elementsOverlappingOffset(0.1)
+        >>> scoreTree.elementsOverlappingOffset(0.1)
         ()
         '''
         if not isinstance(offsets, collections.Iterable):
@@ -1428,10 +1428,10 @@ class TimespanTree(OffsetTree):
         `Part`:`Horizontality` key/value pairs.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans(classList=(note.Note,))
-        >>> iterator = tree.iterateVerticalitiesNwise()
+        >>> scoreTree = score.asTimespans(classList=(note.Note,))
+        >>> iterator = scoreTree.iterateVerticalitiesNwise()
         >>> verticalities = next(iterator)
-        >>> unwrapped = tree.unwrapVerticalities(verticalities)
+        >>> unwrapped = scoreTree.unwrapVerticalities(verticalities)
         >>> for part in sorted(unwrapped, key=lambda x: x.partName):
         ...     print(part)
         ...     horizontality = unwrapped[part]
@@ -1454,7 +1454,7 @@ class TimespanTree(OffsetTree):
             <PitchedTimespan (0.5 to 1.0) <music21.note.Note B>>
             <PitchedTimespan (1.0 to 2.0) <music21.note.Note C#>>
         '''
-        from music21.timespans.verticality import VerticalitySequence 
+        from music21.tree.verticality import VerticalitySequence 
         sequence = VerticalitySequence(verticalities)
         unwrapped = sequence.unwrap()
         return unwrapped
@@ -1479,8 +1479,8 @@ class TimespanTree(OffsetTree):
         timespan collection.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = score.asTimespans(classList=(note.Note,))
-        >>> tree.maximumOverlap
+        >>> scoreTree = score.asTimespans(classList=(note.Note,))
+        >>> scoreTree.maximumOverlap
         4
 
         Returns None if there is no verticality here.
@@ -1504,9 +1504,9 @@ class TimespanTree(OffsetTree):
         probably be either zero or one.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> tree = timespans.fromStream.convert(
+        >>> scoreTree = tree.fromStream.convert(
         ...     score, flatten=False, classList=(note.Note, chord.Chord))
-        >>> tree[0].minimumOverlap
+        >>> scoreTree[0].minimumOverlap
         1
         
         Returns None if there is no verticality here.
@@ -1553,9 +1553,9 @@ class Test(unittest.TestCase):
         pass
     
 #     def testBachDoctest(self):
-#         from music21 import corpus, note, chord, timespans
+#         from music21 import corpus, note, chord, tree
 #         bach = corpus.parse('bwv66.6')
-#         tree = timespans.fromStream.convert(bach, flatten=True, 
+#         tree = tree.fromStream.convert(bach, flatten=True, 
 #                                               classList=(note.Note, chord.Chord))
 #         for verticalities in tree.iterateVerticalitiesNwise(n=3):
 #             print(verticalities)
@@ -1571,14 +1571,14 @@ class Test(unittest.TestCase):
 #                     #tree.insert(merged)
 #      
 #     
-#         newBach = timespans.toStream.partwise(tree, templateStream=bach,)
+#         newBach = tree.toStream.partwise(tree, templateStream=bach,)
 #         newBach.parts[1].measure(7).show('text')
 # #     {0.0} <music21.chord.Chord F#4>
 # #     {1.5} <music21.chord.Chord F#3>
 # #     {2.0} <music21.chord.Chord C#4>
 # #         
     def testTimespanTree(self):
-        from music21.timespans.spans import Timespan
+        from music21.tree.spans import Timespan
         for attempt in range(100):
             starts = list(range(20))
             stops = list(range(20))
@@ -1590,13 +1590,13 @@ class Test(unittest.TestCase):
                     tss.append(Timespan(start, stop))
                 else:
                     tss.append(Timespan(stop, start))
-            tree = TimespanTree()
+            tsTree = TimespanTree()
 
             for i, timespan in enumerate(tss):
-                tree.insert(timespan)
+                tsTree.insert(timespan)
                 currentTimespansInList = list(sorted(tss[:i + 1],
                     key=lambda x: (x.offset, x.endTime)))
-                currentTimespansInTree = [x for x in tree]
+                currentTimespansInTree = [x for x in tsTree]
                 currentPosition = min(
                     x.offset for x in currentTimespansInList)
                 currentEndTime = max(
@@ -1605,12 +1605,12 @@ class Test(unittest.TestCase):
                 self.assertEqual(currentTimespansInTree, 
                                  currentTimespansInList, 
                                  (attempt, currentTimespansInTree, currentTimespansInList))
-                self.assertEqual(tree.rootNode.endTimeLow, 
+                self.assertEqual(tsTree.rootNode.endTimeLow, 
                                  min(x.endTime for x in currentTimespansInList))
-                self.assertEqual(tree.rootNode.endTimeHigh,
+                self.assertEqual(tsTree.rootNode.endTimeHigh,
                                  max(x.endTime for x in currentTimespansInList))
-                self.assertEqual(tree.offset, currentPosition)
-                self.assertEqual(tree.endTime, currentEndTime)
+                self.assertEqual(tsTree.offset, currentPosition)
+                self.assertEqual(tsTree.endTime, currentEndTime)
                 for i in range(len(currentTimespansInTree)):
                     self.assertEqual(currentTimespansInList[i], currentTimespansInTree[i])
 
@@ -1619,47 +1619,47 @@ class Test(unittest.TestCase):
                 timespan = tss.pop()
                 currentTimespansInList = sorted(tss,
                     key=lambda x: (x.offset, x.endTime))
-                tree.remove(timespan)
-                currentTimespansInTree = [x for x in tree]
+                tsTree.remove(timespan)
+                currentTimespansInTree = [x for x in tsTree]
                 self.assertEqual(currentTimespansInTree, 
                                  currentTimespansInList, 
                                  (attempt, currentTimespansInTree, currentTimespansInList))
-                if tree.rootNode is not None:
+                if tsTree.rootNode is not None:
                     currentPosition = min(
                         x.offset for x in currentTimespansInList)
                     currentEndTime = max(
                         x.endTime for x in currentTimespansInList)
-                    self.assertEqual(tree.rootNode.endTimeLow, 
+                    self.assertEqual(tsTree.rootNode.endTimeLow, 
                                      min(x.endTime for x in currentTimespansInList))
-                    self.assertEqual(tree.rootNode.endTimeHigh,
+                    self.assertEqual(tsTree.rootNode.endTimeHigh,
                                      max(x.endTime for x in currentTimespansInList))
-                    self.assertEqual(tree.offset, currentPosition)
-                    self.assertEqual(tree.endTime, currentEndTime)
+                    self.assertEqual(tsTree.offset, currentPosition)
+                    self.assertEqual(tsTree.endTime, currentEndTime)
 
                     for i in range(len(currentTimespansInTree)):
                         self.assertEqual(currentTimespansInList[i], currentTimespansInTree[i])
                         
 
 #     def testBachDoctest(self):
-#         from music21 import corpus, note, chord, timespans
+#         from music21 import corpus, note, chord, tree
 #         bach = corpus.parse('bwv66.6')
-#         tree = timespans.fromStream.convert(bach, flatten=True, 
+#         scoreTree = tree.fromStream.convert(bach, flatten=True, 
 #                                               classList=(note.Note, chord.Chord))
-#         print(tree)
-#         for verticalities in tree.iterateVerticalitiesNwise(n=3):
+#         print(scoreTree)
+#         for verticalities in scoreTree.iterateVerticalitiesNwise(n=3):
 #             if verticalities[-1].offset == 25:
 #                 pass
-#             horizontalities = tree.unwrapVerticalities(verticalities)
+#             horizontalities = scoreTree.unwrapVerticalities(verticalities)
 #             for unused_part, horizontality in horizontalities.items():
 #                 if horizontality.hasNeighborTone:
 #                     merged = horizontality[0].new(endTime=horizontality[2].endTime,)
-#                     tree.remove(horizontality[0])
-#                     tree.remove(horizontality[1])
-#                     tree.remove(horizontality[2])
-#                     tree.insert(merged)
+#                     scoreTree.remove(horizontality[0])
+#                     scoreTree.remove(horizontality[1])
+#                     scoreTree.remove(horizontality[2])
+#                     scoreTree.insert(merged)
 #      
 #     
-#         newBach = timespans.toStream.partwise(tree, templateStream=bach,)
+#         newBach = tree.toStream.partwise(scoreTree, templateStream=bach,)
 #         newBach.show()
 #         newBach.parts[1].measure(7).show('text')
 # #     {0.0} <music21.chord.Chord F#4>
