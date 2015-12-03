@@ -226,7 +226,7 @@ class ElementTree(core.AVLTree):
         <Timespan 5.0 6.0>
         <Timespan 5.0 8.0>
         <Timespan 6.0 8.0>
-        <Timespan 7.0 7.0>
+        <Timespan 7.0 7.0>        
         '''
         for n in super(ElementTree, self).__iter__():
             for el in n.payload:

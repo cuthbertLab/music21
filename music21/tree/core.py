@@ -16,8 +16,9 @@ These are the lowest level tools for working with self-balancing AVL trees.
 There's an overhead to creating an AVL tree, but for a large score it is
 absolutely balanced by having O(log n) search times.
 '''
-from music21.exceptions21 import TimespanException
+import unittest
 
+from music21.exceptions21 import TimespanException
 from music21 import common
 
 #------------------------------------------------------------------------------
@@ -28,12 +29,12 @@ class AVLNode(common.SlottedObject):
     >>> position = 1.0
     >>> node = tree.core.AVLNode(position)
     >>> node
-    <OffsetNode: Start:1.0 Height:0 L:None R:None>
+    <AVLNode: Start:1.0 Height:0 L:None R:None>
     >>> n2 = tree.core.AVLNode(2.0)
     >>> node.rightChild = n2
     >>> node.update()
     >>> node
-    <OffsetNode: Start:1.0 Height:1 L:None R:0>
+    <AVLNode: Start:1.0 Height:1 L:None R:0>
     
     Nodes can rebalance themselves, but they work best in a Tree...
 
@@ -245,7 +246,8 @@ class AVLNode(common.SlottedObject):
         if self.rightChild:
             rcHeight = self.rightChild.height
             
-        return '<OffsetNode: Start:{} Height:{} L:{} R:{}>'.format(
+        return '<{}: Start:{} Height:{} L:{} R:{}>'.format(
+            self.__class__.__name__,
             self.position,
             self.height,
             lcHeight,
@@ -322,7 +324,10 @@ class AVLNode(common.SlottedObject):
         
         Must be called whenever .leftChild or .rightChild are changed.
         
-        Used for the next balancing operation -- does not rebalance itself
+        Used for the next balancing operation -- does not rebalance itself.
+        
+        Note that it only looks at its children's height and balance attributes
+        not their children's. So if they are wrong, this will be too.
         
         Returns None
 
@@ -482,27 +487,27 @@ class AVLTree(object):
     def __iter__(self):
         r'''
         Iterates through all the nodes in the position tree in left to right order.
+        
+        Note that this runs in O(n log n) time in Python, while iterating through
+        a list runs in O(n) time in C, so this isn't something to do on real datasets.
 
-        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> import random
-        >>> random.shuffle(tsList)
-        >>> tss = [tree.spans.Timespan(x, y) for x, y in tsList]
-        >>> tsTree = tree.trees.TimespanTree()
-        >>> tsTree.insert(tss)
-
-        >>> for x in tsTree:
+        >>> nodePositions = [0, 2, 4, 6, 8, 10, 12]
+        >>> avl = tree.core.AVLTree()
+        >>> for np in nodePositions:
+        ...     avl.createNodeAtPosition(np)
+        >>> for x in avl:
         ...     x
-        ...
-        <Timespan 0.0 2.0>
-        <Timespan 0.0 9.0>
-        <Timespan 1.0 1.0>
-        <Timespan 2.0 3.0>
-        <Timespan 3.0 4.0>
-        <Timespan 4.0 9.0>
-        <Timespan 5.0 6.0>
-        <Timespan 5.0 8.0>
-        <Timespan 6.0 8.0>
-        <Timespan 7.0 7.0>
+        <AVLNode: Start:0 Height:0 L:None R:None>
+        <AVLNode: Start:2 Height:1 L:0 R:0>
+        <AVLNode: Start:4 Height:0 L:None R:None>
+        <AVLNode: Start:6 Height:2 L:1 R:1>
+        <AVLNode: Start:8 Height:0 L:None R:None>
+        <AVLNode: Start:10 Height:1 L:0 R:0>
+        <AVLNode: Start:12 Height:0 L:None R:None>
+
+        Note: for this example to be stable, we can't shuffle the nodes, since there are
+        numerous different possible configurations that meet the AVLTree constraints, some
+        of height 2 and some of height 3
         '''
         def recurse(node):
             if node is not None:
@@ -515,6 +520,64 @@ class AVLTree(object):
                         yield n
         return recurse(self.rootNode)
 
+    def populateFromSortedList(self, listOfTuples):
+        '''
+        This method assumes that the current tree is empty (or will be wiped) and 
+        that listOfTuples is a non-empty
+        list where the first element is a unique position to insert,
+        and the second is the complete payload for that node, and
+        that the positions are strictly increasing in order.
+        
+        This is about an order of magnitude faster (3ms vs 21ms for 1000 items; 31 vs. 30ms for
+        10,000 items) than running createNodeAtPosition() for each element in a list if it is
+        already sorted.  Thus it should be used when converting a
+        Stream where .isSorted is True into a tree.
+        
+        If any of the conditions is not true, expect to get a dangerously
+        badly sorted tree that will be useless.
+        
+        >>> listOfTuples = [(i, str(i)) for i in range(1000)]
+        >>> listOfTuples[10]
+        (10, '10')
+        >>> t = tree.core.AVLTree()
+        >>> t.rootNode is None
+        True
+        >>> t.populateFromSortedList(listOfTuples)
+        >>> t.rootNode
+        <AVLNode: Start:500 Height:9 L:8 R:8>
+        
+        >>> n = t.rootNode
+        >>> while n is not None:
+        ...    print(n, repr(n.payload))
+        ...    n = n.leftChild
+        <AVLNode: Start:500 Height:9 L:8 R:8> '500'
+        <AVLNode: Start:250 Height:8 L:7 R:7> '250'
+        <AVLNode: Start:125 Height:7 L:6 R:6> '125'
+        <AVLNode: Start:62 Height:6 L:5 R:5> '62'
+        <AVLNode: Start:31 Height:5 L:4 R:4> '31'
+        <AVLNode: Start:15 Height:4 L:3 R:3> '15'
+        <AVLNode: Start:7 Height:3 L:2 R:2> '7'
+        <AVLNode: Start:3 Height:2 L:1 R:1> '3'
+        <AVLNode: Start:1 Height:1 L:0 R:0> '1'
+        <AVLNode: Start:0 Height:0 L:None R:None> '0'        
+        '''
+        def recurse(l):
+            '''
+            Divide and conquer.
+            '''
+            if len(l) == 0:
+                return None
+            midpoint = len(l)//2
+            midtuple = l[midpoint]
+            n = NodeClass(midtuple[0], midtuple[1])
+            n.leftChild = recurse(l[:midpoint])
+            n.rightChild = recurse(l[midpoint + 1:])
+            n.update()
+            return n
+        
+        NodeClass = self.nodeClass
+        self.rootNode = recurse(listOfTuples)
+
     def createNodeAtPosition(self, position):
         '''
         creates a new node at position and sets the rootNode
@@ -523,26 +586,26 @@ class AVLTree(object):
         >>> avl = tree.core.AVLTree()
         >>> avl.createNodeAtPosition(20)
         >>> avl.rootNode
-        <OffsetNode: Start:20 Height:0 L:None R:None>        
+        <AVLNode: Start:20 Height:0 L:None R:None>        
         
         >>> avl.createNodeAtPosition(10)
         >>> avl.rootNode
-        <OffsetNode: Start:20 Height:1 L:0 R:None>
+        <AVLNode: Start:20 Height:1 L:0 R:None>
 
         >>> avl.createNodeAtPosition(5)
         >>> avl.rootNode
-        <OffsetNode: Start:10 Height:1 L:0 R:0>
+        <AVLNode: Start:10 Height:1 L:0 R:0>
         
         >>> avl.createNodeAtPosition(30)
         >>> avl.rootNode
-        <OffsetNode: Start:10 Height:2 L:0 R:1>
+        <AVLNode: Start:10 Height:2 L:0 R:1>
         >>> avl.rootNode.leftChild
-        <OffsetNode: Start:5 Height:0 L:None R:None>
+        <AVLNode: Start:5 Height:0 L:None R:None>
         >>> avl.rootNode.rightChild
-        <OffsetNode: Start:20 Height:1 L:None R:0>
+        <AVLNode: Start:20 Height:1 L:None R:0>
         
         >>> avl.rootNode.rightChild.rightChild
-        <OffsetNode: Start:30 Height:0 L:None R:None>
+        <AVLNode: Start:30 Height:0 L:None R:None>
         '''
         def recurse(node, position):
             '''
@@ -730,13 +793,13 @@ class AVLTree(object):
         >>> avl.createNodeAtPosition(5)
         >>> avl.createNodeAtPosition(30)
         >>> avl.rootNode
-        <OffsetNode: Start:10 Height:2 L:0 R:1>
+        <AVLNode: Start:10 Height:2 L:0 R:1>
 
         Remove node at 30
 
         >>> avl.removeNode(30)
         >>> avl.rootNode
-        <OffsetNode: Start:10 Height:1 L:0 R:0>
+        <AVLNode: Start:10 Height:1 L:0 R:0>
         
         Removing a node eliminates its payload:
         
@@ -747,7 +810,7 @@ class AVLTree(object):
         
         >>> avl.removeNode(10)
         >>> avl.rootNode
-        <OffsetNode: Start:20 Height:1 L:0 R:None>
+        <AVLNode: Start:20 Height:1 L:0 R:None>
         >>> avl.rootNode.payload
         'twenty'
         
@@ -755,12 +818,12 @@ class AVLTree(object):
         
         >>> avl.removeNode(9.5)
         >>> avl.rootNode
-        <OffsetNode: Start:20 Height:1 L:0 R:None>
+        <AVLNode: Start:20 Height:1 L:0 R:None>
         
         >>> for n in avl:
         ...     print(n, n.payload)
-        <OffsetNode: Start:5 Height:0 L:None R:None> None
-        <OffsetNode: Start:20 Height:1 L:0 R:None> twenty        
+        <AVLNode: Start:5 Height:0 L:None R:None> None
+        <AVLNode: Start:20 Height:1 L:0 R:None> twenty        
         '''
         def recurseRemove(node, position):
             if node is not None:
@@ -785,6 +848,30 @@ class AVLTree(object):
                 return node.rebalance()
 
         self.rootNode = recurseRemove(self.rootNode, position)
+
+
+#-------------------------------#
+class Test(unittest.TestCase):
+    def runTest(self):
+        pass
+    
+    @staticmethod
+    def heightBalanceCheck(avl):
+        '''
+        given an AVLTree, return the height and balance of each node. in order.
+        
+        This doesn't need to be fast (it uses iter), but it can be used for testing
+        that various creation algorithms give the same result.
+        '''
+        retList = []
+        for n in avl:
+            retList.append(n.height, n.balance)
+        return retList
+    
+    def testCheckSortedBalance(self):
+        pass
+         
+
 
 #-------------------------------#
 if __name__ == '__main__':
