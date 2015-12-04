@@ -682,15 +682,21 @@ class AVLTree(object):
 
         >>> score = corpus.parse('bwv66.6')
         >>> scoreTree = score.asTimespans()
-        >>> n1 = scoreTree.getNodeAfter(0.5)
-        >>> n1
+        >>> node1 = scoreTree.getNodeAfter(0.5)
+        >>> node1
         <OffsetNode: Start:1.0 Indices:(25:25:29:29) Length:{4}>
-        >>> n2 = scoreTree.getNodeAfter(0.6)
-        >>> n2 is n1
+        >>> node2 = scoreTree.getNodeAfter(0.6)
+        >>> node2 is node1
         True
         
         >>> scoreTree.getNodeAfter(9999) is None
         True
+        >>> note1 = score.parts[0].measure(4).notes[0]
+        
+        Works with sortTuple positions as well...
+        
+        >>> scoreTree.getNodeAfter(note1.sortTuple())
+        <OffsetNode: Start:36.0 Indices:(191:191:195:195) Length:{4}>
         '''
         def recurse(node, position):
             if node is None:

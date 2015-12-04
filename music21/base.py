@@ -28,7 +28,7 @@ available after importing music21.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'3.0.1'
+'3.0.2'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -78,13 +78,14 @@ from music21 import exceptions21
 Music21Exception = exceptions21.Music21Exception
 
 from music21.sites import SitesException
-
 from music21 import sites
 from music21 import common
 from music21 import defaults
 from music21 import derivation
 from music21 import duration
 from music21 import environment
+
+from music21.sorting import SortTuple
 
 from music21.common import opFrac
 
@@ -131,9 +132,7 @@ class ElementException(exceptions21.Music21Exception):
     pass
 
 #------------------------------------------------------------------------------
-# private metaclass...
-_SortTuple = collections.namedtuple('SortTuple', ['atEnd','offset','priority',
-                                                  'classSortOrder','isNotGrace','insertIndex'])
+    
 
 # pseudo class for returning splitAtX() type commands.
 class _SplitTuple(tuple):
@@ -1282,12 +1281,12 @@ class Music21Object(object):
             if site.isClassOrSubclass(className):
                 return site
             if searchType == 'elementsOnly' or searchType == 'elementsFirst':
-                tsNotFlat = site.asTimespans(classList=className, recurse=False)
+                tsNotFlat = site.asTimespans(classList=className, flatten=False)
                 el = findElInTimespanTreeNoRecurse(tsNotFlat, offsetStart)
                 if el is not None:
                     return el
             if searchType != 'elementsOnly':
-                tsFlat = site.asTimespans(classList=className, recurse=True)
+                tsFlat = site.asTimespans(classList=className, flatten=True)
                 el = findElInTimespanTree(tsFlat, offsetStart)
                 if el is not None:
                     return el
@@ -2170,7 +2169,7 @@ class Music21Object(object):
         else:
             insertIndex = 0
 
-        return _SortTuple(atEnd, offset, self.priority, 
+        return SortTuple(atEnd, offset, self.priority, 
                           self.classSortOrder, isNotGrace, insertIndex)
 
     #------------------------------------------------------------------
@@ -3771,7 +3770,7 @@ class Test(unittest.TestCase):
         sOuter.append(sInner)
 
         unused_tss = sOuter.asTimespans(classList=(sInner.classes[0],), 
-                                        recurse='semiFlat') 
+                                        flatten='semiFlat') 
 
         # append clef to outer stream
         sOuter.insert(0, clef.AltoClef())

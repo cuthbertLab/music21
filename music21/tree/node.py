@@ -18,7 +18,8 @@ This is an implementation detail of the TimespanTree class.
 
 import unittest
 from music21.tree import core
-from music21.base import Music21Object, _SortTuple
+from music21.base import Music21Object
+from music21.sorting import SortTuple
 #------------------------------------------------------------------------------
 class ElementNode(core.AVLNode):
     r'''
@@ -111,8 +112,11 @@ class ElementNode(core.AVLNode):
     ### SPECIAL METHODS ###
 
     def __repr__(self):
+        pos = self.position
+        if hasattr(pos, 'shortRepr'):
+            pos = pos.shortRepr()
         return '<ElementNode: Start:{} Indices:({}--{}--{}) Payload:>'.format(
-            self.position,
+            pos,
             self.subtreeElementsStartIndex,
             self.payloadElementIndex,
             self.subtreeElementsStopIndex,
@@ -163,7 +167,7 @@ class ElementNode(core.AVLNode):
         Returns None.
         '''
         pos = self.position
-        if isinstance(pos, _SortTuple):
+        if isinstance(pos, SortTuple):
             pos = pos.offset
             
         try:

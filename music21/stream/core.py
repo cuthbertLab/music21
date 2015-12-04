@@ -311,7 +311,7 @@ class StreamCoreMixin(object):
         doc = '''A low-level object for Spanner management. This is only a gettable property.
         ''')
 
-    def asTimespans(self, classList=None, recurse=True):
+    def asTimespans(self, classList=None, flatten=True):
         r'''
         Convert stream to a :class:`~music21.tree.trees.TimespanTree` instance, a
         highly optimized data structure for searching through elements and
@@ -344,11 +344,11 @@ class StreamCoreMixin(object):
             <PitchedTimespan (8.0 to 8.0) <music21.bar.Barline style=final>>
             <PitchedTimespan (8.0 to 8.0) <music21.bar.Barline style=final>>
         '''
-        hashedAttributes = hash( (tuple(classList or () ), recurse) ) 
+        hashedAttributes = hash( (tuple(classList or () ), flatten) ) 
         cacheKey = "timespanTree" + str(hashedAttributes)
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             hashedTimespanTree = tree.fromStream.convert(self,
-                                                     flatten=recurse,
+                                                     flatten=flatten,
                                                      classList=classList)
             self._cache[cacheKey] = hashedTimespanTree
         return self._cache[cacheKey]

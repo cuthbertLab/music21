@@ -116,6 +116,7 @@ __all__ = [
     'roman',
     'serial',
     'sieve',
+    'sorting',
     'spanner',
     'stream', 
     'tempo',

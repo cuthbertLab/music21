@@ -24,7 +24,7 @@ import weakref
 from music21 import common
 from music21 import exceptions21
 
-from music21.base import _SortTuple
+from music21.sorting import SortTuple
 
 from music21.tree import spans, core
 from music21.tree import node as nodeModule
@@ -50,22 +50,42 @@ class ElementTree(core.AVLTree):
     >>> et
     <ElementTree {0} (-inf to inf)>
     
+    >>> s = stream.Stream()
     >>> for i in range(100):
     ...     n = note.Note()
-    ...     et.insert(float(i), n)
+    ...     n.duration.quarterLength = 2.0
+    ...     s.insert(i * 2, n)
+
+    >>> for n in s:
+    ...     et.insert(n)
     >>> et
-    <ElementTree {100} (0.0 to 100.0)>
+    <ElementTree {100} (0.0 <0.20...> to 200.0)>
+    >>> et.rootNode
+    <ElementNode: Start:126.0 <0.20...> Indices:(0--63--100) Payload:>
     
-    >>> n2 = note.Note('D#')
-    >>> et.insert(101.0, n2)
-    
+    >>> n2 = s[-1]
+
     These operations are very fast...
 
-    >>> et.index(n2, 101.0)
-    100
-    >>> et.getPositionAfter(100.5)
-    101.0
-
+    >>> et.index(n2, n2.sortTuple())
+    99
+    
+    Get a position after a certain position:
+    
+    >>> st = s[40].sortTuple()
+    >>> st
+    SortTuple(atEnd=0, offset=80.0, priority=0, classSortOrder=20, isNotGrace=1, insertIndex=...)
+    >>> st2 = et.getPositionAfter(st)
+    >>> st2.shortRepr()
+    '82.0 <0.20...>'
+    >>> st2.offset
+    82.0
+    
+    >>> st3 = et.getPositionAfter(5.0)
+    >>> st3.offset
+    6.0
+    >>> et.getPositionAfter(4.0).offset
+    6.0
     '''
     ### CLASS VARIABLES ###
     nodeClass = nodeModule.ElementNode
@@ -263,18 +283,23 @@ class ElementTree(core.AVLTree):
 
     def __repr__(self):
         o = self.source
+        pos = self.lowestPosition
+        if hasattr(pos, 'shortRepr'):
+            # sortTuple
+            pos = pos.shortRepr()
+            
         if o is None:
-            return '<{} {{{}}} ({!r} to {!r})>'.format(
+            return '<{} {{{}}} ({} to {})>'.format(
                 type(self).__name__,
                 len(self),
-                self.offset,
+                pos,
                 self.endTime,
                 )
         else:
-            return '<{} {{{}}} ({!r} to {!r}) {!s}>'.format(
+            return '<{} {{{}}} ({} to {}) {!s}>'.format(
                 type(self).__name__,
                 len(self),
-                self.offset,
+                pos,
                 self.endTime,
                 repr(o),
                 )
@@ -323,7 +348,7 @@ class ElementTree(core.AVLTree):
         result = '\n'.join(result)
         return result
 
-    ### PRIVATE METHODS ###
+    ### PRIVATE METHODS ###    
     def _updateNodes(self, initialPosition=None, initialEndTime=None, visitedParents=None):
         '''
         runs updateIndices and updateEndTimes on the rootNode
@@ -572,9 +597,19 @@ class ElementTree(core.AVLTree):
             self._updateNodes(initialPosition, initialEndTime)
 
 
-    def insert(self, offsetsOrElements, elements=None):
+    def _getPositionsFromElements(self, elements):
+        '''
+        takes a list of elements and returns a list of positions.
+        
+        In an ElementTree, this will be a list of .sortTuple() calls.
+        
+        In an OffsetTree, this will be a list of .offset calls
+        '''
+        return [el.sortTuple() for el in elements]
+
+    def insert(self, positionsOrElements, elements=None):
         r'''
-        Inserts elements or `Timespans` into this offset-tree.
+        Inserts elements or `Timespans` into this tree.
         
         >>> n = note.Note()
         >>> ot = tree.trees.OffsetTree()
@@ -595,23 +630,23 @@ class ElementTree(core.AVLTree):
         initialPosition = self.offset
         initialEndTime = self.endTime
         if elements is None:
-            elements = offsetsOrElements
-            offsets = None
+            elements = positionsOrElements
+            positions = None
         else:
-            offsets = offsetsOrElements
-            if not common.isListLike(offsets):
-                offsets = [offsets]
+            positions = positionsOrElements
+            if not common.isListLike(positions):
+                positions = [positions]
         
         if (not common.isListLike(elements) and
                 not isinstance(elements, (set, frozenset))
                 ): # not a list. a single element or timespan
             elements = [elements]
-        if offsets is None:
-            offsets = [el.offset for el in elements]
+        if positions is None:
+            positions = self._getPositionsFromElements(elements)
                 
         
         for i, el in enumerate(elements):
-            self._insertCore(offsets[i], el)
+            self._insertCore(positions[i], el)
         
         self._updateNodes(initialPosition, initialEndTime)
 
@@ -656,7 +691,7 @@ class ElementTree(core.AVLTree):
     ### PROPERTIES ###
     @property
     def offset(self):
-        return self.lowestOffset
+        return self.lowestPosition
 
     @property
     def endTime(self):
@@ -676,13 +711,13 @@ class ElementTree(core.AVLTree):
 
 
     @property
-    def lowestOffset(self):
+    def lowestPosition(self):
         r'''
-        Gets the earliest start offset in this offset-tree.
+        Gets the earliest position in this tree.
 
         >>> score = corpus.parse('bwv66.6')
         >>> tsTree = score.asTimespans()
-        >>> tsTree.lowestOffset
+        >>> tsTree.lowestPosition
         0.0
         '''
         def recurse(node):
@@ -721,7 +756,7 @@ class ElementTree(core.AVLTree):
             if node.rightChild is not None:
                 return recurse(node.rightChild)
             pos = node.position
-            if isinstance(pos, _SortTuple):
+            if isinstance(pos, SortTuple):
                 return pos.offset
             else:
                 return pos
@@ -772,7 +807,7 @@ class ElementTree(core.AVLTree):
                 if node.leftChild is not None:
                     result.extend(recurse(node.leftChild))
                 pos = node.position
-                if isinstance(pos, _SortTuple):
+                if isinstance(pos, SortTuple):
                     result.append(pos.offset)
                 else:
                     result.append(pos)
@@ -832,6 +867,13 @@ class OffsetTree(ElementTree):
         super(OffsetTree, self).__init__(elements, source)
 
     ### PRIVATE METHODS ###
+    def _getPositionsFromElements(self, elements):
+        '''
+        takes a list of elements and returns a list of positions.
+        
+        In an OffsetTree, this will be a list of .offset calls
+        '''
+        return [el.offset for el in elements]
 
     #----------public methods ------------------------
     def index(self, element, offset=None):
@@ -1270,7 +1312,7 @@ class TimespanTree(OffsetTree):
                 yield verticality
                 verticality = verticality.previousVerticality
         else:
-            offset = self.lowestOffset
+            offset = self.lowestPosition
             verticality = self.getVerticalityAt(offset)
             yield verticality
             verticality = verticality.nextVerticality
@@ -1552,6 +1594,32 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
     
+    def testGetPositionAfterOffset(self):
+        '''
+        test that get position after works with
+        an offset when the tree is built on SortTuples.        
+        '''
+        from music21 import stream, note
+
+        et = ElementTree()
+
+        s = stream.Stream()
+        for i in range(100):
+            n = note.Note()
+            n.duration.quarterLength = 2.0
+            s.insert(i * 2, n)
+
+        for n in s:
+            et.insert(n)
+        self.assertTrue(repr(et).startswith('<ElementTree {100} (0.0 <0.20'))
+    
+        n2 = s[-1]
+
+        self.assertEqual(et.index(n2, n2.sortTuple()), 99)
+    
+        st3 = et.getPositionAfter(5.0)
+        self.assertIsNotNone(st3)
+
 #     def testBachDoctest(self):
 #         from music21 import corpus, note, chord, tree
 #         bach = corpus.parse('bwv66.6')
@@ -1671,6 +1739,7 @@ class Test(unittest.TestCase):
 
 _DOC_ORDER = (
     ElementTree,
+    OffsetTree,
     TimespanTree,
     )
 
