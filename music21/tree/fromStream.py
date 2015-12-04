@@ -15,9 +15,8 @@ Tools for creating timespans (fast, manipulatable objects) from Streams
 '''
 from music21.base import Music21Object
 from music21 import common
-from music21.timespans import spans
-from music21.timespans import trees
-
+from music21.tree import spans
+from music21.tree import trees
 
 def listOfTreesByClass(inputStream,
                        currentParentage=None,
@@ -37,11 +36,11 @@ def listOfTreesByClass(inputStream,
     This is used internally by `streamToTimespanTree`.
     
     
-    >>> score = timespans.makeExampleScore()
+    >>> score = tree.makeExampleScore()
     
     Get everything in the score
     
-    >>> treeList = timespans.fromStream.listOfTimespanTreesByClass(score)
+    >>> treeList = tree.fromStream.listOfTimespanTreesByClass(score)
     >>> treeList
     [<TimespanTree {2} (-inf to inf) <music21.stream.Score ...>>]    
     >>> for t in treeList[0]:
@@ -58,10 +57,10 @@ def listOfTreesByClass(inputStream,
         <TimespanTree {0} (-inf to inf) <music21.stream.Measure 4 offset=6.0>>
     
     Now filter the Notes and the Clefs & TimeSignatures of the score 
-    (flattened) into a list of two timespans
+    (flattened) into a list of two TimespanTrees
     
     >>> classLists = ['Note', ('Clef', 'TimeSignature')]
-    >>> treeList = timespans.fromStream.listOfTimespanTreesByClass(score, 
+    >>> treeList = tree.fromStream.listOfTimespanTreesByClass(score, 
     ...                                            classLists=classLists, flatten=True)
     >>> treeList
     [<TimespanTree {12} (0.0 to 8.0) <music21.stream.Score ...>>, 
@@ -92,7 +91,7 @@ def listOfTreesByClass(inputStream,
     # do this to avoid munging activeSites
     inputStreamElements = inputStream._elements[:] + inputStream._endElements
     for element in inputStreamElements:
-        offset = element.getOffsetBySite(lastParentage) + initialOffset
+        offset = lastParentage.elementOffset(element) + initialOffset
         wasStream = False
         
         if element.isStream:
@@ -152,14 +151,14 @@ def listOfTimespanTreesByClass(inputStream,
 def convert(inputStream, flatten, classList):
     r'''
     Recurses through a score and constructs a
-    :class:`~music21.timespans.TimespanTree`.  Use Stream.asTimespans() generally
+    :class:`~music21.tree.trees.TimespanTree`.  Use Stream.asTimespans() generally
     since that caches the TimespanTree.
 
     >>> score = corpus.parse('bwv66.6')
-    >>> tree = timespans.fromStream.convert(score, flatten=True, classList=(note.Note, chord.Chord))
-    >>> tree
+    >>> scoreTree = tree.fromStream.convert(score, flatten=True, classList=(note.Note, chord.Chord))
+    >>> scoreTree
     <TimespanTree {165} (0.0 to 36.0) <music21.stream.Score ...>>
-    >>> for x in tree[:5]:
+    >>> for x in scoreTree[:5]:
     ...     x
     ...
     <PitchedTimespan (0.0 to 0.5) <music21.note.Note C#>>
@@ -168,11 +167,11 @@ def convert(inputStream, flatten, classList):
     <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>
     <PitchedTimespan (0.5 to 1.0) <music21.note.Note B>>
 
-    >>> tree = timespans.fromStream.convert(score, flatten=False, classList=())
+    >>> scoreTree = tree.fromStream.convert(score, flatten=False, classList=())
 
     Each of these has 11 elements -- mainly the Measures
 
-    >>> for x in tree:
+    >>> for x in scoreTree:
     ...     x
     ...
     <PitchedTimespan (0.0 to 0.0) <music21.metadata.Metadata object at 0x...>>
@@ -182,7 +181,7 @@ def convert(inputStream, flatten, classList):
     <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Bass>>
     <PitchedTimespan (0.0 to 0.0) <music21.layout.StaffGroup ...>>
 
-    >>> tenorElements = tree[3]
+    >>> tenorElements = scoreTree[3]
     >>> tenorElements
     <TimespanTree {11} (0.0 to 36.0) <music21.stream.Part Tenor>>
 
@@ -207,8 +206,8 @@ def flat(inputStream):
     
     TODO: BUG: Why are these not flat offsets?
     
-    >>> ex = timespans.makeExampleScore()
-    >>> ts = timespans.fromStream.flat(ex)
+    >>> ex = tree.makeExampleScore()
+    >>> ts = tree.fromStream.flat(ex)
     >>> ts
     <OffsetTree {20} (0.0 to 2.0) <music21.stream.Score 0x104a94d68>>
     >>> ts[15], ts[15].offset

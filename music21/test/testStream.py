@@ -1603,7 +1603,7 @@ class Test(unittest.TestCase):
         post = sInnerFlat.getContextByClass(clef.Clef)
         self.assertEqual(isinstance(post, clef.AltoClef), True, "post %r is not an AltoClef" % post)
 
-        # 2014 April -- timeSpans version -- not needed...
+        # 2014 April -- tree version -- not needed...
         ## this will only work if the callerFirst is manually set to sInnerFlat
         ## otherwise, this interprets the DefinedContext object as the first 
         ## caller

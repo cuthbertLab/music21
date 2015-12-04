@@ -17,8 +17,9 @@ This is an implementation detail of the TimespanTree class.
 '''
 
 import unittest
-from music21.timespans import core
-from music21.base import Music21Object, _SortTuple
+from music21.tree import core
+from music21.base import Music21Object
+from music21.sorting import SortTuple
 #------------------------------------------------------------------------------
 class ElementNode(core.AVLNode):
     r'''
@@ -42,10 +43,10 @@ class ElementNode(core.AVLNode):
     'payload': r'''
         The contents of the node at this point.  Usually PitchedTimespans.
 
-        >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.fromStream.convert(score, flatten=True, 
+        >>> score = tree.makeExampleScore()
+        >>> scoreTree = tree.fromStream.convert(score, flatten=True, 
         ...                  classList=(note.Note, chord.Chord))
-        >>> print(tree.rootNode.debug())
+        >>> print(scoreTree.rootNode.debug())
         <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
             L: <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>
                 L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
@@ -55,19 +56,19 @@ class ElementNode(core.AVLNode):
                 R: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
                     R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
 
-        >>> tree.rootNode.payload
+        >>> scoreTree.rootNode.payload
         [<PitchedTimespan (3.0 to 4.0) <music21.note.Note F>>]
 
-        >>> tree.rootNode.leftChild.payload
+        >>> scoreTree.rootNode.leftChild.payload
         [<PitchedTimespan (1.0 to 2.0) <music21.note.Note D>>]
 
-        >>> for x in tree.rootNode.leftChild.rightChild.payload:
+        >>> for x in scoreTree.rootNode.leftChild.rightChild.payload:
         ...     x
         ...
         <PitchedTimespan (2.0 to 3.0) <music21.note.Note E>>
         <PitchedTimespan (2.0 to 4.0) <music21.note.Note G>>
 
-        >>> tree.rootNode.rightChild.payload
+        >>> scoreTree.rootNode.rightChild.payload
         [<PitchedTimespan (5.0 to 6.0) <music21.note.Note A>>]
         ''',
         
@@ -111,8 +112,11 @@ class ElementNode(core.AVLNode):
     ### SPECIAL METHODS ###
 
     def __repr__(self):
+        pos = self.position
+        if hasattr(pos, 'shortRepr'):
+            pos = pos.shortRepr()
         return '<ElementNode: Start:{} Indices:({}--{}--{}) Payload:>'.format(
-            self.position,
+            pos,
             self.subtreeElementsStartIndex,
             self.payloadElementIndex,
             self.subtreeElementsStopIndex,
@@ -163,7 +167,7 @@ class ElementNode(core.AVLNode):
         Returns None.
         '''
         pos = self.position
-        if isinstance(pos, _SortTuple):
+        if isinstance(pos, SortTuple):
             pos = pos.offset
             
         try:
@@ -198,7 +202,7 @@ class OffsetNode(ElementNode):
 
     Here's an example of what it means and does:
     
-    >>> score = timespans.makeExampleScore()
+    >>> score = tree.makeExampleScore()
     >>> sf = score.flat
     >>> sf.show('text', addEndTimes=True)
     {0.0 - 0.0} <music21.instrument.Instrument PartA: : >
@@ -222,8 +226,8 @@ class OffsetNode(ElementNode):
     {8.0 - 8.0} <music21.bar.Barline style=final>
     {8.0 - 8.0} <music21.bar.Barline style=final>
     
-    >>> tree = timespans.fromStream.convert(sf, flatten=False, classList=None)
-    >>> rn = tree.rootNode
+    >>> scoreTree = tree.fromStream.convert(sf, flatten=False, classList=None)
+    >>> rn = scoreTree.rootNode
     
     The RootNode here represents the starting position of the Note F at 3.0; It is the center
     of the elements in the flat Stream.  Its index is 5 (that is, it's the sixth note in the
@@ -306,12 +310,12 @@ class OffsetNode(ElementNode):
 
     _DOC_ATTR = {
     'payload': r'''
-        The contents of the node at this point.  Usually PitchedTimespans.
+        The contents of the node at this point.  Usually a list of PitchedTimespans.
 
-        >>> score = timespans.makeExampleScore()
-        >>> tree = timespans.fromStream.convert(score, flatten=True, 
+        >>> score = tree.makeExampleScore()
+        >>> scoreTree = tree.fromStream.convert(score, flatten=True, 
         ...                  classList=(note.Note, chord.Chord))
-        >>> print(tree.rootNode.debug())
+        >>> print(scoreTree.rootNode.debug())
         <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
             L: <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>
                 L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
@@ -321,19 +325,19 @@ class OffsetNode(ElementNode):
                 R: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
                     R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
 
-        >>> tree.rootNode.payload
+        >>> scoreTree.rootNode.payload
         [<PitchedTimespan (3.0 to 4.0) <music21.note.Note F>>]
 
-        >>> tree.rootNode.leftChild.payload
+        >>> scoreTree.rootNode.leftChild.payload
         [<PitchedTimespan (1.0 to 2.0) <music21.note.Note D>>]
 
-        >>> for x in tree.rootNode.leftChild.rightChild.payload:
+        >>> for x in scoreTree.rootNode.leftChild.rightChild.payload:
         ...     x
         ...
         <PitchedTimespan (2.0 to 3.0) <music21.note.Note E>>
         <PitchedTimespan (2.0 to 4.0) <music21.note.Note G>>
 
-        >>> tree.rootNode.rightChild.payload
+        >>> scoreTree.rootNode.rightChild.payload
         [<PitchedTimespan (5.0 to 6.0) <music21.note.Note A>>]
         ''',
         
@@ -463,10 +467,10 @@ class OffsetNode(ElementNode):
         different offset.  Rather, it takes the position and adds it to the 
         duration.quarterLength.
         
-        >>> offsetNode = timespans.node.OffsetNode(40)
+        >>> offsetNode = tree.node.OffsetNode(40)
         >>> n = note.Note()
         >>> offsetNode.payload.append(n)
-        >>> ts = timespans.spans.Timespan(40, 44)
+        >>> ts = tree.spans.Timespan(40, 44)
         >>> offsetNode.payload.append(ts)
         >>> offsetNode.payloadEndTimes()
         [41.0, 44.0]

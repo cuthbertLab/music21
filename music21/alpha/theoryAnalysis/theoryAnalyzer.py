@@ -360,8 +360,8 @@ def getVLQs(score, partNum1, partNum2):
     >>> len(alpha.theoryAnalysis.theoryAnalyzer.getVLQs(sc, 0, 1))
     2
     '''
-    from music21.stream import timespans
-    tsCol = timespans.fromStream.convert(score, flatten=True, classList=(note.Note, chord.Chord))
+    from music21 import tree
+    tsCol = tree.fromStream.convert(score, flatten=True, classList=(note.Note, chord.Chord))
     allVLQs = []
     defaultKey = None
     

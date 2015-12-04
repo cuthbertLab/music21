@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
-# Name:         timespans/__init__.py
+# Name:         tree/__init__.py
 # Purpose:      Tools for grouping notes and chords into a searchable tree
 #               organized by start and stop offsets
 #
@@ -27,17 +27,17 @@ from music21 import common
 from music21 import exceptions21
 from music21 import note
 
-from music21.timespans import fromStream
-from music21.timespans import toStream
+from music21.tree import fromStream
+from music21.tree import toStream
 
-from music21.timespans import trees 
-from music21.timespans import spans 
-from music21.timespans import analysis 
-from music21.timespans import node 
-from music21.timespans import verticality 
+from music21.tree import trees 
+from music21.tree import spans 
+from music21.tree import analysis 
+from music21.tree import node 
+from music21.tree import verticality 
 
 from music21 import environment
-environLocal = environment.Environment("timespans")
+environLocal = environment.Environment("tree")
 
 
 #------------------------------------------------------------------------------
@@ -46,9 +46,9 @@ environLocal = environment.Environment("timespans")
 
 def makeExampleScore():
     r'''
-    Makes example score for use in stream-to-timespan conversion docs.
+    Makes example score for use in stream-to-tree conversion docs.
 
-    >>> score = timespans.makeExampleScore()
+    >>> score = tree.makeExampleScore()
     >>> score.show('text')
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.instrument.Instrument PartA: : >

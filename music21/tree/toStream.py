@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
-# Name:         timespans/toStream.py
-# Purpose:      Tools for creating streams from timespan trees
+# Name:         tree/toStream.py
+# Purpose:      Tools for recreating streams from trees
 #
 # Authors:      Josiah Wolf Oberholtzer
 #               Michael Scott Cuthbert
@@ -11,13 +11,13 @@
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
 '''
-Tools for generating new Streams from timespans (fast, manipulatable objects)
+Tools for generating new Streams from trees (fast, manipulatable objects)
 
 None of these things work acceptably yet.  This is super beta.
 '''
 
 from music21.exceptions21 import TimespanException
-from music21.timespans import trees
+from music21.tree import trees
 
 def chordified(timespans, templateStream=None):
     r'''
@@ -28,9 +28,9 @@ def chordified(timespans, templateStream=None):
     information.
 
     >>> score = corpus.parse('bwv66.6')
-    >>> tree = score.asTimespans()
-    >>> chordifiedScore = timespans.toStream.chordified(
-    ...     tree, templateStream=score)
+    >>> scoreTree = score.asTimespans()
+    >>> chordifiedScore = tree.toStream.chordified(
+    ...     scoreTree, templateStream=score)
     >>> chordifiedScore.show('text')
     {0.0} <music21.stream.Measure 0 offset=0.0>
         {0.0} <music21.clef.TrebleClef>
