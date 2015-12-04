@@ -691,12 +691,16 @@ class AVLTree(object):
         
         >>> scoreTree.getNodeAfter(9999) is None
         True
-        >>> note1 = score.parts[0].measure(4).notes[0]
+        >>> note1 = score.flat.notes[30]
         
         Works with sortTuple positions as well...
         
-        >>> scoreTree.getNodeAfter(note1.sortTuple())
-        <OffsetNode: Start:36.0 Indices:(191:191:195:195) Length:{4}>
+        >>> st = note1.sortTuple()
+        >>> st
+        SortTuple(atEnd=0, offset=6.0, priority=0, classSortOrder=20, isNotGrace=1, insertIndex=...)
+        
+        >>> scoreTree.getNodeAfter(st)
+        <OffsetNode: Start:6.5 Indices:(52:52:53:53) Length:{1}>
         '''
         def recurse(node, position):
             if node is None:
