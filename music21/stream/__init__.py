@@ -6756,7 +6756,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #TODO: change skipSelf by January 2016.
         '''
         includeSelf = not skipSelf
-        ri = iterator.RecursiveIterator(self, streamsOnly=streamsOnly,
+        ri = iterator.RecursiveIterator(self, 
+                                        streamsOnly=streamsOnly,
                                         restoreActiveSites=restoreActiveSites,
                                         includeSelf=includeSelf
                                         )
