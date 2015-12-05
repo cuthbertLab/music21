@@ -15,14 +15,12 @@ sort against bare offsets and other SortTuples.
 
 This is a performance-critical object.
 '''
-import collections
-# private metaclass...
-_SortTuple = collections.namedtuple('_SortTuple', ['atEnd','offset','priority',
-                                                  'classSortOrder','isNotGrace','insertIndex'])
+from collections import namedtuple
 
 INFINITY = float('inf')
 
-class SortTuple(_SortTuple):
+class SortTuple(namedtuple('SortTuple', ['atEnd','offset','priority',
+                           'classSortOrder','isNotGrace','insertIndex'])):
     '''
     Derived class of namedTuple which allows for comparisons with pure ints/fractions...
     
