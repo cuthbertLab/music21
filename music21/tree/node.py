@@ -41,35 +41,7 @@ class ElementNode(core.AVLNode):
 
     _DOC_ATTR = {
     'payload': r'''
-        The contents of the node at this point.  Usually PitchedTimespans.
-
-        >>> score = tree.makeExampleScore()
-        >>> scoreTree = tree.fromStream.convert(score, flatten=True, 
-        ...                  classList=(note.Note, chord.Chord))
-        >>> print(scoreTree.rootNode.debug())
-        <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <OffsetNode: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <OffsetNode: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <OffsetNode: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
-
-        >>> scoreTree.rootNode.payload
-        [<PitchedTimespan (3.0 to 4.0) <music21.note.Note F>>]
-
-        >>> scoreTree.rootNode.leftChild.payload
-        [<PitchedTimespan (1.0 to 2.0) <music21.note.Note D>>]
-
-        >>> for x in scoreTree.rootNode.leftChild.rightChild.payload:
-        ...     x
-        ...
-        <PitchedTimespan (2.0 to 3.0) <music21.note.Note E>>
-        <PitchedTimespan (2.0 to 4.0) <music21.note.Note G>>
-
-        >>> scoreTree.rootNode.rightChild.payload
-        [<PitchedTimespan (5.0 to 6.0) <music21.note.Note A>>]
+        The content of the node at this point.  Usually a Music21Object.
         ''',
         
     'payloadElementIndex': r'''
@@ -115,7 +87,7 @@ class ElementNode(core.AVLNode):
         pos = self.position
         if hasattr(pos, 'shortRepr'):
             pos = pos.shortRepr()
-        return '<ElementNode: Start:{} Indices:({}--{}--{}) Payload:>'.format(
+        return '<ElementNode: Start:{} Indices:({}--{}--{}) Payload:{!r}>'.format(
             pos,
             self.subtreeElementsStartIndex,
             self.payloadElementIndex,
@@ -212,16 +184,16 @@ class OffsetNode(ElementNode):
     {0.0 - 0.0} <music21.meter.TimeSignature 2/4>
     {0.0 - 0.0} <music21.meter.TimeSignature 2/4>
     {0.0 - 1.0} <music21.note.Note C>
-    {0.0 - 2.0} <music21.note.Note C>
+    {0.0 - 2.0} <music21.note.Note C#>
     {1.0 - 2.0} <music21.note.Note D>
     {2.0 - 3.0} <music21.note.Note E>
-    {2.0 - 4.0} <music21.note.Note G>
+    {2.0 - 4.0} <music21.note.Note G#>
     {3.0 - 4.0} <music21.note.Note F>
     {4.0 - 5.0} <music21.note.Note G>
-    {4.0 - 6.0} <music21.note.Note E>
+    {4.0 - 6.0} <music21.note.Note E#>
     {5.0 - 6.0} <music21.note.Note A>
     {6.0 - 7.0} <music21.note.Note B>
-    {6.0 - 8.0} <music21.note.Note D>
+    {6.0 - 8.0} <music21.note.Note D#>
     {7.0 - 8.0} <music21.note.Note C>
     {8.0 - 8.0} <music21.bar.Barline style=final>
     {8.0 - 8.0} <music21.bar.Barline style=final>
@@ -278,7 +250,7 @@ class OffsetNode(ElementNode):
      <PitchedTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>, 
      <PitchedTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>, 
      <PitchedTimespan (0.0 to 1.0) <music21.note.Note C>>, 
-     <PitchedTimespan (0.0 to 2.0) <music21.note.Note C>>]
+     <PitchedTimespan (0.0 to 2.0) <music21.note.Note C#>>]
     
     The Indices:(0:0:8:8) indicates that `leftLeft` has neither left nor right children
     
@@ -335,7 +307,7 @@ class OffsetNode(ElementNode):
         ...     x
         ...
         <PitchedTimespan (2.0 to 3.0) <music21.note.Note E>>
-        <PitchedTimespan (2.0 to 4.0) <music21.note.Note G>>
+        <PitchedTimespan (2.0 to 4.0) <music21.note.Note G#>>
 
         >>> scoreTree.rootNode.rightChild.payload
         [<PitchedTimespan (5.0 to 6.0) <music21.note.Note A>>]

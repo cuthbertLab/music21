@@ -19,8 +19,8 @@ from collections import namedtuple
 
 INFINITY = float('inf')
 
-class SortTuple(namedtuple('SortTuple', ['atEnd','offset','priority',
-                           'classSortOrder','isNotGrace','insertIndex'])):
+class SortTuple(namedtuple('SortTuple', ['atEnd', 'offset', 'priority',
+                                         'classSortOrder', 'isNotGrace', 'insertIndex'])):
     '''
     Derived class of namedTuple which allows for comparisons with pure ints/fractions...
     
@@ -61,6 +61,20 @@ class SortTuple(namedtuple('SortTuple', ['atEnd','offset','priority',
     True
     >>> ts_st == float('inf')
     True
+    
+    Construct one w/ keywords:
+
+    >>> st = sorting.SortTuple(atEnd=0, offset=1.0, priority=0, classSortOrder=20,
+    ...           isNotGrace=1, insertIndex=323)
+    >>> st.shortRepr()
+    '1.0 <0.20.323>'
+
+    or as tuple:
+
+    >>> st = sorting.SortTuple(0, 1.0, 0, 20, 1, 323)
+    >>> st.shortRepr()
+    '1.0 <0.20.323>'
+    
     '''
     def __new__(cls, *tupEls, **kw):
         return super(SortTuple, cls).__new__(cls, *tupEls, **kw)
@@ -141,6 +155,35 @@ class SortTuple(namedtuple('SortTuple', ['atEnd','offset','priority',
         reprParts.append(str(self.insertIndex))
         reprParts.append('>')
         return ''.join(reprParts)
+
+    def modify(self, **kw):
+        '''
+        return a new SortTuple identical to the previous, except with
+        the given keyword modified.  Works only with keywords.
+
+        >>> st = sorting.SortTuple(atEnd=0, offset=1.0, priority=0, classSortOrder=20,
+        ...           isNotGrace=1, insertIndex=32)
+        >>> st2 = st.modify(offset=2.0)
+        >>> st2.shortRepr()
+        '2.0 <0.20.32>'
+        >>> st2
+        SortTuple(atEnd=0, offset=2.0, priority=0, classSortOrder=20, isNotGrace=1, insertIndex=32)
+
+        >>> st3 = st2.modify(atEnd=1, isNotGrace=0)
+        >>> st3.shortRepr()
+        'End <0.20.[Grace].32>'
+
+        The original tuple is never modified (hence tuple):
+        
+        >>> st.offset
+        1.0
+        
+        Changing offset, but nothing else, helps in creating .flat positions.
+        '''
+        outList = []
+        for attr in 'atEnd', 'offset', 'priority',  'classSortOrder', 'isNotGrace', 'insertIndex':
+            outList.append(kw.get(attr, getattr(self, attr)))
+        return self.__class__(*tuple(outList))
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":

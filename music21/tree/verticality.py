@@ -27,7 +27,7 @@ from music21 import pitch
 
 environLocal = environment.Environment("tree.verticality")
 
-class VerticalityException(exceptions21.TimespanException):
+class VerticalityException(exceptions21.TreeException):
     pass
 
 class Verticality(object):
@@ -509,10 +509,10 @@ class Verticality(object):
         ...            classList=(note.Note, chord.Chord))
         >>> verticality = scoreTree.getVerticalityAt(4.0)
         >>> verticality
-        <Verticality 4.0 {E3 G3}>
+        <Verticality 4.0 {E#3 G3}>
         >>> el = verticality.makeElement(2.0)
         >>> el
-        <music21.chord.Chord E3 G3>
+        <music21.chord.Chord E#3 G3>
         >>> el.duration.quarterLength
         2.0
         >>> el.duration.type

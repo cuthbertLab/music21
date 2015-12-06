@@ -29,7 +29,7 @@ from music21.sorting import SortTuple
 from music21.tree import spans, core
 from music21.tree import node as nodeModule
 
-from music21.exceptions21 import TimespanException
+from music21.exceptions21 import TreeException
 from music21 import environment
 environLocal = environment.Environment("tree.trees")
 
@@ -42,10 +42,12 @@ class ElementTree(core.AVLTree):
     r'''
     A data structure for efficiently storing a score: flat or recursed or normal.
     
-    This data structure stores OffsetNodes: objects which implement both a
-    `offset` and `endTime` property. It provides fast lookups of such
-    objects and can quickly locate vertical overlaps.
-
+    This data structure has no connection to the XML ElementTree.
+    
+    This data structure stores ElementNodes: objects which implement both a
+    `position` and `endTime` property. It provides fast lookups of such
+    objects.
+    
     >>> et = tree.trees.ElementTree()
     >>> et
     <ElementTree {0} (-inf to inf)>
@@ -61,7 +63,7 @@ class ElementTree(core.AVLTree):
     >>> et
     <ElementTree {100} (0.0 <0.20...> to 200.0)>
     >>> et.rootNode
-    <ElementNode: Start:126.0 <0.20...> Indices:(0--63--100) Payload:>
+    <ElementNode: Start:126.0 <0.20...> Indices:(0--63--100) Payload:<music21.note.Note C>>
     
     >>> n2 = s[-1]
 
@@ -109,40 +111,19 @@ class ElementTree(core.AVLTree):
     ## Special Methods ##
     def __contains__(self, element):
         r'''
-        Is true when the ElementTree contains the object within it; if and only if the
-        .offset of the element matches the position in the tree.
-
-        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> tss = [tree.spans.Timespan(x, y) for x, y in tsList]
-        >>> tsTree = tree.trees.TimespanTree()
-        >>> tsTree.insert(tss)
-
-        >>> tss[0] in tsTree
-        True
-
-        >>> tree.spans.Timespan(-200, 1000) in tsTree
-        False
+        Is true when the ElementTree contains the object within it
         
-        The exact Timespan object does not have to be in the tree, just one with the same offset
-        and endTime:
+        This is potentially an O(n log n) operation if the element is not at the right offset,
+        like in a flat.
         
-        >>> tsDuplicate = tree.spans.Timespan(0, 2)
-        >>> tsDuplicate in tsTree
-        True
+        TO WRITE AS NEEDED...
         '''
-        try:
-            offset = element.offset
-        except AttributeError:
-            raise TimespanTreeException('element must be a Music21Object, i.e., must have offset')
-        candidates = self.elementsStartingAt(offset)
-        if element in candidates:
-            return True
-        else:
-            return False
+        raise ElementTreeException("Not implemented")
 
     def __eq__(self, expr):
         r'''
-        Two ElementTrees are equal only if they are the same object'''
+        Two ElementTrees are equal only if they are the same object
+        '''
         return self is expr
 
     def __getitem__(self, i):
@@ -225,32 +206,6 @@ class ElementTree(core.AVLTree):
     def __hash__(self):
         return hash((type(self), id(self)))
 
-    def __iter__(self):
-        r'''
-        Iterates through all the nodes in the offset tree and returns each thing
-        in the payload.
-
-        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> tss = [tree.spans.Timespan(x, y) for x, y in tsList]
-        >>> tsTree = tree.trees.TimespanTree()
-        >>> tsTree.insert(tss)
-
-        >>> for x in tsTree:
-        ...     x
-        <Timespan 0.0 2.0>
-        <Timespan 0.0 9.0>
-        <Timespan 1.0 1.0>
-        <Timespan 2.0 3.0>
-        <Timespan 3.0 4.0>
-        <Timespan 4.0 9.0>
-        <Timespan 5.0 6.0>
-        <Timespan 5.0 8.0>
-        <Timespan 6.0 8.0>
-        <Timespan 7.0 7.0>        
-        '''
-        for n in super(ElementTree, self).__iter__():
-            for el in n.payload:
-                yield el
 
     def __len__(self):
         r'''
@@ -430,9 +385,9 @@ class ElementTree(core.AVLTree):
         <TimespanTree {20} (0.0 to 8.0)>
 
         >>> scoreTree[16]
-        <PitchedTimespan (6.0 to 8.0) <music21.note.Note D>>
+        <PitchedTimespan (6.0 to 8.0) <music21.note.Note D#>>
         >>> newTree[16]
-        <PitchedTimespan (6.0 to 8.0) <music21.note.Note D>>
+        <PitchedTimespan (6.0 to 8.0) <music21.note.Note D#>>
         
         >>> scoreTree[16] is newTree[16]
         True
@@ -634,7 +589,8 @@ class ElementTree(core.AVLTree):
             positions = None
         else:
             positions = positionsOrElements
-            if not common.isListLike(positions):
+            if not common.isListLike(positions) or hasattr(positions, 'shortRepr'):
+                # is not a list and not a sortTuple...
                 positions = [positions]
         
         if (not common.isListLike(elements) and
@@ -646,7 +602,8 @@ class ElementTree(core.AVLTree):
                 
         
         for i, el in enumerate(elements):
-            self._insertCore(positions[i], el)
+            pos = positions[i]
+            self._insertCore(pos, el)
         
         self._updateNodes(initialPosition, initialEndTime)
 
@@ -691,7 +648,32 @@ class ElementTree(core.AVLTree):
     ### PROPERTIES ###
     @property
     def offset(self):
-        return self.lowestPosition
+        '''
+        this is just for mimicking elements as streams. 
+        '''
+        lp = self.lowestPosition
+        if hasattr(lp, 'offset'):
+            lp = lp.offset
+        return lp
+
+    def sortTuple(self, site=None):
+        '''
+        mimick a sortTuple for the ElementTree using the source as a guide,
+        but changing the offset.
+        
+        >>> s = stream.Stream(id='testStream')
+        >>> s.insert(3, note.Note())
+        >>> et = tree.trees.ElementTree(s.elements, s)
+        >>> et
+        <ElementTree {1} (3.0 <0.20...> to 4.0) <music21.stream.Stream testStream>>        
+
+        >>> et.sortTuple()
+        SortTuple(atEnd=0, offset=3.0, priority=0, classSortOrder=-20, isNotGrace=1, ...)
+        >>> s.sortTuple()
+        SortTuple(atEnd=0, offset=0.0, priority=0, classSortOrder=-20, isNotGrace=1, ...)
+        '''
+        sourceSortTuple = self.source.sortTuple(site)
+        return sourceSortTuple.modify(offset=self.offset)
 
     @property
     def endTime(self):
@@ -865,6 +847,146 @@ class OffsetTree(ElementTree):
     ### SPECIAL METHODS ###
     def __init__(self, elements=None, source=None):
         super(OffsetTree, self).__init__(elements, source)
+
+
+    def __contains__(self, element):
+        r'''
+        Is true when the ElementTree contains the object within it; if and only if the
+        .offset of the element matches the position in the tree.
+
+        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> tss = [tree.spans.Timespan(x, y) for x, y in tsList]
+        >>> tsTree = tree.trees.TimespanTree()
+        >>> tsTree.insert(tss)
+
+        >>> tss[0] in tsTree
+        True
+
+        >>> tree.spans.Timespan(-200, 1000) in tsTree
+        False
+        
+        The exact Timespan object does not have to be in the tree, just one with the same offset
+        and endTime:
+        
+        >>> tsDuplicate = tree.spans.Timespan(0, 2)
+        >>> tsDuplicate in tsTree
+        True
+        '''
+        try:
+            offset = element.offset
+        except AttributeError:
+            raise TimespanTreeException('element must be a Music21Object, i.e., must have offset')
+        candidates = self.elementsStartingAt(offset)
+        if element in candidates:
+            return True
+        else:
+            return False
+
+    def __getitem__(self, i):
+        r'''
+        Gets elements by integer index or slice.
+
+        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> tss = [tree.spans.Timespan(x, y) for x, y in tsList]
+        >>> tsTree = tree.trees.TimespanTree()
+        >>> tsTree.insert(tss)
+
+        >>> tsTree[0]
+        <Timespan 0.0 2.0>
+
+        >>> tsTree[-1]
+        <Timespan 7.0 7.0>
+
+        >>> tsTree[2:5]
+        [<Timespan 1.0 1.0>, <Timespan 2.0 3.0>, <Timespan 3.0 4.0>]
+
+        >>> tsTree[-6:-3]
+        [<Timespan 3.0 4.0>, <Timespan 4.0 9.0>, <Timespan 5.0 6.0>]
+
+        >>> tsTree[-100:-200]
+        []
+
+        >>> for x in tsTree[:]:
+        ...     x
+        <Timespan 0.0 2.0>
+        ...
+        <Timespan 7.0 7.0>
+        '''
+        def recurseByIndex(node, index):
+            '''
+            Return the payload element at a given index
+            '''
+            if node.payloadElementsStartIndex <= index < node.payloadElementsStopIndex:
+                return node.payload[index - node.payloadElementsStartIndex]
+            elif node.leftChild and index < node.payloadElementsStartIndex:
+                return recurseByIndex(node.leftChild, index)
+            elif node.rightChild and node.payloadElementsStopIndex <= index:
+                return recurseByIndex(node.rightChild, index)
+
+        def recurseBySlice(node, start, stop):
+            '''
+            Return a slice of the payload elements (plural) where start <= index < stop.
+            '''
+            result = []
+            if node is None:
+                return result
+            if start < node.payloadElementsStartIndex and node.leftChild:
+                result.extend(recurseBySlice(node.leftChild, start, stop))
+            if start < node.payloadElementsStopIndex and node.payloadElementsStartIndex < stop:
+                indexStart = start - node.payloadElementsStartIndex
+                if indexStart < 0:
+                    indexStart = 0
+                indexStop = stop - node.payloadElementsStartIndex
+                result.extend(node.payload[indexStart:indexStop])
+            if node.payloadElementsStopIndex <= stop and node.rightChild:
+                result.extend(recurseBySlice(node.rightChild, start, stop))
+            return result
+        
+        if isinstance(i, int):
+            if self.rootNode is None:
+                raise IndexError
+            if i < 0:
+                i = self.rootNode.subtreeElementsStopIndex + i
+            if i < 0 or self.rootNode.subtreeElementsStopIndex <= i:
+                raise IndexError
+            return recurseByIndex(self.rootNode, i)
+        elif isinstance(i, slice):
+            if self.rootNode is None:
+                return []
+            indices = i.indices(self.rootNode.subtreeElementsStopIndex)
+            start, stop = indices[0], indices[1]
+            return recurseBySlice(self.rootNode, start, stop)
+        else:
+            raise TypeError('Indices must be integers or slices, got {}'.format(i))
+
+
+    def __iter__(self):
+        r'''
+        Iterates through all the nodes in the offset tree and returns each thing
+        in the payload.
+
+        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> tss = [tree.spans.Timespan(x, y) for x, y in tsList]
+        >>> tsTree = tree.trees.TimespanTree()
+        >>> tsTree.insert(tss)
+
+        >>> for x in tsTree:
+        ...     x
+        <Timespan 0.0 2.0>
+        <Timespan 0.0 9.0>
+        <Timespan 1.0 1.0>
+        <Timespan 2.0 3.0>
+        <Timespan 3.0 4.0>
+        <Timespan 4.0 9.0>
+        <Timespan 5.0 6.0>
+        <Timespan 5.0 8.0>
+        <Timespan 6.0 8.0>
+        <Timespan 7.0 7.0>        
+        '''
+        for n in super(ElementTree, self).__iter__():
+            for el in n.payload:
+                yield el
+
 
     ### PRIVATE METHODS ###
     def _getPositionsFromElements(self, elements):
@@ -1581,8 +1703,10 @@ class TimespanTree(OffsetTree):
 
 
 #------------------------------------------------------------------------------
+class ElementTreeException(exceptions21.TreeException):
+    pass
 
-class TimespanTreeException(exceptions21.TimespanException):
+class TimespanTreeException(exceptions21.TreeException):
     pass
 
 

@@ -18,7 +18,7 @@ absolutely balanced by having O(log n) search times.
 '''
 import unittest
 
-from music21.exceptions21 import TimespanException
+from music21.exceptions21 import TreeException
 from music21 import common
 
 #------------------------------------------------------------------------------
@@ -461,7 +461,7 @@ class AVLNode(common.SlottedObject):
             else:
                 node = node.rotateLeftRight()
         if node.balance < -1 or node.balance > 1:
-            raise TimespanException(
+            raise TreeException(
                 'Somehow Nodes are still not balanced. node.balance %r must be between -1 and 1')
 
         return node

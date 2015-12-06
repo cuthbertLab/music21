@@ -16,6 +16,7 @@
 # improve them.  Requires pycallgraph (not included with music21).  
 
 import pycallgraph
+import pycallgraph.output
 import time
 
 
