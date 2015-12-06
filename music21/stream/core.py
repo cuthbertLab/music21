@@ -322,7 +322,7 @@ class StreamCoreMixin(object):
         >>> score = tree.makeExampleScore()
         >>> scoreTree = score.asTimespans()
         >>> print(scoreTree)
-        <TimespanTree {20} (0.0 to 8.0) <music21.stream.Score 0x104840438>>
+        <TimespanTree {20} (0.0 to 8.0) <music21.stream.Score exampleScore>>
             <PitchedTimespan (0.0 to 0.0) <music21.instrument.Instrument PartA: : >>
             <PitchedTimespan (0.0 to 0.0) <music21.instrument.Instrument PartB: : >>
             <PitchedTimespan (0.0 to 0.0) <music21.clef.BassClef>>
@@ -330,16 +330,16 @@ class StreamCoreMixin(object):
             <PitchedTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
             <PitchedTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
             <PitchedTimespan (0.0 to 1.0) <music21.note.Note C>>
-            <PitchedTimespan (0.0 to 2.0) <music21.note.Note C>>
+            <PitchedTimespan (0.0 to 2.0) <music21.note.Note C#>>
             <PitchedTimespan (1.0 to 2.0) <music21.note.Note D>>
             <PitchedTimespan (2.0 to 3.0) <music21.note.Note E>>
-            <PitchedTimespan (2.0 to 4.0) <music21.note.Note G>>
+            <PitchedTimespan (2.0 to 4.0) <music21.note.Note G#>>
             <PitchedTimespan (3.0 to 4.0) <music21.note.Note F>>
             <PitchedTimespan (4.0 to 5.0) <music21.note.Note G>>
-            <PitchedTimespan (4.0 to 6.0) <music21.note.Note E>>
+            <PitchedTimespan (4.0 to 6.0) <music21.note.Note E#>>
             <PitchedTimespan (5.0 to 6.0) <music21.note.Note A>>
             <PitchedTimespan (6.0 to 7.0) <music21.note.Note B>>
-            <PitchedTimespan (6.0 to 8.0) <music21.note.Note D>>
+            <PitchedTimespan (6.0 to 8.0) <music21.note.Note D#>>
             <PitchedTimespan (7.0 to 8.0) <music21.note.Note C>>
             <PitchedTimespan (8.0 to 8.0) <music21.bar.Barline style=final>>
             <PitchedTimespan (8.0 to 8.0) <music21.bar.Barline style=final>>
