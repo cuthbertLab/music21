@@ -1822,8 +1822,13 @@ class PartExporter(XMLExporterBase):
         # has been made
         # might need to getAll b/c might need spanners 
         # from a higher level container
-        #spannerBundle = spanner.SpannerBundle(
-        #                measureStream.flat.getAllContextsByClass('Spanner'))
+        # allContexts = []
+        # spannerContext = measureStream.flat.getContextByClass('Spanner')
+        # while spannerContext:
+        #    allContexts.append(spannerContext)
+        #    spannerContext = spannerContext.getContextByClass('Spanner')
+        # 
+        #spannerBundle = spanner.SpannerBundle(allContexts)
         # only getting spanners at this level
         #spannerBundle = spanner.SpannerBundle(measureStream.flat)
         self.spannerBundle = part.spannerBundle

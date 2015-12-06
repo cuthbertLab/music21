@@ -1346,27 +1346,54 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     
     def elementOffset(self, element, stringReturns=False):
         '''
-        return the offset (opFrac) from the offsetMap.
+        Return the offset as an opFrac (float or Fraction) from the offsetMap.
         highly optimized for speed.
         
-        if stringReturns are allowed then returns like 'highestOffset' are allowed.
-        
-        >>> s = stream.Stream()
-        >>> s.append(note.Note('C'))
+
+        >>> m = stream.Measure(number=1)
+        >>> m.append(note.Note('C'))
         >>> d = note.Note('D')
-        >>> s.append(d)
-        >>> s.elementOffset(d)
+        >>> m.append(d)
+        >>> m.elementOffset(d)
         1.0
+
+        If stringReturns is True then returns like 'highestOffset' are allowed.
         
         >>> b = bar.Barline()
-        >>> s.storeAtEnd(b)
-        >>> s.elementOffset(b)
+        >>> m.storeAtEnd(b)
+        >>> m.elementOffset(b)
         2.0
-        >>> s.elementOffset(b, stringReturns=True)
+        >>> m.elementOffset(b, stringReturns=True)
         'highestTime' 
         
-        Performance note: this should usually be about 3x faster than
-        element.getOffsetBySite(self) -- currently 600ns instead of 1.5 microseconds.
+        Unlike element.getOffsetBySite(self), this method will NOT follow derivation chains
+        and in fact will raise a sites.SitesException
+        
+        >>> import copy
+        >>> p = stream.Part(id='sPart')
+        >>> p.insert(20, m)
+        >>> m.getOffsetBySite(p)
+        20.0
+        >>> p.elementOffset(m)
+        20.0
+        
+        >>> mCopy = copy.deepcopy(m)
+        >>> mCopy.number = 10
+        >>> mCopy.derivation
+        <Derivation of <music21.stream.Measure 10 offset=0.0> from 
+            <music21.stream.Measure 1 offset=20.0> via "__deepcopy__">
+        >>> mCopy.getOffsetBySite(p)
+        20.0
+        >>> p.elementOffset(mCopy) 
+        Traceback (most recent call last):
+        SitesException: an entry for this object 0x... is not stored in 
+            stream <music21.stream.Part sPart>
+        
+        
+        Performance note: because it will not follow derivation chains, and does
+        not need to unwrap a weakref, this method 
+        should usually be about 3x faster than element.getOffsetBySite(self) -- 
+        currently 600ns instead of 1.5 microseconds.
         '''
         try:
             o = self._offsetDict[id(element)][0] # 2.3 million times found in TestStream

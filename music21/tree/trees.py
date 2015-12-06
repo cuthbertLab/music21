@@ -29,12 +29,18 @@ from music21.sorting import SortTuple
 from music21.tree import spans, core
 from music21.tree import node as nodeModule
 
-from music21.exceptions21 import TreeException
 from music21 import environment
 environLocal = environment.Environment("tree.trees")
 
 INFINITY = float('inf')
 NEGATIVE_INFINITY = float('-inf')
+
+#------------------------------------------------------------------------------
+class ElementTreeException(exceptions21.TreeException):
+    pass
+
+class TimespanTreeException(exceptions21.TreeException):
+    pass
 
 #-------------------------------#
 
@@ -1702,12 +1708,7 @@ class TimespanTree(OffsetTree):
 
 
 
-#------------------------------------------------------------------------------
-class ElementTreeException(exceptions21.TreeException):
-    pass
 
-class TimespanTreeException(exceptions21.TreeException):
-    pass
 
 
 #------------------------------------------------------------------------------

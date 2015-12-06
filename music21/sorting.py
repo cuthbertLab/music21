@@ -14,6 +14,15 @@ This module defines a single class, SortTuple, which is a named tuple that can
 sort against bare offsets and other SortTuples.
 
 This is a performance-critical object.
+
+It also defines two singleton instance of the SortTupleLow class as ZeroSortTuple and
+ZeroSortTupleHigh which are sortTuple at
+offset 0.0, priority -inf or inf:
+
+>>> sorting.ZeroSortTupleLow
+SortTuple(atEnd=0, offset=0.0, priority=-inf, classSortOrder=0, isNotGrace=1, insertIndex=0)
+>>> sorting.ZeroSortTupleHigh
+SortTuple(atEnd=0, offset=0.0, priority=inf, classSortOrder=0, isNotGrace=1, insertIndex=0)
 '''
 from collections import namedtuple
 
@@ -184,6 +193,13 @@ class SortTuple(namedtuple('SortTuple', ['atEnd', 'offset', 'priority',
         for attr in 'atEnd', 'offset', 'priority',  'classSortOrder', 'isNotGrace', 'insertIndex':
             outList.append(kw.get(attr, getattr(self, attr)))
         return self.__class__(*tuple(outList))
+
+ZeroSortTupleLow = SortTuple(atEnd=0, offset=0.0, priority=float('-inf'), classSortOrder=0,
+                          isNotGrace=1, insertIndex=0)
+
+ZeroSortTupleHigh = SortTuple(atEnd=0, offset=0.0, priority=float('inf'), classSortOrder=0,
+                          isNotGrace=1, insertIndex=0)
+
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
