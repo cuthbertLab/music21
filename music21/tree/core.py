@@ -762,6 +762,7 @@ class AVLTree(object):
         
         >>> at = tree.core.AVLTree()
         >>> at.getPositionAfter(-999) is None
+        True
         '''
         node = self.getNodeAfter(position)
         if node:            
