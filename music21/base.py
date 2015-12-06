@@ -3769,9 +3769,6 @@ class Test(unittest.TestCase):
         sInner.append(n)
         sOuter.append(sInner)
 
-        unused_tss = sOuter.asTimespans(classList=(sInner.classes[0],), 
-                                        flatten='semiFlat') 
-
         # append clef to outer stream
         sOuter.insert(0, clef.AltoClef())
         pre = sOuter.getElementAtOrBefore(0, [clef.Clef])

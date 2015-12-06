@@ -3264,7 +3264,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         if gatherSpanners is True or the string 'all' then all spanners in 
         the score are gathered and
-        included.  TODO: make True only return spanners from the region.
+        included.  
+        
+        TODO: make True only return spanners from the region.  Use core.gatherMissingSpanners()
+        to do so.
 
         if ignoreNumbers is True, then it ignores defined measureNumbers and 
         uses 0-indexed measure objects

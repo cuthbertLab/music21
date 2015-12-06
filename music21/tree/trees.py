@@ -63,7 +63,7 @@ class ElementTree(core.AVLTree):
     >>> et
     <ElementTree {100} (0.0 <0.20...> to 200.0)>
     >>> et.rootNode
-    <ElementNode: Start:126.0 <0.20...> Indices:(0--63--100) Payload:<music21.note.Note C>>
+    <ElementNode: Start:126.0 <0.20...> Indices:(l:0 *63* r:100) Payload:<music21.note.Note C>>
     
     >>> n2 = s[-1]
 

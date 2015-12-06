@@ -162,9 +162,9 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, usePo
     <ElementTree {2} (0.0 <0.-20...> to 8.0) <music21.stream.Score exampleScore>>
     >>> for x in elementTree:
     ...     x
-    <ElementNode: Start:0.0 <0.-20...> Indices:(0--0--2) 
+    <ElementNode: Start:0.0 <0.-20...> Indices:(l:0 *0* r:2) 
         Payload:<ElementTree {5} (0.0 <0.-25...> to 8.0) <music21.stream.Part 0x104970a20>>>
-    <ElementNode: Start:0.0 <0.-20...> Indices:(1--1--2) 
+    <ElementNode: Start:0.0 <0.-20...> Indices:(l:1 *1* r:2) 
         Payload:<ElementTree {5} (0.0 <0.-25...> to 8.0) <music21.stream.Part 0x104970978>>>
     
     >>> etFlat = tree.fromStream.asTree(score, flatten=True)
@@ -176,21 +176,21 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, usePo
 
     >>> for x in etFlat:
     ...     x
-    <ElementNode: Start:0.0 <0.-25...> Indices:(0--0--2) 
+    <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *0* r:2) 
         Payload:<music21.instrument.Instrument PartA: : >>
-    <ElementNode: Start:0.0 <0.-25...> Indices:(1--1--2) 
+    <ElementNode: Start:0.0 <0.-25...> Indices:(l:1 *1* r:2) 
         Payload:<music21.instrument.Instrument PartB: : >>
-    <ElementNode: Start:0.0 <0.0...> Indices:(0--2--4) Payload:<music21.clef.BassClef>>
-    <ElementNode: Start:0.0 <0.0...> Indices:(3--3--4) Payload:<music21.clef.BassClef>>
+    <ElementNode: Start:0.0 <0.0...> Indices:(l:0 *2* r:4) Payload:<music21.clef.BassClef>>
+    <ElementNode: Start:0.0 <0.0...> Indices:(l:3 *3* r:4) Payload:<music21.clef.BassClef>>
     ...
-    <ElementNode: Start:0.0 <0.20...> Indices:(5--6--8) Payload:<music21.note.Note C>>
-    <ElementNode: Start:0.0 <0.20...> Indices:(7--7--8) Payload:<music21.note.Note C#>>
-    <ElementNode: Start:1.0 <0.20...> Indices:(0--8--20) Payload:<music21.note.Note D>>
+    <ElementNode: Start:0.0 <0.20...> Indices:(l:5 *6* r:8) Payload:<music21.note.Note C>>
+    <ElementNode: Start:0.0 <0.20...> Indices:(l:7 *7* r:8) Payload:<music21.note.Note C#>>
+    <ElementNode: Start:1.0 <0.20...> Indices:(l:0 *8* r:20) Payload:<music21.note.Note D>>
     ...
-    <ElementNode: Start:7.0 <0.20...> Indices:(15--17--20) Payload:<music21.note.Note C>>
-    <ElementNode: Start:End <0.-5...> Indices:(18--18--20) 
+    <ElementNode: Start:7.0 <0.20...> Indices:(l:15 *17* r:20) Payload:<music21.note.Note C>>
+    <ElementNode: Start:End <0.-5...> Indices:(l:18 *18* r:20) 
         Payload:<music21.bar.Barline style=final>>
-    <ElementNode: Start:End <0.-5...> Indices:(19--19--20) 
+    <ElementNode: Start:End <0.-5...> Indices:(l:19 *19* r:20) 
         Payload:<music21.bar.Barline style=final>>
     
     >>> etFlat.getPositionAfter(0.5)

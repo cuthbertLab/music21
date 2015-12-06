@@ -27,8 +27,8 @@ class ElementNode(core.AVLNode):
     endTime and index within a stream, as well as the endTimes and indices of the
     elements to the left and right of it. 
 
+    TODO: Specific ElementNode tests and docs.
     '''
-
     ### CLASS VARIABLES ###
 
     __slots__ = (
@@ -87,7 +87,7 @@ class ElementNode(core.AVLNode):
         pos = self.position
         if hasattr(pos, 'shortRepr'):
             pos = pos.shortRepr()
-        return '<ElementNode: Start:{} Indices:({}--{}--{}) Payload:{!r}>'.format(
+        return '<ElementNode: Start:{} Indices:(l:{} *{}* r:{}) Payload:{!r}>'.format(
             pos,
             self.subtreeElementsStartIndex,
             self.payloadElementIndex,

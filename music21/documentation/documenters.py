@@ -734,6 +734,7 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.stream.Stream.beatAndMeasureFromOffset
         music21.stream.core.StreamCoreMixin:
         - music21.stream.core.StreamCoreMixin.asTimespans
+        - music21.stream.core.StreamCoreMixin.asTree
         - music21.stream.core.StreamCoreMixin.coreGatherMissingSpanners
         - music21.stream.core.StreamCoreMixin.elementsChanged        
         '''

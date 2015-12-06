@@ -264,8 +264,6 @@ class StreamCoreMixin(object):
         if element is self: # cannot add this Stream into itself
             raise StreamException("this Stream cannot be contained within itself")
         if checkRedundancy:
-            # TODO: might optimize this by storing a list of all obj ids 
-            #   with every insertion and deletion
             idElement = id(element)
             if idElement in self._offsetDict:
                 # now go slow for safety -- maybe something is amiss in the index.
@@ -352,6 +350,28 @@ class StreamCoreMixin(object):
                                                      classList=classList)
             self._cache[cacheKey] = hashedTimespanTree
         return self._cache[cacheKey]
+
+    def asTree(self, flatten=False, classList=None, useTimespans=False, usePositions=True):
+        '''
+        Returns an elementTree of the score, using exact positioning.
+        
+        See tree.fromStream.asTree() for more details.
+        
+        >>> score = tree.makeExampleScore()
+        >>> scoreTree = score.asTree(flatten=True)
+        >>> scoreTree
+        <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
+        '''
+        hashedAttributes = hash( (tuple(classList or () ), flatten, useTimespans, usePositions) ) 
+        cacheKey = "elementTree" + str(hashedAttributes)
+        if cacheKey not in self._cache or self._cache[cacheKey] is None:
+            hashedElementTree = tree.fromStream.asTree(self,
+                                                     flatten=flatten,
+                                                     classList=classList,
+                                                     useTimespans=useTimespans,
+                                                     usePositions=usePositions)
+            self._cache[cacheKey] = hashedElementTree
+        return self._cache[cacheKey]
     
     def coreGatherMissingSpanners(self, recurse=True, requireAllPresent=True, insert=True):
         '''
@@ -364,10 +384,8 @@ class StreamCoreMixin(object):
         
         Because spanners are stored weakly in .sites this is only guaranteed to find
         the spanners in cases where the spanner is in another stream that is still active.
-        
-        TODO: use this to not require gathering all spanners in a .measure call.
-        
-        A little helper function since we'll make the same Stream several times:
+                
+        Here's a little helper function since we'll make the same Stream several times:
         
         >>> def getStream():
         ...    s = stream.Stream()
@@ -377,6 +395,8 @@ class StreamCoreMixin(object):
         ...    n.bogusAttributeNotWeakref = sl # prevent garbage collecting sl
         ...    s.append([n, m])
         ...    return s
+        
+        
         
         >>> s = getStream()
         >>> s.show('text')
