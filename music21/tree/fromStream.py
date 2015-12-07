@@ -162,10 +162,8 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, usePo
     <ElementTree {2} (0.0 <0.-20...> to 8.0) <music21.stream.Score exampleScore>>
     >>> for x in elementTree:
     ...     x
-    <ElementNode: Start:0.0 <0.-20...> Indices:(l:0 *0* r:2) 
-        Payload:<ElementTree {5} (0.0 <0.-25...> to 8.0) <music21.stream.Part 0x104970a20>>>
-    <ElementNode: Start:0.0 <0.-20...> Indices:(l:1 *1* r:2) 
-        Payload:<ElementTree {5} (0.0 <0.-25...> to 8.0) <music21.stream.Part 0x104970978>>>
+    <ElementNode: Start:0.0 <0.-20...> Indices:(l:0 *0* r:2) Payload:<music21.stream.Part ...>>
+    <ElementNode: Start:0.0 <0.-20...> Indices:(l:1 *1* r:2) Payload:<music21.stream.Part ...>>
     
     >>> etFlat = tree.fromStream.asTree(score, flatten=True)
     >>> etFlat
@@ -230,13 +228,9 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, usePo
                                           currentParentage=localParentage,
                                           initialOffset=offset,
                                           outputTree=outputTree)
+                    wasStream = True
                 else:
-                    # make a new tree and put it in the current tree as an element
-                    containedTree = recurseGetTreeByClass(element,
-                                                          currentParentage=localParentage,
-                                                          initialOffset=offset)
-                    outputTree.insert(containedTree)
-                wasStream = True
+                    pass # do nothing special for streams if not flattening...
                 
             if not wasStream or flatten == 'semiFlat':
                 endTime = offset + element.duration.quarterLength

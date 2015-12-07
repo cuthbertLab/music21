@@ -1248,15 +1248,12 @@ class Music21Object(object):
             
             if contextNode is not None:
                 payload = contextNode.payload
-                if isinstance(payload, Music21Object):
-                    return payload
-                else:
-                    return None # could be another ElementTree, in which case defer.
+                return payload
             else:
                 return None
 
 
-        if not common.isListLike(className):
+        if className and not common.isListLike(className):
             className = (className,)
             
         if 'At' in getElementMethod and self.isClassOrSubclass(className):
@@ -1265,8 +1262,6 @@ class Music21Object(object):
         for site, positionStart, searchType in self.contextSites(
                                             returnSortTuples=True,
                                             sortByCreationTime=sortByCreationTime):
-            if site.isClassOrSubclass(className):
-                return site
             
             if searchType == 'elementsOnly' or searchType == 'elementsFirst':
                 contextEl = payloadExtractor(site, flatten=False, positionStart=positionStart)
@@ -1275,9 +1270,27 @@ class Music21Object(object):
                 # otherwise, continue to check for flattening...
                 
             if searchType != 'elementsOnly': # flatten or elementsFirst
-                contextEl = payloadExtractor(site, flatten=True, positionStart=positionStart)
+                if ('After' in getElementMethod and 
+                        (not className or 
+                         site.isClassOrSubclass(className))):
+                    if 'NotSelf' in getElementMethod and self is site:
+                        pass
+                    elif 'NotSelf' not in getElementMethod: # for 'After' we can't do the
+                        # containing site because that comes before.
+                        return site # if the site itself is the context, return it...
+
+                contextEl = payloadExtractor(site, flatten='semiFlat', positionStart=positionStart)
                 if contextEl is not None:
                     return contextEl
+
+                if ('Before' in getElementMethod and 
+                        (not className or 
+                         site.isClassOrSubclass(className))):
+                    if 'NotSelf' in getElementMethod and self is site:
+                        pass
+                    else:
+                        return site # if the site itself is the context, return it...
+                
                 # otherwise, continue to check in next contextSite.
 
         # nothing found...
@@ -1338,7 +1351,7 @@ class Music21Object(object):
         >>> for y in m.contextSites(returnSortTuples=True):
         ...      yClearer = (y[0], y[1].shortRepr(), y[2])
         ...      print(yClearer)
-        (<music21.stream.Measure 3 offset=9.0>, '0.0 <inf.0.0>', 'elementsFirst')
+        (<music21.stream.Measure 3 offset=9.0>, '0.0 <0.-20...>', 'elementsFirst')
         (<music21.stream.Part Alto>, '9.0 <0.-20...>', 'flatten')
         (<music21.stream.Score bach>, '9.0 <0.-20...>', 'elementsOnly')
 
@@ -1437,7 +1450,8 @@ class Music21Object(object):
                 environLocal.printDebug("Caller first is {} with offsetAppend {}".format(
                                                                 callerFirst, offsetAppend))
                 if returnSortTuples:
-                    yield(self, ZeroSortTupleHigh, recursionType)
+                    selfSortTuple = self.sortTuple().modify(offset=0.0)
+                    yield(self, selfSortTuple, recursionType)
                 else:
                     yield(self, 0.0, recursionType)
 
@@ -1571,105 +1585,9 @@ class Music21Object(object):
         
     #--------------------------------------------------------------------------
 
-    def _adjacentObject(self, 
-                        site, 
-                        classFilterList=None, 
-                        forward=True,
-                        beginNearest=True):
-        '''
-        Core method for finding adjacent objects given a single site.
-
-        The `site` argument is a Stream that contains this
-        element. The index of this element if sound in this site,
-        and either the next or previous element, if found, is returned.
-
-        If `forward` is True index values are
-        incremented; if False, index values are decremented.
-
-        If `beginNearest` is True, index values are searched based
-        on those closest to the caller; if False, the search is
-        done in reverse, from the most remote index toward the caller.
-        This may be useful as an optimization when looking for elements 
-        that are far from the caller.
-
-        The `classFilterList` may specify one or more classes as targets.
-        '''
-        siteLength = len(site)
-        # get another list to avoid function calls
-        siteElements = site.elements
-        # special optimization for class selection when a single str class
-        # is given
-        if (classFilterList is not None and len(classFilterList) == 1 and
-            isinstance(classFilterList[0], str)):
-            if not site.hasElementOfClass(classFilterList[0]):
-                return None
-        # go to right, start at nearest
-        if forward and beginNearest:
-            currentIndex = site.index(self) + 1 # start with next
-            while (currentIndex < siteLength):
-                nextObj = siteElements[currentIndex]
-                if classFilterList is not None:
-                    if nextObj.isClassOrSubclass(classFilterList):
-                        return nextObj
-                else:
-                    return nextObj
-                currentIndex += 1
-        # go to right, start at rightmost
-        elif forward and not beginNearest:
-            try:
-                lastIndex = site.index(self) + 1 # end with next
-            except exceptions21.StreamException: 
-                return None # see note below
-            currentIndex = siteLength
-            while (currentIndex >= lastIndex):
-                nextObj = siteElements[currentIndex]
-                if classFilterList is not None:
-                    if nextObj.isClassOrSubclass(classFilterList):
-                        return nextObj
-                else:
-                    return nextObj
-                currentIndex -= 1
-        # go to left, start at nearest
-        elif not forward and beginNearest:
-            try:
-                currentIndex = site.index(self) - 1 # start with next
-            except exceptions21.StreamException: 
-                return None 
-                # this may happen because a Stream may be in an object's .sites
-                # after a deepcopy but which does not actually have the object in it.
-                # TODO: Remove this check after sites is completely cleaned up so does not happen. 
-            while (currentIndex >= 0):
-                nextObj = siteElements[currentIndex]
-                if classFilterList is not None:
-                    if nextObj.isClassOrSubclass(classFilterList):
-                        return nextObj
-                else:
-                    return nextObj
-                currentIndex -= 1
-        # go to left, start at leftmost
-        elif not forward and not beginNearest:
-            try:
-                lastIndex = site.index(self) - 1 # start with next
-            except exceptions21.StreamException:
-                return None # see note above
-            currentIndex = 0
-            while (currentIndex <= lastIndex):
-                nextObj = siteElements[currentIndex]
-                if classFilterList is not None:
-                    if nextObj.isClassOrSubclass(classFilterList):
-                        return nextObj
-                else:
-                    return nextObj
-                currentIndex += 1
-        else:
-            raise Music21ObjectException('bad organization of forward and beginNearest parameters')
-        # if nothing found, return None
-        return None
-
     def _adjacencySearch(self, 
-                         classFilterList=None, 
-                         forward=True,
-                         beginNearest=True, 
+                         className=None, 
+                         forward=True, 
                          flattenLocalSites=False):
         '''
         Get the next (if forward is True) or previous (if forward is False) element 
@@ -1682,12 +1600,63 @@ class Music21Object(object):
         site will be returned. If not found no next element is found in any site, the flat
         representation of all sites of each immediate site are searched.
 
-        If `beginNearest` is True, sites will be searched from the element nearest to the
-        caller and then outward.
+        The `classFilterList` may specify one or more classes as targets.
         '''
-        if classFilterList is not None:
-            if not common.isListLike(classFilterList):
-                classFilterList = [classFilterList]
+        def adjacentObject(site):
+            '''
+            Core method for finding adjacent objects given a single site.
+
+            The `site` argument is a Stream that contains this
+            element. The index of this element if sound in this site,
+            and either the next or previous element, if found, is returned.
+            
+            '''
+            siteTree = site.asTree(flatten=False, classList=className)
+            try:
+                st = self.sortTuple(site, raiseExceptionOnMiss=True)
+            except SitesException:
+                st = ZeroSortTupleLow.modify(offset=positionStart)
+            
+            if forward:
+                node = siteTree.getNodeAfter(st)
+            else:
+                node = siteTree.getNodeBefore(st)
+    
+            if node:
+                return node.payload
+            else:
+                return None        
+
+
+        if className is not None:
+            if not common.isListLike(className):
+                className = [className]
+
+        #siteMemo = set()
+        for site, positionStart, searchType in self.contextSites(returnSortTuples=True):
+            if className and site.isClassOrSubclass(className):
+                return site
+
+            foundEl = adjacentObject(site)
+            if foundEl is not None:
+                return foundEl
+            foundEl = site._adjacencySearch(className=className, forward=forward)
+            if foundEl:
+                return foundEl
+#             if searchType == 'elementsOnly' or searchType == 'elementsFirst':
+#                 contextEl = payloadExtractor(site, flatten=False, positionStart=positionStart)
+#                 if contextEl is not None:
+#                     return contextEl
+#                 # otherwise, continue to check for flattening...
+#                 
+#             if searchType != 'elementsOnly': # flatten or elementsFirst
+#                 contextEl = payloadExtractor(site, flatten=True, positionStart=positionStart)
+#                 if contextEl is not None:
+#                     return contextEl
+#                 # otherwise, continue to check in next contextSite.
+
+                
+        
         selfSites = self.sites.getSites(excludeNone=True)
         match = None
 
@@ -1731,10 +1700,7 @@ class Music21Object(object):
             else: # normal site
                 target = s.semiFlat
             # use semiflat of site
-            match = self._adjacentObject(target,
-                                         classFilterList=classFilterList, 
-                                         forward=forward,
-                                         beginNearest=beginNearest)
+            match = adjacentObject(target)
             if match is not None and match is not self:
                 return match
             # append new sites to end of queue
@@ -1743,47 +1709,50 @@ class Music21Object(object):
         # if cannot be found, return None
         return None
 
-    def next(self, 
-             classFilterList=None, 
-             flattenLocalSites=False,
-             beginNearest=True):
+    def next(self, className=None):
         '''
         Get the next element found in the activeSite (or other Sites)
         of this Music21Object.
 
-        The `classFilterList` can be used to specify one or more classes to match.
-
-        The `flattenLocalSites` parameter determines if the sites of this element 
-        (e.g., a Measure's Part) are flattened on first search. 
-        When True, elements contained in adjacent containers may be selected first.
-
+        The `className` can be used to specify one or more classes to match.
 
         >>> s = corpus.parse('bwv66.6')
-        >>> m3 = s.parts[0].measure(3) 
-        >>> m3.next() is s.parts[0].measure(4)
+        >>> m3 = s.parts[0].measure(3)
+        >>> m4 = s.parts[0].measure(4)
+        >>> m3
+        <music21.stream.Measure 3 offset=9.0>
+        >>> m3.show('t')
+        {0.0} <music21.layout.SystemLayout>
+        {0.0} <music21.note.Note A>
+        {0.5} <music21.note.Note B>
+        {1.0} <music21.note.Note G#>
+        {2.0} <music21.note.Note F#>
+        {3.0} <music21.note.Note A>
+        >>> m3.next()
+        <music21.layout.SystemLayout>
+        >>> nextM3 = m3.next('Measure')
+        >>> nextM3 is m4
         True
         
         Note that calling next() repeatedly gives...the same object.  You'll want to
         call next on that object...
         
-        >>> m3.next() is s.parts[0].measure(4)
+        >>> m3.next('Measure') is s.parts[0].measure(4)
         True
-        >>> m3.next() is s.parts[0].measure(4)
+        >>> m3.next('Measure') is s.parts[0].measure(4)
         True
 
         So do this instead:
         
         >>> o = m3
-        >>> for i in range(4):
+        >>> for i in range(5):
         ...     print(o)
-        ...     o = o.next()
+        ...     o = o.next('Measure')
         <music21.stream.Measure 3 offset=9.0>
         <music21.stream.Measure 4 offset=13.0>
         <music21.stream.Measure 5 offset=17.0>
         <music21.stream.Measure 6 offset=21.0>        
-
-
-
+        <music21.stream.Measure 7 offset=25.0>        
 
 
         We can find the next element given a certain class with the `classFilterList`:
@@ -1795,6 +1764,8 @@ class Music21Object(object):
         3
         >>> n is m3.notes[0]
         True
+        >>> n.next()
+        <music21.note.Note B>
 
 
         ..note::
@@ -1804,64 +1775,60 @@ class Music21Object(object):
             a .next() function.  In Python3 there will be no problem since the
             `next()` function is renamed to `__next__()`.
 
-
-
-        OMIT_FROM_DOCS
-        
-        Add this back when it's explained what the difference from the previous is.
-        
-        >>> m3.next('Note', flattenLocalSites=True) == s.parts[0].measure(3).notes[0]
-        True
-        >>> n2 = m3.next('Note', flattenLocalSites=True)
-        >>> n2
-        <music21.note.Note A>
-        >>> n2 is n
-        True
-        
-
-
-        THIS IS OMITTED BECAUSE IT SOMETIMES GIVES SEMIFLATs etc.
-
         Notice though that when we get to the end of the set of measures, something
         interesting happens (maybe it shouldn't? don't count on this...): we descend
         into the last measure and give its elements instead.
         
-        We'll leave o where it is (m7 now) to demonstrate what happens, and also
-        print the its Part for more information...
+        We'll leave o where it is (m8 now) to demonstrate what happens, and also
+        print its Part for more information...
         
-        #>>> while o is not None:
-        #...     print(o, o.getContextByClass('Part'))
-        #...     o = o.next()
-        <music21.stream.Measure 7 offset=25.0> <music21.stream.Part Soprano>
+        >>> while o is not None:
+        ...     print(o, o.getContextByClass('Part'))
+        ...     o = o.next()
         <music21.stream.Measure 8 offset=29.0> <music21.stream.Part Soprano>
+        <music21.note.Note F#> <music21.stream.Part Soprano>
+        <music21.note.Note F#> <music21.stream.Part Soprano>
+        <music21.note.Note F#> <music21.stream.Part Soprano>
         <music21.stream.Measure 9 offset=33.0> <music21.stream.Part Soprano>
         <music21.note.Note F#> <music21.stream.Part Soprano>
         <music21.note.Note F#> <music21.stream.Part Soprano>
         <music21.note.Note E#> <music21.stream.Part Soprano>
         <music21.note.Note F#> <music21.stream.Part Soprano>
-        <music21.bar.Barline style=final> <music21.stream.Part Soprano>
-        <music21.bar.Barline style=final> <music21.stream.Part Alto>
-        <music21.bar.Barline style=final> <music21.stream.Part Tenor>
-        <music21.bar.Barline style=final> <music21.stream.Part Bass>       
-        
-        So we get through all the measures in Soprano, then with nothing else to do,
-        it goes into the measure and gets all the notes in the measure and finally
-        the final barline.  Then, having nothing else to do, it backtracks out of the
-        Part to the Score object and finds the object that is at the same offset in
-        the next object, which is the final barline of the Alto part, and so on.
-        
-        Not particularly useful here for `next()`, but it'll be very useful for `prev()`.
-        
+        <music21.bar.Barline style=final> <music21.stream.Part Soprano>        
         '''
-        return self._adjacencySearch(classFilterList=classFilterList,
-                                     forward=True, 
-                                     beginNearest=beginNearest, 
-                                     flattenLocalSites=flattenLocalSites)
+        allSiteContexts = list(self.contextSites(returnSortTuples=True))
+        maxRecurse = 20
+        
+        thisElForNext = self
+        while maxRecurse:
+            nextEl = thisElForNext.getContextByClass(className=className,
+                                                     getElementMethod='getElementAfterNotSelf')
+            
+            callContinue = False
+            for singleSiteContext, unused_positionInContext, unused_recurseType in allSiteContexts:
+                if nextEl is singleSiteContext:
+                    if nextEl and nextEl[0] is not self: # has elements
+                        return nextEl[0]
+                    
+                    thisElForNext = nextEl
+                    callContinue = True
+                    break
+                
+            if callContinue:
+                maxRecurse -= 1
+                continue
+            
+            if nextEl is not self:
+                return nextEl
+            maxRecurse -= 1
 
-    def previous(self, 
-                 classFilterList=None, 
-                 flattenLocalSites=False,
-                 beginNearest=True):
+        if maxRecurse == 0:
+            raise Music21Exception('Maximum recursion!')
+#         return self._adjacencySearch(className=className,
+#                                      forward=True, 
+#                                      flattenLocalSites=flattenLocalSites)
+
+    def previous(self, className=None):
         '''
         Get the previous element found in the activeSite or other .sites of this
         Music21Object.
@@ -1873,23 +1840,75 @@ class Music21Object(object):
         contained in adjacent containers may be selected first.
 
         >>> s = corpus.parse('bwv66.6')
-        >>> m2 = s.parts[0].measure(2)
-        >>> m3 = s.parts[0].measure(3)
-        >>> m3.previous() is m2
+        >>> m2 = s.parts[0].iter.getElementsByClass('Measure')[2] # pickup measure
+        >>> m3 = s.parts[0].iter.getElementsByClass('Measure')[3]
+        >>> m3
+        <music21.stream.Measure 3 offset=9.0>
+        >>> m3prev = m3.previous() 
+        >>> m3prev
+        <music21.note.Note C#>
+        >>> m3prev is m2.notes[-1]
         True
-        >>> m3.previous('Note', flattenLocalSites=True) is m2.notes[-1]
-        True
+        >>> m3.previous('Measure') is m2
+        True        
         
+        We'll iterate backwards from the first note of the second measure of the Alto part.
         
-        TODO:  Try:  l = corpus.parse('luca/gloria'); 
-        for el in l.recurse: print(el, el.previous('Note'))
-        SLOWEST THING EVER! why????
+        >>> o = s.parts[1].iter.getElementsByClass('Measure')[2][0]
+        >>> while o:
+        ...    print(o)
+        ...    o = o.previous()
+        <music21.note.Note E>
+        <music21.stream.Measure 2 offset=5.0>
+        <music21.note.Note E>
+        <music21.note.Note E>
+        <music21.note.Note E>
+        <music21.note.Note F#>
+        <music21.stream.Measure 1 offset=1.0>
+        <music21.note.Note E>
+        <music21.meter.TimeSignature 4/4>
+        <music21.key.KeySignature of 3 sharps, mode minor>
+        <music21.clef.TrebleClef>
+        <music21.stream.Measure 0 offset=0.0>
+        P2: Alto: Instrument 2
+        <music21.stream.Part Alto>
+        <music21.stream.Part Soprano>
+        <music21.stream.Score 0x10513af98>
+        <music21.metadata.Metadata object at 0x105194320>
         '''
-        return self._adjacencySearch(classFilterList=classFilterList,
-                                     forward=False, 
-                                     beginNearest=beginNearest, 
-                                     flattenLocalSites=flattenLocalSites)
-
+#         allSiteContexts = list(self.contextSites(returnSortTuples=True))
+#         maxRecurse = 20
+        
+        prevEl = self.getContextByClass(className=className,
+                                        getElementMethod='getElementBeforeNotSelf')
+        
+#         for singleSiteContext, unused_positionInContext, unused_recurseType in allSiteContexts:
+#             if prevEl is singleSiteContext:
+#                 prevElPrev = prevEl.getContextByClass(prevEl.__class__,
+#                                                     getElementMethod='getElementBeforeNotSelf')
+#                 if prevElPrev and prevElPrev is not self:
+#                     return prevElPrev
+        isInPart = False
+        if self.isStream: # if it is a Part, ensure that the previous element is not in self
+            for cs, unused, unused in prevEl.contextSites():                
+                if cs is self:
+                    isInPart = True
+                    break
+                
+        if prevEl and prevEl is not self and not isInPart:
+            return prevEl
+        else:
+            # okay, go up to next level
+            activeS = self.activeSite # might be None...
+            if activeS is None:
+                return None
+            asTree = activeS.asTree(classList=className, flatten=False)
+            prevNode = asTree.getNodeBefore(self.sortTuple())
+            if prevNode is None:
+                return activeS
+            else:
+                return prevNode.payload
+                
     # end contexts...
     #---------------------------------------------------------------------------------
 
@@ -2128,7 +2147,7 @@ class Music21Object(object):
         which is safer or streamObj.elementOffset(self) which is 3x faster.
         ''')
     
-    def sortTuple(self, useSite=False):
+    def sortTuple(self, useSite=False, raiseExceptionOnMiss=False):
         '''
         Returns a collections.namedtuple called SortTuple(atEnd, offset, priority, classSortOrder,
         isNotGrace, insertIndex)
@@ -2177,6 +2196,13 @@ class Music21Object(object):
 
         >>> st.classSortOrder == note.Note.classSortOrder
         True
+        
+        SortTuples have a few methods that are documented in
+        :class:`~music21.sorting.SortTuple`. The most useful one for documenting
+        is `.shortRepr()
+        
+        >>> st.shortRepr()
+        '4.0 <-3.20.0>'
 
         Inserting the note into the Stream will set the insertIndex.  Most implementations of
         music21 will use a global counter rather than an actual timer.  Note that this is a
@@ -2204,7 +2230,23 @@ class Music21Object(object):
         >>> s.storeAtEnd(rb)
         >>> rb.sortTuple()
         SortTuple(atEnd=1, offset=0.0, priority=0, classSortOrder=-5, 
-                    isNotGrace=1, insertIndex=...)        
+                    isNotGrace=1, insertIndex=...)  
+                    
+                    
+        Normally if there's a site specified and the element is not in the site,
+        the offset of None will be used, but if raiseExceptionOnMiss is set to True
+        then a SitesException will be raised:
+        
+        >>> aloneNote = note.Note()
+        >>> aloneNote.offset = 30
+        >>> aloneStream = stream.Stream(id='aloneStream')  # no insert
+        >>> aloneNote.sortTuple(aloneStream)
+        SortTuple(atEnd=0, offset=30.0, priority=0, classSortOrder=20, isNotGrace=1, insertIndex=0)
+        
+        >>> aloneNote.sortTuple(aloneStream, raiseExceptionOnMiss=True)
+        Traceback (most recent call last):
+        SitesException: an entry for this object 0x... is not stored in 
+            stream <music21.stream.Stream aloneStream>
         '''
         if useSite is False: # False or a Site; since None is a valid site, default is False
             useSite = self.activeSite
@@ -2215,6 +2257,8 @@ class Music21Object(object):
             try:
                 foundOffset = useSite.elementOffset(self, stringReturns=True)
             except SitesException:
+                if raiseExceptionOnMiss:
+                    raise
                 #environLocal.warn(r)  
                     # activeSite may have vanished! or does not have the element
                 foundOffset = self._naiveOffset
@@ -4382,7 +4426,8 @@ class Test(unittest.TestCase):
             notes.append(n) # keep for reference and testing
 
         self.assertEqual(notes[0], s[0])
-        self.assertEqual(notes[1], s[0].next())
+        s0Next = s[0].next()
+        self.assertEqual(notes[1], s0Next)
         self.assertEqual(notes[0], s[1].previous())
 
         self.assertEqual(id(notes[5]), id(s[4].next()))
@@ -4397,21 +4442,23 @@ class Test(unittest.TestCase):
 
         m1 = stream.Measure()
         m1.number = 1
-        n1 = note.Note()
+        n1 = note.Note('C')
         m1.append(n1)
 
         m2 = stream.Measure()
         m2.number = 2
-        n2 = note.Note()
+        n2 = note.Note('D')
         m2.append(n2)
 
         # n1 cannot be connected to n2 as no common site
-        self.assertEqual(n1.next(), None)
+        n1next = n1.next()
+        self.assertEqual(n1next, None)
 
         p1 = stream.Part()
         p1.append(m1)
         p1.append(m2)
-        self.assertEqual(n1.next(), m2)
+        n1next = n1.next()
+        self.assertEqual(n1next, m2)
         self.assertEqual(n1.next('Note'), n2)
 
     def testNextC(self):
@@ -4427,27 +4474,37 @@ class Test(unittest.TestCase):
             '<music21.key.KeySignature of 3 sharps, mode minor>')
 
         # iterating at the Measure level, showing usage of flattenLocalSites
-        measures = s.parts[0].getElementsByClass('Measure')
-        self.assertEqual(measures[3].previous(), measures[2])
-        self.assertEqual(measures[3].previous(flattenLocalSites=True), measures[2][-1])
+        measures = p1.getElementsByClass('Measure').stream()
+        m3 = measures[3]
+        m3prev = m3.previous()
+        self.assertEqual(m3prev, measures[2][-1])
+        m3Prev2 = measures[3].previous().previous()
+        self.assertEqual(m3Prev2, measures[2][-2])
+        self.assertTrue(m3Prev2.expressions) # fermata
 
         m3n = measures[3].next()
-        self.assertEqual(m3n, measures[4])
-        self.assertEqual(measures[3].next('Note', flattenLocalSites=True), measures[3].notes[0])
+        self.assertEqual(m3n, measures[3][0]) # same as next line
+        self.assertEqual(measures[3].next('Note'), measures[3].notes[0])
+        self.assertEqual(m3n.next(), measures[3][1])
 
-        m3nn = m3n.next()
+        m3nm = m3.next('Measure')
+        m3nn = m3nm.next('Measure')
         self.assertEqual(m3nn, measures[5])
-        m3nnn = m3nn.next()
+        m3nnn = m3nn.next('Measure')
         self.assertEqual(m3nnn, measures[6])
 
 
-        self.assertEqual(measures[3].previous().previous(), measures[1])
-        self.assertEqual(measures[3].previous().previous().previous(), measures[0])
-        self.assertEqual(
-            str(measures[3].previous().previous().previous().previous()),
-            'P1: Soprano: Instrument 1')
+        self.assertEqual(measures[3].previous('Measure').previous('Measure'), measures[1])
+        m0viaPrev = measures[3].previous('Measure').previous('Measure').previous('Measure')
+        self.assertEqual(m0viaPrev, measures[0])
+        
+        m0viaPrev.activeSite = s.parts[0] # otherwise there are no instruments...
+        sopranoInst = m0viaPrev.previous()
+        self.assertEqual(str(sopranoInst), 'P1: Soprano: Instrument 1')
 
-        self.assertEqual(str(measures[0].previous()), 'P1: Soprano: Instrument 1')
+        # set active site back to measure stream...
+        self.assertEqual(str(measures[0].previous()), str(p1))
+        
 
     def testActiveSiteCopyingA(self):
         from music21 import note, stream
@@ -4585,6 +4642,36 @@ class Test(unittest.TestCase):
                                     "<music21.stream.Part p1>",
                                     "<music21.stream.Measure 2 offset=0.0>",
                                     "<music21.stream.Part p2>"])
+      
+## great isolation test, but no asserts for now...  
+#     def testPreviousA(self):
+#         from music21 import corpus
+#         s = corpus.parse('bwv66.6')
+#         o = s.parts[0].iter.getElementsByClass('Measure')[2][1]      
+#         i = 20
+#         while o and i:
+#             print(o)
+#             if 'Part' in o.classes:
+#                 pass
+#             o = o.previous()
+#             i -= 1
+#         
+
+    def testPreviousB(self):
+        from music21 import corpus
+        s = corpus.parse('luca/gloria')
+        sf = s.flat
+        o = sf[10]
+        #o = s[2]
+        i = 200
+        while o and i:
+            print(o, o.activeSite, o.sortTuple().shortRepr())
+            o = o.previous()
+#            cc = s._cache
+#             for x in cc:
+#                 if x.startswith('elementTree'):
+#                     print(repr(cc[x]))
+            i -= 1
         
     def testPreviousAfterDeepcopy(self):
         from music21 import stream, note
@@ -4633,13 +4720,7 @@ _DOC_ORDER = [Music21Object, ElementWrapper]
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
-#     from music21 import note, stream
-#     s = stream.Stream(id="hello")
-#     n = note.Note()
-#     s.insert(0, n)
-#     print(id(s))
-#     copy.deepcopy(n)
-    mainTest(Test) #, runTest='testGetContextByClassA')
+    mainTest(Test, runTest='testPreviousB')
 
 
 #------------------------------------------------------------------------------
