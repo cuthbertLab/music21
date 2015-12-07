@@ -9348,7 +9348,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         m-7
         P4
 
-        OMIT_FROM_DOCS
         >>> s = stream.Stream()
         >>> s.append(note.Note('C'))
         >>> s.append(note.Note('D'))
@@ -9362,7 +9361,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ...         print(n.editorial.melodicInterval.directedName)
         None
         M2
-        None
+        P1
         '''
 
         notes = self.notes
@@ -10779,7 +10778,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         list of tuples (highest measure number below insertion, number of inserted measures).
 
         >>> s = converter.parse("tinynotation: 4/4 d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4  g1")
-        >>> s.makeMeasures(inPlace=True)
         >>> s[-1].offset = 20.0
         >>> s.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -11575,10 +11573,8 @@ class Measure(Stream):
 
 
     def _getClef(self):
+        clefList = list(self.iter.getElementsByClass('Clef').getElementsByOffset(0))
         # TODO: perhaps sort by priority?
-        clefList = self.getElementsByClass('Clef')
-        # only return clefs that have offset = 0.0
-        clefList = clefList.getElementsByOffset(0)
         if len(clefList) == 0:
             return None
         else:

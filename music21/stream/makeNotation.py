@@ -391,7 +391,12 @@ def makeMeasures(
     #del clefStream
     clefObj = srcObj.getContextByClass('Clef') 
     if clefObj is None:
-        clefObj = srcObj.bestClef()
+        clefList = list(srcObj.iter.getElementsByClass('Clef').getElementsByOffset(0))
+        # only return clefs that have offset = 0.0
+        if len(clefList) == 0:
+            clefObj = srcObj.bestClef()
+        else:
+            clefObj = clefList[0]
 
     #environLocal.printDebug([
     #    'makeMeasures(): first clef found after copying and flattening',

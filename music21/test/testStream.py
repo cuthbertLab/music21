@@ -1500,6 +1500,7 @@ class Test(unittest.TestCase):
         s2 = Stream()
         n1 = note.Note()
         c1 = clef.AltoClef()
+        c1.priority = -1 # perhaps clefs should sort before streams?
 
         s1.append(n1) # this is the model of a stream with a single part
         s2.append(s1)
@@ -1509,14 +1510,14 @@ class Test(unittest.TestCase):
         # from the lower level stream, we should be able to get to the 
         # higher level clef
         post = s1.getContextByClass(clef.Clef)
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef), post)
 
         # we can also use getClefs to get this from s1 or s2
         post = s1.getClefs()[0]
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef), post)
 
         post = s2.getClefs()[0]
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef), post)
 
         #environLocal.printDebug(['sites.get() of s1', s1.sites.get()])
 
@@ -1527,16 +1528,16 @@ class Test(unittest.TestCase):
         
         # we cannot get the alto clef from s3; this makes sense
         post = s3.getClefs()[0]
-        self.assertEqual(isinstance(post, clef.TrebleClef), True)
+        self.assertTrue(isinstance(post, clef.TrebleClef), post)
 
         # s1 has both streams as sites
-        self.assertEqual(s3 in s1.sites, True)
-        self.assertEqual(s2 in s1.sites, True)
+        self.assertIn(s3, s1.sites)
+        self.assertIn(s2, s1.sites)
 
-        # but if we search s1, shuold not it find an alto clef?
+        # but if we search s1, should not it find an alto clef?
         post = s1.getClefs()
         #environLocal.printDebug(['should not be treble clef:', post])
-        self.assertEqual(isinstance(post[0], clef.AltoClef), True)
+        self.assertTrue(isinstance(post[0], clef.AltoClef), post[0])
 
 
         # this all works fine
@@ -1552,7 +1553,7 @@ class Test(unittest.TestCase):
         #sMeasures.show('t')
         # the third element is a Note; we get it from flattening during
         # makeMeasures
-        self.assertEqual(isinstance(sMeasures[0][2], note.Note), True)
+        self.assertTrue(isinstance(sMeasures[0][2], note.Note), sMeasures[0][2])
 
         # this shows the proper outpt withs the proper clef.
         #sMeasures.show()
@@ -1575,6 +1576,7 @@ class Test(unittest.TestCase):
         sOuter.id = 'outerStream'
         sOuter.append(sInner)
         c1 = clef.AltoClef()
+        c1.priority = -1
         sOuter.insert(0, c1)
         
         # this works fine
@@ -1623,6 +1625,7 @@ class Test(unittest.TestCase):
         s2.id = 's2'
         n1 = note.Note()
         c1 = clef.AltoClef()
+        c1.priority = -1
         
         s1.append(n1) # this is the model of a stream with a single part
         s2.append(s1)
@@ -1692,7 +1695,9 @@ class Test(unittest.TestCase):
         self.assertTrue(isinstance(post, clef.AltoClef))
         
         # now we in sort a clef in s2; s2 will get this clef first
-        s2.insert(0, clef.TenorClef())
+        tenorC = clef.TenorClef()
+        tenorC.priority = -1
+        s2.insert(0, tenorC)
         # only second part should have tenor clef
         post = s2.getClefs()[0]
         self.assertTrue(isinstance(post, clef.TenorClef))
@@ -4995,12 +5000,13 @@ class Test(unittest.TestCase):
         s = corpus.parse('bwv66.6')
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):
-                post = m.getContextByClass(clef.Clef)
-                self.assertEqual(isinstance(post, clef.Clef), True)
-                post = m.getContextByClass(meter.TimeSignature)
-                self.assertEqual(isinstance(post, meter.TimeSignature), True)
-                post = m.getContextByClass(key.KeySignature)
-                self.assertEqual(isinstance(post, key.KeySignature), True)
+                n = m.notes[0]
+                post = n.getContextByClass(clef.Clef)
+                self.assertTrue(isinstance(post, clef.Clef), post)
+                post = n.getContextByClass(meter.TimeSignature)
+                self.assertTrue(isinstance(post, meter.TimeSignature), post)
+                post = n.getContextByClass(key.KeySignature)
+                self.assertTrue(isinstance(post, key.KeySignature), post)
 
 
 
@@ -7550,7 +7556,7 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test, 'verbose') #, runTest='testGetElementAfterElement')
+    music21.mainTest(Test, 'verbose') #, runTest='testGetElementsByContextStream') 
 
 #------------------------------------------------------------------------------
 # eof

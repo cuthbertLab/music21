@@ -1265,7 +1265,12 @@ class Music21Object(object):
             
             if searchType == 'elementsOnly' or searchType == 'elementsFirst':
                 contextEl = payloadExtractor(site, flatten=False, positionStart=positionStart)
+                
                 if contextEl is not None:
+                    try:
+                        contextEl.activeSite = site
+                    except SitesException:
+                        pass
                     return contextEl
                 # otherwise, continue to check for flattening...
                 
@@ -1445,7 +1450,7 @@ class Music21Object(object):
             
         if callerFirst is None:
             callerFirst = self
-            if self.isStream:
+            if self.isStream and self not in memo:
                 recursionType = self.recursionType
                 environLocal.printDebug("Caller first is {} with offsetAppend {}".format(
                                                                 callerFirst, offsetAppend))
@@ -1454,6 +1459,7 @@ class Music21Object(object):
                     yield(self, selfSortTuple, recursionType)
                 else:
                     yield(self, 0.0, recursionType)
+                memo.append(self)
 
         if priorityTarget is None and sortByCreationTime is False:
             priorityTarget = self.activeSite
@@ -1466,6 +1472,8 @@ class Music21Object(object):
                                   excludeNone=True)
         topLevel = self
         for siteObj in allSites:
+            if siteObj in memo:
+                continue
             if 'SpannerStorage' in siteObj.classes:
                 continue
             
@@ -1487,7 +1495,8 @@ class Music21Object(object):
                 yield (siteObj, positionInStream, recursionType)
             else:
                 yield (siteObj, positionInStream.offset, recursionType)
-                
+
+            memo.append(siteObj)          
             environLocal.printDebug("looking in contextSites for {} with position {}".format(
                                                         siteObj, positionInStream.shortRepr()))
             for topLevel, inStreamPos, recurType in siteObj.contextSites(callerFirst=callerFirst,
@@ -4657,21 +4666,25 @@ class Test(unittest.TestCase):
 #             i -= 1
 #         
 
-    def testPreviousB(self):
-        from music21 import corpus
-        s = corpus.parse('luca/gloria')
-        sf = s.flat
-        o = sf[10]
-        #o = s[2]
-        i = 200
-        while o and i:
-            print(o, o.activeSite, o.sortTuple().shortRepr())
-            o = o.previous()
-#            cc = s._cache
-#             for x in cc:
-#                 if x.startswith('elementTree'):
-#                     print(repr(cc[x]))
-            i -= 1
+#     def testPreviousB(self):
+#         '''
+#         fixed a memo problem which could cause .previous() to run forever
+#         on flat/derived streams.
+#         '''
+#         from music21 import corpus
+#         s = corpus.parse('luca/gloria')
+#         sf = s.flat
+#         o = sf[1]
+#         #o = s[2]
+#         i = 200
+#         while o and i:
+#             print(o, o.activeSite, o.sortTuple().shortRepr())
+#             o = o.previous()
+# #            cc = s._cache
+# #             for x in cc:
+# #                 if x.startswith('elementTree'):
+# #                     print(repr(cc[x]))
+#             i -= 1
         
     def testPreviousAfterDeepcopy(self):
         from music21 import stream, note
@@ -4720,7 +4733,7 @@ _DOC_ORDER = [Music21Object, ElementWrapper]
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
-    mainTest(Test, runTest='testPreviousB')
+    mainTest(Test) #, runTest='testPreviousB')
 
 
 #------------------------------------------------------------------------------
