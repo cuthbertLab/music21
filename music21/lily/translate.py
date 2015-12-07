@@ -2004,7 +2004,6 @@ class LilypondConverter(object):
             b...
             c' 4
             d' 4
-            \clef "treble"
             | %{ end measure 1 %}
              \stopStaff}
            }
