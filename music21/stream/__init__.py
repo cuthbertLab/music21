@@ -681,6 +681,149 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         __nonzero__ = __bool__
 
     #-------------------------------
+    def _getClef(self):
+        clefList = self.iter.getElementsByClass('Clef').getElementsByOffset(0)
+        # casting to list added 20microseconds...
+        if len(clefList) == 0:
+            return None
+        else:
+            return clefList[0]
+
+    def _setClef(self, clefObj):
+        # if clef is None; remove object?
+        oldClef = self._getClef()
+        if oldClef is not None:
+            #environLocal.printDebug(['removing clef', oldClef])
+            junk = self.pop(self.index(oldClef))
+        if clefObj is None:
+            # all that is needed is to remove the old clef
+            # there is no new clef - suppresses the clef of a stream
+            return
+        self.insert(0.0, clefObj)
+        # for some reason needed to make sure that sorting of Clef happens before TimeSignature
+        # TODO: Test if this can be deleted...
+        self.elementsChanged() 
+        
+    clef = property(_getClef, _setClef, doc='''
+        Finds or sets a :class:`~music21.clef.Clef` at offset 0.0 in the measure:
+
+        >>> m = stream.Measure()
+        >>> m.number = 10
+        >>> m.clef = clef.TrebleClef()
+        >>> thisTrebleClef = m.clef
+        >>> thisTrebleClef.sign
+        'G'
+        >>> thisTrebleClef.getOffsetBySite(m)
+        0.0
+
+        Setting the clef for the measure a second time removes the previous clef
+        from the measure and replaces it with the new one:
+
+        >>> m.clef = clef.BassClef()
+        >>> m.clef.sign
+        'F'
+
+
+        And the TrebleClef is no longer in the measure:
+
+        >>> thisTrebleClef.getOffsetBySite(m)
+        Traceback (most recent call last):
+        SitesException: an entry for this object <music21.clef.TrebleClef> is not 
+              stored in stream <music21.stream.Measure 10 offset=0.0>
+
+
+        The `.clef` appears in a `.show()` or other call
+        just like any other element
+
+        >>> m.append(note.Note('D#', type='whole'))
+        >>> m.show('text')
+        {0.0} <music21.clef.BassClef>
+        {0.0} <music21.note.Note D#>
+        ''')
+
+    def _getTimeSignature(self):
+        '''
+        >>> a = stream.Measure()
+        >>> a.timeSignature = meter.TimeSignature('2/4')
+        >>> a.timeSignature.numerator, a.timeSignature.denominator
+        (2, 4)
+        '''
+        # there could be more than one
+        tsList = self.iter.getElementsByClass('TimeSignature').getElementsByOffset(0)
+        #environLocal.printDebug([
+        #    'matched Measure classes of type TimeSignature', tsList, len(tsList)])
+        # only return timeSignatures at offset = 0.0
+        if len(tsList) == 0:
+            return None
+        else:
+            return tsList[0]
+
+    def _setTimeSignature(self, tsObj):
+        '''
+        >>> a = stream.Measure()
+        >>> a.timeSignature = meter.TimeSignature('5/4')
+        >>> a.timeSignature.numerator, a.timeSignature.denominator
+        (5, 4)
+        >>> a.timeSignature = meter.TimeSignature('2/8')
+        >>> a.timeSignature.numerator, a.timeSignature.denominator
+        (2, 8)
+
+        '''
+        oldTimeSignature = self._getTimeSignature()
+        if oldTimeSignature is not None:
+            #environLocal.printDebug(['removing ts', oldTimeSignature])
+            junk = self.pop(self.index(oldTimeSignature))
+        if tsObj is None:
+            # all that is needed is to remove the old time signature
+            # there is no new time signature - suppresses the time signature of a stream
+            return
+        self.insert(0, tsObj)
+
+    timeSignature = property(_getTimeSignature, _setTimeSignature)
+
+    def _getKeySignature(self):
+        '''
+        >>> a = stream.Measure()
+        >>> a.keySignature = key.KeySignature(2)
+        >>> a.keySignature.sharps
+        2
+
+        A key.Key object can be used instead of key.KeySignature,
+        since the former derives from the latter.
+
+        >>> a.keySignature = key.Key('E-', 'major')
+        >>> a.keySignature.sharps
+        -3
+        '''
+        keyList = self.iter.getElementsByClass('KeySignature').getElementsByOffset(0)
+        # for k in keyList:  # this method was 40 microseconds slower than the len(x) below
+        #     return k
+        if len(keyList) == 0:
+            return None
+        else:
+            return keyList[0]
+
+    def _setKeySignature(self, keyObj):
+        '''
+        >>> a = stream.Measure()
+        >>> a.keySignature = key.KeySignature(6)
+        >>> a.keySignature.sharps
+        6
+        '''
+        oldKey = self._getKeySignature()
+        if oldKey is not None:
+            #environLocal.printDebug(['removing key', oldKey])
+            junk = self.pop(self.index(oldKey))
+        if keyObj is None:
+            # all that is needed is to remove the old key signature
+            # there is no new key signature - suppresses the key signature of a stream
+            return
+        self.insert(0, keyObj)
+
+    keySignature = property(_getKeySignature, _setKeySignature)
+
+
+    #-------------------------------
     # Temporary -- Remove in  2016
     def stream(self, returnStreamSubclass=None):
         '''
@@ -11572,148 +11715,6 @@ class Measure(Stream):
         return meter.bestTimeSignature(self)
 
 
-    def _getClef(self):
-        clefList = list(self.iter.getElementsByClass('Clef').getElementsByOffset(0))
-        # TODO: perhaps sort by priority?
-        if len(clefList) == 0:
-            return None
-        else:
-            return clefList[0]
-
-    def _setClef(self, clefObj):
-        # if clef is None; remove object?
-        oldClef = self._getClef()
-        if oldClef is not None:
-            #environLocal.printDebug(['removing clef', oldClef])
-            junk = self.pop(self.index(oldClef))
-        if clefObj is None:
-            # all that is needed is to remove the old clef
-            # there is no new clef - suppresses the clef of a stream
-            return
-        self.insert(0.0, clefObj)
-        # for some reason needed to make sure that sorting of Clef happens before TimeSignature
-        # TODO: Test if this can be deleted...
-        self.elementsChanged() 
-        
-    clef = property(_getClef, _setClef, doc='''
-        Finds or sets a :class:`~music21.clef.Clef` at offset 0.0 in the measure:
-
-        >>> m = stream.Measure()
-        >>> m.number = 10
-        >>> m.clef = clef.TrebleClef()
-        >>> thisTrebleClef = m.clef
-        >>> thisTrebleClef.sign
-        'G'
-        >>> thisTrebleClef.getOffsetBySite(m)
-        0.0
-
-        Setting the clef for the measure a second time removes the previous clef
-        from the measure and replaces it with the new one:
-
-        >>> m.clef = clef.BassClef()
-        >>> m.clef.sign
-        'F'
-
-
-        And the TrebleClef is no longer in the measure:
-
-        >>> thisTrebleClef.getOffsetBySite(m)
-        Traceback (most recent call last):
-        SitesException: an entry for this object <music21.clef.TrebleClef> is not 
-              stored in stream <music21.stream.Measure 10 offset=0.0>
-
-
-        The `.clef` appears in a `.show()` or other call
-        just like any other element
-
-        >>> m.append(note.Note('D#', type='whole'))
-        >>> m.show('text')
-        {0.0} <music21.clef.BassClef>
-        {0.0} <music21.note.Note D#>
-        ''')
-
-    def _getTimeSignature(self):
-        '''
-        >>> a = stream.Measure()
-        >>> a.timeSignature = meter.TimeSignature('2/4')
-        >>> a.timeSignature.numerator, a.timeSignature.denominator
-        (2, 4)
-        '''
-        # there could be more than one
-        tsList = self.getElementsByClass('TimeSignature')
-        #environLocal.printDebug([
-        #    'matched Measure classes of type TimeSignature', tsList, len(tsList)])
-        # only return timeSignatures at offset = 0.0
-        tsList = tsList.getElementsByOffset(0)
-        if len(tsList) == 0:
-            return None
-        else:
-            return tsList[0]
-
-    def _setTimeSignature(self, tsObj):
-        '''
-        >>> a = stream.Measure()
-        >>> a.timeSignature = meter.TimeSignature('5/4')
-        >>> a.timeSignature.numerator, a.timeSignature.denominator
-        (5, 4)
-        >>> a.timeSignature = meter.TimeSignature('2/8')
-        >>> a.timeSignature.numerator, a.timeSignature.denominator
-        (2, 8)
-
-        '''
-        oldTimeSignature = self._getTimeSignature()
-        if oldTimeSignature is not None:
-            #environLocal.printDebug(['removing ts', oldTimeSignature])
-            junk = self.pop(self.index(oldTimeSignature))
-        if tsObj is None:
-            # all that is needed is to remove the old time signature
-            # there is no new time signature - suppresses the time signature of a stream
-            return
-        self.insert(0, tsObj)
-
-    timeSignature = property(_getTimeSignature, _setTimeSignature)
-
-    def _getKeySignature(self):
-        '''
-        >>> a = stream.Measure()
-        >>> a.keySignature = key.KeySignature(0)
-        >>> a.keySignature.sharps
-        0
-        '''
-        keyList = self.getElementsByClass('KeySignature')
-        # only return keySignatures with offset = 0.0
-        keyList = keyList.getElementsByOffset(0)
-        if len(keyList) == 0:
-            return None
-        else:
-            return keyList[0]
-
-    def _setKeySignature(self, keyObj):
-        '''
-        >>> a = stream.Measure()
-        >>> a.keySignature = key.KeySignature(6)
-        >>> a.keySignature.sharps
-        6
-
-
-        A key.Key object can be used instead of key.KeySignature,
-        since the former derives from the latter.
-
-        >>> a.keySignature = key.Key('E-', 'major')
-        >>> a.keySignature.sharps
-        -3
-        '''
-        oldKey = self._getKeySignature()
-        if oldKey is not None:
-            #environLocal.printDebug(['removing key', oldKey])
-            junk = self.pop(self.index(oldKey))
-        if keyObj is None:
-            # all that is needed is to remove the old key signature
-            # there is no new key signature - suppresses the key signature of a stream
-            return
-        self.insert(0, keyObj)
-
-    keySignature = property(_getKeySignature, _setKeySignature)
 
     def _getLeftBarline(self):
         barList = []

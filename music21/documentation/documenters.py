@@ -763,11 +763,14 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.base.Music21Object.quarterLength
         music21.stream.Stream:
         - music21.stream.Stream.atSoundingPitch
+        - music21.stream.Stream.clef
         - music21.stream.Stream.duration
         - music21.stream.Stream.elements
         - music21.stream.Stream.finalBarline
+        - music21.stream.Stream.keySignature
         - music21.stream.Stream.metadata
         - music21.stream.Stream.seconds
+        - music21.stream.Stream.timeSignature
 
         '''
         return self._inheritedReadwritePropertiesMapping
@@ -851,11 +854,14 @@ class ClassDocumenter(ObjectDocumenter):
         ...
         <music21.documentation.documenters.AttributeDocumenter: 
             music21.stream.Stream.atSoundingPitch>
+        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.clef>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.duration>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.elements>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.finalBarline>
+        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.keySignature>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.metadata>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.seconds>
+        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.timeSignature>
 
         '''
         return self._readwriteProperties
