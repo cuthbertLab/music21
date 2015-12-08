@@ -456,14 +456,16 @@ class SinglePart(object):
         self.incorrectMeasures = []
         if runFast is True:
             try:
-                ts = self.measureStream[0].getContextByClass('TimeSignature')
+                m = self.measureStream[0]
+                ts = m.timeSignature or m.getContextByClass('TimeSignature')
             except IndexError:
                 ts = meter.TimeSignature('4/4') 
             if ts is None:
                 ts = meter.TimeSignature('4/4')
         for i in range(len(self.measureStream)):
             if runFast is False:
-                ts = self.measureStream[i].getContextByClass('TimeSignature')
+                m = self.measureStream[i]
+                ts = m.timeSignature or m.getContextByClass('TimeSignature')
             tsOmr = ts.barDuration.quarterLength
             if self.measureStream[i].duration.quarterLength == tsOmr:
                 continue
