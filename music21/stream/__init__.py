@@ -6504,6 +6504,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             sNew._storeAtEndCore(e)
 
         sNew.isFlat = True
+        if self.autoSort is True:
+            sNew.sort() # sort it immediately so that cache is not invalidated
         # here, we store the source stream from which this stream was derived
         return sNew
 

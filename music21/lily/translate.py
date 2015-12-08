@@ -1870,7 +1870,8 @@ class LilypondConverter(object):
 
         # Stuff that can be done on the first element only (clef, new/old, id, color)
         replacedElements = variantList[0].replacedElements(activeSite)
-        replacedElementsClef = replacedElements[0].getContextByClass('Clef')
+        re0 = replacedElements[0]
+        replacedElementsClef = re0.clef or re0.getContextByClass('Clef')
 
         variantContainerStream = variantList[0].getContextByClass('Part')
         if variantContainerStream is None:
@@ -2565,7 +2566,7 @@ class TestExternal(unittest.TestCase):
 #-------------------------------------------------------------------------------
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test, TestExternal)
+    music21.mainTest(Test) #, TestExternal)
     #music21.mainTest(TestExternal, 'noDocTest')
 
 #------------------------------------------------------------------------------

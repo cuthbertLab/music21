@@ -158,15 +158,22 @@ class StreamCoreMixin(object):
             memo = []
         memo.append(id(self))
         
+        # WHY??? THIS SEEMS OVERKILL, esp. since the first call to .sort() in .flat will
+        # invalidate it! TODO: Investigate if this is necessary and then remove if not necessary
+        # should not need to do this...
+        
         # if this Stream is a flat representation of something, and its
         # elements have changed, than we must clear the cache of that
-        # ancestor; we can do that by calling elementsChanged on
-        # the derivation.orgin
-        
-        # is this true???
-        if self._derivation is not None and self._derivation.method in ('flat', 'semiflat'):
-            origin = self._derivation.origin
-            origin.elementsChanged(memo=memo)
+        # ancestor so that subsequent calls get a new representation of this derivation; 
+        # we can do that by calling elementsChanged on
+        # the derivation.orgin        
+        if self._derivation is not None:
+            sdm = self._derivation.method 
+            if sdm in ('flat', 'semiflat'):
+                origin = self._derivation.origin
+                if sdm in origin._cache and origin._cache[sdm] is self:
+                    del origin._cache[sdm]
+               
 
         # may not always need to clear cache of the active site, but may
         # be a good idea; may need to intead clear all sites

@@ -167,7 +167,7 @@ class Groups(list): # no need to inherit from slotted object
     The Groups object enforces that all elements must be strings, and that
     the same element cannot be provided more than once.
 
-    NOTE: In the future spaces will not be allowed in group names.
+    NOTE: In the future, spaces will not be allowed in group names.
 
 
     >>> g = Groups()
@@ -1252,6 +1252,103 @@ class Music21Object(object):
             else:
                 return None
 
+        def wellFormed(contextEl, site):
+            '''
+            Long explanation for a short method.
+            
+            It is possible for a contextEl to be returned that contradicts the
+            'Before' or 'After' criterion due to the following (I'll take the example of Before;
+            After is much harder to construct, but possible).
+
+            Assume that s is a Score, and tb2 = s.flat[1] and tb1 is the previous element 
+            (would be s.flat[0])
+            
+            in s we have the following.
+            
+            s.sortTuple   = 0.0 <0.-20.0>  # not inserted
+            tb1.sortTuple = 0.0 <0.-31.1>
+            tb2.sortTuple = 0.0 <0.-31.2>
+            
+            in s.flat we have:
+
+            s.flat.sortTuple = 0.0 <0.-20.0>  # not inserted
+            tb1.sortTuple    = 0.0 <0.-31.3>
+            tb2.sortTuple    = 0.0 <0.-31.4>
+            
+            Now tb2 is set through s.flat[1], so its activeSite is s.flat.  Calling .previous()
+            finds tb1 in s.flat.  This is normal.
+            
+            tb1 calls .previous().  Search of first site finds nothing before tb1, 
+            so .getContextByClass() is ready to return None.  But other sites need to be checked
+
+            Search returns to s.  .getContextByClass() asks is there anything before tb1's
+            sort tuple of 0.0 <0.-31.3> (.3 is the insertIndex) in s?  Yes, it's tb2 at
+            0.0 <0.-31.2> (because s was created before s.flat, the insert indices of objects
+            in s are lower than the insert indices of objects in s.flat (perhaps insert indices
+            should be eventually made global within the context of a stream, but not global
+            overall? but that wasn't the solution here).  So we go back to tb2 in s. Then in
+            theory we should go to tb1 in s, then s, then None.  This would have certain
+            elements appear twice in a .previous() search, which is not optimal, but wouldn't be
+            such a huge bug to make this method necessary.
+            
+            That'd be the only bug that would occur if we did: sf = s.flat, tb2 = sf[1]. But
+            consider the exact phrasing above:  tb2 = s.flat[1].  s.flat is created for an instant,
+            it is assigned to tb2's ._activeSite via weakRef, and then tb2's sortTuple is set
+            via this temporary stream. 
+            
+            Suppose tb2 is from that temp s.flat[1].  Then tb1 = tb2.previous() which is found 
+            in s.flat.  Suppose then that for some reason s._cache['flat'] gets cleaned up
+            (It was a bug that s._cache was being cleaned by the positioning of notes during
+            s_flat's setOffset, 
+            but _cache cleanups are allowed to happen at any time,
+            so it's not a bug that it's being cleaned; assuming that it wouldn't be cleaned
+            would be the bug) and garbage collection runs. 
+            Now we get tb1.previous() would get tb2 in s. Okay, it's redundant but not a huge deal,
+            and tb2.previous() gets tb1.  tb1's ._activeSite is still a weakref to s.flat.
+            When tb1's getContextByClass() is called, it needs its .sortTuple().  This looks 
+            first at .activeSite.  That is None, so it gets it from .offset which is the .offset
+            of the last .activeSite (even if it is dead.  A lot of code depends on .offset
+            still being available if .activeSite dies, so changing that is not an option for now).
+            So its sortTuple is 0.0 <0.-31.3>. which has a .previous() of tb2 in s, which can
+            call previous can get tb1, etc. So with really bad timing of cache cleanups and
+            garbage collecting, it's possible to get an infinite loop.
+            
+            There may be ways to set activeSite on .getContextByClass() call such that this routine
+            is not necessary, but I could not find one that was not disruptive for normal
+            usages.
+            
+            There are some possible issues that one could raise about "wellFormed".  
+            Suppose for instance, that in one stream (b) we have [tb1, tb2] and 
+            then in another stream context (a), created earlier,
+            we have [tb0, tb1, tb2].  tb1 is set up with (b) as an activeSite. Finding nothing
+            previous, it goes to (a) and finds tb2; it then discovers that in (a), tb2 is after
+            tb1 so it returns None for this context.  One might say, "wait a second, why
+            isn't tb0 returned? It's going to be skipped." To this, I would answer, the original
+            context in which .previous() or .getContextByClass() was called was (b). There is
+            no absolute obligation to find what was previous in a different site context. It is
+            absolutely fair game to say, "there's nothing prior to tb1".  Then why even
+            search other streams/sites? Because it's quite common to create a new site
+            for say a single measure or .getElementsByOffset(), etc., so that when leaving
+            this extacted section, one wants to see how that fits into a larger stream hierarchy.
+            '''
+            try:
+                selfSt = self.sortTuple(site, raiseExceptionOnMiss=True)
+                contextSt = contextEl.sortTuple(site, raiseExceptionOnMiss=True)
+            except SitesException:
+                # might be raised by selfSt; should not be by contextSt. It just
+                # means that selfSt isn't in the same stream as contextSt, such as
+                # when crossing measure borders.  Thus it's well-formed.
+                return True
+            
+            if 'Before' in getElementMethod and selfSt < contextSt:
+                #print(getElementMethod, selfSt.shortRepr(), contextSt.shortRepr(), self, contextEl)
+                return False
+            elif 'After' in getElementMethod and selfSt > contextSt:
+                #print(getElementMethod, selfSt.shortRepr(), contextSt.shortRepr(), self, contextEl)
+                return False
+            else:
+                return True
+
 
         if className and not common.isListLike(className):
             className = (className,)
@@ -1262,11 +1359,10 @@ class Music21Object(object):
         for site, positionStart, searchType in self.contextSites(
                                             returnSortTuples=True,
                                             sortByCreationTime=sortByCreationTime):
-            
             if searchType == 'elementsOnly' or searchType == 'elementsFirst':
-                contextEl = payloadExtractor(site, flatten=False, positionStart=positionStart)
+                contextEl = payloadExtractor(site, flatten=False, positionStart=positionStart)                
                 
-                if contextEl is not None:
+                if contextEl is not None and wellFormed(contextEl, site):
                     try:
                         contextEl.activeSite = site
                     except SitesException:
@@ -1285,7 +1381,11 @@ class Music21Object(object):
                         return site # if the site itself is the context, return it...
 
                 contextEl = payloadExtractor(site, flatten='semiFlat', positionStart=positionStart)
-                if contextEl is not None:
+                if contextEl is not None and wellFormed(contextEl, site):
+                    try:
+                        contextEl.activeSite = site
+                    except SitesException:
+                        pass
                     return contextEl
 
                 if ('Before' in getElementMethod and 
@@ -1356,7 +1456,7 @@ class Music21Object(object):
         >>> for y in m.contextSites(returnSortTuples=True):
         ...      yClearer = (y[0], y[1].shortRepr(), y[2])
         ...      print(yClearer)
-        (<music21.stream.Measure 3 offset=9.0>, '0.0 <0.-20...>', 'elementsFirst')
+        (<music21.stream.Measure 3 offset=9.0>, '0.0 <-inf.-20...>', 'elementsFirst')
         (<music21.stream.Part Alto>, '9.0 <0.-20...>', 'flatten')
         (<music21.stream.Score bach>, '9.0 <0.-20...>', 'elementsOnly')
 
@@ -1455,7 +1555,7 @@ class Music21Object(object):
                 environLocal.printDebug("Caller first is {} with offsetAppend {}".format(
                                                                 callerFirst, offsetAppend))
                 if returnSortTuples:
-                    selfSortTuple = self.sortTuple().modify(offset=0.0)
+                    selfSortTuple = self.sortTuple().modify(offset=0.0, priority=float('-inf'))
                     yield(self, selfSortTuple, recursionType)
                 else:
                     yield(self, 0.0, recursionType)
@@ -1512,10 +1612,10 @@ class Music21Object(object):
                 hypotheticalPosition = positionInStream.modify(offset=inStreamOffset)
                 
                 if topLevel not in memo:                    
-                    environLocal.printDebug("Yielding {}, {}, {} from contextSites".format(
-                                                                    topLevel,
-                                                                    inStreamPos.shortRepr(),
-                                                                    recurType))
+                    #environLocal.printDebug("Yielding {}, {}, {} from contextSites".format(
+                    #                                                topLevel,
+                    #                                                inStreamPos.shortRepr(),
+                    #                                                recurType))
                     if returnSortTuples:
                         yield (topLevel, hypotheticalPosition, recurType)
                     else:
@@ -1884,7 +1984,6 @@ class Music21Object(object):
         <music21.stream.Part Alto>
         <music21.stream.Part Soprano>
         <music21.stream.Score 0x10513af98>
-        <music21.metadata.Metadata object at 0x105194320>
         '''
 #         allSiteContexts = list(self.contextSites(returnSortTuples=True))
 #         maxRecurse = 20
@@ -1899,7 +1998,8 @@ class Music21Object(object):
 #                 if prevElPrev and prevElPrev is not self:
 #                     return prevElPrev
         isInPart = False
-        if self.isStream: # if it is a Part, ensure that the previous element is not in self
+        if self.isStream and prevEl is not None: 
+            # if it is a Part, ensure that the previous element is not in self
             for cs, unused, unused in prevEl.contextSites():                
                 if cs is self:
                     isInPart = True
