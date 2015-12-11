@@ -1619,43 +1619,47 @@ class Test(unittest.TestCase):
         '''
         from music21 import sites
         
-        s1 = Stream()
-        s1.id = 's1'
-        s2 = Stream()
-        s2.id = 's2'
+        s1 = Stream(id='s1')
         n1 = note.Note()
-        c1 = clef.AltoClef()
-        c1.priority = -1
         
         s1.append(n1) # this is the model of a stream with a single part
+
+        s2 = Stream(id='s2')
         s2.append(s1)
+        
+        c1 = clef.AltoClef()
+        c1.priority = -1
         s2.insert(0, c1)
         
         # this works fine
         post = s1.getContextByClass(clef.Clef)
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef))
 
         # this is a key tool of the serial reverse search
         post = s2.getElementAtOrBefore(0, [clef.Clef])
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
-
+        self.assertTrue(isinstance(post, clef.AltoClef))
 
         # this is a key tool of the serial reverse search
         post = s2.flat.getElementAtOrBefore(0, [clef.Clef])
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef))
 
         # s1 is in s2; but s1.flat is not in s2! -- not true if isFlat is true
         self.assertEqual(s2.elementOffset(s1), 0.0)
         self.assertRaises(sites.SitesException, s2.elementOffset, s1.flat)
         
 
-        # this did not work before; the clef is in s2; its not in a context of s2
+        # getContextByClass will not work; the clef is in s2; its not in a context of s2
         post = s2.getContextByClass(clef.Clef)
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertIsNone(post)
 
-        # we can find the clef from the flat version of 21
+        # but s2.clef works...
+        self.assertTrue(isinstance(s2.clef, clef.AltoClef))
+
+        # we can find the clef from the flat version of s1 also:
         post = s1.flat.getContextByClass(clef.Clef)
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef))
+
+
 
 
     def testContextNestedD(self):
@@ -5581,8 +5585,9 @@ class Test(unittest.TestCase):
         self.assertEqual(list(p1FlatNotes.derivation.chain()), [p1Flat, p1])
 
 
-        # we cannot do this, as each call to flat produces a new Stream
-        self.assertEqual(p1.flat.notesAndRests.derivation.origin is p1.flat, False)
+        # we cannot do this, as each call to flat could produce a new Stream
+        #self.assertEqual(p1.flat.notesAndRests.derivation.origin is p1.flat, False)
+        
         # chained calls to .derives from can be used
         self.assertEqual(p1.flat.notesAndRests.derivation.origin.derivation.origin is p1, True)
         
@@ -7556,7 +7561,7 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test, 'verbose') #, runTest='testGetElementsByContextStream') 
+    music21.mainTest(Test, 'verbose') #, runTest='testContextNestedC') 
 
 #------------------------------------------------------------------------------
 # eof
