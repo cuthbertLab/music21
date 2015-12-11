@@ -384,12 +384,12 @@ def makeMeasures(
     # presently, this only gets the first clef
     # may need to store a clefStream and access changes in clefs
     # as is done with meterStream
-    #clefStream = srcObj.getClefs(searchActiveSite=True,
+    #clefList = srcObj.getClefs(searchActiveSite=True,
     #                searchContext=searchContext,
     #                returnDefault=True)
-    #clefObj = clefStream[0]
-    #del clefStream
-    clefObj = srcObj.getContextByClass('Clef') 
+    #clefObj = clefList[0]
+    #del clefList
+    clefObj = srcObj.clef or srcObj.getContextByClass('Clef') 
     if clefObj is None:
         clefList = list(srcObj.iter.getElementsByClass('Clef').getElementsByOffset(0))
         # only return clefs that have offset = 0.0
