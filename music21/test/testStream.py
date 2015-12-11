@@ -5743,9 +5743,9 @@ class Test(unittest.TestCase):
         self.assertEqual(id(m1.activeSite), id(s1))
 
         # try imported
-        s = corpus.parse('madrigal.5.8.rntxt')
-        p = s[1]  # for test, not .parts
-        m = p[2]  # for test, not .getElementsByClass('Measure')
+        s = corpus.parse('bwv66.6')
+        p = s.iter.getElementsByClass('Part')[0]  # for test, not .parts
+        m = p.iter.getElementsByClass('Measure')[2]  # for test, not .getElementsByClass('Measure')
         rn = m[2]
 
         self.assertEqual(id(rn.activeSite), id(m))
@@ -7561,7 +7561,7 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test, 'verbose') #, runTest='testContextNestedC') 
+    music21.mainTest(Test, 'verbose') #, runTest='testDeepcopyActiveSite') 
 
 #------------------------------------------------------------------------------
 # eof
