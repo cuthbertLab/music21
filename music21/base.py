@@ -4695,8 +4695,9 @@ class Test(unittest.TestCase):
                           "(<music21.stream.Part Alto>, 9.0, 'flatten')", 
                           "(<music21.stream.Score bach>, 9.0, 'elementsOnly')"])
         siteList = []
-        c.parts.id = 'partStream' # to make it easier to see below, will be cached...
-        ptemp = c.parts[1]
+        cParts = c.parts # need this otherwise it could possibly be garbage collected.
+        cParts.id = 'partStream' # to make it easier to see below, will be cached...
+        ptemp = cParts[1]
         m3 = ptemp.measure(3)
         self.assertIs(m, m3)
         for y in m3.contextSites():
