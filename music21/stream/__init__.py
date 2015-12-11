@@ -4312,8 +4312,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def getClefs(self, searchActiveSite=False, searchContext=True,
         returnDefault=True):
         '''
+        DEPRECATED...
+        
         Collect all :class:`~music21.clef.Clef` objects in
-        this Stream in a new Stream. Optionally search the
+        this Stream in a list. Optionally search the
         activeSite Stream and/or contexts.
 
         If no Clef objects are defined, get a default
@@ -4330,12 +4332,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         # TODO: activeSite searching is not yet implemented
         # this may not be useful unless a stream is flat
-        post = self.getElementsByClass('Clef')
+        post = list(self.iter.getElementsByClass('Clef'))
 
         #environLocal.printDebug(['getClefs(); count of local', len(post), post])
         if len(post) == 0 and searchActiveSite and self.activeSite is not None:
             #environLocal.printDebug(['getClefs(): search activeSite'])
-            post = self.activeSite.getElementsByClass('Clef')
+            post = list(self.activeSite.iter.getElementsByClass('Clef'))
 
         if len(post) == 0 and searchContext:
             # returns a single element match

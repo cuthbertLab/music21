@@ -175,10 +175,11 @@ class StreamCoreMixin(object):
                     del origin._cache[sdm]
                
 
-        # may not always need to clear cache of the active site, but may
-        # be a good idea; may need to intead clear all sites
-        if self.activeSite is not None:
-            self.activeSite.elementsChanged()
+        # may not always need to clear cache of all living sites, but may
+        # always be a good idea since .flat has changed etc. 
+        # should not need to do derivation.origin sites.
+        for livingSite in self.sites:
+            livingSite.elementsChanged()
 
         # clear these attributes for setting later
         if clearIsSorted:
@@ -201,7 +202,7 @@ class StreamCoreMixin(object):
             indexCache = None
             if keepIndex and 'index' in self._cache:
                 indexCache = self._cache['index']
-            # alway clear cache when elements have changed
+            # always clear cache when elements have changed
             self._cache = {}
             if keepIndex and indexCache is not None:
                 self._cache['index'] = indexCache

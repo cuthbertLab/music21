@@ -15,21 +15,29 @@ sort against bare offsets and other SortTuples.
 
 This is a performance-critical object.
 
-It also defines two singleton instance of the SortTupleLow class as ZeroSortTuple and
+It also defines three singleton instance of the SortTupleLow class as ZeroSortTupleDefault, 
+ZeroSortTupleLow and
 ZeroSortTupleHigh which are sortTuple at
-offset 0.0, priority -inf or inf:
+offset 0.0, priority [0, -inf, inf] respectively:
 
+>>> sorting.ZeroSortTupleDefault
+SortTuple(atEnd=0, offset=0.0, priority=0, classSortOrder=0, isNotGrace=1, insertIndex=0)
 >>> sorting.ZeroSortTupleLow
 SortTuple(atEnd=0, offset=0.0, priority=-inf, classSortOrder=0, isNotGrace=1, insertIndex=0)
 >>> sorting.ZeroSortTupleHigh
 SortTuple(atEnd=0, offset=0.0, priority=inf, classSortOrder=0, isNotGrace=1, insertIndex=0)
 '''
 from collections import namedtuple
+from music21 import exceptions21
 
 INFINITY = float('inf')
 
-class SortTuple(namedtuple('SortTuple', ['atEnd', 'offset', 'priority',
-                                         'classSortOrder', 'isNotGrace', 'insertIndex'])):
+_attrList = ['atEnd', 'offset', 'priority', 'classSortOrder', 'isNotGrace', 'insertIndex']
+
+class SortingException(exceptions21.Music21Exception):
+    pass
+
+class SortTuple(namedtuple('SortTuple', _attrList)):
     '''
     Derived class of namedTuple which allows for comparisons with pure ints/fractions...
     
@@ -190,9 +198,74 @@ class SortTuple(namedtuple('SortTuple', ['atEnd', 'offset', 'priority',
         Changing offset, but nothing else, helps in creating .flat positions.
         '''
         outList = []
-        for attr in 'atEnd', 'offset', 'priority',  'classSortOrder', 'isNotGrace', 'insertIndex':
+        for attr in _attrList:
             outList.append(kw.get(attr, getattr(self, attr)))
         return self.__class__(*tuple(outList))
+
+    def add(self, other):
+        '''
+        Add all attributes from one sortTuple to another, 
+        returning a new one.
+        
+        
+        >>> n = note.Note()
+        >>> n.offset = 10
+        >>> s = stream.Stream()
+        >>> s.offset = 10
+        >>> n.sortTuple()
+        SortTuple(atEnd=0, offset=10.0, priority=0, classSortOrder=20, isNotGrace=1, insertIndex=0)
+        >>> s.sortTuple()
+        SortTuple(atEnd=0, offset=10.0, priority=0, classSortOrder=-20, isNotGrace=1, insertIndex=0)
+        >>> s.sortTuple().add(n.sortTuple())
+        SortTuple(atEnd=0, offset=20.0, priority=0, classSortOrder=0, isNotGrace=1, insertIndex=0)
+        
+        Note that atEnd and isNotGrace are equal to other's value. are upper bounded at 1 and
+        take the maxValue of either.
+        '''
+        if not isinstance(other, self.__class__):
+            raise SortingException('Cannot add attributes from a different class')
+        outList = []
+        for attr in _attrList:
+            selfValue = getattr(self, attr)
+            otherValue = getattr(other, attr)
+            newValue = selfValue + otherValue
+            if attr in ('atEnd', 'isNotGrace'):
+                newValue = max(selfValue, otherValue)
+            outList.append(newValue)
+        return self.__class__(*tuple(outList))
+        
+    def sub(self, other):
+        '''
+        Subtract all attributes from to another.  atEnd and isNotGrace take the min value of either.
+
+        >>> n = note.Note()
+        >>> n.offset = 10
+        >>> s = stream.Stream()
+        >>> s.offset = 10
+        >>> n.sortTuple()
+        SortTuple(atEnd=0, offset=10.0, priority=0, classSortOrder=20, isNotGrace=1, insertIndex=0)
+        >>> s.sortTuple()
+        SortTuple(atEnd=0, offset=10.0, priority=0, classSortOrder=-20, isNotGrace=1, insertIndex=0)
+        >>> s.sortTuple().sub(n.sortTuple())
+        SortTuple(atEnd=0, offset=0.0, priority=0, classSortOrder=-40, isNotGrace=1, insertIndex=0)
+        
+        Note that atEnd and isNotGrace are lower bounded at 0.
+
+        '''
+        if not isinstance(other, self.__class__):
+            raise SortingException('Cannot add attributes from a different class')
+        outList = []
+        for attr in _attrList:
+            selfValue = getattr(self, attr)
+            otherValue = getattr(other, attr)
+            newValue = selfValue - otherValue
+            if attr in ('atEnd', 'isNotGrace'):
+                newValue = min(selfValue, otherValue)
+            outList.append(newValue)
+        return self.__class__(*tuple(outList))
+
+ZeroSortTupleDefault = SortTuple(atEnd=0, offset=0.0, priority=0, classSortOrder=0,
+                          isNotGrace=1, insertIndex=0)
 
 ZeroSortTupleLow = SortTuple(atEnd=0, offset=0.0, priority=float('-inf'), classSortOrder=0,
                           isNotGrace=1, insertIndex=0)
