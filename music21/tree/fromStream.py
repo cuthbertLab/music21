@@ -108,7 +108,7 @@ def listOfTreesByClass(inputStream,
                 if flatten is not False: # True or semiFlat
                     outputTree.insert(subTree[:])
                 else:
-                    outputTree.insert(subTree)
+                    outputTree.insert(subTree.lowestPosition(), subTree)
             wasStream = True
             
         if not wasStream or flatten == 'semiFlat':

@@ -237,7 +237,6 @@ class ElementTree(core.AVLTree):
     def __hash__(self):
         return hash((type(self), id(self)))
 
-
     def __len__(self):
         r'''
         Gets the length of the ElementTree, i.e., the number of elements enclosed.
@@ -265,7 +264,7 @@ class ElementTree(core.AVLTree):
         >>> len(offTree) == len(tss)
         True
 
-        >>> offTree.remove(tss)
+        >>> offTree.removeTimespanList(tss)
         >>> len(offTree)
         0
         '''
@@ -278,7 +277,7 @@ class ElementTree(core.AVLTree):
 
     def __repr__(self):
         o = self.source
-        pos = self.lowestPosition
+        pos = self.lowestPosition()
         if hasattr(pos, 'shortRepr'):
             # sortTuple
             pos = pos.shortRepr()
@@ -302,7 +301,7 @@ class ElementTree(core.AVLTree):
     def __setitem__(self, i, new):
         r'''
         Sets elements or timespans at index `i` to `new`, but keeping the old position
-        of the element there. (This is different from OffsetTrees, where things can move around.
+        of the element there. (This is different from OffsetTrees, where things can move around).
 
         >>> score = tree.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True)
@@ -350,6 +349,8 @@ class ElementTree(core.AVLTree):
 
     def __str__(self):
         '''
+        Print the whole contents of the tree.
+        
         Slow: O(n log n) time, but it's just for debugging...
         
         >>> score = tree.makeExampleScore()
@@ -402,7 +403,7 @@ class ElementTree(core.AVLTree):
             self.rootNode.updateIndices()
             self.rootNode.updateEndTimes()
         
-        if (self.offset != initialPosition or
+        if (self.lowestPosition() != initialPosition or
                 self.endTime != initialEndTime):
             self._updateParents(initialPosition, visitedParents=visitedParents)
     
@@ -450,10 +451,6 @@ class ElementTree(core.AVLTree):
                 node.payload = None
             if node.payload is None:
                 self.removeNode(position)
-
-        if isinstance(element, ElementTree): # represents an embedded Stream
-            for pt in element.parentTrees:
-                pt.remove(self)
 
     ### PUBLIC METHODS ###
     def populateFromSortedList(self, listOfTuples):
@@ -769,7 +766,10 @@ class ElementTree(core.AVLTree):
             raise ValueError('{} not in Tree at offset {}.'.format(element, offset))
         return node.payloadElementIndex
 
-    def remove(self, elements, offsets=None, runUpdate=True): 
+    def removeTimespan(self, elements, offsets=None, runUpdate=True):
+        self.removeTimespanList(elements, offsets, runUpdate)
+
+    def removeTimespanList(self, elements, offsets=None, runUpdate=True): 
         r'''
         Removes `elements` which can be Music21Objects or Timespans 
         (a single one or a list) from this Tree.
@@ -780,7 +780,7 @@ class ElementTree(core.AVLTree):
         endTimes; but it can speed up operations where an element is going to be removed
         and then immediately replaced: i.e., where the position of an element has changed        
         '''
-        initialPosition = self.offset
+        initialPosition = self.lowestPosition()
         initialEndTime = self.endTime
         if hasattr(elements, 'offset'): # a music21 object or an PitchedTimespan
             elements = [elements]
@@ -832,7 +832,7 @@ class ElementTree(core.AVLTree):
         >>> ot
         <OffsetTree {3} (5.0 to 21.0)>
         '''
-        initialPosition = self.offset
+        initialPosition = self.lowestPosition()
         initialEndTime = self.endTime
         if elements is None:
             elements = positionsOrElements
@@ -886,53 +886,60 @@ class ElementTree(core.AVLTree):
     def append(self, el):
         '''
         Add an element to the end, making certain speed savings.
+        
+        TODO: will this work for ElementTrees?
         '''
-        initialPosition = self.offset # will only change if is empty
-        endTime = self.latestEndTime
+        initialPosition = self.lowestPosition() # will only change if is empty
+        endTime = self.endTime
         if endTime == INFINITY:
             endTime = 0
-        self._insertCore(endTime, el)
-        
+        self._insertCore(endTime, el)        
         self._updateNodes(initialPosition, initialEndTime=None)
         
     ### PROPERTIES ###
-    @property
     def offset(self):
         '''
         this is just for mimicking elements as streams. 
         '''
-        lp = self.lowestPosition
+        lp = self.lowestPosition()
         if hasattr(lp, 'offset'):
             lp = lp.offset
         return lp
 
-    def sortTuple(self, site=None):
-        '''
-        mimick a sortTuple for the ElementTree using the source as a guide,
-        but changing the offset.
-        
-        >>> s = stream.Stream(id='testStream')
-        >>> s.insert(3, note.Note())
-        >>> et = tree.trees.ElementTree(s.elements, s)
-        >>> et
-        <ElementTree {1} (3.0 <0.20...> to 4.0) <music21.stream.Stream testStream>>        
-
-        >>> et.sortTuple()
-        SortTuple(atEnd=0, offset=3.0, priority=0, classSortOrder=-20, isNotGrace=1, ...)
-        >>> s.sortTuple()
-        SortTuple(atEnd=0, offset=0.0, priority=0, classSortOrder=-20, isNotGrace=1, ...)
-        '''
-        sourceSortTuple = self.source.sortTuple(site)
-        return sourceSortTuple.modify(offset=self.offset)
-
     @property
     def endTime(self):
-        return self.latestEndTime
+        r'''
+        Gets the latest stop offset in this element-tree.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tsTree = score.asTree()
+        >>> tsTree.endTime
+        36.0
+        
+        Returns infinity if no elements exist:
+        
+        >>> et = tree.trees.ElementTree()
+        >>> et.endTime
+        inf
+        '''
+        if self.rootNode is not None:
+            return self.rootNode.endTimeHigh
+        return INFINITY
 
     @property
     def source(self):
         '''
         the original stream. (stored as a weakref but returned unwrapped)
+        
+        >>> example = tree.makeExampleScore()
+        >>> eTree = example.asTree()
+        >>> eTree.source is example
+        True
+        
+        >>> s = stream.Stream()
+        >>> eTree.source = s
+        >>> eTree.source is s
+        True
         '''
         return common.unwrapWeakref(self._source)
         
@@ -941,43 +948,12 @@ class ElementTree(core.AVLTree):
         # uses weakrefs so that garbage collection on the stream cache is possible...
         self._source = common.wrapWeakref(expr)
 
-
-    @property
-    def lowestPosition(self):
-        r'''
-        Gets the earliest position in this tree.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tsTree = score.asTimespans()
-        >>> tsTree.lowestPosition
-        0.0
-        '''
-        def recurse(node):
-            if node.leftChild is not None:
-                return recurse(node.leftChild)
-            return node.position
-        if self.rootNode is not None:
-            return recurse(self.rootNode)
-        return NEGATIVE_INFINITY
-
-    @property
-    def earliestEndTime(self):
-        r'''
-        Gets the earliest stop offset in this offset-tree.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tsTree = score.asTimespans(classList=(note.Note,))
-        >>> tsTree.earliestEndTime
-        0.5
-        '''
-        if self.rootNode is not None:
-            return self.rootNode.endTimeLow
-        return INFINITY
-
     @property
     def highestOffset(self):
         r'''
         Gets the latest start offset in this offset-tree.
+
+        Keep as a property, because a similar property exists on streams.
 
         >>> score = corpus.parse('bwv66.6')
         >>> tsTree = score.asTimespans(classList=(note.Note,))
@@ -997,20 +973,46 @@ class ElementTree(core.AVLTree):
             return recurse(self.rootNode)
         return NEGATIVE_INFINITY
 
-    @property
-    def latestEndTime(self):
-        r'''
-        Gets the latest stop offset in this offset-tree.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tsTree = score.asTimespans()
-        >>> tsTree.latestEndTime
-        36.0
+    def sortTuple(self, site=None):
         '''
-        if self.rootNode is not None:
-            return self.rootNode.endTimeHigh
-        return INFINITY
+        mimick a sortTuple for the ElementTree using the source as a guide,
+        but changing the offset.
+        
+        >>> s = stream.Stream(id='testStream')
+        >>> s.insert(3, note.Note())
+        >>> et = tree.trees.ElementTree(s.elements, s)
+        >>> et
+        <ElementTree {1} (3.0 <0.20...> to 4.0) <music21.stream.Stream testStream>>        
 
+        >>> et.sortTuple()
+        SortTuple(atEnd=0, offset=3.0, priority=0, classSortOrder=-20, isNotGrace=1, ...)
+        >>> s.sortTuple()
+        SortTuple(atEnd=0, offset=0.0, priority=0, classSortOrder=-20, isNotGrace=1, ...)
+        '''
+        sourceSortTuple = self.source.sortTuple(site)
+        return sourceSortTuple.modify(offset=self.lowestPosition().offset)
+
+    def lowestPosition(self):
+        r'''
+        Gets the earliest position in this tree.
+
+        >>> score = tree.makeExampleScore()
+        >>> elTree = score.asTree()
+        >>> elTree.lowestPosition().shortRepr()
+        '0.0 <0.-20...>'
+
+        >>> tsTree = score.asTimespans()
+        >>> tsTree.lowestPosition()
+        0.0
+        '''
+        def recurse(node):
+            if node.leftChild is not None:
+                return recurse(node.leftChild)
+            return node.position
+        
+        if self.rootNode is not None:
+            return recurse(self.rootNode)
+        return NEGATIVE_INFINITY
 
 
 #----------------------------------------------------------------
@@ -1185,7 +1187,7 @@ class OffsetTree(ElementTree):
         '''
         if isinstance(i, (int, slice)):
             old = self[i]
-            self.remove(old)
+            self.removeTimespan(old)
             self.insert(new)
         else:
             message = 'Indices must be ints or slices, got {}'.format(i)
@@ -1410,9 +1412,9 @@ class TimespanTree(OffsetTree):
     ...             merged = horizontality[0].new(
     ...                endTime=horizontality[2].endTime,
     ...             ) # merged is a new PitchedTimespan
-    ...             scoreTree.remove(horizontality[0])
-    ...             scoreTree.remove(horizontality[1])
-    ...             scoreTree.remove(horizontality[2])
+    ...             scoreTree.removeTimespan(horizontality[0])
+    ...             scoreTree.removeTimespan(horizontality[1])
+    ...             scoreTree.removeTimespan(horizontality[2])
     ...             scoreTree.insert(merged)
      
      
@@ -1735,7 +1737,7 @@ class TimespanTree(OffsetTree):
                 yield verticality
                 verticality = verticality.previousVerticality
         else:
-            offset = self.lowestPosition
+            offset = self.lowestPosition()
             verticality = self.getVerticalityAt(offset)
             yield verticality
             verticality = verticality.nextVerticality
@@ -1865,7 +1867,7 @@ class TimespanTree(OffsetTree):
             if not overlaps:
                 continue
             for overlap in overlaps:
-                self.remove(overlap)
+                self.removeTimespan(overlap)
                 shards = overlap.splitAt(offset)
                 self.insert(shards)
 
@@ -2097,7 +2099,7 @@ class Test(unittest.TestCase):
                                  min(x.endTime for x in currentTimespansInList))
                 self.assertEqual(tsTree.rootNode.endTimeHigh,
                                  max(x.endTime for x in currentTimespansInList))
-                self.assertEqual(tsTree.offset, currentPosition)
+                self.assertEqual(tsTree.lowestPosition(), currentPosition)
                 self.assertEqual(tsTree.endTime, currentEndTime)
                 for i in range(len(currentTimespansInTree)):
                     self.assertEqual(currentTimespansInList[i], currentTimespansInTree[i])
@@ -2107,7 +2109,7 @@ class Test(unittest.TestCase):
                 timespan = tss.pop()
                 currentTimespansInList = sorted(tss,
                     key=lambda x: (x.offset, x.endTime))
-                tsTree.remove(timespan)
+                tsTree.removeTimespan(timespan)
                 currentTimespansInTree = [x for x in tsTree]
                 self.assertEqual(currentTimespansInTree, 
                                  currentTimespansInList, 
@@ -2121,7 +2123,7 @@ class Test(unittest.TestCase):
                                      min(x.endTime for x in currentTimespansInList))
                     self.assertEqual(tsTree.rootNode.endTimeHigh,
                                      max(x.endTime for x in currentTimespansInList))
-                    self.assertEqual(tsTree.offset, currentPosition)
+                    self.assertEqual(tsTree.lowestPosition(), currentPosition)
                     self.assertEqual(tsTree.endTime, currentEndTime)
 
                     for i in range(len(currentTimespansInTree)):
