@@ -553,6 +553,7 @@ class MusicXMLImporter(XMLParserBase):
             p.definesExplicitSystemBreaks = self.definesExplicitSystemBreaks
             p.definesExplicitPageBreaks = self.definesExplicitPageBreaks
         
+        s.sort() # do this now so that if the file is cached, we can cache that it's sorted.
         if inputM21 is None:
             return s
 

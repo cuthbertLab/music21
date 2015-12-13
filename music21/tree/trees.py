@@ -120,16 +120,54 @@ class ElementTree(core.AVLTree):
         r'''
         Is true when the ElementTree contains the object within it
         
-        This is potentially an O(n log n) operation if the element is not at the right offset,
-        like in a flat.
+        If element.sortTuple(self.source) returns the right information, it's a fast
+        O(log n) search. If not his is an O(n log n) operation in python not C, so slow.
         
-        TO WRITE AS NEEDED...
+        >>> score = tree.makeExampleScore()
+        >>> scoreTree = score.asTree(flatten=True)
+        >>> lastNote = score.flat.notes[-1]
+        >>> lastNote in scoreTree
+        True
+        >>> n = note.Note("E--")
+        >>> n in scoreTree
+        False
+        
+        >>> s = stream.Stream(id='tinyStream')
+        >>> s.insert(0, n)
+        >>> st = s.asTree(flatten=False)
+        >>> n in st
+        True
         '''
-        raise ElementTreeException("Not implemented")
+        s = self.source
+        sourcePosition = element.sortTuple(s)
+        # might be wrong if element not in s or s is None
+        
+        nodeAtPosition = self.getNodeByPosition(sourcePosition)
+        if nodeAtPosition is not None:
+            if nodeAtPosition.payload is element:
+                return True 
+            
+        # not found, do slow search.
+        for pl in self:
+            if pl.payload is element:
+                return True
+
+        return False
 
     def __eq__(self, expr):
         r'''
-        Two ElementTrees are equal only if they are the same object
+        Two ElementTrees are equal only if they are the same object.
+        
+        >>> et1 = tree.trees.ElementTree()
+        >>> et2 = tree.trees.ElementTree()
+        >>> et3 = et1
+        >>> et1 == et2
+        False
+        >>> et1 == et3
+        True
+
+        >>> et2 != et1
+        True
         '''
         return self is expr
 
@@ -149,6 +187,11 @@ class ElementTree(core.AVLTree):
 
         >>> scoreTree[-1]
         <music21.bar.Barline style=final>
+
+        >>> scoreTree[2000] is None
+        True
+        
+        Slices...
 
         >>> scoreTree[2:5]
         [<music21.clef.BassClef>, <music21.clef.BassClef>, <music21.meter.TimeSignature 2/4>]
@@ -179,7 +222,11 @@ class ElementTree(core.AVLTree):
         ...         if sfSlice[sliceOffset] is not scoreFlat[n]:
         ...             print("false!")
         '''
-        nodeOrNodeList = self.getNodeByIndex(i)
+        try:
+            nodeOrNodeList = self.getNodeByIndex(i)
+        except IndexError:
+            return None
+        
         if nodeOrNodeList is None:
             return nodeOrNodeList
         elif not isinstance(nodeOrNodeList, list):
@@ -409,6 +456,96 @@ class ElementTree(core.AVLTree):
                 pt.remove(self)
 
     ### PUBLIC METHODS ###
+    def populateFromSortedList(self, listOfTuples):
+        '''
+        This method assumes that the current tree is empty (or will be wiped) and 
+        that listOfTuples is a non-empty
+        list where the first element is a unique position to insert,
+        and the second is the complete payload for that node, and
+        that the positions are strictly increasing in order.
+        
+        This is about an order of magnitude faster (3ms vs 21ms for 1000 items; 31 vs. 30ms for
+        10,000 items) than running createNodeAtPosition() for each element in a list if it is
+        already sorted.  Thus it should be used when converting a
+        Stream where .isSorted is True into a tree.
+        
+        If any of the conditions is not true, expect to get a dangerously
+        badly sorted tree that will be useless.
+        
+        >>> bFlat = corpus.parse('bwv66.6').flat
+        >>> bFlat.isSorted
+        True
+        
+        >>> listOfTuples = [(e.sortTuple(bFlat), e) for e in bFlat]
+        >>> listOfTuples[10]
+        (SortTuple(atEnd=0, offset=0.0, priority=0, ...), 
+         <music21.key.KeySignature of 3 sharps, mode minor>)
+
+        >>> t = tree.trees.ElementTree()
+        >>> t.rootNode is None
+        True
+        >>> t.populateFromSortedList(listOfTuples)
+        >>> t.rootNode
+        <ElementNode: Start:15.0 <0.20...> Indices:(l:0 *97* r:195) 
+            Payload:<music21.note.Note D#>>
+        
+        >>> n = t.rootNode
+        >>> while n is not None:
+        ...    print(n)
+        ...    n = n.leftChild
+        <ElementNode: Start:15.0 <0.20...> Indices:(l:0 *97* r:195) Payload:<music21.note.Note D#>>
+        <ElementNode: Start:6.0 <0.20...>  Indices:(l:0 *48* r:97) Payload:<music21.note.Note B>>
+        <ElementNode: Start:0.5 <0.20...>  Indices:(l:0 *24* r:48) Payload:<music21.note.Note G#>>
+        <ElementNode: Start:0.0 <0.2...>   Indices:(l:0 *12* r:24) 
+            Payload:<music21.key.KeySignature of 3 sharps, mode minor>>
+        <ElementNode: Start:0.0 <0.0...>   Indices:(l:0 *6* r:12) Payload:<music21.clef.TrebleClef>>
+        <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *3* r:6) 
+            Payload:<music21.instrument.Instrument P3: Tenor: Instrument 3>>
+        <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *1* r:3) 
+            Payload:<music21.instrument.Instrument P1: Soprano: Instrument 1>>
+        <ElementNode: Start:0.0 <0.-30...> Indices:(l:0 *0* r:1) 
+            Payload:<music21.metadata.Metadata object at 0x104adbdd8>>
+
+        >>> n = t.rootNode
+        >>> while n is not None:
+        ...    print(n)
+        ...    n = n.rightChild
+        <ElementNode: Start:15.0 <0.20...> Indices:(l:0 *97* r:195) 
+            Payload:<music21.note.Note D#>>
+        <ElementNode: Start:25.0 <0.20...> Indices:(l:98 *146* r:195) 
+            Payload:<music21.note.Note F#>>
+        <ElementNode: Start:32.0 <0.20...> Indices:(l:147 *171* r:195) 
+            Payload:<music21.note.Note F#>>
+        <ElementNode: Start:34.0 <0.20...> Indices:(l:172 *183* r:195) 
+            Payload:<music21.note.Note D>>
+        <ElementNode: Start:35.0 <0.20...> Indices:(l:184 *189* r:195) 
+            Payload:<music21.note.Note A#>>
+        <ElementNode: Start:36.0 <0.-5...> Indices:(l:190 *192* r:195) 
+            Payload:<music21.bar.Barline style=final>>
+        <ElementNode: Start:36.0 <0.-5...> Indices:(l:193 *194* r:195) 
+            Payload:<music21.bar.Barline style=final>>
+        '''
+        def recurse(l, globalStartOffset):
+            '''
+            Divide and conquer.
+            '''
+            lenL = len(l)
+            if lenL == 0:
+                return None
+            midpoint = lenL//2
+            midtuple = l[midpoint]
+            n = NodeClass(midtuple[0], midtuple[1])
+            n.payloadElementIndex = globalStartOffset + midpoint
+            n.subtreeElementsStartIndex = globalStartOffset
+            n.subtreeElementsStopIndex = globalStartOffset + lenL
+            n.leftChild = recurse(l[:midpoint], globalStartOffset)
+            n.rightChild = recurse(l[midpoint + 1:], globalStartOffset + midpoint + 1)
+            n.update()
+            return n
+        
+        NodeClass = self.nodeClass
+        self.rootNode = recurse(listOfTuples, 0)    
+    
     def getNodeByIndex(self, i):
         '''
         Get a node whose element is at a particular index (not position).  Works with slices too
@@ -487,7 +624,7 @@ class ElementTree(core.AVLTree):
     
     def copy(self):
         r'''
-        Creates a new offset-tree with the same payload as this offset-tree.
+        Creates a new tree with the same payload as this tree.
         
         This is analogous to `dict.copy()`.  
 
@@ -875,76 +1012,6 @@ class ElementTree(core.AVLTree):
         return INFINITY
 
 
-    @property
-    def allOffsets(self):
-        r'''
-        Gets all unique offsets of all timespans in this offset-tree.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tsTree = score.asTimespans()
-        >>> for offset in tsTree.allOffsets[:10]:
-        ...     offset
-        ...
-        0.0
-        0.5
-        1.0
-        2.0
-        3.0
-        4.0
-        5.0
-        5.5
-        6.0
-        6.5
-        '''
-        def recurse(node):
-            result = []
-            if node is not None:
-                if node.leftChild is not None:
-                    result.extend(recurse(node.leftChild))
-                pos = node.position
-                if isinstance(pos, SortTuple):
-                    result.append(pos.offset)
-                else:
-                    result.append(pos)
-                if node.rightChild is not None:
-                    result.extend(recurse(node.rightChild))
-            return result
-        return tuple(recurse(self.rootNode))
-
-    @property
-    def allTimePoints(self):
-        r'''
-        Gets all unique offsets (both starting and stopping) of all elements/timespans
-        in this offset-tree.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> scoreTree = score.asTimespans()
-        >>> for offset in scoreTree.allTimePoints[:10]:
-        ...     offset
-        ...
-        0.0
-        0.5
-        1.0
-        2.0
-        3.0
-        4.0
-        5.0
-        5.5
-        6.0
-        6.5
-        '''
-        def recurse(node):
-            result = set()
-            if node is not None:
-                if node.leftChild is not None:
-                    result.update(recurse(node.leftChild))
-                result.add(node.position)
-                result.update(node.payloadEndTimes())
-                if node.rightChild is not None:
-                    result.update(recurse(node.rightChild))
-            return result
-        return tuple(sorted(recurse(self.rootNode)))
-
 
 #----------------------------------------------------------------
 class OffsetTree(ElementTree):
@@ -1200,6 +1267,75 @@ class OffsetTree(ElementTree):
         index = node.payload.index(element) + node.payloadElementsStartIndex
         return index
 
+    @property
+    def allOffsets(self):
+        r'''
+        Gets all unique offsets of all timespans in this offset-tree.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tsTree = score.asTimespans()
+        >>> for offset in tsTree.allOffsets[:10]:
+        ...     offset
+        ...
+        0.0
+        0.5
+        1.0
+        2.0
+        3.0
+        4.0
+        5.0
+        5.5
+        6.0
+        6.5
+        '''
+        def recurse(node):
+            result = []
+            if node is not None:
+                if node.leftChild is not None:
+                    result.extend(recurse(node.leftChild))
+                pos = node.position
+                if isinstance(pos, SortTuple):
+                    result.append(pos.offset)
+                else:
+                    result.append(pos)
+                if node.rightChild is not None:
+                    result.extend(recurse(node.rightChild))
+            return result
+        return tuple(recurse(self.rootNode))
+
+    @property
+    def allTimePoints(self):
+        r'''
+        Gets all unique offsets (both starting and stopping) of all elements/timespans
+        in this offset-tree.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> scoreTree = score.asTimespans()
+        >>> for offset in scoreTree.allTimePoints[:10]:
+        ...     offset
+        ...
+        0.0
+        0.5
+        1.0
+        2.0
+        3.0
+        4.0
+        5.0
+        5.5
+        6.0
+        6.5
+        '''
+        def recurse(node):
+            result = set()
+            if node is not None:
+                if node.leftChild is not None:
+                    result.update(recurse(node.leftChild))
+                result.add(node.position)
+                result.update(node.payloadEndTimes())
+                if node.rightChild is not None:
+                    result.update(recurse(node.rightChild))
+            return result
+        return tuple(sorted(recurse(self.rootNode)))
 
 
 #----------------------------------------------------------------

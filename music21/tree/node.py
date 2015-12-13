@@ -40,10 +40,6 @@ class ElementNode(core.AVLNode):
         )
 
     _DOC_ATTR = {
-    'payload': r'''
-        The content of the node at this point.  Usually a Music21Object.
-        ''',
-        
     'payloadElementIndex': r'''
         The index in a stream of the element stored in the payload of this node.
         ''',
@@ -69,9 +65,8 @@ class ElementNode(core.AVLNode):
     
     ### INITIALIZER ###
 
-    def __init__(self, offset):
-        super(ElementNode, self).__init__(offset)
-        self.payload = None
+    def __init__(self, offset, payload=None):
+        super(ElementNode, self).__init__(offset, payload)
         self.payloadElementIndex = -1
         
         self.endTimeHigh = None
@@ -343,7 +338,7 @@ class OffsetNode(ElementNode):
     
     ### INITIALIZER ###
 
-    def __init__(self, offset):
+    def __init__(self, offset, payload=None):
         super(OffsetNode, self).__init__(offset)
         self.payload = []
         self.payloadElementsStartIndex = -1
