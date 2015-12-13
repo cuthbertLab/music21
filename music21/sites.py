@@ -462,6 +462,7 @@ class Sites(common.SlottedObject):
                 post.insert(0, post.pop(post.index(priorityTarget)))
         return post
 
+    @common.deprecated('December 2015', 'February 2015', 'Unused and should not be needed')
     def getAllByClass(self, className, found=None, idFound=None, memo=None):
         '''
         Return all known references of a given class found in any association
@@ -495,8 +496,6 @@ class Sites(common.SlottedObject):
             memo = {} # intialize
         if found is None:
             found = []
-        if idFound is None:
-            idFound = []
 
         objs = self.get()
         for obj in objs:
@@ -506,10 +505,8 @@ class Sites(common.SlottedObject):
             if common.isStr(className):
                 if type(obj).__name__.lower() == className.lower():
                     found.append(obj)
-                    idFound.append(id(obj))
             elif isinstance(obj, className):
                 found.append(obj)
-                idFound.append(id(obj))
         for obj in objs:
             if obj is None:
                 continue # in case the reference is dead
@@ -521,9 +518,6 @@ class Sites(common.SlottedObject):
                 # store this object as having been searched
                 memo[id(obj)] = obj
                 # will add values to found
-                #environLocal.printDebug(['getAllByClass()', 
-                #    'about to call getAllContextsByClass', 'found', found, 'obj', obj])
-                obj.getAllContextsByClass(className)
         # returning found, but not necessary
         return found
 

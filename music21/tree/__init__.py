@@ -72,20 +72,20 @@ def makeExampleScore():
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.BassClef>
             {0.0} <music21.meter.TimeSignature 2/4>
-            {0.0} <music21.note.Note C>
+            {0.0} <music21.note.Note C#>
         {2.0} <music21.stream.Measure 2 offset=2.0>
-            {0.0} <music21.note.Note G>
+            {0.0} <music21.note.Note G#>
         {4.0} <music21.stream.Measure 3 offset=4.0>
-            {0.0} <music21.note.Note E>
+            {0.0} <music21.note.Note E#>
         {6.0} <music21.stream.Measure 4 offset=6.0>
-            {0.0} <music21.note.Note D>
+            {0.0} <music21.note.Note D#>
             {2.0} <music21.bar.Barline style=final>
 
     '''
     from music21 import converter
     from music21 import stream
     streamA = converter.parse('tinynotation: 2/4 C4 D E F G A B C')
-    streamB = converter.parse('tinynotation: 2/4 C2 G E D')
+    streamB = converter.parse('tinynotation: 2/4 C#2  G#  E#  D#')
     streamA.makeMeasures(inPlace=True)
     streamB.makeMeasures(inPlace=True)
     partA = stream.Part()
@@ -100,7 +100,7 @@ def makeExampleScore():
     instrumentB = partB.getInstrument()
     instrumentB.partId = 'PartB'
     partB.insert(0, instrumentB)
-    score = stream.Score()
+    score = stream.Score(id='exampleScore')
     score.insert(0, partA)
     score.insert(0, partB)
     return score

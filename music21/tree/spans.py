@@ -20,11 +20,10 @@ import unittest
 from music21 import exceptions21
 from music21 import meter
 
-from music21.exceptions21 import TimespanException
 from music21 import environment
 environLocal = environment.Environment("tree.spans")
 #------------------------------------------------------------------------------
-class TimespanSpanException(exceptions21.TimespanException):
+class TimespanException(exceptions21.TreeException):
     pass
 
 class Timespan(object):

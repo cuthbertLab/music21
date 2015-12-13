@@ -15,6 +15,7 @@ Tools for grouping elements, timespans, and especially
 pitched elements into kinds of searchable tree organized by start and stop offsets
 and other positions.
 '''
+from __future__ import division, print_function
 
 import collections
 import random
@@ -29,12 +30,18 @@ from music21.sorting import SortTuple
 from music21.tree import spans, core
 from music21.tree import node as nodeModule
 
-from music21.exceptions21 import TimespanException
 from music21 import environment
 environLocal = environment.Environment("tree.trees")
 
 INFINITY = float('inf')
 NEGATIVE_INFINITY = float('-inf')
+
+#------------------------------------------------------------------------------
+class ElementTreeException(exceptions21.TreeException):
+    pass
+
+class TimespanTreeException(exceptions21.TreeException):
+    pass
 
 #-------------------------------#
 
@@ -42,10 +49,12 @@ class ElementTree(core.AVLTree):
     r'''
     A data structure for efficiently storing a score: flat or recursed or normal.
     
-    This data structure stores OffsetNodes: objects which implement both a
-    `offset` and `endTime` property. It provides fast lookups of such
-    objects and can quickly locate vertical overlaps.
-
+    This data structure has no connection to the XML ElementTree.
+    
+    This data structure stores ElementNodes: objects which implement both a
+    `position` and `endTime` property. It provides fast lookups of such
+    objects.
+    
     >>> et = tree.trees.ElementTree()
     >>> et
     <ElementTree {0} (-inf to inf)>
@@ -61,7 +70,7 @@ class ElementTree(core.AVLTree):
     >>> et
     <ElementTree {100} (0.0 <0.20...> to 200.0)>
     >>> et.rootNode
-    <ElementNode: Start:126.0 <0.20...> Indices:(0--63--100) Payload:>
+    <ElementNode: Start:126.0 <0.20...> Indices:(l:0 *63* r:100) Payload:<music21.note.Note C>>
     
     >>> n2 = s[-1]
 
@@ -109,152 +118,91 @@ class ElementTree(core.AVLTree):
     ## Special Methods ##
     def __contains__(self, element):
         r'''
-        Is true when the ElementTree contains the object within it; if and only if the
-        .offset of the element matches the position in the tree.
-
-        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> tss = [tree.spans.Timespan(x, y) for x, y in tsList]
-        >>> tsTree = tree.trees.TimespanTree()
-        >>> tsTree.insert(tss)
-
-        >>> tss[0] in tsTree
-        True
-
-        >>> tree.spans.Timespan(-200, 1000) in tsTree
-        False
+        Is true when the ElementTree contains the object within it
         
-        The exact Timespan object does not have to be in the tree, just one with the same offset
-        and endTime:
+        This is potentially an O(n log n) operation if the element is not at the right offset,
+        like in a flat.
         
-        >>> tsDuplicate = tree.spans.Timespan(0, 2)
-        >>> tsDuplicate in tsTree
-        True
+        TO WRITE AS NEEDED...
         '''
-        try:
-            offset = element.offset
-        except AttributeError:
-            raise TimespanTreeException('element must be a Music21Object, i.e., must have offset')
-        candidates = self.elementsStartingAt(offset)
-        if element in candidates:
-            return True
-        else:
-            return False
+        raise ElementTreeException("Not implemented")
 
     def __eq__(self, expr):
         r'''
-        Two ElementTrees are equal only if they are the same object'''
+        Two ElementTrees are equal only if they are the same object
+        '''
         return self is expr
 
     def __getitem__(self, i):
         r'''
-        Gets elements by integer index or slice.
+        Gets elements by integer index or slice.  This is pretty fast in computational time
+        (O(log n)), but it's O(log n) in Python while normal list slicing is O(1) in C, so
+        don't use trees for __getitem__ searching if you don't have to.
 
-        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> tss = [tree.spans.Timespan(x, y) for x, y in tsList]
-        >>> tsTree = tree.trees.TimespanTree()
-        >>> tsTree.insert(tss)
+        >>> score = tree.makeExampleScore()
+        >>> scoreTree = score.asTree(flatten=True)
+        >>> scoreTree
+        <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
 
-        >>> tsTree[0]
-        <Timespan 0.0 2.0>
+        >>> scoreTree[0]
+        <music21.instrument.Instrument PartA: : >
 
-        >>> tsTree[-1]
-        <Timespan 7.0 7.0>
+        >>> scoreTree[-1]
+        <music21.bar.Barline style=final>
 
-        >>> tsTree[2:5]
-        [<Timespan 1.0 1.0>, <Timespan 2.0 3.0>, <Timespan 3.0 4.0>]
+        >>> scoreTree[2:5]
+        [<music21.clef.BassClef>, <music21.clef.BassClef>, <music21.meter.TimeSignature 2/4>]
 
-        >>> tsTree[-6:-3]
-        [<Timespan 3.0 4.0>, <Timespan 4.0 9.0>, <Timespan 5.0 6.0>]
+        >>> scoreTree[-6:-3]
+        [<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note D#>]
 
-        >>> tsTree[-100:-200]
+        >>> scoreTree[-100:-200]
         []
 
-        >>> for x in tsTree[:]:
+        >>> for x in scoreTree[:]:
         ...     x
-        <Timespan 0.0 2.0>
-        ...
-        <Timespan 7.0 7.0>
-        '''
-        def recurseByIndex(node, index):
-            '''
-            Return the payload element at a given index
-            '''
-            if node.payloadElementsStartIndex <= index < node.payloadElementsStopIndex:
-                return node.payload[index - node.payloadElementsStartIndex]
-            elif node.leftChild and index < node.payloadElementsStartIndex:
-                return recurseByIndex(node.leftChild, index)
-            elif node.rightChild and node.payloadElementsStopIndex <= index:
-                return recurseByIndex(node.rightChild, index)
+        <music21.instrument.Instrument PartA: : >
+                ...
+        <music21.bar.Barline style=final>
 
-        def recurseBySlice(node, start, stop):
-            '''
-            Return a slice of the payload elements (plural) where start <= index < stop.
-            '''
-            result = []
-            if node is None:
-                return result
-            if start < node.payloadElementsStartIndex and node.leftChild:
-                result.extend(recurseBySlice(node.leftChild, start, stop))
-            if start < node.payloadElementsStopIndex and node.payloadElementsStartIndex < stop:
-                indexStart = start - node.payloadElementsStartIndex
-                if indexStart < 0:
-                    indexStart = 0
-                indexStop = stop - node.payloadElementsStartIndex
-                result.extend(node.payload[indexStart:indexStop])
-            if node.payloadElementsStopIndex <= stop and node.rightChild:
-                result.extend(recurseBySlice(node.rightChild, start, stop))
-            return result
+        These should all be the same as the flat version:
         
-        if isinstance(i, int):
-            if self.rootNode is None:
-                raise IndexError
-            if i < 0:
-                i = self.rootNode.subtreeElementsStopIndex + i
-            if i < 0 or self.rootNode.subtreeElementsStopIndex <= i:
-                raise IndexError
-            return recurseByIndex(self.rootNode, i)
-        elif isinstance(i, slice):
-            if self.rootNode is None:
-                return []
-            indices = i.indices(self.rootNode.subtreeElementsStopIndex)
-            start, stop = indices[0], indices[1]
-            return recurseBySlice(self.rootNode, start, stop)
+        >>> scoreFlat = score.flat
+        >>> for i in (0, -1, 10):
+        ...     if scoreFlat[i] is not scoreTree[i]:
+        ...          print("false!")
+
+        >>> for i, j in ((2, 5), (-6, -3)):
+        ...     sfSlice = scoreFlat[i:j]
+        ...     for n in range(i, j):
+        ...         sliceOffset = n - i
+        ...         if sfSlice[sliceOffset] is not scoreFlat[n]:
+        ...             print("false!")
+        '''
+        nodeOrNodeList = self.getNodeByIndex(i)
+        if nodeOrNodeList is None:
+            return nodeOrNodeList
+        elif not isinstance(nodeOrNodeList, list):
+            return nodeOrNodeList.payload
         else:
-            raise TypeError('Indices must be integers or slices, got {}'.format(i))
+            return [n.payload for n in nodeOrNodeList]
 
     def __hash__(self):
         return hash((type(self), id(self)))
 
-    def __iter__(self):
-        r'''
-        Iterates through all the nodes in the offset tree and returns each thing
-        in the payload.
-
-        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> tss = [tree.spans.Timespan(x, y) for x, y in tsList]
-        >>> tsTree = tree.trees.TimespanTree()
-        >>> tsTree.insert(tss)
-
-        >>> for x in tsTree:
-        ...     x
-        <Timespan 0.0 2.0>
-        <Timespan 0.0 9.0>
-        <Timespan 1.0 1.0>
-        <Timespan 2.0 3.0>
-        <Timespan 3.0 4.0>
-        <Timespan 4.0 9.0>
-        <Timespan 5.0 6.0>
-        <Timespan 5.0 8.0>
-        <Timespan 6.0 8.0>
-        <Timespan 7.0 7.0>        
-        '''
-        for n in super(ElementTree, self).__iter__():
-            for el in n.payload:
-                yield el
 
     def __len__(self):
         r'''
-        Gets the length of the ElementTree collection, i.e., the number of elements enclosed.
+        Gets the length of the ElementTree, i.e., the number of elements enclosed.
+        This is a very very fast O(1).
+
+        >>> score = tree.makeExampleScore()
+        >>> scoreTree = score.asTree(flatten=True)
+        >>> len(scoreTree)
+        20
+        
+        Works well on OffsetTrees also, which are more complex, because they can
+        have multiple elements per Node.
 
         >>> offTree = tree.trees.OffsetTree()
         >>> len(offTree)
@@ -306,39 +254,83 @@ class ElementTree(core.AVLTree):
 
     def __setitem__(self, i, new):
         r'''
-        Sets elements or timespans at index `i` to `new`.
+        Sets elements or timespans at index `i` to `new`, but keeping the old position
+        of the element there. (This is different from OffsetTrees, where things can move around.
 
-        >>> tss = [
-        ...     tree.spans.Timespan(0, 2),
-        ...     tree.spans.Timespan(0, 9),
-        ...     tree.spans.Timespan(1, 1),
-        ...     ]
-        >>> tsTree = tree.trees.TimespanTree()
-        >>> tsTree.insert(tss)
-        >>> tsTree[0] = tree.spans.Timespan(-1, 6)
-        >>> for x in tsTree:
-        ...     x
-        <Timespan -1.0 6.0>
-        <Timespan 0.0 9.0>
-        <Timespan 1.0 1.0>
+        >>> score = tree.makeExampleScore()
+        >>> scoreTree = score.asTree(flatten=True)
+        >>> n = scoreTree[10]
+        >>> n
+        <music21.note.Note G#>
+        >>> scoreTree.getNodeByIndex(10)
+        <ElementNode: Start:2.0 <0.20...> Indices:(l:10 *10* r:11) 
+            Payload:<music21.note.Note G#>>
 
-        Works with slices too.
+        >>> scoreTree[10] = note.Note('F#')
+        >>> scoreTree[10]
+        <music21.note.Note F#>
+        >>> scoreTree.getNodeByIndex(10)
+        <ElementNode: Start:2.0 <0.20...> Indices:(l:10 *10* r:11) 
+            Payload:<music21.note.Note F#>>
 
-        >>> tsTree[1:] = [tree.spans.Timespan(10, 20)]
-        >>> for x in tsTree:
-        ...     x
-        <Timespan -1.0 6.0>
-        <Timespan 10.0 20.0>
+        
+        >>> scoreTree[10:13]
+        [<music21.note.Note F#>, <music21.note.Note F>, <music21.note.Note G>]
+        >>> scoreTree[10:14:2] = [note.Note('E#'), note.Note('F-')]
+        >>> scoreTree[10:13]
+        [<music21.note.Note E#>, <music21.note.Note F>, <music21.note.Note F->]
         '''
-        if isinstance(i, (int, slice)):
-            old = self[i]
-            self.remove(old)
-            self.insert(new)
+        if isinstance(i, int):
+            n = self.getNodeByIndex(i)
+            if n is None: 
+                message = 'Index must be less than {}'.format(len(self))
+                raise TypeError(message)
+            n.payload = new
+        elif isinstance(i, slice):
+            if not isinstance(new, list):
+                message = 'If {} is a slice, then {} must be a list'.format(i, new)
+                raise TypeError(message)
+            sliceLen = (i.stop - i.start)/i.step
+            if sliceLen != len(new):
+                message = '{} is a slice of len {}, so {} cannot have len {}'.format(i, sliceLen,
+                                                                                     new, len(new))
+                raise TypeError(message)
+            for j, sliceIter in enumerate(range(i.start, i.stop, i.step)):
+                self[sliceIter] = new[j] # recursive.
         else:
             message = 'Indices must be ints or slices, got {}'.format(i)
             raise TypeError(message)
 
     def __str__(self):
+        '''
+        Slow: O(n log n) time, but it's just for debugging...
+        
+        >>> score = tree.makeExampleScore()
+        >>> scoreTree = score.asTree(flatten=True)
+        >>> print(scoreTree)
+        <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
+            <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *0* r:2) 
+                    Payload:<music21.instrument.Instrument PartA: : >>
+            <ElementNode: Start:0.0 <0.-25...> Indices:(l:1 *1* r:2) 
+                    Payload:<music21.instrument.Instrument PartB: : >>
+            <ElementNode: Start:0.0 <0.0...> Indices:(l:0 *2* r:4) Payload:<music21.clef.BassClef>>
+            <ElementNode: Start:0.0 <0.0...> Indices:(l:3 *3* r:4) Payload:<music21.clef.BassClef>>
+            <ElementNode: Start:0.0 <0.4...> Indices:(l:0 *4* r:8) 
+                    Payload:<music21.meter.TimeSignature 2/4>>
+            <ElementNode: Start:0.0 <0.4...> Indices:(l:5 *5* r:6) 
+                    Payload:<music21.meter.TimeSignature 2/4>>
+            <ElementNode: Start:0.0 <0.20...> Indices:(l:5 *6* r:8) Payload:<music21.note.Note C>>
+            <ElementNode: Start:0.0 <0.20...> Indices:(l:7 *7* r:8) Payload:<music21.note.Note C#>>
+            <ElementNode: Start:1.0 <0.20...> Indices:(l:0 *8* r:20) Payload:<music21.note.Note D>>
+            <ElementNode: Start:2.0 <0.20...> Indices:(l:9 *9* r:11) Payload:<music21.note.Note E>>
+                ...
+            <ElementNode: Start:7.0 <0.20...> Indices:(l:15 *17* r:20) 
+                    Payload:<music21.note.Note C>>
+            <ElementNode: Start:End <0.-5...> Indices:(l:18 *18* r:20) 
+                    Payload:<music21.bar.Barline style=final>>
+            <ElementNode: Start:End <0.-5...> Indices:(l:19 *19* r:20) 
+                    Payload:<music21.bar.Barline style=final>>        
+        '''
         result = []
         result.append(repr(self))
         for x in self:
@@ -348,7 +340,8 @@ class ElementTree(core.AVLTree):
         result = '\n'.join(result)
         return result
 
-    ### PRIVATE METHODS ###    
+    ### PRIVATE METHODS ###
+    
     def _updateNodes(self, initialPosition=None, initialEndTime=None, visitedParents=None):
         '''
         runs updateIndices and updateEndTimes on the rootNode
@@ -416,7 +409,82 @@ class ElementTree(core.AVLTree):
                 pt.remove(self)
 
     ### PUBLIC METHODS ###
+    def getNodeByIndex(self, i):
+        '''
+        Get a node whose element is at a particular index (not position).  Works with slices too
+        
+        See __getitem__ for caveats about speed...
 
+        >>> score = tree.makeExampleScore()
+        >>> scoreTree = score.asTree(flatten=True)
+        >>> scoreTree
+        <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
+
+        >>> scoreTree.getNodeByIndex(0)
+        <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *0* r:2) 
+            Payload:<music21.instrument.Instrument PartA: : >>
+
+        >>> scoreTree.getNodeByIndex(-1)
+        <ElementNode: Start:End <0.-5...> Indices:(l:19 *19* r:20) 
+            Payload:<music21.bar.Barline style=final>>
+
+        >>> scoreTree.getNodeByIndex(slice(2, 5))
+        [<ElementNode: Start:0.0 <0.0...> Indices:(l:0 *2* r:4) Payload:<music21.clef.BassClef>>, 
+         <ElementNode: Start:0.0 <0.0...> Indices:(l:3 *3* r:4) Payload:<music21.clef.BassClef>>, 
+         <ElementNode: Start:0.0 <0.4...> Indices:(l:0 *4* r:8) 
+             Payload:<music21.meter.TimeSignature 2/4>>]
+
+        >>> scoreTree.getNodeByIndex(slice(-6, -3))
+        [<ElementNode: Start:5.0 <0.20...> Indices:(l:9 *14* r:20) Payload:<music21.note.Note A>>, 
+         <ElementNode: Start:6.0 <0.20...> Indices:(l:15 *15* r:17) Payload:<music21.note.Note B>>, 
+         <ElementNode: Start:6.0 <0.20...> Indices:(l:16 *16* r:17) Payload:<music21.note.Note D#>>]
+
+        >>> scoreTree.getNodeByIndex(slice(-100, -200))
+        []
+        '''
+        def recurseByIndex(node, index):
+            '''
+            Return the node element at a given index
+            '''
+            if node.payloadElementIndex == index:
+                return node
+            elif node.leftChild and index < node.payloadElementIndex:
+                return recurseByIndex(node.leftChild, index)
+            elif node.rightChild and node.payloadElementIndex <= index:
+                return recurseByIndex(node.rightChild, index)
+
+        def recurseBySlice(node, start, stop):
+            '''
+            Return a slice of the nodes (plural) whose indices are between start <= index < stop.
+            '''
+            result = []
+            if node is None:
+                return result
+            if start < node.payloadElementIndex and node.leftChild:
+                result.extend(recurseBySlice(node.leftChild, start, stop))
+            if start <= node.payloadElementIndex < stop:
+                result.append(node)
+            if node.payloadElementIndex < stop and node.rightChild:
+                result.extend(recurseBySlice(node.rightChild, start, stop))
+            return result
+        
+        if isinstance(i, int):
+            if self.rootNode is None:
+                raise IndexError
+            if i < 0:
+                i = self.rootNode.subtreeElementsStopIndex + i
+            if i < 0 or self.rootNode.subtreeElementsStopIndex <= i:
+                raise IndexError
+            return recurseByIndex(self.rootNode, i)
+        elif isinstance(i, slice):
+            if self.rootNode is None:
+                return []
+            indices = i.indices(self.rootNode.subtreeElementsStopIndex)
+            start, stop = indices[0], indices[1]
+            return recurseBySlice(self.rootNode, start, stop)
+        else:
+            raise TypeError('Indices must be integers or slices, got {}'.format(i))
+    
     def copy(self):
         r'''
         Creates a new offset-tree with the same payload as this offset-tree.
@@ -430,9 +498,9 @@ class ElementTree(core.AVLTree):
         <TimespanTree {20} (0.0 to 8.0)>
 
         >>> scoreTree[16]
-        <PitchedTimespan (6.0 to 8.0) <music21.note.Note D>>
+        <PitchedTimespan (6.0 to 8.0) <music21.note.Note D#>>
         >>> newTree[16]
-        <PitchedTimespan (6.0 to 8.0) <music21.note.Note D>>
+        <PitchedTimespan (6.0 to 8.0) <music21.note.Note D#>>
         
         >>> scoreTree[16] is newTree[16]
         True
@@ -634,7 +702,8 @@ class ElementTree(core.AVLTree):
             positions = None
         else:
             positions = positionsOrElements
-            if not common.isListLike(positions):
+            if not common.isListLike(positions) or hasattr(positions, 'shortRepr'):
+                # is not a list and not a sortTuple...
                 positions = [positions]
         
         if (not common.isListLike(elements) and
@@ -646,7 +715,8 @@ class ElementTree(core.AVLTree):
                 
         
         for i, el in enumerate(elements):
-            self._insertCore(positions[i], el)
+            pos = positions[i]
+            self._insertCore(pos, el)
         
         self._updateNodes(initialPosition, initialEndTime)
 
@@ -691,7 +761,32 @@ class ElementTree(core.AVLTree):
     ### PROPERTIES ###
     @property
     def offset(self):
-        return self.lowestPosition
+        '''
+        this is just for mimicking elements as streams. 
+        '''
+        lp = self.lowestPosition
+        if hasattr(lp, 'offset'):
+            lp = lp.offset
+        return lp
+
+    def sortTuple(self, site=None):
+        '''
+        mimick a sortTuple for the ElementTree using the source as a guide,
+        but changing the offset.
+        
+        >>> s = stream.Stream(id='testStream')
+        >>> s.insert(3, note.Note())
+        >>> et = tree.trees.ElementTree(s.elements, s)
+        >>> et
+        <ElementTree {1} (3.0 <0.20...> to 4.0) <music21.stream.Stream testStream>>        
+
+        >>> et.sortTuple()
+        SortTuple(atEnd=0, offset=3.0, priority=0, classSortOrder=-20, isNotGrace=1, ...)
+        >>> s.sortTuple()
+        SortTuple(atEnd=0, offset=0.0, priority=0, classSortOrder=-20, isNotGrace=1, ...)
+        '''
+        sourceSortTuple = self.source.sortTuple(site)
+        return sourceSortTuple.modify(offset=self.offset)
 
     @property
     def endTime(self):
@@ -865,6 +960,198 @@ class OffsetTree(ElementTree):
     ### SPECIAL METHODS ###
     def __init__(self, elements=None, source=None):
         super(OffsetTree, self).__init__(elements, source)
+
+
+    def __contains__(self, element):
+        r'''
+        Is true when the ElementTree contains the object within it; if and only if the
+        .offset of the element matches the position in the tree.
+
+        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> tss = [tree.spans.Timespan(x, y) for x, y in tsList]
+        >>> tsTree = tree.trees.TimespanTree()
+        >>> tsTree.insert(tss)
+
+        >>> tss[0] in tsTree
+        True
+
+        >>> tree.spans.Timespan(-200, 1000) in tsTree
+        False
+        
+        The exact Timespan object does not have to be in the tree, just one with the same offset
+        and endTime:
+        
+        >>> tsDuplicate = tree.spans.Timespan(0, 2)
+        >>> tsDuplicate in tsTree
+        True
+        '''
+        try:
+            offset = element.offset
+        except AttributeError:
+            raise TimespanTreeException('element must be a Music21Object, i.e., must have offset')
+        candidates = self.elementsStartingAt(offset)
+        if element in candidates:
+            return True
+        else:
+            return False
+
+    def __getitem__(self, i):
+        r'''
+        Gets elements by integer index or slice.
+
+        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> tss = [tree.spans.Timespan(x, y) for x, y in tsList]
+        >>> tsTree = tree.trees.TimespanTree()
+        >>> tsTree.insert(tss)
+
+        >>> tsTree[0]
+        <Timespan 0.0 2.0>
+
+        >>> tsTree[-1]
+        <Timespan 7.0 7.0>
+
+        >>> tsTree[2:5]
+        [<Timespan 1.0 1.0>, <Timespan 2.0 3.0>, <Timespan 3.0 4.0>]
+
+        >>> tsTree[-6:-3]
+        [<Timespan 3.0 4.0>, <Timespan 4.0 9.0>, <Timespan 5.0 6.0>]
+
+        >>> tsTree[-100:-200]
+        []
+
+        >>> for x in tsTree[:]:
+        ...     x
+        <Timespan 0.0 2.0>
+        ...
+        <Timespan 7.0 7.0>
+        '''
+        def recurseByIndex(node, index):
+            '''
+            Return the payload element at a given index
+            '''
+            if node.payloadElementsStartIndex <= index < node.payloadElementsStopIndex:
+                return node.payload[index - node.payloadElementsStartIndex]
+            elif node.leftChild and index < node.payloadElementsStartIndex:
+                return recurseByIndex(node.leftChild, index)
+            elif node.rightChild and node.payloadElementsStopIndex <= index:
+                return recurseByIndex(node.rightChild, index)
+
+        def recurseBySlice(node, start, stop):
+            '''
+            Return a slice of the payload elements (plural) where start <= index < stop.
+            '''
+            result = []
+            if node is None:
+                return result
+            if start < node.payloadElementsStartIndex and node.leftChild:
+                result.extend(recurseBySlice(node.leftChild, start, stop))
+            if start < node.payloadElementsStopIndex and node.payloadElementsStartIndex < stop:
+                indexStart = start - node.payloadElementsStartIndex
+                if indexStart < 0:
+                    indexStart = 0
+                indexStop = stop - node.payloadElementsStartIndex
+                result.extend(node.payload[indexStart:indexStop])
+            if node.payloadElementsStopIndex <= stop and node.rightChild:
+                result.extend(recurseBySlice(node.rightChild, start, stop))
+            return result
+        
+        if isinstance(i, int):
+            if self.rootNode is None:
+                raise IndexError
+            if i < 0:
+                i = self.rootNode.subtreeElementsStopIndex + i
+            if i < 0 or self.rootNode.subtreeElementsStopIndex <= i:
+                raise IndexError
+            return recurseByIndex(self.rootNode, i)
+        elif isinstance(i, slice):
+            if self.rootNode is None:
+                return []
+            indices = i.indices(self.rootNode.subtreeElementsStopIndex)
+            start, stop = indices[0], indices[1]
+            return recurseBySlice(self.rootNode, start, stop)
+        else:
+            raise TypeError('Indices must be integers or slices, got {}'.format(i))
+
+    def __setitem__(self, i, new):
+        r'''
+        Sets elements or timespans at index `i` to `new`.
+        
+        TODO: this should be a bit different for OffsetTrees, probably more like ElementTrees
+         
+
+        >>> tss = [
+        ...     tree.spans.Timespan(0, 2),
+        ...     tree.spans.Timespan(0, 9),
+        ...     tree.spans.Timespan(1, 1),
+        ...     ]
+        >>> tsTree = tree.trees.TimespanTree()
+        >>> tsTree.insert(tss)
+        >>> tsTree[0] = tree.spans.Timespan(-1, 6)
+        >>> for x in tsTree:
+        ...     x
+        <Timespan -1.0 6.0>
+        <Timespan 0.0 9.0>
+        <Timespan 1.0 1.0>
+
+        Note however, that calling __getitem__ after __setitem__ will not return
+        what you just set if the timing is wrong.  This is different from the
+        behavior on ElementTree which assumes that the new element wants to be
+        at the old element's offset.
+        
+        >>> tsTree[2] = tree.spans.Timespan(-0.5, 4)
+        >>> tsTree[2]
+        <Timespan 0.0 9.0>
+        >>> for x in tsTree:
+        ...     x
+        <Timespan -1.0 6.0>
+        <Timespan -0.5 4.0>
+        <Timespan 0.0 9.0>
+
+
+        Works with slices too.
+
+        >>> tsTree[1:] = [tree.spans.Timespan(10, 20)]
+        >>> for x in tsTree:
+        ...     x
+        <Timespan -1.0 6.0>
+        <Timespan 10.0 20.0>
+        '''
+        if isinstance(i, (int, slice)):
+            old = self[i]
+            self.remove(old)
+            self.insert(new)
+        else:
+            message = 'Indices must be ints or slices, got {}'.format(i)
+            raise TypeError(message)
+
+
+    def __iter__(self):
+        r'''
+        Iterates through all the nodes in the offset tree and returns each thing
+        in the payload.
+
+        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
+        >>> tss = [tree.spans.Timespan(x, y) for x, y in tsList]
+        >>> tsTree = tree.trees.TimespanTree()
+        >>> tsTree.insert(tss)
+
+        >>> for x in tsTree:
+        ...     x
+        <Timespan 0.0 2.0>
+        <Timespan 0.0 9.0>
+        <Timespan 1.0 1.0>
+        <Timespan 2.0 3.0>
+        <Timespan 3.0 4.0>
+        <Timespan 4.0 9.0>
+        <Timespan 5.0 6.0>
+        <Timespan 5.0 8.0>
+        <Timespan 6.0 8.0>
+        <Timespan 7.0 7.0>        
+        '''
+        for n in super(ElementTree, self).__iter__():
+            for el in n.payload:
+                yield el
+
 
     ### PRIVATE METHODS ###
     def _getPositionsFromElements(self, elements):
@@ -1580,10 +1867,7 @@ class TimespanTree(OffsetTree):
 
 
 
-#------------------------------------------------------------------------------
 
-class TimespanTreeException(exceptions21.TimespanException):
-    pass
 
 
 #------------------------------------------------------------------------------

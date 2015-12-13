@@ -158,20 +158,28 @@ class StreamCoreMixin(object):
             memo = []
         memo.append(id(self))
         
+        # WHY??? THIS SEEMS OVERKILL, esp. since the first call to .sort() in .flat will
+        # invalidate it! TODO: Investigate if this is necessary and then remove if not necessary
+        # should not need to do this...
+        
         # if this Stream is a flat representation of something, and its
         # elements have changed, than we must clear the cache of that
-        # ancestor; we can do that by calling elementsChanged on
-        # the derivation.orgin
-        
-        # is this true???
-        if self._derivation is not None and self._derivation.method in ('flat', 'semiflat'):
-            origin = self._derivation.origin
-            origin.elementsChanged(memo=memo)
+        # ancestor so that subsequent calls get a new representation of this derivation; 
+        # we can do that by calling elementsChanged on
+        # the derivation.orgin        
+        if self._derivation is not None:
+            sdm = self._derivation.method 
+            if sdm in ('flat', 'semiflat'):
+                origin = self._derivation.origin
+                if sdm in origin._cache and origin._cache[sdm] is self:
+                    del origin._cache[sdm]
+               
 
-        # may not always need to clear cache of the active site, but may
-        # be a good idea; may need to intead clear all sites
-        if self.activeSite is not None:
-            self.activeSite.elementsChanged()
+        # may not always need to clear cache of all living sites, but may
+        # always be a good idea since .flat has changed etc. 
+        # should not need to do derivation.origin sites.
+        for livingSite in self.sites:
+            livingSite.elementsChanged()
 
         # clear these attributes for setting later
         if clearIsSorted:
@@ -194,7 +202,7 @@ class StreamCoreMixin(object):
             indexCache = None
             if keepIndex and 'index' in self._cache:
                 indexCache = self._cache['index']
-            # alway clear cache when elements have changed
+            # always clear cache when elements have changed
             self._cache = {}
             if keepIndex and indexCache is not None:
                 self._cache['index'] = indexCache
@@ -264,8 +272,6 @@ class StreamCoreMixin(object):
         if element is self: # cannot add this Stream into itself
             raise StreamException("this Stream cannot be contained within itself")
         if checkRedundancy:
-            # TODO: might optimize this by storing a list of all obj ids 
-            #   with every insertion and deletion
             idElement = id(element)
             if idElement in self._offsetDict:
                 # now go slow for safety -- maybe something is amiss in the index.
@@ -322,7 +328,7 @@ class StreamCoreMixin(object):
         >>> score = tree.makeExampleScore()
         >>> scoreTree = score.asTimespans()
         >>> print(scoreTree)
-        <TimespanTree {20} (0.0 to 8.0) <music21.stream.Score 0x104840438>>
+        <TimespanTree {20} (0.0 to 8.0) <music21.stream.Score exampleScore>>
             <PitchedTimespan (0.0 to 0.0) <music21.instrument.Instrument PartA: : >>
             <PitchedTimespan (0.0 to 0.0) <music21.instrument.Instrument PartB: : >>
             <PitchedTimespan (0.0 to 0.0) <music21.clef.BassClef>>
@@ -330,16 +336,16 @@ class StreamCoreMixin(object):
             <PitchedTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
             <PitchedTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
             <PitchedTimespan (0.0 to 1.0) <music21.note.Note C>>
-            <PitchedTimespan (0.0 to 2.0) <music21.note.Note C>>
+            <PitchedTimespan (0.0 to 2.0) <music21.note.Note C#>>
             <PitchedTimespan (1.0 to 2.0) <music21.note.Note D>>
             <PitchedTimespan (2.0 to 3.0) <music21.note.Note E>>
-            <PitchedTimespan (2.0 to 4.0) <music21.note.Note G>>
+            <PitchedTimespan (2.0 to 4.0) <music21.note.Note G#>>
             <PitchedTimespan (3.0 to 4.0) <music21.note.Note F>>
             <PitchedTimespan (4.0 to 5.0) <music21.note.Note G>>
-            <PitchedTimespan (4.0 to 6.0) <music21.note.Note E>>
+            <PitchedTimespan (4.0 to 6.0) <music21.note.Note E#>>
             <PitchedTimespan (5.0 to 6.0) <music21.note.Note A>>
             <PitchedTimespan (6.0 to 7.0) <music21.note.Note B>>
-            <PitchedTimespan (6.0 to 8.0) <music21.note.Note D>>
+            <PitchedTimespan (6.0 to 8.0) <music21.note.Note D#>>
             <PitchedTimespan (7.0 to 8.0) <music21.note.Note C>>
             <PitchedTimespan (8.0 to 8.0) <music21.bar.Barline style=final>>
             <PitchedTimespan (8.0 to 8.0) <music21.bar.Barline style=final>>
@@ -351,6 +357,28 @@ class StreamCoreMixin(object):
                                                      flatten=flatten,
                                                      classList=classList)
             self._cache[cacheKey] = hashedTimespanTree
+        return self._cache[cacheKey]
+
+    def asTree(self, flatten=False, classList=None, useTimespans=False, usePositions=True):
+        '''
+        Returns an elementTree of the score, using exact positioning.
+        
+        See tree.fromStream.asTree() for more details.
+        
+        >>> score = tree.makeExampleScore()
+        >>> scoreTree = score.asTree(flatten=True)
+        >>> scoreTree
+        <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
+        '''
+        hashedAttributes = hash( (tuple(classList or () ), flatten, useTimespans, usePositions) ) 
+        cacheKey = "elementTree" + str(hashedAttributes)
+        if cacheKey not in self._cache or self._cache[cacheKey] is None:
+            hashedElementTree = tree.fromStream.asTree(self,
+                                                     flatten=flatten,
+                                                     classList=classList,
+                                                     useTimespans=useTimespans,
+                                                     usePositions=usePositions)
+            self._cache[cacheKey] = hashedElementTree
         return self._cache[cacheKey]
     
     def coreGatherMissingSpanners(self, recurse=True, requireAllPresent=True, insert=True):
@@ -364,10 +392,8 @@ class StreamCoreMixin(object):
         
         Because spanners are stored weakly in .sites this is only guaranteed to find
         the spanners in cases where the spanner is in another stream that is still active.
-        
-        TODO: use this to not require gathering all spanners in a .measure call.
-        
-        A little helper function since we'll make the same Stream several times:
+                
+        Here's a little helper function since we'll make the same Stream several times:
         
         >>> def getStream():
         ...    s = stream.Stream()
@@ -377,6 +403,8 @@ class StreamCoreMixin(object):
         ...    n.bogusAttributeNotWeakref = sl # prevent garbage collecting sl
         ...    s.append([n, m])
         ...    return s
+        
+        
         
         >>> s = getStream()
         >>> s.show('text')

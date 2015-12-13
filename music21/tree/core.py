@@ -18,7 +18,7 @@ absolutely balanced by having O(log n) search times.
 '''
 import unittest
 
-from music21.exceptions21 import TimespanException
+from music21.exceptions21 import TreeException
 from music21 import common
 
 #------------------------------------------------------------------------------
@@ -461,7 +461,7 @@ class AVLNode(common.SlottedObject):
             else:
                 node = node.rotateLeftRight()
         if node.balance < -1 or node.balance > 1:
-            raise TimespanException(
+            raise TreeException(
                 'Somehow Nodes are still not balanced. node.balance %r must be between -1 and 1')
 
         return node
@@ -681,16 +681,32 @@ class AVLTree(object):
         Gets the first node after `position`.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> scoreTree = score.asTimespans()
+        >>> scoreTree = score.asTree(flatten=True)
         >>> node1 = scoreTree.getNodeAfter(0.5)
         >>> node1
-        <OffsetNode: Start:1.0 Indices:(25:25:29:29) Length:{4}>
+        <ElementNode: Start:1.0 <0.20...> Indices:(l:0 *25* r:61) Payload:<music21.note.Note A>>        
         >>> node2 = scoreTree.getNodeAfter(0.6)
         >>> node2 is node1
         True
         
-        >>> scoreTree.getNodeAfter(9999) is None
-        True
+        >>> endNode = scoreTree.getNodeAfter(9999)
+        >>> endNode
+        <ElementNode: Start:End <0.-5...> Indices:(l:188 *191* r:195) 
+               Payload:<music21.bar.Barline style=final>>
+               
+        >>> while endNode is not None:
+        ...     print(endNode)
+        ...     endNodePosition = endNode.position
+        ...     endNode = scoreTree.getNodeAfter(endNodePosition)
+        <ElementNode: Start:End <0.-5...> Indices:(l:188 *191* r:195) 
+            Payload:<music21.bar.Barline style=final>>
+        <ElementNode: Start:End <0.-5...> Indices:(l:192 *192* r:193) 
+            Payload:<music21.bar.Barline style=final>>
+        <ElementNode: Start:End <0.-5...> Indices:(l:192 *193* r:195) 
+            Payload:<music21.bar.Barline style=final>>
+        <ElementNode: Start:End <0.-5...> Indices:(l:194 *194* r:195) 
+            Payload:<music21.bar.Barline style=final>>        
+        
         >>> note1 = score.flat.notes[30]
         
         Works with sortTuple positions as well...
@@ -700,7 +716,8 @@ class AVLTree(object):
         SortTuple(atEnd=0, offset=6.0, priority=0, classSortOrder=20, isNotGrace=1, insertIndex=...)
         
         >>> scoreTree.getNodeAfter(st)
-        <OffsetNode: Start:6.5 Indices:(52:52:53:53) Length:{1}>
+        <ElementNode: Start:6.5 <0.20...> Indices:(l:51 *52* r:53) 
+            Payload:<music21.note.Note D>>
         '''
         def recurse(node, position):
             if node is None:
@@ -721,19 +738,31 @@ class AVLTree(object):
         Gets start position after `position`.
 
         >>> score = corpus.parse('bwv66.6')
-        >>> scoreTree = score.asTimespans()
-        >>> scoreTree.getPositionAfter(0.5)
+        >>> scoreTree = score.asTree(flatten=True)
+        >>> scoreTree.getPositionAfter(0.5).offset
         1.0
-
+        
         Returns None if no succeeding position exists.
 
-        >>> scoreTree.getPositionAfter(36) is None
-        True
+        >>> endPosition = scoreTree.getPositionAfter(9999)
+        >>> while endPosition is not None:
+        ...     print(endPosition)
+        ...     endPosition = scoreTree.getPositionAfter(endPosition)
+        SortTuple(atEnd=1, offset=33.0, priority=0, classSortOrder=-5, ...)
+        SortTuple(atEnd=1, offset=33.0, priority=0, classSortOrder=-5, ...)
+        SortTuple(atEnd=1, offset=33.0, priority=0, classSortOrder=-5, ...)
+        SortTuple(atEnd=1, offset=33.0, priority=0, classSortOrder=-5, ...)
 
         Generally speaking, negative positions will usually return 0.0
 
-        >>> scoreTree.getPositionAfter(-999)
+        >>> scoreTree.getPositionAfter(-999).offset
         0.0
+        
+        Unless the Tree is empty in which case, None is returned:
+        
+        >>> at = tree.core.AVLTree()
+        >>> at.getPositionAfter(-999) is None
+        True
         '''
         node = self.getNodeAfter(position)
         if node:            

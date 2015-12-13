@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 
+# Copyright:    Copyright © 2009-2012, 2015 Michael Scott Cuthbert and the music21 
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
@@ -4142,8 +4142,8 @@ class TimeSignature(base.Music21Object):
 
         >>> c = corpus.parse('bwv1.6')
         >>> for m in c.parts[0].getElementsByClass('Measure'):
-        ...     print("%s %s" % (m.number, 
-        ...         m.getContextByClass('TimeSignature').getOffsetFromBeat(4.5) - m.paddingLeft))
+        ...     ts = m.timeSignature or m.getContextByClass('TimeSignature')
+        ...     print("%s %s" % (m.number, ts.getOffsetFromBeat(4.5) - m.paddingLeft))
         0 0.5
         1 3.5
         2 3.5

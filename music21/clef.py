@@ -627,7 +627,7 @@ class Test(unittest.TestCase):
         c1.offset = 0
         s1 = stream.Stream([c1, n1])
         
-        self.assertTrue(s1.getContextByClass(Clef) is c1)
+        self.assertTrue(s1.recurse().notes[0].getContextByClass(Clef) is c1)
             ## equally good: getContextsByClass(Clef)[0]
 
         del(s1)

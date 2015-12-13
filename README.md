@@ -1,14 +1,39 @@
-music21
-=======
+# music21 #
 
 music21 -- A Toolkit for Computational Musicology
 
-For more information, visit:
-http://web.mit.edu/music21
-
-And to install, see:
-http://web.mit.edu/music21/doc/installing/install.html
-
 Copyright © 2006-2015 Michael Scott Cuthbert and the music21 Project
 
+For more information, visit:
+http://web.mit.edu/music21 or http://music21.readthedocs.org/en/latest/index.html
+
+And to install, see:
+http://music21.readthedocs.org/en/latest/usersGuide/usersGuide_01_installing.html
+
 Released under either the BSD (3-clause) or GNU LGPL license according to your choice. See LICENSE.
+
+## Mailing list ##
+
+See: https://groups.google.com/forum/#!forum/music21list
+
+## Community Code of Conduct ##
+
+Music21 encourages contributions, discussions, and usage from all people interested in 
+music and computers. This encouragement extends to all people regardless of (among other aspects) 
+gender, race, sexual orientation, disability, religion, appearance, veteran status, 
+gender identity, socioeconomic status, or nationality. 
+
+Members of the community will strive to be friendly, patient, and welcoming, especially of 
+viewpoints and experiences different from our own. We reject harassment and contributions 
+(in mail, comments, or code) that belittle individuals or groups of people.
+
+We ask all members of the community to be mindful particularly about assumptions of the 
+gender of users (choice of pronouns in comments and code). We recognize that members 
+sometimes make mistakes and will, in general, accept sincere regrets for such cases. 
+Blatant or repeated violations of the code will result in the removal of the 
+contributor’s participation in the community.
+
+The maintainers of music21 and associated sites will commit themselves to enforcing 
+this code of conduct. Users who notice violations, including instances of abuse, 
+harassment, or otherwise unacceptable behavior are requested to contact cuthbert@mit.edu. 
+Maintainers will respect confidentiality with regards to reports.

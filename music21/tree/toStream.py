@@ -16,7 +16,7 @@ Tools for generating new Streams from trees (fast, manipulatable objects)
 None of these things work acceptably yet.  This is super beta.
 '''
 
-from music21.exceptions21 import TimespanException
+from music21.exceptions21 import TreeException
 from music21.tree import trees
 
 def chordified(timespans, templateStream=None):
@@ -84,7 +84,7 @@ def chordified(timespans, templateStream=None):
             vert = timespans.getVerticalityAt(offset)
             quarterLength = endTime - offset
             if (quarterLength < 0):
-                raise TimespanException("Something is wrong with the verticality " + 
+                raise TreeException("Something is wrong with the verticality " + 
                         "%r its endTime %f is less than its offset %f" % 
                                          (vert, endTime, offset))
             element = vert.makeElement(quarterLength)
@@ -97,7 +97,7 @@ def chordified(timespans, templateStream=None):
             vert = timespans.getVerticalityAt(offset)
             quarterLength = endTime - offset
             if (quarterLength < 0):
-                raise TimespanException("Something is wrong with the verticality " + 
+                raise TreeException("Something is wrong with the verticality " + 
                     "%r, its endTime %f is less than its offset %f" % (vert, endTime, offset))
             element = vert.makeElement(quarterLength)
             elements.append(element)

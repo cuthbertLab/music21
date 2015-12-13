@@ -18,6 +18,8 @@ from music21 import common
 from music21.tree import spans
 from music21.tree import trees
 
+
+
 def listOfTreesByClass(inputStream,
                        currentParentage=None,
                        initialOffset=0.0,
@@ -148,6 +150,119 @@ def listOfTimespanTreesByClass(inputStream,
                                classLists=classLists,
                                useTimespans=True)
 
+def asTree(inputStream, flatten=False, classList=None, useTimespans=False, usePositions=True):
+    '''
+    Converts a Stream and constructs an :class:`~music21.tree.trees.ElementTree` based on this.
+    
+    Use Stream.asTree() generally since that caches the ElementTree.
+
+    >>> score = tree.makeExampleScore()
+    >>> elementTree = tree.fromStream.asTree(score)
+    >>> elementTree
+    <ElementTree {2} (0.0 <0.-20...> to 8.0) <music21.stream.Score exampleScore>>
+    >>> for x in elementTree:
+    ...     x
+    <ElementNode: Start:0.0 <0.-20...> Indices:(l:0 *0* r:2) Payload:<music21.stream.Part ...>>
+    <ElementNode: Start:0.0 <0.-20...> Indices:(l:1 *1* r:2) Payload:<music21.stream.Part ...>>
+    
+    >>> etFlat = tree.fromStream.asTree(score, flatten=True)
+    >>> etFlat
+    <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
+
+    The elementTree's classSortOrder has changed to -25 to match the lowest positioned element
+    in the score, which is an Instrument object (classSortOrder=-25)
+
+    >>> for x in etFlat:
+    ...     x
+    <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *0* r:2) 
+        Payload:<music21.instrument.Instrument PartA: : >>
+    <ElementNode: Start:0.0 <0.-25...> Indices:(l:1 *1* r:2) 
+        Payload:<music21.instrument.Instrument PartB: : >>
+    <ElementNode: Start:0.0 <0.0...> Indices:(l:0 *2* r:4) Payload:<music21.clef.BassClef>>
+    <ElementNode: Start:0.0 <0.0...> Indices:(l:3 *3* r:4) Payload:<music21.clef.BassClef>>
+    ...
+    <ElementNode: Start:0.0 <0.20...> Indices:(l:5 *6* r:8) Payload:<music21.note.Note C>>
+    <ElementNode: Start:0.0 <0.20...> Indices:(l:7 *7* r:8) Payload:<music21.note.Note C#>>
+    <ElementNode: Start:1.0 <0.20...> Indices:(l:0 *8* r:20) Payload:<music21.note.Note D>>
+    ...
+    <ElementNode: Start:7.0 <0.20...> Indices:(l:15 *17* r:20) Payload:<music21.note.Note C>>
+    <ElementNode: Start:End <0.-5...> Indices:(l:18 *18* r:20) 
+        Payload:<music21.bar.Barline style=final>>
+    <ElementNode: Start:End <0.-5...> Indices:(l:19 *19* r:20) 
+        Payload:<music21.bar.Barline style=final>>
+    
+    >>> etFlat.getPositionAfter(0.5)
+    SortTuple(atEnd=0, offset=1.0, priority=0, classSortOrder=20, isNotGrace=1, insertIndex=...)
+    
+    >>> etFlatNotes = tree.fromStream.asTree(score, flatten=True, classList=[note.Note])
+    >>> etFlatNotes
+    <ElementTree {12} (0.0 <0.20...> to 8.0) <music21.stream.Score exampleScore>>
+    
+    '''
+    def recurseGetTreeByClass(inputStream,
+                       currentParentage,
+                       initialOffset,
+                       outputTree=None):
+        lastParentage = currentParentage[-1]
+        
+        if outputTree is None:
+            outputTree = treeClass(source=lastParentage)
+
+        # do this to avoid munging activeSites
+        inputStreamElements = inputStream._elements[:] + inputStream._endElements
+        parentEndTime = initialOffset + lastParentage.duration.quarterLength
+
+        for element in inputStreamElements:
+            offset = lastParentage.elementOffset(element) + initialOffset
+            
+            # for sortTuples
+            position = element.sortTuple(lastParentage)
+            flatPosition = position.modify(offset=position.offset + initialOffset) 
+            
+            wasStream = False
+            
+            if element.isStream:
+                localParentage = currentParentage + (element,)
+                if flatten is not False: # True or semiFlat
+                    recurseGetTreeByClass(element, # put the elements into the current tree...
+                                          currentParentage=localParentage,
+                                          initialOffset=offset,
+                                          outputTree=outputTree)
+                    wasStream = True
+                else:
+                    pass # do nothing special for streams if not flattening...
+                
+            if not wasStream or flatten == 'semiFlat':
+                endTime = offset + element.duration.quarterLength
+                
+                if classList and not element.isClassOrSubclass(classList):
+                    continue
+                if useTimespans:
+                    pitchedTimespan = spans.PitchedTimespan(element=element,
+                                                        parentage=tuple(reversed(currentParentage)),
+                                                        parentOffset=initialOffset,
+                                                        parentEndTime=parentEndTime,
+                                                        offset=offset,
+                                                        endTime=endTime)
+                    outputTree.insert(pitchedTimespan)
+                elif usePositions:
+                    outputTree.insert(flatPosition, element)                    
+                else:
+                    outputTree.insert(offset, element)
+    
+        return outputTree
+
+    if useTimespans:
+        treeClass = trees.TimespanTree
+    elif usePositions:
+        treeClass = trees.ElementTree
+    else:
+        treeClass = trees.OffsetTree
+    
+    return recurseGetTreeByClass(inputStream,
+                                 currentParentage=(inputStream,),
+                                 initialOffset=0.0)  
+    
 def convert(inputStream, flatten, classList):
     r'''
     Recurses through a score and constructs a
@@ -209,7 +324,7 @@ def flat(inputStream):
     >>> ex = tree.makeExampleScore()
     >>> ts = tree.fromStream.flat(ex)
     >>> ts
-    <OffsetTree {20} (0.0 to 2.0) <music21.stream.Score 0x104a94d68>>
+    <OffsetTree {20} (0.0 to 2.0) <music21.stream.Score exampleScore>>
     >>> ts[15], ts[15].offset
     (<music21.note.Note F>, 1.0)
     '''

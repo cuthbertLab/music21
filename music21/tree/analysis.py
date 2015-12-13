@@ -23,7 +23,7 @@ from music21 import exceptions21
 environLocal = environment.Environment("tree.analysis")
 
 
-class HorizontalityException(exceptions21.TimespanException):
+class HorizontalityException(exceptions21.TreeException):
     pass
 
 
