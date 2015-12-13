@@ -255,16 +255,16 @@ class ElementTree(core.AVLTree):
         0
 
         >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> tss = [note.Note() for _ in tsList]
-        >>> for i,n in enumerate(tss):
+        >>> noteList = [note.Note() for _ in tsList]
+        >>> for i,n in enumerate(noteList):
         ...     n.offset, n.quarterLength = tsList[i]
-        >>> offTree.insert(tss)
+        >>> offTree.insert(noteList)
         >>> len(offTree)
         10
-        >>> len(offTree) == len(tss)
+        >>> len(offTree) == len(noteList)
         True
 
-        >>> offTree.removeTimespanList(tss)
+        >>> offTree.removeElements(noteList)
         >>> len(offTree)
         0
         '''
@@ -300,7 +300,7 @@ class ElementTree(core.AVLTree):
 
     def __setitem__(self, i, new):
         r'''
-        Sets elements or timespans at index `i` to `new`, but keeping the old position
+        Sets elements at index `i` to `new`, but keeping the old position
         of the element there. (This is different from OffsetTrees, where things can move around).
 
         >>> score = tree.makeExampleScore()
@@ -421,27 +421,23 @@ class ElementTree(core.AVLTree):
                 continue
             visitedParents.add(parent)
             parentPosition = parent.offset
-            parent._removeElement(self, oldPosition=oldPosition)
+            parent._removeElementAtPosition(self, oldPosition)
             parent._insertCore(self.offset, self)
             
             parent._updateNodes(parentPosition, visitedParents=visitedParents)
 
-    def _removeElement(self, element, oldPosition=None):
+    def _removeElementAtPosition(self, element, position):
         '''
         removes an element or ElementTree from a position 
         (either its current .offset or its oldPosition) without updating
         the indices, endTimes, etc.  
         '''
-        if oldPosition is not None:
-            position = oldPosition
-        else:
-            position = element.offset
-
         node = self.getNodeByPosition(position)
         if node is None:
             return
 
         if isinstance(node.payload, list):
+            # OffsetTree
             if element in node.payload:
                 node.payload.remove(element)
             if not node.payload:
@@ -453,6 +449,17 @@ class ElementTree(core.AVLTree):
                 self.removeNode(position)
 
     ### PUBLIC METHODS ###
+    def getPositionFromElementUnsafe(self, el):
+        '''
+        A quick but dirty method for getting the likely position (or offset) of an element
+        within the elementTree from the element itself.  Such as calling 
+        
+        el.getOffsetBySite(tree.source) or something like that.
+        
+        Pulled out for subclassing
+        '''
+        return el.sortTuple(self.source)
+    
     def populateFromSortedList(self, listOfTuples):
         '''
         This method assumes that the current tree is empty (or will be wiped) and 
@@ -730,7 +737,7 @@ class ElementTree(core.AVLTree):
         results.sort(key=lambda x: (x.offset, x.endTime))
         return tuple(results)
 
-    def index(self, element, offset=None):
+    def index(self, element, position=None):
         r'''
         Gets index of `element` in tree (can be a Timespan).
         
@@ -759,48 +766,12 @@ class ElementTree(core.AVLTree):
         Traceback (most recent call last):
         ValueError: <Timespan -100.0 100.0> not in Tree at offset -100.0.
         '''
-        if offset is None:
-            offset = element.offset
-        node = self.getNodeByPosition(offset)
+        if position is None:
+            position = self.getPositionFromElementUnsafe(element)
+        node = self.getNodeByPosition(position)
         if node is None or node.payload is not element:
-            raise ValueError('{} not in Tree at offset {}.'.format(element, offset))
+            raise ValueError('{} not in Tree at offset {}.'.format(element, position))
         return node.payloadElementIndex
-
-    def removeTimespan(self, elements, offsets=None, runUpdate=True):
-        self.removeTimespanList(elements, offsets, runUpdate)
-
-    def removeTimespanList(self, elements, offsets=None, runUpdate=True): 
-        r'''
-        Removes `elements` which can be Music21Objects or Timespans 
-        (a single one or a list) from this Tree.
-        
-        Much safer (for non-timespans) if a list of offsets is used but it is optional
-        
-        If runUpdate is False then the tree will be left with incorrect indices and
-        endTimes; but it can speed up operations where an element is going to be removed
-        and then immediately replaced: i.e., where the position of an element has changed        
-        '''
-        initialPosition = self.lowestPosition()
-        initialEndTime = self.endTime
-        if hasattr(elements, 'offset'): # a music21 object or an PitchedTimespan
-            elements = [elements]
-        if offsets is not None and not common.isListLike(offsets):
-            offsets = [offsets]
-        
-        if offsets is not None and len(elements) != len(offsets):
-            raise TimespanTreeException(
-                "Number of elements and number of offsets must be the same")
-
-        
-        for i, el in enumerate(elements):
-            if offsets is not None:
-                self._removeElement(el, offsets[i]) 
-            else:
-                self._removeElement(el)
-        
-        if runUpdate:
-            self._updateNodes(initialPosition, initialEndTime)
-
 
     def _getPositionsFromElements(self, elements):
         '''
@@ -809,8 +780,9 @@ class ElementTree(core.AVLTree):
         In an ElementTree, this will be a list of .sortTuple() calls.
         
         In an OffsetTree, this will be a list of .offset calls
+        
         '''
-        return [el.sortTuple() for el in elements]
+        return [self.getPositionFromElementUnsafe(el) for el in elements]
 
     def insert(self, positionsOrElements, elements=None):
         r'''
@@ -1232,9 +1204,54 @@ class OffsetTree(ElementTree):
         return [el.offset for el in elements]
 
     #----------public methods ------------------------
+    def getPositionFromElementUnsafe(self, el):
+        '''
+        A quick but dirty method for getting the likely position (or offset) of an element
+        within the elementTree from the element itself.  Such as calling 
+        
+        el.getOffsetBySite(tree.source) or something like that.
+        
+        Pulled out for subclassing
+        '''
+        return el.getOffsetBySite(self.source)
+
+    def removeElements(self, elements, offsets=None, runUpdate=True): 
+        r'''
+        Removes `elements` which can be Music21Objects or Timespans 
+        (a single one or a list) from this Tree.
+        
+        Much safer (for non-timespans) if a list of offsets is used but it is optional
+        
+        If runUpdate is False then the tree will be left with incorrect indices and
+        endTimes; but it can speed up operations where an element is going to be removed
+        and then immediately replaced: i.e., where the position of an element has changed        
+        '''
+        initialPosition = self.lowestPosition()
+        initialEndTime = self.endTime
+        if hasattr(elements, 'offset'): # a music21 object or an PitchedTimespan
+            elements = [elements]
+        if offsets is not None and not common.isListLike(offsets):
+            offsets = [offsets]
+        
+        if offsets is not None and len(elements) != len(offsets):
+            raise TimespanTreeException(
+                "Number of elements and number of offsets must be the same")
+
+        
+        for i, el in enumerate(elements):
+            if offsets is not None:
+                self._removeElementAtPosition(el, offsets[i]) 
+            else:
+                self._removeElementAtPosition(el, el.offset)
+        
+        if runUpdate:
+            self._updateNodes(initialPosition, initialEndTime)
+
+
+
     def index(self, element, offset=None):
         r'''
-        Gets index of and element or `Timespan` in tree.
+        Gets index of an element or `Timespan` in tree.
         
         Since Timespans do not have .sites, there is only one offset to deal with...
 
@@ -1455,6 +1472,12 @@ class TimespanTree(OffsetTree):
     def __init__(self, elements=None, source=None):
         super(TimespanTree, self).__init__(elements, source)
     
+
+    def removeTimespanList(self, elements, offsets=None, runUpdate=True):
+        self.removeElements(elements, offsets, runUpdate)
+
+    def removeTimespan(self, elements, offsets=None, runUpdate=True):
+        self.removeTimespanList(elements, offsets, runUpdate)
     
     def findNextPitchedTimespanInSameStreamByClass(self, pitchedTimespan, classList=None):
         r'''
