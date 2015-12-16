@@ -213,7 +213,8 @@ class Instrument(base.Music21Object):
         self.instrumentId = idNew
          
 
-    def autoAssignMidiChannel(self, usedChannels=[]): # CORRECT! # pylint: disable=dangerous-default-value
+    # the empty list as default is actually CORRECT!
+    def autoAssignMidiChannel(self, usedChannels=[]): # pylint: disable=dangerous-default-value
         '''
         Assign an unused midi channel given a list of
         used channels.
@@ -268,7 +269,8 @@ class Instrument(base.Music21Object):
                     self.midiChannel = ch
                     return ch
             return 0
-            #raise InstrumentException("we are out of midi channels and this was not already detected PROGRAM BUG!")
+            #raise InstrumentException("we are out of midi channels and this " + 
+            #            "was not already detected PROGRAM BUG!")
 
 
 #-------------------------------------------------------------------------------
@@ -1794,6 +1796,7 @@ def fromString(instrumentString):
     >>> t8.transposition
     <music21.interval.Interval m3>
     """
+    # pylint: disable=undefined-variable
     from music21.languageExcerpts import instrumentLookup
     allCombinations = _combinations(instrumentString)
     # First task: Find the best instrument.
@@ -1803,14 +1806,15 @@ def fromString(instrumentString):
     for substring in allCombinations:
         try:
             if six.PY2:
-                englishName = instrumentLookup.allToBestName[unicode(substring.lower())] # pylint: disable=undefined-variable
+                uss = unicode(substring.lower()) #@UndefinedVariable
+                englishName = instrumentLookup.allToBestName[uss]
             else:
                 englishName = instrumentLookup.allToBestName[substring.lower()]
             className = instrumentLookup.bestNameToInstrumentClass[englishName]
             thisInstClass = globals()[className]        
             thisInstClassParentClasses = [parentcls.__name__ for parentcls in thisInstClass.mro()]
-            if 'Instrument' not in thisInstClassParentClasses or \
-                'Music21Object' not in thisInstClassParentClasses:
+            if ('Instrument' not in thisInstClassParentClasses or 
+                    'Music21Object' not in thisInstClassParentClasses):
                 # little bit of security against calling another global...
                 raise KeyError
 
@@ -1826,7 +1830,8 @@ def fromString(instrumentString):
         except KeyError:
             pass
     if bestInstClass is None:
-        raise InstrumentException("Could not match string with instrument: {0}".format(instrumentString))
+        raise InstrumentException(
+            "Could not match string with instrument: {0}".format(instrumentString))
     if bestName not in instrumentLookup.transposition:
         return bestInstrument
 
@@ -1835,7 +1840,8 @@ def fromString(instrumentString):
     for substring in allCombinations:
         try:
             if six.PY2:
-                bestPitch = instrumentLookup.pitchFullNameToName[unicode(substring.lower())] # pylint: disable=undefined-variable
+                uss = unicode(substring.lower()) # @UndefinedVariable
+                bestPitch = instrumentLookup.pitchFullNameToName[uss] 
             else:
                 bestPitch = instrumentLookup.pitchFullNameToName[substring.lower()]
             bestInterval = instrumentLookup.transposition[bestName][bestPitch]
@@ -2028,7 +2034,8 @@ class Test(unittest.TestCase):
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
         self.assertEqual(len(post.parts[0].notes), 12)
 
-        self.assertEqual([n.offset for n in post.parts[0].notes], [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 9.0, 10.0, 11.0, 12.0, 13.0])
+        self.assertEqual([n.offset for n in post.parts[0].notes], 
+                         [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 9.0, 10.0, 11.0, 12.0, 13.0])
 
         #environLocal.printDebug(['post processing'])
         #post.show('t')
@@ -2068,7 +2075,8 @@ class Test(unittest.TestCase):
         for n in ppn:
             offsetList.append(n.offset)
 
-        self.assertEqual(offsetList, [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 9.0, 10.0, 11.0, 12.0, 13.0, 20.0])
+        self.assertEqual(offsetList, 
+                         [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 9.0, 10.0, 11.0, 12.0, 13.0, 20.0])
 
 
     def testPartitionByInstrumentF(self):

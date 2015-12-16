@@ -610,21 +610,12 @@ class ClassDocumenter(ObjectDocumenter):
         '''
         The music21 _DOC_ORDER definition for a documented class:
 
-        >>> klass = stream.Stream
+        >>> klass = dynamics.Dynamic
         >>> documenter = documentation.documenters.ClassDocumenter(klass)
         >>> for name in documenter.docOrder:
         ...     name
-        ...
-        'append'
-        'insert'
-        'insertAndShift'
-        'notes'
-        'pitches'
-        'transpose'
-        'augmentOrDiminish'
-        'scaleOffsets'
-        'scaleDurations'
-
+        'longName'
+        'englishName'
         '''
         self._docOrder = getattr(self.referent, '_DOC_ORDER', [])
         return self._docOrder
@@ -743,6 +734,7 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.stream.Stream.beatAndMeasureFromOffset
         music21.stream.core.StreamCoreMixin:
         - music21.stream.core.StreamCoreMixin.asTimespans
+        - music21.stream.core.StreamCoreMixin.asTree
         - music21.stream.core.StreamCoreMixin.coreGatherMissingSpanners
         - music21.stream.core.StreamCoreMixin.elementsChanged        
         '''
@@ -771,11 +763,14 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.base.Music21Object.quarterLength
         music21.stream.Stream:
         - music21.stream.Stream.atSoundingPitch
+        - music21.stream.Stream.clef
         - music21.stream.Stream.duration
         - music21.stream.Stream.elements
         - music21.stream.Stream.finalBarline
+        - music21.stream.Stream.keySignature
         - music21.stream.Stream.metadata
         - music21.stream.Stream.seconds
+        - music21.stream.Stream.timeSignature
 
         '''
         return self._inheritedReadwritePropertiesMapping
@@ -790,16 +785,26 @@ class ClassDocumenter(ObjectDocumenter):
         >>> for method in documenter.methods[:10]:
         ...     method
         ...
-        <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.activateVariants>
-        <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.addGroupForElements>
-        <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.allPlayingWhileSounding>
-        <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.analyze>
-        <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.append>
-        <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.attachIntervalsBetweenStreams>
-        <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.attachMelodicIntervals>
-        <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.attributeCount>
-        <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.augmentOrDiminish>
-        <music21.documentation.documenters.MethodDocumenter: music21.stream.Stream.beatAndMeasureFromOffset>
+        <music21.documentation.documenters.MethodDocumenter: 
+            music21.stream.Stream.activateVariants>
+        <music21.documentation.documenters.MethodDocumenter: 
+            music21.stream.Stream.addGroupForElements>
+        <music21.documentation.documenters.MethodDocumenter: 
+            music21.stream.Stream.allPlayingWhileSounding>
+        <music21.documentation.documenters.MethodDocumenter: 
+            music21.stream.Stream.analyze>
+        <music21.documentation.documenters.MethodDocumenter: 
+            music21.stream.Stream.append>
+        <music21.documentation.documenters.MethodDocumenter: 
+            music21.stream.Stream.attachIntervalsBetweenStreams>
+        <music21.documentation.documenters.MethodDocumenter: 
+            music21.stream.Stream.attachMelodicIntervals>
+        <music21.documentation.documenters.MethodDocumenter: 
+            music21.stream.Stream.attributeCount>
+        <music21.documentation.documenters.MethodDocumenter: 
+            music21.stream.Stream.augmentOrDiminish>
+        <music21.documentation.documenters.MethodDocumenter: 
+            music21.stream.Stream.beatAndMeasureFromOffset>
         '''
         return self._methods
 
@@ -847,12 +852,16 @@ class ClassDocumenter(ObjectDocumenter):
         >>> for prop in documenter.readwriteProperties:
         ...     prop
         ...
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.atSoundingPitch>
+        <music21.documentation.documenters.AttributeDocumenter: 
+            music21.stream.Stream.atSoundingPitch>
+        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.clef>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.duration>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.elements>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.finalBarline>
+        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.keySignature>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.metadata>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.seconds>
+        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.timeSignature>
 
         '''
         return self._readwriteProperties
@@ -1216,27 +1225,13 @@ class ModuleDocumenter(ObjectDocumenter):
     ...     documenter.namesMapping.items())):
     ...     print("%s %s" % (reference, referent))
     ...
-    ContiguousSegmentOfNotes <music21.documentation.documenters.ClassDocumenter: music21.serial.ContiguousSegmentOfNotes>
-    HistoricalTwelveToneRow <music21.documentation.documenters.ClassDocumenter: music21.serial.HistoricalTwelveToneRow>
-    ToneRow <music21.documentation.documenters.ClassDocumenter: music21.serial.ToneRow>
-    TwelveToneMatrix <music21.documentation.documenters.ClassDocumenter: music21.serial.TwelveToneMatrix>
-    TwelveToneRow <music21.documentation.documenters.ClassDocumenter: music21.serial.TwelveToneRow>
-    findMultisets <music21.documentation.documenters.FunctionDocumenter: music21.serial.findMultisets>
-    findSegments <music21.documentation.documenters.FunctionDocumenter: music21.serial.findSegments>
-    findTransformedSegments <music21.documentation.documenters.FunctionDocumenter: music21.serial.findTransformedSegments>
-    findTransposedAndInvertedMultisets <music21.documentation.documenters.FunctionDocumenter: music21.serial.findTransposedAndInvertedMultisets>
-    findTransposedMultisets <music21.documentation.documenters.FunctionDocumenter: music21.serial.findTransposedMultisets>
-    findTransposedSegments <music21.documentation.documenters.FunctionDocumenter: music21.serial.findTransposedSegments>
-    getContiguousSegmentsOfLength <music21.documentation.documenters.FunctionDocumenter: music21.serial.getContiguousSegmentsOfLength>
-    getHistoricalRowByName <music21.documentation.documenters.FunctionDocumenter: music21.serial.getHistoricalRowByName>
-    labelMultisets <music21.documentation.documenters.FunctionDocumenter: music21.serial.labelMultisets>
-    labelSegments <music21.documentation.documenters.FunctionDocumenter: music21.serial.labelSegments>
-    labelTransformedSegments <music21.documentation.documenters.FunctionDocumenter: music21.serial.labelTransformedSegments>
-    labelTransposedAndInvertedMultisets <music21.documentation.documenters.FunctionDocumenter: music21.serial.labelTransposedAndInvertedMultisets>
-    labelTransposedMultisets <music21.documentation.documenters.FunctionDocumenter: music21.serial.labelTransposedMultisets>
-    labelTransposedSegments <music21.documentation.documenters.FunctionDocumenter: music21.serial.labelTransposedSegments>
-    pcToToneRow <music21.documentation.documenters.FunctionDocumenter: music21.serial.pcToToneRow>
-    rowToMatrix <music21.documentation.documenters.FunctionDocumenter: music21.serial.rowToMatrix>
+    HistoricalTwelveToneRow <...ClassDocumenter: music21.serial.HistoricalTwelveToneRow>
+    ToneRow <...ClassDocumenter: music21.serial.ToneRow>
+    TwelveToneMatrix <...ClassDocumenter: music21.serial.TwelveToneMatrix>
+    TwelveToneRow <...ClassDocumenter: music21.serial.TwelveToneRow>
+    getHistoricalRowByName <...FunctionDocumenter: music21.serial.getHistoricalRowByName>
+    pcToToneRow <...FunctionDocumenter: music21.serial.pcToToneRow>
+    rowToMatrix <...FunctionDocumenter: music21.serial.rowToMatrix>
 
     >>> documenter.rstCrossReferenceString
     ':mod:`~music21.serial`'
@@ -1333,7 +1328,6 @@ class ModuleDocumenter(ObjectDocumenter):
         >>> for classDocumenter in documenter.classDocumenters:
         ...     print(classDocumenter.referentPackagesystemPath)
         ...
-        music21.serial.ContiguousSegmentOfNotes
         music21.serial.HistoricalTwelveToneRow
         music21.serial.ToneRow
         music21.serial.TwelveToneMatrix
@@ -1366,20 +1360,7 @@ class ModuleDocumenter(ObjectDocumenter):
         >>> for functionDocumenter in documenter.functionDocumenters:
         ...     print(functionDocumenter.referentPackagesystemPath)
         ...
-        music21.serial.findMultisets
-        music21.serial.findSegments
-        music21.serial.findTransformedSegments
-        music21.serial.findTransposedAndInvertedMultisets
-        music21.serial.findTransposedMultisets
-        music21.serial.findTransposedSegments
-        music21.serial.getContiguousSegmentsOfLength
         music21.serial.getHistoricalRowByName
-        music21.serial.labelMultisets
-        music21.serial.labelSegments
-        music21.serial.labelTransformedSegments
-        music21.serial.labelTransposedAndInvertedMultisets
-        music21.serial.labelTransposedMultisets
-        music21.serial.labelTransposedSegments
         music21.serial.pcToToneRow
         music21.serial.rowToMatrix
 
@@ -1478,7 +1459,7 @@ class CorpusDocumenter(Documenter):
         result.extend(self.rstEditingWarningFormat)
         result.extend(self.rstCorpusIntroductionFormat)
         # TODO: use... common.getCorpusContentDirs to make sure nothing is missed.
-        for directoryInformation in corpus.getWorkReferences():
+        for directoryInformation in corpus.corpora.CoreCorpus().getWorkReferences():
             result.extend(self.getRstComposerDictFormat(directoryInformation))
         return result
 

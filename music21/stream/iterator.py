@@ -17,7 +17,7 @@ StreamIterators are explicitly allowed to access private methods on streams.
 import unittest
 
 from music21 import common
-from music21.stream import filter
+from music21.stream import filters
 from music21.exceptions21 import StreamException
 
 from music21.ext import six
@@ -57,7 +57,7 @@ class StreamIterator(object):
     '''
     def __init__(self, 
                  srcStream, 
-                 filters=None, 
+                 filterList=None, 
                  restoreActiveSites=True,
                  activeInformation=None):
 
@@ -76,16 +76,16 @@ class StreamIterator(object):
         self.cleanupOnStop = False
         self.restoreActiveSites = restoreActiveSites
 
-        if filters is None:
-            filters = []
-        elif not common.isIterable(filters):
-            filters = [filters]
-        elif isinstance(filters, tuple) or isinstance(filters, set):
-            filters = list(filters) # mutable....
+        if filterList is None:
+            filterList = []
+        elif not common.isIterable(filterList):
+            filterList = [filterList]
+        elif isinstance(filterList, tuple) or isinstance(filterList, set):
+            filterList = list(filterList) # mutable....
         # self.filters is a list of expressions that
         # return True or False for an element for
         # whether it should be yielded.
-        self.filters = filters
+        self.filters = filterList
         self._len = None
         self._matchingElements = None
 
@@ -303,7 +303,7 @@ class StreamIterator(object):
         >>> sI.notes is sI
         True
         >>> sI.filters
-        [<music21.stream.filter.ClassFilter NotRest>]
+        [<music21.stream.filters.ClassFilter NotRest>]
         
         >>> sI.matchingElements()
         [<music21.note.Note C>, <music21.note.Note D>, 
@@ -587,7 +587,7 @@ class StreamIterator(object):
         <music21.note.Rest rest>
         
         '''
-        self.addFilter(filter.ClassFilter(classFilterList))
+        self.addFilter(filters.ClassFilter(classFilterList))
         return self
 
     def getElementsNotOfClass(self, classFilterList):
@@ -619,7 +619,7 @@ class StreamIterator(object):
         >>> len(found)
         25
         '''
-        self.addFilter(filter.ClassNotFilter(classFilterList))
+        self.addFilter(filters.ClassNotFilter(classFilterList))
         return self
         
     def getElementsByGroup(self, groupFilterList):
@@ -647,7 +647,7 @@ class StreamIterator(object):
         D
         E
         '''        
-        self.addFilter(filter.GroupFilter(groupFilterList))
+        self.addFilter(filters.GroupFilter(groupFilterList))
         return self
 
 
@@ -741,7 +741,8 @@ class StreamIterator(object):
         >>> out5 = list(st1.iter.getElementsByOffset(1, 2, includeEndBoundary=False))
         >>> len(out5)
         0
-        >>> out6 = list(st1.iter.getElementsByOffset(1, 2, includeEndBoundary=False, mustBeginInSpan=False))
+        >>> out6 = list(st1.iter.getElementsByOffset(1, 2, includeEndBoundary=False,
+        ...                                          mustBeginInSpan=False))
         >>> len(out6)
         1
         >>> out6[0].step
@@ -763,7 +764,8 @@ class StreamIterator(object):
 
         To change this behavior set includeElementsThatEndAtStart=False
 
-        >>> out9 = list(st1.iter.getElementsByOffset(2, 4, mustBeginInSpan=False, includeElementsThatEndAtStart=False))
+        >>> out9 = list(st1.iter.getElementsByOffset(2, 4, mustBeginInSpan=False, 
+        ...                                          includeElementsThatEndAtStart=False))
         >>> len(out9)
         1
         >>> [el.step for el in out9]
@@ -821,7 +823,8 @@ class StreamIterator(object):
         1
         >>> out3b[0].step
         'C'
-        >>> out3b = list(st1.iter.getElementsByOffset(1.0, 3.001, mustFinishInSpan=True, mustBeginInSpan=False))
+        >>> out3b = list(st1.iter.getElementsByOffset(1.0, 3.001, mustFinishInSpan=True, 
+        ...                                           mustBeginInSpan=False))
         >>> len(out3b)
         1
         >>> out3b[0].step
@@ -836,7 +839,8 @@ class StreamIterator(object):
         >>> out5 = list(st1.iter.getElementsByOffset(1.0, 2.0, includeEndBoundary=False))
         >>> len(out5)
         0
-        >>> out6 = list(st1.iter.getElementsByOffset(1.0, 2.0, includeEndBoundary=False, mustBeginInSpan=False))
+        >>> out6 = list(st1.iter.getElementsByOffset(1.0, 2.0, includeEndBoundary=False, 
+        ...                                          mustBeginInSpan=False))
         >>> len(out6)
         1
         >>> out6[0].step
@@ -849,7 +853,7 @@ class StreamIterator(object):
 
         :rtype: StreamIterator
         '''        
-        self.addFilter(filter.OffsetFilter(offsetStart, offsetEnd, includeEndBoundary,
+        self.addFilter(filters.OffsetFilter(offsetStart, offsetEnd, includeEndBoundary,
                                            mustFinishInSpan, mustBeginInSpan,
                                            includeElementsThatEndAtStart))
         return self
@@ -869,7 +873,7 @@ class StreamIterator(object):
         <music21.note.Note C>
         <music21.note.Note D>
         '''
-        self.addFilter(filter.ClassFilter('NotRest'))
+        self.addFilter(filters.ClassFilter('NotRest'))
         return self
 
     @property
@@ -895,28 +899,28 @@ class StreamIterator(object):
         <music21.note.Note C>
         <music21.note.Note D>        
         '''
-        self.addFilter(filter.ClassFilter('GeneralNote'))
+        self.addFilter(filters.ClassFilter('GeneralNote'))
         return self
 
     @property
     def parts(self):
-        self.addFilter(filter.ClassFilter('Part'))
+        self.addFilter(filters.ClassFilter('Part'))
         return self
 
 
     @property
     def spanners(self):
-        self.addFilter(filter.ClassFilter('Spanner'))
+        self.addFilter(filters.ClassFilter('Spanner'))
         return self
 
     @property
     def variants(self):
-        self.addFilter(filter.ClassFilter('Variant'))
+        self.addFilter(filters.ClassFilter('Variant'))
         return self
 
     @property
     def voices(self):
-        self.addFilter(filter.ClassFilter('Voice'))
+        self.addFilter(filters.ClassFilter('Voice'))
         return self
 
 #------------------------------------------------------------------------------
@@ -957,7 +961,8 @@ class RecursiveIterator(StreamIterator):
     <music21.stream.Part Bass>
     ...
     
-    >>> hasExpressions = lambda el, i: True if (hasattr(el, 'expressions') and el.expressions) else False
+    >>> hasExpressions = lambda el, i: True if (hasattr(el, 'expressions') 
+    ...       and el.expressions) else False
     >>> expressive = b.recurse().addFilter(hasExpressions)
     >>> expressive
     <music21.stream.iterator.RecursiveIterator for Score:0x10487f550 @:0>
@@ -980,20 +985,20 @@ class RecursiveIterator(StreamIterator):
     '''
     def __init__(self, 
                  srcStream, 
-                 filters=None, 
+                 filterList=None, 
                  restoreActiveSites=True, 
                  activeInformation=None,
                  streamsOnly=False, # to be removed
                  includeSelf=False, # to be removed
                  ): #, parentIterator=None):
         super(RecursiveIterator, self).__init__(srcStream, 
-                                                filters, 
+                                                filterList, 
                                                 restoreActiveSites,
                                                 activeInformation=activeInformation)
         self.returnSelf = includeSelf
         self.includeSelf = includeSelf
         if streamsOnly is True:
-            self.filters.append(filter.ClassFilter('Stream'))
+            self.filters.append(filters.ClassFilter('Stream'))
         self.recursiveIterator = None
         # not yet used.
         #self.parentIterator = None
@@ -1049,7 +1054,7 @@ class RecursiveIterator(StreamIterator):
                 self.recursiveIterator = RecursiveIterator(
                                             srcStream=e,
                                             restoreActiveSites=self.restoreActiveSites,
-                                            filters=self.filters, # shared list...
+                                            filterList=self.filters, # shared list...
                                             activeInformation=self.activeInformation, # shared dict
                                             includeSelf=False, # always for inner streams
                                             #parentIterator=self

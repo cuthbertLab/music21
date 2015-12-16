@@ -757,6 +757,7 @@ class Test(unittest.TestCase):
         # self.assertEqual(b.activeSite, None)
         instObj = b.getInstrument()
         self.assertEqual(instObj.partName, u'Violone e Organo')
+        self.assertEqual(b.partName, u'Violone e Organo')
 
 
 
@@ -1499,6 +1500,7 @@ class Test(unittest.TestCase):
         s2 = Stream()
         n1 = note.Note()
         c1 = clef.AltoClef()
+        c1.priority = -1 # perhaps clefs should sort before streams?
 
         s1.append(n1) # this is the model of a stream with a single part
         s2.append(s1)
@@ -1508,14 +1510,14 @@ class Test(unittest.TestCase):
         # from the lower level stream, we should be able to get to the 
         # higher level clef
         post = s1.getContextByClass(clef.Clef)
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef), post)
 
         # we can also use getClefs to get this from s1 or s2
         post = s1.getClefs()[0]
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef), post)
 
         post = s2.getClefs()[0]
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef), post)
 
         #environLocal.printDebug(['sites.get() of s1', s1.sites.get()])
 
@@ -1526,16 +1528,16 @@ class Test(unittest.TestCase):
         
         # we cannot get the alto clef from s3; this makes sense
         post = s3.getClefs()[0]
-        self.assertEqual(isinstance(post, clef.TrebleClef), True)
+        self.assertTrue(isinstance(post, clef.TrebleClef), post)
 
         # s1 has both streams as sites
-        self.assertEqual(s3 in s1.sites, True)
-        self.assertEqual(s2 in s1.sites, True)
+        self.assertIn(s3, s1.sites)
+        self.assertIn(s2, s1.sites)
 
-        # but if we search s1, shuold not it find an alto clef?
+        # but if we search s1, should not it find an alto clef?
         post = s1.getClefs()
         #environLocal.printDebug(['should not be treble clef:', post])
-        self.assertEqual(isinstance(post[0], clef.AltoClef), True)
+        self.assertTrue(isinstance(post[0], clef.AltoClef), post[0])
 
 
         # this all works fine
@@ -1551,7 +1553,7 @@ class Test(unittest.TestCase):
         #sMeasures.show('t')
         # the third element is a Note; we get it from flattening during
         # makeMeasures
-        self.assertEqual(isinstance(sMeasures[0][2], note.Note), True)
+        self.assertTrue(isinstance(sMeasures[0][2], note.Note), sMeasures[0][2])
 
         # this shows the proper outpt withs the proper clef.
         #sMeasures.show()
@@ -1574,6 +1576,7 @@ class Test(unittest.TestCase):
         sOuter.id = 'outerStream'
         sOuter.append(sInner)
         c1 = clef.AltoClef()
+        c1.priority = -1
         sOuter.insert(0, c1)
         
         # this works fine
@@ -1602,7 +1605,7 @@ class Test(unittest.TestCase):
         post = sInnerFlat.getContextByClass(clef.Clef)
         self.assertEqual(isinstance(post, clef.AltoClef), True, "post %r is not an AltoClef" % post)
 
-        # 2014 April -- timeSpans version -- not needed...
+        # 2014 April -- tree version -- not needed...
         ## this will only work if the callerFirst is manually set to sInnerFlat
         ## otherwise, this interprets the DefinedContext object as the first 
         ## caller
@@ -1616,42 +1619,47 @@ class Test(unittest.TestCase):
         '''
         from music21 import sites
         
-        s1 = Stream()
-        s1.id = 's1'
-        s2 = Stream()
-        s2.id = 's2'
+        s1 = Stream(id='s1')
         n1 = note.Note()
-        c1 = clef.AltoClef()
         
         s1.append(n1) # this is the model of a stream with a single part
+
+        s2 = Stream(id='s2')
         s2.append(s1)
+        
+        c1 = clef.AltoClef()
+        c1.priority = -1
         s2.insert(0, c1)
         
         # this works fine
         post = s1.getContextByClass(clef.Clef)
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef))
 
         # this is a key tool of the serial reverse search
         post = s2.getElementAtOrBefore(0, [clef.Clef])
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
-
+        self.assertTrue(isinstance(post, clef.AltoClef))
 
         # this is a key tool of the serial reverse search
         post = s2.flat.getElementAtOrBefore(0, [clef.Clef])
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef))
 
         # s1 is in s2; but s1.flat is not in s2! -- not true if isFlat is true
         self.assertEqual(s2.elementOffset(s1), 0.0)
         self.assertRaises(sites.SitesException, s2.elementOffset, s1.flat)
         
 
-        # this did not work before; the clef is in s2; its not in a context of s2
+        # getContextByClass will not work; the clef is in s2; its not in a context of s2
         post = s2.getContextByClass(clef.Clef)
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertIsNone(post)
 
-        # we can find the clef from the flat version of 21
+        # but s2.clef works...
+        self.assertTrue(isinstance(s2.clef, clef.AltoClef))
+
+        # we can find the clef from the flat version of s1 also:
         post = s1.flat.getContextByClass(clef.Clef)
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef))
+
+
 
 
     def testContextNestedD(self):
@@ -1691,7 +1699,9 @@ class Test(unittest.TestCase):
         self.assertTrue(isinstance(post, clef.AltoClef))
         
         # now we in sort a clef in s2; s2 will get this clef first
-        s2.insert(0, clef.TenorClef())
+        tenorC = clef.TenorClef()
+        tenorC.priority = -1
+        s2.insert(0, tenorC)
         # only second part should have tenor clef
         post = s2.getClefs()[0]
         self.assertTrue(isinstance(post, clef.TenorClef))
@@ -4994,12 +5004,13 @@ class Test(unittest.TestCase):
         s = corpus.parse('bwv66.6')
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):
-                post = m.getContextByClass(clef.Clef)
-                self.assertEqual(isinstance(post, clef.Clef), True)
-                post = m.getContextByClass(meter.TimeSignature)
-                self.assertEqual(isinstance(post, meter.TimeSignature), True)
-                post = m.getContextByClass(key.KeySignature)
-                self.assertEqual(isinstance(post, key.KeySignature), True)
+                n = m.notes[0]
+                post = n.getContextByClass(clef.Clef)
+                self.assertTrue(isinstance(post, clef.Clef), post)
+                post = n.getContextByClass(meter.TimeSignature)
+                self.assertTrue(isinstance(post, meter.TimeSignature), post)
+                post = n.getContextByClass(key.KeySignature)
+                self.assertTrue(isinstance(post, key.KeySignature), post)
 
 
 
@@ -5574,8 +5585,9 @@ class Test(unittest.TestCase):
         self.assertEqual(list(p1FlatNotes.derivation.chain()), [p1Flat, p1])
 
 
-        # we cannot do this, as each call to flat produces a new Stream
-        self.assertEqual(p1.flat.notesAndRests.derivation.origin is p1.flat, False)
+        # we cannot do this, as each call to flat could produce a new Stream
+        #self.assertEqual(p1.flat.notesAndRests.derivation.origin is p1.flat, False)
+        
         # chained calls to .derives from can be used
         self.assertEqual(p1.flat.notesAndRests.derivation.origin.derivation.origin is p1, True)
         
@@ -5731,9 +5743,9 @@ class Test(unittest.TestCase):
         self.assertEqual(id(m1.activeSite), id(s1))
 
         # try imported
-        s = corpus.parse('madrigal.5.8.rntxt')
-        p = s[1]  # for test, not .parts
-        m = p[2]  # for test, not .getElementsByClass('Measure')
+        s = corpus.parse('bwv66.6')
+        p = s.iter.getElementsByClass('Part')[0]  # for test, not .parts
+        m = p.iter.getElementsByClass('Measure')[2]  # for test, not .getElementsByClass('Measure')
         rn = m[2]
 
         self.assertEqual(id(rn.activeSite), id(m))
@@ -7549,7 +7561,7 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test, 'verbose') #, runTest='testGetElementAfterElement')
+    music21.mainTest(Test, 'verbose') #, runTest='testDeepcopyActiveSite') 
 
 #------------------------------------------------------------------------------
 # eof

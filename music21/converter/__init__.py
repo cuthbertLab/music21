@@ -425,6 +425,7 @@ class Converter(object):
         return os.path.join(directory, 'm21-' + _version.__version__ + '-' + 
                                             common.getMd5(url) + ext)
 
+    # pylint: disable=redefined-builtin
     def parseFileNoPickle(self, fp, number=None, 
                           format=None, forceSource=False, **keywords): # @ReservedAssignment
         '''
@@ -588,7 +589,8 @@ class Converter(object):
         Note that this checks the user Environment
         `autoDownlaad` setting before downloading.
 
-        >>> #_DOCS_SHOW jeanieLightBrownURL = 'https://github.com/cuthbertLab/music21/raw/master/music21/corpus/leadSheet/fosterBrownHair.mxl'
+        >>> jeanieLightBrownURL = ('https://github.com/cuthbertLab/music21/raw/master' + 
+        ...        '/music21/corpus/leadSheet/fosterBrownHair.mxl')
         >>> c = converter.Converter()
         >>> #_DOCS_SHOW c.parseURL(jeanieLightBrownURL)
         >>> #_DOCS_SHOW jeanieStream = c.stream
@@ -974,7 +976,7 @@ class Converter(object):
 #-------------------------------------------------------------------------------
 # module level convenience methods
 
-
+# pylint: disable=redefined-builtin
 def parseFile(fp, number=None, format=None, forceSource=False, **keywords):  #@ReservedAssignment
     '''
     Given a file path, attempt to parse the file into a Stream.
@@ -984,6 +986,7 @@ def parseFile(fp, number=None, format=None, forceSource=False, **keywords):  #@R
     v.parseFile(fp, number=number, format=format, forceSource=forceSource, **keywords)
     return v.stream
 
+# pylint: disable=redefined-builtin
 def parseData(dataStr, number=None, format=None, **keywords): # @ReservedAssignment
     '''
     Given musical data represented within a Python string, attempt to parse the
@@ -993,6 +996,7 @@ def parseData(dataStr, number=None, format=None, **keywords): # @ReservedAssignm
     v.parseData(dataStr, number=number, format=format, **keywords)
     return v.stream
 
+# pylint: disable=redefined-builtin
 def parseURL(url, number=None, format=None, forceSource=False, **keywords): # @ReservedAssignment
     '''
     Given a URL, attempt to download and parse the file into a Stream. Note:
@@ -1558,7 +1562,7 @@ class Test(unittest.TestCase):
         countTies = 0
         countStartTies = 0
         for p in a.parts:
-            post = p.getContextByClass('Clef')
+            post = p.recurse().notes[0].getContextByClass('Clef')
             self.assertEqual(isinstance(post, clef.TenorClef), True)
             for n in p.flat.notes:
                 if n.tie != None:
@@ -1819,7 +1823,8 @@ class Test(unittest.TestCase):
         # These strings aren't valid documents, but they are enough to pass the detection we're
         # testing in parseData(). But it does mean we'll be testing in a strange way.
         meiString = '<?xml version="1.0" encoding="UTF-8"?><mei><note/></mei>'
-        #mxlString = '<?xml version="1.0" encoding="UTF-8"?><score-partwise><note/></score-partwise>'
+        #mxlString = ('<?xml version="1.0" encoding="UTF-8"?>' + 
+        #                '<score-partwise><note/></score-partwise>')
 
         # The "mei" module raises an MeiElementError with "meiString," so as long as that's raised,
         # we know that parseData() chose correctly.

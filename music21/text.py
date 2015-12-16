@@ -50,7 +50,8 @@ articleReference = {
     # french
     'fr' : ['le', 'la', 'les', 'un', 'une', 'des', 'du', 'de la', 'des'],
     # italian
-    'it' : ['il', 'lo', 'la', 'i', 'gli', 'le', 'un', 'uno', 'una', 'del', 'dello', 'della', 'dei', 'degli', 'delle'],
+    'it' : ['il', 'lo', 'la', 'i', 'gli', 'le', 'un', 'uno', 'una', 
+            'del', 'dello', 'della', 'dei', 'degli', 'delle'],
     }
 
 #-------------------------------------------------------------------------------
@@ -80,7 +81,8 @@ def assembleLyrics(streamIn, lineNumber=1):
             lyricObj = n.lyrics[lineNumber-1] # a list of lyric objs
         except IndexError:
             continue
-        #environLocal.printDebug(['lyricObj', 'lyricObj.text', lyricObj.text, 'lyricObj.syllabic', lyricObj.syllabic, 'word', word])
+        #environLocal.printDebug(['lyricObj', 'lyricObj.text', lyricObj.text, 
+        #    'lyricObj.syllabic', lyricObj.syllabic, 'word', word])
 
         # need to match case of non-defined syllabic attribute
         if lyricObj.text != '_': # continuation syllable in many pieces
@@ -162,7 +164,9 @@ def prependArticle(src, language=None):
 
 
 def postpendArticle(src, language=None):
-    '''Given a text string, if an article is found in a leading position, place it at the end with a comma. 
+    '''
+    Given a text string, if an article is found in a leading position, 
+    place it at the end with a comma. 
 
     
     >>> text.postpendArticle('The Ale is Dear')
@@ -577,11 +581,12 @@ class LanguageDetector(object):
         unicode or ascii. current languages: en, fr, de, it, cn
         
         >>> ld = text.LanguageDetector()
-        >>> ld.mostLikelyLanguage("Hello there, how are you doing today? I haven't seen you in a while.")
+        >>> ld.mostLikelyLanguage("Hello there, how are you doing today? " + 
+        ...                        "I haven't seen you in a while.")
         'en'
         >>> ld.mostLikelyLanguage("Ciao come stai? Sono molto lento oggi, ma non so perche.")
         'it'
-        >>> ld.mostLikelyLanguage("Credo in unum deum. Patrem omnipotentem. Factorum celi et terre")
+        >>> ld.mostLikelyLanguage("Credo in unum deum. Patrem omnipotentem. Factorum celi")
         'la'
         '''
         excTrigram = Trigram(excerpt)
@@ -615,7 +620,8 @@ class LanguageDetector(object):
         5 cn
         6 la
         7 nl
-        >>> numLang = ld.mostLikelyLanguageNumeric("Hello there, how are you doing today? I haven't seen you in a while.")
+        >>> numLang = ld.mostLikelyLanguageNumeric("Hello there, how are you doing today? " + 
+        ...                "I haven't seen you in a while.")
         >>> numLang
         1
         >>> ld.languageCodes[numLang - 1]
@@ -633,7 +639,8 @@ class LanguageDetector(object):
 #-------------------------------------------------------------------------------
 class Trigram(object):
     '''
-    See LanguageDector above.  From http://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
+    See LanguageDector above.  
+    From http://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
     
     The frequency of three character
     sequences is calculated.  When treated as a vector, this information
@@ -668,8 +675,9 @@ class Trigram(object):
     As an extra bonus, there is a method to make up nonsense words in the
     style of the Trigram's text.
 
-    #_DOCS_SHOW >>> reference_en.makeWords(30)
-    #_DOCS_SHOW My withillonquiver and ald, by now wittlectionsurper, may sequia, tory, I ad my notter. Marriusbabilly She lady for rachalle spen hat knong al elf
+    >>> #_DOCS_SHOW reference_en.makeWords(30)
+    My withillonquiver and ald, by now wittlectionsurper, may sequia, 
+    tory, I ad my notter. Marriusbabilly She lady for rachalle spen hat knong al elf
 
 
     '''    
@@ -816,8 +824,13 @@ class Test(unittest.TestCase):
         self.assertTrue(0.67 < ld.trigrams['fr'] - ld.trigrams['de'] < 0.70)
         self.assertTrue(0.99 < ld.trigrams['fr'] - ld.trigrams['cn'] < 1.0)
         
-        self.assertEqual('en', ld.mostLikelyLanguage(u"hello friends, this is a test of the ability of language detector to tell what language I am writing in."))
-        self.assertEqual('it', ld.mostLikelyLanguage(u"ciao amici! cosÃ¬ trovo in quale lingua ho scritto questo passaggio. Spero che troverÃ² che Ã¨ stata scritta in italiano"))
+        self.assertEqual('en', 
+                         ld.mostLikelyLanguage(u"hello friends, this is a test of the " + 
+                                               u"ability of language detector to " + 
+                                               u"tell what language I am writing in."))
+        self.assertEqual('it', ld.mostLikelyLanguage(
+            u"ciao amici! cosé trovo in quale lingua ho scritto questo passaggio. Spero che " + 
+            u"troverà che é stata scritta in italiano"))
 
         ## TODO: Replace
         #messiahGovernment = corpus.parse('handel/hwv56/movement1-13.md')

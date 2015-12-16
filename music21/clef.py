@@ -613,7 +613,8 @@ class Test(unittest.TestCase):
             self.assertEqual(c.sign, params[0])
             self.assertEqual(c.line, params[1])
             self.assertEqual(c.octaveChange, params[2])
-            self.assertEqual(isinstance(c, className), True, "Failed Conversion of classes: %s is not a %s" % (c, className))
+            self.assertEqual(isinstance(c, className), True, 
+                             "Failed Conversion of classes: %s is not a %s" % (c, className))
 
     def testContexts(self):
         from music21 import stream
@@ -626,7 +627,7 @@ class Test(unittest.TestCase):
         c1.offset = 0
         s1 = stream.Stream([c1, n1])
         
-        self.assertTrue(s1.getContextByClass(Clef) is c1)
+        self.assertTrue(s1.recurse().notes[0].getContextByClass(Clef) is c1)
             ## equally good: getContextsByClass(Clef)[0]
 
         del(s1)
@@ -666,7 +667,7 @@ class Test(unittest.TestCase):
         s3.append(n6)
         s3.makeMeasures()
         
-        self.assertTrue(n4.getContextByClass(stream.Measure) is n5.getContextByClass(stream.Measure))
+        self.assertIs(n4.getContextByClass(stream.Measure), n5.getContextByClass(stream.Measure))
         self.assertTrue(n4.getContextByClass(Clef) is bc1)
         self.assertTrue(n5.getContextByClass(Clef) is tc1)
         self.assertTrue(n6.getContextByClass(Clef) is tc1)

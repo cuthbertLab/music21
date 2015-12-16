@@ -34,13 +34,16 @@ class MetadataException(Music21Exception):
 class AnalysisException(Music21Exception):
     pass
 
-class TimespanException(Music21Exception):
+class TreeException(Music21Exception):
     pass
 
 class InstrumentException(Music21Exception):
     pass
 
 class Music21CommonException(Music21Exception):
+    pass
+
+class CorpusException(Music21Exception):
     pass
 
 # warnings

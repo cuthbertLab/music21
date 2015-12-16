@@ -9,59 +9,46 @@ from music21 import tinyNotation
 from music21 import environment
 environLocal = environment.Environment()
 
+class DotsMixin():
+    def dots(self, n, search, pm, t, parent):
+        '''
+        adds the appropriate number of dots to the right place.
+        '''
+        dots = len(search.group(1))
+        if dots == 1:
+            n.duration.dots = 1
+        elif dots == 2:
+            n.duration.dotGroups = (1, 1)
+        t = re.sub(pm, '', t)
+        return t
 
-
-class CadenceNoteToken(tinyNotation.NoteToken):
+class CadenceNoteToken(DotsMixin, tinyNotation.NoteToken):
     '''
     Subclass of NoteToken where 2.. represents a dotted dotted half note (that is, a dotted
     half tied to a dotted quarter) instead of a double dotted note.  This makes entering Trecento
-    music (which uses this note value often) much easier.  1.. and 4.. etc. are similarly transformed. 
+    music (which uses this note value often) much easier.  1.. and 4.. etc. 
+    are similarly transformed. 
     '''
-    def dots(self, n, search, pm, t, parent):
-        '''
-        adds the appropriate number of dots to the right place.
-        
-        Subclassed in TrecentoNotation where two dots has a different meaning.
-        '''
-        dots = len(search.group(1))
-        if dots == 1:
-            n.duration.dots = 1
-        elif dots == 2:
-            n.duration.dotGroups = (1, 1)
-        t = re.sub(pm, '', t)
-        return t
 
-class CadenceRestToken(tinyNotation.RestToken):
+class CadenceRestToken(DotsMixin, tinyNotation.RestToken):
     '''
-    Subclass of RestToken where 2.. represents a dotted dotted half note (that is, a dotted
-    half tied to a dotted quarter) instead of a double dotted note.  This makes entering Trecento
-    music (which uses this note value often) much easier.  1.. and 4.. etc. are similarly transformed. 
+    Subclass of RestToken where 2.. represents a dotted dotted half rest.
+    
+    See CadenceNoteToken for details 
     '''
-    def dots(self, n, search, pm, t, parent):
-        '''
-        adds the appropriate number of dots to the right place.
-        
-        Subclassed in TrecentoNotation where two dots has a different meaning.
-        '''
-        dots = len(search.group(1))
-        if dots == 1:
-            n.duration.dots = 1
-        elif dots == 2:
-            n.duration.dotGroups = (1, 1)
-        t = re.sub(pm, '', t)
-        return t
-
-
 
 class CadenceConverter(tinyNotation.Converter):
     '''
     Subclass of Tiny Notation that calls these tokens instead of the defaults    
     
     
-    >>> dLucaGloriaIncipit = alpha.trecento.trecentoCadence.CadenceConverter("6/8 c'2. d'8 c'4 a8 f4 f8 a4 c'4 c'8").parse().stream
+    >>> dLucaGloriaIncipit = alpha.trecento.trecentoCadence.CadenceConverter(
+    ...     "6/8 c'2. d'8 c'4 a8 f4 f8 a4 c'4 c'8").parse().stream
     >>> dLucaGloriaIncipit.rightBarline = 'final'
     >>> dLucaGloriaIncipit.elements
-    (<music21.stream.Measure 1 offset=0.0>, <music21.stream.Measure 2 offset=3.0>, <music21.stream.Measure 3 offset=6.0>)
+    (<music21.stream.Measure 1 offset=0.0>, 
+     <music21.stream.Measure 2 offset=3.0>, 
+     <music21.stream.Measure 3 offset=6.0>)
     '''
     def __init__(self, stringRep=""):
         super(CadenceConverter, self).__init__(stringRep)

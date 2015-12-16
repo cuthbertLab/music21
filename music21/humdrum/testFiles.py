@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+# pylint: disable=line-too-long
+
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 import re
@@ -15,7 +17,7 @@ r'''
 =2            =2
 *^            *^
 *     *       *     *^
-2F    2G      2a#    2b#    2c#
+2F    2G      2a#    2b#    2f#
 =3    =3      =3    =3
 *v    *v      *     *     *
 *             *v    *v    *v
@@ -26,7 +28,7 @@ r'''
 ''')
 
 
-fakeTest = re.sub(r"\s\s\s\s+", "\t", \
+fakeTest = re.sub(r"\s\s\s\s+", "\t", 
 r'''
 !! Global Comment
 !!!COM: Fake, Composer
@@ -54,6 +56,39 @@ r'''
 .        .              4E-                        4r     pp
 =3       =3             =3                         =3     =3
 *-        *-            *-                         *-     *-
+'''
+)
+
+strangeWTCOpening = re.sub(r"\s\s\s\s+", "\t", 
+r'''
+**kern
+*k[]
+*C:
+*M4/4
+*MM112
+=1
+*^
+*^    *
+8r    16r    2c\
+.    [8.e\    .
+16g/LL    .    .
+16cc/JJ    .    .
+16ee/LL    4e\]    .
+16g/    .    .
+16cc/    .    .
+16ee/JJ    .    .
+8r    16r    2c\
+.    [8.e\    .
+16g/LL    .    .
+16cc/JJ    .    .
+16ee/LL    4e\]    .
+16g/    .    .
+16cc/    .    .
+16ee/JJ    .    .
+=2    =2    =2
+1cc;/ 1g/ 1e/    1C/    1CC;\
+==|!    ==|!    ==|!
+*-    *-    *-
 '''
 )
 

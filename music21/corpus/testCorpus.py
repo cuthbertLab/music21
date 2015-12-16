@@ -155,16 +155,21 @@ class Test(unittest.TestCase):
         self.assertEqual(len(searchResults) > 0, True)
         # returns items in pairs: url and work number
         self.assertEqual(searchResults[0].sourcePath,
-            'http://impromastering.com/uploads/transcription_file/file/196/Giant_Steps__John_Coltrane_C.xml')
+            'http://impromastering.com/uploads/transcription_file/' + 
+            'file/196/Giant_Steps__John_Coltrane_C.xml')
 
 #     def testGetWorkList(self):
-#         self.assertEqual(len(corpus.getPaths('.md')) >= 38, True)
-#         workList = corpus.getWorkList('bach/artOfFugue_bwv1080', 1, '.zip')
+#         self.assertEqual(len(corpus.corpora.CoreCorpus().getPaths('.md')) >= 38, True)
+#         workList = corpus.corpora.CoreCorpus().getWorkList('bach/artOfFugue_bwv1080', 1, '.zip')
 #         self.assertEqual(len(workList), 1)
-#         self.assertEqual(len(corpus.getWorkList('handel/hwv56', (1, 1), '.md')), 1)
-#         self.assertEqual(len(corpus.getWorkList('handel/hwv56', '1-01', '.md')), 1)
-#         self.assertEqual(len(corpus.getWorkList('bach/artOfFugue_bwv1080')), 21)
-#         self.assertEqual(len(corpus.getWorkList('bach/artOfFugue_bwv1080', 1)), 1)
+#         self.assertEqual(len(
+#                corpus.corpora.CoreCorpus().getWorkList('handel/hwv56', (1, 1), '.md')), 1)
+#         self.assertEqual(len(
+#                corpus.corpora.CoreCorpus().getWorkList('handel/hwv56', '1-01', '.md')), 1)
+#         self.assertEqual(len(
+#                corpus.corpora.CoreCorpus().getWorkList('bach/artOfFugue_bwv1080')), 21)
+#         self.assertEqual(len(
+#                corpus.corpora.CoreCorpus().getWorkList('bach/artOfFugue_bwv1080', 1)), 1)
 # 
 #         # there are two versions of this file
 #         self.assertEqual(len(corpus.getWorkList('beethoven/opus18no1', 1)), 2)
@@ -181,9 +186,9 @@ class Test(unittest.TestCase):
 #             'bwv888', 'bwv889', 'bwv890', 'bwv891', 'bwv892', 'bwv893',
 #             ]:
 #             #print bwv
-#             self.assertEqual(len(corpus.getWorkList(bwv)), 2)
-#             self.assertEqual(len(corpus.getWorkList(bwv, 1)), 1)
-#             self.assertEqual(len(corpus.getWorkList(bwv, 2)), 1)
+#             self.assertEqual(len(corpus.corpora.CoreCorpus().getWorkList(bwv)), 2)
+#             self.assertEqual(len(corpus.corpora.CoreCorpus().getWorkList(bwv, 1)), 1)
+#             self.assertEqual(len(corpus.corpora.CoreCorpus().getWorkList(bwv, 2)), 1)
 
 #     def testWTCImport01(self):
 #         score = corpus.parse('bach/bwv846', 1)

@@ -42,8 +42,8 @@ class StreamFilter(object):
         returns a head that can be used with .format() to add additional
         elements.
         
-        >>> stream.filter.StreamFilter()._reprHead()
-        '<music21.stream.filter.StreamFilter {0}>'
+        >>> stream.filters.StreamFilter()._reprHead()
+        '<music21.stream.filters.StreamFilter {0}>'
         '''
         return '<{0}.{1} '.format(self.__module__, self.__class__.__name__) + '{0}>'
 
@@ -58,7 +58,7 @@ class IsFilter(StreamFilter):
     >>> n = note.Note('C#')
     >>> s.append(n)
     >>> s.append(note.Rest())
-    >>> for el in s.iter.addFilter(stream.filter.IsFilter(n)):
+    >>> for el in s.iter.addFilter(stream.filters.IsFilter(n)):
     ...     print(el is n)
     True    
 
@@ -70,7 +70,7 @@ class IsFilter(StreamFilter):
     >>> s.append(n)
     >>> r = note.Rest()
     >>> s.append(r)
-    >>> for el in s.iter.addFilter(stream.filter.IsFilter([n, r])):
+    >>> for el in s.iter.addFilter(stream.filters.IsFilter([n, r])):
     ...     print(el)
     <music21.note.Note C#>
     <music21.note.Rest rest>
@@ -146,9 +146,9 @@ class ClassFilter(StreamFilter):
     <music21.note.Rest rest>
     <music21.note.Note D>
 
-    >>> sI.filters.append(stream.filter.ClassFilter('Note'))
+    >>> sI.filters.append(stream.filters.ClassFilter('Note'))
     >>> sI.filters
-    [<music21.stream.filter.ClassFilter Note>]
+    [<music21.stream.filters.ClassFilter Note>]
     
     >>> for x in sI:
     ...     print(x)
@@ -193,9 +193,9 @@ class ClassNotFilter(ClassFilter):
     >>> s.append(note.Note('D'))
     >>> sI = s.__iter__()
 
-    >>> sI.filters.append(stream.filter.ClassNotFilter('Note'))
+    >>> sI.filters.append(stream.filters.ClassNotFilter('Note'))
     >>> sI.filters
-    [<music21.stream.filter.ClassNotFilter Note>]
+    [<music21.stream.filters.ClassNotFilter Note>]
     
     >>> for x in sI:
     ...     print(x)
@@ -222,7 +222,7 @@ class GroupFilter(StreamFilter):
     >>> s1.append(n1)
     >>> s1.append(n2)
     >>> s1.append(n3)
-    >>> GF = stream.filter.GroupFilter
+    >>> GF = stream.filters.GroupFilter
     
     >>> for thisNote in s1.__iter__().addFilter(GF("trombone")):
     ...     print(thisNote.name)
@@ -296,7 +296,8 @@ class OffsetFilter(StreamFilter):
                 return False
 
         elementEnd = opFrac(offset + dur.quarterLength)
-        if elementEnd < self.offsetStart:  # anything that finishes before the span ends is definitely out
+        if elementEnd < self.offsetStart:  
+            # anything that finishes before the span ends is definitely out
             return False
 
         if dur.quarterLength == 0:
@@ -305,7 +306,8 @@ class OffsetFilter(StreamFilter):
             elementIsZeroLength = False
 
 
-        # all the simple cases done! Now need to filter out those that are border cases depending on settings
+        # all the simple cases done! Now need to filter out those that 
+        # are border cases depending on settings
 
         if self.zeroLengthSearch is True and elementIsZeroLength is True:
             # zero Length Searches -- include all zeroLengthElements
@@ -317,7 +319,8 @@ class OffsetFilter(StreamFilter):
                 #environLocal.warn([elementEnd, offsetEnd, e])
                 return False
             if self.includeEndBoundary is False:
-                # we include the end boundary if the search is zeroLength -- otherwise nothing can be retrieved
+                # we include the end boundary if the search is zeroLength -- 
+                # otherwise nothing can be retrieved
                 if elementEnd == self.offsetEnd:
                     return False
 

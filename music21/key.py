@@ -369,12 +369,14 @@ class KeySignature(base.Music21Object):
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
 
         try:
-            if sharps is not None and \
-                  (sharps != int(sharps)):
-                raise KeySignatureException('Cannot get a KeySignature from this "number" of sharps: "%s"; ' % sharps + 
+            if (sharps is not None and 
+                  (sharps != int(sharps))):
+                raise KeySignatureException(
+                    'Cannot get a KeySignature from this "number" of sharps: "%s"; ' % sharps + 
                     'did you mean to use a key.Key() object instead?')
         except ValueError:
-            raise KeySignatureException('Cannot get a KeySignature from this "number" of sharps: "%s"; ' % sharps + 
+            raise KeySignatureException(
+                    'Cannot get a KeySignature from this "number" of sharps: "%s"; ' % sharps + 
                     'did you mean to use a key.Key() object instead?')
             
         self._sharps = sharps
@@ -387,7 +389,8 @@ class KeySignature(base.Music21Object):
         # cache altered pitches
         self._alteredPitchesCached = []
 
-    #@common.deprecated("Jan 2014", "Jan 2016", "\n\nMode is deprecated in a KeySignature object. Use Key instead.")
+    #@common.deprecated("Jan 2014", "Jan 2016", 
+    #        "\n\nMode is deprecated in a KeySignature object. Use Key instead.")
     #def _mode_is_deprecated(self):
     #    pass
 
@@ -885,7 +888,8 @@ class Key(KeySignature, scale.DiatonicScale):
         self._abstract._buildNetwork(self.type)
 
         # optionally filled attributes
-        # store a floating point value between 0 and 1 regarding correlation coefficent between the detected key and the algorithm for detecting the key
+        # store a floating point value between 0 and 1 regarding 
+        # correlation coefficent between the detected key and the algorithm for detecting the key
         self.correlationCoefficient = None
 
         # store an ordered list of alternative Key objects
@@ -931,7 +935,8 @@ class Key(KeySignature, scale.DiatonicScale):
     def _tonalCertainityCorrelationCoefficient(self, *args, **keywords):
         # possible measures:
         if self.alternateInterpretations is None or len(self.alternateInterpretations) == 0:
-            raise KeySignatureException('cannot process ambiguity without a list of .alternateInterpretations')
+            raise KeySignatureException(
+                    'cannot process ambiguity without a list of .alternateInterpretations')
         focus = []
         focus.append(self.correlationCoefficient)
         for subKey in self.alternateInterpretations:
@@ -959,7 +964,9 @@ class Key(KeySignature, scale.DiatonicScale):
         # standard deviation of all non-neg values
         standardDeviation = common.standardDeviation(focus, bassel=False)
 
-        environLocal.printDebug(['absMagnitude', absMagnitude, 'leaderSpan', leaderSpan, 'meanMagnitude', meanMagnitude, 'standardDeviation', standardDeviation])
+        environLocal.printDebug(['absMagnitude', absMagnitude, 'leaderSpan', leaderSpan, 
+                                 'meanMagnitude', meanMagnitude, 
+                                 'standardDeviation', standardDeviation])
 
         # combine factors with a weighting for each 
         # estimate range as 2, normalize between zero and 1

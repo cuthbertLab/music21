@@ -93,7 +93,8 @@ class PercussionMapper(object):
     
     def midiPitchToInstrument(self, midiPitch):
         '''
-        Takes a pitch.Pitch object or int and returns the corresponding instrument in the GM Percussion Map.
+        Takes a pitch.Pitch object or int and returns the corresponding 
+        instrument in the GM Percussion Map.
         
         
         >>> pm = midi.percussion.PercussionMapper()
@@ -153,7 +154,8 @@ class PercussionMapper(object):
         midiInstrument = self.reverseInstrumentMapping[midiNumber]
         
         midiInstrumentObject = midiInstrument()
-        if midiInstrumentObject.inGMPercMap is True and hasattr(midiInstrumentObject, '_percMapPitchToModifier'):
+        if (midiInstrumentObject.inGMPercMap is True and 
+                hasattr(midiInstrumentObject, '_percMapPitchToModifier')):
             if midiNumber in midiInstrumentObject._percMapPitchToModifier:
                 modifier = midiInstrumentObject._percMapPitchToModifier[midiNumber]
                 midiInstrumentObject.modifier = modifier
@@ -184,9 +186,9 @@ class PercussionMapper(object):
         >>> myBagpipes = instrument.Bagpipes()
         >>> pipePitch = pm.midiInstrumentToPitch(myBagpipes)
         Traceback (most recent call last):
-        MIDIPercussionException: <music21.instrument.Instrument Bagpipes> is not in the GM Percussion Map!
+        MIDIPercussionException: <music21.instrument.Instrument Bagpipes> 
+            is not in the GM Percussion Map!
         '''
-        
         if not hasattr(midiInstrument, 'inGMPercMap') or midiInstrument.inGMPercMap is False:
             raise MIDIPercussionException("%r is not in the GM Percussion Map!" % midiInstrument)
         midiPitch = midiInstrument.percMapPitch

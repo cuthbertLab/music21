@@ -29,12 +29,14 @@ http://www.nilsliberg.se/ksp/easyabc/ .  You can set it up as a MusicXML reader 
 >>> #_DOCS_SHOW us = environment.UserSettings()
 >>> #_DOCS_SHOW us['musicxmlPath'] = '/Applications/EasyABC.app'
 
-or wherever you have downloaded EasyABC to (PC users might need: 'c:/program files (x86)/easyabc/easyabc.exe')
+or wherever you have downloaded EasyABC to 
+(PC users might need: 'c:/program files (x86)/easyabc/easyabc.exe')
 (Thanks to Norman Schmidt for the heads up)
 
 There is a two-step process in converting ABC files to Music21 Streams.  First this module
 reads in the text-based .abc file and converts all the information into ABCToken objects.  Then
-the function :func:`music21.abcFormat.translate.abcToStreamScore` of the `music21.abcFormat.translate` module
+the function :func:`music21.abcFormat.translate.abcToStreamScore` of 
+the :ref:`~music21.abcFormat.translate` module
 translates those Tokens into music21 objects.
 '''
 __all__ = (
@@ -115,7 +117,8 @@ class ABCToken(object):
     The multi-pass procedure is conducted by an ABCHandler object. 
     The ABCHandler.tokenize() method breaks the data stream into 
     ABCToken objects. The :meth:`~music21.abcFormat.ABCHandler.tokenProcess` method first 
-    calls the :meth:`~music21.abcFormat.ABCToken.preParse` method on each token, then does contextual 
+    calls the :meth:`~music21.abcFormat.ABCToken.preParse` method on each token, 
+    then does contextual 
     adjustments to all tokens, then calls :meth:`~music21.abcFormat.ABCToken.parse` on all tokens.
 
     The source ABC string itself is stored in self.src
@@ -333,7 +336,8 @@ class ABCMetadata(ABCToken):
         <music21.meter.TimeSignature 2/2>
         '''
         if not self.isMeter():
-            raise ABCTokenException('no time signature associated with this non-metrical meta-data')
+            raise ABCTokenException(
+                    'no time signature associated with this non-metrical meta-data')
         from music21 import meter
         parameters = self._getTimeSignatureParameters()
         if parameters == None:
@@ -457,7 +461,8 @@ class ABCMetadata(ABCToken):
     def getClefObject(self):
         '''
         Extract any clef parameters stored in the key metadata token. 
-        Assume that a clef definition suggests a transposition. Return both the Clef and the transposition. 
+        Assume that a clef definition suggests a transposition. 
+        Return both the Clef and the transposition. 
 
         Returns a two-element tuple of clefObj and transposition in semitones
 
@@ -468,7 +473,8 @@ class ABCMetadata(ABCToken):
         (<music21.clef.BassClef>, -24)
         '''
         if not self.isKey():
-            raise ABCTokenException('no key signature associated with this meta-data; needed for getting Clef Object')
+            raise ABCTokenException(
+                'no key signature associated with this meta-data; needed for getting Clef Object')
 
         # placing this import in method for now; key.py may import this module
         clefObj = None
@@ -627,7 +633,8 @@ class ABCMetadata(ABCToken):
                 return .5 # otherwiseit is an eighth note
 
         else:       
-            raise ABCTokenException('no quarter length associated with this meta-data: %s' % self.data)
+            raise ABCTokenException(
+                'no quarter length associated with this meta-data: %s' % self.data)
 
 
 
@@ -765,7 +772,8 @@ class ABCBar(ABCToken):
             # bidirectional repeat tokens should already have been replaced
             # by end and start
             else:
-                environLocal.printDebug(['found an unspported repeatForm in ABC: %s' % self.repeatForm])            
+                environLocal.printDebug(['found an unspported repeatForm in ABC: ', 
+                                         '%s' % self.repeatForm])            
         elif self.barStyle == 'regular':
             post = None # do not need an object for regular
         elif self.repeatForm in ['first', 'second']:
@@ -1333,7 +1341,8 @@ class ABCNote(ABCToken):
             activeDefaultQuarterLength = self.activeDefaultQuarterLength
 
         if activeDefaultQuarterLength == None:
-            raise ABCTokenException('cannot calculate quarter length without a default quarter length')
+            raise ABCTokenException(
+                'cannot calculate quarter length without a default quarter length')
 
         numStr = []
         for c in strSrc:
@@ -1418,7 +1427,8 @@ class ABCNote(ABCToken):
             a, b = self._getPitchName(nonChordSymStr,
                    forceKeySignature=forceKeySignature)
         except ABCHandlerException:
-            environLocal.warn(["Could not get pitch information from note: {0}, assuming C".format(nonChordSymStr)])
+            environLocal.warn(["Could not get pitch information from note: " , 
+                               "{0}, assuming C".format(nonChordSymStr)])
             a = "C"
             b = False
             
@@ -1432,7 +1442,8 @@ class ABCNote(ABCToken):
         self.quarterLength = self._getQuarterLength(nonChordSymStr, 
                             forceDefaultQuarterLength=forceDefaultQuarterLength)
 
-        # environLocal.printDebug(['ABCNote:', 'pitch name:', self.pitchName, 'ql:', self.quarterLength])
+        # environLocal.printDebug(['ABCNote:', 'pitch name:', self.pitchName, 
+        #                            'ql:', self.quarterLength])
 
 
 class ABCChord(ABCNote):
@@ -1675,7 +1686,8 @@ class ABCHandler(object):
                 skipAhead = j - (currentIndex + 1)
                 collect = strSrc[currentIndex:j].strip()
                 #environLocal.printDebug(['got metadata:', repr(''.join(collect))])
-                #print "Skipped %d, collected '%s', currentIndex %d, new index %d" % (skipAhead, collect, currentIndex, j)
+                #print("Skipped %d, collected '%s', currentIndex %d, new index %d" % (
+                #    skipAhead, collect, currentIndex, j))
 
                 self._tokens.append(ABCMetadata(collect))
                 continue
@@ -1902,8 +1914,10 @@ class ABCHandler(object):
                     pass
                 # these are bad chords, or other problematic notations like
                 # "D.C."x
-                elif collect.startswith('"') and (collect[-1] in 
-                    ['u', 'v', 'k', 'K', 'Q', '.',    'y', 'T', 'w', 'h', 'x'] or collect.endswith('v.')):
+                elif (collect.startswith('"') and 
+                          (collect[-1] in ['u', 'v', 'k', 'K', 'Q', '.', 
+                                           'y', 'T', 'w', 'h', 'x'] or
+                           collect.endswith('v.'))):
                     pass
                 elif collect.startswith('x') or collect.startswith('H') or collect.startswith('Z'):
                     pass
@@ -1934,7 +1948,8 @@ class ABCHandler(object):
             #environLocal.printDebug(['tokenProcess: calling preParse()', t.src])
             t.preParse()
 
-        # context: iterate through tokens, supplying contextual data as necessary to appropriate objects
+        # context: iterate through tokens, supplying contextual data
+        # as necessary to appropriate objects
         lastDefaultQL = None
         lastKeySignature = None
         lastTimeSignatureObj = None # an m21 object
@@ -1967,7 +1982,8 @@ class ABCHandler(object):
                     lastKeySignature = key.KeySignature(sharpCount, mode)
                 
                 if t.isReferenceNumber():
-                    # reset any spanners or parens at the end of any piece in case they aren't closed.
+                    # reset any spanners or parens at the end of any piece 
+                    # in case they aren't closed.
                     self.activeParens = []
                     self.activeSpanners = []
                 continue
@@ -1979,7 +1995,8 @@ class ABCHandler(object):
                     tPrev.brokenRhythmMarker = (t.data, 'left')
                     tNext.brokenRhythmMarker = (t.data, 'right')
                 else:
-                    environLocal.printDebug(['broken rhythm marker (%s) not positioned between two notes or chords' % t.src])
+                    environLocal.printDebug(['broken rhythm marker ' + 
+                            '(%s) not positioned between two notes or chords' % t.src])
 
             # need to update tuplets with currently active meter
             if isinstance(t, ABCTuplet):
@@ -2049,7 +2066,9 @@ class ABCHandler(object):
             # ABCChord inherits ABCNote, thus getting note is enough for both
             if isinstance(t, (ABCNote, ABCChord)):
                 if lastDefaultQL == None:
-                    raise ABCHandlerException('no active default note length provided for note processing. tPrev: %s, t: %s, tNext: %s' % (tPrev, t, tNext))
+                    raise ABCHandlerException(
+                            'no active default note length provided for note processing. ' + 
+                            'tPrev: %s, t: %s, tNext: %s' % (tPrev, t, tNext))
                 t.activeDefaultQuarterLength = lastDefaultQL
                 t.activeKeySignature = lastKeySignature
                 t.applicableSpanners = copy.copy(self.activeSpanners)
@@ -2286,10 +2305,14 @@ class ABCHandler(object):
 
     def definesMeasures(self):
         '''
-        Returns True if this token structure defines Measures in a normal Measure form.  Otherwise False
+        Returns True if this token structure defines Measures in a normal Measure form.  
+        Otherwise False
 
         
-        >>> abcStr = 'M:6/8\\nL:1/8\\nK:G\\nV:1 name="Whistle" snm="wh"\\nB3 A3 | G6 | B3 A3 | G6 ||\\nV:2 name="violin" snm="v"\\nBdB AcA | GAG D3 | BdB AcA | GAG D6 ||\\nV:3 name="Bass" snm="b" clef=bass\\nD3 D3 | D6 | D3 D3 | D6 ||'
+        >>> abcStr = ('M:6/8\\nL:1/8\\nK:G\\nV:1 name="Whistle" ' + 
+        ...     'snm="wh"\\nB3 A3 | G6 | B3 A3 | G6 ||\\nV:2 name="violin" ' + 
+        ...     'snm="v"\\nBdB AcA | GAG D3 | BdB AcA | GAG D6 ||\\nV:3 name="Bass" ' + 
+        ...     'snm="b" clef=bass\\nD3 D3 | D6 | D3 D3 | D6 ||')
         >>> ah = abcFormat.ABCHandler()
         >>> junk = ah.process(abcStr)
         >>> ah.definesMeasures()
@@ -2325,7 +2348,10 @@ class ABCHandler(object):
         Each part is returned as a ABCHandler instance.
 
         
-        >>> abcStr = 'M:6/8\\nL:1/8\\nK:G\\nV:1 name="Whistle" snm="wh"\\nB3 A3 | G6 | B3 A3 | G6 ||\\nV:2 name="violin" snm="v"\\nBdB AcA | GAG D3 | BdB AcA | GAG D6 ||\\nV:3 name="Bass" snm="b" clef=bass\\nD3 D3 | D6 | D3 D3 | D6 ||'
+        >>> abcStr = ('M:6/8\\nL:1/8\\nK:G\\nV:1 name="Whistle" ' + 
+        ...     'snm="wh"\\nB3 A3 | G6 | B3 A3 | G6 ||\\nV:2 name="violin" ' + 
+        ...     'snm="v"\\nBdB AcA | GAG D3 | BdB AcA | GAG D6 ||\\nV:3 name="Bass" ' + 
+        ...     'snm="b" clef=bass\\nD3 D3 | D6 | D3 D3 | D6 ||')
         >>> ah = abcFormat.ABCHandler()
         >>> junk = ah.process(abcStr)
         >>> tokenColls = ah.splitByVoice()
@@ -2338,9 +2364,11 @@ class ABCHandler(object):
         >>> [t.src for t in tokenColls[1].tokens] 
         ['V:1 name="Whistle" snm="wh"', 'B3', 'A3', '|', 'G6', '|', 'B3', 'A3', '|', 'G6', '||']
         >>> [t.src for t in tokenColls[2].tokens] 
-        ['V:2 name="violin" snm="v"', 'B', 'd', 'B', 'A', 'c', 'A', '|', 'G', 'A', 'G', 'D3', '|', 'B', 'd', 'B', 'A', 'c', 'A', '|', 'G', 'A', 'G', 'D6', '||']
+        ['V:2 name="violin" snm="v"', 'B', 'd', 'B', 'A', 'c', 'A', '|', 
+         'G', 'A', 'G', 'D3', '|', 'B', 'd', 'B', 'A', 'c', 'A', '|', 'G', 'A', 'G', 'D6', '||']
         >>> [t.src for t in tokenColls[3].tokens] 
-        ['V:3 name="Bass" snm="b" clef=bass', 'D3', 'D3', '|', 'D6', '|', 'D3', 'D3', '|', 'D6', '||']
+        ['V:3 name="Bass" snm="b" clef=bass', 'D3', 'D3', '|', 'D6', '|', 
+         'D3', 'D3', '|', 'D6', '||']
 
         Then later the metadata can be merged at the start of each voice...
         
@@ -2348,7 +2376,8 @@ class ABCHandler(object):
         >>> mergedTokens
         <music21.abcFormat.ABCHandler object at 0x...>
         >>> [t.src for t in mergedTokens.tokens] 
-        ['M:6/8', 'L:1/8', 'K:G', 'V:1 name="Whistle" snm="wh"', 'B3', 'A3', '|', 'G6', '|', 'B3', 'A3', '|', 'G6', '||']
+        ['M:6/8', 'L:1/8', 'K:G', 'V:1 name="Whistle" snm="wh"', 
+         'B3', 'A3', '|', 'G6', '|', 'B3', 'A3', '|', 'G6', '||']
 
 
         '''
@@ -2413,8 +2442,11 @@ class ABCHandler(object):
         >>> ah._buildMeasureBoundaryIndices([8, 12, 13, 16], 20)
         [[0, 8], [8, 12], [13, 16], [16, 20]]
 
-        >>> ah._buildMeasureBoundaryIndices([9, 10, 16, 23, 29, 36, 42, 49, 56, 61, 62, 64, 70, 77, 84, 90, 96, 103, 110, 115], 115)
-        [[0, 9], [10, 16], [16, 23], [23, 29], [29, 36], [36, 42], [42, 49], [49, 56], [56, 61], [62, 64], [64, 70], [70, 77], [77, 84], [84, 90], [90, 96], [96, 103], [103, 110], [110, 115]]
+        >>> bi = [9, 10, 16, 23, 29, 36, 42, 49, 56, 61, 62, 64, 70, 77, 84, 90, 96, 103, 110, 115]
+        >>> ah._buildMeasureBoundaryIndices(bi, 115)
+        [[0, 9], [10, 16], [16, 23], [23, 29], [29, 36], [36, 42], [42, 49], [49, 56], [56, 61], 
+         [62, 64], [64, 70], [70, 77], [77, 84], [84, 90], [90, 96], 
+         [96, 103], [103, 110], [110, 115]]
 
         '''
         # collect start and end pairs of split
@@ -2462,7 +2494,8 @@ class ABCHandler(object):
             tNext = None
             if i < len(self._tokens) - 1:
                 tNext = self._tokens[i+1]
-            #environLocal.printDebug(['splitByMeasure(); tokens', t, 'isinstance(t, ABCBar)', isinstance(t, ABCBar)])
+            #environLocal.printDebug(['splitByMeasure(); tokens', t, 
+            #                         'isinstance(t, ABCBar)', isinstance(t, ABCBar)])
 
             #if isinstance(t, (ABCNote, ABCChord)): # not used...
             #    noteCount += 1
@@ -2475,7 +2508,9 @@ class ABCHandler(object):
                 # barCount += 1 # not used
             # case of end of metadata and start of notes in a pickup
             # tag the last metadata as the end
-            elif isinstance(t, ABCMetadata) and tNext is not None and isinstance(tNext, (ABCNote, ABCChord)):
+            elif (isinstance(t, ABCMetadata) and 
+                  tNext is not None and 
+                  isinstance(tNext, (ABCNote, ABCChord))):
                 pos.append(i) # store position                 
 
         #environLocal.printDebug(['splitByMeasure(); raw bar positions', pos])
@@ -2497,14 +2532,17 @@ class ABCHandler(object):
                 lbCandidate = self._tokens[x]
                 # if we get an end repeat, probably already assigned this
                 # in the last measure, so skip
-                #environLocal.printDebug(['reading paris, got token:', lbCandidate, 'lbCandidate.barType', lbCandidate.barType, 'lbCandidate.repeatForm', lbCandidate.repeatForm])
+                #environLocal.printDebug(['reading paris, got token:', lbCandidate, 
+                #    'lbCandidate.barType', lbCandidate.barType, 
+                #    'lbCandidate.repeatForm', lbCandidate.repeatForm])
                 # skip end repeats assigned (improperly) to the left
                 if (lbCandidate.barType == 'repeat' and 
                     lbCandidate.repeatForm == 'end'):
                     pass
                 else: # assign
                     ah.leftBarToken = lbCandidate
-                    #environLocal.printDebug(['splitByMeasure(); assigning left bar token', lbCandidate])
+                    #environLocal.printDebug(['splitByMeasure(); assigning left bar token', 
+                    #                        lbCandidate])
                 # always trim if we have a bar
                 xClip = x + 1
                 #ah.tokens = ah._tokens[1:] # remove first, as not done above
@@ -2512,7 +2550,8 @@ class ABCHandler(object):
             elif isinstance(self._tokens[x], ABCMetadata):
                 xClip = x + 1
             else:
-                # if we find a note in the x-clip position, it is likely a pickup the first note after metadata. this we keep, b/c it 
+                # if we find a note in the x-clip position, it is likely a pickup the 
+                # first note after metadata. this we keep, b/c it 
                 # should be part of this branch
                 pass
 
@@ -2527,7 +2566,8 @@ class ABCHandler(object):
                     rbCandidate.repeatForm == 'start'):
                     pass
                 else:
-                    #environLocal.printDebug(['splitByMeasure(); assigning right bar token', lbCandidate])
+                    #environLocal.printDebug(['splitByMeasure(); assigning right bar token',
+                    #                             lbCandidate])
                     ah.rightBarToken = self._tokens[yTestIndex]
                 # always trim if we have a bar
                 #ah.tokens = ah._tokens[:-1] # remove last
@@ -2554,7 +2594,9 @@ class ABCHandler(object):
             post.append(ah)
 
 #         for sub in post:
-#             environLocal.printDebug(['concluded splitByMeasure:', sub, 'leftBarToken', sub.leftBarToken, 'rightBartoken', sub.rightBarToken, 'len(sub)', len(sub), 'sub.hasNotes()', sub.hasNotes()])
+#             environLocal.printDebug(['concluded splitByMeasure:', sub, 
+#                    'leftBarToken', sub.leftBarToken, 'rightBartoken', sub.rightBarToken, 
+#                    'len(sub)', len(sub), 'sub.hasNotes()', sub.hasNotes()])
 #             for t in sub.tokens:
 #                 print '    ', t
         return post
@@ -2640,7 +2682,8 @@ class ABCHandlerBar(ABCHandler):
                 else:
                     # might resolve this by ignoring standard bars and favoring
                     # repeats or styled bars
-                    environLocal.printDebug(['cannot handle two non-None bars yet: got bNew, bOld', bNew, bOld])
+                    environLocal.printDebug(['cannot handle two non-None bars yet: got bNew, bOld', 
+                                             bNew, bOld])
                     #raise ABCHandlerException('cannot handle two non-None bars yet')
                     setattr(ah, barAttr, bNew)                    
 
@@ -2661,7 +2704,8 @@ def mergeLeadingMetaData(barHandlers):
             mCount += 1
         else:
             metadataPos.append(i)
-    #environLocal.printDebug(['mergeLeadingMetaData()', 'metadataPosList', metadataPos, 'mCount', mCount])
+    #environLocal.printDebug(['mergeLeadingMetaData()', 
+    #                        'metadataPosList', metadataPos, 'mCount', mCount])
     # merge meta data into bars for processing
     mergedHandlers = []
     if mCount <= 1: # if only one true measure, do not create measures
@@ -2762,7 +2806,8 @@ class ABCFile(object):
                 collect.append(line)
 
         if collect == []:
-            raise ABCFileException('cannot find requested reference number in source file: %s' % number)
+            raise ABCFileException(
+                'cannot find requested reference number in source file: %s' % number)
 
         post = '\n'.join(collect)
         return post
@@ -2954,7 +2999,8 @@ class Test(unittest.TestCase):
 
 #         for ahSub in ah.splitByMeasure():
 #             environLocal.printDebug(['split by measure:', ahSub.tokens])
-#             environLocal.printDebug(['leftBar:', ahSub.leftBarToken, 'rightBar:', ahSub.rightBarToken, '\n'])
+#             environLocal.printDebug(['leftBar:', ahSub.leftBarToken, 
+#                'rightBar:', ahSub.rightBarToken, '\n'])
 
 
         ah = ABCHandler()

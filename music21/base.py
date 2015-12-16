@@ -28,7 +28,7 @@ available after importing music21.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'3.0.1'
+'3.0.2'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -38,7 +38,6 @@ under the module "base":
 '''
 from __future__ import (print_function, division)
 
-import collections
 import copy
 import sys
 import types
@@ -46,8 +45,7 @@ import unittest
 
 from music21.test.testRunner import mainTest
 from music21.ext import six
-
-
+## all other music21 modules below...
 
 #------------------------------------------------------------------------------
 # version string and tuple must be the same
@@ -78,13 +76,14 @@ from music21 import exceptions21
 Music21Exception = exceptions21.Music21Exception
 
 from music21.sites import SitesException
-
 from music21 import sites
 from music21 import common
 from music21 import defaults
 from music21 import derivation
 from music21 import duration
 from music21 import environment
+
+from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
 
 from music21.common import opFrac
 
@@ -131,11 +130,9 @@ class ElementException(exceptions21.Music21Exception):
     pass
 
 #------------------------------------------------------------------------------
-# private metaclass...
-_SortTuple = collections.namedtuple('SortTuple', ['atEnd','offset','priority',
-                                                  'classSortOrder','isNotGrace','insertIndex'])
+    
 
-# pseudo class for returning split()
+# pseudo class for returning splitAtX() type commands.
 class _SplitTuple(tuple):
     '''
     >>> st = base._SplitTuple([1, 2])
@@ -155,7 +152,7 @@ class _SplitTuple(tuple):
     def __new__(cls, tupEls):
         return super(_SplitTuple, cls).__new__(cls, tuple(tupEls))
 
-    def __init__(self, tupEls):
+    def __init__(self, tupEls): # pylint: disable=super-init-not-called
         self.spannerList = []
 
 #------------------------------------------------------------------------------
@@ -170,7 +167,7 @@ class Groups(list): # no need to inherit from slotted object
     The Groups object enforces that all elements must be strings, and that
     the same element cannot be provided more than once.
 
-    NOTE: In the future spaces will not be allowed in group names.
+    NOTE: In the future, spaces will not be allowed in group names.
 
 
     >>> g = Groups()
@@ -793,7 +790,8 @@ class Music21Object(object):
         >>> n.getOffsetBySite(None)
         30.0
 
-        If the Stream does not contain the element then a SitesException is raised:
+        If the Stream does not contain the element and the element is not derived from
+        an element that does, then a SitesException is raised:
         
         >>> s2 = stream.Stream()
         >>> s2.id = 'notContainingStream'
@@ -802,6 +800,23 @@ class Music21Object(object):
         SitesException: an entry for this object <music21.note.Note A-> is not 
               stored in stream <music21.stream.Stream notContainingStream>
 
+        Consider this use of derivations:
+        
+        >>> import copy
+        >>> nCopy = copy.deepcopy(n)
+        >>> nCopy.derivation
+        <Derivation of <music21.note.Note A-> from <music21.note.Note A-> via "__deepcopy__">
+        >>> nCopy.getOffsetBySite(s1)
+        Fraction(20, 3)
+
+        TADA! This is the primary difference between element.getOffsetBySite(stream)
+        and stream.elementOffset(element)
+        
+        >>> s1.elementOffset(nCopy)
+        Traceback (most recent call last):
+        SitesException: an entry for this object ... is not 
+            stored in stream <music21.stream.Stream containingStream>
+        
 
         If the object is stored at the end of the Stream, then the highest time 
         is usually returned:
@@ -816,47 +831,46 @@ class Music21Object(object):
         
         However, setting stringReturns to True will return 'highestTime'
         
-        >>> s3._endElements
-        [<music21.bar.Barline style=regular>]
-        
         >>> rb.getOffsetBySite(s3, stringReturns=True)
         'highestTime'
         
-        Normal numbers are still returned as a float or Fraction:
+        Even with stringReturns normal offsets are still returned as a float or Fraction:
         
         >>> n3.getOffsetBySite(s3, stringReturns=True)
         0.0
         '''
+        if site is None:
+            return self._naiveOffset
+
         try:
-            if site is not None:
-                a = None
-                tryOrigin = self
-                originMemo = set()
-                maxSearch = 100
-                while a is None:
-                    try:
-                        a = site.elementOffset(tryOrigin, stringReturns=stringReturns)
-                    except AttributeError:
-                        raise SitesException(
-                            "You were using %r as a site, when it is not a Stream..." % site)
-                    except Music21Exception as e: # currently StreamException, but will change
-                        if tryOrigin in site._endElements:
-                            if stringReturns is True:
-                                return 'highestTime'
-                            else:
-                                return site.highestTime
-                        
-                        tryOrigin = self.derivation.origin
-                        if id(tryOrigin) in originMemo:
-                            raise(e)
+            a = None
+            tryOrigin = self
+            originMemo = set()
+            maxSearch = 100
+            while a is None:
+                try:
+                    a = site.elementOffset(tryOrigin, stringReturns=stringReturns)
+                except AttributeError:
+                    raise SitesException(
+                        "You were using %r as a site, when it is not a Stream..." % site)
+                except Music21Exception as e: # currently StreamException, but will change
+                    if tryOrigin in site._endElements:
+                        if stringReturns is True:
+                            return 'highestTime'
                         else:
-                            originMemo.add(id(tryOrigin))
-                        maxSearch -= 1
-                        if tryOrigin is None or maxSearch < 0:
-                            raise(e)
-            else:
-                a = self._naiveOffset
+                            return site.highestTime
+                    
+                    tryOrigin = self.derivation.origin
+                    if id(tryOrigin) in originMemo:
+                        raise(e)
+                    else:
+                        originMemo.add(id(tryOrigin))
+                    maxSearch -= 1 # prevent infinite recursive searches...
+                    if tryOrigin is None or maxSearch < 0:
+                        raise(e)
+
             return a
+        
         except SitesException:
             raise SitesException(
                 'an entry for this object %r is not stored in stream %r' % (self, site))
@@ -902,7 +916,8 @@ class Music21Object(object):
         contexts having this attribute and return
         the best match.
 
-        DEPRECATED
+        It is a misleading name because it does not actually search what we now call contexts,
+        just sites. Thus it is DEPRECATED
 
         >>> import music21
         >>> class Mock(music21.Music21Object):
@@ -923,7 +938,8 @@ class Music21Object(object):
         '''
         return self.sites.getAttrByName(attr)
 
-    @common.deprecated("September 2015", "January 2016", "use self.sites.setAttrByName(attr, value)")
+    @common.deprecated("September 2015", "January 2016", 
+                       "use self.sites.setAttrByName(attr, value)")
     def setContextAttr(self, attrName, value):
         '''
         Given the name of an attribute, search Contexts and return
@@ -1033,7 +1049,8 @@ class Music21Object(object):
         return post
 
 
-    @common.deprecated('Summer 2015', 'Jan 2016', 'use self.sites.remove() instead and set activeSite manually.')
+    @common.deprecated('Summer 2015', 'Jan 2016', 
+                       'use self.sites.remove() instead and set activeSite manually.')
     def removeLocationBySite(self, site):
         '''
         DEPRECATED Jan 2016: use self.sites.remove() instead and set activeSite
@@ -1106,22 +1123,21 @@ class Music21Object(object):
 
     #---------------------------------------------------------------------------------
     # contexts...
-    def getContextByClass(self, 
-                          className,
-                          getElementMethod='getElementAtOrBefore',
-                          sortByCreationTime=False):
+    def getContextByClass(self,
+                             className,
+                             getElementMethod='getElementAtOrBefore',
+                             sortByCreationTime=False):
         '''
         A very powerful method in music21 of fundamental importance: Returns
         the element matching the className that is closest to this element in
         its current hierarchy.  For instance, take this stream of changing time
         signatures:
 
-        >>> s1 = converter.parse('tinynotation: 3/4 C4 D E 2/4 F G A B 1/4 c')
-        >>> s2 = s1.makeMeasures()
-        >>> s2
+        >>> p = converter.parse('tinynotation: 3/4 C4 D E 2/4 F G A B 1/4 c')
+        >>> p
         <music21.stream.Part 0x104ce64e0>
         
-        >>> s2.show('t')
+        >>> p.show('t')
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.BassClef>
             {0.0} <music21.meter.TimeSignature 3/4>
@@ -1142,11 +1158,11 @@ class Music21Object(object):
 
         Let's get the last two notes of the piece, the B and high c:
 
-        >>> c = s2.measure(4).notes[0]
+        >>> c = p.measure(4).notes[0]
         >>> c
         <music21.note.Note C>
 
-        >>> b = s2.measure(3).notes[-1]
+        >>> b = p.measure(3).notes[-1]
         >>> b
         <music21.note.Note B>
 
@@ -1184,111 +1200,207 @@ class Music21Object(object):
         The `getElementMethod` is a string that selects which Stream method is
         used to get elements for searching. These strings are accepted:
         
-        *    'getElementAtOrBefore'
-        *    'getElementBeforeOffset'
+        *    'getElementBefore'
+        *    'getElementAfter'
+        *    'getElementAtOrBefore' (Default)
         *    'getElementAtOrAfter'
-        *    'getElementAfterOffset'
         
-        Use at or before to avoid getting the same element over and over again
-        in a recursive context search.
-        
-        The latter two do forward contexts -- looking ahead.
-        
-        
-        
+        The "after" do forward contexts -- looking ahead.
+                
         OMIT_FROM_DOCS
 
-        TODO: these should not be the same objects!
-        
-        >>> a = b.getContextByClass('Note', 'getElementBeforeOffset')
+        >>> a = b.getContextByClass('Note', 'getElementBefore')
         >>> a
         <music21.note.Note A>
-        >>> a2 = b.getContextByClass('Note', 'getElementAfterOffset')
-        >>> a2
-        <music21.note.Note A>
-        >>> a is a2
-        True
-
-
-        TODO: these should actually be sort tuples, so that we can avoid the case of 
-        skipping elements that are at the same offset...
-
-
+        >>> c = b.getContextByClass('Note', 'getElementAfter')
+        >>> c
+        <music21.note.Note C>
 
         >>> s = corpus.parse('bwv66.6')
         >>> noteA = s[1][2][0]
         >>> noteA.getContextByClass('TimeSignature')
         <music21.meter.TimeSignature 4/4>
         '''
-        def extractElementFromVerticality(verticality):
-            if verticality is None:
-                return None
-            for prop in ('startTimespans', 'overlapTimespans'):
-                vst = getattr(verticality, prop)
-                if len(vst) == 0:
-                    continue
-                if 'Before' in getElementMethod:
-                    vst = reversed(vst)
-                for timespanPart in vst:
-                    element = timespanPart.element
-                    if element is not self: # not necessary because of how TS was created. 
-                                            #   and element.isClassOrSubclass(className):
-                        return element
-            return None
-
-        def findElInTimespanTree(ts, offsetStart):
-            if getElementMethod == 'getElementAtOrBefore':
-                verticality = ts.getVerticalityAtOrBefore(offsetStart)
-            elif getElementMethod == 'getElementBeforeOffset':
-                verticality = ts.getVerticalityAt(offsetStart).previousVerticality
-            elif getElementMethod == 'getElementAfterOffset':
-                verticality = ts.getVerticalityAt(offsetStart).nextVerticality                
-            elif getElementMethod == 'getElementAtOrAfter':
-                verticality = ts.getVerticalityAtOrAfter(offsetStart)                
-
-            if verticality is not None:
-                element = extractElementFromVerticality(verticality)
-                if element is not None:
-                    return element
-            return None
-
-        def findElInTimespanTreeNoRecurse(ts, offsetStart):
-            # goes through each, but should be fast because
-            # only contains containers and elements with the
-            # proper classes...
-            if getElementMethod == 'getElementAtOrBefore':
-                offsetStart += 0.000001
-            elif getElementMethod == 'getElementAtOrAfter':
-                offsetStart -= 0.000001
-
+        def payloadExtractor(site, flatten, positionStart):
+            '''
+            change the site (stream) to a Tree (using caches if possible),
+            then find the node before (or after) the positionStart and
+            return the element there or None.
             
-            while offsetStart is not None: # redundant, but useful...
-                offsetStart = ts.getPositionBefore(offsetStart)
-                if offsetStart is None:
-                    return None
-                startTimespans = ts.elementsStartingAt(offsetStart)
-                for timeSpan in startTimespans:
-                    if hasattr(timeSpan, 'source'): # this is a stream...
-                        continue
-                    return timeSpan.element
+            '''
+            siteTree = site.asTree(flatten=flatten, classList=className)
+            if 'Offset' in getElementMethod:
+                # these methods match only by offset.  Used in .getBeat among other places
+                if (('At' in getElementMethod and 'Before' in getElementMethod) or
+                    ('At' not in getElementMethod and 'After' in getElementMethod)):
+                    positionStart = ZeroSortTupleHigh.modify(offset=positionStart.offset)
+                elif (('At' in getElementMethod and 'After' in getElementMethod) or 
+                      ('At' not in getElementMethod and 'Before' in getElementMethod)):
+                    positionStart = ZeroSortTupleLow.modify(offset=positionStart.offset)
+                else:
+                    raise Music21Exception(
+                            "Incorrect getElementMethod: {}".format(getElementMethod))
+                      
+            if 'Before' in getElementMethod:
+                contextNode = siteTree.getNodeBefore(positionStart)
+            else:
+                contextNode = siteTree.getNodeAfter(positionStart)
+            
+            if contextNode is not None:
+                payload = contextNode.payload
+                return payload
+            else:
+                return None
 
-        if not common.isListLike(className):
+        def wellFormed(contextEl, site):
+            '''
+            Long explanation for a short method.
+            
+            It is possible for a contextEl to be returned that contradicts the
+            'Before' or 'After' criterion due to the following (I'll take the example of Before;
+            After is much harder to construct, but possible).
+
+            Assume that s is a Score, and tb2 = s.flat[1] and tb1 is the previous element 
+            (would be s.flat[0])
+            
+            in s we have the following.
+            
+            s.sortTuple   = 0.0 <0.-20.0>  # not inserted
+            tb1.sortTuple = 0.0 <0.-31.1>
+            tb2.sortTuple = 0.0 <0.-31.2>
+            
+            in s.flat we have:
+
+            s.flat.sortTuple = 0.0 <0.-20.0>  # not inserted
+            tb1.sortTuple    = 0.0 <0.-31.3>
+            tb2.sortTuple    = 0.0 <0.-31.4>
+            
+            Now tb2 is set through s.flat[1], so its activeSite is s.flat.  Calling .previous()
+            finds tb1 in s.flat.  This is normal.
+            
+            tb1 calls .previous().  Search of first site finds nothing before tb1, 
+            so .getContextByClass() is ready to return None.  But other sites need to be checked
+
+            Search returns to s.  .getContextByClass() asks is there anything before tb1's
+            sort tuple of 0.0 <0.-31.3> (.3 is the insertIndex) in s?  Yes, it's tb2 at
+            0.0 <0.-31.2> (because s was created before s.flat, the insert indices of objects
+            in s are lower than the insert indices of objects in s.flat (perhaps insert indices
+            should be eventually made global within the context of a stream, but not global
+            overall? but that wasn't the solution here).  So we go back to tb2 in s. Then in
+            theory we should go to tb1 in s, then s, then None.  This would have certain
+            elements appear twice in a .previous() search, which is not optimal, but wouldn't be
+            such a huge bug to make this method necessary.
+            
+            That'd be the only bug that would occur if we did: sf = s.flat, tb2 = sf[1]. But
+            consider the exact phrasing above:  tb2 = s.flat[1].  s.flat is created for an instant,
+            it is assigned to tb2's ._activeSite via weakRef, and then tb2's sortTuple is set
+            via this temporary stream. 
+            
+            Suppose tb2 is from that temp s.flat[1].  Then tb1 = tb2.previous() which is found 
+            in s.flat.  Suppose then that for some reason s._cache['flat'] gets cleaned up
+            (It was a bug that s._cache was being cleaned by the positioning of notes during
+            s_flat's setOffset, 
+            but _cache cleanups are allowed to happen at any time,
+            so it's not a bug that it's being cleaned; assuming that it wouldn't be cleaned
+            would be the bug) and garbage collection runs. 
+            Now we get tb1.previous() would get tb2 in s. Okay, it's redundant but not a huge deal,
+            and tb2.previous() gets tb1.  tb1's ._activeSite is still a weakref to s.flat.
+            When tb1's getContextByClass() is called, it needs its .sortTuple().  This looks 
+            first at .activeSite.  That is None, so it gets it from .offset which is the .offset
+            of the last .activeSite (even if it is dead.  A lot of code depends on .offset
+            still being available if .activeSite dies, so changing that is not an option for now).
+            So its sortTuple is 0.0 <0.-31.3>. which has a .previous() of tb2 in s, which can
+            call previous can get tb1, etc. So with really bad timing of cache cleanups and
+            garbage collecting, it's possible to get an infinite loop.
+            
+            There may be ways to set activeSite on .getContextByClass() call such that this routine
+            is not necessary, but I could not find one that was not disruptive for normal
+            usages.
+            
+            There are some possible issues that one could raise about "wellFormed".  
+            Suppose for instance, that in one stream (b) we have [tb1, tb2] and 
+            then in another stream context (a), created earlier,
+            we have [tb0, tb1, tb2].  tb1 is set up with (b) as an activeSite. Finding nothing
+            previous, it goes to (a) and finds tb2; it then discovers that in (a), tb2 is after
+            tb1 so it returns None for this context.  One might say, "wait a second, why
+            isn't tb0 returned? It's going to be skipped." To this, I would answer, the original
+            context in which .previous() or .getContextByClass() was called was (b). There is
+            no absolute obligation to find what was previous in a different site context. It is
+            absolutely fair game to say, "there's nothing prior to tb1".  Then why even
+            search other streams/sites? Because it's quite common to create a new site
+            for say a single measure or .getElementsByOffset(), etc., so that when leaving
+            this extacted section, one wants to see how that fits into a larger stream hierarchy.
+            '''
+            try:
+                selfSt = self.sortTuple(site, raiseExceptionOnMiss=True)
+                contextSt = contextEl.sortTuple(site, raiseExceptionOnMiss=True)
+            except SitesException:
+                # might be raised by selfSt; should not be by contextSt. It just
+                # means that selfSt isn't in the same stream as contextSt, such as
+                # when crossing measure borders.  Thus it's well-formed.
+                return True
+            
+            if 'Before' in getElementMethod and selfSt < contextSt:
+                #print(getElementMethod, selfSt.shortRepr(), contextSt.shortRepr(), self, contextEl)
+                return False
+            elif 'After' in getElementMethod and selfSt > contextSt:
+                #print(getElementMethod, selfSt.shortRepr(), contextSt.shortRepr(), self, contextEl)
+                return False
+            else:
+                return True
+
+
+        if className and not common.isListLike(className):
             className = (className,)
+            
+        if 'At' in getElementMethod and self.isClassOrSubclass(className):
+            return self
 
-        for site, offsetStart, searchType in self.contextSites(
-                                                sortByCreationTime=sortByCreationTime):
-            if site.isClassOrSubclass(className):
-                return site
+        for site, positionStart, searchType in self.contextSites(
+                                            returnSortTuples=True,
+                                            sortByCreationTime=sortByCreationTime):
             if searchType == 'elementsOnly' or searchType == 'elementsFirst':
-                tsNotFlat = site.asTimespans(classList=className, recurse=False)
-                el = findElInTimespanTreeNoRecurse(tsNotFlat, offsetStart)
-                if el is not None:
-                    return el
-            if searchType != 'elementsOnly':
-                tsFlat = site.asTimespans(classList=className, recurse=True)
-                el = findElInTimespanTree(tsFlat, offsetStart)
-                if el is not None:
-                    return el
+                contextEl = payloadExtractor(site, flatten=False, positionStart=positionStart)                
+                
+                if contextEl is not None and wellFormed(contextEl, site):
+                    try:
+                        contextEl.activeSite = site
+                    except SitesException:
+                        pass
+                    return contextEl
+                # otherwise, continue to check for flattening...
+                
+            if searchType != 'elementsOnly': # flatten or elementsFirst
+                if ('After' in getElementMethod and 
+                        (not className or 
+                         site.isClassOrSubclass(className))):
+                    if 'NotSelf' in getElementMethod and self is site:
+                        pass
+                    elif 'NotSelf' not in getElementMethod: # for 'After' we can't do the
+                        # containing site because that comes before.
+                        return site # if the site itself is the context, return it...
+
+                contextEl = payloadExtractor(site, flatten='semiFlat', positionStart=positionStart)
+                if contextEl is not None and wellFormed(contextEl, site):
+                    try:
+                        contextEl.activeSite = site
+                    except SitesException:
+                        pass
+                    return contextEl
+
+                if ('Before' in getElementMethod and 
+                        (not className or 
+                         site.isClassOrSubclass(className))):
+                    if 'NotSelf' in getElementMethod and self is site:
+                        pass
+                    else:
+                        return site # if the site itself is the context, return it...
+                
+                # otherwise, continue to check in next contextSite.
+
+        # nothing found...
+        return None
+
 
     def contextSites(self, 
                      callerFirst=None, 
@@ -1296,11 +1408,13 @@ class Music21Object(object):
                      offsetAppend=0.0, 
                      sortByCreationTime=False, 
                      priorityTarget=None,
+                     returnSortTuples=False,
                      followDerivation=True):
         '''
         A generator that returns a list of tuples of sites to search for a context...
         
-        Each tuple contains a Stream object, the offset of this element in that Stream, and
+        Each tuple contains a Stream object, 
+        the offset or position (sortTuple) of this element in that Stream, and
         the method of searching that should be applied to search for a context.  
         These methods are:
 
@@ -1318,28 +1432,54 @@ class Music21Object(object):
         >>> n
         <music21.note.Note G#>
         
-        >>> for y in n.contextSites():
-        ...      print(y)
-        (<music21.stream.Measure 3 offset=9.0>, 0.5, 'elementsFirst')
-        (<music21.stream.Part Alto>, 9.5, 'flatten')
-        (<music21.stream.Score bach>, 9.5, 'elementsOnly')
+        Returning sortTuples are important for distinguishing the order of multiple sites
+        at the same offset.
+        
+        >>> for y in n.contextSites(returnSortTuples=True):
+        ...      yClearer = (y[0], y[1].shortRepr(), y[2])
+        ...      print(yClearer)
+        (<music21.stream.Measure 3 offset=9.0>, '0.5 <0.20...>', 'elementsFirst')
+        (<music21.stream.Part Alto>, '9.5 <0.20...>', 'flatten')
+        (<music21.stream.Score bach>, '9.5 <0.20...>', 'elementsOnly')
+        
+        Streams have themselves as the first element in their context sites, at position
+        zero and classSortOrder negative infinity. 
+        
+        This example shows the context sites for Measure 3 of the 
+        Alto part. We will get the measure object using direct access to
+        indices to ensure that no other temporary streams are created; normally, we would do
+        c.parts['Alto'].measure(3).
+        
         >>> m = c[2][4]
         >>> m
         <music21.stream.Measure 3 offset=9.0>
-        >>> for y in m.contextSites():
-        ...      print(y)
-        (<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')
-        (<music21.stream.Part Alto>, 9.0, 'flatten')
-        (<music21.stream.Score bach>, 9.0, 'elementsOnly')
+        >>> for y in m.contextSites(returnSortTuples=True):
+        ...      yClearer = (y[0], y[1].shortRepr(), y[2])
+        ...      print(yClearer)
+        (<music21.stream.Measure 3 offset=9.0>, '0.0 <-inf.-20...>', 'elementsFirst')
+        (<music21.stream.Part Alto>, '9.0 <0.-20...>', 'flatten')
+        (<music21.stream.Score bach>, '9.0 <0.-20...>', 'elementsOnly')
+
+        Here we make a copy of the earlier measure and we see that its contextSites
+        follow the derivationChain from the original measure and still find the Part
+        and Score of the original Measure 3 even though mCopy is not in any of these
+        objects.
 
         >>> import copy
-        >>> m2 = copy.deepcopy(m)
-        >>> m2.number = 3333
-        >>> for y in m2.contextSites():
-        ...      print(y)
+        >>> mCopy = copy.deepcopy(m)
+        >>> mCopy.number = 3333
+        >>> for y in mCopy.contextSites():
+        ...      print(y, mCopy in y[0])
+        (<music21.stream.Measure 3333 offset=0.0>, 0.0, 'elementsFirst') False
+        (<music21.stream.Part Alto>, 9.0, 'flatten') False
+        (<music21.stream.Score bach>, 9.0, 'elementsOnly') False
+
+        If followDerivation were False, then the Part and Score would not be found.
+
+        >>> for y in mCopy.contextSites(followDerivation=False):
+        ...     print(y)
         (<music21.stream.Measure 3333 offset=0.0>, 0.0, 'elementsFirst')
-        (<music21.stream.Part Alto>, 9.0, 'flatten')
-        (<music21.stream.Score bach>, 9.0, 'elementsOnly')
+        
 
         >>> tempPartStream = c.parts
         >>> tempPartStream.id = 'partStream' # for identificationBelow
@@ -1407,13 +1547,19 @@ class Music21Object(object):
         '''
         if memo is None:
             memo = []
+            
         if callerFirst is None:
             callerFirst = self
-            if self.isStream:
+            if self.isStream and self not in memo:
                 recursionType = self.recursionType
                 environLocal.printDebug("Caller first is {} with offsetAppend {}".format(
                                                                 callerFirst, offsetAppend))
-                yield(self, 0.0, recursionType)
+                if returnSortTuples:
+                    selfSortTuple = self.sortTuple().modify(offset=0.0, priority=float('-inf'))
+                    yield(self, selfSortTuple, recursionType)
+                else:
+                    yield(self, 0.0, recursionType)
+                memo.append(self)
 
         if priorityTarget is None and sortByCreationTime is False:
             priorityTarget = self.activeSite
@@ -1422,58 +1568,106 @@ class Music21Object(object):
             
 
         allSites = self.sites.get(priorityTarget=priorityTarget,
-                                      sortByCreationTime=sortByCreationTime,
-                                      excludeNone=True)
+                                  sortByCreationTime=sortByCreationTime,
+                                  excludeNone=True)
         topLevel = self
         for siteObj in allSites:
+            if siteObj in memo:
+                continue
             if 'SpannerStorage' in siteObj.classes:
                 continue
+            
             try:
-                # do not change to siteObj.elementOffset(self)...
-                offsetInStream = self.getOffsetBySite(siteObj) + offsetAppend
+                st = self.sortTuple(siteObj)
+                if followDerivation:
+                    # do not change this to ElementOffset because getOffsetBySite can
+                    # follow derivation chains.
+                    offsetInStream = self.getOffsetBySite(siteObj)
+                else:
+                    offsetInStream = siteObj.elementOffset(self)
+                    
+                positionInStream = st.modify(offset=offsetInStream + offsetAppend)
             except SitesException:
                 continue # not a valid site any more.  Could be caught in derivationChain
             
             recursionType = siteObj.recursionType
-            yield (siteObj, offsetInStream, recursionType)
-            environLocal.printDebug("looking in contextSites for {} with offsetInStream {}".format(
-                                                                siteObj, offsetInStream))
-            for x in siteObj.contextSites(callerFirst=callerFirst,
+            if returnSortTuples:
+                yield (siteObj, positionInStream, recursionType)
+            else:
+                yield (siteObj, positionInStream.offset, recursionType)
+
+            memo.append(siteObj)          
+            environLocal.printDebug("looking in contextSites for {} with position {}".format(
+                                                        siteObj, positionInStream.shortRepr()))
+            for topLevel, inStreamPos, recurType in siteObj.contextSites(callerFirst=callerFirst,
                                               memo=memo,
-                                              offsetAppend=offsetInStream,
+                                              offsetAppend=positionInStream.offset,
+                                              returnSortTuples=True, # ALWAYS
                                               sortByCreationTime=sortByCreationTime,
                                               priorityTarget=None): 
                                 # get activeSite unless sortByCreationTime
-                topLevel = x[0] # only look at the derivation chain for the topmost level
-                if x[0] not in memo:                    
-                    environLocal.printDebug("Yielding {} from contextSites".format(x))
-                    yield x
-                    memo.append(x[0])
+                inStreamOffset = inStreamPos.offset
+                # now take that offset and use it to modify the positionInStream
+                # to get where Exactly the object would be if it WERE in this stream
+                hypotheticalPosition = positionInStream.modify(offset=inStreamOffset)
+                
+                if topLevel not in memo:                    
+                    #environLocal.printDebug("Yielding {}, {}, {} from contextSites".format(
+                    #                                                topLevel,
+                    #                                                inStreamPos.shortRepr(),
+                    #                                                recurType))
+                    if returnSortTuples:
+                        yield (topLevel, hypotheticalPosition, recurType)
+                    else:
+                        yield (topLevel, inStreamOffset, recurType)
+                    memo.append(topLevel)
 
         if followDerivation:
             for derivedObject in topLevel.derivation.chain():
                 environLocal.printDebug(
                         "looking now in derivedObject, {} with offsetAppend {}".format(
                                                             derivedObject, offsetAppend))
-                for z in derivedObject.contextSites(callerFirst=None,
+                for derivedCsTuple in derivedObject.contextSites(
+                                              callerFirst=None,
                                               memo=memo,
                                               offsetAppend=0.0,
+                                              returnSortTuples=True,
                                               sortByCreationTime=sortByCreationTime,
                                               priorityTarget=None): 
                                             # get activeSite unless sortByCreationTime
-                    if z[0] not in memo:
+                    if derivedCsTuple[0] not in memo:
                         environLocal.printDebug(
-                                "Yielding {} from derivedObject contextSites".format(z))
-                        zz = (z[0], z[1] + offsetAppend, z[2])
-                        yield zz
-                        memo.append(z[0])
+                                "Yielding {} from derivedObject contextSites".format(derivedCsTuple)
+                                )
+                        offsetAdjustedCsTuple = (
+                            derivedCsTuple[0], 
+                            derivedCsTuple[1].modify(offset=derivedCsTuple[1].offset + 
+                                                                offsetAppend), 
+                            derivedCsTuple[2])
+                        if returnSortTuples:
+                            yield offsetAdjustedCsTuple
+                        else:
+                            yield (offsetAdjustedCsTuple[0],
+                                   offsetAdjustedCsTuple[1].offset,
+                                   offsetAdjustedCsTuple[2])
+                        memo.append(derivedCsTuple[0])
 
         environLocal.printDebug("--returning from derivedObject search")    
 
 
+    @common.deprecated('December 2015', 'February 2016', '''if el is not a member of className use:
 
+        >>> el = self.getContextByClass(className)
+        >>> while el is not None:
+        ...    yield el
+        ...    el = el.getContextByClass(className)        
+
+        Otherwise, use el.previous(className) 
+    ''')
     def getAllContextsByClass(self, className):
         '''
+        DEPRECATED.
+        
         Returns a generator that yields elements found by `.getContextByClass` and
         then finds the previous contexts for that element.
         
@@ -1483,11 +1677,12 @@ class Music21Object(object):
         >>> s.append(meter.TimeSignature('3/4'))
         >>> n = note.Note('D')
         >>> s.append(n)
-        >>> for ts in n.getAllContextsByClass('TimeSignature'):
+        
+        
+        for ts in n.getAllContextsByClass('TimeSignature'):
         ...     print(ts, ts.offset)
         <music21.meter.TimeSignature 3/4> 1.0
         <music21.meter.TimeSignature 2/4> 0.0
-
 
         TODO: make it so that it does not skip over multiple matching classes
         at the same offset.
@@ -1500,105 +1695,9 @@ class Music21Object(object):
         
     #--------------------------------------------------------------------------
 
-    def _adjacentObject(self, 
-                        site, 
-                        classFilterList=None, 
-                        forward=True,
-                        beginNearest=True):
-        '''
-        Core method for finding adjacent objects given a single site.
-
-        The `site` argument is a Stream that contains this
-        element. The index of this element if sound in this site,
-        and either the next or previous element, if found, is returned.
-
-        If `forward` is True index values are
-        incremented; if False, index values are decremented.
-
-        If `beginNearest` is True, index values are searched based
-        on those closest to the caller; if False, the search is
-        done in reverse, from the most remote index toward the caller.
-        This may be useful as an optimization when looking for elements 
-        that are far from the caller.
-
-        The `classFilterList` may specify one or more classes as targets.
-        '''
-        siteLength = len(site)
-        # get another list to avoid function calls
-        siteElements = site.elements
-        # special optimization for class selection when a single str class
-        # is given
-        if (classFilterList is not None and len(classFilterList) == 1 and
-            isinstance(classFilterList[0], str)):
-            if not site.hasElementOfClass(classFilterList[0]):
-                return None
-        # go to right, start at nearest
-        if forward and beginNearest:
-            currentIndex = site.index(self) + 1 # start with next
-            while (currentIndex < siteLength):
-                nextObj = siteElements[currentIndex]
-                if classFilterList is not None:
-                    if nextObj.isClassOrSubclass(classFilterList):
-                        return nextObj
-                else:
-                    return nextObj
-                currentIndex += 1
-        # go to right, start at rightmost
-        elif forward and not beginNearest:
-            try:
-                lastIndex = site.index(self) + 1 # end with next
-            except exceptions21.StreamException: 
-                return None # see note below
-            currentIndex = siteLength
-            while (currentIndex >= lastIndex):
-                nextObj = siteElements[currentIndex]
-                if classFilterList is not None:
-                    if nextObj.isClassOrSubclass(classFilterList):
-                        return nextObj
-                else:
-                    return nextObj
-                currentIndex -= 1
-        # go to left, start at nearest
-        elif not forward and beginNearest:
-            try:
-                currentIndex = site.index(self) - 1 # start with next
-            except exceptions21.StreamException: 
-                return None 
-                # this may happen because a Stream may be in an object's .sites
-                # after a deepcopy but which does not actually have the object in it.
-                # TODO: Remove this check after sites is completely cleaned up so does not happen. 
-            while (currentIndex >= 0):
-                nextObj = siteElements[currentIndex]
-                if classFilterList is not None:
-                    if nextObj.isClassOrSubclass(classFilterList):
-                        return nextObj
-                else:
-                    return nextObj
-                currentIndex -= 1
-        # go to left, start at leftmost
-        elif not forward and not beginNearest:
-            try:
-                lastIndex = site.index(self) - 1 # start with next
-            except exceptions21.StreamException:
-                return None # see note above
-            currentIndex = 0
-            while (currentIndex <= lastIndex):
-                nextObj = siteElements[currentIndex]
-                if classFilterList is not None:
-                    if nextObj.isClassOrSubclass(classFilterList):
-                        return nextObj
-                else:
-                    return nextObj
-                currentIndex += 1
-        else:
-            raise Music21ObjectException('bad organization of forward and beginNearest parameters')
-        # if nothing found, return None
-        return None
-
     def _adjacencySearch(self, 
-                         classFilterList=None, 
-                         forward=True,
-                         beginNearest=True, 
+                         className=None, 
+                         forward=True, 
                          flattenLocalSites=False):
         '''
         Get the next (if forward is True) or previous (if forward is False) element 
@@ -1611,12 +1710,63 @@ class Music21Object(object):
         site will be returned. If not found no next element is found in any site, the flat
         representation of all sites of each immediate site are searched.
 
-        If `beginNearest` is True, sites will be searched from the element nearest to the
-        caller and then outward.
+        The `classFilterList` may specify one or more classes as targets.
         '''
-        if classFilterList is not None:
-            if not common.isListLike(classFilterList):
-                classFilterList = [classFilterList]
+        def adjacentObject(site):
+            '''
+            Core method for finding adjacent objects given a single site.
+
+            The `site` argument is a Stream that contains this
+            element. The index of this element if sound in this site,
+            and either the next or previous element, if found, is returned.
+            
+            '''
+            siteTree = site.asTree(flatten=False, classList=className)
+            try:
+                st = self.sortTuple(site, raiseExceptionOnMiss=True)
+            except SitesException:
+                st = ZeroSortTupleLow.modify(offset=positionStart)
+            
+            if forward:
+                node = siteTree.getNodeAfter(st)
+            else:
+                node = siteTree.getNodeBefore(st)
+    
+            if node:
+                return node.payload
+            else:
+                return None        
+
+
+        if className is not None:
+            if not common.isListLike(className):
+                className = [className]
+
+        #siteMemo = set()
+        for site, positionStart, searchType in self.contextSites(returnSortTuples=True):
+            if className and site.isClassOrSubclass(className):
+                return site
+
+            foundEl = adjacentObject(site)
+            if foundEl is not None:
+                return foundEl
+            foundEl = site._adjacencySearch(className=className, forward=forward)
+            if foundEl:
+                return foundEl
+#             if searchType == 'elementsOnly' or searchType == 'elementsFirst':
+#                 contextEl = payloadExtractor(site, flatten=False, positionStart=positionStart)
+#                 if contextEl is not None:
+#                     return contextEl
+#                 # otherwise, continue to check for flattening...
+#                 
+#             if searchType != 'elementsOnly': # flatten or elementsFirst
+#                 contextEl = payloadExtractor(site, flatten=True, positionStart=positionStart)
+#                 if contextEl is not None:
+#                     return contextEl
+#                 # otherwise, continue to check in next contextSite.
+
+                
+        
         selfSites = self.sites.getSites(excludeNone=True)
         match = None
 
@@ -1660,10 +1810,7 @@ class Music21Object(object):
             else: # normal site
                 target = s.semiFlat
             # use semiflat of site
-            match = self._adjacentObject(target,
-                                         classFilterList=classFilterList, 
-                                         forward=forward,
-                                         beginNearest=beginNearest)
+            match = adjacentObject(target)
             if match is not None and match is not self:
                 return match
             # append new sites to end of queue
@@ -1672,47 +1819,50 @@ class Music21Object(object):
         # if cannot be found, return None
         return None
 
-    def next(self, 
-             classFilterList=None, 
-             flattenLocalSites=False,
-             beginNearest=True):
+    def next(self, className=None):
         '''
         Get the next element found in the activeSite (or other Sites)
         of this Music21Object.
 
-        The `classFilterList` can be used to specify one or more classes to match.
-
-        The `flattenLocalSites` parameter determines if the sites of this element 
-        (e.g., a Measure's Part) are flattened on first search. 
-        When True, elements contained in adjacent containers may be selected first.
-
+        The `className` can be used to specify one or more classes to match.
 
         >>> s = corpus.parse('bwv66.6')
-        >>> m3 = s.parts[0].measure(3) 
-        >>> m3.next() is s.parts[0].measure(4)
+        >>> m3 = s.parts[0].measure(3)
+        >>> m4 = s.parts[0].measure(4)
+        >>> m3
+        <music21.stream.Measure 3 offset=9.0>
+        >>> m3.show('t')
+        {0.0} <music21.layout.SystemLayout>
+        {0.0} <music21.note.Note A>
+        {0.5} <music21.note.Note B>
+        {1.0} <music21.note.Note G#>
+        {2.0} <music21.note.Note F#>
+        {3.0} <music21.note.Note A>
+        >>> m3.next()
+        <music21.layout.SystemLayout>
+        >>> nextM3 = m3.next('Measure')
+        >>> nextM3 is m4
         True
         
         Note that calling next() repeatedly gives...the same object.  You'll want to
         call next on that object...
         
-        >>> m3.next() is s.parts[0].measure(4)
+        >>> m3.next('Measure') is s.parts[0].measure(4)
         True
-        >>> m3.next() is s.parts[0].measure(4)
+        >>> m3.next('Measure') is s.parts[0].measure(4)
         True
 
         So do this instead:
         
         >>> o = m3
-        >>> for i in range(4):
+        >>> for i in range(5):
         ...     print(o)
-        ...     o = o.next()
+        ...     o = o.next('Measure')
         <music21.stream.Measure 3 offset=9.0>
         <music21.stream.Measure 4 offset=13.0>
         <music21.stream.Measure 5 offset=17.0>
         <music21.stream.Measure 6 offset=21.0>        
-
-
-
+        <music21.stream.Measure 7 offset=25.0>        
 
 
         We can find the next element given a certain class with the `classFilterList`:
@@ -1724,6 +1874,8 @@ class Music21Object(object):
         3
         >>> n is m3.notes[0]
         True
+        >>> n.next()
+        <music21.note.Note B>
 
 
         ..note::
@@ -1733,64 +1885,60 @@ class Music21Object(object):
             a .next() function.  In Python3 there will be no problem since the
             `next()` function is renamed to `__next__()`.
 
-
-
-        OMIT_FROM_DOCS
-        
-        Add this back when it's explained what the difference from the previous is.
-        
-        >>> m3.next('Note', flattenLocalSites=True) == s.parts[0].measure(3).notes[0]
-        True
-        >>> n2 = m3.next('Note', flattenLocalSites=True)
-        >>> n2
-        <music21.note.Note A>
-        >>> n2 is n
-        True
-        
-
-
-        THIS IS OMITTED BECAUSE IT SOMETIMES GIVES SEMIFLATs etc.
-
         Notice though that when we get to the end of the set of measures, something
         interesting happens (maybe it shouldn't? don't count on this...): we descend
         into the last measure and give its elements instead.
         
-        We'll leave o where it is (m7 now) to demonstrate what happens, and also
-        print the its Part for more information...
+        We'll leave o where it is (m8 now) to demonstrate what happens, and also
+        print its Part for more information...
         
-        #>>> while o is not None:
-        #...     print(o, o.getContextByClass('Part'))
-        #...     o = o.next()
-        <music21.stream.Measure 7 offset=25.0> <music21.stream.Part Soprano>
+        >>> while o is not None:
+        ...     print(o, o.getContextByClass('Part'))
+        ...     o = o.next()
         <music21.stream.Measure 8 offset=29.0> <music21.stream.Part Soprano>
+        <music21.note.Note F#> <music21.stream.Part Soprano>
+        <music21.note.Note F#> <music21.stream.Part Soprano>
+        <music21.note.Note F#> <music21.stream.Part Soprano>
         <music21.stream.Measure 9 offset=33.0> <music21.stream.Part Soprano>
         <music21.note.Note F#> <music21.stream.Part Soprano>
         <music21.note.Note F#> <music21.stream.Part Soprano>
         <music21.note.Note E#> <music21.stream.Part Soprano>
         <music21.note.Note F#> <music21.stream.Part Soprano>
-        <music21.bar.Barline style=final> <music21.stream.Part Soprano>
-        <music21.bar.Barline style=final> <music21.stream.Part Alto>
-        <music21.bar.Barline style=final> <music21.stream.Part Tenor>
-        <music21.bar.Barline style=final> <music21.stream.Part Bass>       
-        
-        So we get through all the measures in Soprano, then with nothing else to do,
-        it goes into the measure and gets all the notes in the measure and finally
-        the final barline.  Then, having nothing else to do, it backtracks out of the
-        Part to the Score object and finds the object that is at the same offset in
-        the next object, which is the final barline of the Alto part, and so on.
-        
-        Not particularly useful here for `next()`, but it'll be very useful for `prev()`.
-        
+        <music21.bar.Barline style=final> <music21.stream.Part Soprano>        
         '''
-        return self._adjacencySearch(classFilterList=classFilterList,
-                                     forward=True, 
-                                     beginNearest=beginNearest, 
-                                     flattenLocalSites=flattenLocalSites)
+        allSiteContexts = list(self.contextSites(returnSortTuples=True))
+        maxRecurse = 20
+        
+        thisElForNext = self
+        while maxRecurse:
+            nextEl = thisElForNext.getContextByClass(className=className,
+                                                     getElementMethod='getElementAfterNotSelf')
+            
+            callContinue = False
+            for singleSiteContext, unused_positionInContext, unused_recurseType in allSiteContexts:
+                if nextEl is singleSiteContext:
+                    if nextEl and nextEl[0] is not self: # has elements
+                        return nextEl[0]
+                    
+                    thisElForNext = nextEl
+                    callContinue = True
+                    break
+                
+            if callContinue:
+                maxRecurse -= 1
+                continue
+            
+            if nextEl is not self:
+                return nextEl
+            maxRecurse -= 1
 
-    def previous(self, 
-                 classFilterList=None, 
-                 flattenLocalSites=False,
-                 beginNearest=True):
+        if maxRecurse == 0:
+            raise Music21Exception('Maximum recursion!')
+#         return self._adjacencySearch(className=className,
+#                                      forward=True, 
+#                                      flattenLocalSites=flattenLocalSites)
+
+    def previous(self, className=None):
         '''
         Get the previous element found in the activeSite or other .sites of this
         Music21Object.
@@ -1802,23 +1950,75 @@ class Music21Object(object):
         contained in adjacent containers may be selected first.
 
         >>> s = corpus.parse('bwv66.6')
-        >>> m2 = s.parts[0].measure(2)
-        >>> m3 = s.parts[0].measure(3)
-        >>> m3.previous() is m2
+        >>> m2 = s.parts[0].iter.getElementsByClass('Measure')[2] # pickup measure
+        >>> m3 = s.parts[0].iter.getElementsByClass('Measure')[3]
+        >>> m3
+        <music21.stream.Measure 3 offset=9.0>
+        >>> m3prev = m3.previous() 
+        >>> m3prev
+        <music21.note.Note C#>
+        >>> m3prev is m2.notes[-1]
         True
-        >>> m3.previous('Note', flattenLocalSites=True) is m2.notes[-1]
-        True
+        >>> m3.previous('Measure') is m2
+        True        
         
+        We'll iterate backwards from the first note of the second measure of the Alto part.
         
-        TODO:  Try:  l = corpus.parse('luca/gloria'); 
-        for el in l.recurse: print(el, el.previous('Note'))
-        SLOWEST THING EVER! why????
+        >>> o = s.parts[1].iter.getElementsByClass('Measure')[2][0]
+        >>> while o:
+        ...    print(o)
+        ...    o = o.previous()
+        <music21.note.Note E>
+        <music21.stream.Measure 2 offset=5.0>
+        <music21.note.Note E>
+        <music21.note.Note E>
+        <music21.note.Note E>
+        <music21.note.Note F#>
+        <music21.stream.Measure 1 offset=1.0>
+        <music21.note.Note E>
+        <music21.meter.TimeSignature 4/4>
+        <music21.key.KeySignature of 3 sharps, mode minor>
+        <music21.clef.TrebleClef>
+        <music21.stream.Measure 0 offset=0.0>
+        P2: Alto: Instrument 2
+        <music21.stream.Part Alto>
+        <music21.stream.Part Soprano>
+        <music21.stream.Score 0x10513af98>
         '''
-        return self._adjacencySearch(classFilterList=classFilterList,
-                                     forward=False, 
-                                     beginNearest=beginNearest, 
-                                     flattenLocalSites=flattenLocalSites)
-
+#         allSiteContexts = list(self.contextSites(returnSortTuples=True))
+#         maxRecurse = 20
+        
+        prevEl = self.getContextByClass(className=className,
+                                        getElementMethod='getElementBeforeNotSelf')
+        
+#         for singleSiteContext, unused_positionInContext, unused_recurseType in allSiteContexts:
+#             if prevEl is singleSiteContext:
+#                 prevElPrev = prevEl.getContextByClass(prevEl.__class__,
+#                                                     getElementMethod='getElementBeforeNotSelf')
+#                 if prevElPrev and prevElPrev is not self:
+#                     return prevElPrev
+        isInPart = False
+        if self.isStream and prevEl is not None: 
+            # if it is a Part, ensure that the previous element is not in self
+            for cs, unused, unused in prevEl.contextSites():                
+                if cs is self:
+                    isInPart = True
+                    break
+                
+        if prevEl and prevEl is not self and not isInPart:
+            return prevEl
+        else:
+            # okay, go up to next level
+            activeS = self.activeSite # might be None...
+            if activeS is None:
+                return None
+            asTree = activeS.asTree(classList=className, flatten=False)
+            prevNode = asTree.getNodeBefore(self.sortTuple())
+            if prevNode is None:
+                return activeS
+            else:
+                return prevNode.payload
+                
     # end contexts...
     #---------------------------------------------------------------------------------
 
@@ -2054,10 +2254,10 @@ class Music21Object(object):
         30.5
 
         When in doubt, use `.getOffsetBySite(streamObj)`
-        which is safer.
+        which is safer or streamObj.elementOffset(self) which is 3x faster.
         ''')
     
-    def sortTuple(self, useSite=False):
+    def sortTuple(self, useSite=False, raiseExceptionOnMiss=False):
         '''
         Returns a collections.namedtuple called SortTuple(atEnd, offset, priority, classSortOrder,
         isNotGrace, insertIndex)
@@ -2106,6 +2306,13 @@ class Music21Object(object):
 
         >>> st.classSortOrder == note.Note.classSortOrder
         True
+        
+        SortTuples have a few methods that are documented in
+        :class:`~music21.sorting.SortTuple`. The most useful one for documenting
+        is `.shortRepr()
+        
+        >>> st.shortRepr()
+        '4.0 <-3.20.0>'
 
         Inserting the note into the Stream will set the insertIndex.  Most implementations of
         music21 will use a global counter rather than an actual timer.  Note that this is a
@@ -2133,7 +2340,23 @@ class Music21Object(object):
         >>> s.storeAtEnd(rb)
         >>> rb.sortTuple()
         SortTuple(atEnd=1, offset=0.0, priority=0, classSortOrder=-5, 
-                    isNotGrace=1, insertIndex=...)        
+                    isNotGrace=1, insertIndex=...)  
+                    
+                    
+        Normally if there's a site specified and the element is not in the site,
+        the offset of None will be used, but if raiseExceptionOnMiss is set to True
+        then a SitesException will be raised:
+        
+        >>> aloneNote = note.Note()
+        >>> aloneNote.offset = 30
+        >>> aloneStream = stream.Stream(id='aloneStream')  # no insert
+        >>> aloneNote.sortTuple(aloneStream)
+        SortTuple(atEnd=0, offset=30.0, priority=0, classSortOrder=20, isNotGrace=1, insertIndex=0)
+        
+        >>> aloneNote.sortTuple(aloneStream, raiseExceptionOnMiss=True)
+        Traceback (most recent call last):
+        SitesException: an entry for this object 0x... is not stored in 
+            stream <music21.stream.Stream aloneStream>
         '''
         if useSite is False: # False or a Site; since None is a valid site, default is False
             useSite = self.activeSite
@@ -2144,6 +2367,8 @@ class Music21Object(object):
             try:
                 foundOffset = useSite.elementOffset(self, stringReturns=True)
             except SitesException:
+                if raiseExceptionOnMiss:
+                    raise
                 #environLocal.warn(r)  
                     # activeSite may have vanished! or does not have the element
                 foundOffset = self._naiveOffset
@@ -2168,7 +2393,7 @@ class Music21Object(object):
         else:
             insertIndex = 0
 
-        return _SortTuple(atEnd, offset, self.priority, 
+        return SortTuple(atEnd, offset, self.priority, 
                           self.classSortOrder, isNotGrace, insertIndex)
 
     #------------------------------------------------------------------
@@ -2712,7 +2937,7 @@ class Music21Object(object):
 
         TODO: unit into a "split" function -- document obscure uses.
 
-
+        
         >>> n = note.Note()
         >>> n.quarterLength = 3
         >>> post = n.splitByQuarterLengths([1,1,1])
@@ -2919,16 +3144,24 @@ class Music21Object(object):
         >>> n._getMeasureOffset() # returns zero when not assigned
         0.0
         >>> n.quarterLength = .5
+        
         >>> m = stream.Measure()
         >>> m.repeatAppend(n, 4)
         >>> [n._getMeasureOffset() for n in m.notes]
         [0.0, 0.5, 1.0, 1.5]
+        
+        >>> m.paddingLeft = 2
+        >>> [n._getMeasureOffset() for n in m.notes]
+        [2.0, 2.5, 3.0, 3.5]
+        >>> [n._getMeasureOffset(includeMeasurePadding=False) for n in m.notes]
+        [0.0, 0.5, 1.0, 1.5]
         '''
-        if self.activeSite is not None and self.activeSite.isMeasure:
+        activeS = self.activeSite
+        if activeS is not None and activeS.isMeasure:
             #environLocal.printDebug(['found activeSite as Measure, using for offset'])
-            offsetLocal = self.getOffsetBySite(self.activeSite)
+            offsetLocal = activeS.elementOffset(self)
             if includeMeasurePadding:
-                offsetLocal += self.activeSite.paddingLeft
+                offsetLocal += activeS.paddingLeft
         else:
             #environLocal.printDebug(['did not find activeSite as Measure, 
             #    doing context search', 'self.activeSite', self.activeSite])
@@ -3003,6 +3236,18 @@ class Music21Object(object):
             #environLocal.printDebug(['result', post])
             return post
 
+
+    def _getTimeSignatureForBeat(self):
+        '''
+        used by all the _getBeat, _getBeatDuration, _getBeatStrength functions.
+        
+        extracted to make sure that all three of the routines use the same one.
+        '''
+        ts = self.getContextByClass('TimeSignature', getElementMethod='getElementAtOrBeforeOffset')
+        if ts is None:
+            raise Music21ObjectException('this object does not have a TimeSignature in Sites')
+        return ts
+    
     def _getBeat(self):
         '''
         Return a beat designation based on local
@@ -3036,9 +3281,7 @@ class Music21Object(object):
         2.0
         7/3
         '''
-        ts = self.getContextByClass('TimeSignature')
-        if ts is None:
-            raise Music21ObjectException('this object does not have a TimeSignature in Sites')
+        ts = self._getTimeSignatureForBeat()
         return ts.getBeatProportion(
             self._getMeasureOffsetOrMeterModulusOffset(ts))
 
@@ -3080,10 +3323,7 @@ class Music21Object(object):
         ''')
 
     def _getBeatStr(self):
-        ts = self.getContextByClass('TimeSignature')
-        #environLocal.printDebug(['_getBeatStr(): found ts:', ts])
-        if ts is None:
-            raise Music21ObjectException('this object does not have a TimeSignature in Sites')
+        ts = self._getTimeSignatureForBeat()
         return ts.getBeatProportionStr(
             self._getMeasureOffsetOrMeterModulusOffset(ts))
 
@@ -3130,11 +3370,8 @@ class Music21Object(object):
         >>> m.notes[1]._getBeatDuration()
         <music21.duration.Duration 1.0>
         '''
-        ts = self.getContextByClass('TimeSignature')
-        if ts is None:
-            raise Music21ObjectException('this object does not have a TimeSignature in Sites')
-        return ts.getBeatDuration(
-            self._getMeasureOffsetOrMeterModulusOffset(ts))
+        ts = self._getTimeSignatureForBeat()
+        return ts.getBeatDuration(self._getMeasureOffsetOrMeterModulusOffset(ts))
 
     beatDuration = property(_getBeatDuration,
         doc = '''
@@ -3226,16 +3463,7 @@ class Music21Object(object):
         >>> s.notes[5].beatStrength
         0.5
         '''
-        #from music21.meter import MeterException
-        ts = self.getContextByClass('TimeSignature')
-        if ts is None:
-            raise Music21ObjectException('this object does not have a TimeSignature in Sites')
-
-#         environLocal.printDebug(['_getBeatStrength(): calling getAccentWeight()', 
-#                'self._getMeasureOffset()', self._getMeasureOffset(), 'ts', ts, 
-#                 'ts.getAccentWeight', accentWeight])
-        #mOffset = self._getMeasureOffset()
-
+        ts = self._getTimeSignatureForBeat()
         return ts.getAccentWeight(
             self._getMeasureOffsetOrMeterModulusOffset(ts),
                 forcePositionMatch=True, permitMeterModulus=False)
@@ -3413,8 +3641,6 @@ class ElementWrapper(Music21Object):
             return False
 
     def __ne__(self, other):
-        '''
-        '''
         return not self.__eq__(other)
 
     def __setattr__(self, name, value):
@@ -3440,7 +3666,6 @@ class ElementWrapper(Music21Object):
 
         see: http://stackoverflow.com/questions/371753/python-using-getattribute-method 
         for examples
-
         '''
         storedobj = Music21Object.__getattribute__(self, "obj")
         if storedobj is None:
@@ -3530,11 +3755,11 @@ class Test(unittest.TestCase):
         a.offset = 3.0
         c = ElementWrapper(n)
         c.offset = 3.0
-        assert (a == c)
-        assert (a is not c)
+        self.assertEqual(a, c)
+        self.assertIsNot(a, c)
         b = ElementWrapper(n)
         b.offset = 2.0
-        assert (a != b)
+        self.assertNotEqual(a, b)
 
     def testNoteCreation(self):
         from music21 import note
@@ -3668,14 +3893,15 @@ class Test(unittest.TestCase):
 
         n1 = note.Note('A')
         n2 = note.Note('B')
-        c1 = clef.TrebleClef()
-        c2 = clef.BassClef()
 
-        s1 = stream.Stream()
+        s1 = stream.Stream(id='s1')
         s1.insert(10, n1)
         s1.insert(100, n2)
 
-        s2 = stream.Stream()
+        c1 = clef.TrebleClef()
+        c2 = clef.BassClef()
+
+        s2 = stream.Stream(id='s2')
         s2.insert(0, c1)
         s2.insert(100, c2)
         s2.insert(10, s1) # placing s1 here should result in c2 being before n2
@@ -3697,19 +3923,20 @@ class Test(unittest.TestCase):
 
         # both notes can find the treble clef in the activeSite stream
         post = n1.getContextByClass(clef.TrebleClef)
-        self.assertEqual(isinstance(post, clef.TrebleClef), True)
+        self.assertTrue(isinstance(post, clef.TrebleClef))
 
         post = n2.getContextByClass(clef.TrebleClef)
-        self.assertEqual(isinstance(post, clef.TrebleClef), True)
+        self.assertTrue(isinstance(post, clef.TrebleClef))
 
-        # n1 cannot find a bass clef
+        # n1 cannot find a bass clef because it is before the bass clef
         post = n1.getContextByClass(clef.BassClef)
         self.assertEqual(post, None)
 
         # n2 can find a bass clef, due to its shifted position in s2
         post = n2.getContextByClass(clef.BassClef)
-        self.assertEqual(isinstance(post, clef.BassClef), True)
-
+        self.assertTrue(isinstance(post, clef.BassClef))
+        
+    
     def testSitesMeasures(self):
         '''Can a measure determine the last Clef used?
         '''
@@ -3749,7 +3976,7 @@ class Test(unittest.TestCase):
         # we can still access the clef through this measure on this
         # new stream
         post = newStream[0].getContextByClass(clef.Clef)
-        self.assertEqual(isinstance(post, clef.TrebleClef), True)
+        self.assertTrue(isinstance(post, clef.TrebleClef), post)
 
     def testSitesClef(self):
         from music21 import note, stream, clef
@@ -3762,20 +3989,19 @@ class Test(unittest.TestCase):
         sInner.append(n)
         sOuter.append(sInner)
 
-        unused_tss = sOuter.asTimespans(classList=(sInner.classes[0],), 
-                                        recurse='semiFlat') 
-
         # append clef to outer stream
-        sOuter.insert(0, clef.AltoClef())
+        altoClef = clef.AltoClef()
+        altoClef.priority = -1
+        sOuter.insert(0, altoClef)
         pre = sOuter.getElementAtOrBefore(0, [clef.Clef])
-        self.assertEqual(isinstance(pre, clef.AltoClef), True)
+        self.assertTrue(isinstance(pre, clef.AltoClef), pre)
 
         # we should be able to find a clef from the lower-level stream
         post = sInner.getContextByClass(clef.Clef)
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertTrue(isinstance(post, clef.AltoClef), post)
 
         post = sInner.getClefs(clef.Clef)
-        self.assertEqual(isinstance(post[0], clef.AltoClef), True)
+        self.assertTrue(isinstance(post[0], clef.AltoClef), post[0])
 
     def testBeatAccess(self):
         '''Test getting beat data from various Music21Objects.
@@ -3789,19 +4015,20 @@ class Test(unittest.TestCase):
 
         # clef/ks can get its beat; these objects are in a pickup,
         # and this give their bar offset relative to the bar
-        for classStr in ['Clef', 'KeySignature']:
-            self.assertEqual(p1.flat.getElementsByClass(
-                classStr)[0].beat, 4.0)
-            self.assertEqual(p1.flat.getElementsByClass(
-                classStr)[0].beatDuration.quarterLength, 1.0)
-            self.assertEqual(
-                p1.flat.getElementsByClass(classStr)[0].beatStrength, 0.25)
+        eClef = p1.flat.getElementsByClass('Clef')[0]
+        self.assertEqual(eClef.beat, 4.0)
+        self.assertEqual(eClef.beatDuration.quarterLength, 1.0)
+        self.assertEqual(eClef.beatStrength, 0.25)
+
+        eKS = p1.flat.getElementsByClass('KeySignature')[0]
+        self.assertEqual(eKS.beat, 4.0)
+        self.assertEqual(eKS.beatDuration.quarterLength, 1.0)
+        self.assertEqual(eKS.beatStrength, 0.25)
 
         # ts can get beatStrength, beatDuration
-        self.assertEqual(p1.flat.getElementsByClass(
-            'TimeSignature')[0].beatDuration.quarterLength, 1.0)
-        self.assertEqual(p1.flat.getElementsByClass(
-            'TimeSignature')[0].beatStrength, 0.25)
+        eTS = p1.flat.getElementsByClass('TimeSignature')[0]
+        self.assertEqual(eTS.beatDuration.quarterLength, 1.0)
+        self.assertEqual(eTS.beatStrength, 0.25)
 
         # compare offsets found with items positioned in Measures
         # as the first bar is a pickup, the measure offset here is returned
@@ -4091,7 +4318,7 @@ class Test(unittest.TestCase):
         mm2 = tempo.MetronomeMark(number=150, referent=.5)
         m2.insert(0, mm2)
         p.append([m1, m2])
-
+        # p.show('t')
         # if done with default args, we get the same object, as we are using
         # getElementAtOrBefore
         self.assertEqual(str(mm2.getContextByClass('MetronomeMark')),
@@ -4233,6 +4460,13 @@ class Test(unittest.TestCase):
         self.assertEqual(s2.duration.quarterLength, 5.25)
 
 
+    def testGetContextByClass2015(self):
+        from music21 import converter
+        p = converter.parse('tinynotation: 3/4 C4 D E 2/4 F G A B 1/4 c')
+        b = p.measure(3).notes[-1]
+        c = b.getContextByClass('Note', 'getElementAfterOffset')
+        self.assertEqual(c.name, 'C')
+    
     def testGetContextByClassB(self):
         from music21 import stream, note, meter
 
@@ -4302,7 +4536,8 @@ class Test(unittest.TestCase):
             notes.append(n) # keep for reference and testing
 
         self.assertEqual(notes[0], s[0])
-        self.assertEqual(notes[1], s[0].next())
+        s0Next = s[0].next()
+        self.assertEqual(notes[1], s0Next)
         self.assertEqual(notes[0], s[1].previous())
 
         self.assertEqual(id(notes[5]), id(s[4].next()))
@@ -4317,21 +4552,23 @@ class Test(unittest.TestCase):
 
         m1 = stream.Measure()
         m1.number = 1
-        n1 = note.Note()
+        n1 = note.Note('C')
         m1.append(n1)
 
         m2 = stream.Measure()
         m2.number = 2
-        n2 = note.Note()
+        n2 = note.Note('D')
         m2.append(n2)
 
         # n1 cannot be connected to n2 as no common site
-        self.assertEqual(n1.next(), None)
+        n1next = n1.next()
+        self.assertEqual(n1next, None)
 
         p1 = stream.Part()
         p1.append(m1)
         p1.append(m2)
-        self.assertEqual(n1.next(), m2)
+        n1next = n1.next()
+        self.assertEqual(n1next, m2)
         self.assertEqual(n1.next('Note'), n2)
 
     def testNextC(self):
@@ -4347,27 +4584,37 @@ class Test(unittest.TestCase):
             '<music21.key.KeySignature of 3 sharps, mode minor>')
 
         # iterating at the Measure level, showing usage of flattenLocalSites
-        measures = s.parts[0].getElementsByClass('Measure')
-        self.assertEqual(measures[3].previous(), measures[2])
-        self.assertEqual(measures[3].previous(flattenLocalSites=True), measures[2][-1])
+        measures = p1.getElementsByClass('Measure').stream()
+        m3 = measures[3]
+        m3prev = m3.previous()
+        self.assertEqual(m3prev, measures[2][-1])
+        m3Prev2 = measures[3].previous().previous()
+        self.assertEqual(m3Prev2, measures[2][-2])
+        self.assertTrue(m3Prev2.expressions) # fermata
 
         m3n = measures[3].next()
-        self.assertEqual(m3n, measures[4])
-        self.assertEqual(measures[3].next('Note', flattenLocalSites=True), measures[3].notes[0])
+        self.assertEqual(m3n, measures[3][0]) # same as next line
+        self.assertEqual(measures[3].next('Note'), measures[3].notes[0])
+        self.assertEqual(m3n.next(), measures[3][1])
 
-        m3nn = m3n.next()
+        m3nm = m3.next('Measure')
+        m3nn = m3nm.next('Measure')
         self.assertEqual(m3nn, measures[5])
-        m3nnn = m3nn.next()
+        m3nnn = m3nn.next('Measure')
         self.assertEqual(m3nnn, measures[6])
 
 
-        self.assertEqual(measures[3].previous().previous(), measures[1])
-        self.assertEqual(measures[3].previous().previous().previous(), measures[0])
-        self.assertEqual(
-            str(measures[3].previous().previous().previous().previous()),
-            'P1: Soprano: Instrument 1')
+        self.assertEqual(measures[3].previous('Measure').previous('Measure'), measures[1])
+        m0viaPrev = measures[3].previous('Measure').previous('Measure').previous('Measure')
+        self.assertEqual(m0viaPrev, measures[0])
+        
+        m0viaPrev.activeSite = s.parts[0] # otherwise there are no instruments...
+        sopranoInst = m0viaPrev.previous()
+        self.assertEqual(str(sopranoInst), 'P1: Soprano: Instrument 1')
 
-        self.assertEqual(str(measures[0].previous()), 'P1: Soprano: Instrument 1')
+        # set active site back to measure stream...
+        self.assertEqual(str(measures[0].previous()), str(p1))
+        
 
     def testActiveSiteCopyingA(self):
         from music21 import note, stream
@@ -4448,8 +4695,9 @@ class Test(unittest.TestCase):
                           "(<music21.stream.Part Alto>, 9.0, 'flatten')", 
                           "(<music21.stream.Score bach>, 9.0, 'elementsOnly')"])
         siteList = []
-        c.parts.id = 'partStream' # to make it easier to see below, will be cached...
-        ptemp = c.parts[1]
+        cParts = c.parts # need this otherwise it could possibly be garbage collected.
+        cParts.id = 'partStream' # to make it easier to see below, will be cached...
+        ptemp = cParts[1]
         m3 = ptemp.measure(3)
         self.assertIs(m, m3)
         for y in m3.contextSites():
@@ -4505,6 +4753,40 @@ class Test(unittest.TestCase):
                                     "<music21.stream.Part p1>",
                                     "<music21.stream.Measure 2 offset=0.0>",
                                     "<music21.stream.Part p2>"])
+      
+## great isolation test, but no asserts for now...  
+#     def testPreviousA(self):
+#         from music21 import corpus
+#         s = corpus.parse('bwv66.6')
+#         o = s.parts[0].iter.getElementsByClass('Measure')[2][1]      
+#         i = 20
+#         while o and i:
+#             print(o)
+#             if 'Part' in o.classes:
+#                 pass
+#             o = o.previous()
+#             i -= 1
+#         
+
+#     def testPreviousB(self):
+#         '''
+#         fixed a memo problem which could cause .previous() to run forever
+#         on flat/derived streams.
+#         '''
+#         from music21 import corpus
+#         s = corpus.parse('luca/gloria')
+#         sf = s.flat
+#         o = sf[1]
+#         #o = s[2]
+#         i = 200
+#         while o and i:
+#             print(o, o.activeSite, o.sortTuple().shortRepr())
+#             o = o.previous()
+# #            cc = s._cache
+# #             for x in cc:
+# #                 if x.startswith('elementTree'):
+# #                     print(repr(cc[x]))
+#             i -= 1
         
     def testPreviousAfterDeepcopy(self):
         from music21 import stream, note
@@ -4553,13 +4835,7 @@ _DOC_ORDER = [Music21Object, ElementWrapper]
 
 #------------------------------------------------------------------------------
 if __name__ == "__main__":
-#     from music21 import note, stream
-#     s = stream.Stream(id="hello")
-#     n = note.Note()
-#     s.insert(0, n)
-#     print(id(s))
-#     copy.deepcopy(n)
-    mainTest(Test) #, runTest='testPreviousAfterDeepcopy')
+    mainTest(Test) #, runTest='testPreviousB')
 
 
 #------------------------------------------------------------------------------

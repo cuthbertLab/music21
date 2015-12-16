@@ -157,7 +157,8 @@ def rhythmicSearch(thisStream, searchStream):
             #x = searchStream[j].duration
             if "WildcardDuration" in searchStream[j].duration.classes:
                 continue
-            elif searchStream[j].duration.quarterLength != thisStream[start + j].duration.quarterLength:
+            elif searchStream[j].duration.quarterLength != thisStream[start + 
+                                                                      j].duration.quarterLength:
                 foundException = True
                 break
         if foundException == False:
@@ -316,8 +317,12 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
         thatStreamStrDuration = translateStreamToStringOnlyRhythm(sn)
 #        print "notes2",thatStreamStrPitches
 #        print "rhythm2",thatStreamStrDuration 
-        ratioPitches = difflib.SequenceMatcher(isJunk, thisStreamStrPitches, thatStreamStrPitches).ratio()
-        ratioDuration = difflib.SequenceMatcher(isJunk,thisStreamStrDuration,thatStreamStrDuration).ratio()
+        ratioPitches = difflib.SequenceMatcher(isJunk, 
+                                               thisStreamStrPitches, 
+                                               thatStreamStrPitches).ratio()
+        ratioDuration = difflib.SequenceMatcher(isJunk, 
+                                                thisStreamStrDuration, 
+                                                thatStreamStrDuration).ratio()
         ratio = (3*ratioPitches+ratioDuration)/4.0
         s.matchProbability = ratio
         sorterList.append((ratio, s))
@@ -346,7 +351,8 @@ def translateStreamToString(inputStream):
         b += translateNoteWithDurationToBytes(n)
     return b
 
-def translateDiatonicStreamToString(inputStream, previousRest=False, previousTie=False, previousQL=None, returnLastTuple=False):
+def translateDiatonicStreamToString(inputStream, previousRest=False, 
+                                    previousTie=False, previousQL=None, returnLastTuple=False):
     r'''
     translates a stream of Notes and Rests only into a string,
     encoding only the .step (no accidental or octave) and whether
@@ -375,7 +381,7 @@ def translateDiatonicStreamToString(inputStream, previousRest=False, previousTie
     was a rest, whether the last note was tied, and what the last quarterLength was,
     which can be fed back into this algorithm:
     
-    >>> streamString2, lastTuple = search.translateDiatonicStreamToString(sn, returnLastTuple = True)
+    >>> streamString2, lastTuple = search.translateDiatonicStreamToString(sn, returnLastTuple=True)
     >>> streamString == streamString2
     True
     >>> lastTuple
@@ -470,7 +476,7 @@ def translateNoteToByte(n):
     >>> ord(b) == n.pitch.midi
     True
 
-    Chords are currently just searched on the first note (or treated as a rest if none)
+    Chords are currently just searched on the first Note (or treated as a Rest if None)
     '''
     if n.isRest:
         return chr(127)
@@ -602,23 +608,25 @@ def mostCommonMeasureRythms(streamIn, transposeDiatonic = False):
     >>> sortedRhythms = search.mostCommonMeasureRythms(bach)
     >>> for dict in sortedRhythms[0:3]:
     ...     print('no: %d %s %s' % (dict['number'], 'rhythmString:', dict['rhythmString']))
-    ...     print('  bars: %r' % ([(m.number, str(m.getContextByClass('Part').id)) for m in dict['measures']]))
+    ...     print('bars: %r' % ([(m.number, 
+    ...                               str(m.getContextByClass('Part').id)) 
+    ...                            for m in dict['measures']]))
     ...     dict['rhythm'].show('text')
     ...     print('-----')
     no: 34 rhythmString: PPPP
-      bars: [(1, 'Soprano'), (1, 'Alto'), (1, 'Tenor'), (1, 'Bass'), (2, 'Soprano'), ..., (19, 'Soprano')]
+    bars: [(1, 'Soprano'), (1, 'Alto'), (1, 'Tenor'), (1, 'Bass'), (2, ...), ..., (19, 'Soprano')]
     {0.0} <music21.note.Note C>
     {1.0} <music21.note.Note A>
     {2.0} <music21.note.Note F>
     {3.0} <music21.note.Note C>
     -----
     no: 7 rhythmString: ZZ
-      bars: [(13, 'Soprano'), (13, 'Alto'), ..., (14, 'Bass')]
+    bars: [(13, 'Soprano'), (13, 'Alto'), ..., (14, 'Bass')]
     {0.0} <music21.note.Note C>
     {2.0} <music21.note.Note A>
     -----
     no: 6 rhythmString: ZPP
-      bars: [(6, 'Soprano'), (6, 'Bass'), ..., (18, 'Tenor')]
+    bars: [(6, 'Soprano'), (6, 'Bass'), ..., (18, 'Tenor')]
     {0.0} <music21.note.Note C>
     {2.0} <music21.note.Note B->
     {3.0} <music21.note.Note B->

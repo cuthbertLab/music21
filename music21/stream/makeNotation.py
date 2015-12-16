@@ -370,8 +370,6 @@ def makeMeasures(
         meterStream = stream.Stream()
         meterStream.insert(0, ts)
 
-    #assert len(meterStream), 1
-
     #environLocal.printDebug([
     #    'makeMeasures(): meterStream', 'meterStream[0]', meterStream[0],
     #    'meterStream[0].offset',  meterStream[0].offset,
@@ -386,14 +384,19 @@ def makeMeasures(
     # presently, this only gets the first clef
     # may need to store a clefStream and access changes in clefs
     # as is done with meterStream
-    #clefStream = srcObj.getClefs(searchActiveSite=True,
+    #clefList = srcObj.getClefs(searchActiveSite=True,
     #                searchContext=searchContext,
     #                returnDefault=True)
-    #clefObj = clefStream[0]
-    #del clefStream
-    clefObj = srcObj.getContextByClass('Clef') 
+    #clefObj = clefList[0]
+    #del clefList
+    clefObj = srcObj.clef or srcObj.getContextByClass('Clef') 
     if clefObj is None:
-        clefObj = srcObj.bestClef()
+        clefList = list(srcObj.iter.getElementsByClass('Clef').getElementsByOffset(0))
+        # only return clefs that have offset = 0.0
+        if len(clefList) == 0:
+            clefObj = srcObj.bestClef()
+        else:
+            clefObj = clefList[0]
 
     #environLocal.printDebug([
     #    'makeMeasures(): first clef found after copying and flattening',
@@ -502,7 +505,7 @@ def makeMeasures(
                 lastTimeSignature = m.timeSignature
             # get start and end offsets for each measure
             # seems like should be able to use m.duration.quarterLengths
-            mStart = m.getOffsetBySite(post)
+            mStart = post.elementOffset(m)
             mEnd = mStart + lastTimeSignature.barDuration.quarterLength
             # if elements start fits within this measure, break and use
             # offset cannot start on end
@@ -511,6 +514,7 @@ def makeMeasures(
                 #environLocal.printDebug([
                 #    'found measure match', i, mStart, mEnd, start, end, e])
                 break
+
         if not match:
             raise stream.StreamException(
                 'cannot place element %s with start/end %s/%s '
@@ -572,7 +576,7 @@ def makeMeasures(
         s.elementsChanged()
         for e in post.sorted:
             # may need to handle spanners; already have s as site
-            s.insert(e.getOffsetBySite(post), e)
+            s.insert(post.elementOffset(e), e)
 
 
 def makeRests(s, refStreamOrTimeRange=None, fillGaps=False,
@@ -918,7 +922,7 @@ def makeTies(
         else:  # create a new measure
             mNext = stream.Measure()
             # set offset to last offset plus total length
-            moffset = m.getOffsetBySite(measureStream)
+            moffset = measureStream.elementOffset(m)
             if lastTimeSignature is not None:
                 mNext.offset = (moffset +
                                 lastTimeSignature.barDuration.quarterLength)
@@ -931,8 +935,8 @@ def makeTies(
             else:  # get the last encountered meter
                 ts = meterStream.getElementAtOrBefore(mNext.offset)
             # only copy and assign if not the same as the last
-            if lastTimeSignature is not None \
-                and not lastTimeSignature.ratioEqual(ts):
+            if (lastTimeSignature is not None and
+                    not lastTimeSignature.ratioEqual(ts)):
                 mNext.timeSignature = copy.deepcopy(ts)
             # increment measure number
             mNext.number = m.number + 1
@@ -975,17 +979,17 @@ def makeTies(
                 #if hasattr(e, 'duration') and e.duration is not None:
                 if e.duration is not None:
                     # check to see if duration is within Measure
-                    eOffset = e.getOffsetBySite(v)
-                    eEnd = eOffset + e.duration.quarterLength
+                    eOffset = v.elementOffset(e)
+                    eEnd = opFrac(eOffset + e.duration.quarterLength)
                     # assume end can be at boundary of end of measure
                     overshot = eEnd - mEnd
-                    # only process if overshot is greater than a minimum
-                    # 1/64 is 0.015625
-                    if overshot > .001:
+
+                    if overshot > 0:
                         if eOffset >= mEnd:
-                            raise stream.StreamException(
-                                'element (%s) has offset %s within a measure '
-                                'that ends at offset %s' % (e, eOffset, mEnd))
+                            continue # skip elements that extend past measure boundary.
+#                             raise stream.StreamException(
+#                                 'element (%s) has offset %s within a measure '
+#                                 'that ends at offset %s' % (e, eOffset, mEnd))
 
                         qLenBegin = mEnd - eOffset
                         e, eRemain = e.splitAtQuarterLength(qLenBegin,
@@ -1086,7 +1090,8 @@ def makeTupletBrackets(s, inPlace=False):
         elif len(tupletList) > 1:
             #for i in range(len(tuplets)):
             #    tupletMap.append([tuplets[i],dur])
-            environLocal.warn('got multi-tuplet duration; cannot yet handle this. %s' % repr(tupletList))
+            environLocal.warn('got multi-tuplet duration; cannot yet handle this. %s' % 
+                              repr(tupletList))
         elif len(tupletList) == 1:
             tupletMap.append([tupletList[0], dur])
             if tupletList[0] != dur.tuplets[0]:
@@ -1206,7 +1211,8 @@ def realizeOrnaments(s):
     <music21.stream.Measure 2 offset=4.0>
     <music21.note.Note D>
 
-    TODO: does not work for Gapful streams because it uses append rather than the offset of the original
+    TODO: does not work for Gapful streams because it uses append rather 
+    than the offset of the original
     '''
     newStream = s.cloneEmpty()
     newStream.offset = s.offset

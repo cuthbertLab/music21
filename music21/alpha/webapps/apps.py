@@ -28,7 +28,7 @@ def setupURLCorpusParseApp(agenda):
     ResponseData is returned as a bytes object in Python3
     
     >>> agenda = alpha.webapps.Agenda()
-    >>> agenda.addData('measureEnd','4')
+    >>> agenda.addData('measureEnd', '4')
     >>> agenda.addData('workName',"'bwv7.7'")
     >>> agenda.addData('command',"commands.reduction")
     >>> agenda.addData('output',"musicxmlDownload")
@@ -48,19 +48,20 @@ def setupURLCorpusParseApp(agenda):
     >>> converter.parse(responseData).flat.highestOffset
     16.5
     '''
-    agenda.addCommand('function','outputStream',None,'corpus.parse',['workName'])
+    agenda.addCommand('function', 'outputStream', None, 'corpus.parse', ['workName'])
     
     if agenda.getData('measureStart') != None or agenda.getData('measureEnd') != None:
         # Get only certian measures
         if agenda.getData('measureStart') == None:
             agenda.addData('measureStart',0)
         if agenda.getData('measureEnd') == None:
-            agenda.addData('measureEnd','None')
-        agenda.addCommand('method','outputStream','outputStream','measures',['measureStart','measureEnd'])
+            agenda.addData('measureEnd', 'None')
+        agenda.addCommand('method', 'outputStream', 'outputStream', 'measures', 
+                          ['measureStart', 'measureEnd'])
 
     
     if agenda.getData('command') != None: # Command specified
-        agenda.addCommand('function','outputStream',None,'command',['outputStream'])
+        agenda.addCommand('function', 'outputStream', None, 'command', ['outputStream'])
     
     # Resolve desired output
     outputType = agenda.getData('output')
@@ -79,11 +80,12 @@ def setupConverterApp(agenda):
     output: an output format (musicxml, vexflow, braille...)
     
     Example:
-    http://ciconia.mit.edu/music21/webinterface?appName=converterApp&source="tinynotation:F4 A-  B- B c e f2"&output=vexflow
+    http://ciconia.mit.edu/music21/webinterface?appName=converterApp&source=
+        "tinynotation:F4 A-  B- B c e f2"&output=vexflow
     
     
     >>> agenda = alpha.webapps.Agenda()
-    >>> agenda.addData('source','tinynotation:F4 A- B- B c e f2')
+    >>> agenda.addData('source', 'tinynotation:F4 A- B- B c e f2')
     >>> agenda.addData('output',"musicxml")
     >>> alpha.webapps.apps.setupConverterApp(agenda)
 
@@ -121,9 +123,10 @@ def setupConverterApp(agenda):
     53.0
     '''
     if agenda.getData('format') == 'tinyNotation':
-        agenda.addCommand('function','outputStream',None,'converter.parseData',['source','None','tinyNotation'])        
+        agenda.addCommand('function', 'outputStream', None, 'converter.parseData', 
+                          ['source', 'None', 'tinyNotation'])        
     else:
-        agenda.addCommand('function','outputStream',None,'converter.parse',['source'])        
+        agenda.addCommand('function', 'outputStream', None, 'converter.parse', ['source'])        
     
     # Resolve desired output
     outputTypeShortcut = agenda.getData('output')

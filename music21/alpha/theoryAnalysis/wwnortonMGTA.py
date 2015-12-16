@@ -23,14 +23,18 @@ import unittest
 import copy
 
 class wwnortonExercise(object):
-    ''' wwnortonExercise is a base class for all wwwnorton exercises 
+    '''
+    wwnortonExercise is a base class for all wwwnorton exercises 
     
-    Textbook: The Musician's Guide to Theory and Analysis (MGTA), Second Edition: Clendinning and Marvin
-    Workbook: The Musician's Guide Workbook, Second Edition: Clendinning and Marvin (Teacher's Edition)
+    Textbook: The Musician's Guide to Theory and Analysis (MGTA), 
+        Second Edition: Clendinning and Marvin
+    Workbook: The Musician's Guide Workbook, Second Edition: 
+        Clendinning and Marvin (Teacher's Edition)
     
     '''
     def __init__(self):
-        self.xmlFileDirectory = "C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/Exercises/" #/xmlfiles/"
+        self.xmlFileDirectory = "C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/Exercises/" 
+        #/xmlfiles/"
         self.xmlFilename = ""
         self.originalExercise = stream.Stream()
         self.modifiedExercise = stream.Stream()
@@ -72,7 +76,7 @@ class wwnortonExercise(object):
             el.offset = 0
         #self.modifiedExercise.show('text')
 
-    def _updatepn(self,newPartNum,direction):
+    def _updatepn(self, newPartNum, direction):
         for partName in self.pn:
             existingPartNum = self.pn[partName]
             if existingPartNum > newPartNum:
@@ -83,7 +87,8 @@ class wwnortonExercise(object):
                 shiftedPartNum = existingPartNum
             self.pn[partName] = shiftedPartNum   
 
-    def addMarkerPartFromExisting(self, existingPartName, newPartName, newPartTitle="", direction = "below", rhythmType="copy",color = None):
+    def addMarkerPartFromExisting(self, existingPartName, newPartName, newPartTitle="", 
+                                  direction="below", rhythmType="copy", color=None):
         partNum = self.pn[existingPartName]
         
         self._partOffsetsToPartIndecies()
@@ -151,13 +156,13 @@ class wwnortonExercise(object):
         self._partOffsetsToZero()
         return newPart
     
-    def compareMarkerLyricAnswer(self,score,taKey,markerPartName,offsetFunc,lyricFunc):
+    def compareMarkerLyricAnswer(self, score, taKey, markerPartName, offsetFunc, lyricFunc):
         markerPart = self.studentExercise.parts[self.pn[markerPartName]]
         #addAnalysisData(score)   ## BUG: addAnalysisData does not exist!
         for resultObj in score.analysisData['ResultDict'][taKey]:
             offset = offsetFunc(resultObj)
             correctLyric = lyricFunc(resultObj)
-            markerNote = markerPart.flat.getElementAtOrBefore(offset,classList=['Note'])
+            markerNote = markerPart.flat.getElementAtOrBefore(offset, classList=['Note'])
             if markerNote is None or markerNote.offset != offset:
                 print("No Marker")
                 continue
@@ -186,83 +191,57 @@ class ex11_1_I(wwnortonExercise):
         self.loadOriginalExercise()
         
     def addAuxillaryParts(self):
-        self.addMarkerPartFromExisting('part1', newPartName='p1ScaleDegrees',newPartTitle="1. Scale Degrees", direction = "above")
-        self.addMarkerPartFromExisting('part1', newPartName='motionType',newPartTitle="2. Motion Type", rhythmType="quarterNotes", direction = "above")
-        self.addMarkerPartFromExisting('part1', newPartName='harmIntervals',newPartTitle="3. Harmonic Intervals", rhythmType='chordify', direction = "below")
+        self.addMarkerPartFromExisting('part1', 
+                                       newPartName='p1ScaleDegrees', 
+                                       newPartTitle="1. Scale Degrees", 
+                                       direction="above")
+        self.addMarkerPartFromExisting('part1', 
+                                       newPartName='motionType', 
+                                       newPartTitle="2. Motion Type", 
+                                       rhythmType="quarterNotes", 
+                                       direction="above")
+        self.addMarkerPartFromExisting('part1', 
+                                       newPartName='harmIntervals', 
+                                       newPartTitle="3. Harmonic Intervals", 
+                                       rhythmType='chordify', 
+                                       direction="below")
         
     def checkExercise(self):
         theoryAnalyzer.setKeyMeasureMap(self.studentExercise,{0:'F'})
-        theoryAnalyzer.identifyMotionType(self.studentExercise, self.pn['part1'],self.pn['part2'],dictKey='motionType')
-        theoryAnalyzer.identifyScaleDegrees(self.studentExercise, self.pn['part1'],dictKey='p1ScaleDegrees')
-        theoryAnalyzer.identifyHarmonicIntervals(self.studentExercise, self.pn['part1'],self.pn['part2'],dictKey='harmIntervals')
+        theoryAnalyzer.identifyMotionType(self.studentExercise, self.pn['part1'], 
+                                          self.pn['part2'],dictKey='motionType')
+        theoryAnalyzer.identifyScaleDegrees(self.studentExercise, self.pn['part1'], 
+                                            dictKey='p1ScaleDegrees')
+        theoryAnalyzer.identifyHarmonicIntervals(self.studentExercise, self.pn['part1'], 
+                                                 self.pn['part2'],dictKey='harmIntervals')
         
         scaleDegreeOffsetFunc = lambda resultObj: resultObj.n.offset
         scaleDegreeLyricTextFunc = lambda resultObj: resultObj.value
         
-        self.compareMarkerLyricAnswer(self.studentExercise,taKey='p1ScaleDegrees',\
-                                markerPartName='p1ScaleDegrees',\
-                                offsetFunc = scaleDegreeOffsetFunc,\
-                                lyricFunc = scaleDegreeLyricTextFunc)
+        self.compareMarkerLyricAnswer(self.studentExercise,
+                                      taKey='p1ScaleDegrees',
+                                      markerPartName='p1ScaleDegrees',
+                                      offsetFunc=scaleDegreeOffsetFunc,
+                                      lyricFunc = scaleDegreeLyricTextFunc)
         
         motionTypeOffsetFunc = lambda resultObj: resultObj.offset()
         motionTypeLyricTextFunc = lambda resultObj: resultObj.value[0]
         
-        self.compareMarkerLyricAnswer(self.studentExercise,taKey='motionType',\
-                                markerPartName='motionType',\
-                                offsetFunc = motionTypeOffsetFunc,\
-                                lyricFunc = motionTypeLyricTextFunc)
+        self.compareMarkerLyricAnswer(self.studentExercise,
+                                      taKey='motionType',
+                                      markerPartName='motionType',
+                                      offsetFunc=motionTypeOffsetFunc,
+                                      lyricFunc=motionTypeLyricTextFunc)
         
         harmonicIntervalOffsetFunc = lambda resultObj: resultObj.offset()
         
         harmonicIntervalTextFunc = lambda resultObj: resultObj.value 
         
-        self.compareMarkerLyricAnswer(self.studentExercise,taKey='harmIntervals',\
-                                markerPartName='harmIntervals',\
-                                offsetFunc = harmonicIntervalOffsetFunc,\
-                                lyricFunc = harmonicIntervalTextFunc)
-    '''    
-    class ex11_1_II(wwnortonExercise):
-        
-        Assignment 11.1 II. Resolving chordal dissonances
-        
-        def __init__(self):
-            wwnortonExercise.__init__(self)
-            self.xmlFilename = '11_1_II.xml'
-            self.pn['part1'] = 0
-            self.pn['part2'] = 1
-            self.loadOriginalExercise()
-            
-        def addAuxillaryParts(self):
-            self.addMarkerPartFromExisting('part1', newPartName='p1ScaleDegrees',newPartTitle="1. Scale Degrees", direction = "above")
-            self.addMarkerPartFromExisting('part2', newPartName='p2ScaleDegrees',newPartTitle="2. Scale Degrees", direction = "below")
-            self.addMarkerPartFromExisting('part1', newPartName='harmIntervals',newPartTitle="3. Harmonic Intervals", rhythmType='chordify', direction = "below")
-            
-        def checkExercise(self):
-            
-            theoryAnalyzer.setKeyMeasureMap(self.studentExercise, {1:'C',2:'C',3:'d',4:'F',5:'G',6:'e',7:'g',8:'B-',9:'A-',10:'E',11:'f',12:'c#'})
-            
-            theoryAnalyzer.identifyScaleDegrees(self.studentExercise,self.pn['part1'],dictKey='p1ScaleDegrees')
-            theoryAnalyzer.identifyScaleDegrees(self.studentExercise,self.pn['part2'],dictKey='p2ScaleDegrees')
-            theoryAnalyzer.identifyHarmonicIntervals(self.studentExercise,self.pn['part1'],self.pn['part2'],dictKey='harmIntervals')
-            
-            scaleDegreeLyricTextFunc = lambda resultObj: resultObj.value
-            self.compareMarkerLyricAnswer(self.studentExercise,taKey='p1ScaleDegrees',\
-                                    markerPartName='p1ScaleDegrees',\
-                                    lyricFunc = scaleDegreeLyricTextFunc)
-            
-            self.compareMarkerLyricAnswer(self.studentExercise,taKey='p2ScaleDegrees',\
-                                    markerPartName='p2ScaleDegrees',\
-                                    lyricFunc = scaleDegreeLyricTextFunc)
-            
-            harmonicIntervalOffsetFunc = lambda resultObj: resultObj.offset()
-            harmonicIntervalTextFunc = lambda resultObj: resultObj.value 
-            
-            self.compareMarkerLyricAnswer(self.studentExercise,taKey='harmIntervals',\
-                                    markerPartName='harmIntervals',\
-                                    offsetFunc = harmonicIntervalOffsetFunc,\
-                                    lyricFunc = harmonicIntervalTextFunc)    
-        
-    '''
+        self.compareMarkerLyricAnswer(self.studentExercise,
+                                      taKey='harmIntervals',
+                                      markerPartName='harmIntervals',
+                                      offsetFunc=harmonicIntervalOffsetFunc,
+                                      lyricFunc=harmonicIntervalTextFunc)
             
 class ex11_3_A(wwnortonExercise):
     '''
@@ -276,22 +255,29 @@ class ex11_3_A(wwnortonExercise):
         self.loadOriginalExercise()
         
     def addAuxillaryParts(self):
-        self.addMarkerPartFromExisting('part2', newPartName='harmIntervals',newPartTitle="1. Harmonic Intervals", direction = "below")
+        self.addMarkerPartFromExisting('part2', 
+                                       newPartName='harmIntervals', 
+                                       newPartTitle="1. Harmonic Intervals", 
+                                       direction = "below")
         
     def checkExercise(self):
-        theoryAnalyzer.setKeyMeasureMap(self.studentExercise, {0:'G',5:'D',8:'F'})
-        theoryAnalyzer.identifyHarmonicIntervals(self.studentExercise, self.pn['part1'],self.pn['part2'],dictKey='harmIntervals')
-        theoryAnalyzer.identifyCommonPracticeErrors(self.studentExercise, self.pn['part1'],self.pn['part2'],dictKey='counterpointErrors')
+        theoryAnalyzer.setKeyMeasureMap(self.studentExercise, {0:'G', 5:'D', 8:'F'})
+        theoryAnalyzer.identifyHarmonicIntervals(self.studentExercise, self.pn['part1'], 
+                                                 self.pn['part2'], dictKey='harmIntervals')
+        theoryAnalyzer.identifyCommonPracticeErrors(self.studentExercise, self.pn['part1'], 
+                                                    self.pn['part2'], dictKey='counterpointErrors')
                 
-        self.textResultString = theoryAnalyzer.getResultsString(self.studentExercise, ['counterpointErrors'])
+        self.textResultString = theoryAnalyzer.getResultsString(self.studentExercise, 
+                                                                ['counterpointErrors'])
         
         harmonicIntervalOffsetFunc = lambda resultObj: resultObj.offset()
         
         harmonicIntervalTextFunc = lambda resultObj: resultObj.value 
-        self.compareMarkerLyricAnswer(self.studentExercise,taKey='harmIntervals',\
-                                markerPartName='harmIntervals',\
-                                offsetFunc = harmonicIntervalOffsetFunc, \
-                                lyricFunc = harmonicIntervalTextFunc)
+        self.compareMarkerLyricAnswer(self.studentExercise, 
+                                      taKey='harmIntervals',
+                                      markerPartName='harmIntervals',
+                                      offsetFunc=harmonicIntervalOffsetFunc,
+                                      lyricFunc=harmonicIntervalTextFunc)
         
 
 
@@ -309,7 +295,8 @@ class TestExternal(unittest.TestCase):
     
     def demo(self):
         ex = ex11_1_I()
-        sc = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/SampleStudentResponses/S11_1_IA_completed.xml')
+        sc = converter.parse('C:/Users/bhadley/Dropbox/Music21Theory/TestFiles/' + 
+                             'SampleStudentResponses/S11_1_IA_completed.xml')
         ex.loadStudentExercise(sc)
         ex.checkExercise()
         ex.showStudentExercise()

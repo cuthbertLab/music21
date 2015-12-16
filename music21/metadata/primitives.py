@@ -865,7 +865,10 @@ class Contributor(object):
         ['Chopin, Fryderyk', 'Chopin, Frederick']
         '''
         # return first name
-        return str(self._names[0])
+        if len(self._names) > 0:
+            return str(self._names[0])
+        else:
+            return None
 
     @name.setter
     def name(self, value):

@@ -10,6 +10,9 @@
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
+# currently the tinyNotation demos use alignment to show variation, making this necessary...
+# pylint: disable=line-too-long
+# all other lines are linted.
 '''
 Contains :class:`~music21.variant.Variant` and its subclasses, as well as functions for merging
 and showing different variant streams. These functions and the variant class should only be
@@ -170,11 +173,15 @@ def mergeVariantScores(aScore, vScore, variantName='variant', inPlace=False):
     
     >>> aScore, vScore = stream.Score(), stream.Score()
     
-    >>> ap1 = stream.Part(converter.parse("tinynotation: 4/4   a4 b c d    e2 f2   g2 f4 g4 ").makeMeasures())
-    >>> vp1 = stream.Part(converter.parse("tinynotation: 4/4   a4 b c e    e2 f2   g2 f4 a4 ").makeMeasures())
+    >>> ap1 = stream.Part(converter.parse("tinynotation: 4/4   a4 b c d    e2 f2   g2 f4 g4 "
+    ...                                   ).makeMeasures())
+    >>> vp1 = stream.Part(converter.parse("tinynotation: 4/4   a4 b c e    e2 f2   g2 f4 a4 "
+    ...                                   ).makeMeasures())
     
-    >>> ap2 = stream.Part(converter.parse("tinynotation: 4/4   a4 g f e    f2 e2   d2 g4 f4 ").makeMeasures())
-    >>> vp2 = stream.Part(converter.parse("tinynotation: 4/4   a4 g f e    f2 g2   f2 g4 d4 ").makeMeasures())
+    >>> ap2 = stream.Part(converter.parse("tinynotation: 4/4   a4 g f e    f2 e2   d2 g4 f4 "
+    ...                                   ).makeMeasures())
+    >>> vp2 = stream.Part(converter.parse("tinynotation: 4/4   a4 g f e    f2 g2   f2 g4 d4 "
+    ...                                   ).makeMeasures())
     
     >>> aScore.insert(0.0, ap1)
     >>> aScore.insert(0.0, ap2)
@@ -1698,7 +1705,8 @@ def _doVariantFixingOnStream(s, variantNames=None):
     
     for v in s.variants:
         if isinstance(variantNames, list): #If variantNames are controlled
-            if set(v.groups) & set(variantNames) is []: # and if this variant is not in the controlled list
+            if set(v.groups) & set(variantNames) is []: 
+                # and if this variant is not in the controlled list
                 continue # then skip it
         else: # otherwise, skip it unless it is a strict insertion of deletion
             lengthType = v.lengthType
@@ -2305,8 +2313,6 @@ class Variant(base.Music21Object):
         
         >>> #print(lily.translate.LilypondConverter().textFromMusic21Object(s))
         >>> #s.show('lily.png')
-
-        
         '''
         if contextStream is None:
             contextStream = self.activeSite

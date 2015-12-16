@@ -49,7 +49,6 @@ from music21 import tie
 from music21 import repeat
 from music21 import sites
 from music21 import tempo
-from music21 import timespans
 
 from music21.ext import six
 
@@ -57,7 +56,7 @@ from music21.stream import core
 from music21.stream import makeNotation
 from music21.stream import streamStatus
 from music21.stream import iterator
-from music21.stream import filter
+from music21.stream import filters
 
 from music21.common import opFrac
 
@@ -74,7 +73,7 @@ class StreamDeprecationWarning(UserWarning):
 
 #------------------------------------------------------------------------------
 # Metaclass
-_OffsetMap = collections.namedtuple('OffsetMap', ['element','offset', 'endTime', 'voiceIndex'])
+_OffsetMap = collections.namedtuple('OffsetMap', ['element', 'offset', 'endTime', 'voiceIndex'])
 
 
 #------------------------------------------------------------------------------
@@ -154,7 +153,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {0.0} <music21.note.Rest rest>
     {1.0} <music21.note.Note E->
     '''
-
     # this static attributes offer a performance boost over other
     # forms of checking class
     isStream = True
@@ -163,16 +161,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     recursionType = 'elementsFirst'
 
     # define order to present names in documentation; use strings
-    _DOC_ORDER = ['append', 'insert', 'insertAndShift',
-        'notes', 'pitches',
-        'transpose',
-        'augmentOrDiminish', 'scaleOffsets', 'scaleDurations']
+    _DOC_ORDER = ['append', 'insert', 'storeAtEnd', 'insertAndShift',
+                  'recurse', 'flat',
+                  'notes', 'pitches',
+                  'transpose',
+                  'augmentOrDiminish', 'scaleOffsets', 'scaleDurations']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
         'recursionType': '''
+            Class variable: 
+            
             String of ('elementsFirst' (default), 'flatten', 'elementsOnly)
             that decides whether the stream likely holds relevant
             contexts for the elements in it.  
+            
+            Define this for a stream class, not an individual object.
             
             see :meth:`~music21.base.Music21Object.contextSites` 
             ''',
@@ -245,9 +248,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     # sequence like operations
 
     def __len__(self):
-        '''Get the total number of elements in the Stream.
+        '''
+        Get the total number of elements in the Stream.
         This method does not recurse into and count elements in contained Streams.
-
 
         >>> import copy
         >>> a = stream.Stream()
@@ -265,6 +268,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         4
         >>> len(b.flat)
         16
+
+        Includes end elements:
+        
+        >>> b.storeAtEnd(bar.Barline('double'))
+        >>> len(b)
+        5
         '''
         return len(self._elements) + len(self._endElements)
 
@@ -305,23 +314,51 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         (if no results are found) :meth:`~music21.stream.Stream.getElementsByGroup` is used to 
         collect and return elements as a Stream.
 
-        >>> a = stream.Stream()
+        >>> a = stream.Part(id='hello')
         >>> a.repeatInsert(note.Rest(), [0, 1, 2, 3, 4, 5])
         >>> subslice = a[2:5]
+        >>> subslice
+        <music21.stream.Part hello>
+        >>> subslice.derivation
+        <Derivation of <music21.stream.Part hello> from 
+            <music21.stream.Part hello> via "__getitem__">
         >>> len(subslice)
         3
         >>> a[1].offset
         1.0
+        >>> subslice[1].offset
+        3.0
+        
         >>> b = note.Note()
         >>> b.id = 'green'
         >>> b.groups.append('violin')
         >>> a.insert(b)
 
-        >>> a[note.Note][0] == b
+        Get an item by class
+
+        >>> allNotes = a[note.Note]
+        >>> allNotes
+        <music21.stream.Part hello>
+        >>> allNotes.derivation
+        <Derivation of <music21.stream.Part hello> from 
+            <music21.stream.Part hello> via "getElementsByClass">
+        >>> allNotes[0] is b
         True
-        >>> a['violin'][0] == b
+        
+        Get items by groups:
+        
+        >>> violinGroup = a['violin']
+        >>> violinGroup
+        <music21.stream.Part hello>
+        >>> violinGroup.derivation
+        <Derivation of <music21.stream.Part hello> from 
+            <music21.stream.Part hello> via "getElementsByGroup">
+        >>> violinGroup[0] is b
         True
-        >>> a['green'] == b
+        
+        Get a single element by id:
+        
+        >>> a['green'] is b
         True
         '''
 
@@ -357,9 +394,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                 "Stream subclasses and Music21Objects cannot have required " +
                                 "arguments in __init__" )
             for e in self.elements[k]:
-                found.insert(self.elementOffset(e), e)
-            # each insert calls this; does not need to be done here
-            #found.elementsChanged()
+                found._insertCore(self.elementOffset(e), e)
+            
+            found.elementsChanged(clearIsSorted=False)
             return found
 
         elif common.isStr(k):
@@ -426,18 +463,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         The activeSites of some elements may have changed between retrieving
         and setting (esp. if a lot else has happened in the meantime). Where
         are we going to get the new stream's elements' offsets from? why
-        from their active sites.
+        from their active sites! So don't do this!
         '''
         if (not common.isListLike(value) and 
                 hasattr(value, 'isStream') and
                 value.isStream):
-            # set from a Stream.
-            self._elements = list(value._elements)
+            # set from a Stream. Best way to do it
+            self._offsetDict = {}
+            self._elements = list(value._elements) # copy list.
             for e in self._elements:
                 self.setElementOffset(e, value.elementOffset(e))
                 e.sites.add(self)
                 e.activeSite = self
-            self._endElements = value._endElements
+            self._endElements = list(value._endElements)
             for e in self._endElements:
                 self.setElementOffset(e, value.elementOffset(e, stringReturn=True))
                 e.sites.add(self)
@@ -456,18 +494,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     elements = property(_getElements, _setElements,
         doc='''
-        Don't use unless you really know what you're doing.
-        
-        Treat a Stream like a list!
-        
-        
-        
-        
-        A list representing the elements contained in the Stream.
+        .elements is a list representing the elements contained in the Stream.
 
         Directly getting, setting, and manipulating this list is
         reserved for advanced usage. Instead, use the the
         provided high-level methods. 
+        
+        In other words:  Don't use unless you really know what you're doing.
+        Treat a Stream like a list!
+        
         
         When setting .elements, a
         list of Music21Objects can be provided, or a complete Stream.
@@ -644,6 +679,149 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     
     if six.PY2:
         __nonzero__ = __bool__
+
+    #-------------------------------
+    def _getClef(self):
+        clefList = self.iter.getElementsByClass('Clef').getElementsByOffset(0)
+        # casting to list added 20microseconds...
+        if len(clefList) == 0:
+            return None
+        else:
+            return clefList[0]
+
+    def _setClef(self, clefObj):
+        # if clef is None; remove object?
+        oldClef = self._getClef()
+        if oldClef is not None:
+            #environLocal.printDebug(['removing clef', oldClef])
+            junk = self.pop(self.index(oldClef))
+        if clefObj is None:
+            # all that is needed is to remove the old clef
+            # there is no new clef - suppresses the clef of a stream
+            return
+        self.insert(0.0, clefObj)
+        # for some reason needed to make sure that sorting of Clef happens before TimeSignature
+        # TODO: Test if this can be deleted...
+        self.elementsChanged() 
+        
+    clef = property(_getClef, _setClef, doc='''
+        Finds or sets a :class:`~music21.clef.Clef` at offset 0.0 in the measure:
+
+        >>> m = stream.Measure()
+        >>> m.number = 10
+        >>> m.clef = clef.TrebleClef()
+        >>> thisTrebleClef = m.clef
+        >>> thisTrebleClef.sign
+        'G'
+        >>> thisTrebleClef.getOffsetBySite(m)
+        0.0
+
+        Setting the clef for the measure a second time removes the previous clef
+        from the measure and replaces it with the new one:
+
+        >>> m.clef = clef.BassClef()
+        >>> m.clef.sign
+        'F'
+
+
+        And the TrebleClef is no longer in the measure:
+
+        >>> thisTrebleClef.getOffsetBySite(m)
+        Traceback (most recent call last):
+        SitesException: an entry for this object <music21.clef.TrebleClef> is not 
+              stored in stream <music21.stream.Measure 10 offset=0.0>
+
+
+        The `.clef` appears in a `.show()` or other call
+        just like any other element
+
+        >>> m.append(note.Note('D#', type='whole'))
+        >>> m.show('text')
+        {0.0} <music21.clef.BassClef>
+        {0.0} <music21.note.Note D#>
+        ''')
+
+    def _getTimeSignature(self):
+        '''
+        >>> a = stream.Measure()
+        >>> a.timeSignature = meter.TimeSignature('2/4')
+        >>> a.timeSignature.numerator, a.timeSignature.denominator
+        (2, 4)
+        '''
+        # there could be more than one
+        tsList = self.iter.getElementsByClass('TimeSignature').getElementsByOffset(0)
+        #environLocal.printDebug([
+        #    'matched Measure classes of type TimeSignature', tsList, len(tsList)])
+        # only return timeSignatures at offset = 0.0
+        if len(tsList) == 0:
+            return None
+        else:
+            return tsList[0]
+
+    def _setTimeSignature(self, tsObj):
+        '''
+        >>> a = stream.Measure()
+        >>> a.timeSignature = meter.TimeSignature('5/4')
+        >>> a.timeSignature.numerator, a.timeSignature.denominator
+        (5, 4)
+        >>> a.timeSignature = meter.TimeSignature('2/8')
+        >>> a.timeSignature.numerator, a.timeSignature.denominator
+        (2, 8)
+
+        '''
+        oldTimeSignature = self._getTimeSignature()
+        if oldTimeSignature is not None:
+            #environLocal.printDebug(['removing ts', oldTimeSignature])
+            junk = self.pop(self.index(oldTimeSignature))
+        if tsObj is None:
+            # all that is needed is to remove the old time signature
+            # there is no new time signature - suppresses the time signature of a stream
+            return
+        self.insert(0, tsObj)
+
+    timeSignature = property(_getTimeSignature, _setTimeSignature)
+
+    def _getKeySignature(self):
+        '''
+        >>> a = stream.Measure()
+        >>> a.keySignature = key.KeySignature(2)
+        >>> a.keySignature.sharps
+        2
+
+        A key.Key object can be used instead of key.KeySignature,
+        since the former derives from the latter.
+
+        >>> a.keySignature = key.Key('E-', 'major')
+        >>> a.keySignature.sharps
+        -3
+        '''
+        keyList = self.iter.getElementsByClass('KeySignature').getElementsByOffset(0)
+        # for k in keyList:  # this method was 40 microseconds slower than the len(x) below
+        #     return k
+        if len(keyList) == 0:
+            return None
+        else:
+            return keyList[0]
+
+    def _setKeySignature(self, keyObj):
+        '''
+        >>> a = stream.Measure()
+        >>> a.keySignature = key.KeySignature(6)
+        >>> a.keySignature.sharps
+        6
+        '''
+        oldKey = self._getKeySignature()
+        if oldKey is not None:
+            #environLocal.printDebug(['removing key', oldKey])
+            junk = self.pop(self.index(oldKey))
+        if keyObj is None:
+            # all that is needed is to remove the old key signature
+            # there is no new key signature - suppresses the key signature of a stream
+            return
+        self.insert(0, keyObj)
+
+    keySignature = property(_getKeySignature, _setKeySignature)
+
 
     #-------------------------------
     # Temporary -- Remove in  2016
@@ -1311,24 +1489,54 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     
     def elementOffset(self, element, stringReturns=False):
         '''
-        return the offset (opFrac) from the offsetMap.
+        Return the offset as an opFrac (float or Fraction) from the offsetMap.
         highly optimized for speed.
         
-        if stringReturns are allowed then returns like 'highestOffset' are allowed.
-        
-        >>> s = stream.Stream()
-        >>> s.append(note.Note('C'))
+
+        >>> m = stream.Measure(number=1)
+        >>> m.append(note.Note('C'))
         >>> d = note.Note('D')
-        >>> s.append(d)
-        >>> s.elementOffset(d)
+        >>> m.append(d)
+        >>> m.elementOffset(d)
         1.0
+
+        If stringReturns is True then returns like 'highestOffset' are allowed.
         
         >>> b = bar.Barline()
-        >>> s.storeAtEnd(b)
-        >>> s.elementOffset(b)
+        >>> m.storeAtEnd(b)
+        >>> m.elementOffset(b)
         2.0
-        >>> s.elementOffset(b, stringReturns=True)
+        >>> m.elementOffset(b, stringReturns=True)
         'highestTime' 
+        
+        Unlike element.getOffsetBySite(self), this method will NOT follow derivation chains
+        and in fact will raise a sites.SitesException
+        
+        >>> import copy
+        >>> p = stream.Part(id='sPart')
+        >>> p.insert(20, m)
+        >>> m.getOffsetBySite(p)
+        20.0
+        >>> p.elementOffset(m)
+        20.0
+        
+        >>> mCopy = copy.deepcopy(m)
+        >>> mCopy.number = 10
+        >>> mCopy.derivation
+        <Derivation of <music21.stream.Measure 10 offset=0.0> from 
+            <music21.stream.Measure 1 offset=20.0> via "__deepcopy__">
+        >>> mCopy.getOffsetBySite(p)
+        20.0
+        >>> p.elementOffset(mCopy) 
+        Traceback (most recent call last):
+        SitesException: an entry for this object 0x... is not stored in 
+            stream <music21.stream.Part sPart>
+        
+        
+        Performance note: because it will not follow derivation chains, and does
+        not need to unwrap a weakref, this method 
+        should usually be about 3x faster than element.getOffsetBySite(self) -- 
+        currently 600ns instead of 1.5 microseconds.
         '''
         try:
             o = self._offsetDict[id(element)][0] # 2.3 million times found in TestStream
@@ -2014,7 +2222,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #             siterator = self.iter
 #         else:
 #             siterator = self.recurse()
-#         siterator.addFilter(filter.IsFilter(target))
+#         siterator.addFilter(filters.IsFilter(target))
 #  
 #  
 #         found = False
@@ -2379,7 +2587,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         siterator = self.iter
         if classFilter is not None:
-            siterator.addFilter(filter.ClassFilter(classFilter))
+            siterator.addFilter(filters.ClassFilter(classFilter))
         for el in siterator:
             el.groups.append(group)
 
@@ -2578,7 +2786,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         
         :rtype: base.Music21Object
         '''
-        siterator = self.iter.addFilter(filter.IdFilter(elementId))
+        siterator = self.iter.addFilter(filters.IdFilter(elementId))
         if classFilter is not None:
             siterator.getElementsByClass(classFilter)
         for e in siterator:
@@ -2889,7 +3097,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # TODO: need to deal with more than on object the same
         # offset and span from the source
         
-        # TODO: switch to timespans
+        # TODO: switch to trees
         candidates = []
         offset = opFrac(offset)
         nearestTrailSpan = offset # start with max time
@@ -3094,7 +3302,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     return e
 
 #         iterator = self.iter
-#         isFilter = filter.IsFilter(element)
+#         isFilter = filters.IsFilter(element)
 #         iterator.addFilter(isFilter)
 # 
 #         foundElement = False
@@ -3105,9 +3313,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #                 foundElement = True
 #                 iterator.removeFilter(isFilter)
 #                 # now add the filter... 
-#                 iterator.addFilter(filter.IsNotFilter(element))
+#                 iterator.addFilter(filters.IsNotFilter(element))
 #                 if classList is not None:
-#                     iterator.addFilter(filter.ClassFilter(classList))
+#                     iterator.addFilter(filters.ClassFilter(classList))
 # 
 #         return None
 
@@ -3224,8 +3432,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> b.getElementsByClass('Measure')[0].notes[0] is a.parts[0].flat.notes[0]
         True
 
-        if gatherSpanners is True or the string 'all' then all spanners in the score are gathered and
-        included.  TODO: make True only return spanners from the region.
+        if gatherSpanners is True or the string 'all' then all spanners in 
+        the score are gathered and
+        included.  
+        
+        TODO: make True only return spanners from the region.  Use core.gatherMissingSpanners()
+        to do so.
 
         if ignoreNumbers is True, then it ignores defined measureNumbers and 
         uses 0-indexed measure objects
@@ -3378,11 +3590,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnObj.elementsChanged()
             
         if gatherSpanners:
+            sf = srcObj.flat
             for sp in spannerBundle:
                 # can use old offsets of spanners, even though components
                 # have been updated
                 #returnObj.insert(sp.getOffsetBySite(mStreamSpanners), sp)
-                returnObj._insertCore(sp.getOffsetBySite(srcObj.flat), sp)
+                returnObj._insertCore(sf.elementOffset(sp), sp)
 
                 #environLocal.printDebug(['Stream.measrues: copying spanners:', sp])
 
@@ -3948,27 +4161,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Search this stream or activeSite streams for
         :class:`~music21.instrument.Instrument` objects, otherwise
         return a default Instrument
-
-
-        >>> s = stream.Score()
-        >>> p1 = stream.Part()
-        >>> p1.insert(instrument.Violin())
-        >>> m1p1 = stream.Measure()
-        >>> m1p1.append(note.Note('g'))
-        >>> p1.append(m1p1)
-
-        >>> p2 = stream.Part()
-        >>> p2.insert(instrument.Viola())
-        >>> m1p2 = stream.Measure()
-        >>> m1p2.append(note.Note('f#'))
-        >>> p2.append(m1p2)
-
-        >>> s.insert(0, p1)
-        >>> s.insert(0, p2)
-        >>> p1.getInstrument(returnDefault=False).instrumentName
-        'Violin'
-        >>> p2.getInstrument(returnDefault=False).instrumentName
-        'Viola'
         '''
         #environLocal.printDebug(['searching for instrument, called from:',
         #                        self])
@@ -3997,6 +4189,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if returnDefault and instObj is None:
             instObj = instrument.Instrument()
             #instObj.partId = defaults.partId # give a default id
+            # TODO: should this be changed to None? MSC 2015-12
             instObj.partName = defaults.partName # give a default id
             post.insert(0, instObj)
 
@@ -4007,6 +4200,26 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def getInstrument(self, searchActiveSite=True, returnDefault=True):
         '''
         Return the first Instrument found in this Stream.
+
+        >>> s = stream.Score()
+        >>> p1 = stream.Part()
+        >>> p1.insert(instrument.Violin())
+        >>> m1p1 = stream.Measure()
+        >>> m1p1.append(note.Note('g'))
+        >>> p1.append(m1p1)
+
+        >>> p2 = stream.Part()
+        >>> p2.insert(instrument.Viola())
+        >>> m1p2 = stream.Measure()
+        >>> m1p2.append(note.Note('f#'))
+        >>> p2.append(m1p2)
+
+        >>> s.insert(0, p1)
+        >>> s.insert(0, p2)
+        >>> p1.getInstrument(returnDefault=False).instrumentName
+        'Violin'
+        >>> p2.getInstrument(returnDefault=False).instrumentName
+        'Viola'
         '''
         post = self.getInstruments(searchActiveSite=searchActiveSite,
                                 returnDefault=returnDefault)
@@ -4099,8 +4312,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def getClefs(self, searchActiveSite=False, searchContext=True,
         returnDefault=True):
         '''
+        DEPRECATED...
+        
         Collect all :class:`~music21.clef.Clef` objects in
-        this Stream in a new Stream. Optionally search the
+        this Stream in a list. Optionally search the
         activeSite Stream and/or contexts.
 
         If no Clef objects are defined, get a default
@@ -4117,12 +4332,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         # TODO: activeSite searching is not yet implemented
         # this may not be useful unless a stream is flat
-        post = self.getElementsByClass('Clef')
+        post = list(self.iter.getElementsByClass('Clef'))
 
         #environLocal.printDebug(['getClefs(); count of local', len(post), post])
         if len(post) == 0 and searchActiveSite and self.activeSite is not None:
             #environLocal.printDebug(['getClefs(): search activeSite'])
-            post = self.activeSite.getElementsByClass('Clef')
+            post = list(self.activeSite.iter.getElementsByClass('Clef'))
 
         if len(post) == 0 and searchContext:
             # returns a single element match
@@ -5124,7 +5339,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # TODO: this iterates over all notes at each iteration; can be faster
                 for e in post.iter.notesAndRests:
                     # these are flat offset values
-                    o = e.getOffsetBySite(post)
+                    o = post.elementOffset(e)
                     #environLocal.printDebug(['iterating elements', o, e])
                     if o >= mOffsetStart and o < mOffsetEnd:
                         # get offset in relation to inside of Measure
@@ -5200,9 +5415,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             found = self
         for e in found._elements:
             if fx(e):
-                a._insertCore(e.getOffsetBySite(found), e) # provide an offset here
+                a._insertCore(found.elementOffset(e), e) # provide an offset here
             else:
-                b._insertCore(e.getOffsetBySite(found), e)
+                b._insertCore(found.elementOffset(e), e)
         for e in found._endElements:
             if fx(e):
                 #a.storeAtEnd(e)
@@ -5257,8 +5472,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     dur = e.duration.quarterLength
                 else:
                     dur = 0
-                # NOTE: rounding here may cause secondary problems
-                offset = e.getOffsetBySite(group) #round(e.getOffsetBySite(group), 8)
+                offset = group.elementOffset(e)
                 endTime = opFrac(offset + dur)
                 # NOTE: used to make a copy.copy of elements here;
                 # this is not necssary b/c making deepcopy of entire Stream
@@ -6292,6 +6506,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             sNew._storeAtEndCore(e)
 
         sNew.isFlat = True
+        if self.autoSort is True:
+            sNew.sort() # sort it immediately so that cache is not invalidated
         # here, we store the source stream from which this stream was derived
         return sNew
 
@@ -6717,12 +6933,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #TODO: change skipSelf by January 2016.
         '''
         includeSelf = not skipSelf
-        ri = iterator.RecursiveIterator(self, streamsOnly=streamsOnly,
+        ri = iterator.RecursiveIterator(self, 
+                                        streamsOnly=streamsOnly,
                                         restoreActiveSites=restoreActiveSites,
                                         includeSelf=includeSelf
                                         )
         if classFilter != ():
-            ri.addFilter(filter.ClassFilter(classFilter))
+            ri.addFilter(filters.ClassFilter(classFilter))
         return ri        
 
     def restoreActiveSites(self):
@@ -9132,7 +9349,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         elementsSorted = self.flat
         unused_simultaneityMap, overlapMap = self._findLayering(elementsSorted,
-                                                                includeDurationless, includeEndBoundary)
+                                                        includeDurationless, includeEndBoundary)
         #environLocal.printDebug(['simultaneityMap map', simultaneityMap])
         #environLocal.printDebug(['overlapMap', overlapMap])
 
@@ -9161,7 +9378,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         elementsSorted = self.flat
         unused_simultaneityMap, overlapMap = self._findLayering(elementsSorted,
-                                                                includeDurationless, includeEndBoundary)
+                                                    includeDurationless, includeEndBoundary)
         post = True
         for indexList in overlapMap:
             if indexList:
@@ -9278,7 +9495,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         m-7
         P4
 
-        OMIT_FROM_DOCS
         >>> s = stream.Stream()
         >>> s.append(note.Note('C'))
         >>> s.append(note.Note('D'))
@@ -9292,7 +9508,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ...         print(n.editorial.melodicInterval.directedName)
         None
         M2
-        None
+        P1
         '''
 
         notes = self.notes
@@ -9640,15 +9856,18 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     # clefs
                     mActive.mergeElements(m, classFilterList=(
                                                 'Bar', 'TimeSignature', 'Clef', 'KeySignature'))
+                    vIndex = 0  # should not be necessary, but pylint warns on loop variables
+                                # that could possibly be undefined used out of the loop.
                     for vIndex, v in enumerate(m.voices):
                         # make an independent copy
                         mNew = copy.deepcopy(mActive)
                         # merge all elements from the voice
                         mNew.mergeElements(v)
                         # insert in the appropriate part
-                        s.parts[vIndex].insert( self.elementOffset(m), mNew)
-                        
-                    for emptyIndex in range(vIndex+1, partCount):
+                        s.parts[vIndex].insert(self.elementOffset(m), mNew)
+                    
+                    # vIndex is now the number of voices - 1.  Fill empty voices 
+                    for emptyIndex in range(vIndex + 1, partCount):
                         s.parts[emptyIndex].insert(self.elementOffset(m), copy.deepcopy(mActive))
                 # if a measure does not have voices, simply populate
                 # with elements and append
@@ -9920,11 +10139,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         elements will be swapped in when a match is found between an element
         in the variant and an element in the replcement region of the string.
 
-        >>> s = converter.parse("tinynotation: 4/4 d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                  d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1", makeNotation=False)
-        >>> s.makeMeasures(inPlace=True)
-        >>> v1stream = converter.parse("tinynotation: 4/4        a2. b-8 a8", makeNotation=False)
-        >>> v2stream1 = converter.parse("tinynotation: 4/4                                      d4 f4 a2", makeNotation=False)
-        >>> v2stream2 = converter.parse("tinynotation: 4/4                                                  d4 f4 AA2", makeNotation=False)
+        >>> sStr   = "d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2              "
+        >>> v1Str  = "              a2. b-8 a8 "
+        >>> v2Str1 = "                                             d4 f4 a2 "
+        >>> v2Str2 = "                                                      d4 f4 AA2 "
+
+        >>> sStr += "d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1"
+
+        >>> s = converter.parse("tinynotation: 4/4 " + sStr, makeNotation=False)
+        >>> s.makeMeasures(inPlace=True) # maybe not necessary?
+        >>> v1stream = converter.parse("tinynotation: 4/4 " + v1Str, makeNotation=False)
+        >>> v2stream1 = converter.parse("tinynotation: 4/4 " + v2Str1, makeNotation=False)
+        >>> v2stream2 = converter.parse("tinynotation: 4/4 " + v2Str2, makeNotation=False)
+
 
         >>> v1 = variant.Variant()
         >>> v1measure = stream.Measure()
@@ -10697,8 +10924,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         that have been deleted and a
         list of tuples (highest measure number below insertion, number of inserted measures).
 
-        >>> s = converter.parse("tinynotation: 4/4 d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    g1")
-        >>> s.makeMeasures(inPlace=True)
+        >>> s = converter.parse("tinynotation: 4/4 d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4  g1")
         >>> s[-1].offset = 20.0
         >>> s.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -10864,12 +11090,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         'elongation' and 'deletion' as there is no good way to represent ossia staves like those
         by this method.
 
+        >>> sPartStr = "d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2 "
+        >>> v1Str =    "              a2. b-8 a8 "
+        >>> v2Str =    "                                             d4 f4 a2 "
 
-        >>> sPartStream = converter.parse("tinynotation: 4/4      d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                  d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1")
-        >>> sPartStream.makeMeasures(inPlace=True)
-        >>> v1stream = converter.parse("tinynotation: 4/4                       a2. b-8 a8")
-        >>> v2stream = converter.parse("tinynotation: 4/4                                                     d4 f4 a2")
+        >>> sPartStr += "d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1"
 
+        >>> sPartStream = converter.parse("tinynotation: 4/4 " + sPartStr)
+        >>> sPartStream.makeMeasures(inPlace=True) # maybe not necessary?
+        >>> v1stream = converter.parse("tinynotation: 4/4 " + v1Str)
+        >>> v2stream = converter.parse("tinynotation: 4/4 " + v2Str)
+        
         >>> v1 = variant.Variant()
         >>> v1measure = stream.Measure()
         >>> v1.insert(0.0, v1measure)
@@ -11488,150 +11719,6 @@ class Measure(Stream):
         return meter.bestTimeSignature(self)
 
 
-    def _getClef(self):
-        # TODO: perhaps sort by priority?
-        clefList = self.getElementsByClass('Clef')
-        # only return clefs that have offset = 0.0
-        clefList = clefList.getElementsByOffset(0)
-        if len(clefList) == 0:
-            return None
-        else:
-            return clefList[0]
-
-    def _setClef(self, clefObj):
-        # if clef is None; remove object?
-        oldClef = self._getClef()
-        if oldClef is not None:
-            #environLocal.printDebug(['removing clef', oldClef])
-            junk = self.pop(self.index(oldClef))
-        if clefObj is None:
-            # all that is needed is to remove the old clef
-            # there is no new clef - suppresses the clef of a stream
-            return
-        self.insert(0.0, clefObj)
-        # for some reason needed to make sure that sorting of Clef happens before TimeSignature
-        # TODO: Test if this can be deleted...
-        self.elementsChanged() 
-        
-    clef = property(_getClef, _setClef, doc='''
-        Finds or sets a :class:`~music21.clef.Clef` at offset 0.0 in the measure:
-
-        >>> m = stream.Measure()
-        >>> m.number = 10
-        >>> m.clef = clef.TrebleClef()
-        >>> thisTrebleClef = m.clef
-        >>> thisTrebleClef.sign
-        'G'
-        >>> thisTrebleClef.getOffsetBySite(m)
-        0.0
-
-        Setting the clef for the measure a second time removes the previous clef
-        from the measure and replaces it with the new one:
-
-        >>> m.clef = clef.BassClef()
-        >>> m.clef.sign
-        'F'
-
-
-        And the TrebleClef is no longer in the measure:
-
-        >>> thisTrebleClef.getOffsetBySite(m)
-        Traceback (most recent call last):
-        SitesException: an entry for this object <music21.clef.TrebleClef> is not 
-              stored in stream <music21.stream.Measure 10 offset=0.0>
-
-
-        The `.clef` appears in a `.show()` or other call
-        just like any other element
-
-        >>> m.append(note.Note('D#', type='whole'))
-        >>> m.show('text')
-        {0.0} <music21.clef.BassClef>
-        {0.0} <music21.note.Note D#>
-        ''')
-
-    def _getTimeSignature(self):
-        '''
-        >>> a = stream.Measure()
-        >>> a.timeSignature = meter.TimeSignature('2/4')
-        >>> a.timeSignature.numerator, a.timeSignature.denominator
-        (2, 4)
-        '''
-        # there could be more than one
-        tsList = self.getElementsByClass('TimeSignature')
-        #environLocal.printDebug([
-        #    'matched Measure classes of type TimeSignature', tsList, len(tsList)])
-        # only return timeSignatures at offset = 0.0
-        tsList = tsList.getElementsByOffset(0)
-        if len(tsList) == 0:
-            return None
-        else:
-            return tsList[0]
-
-    def _setTimeSignature(self, tsObj):
-        '''
-        >>> a = stream.Measure()
-        >>> a.timeSignature = meter.TimeSignature('5/4')
-        >>> a.timeSignature.numerator, a.timeSignature.denominator
-        (5, 4)
-        >>> a.timeSignature = meter.TimeSignature('2/8')
-        >>> a.timeSignature.numerator, a.timeSignature.denominator
-        (2, 8)
-
-        '''
-        oldTimeSignature = self._getTimeSignature()
-        if oldTimeSignature is not None:
-            #environLocal.printDebug(['removing ts', oldTimeSignature])
-            junk = self.pop(self.index(oldTimeSignature))
-        if tsObj is None:
-            # all that is needed is to remove the old time signature
-            # there is no new time signature - suppresses the time signature of a stream
-            return
-        self.insert(0, tsObj)
-
-    timeSignature = property(_getTimeSignature, _setTimeSignature)
-
-    def _getKeySignature(self):
-        '''
-        >>> a = stream.Measure()
-        >>> a.keySignature = key.KeySignature(0)
-        >>> a.keySignature.sharps
-        0
-        '''
-        keyList = self.getElementsByClass('KeySignature')
-        # only return keySignatures with offset = 0.0
-        keyList = keyList.getElementsByOffset(0)
-        if len(keyList) == 0:
-            return None
-        else:
-            return keyList[0]
-
-    def _setKeySignature(self, keyObj):
-        '''
-        >>> a = stream.Measure()
-        >>> a.keySignature = key.KeySignature(6)
-        >>> a.keySignature.sharps
-        6
-
-
-        A key.Key object can be used instead of key.KeySignature,
-        since the former derives from the latter.
-
-        >>> a.keySignature = key.Key('E-', 'major')
-        >>> a.keySignature.sharps
-        -3
-        '''
-        oldKey = self._getKeySignature()
-        if oldKey is not None:
-            #environLocal.printDebug(['removing key', oldKey])
-            junk = self.pop(self.index(oldKey))
-        if keyObj is None:
-            # all that is needed is to remove the old key signature
-            # there is no new key signature - suppresses the key signature of a stream
-            return
-        self.insert(0, keyObj)
-
-    keySignature = property(_getKeySignature, _setKeySignature)
 
     def _getLeftBarline(self):
         barList = []
@@ -11774,6 +11861,117 @@ class Part(Stream):
     def __init__(self, *args, **keywords):
         Stream.__init__(self, *args, **keywords)
         self.staffLines = 5
+        self._partName = None
+        self._partAbbreviation = None
+        
+    def _getPartName(self):
+        if self._partName is not None:
+            return self._partName
+        elif '_partName' in self._cache:
+            return self._cache['_partName']
+        else:
+            pn = None
+            for e in self.recurse().getElementsByClass('Instrument'):
+                pn = e.partName
+                if pn is None:
+                    pn = e.instrumentName
+                if pn is not None:
+                    break
+            self._cache['_partName'] = pn
+            return pn
+    
+    def _setPartName(self, newName):
+        self._partName = newName
+
+    partName = property(_getPartName, _setPartName, doc='''
+        Gets or sets a string representing the name of this part
+        as a whole (not counting instrument changes, etc.).
+        
+        It can be set explicitly (or set on parsing) or it
+        can take its name from the first :class:`~music21.instrument.Instrument` object
+        encountered in the stream (or within a substream), 
+        first checking its .partName, then checking its .instrumentName
+        
+        Can also return None.
+        
+        >>> p = stream.Part()
+        >>> p.partName is None
+        True
+        >>> cl = instrument.Clarinet()
+        >>> p.insert(0, cl)
+        >>> p.partName
+        'Clarinet'
+        >>> p.remove(cl)
+        >>> p.partName is None
+        True
+        >>> p.insert(0, instrument.Flute())
+        >>> p.partName
+        'Flute'
+        >>> p.partName = 'Reed 1'
+        >>> p.partName
+        'Reed 1'
+        
+        Note that changing an instrument's .partName or .instrumentName while it
+        is already in the Stream will not automatically update this unless 
+        .elementsChanged() is called or this Stream's elements are otherwise altered.
+        This is because the value is cached so that O(n) searches through the Stream
+        do not need to be done every time.
+    ''')
+
+    def _getPartAbbreviation(self):
+        if self._partAbbreviation is not None:
+            return self._partAbbreviation
+        elif '_partAbbreviation' in self._cache:
+            return self._cache['_partAbbreviation']
+        else:
+            pn = None
+            for e in self.recurse().getElementsByClass('Instrument'):
+                pn = e.partAbbreviation
+                if pn is None:
+                    pn = e.instrumentAbbreviation
+                if pn is not None:
+                    break
+            self._cache['_partAbbreviation'] = pn
+            return pn
+    
+    def _setPartAbbreviation(self, newName):
+        self._partAbbreviation = newName
+
+    partAbbreviation = property(_getPartAbbreviation, _setPartAbbreviation, doc='''
+        Gets or sets a string representing the abbreviated name of this part
+        as a whole (not counting instrument changes, etc.).
+        
+        It can be set explicitly (or set on parsing) or it
+        can take its name from the first :class:`~music21.instrument.Instrument` object
+        encountered in the stream (or within a substream), 
+        first checking its .partAbbreviation, then checking its .instrumentAbbreviation
+        
+        Can also return None.
+        
+        >>> p = stream.Part()
+        >>> p.partAbbreviation is None
+        True
+        >>> cl = instrument.Clarinet()
+        >>> p.insert(0, cl)
+        >>> p.partAbbreviation
+        'Cl'
+        >>> p.remove(cl)
+        >>> p.partAbbreviation is None
+        True
+        >>> p.insert(0, instrument.Flute())
+        >>> p.partAbbreviation
+        'Fl'
+        >>> p.partAbbreviation = 'Rd 1'
+        >>> p.partAbbreviation
+        'Rd 1'
+        
+        Note that changing an instrument's .partAbbreviation or .instrumentAbbreviation while it
+        is already in the Stream will not automatically update this unless 
+        .elementsChanged() is called or this Stream's elements are otherwise altered.
+        This is because the value is cached so that O(n) searches through the Stream
+        do not need to be done every time.
+    ''')
+
 
     def makeAccidentals(self, alteredPitches=None,
          cautionaryPitchClass=True,

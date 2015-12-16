@@ -7,7 +7,8 @@ To use, first install mod_wsgi and include it in the HTTPD.conf file.
 Add this file to the server, ideally not in the document root, 
 on mac this could be /Library/WebServer/wsgi-scripts/zipfileapp.py
 
-Then edit the HTTPD.conf file to redirect any requests to WEBSERVER:/music21interface to call this file:
+Then edit the HTTPD.conf file to redirect any requests to WEBSERVER:/music21interface 
+to call this file:
 Note: unlike with mod_python, the end of the URL does not determine which function is called,
 WSGIScriptAlias always calls application.
 
@@ -60,7 +61,8 @@ def music21ModWSGIFeatureApplication(environ, start_response):
     '''
     status = '200 OK'
 
-    pathInfo = environ['PATH_INFO'] # Contents of path after mount point of wsgi app but before question mark
+    pathInfo = environ['PATH_INFO'] 
+    # Contents of path after mount point of wsgi app but before question mark
 
     if pathInfo == '/uploadForm':
         output = getUploadForm()
@@ -253,7 +255,7 @@ def idAndParseFile(fileToParse,filename):
         if music21FormatName is None:
             parsedFile = None
         else:
-            parsedFile = converter.parse(fileToParse.read(),format=music21FormatName)
+            parsedFile = converter.parse(fileToParse.read(), format=music21FormatName)
             
     return parsedFile
 
@@ -265,7 +267,8 @@ def getFeatureInfo():
         if feName is None:
             continue
         fe = feName()
-        output += "\t['" + fe.id + "','" + fe.name + "','" + fe.description + "','" + str(fe.dimensions) + "'],\n"
+        output += "\t['" + fe.id + "','" + fe.name + "','" + \
+            fe.description + "','" + str(fe.dimensions) + "'],\n"
     output = output[:-2]
     output += "]\n"
     
@@ -285,7 +288,8 @@ def getFeatureInfo():
             if feName is None:
                 continue
             fe = feName()
-            output += "\t['" + fe.id + "','" + fe.name + "','" + fe.description + "','" + str(fe.dimensions) + "'],\n"
+            output += "\t['" + fe.id + "','" + fe.name + "','" + fe.description + \
+                "','" + str(fe.dimensions) + "'],\n"
         output = output[:-2]
         output += "]\n"
     return output
@@ -382,21 +386,26 @@ def getUploadForm():
         <tr><td align='left'>"""
     
     # Heading and description
-    html += """ <h1><span style="font-family:'Courier New', Courier, monospace">music21</span> Feature Extraction:</h1>
+    html += """ <h1><span style="font-family:'Courier New', Courier, monospace">music21</span> 
+        Feature Extraction:</h1>
         <a href='/music21/webapps/client'>Back</a>
 
         <hr />
-        <p style='font-size:15'>Multiple Feature Extractors on Multiple Scores using Music21 - <br />
-        Upload a .zip file containing musical scores. They can be of varying formats. music21 will convert and parse .xml, .md, .krn, .abc, .mid, and others.</p>
+        <p style='font-size:15'>Multiple Feature Extractors on Multiple Scores 
+        using Music21 - <br />
+        Upload a .zip file containing musical scores. They can be of varying formats. 
+        music21 will convert and parse .xml, .md, .krn, .abc, .mid, and others.</p>
         """
     # form info
-    html += """<form id='/uploadForm' action="/music21/featureapp" method="POST" enctype="multipart/form-data" style='font-size:14'>"""
+    html += """<form id='/uploadForm' action="/music21/featureapp" method="POST" 
+        enctype="multipart/form-data" style='font-size:14'>"""
     
     # file upload
     html += """
         <hr />
         <input type="hidden" name="subUploadForm" value=1/>
-        <span style='font-size:16'><b>File Selection: </b></span><input type="file" name="fileupload"/>
+        <span style='font-size:16'><b>File Selection: </b></span><input 
+            type="file" name="fileupload"/>
         <br />
         """
     
@@ -404,7 +413,9 @@ def getUploadForm():
     html += """
         <hr />
         <span style='font-size:16'><b>Class Value: </b></span>
-        <p>By default, the Class Value for each file is set to be the directory of the file in the zip archive (e.g. if identifying composers, the directories might be Bach, Beethoven, Unknown)
+        <p>By default, the Class Value for each file is set to be the directory 
+            of the file in the zip archive (e.g. if identifying composers, the 
+            directories might be Bach, Beethoven, Unknown)
         <br />
         """
     
@@ -440,9 +451,12 @@ def getUploadForm():
             name = extractor[1]
             desc = extractor[2]
             dimensions = extractor[3]
-            html += "<input type='checkbox' name='features' value='" + featureId +"' extractortype = '" + typeId + "' onchange='updateCounts(this.checked," + dimensions + ")'/>\n" 
+            html += "<input type='checkbox' name='features' value='" + featureId + \
+                "' extractortype = '" + typeId + "' onchange='updateCounts(this.checked," + \
+                dimensions + ")'/>\n" 
             html += "<span onClick=toggleDesc('"+ featureId + "')>"+ name + "</span><br />\n"
-            html += "<div style='font-size:12;display:none;padding-left:16px;margin-bottom:7px' id ='" + featureId + "desc'>\n"
+            html += "<div style='font-size:12; display:none; padding-left:16px; " + \
+                "margin-bottom:7px' id ='" + featureId + "desc'>\n"
             html += desc + "<br />(vectors output: " + dimensions + ") " + "<br /></div>\n"
         html += "</div>\n"
     html += "</div>\n"
@@ -458,7 +472,11 @@ def getUploadForm():
 
 featureInfo = dict()
 featureInfo['m21']=[
-    ['P22','Quality','Set to 0 if the key signature indicates that a recording is major, set to 1 if it indicates that it is minor and set to 0 if key signature is unknown. Music21 addition: if no key mode is found in the piece, analyze the piece to discover what mode it is most likely in.','1'],
+    ['P22','Quality',
+        'Set to 0 if the key signature indicates that a recording is major, set ' + 
+        'to 1 if it indicates that it is minor and set to 0 if key signature is unknown. ' + 
+        'Music21 addition: if no key mode is found in the piece, analyze the piece to ' + 
+        'discover what mode it is most likely in.', '1'],
     ['QL1','Unique Note Quarter Lengths','The number of unique note quarter lengths.','1'],
     ['QL2','Most Common Note Quarter Length','The value of the most common quarter length.','1'],
     ['QL3','Most Common Note Quarter Length Prevalence','Fraction of notes that have the most common quarter length.','1'],

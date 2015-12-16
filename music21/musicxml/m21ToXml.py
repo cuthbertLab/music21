@@ -10,7 +10,7 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
-Converters for music21 objects to musicxml.
+Converters for music21 objects to musicxml using ElementTree
 '''
 from __future__ import print_function, division
 
@@ -377,7 +377,8 @@ class GeneralObjectExporter():
                 outObj = meth(obj)
                 break
         if outObj is None:
-            raise ToMxObjectsException("Cannot translate the object %s to a complete musicXML document; put it in a Stream first!" % self.generalObj)
+            raise ToMxObjectsException("Cannot translate the object " + 
+                "%s to a complete musicXML document; put it in a Stream first!" % self.generalObj)
         return outObj
 
 
@@ -502,7 +503,7 @@ class GeneralObjectExporter():
         the tonic and dominant.
         '''
         m = stream.Measure(number=1)
-        for i in range(1, diatonicScaleObject._abstract.getDegreeMaxUnique()+1):
+        for i in range(1, diatonicScaleObject._abstract.getDegreeMaxUnique() + 1):
             p = diatonicScaleObject.pitchFromDegree(i)
             n = note.Note()
             n.pitch = p
@@ -661,7 +662,9 @@ class XMLExporterBase(object):
                 elem.tail = i
                 
     def xmlHeader(self):
-        return b'''<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE score-partwise\n  PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'\n  'http://www.musicxml.org/dtds/partwise.dtd'>\n'''
+        return (b'''<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE score-partwise\n  ''' + 
+                b'''PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'\n  ''' + 
+                b''''http://www.musicxml.org/dtds/partwise.dtd'>\n''')
     
     def setPosition(self, m21Object, mxObject):
         if hasattr(m21Object, 'xPosition') and m21Object.xPosition is not None:
@@ -1074,7 +1077,8 @@ class ScoreExporter(XMLExporterBase):
         # this meter  stream is passed to makeNotation()
         meterStream = s.getTimeSignatures(searchContext=False,
                         sortByCreationTime=False, returnDefault=False)
-        #environLocal.printDebug(['streamToMx: post meterStream search', meterStream, meterStream[0]])
+        #environLocal.printDebug(['setMeterStream: post meterStream search', 
+        #                meterStream, meterStream[0]])
         if len(meterStream) == 0:
             # note: this will return a default if no meters are found
             meterStream = s.flat.getTimeSignatures(searchContext=False,
@@ -1626,6 +1630,7 @@ class ScoreExporter(XMLExporterBase):
         <supports attribute="new-page" element="print" type="yes" value="yes" />
         
         '''
+        # pylint: disable=redefined-builtin
         def getSupport(attribute, type, value, element): # @ReservedAssignment
             su = Element('supports')
             su.set('attribute', attribute)
@@ -1705,8 +1710,6 @@ class ScoreExporter(XMLExporterBase):
 class PartExporter(XMLExporterBase):
     '''
     Object to convert one Part stream to a <part> tag on .parse() 
-    
-    
     '''
     
     def __init__(self, partObj=None, parent=None):
@@ -1812,14 +1815,20 @@ class PartExporter(XMLExporterBase):
         part.makeNotation(meterStream=self.meterStream,
                         refStreamOrTimeRange=self.refStreamOrTimeRange,
                         inPlace=True)    
-        #environLocal.printDebug(['Stream.streamPartToMx: post makeNotation, length', len(measureStream)])
+        #environLocal.printDebug(['fixupNotationFlat: post makeNotation, length', 
+        #                    len(measureStream)])
 
         # after calling measuresStream, need to update Spanners, as a deepcopy
         # has been made
         # might need to getAll b/c might need spanners 
         # from a higher level container
-        #spannerBundle = spanner.SpannerBundle(
-        #                measureStream.flat.getAllContextsByClass('Spanner'))
+        # allContexts = []
+        # spannerContext = measureStream.flat.getContextByClass('Spanner')
+        # while spannerContext:
+        #    allContexts.append(spannerContext)
+        #    spannerContext = spannerContext.getContextByClass('Spanner')
+        # 
+        #spannerBundle = spanner.SpannerBundle(allContexts)
         # only getting spanners at this level
         #spannerBundle = spanner.SpannerBundle(measureStream.flat)
         self.spannerBundle = part.spannerBundle
@@ -1881,23 +1890,24 @@ class PartExporter(XMLExporterBase):
         # TODO: identification -- specific metadata... could go here...
         mxScorePart.set('id', self.xmlRoot.get('id'))
 
-        i = self.firstInstrumentObject
         
         mxPartName = SubElement(mxScorePart, 'part-name')
-        if i.partName is not None:
-            mxPartName.text = i.partName
+        if hasattr(self.stream, 'partName') and self.stream.partName is not None:
+            mxPartName.text = self.stream.partName
         else:
             mxPartName.text = defaults.partName
         # TODO: part-name-display
             
-        if i.partAbbreviation is not None:
+        if hasattr(self.stream, 'partAbbreviation') and self.stream.partAbbreviation is not None:
             mxPartAbbreviation = SubElement(mxScorePart, 'part-abbreviation')
-            mxPartAbbreviation.text = i.partAbbreviation
+            mxPartAbbreviation.text = self.stream.partAbbreviation
 
         # TODO: part-abbreviation-display
         # TODO: group    
         
         # TODO: unbounded...
+        i = self.firstInstrumentObject
+
         if i.instrumentName is not None or i.instrumentAbbreviation is not None:
             mxScorePart.append(self.instrumentToXmlScoreInstrument(i))
 
@@ -2231,7 +2241,8 @@ class MeasureExporter(XMLExporterBase):
                 mxTrem.set('type', 'stop')
             else:
                 # this is always an error for tremolos
-                environLocal.printDebug(['spanner w/ a component that is neither a start nor an end.', su, obj])
+                environLocal.printDebug(
+                    ['spanner w/ a component that is neither a start nor an end.', su, obj])
             if su.placement is not None:
                 mxTrem.set('placement', str(su.placement))
             # Tremolos get in a separate ornaments tag...
@@ -2426,7 +2437,8 @@ class MeasureExporter(XMLExporterBase):
         # notehead
         foundANotehead = False
         if (hasattr(n, 'notehead') and 
-                (n.notehead != 'normal' or  # TODO: restore... needed for complete compatibility with toMxObjects...
+                # TODO: restore... needed for complete compatibility with toMxObjects...
+                (n.notehead != 'normal' or  
                  n.noteheadFill is not None or
                  n.color not in (None, ''))
             ):
@@ -2435,7 +2447,8 @@ class MeasureExporter(XMLExporterBase):
             mxNote.append(mxNotehead)
         if foundANotehead is False and chordParent is not None:
             if (hasattr(chordParent, 'notehead') and 
-                    (chordParent.notehead != 'normal' or  # TODO: restore... needed for complete compatibility with toMxObjects...
+                    # TODO: restore... needed for complete compatibility with toMxObjects...
+                    (chordParent.notehead != 'normal' or 
                      chordParent.noteheadFill is not None or
                      chordParent.color not in (None, ''))
                 ):
@@ -2781,7 +2794,8 @@ class MeasureExporter(XMLExporterBase):
         mxNotehead.text = nh 
         setb = _setAttributeFromAttribute
         setb(n, mxNotehead, 'filled', 'noteheadFill', transform=xmlObjects.booleanToYesNo)
-        setb(n, mxNotehead, 'parentheses', 'noteheadParenthesis', transform=xmlObjects.booleanToYesNo)
+        setb(n, mxNotehead, 'parentheses', 'noteheadParenthesis', 
+             transform=xmlObjects.booleanToYesNo)
         # TODO: font
         if n.color not in (None, ''):
             color = normalizeColor(n.color)
@@ -2981,7 +2995,8 @@ class MeasureExporter(XMLExporterBase):
             return []
         
         if tuplet.type not in ('start', 'stop', 'startStop'):
-            raise ToMxObjectsException("Cannot create music XML from a tuplet of type " + tuplet.type)
+            raise ToMxObjectsException(
+                "Cannot create music XML from a tuplet of type " + tuplet.type)
 
         if tuplet.type == 'startStop': # need two musicxml
             localType = ['start', 'stop']
@@ -3156,7 +3171,8 @@ class MeasureExporter(XMLExporterBase):
                 musicXMLTechnicalName = xmlObjects.TECHNICAL_MARKS_REV[c]
                 break
         if musicXMLTechnicalName is None:
-            raise ToMxObjectsException("Cannot translate technical indication %s to musicxml" % articulationMark)
+            raise ToMxObjectsException(
+                "Cannot translate technical indication %s to musicxml" % articulationMark)
         mxTechnicalMark = Element(musicXMLTechnicalName)
         mxTechnicalMark.set('placement', articulationMark.placement)
         #mxArticulations.append(mxArticulationMark)
@@ -3596,7 +3612,8 @@ class MeasureExporter(XMLExporterBase):
           </direction-type>
         </direction>
         '''
-        # if writing just a sound tag, place an empty words tag in a direction type and then follow with sound declaration
+        # if writing just a sound tag, place an empty words tag in a 
+        # direction type and then follow with sound declaration
         # storing lists to accommodate metric modulations
         durs = [] # duration objects
         numbers = [] # tempi
@@ -3819,7 +3836,9 @@ class MeasureExporter(XMLExporterBase):
             elif beamObject.direction == 'right':
                 mxBeam.text = 'forward hook'
             else:
-                raise ToMxObjectsException('partial beam defined without a proper direction set (set to %s)' % beamObject.direction)
+                raise ToMxObjectsException(
+                    'partial beam defined without a proper direction set (set to %s)' % 
+                    beamObject.direction)
         else:
             raise ToMxObjectsException('unexpected beam type encountered (%s)' % beamObject.type)
     
@@ -3968,7 +3987,7 @@ class MeasureExporter(XMLExporterBase):
         mxDivisions = SubElement(mxAttributes, 'divisions')
         mxDivisions.text = str(self.currentDivisions)
         if self.transpositionInterval is not None:
-            mxAttributes.append(self.intervalToXmlTranspose)
+            mxAttributes.append(self.intervalToXmlTranspose(self.transpositionInterval))
         if 'Measure' in m.classes:
             if m.keySignature is not None:
                 mxAttributes.append(self.keySignatureToXml(m.keySignature))
@@ -4236,7 +4255,8 @@ class MeasureExporter(XMLExporterBase):
     def setMxPrint(self):
         m = self.stream
         # print objects come before attributes
-        # note: this class match is a problem in cases where the object is created in the module itself, as in a test. 
+        # note: this class match is a problem in cases where the object 
+        #    is created in the module itself, as in a test. 
     
         # do a quick search for any layout objects before searching individually...
         foundAny = m.getElementsByClass('LayoutBase')
@@ -4394,7 +4414,8 @@ class TestExternal(unittest.TestCase):
         import io
         import difflib
         
-        #b = converter.parse(corpus.getWorkList('cpebach')[0], format='musicxml', forceSource=True)
+        #b = converter.parse(corpus.corpora.CoreCorpus().getWorkList('cpebach')[0], 
+        #    format='musicxml', forceSource=True)
         b = corpus.parse('cpebach')
         #b.show('text')
         #n = b.flat.notes[0]

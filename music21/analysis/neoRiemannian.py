@@ -10,7 +10,8 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
-This module defines the L, P, and R objects and their related transformations as called on a chord.Chord. 
+This module defines the L, P, and R objects and their 
+related transformations as called on a chord.Chord, according to Neo-Riemannian theory.
 '''
 import unittest
 
@@ -222,7 +223,8 @@ def LRP_combinations(c,
             
     else:
         if raiseException is True:
-            raise LRPException('Cannot perform transformations on this chord: not a Major or Minor triad')
+            raise LRPException(
+                'Cannot perform transformations on this chord: not a Major or Minor triad')
         return c
     
     # TODO: Fix enharmonic problem

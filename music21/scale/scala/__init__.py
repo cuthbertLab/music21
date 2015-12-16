@@ -545,7 +545,8 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         ss.parse()
         self.assertEqual(ss.pitchCount, 12)
         self.assertEqual(ss.fileName, 'fj-12tet.scl')
-        self.assertEqual(ss.description, 'Franck Jedrzejewski continued fractions approx. of 12-tet')
+        self.assertEqual(ss.description, 
+                         'Franck Jedrzejewski continued fractions approx. of 12-tet')
 
         self.assertEqual(["%.9f" % x for x in ss.getCentsAboveTonic()], ['100.099209825', 
                                                                          '199.979843291', 

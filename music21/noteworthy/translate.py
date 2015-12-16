@@ -16,7 +16,8 @@ Module to translate Noteworthy Composer's NWCTXT format to music21.
 '''
 
 # to do:
-# |SongInfo|Title:"<FileTitle>"|Author:"<Author>"|Lyricist:"<Lyricist>"|Copyright1:"<Copyright1>"|Copyright2:"<Copyright2>"|Comments:"<Comments>"
+# |SongInfo|Title:"<FileTitle>"|Author:"<Author>"|Lyricist:"<Lyricist>"|
+#                Copyright1:"<Copyright1>"|Copyright2:"<Copyright2>"|Comments:"<Comments>"
 # |StaffProperties|Muted:N|Volume:127|StereoPan:64|Device:0|Channel:2
 # |StaffInstrument|Name:"Lead 6 (voice)"|Patch:85|Trans:0|DynVel:10,30,45,60,75,92,108,127
 # 
@@ -54,7 +55,8 @@ Module to translate Noteworthy Composer's NWCTXT format to music21.
 # |PerformanceStyle|Style:Animato|Pos:-7
 # 
 # low priority:
-# |MPC|Controller:vol|Style:Linear Sweep|TimeRes:Whole|SweepRes:1|Pt1:0,127|Pt2:8,30|Pos:8|Wide:Y|Placement:BestFitForward
+# |MPC|Controller:vol|Style:Linear Sweep|TimeRes:Whole|SweepRes:1|
+#                        Pt1:0,127|Pt2:8,30|Pos:8|Wide:Y|Placement:BestFitForward
 # 
 # Pos2? Dur2?
 # |Chord|Dur:8th|Pos:-4,n-3,b-2,#-1,x0,v1,2x|Opts:Stem=Down,Crescendo|Dur2:8th,DblDotted|Pos2:3x
@@ -163,7 +165,8 @@ class NoteworthyTranslator(object):
                     if attribute.strip() == "":
                         pass
                     else:
-                        raise NoteworthyTranslateException("Cannot unpack value from %s in %s" %(attribute,pi))
+                        raise NoteworthyTranslateException(
+                            "Cannot unpack value from %s in %s" %(attribute,pi))
 
             if command == "Note":  
                 self.translateNote(attributes)
@@ -576,7 +579,8 @@ class NoteworthyTranslator(object):
             elif attributes['OctaveShift'] == 'Octave Up':
                 octaveShift = 1
             else:
-                raise NoteworthyTranslateException('Did not get a proper octave shift from %s' % attributes[3])
+                raise NoteworthyTranslateException(
+                    'Did not get a proper octave shift from %s' % attributes[3])
         else:
             octaveShift = 0
  
@@ -619,7 +623,8 @@ class NoteworthyTranslator(object):
     
     def createKey(self, attributes):
         r'''
-        Adds a new key signature to the given measure.  Returns the number of sharps (negative for flats)
+        Adds a new key signature to the given measure.  
+        Returns the number of sharps (negative for flats)
         
         
         
@@ -751,7 +756,8 @@ class NoteworthyTranslator(object):
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentMeasure = stream.Measure()
-        >>> nwt.createOtherRepetitions({"Style" : "ToCoda", "Pos": "8", "Wide":"Y","Placement":"BestFitForward"})
+        >>> nwt.createOtherRepetitions({"Style" : "ToCoda", "Pos": "8", 
+        ...                             "Wide":"Y","Placement":"BestFitForward"})
         >>> "Coda" in nwt.currentMeasure[0].classes
         True
         '''
@@ -858,21 +864,25 @@ class Test(unittest.TestCase):
     
     def runTest(self):
         pass
+    
     def testBasic(self):
         import os
-        from music21 import common #pylint: disable=reimported, redefined-outer-name
         nwcTranslatePath = common.getSourceFilePath() + os.path.sep + 'noteworthy'
-        simplePath = nwcTranslatePath + os.path.sep + 'verySimple.nwctxt'#'NWCTEXT_Really_complete_example_file.nwctxt' # ## #'Part_OWeisheit.nwctxt' #
+        simplePath = nwcTranslatePath + os.path.sep + 'verySimple.nwctxt'
+        #'NWCTEXT_Really_complete_example_file.nwctxt' # ## #'Part_OWeisheit.nwctxt' #
         myScore = NoteworthyTranslator().parseFile(simplePath)
         self.assertEqual(len(myScore.flat.notes), 1)
         self.assertEqual(str(myScore.flat.notes[0].name), "E")
-        self.assertEqual(str(myScore.flat.getElementsByClass('Clef')[0]), "<music21.clef.BassClef>")
+        self.assertEqual(str(myScore.flat.getElementsByClass('Clef')[0]), 
+                         "<music21.clef.BassClef>")
 
     def testKeySignatureAtBeginning(self):
         '''
-        test a problem with accidentals at the end of one staff not being cleared at the beginning of the next
+        test a problem with accidentals at the end of one staff not 
+        being cleared at the beginning of the next
         
-        showed up in Morley, "Since my tears and lamenting" where Staff 1 ended with a B-natural Picardy, and Staff
+        showed up in Morley, "Since my tears and lamenting" where 
+        Staff 1 ended with a B-natural Picardy, and Staff
         2 began with a B in a flat key, but was showing up as B-natural also
         '''
         
@@ -907,12 +917,13 @@ class Test(unittest.TestCase):
 class TestExternal(unittest.TestCase):
     def runTest(self):
         pass
-    def testPaert(self):
+    def testComplete(self):
         import os
         nwcTranslatePath = common.getSourceFilePath() + os.path.sep + 'noteworthy'
-        paertPath = nwcTranslatePath + os.path.sep + 'NWCTEXT_Really_complete_example_file.nwctxt' #'Part_OWeisheit.nwctxt' #
-        #paertPath = r'D:\docs\research\music21\elvis\Wegman Masses\01\Caput\01 Kyrie.nwctxt'
-        myScore = NoteworthyTranslator().parseFile(paertPath)
+        complete = nwcTranslatePath + os.path.sep + 'NWCTEXT_Really_complete_example_file.nwctxt' 
+        #'Part_OWeisheit.nwctxt' #
+        
+        myScore = NoteworthyTranslator().parseFile(complete)
         myScore.show()
 
 if __name__ == '__main__':

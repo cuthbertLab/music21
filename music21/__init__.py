@@ -83,7 +83,7 @@ __all__ = [
     'scale',
     'search',
     'test',
-    'timespans',
+    'tree',
     'vexflow',
     # individual modules 
     # KEEP ALPHABETICAL unless necessary for load reasons, if so
@@ -116,6 +116,7 @@ __all__ = [
     'roman',
     'serial',
     'sieve',
+    'sorting',
     'spanner',
     'stream', 
     'tempo',

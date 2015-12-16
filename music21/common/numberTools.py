@@ -95,7 +95,8 @@ def cleanupFloat(floatNum, maxDenominator=defaults.limitOffsetDenominator):
 
 
 def numToIntOrFloat(value):
-    '''Given a number, return an integer if it is very close to an integer, otherwise, return a float.
+    '''
+    Given a number, return an integer if it is very close to an integer, otherwise, return a float.
 
 
     >>> common.numToIntOrFloat(1.0)
@@ -155,7 +156,8 @@ def _preFracLimitDenominator(n, d):
     Proof of working...
     
     >>> import random
-    >>> myWay = lambda x: Fraction(*common.numberTools._preFracLimitDenominator(*x.as_integer_ratio()))
+    >>> myWay = lambda x: Fraction(*common.numberTools._preFracLimitDenominator(
+    ...     *x.as_integer_ratio()))
     >>> theirWay = lambda x: Fraction(x).limit_denominator(65535)
 
     >>> for i in range(50):
@@ -254,7 +256,7 @@ def opFrac(num):
         ir = num.as_integer_ratio()
         if ir[1] > DENOM_LIMIT: # slightly faster[SIC!] than hardcoding 65535!
             return Fraction(*_preFracLimitDenominator(*ir)) # way faster!
-            #return Fraction(*ir).limit_denominator(DENOM_LIMIT) # *ir instead of float -- this happens
+            #return Fraction(*ir).limit_denominator(DENOM_LIMIT) # *ir instead of float--can happen
                 # internally in Fraction constructor, but is twice as fast...
         else:
             return num
@@ -407,7 +409,8 @@ def roundToHalfInteger(num):
 
 def almostEquals(x, y = 0.0, grain=1e-7):
     '''
-    almostEquals(x, y) -- returns True if x and y are within grain (default  0.0000001) of each other
+    almostEquals(x, y) -- returns True if x and y are 
+    within grain (default  0.0000001) of each other
 
     Allows comparisons between floats that are normally inconsistent.
 
@@ -436,8 +439,6 @@ def addFloatPrecision(x, grain=1e-2):
     '''
     Given a value that suggests a floating point fraction, like .33,
     return a Fraction or float that provides greater specification, such as .333333333
-
-
 
     >>> import fractions
     >>> common.addFloatPrecision(.333)
@@ -539,13 +540,16 @@ def nearestMultiple(n, unit):
 
     >>> common.nearestMultiple(-0.5, 0.125)
     Traceback (most recent call last):
-    ValueError: n (-0.5) is less than zero. Thus cannot find nearest multiple for a value less than the unit, 0.125
+    ValueError: n (-0.5) is less than zero. Thus cannot find nearest 
+        multiple for a value less than the unit, 0.125
 
 
     :rtype: tuple(float)
     '''
     if n < 0:
-        raise ValueError('n (%s) is less than zero. Thus cannot find nearest multiple for a value less than the unit, %s' % (n, unit))
+        raise ValueError('n (%s) is less than zero. ' % n + 
+                         'Thus cannot find nearest multiple for a value ' + 
+                         'less than the unit, %s' % unit)
 
     mult = math.floor(n / float(unit)) # can start with the floor
     halfUnit = unit / 2.0
@@ -589,7 +593,8 @@ def standardDeviation(coll, bassel=False):
 
 def dotMultiplier(dots):
     '''
-    dotMultiplier(dots) returns how long to multiply the note length of a note in order to get the note length with n dots
+    dotMultiplier(dots) returns how long to multiply the note 
+    length of a note in order to get the note length with n dots
 
     >>> common.dotMultiplier(1)
     Fraction(3, 2)
@@ -673,7 +678,8 @@ def decimalToTuplet(decNum):
 
 
 def unitNormalizeProportion(values):
-    """Normalize values within the unit interval, where max is determined by the sum of the series.
+    """
+    Normalize values within the unit interval, where max is determined by the sum of the series.
 
 
     >>> common.unitNormalizeProportion([0,3,4])
@@ -703,7 +709,9 @@ def unitNormalizeProportion(values):
     return unit
 
 def unitBoundaryProportion(series):
-    """Take a series of parts with an implied sum, and create unit-interval boundaries proportional to the series components.
+    """
+    Take a series of parts with an implied sum, and create 
+    unit-interval boundaries proportional to the series components.
 
 
     >>> common.unitBoundaryProportion([1,1,2])
@@ -999,7 +1007,8 @@ def fromRoman(num):
             if nextvalue > value and value in [1, 10, 100]:
                 value *= -1
             elif nextvalue > value:
-                raise Music21CommonException("input contains an invalid subtraction element: %s" % num)
+                raise Music21CommonException(
+                    "input contains an invalid subtraction element: %s" % num)
         except IndexError:
             # there is no next place.
             pass

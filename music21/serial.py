@@ -5,16 +5,16 @@
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
-#               Carl Lian
 #
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
 '''
 This module defines objects for defining and manipulating structures 
 common to serial and/or twelve-tone music, 
 including :class:`~music21.serial.ToneRow` subclasses.
+
+Serial searching methods that were previously here have been moved to `alpha.search.serial`
 '''
 
 import unittest
@@ -22,12 +22,10 @@ import copy
 
 from music21 import exceptions21
 
-from music21 import base
 from music21 import note
 from music21 import chord
 from music21 import stream
 from music21 import pitch
-from music21 import spanner
 
 from music21 import environment
 
@@ -85,77 +83,152 @@ class TwelveToneMatrix(stream.Stream):
 #-------------------------------------------------------------------------------
 
 historicalDict = {
-      'RowWebernOp29': ('Webern', 'Op. 29', 'Cantata I', [3, 11, 2, 1, 5, 4, 7, 6, 10, 9, 0, 8]), 
-      'RowWebernOp28': ('Webern', 'Op. 28', 'String Quartet', [1, 0, 3, 2, 6, 7, 4, 5, 9, 8, 11, 10]), 
-      'RowSchoenbergOp24Mvmt5': ('Schoenberg', 'Op. 24', 'Serenade, Mvt. 5, "Tanzscene"', [9, 10, 0, 3, 4, 6, 5, 7, 8, 11, 1, 2]), 
-      'RowSchoenbergOp24Mvmt4': ('Schoenberg', 'Op. 24', 'Serenade, Mvt. 4, "Sonett"', [4, 2, 3, 11, 0, 1, 8, 6, 9, 5, 7, 10]), 
-      'RowSchoenbergJakobsleiter': ('Schoenberg', None, 'Die Jakobsleiter', [1, 2, 5, 4, 8, 7, 0, 3, 11, 10, 6, 9]), 
-      'RowSchoenbergOp27No4': ('Schoenberg', 'Op. 27 No. 4', 'Four Pieces for Mixed Chorus, No. 4', [1, 3, 10, 6, 8, 4, 11, 0, 2, 9, 5, 7]), 
-      'RowWebernOp23': ('Webern', 'Op. 23', 'Three Songs', [8, 3, 7, 4, 10, 6, 2, 5, 1, 0, 9, 11]), 
-      'RowBergLuluActIIScene1': ('Berg', 'Lulu, Act II, Scene 1', 'Perm. (Every 5th Note Of Transposed Primary Row)', [10, 7, 1, 0, 9, 2, 4, 11, 5, 8, 3, 6]), 
-      'RowSchoenbergOp27No1': ('Schoenberg', 'Op. 27 No. 1', 'Four Pieces for Mixed Chorus, No. 1', [6, 5, 2, 8, 7, 1, 3, 4, 10, 9, 11, 0]), 
-      'RowBergLuluActIScene20': ('Berg', 'Lulu, Act I , Scene XX', 'Perm. (Every 7th Note Of Transposed Primary Row)', [10, 6, 3, 8, 5, 11, 4, 2, 9, 0, 1, 7]), 
-      'RowSchoenbergOp27No3': ('Schoenberg', 'Op. 27 No. 3', 'Four Pieces for Mixed Chorus, No. 3', [7, 6, 2, 4, 5, 3, 11, 0, 8, 10, 9, 1]), 
-      'RowSchoenbergOp27No2': ('Schoenberg', 'Op. 27 No. 2', 'Four Pieces for Mixed Chorus, No. 2', [0, 11, 4, 10, 2, 8, 3, 7, 6, 5, 9, 1]), 
-      'RowSchoenbergFragPiano': ('Schoenberg', None, 'Fragment For Piano', [6, 9, 0, 7, 1, 2, 8, 11, 5, 10, 4, 3]), 
-      'RowSchoenbergOp50B': ('Schoenberg', 'Op. 50B', 'De Profundis', [3, 9, 8, 4, 2, 10, 7, 11, 0, 6, 5, 1]), 
-      'RowSchoenbergOp50C': ('Schoenberg', 'Op. 50C', 'Modern Psalms, The First Psalm', [4, 3, 0, 8, 11, 7, 5, 9, 6, 10, 1, 2]), 
-      'RowSchoenbergOp50A': ('Schoenberg', 'Op. 50A', 'Three Times A Thousand Years', [7, 9, 6, 4, 5, 11, 10, 2, 0, 1, 3, 8]), 
-      'RowSchoenbergMosesAron': ('Schoenberg', None, 'Moses And Aron', [9, 10, 4, 2, 3, 1, 7, 5, 6, 8, 11, 0]), 
-      'RowWebernOp25': ('Webern', 'Op. 25', 'Three Songs', [7, 4, 3, 6, 1, 5, 2, 11, 10, 0, 9, 8]), 
-      'RowSchoenbergOp23No5': ('Schoenberg', 'Op. 23, No. 5', 'Five Piano Pieces', [1, 9, 11, 7, 8, 6, 10, 2, 4, 3, 0, 5]), 
-      'RowSchoenbergOp28No1': ('Schoenberg', 'Op. 28 No. 1', 'Three Satires for Mixed Chorus, No. 1', [0, 4, 7, 1, 9, 11, 5, 3, 2, 6, 8, 10]), 
-      'RowSchoenbergOp28No3': ('Schoenberg', 'Op. 28 No. 3', 'Three Satires for Mixed Chorus, No. 3', [5, 6, 4, 8, 2, 10, 7, 9, 3, 11, 1, 0]), 
-      'RowWebernOp21': ('Webern', 'Op. 21', 'Chamber Symphony', [5, 8, 7, 6, 10, 9, 3, 4, 0, 1, 2, 11]), 
-      'RowSchoenbergIsraelExists': ('Schoenberg', None, 'Israel Exists Again', [0, 3, 4, 9, 11, 5, 2, 1, 10, 8, 6, 7]), 
-      'RowSchoenbergOp35No2': ('Schoenberg', 'Op. 35', 'Six Pieces for Male Chorus, No. 2', [6, 9, 7, 1, 0, 2, 5, 11, 10, 3, 4, 8]), 
-      'RowSchoenbergOp35No3': ('Schoenberg', 'Op. 35', 'Six Pieces for Male Chorus, No. 3', [3, 6, 7, 8, 5, 0, 9, 10, 4, 11, 2, 1]), 
-      'RowSchoenbergOp35No1': ('Schoenberg', 'Op. 35', 'Six Pieces for Male Chorus, No. 1', [2, 11, 3, 5, 4, 1, 8, 10, 9, 6, 0, 7]), 
-      'RowSchoenbergOp48No1': ('Schoenberg', 'Op. 48', 'Three Songs, No. 1, "Sommermud"', [1, 2, 0, 6, 3, 5, 4, 10, 11, 7, 9, 8]), 
-      'RowSchoenbergOp35No5': ('Schoenberg', 'Op. 35', 'Six Pieces for Male Chorus, No. 5', [1, 7, 10, 2, 3, 11, 8, 4, 0, 6, 5, 9]), 
-      'RowSchoenbergOp29': ('Schoenberg', 'Op. 29', 'Suite', [3, 7, 6, 10, 2, 11, 0, 9, 8, 4, 5, 1]), 
-      'RowBergLyricSuitePerm': ('Berg', None, 'Lyric Suite, Last Mvt. Permutation', [5, 6, 10, 4, 1, 9, 2, 8, 7, 3, 0, 11]), 
-      'RowWebernOp20': ('Webern', 'Op. 20', 'String Trio', [8, 7, 2, 1, 6, 5, 9, 10, 3, 4, 0, 11]), 
-      'RowSchoenbergOp46': ('Schoenberg', 'Op. 46', 'A Survivor From Warsaw', [6, 7, 0, 8, 4, 3, 11, 10, 5, 9, 1, 2]), 
-      'RowSchoenbergFragOrganSonata': ('Schoenberg', None, 'Fragment of Sonata For Organ', [1, 7, 11, 3, 9, 2, 8, 6, 10, 5, 0, 4]), 
-      'RowSchoenbergOp44': ('Schoenberg', 'Op. 44', 'Prelude To A Suite From "Genesis"', [10, 6, 2, 5, 4, 0, 11, 8, 1, 3, 9, 7]), 
-      'RowSchoenbergOp45': ('Schoenberg', 'Op. 45', 'String Trio', [2, 10, 3, 9, 4, 1, 11, 8, 6, 7, 5, 0]), 
-      'RowSchoenbergOp33A': ('Schoenberg', 'Op. 33A', 'Two Piano Pieces, No. 1', [10, 5, 0, 11, 9, 6, 1, 3, 7, 8, 2, 4]), 
-      'RowSchoenbergOp25': ('Schoenberg', 'Op.25', 'Suite for Piano', [4, 5, 7, 1, 6, 3, 8, 2, 11, 0, 9, 10]), 
-      'RowSchoenbergOp26': ('Schoenberg', 'Op. 26', 'Wind Quintet', [3, 7, 9, 11, 1, 0, 10, 2, 4, 6, 8, 5]), 
-      'RowSchoenbergOp33B': ('Schoenberg', 'Op. 33B', 'Two Piano Pieces, No. 2', [11, 1, 5, 3, 9, 8, 6, 10, 7, 4, 0, 2]), 
-      'RowBergViolinConcerto': ('Berg', None, 'Concerto For Violin And Orchestra', [7, 10, 2, 6, 9, 0, 4, 8, 11, 1, 3, 5]), 
-      'RowWebernOp22': ('Webern', 'Op. 22', 'Quartet For Violin, Clarinet, Tenor Sax, And Piano', [6, 3, 2, 5, 4, 8, 9, 10, 11, 1, 7, 0]), 
-      'RowBergLulu': ('Berg', None, 'Lulu: Primary Row', [0, 4, 5, 2, 7, 9, 6, 8, 11, 10, 3, 1]), 
-      'RowWebernOp30': ('Webern', 'Op. 30', 'Variations For Orchestra', [9, 10, 1, 0, 11, 2, 3, 6, 5, 4, 7, 8]), 
-      'RowWebernOp31': ('Webern', 'Op. 31', 'Cantata II', [6, 9, 5, 4, 8, 3, 7, 11, 10, 2, 1, 0]), 
-      'RowWebernOpNo17No1': ('Webern', 'Op. 17, No. 1', '"Armer Sunder, Du"', [11, 10, 5, 6, 3, 4, 7, 8, 9, 0, 1, 2]), 
-      'RowWebernOp24': ('Webern', 'Op. 24', 'Concerto For Nine Instruments', [11, 10, 2, 3, 7, 6, 8, 4, 5, 0, 1, 9]), 
-      'RowSchoenbergOp48No2': ('Schoenberg', 'Op. 48', 'Three Songs, No. 2, "Tot"', [2, 3, 9, 1, 10, 4, 8, 7, 0, 11, 5, 6]), 
-      'RowWebernOp27': ('Webern', 'Op. 27', 'Variations For Piano', [3, 11, 10, 2, 1, 0, 6, 4, 7, 5, 9, 8]), 
-      'RowSchoenbergOp47': ('Schoenberg', 'Op. 47', 'Fantasy For Violin And Piano', [10, 9, 1, 11, 5, 7, 3, 4, 0, 2, 8, 6]), 
-      'RowWebernOp19No2': ('Webern', 'Op. 19, No. 2', '"Ziehn Die Schafe"', [8, 4, 9, 6, 7, 0, 11, 5, 3, 2, 10, 1]), 
-      'RowWebernOp19No1': ('Webern', 'Op. 19, No. 1', '"Weiss Wie Lilien"', [7, 10, 6, 5, 3, 9, 8, 1, 2, 11, 4, 0]), 
-      'RowWebernOp26': ('Webern', 'Op. 26', 'Das Augenlicht', [8, 10, 9, 0, 11, 3, 4, 1, 5, 2, 6, 7]), 
-      'RowSchoenbergFragPianoPhantasia': ('Schoenberg', None, 'Fragment of Phantasia For Piano', [1, 5, 3, 6, 4, 8, 0, 11, 2, 9, 10, 7]), 
-      'RowBergDerWein': ('Berg', None, 'Der Wein', [2, 4, 5, 7, 9, 10, 1, 6, 8, 0, 11, 3]), 
-      'RowBergWozzeckPassacaglia': ('Berg', None, 'Wozzeck, Act I, Scene 4 "Passacaglia"', [3, 11, 7, 1, 0, 6, 4, 10, 9, 5, 8, 2]), 
-      'RowWebernOp18No1': ('Webern', 'Op. 18, No. 1', '"Schatzerl Klein"', [0, 11, 5, 8, 10, 9, 3, 4, 1, 7, 2, 6]), 
-      'RowWebernOp18No2': ('Webern', 'Op. 18, No. 2', '"Erlosung"', [6, 9, 5, 8, 4, 7, 3, 11, 2, 10, 1, 0]), 
-      'RowWebernOp18No3': ('Webern', 'Op. 18, No. 3', '"Ave, Regina Coelorum"', [4, 3, 7, 6, 5, 11, 10, 2, 1, 0, 9, 8]), 
-      'RowSchoenbergOp42': ('Schoenberg', 'Op. 42', 'Concerto For Piano And Orchestra', [3, 10, 2, 5, 4, 0, 6, 8, 1, 9, 11, 7]), 
-      'RowSchoenbergOp48No3': ('Schoenberg', 'Op. 48', 'Three Songs, No, 3, "Madchenlied"', [1, 7, 9, 11, 3, 5, 10, 6, 4, 0, 8, 2]), 
-      'RowSchoenbergOp37': ('Schoenberg', 'Op. 37', 'Fourth String Quartet', [2, 1, 9, 10, 5, 3, 4, 0, 8, 7, 6, 11]), 
-      'RowSchoenbergOp36': ('Schoenberg', 'Op. 36', 'Concerto for Violin and Orchestra', [9, 10, 3, 11, 4, 6, 0, 1, 7, 8, 2, 5]), 
-      'RowSchoenbergOp34': ('Schoenberg', 'Op. 34', 'Accompaniment to a Film Scene', [3, 6, 2, 4, 1, 0, 9, 11, 10, 8, 5, 7]), 
-      'RowBergChamberConcerto': ('Berg', None, 'Chamber Concerto', [11, 7, 5, 9, 2, 3, 6, 8, 0, 1, 4, 10]), 
-      'RowSchoenbergOp32': ('Schoenberg', 'Op. 32', 'Von Heute Auf Morgen', [2, 3, 9, 1, 11, 5, 8, 7, 4, 0, 10, 6]), 
-      'RowSchoenbergOp31': ('Schoenberg', 'Op. 31', 'Variations for Orchestra', [10, 4, 6, 3, 5, 9, 2, 1, 7, 8, 11, 0]), 
-      'RowSchoenbergOp30': ('Schoenberg', 'Op. 30', 'Third String Quartet', [7, 4, 3, 9, 0, 5, 6, 11, 10, 1, 8, 2]), 
-      'RowBergLyricSuite': ('Berg', None, 'Lyric Suite Primary Row', [5, 4, 0, 9, 7, 2, 8, 1, 3, 6, 10, 11]), 
-      'RowSchoenbergOp41': ('Schoenberg', 'Op. 41', 'Ode To Napoleon', [1, 0, 4, 5, 9, 8, 3, 2, 6, 7, 11, 10]), 
-      'RowWebernOp17No3': ('Webern', 'Op. 17, No. 3', '"Heiland, Unsere Missetaten..."', [8, 5, 4, 3, 7, 6, 0, 1, 2, 11, 10, 9]), 
-      'RowWebernOp17No2': ('Webern', 'Op. 17, No. 2', '"Liebste Jungfrau"', [1, 0, 11, 7, 8, 2, 3, 6, 5, 4, 9, 10])
+      'RowWebernOp29': ('Webern', 'Op. 29', 'Cantata I', 
+                        [3, 11, 2, 1, 5, 4, 7, 6, 10, 9, 0, 8]), 
+      'RowWebernOp28': ('Webern', 'Op. 28', 'String Quartet', 
+                        [1, 0, 3, 2, 6, 7, 4, 5, 9, 8, 11, 10]), 
+      'RowSchoenbergOp24Mvmt5': ('Schoenberg', 'Op. 24', 'Serenade, Mvt. 5, "Tanzscene"',
+                        [9, 10, 0, 3, 4, 6, 5, 7, 8, 11, 1, 2]), 
+      'RowSchoenbergOp24Mvmt4': ('Schoenberg', 'Op. 24', 'Serenade, Mvt. 4, "Sonett"',
+                        [4, 2, 3, 11, 0, 1, 8, 6, 9, 5, 7, 10]), 
+      'RowSchoenbergJakobsleiter': ('Schoenberg', None, 'Die Jakobsleiter',
+                        [1, 2, 5, 4, 8, 7, 0, 3, 11, 10, 6, 9]), 
+      'RowSchoenbergOp27No4': ('Schoenberg', 'Op. 27 No. 4', 'Four Pieces for Mixed Chorus, No. 4',
+                        [1, 3, 10, 6, 8, 4, 11, 0, 2, 9, 5, 7]), 
+      'RowWebernOp23': ('Webern', 'Op. 23', 'Three Songs',
+                        [8, 3, 7, 4, 10, 6, 2, 5, 1, 0, 9, 11]), 
+      'RowBergLuluActIIScene1': ('Berg', 'Lulu, Act II, Scene 1', 
+                                 'Perm. (Every 5th Note Of Transposed Primary Row)',
+                                 [10, 7, 1, 0, 9, 2, 4, 11, 5, 8, 3, 6]), 
+      'RowSchoenbergOp27No1': ('Schoenberg', 'Op. 27 No. 1', 'Four Pieces for Mixed Chorus, No. 1',
+                               [6, 5, 2, 8, 7, 1, 3, 4, 10, 9, 11, 0]), 
+      'RowBergLuluActIScene20': ('Berg', 'Lulu, Act I , Scene XX', 
+                                 'Perm. (Every 7th Note Of Transposed Primary Row)',
+                                 [10, 6, 3, 8, 5, 11, 4, 2, 9, 0, 1, 7]), 
+      'RowSchoenbergOp27No3': ('Schoenberg', 'Op. 27 No. 3', 'Four Pieces for Mixed Chorus, No. 3',
+                        [7, 6, 2, 4, 5, 3, 11, 0, 8, 10, 9, 1]), 
+      'RowSchoenbergOp27No2': ('Schoenberg', 'Op. 27 No. 2', 'Four Pieces for Mixed Chorus, No. 2',
+                        [0, 11, 4, 10, 2, 8, 3, 7, 6, 5, 9, 1]), 
+      'RowSchoenbergFragPiano': ('Schoenberg', None, 'Fragment For Piano',
+                        [6, 9, 0, 7, 1, 2, 8, 11, 5, 10, 4, 3]), 
+      'RowSchoenbergOp50B': ('Schoenberg', 'Op. 50B', 'De Profundis',
+                        [3, 9, 8, 4, 2, 10, 7, 11, 0, 6, 5, 1]), 
+      'RowSchoenbergOp50C': ('Schoenberg', 'Op. 50C', 'Modern Psalms, The First Psalm',
+                        [4, 3, 0, 8, 11, 7, 5, 9, 6, 10, 1, 2]), 
+      'RowSchoenbergOp50A': ('Schoenberg', 'Op. 50A', 'Three Times A Thousand Years',
+                        [7, 9, 6, 4, 5, 11, 10, 2, 0, 1, 3, 8]), 
+      'RowSchoenbergMosesAron': ('Schoenberg', None, 'Moses And Aron',
+                        [9, 10, 4, 2, 3, 1, 7, 5, 6, 8, 11, 0]), 
+      'RowWebernOp25': ('Webern', 'Op. 25', 'Three Songs',
+                        [7, 4, 3, 6, 1, 5, 2, 11, 10, 0, 9, 8]), 
+      'RowSchoenbergOp23No5': ('Schoenberg', 'Op. 23, No. 5', 'Five Piano Pieces',
+                        [1, 9, 11, 7, 8, 6, 10, 2, 4, 3, 0, 5]), 
+      'RowSchoenbergOp28No1': ('Schoenberg', 'Op. 28 No. 1', 
+                               'Three Satires for Mixed Chorus, No. 1',
+                               [0, 4, 7, 1, 9, 11, 5, 3, 2, 6, 8, 10]), 
+      'RowSchoenbergOp28No3': ('Schoenberg', 'Op. 28 No. 3', 
+                               'Three Satires for Mixed Chorus, No. 3',
+                               [5, 6, 4, 8, 2, 10, 7, 9, 3, 11, 1, 0]), 
+      'RowWebernOp21': ('Webern', 'Op. 21', 'Chamber Symphony',
+                        [5, 8, 7, 6, 10, 9, 3, 4, 0, 1, 2, 11]), 
+      'RowSchoenbergIsraelExists': ('Schoenberg', None, 'Israel Exists Again',
+                        [0, 3, 4, 9, 11, 5, 2, 1, 10, 8, 6, 7]), 
+      'RowSchoenbergOp35No2': ('Schoenberg', 'Op. 35', 'Six Pieces for Male Chorus, No. 2',
+                        [6, 9, 7, 1, 0, 2, 5, 11, 10, 3, 4, 8]), 
+      'RowSchoenbergOp35No3': ('Schoenberg', 'Op. 35', 'Six Pieces for Male Chorus, No. 3',
+                        [3, 6, 7, 8, 5, 0, 9, 10, 4, 11, 2, 1]), 
+      'RowSchoenbergOp35No1': ('Schoenberg', 'Op. 35', 'Six Pieces for Male Chorus, No. 1',
+                        [2, 11, 3, 5, 4, 1, 8, 10, 9, 6, 0, 7]), 
+      'RowSchoenbergOp48No1': ('Schoenberg', 'Op. 48', 'Three Songs, No. 1, "Sommermud"',
+                        [1, 2, 0, 6, 3, 5, 4, 10, 11, 7, 9, 8]), 
+      'RowSchoenbergOp35No5': ('Schoenberg', 'Op. 35', 'Six Pieces for Male Chorus, No. 5',
+                        [1, 7, 10, 2, 3, 11, 8, 4, 0, 6, 5, 9]), 
+      'RowSchoenbergOp29': ('Schoenberg', 'Op. 29', 'Suite',
+                        [3, 7, 6, 10, 2, 11, 0, 9, 8, 4, 5, 1]), 
+      'RowBergLyricSuitePerm': ('Berg', None, 'Lyric Suite, Last Mvt. Permutation',
+                        [5, 6, 10, 4, 1, 9, 2, 8, 7, 3, 0, 11]), 
+      'RowWebernOp20': ('Webern', 'Op. 20', 'String Trio',
+                        [8, 7, 2, 1, 6, 5, 9, 10, 3, 4, 0, 11]), 
+      'RowSchoenbergOp46': ('Schoenberg', 'Op. 46', 'A Survivor From Warsaw',
+                        [6, 7, 0, 8, 4, 3, 11, 10, 5, 9, 1, 2]), 
+      'RowSchoenbergFragOrganSonata': ('Schoenberg', None, 'Fragment of Sonata For Organ',
+                        [1, 7, 11, 3, 9, 2, 8, 6, 10, 5, 0, 4]), 
+      'RowSchoenbergOp44': ('Schoenberg', 'Op. 44', 'Prelude To A Suite From "Genesis"',
+                        [10, 6, 2, 5, 4, 0, 11, 8, 1, 3, 9, 7]), 
+      'RowSchoenbergOp45': ('Schoenberg', 'Op. 45', 'String Trio',
+                        [2, 10, 3, 9, 4, 1, 11, 8, 6, 7, 5, 0]), 
+      'RowSchoenbergOp33A': ('Schoenberg', 'Op. 33A', 'Two Piano Pieces, No. 1',
+                        [10, 5, 0, 11, 9, 6, 1, 3, 7, 8, 2, 4]), 
+      'RowSchoenbergOp25': ('Schoenberg', 'Op.25', 'Suite for Piano',
+                        [4, 5, 7, 1, 6, 3, 8, 2, 11, 0, 9, 10]), 
+      'RowSchoenbergOp26': ('Schoenberg', 'Op. 26', 'Wind Quintet',
+                        [3, 7, 9, 11, 1, 0, 10, 2, 4, 6, 8, 5]), 
+      'RowSchoenbergOp33B': ('Schoenberg', 'Op. 33B', 'Two Piano Pieces, No. 2',
+                        [11, 1, 5, 3, 9, 8, 6, 10, 7, 4, 0, 2]), 
+      'RowBergViolinConcerto': ('Berg', None, 'Concerto For Violin And Orchestra',
+                        [7, 10, 2, 6, 9, 0, 4, 8, 11, 1, 3, 5]), 
+      'RowWebernOp22': ('Webern', 'Op. 22', 'Quartet For Violin, Clarinet, Tenor Sax, And Piano',
+                        [6, 3, 2, 5, 4, 8, 9, 10, 11, 1, 7, 0]), 
+      'RowBergLulu': ('Berg', None, 'Lulu: Primary Row',
+                        [0, 4, 5, 2, 7, 9, 6, 8, 11, 10, 3, 1]), 
+      'RowWebernOp30': ('Webern', 'Op. 30', 'Variations For Orchestra',
+                        [9, 10, 1, 0, 11, 2, 3, 6, 5, 4, 7, 8]), 
+      'RowWebernOp31': ('Webern', 'Op. 31', 'Cantata II',
+                        [6, 9, 5, 4, 8, 3, 7, 11, 10, 2, 1, 0]), 
+      'RowWebernOpNo17No1': ('Webern', 'Op. 17, No. 1', '"Armer Sunder, Du"',
+                        [11, 10, 5, 6, 3, 4, 7, 8, 9, 0, 1, 2]), 
+      'RowWebernOp24': ('Webern', 'Op. 24', 'Concerto For Nine Instruments',
+                        [11, 10, 2, 3, 7, 6, 8, 4, 5, 0, 1, 9]), 
+      'RowSchoenbergOp48No2': ('Schoenberg', 'Op. 48', 'Three Songs, No. 2, "Tot"',
+                        [2, 3, 9, 1, 10, 4, 8, 7, 0, 11, 5, 6]), 
+      'RowWebernOp27': ('Webern', 'Op. 27', 'Variations For Piano',
+                        [3, 11, 10, 2, 1, 0, 6, 4, 7, 5, 9, 8]), 
+      'RowSchoenbergOp47': ('Schoenberg', 'Op. 47', 'Fantasy For Violin And Piano',
+                        [10, 9, 1, 11, 5, 7, 3, 4, 0, 2, 8, 6]), 
+      'RowWebernOp19No2': ('Webern', 'Op. 19, No. 2', '"Ziehn Die Schafe"',
+                        [8, 4, 9, 6, 7, 0, 11, 5, 3, 2, 10, 1]), 
+      'RowWebernOp19No1': ('Webern', 'Op. 19, No. 1', '"Weiss Wie Lilien"',
+                        [7, 10, 6, 5, 3, 9, 8, 1, 2, 11, 4, 0]), 
+      'RowWebernOp26': ('Webern', 'Op. 26', 'Das Augenlicht',
+                        [8, 10, 9, 0, 11, 3, 4, 1, 5, 2, 6, 7]), 
+      'RowSchoenbergFragPianoPhantasia': ('Schoenberg', None, 'Fragment of Phantasia For Piano',
+                        [1, 5, 3, 6, 4, 8, 0, 11, 2, 9, 10, 7]), 
+      'RowBergDerWein': ('Berg', None, 'Der Wein',
+                        [2, 4, 5, 7, 9, 10, 1, 6, 8, 0, 11, 3]), 
+      'RowBergWozzeckPassacaglia': ('Berg', None, 'Wozzeck, Act I, Scene 4 "Passacaglia"',
+                        [3, 11, 7, 1, 0, 6, 4, 10, 9, 5, 8, 2]), 
+      'RowWebernOp18No1': ('Webern', 'Op. 18, No. 1', '"Schatzerl Klein"',
+                        [0, 11, 5, 8, 10, 9, 3, 4, 1, 7, 2, 6]), 
+      'RowWebernOp18No2': ('Webern', 'Op. 18, No. 2', '"Erlosung"',
+                        [6, 9, 5, 8, 4, 7, 3, 11, 2, 10, 1, 0]), 
+      'RowWebernOp18No3': ('Webern', 'Op. 18, No. 3', '"Ave, Regina Coelorum"',
+                        [4, 3, 7, 6, 5, 11, 10, 2, 1, 0, 9, 8]), 
+      'RowSchoenbergOp42': ('Schoenberg', 'Op. 42', 'Concerto For Piano And Orchestra',
+                        [3, 10, 2, 5, 4, 0, 6, 8, 1, 9, 11, 7]), 
+      'RowSchoenbergOp48No3': ('Schoenberg', 'Op. 48', 'Three Songs, No, 3, "Madchenlied"',
+                        [1, 7, 9, 11, 3, 5, 10, 6, 4, 0, 8, 2]), 
+      'RowSchoenbergOp37': ('Schoenberg', 'Op. 37', 'Fourth String Quartet',
+                        [2, 1, 9, 10, 5, 3, 4, 0, 8, 7, 6, 11]), 
+      'RowSchoenbergOp36': ('Schoenberg', 'Op. 36', 'Concerto for Violin and Orchestra',
+                        [9, 10, 3, 11, 4, 6, 0, 1, 7, 8, 2, 5]), 
+      'RowSchoenbergOp34': ('Schoenberg', 'Op. 34', 'Accompaniment to a Film Scene',
+                        [3, 6, 2, 4, 1, 0, 9, 11, 10, 8, 5, 7]), 
+      'RowBergChamberConcerto': ('Berg', None, 'Chamber Concerto',
+                        [11, 7, 5, 9, 2, 3, 6, 8, 0, 1, 4, 10]), 
+      'RowSchoenbergOp32': ('Schoenberg', 'Op. 32', 'Von Heute Auf Morgen',
+                        [2, 3, 9, 1, 11, 5, 8, 7, 4, 0, 10, 6]), 
+      'RowSchoenbergOp31': ('Schoenberg', 'Op. 31', 'Variations for Orchestra',
+                        [10, 4, 6, 3, 5, 9, 2, 1, 7, 8, 11, 0]), 
+      'RowSchoenbergOp30': ('Schoenberg', 'Op. 30', 'Third String Quartet',
+                        [7, 4, 3, 9, 0, 5, 6, 11, 10, 1, 8, 2]), 
+      'RowBergLyricSuite': ('Berg', None, 'Lyric Suite Primary Row', 
+                            [5, 4, 0, 9, 7, 2, 8, 1, 3, 6, 10, 11]), 
+      'RowSchoenbergOp41': ('Schoenberg', 'Op. 41', 'Ode To Napoleon', 
+                            [1, 0, 4, 5, 9, 8, 3, 2, 6, 7, 11, 10]), 
+      'RowWebernOp17No3': ('Webern', 'Op. 17, No. 3', '"Heiland, Unsere Missetaten..."', 
+                           [8, 5, 4, 3, 7, 6, 0, 1, 2, 11, 10, 9]), 
+      'RowWebernOp17No2': ('Webern', 'Op. 17, No. 2', '"Liebste Jungfrau"', 
+                           [1, 0, 11, 7, 8, 2, 3, 6, 5, 4, 9, 10])
       }
 
 #-------------------------------------------------------------------------------
@@ -195,6 +268,8 @@ class ToneRow(stream.Stream):
         
         >>> L = [5*i for i in range(0,12)]
         >>> quintupleRow = serial.pcToToneRow(L)
+        >>> quintupleRow
+        <music21.serial.TwelveToneRow 0x104760780>
         >>> quintupleRow.pitchClasses()
         [0, 5, 10, 3, 8, 1, 6, 11, 4, 9, 2, 7]
         >>> halfStep = serial.pcToToneRow([0, 1])
@@ -225,7 +300,8 @@ class ToneRow(stream.Stream):
     
     def isTwelveToneRow(self):
         '''
-        Describes whether or not a :class:`~music21.serial.ToneRow` constitutes a twelve-tone row. Note that a
+        Describes whether or not a :class:`~music21.serial.ToneRow` constitutes 
+        a twelve-tone row. Note that a
         :class:`~music21.serial.TwelveToneRow` object might not be a twelve-tone row.
         
         
@@ -250,8 +326,10 @@ class ToneRow(stream.Stream):
     
     def makeTwelveToneRow(self):
         '''
-        Convenience function returning a :class:`~music21.serial.TwelveToneRow` with the same pitches.
-        Note that a :class:`~music21.serial.ToneRow` may be created without being a true twelve tone row.
+        Convenience function returning a :class:`~music21.serial.TwelveToneRow` with the 
+        same pitches.
+        Note that a :class:`~music21.serial.ToneRow` may be created without being a 
+        true twelve tone row.
         
         
         >>> a = serial.pcToToneRow(range(0,11))
@@ -306,7 +384,8 @@ class ToneRow(stream.Stream):
     def getIntervalsAsString(self):
         '''
         
-        Returns the string of intervals between consecutive pitch classes of a :class:`~music21.serial.ToneRow`.
+        Returns the string of intervals between consecutive pitch classes of 
+        a :class:`~music21.serial.ToneRow`.
         'T' = 10, 'E' = 11.
         
         >>> cRow = serial.pcToToneRow([0])
@@ -440,11 +519,13 @@ class ToneRow(stream.Stream):
     
     def findZeroCenteredTransformations(self, otherRow):
         ''' 
-        Gives the list of zero-centered serial transformations taking one :class:`~music21.serial.ToneRow`
+        Gives the list of zero-centered serial transformations 
+        taking one :class:`~music21.serial.ToneRow`
         to another, the second specified in the argument. Each transformation is given as a
         tuple of the transformation type and index.
         
-        See :meth:`~music21.serial.zeroCenteredTransformation` for an explanation of this convention.
+        See :meth:`~music21.serial.zeroCenteredTransformation` for 
+        an explanation of this convention.
         
         
         >>> chromatic = serial.pcToToneRow([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1])
@@ -452,10 +533,12 @@ class ToneRow(stream.Stream):
         >>> chromatic.findZeroCenteredTransformations(reversechromatic)
         [('I', 8), ('R', 9)]
         >>> schoenberg25 = serial.getHistoricalRowByName('RowSchoenbergOp25')
-        >>> schoenberg26 = serial.pcToToneRow(serial.getHistoricalRowByName('RowSchoenbergOp26').row)
+        >>> schoenberg26 = serial.pcToToneRow(serial.getHistoricalRowByName(
+        ...                                        'RowSchoenbergOp26').row)
         >>> schoenberg25.findZeroCenteredTransformations(schoenberg26)
         []
-        >>> schoenberg26.findZeroCenteredTransformations(schoenberg26.zeroCenteredTransformation('RI',8))
+        >>> schoenberg26.findZeroCenteredTransformations(
+        ...     schoenberg26.zeroCenteredTransformation('RI',8))
         [('RI', 8)]
         
         '''
@@ -484,12 +567,13 @@ class ToneRow(stream.Stream):
         
     def findOriginalCenteredTransformations(self, otherRow):
         ''' 
-        Gives the list of original-centered serial transformations taking one :class:`~music21.serial.ToneRow`
+        Gives the list of original-centered serial transformations taking one 
+        :class:`~music21.serial.ToneRow`
         to another, the second specified in the argument. Each transformation is given as a tuple
         of the transformation type and index.
         
-        See :meth:`~music21.serial.originalCenteredTransformation` for an explanation of this convention.
-        
+        See :meth:`~music21.serial.originalCenteredTransformation` for an 
+        explanation of this convention.
         
         >>> chromatic = serial.pcToToneRow([2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 0, 1])
         >>> reversechromatic = serial.pcToToneRow([8, 7, 6, 5, 4, 3, 2, 1, 0, 'B', 'A', 9])
@@ -499,10 +583,12 @@ class ToneRow(stream.Stream):
         >>> schoenberg26 = serial.getHistoricalRowByName('RowSchoenbergOp26')
         >>> schoenberg25.findOriginalCenteredTransformations(schoenberg26)
         []
-        >>> schoenberg26.findOriginalCenteredTransformations(schoenberg26.originalCenteredTransformation('RI',8))
+        >>> schoenberg26.findOriginalCenteredTransformations(
+        ...     schoenberg26.originalCenteredTransformation('RI',8))
         [('RI', 8)]
-        
+
         '''
+        # This is rather confused in execution.
         
         originalRowPitches = self.pitchClasses()
         otherRowPitches = otherRow.pitchClasses()
@@ -511,17 +597,29 @@ class ToneRow(stream.Stream):
         oldLastPitch = originalRowPitches [-1]
         newFirstPitch = otherRowPitches[0]
         
-        if otherRowPitches == self.originalCenteredTransformation('T',(newFirstPitch - oldFirstPitch) % 12).pitchClasses():
+        if otherRowPitches == self.originalCenteredTransformation(
+                                    'T', 
+                                    (newFirstPitch - oldFirstPitch) % 12
+                                ).pitchClasses():
             transformation = 'T', (newFirstPitch - oldFirstPitch) % 12
             transformationList.append(transformation)
-        if otherRowPitches == self.originalCenteredTransformation('I',(newFirstPitch - oldFirstPitch) % 12).pitchClasses():
+        if otherRowPitches == self.originalCenteredTransformation(
+                                    'I', 
+                                    (newFirstPitch - oldFirstPitch) % 12
+                                ).pitchClasses():
             transformation = 'I', (newFirstPitch - oldFirstPitch) % 12
             transformationList.append(transformation)
-        if otherRowPitches == self.originalCenteredTransformation('R',(newFirstPitch - oldLastPitch) % 12).pitchClasses():
+        if otherRowPitches == self.originalCenteredTransformation(
+                                    'R', 
+                                    (newFirstPitch - oldLastPitch) % 12
+                                ).pitchClasses():
             transformation  = 'R', (newFirstPitch - oldLastPitch) % 12
             transformationList.append(transformation)
-        if otherRowPitches == self.originalCenteredTransformation('RI',(newFirstPitch - 2*oldFirstPitch + oldLastPitch) % 12).pitchClasses():
-            transformation = 'RI', (newFirstPitch - 2*oldFirstPitch + oldLastPitch) % 12
+        if otherRowPitches == self.originalCenteredTransformation(
+                                    'RI', 
+                                    (newFirstPitch - 2 * oldFirstPitch + oldLastPitch) % 12
+                                ).pitchClasses():
+            transformation = 'RI', (newFirstPitch - 2 * oldFirstPitch + oldLastPitch) % 12
             transformationList.append(transformation)
             
         return transformationList
@@ -539,8 +637,8 @@ class TwelveToneRow(ToneRow):
     #'row': 'A list representing the pitch class values of the row.',
     #}
     
-    _DOC_ORDER = ['matrix', 'isAllInterval', 'getLinkClassification', 'isLinkChord', 'areCombinatorial']
-    
+    _DOC_ORDER = ['matrix', 'isAllInterval', 
+                  'getLinkClassification', 'isLinkChord', 'areCombinatorial']
 
     def __init__(self):
         ToneRow.__init__(self)
@@ -595,7 +693,8 @@ class TwelveToneRow(ToneRow):
             matrixObj.insert(0, rowObject)
         
 
-        #environLocal.printDebug(['calling matrix start: len row:', self.row, 'len self', len(self)])
+        #environLocal.printDebug([
+        #  'calling matrix start: len row:', self.row, 'len self', len(self)])
 
         return matrixObj
     
@@ -614,19 +713,23 @@ class TwelveToneRow(ToneRow):
         []
         '''
         samerows = []
-        for historicalrow in historicalDict:
-            if self.isSameRow(getHistoricalRowByName(historicalrow)):
-                samerows.append(historicalrow)
+        for historicalRow in historicalDict:
+            if self.isSameRow(getHistoricalRowByName(historicalRow)):
+                samerows.append(historicalRow)
         return samerows
     
     def findTransformedHistorical(self, convention):
         '''
-        Checks if a given :class:`music21.serial.TwelveToneRow` is a transformation of any of the historical
-        twelve-tone rows stored by music21: see :func:`music21.serial.getHistoricalRowByName`. Returns a list
-        of tuples, the tuple consisting of the name of a historical row, and a list of transformations relating
+        Checks if a given :class:`music21.serial.TwelveToneRow` is a transformation of 
+        any of the historical
+        twelve-tone rows stored by music21: see :func:`music21.serial.getHistoricalRowByName`. 
+        Returns a list
+        of tuples, the tuple consisting of the name of a historical row, and a 
+        list of transformations relating
         the input row to the historical row.
         
-        The convention for serial transformations must also be specified as 'zero' or 'original', as explained
+        The convention for serial transformations must also be specified as 'zero' or 
+        'original', as explained
         in :meth:`~music21.serial.findZeroCenteredTransformations` and 
         :meth:`~music21.serial.findOriginalCenteredTransformations`.
         
@@ -636,16 +739,17 @@ class TwelveToneRow(ToneRow):
         '''
         samerows = []
         if convention == 'zero':
-            for historicalrow in historicalDict:
-                trans = getHistoricalRowByName(historicalrow).findZeroCenteredTransformations(self)
+            for historicalRow in historicalDict:
+                trans = getHistoricalRowByName(historicalRow).findZeroCenteredTransformations(self)
                 if trans != []:
-                    samerows.append((historicalrow, trans))
+                    samerows.append((historicalRow, trans))
             return samerows
         if convention == 'original':
-            for historicalrow in historicalDict:
-                trans = getHistoricalRowByName(historicalrow).findOriginalCenteredTransformations(self)
+            for historicalRow in historicalDict:
+                historicalRowObject = getHistoricalRowByName(historicalRow)
+                trans = historicalRowObject.findOriginalCenteredTransformations(self)
                 if trans != []:
-                    samerows.append((historicalrow, trans))
+                    samerows.append((historicalRow, trans))
             return samerows
         else:
             raise SerialException("Invalid convention - choose 'zero' or 'original'.")
@@ -944,2464 +1048,12 @@ class TwelveToneRow(ToneRow):
             else:
                 raise SerialException("Invalid convention - choose 'zero' or 'original'.")
 
-# ------- parsing functions for atonal music -------
-
-class ContiguousSegmentOfNotes(base.Music21Object):
-    '''
-    Class whose instantiations represent contiguous segments of notes and chords appearing
-    within a :class:`~music21.stream.Stream`. Generally speaking, these objects are instantiated 
-    internally, though it is possible
-    for the user to create them as well. 
-    '''
-
-    activeSegment = None
-    matchedSegment = None
-    
-    _DOC_ATTR = {
-    'segment': 'The list of notes and chords in the contiguous segment.',
-    'containerStream': '''The stream containing the contiguous segment - 
-        all contiguous segments must have a container stream.''',
-    'partNumber': '''The part number in which the segment appears, or None 
-        (if the container stream has no parts). Note that this attribute is zero-indexed, 
-        so the top (e.g. soprano) part is labeled 0.''',
-    'activeSegment': '''A list of pitch classes representing the way the contiguous 
-        segment of notes is being read as a sequence of single pitches. Set to None 
-        unless the container stream is being searched for segments or multisets 
-        (for example, using :func:`~music21.serial.findSegments`), in which case 
-        the representation depends on the segments or multisets being searched for. 
-        If there are no chords in the segment, this attribute will simply give the 
-        pitch classes of the notes in the segment.''',
-    'matchedSegment': '''A list of pitch classes representing the segment to which 
-        the contiguous segment of notes is matched when segments or multisets are 
-        searched for (for example, using :func:`~music21.serial.findSegments`); 
-        otherwise set to None. Note that the contiguous segment will only be 
-        matched to one of the segments or multisets being searched for.'''
-    }
-    
-    _DOC_ORDER = ['startMeasureNumber', 'startOffset', 'zeroCenteredTransformationsFromMatched', 
-                  'originalCenteredTransformationsFromMatched']
-
-    def __init__(self, segment=None, containerStream=None, partNumber=0):
-        '''
-        >>> s = stream.Stream()
-        >>> p = stream.Part()
-        >>> n1 = note.Note('c4')
-        >>> n2 = note.Note('d4')
-        >>> p.append(n1)
-        >>> p.append(n2)
-        >>> p = p.makeMeasures()
-        >>> s.insert(0, p)
-        >>> CD_ContiguousSegment = serial.ContiguousSegmentOfNotes([n1, n2], s, 0)
-        '''
-        base.Music21Object.__init__(self)        
-        self.segment = segment
-        self.containerStream = containerStream
-        self.partNumber = partNumber
-        
-    def _getStartMeasureNumber(self):
-        if (len(self.segment)):
-            return self.segment[0].measureNumber
-        else:
-            return None
-    
-    startMeasureNumber = property(_getStartMeasureNumber,
-        doc = '''The measure number on which the contiguous segment begins.''')
-    
-    def _getStartOffset(self):
-        if (len(self.segment)):
-            return self.segment[0].offset
-        else:
-            return None
-    startOffset = property(_getStartOffset,
-        doc = '''The offset of the beginning of the contiguous segment, 
-            with respect to the measure containing the first note.''')
-    
-    def _getZeroCenteredTransformationsFromMatchedToActive(self):
-        activeRow = pcToToneRow(self.activeSegment)
-        matchedRow = pcToToneRow(self.matchedSegment)
-        return matchedRow.findZeroCenteredTransformations(activeRow)
-    
-    zeroCenteredTransformationsFromMatched = property(
-        _getZeroCenteredTransformationsFromMatchedToActive, 
-        doc = '''The list of zero-centered transformations taking a segment being searched 
-                    for to a found segment, for example, in 
-                    :func:`~music21.serial.findTransformedSegments`. 
-                    For an explanation of the zero-centered convention for serial transformations, 
-                    see :meth:`music21.serial.ToneRow.zeroCenteredTransformation`.''')
-        
-    def _getOriginalCenteredTransformationsFromMatchedToActive(self):
-        activeRow = pcToToneRow(self.activeSegment)
-        matchedRow = pcToToneRow(self.matchedSegment)
-        return matchedRow.findOriginalCenteredTransformations(activeRow)
-    
-    originalCenteredTransformationsFromMatched = property(
-        _getOriginalCenteredTransformationsFromMatchedToActive, 
-        doc = '''The list of original-centered transformations taking a segment being 
-                searched for to a found segment, for example, in 
-                :func:`~music21.serial.findTransformedSegments`. For an explanation of the 
-                zero-centered convention for serial transformations, see 
-                :meth:`music21.serial.ToneRow.originalCenteredTransformation`.''')
-
-    def readPitchClassesFromBottom(self):        
-        '''
-        Returns the list of pitch classes in the segment, reading pitches within 
-        chords from bottom to top.
-        
-        >>> sc = stream.Score()
-        >>> n1 = note.Note('d4')
-        >>> n1.quarterLength = 1
-        >>> Cmaj = chord.Chord(['c4', 'e4', 'g4'])
-        >>> Cmaj.quarterLength = 1
-        >>> sc.append(n1)
-        >>> sc.append(Cmaj)
-        >>> sc = sc.makeMeasures()
-        >>> allNotes = serial.getContiguousSegmentsOfLength(sc, 4)
-        >>> allNotes[0].readPitchClassesFromBottom()
-        [2, 0, 4, 7]
-        '''
-        seg = self.segment
-        pitchClasses = []
-        for noteOrChord in seg:
-            for p in noteOrChord.pitches:
-                pitchClasses.append(p.pitchClass)
-        return pitchClasses
-    
-    def getDistinctPitchClasses(self):        
-        '''
-        Returns a list of distinct pitch classes in the segment, in order of appearance,
-        where pitches in a chord are read from bottom to top.
-        
-        
-        >>> sc = stream.Score()
-        >>> n1 = note.Note('d4')
-        >>> n1.quarterLength = 1
-        >>> c = chord.Chord(['d4', 'e4', 'g4', 'd5'])
-        >>> c.quarterLength = 1
-        >>> sc.append(n1)
-        >>> sc.append(c)
-        >>> sc = sc.makeMeasures()
-        >>> allNotes = serial.getContiguousSegmentsOfLength(sc, 5)
-        >>> allNotes[0].getDistinctPitchClasses()
-        [2, 4, 7]
-        
-        '''
-        
-        seg = self.segment
-        pitchClasses = []
-        for noteOrChord in seg:
-            for p in noteOrChord.pitches:
-                if p.pitchClass not in pitchClasses:
-                    pitchClasses.append(p.pitchClass)
-        return pitchClasses
-
-
-def getContiguousSegmentsOfLength(inputStream, 
-                                  length, 
-                                  reps='skipConsecutive', 
-                                  includeChords=True):
-    #TODO: The ignoreAll setting currently gets everything that could possibly work, which is a lot. For example, currently
-    #if you have 123412341234, any subsequence of this with length at least 4 will be found. There are four commented
-    #lines that say "uncomment this line to find shortest." Uncommenting all four of these lines should
-    #find the shortest segment of the given length starting on each note. The reason why this will better is that
-    #there will be far less clutter when calling a labelling function; too much clutter on one of these functions
-    #results in overlapping IdLocals and spanners not showing properly.
-    
-    #For the above, there are other reasonable subsettings for ignoreAll, like to find the longest segment of the given
-    #length containing the first note. Of course, this works very badly with doing something like finding all 12-tone rows,
-    #because all this will do is make the entire piece one big twelve-tone row.
-    
-    #Also, one should keep in mind 121212121212123456 - when 123456 is searched for, what should be found?
-    '''
-    Returns a list of :class:`~music21.serial.ContiguousSegmentOfNotes` objects given a :class:`~music21.stream.Stream`
-    where the desired number of notes in the segment is specified.
-    
-    The inputStream is a :class:`~music21.serial.ContiguousSegmentOfNotes` containing at most one score.
-    Furthermore, all notes must be contained within measures.
-    
-    The reps argument specifies how repeated pitch classes are dealt with. 
-    It may be set to 'skipConsecutive' (default), 'rowsOnly', 'includeAll', or 'ignoreAll'. These are explained in detail below.
-    
-    The includeChords argument specifies how chords are dealt with. When set to True (default), the pitches of all chords
-    are read in order from bottom to top, and when set to False, all segments containing chords are ignored.
-    
-    The main subtleties of this function lie in how each reps setting works in conjunction with chords when
-    includeChords is set to True, and how the lengths of the segments are measured.
-    However, let us first examine what happens when includeChords
-    is set to False, to get an idea of how the function works.
-    
-    To begin, we create a stream on which we will apply the function.
-    
-    >>> s = stream.Stream()
-    >>> n1 = note.Note('e4')
-    >>> n1.quarterLength = 6
-    >>> s.append(n1)
-    >>> n2 = note.Note('f4')
-    >>> n2.quarterLength = 1
-    >>> s.append(n2)
-    >>> n3 = chord.Chord(['g4', 'b4'])
-    >>> n3.quarterLength = 1
-    >>> s.append(n3)
-    >>> n4 = note.Note('g4')
-    >>> n4.quarterLength = 1
-    >>> s.repeatAppend(n4, 2)
-    >>> n5 = note.Note('a4')
-    >>> n5.quarterLength = 3
-    >>> s.repeatAppend(n5, 2)
-    >>> n6 = note.Note('b4')
-    >>> n6.quarterLength = 1
-    >>> s.append(n6)
-    >>> n7 = note.Note('c5')
-    >>> n7.quarterLength = 1
-    >>> s.append(n7)
-        
-    We can now try to apply this function:
-    
-    >>> contiglist = serial.getContiguousSegmentsOfLength(s, 3, 'skipConsecutive', False)
-    >>> print(contiglist)
-    []
-        
-    On our first attempt, no contiguous segments of notes were found above 
-    because the inputStream has no measures -
-    hence we replace s with s.makeMeasures().
-    
-    >>> s = s.makeMeasures()
-    >>> s.makeTies()
-    >>> #_DOCS_SHOW s.show()
-        
-    .. image:: images/serial-findTransposedSegments.png
-       :width: 500
-        
-    We now can apply the function, and in doing so we examine in detail each of the reps settings.
-    
-    'skipConsecutive' means that whenever immediate repetitions of notes or chords occur, only the first
-    instance of the note or chord is included in the segment. The durations of the repeated notes,
-    do not have to be the same.
-    
-    >>> skipConsecutiveList = serial.getContiguousSegmentsOfLength(s, 3, 'skipConsecutive', False)
-    >>> print(skipConsecutiveList)
-    [<music21.serial.ContiguousSegmentOfNotes object ...]
-    >>> [instance.segment for instance in skipConsecutiveList]
-    [[<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 
-    [<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>]]
-        
-    In order to be considered repetition, the spellings of the notes 
-    in question must be exactly the same:
-    enharmonic equivalents are not checked and notes with the 
-    same pitch in different octaves are considered different.
-    To illustrate this, see the example below, in which all three notes, 
-    with pitch class 0, are considered
-    separately.
-    
-    >>> new = stream.Stream()
-    >>> N1 = note.Note('c4')
-    >>> N2 = note.Note('c5')
-    >>> N3 = note.Note('b#5')
-    >>> new.append(N1)
-    >>> new.append(N2)
-    >>> new.append(N3)
-    >>> new = new.makeMeasures()
-    >>> [seg.segment for seg in serial.getContiguousSegmentsOfLength(new, 3, 'skipConsecutive', includeChords = False)]
-    [[<music21.note.Note C>, <music21.note.Note C>, <music21.note.Note B#>]]
-    
-    'rowsOnly' searches only for tone rows, in which all pitch classes 
-    in the segment must be distinct. Below,
-    we are looking for sequences three consecutive notes within the 
-    stream s, all of which have different pitch classes.
-    There is only one such set of notes, and by calling the 
-    :attr:`~music21.serial.ContiguousSegmentOfNotes` we can
-    determine its location (the measure number of its first note).  
-    
-    >>> rowsOnlyList = serial.getContiguousSegmentsOfLength(s, 3, 'rowsOnly', includeChords = False)
-    >>> [(instance.segment, instance.startMeasureNumber) for instance in rowsOnlyList]
-    [([<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>], 4)]
-    
-    'includeAll' disregards all repetitions, and simply gets all 
-    contiguous segments of the specified length (still subject
-    to the includeChords setting).
-    
-    >>> includeAllList = serial.getContiguousSegmentsOfLength(s, 3, 'includeAll', includeChords = False)
-    >>> [(instance.segment, instance.startMeasureNumber, instance.startOffset) for instance in includeAllList]
-    [([<music21.note.Note G>, <music21.note.Note G>, <music21.note.Note A>], 3, 0.0),
-    ([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note A>], 3, 1.0),
-    ([<music21.note.Note A>, <music21.note.Note A>, <music21.note.Note B>], 3, 2.0),
-    ([<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>], 4, 1.0)]
-    
-    Note that there only two total As appear in these segments, despite there being three
-    :class:`~music21.note.Note` objects with the A4 as the pitch 
-    in the stream s; this is because only the first note of each set
-    of tied notes is considered. This convention applies to this 
-    function and all parsing functions below.
-    Also note that so far, neither of the first two notes n1, n2 
-    nor the major third n3 in s have been included in any of the
-    returned contiguous segments. This is because for each of these, 
-    any instance of three consecutive notes or chords
-    contains the chord n3. This phenomenon also applies to the next example below.
-    
-    Finally, when includeChords is set to False, 'ignoreAll' finds all 
-    contiguous segments containing exactly three distinct pitch
-    classes within it. It is unique in that unlike the previous three 
-    reps settings, the segments returned in fact
-    have more than the number of notes specified (3). Rather, they 
-    each have 3 distinct pitch classes, and some pitch classes
-    may be repeated.
-    
-    >>> ignoreAllList = serial.getContiguousSegmentsOfLength(s, 3, 'ignoreAll', includeChords = False)
-    >>> [instance.segment for instance in ignoreAllList]
-    [[<music21.note.Note G>, <music21.note.Note G>, <music21.note.Note A>, <music21.note.Note A>, 
-      <music21.note.Note B>], 
-     [<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note A>, <music21.note.Note B>], 
-     [<music21.note.Note A>, <music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>], 
-     [<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>]]
-        
-    Let us now examine what happens in the default chord setting, in which includeChords is set to True.
-
-    There are two points to remember when considering chords: the first is that all 
-    chords are read as sequences of single notes,
-    from bottom to top. The second is that 'length' always applies to the total 
-    number of single pitches or pitch classes found 
-    in the segment, including within chords, and not to the number of notes or chords. 
-    However, as we will see, when we search
-    for contiguous segments of length 4, the returned segments may not have exactly 
-    4 total notes (possibly existing 
-    as single notes or within chords), a natural point of confusion.
-    
-    Below is a new stream s0.
-    
-    >>> s0 = stream.Stream()
-    >>> n1 = note.Note('d4')
-    >>> maj2nd = chord.Chord(['f4', 'g4'])
-    >>> bmaj1 = chord.Chord(['b4', 'd#5', 'f#5'])
-    >>> bmaj2 = chord.Chord(['b4', 'd#5', 'f#5'])
-    >>> n2 = note.Note('f#4')
-    >>> n3 = note.Note('e4')
-    >>> n4 = note.Note('a4')
-    >>> s0.append(n1)
-    >>> s0.append(maj2nd)
-    >>> s0.append(bmaj1)
-    >>> s0.append(bmaj2)
-    >>> s0.append(n2)
-    >>> s0.append(n3)
-    >>> s0.append(n4)
-    >>> s0 = s0.makeMeasures()
-    >>> #_DOCS_SHOW s.show()
-    
-    .. image:: images/serial-getContiguousSegmentsOfLength2.png
-       :width: 500
-    
-    >>> skipConsecutiveWithChords = serial.getContiguousSegmentsOfLength(s0, 4, 'skipConsecutive')
-    >>> [seg.segment for seg in skipConsecutiveWithChords]
-    [[<music21.note.Note D>, <music21.chord.Chord F4 G4>, <music21.chord.Chord B4 D#5 F#5>], 
-     [<music21.chord.Chord F4 G4>, <music21.chord.Chord B4 D#5 F#5>], 
-     [<music21.chord.Chord B4 D#5 F#5>, <music21.note.Note F#>], 
-     [<music21.chord.Chord B4 D#5 F#5>, <music21.note.Note F#>, <music21.note.Note E>], 
-     [<music21.chord.Chord B4 D#5 F#5>, <music21.note.Note F#>, <music21.note.Note E>, 
-      <music21.note.Note A>]]
-        
-    Let us look closely at the found segments. First, because reps 
-    was set to 'skipConsecutive', the second
-    B major chord (bmaj2) is never considered, as the chord right 
-    before it is the same. As was mentioned before,
-    not all of the segments found have exactly 4 notes total. 
-    This is because, for each segment, only a subset
-    of the notes contained in the first and last elements are read. Given one of the 
-    found segments, it will always 
-    be possible to extract exactly four consecutive pitches from the notes and chords, 
-    reading in order, so that
-    at least one pitch is taken from each of the first and last chords.
-    
-    In the first segment, there is one way to extract 4 consecutive pitches: 
-    we take the D in the first note, read
-    the F and G (in that order) from the next chord, and finally, 
-    reading the last chord from bottom to top, the B
-    from the B major chord. Note that no other reading of the segment 
-    is possible because the D from the first note
-    must be used. The second segment in the returned list, on the other 
-    hand, can be read as a sequence of 4
-    consecutive pitches in two ways, both equally valid. We can either take 
-    the top note of the first chord, and all three
-    notes, in order, of the second chord, or both notes of the first chord 
-    and the bottom two notes of the second chord.
-    
-    >>> rowsOnlyChords = serial.getContiguousSegmentsOfLength(s0, 4, 'rowsOnly')
-    >>> [seg.segment for seg in rowsOnlyChords]
-    [[<music21.note.Note D>, <music21.chord.Chord F4 G4>, <music21.chord.Chord B4 D#5 F#5>], 
-    [<music21.chord.Chord F4 G4>, <music21.chord.Chord B4 D#5 F#5>]]
-        
-    When reps is set to 'rowsOnly', the segments returned are those such that each may be read as a sequence
-    of 4 pitches, in the same manner as explained above with the 'skipConsecutive' setting, such that the sequence
-    of 4 pitches constitutes a four-note tone row. Above, the first segment corresponds to the row [2, 5, 7, 11], and the
-    second may be read as either [5, 7, 11, 3] or [7, 11, 3, 6]. Note that, for example, we could not include both
-    the B-major chord and the F# that comes right after it in the same segment, because there would have to be two 
-    consecutive instances of the pitch class 6 (corresponding to F#). Similarly, we could not include both instances
-    of the B-major chord, as, again, we would have a pitch class repeated in any resulting four-note row.
-    
-    >>> includeAll = serial.getContiguousSegmentsOfLength(s0, 4, 'includeAll')
-    >>> [seg.segment for seg in includeAll]
-    [[<music21.note.Note D>, <music21.chord.Chord F4 G4>, <music21.chord.Chord B4 D#5 F#5>], 
-    [<music21.chord.Chord F4 G4>, <music21.chord.Chord B4 D#5 F#5>], 
-    [<music21.chord.Chord B4 D#5 F#5>, <music21.chord.Chord B4 D#5 F#5>], 
-    [<music21.chord.Chord B4 D#5 F#5>, <music21.note.Note F#>], 
-    [<music21.chord.Chord B4 D#5 F#5>, <music21.note.Note F#>, <music21.note.Note E>], 
-    [<music21.chord.Chord B4 D#5 F#5>, <music21.note.Note F#>, <music21.note.Note E>, <music21.note.Note A>]]
-        
-    Here, all segments from which sequences of four consecutive pitches can be extracted, again with at least
-    one pitch coming from each of the first and last elements of the segments, are found.
-    
-    >>> ignoreAll = serial.getContiguousSegmentsOfLength(s0, 4, 'ignoreAll')
-    >>> [seg.segment for seg in ignoreAll]
-    [[<music21.note.Note D>, <music21.chord.Chord F4 G4>, <music21.chord.Chord B4 D#5 F#5>], 
-    [<music21.chord.Chord F4 G4>, <music21.chord.Chord B4 D#5 F#5>], 
-    [<music21.chord.Chord F4 G4>, <music21.chord.Chord B4 D#5 F#5>, <music21.chord.Chord B4 D#5 F#5>], 
-    [<music21.chord.Chord F4 G4>, <music21.chord.Chord B4 D#5 F#5>, <music21.chord.Chord B4 D#5 F#5>, <music21.note.Note F#>], 
-    [<music21.chord.Chord B4 D#5 F#5>, <music21.chord.Chord B4 D#5 F#5>, <music21.note.Note F#>, <music21.note.Note E>], 
-    [<music21.chord.Chord B4 D#5 F#5>, <music21.note.Note F#>, <music21.note.Note E>], 
-    [<music21.chord.Chord B4 D#5 F#5>, <music21.note.Note F#>, <music21.note.Note E>, <music21.note.Note A>]]
-        
-    When reps is set to 'ignoreAll', the pitch classes from each segment are read by taking, in order, the pitch classes
-    in the order in which they first appear, where chords are again read from bottom to top. For example, in the last segment,
-    the first three pitch classes are those in the first chord, from bottom to top: 11, 3, and 6. Then, the next pitch class
-    appearing is 6, which is disregarded because it has already appeared. Finally, the pitch classes 4 and 9 appear in that order.
-    There are thus five pitch classes in this segment, in the order [11, 3, 6, 4, 9]. 
-    
-    The segment can be read has having length 4 because four consecutive 
-    pitch classes, [3, 6, 4, 9], can be read from this sequence 
-    in such a way that the first pitch class of this subsequence is part of the 
-    first chord in the segment, and the last pitch class
-    is that of the last note of the segment. More generally, in this setting the 
-    found segments are those which contain at least 4
-    distinct pitch classes, but the top note of the first chord (or note), the 
-    bottom note of the last chord (or note), 
-    and all pitches of all notes and chords other than the first and last 
-    contain at most 4 distinct pitch classes.
-    
-    OMIT_FROM_DOCS
-    
-    >>> import copy
-    >>> sc = stream.Score()
-    >>> p = stream.Part()
-    >>> c1 = chord.Chord(['c4', 'd4'])
-    >>> c2 = chord.Chord(['c5', 'd5'])
-    >>> n1 = note.Note('e4')
-    >>> n2 = note.Note('f4')
-    >>> p.append(n2)
-    >>> p.append(n1)
-    >>> p.append(c2)
-    >>> p.append(c1)
-    >>> p = p.makeMeasures()
-    >>> p1 = copy.deepcopy(p)
-    >>> sc.insert(0.0, p1)
-    >>> p2 = copy.deepcopy(p)
-    >>> sc.insert(0.0, p2)
-    >>> [seg.segment for seg in serial.getContiguousSegmentsOfLength(sc, 3, 'ignoreAll')]
-    [[<music21.note.Note F>, <music21.note.Note E>, <music21.chord.Chord C5 D5>], 
-    [<music21.note.Note E>, <music21.chord.Chord C5 D5>], 
-    [<music21.note.Note E>, <music21.chord.Chord C5 D5>, <music21.chord.Chord C4 D4>], 
-    [<music21.note.Note F>, <music21.note.Note E>, <music21.chord.Chord C5 D5>], 
-    [<music21.note.Note E>, <music21.chord.Chord C5 D5>], 
-    [<music21.note.Note E>, <music21.chord.Chord C5 D5>, <music21.chord.Chord C4 D4>]]
-    '''
-    
-    listOfContiguousSegments = []
-    
-    scores = inputStream.getElementsByClass(stream.Score)
-    if len(scores) == 0:
-        parts = inputStream.getElementsByClass(stream.Part)
-    elif len(scores) == 1:
-        parts = scores[0].parts
-    else:
-        raise SerialException("The inputStream can contain at most one score.")
-    
-    if len(parts) == 0:
-        if len(scores) == 0:
-            measures = inputStream.getElementsByClass(stream.Measure)
-        elif len(scores) == 1:
-            measures = scores[0].getElementsByClass(stream.Measure)
-        if reps == 'skipConsecutive':
-            pitchList = []
-            totallength = 0 #counts each pitch within a chord once
-            for m in measures:
-                for n in m.getElementsByClass([note.Note, chord.Chord], returnStreamSubClass=False):
-                    if n.tie == None or n.tie.type == 'start':
-                        add = False
-                        if includeChords == False:
-                            if len(n.pitches) == 1:
-                                if pitchList == []:
-                                    add = True
-                                else:
-                                    if pitchList[-1].pitch != n.pitch:
-                                        add = True
-                                if add == True:
-                                    pitchList.append(n)
-                                    if len(pitchList) == length + 1:
-                                        pitchList.remove(pitchList[0])
-                                    if len(pitchList) == length:
-                                        listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(pitchList), inputStream, None))
-                            elif len(n.pitches) > 1:
-                                pitchList = []
-                        else:
-                            if pitchList == []:
-                                add = True
-                            else:
-                                if pitchList[-1].pitches != n.pitches:
-                                    add = True
-                            if add == True:
-                                pitchList.append(n)
-                                totallength = totallength + len(n.pitches)
-                                lengthofactive = totallength
-                                donechecking = False
-                                numnotestodelete = 0
-                                for i in range(0, len(pitchList)):
-                                    if donechecking == False:
-                                        activePitchList = pitchList[i:len(pitchList)]
-                                        if i != 0:
-                                            lengthofactive = lengthofactive - len(pitchList[i-1].pitches)
-                                        if lengthofactive >= length:
-                                            if lengthofactive - len(activePitchList[0].pitches) - len(activePitchList[-1].pitches) <= length - 2:
-                                                listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(activePitchList), inputStream, None))
-                                            else:
-                                                numnotestodelete = numnotestodelete + 1
-                                        else:
-                                            donechecking = True
-                                for i in range(0, numnotestodelete):
-                                    totallength = totallength - len(pitchList[0].pitches)
-                                    pitchList.remove(pitchList[0])
-        elif reps == 'rowsOnly':
-            pitchList = []
-            totallength = 0     
-            for m in measures:
-                for n in m.getElementsByClass([note.Note, chord.Chord], returnStreamSubClass=False):
-                    if n.tie == None or n.tie.type == 'start':
-                        if includeChords == False:
-                            if len(n.pitches) == 1:
-                                if len(pitchList) == length:
-                                    if n.pitch.pitchClass not in [m.pitch.pitchClass for m in pitchList[1:]]:
-                                        pitchList.append(n)
-                                        pitchList.remove(pitchList[0])
-                                    else:
-                                        pitchList = [n]
-                                else:
-                                    if n.pitch.pitchClass not in [m.pitch.pitchClass for m in pitchList]:
-                                        pitchList.append(n)
-                                    else:
-                                        pitchList = [n]
-                                if len(pitchList) == length:
-                                    listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(pitchList), inputStream, None))
-                            else:
-                                pitchList = []
-                        else:
-                            pitchList.append(n)
-                            totallength = totallength + len(n.pitches)
-                            lengthofactive = totallength
-                            donechecking = False
-                            numnotestodelete = 0
-                            for i in range(0, len(pitchList)):
-                                if donechecking == False:
-                                    activePitchList = pitchList[i:len(pitchList)]
-                                    if i != 0:
-                                        lengthofactive = lengthofactive - len(pitchList[i-1].pitches)
-                                    if lengthofactive >= length:
-                                        if lengthofactive - len(activePitchList[0].pitches) - len(activePitchList[-1].pitches) <= length - 2:
-                                            contigObj = ContiguousSegmentOfNotes(list(activePitchList), inputStream, None)
-                                            rowSuperset = contigObj.readPitchClassesFromBottom()
-                                            lowerBound = max([0, len(rowSuperset) - length - len(activePitchList[-1].pitches) + 1])
-                                            upperBound = min([len(activePitchList[0].pitches) - 1, len(rowSuperset) - length])
-                                            added = False
-                                            for j in range(lowerBound, upperBound + 1):
-                                                if added == False:   
-                                                    if len(set(rowSuperset[j:j+length])) == length:
-                                                        listOfContiguousSegments.append(contigObj)
-                                                        added = True
-                                        else:
-                                            numnotestodelete = numnotestodelete + 1
-                                    else:
-                                        donechecking = True
-                            for i in range(0, numnotestodelete):
-                                totallength = totallength - len(pitchList[0].pitches)
-                                pitchList.remove(pitchList[0])
-        elif reps == 'includeAll':
-            pitchList = []
-            totallength = 0
-            for m in measures:
-                for n in m.getElementsByClass([note.Note, chord.Chord], returnStreamSubClass=False):
-                    #environLocal.warn(str(n.measureNumber))
-                    if n.tie == None or n.tie.type == 'start':
-                        if includeChords == False:
-                            if len(n.pitches) == 1:
-                                pitchList.append(n)
-                                if len(pitchList) == length + 1:
-                                    pitchList.remove(pitchList[0])
-                                if len(pitchList) == length:
-                                    listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(pitchList), inputStream, None))
-                            else:
-                                pitchList = []                            
-                        else:
-                            pitchList.append(n)
-                            totallength = totallength + len(n.pitches)
-                            lengthofactive = totallength
-                            donechecking = False
-                            numnotestodelete = 0
-                            for i in range(0, len(pitchList)):
-                                if donechecking == False:
-                                    activePitchList = pitchList[i:len(pitchList)]
-                                    if i != 0:
-                                        lengthofactive = lengthofactive - len(pitchList[i-1].pitches)
-                                    if lengthofactive >= length:
-                                        if lengthofactive - len(activePitchList[0].pitches) - len(activePitchList[-1].pitches) <= length - 2:
-                                            listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(activePitchList), inputStream, None))
-                                        else:
-                                            numnotestodelete = numnotestodelete + 1
-                                    else:
-                                        donechecking = True
-                            for i in range(0, numnotestodelete):
-                                totallength = totallength - len(pitchList[0].pitches)
-                                pitchList.remove(pitchList[0])
-        elif reps == 'ignoreAll':
-            pitchList = []
-            totallength = 0
-            for m in measures:
-                for n in m.getElementsByClass([note.Note, chord.Chord], returnStreamSubClass=False):
-                    if n.tie == None or n.tie.type == 'start':
-                        if includeChords == False:
-                            if len(n.pitches) == 1:
-                                pitchList.append(n)
-                                donechecking = False
-                                numnotestodelete = 0
-                                for i in range(0, len(pitchList)):
-                                    if donechecking == False:
-                                        activePitchList = pitchList[i:len(pitchList)]
-                                        if len(set([n.pitch.pitchClass for n in activePitchList])) == length:
-                                            listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(activePitchList), inputStream, None))
-#uncomment this line to get shortest        #numnotestodelete = numnotestodelete + 1
-                                        elif len(set([n.pitch.pitchClass for n in activePitchList])) > length:
-                                            numnotestodelete = numnotestodelete + 1
-                                        else:
-                                            donechecking = True
-                                for i in range(0, numnotestodelete):
-                                    totallength = totallength - len(pitchList[0].pitches)
-                                    pitchList.remove(pitchList[0])
-                                                                                
-                            else:
-                                pitchList = []                            
-                        else:
-                            pitchList.append(n)
-                            donechecking = False
-                            numnotestodelete = 0
-                            for i in range(0, len(pitchList)):
-                                if donechecking == False:
-                                    activePitchList = pitchList[i:len(pitchList)]
-                                    activeseg = ContiguousSegmentOfNotes(list(activePitchList), inputStream, None)
-                                    if len(set(activeseg.readPitchClassesFromBottom())) >= length:
-                                        middleseg = ContiguousSegmentOfNotes(list(activePitchList[1:len(activePitchList)-1]), None, None)
-                                        middlePitchClassSet = set(middleseg.readPitchClassesFromBottom())
-                                        setToCheck = middlePitchClassSet.union([activePitchList[0].pitches[-1].pitchClass]).union([activePitchList[-1].pitches[0].pitchClass])
-                                        if len(setToCheck) <= length:
-                                            listOfContiguousSegments.append(activeseg)
-#uncomment this line to get shortest        #numnotestodelete = numnotestodelete + 1                                            
-                                        else:
-                                            numnotestodelete = numnotestodelete + 1
-                                    else:
-                                        donechecking = True
-                            for i in range(0, numnotestodelete):
-                                totallength = totallength - len(pitchList[0].pitches)
-                                pitchList.remove(pitchList[0])
-        else:
-            raise SerialException("Invalid repeated pitch setting.")
-    else:
-        for p in range(0, len(parts)):
-            measures = parts[p].getElementsByClass(stream.Measure)
-            if reps == 'skipConsecutive':
-                pitchList = []
-                totallength = 0 #counts each pitch within a chord once
-                for m in measures:
-                    for n in m.flat.notes:
-                        if n.tie == None or n.tie.type == 'start':
-                            add = False
-                            if includeChords == False:
-                                if len(n.pitches) == 1:
-                                    if pitchList == []:
-                                        add = True
-                                    else:
-                                        if pitchList[-1].pitch != n.pitch:
-                                            add = True
-                                    if add == True:
-                                        pitchList.append(n)
-                                        if len(pitchList) == length + 1:
-                                            pitchList.remove(pitchList[0])
-                                        if len(pitchList) == length:
-                                            listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(pitchList), inputStream, p))
-                                elif len(n.pitches) > 1:
-                                    pitchList = []
-                            else:
-                                if pitchList == []:
-                                    add = True
-                                else:
-                                    if pitchList[-1].pitches != n.pitches:
-                                        add = True
-                                if add == True:
-                                    pitchList.append(n)
-                                    totallength = totallength + len(n.pitches)
-                                    lengthofactive = totallength
-                                    donechecking = False
-                                    numnotestodelete = 0
-                                    for i in range(0, len(pitchList)):
-                                        if donechecking == False:
-                                            activePitchList = pitchList[i:len(pitchList)]
-                                            if i != 0:
-                                                lengthofactive = lengthofactive - len(pitchList[i-1].pitches)
-                                            if lengthofactive >= length:
-                                                if lengthofactive - len(activePitchList[0].pitches) - len(activePitchList[-1].pitches) <= length - 2:
-                                                    listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(activePitchList), inputStream, p))
-                                                else:
-                                                    numnotestodelete = numnotestodelete + 1
-                                            else:
-                                                donechecking = True
-                                    for i in range(0, numnotestodelete):
-                                        totallength = totallength - len(pitchList[0].pitches)
-                                        pitchList.remove(pitchList[0])
-            elif reps == 'rowsOnly':
-                pitchList = []
-                totallength = 0
-                for m in measures:
-                    for n in m.flat.notes:
-                        if n.tie == None or n.tie.type == 'start':
-                            if includeChords == False:
-                                if len(n.pitches) == 1:
-                                    if len(pitchList) == length:
-                                        if n.pitchClass not in [m.pitchClass for m in pitchList[1:]]:
-                                            pitchList.append(n)
-                                            pitchList.remove(pitchList[0])
-                                        else:
-                                            pitchList = [n]
-                                    else:
-                                        if n.pitchClass not in [m.pitchClass for m in pitchList]:
-                                            pitchList.append(n)
-                                        else:
-                                            pitchList = [n]
-                                    if len(pitchList) == length:
-                                        listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(pitchList), inputStream, p))
-                                else:
-                                    pitchList = []
-                            else:
-                                pitchList.append(n)
-                                totallength = totallength + len(n.pitches)
-                                lengthofactive = totallength
-                                donechecking = False
-                                numnotestodelete = 0
-                                for i in range(0, len(pitchList)):
-                                    if donechecking == False:
-                                        activePitchList = pitchList[i:len(pitchList)]
-                                        if i != 0:
-                                            lengthofactive = lengthofactive - len(pitchList[i-1].pitches)
-                                        if lengthofactive >= length:
-                                            if lengthofactive - len(activePitchList[0].pitches) - len(activePitchList[-1].pitches) <= length - 2:
-                                                contigObj = ContiguousSegmentOfNotes(list(activePitchList), inputStream, p)
-                                                rowSuperset = contigObj.readPitchClassesFromBottom()
-                                                lowerBound = max([0, len(rowSuperset) - length - len(activePitchList[-1].pitches) + 1])
-                                                upperBound = min([len(activePitchList[0].pitches) - 1, len(rowSuperset) - length])
-                                                added = False
-                                                for j in range(lowerBound, upperBound + 1):
-                                                    if added == False:   
-                                                        if len(set(rowSuperset[j:j+length])) == length:
-                                                            listOfContiguousSegments.append(contigObj)
-                                                            added = True
-                                            else:
-                                                numnotestodelete = numnotestodelete + 1
-                                        else:
-                                            donechecking = True
-                                for i in range(0, numnotestodelete):
-                                    totallength = totallength - len(pitchList[0].pitches)
-                                    pitchList.remove(pitchList[0])
-            elif reps == 'includeAll':
-                pitchList = []
-                totallength = 0
-                for m in measures:
-                    for n in m.flat.notes:
-                        if n.tie == None or n.tie.type == 'start':
-                            if includeChords == False:
-                                if len(n.pitches) == 1:
-                                    pitchList.append(n)
-                                    if len(pitchList) == length + 1:
-                                        pitchList.remove(pitchList[0])
-                                    if len(pitchList) == length:
-                                        listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(pitchList), inputStream, p))
-                                else:
-                                    pitchList = []
-                            else:
-                                pitchList.append(n)
-                                totallength = totallength + len(n.pitches)
-                                lengthofactive = totallength
-                                donechecking = False
-                                numnotestodelete = 0
-                                for i in range(0, len(pitchList)):
-                                    if donechecking == False:
-                                        activePitchList = pitchList[i:len(pitchList)]
-                                        if i != 0:
-                                            lengthofactive = lengthofactive - len(pitchList[i-1].pitches)
-                                        if lengthofactive >= length:
-                                            if lengthofactive - len(activePitchList[0].pitches) - len(activePitchList[-1].pitches) <= length - 2:
-                                                listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(activePitchList), inputStream, p))
-                                            else:
-                                                numnotestodelete = numnotestodelete + 1
-                                        else:
-                                            donechecking = True
-                                for i in range(0, numnotestodelete):
-                                    totallength = totallength - len(pitchList[0].pitches)
-                                    pitchList.remove(pitchList[0])
-            elif reps == 'ignoreAll':
-                pitchList = []
-                totallength = 0
-                for m in measures:
-                    for n in m.getElementsByClass([note.Note, chord.Chord], returnStreamSubClass=False):
-                        if n.tie == None or n.tie.type == 'start':
-                            if includeChords == False:
-                                if len(n.pitches) == 1:
-                                    pitchList.append(n)
-                                    donechecking = False
-                                    numnotestodelete = 0
-                                    for i in range(0, len(pitchList)):
-                                        if donechecking == False:
-                                            activePitchList = pitchList[i:len(pitchList)]
-                                            if len(set([p.pitchClass for p in activePitchList])) == length:
-                                                listOfContiguousSegments.append(ContiguousSegmentOfNotes(list(activePitchList), inputStream, p))
-#uncomment this line to get shortest            #numnotestodelete = numnotestodelete + 1                                                
-                                            elif len(set([p.pitchClass for p in activePitchList])) > length:
-                                                numnotestodelete = numnotestodelete + 1
-                                            else:
-                                                donechecking = True
-                                    for i in range(0, numnotestodelete):
-                                        totallength = totallength - len(pitchList[0].pitches)
-                                        pitchList.remove(pitchList[0])                                                 
-                                else:
-                                    pitchList = []                            
-                            else:
-                                pitchList.append(n)
-                                donechecking = False
-                                numnotestodelete = 0
-                                for i in range(0, len(pitchList)):
-                                    if donechecking == False:
-                                        activePitchList = pitchList[i:len(pitchList)]
-                                        activeseg = ContiguousSegmentOfNotes(list(activePitchList), inputStream, p)
-                                        if len(set(activeseg.readPitchClassesFromBottom())) >= length:
-                                            middleseg = ContiguousSegmentOfNotes(list(activePitchList[1:len(activePitchList)-1]), None, None)
-                                            middlePitchClassSet = set(middleseg.readPitchClassesFromBottom())
-                                            setToCheck = middlePitchClassSet.union([activePitchList[0].pitches[-1].pitchClass]).union([activePitchList[-1].pitches[0].pitchClass])
-                                            if len(setToCheck) <= length:
-                                                listOfContiguousSegments.append(activeseg)
-#uncomment this line to get shortest            #numnotestodelete = numnotestodelete + 1                                                
-                                            else:
-                                                numnotestodelete = numnotestodelete + 1                                                
-                                        else:
-                                            donechecking = True
-                                for i in range(0, numnotestodelete):
-                                    totallength = totallength - len(pitchList[0].pitches)
-                                    pitchList.remove(pitchList[0])
-                
-
-            else:
-                raise SerialException("Invalid repeated pitch setting.")
-            
-        
-    return listOfContiguousSegments
-
-def _labelGeneral(segmentsToLabel, inputStream, segmentDict, reps, includeChords):
-    '''
-    Helper function for all but one of the labelling functions below. 
-    Private because this should only be called
-    in conjunction with one of the find(type of set of pitch classes) functions.
-    '''
-    
-    from operator import attrgetter
-    
-    if len(inputStream.getElementsByClass(stream.Score)) == 0:
-        bigContainer = inputStream
-    else:
-        bigContainer = inputStream.getElementsByClass(stream.Score)
-    if len(bigContainer.getElementsByClass(stream.Part)) == 0:
-        hasParts = False
-    else:
-        parts = bigContainer.getElementsByClass(stream.Part)
-        hasParts = True
-        
-    segmentList = [segmentDict[label] for label in segmentDict]
-    labelList = [label for label in segmentDict]
-    numSearchSegments = len(segmentList)
-    numSegmentsToLabel = len(segmentsToLabel)
-    reorderedSegmentsToLabel = sorted(segmentsToLabel, key=attrgetter(
-                                                'partNumber', 'startMeasureNumber', 'startOffset'))
-    
-    for k in range (0, numSegmentsToLabel):
-        foundSegment = reorderedSegmentsToLabel[k]          
-        linelabel = spanner.Line(foundSegment.segment[0], foundSegment.segment[-1])
-        if hasParts == True:
-            parts[foundSegment.partNumber].insert(0, linelabel)
-        else:
-            bigContainer.insert(0, linelabel)
-        
-        foundLabel = False
-        rowToMatch = foundSegment.matchedSegment
-        for l in range(0, numSearchSegments):
-            if foundLabel == False:
-                if segmentList[l] == rowToMatch:
-                    foundLabel = True
-                    label = labelList[l]
-                    firstnote = foundSegment.segment[0]
-                    if label not in [lyr.text for lyr in firstnote.lyrics]:
-                        firstnote.addLyric(label)
-                    
-    return inputStream
-    
-
-def findSegments(inputStream, searchList, reps='skipConsecutive', includeChords=True):
-    '''
-    Finds all instances of given contiguous segments of pitch classes within a :class:`~music21.stream.Stream`.
-    
-    The inputStream is a :class:`~music21.stream.Stream`; as in :func:`~music21.serial.getContiguousSegmentsOfLength`, 
-    the inputStream can contain at most one :class:`~music21.stream.Score` and
-    its notes must be contained in measures. The searchList is a list of contiguous segments to
-    be searched for, each segment being given as a list of pitch classes. The reps and includeChords settings specify how
-    repeated pitches and chords, respectively, are handled; the possible settings are the same as those in
-    :func:`~music21.serial.getContiguousSegmentsOfLength`.
-    
-    Returns a list of :class:`~music21.serial.ContiguousSegmentOfNotes` objects for which the
-    :attr:`~music21.serial.ContiguousSegmentOfNotes.activeSegment` matches at least one of the elements of the searchList,
-    subject to the settings specified in reps and includeChords.
-    
-    
-    >>> sc = stream.Score()
-    >>> part = stream.Part()
-    >>> sig = meter.TimeSignature('2/4')
-    >>> part.append(sig)
-    >>> n1 = note.Note('e4')
-    >>> n1.quarterLength = 6
-    >>> part.append(n1)
-    >>> n2 = note.Note('f4')
-    >>> n2.quarterLength = 1
-    >>> part.append(n2)
-    >>> n3 = chord.Chord(['g4', 'b4'])
-    >>> n3.quarterLength = 1
-    >>> part.append(n3)
-    >>> n4 = note.Note('g4')
-    >>> n4.quarterLength = 1
-    >>> part.repeatAppend(n4, 2)
-    >>> n5 = note.Note('a4')
-    >>> n5.quarterLength = 3
-    >>> part.repeatAppend(n5, 2)
-    >>> n6 = note.Note('b4')
-    >>> n6.quarterLength = 1
-    >>> part.append(n6)
-    >>> n7 = note.Note('c5')
-    >>> n7.quarterLength = 1
-    >>> part.append(n7)
-    >>> newpart = part.makeMeasures()
-    >>> newpart.makeTies()
-    >>> #_DOCS_SHOW newpart.show()
-    
-    .. image:: images/serial-findSegments.png
-        :width: 500
-    
-    >>> sc.insert(0, newpart)
-    >>> GABandABC = serial.findSegments(sc, [[7, 9, 11], [9, 11, 0]], includeChords = False)
-    >>> print(GABandABC)
-    [<music21.serial.ContiguousSegmentOfNotes object...]
-    >>> len(GABandABC)
-    2
-    >>> GABandABC[0].segment, GABandABC[1].segment
-    ([<music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>], 
-    [<music21.note.Note A>, <music21.note.Note B>, <music21.note.Note C>])
-    >>> GABandABC[0].startMeasureNumber, GABandABC[1].startMeasureNumber
-    (5, 6)
-    
-    In case it is not clear, we can use the :attr:`~music21.serial.ContiguousSegmentsOfNotes.matchedSegment` property
-    to determine, to which element of the original searchList the found contiguous segments were matched.
-    
-    >>> GABandABC[0].matchedSegment
-    [7, 9, 11]
-    >>> GABandABC[1].matchedSegment
-    [9, 11, 0]
-    
-    One can also search for segments of different lengths, simultaneously. Below, 'B' refers to the
-    pitch class 11, which only coincidentally is the same as that of the note B.
-    
-    >>> len(serial.findSegments(sc, [[7, 9, 11], ['B', 0]], includeChords = False))
-    2
-    
-    Below, we can see what happens when we include the chords.
-    
-    >>> [seg.segment for seg in serial.findSegments(newpart, [[5, 7, 'B']], 'ignoreAll')]
-    [[<music21.note.Note F>, <music21.chord.Chord G4 B4>]]
-    
-    As expected, the pitch classes found segment are read in the order 5, 7, 11 ('B'), as the pitches
-    in the chord are read from bottom to top.
-    
-    Consider the following other example with chords, which is somewhat more complex:
-    
-    >>> sc0 = stream.Score()
-    >>> p0 = stream.Part()
-    >>> c1 = chord.Chord(['c4', 'd4'])
-    >>> c2 = chord.Chord(['e4', 'f4'])
-    >>> p0.append(c1)
-    >>> p0.append(c2)
-    >>> p0 = p0.makeMeasures()
-    >>> sc0.insert(0, p0)
-    >>> [(seg.segment, seg.activeSegment) for seg in serial.findSegments(sc0, [[0, 2, 4]])]
-    [([<music21.chord.Chord C4 D4>, <music21.chord.Chord E4 F4>], [0, 2, 4])]
-    >>> [(seg.segment, seg.activeSegment) for seg in serial.findSegments(sc0, [[2, 4, 5]])]
-    [([<music21.chord.Chord C4 D4>, <music21.chord.Chord E4 F4>], [2, 4, 5])]
-    
-    In the two function calls, despite the fact that two different segments of pitch classes were searched for, the same
-    :class:`~music21.serial.ContiguousSegmentOfNotes` object was found for each. This is because the found object can be read
-    in two ways as a sequence of three pitch classes: either as [0, 2, 4], by taking the two notes of the first chord in order
-    and the bottom note of the second, or as [2, 4, 5], by taking the top note of the first chord and the two notes of the second
-    chord in order. Both times, the chords are read from bottom to top.
-    
-    OMIT_FROM_DOCS
-    
-    >>> for a in serial.findSegments(sc, [[7, -3, 11], [9, 11, 0]], includeChords = False):
-    ...    print(a.matchedSegment)
-    [7, -3, 11]
-    [9, 11, 0]
-    >>> len(serial.findSegments(sc, [[7, -3, 11], [9, 11, 0]], includeChords = False))
-    2
-    
-    >>> s = stream.Stream()
-    >>> n1 = note.Note('e4')
-    >>> n2 = note.Note('f4')
-    >>> n3 = note.Note('g4')
-    >>> c = chord.Chord(['b4', 'g5', 'a5'])
-    >>> s.append(n1)
-    >>> s.append(n2)
-    >>> s.append(n3)
-    >>> s.append(c)
-    >>> s = s.makeMeasures()
-    >>> [seg.segment for seg in serial.findSegments(s, [[4, -7, 7]], 'ignoreAll')]
-    [[<music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>]]
-    >>> [seg.segment for seg in serial.findSegments(s, [[7, 'B', 9]], 'ignoreAll')]
-    [[<music21.note.Note G>, <music21.chord.Chord B4 G5 A5>]]
-    
-    '''
-    
-    numsegs = len(searchList)
-    segs = []
-    donealready = []
-    contigdict = {}
-    
-    for k in range(0,numsegs):
-        currentSearchSegment = searchList[k]
-        currentSearchSegmentCopy = list(currentSearchSegment)
-        used = False
-        searchRow = pcToToneRow(currentSearchSegment)
-        currentSearchSegment = searchRow.pitchClasses()
-        for usedsegment in donealready:
-            if used == False:
-                used = searchRow.isSameRow(pcToToneRow(usedsegment))
-        if used == False:
-            donealready.append(currentSearchSegment)
-            length = len(currentSearchSegment)
-            if length in contigdict:
-                contig = contigdict[length]
-            else:
-                contig = getContiguousSegmentsOfLength(inputStream, length, reps, includeChords)
-                contigdict[length] = contig        
-            for contiguousseg in contig:
-                if reps == 'ignoreAll':
-                    segment = contiguousseg.segment
-                    pitchList = contiguousseg.getDistinctPitchClasses()
-                    matched = False
-                    for i in range(0, len(pitchList) - len(currentSearchSegment) + 1):
-                        if matched == False:
-                            subsetToCheck = pitchList[i:i+length]
-                            if currentSearchSegment == subsetToCheck:
-                                if subsetToCheck[0] in [p.pitchClass for p in segment[0].pitches]:
-                                    startseg = segment[0:len(segment)-1]
-                                    if subsetToCheck[-1] not in ContiguousSegmentOfNotes(startseg, None, None).readPitchClassesFromBottom():
-                                        matched = True
-                                        contiguousseg.activeSegment = subsetToCheck
-                                        contiguousseg.matchedSegment = currentSearchSegmentCopy
-                                        segs.append(contiguousseg)
-                                            
-                else:
-                    pitchList = contiguousseg.readPitchClassesFromBottom()
-                    segment = contiguousseg.segment
-                    matched = False
-                    lowerBound = max([0, len(pitchList) - length - len(segment[-1].pitches) + 1])
-                    upperBound = min([len(segment[0].pitches) - 1, len(pitchList) - length])
-                    for j in range(lowerBound, upperBound + 1):
-                        if matched == False:
-                            subsetToCheck = pitchList[j:j+length]
-                            if subsetToCheck == currentSearchSegment:
-                                matched = True
-                                contiguousseg.activeSegment = subsetToCheck
-                                contiguousseg.matchedSegment = currentSearchSegmentCopy
-                                segs.append(contiguousseg)
-        
-    return segs
-
-        
-
-def labelSegments(inputStream, segmentDict, reps='skipConsecutive', includeChords=True):
-    '''
-    Labels all instances of a given collection of segments of pitch classes in a
-    :class:`~music21.stream.Stream`.
-    
-    The segmentDict is a dictionary whose keys are names of 
-    the segments to be searched for, and whose values are the segments of pitch classes. The values will be
-    turned in to a segmentList, as in :func:`~music21.serial.findSegments`.
-    All other settings are as in :func:`~music21.serial.findSegments` as well.
-    
-    Returns a deepcopy of the inputStream with a :class:`~music21.spanner.Line` connecting the first and last notes
-    of each found segment, and the first note of each found segment labeled with a :class:`~music21.note.Lyric`,
-    the label being the key corresponding to the segment of pitch classes. One should make sure not
-    to call this function with too large of a segmentDict, as a note being contained
-    in too many segments will result in some spanners not showing.
-    
-    >>> part = stream.Part()
-    >>> sig = meter.TimeSignature('2/4')
-    >>> part.append(sig)
-    >>> n1 = note.Note('e4')
-    >>> n1.quarterLength = 6
-    >>> part.append(n1)
-    >>> n2 = note.Note('f4')
-    >>> n2.quarterLength = 1
-    >>> part.append(n2)
-    >>> n3 = chord.Chord(['g4', 'b4'])
-    >>> n3.quarterLength = 1
-    >>> part.append(n3)
-    >>> n4 = note.Note('g4')
-    >>> n4.quarterLength = 1
-    >>> part.repeatAppend(n4, 2)
-    >>> n5 = note.Note('a4')
-    >>> n5.quarterLength = 3
-    >>> part.repeatAppend(n5, 2)
-    >>> n6 = note.Note('b4')
-    >>> n6.quarterLength = 1
-    >>> part.append(n6)
-    >>> n7 = note.Note('c5')
-    >>> n7.quarterLength = 1
-    >>> part.append(n7)
-    >>> newpart = part.makeMeasures()
-    >>> newpart.makeTies()
-    
-    We can then label the segment of pitch classes [7, 9, 11], which corresponds to a G, followed by an A,
-    followed by a B. Let us call this segment "GAB".
-    
-    >>> labelGAB = serial.labelSegments(newpart, {'GAB':[7, 9, 11]}, includeChords=False)
-    >>> #_DOCS_SHOW labelGAB.show()
-    
-    .. image:: images/serial-labelSegments.png
-       :width: 500
-    
-    OMIT_FROM_DOCS
-    
-    >>> len(labelGAB.getElementsByClass(spanner.Line))
-    1
-    
-    '''
-    streamCopy = copy.deepcopy(inputStream)
-    segmentList = [segmentDict[label] for label in segmentDict]
-    segmentsToLabel = findSegments(streamCopy, segmentList, reps, includeChords)
-    return _labelGeneral(segmentsToLabel, streamCopy, segmentDict, reps, includeChords)
-        
-def findTransposedSegments(inputStream, searchList, reps='skipConsecutive', includeChords=True):
-    
-        
-    '''
-    Finds all instances of given contiguous segments of pitch classes, with transpositions, within a :class:`~music21.stream.Stream`.
-    
-    The inputStream is a :class:`~music21.stream.Stream`; as in :func:`~music21.serial.getContiguousSegmentsOfLength`, 
-    the inputStream can contain at most one :class:`~music21.stream.Score` and
-    its notes must be contained in measures. The searchList is a list of contiguous segments to
-    be searched for, each segment being given as a list of pitch classes. The reps and includeChords settings specify how
-    repeated pitches and chords, respectively, are handled; the possible settings are the same as those in
-    :func:`~music21.serial.getContiguousSegmentsOfLength`.
-    
-    Returns a list of :class:`~music21.serial.ContiguousSegmentOfNotes` objects for which some transposition of the
-    :attr:`~music21.serial.ContiguousSegmentOfNotes.activeSegment` matches at least one of the elements of the searchList,
-    subject to the settings specified in reps and includeChords.
-    
-    
-    >>> part = stream.Part()
-    >>> n1 = note.Note('e4')
-    >>> n1.quarterLength = 6
-    >>> part.append(n1)
-    >>> n2 = note.Note('f4')
-    >>> n2.quarterLength = 1
-    >>> part.append(n2)
-    >>> n3 = chord.Chord(['g4', 'b4'])
-    >>> n3.quarterLength = 1
-    >>> part.append(n3)
-    >>> n4 = note.Note('g4')
-    >>> n4.quarterLength = 1
-    >>> part.repeatAppend(n4, 2)
-    >>> n5 = note.Note('a4')
-    >>> n5.quarterLength = 3
-    >>> part.repeatAppend(n5, 2)
-    >>> n6 = note.Note('b4')
-    >>> n6.quarterLength = 1
-    >>> part.append(n6)
-    >>> n7 = note.Note('c5')
-    >>> n7.quarterLength = 1
-    >>> part.append(n7)
-    >>> newpart = part.makeMeasures()
-    >>> newpart.makeTies()
-    >>> #_DOCS_SHOW newpart.show()
-    
-    .. image:: images/serial-findTransposedSegments.png
-        :width: 500
-        
-    First, note that it is impossible, using the 'ignoreAll' setting, to find segments, transposed or not,
-    with repeated pitch classes.
-    
-    >>> serial.findTransposedSegments(newpart, [[0, 0]], 'ignoreAll')
-    []
-    
-    A somewhat more interesting example is below.
-    
-    >>> halfStepList = serial.findTransposedSegments(newpart, [[0, 1]], 'rowsOnly', includeChords=False)
-    >>> L = [step.segment for step in halfStepList]
-    >>> print(L)
-    [[<music21.note.Note E>, <music21.note.Note F>], [<music21.note.Note B>, <music21.note.Note C>]]
-    >>> [step.startMeasureNumber for step in halfStepList]
-    [1, 5]
-    
-    In addition to calling the :attr:`~music21.serial.ContiguousSegmentOfNotes.startMeasureNumber` property
-    to return the measure numbers on which the half steps start, one may also call the
-    :attr:`~music21.base.Music21Object.measureNumber` property of the first :class:`~music21.note.Note` of each segment.
-    
-    >>> s = stream.Stream()
-    >>> s.repeatAppend(newpart, 2) #s has two parts, each of which is a copy of newpart.
-    >>> wholeStepList = serial.findTransposedSegments(s, [[12, 2]], includeChords=False)
-    >>> [(step.segment, step.startMeasureNumber, step.partNumber) for step in wholeStepList]
-    [([<music21.note.Note G>, <music21.note.Note A>], 3, 0), 
-    ([<music21.note.Note A>, <music21.note.Note B>], 3, 0), 
-    ([<music21.note.Note G>, <music21.note.Note A>], 3, 1), 
-    ([<music21.note.Note A>, <music21.note.Note B>], 3, 1)]
-    
-    Including chords works similarly as in :class:`~music21.serial.findSegments`.
-    
-    >>> [seg.segment for seg in serial.findTransposedSegments(newpart, [[4, 6, 'A']])]
-    [[<music21.note.Note F>, <music21.chord.Chord G4 B4>]]
-    
-    OMIT_FROM_DOCS
-    
-    >>> testSameSeg = serial.findTransposedSegments(newpart, [[12, 13], [0, 1]], 'skipConsecutive', includeChords=False)
-    >>> len(testSameSeg)
-    2
-    >>> testSameSeg[0].matchedSegment
-    [12, 13]
-    >>> serial.findTransposedSegments(newpart, [[9, 'A', 'B']], 'rowsOnly', includeChords=False)
-    []
-    
-    >>> s = stream.Stream()
-    >>> n1 = note.Note('e4')
-    >>> n2 = note.Note('f4')
-    >>> n3 = note.Note('g4')
-    >>> c = chord.Chord(['b4', 'g5', 'a5'])
-    >>> s.append(n1)
-    >>> s.append(n2)
-    >>> s.append(n3)
-    >>> s.append(c)
-    >>> s = s.makeMeasures()
-    >>> [seg.segment for seg in serial.findTransposedSegments(s, [[3, 4, 6]], 'ignoreAll')]
-    [[<music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>]]
-    >>> [seg.segment for seg in serial.findTransposedSegments(s, [[4, 8, 6]], 'ignoreAll')]
-    [[<music21.note.Note G>, <music21.chord.Chord B4 G5 A5>]]
-    
-    '''
-    
-    numsegs = len(searchList)
-    segs = []
-    donealready = []
-    contigdict = {}
-
-    for k in range(0, numsegs):
-        currentSearchSegment = searchList[k]
-        row = pcToToneRow([n for n in currentSearchSegment])
-        intervals = row.getIntervalsAsString()
-        if intervals not in donealready:
-            donealready.append(intervals)
-            length = len(currentSearchSegment)
-            if length in contigdict:
-                contig = contigdict[length]
-            else:
-                contig = getContiguousSegmentsOfLength(inputStream, length, reps, includeChords)
-                contigdict[length] = contig
-            for contiguousseg in contig:
-                if reps == 'ignoreAll':
-                    segment = contiguousseg.segment
-                    pitchList = contiguousseg.getDistinctPitchClasses()
-                    matched = False
-                    for i in range(0, len(pitchList) - len(currentSearchSegment) + 1):
-                        if matched == False:
-                            subsetToCheck = pitchList[i:i+length]
-                            subsetToCheckAsRow = pcToToneRow(subsetToCheck)
-                            if row.getIntervalsAsString() == subsetToCheckAsRow.getIntervalsAsString():
-                                if subsetToCheck[0] in [p.pitchClass for p in segment[0].pitches]:
-                                    startseg = segment[0:len(segment)-1]
-                                    if subsetToCheck[-1] not in ContiguousSegmentOfNotes(startseg, None, None).readPitchClassesFromBottom():
-                                        matched = True
-                                        contiguousseg.activeSegment = subsetToCheck
-                                        contiguousseg.matchedSegment = currentSearchSegment
-                                        segs.append(contiguousseg)
-                else:
-                    segment = contiguousseg.segment
-                    pitchList = contiguousseg.readPitchClassesFromBottom()
-                    matched = False
-                    lowerBound = max([0, len(pitchList) - length - len(segment[-1].pitches) + 1])
-                    upperBound = min([len(segment[0].pitches) - 1, len(pitchList) - length])
-                    for j in range(lowerBound, upperBound + 1):
-                        if matched == False:
-                            subsetToCheck = pitchList[j:j+length]
-                            if intervals == pcToToneRow(pitchList).getIntervalsAsString():
-                                matched = True
-                                contiguousseg.activeSegment = subsetToCheck
-                                contiguousseg.matchedSegment = currentSearchSegment
-                                segs.append(contiguousseg)
-    return segs
-
-def labelTransposedSegments(inputStream, segmentDict, reps='skipConsecutive', includeChords=True):
-    '''
-    Labels all instances of a given collection of segments of pitch classes,
-    with transpositions, in a :class:`~music21.stream.Stream`.
-    
-    The segmentDict is a dictionary whose keys are names of the segments to be
-    searched for, and whose values are the segments of pitch classes. The
-    values will be turned in to a segmentList, as in
-    :func:`~music21.serial.findTransposedSegments`.  All other settings are as
-    in :func:`~music21.serial.findTransposedSegments` as well.
-    
-    Returns a deep copy of the inputStream with a
-    :class:`~music21.spanner.Line` connecting the first and last notes of each
-    found segment, and the first note of each found segment labeled with a
-    :class:`~music21.note.Lyric`, the label being the key corresponding to the
-    segment of pitch classes. One should make sure not to call this function 
-    with too large of a segmentDict, as a note being contained in too many 
-    segments will result in some spanners not showing.
-    
-    >>> part = stream.Part()
-    >>> n1 = note.Note('e4')
-    >>> n1.quarterLength = 6
-    >>> part.append(n1)
-    >>> n2 = note.Note('f4')
-    >>> n2.quarterLength = 1
-    >>> part.append(n2)
-    >>> n3 = chord.Chord(['g4', 'b4'])
-    >>> n3.quarterLength = 1
-    >>> part.append(n3)
-    >>> n4 = note.Note('g4')
-    >>> n4.quarterLength = 1
-    >>> part.repeatAppend(n4, 2)
-    >>> n5 = note.Note('a4')
-    >>> n5.quarterLength = 3
-    >>> part.repeatAppend(n5, 2)
-    >>> n6 = note.Note('b4')
-    >>> n6.quarterLength = 1
-    >>> part.append(n6)
-    >>> n7 = note.Note('c5')
-    >>> n7.quarterLength = 1
-    >>> part.append(n7)
-    >>> newpart = part.makeMeasures()
-    >>> newpart.makeTies()
-
-    We have a soprano line; let us now form a bass line.
-    
-    >>> bass = stream.Part()
-    >>> n8 = note.Note('c3')
-    >>> n8.quarterLength = 4
-    >>> bass.append(n8)
-    >>> r1 = note.Rest()
-    >>> r1.quarterLength = 4
-    >>> bass.append(r1)
-    >>> n9 = note.Note('b2')
-    >>> n9.quarterLength = 4
-    >>> bass.append(n9)
-    >>> r2 = note.Rest()
-    >>> r2.quarterLength = 4
-    >>> bass.append(r2)
-    >>> n10 = note.Note('c3')
-    >>> n10.quarterLength = 4
-    >>> bass.append(n10)
-    >>> newbass = bass.makeMeasures()
-    >>> sc = stream.Score()
-    >>> import copy
-    >>> sc.insert(0, copy.deepcopy(newpart))
-    >>> sc.insert(0, copy.deepcopy(newbass))
-    >>> labeledsc = serial.labelTransposedSegments(sc, {'half':[0, 1]}, 'rowsOnly')
-    >>> #_DOCS_SHOW labeledsc.show()
-
-    .. image:: images/serial-labelTransposedSegments.png
-       :width: 500
-        
-    OMIT_FROM_DOCS
-    
-    >>> len(labeledsc.parts[0].getElementsByClass(spanner.Line))
-    2    
-    '''
-    
-    
-    streamCopy = copy.deepcopy(inputStream)
-    segmentList = [segmentDict[label] for label in segmentDict]
-    segmentsToLabel = findTransposedSegments(streamCopy, segmentList, reps, includeChords)
-    return _labelGeneral(segmentsToLabel, streamCopy, segmentDict, reps, includeChords)
-
-def findTransformedSegments(inputStream, searchList, reps='skipConsecutive', includeChords='skipChords'):
-    
-    '''
-    Finds all instances of given contiguous segments of pitch classes, with serial transformations,
-    within a :class:`~music21.stream.Stream`.
-    
-    The inputStream is :class:`~music21.stream.Stream`; as in :func:`~music21.serial.getContiguousSegmentsOfLength`,
-    the inputStream can 
-    contain at most one :class:`~music21.stream.Score` 
-    and its notes must be contained in measures. The searchList is a list of contiguous segments to
-    be searched for, each segment being given as a list of pitch classes. The reps and includeChords settings specify how
-    repeated pitches and chords, respectively, are handled; the possible settings are the same as those in
-    :func:`~music21.serial.getContiguousSegmentsOfLength`. The convention for serial transformations must be specified to either
-    'zero' or 'original', as described in :meth:`~music21.serial.zeroCenteredTransformation` and
-    :func:`~music21.serial.originalCenteredTransformation` - the default setting is 'original', as to relate found segments
-    directly to the given segments, without first transposing the given segment to begin on the pitch class 0.
-    
-    Returns a list of :class:`~music21.serial.ContiguousSegmentOfNotes` objects for which some transformation of the
-    :attr:`~music21.serial.ContiguousSegmentOfNotes.activeSegment` matches at least one of the elements of the searchList,
-    subject to the settings specified in reps and includeChords.
-    
-    
-    >>> n1 = note.Note('c#4')
-    >>> n2 = note.Note('e4')
-    >>> n3 = note.Note('d#4')
-    >>> n4 = note.Note('f4')
-    >>> n5 = note.Note('e4')
-    >>> n6 = note.Note('g4')
-    >>> notelist = [n1, n2, n3, n4, n5, n6]
-    >>> part = stream.Part()
-    >>> for n in notelist:
-    ...    n.quarterLength = 1
-    ...    part.append(n)
-    >>> part = part.makeMeasures()
-    >>> #_DOCS_SHOW part.show()
-    
-    .. image:: images/serial-findTransformedSegments.png
-        :width: 150
-    
-    >>> row = [2, 5, 4]    
-    >>> rowInstances = serial.findTransformedSegments(part, [row], 'rowsOnly', includeChords=False)
-    >>> len(rowInstances)
-    2
-    >>> firstInstance = rowInstances[0]
-    >>> firstInstance.activeSegment, firstInstance.startMeasureNumber
-    ([1, 4, 3], 1)
-    >>> firstInstance.originalCenteredTransformationsFromMatched
-    [('T', 11)]
-    
-    We have thus found that the first instance of the row [2, 5, 4] within our stream appears as a transposition
-    down a semitone, beginning in measure 1. We can do a similar analysis on the other instance of the row.
-    
-    >>> secondInstance = rowInstances[1]
-    >>> secondInstance.activeSegment, secondInstance.startMeasureNumber
-    ([5, 4, 7], 1)
-    >>> secondInstance.zeroCenteredTransformationsFromMatched
-    [('RI', 7)]
-    
-    Let us give an example of this function used with chords included and reps set to 'ignoreAll'.
-    
-    >>> s = stream.Stream()
-    >>> n1 = note.Note('e4')
-    >>> n2 = note.Note('f4')
-    >>> n3 = note.Note('g4')
-    >>> c = chord.Chord(['b4', 'g5', 'a5'])
-    >>> s.append(n1)
-    >>> s.append(n2)
-    >>> s.append(n3)
-    >>> s.append(c)
-    >>> s = s.makeMeasures()
-    >>> [seg.segment for seg in serial.findTransformedSegments(s, [[6, 4, 3]], 'ignoreAll')]
-    [[<music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>]]
-    >>> [seg.segment for seg in serial.findTransformedSegments(s, [[6, 8, 4]], 'ignoreAll')]
-    [[<music21.note.Note G>, <music21.chord.Chord B4 G5 A5>], [<music21.chord.Chord B4 G5 A5>]]
-    >>> [seg.activeSegment for seg in serial.findTransformedSegments(s, [[6, 8, 4]], 'ignoreAll')]
-    [[7, 11, 9], [11, 7, 9]]
-    >>> [seg.originalCenteredTransformationsFromMatched for seg in serial.findTransformedSegments(s, [[6, 8, 4]], 'ignoreAll')]
-    [[('R', 3)], [('RI', 3)]]
-    
-    Pitch classes are extracted from segments in order of appearance, with pitches in chords being read from bottom to top.
-    However, only the first instance of each pitch class is considered, as seen in the
-    :attr:`~music21.serial.ContiguousSegmentOfNotes.activeSegment` calls. As long as the first and last pitch classes in the
-    active segment first appear in the first and last elements of the found segment, respectively, the segment will be matched to the
-    segment being searched for. To make this more clear, consider the following example in the same stream s:
-    
-    >>> [(seg.segment, seg.activeSegment) for seg in serial.findTransformedSegments(s, [[4, 0, 4]], 'includeAll')]
-    [([<music21.note.Note G>, <music21.chord.Chord B4 G5 A5>], [7, 11, 7])]
-    
-    Above, the pitch classes of the found segment are read in the order 7, 11, 7, 9. Because a subsequence of this, [7, 11, 7],
-    is an inversion of the search segment, [4, 0, 4], and furthermore, the first 7 is part of the first note of the segment (G), and
-    the last 7 is part of the last chord of the segment, the found segment is matched to the segment being searched for.
-    
-    OMIT_FROM_DOCS
-    
-    >>> s = stream.Stream()
-    >>> s.repeatAppend(part, 2)
-    >>> testNegativePitchClass = serial.findTransformedSegments(s, [[2, -7, 4]], includeChords=False)
-    >>> len(testNegativePitchClass)
-    4
-    >>> testNegativePitchClass[0].matchedSegment
-    [2, -7, 4]
-
-    '''
-    
-    numsegs = len(searchList)
-    segs = []
-    donealready = []
-    contigdict = {}
-    
-    for k in range(0, numsegs):
-        currentSearchSegment = searchList[k]
-        row = pcToToneRow(currentSearchSegment)
-        used = False
-        for usedrow in donealready:
-            if used == False:
-                if row.findZeroCenteredTransformations(pcToToneRow(usedrow)) != []:
-                    used = True
-        if used == False:
-            donealready.append(currentSearchSegment)
-            length = len(currentSearchSegment)
-            if length in contigdict:
-                contig = contigdict[length]
-            else:
-                contig = getContiguousSegmentsOfLength(inputStream, length, reps, includeChords)
-                contigdict[length] = contig    
-            for contiguousseg in contig:
-                if reps == 'ignoreAll':
-                    segment = contiguousseg.segment
-                    pitchList = contiguousseg.getDistinctPitchClasses()
-                    matched = False
-                    for i in range(0, len(pitchList) - len(currentSearchSegment) + 1):
-                        if matched == False:
-                            subsetToCheck = pitchList[i:i+length]
-                            subsetToCheckAsRow = pcToToneRow(subsetToCheck)
-                            transformations = row.findZeroCenteredTransformations(subsetToCheckAsRow)
-                            if transformations != []:
-                                if subsetToCheck[0] in [p.pitchClass for p in segment[0].pitches]:
-                                    startseg = segment[0:len(segment)-1]
-                                    if subsetToCheck[-1] not in ContiguousSegmentOfNotes(startseg, None, None).readPitchClassesFromBottom():
-                                        matched = True
-                                        contiguousseg.activeSegment = subsetToCheck
-                                        contiguousseg.matchedSegment = currentSearchSegment
-                                        segs.append(contiguousseg)
-                else:
-                    segment = contiguousseg.segment
-                    pitchList = contiguousseg.readPitchClassesFromBottom()
-                    matched = False
-                    lowerBound = max([0, len(pitchList) - length - len(segment[-1].pitches) + 1])
-                    upperBound = min([len(segment[0].pitches) - 1, len(pitchList) - length])
-                    for j in range(lowerBound, upperBound + 1):
-                        if matched == False:
-                            subsetToCheck = pitchList[j:j+length]
-                            contiguoussegrow = pcToToneRow(subsetToCheck)
-                            transformations = row.findZeroCenteredTransformations(contiguoussegrow)
-                            if transformations != []:
-                                matched = True
-                                contiguousseg.activeSegment = subsetToCheck
-                                contiguousseg.matchedSegment = currentSearchSegment
-                                segs.append(contiguousseg)
-    return segs
-
-def labelTransformedSegments(inputStream, segmentDict, reps='skipConsecutive', chords = 'skipChords', convention = 'original'):
-    
-    '''
-    Labels all instances of a given collection of segments of pitch classes,
-    with transformations, in a :class:`~music21.stream.Stream`.
-    
-    The segmentDict is a dictionary whose keys are names of the segments to be 
-    searched for, and whose values are the segments of pitch classes. The 
-    values will be turned in to a segmentList, as in 
-    :func:`~music21.serial.findTransposedSegments`. The last argument specifies
-    the convention ('zero' or 'original') used for naming serial 
-    transformations, as explained in 
-    :meth:`~music21.serial.ToneRow.zeroCenteredTransformation` and
-    :meth:`~music21.serial.ToneRow.originalCenteredTransformation`.
-
-    All other settings are as in :func:`~music21.serial.findTransposedSegments`
-    as well.
-    
-    Returns a deep copy of the inputStream with a 
-    :class:`~music21.spanner.Line` connecting the first and last notes of each
-    found segment, and the first note of each found segment labeled with a 
-    :class:`~music21.note.Lyric`, the label being the key corresponding to the 
-    segment of pitch classes. One should make sure not to call this function 
-    with too large of a segmentDict, as a note being contained in too many
-    segments will result in some spanners not showing.
-    
-    >>> c1 = chord.Chord(['c#4', 'e4'])
-    >>> c2 = chord.Chord(['d#4', 'f4'])
-    >>> c3 = chord.Chord(['e4', 'g4'])
-    >>> chordList = [c1, c2, c3]
-    >>> part = stream.Part()
-    >>> for c in chordList:
-    ...    c.quarterLength = 4
-    ...    part.append(c)
-    >>> part = part.makeMeasures()
-    >>> labeledPart = serial.labelTransformedSegments(part, {'row':[2, 5, 4]})
-    >>> #_DOCS_SHOW labeledPart.show()
-    
-    .. image:: images/serial-labelTransformedSegments.png
-       :width: 500
-    
-    Note: the spanners above were moved manually so that they can be more easily distinguished from one another.
-    
-    OMIT_FROM_DOCS
-    
-    >>> [len(n.lyrics) for n in labeledPart.flat.notes]
-    [1, 1, 0]
-    
-    '''
-    
-    from operator import attrgetter
-    
-    streamCopy = copy.deepcopy(inputStream)
-    
-    #this doesn't call _labelGeneral because each segment is also labeled with the transformations.
-    if len(streamCopy.getElementsByClass(stream.Score)) == 0:
-        bigContainer = streamCopy
-    else:
-        bigContainer = streamCopy.getElementsByClass(stream.Score)
-    if len(bigContainer.getElementsByClass(stream.Part)) == 0:
-        hasParts = False
-    else:
-        parts = bigContainer.getElementsByClass(stream.Part)
-        hasParts = True
-        
-    segmentList = [segmentDict[label] for label in segmentDict]
-    labelList = [label for label in segmentDict]
-    numSearchSegments = len(segmentList)
-    segmentsToLabel = findTransformedSegments(streamCopy, segmentList, reps, chords)
-    numSegmentsToLabel = len(segmentsToLabel)
-    reorderedSegmentsToLabel = sorted(segmentsToLabel, key = attrgetter('partNumber', 'startMeasureNumber', 'startOffset'))
-    
-    for k in range (0, numSegmentsToLabel):
-        foundSegment = reorderedSegmentsToLabel[k]          
-        linelabel = spanner.Line(foundSegment.segment[0], foundSegment.segment[-1])
-        if hasParts == True:
-            parts[foundSegment.partNumber].insert(0, linelabel)
-        else:
-            bigContainer.insert(0, linelabel)
-        
-        foundLabel = False
-        rowToMatch = foundSegment.matchedSegment
-        for l in range(0, numSearchSegments):
-            if foundLabel == False:
-                if segmentList[l] == rowToMatch:
-                    foundLabel = True
-                    label = labelList[l]
-                    firstnote = foundSegment.segment[0]
-                    if convention == 'original':
-                        transformations = foundSegment.originalCenteredTransformationsFromMatched
-                    elif convention == 'zero':
-                        transformations = foundSegment.zeroCenteredTransformationsFromMatched
-                    else:
-                        raise SerialException("Invalid convention - choose 'zero' or 'original'.")
-                    for trans in transformations:
-                        label = label + ' ,' + str(trans[0]) + str(trans[1])
-                    if label not in [lyr.text for lyr in firstnote.lyrics]:
-                        firstnote.addLyric(label)
-                    
-    return streamCopy
-
-def _checkMultisetEquivalence(multiset1, multiset2):
-    
-    '''
-    Boolean describing if two multisets of pitch classes are the same.
-    
-    
-    >>> serial._checkMultisetEquivalence([3, 4, 5], [3, 3, 4, 5])
-    False
-    >>> serial._checkMultisetEquivalence([10, 'A', -7], [-2, 5, -2])
-    True
-    '''
-    
-    if len(multiset1) != len(multiset2):
-        return False
-    else:
-        
-        row1 = pcToToneRow(multiset1)
-        multiset1 = row1.pitchClasses()
-        
-        row2 = pcToToneRow(multiset2)
-        multiset2 = row2.pitchClasses()
-        
-        uniqueelements = set(multiset1)
-        tempsame = True
-        for i in uniqueelements:
-            if tempsame == True:
-                if multiset1.count(i) != multiset2.count(i):
-                    tempsame = False
-        return tempsame
-            
-def findMultisets(inputStream, searchList, reps='skipConsecutive', includeChords=True):
-    
-    '''
-    Finds all instances of given multisets of pitch classes within a :class:`~music21.stream.Stream`. A multiset
-    is a generalization of a set, in which the order of the elements in the multiset does not matter, but multiple instances
-    of the same thing (in this case, same pitch class) are treated as distinct elements. Thus, two multisets of pitch classes
-    are considered to be equal if and only if the number of times any given pitch class appears in one multiset is the same as
-    the number of times the pitch class appears in the other multiset.
-
-    The inputStream is :class:`~music21.stream.Stream`; as in :func:`~music21.serial.getContiguousSegmentsOfLength`,
-    the inputStream can contain at most one :class:`~music21.stream.Score`
-    its notes must be contained in measures. However, the inputStream may have
-    multiple parts. The searchList is a list of multisets to
-    be searched for, each multiset being given as a list of pitch classes. Note that the order of pitch classes given in a multiset
-    does not matter. The reps and includeChords settings specify how
-    repeated pitches and chords, respectively, are handled; the possible settings are the same as those in
-    :func:`~music21.serial.getContiguousSegmentsOfLength`.
-    
-    Returns a list of :class:`~music21.serial.ContiguousSegmentOfNotes` objects for the
-    :attr:`~music21.serial.ContiguousSegmentOfNotes.activeSegment`, interpreted as a multiset,
-    matches at least one of the elements of the searchList,
-    subject to the settings specified in reps and includeChords.
-    
-    
-    >>> part = stream.Part()
-    >>> n1 = note.Note('e4')
-    >>> n1.quarterLength = 4
-    >>> n2 = note.Note('e4')
-    >>> n2.quarterLength = 4
-    >>> n3 = note.Note('f4')
-    >>> n3.quarterLength = 4
-    >>> n4 = note.Note('e4')
-    >>> n4.quarterLength = 4
-    >>> part.append(n1)
-    >>> part.append(n2)
-    >>> part.append(n3)
-    >>> part.append(n4)
-    >>> part.makeMeasures(inPlace = True)
-    >>> part.show('text')
-    {0.0} <music21.stream.Measure 1 offset=0.0>
-        {0.0} <music21.clef.TrebleClef>
-        {0.0} <music21.meter.TimeSignature 4/4>
-        {0.0} <music21.note.Note E>
-    {4.0} <music21.stream.Measure 2 offset=4.0>
-        {0.0} <music21.note.Note E>
-    {8.0} <music21.stream.Measure 3 offset=8.0>
-        {0.0} <music21.note.Note F>
-    {12.0} <music21.stream.Measure 4 offset=12.0>
-        {0.0} <music21.note.Note E>
-        {4.0} <music21.bar.Barline style=final>
-            
-    >>> #_DOCS_SHOW part.show()
-    
-    .. image:: images/serial-findMultisets.png
-        :width: 150
-    
-    
-    Find all instances of the multiset [5,4,4] in the part
-    
-    >>> EEF = serial.findMultisets(part, [[5, 4, 4]], 'includeAll', includeChords=False)
-    >>> [(seg.activeSegment, seg.startMeasureNumber) for seg in EEF]
-    [([4, 4, 5], 1), ([4, 5, 4], 2)]
-    >>> EF = serial.findMultisets(part, [[4, 5]], 'ignoreAll')
-    >>> [seg.segment for seg in EF]
-    [[<music21.note.Note E>, <music21.note.Note E>, <music21.note.Note F>], 
-    [<music21.note.Note E>, <music21.note.Note F>], 
-    [<music21.note.Note E>, <music21.note.Note E>, <music21.note.Note F>, <music21.note.Note E>], 
-    [<music21.note.Note E>, <music21.note.Note F>, <music21.note.Note E>], 
-    [<music21.note.Note F>, <music21.note.Note E>]]    
-    
-    Consider the following examples, with chords.
-    
-    >>> sc0 = stream.Score()
-    >>> part0 = stream.Part()
-    >>> part0.append(note.Note('c4'))
-    >>> part0.append(note.Note('d4'))
-    >>> part0.append(note.Note('e4'))
-    >>> part0.append(chord.Chord(['f4', 'e5']))
-    >>> part0 = part0.makeMeasures()
-    >>> sc0.insert(0, part0)
-    >>> [seg.segment for seg in serial.findMultisets(sc0, [[0, 2, 4]], 'ignoreAll')]
-    [[<music21.note.Note C>, <music21.note.Note D>, <music21.note.Note E>]]
-    
-    Also:
-    
-    >>> sc1 = stream.Score()
-    >>> part1 = stream.Part()
-    >>> part1.append(note.Note('c4'))
-    >>> part1.append(note.Note('d4'))
-    >>> part1.append(chord.Chord(['e4', 'f4']))
-    >>> part1 = part1.makeMeasures()
-    >>> sc1.insert(0, part1)
-    >>> [seg.getDistinctPitchClasses() for seg in serial.getContiguousSegmentsOfLength(sc1, 3)]
-    [[0, 2, 4, 5], [2, 4, 5]]
-    >>> serial.findMultisets(sc1, [[0, 2, 5]])
-    []
-    
-    OMIT_FROM_DOCS
-    
-    >>> s = stream.Stream()
-    >>> s.repeatAppend(part, 2)
-    >>> serial.findMultisets(part, [[5, 4, 4]], 'rowsOnly')
-    []
-    >>> testMultiple = serial.findMultisets(s, [[-7, 16, 4], [5, 4, 4]], 'includeAll', includeChords=False)
-    >>> len(testMultiple)
-    4
-    >>> testMultiple[0].matchedSegment
-    [-7, 16, 4]
-    
-    >>> sc = stream.Score()
-    >>> part = stream.Part()
-    >>> part.append(note.Note('c4'))
-    >>> part.append(note.Note('d4'))
-    >>> part.append(note.Note('e4'))
-    >>> part.append(chord.Chord(['f4', 'e5']))
-    >>> part = part.makeMeasures()
-    >>> sc.insert(0, part)
-    >>> [seg.segment for seg in serial.findMultisets(sc, [[0, 2, 4]], 'ignoreAll')]
-    [[<music21.note.Note C>, <music21.note.Note D>, <music21.note.Note E>]]
-
-    
-    '''
-    
-    nummultisets = len(searchList)
-    multisets = []
-    donealready = []
-    contigdict = {}
-    
-    for k in range(0, nummultisets):
-        multiset = searchList[k]
-        length = len(multiset)
-        used = False
-        for usedset in donealready:
-            if used == False:
-                if _checkMultisetEquivalence(usedset, multiset) == True:
-                    used = True
-        if used == False:
-            donealready.append(multiset)
-            length = len(multiset)
-            if length in contigdict:
-                contig = contigdict[length]
-            else:
-                contig = getContiguousSegmentsOfLength(inputStream, length, reps, includeChords)
-                contigdict[length] = contig
-            for contiguousseg in contig:
-                if reps == 'ignoreAll':
-                    segment = contiguousseg.segment
-                    pitchList = contiguousseg.getDistinctPitchClasses()
-#                    if len(set([p.pitchClass for p in segment[0].pitches]) and set(multiset)) != 0:
-#                        if len(set([p.pitchClass for p in segment[-1].pitches]) and set(multiset)) != 0:
-                    matched = False
-                    for i in range(0, len(pitchList) - len(multiset) + 1):
-                        if matched == False:
-                            subsetToCheck = pitchList[i:i+len(multiset)]
-                            if _checkMultisetEquivalence(multiset, subsetToCheck) == True:
-                                if len(segment) == 1:
-                                    matched = True
-                                    contiguousseg.activeSegment = subsetToCheck
-                                    contiguousseg.matchedSegment = multiset
-                                    multisets.append(contiguousseg)
-                                else:
-                                    multiset = pcToToneRow(multiset).pitchClasses()
-                                    if segment[0].pitches[-1].pitchClass in multiset:
-                                        if segment[-1].pitches[0].pitchClass in multiset:
-                                            middleseg = ContiguousSegmentOfNotes(list(segment[1:len(segment)-1]), None, None)
-                                            # environLocal.warn("" + str(middleseg.startMeasureNumber))
-                                            listOfPitchClasses = middleseg.readPitchClassesFromBottom()
-                                            doneAddingFirst = False
-                                            firstChordPitches = segment[0].pitches
-                                            for j in range(1, len(firstChordPitches) + 1):
-                                                if doneAddingFirst == False:
-                                                    if firstChordPitches[-j].pitchClass in multiset:
-                                                        listOfPitchClasses.append(firstChordPitches[-j].pitchClass)
-                                                    else:
-                                                        doneAddingFirst = True
-                                            doneAddingLast = False
-                                            lastChordPitches = segment[-1].pitches
-                                            for k in range(0, len(lastChordPitches)):
-                                                if doneAddingLast == False:
-                                                    if lastChordPitches[k].pitchClass in multiset:
-                                                        listOfPitchClasses.append(lastChordPitches[k].pitchClass)
-                                                    else:
-                                                        doneAddingLast = True
-                                            if set(listOfPitchClasses) == set(multiset):
-                                                matched = True
-                                                contiguousseg.activeSegment = subsetToCheck
-                                                contiguousseg.matchedSegment = multiset
-                                                multisets.append(contiguousseg)
-                else:
-                    segment = contiguousseg.segment
-                    pitchList = contiguousseg.readPitchClassesFromBottom()
-                    matched = False
-                    lowerBound = max([0, len(pitchList) - length - len(segment[-1].pitches) + 1])
-                    upperBound = min([len(segment[0].pitches) - 1, len(pitchList) - length])
-                    for j in range(lowerBound, upperBound + 1):
-                        if matched == False:
-                            subsetToCheck = pitchList[j:j+length]
-                            if _checkMultisetEquivalence(subsetToCheck, multiset) == True:
-                                matched = True
-                                contiguousseg.activeSegment = subsetToCheck
-                                contiguousseg.matchedSegment = multiset
-                                multisets.append(contiguousseg)
-    return multisets
-
-def labelMultisets(inputStream, multisetDict, reps='skipConsecutive', includeChords=True):
-    
-    '''
-    
-    Labels all instances of a given collection of multisets of pitch classes in a
-    :class:`~music21.stream.Stream`. A multiset
-    is a generalization of a set, as described in :meth:`~music21.serial.findMultisets`.
-    
-    The multisetDict is a dictionary whose keys are names of 
-    the multisets to be searched for, and whose values are the segments of pitch classes. The values will be
-    turned in to a segmentList, as in :func:`~music21.serial.findMultisets`.
-    All other settings are as in :func:`~music21.serial.findMultisets` as well.
-    
-    Returns a deep copy of the inputStream with a :class:`~music21.spanner.Line` connecting the first and last notes
-    of each found multiset, and the first note of each found multiset labeled with a :class:`~music21.note.Lyric`,
-    the label being the key corresponding to the segment of pitch classes. One should make sure not
-    to call this function with too large of a segmentDict, as a note being contained
-    in too many segments will result in some spanners not showing.
-    
-    At the present time a relatively large number of multisets are found using the 'ignoreAll' setting,
-    particularly when there are many repetitions of pitch classes (immediate or otherwise).
-    As a result, it is possible that at points in the stream there will be more than six spanners active 
-    simultaneously, which may result in some spanners not showing correctly in XML format, or not at all.
-    
-    
-    >>> part = stream.Part()
-    >>> n1 = note.Note('e4')
-    >>> n1.quarterLength = 4
-    >>> n2 = note.Note('e4')
-    >>> n2.quarterLength = 4
-    >>> n3 = note.Note('f4')
-    >>> n3.quarterLength = 4
-    >>> n4 = note.Note('e4')
-    >>> n4.quarterLength = 4
-    >>> part.append(n1)
-    >>> part.append(n2)
-    >>> part.append(n3)
-    >>> part.append(n4)
-    >>> part = part.makeMeasures()
-    >>> labeledPart = serial.labelMultisets(part, {'EEF':[4, 5, 4]}, reps='includeAll', includeChords=False)
-    >>> #_DOCS_SHOW labeledPart.show()
-    
-    .. image:: images/serial-labelMultisets.png
-        :width: 500
-        
-    Note: the spanners above were moved manually so that they can be more easily distinguished from one another.
-    
-    OMIT_FROM_DOCS
-    
-    >>> [len(n.lyrics) for n in labeledPart.flat.notes]
-    [1, 1, 0, 0]
-    
-    '''
-
-    
-    streamCopy = copy.deepcopy(inputStream)
-    segmentList = [multisetDict[label] for label in multisetDict]
-    segmentsToLabel = findMultisets(streamCopy, segmentList, reps, includeChords)
-    return _labelGeneral(segmentsToLabel, streamCopy, multisetDict, reps, includeChords)    
-    
-def findTransposedMultisets(inputStream, searchList, reps='skipConsecutive', includeChords=True):
-    
-    '''
-    
-    Finds all instances of given multisets of pitch classes, with transpositions, within a :class:`~music21.stream.Stream`. A multiset
-    is a generalization of a set, as described in :meth:`~music21.serial.findMultisets`.
-
-    The inputStream is :class:`~music21.stream.Stream`; as in :func:`~music21.serial.getContiguousSegmentsOfLength`,
-    the inputStream can contain at most one :class:`~music21.stream.Score` and its notes must be contained in measures. 
-    The searchList is a list of multisets to
-    be searched for, each multiset being given as a list of pitch classes. Note that the order of pitch classes given in a multiset
-    does not matter. The reps and includeChords settings specify how
-    repeated pitches and chords, respectively, are handled; the possible settings are the same as those in
-    :func:`~music21.serial.getContiguousSegmentsOfLength`.
-    
-    Returns a list of :class:`~music21.serial.ContiguousSegmentOfNotes` objects for some transposition of the 
-    :attr:`~music21.serial.ContiguousSegmentOfNotes.activeSegment`, interpreted as a multiset,
-    matches at least one of the elements of the searchList,
-    subject to the settings specified in reps and includeChords.
-    
-    
-    >>> part = stream.Part()
-    >>> n1 = note.Note('c4')
-    >>> n2 = note.Note('c#4')
-    >>> n3 = note.Note('d4')
-    >>> n4 = note.Note('e4')
-    >>> n5 = note.Note('e-4')
-    >>> n6 = note.Note('e4')
-    >>> n7 = note.Note('d4')
-    >>> for n in [n1, n2, n3, n4, n5, n6, n7]:
-    ...    n.quarterLength = 2
-    ...    part.repeatAppend(n, 2)
-    >>> part = part.makeMeasures()
-    >>> #_DOCS_SHOW part.show()
-    
-    .. image:: images/serial-findTransposedMultisets.png
-        :width: 500
-    
-    >>> instanceList = serial.findTransposedMultisets(part, [[-9, -10, -11]], includeChords=False)
-    >>> for instance in instanceList:
-    ...    (instance.activeSegment, instance.startMeasureNumber, instance.matchedSegment)
-    ([2, 4, 3], 3, [-9, -10, -11])
-    ([3, 4, 2], 5, [-9, -10, -11])
-    ([0, 1, 2], 1, [-9, -10, -11])
-    
-    OMIT_FROM_DOCS
-    
-    
-    >>> part2 = stream.Part()
-    >>> n1 = chord.Chord(['c4', 'c5'])
-    >>> n2 = chord.Chord(['c#4', 'c#5'])
-    >>> n3 = chord.Chord(['d4', 'd5'])
-    >>> n4 = chord.Chord(['e4', 'e5'])
-    >>> n5 = chord.Chord(['e-4', 'e-5'])
-    >>> n6 = chord.Chord(['e4', 'e5'])
-    >>> n7 = chord.Chord(['d4', 'd5'])
-    >>> for n in [n1, n2, n3, n4, n5, n6, n7]:
-    ...    n.quarterLength = 1
-    ...    part2.append(n)
-    >>> part2 = part2.makeMeasures()
-    >>> instanceList2 = serial.findTransposedMultisets(part2, [[-9, -10, -11]], 'ignoreAll')
-    >>> [seg.segment for seg in instanceList2]
-    [[<music21.chord.Chord D4 D5>, <music21.chord.Chord E4 E5>, <music21.chord.Chord E-4 E-5>], 
-    [<music21.chord.Chord D4 D5>, <music21.chord.Chord E4 E5>, <music21.chord.Chord E-4 E-5>, <music21.chord.Chord E4 E5>], 
-    [<music21.chord.Chord D4 D5>, <music21.chord.Chord E4 E5>, <music21.chord.Chord E-4 E-5>, <music21.chord.Chord E4 E5>, <music21.chord.Chord D4 D5>], 
-    [<music21.chord.Chord E4 E5>, <music21.chord.Chord E-4 E-5>, <music21.chord.Chord E4 E5>, <music21.chord.Chord D4 D5>], 
-    [<music21.chord.Chord E-4 E-5>, <music21.chord.Chord E4 E5>, <music21.chord.Chord D4 D5>], 
-    [<music21.chord.Chord C4 C5>, <music21.chord.Chord C#4 C#5>, <music21.chord.Chord D4 D5>]]
-    >>> [seg.matchedSegment for seg in instanceList2]
-    [[-9, -10, -11], [-9, -10, -11], [-9, -10, -11], [-9, -10, -11], [-9, -10, -11], [-9, -10, -11]]
-    
-    
-        
-    '''
-    
-    nummultisets = len(searchList)
-    multisets = []
-    donealready = []
-    contigdict = {}
-    
-    for k in range(0, nummultisets):
-        baseMultiset = searchList[k]
-        baseMultisetPitchClasses = pcToToneRow(baseMultiset).pitchClasses()
-        for l in range(0, 12):
-            multiset = [(l + x) % 12 for x in baseMultisetPitchClasses]
-            length = len(multiset)
-            used = False
-            for usedset in donealready:
-                if used == False:
-                    if _checkMultisetEquivalence(usedset, multiset) == True:
-                        used = True
-            if used == False:
-                donealready.append(multiset)
-                length = len(multiset)
-                if length in contigdict:
-                    contig = contigdict[length]
-                else:
-                    contig = getContiguousSegmentsOfLength(inputStream, length, reps, includeChords)
-                    contigdict[length] = contig
-                for contiguousseg in contig:
-                    if reps == 'ignoreAll':
-                        segment = contiguousseg.segment
-                        pitchList = contiguousseg.getDistinctPitchClasses()
-    #                    if len(set([p.pitchClass for p in segment[0].pitches]) and set(multiset)) != 0:
-    #                        if len(set([p.pitchClass for p in segment[-1].pitches]) and set(multiset)) != 0:
-                        matched = False
-                        for i in range(0, len(pitchList) - len(multiset) + 1):
-                            if matched == False:
-                                subsetToCheck = pitchList[i:i+len(multiset)]
-                                if _checkMultisetEquivalence(multiset, subsetToCheck) == True:
-                                    if len(segment) == 1:
-                                        matched = True
-                                        contiguousseg.activeSegment = subsetToCheck
-                                        contiguousseg.matchedSegment = baseMultiset
-                                        multisets.append(contiguousseg)
-                                    else:
-                                        multiset = pcToToneRow(multiset).pitchClasses()
-                                        if segment[0].pitches[-1].pitchClass in multiset:
-                                            if segment[-1].pitches[0].pitchClass in multiset:
-                                                middleseg = ContiguousSegmentOfNotes(list(segment[1:len(segment)-1]), None, None)
-                                                listOfPitchClasses = middleseg.readPitchClassesFromBottom()
-                                                doneAddingFirst = False
-                                                firstChordPitches = segment[0].pitches
-                                                for j in range(1, len(firstChordPitches) + 1):
-                                                    if doneAddingFirst == False:
-                                                        if firstChordPitches[-j].pitchClass in multiset:
-                                                            listOfPitchClasses.append(firstChordPitches[-j].pitchClass)
-                                                        else:
-                                                            doneAddingFirst = True
-                                                doneAddingLast = False
-                                                lastChordPitches = segment[-1].pitches
-                                                for k in range(0, len(lastChordPitches)):
-                                                    if doneAddingLast == False:
-                                                        if lastChordPitches[k].pitchClass in multiset:
-                                                            listOfPitchClasses.append(lastChordPitches[k].pitchClass)
-                                                        else:
-                                                            doneAddingLast = True
-                                                if set(listOfPitchClasses) == set(multiset):
-                                                    matched = True
-                                                    contiguousseg.activeSegment = subsetToCheck
-                                                    contiguousseg.matchedSegment = baseMultiset
-                                                    multisets.append(contiguousseg)
-                    else:
-                        segment = contiguousseg.segment
-                        pitchList = contiguousseg.readPitchClassesFromBottom()
-                        matched = False
-                        lowerBound = max([0, len(pitchList) - length - len(segment[-1].pitches) + 1])
-                        upperBound = min([len(segment[0].pitches) - 1, len(pitchList) - length])
-                        for j in range(lowerBound, upperBound + 1):
-                            if matched == False:
-                                subsetToCheck = pitchList[j:j+length]
-                                if _checkMultisetEquivalence(subsetToCheck, multiset) == True:
-                                    matched = True
-                                    contiguousseg.activeSegment = subsetToCheck
-                                    contiguousseg.matchedSegment = baseMultiset
-                                    multisets.append(contiguousseg)
-                                    
-    return multisets
-
-def labelTransposedMultisets(inputStream, multisetDict, reps='skipConsecutive', includeChords=True):
-    '''
-    Labels all instances of a given collection of multisets, with 
-    transpositions, of pitch classes in a :class:`~music21.stream.Stream`.
-
-    A multiset is a generalization of a set, as described in 
-    :meth:`~music21.serial.findMultisets`.
-    
-    The multisetDict is a dictionary whose keys are names of the multisets to 
-    be searched for, and whose values are the segments of pitch classes. The 
-    values will be turned in to a segmentList, as in 
-    :func:`~music21.serial.findMultisets`.
-
-    All other settings are as in 
-    :func:`~music21.serial.findTransposedMultisets` as well.
-    
-    Returns a deep copy of the inputStream with a 
-    :class:`~music21.spanner.Line` connecting the first and last notes of each 
-    found multiset, and the first note of each found multiset labeled with a 
-    :class:`~music21.note.Lyric`, the label being the key corresponding to the 
-    segment of pitch classes. One should make sure not to call this function 
-    with too large of a segmentDict, as a note being contained in too many 
-    segments will result in some spanners not showing.
-    
-    At the present time a relatively large number of multisets are found using 
-    the 'ignoreAll' setting, particularly when there are many repetitions of 
-    pitch classes (immediate or otherwise). As a result, it is possible that at 
-    points in the stream there will be more than six spanners active 
-    simultaneously, which may result in some spanners not showing correctly in 
-    XML format, or not at all.
-    
-    As a diversion, instead of using this tool on atonal music, let us do so on 
-    Bach.
-    
-    We can label all instances of three of the same pitch classes occurring in 
-    a row in one of the chorales.
-    
-    We learn the obvious - it appears that the alto section would be the most 
-    bored while performing this chorale.
-    
-    >>> bach = corpus.parse('bach/bwv57.8')
-    >>> #_DOCS_SHOW serial.labelTransposedMultisets(bach, {'x3':[0, 0, 0]}, reps='includeAll', includeChords=False).show()
-    
-    .. image:: images/serial-labelTransposedMultisets.png
-        :width: 500
-    
-    Note: the spanners above were moved manually so that they can be more 
-    easily distinguished from one another.
-    '''
-    
-    
-    streamCopy = copy.deepcopy(inputStream)
-    segmentList = [multisetDict[label] for label in multisetDict]
-    segmentsToLabel = findTransposedMultisets(streamCopy, segmentList, reps, includeChords)
-    return _labelGeneral(segmentsToLabel, streamCopy, multisetDict, reps, includeChords)    
-    
-
-def findTransposedAndInvertedMultisets(inputStream, searchList, reps='skipConsecutive', includeChords=True):
-    
-    '''
-    
-    Finds all instances of given multisets of pitch classes, with transpositions and inversions, within a :class:`~music21.stream.Stream`. 
-    A multiset is a generalization of a set, as described in :meth:`~music21.serial.findMultisets`.
-
-    The inputStream is :class:`~music21.stream.Stream`; as in :func:`~music21.serial.getContiguousSegmentsOfLength`,
-    it can contain at most one :class:`~music21.stream.Score`, and
-    its notes must be contained in measures. The multisetList is a list of multisets to
-    be searched for, each multiset being given as a list of pitch classes. Note that the order of pitch classes given in a multiset
-    does not matter. The reps and includeChords settings specify how
-    repeated pitches and chords, respectively, are handled; the possible settings are the same as those in
-    :func:`~music21.serial.getContiguousSegmentsOfLength`.
-    
-    Returns a list of :class:`~music21.serial.ContiguousSegmentOfNotes` objects for some transposition or inversion of the 
-    :attr:`~music21.serial.ContiguousSegmentOfNotes.activeSegment`, interpreted as a multiset,
-    matches at least one of the elements of the searchList,
-    subject to the settings specified in reps and includeChords.
-    
-    
-    >>> s = stream.Stream()
-    >>> n1 = note.Note('c4')
-    >>> n2 = note.Note('e-4')
-    >>> n3 = note.Note('g4')
-    >>> n4 = note.Note('e4')
-    >>> n5 = note.Note('c4')
-    >>> for n in [n1, n2, n3, n4]:
-    ...     n.quarterLength = 1
-    ...     s.append(n)
-    >>> n5.quarterLength = 4
-    >>> s.append(n5)
-    >>> s = s.makeMeasures()
-    >>> #_DOCS_SHOW s.show()
-    
-    .. image:: images/serial-findTransposedAndInvertedMultisets.png
-        :width: 150
-        
-    >>> majTriads = serial.findTransposedAndInvertedMultisets(s, [[0, 4, 7], [0, 3, 7]], 'ignoreAll', includeChords=False)
-    >>> [(maj.segment, maj.startOffset) for maj in majTriads]
-    [([<music21.note.Note G>, <music21.note.Note E>, <music21.note.Note C>], 2.0), 
-    ([<music21.note.Note C>, <music21.note.Note E->, <music21.note.Note G>], 0.0)]
-    >>> [maj.matchedSegment for maj in majTriads]
-    [[0, 4, 7], [0, 4, 7]]
-        
-    Note that when we search for both [0, 4, 7] and [0, 3, 7], which are related to each other
-    by the composition of an inversion and a transposition, each found segment is only matched to one
-    of the multisets in the searchList; thus each found segment appears still appears at most once in the returned list
-    of contiguous segments. Accordingly, calling :attr:`~music21.serial.ContiguousSegmentOfNotes.matchedSegment`
-    returns only one element of the searchList for each found segment.
-    
-    OMIT_FROM_DOCS
-    
-    >>> majAndMinTriads = serial.findTransposedAndInvertedMultisets(s, [[0, 4, 7]], 'rowsOnly', includeChords=True)
-    >>> [maj.segment for maj in majAndMinTriads]
-    [[<music21.note.Note G>, <music21.note.Note E>, <music21.note.Note C>], 
-    [<music21.note.Note C>, <music21.note.Note E->, <music21.note.Note G>]]
-    
-    '''
-    
-    nummultisets = len(searchList)
-    multisets = []
-    donealready = []
-    contigdict = {}
-    
-    for k in range(0, nummultisets):
-        baseMultiset = searchList[k]
-        baseMultisetPitchClasses = pcToToneRow(baseMultiset).pitchClasses()
-        baseMultisetInversion = pcToToneRow(baseMultiset).zeroCenteredTransformation('I', 0).pitchClasses()
-        for l in range(0, 12):
-            multiset = [(l + x) % 12 for x in baseMultisetPitchClasses]
-            length = len(multiset)
-            used = False
-            for usedset in donealready:
-                if used == False:
-                    if _checkMultisetEquivalence(usedset, multiset) == True:
-                        used = True
-            if used == False:
-                donealready.append(multiset)
-                length = len(multiset)
-                if length in contigdict:
-                    contig = contigdict[length]
-                else:
-                    contig = getContiguousSegmentsOfLength(inputStream, length, reps, includeChords)
-                    contigdict[length] = contig
-                for contiguousseg in contig:
-                    if reps == 'ignoreAll':
-                        segment = contiguousseg.segment
-                        pitchList = contiguousseg.getDistinctPitchClasses()
-    #                    if len(set([p.pitchClass for p in segment[0].pitches]) and set(multiset)) != 0:
-    #                        if len(set([p.pitchClass for p in segment[-1].pitches]) and set(multiset)) != 0:
-                        matched = False
-                        for i in range(0, len(pitchList) - len(multiset) + 1):
-                            if matched == False:
-                                subsetToCheck = pitchList[i:i+len(multiset)]
-                                if _checkMultisetEquivalence(multiset, subsetToCheck) == True:
-                                    if len(segment) == 1:
-                                        matched = True
-                                        contiguousseg.activeSegment = subsetToCheck
-                                        contiguousseg.matchedSegment = baseMultiset
-                                        multisets.append(contiguousseg)
-                                    else:
-                                        multiset = pcToToneRow(multiset).pitchClasses()
-                                        if segment[0].pitches[-1].pitchClass in multiset:
-                                            if segment[-1].pitches[0].pitchClass in multiset:
-                                                middleseg = ContiguousSegmentOfNotes(list(segment[1:len(segment)-1]), None, None)
-                                                listOfPitchClasses = middleseg.readPitchClassesFromBottom()
-                                                doneAddingFirst = False
-                                                firstChordPitches = segment[0].pitches
-                                                for j in range(1, len(firstChordPitches) + 1):
-                                                    if doneAddingFirst == False:
-                                                        if firstChordPitches[-j].pitchClass in multiset:
-                                                            listOfPitchClasses.append(firstChordPitches[-j].pitchClass)
-                                                        else:
-                                                            doneAddingFirst = True
-                                                doneAddingLast = False
-                                                lastChordPitches = segment[-1].pitches
-                                                for k in range(0, len(lastChordPitches)):
-                                                    if doneAddingLast == False:
-                                                        if lastChordPitches[k].pitchClass in multiset:
-                                                            listOfPitchClasses.append(lastChordPitches[k].pitchClass)
-                                                        else:
-                                                            doneAddingLast = True
-                                                if set(listOfPitchClasses) == set(multiset):
-                                                    matched = True
-                                                    contiguousseg.activeSegment = subsetToCheck
-                                                    contiguousseg.matchedSegment = baseMultiset
-                                                    multisets.append(contiguousseg)
-                    else:
-                        segment = contiguousseg.segment
-                        pitchList = contiguousseg.readPitchClassesFromBottom()
-                        matched = False
-                        lowerBound = max([0, len(pitchList) - length - len(segment[-1].pitches) + 1])
-                        upperBound = min([len(segment[0].pitches) - 1, len(pitchList) - length])
-                        for j in range(lowerBound, upperBound + 1):
-                            if matched == False:
-                                subsetToCheck = pitchList[j:j+length]
-                                if _checkMultisetEquivalence(subsetToCheck, multiset) == True:
-                                    matched = True
-                                    contiguousseg.activeSegment = subsetToCheck
-                                    contiguousseg.matchedSegment = baseMultiset
-                                    multisets.append(contiguousseg)
-        for l in range(0, 12):
-            multiset = [(l + x) % 12 for x in baseMultisetInversion]
-            length = len(multiset)
-            used = False
-            for usedset in donealready:
-                if used == False:
-                    if _checkMultisetEquivalence(usedset, multiset) == True:
-                        used = True
-            if used == False:
-                donealready.append(multiset)
-                length = len(multiset)
-                if length in contigdict:
-                    contig = contigdict[length]
-                else:
-                    contig = getContiguousSegmentsOfLength(inputStream, length, reps, includeChords)
-                    contigdict[length] = contig
-                for contiguousseg in contig:
-                    if reps == 'ignoreAll':
-                        segment = contiguousseg.segment
-                        pitchList = contiguousseg.getDistinctPitchClasses()
-    #                    if len(set([p.pitchClass for p in segment[0].pitches]) and set(multiset)) != 0:
-    #                        if len(set([p.pitchClass for p in segment[-1].pitches]) and set(multiset)) != 0:
-                        matched = False
-                        for i in range(0, len(pitchList) - len(multiset) + 1):
-                            if matched == False:
-                                subsetToCheck = pitchList[i:i+len(multiset)]
-                                if _checkMultisetEquivalence(multiset, subsetToCheck) == True:
-                                    if len(segment) == 1:
-                                        matched = True
-                                        contiguousseg.activeSegment = subsetToCheck
-                                        contiguousseg.matchedSegment = baseMultiset
-                                        multisets.append(contiguousseg)
-                                    else:
-                                        multiset = pcToToneRow(multiset).pitchClasses()
-                                        if segment[0].pitches[-1].pitchClass in multiset:
-                                            if segment[-1].pitches[0].pitchClass in multiset:
-                                                middleseg = ContiguousSegmentOfNotes(list(segment[1:len(segment)-1]), None, None)
-                                                listOfPitchClasses = middleseg.readPitchClassesFromBottom()
-                                                doneAddingFirst = False
-                                                firstChordPitches = segment[0].pitches
-                                                for j in range(1, len(firstChordPitches) + 1):
-                                                    if doneAddingFirst == False:
-                                                        if firstChordPitches[-j].pitchClass in multiset:
-                                                            listOfPitchClasses.append(firstChordPitches[-j].pitchClass)
-                                                        else:
-                                                            doneAddingFirst = True
-                                                doneAddingLast = False
-                                                lastChordPitches = segment[-1].pitches
-                                                for k in range(0, len(lastChordPitches)):
-                                                    if doneAddingLast == False:
-                                                        if lastChordPitches[k].pitchClass in multiset:
-                                                            listOfPitchClasses.append(lastChordPitches[k].pitchClass)
-                                                        else:
-                                                            doneAddingLast = True
-                                                if set(listOfPitchClasses) == set(multiset):
-                                                    matched = True
-                                                    contiguousseg.activeSegment = subsetToCheck
-                                                    contiguousseg.matchedSegment = baseMultiset
-                                                    multisets.append(contiguousseg)
-                    else:
-                        segment = contiguousseg.segment
-                        pitchList = contiguousseg.readPitchClassesFromBottom()
-                        matched = False
-                        lowerBound = max([0, len(pitchList) - length - len(segment[-1].pitches) + 1])
-                        upperBound = min([len(segment[0].pitches) - 1, len(pitchList) - length])
-                        for j in range(lowerBound, upperBound + 1):
-                            if matched == False:
-                                subsetToCheck = pitchList[j:j+length]
-                                if _checkMultisetEquivalence(subsetToCheck, multiset) == True:
-                                    matched = True
-                                    contiguousseg.activeSegment = subsetToCheck
-                                    contiguousseg.matchedSegment = baseMultiset
-                                    multisets.append(contiguousseg)
-    return multisets
-
-def labelTransposedAndInvertedMultisets(inputStream, 
-                                        multisetDict, 
-                                        reps='skipConsecutive', 
-                                        includeChords=True):    
-    '''
-    Labels all instances of a given collection of multisets, with 
-    transpositions and inversions, of pitch classes in a
-    :class:`~music21.stream.Stream`.
-
-    A multiset is a generalization of a set, as described in 
-    :meth:`~music21.serial.findMultisets`.
-    
-    The multisetDict is a dictionary whose keys are names of the multisets to
-    be searched for, and whose values are the segments of pitch classes. The 
-    values will be turned in to a segmentList, as in 
-    :func:`~music21.serial.findMultisets`.
-
-    All other settings are as in 
-    :func:`~music21.serial.findTransposedMultisets` as well.
-    
-    Returns a deep copy of the inputStream with a 
-    :class:`~music21.spanner.Line` connecting the first and last notes of each
-    found multiset, and the first note of each found multiset labeled with a 
-    :class:`~music21.note.Lyric`, the label being the key corresponding to the 
-    segment of pitch classes. One should make sure not to call this function 
-    with too large of a segmentDict, as a note being contained in too many 
-    segments will result in some spanners not showing.
-    
-    At the present time a relatively large number of multisets are found using 
-    the 'ignoreAll' setting, particularly when there are many repetitions of 
-    pitch classes (immediate or otherwise).
-
-    As a result, it is possible that at points in the stream there will be more 
-    than six spanners active simultaneously, which may result in some spanners 
-    not showing correctly in XML format, or not at all.
-    
-    >>> s = stream.Stream()
-    >>> n1 = note.Note('c4')
-    >>> n2 = note.Note('e-4')
-    >>> n3 = note.Note('g4')
-    >>> n4 = note.Note('e4')
-    >>> n5 = note.Note('c4')
-    >>> for n in [n1, n2, n3, n4]:
-    ...     n.quarterLength = 1
-    ...     s.append(n)
-    >>> n5.quarterLength = 4
-    >>> s.append(n5)
-    >>> s = s.makeMeasures()
-    >>> #_DOCS_SHOW serial.labelTransposedAndInvertedMultisets(s, {'triad':[0, 4, 7]}, includeChords=False).show()
-        
-    .. image:: images/serial-labelTransposedAndInvertedMultisets.png
-       :width: 500
-    
-    Note: the spanners above were moved manually so that they can be more 
-    easily distinguished from one another.
-    '''
-    
-    
-    streamCopy = copy.deepcopy(inputStream)
-    segmentList = [multisetDict[label] for label in multisetDict]
-    segmentsToLabel = findTransposedAndInvertedMultisets(streamCopy, segmentList, reps, includeChords)
-    return _labelGeneral(segmentsToLabel, streamCopy, multisetDict, reps, includeChords)   
-      
-#---------------------------------------------------------------------            
-
 
 class HistoricalTwelveToneRow(TwelveToneRow):
     
     '''
-    Subclass of :class:`~music21.serial.TwelveToneRow` storing additional attributes of a twelve-tone row used in the historical literature.
+    Subclass of :class:`~music21.serial.TwelveToneRow` storing additional attributes of a 
+    twelve-tone row used in the historical literature.
     
     '''
     
@@ -3428,9 +1080,11 @@ def getHistoricalRowByName(rowName):
     
     '''
     Given the name referring to a twelve-tone row used in the historical literature,
-    returns a :class:`~music21.serial.HistoricalTwelveToneRow` object with attributes describing the row.
+    returns a :class:`~music21.serial.HistoricalTwelveToneRow` object with attributes 
+    describing the row.
     
-    The names of the rows with stored attributes are below (each must be passed as a string, in single quotes).
+    The names of the rows with stored attributes are below (each must be passed as a string, 
+    in single quotes).
     
     >>> for r in sorted(list(serial.historicalDict)):
     ...     print(r)   
@@ -3605,24 +1259,6 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-    def testCarlCode(self):
-        part = stream.Part()
-        n1 = note.Note('e4')
-        n1.quarterLength = 4
-        n2 = note.Note('e4')
-        n2.quarterLength = 4
-        n3 = note.Note('f4')
-        n3.quarterLength = 4
-        n4 = note.Note('e4')
-        n4.quarterLength = 4
-        part.append(n1)
-        part.append(n2)
-        part.append(n3)
-        part.append(n4)
-        part.makeMeasures(inPlace = True)
-        EEF = findMultisets(part, [[5, 4, 4]], 'includeAll', includeChords=False)
-        unused = [(seg.activeSegment, seg.startMeasureNumber) for seg in EEF]
-        # TODO: Test this?
 
 #    def testRows(self):
 #        from music21 import interval
@@ -3655,7 +1291,8 @@ class Test(unittest.TestCase):
         self.assertEqual([p.name for p in src], 
             ['D', 'C#', 'A', 'B-', 'F', 'E-', 'E', 'C', 'G#', 'G', 'F#', 'B'])
         s37 = getHistoricalRowByName('RowSchoenbergOp37').matrix()
-        self.assertEqual([e.name for e in s37[0]], ['C', 'B', 'G', 'G#', 'E-', 'C#', 'D', 'B-', 'F#', 'F', 'E', 'A'])
+        self.assertEqual([e.name for e in s37[0]], ['C', 'B', 'G', 'G#', 'E-', 'C#', 'D', 'B-', 
+                                                    'F#', 'F', 'E', 'A'])
 
 
     def testLabelingA(self):
@@ -3671,7 +1308,10 @@ class Test(unittest.TestCase):
         match = []
         for n in s.parts[0].flat.notes:
             match.append(n.lyric)
-        self.assertEqual(match, ['10', '12', '1', '12', '10', '7', '10', '12', '1', '10', '1', '12', '4', '2', '1', '12', '12', '2', '7', '1', '12', '10', '10', '1', '12', '10', '1', '4', '2', '4', '2', '2', '2', '2', '2', '5', '2'])
+        self.assertEqual(match, ['10', '12', '1', '12', '10', '7', '10', '12', '1', '10', '1', 
+                                 '12', '4', '2', '1', '12', '12', '2', '7', '1', '12', '10', 
+                                 '10', '1', '12', '10', '1', '4', '2', '4', '2', '2', '2', 
+                                 '2', '2', '5', '2'])
         #s.show()
     
     def testHistorical(self):
@@ -3691,8 +1331,8 @@ class Test(unittest.TestCase):
         aRow = getHistoricalRowByName('RowBergViolinConcerto')
         #aMatrix = aRow.matrix()
         bStream = stream.Stream()
-        for i in range(0,12,3):
-            aRow2 = aRow[i:i+3]
+        for i in range(0, 12, 3):
+            aRow2 = aRow[i:i + 3]
             c = chord.Chord(aRow2)
             c.addLyric(c.primeFormString)
             c.addLyric(c.forteClass)
@@ -3720,13 +1360,6 @@ class Test(unittest.TestCase):
 # define presented order in documentation
 _DOC_ORDER = ['ToneRow', 'TwelveToneRow', 'HistoricalTwelveToneRow', 'ContiguousSegmentOfNotes',
               'pcToToneRow', 'TwelveToneMatrix', 'rowToMatrix', 'getHistoricalRowByName', 
-              'getContiguousSegmentsOfLength',
-              'findSegments', 'labelSegments',
-              'findTransposedSegments', 'labelTransposedSegments',
-              'findTransformedSegments', 'labelTransformedSegments',
-              'findMultisets', 'labelMultisets',
-              'findTransposedMultisets', 'labelTransposedMultisets',
-              'findTransposedAndInvertedMultisets', 'labelTransposedAndInvertedMultisets'
               ]
 
 if __name__ == "__main__":

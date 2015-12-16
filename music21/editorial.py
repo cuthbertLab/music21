@@ -119,13 +119,19 @@ class NoteEditorial(SlottedObject):
     '''
 
     _DOC_ATTR = {
-        'color': 'the color of the note (x11 colors and extended x11colors are allowed), only displays properly in lilypond',
+        'color': 'the color of the note (RGP, x11 colors, and extended x11colors are allowed)',
         'comment': 'a reference to a :class:`~music21.editorial.Comment` object',
-        'ficta': 'a :class:`~music21.pitch.Accidental` object that specifies musica ficta for the note.  Will only be displayed in LilyPond and then only if there is no Accidental object on the note itself',
-        'hidden': 'boolean value about whether to hide the note or not (only works in lilypond)',
-        'harmonicInterval': 'an :class:`~music21.interval.Interval` object that specifies the harmonic interval between this note and a single other note (useful for storing information post analysis',
+        'ficta': '''a :class:`~music21.pitch.Accidental` object that specifies musica 
+            ficta for the note.  Will only be displayed in LilyPond and then only if 
+            there is no Accidental object on the note itself''',
+        'hidden': '''boolean value about whether to hide the 
+            note or not (only works in lilypond)''',
+        'harmonicInterval': '''an :class:`~music21.interval.Interval` object that specifies 
+            the harmonic interval between this note and a single other note 
+            (useful for storing information post analysis)''',
         'harmonicIntervals': 'a list for when you want to store more than one harmonicInterval',
-        'melodicInterval': 'an :class:`~music21.interval.Interval` object that specifies the melodic interval to the next note in this part/voice/stream, etc.',
+        'melodicInterval': '''an :class:`~music21.interval.Interval` object that specifies 
+            the melodic interval to the next note in this part/voice/stream, etc.''',
         'melodicIntervals': 'a list for storing more than one melodic interval',
         'melodicIntervalsOverRests': 'same thing but a list',
         'misc': 'A dict to hold anything you might like to store.',
@@ -204,9 +210,10 @@ class NoteEditorial(SlottedObject):
         Returns any information that should be attached under the note,
         currently just returns self.comment.lily or "".
         '''
+        # pylint: disable=undefined-variable
         if self.comment and self.comment.text:
             if six.PY2:
-                return unicode(self.comment.lily) # pylint: disable=undefined-variable
+                return unicode(self.comment.lily) # @UndefinedVariable
             else:
                 return str(self.comment.lily)
         else:

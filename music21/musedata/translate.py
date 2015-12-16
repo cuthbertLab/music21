@@ -44,7 +44,8 @@ def _musedataBeamToBeams(beamSymbol):
     >>> translate._musedataBeamToBeams('[[')
     <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
     >>> translate._musedataBeamToBeams('===')
-    <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>/<music21.beam.Beam 3/continue>>
+    <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 
+            2/continue>/<music21.beam.Beam 3/continue>>
 
     >>> translate._musedataBeamToBeams(r']/') # must escape backslash
     <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/right>>
@@ -84,7 +85,8 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
     '''Given a list of MuseDataRecord objects, return a configured
     :class:`~music21.note.Note` or :class:`~music21.chord.Chord`.
 
-    Optionally pass a previous element, which may be music21 Note, Chord, or Rest; this is used to determine tie status
+    Optionally pass a previous element, which may be music21 Note, Chord, or Rest; 
+    this is used to determine tie status
     '''
     from music21 import note
     from music21 import chord
@@ -170,6 +172,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
 
     p = stream.Part()
     p.id = museDataPart.getPartName()
+    p.partName = p.id
 
     # create and store objects
     mdmObjs = museDataPart.getMeasures()
@@ -293,7 +296,8 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
             # can only do this b/c ts is defined
             if m.barDurationProportion() < 1.0:
                 m.padAsAnacrusis()
-                #environLocal.printDebug(['incompletely filled Measure found on musedata import; interpreting as a anacrusis:', 'padingLeft:', m.paddingLeft])
+                #environLocal.printDebug(['incompletely filled Measure found on musedata import; ',
+                #   'interpreting as a anacrusis:', 'padingLeft:', m.paddingLeft])
         p._appendCore(m)
         barCount += 1
 
@@ -321,12 +325,16 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
 
 
 def museDataWorkToStreamScore(museDataWork, inputM21=None):
-    '''Given an museDataWork object, build into a multi-part :class:`~music21.stream.Score` with metadata.
+    '''
+    Given an museDataWork object, build into a multi-part 
+    :class:`~music21.stream.Score` with metadata.
 
-    This assumes that this MuseDataHandler defines a single work (with 1 or fewer reference numbers). 
+    This assumes that this MuseDataHandler defines a single work 
+    (with 1 or fewer reference numbers). 
     
     if the optional parameter inputM21 is given a music21 Stream subclass, it will use that object
-    as the outermost object.  However, inner parts will always be made :class:`~music21.stream.Part` objects.
+    as the outermost object.  However, inner parts will always be 
+    made :class:`~music21.stream.Part` objects.
     '''
     from music21 import stream
     from music21 import metadata
@@ -370,7 +378,8 @@ class Test(unittest.TestCase):
         from music21 import common
         #from music21.musicxml import m21ToString
 
-        fp1 = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01', '01.md')
+        fp1 = os.path.join(common.getSourceFilePath(), 
+                           'musedata', 'testPrimitive', 'test01', '01.md')
         mdw = musedata.MuseDataWork()
         mdw.addFile(fp1)
         
@@ -425,13 +434,16 @@ class Test(unittest.TestCase):
     def testGetBeams(self):
         # try single character conversion
         post = _musedataBeamToBeams('=')
-        self.assertEqual(str(post), '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
+        self.assertEqual(str(post), 
+            '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
 
         post = _musedataBeamToBeams(']\\')
-        self.assertEqual(str(post), '<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/left>>')
+        self.assertEqual(str(post), 
+            '<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/left>>')
 
         post = _musedataBeamToBeams(']/')
-        self.assertEqual(str(post), '<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/right>>')
+        self.assertEqual(str(post), 
+            '<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/right>>')
 
 
 #         s = corpus.parse('hwv56', '1-18')
@@ -444,13 +456,17 @@ class Test(unittest.TestCase):
 # 
 #         # the bottom part has 8ths beamed two to a bar
 #         self.assertEqual(str(s.parts[4].getElementsByClass(
-#             'Measure')[3].notesAndRests[0].beams), '<music21.beam.Beams <music21.beam.Beam 1/start>>')
+#             'Measure')[3].notesAndRests[0].beams),
+#             '<music21.beam.Beams <music21.beam.Beam 1/start>>')
 #         self.assertEqual(str(s.parts[4].getElementsByClass(
-#             'Measure')[3].notesAndRests[1].beams), '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
+#             'Measure')[3].notesAndRests[1].beams),
+#             '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
 #         self.assertEqual(str(s.parts[4].getElementsByClass(
-#             'Measure')[3].notesAndRests[2].beams), '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
+#             'Measure')[3].notesAndRests[2].beams),
+#             '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
 #         self.assertEqual(str(s.parts[4].getElementsByClass(
-#             'Measure')[3].notesAndRests[3].beams), '<music21.beam.Beams <music21.beam.Beam 1/stop>>')
+#             'Measure')[3].notesAndRests[3].beams),
+#             '<music21.beam.Beams <music21.beam.Beam 1/stop>>')
 # 
 #         #s.show()
 #         # test that stage1 files continue to have makeBeams called
@@ -461,11 +477,14 @@ class Test(unittest.TestCase):
 #         #s.parts[0].getElementsByClass('Measure')[1].show()
 # 
 #         self.assertEqual(str(s.parts[0].getElementsByClass(
-#             'Measure')[1].notesAndRests[0].beams), '<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>')
+#             'Measure')[1].notesAndRests[0].beams), 
+#             '<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>')
 #         self.assertEqual(str(s.parts[0].getElementsByClass(
-#             'Measure')[1].notesAndRests[1].beams), '<music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>')
+#             'Measure')[1].notesAndRests[1].beams),
+#             '<music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>')
 #         self.assertEqual(str(s.parts[0].getElementsByClass(
-#             'Measure')[1].notesAndRests[2].beams), '<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>')
+#             'Measure')[1].notesAndRests[2].beams),
+#             '<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>')
 
 
 
@@ -476,7 +495,8 @@ class Test(unittest.TestCase):
         pass
 #         s = corpus.parse('bwv1080', '16')
 #         self.assertEqual(len(s.parts[0].getKeySignatures()), 1)
-#         self.assertEqual(str(s.parts[0].getKeySignatures()[0]), '<music21.key.KeySignature of 1 flat>')
+#         self.assertEqual(str(s.parts[0].getKeySignatures()[0]), 
+#                '<music21.key.KeySignature of 1 flat>')
 # 
 #         notes = s.parts[0].flat.notesAndRests
 #         self.assertEqual(str(notes[2].accidental), '<accidental sharp>')
@@ -502,7 +522,8 @@ class Test(unittest.TestCase):
 #         fpDir = os.path.join(common.getSourceFilePath(), 'musedata', 'testPrimitive', 'test01')
 #         s = converter.parse(fpDir)
 #         p = s.parts['Clarinet in A']
-#         self.assertEqual(str(p.getElementsByClass('Measure')[0].keySignature), '<music21.key.KeySignature of 3 sharps>')
+#         self.assertEqual(str(p.getElementsByClass('Measure')[0].keySignature),
+#             '<music21.key.KeySignature of 3 sharps>')
 #         self.assertEqual(str(p.flat.notesAndRests[0]), '<music21.note.Note A>')
 
         #s.show()
@@ -534,26 +555,34 @@ class Test(unittest.TestCase):
 #         s = corpus.parse('k168', 1)
 # 
 #         self.assertEqual(len(s.parts), 4)
-#         self.assertEqual(str(s.parts[0].flat.getElementsByClass('TimeSignature')[0]), '<music21.meter.TimeSignature 4/4>')
+#         self.assertEqual(str(s.parts[0].flat.getElementsByClass('TimeSignature')[0]), 
+#                '<music21.meter.TimeSignature 4/4>')
 #     
-#         self.assertEqual([n.offset for n in s.parts[0].getElementsByClass('Measure')[0].notes], [0.0, 3.0, 3.5, 3.75])
+#         self.assertEqual([n.offset for 
+#            n in s.parts[0].getElementsByClass('Measure')[0].notes], [0.0, 3.0, 3.5, 3.75])
 # 
-#         self.assertEqual([n.nameWithOctave for n in s.parts[0].getElementsByClass('Measure')[0].notes], ['F5', 'F5', 'E5', 'D5'])
+#         self.assertEqual([n.nameWithOctave for 
+#                n in s.parts[0].getElementsByClass('Measure')[0].notes], ['F5', 'F5', 'E5', 'D5'])
 # 
-#         self.assertEqual([n.offset for n in s.parts[1].getElementsByClass('Measure')[0].notes], [1.0, 2.0, 3.0])
+#         self.assertEqual([n.offset for n in s.parts[1].getElementsByClass('Measure')[0].notes], 
+#                [1.0, 2.0, 3.0])
 
 #     def testMuseDataStage1B(self):
 #         from music21 import corpus
 #         s = corpus.parse('k169', 3)
 #         
 #         self.assertEqual(len(s.parts), 4)
-#         self.assertEqual(str(s.parts[0].flat.getElementsByClass('TimeSignature')[0]), '<music21.meter.TimeSignature 3/4>')
+#         self.assertEqual(str(s.parts[0].flat.getElementsByClass('TimeSignature')[0]),
+#             '<music21.meter.TimeSignature 3/4>')
 #     
-#         self.assertEqual([n.offset for n in s.parts[0].getElementsByClass('Measure')[0].notes], [0.0, 2.0])
+#         self.assertEqual([n.offset for n in s.parts[0].getElementsByClass('Measure')[0].notes], 
+#                [0.0, 2.0])
 # 
-#         self.assertEqual([n.nameWithOctave for n in s.parts[0].getElementsByClass('Measure')[0].notes], ['A4', 'B4'])
+#         self.assertEqual([n.nameWithOctave for 
+#                    n in s.parts[0].getElementsByClass('Measure')[0].notes], ['A4', 'B4'])
 # 
-#         self.assertEqual([n.offset for n in s.parts[2].getElementsByClass('Measure')[0].notes], [0.0, 1.0, 2.0])
+#         self.assertEqual([n.offset for n in s.parts[2].getElementsByClass('Measure')[0].notes], 
+#            [0.0, 1.0, 2.0])
 
 
 

@@ -59,15 +59,22 @@ def runTranscribe(show=True, plot=True, useMic=True,
     
     # the rest of the score
     if useMic is True:
-        freqFromAQList = audioSearchBase.getFrequenciesFromMicrophone(length=seconds, storeWaveFilename=WAVE_FILENAME)
+        freqFromAQList = audioSearchBase.getFrequenciesFromMicrophone(
+                                                  length=seconds, 
+                                                  storeWaveFilename=WAVE_FILENAME)
     else:
         freqFromAQList = audioSearchBase.getFrequenciesFromAudioFile(waveFilename=WAVE_FILENAME)
         
     detectedPitchesFreq = audioSearchBase.detectPitchFrequencies(freqFromAQList, useScale)
     detectedPitchesFreq = audioSearchBase.smoothFrequencies(detectedPitchesFreq)
-    (detectedPitchObjects, listplot) = audioSearchBase.pitchFrequenciesToObjects(detectedPitchesFreq, useScale)
-    (notesList, durationList) = audioSearchBase.joinConsecutiveIdenticalPitches(detectedPitchObjects)
-    myScore, unused_length_part = audioSearchBase.notesAndDurationsToStream(notesList, durationList, removeRestsAtBeginning=True)    
+    (detectedPitchObjects, 
+        listplot) = audioSearchBase.pitchFrequenciesToObjects(detectedPitchesFreq, useScale)
+    (notesList, 
+        durationList) = audioSearchBase.joinConsecutiveIdenticalPitches(detectedPitchObjects)
+    myScore, unused_length_part = audioSearchBase.notesAndDurationsToStream(
+                                                            notesList, 
+                                                            durationList, 
+                                                            removeRestsAtBeginning=True)    
 
     if show == True:
         myScore.show()        
@@ -95,9 +102,9 @@ def monophonicStreamFromFile(fileName, useScale=None):
 
     We demonstrate with an audio file beginning with an ascending scale.
     
-    >>> import os
     >>> import os #_DOCS_HIDE
-    >>> waveFile = common.getSourceFilePath() + os.path.sep + 'audioSearch' + os.path.sep + 'test_audio.wav' #_DOCS_HIDE
+    >>> taw = 'test_audio.wav' #_DOCS_HIDE
+    >>> waveFile = os.path.join(common.getSourceFilePath(), 'audioSearch', taw) #_DOCS_HIDE
     >>> #_DOCS_SHOW waveFile = 'test_audio.wav'
     >>> p = audioSearch.transcriber.monophonicStreamFromFile(waveFile)
     >>> p
@@ -120,9 +127,12 @@ def monophonicStreamFromFile(fileName, useScale=None):
         
     detectedPitchesFreq = audioSearchBase.detectPitchFrequencies(freqFromAQList, useScale)
     detectedPitchesFreq = audioSearchBase.smoothFrequencies(detectedPitchesFreq)
-    (detectedPitchObjects, unused_listplot) = audioSearchBase.pitchFrequenciesToObjects(detectedPitchesFreq, useScale)
-    (notesList, durationList) = audioSearchBase.joinConsecutiveIdenticalPitches(detectedPitchObjects)
-    myScore, unused_length_part = audioSearchBase.notesAndDurationsToStream(notesList, durationList, removeRestsAtBeginning=True)    
+    (detectedPitchObjects, 
+        unused_listplot) = audioSearchBase.pitchFrequenciesToObjects(detectedPitchesFreq, useScale)
+    (notesList, 
+        durationList) = audioSearchBase.joinConsecutiveIdenticalPitches(detectedPitchObjects)
+    myScore, unused_length_part = audioSearchBase.notesAndDurationsToStream(
+                                        notesList, durationList, removeRestsAtBeginning=True)    
     return myScore.parts[0]
 
 

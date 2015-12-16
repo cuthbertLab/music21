@@ -12,20 +12,20 @@
 #-------------------------------------------------------------------------------
 '''
 The various Scale objects provide a bi-directional object representation 
-of octave repeating and non-octave repeating scales built by network of 
-:class:`~music21.interval.Interval` objects as modeled in 
-:class:`~music21.intervalNetwork.IntervalNetwork`.
+of octave repeating and non-octave repeating scales built by network 
+of :class:`~music21.interval.Interval` objects as modeled 
+in :class:`~music21.intervalNetwork.IntervalNetwork`.
 
 
-The main public interface to these resources are subclasses of
-:class:`~music21.scale.ConcreteScale`, such as 
-:class:`~music21.scale.MajorScale`, :class:`~music21.scale.MinorScale`, 
+The main public interface to these resources are subclasses 
+of :class:`~music21.scale.ConcreteScale`, such 
+as :class:`~music21.scale.MajorScale`, :class:`~music21.scale.MinorScale`, 
 and :class:`~music21.scale.MelodicMinorScale`.
 
 
-More unusual scales are also available, such as 
-:class:`~music21.scale.OctatonicScale`, 
-:class:`~music21.scale.SieveScale`, and :class:`~music21.scale.RagMarwa`.
+More unusual scales are also available, such 
+as :class:`~music21.scale.OctatonicScale`, :class:`~music21.scale.SieveScale`, 
+and :class:`~music21.scale.RagMarwa`.
 
 
 All :class:`~music21.scale.ConcreteScale` subclasses provide the ability 
@@ -108,11 +108,12 @@ class Scale(base.Music21Object):
         without a defined tonic.
         ''')
 
-    def extractPitchList(self, other, comparisonAttribute='nameWithOctave', removeDuplicates = True):
+    def extractPitchList(self, other, comparisonAttribute='nameWithOctave', removeDuplicates=True):
         '''
         Utility function:
         
-        Given a data format as "other" (a ConcreteScale, Chord, Stream, List of Pitches, or single Pitch), 
+        Given a data format as "other" (a ConcreteScale, Chord, Stream, List of Pitches, 
+        or single Pitch), 
         extract all unique Pitches using comparisonAttribute to test for them.
         
         
@@ -136,9 +137,10 @@ class Scale(base.Music21Object):
         >>> [str(p) for p in sc.extractPitchList(s, comparisonAttribute='pitchClass')]
         ['A4', 'D4', 'E4', 'D#4']
 
-        Now let's get rid of all but one diatonic `D` by using :meth:`~music21.pitch.Pitch.step` as our
-        `comparisonAttribute`.  Note that we can just give a list of strings as well, and they become
-        :class:`~music21.pitch.Pitch` objects:        
+        Now let's get rid of all but one diatonic `D` 
+        by using :meth:`~music21.pitch.Pitch.step` as our
+        `comparisonAttribute`.  Note that we can just give a list of 
+        strings as well, and they become :class:`~music21.pitch.Pitch` objects:        
         
         >>> [str(p) for p in sc.extractPitchList(pStrList, comparisonAttribute='step')]
         ['A4', 'D4', 'E4', 'F-4']
@@ -269,14 +271,20 @@ class AbstractScale(Scale):
 
 
     def _buildNetwork(self):
-        '''Calling the _buildNetwork, with or without parameters, is main job of the AbstractScale class.
+        '''
+        Calling the _buildNetwork, with or without parameters, 
+        is main job of the AbstractScale class.  This needs to be subclassed by a derived class
+        
+        todo: make @abc.abstractmethod
         '''
         pass
 
     def buildNetworkFromPitches(self, pitchList):
         '''
-        Builds the network (list of motions) for an abstract scale from a list of pitch.Pitch objects.  If
-        the concluding note (usually the "octave") is not given, then it'll be created automatically.
+        Builds the network (list of motions) for an abstract scale 
+        from a list of pitch.Pitch objects.  If
+        the concluding note (usually the "octave") is not given, 
+        then it'll be created automatically.
         
         
         Here we treat the augmented triad as a scale:
@@ -352,7 +360,8 @@ class AbstractScale(Scale):
 #             else:
 #                 self.octaveDuplicating == False
         
-        #environLocal.printDebug(['intervalList', intervalList, 'self.octaveDuplicating', self.octaveDuplicating])
+        #environLocal.printDebug(['intervalList', intervalList, 
+        #                        'self.octaveDuplicating', self.octaveDuplicating])
         self._net = intervalNetwork.IntervalNetwork(intervalList,
                     octaveDuplicating=self.octaveDuplicating)
 
@@ -379,17 +388,17 @@ class AbstractScale(Scale):
         one has a .ps above the previous:
         
         >>> sc = scale.AbstractScale()
-        >>> pitchList2 = sc.fixDefaultOctaveForPitchList(pitchList)
-        >>> (pitchList2[1].implicitOctave, pitchList2[2].implicitOctave, pitchList2[3].implicitOctave)
+        >>> pl2 = sc.fixDefaultOctaveForPitchList(pitchList)
+        >>> (pl2[1].implicitOctave, pl2[2].implicitOctave, pl2[3].implicitOctave)
         (4, 5, 5)        
-        >>> (pitchList2[1].ps, pitchList2[2].ps)
+        >>> (pl2[1].ps, pl2[2].ps)
         (71.0, 72.0)
 
         Note that the list is modified inPlace:
         
-        >>> pitchList is pitchList2
+        >>> pitchList is pl2
         True
-        >>> pitchList[2] is pitchList2[2]
+        >>> pitchList[2] is pl2[2]
         True
         '''
         ## fix defaultOctave for pitchList
@@ -485,7 +494,9 @@ class AbstractScale(Scale):
         direction=DIRECTION_ASCENDING, minPitch=None, maxPitch=None):        
         '''
         Given one or more scale degrees, return a list of 
-        all matches over the entire range.  See :meth:`~music21.intervalNetwork.IntervalNetwork.realizePitchByDegree`.
+        all matches over the entire range.  
+        
+        See :meth:`~music21.intervalNetwork.IntervalNetwork.realizePitchByDegree`.
         in `intervalNetwork.IntervalNetwork`.
 
         Create an abstract pentatonic scale:
@@ -611,7 +622,8 @@ class AbstractScale(Scale):
         return self._net.getNetworkxGraph()
 
     networkxGraph = property(_getNetworkxGraph, doc='''
-        Return a networks Graph object representing a realized version of this :class:`~music21.intervalNetwork.IntervalNetwork`.
+        Return a networks Graph object representing a realized version 
+        of this :class:`~music21.intervalNetwork.IntervalNetwork`.
         ''')
 
 
@@ -635,7 +647,8 @@ class AbstractScale(Scale):
         g = graph.GraphNetworxGraph( 
             networkxGraph=self._getNetworkxGraph(), *args, **keywords)
             # for pitched version
-            #networkxGraph=self._getNetworkxRealizedGraph(pitchObj=pitchObj, nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch))
+            #networkxGraph=self._getNetworkxRealizedGraph(pitchObj=pitchObj, 
+            #    nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch))
         g.process()
 
 
@@ -916,7 +929,9 @@ class AbstractMelodicMinorScale(AbstractScale):
 
 
 class AbstractCyclicalScale(AbstractScale):
-    '''A scale of any size built with an interval list of any form. The resulting scale may be non octave repeating.
+    '''
+    A scale of any size built with an interval list of any form. 
+    The resulting scale may be non octave repeating.
     '''
     def __init__(self, mode=None):
         AbstractScale.__init__(self)
@@ -979,12 +994,6 @@ class AbstractOctaveRepeatingScale(AbstractScale):
         self.tonicDegree = 1
         self._net = intervalNetwork.IntervalNetwork(mode, 
                         octaveDuplicating=self.octaveDuplicating)
-
-
-
-
-
-
 
 
 class AbstractRagAsawari(AbstractScale):
@@ -1064,7 +1073,8 @@ class AbstractRagAsawari(AbstractScale):
 
 
 class AbstractRagMarwa(AbstractScale):
-    '''A pseudo raga-scale. 
+    '''
+    A pseudo raga-scale. 
     '''
     def __init__(self):
         AbstractScale.__init__(self)
@@ -1203,11 +1213,6 @@ class AbstractWeightedHexatonicBlues(AbstractScale):
         self._net.fillArbitrary(nodes, edges)
 
 
-
-
-
-
-
 #-------------------------------------------------------------------------------
 class ConcreteScale(Scale):
     '''
@@ -1236,8 +1241,8 @@ class ConcreteScale(Scale):
     A scale that lasts two octaves and uses quarter tones (D~)
     
     
-    
-    >>> complexscale = scale.ConcreteScale(pitches = ["C#3", "E-3", "F3", "G3", "B3", "D~4", "F#4", "A4", "C#5"])
+    >>> complexscale = scale.ConcreteScale(pitches=[
+    ...                         "C#3", "E-3", "F3", "G3", "B3", "D~4", "F#4", "A4", "C#5"])
     >>> complexscale.getTonic()
     <music21.pitch.Pitch C#3>
     >>> complexscale.next("G3", direction=scale.DIRECTION_DESCENDING)
@@ -1322,8 +1327,9 @@ class ConcreteScale(Scale):
 
 
     def __eq__(self, other):
-        '''For concrete equality, the stored abstract objects must evaluate as equal, as well as local attributes. 
-
+        '''
+        For concrete equality, the stored abstract objects must evaluate as equal, 
+        as well as local attributes. 
         
         >>> sc1 = scale.MajorScale('c')
         >>> sc2 = scale.MajorScale('c')
@@ -1562,8 +1568,8 @@ class ConcreteScale(Scale):
             if common.isStr(maxPitch):
                 maxPitch = pitch.Pitch(maxPitch)
             
-            if minPitch is not None and maxPitch is not None and \
-                   minPitch > maxPitch and direction is None:
+            if (minPitch is not None and maxPitch is not None and 
+                   minPitch > maxPitch and direction is None):
                 reverse = True
                 (minPitch, maxPitch) = (maxPitch, minPitch)
             elif direction == DIRECTION_DESCENDING:
@@ -1600,7 +1606,9 @@ class ConcreteScale(Scale):
         `quarterLength` and similar parameters.
         '''
         from music21 import chord
-        return chord.Chord(self.getPitches(minPitch=minPitch, maxPitch=maxPitch, direction=direction), **keywords)
+        return chord.Chord(self.getPitches(minPitch=minPitch, 
+                                           maxPitch=maxPitch, 
+                                           direction=direction), **keywords)
 
     chord = property(getChord, 
         doc = '''Return a Chord object from this harmony over a default range.  
@@ -1644,7 +1652,8 @@ class ConcreteScale(Scale):
 #         if 0 < degree <= self._abstract.getDegreeMaxUnique(): 
 #             return self.getPitches()[degree - 1]
 #         else: 
-#             raise("Scale degree is out of bounds: must be between 1 and %s." % self._abstract.getDegreeMaxUnique())
+#             raise("Scale degree is out of bounds: must be between 1 and %s." % (
+#                self._abstract.getDegreeMaxUnique()))
 
 
     def pitchesFromScaleDegrees(self, degreeTargets, minPitch=None, 
@@ -1699,8 +1708,10 @@ class ConcreteScale(Scale):
             raise ScaleException('cannot get a pitch for scale degree: %s' % pStart)
         return interval.Interval(pStart, pEnd)
 
-    def getScaleDegreeFromPitch(self, pitchTarget, 
-            direction=DIRECTION_ASCENDING, comparisonAttribute='name'):
+    def getScaleDegreeFromPitch(self, 
+                                pitchTarget, 
+                                direction=DIRECTION_ASCENDING, 
+                                comparisonAttribute='name'):
         '''
         For a given pitch, return the appropriate scale degree. 
         If no scale degree is available, None is returned.
@@ -1740,7 +1751,9 @@ class ConcreteScale(Scale):
 
 
         >>> cmaj = key.Key('C')
-        >>> cmaj.getScaleDegreeFromPitch(pitch.Pitch('E-'), direction=scale.DIRECTION_ASCENDING, comparisonAttribute = 'step')
+        >>> cmaj.getScaleDegreeFromPitch(pitch.Pitch('E-'), 
+        ...                              direction=scale.DIRECTION_ASCENDING, 
+        ...                              comparisonAttribute='step')
         3
 
         '''
@@ -1771,23 +1784,30 @@ class ConcreteScale(Scale):
         The Direction of a melodic minor scale is significant
         
         >>> amin = scale.MelodicMinorScale('a')
-        >>> amin.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('G'), direction=scale.DIRECTION_DESCENDING)
+        >>> amin.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('G'), 
+        ...                                           direction=scale.DIRECTION_DESCENDING)
         (7, None)
-        >>> amin.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('G'), direction=scale.DIRECTION_ASCENDING)
+        >>> amin.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('G'), 
+        ...                                           direction=scale.DIRECTION_ASCENDING)
         (7, <accidental flat>)
-        >>> amin.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('G-'), direction=scale.DIRECTION_ASCENDING)
+        >>> amin.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('G-'), 
+        ...                                           direction=scale.DIRECTION_ASCENDING)
         (7, <accidental double-flat>)
         
-        Returns (None, None) if for some reason this scale does not have this step (a whole-tone scale,
-        for instance)
+        Returns (None, None) if for some reason this scale does not have this step 
+        (a whole-tone scale, for instance)
         '''        
         scaleStep = self.getScaleDegreeFromPitch(pitchTarget, direction, comparisonAttribute)
         if scaleStep is not None:
             return (scaleStep, None)
         else:
-            scaleStepNormal = self.getScaleDegreeFromPitch(pitchTarget, direction, comparisonAttribute='step')
+            scaleStepNormal = self.getScaleDegreeFromPitch(pitchTarget, 
+                                                           direction, 
+                                                           comparisonAttribute='step')
             if scaleStepNormal is None:
-                raise ScaleException("Cannot get any scale degree from getScaleDegreeFromPitch for pitchTarget %s, direction %s, comparisonAttribute='step'" % (pitchTarget, direction))
+                raise ScaleException(
+                    "Cannot get any scale degree from getScaleDegreeFromPitch for pitchTarget  " + 
+                    "%s, direction %s, comparisonAttribute='step'" % (pitchTarget, direction))
             pitchesFound = self.pitchesFromScaleDegrees([scaleStepNormal])
             
             if len(pitchesFound) == 0:
@@ -1908,15 +1928,15 @@ class ConcreteScale(Scale):
 
     
     
-    def solfeg(self, pitchTarget=None, direction=DIRECTION_ASCENDING, variant="music21", chromatic=True):
+    def solfeg(self, pitchTarget=None, direction=DIRECTION_ASCENDING, 
+               variant="music21", chromatic=True):
         '''
-        Returns the chromatic solfege (or diatonic if chromatic is False) for a given pitch in a given
-        scale.
+        Returns the chromatic solfege (or diatonic if chromatic is False) 
+        for a given pitch in a given scale.
         
-        The `variant` method lets one specify either the default `music21` or `humdrum` solfeg representation
-        for altered notes.
-         
-         
+        The `variant` method lets one specify either the default `music21` 
+        or `humdrum` solfeg representation
+        for altered notes. 
         
         >>> eflatMaj = key.Key('E-')
         >>> eflatMaj.solfeg(pitch.Pitch('G'))
@@ -2043,8 +2063,9 @@ class ConcreteScale(Scale):
 
     def isNext(self, other, pitchOrigin, direction='ascending', stepSize=1, 
         getNeighbor=True, comparisonAttribute='name'):
-        '''Given another pitch, as well as an origin and a direction, determine if this other pitch is in the next in the scale.
-
+        '''
+        Given another pitch, as well as an origin and a direction, 
+        determine if this other pitch is in the next in the scale.
         
         >>> sc1 = scale.MajorScale('g')
         >>> sc1.isNext('d4', 'c4', 'ascending')
@@ -2076,7 +2097,8 @@ class ConcreteScale(Scale):
     def match(self, other, comparisonAttribute='name'):
         '''
         Given another object of the forms that `extractPitchList` can take,
-        (e.g., a :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, a list of :class:`~music21.pitch.Pitch` objects), 
+        (e.g., a :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, 
+        a list of :class:`~music21.pitch.Pitch` objects), 
         return a named dictionary of pitch lists with keys 'matched' and 'notMatched'.
 
         
@@ -2127,9 +2149,12 @@ class ConcreteScale(Scale):
         minPitch=None, maxPitch=None, direction=DIRECTION_ASCENDING,
         alteredDegrees=None):
         '''
-        Given another object of the forms that `extractPitches` takes (e.g., a :class:`~music21.stream.Stream`, 
-        a :class:`~music21.scale.ConcreteScale`, a list of :class:`~music21.pitch.Pitch` objects), 
-        return a list of pitches that are found in this Scale but are not found in the provided object. 
+        Given another object of the forms that `extractPitches` takes 
+        (e.g., a :class:`~music21.stream.Stream`, 
+        a :class:`~music21.scale.ConcreteScale`, 
+        a list of :class:`~music21.pitch.Pitch` objects), 
+        return a list of pitches that are found in this Scale but are not 
+        found in the provided object. 
 
         
         >>> sc1 = scale.MajorScale('g4')
@@ -2154,28 +2179,45 @@ class ConcreteScale(Scale):
     def deriveRanked(self, other, resultsReturned=4,
         comparisonAttribute='pitchClass', removeDuplicates = False):
         '''
-        Return a list of closest-matching 
-        :class:`~music21.scale.ConcreteScale` objects based on this 
-        :class:`~music21.scale.AbstractScale`, provided as a :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, 
-        or a list of :class:`~music21.pitch.Pitch` objects. Returned integer values represent the number of mathces. 
+        Return a list of closest-matching :class:`~music21.scale.ConcreteScale` objects 
+        based on this :class:`~music21.scale.AbstractScale`, 
+        provided as a :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, 
+        or a list of :class:`~music21.pitch.Pitch` objects. 
+        Returned integer values represent the number of matches. 
 
-        If you are working with Diatonic Scales, you will probably want to change the `comparisonAttribute` to `name`.
-
+        If you are working with Diatonic Scales, you will probably 
+        want to change the `comparisonAttribute` to `name`.
         
         >>> sc1 = scale.MajorScale()
         >>> sc1.deriveRanked(['c', 'e', 'b'])
-        [(3, <music21.scale.MajorScale G major>), (3, <music21.scale.MajorScale C major>), (2, <music21.scale.MajorScale B major>), (2, <music21.scale.MajorScale A major>)]
+        [(3, <music21.scale.MajorScale G major>), 
+         (3, <music21.scale.MajorScale C major>), 
+         (2, <music21.scale.MajorScale B major>), 
+         (2, <music21.scale.MajorScale A major>)]
+        
         >>> sc1.deriveRanked(['d-', 'e', 'b'])
-        [(3, <music21.scale.MajorScale B major>), (3, <music21.scale.MajorScale A major>), (3, <music21.scale.MajorScale E major>), (3, <music21.scale.MajorScale D major>)]        
+        [(3, <music21.scale.MajorScale B major>), 
+         (3, <music21.scale.MajorScale A major>), 
+         (3, <music21.scale.MajorScale E major>), 
+         (3, <music21.scale.MajorScale D major>)]        
+        
         >>> sc1.deriveRanked(['d-', 'e', 'b'], comparisonAttribute='name')
-        [(2, <music21.scale.MajorScale B major>), (2, <music21.scale.MajorScale A major>), (2, <music21.scale.MajorScale G major>), (2, <music21.scale.MajorScale E major>)]
+        [(2, <music21.scale.MajorScale B major>), 
+         (2, <music21.scale.MajorScale A major>), 
+         (2, <music21.scale.MajorScale G major>), 
+         (2, <music21.scale.MajorScale E major>)]
 
         >>> sc1.deriveRanked(['c', 'e', 'e', 'e', 'b'])
-        [(5, <music21.scale.MajorScale G major>), (5, <music21.scale.MajorScale C major>), (4, <music21.scale.MajorScale B major>), (4, <music21.scale.MajorScale A major>)]
+        [(5, <music21.scale.MajorScale G major>), 
+         (5, <music21.scale.MajorScale C major>), 
+         (4, <music21.scale.MajorScale B major>), 
+         (4, <music21.scale.MajorScale A major>)]
 
         >>> sc1.deriveRanked(['c#', 'e', 'g#'])
-        [(3, <music21.scale.MajorScale B major>), (3, <music21.scale.MajorScale A major>), (3, <music21.scale.MajorScale E major>), (3, <music21.scale.MajorScale C- major>)]
-
+        [(3, <music21.scale.MajorScale B major>), 
+         (3, <music21.scale.MajorScale A major>), 
+         (3, <music21.scale.MajorScale E major>), 
+         (3, <music21.scale.MajorScale C- major>)]
 
         Test that a Concrete Scale (that is, with no _abstract defined) still has similar
         characteristics to the original.
@@ -2185,7 +2227,11 @@ class ConcreteScale(Scale):
         >>> e = scale.ConcreteScale(pitches=['A4', 'B-4', 'C5', 'D#5', 'E5', 'F5', 'G#5', 'A5'])
         >>> f = e.deriveRanked(['C','E','G'])
         >>> f
-        [(3, <music21.scale.ConcreteScale E Concrete>), (3, <music21.scale.ConcreteScale D- Concrete>), (3, <music21.scale.ConcreteScale C# Concrete>), (2, <music21.scale.ConcreteScale B Concrete>)]
+        [(3, <music21.scale.ConcreteScale E Concrete>), 
+         (3, <music21.scale.ConcreteScale D- Concrete>), 
+         (3, <music21.scale.ConcreteScale C# Concrete>), 
+         (2, <music21.scale.ConcreteScale B Concrete>)]
+        
         >>> ' '.join([str(p) for p in f[0][1].pitches])
         'E4 F4 G4 A#4 B4 C5 D#5 E5'
         
@@ -2214,7 +2260,8 @@ class ConcreteScale(Scale):
     def derive(self, other, comparisonAttribute='pitchClass'):
         '''
         Return the closest-matching :class:`~music21.scale.ConcreteScale` 
-        based on the pitch collection provided as a :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, 
+        based on the pitch collection provided as a 
+        :class:`~music21.stream.Stream`, a :class:`~music21.scale.ConcreteScale`, 
         or a list of :class:`~music21.pitch.Pitch` objects.
 
         How the "closest-matching" scale is defined still needs to be
@@ -2784,10 +2831,11 @@ class MelodicMinorScale(DiatonicScale):
 
 
 #-------------------------------------------------------------------------------
-# other sscales
+# other scales
 
 class OctatonicScale(ConcreteScale):
-    '''A concrete Octatonic scale. Two modes
+    '''
+    A concrete Octatonic scale in one of two modes
     '''
     def __init__(self, tonic=None, mode=None):
         ConcreteScale.__init__(self, tonic=tonic)
@@ -2812,13 +2860,10 @@ class OctaveRepeatingScale(ConcreteScale):
     >>> sc.getScaleDegreeFromPitch('e-')
     2
     '''
-
     def __init__(self, tonic=None, intervalList=('m2',)):
         ConcreteScale.__init__(self, tonic=tonic)
         self._abstract = AbstractOctaveRepeatingScale(mode=intervalList)
         self.type = 'Octave Repeating'
-
-
 
 
 
@@ -3015,7 +3060,8 @@ class ScalaScale(ConcreteScale):
             # returns None or a scala storage object
             readFile = scala.parse(scalaString)
             if readFile is None:
-                raise ScaleException("Could not find a file named %s in the scala database" % scalaString)
+                raise ScaleException(
+                    "Could not find a file named %s in the scala database" % scalaString)
             self._scalaData = readFile
         else: # grab a default
             self._scalaData = scala.parse('fj-12tet.scl')    
@@ -3029,8 +3075,8 @@ class ScalaScale(ConcreteScale):
 
 
 class RagAsawari(ConcreteScale):
-    '''A concrete pseudo-raga scale. 
-
+    '''
+    A concrete pseudo-raga scale. 
     
     >>> sc = scale.RagAsawari('c2') 
     >>> [str(p) for p in sc.pitches]
@@ -3047,8 +3093,8 @@ class RagAsawari(ConcreteScale):
 
 
 class RagMarwa(ConcreteScale):
-    '''A concrete pseudo-raga scale. 
-
+    '''
+    A concrete pseudo-raga scale. 
     
     >>> sc = scale.RagMarwa('c2') 
     
@@ -3056,36 +3102,26 @@ class RagMarwa(ConcreteScale):
     
     >>> [str(p) for p in sc.pitches]
     ['C2', 'D-2', 'E2', 'F#2', 'A2', 'B2', 'A2', 'C3', 'D-3']
-
     '''
-#     >>> sc.getPitches(direction='descending')
-#     [C2, D2, E2, G2, A2, C3]
-
     def __init__(self, tonic=None):
         ConcreteScale.__init__(self, tonic=tonic)
         self._abstract = AbstractRagMarwa()
         self.type = 'Rag Marwa'
-
+#     >>> sc.getPitches(direction='descending')
+#     [C2, D2, E2, G2, A2, C3]
 
 
 
 
 class WeightedHexatonicBlues(ConcreteScale):
-    '''A concrete scale based on a dynamic mixture of a minor pentatonic and the hexatonic blues scale.
-
-    
     '''
-
+    A concrete scale based on a dynamic mixture of a minor pentatonic 
+    and the hexatonic blues scale.
+    '''
     def __init__(self, tonic=None):
         ConcreteScale.__init__(self, tonic=tonic)
         self._abstract = AbstractWeightedHexatonicBlues()
         self.type = 'Weighted Hexatonic Blues'
-
-
-
-
-
-
 
 
 #-------------------------------------------------------------------------------
@@ -3161,7 +3197,7 @@ class Test(unittest.TestCase):
         
 #         melodic = bFlatMinor.getConcreteMelodicMinorScale()
 #         niceMelodic = [note1.name for note1 in melodic]
-#         assert niceMelodic == ["B-", "C", "D-", "E-", "F", "G", "A", "B-", "A-", "G-", \
+#         assert niceMelodic == ["B-", "C", "D-", "E-", "F", "G", "A", "B-", "A-", "G-", 
 #                                "F", "E-", "D-", "C", "B-"]
         
 #         melodic2 = bFlatMinor.getAbstractMelodicMinorScale()
@@ -3197,20 +3233,23 @@ class Test(unittest.TestCase):
 
         # we can get a range of pitches
         self.assertEqual(self.pitchOut(sc2.getPitches('c2', 'c5')), 
-                         '[C2, D2, E-2, F2, G2, A-2, B-2, C3, D3, E-3, F3, G3, A-3, B-3, C4, D4, E-4, F4, G4, A-4, B-4, C5]')
+                         '[C2, D2, E-2, F2, G2, A-2, B-2, C3, D3, E-3, F3, G3, A-3, B-3, ' + 
+                         'C4, D4, E-4, F4, G4, A-4, B-4, C5]')
 
 
 
         # we can transpose the Scale
         sc3 = sc2.transpose('-m3')
         self.assertEqual(self.pitchOut(sc3.getPitches('c2', 'c5')), 
-                         '[C2, D2, E2, F2, G2, A2, B2, C3, D3, E3, F3, G3, A3, B3, C4, D4, E4, F4, G4, A4, B4, C5]')
+                         '[C2, D2, E2, F2, G2, A2, B2, C3, D3, E3, F3, G3, A3, B3, ' + 
+                         'C4, D4, E4, F4, G4, A4, B4, C5]')
         
         # getting pitches from scale degrees
         self.assertEqual(str(sc3.pitchFromDegree(3)), 'C4')
         self.assertEqual(str(sc3.pitchFromDegree(7)), 'G4')
         self.assertEqual(self.pitchOut(sc3.pitchesFromScaleDegrees([1,5,6])), '[A3, E4, F4, A4]')
-        self.assertEqual(self.pitchOut(sc3.pitchesFromScaleDegrees([2,3], minPitch='c6', maxPitch='c9')), 
+        self.assertEqual(self.pitchOut(sc3.pitchesFromScaleDegrees([2,3], 
+                                                                   minPitch='c6', maxPitch='c9')), 
                          '[C6, B6, C7, B7, C8, B8, C9]')
 
 
@@ -3436,7 +3475,8 @@ class Test(unittest.TestCase):
         '''Need to test descending form of getting pitches with no defined min and max
         '''
         mm = MelodicMinorScale('a')
-#         self.assertEqual(str(mm.getPitches(None, None, direction='ascending')), '[A4, B4, C5, D5, E5, F#5, G#5, A5]')
+        #self.assertEqual(str(mm.getPitches(None, None, direction='ascending')), 
+        #    '[A4, B4, C5, D5, E5, F#5, G#5, A5]')
 
         self.assertEqual(mm.pitchFromDegree(2, direction='ascending').nameWithOctave, 'B4')
 
@@ -3630,9 +3670,11 @@ class Test(unittest.TestCase):
     def testRagMarwaC(self):
         sc = RagMarwa('c4')
 
-        self.assertEqual(sc.abstract._net.realizeTermini('c1', 'terminusLow'), (pitch.Pitch('C1'), pitch.Pitch('C2')))
+        self.assertEqual(sc.abstract._net.realizeTermini('c1', 'terminusLow'), 
+                         (pitch.Pitch('C1'), pitch.Pitch('C2')))
 
-        self.assertEqual(sc.abstract._net.realizeMinMax('c1', 'terminusLow'), (pitch.Pitch('C1'), pitch.Pitch('D-2')))
+        self.assertEqual(sc.abstract._net.realizeMinMax('c1', 'terminusLow'), 
+                         (pitch.Pitch('C1'), pitch.Pitch('D-2')))
 
         # descending from d-2, we can either go to c2 or b1
         post = []
@@ -3768,8 +3810,12 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         # provide a raw scala string
         sc = ScalaScale('c4', msg)
         self.assertEqual(str(sc), '<music21.scale.ScalaScale C Scala: fj-12tet.scl>')
-        self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c4')), '[C2(+0c), C#2(+0c), C##2(0c), D#2(0c), E2(+0c), E#2(-2c), F#2(+0c), F##2(0c), G#2(+1c), A2(+0c), B-2(+0c), B2(-12c), C3(+0c), C#3(+0c), C##3(0c), D#3(0c), E3(+0c), E#3(-2c), F#3(+0c), F##3(0c), G#3(+1c), A3(+0c), B-3(+0c), B3(-12c), C4]')
-
+        self.assertTrue(common.whitespaceEqual(self.pitchOut(sc.getPitches('c2', 'c4')), 
+            '''
+            [C2(+0c), C#2(+0c), C##2(0c), D#2(0c), E2(+0c), E#2(-2c), F#2(+0c), 
+            F##2(0c), G#2(+1c), A2(+0c), B-2(+0c), B2(-12c), C3(+0c), C#3(+0c), 
+            C##3(0c), D#3(0c), E3(+0c), E#3(-2c), F#3(+0c), F##3(0c), G#3(+1c), 
+            A3(+0c), B-3(+0c), B3(-12c), C4]'''))
 
 
     def testScalaScaleOutput(self):
@@ -3796,7 +3842,8 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         from music21 import stream, meter, note
 
         sc = ScalaScale('e2', 'fj 12tet')
-        # this is showing that there are slight microtonal adjustments but they are less than one cent large
+        # this is showing that there are slight microtonal adjustments 
+        # but they are less than one cent large
         self.assertEqual(self.pitchOut(sc.pitches), 
                          '[E2, F2(+0c), F#2(0c), G2(0c), A-2(+0c), G##2(-2c), B-2(+0c), B2(0c), ' + 
                          'C3(+1c), D-3(+0c), D3(+0c), D#3(-12c), E3]')
@@ -3992,7 +4039,10 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
     def testDerivedScaleNoOctaves(self):
         d = ConcreteScale(pitches = ['a', 'b', 'c', 'd', 'e', 'f', 'g#', 'a'])
         e = d.deriveRanked(['C', 'E', 'G'], comparisonAttribute='name')
-        self.assertEqual(str(e), "[(3, <music21.scale.ConcreteScale F Concrete>), (3, <music21.scale.ConcreteScale E Concrete>), (2, <music21.scale.ConcreteScale B Concrete>), (2, <music21.scale.ConcreteScale A Concrete>)]")
+        self.assertEqual(str(e), ''.join(["[(3, <music21.scale.ConcreteScale F Concrete>), ", 
+                                          "(3, <music21.scale.ConcreteScale E Concrete>), ", 
+                                          "(2, <music21.scale.ConcreteScale B Concrete>), ", 
+                                          "(2, <music21.scale.ConcreteScale A Concrete>)]"]))
 
     def testDerivedScaleAbsurdOctaves(self):
         e = ConcreteScale(pitches=['A4', 'B4', 'C4', 'D4', 'E4', 'F4', 'G4', 'A4'])

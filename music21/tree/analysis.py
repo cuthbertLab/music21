@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
-# Name:         timespans/analysis.py
-# Purpose:      Tools for grouping notes and chords into a searchable tree
-#               organized by start and stop offsets
+# Name:         tree/analysis.py
+# Purpose:      horizontal analysis tools on timespan trees
 #
 # Authors:      Josiah Wolf Oberholtzer
 #
@@ -11,7 +10,7 @@
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
 '''
-Tools for performing voice-leading analysis with timespans.
+Tools for performing voice-leading analysis with trees.
 '''
 import collections
 import unittest
@@ -21,10 +20,10 @@ from music21 import environment
 from music21 import exceptions21
 #from music21 import key
 
-environLocal = environment.Environment("timespans.analysis")
+environLocal = environment.Environment("tree.analysis")
 
 
-class HorizontalityException(exceptions21.TimespanException):
+class HorizontalityException(exceptions21.TreeException):
     pass
 
 
@@ -33,7 +32,7 @@ class HorizontalityException(exceptions21.TimespanException):
 
 class Horizontality(collections.Sequence):
     r'''
-    A horizontality of consecutive elementTimespan objects.
+    A horizontality of consecutive PitchedTimespan objects.
     
     It must be initiated with a list or tuple of Timespan objects.
     '''
@@ -52,7 +51,8 @@ class Horizontality(collections.Sequence):
         if not isinstance(timespans, collections.Sequence):
             raise HorizontalityException("timespans must be a sequence, not %r" % timespans)
         if len(timespans) == 0:
-            raise HorizontalityException("there must be at least one timespan in the timespans list")
+            raise HorizontalityException(
+                "there must be at least one timespan in the timespans list")
         if not all(hasattr(x, 'offset') and hasattr(x, 'endTime') for x in timespans):
             raise HorizontalityException("only Timespan objects can be added to a horizontality")
         self.timespans = tuple(timespans)
@@ -259,8 +259,7 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 
 
-_DOC_ORDER = (
-    )
+_DOC_ORDER = ()
 
 
 #------------------------------------------------------------------------------

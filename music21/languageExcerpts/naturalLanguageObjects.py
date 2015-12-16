@@ -179,7 +179,8 @@ class Test(unittest.TestCase):
         self.assertEqual("<music21.pitch.Pitch E##>", toPitch("Eisis","de").__repr__())
         self.assertEqual("<music21.pitch.Pitch D-->", toPitch("Deses","du").__repr__())
         self.assertEqual("<music21.pitch.Pitch B->", toPitch("Bes","du").__repr__())
-        self.assertEqual("<music21.pitch.Pitch A####>", toPitch("la quadruple dièse","fr").__repr__())
+        self.assertEqual("<music21.pitch.Pitch A####>",
+                         toPitch("la quadruple dièse","fr").__repr__())
         self.assertEqual("<music21.pitch.Pitch B--->", toPitch("si triple bémol","fr").__repr__())
         pass
 
@@ -261,22 +262,29 @@ class Test(unittest.TestCase):
         
         #testing defaults in case of valid input list and valid language    
         self.assertEqual("<music21.chord.Chord C##>", toChord(["do doppio diesis"],"it").__repr__())
-        self.assertEqual("<music21.chord.Chord F##>", toChord(["fa doble sostenido"],"es").__repr__())
-        self.assertEqual("<music21.chord.Chord G--->", toChord(["sol triple bèmol"],"es").__repr__())
+        self.assertEqual("<music21.chord.Chord F##>",
+                         toChord(["fa doble sostenido"],"es").__repr__())
+        self.assertEqual("<music21.chord.Chord G--->", 
+                         toChord(["sol triple bèmol"],"es").__repr__())
         self.assertEqual("<music21.chord.Chord D>", toChord(["re"],"it").__repr__())
         self.assertEqual("<music21.chord.Chord B-->", toChord(["Heses"],"de").__repr__())
         self.assertEqual("<music21.chord.Chord E##>", toChord(["Eisis"],"de").__repr__())
         self.assertEqual("<music21.chord.Chord D-->", toChord(["Deses"],"du").__repr__())
         self.assertEqual("<music21.chord.Chord B->", toChord(["Bes"],"du").__repr__())
-        self.assertEqual("<music21.chord.Chord A####>", toChord(["la quadruple dièse"],"fr").__repr__())
+        self.assertEqual("<music21.chord.Chord A####>", 
+                         toChord(["la quadruple dièse"],"fr").__repr__())
         self.assertEqual("<music21.chord.Chord B--->", toChord(["si triple bémol"],"fr").__repr__())    
         
-        self.assertEqual("<music21.chord.Chord C## D>", toChord(["do doppio diesis","re"],"it").__repr__())
-        self.assertEqual("<music21.chord.Chord F## G--->", toChord(["fa doble sostenido","sol triple bèmol"],"es").__repr__())
-        self.assertEqual("<music21.chord.Chord B-- E##>", toChord(["Heses","Eisis"],"de").__repr__())
+        self.assertEqual("<music21.chord.Chord C## D>", 
+                         toChord(["do doppio diesis","re"],"it").__repr__())
+        self.assertEqual("<music21.chord.Chord F## G--->", 
+                         toChord(["fa doble sostenido","sol triple bèmol"],"es").__repr__())
+        self.assertEqual("<music21.chord.Chord B-- E##>", 
+                         toChord(["Heses","Eisis"],"de").__repr__())
         self.assertEqual("<music21.chord.Chord D-- B->", toChord(["Deses","Bes"],"du").__repr__())
-        self.assertEqual("<music21.chord.Chord A#### B--->", toChord(["la quadruple dièse","si triple bémol"],"fr").__repr__())
-        pass
+        self.assertEqual("<music21.chord.Chord A#### B--->", 
+                         toChord(["la quadruple dièse","si triple bémol"],"fr").__repr__())
+
 #------------------------------------------------------------------------------
 # define presented order in documentation
 

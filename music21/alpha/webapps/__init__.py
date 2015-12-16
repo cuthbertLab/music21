@@ -12,7 +12,8 @@
 '''
 Webapps is a module designed for using music21 with a webserver.
 
-This file includes the classes and functions used to parse and process requests to music21 running on a server.
+This file includes the classes and functions used to parse and process 
+requests to music21 running on a server.
 
 For information about how to set up a server to use music21, look at the files in webapps.server
 For examples of application-specific commands and templates, see webapps.apps
@@ -37,7 +38,8 @@ to a parsedDataDict. For more information, see ``commandProcessor._parseData()``
 For more information, see :meth:`~music21.webapps.CommandProcessor.executeCommands`
 
 6. If outputTemplate is specified, the processor uses a template to generate and output. 
-For more information, see :meth:`~music21.webapps.CommandProcessor.getOutput` and the templates in templates.py
+For more information, see :meth:`~music21.webapps.CommandProcessor.getOutput` 
+and the templates in templates.py
 
 7. Otherwise, the data will be returned as JSON, where the variables in the agenda's 
 returnDict specify which variables to include in the returned JSON.
@@ -107,14 +109,9 @@ from music21.alpha.theoryAnalysis import theoryAnalyzer #@UnusedImport
 
 from music21.ext import six
 
-if six.PY2:
-    import apps
-    import commands
-    import templates
-else:
-    from music21.alpha.webapps import templates # @Reimport
-    from music21.alpha.webapps import apps      # @Reimport
-    from music21.alpha.webapps import commands  # @Reimport
+from music21.alpha.webapps import templates
+from music21.alpha.webapps import apps     
+from music21.alpha.webapps import commands  
 
 # python library imports
 import json
@@ -133,6 +130,10 @@ if six.PY3:
     import io
     file = io.IOBase # @ReservedAssignment
     unicode = str # @ReservedAssignment
+    
+# TODO: REWRITE WITHOUT EVAL!
+# pylint: disable=eval-used
+    
 #-------------------------------------------------------------------------------
 
 # Valid format types for data input to the server
@@ -203,13 +204,22 @@ def ModWSGIApplication(environ, start_response):
     Reads the contents of a post request, and passes the data string to
     webapps.processDataString for further processing. 
         
-    For an example of how to install this application on a server see music21.webapps.server.wsgiapp.py
+    For an example of how to install this application on a server see 
+    music21.webapps.server.wsgiapp.py
     
     The request to the application should have the following structures:
 
     >>> from music21.ext.six import StringIO
-    >>> environ = {}              # environ is usually created by the server. Manually constructing dictionary for demonstrated
-    >>> wsgiInput = StringIO()    # wsgi.input is usually a buffer containing the contents of a POST request. Using StringIO to demonstrate
+    
+    environ is usually created by the server. Manually constructing dictionary for demonstrated
+    
+    >>> environ = {}
+    
+    wsgi.input is usually a buffer containing the contents of a POST request. 
+    Here we're using StringIO to demonstrate
+    
+    >>> wsgiInput = StringIO()
+    
     >>> unused = wsgiInput.write('{"dataDict":{"a":{"data":3}},"returnDict":{"a":"int"}}')
     >>> unused = wsgiInput.seek(0)
     >>> environ['wsgi.input'] = wsgiInput
@@ -218,7 +228,11 @@ def ModWSGIApplication(environ, start_response):
     >>> environ['HTTP_HOST'] = "ciconia.mit.edu"
     >>> environ['SCRIPT_NAME'] = "/music21/unifiedinterface"
     >>> environ['CONTENT_TYPE'] = "application/json"
-    >>> start_response = lambda status, headers: None         # usually called by mod_wsgi server. Used to initiate response
+    
+    usually called by mod_wsgi server. Used to initiate response
+    
+    >>> start_response = lambda status, headers: None 
+    
     >>> alpha.webapps.ModWSGIApplication(environ, start_response)
     [...'{"dataDict": {"a": ...}, "errorList": [], "status": "success"}']    
     '''    
@@ -236,6 +250,7 @@ def ModWSGIApplication(environ, start_response):
         
     # Handle any unexpected exceptions
     # TODO: Change output based on environment variables...
+    # pylint: disable=broad-except
     except Exception as e:
         errorData = 'music21_server_error: %s\n' % e
         errorData += traceback.format_exc()
@@ -282,7 +297,8 @@ def makeAgendaFromRequest(requestInput, environ, requestType = None):
     (the ellipses above comment out the u unicode prefix in PY2)
 
     >>> environ2 = {"QUERY_STRING":"a=2&b=3&b=4"}
-    >>> agenda2 = alpha.webapps.makeAgendaFromRequest(requestInput, environ2, 'multipart/form-data')
+    >>> agenda2 = alpha.webapps.makeAgendaFromRequest(requestInput, environ2, 
+    ...                   'multipart/form-data')
 
     Note that the 3 in a:data becomes '2' -- a string.
     
@@ -306,7 +322,8 @@ def makeAgendaFromRequest(requestInput, environ, requestType = None):
     elif requestType == 'multipart/form-data':
         postFormFields = cgi.FieldStorage(requestInput, environ = environ)  
         for key in postFormFields:
-            if hasattr(postFormFields[key],'filename') and postFormFields[key].filename != None: # Its an uploaded file
+            if hasattr(postFormFields[key],'filename') and postFormFields[key].filename != None: 
+                # Its an uploaded file
                 value = postFormFields[key].file
             else:
                 value = postFormFields.getlist(key)
@@ -326,7 +343,9 @@ def makeAgendaFromRequest(requestInput, environ, requestType = None):
         agenda.loadJson(combinedFormFields['json'])
         
     # Add GET fields:
-    getFormFields = urlparse.parse_qs(environ['QUERY_STRING']) # Parse GET request in URL to dict
+    getFormFields = urlparse.parse_qs(environ['QUERY_STRING']) 
+    # Parse GET request in URL to dict
+    
     for (key,value) in getFormFields.items():
         if len(value) == 1:
             value = value[0]
@@ -334,15 +353,16 @@ def makeAgendaFromRequest(requestInput, environ, requestType = None):
 
     # Add remaining form fields to agenda
     for (key, value) in combinedFormFields.items():
-        if key in ['dataDict','commandList','returnDict','json']: # These values can only be specified via JSON, JSON already loaded
+        if key in ['dataDict', 'commandList', 'returnDict', 'json']: 
+            # These values can only be specified via JSON, JSON already loaded
             pass
             
         elif key in ['appName','outputTemplate','outputArgList']:
             agenda[key] = value
             
-        elif type(value) == file:
-            agenda['dataDict'][key] = collections.OrderedDict([("data",value),
-                                                               ("fmt","file")])
+        elif isinstance(value, file):
+            agenda['dataDict'][key] = collections.OrderedDict([("data", value),
+                                                               ("fmt", "file")])
     
         else: # Put in data dict
             agenda['dataDict'][key] = {"data": value}
@@ -358,9 +378,11 @@ def makeAgendaFromRequest(requestInput, environ, requestType = None):
 def setupApplication(agenda, appName = None):
     '''
     Given an agenda, determines which application is desired either from the appName parameter
-    or if the appName parameter is none, from the value associated with the "appName" key in the agenda.
+    or if the appName parameter is none, from the value associated with the "appName" key 
+    in the agenda.
     
-    If the application name is a valid application name, calls the appropriate application initializer
+    If the application name is a valid application name, calls the 
+    appropriate application initializer
     from music21.webapps.apps.py on the agenda.
     '''
     if appName == None:
@@ -384,7 +406,8 @@ class Agenda(dict):
     
     The Agenda contains the following keys:
     
-*   **'dataDict'** whose value is a dictionary specifying data to be input to the  processor of the form::
+*   **'dataDict'** whose value is a dictionary specifying data to be input to the 
+        processor of the form::
     
             "dataDict" : {"<VARIABLE_1_NAME>": {"data": "<VARIABLE_1_DATA>",
                                                 "fmt":  "<VARIABLE_1_FMT>"},
@@ -395,7 +418,8 @@ class Agenda(dict):
         
     where the variable formats are elements of availableDataFormats ("str","int","musicxml", etc.)
     
-*     **'commandList'**  whose value is a list specifying commands to be executed by the processor of the form::
+*     **'commandList'**  whose value is a list specifying commands to be executed by the 
+      processor of the form::
     
             "commandList" : [{"<CMD_1_TYPE>": "<CMD_2_COMMAND_NAME>",
                               "resultVar":    "<CMD_1_RESULT_VARIABLE>",
@@ -412,15 +436,18 @@ class Agenda(dict):
                               
     Calling :meth:`~music21.webapps.CommandProcessor.executeCommands` iterates through 
     the commandList sequentially, calling the equivalent of 
-    ``<CMD_n_RESULT_VARAIBLE> = <CMD_n_CALLER>.<CMD_n_COMMAND_NAME>(<CMD_n_ARG_1>,<CMD_n_ARG_2>...)``
+    ``<CMD_n_RESULT_VARAIBLE> = <CMD_n_CALLER>.<CMD_n_COMMAND_NAME>(<CMD_n_ARG_1>, 
+        <CMD_n_ARG_2>...)``
     where the command TYPE is "function", "method", or "attribute"
     
-*    **'returnDict'** whose value is a list specifying the variables to be returned from the server::
+*    **'returnDict'** whose value is a list specifying the variables to be 
+        returned from the server::
     
             "returnDict" : {"<VARIABLE_1_NAME>": "<VARIABLE_1_FORMAT",
                             "<VARIABLE_2_NAME>": "<VARIABLE_2_FORMAT", etc.}
         
-    returnDict is used to limit JSON output to only the relevant variables. If returnDict is not specified,
+    returnDict is used to limit JSON output to only the relevant variables. 
+    If returnDict is not specified,
     the entire set of variables in the processor's environment will be returned in string format.
     
 *    **'outputTemplate'**  which specifies the return template to be used
@@ -457,19 +484,18 @@ class Agenda(dict):
         >>> pp(agenda)
         {'commandList': [], 'dataDict': {'a': {'data': 2}}, 'returnDict': {}}
         '''
-        if key in ['dataDict','returnDict'] and type(value) is not dict:
+        if key in ['dataDict','returnDict'] and not isinstance(value, dict):
             raise Exception('value for key: '+ str(key) + ' must be dict')
-            return
         
-        elif key in ['commandList'] and type(value) is not list:
+        elif key in ['commandList'] and not isinstance(value, list):
             raise Exception('value for key: '+ str(key) + ' must be list')
-            return
         
         dict.__setitem__(self,key,value)
     
-    def addData(self, variableName, data, fmt = None):
+    def addData(self, variableName, data, fmt=None):
         '''
-        Given a variable name, data, and optionally format, constructs the proper dataDictElement structure,
+        Given a variable name, data, and optionally format, constructs the proper 
+        dataDictElement structure,
         and adds it to the dataDict of the agenda.
         
         >>> from pprint import pprint as pp
@@ -493,7 +519,8 @@ class Agenda(dict):
         
     def getData(self, variableName):
         '''
-        Given a variable name, returns the data stored in the agenda for that variable name. If no data is stored,
+        Given a variable name, returns the data stored in the agenda for that variable name. 
+        If no data is stored,
         returns the value None.        
 
         >>> from pprint import pprint as pp        
@@ -511,13 +538,16 @@ class Agenda(dict):
         else:
             return None
         
-    def addCommand(self, commandType, resultVar, caller, command, argList = None):
+    def addCommand(self, commandType, resultVar, caller, command, argList=None):
         '''
-        Adds the specified command to the commandList of the agenda. `commandType` is either "function", "attribute" or method. 
-        resultVar, caller, and command are strings that will result in the form shown below. Set an argument as 
+        Adds the specified command to the commandList of the agenda. `commandType` is 
+        either "function", "attribute" or method. 
+        resultVar, caller, and command are strings that will result in the form shown below. 
+        Set an argument as 
         none to 
         argList should be a list of data encoded in an appropriate 
-        format (see :meth:`~music21.webapps.CommandProcessor.parseInputToPrimitive` for more information)
+        format (see :meth:`~music21.webapps.CommandProcessor.parseInputToPrimitive` 
+        for more information)
         
             ``<resultVar> = <caller>.<command>(<argList>)``
         
@@ -648,14 +678,17 @@ class CommandProcessor(object):
         if "outputArgList" in agenda:
             self.outputArgList = agenda['outputArgList']
       
-    def recordError(self, errorString, exceptionObj = None):
+    def recordError(self, errorString, exceptionObj=None):
         '''
         Adds an error to the internal errorList array and prints the whole error to stderr
-        so both the user and the administrator know. Error string represents a brief, human-readable
+        so both the user and the administrator know. Error string represents a brief, 
+        human-readable
         message decribing the error.
         
-        Errors are appended to the errorList as a tuple (errorString, errorTraceback) where errorTraceback
-        is the traceback of the exception if exceptionObj is specified, otherwise errorTraceback is the empty string
+        Errors are appended to the errorList as a tuple (errorString, errorTraceback) where 
+        errorTraceback
+        is the traceback of the exception if exceptionObj is specified, otherwise 
+        errorTraceback is the empty string
         '''
         errorTraceback = u''    
         if exceptionObj is not None:
@@ -665,7 +698,8 @@ class CommandProcessor(object):
         
         sys.stderr.write(errorString)
         sys.stderr.write(errorTraceback)
-        self.errorList.append((('music21_server_error: '+errorString).encode('ascii','ignore'),errorTraceback.encode('ascii','ignore')))
+        self.errorList.append((('music21_server_error: ' + errorString).encode('ascii', 
+                                            'ignore'),errorTraceback.encode('ascii', 'ignore')))
 
 
     def _parseData(self):
@@ -683,10 +717,12 @@ class CommandProcessor(object):
                 fmt = dataDictElement['fmt']
                 
                 if name in self.parsedDataDict:
-                    self.recordError("duplicate definition for data named "+str(name)+" "+str(dataDictElement))
+                    self.recordError("duplicate definition for data named " + str(name) + " " + 
+                                     str(dataDictElement))
                     continue
                 if fmt not in availableDataFormats:
-                    self.recordError("invalid data format for data element "+str(dataDictElement))
+                    self.recordError("invalid data format for data element " + 
+                                     str(dataDictElement))
                     continue
                 
                 if fmt == 'string' or fmt == 'str':
@@ -695,13 +731,14 @@ class CommandProcessor(object):
                     elif dataStr.count("\"") == 2: # Double Quoted String
                         data = dataStr.replace("\"","") # remove excess quotes
                     else:
-                        self.recordError("invalid string (not in quotes...) for data element "+str(dataDictElement))
+                        self.recordError("invalid string (not in quotes...) for data element " + 
+                                         str(dataDictElement))
                         continue
                 elif fmt == 'int':
                     try:
                         data = int(dataStr)
-                    except:
-                        self.recordError("invalid integer for data element "+str(dataDictElement))
+                    except ValueError:
+                        self.recordError("invalid integer for data element " + str(dataDictElement))
                         continue
                 elif fmt in ['bool','boolean']:
                     if dataStr in ['true','True']:
@@ -709,7 +746,7 @@ class CommandProcessor(object):
                     elif dataStr in ['false','False']:
                         data = False
                     else:
-                        self.recordError("invalid boolean for data element "+str(dataDictElement))
+                        self.recordError("invalid boolean for data element " + str(dataDictElement))
                         continue
                 elif fmt == 'list':
                     # in this case dataStr should actually be an list object.
@@ -729,14 +766,17 @@ class CommandProcessor(object):
                 else:
                     if fmt in ['xml','musicxml']:                
                         if dataStr.find("<!DOCTYPE") == -1:
-                            dataStr = """<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">""" + dataStr
+                            dataStr = (
+                                '<!DOCTYPE score-partwise PUBLIC ' + 
+                                '"-//Recordare//DTD MusicXML 1.1 Partwise//EN"' + 
+                                '"http://www.musicxml.org/dtds/partwise.dtd">' + dataStr)
                         if dataStr.find("<?xml") == -1:
                             dataStr = """<?xml version="1.0" encoding="UTF-8"?>""" + dataStr
                     try:
                         data = converter.parseData(dataStr)
                     except converter.ConverterException as e:
-                        #self.recordError("Error parsing data variable "+name+": "+str(e)+"\n\n"+dataStr)
-                        self.recordError("Error parsing data variable "+name+": "+unicode(e)+"\n\n"+dataStr,e)
+                        self.recordError("Error parsing data variable " + name + ": " + 
+                                         six.u(e) + "\n\n" + dataStr, e)
                         continue
             else: # No format specified
                 dataStr = str(dataStr)
@@ -752,7 +792,8 @@ class CommandProcessor(object):
         
         In the JSON, commands are described by:
         
-        **'commandList'**  whose value is a list specifying commands to be executed by the processor of the form::
+        **'commandList'**  whose value is a list specifying commands to be executed by 
+        the processor of the form::
         
                 "commandList" : [{"<CMD_1_TYPE>": "<CMD_2_COMMAND_NAME>",
                                   "resultVar":    "<CMD_1_RESULT_VARIABLE>",
@@ -767,14 +808,18 @@ class CommandProcessor(object):
                                   etc.
                                   ]
                                   
-        Calling .executeCommands() iterates through the commandList sequentially, calling the equivalent of::
+        Calling .executeCommands() iterates through the commandList sequentially, 
+        calling the equivalent of::
                 
-                <CMD_n_RESULT_VARAIBLE> = <CMD_n_CALLER>.<CMD_n_COMMAND_NAME>(<CMD_n_ARG_1>,<CMD_n_ARG_2>...)
+                <CMD_n_RESULT_VARAIBLE> = <CMD_n_CALLER>.<CMD_n_COMMAND_NAME>(<CMD_n_ARG_1>, 
+                    <CMD_n_ARG_2>...)
             
         where the command TYPE is "function" (no caller), "method" (has a caller), or "attribute"
             
-        See :meth:`~music21.webapps.CommandProcessor.executeFunctionCommand`, :meth:`~music21.webapps.CommandProcessor.executeMethodCommand`, 
-        and :meth:`~music21.webapps.CommandProcessor.executeAttributeCommand` for more information about the format
+        See :meth:`~music21.webapps.CommandProcessor.executeFunctionCommand`, 
+        :meth:`~music21.webapps.CommandProcessor.executeMethodCommand`, 
+        and :meth:`~music21.webapps.CommandProcessor.executeAttributeCommand` 
+        for more information about the format
         required for those commands.
             
         EXAMPLE::
@@ -803,9 +848,13 @@ class CommandProcessor(object):
         '''
         
         for commandElement in self.commandList:
-            typeKeysInCommandList = [k for k in commandElement if k in ['function', 'attribute', 'method']]
+            typeKeysInCommandList = [k for k in commandElement if k in ['function', 
+                                                                        'attribute', 
+                                                                        'method']]
             if len(typeKeysInCommandList) != 1:
-                self.recordError("Must have exactly one key denoting type ('function', 'attribute', or 'method'):  "+str(commandElement))
+                self.recordError(
+                    "Must have exactly one key denoting type ('function', 'attribute', " + 
+                    "or 'method'):  " + str(commandElement))
                 continue
             commandType = typeKeysInCommandList[0]
             
@@ -816,7 +865,7 @@ class CommandProcessor(object):
             elif  commandType == 'method':
                 self.executeMethodCommand(commandElement)
             else:
-                self.recordError("No type specified for:  "+str(commandElement))
+                self.recordError("No type specified for:  " + str(commandElement))
                 continue
         return
         
@@ -830,16 +879,19 @@ class CommandProcessor(object):
              'argList': ["<ARG_1>","<ARG_2>", etc.],
              'resultVar' : "<RESULT_VARIABLE>"}
          
-        Executing it yields the equivalent of: ``<RESULT_VARIABLE> = <FUNCTION_NAME>(ARG_1, ARG_2, ...)``
+        Executing it yields the equivalent of: 
+        ``<RESULT_VARIABLE> = <FUNCTION_NAME>(ARG_1, ARG_2, ...)``
         
-        The keys argList and resultVar are optional. A commandElement without argList will just call ``<FUNCTION_NAME>()``
-        with no arguments and a commandElement without resutlVar will not assign the result of the function to any variable.
+        The keys argList and resultVar are optional. A commandElement without argList will 
+        just call ``<FUNCTION_NAME>()``
+        with no arguments and a commandElement without resutlVar will not assign the result 
+        of the function to any variable.
         
         
         '''
         # Get function name
         if 'function' not in commandElement:
-            self.recordError("No function specified for function command: "+str(commandElement))
+            self.recordError("No function specified for function command: " + str(commandElement))
             return
             
         functionName = commandElement['function']
@@ -853,7 +905,8 @@ class CommandProcessor(object):
         
         # Make sure function is valid for processing on webserver
         if functionName not in availableFunctions:
-            self.recordError("Function "+str(functionName)+" not available on webserver:"+str(commandElement))
+            self.recordError("Function " + str(functionName) + 
+                             " not available on webserver:" + str(commandElement))
             return
         
         # Process arguments
@@ -866,10 +919,13 @@ class CommandProcessor(object):
                 argList[i] = parsedArg
         
         # Call the function
+        # pylint: disable=broad-except
         try:
-            result = eval(functionName)(*argList)  # safe because of check for functionName in availableFunctions
+            result = eval(functionName)(*argList)  
+            # safe because of check for functionName in availableFunctions
         except Exception as e:
-            self.recordError("Error: "+str(e)+" executing function "+str(functionName)+" :"+str(commandElement))
+            self.recordError("Error: " + str(e) + " executing function " + 
+                             str(functionName) + " :" + str(commandElement))
             return
         
         # Save it if resutlVar specified
@@ -888,22 +944,23 @@ class CommandProcessor(object):
              'caller': "<CALLER_VARIABLE>",
              'resultVar' : "<RESULT_VARIABLE>"}
          
-        Executing it yields the equivalent of: ``<RESULT_VARIABLE> = <CALLER_VARIABLE>.<ATTRIBUTE_NAME>.``
+        Executing it yields the equivalent of: 
+        ``<RESULT_VARIABLE> = <CALLER_VARIABLE>.<ATTRIBUTE_NAME>.``
         
         All three keys 'attributeName', 'caller', and 'resultVar' are required.
 
         ''' 
         # Make sure the appropriate keys are set:
         if 'attribute' not in commandElement:
-            self.recordError("No attribute specified for attribute command: "+str(commandElement))
+            self.recordError("No attribute specified for attribute command: " + str(commandElement))
             return
         
         if 'caller' not in commandElement:
-            self.recordError("calle must be specified with attribute :"+str(commandElement))
+            self.recordError("calle must be specified with attribute :" + str(commandElement))
             return
         
         if 'resultVar' not in commandElement:
-            self.recordError("resultVar must be specified with attribute :"+str(commandElement))
+            self.recordError("resultVar must be specified with attribute :" + str(commandElement))
             return
         
         # Get attribute name
@@ -911,7 +968,8 @@ class CommandProcessor(object):
         
         # Make sure attribute is valid for processing on webserver
         if attributeName not in availableAttribtues:
-            self.recordError("Attribute "+str(attributeName)+" not available on webserver :"+str(commandElement))
+            self.recordError("Attribute " + str(attributeName) + 
+                             " not available on webserver :" + str(commandElement))
             return
         
         # Get the caller and result variable names
@@ -920,13 +978,15 @@ class CommandProcessor(object):
 
         # Make sure the caller is defined        
         if callerName not in self.parsedDataDict:
-            self.recordError(callerName+" not defined "+str(commandElement))
+            self.recordError(callerName + " not defined " + str(commandElement))
             return
         
         # Check that the caller has the desired attribute
         caller = self.parsedDataDict[callerName]
         if not hasattr(caller, attributeName):
-            self.recordError("caller "+str(callerName)+": "+str(caller) +" has no attribute "+str(attributeName)+": "+str(commandElement))
+            self.recordError("caller " + str(callerName) + ": " + 
+                             str(caller) + " has no attribute " + 
+                             str(attributeName) + ": " + str(commandElement))
             return
     
         self.parsedDataDict[resultVarName] = getattr(caller, attributeName)
@@ -940,18 +1000,21 @@ class CommandProcessor(object):
              'argList': ["<ARG_1>","<ARG_2>", etc.],
              'resultVar' : "<RESULT_VARIABLE>"}
          
-        Executing it yields the equivalent of ``<RESULT_VARIABLE> = <CALLER_VARIABLE>.<METHOD_NAME>(ARG_1, ARG_2, ...)``
+        Executing it yields the equivalent of 
+        ``<RESULT_VARIABLE> = <CALLER_VARIABLE>.<METHOD_NAME>(ARG_1, ARG_2, ...)``
         
-        The keys argList and resultVar are optional. A commandElement without argList will just call ``<CALLER_VARIABLE>.<METHOD_NAME>()``
-        with no arguments and a commandElement without resutlVar will not assign the result of the function to any variable.
+        The keys argList and resultVar are optional. A commandElement without argList will 
+        just call ``<CALLER_VARIABLE>.<METHOD_NAME>()``
+        with no arguments and a commandElement without resutlVar will not assign the result 
+        of the function to any variable.
         
         ''' 
         # Make sure the appropriate keys are set:
         if 'method' not in commandElement:
-            self.recordError("No methodName specified for method command: "+str(commandElement))
+            self.recordError("No methodName specified for method command: " + str(commandElement))
             return
         if 'caller' not in commandElement:
-            self.recordError("No caller specified for method command: "+str(commandElement))
+            self.recordError("No caller specified for method command: " + str(commandElement))
             return
         
         # Get method name and caller name
@@ -960,7 +1023,8 @@ class CommandProcessor(object):
         
         # Make sure the method is valid for processing on webserver
         if methodName not in availableMethods:
-            self.recordError("Method "+str(methodName)+" not available on webserver :"+str(commandElement))
+            self.recordError("Method " + str(methodName) + " not available on webserver :" + 
+                             str(commandElement))
             return
     
         # Process arguments
@@ -980,19 +1044,23 @@ class CommandProcessor(object):
         # Check that the caller has the desired method
         caller = self.parsedDataDict[callerName]
         if not hasattr(caller, methodName):
-            self.recordError("caller "+str(callerName)+": "+str(caller) +" has no method "+str(methodName)+": "+str(commandElement))
+            self.recordError("caller " + str(callerName) + ": " + str(caller) +" has no method " +
+                             str(methodName)+": "+str(commandElement))
             return
         
         if not callable(getattr(caller, methodName)):
-            self.recordError(str(callerName)+"."+str(methodName) +" is not callable: "+str(commandElement))
+            self.recordError(str(callerName) + "." + str(methodName) +" is not callable: " + 
+                             str(commandElement))
             return
 
         # Call the method        
+        # pylint: disable=broad-except
         try:
             result = getattr(caller, methodName)(*argList)
         except Exception:
             exc_type, unused_exc_obj, unused_exc_tb = sys.exc_info()
-            self.recordError("Error: "+str(exc_type)+" executing method "+str(methodName)+" :"+str(commandElement))
+            self.recordError("Error: " + str(exc_type) + " executing method " + 
+                             str(methodName) + " :" + str(commandElement))
             return
         
         # Save it if resutlVar specified
@@ -1070,9 +1138,12 @@ class CommandProcessor(object):
         name of an allowable function. In either of these cases, it will return the actual value
         of the data or the actual function.
         
-        Next, it will check if the string is an int, float, boolean, or none, returning the appropriate value.
-        If it is a quoted string then it will remove the quotes on the ends and return it as a string.
-        If it has square braces indicating a list, the inner elements will be parsed using this same function recursively.
+        Next, it will check if the string is an int, float, boolean, or none, 
+        returning the appropriate value.
+        If it is a quoted string then it will remove the quotes on the ends and 
+        return it as a string.
+        If it has square braces indicating a list, the inner elements will be 
+        parsed using this same function recursively.
         (Note that recursive lists like [1, 2, [3, 4]] are not yet supported
         
         If the input corresponds to none of these types, it is returned as a string.
@@ -1128,10 +1199,10 @@ class CommandProcessor(object):
         else:
             try:
                 returnVal = int(strVal)
-            except:
+            except ValueError:
                 try:
                     returnVal = float(strVal)
-                except:
+                except ValueError:
                     if strVal == "True":
                         returnVal = True
                         
@@ -1149,18 +1220,22 @@ class CommandProcessor(object):
                         
                     elif strVal[0] == "[" and strVal[-1] == "]": # List
                         listElements = strVal[1:-1].split(",") # remove [] and split by commas
-                        returnVal = [self.parseInputToPrimitive(element) for element in listElements]
+                        returnVal = [self.parseInputToPrimitive(element) for 
+                                        element in listElements]
                     else: 
                         returnVal = cgi.escape(str(strVal))
         return returnVal
     
     def getOutput(self):
         '''
-        Generates the output of the processor. Uses the attributes outputTemplate and outputArgList from the agenda
-        to determine which format the output should be in. If an outputTemplate is unspecified or known,
+        Generates the output of the processor. Uses the attributes outputTemplate and 
+        outputArgList from the agenda
+        to determine which format the output should be in. If an outputTemplate is 
+        unspecified or known,
         will return json by default.
         
-        Return is of the style (output, outputType) where outputType is a content-type ready for returning 
+        Return is of the style (output, outputType) where outputType is a 
+        content-type ready for returning 
         to the server:
         "text/plain", "application/json", "text/html", etc.
         '''
@@ -1198,7 +1273,15 @@ class CommandProcessor(object):
 #-------------------------------------------------------------------------------
 
 
-sampleFormDataSimple = '------WebKitFormBoundarytO99C5T6SZEHKAIb\r\nContent-Disposition: form-data; name="a"\r\n\r\n7\r\n------WebKitFormBoundarytO99C5T6SZEHKAIb\r\nContent-Disposition: form-data; name="b"\r\n\r\n8\r\n------WebKitFormBoundarytO99C5T6SZEHKAIb\r\nContent-Disposition: form-data; name="json"\r\n\r\n{"dataDict":{"c":{"data":7}},\r\n        "returnDict":{"a":"int"}\r\n        }\r\n------WebKitFormBoundarytO99C5T6SZEHKAIb--\r\n'
+sampleFormDataSimple = ('------WebKitFormBoundarytO99C5T6SZEHKAIb\r\n' + 
+    'Content-Disposition: form-data; name="a"\r\n\r\n7\r\n' + 
+    '------WebKitFormBoundarytO99C5T6SZEHKAIb\r\n' + 
+    'Content-Disposition: form-data; name="b"\r\n\r\n' + 
+    '8\r\n------WebKitFormBoundarytO99C5T6SZEHKAIb\r\n' + 
+    'Content-Disposition: form-data; name="json"\r\n\r\n' + 
+    '{"dataDict":{"c":{"data":7}},\r\n' + 
+    '        "returnDict":{"a":"int"}\r\n        }\r\n' + 
+    '------WebKitFormBoundarytO99C5T6SZEHKAIb--\r\n')
 
 sampleJsonStringSimple = r'''
     {

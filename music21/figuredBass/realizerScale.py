@@ -30,8 +30,10 @@ scaleModes = {'major' : scale.MajorScale,
 #-------------------------------------------------------------------------------
 
 class FiguredBassScale(object):
-    _DOC_ATTR = {'realizerScale': 'A :class:`~music21.scale.Scale` based on the desired value and mode.',
-                 'keySig': 'A :class:`~music21.key.KeySignature` corresponding to the scale value and mode.'}
+    _DOC_ATTR = {'realizerScale': 'A :class:`~music21.scale.Scale` based on the ' + 
+                    'desired value and mode.',
+                 'keySig': 'A :class:`~music21.key.KeySignature` corresponding to ' + 
+                    'the scale value and mode.'}
     
     def __init__(self, scaleValue = 'C', scaleMode = 'major'):
         '''
@@ -165,20 +167,27 @@ class FiguredBassScale(object):
         Root position seventh chord, showing MaxPitch
         
         >>> fbScale.getPitches(pitch.Pitch('G3'), '7', 'F4')
-        [<music21.pitch.Pitch G3>, <music21.pitch.Pitch B3>, <music21.pitch.Pitch D4>, <music21.pitch.Pitch F4>]
+        [<music21.pitch.Pitch G3>, <music21.pitch.Pitch B3>, 
+         <music21.pitch.Pitch D4>, <music21.pitch.Pitch F4>]
         '''
         bassPitch = convertToPitch(bassPitch)
         maxPitch = convertToPitch(maxPitch)
         pitchNames = self.getPitchNames(bassPitch, notationString)
         iter1 = itertools.product(pitchNames, range(maxPitch.octave + 1))
         if six.PY3:
-            iter2 = map(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1) # pylint: disable=bad-builtin
-            iter3 = itertools.filterfalse(lambda samplePitch: bassPitch > samplePitch, iter2) # @UndefinedVariable
-            iter4 = itertools.filterfalse(lambda samplePitch: samplePitch > maxPitch, iter3) # @UndefinedVariable
+            iter2 = map( # pylint: disable=bad-builtin
+                        lambda x: pitch.Pitch(x[0] + str(x[1])), iter1) 
+            iter3 = itertools.filterfalse( # @UndefinedVariable
+                                          lambda samplePitch: bassPitch > samplePitch, iter2) 
+            iter4 = itertools.filterfalse( # @UndefinedVariable
+                                          lambda samplePitch: samplePitch > maxPitch, iter3) 
         else:
-            iter2 = itertools.imap(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1)  # @UndefinedVariable
-            iter3 = itertools.ifilterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)  # @UndefinedVariable
-            iter4 = itertools.ifilterfalse(lambda samplePitch: samplePitch > maxPitch, iter3)  # @UndefinedVariable
+            iter2 = itertools.imap( # @UndefinedVariable
+                            lambda x: pitch.Pitch(x[0] + str(x[1])), iter1)  
+            iter3 = itertools.ifilterfalse(  # @UndefinedVariable
+                            lambda samplePitch: bassPitch > samplePitch, iter2) 
+            iter4 = itertools.ifilterfalse(  # @UndefinedVariable
+                            lambda samplePitch: samplePitch > maxPitch, iter3)  
         allPitches = list(iter4)
         allPitches.sort()
         return allPitches

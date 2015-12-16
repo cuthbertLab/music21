@@ -10,7 +10,6 @@
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
-
 '''
 The module defines Beam and Beams (note plural) objects.
 
@@ -126,7 +125,7 @@ class Beam(SlottedObject):
         )
 
     ### INITIALIZER ###
-
+    # pylint: disable=redefined-builtin
     def __init__(self, type=None, direction=None):  # type is okay @ReservedAssignment
         self.type = type  # start, stop, continue, partial
         self.direction = direction  # left or right for partial
@@ -180,7 +179,8 @@ class Beams(SlottedObject):
         )
 
     _DOC_ATTR = {
-        'feathered': 'Boolean determining if this is a feathered beam or not (does nothing for now).',
+        'feathered': 'Boolean determining if this is a feathered beam or not ' + 
+            '(does nothing for now).',
         }
 
     ### INITIALIZER ###
@@ -204,7 +204,7 @@ class Beams(SlottedObject):
         return '<music21.beam.Beams %s>' % '/'.join(msg)
 
     ### PUBLIC METHODS ###
-
+    # pylint: disable=redefined-builtin
     def append(self, type=None, direction=None): # type is okay @ReservedAssignment
         '''
         Append a new Beam object to this Beams, automatically creating the Beam

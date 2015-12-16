@@ -237,21 +237,26 @@ class GregorianNote(note.Note):
         asciiM = 109
        
         if not hasattr(useClef, 'lowestLine'):
-            raise ChantException("useClef has to define the diatonicNoteNum representing the lowest line")
+            raise ChantException(
+                "useClef has to define the diatonicNoteNum representing the lowest line")
        
         stepsAboveLowestLine = inNote.diatonicNoteNum - useClef.lowestLine
         asciiNote = stepsAboveLowestLine + asciiD
        
         if asciiNote < asciiA:
             if usedDefaultClef is True:
-                raise ChantException("note is too low for the default clef (AltoClef), choose a lower one")
+                raise ChantException(
+                    "note is too low for the default clef (AltoClef), choose a lower one")
             else:
-                raise ChantException("note is too low for the clef (%s), choose a lower one" % str(useClef))
+                raise ChantException(
+                    "note is too low for the clef (%s), choose a lower one" % str(useClef))
         elif asciiNote > asciiM:
             if usedDefaultClef is True:
-                raise ChantException("note is too high for the default clef (AltoClef), choose a higher one")
+                raise ChantException(
+                    "note is too high for the default clef (AltoClef), choose a higher one")
             else:
-                raise ChantException("note is too high for the clef (%s), choose a higher one" % str(useClef))
+                raise ChantException(
+                    "note is too high for the clef (%s), choose a higher one" % str(useClef))
         else:
             return six.unichr(asciiNote) # unichr on python2; chr python3
 
@@ -298,18 +303,25 @@ class BaseScoreConverter(object):
     samplePiece = r'''
     style: modern;
     
-    % Then, when gregorio encounters the following line (%%), it switches to the score, where you input the notes
+    % Then, when gregorio encounters the following line (%%), 
+    % it switches to the score, where you input the notes
     %%
     
-    % The syntax in this part is called gabc. Please refer to http://home.gna.org/gregorio/gabc/#basis
+    % The syntax in this part is called gabc. 
+    % Please refer to http://home.gna.org/gregorio/gabc/#basis
     
-    Pó(c3eh)pu(g)lus(h) Si(hi)on,(hgh.) *(;) ec(hihi)ce(e.) Dó(e.f!gwhhi)mi(h){n}us(h) vé(hi)ni(ig//ih)et(h.) (,) ad(iv./hig) sal(fe)ván(ghg)das(fg) gen(e_f_e_)tes(e.) :(:)
+    Pó(c3eh)pu(g)lus(h) Si(hi)on,(hgh.) *(;) ec(hihi)ce(e.) Dó(e.f!gwhhi)mi(h){n}us(h) 
+    vé(hi)ni(ig//ih)et(h.) (,) ad(iv./hig) sal(fe)ván(ghg)das(fg) gen(e_f_e_)tes(e.) :(:)
     
-    et(e) au(eh)dí(hhi)tam(i) fá(kjki)ci(i)et(i) Dó(ij)mi(ihi)nus(iv./hiHF) (,) gló(h!i'j)ri(ji!kvJI)am(ij) vo(j.i!jwk)cis(ji) su(i_j_i_)æ,(i.) (;) in(e) læ(e)tí(e!f'h)ti(h)a(hi!jVji)
+    et(e) au(eh)dí(hhi)tam(i) fá(kjki)ci(i)et(i) Dó(ij)mi(ihi)nus(iv./hiHF) 
+    (,) gló(h!i'j)ri(ji!kvJI)am(ij) vo(j.i!jwk)cis(ji) su(i_j_i_)æ,(i.) (;) 
+    in(e) læ(e)tí(e!f'h)ti(h)a(hi!jVji)
     
-    cor(gh!ijI'H<)dis(ihhf!gwh) ve(e_f_e_)stri.(e) Ps.(::) Qui(ehg) re(hi)gis(i) I(i)sra(i)el,(hj) in(j)tén(ji)de(ij..) :*(:) qui(ig) de(hi)dú(i)cis(i)
+    cor(gh!ijI'H<)dis(ihhf!gwh) ve(e_f_e_)stri.(e) Ps.(::) Qui(ehg) 
+    re(hi)gis(i) I(i)sra(i)el,(hj) in(j)tén(ji)de(ij..) :*(:) qui(ig) de(hi)dú(i)cis(i)
     
-    vel(i)ut(i!jwk) o(i')vem(h) Jo(hhh)seph.(fe..) (::) Gló(ehg)ri(hi)a(i) Pa(i)tri.(i) (:) E(i) u(i!jwk) o(i) u(h) a(hhh) e(fe..) (::)
+    vel(i)ut(i!jwk) o(i')vem(h) Jo(hhh)seph.(fe..) (::) Gló(ehg)ri(hi)a(i) 
+    Pa(i)tri.(i) (:) E(i) u(i!jwk) o(i) u(h) a(hhh) e(fe..) (::)
     '''
 
 
@@ -333,9 +345,9 @@ class BaseScoreConverter(object):
         >>> bsc = alpha.chant.BaseScoreConverter()
         >>> filePath = bsc.writeFile('hello')
         >>> assert(filePath.endswith('.gabc')) #_DOCS_HIDE
-        >>> filePath = '/var/folders/k9/85ztxmy53xg1qxvr0brw1zyr0000gn/T/music21/tmpekHFCr.gabc' #_DOCS_HIDE
+        >>> filePath = '/var/folders/k9/T/music21/tmpekHFCr.gabc' #_DOCS_HIDE
         >>> filePath 
-        '/var/folders/k9/85ztxmy53xg1qxvr0brw1zyr0000gn/T/music21/tmpekHFCr.gabc'
+        '/var/folders/k9/T/music21/tmpekHFCr.gabc'
         
         '''
         
@@ -354,9 +366,10 @@ class BaseScoreConverter(object):
         gregorio converter.  Returns the filename with .tex substituted for .gabc
         
         >>> bsc = alpha.chant.BaseScoreConverter()
-        >>> #_DOCS_SHOW newFp = bsc.launchGregorio('~cuthbert/Library/Gregorio/examples/Populas.gabc')
+        >>> fn = '~cuthbert/Library/Gregorio/examples/Populas.gabc'
+        >>> #_DOCS_SHOW newFp = bsc.launchGregorio(fn)
         >>> #_DOCS_SHOW bsc.gregorioCommand
-        >>> 'open -a"/usr/local/bin/gregorio"  ~cuthbert/Library/Gregorio/examples/Populas.gabc' #_DOCS_HIDE
+        >>> 'open -a"/usr/local/bin/gregorio" ' + fn #_DOCS_HIDE
         'open -a"/usr/local/bin/gregorio"  ~cuthbert/Library/Gregorio/examples/Populas.gabc'
         
         

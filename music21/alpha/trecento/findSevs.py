@@ -18,9 +18,7 @@ from music21.alpha.trecento import cadencebook
 from music21 import stream
 
 
-def find(startRow = 2, endRow = 469, searchInterval = 7):
-
-    
+def find(startRow=2, endRow=469, searchInterval=7):
     opus = stream.Opus()
     ballatas = cadencebook.BallataSheet()
     for row in range(startRow, endRow):
@@ -48,7 +46,8 @@ def findInWork(work, searchInterval = 7):
                     thisInterval.noteEnd.editorial.color = 'blue'
 #                    except:
 #                        pass # not worth dying if the startNote can't be found
-                    #print(thisInterval.note1.nameWithOctave + ' -- ' + thisInterval.note2.nameWithOctave)
+                    #print(thisInterval.note1.nameWithOctave + ' -- ' + 
+                    #    thisInterval.note2.nameWithOctave)
                     #interval.note1.editorial.color = "blue" #this doesn't actually work yet....
                     #interval.note2.editorial.color = "blue"
     return containsInterval

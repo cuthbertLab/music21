@@ -470,7 +470,7 @@ class MidiEvent(object):
     >>> me2
     <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data='guitar'>
     '''
-    
+    # pylint: disable=redefined-builtin    
     def __init__(self, track, type=None, time=None, channel=None): #@ReservedAssignment
         self.track = track  # a MidiTrack object
         self.type = type
@@ -1545,7 +1545,9 @@ class Test(unittest.TestCase):
 
         mt = MidiTrack(1)
 
-#(0 - 16383). The pitch value affects all playing notes on the current channel. Values below 8192 decrease the pitch, while values above 8192 increase the pitch. The pitch range may vary from instrument to instrument, but is usually +/-2 semi-tones.
+        #(0 - 16383). The pitch value affects all playing notes on the current channel. 
+        # Values below 8192 decrease the pitch, while values above 8192 increase the pitch. 
+        # The pitch range may vary from instrument to instrument, but is usually +/-2 semi-tones.
         #pbValues = [0, 5, 10, 15, 20, 25, 30, 35, 40, 50] 
         pbValues = [0, 25, 0, 50, 0, 100, 0, 150, 0, 200] 
         pbValues += [-x for x in pbValues]

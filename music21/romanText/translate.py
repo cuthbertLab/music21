@@ -83,7 +83,8 @@ It's a little complex, but worth seeing in full:
 >>> data = []
 >>> xlabels = []
 >>> values = []
->>> for deg,value in sorted(list(degreeDictionary.items()), key=operator.itemgetter(1), reverse=True):
+>>> ddList = list(degreeDictionary.items())
+>>> for deg,value in sorted(ddList, key=operator.itemgetter(1), reverse=True):
 ...    data.append((i, degreeDictionary[deg]), )
 ...    xlabels.append((i+.5, deg), )
 ...    values.append(degreeDictionary[deg])
@@ -455,9 +456,9 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                     setKeyChangeToken = False 
                     
                     for i, a in enumerate(t.atoms):
-                        if isinstance(a, rtObjects.RTKey) or \
-                           ((foundAKeySignatureSoFar == False) and \
-                            (isinstance(a, rtObjects.RTAnalyticKey))): 
+                        if (isinstance(a, rtObjects.RTKey) or
+                            ((foundAKeySignatureSoFar == False) and
+                             (isinstance(a, rtObjects.RTAnalyticKey)))): 
                             # found a change of Key+KeySignature or
                             # just found a change of analysis but no keysignature so far
                     
@@ -656,7 +657,10 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
         except Exception:
             import traceback
             tracebackMessage = traceback.format_exc()
-            raise RomanTextTranslateException("At line %d for token %r, an exception was raised: \n%s" % (t.lineNumber, t, tracebackMessage))
+            raise RomanTextTranslateException(
+                "At line %d for token %r, an exception was raised: \n%s" % (t.lineNumber, 
+                                                                            t, 
+                                                                            tracebackMessage))
 
     p.elementsChanged()
     fixPickupMeasure(p)
@@ -696,7 +700,8 @@ def appendMeasureToRepeatEndingsDict(t, m, repeatEndings, measureNumber = None):
     {1: [(15, <music21.stream.Measure 0a offset=0.0>)]}
     >>> romanText.translate.appendMeasureToRepeatEndingsDict(rtm2, m2, repeatEndings)
     >>> repeatEndings[1], repeatEndings[2]
-    ([(15, <music21.stream.Measure 0a offset=0.0>)], [(15, <music21.stream.Measure 0b offset=0.0>)])
+    ([(15, <music21.stream.Measure 0a offset=0.0>)], 
+     [(15, <music21.stream.Measure 0b offset=0.0>)])
     >>> repeatEndings[2][0][1] is m2
     True
     '''
@@ -733,11 +738,13 @@ def _consolidateRepeatEndings(repeatEndings):
     For the sake of demo and testing, we will use strings instead of measure objects.
 
     
-    >>> repeatEndings = {1: [(5, 'm5a'), (6, 'm6a'), (17, 'm17'), (18, 'm18'), (19, 'm19'), (23, 'm23a')], 
+    >>> repeatEndings = {1: [(5, 'm5a'), (6, 'm6a'), (17, 'm17'), (18, 'm18'), 
+    ...                      (19, 'm19'), (23, 'm23a')], 
     ...                  2: [(5, 'm5b'), (6, 'm6b'), (20, 'm20'), (21, 'm21'), (23, 'm23b')], 
     ...                  3: [(23, 'm23c')]}
     >>> print(romanText.translate._consolidateRepeatEndings(repeatEndings))
-    [(['m5a', 'm6a'], 1), (['m17', 'm18', 'm19'], 1), (['m23a'], 1), (['m5b', 'm6b'], 2), (['m20', 'm21'], 2), (['m23b'], 2), (['m23c'], 3)]
+    [(['m5a', 'm6a'], 1), (['m17', 'm18', 'm19'], 1), (['m23a'], 1), 
+     (['m5b', 'm6b'], 2), (['m20', 'm21'], 2), (['m23b'], 2), (['m23c'], 3)]
     '''
     returnList = []
     
@@ -779,7 +786,8 @@ def _addRepeatsFromRepeatEndings(s, repeatEndings):
         #Adding repeat bracket to stream at beginning of repeated section.  
         #Maybe better at end?
         s.insert(rbOffset, rb)
-        if endingNumber == 1: # should be "if not max(endingNumbers), but we can't tell that for each repeat...
+        # should be "if not max(endingNumbers), but we can't tell that for each repeat.
+        if endingNumber == 1: 
             if measureList[-1].rightBarline is None:
                 measureList[-1].rightBarline = bar.Repeat(direction='end')
 
@@ -1096,9 +1104,11 @@ m7 = m3
 
         s = romanTextToStreamScore(testSecondaryInCopy)
         m = s.measure(6).flat
-        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].pitchedCommonName, 'E5-dominant seventh chord')
+        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].pitchedCommonName, 
+                         'E5-dominant seventh chord')
         m = s.measure(7).flat
-        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].pitchedCommonName, 'E5-dominant seventh chord')
+        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].pitchedCommonName,
+                         'E5-dominant seventh chord')
         #s.show()
 
     def testBasicB(self):
@@ -1109,7 +1119,8 @@ m7 = m3
 
     def testRomanTextString(self):
         from music21 import converter
-        s = converter.parse('m1 KS1 I \n m2 V6/5 \n m3 I b3 V7 \n m4 KS-3 vi \n m5 a: i b3 V4/2 \n m6 I', format='romantext')
+        s = converter.parse('m1 KS1 I \n m2 V6/5 \n m3 I b3 V7 \n' + 
+                            'm4 KS-3 vi \n m5 a: i b3 V4/2 \n m6 I', format='romantext')
 
         rnStream = s.flat.getElementsByClass('RomanNumeral')
         self.assertEqual(rnStream[0].figure, 'I')
@@ -1144,7 +1155,8 @@ m6-7 = m4-5
 
         for elementNumber in [0, 6, 12]:
             self.assertEqual(rnStream[elementNumber + 4].figure, 'III6')
-            self.assertEqual(str([str(p) for p in rnStream[elementNumber + 4].pitches]), "['A4', 'C5', 'F5']")
+            self.assertEqual(str([str(p) for p in rnStream[elementNumber + 4].pitches]), 
+                             "['A4', 'C5', 'F5']")
 
             x = rnStream[elementNumber + 4].pitches[2].accidental
             if x == None: 
@@ -1152,7 +1164,8 @@ m6-7 = m4-5
             self.assertEqual(x.alter, 0)
 
             self.assertEqual(rnStream[elementNumber + 5].figure, 'iv6')
-            self.assertEqual(str([str(p) for p in rnStream[elementNumber + 5].pitches]), "['B-4', 'D5', 'G5']")
+            self.assertEqual(str([str(p) for p in rnStream[elementNumber + 5].pitches]), 
+                             "['B-4', 'D5', 'G5']")
 
             self.assertEqual(rnStream[elementNumber + 5].pitches[0].accidental.displayStatus, True)
 

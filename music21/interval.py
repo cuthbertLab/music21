@@ -17,15 +17,15 @@ Fundamental classes are :class:`~music21.interval.Interval`,
 :class:`~music21.interval.GenericInterval`, 
 and :class:`~music21.interval.ChromaticInterval`.
 '''
-
+import abc
 import copy
+from fractions import Fraction
 import math
 import unittest
 
 from music21 import base
 from music21 import common 
 from music21 import exceptions21
-
 
 #from music21 import pitch # SHOULD NOT, b/c of enharmonics
 
@@ -50,7 +50,9 @@ directionTerms = {DESCENDING:"Descending",
 # specifiers are derived from these two lists; 
 # perhaps better represented with a dictionary
 # perhaps the first entry, below, should be None, like in prefixSpecs?
-niceSpecNames = ['ERROR', 'Perfect', 'Major', 'Minor', 'Augmented', 'Diminished', 'Doubly-Augmented', 'Doubly-Diminished', 'Triply-Augmented', 'Triply-Diminished', "Quadruply-Augmented", "Quadruply-Diminished"]
+niceSpecNames = ['ERROR', 'Perfect', 'Major', 'Minor', 'Augmented', 'Diminished', 
+                 'Doubly-Augmented', 'Doubly-Diminished', 'Triply-Augmented', 
+                 'Triply-Diminished', "Quadruply-Augmented", "Quadruply-Diminished"]
 prefixSpecs = [None, 'P', 'M', 'm', 'A', 'd', 'AA', 'dd', 'AAA', 'ddd', 'AAAA', 'dddd']
 
 # constants provide the common numerical representation of an interval. 
@@ -441,20 +443,106 @@ def convertSemitoneToSpecifierGeneric(count):
     return convertSemitoneToSpecifierGenericMicrotone(count)[:2]
 
 
+_pythagorean_cache = {}
+
+def intervalToPythagoreanRatio(intervalObj):
+    r'''
+    Returns the interval ratio in pythagorean tuning, always as a Fraction object.
+
+    >>> iList = [interval.Interval(name) for name in ('P4', 'P5', 'M7')]
+    >>> iList
+    [<music21.interval.Interval P4>, <music21.interval.Interval P5>, <music21.interval.Interval M7>]
+    
+    >>> [interval.intervalToPythagoreanRatio(i) for i in iList]
+    [Fraction(4, 3), Fraction(3, 2), Fraction(243, 128)]
+
+    Throws an exception if no ratio can be found, such as for quarter tones.
+
+    >>> p1, p2 = pitch.Pitch('C1'), pitch.Pitch('C1')
+    >>> p2.accidental = 'half-sharp'
+    >>> fiftyCent = interval.Interval(p1, p2)
+    >>> fiftyCent
+    <music21.interval.Interval A1 (-50c)>
+    >>> interval.intervalToPythagoreanRatio(fiftyCent)
+    Traceback (most recent call last):
+    IntervalException: Could not find a pythagorean ratio for <music21.interval.Interval A1 (-50c)>.
+    '''
+    from music21.pitch import Pitch
+
+    start_pitch = Pitch('C1')
+    end_pitch_wanted = start_pitch.transpose(intervalObj)
+
+    if end_pitch_wanted.name in _pythagorean_cache:
+        end_pitch, ratio = _pythagorean_cache[end_pitch_wanted.name]
+
+    else:
+        end_pitch_up = start_pitch
+        end_pitch_down = start_pitch
+
+        # when counter == 36, it wraps back to 'C' because of
+        # music21's limiting of accidentals
+        for counter in range(37):
+            if end_pitch_up.name == end_pitch_wanted.name:
+                ratio = Fraction(3, 2) ** counter
+                end_pitch = end_pitch_up
+                break
+                
+            elif end_pitch_down.name == end_pitch_wanted.name:
+                ratio = Fraction(2, 3) ** counter
+                end_pitch = end_pitch_down
+                break
+
+            else:
+                end_pitch_up = end_pitch_up.transpose('P5')
+                end_pitch_down = end_pitch_down.transpose('-P5')
+        else:
+            raise IntervalException(
+                'Could not find a pythagorean ratio for {}.'.format(intervalObj))
+
+        _pythagorean_cache[end_pitch_wanted.name] = end_pitch, ratio
+
+    octaves = int((end_pitch_wanted.midi - end_pitch.midi)/12)
+    return ratio * Fraction(2, 1) ** octaves
 
 #-------------------------------------------------------------------------------
 class IntervalBase(base.Music21Object):
     '''
     General base class for inheritance.
     '''
-    pass
+    def transposeNote(self, note1):
+        '''
+        Uses self.transposePitch to do the same to a note.
+        
+        >>> n1 = note.Note("C#4", quarterLength=2.0)
+        >>> i = interval.Interval('d5')
+        >>> n2 = i.transposeNote(n1)
+        >>> n2
+        <music21.note.Note G>
+        >>> n2.pitch
+        <music21.pitch.Pitch G4>
+        >>> n2.duration.type
+        'half'
+        '''
+        newPitch = self.transposePitch(note1.pitch)
+        newNote = copy.deepcopy(note1)
+        newNote.pitch = newPitch
+        return newNote
+    
+    @abc.abstractmethod
+    def transposePitch(self, pitch1):
+        '''
+        IntervalBase does not know how to do this, so it must be overridden in
+        derived classes.
+        '''
+        raise NotImplementedError
 
 class GenericInterval(IntervalBase):
     '''
     A GenericInterval is an interval such as Third, Seventh, Octave, or Tenth.
     Constructor takes an integer or string specifying the interval and direction. 
 
-    The interval is not specified in half-steps, but in numeric values derived from interval names: 
+    The interval is not specified in half-steps, but in numeric values 
+    derived from interval names: 
     a Third is 3; a Seventh is 7, etc. String values for interval names ('3rd' or 'third') 
     are generally accepted, but discouraged since not every one will work.
     
@@ -736,7 +824,8 @@ class GenericInterval(IntervalBase):
         
 
     def getDiatonic(self, specifier):
-        '''Given a specifier, return a :class:`~music21.interval.DiatonicInterval` object. 
+        '''
+        Given a specifier, return a :class:`~music21.interval.DiatonicInterval` object. 
 
         Specifier should be provided as a string name, such as 'dd', 'M', or 'perfect'.
 
@@ -777,7 +866,7 @@ class DiatonicInterval(IntervalBase):
     'directedNiceName': 'The name of the interval in full form with direction.',
     }
 
-    def __init__(self, specifier = "P", generic = 1):
+    def __init__(self, specifier="P", generic=1):
         '''
         The `specifier` is an integer or string specifying a value in the `prefixSpecs` and 
         `niceSpecNames` lists. 
@@ -869,7 +958,9 @@ class DiatonicInterval(IntervalBase):
         self.specifier, unused_specifierStr = convertSpecifier(specifier)
         if self.generic.undirected != 1 or specifier == PERFECT:
             self.direction = self.generic.direction
-        else: # assume in the absence of other evidence, that augmented unisons are ascending and dim are descending 
+        else: 
+            # assume in the absence of other evidence, 
+            # that augmented unisons are ascending and dim are descending 
             if perfSpecifiers.index(self.specifier) <= perfSpecifiers.index(DIMINISHED):
                 self.direction = DESCENDING
             else:
@@ -899,8 +990,10 @@ class DiatonicInterval(IntervalBase):
                                      str(self.generic.simpleDirected))
             self.directedSemiSimpleName = (prefixSpecs[self.specifier] +
                                  str(self.generic.semiSimpleDirected))
-            self.directedSimpleNiceName = (diatonicDirectionNiceName + " " + self.simpleNiceName)
-            self.directedSemiSimpleNiceName = (diatonicDirectionNiceName + " " + self.semiSimpleNiceName)
+            self.directedSimpleNiceName = (diatonicDirectionNiceName + " " + 
+                                           self.simpleNiceName)
+            self.directedSemiSimpleNiceName = (diatonicDirectionNiceName + " " + 
+                                               self.semiSimpleNiceName)
 
             self.specificName = niceSpecNames[self.specifier]
             self.prefectable = self.generic.perfectable
@@ -1055,7 +1148,32 @@ class DiatonicInterval(IntervalBase):
 
         return ChromaticInterval(semitones)
 
+    def transposePitch(self, p):
+        '''
+        Calls transposePitch from a full interval object.
 
+        This is not particularly optimized since it requires creating both a ChromaticInterval
+        object and a full Interval object. But it's here for completeness.
+        
+        >>> di = interval.DiatonicInterval('P', 11)
+        >>> di.transposePitch(pitch.Pitch('C#4'))
+        <music21.pitch.Pitch F#5>
+        '''
+        fullIntervalObject = Interval(diatonic=self, chromatic=self.getChromatic())
+        return fullIntervalObject.transposePitch(p)
+
+
+    @property
+    def specifierAbbreviation(self):
+        '''
+        Returns the abbreviation for the specifier.
+        
+        >>> i = interval.Interval('M-10')
+        >>> d = i.diatonic
+        >>> d.specifierAbbreviation
+        'M'
+        '''
+        return prefixSpecs[self.specifier]
 
     def _getCents(self):
         c = self.getChromatic()
@@ -1387,7 +1505,8 @@ def notesToChromatic(n1, n2):
 def _getSpecifierFromGenericChromatic(gInt, cInt):
     '''
     Given a :class:`~music21.interval.GenericInterval` and 
-    a :class:`~music21.interval.ChromaticInterval` object, return a specifier (i.e. MAJOR, MINOR, etc...).
+    a :class:`~music21.interval.ChromaticInterval` object, return a specifier 
+    (i.e. MAJOR, MINOR, etc...).
 
     >>> aInterval = interval.GenericInterval('seventh')
     >>> bInterval = interval.ChromaticInterval(11)
@@ -1409,7 +1528,8 @@ def _getSpecifierFromGenericChromatic(gInt, cInt):
 
     if (gInt.direction != cInt.direction and 
         gInt.direction != OBLIQUE and cInt.direction != OBLIQUE):
-        # intervals like d2 and dd2 etc. (the last test doesn't matter, since -1*0 == 0, but in theory it should be there)
+        # intervals like d2 and dd2 etc. 
+        # (the last test doesn't matter, since -1*0 == 0, but in theory it should be there)
         theseSemis = -1 * cInt.undirected
     elif gInt.undirected == 1:
         theseSemis = cInt.directed # matters for unison
@@ -1593,7 +1713,8 @@ class Interval(IntervalBase):
     
     >>> aInterval = interval.Interval(noteStart=n1, noteEnd=None)
     Traceback (most recent call last):
-    IntervalException: either both the starting and the ending note.Note must be given or neither can be given.  You cannot have one without the other.
+    IntervalException: either both the starting and the ending note.Note must 
+        be given or neither can be given.  You cannot have one without the other.
 
     An Interval can be constructed from a Diatonic and Chromatic Interval object
 
@@ -1605,7 +1726,8 @@ class Interval(IntervalBase):
 
     >>> cInterval = interval.Interval(diatonic=aInterval, chromatic=None)
     Traceback (most recent call last):
-    IntervalException: either both a DiatonicInterval and a ChromaticInterval object have to be given or neither can be given.  You cannot have one without the other.
+    IntervalException: either both a DiatonicInterval and a ChromaticInterval object have 
+       to be given or neither can be given.  You cannot have one without the other.
 
     Two Intervals are the same if their Chromatic and Diatonic intervals
     are the same.  N.B. that interval.Interval('a4') != 'a4' -- maybe it should...
@@ -1676,8 +1798,11 @@ class Interval(IntervalBase):
             self._noteEnd = note.Note()
             self._noteEnd.pitch = arguments[1]
 
-        elif (len(arguments) == 2 and arguments[0].isNote == True and 
-            arguments[1].isNote == True):
+        elif (len(arguments) == 2 and 
+              hasattr(arguments[0], 'isNote') and 
+              hasattr(arguments[1], 'isNote') and 
+              arguments[0].isNote == True and 
+              arguments[1].isNote == True):
             self._noteStart = arguments[0]
             self._noteEnd = arguments[1]
         else:
@@ -1774,8 +1899,7 @@ class Interval(IntervalBase):
         >>> i1.isConsonant()
         False
         ''' 
-        if self.simpleName == 'P5' or self.simpleName == 'm3' or self.simpleName == 'M3' or \
-        self.simpleName == 'm6' or self.simpleName == 'M6' or self.simpleName == 'P1':
+        if self.simpleName in ('P5', 'm3', 'M3', 'm6', 'M6', 'P1'):
             return True
         else:
             return False
@@ -1892,8 +2016,11 @@ class Interval(IntervalBase):
         cCents = self.chromatic.cents
         return cCents - dCents
 
-    def transposePitch(self, p, reverse=False, clearAccidentalDisplay=True, 
-        maxAccidental=4):
+    def transposePitch(self, 
+                       p, 
+                       reverse=False, 
+                       clearAccidentalDisplay=True, 
+                       maxAccidental=4):
         '''
         Given a :class:`~music21.pitch.Pitch` object, return a new, 
         transposed Pitch, that is transformed 
@@ -1966,7 +2093,8 @@ class Interval(IntervalBase):
             halfStepsToFix = (-self.chromatic.semitones -
                           interval2.chromatic.semitones)
 
-        #environLocal.printDebug(['self', self, 'halfStepsToFix', halfStepsToFix, 'centsOrigin', centsOrigin, 'interval2', interval2])
+        #environLocal.printDebug(['self', self, 'halfStepsToFix', halfStepsToFix, 
+        #    'centsOrigin', centsOrigin, 'interval2', interval2])
 
         if halfStepsToFix != 0:
             while halfStepsToFix >= 12:
@@ -1979,7 +2107,9 @@ class Interval(IntervalBase):
                 # just create new pitch, directly setting the pitch space value
                 #pitchAlt = copy.deepcopy(pitch2)
                 #pitchAlt.ps = pitch2.ps + halfStepsToFix
-                #environLocal.printDebug('coercing pitch due to a transposition that requires a, extreme accidental: %s -> %s' % (pitch2, pitchAlt) )
+                #environLocal.printDebug(
+                #    'coercing pitch due to a transposition that requires an extreme ' + 
+                #    'accidental: %s -> %s' % (pitch2, pitchAlt) )
                 #pitch2 = pitchAlt
                 pitch2.ps = pitch2.ps + halfStepsToFix
             else:
@@ -2248,9 +2378,9 @@ def getAbsoluteLowerNote(note1, note2):
 def transposePitch(pitch1, interval1):
     '''
     Given a :class:`~music21.pitch.Pitch` 
-    and a :class:`~music21.interval.Interval` object, return a new 
-    Pitch object at the appropriate pitch level. 
-
+    and a :class:`~music21.interval.Interval` object (Not another class such
+    as ChromaticInterval) or a string such as 'P5' or a number such as 6 (=tritone), 
+    return a new Pitch object at the appropriate pitch level. 
     
     >>> aPitch = pitch.Pitch('C4')
     >>> aInterval = interval.Interval('P5')
@@ -2262,7 +2392,7 @@ def transposePitch(pitch1, interval1):
     >>> cPitch
     <music21.pitch.Pitch F3>
     
-    Implicit Intervals should still work:
+    Pitches with implicit octaves should work,
     
     >>> dPitch = pitch.Pitch('G')
     >>> ePitch = interval.transposePitch(dPitch, aInterval)
@@ -2272,36 +2402,14 @@ def transposePitch(pitch1, interval1):
 
     # check if interval1 is a string,
     # then convert it to interval object if necessary
-    if common.isStr(interval1):
-        #print interval1, "same name"
+    if common.isStr(interval1) or isinstance(interval1, int):
         interval1 = Interval(interval1) 
-        #print interval1.name, " int name" # del me
     else:
-        pass # assuming it is an interval object
-        #raise IntervalException('numeric intervals not yet defined')
-    
-    if pitch1.octave is None:
-        useImplicitOctave = True
-    else:
-        useImplicitOctave = False        
-        
-    newDiatonicNumber = (pitch1.diatonicNoteNum +
-                         interval1.diatonic.generic.staffDistance)
-    pitch2 = copy.deepcopy(pitch1)
-    newStep, newOctave = convertDiatonicNumberToStep(newDiatonicNumber)
-    pitch2.step = newStep
-    pitch2.octave = newOctave
-    pitch2.accidental = None
-    # at this point note2 has the right note name (step), but possibly
-    # the wrong accidental.  We fix that below
-    interval2 = notesToInterval(pitch1, pitch2)    
-    halfStepsToFix = (interval1.chromatic.semitones -
-                      interval2.chromatic.semitones)
-    pitch2.accidental = halfStepsToFix
-    
-    if useImplicitOctave is True:
-        pitch2.octave = None
-    return pitch2
+        if not hasattr(interval1, 'transposePitch'):
+            raise IntervalException(
+                'interval must be a music21.interval.Interval object not {}'.format(
+                                                            interval1.__class__.__name__))
+    return interval1.transposePitch(pitch1)
 
 def transposeNote(note1, intervalString):
     '''
@@ -2505,7 +2613,7 @@ class Test(unittest.TestCase):
         
         #int1 = interval.notesToInterval(n1, n2)   # returns music21.interval.Interval object
         int1  = Interval(noteStart = n1, noteEnd = n2)
-        dInt1 = int1.diatonic   # returns same as gInt1 -- just a different way of thinking of things
+        dInt1 = int1.diatonic # returns same as gInt1 -- just a different way of thinking of things
         gInt1 = dInt1.generic
     
         self.assertEqual(gInt1.isDiatonicStep, False)
@@ -2515,7 +2623,7 @@ class Test(unittest.TestCase):
         int1.reinit()
         
         cInt1 = notesToChromatic(n1,n2) # returns music21.interval.ChromaticInterval object
-        cInt2 = int1.chromatic        # returns same as cInt1 -- just a different way of thinking of things
+        cInt2 = int1.chromatic # returns same as cInt1 -- a different way of thinking of things
         self.assertEqual(cInt1.semitones, cInt2.semitones)
         
         self.assertEqual(int1.simpleNiceName, "Diminished Seventh")
@@ -2574,18 +2682,18 @@ class Test(unittest.TestCase):
         noteA3.name = "D"
         noteA3.octave = 1
     
-        noteA4 = transposePitch(noteA3, intervalA1)
+        noteA4 = transposeNote(noteA3, intervalA1)
         self.assertEqual(noteA4.name, "E#")
         self.assertEqual(noteA4.octave, 2)
         
         interval1 = Interval("P-5")
         
-        n5 = transposePitch(n4, interval1)
-        n6 = transposePitch(n4, "P-5")
+        n5 = transposeNote(n4, interval1)
+        n6 = transposeNote(n4, "P-5")
         self.assertEqual(n5.name, "G-")
         self.assertEqual(n6.name, n5.name)
         n7 = Note()
-        n8 = transposePitch(n7, "P8")
+        n8 = transposeNote(n7, "P8")
         self.assertEqual(n8.name, "C")
         self.assertEqual(n8.octave, 5)
 
@@ -2593,20 +2701,20 @@ class Test(unittest.TestCase):
         
         interval1 = Interval("P-5")
         
-        n5 = transposePitch(n4, interval1)
-        n6 = transposePitch(n4, "P-5")
+        n5 = transposeNote(n4, interval1)
+        n6 = transposeNote(n4, "P-5")
         self.assertEqual(n5.name, "G-")
         self.assertEqual(n6.name, n5.name)
         n7 = Note()
-        n8 = transposePitch(n7, "P8")
+        n8 = transposeNote(n7, "P8")
         self.assertEqual(n8.name, "C")
         self.assertEqual(n8.octave, 5)
 
         
-        n9 = transposePitch(n7, "m7")  ## should be B-
+        n9 = transposeNote(n7, "m7")  ## should be B-
         self.assertEqual(n9.name, "B-")
         self.assertEqual(n9.octave, 4)
-        n10 = transposePitch(n7, "dd-2")  ## should be B##
+        n10 = transposeNote(n7, "dd-2")  ## should be B##
         self.assertEqual(n10.name, "B##")
         self.assertEqual(n10.octave, 3)
     
@@ -2657,8 +2765,10 @@ class Test(unittest.TestCase):
         lowerC  = Note()
         lowerC.octave = 3
         descendingOctave = notesToInterval(middleC, lowerC)
-        self.assertEqual(descendingOctave.generic.simpleDirected, 1)  # no descending unisons ever
-        self.assertEqual(descendingOctave.generic.semiSimpleDirected, -8)  # no descending unisons ever
+        self.assertEqual(descendingOctave.generic.simpleDirected, 1)  
+        # no descending unisons ever
+        self.assertEqual(descendingOctave.generic.semiSimpleDirected, -8)  
+        # no descending unisons ever
         self.assertEqual(descendingOctave.directedName, "P-8")
         self.assertEqual(descendingOctave.directedSimpleName, "P1")
     

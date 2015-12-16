@@ -76,8 +76,6 @@ stemDirectionNames = [
 
 
 #------------------------------------------------------------------------------
-
-
 class LyricException(exceptions21.Music21Exception):
     pass
 
@@ -171,7 +169,8 @@ class Lyric(SlottedObject):
         if self._identifier is None:
             if self.text is not None:
                 if self.syllabic is not None:
-                    return '<music21.note.Lyric number=%d syllabic=%s text="%s">' % (self.number, self.syllabic, self.text)
+                    return '<music21.note.Lyric number=%d syllabic=%s text="%s">' % (
+                                                self.number, self.syllabic, self.text)
                 else:
                     return '<music21.note.Lyric number=%d text="%s">' % (self.number, self.text)
             else:
@@ -179,11 +178,15 @@ class Lyric(SlottedObject):
         else:
             if self.text is not None:
                 if self.syllabic is not None:
-                    return '<music21.note.Lyric number=%d identifier="%s" syllabic=%s text="%s">' % (self.number, self.identifier, self.syllabic, self.text)
+                    return ('<music21.note.Lyric ' + 
+                            'number=%d identifier="%s" syllabic=%s text="%s">' % (
+                                    self.number, self.identifier, self.syllabic, self.text))
                 else:
-                    return '<music21.note.Lyric number=%d identifier="%s" text="%s">' % (self.number, self.identifier, self.text)
+                    return '<music21.note.Lyric number=%d identifier="%s" text="%s">' % (
+                                                self.number, self.identifier, self.text)
             else:
-                return '<music21.note.Lyric number=%d identifier="%s">' % (self.number, self.identifier)
+                return '<music21.note.Lyric number=%d identifier="%s">' % (
+                                                self.number, self.identifier)
 
     ### PRIVATE METHODS ###
 
@@ -323,13 +326,15 @@ class GeneralNote(base.Music21Object):
     _DOC_ORDER = ['duration', 'quarterLength']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
-    #'expressions': 'a list of :class:`music21.expressions.TextExpression` objects to store note-attached expressions',
-    'isChord': 'Boolean read-only value describing if this object is a Chord.',
-    'lyrics': 'A list of :class:`~music21.note.Lyric` objects.',
-    'tie': 'either None or a :class:`~music21.note.Tie` object.',
-    'expressions': 'a list of expressions (such as :class:`~music21.expressions.Fermata`, etc.) that are stored on this Note.',
-    'articulations': 'a list of articulations (such as :class:`~music21.articulations.Staccato`, etc.) that are stored on this Note.'
-    }
+        'isChord': 'Boolean read-only value describing if this object is a Chord.',
+        'lyrics': 'A list of :class:`~music21.note.Lyric` objects.',
+        'tie': 'either None or a :class:`~music21.note.Tie` object.',
+        'expressions': '''a list of expressions (such 
+            as :class:`~music21.expressions.Fermata`, etc.) 
+            that are stored on this Note.''',
+        'articulations': '''a list of articulations such
+            as :class:`~music21.articulations.Staccato`, etc.) that are stored on this Note.'''
+        }
     def __init__(self, *arguments, **keywords):
         if 'duration' not in keywords:
             # music21base does not automatically create a duration.
@@ -370,7 +375,8 @@ class GeneralNote(base.Music21Object):
 
     editorial = property(_getEditorial, _setEditorial, doc = '''
         a :class:`~music21.editorial.NoteEditorial` object that stores editorial information
-        (comments, harmonic information, ficta) and certain display information (color, hidden-state).
+        (comments, harmonic information, ficta) and 
+        certain display information (color, hidden-state).
 
         Created automatically as needed:
 
@@ -474,7 +480,7 @@ class GeneralNote(base.Music21Object):
         lyrics
         ''')
 
-    def addLyric(self, text, lyricNumber = None, applyRaw = False, lyricIdentifier=None):
+    def addLyric(self, text, lyricNumber=None, applyRaw=False, lyricIdentifier=None):
         '''
         Adds a lyric, or an additional lyric, to a Note, Chord, or Rest's lyric list. 
         If `lyricNumber` is not None, a specific line of lyric text can be set. The lyricIdentifier
@@ -537,7 +543,8 @@ class GeneralNote(base.Music21Object):
             text = str(text)
         if lyricNumber is None:
             maxLyrics = len(self.lyrics) + 1
-            self.lyrics.append(Lyric(text, maxLyrics, applyRaw = applyRaw, identifier = lyricIdentifier))
+            self.lyrics.append(Lyric(text, maxLyrics, 
+                                     applyRaw=applyRaw, identifier=lyricIdentifier))
         else:
             foundLyric = False
             for thisLyric in self.lyrics:
@@ -546,7 +553,8 @@ class GeneralNote(base.Music21Object):
                     foundLyric = True
                     break
             if foundLyric is False:
-                self.lyrics.append(Lyric(text, lyricNumber, applyRaw = applyRaw, identifier = lyricIdentifier))
+                self.lyrics.append(Lyric(text, lyricNumber, 
+                                         applyRaw=applyRaw, identifier=lyricIdentifier))
 
     def insertLyric(self, text, index=0, applyRaw=False, identifier=None):
         '''Inserts a lyric into the Note, Chord, or Rest's lyric list in front of
@@ -560,18 +568,25 @@ class GeneralNote(base.Music21Object):
         [<music21.note.Lyric number=1 syllabic=single text="second">]
         >>> n1.insertLyric("first", 0)
         >>> n1.lyrics
-        [<music21.note.Lyric number=1 syllabic=single text="first">, <music21.note.Lyric number=2 syllabic=single text="second">]
+        [<music21.note.Lyric number=1 syllabic=single text="first">, 
+         <music21.note.Lyric number=2 syllabic=single text="second">]
 
         OMIT_FROM_DOCS
+        
+        test inserting in the middle.
+        
         >>> n1.insertLyric("newSecond", 1)
         >>> n1.lyrics
-        [<music21.note.Lyric number=1 syllabic=single text="first">, <music21.note.Lyric number=2 syllabic=single text="newSecond">, <music21.note.Lyric number=3 syllabic=single text="second">]
+        [<music21.note.Lyric number=1 syllabic=single text="first">, 
+         <music21.note.Lyric number=2 syllabic=single text="newSecond">, 
+         <music21.note.Lyric number=3 syllabic=single text="second">]
         '''
         if not common.isStr(text):
             text = str(text)
         for lyric in self.lyrics[index:]:
             lyric.number += 1
-        self.lyrics.insert(index, Lyric(text, (index+ 1), applyRaw=applyRaw, identifier=identifier ))
+        self.lyrics.insert(index, Lyric(text, (index + 1), 
+                                        applyRaw=applyRaw, identifier=identifier))
 
     def hasLyrics(self):
         '''
@@ -590,7 +605,10 @@ class GeneralNote(base.Music21Object):
 
     #---------------------------------------------------------------------------
     def augmentOrDiminish(self, scalar, inPlace=True):
-        '''Given a scalar greater than zero, return a Note with a scaled Duration. If `inPlace` is True, this is done in-place and the method returns None. If `inPlace` is False, this returns a modified deep copy.
+        '''
+        Given a scalar greater than zero, return a Note with a scaled Duration. 
+        If `inPlace` is True, this is done in-place and the method returns None. 
+        If `inPlace` is False, this returns a modified deepcopy.
 
 
         >>> n = note.Note('g#')
@@ -628,8 +646,8 @@ class GeneralNote(base.Music21Object):
 
     #---------------------------------------------------------------------------
     def getGrace(self, appogiatura=False, inPlace=False):
-        '''Return a grace version of this GeneralNote
-
+        '''
+        Return a grace version of this GeneralNote
 
         >>> n = note.Note('G4', quarterLength=2)
         >>> n.duration.quarterLength
@@ -698,7 +716,8 @@ class NotRest(GeneralNote):
     # unspecified means that there may be a stem, but its orientation
     # has not been declared.
     _DOC_ATTR = {
-    'beams': 'A :class:`~music21.beam.Beams` object that contains information about the beaming of this note.',
+    'beams': '''A :class:`~music21.beam.Beams` object that contains 
+        information about the beaming of this note.''',
     }
     def __init__(self, *arguments, **keywords):
         GeneralNote.__init__(self, **keywords)
@@ -714,9 +733,9 @@ class NotRest(GeneralNote):
         else:
             self.beams = beam.Beams()
 
-    #===============================================================================================
+    #==============================================================================================
     # Special functions
-    #===============================================================================================
+    #==============================================================================================
 
     def __deepcopy__(self, memo=None):
         '''
@@ -763,8 +782,9 @@ class NotRest(GeneralNote):
         self._stemDirection = direction
 
     stemDirection = property(_getStemDirection, _setStemDirection, doc=
-        '''Get or set the stem direction of this NotRest object. Valid stem direction names are found in note.stemDirectionNames (see below).
-
+        '''
+        Get or set the stem direction of this NotRest object. 
+        Valid stem direction names are found in note.stemDirectionNames (see below).
 
         >>> note.stemDirectionNames
         ['double', 'down', 'noStem', 'none', 'unspecified', 'up']
@@ -795,7 +815,10 @@ class NotRest(GeneralNote):
 
 
         >>> note.noteheadTypeNames
-        ['arrow down', 'arrow up', 'back slashed', 'circle dot', 'circle-x', 'cluster', 'cross', 'diamond', 'do', 'fa', 'inverted triangle', 'la', 'left triangle', 'mi', 'none', 'normal', 're', 'rectangle', 'slash', 'slashed', 'so', 'square', 'ti', 'triangle', 'x']
+        ['arrow down', 'arrow up', 'back slashed', 'circle dot', 'circle-x', 'cluster', 
+         'cross', 'diamond', 'do', 'fa', 'inverted triangle', 'la', 'left triangle', 
+         'mi', 'none', 'normal', 're', 'rectangle', 'slash', 'slashed', 'so', 
+         'square', 'ti', 'triangle', 'x']
         >>> n = note.Note()
         >>> n.notehead = 'diamond'
         >>> n.notehead
@@ -974,7 +997,9 @@ class Note(NotRest):
     _DOC_ATTR = {
     'isNote': 'Boolean read-only value describing if this Note is a Note (True).',
     'isRest': 'Boolean read-only value describing if this Note is a Rest (False).',
-    'pitch': 'A :class:`~music21.pitch.Pitch` object containing all the information about the note\'s pitch.  Many `.pitch` properties and methods are also made `Note` properties also',
+    'pitch': '''A :class:`~music21.pitch.Pitch` object containing all the 
+                information about the note's pitch.  Many `.pitch` properties and 
+                methods are also made `Note` properties also''',
     }
 
     # Accepts an argument for pitch
@@ -1158,7 +1183,8 @@ class Note(NotRest):
         self.pitch.step = value
 
     step = property(_getStep, _setStep,
-        doc = '''Return or set the pitch step from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.step`.
+        doc = '''Return or set the pitch step from the :class:`~music21.pitch.Pitch` object. 
+        See :attr:`~music21.pitch.Pitch.step`.
         ''')
 
     @common.deprecated("May 2014", "Jan 2016", "use pitch.frequency instead")
@@ -1185,7 +1211,8 @@ class Note(NotRest):
         self.pitch.octave = value
 
     octave = property(_getOctave, _setOctave,
-        doc = '''Return or set the octave value from the :class:`~music21.pitch.Pitch` object. See :attr:`~music21.pitch.Pitch.octave`.''')
+        doc = '''Return or set the octave value from the :class:`~music21.pitch.Pitch` object. 
+        See :attr:`~music21.pitch.Pitch.octave`.''')
 
     @common.deprecated("May 2014", "Jan 2016", "use pitch.midi instead")
     def _getMidi(self):
@@ -1377,7 +1404,8 @@ class Note(NotRest):
 
     fullName = property(_getFullName,
         doc = '''
-        Return the most complete representation of this Note, providing duration and pitch information.
+        Return the most complete representation of this Note, 
+        providing duration and pitch information.
 
 
         >>> n = note.Note('A-', quarterLength=1.5)
@@ -1543,8 +1571,9 @@ class Rest(GeneralNote):
         return ''.join(msg)
 
     fullName = property(_getFullName,
-        doc = '''Return the most complete representation of this Rest, providing duration information.
-
+        doc = '''
+        Return the most complete representation of this Rest, 
+        providing duration information.
 
         >>> r = note.Rest(quarterLength=1.5)
         >>> r.fullName
@@ -1566,7 +1595,8 @@ class SpacerRest(Rest):
         Rest.__init__(self, **keywords)
 
     def __repr__(self):
-        return "<music21.note.SpacerRest %s duration=%s>" % (self.name, self.duration.quarterLength)
+        return "<music21.note.SpacerRest %s duration=%s>" % (
+                    self.name, self.duration.quarterLength)
 
 
 #-------------------------------------------------------------------------------
@@ -1890,20 +1920,22 @@ class Test(unittest.TestCase):
     def testMetricalAccent(self):
         from music21 import meter, stream
         data = [
-('4/4', 8, .5, [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125]),
-('3/4', 6, .5, [1.0, 0.25, 0.5, 0.25, 0.5, 0.25] ),
-('6/8', 6, .5, [1.0, 0.25, 0.25, 0.5, 0.25, 0.25]  ),
+                ('4/4', 8, .5, [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125]),
+                ('3/4', 6, .5, [1.0, 0.25, 0.5, 0.25, 0.5, 0.25] ),
+                ('6/8', 6, .5, [1.0, 0.25, 0.25, 0.5, 0.25, 0.25]  ),
 
-('12/32', 12, .125, [1.0, 0.125, 0.125, 0.25, 0.125, 0.125, 0.5, 0.125, 0.125, 0.25, 0.125, 0.125]  ),
+                ('12/32', 12, .125, [1.0, 0.125, 0.125, 0.25, 0.125, 0.125, 
+                                     0.5, 0.125, 0.125, 0.25, 0.125, 0.125]  ),
 
-('5/8', 10, .25, [1.0, 0.25, 0.5, 0.25, 0.5, 0.25, 0.5, 0.25, 0.5, 0.25]  ),
+                ('5/8', 10, .25, [1.0, 0.25, 0.5, 0.25, 0.5, 0.25, 0.5, 0.25, 0.5, 0.25]  ),
 
-# test notes that do not have defined accents
-('4/4', 16, .25, [1.0, 0.0625, 0.125, 0.0625, 0.25, 0.0625, 0.125, 0.0625, 0.5, 0.0625, 0.125, 0.0625, 0.25, 0.0625, 0.125, 0.0625]),
-
-('4/4', 32, .125, [1.0, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625, 0.25, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625, 0.5, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625, 0.25, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625]),
-
-
+                # test notes that do not have defined accents
+                ('4/4', 16, .25, [1.0, 0.0625, 0.125, 0.0625, 0.25, 0.0625, 0.125, 0.0625, 
+                                  0.5, 0.0625, 0.125, 0.0625, 0.25, 0.0625, 0.125, 0.0625]),
+                ('4/4', 32, .125, [1.0, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625, 
+                                   0.25, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625, 
+                                   0.5, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625, 
+                                   0.25, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625]),
                 ]
 
         for tsStr, nCount, dur, match in data:

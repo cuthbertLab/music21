@@ -149,8 +149,10 @@ class TonalityCounter(object):
                     bigTotalDiff    += myDict[outKey][inKey] 
                 output += "%4s %4s %4d\n" % (outKey, inKey, myDict[outKey][inKey])
             output += "     %4s diff %4d\n" % (outKey, outKeyDiffTotal)
-        output += "Total Same %4d %3.1f%%\n" % (bigTotalSame, (bigTotalSame * 100.0)/(bigTotalSame + bigTotalDiff))
-        output += "Total Diff %4d %3.1f%%\n" % (bigTotalDiff, (bigTotalDiff * 100.0)/(bigTotalSame + bigTotalDiff))
+        output += "Total Same %4d %3.1f%%\n" % (bigTotalSame, 
+            (bigTotalSame * 100.0) / (bigTotalSame + bigTotalDiff))
+        output += "Total Diff %4d %3.1f%%\n" % (bigTotalDiff, 
+            (bigTotalDiff * 100.0) / (bigTotalSame + bigTotalDiff))
         self.storedDict = myDict
         self.displayStream = allScores
         self.output = output
@@ -295,7 +297,8 @@ def anonBallataTonality(show = True):
     tCounter.run()
     if show is True:
         print(tCounter.output)
-        print("Generating Lilypond PNG of all pieces where the first note of the tenor is the same pitchclass as the last note of Cadence A")
+        print("Generating Lilypond PNG of all pieces where the first note of " + 
+              "the tenor is the same pitchclass as the last note of Cadence A")
         print("It might take a while, esp. on the first Lilypond run...")
         tCounter.displayStream.show('lily.png')
 
@@ -308,9 +311,7 @@ def sacredTonality(show = True):
     note that we only have a very very few sacred pieces encoded at this point so
     the results are NOT statistically significant, but it's very fast for testing.
 
-
     '''
-    
     kyrieObj  = cadencebook.KyrieSheet()
     gloriaObj  = cadencebook.GloriaSheet()
     credoObj  = cadencebook.CredoSheet()
@@ -329,11 +330,11 @@ def sacredTonality(show = True):
         tCounter.displayStream.show('lily.png')
 
 def testAll(show = True, fast = False):
-        sacredTonality(show)
-        if fast is False:
-            nonLandiniTonality(show)
-            anonBallataTonality(show)
-            landiniTonality(show)            
+    sacredTonality(show)
+    if fast is False:
+        nonLandiniTonality(show)
+        anonBallataTonality(show)
+        landiniTonality(show)            
 
 class Test(unittest.TestCase):
     pass

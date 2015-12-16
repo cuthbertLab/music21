@@ -424,7 +424,8 @@ class RTMeasure(RTToken):
         self.number = [] # one or more measure numbers
         self.repeatLetter = [] # one or more repeat letters
         self.variantNumber = None # a one-measure or short variant
-        self.variantLetter = None # a longer-variant that defines a different way of reading a large section 
+        self.variantLetter = None # a longer-variant that 
+                                # defines a different way of reading a large section 
         # store boolean if this measure defines copying another range
         self.isCopyDefinition = False
         # store processed tokens associated with this measure
@@ -615,7 +616,6 @@ class RTBeat(RTAtom):
         '''
         Gets the beat number as a float or fraction. Time signature independent
         
-        
         >>> RTB = romanText.rtObjects.RTBeat
         
         Simple ones:
@@ -733,7 +733,8 @@ class RTBeat(RTAtom):
         try:
             post = timeSignature.getOffsetFromBeat(beat)
         except meter.TimeSignatureException:
-            environLocal.printDebug(['bad beat specification: %s in a meter of %s' % (self.src, timeSignature)])
+            environLocal.printDebug(['bad beat specification: %s in a meter of %s' % (
+                                    self.src, timeSignature)])
             post = 0.0 
 
         return post
@@ -1072,7 +1073,8 @@ class RTHandler(object):
                 iStartBody = i
                 break
         if iStartBody is None:
-            raise RomanTextException("Cannot find the first measure definition in this file.  Dumping contextss: %s", lines)
+            raise RomanTextException("Cannot find the first measure definition in this file. " + 
+                                     "Dumping contexts: %s", lines)
         return lines[:iStartBody], lines[iStartBody:]
     
     def tokenizeHeader(self, lines):
@@ -1120,7 +1122,8 @@ class RTHandler(object):
             except Exception:
                 import traceback
                 tracebackMessage = traceback.format_exc()
-                raise RTHandlerException("At line %d (%s) an exception was raised: \n%s" % (currentLineNumber, l, tracebackMessage))
+                raise RTHandlerException("At line %d (%s) an exception was raised: \n%s" % (
+                                            currentLineNumber, l, tracebackMessage))
         return post
 
     def tokenizeAtoms(self, line, container=None):
@@ -1128,24 +1131,30 @@ class RTHandler(object):
         tokenize and return a list.
 
         >>> rth = romanText.rtObjects.RTHandler()
-        >>> str(rth.tokenizeAtoms('IV b3 ii7 b4 ii'))
-        "[<RTChord 'IV'>, <RTBeat 'b3'>, <RTChord 'ii7'>, <RTBeat 'b4'>, <RTChord 'ii'>]"
+        >>> rth.tokenizeAtoms('IV b3 ii7 b4 ii')
+        [<RTChord 'IV'>, <RTBeat 'b3'>, <RTChord 'ii7'>, <RTBeat 'b4'>, <RTChord 'ii'>]
 
-        >>> str(rth.tokenizeAtoms('V7 b2 V13 b3 V7 iio6/5[no5]'))
-        "[<RTChord 'V7'>, <RTBeat 'b2'>, <RTChord 'V13'>, <RTBeat 'b3'>, <RTChord 'V7'>, <RTChord 'iio6/5[no5]'>]"
+        >>> rth.tokenizeAtoms('V7 b2 V13 b3 V7 iio6/5[no5]')
+        [<RTChord 'V7'>, <RTBeat 'b2'>, <RTChord 'V13'>, 
+         <RTBeat 'b3'>, <RTChord 'V7'>, <RTChord 'iio6/5[no5]'>]
 
         >>> tokenList = rth.tokenizeAtoms('I b2 I b2.25 V/ii b2.5 bVII b2.75 V g: IV')
-        >>> str(tokenList)
-        "[<RTChord 'I'>, <RTBeat 'b2'>, <RTChord 'I'>, <RTBeat 'b2.25'>, <RTChord 'V/ii'>, <RTBeat 'b2.5'>, <RTChord 'bVII'>, <RTBeat 'b2.75'>, <RTChord 'V'>, <RTAnalyticKey 'g:'>, <RTChord 'IV'>]"
+        >>> tokenList
+        [<RTChord 'I'>, <RTBeat 'b2'>, <RTChord 'I'>, <RTBeat 'b2.25'>, <RTChord 'V/ii'>, 
+         <RTBeat 'b2.5'>, <RTChord 'bVII'>, <RTBeat 'b2.75'>, <RTChord 'V'>, 
+         <RTAnalyticKey 'g:'>, <RTChord 'IV'>]
         >>> tokenList[9].getKey()
         <music21.key.Key of g minor>
 
-        >>> str(rth.tokenizeAtoms('= m3'))
-        '[]'
+        >>> rth.tokenizeAtoms('= m3')
+        []
 
         >>> tokenList = rth.tokenizeAtoms('g;: ||: V b2 ?(Bb: VII7 b3 III b4 ?)Bb: i :||')
-        >>> str(tokenList)
-        "[<RTKey 'g;:'>, <RTRepeatStart '||:'>, <RTChord 'V'>, <RTBeat 'b2'>, <RTOptionalKeyOpen '?(Bb:'>, <RTChord 'VII7'>, <RTBeat 'b3'>, <RTChord 'III'>, <RTBeat 'b4'>, <RTOptionalKeyClose '?)Bb:'>, <RTChord 'i'>, <RTRepeatStop ':||'>]"
+        >>> tokenList
+        [<RTKey 'g;:'>, <RTRepeatStart '||:'>, <RTChord 'V'>, <RTBeat 'b2'>, 
+         <RTOptionalKeyOpen '?(Bb:'>, <RTChord 'VII7'>, <RTBeat 'b3'>, 
+         <RTChord 'III'>, <RTBeat 'b4'>, <RTOptionalKeyClose '?)Bb:'>, 
+         <RTChord 'i'>, <RTRepeatStop ':||'>]
         '''
         post = []
         # break by spaces
@@ -1355,7 +1364,8 @@ class RTFile(object):
                 except UnicodeDecodeError:
                     pass
             if self.file is None:
-                raise RomanTextException("Cannot parse file %s, possibly a broken codec?" % filename)
+                raise RomanTextException(
+                        "Cannot parse file %s, possibly a broken codec?" % filename)
                     
         self.filename = filename
 

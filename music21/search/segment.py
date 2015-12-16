@@ -89,7 +89,9 @@ def translateMonophonicPartToSegments(
     for m in inputStream.getElementsByClass('Measure'):
         mNotes = m.flat.getElementsByClass('Note')
         if algorithm == search.translateDiatonicStreamToString:
-            algorithmOutput, previousTuple = algorithm(mNotes, previousTuple[0], previousTuple[1], previousTuple[2], returnLastTuple=True)
+            algorithmOutput, previousTuple = algorithm(mNotes, previousTuple[0], 
+                                                       previousTuple[1], previousTuple[2], 
+                                                       returnLastTuple=True)
         else: # not all algorithms can take two streams...
             algorithmOutput = algorithm(mNotes) 
         
@@ -319,7 +321,8 @@ def scoreSimilarity(
                     thatScoreKey = scoreDictKeys[thatScoreNumber]
                     thatScore = scoreDict[thatScoreKey]
                     for pNum2 in range(len(thatScore)):
-                        for thatSegmentNumber, thatSegment in enumerate(thatScore[pNum2]['segmentList']):
+                        for thatSegmentNumber, thatSegment in enumerate(
+                                                            thatScore[pNum2]['segmentList']):
                             if len(thatSegment) < minimumLength:
                                 continue
                             dl.set_seq1(thatSegment)

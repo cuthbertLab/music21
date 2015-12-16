@@ -50,7 +50,8 @@ _singletonCounter['value'] = 0
 
 class SingletonCounter(object):
     '''
-    A simple counter that can produce unique numbers regardless of how many instances exist.
+    A simple counter that can produce unique numbers (in ascending order) 
+    regardless of how many instances exist.
     
     Instantiate and then call it.
     
@@ -131,7 +132,8 @@ class SlottedObject(object):
             sValue = getattr(self, slot, None)
             if isinstance(sValue, weakref.ref):
                 sValue = sValue()
-                print("Warning: uncaught weakref found in %r - %s, will not be rewrapped" % (self, slot))
+                print("Warning: uncaught weakref found in %r - %s, will not be rewrapped" % 
+                      (self, slot))
             state[slot] = sValue
         return state
 
@@ -208,7 +210,11 @@ class Timer(object):
         self._tStop = None
 
     def start(self):
-        '''Explicit start method; will clear previous values. Start always happens on initialization.'''
+        '''
+        Explicit start method; will clear previous values. 
+        
+        Start always happens on initialization.
+        '''
         self._tStart = time.time()
         self._tStop = None # show that a new run has started so __call__ works
         self._tDif = 0
@@ -223,7 +229,8 @@ class Timer(object):
         self._tStart = None
 
     def __call__(self):
-        '''Reports current time or, if stopped, stopped time.
+        '''
+        Reports current time or, if stopped, stopped time.
         '''
         # if stopped, gets _tDif; if not stopped, gets current time
         if self._tStop == None: # if not stoped yet
@@ -240,9 +247,7 @@ class Timer(object):
         return str(round(t,3))
 
 
-
-
-
 if __name__ == '__main__':
     import music21
     music21.mainTest()
+

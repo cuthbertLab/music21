@@ -645,9 +645,12 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         return k
 
     def getSolution(self, sStream):
-        '''Return a music21 Key object defining the results of the analysis. Do not call process before calling this method, as this method calls process. 
+        '''
+        Return a music21 Key object defining the results of the analysis. 
+        Do not call process before calling this method, as this method calls process. 
 
-        Note that all alternative solutions are returned as Key objects and stored on a list found at Key.alternateInterpretations.
+        Note that all alternative solutions are returned as Key objects and stored 
+        on a list found at Key.alternateInterpretations.
 
         
         >>> s = corpus.parse('bach/bwv66.6')
@@ -880,7 +883,8 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
     # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Temperley Kostka Payne Key Analysis'
-    identifiers = ['temperley', 'kostka', 'payne', 'temperley-kostka-payne', 'temperleykostkapayne']
+    identifiers = ['temperley', 'kostka', 'payne', 
+                   'temperley-kostka-payne', 'temperleykostkapayne']
 
     def __init__(self, referenceStream=None):
         KeyWeightKeyAnalysis.__init__(self, referenceStream=referenceStream)
@@ -897,14 +901,17 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
         weightType = weightType.lower()
         # note: only one value is different from KrumhanslSchmuckler
         if weightType == 'major':
-            return [0.748, 0.060, 0.488, 0.082, 0.670, 0.460, 0.096, 0.715, 0.104, 0.366, 0.057, 0.400]
+            return [0.748, 0.060, 0.488, 0.082, 0.670, 0.460, 
+                    0.096, 0.715, 0.104, 0.366, 0.057, 0.400]
         elif weightType == 'minor':
-            return [0.712, 0.084, 0.474, 0.618, 0.049, 0.460, 0.105, 0.747, 0.404, 0.067, 0.133, 0.330]    
+            return [0.712, 0.084, 0.474, 0.618, 0.049, 0.460, 
+                    0.105, 0.747, 0.404, 0.067, 0.133, 0.330]    
         else:
             raise DiscreteAnalysisException('no weights defined for weight type: %s' % weightType)
 
 # store a constant with all classes 
-keyWeightKeyAnalysisClasses = [KrumhanslSchmuckler, KrumhanslKessler, AardenEssen, SimpleWeights, BellmanBudge, TemperleyKostkaPayne]
+keyWeightKeyAnalysisClasses = [KrumhanslSchmuckler, KrumhanslKessler, 
+                               AardenEssen, SimpleWeights, BellmanBudge, TemperleyKostkaPayne]
 
 
 
@@ -976,7 +983,8 @@ class Ambitus(DiscreteAnalysis):
     
     def getPitchSpan(self, subStream):
         '''
-        For a given subStream, return the pitch with the minimum and maximum pitch space value found. 
+        For a given subStream, return the pitch with the minimum and 
+        maximum pitch space value found. 
 
         This public method may be used by other classes. 
 
@@ -1228,7 +1236,8 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
         and counts of Intervals already found will be incremented.
         '''
         # note that Stream.findConsecutiveNotes() and Stream.melodicIntervals()
-        # offer similar approaches, but return Streams and manage offsets and durations, components not needed here
+        # offer similar approaches, but return Streams and manage offsets and durations, 
+        # components not needed here
     
         if found == None:
             found = {}
@@ -1379,9 +1388,11 @@ class Test(unittest.TestCase):
         p = KrumhanslSchmuckler()
         s1 = converter.parse('tinynotation: 4/4 c4 d e f g a b c   c#4 d# e# f#')
         s2 = converter.parse('tinynotation: 4/4 c#4 d# e# f#  f g a b- c d e f')
-        s3 = converter.parse('tinynotation: 4/4 c4 d e f g a b c   c#4 d# e# f#  c#4 d# e# f#  f g a b- c d e f')
+        s3 = converter.parse('tinynotation: 4/4 c4 d e f g a b c   c#4 d# e# f#  ' + 
+                             'c#4 d# e# f#  f g a b- c d e f')
 
-        #self.assertEqual(p._getPitchClassDistribution(s1), [1.0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        #self.assertEqual(p._getPitchClassDistribution(s1), 
+        #            [1.0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
         p.process(s1.flat)
         likelyKeysMajor1, likelyKeysMinor1 = p._likelyKeys(s1.flat)

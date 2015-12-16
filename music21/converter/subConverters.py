@@ -16,7 +16,8 @@ Each subconverter should inherit from the base SubConverter object and have at l
 parseData method that sets self.stream.
 '''
 #-------------------------------------------------------------------------------
-# Converters are associated classes; they are not subclasses, but most define a pareData() method, a parseFile() method, and a .stream attribute or property.
+# Converters are associated classes; they are not subclasses, but most define a pareData() method, 
+# a parseFile() method, and a .stream attribute or property.
 import io
 import os
 import sys
@@ -53,7 +54,8 @@ class SubConverter(object):
             the first will be used in calls to .write()
         canBePickled = True or False (default True; does not do anything yet)
         codecWrite = True or False (default False) if encodings need to be used to write
-        stringEncoding = string (default 'utf-8'). If codecWrite is True, this specifies what encoding to use
+        stringEncoding = string (default 'utf-8'). If codecWrite is True, this specifies what 
+            encoding to use
 
 
     '''
@@ -310,7 +312,8 @@ class ConverterIPython(SubConverter):
             outputId = "midiPlayerDiv" + str(s())
             display(HTML("""
                 <div id='""" + outputId + """'></div>
-                <link rel="stylesheet" href="http://artusi.xyz/music21j/css/m21.css" type="text/css" />
+                <link rel="stylesheet" href="http://artusi.xyz/music21j/css/m21.css" 
+                    type="text/css" />
                 <script>
                 require.config({
                     paths: {'music21': 'http://artusi.xyz/music21j/src/music21'} 
@@ -318,7 +321,8 @@ class ConverterIPython(SubConverter):
                 require(['music21'], function() { 
                                mp = new music21.miditools.MidiPlayer();
                                mp.addPlayer('#""" + outputId + """'); 
-                               mp.base64Load('data:audio/midi;base64,""" + binaryBase64.decode('utf-8') + """'); 
+                               mp.base64Load('data:audio/midi;base64,""" + 
+                                   binaryBase64.decode('utf-8') + """'); 
                         });
                 </script>"""))
                 
@@ -427,7 +431,7 @@ class ConverterTextLine(SubConverter):
     
     >>> s = corpus.parse('bwv66.6')
     >>> s.measures(1,4).show('textline')
-    '{0.0} <music21.stream.Part Soprano> / {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>...' 
+    '{0.0} <music21.stream.Part Soprano> / {0.0} <music21.instrument.Instrument ... 1>...' 
     '''
     registerFormats = ('textline',)
     registerOutputExtensions = ('txt',)
@@ -462,7 +466,8 @@ class ConverterHumdrum(SubConverter):
     def parseData(self, humdrumString, number=None):
         '''Open Humdrum data from a string -- calls humdrum.parseData()
 
-        >>> humdata = '**kern\\n*M2/4\\n=1\\n24r\\n24g#\\n24f#\\n24e\\n24c#\\n24f\\n24r\\n24dn\\n24e-\\n24gn\\n24e-\\n24dn\\n*-'
+        >>> humdata = ('**kern\\n*M2/4\\n=1\\n24r\\n24g#\\n24f#\\n24e\\n24c#\\n' + 
+        ...     '24f\\n24r\\n24dn\\n24e-\\n24gn\\n24e-\\n24dn\\n*-')
         >>> c = converter.subConverters.ConverterHumdrum()
         >>> s = c.parseData(humdata)
         >>> c.stream.show('text')
@@ -545,7 +550,9 @@ class ConverterTinyNotation(SubConverter):
         if common.isStr(tnData):
             tnStr = tnData
         else: # assume a 2 element sequence
-            raise SubConverterException("TinyNotation no longer supports two-element calls; put the time signature in the stream")
+            raise SubConverterException(
+                "TinyNotation no longer supports two-element calls; put the time signature " + 
+                "in the stream")
         from music21 import tinyNotation
         self.stream = tinyNotation.Converter(tnStr, **self.keywords).parse().stream
 
@@ -578,7 +585,8 @@ class ConverterNoteworthy(SubConverter):
     def parseData(self, nwcData):
         r'''Open Noteworthy data from a string or list
 
-        >>> nwcData = "!NoteWorthyComposer(2.0)\n|AddStaff\n|Clef|Type:Treble\n|Note|Dur:Whole|Pos:1^"
+        >>> nwcData = ("!NoteWorthyComposer(2.0)\n|AddStaff\n|Clef|" + 
+        ...     "Type:Treble\n|Note|Dur:Whole|Pos:1^")
         >>> c = converter.subConverters.ConverterNoteworthy()
         >>> c.parseData(nwcData)
         >>> c.stream.show('text')
@@ -608,7 +616,8 @@ class ConverterNoteworthy(SubConverter):
 
 class ConverterNoteworthyBinary(SubConverter):
     '''
-    Simple class wrapper for parsing NoteworthyComposer binary data provided in a file or in a string.
+    Simple class wrapper for parsing NoteworthyComposer binary data 
+    provided in a file or in a string.
 
     Gets data with the file format .nwc
 
@@ -682,10 +691,14 @@ class ConverterMusicXMLET(SubConverter):
 
     def runThroughMusescore(self, fp, **keywords):
         musescorePath = environLocal['musescoreDirectPNGPath']
-        if musescorePath == "":
-            raise SubConverterException("To create PNG files directly from MusicXML you need to download MuseScore")
+        if not musescorePath:
+            raise SubConverterException(
+                "To create PNG files directly from MusicXML you need to download MuseScore and " +
+                "put a link to it in your .music21rc via Environment.")
         elif not os.path.exists(musescorePath):
-            raise SubConverterException("Cannot find a path to the 'mscore' file at %s -- download MuseScore" % musescorePath)
+            raise SubConverterException(
+                        "Cannot find a path to the 'mscore' file at " + 
+                        "%s -- download MuseScore" % musescorePath)
 
         fpOut = fp[0:len(fp) - 3]
         fpOut += "png"
@@ -782,11 +795,15 @@ class ConverterMusicXML(SubConverter):
         try:
             c.read(xmlString)
         except AttributeError:
-            raise SubConverterException('score from xmlString (%s...) either has no parts defined, was incompletely parsed, or may not be MusicXML at all' % xmlString[:30])            
+            excpStr = 'score from xmlString (%s...) either has no parts defined, '
+            excpStr += 'was incompletely parsed, or may not be MusicXML at all'
+            raise SubConverterException(excpStr % xmlString[:30])            
         self._mxScore = c.score #  the mxScore object from the musicxml Document
         if len(self._mxScore) == 0:
             #print xmlString
-            raise SubConverterException('score from xmlString (%s...) either has no parts defined or was incompletely parsed' % xmlString[:30])
+            raise SubConverterException(
+                'score from xmlString (%s...) has no parts defined or was incompletely parsed' % 
+                    xmlString[:30])
         self.load()
 
     def parseFile(self, fp, number=None):
@@ -833,9 +850,12 @@ class ConverterMusicXML(SubConverter):
     def runThroughMusescore(self, fp, **keywords):
         musescorePath = environLocal['musescoreDirectPNGPath']
         if musescorePath == "":
-            raise SubConverterException("To create PNG files directly from MusicXML you need to download MuseScore")
+            raise SubConverterException(
+                "To create PNG files directly from MusicXML you need to download MuseScore")
         elif not os.path.exists(musescorePath):
-            raise SubConverterException("Cannot find a path to the 'mscore' file at %s -- download MuseScore" % musescorePath)
+            raise SubConverterException(
+                "Cannot find a path to the 'mscore' file at " + 
+                "%s -- download MuseScore" % musescorePath)
 
         fpOut = fp[0:len(fp) - 3]
         fpOut += "png"
@@ -957,9 +977,13 @@ class ConverterABC(SubConverter):
             abcFormat.translate.abcToStreamScore(abcHandler, self.stream)
 
     def parseFile(self, fp, number=None):
-        '''Get MIDI data from a file path. If more than one work is defined in the ABC data, a  :class:`~music21.stream.Opus` object will be returned; otherwise, a :class:`~music21.stream.Score` is returned.
+        '''
+        Get ABC data from a file path. If more than one work is defined in the ABC 
+        data, a  :class:`~music21.stream.Opus` object will be returned; 
+        otherwise, a :class:`~music21.stream.Score` is returned.
 
-        If `number` is provided, and this ABC file defines multiple works with a X: tag, just the specified work will be returned.
+        If `number` is provided, and this ABC file defines multiple works 
+        with a X: tag, just the specified work will be returned.
         '''
         #environLocal.printDebug(['ConverterABC.parseFile: got number', number])
         from music21 import abcFormat
@@ -1251,7 +1275,8 @@ class Test(unittest.TestCase):
 
     def testImportMei3(self):
         '''
-        When the file uses UTF-16 encoding rather than UTF-8 (which happens if it was exported from
+        When the file uses UTF-16 encoding rather than UTF-8 (which happens if 
+        it was exported from
         the "sibmei" plug-in for Sibelius.
         '''
         try:

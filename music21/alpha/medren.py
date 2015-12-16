@@ -74,9 +74,12 @@ _validMensuralAbbr = [None, 'Mx', 'L', 'B', 'SB', 'M', 'SM']
 # def _getTargetBeforeOrAtObj(music21Obj, targetClassList):
 #    '''
 #    Takes two arguments: music21Obj, targetObj
-#    If music21Obj has some set of contexts, returns the list of object of class targetClass at or before music21Obj.
+#    If music21Obj has some set of contexts, returns the list of
+#     object of class targetClass at or before music21Obj.
 #    If no such instance exists, of if the only context is None, returns None.
-#    NOTE: This has no other use than to act as an alternate way of getting the closest instance of a mensuration or divisione for :class:`music21.medren.GeneralMensuralNote`. 
+#    NOTE: This has no other use than to act as an alternate way of 
+#    getting the closest instance of a mensuration or divisione for 
+#    :class:`music21.medren.GeneralMensuralNote`. 
 #    
 #    
 #    >>> n = note.Note('A')
@@ -117,13 +120,14 @@ _validMensuralAbbr = [None, 'Mx', 'L', 'B', 'SB', 'M', 'SM']
 #    if len(tempSites) > 0:
 #        for s in tempSites:
 #            for i in range(int(s.lowestOffset), int(s.elementOffset(music21Obj))+1):
-#                cList += list(s.getElementsByOffset(i, i+1, classList = targetClassList).recurse())[1:]
+#                cList += list(s.getElementsByOffset(i, i+1, classList = 
+#                        targetClassList).recurse())[1:]
 #        cList += music21.medren._getTargetBeforeOrAtObj(s, targetClassList)
 #    
 #    return list(set(cList))
 #===============================================================================
 
-#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 class MensuralClef(clef.Clef):
     '''
     An object representing a mensural clef found in medieval and Renaissance music.
@@ -168,14 +172,17 @@ class MensuralClef(clef.Clef):
         return self._fontString
     
     fontString = property(_getFontString, 
-                          doc = ''' Returns the utf-8 code corresponding to the mensural clef in Ciconia font''')
+                          doc = '''Returns the utf-8 code corresponding to the 
+                              mensural clef in Ciconia font''')
 
 class Mensuration(meter.TimeSignature):
     '''
     An object representing a mensuration sign found in French notation.
-    Takes four optional arguments: tempus, prolation, mode, and maximode. Defaults are 'perfect', 'minor', 'perfect', and None respectively.
+    Takes four optional arguments: tempus, prolation, mode, and maximode. 
+    Defaults are 'perfect', 'minor', 'perfect', and None respectively.
     
-    Valid values for tempus and mode are 'perfect' and 'imperfect'. Valid values for prolation and maximode are 'major' and 'minor'.
+    Valid values for tempus and mode are 'perfect' and 'imperfect'. 
+    Valid values for prolation and maximode are 'major' and 'minor'.
     
     >>> from music21.alpha import medren
     
@@ -186,7 +193,8 @@ class Mensuration(meter.TimeSignature):
     '0x50'
     '''
     
-    def __init__(self, tempus = 'perfect', prolation = 'minor', mode = 'perfect', maximode = None, scalingFactor = 4):
+    def __init__(self, tempus='perfect', prolation='minor', mode='perfect', 
+                 maximode=None, scalingFactor=4):
         self.tempus = tempus
         self.prolation = prolation
         self.mode = mode
@@ -217,7 +225,9 @@ class Mensuration(meter.TimeSignature):
             self._fontString = '0x43'
             self._minimaPerBrevis = 4
         else:
-            raise MedRenException('cannot make out the mensuration from tempus %s and prolation %s' % (tempus, prolation)) 
+            raise MedRenException(
+                'cannot make out the mensuration from tempus %s and prolation %s' % 
+                (tempus, prolation)) 
 
         meter.TimeSignature.__init__(self, self.timeString)
         
@@ -234,7 +244,8 @@ class Mensuration(meter.TimeSignature):
         self._minimaPerBrevis = mPM
     
     minimaPerBrevis = property(_getMinimaPerMeasure, _setMinimaPerMeasure,
-                                doc = '''Used to get or set the number of minima in a 'measure' under the given mensuration.
+                                doc = '''Used to get or set the number of minima in a 
+                                'measure' under the given mensuration.
                                         
                                 >>> from music21.alpha import medren
                                 
@@ -269,16 +280,26 @@ class Mensuration(meter.TimeSignature):
 
 class GeneralMensuralNote(base.Music21Object):
     '''
-    The base class object for :class:`music21.medren.MensuralNote` and :class:`music21.medren.MensuralRest`. This is arguably the most important mensural object, since it is responsible for getting the context and determining the contextual duration of objects within both subclasses.
-    A :class:`music21.medren.GeneralMensuralNote` object takes a mensural type or its abbreviation as an argument. The default value for this argument is 'brevis'.
+    The base class object for :class:`music21.medren.MensuralNote` and 
+    :class:`music21.medren.MensuralRest`. This is arguably the most important mensural object, 
+    since it is responsible for getting the context and determining the contextual duration of 
+    objects within both subclasses.
+    A :class:`music21.medren.GeneralMensuralNote` object takes a mensural type or its 
+    abbreviation as an argument. The default value for this argument is 'brevis'.
     
     Valid mensural types are 'maxima', 'longa', 'brevis', 'semibrevis', 'minima', and 'semiminima'.
     The corresponding abbreviations are 'Mx', 'L', 'B', 'SB', 'M', and 'SM'.
     
-    The object's mensural type can be set and accessed via the property :attr:`music21.medren.GeneralMensuralNote.mensuralType`.
-    The duration of a general mensural note can be set and accessed using the property :attr:`music21.medren.GeneralMensuralNote.duration`. If the duration of an general mensural note cannot be determined from context, it is set to 0. For more specific examples of this, please see the :attr:`music21.medren.GeneralMensuralNote.duration` documentation.
+    The object's mensural type can be set and accessed via the property 
+    :attr:`music21.medren.GeneralMensuralNote.mensuralType`.
+    The duration of a general mensural note can be set and accessed using the property 
+    :attr:`music21.medren.GeneralMensuralNote.duration`. If the duration of an general 
+    mensural note cannot be determined from context, it is set to 0. For more specific 
+    examples of this, please see the :attr:`music21.medren.GeneralMensuralNote.duration` 
+    documentation.
     
-    Two general mensural notes are considered equal if they have the same mensural type, are present in the same context, and have the same offset within that context.
+    Two general mensural notes are considered equal if they have the same mensural type, 
+    are present in the same context, and have the same offset within that context.
     '''
     def __init__(self, mensuralTypeOrAbbr = 'brevis'):
         base.Music21Object.__init__(self)
@@ -289,7 +310,8 @@ class GeneralMensuralNote(base.Music21Object):
         elif mensuralTypeOrAbbr in _validMensuralAbbr:
             self.mensuralType = _validMensuralTypes[_validMensuralAbbr.index(mensuralTypeOrAbbr)]
         else:
-            raise MedRenException('%s is not a valid mensural type or abbreviation' % mensuralTypeOrAbbr)
+            raise MedRenException('%s is not a valid mensural type or abbreviation' % 
+                                  mensuralTypeOrAbbr)
         
         self.lenList = []
         
@@ -299,7 +321,8 @@ class GeneralMensuralNote(base.Music21Object):
     
     def __eq__(self, other):
         '''
-        Essentially the same as music21.base.Music21Object.__eq__, but equality of mensural type is tested rather than equality of duration
+        Essentially the same as music21.base.Music21Object.__eq__, but equality of 
+        mensural type is tested rather than equality of duration
         
         >>> from music21.alpha import medren
         
@@ -341,10 +364,12 @@ class GeneralMensuralNote(base.Music21Object):
         elif mensuralTypeOrAbbr in _validMensuralAbbr:
             self.mensuralType = _validMensuralTypes[_validMensuralAbbr.index(mensuralTypeOrAbbr)]
         else:
-            raise MedRenException('%s is not a valid mensural type or abbreviation' % mensuralTypeOrAbbr)
+            raise MedRenException('%s is not a valid mensural type or abbreviation' % 
+                                  mensuralTypeOrAbbr)
     
     mensuralType = property(_getMensuralType, _setMensuralType,
-                        doc = '''Name of the mensural length of the general mensural note (brevis, longa, etc.):
+                        doc = '''Name of the mensural length of the general mensural note 
+                        (brevis, longa, etc.):
                         
                         >>> from music21.alpha import medren
                         
@@ -359,14 +384,22 @@ class GeneralMensuralNote(base.Music21Object):
                         MedRenException: blah is not a valid mensural type or abbreviation
                         ''')
     
-    def updateDurationFromMensuration(self, mensuration = None, surroundingStream = None):
+    def updateDurationFromMensuration(self, mensuration=None, surroundingStream=None):
         '''
-        The duration of a :class:`music21.medren.GeneralMensuralNote` object can be accessed and set using the :attr:`music21.medren.GeneralMensuralNote.duration` property. 
-        The duration of a general mensural note is by default 0. If the object's subclass is not specified (:class:`music21.medren.MensuralNote` or :class:`music21.medren.MensuralRest`), the duration will remain 0 unless set to some other value.
-        If a general mensural note has no context, the duration will remain 0 since duration is context dependant. 
-        Finally, if a mensural note or a mensural rest has context, but a mensuration or divisione cannot be found or determined from that context, the duration will remain 0.
+        The duration of a :class:`music21.medren.GeneralMensuralNote` object can be accessed 
+        and set using the :attr:`music21.medren.GeneralMensuralNote.duration` property. 
+        The duration of a general mensural note is by default 0. If the object's subclass 
+        is not specified (:class:`music21.medren.MensuralNote` or 
+        :class:`music21.medren.MensuralRest`), the duration will remain 0 unless set to 
+        some other value.
+        If a general mensural note has no context, the duration will remain 0 since 
+        duration is context dependant. 
+        Finally, if a mensural note or a mensural rest has context, but a 
+        mensuration or divisione cannot be found or determined from that context, 
+        the duration will remain 0.
         
-        Every time a duration is changed, the method :meth:`music21.medren.GeneralMensuralNote.updateDurationFromMensuration`` should be called.
+        Every time a duration is changed, the method 
+        :meth:`music21.medren.GeneralMensuralNote.updateDurationFromMensuration`` should be called.
         
         >>> from music21.alpha import medren
         
@@ -377,7 +410,8 @@ class GeneralMensuralNote(base.Music21Object):
         >>> mn.duration.quarterLength
         0.0
         
-        However, if subclass is given, context (a stream) is given, and a mensuration or divisione is given, duration can be determined.
+        However, if subclass is given, context (a stream) is given, and a mensuration or 
+        divisione is given, duration can be determined.
         
         >>> from music21.alpha import medren
         >>> from music21.alpha import trecento
@@ -393,7 +427,7 @@ class GeneralMensuralNote(base.Music21Object):
         >>> s.append(medren.MensuralNote('A', 'B'))
         >>> for mn in s:
         ...    if isinstance(mn, medren.GeneralMensuralNote):
-        ...        mn.updateDurationFromMensuration(surroundingStream = s)
+        ...        mn.updateDurationFromMensuration(surroundingStream=s)
         ...        print(mn.duration.quarterLength)
         1.0
         1.0
@@ -406,7 +440,7 @@ class GeneralMensuralNote(base.Music21Object):
         '''
         mLen, mDur = 0, 0
         if self._gettingDuration is True:
-            return duration.ZeroDuration()
+            return duration.Duration(0.0)
         
         if mensuration is None:
             mOrD = self._determineMensurationOrDivisione()
@@ -414,7 +448,8 @@ class GeneralMensuralNote(base.Music21Object):
         else:
             mOrD = mensuration
             
-        index = self._getTranslator(mensurationOrDivisione = mOrD, surroundingStream = surroundingStream)
+        index = self._getTranslator(mensurationOrDivisione=mOrD, 
+                                    surroundingStream=surroundingStream)
         
         if self.lenList:
             if mOrD.standardSymbol in ['.q.', '.p.', '.i.', '.n.']:
@@ -422,10 +457,11 @@ class GeneralMensuralNote(base.Music21Object):
             else:
                 mDur = 0.25
             mLen = self.lenList[index]
-        #print "MDUR! " + str(mDur) + "MLEN " + str(mLen) + "index " + str(index) + " MEASURE " + str(self._getSurroundingMeasure()[0])
+        #print("MDUR! " + str(mDur) + "MLEN " + str(mLen) + "index " + str(index) +
+        # " MEASURE " + str(self._getSurroundingMeasure()[0]))
             self.duration = duration.Duration(mLen*mDur)
         else:
-            self.duration = duration.ZeroDuration()
+            self.duration = duration.Duration(0.0)
     
     
     def _getTranslator(self, mensurationOrDivisione = None, surroundingStream = None):
@@ -433,23 +469,32 @@ class GeneralMensuralNote(base.Music21Object):
         mOrD = mensurationOrDivisione
         if mOrD is None:
             mOrD = self._determineMensurationOrDivisione()
-        measure, index = self._getSurroundingMeasure(mensurationOrDivisione = mOrD, activeSite = surroundingStream)
+        measure, index = self._getSurroundingMeasure(mensurationOrDivisione=mOrD, 
+                                                     activeSite=surroundingStream)
         
         self._gettingDuration = True
         if measure and 'Divisione' in mOrD.classes:
             if index == 0:
-                self.lenList = trecento.notation.BrevisLengthTranslator(mOrD, measure).getKnownLengths()
+                self.lenList = trecento.notation.BrevisLengthTranslator(
+                                    mOrD, measure).getKnownLengths()
             elif index != -1:
                 tempMN = measure[0]
                 self.lenList = tempMN.lenList
         self._gettingDuration = False
         return index
     
-    #Using Music21Object.getContextByClass makes _getDuration go into an infinite loop. Thus, the alternative method. 
+    #Using Music21Object.getContextByClass makes _getDuration go into 
+    #an infinite loop. Thus, the alternative method. 
     def _determineMensurationOrDivisione(self):
         '''
-        If the general mensural notes has context which contains a mensuration or divisione sign, it returns the mensuration or divisione sign closest to but before itself.
-        Otherwise, it tries to determine the mensuration sign from the context. If no mensuration sign can be determined, it throws an error.
+        If the general mensural notes has context which contains a mensuration 
+        or divisione sign, it returns the mensuration or divisione sign 
+        closest to but before itself.
+        
+        Otherwise, it tries to determine the mensuration sign from the context. 
+        
+        If no mensuration sign can be determined, it throws an error.
+        
         If no context is present, returns None.
         
         >>> from music21.alpha import medren
@@ -470,7 +515,8 @@ class GeneralMensuralNote(base.Music21Object):
         <music21.alpha.trecento.notation.Divisione .q.>
         '''
         
-        #mOrD = music21.medren._getTargetBeforeOrAtObj(self, [Mensuration, trecento.notation.Divisione])
+        #mOrD = music21.medren._getTargetBeforeOrAtObj(self, 
+        #        [Mensuration, trecento.notation.Divisione])
         searchClasses = (Mensuration, trecento.notation.Divisione)
         mOrD = self.getContextByClass(searchClasses)
         if mOrD is not None:
@@ -484,11 +530,13 @@ class GeneralMensuralNote(base.Music21Object):
 #        
 #        return mOrD
     
-    def _getSurroundingMeasure(self, mensurationOrDivisione = None, activeSite = None):
+    def _getSurroundingMeasure(self, mensurationOrDivisione=None, activeSite=None):
         '''
-        Returns a list of the objects (ordered by offset) that are within the measure containing the general mensural note.
+        Returns a list of the objects (ordered by offset) that are within 
+        the measure containing the general mensural note.
         If the general mensural note has no context, returns an empty list.
-        If the general mensural note has more than one context, only the surrounding measure of the first context is returned.
+        If the general mensural note has more than one context, only the 
+        surrounding measure of the first context is returned.
         
         >>> from music21.alpha import medren
         >>> from music21.alpha import trecento
@@ -504,8 +552,13 @@ class GeneralMensuralNote(base.Music21Object):
         >>> s_1.append(medren.MensuralNote('C', 'minima'))
         >>> s_1.append(trecento.notation.Punctus())
         >>> gmn_1._getSurroundingMeasure(activeSite = s_1)
-        ([<music21.medren.MensuralNote minima B>, <music21.medren.MensuralNote minima B>, <music21.medren.MensuralNote minima B>, <music21.medren.MensuralNote minima B>, <music21.medren.GeneralMensuralNote minima>, <music21.medren.MensuralNote minima C>], 4) 
-        >>> 
+        ([<music21.medren.MensuralNote minima B>, 
+          <music21.medren.MensuralNote minima B>, 
+          <music21.medren.MensuralNote minima B>, 
+          <music21.medren.MensuralNote minima B>, 
+          <music21.medren.GeneralMensuralNote minima>, 
+          <music21.medren.MensuralNote minima C>], 4) 
+        
         >>> s_2 = stream.Stream()
         >>> s_2.append(trecento.notation.Divisione('.p.'))
         >>> s_2.append(trecento.notation.Punctus())
@@ -515,7 +568,9 @@ class GeneralMensuralNote(base.Music21Object):
         >>> s_2.append(gmn_2)
         >>> s_2.append(medren.Ligature(['A','B']))
         >>> gmn_2._getSurroundingMeasure(activeSite = s_2)
-        ([<music21.medren.MensuralNote semibrevis A>, <music21.medren.MensuralNote semibrevis B>, <music21.medren.GeneralMensuralNote semibrevis>], 2)
+        ([<music21.medren.MensuralNote semibrevis A>, 
+          <music21.medren.MensuralNote semibrevis B>, 
+          <music21.medren.GeneralMensuralNote semibrevis>], 2)
         '''
         
         mOrD = mensurationOrDivisione
@@ -546,13 +601,14 @@ class GeneralMensuralNote(base.Music21Object):
                                        
                     for i in range(currentIndex-1, -1, -1):
                         # Punctus and ligature marks indicate a new measure
-                        if ('Punctus' in tempList[i].classes) or ('Ligature' in tempList[i].classes):
+                        if (('Punctus' in tempList[i].classes) or 
+                                ('Ligature' in tempList[i].classes)):
                             indOffset = i+1
                             break
                         elif 'GeneralMensuralNote' in tempList[i].classes:
                             # In Italian notation, brevis, longa, and maxima indicate a new measure
-                            if ('Divisione' in mOrD.classes) and \
-                            (tempList[i].mensuralType in ['brevis', 'longa', 'maxima']):
+                            if (('Divisione' in mOrD.classes) and
+                                    (tempList[i].mensuralType in ['brevis', 'longa', 'maxima'])):
                                 indOffset = i+1
                                 break
                             else:
@@ -563,11 +619,12 @@ class GeneralMensuralNote(base.Music21Object):
                     mList.reverse()
                     mList.insert(currentIndex, self)
                     for j in range(currentIndex+1,len(tempList), 1):
-                        if ('Punctus' in tempList[j].classes) or ('Ligature' in tempList[j].classes):
+                        if (('Punctus' in tempList[j].classes) or 
+                                ('Ligature' in tempList[j].classes)):
                             break
                         if 'GeneralMensuralNote' in tempList[j].classes:
-                            if ('Divisione' in mOrD.classes) and \
-                            (tempList[j].mensuralType in ['brevis', 'longa', 'maxima']):
+                            if (('Divisione' in mOrD.classes) and 
+                                    (tempList[j].mensuralType in ['brevis', 'longa', 'maxima'])):
                                 break
                             else:
                                 mList.insert(j, tempList[j])
@@ -579,9 +636,11 @@ class GeneralMensuralNote(base.Music21Object):
 class MensuralRest(GeneralMensuralNote, note.Rest):
     '''
     An object representing a mensural rest. First argument is mensural type.
-    The utf-8 code for the Ciconia font character can be accessed via the property :attr:`music21.medren.MensuralNote.fontString`
+    The utf-8 code for the Ciconia font character can be accessed via the property 
+    :attr:`music21.medren.MensuralNote.fontString`
     
-    Additional methods regarding color, duration, equality, and mensural type are inherited from :class:`music21.medren.GeneralMensuralNote`.
+    Additional methods regarding color, duration, equality, and mensural type are inherited from 
+    :class:`music21.medren.GeneralMensuralNote`.
     '''
     
     # scaling?
@@ -628,7 +687,8 @@ class MensuralRest(GeneralMensuralNote, note.Rest):
         return self._fontString
     
     fontString  = property(_getFontString,
-                           doc = ''' The utf-8 code corresponding to the mensural rest in Ciconia font.
+                           doc = ''' The utf-8 code corresponding to the mensural rest 
+                            in Ciconia font.
                             Note that there is no character for a semiminima rest yet.
                             
                             TODO: Replace w/ SMuFL
@@ -644,18 +704,27 @@ class MensuralNote(GeneralMensuralNote, note.Note):
     '''
     An object representing a mensural note commonly found in medieval and renaissance music.
     Takes pitch and mensural type as arguments, but defaults to 'C' and 'brevis'.
-    Pitch and and mensural type can also be set using the properties :attr:`music21.medren.MensuralNote.pitch` and :attr:`music21.medren.MensuralNote.mensuralType` respectively.
-    The utf-8 code for the Ciconia font character can be accessed via the property :attr:`music21.medren.MensuralNote.fontString`
+    Pitch and and mensural type can also be set using the properties 
+    :attr:`music21.medren.MensuralNote.pitch` and :attr:`music21.medren.MensuralNote.mensuralType` 
+    respectively.
+    The utf-8 code for the Ciconia font character can be accessed via the property 
+    :attr:`music21.medren.MensuralNote.fontString`
 
-    The note stems can can be set using the method :meth:`music21.medren.MensuralNote.setStem`. A note's stems can be displayed using the method :meth:`music21.medren.MensuralNote.getStems`.
-    Stems may only be added to notes shorter than a brevis. For additional detail, see the documentation for :meth:`music21.medren.MensuralNote.setStem`.
+    The note stems can can be set using the method :meth:`music21.medren.MensuralNote.setStem`. 
+    A note's stems can be displayed using the method :meth:`music21.medren.MensuralNote.getStems`.
+    Stems may only be added to notes shorter than a brevis. For additional detail, see the 
+    documentation for :meth:`music21.medren.MensuralNote.setStem`.
     
-    The note flags can be set using the method :meth:`music21.medren.MensuralNote.setFlag`. A note's flags can be displayed using the method :meth:`music21.medren.MensuralNote.getFlags`.
-    Flags may only be added to stems that exist for the given note. For additional detail, see the documentation for :meth:`music21.medren.MensuralNote.setFlag`.
+    The note flags can be set using the method :meth:`music21.medren.MensuralNote.setFlag`. 
+    A note's flags can be displayed using the method :meth:`music21.medren.MensuralNote.getFlags`.
+    Flags may only be added to stems that exist for the given note. For additional detail, 
+    see the documentation for :meth:`music21.medren.MensuralNote.setFlag`.
     
-    Two mensural notes are considered equal if they match in pitch, articulation, and are equal as general mensural notes.
+    Two mensural notes are considered equal if they match in pitch, articulation, 
+    and are equal as general mensural notes.
     
-    Additional methods regarding color, duration, mensural type are inherited from :class:`music21.medren.GeneralMensuralNote`.
+    Additional methods regarding color, duration, mensural type are inherited from 
+    :class:`music21.medren.GeneralMensuralNote`.
     '''
     
     # scaling? 
@@ -693,8 +762,10 @@ class MensuralNote(GeneralMensuralNote, note.Note):
     
     def __eq__(self, other):
         '''
-        Same as music21.medren.GeneralNote.__eq__, but also tests equality of pitch and articulation.
-        Only pitch is shown as a test. For other cases, please see the docs for :meth:``music21.medren.GeneralMensuralNote.__eq__``
+        Same as music21.medren.GeneralNote.__eq__, but also tests equality of pitch 
+        and articulation.
+        Only pitch is shown as a test. For other cases, please see the docs for 
+        :meth:``music21.medren.GeneralMensuralNote.__eq__``
         
         >>> from music21.alpha import medren
         >>> from music21.alpha import trecento
@@ -716,7 +787,8 @@ class MensuralNote(GeneralMensuralNote, note.Note):
             eq = eq and (self.pitch == other.pitch)
         eq = eq and hasattr(other, 'articulations')
         if eq:
-            eq = eq and ( sorted(list(set(self.articulations))) == sorted(list(set(other.articulations))) )
+            eq = eq and (sorted(list(set(self.articulations))) == 
+                                        sorted(list(set(other.articulations))) )
         return eq
     
     def _getFullName(self):
@@ -775,7 +847,10 @@ class MensuralNote(GeneralMensuralNote, note.Note):
     
     fontString = property(_getFontString, 
                           doc = ''' The utf-8 code corresponding to a mensural note in Ciconia font.
-                          Note that semiminima with a left flag on the upper stem and any flag on the lower stem, semiminima with a right flag on the upperstem and on the lowerstem, and any red or unfilled notes with sidestems have no corresponding characters in the Cicionia font.
+                          Note that semiminima with a left flag on the upper stem 
+                          and any flag on the lower stem, semiminima with a right flag on the 
+                          upperstem and on the lowerstem, and any red or unfilled notes with 
+                          sidestems have no corresponding characters in the Cicionia font.
                         
                         
                           TODO: Replace with SMuFL
@@ -849,14 +924,18 @@ class MensuralNote(GeneralMensuralNote, note.Note):
         return self.stems
     
     def setStem(self, direction):
-        #NOTE: This method makes it possible to have a semibrevis with a sidestem and a downstem. This doesn't mean anything so far as I can tell.
+        #NOTE: This method makes it possible to have a semibrevis with a sidestem and a 
+        # downstem. This doesn't mean anything so far as I can tell.
         '''
         Takes one argument: direction.
         
-        Adds a stem to a note. Any note with length less than or equal to a minima gets an upstem by default.
+        Adds a stem to a note. Any note with length less than or equal to a minima gets an 
+        upstem by default.
         Any note can have at most two stems. Valid stem directions are "down" and "side". 
         Downstems can be applied to any note with length less than or equal to a brevis.
-        Side stems in Trecento notation are the equivalent of dots, but may only be applied to notes of the type semibrevis and minima (hence, a dotted note may not have a side stem, and vice versa).
+        Side stems in Trecento notation are the equivalent of dots, but may only be 
+        applied to notes of the type semibrevis and minima (hence, a dotted note may not 
+        have a side stem, and vice versa).
         Setting stem direction to None removes all but the default number of stems. 
         
         >>> from music21.alpha import medren
@@ -889,7 +968,8 @@ class MensuralNote(GeneralMensuralNote, note.Note):
                 self.stems = []
         else:
             if self.mensuralType in ['brevis','longa', 'maxima']:
-                raise MedRenException('A note of type %s cannot be equipped with a stem' % self.mensuralType)
+                raise MedRenException('A note of type %s cannot be equipped with a stem' % 
+                                      self.mensuralType)
             else:
                 if direction in ['down', 'Down']:
                     direction = 'down'
@@ -900,8 +980,10 @@ class MensuralNote(GeneralMensuralNote, note.Note):
                             
                 elif direction in ['side', 'Side']:
                     direction = 'side'
-                    if (self.mensuralType not in ['semibrevis', 'minima']) or self.getNumDots() > 0:
-                        raise MedRenException('This note may not have a stem of direction %s' % direction)
+                    if ((self.mensuralType not in ['semibrevis', 'minima']) or 
+                        self.getNumDots() > 0):
+                        raise MedRenException('This note may not have a stem of direction %s' % 
+                                              direction)
                     elif len(self.stems) > 1:
                         raise MedRenException('This note already has the maximum number of stems')
                     else:
@@ -919,12 +1001,18 @@ class MensuralNote(GeneralMensuralNote, note.Note):
         '''
         Takes two arguments: stemDirection and orientation.
         
-        stemDirection may be 'up' or 'down' (sidestems cannot have flags), and orientation may be 'left' or 'right'.
-        If the note has a stem with direction stemDirection, a flag with the specified orientation is added.
-        Any stem may only have up to one flag, so setting a flag overrides whatever flag was previously present.
-        Setting the orientation of a flag to None returns that stem to its default flag setting ('right' for semiminima, None otherwise).
+        stemDirection may be 'up' or 'down' (sidestems cannot have flags), and orientation 
+        may be 'left' or 'right'.
+        If the note has a stem with direction stemDirection, a flag with the specified 
+        orientation is added.
+        Any stem may only have up to one flag, so setting a flag overrides whatever 
+        flag was previously present.
+        Setting the orientation of a flag to None returns that stem to its default 
+        flag setting ('right' for semiminima, None otherwise).
         
-        A minima may not have a flag on its upstem, while a semiminima always has a flag on its upstem. The flag orientation for a semiminima is 'right' by default, but may be set to 'left'. 
+        A minima may not have a flag on its upstem, while a semiminima always has a 
+        flag on its upstem. The flag orientation for a semiminima is 'right' by default, 
+        but may be set to 'left'. 
         Any note with a downstem may also have a flag on that stem. 
         
         >>> from music21.alpha import medren
@@ -954,7 +1042,8 @@ class MensuralNote(GeneralMensuralNote, note.Note):
         
         if stemDirection == 'up':
             if self.mensuralType != 'semiminima':
-                raise MedRenException('a flag may not be added to an upstem of note type %s' % self.mensuralType)
+                raise MedRenException('a flag may not be added to an upstem of note type %s' % 
+                                      self.mensuralType)
             else:
                 if orientation in ['left', 'Left']:
                     orientation = 'left'
@@ -981,38 +1070,59 @@ class MensuralNote(GeneralMensuralNote, note.Note):
                 else:
                     raise MedRenException('a flag of orientation %s not supported' % orientation)
             else:
-                raise MedRenException('this note does not have a stem with direction %s' % stemDirection)
+                raise MedRenException('this note does not have a stem with direction %s' % 
+                                      stemDirection)
         else:
-            raise MedRenException('a flag cannot be added to a stem with direction %s' % stemDirection)  
+            raise MedRenException(
+                'a flag cannot be added to a stem with direction %s' % stemDirection)  
         
         
 class Ligature(base.Music21Object):
     '''
     An object that represents a ligature commonly found in medieval and Renaissance music. 
     Initialization takes a list of the pitches in the ligature as a required argument.
-    Color of the ligature is an optional argument (default is 'black'). Color can also be set with the :meth:`music21.medren.Ligature.setColor` method. 
+    Color of the ligature is an optional argument (default is 'black'). Color can also be set 
+    with the :meth:`music21.medren.Ligature.setColor` method. 
     Color of a ligature can be determined with the :meth:`music21.medren.Ligature.getColor` method.
-    Whether the noteheads of the ligature are filled is an optional argument (default is 'yes'). Noteheads can be also filled with the :meth:`music21.medren.Ligature.setFillStatus` method. 
-    Fill status of a ligature can be determined with the :meth:`music21.medren.Ligature.getFillStatus` method.
+    Whether the noteheads of the ligature are filled is an optional argument (default is 'yes'). 
+    Noteheads can be also filled with the :meth:`music21.medren.Ligature.setFillStatus` method. 
+    Fill status of a ligature can be determined with the 
+    :meth:`music21.medren.Ligature.getFillStatus` method.
     
-    The notes of the ligature can be accessed via the property :attr:`music21.medren.Ligature.notes`.
+    The notes of the ligature can be accessed via the property 
+    :attr:`music21.medren.Ligature.notes`.
     The mensural length of each note is calculated automatically. 
-    To determine if a ligature is cum proprietate, use the :meth:`music21.medren.Ligature.isCumProprietate` method.
-    Similarly, to determine if a ligautre is cum perfectione, use the :meth:`music21.medren.Ligature.isCumPerfectione` method.
-    Finally, to determine if a ligature is cum opposita proprietate (C.O.P), use the :meth:`music21.medren.Ligature.isCOP` method. 
+    To determine if a ligature is cum proprietate, use the 
+    :meth:`music21.medren.Ligature.isCumProprietate` method.
+    Similarly, to determine if a ligautre is cum perfectione, use the 
+    :meth:`music21.medren.Ligature.isCumPerfectione` method.
+    Finally, to determine if a ligature is cum opposita proprietate (C.O.P), use the 
+    :meth:`music21.medren.Ligature.isCOP` method. 
     
-    Noteheads can be set to have oblique shape using the :meth:`music21.medren.Ligature.makeOblique` method. Similarly, oblique noteheads can be set to have a square shape using the :meth:`music21.medren.Ligature.makeSquare` method. 
-    The shape of a notehead can be determined using the :meth:`music21.medren.Ligature.getNoteheadShape` method. By default, all noteheads in a ligature are square.
+    Noteheads can be set to have oblique shape using the 
+    :meth:`music21.medren.Ligature.makeOblique` method. Similarly, oblique noteheads 
+    can be set to have a square shape using the :meth:`music21.medren.Ligature.makeSquare` method. 
+    The shape of a notehead can be determined using the 
+    :meth:`music21.medren.Ligature.getNoteheadShape` method. By default, all noteheads in a 
+    ligature are square.
     
-    A note in the ligature can be made to be maxima by the :meth:`music21.medren.Ligature.setMaxima` method. It can be determined whether a note is a maxima by the :meth:`music21.medren.Ligature.isMaxima` method.
+    A note in the ligature can be made to be maxima by the 
+    :meth:`music21.medren.Ligature.setMaxima` method. It can be determined whether a note 
+    is a maxima by the :meth:`music21.medren.Ligature.isMaxima` method.
     By default, no notes in a ligature are maxima.
     
-    A note in the ligature can be set to have an upstem, a downstem, or no stem by the :meth:`music21.medren.Ligature.setStem` method.
-    It can be determined whether a note has a stem by the :meth:`music21.medren.Ligature.getStem` method. By default, no notes in a ligature have stems.
+    A note in the ligature can be set to have an upstem, a downstem, or no 
+    stem by the :meth:`music21.medren.Ligature.setStem` method.
+    It can be determined whether a note has a stem by the 
+    :meth:`music21.medren.Ligature.getStem` method. By default, no notes in a ligature have stems.
     
-    A note in the ligature can be 'reversed' by the `music21.medren.Ligature.setReverse` method. A 'reversed' note is displayed as stacked upon the preceding note (see the second note in the example).
-    It can be determined whether a note is reversed by the `music21.medren.Ligature.isReversed` method. By default, no notes in a ligature are reversed. 
-    -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    A note in the ligature can be 'reversed' by the `music21.medren.Ligature.setReverse` 
+    method. A 'reversed' note is displayed as stacked upon the preceding note 
+    (see the second note in the example).
+    It can be determined whether a note is 
+    reversed by the `music21.medren.Ligature.isReversed` method. By default, no notes 
+    in a ligature are reversed. 
+    --------------------------------------------------------
     
     Example:
     
@@ -1030,7 +1140,8 @@ class Ligature(base.Music21Object):
     >>> l1.makeOblique(0)
     >>> l1.setStem(0, 'down', 'left')
     >>> print([n.fullName for n in l1.notes])
-    ['brevis A in octave 4 ', 'brevis F in octave 4 ', 'brevis G in octave 4 ', 'brevis A in octave 4 ', 'brevis B-flat in octave 4 ']
+    ['brevis A in octave 4 ', 'brevis F in octave 4 ', 
+     'brevis G in octave 4 ', 'brevis A in octave 4 ', 'brevis B-flat in octave 4 ']
     >>>
     >>> l2 = medren.Ligature(['F4','G4','A4','B-4','D5'])
     >>> l2.setStem(4, 'down', 'left')
@@ -1125,7 +1236,8 @@ class Ligature(base.Music21Object):
         '''
         Takes no arguments.
         
-        Returns True if the ligature is cum proprietate, and False if the ligature is sine proprietate.
+        Returns True if the ligature is cum proprietate, and 
+        False if the ligature is sine proprietate.
         '''
         return self.notes[0].mensuralType == 'brevis'
     
@@ -1133,7 +1245,8 @@ class Ligature(base.Music21Object):
         '''
         Takes no arguments.
         
-        Returns True if the ligature is cum perfectione, and False if the ligature is sine perfectione.
+        Returns True if the ligature is cum perfectione, 
+        and False if the ligature is sine perfectione.
         '''
         return self.notes[self._ligatureLength()-1].mensuralType == 'longa'
     
@@ -1145,11 +1258,12 @@ class Ligature(base.Music21Object):
         '''
         return self.notes[0].mensuralType == 'semibrevis'
     
-    def getColor(self, index = None):
+    def getColor(self, index=None):
         '''
         Take one argument: index (optional, default is None).
         
-        Returns the color of the note at the given index. If no index specified, returns the color of the ligature.
+        Returns the color of the note at the given index. If no index specified, 
+        returns the color of the ligature.
         If multiple colors are present, returns mixed.
         '''
         if index == 'None' or index == 'none':
@@ -1162,11 +1276,12 @@ class Ligature(base.Music21Object):
         else: 
             return self.color
         
-    def setColor(self, value, index = None):
+    def setColor(self, value, index=None):
         '''
         Takes two arguments: value, index (optional, default is None).
         
-        Sets the color of note at index to value. If no index is specified, or index is set to None, every note in the ligature is given value as a color. 
+        Sets the color of note at index to value. If no index is specified, or 
+        index is set to None, every note in the ligature is given value as a color. 
         
         >>> from music21.alpha import medren
         
@@ -1200,7 +1315,8 @@ class Ligature(base.Music21Object):
         '''
         Take one argument: index (optional, default is None).
         
-        Returns whether the notehead is filled at the given index. If no index specified, returns whether fill status of the ligature.
+        Returns whether the notehead is filled at the given index. If no index specified, 
+        returns whether fill status of the ligature.
         If noteheads are not consistent throughout the ligature, returns mixed.
         '''
         if index == 'None' or index == 'none':
@@ -1217,8 +1333,10 @@ class Ligature(base.Music21Object):
         '''
         Takes two arguments: value, index (optional, default is None).
         
-        Sets the fill status of the notehead at index to value. If no index is specified, or if index is set to None, every notehead is give fill status value.
-        To set a notehead as filled, value should be 'yes' or 'filled'. To set a notehead as empty, value should be 'no' or 'empty' .
+        Sets the fill status of the notehead at index to value. If no index is specified, 
+        or if index is set to None, every notehead is give fill status value.
+        To set a notehead as filled, value should be 'yes' or 'filled'. 
+        To set a notehead as empty, value should be 'no' or 'empty' .
         
         >>> from music21.alpha import medren
         
@@ -1310,7 +1428,9 @@ class Ligature(base.Music21Object):
         '''
         Takes one argument: index.
         
-        Sets the note at index to have a square notehead. If the note at index is part of an oblique notehead, all other notes that are part of that notehead are also set to have square noteheads.
+        Sets the note at index to have a square notehead. 
+        If the note at index is part of an oblique notehead, all other notes that 
+        are part of that notehead are also set to have square noteheads.
 
         >>> from music21.alpha import medren
         
@@ -1352,9 +1472,11 @@ class Ligature(base.Music21Object):
         '''
         Takes two arguments: index, value.
         
-        Sets the note at index to value. If value is True, that note is a maxima. If value if False, that note is not.
+        Sets the note at index to value. If value is True, that note is a maxima. 
+        If value if False, that note is not.
         A note with an oblique notehead cannot be a maxima. 
-        A note cannot be a maxima if that note has a stem. A note cannot be a maxima if the previous note has an up-stem.
+        A note cannot be a maxima if that note has a stem. 
+        A note cannot be a maxima if the previous note has an up-stem.
         
         >>> from music21.alpha import medren
         
@@ -1375,7 +1497,9 @@ class Ligature(base.Music21Object):
         '''
         if index < self._ligatureLength():
             if value == True or value == 'True' or value == 'true':
-                if (self.getNoteheadShape(index) == 'oblique') or (self.getStem(index) != (None, None)) or (index > 0 and self.getStem(index-1)[0] == 'up'):
+                if ((self.getNoteheadShape(index) == 'oblique') or 
+                        (self.getStem(index) != (None, None)) or 
+                        (index > 0 and self.getStem(index-1)[0] == 'up')):
                     raise MedRenException('cannot make note at index %d a maxima' % index)
                 else:
                     self.maximaNotes[index] = value
@@ -1390,7 +1514,8 @@ class Ligature(base.Music21Object):
     def getStem(self, index):
         '''
         Takes one argument: index
-        If the note at index has a stem, it returns direction (up or down) and orientation (left, right)
+        If the note at index has a stem, it returns direction (up or down) 
+        and orientation (left, right)
         '''
         if index < self._ligatureLength():
             return self.stems[index]
@@ -1402,14 +1527,21 @@ class Ligature(base.Music21Object):
         Takes three arguments: index, direction, orientation.
         
         Index determines which note in the ligature the stem will be placed on.
-        Direction determines which way the stem faces. Permitted directions are 'up','down', and 'none'.
-        Orientation determines on which side of the note the stem sits. Permitted orientations are 'left', 'right', and 'none'. 
+        Direction determines which way the stem faces. Permitted directions 
+        are 'up','down', and 'none'.
+        Orientation determines on which side of the note the stem sits. 
+        Permitted orientations are 'left', 'right', and 'none'. 
         Setting the direction and orientation of a stem to 'none' removes the stem from the note.
         
-        Note that if the direction of a stem is 'none', then no stem is present on that note. So the orientation must also be 'none'.
-        Also note that an up-stem followed consecutively by a stemmed note is not permitted. An up-stem cannot be on the last note of a ligature.
-        Stems may also not overlap. So two consecutive notes may note have stem orientations 'right' and 'left' respectively.
-        Finally, a stem cannot be set on a note that is a maxima. An up-stem cannot be set on a note preceding a maxima.
+        Note that if the direction of a stem is 'none', then no stem is present on that note. 
+        So the orientation must also be 'none'.
+        Also note that an up-stem followed consecutively by a stemmed note is not permitted. 
+        An up-stem cannot be on the last note of a ligature.
+        Stems may also not overlap. So two consecutive notes may note have stem orientations 
+        'right' and 'left' respectively.
+        
+        Finally, a stem cannot be set on a note that is a maxima. An up-stem cannot 
+        be set on a note preceding a maxima.
         
         >>> from music21.alpha import medren
         
@@ -1451,12 +1583,15 @@ class Ligature(base.Music21Object):
                     else:
                         prevStem = self.getStem(index-1)
                         nextStem = self.getStem(index+1)
-                    if (orientation == 'left' and prevStem[1] != 'right') or (orientation == 'right' and nextStem[1] != 'left'):
+                    if ((orientation == 'left' and prevStem[1] != 'right') or 
+                            (orientation == 'right' and nextStem[1] != 'left')):
                         if direction == 'down':
                             if prevStem[0] != 'up':
                                 self.stems[index] = (direction, orientation)
                             else:
-                                raise MedRenException('a stem with direction "%s" not permitted at index %d' % (direction, index))
+                                raise MedRenException(
+                                    'a stem with direction "%s" not permitted at index %d' % 
+                                    (direction, index))
                         elif direction == 'up':
                             if ((index < self._ligatureLength()-1) 
                                     and (prevStem[0] != 'up') 
@@ -1464,13 +1599,21 @@ class Ligature(base.Music21Object):
                                     and not self.isMaxima(index+1)):
                                 self.stems[index] = (direction, orientation)
                             else:
-                                raise MedRenException('a stem with direction "%s" not permitted at index %d' % (direction, index))
+                                raise MedRenException(
+                                    'a stem with direction "%s" not permitted at index %d' % 
+                                    (direction, index))
                         else:
-                            raise MedRenException('direction "%s" and orientation "%s" not supported for ligatures' % (direction, orientation))
+                            raise MedRenException(
+                                'direction "%s" and orientation "%s" not supported for ligatures' %
+                                (direction, orientation))
                     else:
-                        raise MedRenException('a stem with orientation "%s" not permitted at index %d' % (orientation,index))
+                        raise MedRenException(
+                            'a stem with orientation "%s" not permitted at index %d' % 
+                            (orientation,index))
                 else:
-                    raise MedRenException('direction "%s" and orientation "%s" not supported for ligatures' % (direction,orientation))
+                    raise MedRenException(
+                        'direction "%s" and orientation "%s" not supported for ligatures' % 
+                        (direction,orientation))
         else:
             raise MedRenException('no note exists at index %d' % index)
         self._notes = []     
@@ -1491,10 +1634,13 @@ class Ligature(base.Music21Object):
         Takes two arguments: endIndex, value.
         
         endIndex designates the note to be reversed. value may be True or False.
-        Setting value to True reverses the note at endIndex. Setting value to false 'de-reverses' the note at endIndex.
+        Setting value to True reverses the note at endIndex. 
+        Setting value to False 'de-reverses' the note at endIndex.
          
-        If the note at endIndex has a stem with direction 'down' and orientation 'left', and is at least a step above the preceding note, it can be reversed.
-        No two consecutive notes can be reversed. Also, if the note at endIndex is preceded by a note with an upstem, it cannot be reversed.
+        If the note at endIndex has a stem with direction 'down' and orientation 'left', 
+        and is at least a step above the preceding note, it can be reversed.
+        No two consecutive notes can be reversed. Also, if the note at endIndex is 
+        preceded by a note with an upstem, it cannot be reversed.
         
         A reversed note is displayed directly on top of the preceeding note in the ligature. 
         
@@ -1537,7 +1683,9 @@ class Ligature(base.Music21Object):
                             self.reversedNotes[endIndex] = True
                         else:                           
                             #environLocal.warn([tempPitchCurrent, tempPitchPrev])
-                            raise MedRenException('the note at index %d cannot be given reverse value %s' % (endIndex, value))
+                            raise MedRenException(
+                                'the note at index %d cannot be given reverse value %s' % 
+                                (endIndex, value))
                     else:
                         raise MedRenException('no note exists at index %d' % (endIndex-1,)) 
             else:
@@ -1547,7 +1695,8 @@ class Ligature(base.Music21Object):
     
     def _expandLigature(self):
         '''
-        Given pitch, notehead, and stem information, assigns a mensural note to each note of the ligature.
+        Given pitch, notehead, and stem information, assigns a mensural note 
+        to each note of the ligature.
         '''
         
         ind = 0
@@ -1620,19 +1769,30 @@ class Ligature(base.Music21Object):
             
         return notes
     
-#--------------------------------------------------------------------------------------------------------        
-def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None, printUpdates = False):
+#-------------------------------------------------------------------------------------
+def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD=None, printUpdates=False):
     '''
     Takes a stream as an argument. Takes a mensuration or divisione object as an optional argument.
      
     To work effectively, this stream must contain only mensural objects. 
-    The function :meth:`music21.medren.breakMensuralStreamIntoBrevisLengths` takes the mensural stream, and returns a measured stream.
-    This measured stream preserves the structure of the original stream. The mensural object present in the original stream are also present in the measured stream. 
-    Each brevis length worth of objects in the original are stored in the mensural stream as a mensural object.
+    The function :meth:`music21.medren.breakMensuralStreamIntoBrevisLengths` 
+    takes the mensural stream, and returns a measured stream.
+    This measured stream preserves the structure of the original stream. 
+    The mensural object present in the original stream are also present in the measured stream. 
+    Each brevis length worth of objects in the original are stored in the mensural 
+    stream as a mensural object.
     
-    No substream of the original stream can contain both stream and mensural type objects, otherwise the stream cannot be processed. 
-    Furthermore, no stream can contain higher hierarchy stream types. The stream type hierarchy is :class:`music21.stream.Stream`, followed by :class:`music21.stream.Score`, :class:`music21.stream.Part`, then :class:`music21.stream.Measure`.
-    Finally, a mensuration or divisione must be present or determinable, otherwise the stream cannot be converted. If multiple mensurations are present, they must change only at the highest stream instance.
+    No substream of the original stream can contain both stream and mensural type objects, 
+    otherwise the stream cannot be processed. 
+    
+    Furthermore, no stream can contain higher hierarchy stream types. The stream type 
+    hierarchy is :class:`music21.stream.Stream`, followed by :class:`music21.stream.Score`, 
+    :class:`music21.stream.Part`, then :class:`music21.stream.Measure`.
+    
+    Finally, a mensuration or divisione must be present or determinable, 
+    otherwise the stream cannot be converted. If multiple mensurations are present, 
+    they must change only at the highest stream instance.
+    
     Otherwise, this causes a inconsistency when converting the stream.
     
     >>> from music21.alpha import medren
@@ -1644,13 +1804,15 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None, printUpdates
     >>> s.append(medren.GeneralMensuralNote('B'))
     >>> medren.breakMensuralStreamIntoBrevisLengths(s)
     Traceback (most recent call last):
-    MedRenException: cannot combine objects of type <class 'music21.stream.Part'>, <class 'music21.alpha.medren.GeneralMensuralNote'> within stream
+    MedRenException: cannot combine objects of type <class 'music21.stream.Part'>, 
+       <class 'music21.alpha.medren.GeneralMensuralNote'> within stream
 
     >>> s = stream.Score()
     >>> p.append(s)
     >>> medren.breakMensuralStreamIntoBrevisLengths(p)
     Traceback (most recent call last):
-    MedRenException: Hierarchy of <class 'music21.stream.Part'> violated by <class 'music21.stream.Score'>
+    MedRenException: Hierarchy of <class 'music21.stream.Part'> 
+       violated by <class 'music21.stream.Score'>
 
     >>> from music21.alpha import trecento
     >>> p = stream.Part()
@@ -1666,7 +1828,8 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None, printUpdates
     >>> s.append(m)
     >>> medren.breakMensuralStreamIntoBrevisLengths(s, printUpdates = True)
     Traceback (most recent call last):
-    MedRenException: Mensuration or divisione <music21.alpha.trecento.notation.Divisione .q.> not consistent within hierarchy
+    MedRenException: Mensuration or divisione 
+       <music21.alpha.trecento.notation.Divisione .q.> not consistent within hierarchy
     
     >>> s = stream.Stream()
     >>> s.append(trecento.notation.Divisione('.q.'))
@@ -1728,7 +1891,9 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None, printUpdates
     tempStream_1, tempStream_2 = inpStream_copy.splitByClass(None, lambda x: x.isStream)
     if tempStream_1:
         if tempStream_2 and tempStream_2.hasElementOfClass(GeneralMensuralNote):
-            raise MedRenException('cannot combine objects of type %s, %s within stream' % (tempStream_1[0].__class__, tempStream_2[0].__class__))
+            raise MedRenException(
+                'cannot combine objects of type %s, %s within stream' % (
+                                        tempStream_1[0].__class__, tempStream_2[0].__class__))
         else:
             for item in tempStream_2:
                 
@@ -1736,19 +1901,25 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None, printUpdates
                 if ('Mensuration' in item.classes) or ('Divisione' in item.classes):
                     if mOrDInAsNone: #If first case or changed mOrD
                         mOrD = item
-                    elif mOrD.standardSymbol != item.standardSymbol: #If higher, different mOrD found
-                        raise MedRenException('Mensuration or divisione %s not consistent within hierarchy' % item)
+                    elif mOrD.standardSymbol != item.standardSymbol: 
+                        #If higher, different mOrD found
+                        raise MedRenException(
+                            'Mensuration or divisione %s not consistent within hierarchy' % item)
                     
-            tempStream_1_1, tempStream_1_2 = tempStream_1.splitByClass(None, lambda x: isHigherInhierarchy(x, tempStream_1))
+            tempStream_1_1, tempStream_1_2 = tempStream_1.splitByClass(None, 
+                                                lambda x: isHigherInhierarchy(x, tempStream_1))
             if tempStream_1_1:
-                raise MedRenException('Hierarchy of %s violated by %s' % (tempStream_1.__class__, tempStream_1_1[0].__class__))
+                raise MedRenException('Hierarchy of %s violated by %s' % 
+                                      (tempStream_1.__class__, tempStream_1_1[0].__class__))
             elif tempStream_1_2:
                 for e in tempStream_1_2:
                     
                     if e.isMeasure:
                         newStream.append(e)
                     else:
-                        newStream.append(breakMensuralStreamIntoBrevisLengths(e, mOrD, printUpdates))
+                        newStream.append(breakMensuralStreamIntoBrevisLengths(e, 
+                                                                              mOrD, 
+                                                                              printUpdates))
     else:
         measureNum = 0
         mensuralMeasure = []
@@ -1762,7 +1933,8 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None, printUpdates
                     mOrD = e
                     newStream.append(e)
                 elif mOrD.standardSymbol != e.standardSymbol: #If higher, different mOrD found 
-                    raise MedRenException('Mensuration or divisione %s not consistent within hierarchy' % e)
+                    raise MedRenException(
+                        'Mensuration or divisione %s not consistent within hierarchy' % e)
             elif 'Ligature' in e.classes:
                 tempStream = stream.Stream()
                 for mn in e.notes:
@@ -1783,11 +1955,12 @@ def breakMensuralStreamIntoBrevisLengths(inpStream, inpMOrD = None, printUpdates
             
     return newStream
 
-#-----------------------------------------------------------------------------------------------------------------------------------------               
-def setBarlineStyle(score, newStyle, oldStyle = 'regular', inPlace = True):
+#------------------------------------------------------------
+def setBarlineStyle(score, newStyle, oldStyle='regular', inPlace=True):
     '''
     Converts any right barlines in the previous style (oldStyle; default = 'regular')
     to have the newStyle (such as 'tick', 'none', etc., see bar.py).  
+    
     Leaves alone any other barline types (such as
     double bars, final bars, etc.).  Also changes any measures with no specified
     barlines (which come out as 'regular') to have the new style.
@@ -1821,7 +1994,9 @@ def scaleDurations(score, scalingNum=1, inPlace=False, scaleUnlinked=True):
         el.offset = el.offset * scalingNum
         if el.duration is not None:
             el.duration.quarterLength = el.duration.quarterLength * scalingNum
-            if hasattr(el.duration, 'linked') and el.duration.linked is False and scaleUnlinked is True:
+            if (hasattr(el.duration, 'linked') and 
+                    el.duration.linked is False and 
+                    scaleUnlinked is True):
                 raise MedRenException('scale unlinked is not yet supported')
         if isinstance(el, tempo.MetronomeMark):
             el.value = el.value * scalingNum
@@ -1834,7 +2009,8 @@ def scaleDurations(score, scalingNum=1, inPlace=False, scaleUnlinked=True):
                 newDem = newDem * 2
                 iterationNum += 1
                 if iterationNum > 4:
-                    raise MedRenException('cannot create a scaling of the TimeSignature for this ratio')
+                    raise MedRenException(
+                        'cannot create a scaling of the TimeSignature for this ratio')
             newDem = int(newDem)
             el.loadRatio(newNum, newDem)
     
@@ -1844,7 +2020,8 @@ def scaleDurations(score, scalingNum=1, inPlace=False, scaleUnlinked=True):
 
 def transferTies(score, inPlace=True):
     '''
-    transfer the duration of tied notes (if possible) to the first note and fill the remaining places
+    transfer the duration of tied notes (if possible) to the first note and 
+    fill the remaining places
     with invisible rests:
     
     returns the new Score object
@@ -1873,7 +2050,8 @@ def transferTies(score, inPlace=True):
                     ratioDecimal = tiedQL/float(tieBeneficiary.duration.quarterLength)
                     (tupAct, tupNorm) = common.decimalToTuplet(ratioDecimal)
                     if (tupAct != 0): # error...
-                        tempTuplet = duration.Tuplet(tupAct, tupNorm, copy.deepcopy(tempDuration.components[0]))
+                        tempTuplet = duration.Tuplet(tupAct, tupNorm, 
+                                                     copy.deepcopy(tempDuration.components[0]))
                         tempTuplet.tupletActualShow = "none"
                         tempTuplet.bracket = False
                         tieBeneficiary.duration = tempDuration
@@ -1886,18 +2064,31 @@ def transferTies(score, inPlace=True):
 
     return score
 
-def convertHouseStyle(score, durationScale = 2, barlineStyle = 'tick', tieTransfer = True, inPlace = False):
+def convertHouseStyle(score, durationScale=2, barlineStyle='tick', 
+                      tieTransfer=True, inPlace=False):
     '''
-    The method :meth:`music21.medren.convertHouseStyle` takes a score, durationScale, barlineStyle, tieTransfer, and inPlace as arguments. Of these, only score is not optional.
-    Default values for durationScale, barlineStyle, tieTransfer, and inPlace are 2, 'tick', True, and False respectively. 
+    The method :meth:`music21.medren.convertHouseStyle` takes a score, 
+    durationScale, barlineStyle, tieTransfer, and inPlace as arguments. Of these, 
+    only score is not optional.
     
-    Changing :attr:`music21.medren.convertHouseStyle.barlineStyle` changes how the barlines are displayed within the piece. 
-    Changing :attr:`music21.medren.convertHouseStyle.durationScale` keeps ratios of note durations constant, but scales each duration by the specified value. 
-    If changing the duration scale causes tied notes, and :attr:`music21.medren.convertHouseStyle.tieTransfer` is set to True, the total duration is transferred to the first note, and all remaining space is left blank.
+    Default values for durationScale, barlineStyle, tieTransfer, and inPlace are 
+    2, 'tick', True, and False respectively. 
+    
+    Changing :attr:`music21.medren.convertHouseStyle.barlineStyle` 
+    changes how the barlines are displayed within the piece. 
+    
+    Changing :attr:`music21.medren.convertHouseStyle.durationScale` 
+    keeps ratios of note durations constant, but scales each duration by the specified value. 
+    
+    If changing the duration scale causes tied notes, and 
+    :attr:`music21.medren.convertHouseStyle.tieTransfer` is set to True, 
+    the total duration is transferred to the first note, and all remaining space is left blank.
     
     Examples:
     The first image shows the original score.
-    The second image shows the score with each note's duration scaled by 2, and with the barline style set to 'tick'. The circled area shows a space left blank due to tieTransfer being True. 
+    The second image shows the score with each note's duration scaled by 2, 
+    and with the barline style set to 'tick'. The circled area shows a space 
+    left blank due to tieTransfer being True. 
     
     
     >>> gloria = corpus.parse('luca/gloria')
@@ -1910,7 +2101,8 @@ def convertHouseStyle(score, durationScale = 2, barlineStyle = 'tick', tieTransf
     >>> from music21.alpha import medren
     
     >>> gloria = corpus.parse('luca/gloria')
-    >>> newGloria = medren.convertHouseStyle(gloria, durationScale = 2, barlineStyle = 'tick', tieTransfer = True)
+    >>> newGloria = medren.convertHouseStyle(gloria, durationScale=2, 
+    ...                barlineStyle='tick', tieTransfer=True)
     >>> #_DOCS_HIDE newGloria.show()
     
     .. image:: images/medren_convertHouseStyle_2.*
@@ -1940,7 +2132,8 @@ def cummingSchubertStrettoFuga(score):
         thisInt = interval.notesToInterval(sn[i], sn[i+1])
         thisGeneric = thisInt.generic.directed
         for strettoType in [8, -8, 5, -5, 4, -4]:
-            strettoAllowed = [x[0] for x in allowableStrettoIntervals[strettoType]] #inefficent but who cares
+            strettoAllowed = [x[0] for x in allowableStrettoIntervals[strettoType]] 
+            #inefficent but who cares
             repeatAllowed = [x[1] for x in allowableStrettoIntervals[strettoType]]
             for j in range(len(strettoAllowed)):
                 thisStrettoAllowed = strettoAllowed[j]

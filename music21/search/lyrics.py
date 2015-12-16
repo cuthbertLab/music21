@@ -39,11 +39,16 @@ class LyricSearcher(object):
         >>> p0 = corpus.parse('luca/gloria').parts[0]
         >>> ls = search.lyrics.LyricSearcher(p0)
         >>> pp(ls.index()[0:5]) 
-        [IndexedLyric(el=<music21.note.Note C>, start=0, end=2, measure=1, lyric=<music21.note.Lyric number=1 syllabic=single text="Et">, text=...'Et'),
-         IndexedLyric(el=<music21.note.Note D>, start=3, end=5, measure=2, lyric=<music21.note.Lyric number=1 syllabic=single text="in">, text=...'in'),
-         IndexedLyric(el=<music21.note.Note F>, start=6, end=9, measure=2, lyric=<music21.note.Lyric number=1 syllabic=begin text="ter">, text=...'ter'),
-         IndexedLyric(el=<music21.note.Note F>, start=9, end=11, measure=3, lyric=<music21.note.Lyric number=1 syllabic=end text="ra">, text=...'ra'),
-         IndexedLyric(el=<music21.note.Note A>, start=12, end=15, measure=3, lyric=<music21.note.Lyric number=1 syllabic=single text="pax">, text=...'pax')]        
+        [IndexedLyric(el=<music21.note.Note C>, start=0, end=2, measure=1,
+             lyric=<music21.note.Lyric number=1 syllabic=single text="Et">, text=...'Et'),
+         IndexedLyric(el=<music21.note.Note D>, start=3, end=5, measure=2, 
+             lyric=<music21.note.Lyric number=1 syllabic=single text="in">, text=...'in'),
+         IndexedLyric(el=<music21.note.Note F>, start=6, end=9, measure=2, 
+             lyric=<music21.note.Lyric number=1 syllabic=begin text="ter">, text=...'ter'),
+         IndexedLyric(el=<music21.note.Note F>, start=9, end=11, measure=3, 
+             lyric=<music21.note.Lyric number=1 syllabic=end text="ra">, text=...'ra'),
+         IndexedLyric(el=<music21.note.Note A>, start=12, end=15, measure=3, 
+             lyric=<music21.note.Lyric number=1 syllabic=single text="pax">, text=...'pax')]        
         '''
         if s is None:
             s = self.stream
@@ -84,15 +89,18 @@ class LyricSearcher(object):
         >>> p0 = corpus.parse('luca/gloria').parts[0]
         >>> ls = search.lyrics.LyricSearcher(p0)
         >>> ls.search('pax') # ellipsis because of unicode in Py2
-        [SearchMatch(mStart=3, mEnd=3, matchText=...'pax', els=(<music21.note.Note A>,), tups=[IndexedLyric(...)])]
+        [SearchMatch(mStart=3, mEnd=3, matchText=...'pax', els=(<music21.note.Note A>,), 
+                        tups=[IndexedLyric(...)])]
 
         Search a regular expression that takes into account non-word characters such as commas
 
         >>> agnus = re.compile(r'agnus dei\W+filius patris', re.IGNORECASE)
         >>> sm = ls.search(agnus)
         >>> sm
-        [SearchMatch(mStart=49, mEnd=55, matchText=...'Agnus Dei, Filius Patris', els=(<music21.note.Note G>,...<music21.note.Note G>), 
-                     tups=[IndexedLyric(el=<music21.note.Note G>, start=251, end=252, measure=49, lyric=<...>, text=...'A'), 
+        [SearchMatch(mStart=49, mEnd=55, matchText=...'Agnus Dei, Filius Patris', 
+                        els=(<music21.note.Note G>,...<music21.note.Note G>), 
+                     tups=[IndexedLyric(el=<music21.note.Note G>, start=251, end=252, 
+                                                 measure=49, lyric=<...>, text=...'A'), 
                            ...
                            IndexedLyric(el=<music21.note.Note G>, ...text=...'tris.')])]
         >>> sm[0].mStart, sm[0].mEnd
@@ -109,7 +117,8 @@ class LyricSearcher(object):
         elif hasattr(textOrRe, 'finditer'):
             plainText = False
         else:
-            raise LyricSearcherException('{0} is not a string or RE with the finditer() function'.format(textOrRe))
+            raise LyricSearcherException(
+                    '{0} is not a string or RE with the finditer() function'.format(textOrRe))
         
         if plainText is True:
             return self._plainTextSearch(textOrRe)
@@ -120,7 +129,8 @@ class LyricSearcher(object):
         '''
         Finds an object in ._indexTuples by search position.
         
-        Runs in O(n) time on number of lyrics. Would not be hard to do in O(log(n)) for very large lyrics
+        Runs in O(n) time on number of lyrics. Would not be 
+        hard to do in O(log(n)) for very large lyrics
         '''
         for i in self._indexTuples:
             if pos >= i.start and pos <= i.end:

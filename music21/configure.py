@@ -8,8 +8,6 @@
 # Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
-
 import os
 import re
 import time
@@ -34,6 +32,7 @@ try:
 except ImportError:
     from io import StringIO # python3 (also in python 2.6+)
 
+# pylint: disable=redefined-builtin
 try:
     input = raw_input # @ReservedAssignment @UndefinedVariable # pylint: disable=undefined-variable 
 except NameError:
@@ -625,7 +624,8 @@ class Dialog(object):
             except DialogError: # pylint: disable=catching-non-exception
                 # in some cases, the action selected requires exciting the 
                 # configuration assistant
-                raise DialogError('perform action raised a dialog exception') # pylint: disable=raising-non-exception
+                # pylint: disable=raising-non-exception
+                raise DialogError('perform action raised a dialog exception') 
 
 
 #-------------------------------------------------------------------------------
@@ -1151,10 +1151,12 @@ class AskAutoDownload(SelectFromList):
         if force is not None:
             return force
         else:
-            return ['Acknowledge these terms and allow music21 to aid in finding pieces in the corpus',
-            'Acknowledge these terms and block the virtual corpus',
-            'Do not agree to these terms and will not use music21 (agreeing to the terms of ' + 
-                 'the corpus is mandatory for using the system).']
+            return [
+                'Acknowledge these terms and allow music21 to aid in finding pieces in the corpus',
+                'Acknowledge these terms and block the virtual corpus',
+                'Do not agree to these terms and will not use music21 (agreeing to the terms of ' + 
+                    'the corpus is mandatory for using the system).'
+                 ]
 
     def _evaluateUserInput(self, raw):
         '''Evaluate the user's string entry after parsing; do not return None: 
@@ -1475,9 +1477,12 @@ class ConfigurationAssistant(object):
 
     def _introduction(self):
         msg = []
-        msg.append('''Welcome the music21 Configuration Assistant. You will be guided through a number of questions to install and setup music21. Simply pressing return at a prompt will select a default, if available.''')
+        msg.append('Welcome the music21 Configuration Assistant. You will be guided ' + 
+                   'through a number of questions to install and setup music21. ' + 
+                   'Simply pressing return at a prompt will select a default, if available.')
         msg.append('') # will cause a line break
-        msg.append('''You may run this configuration again at a later time by running music21/configure.py.''')
+        msg.append('You may run this configuration again at a later time ' + 
+                   'by running music21/configure.py.')
         msg.append(' ') # will cause a blank line
 
         writeToUser(msg)
