@@ -1577,7 +1577,7 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     return post
 
 
-def staffGrpFromElement(elem, slurBundle=None, staffDefDict={}):
+def staffGrpFromElement(elem, slurBundle=None, staffDefDict=None):
     '''
     <staffGrp> A group of bracketed or braced staves.
 
@@ -1621,6 +1621,8 @@ def staffGrpFromElement(elem, slurBundle=None, staffDefDict={}):
     
     staffDefTag = '{http://www.music-encoding.org/ns/mei}staffDef'
     staffGroupTag = '{http://www.music-encoding.org/ns/mei}staffGrp'
+
+    staffDefDict = staffDefDict if staffDefDict is not None else {}
 
     for el in elem.findall("*"):
         # return all staff defs in this staff group
