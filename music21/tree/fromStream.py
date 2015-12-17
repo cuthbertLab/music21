@@ -332,25 +332,25 @@ def convert(inputStream, flatten, classList):
                                         classLists=classLists)
     return listOfTimespanTrees[0]
 
-def flat(inputStream):
-    '''
-    Returns a timespan tree corresponding to a flat representation of the score.
-    
-    TODO: BUG: Why are these not flat offsets?
-    
-    >>> ex = tree.makeExampleScore()
-    >>> ts = tree.fromStream.flat(ex)
-    >>> ts
-    <OffsetTree {20} (0.0 to 2.0) <music21.stream.Score exampleScore>>
-    >>> ts[15], ts[15].offset
-    (<music21.note.Note F>, 1.0)
-    '''
-    classLists = [Music21Object]
-    listOfTimespanTrees = listOfTreesByClass(inputStream, 
-                                        initialOffset=0.0, 
-                                        flatten=True, 
-                                        classLists=classLists)
-    return listOfTimespanTrees[0]
+# def flat(inputStream):
+#     '''
+#     Returns a timespan tree corresponding to a flat representation of the score.
+#     
+#     TODO: BUG: Why are these not flat offsets?
+#     
+#     >>> ex = tree.makeExampleScore()
+#     >>> ts = tree.fromStream.flat(ex)
+#     >>> ts
+#     <OffsetTree {20} (0.0 to 2.0) <music21.stream.Score exampleScore>>
+#     >>> ts[15], ts[15].offset
+#     (<music21.note.Note F>, 1.0)
+#     '''
+#     classLists = [Music21Object]
+#     listOfTimespanTrees = listOfTreesByClass(inputStream, 
+#                                         initialOffset=0.0, 
+#                                         flatten=True, 
+#                                         classLists=classLists)
+#     return listOfTimespanTrees[0]
 
 #---------------------
 class Test(unittest.TestCase):

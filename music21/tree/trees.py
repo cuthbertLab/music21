@@ -626,151 +626,45 @@ class ElementTree(core.AVLTree):
         else:
             raise TypeError('Indices must be integers or slices, got {}'.format(i))
     
-    def copy(self):
-        r'''
-        Creates a new tree with the same payload as this tree.
-        
-        This is analogous to `dict.copy()`.  
-
-        >>> score = tree.makeExampleScore()
-        >>> scoreTree = score.asTimespans()
-        >>> newTree = scoreTree.copy()
-        >>> newTree
-        <TimespanTree {20} (0.0 to 8.0)>
-
-        >>> scoreTree[16]
-        <PitchedTimespan (6.0 to 8.0) <music21.note.Note D#>>
-        >>> newTree[16]
-        <PitchedTimespan (6.0 to 8.0) <music21.note.Note D#>>
-        
-        >>> scoreTree[16] is newTree[16]
-        True
-        '''
-        newTree = type(self)()
-        # this is just as efficient as ._insertCore, since it's given a list.
-        newTree.insert([x for x in self])
-        return newTree
-
-    def elementsStartingAt(self, offset):
-        r'''
-        Finds elements or timespans in this offset-tree which start at `offset`.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> scoreTree = score.asTimespans()
-        >>> for timespan in scoreTree.elementsStartingAt(0.5):
-        ...     timespan
-        ...
-        <PitchedTimespan (0.5 to 1.0) <music21.note.Note B>>
-        <PitchedTimespan (0.5 to 1.0) <music21.note.Note B>>
-        <PitchedTimespan (0.5 to 1.0) <music21.note.Note G#>>
-        '''
-        results = []
-        node = self.getNodeByPosition(offset)
-        if node is not None:
-            if isinstance(node.payload, list):
-                results.extend(node.payload)
-            elif node.payload is not None:
-                results.append(node.payload)
-        return tuple(results)
-
-    def elementsStoppingAt(self, offset):
-        r'''
-        Finds elements or timespans in this offset-tree which stop at `offset`.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> scoreTree = score.asTimespans()
-        >>> for timespan in scoreTree.elementsStoppingAt(0.5):
-        ...     timespan
-        ...
-        <PitchedTimespan (0.0 to 0.5) <music21.note.Note C#>>
-        <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>
-        <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>
-        '''
-        def recurse(node, offset):
-            result = []
-            if node is not None: # could happen in an empty TimespanTree
-                if node.endTimeLow <= offset <= node.endTimeHigh:
-                    # This currently requires timespans not elements, and list payloads...
-                    # TODO: Fix/disambiguate.
-                    for timespan in node.payload:
-                        if timespan.endTime == offset:
-                            result.append(timespan)
-                    if node.leftChild is not None:
-                        result.extend(recurse(node.leftChild, offset))
-                    if node.rightChild is not None:
-                        result.extend(recurse(node.rightChild, offset))
-            return result
-        
-        results = recurse(self.rootNode, offset)
-        results.sort(key=lambda x: (x.offset, x.endTime))
-        return tuple(results)
-
-    def elementsOverlappingOffset(self, offset):
-        r'''
-        Finds elements or timespans in this ElementTree which overlap `offset`.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> scoreTree = score.asTimespans()
-        >>> for el in scoreTree.elementsOverlappingOffset(0.5):
-        ...     el
-        ...
-        <PitchedTimespan (0.0 to 1.0) <music21.note.Note E>>
-        '''
-        def recurse(node, offset, indent=0):
-            result = []
-            if node is not None:
-                if node.position < offset < node.endTimeHigh:
-                    result.extend(recurse(node.leftChild, offset, indent + 1))
-                    # This currently requires timespans not elements, and list payloads...
-                    # TODO: Fix/disambiguate.
-                    for timespan in node.payload:
-                        if offset < timespan.endTime:
-                            result.append(timespan)
-                    result.extend(recurse(node.rightChild, offset, indent + 1))
-                elif offset <= node.position:
-                    result.extend(recurse(node.leftChild, offset, indent + 1))
-            return result
-        results = recurse(self.rootNode, offset)
-        #if len(results) > 0 and hasattr(results[0], 'element'):
-        #    results.sort(key=lambda x: (x.offset, x.endTime, x.element.sortTuple()[1:]))
-        #else:
-        results.sort(key=lambda x: (x.offset, x.endTime))
-        return tuple(results)
 
     def index(self, element, position=None):
         r'''
-        Gets index of `element` in tree (can be a Timespan).
+        Gets index of `element` in tree. position could be none.
+
+        If the element is in the original score, then it should be very fast (O(log n))
+
+        >>> score = tree.makeExampleScore()
+        >>> scoreFlat = score.flat
+        >>> n = scoreFlat.notes[-1]
         
-        Since Timespans do not have .sites, there is only one offset to deal with...
+        >>> flatTree = scoreFlat.asTree()
+        >>> flatTree.index(n)
+        17
 
-        >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
-        >>> ts = [tree.spans.Timespan(x, y) for x, y in tsList]
-        >>> tsTree = tree.trees.TimespanTree()
-        >>> tsTree.insert(ts)
+        If it's not in the original stream, then it should be slower than doing 
+        it on a stream (O (n log n)).
+        
+        >>> scoreTree = score.asTree(flatten=True)
+        >>> n = score.flat.notes[-1]
+        >>> scoreTree.index(n)
+        17
 
-        >>> for timespan in ts:
-        ...     print("%r %d" % (timespan, tsTree.index(timespan)))
-        ...
-        <Timespan 0.0 2.0> 0
-        <Timespan 0.0 9.0> 1
-        <Timespan 1.0 1.0> 2
-        <Timespan 2.0 3.0> 3
-        <Timespan 3.0 4.0> 4
-        <Timespan 4.0 9.0> 5
-        <Timespan 5.0 6.0> 6
-        <Timespan 5.0 8.0> 7
-        <Timespan 6.0 8.0> 8
-        <Timespan 7.0 7.0> 9
+        And if it's nowhere at all, you get a ValueError!
 
-        >>> tsTree.index(tree.spans.Timespan(-100, 100))
+        >>> scoreTree.index(note.Note("F-"))
         Traceback (most recent call last):
-        ValueError: <Timespan -100.0 100.0> not in Tree at offset -100.0.
+        ValueError: <music21.note.Note F-> not in Tree at position 
+            SortTuple(atEnd=0, offset=0.0, priority=0, ...).
         '''
         if position is None:
             position = self.getPositionFromElementUnsafe(element)
         node = self.getNodeByPosition(position)
         if node is None or node.payload is not element:
-            raise ValueError('{} not in Tree at offset {}.'.format(element, position))
+            for i, n in enumerate(self):
+                if n.payload is element:
+                    return i
+            
+            raise ValueError('{} not in Tree at position {}.'.format(element, position))
         return node.payloadElementIndex
 
     def _getPositionsFromElements(self, elements):
@@ -822,147 +716,42 @@ class ElementTree(core.AVLTree):
         if positions is None:
             positions = self._getPositionsFromElements(elements)
                 
-        
         for i, el in enumerate(elements):
             pos = positions[i]
             self._insertCore(pos, el)
         
         self._updateNodes(initialPosition, initialEndTime)
 
-    def _insertCore(self, offset, el):
+    def _insertCore(self, position, el):
         '''
         Inserts a single element at an offset, creating new nodes as necessary,
         but does not updateIndices or updateEndTimes or updateParents
-        '''
-        def key(x):
-            try:
-                return x.sortTuple()[2:] # cut off atEnd and offset
-            except AttributeError:
-                if hasattr(x, 'element'):
-                    return x.element.sortTuple()[2:]
-                elif isinstance(x, TimespanTree) and x.source is not None:
-                    return x.source.sortTuple()[2:]
-                else:
-                    return x.endTime  # PitchedTimespan with no Element!
-                
-        self.createNodeAtPosition(offset)
-        node = self.getNodeByPosition(offset)
-        if isinstance(node.payload, list): # OffsetNode
-            node.payload.append(el)
-            node.payload.sort(key=key)
-        else: # ElementNode
-            node.payload = el
-        if isinstance(el, TimespanTree):
-            el.parentTrees.add(self)
-
-    def append(self, el):
-        '''
-        Add an element to the end, making certain speed savings.
+        '''                
+        self.createNodeAtPosition(position)
+        node = self.getNodeByPosition(position)
+        node.payload = el
         
-        TODO: will this work for ElementTrees?
-        '''
-        initialPosition = self.lowestPosition() # will only change if is empty
-        endTime = self.endTime
-        if endTime == INFINITY:
-            endTime = 0
-        self._insertCore(endTime, el)        
-        self._updateNodes(initialPosition, initialEndTime=None)
-        
-    ### PROPERTIES ###
-    def offset(self):
-        '''
-        this is just for mimicking elements as streams. 
-        '''
-        lp = self.lowestPosition()
-        if hasattr(lp, 'offset'):
-            lp = lp.offset
-        return lp
-
-    @property
-    def endTime(self):
+    def highestPosition(self):
         r'''
-        Gets the latest stop offset in this element-tree.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> tsTree = score.asTree()
-        >>> tsTree.endTime
-        36.0
-        
-        Returns infinity if no elements exist:
-        
-        >>> et = tree.trees.ElementTree()
-        >>> et.endTime
-        inf
-        '''
-        if self.rootNode is not None:
-            return self.rootNode.endTimeHigh
-        return INFINITY
-
-    @property
-    def source(self):
-        '''
-        the original stream. (stored as a weakref but returned unwrapped)
-        
-        >>> example = tree.makeExampleScore()
-        >>> eTree = example.asTree()
-        >>> eTree.source is example
-        True
-        
-        >>> s = stream.Stream()
-        >>> eTree.source = s
-        >>> eTree.source is s
-        True
-        '''
-        return common.unwrapWeakref(self._source)
-        
-    @source.setter
-    def source(self, expr):
-        # uses weakrefs so that garbage collection on the stream cache is possible...
-        self._source = common.wrapWeakref(expr)
-
-    @property
-    def highestOffset(self):
-        r'''
-        Gets the latest start offset in this offset-tree.
+        Gets the latest position in this tree.
 
         Keep as a property, because a similar property exists on streams.
 
         >>> score = corpus.parse('bwv66.6')
         >>> tsTree = score.asTimespans(classList=(note.Note,))
-        >>> tsTree.highestOffset
+        >>> tsTree.highestPosition()
         35.0
         '''
         def recurse(node):
             if node.rightChild is not None:
                 return recurse(node.rightChild)
-            pos = node.position
-            if isinstance(pos, SortTuple):
-                return pos.offset
             else:
-                return pos
-            return node.position
+                return node.position
+            
         if self.rootNode is not None:
             return recurse(self.rootNode)
-        return NEGATIVE_INFINITY
-
-    def sortTuple(self, site=None):
-        '''
-        mimick a sortTuple for the ElementTree using the source as a guide,
-        but changing the offset.
-        
-        >>> s = stream.Stream(id='testStream')
-        >>> s.insert(3, note.Note())
-        >>> et = tree.trees.ElementTree(s.elements, s)
-        >>> et
-        <ElementTree {1} (3.0 <0.20...> to 4.0) <music21.stream.Stream testStream>>        
-
-        >>> et.sortTuple()
-        SortTuple(atEnd=0, offset=3.0, priority=0, classSortOrder=-20, isNotGrace=1, ...)
-        >>> s.sortTuple()
-        SortTuple(atEnd=0, offset=0.0, priority=0, classSortOrder=-20, isNotGrace=1, ...)
-        '''
-        sourceSortTuple = self.source.sortTuple(site)
-        return sourceSortTuple.modify(offset=self.lowestPosition().offset)
+        else:
+            return NEGATIVE_INFINITY
 
     def lowestPosition(self):
         r'''
@@ -984,7 +773,54 @@ class ElementTree(core.AVLTree):
         
         if self.rootNode is not None:
             return recurse(self.rootNode)
-        return NEGATIVE_INFINITY
+        else:
+            return NEGATIVE_INFINITY
+
+    
+    ### PROPERTIES ###
+    @property
+    def source(self):
+        '''
+        the original stream. (stored as a weakref but returned unwrapped)
+        
+        >>> example = tree.makeExampleScore()
+        >>> eTree = example.asTree()
+        >>> eTree.source is example
+        True
+        
+        >>> s = stream.Stream()
+        >>> eTree.source = s
+        >>> eTree.source is s
+        True
+        '''
+        return common.unwrapWeakref(self._source)
+        
+    @source.setter
+    def source(self, expr):
+        # uses weakrefs so that garbage collection on the stream cache is possible...
+        self._source = common.wrapWeakref(expr)
+    
+    @property
+    def endTime(self):
+        r'''
+        Gets the latest stop offset in this element-tree.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> tsTree = score.asTree()
+        >>> tsTree.endTime
+        36.0
+        
+        Returns infinity if no elements exist:
+        
+        >>> et = tree.trees.ElementTree()
+        >>> et.endTime
+        inf
+        '''
+        if self.rootNode is not None:
+            return self.rootNode.endTimeHigh
+        return INFINITY
+
+
 
 
 #----------------------------------------------------------------
@@ -1194,14 +1030,6 @@ class OffsetTree(ElementTree):
                 yield el
 
 
-    ### PRIVATE METHODS ###
-    def _getPositionsFromElements(self, elements):
-        '''
-        takes a list of elements and returns a list of positions.
-        
-        In an OffsetTree, this will be a list of .offset calls
-        '''
-        return [el.offset for el in elements]
 
     #----------public methods ------------------------
     def getPositionFromElementUnsafe(self, el):
@@ -1213,7 +1041,157 @@ class OffsetTree(ElementTree):
         
         Pulled out for subclassing
         '''
-        return el.getOffsetBySite(self.source)
+        return el.offset
+
+    def append(self, el):
+        '''
+        Add an element to the end, making certain speed savings.
+        
+        TODO: will this work for ElementTrees?
+        '''
+        initialPosition = self.lowestPosition() # will only change if is empty
+        endTime = self.endTime
+        if endTime == INFINITY:
+            endTime = 0
+        self._insertCore(endTime, el)        
+        self._updateNodes(initialPosition, initialEndTime=None)
+
+
+    def _insertCore(self, position, el):
+        '''
+        Inserts a single element at an offset, creating new nodes as necessary,
+        but does not updateIndices or updateEndTimes or updateParents
+        '''
+        def sortKey(x):
+            try:
+                return x.sortTuple()[2:] # cut off atEnd and offset
+            except AttributeError:
+                if hasattr(x, 'element'):
+                    return x.element.sortTuple()[2:]
+                elif isinstance(x, TimespanTree) and x.source is not None:
+                    environLocal.printDebug("Timespan tree added to Tree...nope...")
+                    return x.source.sortTuple()[2:]
+                else:
+                    return x.endTime  # PitchedTimespan with no Element!
+                
+        self.createNodeAtPosition(position)
+        node = self.getNodeByPosition(position)
+        
+        node.payload.append(el)
+        node.payload.sort(key=sortKey)
+    
+    def copy(self):
+        r'''
+        Creates a new tree with the same payload as this tree.
+        
+        SLOW!
+        
+        This is analogous to `dict.copy()`.  
+
+        >>> score = tree.makeExampleScore()
+        >>> scoreTree = score.asTimespans()
+        >>> newTree = scoreTree.copy()
+        >>> newTree
+        <TimespanTree {20} (0.0 to 8.0)>
+
+        >>> scoreTree[16]
+        <PitchedTimespan (6.0 to 8.0) <music21.note.Note D#>>
+        >>> newTree[16]
+        <PitchedTimespan (6.0 to 8.0) <music21.note.Note D#>>
+        
+        >>> scoreTree[16] is newTree[16]
+        True
+        '''
+        newTree = type(self)()
+        # this is just as efficient as ._insertCore, since it's given a list.
+        newTree.insert([x for x in self])
+        return newTree
+
+    def elementsStartingAt(self, position):
+        r'''
+        Finds elements or timespans in this tree which start at `position`.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> scoreTree = score.asTimespans()
+        >>> for timespan in scoreTree.elementsStartingAt(0.5):
+        ...     timespan
+        ...
+        <PitchedTimespan (0.5 to 1.0) <music21.note.Note B>>
+        <PitchedTimespan (0.5 to 1.0) <music21.note.Note B>>
+        <PitchedTimespan (0.5 to 1.0) <music21.note.Note G#>>
+        '''
+        results = []
+        node = self.getNodeByPosition(position)
+        if node is not None:
+            if isinstance(node.payload, list):
+                results.extend(node.payload)
+            elif node.payload is not None:
+                results.append(node.payload)
+        return tuple(results)
+
+    def elementsStoppingAt(self, offset):
+        r'''
+        Finds elements or timespans in this offset-tree which stop at `offset`.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> scoreTree = score.asTimespans()
+        >>> for timespan in scoreTree.elementsStoppingAt(0.5):
+        ...     timespan
+        ...
+        <PitchedTimespan (0.0 to 0.5) <music21.note.Note C#>>
+        <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>
+        <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>
+        '''
+        def recurse(node, offset):
+            result = []
+            if node is not None: # could happen in an empty TimespanTree
+                if node.endTimeLow <= offset <= node.endTimeHigh:
+                    # This currently requires timespans not elements, and list payloads...
+                    # TODO: Fix/disambiguate.
+                    for timespan in node.payload:
+                        if timespan.endTime == offset:
+                            result.append(timespan)
+                    if node.leftChild is not None:
+                        result.extend(recurse(node.leftChild, offset))
+                    if node.rightChild is not None:
+                        result.extend(recurse(node.rightChild, offset))
+            return result
+        
+        results = recurse(self.rootNode, offset)
+        results.sort(key=lambda x: (x.offset, x.endTime))
+        return tuple(results)
+
+    def elementsOverlappingOffset(self, offset):
+        r'''
+        Finds elements or timespans in this ElementTree which overlap `offset`.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> scoreTree = score.asTimespans()
+        >>> for el in scoreTree.elementsOverlappingOffset(0.5):
+        ...     el
+        ...
+        <PitchedTimespan (0.0 to 1.0) <music21.note.Note E>>
+        '''
+        def recurse(node, offset, indent=0):
+            result = []
+            if node is not None:
+                if node.position < offset < node.endTimeHigh:
+                    result.extend(recurse(node.leftChild, offset, indent + 1))
+                    # This currently requires timespans not elements, and list payloads...
+                    # TODO: Fix/disambiguate.
+                    for timespan in node.payload:
+                        if offset < timespan.endTime:
+                            result.append(timespan)
+                    result.extend(recurse(node.rightChild, offset, indent + 1))
+                elif offset <= node.position:
+                    result.extend(recurse(node.leftChild, offset, indent + 1))
+            return result
+        results = recurse(self.rootNode, offset)
+        #if len(results) > 0 and hasattr(results[0], 'element'):
+        #    results.sort(key=lambda x: (x.offset, x.endTime, x.element.sortTuple()[1:]))
+        #else:
+        results.sort(key=lambda x: (x.offset, x.endTime))
+        return tuple(results)
 
     def removeElements(self, elements, offsets=None, runUpdate=True): 
         r'''
@@ -1473,11 +1451,24 @@ class TimespanTree(OffsetTree):
         super(TimespanTree, self).__init__(elements, source)
     
 
+    def offset(self):
+        '''
+        this is just for mimicking elements as streams. 
+        '''
+        return self.lowestPosition()
+
+
     def removeTimespanList(self, elements, offsets=None, runUpdate=True):
+        '''
+        this will eventually be different from above...
+        '''
         self.removeElements(elements, offsets, runUpdate)
 
     def removeTimespan(self, elements, offsets=None, runUpdate=True):
-        self.removeTimespanList(elements, offsets, runUpdate)
+        '''
+        this will eventually be different from above...
+        '''
+        self.removeElements(elements, offsets, runUpdate)
     
     def findNextPitchedTimespanInSameStreamByClass(self, pitchedTimespan, classList=None):
         r'''
@@ -1752,7 +1743,7 @@ class TimespanTree(OffsetTree):
         <Verticality 29.5 {A#2 F#3 D4 F#4}>
         '''
         if reverse:
-            offset = self.highestOffset
+            offset = self.highestPosition()
             verticality = self.getVerticalityAt(offset)
             yield verticality
             verticality = verticality.previousVerticality
