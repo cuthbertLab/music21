@@ -8,15 +8,12 @@
 # Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
-
 import os
 import re
 import time
 import sys
 import unittest
 import textwrap
-
 
 try:
     reload  # python2 @UndefinedVariable
@@ -35,8 +32,9 @@ try:
 except ImportError:
     from io import StringIO # python3 (also in python 2.6+)
 
+# pylint: disable=redefined-builtin
 try:
-    input = raw_input #  @ReservedAssignment @UndefinedVariable # pylint: disable=undefined-variable 
+    input = raw_input # @ReservedAssignment @UndefinedVariable # pylint: disable=undefined-variable 
 except NameError:
     pass
 
@@ -53,16 +51,16 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 #-------------------------------------------------------------------------------
 # match finale name, which may be directory or something else
-reFinaleApp = re.compile(r'Finale 20[0-1][0-9][a-z]*.app')
-reFinaleExe = re.compile(r'Finale 20[0-1][0-9][a-z]*.exe')
-reFinaleReaderApp = re.compile(r'Finale Reader.app')
-reMuseScoreApp = re.compile(r'MuseScore\s?[0-9]*.app')
+reFinaleApp = re.compile(r'Finale (?:Notepad )?20[0-2][0-9][a-z\.0-9]*.app', re.IGNORECASE)
+reFinaleExe = re.compile(r'Finale (?:Notepad )?20[0-2][0-9][a-z\.0-9]*.exe', re.IGNORECASE)
+reFinaleReaderApp = re.compile(r'Finale Reader.app', re.IGNORECASE)
+reMuseScoreApp = re.compile(r'MuseScore\s?[0-9]*.app', re.IGNORECASE)
 
 
 urlMusic21 = 'http://web.mit.edu/music21'
-urlFinaleReader = 'http://www.finalemusic.com/Reader'
+urlFinaleNotepad = 'http://www.finalemusic.com/products/finale-notepad/resources/'
 urlMuseScore = 'http://musescore.org'
-urlGettingStarted = 'http://mit.edu/music21/doc/'
+urlGettingStarted = 'http://music21.readthedocs.org'
 urlMusic21List = 'http://groups.google.com/group/music21list'
 
 LINE_WIDTH = 78
@@ -70,7 +68,8 @@ LINE_WIDTH = 78
 #-------------------------------------------------------------------------------
 # class Action(threading.Thread):
 #     '''
-#     A thread-based action for performing remote actions, like downloading or opening in a webbrowser. 
+#     A thread-based action for performing remote actions, like downloading
+#     or opening in a webbrowser. 
 #     '''
 #     def __init__ (self, prompt, timeOutTime):
 #         threading.Thread.__init__(self)
@@ -107,6 +106,7 @@ def writeToUser(msg, wrap=True, linesPerPage=20):
                 post += textwrap.wrap(sub, LINE_WIDTH)
     else:
         post = lines
+    
     #print post
     lineCount = 0
     for i, l in enumerate(post):
@@ -137,7 +137,9 @@ def getSitePackages():
 
 
 def findInstallations():
-    '''Find all music21 references found in site packages, or possibly look at the running code as well.
+    '''
+    Find all music21 references found in site packages, or 
+    possibly look at the running code as well.
     '''
     found = []
     sitePackages = getSitePackages()
@@ -153,7 +155,9 @@ def findInstallations():
     return found
 
 def findInstallationsEggInfo():
-    '''Find all music21 references found in site packages, or possibly look at the running code as well.
+    '''
+    Find all music21 eggs found in site packages, or possibly look 
+    at the running code as well.
     '''
     found = findInstallations()
     # only get those that end w/ egg-info
@@ -165,7 +169,8 @@ def findInstallationsEggInfo():
     return post
 
 def findInstallationsEggInfoStr():
-    '''Return a string presentation, or None
+    '''
+    Return a string presentation, or the string None
     '''
     found = findInstallationsEggInfo()
     if found == []:
@@ -312,13 +317,17 @@ class DialogException(exceptions21.Music21Exception):
 #-------------------------------------------------------------------------------
 class Dialog(object):
     '''
-    Model a dialog as a question and response. Have different subclases for different types of questions. Store all in a Conversation, or multiple dialog passes.
+    Model a dialog as a question and response. Have different subclases for 
+    different types of questions. Store all in a Conversation, or multiple dialog passes.
 
     A `default`, if provided, is returned if the users provides no input and just enters return. 
 
-    The `tryAgain` option determines if, if a user provides incomplete or no response, and there is no default (for no response), whether the user is given another chance to provide valid input. 
+    The `tryAgain` option determines if, if a user provides incomplete or no response, 
+    and there is no default (for no response), whether the user is given another chance 
+    to provide valid input. 
 
-    The `promptHeader` is a string header that is placed in front of any common header for this dialog.
+    The `promptHeader` is a string header that is placed in front of any common header 
+    for this dialog.
     '''
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         # store the result obtained from the user
@@ -479,30 +488,42 @@ class Dialog(object):
         pass
 
     def _formatResultForUser(self, result):
-        '''For various result options, we may need to at times convert the internal representation of the result into something else. For example, we might present the user with 'Yes' or 'No' but store the result as True or False.
+        '''
+        For various result options, we may need to at times convert the internal 
+        representation of the result into something else. For example, we might present 
+        the user with 'Yes' or 'No' but store the result as True or False.
         '''
         # override in subclass
         return result
 
     def _parseUserInput(self, raw):
-        '''Translate string to desired output. Pass None through (as no input), convert '' to None, and pass all other outputs as IncompleteInput objects. 
+        '''
+        Translate string to desired output. Pass None through 
+        (as no input), convert '' to None, and pass all other 
+        outputs as IncompleteInput objects. 
         '''
         return raw
 
     def _evaluateUserInput(self, raw):
-        '''Evaluate the user's string entry after persing; do not return None: either return a valid response, default if available, or IncompleteInput object. 
+        '''
+        Evaluate the user's string entry after parsing; do not return None: 
+        either return a valid response, default if available, or IncompleteInput object. 
         '''
         pass
         # define in subclass
 
     def _preAskUser(self, force=None):
-        '''Call this method immediately before calling askUser. Can be used for configuration getting additional information. 
+        '''
+        Call this method immediately before calling askUser. 
+        Can be used for configuration getting additional information. 
         '''
         pass
         # define in subclass
 
     def askUser(self, force=None):
-        '''Ask the user, display the query. The force argument can be provided to test. Sets self._result; does not return a value.
+        '''
+        Ask the user, display the query. The force argument can 
+        be provided to test. Sets self._result; does not return a value.
         '''
         # if an introduction is defined, try to use it
         intro = self._rawIntroduction()
@@ -568,7 +589,9 @@ class Dialog(object):
         # self._result may still be None
 
     def getResult(self, simulate=True):
-        '''Return the result, or None if not set. This may also do a processing routine that is part of the desired result. 
+        '''
+        Return the result, or None if not set. This may also do a 
+        processing routine that is part of the desired result. 
         '''
         return self._result 
 
@@ -579,36 +602,43 @@ class Dialog(object):
         pass 
 
     def performAction(self, simulate=False):
-        '''After getting a result, the query might require an action to be performed. If result is None, this will use whatever value is found in _result. 
+        '''
+        After getting a result, the query might require an action 
+        to be performed. If result is None, this will use whatever 
+        value is found in _result. 
 
         If simulate is True, no action will be taken.
         '''
         dummy = self.getResult()
         if isinstance(self._result, DialogError):
-            environLocal.printDebug('performAction() called, but result is an error: %s' % self._result)
+            environLocal.printDebug(
+                        'performAction() called, but result is an error: %s' % self._result)
             self._writeToUser(['No action taken.', ' '])
 
         elif simulate: # do not operate
-            environLocal.printDebug('performAction() called, but in simulation mode: %s' % self._result)
+            environLocal.printDebug(
+                        'performAction() called, but in simulation mode: %s' % self._result)
         else:
             try:
                 self._performAction(simulate=simulate)
             except DialogError: # pylint: disable=catching-non-exception
                 # in some cases, the action selected requires exciting the 
                 # configuration assistant
-                raise DialogError('perform action raised a dialog exception') # pylint: disable=raising-non-exception
+                # pylint: disable=raising-non-exception
+                raise DialogError('perform action raised a dialog exception') 
 
 
 #-------------------------------------------------------------------------------
 class AnyKey(Dialog):
-    '''Press any key to continue
-
+    '''
+    Press any key to continue
     '''
     def __init__(self, default=None, tryAgain=False, promptHeader=None):
         Dialog.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
     
     def _rawQuery(self):
-        '''Return a multiline presentation of the question.
+        '''
+        Return a multiline presentation of the question.
         '''
         msg = 'Press return to continue.'
         msg = self._rawQueryPrepareHeader(msg)
@@ -617,7 +647,8 @@ class AnyKey(Dialog):
         return msg
 
     def _parseUserInput(self, raw):
-        '''Always returns True
+        '''
+        Always returns True
         '''
         return True
 
@@ -628,8 +659,8 @@ class AnyKey(Dialog):
 
 #-------------------------------------------------------------------------------
 class YesOrNo(Dialog):
-    '''Ask a yes or no question.
-
+    '''
+    Ask a yes or no question.
     
     >>> d = configure.YesOrNo(default=True)
     >>> d.askUser('yes') # force arg for testing
@@ -646,7 +677,11 @@ class YesOrNo(Dialog):
     
 
     def _formatResultForUser(self, result):
-        '''For various result options, we may need to at times convert the internal representation of the result into something else. For example, we might present the user with 'Yes' or 'No' but store the result as True or False.
+        '''
+        For various result options, we may need to at times convert 
+        the internal representation of the result into something else. 
+        For example, we might present the user with 'Yes' or 'No' but 
+        store the result as True or False.
         '''
         if result is True:
             return 'Yes'
@@ -658,8 +693,8 @@ class YesOrNo(Dialog):
             raise DialogException('attempting to format result for user: %s' % result)
 
     def _rawQuery(self):
-        '''Return a multiline presentation of the question.
-
+        '''
+        Return a multiline presentation of the question.
         
         >>> d = configure.YesOrNo(default=True)
         >>> d._rawQuery()
@@ -668,7 +703,6 @@ class YesOrNo(Dialog):
         >>> d._rawQuery()
         'Enter Yes or No (default is No): '
 
-        
         >>> d = configure.YesOrNo(default=True, promptHeader='Would you like more time?')
         >>> d._rawQuery()
         'Would you like more time? Enter Yes or No (default is Yes): '
@@ -679,8 +713,9 @@ class YesOrNo(Dialog):
         return msg
 
     def _parseUserInput(self, raw):
-        '''Translate string to desired output. Pass None and '' (as no input), as NoInput objects, and pass all other outputs as IncompleteInput objects. 
-
+        '''
+        Translate string to desired output. Pass None and '' (as no input), as 
+        NoInput objects, and pass all other outputs as IncompleteInput objects. 
         
         >>> d = configure.YesOrNo()
         >>> d._parseUserInput('y')
@@ -707,8 +742,10 @@ class YesOrNo(Dialog):
         return IncompleteInput(raw)
 
     def _evaluateUserInput(self, raw):
-        '''Evaluate the user's string entry after persing; do not return None: either return a valid response, default if available, IncompleteInput, NoInput objects. 
-    
+        '''
+        Evaluate the user's string entry after parsing; 
+        do not return None: either return a valid response, 
+        default if available, IncompleteInput, NoInput objects.     
         
         >>> d = configure.YesOrNo()
         >>> d._evaluateUserInput('y')
@@ -748,7 +785,8 @@ class YesOrNo(Dialog):
 
 #-------------------------------------------------------------------------------
 class AskOpenInBrowser(YesOrNo):
-    '''Ask the user if the want to open a URL in a browser.
+    '''
+    Ask the user if the want to open a URL in a browser.
 
     
     >>> d = configure.AskOpenInBrowser('http://mit.edu/music21')
@@ -802,7 +840,8 @@ class AskInstall(YesOrNo):
         # define platforms that this will run on
         self._platforms = ['darwin', 'nix']
 
-        msg = 'Would you like to install music21 in the normal place for Python packages (i.e., site-packages)?'
+        msg = ('Would you like to install music21 in the normal ' + 
+                'place for Python packages (i.e., site-packages)?')
         self.appendPromptHeader(msg)
 
 
@@ -810,7 +849,11 @@ class AskInstall(YesOrNo):
         fp = findSetup()
         if fp is not None:
 
-            self._writeToUser(['You must authorize writing in the following directory:', getSitePackages(), ' ', 'Please provide your user password to complete this operation.', ''])
+            self._writeToUser(['You must authorize writing in the following directory:', 
+                               getSitePackages(), 
+                               ' ', 
+                               'Please provide your user password to complete this operation.', 
+                               ''])
 
             stdoutSrc = sys.stdout
             #stderrSrc = sys.stderr
@@ -846,9 +889,9 @@ class AskInstall(YesOrNo):
 
 
 class AskSendInstallationReport(YesOrNo):
-    '''Ask the user if they want to send a report regarding their system and usage.
-
-    
+    '''
+    Ask the user if they want to send a report 
+    regarding their system and usage.    
     '''
     def __init__(self, default=True, tryAgain=True,
         promptHeader=None, additionalEntries=None):        
@@ -858,14 +901,17 @@ class AskSendInstallationReport(YesOrNo):
             additionalEntries = {}
         self._additionalEntries = additionalEntries
         
-        msg = 'Would you like to send a pre-formatted email to music21 regarding your installation? Installation reports help us make music21 work better for you'
+        msg = ('Would you like to send a pre-formatted email to music21 regarding your ' + 
+               'installation? Installation reports help us make music21 work better for you')
         self.appendPromptHeader(msg)
 
     def _getMailToStr(self):
         body = []
-        body.append('Please send the following email; your return email address will never be used in any way.')
+        body.append('Please send the following email; your return email address ' + 
+                    'will never be used in any way.')
         body.append('')
-        body.append('The following information on your installation will be used only for research.')
+        body.append('The following information on your installation ' + 
+                    'will be used only for research.')
         body.append('')
 
         userData = getUserData()
@@ -875,7 +921,10 @@ class AskSendInstallationReport(YesOrNo):
             body.append('%s // %s' % (key, userData[key]))
 
         body.append('')
-        body.append('Below, please provide a few words about what sorts of tasks or problems you plan to explore with music21. Any information on your background is also appreciated (e.g., amateur musician, computer programmer, professional music researcher). Thanks!')
+        body.append('Below, please provide a few words about what sorts of tasks ' + 
+                    'or problems you plan to explore with music21. Any information on ' + 
+                    'your background is also appreciated (e.g., amateur musician, ' + 
+                    'computer programmer, professional music researcher). Thanks!')
         body.append('')
 
         platform = common.getPlatform()
@@ -889,7 +938,8 @@ class AskSendInstallationReport(YesOrNo):
         return msg # pass this to webbrowser
 
     def _performAction(self, simulate=False):
-        '''The action here is to open the stored URL in a browser, if the user agrees. 
+        '''
+        The action here is to open the stored URL in a browser, if the user agrees. 
         '''
         result = self.getResult()
         if result is True:
@@ -906,14 +956,10 @@ class AskSendInstallationReport(YesOrNo):
                 print("Could not open your mail program.  Sorry!")
 
 
-
-        
-
-
 #-------------------------------------------------------------------------------
 class SelectFromList(Dialog):
-    '''General class to select values from a list.
-
+    '''
+    General class to select values from a list.
     
     >>> d = configure.SelectFromList() # empty selection list
     >>> d.askUser('no') # results in bad condition
@@ -931,7 +977,8 @@ class SelectFromList(Dialog):
         Dialog.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
 
     def _getValidResults(self, force=None):
-        '''Return a list of valid results that are possible and should be displayed to the user. These will be processed by _formatResultForUser before usage.
+        '''
+        Return a list of valid results that are possible and should be displayed to the user. 
         '''
         # this might need to be cached
         # customize in subclass
@@ -947,8 +994,9 @@ class SelectFromList(Dialog):
 
 
     def _askFillEmptyList(self, default=None, force=None):
-        '''What to do if the selection list is empty. Only return True or False: if we should continue or not.
-
+        '''
+        What to do if the selection list is empty. Only return True or False: 
+        if we should continue or not.
         
         >>> d = configure.SelectFromList(default=True)
         >>> d._askFillEmptyList(force='yes')
@@ -974,8 +1022,8 @@ class SelectFromList(Dialog):
             return post
 
     def _preAskUser(self, force=None):
-        '''Before we ask user, we need to to run _askFillEmptyList list if the list is empty.
-
+        '''
+        Before we ask user, we need to to run _askFillEmptyList list if the list is empty.
         
         >>> d = configure.SelectFromList()
         >>> d._preAskUser('no') # force for testing
@@ -996,8 +1044,8 @@ class SelectFromList(Dialog):
             return True
 
     def _rawQuery(self, force=None):
-        '''Return a multiline presentation of the question.
-
+        '''
+        Return a multiline presentation of the question.
         
         >>> d = configure.SelectFromList()
         >>> d._rawQuery(['a', 'b', 'c'])
@@ -1007,7 +1055,8 @@ class SelectFromList(Dialog):
         >>> d._default
         1
         >>> d._rawQuery(['a', 'b', 'c'])
-        ['[1] a', '[2] b', '[3] c', ' ', 'Select a number from the preceding options (default is 1): ']
+        ['[1] a', '[2] b', '[3] c', ' ', 
+         'Select a number from the preceding options (default is 1): ']
         '''
         head = []
         i = 1
@@ -1027,8 +1076,9 @@ class SelectFromList(Dialog):
         return head + [' ', tail]
 
     def _parseUserInput(self, raw):
-        '''Convert all values to an integer, or return NoInput or IncompleteInput. Do not yet evaluate whether the number is valid in the context of the selection choices. 
-
+        '''
+        Convert all values to an integer, or return NoInput or IncompleteInput. 
+        Do not yet evaluate whether the number is valid in the context of the selection choices. 
         
         >>> d = configure.SelectFromList()
         '''
@@ -1051,10 +1101,6 @@ class SelectFromList(Dialog):
 
     
     def _evaluateUserInput(self, raw):
-        '''Evaluate the user's string entry after persing; do not return None: either return a valid response, default if available, IncompleteInput, NoInput objects. 
-    
-        
-        '''
         rawParsed = self._parseUserInput(raw)
         # means no answer: return default
         if isinstance(rawParsed, NoInput): 
@@ -1075,11 +1121,26 @@ class AskAutoDownload(SelectFromList):
     def _rawIntroduction(self):
         '''Return a multiline presentation of an introduction.
         '''
-        return ['The LGPL music21 software is distributed with a corpus of encoded compositions which are distributed with the permission of the encoders (and, where needed, the composers or arrangers) and where permitted under United States copyright law. Some encodings included in the corpus may not be used for commercial uses or have other restrictions: please see the licenses embedded in individual compositions or directories for more details.', 
+        return ['The BSD/LGPL licensed music21 software is distributed with a corpus of encoded ' + 
+                'compositions which are distributed with the permission of the encoders ' + 
+                '(and, where needed, the composers or arrangers) and where permitted under ' + 
+                'United States copyright law. Some encodings included in the corpus may not ' + 
+                'be used for commercial uses or have other restrictions: please see the ' + 
+                'licenses embedded in individual compositions or directories for more details.', 
         ' ',
-        'In addition to the corpus distributed with music21, other pieces are not included in this distribution, but are indexed as links to other web sites where they can be downloaded (the "virtual corpus"). If you would like, music21 can help your computer automatically resolve these links and bring them to your hard drive for analysis. See corpus/virtual.py for a list of sites that music21 might index.',
+        'In addition to the corpus distributed with music21, other pieces are not ' + 
+        'included in this distribution, but are indexed as links to other web sites ' + 
+        'where they can be downloaded (the "virtual corpus"). If you would like, music21 ' + 
+        'can help your computer automatically resolve these links and bring them to your ' + 
+        'hard drive for analysis. See corpus/virtual.py for a list of sites that music21 ' + 
+        'might index.',
         ' ',
-        'To the best of our knowledge, the music (if not the encodings) in the corpus are either out of copyright in the United States and/or are licensed for non-commercial use. These works, along with any works linked to in the virtual corpus, may or may not be free in your jurisdiction. If you believe this message to be in error regarding one or more works please contact Michael Cuthbert at cuthbert@mit.edu.',
+        'To the best of our knowledge, the music (if not the encodings) in the corpus are ' + 
+            'either out of copyright in the United States and/or are licensed for ' + 
+            'non-commercial use. These works, along with any works linked to in the virtual ' + 
+            'corpus, may or may not be free in your jurisdiction. If you believe this message ' + 
+            'to be in error regarding one or more works please contact ' + 
+            'Michael Cuthbert at cuthbert@mit.edu.',
         ' ',
         'Would you like to:'
         ]
@@ -1090,12 +1151,16 @@ class AskAutoDownload(SelectFromList):
         if force is not None:
             return force
         else:
-            return ['Acknowledge these terms and allow music21 to aid in finding pieces in the corpus',
-            'Acknowledge these terms and block the virtual corpus',
-            'Do not agree to these terms and will not use music21 (agreeing to the terms of the corpus is mandatory for using the system).']
+            return [
+                'Acknowledge these terms and allow music21 to aid in finding pieces in the corpus',
+                'Acknowledge these terms and block the virtual corpus',
+                'Do not agree to these terms and will not use music21 (agreeing to the terms of ' + 
+                    'the corpus is mandatory for using the system).'
+                 ]
 
     def _evaluateUserInput(self, raw):
-        '''Evaluate the user's string entry after persing; do not return None: either return a valid response, default if available, IncompleteInput, NoInput objects. 
+        '''Evaluate the user's string entry after parsing; do not return None: 
+        either return a valid response, default if available, IncompleteInput, NoInput objects. 
         '''
         rawParsed = self._parseUserInput(raw)
         # if NoInput: and a default, return default
@@ -1149,7 +1214,8 @@ class SelectFilePath(SelectFromList):
         SelectFromList.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
 
     def _getDarwinApp(self, comparisonFunction):
-        '''Provide a comparison function that returns True or False based on the file name. This looks at everything in Applications, as well as every directory in Applications
+        '''Provide a comparison function that returns True or False based on the file name. 
+        This looks at everything in Applications, as well as every directory in Applications
         '''
         post = []
         path0 = '/Applications'
@@ -1183,7 +1249,9 @@ class SelectFilePath(SelectFromList):
 
 
     def _evaluateUserInput(self, raw):
-        '''Evaluate the user's string entry after persing; do not return None: either return a valid response, default if available, IncompleteInput, NoInput objects. 
+        '''Evaluate the user's string entry after parsing; 
+        do not return None: either return a valid response, default if available, 
+        IncompleteInput, NoInput objects. 
     
         Here, we convert the user-selected number into a file path
         
@@ -1215,20 +1283,25 @@ class SelectMusicXMLReader(SelectFilePath):
     Select a MusicXML Reader by presenting a user a list of options. 
     '''
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
-        SelectFilePath.__init__(self, default=default, tryAgain=tryAgain, promptHeader=promptHeader) 
+        SelectFilePath.__init__(self, 
+                                default=default, 
+                                tryAgain=tryAgain, 
+                                promptHeader=promptHeader) 
 
         # define platforms that this will run on
         self._platforms = ['darwin']
 
     def _rawIntroduction(self):
-        '''Return a multiline presentation of an introduction.
         '''
-        return ['''Defining an XML Reader permits automatically opening 
-            music21-generated MusicXML in an editor for display and manipulation when calling 
-            the show() method. Setting this option is highly recommended.''', ' ']
+        Return a multiline presentation of an introduction.
+        '''
+        return ['Defining an XML Reader permits automatically opening ' +
+            'music21-generated MusicXML in an editor for display and manipulation when calling ' +
+            'the show() method. Setting this option is highly recommended.', ' ']
 
     def _getMusicXMLReaderDarwin(self):
-        '''Get all possible Finale or MuseScore paths on Darwin
+        '''
+        Get all possible Finale or MuseScore paths on Darwin
         '''
         # order here results in ranks
         def comparisonFinale(name):
@@ -1245,6 +1318,7 @@ class SelectMusicXMLReader(SelectFilePath):
                 return True
             else: 
                 return False
+            
         results += self._getDarwinApp(comparisonMuseScore)
 
         def comparisonFinaleReader(name):
@@ -1253,6 +1327,7 @@ class SelectMusicXMLReader(SelectFilePath):
                 return True
             else: 
                 return False
+            
         results += self._getDarwinApp(comparisonFinaleReader)
 
         return results
@@ -1262,17 +1337,22 @@ class SelectMusicXMLReader(SelectFilePath):
 
 
     def _getMusicXMLReaderWin(self):
-        '''Get all possible finale paths on Darwin
+        '''
+        Get all possible Finale, MuseScore paths on Windows
         '''
         return []
 
     def _getMusicXMLReaderNix(self):
-        '''Get all possible finale paths on Darwin
+        '''
+        Get all possible Finale paths on Unix
         '''
         return []
 
     def _getValidResults(self, force=None):
-        '''Return a list of valid results that are possible and should be displayed to the user. These will be processed by _formatResultForUser before usage.
+        '''
+        Return a list of valid results that are possible and 
+        should be displayed to the user. 
+        These will be processed by _formatResultForUser before usage.
         '''
         # customize in subclass
         if force is not None:
@@ -1294,15 +1374,16 @@ class SelectMusicXMLReader(SelectFilePath):
         '''
         platform = common.getPlatform()
         if platform == 'win':
-            urlTarget = urlFinaleReader
+            urlTarget = urlFinaleNotepad
         elif platform == 'darwin':
-            urlTarget = urlFinaleReader
+            urlTarget = urlFinaleNotepad
         elif platform == 'nix':
             urlTarget = urlMuseScore
         
         # this does not do anything: customize in subclass
         d = AskOpenInBrowser(urlTarget=urlTarget, default=True, tryAgain=False, 
-            promptHeader='No available MusicXML readers are found on your system. It is recomended to download and install a reader before continuing.')
+            promptHeader='No available MusicXML readers are found on your system. ' + 
+            'We recommend downloading and installing a reader before continuing.')
         d.askUser(force=force)
         post = d.getResult()
         # can call regardless of result; will only function if result is True
@@ -1329,7 +1410,8 @@ class SelectMusicXMLReader(SelectFilePath):
 
 
     def _performAction(self, simulate=False):
-        '''The action here is to open the stored URL in a browser, if the user agrees. 
+        '''
+        The action here is to open the stored URL in a browser, if the user agrees. 
         '''
         result = self.getResult()
         if result is not None and not isinstance(result, DialogError): 
@@ -1347,7 +1429,6 @@ class SelectMusicXMLReader(SelectFilePath):
 class ConfigurationAssistant(object):
     '''
     Class for managing numerous configuration tasks.
-
     '''
     def __init__(self, simulate=False):
 
@@ -1379,13 +1460,16 @@ class ConfigurationAssistant(object):
         self._dialogs.append(d)
 
 
-        d = AskOpenInBrowser(urlTarget=urlMusic21List, prompt='The music21 discussion group provides a forum for asking questions and getting help. Would you like to see the music21 discussion list or sign up for updates?')
+        d = AskOpenInBrowser(urlTarget=urlMusic21List, 
+                             prompt='The music21 discussion group provides a forum for ' + 
+                             'asking questions and getting help. Would you like to see the ' + 
+                             'music21 discussion list or sign up for updates?')
         self._dialogs.append(d)
 
         # note: this is the on-line URL: 
         # might be better to find local documentaiton
         d = AskOpenInBrowser(urlTarget=urlGettingStarted, 
-                             prompt='Would you like to view the music21 documentation in a web browser?')
+                    prompt='Would you like to view the music21 documentation in a web browser?')
         self._dialogs.append(d)
 
         d = AnyKey(promptHeader='The music21 Configuration Assistant is complete.')
@@ -1395,9 +1479,12 @@ class ConfigurationAssistant(object):
 
     def _introduction(self):
         msg = []
-        msg.append('''Welcome the music21 Configuration Assistant. You will be guided through a number of questions to install and setup music21. Simply pressing return at a prompt will select a default, if available.''')
+        msg.append('Welcome the music21 Configuration Assistant. You will be guided ' + 
+                   'through a number of questions to install and setup music21. ' + 
+                   'Simply pressing return at a prompt will select a default, if available.')
         msg.append('') # will cause a line break
-        msg.append('''You may run this configuration again at a later time by running music21/configure.py.''')
+        msg.append('You may run this configuration again at a later time ' + 
+                   'by running music21/configure.py.')
         msg.append(' ') # will cause a blank line
 
         writeToUser(msg)
@@ -1411,7 +1498,8 @@ class ConfigurationAssistant(object):
 
 
     def _hr(self):
-        '''Draw a line
+        '''
+        Draw a line
         '''
         msg = []
         msg.append('_' * LINE_WIDTH)
