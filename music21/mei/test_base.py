@@ -27,17 +27,15 @@ Tests for :mod:`music21.mei.base`.
 # pylint is bad at guessing types in these tests---reasonably so
 # pylint: disable=maybe-no-member
 
+from music21.ext import six
+from six.moves import xrange  # pylint: disable=redefined-builtin,import-error,unused-import
+from six.moves import range  # pylint: disable=redefined-builtin,import-error,unused-import
+
 import unittest
-try:
-    # this works in Python 3.3+
+if six.PY3:
     from unittest import mock  # pylint: disable=no-name-in-module
-except ImportError:
-    try:
-        # system library overrides the built-in
-        import mock
-    except ImportError:
-        # last resort
-        from music21.ext import mock
+else:
+    from music21.ext import mock
 
 # To have working MagicMock objects, we can't use cElementTree even though it would be faster.
 # The C implementation provides some methods/attributes dynamically (notably "tag"), so MagicMock
@@ -54,6 +52,7 @@ from music21 import duration
 from music21 import instrument
 from music21 import interval
 from music21 import key
+from music21 import metadata
 from music21 import meter
 from music21 import note
 from music21 import pitch
@@ -111,6 +110,37 @@ class TestMeiToM21Class(unittest.TestCase):
             base.MeiToM21Converter(inputFile)
         except base.MeiElementError as theError:
             self.assertEqual(base._WRONG_ROOT_ELEMENT.format('score-partwise'), theError.args[0])
+
+    @mock.patch('music21.mei.base._ppSlurs')
+    @mock.patch('music21.mei.base._ppTies')
+    @mock.patch('music21.mei.base._ppBeams')
+    @mock.patch('music21.mei.base._ppTuplets')
+    @mock.patch('music21.mei.base._ppConclude')
+    @mock.patch('music21.mei.base.scoreFromElement')
+    @mock.patch('music21.mei.base.makeMetadata')
+    def testRun1(self, mockMeta, mockScoreFE, mockConclude, mockTuplet, mockBeams, mockTies, mockSlurs):
+        '''
+        MeiToM21Converter.run(): that it works
+        '''
+        # ha... "test run"... get it?
+        testConv = base.MeiToM21Converter()
+        testConv.documentRoot = mock.MagicMock(spec_set=ETree.Element)
+        testConv.documentRoot.find.return_value = 5
+        expScore = mock.MagicMock(spec_set=stream.Stream)
+        mockScoreFE.return_value = expScore
+        expDocRootQuery = './/{mei}music//{mei}score'.format(mei=_MEINS)
+
+        actual = testConv.run()
+
+        self.assertIs(expScore, actual)
+        mockTuplet.assert_called_once_with(testConv)
+        mockBeams.assert_called_once_with(testConv)
+        mockTies.assert_called_once_with(testConv)
+        mockSlurs.assert_called_once_with(testConv)
+        mockConclude.assert_called_once_with(testConv)
+        testConv.documentRoot.find.assert_called_once_with(expDocRootQuery)
+        mockScoreFE.assert_called_once_with(5, testConv.slurBundle)
+        mockMeta.assert_called_once_with(testConv.documentRoot)
 
 
 #------------------------------------------------------------------------------
@@ -320,6 +350,285 @@ class TestThings(unittest.TestCase):
         otherVoice.id = 24
         fromThese = [None, firstVoice, stream.Stream(), stream.Part(), otherVoice, 900]
         self.assertRaises(RuntimeError, base.getVoiceId, fromThese)
+
+
+#------------------------------------------------------------------------------
+class TestMetadata(unittest.TestCase):
+    '''Tests for the metadata-fetching functions.'''
+
+    @mock.patch('music21.mei.base.metaSetTitle')
+    @mock.patch('music21.mei.base.metaSetComposer')
+    @mock.patch('music21.mei.base.metaSetDate')
+    def testMakeMeta1(self, mockDate, mockComposer, mockTitle):
+        '''
+        makeMetadata() when there is no <work> element.
+        '''
+        documentRoot = mock.MagicMock(spec_set=ETree.Element)
+        documentRoot.find.return_value = None
+
+        actual = base.makeMetadata(documentRoot)
+
+        self.assertIsInstance(actual, metadata.Metadata)
+        documentRoot.find.assert_called_once_with('.//{}work'.format(_MEINS))
+        self.assertEqual(0, mockDate.call_count)
+        self.assertEqual(0, mockComposer.call_count)
+        self.assertEqual(0, mockTitle.call_count)
+
+    @mock.patch('music21.mei.base.metaSetTitle')
+    @mock.patch('music21.mei.base.metaSetComposer')
+    @mock.patch('music21.mei.base.metaSetDate')
+    def testMakeMeta2(self, mockDate, mockComposer, mockTitle):
+        '''
+        makeMetadata() when there is a <work> element.
+        '''
+        documentRoot = mock.MagicMock(spec_set=ETree.Element)
+        mockWork = mock.MagicMock(spec_set=ETree.Element)
+        documentRoot.find.return_value = mockWork
+        mockDate.side_effect = lambda x, y: y
+        mockComposer.side_effect = lambda x, y: y
+        mockTitle.side_effect = lambda x, y: y
+
+        actual = base.makeMetadata(documentRoot)
+
+        self.assertIsInstance(actual, metadata.Metadata)
+        documentRoot.find.assert_called_once_with('.//{}work'.format(_MEINS))
+        mockDate.assert_called_once_with(mockWork, actual)
+        mockComposer.assert_called_once_with(mockWork, actual)
+        mockTitle.assert_called_once_with(mockWork, actual)
+
+    def testMetaTitle1(self):
+        '''
+        metaSetTitle() with a title and tempo but no subtitle
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+            <titleStmt>
+                <title>Symphony No. 7</title>
+            </titleStmt>
+            <tempo>Adagio</tempo>
+        </work>"""
+        work = ETree.fromstring(work)
+        expTitle = 'Symphony No. 7'
+        expMovementName = 'Adagio'
+        meta = metadata.Metadata()
+
+        actual = base.metaSetTitle(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertFalse(hasattr(meta, 'subtitle'))
+        self.assertEqual(expTitle, actual.title)
+        self.assertEqual(expMovementName, actual.movementName)
+
+    def testMetaTitle2(self):
+        '''
+        metaSetTitle() with a title, subtitle, but no tempo
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+            <titleStmt>
+                <title>Symphony No. 7</title>
+                <title type="subtitle">in one movement</title>
+            </titleStmt>
+        </work>"""
+        work = ETree.fromstring(work)
+        expTitle = 'Symphony No. 7 (in one movement)'
+        meta = metadata.Metadata()
+
+        actual = base.metaSetTitle(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertFalse(hasattr(meta, 'subtitle'))
+        self.assertEqual(expTitle, actual.title)
+        self.assertIsNone(actual.movementName)
+
+    def testMetaComposer1(self):
+        '''
+        metaSetComposer() with no composers
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei"/>"""
+        work = ETree.fromstring(work)
+        meta = metadata.Metadata()
+
+        actual = base.metaSetComposer(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertIsNone(actual.composer)
+
+    def testMetaComposer2(self):
+        '''
+        metaSetComposer() with one composer in <respStmt>
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+            <titleStmt>
+                <respStmt>
+                    <persName role="composer">Jean Sibelius</persName>
+                </respStmt>
+            </titleStmt>
+        </work>"""
+        work = ETree.fromstring(work)
+        expComposer = 'Jean Sibelius'
+        meta = metadata.Metadata()
+
+        actual = base.metaSetComposer(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertEqual(expComposer, actual.composer)
+
+    def testMetaComposer3(self):
+        '''
+        metaSetComposer() with one composer in <composer>
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+            <titleStmt>
+                <composer>Jean Sibelius</composer>
+            </titleStmt>
+        </work>"""
+        work = ETree.fromstring(work)
+        expComposer = 'Jean Sibelius'
+        meta = metadata.Metadata()
+
+        actual = base.metaSetComposer(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertEqual(expComposer, actual.composer)
+
+    def testMetaComposer4(self):
+        '''
+        metaSetComposer() with two composers, one specified each way
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+            <titleStmt>
+                <respStmt>
+                    <persName role="composer">Jean Sibelius</persName>
+                </respStmt>
+                <composer>Sibelius, Jean</composer>
+            </titleStmt>
+        </work>"""
+        work = ETree.fromstring(work)
+        expComposer1 = "['Jean Sibelius', 'Sibelius, Jean']"
+        expComposer2 = "['Sibelius, Jean', 'Jean Sibelius']"
+        meta = metadata.Metadata()
+
+        actual = base.metaSetComposer(work, meta)
+
+        self.assertIs(meta, actual)
+        if expComposer1 != actual.composer and expComposer2 != actual.composer:
+            self.fail('composer names do not match in either order')
+
+    def testMetaDate1(self):
+        '''
+        metaSetDate() with no dates
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei"/>"""
+        work = ETree.fromstring(work)
+        expDate = 'None'  # I don't know why, but that's what it does
+        meta = metadata.Metadata()
+
+        actual = base.metaSetDate(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertEqual(expDate, actual.date)
+
+    def testMetaDate2(self):
+        '''
+        metaSetDate() with @isodate
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+            <history>
+                <creation>
+                    <date isodate="1924-03-02"/>
+                </creation>
+            </history>
+        </work>"""
+        work = ETree.fromstring(work)
+        expDate = '1924/03/02'
+        meta = metadata.Metadata()
+
+        actual = base.metaSetDate(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertEqual(expDate, actual.date)
+
+    def testMetaDate3(self):
+        '''
+        metaSetDate() with text
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+            <history>
+                <creation>
+                    <date>1924-03-02</date>
+                </creation>
+            </history>
+        </work>"""
+        work = ETree.fromstring(work)
+        expDate = '1924/03/02'
+        meta = metadata.Metadata()
+
+        actual = base.metaSetDate(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertEqual(expDate, actual.date)
+
+    @mock.patch('music21.mei.base.environLocal')
+    def testMetaDate4(self, mockEnviron):
+        '''
+        metaSetDate() with text that fails
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+            <history>
+                <creation>
+                    <date>2 March 1924</date>
+                </creation>
+            </history>
+        </work>"""
+        work = ETree.fromstring(work)
+        expDate = 'None'
+        expWarn = base._MISSED_DATE.format('2 March 1924')
+        meta = metadata.Metadata()
+
+        actual = base.metaSetDate(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertEqual(expDate, actual.date)
+        mockEnviron.warn.assert_called_once_with(expWarn)
+
+    def testMetaDate5(self):
+        '''
+        metaSetDate() with @notbefore and @notafter
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+            <history>
+                <creation>
+                    <date notbefore="1915" notafter="1924"/>
+                </creation>
+            </history>
+        </work>"""
+        work = ETree.fromstring(work)
+        expDate = '1915/--/-- to 1924/--/--'
+        meta = metadata.Metadata()
+
+        actual = base.metaSetDate(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertEqual(expDate, actual.date)
+
+    def testMetaDate6(self):
+        '''
+        metaSetDate() with @startdate and @enddate
+        '''
+        work = """<work xmlns="http://www.music-encoding.org/ns/mei">
+            <history>
+                <creation>
+                    <date startdate="1915" enddate="1924"/>
+                </creation>
+            </history>
+        </work>"""
+        work = ETree.fromstring(work)
+        expDate = '1915/--/-- to 1924/--/--'
+        meta = metadata.Metadata()
+
+        actual = base.metaSetDate(work, meta)
+
+        self.assertIs(meta, actual)
+        self.assertEqual(expDate, actual.date)
 
 
 #------------------------------------------------------------------------------
@@ -537,6 +846,146 @@ class TestAttrTranslators(unittest.TestCase):
         actual = base._tieFromAttr(right)
         self.assertEqual(type(expected), type(actual))
         self.assertEqual(expected.type, expected.type)
+
+
+#------------------------------------------------------------------------------
+class TestLyrics(unittest.TestCase):
+    '''Tests for sylFromElement() and verseFromElement()'''
+
+    def testSyl1(self):
+        '''
+        sylFromElement() where @con is given and @wordpos="i"
+        '''
+        elem = ETree.Element('syl', attrib={'wordpos': 'i', 'con': 's'})
+        elem.text = 'Chri'
+
+        actual = base.sylFromElement(elem)
+
+        self.assertIsInstance(actual, note.Lyric)
+        self.assertEqual('begin', actual.syllabic)
+        self.assertEqual('Chri ', actual.text)
+
+    def testSyl2(self):
+        '''
+        sylFromElement() where @con is given and @wordpos="m"
+        '''
+        elem = ETree.Element('syl', attrib={'wordpos': 'm', 'con': 't'})
+        elem.text = 'sto'
+
+        actual = base.sylFromElement(elem)
+
+        self.assertIsInstance(actual, note.Lyric)
+        self.assertEqual('middle', actual.syllabic)
+        self.assertEqual('~sto~', actual.text)
+
+    def testSyl3(self):
+        '''
+        sylFromElement() where @con is not given and @wordpos="t"
+        '''
+        elem = ETree.Element('syl', attrib={'wordpos': 't', 'con': 'd'})
+        elem.text = 'pher'
+
+        actual = base.sylFromElement(elem)
+
+        self.assertIsInstance(actual, note.Lyric)
+        self.assertEqual('end', actual.syllabic)
+        self.assertEqual('-pher', actual.text)
+
+    def testSyl4(self):
+        '''
+        sylFromElement() where @wordpos is not specified
+        '''
+        elem = ETree.Element('syl')
+        elem.text = 'shoe'
+
+        actual = base.sylFromElement(elem)
+
+        self.assertIsInstance(actual, note.Lyric)
+        self.assertEqual('single', actual.syllabic)
+        self.assertEqual('shoe', actual.text)
+
+    def testVerse1(self):
+        '''
+        verseFromElement() with one <syl> and @n given
+        '''
+        elem = ETree.Element('verse', attrib={'n': '42'})
+        syl = ETree.Element('{}syl'.format(_MEINS))
+        syl.text = 'Hin-'
+        elem.append(syl)
+
+        actual = base.verseFromElement(elem, backupN=5)
+
+        self.assertEqual(1, len(actual))
+        self.assertIsInstance(actual[0], note.Lyric)
+        self.assertEqual('begin', actual[0].syllabic)
+        self.assertEqual('Hin', actual[0].text)
+        self.assertEqual(42, actual[0].number)
+
+    def testVerse2(self):
+        '''
+        verseFromElement() with three <syl> and @n not given
+        '''
+        elem = ETree.Element('verse')
+        syl = ETree.Element('{}syl'.format(_MEINS))
+        syl.text = 'Hin-'
+        elem.append(syl)
+        syl = ETree.Element('{}syl'.format(_MEINS))
+        syl.text = '-de-'
+        elem.append(syl)
+        syl = ETree.Element('{}syl'.format(_MEINS))
+        syl.text = '-mith'
+        elem.append(syl)
+
+        actual = base.verseFromElement(elem, backupN=5)
+
+        self.assertEqual(3, len(actual))
+        for eachSyl in actual:
+            self.assertIsInstance(eachSyl, note.Lyric)
+            self.assertEqual(5, eachSyl.number)
+        self.assertEqual('begin', actual[0].syllabic)
+        self.assertEqual('Hin', actual[0].text)
+        self.assertEqual('middle', actual[1].syllabic)
+        self.assertEqual('de', actual[1].text)
+        self.assertEqual('end', actual[2].syllabic)
+        self.assertEqual('mith', actual[2].text)
+
+    @mock.patch('music21.mei.base.environLocal')
+    def testVerse3(self, mockEnviron):
+        '''
+        verseFromElement() with one <syl> and invalid @n
+        '''
+        elem = ETree.Element('verse', attrib={'n': 'mistake'})
+        syl = ETree.Element('{}syl'.format(_MEINS))
+        syl.text = 'Hin-'
+        elem.append(syl)
+
+        actual = base.verseFromElement(elem)
+
+        self.assertEqual(1, len(actual))
+        self.assertIsInstance(actual[0], note.Lyric)
+        self.assertEqual('begin', actual[0].syllabic)
+        self.assertEqual('Hin', actual[0].text)
+        self.assertEqual(1, actual[0].number)
+        mockEnviron.warn.assert_called_once_with(base._BAD_VERSE_NUMBER.format('mistake'))
+
+    @mock.patch('music21.mei.base.environLocal')
+    def testVerse4(self, mockEnviron):
+        '''
+        verseFromElement() with one <syl> and no @n
+        '''
+        elem = ETree.Element('verse')
+        syl = ETree.Element('{}syl'.format(_MEINS))
+        syl.text = 'Hin-'
+        elem.append(syl)
+
+        actual = base.verseFromElement(elem)
+
+        self.assertEqual(1, len(actual))
+        self.assertIsInstance(actual[0], note.Lyric)
+        self.assertEqual('begin', actual[0].syllabic)
+        self.assertEqual('Hin', actual[0].text)
+        self.assertEqual(1, actual[0].number)
+        mockEnviron.warn.assert_called_once_with(base._BAD_VERSE_NUMBER.format('None'))
 
 
 #------------------------------------------------------------------------------
@@ -784,17 +1233,20 @@ class TestNoteFromElement(unittest.TestCase):
     @mock.patch('music21.duration.GraceDuration')
     def testUnit5(self, mockGrace, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
         '''
-        noteFromElement(): test @grace and @m21Beam where the duration requires adjusting beams
+        noteFromElement(): test @grace and @m21Beam where the duration requires adjusting beams,
+            and contained <syl>
 
         (mostly-unit test)
         '''
         elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '16',
                                              'm21Beam': 'start', 'grace': 'acc'})
+        sylElem = ETree.Element('{}syl'.format(_MEINS))
+        elem.append(sylElem)
         mockSafePitch.return_value = 'safePitch() return'
         mockNewNote = mock.MagicMock()
         mockNewNote.beams = mock.MagicMock()
         mockNote.return_value = mockNewNote
-        mockProcEmbEl.return_value = []
+        mockProcEmbEl.return_value = [mock.MagicMock(spec_set=note.Lyric)]
         mockGrace.return_value = mock.MagicMock(spec_set=duration.Duration)
         mockGrace.return_value.type = '16th'
         expected = mockNewNote
@@ -807,14 +1259,19 @@ class TestNoteFromElement(unittest.TestCase):
         mockNote.assert_called_once_with(mockSafePitch.return_value)
         mockNewNote.beams.fill.assert_called_once_with('16th', 'start')
         self.assertEqual(mockGrace.return_value, mockNewNote.duration)
+        self.assertEqual(mockProcEmbEl.return_value, mockNewNote.lyrics)
 
     def testIntegration5(self):
         '''
-        noteFromElement(): test @grace and @m21Beam where the duration requires adjusting beams
+        noteFromElement(): test @grace and @m21Beam where the duration requires adjusting beams,
+            and contained <syl>
         (corresponds to testUnit5() with no mocks)
         '''
         elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '16',
                                              'm21Beam': 'start', 'grace': 'acc'})
+        sylElem = ETree.Element('{}syl'.format(_MEINS))
+        sylElem.text = 'words!'
+        elem.append(sylElem)
         slurBundle = spanner.SpannerBundle()
 
         actual = base.noteFromElement(elem, slurBundle)
@@ -822,10 +1279,86 @@ class TestNoteFromElement(unittest.TestCase):
         self.assertEqual('D2', actual.nameWithOctave)
         self.assertEqual(0.0, actual.quarterLength)
         self.assertEqual('16th', actual.duration.type)
-        self.assertEqual(1, actual.beams.beamsList[0].number)
-        self.assertEqual('start', actual.beams.beamsList[0].type)
-        self.assertEqual(2, actual.beams.beamsList[1].number)
-        self.assertEqual('start', actual.beams.beamsList[1].type)
+        self.assertTrue(1, actual.beams.beamsList[0].number)
+        self.assertTrue('start', actual.beams.beamsList[0].type)
+        self.assertTrue(2, actual.beams.beamsList[1].number)
+        self.assertTrue('start', actual.beams.beamsList[1].type)
+        self.assertTrue(1, len(actual.lyrics))
+        self.assertTrue('words!', actual.lyrics[0].text)
+
+    @mock.patch('music21.note.Note')
+    @mock.patch('music21.mei.base._processEmbeddedElements')
+    @mock.patch('music21.mei.base.safePitch')
+    @mock.patch('music21.mei.base.makeDuration')
+    @mock.patch('music21.mei.base.verseFromElement')
+    def testUnit6(self, mockVerseFE, mockMakeDuration, mockSafePitch, mockProcEmbEl, mockNote):
+        '''
+        noteFromElement(): test contained <verse>
+
+        (mostly-unit test)
+        '''
+        elem = """<note pname="D" oct="2" dur="16" xmlns="http://www.music-encoding.org/ns/mei">
+            <verse>
+                <syl>au</syl>
+                <syl>luong</syl>
+            </verse>
+            <verse>
+                <syl>sun</syl>
+            </verse>
+        </note>
+        """
+        elem = ETree.fromstring(elem)
+        mockSafePitch.return_value = 'safePitch() return'
+        mockNewNote = mock.MagicMock()
+        mockNewNote.beams = mock.MagicMock()
+        mockNote.return_value = mockNewNote
+        mockProcEmbEl.return_value = []
+        expected = mockNewNote
+        # verseFromElement() return values
+        vfeReturns = [[mock.MagicMock(name='au'), mock.MagicMock(name='luong')],
+                      [mock.MagicMock(name='sun')]]
+        def mockVerseFESideEffect(elem, backupN):
+            "this way we can check it gets called with the right elements"
+            assert '{}verse'.format(_MEINS) == elem.tag
+            return vfeReturns.pop(0)
+        mockVerseFE.side_effect = mockVerseFESideEffect
+        expLyrics = [vfeReturns[0][0], vfeReturns[0][1], vfeReturns[1][0]]
+
+        actual = base.noteFromElement(elem, 'slur bundle')
+
+        self.assertEqual(expected, actual)
+        self.assertEqual(expLyrics, actual.lyrics)
+        self.assertEqual(2, mockVerseFE.call_count)
+        mockVerseFE.assert_any_call(mock.ANY, backupN=1)
+        mockVerseFE.assert_any_call(mock.ANY, backupN=2)
+
+    def testIntegration6(self):
+        '''
+        noteFromElement(): test contained <verse>
+        (corresponds to testUnit6() with no mocks)
+        '''
+        elem = """<note pname="D" oct="2" dur="16" xmlns="http://www.music-encoding.org/ns/mei">
+            <verse>
+                <syl>au</syl>
+                <syl>luong</syl>
+            </verse>
+            <verse>
+                <syl>sun</syl>
+            </verse>
+        </note>
+        """
+        elem = ETree.fromstring(elem)
+        slurBundle = spanner.SpannerBundle()
+
+        actual = base.noteFromElement(elem, slurBundle)
+
+        self.assertEqual(3, len(actual.lyrics))
+        self.assertEqual('au', actual.lyrics[0].text)
+        self.assertEqual('luong', actual.lyrics[1].text)
+        self.assertEqual('sun', actual.lyrics[2].text)
+        self.assertEqual(1, actual.lyrics[0].number)
+        self.assertEqual(1, actual.lyrics[1].number)
+        self.assertEqual(2, actual.lyrics[2].number)
 
     # NOTE: consider adding to previous tests rather than making new ones
 
@@ -1877,10 +2410,10 @@ class TestStaffDefFromElement(unittest.TestCase):
         # NB: differences from testUnit2() are marked with a "D2" comment at the end of the line
         # 1.) prepare
         elem = ETree.Element('{}staffDef'.format(_MEINS),
-                        attrib={'clef.shape': 'F', 'clef.line': '4', 'clef.dis': 'cd',
-                                'clef.dis.place': 'cdp', 'label': 'the label',
-                                'label.abbr': 'the l.', 'n': '1', 'meter.count': '1',
-                                'key.pname': 'G', 'trans.semi': '123'})
+                             attrib={'clef.shape': 'F', 'clef.line': '4', 'clef.dis': 'cd',
+                                     'clef.dis.place': 'cdp', 'label': 'the label',
+                                     'label.abbr': 'the l.', 'n': '1', 'meter.count': '1',
+                                     'key.pname': 'G', 'trans.semi': '123'})
         theMockInstrument = mock.MagicMock('mock instrument')
         mockFromString.side_effect = instrument.InstrumentException  # D2
         mockInstrInit.return_value = theMockInstrument  # D1 & D2
@@ -1986,7 +2519,7 @@ class TestStaffDefFromElement(unittest.TestCase):
     @mock.patch('music21.mei.base.staffDefFromElement')
     def testStaffGrpUnit1(self, mockStaffDefFE):
         '''
-        staffGrpFromElement(): it's not a complicated function!
+        staffGrpFromElement(): it's not a very complicated function!
         '''
         elem = ETree.Element('staffGrp')
         innerElems = [ETree.Element('{}staffDef'.format(_MEINS), attrib={'n': str(n)}) 
@@ -1996,7 +2529,7 @@ class TestStaffDefFromElement(unittest.TestCase):
         mockStaffDefFE.side_effect = lambda x, y: 'processed {}'.format(x.get('n'))
         expected = {str(n): 'processed {}'.format(n) for n in range(4)}
 
-        actual = base.staffGrpFromElement(elem, None)
+        actual = base.staffGrpFromElement(elem, None, {})
 
         self.assertEqual(expected, actual)
         self.assertEqual(len(innerElems), mockStaffDefFE.call_count)
@@ -2005,7 +2538,7 @@ class TestStaffDefFromElement(unittest.TestCase):
 
     def testStaffGrpInt1(self):
         '''
-        staffGrpFromElement(): we'll use
+        staffGrpFromElement(): with <staffDef> directly inside this <staffGrp>
         '''
         elem = ETree.Element('staffGrp')
         innerElems = [ETree.Element('{}staffDef'.format(_MEINS),
@@ -2014,6 +2547,28 @@ class TestStaffDefFromElement(unittest.TestCase):
                       for n in range(4)]
         for eachElem in innerElems:
             elem.append(eachElem)
+        expected = {'1': {'key': key.KeySignature(sharps=-1, mode='major')},
+                    '2': {'key': key.KeySignature(sharps=-2, mode='major')},
+                    '3': {'key': key.KeySignature(sharps=-3, mode='major')},
+                    '4': {'key': key.KeySignature(sharps=-4, mode='major')}}
+
+        actual = base.staffGrpFromElement(elem, None)
+
+        self.assertDictEqual(expected, actual)
+
+    def testStaffGrpInt2(self):
+        '''
+        staffGrpFromElement(): with <staffDef> embedded in another <staffGrp>
+        '''
+        elem = ETree.Element('staffGrp')
+        innerElems = [ETree.Element('{}staffDef'.format(_MEINS),
+                                    attrib={'n': str(n + 1), 'key.mode': 'major',
+                                            'key.sig': '{}f'.format(n + 1)})
+                      for n in range(4)]
+        innerGrp = ETree.Element('{}staffGrp'.format(_MEINS))
+        for eachElem in innerElems:
+            innerGrp.append(eachElem)
+        elem.append(innerGrp)
         expected = {'1': {'key': key.KeySignature(sharps=-1, mode='major')},
                     '2': {'key': key.KeySignature(sharps=-2, mode='major')},
                     '3': {'key': key.KeySignature(sharps=-3, mode='major')},
@@ -2089,8 +2644,7 @@ class TestScoreDefFromElement(unittest.TestCase):
         elem.append(staffGrp)
         mockTime.return_value = 'mockTime return'
         mockKey.return_value = 'mockKey return'
-        mockStaffGrpFE.return_value = {'1': {'instrument': 'A clarinet'}}  
-                    # but is it "any clarinet," or a specific clarinet in A? Ambiguity!
+        mockStaffGrpFE.return_value = {'1': {'instrument': 'A clarinet'}}
         expected = {'all-part objects': [mockTime.return_value, mockKey.return_value],
                     'whole-score objects': [],
                     '1': {'instrument': 'A clarinet'}}
@@ -2177,13 +2731,13 @@ class TestEmbeddedElements(unittest.TestCase):
         mapping = {'note': mockTranslator}
         callerName = 'ocean'
         expected = ['translator return']
-        exp_err = base._UNPROCESSED_SUBELEMENT.format(elements[1].tag, callerName)
+        expErr = base._UNPROCESSED_SUBELEMENT.format(elements[1].tag, callerName)
 
         actual = base._processEmbeddedElements(elements, mapping, callerName)
 
         self.assertSequenceEqual(expected, actual)
         mockTranslator.assert_called_once_with(elements[0], None)
-        mockEnviron.printDebug.assert_called_once_with(exp_err)
+        mockEnviron.printDebug.assert_called_once_with(expErr)
 
 
 
@@ -3432,7 +3986,7 @@ class TestMeasureFromElement(unittest.TestCase):
         mRestTag = '{}mRest'.format(_MEINS)
         elem = ETree.Element('measure', attrib={'right': 'rptboth'})
         innerStaffs = [ETree.Element(staffTag, attrib={'n': str(n + 1)}) for n in range(3)]
-        for i, eachStaff in enumerate(innerStaffs):
+        for eachStaff in innerStaffs:
             thisLayer = ETree.Element(layerTag, attrib={'n': '1'})
             thisLayer.append(ETree.Element(mRestTag))
             eachStaff.append(thisLayer)
@@ -3871,16 +4425,542 @@ class TestSectionScore(unittest.TestCase):
         # ensure "parsed" is the right format
         self.assertEqual(1, len(parsed))
         self.assertTrue('1' in parsed)
-        self.assertEqual(1, len(parsed['1']))  # there is one <section>
-        self.assertEqual(1, len(parsed['1'][0]))  # there is one Measure
+        self.assertEqual(1, len(parsed['1']))  # one <measure> from one <section>
         meas = parsed['1'][0][0]
         self.assertIsInstance(meas, stream.Measure)
         self.assertEqual(1, meas.number)
         self.assertEqual(3, len(meas))  # a Voice, a Clef, a TimeSignature
-        self.assertIsInstance(meas[2], stream.Voice)  # check out the Voice and its Note
-        self.assertEqual(1, len(meas[2]))
-        self.assertIsInstance(meas[2][0], note.Note)
-        self.assertEqual('G4', meas[2][0].nameWithOctave)
-        self.assertIsInstance(meas[0], clef.TrebleClef)  # check out the Clef
-        self.assertIsInstance(meas[1], meter.TimeSignature)  # check out the TimeSignature
-        self.assertEqual('8/8', meas[1].ratioString)
+        # the order of these doesn't matter, but it may change, so this is easier to adjust
+        clefIndex = 0
+        timeSigIndex = 1
+        voiceIndex = 2
+        self.assertIsInstance(meas[voiceIndex], stream.Voice)  # check out the Voice and its Note
+        self.assertEqual(1, len(meas[voiceIndex]))
+        self.assertIsInstance(meas[voiceIndex][0], note.Note)
+        self.assertEqual('G4', meas[voiceIndex][0].nameWithOctave)
+        self.assertIsInstance(meas[clefIndex], clef.TrebleClef)  # check out the Clef
+        self.assertIsInstance(meas[timeSigIndex], meter.TimeSignature)  # check out the TimeSignature
+        self.assertEqual('8/8', meas[timeSigIndex].ratioString)
+
+    @mock.patch('music21.mei.base.measureFromElement')
+    @mock.patch('music21.mei.base.sectionFromElement')
+    @mock.patch('music21.mei.base.scoreDefFromElement')
+    @mock.patch('music21.mei.base.staffDefFromElement')
+    def testCoreUnit2(self, mockStaffDFE, mockScoreDFE, mockSectionFE, mockMeasureFE):
+        '''
+        sectionScoreCore(): everything basic, as called by sectionFromElement()
+            - no kwargs
+                - but the <measure> elements do have @n so those values should be used
+            - one of most things (<section>, <scoreDef>, and <staffDef>)
+            - two of <measure> (one in a <section>)
+            - things in a <section> are appended properly (different for <score> and <section>)
+
+        This test is roughly equivalent to testCoreUnit1() but with a <section> instead of a <score>.
+        Note that, because the <measure> *should* be processed here, this test is indeed more
+        complicated.
+
+        mocked:
+            - measureFromElement()
+            - sectionFromElement()
+            - scoreDefFromElement()
+            - staffDefFromElement()
+        '''
+        # setup the arguments
+        # NB: there's more MEI here than we need, but it's shared between unit & integration tests
+        elem = """<section xmlns="http://www.music-encoding.org/ns/mei">
+            <scoreDef meter.count="8" meter.unit="8"/>
+            <staffDef n="1" clef.shape="G" clef.line="2"/>
+            <measure n="400">
+                <staff n="1">
+                    <layer n="1">
+                        <note pname="E" oct="7" dur="1"/>
+                    </layer>
+                </staff>
+            </measure>
+            <section>
+                <measure n="92">
+                    <staff n="1">
+                        <layer n="1">
+                            <note pname="G" oct="4" dur="1"/>
+                        </layer>
+                    </staff>
+                </measure>
+            </section>
+        </section>"""
+        elem = ETree.fromstring(elem)
+        slurBundle = mock.MagicMock()
+        allPartNs = ['1']
+        # setup measureFromElement()
+        expMeas1 = mock.MagicMock(spec_set=stream.Stream)
+        mockMeasureFE.return_value = {'1': expMeas1}
+        # setup sectionFromElement()
+        expActiveMeter = mock.MagicMock(spec_set=meter.TimeSignature)
+        expMeasureNum = 1
+        expNMLeft = 'barline for the next Meausre'
+        expPart1 = [mock.MagicMock(spec_set=stream.Stream)]
+        mockSectionFE.return_value = ({'1': expPart1},
+                                      expActiveMeter, expNMLeft, expMeasureNum)
+        # setup scoreDefFromElement()
+        scoreDefActiveMeter = mock.MagicMock(spec_set=meter.TimeSignature)
+        mockScoreDFE.return_value = {'all-part objects': [scoreDefActiveMeter],
+                                     '1': {'whatever': '8/8'}}
+        # setup staffDefFromElement()
+        mockStaffDFE.return_value = {'whatever': 'treble clef'}
+        # prepare the "expected" return
+        expected = {'1': [expMeas1, expPart1[0]]}  # must be [0] b/c expPart1 would be list of Measure
+        expected = (expected, expActiveMeter, expNMLeft, expMeasureNum)
+
+        actual = base.sectionScoreCore(elem, allPartNs, slurBundle)
+
+        # ensure expected == actual
+        self.assertEqual(expected, actual)
+        # ensure measureFromElement()
+        mockMeasureFE.assert_called_once_with(mock.ANY, 1, allPartNs,
+                                              slurBundle=slurBundle,
+                                              activeMeter=scoreDefActiveMeter)
+        # ensure sectionFromElement()
+        mockSectionFE.assert_called_once_with(mock.ANY,
+                                              allPartNs,
+                                              activeMeter=scoreDefActiveMeter,
+                                              nextMeasureLeft=None,
+                                              backupMeasureNum=1,  # incremented automatically on finding a <measure>
+                                              slurBundle=slurBundle)
+        self.assertEqual('{}section'.format(_MEINS), mockSectionFE.call_args_list[0][0][0].tag)
+        # ensure scoreDefFromElement()
+        mockScoreDFE.assert_called_once_with(mock.ANY, slurBundle)
+        self.assertEqual('{}scoreDef'.format(_MEINS), mockScoreDFE.call_args_list[0][0][0].tag)
+        # ensure staffDefFromElement()
+        mockStaffDFE.assert_called_once_with(mock.ANY, slurBundle)
+        self.assertEqual('{}staffDef'.format(_MEINS), mockStaffDFE.call_args_list[0][0][0].tag)
+        # ensure the "inNextThing" numbers and mock.TimeSignature were put into the mocked Measure,
+        # and not into the mocked Part
+        self.assertEqual(3, expMeas1.insert.call_count)
+        self.assertEqual(0, expPart1[0].insert.call_count)
+        expMeas1.insert.assert_any_call(0.0, scoreDefActiveMeter)
+        expMeas1.insert.assert_any_call(0.0, '8/8')
+        expMeas1.insert.assert_any_call(0.0, 'treble clef')
+
+    def testCoreIntegration2(self):
+        '''
+        sectionScoreCore(): everything basic, as called by sectionFromElement()
+            - no kwargs
+                - but the <measure> elements do have @n so those values should be used
+            - one of most things (<section>, <scoreDef>, and <staffDef>)
+            - two of <measure> (one in a <section>)
+            - things in a <section> are appended properly (different for <score> and <section>)
+        '''
+        # setup the arguments
+        elem = """<section xmlns="http://www.music-encoding.org/ns/mei">
+            <scoreDef meter.count="8" meter.unit="8"/>
+            <staffDef n="1" clef.shape="G" clef.line="2"/>
+            <measure n="400">
+                <staff n="1">
+                    <layer n="1">
+                        <note pname="E" oct="7" dur="1"/>
+                    </layer>
+                </staff>
+            </measure>
+            <section>
+                <measure n="92">
+                    <staff n="1">
+                        <layer n="1">
+                            <note pname="G" oct="4" dur="1"/>
+                        </layer>
+                    </staff>
+                </measure>
+            </section>
+        </section>"""
+        elem = ETree.fromstring(elem)
+        slurBundle = spanner.SpannerBundle()
+        allPartNs = ['1']
+
+        parsed, activeMeter, nextMeasureLeft, backupMeasureNum = base.sectionScoreCore(elem, allPartNs, slurBundle)
+
+        # ensure simple returns are okay
+        self.assertEqual('8/8', activeMeter.ratioString)
+        self.assertIsNone(nextMeasureLeft)
+        self.assertEqual(2, backupMeasureNum)
+        # ensure "parsed" is the right format
+        self.assertEqual(1, len(parsed))
+        self.assertTrue('1' in parsed)
+        self.assertEqual(2, len(parsed['1']))  # one <measure> plus one <section> with one <measure> in it
+        # check the first Measure
+        meas = parsed['1'][0]
+        # the order of these doesn't matter, but it may change, so this is easier to adjust
+        clefIndex = 0
+        timeSigIndex = 1
+        voiceIndex = 2
+        self.assertIsInstance(meas, stream.Measure)
+        self.assertEqual(400, meas.number)
+        self.assertEqual(3, len(meas))  # a Voice, a Clef, a TimeSignature
+        self.assertIsInstance(meas[voiceIndex], stream.Voice)  # check out the Voice and its Note
+        self.assertEqual(1, len(meas[voiceIndex]))
+        self.assertIsInstance(meas[voiceIndex][0], note.Note)
+        self.assertEqual('E7', meas[voiceIndex][0].nameWithOctave)
+        self.assertIsInstance(meas[clefIndex], clef.TrebleClef)  # check out the Clef
+        self.assertIsInstance(meas[timeSigIndex], meter.TimeSignature)  # check out the TimeSignature
+        self.assertEqual('8/8', meas[timeSigIndex].ratioString)
+        # check the second Measure
+        meas = parsed['1'][1]
+        # the order of these doesn't matter, but it may change, so this is easier to adjust
+        clefIndex = 0
+        timeSigIndex = 1
+        voiceIndex = 2
+        self.assertIsInstance(meas, stream.Measure)
+        self.assertEqual(92, meas.number)
+        self.assertEqual(1, len(meas))  # a Voice
+        self.assertIsInstance(meas[0], stream.Voice)  # check out the Voice and its Note
+        self.assertEqual(1, len(meas[0]))
+        self.assertIsInstance(meas[0][0], note.Note)
+        self.assertEqual('G4', meas[0][0].nameWithOctave)
+
+    @mock.patch('music21.mei.base.measureFromElement')
+    @mock.patch('music21.mei.base.sectionFromElement')
+    @mock.patch('music21.mei.base.scoreDefFromElement')
+    @mock.patch('music21.mei.base.staffDefFromElement')
+    def testCoreUnit3(self, mockStaffDFE, mockScoreDFE, mockSectionFE, mockMeasureFE):
+        '''
+        sectionScoreCore(): everything basic, as called by sectionFromElement()
+            - all kwargs
+                - and the <measure> has no @n; it should use the backupNum
+                - activeMeter = a MagicMock (we expect this returned)
+                - nextMeasureLeft = 'next left measure' (expected in the Measure)
+                - backupMeasureNum = 900 (expected in the Measure)
+
+        mocked:
+            - measureFromElement()
+            - sectionFromElement()
+            - scoreDefFromElement()
+            - staffDefFromElement()
+        '''
+        # setup the arguments
+        # NB: there's more MEI here than we need, but it's shared between unit & integration tests
+        elem = """<section xmlns="http://www.music-encoding.org/ns/mei">
+            <measure>
+                <staff n="1">
+                    <layer n="1">
+                        <note pname="G" oct="4" dur="1"/>
+                    </layer>
+                </staff>
+            </measure>
+        </section>"""
+        elem = ETree.fromstring(elem)
+        slurBundle = mock.MagicMock()
+        allPartNs = ['1']
+        activeMeter = mock.MagicMock(spec_set=meter.TimeSignature)
+        nextMeasureLeft = 'next left measure'
+        backupMeasureNum = 900
+        # setup measureFromElement()
+        expMeas1 = mock.MagicMock(spect_set=stream.Stream)
+        mockMeasureFE.return_value = {'1': expMeas1}
+        # prepare the "expected" return
+        expActiveMeter = activeMeter
+        expNMLeft = None
+        expMeasureNum = backupMeasureNum + 1
+        expected = {'1': [expMeas1]}
+        expected = (expected, expActiveMeter, expNMLeft, expMeasureNum)
+
+        actual = base.sectionScoreCore(elem, allPartNs, slurBundle, activeMeter=activeMeter,
+                                       nextMeasureLeft=nextMeasureLeft, backupMeasureNum=backupMeasureNum)
+
+        # ensure expected == actual
+        self.assertEqual(expected, actual)
+        # ensure measureFromElement()
+        mockMeasureFE.assert_called_once_with(mock.ANY,
+                                              backupMeasureNum + 1,
+                                              allPartNs,
+                                              activeMeter=activeMeter,
+                                              slurBundle=slurBundle)
+        # ensure sectionFromElement()
+        self.assertEqual(0, mockSectionFE.call_count)
+        # ensure scoreDefFromElement()
+        self.assertEqual(0, mockScoreDFE.call_count)
+        # ensure staffDefFromElement()
+        self.assertEqual(0, mockStaffDFE.call_count)
+        # ensure the "nextMeasureLeft" was actually put onto the Measure
+        self.assertEqual(nextMeasureLeft, actual[0]['1'][0].leftBarline)
+
+    def testCoreIntegration3(self):
+        '''
+        sectionScoreCore(): everything basic, as called by sectionFromElement()
+            - all kwargs
+                - and the <measure> has no @n; it should use the backupNum
+                - activeMeter = a MagicMock (we expect this returned)
+                - nextMeasureLeft = 'next left measure' (expected in the Measure)
+                - backupMeasureNum = 900 (expected in the Measure)
+        '''
+        # setup the arguments
+        elem = """<section xmlns="http://www.music-encoding.org/ns/mei">
+            <measure>
+                <staff n="1">
+                    <layer n="1">
+                        <note pname="G" oct="4" dur="1"/>
+                    </layer>
+                </staff>
+            </measure>
+        </section>"""
+        elem = ETree.fromstring(elem)
+        slurBundle = spanner.SpannerBundle()
+        allPartNs = ['1']
+        activeMeter = meter.TimeSignature('8/8')
+        nextMeasureLeft = bar.Repeat('start')
+        backupMeasureNum = 900
+
+        parsed, activeMeter, nextMeasureLeft, backupMeasureNum = base.sectionScoreCore(elem,
+                                                                                       allPartNs,
+                                                                                       slurBundle,
+                                                                                       activeMeter=activeMeter,
+                                                                                       nextMeasureLeft=nextMeasureLeft,
+                                                                                       backupMeasureNum=backupMeasureNum)
+
+        # ensure simple returns are okay
+        self.assertEqual('8/8', activeMeter.ratioString)
+        self.assertIsNone(nextMeasureLeft)
+        self.assertEqual(901, backupMeasureNum)
+        # ensure "parsed" is the right format
+        self.assertEqual(1, len(parsed))
+        self.assertTrue('1' in parsed)
+        self.assertEqual(1, len(parsed['1']))  # one <measure>
+        # check the Measure
+        meas = parsed['1'][0]
+        # the order of these doesn't matter, but it may change, so this is easier to adjust
+        repeatIndex = 0
+        voiceIndex = 1
+        self.assertIsInstance(meas, stream.Measure)
+        self.assertEqual(901, meas.number)
+        self.assertEqual(2, len(meas))  # a Voice, a Repeat
+        self.assertIsInstance(meas[voiceIndex], stream.Voice)  # check out the Voice and its Note
+        self.assertEqual(1, len(meas[voiceIndex]))
+        self.assertIsInstance(meas[voiceIndex][0], note.Note)
+        self.assertEqual('G4', meas[voiceIndex][0].nameWithOctave)
+        self.assertIsInstance(meas[repeatIndex], bar.Repeat)  # check the Repeat barline
+        self.assertEqual('start', meas[repeatIndex].direction)
+        self.assertIs(meas[repeatIndex], meas.leftBarline)
+
+    @mock.patch('music21.mei.base.environLocal')
+    @mock.patch('music21.mei.base.measureFromElement')
+    @mock.patch('music21.mei.base.sectionFromElement')
+    @mock.patch('music21.mei.base.scoreDefFromElement')
+    @mock.patch('music21.mei.base.staffDefFromElement')
+    def testCoreUnit4(self, mockStaffDFE, mockScoreDFE, mockSectionFE, mockMeasureFE, mockEnviron):
+        '''
+        sectionScoreCore(): as called by sectionFromElement()
+            - there's an "rptboth" barline, so we have to return a "nextMeasureLeft"
+            - the <staffDef> gives a TimeSignature, so we have to change "activeMeter" (and return)
+            - there's a <staffDef> without @n attribute, so we have to warn the user about it
+            - there's an unknown element, so we have to debug-warn the user
+
+        mocked:
+            - measureFromElement()
+            - sectionFromElement()
+            - scoreDefFromElement()
+            - staffDefFromElement()
+            - environLocal
+        '''
+        # setup the arguments
+        # NB: there's more MEI here than we need, but it's shared between unit & integration tests
+        elem = """<section xmlns="http://www.music-encoding.org/ns/mei">
+            <bogus>5</bogus>  <!-- this will be ignored -->
+            <staffDef n="1" meter.count="6" meter.unit="8"/>
+            <staffDef key.accid="3s" key.mode="minor"/>  <!-- this will be ignored -->
+            <measure n="42" right="rptboth">
+                <staff n="1"><layer n="1"><note pname="G" oct="4" dur="1"/></layer></staff>
+            </measure>
+        </section>"""
+        elem = ETree.fromstring(elem)
+        slurBundle = mock.MagicMock()
+        allPartNs = ['1']
+        # setup measureFromElement()
+        # return a Mock with the right measure number
+        expMeas1 = mock.MagicMock(spec_set=stream.Stream)
+        expRepeat = mock.MagicMock(spec_set=bar.Repeat)
+        mockMeasureFE.return_value = {'1': expMeas1, 'next @left': expRepeat}
+        # setup staffDefFromElement()
+        expMeter = mock.MagicMock(spec_set=meter.TimeSignature)
+        mockStaffDFE.return_value = {'meter': expMeter}
+        # prepare the "expected" return
+        expActiveMeter = expMeter
+        expNMLeft = expRepeat
+        expMeasureNum = 1
+        expected = {'1': [expMeas1]}
+        expected = (expected, expActiveMeter, expNMLeft, expMeasureNum)
+        # prepare expected environLocal message
+        expPrintDebug = base._UNPROCESSED_SUBELEMENT.format('{}bogus'.format(_MEINS),
+                                                            '{}section'.format(_MEINS))
+        expWarn = base._UNIMPLEMENTED_IMPORT.format('<staffDef>', '@n')
+
+        actual = base.sectionScoreCore(elem, allPartNs, slurBundle)
+
+        # ensure expected == actual
+        self.assertEqual(expected, actual)
+        # ensure environLocal
+        mockEnviron.printDebug.assert_called_once_with(expPrintDebug)
+        mockEnviron.warn.assert_called_once_with(expWarn)
+        # ensure measureFromElement()
+        mockMeasureFE.assert_called_once_with(mock.ANY,
+                                              1,
+                                              allPartNs,
+                                              activeMeter=expActiveMeter,
+                                              slurBundle=slurBundle)
+        # ensure sectionFromElement()
+        self.assertEqual(0, mockSectionFE.call_count)
+        # ensure scoreDefFromElement()
+        self.assertEqual(0, mockScoreDFE.call_count)
+        # ensure staffDefFromElement()
+        mockStaffDFE.assert_called_once_with(mock.ANY, slurBundle)
+
+    def testCoreIntegration4(self):
+        '''
+        sectionScoreCore(): as called by sectionFromElement()
+            - there's an "rptboth" barline, so we have to return a "nextMeasureLeft"
+            - the <staffDef> gives a TimeSignature, so we have to change "activeMeter" (and return)
+            - there's a <staffDef> without @n attribute, so we have to warn the user about it
+            - there's an unknown element, so we have to debug-warn the user
+        '''
+        # setup the arguments
+        elem = """<section xmlns="http://www.music-encoding.org/ns/mei">
+            <bogus>5</bogus>  <!-- this will be ignored -->
+            <staffDef n="1" meter.count="6" meter.unit="8"/>
+            <staffDef key.accid="3s" key.mode="minor"/>  <!-- this will be ignored -->
+            <measure n="42" right="rptboth">
+                <staff n="1"><layer n="1"><note pname="G" oct="4" dur="1"/></layer></staff>
+            </measure>
+        </section>"""
+        elem = ETree.fromstring(elem)
+        slurBundle = spanner.SpannerBundle()
+        allPartNs = ['1']
+
+        parsed, activeMeter, nextMeasureLeft, backupMeasureNum = base.sectionScoreCore(elem,
+                                                                                       allPartNs,
+                                                                                       slurBundle)
+
+        # ensure simple returns are okay
+        self.assertEqual('6/8', activeMeter.ratioString)
+        self.assertIsInstance(nextMeasureLeft, bar.Repeat)
+        self.assertEqual(1, backupMeasureNum)
+        # ensure "parsed" is the right format
+        self.assertEqual(1, len(parsed))
+        self.assertTrue('1' in parsed)
+        self.assertEqual(1, len(parsed['1']))  # one <measure>
+        # check the Measure
+        meas = parsed['1'][0]
+        # the order of these doesn't matter, but it may change, so this is easier to adjust
+        timeSigIndex = 0
+        voiceIndex = 1
+        repeatIndex = 2
+        self.assertIsInstance(meas, stream.Measure)
+        self.assertEqual(42, meas.number)
+        self.assertEqual(3, len(meas))  # a Voice, a TimeSignature, a Repeat
+        self.assertIsInstance(meas[voiceIndex], stream.Voice)  # check out the Voice and its Note
+        self.assertEqual(1, len(meas[voiceIndex]))
+        self.assertIsInstance(meas[voiceIndex][0], note.Note)
+        self.assertEqual('G4', meas[voiceIndex][0].nameWithOctave)
+        self.assertIsInstance(meas[timeSigIndex], meter.TimeSignature)  # check the TimeSignature
+        self.assertEqual('6/8', meas[timeSigIndex].ratioString)
+        self.assertIsInstance(meas[repeatIndex], bar.Repeat)  # check the Repeat barline
+        self.assertEqual('end', meas[repeatIndex].direction)
+        self.assertIs(meas[repeatIndex], meas.rightBarline)
+
+    def testCoreIntegration5(self):
+        '''
+        sectionScoreCore(): as called by scoreFromElement()
+
+        With a preposterously embedded set of <section> elements, we have to ensure that
+        staff-related metadata are cascaded properly into the <measure>
+
+        NOTE there is no unit test corresponding to this integration test---this is really all about
+             the cumulative effect
+        '''
+        # setup the arguments
+        elem = """<score xmlns="http://www.music-encoding.org/ns/mei">
+            <scoreDef key.sig="1f" key.mode="minor">
+                <staffGrp>
+                    <staffDef n="1" clef.line="4" clef.shape="F"/>
+                </staffGrp>
+            </scoreDef>
+            <staffDef n="1" meter.count="6" meter.unit="8"/>
+            <section>
+                <staffDef n="1" label="tuba"/>
+                <section>
+                    <measure n="42">
+                        <staff n="1"><layer n="1"><note pname="C" oct="1" dur="1"/></layer></staff>
+                    </measure>
+                </section>
+            </section>
+            <section>
+                <measure n="402">
+                    <staff n="1"><layer n="1"><note pname="C" oct="2" dur="1"/></layer></staff>
+                </measure>
+            </section>
+        </score>"""
+        elem = ETree.fromstring(elem)
+        slurBundle = spanner.SpannerBundle()
+        allPartNs = ['1']
+
+        parsed, activeMeter, nextMeasureLeft, backupMeasureNum = base.sectionScoreCore(elem,
+                                                                                       allPartNs,
+                                                                                       slurBundle)
+
+        # ensure simple returns are okay
+        self.assertEqual('6/8', activeMeter.ratioString)
+        self.assertIsNone(nextMeasureLeft)
+        self.assertEqual(2, backupMeasureNum)
+        # ensure "parsed" is the right format
+        self.assertEqual(1, len(parsed))
+        self.assertTrue('1' in parsed)
+        self.assertEqual(2, len(parsed['1']))  # two <measure>s, each in a <section>
+        # check the first Measure
+        meas = parsed['1'][0][0]
+        # the order of these doesn't matter, but it may change, so this is easier to adjust
+        instrIndex = 0
+        clefIndex = 1
+        keysigIndex = 2
+        timesigIndex = 3
+        voiceIndex = 4
+        self.assertIsInstance(meas, stream.Measure)
+        self.assertEqual(42, meas.number)
+        self.assertEqual(5, len(meas))  # an Instrument, a Voice, a Clef, a KeySignature, a TimeSignature
+        self.assertIsInstance(meas[instrIndex], instrument.Tuba)  # check out the Instrument
+        self.assertIsInstance(meas[voiceIndex], stream.Voice)  # check out the Voice and its Note
+        self.assertEqual(1, len(meas[voiceIndex]))
+        self.assertIsInstance(meas[voiceIndex][0], note.Note)
+        self.assertEqual('C1', meas[voiceIndex][0].nameWithOctave)
+        self.assertIsInstance(meas[clefIndex], clef.BassClef)  # check out the Clef
+        self.assertIsInstance(meas[keysigIndex], key.KeySignature)  # check out the KeySignature
+        self.assertEqual(-1, meas[keysigIndex].sharps)
+        self.assertEqual('minor', meas[keysigIndex].mode)
+        self.assertIsInstance(meas[timesigIndex], meter.TimeSignature)  # check the TimeSignature
+        self.assertEqual('6/8', meas[timesigIndex].ratioString)
+        # check the second Measure
+        meas = parsed['1'][1][0]
+        self.assertIsInstance(meas, stream.Measure)
+        self.assertEqual(402, meas.number)
+        self.assertEqual(1, len(meas))  # a Voice
+        self.assertIsInstance(meas[0], stream.Voice)  # check out the Voice and its Note
+        self.assertEqual(1, len(meas[0]))
+        self.assertIsInstance(meas[0][0], note.Note)
+        self.assertEqual('C2', meas[0][0].nameWithOctave)
+
+
+
+#------------------------------------------------------------------------------
+class TestBarLineFromElement(unittest.TestCase):
+    '''Tests for barLineFromElement()'''
+
+    def testBarLine1(self):
+        '''
+        barLineFromElement(): <barLine rend="dbl"/>
+        '''
+        elem = ETree.Element('barLine', attrib={'rend': 'dbl'})
+        actual = base.barLineFromElement(elem)
+        self.assertIsInstance(actual, bar.Barline)
+        self.assertEqual('double', actual.style)
+
+    def testBarLine2(self):
+        '''
+        barLineFromElement(): <barLine/>
+        '''
+        elem = ETree.Element('barLine')
+        actual = base.barLineFromElement(elem)
+        self.assertIsInstance(actual, bar.Barline)
+        self.assertEqual('regular', actual.style)

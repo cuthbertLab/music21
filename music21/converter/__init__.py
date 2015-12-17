@@ -64,13 +64,6 @@ from music21 import environment
 _MOD = 'converter/__init__.py'
 environLocal = environment.Environment(_MOD)
 
-# use the faster library if possible (won't be possible on Jython, PyPy, etc.)
-try:
-    import xml.etree.cElementTree as ETree
-except ImportError:
-    import xml.etree.ElementTree as ETree
-
-
 
 #-------------------------------------------------------------------------------
 class ArchiveManagerException(exceptions21.Music21Exception):
