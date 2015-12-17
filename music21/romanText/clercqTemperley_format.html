@@ -1,0 +1,344 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr" id="html-main">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>A Corpus Study of Rock Music</title>
+<link rel="StyleSheet" href="rock_style.css" type="text/css" media="screen">
+</head>
+
+<body class="main">
+
+<div class="nav_bar">
+<h1> A Corpus Study of Rock Music </h1>
+
+	<div class="nav_block">
+	<span class="buffer">&nbsp;</span>
+	<a class="nav" href="index.html">Overview</a>
+	<span class="current">Harmonic Analyses</span>
+	<a class="nav" href="melodic_transcriptions.html">Melodic Transcriptions</a>
+	<a class="nav" href="timing_data.html">Timing Data</a>
+	<a class="nav" href="programs.html">Programs</a>
+	<a class="nav" href="2011_paper.html">2011 Paper</a>
+	</div>
+
+</div>
+
+<div class="content">
+
+<h3>Harmonic Analyses</h3>
+
+<p>
+ Each of us (TdC and DT) created a text file with a harmonic analysis of every song in the RS 200.  The songs are analyzed in
+  Roman numeral notation, showing the relationship of each chord to
+  the current key.  We used a recursive notation (described in detail below) that allows a
+  repeated pattern or section to be encoded as a single symbol.  We can "expand" such a reduced analysis into a list of chords by using a <a href="programs.html">computer program</a> that we wrote for this
+  specific purpose.  Our reduced analysis contains some information (via the variable names) as to the form of the song; these form labels are absent in the expanded version.
+
+<p>We did
+the analyses on our own, by ear, without consulting each other or any
+printed sources (e.g., lead sheets). When we were done, we compared our
+analyses. Any differences in meter or barlines were resolved (in this
+respect, the two sets of analyses are identical).  Other differences
+were mostly not resolved. When a difference was clearly due to an
+error on one of our parts, we corrected it; but differences that
+reflected a real difference of opinion about the harmony (or key or
+form) were left standing. For more detail on our analytical process,
+see our <a href="2011_paper.html">2011 <i>Popular Music</i></a> article.
+
+<p>Our analyses of the RS 200 can be downloaded here in a few formats.  (The original author is indicated via a "dt" or "tdc" label at the end of the filename.)
+
+<ul>
+<li><a href="harmonic_analyses/rs200_harmony/">Individual versions of our harmonic analyses</a></li>
+<li><a href="harmonic_analyses/rs200_harmony.zip">A zipped file containing all our harmonic analyses (raw)</a></li>
+<li><a href="harmonic_analyses/rs200_harmony_exp.zip">A zipped file containing all our harmonic analyses (expanded)</a></li>
+<li><a href="harmonic_analyses/rs200_harmony_clt.zip">A zipped file containing all our harmonic analyses (as timed chord lists)</a></li>
+</ul>
+
+<p>An explanation of the "expanded" format can be found below in the
+  overview of our notation.  The "timed chord list" format provides
+  absolute times (in seconds) for each chord; a full description of this format can be found on our 
+<a href="programs.html">programs</a> page
+(under <a href="programs.html#P3">add-timings.pl</a>). For unexpanded
+harmonic analysis files, we use the suffix <i>.har</i>; for timed chord
+lists, we use <i>.clt</i>.
+
+<p>For those researchers familiar with the <a href="http://www.python.org">Python</a> programming language and the 
+<a href="http://web.mit.edu/music21/">music21</a> toolkit for computer-aided musicology, note that MIT student Beth Hadley has written a
+<a href="http://web.mit.edu/music21/doc/html/moduleRomanTextClercqTemperley.html">parser</a> for our "unexpanded" harmonic analysis format.
+
+<hr>
+
+<h3>The Harmonic Analysis Notational System</h3>
+
+
+<blockquote>
+	<ol class="letter_list">
+	<li><a href="#3.1A">Overview</a></li>
+	<li><a href="#3.1B">Basic Syntax</a></li>
+	<li><a href="#3.1C">Chord Symbols</a></li>
+	<li><a href="#3.1D">Special Symbols</a></li>
+	<li><a href="#3.1E">Measures and Dots</a></li>
+	</ol>
+</blockquote>
+
+
+<p><a id="3.1A" class="internal_nav"><b>A. Overview</a></b>
+
+<p>Our analyses use a recursive notation: the analysis of a section
+may be defined with a single symbol, and that symbol may then be used
+in a higher-level expression. For example, an analysis (for a
+  hypothetical song) might look like
+this:
+
+<pre>
+VP: I IV |
+Vr: $VP $VP I ii | V |
+Ch: I V | vi IV |
+S: [C] $Vr $Ch $Vr $Ch $Ch I |
+</pre>
+
+<p>"VP" is a short (one-measure) harmonic progression, consisting of
+  the chords I and IV; "Vr" (verse) contains two repetitions of VP,
+  and some other chords; "Ch" (chorus) likewise contains a series of
+  chords; and "S" (the entire song) contains a pattern of alternating
+  verses and choruses, ending with a I chord. "[C]" indicates a key of C.
+
+<p>The program <a href="programs.html#P1"><i>expand6</i></a> (which we call the expander) takes such a reduced analysis and expands it
+like this (for the reduced analysis above):
+
+<pre>
+[C] I IV | I IV | I ii | V | I V | vi IV | I IV | I IV | I ii | V | I
+V | vi IV | I V | vi IV | I |
+</pre>
+
+
+<p>We refer to this format as the "expanded" version of the harmonic
+analyses. This is the format used in the expanded harmonic analysis
+files mentioned above.
+
+<p>The expander can also output the above representation as a list of
+  chords, on a timeline defined by measures. The following shows the
+  "chord list" for the beginning of the song defined above. (The
+  integers at right are explained in the explanation of <a href="programs.html#P1"><i>expand6</i></a> on our <a href="programs.html">programs</a> page.)
+
+<p>
+<pre>
+ 0.00  0.50   I    0   1   0   0
+ 0.50  1.00   IV   5   4   0   5
+ 1.00  1.50   I    0   1   0   0
+ 1.50  2.00   IV   5   4   0   5
+(etc.)
+</pre>
+
+<p>We also provide <a href="programs.html">tools for extracting aggregate data</a> from such a
+  list.
+
+<p>In this documentation, we explain the syntax we use, how the
+expansion works, and the tools for extracting aggregate data. 
+
+<p><a id="3.1B" class="internal_nav"><b>B. Basic Syntax</a></b>
+
+<p>An analysis file is a text file consisting of a series of <i>rules</i>, one
+on each line. 
+
+<p>A rule consists of a left-hand-side (LHS) and a right-hand-side (RHS).
+The LHS consists of a string, followed by a colon. (Unless otherwise
+indicated, a "string" here implies any series of letters, numbers, or
+punctuation symbols, except for a few symbols with special meanings,
+described below.)
+
+<p>The RHS is a series of <i>nonterminals</i>, <i>defined measures</i>, and <i>key/meter 
+symbols</i>. A nonterminal is a string preceded by "$"; each nonterminal 
+in an RHS must be defined somewhere else as the LHS of a rule (here 
+the $ must be omitted). A "defined measure" is a series of one or more
+<i>terminals</i> (chord symbols or special symbols) followed by a
+barline "|". So in the third rule of the hypothetical song above
+(restated here)
+
+<pre>
+Vr: $VP $VP I ii | V |
+</pre>
+
+<p>"I ii |" constitutes one defined measure; "V |" constitutes another.
+The following rule is invalid
+
+<pre>
+Vr: | $VP $VP I vi | V 
+</pre>
+
+<p>for two reasons: 1) it starts with a barline (which is not a defined
+measure or part of one), and 2) it ends with a harmonic symbol not
+followed by a barline (which is not a defined measure or part of one).
+
+<p>One exception is that, following a defined measure, another defined
+measure may be indicated with a single barline (meaning that the
+previously stated chord continues through the entire measure). So 
+this is a valid rule:
+
+<pre>
+Vr: $VP $VP I vi | V | |
+</pre>
+
+<p>A key/meter symbol is surrounded by square brackets and indicates 
+key or meter; these will be discussed further below. 
+
+<p>The top level symbol (representing the entire song) is assumed
+to be "S". The expander searches for the rule with S as the LHS, and
+then outputs its RHS, recursively expanding any nonterminals. 
+
+<p>Note that the names of nonterminals are arbitrary; they have no
+  meaning for any of the programs described below. However, we try to
+use meaningful symbols such as Vr for verse and Ch for chorus; in this
+  way, the definition of S becomes a kind of formal analysis of the song.
+
+<p><a id="3.1C" class="internal_nav"><b>C. Chord Symbols</a></b>
+
+<p>Each chord symbol is assumed to have this syntax (using "regular
+  expression" notation):
+
+<p>(RN).*(/RN)?
+
+<p>where .* may not contain a slash. RN is a Roman numeral, which must be
+one of the following: I #I bII II #II bIII III IV #IV bV V #V bVI VI
+  #VI bVII VII (or the lower-case versions of these). (We assume 
+upper-case for major triads, lower-case for minor triads.)
+
+<p>In other words: A harmonic label must begin with a Roman
+numeral symbol. After that, anything can happen (as long as it doesn't
+contain a slash); this is to allow all kinds of additional symbols
+such as "o", "7", "63", "b9", etc. After that, there may be an optional
+"/" plus Roman numeral to indicate an applied chord, e.g. "V7/IV".
+
+<p>The portion of the chord symbol after the first Roman numeral
+  (before the slash, if any) can be used to indicate what might be
+  called "subcategorical" information about harmony, such as chord
+  quality, inversion, and extensions. For the most part, our tools for
+  aggregate data extraction look only at root and key, not at
+  subcategorical information. And we did not attempt to fully
+  standardize our treatment of subcategorical information in our
+  analyses. However, we did agree on certain conventions, most of
+  which are quite standard:
+
+<blockquote>
+<p>Inversions: 6 = first inversion triad, 64 = second inversion triad;
+  7 = root-position seventh chord, 65 = first inversion seventh chord,
+  43 = second inversion seventh chord, 42 = third inversion seventh
+  chord
+
+<p>Triads: Upper-case for major triads, lower-case for minor triads,
+lower-case plus "o" for diminished, upper-case plus "a" for augmented.
+
+<p>Seventh chords: capital Roman numeral plus 7 (e.g. IV7) is a major
+  seventh, lower-case Roman numeral plus 7 (e.g. iv7) is a minor
+  seventh, capital RN plus d7 (e.g. Id7) is a dominant seventh,
+  lower-case RN plus h7 is a half-diminished seventh, lower-case RN
+  plus x7 is a fully diminished seventh. The exception is V7, which
+  indicates a dominant seventh chord. Inversions may be used with any
+  of these: for example, iih65 is a first-inversion half-diminished ii
+  chord.
+
+<p>Miscellaneous: "s" indicates a suspended note: for example, "Vs4"
+indicates a triad with a suspended fourth (and no third). V11
+indicates a IV triad over 5 in the bass. Other symbols may also be
+used occasionally.
+
+</blockquote>
+
+<p><a id="3.1D" class="internal_nav"><b>D. Special Symbols</a></b>
+
+<p>A few symbols have special meanings.
+
+<p>The asterisk is used to represent repetitions of a nonterminal; for
+  example, "$Ch*3" means Ch three times in a row. This notation may only be
+  used with nonterminals and barlines (e.g. "|*3").
+
+<p>Strings surrounded by square brackets are key/meter symbols.  Keys
+must be pitch names such as C or C#. (Major/minor distinctions are not
+recognized. For black-note keys, either of the two common spellings
+may be used, e.g. G# or Ab.) The time signature string must be N/D,
+where N is an integer 1-12 and D is 2, 4, 8, or 16.  The exception is the symbol [0], 
+which refers to a span of music without any clear meter.  (Multiple measures of [0] meter
+are a convenience used to indicate measure-sized divisions in a general way.)
+The S statement
+must start with a key symbol; a time signature symbol is optional (if
+no time signature is stated, 4/4 is assumed). Key and time signature
+statements may also be inserted in other RHS expressions (at the
+beginning or in the middle) to indicate changes of time and
+meter. (Time signature symbols may only occur at the beginning of a
+measure.) Key/meter symbols stated in a rule apply recursively to all
+descendant nonterminals, but may be overridden by a symbol stated in a
+descendant rule; at the end of the descendant span, the key/meter
+reverts to that stated in the parent rule.
+
+<p>'.' indicates the continuation of the previous chord.  See section E
+below for explanation. This symbol may not be used at the beginning
+of an RHS.
+
+<p>'R' means a segment of "rest" that seems to have no harmony. This may
+occur at the beginning of the song (e.g. if there is an intro with
+just drums) or elsewhere. (In the chord-list output, R's are
+ignored; the previous chord is assumed to continue over them. However,
+R's are recognized as taking time at the beginning of the piece,
+e.g. if the analysis starts "R | I |" then the first chord statement is
+assumed to start at 1.0.)
+
+<p>'%' means that everything afterwards on that line is a comment. 
+('%' need not be at the beginning of a line.)
+
+<p>To summarize, the following are the symbols with special meanings:
+
+<blockquote>
+<p>':' must be used after the LHS of a rule, nowhere else.
+<p>'%' means that everything afterwards on that line is a comment.
+<p>'*' may only be used immediately following a nonterminal or
+  barline, and must be immediately followed by an integer.
+<p>'$' must be used at the beginning of a string in an RHS expression that is defined 
+elsewhere; it may not be used anywhere else.
+<p>'[' and ']' may be used around a key/meter symbol, nowhere else.
+<p>'.' (as a complete string) indicates the continuation of the previous chord,
+and may not be used at the beginning of an RHS.
+<p>'R' means rest and may be used anywhere that a chord symbol may be used.
+</blockquote>
+
+<p><a id="3.1E" class="internal_nav"><b>E. Measures and Dots</a></b>
+
+<p>The chords stated in a defined measure are assumed to partition the measure evenly.
+So this 
+
+<pre>
+I vi IV V |
+</pre>
+
+<p>indicates I in the first quarter of the measure, vi on the second,
+IV on the third and V on the fourth. (There is currently no check to
+ensure that the number of divisons of the measure makes sense given
+the time signature.)
+
+<p>For uneven divisions, the dot may be used, e.g.
+
+<pre>
+I . IV V |
+</pre>
+
+<p>This implies that the I chord takes up the first half of the measure.
+
+<p>A dot has the same meaning as simply repeating the previous
+symbol. This may be done anywhere, even when it is redundant (except
+at the beginning of the RHS). So the following are all legal and
+equivalent:
+
+<pre>
+I | |
+I | . | 
+I I . . | . I . I |
+</pre>
+
+<hr>
+<br><br><br>
+
+</div>
+
+</body>
+</html>
+

@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2010, 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2010, 2012, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
@@ -16,8 +16,11 @@ conceptual idea of tied notes.  They can be start or stop ties.
 '''
 
 import unittest
-
+from music21 import exceptions21
 from music21.common import SlottedObject
+
+class TieException(exceptions21.Music21Exception):
+    pass
 
 #-------------------------------------------------------------------------------
 
@@ -26,18 +29,14 @@ class Tie(SlottedObject):
     Object added to notes that are tied to other notes. The `type` value is one
     of start, stop, or continue.
 
-    ::
+    >>> note1 = note.Note()
+    >>> note1.tie = tie.Tie("start") # start, stop, or continue
+    >>> note1.tie.style = "normal" # default; could also be "dotted" or "dashed" or "hidden"
+    >>> note1.tie.type
+    'start'
 
-        >>> note1 = note.Note()
-        >>> note1.tie = tie.Tie("start") # start, stop, or continue
-        >>> note1.tie.style = "normal" # default; could also be "dotted" or "dashed" or "hidden"
-        >>> note1.tie.type
-        'start'
-
-    ::
-
-        >>> note1.tie
-        <music21.tie.Tie start>
+    >>> note1.tie
+    <music21.tie.Tie start>
 
     Differences from MusicXML:
        notes do not need to know if they are tied from a
@@ -64,9 +63,14 @@ class Tie(SlottedObject):
         )
 
     ### INITIALIZER ###
-
+    # pylint: disable=redefined-builtin
     def __init__(self, type='start'): #@ReservedAssignment
         #music21.Music21Object.__init__(self)
+        if type not in ('start', 'stop', 'continue'):
+            raise TieException("Type must be one of 'start', 'stop', or 'continue', not %s" % type)
+        # naming this "type" was a mistake, because cannot create a property of this name.
+        
+        
         self.type = type
         self.style = "normal"
 
@@ -74,28 +78,19 @@ class Tie(SlottedObject):
 
     def __eq__(self, other):
         '''
-        Equality. Based on attributes (such as pitch, accidental, duration,
-        articulations, and ornaments) that are  not dependent on the wider
-        context of a note (such as offset, beams, stem direction).
+        Equality. Based entirely on Tie.type.
 
-        ::
+        >>> t1 = tie.Tie('start')
+        >>> t2 = tie.Tie('start')
+        >>> t3 = tie.Tie('stop')
+        >>> t1 == t2
+        True
 
-            >>> t1 = tie.Tie('start')
-            >>> t2 = tie.Tie('start')
-            >>> t3 = tie.Tie('end')
-            >>> t1 == t2
-            True
+        >>> t2 == t3, t3 == t1
+        (False, False)
 
-        ::
-
-            >>> t2 == t3, t3 == t1
-            (False, False)
-
-        ::
-
-            >>> t2 == None
-            False
-
+        >>> t2 == None
+        False
         '''
         if other is None or not isinstance(other, Tie):
             return False
@@ -108,7 +103,7 @@ class Tie(SlottedObject):
         Tests for object inequality. Needed for pitch comparisons.
 
         >>> a = tie.Tie('start')
-        >>> b = tie.Tie('end')
+        >>> b = tie.Tie('stop')
         >>> a != b
         True
         '''

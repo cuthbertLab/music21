@@ -5,19 +5,16 @@
 #
 # Authors:      Beth Hadley
 #
-# Copyright:    (c) 2011 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2011 The music21 Project
+# License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
 '''
 A Sample mrjob. This mrjob is designed to extract all 91 features (jsymbolic and native)
 from every corpus file (1,200 scores). This is a work in progress =)
 '''
-
-
 from mrjob.job import MRJob
 
-import music21
 from music21.demos.bhadley.mrjobaws import awsutility
 from music21.features import base
 

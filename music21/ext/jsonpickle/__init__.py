@@ -15,23 +15,22 @@ Additionally, it can reconstitute the object back into Python.
 The object must be accessible globally via a module and must
 inherit from object (AKA new-style classes).
 
-Create an object.
+Create an object::
 
-    >>> from jsonpickle._samples import Thing
-    >>> obj = Thing('A String')
-    >>> obj.name
-    'A String'
+    class Thing(object):
+        def __init__(self, name):
+            self.name = name
 
-Use jsonpickle to transform the object into a JSON string.
+    obj = Thing('Awesome')
 
-    >>> import jsonpickle
-    >>> pickled = jsonpickle.encode(obj)
+Use jsonpickle to transform the object into a JSON string::
 
-Use jsonpickle to recreate a Python object from a JSON string
+    import jsonpickle
+    frozen = jsonpickle.encode(obj)
 
-    >>> unpickled = jsonpickle.decode(pickled)
-    >>> print(unpickled.name)
-    A String
+Use jsonpickle to recreate a Python object from a JSON string::
+
+    thawed = jsonpickle.decode(frozen)
 
 .. warning::
 
@@ -41,35 +40,28 @@ Use jsonpickle to recreate a Python object from a JSON string
 The new object has the same type and data, but essentially is now a copy of
 the original.
 
-    >>> obj is unpickled
-    False
-    >>> obj.name == unpickled.name
-    True
-    >>> type(obj) == type(unpickled)
-    True
+.. code-block:: python
+
+    assert obj.name == thawed.name
 
 If you will never need to load (regenerate the Python class from JSON), you can
 pass in the keyword unpicklable=False to prevent extra information from being
-added to JSON.
+added to JSON::
 
-    >>> oneway = jsonpickle.encode(obj, unpicklable=False)
-    >>> result = jsonpickle.decode(oneway)
-    >>> print(result['name'])
-    A String
-
-    >>> print(result['child'])
-    None
-
+    oneway = jsonpickle.encode(obj, unpicklable=False)
+    result = jsonpickle.decode(oneway)
+    assert obj.name == result['name'] == 'Awesome'
 
 """
 import sys, os
 from music21 import common
 sys.path.append(common.getSourceFilePath() + os.path.sep + 'ext')
 
-from jsonpickle import pickler # @UnresolvedImport
-from jsonpickle import unpickler # @UnresolvedImport
-from jsonpickle.backend import JSONBackend # @UnresolvedImport
-from jsonpickle.version import VERSION  # @UnresolvedImport
+
+from jsonpickle import pickler
+from jsonpickle import unpickler
+from jsonpickle.backend import JSONBackend
+from jsonpickle.version import VERSION
 
 # ensure built-in handlers are loaded
 __import__('jsonpickle.handlers')
@@ -88,32 +80,34 @@ enable_fallthrough = json.enable_fallthrough
 
 
 def encode(value,
-           unpicklable=True, make_refs=True, keys=False,
-           max_depth=None, backend=None):
-    """
-    Return a JSON formatted representation of value, a Python object.
+           unpicklable=True,
+           make_refs=True,
+           keys=False,
+           max_depth=None,
+           backend=None,
+           warn=False,
+           max_iter=None):
+    """Return a JSON formatted representation of value, a Python object.
 
-    The keyword argument 'unpicklable' defaults to True.
-    If set to False, the output will not contain the information
-    necessary to turn the JSON data back into Python objects.
-
-    The keyword argument 'max_depth' defaults to None.
-    If set to a non-negative integer then jsonpickle will not recurse
-    deeper than 'max_depth' steps into the object.  Anything deeper
-    than 'max_depth' is represented using a Python repr() of the object.
-
-    The keyword argument 'make_refs' defaults to True.
-    If set to False jsonpickle's referencing support is disabled.
-    Objects that are id()-identical won't be preserved across
-    encode()/decode(), but the resulting JSON stream will be conceptually
-    simpler.  jsonpickle detects cyclical objects and will break the
-    cycle by calling repr() instead of recursing when make_refs is set False.
-    
-    MSC: if make_refs is None then continues until max_depth is reached.
-
-    The keyword argument 'keys' defaults to False.
-    If set to True then jsonpickle will encode non-string dictionary keys
-    instead of coercing them into strings via `repr()`.
+    :param unpicklable: If set to False then the output will not contain the
+        information necessary to turn the JSON data back into Python objects,
+        but a simpler JSON stream is produced.
+    :param max_depth: If set to a non-negative integer then jsonpickle will
+        not recurse deeper than 'max_depth' steps into the object.  Anything
+        deeper than 'max_depth' is represented using a Python repr() of the
+        object.
+    :param make_refs: If set to False jsonpickle's referencing support is
+        disabled.  Objects that are id()-identical won't be preserved across
+        encode()/decode(), but the resulting JSON stream will be conceptually
+        simpler.  jsonpickle detects cyclical objects and will break the cycle
+        by calling repr() instead of recursing when make_refs is set False.
+    :param keys: If set to True then jsonpickle will encode non-string
+        dictionary keys instead of coercing them into strings via `repr()`.
+    :param warn: If set to True then jsonpickle will warn when it
+        returns None for an object which it cannot pickle
+        (e.g. file descriptors).
+    :param max_iter: If set to a non-negative integer then jsonpickle will
+        consume at most `max_iter` items when pickling iterators.
 
     >>> encode('my string')
     '"my string"'
@@ -138,12 +132,12 @@ def encode(value,
                           unpicklable=unpicklable,
                           make_refs=make_refs,
                           keys=keys,
-                          max_depth=max_depth)
+                          max_depth=max_depth,
+                          warn=warn)
 
 
 def decode(string, backend=None, keys=False):
-    """
-    Convert a JSON string into a Python object.
+    """Convert a JSON string into a Python object.
 
     The keyword argument 'keys' defaults to False.
     If set to True then jsonpickle will decode non-string dictionary keys
@@ -157,3 +151,8 @@ def decode(string, backend=None, keys=False):
     if backend is None:
         backend = json
     return unpickler.decode(string, backend=backend, keys=keys)
+
+
+# json.load(),loads(), dump(), dumps() compatibility
+dumps = encode
+loads = decode

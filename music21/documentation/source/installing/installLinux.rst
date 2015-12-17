@@ -4,24 +4,27 @@
 Installing Music21 on GNU/Linux
 ============================================
 
-
-Alternative Installation Methods
-----------------------------------------------
-
-The following instructions are for general users. If you are an advanced user 
-and have installed other Python packages before, or want to use an EGG, SVN, PIP, 
-or setuptools, you should read :ref:`installAdvanced`.
+GNU/Linux, FreeBSD, etc. are supported by music21. However, by choosing to use 
+Unix-like systems you should be an advanced user -- the music21list should not
+be used for general installation/configuration problems that are specific to
+your operating system. Because of the number of different Unix variants, the list
+maintainers can only help with music21-specific problems post installation or
+Mac/PC problems.
 
 
 Check Your Version of Python
 ----------------------------------------------
 
-Music21 requires Python 2.7 or Python 3.3+.
+Music21 requires Python 2.7.3+ or Python 3.3+.
 
 To determine the Python version you have installed, open a shell 
 or terminal and enter the following command-line argument (where "$" is the prompt):
 
     $ python -V
+    
+or in many 3.X installation cases:
+
+    $ python3 -V
 
 it should display something like:
 
@@ -50,7 +53,8 @@ Installing Music21 with setup.py
 
 First, uncompress the .tar.gz file. 
 
-Open a shell or terminal, enter the outer-most music21 directory, and use `python` to execute the setup.py file with the 'install' argument: ::
+Open a shell or terminal, enter the outer-most music21 directory, and use `python` 
+to execute the setup.py file with the 'install' argument: ::
 
     $ cd /path/to/dir/music21-version
     $ python setup.py install
@@ -82,7 +86,7 @@ http://docs.python.org/using/cmdline.html#envvar-PYTHONPATH
 After Installation
 -------------------------------
 
-After a successful installation, you may proceed to :ref:`usersGuide_01_Installing` to 
+After a successful installation, you may proceed to :ref:`Notes <usersGuide_02_notes>` to 
 begin using `music21`.
 
 
@@ -90,8 +94,7 @@ begin using `music21`.
 Installation Help
 -------------------------------
 
-If you have followed all the instructions and still encounter problems, start over from scratch
-and try it again very carefully.  If you still have problems
-contact the music21 group and someone should be able to help:
-
-http://groups.google.com/group/music21list
+If you have followed all the instructions and still encounter problems, 
+start over from scratch
+and try it again very carefully.  If you still have problems contact an
+expert in your operating system.

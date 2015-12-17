@@ -9,7 +9,13 @@
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
 # Project License:      LGPL, see license.txt
 #------------------------------------------------------------------------------
-
+__all__ = ['Date', 'DateSingle', 'DateRelative', 'DateBetween',
+           'DateSelection',
+           'Text',
+           'Contributor',
+           'Creator',
+           'Imprint',
+           'Copyright']
 
 import datetime
 import os
@@ -47,23 +53,16 @@ class Date(object):
     :class:`~music21.metadata.DateSingle` and related subclasses that represent
     single dates and date ranges.
 
-    ::
+    >>> a = metadata.Date(year=1843, yearError='approximate')
+    >>> a.year
+    1843
 
-        >>> from music21 import metadata
-        >>> a = metadata.Date(year=1843, yearError='approximate')
-        >>> a.year
-        1843
+    >>> a.yearError
+    'approximate'
 
-    ::
-
-        >>> a.yearError
-        'approximate'
-
-    ::
-
-        >>> a = metadata.Date(year='1843?')
-        >>> a.yearError
-        'uncertain'
+    >>> a = metadata.Date(year='1843?')
+    >>> a.yearError
+    'uncertain'
 
     '''
 
@@ -111,14 +110,10 @@ class Date(object):
         r'''
         Return a string representation, including error if defined.
 
-        ::
-
-            >>> from music21 import metadata
-            >>> d = metadata.Date()
-            >>> d.loadStr('3030?/12~/?4')
-            >>> str(d)
-            '3030?/12~/04?'
-
+        >>> d = metadata.Date()
+        >>> d.loadStr('1030?/12~/?4')
+        >>> str(d)
+        '1030?/12~/04?'
         '''
         # datetime.strftime("%Y.%m.%d")
         # cannot use this, as it does not support dates lower than 1900!
@@ -151,22 +146,15 @@ class Date(object):
         Strip error symbols from a numerical value. Return cleaned source and
         sym. Only one error symbol is expected per string.
 
-        ::
+        >>> d = metadata.Date()
+        >>> d._stripError('1247~')
+        ('1247', 'approximate')
 
-            >>> from music21 import metadata
-            >>> d = metadata.Date()
-            >>> d._stripError('1247~')
-            ('1247', 'approximate')
+        >>> d._stripError('234.43?')
+        ('234.43', 'uncertain')
 
-        ::
-
-            >>> d._stripError('234.43?')
-            ('234.43', 'uncertain')
-
-        ::
-
-            >>> d._stripError('234.43')
-            ('234.43', None)
+        >>> d._stripError('234.43')
+        ('234.43', None)
 
         '''
         if common.isNum(value):  # if a number, let pass
@@ -195,17 +183,11 @@ class Date(object):
         r'''
         Convert an error string (approximate, uncertain) into a symbol.
 
-        ::
+        >>> metadata.Date.errorToSymbol('approximate')
+        '~'
 
-            >>> from music21 import metadata
-            >>> metadata.Date.errorToSymbol('approximate')
-            '~'
-
-        ::
-
-            >>> metadata.Date.errorToSymbol('uncertain')
-            '?'
-
+        >>> metadata.Date.errorToSymbol('uncertain')
+        '?'
         '''
         if value.lower() in Date.approximateSymbols + ['approximate']:
             return Date.approximateSymbols[0]
@@ -216,15 +198,11 @@ class Date(object):
         r'''
         Load values by string, datetime object, or Date object:
 
-        ::
-
-            >>> from music21 import metadata
-            >>> a = metadata.Date(year=1843, month=3, day=3)
-            >>> b = metadata.Date()
-            >>> b.load(a)
-            >>> b.year
-            1843
-
+        >>> a = metadata.Date(year=1843, month=3, day=3)
+        >>> b = metadata.Date()
+        >>> b.load(a)
+        >>> b.year
+        1843
         '''
         if isinstance(value, datetime.datetime):
             self.loadDatetime(value)
@@ -239,21 +217,15 @@ class Date(object):
         r'''
         Load time data from a datetime object:
 
-        ::
+        >>> import datetime
+        >>> dt = datetime.datetime(2005, 2, 1)
+        >>> dt
+        datetime.datetime(2005, 2, 1, 0, 0)
 
-            >>> import datetime
-            >>> dt = datetime.datetime(2005, 2, 1)
-            >>> dt
-            datetime.datetime(2005, 2, 1, 0, 0)
-
-        ::
-
-            >>> from music21 import metadata
-            >>> m21mdDate = metadata.Date()
-            >>> m21mdDate.loadDatetime(dt)
-            >>> str(m21mdDate)
-            '2005/02/01'
-
+        >>> m21mdDate = metadata.Date()
+        >>> m21mdDate.loadDatetime(dt)
+        >>> str(m21mdDate)
+        '2005/02/01'
         '''
         for attr in self.attrNames:
             if hasattr(dt, attr):
@@ -266,15 +238,11 @@ class Date(object):
         r'''
         Load values based on another Date object:
 
-        ::
-
-            >>> from music21 import metadata
-            >>> a = metadata.Date(year=1843, month=3, day=3)
-            >>> b = metadata.Date()
-            >>> b.loadOther(a)
-            >>> b.year
-            1843
-
+        >>> a = metadata.Date(year=1843, month=3, day=3)
+        >>> b = metadata.Date()
+        >>> b.loadOther(a)
+        >>> b.year
+        1843
         '''
         for attr in self.attrNames:
             if getattr(other, attr) is not None:
@@ -286,36 +254,24 @@ class Date(object):
 
         Assume `year/month/day/hour:minute:second`:
 
-        ::
+        >>> d = metadata.Date()
+        >>> d.loadStr('1030?/12~/?4')
+        >>> d.month, d.monthError
+        (12, 'approximate')
 
-            >>> from music21 import metadata
-            >>> d = metadata.Date()
-            >>> d.loadStr('3030?/12~/?4')
-            >>> d.month, d.monthError
-            (12, 'approximate')
+        >>> d.year, d.yearError
+        (1030, 'uncertain')
 
-        ::
+        >>> d.month, d.monthError
+        (12, 'approximate')
 
-            >>> d.year, d.yearError
-            (3030, 'uncertain')
+        >>> d.day, d.dayError
+        (4, 'uncertain')
 
-        ::
-
-            >>> d.month, d.monthError
-            (12, 'approximate')
-
-        ::
-
-            >>> d.day, d.dayError
-            (4, 'uncertain')
-
-        ::
-
-            >>> d = metadata.Date()
-            >>> d.loadStr('1834/12/4/4:50:32')
-            >>> d.minute, d.second
-            (50, 32)
-
+        >>> d = metadata.Date()
+        >>> d.loadStr('1834/12/4/4:50:32')
+        >>> d.minute, d.second
+        (50, 32)
         '''
         post = []
         postError = []
@@ -326,7 +282,7 @@ class Date(object):
             post.append(value)
             postError.append(error)
         # as error is stripped, we can now convert to numbers
-        if len(post) > 0 and post[0] != '':
+        if post and post[0] != '':
             post = [int(x) for x in post]
         # assume in order in post list
         for i in range(len(self.attrNames)):
@@ -342,32 +298,23 @@ class Date(object):
         r'''
         Get a datetime object from a metadata.Date() object
 
-        ::
+        >>> a = metadata.Date(year=1843, month=3, day=3)
+        >>> str(a)
+        '1843/03/03'
 
-            >>> from music21 import metadata
-            >>> a = metadata.Date(year=1843, month=3, day=3)
-            >>> str(a)
-            '1843/03/03'
-
-        ::
-
-            >>> a.datetime
-            datetime.datetime(1843, 3, 3, 0, 0)
+        >>> a.datetime
+        datetime.datetime(1843, 3, 3, 0, 0)
 
         Lack of a required date element raises an exception:
 
-        ::
+        >>> a = metadata.Date(year=1843, month=3)
+        >>> str(a)
+        '1843/03/--'
 
-            >>> a = metadata.Date(year=1843, month=3)
-            >>> str(a)
-            '1843/03/--'
-
-        ::
-
-            >>> a.datetime
-            Traceback (most recent call last):
-            ...
-            TypeError: Required argument 'day' (pos 3) not found
+        >>> a.datetime
+        Traceback (most recent call last):
+        ...
+        TypeError: Required argument 'day' (pos 3) not found
 
         '''
         post = []
@@ -386,19 +333,13 @@ class Date(object):
         r'''
         Return True if any time elements are defined:
 
-        ::
+        >>> a = metadata.Date(year=1843, month=3, day=3)
+        >>> a.hasTime
+        False
 
-            >>> from music21 import metadata
-            >>> a = metadata.Date(year=1843, month=3, day=3)
-            >>> a.hasTime
-            False
-
-        ::
-
-            >>> b = metadata.Date(year=1843, month=3, day=3, minute=3)
-            >>> b.hasTime
-            True
-
+        >>> b = metadata.Date(year=1843, month=3, day=3, minute=3)
+        >>> b.hasTime
+        True
         '''
         if self.hour is not None \
             or self.minute is not None \
@@ -412,28 +353,23 @@ class Date(object):
         r'''
         Return True if any data points have error defined:
 
-        ::
+        >>> a = metadata.Date(
+        ...     year=1843,
+        ...     month=3,
+        ...     day=3,
+        ...     dayError='approximate',
+        ...     )
+        >>> a.hasError
+        True
 
-            >>> from music21 import metadata
-            >>> a = metadata.Date(
-            ...     year=1843,
-            ...     month=3,
-            ...     day=3,
-            ...     dayError='approximate',
-            ...     )
-            >>> a.hasError
-            True
-
-        ::
-
-            >>> b = metadata.Date(
-            ...     year=1843,
-            ...     month=3,
-            ...     day=3,
-            ...     minute=3,
-            ...     )
-            >>> b.hasError
-            False
+        >>> b = metadata.Date(
+        ...     year=1843,
+        ...     month=3,
+        ...     day=3,
+        ...     minute=3,
+        ...     )
+        >>> b.hasError
+        False
 
         '''
         for attr in self.attrNames:
@@ -453,24 +389,16 @@ class DateSingle(object):
     depending on the design of the class. Alternative relevance types should be
     configured as other DateSingle subclasses.
 
-    ::
+    >>> dd = metadata.DateSingle('2009/12/31', 'approximate')
+    >>> str(dd)
+    '2009/12/31'
 
-        >>> from music21 import metadata
-        >>> dd = metadata.DateSingle('2009/12/31', 'approximate')
-        >>> str(dd)
-        '2009/12/31'
+    >>> dd.relevance
+    'approximate'
 
-    ::
-
-        >>> dd.relevance
-        'approximate'
-
-    ::
-
-        >>> dd = metadata.DateSingle('1805/3/12', 'uncertain')
-        >>> str(dd)
-        '1805/03/12'
-
+    >>> dd = metadata.DateSingle('1805/3/12', 'uncertain')
+    >>> str(dd)
+    '1805/03/12'
     '''
 
     ### CLASS VARIABLES ###
@@ -514,24 +442,16 @@ class DateSingle(object):
         r'''
         Get a datetime object.
 
-        ::
+        >>> a = metadata.DateSingle('1843/03/03')
+        >>> str(a)
+        '1843/03/03'
 
-            >>> from music21 import metadata
-            >>> a = metadata.DateSingle('1843/03/03')
-            >>> str(a)
-            '1843/03/03'
+        >>> a.datetime
+        datetime.datetime(1843, 3, 3, 0, 0)
 
-        ::
-
-            >>> a.datetime
-            datetime.datetime(1843, 3, 3, 0, 0)
-
-        ::
-
-            >>> a = metadata.DateSingle('1843/03')
-            >>> str(a)
-            '1843/03/--'
-
+        >>> a = metadata.DateSingle('1843/03')
+        >>> str(a)
+        '1843/03/--'
         '''
         # get from stored Date object
         return self._data[0].datetime
@@ -561,19 +481,13 @@ class DateRelative(DateSingle):
     r'''
     Store a relative date, sometime prior or sometime after.
 
-    ::
+    >>> dd = metadata.DateRelative('2009/12/31', 'prior')
+    >>> str(dd)
+    '2009/12/31'
 
-        >>> from music21 import metadata
-        >>> dd = metadata.DateRelative('2009/12/31', 'prior')
-        >>> str(dd)
-        '2009/12/31'
-
-    ::
-
-        >>> dd = metadata.DateRelative('2009/12/31', 'certain')
-        Traceback (most recent call last):
-        MetadataException: Relevance value is not supported by this object: 'certain'
-
+    >>> dd = metadata.DateRelative('2009/12/31', 'certain')
+    Traceback (most recent call last):
+    MetadataException: Relevance value is not supported by this object: 'certain'
     '''
 
     ### CLASS VARIABLES ###
@@ -608,19 +522,13 @@ class DateBetween(DateSingle):
     r'''
     Store a relative date, sometime between two dates:
 
-    ::
+    >>> dd = metadata.DateBetween(['2009/12/31', '2010/1/28'])
+    >>> str(dd)
+    '2009/12/31 to 2010/01/28'
 
-        >>> from music21 import metadata
-        >>> dd = metadata.DateBetween(['2009/12/31', '2010/1/28'])
-        >>> str(dd)
-        '2009/12/31 to 2010/01/28'
-
-    ::
-
-        >>> dd = metadata.DateBetween(['2009/12/31', '2010/1/28'], 'certain')
-        Traceback (most recent call last):
-        MetadataException: Relevance value is not supported by this object: 'certain'
-
+    >>> dd = metadata.DateBetween(['2009/12/31', '2010/1/28'], 'certain')
+    Traceback (most recent call last):
+    MetadataException: Relevance value is not supported by this object: 'certain'
     '''
 
     ### CLASS VARIABLES ###
@@ -629,8 +537,10 @@ class DateBetween(DateSingle):
 
     ### INITIALIZER ###
 
-    def __init__(self, data=[], relevance='between'):
-        DateSingle.__init__(self, data, relevance)
+    def __init__(self, data=None, relevance='between'):
+        if data is None:
+            data = []
+        super(DateBetween, self).__init__(data, relevance)
 
     ### SPECIAL METHODS ###
 
@@ -679,25 +589,19 @@ class DateSelection(DateSingle):
     Store a selection of dates, or a collection of dates that might all be
     possible
 
-    ::
+    >>> dd = metadata.DateSelection(
+    ...     ['2009/12/31', '2010/1/28', '1894/1/28'],
+    ...     'or',
+    ...     )
+    >>> str(dd)
+    '2009/12/31 or 2010/01/28 or 1894/01/28'
 
-        >>> from music21 import metadata
-        >>> dd = metadata.DateSelection(
-        ...     ['2009/12/31', '2010/1/28', '1894/1/28'],
-        ...     'or',
-        ...     )
-        >>> str(dd)
-        '2009/12/31 or 2010/01/28 or 1894/01/28'
-
-    ::
-
-        >>> dd = metadata.DateSelection(
-        ...     ['2009/12/31', '2010/1/28'],
-        ...     'certain',
-        ...     )
-        Traceback (most recent call last):
-        MetadataException: Relevance value is not supported by this object: 'certain'
-
+    >>> dd = metadata.DateSelection(
+    ...     ['2009/12/31', '2010/1/28'],
+    ...     'certain',
+    ...     )
+    Traceback (most recent call last):
+    MetadataException: Relevance value is not supported by this object: 'certain'
     '''
 
     ### CLASS VARIABLES ###
@@ -757,13 +661,9 @@ class Text(object):
     string and a language name or code. This object can be used and/or
     subclassed for a variety for of text storage.
 
-    ::
-
-        >>> from music21 import metadata
-        >>> td = metadata.Text('concerto in d', 'en')
-        >>> str(td)
-        'concerto in d'
-
+    >>> td = metadata.Text('concerto in d', 'en')
+    >>> str(td)
+    'concerto in d'
     '''
 
     ### INITIALIZER ###
@@ -802,14 +702,10 @@ class Text(object):
         r'''
         Set the language of the Text stored within.
 
-        ::
-
-            >>> from music21 import metadata
-            >>> t = metadata.Text('my text')
-            >>> t.language = 'en'
-            >>> t.language
-            'en'
-
+        >>> t = metadata.Text('my text')
+        >>> t.language = 'en'
+        >>> t.language
+        'en'
         '''
         return self._language
 
@@ -824,23 +720,16 @@ class Text(object):
         r'''
         Return a string representation with normalized articles.
 
-        ::
+        >>> td = metadata.Text('Ale is Dear, The', 'en')
+        >>> str(td)
+        'Ale is Dear, The'
 
-            >>> td = metadata.Text('Ale is Dear, The', 'en')
-            >>> str(td)
-            'Ale is Dear, The'
+        >>> td.getNormalizedArticle()
+        'The Ale is Dear'
 
-        ::
-
-            >>> td.getNormalizedArticle()
-            'The Ale is Dear'
-
-        ::
-
-            >>> td.language = 'de'
-            >>> td.getNormalizedArticle()
-            'Ale is Dear, The'
-
+        >>> td.language = 'de'
+        >>> td.getNormalizedArticle()
+        'Ale is Dear, The'
         '''
         from music21 import text
         return text.prependArticle(str(self), self._language)
@@ -854,23 +743,15 @@ class Contributor(object):
     A person that contributed to a work. Can be a composer, lyricist, arranger,
     or other type of contributor.  In MusicXML, these are "creator" elements.
 
-    ::
+    >>> td = metadata.Contributor(role='composer', name='Chopin, Fryderyk')
+    >>> td.role
+    'composer'
 
-        >>> from music21 import metadata
-        >>> td = metadata.Contributor(role='composer', name='Chopin, Fryderyk')
-        >>> td.role
-        'composer'
+    >>> td.name
+    'Chopin, Fryderyk'
 
-    ::
-
-        >>> td.name
-        'Chopin, Fryderyk'
-
-    ::
-
-        >>> td.relevance
-        'contributor'
-
+    >>> td.relevance
+    'contributor'
     '''
 
     ### CLASS VARIABLES ###
@@ -887,6 +768,9 @@ class Contributor(object):
     # !!!LAR: Arranger.
     # !!!LOR: Orchestrator.
     # !!!TRN: Translator of text.
+
+
+    # TODO: add editor...
 
     roleAbbreviationsDict = {
         'com': 'composer',
@@ -908,6 +792,7 @@ class Contributor(object):
     ### INITIALIZER ###
 
     def __init__(self, *args, **keywords):
+        self._role = None
         if 'role' in keywords:
             # stored in self._role
             self.role = keywords['role']  # validated with property
@@ -937,33 +822,23 @@ class Contributor(object):
         Calculate the age at death of the Contributor, returning a
         datetime.timedelta object.
 
-        ::
+        >>> a = metadata.Contributor(
+        ...     name='Beethoven, Ludwig van',
+        ...     role='composer',
+        ...     birth='1770/12/17',
+        ...     death='1827/3/26',
+        ...     )
+        >>> a.role
+        'composer'
 
-            >>> from music21 import metadata
-            >>> a = metadata.Contributor(
-            ...     name='Beethoven, Ludwig van',
-            ...     role='composer',
-            ...     birth='1770/12/17',
-            ...     death='1827/3/26',
-            ...     )
-            >>> a.role
-            'composer'
+        >>> a.age()
+        datetime.timedelta(20552)
 
-        ::
+        >>> str(a.age())
+        '20552 days, 0:00:00'
 
-            >>> a.age()
-            datetime.timedelta(20552)
-
-        ::
-
-            >>> str(a.age())
-            '20552 days, 0:00:00'
-
-        ::
-
-            >>> a.age().days // 365
-            56
-
+        >>> a.age().days // 365
+        56
         '''
         if self._dateRange[0] is not None and self._dateRange[1] is not None:
             b = self._dateRange[0].datetime
@@ -979,24 +854,21 @@ class Contributor(object):
         r'''
         Returns the text name, or the first of many names entered.
 
-        ::
+        >>> td = metadata.Contributor(
+        ...     role='composer',
+        ...     names=['Chopin, Fryderyk', 'Chopin, Frederick'],
+        ...     )
+        >>> td.name
+        'Chopin, Fryderyk'
 
-            >>> from music21 import metadata
-            >>> td = metadata.Contributor(
-            ...     role='composer',
-            ...     names=['Chopin, Fryderyk', 'Chopin, Frederick'],
-            ...     )
-            >>> td.name
-            'Chopin, Fryderyk'
-
-        ::
-
-            >>> td.names
-            ['Chopin, Fryderyk', 'Chopin, Frederick']
-
+        >>> td.names
+        ['Chopin, Fryderyk', 'Chopin, Frederick']
         '''
         # return first name
-        return str(self._names[0])
+        if len(self._names) > 0:
+            return str(self._names[0])
+        else:
+            return None
 
     @name.setter
     def name(self, value):
@@ -1010,16 +882,12 @@ class Contributor(object):
         r'''
         Returns all names in a list.
 
-        ::
-
-            >>> from music21 import metadata
-            >>> td = metadata.Contributor(
-            ...     role='composer',
-            ...     names=['Chopin, Fryderyk', 'Chopin, Frederick'],
-            ...     )
-            >>> td.names
-            ['Chopin, Fryderyk', 'Chopin, Frederick']
-
+        >>> td = metadata.Contributor(
+        ...     role='composer',
+        ...     names=['Chopin, Fryderyk', 'Chopin, Frederick'],
+        ...     )
+        >>> td.names
+        ['Chopin, Fryderyk', 'Chopin, Frederick']
         '''
         # return first name
         msg = []
@@ -1033,20 +901,14 @@ class Contributor(object):
         The role is what part this Contributor plays in the work.  Both
         full roll strings and roll abbreviations may be used.
 
-        ::
+        >>> td = metadata.Contributor()
+        >>> td.role = 'composer'
+        >>> td.role
+        'composer'
 
-            >>> from music21 import metadata
-            >>> td = metadata.Contributor()
-            >>> td.role = 'composer'
-            >>> td.role
-            'composer'
-
-        ::
-
-            >>> td.role = 'lor'
-            >>> td.role
-            'orchestrator'
-
+        >>> td.role = 'lor'
+        >>> td.role
+        'orchestrator'
         '''
         return self._role
 
@@ -1067,17 +929,11 @@ class Contributor(object):
         r'''
         Convert `abbreviation` to role name:
 
-        ::
+        >>> metadata.Contributor.abbreviationToRole('com')
+        'composer'
 
-            >>> from music21 import metadata
-            >>> metadata.Contributor.abbreviationToRole('com')
-            'composer'
-
-        ::
-
-            >>> metadata.Contributor.abbreviationToRole('lib')
-            'librettist'
-
+        >>> metadata.Contributor.abbreviationToRole('lib')
+        'librettist'
         '''
         abbreviation = abbreviation.lower()
         if abbreviation in Contributor.roleAbbreviationsDict:
@@ -1090,12 +946,8 @@ class Contributor(object):
     def roleToAbbreviation(roleName):
         '''Convert `roleName` to role abbreviation:
 
-        ::
-
-            >>> from music21 import metadata
-            >>> metadata.Contributor.roleToAbbreviation('composer')
-            'com'
-
+        >>> metadata.Contributor.roleToAbbreviation('composer')
+        'com'
         '''
         # note: probably not the fastest way to do this
         for role_id in Contributor.roleAbbreviationsDict:
@@ -1114,23 +966,15 @@ class Creator(Contributor):
 
     In MusicXML, these are "creator" elements.
 
-    ::
+    >>> td = metadata.Creator(role='composer', name='Chopin, Fryderyk')
+    >>> td.role
+    'composer'
 
-        >>> from music21 import metadata
-        >>> td = metadata.Creator(role='composer', name='Chopin, Fryderyk')
-        >>> td.role
-        'composer'
+    >>> td.name
+    'Chopin, Fryderyk'
 
-    ::
-
-        >>> td.name
-        'Chopin, Fryderyk'
-
-    ::
-
-        >>> td.relevance
-        'creator'
-
+    >>> td.relevance
+    'creator'
     '''
 
     ### CLASS VARIABLES ###

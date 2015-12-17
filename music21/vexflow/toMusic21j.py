@@ -33,21 +33,28 @@ def fromObject(thisObject, mode='html', local=False):
     
     >>> n = note.Note('C#4')
     >>> #_DOCS_SHOW print(vexflow.toMusic21j.fromObject(n))
-    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+            "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
         <!-- for MSIE 10 on Windows 8 -->
         <meta http-equiv="X-UA-Compatible" content="requiresActiveX=true"/>
         <title>Music21 Fragment</title>
-        <script data-main='http://web.mit.edu/music21/music21j/src/music21' src='http://web.mit.edu/music21/music21j/ext/require/require.js'></script>
+        <script data-main='http://web.mit.edu/music21/music21j/src/music21' 
+                src='http://web.mit.edu/music21/music21j/ext/require/require.js'></script>
         <script>
             require(['music21'], function() {
-                var pickleIn = '{"m21Version": {"py/tuple": [1, 9, 2]}, "stream": {"_mutable": true, "_activeSite": null, "xPosition": null, "' + 
-    '_priority": 0, "_elements": [], "_cache": {}, "definesExplicitPageBreaks": false, "_unlinkedDuration": null, "' + 
-    'id": ..., "_duration": null, "py/object": "music21.stream.Stream", "streamStatus": {"py/object": "music' + 
-    '21.stream.streamStatus.StreamStatus", "_enharmonics": null, "_dirty": null, "_concertPitch": null, "_accidenta' + 
-    'ls": null, "_ties": null, "_rests": null, "_ornaments": null, "_client": null, "_beams": null, "_measures": nu' + 
+                var pickleIn = '{"m21Version": {"py/tuple": [1, 9, 2]}, "stream": 
+    {"_mutable": true, "_activeSite": null, "xPosition": null, "' + 
+    '_priority": 0, "_elements": [], "_cache": {}, "definesExplicitPageBreaks": 
+    false, "_unlinkedDuration": null, "' + 
+    'id": ..., "_duration": null, "py/object": "music21.stream.Stream", 
+    "streamStatus": {"py/object": "music' + 
+    '21.stream.streamStatus.StreamStatus", "_enharmonics": null, 
+    "_dirty": null, "_concertPitch": null, "_accidenta' + 
+    'ls": null, "_ties": null, "_rests": null, "_ornaments": null, 
+    "_client": null, "_beams": null, "_measures": nu' + 
     ...
     'd": null}, "definesExplicitSystemBreaks": false, ...}}';
                 var jpc = new music21.fromPython.Converter();
@@ -68,7 +75,8 @@ def fromObject(thisObject, mode='html', local=False):
     return conv.fromObject(thisObject)
 
 class VexflowPickler(object):
-    templateHtml = '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    templateHtml = ('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" ' + 
+                    '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">' + '''
     <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -81,7 +89,7 @@ class VexflowPickler(object):
     <body>
     </body>
     </html>
-    '''
+    ''')
     jsBodyScript = '''<script>\n{jsBody}\n</script>'''
     jsBody = '''require(['music21'], function() {{
                 var pickleIn = {pickleOutput};
@@ -96,7 +104,8 @@ class VexflowPickler(object):
             'pickleOutput' : '{"py/object": "hello"}',
             'm21URI' : 'http://web.mit.edu/music21/music21j/src/music21',
             'requireURI' :'http://web.mit.edu/music21/music21j/ext/require/require.js',
-            'callback' :'streamObj.renderOptions.events.resize = "reflow";\n\t\tstreamObj.appendNewCanvas();',
+            'callback' :'streamObj.renderOptions.events.resize = ' + 
+                '"reflow";\n\t\tstreamObj.appendNewCanvas();',
             'm21URIlocal' : 'file:///Users/Cuthbert/git/music21j/src/music21',
             'requireURIlocal' : 'file:///Users/Cuthbert/git/music21j/ext/require/require.js',
         }
@@ -126,7 +135,8 @@ class VexflowPickler(object):
         
         >>> vfp = vexflow.toMusic21j.VexflowPickler()
         >>> vfp.getLoadTemplate()
-        "<script data-main='http://web.mit.edu/music21/music21j/src/music21' src='http://web.mit.edu/music21/music21j/ext/require/require.js'></script>"
+        "<script data-main='http://web.mit.edu/music21/music21j/src/music21' 
+            src='http://web.mit.edu/music21/music21j/ext/require/require.js'></script>"
 
         >>> d = {'m21URI': 'file:///tmp/music21', 'requireURI': 'http://requirejs.com/require.js'}
         >>> vfp.getLoadTemplate(d)
@@ -165,7 +175,7 @@ class VexflowPickler(object):
             defaults = self.defaults
         jsBody = self.getJSBody(dataSplit, defaults)
         jsBodyScript = self.jsBodyScript.format(jsBody = jsBody)
-        return jsBodyScript;
+        return jsBodyScript
 
     def getJSBody(self, dataSplit, defaults = None):
         '''
@@ -187,7 +197,7 @@ class VexflowPickler(object):
             d = defaults
         jsBody = self.jsBody.format(pickleOutput = dataSplit,
                                     callback = d['callback'])
-        return jsBody;
+        return jsBody
     
     def getHTML(self, dataSplit, title=None, defaults=None):
         '''
@@ -195,14 +205,16 @@ class VexflowPickler(object):
         
         >>> vfp = vexflow.toMusic21j.VexflowPickler()
         >>> print(vfp.getHTML('{"hi": "hello"}', 'myPiece'))
-           <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+           <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
                 <html xmlns="http://www.w3.org/1999/xhtml">
                 <head>
             <meta http-equiv="content-type" content="text/html; charset=utf-8" />
             <!-- for MSIE 10 on Windows 8 -->
             <meta http-equiv="X-UA-Compatible" content="requiresActiveX=true"/>
             <title>myPiece</title>
-            <script data-main='http://web.mit.edu/music21/music21j/src/music21' src='http://web.mit.edu/music21/music21j/ext/require/require.js'></script>
+            <script data-main='http://web.mit.edu/music21/music21j/src/music21' 
+                    src='http://web.mit.edu/music21/music21j/ext/require/require.js'></script>
             <script>
             require(['music21'], function() {
                             var pickleIn = {"hi": "hello"};
@@ -238,7 +250,8 @@ class VexflowPickler(object):
             title = "Music21 Fragment"
         sf = freezeThaw.StreamFreezer(thisStream)
 
-        ## recursive data structures will be expanded up to a high depth -- make sure there are none...
+        ## recursive data structures will be expanded up to a high depth 
+        # -- make sure there are none...
         data = sf.writeStr(fmt='jsonpickle')
         dataSplit = self.splitLongJSON(data)
         if mode == 'json':
@@ -283,7 +296,7 @@ class TestExternal(unittest.TestCase):
         vfp = VexflowPickler()
         vfp.defaults['m21URI'] = 'file:///Users/Cuthbert/git/music21j/src/music21'
         vfp.defaults['requireURI'] = 'file:///Users/Cuthbert/git/music21j/ext/require/require.js'
-        data = vfp.fromObject(s);
+        data = vfp.fromObject(s)
         fp = environLocal.getTempFile('.html')
         with open(fp, 'w') as f:
             f.write(data)
@@ -294,15 +307,15 @@ if __name__ == "__main__":
     import music21
     music21.mainTest(Test)
     
-    from music21 import note, clef, meter
-    s = stream.Measure()
-    s.insert(0, clef.TrebleClef())
-    s.insert(0, meter.TimeSignature('1/4'))
-    n = note.Note()
-    n.duration.quarterLength = 1/3.
-    s.repeatAppend(n, 3)
-    p = stream.Part()
-    p.repeatAppend(s, 2)
-    p.show('vexflow', local=True)
-    
+#     from music21 import note, clef, meter
+#     s = stream.Measure()
+#     s.insert(0, clef.TrebleClef())
+#     s.insert(0, meter.TimeSignature('1/4'))
+#     n = note.Note()
+#     n.duration.quarterLength = 1/3.
+#     s.repeatAppend(n, 3)
+#     p = stream.Part()
+#     p.repeatAppend(s, 2)
+#     p.show('vexflow', local=True)
+#     
     #s.show('vexflow')

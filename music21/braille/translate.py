@@ -7,7 +7,6 @@
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
-
 """
 Methods for exporting music21 data as braille.
 
@@ -31,7 +30,8 @@ Keywords:
   on all :class:`~music21.stream.Measure`, :class:`~music21.stream.Part`, and
   :class:`~music21.stream.PartStaff` instances. Copies of those objects are then
   used to transcribe the music. If True, the transcription is done "as is."
-  This is useful for strict transcription because sometimes :meth:`~music21.stream.Stream.makeNotation`
+  This is useful for strict transcription because 
+  sometimes :meth:`~music21.stream.Stream.makeNotation`
   introduces some unwanted artifacts in the music. However, the music needs
   to be organized into measures for transcription to work.
 * **debug** (False): If True, a braille-english representation of the music is returned. Useful
@@ -44,51 +44,60 @@ the reader in a meaningful manner and to give him convenient reference points to
 memorization" (BMTM, 71). Some of these keywords are changed automatically in context.
 
 
-* **cancelOutgoingKeySig** (True): If True, whenever a key signature change is encountered, the new
-  signature should be preceded by the old one.
-* **descendingChords** (True): If True, then chords are spelled around the highest note. If False,
-  then chords are spelled around the lowest note. This keyword is overriden by any valid clefs
-  present in the music.
-* **dummyRestLength** (None) For a given positive integer n, adds n "dummy rests" near the beginning
-  of a segment. Designed for test purposes, as the rests are used to demonstrate measure division at
-  the end of braille lines.
-* **maxLineLength** (40): The maximum amount of braille characters that should be present in a line of braille.
-* **segmentBreaks** ([]): A list consisting of (measure number, offset start) tuples indicating where the
-  music should be broken into segments.
-* **showClefSigns** (False): If True, then clef signs are displayed. Since braille does not use clefs and
-  staves to represent music, they would instead be shown for referential or historical purposes.
-* **showFirstMeasureNumber** (True): If True, then a measure number is shown following the heading
-  (if applicable) and preceding the music.
-* **showHand** (None): If set to "right" or "left", the corresponding hand sign is shown before the music. In
-  keyboard music, the hand signs are shown automatically.
-* **showHeading** (True): If True, then a braille heading is created above the initial segment. A heading consists
-  of an initial :class:`~music21.key.KeySignature`, :class:`~music21.meter.TimeSignature`,
-  :class:`~music21.tempo.TempoText`, and :class:`~music21.tempo.MetronomeMark`, or any subset thereof. The heading
-  is centered above the music automatically.
-* **showLongSlursAndTiesTogether** (False), **showShortSlursAndTiesTogether** (False): If False, then the slur on
-  either side of the phrase is reduced by the amount that ties are present. If True, then slurs and ties are shown
-  together (i.e. the note can have both a slur and a tie).
-* **slurLongPhraseWithBrackets** (True): If True, then the slur of a long phrase (4+ consecutive notes) is brailled
-  using the bracket slur. If False, the double slur is used instead.
-* **suppressOctaveMarks** (True): If True, then all octave marks are suppressed. Designed for test purposes, as
-  octave marks were not presented in BMTM until Chapter 7.
-* **upperFirstInNoteFingering** (True): If True, then whenever there is a choice fingering (i.e. 5|4), the upper
-  number is transcribed before the lower number. If False, the reverse is the case.
+* **cancelOutgoingKeySig** (True): If True, whenever a key signature change is 
+    encountered, the new signature should be preceded by the old one.
+* **descendingChords** (True): If True, then chords are spelled around the highest note. 
+    If False, then chords are spelled around the lowest note. This keyword is 
+    overriden by any valid clefs present in the music.
+* **dummyRestLength** (None) For a given positive integer n, adds n "dummy rests" 
+    near the beginning of a segment. Designed for test purposes, as the rests 
+    are used to demonstrate measure division at the end of braille lines.
+* **maxLineLength** (40): The maximum amount of braille characters 
+    that should be present in a line of braille.
+* **segmentBreaks** ([]): A list consisting of (measure number, offset start) 
+    tuples indicating where the music should be broken into segments.
+* **showClefSigns** (False): If True, then clef signs are displayed. 
+    Since braille does not use clefs or staves to represent music, they would 
+    instead be shown for referential or historical purposes.
+* **showFirstMeasureNumber** (True): If True, then a measure number is shown 
+    following the heading (if applicable) and preceding the music.
+* **showHand** (None): If set to "right" or "left", the corresponding 
+    hand sign is shown before the music. In keyboard music, 
+    the hand signs are shown automatically.
+* **showHeading** (True): If True, then a braille heading is created above 
+    the initial segment. A heading consists 
+    of an initial :class:`~music21.key.KeySignature`, :class:`~music21.meter.TimeSignature`,
+    :class:`~music21.tempo.TempoText`, and :class:`~music21.tempo.MetronomeMark`, 
+    or any subset thereof. The heading
+    is centered above the music automatically.
+* **showLongSlursAndTiesTogether** (False), **showShortSlursAndTiesTogether** (False): 
+    If False, then the slur on either side of the phrase is reduced by the amount 
+    that ties are present. If True, then slurs and ties are shown together 
+    (i.e. the note can have both a slur and a tie).
+* **slurLongPhraseWithBrackets** (True): If True, then the slur of a 
+    long phrase (4+ consecutive notes) is brailled using the bracket slur. 
+    If False, the double slur is used instead.
+* **suppressOctaveMarks** (True): If True, then all octave marks are suppressed. 
+    Designed for test purposes, as octave marks were not presented in BMTM until Chapter 7.
+* **upperFirstInNoteFingering** (True): If True, then whenever 
+    there is a choice fingering (i.e. 5|4), the upper 
+    number is transcribed before the lower number. If False, the reverse is the case.
 """
 
-from music21 import metadata, stream, tinyNotation, exceptions21
+from music21 import metadata, stream, exceptions21
 from music21.braille import segment
 from music21.ext import six
 
 import re
 import unittest
 
+# pylint: disable=redefined-builtin    
 if six.PY3:
     unicode = str # @ReservedAssignment
 
-try:
+try: # gives Py2 the zip of Py3
     from future_builtins import zip
-except ImportError: # not 2.6+ or is 3.x
+except ImportError:
     pass
 
 
@@ -100,8 +109,7 @@ def objectToBraille(music21Obj, **keywords):
     Translates an arbitrary object to braille.
 
     >>> from music21.braille import translate
-    >>> from music21 import tinyNotation
-    >>> samplePart = tinyNotation.TinyNotationStream("3/4 C4 D16 E F G# r4 e2.")
+    >>> samplePart = converter.parse("tinynotation: 3/4 C4 D16 E F G# r4 e2.")
     >>> #_DOCS_SHOW samplePart.show()
 
 
@@ -125,12 +133,10 @@ def objectToBraille(music21Obj, **keywords):
     Other examples:
 
 
-    >>> from music21 import note
     >>> sampleNote = note.Note("C3")
     >>> print(translate.objectToBraille(sampleNote))
     ⠸⠹
 
-    >>> from music21 import dynamics
     >>> sampleDynamic = dynamics.Dynamic("fff")
     >>> print(translate.objectToBraille(sampleDynamic))
     ⠜⠋⠋⠋
@@ -148,7 +154,7 @@ def streamToBraille(music21Stream, **keywords):
     Translates a :class:`~music21.stream.Stream` to braille.
     """
 
-    if isinstance(music21Stream, stream.Part) or isinstance(music21Stream, tinyNotation.TinyNotationStream):
+    if isinstance(music21Stream, stream.Part):
         return partToBraille(music21Stream, **keywords)
     if isinstance(music21Stream, stream.Measure):
         return measureToBraille(music21Stream, **keywords)
@@ -176,7 +182,6 @@ def scoreToBraille(music21Score, **keywords):
 def metadataToString(music21Metadata):
     """
     >>> from music21.braille import translate
-    >>> from music21 import corpus
     >>> corelli = corpus.parse("monteverdi/madrigal.3.1.rntxt")
     >>> corelli.getElementsByClass('Metadata')[0].__class__
     <class 'music21.metadata.Metadata'>
@@ -260,10 +265,12 @@ def keyboardPartsToBraille(music21PartStaffUpper, music21PartStaffLower, **keywo
     (inPlace, debug) = _translateArgs(**keywords)
     upperPartToTranscribe = music21PartStaffUpper
     if not inPlace:
-        upperPartToTranscribe = music21PartStaffUpper.makeNotation(cautionaryNotImmediateRepeat=False)
+        upperPartToTranscribe = music21PartStaffUpper.makeNotation(
+                                                                cautionaryNotImmediateRepeat=False)
     lowerPartToTranscribe = music21PartStaffLower
     if not inPlace:
-        lowerPartToTranscribe = music21PartStaffLower.makeNotation(cautionaryNotImmediateRepeat=False)
+        lowerPartToTranscribe = music21PartStaffLower.makeNotation(
+                                                                cautionaryNotImmediateRepeat=False)
     rhSegments = segment.findSegments(upperPartToTranscribe, **keywords)
     lhSegments = segment.findSegments(lowerPartToTranscribe, **keywords)
     allBrailleText = []

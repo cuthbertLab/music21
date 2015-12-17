@@ -1,4 +1,14 @@
 # -*- coding: utf-8 -*-
+#-------------------------------------------------------------------------------
+# Name:          installer.py
+# Purpose:       install and configure
+#
+# Authors:       Christopher Ariza
+#                Michael Scott Cuthbert
+#
+# Copyright:     (c) 2009-2015 The music21 Project
+# License:       LGPL or BSD
+#-------------------------------------------------------------------------------
 
 import os, sys
 

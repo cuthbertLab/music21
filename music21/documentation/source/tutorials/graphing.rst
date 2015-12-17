@@ -252,7 +252,10 @@ The example follows::
     ...                     partDict[noteLength] += 1
     ...                 else:
     ...                     partDict[noteLength] = 1
-    >>> quarterLengths = list(set(sopranoDict.keys()+altoDict.keys()+tenorDict.keys()+bassDict.keys()))
+    >>> quarterLengths = list(set(list(sopranoDict.keys())
+    ...                           + list(altoDict.keys())
+    ...                           + list(tenorDict.keys())
+    ...                           + list(bassDict.keys())))
     >>> for ql in quarterLengths:
     ...     values = []
     ...     for partDict in [sopranoDict, altoDict, tenorDict, bassDict]:     
@@ -301,7 +304,7 @@ A basic example follows::
     >>> data = {1:[], 2:[], 3:[]}
     >>> for i in range(len(data.keys())):
     ...    q = [(x, random.choice(range(10*(i+1)))) for x in range(20)]
-    ...    data[data.keys()[i]] = q
+    ...    data[list(data.keys())[i]] = q
     >>> a.setData(data) 
     >>> a.process()  # doctest: +SKIP
 
@@ -318,8 +321,8 @@ and which notes are not::
     >>> majorScale = [0, 2, 4, 5, 7, 9, 11]
     >>> for pitchClass in range(12):
     ...     n = note.Note()
-    ...     n.pitchClass = pitchClass
-    ...     frequency = n.frequency
+    ...     n.pitch.pitchClass = pitchClass
+    ...     frequency = n.pitch.frequency
     ...     for scale in data.keys():
     ...         if (pitchClass - scale) % 12 in majorScale:
     ...             data[scale].append((pitchClass, frequency))

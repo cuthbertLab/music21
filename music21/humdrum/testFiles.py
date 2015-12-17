@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
+# pylint: disable=line-too-long
+
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 import re
 
-splitLots = re.sub("\s\s\s\s+", "\t", \
-'''
+splitLots = re.sub(r"\s\s\s\s+", "\t", 
+r'''
 **kern        **kern
 *staff2       *staff1
 *clefF4       *clefG2
@@ -15,7 +17,7 @@ splitLots = re.sub("\s\s\s\s+", "\t", \
 =2            =2
 *^            *^
 *     *       *     *^
-2F    2G      2a#    2b#    2c#
+2F    2G      2a#    2b#    2f#
 =3    =3      =3    =3
 *v    *v      *     *     *
 *             *v    *v    *v
@@ -26,8 +28,8 @@ splitLots = re.sub("\s\s\s\s+", "\t", \
 ''')
 
 
-fakeTest = re.sub("\s\s\s\s+", "\t", \
-'''
+fakeTest = re.sub(r"\s\s\s\s+", "\t", 
+r'''
 !! Global Comment
 !!!COM: Fake, Composer
 !!!CDT: 1700-1990
@@ -57,8 +59,41 @@ fakeTest = re.sub("\s\s\s\s+", "\t", \
 '''
 )
 
-ojibway =  re.sub("\s\s\s\s+", "\t", \
+strangeWTCOpening = re.sub(r"\s\s\s\s+", "\t", 
+r'''
+**kern
+*k[]
+*C:
+*M4/4
+*MM112
+=1
+*^
+*^    *
+8r    16r    2c\
+.    [8.e\    .
+16g/LL    .    .
+16cc/JJ    .    .
+16ee/LL    4e\]    .
+16g/    .    .
+16cc/    .    .
+16ee/JJ    .    .
+8r    16r    2c\
+.    [8.e\    .
+16g/LL    .    .
+16cc/JJ    .    .
+16ee/LL    4e\]    .
+16g/    .    .
+16cc/    .    .
+16ee/JJ    .    .
+=2    =2    =2
+1cc;/ 1g/ 1e/    1C/    1CC;\
+==|!    ==|!    ==|!
+*-    *-    *-
 '''
+)
+
+ojibway =  re.sub(r"\s\s\s\s+", "\t", \
+r'''
 !! Ojibway Indian Song
 !! Transcribed by Frances Densmore
 !! No. 84 "The Sioux Follow Me"
@@ -81,8 +116,8 @@ ojibway =  re.sub("\s\s\s\s+", "\t", \
 )
 
 # Tests the two kinds of flavors of JRP
-dottedTuplet = re.sub('\s\s\s\s+', '\t', \
-'''
+dottedTuplet = re.sub(r'\s\s\s\s+', '\t', \
+r'''
 **kern
 *M2/2
 *d:
@@ -99,8 +134,8 @@ dottedTuplet = re.sub('\s\s\s\s+', '\t', \
 *-
 ''')
 
-splitSpines =  re.sub("\s\s\s\s+", "\t", \
-'''
+splitSpines =  re.sub(r"\s\s\s\s+", "\t", \
+r'''
 **kern
 *staff1
 *clefG2
@@ -117,8 +152,8 @@ splitSpines =  re.sub("\s\s\s\s+", "\t", \
 '''
 )
 
-splitSpines2 =  re.sub("\s\s\s\s+", "\t", \
-'''
+splitSpines2 =  re.sub(r"\s\s\s\s+", "\t", \
+r'''
 **kern
 *staff1
 *clefG2
@@ -147,8 +182,8 @@ splitSpines2 =  re.sub("\s\s\s\s+", "\t", \
 
 
   
-schubert = re.sub("\s\s\s\s", "\t", \
-'''
+schubert = re.sub(r"\s\s\s\s", "\t", \
+r'''
 !!!COM: Schubert, Franz Peter
 !!!CDT: 1797-1828
 !!!OTL: Heidenroeslein
@@ -414,8 +449,8 @@ schubert = re.sub("\s\s\s\s", "\t", \
 )
     
     
-mazurka6 = re.sub("\s\s\s\s", "\t", \
-'''
+mazurka6 = re.sub(r"\s\s\s\s", "\t", \
+r'''
 !!!COM: Chopin, Frederic
 !!!CDT: 1810///-1849///
 !!!OTL: Mazurka in C-sharp Minor, Op. 6, No. 2
@@ -913,8 +948,8 @@ mazurka6 = re.sub("\s\s\s\s", "\t", \
 '''\
 )
 
-ivesSpring = re.sub("\s\s\s\s", "\t", \
-'''
+ivesSpring = re.sub(r"\s\s\s\s", "\t", \
+r'''
 !!!COM: Ives, Charles
 !!!CDT: 1874/10/20/-1954/05/19/
 !!!OTL: Spring Song
@@ -1103,8 +1138,8 @@ ivesSpring = re.sub("\s\s\s\s", "\t", \
 '''
 )                    
 
-sousaStars = re.sub("\s\s\s\s","\t",
-'''
+sousaStars = re.sub(r"\s\s\s\s","\t",
+r'''
 !!!COM: Sousa, John Phillip
 !!!CDT: 1854/11/05/-1932/04/08/
 !!!OTL: Stars and Strips Forever March
@@ -1822,8 +1857,8 @@ sousaStars = re.sub("\s\s\s\s","\t",
 '''
 )
 
-multipartSanctus = re.sub("\s\s\s\s","\t",
-'''!!!COM: Palestrina, Giovanni Perluigi da
+multipartSanctus = re.sub(r"\s\s\s\s","\t",
+r'''!!!COM: Palestrina, Giovanni Perluigi da
 **kern    **kern    **kern    **kern
 *Ibass    *Itenor    *Icalto    *Icant
 !Bassus    !Tenor    !Altus    !Cantus

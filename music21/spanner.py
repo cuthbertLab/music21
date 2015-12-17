@@ -29,6 +29,8 @@ from music21 import base
 from music21 import common
 from music21 import duration
 
+from music21.ext import six
+
 from music21 import environment
 _MOD = "spanner.py"  
 environLocal = environment.Environment(_MOD)
@@ -48,7 +50,8 @@ class Spanner(base.Music21Object):
     but represent and store connections between one or more other Music21Objects.
 
     Commonly used Spanner subclasses include the :class:`~music21.spanner.Slur`, 
-    :class:`~music21.spanner.RepeatBracket`, :class:`~music21.spanner.Crescendo`, and :class:`~music21.spanner.Diminuendo`
+    :class:`~music21.spanner.RepeatBracket`, :class:`~music21.spanner.Crescendo`, 
+    and :class:`~music21.spanner.Diminuendo`
     objects.
 
     In some cases you will want to subclass Spanner
@@ -103,10 +106,12 @@ class Spanner(base.Music21Object):
     <music21.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>
 
 
-    (3) we can get the spanner by looking at the list getSpannerSites() on any object that has a spanner:
+    (3) we can get the spanner by looking at the list getSpannerSites() on 
+    any object that has a spanner:
     
     >>> n2.getSpannerSites()
-    [<music21.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>]
+    [<music21.CarterAccelerandoSign 
+            <music21.note.Note C><music21.note.Note D><music21.note.Note E>>]
     
     In this example we will slur a few notes and then iterate over the stream to
     see which are slurred:
@@ -196,13 +201,7 @@ class Spanner(base.Music21Object):
     When we're done adding elements:
     
     >>> sp1.completeStatus = True
-    
-    
-
     '''
-    # this class attribute provides performance optimized class selection
-    isSpanner = True 
-
     def __init__(self, *arguments, **keywords):
         base.Music21Object.__init__(self)
 
@@ -210,10 +209,7 @@ class Spanner(base.Music21Object):
 
         # store this so subclasses can replace
         if self.__module__ != '__main__':
-            if self.__module__.startswith('music21') == False:
-                self._reprHead = '<music21.' + self.__module__ + '.' + self.__class__.__name__ + ' '
-            else:
-                self._reprHead = '<' + self.__module__ + '.' + self.__class__.__name__ + ' '
+            self._reprHead = '<' + self.__module__ + '.' + self.__class__.__name__ + ' '
         else:
             self._reprHead = '<music21.spanner.' + self.__class__.__name__ + ' '
         # store a Stream inside of Spanner
@@ -456,11 +452,13 @@ class Spanner(base.Music21Object):
             else:
                 pass
                 # it makes sense to not have multiple copies
-                #environLocal.printDebug(['attempting to add an object (%s) that is already found in the SpannerStorage stream of spaner %s; this may not be an error.' % (c, self)])
+                #environLocal.printDebug(['''attempting to add an object (%s) that is 
+                #    already found in the SpannerStorage stream of spaner %s; 
+                #    this may not be an error.''' % (c, self)])
 
-        self.spannerStorage._elementsChanged()
+        self.spannerStorage.elementsChanged()
         # always clear cache
-        if len(self._cache) > 0:
+        if self._cache:
             self._cache = {} 
 
     def hasSpannedElement(self, spannedElement):  
@@ -480,7 +478,6 @@ class Spanner(base.Music21Object):
 
         The `old` parameter can be either an object or object id. 
 
-        
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
         >>> c1 = clef.AltoClef()
@@ -489,6 +486,8 @@ class Spanner(base.Music21Object):
         >>> sl.replaceSpannedElement(c1, c2)
         >>> sl[-1] == c2
         True
+        
+        :rtype: None
         '''
         if old is None:
             return None # do nothing
@@ -498,24 +497,28 @@ class Spanner(base.Music21Object):
             # e here is the old element that was spanned by this Spanner
             
 
-            #environLocal.printDebug(['current Spanner.getSpannedElementIdsIds()', self.getSpannedElementIds()])
-            #environLocal.printDebug(['Spanner.replaceSpannedElement:', 'getElementById result', e, 'old target', old])
+            #environLocal.printDebug(['current Spanner.getSpannedElementIdsIds()', 
+            #    self.getSpannedElementIds()])
+            #environLocal.printDebug(['Spanner.replaceSpannedElement:', 'getElementById result', 
+            #    e, 'old target', old])
             if e is not None:
                 #environLocal.printDebug(['Spanner.replaceSpannedElement:', 'old', e, 'new', new])
                 # do not do all Sites: only care about this one
-                self.spannerStorage.replace(e, new, allTargetSites=False)
+                self.spannerStorage.replace(e, new, allDerived=False)
         else:
             # do not do all Sites: only care about this one
-            self.spannerStorage.replace(old, new, allTargetSites=False)
+            self.spannerStorage.replace(old, new, allDerived=False)
             #environLocal.printDebug(['Spanner.replaceSpannedElement:', 'old', e, 'new', new])
 
-        # while this Spanner now has proper elements in its spannerStorage Stream, the element replaced likely has a site left-over from its previous Spanner
+        # while this Spanner now has proper elements in its spannerStorage Stream, 
+        # the element replaced likely has a site left-over from its previous Spanner
 
         # always clear cache
-        if len(self._cache) > 0:
+        if self._cache:
             self._cache = {} 
 
-        #environLocal.printDebug(['replaceSpannedElement()', 'id(old)', id(old), 'id(new)', id(new)])
+        #environLocal.printDebug(['replaceSpannedElement()', 'id(old)', id(old), 
+        #    'id(new)', id(new)])
 
 
     def isFirst(self, spannedElement):
@@ -610,7 +613,7 @@ class Spanner(base.Music21Object):
         for c in self.spannerStorage._elements:
             # getting site ids is fast, as weakrefs do not have to be unpacked
             if idSite in c.sites.getSiteIds():
-                o = c.getOffsetBySite(site)
+                o = site.elementOffset(c)
                 post.append(o)
         return post
 
@@ -638,7 +641,7 @@ class Spanner(base.Music21Object):
 
         # special handling for case of a single spannedElement spanner
         if len(self.spannerStorage) == 1:
-            o = self.spannerStorage[0].getOffsetBySite(site)
+            o = site.elementOffset(self.spannerStorage[0])
             return o, o + self.spannerStorage[0].duration.quarterLength
 
         offsetSpannedElement = [] # store pairs
@@ -646,7 +649,7 @@ class Spanner(base.Music21Object):
         #for c in self.getSpannedElements():
             objRef = c
             if idSite in objRef.sites.getSiteIds():
-                o = objRef.getOffsetBySite(site)
+                o = site.elementOffset(objRef)
                 offsetSpannedElement.append([o, objRef])
         offsetSpannedElement.sort() # sort by offset
         minOffset = offsetSpannedElement[0][0]
@@ -689,13 +692,13 @@ class SpannerBundle(object):
     If a Stream or Stream subclass is provided as an argument, 
     all Spanners on this Stream will be accumulated herein. 
     
-    Not to be confused with SpannerStorage.
+    Not to be confused with SpannerStorage (which stores Elements that are spanned)
     '''
     def __init__(self, *arguments, **keywords):
         self._cache = {}     
         self._storage = [] # a simple List, not a Stream
         for arg in arguments:
-            if common.isListLike(arg):
+            if common.isListLike(arg): # spannners are iterable but not listlike...
                 for e in arg:
                     self._storage.append(e)    
             # take a Stream and use its .spanners property to get all spanners            
@@ -719,7 +722,7 @@ class SpannerBundle(object):
         to a Stream.
         '''
         self._storage.append(other)
-        if len(self._cache) > 0:
+        if self._cache:
             self._cache = {} 
 
     def __len__(self):
@@ -732,7 +735,9 @@ class SpannerBundle(object):
         return self._storage[key]
 
     def remove(self, item):
-        '''Remove a stored Spanner from the bundle with an instance. Each reference must have a matching id() value.
+        '''
+        Remove a stored Spanner from the bundle with an instance. 
+        Each reference must have a matching id() value.
         
         >>> su1 = spanner.Slur()
         >>> su1.idLocal = 1
@@ -754,7 +759,7 @@ class SpannerBundle(object):
             self._storage.remove(item)
         else:
             raise SpannerBundleException('cannot match object for removal: %s' % item)
-        if len(self._cache) > 0:
+        if self._cache:
             self._cache = {} 
 
     def __repr__(self):
@@ -792,11 +797,10 @@ class SpannerBundle(object):
         return post
 
     def getByIdLocal(self, idLocal=None):
-        '''Get spanners by `idLocal` or `complete` status.
+        '''Get spanners by `idLocal`.
 
         Returns a new SpannerBundle object
 
-        
         >>> su1 = spanner.Slur()
         >>> su1.idLocal = 1
         >>> su2 = spanner.Slur()
@@ -896,6 +900,8 @@ class SpannerBundle(object):
         The `old` parameter can be either an object or object id. 
 
         If no replacements are found, no errors are raised.
+        
+        Returns a list of spanners that had elements replaced.
 
         >>> n1 = note.Note('C')
         >>> n2 = note.Note('D')
@@ -911,7 +917,9 @@ class SpannerBundle(object):
         <music21.spanner.Glissando <music21.note.Note D><music21.note.Note C>>
 
         >>> n3 = note.Note('E')
-        >>> sb.replaceSpannedElement(n2, n3)
+        >>> replacedSpanners = sb.replaceSpannedElement(n2, n3)
+        >>> replacedSpanners == [su1, su2]
+        True
 
         >>> su1
         <music21.spanner.Line <music21.note.Note C><music21.note.Note E>>
@@ -920,13 +928,15 @@ class SpannerBundle(object):
 
 
         '''
-        #environLocal.printDebug(['SpannerBundle.replaceSpannedElement()', 'old', old, 'new', new, 'len(self._storage)', len(self._storage)])
+        #environLocal.printDebug(['SpannerBundle.replaceSpannedElement()', 'old', old, 
+        #    'new', new, 'len(self._storage)', len(self._storage)])
 
         if common.isNum(old): # assume this is an id
             idTarget = old
         else:
             idTarget = id(old)
 
+        replacedSpanners = []
         #post = self.__class__() # return a bundle of spanners that had changes
         for sp in self._storage: # Spanners in a list
             #environLocal.printDebug(['looking at spanner', sp, sp.getSpannedElementIds()])
@@ -934,11 +944,15 @@ class SpannerBundle(object):
             # must check to see if this id is in this spanner
             if idTarget in sp.getSpannedElementIds():
                 sp.replaceSpannedElement(old, new)
+                replacedSpanners.append(sp)
                 #post.append(sp)
-                #environLocal.printDebug(['replaceSpannedElement()', sp, 'old', old, 'id(old)', id(old), 'new', new, 'id(new)', id(new)])
+                #environLocal.printDebug(['replaceSpannedElement()', sp, 'old', old, 
+                #    'id(old)', id(old), 'new', new, 'id(new)', id(new)])
 
-        if len(self._cache) > 0:
+        if self._cache:
             self._cache = {} 
+
+        return replacedSpanners
 
     def getByClass(self, className):
         '''
@@ -1054,7 +1068,9 @@ class SpannerBundle(object):
         [None, None]
         >>> sb.setIdLocals()
         >>> [(sp, sp.idLocal) for sp in sb]
-        [(<music21.spanner.Slur >, 1), (<music21.layout.StaffGroup >, 1), (<music21.spanner.Slur >, 2)]
+        [(<music21.spanner.Slur >, 1), 
+         (<music21.layout.StaffGroup >, 1), 
+         (<music21.spanner.Slur >, 2)]
         '''
         classes = []
         for sp in self._storage:
@@ -1085,20 +1101,81 @@ class SpannerBundle(object):
             idLocal).getByCompleteStatus(completeStatus)
 
     def setPendingSpannedElementAssignment(self, sp, className):
+        '''
+        A SpannerBundle can be set up so that a particular spanner (sp) 
+        is looking for an element of class (className) to complete it. Any future
+        element that matches the className which is passed to the SpannerBundle
+        via freePendingSpannedElementAssignment() will get it.
+        
+        >>> n1 = note.Note('C')
+        >>> r1 = note.Rest()
+        >>> n2 = note.Note('D')
+        >>> n3 = note.Note('E')
+        >>> su1 = spanner.Slur([n1])
+        >>> sb = spanner.SpannerBundle()
+        >>> sb.append(su1)
+        >>> su1.getSpannedElements()
+        [<music21.note.Note C>]
+
+        >>> n1.getSpannerSites()
+        [<music21.spanner.Slur <music21.note.Note C>>]
+
+        Now set up su1 to get the next note assigned to it.
+        
+        >>> sb.setPendingSpannedElementAssignment(su1, 'Note')
+
+        Call freePendingSpannedElementAssignment to attach.
+
+        Should not get a rest... because it is not a 'Note'
+    
+        >>> sb.freePendingSpannedElementAssignment(r1)
+        >>> su1.getSpannedElements()
+        [<music21.note.Note C>]
+        
+        But will get the next note:
+        
+        >>> sb.freePendingSpannedElementAssignment(n2)
+        >>> su1.getSpannedElements()
+        [<music21.note.Note C>, <music21.note.Note D>]        
+        
+        >>> n2.getSpannerSites()
+        [<music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>]
+        
+        And now that the assignment has been made, the pending assignment
+        has been cleared, so n3 will not get assigned to the slur:
+        
+        >>> sb.freePendingSpannedElementAssignment(n3)
+        >>> su1.getSpannedElements()
+        [<music21.note.Note C>, <music21.note.Note D>]        
+        
+        >>> n3.getSpannerSites()
+        []
+        
+        '''
         ref = {'spanner':sp, 'className':className}
         self._pendingSpannedElementAssignment.append(ref)
 
     def freePendingSpannedElementAssignment(self, spannedElementCandidate):
+        '''
+        Assigns and frees up a pendingSpannedElementAssignment if one is
+        active and the candidate matches the class.  See 
+        setPendingSpannedElementAssignment for documentation and tests.
+        
+        It is set up via a first-in, first-out priority.
+        '''
+        
         if len(self._pendingSpannedElementAssignment) == 0:
             return
 
         remove = None
         for i, ref in enumerate(self._pendingSpannedElementAssignment):
-            #environLocal.printDebug(['calling freePendingSpannedElementAssignment()', self._pendingSpannedElementAssignment])
+            #environLocal.printDebug(['calling freePendingSpannedElementAssignment()', 
+            #    self._pendingSpannedElementAssignment])
             if spannedElementCandidate.isClassOrSubclass([ref['className']]):
                 ref['spanner'].addSpannedElements(spannedElementCandidate)
                 remove = i      
-                #environLocal.printDebug(['freePendingSpannedElementAssignment()', 'added spannedElement', ref['spanner']])
+                #environLocal.printDebug(['freePendingSpannedElementAssignment()', 
+                #    'added spannedElement', ref['spanner']])
                 break
         if remove is not None:
             self._pendingSpannedElementAssignment.pop(remove)
@@ -1111,7 +1188,8 @@ class SpannerBundle(object):
 class Slur(Spanner):
     '''A slur represented as a spanner between two Notes. 
 
-    The `idLocal` attribute, defined in the Spanner base class, is used to mark start and end tags of potentially overlapping indicators.
+    The `idLocal` attribute, defined in the Spanner base class, 
+    is used to mark start and end tags of potentially overlapping indicators.
     '''
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)
@@ -1130,11 +1208,13 @@ class Slur(Spanner):
 #-------------------------------------------------------------------------------
 # first/second repeat bracket
 class RepeatBracket(Spanner):
-    '''A grouping of one or more measures, presumably in sequence, that mark an alternate repeat. 
+    '''
+    A grouping of one or more measures, presumably in sequence, that mark an alternate repeat. 
 
     These gather what are sometimes called first-time bars and second-time bars.
 
-    It is assumed that numbering starts from 1. Numberings above 2 are permitted. The `number` keyword argument can be used to pass in the desired number. 
+    It is assumed that numbering starts from 1. Numberings above 2 are permitted. 
+    The `number` keyword argument can be used to pass in the desired number. 
 
     
     >>> m = stream.Measure()
@@ -1187,7 +1267,9 @@ class RepeatBracket(Spanner):
 
     # property to enforce numerical numbers
     def _getNumber(self):
-        '''This must return a string, as we may have single numbers or lists. For a raw numerical list, use getNumberList() below.
+        '''
+        This must return a string, as we may have single numbers or lists. 
+        For a raw numerical list, use getNumberList() below.
         '''
         if len(self._numberRange) == 1:
             return str(self._number)
@@ -1207,13 +1289,14 @@ class RepeatBracket(Spanner):
             # assume this is 1 
             self._numberRange = [1]
             self._number = 1
-        elif common.isListLike(value):
+        elif common.isIterable(value):
             self._numberRange = [] # clear
             for x in value:
                 if common.isNum(x):
                     self._numberRange.append(x)
                 else:
-                    raise SpannerException('number for RepeatBracket must be a number, not %r' % value)
+                    raise SpannerException(
+                        'number for RepeatBracket must be a number, not %r' % value)
             self._number = min(self._numberRange)
             self._numberSpanIsContiguous = common.contiguousList(self._numberRange)
             if (len(self._numberRange) == 2) and (self._numberRange[0] == self._numberRange[1] - 1):
@@ -1238,7 +1321,8 @@ class RepeatBracket(Spanner):
                 
                 # returns bool 
                 self._numberSpanIsContiguous = common.contiguousList(self._numberRange)
-                if (len(self._numberRange) == 2) and (self._numberRange[0] == self._numberRange[1] - 1):
+                if ((len(self._numberRange) == 2) and 
+                        (self._numberRange[0] == self._numberRange[1] - 1)):
                     self._numberSpanIsAdjacent = True
                 else:
                     self._numberSpanIsAdjacent = False
@@ -1596,7 +1680,9 @@ class Line(Spanner):
 
 
 class Glissando(Spanner):
-    '''A between two Notes specifying a glissando or similar alteration. Different line types can be specified. 
+    '''
+    A between two Notes specifying a glissando or similar alteration. 
+    Different line types can be specified. 
     '''
     validLineTypes = ('solid', 'dashed', 'dotted', 'wavy')
     
@@ -1690,6 +1776,21 @@ class Test(unittest.TestCase):
 
     def runTest(self):
         pass
+
+    def setUp(self):
+        from music21.musicxml.m21ToXml import GeneralObjectExporter
+        self.GEX = GeneralObjectExporter()
+
+    def xmlStr(self, obj):
+        xmlBytes = self.GEX.parse(obj)
+        if six.PY2:
+            return xmlBytes
+        else:
+            return xmlBytes.decode('utf-8')
+        
+    def xmlStrOld(self, obj):
+        from music21.musicxml.m21ToString import fromMusic21Object
+        return fromMusic21Object(obj)
 
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
@@ -1931,7 +2032,6 @@ class Test(unittest.TestCase):
 
     def testRepeatBracketC(self):
         from music21 import note, spanner, stream, bar
-        from music21.musicxml import m21ToString
 
         p = stream.Part()
         m1 = stream.Measure()
@@ -1969,14 +2069,13 @@ class Test(unittest.TestCase):
         self.assertEqual(rb1.getDurationBySite(p).quarterLength, 8.0)
 
         #p.show()
-        raw = m21ToString.fromMusic21Object(p)
+        raw = self.xmlStrOld(p)
         self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
 
     def testRepeatBracketD(self):
         from music21 import note, spanner, stream, bar
-        from music21.musicxml import m21ToString
 
         p = stream.Part()
         m1 = stream.Measure()
@@ -2062,19 +2161,19 @@ class Test(unittest.TestCase):
         # have the offsets of the start of each measure
         self.assertEqual(rb4.getOffsetsBySite(p), [32.0, 36.0, 40.0, 44.0])
         self.assertEqual(rb4.getDurationBySite(p).quarterLength, 16.0)
-        raw = m21ToString.fromMusic21Object(p)
+        raw = self.xmlStrOld(p)
         self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
         
         p1 = copy.deepcopy(p)
-        raw = m21ToString.fromMusic21Object(p1)
+        raw = self.xmlStrOld(p1)
         self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
 
         p2 = copy.deepcopy(p1)
-        raw = m21ToString.fromMusic21Object(p2)
+        raw = self.xmlStrOld(p2)
         self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
         self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
@@ -2148,7 +2247,6 @@ class Test(unittest.TestCase):
         objects through make measure calls. 
         '''
         from music21 import stream, note, spanner, chord
-        from music21.musicxml import m21ToString
 
         s = stream.Stream()
         s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
@@ -2157,7 +2255,7 @@ class Test(unittest.TestCase):
         n2 = s.notes[-1]
         sp1 = spanner.Ottava(n1, n2) # default is 8va
         s.append(sp1)
-        raw = m21ToString.fromMusic21Object(s)
+        raw = self.xmlStrOld(s)
         self.assertEqual(raw.count('octave-shift'), 2)
         self.assertEqual(raw.count('type="down"'), 1)
         #s.show()
@@ -2169,7 +2267,7 @@ class Test(unittest.TestCase):
         sp1 = spanner.Ottava(n1, n2, type='8vb')
         s.append(sp1)
         #s.show()
-        raw = m21ToString.fromMusic21Object(s)
+        raw = self.xmlStrOld(s)
         self.assertEqual(raw.count('octave-shift'), 2)
         self.assertEqual(raw.count('type="up"'), 1)
 
@@ -2180,7 +2278,7 @@ class Test(unittest.TestCase):
         sp1 = spanner.Ottava(n1, n2, type='15ma')
         s.append(sp1)
         #s.show()
-        raw = m21ToString.fromMusic21Object(s)
+        raw = self.xmlStrOld(s)
         self.assertEqual(raw.count('octave-shift'), 2)
         self.assertEqual(raw.count('type="down"'), 1)
 
@@ -2191,7 +2289,7 @@ class Test(unittest.TestCase):
         sp1 = spanner.Ottava(n1, n2, type='15mb')
         s.append(sp1)
         #s.show()
-        raw = m21ToString.fromMusic21Object(s)
+        raw = self.xmlStrOld(s)
         self.assertEqual(raw.count('octave-shift'), 2)
         self.assertEqual(raw.count('type="up"'), 1)
 
@@ -2201,14 +2299,13 @@ class Test(unittest.TestCase):
         '''Test a single note octave
         '''
         from music21 import stream, note, spanner
-        from music21.musicxml import m21ToString
         s = stream.Stream()
         n = note.Note('c4')
         sp = spanner.Ottava(n)
         s.append(n)
         s.append(sp)
         #s.show()
-        raw = m21ToString.fromMusic21Object(s)
+        raw = self.xmlStrOld(s)
         self.assertEqual(raw.count('octave-shift'), 2)
         self.assertEqual(raw.count('type="down"'), 1)
 
@@ -2217,23 +2314,39 @@ class Test(unittest.TestCase):
 
     def testCrescendoA(self):
         from music21 import stream, note, dynamics
-        from music21.musicxml import m21ToString
-
         s = stream.Stream()
+#         n1 = note.Note('C')
+#         n2 = note.Note('D')
+#         n3 = note.Note('E')
+#          
+#         s.append(n1)
+#         s.append(note.Note('A'))
+#         s.append(n2)
+#         s.append(note.Note('B'))
+#         s.append(n3)
+         
         #s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
-        s.repeatAppend(note.Note(), 12)
+        s.repeatAppend(note.Note(type='half'), 4)
+#        n1 = s._elements[0]
         n1 = s.notes[0]
+        n1.pitch.step = 'D'
         #s.insert(n1.offset, dynamics.Dynamic('fff'))
+        #n2 = s._elements[2]
         n2 = s.notes[len(s.notes) // 2]
+        n2.pitch.step = 'E'
         #s.insert(n2.offset, dynamics.Dynamic('ppp'))
+        #n3 = s._elements[-1]
         n3 = s.notes[-1]
+        n3.pitch.step = 'F'
         #s.insert(n3.offset, dynamics.Dynamic('ff'))
         sp1 = dynamics.Diminuendo(n1, n2)
         sp2 = dynamics.Crescendo(n2, n3)
         s.append(sp1)
         s.append(sp2)
-        #s.show()
-        raw = m21ToString.fromMusic21Object(s)
+        #s._reprText()
+        #s.show('t')
+        raw = self.xmlStr(s)
+        #print(raw)
         self.assertEqual(raw.count('<wedge'), 4)
 
         #self.assertEqual(raw.count('octave-shift'), 2)
@@ -2241,7 +2354,6 @@ class Test(unittest.TestCase):
 
     def testLineA(self):
         from music21 import stream, note, spanner
-        from music21.musicxml import m21ToString
 
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
@@ -2253,14 +2365,14 @@ class Test(unittest.TestCase):
                                     endHeight=40)
         s.append(sp1)
         s.append(sp2)
-        #s.show()
-        raw = m21ToString.fromMusic21Object(s)
+        #s.show('t')
+        raw = self.xmlStr(s)
+        #print(raw)
         self.assertEqual(raw.count('<bracket'), 4)
 
 
     def testLineB(self):
         from music21 import stream, note, spanner
-        from music21.musicxml import m21ToString
 
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
@@ -2277,7 +2389,7 @@ class Test(unittest.TestCase):
         s.append(sp2)
 
         #s.show()
-        raw = m21ToString.fromMusic21Object(s)
+        raw = self.xmlStr(s)
         self.assertEqual(raw.count('<bracket'), 4)
         self.assertEqual(raw.count('line-end="arrow"'), 1)
         self.assertEqual(raw.count('line-end="none"'), 1)
@@ -2287,10 +2399,9 @@ class Test(unittest.TestCase):
 
     def testGlissandoA(self):
         from music21 import stream, note, spanner
-        from music21.musicxml import m21ToString
 
         s = stream.Stream()
-        s.repeatAppend(note.Note(), 12)
+        s.repeatAppend(note.Note(), 3)
         for i, n in enumerate(s.notes):
             n.transpose(i + (i%2*12), inPlace=True)
 
@@ -2303,15 +2414,16 @@ class Test(unittest.TestCase):
         sp2.lineType = 'dashed'
         s.append(sp1)
         s.append(sp2)
-        #s.show()
-        raw = m21ToString.fromMusic21Object(s)
+        s = s.makeNotation()
+        #s.show('t')
+        raw = self.xmlStr(s)
+        #print(raw)
         self.assertEqual(raw.count('<glissando'), 4)
         self.assertEqual(raw.count('line-type="dashed"'), 2)        
 
 
     def testGlissandoB(self):
         from music21 import stream, note, spanner
-        from music21.musicxml import m21ToString
 
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
@@ -2327,7 +2439,7 @@ class Test(unittest.TestCase):
         s.append(sp1)
 
         #s.show()
-        raw = m21ToString.fromMusic21Object(s)
+        raw = self.xmlStr(s)
         self.assertEqual(raw.count('<glissando'), 2)
         self.assertEqual(raw.count('line-type="solid"'), 2)        
         self.assertEqual(raw.count('>gliss.<'), 1)        

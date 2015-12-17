@@ -15,10 +15,10 @@ demonstrated by Dmitri Tymoczko.
 '''
 
 #from __future__ import unicode_literals
-
-import unittest
+from fractions import Fraction
+import io
 import re
-import codecs
+import unittest
 
 from music21 import common
 from music21 import exceptions21
@@ -36,6 +36,7 @@ reNoteTag = re.compile(r'[Nn]ote:')
 
 reOptKeyOpenAtom = re.compile(r'\?\([A-Ga-g]+[b#]*:')
 reOptKeyCloseAtom = re.compile(r'\?\)[A-Ga-g]+[b#]*:?')
+# ?g:( ?
 reKeyAtom = re.compile('[A-Ga-g]+[b#]*;:')
 reAnalyticKeyAtom = re.compile('[A-Ga-g]+[b#]*:')
 reKeySignatureAtom = re.compile(r'KS\-?[0-7]')
@@ -423,7 +424,8 @@ class RTMeasure(RTToken):
         self.number = [] # one or more measure numbers
         self.repeatLetter = [] # one or more repeat letters
         self.variantNumber = None # a one-measure or short variant
-        self.variantLetter = None # a longer-variant that defines a different way of reading a large section 
+        self.variantLetter = None # a longer-variant that 
+                                # defines a different way of reading a large section 
         # store boolean if this measure defines copying another range
         self.isCopyDefinition = False
         # store processed tokens associated with this measure
@@ -610,6 +612,94 @@ class RTBeat(RTAtom):
     def __repr__(self):
         return '<RTBeat %r>' % self.src
 
+    def getBeatFloatOrFrac(self):
+        '''
+        Gets the beat number as a float or fraction. Time signature independent
+        
+        >>> RTB = romanText.rtObjects.RTBeat
+        
+        Simple ones:
+        
+        >>> RTB('b1').getBeatFloatOrFrac()
+        1.0
+        >>> RTB('b2').getBeatFloatOrFrac()
+        2.0
+        
+        etc.
+        
+        with easy float:
+        
+        >>> RTB('b1.5').getBeatFloatOrFrac()
+        1.5
+        >>> RTB('b1.25').getBeatFloatOrFrac()
+        1.25
+        
+        with harder:
+        
+        >>> RTB('b1.33').getBeatFloatOrFrac()
+        Fraction(4, 3)
+        
+        >>> RTB('b2.66').getBeatFloatOrFrac()
+        Fraction(8, 3)
+                
+        >>> RTB('b1.2').getBeatFloatOrFrac()
+        Fraction(6, 5)
+
+
+        A third digit of .5 adds 1/2 of 1/DENOM of before.  Here DENOM is 3 (in 5/3) so
+        we add 1/6 to 5/3 to get 11/6:
+        
+
+        >>> RTB('b1.66').getBeatFloatOrFrac()
+        Fraction(5, 3)
+
+        >>> RTB('b1.66.5').getBeatFloatOrFrac()
+        Fraction(11, 6)
+
+
+        Similarly .25 adds 1/4 of 1/DENOM... to get 21/12 or 7/4 or 1.75
+
+        >>> RTB('b1.66.25').getBeatFloatOrFrac()
+        1.75
+
+        And .75 adds 3/4 of 1/DENOM to get 23/12
+        
+        >>> RTB('b1.66.75').getBeatFloatOrFrac()
+        Fraction(23, 12)
+
+
+        A weird way of writing 'b1.5'
+
+        >>> RTB('b1.33.5').getBeatFloatOrFrac()
+        1.5
+        '''
+        beatStr = self.src.replace('b', '')
+        # there may be more than one decimal in the number, such as
+        # 1.66.5, to show halfway through 2/3rd of a beat
+        parts = beatStr.split('.')
+        mainBeat = int(parts[0])
+        if len(parts) > 1: # 1.66
+            fracPart = common.addFloatPrecision('.' + parts[1])
+        else:
+            fracPart = 0.0
+            
+        if len(parts) > 2: # 1.66.5 
+            fracPartDivisor = float('.' + parts[2]) # 0.5
+            if isinstance(fracPart, float):
+                fracPart = Fraction.from_float(fracPart)
+            denom = fracPart.denominator
+            fracBeatFrac = common.opFrac(1./(denom/fracPartDivisor))
+        else:
+            fracBeatFrac = 0.0
+
+        if len(parts) > 3:
+            environLocal.printDebug(['got unexpected beat: %s' % self.src])
+            raise RTTokenException('cannot handle specification: %s' %  self.src)
+            
+            
+        beat = common.opFrac(mainBeat + fracPart + fracBeatFrac)
+        return beat
+
     def getOffset(self, timeSignature):
         '''Given a time signature, return the offset position specified by this
         beat.
@@ -636,36 +726,15 @@ class RTBeat(RTAtom):
         1.25
         '''
         from music21 import meter
-        beatStr = self.src.replace('b', '')
-        # there may be more than one decimal in the number, such as
-        # 1.66.5, to show halfway through 2/3rd of a beat
-        if '.' in beatStr:
-            parts = beatStr.split('.')
-            if len(parts) == 2:
-                beat = int(parts[0]) + common.nearestCommonFraction(
-                                    '.' + parts[1])
-            # assume not more than 2 decimals are given
-            elif len(parts) == 3:
-                if parts[1] == '66' and parts[2] == '5':
-                    add = 5./6
-                elif parts[1] == '0' and parts[2] == '5':
-                    add = 1./6
-                else: 
-                    raise RTTokenException('cannot handle specification: %s' %  self.src)
-                beat = int(parts[0]) + add
-                # TODO: need to treat the third part as a fraction of the beat division that has just been specified
-                environLocal.printDebug(['discarding beat specification for beat indication: %s' % self.src])
-            else:
-                environLocal.printDebug(['got unexpected beat: %s' % self.src])
-                raise RTTokenException('cannot handle specification: %s' %  self.src)
-        else: # assume it is an integer
-            beat = int(beatStr)
+        beat = self.getBeatFloatOrFrac()
+
         #environLocal.printDebug(['using beat value:', beat])
         # TODO: check for exceptions/errors if this beat is bad
         try:
             post = timeSignature.getOffsetFromBeat(beat)
         except meter.TimeSignatureException:
-            environLocal.printDebug(['bad beat specification: %s in a meter of %s' % (self.src, timeSignature)])
+            environLocal.printDebug(['bad beat specification: %s in a meter of %s' % (
+                                    self.src, timeSignature)])
             post = 0.0 
 
         return post
@@ -727,7 +796,7 @@ class RTKey(RTKeyTypeAtom):
         >>> eflatmajor.getKey()
         <music21.key.Key of E- major>
         '''
-        RTAtom.__init__(self, src, container)
+        super(RTKey, self).__init__(src, container)
 
     def __repr__(self):
         return '<RTKey %r>' % self.src
@@ -754,7 +823,7 @@ class RTAnalyticKey(RTKeyTypeAtom):
         <music21.key.Key of b- minor>
 
         '''
-        RTAtom.__init__(self, src, container)
+        super(RTAnalyticKey, self).__init__(src, container)
     
     def __repr__(self):
         return '<RTAnalyticKey %r>' % self.src
@@ -778,7 +847,7 @@ class RTKeySignature(RTAtom):
         >>> Amajor.getKeySignature()
         <music21.key.KeySignature of 3 sharps>
         '''
-        RTAtom.__init__(self, src, container)
+        super(RTKeySignature, self).__init__(src, container)
 
     def __repr__(self):
         return '<RTKeySignature %r>' % self.src
@@ -1004,7 +1073,8 @@ class RTHandler(object):
                 iStartBody = i
                 break
         if iStartBody is None:
-            raise RomanTextException("Cannot find the first measure definition in this file.  Dumping contextss: %s", lines)
+            raise RomanTextException("Cannot find the first measure definition in this file. " + 
+                                     "Dumping contexts: %s", lines)
         return lines[:iStartBody], lines[iStartBody:]
     
     def tokenizeHeader(self, lines):
@@ -1052,7 +1122,8 @@ class RTHandler(object):
             except Exception:
                 import traceback
                 tracebackMessage = traceback.format_exc()
-                raise RTHandlerException("At line %d (%s) an exception was raised: \n%s" % (currentLineNumber, l, tracebackMessage))
+                raise RTHandlerException("At line %d (%s) an exception was raised: \n%s" % (
+                                            currentLineNumber, l, tracebackMessage))
         return post
 
     def tokenizeAtoms(self, line, container=None):
@@ -1060,24 +1131,30 @@ class RTHandler(object):
         tokenize and return a list.
 
         >>> rth = romanText.rtObjects.RTHandler()
-        >>> str(rth.tokenizeAtoms('IV b3 ii7 b4 ii'))
-        "[<RTChord 'IV'>, <RTBeat 'b3'>, <RTChord 'ii7'>, <RTBeat 'b4'>, <RTChord 'ii'>]"
+        >>> rth.tokenizeAtoms('IV b3 ii7 b4 ii')
+        [<RTChord 'IV'>, <RTBeat 'b3'>, <RTChord 'ii7'>, <RTBeat 'b4'>, <RTChord 'ii'>]
 
-        >>> str(rth.tokenizeAtoms('V7 b2 V13 b3 V7 iio6/5[no5]'))
-        "[<RTChord 'V7'>, <RTBeat 'b2'>, <RTChord 'V13'>, <RTBeat 'b3'>, <RTChord 'V7'>, <RTChord 'iio6/5[no5]'>]"
+        >>> rth.tokenizeAtoms('V7 b2 V13 b3 V7 iio6/5[no5]')
+        [<RTChord 'V7'>, <RTBeat 'b2'>, <RTChord 'V13'>, 
+         <RTBeat 'b3'>, <RTChord 'V7'>, <RTChord 'iio6/5[no5]'>]
 
         >>> tokenList = rth.tokenizeAtoms('I b2 I b2.25 V/ii b2.5 bVII b2.75 V g: IV')
-        >>> str(tokenList)
-        "[<RTChord 'I'>, <RTBeat 'b2'>, <RTChord 'I'>, <RTBeat 'b2.25'>, <RTChord 'V/ii'>, <RTBeat 'b2.5'>, <RTChord 'bVII'>, <RTBeat 'b2.75'>, <RTChord 'V'>, <RTAnalyticKey 'g:'>, <RTChord 'IV'>]"
+        >>> tokenList
+        [<RTChord 'I'>, <RTBeat 'b2'>, <RTChord 'I'>, <RTBeat 'b2.25'>, <RTChord 'V/ii'>, 
+         <RTBeat 'b2.5'>, <RTChord 'bVII'>, <RTBeat 'b2.75'>, <RTChord 'V'>, 
+         <RTAnalyticKey 'g:'>, <RTChord 'IV'>]
         >>> tokenList[9].getKey()
         <music21.key.Key of g minor>
 
-        >>> str(rth.tokenizeAtoms('= m3'))
-        '[]'
+        >>> rth.tokenizeAtoms('= m3')
+        []
 
         >>> tokenList = rth.tokenizeAtoms('g;: ||: V b2 ?(Bb: VII7 b3 III b4 ?)Bb: i :||')
-        >>> str(tokenList)
-        "[<RTKey 'g;:'>, <RTRepeatStart '||:'>, <RTChord 'V'>, <RTBeat 'b2'>, <RTOptionalKeyOpen '?(Bb:'>, <RTChord 'VII7'>, <RTBeat 'b3'>, <RTChord 'III'>, <RTBeat 'b4'>, <RTOptionalKeyClose '?)Bb:'>, <RTChord 'i'>, <RTRepeatStop ':||'>]"
+        >>> tokenList
+        [<RTKey 'g;:'>, <RTRepeatStart '||:'>, <RTChord 'V'>, <RTBeat 'b2'>, 
+         <RTOptionalKeyOpen '?(Bb:'>, <RTChord 'VII7'>, <RTBeat 'b3'>, 
+         <RTChord 'III'>, <RTBeat 'b4'>, <RTOptionalKeyClose '?)Bb:'>, 
+         <RTChord 'i'>, <RTRepeatStop ':||'>]
         '''
         post = []
         # break by spaces
@@ -1268,12 +1345,12 @@ class RTFile(object):
         self.filename = None
 
     def open(self, filename): 
-        '''Open a file for reading, trying a variety of codecs and then
+        '''Open a file for reading, trying a variety of encodings and then
         trying them again with an ignore if it is not possible.
         '''
         for encoding in ('utf-8', 'macintosh', 'latin-1', 'utf-16'):
             try:
-                self.file = codecs.open(filename, encoding=encoding)
+                self.file = io.open(filename, encoding=encoding)
                 if self.file is not None:
                     break
             except UnicodeDecodeError:
@@ -1281,13 +1358,14 @@ class RTFile(object):
         if self.file is None:
             for encoding in ('utf-8', 'macintosh', 'latin-1', 'utf-16', None):
                 try:
-                    self.file = codecs.open(filename, encoding=encoding, errors='ignore')
+                    self.file = io.open(filename, encoding=encoding, errors='ignore')
                     if self.file is not None:
                         break
                 except UnicodeDecodeError:
                     pass
             if self.file is None:
-                raise RomanTextException("Cannot parse file %s, possibly a broken codec?" % filename)
+                raise RomanTextException(
+                        "Cannot parse file %s, possibly a broken codec?" % filename)
                     
         self.filename = filename
 

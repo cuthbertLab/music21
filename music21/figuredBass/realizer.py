@@ -9,8 +9,10 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
-This module, the heart of fbRealizer, is all about realizing a bass line of (bassNote, notationString)
-pairs. All it takes to create well-formed realizations of a bass line is a few lines of music21 code, 
+This module, the heart of fbRealizer, is all about realizing 
+a bass line of (bassNote, notationString)
+pairs. All it takes to create well-formed realizations of a 
+bass line is a few lines of music21 code, 
 from start to finish. See :class:`~music21.figuredBass.realizer.FiguredBassLine` for more details.
 
 >>> from music21.figuredBass import realizer
@@ -28,12 +30,12 @@ from start to finish. See :class:`~music21.figuredBass.realizer.FiguredBassLine`
         :width: 500
         
 
-The same can be accomplished by taking the notes and notations from a :class:`~music21.stream.Stream`.
+The same can be accomplished by taking the notes and notations 
+from a :class:`~music21.stream.Stream`.
 See :meth:`~music21.figuredBass.realizer.figuredBassFromStream` for more details.
 
 
->>> from music21 import tinyNotation
->>> s = tinyNotation.TinyNotationStream("C4 D4_4,3 C2")
+>>> s = converter.parse("tinynotation: C4 D4_4,3 C2", makeNotation=False)
 >>> fbLine = realizer.figuredBassFromStream(s)
 >>> allSols2 = fbLine.realize()
 >>> allSols2.getNumSolutions()
@@ -48,7 +50,7 @@ import unittest
 
 from music21 import chord
 from music21 import clef
-from music21 import environment
+from music21 import common
 from music21 import exceptions21
 from music21 import key
 from music21 import meter
@@ -75,7 +77,7 @@ def figuredBassFromStream(streamPart):
     way of converting from a notated version of a figured bass (such as in a MusicXML file) to 
     a realized version of the same line.
     
-    >>> s = tinyNotation.TinyNotationStream('4/4 C4 D8_6 E8_6 F4 G4_7 c1')
+    >>> s = converter.parse('tinynotation: 4/4 C4 D8_6 E8_6 F4 G4_7 c1', makeNotation=False)
     >>> fb = figuredBass.realizer.figuredBassFromStream(s)
     >>> fb
     <music21.figuredBass.realizer.FiguredBassLine object at 0x...>
@@ -122,7 +124,7 @@ def figuredBassFromStream(streamPart):
             fb._paddingLeft = paddingLeft
     
     for n in sfn:
-        if len(n.lyrics) > 0:
+        if n.lyrics:
             annotationString = ", ".join([x.text for x in n.lyrics])
             fb.addElement(n, annotationString)
         else:
@@ -130,14 +132,14 @@ def figuredBassFromStream(streamPart):
     
     return fb
 
+
+@common.deprecated("2012","2016","Use music21.figuredBass.realizer.figuredBassFromStream.")
 def figuredBassFromStreamPart(streamPart):
     '''
     Deprecated. Use :meth:`~music21.figuredBass.realizer.figuredBassFromStream` instead.
     
     (Keep because it appears in the Cabel-Ugaz thesis)
     '''
-    _environRules = environment.Environment(_MOD)
-    _environRules.warn("The method figuredBassFromStreamPart() is deprecated. Use figuredBassFromStream().", DeprecationWarning)
     return figuredBassFromStream(streamPart)
     
 def addLyricsToBassNote(bassNote, notationString = None):
@@ -196,8 +198,12 @@ class FiguredBassLine(object):
     <music21.meter.TimeSignature 3/4>
     '''
     _DOC_ORDER = ['addElement', 'generateBassLine', 'realize']
-    _DOC_ATTR = {'inKey': 'A :class:`~music21.key.Key` which implies a scale value, scale mode, and key signature for a :class:`~music21.figuredBass.realizerScale.FiguredBassScale`.',
-                 'inTime': 'A :class:`~music21.meter.TimeSignature` which specifies the time signature of realizations outputted to a :class:`~music21.stream.Score`.'}    
+    _DOC_ATTR = {'inKey': 'A :class:`~music21.key.Key` which implies a scale value, ' + 
+                    'scale mode, and key signature for a ' + 
+                    ':class:`~music21.figuredBass.realizerScale.FiguredBassScale`.',
+                 'inTime': 'A :class:`~music21.meter.TimeSignature` which specifies the ' + 
+                    'time signature of realizations outputted to a ' + 
+                    ':class:`~music21.stream.Score`.'}    
     
     def __init__(self, inKey = None, inTime=None):
         if inKey is None:
@@ -245,11 +251,12 @@ class FiguredBassLine(object):
         if 'Note' in c:
             self._fbList.append((bassObject, notationString)) #a bass note, and a notationString
             addLyricsToBassNote(bassObject, notationString) 
-        #!---------- Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects --------!     
-        elif 'RomanNumeral' in c or 'ChordSymbol' in c: #and item.isClassOrSubclass(harmony.Harmony):
+        #!---------- Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects ---     
+        elif 'RomanNumeral' in c or 'ChordSymbol' in c:
             self._fbList.append(bassObject) #a roman Numeral object
         else:
-            raise FiguredBassLineException("Not a valid bassObject (only note.Note, harmony.ChordSymbol, and roman.RomanNumeral supported) was %r" % bassObject)
+            raise FiguredBassLineException("Not a valid bassObject (only note.Note, " + 
+                "harmony.ChordSymbol, and roman.RomanNumeral supported) was %r" % bassObject)
     
     def generateBassLine(self):
         '''
@@ -328,14 +335,16 @@ class FiguredBassLine(object):
         bassNoteIndex = 0
         previousBassNote = bassLine[bassNoteIndex]
         bassNote = currentMapping[allKeys[0]][-1]
-        previousSegment = segment.OverlayedSegment(bassNote, bassNote.notationString, self._fbScale,\
+        previousSegment = segment.OverlayedSegment(bassNote, bassNote.notationString, 
+                                                   self._fbScale,
                                                    fbRules, numParts, maxPitch)
         previousSegment.quarterLength = previousBassNote.quarterLength
         segmentList.append(previousSegment)
         for k in allKeys[1:]:
             (startTime, unused_endTime) = k
             bassNote = currentMapping[k][-1]
-            currentSegment = segment.OverlayedSegment(bassNote, bassNote.notationString, self._fbScale,\
+            currentSegment = segment.OverlayedSegment(bassNote, bassNote.notationString, 
+                                                      self._fbScale,
                                                       fbRules, numParts, maxPitch)
             for partNumber in range(1, len(currentMapping[k])):
                 upperPitch = currentMapping[k][partNumber-1]
@@ -347,7 +356,9 @@ class FiguredBassLine(object):
             else:
                 for partNumber in range(len(currentMapping[k]), numParts+1):
                     previousSegment.fbRules._partsToCheck.append(partNumber)
-                currentSegment.quarterLength = 0.0 # Fictitious, representative only for harmonies preserved with addition of melody or melodies
+                # Fictitious, representative only for harmonies preserved 
+                # with addition of melody or melodies
+                currentSegment.quarterLength = 0.0 
             segmentList.append(currentSegment)
             previousSegment = currentSegment
         return segmentList
@@ -357,12 +368,15 @@ class FiguredBassLine(object):
         
     def realize(self, fbRules = None, numParts = 4, maxPitch = None):
         '''
-        Creates a :class:`~music21.figuredBass.segment.Segment` for each (bassNote, notationString) pair
-        added using :meth:`~music21.figuredBass.realizer.FiguredBassLine.addElement`. Each Segment is associated
+        Creates a :class:`~music21.figuredBass.segment.Segment` 
+        for each (bassNote, notationString) pair
+        added using :meth:`~music21.figuredBass.realizer.FiguredBassLine.addElement`. 
+        Each Segment is associated
         with the :class:`~music21.figuredBass.rules.Rules` object provided, meaning that rules are
         universally applied across all Segments. The number of parts in a realization
         (including the bass) can be controlled through numParts, and the maximum pitch can
-        likewise be controlled through maxPitch. Returns a :class:`~music21.figuredBass.realizer.Realization`.
+        likewise be controlled through maxPitch. 
+        Returns a :class:`~music21.figuredBass.realizer.Realization`.
         
         
         If this methods is called without having provided any (bassNote, notationString) pairs,
@@ -428,8 +442,9 @@ class FiguredBassLine(object):
                 continue
             if 'Note' in c:
                 break
-            #!---------- Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects --------!
-            if 'RomanNumeral' in c or 'ChordSymbol' in c: #and item.isClassOrSubclass(harmony.Harmony):
+            # Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects 
+            if ('RomanNumeral' in c or 
+                    'ChordSymbol' in c): #and item.isClassOrSubclass(harmony.Harmony):
                 listOfHarmonyObjects = True
                 break
             
@@ -444,9 +459,14 @@ class FiguredBassLine(object):
                     d[x]=x
                 outputList = d.values()    
                 g = lambda x: x if x != 0.0 else 1.0
-                passedNote = note.Note(harmonyObject.bass().nameWithOctave , quarterLength = g(harmonyObject.duration.quarterLength) )
-                correspondingSegment = segment.Segment(bassNote=passedNote, \
-                fbScale=self._fbScale, fbRules=fbRules, numParts=numParts, maxPitch=maxPitch, listOfPitches=outputList)
+                passedNote = note.Note(harmonyObject.bass().nameWithOctave, 
+                                       quarterLength = g(harmonyObject.duration.quarterLength) )
+                correspondingSegment = segment.Segment(bassNote=passedNote, 
+                                                       fbScale=self._fbScale, 
+                                                       fbRules=fbRules, 
+                                                       numParts=numParts, 
+                                                       maxPitch=maxPitch, 
+                                                       listOfPitches=outputList)
                 correspondingSegment.quarterLength = g(harmonyObject.duration.quarterLength)
                 segmentList.append(correspondingSegment)                
         #!---------- Original code - Accommodates a tuple (figured bass)  --------!
@@ -473,6 +493,9 @@ class FiguredBassLine(object):
                            inTime = self.inTime, overlayedParts = self._overlayedParts[0:-1],
                            paddingLeft = self._paddingLeft)
 
+
+    @common.deprecated("2011", "Jan 2016", "Use realize() instead and call " + 
+                       "generateRandomRealization() on the result.")
     def generateRandomRealization(self):         
         '''
         Generates a random realization of a figured bass as a :class:`~music21.stream.Score`, 
@@ -480,14 +503,15 @@ class FiguredBassLine(object):
         
         
         .. note:: Deprecated. Use :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`
-            which returns a :class:`~music21.figuredBass.realizer.Realization`. Then, call :meth:`~music21.figuredBass.realizer.Realization.generateRandomRealization`.
+            which returns a :class:`~music21.figuredBass.realizer.Realization`. 
+            Then, call :meth:`~music21.figuredBass.realizer.Realization.generateRandomRealization`.
         '''
-        _environRules = environment.Environment(_MOD)
-        _environRules.warn("The method generateRandomRealization() is deprecated. Use realize() instead and call generateRandomRealization() on the result.", DeprecationWarning)
         fbRules = rules.Rules()
         fbRules.partMovementLimits = [(1,2),(2,12),(3,12)]        
         return self.realize(fbRules).generateRandomRealization()
 
+    @common.deprecated("2011", "Jan 2016", "Use realize() instead and call " + 
+                       "generateRandomRealization().show() on the result.")
     def showRandomRealization(self):         
         '''
         Displays a random realization of a figured bass as a musicxml in external software, 
@@ -495,15 +519,17 @@ class FiguredBassLine(object):
         
         
         .. note:: Deprecated. Use :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`
-            which returns a :class:`~music21.figuredBass.realizer.Realization`. Then, call :meth:`~music21.figuredBass.realizer.Realization.generateRandomRealization`
+            which returns a :class:`~music21.figuredBass.realizer.Realization`. 
+            Then, call :meth:`~music21.figuredBass.realizer.Realization.generateRandomRealization`
             followed by a call to :meth:`~music21.base.Music21Object.show`.
         '''
-        _environRules = environment.Environment(_MOD)
-        _environRules.warn("The method showRandomRealization() is deprecated. Use realize() instead and call generateRandomRealization().show() on the result.", DeprecationWarning)
         fbRules = rules.Rules()
         fbRules.partMovementLimits = [(1,2),(2,12),(3,12)]
         return self.realize(fbRules).generateRandomRealization().show()
             
+    @common.deprecated("2011", "Jan 2016", 
+                       "Use realize() instead and call generateAllRealizations().show() " + 
+                       "on the result.")
     def showAllRealizations(self):
         '''
         Displays all realizations of a figured bass as a musicxml in external software, 
@@ -511,15 +537,14 @@ class FiguredBassLine(object):
         
         
         .. note:: Deprecated. Use :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`
-            which returns a :class:`~music21.figuredBass.realizer.Realization`. Then, call :meth:`~music21.figuredBass.realizer.Realization.generateAllRealizations`
+            which returns a :class:`~music21.figuredBass.realizer.Realization`. 
+            Then, call :meth:`~music21.figuredBass.realizer.Realization.generateAllRealizations`
             followed by a call to :meth:`~music21.base.Music21Object.show`.
         
 
         .. warning:: This method is unoptimized, and may take a prohibitive amount
             of time for a Realization which has more than tens of unique realizations.
         '''
-        _environRules = environment.Environment(_MOD)
-        _environRules.warn("The method showAllRealizations() is deprecated. Use realize() instead and call generateAllRealizations().show() on the result.", DeprecationWarning)
         fbRules = rules.Rules()
         fbRules.partMovementLimits = [(1,2),(2,12),(3,12)]
         return self.realize(fbRules).generateAllRealizations().show()
@@ -539,6 +564,7 @@ class FiguredBassLine(object):
             return True
         elif len(segmentList) >= 3:
             segmentList.reverse()
+            # gets this wrong... # pylint: disable=cell-var-from-loop
             for segmentIndex in range(1, len(segmentList) - 1):
                 movementsAB = segmentList[segmentIndex + 1].movements
                 movementsBC = segmentList[segmentIndex].movements
@@ -547,7 +573,8 @@ class FiguredBassLine(object):
                     if len(possibCList) == 0:
                         del movementsBC[possibB]
                 for (possibA, possibBList) in list(movementsAB.items()):
-                    movementsAB[possibA] = list(ifilter(lambda possibB: possibB in movementsBC, possibBList))
+                    movementsAB[possibA] = list(
+                                ifilter(lambda possibB: possibB in movementsBC, possibBList))
 
             for (possibA, possibBList) in list(movementsAB.items()):
                 if len(possibBList) == 0:
@@ -569,10 +596,14 @@ class Realization(object):
       :class:`~music21.figuredBass.segment.Segment` instances.
       See :mod:`~music21.figuredBass.possibility` for more details on possibilities.
     '''
-    _DOC_ORDER = ['getNumSolutions', 'generateRandomRealization', 'generateRandomRealizations', 'generateAllRealizations',
-                  'getAllPossibilityProgressions', 'getRandomPossibilityProgression', 'generateRealizationFromPossibilityProgression']
-    _DOC_ATTR = {'keyboardStyleOutput': '''True by default. If True, generated realizations are represented in keyboard style, with two staves. If False,
-    realizations are represented in chorale style with n staves, where n is the number of parts. SATB if n = 4.'''}
+    _DOC_ORDER = ['getNumSolutions', 'generateRandomRealization', 
+                  'generateRandomRealizations', 'generateAllRealizations',
+                  'getAllPossibilityProgressions', 'getRandomPossibilityProgression', 
+                  'generateRealizationFromPossibilityProgression']
+    _DOC_ATTR = {'keyboardStyleOutput': '''True by default. If True, generated realizations 
+                        are represented in keyboard style, with two staves. If False,
+                        realizations are represented in chorale style with n staves, 
+                        where n is the number of parts. SATB if n = 4.'''}
     def __init__(self, **fbLineOutputs):
         # fbLineOutputs always will have three elements, checks are for sphinx documentation only.
         if 'realizedSegmentList' in fbLineOutputs:
@@ -775,7 +806,8 @@ class Realization(object):
             allSols.append(music21Part)
         
         for possibIndex in range(1, len(possibilityProgressions)):
-            solX = self.generateRealizationFromPossibilityProgression(possibilityProgressions[possibIndex])
+            solX = self.generateRealizationFromPossibilityProgression(
+                                                    possibilityProgressions[possibIndex])
             for partIndex in range(len(solX)):
                 for music21Measure in solX[partIndex]:
                     allSols[partIndex].append(music21Measure)
@@ -813,7 +845,8 @@ class Realization(object):
         
         return allSols
 
-_DOC_ORDER = [figuredBassFromStream, figuredBassFromStreamPart, addLyricsToBassNote, FiguredBassLine, Realization]
+_DOC_ORDER = [figuredBassFromStream, figuredBassFromStreamPart, addLyricsToBassNote, 
+              FiguredBassLine, Realization]
 
 class FiguredBassLineException(exceptions21.Music21Exception):
     pass

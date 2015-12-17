@@ -30,7 +30,8 @@ the PMusic (Perl) library, developed by Cuthbert prior to arriving at MIT.
 
 music21 outputs a subset of XML data defined by the  MusicXML 2.0 
 standard, Copyright © Recordare LLC;  License available at
-http://www.recordare.com/dtds/license.html, now transferred to MakeMusic
+http://www.recordare.com/dtds/license.html, transfered to MakeMusic
+now transferred to W3C
 
 music21 incorporates Microsoft Excel reading via the included 
 xlrd library:
@@ -49,16 +50,19 @@ owners who have allowed them to be included with music21.
 
 
 __all__ = [
-    'base',
+    'base', # top...
     'sites', # important 
+
     # sub folders
     'abcFormat', 
+    'alpha',
     'analysis', 
     'audioSearch',
     'braille', 
     'capella',
-    'composition',
-    'counterpoint',
+    'chord',
+    'common',
+    'converter',
     'corpus', 
     'demos',
     'documentation',
@@ -69,20 +73,18 @@ __all__ = [
     'languageExcerpts',
     'lily', 
     'mei',
+    'metadata',
     'midi',
     'musedata',
     'musicxml', 
     'noteworthy',
     'omr',
     'romanText', 
-    'scala', 
+    'scale',
     'search',
     'test',
-    'theoryAnalysis',
-    'timespans',
-    'trecento',
+    'tree',
     'vexflow',
-    'webapps', 
     # individual modules 
     # KEEP ALPHABETICAL unless necessary for load reasons, if so
     # put a note.  Keep one letter per line.
@@ -90,14 +92,8 @@ __all__ = [
     'bar',
     # base listed above
     'beam', 
-    'chant',
-    'chord',
-    'chordTables', 
     'clef',
-    'common',
     'configure',
-    'contour',
-    'converter',
     'defaults',
     'derivation',
     'duration',
@@ -111,19 +107,16 @@ __all__ = [
     'harmony', 
     'instrument',
     'interval',
-    'intervalNetwork', 
     'key', 
     'layout',
-    'medren',
-    'metadata',
     'meter', 
     'note', 
     'pitch', 
     'repeat',
     'roman',
-    'scale',
     'serial',
     'sieve',
+    'sorting',
     'spanner',
     'stream', 
     'tempo',
@@ -136,33 +129,31 @@ __all__ = [
     'xmlnode',
     ]
 
-#__all__.reverse()
-#print __all__
-# skipped purposely, "base", "xmlnode"
 
 #-------------------------------------------------------------------------------
 # for sub packages, need to manually add the modules in these subpackages
-#from music21.analysis import *
-#import sys
-#x = sys.stdout
 
 
 #-------------------------------------------------------------------------------
 # base Music21Object -- all objects should inherit from this!
 from music21 import base
+
 from music21.base import VERSION
 from music21.base import VERSION_STR
+__version__ = VERSION_STR
+
 from music21.base import Music21Exception
 from music21.base import SitesException
 from music21.base import Music21ObjectException
 from music21.base import ElementException
+
 from music21.base import Groups
-from music21.base import SiteRef
-from music21.base import Sites
 from music21.base import Music21Object
 from music21.base import ElementWrapper
-from music21.base import mainTest
-from music21.base import *
+
+# legacy reason why it's here...
+from music21.test.testRunner import mainTest
+
 #del(types)
 #del(sys)
 #del(imp)
@@ -170,18 +161,11 @@ from music21.base import *
 #del(copy)
 #del(codecs)
 #del(unittest)
-#-------------------------------------------------------------------------------
-# place the parse function directly in the music21 namespace
-# this cannot go in music21/base.py
-#import converter
-#parse = converter.parse
-
 
 #------------------------------------------------------------------------------
 # this bring all of the __all__ names into the music21 package namespace
-from music21 import * # @UnresolvedImport
+from music21 import * # @UnresolvedImport # pylint: disable=wildcard-import
 
 #------------------------------------------------------------------------------
 # eof
-
 

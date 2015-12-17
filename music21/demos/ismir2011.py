@@ -8,15 +8,15 @@
 #               Michael Scott Cuthbert
 #               Lisa D. Friedland
 #
-# Copyright:    (c) 2011 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# License:      BSD or LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 
-from music21 import corpus, features, converter
-from music21 import trecento, figuredBass, tinyNotation
+from music21 import corpus, features, converter, graph
+from music21 import figuredBass
 from music21 import expressions, stream
-
+from music21.alpha import trecento
 # def example2():
 #     handel = corpus.parse('hwv56/movement3-05.md')
 #     fe = features.jSymbolic.TripleMeterFeature(handel)
@@ -125,7 +125,7 @@ def prepareChinaEurope2():
     ds2.write('d:/desktop/folkTest.tab')
 
 def testChinaEuropeFull():
-    import orange, orngTree
+    import orange, orngTree # @UnresolvedImport
     data1 = orange.ExampleTable('d:/desktop/1.tab')
     data2 = orange.ExampleTable('d:/desktop/2.tab')
 
@@ -153,7 +153,7 @@ def testChinaEuropeFull():
 
 # this test requires orange and related files
 def xtestChinaEuropeSimpler():
-    import orange, orngTree
+    import orange, orngTree # @UnusedImport @UnresolvedImport
 
     trainData = orange.ExampleTable('ismir2011_fb_folkTrain.tab')
     testData  = orange.ExampleTable('ismir2011_fb_folkTest.tab')
@@ -210,7 +210,7 @@ def prepareTrecentoCadences():
 
 
 def testTrecentoSimpler():
-    import orange, orngTree
+    import orange, orngTree # @UnusedImport @UnresolvedImport
 
     trainData = orange.ExampleTable('d:/desktop/trecento2.tab')
     testData  = orange.ExampleTable('d:/desktop/trecento1.tab')
@@ -293,7 +293,7 @@ def wekaCommands():
 ### FIGURED BASS PAPER ###
 
 def tinyNotationBass():
-    bass1 = tinyNotation.TinyNotationStream('4/4 C4 D8_6 E8_6 F4 G4_7 c1')
+    bass1 = converter.parse('tinyNotation: 4/4 C4 D8_6 E8_6 F4 G4_7 c1', makeNotation=False)
     #bass1.show('lily.png')
     fbLine1 = figuredBass.realizer.figuredBassFromStream(bass1)
     fbLine1.showAllRealizations()

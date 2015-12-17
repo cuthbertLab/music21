@@ -6,8 +6,8 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    (c) 2011 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# License:      BSD or LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 '''
@@ -19,7 +19,7 @@ chromatic pitch world.  This module investigates the probability
 of the set A.SCHBEG (=A. Schoenberg; with S = Es = E-flat; H=B, B=B-flat)
 arising given the different exceptions that Taruskin allows.
 '''
-import music21
+from music21 import chord
 import random
 
 eschbeg = '30ET47'
@@ -31,14 +31,17 @@ def letterToNumber(letter):
     return number
 
 def numberToLetter(number):
-    if number == 11: letter = "E"
-    elif number == 10: letter = "T"
-    else: letter = str(number)
+    if number == 11: 
+        letter = "E"
+    elif number == 10: 
+        letter = "T"
+    else: 
+        letter = str(number)
     return letter
 
 
 def setupTranspositions():
-    eschbegTransposed = []
+    _eschbegTransposed = []
     for i in range(0, 12):
         thisTransposition = ""
         for letter in eschbeg:
@@ -46,8 +49,8 @@ def setupTranspositions():
             newnum = (number + i) % 12
             newletter = numberToLetter(newnum)
             thisTransposition += newletter
-        eschbegTransposed.append(thisTransposition)
-    return eschbegTransposed
+        _eschbegTransposed.append(thisTransposition)
+    return _eschbegTransposed
 
 eschbegTransposed = setupTranspositions()
 
@@ -203,7 +206,7 @@ def findEmbeddedChords(testSet = "0234589", cardinality = 3, skipInverse = False
     '''
     eschbegSplit12 = [letterToNumber(x) for x in testSet]
     ret = "" 
-    for myTrichord in music21.chordTables.FORTE[cardinality]:
+    for myTrichord in chord.tables.FORTE[cardinality]:
         if myTrichord is None:
             continue
         myPitches = myTrichord[0]
@@ -252,7 +255,7 @@ def uniquenessOfEschbeg(cardinality = 7, searchCardinality = 3, skipInverse = Fa
     First a baseline:
     
     >>> from music21 import *
-    >>> len(chordTables.FORTE[7])
+    >>> len(chord.tables.FORTE[7])
     39
     
     There are 39 chords in that list, but #0 is blank, so that you can reference them by
@@ -291,7 +294,7 @@ def uniquenessOfEschbeg(cardinality = 7, searchCardinality = 3, skipInverse = Fa
     
     Is every octachord all-trichord?
     
-    >>> numOctochords = len(chordTables.FORTE[8]) - 1
+    >>> numOctochords = len(chord.tables.FORTE[8]) - 1
     >>> numOctochords
     29
     >>> len(demos.eschbeg.uniquenessOfEschbeg(cardinality = 8, searchCardinality = 3, skipInverse = True))
@@ -305,7 +308,7 @@ def uniquenessOfEschbeg(cardinality = 7, searchCardinality = 3, skipInverse = Fa
     These are the complement sets of 0123 0128 0167 0235 0136 0258 0369
     
     '''
-    allHeptachords = music21.chordTables.FORTE[cardinality]
+    allHeptachords = chord.tables.FORTE[cardinality]
     allHeptachordList = []
     for i in range(1, len(allHeptachords)):
         thisHeptachord = allHeptachords[i][0]
@@ -326,6 +329,7 @@ def uniquenessOfEschbeg(cardinality = 7, searchCardinality = 3, skipInverse = Fa
     return allHeptachordList
 
 if __name__ == "__main__":
+    import music21
     music21.mainTest()
 
     #print findEmbeddedChords(cardinality = 5)

@@ -10,14 +10,18 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
-'''This module describes classes for performing windowed and overlapping windowed analysis. The :class:`music21.analysis.windowed.WindowedAnalysis` provides a reusable framework for systematic overlapping window analysis at the starting at the level of the quarter note and moving to the size of an entire :class:`music21.stream.Stream`.
+'''This module describes classes for performing windowed and overlapping windowed analysis. 
+The :class:`music21.analysis.windowed.WindowedAnalysis` provides a reusable framework for 
+systematic overlapping window analysis at the starting at the level of the quarter note 
+and moving to the size of an entire :class:`music21.stream.Stream`.
 
-Modular analysis procedures inherit from :class:`music21.analysis.discrete.DiscreteAnalysis`. The :class:`music21.analysis.discrete.KrumhanslSchmuckler` (for algorithmic key detection) and :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) classes provide examples.
+Modular analysis procedures inherit from :class:`music21.analysis.discrete.DiscreteAnalysis`. 
+The :class:`music21.analysis.discrete.KrumhanslSchmuckler` (for algorithmic key detection) 
+and :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) classes provide examples.
 '''
 
 
 import unittest
-import sys
 
 from music21 import exceptions21
 
@@ -42,7 +46,9 @@ class WindowedAnalysis(object):
     def __init__(self, streamObj, analysisProcessor):
         '''Create a WindowedAnalysis object.
 
-        The provided `analysisProcessor` must provide a `process()` method that, when given a windowed Stream (a Measure) returns two element tuple containing (a) a data value (implementation dependent) and (b) a color code. 
+        The provided `analysisProcessor` must provide a `process()` method that, 
+        when given a windowed Stream (a Measure) returns two element tuple containing 
+        (a) a data value (implementation dependent) and (b) a color code. 
         '''
         self.processor = analysisProcessor
         #environLocal.printDebug(self.processor)
@@ -88,14 +94,18 @@ class WindowedAnalysis(object):
 
 
     def _analyze(self, windowSize, windowType='overlap'):
-        ''' Calls, for a given window size, an analysis method across all windows in the source Stream. 
+        '''
+        Calls, for a given window size, an analysis method across all windows in the source Stream. 
 
-
-        If windowType is "overlap", windows above size 1 are always overlapped, so if a window of size 2 is used, windows 1-2, then 2-3, then 3-4 are compared. If a window of size 3 is used, windows 1-3, then 2-4, then 3-5 are compared. 
+        If windowType is "overlap", windows above size 1 are always overlapped, so if a window 
+        of size 2 is used, windows 1-2, then 2-3, then 3-4 are compared. If a window of size 3 
+        is used, windows 1-3, then 2-4, then 3-5 are compared. 
 
         Windows are assumed to be partitioned by :class:`music21.stream.Measure` objects.
 
-        Returns two lists for results, each equal in size to the length of minimum windows minus the window size plus one. If we have 20 1/4 windows, then the results lists will be of length 20 for window size 1, 19 for window size 2, 18 for window size 3, etc. 
+        Returns two lists for results, each equal in size to the length of minimum windows 
+        minus the window size plus one. If we have 20 1/4 windows, then the results lists 
+        will be of length 20 for window size 1, 19 for window size 2, 18 for window size 3, etc. 
 
         
         >>> s = corpus.parse('bach/bwv66.6')
@@ -189,7 +199,9 @@ class WindowedAnalysis(object):
         Calls :meth:`~music21.analysis.WindowedAnalysis._analyze` for 
         the number of different window sizes to be analyzed.
 
-        The `minWindow` and `maxWindow` set the range of window sizes in quarter lengths. The `windowStepSize` parameter determines the increment between these window sizes, in quarter lengths. 
+        The `minWindow` and `maxWindow` set the range of window sizes in quarter lengths. 
+        The `windowStepSize` parameter determines the increment between these window sizes, 
+        in quarter lengths. 
 
         If `minWindow` or `maxWindow` is None, the largest window size available will be set. 
 
@@ -396,14 +408,8 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [WindowedAnalysis]
 
 if __name__ == "__main__":
-    if len(sys.argv) == 1: # normal conditions
-        import music21
-        music21.mainTest(Test)
-    elif len(sys.argv) > 1:
-        a = Test()
-
-        a.testWindowing()
-        #a.testVariableWindowing()
+    import music21
+    music21.mainTest(Test)
 
 
 #------------------------------------------------------------------------------

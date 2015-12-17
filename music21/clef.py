@@ -43,24 +43,21 @@ class Clef(base.Music21Object):
     Some clefs only represent the graphical element of the clef, 
     such as G clef, which is subclassed by TrebleClef() and FrenchViolinClef().
     
-    ::
-    
-        >>> tc = clef.TrebleClef()
-        >>> tc
-        <music21.clef.TrebleClef>
-        >>> tc.sign
-        'G'
-        >>> tc.line
-        2
+    >>> tc = clef.TrebleClef()
+    >>> tc
+    <music21.clef.TrebleClef>
+    >>> tc.sign
+    'G'
+    >>> tc.line
+    2
         
-    Most clefs also have a "lowest note" function which represents the
-    :attr:`~music21.pitch.Pitch.diatonicNoteNum` of the note. (Where C4,C#4,C##4,C-4
+    Most clefs also have a "lowestLine" function which represents the
+    :attr:`~music21.pitch.Pitch.diatonicNoteNum` of the note that would fall on the
+    lowest line if the Clef were put on a five-line staff. (Where C4,C#4,C##4,C-4
     etc. = 29, all types of D4 = 30, etc.)
     
-    ::
-
-        >>> tc.lowestLine
-        31
+    >>> tc.lowestLine
+    31
     '''
     
     classSortOrder = 0
@@ -109,7 +106,7 @@ class Clef(base.Music21Object):
 #-------------------------------------------------------------------------------
 class PitchClef(Clef):
     '''
-    superclass for all other clef subclasses. 
+    superclass for all other clef subclasses that use pitches...
     '''
     def __init__(self):
         Clef.__init__(self)
@@ -118,26 +115,66 @@ class PitchClef(Clef):
 class PercussionClef(Clef):
     '''
     represents a Percussion clef. 
-    '''    
-    pass
+    
+    >>> pc = clef.PercussionClef()
+    >>> pc.sign
+    'percussion'
+    >>> pc.line is None
+    True
 
+    Percussion clefs should not, technically. have a
+    lowest line, but it is a common usage to assume that
+    in pitch-centric contexts to use the pitch numbers
+    from treble clef for percussion clefs.  Thus:
+    
+    >>> pc.lowestLine == clef.TrebleClef().lowestLine
+    True
+    '''    
+    def __init__(self):
+        Clef.__init__(self)
+        self.sign = 'percussion'
+        self.lowestLine = (7*4) + 3  # 4 octaves + 3 notes = e4
+        
 class NoClef(Clef):
     '''
     represents the absence of a Clef. 
+    
+    >>> nc = clef.NoClef()
+    >>> nc.sign
+    'none'
+    
+    Note that the sign is the string 'none' not the None object
+    
+    >>> nc.sign is None
+    False
     '''
-    pass
+    def __init__(self):
+        Clef.__init__(self)
+        self.sign = 'none'
+
+class JianpuClef(NoClef):
+    '''
+    Jianpu notation does not use a clef, but musicxml marks it
+    with a specialized "jianpu" sign.
+    
+    >>> jc = clef.JianpuClef()
+    >>> jc.sign
+    'jianpu'
+    '''
+    def __init__(self):
+        NoClef.__init__(self)
+        self.sign = 'jianpu'
+
 
 class TabClef(PitchClef):
     '''
     represents a Tablature clef. 
+
+    >>> a = clef.TabClef()
+    >>> a.sign
+    'TAB'
     '''
     def __init__(self):
-        '''
-        
-        >>> a = clef.TabClef()
-        >>> a.sign
-        'TAB'
-        '''        
         PitchClef.__init__(self)
         self.sign = "TAB"
         self.line = 5
@@ -398,6 +435,8 @@ CLASS_FROM_TYPE = {
 def clefFromString(clefString, octaveShift = 0):
     '''
     Returns a Clef object given a string like "G2" or "F4" etc.
+    
+    Does not refer to a violin/guitar string.
 
     
     >>> tc = clef.clefFromString("G2")
@@ -421,24 +460,41 @@ def clefFromString(clefString, octaveShift = 0):
     >>> tc8vb
     <music21.clef.Treble8vbClef>
 
+    Three special clefs, Tab, Percussion, and None are also supported.
 
     >>> tabClef = clef.clefFromString("TAB")
     >>> tabClef
     <music21.clef.TabClef>
+
+    Case does not matter.
+
+    >>> tc8vb = clef.clefFromString("g2", -1)
+    >>> tc8vb
+    <music21.clef.Treble8vbClef>
+
+    >>> percussionClef = clef.clefFromString('Percussion')
+    >>> percussionClef
+    <music21.clef.PercussionClef>
+
+    >>> noClef = clef.clefFromString('None')
+    >>> noClef
+    <music21.clef.NoClef>
     '''
     xnStr = clefString.strip()
-    if xnStr.lower() in ['tab', 'percussion', 'none']:
+    if xnStr.lower() in ('tab', 'percussion', 'none', 'jianpu'):
         if xnStr.lower() == 'tab':
             return TabClef()
         elif xnStr.lower() == 'percussion':
             return PercussionClef()
         elif xnStr.lower() == 'none':
             return NoClef()
+        elif xnStr.lower() == 'jianpu':
+            return JianpuClef()
     
     if len(xnStr) > 1:
         (thisType, lineNum) = (xnStr[0], xnStr[1])
     elif len(xnStr) == 1: # some Humdrum files have just ClefG, eg. Haydn op. 9 no 3, mvmt 1
-        thisType = xnStr[0]
+        thisType = xnStr[0].upper()
         if thisType == "G":
             lineNum = 2
         elif thisType == "F":
@@ -449,7 +505,7 @@ def clefFromString(clefString, octaveShift = 0):
         raise ClefException("Entry has clef info but no clef specified")
 
     if octaveShift != 0:
-        params = (thisType, int(lineNum), octaveShift)
+        params = (thisType.upper(), int(lineNum), octaveShift)
         if params == ('G', 2, -1):
             return Treble8vbClef()
         elif params == ('G', 2, 1):
@@ -517,24 +573,10 @@ class Test(unittest.TestCase):
                 unused_a = copy.copy(obj)
                 unused_b = copy.deepcopy(obj)
 
-    def testConversionMX(self):
-        from music21.musicxml import toMxObjects
-        # test basic creation
-        for clefObjName in [FrenchViolinClef, TrebleClef, Treble8vbClef, 
-                GSopranoClef, SopranoClef, MezzoSopranoClef,
-                TenorClef, CBaritoneClef, FBaritoneClef, BassClef, 
-                SubBassClef,TabClef]:
-            a = clefObjName()
-            unused_mxClef = toMxObjects.clefToMxClef(a)
-
-        # test specific clefs
-        a = Treble8vbClef()
-        mxClef = toMxObjects.clefToMxClef(a)
-        self.assertEqual(mxClef.get('clefOctaveChange'), -1)
 
     def testConversionClassMatch(self):
-        from music21 import musicxml as musicxmlMod
-        from music21.musicxml import fromMxObjects
+        from xml.etree.ElementTree import fromstring as El
+        from music21.musicxml.xmlToM21 import MeasureParser
         from music21 import clef
         # need to get music21.clef.X, not X, because
         # we are comparing the result to a translation outside
@@ -558,22 +600,23 @@ class Test(unittest.TestCase):
             [('TAB', 5, 0), clef.TabClef]
         ]
 
+        MP = MeasureParser()
+        
         for params, className in src:
-            mxClef = musicxmlMod.mxObjects.Clef()
-            mxClef.set('sign', params[0])
-            mxClef.set('line', params[1])
-            mxClef.set('octaveChange', params[2])
-
-            c = fromMxObjects.mxClefToClef(mxClef)
+            sign, line, octaveChange = params
+            mxClef = El(r'<clef><sign>' + sign + '</sign><line>' + str(line) + '</line>' +
+                        '<clef-octave-change>' + str(octaveChange) + '</clef-octave-change></clef>')
+            c = MP.xmlToClef(mxClef)
 
             #environLocal.printDebug([type(c).__name__])
 
             self.assertEqual(c.sign, params[0])
             self.assertEqual(c.line, params[1])
             self.assertEqual(c.octaveChange, params[2])
-            self.assertEqual(isinstance(c, className), True, "Failed Conversion of classes: %s is not a %s" % (c, className))
+            self.assertEqual(isinstance(c, className), True, 
+                             "Failed Conversion of classes: %s is not a %s" % (c, className))
 
-    def xtestContexts(self):
+    def testContexts(self):
         from music21 import stream
         from music21 import note
         from music21 import meter
@@ -584,7 +627,7 @@ class Test(unittest.TestCase):
         c1.offset = 0
         s1 = stream.Stream([c1, n1])
         
-        self.assertTrue(s1.getContextByClass(Clef) is c1)
+        self.assertTrue(s1.recurse().notes[0].getContextByClass(Clef) is c1)
             ## equally good: getContextsByClass(Clef)[0]
 
         del(s1)
@@ -600,7 +643,6 @@ class Test(unittest.TestCase):
         s2.append(n2)
         s2.append(n3)
         s2.makeMeasures()
-        self.assertFalse(n2.getContextByClass(stream.Measure) is n3.getContextByClass(stream.Measure))
         self.assertTrue(n2.getContextByClass(Clef) is c1)
 
         del(s2)
@@ -625,7 +667,7 @@ class Test(unittest.TestCase):
         s3.append(n6)
         s3.makeMeasures()
         
-        self.assertTrue(n4.getContextByClass(stream.Measure) is n5.getContextByClass(stream.Measure))
+        self.assertIs(n4.getContextByClass(stream.Measure), n5.getContextByClass(stream.Measure))
         self.assertTrue(n4.getContextByClass(Clef) is bc1)
         self.assertTrue(n5.getContextByClass(Clef) is tc1)
         self.assertTrue(n6.getContextByClass(Clef) is tc1)

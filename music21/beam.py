@@ -10,7 +10,6 @@
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
-
 '''
 The module defines Beam and Beams (note plural) objects.
 
@@ -32,57 +31,46 @@ information automatically given the current meter.
 Suppose you had a measure of two eighths and a quarter and wanted to explicitly
 beam the two eighth notes.  You could do this:
 
-::
+>>> m = stream.Measure()
+>>> n1 = note.Note('C4', quarterLength = 0.5)
+>>> n2 = note.Note('D4', quarterLength = 0.5)
+>>> n3 = note.Note('E4', quarterLength = 1.0)
+>>> m.append(n1)
+>>> m.append(n2)
+>>> m.append(n3)
+>>> n1.beams.fill('eighth', type='start')
+>>> n2.beams.fill('eighth', type='stop')
+>>> n1.beams
+<music21.beam.Beams <music21.beam.Beam 1/start>>
 
-    >>> m = stream.Measure()
-    >>> n1 = note.Note('C4', quarterLength = 0.5)
-    >>> n2 = note.Note('D4', quarterLength = 0.5)
-    >>> n3 = note.Note('E4', quarterLength = 1.0)
-    >>> m.append(n1)
-    >>> m.append(n2)
-    >>> m.append(n3)
-    >>> n1.beams.fill('eighth', type='start')
-    >>> n2.beams.fill('eighth', type='stop')
-    >>> n1.beams
-    <music21.beam.Beams <music21.beam.Beam 1/start>>
-
-::
-
-    >>> n2.beams
-    <music21.beam.Beams <music21.beam.Beam 1/stop>>
+>>> n2.beams
+<music21.beam.Beams <music21.beam.Beam 1/stop>>
 
 But suppose you wanted something harder: two 16ths, an 8th, a quarter, with the
 first 3 notes beamed?  The first note and 3rd are easy to do, using the method
 above:
 
-::
-
-    >>> m = stream.Measure()
-    >>> n1 = note.Note('C4', quarterLength = 0.25)
-    >>> n2 = note.Note('D4', quarterLength = 0.25)
-    >>> n3 = note.Note('E4', quarterLength = 0.5)
-    >>> n4 = note.Note('F4', quarterLength = 1.0)
-    >>> for n in [n1, n2, n3, n4]:
-    ...     m.append(n)
-    >>> n1.beams.fill('16th', type='start')
-    >>> n3.beams.fill('eighth', type='stop')
+>>> m = stream.Measure()
+>>> n1 = note.Note('C4', quarterLength = 0.25)
+>>> n2 = note.Note('D4', quarterLength = 0.25)
+>>> n3 = note.Note('E4', quarterLength = 0.5)
+>>> n4 = note.Note('F4', quarterLength = 1.0)
+>>> for n in [n1, n2, n3, n4]:
+...     m.append(n)
+>>> n1.beams.fill('16th', type='start')
+>>> n3.beams.fill('eighth', type='stop')
 
 but the second note has an 8th beam that continues and a 16th beam that stops.
 So you will need to set them separately:
 
-::
-
-    >>> n2.beams.append('continue')
-    >>> n2.beams.append('stop')
-    >>> n2.beams
-    <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>
+>>> n2.beams.append('continue')
+>>> n2.beams.append('stop')
+>>> n2.beams
+<music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>
 
 To get rid of beams on a note do:
 
-::
-
-    >>> n2.beams.beamsList = []
-
+>>> n2.beams.beamsList = []
 '''
 
 import unittest
@@ -109,28 +97,22 @@ class Beam(SlottedObject):
 
     Here are two ways to define the start of a beam
 
-    ::
-
-        >>> b1 = beam.Beam(type='start')
-        >>> b2 = beam.Beam('start')
+    >>> b1 = beam.Beam(type='start')
+    >>> b2 = beam.Beam('start')
 
     Here is a partial beam (that is, one that does not connect to any other
     note, such as the second beam of a dotted eighth, sixteenth group)
 
     Two ways of doing the same thing
 
-    ::
+    >>> b3 = beam.Beam(type='partial', direction='left')
+    >>> b4 = beam.Beam('partial', 'left')
+    >>> b4.number = 1
+    >>> b4
+    <music21.beam.Beam 1/partial/left>
 
-        >>> b3 = beam.Beam(type='partial', direction='left')
-        >>> b4 = beam.Beam('partial', 'left')
-        >>> b4.number = 1
-        >>> b4
-        <music21.beam.Beam 1/partial/left>
-
-    ::
-
-        >>> b2
-        <music21.beam.Beam None/start>
+    >>> b2
+    <music21.beam.Beam None/start>
     '''
 
     ### CLASS VARIABLES ###
@@ -143,7 +125,7 @@ class Beam(SlottedObject):
         )
 
     ### INITIALIZER ###
-
+    # pylint: disable=redefined-builtin
     def __init__(self, type=None, direction=None):  # type is okay @ReservedAssignment
         self.type = type  # start, stop, continue, partial
         self.direction = direction  # left or right for partial
@@ -171,29 +153,21 @@ class Beams(SlottedObject):
     note currently has on it, and iterating over a Beams object gives you each
     Beam.
 
-    ::
+    >>> n = note.Note(type='16th')
+    >>> isinstance(n.beams, beam.Beams)
+    True
 
-        >>> n = note.Note(type='16th')
-        >>> isinstance(n.beams, beam.Beams)
-        True
+    >>> n.beams.fill(2, 'start')
+    >>> len(n.beams)
+    2
+    
+    >>> for thisBeam in n.beams:
+    ...     thisBeam.type
+    'start'
+    'start'
 
-    ::
-
-        >>> n.beams.fill(2, 'start')
-        >>> len(n.beams)
-        2
-
-    ::
-
-        >>> for thisBeam in n.beams:
-        ...     thisBeam.type
-        'start'
-        'start'
-
-    ::
-
-        >>> print(n.beams)
-        <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
+    >>> print(n.beams)
+    <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
 
     '''
 
@@ -205,7 +179,8 @@ class Beams(SlottedObject):
         )
 
     _DOC_ATTR = {
-        'feathered': 'Boolean determining if this is a feathered beam or not (does nothing for now).',
+        'feathered': 'Boolean determining if this is a feathered beam or not ' + 
+            '(does nothing for now).',
         }
 
     ### INITIALIZER ###
@@ -229,24 +204,20 @@ class Beams(SlottedObject):
         return '<music21.beam.Beams %s>' % '/'.join(msg)
 
     ### PUBLIC METHODS ###
-
+    # pylint: disable=redefined-builtin
     def append(self, type=None, direction=None): # type is okay @ReservedAssignment
         '''
         Append a new Beam object to this Beams, automatically creating the Beam
         object and incrementing the number count.
 
-        ::
-
-            >>> beams = beam.Beams()
-            >>> beams.append('start')
-            >>> beams.beamsList
-            [<music21.beam.Beam 1/start>]
+        >>> beams = beam.Beams()
+        >>> beams.append('start')
+        >>> beams.beamsList
+        [<music21.beam.Beam 1/start>]
         
-        ::
-
-            >>> beams.append('partial', 'right')
-            >>> beams.beamsList
-            [<music21.beam.Beam 1/start>, <music21.beam.Beam 2/partial/right>]
+        >>> beams.append('partial', 'right')
+        >>> beams.beamsList
+        [<music21.beam.Beam 1/start>, <music21.beam.Beam 2/partial/right>]
 
         '''
         obj = Beam(type, direction)
@@ -267,64 +238,46 @@ class Beams(SlottedObject):
         Both "eighth" and "8th" work.  Adding more than six beams (i.e. things
         like 512th notes) raises an error.
 
-        ::
+        >>> a = beam.Beams()
+        >>> a.fill('16th')
+        >>> len(a)
+        2
 
-            >>> a = beam.Beams()
-            >>> a.fill('16th')
-            >>> len(a)
-            2
+        >>> a.fill('32nd', type='start')
+        >>> len(a)
+        3
 
-        ::
+        >>> a.beamsList[2]
+        <music21.beam.Beam 3/start>
 
-            >>> a.fill('32nd', type='start')
-            >>> len(a)
-            3
-
-        ::
-
-            >>> a.beamsList[2]
-            <music21.beam.Beam 3/start>
-
-        ::
-
-            >>> a.beamsList[2].type
-            'start'
+        >>> a.beamsList[2].type
+        'start'
 
         Filling a smaller number wipes larger numbers of beams:
 
-        ::
-
-            >>> a.fill('eighth', type='start')
-            >>> len(a)
-            1
+        >>> a.fill('eighth', type='start')
+        >>> len(a)
+        1
 
         OMIT_FROM_DOCS
 
-        ::
+        >>> a.fill(4)
+        >>> len(a)
+        4
 
-            >>> a.fill(4)
-            >>> len(a)
-            4
+        >>> a.fill('128th')
+        >>> len(a)
+        5
 
-        ::
+        >>> a.fill('256th')
+        >>> len(a)
+        6
 
-            >>> a.fill('128th')
-            >>> len(a)
-            5
-
-        ::
-
-            >>> a.fill('256th')
-            >>> len(a)
-            6
-
-        ::
-
-            >>> a.fill(7)
-            Traceback (most recent call last):
-            BeamException: cannot fill beams for level 7
-
+        >>> a.fill(7)
+        Traceback (most recent call last):
+        BeamException: cannot fill beams for level 7
         '''
+        #TODO -- why not to 2048th?
         self.beamsList = []
         # 8th, 16th, etc represented as 1, 2, ...
         if level in [1, '8th', duration.typeFromNumDict[8]]: # eighth
@@ -354,20 +307,15 @@ class Beams(SlottedObject):
         '''
         Gets an internal beam object by number.
 
-        ::
+        >>> a = beam.Beams()
+        >>> a.fill('16th')
+        >>> a.setAll('start')
+        >>> a.getByNumber(2).type
+        'start'
 
-            >>> a = beam.Beams()
-            >>> a.fill('16th')
-            >>> a.setAll('start')
-            >>> a.getByNumber(2).type
-            'start'
-
-        ::
-
-            >>> a.getByNumber(30)
-            Traceback (most recent call last):
-            IndexError: beam number 30 cannot be accessed
-
+        >>> a.getByNumber(30)
+        Traceback (most recent call last):
+        IndexError: beam number 30 cannot be accessed
         '''
         if number not in self.getNumbers():
             raise IndexError('beam number %s cannot be accessed' % number)
@@ -380,12 +328,10 @@ class Beams(SlottedObject):
         Returns a list of all defined beam numbers; it should normally be a set
         of consecutive integers, but it might not be.
 
-        ::
-
-            >>> a = beam.Beams()
-            >>> a.fill('32nd')
-            >>> a.getNumbers()
-            [1, 2, 3]
+        >>> a = beam.Beams()
+        >>> a.fill('32nd')
+        >>> a.getNumbers()
+        [1, 2, 3]
 
         '''
         return [x.number for x in self.beamsList]
@@ -394,20 +340,15 @@ class Beams(SlottedObject):
         '''
         Get beam type, with direction, by number
 
-        ::
+        >>> a = beam.Beams()
+        >>> a.fill('16th')
+        >>> a.setAll('start')
+        >>> a.setByNumber(2, 'partial-right')
+        >>> a.getTypeByNumber(2)
+        'partial-right'
 
-            >>> a = beam.Beams()
-            >>> a.fill('16th')
-            >>> a.setAll('start')
-            >>> a.setByNumber(2, 'partial-right')
-            >>> a.getTypeByNumber(2)
-            'partial-right'
-
-        ::
-
-            >>> a.getTypeByNumber(1)
-            'start'
-
+        >>> a.getTypeByNumber(1)
+        'start'
         '''
         beamObj = self.getByNumber(number)
         if beamObj.direction is None:
@@ -419,14 +360,11 @@ class Beams(SlottedObject):
         '''
         Returns a list of all beam types defined for the current beams
 
-        ::
-
-            >>> a = beam.Beams()
-            >>> a.fill('16th')
-            >>> a.setAll('start')
-            >>> a.getTypes()
-            ['start', 'start']
-
+        >>> a = beam.Beams()
+        >>> a.fill('16th')
+        >>> a.setAll('start')
+        >>> a.getTypes()
+        ['start', 'start']
         '''
         return [x.type for x in self.beamsList]
 
@@ -439,19 +377,15 @@ class Beams(SlottedObject):
         Acceptable directions (start, stop, continue, etc.) are listed under
         Beam() above.
 
-        ::
+        >>> a = beam.Beams()
+        >>> a.fill('16th')
+        >>> a.setAll('start')
+        >>> a.getTypes()
+        ['start', 'start']
 
-            >>> a = beam.Beams()
-            >>> a.fill('16th')
-            >>> a.setAll('start')
-            >>> a.getTypes()
-            ['start', 'start']
-
-        ::
-
-            >>> a.setAll('sexy')
-            Traceback (most recent call last):
-            BeamException: beam type cannot be sexy
+        >>> a.setAll('sexy')
+        Traceback (most recent call last):
+        BeamException: beam type cannot be sexy
 
         '''
         if type not in ('start', 'stop', 'continue', 'partial'):
@@ -464,43 +398,31 @@ class Beams(SlottedObject):
         '''
         Set an internal beam object by number, or rhythmic symbol level.
 
-        ::
+        >>> a = beam.Beams()
+        >>> a.fill('16th')
+        >>> a.setAll('start')
+        >>> a.setByNumber(1, 'continue')
+        >>> a.beamsList[0].type
+        'continue'
 
-            >>> a = beam.Beams()
-            >>> a.fill('16th')
-            >>> a.setAll('start')
-            >>> a.setByNumber(1, 'continue')
-            >>> a.beamsList[0].type
-            'continue'
+        >>> a.setByNumber(2, 'stop')
+        >>> a.beamsList[1].type
+        'stop'
 
-        ::
+        >>> a.setByNumber(2, 'partial-right')
+        >>> a.beamsList[1].type
+        'partial'
 
-            >>> a.setByNumber(2, 'stop')
-            >>> a.beamsList[1].type
-            'stop'
+        >>> a.beamsList[1].direction
+        'right'
 
-        ::
+        >>> a.setByNumber(30, 'stop')
+        Traceback (most recent call last):
+        IndexError: beam number 30 cannot be accessed
 
-            >>> a.setByNumber(2, 'partial-right')
-            >>> a.beamsList[1].type
-            'partial'
-
-        ::
-
-            >>> a.beamsList[1].direction
-            'right'
-
-        ::
-
-            >>> a.setByNumber(30, 'stop')
-            Traceback (most recent call last):
-            IndexError: beam number 30 cannot be accessed
-
-        ::
-
-            >>> a.setByNumber(2, 'crazy')
-            Traceback (most recent call last):
-            BeamException: beam type cannot be crazy
+        >>> a.setByNumber(2, 'crazy')
+        Traceback (most recent call last):
+        BeamException: beam type cannot be crazy
 
         '''
         # permit providing one argument hyphenated

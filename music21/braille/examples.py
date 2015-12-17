@@ -24,7 +24,6 @@ A piano reduction of Giuseppi Verdi's famous aria from the opera
 Rigoletto, "La Donna É Mobile," in Bb major and 3/8 time.
 
 
->>> from music21 import corpus
 >>> verdi = corpus.parse('verdi/laDonnaEMobile')
 >>> #_DOCS_SHOW verdi.show('braille')
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠉⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -178,11 +177,17 @@ import unittest
 from music21 import key
 from music21 import note
 from music21 import tempo
-from music21 import tinyNotation
+from music21 import converter
+
+def cp(strIn):
+    return converter.parse(strIn, makeNotation=False)
 
 def happyBirthday():
-    hb = tinyNotation.TinyNotationStream\
-        ("3/4 d8. d16 e4 d g f#2 d8. d16 e4 d a g2 d8. d16 d'4 b g8. g16 f#4 e c'8. c'16 b4 g a g2")
+    '''
+    fully copyright free!
+    '''
+    hb = cp("tinynotation: 3/4 d8. d16 e4 d g f#2 d8. d16 e4 d a g2 d8. " + 
+            "d16 d'4 b g8. g16 f#4 e c'8. c'16 b4 g a g2")
     hb.insert(0, key.KeySignature(1))
     hb.insert(0, tempo.TempoText("Brightly"))
     hb.insert(0, tempo.MetronomeMark(number = 120, referent = note.Note(type='quarter')))
@@ -423,7 +428,7 @@ Interval 6 ⠴
 ====
 Measure 7 Right, Note Grouping 1:
 Octave 5 ⠨
-C eighth ⠙
+C eighth Gracenote--not supported ⠙
 B 16th ⠾
 Dot ⠄
 Opening single slur ⠉
@@ -468,7 +473,7 @@ Interval 7 ⠒
 ====
 Measure 9 Right, Note Grouping 1:
 Octave 4 ⠐
-A eighth ⠊
+A eighth Gracenote--not supported ⠊
 G 16th ⠷
 Dot ⠄
 Opening single slur ⠉
@@ -615,7 +620,7 @@ F beam ⠛
 ====
 Measure 15 Right, Note Grouping 1:
 Octave 5 ⠨
-C eighth ⠙
+C eighth Gracenote--not supported ⠙
 B 16th ⠾
 Dot ⠄
 Opening single slur ⠉
@@ -662,7 +667,7 @@ F beam ⠛
 ====
 Measure 17 Right, Note Grouping 1:
 Octave 4 ⠐
-A eighth ⠊
+A eighth Gracenote--not supported ⠊
 G 16th ⠷
 Dot ⠄
 Opening single slur ⠉
@@ -712,7 +717,7 @@ Interval 4 ⠼
 Measure 19 Right, Note Grouping 1:
 Accidental natural ⠡
 Octave 5 ⠨
-E eighth ⠋
+E eighth Gracenote--not supported ⠋
 Descending Chord:
 F 16th ⠿
 Interval 6 ⠴
@@ -761,7 +766,7 @@ Interval 4 ⠼
 Measure 21 Right, Note Grouping 1:
 Accidental flat ⠣
 Octave 5 ⠨
-G eighth ⠓
+G eighth Gracenote--not supported ⠓
 Descending Chord:
 Accidental natural ⠡
 G 16th ⠷
@@ -1163,6 +1168,7 @@ Barline final ⠣⠅
 
 ---end grand segment---
 '''
+        self.maxDiff = None
         self.assertEqual(x.splitlines(), y.splitlines())
 
 if __name__ == "__main__":

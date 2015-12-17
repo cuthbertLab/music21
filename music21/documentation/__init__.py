@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import sys
+__all__ = ['documenters', 'iterators', 'writers']
 
-if sys.version > '3':
-    from music21.documentation.library import * 
-else:
-    from library import *
+from music21.documentation import documenters
+from music21.documentation import iterators
+from music21.documentation import writers
 

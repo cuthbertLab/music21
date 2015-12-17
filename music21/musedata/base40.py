@@ -188,7 +188,8 @@ def base40DeltaToInterval(delta):
     numOctaves = abs(delta) // 40
     
     sgi = simpleInterval.generic #Simple generic interval
-    cgi = interval.GenericInterval(direction * (sgi.value + 7 * numOctaves)) #Compound generic interval
+    #Compound generic interval
+    cgi = interval.GenericInterval(direction * (sgi.value + 7 * numOctaves)) 
     sdi = simpleInterval.diatonic #Simple diatonic interval
     
     newInterval = interval.convertSpecifier(sdi.specifier)[1] + str(cgi.value)
@@ -246,7 +247,7 @@ def pitchToBase40(pitchToConvert):
     Traceback (most recent call last):
     Base40Exception: Base40 cannot handle this pitch F###4
     '''
-    if type(pitchToConvert) == str:
+    if isinstance(pitchToConvert, str):
         pitchToConvert = pitch.Pitch(pitchToConvert)
     if pitchToConvert.name in base40Representation:
         tableNum = base40Representation[pitchToConvert.name]

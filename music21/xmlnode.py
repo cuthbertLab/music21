@@ -38,35 +38,6 @@ RE_CAPS = re.compile('[A-Z]+')
 #-------------------------------------------------------------------------------
 # xml base class
 
-# ugly printyprint hack thanks to 
-# http://ronrothman.com/public/leftbraned/xml-dom-minidom-toprettyxml-and-silly-whitespace
-# this should be fixed by python 2.7
-
-
-def fixed_writexml(self, writer, indent="", addindent="", newl=""):
-    writer.write(indent+"<" + self.tagName)
-
-    attrs = self._get_attributes()
-    a_names = list(attrs.keys())
-    a_names.sort()
-
-    for a_name in a_names:
-        writer.write(" %s=\"" % a_name)
-        xml.dom.minidom._write_data(writer, attrs[a_name].value)
-        writer.write("\"")
-    if self.childNodes:
-        if len(self.childNodes) == 1 \
-          and self.childNodes[0].nodeType == xml.dom.minidom.Node.TEXT_NODE:
-            writer.write(">")
-            self.childNodes[0].writexml(writer, "", "", "")
-            writer.write("</%s>%s" % (self.tagName, newl))
-            return
-        writer.write(">%s"%(newl))
-        for node in self.childNodes:
-            node.writexml(writer,indent+addindent,addindent,newl)
-        writer.write("%s</%s>%s" % (indent,self.tagName,newl))
-    else:
-        writer.write("/>%s"%(newl))
 
 def fixBytes(value):
     if six.PY3 and isinstance(value, bytes):
@@ -387,7 +358,8 @@ class XMLNode(object):
                 match = True
                 break
         if not match:
-            raise XMLNodeException('this object (%r) does not have a "%s" (or %s) attribute' % (self, name, candidates))
+            raise XMLNodeException('this object (%r) does not have a "%s" (or %s) attribute' % 
+                                   (self, name, candidates))
         
     def get(self, name):
         '''
@@ -427,7 +399,8 @@ class XMLNode(object):
                 match = True
                 return fixBytes(getattr(self, candidate))
         if not match:
-            raise XMLNodeException('this object (%r) does not have a "%s" (or %r) attribute' % (self, name, candidate))
+            raise XMLNodeException('this object (%r) does not have a "%s" (or %r) attribute' % 
+                                   (self, name, candidate))
         
 
     def setDefaults(self):
@@ -454,12 +427,12 @@ class XMLNode(object):
             sub.append(u'charData=%s' % fixBytes(self.charData))
         
         for component in self._getComponents():
-            if type(component) == tuple: # its a simple element
+            if isinstance(component, tuple): # its a simple element
                 name, value = component
                 if value == None: 
                     continue
                 # generally we do not need to see False boolean nodes
-                if type(value) == bool and value == False: 
+                if isinstance(value, bool) and value == False: 
                     continue 
                 sub.append(u'%s=%s' % (fixBytes(name), fixBytes(value)))
             else: # its a node subclass
@@ -504,9 +477,8 @@ class XMLNode(object):
 
         # if attributes are defined, add to tag
         for name, value in self._getAttributes():
-            if value in [None, '']: 
-                continue
-            node.setAttribute(name, str(value))
+            if value not in [None, '']: 
+                node.setAttribute(name, str(value))
 
         # if self.charData is defined, this is a text component of this tag
         if self.charData != None:
@@ -528,13 +500,13 @@ class XMLNode(object):
 
                 # some elements are treated as boolean values; presence 
                 # of element, w/o text, is true
-                if type(content) == bool and content == False: 
+                if isinstance(content, bool) and content == False: 
                     continue 
                 content = fixBytes(content)
                 tag = fixBytes(tag)
                 
                 sub = doc.createElement(tag)
-                if type(content) == bool and content == True:
+                if isinstance(content, bool) and content == True:
                     pass # no text node needed
                 else:
                     # was the topline; trying to use replace for errors
@@ -546,7 +518,8 @@ class XMLNode(object):
 
                     if six.PY2:                       
                         try:
-                            entry = unicode(contentStr, errors='replace') # pylint: disable=undefined-variable
+                            entry = unicode(contentStr, errors='replace') # @UndefinedVariable pylint: disable=undefined-variable 
+                            
                         except TypeError:
                             entry = u"%s" % contentStr
                             #entry = str(content)
@@ -579,10 +552,7 @@ class XMLNode(object):
         # append completed node to parent (from arg) or document
         parent.appendChild(node)
         if stringOut:
-            if six.PY2:
-                return parent.toprettyxml(indent=u"  ", encoding="utf-8")
-            else:
-                return parent.toprettyxml(indent="  ")
+            return parent.toprettyxml(indent=u"  ", encoding="utf-8")
             #return parent.toxml(encoding="utf-8")
 
         else:

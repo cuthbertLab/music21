@@ -5,8 +5,8 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    (c) 2011 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# License:      BSD or LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
 '''
@@ -18,14 +18,14 @@ The workshop gave the excuse to add the romanText format, which DT and others
 have encoded lots of analyses in.  Some demos of the format are below
 '''
 
-import music21 
+from music21 import corpus, clef, interval, pitch, voiceLeading, roman
 
 def spliceAnalysis(book = 3, madrigal = 1):
     '''
     splice an analysis of the madrigal under the analysis itself
     '''
-    mad = music21.corpus.parse('monteverdi/madrigal.%s.%s.xml' % (book, madrigal))
-    analysis = music21.corpus.parse('monteverdi/madrigal.%s.%s.rntxt' % (book, madrigal))
+    #mad = corpus.parse('monteverdi/madrigal.%s.%s.xml' % (book, madrigal))
+    analysis = corpus.parse('monteverdi/madrigal.%s.%s.rntxt' % (book, madrigal))
 
     # these are multiple parts in a score stream
     #excerpt = mad.measures(1,20)
@@ -43,13 +43,13 @@ def spliceAnalysis(book = 3, madrigal = 1):
 def showAnalysis(book = 3, madrigal = 13):
     #analysis = converter.parse('d:/docs/research/music21/dmitri_analyses/Mozart Piano Sonatas/k331.rntxt') 
     filename = 'monteverdi/madrigal.%s.%s.rntxt' % (book, madrigal)
-    analysis = music21.corpus.parse(filename)
+    analysis = corpus.parse(filename)
     #analysis.show()
     (major, minor) = iqSemitonesAndPercentage(analysis)
     print (major)
     print (minor)
     
-def analyzeBooks(books = [3], start = 1, end = 20, show = False, strict = False):
+def analyzeBooks(books = (3,), start = 1, end = 20, show = False, strict = False):
     majorFig = ""
     minorFig = ""
     majorSt = ""
@@ -60,14 +60,14 @@ def analyzeBooks(books = [3], start = 1, end = 20, show = False, strict = False)
         for i in range(start, end+1):
             filename = 'monteverdi/madrigal.%s.%s.rntxt' % (book, i)
             if strict == True:
-                analysis = music21.corpus.parse(filename)
-                print (book,i)
+                analysis = corpus.parse(filename)
+                print(book,i)
             else:
                 try:
-                    analysis = music21.corpus.parse(filename)
-                    print (book,i)
-                except:
-                    print ("Cannot parse %s, maybe it does not exist..." % (filename))
+                    analysis = corpus.parse(filename)
+                    print(book,i)
+                except Exception:
+                    print("Cannot parse %s, maybe it does not exist..." % (filename))
                     continue
             if show == True:
                 analysis.show()
@@ -80,17 +80,20 @@ def analyzeBooks(books = [3], start = 1, end = 20, show = False, strict = False)
             minorSt += mSt
             majorRoot += MRoot
             minorRoot += mRoot
-    print (majorFig)
-    print (minorFig)
-    print (majorSt)
-    print (minorSt)
-    print (majorRoot)
-    print (minorRoot)
+    print(majorFig)
+    print(minorFig)
+    print(majorSt)
+    print(minorSt)
+    print(majorRoot)
+    print(minorRoot)
 
 
 def iqChordsAndPercentage(analysisStream):
     '''
-    returns two strings, one for major, one for minor, containing the key, figure, and (in parentheses) the % of the total duration that this chord represents.
+    returns two strings, one for major, one for minor, containing the key, 
+    figure, and (in parentheses) the % of the total duration that this chord represents.
+    
+    Named for Ian Quinn
     '''
     totalDuration = analysisStream.duration.quarterLength
     romMerged = analysisStream.flat.stripTies()
@@ -148,7 +151,7 @@ def iqRootsAndPercentage(analysisStream):
     active = 'minor'
     for element in romMerged:
         if "RomanNumeral" in element.classes:       
-            distanceToTonicInSemis = int((element.root().ps - pitch.Pitch(element.scale.tonic).ps) % 12)
+            #distanceToTonicInSemis = int((element.root().ps - pitch.Pitch(element.scale.tonic).ps) % 12)
             elementLetter = str(element.root().name) 
             
             ## leave El
@@ -177,7 +180,7 @@ def iqRootsAndPercentage(analysisStream):
                 minor += "\n" + element.tonic + " " + element.mode + " "
     return (major, minor)
 
-def monteverdiParallels(books = [3], start = 1, end = 20, show = True, strict = False):
+def monteverdiParallels(books = (3,), start = 1, end = 20, show = True, strict = False):
     '''
     find all instances of parallel fifths or octaves in Monteverdi madrigals.
     '''
@@ -196,7 +199,7 @@ def monteverdiParallels(books = [3], start = 1, end = 20, show = True, strict = 
                     continue
             displayMe = False
             for i in range(len(c.parts) - 1):
-                iName = c.parts[i].id
+                #iName = c.parts[i].id
                 ifn = c.parts[i].flat.notesAndRests
                 omi = ifn.offsetMap
                 for j in range(i+1, len(c.parts)):
@@ -240,7 +243,7 @@ def findPhraseBoundaries(book = 4, madrigal = 12):
 
     for p in sc.parts:
         partNotes = p.flat.stripTies(matchByPitch = True).notesAndRests
-        thisPartPhraseScores = [] # keeps track of the likelihood that a phrase boundary is after note i
+        #thisPartPhraseScores = [] # keeps track of the likelihood that a phrase boundary is after note i
         for i in range(2, len(partNotes) - 2): # start on the third note and stop searching on the third to last note...
             thisScore = 0
             twoNotesBack = partNotes[i-2]

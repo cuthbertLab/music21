@@ -8,4 +8,5 @@ Tutorials
    graphing
    advancedGraphing
    tutorialFinaleMac
+   examples
 

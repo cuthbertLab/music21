@@ -19,7 +19,7 @@ from music21 import base
 from music21 import exceptions21
 
 from music21 import expressions
-from music21 import repeat
+from music21.repeat import RepeatMark
 
 from music21 import environment
 _MOD = 'bar.py'
@@ -170,7 +170,8 @@ class Barline(base.Music21Object):
 
 # type <ending> in musicxml is used to mark different endings
 
-class Repeat(repeat.RepeatMark, Barline):
+
+class Repeat(RepeatMark, Barline):
     '''
     A Repeat barline.
 
@@ -182,7 +183,8 @@ class Repeat(repeat.RepeatMark, Barline):
     >>> rep
     <music21.bar.Repeat direction=end times=3>
 
-    To apply a repeat barline assign it to either the `.leftBarline` or `.rightBarline` attribute
+    To apply a repeat barline assign it to either the `.leftBarline` or 
+    `.rightBarline` attribute
     of a measure.
     
     >>> m = stream.Measure()
@@ -229,11 +231,11 @@ class Repeat(repeat.RepeatMark, Barline):
 
 
     def __init__(self, direction='start', times=None):
+        RepeatMark.__init__(self)
         if direction == 'start':
             style = 'heavy-light'
         else:
             style = 'final'
-        
         Barline.__init__(self, style=style)
 
         self._direction = None # either start or end
@@ -287,14 +289,21 @@ class Repeat(repeat.RepeatMark, Barline):
         return self._times
 
     times = property(_getTimes, _setTimes, 
-        doc = '''Get or set the times property of this barline. This defines how many times the repeat happens. A standard repeat repeats 2 times; values equal to or greater than 0 are permitted. A repeat of 0 skips the repeated passage. 
+        doc = '''
+        Get or set the times property of this barline. This 
+        defines how many times the repeat happens. A standard repeat 
+        repeats 2 times; values equal to or greater than 0 are permitted. 
+        A repeat of 0 skips the repeated passage. 
         
-        >>> from music21 import bar
         >>> lb = bar.Repeat(direction='start')
         >>> rb = bar.Repeat(direction='end')
+        
+        Only end expressions can have times:
+        
         >>> lb.times = 3
         Traceback (most recent call last):
         BarException: cannot set repeat times on a start Repeat
+        
         >>> rb.times = 3
         >>> rb.times = -3
         Traceback (most recent call last):
@@ -303,7 +312,18 @@ class Repeat(repeat.RepeatMark, Barline):
 
 
     def getTextExpression(self, prefix='', postfix='x'):
-        '''Return a configured :class:`~music21.expressions.TextExpressions` object describing the repeat times. Append this to the stream for annotation of repeat times. 
+        '''
+        Return a configured :class:`~music21.expressions.TextExpressions` 
+        object describing the repeat times. Append this to the stream 
+        for annotation of repeat times. 
+        
+        >>> rb = bar.Repeat(direction='end')
+        >>> rb.times = 3
+        >>> rb.getTextExpression()
+        <music21.expressions.TextExpression "3x">
+        
+        >>> rb.getTextExpression(prefix='repeat ', postfix=' times')
+        <music21.expressions.TextExpression "repeat 3 t...">        
         '''
         value = '%s%s%s' % (prefix, self._times, postfix)
         return expressions.TextExpression(value)
@@ -317,9 +337,9 @@ class Test(unittest.TestCase):
    
 
     def testSortorder(self):
-        from music21 import stream, bar, clef, note, metadata
+        from music21 import stream, clef, note, metadata
         m = stream.Measure()
-        b = bar.Repeat()
+        b = Repeat()
         m.leftBarline = b
         c = clef.BassClef()
         m.append(c)

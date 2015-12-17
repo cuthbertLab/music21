@@ -50,30 +50,25 @@ def getObjectsWithEditorial(
     dictionary key of editorial notes stored in the miscellaneous (misc)
     dictionary.  For example, "isPassingTone" or "isNeighborTone"
 
-    ::
+    >>> n1 = note.Note()
+    >>> n1.editorial.misc['isPassingTone'] = True
+    >>> n2 = note.Note()
+    >>> n2.editorial.comment = 'consider revising'
+    >>> s = stream.Stream()
+    >>> s.repeatAppend(n1, 5)
+    >>> s.repeatAppend(note.Note(), 2)
+    >>> s.repeatAppend(n2, 3)
+    >>> listofNotes = s.getElementsByClass(note.Note)
+    >>> listOfValues = ['consider revising', 'remove']
+    >>> listofNotesWithEditorialisPassingTone = editorial.getObjectsWithEditorial(
+    ...     listofNotes, "isPassingTone")
+    >>> listofNotesWithEditorialComment = editorial.getObjectsWithEditorial(
+    ...     listofNotes, "comment", listOfValues)
+    >>> print(len(listofNotesWithEditorialisPassingTone))
+    5
 
-        >>> n1 = note.Note()
-        >>> n1.editorial.misc['isPassingTone'] = True
-        >>> n2 = note.Note()
-        >>> n2.editorial.comment = 'consider revising'
-        >>> s = stream.Stream()
-        >>> s.repeatAppend(n1, 5)
-        >>> s.repeatAppend(note.Note(), 2)
-        >>> s.repeatAppend(n2, 3)
-        >>> listofNotes = s.getElementsByClass(note.Note)
-        >>> listOfValues = ['consider revising', 'remove']
-        >>> listofNotesWithEditorialisPassingTone = editorial.getObjectsWithEditorial(
-        ...     listofNotes, "isPassingTone")
-        >>> listofNotesWithEditorialComment = editorial.getObjectsWithEditorial(
-        ...     listofNotes, "comment", listOfValues)
-        >>> print(len(listofNotesWithEditorialisPassingTone))
-        5
-
-    ::
-
-        >>> print(len(listofNotesWithEditorialComment))
-        3
-
+    >>> print(len(listofNotesWithEditorialComment))
+    3
     '''
     listofOBJToReturn = []
     for obj in listToSearch:
@@ -100,11 +95,9 @@ class NoteEditorial(SlottedObject):
     Standard ones are stored as attributes.  Non-standard/one-off effects are
     stored in the dict called "misc":
 
-    ::
-
-        >>> a = editorial.NoteEditorial()
-        >>> a.color = "blue"  # a standard editorial effect
-        >>> a.misc['backgroundHighlight'] = 'yellow'  # non-standard.
+    >>> a = editorial.NoteEditorial()
+    >>> a.color = "blue"  # a standard editorial effect
+    >>> a.misc['backgroundHighlight'] = 'yellow'  # non-standard.
 
     Every GeneralNote object already has a NoteEditorial object attached to it
     at object.editorial.  Normally you will just change that object instead.
@@ -114,13 +107,11 @@ class NoteEditorial(SlottedObject):
     the editorial suggestion to sing F-sharp as a "musica ficta" accidental
     object:
 
-    ::
-
-        >>> fictaSharp = pitch.Accidental("Sharp")
-        >>> n = note.Note("F")
-        >>> n.editorial.ficta = fictaSharp
-        >>> assert(n.editorial.ficta.alter == 1.0) #_DOCS_HIDE
-        >>> #_DOCS_SHOW n.show('lily.png')  # only Lilypond currently supports musica ficta
+    >>> fictaSharp = pitch.Accidental("Sharp")
+    >>> n = note.Note("F")
+    >>> n.editorial.ficta = fictaSharp
+    >>> assert(n.editorial.ficta.alter == 1.0) #_DOCS_HIDE
+    >>> #_DOCS_SHOW n.show('lily.png')  # only Lilypond currently supports musica ficta
 
     .. image:: images/noteEditorialFictaSharp.*
         :width: 103
@@ -128,15 +119,20 @@ class NoteEditorial(SlottedObject):
     '''
 
     _DOC_ATTR = {
-        'color': 'the color of the note (x11 colors and extended x11colors are allowed), only displays properly in lilypond',
+        'color': 'the color of the note (RGP, x11 colors, and extended x11colors are allowed)',
         'comment': 'a reference to a :class:`~music21.editorial.Comment` object',
-        'ficta': 'a :class:`~music21.pitch.Accidental` object that specifies musica ficta for the note.  Will only be displayed in LilyPond and then only if there is no Accidental object on the note itself',
-        'hidden': 'boolean value about whether to hide the note or not (only works in lilypond)',
-        'harmonicInterval': 'an :class:`~music21.interval.Interval` object that specifies the harmonic interval between this note and a single other note (useful for storing information post analysis',
+        'ficta': '''a :class:`~music21.pitch.Accidental` object that specifies musica 
+            ficta for the note.  Will only be displayed in LilyPond and then only if 
+            there is no Accidental object on the note itself''',
+        'hidden': '''boolean value about whether to hide the 
+            note or not (only works in lilypond)''',
+        'harmonicInterval': '''an :class:`~music21.interval.Interval` object that specifies 
+            the harmonic interval between this note and a single other note 
+            (useful for storing information post analysis)''',
         'harmonicIntervals': 'a list for when you want to store more than one harmonicInterval',
-        'melodicInterval': 'an :class:`~music21.interval.Interval` object that specifies the melodic interval to the next note in this part/voice/stream, etc.',
+        'melodicInterval': '''an :class:`~music21.interval.Interval` object that specifies 
+            the melodic interval to the next note in this part/voice/stream, etc.''',
         'melodicIntervals': 'a list for storing more than one melodic interval',
-        'melodicIntervalOverRests': 'same as melodicInterval but ignoring rests; MIGHT BE REMOVED SOON',
         'melodicIntervalsOverRests': 'same thing but a list',
         'misc': 'A dict to hold anything you might like to store.',
         }
@@ -150,7 +146,6 @@ class NoteEditorial(SlottedObject):
         'hidden',
         'melodicInterval',
         'melodicIntervals',
-        'melodicIntervalOverRests',
         'melodicIntervalsOverRests',
         'comment',
         )
@@ -167,7 +162,6 @@ class NoteEditorial(SlottedObject):
         self.hidden = False
         self.melodicInterval = None
         self.melodicIntervals = []
-        self.melodicIntervalOverRests = None
         self.melodicIntervalsOverRests = []
         self.comment = Comment()
 
@@ -178,19 +172,15 @@ class NoteEditorial(SlottedObject):
         A method that returns a string containing the lilypond output that
         comes before the note.
 
-        ::
+        >>> n = note.Note()
+        >>> n.editorial.lilyStart()
+        ''
 
-            >>> n = note.Note()
-            >>> n.editorial.lilyStart()
-            ''
-
-        ::
-
-            >>> n.editorial.ficta = pitch.Accidental("Sharp")
-            >>> n.editorial.color = "blue"
-            >>> n.editorial.hidden = True
-            >>> print(n.editorial.lilyStart())
-            \ficta \color "blue" \hideNotes
+        >>> n.editorial.ficta = pitch.Accidental("Sharp")
+        >>> n.editorial.color = "blue"
+        >>> n.editorial.hidden = True
+        >>> print(n.editorial.lilyStart())
+        \ficta \color "blue" \hideNotes
 
         '''
         result = ""
@@ -220,9 +210,10 @@ class NoteEditorial(SlottedObject):
         Returns any information that should be attached under the note,
         currently just returns self.comment.lily or "".
         '''
+        # pylint: disable=undefined-variable
         if self.comment and self.comment.text:
             if six.PY2:
-                return unicode(self.comment.lily) # pylint: disable=undefined-variable
+                return unicode(self.comment.lily) # @UndefinedVariable
             else:
                 return str(self.comment.lily)
         else:
@@ -243,13 +234,11 @@ class Comment(SlottedObject):
     '''
     An object that adds text above or below a note:
 
-    ::
-
-        >>> n = note.Note()
-        >>> n.editorial.comment.text = "hello"
-        >>> n.editorial.comment.position = "above"
-        >>> n.editorial.comment.lily
-        '^"hello"'
+    >>> n = note.Note()
+    >>> n.editorial.comment.text = "hello"
+    >>> n.editorial.comment.position = "above"
+    >>> n.editorial.comment.lily
+    '^"hello"'
 
     '''
 

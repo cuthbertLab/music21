@@ -10,10 +10,14 @@
 '''
 Each of the example methods in this module provides a figured bass line as a 
 :class:`~music21.figuredBass.realizer.FiguredBassLine` instance.
-These can be realized by calling :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`, which takes in an 
-optional :class:`~music21.figuredBass.rules.Rules` object. The result is a :class:`~music21.figuredBass.realizer.Realization` 
-object which can generate realizations as instances of :class:`~music21.stream.Score`. These realizations can then be displayed 
-in external software such as MuseScore or Finale by calling :meth:`~music21.base.Music21Object.show`.
+These can be realized by calling 
+:meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`, which takes in an 
+optional :class:`~music21.figuredBass.rules.Rules` object. 
+The result is a :class:`~music21.figuredBass.realizer.Realization` 
+object which can generate realizations as instances of 
+:class:`~music21.stream.Score`. These realizations can then be displayed 
+in external software such as MuseScore or Finale by 
+calling :meth:`~music21.base.Music21Object.show`.
 '''
 
 import copy
@@ -66,8 +70,9 @@ def exampleA():
     .. image:: images/figuredBass/fbExamples_sol2A.*
         :width: 700
     '''
-    from music21 import tinyNotation
-    s = tinyNotation.TinyNotationStream("C2 D2_6 E2_6 F2_6 C#2_b7,5,3 D2 BB2_#6,5,3 C2_6 AA#2_7,5,#3 BB1_6,4 BB2_7,#5,#3 E1.", "3/2")
+    from music21 import converter
+    s = converter.parse("tinynotation: 3/2 C2 D2_6 E2_6 F2_6 C#2_b7,5,3 D2 " + 
+                        "BB2_#6,5,3 C2_6 AA#2_7,5,#3 BB1_6,4 BB2_7,#5,#3 E1.", makeNotation=False)
     return realizer.figuredBassFromStream(s)
 
 def exampleD():
@@ -127,8 +132,9 @@ def exampleD():
     .. image:: images/figuredBass/fbExamples_sol3D.*
             :width: 700
     '''
-    from music21 import tinyNotation, key
-    s = tinyNotation.TinyNotationStream("BB4 C#4_#6 D4_6 E2 E#4_7,5,#3 F#2_6,4 F#4_5,#3 G2 E4_6 F#2_6,4 E4_#4,2 D2_6 EE4_7,5,#3 AA2.", "3/4")
+    from music21 import converter, key
+    s = converter.parse("tinynotation: 3/4 BB4 C#4_#6 D4_6 E2 E#4_7,5,#3 F#2_6,4 " + 
+                        "F#4_5,#3 G2 E4_6 F#2_6,4 E4_#4,2 D2_6 EE4_7,5,#3 AA2.", makeNotation=False)
     s.insert(0, key.Key('b'))
     return realizer.figuredBassFromStream(s)
 
@@ -170,8 +176,9 @@ def exampleB():
     .. image:: images/figuredBass/fbExamples_sol2B.*
         :width: 700
     '''
-    from music21 import tinyNotation, key
-    s = tinyNotation.TinyNotationStream("D4 A4_7,5,#3 B-4 F4_6 G4_6 AA4_7,5,#3 D2", "4/4")
+    from music21 import converter, key
+    s = converter.parse("tinynotation: 4/4 D4 A4_7,5,#3 B-4 F4_6 G4_6 AA4_7,5,#3 D2", 
+                        makeNotation=False)
     s.insert(0, key.Key('d'))
     return realizer.figuredBassFromStream(s)
         
@@ -213,8 +220,9 @@ def exampleC():
     .. image:: images/figuredBass/fbExamples_sol2C.*
         :width: 700
     '''
-    from music21 import tinyNotation, key
-    s = tinyNotation.TinyNotationStream("FF#4 GG#4_#6 AA4_6 FF#4 BB4_6,5 C#4_7,5,#3 F#2", "4/4")
+    from music21 import converter, key
+    s = converter.parse("tinynotation: 4/4 FF#4 GG#4_#6 AA4_6 FF#4 BB4_6,5 C#4_7,5,#3 F#2", 
+                        makeNotation=False)
     s.insert(0, key.Key('f#'))
     return realizer.figuredBassFromStream(s)
 
@@ -232,8 +240,8 @@ def V43ResolutionExample():
     .. image:: images/figuredBass/fbExamples_V43.*
         :width: 350
     '''
-    from music21 import tinyNotation, key
-    s = tinyNotation.TinyNotationStream("D2 E2_4,3 D2_5,3 E2_4,3 F#1_6,3", "4/4")
+    from music21 import converter, key
+    s = converter.parse("tinynotation: 4/4 D2 E2_4,3 D2_5,3 E2_4,3 F#1_6,3", makeNotation=False)
     s.insert(0, key.Key('D'))
     return realizer.figuredBassFromStream(s)
 
@@ -242,7 +250,8 @@ def viio65ResolutionExample():
     For a fully diminished seventh chord resolving to the tonic, the resolution chord
     can contain either a doubled third (standard resolution) or a doubled tonic (alternate
     resolution), depending on whether the third of the diminished chord rises or falls.
-    The user can control this in a Rules object by modifying :attr:`~music21.figuredBass.rules.Rules.doubledRootInDim7`.
+    The user can control this in a Rules object by modifying 
+    :attr:`~music21.figuredBass.rules.Rules.doubledRootInDim7`.
     However, when resolving a diminished 6,5, the third is found in the bass and the
     proper resolution is determined in context, regardless of user preference.
     
@@ -260,8 +269,8 @@ def viio65ResolutionExample():
     .. image:: images/figuredBass/fbExamples_vii65.*
         :width: 700
     '''
-    from music21 import tinyNotation, key
-    s = tinyNotation.TinyNotationStream("D2 E2_6,b5 D2 E2_6,b5 F#1_6", "4/4")
+    from music21 import converter, key
+    s = converter.parse("tinyNotation: 4/4 D2 E2_6,b5 D2 E2_6,b5 F#1_6", makeNotation=False)
     s.insert(0, key.Key('D'))
     return realizer.figuredBassFromStream(s)
 
@@ -270,9 +279,12 @@ def augmentedSixthResolutionExample():
     This example was retrieved from page 61 of *The Music Theory Handbook* by Marjorie Merryman.
     
     
-    Italian (8,#6,3), French (#6,4,3), German (#6,5,3), and Swiss (#6,#4,3) augmented sixth resolutions to
-    either the major dominant or the major/minor tonic 6,4 are supported. The first four bars show the 
-    resolutions to the dominant in the order above, while the last bar shows the German augmented sixth
+    Italian (8,#6,3), French (#6,4,3), German (#6,5,3), and Swiss (#6,#4,3) 
+    augmented sixth resolutions to
+    either the major dominant or the major/minor tonic 6,4 are supported. 
+    The first four bars show the 
+    resolutions to the dominant in the order above, while the last bar 
+    shows the German augmented sixth
     resolving to the tonic. 
     >>> from music21.figuredBass import examples
     >>> fbLine = examples.augmentedSixthResolutionExample()
@@ -282,25 +294,36 @@ def augmentedSixthResolutionExample():
     .. image:: images/figuredBass/fbExamples_a6.*
         :width: 700   
     '''
-    from music21 import tinyNotation, key
-    s = tinyNotation.TinyNotationStream("D4 BB-4_8,#6,3 AA2_# D4 BB-4_#6,4,3 AA2_# D4 BB-4_#6,5,3 AA2_# D4 BB-4_#6,#4,3 AA2_# D4 BB-4_#6,5,3 AA2_6,4", "4/4")
+    from music21 import converter, key
+    s = converter.parse("tinynotation: 4/4 D4 BB-4_8,#6,3 AA2_# D4 BB-4_#6,4,3 " + 
+                        "AA2_# D4 BB-4_#6,5,3 AA2_# D4 BB-4_#6,#4,3 AA2_# D4 " + 
+                        "BB-4_#6,5,3 AA2_6,4", makeNotation=False)
     s.insert(0, key.Key('d'))
     return realizer.figuredBassFromStream(s)
     
 def italianA6ResolutionExample():
     '''
-    The Italian augmented sixth chord (It+6) is the only augmented sixth chord to consist of only three
-    pitch names, and when represented in four parts, the tonic is doubled. The tonic can resolve up, down or 
-    stay the same, and in four parts, the two tonics always resolve differently, resulting in two equally 
-    acceptable resolutions. An alternate approach to resolving the It+6 chord was taken, such that an It+6 
-    chord could map internally to two different resolutions. Every other special resolution in fbRealizer 
+    The Italian augmented sixth chord (It+6) is the only 
+    augmented sixth chord to consist of only three
+    pitch names, and when represented in four parts, the 
+    tonic is doubled. The tonic can resolve up, down or 
+    stay the same, and in four parts, the two tonics always 
+    resolve differently, resulting in two equally 
+    acceptable resolutions. An alternate approach to resolving 
+    the It+6 chord was taken, such that an It+6 
+    chord could map internally to two different resolutions. 
+    Every other special resolution in fbRealizer 
     consists of a 1:1 mapping of special chords to resolutions.
      
     
-    Here, the It+6 chord is resolving to the dominant, minor tonic, and major tonic, respectively. In the
-    dominant resolution shown, the tonics (D) are resolving inward, but they can resolve outward as well. In
-    the minor tonic resolution, the higher tonic is resolving up to F, and the lower tonic remains the same.
-    In the major tonic resolution, the higher tonic remains the same, while the lower tonic resolves up to the F#.
+    Here, the It+6 chord is resolving to the dominant, minor tonic, 
+    and major tonic, respectively. In the
+    dominant resolution shown, the tonics (D) are resolving inward, 
+    but they can resolve outward as well. In
+    the minor tonic resolution, the higher tonic is resolving up to F, 
+    and the lower tonic remains the same.
+    In the major tonic resolution, the higher tonic remains the same, 
+    while the lower tonic resolves up to the F#.
     
     >>> from music21.figuredBass import examples
     >>> from music21.figuredBass import rules
@@ -315,8 +338,10 @@ def italianA6ResolutionExample():
     .. image:: images/figuredBass/fbExamples_it+6.*
         :width: 700
     '''
-    from music21 import tinyNotation, key
-    s = tinyNotation.TinyNotationStream("D4 BB-4_#6,3 AA2_# D4 BB-4_#6,3 AA2_6,4 D4 BB-4_#6,3 AA2_#6,4")
+    from music21 import converter, key
+    s = converter.parse(
+        "tinynotation: D4 BB-4_#6,3 AA2_# D4 BB-4_#6,3 AA2_6,4 D4 BB-4_#6,3 AA2_#6,4", 
+        makeNotation=False)
     s.insert(0, key.Key('d'))
     return realizer.figuredBassFromStream(s)
 
@@ -353,8 +378,10 @@ def twelveBarBlues():
     .. image:: images/figuredBass/fbExamples_twelveBarBlues.*
         :width: 700   
     '''
-    from music21 import tinyNotation, key
-    s = tinyNotation.TinyNotationStream("BB-1 E-1 BB-1 BB-1_7 E-1 E-1 BB-1 BB-1_7 F1_7 G1_6 BB-1 BB-1")
+    from music21 import converter, key
+    s = converter.parse(
+        "tinynotation: BB-1 E-1 BB-1 BB-1_7 E-1 E-1 BB-1 BB-1_7 F1_7 G1_6 BB-1 BB-1", 
+        makeNotation=False)
     s.insert(0, key.Key('B-'))
     return realizer.figuredBassFromStream(s)
 
@@ -375,7 +402,7 @@ def generateBoogieVamp(blRealization = None, numRepeats = 5):
     .. image:: images/figuredBass/fbExamples_boogieVamp.*
         :width: 700   
     '''
-    from music21 import tinyNotation, stream, interval
+    from music21 import converter, stream, interval
     if blRealization == None:
         bluesLine = twelveBarBlues()
         fbRules = rules.Rules()
@@ -384,7 +411,8 @@ def generateBoogieVamp(blRealization = None, numRepeats = 5):
         blRealization = bluesLine.realize(fbRules)
         sampleScore = blRealization.generateRandomRealizations(numRepeats)
     
-    boogieBassLine = tinyNotation.TinyNotationStream("BB-8. D16 F8. G16 A-8. G16 F8. D16")
+    boogieBassLine = converter.parse("tinynotation: BB-8. D16 F8. G16 A-8. G16 F8. D16", 
+                                     makeNotation=False)
 
     newBassLine = stream.Part()
     newBassLine.append(sampleScore[1][0]) #Time signature
@@ -419,7 +447,7 @@ def generateTripletBlues(blRealization = None, numRepeats = 5): #12/8
     .. image:: images/figuredBass/fbExamples_tripletBlues.*
         :width: 700   
     '''
-    from music21 import tinyNotation, stream, interval, meter
+    from music21 import converter, stream, interval, meter
     if blRealization == None:
         bluesLine = twelveBarBlues()
         fbRules = rules.Rules()
@@ -428,7 +456,8 @@ def generateTripletBlues(blRealization = None, numRepeats = 5): #12/8
         blRealization = bluesLine.realize(fbRules)
         sampleScore = blRealization.generateRandomRealizations(numRepeats)
 
-    tripletBassLine = tinyNotation.TinyNotationStream("BB-4 BB-8 D4 D8 F4 F8 A-8 G8 F8")
+    tripletBassLine = converter.parse("tinynotation: BB-4 BB-8 D4 D8 F4 F8 A-8 G8 F8", 
+                                      makeNotation=False)
 
     newBassLine = stream.Part()
     for n in sampleScore[1].notes:
@@ -453,7 +482,8 @@ def generateTripletBlues(blRealization = None, numRepeats = 5): #12/8
     return newScore
 
 
-_DOC_ORDER = [exampleA, exampleB, exampleC, exampleD, V43ResolutionExample, viio65ResolutionExample, 
+_DOC_ORDER = [exampleA, exampleB, exampleC, exampleD, V43ResolutionExample, 
+              viio65ResolutionExample, 
               augmentedSixthResolutionExample, italianA6ResolutionExample, twelveBarBlues,
               generateBoogieVamp, generateTripletBlues]
 

@@ -1,25 +1,21 @@
 # -*- coding: utf-8 -*-
 #-------------------------------------------------------------------------------
-# Name:         smt2011.py
-# Purpose:      Demonstrations for the SMT 2011 poster session
+# Name:         icmc2011.py
+# Purpose:      Demonstrations for the ICMC 2011 poster session
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    (c) 2009-2010 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2009-11 Michael Scott Cuthbert and the music21 Project
+# License:      BSD or LGPL, see license.txt
 #-------------------------------------------------------------------------------
 
-
-
-
-
-
 import unittest
-from music21 import note, stream, clef, metadata, spanner, environment, converter, scale, corpus, common
+from music21 import alpha, note, stream, clef, metadata, spanner, environment
+from music21 import converter, scale, corpus, common
 
 
-_MOD = 'demo/smt2010.py'
+_MOD = 'demo/icmc2011.py'
 environLocal = environment.Environment(_MOD)
 
 
@@ -29,8 +25,6 @@ environLocal = environment.Environment(_MOD)
 class Test(unittest.TestCase):
 
     def runTest(self):
-        ''' 
-        '''
         pass
     
 
@@ -110,7 +104,7 @@ class Test(unittest.TestCase):
         assert n2.getOffsetBySite(m1) == 2.0
         assert n2.getOffsetBySite(s2) == 10
         # the None site provides a default offset
-        assert n2.sites.getSites() == [None, m1, s2, s3]
+        assert set(n2.sites.getSites()) == set([None, m1, s2, s3])
         # the same instance is found in all Streams
         assert m1.hasElement(n2) == True
         assert s2.hasElement(n2) == True
@@ -293,7 +287,8 @@ class Test(unittest.TestCase):
         # based on Stream.testAddSlurByMelisma(self):
 
         #from music21 import corpus, spanner
-        nStart = None; nEnd = None
+        nStart = None
+        nEnd = None
         
         ex = corpus.parse('luca/gloria').parts['cantus'].measures(1,11)        
         exFlatNotes = ex.flat.notesAndRests
@@ -314,7 +309,8 @@ class Test(unittest.TestCase):
             if nStart is not None and nEnd is not None:
                 nStart.addLyric(nStart.beatStr)
                 ex.insert(spanner.Slur(nStart, nEnd))
-                nStart = None; nEnd = None
+                nStart = None
+                nEnd = None
         
         for sp in ex.spanners.getElementsByClass('Slur'):  
             #environLocal.printDebug(['sp', n.nameWithOctave, sp])
@@ -425,7 +421,7 @@ class Test(unittest.TestCase):
         
         s = stream.Stream()
         p = None
-        for i in range(16):
+        for i in range(8): # was 16, but sometimes exceeded scale length.
             direction = random.choice([-1, 1])
             for j in range(2):
                 p = sc1.next(p, direction)
@@ -538,7 +534,7 @@ class Test(unittest.TestCase):
 
     def testScalesPy06(self):
         #from music21 import corpus, scale, note
-        from music21 import analysis
+        #from music21 import analysis
 
         scGMajor = scale.MajorScale('g4')
         scDMajor = scale.MajorScale('d4')
@@ -547,7 +543,7 @@ class Test(unittest.TestCase):
         s.remove(s['viola'])
         for part in s.parts: 
             for sc in [scGMajor, scDMajor]:
-                groups = analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=5, comparisonAttribute='name')
+                groups = alpha.analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=5, comparisonAttribute='name')
                 for group in groups:
                     for n in group['stream'].notesAndRests:
                         n.addLyric('%s^%s' % (sc.getTonic().name, sc.getScaleDegreeFromPitch(n.pitch)))
@@ -568,7 +564,7 @@ class Test(unittest.TestCase):
 #         part = corpus.parse('bwv1080/03').parts[0].measures(46,53)
 #         
 #         for sc in [scDMelodicMinor, scGMelodicMinor]:
-#             groups = analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=4, comparisonAttribute='name')
+#             groups = alpha.analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=4, comparisonAttribute='name')
 #             for group in groups:
 #                 for n in group['stream'].notes:
 #                     n.addLyric('%s^%s' % (sc.getTonic().name.lower(), sc.getScaleDegreeFromPitch(n.pitch, group['direction'])))
@@ -582,7 +578,7 @@ class Test(unittest.TestCase):
 #         s = corpus.parse('mozart/k80/movement1').measures(1,28)
 #         for sc in [scGMajor, scDMajor, scAMajor]:
 #             for part in s.parts: 
-#                 post = analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=5,             
+#                 post = alpha.analysis.search.findConsecutiveScale(part.flat, sc, degreesRequired=5,             
 #                        comparisonAttribute='name')
 #                 for g, group in enumerate(post):
 #                     for n in group:

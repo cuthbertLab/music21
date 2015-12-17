@@ -83,7 +83,8 @@ It's a little complex, but worth seeing in full:
 >>> data = []
 >>> xlabels = []
 >>> values = []
->>> for deg,value in sorted(list(degreeDictionary.items()), key=operator.itemgetter(1), reverse=True):
+>>> ddList = list(degreeDictionary.items())
+>>> for deg,value in sorted(ddList, key=operator.itemgetter(1), reverse=True):
 ...    data.append((i, degreeDictionary[deg]), )
 ...    xlabels.append((i+.5, deg), )
 ...    values.append(degreeDictionary[deg])
@@ -114,7 +115,8 @@ OMIT_FROM_DOCS
 >>> [str(p) for p in x.flat.getElementsByClass('RomanNumeral')[0].pitches]
 ['F#5', 'A5', 'C#6']
 
->>> [str(p) for p in converter.parse('romantext: m1 a: vio').flat.getElementsByClass('RomanNumeral')[0].pitches]
+>>> [str(p) for p in 
+...  converter.parse('romantext: m1 a: vio').flat.getElementsByClass('RomanNumeral')[0].pitches]
 ['F#5', 'A5', 'C6']
 '''
 import unittest
@@ -155,7 +157,8 @@ def _copySingleMeasure(t, p, kCurrent):
     #environLocal.printDebug(['calling _copySingleMeasure()'])
     targetNumber, unused_targetRepeat = t.getCopyTarget()
     if len(targetNumber) > 1: # this is an encoding error
-        raise RomanTextTranslateException('a single measure cannot define a copy operation for multiple measures')
+        raise RomanTextTranslateException(
+                'a single measure cannot define a copy operation for multiple measures')
     # TODO: ignoring repeat letters
     target = targetNumber[0]
     for mPast in p.getElementsByClass('Measure'):
@@ -163,12 +166,16 @@ def _copySingleMeasure(t, p, kCurrent):
             try:
                 m = copy.deepcopy(mPast)
             except TypeError:
-                raise RomanTextTranslateException('Failed to copy measure %d: did you perhaps parse an RTOpus object with romanTextToStreamScore instead of romanTextToStreamOpus?' % (mPast.number))
+                raise RomanTextTranslateException(
+                        'Failed to copy measure {0}:'.format(mPast.number) + 
+                        ' did you perhaps parse an RTOpus object with romanTextToStreamScore ' +
+                        'instead of romanTextToStreamOpus?')
             m.number = t.number[0]
             # update all keys
             for rnPast in m.getElementsByClass('RomanNumeral'):
                 if kCurrent is None: # should not happen
-                    raise RomanTextTranslateException('attempting to copy a measure but no past key definitions are found')
+                    raise RomanTextTranslateException(
+                            'attempting to copy a measure but no past key definitions are found')
                 if rnPast.followsKeyChange is True:
                     kCurrent = rnPast.key
                 elif rnPast.pivotChord is not None:
@@ -209,9 +216,11 @@ def _copyMultipleMeasures(t, p, kCurrent):
     targetEnd = targetNumbers[1]
     
     if t.number[1] - t.number[0] != targetEnd - targetStart:
-        raise RomanTextTranslateException('both the source and destination sections need to have the same number of measures')
+        raise RomanTextTranslateException(
+            'both the source and destination sections need to have the same number of measures')
     elif t.number[0] < targetEnd:
-        raise RomanTextTranslateException('the source section cannot overlap with the destination section')
+        raise RomanTextTranslateException(
+            'the source section cannot overlap with the destination section')
 
     measures = []
     for mPast in p.getElementsByClass('Measure'):
@@ -219,7 +228,11 @@ def _copyMultipleMeasures(t, p, kCurrent):
             try:
                 m = copy.deepcopy(mPast)
             except TypeError:
-                raise RomanTextTranslateException('Failed to copy measure %d to measure range %d-%d: did you perhaps parse an RTOpus object with romanTextToStreamScore instead of romanTextToStreamOpus?' % (mPast.number, targetStart, targetEnd))
+                raise RomanTextTranslateException(
+                        'Failed to copy measure {0} to measure range {1}-{2}: '.format(
+                                                mPast.number, targetStart, targetEnd) +
+                        'did you perhaps parse an RTOpus object with romanTextToStreamScore ' + 
+                        'instead of romanTextToStreamOpus?')
             
             m.number = t.number[0] + mPast.number - targetStart
             measures.append(m)
@@ -227,7 +240,8 @@ def _copyMultipleMeasures(t, p, kCurrent):
             allRNs = m.getElementsByClass('RomanNumeral').elements
             for rnPast in allRNs:
                 if kCurrent is None: # should not happen
-                    raise RomanTextTranslateException('attempting to copy a measure but no past key definitions are found')
+                    raise RomanTextTranslateException(
+                        'attempting to copy a measure but no past key definitions are found')
                 if rnPast.followsKeyChange is True:
                     kCurrent = rnPast.key
                 elif rnPast.pivotChord is not None:
@@ -286,7 +300,8 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
         rtf = rtObjects.RTFile()
         rtHandler = rtf.readstr(rtHandler) # return handler, processes tokens
 
-    # this could be just a Stream, but b/c we are creating metadata, perhaps better to match presentation of other scores. 
+    # this could be just a Stream, but b/c we are creating metadata, 
+    # perhaps better to match presentation of other scores. 
 
     from music21 import metadata
     from music21 import stream
@@ -308,6 +323,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     p = stream.Part()
     # ts indication are found in header, and also found elsewhere
     tsCurrent = meter.TimeSignature('4/4') # create default 4/4
+    tsAtTimeOfLastChord = tsCurrent
     tsSet = False # store if set to a measure
     lastMeasureToken = None
     lastMeasureNumber = 0
@@ -353,8 +369,10 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                 else:
                     pass 
                     # better to print a message
-                    # environLocal.printDebug(['still need to write a generic RomanText KeySignature routine.  this is just temporary'])
-                    # raise RomanTextTranslateException("still need to write a generic RomanText KeySignature routine.  this is just temporary")
+                    # environLocal.printDebug(['still need to write a generic RomanText
+                    #     KeySignature routine.  this is just temporary'])
+                    # raise RomanTextTranslateException("still need to write a generic
+                    #     RomanText KeySignature routine.  this is just temporary")
                 keySigSet = False
                 # environLocal.printDebug(['keySigCurrent:', keySigCurrent])
                 foundAKeySignatureSoFar = True
@@ -381,7 +399,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                         newRn = copy.deepcopy(previousRn)
                         newRn.lyric = ""
                         # set to entire bar duration and tie 
-                        newRn.duration = copy.deepcopy(tsCurrent.barDuration)
+                        newRn.duration = copy.deepcopy(tsAtTimeOfLastChord.barDuration)
                         if previousRn.tie is None:
                             previousRn.tie = tie.Tie('start')
                         else:
@@ -397,23 +415,23 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
 
                 # create a new measure or copy a past measure
                 if len(t.number) == 1 and t.isCopyDefinition: # if not a range
-                    p._elementsChanged()
+                    p.elementsChanged()
                     m, kCurrent = _copySingleMeasure(t, p, kCurrent)
                     p._appendCore(m)
                     lastMeasureNumber = m.number
                     lastMeasureToken = t
-                    romans = m.getElementsByClass(roman.RomanNumeral, returnStreamSubClass='list')
-                    if len(romans) > 0:
+                    romans = m.iter.getElementsByClass(roman.RomanNumeral)
+                    if romans:
                         previousRn = romans[-1] 
 
                 elif len(t.number) > 1:
-                    p._elementsChanged()
+                    p.elementsChanged()
                     measures, kCurrent = _copyMultipleMeasures(t, p, kCurrent)
                     p.append(measures) # appendCore does not work with list
                     lastMeasureNumber = measures[-1].number
                     lastMeasureToken = t
-                    romans = measures[-1].getElementsByClass(roman.RomanNumeral, returnStreamSubClass='list')
-                    if len(romans) > 0:
+                    romans = measures[-1].iter.getElementsByClass(roman.RomanNumeral)
+                    if romans:
                         previousRn = romans[-1]
 
                 else:       
@@ -434,12 +452,13 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                     previousChordInMeasure = None
                     pivotChordPossible = False
                     numberOfAtoms = len(t.atoms)
-                    setKeyChangeToken = False # first RomanNumeral object after a key change should have this set to True
+                    # first RomanNumeral object after a key change should have this set to True
+                    setKeyChangeToken = False 
                     
                     for i, a in enumerate(t.atoms):
-                        if isinstance(a, rtObjects.RTKey) or \
-                           ((foundAKeySignatureSoFar == False) and \
-                            (isinstance(a, rtObjects.RTAnalyticKey))): 
+                        if (isinstance(a, rtObjects.RTKey) or
+                            ((foundAKeySignatureSoFar == False) and
+                             (isinstance(a, rtObjects.RTAnalyticKey)))): 
                             # found a change of Key+KeySignature or
                             # just found a change of analysis but no keysignature so far
                     
@@ -448,8 +467,10 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                 kCurrent, pl = _getKeyAndPrefix(a)
                                 prefixLyric += pl
                             except:
-                                raise RomanTextTranslateException('cannot get key from %s in line %s' % (a.src, t.src))
-                            # insert at beginning of measure if at beginning -- for things like pickups.
+                                raise RomanTextTranslateException(
+                                            'cannot get key from %s in line %s' % (a.src, t.src))
+                            # insert at beginning of measure if at beginning 
+                            #    -- for things like pickups.
                             if m.number < 2:
                                 m._insertCore(0, kCurrent)
                             else:
@@ -461,8 +482,10 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                             try: # this sets the keysignature but not the prefix text
                                 thisSig = a.getKeySignature()
                             except:
-                                raise RomanTextTranslateException('cannot get key from %s in line %s' % (a.src, t.src))
-                            #insert at beginning of measure if at beginning -- for things like pickups.
+                                raise RomanTextTranslateException(
+                                            'cannot get key from %s in line %s' % (a.src, t.src))
+                            #insert at beginning of measure if at beginning
+                            #     -- for things like pickups.
                             if m.number < 2:
                                 m._insertCore(0, thisSig)
                             else:
@@ -477,14 +500,18 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                             setKeyChangeToken = True
 
                             #except:
-                            #    raise RomanTextTranslateException('cannot get key from %s in line %s' % (a.src, t.src))
+                            #    raise RomanTextTranslateException(
+                            #         'cannot get key from %s in line %s' % (a.src, t.src))
     
                         elif isinstance(a, rtObjects.RTBeat):
                             # set new offset based on beat
                             try:
                                 o = a.getOffset(tsCurrent)
                             except ValueError:
-                                raise RomanTextTranslateException("cannot properly get an offset from beat data %s under timeSignature %s in line %s" % (a.src, tsCurrent, t.src))
+                                raise RomanTextTranslateException(
+                                    "cannot properly get an offset from " + 
+                                    "beat data {0}".format(a.src) + 
+                                    "under timeSignature {0} in line {1}".format(tsCurrent, t.src))
                             if (previousChordInMeasure is None and 
                                 previousRn is not None and o > 0):
                                 # setting a new beat before giving any chords
@@ -503,6 +530,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
 
                         elif isinstance(a, rtObjects.RTNoChord):
                             # use source to evaluation roman 
+                            tsAtTimeOfLastChord = tsCurrent
                             rn = note.Rest()
                             if pivotChordPossible == False:
                                 # probably best to find duration
@@ -512,7 +540,8 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                     oPrevious = previousChordInMeasure.getOffsetBySite(m)
                                     newQL = o - oPrevious
                                     if newQL <= 0:
-                                        raise RomanTextTranslateException('too many notes in this measure: %s' % t.src)
+                                        raise RomanTextTranslateException(
+                                            'too many notes in this measure: %s' % t.src)
                                     previousChordInMeasure.quarterLength = newQL                                                          
                                 prefixLyric = ""
                                 m._insertCore(o, rn)
@@ -522,6 +551,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
 
                         elif isinstance(a, rtObjects.RTChord):
                             # use source to evaluation roman 
+                            tsAtTimeOfLastChord = tsCurrent
                             try:
                                 asrc = a.src
     #                            if kCurrent.mode == 'minor':
@@ -531,7 +561,8 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                 cacheTuple = (asrc, kCurrent.tonicPitchNameWithCase)
                                 if USE_RN_CACHE and cacheTuple in rnKeyCache:                                    
                                     #print "Got a match: " + str(cacheTuple)
-                                    # Problems with Caches not picking up pivot chords... Not faster, see below.
+                                    # Problems with Caches not picking up pivot chords...
+                                    #    Not faster, see below.
                                     rn = copy.deepcopy(rnKeyCache[cacheTuple])
                                 else:
                                     #print "No match for: " + str(cacheTuple)
@@ -543,14 +574,20 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                 #rn = roman.RomanNumeral(asrc, kCurrent.tonicPitchNameWithCase)                                
                                 
                                 #>>> from timeit import timeit as t
-                                #>>> t('roman.RomanNumeral("IV", "c#")', 'from music21 import roman', number=1000)
+                                #>>> t('roman.RomanNumeral("IV", "c#")', 
+                                #...     'from music21 import roman', number=1000)
                                 #45.75
-                                #>>> t('roman.RomanNumeral("IV", k)', 'from music21 import roman, key; k = key.Key("c#")', number=1000)
+                                #>>> t('roman.RomanNumeral("IV", k)', 
+                                #...     'from music21 import roman, key; k = key.Key("c#")', 
+                                #...     number=1000)
                                 #16.09
-                                #>>> t('roman.RomanNumeral("IV", copy.deepcopy(k))', 'from music21 import roman, key; import copy; k = key.Key("c#")', number=1000)
+                                #>>> t('roman.RomanNumeral("IV", copy.deepcopy(k))', 
+                                #...    'from music21 import roman, key; import copy; 
+                                #...     k = key.Key("c#")', number=1000)
                                 #22.49
                                 ## key cache, does not help much...
-                                #>>> t('copy.deepcopy(r)', 'from music21 import roman; import copy; r = roman.RomanNumeral("IV", "c#")', number=1000)
+                                #>>> t('copy.deepcopy(r)', 'from music21 import roman; import copy; 
+                                #...        r = roman.RomanNumeral("IV", "c#")', number=1000)
                                 #19.01
                                                               
                                 if setKeyChangeToken is True:
@@ -559,7 +596,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                 else:
                                     rn.followsKeyChange = False
                             except (roman.RomanNumeralException, 
-                                common.Music21CommonException): 
+                                exceptions21.Music21CommonException): 
                                 #environLocal.printDebug('cannot create RN from: %s' % a.src)
                                 rn = note.Note() # create placeholder 
 
@@ -571,7 +608,8 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                     oPrevious = previousChordInMeasure.getOffsetBySite(m)
                                     newQL = o - oPrevious
                                     if newQL <= 0:
-                                        raise RomanTextTranslateException('too many notes in this measure: %s' % t.src)
+                                        raise RomanTextTranslateException(
+                                            'too many notes in this measure: %s' % t.src)
                                     previousChordInMeasure.quarterLength = newQL                          
                                 
                                 rn.addLyric(prefixLyric + a.src)
@@ -593,7 +631,9 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                 else:
                                     rtt = RomanTextUnprocessedToken(a)
                                     m._insertCore(o, rtt)
-                            elif tsCurrent is not None and (tsCurrent.barDuration.quarterLength == o or i == numberOfAtoms - 1):
+                            elif (tsCurrent is not None and 
+                                    (tsCurrent.barDuration.quarterLength == o or 
+                                     i == numberOfAtoms - 1)):
                                 if isinstance(a, rtObjects.RTRepeatStop):
                                     m.rightBarline = bar.Repeat(direction='end')
                                 else:
@@ -611,15 +651,18 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                     # may need to adjust duration of last chord added
                     if tsCurrent is not None:
                         previousRn.quarterLength = tsCurrent.barDuration.quarterLength - o
-                    m._elementsChanged()
+                    m.elementsChanged()
                     p._appendCore(m)
 
         except Exception:
             import traceback
             tracebackMessage = traceback.format_exc()
-            raise RomanTextTranslateException("At line %d for token %r, an exception was raised: \n%s" % (t.lineNumber, t, tracebackMessage))
+            raise RomanTextTranslateException(
+                "At line %d for token %r, an exception was raised: \n%s" % (t.lineNumber, 
+                                                                            t, 
+                                                                            tracebackMessage))
 
-    p._elementsChanged()
+    p.elementsChanged()
     fixPickupMeasure(p)
     p.makeBeams(inPlace=True)
     p.makeAccidentals(inPlace=True)
@@ -657,7 +700,8 @@ def appendMeasureToRepeatEndingsDict(t, m, repeatEndings, measureNumber = None):
     {1: [(15, <music21.stream.Measure 0a offset=0.0>)]}
     >>> romanText.translate.appendMeasureToRepeatEndingsDict(rtm2, m2, repeatEndings)
     >>> repeatEndings[1], repeatEndings[2]
-    ([(15, <music21.stream.Measure 0a offset=0.0>)], [(15, <music21.stream.Measure 0b offset=0.0>)])
+    ([(15, <music21.stream.Measure 0a offset=0.0>)], 
+     [(15, <music21.stream.Measure 0b offset=0.0>)])
     >>> repeatEndings[2][0][1] is m2
     True
     '''
@@ -694,11 +738,13 @@ def _consolidateRepeatEndings(repeatEndings):
     For the sake of demo and testing, we will use strings instead of measure objects.
 
     
-    >>> repeatEndings = {1: [(5, 'm5a'), (6, 'm6a'), (17, 'm17'), (18, 'm18'), (19, 'm19'), (23, 'm23a')], 
+    >>> repeatEndings = {1: [(5, 'm5a'), (6, 'm6a'), (17, 'm17'), (18, 'm18'), 
+    ...                      (19, 'm19'), (23, 'm23a')], 
     ...                  2: [(5, 'm5b'), (6, 'm6b'), (20, 'm20'), (21, 'm21'), (23, 'm23b')], 
     ...                  3: [(23, 'm23c')]}
     >>> print(romanText.translate._consolidateRepeatEndings(repeatEndings))
-    [(['m5a', 'm6a'], 1), (['m17', 'm18', 'm19'], 1), (['m23a'], 1), (['m5b', 'm6b'], 2), (['m20', 'm21'], 2), (['m23b'], 2), (['m23c'], 3)]
+    [(['m5a', 'm6a'], 1), (['m17', 'm18', 'm19'], 1), (['m23a'], 1), 
+     (['m5b', 'm6b'], 2), (['m20', 'm21'], 2), (['m23b'], 2), (['m23c'], 3)]
     '''
     returnList = []
     
@@ -740,7 +786,8 @@ def _addRepeatsFromRepeatEndings(s, repeatEndings):
         #Adding repeat bracket to stream at beginning of repeated section.  
         #Maybe better at end?
         s.insert(rbOffset, rb)
-        if endingNumber == 1: # should be "if not max(endingNumbers), but we can't tell that for each repeat...
+        # should be "if not max(endingNumbers), but we can't tell that for each repeat.
+        if endingNumber == 1: 
             if measureList[-1].rightBarline is None:
                 measureList[-1].rightBarline = bar.Repeat(direction='end')
 
@@ -1057,9 +1104,11 @@ m7 = m3
 
         s = romanTextToStreamScore(testSecondaryInCopy)
         m = s.measure(6).flat
-        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].pitchedCommonName, 'E5-dominant seventh chord')
+        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].pitchedCommonName, 
+                         'E5-dominant seventh chord')
         m = s.measure(7).flat
-        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].pitchedCommonName, 'E5-dominant seventh chord')
+        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].pitchedCommonName,
+                         'E5-dominant seventh chord')
         #s.show()
 
     def testBasicB(self):
@@ -1070,7 +1119,8 @@ m7 = m3
 
     def testRomanTextString(self):
         from music21 import converter
-        s = converter.parse('m1 KS1 I \n m2 V6/5 \n m3 I b3 V7 \n m4 KS-3 vi \n m5 a: i b3 V4/2 \n m6 I', format='romantext')
+        s = converter.parse('m1 KS1 I \n m2 V6/5 \n m3 I b3 V7 \n' + 
+                            'm4 KS-3 vi \n m5 a: i b3 V4/2 \n m6 I', format='romantext')
 
         rnStream = s.flat.getElementsByClass('RomanNumeral')
         self.assertEqual(rnStream[0].figure, 'I')
@@ -1105,7 +1155,8 @@ m6-7 = m4-5
 
         for elementNumber in [0, 6, 12]:
             self.assertEqual(rnStream[elementNumber + 4].figure, 'III6')
-            self.assertEqual(str([str(p) for p in rnStream[elementNumber + 4].pitches]), "['A4', 'C5', 'F5']")
+            self.assertEqual(str([str(p) for p in rnStream[elementNumber + 4].pitches]), 
+                             "['A4', 'C5', 'F5']")
 
             x = rnStream[elementNumber + 4].pitches[2].accidental
             if x == None: 
@@ -1113,7 +1164,8 @@ m6-7 = m4-5
             self.assertEqual(x.alter, 0)
 
             self.assertEqual(rnStream[elementNumber + 5].figure, 'iv6')
-            self.assertEqual(str([str(p) for p in rnStream[elementNumber + 5].pitches]), "['B-4', 'D5', 'G5']")
+            self.assertEqual(str([str(p) for p in rnStream[elementNumber + 5].pitches]), 
+                             "['B-4', 'D5', 'G5']")
 
             self.assertEqual(rnStream[elementNumber + 5].pitches[0].accidental.displayStatus, True)
 
@@ -1157,6 +1209,39 @@ m3 NC b3 G: V
         self.assertIsNone(notPChord.pivotChord)
         #s.show('text')
         
+    def testTimeSigChanges(self):
+        from music21 import converter
+        src = """Time Signature: 4/4
+        m1 C: I
+        Time Signature: 2/4
+        m10 V
+        Time Signature: 4/4
+        m12 I
+        m14-25 = m1-12
+        """
+        s = converter.parse(src, format='romantext')
+        p = s.parts[0]
+        m3 = p.getElementsByClass('Measure')[2]
+        self.assertEqual(m3.getOffsetBySite(p), 8.0)
+        m10 = p.getElementsByClass('Measure')[9]
+        self.assertEqual(m10.getOffsetBySite(p), 36.0)
+        m11 = p.getElementsByClass('Measure')[10]
+        self.assertEqual(m11.getOffsetBySite(p), 38.0)
+        m12 = p.getElementsByClass('Measure')[11]
+        self.assertEqual(m12.getOffsetBySite(p), 40.0)
+        m13 = p.getElementsByClass('Measure')[12]
+        self.assertEqual(m13.getOffsetBySite(p), 44.0)
+        
+        m16 = p.getElementsByClass('Measure')[15]
+        self.assertEqual(m16.getOffsetBySite(p), 56.0)
+        m23 = p.getElementsByClass('Measure')[22]
+        self.assertEqual(m23.getOffsetBySite(p), 84.0)
+        m24 = p.getElementsByClass('Measure')[23]
+        self.assertEqual(m24.getOffsetBySite(p), 86.0)
+        m25 = p.getElementsByClass('Measure')[24]
+        self.assertEqual(m25.getOffsetBySite(p), 88.0)
+
+        
     def testEndings(self):
         # has first and second endings...
         
@@ -1164,6 +1249,29 @@ m3 NC b3 G: V
         from music21 import converter
         unused_s = converter.parse(testFiles.mozartK283_2_opening, format='romanText')
         #s.show('text')
+
+    def testTuplets(self):
+        from music21 import converter
+        c = converter.parse("m1 C: I b2.66 V", format='romantext')
+        n1 = c.flat.notes[0]
+        n2 = c.flat.notes[1]
+        self.assertEqual(n1.duration.quarterLength, common.opFrac(5./3) )
+        self.assertEqual(n2.offset, common.opFrac(5./3) )        
+        self.assertEqual(n2.duration.quarterLength, common.opFrac(7./3) )
+
+        c = converter.parse("TimeSignature: 6/8\nm1 C: I b2.66 V", format='romantext')
+        n1 = c.flat.notes[0]
+        n2 = c.flat.notes[1]
+        self.assertEqual(n1.duration.quarterLength, common.opFrac(5./2) )
+        self.assertEqual(n2.offset, common.opFrac(5./2) )        
+        self.assertEqual(n2.duration.quarterLength, common.opFrac(1./2) )
+
+        c = converter.parse("m1 C: I b2.66.5 V", format='romantext')
+        n1 = c.flat.notes[0]
+        n2 = c.flat.notes[1]
+        self.assertEqual(n1.duration.quarterLength, common.opFrac(11./6) )
+        self.assertEqual(n2.offset, common.opFrac(11./6) )        
+        self.assertEqual(n2.duration.quarterLength, common.opFrac(13./6) )
 
 
 #-------------------------------------------------------------------------------
@@ -1181,7 +1289,7 @@ if __name__ == "__main__":
     #t = time.time()
     #import sys
     #sys.argv.append('PivotInCopyMultiple2')
-    
+    #music21.mainTest(Test, runTest='testTuplets')
     music21.mainTest(Test, TestSlow)
     #print(time.time() - t)
 

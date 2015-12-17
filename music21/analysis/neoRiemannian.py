@@ -10,7 +10,8 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
-This module defines the L, P, and R objects and their related transformations as called on a chord.Chord. 
+This module defines the L, P, and R objects and their 
+related transformations as called on a chord.Chord, according to Neo-Riemannian theory.
 '''
 import unittest
 
@@ -22,15 +23,10 @@ from music21 import environment
 _MOD = "analysis.neoRiemannian"
 environLocal = environment.Environment(_MOD)
 
+# TODO: change doctests from passing on exceptions to raising them and trapping them.
 
 #-------------------------------------------------------------------------------
 class LRPException(exceptions21.Music21Exception):
-    pass
-
-class leftOrdered:
-    pass
-
-class simplifyEnharmonic:
     pass
 
 def L(c, raiseException=False):
@@ -40,20 +36,16 @@ def L(c, raiseException=False):
     
     Example 1: A C major chord, under P, will return an E minor chord
     
-    ::
-
-        >>> c1 = chord.Chord("C4 E4 G4")
-        >>> c2 = analysis.neoRiemannian.L(c1)
-        >>> c2.pitches
-        (<music21.pitch.Pitch B3>, <music21.pitch.Pitch E4>, <music21.pitch.Pitch G4>)
+    >>> c1 = chord.Chord("C4 E4 G4")
+    >>> c2 = analysis.neoRiemannian.L(c1)
+    >>> c2.pitches
+    (<music21.pitch.Pitch B3>, <music21.pitch.Pitch E4>, <music21.pitch.Pitch G4>)
     
-    ::
-
-        >>> try:
-        ...     c3 = chord.Chord("C4 D4 E4")
-        ...     c4 = analysis.neoRiemannian.L(c3, raiseException=True)
-        ... except analysis.neoRiemannian.LRPException:
-        ...     pass
+    >>> try:
+    ...     c3 = chord.Chord("C4 D4 E4")
+    ...     c4 = analysis.neoRiemannian.L(c3, raiseException=True)
+    ... except analysis.neoRiemannian.LRPException:
+    ...     pass
     
     '''
     if c.isMajorTriad() == True:
@@ -78,20 +70,16 @@ def P(c, raiseException=False):
     
     Example 1: A C major chord, under P, will return an C minor chord
     
-    ::
-
-        >>> c2 = chord.Chord("C4 E4 G4")
-        >>> c3 = analysis.neoRiemannian.P(c2)
-        >>> c3.pitches
-        (<music21.pitch.Pitch C4>, <music21.pitch.Pitch E-4>, <music21.pitch.Pitch G4>)
+    >>> c2 = chord.Chord("C4 E4 G4")
+    >>> c3 = analysis.neoRiemannian.P(c2)
+    >>> c3.pitches
+    (<music21.pitch.Pitch C4>, <music21.pitch.Pitch E-4>, <music21.pitch.Pitch G4>)
     
-    ::
-
-        >>> try:
-        ...     c3 = chord.Chord("C4 D4 E4")
-        ...     c4 = analysis.neoRiemannian.P(c3, raiseException=True)
-        ... except analysis.neoRiemannian.LRPException:
-        ...     pass
+    >>> try:
+    ...     c3 = chord.Chord("C4 D4 E4")
+    ...     c4 = analysis.neoRiemannian.P(c3, raiseException=True)
+    ... except analysis.neoRiemannian.LRPException:
+    ...     pass
 
     '''
     if c.isMajorTriad() == True:
@@ -115,20 +103,16 @@ def R(c, raiseException=False):
     
     Example 1: A C major chord, under R, will return an A minor chord
     
-    ::
+    >>> c1 = chord.Chord("C4 E4 G4")
+    >>> c2 = analysis.neoRiemannian.R(c1)
+    >>> c2.pitches
+    (<music21.pitch.Pitch C4>, <music21.pitch.Pitch E4>, <music21.pitch.Pitch A4>) 
 
-        >>> c1 = chord.Chord("C4 E4 G4")
-        >>> c2 = analysis.neoRiemannian.R(c1)
-        >>> c2.pitches
-        (<music21.pitch.Pitch C4>, <music21.pitch.Pitch E4>, <music21.pitch.Pitch A4>) 
-
-    ::
-
-        >>> try:
-        ...     c3 = chord.Chord("C4 D4 E4")
-        ...     c4 = analysis.neoRiemannian.R(c3, raiseException=True)
-        ... except analysis.neoRiemannian.LRPException:
-        ...     pass
+    >>> try:
+    ...     c3 = chord.Chord("C4 D4 E4")
+    ...     c4 = analysis.neoRiemannian.R(c3, raiseException=True)
+    ... except analysis.neoRiemannian.LRPException:
+    ...     pass
     
     '''
     if c.isMajorTriad() == True:
@@ -152,11 +136,17 @@ def LRP_transform(c, transposeInterval, changingPitch):
             newChord.pitches[i].transpose(transposeInterval, inPlace=True) 
     return chord.Chord(newChord.pitches)
 
-def LRP_combinations(c, transformationString, raiseException = False, leftOrdered = False, simplifyEnharmonic = False):
+def LRP_combinations(c, 
+                     transformationString, 
+                     raiseException=False, 
+                     leftOrdered=False, 
+                     simplifyEnharmonic=False):
     '''
     LRP_combinations is a function that takes a major or minor triad and a transformationString
-    and returns a transformed triad, using the L, R, and P transformations. Certain combinations, such
-    as LPLPLP, are cyclical, and therefore will return the original chord if simplifyEnharmonic = True.
+    and returns a transformed triad, using the L, R, and P transformations. 
+    Certain combinations, such
+    as LPLPLP, are cyclical, and therefore will return the original chord 
+    if simplifyEnharmonic = True.
     
     leftOrdered allows a user to work with the function notation that they prefer. 
     leftOrdered = False, the default, will mean that a transformationString that reads 
@@ -165,24 +155,22 @@ def LRP_combinations(c, transformationString, raiseException = False, leftOrdere
     transforming the chord by R, then P, then L--by reading the transformations left to right. 
     
     simplifyEnharmonic allows a user to determine if they want the transformation to return
-    the actual results of such combined transformations, which may include multiple sharps and flats.
-    if simplifyEnharmonic= True, the resulting chord will be simplified to notes with at most 1 flat
+    the actual results of such combined transformations, 
+    which may include multiple sharps and flats.
+    
+    If simplifyEnharmonic is True, the resulting chord will be simplified 
+    to notes with at most 1 flat
     or 1 sharp, in their most common form. 
     
-    ::
-
-        >>> c1 = chord.Chord("C4 E4 G4")
-        >>> c2 = analysis.neoRiemannian.LRP_combinations(c1, 'LP')
-        >>> c2
-        <music21.chord.Chord B3 E4 G#4>
+    >>> c1 = chord.Chord("C4 E4 G4")
+    >>> c2 = analysis.neoRiemannian.LRP_combinations(c1, 'LP')
+    >>> c2
+    <music21.chord.Chord B3 E4 G#4>
     
-    ::
-
-        >>> c3 = chord.Chord("C4 E4 G4 C5 E5")
-        >>> c4 = analysis.neoRiemannian.LRP_combinations(c3, 'RLP')
-        >>> c4
-        <music21.chord.Chord C4 F4 A-4 C5 F5>
-
+    >>> c3 = chord.Chord("C4 E4 G4 C5 E5")
+    >>> c4 = analysis.neoRiemannian.LRP_combinations(c3, 'RLP')
+    >>> c4
+    <music21.chord.Chord C4 F4 A-4 C5 F5>
     '''
     
 #    >>> c5 = chord.Chord("B4 D#5 F#5")
@@ -235,11 +223,13 @@ def LRP_combinations(c, transformationString, raiseException = False, leftOrdere
             
     else:
         if raiseException is True:
-            raise LRPException('Cannot perform transformations on this chord: not a Major or Minor triad')
+            raise LRPException(
+                'Cannot perform transformations on this chord: not a Major or Minor triad')
         return c
     
     # TODO: Fix enharmonic problem
-    # create method, chord.simplifyEnharmonic() that will take the c.root() [call it correctlySpelled or simplifySpelling or something]
+    # create method, chord.simplifyEnharmonic() that will take the c.root() 
+    # [call it correctlySpelled or simplifySpelling or something]
     # and simplify it--how do we make sure it take the right one?
     # Conflict between G# and A-. Then build triads from there using pitch.flipEnharmonic()
     # have to make sure it is a minor or major triad
@@ -258,7 +248,8 @@ def LRP_combinations(c, transformationString, raiseException = False, leftOrdere
     
     # can also use isTriad and incorrectlySpelled
     
-    # first figure out what scale you're simplifying into, then simplify it. Optional parameter to take the scale/key
+    # first figure out what scale you're simplifying into, then simplify it. 
+    # Optional parameter to take the scale/key
     # to simplify into, and then we can skip the step of having to find the key. 
     
 def completeHexatonic(c):

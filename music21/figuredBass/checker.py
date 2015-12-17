@@ -41,7 +41,7 @@ def getVoiceLeadingMoments(music21Stream):
             :width: 700
     '''
     allHarmonies = extractHarmonies(music21Stream)
-    allParts = music21Stream.getElementsByClass(['Part', 'TinyNotationStream'])
+    allParts = music21Stream.getElementsByClass('Part')
     newParts = [allParts[i].flat.getElementsNotOfClass('GeneralNote') for i in range(len(allParts))]
     paddingLeft = allParts[0].getElementsByClass('Measure')[0].paddingLeft
     for (offsets, notes) in sorted(allHarmonies.items()):
@@ -100,7 +100,7 @@ def extractHarmonies(music21Stream):
     (11.0, 11.5)   [<music21.note.Note A>  <music21.note.Note F>  <music21.note.Note D> ]
     (11.5, 12.0)   [<music21.note.Note A>  <music21.note.Note F>  <music21.note.Note A> ]
     '''
-    allParts = music21Stream.getElementsByClass(['Part', 'TinyNotationStream'])
+    allParts = music21Stream.getElementsByClass('Part')
     if len(allParts) < 2:
         raise Exception()
     allHarmonies = createOffsetMapping(allParts[0])
@@ -173,8 +173,10 @@ def correlateHarmonies(currentMapping, music21Part):
     
     for offsets in sorted(currentMapping.keys()):
         (initOffset, endTime) = offsets
-        notesInRange = music21Part.flat.getElementsByClass('GeneralNote').getElementsByOffset(initOffset, offsetEnd=endTime, \
-                        includeEndBoundary=False, mustFinishInSpan=False, mustBeginInSpan=False, includeElementsThatEndAtStart=False)
+        notesInRange = music21Part.flat.iter.getElementsByClass('GeneralNote').getElementsByOffset(
+                            initOffset, offsetEnd=endTime, 
+                            includeEndBoundary=False, mustFinishInSpan=False, 
+                            mustBeginInSpan=False, includeElementsThatEndAtStart=False)
         allNotesSoFar = currentMapping[offsets]
         for music21GeneralNote in notesInRange:
             newInitOffset = initOffset
@@ -233,7 +235,7 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
         debugInfo.append("{0!s:25}{1!s}".format("(Offset, End Time):", "Part Numbers:"))
     
     allHarmonies = sorted(list(extractHarmonies(music21Stream).items()))
-    allParts = [p.flat for p in music21Stream.getElementsByClass(['Part', 'TinyNotationStream'])]
+    allParts = [p.flat for p in music21Stream.getElementsByClass('Part')]
     for (offsets, notes) in allHarmonies:
         vlm = [generalNoteToPitch(n) for n in notes]
         vlm_violations = functionToApply(vlm)
@@ -241,7 +243,10 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
         for partNumberTuple in vlm_violations:
             for partNumber in partNumberTuple:
                 if color is not None:
-                    noteA = allParts[partNumber - 1].getElementsByOffset(initOffset, initOffset, mustBeginInSpan=False)[0]
+                    noteA = allParts[partNumber - 1].iter.getElementsByOffset(
+                                                            initOffset, 
+                                                            initOffset, 
+                                                            mustBeginInSpan=False)[0]
                     noteA.color = color
             if debug is True:
                 debugInfo.append("{0!s:25}{1!s}".format(offsets, partNumberTuple))
@@ -272,7 +277,7 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
 
     >>> from music21.figuredBass import checker
     >>> functionToApply = checker.parallelOctaves    
-    >>> checker.checkConsecutivePossibilities(music21Stream, functionToApply, debug = True)
+    >>> checker.checkConsecutivePossibilities(music21Stream, functionToApply, debug=True)
     Function To Apply: parallelOctaves
     (Offset A, End Time A):  (Offset B, End Time B):  Part Numbers:
     (1.0, 2.0)               (2.0, 3.0)               (2, 4)
@@ -292,10 +297,11 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
     if debug is True:
         debugInfo = []
         debugInfo.append("Function To Apply: " + functionToApply.__name__)
-        debugInfo.append("{0!s:25}{1!s:25}{2!s}".format("(Offset A, End Time A):", "(Offset B, End Time B):", "Part Numbers:"))
+        debugInfo.append("{0!s:25}{1!s:25}{2!s}".format(
+                        "(Offset A, End Time A):", "(Offset B, End Time B):", "Part Numbers:"))
 
     allHarmonies = sorted(extractHarmonies(music21Stream).items())
-    allParts = [p.flat for p in music21Stream.getElementsByClass(['Part', 'TinyNotationStream'])]    
+    allParts = [p.flat for p in music21Stream.getElementsByClass('Part')]    
     (previousOffsets, previousNotes) = allHarmonies[0]
     vlmA = [generalNoteToPitch(n) for n in previousNotes]
     initOffsetA = previousOffsets[0]
@@ -307,12 +313,16 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
         for partNumberTuple in vlm_violations:
             for partNumber in partNumberTuple:
                 if color is not None:
-                    noteA = allParts[partNumber - 1].getElementsByOffset(initOffsetA, initOffsetA, mustBeginInSpan=False)[0]
-                    noteB = allParts[partNumber - 1].getElementsByOffset(initOffsetB, initOffsetB, mustBeginInSpan=False)[0]
+                    noteA = allParts[partNumber - 1].iter.getElementsByOffset(
+                                initOffsetA, initOffsetA, mustBeginInSpan=False)[0]
+                    noteB = allParts[partNumber - 1].iter.getElementsByOffset(
+                                initOffsetB, initOffsetB, mustBeginInSpan=False)[0]
                     noteA.color = color
                     noteB.color = color
             if debug is True:
-                debugInfo.append("{0!s:25}{1!s:25}{2!s}".format(previousOffsets, offsets, partNumberTuple))
+                debugInfo.append("{0!s:25}{1!s:25}{2!s}".format(previousOffsets, 
+                                                                offsets, 
+                                                                partNumberTuple))
         # Current vlm becomes previous
         previousOffsets = offsets
         vlmA = vlmB
@@ -355,13 +365,13 @@ def voiceCrossing(possibA):
     for part1Index in range(len(possibA)):
         try:
             higherPitch = possibA[part1Index]
-            higherPitch.ps
+            higherPitch.ps # pylint: disable=pointless-statement
         except AttributeError:
             continue
         for part2Index in range(part1Index + 1, len(possibA)):
             try:
                 lowerPitch = possibA[part2Index]
-                lowerPitch.ps
+                lowerPitch.ps # pylint: disable=pointless-statement
             except AttributeError:
                 continue
             if higherPitch < lowerPitch:
@@ -703,7 +713,8 @@ def generalNoteToPitch(music21GeneralNote):
     else:
         return "RT"
 
-_DOC_ORDER = [extractHarmonies, getVoiceLeadingMoments, checkConsecutivePossibilities, checkSinglePossibilities]
+_DOC_ORDER = [extractHarmonies, getVoiceLeadingMoments, 
+              checkConsecutivePossibilities, checkSinglePossibilities]
 #------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 

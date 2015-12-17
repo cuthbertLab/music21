@@ -127,8 +127,8 @@ the conf file.
 		*install_music21.sh*
 		
 		#!/bin/bash
-		tar xvfz music21-2.0.0.tar.gz
-		cd music21-2.0.0
+		tar xvfz music21-2.0.5.tar.gz
+		cd music21-2.0.5
 		sudo python setup.py install
 		
 		*install_mrjob.sh*

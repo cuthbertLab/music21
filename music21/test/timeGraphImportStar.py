@@ -16,6 +16,7 @@
 # improve them.  Requires pycallgraph (not included with music21).  
 
 import pycallgraph
+import pycallgraph.output
 import time
 
 # this class is duplicated from common.py in order to avoid 
@@ -91,7 +92,7 @@ class TestImportStar(CallTest):
 class CallGraph:
 
     def __init__(self):
-        self.includeList = None
+        self.includeList = ['music21.*']
         self.excludeList = ['pycallgraph.*']
         self.excludeList += ['re.*','sre_*']
         
@@ -104,10 +105,10 @@ class CallGraph:
         self.excludeList += ['difflib*','urlparse*', 'dateutil.*', 'calendar.*',]
         self.excludeList += ['zipfile*','io.*', 'collections.*', 'tempfile.*', 'urllib.*', 'StringIO*']
         self.excludeList += ['csv.*', 'json.*', 'os.*', 'distutils.*','ctypes*']
-        self.excludeList += ['FileDialog.*', 'Tk*', 'PIL*']
+        self.excludeList += ['FileDialog.*', 'Tk*', 'PIL*', 'tk*', 'pillow*']
         
         # these have been shown to be very fast
-        self.excludeList += ['*xmlnode*', 'xml.dom.*', 'xml.sax.*', 'codecs.*']
+        self.excludeList += ['*xmlnode*', 'xml.dom.*', 'xml.sax.*', 'codecs.*', 'io.*']
         #self.excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
 
         # these cloud up the graph... should be tested, but removed when you want to see
@@ -117,6 +118,7 @@ class CallGraph:
                              'music21.musicxml.*',
                              'music21.romanText.base.*',
                              'music21.clef.*',
+                             'music21.corpus.*',
                              'music21.features.jSymbolic.*',
                              'music21.features.native.*',
                              'music21.lily.lilyObjects.*']
@@ -130,9 +132,9 @@ class CallGraph:
     def run(self, runWithEnviron=False):
         '''Main code runner for testing. To set a new test, update the self.callTest attribute in __init__(). 
         '''
-        suffix = '.svg'
+        suffix = '.png' # '.svg' no reader for now...
         fmt = suffix[1:]
-        _MOD = "test.timeGraphs.py"
+        _MOD = "test.timeGraphImportStar.py"
 
         if runWithEnviron:
             from music21 import environment
@@ -177,11 +179,15 @@ class CallGraph:
         t = Timer()
         t.start()
 
-        pycallgraph.start_trace(filter_func = gf)
-        ct.testFocus() # run routine
+        graphviz = pycallgraph.output.GraphvizOutput(output_file=fp)
+        graphviz.tool = '/usr/local/bin/dot'
 
-        pycallgraph.stop_trace()
-        pycallgraph.make_dot_graph(fp, format=fmt, tool='/usr/local/bin/dot')
+        config = pycallgraph.Config()
+        config.trace_filter = gf
+
+        with pycallgraph.PyCallGraph(output=graphviz, config=config):
+            ct.testFocus() # run routine
+
         print('elapsed time: %s' % t)
         # open the completed file
         print('file path: ' + fp)

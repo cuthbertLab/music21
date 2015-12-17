@@ -5,6 +5,7 @@ Documenting music21
 =============================================
 
 Music21's documentation system uses a combination of handwritten documentation pages (like this one),
+IPython notebooks, 
 and documentation automatically generated from the documentation found in modules.  
 
 For handwritten pages, the files can be found in the top-level /buildDoc/rst/ directories, outside
@@ -42,8 +43,7 @@ as close to the relevant code as possible.
 
 If you're going to edit docs you'll need the latest version of Sphinx.  Go to the command line and Type::
 
-  sudo easy_install -U Sphinx
-  sudo easy_install rst2pdf
+  sudo pip install sphinx
  
 Sphinx uses special characters to identify formatting of documentation. For example, to write a heading you can write:
 Helpful tips on Sphinx formatting may be found here:  `Sphinx Documentation Formatting <http://sphinx.pocoo.org/rest.html>`_ 
@@ -271,7 +271,6 @@ Here's an example from note.py::
         Class doc string goes here.
         '''
         isNote = True
-        isUnpitched = False
         isRest = False
         
         # define order to present names in documentation; use strings
@@ -280,7 +279,6 @@ Here's an example from note.py::
         # documentation for all attributes (that are not properties or methods)
         _DOC_ATTR = {
         'isNote': 'Boolean read-only value describing if this object is a Note.',
-        'isUnpitched': 'Boolean read-only value describing if this is Unpitched.',
         'isRest': 'Boolean read-only value describing if this is a Rest.',
         'beams': 'A :class:`music21.note.Beams` object.',
         'pitch': 'A :class:`music21.pitch.Pitch` object.',
@@ -289,9 +287,9 @@ Here's an example from note.py::
         def __init__(self, *arguments, **keywords):
             pass
 
-If a `_DOC_ATTR` attribute is not defined, the most-recently inherited `_DOC_ATTR` attribute will be used. 
-To explicitly merge an inherited `_DOC_ATTR` attribute with a locally defined `_DOC_ATTR`, use the 
-dictionary's `update()` method.
+If a `_DOC_ATTR` attribute is not defined, the most-recently inherited `_DOC_ATTR` 
+attribute will be used.  To explicitly merge an inherited `_DOC_ATTR` attribute with 
+a locally defined `_DOC_ATTR`, use the dictionary's `update()` method.
 
 The following abbreviated example, showing the updating of the `_DOC_ATTR` inherited from NotRest, 
 is from chord.py::
@@ -322,8 +320,8 @@ is from chord.py::
 Documenting Class-Level Methods
 -----------------------------------------------------------------
 
-This is the most common type of documentation, and it ensures both excellent documentation and doctests. 
-A typical example of source code might look like this::
+This is the most common type of documentation, and it ensures both excellent 
+documentation and doctests. A typical example of source code might look like this::
 
 	class className():
 		[instance variables, __init__, etc.]
@@ -337,3 +335,5 @@ A typical example of source code might look like this::
 		    'value'
 		    '''
 			[method code]
+
+			

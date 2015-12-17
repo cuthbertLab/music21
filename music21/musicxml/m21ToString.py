@@ -68,7 +68,8 @@ def fromMusic21Object(m21Object):
     elif 'TimeSignature' in classes:
         return fromTimeSignature(m21Object)
     else:
-        raise M21ToStringException("Cannot translate the object %s to a complete musicXML document; put it in a Stream first!" % m21Object)
+        raise M21ToStringException("Cannot translate the object " + 
+                "%s to a complete musicXML document; put it in a Stream first!" % m21Object)
 
 def fromStream(streamObject):
     '''
@@ -269,11 +270,10 @@ def fromGeneralNote(n):
     # make a copy, as this process will change tuple types
     # this method is called infrequently, and only for display of a single 
     # note
-    from music21 import duration
-
     nCopy = copy.deepcopy(n)
-    duration.updateTupletType(nCopy.duration) # modifies in place
-
+    
+    # modifies in place
+    stream.makeNotation.makeTupletBrackets([nCopy.duration], inPlace=True) 
     out = stream.Stream()
     out.append(nCopy)
 
@@ -375,6 +375,7 @@ spirit</words>
         s = corpus.parse('opus74no1', 3)
         raw = fromMusic21Object(s.parts[1])
 
+        # TODO: order of attributes is not assured; allow for either order.
         self.assertEqual(raw.find("""<ending number="1" type="start"/>""") > 1, True)
         self.assertEqual(raw.find("""<ending number="1" type="stop"/>""") > 1, True)
 
@@ -398,9 +399,11 @@ spirit</words>
         match = '<beat-unit>long</beat-unit><beat-unit>32nd</beat-unit><beat-unit-dot/>'
         self.assertEqual(raw.find(match) > 0, True)
 
-        match = '<beat-unit>quarter</beat-unit><beat-unit-dot/><beat-unit>half</beat-unit><beat-unit-dot/>'
+        match = ('<beat-unit>quarter</beat-unit>' + 
+            '<beat-unit-dot/><beat-unit>half</beat-unit><beat-unit-dot/>')
         self.assertEqual(raw.find(match) > 0, True)
 
+        # this is <metronome parenthesis="yes"> with spaces removed...
         match = '<metronomeparentheses="yes">'
         self.assertEqual(raw.find(match) > 0, True)
 
@@ -468,6 +471,7 @@ spirit</words>
         # default quarter assumed
         p.insert(0, tempo.MetronomeMark('super fast', number=222.2))
 
+        # TODO: order of attributes is not assured; allow for any order.
         match1 = '<words default-y="45.0" font-weight="bold" justify="left">super fast</words>'
         match2 = '<per-minute>222.2</per-minute>'
         raw = fromMusic21Object(p)
@@ -478,6 +482,7 @@ spirit</words>
         p.repeatAppend(note.Note('g#3'), 8)
         # text does not show when implicit
         p.insert(0, tempo.MetronomeMark(number=132))
+        # TODO: order of attributes is not assured; allow for any order.
         match1 = '<words default-y="45.0" font-weight="bold" justify="left">fast</words>'
         match2 = '<per-minute>132</per-minute>'
         raw = fromMusic21Object(p)
@@ -490,6 +495,7 @@ spirit</words>
         self.assertEqual(mm.number, None)
         p.insert(0, mm)
         # text but no number
+        # TODO: order of attributes is not assured; allow for any order.
         match1 = '<words default-y="45.0" font-weight="bold" justify="left">very slowly</words>'
         match2 = '<per-minute>'
         
@@ -637,7 +643,8 @@ spirit</words>
         c.notehead = 'normal'
         tc = expressions.TextExpression('normal')
 
-        noteList = [tc, c, tn, n, th, h, tl, l, tf, f, tg, g, te, e, ti, i, tj, j, tm, m, tk, k, td, d]
+        noteList = [tc, c, tn, n, th, h, tl, l, tf, f, tg, g, 
+                    te, e, ti, i, tj, j, tm, m, tk, k, td, d]
         for thisNote in noteList:
             p.append(thisNote)
 
@@ -680,7 +687,7 @@ spirit</words>
         n1.tie = tie.Tie('start')
         n2 = note.Note('c3')
         n2.notehead = 'cross'
-        n2.tie = tie.Tie('end')
+        n2.tie = tie.Tie('stop')
         p = stream.Part()
         p.append(n1)
         p.append(n2)
@@ -738,7 +745,8 @@ spirit</words>
         sg4 = layout.StaffGroup([p5, p6, p7], symbol='line', barTogether=False)
 
         s = stream.Score()
-        s.insert([0, p1, 0, p2, 0, p3, 0, p4, 0, p5, 0, p6, 0, p7, 0, p8, 0, sg1, 0, sg2, 0, sg3, 0, sg4])
+        s.insert([0, p1, 0, p2, 0, p3, 0, p4, 0, p5, 0, p6, 0, p7, 
+                  0, p8, 0, sg1, 0, sg2, 0, sg3, 0, sg4]) # deprecated insert usage
         #s.show()
 
         raw = fromMusic21Object(s)
@@ -747,6 +755,7 @@ spirit</words>
         self.assertEqual(raw.find(match) > 0, True)
         match = '<group-symbol>bracket</group-symbol>'
         self.assertEqual(raw.find(match) > 0, True)
+        # TODO: order of attributes is not assured; allow for any order.
         match = '<part-group number="1" type="start">'
         self.assertEqual(raw.find(match) > 0, True)
         match = '<part-group number="1" type="stop"/>'
@@ -874,12 +883,12 @@ spirit</words>
     def testChordNoteheadFillA(self):
         from music21 import chord
         c = chord.Chord(['c4', 'g4'])
-        c[0].noteheadFill = 'no'
+        c[0].noteheadFill = False
 
         raw = fromMusic21Object(c)
         self.assertEqual(raw.count('<notehead filled="no">normal</notehead>'), 1)
         
-        c[1].noteheadFill = 'no'
+        c[1].noteheadFill = False
         raw = fromMusic21Object(c)
         self.assertEqual(raw.count('<notehead filled="no">normal</notehead>'), 2)
 
@@ -947,7 +956,8 @@ spirit</words>
 
         raw = fromMusic21Object(s)
         # three color indications
-        self.assertEqual(raw.count("color="), 8) #exports to notehead AND note, so increased from 6 to 8
+        self.assertEqual(raw.count("color="), 8) 
+        #exports to notehead AND note, so increased from 6 to 8
         # color set at note level only for rest, so only 1
         self.assertEqual(raw.count('note color="#11ff11"'), 1)
 
@@ -959,9 +969,13 @@ spirit</words>
         #s.show()
         raw = fromMusic21Object(s)
         expectedColors = 8
-        self.assertEqual(raw.count("color="), expectedColors, 'did not find the correct number of color statements: %d != %d \n %s' % (raw.count("color="), expectedColors, raw)) #exports to notehead AND note, so increased from 6 to 8
+        self.assertEqual(raw.count("color="), expectedColors, 
+                'did not find the correct number of color statements: ' + 
+                '%d != %d \n %s' % (raw.count("color="), expectedColors, raw)) 
+                #exports to notehead AND note, so increased from 6 to 8
         # color set at note level only for rest, so only 1
-        self.assertEqual(raw.count('note color="#11ff11"'), 1, 'did not find the correct number of color statements: %s' % raw)
+        self.assertEqual(raw.count('note color="#11ff11"'), 1, 
+                'did not find the correct number of color statements: %s' % raw)
 
     def testTextBoxB(self):
         from music21 import text

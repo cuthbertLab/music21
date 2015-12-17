@@ -33,7 +33,8 @@ crossing is present.
 >>> p1 = (G5, C5, E4, C4)
 
 
-Here, another possibility is created with the same pitches, but this time, with voice crossing present.
+Here, another possibility is created with the same pitches, but this time, 
+with voice crossing present.
 C5 is in the highest part, but the highest Pitch G5 is in the second highest part.
 
 
@@ -53,7 +54,8 @@ possibA being any correct possibility in segmentA and possibB being any correct 
 in segmentB.
 
 
-3) Special Resolution Methods. These methods are applied in :meth:`~music21.figuredBass.segment.Segment.allCorrectConsecutivePossibilities`
+3) Special Resolution Methods. These methods are applied in 
+:meth:`~music21.figuredBass.segment.Segment.allCorrectConsecutivePossibilities`
 as applicable if the pitch names of a Segment correctly spell out an augmented sixth, dominant
 seventh, or diminished seventh chord. They are located in :mod:`~music21.figuredBass.resolution`.
 
@@ -63,7 +65,8 @@ The application of these methods is controlled by corresponding instance variabl
 
 
 
-.. note:: The number of parts and maxPitch are universal for a :class:`~music21.figuredBass.realizer.FiguredBassLine`.
+.. note:: The number of parts and maxPitch are universal for a 
+    :class:`~music21.figuredBass.realizer.FiguredBassLine`.
 '''
 import unittest
 
@@ -115,7 +118,8 @@ def isIncomplete(possibA, pitchNamesToContain):
     '''
     Returns True if possibA is incomplete, if it doesn't contain at least
     one of every pitch name in pitchNamesToContain.
-    For a Segment, pitchNamesToContain is :attr:`~music21.figuredBass.segment.Segment.pitchNamesInChord`.
+    For a Segment, pitchNamesToContain is 
+    :attr:`~music21.figuredBass.segment.Segment.pitchNamesInChord`.
     
     
     If possibA contains excessive pitch names, a PossibilityException is
@@ -137,21 +141,22 @@ def isIncomplete(possibA, pitchNamesToContain):
     >>> possibility.isIncomplete(possibA1, pitchNamesA2)
     False
     ''' 
-    isIncomplete = False
+    isIncompleteV = False
     pitchNamesContained = []
     for givenPitch in possibA:
         if givenPitch.name not in pitchNamesContained:
             pitchNamesContained.append(givenPitch.name)
     for pitchName in pitchNamesToContain:
         if pitchName not in pitchNamesContained:
-            isIncomplete = True
-    if not isIncomplete and (len(pitchNamesContained) > len(pitchNamesToContain)):
-        isIncomplete = False
-        #raise PossibilityException(str(possibA) + " contains pitch names not found in pitchNamesToContain.")
+            isIncompleteV = True
+    if not isIncompleteV and (len(pitchNamesContained) > len(pitchNamesToContain)):
+        isIncompleteV = False
+        #raise PossibilityException(str(possibA) + " 
+        #        contains pitch names not found in pitchNamesToContain.")
 
-    return isIncomplete
+    return isIncompleteV
 
-def upperPartsWithinLimit(possibA, maxSemitoneSeparation = 12):
+def upperPartsWithinLimit(possibA, maxSemitoneSeparation=12):
     '''
     Returns True if the pitches in the upper parts of possibA
     are found within maxSemitoneSeparation of each other. The 
@@ -182,7 +187,7 @@ def upperPartsWithinLimit(possibA, maxSemitoneSeparation = 12):
     >>> possibility.upperPartsWithinLimit(possibA2)
     False
     '''
-    upperPartsWithinLimit = True
+    upperPartsWithinLimit = True # pylint: disable=redefined-outer-name
     if maxSemitoneSeparation == None:
         return upperPartsWithinLimit
     
@@ -197,7 +202,7 @@ def upperPartsWithinLimit(possibA, maxSemitoneSeparation = 12):
     
     return upperPartsWithinLimit
 
-def pitchesWithinLimit(possibA, maxPitch = pitch.Pitch('B5')):
+def pitchesWithinLimit(possibA, maxPitch=pitch.Pitch('B5')):
     '''
     Returns True if all pitches in possibA are less than or equal to
     the maxPitch provided. Comparisons between pitches are done using pitch
@@ -222,7 +227,10 @@ def pitchesWithinLimit(possibA, maxPitch = pitch.Pitch('B5')):
     True
     >>> resPossib = resolution.dominantSeventhToMajorTonic(domPossib)
     >>> resPossib # Contains C6 > B5
-    (<music21.pitch.Pitch C6>, <music21.pitch.Pitch E5>, <music21.pitch.Pitch C4>, <music21.pitch.Pitch C3>)
+    (<music21.pitch.Pitch C6>, 
+     <music21.pitch.Pitch E5>, 
+     <music21.pitch.Pitch C4>, 
+     <music21.pitch.Pitch C3>)
     >>> possibility.pitchesWithinLimit(resPossib)
     False 
     '''
@@ -232,9 +240,9 @@ def pitchesWithinLimit(possibA, maxPitch = pitch.Pitch('B5')):
         
     return True
 
-def limitPartToPitch(possibA, partPitchLimits = {}):
+def limitPartToPitch(possibA, partPitchLimits=None):
     '''
-    Takes in partPitchLimits containing (partNumber, partPitch) pairs, each
+    Takes in a dict, partPitchLimits containing (partNumber, partPitch) pairs, each
     of which limits a part in possibA to a certain :class:`~music21.pitch.Pitch`.
     Returns True if all limits are followed in possibA, False otherwise.
     
@@ -253,6 +261,8 @@ def limitPartToPitch(possibA, partPitchLimits = {}):
     >>> possibility.limitPartToPitch(possibA2, {1: sopranoPitch})
     True
     '''
+    if partPitchLimits is None:
+        partPitchLimits = {}
     for (partNumber, partPitch) in partPitchLimits.items():
         if not (possibA[partNumber - 1] == partPitch):
             return False
@@ -641,17 +651,19 @@ def voiceOverlap(possibA, possibB):
         
     return hasVoiceOverlap
 
-def partMovementsWithinLimits(possibA, possibB, partMovementLimits = []):
+def partMovementsWithinLimits(possibA, possibB, partMovementLimits=None):
     '''
     Returns True if all movements between shared parts of possibA and possibB
-    are within limits, as specified by partMovementLimits, which consists of
+    are within limits, as specified by list partMovementLimits, which consists of
     (partNumber, maxSeparation) tuples. 
     
     
-    * partNumber: Specified from 1 to n, where 1 is the soprano or highest part and n is the bass or lowest part.
+    * partNumber: Specified from 1 to n, where 1 is the soprano or 
+    highest part and n is the bass or lowest part.
     
     
-    * maxSeparation: For a given part, the maximum separation to allow between a pitch in possibA and a corresponding pitch in possibB, in semitones.  
+    * maxSeparation: For a given part, the maximum separation to allow 
+    between a pitch in possibA and a corresponding pitch in possibB, in semitones.  
     
     
     >>> from music21 import pitch
@@ -666,8 +678,10 @@ def partMovementsWithinLimits(possibA, possibB, partMovementLimits = []):
     >>> C5 = pitch.Pitch('C5')
     
     
-    Here, we limit the soprano part to motion of two semitones, enharmonically equivalent to a major second. 
-    Moving from C5 to B4 is allowed because it constitutes stepwise motion, but moving to A4 is not allowed 
+    Here, we limit the soprano part to motion of two semitones, 
+    enharmonically equivalent to a major second. 
+    Moving from C5 to B4 is allowed because it constitutes stepwise 
+    motion, but moving to A4 is not allowed 
     because the distance between A4 and C5 is three semitones.
     
     
@@ -680,6 +694,8 @@ def partMovementsWithinLimits(possibA, possibB, partMovementLimits = []):
     >>> possibility.partMovementsWithinLimits(possibA1, possibB2, partMovementLimits)
     False
     '''
+    if partMovementLimits is None:
+        partMovementLimits = []
     withinLimits = True
     for (partNumber, maxSeparation) in partMovementLimits:
         pitchA = possibA[partNumber - 1]
@@ -749,12 +765,16 @@ def partsSame(possibA, possibB, partsToCheck = None):
     
     return True
 
-def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo = None, restrictDoublings = True):
+def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restrictDoublings=True):
     '''
-    Speed-enhanced but designed to stand alone. Returns True if possibA is an Italian A6 chord 
-    and possibB could possibly be an acceptable resolution. If restrictDoublings is set to True,
-    only the tonic can be doubled. Setting restrictDoublings to False opens up the chance
-    that the root or the third can be doubled. Controlled in the :class:`~music21.figuredBass.rules.Rules`
+    Speed-enhanced but designed to stand alone. 
+    Returns True if possibA is an Italian A6 chord 
+    and possibB could possibly be an acceptable resolution. 
+    If restrictDoublings is set to True,
+    only the tonic can be doubled. Setting restrictDoublings 
+    to False opens up the chance
+    that the root or the third can be doubled. Controlled 
+    in the :class:`~music21.figuredBass.rules.Rules`
     object by :attr:`~music21.figuredBass.rules.Rules.restrictDoublingsInItalianA6Resolution`.    
     
     
@@ -812,9 +832,9 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo = None, rest
     
     >>> possibA3 = (Gs4, Gs4, D4, Bb2)
     >>> possibB6 = (A4, A4, Cs4, A2)
-    >>> possibility.couldBeItalianA6Resolution(possibA3, possibB6, restrictDoublings = True)
+    >>> possibility.couldBeItalianA6Resolution(possibA3, possibB6, restrictDoublings=True)
     False
-    >>> possibility.couldBeItalianA6Resolution(possibA3, possibB6, restrictDoublings = False)
+    >>> possibility.couldBeItalianA6Resolution(possibA3, possibB6, restrictDoublings=False)
     True
     '''
     if threePartChordInfo == None:
@@ -867,49 +887,47 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo = None, rest
             if not i.directedName == 'm-2':
                 return False
 
-    '''
-    # Part 1: Check if possibA is A6 chord, and if it is properly formed.
-    bass = possibA[-1]
-    root = None
-    rootIndex = 0
-    for pitchA in possibA[0:-1]:
-        if not (pitchA.ps - bass.ps) % 12 == 10:
-            rootIndex += 1
-            continue
-        br = interval.Interval(bass, pitchA)
-        isAugmentedSixth = (br.directedSimpleName == 'A6')
-        if isAugmentedSixth:
-            root = pitchA
-            break
-    tonic = bass.transpose('M3')
-    #Restrict doublings, It+6
-    for pitchIndex in range(len(possibA) - 1):
-        if pitchIndex == rootIndex:
-            continue
-        pitchA = possibA[pitchIndex]
-        if not pitchA.name == tonic.name:
-            return False
-
-    #Part 2: If possibA is Italian A6 chord, check that it resolves properly in possibB.
-    fifth = root.transpose('m2')
-    pairsList = partPairs(possibA, possibB)
-    (bassA, bassB) = pairsList[-1]
-    (rootA, rootB) = pairsList[rootIndex]
-    if not (bassB.name == fifth.name and rootB.name == fifth.name):
-        return False
-    if not (bassB.ps - bassA.ps == -1.0 and rootB.ps - rootA.ps == 1.0):
-        return False
-    allowedIntervalNames = ['M3','m3','M2','m-2']
-    for pitchIndex in range(len(pairsList) - 1):
-        if pitchIndex == rootIndex:
-            continue
-        (tonicA, tonicB) = pairsList[pitchIndex]
-        if tonicA == tonicB:
-            continue
-        tt = interval.Interval(tonicA, tonicB)
-        if not tt.directedSimpleName in allowedIntervalNames:
-            return False
-    '''
+#     # Part 1: Check if possibA is A6 chord, and if it is properly formed.
+#     bass = possibA[-1]
+#     root = None
+#     rootIndex = 0
+#     for pitchA in possibA[0:-1]:
+#         if not (pitchA.ps - bass.ps) % 12 == 10:
+#             rootIndex += 1
+#             continue
+#         br = interval.Interval(bass, pitchA)
+#         isAugmentedSixth = (br.directedSimpleName == 'A6')
+#         if isAugmentedSixth:
+#             root = pitchA
+#             break
+#     tonic = bass.transpose('M3')
+#     #Restrict doublings, It+6
+#     for pitchIndex in range(len(possibA) - 1):
+#         if pitchIndex == rootIndex:
+#             continue
+#         pitchA = possibA[pitchIndex]
+#         if not pitchA.name == tonic.name:
+#             return False
+# 
+#     #Part 2: If possibA is Italian A6 chord, check that it resolves properly in possibB.
+#     fifth = root.transpose('m2')
+#     pairsList = partPairs(possibA, possibB)
+#     (bassA, bassB) = pairsList[-1]
+#     (rootA, rootB) = pairsList[rootIndex]
+#     if not (bassB.name == fifth.name and rootB.name == fifth.name):
+#         return False
+#     if not (bassB.ps - bassA.ps == -1.0 and rootB.ps - rootA.ps == 1.0):
+#         return False
+#     allowedIntervalNames = ['M3','m3','M2','m-2']
+#     for pitchIndex in range(len(pairsList) - 1):
+#         if pitchIndex == rootIndex:
+#             continue
+#         (tonicA, tonicB) = pairsList[pitchIndex]
+#         if tonicA == tonicB:
+#             continue
+#         tt = interval.Interval(tonicA, tonicB)
+#         if not tt.directedSimpleName in allowedIntervalNames:
+#             return False
     
     return True
 
@@ -956,8 +974,10 @@ def partPairs(possibA, possibB):
 
 singlePossibilityMethods = [voiceCrossing, isIncomplete, upperPartsWithinLimit, pitchesWithinLimit]
 #singlePossibilityMethods.sort(None, lambda x: x.__name__)
-consequentPossibilityMethods = [parallelFifths, parallelOctaves, hiddenFifth, hiddenOctave, voiceOverlap, 
-                                  partMovementsWithinLimits, upperPartsSame, couldBeItalianA6Resolution]
+consequentPossibilityMethods = [parallelFifths, parallelOctaves, 
+                                hiddenFifth, hiddenOctave, voiceOverlap, 
+                                partMovementsWithinLimits, upperPartsSame, 
+                                couldBeItalianA6Resolution]
 #consequentPossibilityMethods.sort(None, lambda x: x.__name__)
 
 _DOC_ORDER = singlePossibilityMethods + [partPairs] + consequentPossibilityMethods

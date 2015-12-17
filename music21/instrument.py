@@ -27,10 +27,11 @@ import sys
 from collections import OrderedDict
 
 from music21 import base
-from music21 import exceptions21
 from music21 import common
 from music21 import interval
 from music21 import pitch
+
+from music21.exceptions21 import InstrumentException
 
 from music21.ext import six
 
@@ -39,8 +40,6 @@ _MOD = "instrument.py"
 environLocal = environment.Environment(_MOD)
 
 
-class InstrumentException(exceptions21.Music21Exception):
-    pass
 
 
 def unbundleInstruments(streamIn, inPlace = False):
@@ -123,6 +122,22 @@ class Instrument(base.Music21Object):
     for subclassing, though usually a more specific
     instrument class (such as StringInstrument) would
     be better to subclass.
+    
+    Some defined attributes for instruments include:
+    
+    * partId
+    * partName
+    * partAbbreviation
+    * instrumentId
+    * instrumentName
+    * instrumentAbbreviation
+    * midiProgram
+    * midiChannel
+    * lowestNote (a note object or a string)
+    * highestNote (a note object or a string)
+    * transposition (an interval object)
+    * inGMPercMap (bool -- if it uses the GM percussion map)
+    * soundfontFn (filepath to a sound font, optional)
     '''
     
     classSortOrder = -25
@@ -198,7 +213,8 @@ class Instrument(base.Music21Object):
         self.instrumentId = idNew
          
 
-    def autoAssignMidiChannel(self, usedChannels=[]): # CORRECT! # pylint: disable=dangerous-default-value
+    # the empty list as default is actually CORRECT!
+    def autoAssignMidiChannel(self, usedChannels=[]): # pylint: disable=dangerous-default-value
         '''
         Assign an unused midi channel given a list of
         used channels.
@@ -253,7 +269,8 @@ class Instrument(base.Music21Object):
                     self.midiChannel = ch
                     return ch
             return 0
-            #raise InstrumentException("we are out of midi channels and this was not already detected PROGRAM BUG!")
+            #raise InstrumentException("we are out of midi channels and this " + 
+            #            "was not already detected PROGRAM BUG!")
 
 
 #-------------------------------------------------------------------------------
@@ -1538,9 +1555,6 @@ def partitionByInstrument(streamObj):
     >>> p1 = converter.parse("tinynotation: 4/4 c4  d  e  f  g  a  b  c'  c1")
     >>> p2 = converter.parse("tinynotation: 4/4 C#4 D# E# F# G# A# B# c#  C#1")
 
-    >>> p1.makeMeasures(inPlace=True)
-    >>> p2.makeMeasures(inPlace=True)
-
     >>> p1.getElementsByClass('Measure')[0].insert(0.0, instrument.Piccolo())
     >>> p1.getElementsByClass('Measure')[0].insert(2.0, instrument.AltoSaxophone())
     >>> p1.getElementsByClass('Measure')[1].insert(3.0, instrument.Piccolo())
@@ -1553,7 +1567,7 @@ def partitionByInstrument(streamObj):
     >>> s.insert(0, p1)
     >>> s.insert(0, p2)
     >>> s.show('text')
-    {0.0} <music21.tinyNotation.TinyNotationStream ...>
+    {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.instrument.Instrument Piccolo>
             {0.0} <music21.clef.TrebleClef>
@@ -1572,7 +1586,7 @@ def partitionByInstrument(streamObj):
         {8.0} <music21.stream.Measure 3 offset=8.0>
             {0.0} <music21.note.Note C>
             {4.0} <music21.bar.Barline style=final>
-    {0.0} <music21.tinyNotation.TinyNotationStream ...>
+    {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.instrument.Instrument Trombone>
             {0.0} <music21.clef.BassClef>
@@ -1703,9 +1717,9 @@ def partitionByInstrument(streamObj):
     # add to corresponding part
     for sub in s:
         for i in sub.getElementsByClass('Instrument'):
-            start = i.getOffsetBySite(sub) 
+            start = i.offset 
             # duration will have been set with sub.extendDuration above
-            end = i.getOffsetBySite(sub) + i.duration.quarterLength
+            end = i.offset + i.duration.quarterLength
             # get destination Part
             p = names[i.instrumentName]['Part']
             coll = sub.getElementsByOffset(start, end, 
@@ -1715,7 +1729,7 @@ def partitionByInstrument(streamObj):
             # add to part at original offset
             # do not gather instrument
             for e in coll.getElementsNotOfClass('Instrument'):
-                p.insert(e.getOffsetBySite(sub), e)
+                p.insert(sub.elementOffset(e), e)
     return post
 
 
@@ -1782,6 +1796,7 @@ def fromString(instrumentString):
     >>> t8.transposition
     <music21.interval.Interval m3>
     """
+    # pylint: disable=undefined-variable
     from music21.languageExcerpts import instrumentLookup
     allCombinations = _combinations(instrumentString)
     # First task: Find the best instrument.
@@ -1791,14 +1806,15 @@ def fromString(instrumentString):
     for substring in allCombinations:
         try:
             if six.PY2:
-                englishName = instrumentLookup.allToBestName[unicode(substring.lower())] # pylint: disable=undefined-variable
+                uss = unicode(substring.lower()) #@UndefinedVariable
+                englishName = instrumentLookup.allToBestName[uss]
             else:
                 englishName = instrumentLookup.allToBestName[substring.lower()]
             className = instrumentLookup.bestNameToInstrumentClass[englishName]
             thisInstClass = globals()[className]        
             thisInstClassParentClasses = [parentcls.__name__ for parentcls in thisInstClass.mro()]
-            if 'Instrument' not in thisInstClassParentClasses or \
-                'Music21Object' not in thisInstClassParentClasses:
+            if ('Instrument' not in thisInstClassParentClasses or 
+                    'Music21Object' not in thisInstClassParentClasses):
                 # little bit of security against calling another global...
                 raise KeyError
 
@@ -1814,7 +1830,8 @@ def fromString(instrumentString):
         except KeyError:
             pass
     if bestInstClass is None:
-        raise InstrumentException("Could not match string with instrument: {0}".format(instrumentString))
+        raise InstrumentException(
+            "Could not match string with instrument: {0}".format(instrumentString))
     if bestName not in instrumentLookup.transposition:
         return bestInstrument
 
@@ -1823,7 +1840,8 @@ def fromString(instrumentString):
     for substring in allCombinations:
         try:
             if six.PY2:
-                bestPitch = instrumentLookup.pitchFullNameToName[unicode(substring.lower())] # pylint: disable=undefined-variable
+                uss = unicode(substring.lower()) # @UndefinedVariable
+                bestPitch = instrumentLookup.pitchFullNameToName[uss] 
             else:
                 bestPitch = instrumentLookup.pitchFullNameToName[substring.lower()]
             bestInterval = instrumentLookup.transposition[bestName][bestPitch]
@@ -2016,7 +2034,8 @@ class Test(unittest.TestCase):
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
         self.assertEqual(len(post.parts[0].notes), 12)
 
-        self.assertEqual([n.offset for n in post.parts[0].notes], [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 9.0, 10.0, 11.0, 12.0, 13.0])
+        self.assertEqual([n.offset for n in post.parts[0].notes], 
+                         [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 9.0, 10.0, 11.0, 12.0, 13.0])
 
         #environLocal.printDebug(['post processing'])
         #post.show('t')
@@ -2056,7 +2075,8 @@ class Test(unittest.TestCase):
         for n in ppn:
             offsetList.append(n.offset)
 
-        self.assertEqual(offsetList, [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 9.0, 10.0, 11.0, 12.0, 13.0, 20.0])
+        self.assertEqual(offsetList, 
+                         [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 9.0, 10.0, 11.0, 12.0, 13.0, 20.0])
 
 
     def testPartitionByInstrumentF(self):

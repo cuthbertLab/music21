@@ -14,9 +14,9 @@ Converts musicxml xml text to the intermediate mxObjects format.
 '''
 from music21.musicxml import mxObjects as musicxmlMod
 
+import io
 import sys
 from music21.ext import six, chardet
-import codecs
 
 # in order for sax parsing to properly handle unicode strings w/ unicode chars
 # stored in StringIO.StringIO, this update is necessary
@@ -41,21 +41,17 @@ import copy
 import os
 import unittest
 
-# use io.StringIO  in python 3, avail in 2.6, not 2.5
 from music21.ext.six import StringIO, BytesIO
 
 try:
-    import cPickle as pickleMod # much faster...
+    import cPickle as pickleMod # much faster.. on python2..
 except ImportError:
-    # in case we're on Jython, etc.
+    # in case we're on Jython, etc. or Py3
     import pickle as pickleMod
 
 import xml.sax
-import xml.dom.minidom # @UnusedImport
 
 from music21.base import VERSION
-from music21 import xmlnode
-xml.dom.minidom.Element.writexml = xmlnode.fixed_writexml
 
 from music21 import environment
 _MOD = 'musicxml/xmlHandler.py'
@@ -387,6 +383,7 @@ class Handler(xml.sax.ContentHandler):
             self._mxObjs['ornaments'].append(self._mxObjs['schleifer'])
 
         elif name == 'tremolo':
+            self._mxObjs['tremolo'].charData = self._currentTag.charData
             self._mxObjs['ornaments'].append(self._mxObjs['tremolo'])
 
         elif name == 'sound':
@@ -927,7 +924,12 @@ class Handler(xml.sax.ContentHandler):
                 musicxmlMod.BeatType(self._currentTag.charData))
 
         elif name == 'clef':
-            self._mxObjs['attributes'].clefList.append(self._mxObjs['clef'])
+            if len(self._mxObjs['measure']) == 0:
+                # clef at beginning of measure into attributes
+                self._mxObjs['attributes'].clefList.append(self._mxObjs['clef'])
+            else:
+                # mid-measure clefs into measure-components
+                self._mxObjs['measure'].componentList.append(self._mxObjs['clef'])
 
         elif name == 'multiple-rest':
             self._mxObjs['measure-style'].multipleRest = self._currentTag.charData
@@ -1040,7 +1042,7 @@ class Document(object):
 
         else: 
             
-            fileLikeOpen = codecs.open(fileLike, encoding='utf-8')
+            fileLikeOpen = io.open(fileLike, encoding='utf-8')
 
         # the file always needs to be closed, otherwise
         # subsequent parsing operations produce an unclosed token error
@@ -1051,10 +1053,10 @@ class Document(object):
             fileLikeOpen.close()
             if not isFile:
                 raise e
-            with codecs.open(fileLike, 'rb') as fileBinary:
+            with io.open(fileLike, 'rb') as fileBinary:
                 fileContentsBinary = fileBinary.read()
                 encodingGuess = chardet.detect(fileContentsBinary)['encoding']
-            fileLikeOpen2 = codecs.open(fileLike, encoding=encodingGuess)
+            fileLikeOpen2 = io.open(fileLike, encoding=encodingGuess)
             fileContentsUnicode = fileLikeOpen2.read()
             fileLikeOpen2.close()
             fileBytes = fileContentsUnicode.encode(encodingGuess)
@@ -1124,11 +1126,11 @@ class Document(object):
         print(('+'*20 + ' ' + bestTitle))
         print((self.score))
         print()
-        print((self.score.toxml(None, None, 1)))
+        print((self.score.toxml(None, None, True)))
 
     #---------------------------------------------------------------------------
     def write(self, fp):
-        msg = self.score.toxml(None, None, 1)
+        msg = self.score.toxml(None, None, True)
         f = open(fp, 'w')
         f.write(msg)
         f.close()
@@ -1351,7 +1353,7 @@ class Test(unittest.TestCase):
                             if isinstance(n, musicxmlMod.Ornaments):
                                 for o in n:
                                     if isinstance(o, musicxmlMod.WavyLine):
-                                        wavyCount += 1;
+                                        wavyCount += 1
         self.assertEqual(glissCount, 2)
         self.assertEqual(wavyCount, 4)
 
@@ -1365,7 +1367,7 @@ if __name__ == "__main__":
 
     import music21
     #music21.converter.parse('/Users/Cuthbert/Dropbox/EMMSAP/MusicXML In/PMFC_05_34-Bon_Bilgrana_de_Valor.xml', forceSource=True)
-    music21.mainTest(Test, TestExternal)
+    music21.mainTest(Test) #, TestExternal)
 
 #------------------------------------------------------------------------------
 # eof

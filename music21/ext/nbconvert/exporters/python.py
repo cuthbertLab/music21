@@ -1,6 +1,5 @@
-"""
-Python exporter which exports Notebook code into a PY file.
-"""
+"""Python script Exporter class"""
+
 #-----------------------------------------------------------------------------
 # Copyright (c) 2013, the IPython Development Team.
 #
@@ -13,47 +12,20 @@ Python exporter which exports Notebook code into a PY file.
 # Imports
 #-----------------------------------------------------------------------------
 
-from IPython.utils.traitlets import Unicode
-
-# local import
-import exporter
+from .templateexporter import TemplateExporter
 
 #-----------------------------------------------------------------------------
 # Classes
 #-----------------------------------------------------------------------------
 
-class PythonExporter(exporter.Exporter):
+class PythonExporter(TemplateExporter):
     """
     Exports a Python code file.
     """
-    
-    file_extension = Unicode(
-        'py', config=True, 
-        help="Extension of the file that should be written to disk")
+    def _file_extension_default(self):
+        return '.py'
 
-    template_file = Unicode(
-            'python', config=True,
-            help="Name of the template file to use")
+    def _template_file_default(self):
+        return 'python'
 
-
-    def __init__(self, transformers=None, filters=None, config=None, **kw):
-        """
-        Public constructor
-    
-        Parameters
-        ----------
-        transformers : list[of transformer]
-            Custom transformers to apply to the notebook prior to engaging
-            the Jinja template engine.  Any transformers specified here 
-            will override existing transformers if a naming conflict
-            occurs.
-        filters : dict{of filter}
-            Custom filters to make accessible to the Jinja templates.  Any
-            filters specified here will override existing filters if a
-            naming conflict occurs.
-        config : config
-            User configuration instance.
-        """
-        
-        #Call base class constructor.
-        super(PythonExporter, self).__init__(transformers, filters, config, **kw)
+    output_mimetype = 'text/x-python'

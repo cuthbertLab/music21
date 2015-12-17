@@ -86,8 +86,8 @@ class StreamStatus(SlottedObject):
     ## SPECIAL METHODS ###
     def __deepcopy__(self, memo=None):
         '''
-        Manage deepcopying by creating a new reference to the same object. If
-        the origin no longer exists, than origin is set to None
+        Manage deepcopying by creating a new reference to the same object. 
+        leaving out the client
         '''
         new = type(self)()
         for x in self.__slots__:
@@ -132,10 +132,43 @@ class StreamStatus(SlottedObject):
         exist, this method returns True, regardless of if makeBeams has
         actually been run.
         '''
-        for n in self.client.flat.notes:
+        for n in self.client.recurse(classFilter=('NotRest'), restoreActiveSites=False):
             if n.beams is not None and len(n.beams.beamsList):
                 return True
         return False
+    
+    def haveTupletBracketsBeenMade(self):
+        '''
+        If any GeneralNote in this Stream is a tuplet, then check to
+        see if any of them have a first Tuplet with type besides None
+        return True. Otherwise return False if there is a tuplet. Return None if
+        no Tuplets.
+        
+        >>> s = stream.Stream()
+        >>> s.streamStatus.haveTupletBracketsBeenMade() is None
+        True
+        >>> s.append(note.Note())
+        >>> s.streamStatus.haveTupletBracketsBeenMade() is None
+        True
+        >>> n = note.Note(quarterLength=1./3)
+        >>> s.append(n)
+        >>> s.streamStatus.haveTupletBracketsBeenMade()
+        False
+        >>> n.duration.tuplets[0].type = 'start'
+        >>> s.streamStatus.haveTupletBracketsBeenMade()
+        True
+        
+        '''
+        foundTuplet = False
+        for n in self.client.recurse(classFilter='GeneralNote', restoreActiveSites=False):
+            if n.duration.tuplets:
+                foundTuplet = True
+                if n.duration.tuplets[0].type is not None:
+                    return True
+        if foundTuplet:
+            return False
+        else:
+            return None
 
     ### PUBLIC PROPERTIES ###
 

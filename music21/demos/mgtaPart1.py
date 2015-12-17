@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    © 2009-2010, 2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2010, 2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
@@ -367,10 +367,8 @@ def ch1_writing_I_B_1(show=True, *arguments, **keywords):
     p.6 
     Transcribe these melodies into the clef specified without changing octaves.
     '''
-    from music21 import tinyNotation
-
     # camptown races
-    ex = tinyNotation.TinyNotationStream("2/4 g8 g e g")
+    ex = converter.parse("tinynotation: 2/4 g8 g e g", makeNotation=False)
     ex.insert(0, clef.AltoClef()) # maintain clef
     if show:
         ex.show()
@@ -440,7 +438,6 @@ def ch1_writing_I_B_3(show=True, *arguments, **keywords):
 
 #     purcellScore = music21.parseData("Music_for_a_while.musicxml")
 #     thisClef = purcellScore.getElementsByClass(clef.Clef)[0]
-#     thisClef.__class__ = clef.TenorClef
 #     purcellScore.insert(0, instrument.Instrument('bassoon'))
 #     assert purcellScore.allInRange() is True
 #     purcellScore.playMidi()   ## will play on bassoon

@@ -6,17 +6,8 @@
 # Authors:      Hugh Zabriskie
 #
 # Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
-#
-# License:      LGPL, see license.txt
+# License:      BSD or LGPL, see license.txt
 #--------------------------------------------------------
-from music21 import exceptions21
-from music21 import stream
-from music21 import note
-from music21 import pitch
-from music21 import corpus
-from music21 import key
-import unittest
-
 '''
 Have you ever wondered whether Bach uses more sharps than flats in the Chorales? With just a
 few lines of code, music21 allows you to quickly answer this question.
@@ -52,6 +43,14 @@ Here's some inspiration:
 "Some art is off the beat, but 'Mostart' is on the beat."
 
 '''
+
+from music21 import exceptions21
+from music21 import stream
+from music21 import note
+from music21 import pitch
+from music21 import corpus
+import unittest
+
 
 
 #-------------------------------------------------------- 
@@ -138,8 +137,8 @@ def getAccidentalCountSum(scores, includeNonAccidentals=False, excludeZeros=True
         assert score.isStream
         scoreTally = getAccidentalCount(score, includeNonAccidentals, False)
         # dict.update() won't suffice; list() for Python v3
-        for key in list(scoreTally.keys()):
-            tally[key] += scoreTally[key]
+        for k in list(scoreTally.keys()):
+            tally[k] += scoreTally[k]
     return _deleteZeros(tally, excludeZeros)
     
             
@@ -186,9 +185,9 @@ def _deleteZeros(tally, excludeZeros):
     {'a': 5, 'b': 3}
     '''
     if excludeZeros:
-        for key in list(tally.keys()):
-            if tally[key] is 0:
-                del tally[key]
+        for k in list(tally.keys()):
+            if tally[k] is 0:
+                del tally[k]
     return tally
 
 #--------------------------------------------------------   
@@ -217,8 +216,8 @@ class Test(unittest.TestCase):
         self.assertEqual(getAccidentalCount(s, True), {'flat': 1, 'sharp': 1, 'natural': 1})
         
         note4 = note.Note("C4")
-        self.assertIsNone(note4.accidental)
-        note4.accidental = pitch.Accidental('natural')  # add a natural accidental
+        self.assertIsNone(note4.pitch.accidental)
+        note4.pitch.accidental = pitch.Accidental('natural')  # add a natural accidental
         s.append(note4)
         self.assertEqual(getAccidentalCount(s), {'flat': 1, 'sharp': 1, 'natural': 1})
         

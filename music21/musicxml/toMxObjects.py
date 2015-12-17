@@ -76,7 +76,6 @@ def configureMxPartGroupFromStaffGroup(staffGroup):
 def textBoxToMxCredit(textBox):
     '''
     Convert a music21 TextBox to a MusicXML Credit.
-
     
     >>> tb = text.TextBox('testing')
     >>> tb.positionVertical = 500
@@ -511,7 +510,7 @@ def durationToMx(d):
 
     >>> a = duration.Duration()
     >>> a.type = 'half'
-    >>> a.dotGroups = [1,1]
+    >>> a.dotGroups = (1,1)
     >>> b = musicxml.toMxObjects.durationToMx(a)
     >>> len(b) == 2
     True
@@ -526,7 +525,7 @@ def durationToMx(d):
         d = d.splitDotGroups()
     # most common case...
     # a grace is not linked, but still needs to be processed as a grace
-    if (d.isLinked is True or len(d.components) > 1 or
+    if (d.linked is True or len(d.components) > 1 or
         (len(d.components) > 1 and d.isGrace)):
         for dur in d.components:
             mxDivisions = int(defaults.divisionsPerQuarter *
@@ -601,9 +600,9 @@ def durationToMx(d):
                     mxNotations.append(mxTied)
         if len(d.components) > 1:
             mxNote.set('tieList', mxTieList)
-        if len(dur.tuplets) > 0:
+        if len(d.tuplets) > 0:
             # only getting first tuplet here
-            mxTimeModification, mxTupletList = tupletToMx(dur.tuplets[0])
+            mxTimeModification, mxTupletList = tupletToMx(d.tuplets[0])
             mxNote.set('timemodification', mxTimeModification)
             if mxTupletList != []:
                 mxNotations.componentList += mxTupletList
@@ -728,7 +727,7 @@ def timeSignatureToMx(ts):
 
 def keySignatureToMx(keySignature):
     '''
-    Returns a musicxml.mxObjects.KeySignature object from a music21
+    Returns a musicxml.mxObjects.Key object from a music21
     key.KeySignature or key.Key object
        
     
@@ -770,10 +769,34 @@ def clefToMxClef(clefObj):
     'G'
     >>> mxc2.get('clefOctaveChange')
     -1
+
+    >>> pc = clef.PercussionClef()
+    >>> mxc3 = musicxml.toMxObjects.clefToMxClef(pc)
+    >>> mxc3.get('sign')
+    'percussion'
+    >>> mxc3.get('line') is None
+    True
+    
+    
+    Clefs without signs get exported as G clefs with a warning
+    
+    >>> generic = clef.Clef()
+    >>> mxc4 = musicxml.toMxObjects.clefToMxClef(generic)
+    Clef with no .sign exported; setting as a G clef
+    >>> mxc4.get('sign')
+    'G'
+    >>> mxc4.get('line') is None
+    True 
     '''
     mxClef = mxObjects.Clef()
-    mxClef.set('sign', clefObj.sign)
-    mxClef.set('line', clefObj.line)
+    sign = clefObj.sign
+    if sign is None:
+        print("Clef with no .sign exported; setting as a G clef")
+        sign = 'G'
+    
+    mxClef.set('sign', sign) # we use musicxml signs internally, so no problem...
+    if clefObj.line is not None:
+        mxClef.set('line', clefObj.line)
     if clefObj.octaveChange != 0:
         mxClef.set('clefOctaveChange', clefObj.octaveChange)
     return mxClef
@@ -886,8 +909,6 @@ def codaToMx(rm):
 def segnoToMx(rm):
     '''
     Returns a musicxml.mxObjects.Direction object with a musicxml.mxObjects.Segno mark in it
-
-    
     '''
     mxSegno = mxObjects.Segno()
     for src, dst in [(rm._positionDefaultX, 'default-x'),
@@ -942,11 +963,25 @@ def chordSymbolToMx(cs):
     >>> mxF = musicxml.toMxObjects.chordSymbolToMx(f)
     >>> mxF
     <harmony <root root-step=G> <kind text= charData=suspended-fourth> inversion=3 <bass bass-step=F> <degree <degree-value charData=9> <degree-alter > <degree-type charData=add>>>
+    
+    MusicXML uses "dominant" for "dominant-seventh" so check aliases back...
+
+    >>> dom7 = harmony.ChordSymbol('C7')
+    >>> dom7.chordKind
+    'dominant-seventh'
+    >>> mxF = musicxml.toMxObjects.chordSymbolToMx(dom7)
+    >>> mxF
+    <harmony <root root-step=C> <kind text= charData=dominant> inversion=0>    
     '''
+    from music21 import harmony
     mxHarmony = mxObjects.Harmony()
 
     mxKind = mxObjects.Kind()
-    mxKind.set('charData', cs.chordKind)
+    cKind = cs.chordKind
+    for xmlAlias in harmony.CHORD_ALIASES:
+        if harmony.CHORD_ALIASES[xmlAlias] == cKind:
+            cKind = xmlAlias
+    mxKind.set('charData', cKind)
     mxKind.set('text', cs.chordKindStr)
     mxHarmony.set('kind', mxKind)
 
@@ -1061,10 +1096,19 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
     Convenience routine to create and add MusicXML objects from music21 objects provided 
     as a target and as a SpannerBundle. 
 
-    The `target` parameter here may be music21 Note or Chord.
+    The `target` parameter here may be music21 Note, Rest, or Chord.
     This may edit the mxNoteList and direction lists in place, and thus returns None.
     
-    TODO: Improve docs and show a test...
+    mxNoteList is a list of <mxNote> objects that represent the note or Chord (multiple for chords)
+    
+    some spanner produce direction tags, and sometimes these need
+    to go before or after the notes of this element, hence the mxDirectionPre and mxDirectionPost lists
+    
+    spannerBundle is a bundle that has already been created by getBySpannedElement, so not
+    a big deal to iterate over it.
+    
+    
+    TODO: Show a test...
     '''
     if spannerBundle is None or len(spannerBundle) == 0:
         return
@@ -1084,9 +1128,28 @@ def spannersToMx(target, mxNoteList, mxDirectionPre, mxDirectionPost,
             mxSlur.set('type', 'stop')
         else:
             # this may not always be an error
-            environLocal.printDebug(['spanner w/ a component that is neither a start nor an end.', su, target])
+            #environLocal.printDebug(['spanner w/ a component that is neither a start nor an end.', su, target])
             continue
         mxNoteList[0].notationsObj.componentList.append(mxSlur)
+
+    for su in spannerBundle.getByClass('TremoloSpanner'):
+        mxTrem = mxObjects.Tremolo()
+        mxTrem.charData = str(su.numberOfMarks)
+        if su.isFirst(target):
+            mxTrem.set('type', 'start')
+        elif su.isLast(target):
+            mxTrem.set('type', 'stop')
+        else:
+            # this is always an error for tremolos
+            environLocal.printDebug(['spanner w/ a component that is neither a start nor an end.', su, target])
+        mxOrnamentsList = mxNoteList[0].notationsObj.getOrnaments()
+        if mxOrnamentsList == []: # need to create ornaments obj
+            mxOrnaments = mxObjects.Ornaments()
+            mxNoteList[0].notationsObj.componentList.append(mxOrnaments)
+            mxOrnamentsList = [mxOrnaments] # emulate returned obj
+
+        mxOrnamentsList[0].append(mxTrem)
+        
 
     for su in spannerBundle.getByClass('TrillExtension'):
         mxWavyLine = mxObjects.WavyLine()
@@ -1438,13 +1501,14 @@ def expressionToMx(orn):
         mx.set('placement', orn.placement)
     elif 'Fermata' in orn.classes:
         mx = fermataToMxFermata(orn)
+    elif 'Tremolo' in orn.classes:
+        mx = mxObjects.Tremolo()
+        mx.charData = orn.numberOfMarks
+        mx.set('type', 'single')
     elif 'Mordent' in orn.classes:
         mx = mxObjects.Mordent()
     elif 'InvertedMordent' in orn.classes:
         mx = mxObjects.InvertedMordent()
-    elif 'Trill' in orn.classes:
-        mx = mxObjects.TrillMark()
-        mx.set('placement', orn.placement)
     elif 'Turn' in orn.classes:
         mx = mxObjects.Turn()
     elif 'DelayedTurn' in orn.classes:
@@ -1634,7 +1698,7 @@ def noteheadToMxNotehead(obj, defaultColor=None):
     >>> n1 = note.Note('c3')
     >>> n1.notehead = 'diamond'
     >>> n1.noteheadParenthesis = True
-    >>> n1.noteheadFill = 'no'
+    >>> n1.noteheadFill = False
     >>> mxN4 = musicxml.toMxObjects.noteheadToMxNotehead(n1)
     >>> mxN4._attr['filled']
     'no'
@@ -1643,7 +1707,7 @@ def noteheadToMxNotehead(obj, defaultColor=None):
     '''
     mxNotehead = mxObjects.Notehead()
     nh = 'normal'
-    nhFill = 'default'
+    nhFill = None
     nhParen = False
 
     # default noteheard, regardless of if set as attr
@@ -1664,12 +1728,15 @@ def noteheadToMxNotehead(obj, defaultColor=None):
 
 
     if nh not in note.noteheadTypeNames:
-        raise NoteheadException('This notehead type is not supported by MusicXML: "%s"' % nh)
+        if nh is None:
+            nh = 'none'
+        else:
+            raise NoteheadException('This notehead type is not supported by MusicXML: "%s"' % nh)
     else:
         # should only set if needed, otherwise creates extra musicxl  data
         #if nh not in ['normal']: 
         mxNotehead.set('charData', nh)
-    if nhFill != 'default':
+    if nhFill is not None:
         mxNotehead.set('filled', nhFill)
     if nhParen is not False:
         mxNotehead.set('parentheses', nhParen)
@@ -1768,7 +1835,7 @@ def noteToMxNotes(n, spannerBundle=None):
             mxNote.beamList = nBeamsMx
 
     #Adds the notehead type if it is not set to the default 'normal'.
-    if (n.notehead != 'normal' or n.noteheadFill != 'default' or
+    if (n.notehead != 'normal' or n.noteheadFill is not None or
         n.color not in [None, '']):
         mxNoteList[0].noteheadObj = noteheadToMxNotehead(n)
 
@@ -1847,7 +1914,7 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
         rbSpanners = [] # for size comparison
 
     mxMeasure = mxObjects.Measure()
-    mxMeasure.set('number', m.number)
+    mxMeasure.set('number', m.measureNumberWithSuffix())
     if m.layoutWidth is not None:
         mxMeasure.set('width', m.layoutWidth)
 
@@ -2023,9 +2090,9 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
             elif 'GeneralNote' in classes: # this includes chords so caught before.
                 mxList = None
                 if 'Note' in classes:
-                    mxList = noteToMxNotes(obj)
+                    mxList = noteToMxNotes(obj, spannerBundle=spannerBundle)
                 elif 'Rest' in classes:
-                    mxList = restToMxNotes(obj)
+                    mxList = restToMxNotes(obj, spannerBundle=spannerBundle)
                 
                 mxMeasure.componentList += mxList
             elif 'Dynamic' in classes:
@@ -2083,6 +2150,11 @@ def measureToMx(m, spannerBundle=None, mxTranspose=None):
                 mxDirection.offset = mxOffset
                 # place at zero position, as offset value determines horizontal position, not location amongst notes
                 mxMeasure.insert(0, mxDirection)
+            elif 'Clef' in classes and obj.offset != 0.0:
+                # clef within bar
+                clefAttributes = mxObjects.Attributes()
+                clefAttributes.clefList = [clefToMxClef(obj)]
+                mxMeasure.componentList.append(clefAttributes)
             else: # other objects may have already been added
                 pass
                 #environLocal.printDebug(['mesureToMx of Measure is not processing', obj])
@@ -2169,12 +2241,6 @@ def streamPartToMx(part, instStream=None, meterStream=None,
 
         #environLocal.printDebug(['Stream.streamPartToMx: post makeNotation, length', len(measureStream)])
 
-        # after calling measuresStream, need to update Spanners, as a deepcopy
-        # has been made
-        # might need to getAll b/c might need spanners 
-        # from a higher level container
-        #spannerBundle = spanner.SpannerBundle(
-        #                measureStream.flat.getAllContextsByClass('Spanner'))
         # only getting spanners at this level
         #spannerBundle = spanner.SpannerBundle(measureStream.flat)
         spannerBundle = part.spannerBundle
@@ -2201,11 +2267,11 @@ def streamPartToMx(part, instStream=None, meterStream=None,
         # see if accidentals/beams can be processed
         if not measureStream.haveAccidentalsBeenMade():
             measureStream.makeAccidentals(inPlace=True)
-        if not measureStream.haveBeamsBeenMade():
+        if not measureStream.streamStatus.haveBeamsBeenMade():
             # if making beams, have to make a deep copy, as modifying notes
             try:
                 measureStream.makeBeams(inPlace=True)
-            except: # cannot match StreamException, must catch all
+            except exceptions21.StreamException: 
                 pass
         if spannerBundle is None:
             spannerBundle = spanner.SpannerBundle(measureStream.flat)
@@ -2349,7 +2415,10 @@ def streamToMx(s, spannerBundle=None):
 
             if (inst.midiChannel == None or
                 inst.midiChannel in midiChannelList):
-                inst.autoAssignMidiChannel(usedChannels=midiChannelList)
+                try:
+                    inst.autoAssignMidiChannel(usedChannels=midiChannelList)
+                except exceptions21.InstrumentException as e:
+                    environLocal.warn(str(e))
             midiChannelList.append(inst.midiChannel)
             #environLocal.printDebug(['midiChannel list', midiChannelList])
 
@@ -2430,6 +2499,7 @@ def streamToMx(s, spannerBundle=None):
         # add score part
         mxPartList.append(mxScorePart)
         # check for last
+        activeIndex = None
         for sg in staffGroups:
             if sg.isLast(p):
                 # find the spanner in the dictionary already-assigned
@@ -2439,7 +2509,8 @@ def streamToMx(s, spannerBundle=None):
                         break
                 mxPartGroup = mxObjects.PartGroup()
                 mxPartGroup.set('type', 'stop')
-                mxPartGroup.set('number', activeIndex)
+                if activeIndex is not None:
+                    mxPartGroup.set('number', activeIndex)
                 mxPartList.append(mxPartGroup)
 
     # addition of parts must simply be in the same order as above
@@ -2703,19 +2774,8 @@ def systemLayoutToMxPrint(systemLayout):
     
     >>> sl = layout.SystemLayout(leftmargin=234, rightmargin=124, distance=3, isNew=True)
     >>> mxPrint = musicxml.toMxObjects.systemLayoutToMxPrint(sl)
-
-    Test conversion back using the parallel routine
-    
-    >>> slAlt = layout.SystemLayout()
-    >>> musicxml.fromMxObjects.mxPrintToSystemLayout(mxPrint, slAlt)
-    >>> slAlt.leftMargin
-    234.0
-    >>> slAlt.rightMargin
-    124.0
-    >>> slAlt.distance
-    3.0
-    >>> slAlt.isNew
-    True
+    >>> mxPrint
+    <print new-system=yes <system-layout <system-margins left-margin=234 right-margin=124> system-distance=3>>
     '''
     mxPrint = mxObjects.Print()
     if systemLayout.isNew:

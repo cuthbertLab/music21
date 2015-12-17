@@ -30,6 +30,7 @@ from music21 import environment
 
 _MOD = 'search.segment.py'
 environLocal = environment.Environment(_MOD)
+import copy
 import os
 import math
 import json
@@ -88,7 +89,9 @@ def translateMonophonicPartToSegments(
     for m in inputStream.getElementsByClass('Measure'):
         mNotes = m.flat.getElementsByClass('Note')
         if algorithm == search.translateDiatonicStreamToString:
-            algorithmOutput, previousTuple = algorithm(mNotes, previousTuple[0], previousTuple[1], previousTuple[2], returnLastTuple=True)
+            algorithmOutput, previousTuple = algorithm(mNotes, previousTuple[0], 
+                                                       previousTuple[1], previousTuple[2], 
+                                                       returnLastTuple=True)
         else: # not all algorithms can take two streams...
             algorithmOutput = algorithm(mNotes) 
         
@@ -168,29 +171,21 @@ def indexScoreFilePaths(
     Returns a dictionary of the lists from indexScoreParts for each score in
     scoreFilePaths
     
-    ::
+    >>> searchResults = corpus.search('bwv19')
+    >>> fpsNamesOnly = sorted([searchResult.sourcePath
+    ...     for searchResult in searchResults])
+    >>> len(fpsNamesOnly)
+    9
 
-        >>> searchResults = corpus.search('bwv19')
-        >>> fpsNamesOnly = sorted([searchResult.sourcePath
-        ...     for searchResult in searchResults])
-        >>> len(fpsNamesOnly)
-        9
+    >>> scoreDict = search.segment.indexScoreFilePaths(fpsNamesOnly[2:5])
+    >>> len(scoreDict['bwv190.7.mxl'])
+    4
 
-    ::
+    >>> scoreDict['bwv190.7.mxl'][0]['measureList']
+    [0, 5, 11, 17, 22, 27]
 
-        >>> scoreDict = search.segment.indexScoreFilePaths(fpsNamesOnly[2:5])
-        >>> len(scoreDict['bwv190.7.mxl'])
-        4
-
-    ::
-
-        >>> scoreDict['bwv190.7.mxl'][0]['measureList']
-        [0, 5, 11, 17, 22, 27]
-
-    ::
-
-        >>> scoreDict['bwv190.7.mxl'][0]['segmentList'][0]
-        'NNJLNOLLLJJIJLLLLNJJJIJLLJNNJL'
+    >>> scoreDict['bwv190.7.mxl'][0]['segmentList'][0]
+    'NNJLNOLLLJJIJLLLLNJJJIJLLJNNJL'
     
     '''
     scoreDict = OrderedDict()
@@ -202,16 +197,26 @@ def indexScoreFilePaths(
             print("Indexing %s (%d/%d)" % (
                 shortfp, scoreIndex, totalScores))
         scoreIndex += 1
-        try:
-            if not os.path.isabs(filePath):
-                scoreObj = corpus.parse(filePath)
-            else:
-                scoreObj = converter.parse(filePath)
-            scoreDict[shortfp] = indexScoreParts(scoreObj, *args, **kwds)
-        except:
-            print("Failed on parse for: %s" % filePath)
+        if 'failFast' not in kwds or kwds['failFast'] is False:        
+            try:
+                scoreDict[shortfp] = indexOnePath(filePath, *args, **kwds)
+            except Exception as e: # pylint: disable=broad-except
+                print("Failed on parse for, %s: %s" % (filePath, str(e)))
+        else:
+            kwds2 = copy.copy(kwds)
+            del(kwds2['failFast'])
+            scoreDict[shortfp] = indexOnePath(filePath, *args, **kwds2)
+            
     return scoreDict
 
+
+def indexOnePath(filePath, *args, **kwds):
+    if not os.path.isabs(filePath):
+        scoreObj = corpus.parse(filePath)
+    else:
+        scoreObj = converter.parse(filePath)
+    scoreDictEntry = indexScoreParts(scoreObj, *args, **kwds)
+    return scoreDictEntry
 
 def saveScoreDict(scoreDict, filePath=None):
     '''
@@ -316,7 +321,8 @@ def scoreSimilarity(
                     thatScoreKey = scoreDictKeys[thatScoreNumber]
                     thatScore = scoreDict[thatScoreKey]
                     for pNum2 in range(len(thatScore)):
-                        for thatSegmentNumber, thatSegment in enumerate(thatScore[pNum2]['segmentList']):
+                        for thatSegmentNumber, thatSegment in enumerate(
+                                                            thatScore[pNum2]['segmentList']):
                             if len(thatSegment) < minimumLength:
                                 continue
                             dl.set_seq1(thatSegment)

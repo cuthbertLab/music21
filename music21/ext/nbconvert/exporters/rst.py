@@ -1,6 +1,5 @@
-"""
-Exporter for exporting notebooks to restructured text.
-"""
+"""restructuredText Exporter class"""
+
 #-----------------------------------------------------------------------------
 # Copyright (c) 2013, the IPython Development Team.
 #
@@ -13,40 +12,29 @@ Exporter for exporting notebooks to restructured text.
 # Imports
 #-----------------------------------------------------------------------------
 
-from IPython.utils.traitlets import Unicode
 from IPython.config import Config
 
-# local import
-import exporter
+from .templateexporter import TemplateExporter
 
 #-----------------------------------------------------------------------------
 # Classes
 #-----------------------------------------------------------------------------
 
-class RstExporter(exporter.Exporter):
+class RSTExporter(TemplateExporter):
     """
     Exports restructured text documents.
     """
     
-    file_extension = Unicode(
-        'rst', config=True, 
-        help="Extension of the file that should be written to disk")
+    def _file_extension_default(self):
+        return '.rst'
 
-    template_file = Unicode(
-            'rst', config=True,
-            help="Name of the template file to use")
+    def _template_file_default(self):
+        return 'rst'
 
-    _default_config = Config({'ExtractFigureTransformer':{'enabled':True}}) 
+    output_mimetype = 'text/restructuredtext'
 
-
-    def __init__(self, transformers=None, filters=None, config=None, **kw):
-       
-        c = self.default_config
-        if config :
-            c.merge(config)
-        
-        super(RstExporter, self).__init__(transformers=transformers,
-                                                filters=filters,
-                                                config=c,
-                                                **kw)
-                    
+    @property
+    def default_config(self):
+        c = Config({'ExtractOutputPreprocessor':{'enabled':True}})
+        c.merge(super(RSTExporter,self).default_config)
+        return c

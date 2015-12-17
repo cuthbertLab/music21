@@ -1,73 +1,67 @@
 {% extends 'display_priority.tpl' %}
-{% block in_prompt %}
-In[{{cell.prompt_number if cell.prompt_number else ' '}}]:{% endblock in_prompt %}
 
-{% block output_prompt %}{% if cell.haspyout %}Out[{{cell.prompt_number}}]:
-{%- endif %}{%- endblock output_prompt %}
+
+{% block in_prompt %}
+{% endblock in_prompt %}
+
+{% block output_prompt %}
+{%- endblock output_prompt %}
 
 {% block input %}
-```
-{{ cell.input}}
-```
+{{ cell.source | indent(4)}}
 {% endblock input %}
 
-{% block pyerr %}
+{% block error %}
 {{ super() }}
-{% endblock pyerr %}
+{% endblock error %}
 
 {% block traceback_line %}
-{{ line |indent| rm_ansi }}{% endblock traceback_line %}
+{{ line | indent | strip_ansi }}
+{% endblock traceback_line %}
 
-{% block pyout %}
-{% block data_priority scoped %}{{ super()}}{% endblock %}
-{% endblock pyout %}
+{% block execute_result %}
+
+{% block data_priority scoped %}
+{{ super() }}
+{% endblock %}
+{% endblock execute_result %}
 
 {% block stream %}
-{{ output.text| indent }}
+{{ output.text | indent }}
 {% endblock stream %}
 
-
-
-
 {% block data_svg %}
-[!image]({{output.key_svg}})
+![svg]({{ output.metadata.filenames['image/svg+xml'] | path2url }})
 {% endblock data_svg %}
 
 {% block data_png %}
-[!image]({{output.key_png}})
+![png]({{ output.metadata.filenames['image/png'] | path2url }})
 {% endblock data_png %}
 
 {% block data_jpg %}
-[!image]({{output.key_jpg}})
+![jpeg]({{ output.metadata.filenames['image/jpeg'] | path2url }})
 {% endblock data_jpg %}
 
-
-
 {% block data_latex %}
-$$
-{{output.latex}}
-$$
+{{ output.data['text/latex'] }}
 {% endblock data_latex %}
 
+{% block data_html scoped %}
+{{ output.data['text/html'] }}
+{% endblock data_html %}
+
+{% block data_markdown scoped %}
+{{ output.data['text/markdown'] }}
+{% endblock data_markdown %}
+
 {% block data_text scoped %}
-
-{{output.text | indent}}
-
+{{ output.data['text/plain'] | indent }}
 {% endblock data_text %}
 
 {% block markdowncell scoped %}
-{{ cell.source | wrap(80)}}
+{{ cell.source }}
 {% endblock markdowncell %}
 
-{% block headingcell scoped %}
-
-{{ '#' * cell.level }} {{ cell.source}}
-
-{% endblock headingcell %}
-
-{% block rawcell scoped %}{{ cell.source  }}
-{% endblock rawcell %}
-
 {% block unknowncell scoped %}
-unknown type  {{cell.type}}
+unknown type  {{ cell.type }}
 {% endblock unknowncell %}

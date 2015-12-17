@@ -1,4 +1,13 @@
 # -*- coding: utf-8 -*-
+#-------------------------------------------------------------------------------
+# Name:         corpus/testCorpus.py
+# Purpose:      testing for the corpus
+#
+# Authors:      Chris Ariza 
+#
+# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# License:      LGPL or BSD, see license.txt
+#-------------------------------------------------------------------------------
 from music21 import corpus
 import unittest
 import re
@@ -85,23 +94,23 @@ class Test(unittest.TestCase):
             (u'essenFolksong/han1.abc', u'528'),
             (u'essenFolksong/han1.abc', u'529'),
             (u'essenFolksong/han1.abc', u'530'),
-            (u'essenFolksong/han2.abc', u'204'),
-            (u'essenFolksong/han2.abc', u'205'),
-            (u'essenFolksong/han2.abc', u'206'),
-            (u'essenFolksong/han2.abc', u'207'),
-            (u'essenFolksong/han2.abc', u'208'),
-            (u'essenFolksong/han2.abc', u'209'),
-            (u'essenFolksong/han2.abc', u'210'),
-            (u'essenFolksong/han2.abc', u'211'),
-            (u'essenFolksong/han2.abc', u'212'),
-            (u'essenFolksong/han2.abc', u'213'),
-            (u'essenFolksong/han2.abc', u'214'),
-            (u'essenFolksong/han2.abc', u'215'),
-            (u'essenFolksong/han2.abc', u'216'),
-            (u'essenFolksong/han2.abc', u'217'),
-            (u'essenFolksong/han2.abc', u'218'),
-            (u'essenFolksong/han2.abc', u'219'),
-            (u'essenFolksong/han2.abc', u'220'),
+             (u'essenFolksong/han2.abc', u'204'),
+             (u'essenFolksong/han2.abc', u'205'),
+             (u'essenFolksong/han2.abc', u'206'),
+             (u'essenFolksong/han2.abc', u'207'),
+             (u'essenFolksong/han2.abc', u'208'),
+             (u'essenFolksong/han2.abc', u'209'),
+             (u'essenFolksong/han2.abc', u'210'),
+             (u'essenFolksong/han2.abc', u'211'),
+             (u'essenFolksong/han2.abc', u'212'),
+             (u'essenFolksong/han2.abc', u'213'),
+             (u'essenFolksong/han2.abc', u'214'),
+             (u'essenFolksong/han2.abc', u'215'),
+             (u'essenFolksong/han2.abc', u'216'),
+             (u'essenFolksong/han2.abc', u'217'),
+             (u'essenFolksong/han2.abc', u'218'),
+             (u'essenFolksong/han2.abc', u'219'),
+             (u'essenFolksong/han2.abc', u'220'),
             ])
 
     def testSearch04(self):
@@ -132,7 +141,7 @@ class Test(unittest.TestCase):
 
     def testSearch10(self):
         from music21 import key
-        ks = key.KeySignature(3, 'major')
+        ks = key.KeySignature(3)
         searchResults = corpus.search(str(ks), field='keySignature')
         self.assertEqual(len(searchResults) >= 32, True, len(searchResults))
 
@@ -146,16 +155,21 @@ class Test(unittest.TestCase):
         self.assertEqual(len(searchResults) > 0, True)
         # returns items in pairs: url and work number
         self.assertEqual(searchResults[0].sourcePath,
-            'http://impromastering.com/uploads/transcription_file/file/196/Giant_Steps__John_Coltrane_C.xml')
+            'http://impromastering.com/uploads/transcription_file/' + 
+            'file/196/Giant_Steps__John_Coltrane_C.xml')
 
 #     def testGetWorkList(self):
-#         self.assertEqual(len(corpus.getPaths('.md')) >= 38, True)
-#         workList = corpus.getWorkList('bach/artOfFugue_bwv1080', 1, '.zip')
+#         self.assertEqual(len(corpus.corpora.CoreCorpus().getPaths('.md')) >= 38, True)
+#         workList = corpus.corpora.CoreCorpus().getWorkList('bach/artOfFugue_bwv1080', 1, '.zip')
 #         self.assertEqual(len(workList), 1)
-#         self.assertEqual(len(corpus.getWorkList('handel/hwv56', (1, 1), '.md')), 1)
-#         self.assertEqual(len(corpus.getWorkList('handel/hwv56', '1-01', '.md')), 1)
-#         self.assertEqual(len(corpus.getWorkList('bach/artOfFugue_bwv1080')), 21)
-#         self.assertEqual(len(corpus.getWorkList('bach/artOfFugue_bwv1080', 1)), 1)
+#         self.assertEqual(len(
+#                corpus.corpora.CoreCorpus().getWorkList('handel/hwv56', (1, 1), '.md')), 1)
+#         self.assertEqual(len(
+#                corpus.corpora.CoreCorpus().getWorkList('handel/hwv56', '1-01', '.md')), 1)
+#         self.assertEqual(len(
+#                corpus.corpora.CoreCorpus().getWorkList('bach/artOfFugue_bwv1080')), 21)
+#         self.assertEqual(len(
+#                corpus.corpora.CoreCorpus().getWorkList('bach/artOfFugue_bwv1080', 1)), 1)
 # 
 #         # there are two versions of this file
 #         self.assertEqual(len(corpus.getWorkList('beethoven/opus18no1', 1)), 2)
@@ -172,9 +186,9 @@ class Test(unittest.TestCase):
 #             'bwv888', 'bwv889', 'bwv890', 'bwv891', 'bwv892', 'bwv893',
 #             ]:
 #             #print bwv
-#             self.assertEqual(len(corpus.getWorkList(bwv)), 2)
-#             self.assertEqual(len(corpus.getWorkList(bwv, 1)), 1)
-#             self.assertEqual(len(corpus.getWorkList(bwv, 2)), 1)
+#             self.assertEqual(len(corpus.corpora.CoreCorpus().getWorkList(bwv)), 2)
+#             self.assertEqual(len(corpus.corpora.CoreCorpus().getWorkList(bwv, 1)), 1)
+#             self.assertEqual(len(corpus.corpora.CoreCorpus().getWorkList(bwv, 2)), 1)
 
 #     def testWTCImport01(self):
 #         score = corpus.parse('bach/bwv846', 1)

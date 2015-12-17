@@ -30,15 +30,20 @@ of Music21 makes installation cleaner, and also helps other software - like
 package managers in various Linux distributions - work with Music21 without
 complaint.
 
+Changing Versions
+==================
+
 When it's time to update Music21's version, just change the numbers in the
 tuple assigned to __version_info__, and the __version__ string will be
 updated along with it.
 
 When changing, update the single test case in base.py, and in freezeThaw.JSONFreezer.jsonPrint
-and at the end of the two corpus/metadataCache .jsons
+(on a major version change). If you dare edit a 28MB file, chang it 
+at the end of the two corpus/metadataCache .jsons, but only a problem there sometimes.
 
 Changing this number invalidates old pickles -- do it if the old pickles create a problem.
 '''
 
-__version_info__ = (2, 0, 4)
+__version_info__ = (3, 0, 2)
 __version__ = '.'.join(str(x) for x in __version_info__)
+

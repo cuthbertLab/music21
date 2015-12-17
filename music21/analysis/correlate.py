@@ -10,9 +10,6 @@
 #-------------------------------------------------------------------------------
 '''
 Various tools and utilities to find correlations between disparate objects in a Stream.
-
-See the chapter :ref:`overviewFormats` for more information and examples of 
-converting formats into and out of music21.
 '''
 
 
@@ -123,7 +120,7 @@ class ActivityMatch(object):
 
         Many dynamics
 
-        >>> s = corpus.parse('schoenberg')
+        >>> s = corpus.parse('schoenberg/opus19/movement2')
         >>> am = analysis.correlate.ActivityMatch(s.parts[0].flat)
         >>> data = am.pitchToDynamic()
         >>> len(data)
@@ -138,11 +135,12 @@ class ActivityMatch(object):
         for objName in [objNameSrc, objNameDst]:
             dstCheck = self.streamObj.flat.getElementsByClass(objName)
             if len(dstCheck) == 0:
-                raise CorrelateException('cannot create correlation an object that is not found in the Stream: %s' % objName)
+                raise CorrelateException('cannot create correlation an object ' +
+                                         'that is not found in the Stream: %s' % objName)
 
         self._findActive(objNameSrc, objNameDst)
 
-        fx = lambda e: e.ps
+        fx = lambda e: e.pitch.ps
         # get index value used for dynamics
         fy = lambda e: dynamics.shortNames.index(e.value)
 
@@ -154,7 +152,7 @@ class ActivityMatch(object):
 
             #if hasattr(entrySrc, 'pitches'): # a chord
             if entrySrc.isChord:
-                sub = entrySrc.pitches
+                sub = [n for n in entrySrc]
             else:   
                 sub = [entrySrc]
 
@@ -196,7 +194,8 @@ class Test(unittest.TestCase):
         pass
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
+        '''
+        Test copying all objects defined in this module
         '''
         import sys, types, copy
         for part in sys.modules[self.__module__].__dict__:

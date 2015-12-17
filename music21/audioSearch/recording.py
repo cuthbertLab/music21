@@ -44,15 +44,15 @@ environLocal = environment.Environment(_MOD)
 # users of 64-bit windows and 64-bit python should download the amd64 port
 # requires portaudio to be installed http://www.portaudio.com/download.html
 
-recordChannels = 1
-recordSampleRate = 44100
-recordChunkLength = 1024
+default_recordChannels = 1
+default_recordSampleRate = 44100
+default_recordChunkLength = 1024
 
 def samplesFromRecording(seconds=10.0, storeFile=True,
                 recordFormat=None,
-                recordChannels=recordChannels,
-                recordSampleRate=recordSampleRate,
-                recordChunkLength=1024):
+                recordChannels=default_recordChannels,     
+                recordSampleRate=default_recordSampleRate, 
+                recordChunkLength=default_recordChunkLength):
     '''
     records `seconds` length of sound in the given format (default Wave)
     and optionally stores it to disk using the filename of `storeFile`
@@ -66,6 +66,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
         recordFormatDefault = pyaudio.paInt16
     except (ImportError, SystemExit):
         pyaudio = None
+        environLocal.warn("No Pyaudio found. Recording will probably not work.")
         recordFormatDefault = 8 # pyaudio.paInt16    
 
     if recordFormat is None:
@@ -99,7 +100,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
         else:
             waveFilename = environLocal.getRootTempDir() + os.path.sep + 'recordingTemp.wav'
         ### write recording to disk
-        data = ''.join(storedWaveSampleList)
+        data = b''.join(storedWaveSampleList)
         try:
             wf = wave.open(waveFilename, 'wb')
             wf.setnchannels(recordChannels)

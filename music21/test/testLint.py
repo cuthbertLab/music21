@@ -12,11 +12,16 @@
 
 # this requires pylint to be installed and available from the command line
 
+import multiprocessing
+import sys
 
-import os, sys
+from music21.test import commonTest
 
-from music21 import common
-from music21.test import testSingleCoreAll as test
+try:
+    from pylint.lint import Run as pylintRun
+except ImportError:
+    pylintRun = None
+
 
 
 # see feature list here:
@@ -24,46 +29,61 @@ from music21.test import testSingleCoreAll as test
 
 # W0511:	Used when a warning note as FIXME or XXX is detected.
 # W0404:	Reimport %r (imported line %s) Used when a module is reimported multiple times.
+
 # we do this all the time in unit tests
-# R0201:	Method could be a function Used when a method doesn't use its bound instance, and so could be written as a function.
-# R0904:	Too many public methods (%s/%s) Used when class has too many public methods, try to reduce this to get a more simple (and so easier to use) class.
-# E1101:	%s %r has no %r member Used when a variable is accessed for an unexistant member.
-# R0914:	Too many local variables (%s/%s) Used when a function or method has too many local variables.
+# R0201:	Method could be a function Used when a method doesn't 
+#           use its bound instance, and so could be written as a function.
+# R0904:	Too many public methods (%s/%s) Used when class has too many public methods, 
+#            try to reduce this to get a more simple (and so easier to use) class.
+# E1101:	%s %r has no %r member Used when a variable is accessed for an non-existent member.
+# R0914:	Too many local variables (%s/%s) Used when a function or method has 
+#           too many local variables.
 # many of our test use many local variables
-# R0903:	Too few public methods (%s/%s) Used when class has too few public methods, so be sure it's really worth it.
-# R0911:	Too many return statements (%s/%s) Used when a function or method has too many return statement, making it hard to follow.
+# R0903:	Too few public methods (%s/%s) Used when class has too few public methods,
+#                  so be sure it's really worth it.
+# R0911:	Too many return statements (%s/%s) Used when a function or method has
+#                  too many return statement, making it hard to follow.
 
 
 def main(fnAccept=None):
     '''
-    `fnAccept` is a list of one or more files to test.
+    `fnAccept` is a list of one or more files to test.  Otherwise runs all.
     '''
-    sourceFolder = common.getSourceFilePath()
-    mg = test.ModuleGather()
-    print("If you get an error, make sure that 'sudo pip install pylint' is there")
+    poolSize = multiprocessing.cpu_count() # @UndefinedVariable
+    if poolSize > 2:
+        poolSize = poolSize - 1
 
-    # only accept a few file names for now
-    if fnAccept in (None, []):
-        fnAccept = ['stream']
-    fnPathReject = ['/ext/',
-                    'bar.py',  # crashes pylint...
-                    'repeat.py', # hangs pylint...
-                    'spanner.py', # hangs pylint...
+    if pylintRun is None:
+        print("make sure that 'sudo pip install pylint' is there. exiting.")
+        return 
+
+    mg = commonTest.ModuleGather()
+
+    fnPathReject = [
+                    'demos/',
+                    'alpha/webapps/server',
+                    'test/',
+                    'mxObjects.py',
+                    'fromMxObjects.py',
+                    'toMxObjects.py',
+                    'xmlHandler.py',
+                    '/ext/',
+                    #'bar.py',  # used to crash pylint...
+                    #'repeat.py', # used to hang pylint...
+                    #'spanner.py', # used to hang pylint...
                     ]
-        #fnAccept = ['stream.py', 'note.py', 'chord.py']
     disable = [
-                #'C0301', 'C0302', 'C0103', 'C0330', 'C0324', 
-                #'W0621', 'W0511', 
-                #'W0404', 'R0201', 'R0904', 'E1101', 'R0914', 'R0903',
-                #'R0911', 'R0902', 
+                'cyclic-import', # we use these inside functions when there's a deep problem.
                 'unnecessary-pass', # nice, but not really a problem...
-                'locally-disabled', # test for this later, but hopefully will know what they're doing
+                'locally-disabled', # test for this later, but hopefully will know what 
+                            # they're doing
+
+                'duplicate-code', # needs to ignore strings -- keeps getting doctests...
 
                 'arguments-differ', # someday...
                 'abstract-class-instantiated', # this trips on the fractions.Fraction() class.
-                'redefined-builtin', # remove when Eclipse tags are parsed @ReservedAssignment = pylint: disable=W0622
                 'fixme', # known...
-                'superfluous-parens', # next...
+                'superfluous-parens', # nope -- if they make things clearer...
                 'too-many-statements', # someday
                 'no-member', # important, but too many false positives
                 'too-many-arguments', # definitely! but takes too long to get a fix now...
@@ -71,14 +91,13 @@ def main(fnAccept=None):
                 'too-many-branches', # yes, someday
                 'too-many-locals',   # no
                 'too-many-lines',    # yes, someday.
-                'bad-whitespace',    # maybe later, but "bad" isn't something I necessarily agree with
+                'bad-whitespace', # maybe later, but "bad" isn't something I necessarily agree with
                 'bad-continuation',  # never remove -- this is a good thing many times.
-                'line-too-long',     # maybe later
                 'too-many-return-statements', # we'll see
                 'unpacking-non-sequence', # gets it wrong too often.
                 'too-many-instance-attributes', # maybe later
                 
-                'invalid-name',      # never remove -- these are good music21 names; fix the regexp instead...
+                'invalid-name',      # these are good music21 names; fix the regexp instead...
                 'no-self-use',       # maybe later
                 'too-few-public-methods', # never remove or set to 1
                 'trailing-whitespace',  # should ignore blank lines with tabs
@@ -90,16 +109,36 @@ def main(fnAccept=None):
                 'import-self', # fix is either to get rid of it or move away many tests...
                ]
 
-    cmd = ['/usr/bin/env pylint -f colorized ' +
-           '--dummy-variables-rgx="_|dummy|unused|i|j|junk" ' + 
-           '--docstring-min-length=3 ' +
-           '--max-args=7 ' +  # should be 5 later, but baby steps
-           '--bad-name="foo,shit,fuck,stuff" ' # definitely allow "bar" for barlines
+    goodnameRx = {'argument-rgx': r'[a-z_][A-Za-z0-9_]{2,30}$',
+                  'attr-rgx': r'[a-z_][A-Za-z0-9_]{2,30}$',
+                  'class-rgx': r'[A-Z_][A-Za-z0-9_]{2,30}$',
+                  'function-rgx': r'[a-z_][A-Za-z0-9_]{2,30}$',
+                  'method-rgx': r'[a-z_][A-Za-z0-9_]{2,30}$',
+                  'module-rgx': r'(([a-z_][a-zA-Z0-9_]*)|([A-Z][a-zA-Z0-9]+))$',
+                  'variable-rgx': r'[a-z_][A-Za-z0-9_]{2,30}$',
+                  }
+
+    cmd = ['--output-format=parseable',
+           r'--dummy-variables-rgx="_$|dummy|unused|i$|j$|junk|counter"', 
+           '--docstring-min-length=3',
+           '--max-args=7',  # should be 5 later, but baby steps
+           '--bad-names="foo,shit,fuck,stuff"', # definitely allow "bar" for barlines
+           '--reports=n',
+           '--max-branches=20',
+           '-j ' + str(poolSize), # multiprocessing!
+           r'--ignore-long-lines="converter\.parse"', # some tiny notation...
+           '--max-line-length=100', # tada
            ]
+    for gn, gnv in goodnameRx.items():
+        cmd.append('--' + gn + '="' + gnv + '"')
+
+    #print(cmd)
+    
     for pyLintId in disable:
         cmd.append('--disable=%s' % pyLintId)
 
     # add entire package
+    acceptable = []
     for fp in mg.modulePaths:
         rejectIt = False
         for rejectPath in fnPathReject:
@@ -108,15 +147,21 @@ def main(fnAccept=None):
                 break
         if rejectIt:
             continue
-        fpRelative = fp.replace(sourceFolder, '')
-        unused_dir, fn = os.path.split(fpRelative)
-        fnNoExt = fn.replace('.py', '')
-        fpRelativeNoSlash = fpRelative[1:]
-        if fn in fnAccept or fnNoExt in fnAccept or fpRelative in fnAccept or fpRelativeNoSlash in fnAccept:
-            cmdFile = cmd + [fp]
-            print(' '.join(cmdFile))
-            if common.getPlatform() != 'win':
-                os.system(' '.join(cmdFile))
+        if fnAccept:
+            rejectIt = True
+            for acceptableName in fnAccept:
+                if acceptableName in fp:
+                    rejectIt = False
+                    break
+            if rejectIt:
+                continue
+
+        acceptable.append(fp)
+
+    cmdFile = cmd + acceptable
+    #print(' '.join(cmdFile))
+    #print(fp)
+    pylintRun(cmdFile, exit=False)
 
 
 if __name__ == '__main__':

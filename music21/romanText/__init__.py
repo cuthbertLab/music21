@@ -14,7 +14,7 @@
 demonstrated by Dmitri Tymoczko.
 '''
 
-__all__ = ['clercqTemperley', 'translate', 'testFiles', 'objects']
+__all__ = ['clercqTemperley', 'translate', 'testFiles', 'rtObjects']
 
 from music21.romanText import clercqTemperley
 from music21.romanText import testFiles

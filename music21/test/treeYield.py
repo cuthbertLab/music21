@@ -9,7 +9,6 @@
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert
 # License:      CC-BY (see http://stackoverflow.com/questions/12611337/recursively-dir-a-python-object-to-find-values-of-a-certain-type-or-with-a-cer)
 #-------------------------------------------------------------------------------
-import types
 import sys
 if sys.version_info[0] >= 3:
     unicode = str
@@ -22,6 +21,7 @@ class TreeYielder(object):
         will be passed the value of a current attribute
         '''        
         self.currentStack = []
+        self.memo = None
         self.yieldValue = yieldValue
         self.stackVals = []
         self.nonIterables = [int, str, unicode, # t.LongType,
@@ -86,7 +86,7 @@ class TreeYielder(object):
             for x in instance_dict:
                 try:
                     gotValue = object.__getattribute__(obj, x)
-                except: # ?? property that relies on something else being set.
+                except Exception: # ?? property that relies on something else being set.
                     continue
                 objTuple = ('getattr', x)
                 self.stackVals.append(objTuple)
@@ -139,7 +139,7 @@ def testCode():
         print(val, ty.currentLevel())
 
 def testMIDIParse():
-    from music21 import converter, corpus, common
+    from music21 import converter, common
     from music21 import freezeThaw
 
     #a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
@@ -170,3 +170,4 @@ if __name__ == "__main__":
     pass
     #testCode()
     testMIDIParse()
+    

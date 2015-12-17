@@ -125,6 +125,7 @@ class Articulation(base.Music21Object):
         self.placement = 'above'
         # declare a unit interval shift for the performance of this articulation
         self._volumeShift = 0.0 
+        self.tieAttach = 'first' # attach to first or last or all notes after split
 
     def __repr__(self):
         return '<music21.articulations.%s>' % (self.__class__.__name__)
@@ -203,7 +204,8 @@ class Articulation(base.Music21Object):
         self._volumeShift = value
 
     volumeShift = property(_getVolumeShift, _setVolumeShift, doc='''
-        Get or set the volumeShift of this Articulation. This value, between -1 and 1, that is used to shift the final Volume of the object it is attached to.
+        Get or set the volumeShift of this Articulation. This value, between -1 and 1, 
+        that is used to shift the final Volume of the object it is attached to.
 
         
         >>> at1 = articulations.StrongAccent()
@@ -217,28 +219,29 @@ class LengthArticulation(Articulation):
     Superclass for all articulations that change the length of a note.
     '''
     def __init__(self):
-        Articulation.__init__(self)
+        super(LengthArticulation, self).__init__()
+        self.tieAttach = 'last'
 
 class DynamicArticulation(Articulation):
     '''
     Superclass for all articulations that change the dynamic of a note.
     '''
     def __init__(self):
-        Articulation.__init__(self)
+        super(DynamicArticulation, self).__init__()
 
 class PitchArticulation(Articulation):
     '''
     Superclass for all articulations that change the pitch of a note.
     '''
     def __init__(self):
-        Articulation.__init__(self)
+        super(PitchArticulation, self).__init__()
 
 class TimbreArticulation(Articulation):
     '''
     Superclass for all articulations that change the timbre of a note.
     '''
     def __init__(self):
-        Articulation.__init__(self)
+        super(TimbreArticulation, self).__init__()
 
 
 #-------------------------------------------------------------------------------

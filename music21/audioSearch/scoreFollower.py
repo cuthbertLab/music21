@@ -33,9 +33,7 @@ class ScoreFollower(object):
             self.scoreNotesOnly = scoreStream.flat.notesAndRests
         else:
             self.scoreNotesOnly = None
-        self.waveFile = environLocal.getRootTempDir() + \
-            os.path.sep + \
-            'scoreFollowerTemp.wav'
+        self.waveFile = os.path.join(environLocal.getRootTempDir(), 'scoreFollowerTemp.wav')
         self.lastNotePostion = 0
         self.currentSample = 0
         self.totalFile = 0
@@ -51,6 +49,13 @@ class ScoreFollower(object):
         self.silencePeriodCounter = 0
         self.notesCounter = 0
         self.begins = True
+
+        self.useScale = None
+        self.silencePeriod = None
+        self.result = None
+        self.useMic = None
+        self.processing_time = None
+        self.seconds_recording = None
 
     def runScoreFollower(
         self,
@@ -99,17 +104,16 @@ class ScoreFollower(object):
         if there has been a problem like some consecutive bad matchings or the
         score has finished.
 
-        >>> from music21 import common, converter
         >>> from music21.audioSearch import scoreFollower
         >>> scoreNotes = " ".join(["c4", "d", "e", "f", "g", "a", "b", "c'", "c", "e",
         ...     "g", "c'", "a", "f", "d", "c#", "d#", "f#","c", "e", "g", "c'",
         ...     "a", "f", "d", "c#", "d#", "f#"])
-        >>> scNotes = converter.parse("tinynotation: 4/4 " + scoreNotes)
+        >>> scNotes = converter.parse("tinynotation: 4/4 " + scoreNotes, makeNotation=False)
         >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         >>> ScF.useMic = False
         >>> import os #_DOCS_HIDE
-        >>> readPath = os.path.join(common.getSourceFilePath(), 'audioSearch', 'test_audio.wav') #_DOCS_HIDE
-        >>> ScF.waveFile = readPath #_DOCS_HIDE
+        >>> ScF.waveFile = os.path.join(common.getSourceFilePath(), #_DOCS_HIDE
+        ...                 'audioSearch', 'test_audio.wav') #_DOCS_HIDE
         >>> #_DOCS_SHOW ScF.waveFile = 'test_audio.wav'
         >>> ScF.seconds_recording = 10
         >>> ScF.useScale = scale.ChromaticScale('C4')
@@ -213,7 +217,6 @@ class ScoreFollower(object):
         Detection of consecutive periods of silence.
         Useful if the musician has some consecutive measures of silence.
 
-        >>> from music21 import corpus, note
         >>> from music21.audioSearch import scoreFollower
         >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
         >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
@@ -267,7 +270,6 @@ class ScoreFollower(object):
         See example of a bad prediction at the beginning of the song:
 
         >>> from time import time
-        >>> from music21 import corpus
         >>> from music21.audioSearch import scoreFollower
         >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
         >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
@@ -458,7 +460,6 @@ class ScoreFollower(object):
         It returns a number with the position of the predicted note in the
         score.
 
-        >>> from music21 import corpus
         >>> from time import time
         >>> from music21.audioSearch import scoreFollower
         >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
@@ -492,9 +493,6 @@ class ScoreFollower(object):
         notePrediction,
         lastNotePosition,
         ):
-        '''
-
-        '''
         from music21 import audioSearch
 
         # Analyzing streams
@@ -543,7 +541,8 @@ class ScoreFollower(object):
         number = int(listOfParts[position].id)
 
         if self.silencePeriod is True and self.silencePeriodCounter < 5:
-            # print lastCountdown, self.countdown, lastNotePosition, beginningData[number], lengthData[number]
+            # print(lastCountdown, self.countdown, lastNotePosition, 
+            #    beginningData[number], lengthData[number])
             environLocal.printDebug("All rest period")
             self.countdown -= 1
 
@@ -552,9 +551,12 @@ class ScoreFollower(object):
         else:
             probabilityHit = listOfParts[position].matchProbability
 
-        unused_listOfParts2 = search.approximateNoteSearch(transcribedScore.flat.notesAndRests, totScores)
-        unused_listOfParts3 = search.approximateNoteSearchNoRhythm(transcribedScore.flat.notesAndRests, totScores)
-        unused_listOfParts4 = search.approximateNoteSearchOnlyRhythm(transcribedScore.flat.notesAndRests, totScores)
+        unused_listOfParts2 = search.approximateNoteSearch(
+                                    transcribedScore.flat.notesAndRests, totScores)
+        unused_listOfParts3 = search.approximateNoteSearchNoRhythm(
+                                    transcribedScore.flat.notesAndRests, totScores)
+        unused_listOfParts4 = search.approximateNoteSearchOnlyRhythm(
+                                    transcribedScore.flat.notesAndRests, totScores)
 #        print "PROBABILITIES:",
 #        print "pitches and durations weighted (current)",listOfParts[position].matchProbability,
 #        print "pitches and durations without weighting" , listOfParts2[position].matchProbability,

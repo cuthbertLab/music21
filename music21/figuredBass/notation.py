@@ -130,15 +130,26 @@ class Notation(object):
     >>> n3.figures[1]
     <music21.figuredBass.notation Figure 3 <modifier b <accidental flat>>>
     '''
-    _DOC_ORDER = ['notationColumn', 'figureStrings', 'numbers', 'modifiers', 'figures', 'origNumbers', 'origModStrings', 'modifierStrings']
-    _DOC_ATTR = {'modifiers': 'A list of :class:`~music21.figuredBass.notation.Modifier` objects associated with the expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
-                 'notationColumn': 'A string of figures delimited by commas, each associated with a number and an optional modifier.',
-                 'modifierStrings': 'The modifiers associated with the expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`, as strings.',
-                 'figureStrings': 'A list of figures derived from the original :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
-                 'origNumbers': 'The numbers associated with the original :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
-                 'numbers': 'The numbers associated with the expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
-                 'origModStrings': 'The modifiers associated with the original :attr:`~music21.figuredBass.notation.Notation.notationColumn`, as strings.',
-                 'figures': 'A list of :class:`~music21.figuredBass.notation.Figure` objects associated with figures in the expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.'}
+    _DOC_ORDER = ['notationColumn', 'figureStrings', 'numbers', 'modifiers', 
+                  'figures', 'origNumbers', 'origModStrings', 'modifierStrings']
+    _DOC_ATTR = {'modifiers': 'A list of :class:`~music21.figuredBass.notation.Modifier` ' + 
+                    'objects associated with the expanded ' + 
+                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
+                 'notationColumn': 'A string of figures delimited by commas, ' + 
+                    'each associated with a number and an optional modifier.',
+                 'modifierStrings': 'The modifiers associated with the expanded ' + 
+                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`, as strings.',
+                 'figureStrings': 'A list of figures derived from the original ' + 
+                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
+                 'origNumbers': 'The numbers associated with the original ' + 
+                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
+                 'numbers': 'The numbers associated with the expanded ' + 
+                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
+                 'origModStrings': 'The modifiers associated with the original ' + 
+                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`, as strings.',
+                 'figures': 'A list of :class:`~music21.figuredBass.notation.Figure` objects ' + 
+                    'associated with figures in the expanded ' + 
+                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.'}
     
     def __init__(self, notationColumn = None):
         #Parse notation string
@@ -351,9 +362,13 @@ class Figure(object):
     >>> f1
     <music21.figuredBass.notation Figure 4 <modifier + <accidental sharp>>>
     '''
-    _DOC_ATTR = {'number': 'A number associated with an expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
-                 'modifierString': 'A modifier string associated with an expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
-                 'modifier': 'A :class:`~music21.figuredBass.notation.Modifier` associated with an expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.'}
+    _DOC_ATTR = {'number': 'A number associated with an expanded ' + 
+                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
+                 'modifierString': 'A modifier string associated with an ' + 
+                    'expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
+                 'modifier': 'A :class:`~music21.figuredBass.notation.Modifier` ' + 
+                    'associated with an expanded ' + 
+                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.'}
     
     def __init__(self, number = 1, modifierString = None):
         self.number = number
@@ -361,7 +376,8 @@ class Figure(object):
         self.modifier = Modifier(modifierString)
     
     def __repr__(self):
-        return '<music21.figuredBass.notation %s %s %s>' % (self.__class__.__name__, self.number, self.modifier)
+        return '<music21.figuredBass.notation %s %s %s>' % (
+                        self.__class__.__name__, self.number, self.modifier)
 
 
 class FigureException(exceptions21.Music21Exception):
@@ -382,8 +398,10 @@ specialModifiers = {'+' : '#',
 
 class Modifier(object):
     '''
-    Turns a modifierString (a modifier in a :attr:`~music21.figuredBass.notation.Notation.notationColumn`)
-    to an :class:`~music21.pitch.Accidental`. A ModifierException is raised if the modifierString is not valid.
+    Turns a modifierString (a modifier in a 
+    :attr:`~music21.figuredBass.notation.Notation.notationColumn`)
+    to an :class:`~music21.pitch.Accidental`. A ModifierException 
+    is raised if the modifierString is not valid.
     
     
     Accepted inputs are those accepted by Accidental, as well as the following:
@@ -421,8 +439,10 @@ class Modifier(object):
     >>> m2b.accidental == None
     True
     '''
-    _DOC_ATTR = {'modifierString': 'A modifier string associated with an expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
-                 'accidental': ' A :class:`~music21.pitch.Accidental` corresponding to :attr:`~music21.figuredBass.notation.Modifier.modifierString`.'}
+    _DOC_ATTR = {'modifierString': 'A modifier string associated with an ' + 
+                    'expanded :attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
+                 'accidental': ' A :class:`~music21.pitch.Accidental` corresponding to ' + 
+                    ':attr:`~music21.figuredBass.notation.Modifier.modifierString`.'}
 
     def __init__(self, modifierString = None):
         self.modifierString = modifierString
@@ -461,7 +481,8 @@ class Modifier(object):
             try:
                 newModifierString = specialModifiers[self.modifierString]
             except KeyError:
-                raise ModifierException("Figure modifier unsupported in music21: %s." % self.modifierString)
+                raise ModifierException(
+                    "Figure modifier unsupported in music21: %s." % self.modifierString)
             a.set(newModifierString)
         
         return a

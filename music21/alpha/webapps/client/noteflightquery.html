@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<script language="javascript" src="javascript/music21.js"></script>
+
+<script language="javascript">
+
+m21interface = new Music21interface();
+
+</script>
+
+<title>Noteflight Test</title>
+</head>
+
+<body>
+
+<!-- Noteflight Embed -->
+<object id="score1" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="640" height="253"> <param name="movie" value="http://music21.sites.noteflight.com/scores/embed"></param> <param name="allowScriptAccess" value="always"></param> <param name="FlashVars" value="id=26394a4dadb3965e3e629f58dd14f6a831db7a23&scale=1&role=template"></param> <embed name="score1" src="http://music21.sites.noteflight.com/scores/embed" type="application/x-shockwave-flash" FlashVars="id=26394a4dadb3965e3e629f58dd14f6a831db7a23&scale=1&role=template" width="640" height="253" allowScriptAccess="always"></embed></object>
+<!-- End Noteflight Embed --> 
+
+<br />
+<p id='message'></p>
+<form name='form1' id='form1' >
+<b>Command:</b>
+<input id='command' size="50"/>
+<input type='button' onClick="m21interface.sendRequest()" value='Query Music 21' />
+<input type='button' onClick="m21interface.sendRawRequest(document.getElementById('requestxmltextarea').value)" Value='Query Music 21 XML with Requst field ' />
+<input type='button' onClick="m21interface.noteflight.sendMusicXMLToNoteflightEmbed('score1',document.getElementById('resultxmltextarea').value)" Value='Response to Noteflight' />
+<br />
+
+
+<br />
+<hr />
+<div id='result'>
+<table width='100%'>
+<tr>
+	<td width='33%'>
+	Request:</br>
+	<textarea name='resultxmltext' id='requestxmltextarea' rows='100' cols='75' style="width:100%"></textarea><br />
+	</td>
+	<td width='33%'>
+	Response:</br>
+	<textarea name='' id='realresponse' rows='100' cols='75' style="width:100%"></textarea><br />
+	</td>
+    <td width='33%'>
+	XML of Response:</br>
+	<textarea name='resultxmltext' id='resultxmltextarea' rows='100' cols='75' style="width:100%"></textarea><br />
+	</td>
+	</tr>
+	</table>
+	<input type='submit' value='Submit' />
+</div>
+</form>
+</body>
+</html>

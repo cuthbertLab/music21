@@ -9,7 +9,7 @@
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
-
+# TODO: is this the same as textwrap.dedent()?  If so, delete and replace.
 
 def dedent(string):
     r'''
@@ -33,6 +33,7 @@ def dedent(string):
     if not splitLines[-1] or splitLines[-1].isspace():
         splitLines.pop(-1)
 
+    indentWidth = 0
     for indentWidth, character in enumerate(splitLines[0]):
         if character != ' ':
             break

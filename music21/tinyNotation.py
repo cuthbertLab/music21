@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -61,71 +61,48 @@ to see how to make TinyNotation useful for your own needs.
 (Currently, final notes with fermatas (or any very long final note), 
 take 0 for the note length.  But expect this to disappear from the
 TinyNotation specification soon, as it's too Trecento specific.)
-'''
-
-#python3
-try:
-    basestring # @UndefinedVariable
-except NameError:
-    basestring = str # @ReservedAssignment
 
 
 
-import unittest
-import copy
-import re
+an alpha complete rewrite of tinyNotation.
 
-from music21 import note
-from music21 import duration
-from music21 import common
-from music21 import exceptions21
-from music21 import stream
-from music21 import tie
-from music21 import expressions
-from music21 import meter
-from music21 import pitch
+tinyNotation was one of the first modules of music21 and one of my first attempts to
+program in Python.  and it shows.
 
-from music21 import environment
-_MOD = "tinyNotation.py"
-environLocal = environment.Environment(_MOD)
+this is what the module should have been... from mistakes
+learned and insights from ABC etc. parsing.
+
+keeping both until this becomes stable.
 
 
-
-class TinyNotationStream(stream.Stream):
-    '''
-    A TinyNotationStream takes in a string representation 
-    similar to Lilypond format
-    but simplified somewhat. 
-    
-    Can also take in an optional time signature 
-    string (or TimeSignature object) as a second argument, but this is
-    mostly for historical reasons.
-    
-    
-    Example in 3/4:
-    
-    >>> stream1 = tinyNotation.TinyNotationStream("3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
+    >>> tnc = tinyNotation.Converter("3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
+    >>> stream1 = tnc.parse().stream
     >>> stream1.show('text')
-    {0.0} <music21.meter.TimeSignature 3/4>
-    {0.0} <music21.note.Note E>
-    {1.0} <music21.note.Rest rest>
-    {2.0} <music21.note.Note F#>
-    {3.0} <music21.note.Note G>
-    {4.0} <music21.note.Note B->
-    {4.3333} <music21.note.Note A>
-    {4.6667} <music21.note.Note G>
-    {5.0} <music21.note.Note C>
-    {6.0} <music21.note.Note C>
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 3/4>
+        {0.0} <music21.note.Note E>
+        {1.0} <music21.note.Rest rest>
+        {2.0} <music21.note.Note F#>
+    {3.0} <music21.stream.Measure 2 offset=3.0>
+        {0.0} <music21.note.Note G>
+        {1.0} <music21.note.Note B->
+        {1.3333} <music21.note.Note A>
+        {1.6667} <music21.note.Note G>
+        {2.0} <music21.note.Note C>
+    {6.0} <music21.stream.Measure 3 offset=6.0>
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.bar.Barline style=final>
 
-    >>> stream1.getElementById("lastG").step
+    >>> stream1.flat.getElementById("lastG").step
     'G'
-    >>> stream1.notesAndRests[1].isRest
+    >>> stream1.flat.notesAndRests[1].isRest
     True
-    >>> stream1.notesAndRests[0].octave
+    >>> stream1.flat.notesAndRests[0].octave
     3    
-    >>> stream1.notes[-2].tie.type
+    >>> stream1.flat.notes[-2].tie.type
     'start'
-    >>> stream1.notes[-1].tie.type
+    >>> stream1.flat.notes[-1].tie.type
     'stop'
     
     
@@ -133,20 +110,6 @@ class TinyNotationStream(stream.Stream):
     
     >>> s1 = converter.parse('tinynotation: 3/4 C4 D E 2/4 F G A B 1/4 c')
     >>> s1.show('t')
-    {0.0} <music21.meter.TimeSignature 3/4>
-    {0.0} <music21.note.Note C>
-    {1.0} <music21.note.Note D>
-    {2.0} <music21.note.Note E>
-    {3.0} <music21.meter.TimeSignature 2/4>
-    {3.0} <music21.note.Note F>
-    {4.0} <music21.note.Note G>
-    {5.0} <music21.note.Note A>
-    {6.0} <music21.note.Note B>
-    {7.0} <music21.meter.TimeSignature 1/4>
-    {7.0} <music21.note.Note C>
-
-    >>> s2 = s1.makeMeasures()
-    >>> s2.show('t')
     {0.0} <music21.stream.Measure 1 offset=0.0>
         {0.0} <music21.clef.BassClef>
         {0.0} <music21.meter.TimeSignature 3/4>
@@ -164,597 +127,600 @@ class TinyNotationStream(stream.Stream):
         {0.0} <music21.meter.TimeSignature 1/4>
         {0.0} <music21.note.Note C>
         {1.0} <music21.bar.Barline style=final>
-    '''
-    regularExpressions = {'TRIP': r'trip\{',
-                          'QUAD': r'quad\{',
-                          'ENDBRAC': r'\}',
-                          'TIMESIG': r'(\d+\/\d+)'}
-    
-    def __init__(self, stringRep = "", timeSignature = None):
-        stream.Stream.__init__(self)
-        self.stringRep = stringRep
-        noteStrs = self.stringRep.split()
+'''
+import unittest
+import copy
+import re
+import sre_parse
 
-        self.setupRegularExpressions()
-        
-        if (timeSignature is None):
-            barDuration = duration.Duration()
-            barDuration.type = "whole"    ## assume 4/4
-        elif (hasattr(timeSignature, "barDuration")): # is a TimeSignature object
-            barDuration = timeSignature.barDuration
-        else: # is a string
-            timeSignature = meter.TimeSignature(timeSignature)
-            barDuration = timeSignature.barDuration
+from music21 import note
+from music21 import duration
+from music21 import common
+from music21 import exceptions21
+from music21 import stream
+from music21 import tie
+from music21 import expressions
+from music21 import meter
+from music21 import pitch
 
-        noteList = []
-        if timeSignature is not None and hasattr(timeSignature, "barDuration"):
-            noteList.append(timeSignature)
-
-        
-        parseStatus = { 
-                        'inTrip': False,
-                        'inQuad': False,
-                        'beginTuplet': False,
-                        'endTuplet': False,
-                        'lastDuration': None, 
-                        'barDuration': barDuration,
-                        'lastNoteTied': False, }
-
-        for thisNoteStr in noteStrs:
-            if self.TRIP.match(thisNoteStr):
-                thisNoteStr = self.TRIP.sub('', thisNoteStr)
-                parseStatus['inTrip'] = True
-                parseStatus['beginTuplet'] = True
-            elif self.QUAD.match(thisNoteStr):
-                thisNoteStr = self.QUAD.sub('', thisNoteStr)
-                parseStatus['inQuad'] = True
-                parseStatus['beginTuplet'] = True
-            elif self.ENDBRAC.search(thisNoteStr):
-                thisNoteStr = self.ENDBRAC.sub('', thisNoteStr)
-                parseStatus['endTuplet'] = True
-            elif self.TIMESIG.match(thisNoteStr):
-                newTime = self.TIMESIG.match(thisNoteStr).group(1)
-                timeSignature = meter.TimeSignature(newTime)
-                barDuration = timeSignature.barDuration
-                parseStatus['barDuration'] = barDuration
-                noteList.append(timeSignature)
-                continue
-
-            tN = None
-            try:
-                tN = self.getNote(thisNoteStr, parseStatus)
-            except duration.DurationException as value:
-                raise duration.DurationException(str(value) + " in context " + str(thisNoteStr))
-#            except Exception, (value):
-#                raise Exception(str(value) + "in context " + str(thisNoteStr) + ": " + str(stringRep) )
-            #try:
-            noteList.append(tN.note)
-            #except TinyNotationException:
-            #    raise TinyNotationException(thisNoteStr + " " + str(noteStrs))
-            
-
-            if parseStatus['endTuplet'] == True:
-                parseStatus['endTuplet'] = False
-                
-                if parseStatus['inTrip'] == True:
-                    parseStatus['inTrip'] = False
-                elif parseStatus['inQuad'] == True:
-                    parseStatus['inQuad'] = False
-                else:
-                    raise TinyNotationException("unexpected end bracket in TinyNotationStream")
-
-            parseStatus['beginTuplet'] = False
-
-        
-        for thisNote in noteList:
-            self.append(thisNote)
-                
-    def setupRegularExpressions(self):
-        r'''
-        helper method that takes the dictionary
-        self.regularExpressions (which should be a shared, 
-        class-level object) and compiles each one if it
-        hasn't already been compiled and makes it an attribute
-        of the class.
-        
-        For instance, if you have:
-        
-        >>> regularExpressions = {'PUNCTUS': 'p', 'BREVE': 'b+'}
-        
-        calling self.setupRegularExpressions 
-        will replace p and b+ with `re.compile` versions of the
-        same and make `self.PUNCTUS = re.compile('p')`, etc.
-        '''
-# DO NOT DOCTEST
-#         from music21 import tinyNotation
-#         dummy = reload(tinyNotation) # show before and after
-#         print(tinyNotation.TinyNotationStream.regularExpressions)
-#         {'ENDBRAC': '\\}', 'QUAD': 'quad\\{', ...}
-#         tns = tinyNotation.TinyNotationStream('3/4 d2 e4 f2 g4')
-#         tinyNotation.TinyNotationStream.regularExpressions['ENDBRAC']
-#         <_sre.SRE_Pattern object at 0x...>
-
-        
-        for regexpName in self.regularExpressions:
-            regexpValue = self.regularExpressions[regexpName]
-            if isinstance(regexpValue, basestring):
-                self.regularExpressions[regexpName] = re.compile(regexpValue) 
-            setattr(self, regexpName, self.regularExpressions[regexpName])
-       
-    def getNote(self, stringRep, storedDict = None):
-        '''
-        called out so as to be subclassable, returns a 
-        :class:`~music21.tinyNotation.TinyNotationNote` object
-        '''
-        if storedDict is None:
-            storedDict = {}
-        return TinyNotationNote(stringRep, storedDict)
-
-
-class TinyNotationNote(object):
-    ''' 
-    Class defining a single note in TinyNotation.  The "note" attribute
-    returns a :class:`~music21.note.Note` object.
-
-
-    See docs for :class:`~music21.tinyNotation.TinyNotationStream` for
-    usage.
-    
-
-    Simple example:
-
-
-    
-    >>> tnN = tinyNotation.TinyNotationNote("c8")
-    >>> m21Note = tnN.note
-    >>> m21Note
-    <music21.note.Note C>
-    >>> m21Note.octave
-    4
-    >>> m21Note.duration
-    <music21.duration.Duration 0.5>
-    
-    
-    Very complex example:
-
-
-    >>> tnN = tinyNotation.TinyNotationNote("AA-4.~=aflat_hel-")
-    >>> m21Note = tnN.note
-    >>> m21Note.name
-    'A-'
-    >>> m21Note.octave
-    2
-    >>> m21Note.lyric
-    'hel'
-    >>> m21Note.id
-    'aflat'
-
-
-
-    The optional third element is a dictionary of stored information
-    from previous notes that might affect parsing of this note:
-    
-    
-    >>> storedDict = {}
-    >>> storedDict['lastNoteTied'] = True
-    >>> storedDict['inTrip'] = True
-    >>> tnN = tinyNotation.TinyNotationNote("d''#4", storedDict)
-    >>> tnN.note.tie
-    <music21.tie.Tie stop>
-    >>> tnN.note.duration.quarterLength
-    Fraction(2, 3)
-
-
-    OMIT_FROM_DOCS
-    >>> tinyNotation.TinyNotationNote("c4").note.octave
-    4
-    >>> tinyNotation.TinyNotationNote("C4").note.octave
-    3
-    >>> tinyNotation.TinyNotationNote("CC4").note.octave
-    2
-    >>> tinyNotation.TinyNotationNote("CCC4").note.octave
-    1
-    
-    >>> tcn2 = tinyNotation.TinyNotationNote("c''##16").note
-    >>> tcn2.accidental
-    <accidental double-sharp>
-    >>> tcn2.octave
-    6
-    >>> tcn2.quarterLength
-    0.25
-
-
-    >>> tcn3 = tinyNotation.TinyNotationNote("d''(---)16").note
-    >>> tcn3.editorial.ficta
-    <accidental triple-flat>
-    
-    
-    Test instantiating without any parameters:
-    
-    >>> tcn4 = tinyNotation.TinyNotationNote()
-    
-    '''
-    regularExpressions = {  'REST'    : r'r',
-                            'OCTAVE2' : r'([A-G]+)[A-G]',
-                            'OCTAVE3' : r'([A-G])',
-                            'OCTAVE5' : r'([a-g])(\'+)', 
-                            'OCTAVE4' : r'([a-g])',
-                            'EDSHARP' : r'\((\#+)\)',
-                            'EDFLAT'  : r'\((\-+)\)',
-                            'EDNAT'   : r'\(n\)',
-                            'SHARP'   : r'^[A-Ga-g]+\'*(\#+)',  # simple notation finds 
-                            'FLAT'    : r'^[A-Ga-g]+\'*(\-+)',  # double sharps too
-                            'TYPE'    : r'(\d+)',
-                            'TIE'     : r'.\~', # not preceding ties
-                            'PRECTIE' : r'\~',  # front ties
-                            'ID_EL'   : r'\=([A-Za-z0-9]*)',
-                            'LYRIC'   : r'\_(.*)',  }
-    
-    def __init__(self, stringRep = None, storedDict = None):
-        if storedDict is None:
-            storedDict = {'lastNoteTied': False,
-                          'barDuration': None,
-                          'lastDuration': None,
-                          'inTrip': False,
-                          'inQuad': False,
-                          'beginTuplet': False,
-                          'endTuplet': False,
-                          }
-        self.debug = False
-        self.stringRep = stringRep
-        self.storedDict = storedDict
-        self._note = None
-        self.setupRegularExpressions()
-
-    def setupRegularExpressions(self):
-        r'''
-        helper method that takes the dictionary
-        self.regularExpressions (which should be a shared, 
-        class-level object) and compiles each one if it
-        hasn't already been compiled and makes it an attribute
-        of the class.  See :meth:`~music21.tinyNotation.TinyNotationStream.setupRegularExpressions` in
-        TinyNotationStream for more details.
-        '''
-        for regexpName in self.regularExpressions:
-            regexpValue = self.regularExpressions[regexpName]
-            if isinstance(regexpValue, basestring):
-                self.regularExpressions[regexpName] = re.compile(regexpValue) 
-            setattr(self, regexpName, self.regularExpressions[regexpName])
-
-
-    def _getNote(self):
-        if self._note is not None:
-            return self._note
-        noteObj = None
-        storedtie = None
-
-        stringRep = self.stringRep
-        storedDict = self.storedDict
-        
-        if stringRep is None:
-            raise TinyNotationException('Cannot return a note without some parameters')
-        
-        
-        if self.PRECTIE.match(stringRep):
-            environLocal.printDebug('Found Front Tie')
-            stringRep = self.PRECTIE.sub("", stringRep)
-            storedtie = tie.Tie("stop")
-            storedDict['lastNoteTied'] = False
-
-        elif 'lastNoteTied' in storedDict and storedDict['lastNoteTied'] is True:
-            storedtie = tie.Tie("stop")
-            storedDict['lastNoteTied'] = False
-
-        x = self.customPitchMatch(stringRep, storedDict)
-       
-        if x is not None:
-            noteObj = x
-        elif (self.REST.match(stringRep) is not None): # rest
-            noteObj = note.Rest()
-        elif (self.OCTAVE2.match(stringRep)): # BB etc.
-            nn = self.OCTAVE2.match(stringRep)
-            noteObj = self._getPitch(nn, 3 - len(nn.group(1)))
-        elif (self.OCTAVE3.match(stringRep)):
-            noteObj = self._getPitch(self.OCTAVE3.match(stringRep), 3)
-        elif (self.OCTAVE5.match(stringRep)): # must match octave 5 then 4!
-            nn = self.OCTAVE5.match(stringRep)
-            noteObj = self._getPitch(nn, 4 + len(nn.group(2)))
-        elif (self.OCTAVE4.match(stringRep)): 
-            noteObj = self._getPitch(self.OCTAVE4.match(stringRep), 4)
-        else:
-            raise TinyNotationException("could not get pitch information from " + str(stringRep))
-
-        if storedtie: 
-            noteObj.tie = storedtie
-
-        ## get duration
-        usedLastDuration = False
-        
-        if (self.TYPE.search(stringRep)):
-            typeNum = self.TYPE.search(stringRep).group(1)
-            if (typeNum == "0"): ## special case = full measure + fermata
-                if 'barDuration' in storedDict:
-                    noteObj.duration = storedDict['barDuration']
-                newFerm = expressions.Fermata()
-                noteObj.expressions.append(newFerm)
-            else:
-                noteObj.duration.type = duration.typeFromNumDict[int(typeNum)]
-        else:
-            if 'lastDuration' in storedDict:
-                noteObj.duration = copy.deepcopy(storedDict['lastDuration'])
-                usedLastDuration = True
-            if (noteObj.duration.tuplets):
-                noteObj.duration.tuplets[0].type = ""
-                # if it continues a tuplet it cannot be start; maybe end
-
-        ## get dots; called out because subclassable
-        self.getDots(stringRep, noteObj)
-        
-        ## get ties
-        if self.TIE.search(stringRep):
-            environLocal.printDebug('Found Tie Tie')
-            storedDict['lastNoteTied'] = True
-            if noteObj.tie is None:
-                noteObj.tie = tie.Tie("start")
-            else:
-                noteObj.tie.type = 'continue'
-        
-        ## use dict to set tuplets
-        if ((('inTrip' in storedDict and storedDict['inTrip'] == True) or 
-             ('inQuad' in storedDict and storedDict['inQuad'] == True)) and usedLastDuration == False):
-            newTup = duration.Tuplet()
-            newTup.durationActual.type = noteObj.duration.type
-            newTup.durationNormal.type = noteObj.duration.type
-            if 'inQuad' in storedDict and storedDict['inQuad'] == True:
-                newTup.numNotesActual = 4.0
-                newTup.numNotesNormal = 3.0            
-            if 'beginTuplet' in storedDict and storedDict['beginTuplet'] == True:
-                newTup.type = "start"
-            noteObj.duration.appendTuplet(newTup)
-
-        if ((('inTrip' in storedDict and storedDict['inTrip'] == True) or
-             ('inQuad' in storedDict and storedDict['inQuad'] == True)) and 
-             ('endTuplet' in storedDict and storedDict['endTuplet'] == True)):
-            noteObj.duration.tuplets[0].type = "stop"
-        
-        storedDict['lastDuration'] = noteObj.duration
-
-        ## get accidentals
-        if (isinstance(noteObj, note.Note)):
-            if (self.EDSHARP.search(stringRep)): # must come before sharp
-                alter = len(self.EDSHARP.search(stringRep).group(1))
-                acc1 = pitch.Accidental(alter)
-                noteObj.editorial.ficta = acc1
-                noteObj.editorial.misc['pmfc-ficta'] = acc1
-            elif (self.EDFLAT.search(stringRep)): # must come before flat
-                alter = -1 * len(self.EDFLAT.search(stringRep).group(1))
-                acc1 = pitch.Accidental(alter)
-                noteObj.editorial.ficta = acc1
-                noteObj.editorial.misc['pmfc-ficta'] = acc1
-            elif (self.EDNAT.search(stringRep)):
-                acc1 = pitch.Accidental("natural")
-                noteObj.editorial.ficta = acc1
-                noteObj.editorial.misc['pmfc-ficta'] = acc1
-                noteObj.accidental = acc1
-            elif (self.SHARP.search(stringRep)):
-                alter = len(self.SHARP.search(stringRep).group(1))
-                noteObj.accidental = pitch.Accidental(alter)
-            elif (self.FLAT.search(stringRep)):
-                alter = -1 * len(self.FLAT.search(stringRep).group(1))
-                noteObj.accidental = pitch.Accidental(alter)
-
-        self.customNotationMatch(noteObj, stringRep, storedDict)
-
-        if self.ID_EL.search(stringRep):
-            noteObj.id = self.ID_EL.search(stringRep).group(1)
-        
-        if self.LYRIC.search(stringRep):
-            noteObj.lyric = self.LYRIC.search(stringRep).group(1)
-            
-        self._note = noteObj
-        return self._note
-    
-    note = property(_getNote)
-
-    def getDots(self, stringRep, noteObj):
-        '''
-        Subclassable method to set the dots attributes of 
-        the duration object.
-        
-        It is subclassed in music21.trecento.cadencebook.TrecentoNote
-        where double dots are redefined as referring to multiply by
-        2.25 (according to a practice used by some Medieval musicologists).
-        '''
-        DBLDOT  = r'\.\.' 
-        DOT     = r'\.'
-        
-        if (re.search(DBLDOT, stringRep)):
-            noteObj.duration.dots = 2
-        elif (re.search(DOT, stringRep)):
-            noteObj.duration.dots = 1
-        
-    def _getPitch(self, matchObj, octave):
-        noteObj = note.Note()
-        noteObj.step = matchObj.group(1)[0].upper()
-        noteObj.octave = octave
-        return noteObj
-
-    def customPitchMatch(self, stringRep, storedDict):
-        '''
-        method to create a note object in sub classes of tiny notation.  
-        Should return a Note-like object or None
-        '''
-        return None
-
-    def customNotationMatch(self, m21NoteObject, stringRep, storedDict):
-        return None
-
-class HarmonyStream(TinyNotationStream):
-    '''
-    HarmonyStream provides an
-    example of subclassing :class:`~music21.tinyNotation.TinyNotationStream`
-    to include harmonies and lyrics encoded in a simple format.
-    
-    
-    >>> michelle = "c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle "
-    >>> michelle += "G4*E-*_these c_are A-_words G_that "
-    >>> michelle += "F*Ddim*_go A-_to- Bn_geth- A-_er"
-    
-    >>> hns = tinyNotation.HarmonyStream(michelle, "4/4")
-    >>> ns = hns.notesAndRests
-    >>> ns[0].step
-    'C'
-    >>> ns[0].editorial.misc['harmony']
-    'F'
-    >>> ns[0].lyric # note that hyphens are removed
-    'Mi'
-    >>> ns[2].isRest
-    True
-    >>> ns[5].name
-    'G'
-    >>> ns[7].name
-    'A-'
-
-    '''
-    def getNote(self, stringRep, storedDict = None):
-        if storedDict is None:
-            storedDict = {}
-        return HarmonyNote(stringRep, storedDict)
-
-class HarmonyNote(TinyNotationNote):    
-    def customNotationMatch(self, m21NoteObject, stringRep, storedDict):
-        '''
-        checks to see if a note has markup in the form *TEXT* and if
-        so, stores TEXT in the notes editorial.misc[] dictionary object
-        
-        See the demonstration in the docs for class HarmonyLine.
-        '''
-        HARMONY   = r'\*(.*)\*'
-
-        if re.search(HARMONY, stringRep):
-            harmony = re.search(HARMONY, stringRep).group(1)
-            m21NoteObject.editorial.misc['harmony'] = harmony
-
+from music21 import environment
+_MOD = "tinyNotation.py"
+environLocal = environment.Environment(_MOD)
 
 class TinyNotationException(exceptions21.Music21Exception):
     pass
 
+class State(object):
+    '''
+    State tokens apply something to 
+    every note found within it.
+    '''
+    autoExpires = False # expires after N tokens or never.
+    
+    def __init__(self, parent, stateInfo):
+        self.affectedTokens = []
+        self.parent = common.wrapWeakref(parent)
+        self.stateInfo = stateInfo
+        #print("Adding state", self, parent.activeStates)
+        
+    def start(self):
+        '''
+        called when the state is initiated
+        '''
+        pass
+
+    def end(self):
+        '''
+        called just after removing state
+        '''
+        pass
+    
+    def affectTokenBeforeParse(self, tokenStr):
+        '''
+        called to modify the string of a token.
+        '''
+        return tokenStr
+
+    def affectTokenAfterParseBeforeModifiers(self, m21Obj):
+        '''
+        called after the object has been acquired but before modifiers have been applied.
+        '''
+        return m21Obj
+
+    def affectTokenAfterParse(self, m21Obj):
+        '''
+        called to modify the tokenObj after parsing
+        
+        tokenObj may be None if another
+        state has deleted it.
+        '''
+        self.affectedTokens.append(m21Obj)
+        if self.autoExpires is not False:
+            if len(self.affectedTokens) == self.autoExpires:
+                self.end()
+                p = common.unwrapWeakref(self.parent)
+                for i in range(len(p.activeStates)):
+                    backCount = -1 * (i+1)
+                    if p.activeStates[backCount] is self:
+                        p.activeStates.pop(backCount)
+                        break
+        return m21Obj
+
+class TieState(State):
+    '''
+    A TieState is an autoexpiring state that applies a tie start to this note and a 
+    tie stop to the next note.
+    '''
+    autoExpires = 2
+
+    def end(self):
+        '''
+        end the tie state by applying tie ties to the appropriate notes
+        '''
+        if self.affectedTokens[0].tie is None:
+            self.affectedTokens[0].tie = tie.Tie('start')
+        else:
+            self.affectedTokens[0].tie.type = 'continue'
+        if len(self.affectedTokens) > 1: # could be end...            
+            self.affectedTokens[1].tie = tie.Tie('stop')
 
 
-#-------------------------------------------------------------------------------
+class TupletState(State):
+    '''
+    a tuplet state applies tuplets to notes while parsing and sets 'start' and 'stop'
+    on the first and last note when end is called.
+    '''
+    actual = 3
+    normal = 2
+    
+    def end(self):
+        '''
+        end a tuplet by putting start on the first note and stop on the last.
+        '''
+        if len(self.affectedTokens) == 0:
+            return 
+        self.affectedTokens[0].duration.tuplets[0].type = 'start'
+        self.affectedTokens[-1].duration.tuplets[0].type = 'stop'
+            
+    
+    def affectTokenAfterParse(self, n):
+        '''
+        puts a tuplet on the note
+        '''
+        super(TupletState, self).affectTokenAfterParse(n)
+        newTup = duration.Tuplet()
+        newTup.durationActual = duration.durationTupleFromTypeDots(n.duration.type, 0)
+        newTup.durationNormal = duration.durationTupleFromTypeDots(n.duration.type, 0)
+        newTup.numberNotesActual = self.actual
+        newTup.numberNotesNormal = self.normal
+        n.duration.appendTuplet(newTup)
+        return n      
+
+class TripletState(TupletState):
+    '''
+    a 3:2 tuplet
+    '''
+    actual = 3
+    normal = 2
+
+class QuadrupletState(TupletState):
+    '''
+    a 4:3 tuplet
+    '''    
+    actual = 4
+    normal = 3
+
+class Modifier(object):
+    '''
+    a modifier is something that changes the current
+    token, like setting the Id or Lyric.
+    '''
+    def __init__(self, modifierData, modifierString, parent):
+        self.modifierData = modifierData
+        self.modifierString = modifierString
+        self.parent = common.wrapWeakref(parent)
+        
+    def preParse(self, tokenString):
+        '''
+        called before the tokenString has been
+        turned into an object
+        '''
+        pass
+    
+    def postParse(self, m21Obj):
+        '''
+        called after the tokenString has been
+        truend into an m21Obj.  m21Obj may be None
+        '''
+        pass
+
+
+class IdModifier(Modifier):
+    '''
+    sets the .id of the m21Obj, called with =
+    '''
+    def postParse(self, m21Obj):
+        if hasattr(m21Obj, 'id'):
+            m21Obj.id = self.modifierData
+
+class LyricModifier(Modifier):
+    '''
+    sets the .lyric of the m21Obj, called with _
+    '''
+    def postParse(self, m21Obj):
+        if hasattr(m21Obj, 'lyric'):
+            m21Obj.lyric = self.modifierData
+
+class StarModifier(Modifier):
+    '''
+    does nothing, but easily subclassed.  Uses *...* to make it happen
+    '''
+    pass
+
+
+class Token(object):
+    '''
+    A single token made from the parser.
+    
+    Call .parse(parent) to make it work.
+    '''
+    def __init__(self, token=""):
+        self.token = token
+
+    def parse(self, parent):
+        '''
+        do NOT store parent -- probably
+        too slow
+        '''
+        pass
+        
+
+class TimeSignatureToken(Token):
+    '''
+    Represents a single time signature, like 1/4
+    '''
+    def parse(self, parent):
+        tsObj = meter.TimeSignature(self.token)
+        parent.stateDict['currentTimeSignature'] = tsObj
+        return tsObj
+
+class NoteOrRestToken(Token):
+    '''
+    represents a Note or Rest.  Chords are represented by Note objects
+    '''
+    def __init__(self, token=""):
+        super(NoteOrRestToken, self).__init__(token)
+        self.durationMap = [
+                            (r'(\d+)', 'durationType'),
+                            (r'(\.+)', 'dots'),
+        ]  ## tie later...
+    
+        
+        self.durationFound = False
+
+    def applyDuration(self, n, t, parent):
+        '''
+        takes the information in the string `t` and creates a Duration object for the 
+        note or rest `n`.
+        '''
+        for pm, method in self.durationMap:
+            searchSuccess = re.search(pm, t)
+            if searchSuccess:
+                callFunc = getattr(self, method)
+                t = callFunc(n, searchSuccess, pm, t, parent)
+        
+        if self.durationFound is False:
+            n.duration.quarterLength = parent.stateDict['lastDuration']
+
+        # do this by quarterLength here, so that applied tuplets do not persist.        
+        parent.stateDict['lastDuration'] = n.duration.quarterLength
+        
+        return t
+
+    def durationType(self, n, search, pm, t, parent):
+        '''
+        The result of a successful search for a duration type: puts a Duration in the right place.
+        '''
+        self.durationFound = True
+        typeNum = int(search.group(1))
+        if typeNum == 0:
+            if parent.stateDict['currentTimeSignature'] is not None:
+                n.duration = copy.deepcopy(parent.stateDict['currentTimeSignature'].barDuration)
+                n.expressions.append(expressions.Fermata())
+        else:
+            n.duration.type = duration.typeFromNumDict[typeNum]
+        t = re.sub(pm, '', t)
+        return t
+    
+    def dots(self, n, search, pm, t, parent):
+        '''
+        adds the appropriate number of dots to the right place.
+        
+        Subclassed in TrecentoNotation where two dots has a different meaning.
+        '''
+        n.duration.dots = len(search.group(1))
+        t = re.sub(pm, '', t)
+        return t
+    
+
+class RestToken(NoteOrRestToken):
+    '''
+    A token starting with 'r', representing a rest.
+    '''
+    def parse(self, parent):    
+        r = note.Rest()
+        self.applyDuration(r, self.token, parent)        
+        return r
+
+class NoteToken(NoteOrRestToken):
+    '''
+    A NoteToken represents a single Note with pitch
+    '''    
+    pitchMap = [
+        (r'([A-G]+)', 'lowOctave'),
+        (r'([a-g])(\'*)', 'highOctave'),
+        (r'\(([\#\-n]+)\)(.*)', 'editorialAccidental'),
+        (r'(\#+)', 'sharps'),
+        (r'(\-+)', 'flats'),
+        (r'(n)', 'natural'),
+    ]
+    def __init__(self, token=""):
+        super(NoteToken, self).__init__(token)
+        self.isEditorial = False
+    
+    def parse(self, parent):
+        '''
+        Extract the pitch from the note.
+        '''
+        t = self.token
+        
+        n = note.Note()
+        t = self.getPitch(n, t)
+        self.applyDuration(n, t, parent)
+        return n
+
+    def getPitch(self, n, t):
+        for pm, method in self.pitchMap:
+            searchSuccess = re.search(pm, t)
+            if searchSuccess:
+                callFunc = getattr(self, method)
+                t = callFunc(n, searchSuccess, pm, t)
+        return t
+
+    def editorialAccidental(self, n, search, pm, t):
+        '''
+        indicates that the accidental is in parentheses, so set it up to be stored in ficta.
+        '''
+        self.isEditorial = True
+        t = search.group(1) + search.group(2)
+        return t
+
+    def _addAccidental(self, n, alter, pm, t):
+        '''
+        helper function for all accidental types.
+        '''
+        acc = pitch.Accidental(alter)
+        if self.isEditorial:
+            n.editorial.ficta = acc
+        else:
+            n.pitch.accidental = acc
+        t = re.sub(pm, '', t)
+        return t
+
+    def sharps(self, n, search, pm, t):
+        '''
+        called when one or more sharps have been found.
+        '''
+        alter = len(search.group(1))
+        return self._addAccidental(n, alter, pm, t)
+
+    def flats(self, n, search, pm, t):
+        '''
+        called when one or more flats have been found.
+        '''
+        alter = -1 * len(search.group(1))
+        return self._addAccidental(n, alter, pm, t)
+
+    def natural(self, n, search, pm, t):
+        '''
+        called when an explicit natural has been found.  All pitches are natural without
+        being specified, so not needed.
+        '''
+        return self._addAccidental(n, 0, pm, t)
+
+    def lowOctave(self, n, search, pm, t):
+        '''
+        Called when a note of octave 3 or below is encountered.
+        '''
+        stepName = search.group(1)[0].upper()
+        octaveNum = 4 - len(search.group(1))
+        n.step = stepName
+        n.octave = octaveNum
+        t = re.sub(pm, '', t)
+        return t
+
+    def highOctave(self, n, search, pm, t):
+        '''
+        Called when a note of octave 4 or higher is encountered.
+        '''
+        stepName = search.group(1)[0].upper()
+        octaveNum = 4 + len(search.group(2))
+        n.step = stepName
+        n.octave = octaveNum
+        t = re.sub(pm, '', t)
+        return t
+
+
+class Converter(object):
+    '''
+    Main conversion object for TinyNotation.
+    
+    Accepts one keyword: makeNotation=False to get "classic" TinyNotation formats.
+    
+    '''
+    def __init__(self, stringRep = "", **keywords):
+        self.stateMap = [ 
+            (r'trip\{', TripletState),
+            (r'quad\{', QuadrupletState),
+            (r'\~', TieState)
+            ]
+    
+        self.endState = re.compile(r'\}$')
+        
+        self.tokenMap = [
+                    (r'(\d+\/\d+)', TimeSignatureToken),
+                    (r'r(\S*)', RestToken),
+                    (r'(\S*)', NoteToken), # last
+        ]
+        
+        self.modifierMap = [
+                    (r'\=([A-Za-z0-9]*)', IdModifier),
+                    (r'_(.*)', LyricModifier),
+                    (r'\*(.*)\*', StarModifier),
+        ]
+
+        self.keywords = keywords
+        if 'makeNotation' in keywords:
+            self.makeNotation = keywords['makeNotation']
+        else:
+            self.makeNotation = True
+        
+        self.stream = stream.Part()
+        self.stateDict = {'currentTimeSignature': None,
+                          'lastDuration': 1.0
+                          }
+        self.stringRep = stringRep
+        #self.regexps = {}
+        self.activeStates = []
+        self.preTokens = [] # space-separated strings
+    
+        self._stateMapRe = None
+        self._tokenMapRe = None
+        self._modifierMapRe = None
+            
+    def splitPreTokens(self):
+        '''
+        splits the string into textual tokens.
+        
+        Right now just splits on spaces, but might be smarter to ignore spaces in
+        quotes, etc. later.
+        '''
+        self.preTokens = self.stringRep.split() # do something better...
+    
+    def setupRegularExpressions(self):
+        '''
+        Regular expressions get compiled for faster
+        usage.
+        '''
+        self._stateMapRe = []
+        for rePre, classCall in self.stateMap:
+            try:
+                self._stateMapRe.append( (re.compile(rePre), classCall) )
+            except sre_parse.error as e:
+                raise TinyNotationException("Error in compiling state, %s: %s" % (rePre, str(e)))
+
+
+        self._tokenMapRe = []
+        for rePre, classCall in self.tokenMap:
+            try:
+                self._tokenMapRe.append( (re.compile(rePre), classCall) )
+            except sre_parse.error as e:
+                raise TinyNotationException("Error in compiling token, %s: %s" % (rePre, str(e)))
+        
+        self._modifierMapRe = []
+        for rePre, classCall in self.modifierMap:
+            try:
+                self._modifierMapRe.append( (re.compile(rePre), classCall) )
+            except sre_parse.error as e:
+                raise TinyNotationException("Error in compiling modifier, %s: %s" % (rePre, str(e)))
+        
+    def parse(self):
+        '''
+        splitPreTokens, setupRegularExpressions, then run through each preToken, and run postParse.
+        '''
+        if self.preTokens == [] and self.stringRep != "":
+            self.splitPreTokens()
+        if self._tokenMapRe is None:
+            self.setupRegularExpressions()
+        
+        for i, t in enumerate(self.preTokens):
+            self.parseOne(i, t)
+        self.postParse()
+        return self
+
+    def parseOne(self, i, t):
+        '''
+        parse a single token at position i, with
+        text t.
+        
+        Checks for state changes, modifiers, tokens, and end-state brackets.
+        '''        
+        endBrackets = 0
+        
+        for s, c in self._stateMapRe:
+            matchSuccess = s.search(t)
+            if matchSuccess is not None:
+                stateData = matchSuccess.group(0)
+                t = s.sub('', t)
+                stateObj = c(self, stateData)
+                stateObj.start()
+                self.activeStates.append(stateObj)
+
+        while self.endState.search(t):
+            t = self.endState.sub('', t)
+            endBrackets += 1
+
+        
+        modifiers = []
+        for m, c in self._modifierMapRe:
+            matchSuccess = m.search(t)
+            if matchSuccess is not None:
+                modifierData = matchSuccess.group(1)
+                t = m.sub('', t)
+                modObj = c(modifierData, t, self)
+                modifiers.append(modObj)
+                
+        for mObj in modifiers:
+            mObj.preParse(t)
+        
+        for s in self.activeStates[:]:
+            t = s.affectTokenBeforeParse(t)
+        
+        m21Obj = None
+        tokenObj = None   
+        # parse token...with state...
+        for tokenRe, c in self._tokenMapRe:
+            matchSuccess = tokenRe.search(t)
+            if matchSuccess is not None:
+                tokenData = matchSuccess.group(1)
+                tokenObj = c(tokenData)
+                m21Obj = tokenObj.parse(self)
+                if m21Obj is not None:
+                    break
+
+        for s in self.activeStates[:]: # iterate over copy so we can remove....
+            m21Obj = s.affectTokenAfterParseBeforeModifiers(m21Obj)
+
+
+        for m in modifiers:
+            m.postParse(m21Obj)
+        
+        for s in self.activeStates[:]: # iterate over copy so we can remove....
+            m21Obj = s.affectTokenAfterParse(m21Obj)
+        
+        for i in range(endBrackets):
+            stateToRemove = self.activeStates.pop()
+            tempObj = stateToRemove.end()
+            if tempObj is not None:
+                m21Obj = tempObj
+
+        if m21Obj is not None:
+            self.stream._appendCore(m21Obj)
+    
+    def postParse(self):
+        '''
+        Call postParse calls on .stream, currently just .makeMeasures.
+        '''
+        if self.makeNotation is not False:
+            self.stream.makeMeasures(inPlace=True)
+        
 class Test(unittest.TestCase):
-
+    parseTest = "1/4 trip{C8~ C~_hello C=mine} F~ F~ 2/8 F F# quad{g--16 a## FF(n) g#} g16 F0"
+    
     def runTest(self):
         pass
     
-    def compactNoteInfo(self, n):
-        '''
-        A debugging info tool, returning information about a note
+    def testOne(self):
+        c = Converter(self.parseTest)
+        c.parse()
+        s = c.stream
+        sfn = s.flat.notes
+        self.assertEqual(sfn[0].tie.type, 'start')
+        self.assertEqual(sfn[1].tie.type, 'continue')
+        self.assertEqual(sfn[2].tie.type, 'stop')
+        self.assertEqual(sfn[0].step, 'C')
+        self.assertEqual(sfn[0].octave, 3)
+        self.assertEqual(sfn[1].lyric, "hello")
+        self.assertEqual(sfn[2].id, "mine")
+        self.assertEqual(sfn[6].pitch.accidental.alter, 1)
+        self.assertEqual(sfn[7].pitch.accidental.alter, -2)
+        self.assertEqual(sfn[9].editorial.ficta.alter, 0)
+        self.assertEqual(sfn[12].duration.quarterLength, 1.0)
+        self.assertEqual(sfn[12].expressions[0].classes, expressions.Fermata().classes)
+
+class TestExternal(unittest.TestCase):
+    def runTest(self):
+        pass
+    
+    def testOne(self):
+        c = Converter(Test.parseTest)
+        c.parse()
+        c.stream.show('musicxml.png')
+
+
+### TODO: Chords
         
-        E- E 4 flat 16th 0.1667 & is a tuplet (in fact STOPS the tuplet)
-        '''
-        ret = ""
-        if (n.isNote is True):
-            ret += n.name + " " + n.step + " " + str(n.octave)
-            if (n.accidental is not None):
-                ret += " " + n.accidental.name
-        elif (n.isRest is True):
-            ret += "rest"
-        else:
-            ret += "other note type"
-        if (n.tie is not None):
-            ret += " (Tie: " + n.tie.type + ")"
-        ret += " " + n.duration.type
-        ret += " " + common.strTrimFloat(n.duration.quarterLength)
-        if len(n.duration.tuplets) > 0:
-            ret += " & is a tuplet"
-            if n.duration.tuplets[0].type == "start":
-                ret += " (in fact STARTS the tuplet)"
-            elif n.duration.tuplets[0].type == "stop":
-                ret += " (in fact STOPS the tuplet)"
-        if len(n.expressions) > 0:
-            if (isinstance(n.expressions[0], expressions.Fermata)):
-                ret += " has Fermata"
-        return ret
-    
-    
-    def testTinyNotationNote(self):
-        cn = TinyNotationNote('AA-4.~')
-        a = cn.note
-        self.assertEqual(self.compactNoteInfo(a), "A- A 2 flat (Tie: start) quarter 1.5")
-    
-    def testTinyNotationStream(self):
-        st = TinyNotationStream('e2 f#8 r f trip{g16 f e-} d8 c B trip{d16 c B}')
-        ret = ""
-        for thisNote in st:
-            ret += self.compactNoteInfo(thisNote) + "\n"
-        
-        #d1 = st.duration
-        #l1 = d1.quarterLength
-        self.assertAlmostEquals(st.duration.quarterLength, 6.0)
-        
-        ret += "Total duration of Stream: " + common.strTrimFloat(st.duration.quarterLength) + "\n"
-        canonical = '''
-E E 4 half 2.0
-F# F 4 sharp eighth 0.5
-rest eighth 0.5
-F F 4 eighth 0.5
-G G 4 16th 0.1667 & is a tuplet (in fact STARTS the tuplet)
-F F 4 16th 0.1667 & is a tuplet
-E- E 4 flat 16th 0.1667 & is a tuplet (in fact STOPS the tuplet)
-D D 4 eighth 0.5
-C C 4 eighth 0.5
-B B 3 eighth 0.5
-D D 4 16th 0.1667 & is a tuplet (in fact STARTS the tuplet)
-C C 4 16th 0.1667 & is a tuplet
-B B 3 16th 0.1667 & is a tuplet (in fact STOPS the tuplet)
-Total duration of Stream: 6.0
-'''
-        self.assertTrue(common.basicallyEqual(canonical, ret), ret)
-    
-    def testConvert(self):
-        st1 = TinyNotationStream('e2 f#8 r f trip{g16 f e-} d8 c B trip{d16 c B}')
-        self.assertEqual(st1[1].offset, 2.0) 
-        self.assertTrue(isinstance(st1[2], note.Rest))     
-
-    def testHarmonyNotation(self):
-        hns = HarmonyStream("c2*F*_Mi- c_chelle r4*B-m7* d-_ma A-2_belle G4*E-*_these c_are A-_words G_that F*Ddim*_go A-_to- Bn_geth- A-_er", "4/4")
-        nst1 = hns.notesAndRests
-        self.assertEqual(nst1[0].step, "C")
-        self.assertEqual(nst1[0].editorial.misc['harmony'], "F")
-        self.assertEqual(nst1[0].lyric, "Mi")
-        self.assertEqual(nst1[2].isRest, True)
-        self.assertEqual(nst1[5].name, "G")
-        self.assertEqual(nst1[7].name, "A-")
-
-class TestExternal(unittest.TestCase):    
-
-    def xtestCreateEasyScale(self):
-        myScale = "d8 e f g a b"
-        time1 = meter.TimeSignature("3/4")
-        tinyNotation = TinyNotationStream(myScale, time1)
-        tinyNotation.show('lily.pdf')
-    
-    def testMusicXMLExt(self):
-        cadB = TinyNotationStream("c8 B- B- A c trip{d16 c B-} A8 B- A0", "2/4")
-#        last = cadB[10]
-#        cadB = stream.Stream()
-#        n1 = note.Note()
-#        n1.duration.type = "whole"
-#        cadB.append(n1)
-#        cadB.show('lily.pdf')
-        cadB.show()
-
-
-
-#-------------------------------------------------------------------------------
-# define presented order in documentation
-_DOC_ORDER = [TinyNotationNote, TinyNotationStream, HarmonyStream, HarmonyNote]
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-
-#------------------------------------------------------------------------------
-# eof
-
+        

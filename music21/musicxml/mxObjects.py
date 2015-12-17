@@ -17,7 +17,7 @@ import sys
 
 import copy
 import unittest
-#import codecs
+#import io
 
 from music21 import defaults
 from music21 import common
@@ -30,16 +30,7 @@ from music21 import environment
 _MOD = 'musicxml.py'
 environLocal = environment.Environment(_MOD)
 
-
-#-------------------------------------------------------------------------------
-# store the highest version number of m21 that pickled mxl object files
-# are compatible; compatible pickles (always written with the m21 version)
-# are >= to this value
-# if changes are made here that are not compatible, the m21 version number
-# needs to be increased and this number needs to be set to that value
-VERSION_MINIMUM = (1, 9, 0) 
-
-
+ 
 # new objects to add: octave-shift, in direction-type
 # bracket, in direction-type
 # Notations -> ornaments, trill-mark/wavy-line
@@ -96,7 +87,7 @@ TECHNICAL_MARKS = ['up-bow', 'down-bow', 'harmonic', 'open-string',
 
 #-------------------------------------------------------------------------------
 def yesNoToBoolean(value):
-    if value in ['yes', True]:
+    if value in ('yes', True):
         return True
     return False
 
@@ -250,7 +241,7 @@ class TagLib(object):
         ('accidental-mark', True, AccidentalMark), 
         ('shake', False, Shake), 
         ('schleifer', False, Schleifer), 
-        ('tremolo', False, Tremolo), 
+        ('tremolo', True, Tremolo), 
         
         ('attributes', False, Attributes), 
         
@@ -1297,7 +1288,10 @@ class Measure(MusicXMLElementList):
         self.external['divisions'] = attributes.get('divisions')
 
     def update(self):
-        '''This method looks at all note, forward, and backup objects and updates divisons and attributes references
+        '''
+        This method looks at all note, forward, and backup 
+        objects and updates divisons and attributes 
+        references.
         '''
         updateAttributes = False
         if len(self._attributesObjList) > 1:
@@ -2638,9 +2632,10 @@ class Tremolo(MusicXMLElement):
     def __init__(self, type=None): # @ReservedAssignment
         MusicXMLElement.__init__(self)
         self._tag = 'tremolo'
+        self.charData = None
         # type may or may not be defined
         self._attr['type'] = None # start or stop; 
-        self._attr['number'] = None # for id
+        #self._attr['number'] = None # for id
 
 class Notehead(MusicXMLElement):
     def __init__(self, type=None): # @ReservedAssignment
@@ -2973,9 +2968,7 @@ class Defaults(MusicXMLElementList):
     def __init__(self):
         '''From the MusicXML schema:
         
-        ::
-
-            The defaults type specifies score-wide defaults for scaling, layout, and appearance.
+        The defaults type specifies score-wide defaults for scaling, layout, and appearance::
 
             <xs:sequence>
                 <xs:element name="scaling" type="scaling" minOccurs="0"/>

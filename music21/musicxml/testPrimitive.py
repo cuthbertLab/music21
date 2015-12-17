@@ -17623,31 +17623,223 @@ unicodeStrNoNonAscii = u"""<?xml version="1.0" encoding="utf-8"?>
 </score-partwise>
 """
 
+tremoloTest = u"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="3.0">
+  <identification>
+    <encoding>
+      <software>Finale 2014 for Mac</software>
+      <software>Dolet Light for Finale 2014</software>
+      <encoding-date>2015-08-05</encoding-date>
+      <supports attribute="new-system" element="print" type="yes" value="yes"/>
+      <supports attribute="new-page" element="print" type="yes" value="yes"/>
+      <supports element="accidental" type="yes"/>
+      <supports element="beam" type="yes"/>
+      <supports element="stem" type="yes"/>
+    </encoding>
+  </identification>
+  <defaults>
+    <scaling>
+      <millimeters>7.2319</millimeters>
+      <tenths>40</tenths>
+    </scaling>
+    <page-layout>
+      <page-height>1545</page-height>
+      <page-width>1194</page-width>
+      <page-margins type="both">
+        <left-margin>70</left-margin>
+        <right-margin>70</right-margin>
+        <top-margin>88</top-margin>
+        <bottom-margin>88</bottom-margin>
+      </page-margins>
+    </page-layout>
+    <system-layout>
+      <system-margins>
+        <left-margin>0</left-margin>
+        <right-margin>0</right-margin>
+      </system-margins>
+      <system-distance>121</system-distance>
+      <top-system-distance>70</top-system-distance>
+    </system-layout>
+    <appearance>
+      <line-width type="stem">0.7487</line-width>
+    </appearance>
+    <music-font font-family="Maestro,engraved" font-size="20.5"/>
+    <word-font font-family="Times New Roman" font-size="10.25"/>
+  </defaults>
+  <credit page="1">
+    <credit-words default-x="70" default-y="1453" font-size="12" valign="top">Score</credit-words>
+  </credit>
+  <part-list>
+    <score-part id="P1">
+      <part-name print-object="no">MusicXML Part</part-name>
+      <score-instrument id="P1-I1">
+        <instrument-name>SmartMusic SoftSynth 1</instrument-name>
+      </score-instrument>
+      <midi-instrument id="P1-I1">
+        <midi-channel>1</midi-channel>
+        <midi-bank>15489</midi-bank>
+        <midi-program>1</midi-program>
+        <volume>80</volume>
+        <pan>0</pan>
+      </midi-instrument>
+    </score-part>
+  </part-list>
+  <!--=========================================================-->
+  <part id="P1">
+    <measure number="1" width="504">
+      <print>
+        <system-layout>
+          <system-margins>
+            <left-margin>70</left-margin>
+            <right-margin>0</right-margin>
+          </system-margins>
+          <top-system-distance>211</top-system-distance>
+        </system-layout>
+        <measure-numbering>system</measure-numbering>
+      </print>
+      <attributes>
+        <divisions>8</divisions>
+        <key>
+          <fifths>0</fifths>
+          <mode>major</mode>
+        </key>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <sound tempo="120"/>
+      <note default-x="84">
+        <pitch>
+          <step>B</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>16</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <stem default-y="-55">down</stem>
+        <notations>
+          <ornaments>
+            <tremolo default-x="-5" default-y="-52" type="single">3</tremolo>
+          </ornaments>
+        </notations>
+      </note>
+      <note default-x="293">
+        <pitch>
+          <step>A</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>16</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <stem default-y="10.5">up</stem>
+        <notations>
+          <ornaments>
+            <tremolo default-x="6" default-y="-13" type="single">2</tremolo>
+          </ornaments>
+        </notations>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="2" width="480">
+      <note default-x="14">
+        <pitch>
+          <step>B</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>16</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <stem default-y="-55">down</stem>
+        <notations>
+          <ornaments>
+            <tremolo default-x="-4" default-y="-45" type="single">1</tremolo>
+          </ornaments>
+        </notations>
+      </note>
+      <note default-x="222">
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>8</duration>
+        <voice>1</voice>
+        <type>32nd</type>
+        <time-modification>
+          <actual-notes>1</actual-notes>
+          <normal-notes>8</normal-notes>
+          <normal-type>16th</normal-type>
+        </time-modification>
+        <stem default-y="-62">down</stem>
+        <notehead filled="no">normal</notehead>
+        <beam number="1">begin</beam>
+        <beam number="2">begin</beam>
+        <beam number="3">begin</beam>
+        <notations>
+          <tuplet bracket="no" number="1" show-number="none" type="start">
+            <tuplet-actual>
+              <tuplet-number>1</tuplet-number>
+              <tuplet-type>16th</tuplet-type>
+            </tuplet-actual>
+            <tuplet-normal>
+              <tuplet-number>1</tuplet-number>
+              <tuplet-type>half</tuplet-type>
+            </tuplet-normal>
+          </tuplet>
+        </notations>
+      </note>
+      <note default-x="351">
+        <pitch>
+          <step>A</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>8</duration>
+        <voice>1</voice>
+        <type>32nd</type>
+        <time-modification>
+          <actual-notes>1</actual-notes>
+          <normal-notes>8</normal-notes>
+          <normal-type>16th</normal-type>
+        </time-modification>
+        <stem default-y="-67.5">down</stem>
+        <notehead filled="no">normal</notehead>
+        <beam number="1">end</beam>
+        <beam number="2">end</beam>
+        <beam number="3">end</beam>
+        <notations>
+          <tuplet number="1" type="stop"/>
+        </notations>
+      </note>
+    </measure>
+  </part>
+  <!--=========================================================-->
+</score-partwise>
+"""
 
 
 
-ALL = [articulations01, pitches01a, directions31a, lyricsMelisma61d, notations32a, restsDurations02a, rhythmDurations03a, chordsThreeNotesDuration21c,
-beams01, timeSignatures11c, timeSignatures11d, clefs12a, beams02, tuplets23a, tuplets23b, tupletsNested23d, keySignatures13a,
 
-barlines46a, simpleRepeat45a, repeatMultipleTimes45c,
-spannersSlurs33c, metronomeMarks31c, 
-
-multipleAttributesPerMeasures, systemLayoutTwoPart, multiMeasureTies, chordIndependentTies, textExpressions, repeatExpressionsA, repeatExpressionsB, 
-
-repeatBracketsA,
-
-voiceDouble, pianoStaff43a, spanners33a, staffGroupsNested41d,
-
-graceNotes24a, transposingInstruments72a, transposing01, 
-
-
-mixedVoices1a, mixedVoices1b, mixedVoices2, 
-
-colors01, triplets01, textBoxes01, otaveShifts33d,
-
-unicodeStrNoNonAscii,
-unicodeStrWithNonAscii, 
-
+ALL = [
+       articulations01, pitches01a, directions31a, lyricsMelisma61d, notations32a, # 0
+       restsDurations02a, rhythmDurations03a, chordsThreeNotesDuration21c, # 5
+       beams01, timeSignatures11c, timeSignatures11d, clefs12a, beams02, # 8  
+       tuplets23a, tuplets23b, tupletsNested23d, keySignatures13a, #13
+       barlines46a, simpleRepeat45a, repeatMultipleTimes45c, # 17
+       spannersSlurs33c, metronomeMarks31c,  # 20
+       multipleAttributesPerMeasures, systemLayoutTwoPart, multiMeasureTies, #22
+       chordIndependentTies, textExpressions, repeatExpressionsA, repeatExpressionsB, # 25 
+       repeatBracketsA, # 29
+       voiceDouble, pianoStaff43a, spanners33a, staffGroupsNested41d, #30
+       graceNotes24a, transposingInstruments72a, transposing01,  #34
+       mixedVoices1a, mixedVoices1b, mixedVoices2, #37
+       colors01, triplets01, textBoxes01, otaveShifts33d, #40
+       unicodeStrNoNonAscii, unicodeStrWithNonAscii, #44
+       tremoloTest #46
 ]
 
 
@@ -17662,11 +17854,12 @@ def get(contentRequest):
     '''
     if contentRequest in ['pitch']:
         return pitches01a
-    if contentRequest in ['lyrics']:
+    elif contentRequest in ['lyrics']:
         return lyricsMelisma61d
-    if contentRequest in ['beams']:
+    elif contentRequest in ['beams']:
         return beams02
-
+    elif contentRequest in ['tremolos']:
+        return tremoloTest
 
 
 #-------------------------------------------------------------------------------
@@ -17678,10 +17871,71 @@ class Test(unittest.TestCase):
     def testBasic(self):
         # a basic test to make sure each parse
         from music21 import converter
-        for testMaterial in ALL:
-            dummy = converter.parse(testMaterial)
+        for i,testMaterial in enumerate(ALL):
+            try:
+                dummy = converter.parse(testMaterial)
+            except Exception:
+                print("Failure in test ", i)
+                raise
+
+    def testMidMeasureClef1(self):
+        """ Tests if there are mid-mesure clefs clefs: single staff """
+        from music21 import stream, note, clef, musicxml, converter, meter
+
+        orig_stream = stream.Stream()
+        orig_stream.append(meter.TimeSignature("4/4"))
+        orig_stream.append(clef.TrebleClef())
+        orig_stream.repeatAppend(note.Note("C4"), 2)
+        orig_stream.append(clef.BassClef())
+        orig_stream.repeatAppend(note.Note("C4"), 2)
+        orig_clefs = orig_stream.flat.getElementsByClass('Clef')
+
+        xml = musicxml.m21ToString.fromStream(orig_stream)
+        self.assertEquals(xml.count('<clef>'), 2) # clefs got out
+        self.assertEquals(xml.count('<measure'), 1) # in one measure
+        
+        new_stream = converter.parse(xml)
+        new_clefs = new_stream.flat.getElementsByClass('Clef')
+
+        self.assertEqual(len(new_clefs), len(orig_clefs))
+        self.assertEqual([c.offset for c in new_clefs], [c.offset for c in orig_clefs])
+        self.assertEqual([c.classes for c in new_clefs], [c.classes for c in orig_clefs])
 
 
+    def testMidMeasureClefs2(self):
+        """ Tests if there are mid-mesure clefs clefs: multiple staves """
+        from music21 import stream, note, clef, musicxml, converter, meter
+
+        orig_stream = stream.Stream()
+        orig_stream.append(stream.Part())
+        orig_stream.append(stream.Part())
+        orig_stream.append(meter.TimeSignature("3/4"))
+        
+        for item in [clef.TrebleClef(), note.Note("C4"), clef.BassClef(),
+            note.Note("C4"), note.Note("C4")]:
+            orig_stream[0].append(item)
+
+        for item in [clef.BassClef(), note.Note("C4"), note.Note("C4"),
+            clef.TrebleClef(), note.Note("C4")]:
+            orig_stream[1].append(item)
+
+        orig_clefs = [staff.flat.getElementsByClass('Clef') for staff in
+            orig_stream.getElementsByClass('Part')]
+
+        xml = musicxml.m21ToString.fromStream(orig_stream)
+
+        new_stream = converter.parse(xml)
+        new_clefs = [staff.flat.getElementsByClass('Clef') for staff in
+            new_stream.getElementsByClass('Part')]
+
+        self.assertEqual([len(clefs) for clefs in new_clefs],
+          [len(clefs) for clefs in orig_clefs])
+        self.assertEqual([c.offset for c in new_clefs],
+          [c.offset for c in orig_clefs])
+        self.assertEqual([c.classes for c in new_clefs],
+          [c.classes for c in orig_clefs])
+
+#-------------------------------------------------------------------------------
 
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()

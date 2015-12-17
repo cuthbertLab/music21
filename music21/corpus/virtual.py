@@ -8,8 +8,10 @@
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
-
-'The virtual.py module is a library of references to remotely stored music data files, as well as meta-data necessary to download and, if available, access an already downloaded file.'
+'''
+The virtual.py module is a library of references to remotely stored music data files, 
+as well as meta-data necessary to download and, if available, access an already downloaded file.
+'''
 
 import unittest
 
@@ -17,8 +19,6 @@ from music21 import common
 from music21 import environment
 _MOD = 'converter.py'
 environLocal = environment.Environment(_MOD)
-
-
 
 
 class VirtualWork(object):
@@ -36,7 +36,8 @@ class VirtualWork(object):
 
 #     def _getDstFp(self, dir):
 #         '''Given a directory (usually the users scratch directory) create
-#         a file path based on the md5 of the works title. This means that all works must have unique titles in the virtual corpus. 
+#         a file path based on the md5 of the works title. This means that all
+#         works must have unique titles in the virtual corpus. 
 #         '''
 #         if dir == None:
 #             raise ValueError
@@ -80,8 +81,9 @@ class BachBWV1007Prelude(VirtualWork):
         self.composer = 'Johann Sebastian Bach'
         self.title = 'Prelude from Cello Suite No. 1 in G Major, BWV 1007'
         self.corpusPath = 'bach/bwv1007/prelude'        
-        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml')        
-        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=kern')
+        cello = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello'
+        self.urlList.append(cello + '&file=bwv1007-01.krn&f=xml')        
+        self.urlList.append(cello + '&file=bwv1007-01.krn&f=kern')
 
 
 class BachBWV772(VirtualWork):
@@ -91,7 +93,8 @@ class BachBWV772(VirtualWork):
         self.composer = 'Johann Sebastian Bach'
         self.title = 'Invention No. 1 in C Major, BWV 772'
         self.corpusPath = 'bach/bwv772'        
-        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=osu/classical/bach/inventions&file=inven01.krn&f=xml')  
+        invention = 'http://kern.ccarh.org/cgi-bin/ksdata?l=osu/classical/bach/inventions'       
+        self.urlList.append(invention + '&file=inven01.krn&f=xml')  
 
 
 class BachBWV773(VirtualWork):
@@ -100,9 +103,10 @@ class BachBWV773(VirtualWork):
 
         self.composer = 'Johann Sebastian Bach'
         self.title = 'Invention No. 2 in C Minor, BWV 773'
-        self.corpusPath = 'bach/bwv773'        
-        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=osu/classical/bach/inventions&file=inven02.krn&f=xml')  
-        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=osu/classical/bach/inventions&file=inven02.krn&f=kern')  
+        self.corpusPath = 'bach/bwv773' 
+        invention = 'http://kern.ccarh.org/cgi-bin/ksdata?l=osu/classical/bach/inventions'       
+        self.urlList.append(invention + '&file=inven02.krn&f=xml')  
+        self.urlList.append(invention + '&file=inven02.krn&f=kern')  
 
 
 class ColtraneGiantSteps(VirtualWork):
@@ -113,7 +117,8 @@ class ColtraneGiantSteps(VirtualWork):
         self.composer = 'John Coltrane'
         self.title = 'Giant Steps'
         self.corpusPath = 'coltrane/giantSteps'        
-        self.urlList.append('http://impromastering.com/uploads/transcription_file/file/196/Giant_Steps__John_Coltrane_C.xml')        
+        self.urlList.append('http://impromastering.com/uploads/transcription_file/file/196/' + 
+                            'Giant_Steps__John_Coltrane_C.xml')        
 
 
 
@@ -124,7 +129,8 @@ class SchubertD576(VirtualWork):
         self.composer = 'Franz Schubert'
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
         self.corpusPath = 'schubert/d576-1'        
-        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=xml')        
+        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/' + 
+                            'd0576&file=d0576-06.krn&f=xml')        
 
 
 class SchubertD5762(VirtualWork):
@@ -134,7 +140,8 @@ class SchubertD5762(VirtualWork):
         self.composer = 'Franz Schubert'
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
         self.corpusPath = 'schubert/d576-2'
-        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-02.krn&f=xml')
+        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=users/' + 
+                            'craig/classical/schubert/piano/d0576&file=d0576-02.krn&f=xml')
 
 
 class SchubertD5763(VirtualWork):
@@ -144,7 +151,8 @@ class SchubertD5763(VirtualWork):
         self.composer = 'Franz Schubert'
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
         self.corpusPath = 'schubert/d576-3'
-        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-03.krn&f=xml')
+        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/' + 
+                            'schubert/piano/d0576&file=d0576-03.krn&f=xml')
 
 
 class SchubertD5764(VirtualWork):
@@ -154,7 +162,8 @@ class SchubertD5764(VirtualWork):
         self.composer = 'Franz Schubert'
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
         self.corpusPath = 'schubert/d576-4'
-        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/schubert/piano/d0576&file=d0576-04.krn&f=xml')
+        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/' + 
+                            'schubert/piano/d0576&file=d0576-04.krn&f=xml')
 
 
 class PachelbelCanonD(VirtualWork):
@@ -164,14 +173,8 @@ class PachelbelCanonD(VirtualWork):
         self.composer = 'Johann Pachelbel'
         self.title = 'Canon in D Major'
         self.corpusPath = 'pachelbel/canon'        
-        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=cc/pachelbel&file=canon.krn&f=xml')        
-
-
-
-
-
-
-
+        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=cc/' + 
+                            'pachelbel&file=canon.krn&f=xml')        
 
 
 #-------------------------------------------------------------------------------
@@ -183,9 +186,9 @@ class TestExternal(unittest.TestCase):
 
     def testParseURL(self):
         pass
-        #urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=xml'
-        #urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=kern'
-        #urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml'
+#urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=xml'
+#urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=kern'
+#urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml'
 
 class Test(unittest.TestCase):
 

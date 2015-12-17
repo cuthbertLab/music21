@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from music21 import stream, converter, corpus, instrument, graph, note, meter, humdrum
-import music21.note
 import music21.pitch
 from collections import defaultdict
 
@@ -15,7 +14,7 @@ def simple1():
     
     for work in ['opus18no1', 'opus59no3']:
         movementNumber = 3
-        score = corpus.parse(work, movementNumber, extList=['xml'])
+        score = corpus.parse(work, movementNumber) #, extList=['xml'])
     
         for part in score:
             instrumentName = part.flat.getElementsByClass(
@@ -152,7 +151,7 @@ def simple4a(show=True):
     #movement = corpus.getWork(work, movementNumber)
     #s = converter.parse(movement)
 
-    s = corpus.parse('opus18no1', movementNumber, extList=['xml'])
+    s = corpus.parse('opus18no1', movementNumber) #, extList=['xml'])
 
     #s[0].show()
 
@@ -180,7 +179,7 @@ def simple4b(show=True):
 
     work = 'opus41no1'
     movementNumber = 2
-    s = corpus.parse(work, movementNumber, extList='xml')
+    s = corpus.parse(work, movementNumber) #, extList='xml')
     countCrescendo = 0
     countDiminuendo = 0
     for part in s.getElementsByClass(stream.Part):
@@ -250,7 +249,7 @@ def simple4f(show=True):
     # question 19: Calculate pitch-class sets for melodic passages segmented by rests.
     work = 'opus18no1'
     movementNumber = 3
-    s = corpus.parse(work, movementNumber, extList=['xml'])
+    s = corpus.parse(work, movementNumber) #, extList=['xml'])
 
     foundSets = []
     candidateSet = []
@@ -258,14 +257,14 @@ def simple4f(show=True):
         eventStream = part.flat.notesAndRests
         for i in range(len(eventStream)):
             e = eventStream[i]
-            if isinstance(e, music21.note.Rest) or i == len(eventStream)-1:
+            if isinstance(e, note.Rest) or i == len(eventStream)-1:
                 if len(candidateSet) > 0:
                     candidateSet.sort()
                     # this removes redundancies for simplicity
                     if candidateSet not in foundSets:
                         foundSets.append(candidateSet)
                     candidateSet = []
-            elif isinstance(e, music21.note.Note):      
+            elif isinstance(e, note.Note):      
                 if e.pitchClass not in candidateSet:
                     candidateSet.append(e.pitchClass)
     foundSets.sort()
@@ -282,7 +281,7 @@ def simple4g():
     s = converter.parse(movements[movementNumber-1])
     count = 0
     for part in s:
-        noteStream = part.flat.getElementsByClass(music21.note.Note)
+        noteStream = part.flat.getElementsByClass(note.Note)
         for i in range(len(noteStream)-1):
             # assuming spelling does not count
             if noteStream[i].midi == noteStream[i+1].midi:
@@ -360,23 +359,22 @@ def januaryThankYou():
             for i in range(len(notes) - 4):
 #                if (notes[i].name == 'E-' or notes[i].name == "D#") and notes[i+1].name == 'E' and notes[i+2].name == 'A':
                 if notes[i].name == 'E-' and notes[i+1].name == 'E' and notes[i+2].name == 'A':
-                        measureNumber = 0
-                        for site in notes[i].sites.getSites():
-                            if isinstance(site, stream.Measure):
-                                measureNumber = site.number
-                                display.append(site)
-                        notes[i].lyric = workName + " " + str(thisPart.id) + " " + str(measureNumber)
-                        m = stream.Measure()
-                        m.append(notes[i])
-                        m.append(notes[i+1])
-                        m.append(notes[i+2])
-                        m.append(notes[i+3])
-                        m.insert(0, m.bestClef())
-                        display.append(m)
-            try:
-                display.show()
-            except:
-                pass
+                    measureNumber = 0
+                    for site in notes[i].sites.getSites():
+                        if isinstance(site, stream.Measure):
+                            measureNumber = site.number
+                            display.append(site)
+                    notes[i].lyric = workName + " " + str(thisPart.id) + " " + str(measureNumber)
+                    m = stream.Measure()
+                    m.append(notes[i])
+                    m.append(notes[i+1])
+                    m.append(notes[i+2])
+                    m.append(notes[i+3])
+                    m.insert(0, m.bestClef())
+                    display.append(m)
+
+            
+            display.show()
     
 
 
@@ -384,30 +382,30 @@ def januaryThankYou():
 #-------------------------------------------------------------------------------
 
 
-'''
-jdstewar@fas.harvard.edu wrote on Nov 21 [1999]:
-> Dear Myke, 
-> 
-> In the meantime here are a few 
-> questions I would pose for the program; some I imagine would be easy 
-> and straighforward, some perhaps not so easy: 
 
-Indeed, you've organized the questions in order from what I believe
-will be the easiest to answer to what I believe will be the hardest.
-The program doesn't have a good "Label Harmony" function (just because
-of how complicated and ambiguous that can be) so anything involving a
-single labeled chord can be difficult.  The first and second should be
-extremely easy.  The third and fifth should be easy to construct in
-such a way that it doesn't miss anything but it might give some
-results that are "false positives".  #4 will be the hardest to
-construct, since a half cadence is something that's not determined so
-much by the cadence chord and the chords directly preceding but more
-from a larger sense of tonal listening which is of course harder to
-teach a computer to have.
+# jdstewar@fas.harvard.edu wrote on Nov 21 [1999]:
+# > Dear Myke, 
+# > 
+# > In the meantime here are a few 
+# > questions I would pose for the program; some I imagine would be easy 
+# > and straighforward, some perhaps not so easy: 
+# 
+# Indeed, you've organized the questions in order from what I believe
+# will be the easiest to answer to what I believe will be the hardest.
+# The program doesn't have a good "Label Harmony" function (just because
+# of how complicated and ambiguous that can be) so anything involving a
+# single labeled chord can be difficult.  The first and second should be
+# extremely easy.  The third and fifth should be easy to construct in
+# such a way that it doesn't miss anything but it might give some
+# results that are "false positives".  #4 will be the hardest to
+# construct, since a half cadence is something that's not determined so
+# much by the cadence chord and the chords directly preceding but more
+# from a larger sense of tonal listening which is of course harder to
+# teach a computer to have.
+# 
+# warmly,
+# Myke Cuthbert
 
-warmly,
-Myke Cuthbert
-'''
 
 
 def js_q1():
