@@ -1239,16 +1239,10 @@ class Test(unittest.TestCase):
         '''
         When the string starts with "mei:"
         '''
-        try:
-            # this works in Python 3.3+
+        if six.PY3:
             from unittest import mock  # pylint: disable=no-name-in-module
-        except ImportError:
-            try:
-                # system library overrides the built-in
-                import mock
-            except ImportError:
-                # last resort
-                from music21.ext import mock
+        else:
+            from music21.ext import mock
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             testConverter = ConverterMEI()
             testConverter.parseData('mei: <?xml><mei><note/></mei>')
@@ -1258,16 +1252,10 @@ class Test(unittest.TestCase):
         '''
         When the string doesn't start with "mei:"
         '''
-        try:
-            # this works in Python 3.3+
+        if six.PY3:
             from unittest import mock  # pylint: disable=no-name-in-module
-        except ImportError:
-            try:
-                # system library overrides the built-in
-                import mock
-            except ImportError:
-                # last resort
-                from music21.ext import mock
+        else:
+            from music21.ext import mock
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             testConverter = ConverterMEI()
             testConverter.parseData('<?xml><mei><note/></mei>')
