@@ -51,16 +51,16 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 #-------------------------------------------------------------------------------
 # match finale name, which may be directory or something else
-reFinaleApp = re.compile(r'Finale 20[0-1][0-9][a-z]*.app')
-reFinaleExe = re.compile(r'Finale 20[0-1][0-9][a-z]*.exe')
-reFinaleReaderApp = re.compile(r'Finale Reader.app')
-reMuseScoreApp = re.compile(r'MuseScore\s?[0-9]*.app')
+reFinaleApp = re.compile(r'Finale (?:Notepad )?20[0-2][0-9][a-z\.0-9]*.app', re.IGNORECASE)
+reFinaleExe = re.compile(r'Finale (?:Notepad )?20[0-2][0-9][a-z\.0-9]*.exe', re.IGNORECASE)
+reFinaleReaderApp = re.compile(r'Finale Reader.app', re.IGNORECASE)
+reMuseScoreApp = re.compile(r'MuseScore\s?[0-9]*.app', re.IGNORECASE)
 
 
 urlMusic21 = 'http://web.mit.edu/music21'
-urlFinaleReader = 'http://www.finalemusic.com/Reader'
+urlFinaleNotepad = 'http://www.finalemusic.com/products/finale-notepad/resources/'
 urlMuseScore = 'http://musescore.org'
-urlGettingStarted = 'http://mit.edu/music21/doc/'
+urlGettingStarted = 'http://music21.readthedocs.org'
 urlMusic21List = 'http://groups.google.com/group/music21list'
 
 LINE_WIDTH = 78
@@ -1318,6 +1318,7 @@ class SelectMusicXMLReader(SelectFilePath):
                 return True
             else: 
                 return False
+            
         results += self._getDarwinApp(comparisonMuseScore)
 
         def comparisonFinaleReader(name):
@@ -1326,6 +1327,7 @@ class SelectMusicXMLReader(SelectFilePath):
                 return True
             else: 
                 return False
+            
         results += self._getDarwinApp(comparisonFinaleReader)
 
         return results
@@ -1372,9 +1374,9 @@ class SelectMusicXMLReader(SelectFilePath):
         '''
         platform = common.getPlatform()
         if platform == 'win':
-            urlTarget = urlFinaleReader
+            urlTarget = urlFinaleNotepad
         elif platform == 'darwin':
-            urlTarget = urlFinaleReader
+            urlTarget = urlFinaleNotepad
         elif platform == 'nix':
             urlTarget = urlMuseScore
         

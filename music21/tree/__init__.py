@@ -18,26 +18,18 @@ organized by start and stop offsets.
 This is a lower-level tool that for now at least normal music21
 users won't need to worry about.
 '''
-__all__ = ['trees', 'spans', 'analysis', 'node', 'verticality', 'fromStream', 'toStream']
+__all__ = ['analysis', 'core', 'fromStream', 'node', 'spans', 'toStream', 'trees', 'verticality']
 
 import unittest
 
-from music21 import chord
-from music21 import common
-from music21 import exceptions21
-from music21 import note
-
-from music21.tree import fromStream
-from music21.tree import toStream
-
-from music21.tree import trees 
-from music21.tree import spans 
 from music21.tree import analysis 
+from music21.tree import core
+from music21.tree import fromStream
 from music21.tree import node 
+from music21.tree import spans 
+from music21.tree import toStream
+from music21.tree import trees 
 from music21.tree import verticality 
-
-from music21 import environment
-environLocal = environment.Environment("tree")
 
 
 #------------------------------------------------------------------------------

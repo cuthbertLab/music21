@@ -2337,7 +2337,7 @@ class PlotStream(object):
             #environLocal.printDebug(['using measures for offset ticks'])
             # store indices in offsetMap
             mNoToUse = []
-            sortedKeys = sorted(list(offsetMap.keys()))
+            sortedKeys = list(offsetMap.keys())
             for key in sortedKeys:
                 if key >= offsetMin and key <= offsetMax:
 #                     if key == 0.0 and not displayMeasureNumberZero:
