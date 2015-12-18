@@ -11135,7 +11135,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnPart = containedPart
         else:
             returnObj = copy.deepcopy(self)
-            containedPartIndex = self.parts.index(containedPart)
+            containedPartIndex = self.parts.stream().index(containedPart)
             returnPart = returnObj.parts[containedPartIndex]
 
         #First build a new part object that is the same length as returnPart 
@@ -12090,8 +12090,7 @@ class Score(Stream):
     def _getParts(self):
 #         return self.getElementsByClass('Part')
         if 'parts' not in self._cache or self._cache['parts'] is None:
-            self._cache['parts'] = self.getElementsByClass('Part').stream()
-            # TODO: eliminate .stream()
+            self._cache['parts'] = self.getElementsByClass('Part')
         return self._cache['parts']
 
     parts = property(_getParts,
@@ -12103,7 +12102,9 @@ class Score(Stream):
 
 
         >>> s = corpus.parse('bach/bwv66.6')
-        >>> partStream = s.parts
+        >>> s.parts
+        <music21.stream.iterator.StreamIterator for Score:0x104af3a58 @:0>
+        >>> partStream = s.parts.stream()
         >>> partStream.classes
         ('Score', 'Stream', 'StreamCoreMixin', 'Music21Object', 'object')
         >>> len(partStream)
