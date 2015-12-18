@@ -5605,7 +5605,8 @@ class Test(unittest.TestCase):
             'Measure')[3], True)
 
         m4 = p1.measure(4)
-        self.assertTrue(m4.flat.notesAndRests.derivation.rootDerivation is m4, list(m4.flat.notesAndRests.derivation.chain()))
+        self.assertTrue(m4.flat.notesAndRests.derivation.rootDerivation is m4, 
+                        list(m4.flat.notesAndRests.derivation.chain()))
         
         # part is the root derivation of a measures() call
         mRange = p1.measures(4, 6)
@@ -5613,13 +5614,11 @@ class Test(unittest.TestCase):
         self.assertEqual(mRange.flat.notesAndRests.derivation.rootDerivation, p1)
 
 
-        self.assertEqual(s.flat.getElementsByClass(
-            'Rest').derivation.rootDerivation is s, True) 
+        self.assertIs(s.flat.getElementsByClass('Rest').stream().derivation.rootDerivation, s) 
         
         # we cannot use the activeSite to get the Part from the Measure, as
         # the activeSite was set when doing the getElementsByClass operation
-        self.assertEqual(p1.getElementsByClass(
-            'Measure')[3].activeSite is p1, False)
+        self.assertIsNot(p1.getElementsByClass('Measure')[3].activeSite, p1)
 
 
 
