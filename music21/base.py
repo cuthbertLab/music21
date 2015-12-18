@@ -1481,14 +1481,12 @@ class Music21Object(object):
         (<music21.stream.Measure 3333 offset=0.0>, 0.0, 'elementsFirst')
         
 
-        >>> tempPartStream = c.parts
-        >>> tempPartStream.id = 'partStream' # for identificationBelow
-        >>> m3 = tempPartStream[1].measure(3)
+        >>> partIterator = c.parts
+        >>> m3 = partIterator[1].measure(3)
         >>> for y in m3.contextSites():
         ...      print(y)
         (<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')
         (<music21.stream.Part Alto>, 9.0, 'flatten')
-        (<music21.stream.Score partStream>, 9.0, 'elementsOnly')
         (<music21.stream.Score bach>, 9.0, 'elementsOnly')
 
 
@@ -1983,6 +1981,7 @@ class Music21Object(object):
         P2: Alto: Instrument 2
         <music21.stream.Part Alto>
         <music21.stream.Part Soprano>
+        <music21.metadata.Metadata object at 0x11116d080>
         <music21.stream.Score 0x10513af98>
         '''
 #         allSiteContexts = list(self.contextSites(returnSortTuples=True))
@@ -4695,7 +4694,8 @@ class Test(unittest.TestCase):
                           "(<music21.stream.Part Alto>, 9.0, 'flatten')", 
                           "(<music21.stream.Score bach>, 9.0, 'elementsOnly')"])
         siteList = []
-        cParts = c.parts # need this otherwise it could possibly be garbage collected.
+
+        cParts = c.parts.stream() # need this otherwise it could possibly be garbage collected.
         cParts.id = 'partStream' # to make it easier to see below, will be cached...
         ptemp = cParts[1]
         m3 = ptemp.measure(3)

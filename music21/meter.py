@@ -3911,7 +3911,7 @@ class TimeSignature(base.Music21Object):
         [default] only the notes) in the `Stream` specified as streamIn.
 
 
-        >>> s = converter.parse('C4 D4 E8 F8', format='tinyNotation').flat.notes
+        >>> s = converter.parse('C4 D4 E8 F8', format='tinyNotation').flat.notes.stream()
         >>> sixEight = meter.TimeSignature('6/8')
         >>> sixEight.averageBeatStrength(s)
         0.4375

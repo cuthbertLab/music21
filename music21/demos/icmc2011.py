@@ -30,6 +30,9 @@ class Test(unittest.TestCase):
 
 
     def testStreams01(self):
+        '''
+        Basic stream issues
+        '''
         #from music21 import note, stream, clef, metadata, spanner
 
 
@@ -292,7 +295,7 @@ class Test(unittest.TestCase):
         nEnd = None
         
         ex = corpus.parse('luca/gloria').parts['cantus'].measures(1,11)        
-        exFlatNotes = ex.flat.notesAndRests
+        exFlatNotes = ex.flat.notesAndRests.stream()
         nLast = exFlatNotes[-1]
         
         for i, n in enumerate(exFlatNotes):
@@ -753,7 +756,7 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     import music21
     import sys
-    sys.argv.append('hi')
+    #sys.argv.append('hi')
 
     if len(sys.argv) == 1: # normal conditions
         music21.mainTest(Test)

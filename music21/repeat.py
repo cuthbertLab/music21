@@ -4227,7 +4227,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('ryansMammoth/BanjoReel')
         #s.show()
-        firstNotesList = s.flat.notes.elements
+        firstNotesList = list(s.flat.notes)
         #[0:16][16:22][0:16][22:27][27:58][27:58]
         expandedByHandList = (firstNotesList[0:16] + firstNotesList[16:22] + 
                               firstNotesList[0:16] + firstNotesList[22:27] + 
@@ -4238,7 +4238,7 @@ class Test(unittest.TestCase):
         #post.show()
         #print [n.nameWithOctave for n in post.flat.notes]
         #post.show()
-        secondNotesList = post.flat.notes.elements
+        secondNotesList = list(post.flat.notes)
         secondNotesNoteNames = [n.nameWithOctave for n in secondNotesList]
         self.assertEqual(expandedByHandNoteNames, secondNotesNoteNames)
 

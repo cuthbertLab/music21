@@ -2830,7 +2830,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         src = corpus.parse('bach/bwv324.xml')
         # get some measures of the soprano; just get the notes
-        ex = src.parts[0].flat.notesAndRests[0:30]
+        ex = src.parts[0].flat.notesAndRests.stream()[0:30]
 
         self.assertEqual(ex.highestOffset, 38.0)
         self.assertEqual(ex.highestTime, 42.0)
@@ -2861,7 +2861,7 @@ class Test(unittest.TestCase):
         src = corpus.parse('bach/bwv324.xml')
         # get some measures of the soprano; just get the notes
         #environLocal.printDebug(['testAugmentOrDiminishCorpus()', 'extracting notes:'])
-        ex = src.parts[0].flat.notesAndRests[0:30]
+        ex = src.parts[0].flat.notesAndRests.stream()[0:30]
         # attach a couple of transformations
         s = Score()
         for scalar in [.5, 1.5, 2, .25]:
@@ -2878,7 +2878,7 @@ class Test(unittest.TestCase):
         # second method: getting flattened stream
         src = corpus.parse('bach/bwv323.xml')
         # get notes from one part
-        ex = src.parts[0].flat.notesAndRests
+        ex = src.parts[0].flat.notesAndRests.stream()
         s = Score()
         for scalar in [1, 2, .5, 1.5]:
             part = ex.augmentOrDiminish(scalar, inPlace=False)
@@ -3893,7 +3893,7 @@ class Test(unittest.TestCase):
         self.assertEqual(collectAccidentalDisplayStatus(sSub), ['x', (u'C#', False), 'x', 'x', (u'E#', True), (u'F#', False), 'x', (u'C#', False), (u'F#', False), (u'F#', False), (u'G#', False), (u'F#', False), (u'G#', False), 'x', 'x', 'x', (u'C#', False), (u'F#', False), (u'G#', False), 'x', 'x', 'x', 'x', (u'E#', True), (u'F#', False)] )
 
         # this removes key signature
-        sSub = sSub.flat.notesAndRests
+        sSub = sSub.flat.notesAndRests.stream()
         self.assertEqual(len(sSub), 25)
 
         sSub.insert(0, meter.TimeSignature('3/8'))
@@ -5578,7 +5578,7 @@ class Test(unittest.TestCase):
         self.assertEqual(p1.flat.derivation.origin is p1, True)
         self.assertEqual(p1.flat.derivation.origin is s, False)
         
-        p1FlatNotes = p1Flat.notesAndRests
+        p1FlatNotes = p1Flat.notesAndRests.stream()
         self.assertEqual(p1FlatNotes.derivation.origin is p1Flat, True)
         self.assertEqual(p1FlatNotes.derivation.origin is p1, False)
         
@@ -5589,29 +5589,29 @@ class Test(unittest.TestCase):
         #self.assertEqual(p1.flat.notesAndRests.derivation.origin is p1.flat, False)
         
         # chained calls to .derives from can be used
-        self.assertEqual(p1.flat.notesAndRests.derivation.origin.derivation.origin is p1, True)
+        self.assertEqual(p1.flat.notesAndRests.stream().derivation.origin.derivation.origin is p1, True)
         
         # can use rootDerivation to get there faster
-        self.assertEqual(p1.flat.notesAndRests.derivation.rootDerivation is p1, True)
+        self.assertEqual(p1.flat.notesAndRests.stream().derivation.rootDerivation is p1, True)
         
         # this does not work because are taking an item via in index
         # value, and this Measure is not derived from a Part
         self.assertEqual(p1.getElementsByClass(
-            'Measure')[3].flat.notesAndRests.derivation.rootDerivation is p1, False)
+            'Measure')[3].flat.notesAndRests.stream().derivation.rootDerivation is p1, False)
         
         # the root here is the Measure 
         self.assertEqual(p1.getElementsByClass(
-            'Measure')[3].flat.notesAndRests.derivation.rootDerivation is p1.getElementsByClass(
+            'Measure')[3].flat.notesAndRests.stream().derivation.rootDerivation is p1.getElementsByClass(
             'Measure')[3], True)
 
         m4 = p1.measure(4)
-        self.assertTrue(m4.flat.notesAndRests.derivation.rootDerivation is m4, 
-                        list(m4.flat.notesAndRests.derivation.chain()))
+        self.assertTrue(m4.flat.notesAndRests.stream().derivation.rootDerivation is m4, 
+                        list(m4.flat.notesAndRests.stream().derivation.chain()))
         
         # part is the root derivation of a measures() call
         mRange = p1.measures(4, 6)
         self.assertEqual(mRange.derivation.rootDerivation, p1)
-        self.assertEqual(mRange.flat.notesAndRests.derivation.rootDerivation, p1)
+        self.assertEqual(mRange.flat.notesAndRests.stream().derivation.rootDerivation, p1)
 
 
         self.assertIs(s.flat.getElementsByClass('Rest').stream().derivation.rootDerivation, s) 
@@ -5647,8 +5647,9 @@ class Test(unittest.TestCase):
         p1 = s.parts['Soprano']
         pMeasures = p1.measures(3, 10)
         pMeasuresFlat = pMeasures.flat
-        pMeasuresFlatNotes = pMeasuresFlat.notesAndRests
-        self.assertEqual(list(pMeasuresFlatNotes.derivation.chain()), [pMeasuresFlat, pMeasures, p1])
+        pMeasuresFlatNotes = pMeasuresFlat.notesAndRests.stream()
+        self.assertEqual(list(pMeasuresFlatNotes.derivation.chain()), 
+                         [pMeasuresFlat, pMeasures, p1])
 
 
     def testDerivationMethodA(self):
@@ -6011,7 +6012,7 @@ class Test(unittest.TestCase):
         sPartFlat = sPart.flat
         unused_notesAndRests = sPartFlat.notesAndRests
         # test cache...
-        sMeasures = sPart.flat.notesAndRests.makeMeasures(ts)
+        sMeasures = sPart.flat.notesAndRests.stream().makeMeasures(ts)
         target = []
         for n in sMeasures.flat.notesAndRests:
             target.append(n.beatStr)
@@ -7045,7 +7046,7 @@ class Test(unittest.TestCase):
         #sFlatVoiced.show()
         self.assertEqual(len(sMeasures.flat.notes), len(sFlatVoiced.flat.notes))
         self.assertEqual(sMeasures.flat.highestTime, 
-            sFlatVoiced.flat.notes.highestTime)
+            sFlatVoiced.flat.notes.stream().highestTime)
         self.assertEqual(len(sFlatVoiced.voices), 4)
 
 

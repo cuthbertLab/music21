@@ -37,6 +37,9 @@ class StreamIterator(object):
     Note that this iterator automatically sets the active site of
     returned elements to the source Stream.
 
+    There is one property to know about: .overrideDerivation which overrides the set
+    derivation of the class when .stream() is called
+
     Sets:
 
     * StreamIterator.srcStream -- the Stream iterated over
@@ -75,6 +78,8 @@ class StreamIterator(object):
         
         self.cleanupOnStop = False
         self.restoreActiveSites = restoreActiveSites
+
+        self.overrideDerivation = None
 
         if filterList is None:
             filterList = []
@@ -152,6 +157,76 @@ class StreamIterator(object):
         
     if six.PY2:
         next = __next__
+
+    def __getitem__(self, k):
+        '''
+        if you are in the iterator, you should still be able to request other items...
+        uses self.srcStream.__getitem__
+
+        >>> s = stream.Stream()
+        >>> s.insert(0, note.Note('F#'))
+        >>> s.repeatAppend(note.Note('C'), 2)
+        >>> sI = s.iter
+        >>> sI
+        <music21.stream.iterator.StreamIterator for Stream:0x104743be0 @:0>
+
+        >>> sI.srcStream is s
+        True
+
+        >>> for n in sI:
+        ...    printer = (repr(n), repr(sI[0]))
+        ...    print(printer)
+        ('<music21.note.Note F#>', '<music21.note.Note F#>')
+        ('<music21.note.Note C>', '<music21.note.Note F#>')
+        ('<music21.note.Note C>', '<music21.note.Note F#>')
+        >>> sI.srcStream is s
+        True
+        
+        Slices work:
+        
+        >>> nSlice = sI[1:]
+        >>> for n in nSlice:
+        ...     print(n)
+        <music21.note.Note C>
+        <music21.note.Note C>        
+        
+        Filters, such as "notes" apply.
+        
+        >>> s.insert(0, clef.TrebleClef())
+        >>> s[0]
+        <music21.clef.TrebleClef>
+        >>> s.iter.notes[0]
+        <music21.note.Note F#>
+
+        Demo of cleanupOnStop = True
+
+        >>> sI.cleanupOnStop = True
+        >>> for n in sI:
+        ...    printer = (repr(n), repr(sI[0]))
+        ...    print(printer)
+        ('<music21.note.Note F#>', '<music21.note.Note F#>')
+        ('<music21.note.Note C>', '<music21.note.Note F#>')
+        ('<music21.note.Note C>', '<music21.note.Note F#>')
+        >>> sI.srcStream is None
+        True
+        >>> for n in sI:
+        ...    printer = (repr(n), repr(sI[0]))
+        ...    print(printer)
+
+        (nothing is printed)
+        '''
+        fe = self.matchingElements()
+        try:
+            e = fe[k]
+        except TypeError:
+            e = None
+            for el in fe:
+                if el.id.lower() == k.lower():
+                    e = el
+                    break
+        # TODO: Slices and everything else in Stream __getitem__ ; in fact, merge...
+        return e
+        
 
     def __len__(self):
         '''
@@ -343,75 +418,7 @@ class StreamIterator(object):
 
 
     
-    def __getitem__(self, k):
-        '''
-        if you are in the iterator, you should still be able to request other items...
-        uses self.srcStream.__getitem__
 
-        >>> s = stream.Stream()
-        >>> s.insert(0, note.Note('F#'))
-        >>> s.repeatAppend(note.Note('C'), 2)
-        >>> sI = s.iter
-        >>> sI
-        <music21.stream.iterator.StreamIterator for Stream:0x104743be0 @:0>
-
-        >>> sI.srcStream is s
-        True
-
-        >>> for n in sI:
-        ...    printer = (repr(n), repr(sI[0]))
-        ...    print(printer)
-        ('<music21.note.Note F#>', '<music21.note.Note F#>')
-        ('<music21.note.Note C>', '<music21.note.Note F#>')
-        ('<music21.note.Note C>', '<music21.note.Note F#>')
-        >>> sI.srcStream is s
-        True
-        
-        Slices work:
-        
-        >>> nSlice = sI[1:]
-        >>> for n in nSlice:
-        ...     print(n)
-        <music21.note.Note C>
-        <music21.note.Note C>        
-        
-        Filters, such as "notes" apply.
-        
-        >>> s.insert(0, clef.TrebleClef())
-        >>> s[0]
-        <music21.clef.TrebleClef>
-        >>> s.iter.notes[0]
-        <music21.note.Note F#>
-
-        Demo of cleanupOnStop = True
-
-        >>> sI.cleanupOnStop = True
-        >>> for n in sI:
-        ...    printer = (repr(n), repr(sI[0]))
-        ...    print(printer)
-        ('<music21.note.Note F#>', '<music21.note.Note F#>')
-        ('<music21.note.Note C>', '<music21.note.Note F#>')
-        ('<music21.note.Note C>', '<music21.note.Note F#>')
-        >>> sI.srcStream is None
-        True
-        >>> for n in sI:
-        ...    printer = (repr(n), repr(sI[0]))
-        ...    print(printer)
-
-        (nothing is printed)
-        '''
-        fe = self.matchingElements()
-        try:
-            e = fe[k]
-        except TypeError:
-            e = None
-            for el in fe:
-                if el.id == k:
-                    e = el
-                    break
-
-        return e
-        
     
     def _newBaseStream(self):
         '''
@@ -501,10 +508,13 @@ class StreamIterator(object):
             
         found.mergeAttributes(ss)
         found.derivation.origin = ss
-        derivationMethods = []
-        for f in self.filters:
-            derivationMethods.append(f.derivationStr)
-        found.derivation.method = '.'.join(derivationMethods)
+        if self.overrideDerivation is not None:
+            found.derivation.method = self.overrideDerivation
+        else:
+            derivationMethods = []
+            for f in self.filters:
+                derivationMethods.append(f.derivationStr)
+            found.derivation.method = '.'.join(derivationMethods)
         
         fe = self.matchingElements()
         for e in fe:
