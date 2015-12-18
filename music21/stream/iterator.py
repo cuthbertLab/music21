@@ -401,7 +401,14 @@ class StreamIterator(object):
         (nothing is printed)
         '''
         fe = self.matchingElements()
-        e = fe[k]
+        try:
+            e = fe[k]
+        except TypeError:
+            e = None
+            for el in fe:
+                if el.id == k:
+                    e = el
+                    break
 
         return e
         

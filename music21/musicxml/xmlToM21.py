@@ -2666,6 +2666,7 @@ class MeasureParser(XMLParserBase):
                     useVoice = 1
             else:
                 useVoice = useVoice.text.strip()
+                
             try:
                 thisVoice = m.voices[useVoice]
             except stream.StreamException:
@@ -4220,7 +4221,7 @@ class Test(unittest.TestCase):
                             #forceSource=True
                             )
         #c = corpus.parse('demos/layoutTest.xml')        
-        layouts = c.flat.getElementsByClass('LayoutBase')
+        layouts = c.flat.getElementsByClass('LayoutBase').stream()
         systemLayouts = layouts.getElementsByClass('SystemLayout')
         self.assertEqual(len(systemLayouts), 42)
         staffLayouts = layouts.getElementsByClass('StaffLayout')
@@ -4260,7 +4261,7 @@ class Test(unittest.TestCase):
                             #forceSource=True
                             )
         #c = corpus.parse('demos/layoutTest.xml')        
-        layouts = c.flat.getElementsByClass('LayoutBase')
+        layouts = c.flat.getElementsByClass('LayoutBase').stream()
         self.assertEqual(len(layouts), 76)
         systemLayouts = layouts.getElementsByClass('SystemLayout')
         sl0 = systemLayouts[0]

@@ -1799,7 +1799,7 @@ class Test(unittest.TestCase):
 
             #environLocal.printDebug(['first element', p[0], p[0].duration])
             # by default, initial rest should be made
-            sub = p.getElementsByClass(note.Rest)
+            sub = p.getElementsByClass(note.Rest).stream()
             self.assertEqual(len(sub), 1)
 
             self.assertEqual(sub.duration.quarterLength, partOffset)
@@ -4320,7 +4320,7 @@ class Test(unittest.TestCase):
         self.assertEqual(s.getElementAfterElement(n2), b1)
 
         # try to get elements by class
-        sub1 = s.getElementsByClass('Barline')
+        sub1 = s.getElementsByClass('Barline').stream()
         self.assertEqual(len(sub1), 1)
         # only found item is barline
         self.assertEqual(sub1[0], b1)
@@ -5557,13 +5557,13 @@ class Test(unittest.TestCase):
         # for testing against
         s2 = stream.Stream()
         
-        s3 = s1.getElementsByClass('GeneralNote')
+        s3 = s1.getElementsByClass('GeneralNote').stream()
         self.assertEqual(len(s3), 20)
         #environLocal.printDebug(['s3.derivation.origin', s3.derivation.origin])
         self.assertEqual(s3.derivation.origin is s1, True)
         self.assertEqual(s3.derivation.origin is not s2, True)
         
-        s4 = s3.getElementsByClass('Chord')
+        s4 = s3.getElementsByClass('Chord').stream()
         self.assertEqual(len(s4), 10)
         self.assertEqual(s4.derivation.origin is s3, True)
         
@@ -5660,7 +5660,7 @@ class Test(unittest.TestCase):
         self.assertEqual(s1Flat.derivation.origin is s1, True)
         self.assertEqual(s1Flat.derivation.method is 'flat', True)
 
-        s1Elements = s1Flat.getElementsByClass('Note')
+        s1Elements = s1Flat.getElementsByClass('Note').stream()
         self.assertEqual(s1Elements.derivation.method is 'getElementsByClass', True)
 
 

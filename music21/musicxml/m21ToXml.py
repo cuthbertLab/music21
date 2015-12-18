@@ -1101,7 +1101,7 @@ class ScoreExporter(XMLExporterBase):
         <music21.layout.ScoreLayout>
         '''
         s = self.stream
-        scoreLayouts = s.getElementsByClass('ScoreLayout')
+        scoreLayouts = s.getElementsByClass('ScoreLayout').stream()
         if len(scoreLayouts) > 0:
             scoreLayout = scoreLayouts[0]
         else:
@@ -1119,13 +1119,14 @@ class ScoreExporter(XMLExporterBase):
         '''
         # would like to do something like this but cannot
         # replace object inside of the stream
-        for innerStream in self.parts:
+        sp = list(self.parts)
+        for innerStream in sp:
             innerStream.makeRests(self.refStreamOrTimeRange, inPlace=True)
 
         count = 0
-        for innerStream in self.parts:
+        for innerStream in sp:
             count += 1
-            if count > len(self.parts):
+            if count > len(sp):
                 raise ToMxObjectsException('infinite stream encountered')
 
             pp = PartExporter(innerStream, parent=self)
@@ -1746,7 +1747,7 @@ class PartExporter(XMLExporterBase):
         self.instrumentSetup()
             
         self.xmlRoot.set('id', str(self.firstInstrumentObject.partId))
-        measureStream = self.stream.getElementsByClass('Stream') # suppose that everything 
+        measureStream = self.stream.getElementsByClass('Stream').stream() # suppose that everything 
             # below this is a measure
         if len(measureStream) == 0:
             self.fixupNotationFlat() 
@@ -2028,7 +2029,7 @@ class MeasureExporter(XMLExporterBase):
 
         if m.hasVoices():
             # TODO... Voice not Stream
-            nonVoiceMeasureItems = m.getElementsNotOfClass('Stream')
+            nonVoiceMeasureItems = m.getElementsNotOfClass('Stream').stream()
         else:
             nonVoiceMeasureItems = m # use self.
 

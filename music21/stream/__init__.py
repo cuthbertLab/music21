@@ -5253,7 +5253,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if allParts[0].atSoundingPitch == False: # if false
                 returnObj.toSoundingPitch(inPlace=True)
 
-        mStream = allParts[0].getElementsByClass('Measure')
+        mStream = allParts[0].getElementsByClass('Measure').stream()
         mCount = len(mStream)
         hasMeasures = True
         if mCount == 0:
@@ -5315,7 +5315,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # assume we can manipulate this these measures as already have deepcopy
         # the Part may not have had any Measures;
         if mStream:
-            for i, m in enumerate(list(mStream.iter.getElementsByClass('Measure'))):
+            for i, m in enumerate(mStream.getElementsByClass('Measure')):
                 # get highest time before removal
                 mQl = m.duration.quarterLength
                 m.removeByClass('GeneralNote')
