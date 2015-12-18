@@ -2596,9 +2596,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     # getElementsByX(self): anything that returns a collection of Elements 
     #  formerly always returned a Stream; turning to Iterators in September 2015
 
-    def getElementsByClass(self, classFilterList, returnStreamSubClass=True):
+    def getElementsByClass(self, classFilterList):
         '''
-        Return a Stream containing all Elements that match one
+        Return a StreamIterator that will iterate over Elements that match one
         or more classes in the `classFilterList`. A single class
         can also used for the `classFilterList` parameter instead of a List.
 
@@ -2609,12 +2609,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ...     n.offset = x * 3
         ...     a.insert(n)
         >>> found = a.getElementsByClass(note.Note)
-        >>> "Score" in found.classes
-        True
+        >>> found
+        <music21.stream.iterator.StreamIterator for Score:0x104f2f400 @:0>
+        
         >>> len(found)
         4
         >>> found[0].pitch.accidental.name
         'sharp'
+
+        >>> foundStream = found.stream()
+        >>> "Score" in foundStream.classes
+        True
 
 
         Notice that we do not find elements that are in
@@ -2647,44 +2652,30 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         The class name of the Stream created is the same as the original:
 
-        >>> found = a.getElementsByClass(note.Note)
+        >>> found = a.getElementsByClass(note.Note).stream()
         >>> found.__class__.__name__
         'Score'
 
         ...except if `returnStreamSubClass` is False, which makes the method
         return a generic Stream:
 
-        >>> found = a.getElementsByClass(note.Rest, returnStreamSubClass=False)
+        >>> found = a.getElementsByClass(note.Rest).stream(returnStreamSubClass=False)
         >>> found.__class__.__name__
         'Stream'
 
 
-        If `returnStreamSubClass` == 'list' then a generic list is returned.
-        Generally not to be used, but can help in certain speed-critical applications
-        where say only the length of the returned list or the presence or 
-        absence of elements matters:
+        Make a list from a StreamIterator:
 
-        >>> foundList = a.flat.getElementsByClass(note.Rest, returnStreamSubClass='list')
+        >>> foundList = list(a.flat.getElementsByClass(note.Rest))
         >>> len(foundList)
         25
 
         :rtype: Stream
         '''
-        siterator = self.iter.getElementsByClass(classFilterList)
-        if returnStreamSubClass == 'list':
-            return siterator.matchingElements()
-        else:
-            return siterator.stream(returnStreamSubClass=returnStreamSubClass)
+        return self.iter.getElementsByClass(classFilterList)
 
-        # this was 11 micro-sec for BWV 66.6, getElementsByClass('Part', 'list')
-        # and 85 w/o list before changing to .iter (and adding mergeAttributes, etc.)
-        # how close can we get?
-        
-        # mergeAttributes added 22 microseconds and should have been done before.  
-        # So fair comparison is
-        # 107 for old vs. 133 for new.  -- acceptable.
 
-    def getElementsNotOfClass(self, classFilterList, returnStreamSubClass=True):
+    def getElementsNotOfClass(self, classFilterList):
         '''
         Return a list of all Elements that do not
         match the one or more classes in the `classFilterList`.
@@ -2715,11 +2706,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         
         :rtype: Stream
         '''
-        siterator = self.iter.getElementsNotOfClass(classFilterList)
-        if returnStreamSubClass == 'list':
-            return siterator.matchingElements()
-        else:
-            return siterator.stream(returnStreamSubClass=returnStreamSubClass)
+        return self.iter.getElementsNotOfClass(classFilterList)
 
 
     def getElementsByGroup(self, groupFilterList):
@@ -3449,13 +3436,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # there may be more than one Measure with the same Measure number
         mapRaw = {}
         mNumbersUnique = [] # store just the numbers
-        mStreamList = self.getElementsByClass('Measure', returnStreamSubClass='list')
+        mStreamIter = self.getElementsByClass('Measure')
         # if we have no Measures defined, call makeNotation
         # this will  return a deepcopy of all objects
-        if len(mStreamList) == 0:
+        if len(mStreamIter) == 0:
             srcObj = self.makeNotation(inPlace=False)
             # need to set srcObj to this new stream
-            mStreamList = srcObj.getElementsByClass('Measure', returnStreamSubClass='list')
+            mStreamIter = srcObj.getElementsByClass('Measure')
             # get spanners from make notation, as this will be a copy
             # TODO: make sure that makeNotation copies spanners
             #mStreamSpanners = mStream.spanners
@@ -3468,7 +3455,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if gatherSpanners:
             spannerBundle = srcObj.spannerBundle
 
-        for index, m in enumerate(mStreamList):
+        for index, m in enumerate(mStreamIter):
             #environLocal.printDebug(['m', m])
             # mId is a tuple of measure nmber and any suffix
             if ignoreNumbers is False:
@@ -3519,7 +3506,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             numberEnd = max([x for x, dummy in mapCooked])
         #environLocal.printDebug(['numberStart', numberStart, 'numberEnd', numberEnd])
 
-        for i in range(numberStart, numberEnd+1):
+        for i in range(numberStart, numberEnd + 1):
             matches = []
             # do not know if we have suffixes for the number
             for number, suffix in mapCooked:
@@ -3631,7 +3618,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         # we must be able to obtain a measure from this (not a flat)
         # representation (e.g., this is a Stream or Part, not a Score)
-        if len(self.getElementsByClass('Measure', returnStreamSubClass='list')) >= 1:
+        if len(self.getElementsByClass('Measure')) >= 1:
             #environLocal.printDebug(['got measures from getElementsByClass'])
             s = self.measures(measureNumber, 
                               measureNumber, 
@@ -3640,7 +3627,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if len(s) == 0:
                 return None
             else:
-                m = s.getElementsByClass('Measure', returnStreamSubClass='list')[0]
+                m = s.getElementsByClass('Measure')[0]
                 # NO m is the same object as before so it does not get a new derivation                
 #                 m.derivation.client = m
 #                 m.derivation.origin = s # was self, will change some things
@@ -3747,7 +3734,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if not self.hasMeasures():
             raise StreamException('the requested Stream does not have Measures')
         # should this be deepcopy or just a recursive call...
-        measureTemplate = copy.deepcopy(self.getElementsByClass(classType))
+        measureTemplate = copy.deepcopy(self.getElementsByClass(classType).stream())
         for m in measureTemplate:
             ql = m.duration.quarterLength
             if customRemove is not None:
@@ -4132,7 +4119,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # even if this is a Measure, the TimeSignatue in the Stream will be
         # found
         #post = self.getElementsByClass(meter.TimeSignature)
-        post = self.getElementsByClass('TimeSignature')
+        post = self.getElementsByClass('TimeSignature').stream()
 
         # search activeSite Streams through contexts
         if len(post) == 0 and searchContext:
@@ -5410,10 +5397,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         a = self.cloneEmpty(derivationMethod='splitByClass')
         b = self.cloneEmpty(derivationMethod='splitByClass')
         if classObj is not None:
-            found = self.getElementsByClass(classObj)
+            found = self.getElementsByClass(classObj).stream()
         else:
             found = self
-        for e in found._elements:
+        for e in found:
             if fx(e):
                 a._insertCore(found.elementOffset(e), e) # provide an offset here
             else:
@@ -5806,7 +5793,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 inPlace=True, 
                 bestClef=bestClef)
 
-        measureStream = returnStream.getElementsByClass('Measure')
+        measureStream = returnStream.getElementsByClass('Measure').stream()
         #environLocal.printDebug(['Stream.makeNotation(): post makeMeasures, 
         #   length', len(returnStream)])
 
@@ -8570,8 +8557,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 returnStreamSubClass = False
             else:
                 returnStreamSubClass = True
-            self._cache['notesAndRests'] = self.getElementsByClass(
-                                          'GeneralNote',
+            self._cache['notesAndRests'] = self.getElementsByClass('GeneralNote').stream(
                             returnStreamSubClass=returnStreamSubClass)
         return self._cache['notesAndRests']
 
@@ -8617,7 +8603,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     def _getNotes(self):
         if 'notes' not in self._cache or self._cache['notes'] is None:
-            self._cache['notes'] = self.getElementsByClass('NotRest',
+            self._cache['notes'] = self.getElementsByClass('NotRest').stream(
                                         returnStreamSubClass=False)
             self._cache['notes'].derivation.method = 'notes'
         return self._cache['notes']
@@ -10094,8 +10080,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     def _getVariants(self):
         if 'variants' not in self._cache or self._cache['variants'] is None:
-            self._cache['variants'] = self.getElementsByClass('Variant',
-                                  returnStreamSubClass=False)
+            self._cache['variants'] = self.getElementsByClass('Variant').stream(
+                                                                        returnStreamSubClass=False)
         return self._cache['variants']
 
     variants = property(_getVariants, doc='''
@@ -11028,7 +11014,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             
         allMeasures.sort(key=measureNumberSortRoutine)
 
-        oldMeasures = self.getElementsByClass("Measure")
+        oldMeasures = self.getElementsByClass("Measure").stream()
         newMeasures = []
 
         cummulativeNumberShift = 0
@@ -11053,7 +11039,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     newMeasures.append(m)
                     m.number = nextMeasure
                     nextMeasure += 1
-                oldCorrections[measurePrior+1] = cummulativeNumberShift
+                oldCorrections[measurePrior + 1] = cummulativeNumberShift
                 newCorrections[nextMeasure] = cummulativeNumberShift
             else: #integer implies deletion
                 cummulativeNumberShift -= 1
@@ -12100,8 +12086,8 @@ class Score(Stream):
     def _getParts(self):
 #         return self.getElementsByClass('Part')
         if 'parts' not in self._cache or self._cache['parts'] is None:
-            self._cache['parts'] = self.getElementsByClass('Part',
-                                                           returnStreamSubClass=True)
+            self._cache['parts'] = self.getElementsByClass('Part').stream()
+            # TODO: eliminate .stream()
         return self._cache['parts']
 
     parts = property(_getParts,

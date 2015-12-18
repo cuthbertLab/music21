@@ -2229,7 +2229,7 @@ def streamPartToMx(part, instStream=None, meterStream=None,
     # get a stream of measures
     # if flat is used here, the Measure is not obtained
     # may need to be semi flat?
-    measureStream = part.getElementsByClass('Measure')
+    measureStream = part.getElementsByClass('Measure').stream()
     if len(measureStream) == 0:
         part.makeMutable() # must mutate
         # try to add measures if none defined
@@ -2237,7 +2237,7 @@ def streamPartToMx(part, instStream=None, meterStream=None,
         part.makeNotation(meterStream=meterStream,
                         refStreamOrTimeRange=refStreamOrTimeRange,
                         inPlace=True)
-        measureStream = part.getElementsByClass('Measure')
+        measureStream = part.getElementsByClass('Measure').stream()
 
         #environLocal.printDebug(['Stream.streamPartToMx: post makeNotation, length', len(measureStream)])
 
