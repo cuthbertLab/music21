@@ -305,7 +305,7 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
     o2 0.25
     '''
     isJunk = None
-    n = thisStream.flat.notesAndRests
+    n = thisStream.flat.notesAndRests.stream()
     thisStreamStrPitches = translateStreamToStringNoRhythm(n)
     thisStreamStrDuration = translateStreamToStringOnlyRhythm(n)   
 #    print "notes",thisStreamStrPitches

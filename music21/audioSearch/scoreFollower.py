@@ -30,7 +30,7 @@ class ScoreFollower(object):
     def __init__(self, scoreStream=None):
         self.scoreStream = scoreStream
         if scoreStream is not None:
-            self.scoreNotesOnly = scoreStream.flat.notesAndRests
+            self.scoreNotesOnly = scoreStream.flat.notesAndRests.stream()
         else:
             self.scoreNotesOnly = None
         self.waveFile = os.path.join(environLocal.getRootTempDir(), 'scoreFollowerTemp.wav')
@@ -218,7 +218,7 @@ class ScoreFollower(object):
         Useful if the musician has some consecutive measures of silence.
 
         >>> from music21.audioSearch import scoreFollower
-        >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
+        >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes.stream()
         >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         >>> notesList = []
         >>> notesList.append(note.Rest())
@@ -271,7 +271,7 @@ class ScoreFollower(object):
 
         >>> from time import time
         >>> from music21.audioSearch import scoreFollower
-        >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
+        >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes.stream()
         >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         >>> ScF.begins = True
         >>> ScF.startSearchAtSlot = 15
