@@ -2180,7 +2180,7 @@ def realizeChordSymbolDurations(piece):
     {12.0} <music21.bar.Barline style=final>
     '''
     pf = piece.flat
-    onlyChords = pf.getElementsByClass(ChordSymbol)
+    onlyChords = pf.getElementsByClass(ChordSymbol).stream()
     first = True
     if len(onlyChords) > 1:
         for cs in onlyChords:

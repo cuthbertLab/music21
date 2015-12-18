@@ -41,8 +41,9 @@ def getVoiceLeadingMoments(music21Stream):
             :width: 700
     '''
     allHarmonies = extractHarmonies(music21Stream)
-    allParts = music21Stream.getElementsByClass('Part')
-    newParts = [allParts[i].flat.getElementsNotOfClass('GeneralNote') for i in range(len(allParts))]
+    allParts = music21Stream.getElementsByClass('Part').stream()
+    newParts = [allParts[i].flat.getElementsNotOfClass('GeneralNote').stream() 
+                for i in range(len(allParts))]
     paddingLeft = allParts[0].getElementsByClass('Measure')[0].paddingLeft
     for (offsets, notes) in sorted(allHarmonies.items()):
         (initOffset, endTime) = offsets
