@@ -228,7 +228,7 @@ class Derivation(SlottedObject):
         >>> s.derivation.method is None
         True
 
-        >>> sNotes = s.notes
+        >>> sNotes = s.notes.stream()
         >>> sNotes.derivation.method
         'notes'
         '''

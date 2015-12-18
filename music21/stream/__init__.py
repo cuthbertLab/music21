@@ -8555,7 +8555,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         if 'notesAndRests' not in self._cache or self._cache['notesAndRests'] is None:
             #environLocal.printDebug(['updating noteAndRests cache:', str(self), id(self)])
-            self._cache['notesAndRests'] = self.getElementsByClass('GeneralNote')
+            noteIterator = self.getElementsByClass('GeneralNote')
+            noteIterator.overrideDerivation = 'notesAndRests'
+            self._cache['notesAndRests'] = noteIterator
         return self._cache['notesAndRests']
 
         #return self.getElementsByClass([note.GeneralNote, chord.Chord])
@@ -8600,8 +8602,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     def _getNotes(self):
         if 'notes' not in self._cache or self._cache['notes'] is None:
-            self._cache['notes'] = self.getElementsByClass('NotRest')
-            #self._cache['notes'].derivation.method = 'notes'
+            noteIterator = self.getElementsByClass('NotRest')
+            noteIterator.overrideDerivation = 'notes'
+            self._cache['notes'] = noteIterator
         return self._cache['notes']
 
 
@@ -12084,7 +12087,9 @@ class Score(Stream):
     def _getParts(self):
 #         return self.getElementsByClass('Part')
         if 'parts' not in self._cache or self._cache['parts'] is None:
-            self._cache['parts'] = self.getElementsByClass('Part')
+            partIterator = self.getElementsByClass('Part')
+            partIterator.overrideDerivation = 'parts'
+            self._cache['parts'] = partIterator
         return self._cache['parts']
 
     parts = property(_getParts,

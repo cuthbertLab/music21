@@ -37,6 +37,9 @@ class StreamIterator(object):
     Note that this iterator automatically sets the active site of
     returned elements to the source Stream.
 
+    There is one property to know about: .overrideDerivation which overrides the set
+    derivation of the class when .stream() is called
+
     Sets:
 
     * StreamIterator.srcStream -- the Stream iterated over
@@ -75,6 +78,8 @@ class StreamIterator(object):
         
         self.cleanupOnStop = False
         self.restoreActiveSites = restoreActiveSites
+
+        self.overrideDerivation = None
 
         if filterList is None:
             filterList = []
@@ -503,10 +508,13 @@ class StreamIterator(object):
             
         found.mergeAttributes(ss)
         found.derivation.origin = ss
-        derivationMethods = []
-        for f in self.filters:
-            derivationMethods.append(f.derivationStr)
-        found.derivation.method = '.'.join(derivationMethods)
+        if self.overrideDerivation is not None:
+            found.derivation.method = self.overrideDerivation
+        else:
+            derivationMethods = []
+            for f in self.filters:
+                derivationMethods.append(f.derivationStr)
+            found.derivation.method = '.'.join(derivationMethods)
         
         fe = self.matchingElements()
         for e in fe:
