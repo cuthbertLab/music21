@@ -1653,19 +1653,8 @@ class Music21Object(object):
         environLocal.printDebug("--returning from derivedObject search")    
 
 
-    @common.deprecated('December 2015', 'February 2016', '''if el is not a member of className use:
-
-        >>> el = self.getContextByClass(className)
-        >>> while el is not None:
-        ...    yield el
-        ...    el = el.getContextByClass(className)        
-
-        Otherwise, use el.previous(className) 
-    ''')
     def getAllContextsByClass(self, className):
         '''
-        DEPRECATED.
-        
         Returns a generator that yields elements found by `.getContextByClass` and
         then finds the previous contexts for that element.
         
