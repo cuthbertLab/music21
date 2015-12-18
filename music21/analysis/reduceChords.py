@@ -158,7 +158,7 @@ class ChordReducer(object):
             timespanList = [x for x in subtree]
             for timespan in timespanList:
                 print('\t', timespan)
-            overlap = subtree.maximumOverlap
+            overlap = subtree.maximumOverlap()
             if 1 < overlap:
                 print(part)
                 raise Exception()
@@ -685,13 +685,13 @@ class ChordReducer(object):
         scoreTree.removeTimespanList(zeroDurationTimespans)
 
     def splitByBass(self, scoreTree):
-        parts = scoreTree.allParts
+        parts = scoreTree.allParts()
         for part in parts:
             self.fuseTimespansByPart(scoreTree, part)
         mapping = scoreTree.toPartwiseTimespanTrees()
         bassPart = parts[-1]
         bassTree = mapping[bassPart]
-        bassOffsets = bassTree.allOffsets
+        bassOffsets = bassTree.allOffsets()
         scoreTree.splitAt(bassOffsets)
 
 

@@ -3768,7 +3768,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     def measureOffsetMap(self, classFilterList=None):
         '''
-        If this Stream contains Measures, provide a dictionary
+        If this Stream contains Measures, provide an OrderedDict
         whose keys are the offsets of the start of each measure
         and whose values are a list of references
         to the :class:`~music21.stream.Measure` objects that start
@@ -3800,7 +3800,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> chorale = corpus.parse('bach/bwv324.xml')
         >>> alto = chorale.parts['alto']
         >>> altoMeasures = alto.measureOffsetMap()
-        >>> sorted(altoMeasures)
+        >>> list(altoMeasures.keys())
         [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0]
 
         altoMeasures is a dictionary (hash) of the measures
@@ -3847,7 +3847,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # first, try to get measures
         # this works best of this is a Part or Score
         if Measure in classFilterList or 'Measure' in classFilterList:
-            for m in self.getElementsByClass('Measure'):
+            for m in self.iter.getElementsByClass('Measure'):
                 offset = self.elementOffset(m)
                 if offset not in offsetMap:
                     offsetMap[offset] = []
@@ -3875,7 +3875,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     offsetMap[offset] = []
                 if m not in offsetMap[offset]:
                     offsetMap[offset].append(m)
-        return offsetMap
+        
+        orderedOffsetMap = collections.OrderedDict(sorted(offsetMap.items(), key=lambda o: o[0]))
+        return orderedOffsetMap
 
 
     def _getFinalBarline(self):
@@ -5255,7 +5257,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         returnObj = copy.deepcopy(self)
         returnObj.isSorted = False # this makes all the difference in the world for some reason...
         if returnObj.hasPartLikeStreams():
-            allParts = returnObj.getElementsByClass('Stream')
+            allParts = list(returnObj.iter.getElementsByClass('Stream'))
         else: # simulate a list of Streams
             allParts = [returnObj]
 
@@ -5290,6 +5292,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         uniqueOffsets.append(t)
             #environLocal.printDebug(['chordify: uniqueOffsets for all parts, m', uniqueOffsets, i])
             uniqueOffsets = sorted(uniqueOffsets)
+            
+            
             for pNum, p in enumerate(allParts):
                 # get one measure at a time
                 if hasMeasures is True:
@@ -12267,21 +12271,22 @@ class Score(Stream):
         This method is smart and does not assume that all Parts
         have measures with identical offsets.
         '''
-        offsetMap = {}
-        parts = self.parts
+        parts = self.iter.parts
         if len(parts) == 0:
             return Stream.measureOffsetMap(self, classFilterList)
-        else:
-            for p in parts:
-                mapPartial = p.measureOffsetMap(classFilterList)
-                #environLocal.printDebug(['mapPartial', mapPartial])
-                for k in mapPartial:
-                    if k not in offsetMap:
-                        offsetMap[k] = []
-                    for m in mapPartial[k]: # get measures from partial
-                        if m not in offsetMap[k]:
-                            offsetMap[k].append(m)
-            return offsetMap
+        #else:
+        offsetMap = {}
+        for p in parts:
+            mapPartial = p.measureOffsetMap(classFilterList)
+            #environLocal.printDebug(['mapPartial', mapPartial])
+            for k in mapPartial:
+                if k not in offsetMap:
+                    offsetMap[k] = []
+                for m in mapPartial[k]: # get measures from partial
+                    if m not in offsetMap[k]:
+                        offsetMap[k].append(m)
+        orderedOffsetMap = collections.OrderedDict(sorted(offsetMap.items(), key=lambda o: o[0]))                
+        return orderedOffsetMap
 
     def sliceByGreatestDivisor(self, inPlace=True, addTies=True):
         '''

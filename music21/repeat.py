@@ -529,22 +529,22 @@ def deleteMeasures(s, toDelete, inPlace=False):
     Given a stream s and a list of numbers, toDelete, removes each measure with a number
     corresponding to a number in toDelete and then renumbers the remaining measures in the stream.
             
-    
+    TODO: Move to someplace more appropriate.
     
     >>> from copy import deepcopy
     >>> chorale1 = corpus.parse('bwv10.7.mxl')
     >>> s = deepcopy(chorale1)
     >>> repeat.deleteMeasures(s, [6, 3, 4], inPlace=True)
-    >>> m2 = search.translateStreamToString( chorale1.parts[1].measure(2).notesAndRests)
-    >>> resm2 = search.translateStreamToString( s.parts[1].measure(2).notesAndRests)
+    >>> m2 = search.translateStreamToString(chorale1.parts[1].measure(2).notesAndRests)
+    >>> resm2 = search.translateStreamToString(s.parts[1].measure(2).notesAndRests)
     >>> m2 == resm2
     True
-    >>> m5 = search.translateStreamToString( chorale1.parts[1].measure(5).notesAndRests)
-    >>> resm3 = search.translateStreamToString( s.parts[1].measure(3).notesAndRests)
+    >>> m5 = search.translateStreamToString(chorale1.parts[1].measure(5).notesAndRests)
+    >>> resm3 = search.translateStreamToString(s.parts[1].measure(3).notesAndRests)
     >>> m5 == resm3
     True
-    >>> m7 = search.translateStreamToString( chorale1.parts[1].measure(7).notesAndRests)
-    >>> resm4 = search.translateStreamToString( s.parts[1].measure(4).notesAndRests)
+    >>> m7 = search.translateStreamToString(chorale1.parts[1].measure(7).notesAndRests)
+    >>> resm4 = search.translateStreamToString(s.parts[1].measure(4).notesAndRests)
     >>> m7 == resm4
     True
     >>> lenS = len(s.parts[0].getElementsByClass(stream.Measure))
@@ -557,11 +557,11 @@ def deleteMeasures(s, toDelete, inPlace=False):
     >>> chorale2 = corpus.parse('bwv101.7.mxl')
     >>> s = deepcopy(chorale2)
     >>> repeat.deleteMeasures(s, [3, 4, 5], True)
-    >>> m2 = search.translateStreamToString( chorale2.parts[0].measure(2).notesAndRests)
-    >>> resm2 = search.translateStreamToString( s.parts[0].measure(2).notesAndRests)
-    >>> m3 = search.translateStreamToString( chorale2.parts[0].measure(3).notesAndRests)
-    >>> m6 = search.translateStreamToString( chorale2.parts[0].measure(6).notesAndRests)
-    >>> resm3 = search.translateStreamToString( s.parts[0].measure(3).notesAndRests)
+    >>> m2 = search.translateStreamToString(chorale2.parts[0].measure(2).notesAndRests)
+    >>> resm2 = search.translateStreamToString(s.parts[0].measure(2).notesAndRests)
+    >>> m3 = search.translateStreamToString(chorale2.parts[0].measure(3).notesAndRests)
+    >>> m6 = search.translateStreamToString(chorale2.parts[0].measure(6).notesAndRests)
+    >>> resm3 = search.translateStreamToString(s.parts[0].measure(3).notesAndRests)
     >>> m2 == resm2
     True
     >>> resm3 == m3
@@ -607,7 +607,7 @@ def deleteMeasures(s, toDelete, inPlace=False):
             return s
     
     #correct the measure numbers
-    measures = s.getElementsByClass("Measure")
+    measures = list(s.iter.getElementsByClass("Measure"))
     if len(measures) is not 0:
         i = measures[0].number
         
@@ -1956,13 +1956,12 @@ class RepeatFinder(object):
 
         
         mOffsets = list(s2.measureOffsetMap().keys())
-        mOffsets.sort()
         if len(mOffsets) < 3:
             raise InsufficientLengthException(
                 "Cannot determine length of pickup given fewer than 3 measures")
         
-        pickup = mOffsets[1]-mOffsets[0]
-        normMeasure = mOffsets[2]-mOffsets[1]
+        pickup = mOffsets[1] - mOffsets[0]
+        normMeasure = mOffsets[2] - mOffsets[1]
         return pickup % normMeasure
         
     def hasPickup(self):

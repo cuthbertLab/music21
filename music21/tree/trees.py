@@ -278,23 +278,28 @@ class ElementTree(core.AVLTree):
     def __repr__(self):
         o = self.source
         pos = self.lowestPosition()
+        endt = self.endTime
+        
         if hasattr(pos, 'shortRepr'):
             # sortTuple
             pos = pos.shortRepr()
+        if hasattr(endt, 'shortRepr'):
+            # sortTuple
+            endt = endt.shortRepr()
             
         if o is None:
             return '<{} {{{}}} ({} to {})>'.format(
                 type(self).__name__,
                 len(self),
                 pos,
-                self.endTime,
+                endt,
                 )
         else:
             return '<{} {{{}}} ({} to {}) {!s}>'.format(
                 type(self).__name__,
                 len(self),
                 pos,
-                self.endTime,
+                endt,
                 repr(o),
                 )
 
@@ -803,7 +808,9 @@ class ElementTree(core.AVLTree):
     @property
     def endTime(self):
         r'''
-        Gets the latest stop offset in this element-tree.
+        Gets the latest stop position in this element-tree.
+
+        This is cast as a property so that it can be used like a TimeSpan in a TimeSpanTree
 
         >>> score = corpus.parse('bwv66.6')
         >>> tsTree = score.asTree()
@@ -1025,7 +1032,7 @@ class OffsetTree(ElementTree):
         <Timespan 6.0 8.0>
         <Timespan 7.0 7.0>        
         '''
-        for n in super(ElementTree, self).__iter__():
+        for n in super(OffsetTree, self).__iter__():
             for el in n.payload:
                 yield el
 
@@ -1045,9 +1052,7 @@ class OffsetTree(ElementTree):
 
     def append(self, el):
         '''
-        Add an element to the end, making certain speed savings.
-        
-        TODO: will this work for ElementTrees?
+        Add an element to the end, making certain speed savings.        
         '''
         initialPosition = self.lowestPosition() # will only change if is empty
         endTime = self.endTime
@@ -1264,14 +1269,13 @@ class OffsetTree(ElementTree):
         index = node.payload.index(element) + node.payloadElementsStartIndex
         return index
 
-    @property
     def allOffsets(self):
         r'''
         Gets all unique offsets of all timespans in this offset-tree.
 
         >>> score = corpus.parse('bwv66.6')
         >>> tsTree = score.asTimespans()
-        >>> for offset in tsTree.allOffsets[:10]:
+        >>> for offset in tsTree.allOffsets()[:10]:
         ...     offset
         ...
         0.0
@@ -1300,7 +1304,6 @@ class OffsetTree(ElementTree):
             return result
         return tuple(recurse(self.rootNode))
 
-    @property
     def allTimePoints(self):
         r'''
         Gets all unique offsets (both starting and stopping) of all elements/timespans
@@ -1308,7 +1311,7 @@ class OffsetTree(ElementTree):
 
         >>> score = corpus.parse('bwv66.6')
         >>> scoreTree = score.asTimespans()
-        >>> for offset in scoreTree.allTimePoints[:10]:
+        >>> for offset in scoreTree.allTimePoints()[:10]:
         ...     offset
         ...
         0.0
@@ -1822,7 +1825,7 @@ class TimespanTree(OffsetTree):
         if (n<=0):
             message = "The number of verticalities in the group must be at "
             message += "least one. Got {}".format(n)
-            raise TimespanException(message)
+            raise TimespanTreeException(message)
         if reverse:
             for v in self.iterateVerticalities(reverse=True):
                 verticalities = [v]
@@ -1895,7 +1898,7 @@ class TimespanTree(OffsetTree):
         Used by reduceChords.  May disappear.
         '''
         partwiseTimespanTrees = {}
-        for part in self.allParts:
+        for part in self.allParts():
             partwiseTimespanTrees[part] = TimespanTree()
         for timespan in self:
             partwiseTimespanTree = partwiseTimespanTrees[timespan.part]
@@ -1942,8 +1945,6 @@ class TimespanTree(OffsetTree):
 
     ### PUBLIC PROPERTIES ###
 
-
-    @property
     def allParts(self):
         parts = set()
         for timespan in self:
@@ -1952,8 +1953,6 @@ class TimespanTree(OffsetTree):
         return parts
 
 
-
-    @property
     def maximumOverlap(self):
         '''
         The maximum number of timespans overlapping at any given moment in this
@@ -1961,7 +1960,7 @@ class TimespanTree(OffsetTree):
 
         >>> score = corpus.parse('bwv66.6')
         >>> scoreTree = score.asTimespans(classList=(note.Note,))
-        >>> scoreTree.maximumOverlap
+        >>> scoreTree.maximumOverlap()
         4
 
         Returns None if there is no verticality here.
@@ -1975,31 +1974,30 @@ class TimespanTree(OffsetTree):
                 overlap = degreeOfOverlap
         return overlap
 
-    @property
-    def minimumOverlap(self):
-        '''
-        The minimum number of timespans overlapping at any given moment in this
-        timespan collection.
-
-        In a tree created from a monophonic stream, the minimumOverlap will
-        probably be either zero or one.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> scoreTree = tree.fromStream.convert(
-        ...     score, flatten=False, classList=(note.Note, chord.Chord))
-        >>> scoreTree[0].minimumOverlap
-        1
-        
-        Returns None if there is no verticality here.
-        '''
-        overlap = None
-        for v in self.iterateVerticalities():
-            degreeOfOverlap = len(v.startTimespans) + len(v.overlapTimespans)
-            if overlap is None:
-                overlap = degreeOfOverlap
-            elif degreeOfOverlap < overlap:
-                overlap = degreeOfOverlap
-        return overlap
+#     def minimumOverlap(self):
+#         '''
+#         The minimum number of timespans overlapping at any given moment in this
+#         timespan collection.
+# 
+#         In a tree created from a monophonic stream, the minimumOverlap will
+#         probably be either zero or one.
+# 
+#         >>> score = corpus.parse('bwv66.6')
+#         >>> scoreTree = tree.fromStream.convert(
+#         ...     score, flatten=False, classList=(note.Note, chord.Chord))
+#         >>> scoreTree[0].minimumOverlap()
+#         1
+#         
+#         Returns None if there is no verticality here.
+#         '''
+#         overlap = None
+#         for v in self.iterateVerticalities():
+#             degreeOfOverlap = len(v.startTimespans) + len(v.overlapTimespans)
+#             if overlap is None:
+#                 overlap = degreeOfOverlap
+#             elif degreeOfOverlap < overlap:
+#                 overlap = degreeOfOverlap
+#         return overlap
 
 
     @property
@@ -2014,11 +2012,6 @@ class TimespanTree(OffsetTree):
     @element.setter
     def element(self, expr):
         self._source = common.wrapWeakref(expr)
-
-
-
-
-
 
 
 
