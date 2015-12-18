@@ -672,7 +672,7 @@ class TwelveToneRow(ToneRow):
         '''        
         # note: do not want to return a TwelveToneRow() type, as this will
         # add again the same pitches to the elements list twice. 
-        noteList = self.getElementsByClass('Note', returnStreamSubClass='list')
+        noteList = self.getElementsByClass('Note')
 
         i = [(12-x.pitch.pitchClass) % 12 for x in noteList]
         matrix = [[(x.pitch.pitchClass+t) % 12 for x in noteList] for t in i]

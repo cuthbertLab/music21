@@ -387,7 +387,7 @@ class Verticality(object):
         asked. Because of this, it is safe to mutate the offset-tree by
         inserting or removing timespans while iterating over it.
 
-        >>> scoreTree.remove(nextVerticality.startTimespans)
+        >>> scoreTree.removeTimespanList(nextVerticality.startTimespans)
         >>> verticality.nextVerticality
         <Verticality 3.0 {A3 E4 C#5}>
         '''
@@ -484,7 +484,7 @@ class Verticality(object):
         asked. Because of this, it is safe to mutate the offset-tree by
         inserting or removing timespans while iterating over it.
 
-        >>> scoreTree.remove(previousVerticality.startTimespans)
+        >>> scoreTree.removeTimespanList(previousVerticality.startTimespans)
         >>> verticality.previousVerticality
         <Verticality 0.0 {A3 E4 C#5}>
         '''

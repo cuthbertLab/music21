@@ -547,7 +547,7 @@ class PartReduction(object):
             if self._fillByMeasure:    
                 partMeasures = []
                 for p in parts:
-                    partMeasures.append(p.getElementsByClass('Measure'))
+                    partMeasures.append(p.getElementsByClass('Measure').stream())
                 #environLocal.printDebug(['partMeasures', partMeasures])
                 # assuming that all parts have same number of measures
                 # iterate over each measures
@@ -672,7 +672,7 @@ class PartReduction(object):
                     offsetEnd = offsetStart + ds['span']
                     match = flatRef.getElementsByOffset(offsetStart, offsetEnd,
                         includeEndBoundary=False, mustFinishInSpan=False, 
-                        mustBeginInSpan=True).getElementsByClass(target)
+                        mustBeginInSpan=True).getElementsByClass(target).stream()
                     if len(match) == 0:
                         w = None
                     else:
@@ -691,7 +691,7 @@ class PartReduction(object):
                     # e.g., Dynamics objects
                     match = flatRef.getElementsByOffset(offsetStart, offsetEnd,
                         includeEndBoundary=True, mustFinishInSpan=False, 
-                        mustBeginInSpan=True).getElementsByClass(target)
+                        mustBeginInSpan=True).getElementsByClass(target).stream()
                     #environLocal.printDebug(['matched elements', target, match])
                     # extend duration of all found dynamics
                     match.extendDuration(target, inPlace=True)
@@ -863,7 +863,7 @@ class Test(unittest.TestCase):
         #post.parts[0].show('t')
 
         match = [(repr(e), e.offset, e.duration.quarterLength) 
-                  for e in post.parts[0].getElementsByClass('Measure')[0:3].flat.notesAndRests]
+            for e in post.parts[0].getElementsByClass('Measure').stream()[0:3].flat.notesAndRests]
         self.assertEqual(match, 
                          [('<music21.note.Rest rest>', 0.0, 1.0), 
                           ('<music21.note.Note F#>', 1.0, 1.0), 

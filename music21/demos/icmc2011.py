@@ -38,8 +38,6 @@ class Test(unittest.TestCase):
 
         n1 = note.Note('g3', type='half')
         n2 = note.Note('d4', type='half')
-        n3 = note.Note('g#3', quarterLength=0.5)
-        n4 = note.Note('d-4', quarterLength=3.5)
         cf1 = clef.AltoClef()
         
         m1 = stream.Measure(number=1)
@@ -56,6 +54,9 @@ class Test(unittest.TestCase):
         assert m1.index(n2) == 2
         # can find an element based on a given offset
         assert m1.getElementAtOrBefore(3) == n2 
+
+        n3 = note.Note('g#3', quarterLength=0.5)
+        n4 = note.Note('d-4', quarterLength=3.5)
         
         m2 = stream.Measure(number=2)
         m2.append([n3, n4])
@@ -180,7 +181,7 @@ class Test(unittest.TestCase):
 
 
         # get the Clef object, and report its sign, from Measure 1
-        assert m1.getElementsByClass('Clef')[0].sign == 'C'
+        assert m1.getElementsByClass('Clef').stream()[0].sign == 'C'
         # collect into a list the sign of all clefs in the flat Score
         assert [cf.sign for cf in s1.flat.getElementsByClass('Clef')] == ['C', 'F']
         
@@ -194,17 +195,17 @@ class Test(unittest.TestCase):
         
         # get all pitch names
         match = []
-        for e in s1.flat.getElementsByClass('Note'):
+        for e in s1.flat.getElementsByClass('Note').stream():
             match.append(e.pitch.nameWithOctave)
         assert match == ['G3', 'C4', 'G#3', 'A#1', 'D-4', 'B2']
         
         # collect all Notes and transpose up a perfect fifth
-        for n in s1.flat.getElementsByClass('Note'):
+        for n in s1.flat.getElementsByClass('Note').stream():
             n.transpose('P5', inPlace=True)
         
         # check that all pitches are correctly transposed
         match = []
-        for e in s1.flat.getElementsByClass('Note'):
+        for e in s1.flat.getElementsByClass('Note').stream():
             match.append(e.pitch.nameWithOctave)    
         assert match == ['D4', 'G4', 'D#4', 'E#2', 'A-4', 'F#3']
         
@@ -220,7 +221,7 @@ class Test(unittest.TestCase):
         # Searching by Locations and Contexts
 
         # a Note can always find a Clef
-        assert n4.getContextByClass('Clef') == cf1
+        self.assertIs(n4.getContextByClass('Clef'), cf1)
         # must search oldest sites first
         assert n6.getContextByClass('Clef', sortByCreationTime='reverse') == cf2
         

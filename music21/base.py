@@ -3942,7 +3942,7 @@ class Test(unittest.TestCase):
         '''
         from music21 import corpus, clef, stream
         a = corpus.parse('bach/bwv324.xml')
-        measures = a.parts[0].getElementsByClass('Measure') # measures of first part
+        measures = a.parts[0].getElementsByClass('Measure').stream() # measures of first part
 
         # the activeSite of measures[1] is set to the new output stream
         self.assertEqual(measures[1].activeSite, measures)

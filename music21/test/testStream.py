@@ -1799,7 +1799,7 @@ class Test(unittest.TestCase):
 
             #environLocal.printDebug(['first element', p[0], p[0].duration])
             # by default, initial rest should be made
-            sub = p.getElementsByClass(note.Rest)
+            sub = p.getElementsByClass(note.Rest).stream()
             self.assertEqual(len(sub), 1)
 
             self.assertEqual(sub.duration.quarterLength, partOffset)
@@ -4320,7 +4320,7 @@ class Test(unittest.TestCase):
         self.assertEqual(s.getElementAfterElement(n2), b1)
 
         # try to get elements by class
-        sub1 = s.getElementsByClass('Barline')
+        sub1 = s.getElementsByClass('Barline').stream()
         self.assertEqual(len(sub1), 1)
         # only found item is barline
         self.assertEqual(sub1[0], b1)
@@ -5557,13 +5557,13 @@ class Test(unittest.TestCase):
         # for testing against
         s2 = stream.Stream()
         
-        s3 = s1.getElementsByClass('GeneralNote')
+        s3 = s1.getElementsByClass('GeneralNote').stream()
         self.assertEqual(len(s3), 20)
         #environLocal.printDebug(['s3.derivation.origin', s3.derivation.origin])
         self.assertEqual(s3.derivation.origin is s1, True)
         self.assertEqual(s3.derivation.origin is not s2, True)
         
-        s4 = s3.getElementsByClass('Chord')
+        s4 = s3.getElementsByClass('Chord').stream()
         self.assertEqual(len(s4), 10)
         self.assertEqual(s4.derivation.origin is s3, True)
         
@@ -5605,7 +5605,8 @@ class Test(unittest.TestCase):
             'Measure')[3], True)
 
         m4 = p1.measure(4)
-        self.assertTrue(m4.flat.notesAndRests.derivation.rootDerivation is m4, list(m4.flat.notesAndRests.derivation.chain()))
+        self.assertTrue(m4.flat.notesAndRests.derivation.rootDerivation is m4, 
+                        list(m4.flat.notesAndRests.derivation.chain()))
         
         # part is the root derivation of a measures() call
         mRange = p1.measures(4, 6)
@@ -5613,13 +5614,11 @@ class Test(unittest.TestCase):
         self.assertEqual(mRange.flat.notesAndRests.derivation.rootDerivation, p1)
 
 
-        self.assertEqual(s.flat.getElementsByClass(
-            'Rest').derivation.rootDerivation is s, True) 
+        self.assertIs(s.flat.getElementsByClass('Rest').stream().derivation.rootDerivation, s) 
         
-        # we cannot use the activeSite to get the Part from the Measure, as
-        # the activeSite was set when doing the getElementsByClass operation
-        self.assertEqual(p1.getElementsByClass(
-            'Measure')[3].activeSite is p1, False)
+        # As of v3, we CAN use the activeSite to get the Part from the Measure, as
+        # the activeSite was not set when doing the getElementsByClass operation
+        self.assertIs(p1.getElementsByClass('Measure')[3].activeSite, p1)
 
 
 
@@ -5660,7 +5659,7 @@ class Test(unittest.TestCase):
         self.assertEqual(s1Flat.derivation.origin is s1, True)
         self.assertEqual(s1Flat.derivation.method is 'flat', True)
 
-        s1Elements = s1Flat.getElementsByClass('Note')
+        s1Elements = s1Flat.getElementsByClass('Note').stream()
         self.assertEqual(s1Elements.derivation.method is 'getElementsByClass', True)
 
 

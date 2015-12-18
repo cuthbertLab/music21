@@ -50,7 +50,7 @@ You can then iterate through these objects and access the attributes directly. H
 of this that will analyze the root motion in a score:
 
     
-    >>> p = corpus.parse('leadsheet').flat.getElementsByClass('Harmony')
+    >>> p = corpus.parse('leadsheet').flat.getElementsByClass('Harmony').stream()
     >>> p = harmony.realizeChordSymbolDurations(p)
     >>> averageMotion = 0
     >>> l = alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(p,0,2, ['Harmony']) 

@@ -16,8 +16,6 @@ These are the lowest level tools for working with self-balancing AVL trees.
 There's an overhead to creating an AVL tree, but for a large score it is
 absolutely balanced by having O(log n) search times.
 '''
-import unittest
-
 from music21.exceptions21 import TreeException
 from music21 import common
 
@@ -139,7 +137,10 @@ class AVLNode(common.SlottedObject):
         >>> print(scoreTree.rootNode.rightChild.rightChild.rightChild.rightChild)
         None
         ''',
-        
+    'payload': r'''
+        The content of the node at this point.  Usually a Music21Object.
+        ''',
+                
     'position': r'''
         The position of this node -- this is often the same as the offset of
         the node in a containing score, but does not need to be. It could be the .sortTuple
@@ -888,28 +889,6 @@ class AVLTree(object):
 
         self.rootNode = recurseRemove(self.rootNode, position)
 
-
-#-------------------------------#
-class Test(unittest.TestCase):
-    def runTest(self):
-        pass
-    
-    @staticmethod
-    def heightBalanceCheck(avl):
-        '''
-        given an AVLTree, return the height and balance of each node. in order.
-        
-        This doesn't need to be fast (it uses iter), but it can be used for testing
-        that various creation algorithms give the same result.
-        '''
-        retList = []
-        for n in avl:
-            retList.append(n.height, n.balance)
-        return retList
-    
-    def testCheckSortedBalance(self):
-        pass
-         
 
 
 #-------------------------------#

@@ -1160,7 +1160,7 @@ def getRawSegments(music21Part, segmentBreaks=None):
     if segmentBreaks:
         (mnStart, offsetStart) = segmentBreaks[segmentIndex]
     currentSegment = BrailleSegment()
-    for music21Measure in music21Part.getElementsByClass(stream.Measure, stream.Voice):
+    for music21Measure in music21Part.getElementsByClass([stream.Measure, stream.Voice]):
         prepareBeamedNotes(music21Measure)
         if music21Measure.number >= mnStart:
             music21Measure.sliceAtOffsets(offsetList=[offsetStart], inPlace=True)

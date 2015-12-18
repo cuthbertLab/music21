@@ -237,7 +237,7 @@ def _copyMultipleMeasures(t, p, kCurrent):
             m.number = t.number[0] + mPast.number - targetStart
             measures.append(m)
             # update all keys
-            allRNs = m.getElementsByClass('RomanNumeral').elements
+            allRNs = list(m.getElementsByClass('RomanNumeral')) 
             for rnPast in allRNs:
                 if kCurrent is None: # should not happen
                     raise RomanTextTranslateException(

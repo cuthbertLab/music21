@@ -309,7 +309,7 @@ class StreamCoreMixin(object):
     def _getSpannerBundle(self):
         if 'spannerBundle' not in self._cache or self._cache['spannerBundle'] is None:
             sf = self.flat
-            sp = sf.spanners
+            sp = sf.spanners.stream()
             self._cache['spannerBundle'] = spanner.SpannerBundle(sp)
         return self._cache['spannerBundle']
 
