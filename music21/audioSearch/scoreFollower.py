@@ -154,19 +154,15 @@ class ScoreFollower(object):
         environLocal.printDebug("got Frequencies from Microphone")
 
         time_start = time()
-        detectedPitchesFreq = audioSearch.detectPitchFrequencies(
-            freqFromAQList, self.useScale)
-        detectedPitchesFreq = audioSearch.smoothFrequencies(
-            detectedPitchesFreq)
-        detectedPitchObjects, unused_listplot = \
-            audioSearch.pitchFrequenciesToObjects(
-                detectedPitchesFreq, self.useScale)
+        detectedPitchesFreq = audioSearch.detectPitchFrequencies(freqFromAQList, self.useScale)
+        detectedPitchesFreq = audioSearch.smoothFrequencies(detectedPitchesFreq)
+        detectedPitchObjects, unused_listplot = audioSearch.pitchFrequenciesToObjects(
+                                                            detectedPitchesFreq, self.useScale)
         notesList, durationList = audioSearch.joinConsecutiveIdenticalPitches(
             detectedPitchObjects)
         self.silencePeriodDetection(notesList)
         environLocal.printDebug("made it to here...")
-        scNotes = self.scoreStream[self.lastNotePosition:self.lastNotePosition
-            + len(notesList)]
+        scNotes = self.scoreStream[self.lastNotePosition:self.lastNotePosition + len(notesList)]
         #print "1"
         transcribedScore, self.qle = audioSearch.notesAndDurationsToStream(
             notesList,
@@ -175,13 +171,12 @@ class ScoreFollower(object):
             qle=self.qle,
             )
         #print "2"
-        totalLengthPeriod, self.lastNotePosition, prob, END_OF_SCORE = \
-            self.matchingNotes(
-                self.scoreStream,
-                transcribedScore,
-                self.startSearchAtSlot,
-                self.lastNotePosition,
-                )
+        totalLengthPeriod, self.lastNotePosition, prob, END_OF_SCORE = self.matchingNotes(
+                                                                            self.scoreStream,
+                                                                            transcribedScore,
+                                                                            self.startSearchAtSlot,
+                                                                            self.lastNotePosition,
+                                                                            )
         #print "3"
         self.processing_time = time() - time_start
         environLocal.printDebug("and even to here...")
@@ -462,7 +457,7 @@ class ScoreFollower(object):
 
         >>> from time import time
         >>> from music21.audioSearch import scoreFollower
-        >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
+        >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes.stream()
         >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         >>> ScF.scoreNotesOnly = ScF.scoreStream.flat.notesAndRests
         >>> ScF.lastNotePosition = 14
@@ -518,7 +513,7 @@ class ScoreFollower(object):
             scNotes.id = name
             totScores.append(scNotes)
         listOfParts = search.approximateNoteSearchWeighted(
-            transcribedScore.flat.notesAndRests, totScores)
+            transcribedScore.flat.notesAndRests.stream(), totScores)
 
         #decision process
         if notePrediction > len(scoreStream) - tn_recording - hop - 1:
@@ -552,11 +547,11 @@ class ScoreFollower(object):
             probabilityHit = listOfParts[position].matchProbability
 
         unused_listOfParts2 = search.approximateNoteSearch(
-                                    transcribedScore.flat.notesAndRests, totScores)
+                                    transcribedScore.flat.notesAndRests.stream(), totScores)
         unused_listOfParts3 = search.approximateNoteSearchNoRhythm(
-                                    transcribedScore.flat.notesAndRests, totScores)
+                                    transcribedScore.flat.notesAndRests.stream(), totScores)
         unused_listOfParts4 = search.approximateNoteSearchOnlyRhythm(
-                                    transcribedScore.flat.notesAndRests, totScores)
+                                    transcribedScore.flat.notesAndRests.stream(), totScores)
 #        print "PROBABILITIES:",
 #        print "pitches and durations weighted (current)",listOfParts[position].matchProbability,
 #        print "pitches and durations without weighting" , listOfParts2[position].matchProbability,
