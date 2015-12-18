@@ -2143,7 +2143,7 @@ class Test(unittest.TestCase):
         #s.show('midi')
         
         # get and compare just the time signatures
-        mtAlt = streamHierarchyToMidiTracks(s.getElementsByClass('TimeSignature'))[0]
+        mtAlt = streamHierarchyToMidiTracks(s.getElementsByClass('TimeSignature').stream())[0]
 
         match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, 
         <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=''>, 
@@ -2179,7 +2179,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(mt.events), 98)
 
         #s.show('midi')
-        unused_mtAlt = streamHierarchyToMidiTracks(s.getElementsByClass('TimeSignature'))[0]
+        unused_mtAlt = streamHierarchyToMidiTracks(s.getElementsByClass('TimeSignature'
+                                                                        ).stream())[0]
 
     def testAnacrusisTiming(self):
 

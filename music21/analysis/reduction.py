@@ -672,7 +672,7 @@ class PartReduction(object):
                     offsetEnd = offsetStart + ds['span']
                     match = flatRef.getElementsByOffset(offsetStart, offsetEnd,
                         includeEndBoundary=False, mustFinishInSpan=False, 
-                        mustBeginInSpan=True).getElementsByClass(target)
+                        mustBeginInSpan=True).getElementsByClass(target).stream()
                     if len(match) == 0:
                         w = None
                     else:
@@ -691,7 +691,7 @@ class PartReduction(object):
                     # e.g., Dynamics objects
                     match = flatRef.getElementsByOffset(offsetStart, offsetEnd,
                         includeEndBoundary=True, mustFinishInSpan=False, 
-                        mustBeginInSpan=True).getElementsByClass(target)
+                        mustBeginInSpan=True).getElementsByClass(target).stream()
                     #environLocal.printDebug(['matched elements', target, match])
                     # extend duration of all found dynamics
                     match.extendDuration(target, inPlace=True)
