@@ -5616,9 +5616,9 @@ class Test(unittest.TestCase):
 
         self.assertIs(s.flat.getElementsByClass('Rest').stream().derivation.rootDerivation, s) 
         
-        # we cannot use the activeSite to get the Part from the Measure, as
-        # the activeSite was set when doing the getElementsByClass operation
-        self.assertIsNot(p1.getElementsByClass('Measure')[3].activeSite, p1)
+        # As of v3, we CAN use the activeSite to get the Part from the Measure, as
+        # the activeSite was not set when doing the getElementsByClass operation
+        self.assertIs(p1.getElementsByClass('Measure')[3].activeSite, p1)
 
 
 
