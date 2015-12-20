@@ -32,6 +32,7 @@ import time
 import unittest
 
 from music21 import environment
+from music21 import common
 from music21.test import testRunner
 from music21.test import commonTest
 
@@ -108,18 +109,14 @@ def runOneModuleWithoutImp(args):
         return ModuleResponse("LargeException", fp, None, None, str(excp))
 
     
-def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveOut = 1):
+def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveOut=1):
     '''
     Run all tests. Group can be test and/or external
     '''    
     normalStdError = sys.stderr
     
     timeStart = time.time()
-    poolSize = multiprocessing.cpu_count() # @UndefinedVariable
-    if poolSize > 2:
-        poolSize = poolSize - leaveOut
-    else:
-        leaveOut = 0
+    poolSize = common.cpus()
 
     print('Creating %d processes for multiprocessing (omitting %d processors)' % (poolSize, leaveOut))
     

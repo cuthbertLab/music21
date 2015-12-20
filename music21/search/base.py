@@ -227,11 +227,11 @@ def approximateNoteSearchNoRhythm(thisStream, otherStreams):
     o2 0.1666666...
     '''
     isJunk = None
-    n = thisStream.flat.notesAndRests
+    n = thisStream.flat.notesAndRests.stream()
     thisStreamStr = translateStreamToStringNoRhythm(n)
     sorterList = []
     for s in otherStreams:
-        sn = s.flat.notesAndRests
+        sn = s.flat.notesAndRests.stream()
         thatStreamStr = translateStreamToStringNoRhythm(sn)
         ratio = difflib.SequenceMatcher(isJunk, thisStreamStr, thatStreamStr).ratio()
         s.matchProbability = ratio
@@ -265,11 +265,11 @@ def approximateNoteSearchOnlyRhythm(thisStream, otherStreams):
     o2 0.0
     '''
     isJunk = None
-    n = thisStream.flat.notesAndRests
+    n = thisStream.flat.notesAndRests.stream()
     thisStreamStr = translateStreamToStringOnlyRhythm(n)
     sorterList = []
     for s in otherStreams:
-        sn = s.flat.notesAndRests
+        sn = s.flat.notesAndRests.stream()
         thatStreamStr = translateStreamToStringOnlyRhythm(sn)
         ratio = difflib.SequenceMatcher(isJunk, thisStreamStr, thatStreamStr).ratio()
         s.matchProbability = ratio
@@ -332,9 +332,9 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
 
 
 
-def translateStreamToString(inputStream):
+def translateStreamToString(inputStreamOrIterator, returnMeasures=False):
     '''
-    takes a stream of notesAndRests only and returns
+    takes a stream (or streamIterator) of notesAndRests only and returns
     a string for searching on.
     
     
@@ -347,14 +347,19 @@ def translateStreamToString(inputStream):
     12
     '''
     b = ''
-    for n in inputStream:
+    measures = []
+    for n in inputStreamOrIterator:
         b += translateNoteWithDurationToBytes(n)
-    return b
+        if returnMeasures:
+            measures.append(n.measureNumber)
+    if returnMeasures is False:
+        return b
+    else:
+        return (b, measures)
 
-def translateDiatonicStreamToString(inputStream, previousRest=False, 
-                                    previousTie=False, previousQL=None, returnLastTuple=False):
+def translateDiatonicStreamToString(inputStreamOrIterator, returnMeasures=False):
     r'''
-    translates a stream of Notes and Rests only into a string,
+    Translates a Stream or StreamIterator of Notes and Rests only into a string,
     encoding only the .step (no accidental or octave) and whether
     the note is slower, faster, or the same speed as the previous
     note.
@@ -370,34 +375,39 @@ def translateDiatonicStreamToString(inputStream, previousRest=False,
     
     
     >>> s = converter.parse("tinynotation: 3/4 c4 d8~ d16 r16 FF8 F#8 a'8 b-2.")
-    >>> sn = s.flat.notesAndRests
-    >>> streamString = search.translateDiatonicStreamToString(sn)
+    >>> streamString = search.translateDiatonicStreamToString(s.recurse().notesAndRests)
     >>> print(streamString)
     CRZFFAI
     >>> len(streamString)
     7
     
-    If returnLastTuple is True, returns a triplet of whether the last note
-    was a rest, whether the last note was tied, and what the last quarterLength was,
-    which can be fed back into this algorithm:
+    If returnMeasures is True, returns an array of measureNumbers where each entry represents
+    the measure number of the measure of the object at that character position :
     
-    >>> streamString2, lastTuple = search.translateDiatonicStreamToString(sn, returnLastTuple=True)
+    >>> streamString2, measures = search.translateDiatonicStreamToString(s.recurse().notesAndRests, 
+    ...                                    returnMeasures=True)
     >>> streamString == streamString2
     True
-    >>> lastTuple
-    (False, False, 3.0)
+    >>> measures
+    [1, 1, 1, 1, 1, 2, 2]
     '''
     b = []
-#    previousRest = False
-#    previousTie = False
-#    previousQL = None
-    for n in inputStream:
+    measures = []
+    previousRest = False
+    previousTie = False
+    previousQL = None
+    for n in inputStreamOrIterator:
+        mNum = None
+        if returnMeasures:
+            mNum = n.measureNumber
+
         if n.isRest:
             if previousRest is True:
                 continue
             else:
                 previousRest = True
                 b.append('Z')
+                measures.append(mNum)
                 continue
         else:
             previousRest = False
@@ -415,14 +425,104 @@ def translateDiatonicStreamToString(inputStream, previousRest=False,
         else:
             ascShift = 7
         previousQL = ql
-        newName = chr(ord(n.pitch.step) + ascShift)
+        newName = chr(ord(n.pitches[0].step) + ascShift)
+        measures.append(mNum)
         b.append(newName)
     
-    if returnLastTuple is False:
-        return ''.join(b)
+    joined = ''.join(b)
+    if returnMeasures is False:
+        return joined
     else:
-        joined = ''.join(b)
-        return (joined, (previousRest, previousTie, previousQL))
+        return (joined, measures)
+
+def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
+    r'''
+    Translates a Stream (not StreamIterator) of Notes and Rests only into a string,
+    encoding only the chromatic distance from the last note and whether
+    the note is slower, faster, or the same speed as the previous
+    note.
+    
+    Skips all but the first note of tie. Skips multiple rests in a row 
+    
+    Each note gets one byte and encodes up from -13 to 13 (all notes > octave are 13 or -13)
+        
+    
+    >>> s = converter.parse("tinynotation: 3/4 c4 d8~ d16 r16 F8 F#8 a'8 b-2.")
+    >>> sn = s.flat.notesAndRests.stream()
+    >>> streamString = search.translateIntervalsAndSpeed(sn)
+    >>> print(streamString)
+    Ib RH<9
+    >>> len(streamString)
+    7
+    
+    If returnLastTuple is True, returns a triplet of whether the last note
+    was a rest, whether the last note was tied, what the last quarterLength was, and what the
+    last pitches' midi number was
+    
+    which can be fed back into this algorithm:
+    
+    >>> streamString2, measures = search.translateIntervalsAndSpeed(sn, returnMeasures=True)
+    >>> streamString == streamString2
+    True
+    >>> measures
+    [1, 1, 1, 1, 1, 2, 2]
+    '''
+    b = []
+    measures = []
+    
+    previousRest = False
+    previousTie = False
+    previousQL = None
+    previousMidi = 60
+    for n in inputStream:
+        if n.isNote:
+            previousMidi = n.pitches[0].midi
+            break
+                
+    for n in inputStream:
+        mNum = None
+        if returnMeasures:
+            mNum = n.measureNumber
+        if n.isRest:
+            if previousRest is True:
+                continue
+            else:
+                previousRest = True
+                b.append(' ')
+                measures.append(mNum)
+                continue
+        else:
+            previousRest = False
+        if previousTie is True:
+            if n.tie is None or n.tie.type == 'stop':
+                previousTie = False
+            continue
+        elif n.tie is not None:
+            previousTie = True
+        ql = n.duration.quarterLength
+        if previousQL is None or previousQL == ql:
+            ascShift = 27 + 14
+        elif previousQL > ql:
+            ascShift = 27*2 + 14
+        else:
+            ascShift = 14
+        previousQL = ql
+        pitchDifference = previousMidi - n.pitches[0].midi
+        if pitchDifference > 13:
+            pitchDifference = 13
+        elif pitchDifference < -13:
+            pitchDifference = -13
+        previousMidi = n.pitches[0].midi
+        newName = chr(32 + pitchDifference + ascShift)
+        measures.append(mNum)
+        b.append(newName)
+    
+    joined = ''.join(b)
+    if returnMeasures is False:
+        return joined
+    else:
+        return (joined, measures)
+
 
 def translateStreamToStringNoRhythm(inputStream):
     '''

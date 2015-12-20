@@ -1967,7 +1967,7 @@ class Test(unittest.TestCase):
             targetCount,
             )
         for e in s2.flat.getElementsByClass('KeySignature'):
-            for site in e.sites.getSites():
+            for site in e.sites.get():
                 if site is not None:
                     site.remove(e)
         #s2.show()

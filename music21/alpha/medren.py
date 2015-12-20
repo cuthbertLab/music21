@@ -70,62 +70,6 @@ allowableStrettoIntervals = {
 _validMensuralTypes = [None,'maxima', 'longa', 'brevis', 'semibrevis', 'minima', 'semiminima']
 _validMensuralAbbr = [None, 'Mx', 'L', 'B', 'SB', 'M', 'SM']
 
-#===============================================================================
-# def _getTargetBeforeOrAtObj(music21Obj, targetClassList):
-#    '''
-#    Takes two arguments: music21Obj, targetObj
-#    If music21Obj has some set of contexts, returns the list of
-#     object of class targetClass at or before music21Obj.
-#    If no such instance exists, of if the only context is None, returns None.
-#    NOTE: This has no other use than to act as an alternate way of 
-#    getting the closest instance of a mensuration or divisione for 
-#    :class:`music21.medren.GeneralMensuralNote`. 
-#    
-#    
-#    >>> n = note.Note('A')
-#    >>> medren._getTargetBeforeOrAtObj(n, note.Note)
-#    []
-#    >>> n_1 = note.Note('B')
-#    >>> n_1.duration = duration.Duration(2.5)
-#    >>> n_2 = note.Note('C')
-#    >>> n_2.duration = duration.Duration(0.5)
-#    >>> s_1 = stream.Stream()
-#    >>> s_1.append(n_1)
-#    >>> s_1.append(n)
-#    >>> s_1.append(n_2)
-#    >>> medren._getTargetBeforeOrAtObj(n, note.Note)
-#    [<music21.note.Note B>, <music21.note.Note A>]
-#    >>> n_3 = note.Note('D')
-#    >>> n_3.duration = duration.Duration(1.0)
-#    >>> n_4 = note.Note('E')
-#    >>> n_4.duration = duration.Duration(1.5)
-#    >>> m = stream.Measure()
-#    >>> m.append(n_3)
-#    >>> m.append(n)
-#    >>> s = stream.Score()
-#    >>> s.append(n_4)
-#    >>> s.append(meter.TimeSignature())
-#    >>> s.append(m)
-#    >>> medren._getTargetBeforeOrAtObj(n, meter.TimeSignature)
-#    [<music21.meter.TimeSignature 4/4>]
-#    '''
-#    #Get contacts by class
-#    #Improve efficiency
-#    cList = []
-#    
-#    if not isinstance(targetClassList, list):
-#        targetClassList = [targetClassList]
-#    
-#    tempSites = music21Obj.getSites()[1:]
-#    if len(tempSites) > 0:
-#        for s in tempSites:
-#            for i in range(int(s.lowestOffset), int(s.elementOffset(music21Obj))+1):
-#                cList += list(s.getElementsByOffset(i, i+1, classList = 
-#                        targetClassList).recurse())[1:]
-#        cList += music21.medren._getTargetBeforeOrAtObj(s, targetClassList)
-#    
-#    return list(set(cList))
-#===============================================================================
 
 #---------------------------------------------------------------------------------
 class MensuralClef(clef.Clef):

@@ -35,9 +35,9 @@ if six.PY2:
         try:
             from StringIO import StringIO as StrByIO
         except ImportError:
-            from io import StringIO as StrByIO
+            from io import StringIO as StrByIO # @UnusedImport
 else:
-    from io import BytesIO as StrByIO
+    from io import BytesIO as StrByIO # @Reimport
 
 
 class StreamPlayerException(Music21Exception):

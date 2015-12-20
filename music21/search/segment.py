@@ -24,6 +24,8 @@ Speed notes:
    slightly different, but the speedup is between 10 and 100x!
 
 '''
+from __future__ import print_function, division
+
 from music21 import converter
 from music21 import corpus
 from music21 import environment
@@ -47,7 +49,7 @@ def translateMonophonicPartToSegments(
     Translates a monophonic part with measures to a set of segments of length
     `segmentLengths` (measured in number of notes) with an overlap of `overlap` notes 
     using a conversion algorithm of `algorithm` (default: search.translateStreamToStringNoRhythm). 
-    Returns two lists, a list of segments, and a list of measure
+    Returns two lists, a list of segments, and a list of tuples of measure start and end
     numbers that match the segments.
     
     If algorithm is None then a default algorithm of music21.search.translateStreamToStringNoRhythm
@@ -79,61 +81,26 @@ def translateMonophonicPartToSegments(
     from music21 import search
     if algorithm is None:
         algorithm = search.translateStreamToStringNoRhythm
-    
+        
+    nStream = inputStream.recurse().notes.stream()
+    outputStr, measures = algorithm(nStream, returnMeasures=True) 
+    totalLength = len(outputStr)
+
+
+    numberOfSegments = int(math.ceil((totalLength + 0.0) / (segmentLengths - overlap)))
+    segmentStarts = [i * (segmentLengths - overlap) for i in range(numberOfSegments)]
+    #print(totalLength, numberOfSegments, segmentStarts)
+
     segmentList = []
-    measureSegmentList = []
     measureList = []
     
-    totalLength = 0
-    previousTuple = (False, False, None) # lastRest, lastTied, lastQL
-    for m in inputStream.getElementsByClass('Measure'):
-        mNotes = m.flat.getElementsByClass('Note')
-        if algorithm == search.translateDiatonicStreamToString:
-            algorithmOutput, previousTuple = algorithm(mNotes, previousTuple[0], 
-                                                       previousTuple[1], previousTuple[2], 
-                                                       returnLastTuple=True)
-        else: # not all algorithms can take two streams...
-            algorithmOutput = algorithm(mNotes) 
-        
-        mDict = {'measureNumber': m.number, 
-                 'data': algorithmOutput, 
-                 'dataLength': len(algorithmOutput), 
-                 'startPosition': totalLength}
-        totalLength += len(algorithmOutput)
-        measureSegmentList.append(mDict)
-
-    numberOfSegments = int(math.ceil((totalLength+0.0)/(segmentLengths-overlap)))
-    segmentStarts = [i*(segmentLengths-overlap) for i in range(numberOfSegments)]
-    #print totalLength, numberOfSegments, segmentStarts
-    
     for segmentStart in segmentStarts:
-        segmentEnd = segmentStart + segmentLengths
-        currentSegment = ""
-        startMeasure = None
-        lengthLeft = segmentLengths
-        for mDict in measureSegmentList:
-            if mDict['startPosition'] + mDict['dataLength'] < segmentStart:
-                continue
-            elif mDict['startPosition'] >= segmentEnd:
-                break
-            if startMeasure is None:
-                startMeasure = mDict['measureNumber']
-            currentData = mDict['data']
-            lenCurrentData = mDict['dataLength']
-            if mDict['startPosition'] < segmentStart:
-                trimFromFront = segmentStart - mDict['startPosition']
-                currentDataTrimmed = currentData[trimFromFront:]
-                lengthLeft = lengthLeft - len(currentDataTrimmed)
-                currentSegment += currentDataTrimmed
-            elif lengthLeft < lenCurrentData:
-                currentDataTrimmed = currentData[0:lengthLeft]
-                currentSegment += currentDataTrimmed
-                lengthLeft = lengthLeft - len(currentDataTrimmed) # shouldn't matter...
-            else:
-                lengthLeft = lengthLeft - lenCurrentData
-                currentSegment += currentData      
+        segmentEnd = min(segmentStart + segmentLengths, totalLength)
+        currentSegment = outputStr[segmentStart:segmentEnd]
+        measureTuple = (measures[segmentStart],  measures[segmentEnd])
+
         segmentList.append(currentSegment)
-        measureList.append(startMeasure)
+        measureList.append(measureTuple)
     return (segmentList, measureList)
 
 def indexScoreParts(scoreFile, *args, **kwds):
@@ -197,9 +164,12 @@ def indexScoreFilePaths(
             print("Indexing %s (%d/%d)" % (
                 shortfp, scoreIndex, totalScores))
         scoreIndex += 1
-        if 'failFast' not in kwds or kwds['failFast'] is False:        
+        if 'failFast' not in kwds or kwds['failFast'] is False:
             try:
-                scoreDict[shortfp] = indexOnePath(filePath, *args, **kwds)
+                kwds2 = copy.copy(kwds)
+                if 'failFast' in kwds2:
+                    del(kwds2['failFast'])
+                scoreDict[shortfp] = indexOnePath(filePath, *args, **kwds2)
             except Exception as e: # pylint: disable=broad-except
                 print("Failed on parse for, %s: %s" % (filePath, str(e)))
         else:

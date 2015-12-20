@@ -43,6 +43,8 @@ import sys
 import types
 import unittest
 
+from collections import namedtuple
+
 from music21.test.testRunner import mainTest
 from music21.ext import six
 ## all other music21 modules below...
@@ -83,9 +85,9 @@ from music21 import derivation
 from music21 import duration
 from music21 import environment
 
+from music21.common import opFrac
 from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
 
-from music21.common import opFrac
 
 _MOD = 'music21.base.py'
 environLocal = environment.Environment(_MOD)
@@ -130,7 +132,8 @@ class ElementException(exceptions21.Music21Exception):
     pass
 
 #------------------------------------------------------------------------------
-    
+# for contextSites searches...
+ContextTuple = namedtuple('ContextTuple', 'site offset recurseType')
 
 # pseudo class for returning splitAtX() type commands.
 class _SplitTuple(tuple):
@@ -909,6 +912,64 @@ class Music21Object(object):
         else:
             self._naiveOffset = value
 
+    def getOffsetInHierarchy(self, site):
+        '''
+        For an element which may not be in site, but might be in a Stream in site (or further
+        in streams), find the cumulative offset of the element in that site.
+        
+        >>> s = stream.Score(id="mainScore")
+        >>> p = stream.Part()
+        >>> m = stream.Measure()
+        >>> n = note.Note()
+        >>> m.insert(5.0, n)
+        >>> p.insert(10.0, m)
+        >>> s.insert(0.0, p)
+        >>> n.getOffsetInHierarchy(s)
+        15.0
+        
+        If no hierarchy beginning with site contains the element and the element is not derived from
+        an element that does, then a SitesException is raised:
+        
+        >>> s2 = stream.Score(id="otherScore")
+        >>> n.getOffsetInHierarchy(s2)
+        Traceback (most recent call last):
+        SitesException: Element <music21.note.Note C> 
+            is not in hierarchy of <music21.stream.Score otherScore>
+        
+        But if the element is derived from an element in a hierarchy then it can get the offset:
+        
+        >>> n2 = n.transpose('P5')
+        >>> n2.derivation.origin is n
+        True
+        >>> n2.derivation.method
+        'transpose'
+        >>> n2.getOffsetInHierarchy(s)
+        15.0
+        
+        There is no corresponding `.setOffsetInHierarchy()` since it's unclear what that would mean.
+
+        *new in v.3*
+
+        OMIT_FROM_DOCS
+        
+        Timing: 113microseconds for a search.  vs 1 microsecond for elementOffset vs .4 for
+        elementOffset.  Hence the short-circuit for easy looking below...
+        
+        TODO: If timing permits, replace .flat and .semiFlat with this routine.
+        
+        '''
+        try:
+            return self.getOffsetBySite(site)
+        except SitesException:
+            pass
+        
+        for cs in self.contextSites():
+            if cs.site is site:
+                return cs.offset
+        
+        raise SitesException("Element {} is not in hierarchy of {}".format(self, site))
+    
+
     @common.deprecated("September 2015", "January 2016", "use self.sites.getAttrByName(attr)")
     def getContextAttr(self, attr):
         '''
@@ -1091,12 +1152,10 @@ class Music21Object(object):
         orphans = []
         # TODO: how can this be optimized to not use getSites, so as to
         # not unwrap weakrefs?
-        for s in self.sites.getSites():
+        for s in self.sites.yieldSites(excludeNone=True):
             # of the site does not actually have this Music21Object in
             # its elements list, it is an orphan and should be removed
             # note: this permits non-site context Streams to continue
-            if s is None:
-                continue
             if s.isStream and not s.hasElement(self):
                 if excludeStorageStreams:
                     # only get those that are not Storage Streams
@@ -1406,17 +1465,20 @@ class Music21Object(object):
                      callerFirst=None, 
                      memo=None, 
                      offsetAppend=0.0, 
-                     sortByCreationTime=False, 
+                     sortByCreationTime=False,
                      priorityTarget=None,
                      returnSortTuples=False,
                      followDerivation=True):
         '''
-        A generator that returns a list of tuples of sites to search for a context...
+        A generator that returns a list of namedtuples of sites to search for a context...
         
-        Each tuple contains a Stream object, 
-        the offset or position (sortTuple) of this element in that Stream, and
-        the method of searching that should be applied to search for a context.  
-        These methods are:
+        Each tuple contains three elements:
+        
+        .site --  Stream object, 
+        .offset -- the offset or position (sortTuple) of this element in that Stream
+        .recurseType -- the method of searching that should be applied to search for a context.  
+
+        The recurseType methods are:
 
             * 'flatten' -- flatten the stream and then look from this offset backwards.
             
@@ -1435,8 +1497,8 @@ class Music21Object(object):
         Returning sortTuples are important for distinguishing the order of multiple sites
         at the same offset.
         
-        >>> for y in n.contextSites(returnSortTuples=True):
-        ...      yClearer = (y[0], y[1].shortRepr(), y[2])
+        >>> for csTuple in n.contextSites(returnSortTuples=True):
+        ...      yClearer = (csTuple.site, csTuple.offset.shortRepr(), csTuple.recurseType)
         ...      print(yClearer)
         (<music21.stream.Measure 3 offset=9.0>, '0.5 <0.20...>', 'elementsFirst')
         (<music21.stream.Part Alto>, '9.5 <0.20...>', 'flatten')
@@ -1453,8 +1515,8 @@ class Music21Object(object):
         >>> m = c[2][4]
         >>> m
         <music21.stream.Measure 3 offset=9.0>
-        >>> for y in m.contextSites(returnSortTuples=True):
-        ...      yClearer = (y[0], y[1].shortRepr(), y[2])
+        >>> for csTuple in m.contextSites(returnSortTuples=True):
+        ...      yClearer = (csTuple.site, csTuple.offset.shortRepr(), csTuple.recurseType)
         ...      print(yClearer)
         (<music21.stream.Measure 3 offset=9.0>, '0.0 <-inf.-20...>', 'elementsFirst')
         (<music21.stream.Part Alto>, '9.0 <0.-20...>', 'flatten')
@@ -1468,26 +1530,40 @@ class Music21Object(object):
         >>> import copy
         >>> mCopy = copy.deepcopy(m)
         >>> mCopy.number = 3333
-        >>> for y in mCopy.contextSites():
-        ...      print(y, mCopy in y[0])
-        (<music21.stream.Measure 3333 offset=0.0>, 0.0, 'elementsFirst') False
-        (<music21.stream.Part Alto>, 9.0, 'flatten') False
-        (<music21.stream.Score bach>, 9.0, 'elementsOnly') False
+        >>> for csTuple in mCopy.contextSites():
+        ...      print(csTuple, mCopy in csTuple.site)
+        ContextTuple(site=<music21.stream.Measure 3333 offset=0.0>, 
+                     offset=0.0, 
+                     recurseType='elementsFirst') False
+        ContextTuple(site=<music21.stream.Part Alto>, 
+                     offset=9.0, 
+                     recurseType='flatten') False
+        ContextTuple(site=<music21.stream.Score bach>, 
+                     offset=9.0, 
+                     recurseType='elementsOnly') False
 
         If followDerivation were False, then the Part and Score would not be found.
 
-        >>> for y in mCopy.contextSites(followDerivation=False):
-        ...     print(y)
-        (<music21.stream.Measure 3333 offset=0.0>, 0.0, 'elementsFirst')
+        >>> for csTuple in mCopy.contextSites(followDerivation=False):
+        ...     print(csTuple)
+        ContextTuple(site=<music21.stream.Measure 3333 offset=0.0>, 
+                     offset=0.0, 
+                     recurseType='elementsFirst')
         
 
         >>> partIterator = c.parts
         >>> m3 = partIterator[1].measure(3)
-        >>> for y in m3.contextSites():
-        ...      print(y)
-        (<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')
-        (<music21.stream.Part Alto>, 9.0, 'flatten')
-        (<music21.stream.Score bach>, 9.0, 'elementsOnly')
+        >>> for csTuple in m3.contextSites():
+        ...      print(csTuple)
+        ContextTuple(site=<music21.stream.Measure 3 offset=9.0>, 
+                     offset=0.0, 
+                     recurseType='elementsFirst')
+        ContextTuple(site=<music21.stream.Part Alto>,
+                     offset=9.0, 
+                     recurseType='flatten')
+        ContextTuple(site=<music21.stream.Score bach>, 
+                     offset=9.0, 
+                     recurseType='elementsOnly')
 
 
 
@@ -1500,8 +1576,8 @@ class Music21Object(object):
         >>> n = note.Note()
         >>> m1.append(n)
         >>> p1.append(m1)
-        >>> for y in n.contextSites():
-        ...     print(y[0])
+        >>> for csTuple in n.contextSites():
+        ...     print(csTuple.site)
         <music21.stream.Measure 1 offset=0.0>
         <music21.stream.Part p1>
 
@@ -1523,12 +1599,10 @@ class Music21Object(object):
         <music21.stream.Measure 1 offset=0.0>
         <music21.stream.Part p1>
 
+        We can sort sites by creationTime...
 
-        Or sort by creationTime...
-
-
-        >>> for y in n.contextSites(sortByCreationTime = True):
-        ...     print(y[0])
+        >>> for csTuple in n.contextSites(sortByCreationTime=True):
+        ...     print(csTuple.site)
         <music21.stream.Measure 2 offset=0.0>
         <music21.stream.Part p2>
         <music21.stream.Measure 1 offset=0.0>
@@ -1536,12 +1610,14 @@ class Music21Object(object):
 
         oldest first...
 
-        >>> for y in n.contextSites(sortByCreationTime='reverse'):
-        ...     print(y[0])
+        >>> for csTuple in n.contextSites(sortByCreationTime='reverse'):
+        ...     print(csTuple.site)
         <music21.stream.Measure 1 offset=0.0>
         <music21.stream.Part p1>
         <music21.stream.Measure 2 offset=0.0>
-        <music21.stream.Part p2>        
+        <music21.stream.Part p2>       
+        
+        *removed in v3: priorityTarget cannot be set, in order to use .sites.yieldSites()* 
         '''
         if memo is None:
             memo = []
@@ -1554,22 +1630,21 @@ class Music21Object(object):
                                                                 callerFirst, offsetAppend))
                 if returnSortTuples:
                     selfSortTuple = self.sortTuple().modify(offset=0.0, priority=float('-inf'))
-                    yield(self, selfSortTuple, recursionType)
+                    yield ContextTuple(self, selfSortTuple, recursionType)
                 else:
-                    yield(self, 0.0, recursionType)
+                    yield ContextTuple(self, 0.0, recursionType)
                 memo.append(self)
-
+            
         if priorityTarget is None and sortByCreationTime is False:
             priorityTarget = self.activeSite
         else:
             environLocal.printDebug('sortByCreationTime {}'.format(sortByCreationTime))
             
-
-        allSites = self.sites.get(priorityTarget=priorityTarget,
-                                  sortByCreationTime=sortByCreationTime,
-                                  excludeNone=True)
+            
         topLevel = self
-        for siteObj in allSites:
+        for siteObj in self.sites.yieldSites(sortByCreationTime=sortByCreationTime, 
+                                             priorityTarget=priorityTarget,
+                                             excludeNone=True):
             if siteObj in memo:
                 continue
             if 'SpannerStorage' in siteObj.classes:
@@ -1590,9 +1665,9 @@ class Music21Object(object):
             
             recursionType = siteObj.recursionType
             if returnSortTuples:
-                yield (siteObj, positionInStream, recursionType)
+                yield ContextTuple(siteObj, positionInStream, recursionType)
             else:
-                yield (siteObj, positionInStream.offset, recursionType)
+                yield ContextTuple(siteObj, positionInStream.offset, recursionType)
 
             memo.append(siteObj)          
             environLocal.printDebug("looking in contextSites for {} with position {}".format(
@@ -1601,8 +1676,7 @@ class Music21Object(object):
                                               memo=memo,
                                               offsetAppend=positionInStream.offset,
                                               returnSortTuples=True, # ALWAYS
-                                              sortByCreationTime=sortByCreationTime,
-                                              priorityTarget=None): 
+                                              sortByCreationTime=sortByCreationTime): 
                                 # get activeSite unless sortByCreationTime
                 inStreamOffset = inStreamPos.offset
                 # now take that offset and use it to modify the positionInStream
@@ -1615,9 +1689,9 @@ class Music21Object(object):
                     #                                                inStreamPos.shortRepr(),
                     #                                                recurType))
                     if returnSortTuples:
-                        yield (topLevel, hypotheticalPosition, recurType)
+                        yield ContextTuple(topLevel, hypotheticalPosition, recurType)
                     else:
-                        yield (topLevel, inStreamOffset, recurType)
+                        yield ContextTuple(topLevel, inStreamOffset, recurType)
                     memo.append(topLevel)
 
         if followDerivation:
@@ -1630,25 +1704,24 @@ class Music21Object(object):
                                               memo=memo,
                                               offsetAppend=0.0,
                                               returnSortTuples=True,
-                                              sortByCreationTime=sortByCreationTime,
-                                              priorityTarget=None): 
+                                              sortByCreationTime=sortByCreationTime): 
                                             # get activeSite unless sortByCreationTime
-                    if derivedCsTuple[0] not in memo:
+                    if derivedCsTuple.site not in memo:
                         environLocal.printDebug(
                                 "Yielding {} from derivedObject contextSites".format(derivedCsTuple)
                                 )
-                        offsetAdjustedCsTuple = (
-                            derivedCsTuple[0], 
-                            derivedCsTuple[1].modify(offset=derivedCsTuple[1].offset + 
+                        offsetAdjustedCsTuple = ContextTuple(
+                            derivedCsTuple.site, 
+                            derivedCsTuple.offset.modify(offset=derivedCsTuple[1].offset + 
                                                                 offsetAppend), 
-                            derivedCsTuple[2])
+                            derivedCsTuple.recurseType)
                         if returnSortTuples:
                             yield offsetAdjustedCsTuple
                         else:
-                            yield (offsetAdjustedCsTuple[0],
-                                   offsetAdjustedCsTuple[1].offset,
-                                   offsetAdjustedCsTuple[2])
-                        memo.append(derivedCsTuple[0])
+                            yield ContextTuple(offsetAdjustedCsTuple.site,
+                                               offsetAdjustedCsTuple.offset.offset,
+                                               offsetAdjustedCsTuple.recurseType)
+                        memo.append(derivedCsTuple.site)
 
         environLocal.printDebug("--returning from derivedObject search")    
 
@@ -1754,7 +1827,7 @@ class Music21Object(object):
 
                 
         
-        selfSites = self.sites.getSites(excludeNone=True)
+        selfSites = self.sites.get(excludeNone=True)
         match = None
 
         # store ids of first sites; might need to take flattened version
@@ -1802,7 +1875,7 @@ class Music21Object(object):
                 return match
             # append new sites to end of queue
             # these are the sites of s, not target
-            selfSites += s.sites.getSites(excludeNone=True)
+            selfSites += s.sites.get(excludeNone=True)
         # if cannot be found, return None
         return None
 
@@ -3464,7 +3537,7 @@ class Music21Object(object):
             raise Music21ObjectException('this object does not have a TempoIndication in Sites')
         mm = ti.getSoundingMetronomeMark()
         self.duration = mm.secondsToDuration(value)
-        for s in self.sites.getSites(excludeNone=True):
+        for s in self.sites.get(excludeNone=True):
             if self in s._elements:
                 s.elementsChanged() # highest time is changed.
 
@@ -4657,7 +4730,8 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(n), '<music21.note.Note G#>')
         siteList = []
         for y in n.contextSites():
-            siteList.append(repr(y))
+            yTup = (y.site, y.offset, y.recurseType)
+            siteList.append(repr(yTup))
         self.assertEqual(siteList, ["(<music21.stream.Measure 3 offset=9.0>, 0.5, 'elementsFirst')",
                                     "(<music21.stream.Part Alto>, 9.5, 'flatten')", 
                                     "(<music21.stream.Score bach>, 9.5, 'elementsOnly')"])
@@ -4667,7 +4741,8 @@ class Test(unittest.TestCase):
 
         siteList = []      
         for y in m.contextSites():
-            siteList.append(repr(y))
+            yTup = (y.site, y.offset, y.recurseType)
+            siteList.append(repr(yTup))
         self.assertEqual(siteList, ["(<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')",
                                     "(<music21.stream.Part Alto>, 9.0, 'flatten')", 
                                     "(<music21.stream.Score bach>, 9.0, 'elementsOnly')"])
@@ -4677,7 +4752,8 @@ class Test(unittest.TestCase):
         siteList = []   
         #environLocal.warn("#########################")   
         for y in m2.contextSites():
-            siteList.append(repr(y))
+            yTup = (y.site, y.offset, y.recurseType)
+            siteList.append(repr(yTup))
         self.assertEqual(siteList, 
                          ["(<music21.stream.Measure 3333 offset=0.0>, 0.0, 'elementsFirst')",
                           "(<music21.stream.Part Alto>, 9.0, 'flatten')", 
@@ -4690,11 +4766,12 @@ class Test(unittest.TestCase):
         m3 = ptemp.measure(3)
         self.assertIs(m, m3)
         for y in m3.contextSites():
-            siteList.append(repr(y))
+            yTup = (y.site, y.offset, y.recurseType)
+            siteList.append(repr(yTup))
         
         self.assertEqual(siteList, 
                          ["(<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')", 
-                          "(<music21.stream.Part Alto>, 9.0, 'flatten')", 
+                          "(<music21.stream.Part Alto>, 9.0, 'flatten')",
                           "(<music21.stream.Score partStream>, 9.0, 'elementsOnly')",
                           "(<music21.stream.Score bach>, 9.0, 'elementsOnly')"])
 
@@ -4709,7 +4786,7 @@ class Test(unittest.TestCase):
         p1.append(m1)
         siteList = []
         for y in n.contextSites():
-            siteList.append(repr(y[0]))
+            siteList.append(repr(y.site))
         self.assertEqual(siteList, ["<music21.stream.Measure 1 offset=0.0>",
                                     "<music21.stream.Part p1>"])
         p2 = stream.Part()
@@ -4720,24 +4797,24 @@ class Test(unittest.TestCase):
         p2.append(m2)
 
         siteList = []
-        for y in n.contextSites(priorityTarget=n.activeSite):
-            siteList.append(repr(y[0]))
+        for y in n.contextSites():
+            siteList.append(repr(y.site))
         self.assertEqual(siteList, ["<music21.stream.Measure 2 offset=0.0>",
                                     "<music21.stream.Part p2>",
                                     "<music21.stream.Measure 1 offset=0.0>",
                                     "<music21.stream.Part p1>"])
 
         siteList = []
-        for y in n.contextSites(sortByCreationTime = True):
-            siteList.append(repr(y[0]))
+        for y in n.contextSites(sortByCreationTime=True):
+            siteList.append(repr(y.site))
         self.assertEqual(siteList, ["<music21.stream.Measure 2 offset=0.0>",
                                     "<music21.stream.Part p2>",
                                     "<music21.stream.Measure 1 offset=0.0>",
                                     "<music21.stream.Part p1>"])
 
         siteList = []
-        for y in n.contextSites(sortByCreationTime = 'reverse'):
-            siteList.append(repr(y[0]))
+        for y in n.contextSites(sortByCreationTime='reverse'):
+            siteList.append(repr(y.site))
         self.assertEqual(siteList, ["<music21.stream.Measure 1 offset=0.0>",
                                     "<music21.stream.Part p1>",
                                     "<music21.stream.Measure 2 offset=0.0>",
@@ -4809,7 +4886,9 @@ class Test(unittest.TestCase):
         # but more instructive in debugging since pitches change...
         #w = copy.deepcopy(v)
         ecopy1 = w[0][0]
+        self.assertEqual(ecopy1.pitch.name, 'E')
         ecopy2 = w[1][0]
+        self.assertEqual(ecopy2.pitch.name, 'F#')
         prev = ecopy2.previous('Note')
         self.assertIs(prev, ecopy1)
         

@@ -349,7 +349,7 @@ class JobProcessor(object):
         jobs is a list of :class:`~music21.metadata.MetadataCachingJob` objects.
         
         '''
-        processCount = processCount or multiprocessing.cpu_count() - 1  # @UndefinedVariable
+        processCount = processCount or common.cpus()  # @UndefinedVariable
         if processCount < 1:
             processCount = 1
         remainingJobs = len(jobs)

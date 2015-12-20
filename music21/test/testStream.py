@@ -347,7 +347,7 @@ class Test(unittest.TestCase):
         sf1 = s1.flat
         sf1.id = "flat s1"
         
-#        for site in n4.sites.getSites():
+#        for site in n4.sites.get():
 #            print site.id,
 #            print n4.sites.getOffsetBySite(site)
         
@@ -1738,7 +1738,7 @@ class Test(unittest.TestCase):
         post = s1Flat.getClefs()[0]
         self.assertTrue(isinstance(post, clef.AltoClef), post)
         #environLocal.printDebug(['s1.activeSite', s1.activeSite])
-        self.assertTrue(sOuter in s1.sites.getSites())
+        self.assertTrue(sOuter in s1.sites.get())
         s1Measures = s1.makeMeasures()
         #print s1Measures[0].clef
         
@@ -2090,13 +2090,13 @@ class Test(unittest.TestCase):
         s1 = Stream()
         s1.insert(n1)
 
-        #environLocal.printDebug(['n1.siteIds after one insertion', n1, n1.getSites(), n1.sites.getSiteIds()])
+        #environLocal.printDebug(['n1.siteIds after one insertion', n1, n1.sites.get(), n1.sites.getSiteIds()])
 
 
         s2 = Stream()
         s2.insert(s1)
 
-        #environLocal.printDebug(['n1.siteIds after container insertion', n1, n1.getSites(), n1.sites.getSiteIds()])
+        #environLocal.printDebug(['n1.siteIds after container insertion', n1, n1.sites.get(), n1.sites.getSiteIds()])
 
         s2Flat = s2.flat
 
@@ -2104,7 +2104,7 @@ class Test(unittest.TestCase):
         #environLocal.printDebug(['s2', s2, id(s2)])    
         #environLocal.printDebug(['s2flat', s2Flat, id(s2Flat)])
 
-        #environLocal.printDebug(['n1.siteIds', n1, n1.getSites(), n1.sites.getSiteIds()])
+        #environLocal.printDebug(['n1.siteIds', n1, n1.sites.get(), n1.sites.getSiteIds()])
 
         # previously, one of these raised an error
         unused_s3 = copy.deepcopy(s2Flat)
@@ -6068,10 +6068,10 @@ class Test(unittest.TestCase):
 #         s1 = stream.Stream()
 #         n1 = note.Note()
 #         s1.append(n1)
-#         print [id(x) for x in n1.getSites()]
+#         print [id(x) for x in n1.sites.get()]
 #         s2 = copy.deepcopy(s1)
 #         #print s2[0].getSites()
-#         print [id(x) for x in s2[0].getSites()]
+#         print [id(x) for x in s2[0].sites.get()]
 
 
     def testFlattenUnnecessaryVoicesA(self):

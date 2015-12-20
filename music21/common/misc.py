@@ -18,13 +18,15 @@ __all__ = ['getMissingImportStr',
            'sortModules',
            'pitchList',
            'runningUnderIPython',
-           'defaultDeepcopy']
+           'defaultDeepcopy',
+           'cpus',]
 
 import copy
 import os
 import sys
 import textwrap
 import time
+import multiprocessing
 
 #-------------------------------------------------------------------------------
 # provide warning strings to users for use in conditional imports
@@ -185,6 +187,16 @@ def defaultDeepcopy(obj, memo, callInit=True):
         setattr(new, slot, copy.deepcopy(slotValue))
 
     return new
+
+def cpus():
+    '''
+    Returns the number of CPUs or if >= 3, one less (to leave something out for multiprocessing)
+    '''
+    cpuCount = multiprocessing.cpu_count() # @UndefinedVariable
+    if cpuCount >= 3:
+        return cpuCount - 1
+    else:
+        return cpuCount
 
 # Not shown to work.
 # def pickleCopy(obj):
