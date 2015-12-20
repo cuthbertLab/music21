@@ -524,9 +524,9 @@ def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
         return (joined, measures)
 
 
-def translateStreamToStringNoRhythm(inputStream):
+def translateStreamToStringNoRhythm(inputStream, returnMeasures=False):
     '''
-    takes a stream of notesAndRests only and returns
+    takes a stream or streamIterator of notesAndRests only and returns
     a string for searching on, using translateNoteToByte.
     
     >>> s = converter.parse("tinynotation: 4/4 c4 d e FF a' b-")
@@ -535,14 +535,20 @@ def translateStreamToStringNoRhythm(inputStream):
     '<>@)QF'
     '''
     b = ''
+    measures = []
     for n in inputStream:
         b += translateNoteToByte(n)
-    return b
+        if returnMeasures:
+            measures.append(n.measureNumber)
+    if returnMeasures:
+        return (b, measures)
+    else:
+        return b
   
   
-def translateStreamToStringOnlyRhythm(inputStream):
+def translateStreamToStringOnlyRhythm(inputStream, returnMeasures=False):
     '''
-    takes a stream of notesAndRests only and returns
+    takes a stream or streamIterator of notesAndRests only and returns
     a string for searching on.
     
     
@@ -555,9 +561,15 @@ def translateStreamToStringOnlyRhythm(inputStream):
     6
     '''
     b = ''
+    measures = []
     for n in inputStream:
         b += translateDurationToBytes(n)
-    return b
+        if returnMeasures:
+            measures.append(n.measureNumber)
+    if returnMeasures:
+        return (b, measures)
+    else:
+        return b
 
   
 def translateNoteToByte(n):

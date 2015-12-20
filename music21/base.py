@@ -956,6 +956,12 @@ class Music21Object(object):
         elementOffset.  Hence the short-circuit for easy looking below...
         
         TODO: If timing permits, replace .flat and .semiFlat with this routine.
+        Currently not possible; b = bwv66.6
+        
+        %timeit b = corpus.parse('bwv66.6') -- 24.8ms
+        %timeit b = corpus.parse('bwv66.6'); b.flat -- 42.9ms
+        %timeit b = corpus.parse('bwv66.6'); b.recurse().stream() -- 83.1ms
+        
         
         '''
         try:
@@ -963,6 +969,8 @@ class Music21Object(object):
         except SitesException:
             pass
         
+        # do not use priorityTarget, just slows things down because will need to search
+        # all anyhow, since site is not in self.sites.yieldSites()
         for cs in self.contextSites():
             if cs.site is site:
                 return cs.offset

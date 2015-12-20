@@ -9,6 +9,7 @@
 # Copyright:    Copyright © 2008-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
+from music21.sites import SitesException
 '''
 this class contains iterators and filters for walking through streams
 
@@ -491,12 +492,34 @@ class StreamIterator(object):
         >>> s4.show('t')
         {0.0} <music21.bar.Barline style=regular>
         
+        
+        Note that this routine can create Streams that have elements that the original
+        stream did not, in the case of recursion:
+        
+        >>> bach = corpus.parse('bwv66.6')
+        >>> bn = bach.flat[30]
+        >>> bn
+        <music21.note.Note E>
+        
+        >>> bn in bach
+        False
+        >>> bfn = bach.recurse().notes.stream()
+        >>> bn in bfn
+        True
+        >>> bn.getOffsetBySite(bfn)
+        2.0
+        >>> bn.getOffsetInHierarchy(bach)
+        2.0
+        
         OMIT_FROM_DOCS
         
         >>> s4._endElements[0] is b
         True
         '''
         ss = self.srcStream
+        
+        # if this stream was sorted, the resultant stream is sorted
+        clearIsSorted = False
 
         if returnStreamSubClass is True:
             try:
@@ -518,7 +541,14 @@ class StreamIterator(object):
         
         fe = self.matchingElements()
         for e in fe:
-            o = ss.elementOffset(e, stringReturns=True)
+            try:
+                o = ss.elementOffset(e, stringReturns=True)
+            except SitesException:
+                # this can happen in the case of, s.recurse().notes.stream() -- need to do new
+                # stream...
+                o = e.getOffsetInHierarchy(ss)
+                clearIsSorted = True # now the stream is probably not sorted...
+            
             if not isinstance(o, str):                
                 found._insertCore(o, e, ignoreSort=True)
             else:
@@ -528,9 +558,9 @@ class StreamIterator(object):
                     # TODO: something different...
                     found._storeAtEndCore(e)
 
-        # if this stream was sorted, the resultant stream is sorted        
+                
         if fe:
-            found.elementsChanged(clearIsSorted=False)
+            found.elementsChanged(clearIsSorted=clearIsSorted)
         
         return found
     

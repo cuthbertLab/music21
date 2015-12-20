@@ -21,7 +21,7 @@ Speed notes:
    use pyLevenshtein if it is installed from http://code.google.com/p/pylevenshtein/ .
    You will need to compile it by running **sudo python setup.py install** on Mac or
    Unix (compilation is much more difficult on Windows; sorry). The ratios are very 
-   slightly different, but the speedup is between 10 and 100x!
+   slightly different, but the speedup is between 10 and 100x! (but then PyPy probably won't work)
 
 '''
 from __future__ import print_function, division
@@ -63,10 +63,10 @@ def translateMonophonicPartToSegments(
     ['HJHEAAEHHCE@JHGECA@A>@A><A@AAE', '@A>@A><A@AAEEECGHJHGH@CAE@FECA']
 
 
-    Segment zero begins at measure 1.  Segment 1 begins at measure 7:
+    Segment zero begins at measure 1 and ends in m. 12.  Segment 1 spans m.7 - m.18:
 
     >>> measureLists[0:2]
-    [1, 7]
+    [(1, 12), (7, 18)]
 
     >>> segments, measureLists = search.segment.translateMonophonicPartToSegments(
     ...     lucaCantus, 
@@ -75,7 +75,7 @@ def translateMonophonicPartToSegments(
     ['CRJOMTHCQNALRQPAGFEFDLFDCFEMOO', 'EFDLFDCFEMOOONPJDCBJSNTHLBOGFE']
 
     >>> measureLists[0:2]
-    [1, 7]
+    [(1, 12), (7, 18)]
 
     '''
     from music21 import search
@@ -97,7 +97,7 @@ def translateMonophonicPartToSegments(
     for segmentStart in segmentStarts:
         segmentEnd = min(segmentStart + segmentLengths, totalLength)
         currentSegment = outputStr[segmentStart:segmentEnd]
-        measureTuple = (measures[segmentStart],  measures[segmentEnd])
+        measureTuple = (measures[segmentStart],  measures[segmentEnd - 1])
 
         segmentList.append(currentSegment)
         measureList.append(measureTuple)
@@ -114,7 +114,7 @@ def indexScoreParts(scoreFile, *args, **kwds):
     >>> scoreList[1]['segmentList'][0]
     '@B@@@@ED@DBDA=BB@?==B@@EBBDBBA'
     >>> scoreList[1]['measureList'][0:3]
-    [0, 4, 8]
+    [(0, 7), (4, 9), (8, 9)]
     '''
     scoreFileParts = scoreFile.parts
     indexedList = []
@@ -128,19 +128,16 @@ def indexScoreParts(scoreFile, *args, **kwds):
     return indexedList
 
 
-def indexScoreFilePaths(
-    scoreFilePaths,
-    giveUpdates=False,
-    *args,
-    **kwds
-    ):
+def indexScoreFilePaths(scoreFilePaths,
+                        giveUpdates=False,
+                        *args,
+                        **kwds):
     '''
     Returns a dictionary of the lists from indexScoreParts for each score in
     scoreFilePaths
     
     >>> searchResults = corpus.search('bwv19')
-    >>> fpsNamesOnly = sorted([searchResult.sourcePath
-    ...     for searchResult in searchResults])
+    >>> fpsNamesOnly = sorted([searchResult.sourcePath for searchResult in searchResults])
     >>> len(fpsNamesOnly)
     9
 
@@ -149,7 +146,7 @@ def indexScoreFilePaths(
     4
 
     >>> scoreDict['bwv190.7.mxl'][0]['measureList']
-    [0, 5, 11, 17, 22, 27]
+    [(0, 9), (6, 15), (11, 20), (17, 25), (22, 31), (27, 32)]
 
     >>> scoreDict['bwv190.7.mxl'][0]['segmentList'][0]
     'NNJLNOLLLJJIJLLLLNJJJIJLLJNNJL'
@@ -263,10 +260,10 @@ def scoreSimilarity(
     >>> for result in scoreSim[64:68]:
     ...     result
     ...
-    (...'bwv197.5.mxl', 0, 1, 4, ...'bwv197.10.mxl', 3, 1, 4, 0.0)
-    (...'bwv197.5.mxl', 0, 1, 4, ...'bwv197.10.mxl', 3, 2, 9, 0.0)
-    (...'bwv197.5.mxl', 0, 2, 9, ...'bwv190.7.mxl', 0, 0, 0, 0.07547...)
-    (...'bwv197.5.mxl', 0, 2, 9, ...'bwv190.7.mxl', 0, 1, 5, 0.07547...)
+    (...'bwv197.5.mxl', 0, 1, (5, 11), ...'bwv197.10.mxl', 3, 1, (5, 12), 0.0)
+    (...'bwv197.5.mxl', 0, 1, (5, 11), ...'bwv197.10.mxl', 3, 2, (9, 14), 0.0)
+    (...'bwv197.5.mxl', 0, 2, (9, 14), ...'bwv190.7.mxl', 0, 0, (0, 9), 0.07547...)
+    (...'bwv197.5.mxl', 0, 2, (9, 14), ...'bwv190.7.mxl', 0, 1, (6, 15), 0.07547...)
         
     '''
     similarityScores = []
