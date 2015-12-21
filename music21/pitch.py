@@ -16,7 +16,7 @@ Each :class:`~music21.note.Note` object has a `Pitch` object embedded in it.
 Some of the methods below, such as `Pitch.name`, `Pitch.step`, etc. are
 made available directly in the `Note` object, so they will seem familiar.
 '''
-import copy, math
+import copy, math, itertools
 import unittest
 
 from music21 import base
