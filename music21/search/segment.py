@@ -26,6 +26,7 @@ Speed notes:
 '''
 from __future__ import print_function, division
 
+from music21 import common
 from music21 import converter
 from music21 import corpus
 from music21 import environment
@@ -38,12 +39,15 @@ import math
 import json
 import difflib
 from collections import OrderedDict
+from functools import partial
+import random
 
 def translateMonophonicPartToSegments(
     inputStream,
-    segmentLengths = 30,
-    overlap = 12,
-    algorithm = None,
+    segmentLengths=30,
+    overlap=12,
+    algorithm=None,
+    jitter=0,
     ):
     '''
     Translates a monophonic part with measures to a set of segments of length
@@ -95,6 +99,10 @@ def translateMonophonicPartToSegments(
     measureList = []
     
     for segmentStart in segmentStarts:
+        segmentStart += random.randint(-1 * jitter, jitter)
+        segmentStart = max(0, segmentStart)
+        segmentStart = min(segmentStart, totalLength - 1)
+        
         segmentEnd = min(segmentStart + segmentLengths, totalLength)
         currentSegment = outputStr[segmentStart:segmentEnd]
         measureTuple = (measures[segmentStart],  measures[segmentEnd - 1])
@@ -128,6 +136,28 @@ def indexScoreParts(scoreFile, *args, **kwds):
     return indexedList
 
 
+def _indexSingleMulticore(filePath, *args, **kwds):
+    kwds2 = copy.copy(kwds)
+    if 'failFast' in kwds2:
+        del(kwds2['failFast'])
+
+    shortfp = filePath.split(os.sep)[-1]
+    try:
+        indexOutput = indexOnePath(filePath, *args, **kwds2)
+    except Exception as e: # pylint: disable=broad-except
+        if 'failFast' not in kwds or kwds['failFast'] is False:
+            print("Failed on parse/index for, %s: %s" % (filePath, str(e)))
+            indexOutput = ""
+        else:
+            raise(e)
+    return(shortfp, indexOutput)
+
+def _giveUpdatesMulticore(numRun, totalRun, latestOutput):
+        for o in latestOutput:
+            print("Indexed %s (%d/%d)" % (
+                o[0], numRun, totalRun))
+    
+
 def indexScoreFilePaths(scoreFilePaths,
                         giveUpdates=False,
                         *args,
@@ -152,28 +182,16 @@ def indexScoreFilePaths(scoreFilePaths,
     'NNJLNOLLLJJIJLLLLNJJJIJLLJNNJL'
     
     '''
-    scoreDict = OrderedDict()
-    scoreIndex = 0
-    totalScores = len(scoreFilePaths)
-    for filePath in scoreFilePaths:
-        shortfp = filePath.split(os.sep)[-1]
-        if giveUpdates is True:
-            print("Indexing %s (%d/%d)" % (
-                shortfp, scoreIndex, totalScores))
-        scoreIndex += 1
-        if 'failFast' not in kwds or kwds['failFast'] is False:
-            try:
-                kwds2 = copy.copy(kwds)
-                if 'failFast' in kwds2:
-                    del(kwds2['failFast'])
-                scoreDict[shortfp] = indexOnePath(filePath, *args, **kwds2)
-            except Exception as e: # pylint: disable=broad-except
-                print("Failed on parse for, %s: %s" % (filePath, str(e)))
-        else:
-            kwds2 = copy.copy(kwds)
-            del(kwds2['failFast'])
-            scoreDict[shortfp] = indexOnePath(filePath, *args, **kwds2)
-            
+    if giveUpdates is True:
+        updateFunction = _giveUpdatesMulticore
+    else:
+        updateFunction = None
+    
+    indexFunc = partial(_indexSingleMulticore, *args, **kwds)
+
+    rpList = common.runParallel(scoreFilePaths, indexFunc, updateFunction)
+    scoreDict = OrderedDict(rpList)
+
     return scoreDict
 
 

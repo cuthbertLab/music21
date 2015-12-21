@@ -19,6 +19,7 @@ __all__ = ['getMissingImportStr',
            'pitchList',
            'runningUnderIPython',
            'defaultDeepcopy',
+           'runParallel',
            'cpus',]
 
 import copy
@@ -187,6 +188,62 @@ def defaultDeepcopy(obj, memo, callInit=True):
         setattr(new, slot, copy.deepcopy(slotValue))
 
     return new
+
+def runParallel(iterable, parallelFunction, 
+                updateFunction=None, updateMultiply=3,
+                unpackIterable=False):
+    '''
+    runs parallelFunction over iterable in parallel, optionally calling updateFunction after
+    each common.cpus * updateMultiply calls.
+    
+    Setting updateMultiply too small can make it so that cores wait around when they
+    could be working if one CPU has a particularly hard task.  Setting it too high
+    can make it seem like the job has hung.
+
+    updateFunction should take three arguments: the current position, the total to run,
+    and the most recent results.  It does not need to be pickleable, and in fact,
+    a bound method might be very useful here.  Or updateFunction can be "True"
+    which just prints a generic message.
+
+    If unpackIterable is True then each element in iterable is considered a list or
+    tuple of different arguments to delayFunction.
+
+    As of Python 2.7, partial functions are pickleable, so if you need to pass the same
+    arguments to parallelFunction each time, make it a partial function before passing
+    it to runParallel.
+
+    Note that parallelFunction, iterable's contents, and the results of calling parallelFunction
+    must all be pickleable, and that if pickling the contents or
+    unpickling the results takes a lot of time, you won't get nearly the speedup
+    from this function as you might expect.  The big culprit here is definitely
+    music21 streams.
+    '''
+    from music21.ext.joblib import Parallel, delayed  # @UnresolvedImport
+    iterLength = len(iterable)
+    totalRun = 0
+    numCpus = cpus()
+    
+    resultsList = []
+    
+    with Parallel(n_jobs=numCpus) as para:
+        delayFunction = delayed(parallelFunction)
+        while totalRun < iterLength:
+            endPosition = min(totalRun + numCpus * updateMultiply, iterLength)
+            rangeGen = range(totalRun, endPosition)
+            
+            if unpackIterable:
+                _r = para(delayFunction(*iterable[i]) for i in rangeGen)
+            else:
+                _r = para(delayFunction(iterable[i]) for i in rangeGen)
+
+            totalRun = endPosition
+            resultsList.extend(_r)
+            if updateFunction is True:
+                print("Done {} tasks of {}".format(totalRun, iterLength))
+            elif updateFunction is not None:
+                updateFunction(totalRun, iterLength, _r)
+
+    return resultsList
 
 def cpus():
     '''
