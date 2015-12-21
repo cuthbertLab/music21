@@ -360,6 +360,9 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
     score_ratio = 0.0
     score_traid = 0.0
 
+    if len(pitches) == 0:
+        return 0.0
+
     if accidentalPenalty:
         # score_accidentals = accidentals per pitch
         accidentals = [abs(p.alter) for p in pitches]
@@ -375,7 +378,7 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
                 penalty = math.log(ratio.numerator * ratio.denominator /
                     ratio)  / 26.366694928034633 # d2 is 1.0
                 score_ratio += penalty
-            except IntervalException:
+            except interval.IntervalException:
                 return float('inf')
 
         score_ratio /= len(pitches)
