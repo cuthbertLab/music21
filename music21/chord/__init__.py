@@ -3391,9 +3391,7 @@ class Chord(note.NotRest):
         else:
             returnObj = copy.deepcopy(self)
 
-        pitches = pitch.simplifyMultipleEnharmonics(self.pitches, 
-                                                    criterion='maximizeConsonance', 
-                                                    keyContext=None)
+        pitches = pitch.simplifyMultipleEnharmonics(self.pitches)
         returnObj.pitches = pitches
 
         if inPlace is False:
