@@ -1392,7 +1392,7 @@ class Chord(note.NotRest):
         '''Return a Z relation if it exists, otherwise return None.
 
         >>> chord.fromIntervalVector((1,1,1,1,1,1))
-        <music21.chord.Chord C D- F- G->
+        <music21.chord.Chord C C# E F#>
 
         >>> chord.fromIntervalVector((1,1,1,1,1,1)).getZRelation()
         <music21.chord.Chord C D- E- G>
@@ -3389,9 +3389,7 @@ class Chord(note.NotRest):
         else:
             returnObj = copy.deepcopy(self)
 
-        pitches = pitch.simplifyMultipleEnharmonics(self.pitches, 
-                                                    criterion='maximizeConsonance', 
-                                                    keyContext=None)
+        pitches = pitch.simplifyMultipleEnharmonics(self.pitches)
         returnObj.pitches = pitches
 
         if inPlace is False:
@@ -4444,7 +4442,7 @@ def fromIntervalVector(notation, getZRelation=False):
     True
 
     >>> chord.fromIntervalVector((1,1,1,1,1,1))
-    <music21.chord.Chord C D- F- G->
+    <music21.chord.Chord C C# E F#>
 
     >>> chord.fromIntervalVector((1,1,1,1,1,1), getZRelation=True)
     <music21.chord.Chord C D- E- G>

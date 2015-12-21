@@ -501,7 +501,7 @@ def intervalToPythagoreanRatio(intervalObj):
 
         _pythagorean_cache[end_pitch_wanted.name] = end_pitch, ratio
 
-    octaves = int((end_pitch_wanted.midi - end_pitch.midi)/12)
+    octaves = int((end_pitch_wanted.ps - end_pitch.ps)/12)
     return ratio * Fraction(2, 1) ** octaves
 
 #-------------------------------------------------------------------------------

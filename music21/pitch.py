@@ -16,7 +16,7 @@ Each :class:`~music21.note.Note` object has a `Pitch` object embedded in it.
 Some of the methods below, such as `Pitch.name`, `Pitch.step`, etc. are
 made available directly in the `Note` object, so they will seem familiar.
 '''
-import copy, math
+import copy, math, itertools
 import unittest
 
 from music21 import base
@@ -346,14 +346,83 @@ def _convertHarmonicToCents(value):
         value = 1.0/(abs(value))
     return int(round(1200*math.log(value, 2), 0))
 
-def simplifyMultipleEnharmonics(pitches, criterion='maximizeConsonance', keyContext=None):
+#------------------------------------------------------------------------------
+
+def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True, triadAward=True):
+    r'''
+    Calculates the 'dissonance' of a list of pitches based on three criteria:
+    it is considered more consonant if 1. the numerator and denominator of the
+    Pythagorean ratios of its containing intervals are small (`smallPythagoreanRatio`);
+    2. it shows few double- or triple-accidentals (`accidentalPenalty`); 3. it shows
+    thirds that can form some triad (`triadAward`)
+    '''    
+    score_accidentals = 0.0
+    score_ratio = 0.0
+    score_traid = 0.0
+
+    if len(pitches) == 0:
+        return 0.0
+
+    if accidentalPenalty:
+        # score_accidentals = accidentals per pitch
+        accidentals = [abs(p.alter) for p in pitches]
+        score_accidentals = sum(a if a>1 else 0 for a in accidentals) / len(pitches)
+
+    if smallPythagoreanRatio:
+        # score_ratio = Pythagorean ratio complexity per pitch
+        for p1, p2 in itertools.combinations(pitches, 2):
+            # does not accept weird intervals, e.g. with semitones
+            try:
+                this_interval = interval.Interval(noteStart=p1,  noteEnd=p2)
+                ratio = interval.intervalToPythagoreanRatio(this_interval)
+                penalty = math.log(ratio.numerator * ratio.denominator /
+                    ratio)  / 26.366694928034633 # d2 is 1.0
+                score_ratio += penalty
+            except interval.IntervalException:
+                return float('inf')
+
+        score_ratio /= len(pitches)
+
+    if triadAward:
+        # score_traid = number of thirds per pitch (avoid double-base-thirds)
+        triad_bases = []
+        for p1, p2 in itertools.combinations(pitches, 2):
+            this_interval = interval.Interval(noteStart=p1,  noteEnd=p2)
+            generic_interval_value = abs(this_interval.generic.value) % 8
+            interval_semitones = this_interval.chromatic.semitones % 12
+            if generic_interval_value == 3 and interval_semitones in [3, 4]:
+                triad_steps = (p1.step, p2.step)
+                if triad_steps not in triad_bases:
+                    score_traid -= 1.0
+            elif generic_interval_value == 6 and interval_semitones in [8, 9]:
+                triad_steps = (p2.step, p1.step)
+                if triad_steps not in triad_bases:
+                    score_traid -= 1.0
+        score_traid /= len(pitches)
+
+    return (score_accidentals + score_ratio + score_traid) / int(smallPythagoreanRatio
+            + accidentalPenalty + triadAward)
+
+def _bruteForceEnharmonicsSearch(oldPitches, scoreFunc=_dissonanceScore):
+    all_possible_pitches = [[p] + p.getAllCommonEnharmonics() for p in oldPitches[1:]]
+    all_pitch_combinations = itertools.product(*all_possible_pitches)
+    newPitches = min(all_pitch_combinations, key=lambda x:  scoreFunc(oldPitches[:1] + list(x)))
+    return oldPitches[:1] + list(newPitches)
+
+def _greedyEnharmonicsSearch(oldPitches, scoreFunc=_dissonanceScore):
+    newPitches = oldPitches[:1]
+    for oldPitch in oldPitches[1:]:
+        candidates = [oldPitch] + oldPitch.getAllCommonEnharmonics()
+        newPitch = min(candidates, key=lambda x:  scoreFunc(newPitches + [x]))
+        newPitches.append(newPitch)
+    return newPitches
+
+def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=None):
     r'''Tries to simplify the enharmonic spelling of a list of pitches, pitch-
     or pitch-class numbers according to a given criterion. 
 
-    Currently `maximizeConsonance` is the only criterion, that tries to
-    maximize the consonances in a greedy left-to-right fashion. The dissonance
-    of an interval is quantified by the product of numerator and denominator of its
-    pythagorean ratio (see :func:`~music21.interval.intervalToPythagoreanRatio`).
+    A function can be passed as an argument to `criterion`, that is tried to be
+    minimized in a greedy left-to-right fashion.
 
     >>> pitch.simplifyMultipleEnharmonics([11, 3, 6])
     [<music21.pitch.Pitch B>, <music21.pitch.Pitch D#>, <music21.pitch.Pitch F#>]
@@ -379,49 +448,27 @@ def simplifyMultipleEnharmonics(pitches, criterion='maximizeConsonance', keyCont
     
     >>> pitch.simplifyMultipleEnharmonics([6, 10, 1], keyContext=key.Key('C-'))
     [<music21.pitch.Pitch G->, <music21.pitch.Pitch B->, <music21.pitch.Pitch D->]
-
     '''
 
     oldPitches = [p if isinstance(p, Pitch) else Pitch(p) for p in pitches]
-    simplifiedPitches = []
 
-    if criterion == 'maximizeConsonance':
+    if keyContext:
+        oldPitches = [keyContext.pitchAndMode[0]] + oldPitches
+        remove_first = True
+    else:
+        remove_first = False
 
-        if keyContext:
-            simplifiedPitches.append(keyContext.pitchAndMode[0])
-            remove_first = True
-        else:
-            remove_first = False
+    if len(oldPitches) < 5:
+        simplifiedPitches = _bruteForceEnharmonicsSearch(oldPitches, criterion)
+    else:
+        simplifiedPitches = _greedyEnharmonicsSearch(oldPitches, criterion)
 
-        for i, p in enumerate(oldPitches):
-            candidates = [p] + p.getAllCommonEnharmonics()
-            consonant_counter = [0] * len(candidates)
-            for context_pitch in simplifiedPitches[::-1]:
-                intervals = [interval.Interval(noteStart=candidate, 
-                                               noteEnd=context_pitch) for candidate in candidates]
-
-                for j, interval_candidate in enumerate(intervals):
-                    try:
-                        ratio_candidate = interval.intervalToPythagoreanRatio(interval_candidate)
-                        consonant_counter[j] += \
-                            1./(ratio_candidate.numerator * ratio_candidate.denominator)
-                    except IntervalException:
-                        pass
-
-            # order the candidates by their consonant count
-            candidates_by_consonants = sorted(zip(consonant_counter, 
-                                                  candidates), key=lambda x: x[0], reverse=True)
-            # append the candidate with the maximum consonant count
-            simplifiedPitches.append(candidates_by_consonants[0][1])
-
-        if remove_first:
-            simplifiedPitches = simplifiedPitches[1:]
+    if remove_first:
+        simplifiedPitches = simplifiedPitches[1:]
 
     return simplifiedPitches
 
-
 #------------------------------------------------------------------------------
-
 
 class AccidentalException(exceptions21.Music21Exception):
     pass
