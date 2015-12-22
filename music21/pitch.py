@@ -405,7 +405,7 @@ def simplifyMultipleEnharmonics(pitches, criterion='maximizeConsonance', keyCont
                         ratio_candidate = interval.intervalToPythagoreanRatio(interval_candidate)
                         consonant_counter[j] += \
                             1./(ratio_candidate.numerator * ratio_candidate.denominator)
-                    except IntervalException:
+                    except interval.IntervalException:
                         pass
 
             # order the candidates by their consonant count
@@ -3420,13 +3420,18 @@ class Pitch(object):
                 return True
             return False
 
+    # a cache so that interval objects can be reused...
+    _transpositionIntervals = {'-d2': None, 'd2': None}
+
     def _getEnharmonicHelper(self, inPlace, intervalString):
         '''
         abstracts the code from `getHigherEnharmonic` and `getLowerEnharmonic`
         
         :rtype: music21.pitch.Pitch
         '''
-        intervalObj = interval.Interval(intervalString)
+        if self._transpositionIntervals[intervalString] is None:
+            self._transpositionIntervals[intervalString] = interval.Interval(intervalString) 
+        intervalObj = self._transpositionIntervals[intervalString]
         octaveStored = self.octave # may be None
         if not inPlace:
             post = intervalObj.transposePitch(self, maxAccidental=None)
@@ -3577,8 +3582,8 @@ class Pitch(object):
             returnObj = copy.deepcopy(self)
 
         if returnObj.accidental is not None:
-            if abs(returnObj.accidental.alter) < 2.0 and \
-                returnObj.name not in ('E#', 'B#', 'C-', 'F-'):
+            if (abs(returnObj.accidental.alter) < 2.0 and
+                    returnObj.name not in ('E#', 'B#', 'C-', 'F-')):
                 pass
             else:
                 # by reseting the pitch space value, we will get a simplyer
