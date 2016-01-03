@@ -1187,7 +1187,7 @@ class LilypondConverter(object):
         >>> c2 = chord.Chord(["D4", "F#4", "A4"])
         >>> c2.duration.quarterLength = 1.0/3
         >>> c2.duration.tuplets[0].type = 'start'
-        >>> c3 = chord.Chord(["D4", "F4", "B4"])
+        >>> c3 = chord.Chord(["D4", "F4", "G4"])
         >>> c3.duration.quarterLength = 1.0/3
         >>> c4 = chord.Chord(["C4", "E4", "G4", "C5"])
         >>> c4.duration.quarterLength = 1.0/3
@@ -1203,7 +1203,7 @@ class LilypondConverter(object):
         >>> print(lpc.context)
         < c'  e'  g'  > 4   
         \times 2/3 { < d'  fis'  a'  > 8   
-           < d'  f'  b'  > 8   
+           < d'  f'  g'  > 8
            < c'  e'  g'  c''  > 8   
             } 
         <BLANKLINE>
