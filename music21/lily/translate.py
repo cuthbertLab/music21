@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2007-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright ?? 2007-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -1173,6 +1173,7 @@ class LilypondConverter(object):
         appends lySimpleMusicFromChord to the
         current context.
 
+
         >>> c = chord.Chord(["C4", "E4", "G4"])
         >>> lpc = lily.translate.LilypondConverter()
         >>> lpMusicList = lily.lilyObjects.LyMusicList()
@@ -1200,13 +1201,13 @@ class LilypondConverter(object):
         >>> lpc.appendContextFromChord(c5)
 
         >>> print(lpc.context)
-        < c'  e'  g'  > 4
-        \times 2/3 { < d'  fis'  a'  > 8
-           < d'  f'  b'  > 8
-           < c'  e'  g'  c''  > 8
-            }
+        < c'  e'  g'  > 4   
+        \times 2/3 { < d'  fis'  a'  > 8   
+           < d'  f'  b'  > 8   
+           < c'  e'  g'  c''  > 8   
+            } 
         <BLANKLINE>
-        < c'  f'  aes'  > 4
+        < c'  f'  aes'  > 4   
         <BLANKLINE>
 
         '''
