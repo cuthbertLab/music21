@@ -159,6 +159,58 @@ class StreamIterator(object):
     if six.PY2:
         next = __next__
 
+    def __getattr__(self, attr):
+        '''
+        In case an attribute is defined on Stream but not on a StreamIterator, 
+        create a Stream and then return that attribute.  This is NOT performance
+        optimized -- calling this repeatedly will mean creating a lot of different
+        streams.  However, it will prevent most code that worked on v.2. from breaking
+        on v.3.
+        
+        >>> s = stream.Measure()
+        >>> s.insert(0, note.Rest())
+        >>> s.repeatAppend(note.Note('C'), 2)
+        >>> s.definesExplicitSystemBreaks
+        False
+        
+        >>> s.notes
+        <music21.stream.iterator.StreamIterator for Measure:0x101c1a208 @:0>
+        
+        >>> s.notes.definesExplicitSystemBreaks
+        False
+        
+        Works with methods as well:
+        
+        >>> s.notes.pop(0)
+        <music21.note.Note C>
+        
+        But remember that a new Stream is being created each time, so you can pop() forever:
+        
+        >>> s.notes.pop(0)
+        <music21.note.Note C>
+        >>> s.notes.pop(0)
+        <music21.note.Note C>
+        >>> s.notes.pop(0)
+        <music21.note.Note C>
+        
+        
+        Failures are explicitly given as coming from the StreamIterator object.
+        
+        >>> s.asdf
+        Traceback (most recent call last):        
+        AttributeError: 'Measure' object has no attribute 'asdf'
+        >>> s.notes.asdf
+        Traceback (most recent call last):        
+        AttributeError: 'StreamIterator' object has no attribute 'asdf'
+        '''
+        if not hasattr(self.srcStream, attr):
+            # original stream did not have the attribute, so new won't; but raise on iterator.
+            raise AttributeError("%r object has no attribute %r" %
+                         (self.__class__.__name__, attr)) 
+            
+        sOut = self.stream()
+        return getattr(sOut, attr)
+
     def __getitem__(self, k):
         '''
         if you are in the iterator, you should still be able to request other items...
