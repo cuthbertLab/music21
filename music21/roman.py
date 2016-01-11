@@ -484,9 +484,9 @@ def romanNumeralFromChord(chordObj,
     '''
     Takes a chord object and returns an appropriate chord name.  If keyObj is
     omitted, the root of the chord is considered the key (if the chord has a
-    major third, it's major; otherwise it's minor):
+    major third, it's major; otherwise it's minor).  preferSecondaryDominants does not currently
+    do anything.
 
-    >>> from music21 import roman
     >>> rn = roman.romanNumeralFromChord(
     ...     chord.Chord(['E-3','C4','G-6']),
     ...     key.Key('g#'),
