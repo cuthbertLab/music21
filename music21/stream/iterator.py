@@ -16,7 +16,7 @@ this class contains iterators and filters for walking through streams
 StreamIterators are explicitly allowed to access private methods on streams.
 '''
 import unittest
-
+import warnings
 from music21 import common
 from music21.stream import filters
 from music21.exceptions21 import StreamException
@@ -25,6 +25,9 @@ from music21.ext import six
 
 #------------------------------------------------------------------------------
 class StreamIteratorException(StreamException):
+    pass
+
+class StreamIteratorInefficientWarning(PendingDeprecationWarning):
     pass
 
 #------------------------------------------------------------------------------
@@ -193,6 +196,9 @@ class StreamIterator(object):
         >>> s.notes.pop(0)
         <music21.note.Note C>
         
+        If run with -w, this call will send a StreamIteratorInefficientWarning to stderr
+        reminding developers that this is not an efficient call, and .stream() should be
+        called (and probably cached) explicitly.
         
         Failures are explicitly given as coming from the StreamIterator object.
         
@@ -207,6 +213,11 @@ class StreamIterator(object):
             # original stream did not have the attribute, so new won't; but raise on iterator.
             raise AttributeError("%r object has no attribute %r" %
                          (self.__class__.__name__, attr)) 
+            
+        warnings.warn(
+            attr + " is not defined on StreamIterators. Call .stream() first for efficiency",
+            StreamIteratorInefficientWarning,
+            stacklevel=2)
             
         sOut = self.stream()
         return getattr(sOut, attr)
@@ -467,11 +478,6 @@ class StreamIterator(object):
             except StopIteration:
                 raise
         return True
-
-
-
-    
-
     
     def _newBaseStream(self):
         '''
