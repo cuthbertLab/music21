@@ -722,7 +722,7 @@ class KrumhanslKessler(KeyWeightKeyAnalysis):
     Values from from http://extra.humdrum.org/man/keycor/, which describes these 
     weightings as "Strong tendancy to identify the dominant key as the tonic."
     '''
-    # from http://extra.humdrum.org/man/keycor
+    # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Krumhansl Kessler Key Analysis'
     identifiers = ['krumhansl', 'kessler', 'krumhansl-kessler', 'krumhanslkessler']
@@ -755,7 +755,7 @@ class AardenEssen(KeyWeightKeyAnalysis):
     '''
     Implementation of Aarden-Essen weightings for Krumhansl-Schmuckler key determination algorithm.
 
-    Values from from http://extra.humdrum.org/man/keycor, which 
+    Values from from http://extra.humdrum.org/man/keycor/, which 
     describes these weightings as "Weak tendency to identify the subdominant key as the tonic."
 
     (N.B. -- we are not sure exactly where the minor weightings come from, and recommend
@@ -800,7 +800,7 @@ class SimpleWeights(KeyWeightKeyAnalysis):
     Implementation of Craig Sapp's simple weights for Krumhansl-Schmuckler 
     key determination algorithm.
 
-    Values from from http://extra.humdrum.org/man/keycor, which describes 
+    Values from from http://extra.humdrum.org/man/keycor/, which describes 
     these weightings as "Performs most consistently with large regions of music, 
     becomes noiser with smaller regions of music."
     '''
@@ -836,7 +836,7 @@ class BellmanBudge(KeyWeightKeyAnalysis):
     '''
     Implementation of Bellman-Budge weightings for Krumhansl-Schmuckler key determination algorithm.
 
-    Values from from http://extra.humdrum.org/man/keycor, which describes these 
+    Values from from http://extra.humdrum.org/man/keycor/, which describes these 
     weightings as "No particular tendancies for confusions with neighboring keys."
     '''
     # from http://extra.humdrum.org/man/keycor/
@@ -876,7 +876,7 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
     Implementation of Temperley-Kostka-Payne weightings for Krumhansl-Schmuckler 
     key determination algorithm.
 
-    Values from from http://extra.humdrum.org/man/keycor, which describes 
+    Values from from http://extra.humdrum.org/man/keycor/, which describes 
     these weightings as "Strong tendancy to identify the relative major as the tonic 
     in minor keys. Well-balanced for major keys."
     '''
