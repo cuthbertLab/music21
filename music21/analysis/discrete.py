@@ -719,7 +719,7 @@ class KrumhanslKessler(KeyWeightKeyAnalysis):
     Implementation of Krumhansl-Kessler weightings for Krumhansl-Schmuckler 
     key determination algorithm.
 
-    Values from from http://extra.humdrum.org/man/keycor, which describes these 
+    Values from from http://extra.humdrum.org/man/keycor/, which describes these 
     weightings as "Strong tendancy to identify the dominant key as the tonic."
     '''
     # from http://extra.humdrum.org/man/keycor

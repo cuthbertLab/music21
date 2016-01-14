@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2010-2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -131,8 +131,6 @@ class Distributor(object):
             if self.version in fn and fn.endswith('.exe'):
                 fpNew = fp.replace('.macosx-10.8-intel.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.8-x86_64.exe', '.win32.exe')
-                fpNew = fpNew.replace('.macosx-10.5-x86_64.exe', '.win32.exe')
-                fpNew = fpNew.replace('.macosx-10.6-x86_64.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.9-intel.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.9-x86_64.exe', '.win32.exe')
                 fpNew = fpNew.replace('.macosx-10.10-intel.exe', '.win32.exe')
