@@ -463,6 +463,24 @@ def quickEnharmonicString(nameStr, allowDoubleAccidentals=True):
 class Base40Exception(exceptions21.Music21Exception):
     pass
     
+
+
+class BaseN(object):        
+    def __init__(self, order=2):
+        self.order = order
+
+    def generateLetters(self):
+        outLetters = []
+        for letter in ('C', 'D', 'E', 'F', 'G', 'A', 'B'):
+            for i in range(self.order, 0, -1):
+                outLetters.append(letter + '-' * i)
+            outLetters.append(letter)
+            for i in range(self.order):
+                outLetters.append(letter + '#' * (i+1))
+            if letter not in ('E', 'B'):
+                outLetters.append(None)
+        return outLetters
+
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
@@ -475,6 +493,8 @@ _DOC_ORDER = [base40ActualInterval]
 
 
 if __name__ == "__main__":
+#     bn = BaseN(3)
+#     print(bn.generateLetters())
     import music21
     music21.mainTest(Test)
 
