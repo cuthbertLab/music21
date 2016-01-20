@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2007-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright ?? 2007-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -1073,9 +1073,7 @@ class LilypondConverter(object):
         elif "Note" in c or "Rest" in c:
             self.appendContextFromNoteOrRest(thisObject)
         elif "Chord" in c:
-            lyObject = self.lySimpleMusicFromChord(thisObject)
-            currentMusicList.append(lyObject)
-            lyObject.setParent(contextObject)
+            self.appendContextFromChord(thisObject)
         elif "Clef" in c:
             lyObject = self.lyEmbeddedScmFromClef(thisObject)
             currentMusicList.append(lyObject)
@@ -1169,6 +1167,58 @@ class LilypondConverter(object):
         self.context.contents.append(lpSimpleMusic)
         lpSimpleMusic.setParent(self.context)
         self.setContextForTupletStop(noteOrRest)
+
+    def appendContextFromChord(self, chord):
+        r'''
+        appends lySimpleMusicFromChord to the
+        current context.
+
+
+        >>> c = chord.Chord(["C4", "E4", "G4"])
+        >>> lpc = lily.translate.LilypondConverter()
+        >>> lpMusicList = lily.lilyObjects.LyMusicList()
+        >>> lpc.context = lpMusicList
+        >>> lpc.appendContextFromChord(c)
+        >>> print(lpMusicList)
+        < c' e' g'  > 4
+        <BLANKLINE>
+
+
+        >>> c2 = chord.Chord(["D4", "F#4", "A4"])
+        >>> c2.duration.quarterLength = 1.0/3
+        >>> c2.duration.tuplets[0].type = 'start'
+        >>> c3 = chord.Chord(["D4", "F4", "G4"])
+        >>> c3.duration.quarterLength = 1.0/3
+        >>> c4 = chord.Chord(["C4", "E4", "G4", "C5"])
+        >>> c4.duration.quarterLength = 1.0/3
+        >>> c4.duration.tuplets[0].type = 'stop'
+
+        >>> c5 = chord.Chord(["C4", "F4", "A-4"])
+
+        >>> lpc.appendContextFromChord(c2)
+        >>> lpc.appendContextFromChord(c3)
+        >>> lpc.appendContextFromChord(c4)
+        >>> lpc.appendContextFromChord(c5)
+
+        >>> print(lpc.context)
+        < c'  e'  g'  > 4   
+        \times 2/3 { < d'  fis'  a'  > 8   
+           < d'  f'  g'  > 8
+           < c'  e'  g'  c''  > 8   
+            } 
+        <BLANKLINE>
+        < c'  f'  aes'  > 4   
+        <BLANKLINE>
+
+        '''
+        self.setContextForTupletStart(chord)
+        self.appendBeamCode(chord)
+        self.appendStemCode(chord)
+
+        lpSimpleMusic = self.lySimpleMusicFromChord(chord)
+        self.context.contents.append(lpSimpleMusic)
+        lpSimpleMusic.setParent(self.context)
+        self.setContextForTupletStop(chord)
 
 
     def lySimpleMusicFromNoteOrRest(self, noteOrRest):
