@@ -165,7 +165,7 @@ class Dynamic(base.Music21Object):
     >>> myDyn.value
     'rfzsfmp'
     >>> print(myDyn.volumeScalar)
-    None
+    0.5
     >>> myDyn.volumeScalar = 0.87
     >>> myDyn.volumeScalar
     0.87
