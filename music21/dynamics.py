@@ -273,10 +273,18 @@ class Dynamic(base.Music21Object):
         # use default
         elif self._value in dynamicStrToScalar:
             return dynamicStrToScalar[self._value]
-        # ignore subito
-        elif self._value[0] == 's' and self._value[1:] in dynamicStrToScalar:
-            return dynamicStrToScalar[self._value[1:]]
-        return 
+        else:
+            this_dynmaic = self._value
+            # ignore leading s like in sf
+            if 's' in this_dynmaic:
+                this_dynmaic = this_dynmaic[1:]
+            # ignore closing z like in fz
+            if this_dynmaic[-1] == 'z':
+                this_dynmaic = this_dynmaic[:-1]
+            if this_dynmaic in dynamicStrToScalar:
+                return dynamicStrToScalar[this_dynmaic]
+            else:
+                return dynamicStrToScalar[None]
 
     def _setVolumeScalar(self, value):
         # we can manually set this to be anything, overriding defaults
