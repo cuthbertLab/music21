@@ -65,15 +65,15 @@ def cacheMetadata(corpusNames=('local', 'core', 'virtual'),
     # virtual is on-line
     for corpusName in corpusNames:
         if corpusName == 'core':
-            metadataBundle = corpora.CoreCorpus()
+            metadataBundle = corpora.CoreCorpus().metadataBundle
             paths = corpus.getCorePaths()
             useCorpus = True
         elif corpusName == 'local':
-            metadataBundle = corpora.LocalCorpus()
+            metadataBundle = corpora.LocalCorpus().metadataBundle
             paths = corpus.getLocalPaths()
             useCorpus = False
         elif corpusName == 'virtual':
-            metadataBundle = corpora.VirtualCorpus()
+            metadataBundle = corpora.VirtualCorpus().metadataBundle
             paths = corpus.getVirtualPaths()
             useCorpus = False
         else:
