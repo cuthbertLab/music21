@@ -928,7 +928,7 @@ class LilypondConverter(object):
         >>> lpc.context = lpMusicList
         >>> lpc.context.contents
         []
-        >>> c = converter.parse('tinynotation: 3/4 c4 d- e#')
+        >>> c = converter.parse('tinynotation: 3/4 b4 d- e#')
         >>> lpc.appendObjectsToContextFromStream(c)
         >>> print(lpc.context.contents)
         [<music21.lily.lilyObjects.LyEmbeddedScm...>, 
@@ -938,7 +938,7 @@ class LilypondConverter(object):
         >>> print(lpc.context)
         \clef "treble" 
         \time 3/4
-        c' 4
+        b' 4
         des' 4
         eis' 4
         <BLANKLINE>
