@@ -425,11 +425,13 @@ class Sites(common.SlottedObject):
         >>> aSites.add(aObj)
         >>> aSites.add(bObj)
         
-        Returns a generator:
+        Returns a generator (The ellipsis in the repr here is 
+        because Python 3.5 gives a fully qualified name to a generator object):
+
         
         >>> ys = aSites.yieldSites()
         >>> ys
-        <generator object yieldSites at 0x1058085e8>
+        <generator object ...yieldSites at 0x1058085e8>        
         
         That's no help, so iterate over it instead...
         
