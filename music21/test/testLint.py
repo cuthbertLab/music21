@@ -11,8 +11,6 @@
 #-------------------------------------------------------------------------------
 
 # this requires pylint to be installed and available from the command line
-
-import multiprocessing
 import sys
 
 from music21 import common

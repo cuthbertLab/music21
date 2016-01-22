@@ -133,6 +133,8 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
     # the overhead of returning is outweighed by the positive aspect of getting results immediately
     # unordered says that results can RETURN in any order; not that they'd be pooled out in any
     # order.
+    os.environ['alreadyRunningInParallel'] = 'yes'
+    
     res = pool.imap_unordered(runOneModuleWithoutImp, 
                               ((modGather, fp) for fp in pathsToRun))
 
@@ -195,6 +197,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
             summaryOutput.append(exceptionLog)
 
     sys.stderr = normalStdError
+    os.environ['alreadyRunningInParallel'] = 'no'
     printSummary(summaryOutput, timeStart, pathsToRun)
 
 def printSummary(summaryOutput, timeStart, pathsToRun):

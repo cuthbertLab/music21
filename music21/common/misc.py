@@ -20,6 +20,7 @@ __all__ = ['getMissingImportStr',
            'runningUnderIPython',
            'defaultDeepcopy',
            'runParallel',
+           'runNonParallel',
            'cpus',]
 
 import copy
@@ -28,6 +29,8 @@ import sys
 import textwrap
 import time
 import multiprocessing
+
+from music21.ext.joblib import Parallel, delayed  # @UnresolvedImport
 
 #-------------------------------------------------------------------------------
 # provide warning strings to users for use in conditional imports
@@ -218,12 +221,17 @@ def runParallel(iterable, parallelFunction,
     from this function as you might expect.  The big culprit here is definitely
     music21 streams.
     '''
-    from music21.ext.joblib import Parallel, delayed  # @UnresolvedImport
     iterLength = len(iterable)
     totalRun = 0
     numCpus = cpus()
     
     resultsList = []
+    
+    if os.environ.get('alreadyRunningInParallel', 'no') == 'yes':
+        return runNonParallel(iterable, parallelFunction, updateFunction,
+                              updateMultiply, unpackIterable)
+    else:
+        os.environ['alreadyRunningInParallel'] = 'yes'
     
     with Parallel(n_jobs=numCpus) as para:
         delayFunction = delayed(parallelFunction)
@@ -243,7 +251,38 @@ def runParallel(iterable, parallelFunction,
             elif updateFunction is not None:
                 updateFunction(totalRun, iterLength, _r)
 
+    os.environ['alreadyRunningInParallel'] = 'no'
+
     return resultsList
+
+
+def runNonParallel(iterable, parallelFunction, 
+                updateFunction=None, updateMultiply=3,
+                unpackIterable=False):
+    '''
+    This is intended to be a perfect drop in replacement for runParallel, except that
+    it runs on one core only, and not in parallel.
+    
+    Used, for instance, if we're already in a parallel function.
+    '''
+    iterLength = len(iterable)
+    resultsList = []
+
+    for i in range(iterLength):
+        if unpackIterable:
+            _r = parallelFunction(*iterable[i])
+        else:
+            _r = parallelFunction(iterable[i])
+        
+        resultsList.append(_r)
+            
+        if updateFunction is True and i % updateMultiply == 0:
+            print("Done {} tasks of {} not in parallel".format(i, iterLength))
+        elif updateFunction is not None and i % updateMultiply == 0:
+            updateFunction(i, iterLength, [_r])
+        
+    return resultsList
+    
 
 def cpus():
     '''

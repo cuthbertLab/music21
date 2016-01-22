@@ -21,8 +21,6 @@ from music21 import common
 from music21 import documentation
 from music21 import exceptions21
 
-import multiprocessing
-
 class DocBuilderException(exceptions21.Music21Exception):
     pass
 
