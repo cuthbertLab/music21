@@ -52,7 +52,9 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 #-------------------------------------------------------------------------------
 # match finale name, which may be directory or something else
 reFinaleApp = re.compile(r'Finale (?:Notepad )?20[0-2][0-9][a-z\.0-9]*.app', re.IGNORECASE)
+reSibeliusApp = re.compile(r'Sibelius.app', re.IGNORECASE)
 reFinaleExe = re.compile(r'Finale (?:Notepad )?20[0-2][0-9][a-z\.0-9]*.exe', re.IGNORECASE)
+reSibeliusExe = re.compile(r'Sibelius.exe', re.IGNORECASE)
 reFinaleReaderApp = re.compile(r'Finale Reader.app', re.IGNORECASE)
 reMuseScoreApp = re.compile(r'MuseScore\s?[0-9]*.app', re.IGNORECASE)
 
@@ -1327,8 +1329,17 @@ class SelectMusicXMLReader(SelectFilePath):
                 return True
             else: 
                 return False
-            
+
         results += self._getDarwinApp(comparisonFinaleReader)
+
+        def comparisonSibelius(name):
+            m = reSibeliusApp.match(name)
+            if m is not None: 
+                return True
+            else: 
+                return False
+            
+        results += self._getDarwinApp(comparisonSibelius)
 
         return results
         
