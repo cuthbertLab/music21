@@ -227,11 +227,9 @@ def runParallel(iterable, parallelFunction,
     
     resultsList = []
     
-    if os.environ.get('alreadyRunningInParallel', 'no') == 'yes':
+    if multiprocessing.current_process().daemon: # @UndefinedVariable
         return runNonParallel(iterable, parallelFunction, updateFunction,
                               updateMultiply, unpackIterable)
-    else:
-        os.environ['alreadyRunningInParallel'] = 'yes'
     
     with Parallel(n_jobs=numCpus) as para:
         delayFunction = delayed(parallelFunction)
@@ -251,7 +249,6 @@ def runParallel(iterable, parallelFunction,
             elif updateFunction is not None:
                 updateFunction(totalRun, iterLength, _r)
 
-    os.environ['alreadyRunningInParallel'] = 'no'
 
     return resultsList
 
