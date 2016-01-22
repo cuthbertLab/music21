@@ -785,7 +785,7 @@ class Test(unittest.TestCase):
     def testBasic(self):
         from music21 import converter, corpus
 
-        a = converter.parse(corpus.getWork('haydn/opus74no2/movement4.xml'))
+        a = converter.parse(corpus.getWork('haydn/opus1no1/movement4.xml'))
         post = assembleLyrics(a)
         self.assertEqual(post, '') # no lyrics!
 
