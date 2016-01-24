@@ -4238,6 +4238,8 @@ class TestSectionScore(unittest.TestCase):
         mockPart1.append.assert_any_call('1-2')
         mockPart2.append.assert_any_call('2-1')
         mockPart2.append.assert_any_call('2-2')
+        self.assertFalse(mockPart1.atSoundingPitch)
+        self.assertFalse(mockPart2.atSoundingPitch)
 
     def testScoreIntegration1(self):
         '''
@@ -4279,6 +4281,8 @@ class TestSectionScore(unittest.TestCase):
         self.assertEqual(3, len(actual))  # parts plus "slurBundle"
         self.assertEqual(1, len(actual.parts[0]))  # one Measure in each part
         self.assertEqual(1, len(actual.parts[1]))
+        self.assertFalse(actual.parts[0].atSoundingPitch)  # each Part is set as not sounding pitch
+        self.assertFalse(actual.parts[1].atSoundingPitch)
         self.assertIsInstance(actual.parts[0][0], stream.Measure)
         self.assertIsInstance(actual.parts[1][0], stream.Measure)
         self.assertEqual(3, len(actual.parts[0][0]))  

@@ -3414,6 +3414,8 @@ def scoreFromElement(elem, slurBundle):
     environLocal.printDebug('*** making the Score')
     theScore = [stream.Part() for _ in range(len(allPartNs))]
     for i, eachN in enumerate(allPartNs):
+        # set "atSoundingPitch" so transposition works
+        theScore[i].atSoundingPitch = False
         for eachObj in parsed[eachN]:
             theScore[i].append(eachObj)
     theScore = stream.Score(theScore)
