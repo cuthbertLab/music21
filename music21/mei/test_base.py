@@ -4909,18 +4909,19 @@ class TestSectionScore(unittest.TestCase):
         self.assertEqual(1, len(parsed))
         self.assertTrue('1' in parsed)
         self.assertEqual(2, len(parsed['1']))  # two <measure>s, each in a <section>
+        # check the Instrument
+        instr = parsed['1'][0][0]
+        self.assertIsInstance(instr, instrument.Tuba)  # check out the Instrument
         # check the first Measure
-        meas = parsed['1'][0][0]
+        meas = parsed['1'][0][1]
         # the order of these doesn't matter, but it may change, so this is easier to adjust
-        instrIndex = 0
-        clefIndex = 1
-        keysigIndex = 2
-        timesigIndex = 3
-        voiceIndex = 4
+        clefIndex = 0
+        keysigIndex = 1
+        timesigIndex = 2
+        voiceIndex = 3
         self.assertIsInstance(meas, stream.Measure)
         self.assertEqual(42, meas.number)
-        self.assertEqual(5, len(meas))  # an Instrument, a Voice, a Clef, a KeySignature, a TimeSignature
-        self.assertIsInstance(meas[instrIndex], instrument.Tuba)  # check out the Instrument
+        self.assertEqual(4, len(meas))  # a Voice, a Clef, a KeySignature, a TimeSignature
         self.assertIsInstance(meas[voiceIndex], stream.Voice)  # check out the Voice and its Note
         self.assertEqual(1, len(meas[voiceIndex]))
         self.assertIsInstance(meas[voiceIndex][0], note.Note)
@@ -5009,4 +5010,4 @@ class RegressionIntegrationTests(unittest.TestCase):
         instr = actual.parts[0].getInstruments()[0]
         self.assertIsInstance(instr, instrument.Instrument)
         self.assertEqual(instr.partName, 'Clarinet')
-        self.assertEqual(instr.transposition, 'm-3')
+        self.assertEqual(instr.transposition.directedName, 'm-3')
