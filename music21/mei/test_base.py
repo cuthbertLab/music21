@@ -4964,3 +4964,49 @@ class TestBarLineFromElement(unittest.TestCase):
         actual = base.barLineFromElement(elem)
         self.assertIsInstance(actual, bar.Barline)
         self.assertEqual('regular', actual.style)
+
+
+
+#------------------------------------------------------------------------------
+class RegressionIntegrationTests(unittest.TestCase):
+    '''
+    Targeted tests that address bugs, run without any mock objects.
+    '''
+
+    def testInstrumentDetails(self):
+        '''
+        Ensure that instrument details are imported properly.
+
+        There should be one instrument called "Clarinet."
+        '''
+        meiSource = '''<?xml version="1.0" encoding="UTF-8"?>
+            <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
+            <music><score>
+                <scoreDef meter.count="8" meter.unit="8">
+                    <staffGrp>
+                        <staffDef n="1" label="Clarinet" trans.diat="-2" trans.semi="-3">
+                            <clef shape="F" line="4"/>
+                        </staffDef>
+                    </staffGrp>
+                </scoreDef>
+                <section>
+                    <scoreDef key.sig="1f" key.mode="major"/>
+                    <measure n="1">
+                        <staff n="1">
+                            <layer n="1" xml:id="asdf">
+                                <note pname="E" oct="2" dur="1"/>
+                            </layer>
+                        </staff>
+                    </measure>
+                </section>
+            </score></music></mei>
+        '''
+        testConv = base.MeiToM21Converter(meiSource)
+
+        actual = testConv.run()
+
+        self.assertEqual(1, len(actual.parts[0].getInstruments()))
+        instr = actual.parts[0].getInstruments()[0]
+        self.assertIsInstance(instr, instrument.Instrument)
+        self.assertEqual(instr.partName, 'Clarinet')
+        self.assertEqual(instr.transposition, 'm-3')

@@ -3482,6 +3482,7 @@ if __name__ == "__main__":
         test_base.TestMeasureFromElement,
         test_base.TestSectionScore,
         test_base.TestBarLineFromElement,
+        test_base.RegressionIntegrationTests,
     )
 
 #------------------------------------------------------------------------------
