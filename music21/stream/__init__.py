@@ -3992,6 +3992,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def _transposeByInstrument(self, reverse=False, inPlace=True,
         transposeKeySignature=True):
         '''
+        Transpose the Stream according to each instrument's transpostion.
+        
         If reverse is False, the transposition will happen in the direction
         opposite of what is specified by the Instrument. for instance,
         for changing a concert score to a transposed score or for
@@ -4005,8 +4007,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnObj = self
 
         # this will change the working Stream; not sure if a problem
-        boundaries = returnObj.extendDurationAndGetBoundaries('Instrument',
-                        inPlace=True)
+        try:
+            boundaries = returnObj.extendDurationAndGetBoundaries('Instrument',
+                            inPlace=True)
+        except StreamException:
+            return returnObj  # there are no instruments in the Stream.
 
 #         returnObj.extendDuration('Instrument', inPlace=True)
 #         insts = returnObj.getElementsByClass('Instrument')
@@ -4049,7 +4054,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         is used to determine if transposition is necessary.
 
         v2.0.10 changes -- inPlace is False
-        
+
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)

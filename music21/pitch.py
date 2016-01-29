@@ -767,7 +767,6 @@ class Accidental(SlottedObject):
 
         >>> a == c
         False
-
         '''
         if other is None or not isinstance(other, Accidental):
             return False
@@ -847,12 +846,7 @@ class Accidental(SlottedObject):
         '''
         Inequality. Needed for pitch comparisons.
         '''
-        if other is None:
-            return True
-        if self.name == other.name:
-            return False
-        else:
-            return True
+        return not (self.__eq__(other))
 
     def __repr__(self):
         return '<accidental %s>' % self.name

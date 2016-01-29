@@ -237,12 +237,11 @@ def augmentedSixthToMinorTonic(augSixthPossib, augSixthType=None, augSixthChordI
     elif augSixthType == 2:
         [bass, root, unused_third, fifth, other] = augSixthChordInfo # other == seventh
     
-    howToResolve = \
-    [(lambda p: p.name == bass.name, '-m2'),
-    (lambda p: p.name == root.name, 'm2'),
-    (lambda p: p.name == fifth.name, 'P1'),
-    (lambda p: p.name == other.name and augSixthType == 1, 'm2'),
-    (lambda p: p.name == other.name and augSixthType == 3, 'd2')]
+    howToResolve = [(lambda p: p.name == bass.name, '-m2'),
+                    (lambda p: p.name == root.name, 'm2'),
+                    (lambda p: p.name == fifth.name, 'P1'),
+                    (lambda p: p.name == other.name and augSixthType == 1, 'm2'),
+                    (lambda p: p.name == other.name and augSixthType == 3, 'd2')]
     
     return _resolvePitches(augSixthPossib, howToResolve)
 
@@ -385,13 +384,12 @@ def dominantSeventhToMinorTonic(domPossib, resolveV43toi6=False, domChordInfo=No
         domChordInfo = _unpackSeventhChord(chord.Chord(domPossib))
     [bass, root, third, fifth, seventh] = domChordInfo
 
-    howToResolve = \
-    [(lambda p: p.name == root.name and p == bass, 'P4'),
-    (lambda p: p.name == third.name, 'm2'),
-    (lambda p: p.name == fifth.name and resolveV43toi6, 'm2'),
-    (lambda p: p.name == fifth.name, '-M2'),
-    (lambda p: p.name == seventh.name and resolveV43toi6, 'M2'),
-    (lambda p: p.name == seventh.name, '-M2')]
+    howToResolve = [(lambda p: p.name == root.name and p == bass, 'P4'),
+                    (lambda p: p.name == third.name, 'm2'),
+                    (lambda p: p.name == fifth.name and resolveV43toi6, 'm2'),
+                    (lambda p: p.name == fifth.name, '-M2'),
+                    (lambda p: p.name == seventh.name and resolveV43toi6, 'M2'),
+                    (lambda p: p.name == seventh.name, '-M2')]
     
     return _resolvePitches(domPossib, howToResolve)
 
