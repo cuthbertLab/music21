@@ -745,10 +745,10 @@ class LayoutScore(stream.Opus):
         self.measureStart = None
         self.measureEnd = None
 
-    def _getPages(self):
+    @property
+    def pages(self):
         return self.getElementsByClass(Page)
 
-    pages = property(_getPages)
 
     def getPageAndSystemNumberFromMeasureNumber(self, measureNumber):
         '''
@@ -1497,10 +1497,9 @@ class Page(stream.Opus):
         self.systemEnd = None
         self.pageLayout = None
 
-    def _getSystems(self):
+    @property
+    def systems(self):
         return self.getElementsByClass(System)
-
-    systems = property(_getSystems)
 
 
 class System(stream.Score):
@@ -1524,10 +1523,9 @@ class System(stream.Score):
                                                         self.systemNumber, 
                                                         self.pageNumber, self.pageSystemNumber)
 
-    def _getStaves(self):
+    @property
+    def staves(self):
         return self.getElementsByClass(Staff)
-
-    staves = property(_getStaves)
 
 
 class Staff(stream.Part):

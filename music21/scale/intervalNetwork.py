@@ -147,11 +147,9 @@ class Edge(object):
         return '<music21.scale.intervalNetwork.Edge %s %s %s>' % (self._direction, 
              self._interval.name, repr(self._connections).replace(' ', ''))
 
-    def _getInterval(self):
-        return self._interval
-
-    interval = property(_getInterval, 
-        doc = '''
+    @property
+    def interval(self):
+        '''
         Return the stored Interval object
 
         >>> i = interval.Interval('M3')
@@ -161,13 +159,12 @@ class Edge(object):
         >>> e1.addDirectedConnection(n1, n2, 'ascending')
         >>> e1.interval
         <music21.interval.Interval M3>
-        ''')
+        '''
+        return self._interval
 
-    def _getDirection(self):
-        return self._direction
-
-    direction = property(_getDirection, 
-        doc = '''
+    @property
+    def direction(self):
+        '''
         Return the direction of the Edge.
 
         >>> i = interval.Interval('M3')
@@ -177,7 +174,8 @@ class Edge(object):
         >>> e1.addDirectedConnection(n1, n2, 'ascending')
         >>> e1.direction
         'ascending'
-        ''')
+        '''
+        return self._direction
 
 
     def addDirectedConnection(self, node1, node2, direction=None):
@@ -294,6 +292,7 @@ class Edge(object):
         # if no connections are possible, return none
         return None
 
+    # keep separate property, since getConnections takes a direction argument.
     connections = property(getConnections)
 
 
@@ -768,7 +767,17 @@ class IntervalNetwork(object):
 
 
     #---------------------------------------------------------------------------
-    def _getDegreeMin(self):
+    @property
+    def degreeMin(self):
+        '''
+        Return the lowest degree value.
+        
+        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        >>> net = scale.intervalNetwork.IntervalNetwork()
+        >>> net.fillBiDirectedEdges(edgeList)
+        >>> net.degreeMin    
+        1
+        '''
         x = None
         for n in self._nodes.values():
             if x is None:
@@ -777,28 +786,9 @@ class IntervalNetwork(object):
                 x = n.degree
         return x
 
-    degreeMin = property(_getDegreeMin, 
-        doc = '''
-        Return the lowest degree value.
-        
-        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = scale.intervalNetwork.IntervalNetwork()
-        >>> net.fillBiDirectedEdges(edgeList)
-        >>> net.degreeMin    
-        1
-        ''')
-
-    def _getDegreeMax(self):
-        x = None
-        for n in self._nodes.values():
-            if x == None:
-                x = n.degree
-            if n.degree > x:
-                x = n.degree
-        return x
-
-    degreeMax = property(_getDegreeMax, 
-        doc = '''
+    @property
+    def degreeMax(self):
+        '''
         Return the largest degree value.
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
@@ -806,10 +796,27 @@ class IntervalNetwork(object):
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net.degreeMax    # returns eight, as this is the last node
         8
-        ''')
-
+        '''
+        x = None
+        for n in self._nodes.values():
+            if x == None:
+                x = n.degree
+            if n.degree > x:
+                x = n.degree
+        return x
     
-    def _getDegreeMaxUnique(self):
+    @property
+    def degreeMaxUnique(self):
+        '''
+        Return the largest degree value that represents a pitch level 
+        that is not a terminus of the scale. 
+        
+        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
+        >>> net = scale.intervalNetwork.IntervalNetwork()
+        >>> net.fillBiDirectedEdges(edgeList)
+        >>> net.degreeMaxUnique
+        7
+        '''
         x = None
         for nId, n in self._nodes.items():
             # reject terminus high, as this duplicates terminus low
@@ -821,26 +828,9 @@ class IntervalNetwork(object):
                 x = n.degree
         return x
 
-    degreeMaxUnique = property(_getDegreeMaxUnique, 
-        doc = '''
-        Return the largest degree value that represents a pitch level 
-        that is not a terminus of the scale. 
-        
-        >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        >>> net = scale.intervalNetwork.IntervalNetwork()
-        >>> net.fillBiDirectedEdges(edgeList)
-        >>> net.degreeMaxUnique
-        7
-        ''')
-
-    def _getTerminusLowNodes(self):
-        post = []
-        # for now, there is only one
-        post.append(self._nodes[TERMINUS_LOW])
-        return post
-    
-    terminusLowNodes = property(_getTerminusLowNodes, 
-        doc='''
+    @property
+    def terminusLowNodes(self):
+        '''
         Return a list of first Nodes, or Nodes that contain "terminusLow". 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
@@ -848,17 +838,15 @@ class IntervalNetwork(object):
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net.terminusLowNodes
         [<music21.scale.intervalNetwork.Node id='terminusLow'>]
-        ''')
-
-    def _getTerminusHighNodes(self):
+        '''
         post = []
         # for now, there is only one
-        post.append(self._nodes[TERMINUS_HIGH])
+        post.append(self._nodes[TERMINUS_LOW])
         return post
-
     
-    terminusHighNodes = property(_getTerminusHighNodes, 
-        doc='''
+    @property
+    def terminusHighNodes(self):
+        '''
         Return a list of last Nodes, or Nodes that contain "terminusHigh". 
         
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
@@ -866,7 +854,11 @@ class IntervalNetwork(object):
         >>> net.fillBiDirectedEdges(edgeList)
         >>> net.terminusHighNodes
         [<music21.scale.intervalNetwork.Node id='terminusHigh'>]
-        ''')
+        '''
+        post = []
+        # for now, there is only one
+        post.append(self._nodes[TERMINUS_HIGH])
+        return post
 
 
     #---------------------------------------------------------------------------
@@ -969,8 +961,8 @@ class IntervalNetwork(object):
         if degree is None:
             raise IntervalNetworkException('Degree of None given to _degreeModulus')
         # TODO: these need to be cached
-        sMin = self._getDegreeMin()
-        sMax = self._getDegreeMax()
+        sMin = self.degreeMin
+        sMax = self.degreeMax
         # the number of unique values; assumes redundancy in 
         # top and bottom value, so 8 steps, from 1 to 8, have
         # seven unique values
@@ -1040,11 +1032,11 @@ class IntervalNetwork(object):
             return post
         elif common.isStr(nodeId):
             if nodeId.lower() in ['terminuslow', 'low']:
-                return self._getTerminusLowNodes() # returns a list
+                return self.terminusLowNodes # returns a list
             elif nodeId.lower() in ['terminushigh', 'high']:
-                return self._getTerminusHighNodes()# returns a list
+                return self.terminusHighNodes # returns a list
             else:
-                raise IntervalNetworkException('got a strin that has no match:', nodeId)
+                raise IntervalNetworkException('got a string that has no match:', nodeId)
         elif isinstance(nodeId, Node):
             # look for direct match     
             for nId in self._nodes:
@@ -1332,7 +1324,7 @@ class IntervalNetwork(object):
         if isinstance(nodeId, Node):
             nodeObj = nodeId
         elif nodeId is None: # assume first
-            nodeObj = self._getTerminusLowNodes()[0]
+            nodeObj = self.terminusLowNodes[0]
         else:
             nodeObj = self._nodeNameToNodes(nodeId)[0]
             
@@ -1416,7 +1408,7 @@ class IntervalNetwork(object):
             if n.id == TERMINUS_HIGH:
                 if maxPitch is None: # if not defined, stop at terminus high
                     break
-                n = self._getTerminusLowNodes()[0]
+                n = self.terminusLowNodes[0]
             # this returns a list of possible edges and nodes
             nextBundle = self._getNext(n, DIRECTION_ASCENDING)
             #environLocal.printDebug(['_realizeAscending()', 'n', n, 'nextBundle', nextBundle])
@@ -1516,7 +1508,7 @@ class IntervalNetwork(object):
         elif nodeId is None: # assume low terminus by default
             # this is useful for appending a descending segment with an 
             # ascending segment
-            nodeObj = self._getTerminusLowNodes()[0]
+            nodeObj = self.terminusLowNodes[0]
         else:
             nodeObj = self._nodeNameToNodes(nodeId)[0]
             
@@ -1599,7 +1591,7 @@ class IntervalNetwork(object):
                 if minPitch is None: # if not defined, stop at terminus high
                     break
                 # get high and continue
-                n = self._getTerminusHighNodes()[0]
+                n = self.terminusHighNodes[0]
             if n.id == TERMINUS_LOW:
                 if minPitch is None: # if not defined, stop at terminus high
                     break
@@ -2760,7 +2752,7 @@ class IntervalNetwork(object):
 
         If resultsReturned is None then return every such scale.
         '''
-        nodeId = self._getTerminusLowNodes()[0]
+        nodeId = self.terminusLowNodes[0]
         sortList = []
 
         # for now, searching 12 pitches; this may be more than necessary

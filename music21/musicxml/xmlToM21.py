@@ -870,11 +870,10 @@ class PartParser(XMLParserBase):
         
         self.appendToScoreAfterParse = True
 
-    def _getParent(self):
+    @property
+    def parent(self):
         return common.unwrapWeakref(self._parent)
 
-    parent = property(_getParent)
-    
     def parse(self):
         self.parsePartInfo()
         self.parseMeasures()

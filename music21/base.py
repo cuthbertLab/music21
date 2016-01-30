@@ -619,16 +619,10 @@ class Music21Object(object):
         '''
         return not self.classSet.isdisjoint(classFilterList)
 
-    def _getClasses(self):
-        try:
-            return self._classListCacheDict[self.__class__]
-        except KeyError:
-            classList = tuple([x.__name__ for x in self.__class__.mro()])
-            self._classListCacheDict[self.__class__] = classList
-            return classList
-
-    classes = property(_getClasses,
-        doc='''Returns a tuple containing the names (strings, not objects) of classes that this
+    @property
+    def classes(self):
+        '''
+        Returns a tuple containing the names (strings, not objects) of classes that this
         object belongs to -- starting with the object's class name and going up the mro()
         for the object.  Very similar to Perl's @ISA array:
 
@@ -656,21 +650,17 @@ class Music21Object(object):
         {30.0} <music21.clef.FrenchViolinClef>
         
         `Changed 2015 Sep`: returns a tuple, not a list.        
-        ''')
-
-    def _getClassSet(self):
+        '''
         try:
-            return self._classSetCacheDict[self.__class__]
+            return self._classListCacheDict[self.__class__]
         except KeyError:
-            classNameList = list(self.classes)
-            classObjList = self.__class__.mro()
-            classListFQ = [x.__module__ + '.' + x.__name__ for x in self.__class__.mro()]
-            classList = classNameList + classObjList + classListFQ
-            classSet = frozenset(classList)
-            self._classSetCacheDict[self.__class__] = classSet
-            return classSet
+            classList = tuple([x.__name__ for x in self.__class__.mro()])
+            self._classListCacheDict[self.__class__] = classList
+            return classList
 
-    classSet = property(_getClassSet, doc='''
+    @property
+    def classSet(self):
+        '''
         Returns a set (that is, unordered, but indexed) of all of the classes that
         this class belongs to, including
         string names, fullyQualified string names, and objects themselves.
@@ -711,11 +701,20 @@ class Music21Object(object):
          <class 'music21.note.NotRest'>, 
          <class 'music21.note.Note'>, 
          <... 'object'>]
-        
-    ''')
+        '''
+        try:
+            return self._classSetCacheDict[self.__class__]
+        except KeyError:
+            classNameList = list(self.classes)
+            classObjList = self.__class__.mro()
+            classListFQ = [x.__module__ + '.' + x.__name__ for x in self.__class__.mro()]
+            classList = classNameList + classObjList + classListFQ
+            classSet = frozenset(classList)
+            self._classSetCacheDict[self.__class__] = classSet
+            return classSet
 
     #---------------------------
-    # convienence.  used to be in note.Note, but belongs everywhere:
+    # convenience.  used to be in note.Note, but belongs everywhere:
     def _getQuarterLength(self):
         return self.duration.quarterLength
     
@@ -3120,25 +3119,9 @@ class Music21Object(object):
 
     #--------------------------------------------------------------------------
     # temporal and beat based positioning
-
-    def _getMeasureNumber(self):
+    @property
+    def measureNumber(self):
         '''
-        If this object is contained in a Measure, return the measure number
-        '''
-        mNumber = None # default for not defined
-        if self.activeSite is not None and self.activeSite.isMeasure:
-            mNumber = self.activeSite.number
-        else:
-            # testing sortByCreationTime == true; this may be necessary
-            # as we often want the most recent measure
-            for cs in self.contextSites():
-                m = cs[0]
-                if 'Measure' in m.classes:
-                    mNumber = m.number
-        return mNumber
-
-    measureNumber = property(_getMeasureNumber,
-        doc = '''
         Return the measure number of a :class:`~music21.stream.Measure` that contains this
         object if the object is in a measure.
 
@@ -3196,8 +3179,20 @@ class Music21Object(object):
         >>> m3.append(nCopy)
         >>> nCopy.measureNumber
         4
-        ''')
+        '''
+        mNumber = None # default for not defined
+        if self.activeSite is not None and self.activeSite.isMeasure:
+            mNumber = self.activeSite.number
+        else:
+            # testing sortByCreationTime == true; this may be necessary
+            # as we often want the most recent measure
+            for cs in self.contextSites():
+                m = cs[0]
+                if 'Measure' in m.classes:
+                    mNumber = m.number
+        return mNumber
 
+        
     def _getMeasureOffset(self, includeMeasurePadding=True):
         '''
         Try to obtain the nearest Measure that contains this object,
@@ -3317,50 +3312,13 @@ class Music21Object(object):
             raise Music21ObjectException('this object does not have a TimeSignature in Sites')
         return ts
     
-    def _getBeat(self):
+    @property
+    def beat(self):
         '''
-        Return a beat designation based on local
-        Measure and TimeSignature
-
-        >>> n = note.Note()
-        >>> n.quarterLength = 2
-        >>> m = stream.Measure()
-        >>> m.isMeasure
-        True
-        >>> m.timeSignature = meter.TimeSignature('4/4')
-        >>> m.repeatAppend(n, 2)
-        >>> m[1].activeSite # here we get the activeSite, but not in m.notes
-        <music21.stream.Measure 0 offset=0.0>
-
-        >>> m.notes[0]._getBeat()
-        1.0
-        >>> m.notes[1]._getBeat()
-        3.0
-        
-        >>> m = stream.Measure()        
-        >>> m.timeSignature = meter.TimeSignature('4/4')
-        >>> n = note.Note()
-        >>> n.quarterLength = 1./3
-        >>> m.repeatAppend(n, 12)
-        >>> for i in range(5):
-        ...    print(m.notes[i].beat)
-        1.0
-        4/3
-        5/3
-        2.0
-        7/3
-        '''
-        ts = self._getTimeSignatureForBeat()
-        return ts.getBeatProportion(
-            self._getMeasureOffsetOrMeterModulusOffset(ts))
-
-    beat = property(_getBeat,
-        doc = '''
         Return the beat of this object as found in the most
         recently positioned Measure. Beat values count from 1 and
         contain a floating-point designation between 0 and 1 to
         show proportional progress through the beat.
-
 
         >>> n = note.Note()
         >>> n.quarterLength = .5
@@ -3389,15 +3347,28 @@ class Music21Object(object):
         >>> s.makeMeasures(inPlace = True)
         >>> [n.beat for n in s.flat.notes]
         [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5]
-        ''')
-
-    def _getBeatStr(self):
+        
+        
+        >>> m = stream.Measure()        
+        >>> m.timeSignature = meter.TimeSignature('4/4')
+        >>> n = note.Note()
+        >>> n.quarterLength = 1./3
+        >>> m.repeatAppend(n, 12)
+        >>> for i in range(5):
+        ...    print(m.notes[i].beat)
+        1.0
+        4/3
+        5/3
+        2.0
+        7/3
+        '''
         ts = self._getTimeSignatureForBeat()
-        return ts.getBeatProportionStr(
+        return ts.getBeatProportion(
             self._getMeasureOffsetOrMeterModulusOffset(ts))
 
-    beatStr = property(_getBeatStr,
-        doc = '''
+    @property
+    def beatStr(self):
+        '''
         Return a string representation of the beat of
         this object as found in the most recently positioned
         Measure. Beat values count from 1 and contain a
@@ -3419,37 +3390,21 @@ class Music21Object(object):
         >>> s.insert(0, meter.TimeSignature('3/4'))
         >>> s.repeatAppend(note.Note(), 8)
         >>> [n.beatStr for n in s.notes]
-        ['1', '2', '3', '1', '2', '3', '1', '2']
-        ''')
+        ['1', '2', '3', '1', '2', '3', '1', '2']        
+        '''
+        ts = self._getTimeSignatureForBeat()
+        return ts.getBeatProportionStr(
+            self._getMeasureOffsetOrMeterModulusOffset(ts))
 
-    def _getBeatDuration(self):
+    @property
+    def beatDuration(self):
         '''
         Return a :class:`~music21.duration.Duration` of the beat
         active for this object as found in the most recently
         positioned Measure.
 
-
-        >>> n = note.Note()
-        >>> n.quarterLength = 2
-        >>> m = stream.Measure()
-        >>> m.timeSignature = meter.TimeSignature('4/4')
-        >>> m.repeatAppend(n, 2)
-        >>> m.notes[0]._getBeatDuration()
-        <music21.duration.Duration 1.0>
-        >>> m.notes[1]._getBeatDuration()
-        <music21.duration.Duration 1.0>
-        '''
-        ts = self._getTimeSignatureForBeat()
-        return ts.getBeatDuration(self._getMeasureOffsetOrMeterModulusOffset(ts))
-
-    beatDuration = property(_getBeatDuration,
-        doc = '''
-        Return a :class:`~music21.duration.Duration` of the beat active 
-        for this object as found in the most recently positioned Measure.
-
         If extending beyond the Measure, or in a Stream with a TimeSignature, 
         the meter modulus value will be returned.
-
 
         >>> n = note.Note()
         >>> n.quarterLength = .5
@@ -3468,9 +3423,13 @@ class Music21Object(object):
         >>> s.repeatAppend(note.Note(), 8)
         >>> [n.beatDuration.quarterLength for n in s.notes]
         [2.0, 2.0, 3.0, 3.0, 3.0, 2.0, 2.0, 3.0]
-        ''')
+        '''
+        ts = self._getTimeSignatureForBeat()
+        return ts.getBeatDuration(self._getMeasureOffsetOrMeterModulusOffset(ts))
 
-    def _getBeatStrength(self):
+
+    @property
+    def beatStrength(self):
         '''
         Return the metrical accent of this object
         in the most recently positioned Measure. Accent values
@@ -3536,8 +3495,6 @@ class Music21Object(object):
         return ts.getAccentWeight(
             self._getMeasureOffsetOrMeterModulusOffset(ts),
                 forcePositionMatch=True, permitMeterModulus=False)
-
-    beatStrength = property(_getBeatStrength)
 
     def _setSeconds(self, value):
         ti = self.getContextByClass('TempoIndication')

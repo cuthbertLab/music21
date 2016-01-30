@@ -3921,39 +3921,35 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
          <music21.bar.Barline style=none>]
         ''')
 
-
-    def _getVoices(self):
-        return self.getElementsByClass('Voice')
-
-    voices = property(_getVoices,
-        doc='''
+    @property
+    def voices(self):
+        '''
         Return all :class:`~music21.stream.Voices` objects
-        in a :class:`~music21.stream.Stream` or Stream subclass.
-
-
+        in an iterator
+        
         >>> s = stream.Stream()
         >>> s.insert(0, stream.Voice())
         >>> s.insert(0, stream.Voice())
         >>> len(s.voices)
         2
-        ''')
+        '''
+        return self.getElementsByClass('Voice')
 
-    def _getSpanners(self):
-        return self.getElementsByClass('Spanner')
-
-    spanners = property(_getSpanners,
-        doc='''
+    @property
+    def spanners(self):
+        '''
         Return all :class:`~music21.spanner.Spanner` objects
         (things such as Slurs, long trills, or anything that
         connects many objects)
-        into a :class:`~music21.stream.Stream` or Stream subclass.
-
+        in an Iterator
+        
         >>> s = stream.Stream()
         >>> s.insert(0, spanner.Slur())
         >>> s.insert(0, spanner.Slur())
         >>> len(s.spanners)
         2
-        ''')
+        '''
+        return self.getElementsByClass('Spanner')
 
     #---------------------------------------------------------------------------
     # handling transposition values and status
@@ -5479,6 +5475,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 #offsetMap.append([offset, offset + dur, copy.copy(e)])
         return offsetMap
 
+
+    # Do not make a property decorator since _getOffsetMap takes parameters
     offsetMap = property(_getOffsetMap, doc='''
         Returns a list where each element is a dictionary
         consisting of the 'offset' of each element in a stream, the
@@ -6301,46 +6299,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self.isSorted = True
             #environLocal.printDebug(['_elements', self._elements])
 
-    def _getSorted(self):
-        if 'sorted' not in self._cache or self._cache['sorted'] is None:
-            shallowElements = copy.copy(self._elements) # already a copy
-            shallowEndElements = copy.copy(self._endElements) # already a copy
-            s = copy.copy(self)
-            # assign directly to _elements, as we do not need to call
-            # elementsChanged()
-            s._elements = shallowElements
-            s._endElements = shallowEndElements
-
-            for e in shallowElements + shallowEndElements:
-                s.setElementOffset(e, self.elementOffset(e))
-                e.sites.add(s)
-                # need to explicitly set activeSite
-                e.activeSite = s
-            # now just sort this stream in place; this will update the
-            # isSorted attribute and sort only if not already sorted
-            s.sort()
-            self._cache['sorted'] = s
-        return self._cache['sorted']
-
-        # get a shallow copy of elements list
-#         shallowElements = copy.copy(self._elements) # already a copy
-#         shallowEndElements = copy.copy(self._endElements) # already a copy
-#         newStream = copy.copy(self)
-#         # assign directly to _elements, as we do not need to call
-#         # elementsChanged()
-#         newStream._elements = shallowElements
-#         newStream._endElements = shallowEndElements
-#
-#         for e in shallowElements + shallowEndElements:
-#             e.sites.add(newStream)
-#             # need to explicitly set activeSite
-#             e.activeSite = newStream
-#         # now just sort this stream in place; this will update the
-#         # isSorted attribute and sort only if not already sorted
-#         newStream.sort()
-#         return newStream
-
-    sorted = property(_getSorted, doc='''
+    @property
+    def sorted(self):
+        '''
         Returns a new Stream where all the elements are sorted according to offset time, then
         priority, then classSortOrder (so that, for instance, a Clef at offset 0 appears before
         a Note at offset 0)
@@ -6413,9 +6374,44 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '0.0: C#; 1.0: D-; 2.0: C#; 2.0: E; 3.0: D-; 4.0: C#; 5.0: D-; '
         >>> z[2].name, z[3].name
         ('C#', 'E')
+        '''
+        if 'sorted' not in self._cache or self._cache['sorted'] is None:
+            shallowElements = copy.copy(self._elements) # already a copy
+            shallowEndElements = copy.copy(self._endElements) # already a copy
+            s = copy.copy(self)
+            # assign directly to _elements, as we do not need to call
+            # elementsChanged()
+            s._elements = shallowElements
+            s._endElements = shallowEndElements
 
-        ''')
+            for e in shallowElements + shallowEndElements:
+                s.setElementOffset(e, self.elementOffset(e))
+                e.sites.add(s)
+                # need to explicitly set activeSite
+                e.activeSite = s
+            # now just sort this stream in place; this will update the
+            # isSorted attribute and sort only if not already sorted
+            s.sort()
+            self._cache['sorted'] = s
+        return self._cache['sorted']
 
+        # get a shallow copy of elements list
+#         shallowElements = copy.copy(self._elements) # already a copy
+#         shallowEndElements = copy.copy(self._endElements) # already a copy
+#         newStream = copy.copy(self)
+#         # assign directly to _elements, as we do not need to call
+#         # elementsChanged()
+#         newStream._elements = shallowElements
+#         newStream._endElements = shallowEndElements
+#
+#         for e in shallowElements + shallowEndElements:
+#             e.sites.add(newStream)
+#             # need to explicitly set activeSite
+#             e.activeSite = newStream
+#         # now just sort this stream in place; this will update the
+#         # isSorted attribute and sort only if not already sorted
+#         newStream.sort()
+#         return newStream
 
     def _getFlatOrSemiFlat(self, retainContainers=False):
         '''
@@ -6507,17 +6503,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # here, we store the source stream from which this stream was derived
         return sNew
 
-
-    def _getFlat(self):
-        if 'flat' not in self._cache or self._cache['flat'] is None:
-            self._cache['flat'] = self._getFlatOrSemiFlat(
-                                  retainContainers=False)
-        return self._cache['flat']
-
-        # non cached approach
-        #return self._getFlatOrSemiFlat(retainContainers=False)
-
-    flat = property(_getFlat, doc=
+    @property
+    def flat(self):
         '''
         A very important read-only property that returns a new Stream
         that has all sub-containers "flattened" within it,
@@ -6657,20 +6644,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> r.flat[124].offset
         444.0
-        ''')
+        '''
+        if 'flat' not in self._cache or self._cache['flat'] is None:
+            self._cache['flat'] = self._getFlatOrSemiFlat(
+                                  retainContainers=False)
+        return self._cache['flat']
+
+        # non cached approach
+        #return self._getFlatOrSemiFlat(retainContainers=False)
 
 
-    def _getSemiFlat(self):
-        if 'semiFlat' not in self._cache or self._cache['semiFlat'] is None:
-            #environLocal.printDebug(['using cached semiFlat', self])
-            self._cache['semiFlat'] = self._getFlatOrSemiFlat(
-                                    retainContainers=True)
-        return self._cache['semiFlat']
-
-        #return self._getFlatOrSemiFlat(retainContainers=True)
-
-
-    semiFlat = property(_getSemiFlat, doc='''
+    @property
+    def semiFlat(self):
+        '''
         Returns a flat-like Stream representation.
         Stream sub-classed containers, such as Measure or Part,
         are retained in the output Stream, but positioned at their
@@ -6703,8 +6689,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         <music21.note.Note C>
         >>> sf[0][0]
         <music21.note.Note C>
+        '''
+        if 'semiFlat' not in self._cache or self._cache['semiFlat'] is None:
+            #environLocal.printDebug(['using cached semiFlat', self])
+            self._cache['semiFlat'] = self._getFlatOrSemiFlat(
+                                    retainContainers=True)
+        return self._cache['semiFlat']
 
-        ''')
+        
 
     def _yieldReverseUpwardsSearch(self, memo=None, streamsOnly=False,
                              skipDuplicates=True, classFilter=()):
@@ -6973,14 +6965,24 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     #---------------------------------------------------------------------------
     # duration and offset methods and properties
 
-    def _getHighestOffset(self):
+    @property
+    def highestOffset(self):
         '''
+        Get start time of element with the highest offset in the Stream.
+        Note the difference between this property and highestTime
+        which gets the end time of the highestOffset
 
-        >>> p = stream.Stream()
-        >>> p.repeatInsert(note.Note("C"), [0, 1, 2, 3, 4])
-        >>> p.highestOffset
-        4.0
+
+        >>> stream1 = stream.Stream()
+        >>> for offset in [0, 4, 8]:
+        ...     n = note.Note('G#', type='whole')
+        ...     stream1.insert(offset, n)
+        >>> stream1.highestOffset
+        8.0
+        >>> stream1.highestTime
+        12.0
         '''
+        # TODO: Perfect timespans candidate
         if 'HighestOffset' in self._cache and self._cache["HighestOffset"] is not None:
             pass  # return cache unaltered
         elif len(self._elements) == 0:
@@ -7001,33 +7003,53 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 self._cache["HighestOffset"] = None
         return self._cache["HighestOffset"]
 
-    highestOffset = property(_getHighestOffset,
-        doc='''Get start time of element with the highest offset in the Stream.
-        Note the difference between this property and highestTime
-        which gets the end time of the highestOffset
-
-
-
-        >>> stream1 = stream.Stream()
-        >>> for offset in [0, 4, 8]:
-        ...     n = note.Note('G#', type='whole')
-        ...     stream1.insert(offset, n)
-        >>> stream1.highestOffset
-        8.0
-        >>> stream1.highestTime
-        12.0
-        ''')
 
     def _setHighestTime(self, value):
         '''For internal use only.
         '''
         self._cache["HighestTime"] = value
 
-    def _getHighestTime(self):
+    @property
+    def highestTime(self):
         '''
-        Returns the largest offset plus duration.
-        see complete instructions in property highestTime.
+        Returns the maximum of all Element offsets plus their Duration
+        in quarter lengths. This value usually represents the last
+        "release" in the Stream.
 
+
+        Stream.duration is usually equal to the highestTime
+        expressed as a Duration object, but it can be set separately
+        for advanced operations.
+
+
+        Example: Insert a dotted half note at position 0 and see where
+        it cuts off:
+
+
+
+        >>> p1 = stream.Stream()
+        >>> p1.highestTime
+        0.0
+
+        >>> n = note.Note('A-')
+        >>> n.quarterLength = 3
+        >>> p1.insert(0, n)
+        >>> p1.highestTime
+        3.0
+
+
+        Now insert in the same stream, the dotted half note
+        at positions 1, 2, 3, 4 and see when the final note cuts off:
+
+
+
+        >>> p1.repeatInsert(n, [1, 2, 3, 4])
+        >>> p1.highestTime
+        7.0
+        
+        
+        Another example.
+        
         >>> n = note.Note('C#')
         >>> n.quarterLength = 3
 
@@ -7078,46 +7100,26 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self._cache["HighestTime"] = float(highestTimeSoFar)
         return self._cache["HighestTime"]
 
-    highestTime = property(_getHighestTime, doc='''
-        Returns the maximum of all Element offsets plus their Duration
-        in quarter lengths. This value usually represents the last
-        "release" in the Stream.
+    @property
+    def lowestOffset(self):
+        '''
+        Get the start time of the Element with the lowest offset in the Stream.
 
-
-        Stream.duration is usually equal to the highestTime
-        expressed as a Duration object, but it can be set separately
-        for advanced operations.
-
-
-        Example: Insert a dotted half note at position 0 and see where
-        it cuts off:
-
-
-
-        >>> p1 = stream.Stream()
-        >>> p1.highestTime
-        0.0
-
-        >>> n = note.Note('A-')
-        >>> n.quarterLength = 3
-        >>> p1.insert(0, n)
-        >>> p1.highestTime
+        >>> stream1 = stream.Stream()
+        >>> for x in range(3,5):
+        ...     n = note.Note('G#')
+        ...     stream1.insert(x, n)
+        ...
+        >>> stream1.lowestOffset
         3.0
 
 
-        Now insert in the same stream, the dotted half note
-        at positions 1, 2, 3, 4 and see when the final note cuts off:
+        If the Stream is empty, then the lowest offset is 0.0:
 
 
-
-        >>> p1.repeatInsert(n, [1, 2, 3, 4])
-        >>> p1.highestTime
-        7.0
-        ''')
-
-
-    def _getLowestOffset(self):
-        '''
+        >>> stream2 = stream.Stream()
+        >>> stream2.lowestOffset
+        0.0
 
 
 
@@ -7155,29 +7157,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         return self._cache["LowestOffset"]
 
-
-    lowestOffset = property(_getLowestOffset, doc='''
-        Get the start time of the Element with the lowest offset in the Stream.
-
-
-
-        >>> stream1 = stream.Stream()
-        >>> for x in range(3,5):
-        ...     n = note.Note('G#')
-        ...     stream1.insert(x, n)
-        ...
-        >>> stream1.lowestOffset
-        3.0
-
-
-        If the Stream is empty, then the lowest offset is 0.0:
-
-
-        >>> stream2 = stream.Stream()
-        >>> stream2.lowestOffset
-        0.0
-
-        ''')
 
     def _getDuration(self):
         '''
@@ -7482,7 +7461,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 secondsMap.append(secondsDict)
         return secondsMap
 
-
+    # do not make a property decorator since _getSecondsMap takes arguments
     secondsMap = property(_getSecondsMap, doc='''
         Returns a list where each element is a dictionary 
         consisting of the 'offsetSeconds' in seconds of each element in a Stream, 
@@ -7563,33 +7542,40 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # for now, simply return the offset
         return self.getOffsetBySite(self.activeSite)
 
-    def _getBeat(self):
+    @property
+    def beat(self):
+        '''
+        beat returns None for a Stream.
+        '''
         # this normally returns the beat within a measure; here, it could
         # be beats from the beginning?
         return None
 
-    beat = property(_getBeat)
-
-    def _getBeatStr(self):
+    @property
+    def beatStr(self):
+        '''
+        unlike other Music21Objects, streams always have beatStr (beat string) of None
+        
+        May change to "" soon.
+        '''
         return None
 
-    beatStr = property(_getBeatStr, doc='''
-    unlike other Music21Objects, streams always have beatStr (beat string) of None
-    ''')
-
-    def _getBeatDuration(self):
+    @property
+    def beatDuration(self):
+        '''
+        unlike other Music21Objects, streams always have beatDuration of None
+        ''' 
         # this returns the duration of the active beat
         return None
 
-    beatDuration = property(_getBeatDuration, 
-                doc='unlike other Music21Objects, streams always have beatDuration of None')
-
-    def _getBeatStrength(self):
+    @property
+    def beatStrength(self):
+        '''
+        unlike other Music21Objects, streams always have beatStrength of None
+        '''        
         # this returns the accent weight of the active beat
         return None
 
-    beatStrength = property(_getBeatStrength, 
-                    doc='unlike other Music21Objects, streams always have beatStrength of None')
 
     def beatAndMeasureFromOffset(self, searchOffset, fixZeros=True):
         '''
@@ -8554,24 +8540,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
     #---------------------------------------------------------------------------
-    def _getNotesAndRests(self):
+    @property
+    def notesAndRests(self):
         '''
-        see property `notesAndRests`, below
-        '''
-        if 'notesAndRests' not in self._cache or self._cache['notesAndRests'] is None:
-            #environLocal.printDebug(['updating noteAndRests cache:', str(self), id(self)])
-            noteIterator = self.getElementsByClass('GeneralNote')
-            noteIterator.overrideDerivation = 'notesAndRests'
-            self._cache['notesAndRests'] = noteIterator
-        return self._cache['notesAndRests']
-
-        #return self.getElementsByClass([note.GeneralNote, chord.Chord])
-        # using string class names is import for some test contexts where
-        # absolute class name matching fails
-        #return self.getElementsByClass(['GeneralNote', 'Chord'])
-
-    notesAndRests = property(_getNotesAndRests, doc='''
-        The notesAndRests property of a Stream returns a new Stream object
+        The notesAndRests property of a Stream returns a `StreamIterator`
         that consists only of the :class:`~music21.note.GeneralNote` objects found in
         the stream.  The new Stream will contain
         mostly notes and rests (including
@@ -8602,19 +8574,23 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {2.0} <music21.chord.Chord A B->
 
         The same caveats about `Stream` classes and `.flat` in `.notes` apply here.
-        ''')
+        '''
+        if 'notesAndRests' not in self._cache or self._cache['notesAndRests'] is None:
+            #environLocal.printDebug(['updating noteAndRests cache:', str(self), id(self)])
+            noteIterator = self.getElementsByClass('GeneralNote')
+            noteIterator.overrideDerivation = 'notesAndRests'
+            self._cache['notesAndRests'] = noteIterator
+        return self._cache['notesAndRests']
 
+        #return self.getElementsByClass([note.GeneralNote, chord.Chord])
+        # using string class names is import for some test contexts where
+        # absolute class name matching fails
+        #return self.getElementsByClass(['GeneralNote', 'Chord'])
 
-    def _getNotes(self):
-        if 'notes' not in self._cache or self._cache['notes'] is None:
-            noteIterator = self.getElementsByClass('NotRest')
-            noteIterator.overrideDerivation = 'notes'
-            self._cache['notes'] = noteIterator
-        return self._cache['notes']
-
-
-    notes = property(_getNotes, doc='''
-        The notes property of a Stream returns a new Stream object
+    @property
+    def notes(self):
+        '''
+        The notes property of a Stream returns an iterator
         that consists only of the notes (that is,
         :class:`~music21.note.Note`,
         :class:`~music21.chord.Chord`, etc.) found
@@ -8662,24 +8638,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {0.0} <music21.note.Note B>
         {2.0} <music21.chord.Chord A B->
         {3.0} <music21.note.Note D>
-        ''')
+        '''
+        if 'notes' not in self._cache or self._cache['notes'] is None:
+            noteIterator = self.getElementsByClass('NotRest')
+            noteIterator.overrideDerivation = 'notes'
+            self._cache['notes'] = noteIterator
+        return self._cache['notes']
 
-    def _getPitches(self):
-        post = []
-        for e in self.elements:
-            if hasattr(e, "pitch"):
-                post.append(e.pitch)
-            # both Chords and Stream have a pitches properties; this just
-            # causes a recursive pitch gathering
-            elif hasattr(e, "pitches"):
-                for p in e.pitches:
-                    post.append(p)
-            # do an ininstance comparison
-            elif 'Pitch' in e.classes:
-                post.append(e)
-        return post
-
-    pitches = property(_getPitches, doc='''
+    @property
+    def pitches(self):
+        '''
         Returns all :class:`~music21.pitch.Pitch` objects found in any
         element in the Stream as a Python List. Elements such as
         Streams, and Chords will have their Pitch objects accumulated as
@@ -8690,6 +8658,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         objects usually have by default a Duration of zero. This is an important difference
         between them and :class:`music21.note.Note` objects.
 
+        N.B., TODO: This may turn to an Iterator soon.
 
         >>> from music21 import corpus
         >>> a = corpus.parse('bach/bwv324.xml')
@@ -8724,7 +8693,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> m.pitches
         [<music21.pitch.Pitch F#4>, <music21.pitch.Pitch C4>,
          <music21.pitch.Pitch E4>, <music21.pitch.Pitch G4>]
-        ''')
+        '''
+        post = []
+        for e in self.elements:
+            if hasattr(e, "pitch"):
+                post.append(e.pitch)
+            # both Chords and Stream have a pitches properties; this just
+            # causes a recursive pitch gathering
+            elif hasattr(e, "pitches"):
+                for p in e.pitches:
+                    post.append(p)
+            # do an ininstance comparison
+            elif 'Pitch' in e.classes:
+                post.append(e)
+        return post
 
 
     def pitchAttributeCount(self, pitchAttr='name'):
@@ -9234,7 +9216,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self._cache["GapStream"] = gapStream
             return gapStream
 
-    def _getIsGapless(self):
+    @property
+    def isGapless(self):
+        '''
+        Returns True if there are no gaps between the lowest offset and the highest time.
+        Otherwise returns False
+        
+        TODO: Demos, tests...
+        '''
         if 'isGapless' in self._cache and self._cache["isGapless"] is not None:
             return self._cache["isGapless"]
         else:
@@ -9244,8 +9233,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             else:
                 self._cache["Gapless"] = False
                 return False
-
-    isGapless = property(_getIsGapless)
 
     def getSimultaneous(self, includeDurationless=True):
         '''Find and return any elements that start at the same time.
@@ -10083,17 +10070,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     #---------------------------------------------------------------------------
     # Variant control
-
-    def _getVariants(self):
-        if 'variants' not in self._cache or self._cache['variants'] is None:
-            self._cache['variants'] = self.getElementsByClass('Variant').stream(
-                                                                        returnStreamSubClass=False)
-        return self._cache['variants']
-
-    variants = property(_getVariants, doc='''
+    @property
+    def variants(self):
+        '''
         Return a Stream containing all :class:`~music21.variant.Variant` objects in this Stream.
-
-        # TODO -- make an iterator...
 
         >>> s = stream.Stream()
         >>> s.repeatAppend(note.Note('C4'), 8)
@@ -10112,7 +10092,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> [str(p) for p in s.pitches]
         ['C4', 'C4', 'C4', 'C4', 'C4', 'C4', 'C4', 'C4']
-        ''')
+        '''
+        if 'variants' not in self._cache or self._cache['variants'] is None:
+            self._cache['variants'] = self.getElementsByClass('Variant').stream(
+                                                                        returnStreamSubClass=False)
+        return self._cache['variants']
 
     #---- Variant Activation Methods
 
@@ -11603,32 +11587,9 @@ class Measure(Stream):
             # no anacrusis shift necessary:', barDuration.quarterLength, proportion])
 
     #---------------------------------------------------------------------------
-
-
-    def _getBarDuration(self):
-        # Docs in the property.
-
-        # TODO: it is possible that this should be cached or exposed as a method
-        # as this search may take some time.
-        if self.timeSignature is not None:
-            ts = self.timeSignature
-        else: # do a context-based search
-            tsStream = self.getTimeSignatures(searchContext=True,
-                       returnDefault=False, sortByCreationTime=True)
-            if len(tsStream) == 0:
-                try:
-                    ts = self.bestTimeSignature()
-                except exceptions21.Music21Exception:
-                    return duration.Duration(self.highestTime)
-
-                #raise StreamException(
-                #   'cannot determine bar duration without a time signature reference')
-            else: # it is the first found
-                ts = tsStream[0]
-        return ts.barDuration
-
-    barDuration = property(_getBarDuration,
-        doc = '''
+    @property
+    def barDuration(self):
+        '''
         Return the bar duration, or the Duration specified by the TimeSignature,
         regardless of what elements are found in this Measure or the highest time.
         TimeSignature is found first within the Measure,
@@ -11660,7 +11621,26 @@ class Measure(Stream):
         'Dotted Half'
         >>> m.duration.fullName
         'Whole tied to Quarter (5 total QL)'
-        ''')
+        '''
+        # TODO: it is possible that this should be cached or exposed as a method
+        # as this search may take some time.
+        if self.timeSignature is not None:
+            ts = self.timeSignature
+        else: # do a context-based search
+            tsStream = self.getTimeSignatures(searchContext=True,
+                       returnDefault=False, sortByCreationTime=True)
+            if len(tsStream) == 0:
+                try:
+                    ts = self.bestTimeSignature()
+                except exceptions21.Music21Exception:
+                    return duration.Duration(self.highestTime)
+
+                #raise StreamException(
+                #   'cannot determine bar duration without a time signature reference')
+            else: # it is the first found
+                ts = tsStream[0]
+        return ts.barDuration
+
 
     #---------------------------------------------------------------------------
     # Music21Objects are stored in the Stream's elements list
@@ -12088,17 +12068,9 @@ class Score(Stream):
         # a good idea.
         #self.insert(0, metadata.Metadata())
 
-
-    def _getParts(self):
-#         return self.getElementsByClass('Part')
-        if 'parts' not in self._cache or self._cache['parts'] is None:
-            partIterator = self.getElementsByClass('Part')
-            partIterator.overrideDerivation = 'parts'
-            self._cache['parts'] = partIterator
-        return self._cache['parts']
-
-    parts = property(_getParts,
-        doc='''
+    @property
+    def parts(self):
+        '''
         Return all :class:`~music21.stream.Part` objects in a :class:`~music21.stream.Score`.
 
         It filters out all other things that might be in a Score object, such as Metadata
@@ -12127,7 +12099,29 @@ class Score(Stream):
         Alto
         Tenor
         Bass
-        ''')
+        
+        
+        OMIT_FROM_DOCS
+        
+        Ensure that getting from cache still will reset the iteration.
+        
+        >>> for i, p in enumerate(s.parts):
+        ...     print(i, p)
+        ...     break
+        0 <music21.stream.Part Soprano>
+
+        >>> for i, p in enumerate(s.parts):
+        ...     print(i, p)
+        ...     break
+        0 <music21.stream.Part Soprano>
+        '''        
+#         return self.getElementsByClass('Part')
+        if 'parts' not in self._cache or self._cache['parts'] is None:
+            partIterator = self.getElementsByClass('Part')
+            partIterator.overrideDerivation = 'parts'
+            self._cache['parts'] = partIterator
+        return self._cache['parts']
+
 
     def measures(self, numberStart, numberEnd,
         collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'), 
@@ -12709,14 +12703,13 @@ class Opus(Stream):
             if match:
                 return s
 
-    def _getScores(self):
-        return self.getElementsByClass(Score)
-
-    scores = property(_getScores,
-        doc='''
+    @property
+    def scores(self):
+        '''
         Return all :class:`~music21.stream.Score` objects
-        in a :class:`~music21.stream.Opus`.
-        ''')
+        in an iterator
+        '''
+        return self.getElementsByClass(Score)
 
     def mergeScores(self):
         '''

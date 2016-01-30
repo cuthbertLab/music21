@@ -93,7 +93,8 @@ class LyObject(object):
                     currentIter += 1
         return None
     
-    def _getNewlineIndent(self):
+    @property
+    def newlineIndent(self):
         #totalIndents = self.thisIndent
         ancestors = self.ancestorList()
         #for a in ancestors:
@@ -102,7 +103,6 @@ class LyObject(object):
         indentSpaces = ' ' * totalIndents
         return '\n' + indentSpaces
     
-    newlineIndent = property(_getNewlineIndent)
     
     def setAttributes(self, m21Object):
         r'''
@@ -1040,13 +1040,13 @@ class LyCompositeMusic(LyObject):
         self.groupedMusicList = groupedMusicList 
         self.newLyrics = newLyrics
     
-    def _getContents(self):
+    @property
+    def contents(self):
         if self.prefixCompositeMusic is not None:
             return self.prefixCompositeMusic
         else:
             return self.groupedMusicList
     
-    contents = property(_getContents)
     
     def stringOutput(self):
         if self.newLyrics is not None:

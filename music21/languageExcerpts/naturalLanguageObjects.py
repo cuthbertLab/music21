@@ -14,7 +14,7 @@ Module docs...
 import unittest
 from music21 import pitch
 
-SUPPORTED_LANGUAGES = ["de","fr","it","du","es"]
+SUPPORTED_LANGUAGES = ["de","fr","it","es"]
 SUPPORTED_ACCIDENTALS = ["----","---","--","-","","#","##","###","####"]
 SUPPORTED_MICROTONES = ["A","B","C","D","E","F","G"]
 
@@ -38,23 +38,19 @@ def generateLanguageDictionary(languageString):
     if languageString is "de":
         for pitchString in pitchStrings:
             p = pitch.Pitch(pitchString)
-            dictionary[p._getGerman()] = pitchString
+            dictionary[p.german] = pitchString
     elif languageString is "fr":
         for pitchString in pitchStrings:
             p = pitch.Pitch(pitchString)
-            dictionary[p._getFrench()] = pitchString
+            dictionary[p.french] = pitchString
     elif languageString is "it":
         for pitchString in pitchStrings:
             p = pitch.Pitch(pitchString)
-            dictionary[p._getItalian()] = pitchString
-    elif languageString is "du":
-        for pitchString in pitchStrings:
-            p = pitch.Pitch(pitchString)
-            dictionary[p._getDutch()] = pitchString
+            dictionary[p.italian] = pitchString
     elif languageString is "es":
         for pitchString in pitchStrings:
             p = pitch.Pitch(pitchString)
-            dictionary[p._getSpanish()] = pitchString
+            dictionary[p.spanish] = pitchString
     
     return dictionary
 
@@ -62,7 +58,7 @@ def toPitch(pitchString, languageString):
     '''
     Converts a string to a :class:`music21.pitch.Pitch` object given a language.
     
-    Supported languages are Dutch, French, German, Italian, and Spanish
+    Supported languages are French, German, Italian, and Spanish
     
     Defaults to C natural
     
@@ -89,7 +85,7 @@ def toNote(pitchString, languageString):
     '''
     Converts a string to a :class:`music21.note.Note` object given a language
     
-    Supported languages are Dutch, French, German, Italian, and Spanish
+    Supported languages are French, German, Italian, and Spanish
     
     Defaults to C Naturual
     
@@ -113,7 +109,7 @@ def toChord(pitchArray, languageString):
     '''
     Converts a list of strings to a :class:`music21.chord.Chord` object given a language
     
-    Supported languages are Dutch, French, German, Italian, and Spanish
+    Supported languages are French, German, Italian, and Spanish
     
     Unsupported strings default to pitch C Naturual
     
@@ -126,13 +122,6 @@ def toChord(pitchArray, languageString):
     noteList = [toNote(pitchObj, languageString) for pitchObj in pitchArray]
     return chord.Chord(noteList)
 
-def toDuration():
-    
-    '''
-    TODO: Everything
-    '''
-    
-    pass
 #------------------------------------------------------------------------------
 
 
@@ -165,8 +154,6 @@ class Test(unittest.TestCase):
         self.assertEqual("<music21.pitch.Pitch C>", toPitch("","fr").__repr__())
         self.assertEqual("<music21.pitch.Pitch C>", toPitch("hello","es").__repr__())
         self.assertEqual("<music21.pitch.Pitch C>", toPitch("","es").__repr__())
-        self.assertEqual("<music21.pitch.Pitch C>", toPitch("hello","du").__repr__())
-        self.assertEqual("<music21.pitch.Pitch C>", toPitch("","du").__repr__())
         self.assertEqual("<music21.pitch.Pitch C>", toPitch("hello","it").__repr__())
         self.assertEqual("<music21.pitch.Pitch C>", toPitch("","it").__repr__())
         
@@ -177,8 +164,6 @@ class Test(unittest.TestCase):
         self.assertEqual("<music21.pitch.Pitch D>", toPitch("re","it").__repr__())
         self.assertEqual("<music21.pitch.Pitch B-->", toPitch("Heses","de").__repr__())
         self.assertEqual("<music21.pitch.Pitch E##>", toPitch("Eisis","de").__repr__())
-        self.assertEqual("<music21.pitch.Pitch D-->", toPitch("Deses","du").__repr__())
-        self.assertEqual("<music21.pitch.Pitch B->", toPitch("Bes","du").__repr__())
         self.assertEqual("<music21.pitch.Pitch A####>",
                          toPitch("la quadruple dièse","fr").__repr__())
         self.assertEqual("<music21.pitch.Pitch B--->", toPitch("si triple bémol","fr").__repr__())
@@ -209,8 +194,6 @@ class Test(unittest.TestCase):
         self.assertEqual("<music21.note.Note C>", toNote("","fr").__repr__())
         self.assertEqual("<music21.note.Note C>", toNote("hello","es").__repr__())
         self.assertEqual("<music21.note.Note C>", toNote("","es").__repr__())
-        self.assertEqual("<music21.note.Note C>", toNote("hello","du").__repr__())
-        self.assertEqual("<music21.note.Note C>", toNote("","du").__repr__())
         self.assertEqual("<music21.note.Note C>", toNote("hello","it").__repr__())
         self.assertEqual("<music21.note.Note C>", toNote("","it").__repr__())
         
@@ -221,8 +204,6 @@ class Test(unittest.TestCase):
         self.assertEqual("<music21.note.Note D>", toNote("re","it").__repr__())
         self.assertEqual("<music21.note.Note B-->", toNote("Heses","de").__repr__())
         self.assertEqual("<music21.note.Note E##>", toNote("Eisis","de").__repr__())
-        self.assertEqual("<music21.note.Note D-->", toNote("Deses","du").__repr__())
-        self.assertEqual("<music21.note.Note B->", toNote("Bes","du").__repr__())
         self.assertEqual("<music21.note.Note A####>", toNote("la quadruple dièse","fr").__repr__())
         self.assertEqual("<music21.note.Note B--->", toNote("si triple bémol","fr").__repr__())
         
@@ -235,7 +216,6 @@ class Test(unittest.TestCase):
         self.assertEqual("<music21.chord.Chord >", toChord([],"de").__repr__())
         self.assertEqual("<music21.chord.Chord >", toChord([],"fr").__repr__())
         self.assertEqual("<music21.chord.Chord >", toChord([],"es").__repr__())
-        self.assertEqual("<music21.chord.Chord >", toChord([],"du").__repr__())
         self.assertEqual("<music21.chord.Chord >", toChord([],"it").__repr__())
         
         #testing defaults in case of invalid language and valid list    
@@ -255,8 +235,6 @@ class Test(unittest.TestCase):
         self.assertEqual("<music21.chord.Chord C>", toChord([""],"fr").__repr__())
         self.assertEqual("<music21.chord.Chord C>", toChord(["hello"],"es").__repr__())
         self.assertEqual("<music21.chord.Chord C>", toChord([""],"es").__repr__())
-        self.assertEqual("<music21.chord.Chord C>", toChord(["hello"],"du").__repr__())
-        self.assertEqual("<music21.chord.Chord C>", toChord([""],"du").__repr__())
         self.assertEqual("<music21.chord.Chord C>", toChord(["hello"],"it").__repr__())
         self.assertEqual("<music21.chord.Chord C>", toChord([""],"it").__repr__())
         
@@ -269,8 +247,6 @@ class Test(unittest.TestCase):
         self.assertEqual("<music21.chord.Chord D>", toChord(["re"],"it").__repr__())
         self.assertEqual("<music21.chord.Chord B-->", toChord(["Heses"],"de").__repr__())
         self.assertEqual("<music21.chord.Chord E##>", toChord(["Eisis"],"de").__repr__())
-        self.assertEqual("<music21.chord.Chord D-->", toChord(["Deses"],"du").__repr__())
-        self.assertEqual("<music21.chord.Chord B->", toChord(["Bes"],"du").__repr__())
         self.assertEqual("<music21.chord.Chord A####>", 
                          toChord(["la quadruple dièse"],"fr").__repr__())
         self.assertEqual("<music21.chord.Chord B--->", toChord(["si triple bémol"],"fr").__repr__())    
@@ -281,7 +257,6 @@ class Test(unittest.TestCase):
                          toChord(["fa doble sostenido","sol triple bèmol"],"es").__repr__())
         self.assertEqual("<music21.chord.Chord B-- E##>", 
                          toChord(["Heses","Eisis"],"de").__repr__())
-        self.assertEqual("<music21.chord.Chord D-- B->", toChord(["Deses","Bes"],"du").__repr__())
         self.assertEqual("<music21.chord.Chord A#### B--->", 
                          toChord(["la quadruple dièse","si triple bémol"],"fr").__repr__())
 

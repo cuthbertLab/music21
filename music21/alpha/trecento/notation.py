@@ -426,11 +426,10 @@ class Punctus(base.Music21Object):
         self._fontString = '0x70'
         base.Music21Object.__init__(self)
 
-    def _getFontString(self):
+    @property
+    def fontString(self):
+        '''The utf-8 code corresponding the punctus in Cicionia font'''
         return self._fontString
-
-    fontString = property(_getFontString,
-                          doc = '''The utf-8 code corresponding the punctus in Cicionia font''')
 
 class Divisione(meter.TimeSignature):
     '''

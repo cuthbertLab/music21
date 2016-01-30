@@ -1175,22 +1175,21 @@ class DiatonicInterval(IntervalBase):
         '''
         return prefixSpecs[self.specifier]
 
-    def _getCents(self):
-        c = self.getChromatic()
-        return c.cents
-
-    cents = property(_getCents,
-        doc = '''
+    @property
+    def cents(self):
+        '''
         Return a cents representation of this interval as a float, 
         always assuming an equal-tempered presentation. 
-
         
         >>> i = interval.DiatonicInterval('minor', 'second')
         >>> i.niceName
         'Minor Second'
         >>> i.cents
         100.0
-        ''')
+        '''
+        c = self.getChromatic()
+        return c.cents
+
 
 
 

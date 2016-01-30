@@ -443,9 +443,12 @@ class KeySignature(base.Music21Object):
     def __str__(self):
         return self.__repr__()
 
-    def _getPitchAndMode(self):
+    @property
+    def pitchAndMode(self):
         '''
         DEPRECATED!
+        
+        TODO: Formally deprecate.
         
         Returns a a two value list containing 
         a :class:`music21.pitch.Pitch` object that 
@@ -478,8 +481,6 @@ class KeySignature(base.Music21Object):
         else:
             pitchObj = sharpsToPitch(self.sharps)
         return pitchObj, self.mode
-
-    pitchAndMode = property(_getPitchAndMode)
 
 
     def _getAlteredPitches(self):
@@ -671,7 +672,7 @@ class KeySignature(base.Music21Object):
         else:
             post = self
 
-        p1, mode = post._getPitchAndMode()
+        p1, mode = post.pitchAndMode
         p2 = p1.transpose(intervalObj)
         
         post.sharps = pitchToSharps(p2, mode)
@@ -700,7 +701,7 @@ class KeySignature(base.Music21Object):
         >>> ks.getScale()
         <music21.scale.MinorScale F# minor>
         '''
-        pitchObj, stored_mode = self._getPitchAndMode()
+        pitchObj, stored_mode = self.pitchAndMode
         if mode is None:
             mode = stored_mode
         
@@ -1062,7 +1063,7 @@ class Key(KeySignature, scale.DiatonicScale):
         else:
             post = super(Key, self).transpose(value, inPlace)
         
-        p1, unused_mode = post._getPitchAndMode()
+        p1, unused_mode = post.pitchAndMode
         post.tonic = p1
         post._attributesChanged()
 

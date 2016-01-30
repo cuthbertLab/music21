@@ -1301,19 +1301,16 @@ class Note(NotRest):
         ''')
 
 
-    # was diatonicNoteNum
-    def _getDiatonicNoteNum(self):
+    @property
+    def diatonicNoteNum(self):
         '''
-        see Pitch.diatonicNoteNum
-        '''
-        return self.pitch.diatonicNoteNum
-
-    diatonicNoteNum = property(_getDiatonicNoteNum,
-        doc = '''Return the diatonic note number from the :class:`~music21.pitch.Pitch` object. 
+        Return the diatonic note number from the :class:`~music21.pitch.Pitch` object. 
         See :attr:`~music21.pitch.Pitch.diatonicNoteNum`.
         
         Probably will be deprecated soon...
-        ''')
+        '''
+        return self.pitch.diatonicNoteNum
+
 
 
 
@@ -1393,17 +1390,9 @@ class Note(NotRest):
         else:
             return None
 
-
-
-    def _getFullName(self):
-        msg = []
-        msg.append('%s ' % self.pitch.fullName)
-        msg.append(self.duration.fullName)
-        msg.append(' Note')
-        return ''.join(msg)
-
-    fullName = property(_getFullName,
-        doc = '''
+    @property
+    def fullName(self):
+        '''
         Return the most complete representation of this Note, 
         providing duration and pitch information.
 
@@ -1420,7 +1409,12 @@ class Note(NotRest):
         >>> n.microtone = 25
         >>> n.fullName
         'D (+25c) 16th Note'
-        ''')
+        '''
+        msg = []
+        msg.append('%s ' % self.pitch.fullName)
+        msg.append(self.duration.fullName)
+        msg.append(' Note')
+        return ''.join(msg)
 
 
 #-------------------------------------------------------------------------------
@@ -1564,14 +1558,9 @@ class Rest(GeneralNote):
         return not self == other
 
 
-    def _getFullName(self):
-        msg = []
-        msg.append(self.duration.fullName)
-        msg.append(' Rest')
-        return ''.join(msg)
-
-    fullName = property(_getFullName,
-        doc = '''
+    @property
+    def fullName(self):
+        '''
         Return the most complete representation of this Rest, 
         providing duration information.
 
@@ -1580,8 +1569,13 @@ class Rest(GeneralNote):
         'Dotted Quarter Rest'
 
         >>> note.Rest(type='whole').fullName
-        'Whole Rest'
-        ''')
+        'Whole Rest'        
+        '''
+        msg = []
+        msg.append(self.duration.fullName)
+        msg.append(' Rest')
+        return ''.join(msg)
+
 
 
 class SpacerRest(Rest):
