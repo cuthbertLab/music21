@@ -42,15 +42,15 @@ articleReference = {
     # german
     'de' : ['der', 'die', 'das', 'des', 'dem', 'den', 'ein', 'eine', 'einer', 'einem', 'einen'],
     # dutch
-    'nl' : ['de', 'het', 'een'],
+    'nl' : ['de', 'het', '\'t', 'een'],
     # spanish
     'es' : ['el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas'],
     # portuguese
     'pt' : ['o', 'a', 'os', 'as', 'um', 'uma', 'uns', 'umas'],
     # french
-    'fr' : ['le', 'la', 'les', 'un', 'une', 'des', 'du', 'de la', 'des'],
+    'fr' : ['le', 'la', 'les', 'l\'', 'un', 'une', 'des', 'du', 'de la', 'des'],
     # italian
-    'it' : ['il', 'lo', 'la', 'i', 'gli', 'le', 'un', 'uno', 'una', 
+    'it' : ['il', 'lo', 'la', 'l\'', 'i', 'gli', 'le', 'un\'', 'un', 'uno', 'una', 
             'del', 'dello', 'della', 'dei', 'degli', 'delle'],
     }
 
@@ -785,7 +785,7 @@ class Test(unittest.TestCase):
     def testBasic(self):
         from music21 import converter, corpus
 
-        a = converter.parse(corpus.getWork('haydn/opus74no2/movement4.xml'))
+        a = converter.parse(corpus.getWork('haydn/opus1no1/movement4.xml'))
         post = assembleLyrics(a)
         self.assertEqual(post, '') # no lyrics!
 
@@ -805,12 +805,12 @@ class Test(unittest.TestCase):
         self.assertEqual(post, 'hello again')
         
         s = stream.Stream()
-        for syl in ['a-', '-ris-', '-to-', '-crats', 'are', 'great']:
+        for syl in ['a-', '-ris-', '-to-', '-cats', 'are', 'great']:
             n = note.Note()
             n.lyric = syl
             s.append(n)
         post = assembleLyrics(s)
-        self.assertEqual(post, 'aristocrats are great')
+        self.assertEqual(post, 'aristocats are great')
 
 
     def testLanguageDetector(self):

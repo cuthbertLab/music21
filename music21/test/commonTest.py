@@ -14,7 +14,6 @@ Things that are common to testing...
 '''
 import doctest
 import imp
-import multiprocessing
 import os
 #import time
 import types
@@ -264,7 +263,7 @@ class ModuleGather(object):
         for dirpath, unused_dirnames, filenames in os.walk(self.dirParent):
             self._visitFunc(None, dirpath, filenames)
 
-        if multiprocessing.cpu_count() > 4:# @UndefinedVariable
+        if common.cpus() > 4:# @UndefinedVariable
             self.modulePaths.sort(key=manyCoreSortFunc)
         else:
             self.modulePaths.sort()

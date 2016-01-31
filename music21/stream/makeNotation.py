@@ -907,7 +907,7 @@ def makeTies(
     while True:
         # update measureStream on each iteration,
         # as new measure may have been added to the returnObj stream
-        measureStream = returnObj.getElementsByClass('Measure')
+        measureStream = returnObj.getElementsByClass('Measure').stream()
         if mCount >= len(measureStream):
             break  # reached the end of all measures available or added
         # get the current measure to look for notes that need ties

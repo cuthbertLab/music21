@@ -1948,14 +1948,14 @@ class PlotStream(object):
 
 
     #---------------------------------------------------------------------------
-    def _getId(self):
-        return '%s-%s' % (self.format, '-'.join(self.values))
-
-
-    id = property(_getId, doc='''
+    @property
+    def id(self):
+        '''
         Each PlotStream has a unique id that consists of its format and a 
         string that defines the parameters that are graphed.
-        ''')
+        '''
+        return '%s-%s' % (self.format, '-'.join(self.values))
+
 
     #---------------------------------------------------------------------------
     def _axisLabelMeasureOrOffset(self):
@@ -2337,7 +2337,7 @@ class PlotStream(object):
             #environLocal.printDebug(['using measures for offset ticks'])
             # store indices in offsetMap
             mNoToUse = []
-            sortedKeys = sorted(list(offsetMap.keys()))
+            sortedKeys = list(offsetMap.keys())
             for key in sortedKeys:
                 if key >= offsetMin and key <= offsetMax:
 #                     if key == 0.0 and not displayMeasureNumberZero:

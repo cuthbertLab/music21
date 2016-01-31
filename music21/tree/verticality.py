@@ -387,7 +387,7 @@ class Verticality(object):
         asked. Because of this, it is safe to mutate the offset-tree by
         inserting or removing timespans while iterating over it.
 
-        >>> scoreTree.remove(nextVerticality.startTimespans)
+        >>> scoreTree.removeTimespanList(nextVerticality.startTimespans)
         >>> verticality.nextVerticality
         <Verticality 3.0 {A3 E4 C#5}>
         '''
@@ -484,7 +484,7 @@ class Verticality(object):
         asked. Because of this, it is safe to mutate the offset-tree by
         inserting or removing timespans while iterating over it.
 
-        >>> scoreTree.remove(previousVerticality.startTimespans)
+        >>> scoreTree.removeTimespanList(previousVerticality.startTimespans)
         >>> verticality.previousVerticality
         <Verticality 0.0 {A3 E4 C#5}>
         '''
@@ -550,7 +550,7 @@ class Verticality(object):
 
     #########  Analysis type things...
 
-    def getAllVoiceLeadingQuartets(self, includeRests = True, includeOblique = True, 
+    def getAllVoiceLeadingQuartets(self, includeRests=True, includeOblique=True, 
                                    includeNoMotion=False, returnObjects=True, partPairNumbers=None):
         '''
         >>> c = corpus.parse('luca/gloria').measures(1,8)
@@ -571,7 +571,7 @@ class Verticality(object):
             v1n1=<music21.note.Note G>, v1n2=<music21.note.Note C>, 
             v2n1=<music21.note.Note A>, v2n2=<music21.note.Note A> >
 
-        >>> for vlq in verticality22.getAllVoiceLeadingQuartets(includeRests = False):
+        >>> for vlq in verticality22.getAllVoiceLeadingQuartets(includeRests=False):
         ...     pp(vlq)
         <music21.voiceLeading.VoiceLeadingQuartet 
             v1n1=<music21.note.Note E>, v1n2=<music21.note.Note F>, 
@@ -656,8 +656,13 @@ class Verticality(object):
                     n12 = thisQuartet[0][1].element
                     n21 = thisQuartet[1][0].element
                     n22 = thisQuartet[1][1].element
-                    vlq = VoiceLeadingQuartet(n11, n12, n21, n22)
-                    filteredList.append(vlq)
+                    
+                    if (n11 is not None and
+                            n12 is not None and
+                            n21 is not None and
+                            n22 is not None): 
+                        vlq = VoiceLeadingQuartet(n11, n12, n21, n22)
+                        filteredList.append(vlq)
         
         return filteredList
         

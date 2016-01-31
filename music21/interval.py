@@ -501,7 +501,7 @@ def intervalToPythagoreanRatio(intervalObj):
 
         _pythagorean_cache[end_pitch_wanted.name] = end_pitch, ratio
 
-    octaves = int((end_pitch_wanted.midi - end_pitch.midi)/12)
+    octaves = int((end_pitch_wanted.ps - end_pitch.ps)/12)
     return ratio * Fraction(2, 1) ** octaves
 
 #-------------------------------------------------------------------------------
@@ -1175,22 +1175,21 @@ class DiatonicInterval(IntervalBase):
         '''
         return prefixSpecs[self.specifier]
 
-    def _getCents(self):
-        c = self.getChromatic()
-        return c.cents
-
-    cents = property(_getCents,
-        doc = '''
+    @property
+    def cents(self):
+        '''
         Return a cents representation of this interval as a float, 
         always assuming an equal-tempered presentation. 
-
         
         >>> i = interval.DiatonicInterval('minor', 'second')
         >>> i.niceName
         'Minor Second'
         >>> i.cents
         100.0
-        ''')
+        '''
+        c = self.getChromatic()
+        return c.cents
+
 
 
 

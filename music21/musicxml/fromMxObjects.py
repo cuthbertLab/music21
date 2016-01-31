@@ -4024,20 +4024,21 @@ class Test(unittest.TestCase):
 
     def testStaffLayout(self):
         from music21 import corpus, converter
-        c = converter.parse(corpus.corpora.CoreCorpus().getWorkList('demos/layoutTest.xml')[0], format='oldmusicxml', forceSource=True)
+        c = converter.parse(corpus.corpora.CoreCorpus().getWorkList(
+                'demos/layoutTest.xml')[0], format='oldmusicxml', forceSource=True)
         #c = corpus.parse('demos/layoutTest.xml')        
-        layouts = c.flat.getElementsByClass('LayoutBase')
-        systemLayouts = layouts.getElementsByClass('SystemLayout')
+        layouts = c.flat.getElementsByClass('LayoutBase').stream()
+        systemLayouts = layouts.getElementsByClass('SystemLayout').stream()
         self.assertEqual(len(systemLayouts), 42)
-        staffLayouts = layouts.getElementsByClass('StaffLayout')
+        staffLayouts = layouts.getElementsByClass('StaffLayout').stream()
 #         for i,p in enumerate(c.parts):
 #             print(i)
 #             for l in p.flat.getElementsByClass('StaffLayout'):
 #                 print(l.distance)        
         self.assertEqual(len(staffLayouts), 20)
-        pageLayouts = layouts.getElementsByClass('PageLayout')
+        pageLayouts = layouts.getElementsByClass('PageLayout').stream()
         self.assertEqual(len(pageLayouts), 10)
-        scoreLayouts = layouts.getElementsByClass('ScoreLayout')
+        scoreLayouts = layouts.getElementsByClass('ScoreLayout').stream()
         self.assertEqual(len(scoreLayouts), 1)
         #score1 = scoreLayouts[0]
         #for sltemp in score1.staffLayoutList:
@@ -4062,11 +4063,12 @@ class Test(unittest.TestCase):
 
     def testStaffLayoutMore(self):
         from music21 import corpus, converter
-        c = converter.parse(corpus.corpora.CoreCorpus().getWorkList('demos/layoutTestMore.xml')[0], format='oldmusicxml', forceSource=True)
+        c = converter.parse(corpus.corpora.CoreCorpus().getWorkList(
+                            'demos/layoutTestMore.xml')[0], format='oldmusicxml', forceSource=True)
         #c = corpus.parse('demos/layoutTest.xml')        
-        layouts = c.flat.getElementsByClass('LayoutBase')
+        layouts = c.flat.getElementsByClass('LayoutBase').stream()
         self.assertEqual(len(layouts), 76)
-        systemLayouts = layouts.getElementsByClass('SystemLayout')
+        systemLayouts = layouts.getElementsByClass('SystemLayout').stream()
         sl0 = systemLayouts[0]
         self.assertEqual(sl0.distance, None)
         self.assertEqual(sl0.topDistance, 211.0)
@@ -4076,7 +4078,7 @@ class Test(unittest.TestCase):
 #             if hasattr(s, 'staffSize'):
 #                 print(s, s.staffSize)
                 
-        staffLayouts = layouts.getElementsByClass('StaffLayout')
+        staffLayouts = layouts.getElementsByClass('StaffLayout').stream()
         sizes = []
         for s in staffLayouts:
             if s.staffSize is not None:
@@ -4085,7 +4087,8 @@ class Test(unittest.TestCase):
         
     def testCountDynamics(self):
         from music21 import  corpus, converter
-        c = converter.parse(corpus.corpora.CoreCorpus().getWorkList('schoenberg/opus19/movement2.mxl')[0], format='oldmusicxml', forceSource=True)
+        c = converter.parse(corpus.corpora.CoreCorpus().getWorkList(
+            'schoenberg/opus19/movement2.mxl')[0], format='oldmusicxml', forceSource=True)
         #c.show('musicxml.png')
         dynAll = c.flat.getElementsByClass('Dynamic')
         self.assertEqual(len(dynAll), 6)

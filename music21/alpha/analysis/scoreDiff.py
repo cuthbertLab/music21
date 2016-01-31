@@ -16,9 +16,6 @@ See the chapter :ref:`overviewFormats` for more information and examples of
 converting formats into and out of music21.
 '''
 from __future__ import print_function
-import math
-import collections
-import pdb
 
 """
 modification/redo of the algorithm used in variant.py
@@ -36,15 +33,15 @@ class Variant(object):
 		self.naiveVariant = None
 
 	def runStreamAnalyses(self):
-		classesX = streamX.classes
+		classesX = self.streamX.classes
 		if "Score" in classesX:
 			pass
-		elif "Part" in classesX or len(streamX.getElementsByClass("Measure")) > 0:
+		elif "Part" in classesX or len(self.streamX.getElementsByClass("Measure")) > 0:
 			pass
-    	elif len(streamX.notesAndRests) > 0 and streamX.duration.quarterLength == streamY.duration.quarterLength:
+		elif len(self.streamX.notesAndRests) > 0 and self.streamX.duration.quarterLength == self.streamY.duration.quarterLength:
 			pass
-	    else:
-        	raise VariantException("Could not determine what merging method to use. Try using a more specific merging function.")
+		else:
+			raise Exception("Could not determine what merging method to use. Try using a more specific merging function.")
 
 	def createVariantsNaive(self):
 		"""
@@ -69,7 +66,7 @@ class Variant(object):
 		#
 
 
-	def hashMeasure(self.measure):
+	def hashMeasure(self, measure):
 		"""
 		note-based hash of a measure
 		possibly timed-based in future as well?
@@ -80,7 +77,7 @@ class Variant(object):
 
 		pass
 
-	def getLevenshteinDist(streamhash1, streamhash2):
+	def getLevenshteinDist(self, streamhash1, streamhash2):
 		"""
 		helper method for computing edit distances between two measures(?) 
 		(poassibly bigger streams)
@@ -91,7 +88,7 @@ class Variant(object):
 		
 		pass
 
-	def getMostLikelyOperation(stream1, stream2):
+	def getMostLikelyOperation(self, stream1, stream2):
 		"""
 		returns the most likely operation that happened to a certain stream in the context of the other stream
 		"""

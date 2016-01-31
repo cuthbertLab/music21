@@ -52,6 +52,8 @@ if six.PY2:
     naive_single_quote_re = re.compile(r"(^|.)'((\\'|[^'])*?)'")
     naive_double_quote_re = re.compile(r'(^|.)"((\\"|[^"])*?)"')
     
+    # s = single; d = double; u = unicode; b = binary; 
+    # thus suquoteConv = single unicode quote converter
     suquoteConv = lambda m: (m.group(1) if m.group(1) != "u" else "") + "'" + m.group(2) + "'"
     duquoteConv = lambda m: (m.group(1) if m.group(1) != "u" else "") + '"' + m.group(2) + '"'
 
@@ -74,9 +76,11 @@ class Py3In2OutputChecker(doctest.OutputChecker):
         cannot use super with Py2 since we have old-style classes going on.
         '''
         if six.PY3:
-            return super(Py3In2OutputChecker, self).check_output(want, got, optionflags)
+            return super().check_output(want, got, optionflags)
         else:
             #x = [want, got]
+            wantOrig = want
+            gotOrig = got
             
             want = naive_single_quote_re.sub(sbquoteConv, want) # bytes in WANT disappear
             want = naive_double_quote_re.sub(dbquoteConv, want) # bytes in WANT disappear
@@ -86,7 +90,10 @@ class Py3In2OutputChecker(doctest.OutputChecker):
             
             #x.extend([want, got])
             #ALL_OUTPUT.append(x)
-            return doctest.OutputChecker.check_output(self, want, got, optionflags)
+            # if either the original output or the replaced output matches, then it's good.
+            return (doctest.OutputChecker.check_output(self, want, got, optionflags) or
+                    doctest.OutputChecker.check_output(self, wantOrig, gotOrig, optionflags)
+                    )
 
 ###### test related functions
 

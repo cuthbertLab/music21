@@ -64,13 +64,6 @@ from music21 import environment
 _MOD = 'converter/__init__.py'
 environLocal = environment.Environment(_MOD)
 
-# use the faster library if possible (won't be possible on Jython, PyPy, etc.)
-try:
-    import xml.etree.cElementTree as ETree
-except ImportError:
-    import xml.etree.ElementTree as ETree
-
-
 
 #-------------------------------------------------------------------------------
 class ArchiveManagerException(exceptions21.Music21Exception):
@@ -954,8 +947,8 @@ class Converter(object):
 
     #---------------------------------------------------------------------------
     # properties
-
-    def _getStream(self):
+    @property
+    def stream(self):
         '''
         Returns the .subConverter.stream object.
         '''
@@ -967,8 +960,6 @@ class Converter(object):
             return None
         # not _stream: please don't look in other objects' private variables;
         #              humdrum worked differently.
-
-    stream = property(_getStream)
 
 
 

@@ -13,12 +13,12 @@
 '''
 Tools for creating timespans (fast, manipulatable objects) from Streams
 '''
+import unittest
+
 from music21.base import Music21Object
 from music21 import common
 from music21.tree import spans
 from music21.tree import trees
-
-
 
 def listOfTreesByClass(inputStream,
                        currentParentage=None,
@@ -108,7 +108,7 @@ def listOfTreesByClass(inputStream,
                 if flatten is not False: # True or semiFlat
                     outputTree.insert(subTree[:])
                 else:
-                    outputTree.insert(subTree)
+                    outputTree.insert(subTree.lowestPosition(), subTree)
             wasStream = True
             
         if not wasStream or flatten == 'semiFlat':
@@ -205,13 +205,30 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, usePo
                        outputTree=None):
         lastParentage = currentParentage[-1]
         
+        newOutputTree = False
         if outputTree is None:
             outputTree = treeClass(source=lastParentage)
+            newOutputTree = True
 
         # do this to avoid munging activeSites
         inputStreamElements = inputStream._elements[:] + inputStream._endElements
         parentEndTime = initialOffset + lastParentage.duration.quarterLength
 
+        if (newOutputTree and 
+                inputStream.isSorted and 
+                usePositions and # currently we can't populate for an OffsetTree
+                (inputStream.isFlat or flatten is False)):
+            # Can use tree.populateFromSortedList and speed up by an order of magnitude
+            if classList is None:
+                elementTupleList = [(e.sortTuple(inputStream), e) for e in inputStreamElements]
+            else:
+                elementTupleList = [(e.sortTuple(inputStream), e) for e in inputStreamElements 
+                                        if e.isClassOrSubclass(classList)]
+            outputTree.populateFromSortedList(elementTupleList)
+            return outputTree
+            
+            
+            
         for element in inputStreamElements:
             offset = lastParentage.elementOffset(element) + initialOffset
             
@@ -315,27 +332,45 @@ def convert(inputStream, flatten, classList):
                                         classLists=classLists)
     return listOfTimespanTrees[0]
 
-def flat(inputStream):
-    '''
-    Returns a timespan tree corresponding to a flat representation of the score.
-    
-    TODO: BUG: Why are these not flat offsets?
-    
-    >>> ex = tree.makeExampleScore()
-    >>> ts = tree.fromStream.flat(ex)
-    >>> ts
-    <OffsetTree {20} (0.0 to 2.0) <music21.stream.Score exampleScore>>
-    >>> ts[15], ts[15].offset
-    (<music21.note.Note F>, 1.0)
-    '''
-    classLists = [Music21Object]
-    listOfTimespanTrees = listOfTreesByClass(inputStream, 
-                                        initialOffset=0.0, 
-                                        flatten=True, 
-                                        classLists=classLists)
-    return listOfTimespanTrees[0]
+# def flat(inputStream):
+#     '''
+#     Returns a timespan tree corresponding to a flat representation of the score.
+#     
+#     TODO: BUG: Why are these not flat offsets?
+#     
+#     >>> ex = tree.makeExampleScore()
+#     >>> ts = tree.fromStream.flat(ex)
+#     >>> ts
+#     <OffsetTree {20} (0.0 to 2.0) <music21.stream.Score exampleScore>>
+#     >>> ts[15], ts[15].offset
+#     (<music21.note.Note F>, 1.0)
+#     '''
+#     classLists = [Music21Object]
+#     listOfTimespanTrees = listOfTreesByClass(inputStream, 
+#                                         initialOffset=0.0, 
+#                                         flatten=True, 
+#                                         classLists=classLists)
+#     return listOfTimespanTrees[0]
 
+#---------------------
+class Test(unittest.TestCase):
+    
+    def testFastPopulate(self):
+        from music21 import corpus
+        sf = corpus.parse('bwv66.6').flat
+        sfTree = sf.asTree()
+        #print(sfTree)
+
+        sf.isSorted = False
+        sf._cache = {}
+        sfTreeSlow = sf.asTree()
+        for i in range(len(sf)):
+            fasti = sfTree[i]
+            slowi = sfTreeSlow[i]
+            self.assertIs(fasti, slowi)
+
+#---------------------
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest()
+    music21.mainTest(Test) #, runTest='testFastPopulate')

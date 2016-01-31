@@ -352,7 +352,18 @@ class CTSong(object):
 
         self.text = pieceString
 
-    def _getTitle(self):
+    @property
+    def title(self):
+        '''
+        Get or set the title of the CTSong. If not specified 
+        explicitly but the clercq-Temperley text exists, 
+        this attribute searches first few lines of text file for title (a string preceded by a '%') 
+        if found, sets title attribute to this string and returns this title)
+        
+        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.textString)
+        >>> s.title
+        'Simple Gifts'        
+        '''
         if self._title not in (None, ''):
             return self._title
 
@@ -361,28 +372,10 @@ class CTSong(object):
         self._title = title
         return title
 
-    title = property(_getTitle, doc= '''
-        Get or set the title of the CTSong. If not specified 
-        explicitly but the clercq-Temperley text exists, 
-        this attribute searches first few lines of text file for title (a string preceded by a '%') 
-        if found, sets title attribute to this string and returns this title)
-        
-        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.textString)
-        >>> s.title
-        'Simple Gifts'
-        ''')
 
-    def _getComments(self):
-        comments = []
-        for line in self.lines[1:]:
-            if "%" in line:
-                if line.split()[0].endswith(':'):
-                    comments.append([ line.split()[0] , (line[line.index('%')+1:].strip()) ] )
-                else:
-                    comments.append([ line[line.index('%')+1:].strip() ])
-        return comments
-    
-    comments = property(_getComments, doc= r"""
+    @property
+    def comments(self):
+        r"""
         Get the comments list of all CTRule objects. 
     
         comments are stored as a list of comments, each comment on a line as a list. If the
@@ -405,22 +398,19 @@ class CTSong(object):
         >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.textString)
         >>> s.comments
         [['A wonderful shaker melody'], ['Vr:', 'incomplete verse'], ['S:', 'Not quite finished!']]
-        """)
-            
-
-    def _getRules(self):
-        if self._rules:
-            return self._rules
-
-        for line in self.lines:
-            ls = line.split()
-            if ls and ls[0].endswith(':'):
-                rule = CTRule(line, parent=self)
-                self._rules[rule.LHS] = rule
-
-        return self._rules
-
-    rules = property(_getRules, doc= '''
+        """
+        comments = []
+        for line in self.lines[1:]:
+            if "%" in line:
+                if line.split()[0].endswith(':'):
+                    comments.append([ line.split()[0] , (line[line.index('%')+1:].strip()) ] )
+                else:
+                    comments.append([ line[line.index('%')+1:].strip() ])
+        return comments
+                
+    @property
+    def rules(self):
+        '''
         Get the rules of a CTSong. the Rules is an OrderedDict of 
         objects of type CTRule. If only a textfile
         provided, this goes through text file and creates the 
@@ -437,11 +427,36 @@ class CTSong(object):
         ('Vr', <music21.CTRule.CTRule text="Vr: $BP*3 I IV | I |">)
         ('Br', <music21.CTRule.CTRule text="Br: IV | | I | IV I | IV | | ii | IV V |">)
         ('Co', <music21.CTRule.CTRule text="Co: R |*4 I |*4">)
-        ('S', <music21.CTRule.CTRule text="S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co">)
-        ''')
+        ('S', <music21.CTRule.CTRule text="S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co">)        
+        '''
+        if self._rules:
+            return self._rules
+
+        for line in self.lines:
+            ls = line.split()
+            if ls and ls[0].endswith(':'):
+                rule = CTRule(line, parent=self)
+                self._rules[rule.LHS] = rule
+
+        return self._rules
     
-    
-    def _getHomeTimeSig(self):
+    @property
+    def homeTimeSig(self):
+        r'''
+        gets the initial, or 'home', time signature in a song by looking at the 'S' substring
+        and returning the provided time signature. If not present, returns a default music21
+        time signature of 4/4
+        
+        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.textString)
+        >>> s.homeTimeSig
+        <music21.meter.TimeSignature 4/4>
+        
+        >>> change = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.changeIsGonnaCome)
+        >>> change.homeTimeSig
+        <music21.meter.TimeSignature 12/8>
+        >>> change.homeTimeSig.beatSequence
+        <MeterSequence {{1/8+1/8+1/8}+{1/8+1/8+1/8}+{1/8+1/8+1/8}+{1/8+1/8+1/8}}>
+        '''
         #look at 'S' Rule and grab the home time Signature
         if self.text and 'S:' in self.text:
             lines = self.text.split('\n')
@@ -458,24 +473,16 @@ class CTSong(object):
                             pass
         return self._homeTimeSig
     
-    homeTimeSig = property(_getHomeTimeSig, doc = r'''
-        gets the initial, or 'home', time signature in a song by looking at the 'S' substring
-        and returning the provided time signature. If not present, returns a default music21
-        time signature of 4/4
+    @property
+    def homeKeySig(self):
+        '''
+        gets the initial, or 'home', key signature by looking at the musictext and locating
+        the key signature at the start of the S: rule.
         
         >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.textString)
-        >>> s.homeTimeSig
-        <music21.meter.TimeSignature 4/4>
-        
-        >>> change = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.changeIsGonnaCome)
-        >>> change.homeTimeSig
-        <music21.meter.TimeSignature 12/8>
-        >>> change.homeTimeSig.beatSequence
-        <MeterSequence {{1/8+1/8+1/8}+{1/8+1/8+1/8}+{1/8+1/8+1/8}+{1/8+1/8+1/8}}>
-        ''')
-    
-
-    def _getHomeKeySig(self):
+        >>> s.homeKeySig
+        <music21.key.Key of A major>
+        '''
         #look at 'S' Rule and grab the home key Signature
         if self.text and 'S:' in self.text:
             lines = self.text.split('\n')
@@ -492,15 +499,6 @@ class CTSong(object):
                         else:
                             pass
         return self._homeKeySig
-    
-    homeKeySig = property(_getHomeKeySig, doc = '''
-        gets the initial, or 'home', key signature by looking at the musictext and locating
-        the key signature at the start of the S: rule.
-        
-        >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.textString)
-        >>> s.homeKeySig
-        <music21.key.Key of A major>
-        ''')
     
 
     def toScore(self, labelRomanNumerals=True, labelSubsectionsOnScore=True):
@@ -876,21 +874,21 @@ class CTRule(object):
         '$BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4'
         ''')
 
-    def _getComment(self):
-        if "%" in self.text:
-            return self.text[self.text.index('%')+1:].strip()
-        else:
-            return None
-                        
-    comment = property(_getComment,  doc= '''
+    @property
+    def comment(self):
+        '''
         Get the comment of a CTRule object.
         
         >>> rs = 'In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment'
         >>> s = romanText.clercqTemperley.CTRule(rs)
         >>> s.comment
         'This is a comment'
-        ''')
-
+        '''
+        if "%" in self.text:
+            return self.text[self.text.index('%')+1:].strip()
+        else:
+            return None
+                        
     def _setLHS(self, value):
         self._LHS = str(value)
          
@@ -919,8 +917,26 @@ class CTRule(object):
         'In'
         ''')
 
-
-    def _getSectionName(self):
+    @property
+    def sectionName(self):
+        '''
+        Returns the expanded version of the Left hand side (LHS) such as 
+        Introduction, Verse, etc. if
+        text present uses LHS to expand)
+        
+        Currently supported abbreviations: 
+        
+        * In: Introduction
+        * Br: Bridge
+        * Vr: Verse
+        * Ch: Chorus
+        * Fadeout: Fadeout
+        * S: Song
+        
+        >>> s = romanText.clercqTemperley.CTRule('Vr2: $BP*3 I IV | I |')
+        >>> s.sectionName
+        'Verse2'
+        '''
         sectionName = ""
         if 'In' in self.LHS:
             sectionName = 'Introduction' + self.LHS[2:]
@@ -939,25 +955,6 @@ class CTRule(object):
         else:
             sectionName = self.LHS
         return sectionName
-
-    sectionName = property(_getSectionName, doc= '''
-        Stores the expanded version of the Left hand side (LHS) such as 
-        Introduction, Verse, etc. if
-        text present uses LHS to expand)
-        
-        Currently supported abbreviations: 
-        
-        * In: Introduction
-        * Br: Bridge
-        * Vr: Verse
-        * Ch: Chorus
-        * Fadeout: Fadeout
-        * S: Song
-        
-        >>> s = romanText.clercqTemperley.CTRule('Vr2: $BP*3 I IV | I |')
-        >>> s.sectionName
-        'Verse2'
-        ''')
 
 
 #-------------------------------------------------------------------------------

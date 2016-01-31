@@ -394,6 +394,95 @@ class Sites(common.SlottedObject):
         self.siteDict = collections.OrderedDict([(None, _NoneSiteRef),])
         self._lastID = -1  # cannot be None
 
+    def yieldSites(self, 
+                   sortByCreationTime=False, 
+                   priorityTarget=None,
+                   excludeNone=False):
+        '''
+        Yield references; order, based on dictionary keys, is from most 
+        recently added to least recently added.
+        
+        The `sortByCreationTime` option will sort objects by creation time,
+        where most-recently assigned objects are returned first. 
+        Can be [False, other], [True, 1] or ['reverse', -1]
+        
+        Note that priorityTarget is searched only on id -- this could be dangerous if the
+        target has been garbage collected and the id is reused. Unlikely since you gotta
+        pass in the priorityTarget itself so therefore it still exists...
+        
+        This can be much faster than .get in the case where the sought-for site
+        is earlier in the list.
+
+        >>> class Mock(base.Music21Object):
+        ...     def __init__(self, idEl):
+        ...         self.id = idEl
+        ...
+        >>> aObj = Mock('a')
+        >>> bObj = Mock('b')
+        >>> cObj = Mock('c')
+        >>> aSites = sites.Sites()
+        >>> aSites.add(cObj) 
+        >>> aSites.add(aObj)
+        >>> aSites.add(bObj)
+        
+        Returns a generator (The ellipsis in the repr here is 
+        because Python 3.5 gives a fully qualified name to a generator object):
+
+        
+        >>> ys = aSites.yieldSites()
+        >>> ys
+        <generator object ...yieldSites at 0x1058085e8>        
+        
+        That's no help, so iterate over it instead...
+        
+        >>> for s in aSites.yieldSites(sortByCreationTime=True, excludeNone=True):
+        ...     print(s.id)
+        b
+        a
+        c
+        
+        With priorityTarget
+        
+        >>> for s in aSites.yieldSites(sortByCreationTime=True, priorityTarget=cObj, 
+        ...                            excludeNone=True):
+        ...     print(s.id)
+        c
+        b
+        a
+        
+        *changed drammatically from the unused version in v.3*
+        '''
+        if sortByCreationTime is True:
+            keyRepository = self._keysByTime(newFirst=True)
+        # reverse creation time puts oldest elements first
+        elif sortByCreationTime == 'reverse':
+            keyRepository = self._keysByTime(newFirst=False)
+        else:  # None, or False
+            keyRepository = list(self.siteDict.keys())
+
+        if priorityTarget is not None:
+            priorityId = id(priorityTarget)
+            if priorityId in keyRepository:
+                #environLocal.printDebug(['priorityTarget found in post:', priorityTarget])
+                # extract object and make first
+                keyRepository.insert(0, keyRepository.pop(keyRepository.index(priorityId)))
+            
+
+        # get each dict from all defined contexts
+        for key in keyRepository:
+            siteRef = self.siteDict[key]
+            # check for None object; default location, not a weakref, keep
+            if siteRef.site is None:
+                if not excludeNone:
+                    yield siteRef.site
+            else:
+                obj = siteRef.site
+                if obj is None:  # dead ref
+                    siteRef.isDead = True
+                else:
+                    yield obj
+
+
     def get(self, 
             sortByCreationTime=False,
             priorityTarget=None, 
@@ -429,97 +518,24 @@ class Sites(common.SlottedObject):
         >>> aSites.get(sortByCreationTime=True) == [bObj, aObj, cObj, None]
         True
 
+        Priority target
+
+        >>> begotten = aSites.get(sortByCreationTime=True, priorityTarget=cObj, excludeNone=True) 
+        >>> begotten == [cObj, bObj, aObj]
+        True
+
+
         '''
-        if sortByCreationTime is True:
-            keyRepository = self._keysByTime(newFirst=True)
-        # reverse creation time puts oldest elements first
-        elif sortByCreationTime == 'reverse':
-            keyRepository = self._keysByTime(newFirst=False)
-        else:  # None, or False
-            keyRepository = self.siteDict
+        post = list(self.yieldSites(sortByCreationTime, priorityTarget, excludeNone))
 
-        post = []
-
-        # get each dict from all defined contexts
-        for key in keyRepository:
-            siteRef = self.siteDict[key]
-            # check for None object; default location, not a weakref, keep
-            if siteRef.site is None:
-                if not excludeNone:
-                    post.append(siteRef.site)
-            else:
-                obj = siteRef.site
-                if obj is None:  # dead ref
-                    siteRef.isDead = True
-                else:
-                    post.append(obj)
-
-
+        # we do this resorting again, because the priority target might not match id and we
+        # want to be extra safe.  If you want fast, use .yieldSites
         if priorityTarget is not None:
             if priorityTarget in post:
                 #environLocal.printDebug(['priorityTarget found in post:', priorityTarget])
                 # extract object and make first
                 post.insert(0, post.pop(post.index(priorityTarget)))
         return post
-
-    @common.deprecated('December 2015', 'February 2015', 'Unused and should not be needed')
-    def getAllByClass(self, className, found=None, idFound=None, memo=None):
-        '''
-        Return all known references of a given class found in any association
-        with this Sites object.
-
-        This will recursively search the defined contexts of existing defined
-        contexts, and return a list of all objects that match the given class.
-
-        >>> class Mock(base.Music21Object):
-        ...    pass
-        ...
-        >>> class Mocker(base.Music21Object):
-        ...    pass
-        ...
-        >>> aObj = Mock()
-        >>> bObj = Mock()
-        >>> cObj = Mocker()
-        >>> dc = sites.Sites()
-        >>> dc.add(aObj)
-        >>> dc.add(bObj)
-        >>> dc.add(cObj)
-        >>> dc.getAllByClass(Mock) == [aObj, bObj]
-        True
-
-        A string (case insensitive) can also be used:
-        
-        >>> dc.getAllByClass("mock") == [aObj, bObj]
-        True
-        '''
-        if memo is None:
-            memo = {} # intialize
-        if found is None:
-            found = []
-
-        objs = self.get()
-        for obj in objs:
-            #environLocal.printDebug(['memo', memo])
-            if obj is None:
-                continue # in case the reference is dead
-            if common.isStr(className):
-                if type(obj).__name__.lower() == className.lower():
-                    found.append(obj)
-            elif isinstance(obj, className):
-                found.append(obj)
-        for obj in objs:
-            if obj is None:
-                continue # in case the reference is dead
-            # if after trying to match name, look in the defined contexts'
-            # defined contexts [sic!]
-            if id(obj) not in memo:
-                # if the object is a Musci21Object
-                #if hasattr(obj, 'getContextByClass'):
-                # store this object as having been searched
-                memo[id(obj)] = obj
-                # will add values to found
-        # returning found, but not necessary
-        return found
 
     def getAttrByName(self, attrName):
         '''
@@ -725,62 +741,6 @@ class Sites(common.SlottedObject):
         # may want to convert to tuple to avoid user editing?
         return set(self.siteDict.keys())
 
-    def getSites(self, idExclude=None, excludeNone=False):
-        '''
-        Get all Site objects in .siteDict that are locations (that is, generally, Streams). 
-        Note that this unwraps all sites from weakrefs and is thus an expensive operation.
-
-        Order is newest site first.
-
-        >>> class Mock(base.Music21Object):
-        ...     pass
-        ...
-        >>> aObj = Mock()
-        >>> bObj = Mock()
-        >>> aSites = sites.Sites()
-        >>> aSites.add(aObj)
-        >>> aSites.add(bObj)
-        >>> len(aSites.getSites())
-        3
-        >>> len(aSites.getSites(excludeNone=True))
-        2
-
-        >>> len(aSites.getSites(idExclude=[id(aObj)]))
-        2
-        >>> len(aSites.getSites(idExclude=[id(aObj), id(bObj)], excludeNone=True))
-        0
-        
-        :rtype: list(music21.stream.Stream)
-        '''
-        return list(self.yieldSites(idExclude, excludeNone))
-
-    def yieldSites(self, idExclude=None, excludeNone=False):
-        '''
-        Same as getSites() but returns a generator.
-        '''
-        if excludeNone is False:
-            yield None
-        
-        # orderedDict oldest first...
-        for idKey in self.siteDict:
-            if idKey is None:
-                continue
-            if idExclude is not None and idKey in idExclude:
-                continue
-
-            siteRef = self.siteDict[idKey]
-            # skip dead references
-            if siteRef.isDead:
-                continue
-
-            try:
-                objRef = siteRef.site
-            except KeyError:
-                raise SitesException('no such site: %s' % idKey)
-            if objRef is None:
-                siteRef.isDead = True
-                continue
-            yield objRef
 
     def getSitesByClass(self, className):
         '''

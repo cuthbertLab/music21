@@ -553,6 +553,7 @@ class MusicXMLImporter(XMLParserBase):
             p.definesExplicitSystemBreaks = self.definesExplicitSystemBreaks
             p.definesExplicitPageBreaks = self.definesExplicitPageBreaks
         
+        s.sort() # do this now so that if the file is cached, we can cache that it's sorted.
         if inputM21 is None:
             return s
 
@@ -869,11 +870,10 @@ class PartParser(XMLParserBase):
         
         self.appendToScoreAfterParse = True
 
-    def _getParent(self):
+    @property
+    def parent(self):
         return common.unwrapWeakref(self._parent)
 
-    parent = property(_getParent)
-    
     def parse(self):
         self.parsePartInfo()
         self.parseMeasures()
@@ -2665,6 +2665,7 @@ class MeasureParser(XMLParserBase):
                     useVoice = 1
             else:
                 useVoice = useVoice.text.strip()
+                
             try:
                 thisVoice = m.voices[useVoice]
             except stream.StreamException:
@@ -4219,7 +4220,7 @@ class Test(unittest.TestCase):
                             #forceSource=True
                             )
         #c = corpus.parse('demos/layoutTest.xml')        
-        layouts = c.flat.getElementsByClass('LayoutBase')
+        layouts = c.flat.getElementsByClass('LayoutBase').stream()
         systemLayouts = layouts.getElementsByClass('SystemLayout')
         self.assertEqual(len(systemLayouts), 42)
         staffLayouts = layouts.getElementsByClass('StaffLayout')
@@ -4259,7 +4260,7 @@ class Test(unittest.TestCase):
                             #forceSource=True
                             )
         #c = corpus.parse('demos/layoutTest.xml')        
-        layouts = c.flat.getElementsByClass('LayoutBase')
+        layouts = c.flat.getElementsByClass('LayoutBase').stream()
         self.assertEqual(len(layouts), 76)
         systemLayouts = layouts.getElementsByClass('SystemLayout')
         sl0 = systemLayouts[0]

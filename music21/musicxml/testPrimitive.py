@@ -17919,21 +17919,21 @@ class Test(unittest.TestCase):
             clef.TrebleClef(), note.Note("C4")]:
             orig_stream[1].append(item)
 
-        orig_clefs = [staff.flat.getElementsByClass('Clef') for staff in
+        orig_clefs = [staff.flat.getElementsByClass('Clef').stream() for staff in
             orig_stream.getElementsByClass('Part')]
 
         xml = musicxml.m21ToString.fromStream(orig_stream)
 
         new_stream = converter.parse(xml)
-        new_clefs = [staff.flat.getElementsByClass('Clef') for staff in
+        new_clefs = [staff.flat.getElementsByClass('Clef').stream() for staff in
             new_stream.getElementsByClass('Part')]
 
         self.assertEqual([len(clefs) for clefs in new_clefs],
-          [len(clefs) for clefs in orig_clefs])
+                         [len(clefs) for clefs in orig_clefs])
         self.assertEqual([c.offset for c in new_clefs],
-          [c.offset for c in orig_clefs])
+                         [c.offset for c in orig_clefs])
         self.assertEqual([c.classes for c in new_clefs],
-          [c.classes for c in orig_clefs])
+                         [c.classes for c in orig_clefs])
 
 #-------------------------------------------------------------------------------
 

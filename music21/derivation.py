@@ -201,9 +201,9 @@ class Derivation(SlottedObject):
         >>> s1.id = 's1'
         >>> s1.repeatAppend(note.Note(), 10)
         >>> s1.repeatAppend(note.Rest(), 10)
-        >>> s2 = s1.getElementsByClass('GeneralNote')
+        >>> s2 = s1.getElementsByClass('GeneralNote').stream()
         >>> s2.id = 's2'
-        >>> s3 = s2.getElementsByClass('Note')
+        >>> s3 = s2.getElementsByClass('Note').stream()
         >>> s3.id = 's3'
         >>> for y in s3.derivation.chain():
         ...     print(y)
@@ -228,7 +228,7 @@ class Derivation(SlottedObject):
         >>> s.derivation.method is None
         True
 
-        >>> sNotes = s.notes
+        >>> sNotes = s.notes.stream()
         >>> sNotes.derivation.method
         'notes'
         '''
@@ -286,8 +286,8 @@ class Derivation(SlottedObject):
         >>> s1 = stream.Stream()
         >>> s1.repeatAppend(note.Note(), 10)
         >>> s1.repeatAppend(note.Rest(), 10)
-        >>> s2 = s1.getElementsByClass('GeneralNote')
-        >>> s3 = s2.getElementsByClass('Note')
+        >>> s2 = s1.getElementsByClass('GeneralNote').stream()
+        >>> s3 = s2.getElementsByClass('Note').stream()
         >>> s3.derivation.rootDerivation is s1
         True
         '''

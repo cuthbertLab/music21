@@ -11,10 +11,9 @@
 #-------------------------------------------------------------------------------
 
 # this requires pylint to be installed and available from the command line
-
-import multiprocessing
 import sys
 
+from music21 import common
 from music21.test import commonTest
 
 try:
@@ -49,10 +48,8 @@ def main(fnAccept=None):
     '''
     `fnAccept` is a list of one or more files to test.  Otherwise runs all.
     '''
-    poolSize = multiprocessing.cpu_count() # @UndefinedVariable
-    if poolSize > 2:
-        poolSize = poolSize - 1
-
+    poolSize = common.cpus()
+    
     if pylintRun is None:
         print("make sure that 'sudo pip install pylint' is there. exiting.")
         return 

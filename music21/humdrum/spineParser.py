@@ -707,7 +707,8 @@ class HumdrumDataCollection(object):
         if appendList:
             self.stream.elementsChanged()
 
-    def _getStream(self):
+    @property
+    def stream(self):
         if self._storedStream is not None:
             return self._storedStream
         if self.parsedLines is False:
@@ -732,7 +733,6 @@ class HumdrumDataCollection(object):
             self._storedStream = masterStream
             return masterStream
 
-    stream = property(_getStream)
 
 class HumdrumFile(HumdrumDataCollection):
     '''

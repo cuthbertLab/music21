@@ -2229,7 +2229,7 @@ def streamPartToMx(part, instStream=None, meterStream=None,
     # get a stream of measures
     # if flat is used here, the Measure is not obtained
     # may need to be semi flat?
-    measureStream = part.getElementsByClass('Measure')
+    measureStream = part.getElementsByClass('Measure').stream()
     if len(measureStream) == 0:
         part.makeMutable() # must mutate
         # try to add measures if none defined
@@ -2237,7 +2237,7 @@ def streamPartToMx(part, instStream=None, meterStream=None,
         part.makeNotation(meterStream=meterStream,
                         refStreamOrTimeRange=refStreamOrTimeRange,
                         inPlace=True)
-        measureStream = part.getElementsByClass('Measure')
+        measureStream = part.getElementsByClass('Measure').stream()
 
         #environLocal.printDebug(['Stream.streamPartToMx: post makeNotation, length', len(measureStream)])
 
@@ -2368,7 +2368,7 @@ def streamToMx(s, spannerBundle=None):
                     sortByCreationTime=True, returnDefault=True)
 
     # get all text boxes
-    textBoxes = s.flat.getElementsByClass('TextBox')
+    textBoxes = s.flat.getElementsByClass('TextBox').stream()
 
     # we need independent sub-stream elements to shift in presentation
     highestTime = 0
@@ -2382,7 +2382,7 @@ def streamToMx(s, spannerBundle=None):
 
     if s.hasPartLikeStreams():
         #environLocal.printDebug('streamToMx(): interpreting multipart')
-        streamOfStreams = s.getElementsByClass('Stream')
+        streamOfStreams = s.getElementsByClass('Stream').stream()
         for obj in streamOfStreams:
             # may need to copy element here
             # apply this streams offset to elements

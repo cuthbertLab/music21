@@ -288,13 +288,13 @@ class Corpus(object):
         Search this corpus for metadata entries, returning a metadataBundle
 
         >>> corpus.corpora.CoreCorpus().search('3/4')
-        <music21.metadata.bundles.MetadataBundle {1866 entries}>
+        <music21.metadata.bundles.MetadataBundle {1842 entries}>
 
         >>> corpus.corpora.CoreCorpus().search(
         ...      'bach',
         ...      field='composer',
         ...      )
-        <music21.metadata.bundles.MetadataBundle {21 entries}>
+        <music21.metadata.bundles.MetadataBundle {22 entries}>
 
         >>> predicate = lambda noteCount: noteCount < 20
         >>> corpus.corpora.CoreCorpus().search(
@@ -348,7 +348,7 @@ class Corpus(object):
 
         >>> from music21 import corpus
         >>> corpus.corpora.CoreCorpus().metadataBundle
-        <music21.metadata.bundles.MetadataBundle 'core': {144... entries}>
+        <music21.metadata.bundles.MetadataBundle 'core': {140... entries}>
 
         As a technical aside, the metadata bundle for a corpus is actually
         stored in corpus.manager, in order to cache most effectively over

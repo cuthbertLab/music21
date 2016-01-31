@@ -70,62 +70,6 @@ allowableStrettoIntervals = {
 _validMensuralTypes = [None,'maxima', 'longa', 'brevis', 'semibrevis', 'minima', 'semiminima']
 _validMensuralAbbr = [None, 'Mx', 'L', 'B', 'SB', 'M', 'SM']
 
-#===============================================================================
-# def _getTargetBeforeOrAtObj(music21Obj, targetClassList):
-#    '''
-#    Takes two arguments: music21Obj, targetObj
-#    If music21Obj has some set of contexts, returns the list of
-#     object of class targetClass at or before music21Obj.
-#    If no such instance exists, of if the only context is None, returns None.
-#    NOTE: This has no other use than to act as an alternate way of 
-#    getting the closest instance of a mensuration or divisione for 
-#    :class:`music21.medren.GeneralMensuralNote`. 
-#    
-#    
-#    >>> n = note.Note('A')
-#    >>> medren._getTargetBeforeOrAtObj(n, note.Note)
-#    []
-#    >>> n_1 = note.Note('B')
-#    >>> n_1.duration = duration.Duration(2.5)
-#    >>> n_2 = note.Note('C')
-#    >>> n_2.duration = duration.Duration(0.5)
-#    >>> s_1 = stream.Stream()
-#    >>> s_1.append(n_1)
-#    >>> s_1.append(n)
-#    >>> s_1.append(n_2)
-#    >>> medren._getTargetBeforeOrAtObj(n, note.Note)
-#    [<music21.note.Note B>, <music21.note.Note A>]
-#    >>> n_3 = note.Note('D')
-#    >>> n_3.duration = duration.Duration(1.0)
-#    >>> n_4 = note.Note('E')
-#    >>> n_4.duration = duration.Duration(1.5)
-#    >>> m = stream.Measure()
-#    >>> m.append(n_3)
-#    >>> m.append(n)
-#    >>> s = stream.Score()
-#    >>> s.append(n_4)
-#    >>> s.append(meter.TimeSignature())
-#    >>> s.append(m)
-#    >>> medren._getTargetBeforeOrAtObj(n, meter.TimeSignature)
-#    [<music21.meter.TimeSignature 4/4>]
-#    '''
-#    #Get contacts by class
-#    #Improve efficiency
-#    cList = []
-#    
-#    if not isinstance(targetClassList, list):
-#        targetClassList = [targetClassList]
-#    
-#    tempSites = music21Obj.getSites()[1:]
-#    if len(tempSites) > 0:
-#        for s in tempSites:
-#            for i in range(int(s.lowestOffset), int(s.elementOffset(music21Obj))+1):
-#                cList += list(s.getElementsByOffset(i, i+1, classList = 
-#                        targetClassList).recurse())[1:]
-#        cList += music21.medren._getTargetBeforeOrAtObj(s, targetClassList)
-#    
-#    return list(set(cList))
-#===============================================================================
 
 #---------------------------------------------------------------------------------
 class MensuralClef(clef.Clef):
@@ -164,16 +108,16 @@ class MensuralClef(clef.Clef):
     line = property(_getLine, _setLine,
                     doc = '''The staff line the clef resides on''')
     
-    def _getFontString(self):
+    @property
+    def fontString(self):
+        '''Returns the utf-8 code corresponding to the 
+                              mensural clef in Ciconia font'''
         if self.sign == 'C':
             self._fontString = '0x4b'
         else:
             self._fontString = '0x5c'
         return self._fontString
-    
-    fontString = property(_getFontString, 
-                          doc = '''Returns the utf-8 code corresponding to the 
-                              mensural clef in Ciconia font''')
+
 
 class Mensuration(meter.TimeSignature):
     '''
@@ -257,21 +201,21 @@ class Mensuration(meter.TimeSignature):
                                 8
                                 ''')
     
-    def _getFontString(self):
+    @property
+    def fontString(self):
+        '''
+        The utf-8 code corresponding to the mensuration character in Ciconia font 
+          
+        TODO: Convert to SMuFL
+        
+        >>> from music21.alpha import medren
+        
+        >>> O = medren.Mensuration('imperfect', 'major')
+        >>> O.fontString
+        '0x4f'
+        '''
         return self._fontString
-    
-    fontString = property(_getFontString, 
-                          doc = '''
-                          The utf-8 code corresponding to the mensuration character in Ciconia font 
-                            
-                          TODO: Convert to SMuFL
-                          
-                          >>> from music21.alpha import medren
-                          
-                          >>> O = medren.Mensuration('imperfect', 'major')
-                          >>> O.fontString
-                          '0x4f'
-                          ''')
+
 #    def _getScalingFactor(self):
 #        return self._scalingFactor
     
@@ -675,30 +619,31 @@ class MensuralRest(GeneralMensuralNote, note.Rest):
     def __repr__(self):
         return '<music21.medren.MensuralRest %s>' % self.mensuralType  
     
-    def _getFullName(self):
+    @property
+    def fullName(self):
         msg = []
         msg.append(self.mensuralType)
         msg.append(' rest')
         return ''.join(msg)
        
-    fullName = property(_getFullName)
-    
-    def _getFontString(self):
+    @property
+    def fontString(self):
+        ''' 
+        The utf-8 code corresponding to the mensural rest 
+        in Ciconia font.
+
+        Note that there is no character for a semiminima rest yet.
+                            
+        TODO: Replace w/ SMuFL
+        
+        >>> from music21.alpha import medren
+        
+        >>> mr = medren.MensuralRest('SB')
+        >>> mr.fontString
+        '0x32'
+        '''
         return self._fontString
     
-    fontString  = property(_getFontString,
-                           doc = ''' The utf-8 code corresponding to the mensural rest 
-                            in Ciconia font.
-                            Note that there is no character for a semiminima rest yet.
-                            
-                            TODO: Replace w/ SMuFL
-                            
-                            >>> from music21.alpha import medren
-                            
-                            >>> mr = medren.MensuralRest('SB')
-                            >>> mr.fontString
-                            '0x32'
-                            ''')
 
 class MensuralNote(GeneralMensuralNote, note.Note):
     '''
@@ -791,15 +736,41 @@ class MensuralNote(GeneralMensuralNote, note.Note):
                                         sorted(list(set(other.articulations))) )
         return eq
     
-    def _getFullName(self):
+    @property
+    def fullName(self):
         msg = []
         msg.append(self.mensuralType)
         msg.append(' %s ' % self.pitch.fullName)
         return ''.join(msg)
     
-    fullName = property(_getFullName)
-    
-    def _getFontString(self):
+    @property
+    def fontString(self):
+        '''
+        The utf-8 code corresponding to a mensural note in Ciconia font.
+        Note that semiminima with a left flag on the upper stem 
+        and any flag on the lower stem, semiminima with a right flag on the 
+        upperstem and on the lowerstem, and any red or unfilled notes with 
+        sidestems have no corresponding characters in the Cicionia font.
+        
+        TODO: Replace with SMuFL
+        
+        >>> from music21.alpha import medren
+        
+        >>> mn = medren.MensuralNote('A', 'M')
+        >>> mn.setStem('down')
+        >>> mn.fontString
+        '0x44'
+        >>> mn.setFlag('down', 'right')
+        >>> mn.fontString
+        '0x47'
+        >>> mn.setFlag('down', None)
+        >>> mn.setStem(None)
+        >>> mn.fontString
+        '0x4d'
+        >>> mn.color = 'red'
+        >>> mn.fontString
+        '0x6d'        
+        '''
         if self.mensuralType == 'maxima':
             self._fontString = '0x58'
         elif self.mensuralType == 'Longa':
@@ -845,35 +816,7 @@ class MensuralNote(GeneralMensuralNote, note.Note):
         
         return self._fontString
     
-    fontString = property(_getFontString, 
-                          doc = ''' The utf-8 code corresponding to a mensural note in Ciconia font.
-                          Note that semiminima with a left flag on the upper stem 
-                          and any flag on the lower stem, semiminima with a right flag on the 
-                          upperstem and on the lowerstem, and any red or unfilled notes with 
-                          sidestems have no corresponding characters in the Cicionia font.
-                        
-                        
-                          TODO: Replace with SMuFL
-                          
-                        
-                          >>> from music21.alpha import medren
-                          
-                          >>> mn = medren.MensuralNote('A', 'M')
-                          >>> mn.setStem('down')
-                          >>> mn.fontString
-                          '0x44'
-                          >>> mn.setFlag('down', 'right')
-                          >>> mn.fontString
-                          '0x47'
-                          >>> mn.setFlag('down', None)
-                          >>> mn.setStem(None)
-                          >>> mn.fontString
-                          '0x4d'
-                          >>> mn.color = 'red'
-                          >>> mn.fontString
-                          '0x6d'
-                          ''')
-    
+
     def _setMensuralType(self, mensuralTypeOrAbbr):
         GeneralMensuralNote._setMensuralType(self, mensuralTypeOrAbbr)
         
@@ -1187,44 +1130,44 @@ class Ligature(base.Music21Object):
     pitches = property(_getPitches, _setPitches,
                        doc = '''A list of pitches comprising the ligature''')
     
-    def _getNotes(self):
+    @property
+    def notes(self):
+        '''
+        Returns the ligature as a list of mensural notes
+        
+        >>> from music21.alpha import medren
+        
+        >>> l = medren.Ligature(['A4','B4'])
+        >>> print([n.mensuralType for n in l.notes])
+        ['brevis', 'brevis']
+        >>> l.makeOblique(0)
+        >>> print([n.mensuralType for n in l.notes])
+        ['longa', 'brevis']
+        >>> l = medren.Ligature(['B4','A4'])
+        >>> print([n.mensuralType for n in l.notes])
+        ['longa', 'longa']
+        >>> l.makeOblique(0)
+        >>> print([n.mensuralType for n in l.notes])
+        ['longa', 'brevis']
+        >>> l.setStem(0, 'down','left')
+        >>> print([n.mensuralType for n in l.notes])
+        ['brevis', 'brevis']
+        >>> l = medren.Ligature(['G4','A4','B4','A4'])
+        >>> l.setStem(2, 'up','left')
+        >>> print([n.mensuralType for n in l.notes])
+        ['brevis', 'brevis', 'semibrevis', 'semibrevis']
+        >>> l = medren.Ligature(['B4','A4','G4','A4','G4','A4','F4'])
+        >>> l.makeOblique(0)
+        >>> l.makeOblique(4)
+        >>> l.setStem(2, 'down', 'left')
+        >>> l.setStem(4, 'up','left')
+        >>> l.setMaxima(6, True)
+        >>> print([n.mensuralType for n in l.notes])
+        ['longa', 'brevis', 'longa', 'brevis', 'semibrevis', 'semibrevis', 'maxima']
+        '''
         if self._notes == []:
             self._notes = self._expandLigature()
         return self._notes
-    
-    notes = property(_getNotes,
-                     doc = '''Returns the ligature as a list of mensural notes
-                     
-                     >>> from music21.alpha import medren
-                     
-                     >>> l = medren.Ligature(['A4','B4'])
-                     >>> print([n.mensuralType for n in l.notes])
-                     ['brevis', 'brevis']
-                     >>> l.makeOblique(0)
-                     >>> print([n.mensuralType for n in l.notes])
-                     ['longa', 'brevis']
-                     >>> l = medren.Ligature(['B4','A4'])
-                     >>> print([n.mensuralType for n in l.notes])
-                     ['longa', 'longa']
-                     >>> l.makeOblique(0)
-                     >>> print([n.mensuralType for n in l.notes])
-                     ['longa', 'brevis']
-                     >>> l.setStem(0, 'down','left')
-                     >>> print([n.mensuralType for n in l.notes])
-                     ['brevis', 'brevis']
-                     >>> l = medren.Ligature(['G4','A4','B4','A4'])
-                     >>> l.setStem(2, 'up','left')
-                     >>> print([n.mensuralType for n in l.notes])
-                     ['brevis', 'brevis', 'semibrevis', 'semibrevis']
-                     >>> l = medren.Ligature(['B4','A4','G4','A4','G4','A4','F4'])
-                     >>> l.makeOblique(0)
-                     >>> l.makeOblique(4)
-                     >>> l.setStem(2, 'down', 'left')
-                     >>> l.setStem(4, 'up','left')
-                     >>> l.setMaxima(6, True)
-                     >>> print([n.mensuralType for n in l.notes])
-                     ['longa', 'brevis', 'longa', 'brevis', 'semibrevis', 'semibrevis', 'maxima']
-                     ''')
         
     def _ligatureLength(self):
         return len(self.pitches)

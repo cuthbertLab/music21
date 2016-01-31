@@ -64,18 +64,17 @@ def chordified(timespans, templateStream=None):
     if not isinstance(timespans, trees.TimespanTree):
         raise trees.TimespanTreeException('Needs a TimespanTree to run')
     if isinstance(templateStream, stream.Stream):
-        templateOffsets = sorted(templateStream.measureOffsetMap())
+        mos = templateStream.measureOffsetMap()
+        templateOffsets = list(mos)
         templateOffsets.append(templateStream.duration.quarterLength)
         if hasattr(templateStream, 'parts') and templateStream.iter.parts:
-            outputStream = templateStream.iter.parts[0].measureTemplate(
-                fillWithRests=False)
+            outputStream = templateStream.iter.parts[0].measureTemplate(fillWithRests=False)
         else:
-            outputStream = templateStream.measureTemplate(
-                fillWithRests=False)
+            outputStream = templateStream.measureTemplate(fillWithRests=False)
         timespans = timespans.copy()
         timespans.splitAt(templateOffsets)
         measureIndex = 0
-        allTimePoints = timespans.allTimePoints + tuple(templateOffsets)
+        allTimePoints = timespans.allTimePoints() + tuple(templateOffsets)
         allTimePoints = sorted(set(allTimePoints))
         for offset, endTime in zip(allTimePoints, allTimePoints[1:]):
             while templateOffsets[1] <= offset:
@@ -91,7 +90,7 @@ def chordified(timespans, templateStream=None):
             outputStream[measureIndex].append(element)
         return outputStream
     else:
-        allTimePoints = timespans.allTimePoints
+        allTimePoints = timespans.allTimePoints()
         elements = []
         for offset, endTime in zip(allTimePoints, allTimePoints[1:]):
             vert = timespans.getVerticalityAt(offset)

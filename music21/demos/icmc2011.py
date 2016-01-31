@@ -30,6 +30,9 @@ class Test(unittest.TestCase):
 
 
     def testStreams01(self):
+        '''
+        Basic stream issues
+        '''
         #from music21 import note, stream, clef, metadata, spanner
 
 
@@ -38,8 +41,6 @@ class Test(unittest.TestCase):
 
         n1 = note.Note('g3', type='half')
         n2 = note.Note('d4', type='half')
-        n3 = note.Note('g#3', quarterLength=0.5)
-        n4 = note.Note('d-4', quarterLength=3.5)
         cf1 = clef.AltoClef()
         
         m1 = stream.Measure(number=1)
@@ -56,6 +57,9 @@ class Test(unittest.TestCase):
         assert m1.index(n2) == 2
         # can find an element based on a given offset
         assert m1.getElementAtOrBefore(3) == n2 
+
+        n3 = note.Note('g#3', quarterLength=0.5)
+        n4 = note.Note('d-4', quarterLength=3.5)
         
         m2 = stream.Measure(number=2)
         m2.append([n3, n4])
@@ -104,7 +108,7 @@ class Test(unittest.TestCase):
         assert n2.getOffsetBySite(m1) == 2.0
         assert n2.getOffsetBySite(s2) == 10
         # the None site provides a default offset
-        assert set(n2.sites.getSites()) == set([None, m1, s2, s3])
+        assert set(n2.sites.get()) == set([None, m1, s2, s3])
         # the same instance is found in all Streams
         assert m1.hasElement(n2) == True
         assert s2.hasElement(n2) == True
@@ -180,7 +184,7 @@ class Test(unittest.TestCase):
 
 
         # get the Clef object, and report its sign, from Measure 1
-        assert m1.getElementsByClass('Clef')[0].sign == 'C'
+        assert m1.getElementsByClass('Clef').stream()[0].sign == 'C'
         # collect into a list the sign of all clefs in the flat Score
         assert [cf.sign for cf in s1.flat.getElementsByClass('Clef')] == ['C', 'F']
         
@@ -194,17 +198,17 @@ class Test(unittest.TestCase):
         
         # get all pitch names
         match = []
-        for e in s1.flat.getElementsByClass('Note'):
+        for e in s1.flat.getElementsByClass('Note').stream():
             match.append(e.pitch.nameWithOctave)
         assert match == ['G3', 'C4', 'G#3', 'A#1', 'D-4', 'B2']
         
         # collect all Notes and transpose up a perfect fifth
-        for n in s1.flat.getElementsByClass('Note'):
+        for n in s1.flat.getElementsByClass('Note').stream():
             n.transpose('P5', inPlace=True)
         
         # check that all pitches are correctly transposed
         match = []
-        for e in s1.flat.getElementsByClass('Note'):
+        for e in s1.flat.getElementsByClass('Note').stream():
             match.append(e.pitch.nameWithOctave)    
         assert match == ['D4', 'G4', 'D#4', 'E#2', 'A-4', 'F#3']
         
@@ -220,7 +224,7 @@ class Test(unittest.TestCase):
         # Searching by Locations and Contexts
 
         # a Note can always find a Clef
-        assert n4.getContextByClass('Clef') == cf1
+        self.assertIs(n4.getContextByClass('Clef'), cf1)
         # must search oldest sites first
         assert n6.getContextByClass('Clef', sortByCreationTime='reverse') == cf2
         
@@ -291,7 +295,7 @@ class Test(unittest.TestCase):
         nEnd = None
         
         ex = corpus.parse('luca/gloria').parts['cantus'].measures(1,11)        
-        exFlatNotes = ex.flat.notesAndRests
+        exFlatNotes = ex.flat.notesAndRests.stream()
         nLast = exFlatNotes[-1]
         
         for i, n in enumerate(exFlatNotes):
@@ -752,7 +756,7 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     import music21
     import sys
-    sys.argv.append('hi')
+    #sys.argv.append('hi')
 
     if len(sys.argv) == 1: # normal conditions
         music21.mainTest(Test)
