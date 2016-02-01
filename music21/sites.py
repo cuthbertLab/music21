@@ -113,9 +113,15 @@ class SiteRef(common.SlottedObject):
                 self.siteWeakref = None
             else:
                 siteIdValue = str(id(currentSite)) + "_" + str(_singletonCounter())
-                GLOBAL_SITE_STATE_DICT[siteIdValue] = currentSite
+                try:
+                    GLOBAL_SITE_STATE_DICT[siteIdValue] = currentSite
+                except TypeError:
+                    raise TypeError("This str screwed up everything: {}".format(currentSite))
                 self.siteWeakref = siteIdValue
-        return common.SlottedObject.__getstate__(self)
+        returnState = common.SlottedObject.__getstate__(self)
+        if WEAKREF_ACTIVE and currentSite is not None:
+            self.site = currentSite
+        return returnState
 
     ## called on unpickling
     def __setstate__(self, state):
