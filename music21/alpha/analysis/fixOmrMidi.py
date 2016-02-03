@@ -3,12 +3,56 @@ Created on Jan 31, 2016
 
 @author: Emily
 '''
-
+from music21 import interval
+import copy
 import unittest
 
+class OMRMidiNoteFixer(object):
+    '''
+    Fixes OMR stream according to MIDI information
+    '''
+    def __init__(self, omrstream, midistream):
+        self.omrstream = omrstream
+        self.midistream = midistream
+        self.correctedstream = copy.deepcopy(self.omrstream)
+    
+    def fixStreams(self):
+        self.alignstreams()
+        for omrnote, midinote in zip(self.omrstream, self.midistream):
+            fixerRhythm = OMRMidiNoteRhythmFixer(omrnote, midinote)
+            fixerRhythm.fix()
+            fixerPitch = OMRMidiNotePitchFixer(omrnote, midinote)
+            fixerPitch.fix()
+    
+    def alignStreams(self):
+        if self.approxequal(self.omrstream.highestTime, self.midistream.highestTime):
+            pass
+        # TODO: more ways of checking if stream is aligned 
+        pass
+    
+    def cursoryCheck(self):
+        '''
+        check if both rhythm and pitch are close enough together
+        '''
+        pass
+    
+class OMRMidiNoteRhythmFixer(object):
+    '''
+    Fixes an OMR Note pitch according to information from MIDI Note
+    '''
+    
+    def __init__(self, omrnote, midinote):
+        self.omrnote = omrnote
+        self.midinote = midinote
+        self.isPossiblyMisaligned = False
+        
+    def fix(self):
+        pass
+    
+    
 class OMRMidiNotePitchFixer(object):
     '''
-    Fixes an OMRNote according to information from MIDI Note
+    Fixes an OMR Note pitch according to information from MIDI Note
     '''
 
     def __init__(self, omrnote, midinote):
@@ -20,50 +64,50 @@ class OMRMidiNotePitchFixer(object):
     def fix(self):
         # keySignature = self.omrnote.getContextByClass('KeySignature')
         # curr_measure = self.midinote.measureNumber
-
-        self.setOMRacc()
+        if self.intervalTooBig(self.omrnote, self.midinote):
+            self.isPossiblyMisaligned = True
+        else:    
+            self.setOMRacc()
 
     def setOMRacc(self):
-        if self._isEnharmonic():
+        
+        
+        if self.isEnharmonic():
             pass
 
-        if self._hasNatAcc():
-            if self._isEnharmonic():
+        if self.hasNatAcc():
+            if self.isEnharmonic():
                 self.omrnote.accidental = None
             if len(self.measure_accidentals) == 0:
                 self.omrnote.accidental = self.midinote.accidental
-            # fix this, reference to outside of class 
-            # measure_accidentals.append(self.omrnote.pitch)
+                
             else:
-                # append to measure_accidentals
-                pass
-        elif self._hasSharpFlatAcc() and self._stepEq():
-            if self._hasAcc():
+                self.measure_accidentals.append(self.omrnote.pitch)
+        elif self.hasSharpFlatAcc() and self.stepEq():
+            if self.hasAcc():
                 self.omrnote.accidental = self.midinote.accidental
             else: 
                 self.omrnote.accidental = None
 
-    def _isEnharmonic(self):
+    def isEnharmonic(self):
         return self.omrnote.pitch.isEnharmonic(self.midinote.pitch)
 
-    def _hasAcc(self):
+    def hasAcc(self):
         return self.omrnote.accidental is not None
 
-    def _hasNatAcc(self):
-        return self._hasAcc() and self.omrnote.accidental.name == "natural"
+    def hasNatAcc(self):
+        return self.hasAcc() and self.omrnote.accidental.name == "natural"
 
-    def _hasSharpFlatAcc(self):
-        return self._hasAcc() and self.omrnote.accidental.name != "natural"
+    def hasSharpFlatAcc(self):
+        return self.hasAcc() and self.omrnote.accidental.name != "natural"
 
-    def _stepEq(self):
+    def stepEq(self):
         return self.omrnote.step == self.midinote.step
-        #score = omrnote.ActiveSite
-
-# 
-# for midinote, omrnote in zip(gtMIDI.recurse(classFilter='Note'), gtOMR.recurse(classFilter='Note')):
-#     if omrnote != midinote:
-#         newFix = OMRMidiNotePitchFixer(omrnote, midinote)
-#         newFix.fix()
+    
+    def intervalTooBig(self, aNote, bNote, setint = 5):
+        if interval.notesToChromatic(aNote, bNote).intervalClass > setint:
+            return True
+        return False
 
 class Test(unittest.TestCase):
     def testEnharmonic(self):
