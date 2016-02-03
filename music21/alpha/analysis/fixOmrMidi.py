@@ -70,8 +70,6 @@ class OMRMidiNotePitchFixer(object):
             self.setOMRacc()
 
     def setOMRacc(self):
-        
-        
         if self.isEnharmonic():
             pass
 
@@ -139,7 +137,20 @@ class Test(unittest.TestCase):
         self.assertEqual(midinote.nameWithOctave, 'B#4')
 
 
-    def failing_testNotSameStep(self):
+    def testIntervalNotTooBig(self):
+        from music21 import note
+        omrnote = note.Note('G-4')
+        midinote = note.Note('A#4')
+    
+        self.assertIsNotNone(omrnote.pitch.accidental)
+    
+        fixer = OMRMidiNotePitchFixer(omrnote, midinote)
+        fixer.fix()
+        self.assertEqual(omrnote.nameWithOctave, 'G-4')
+        self.assertEqual(midinote.nameWithOctave, 'A#4')
+        self.assertFalse(fixer.isPossiblyMisaligned)
+        
+    def testNotSameStep(self):
         from music21 import note
         omrnote = note.Note('En4')
         midinote = note.Note('B-4')
