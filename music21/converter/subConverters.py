@@ -715,7 +715,15 @@ class ConverterMusicXMLET(SubConverter):
         fileLikeOpen.close()
         sys.stderr = storedStrErr
 
-        fp = fpOut[0:len(fpOut) - 4] + "-1.png"
+        # check whether total number of pngs is in 1-9, 10-99, or 100-999 range, then return appropriate fp
+        if os.path.exists(fpOut[0:len(fpOut) - 4] + "-1.png"):
+            fp = fpOut[0:len(fpOut) - 4] + "-1.png"
+        elif os.path.exists(fpOut[0:len(fpOut) - 4] + "-01.png"):
+            fp = fpOut[0:len(fpOut) - 4] + "-01.png"
+        elif os.path.exists(fpOut[0:len(fpOut) - 4] + "-001.png"):
+            fp = fpOut[0:len(fpOut) - 4] + "-001.png"
+        else:
+            raise "png file of xml not found. Is your file >999 pages?"
         #common.cropImageFromPath(fp)       
         return fp
     
@@ -1323,11 +1331,35 @@ class TestExternal(unittest.TestCase):
         s.append(n)
         s.show('lily.png')
         print(s.write('lily.png'))
+    
+    def testMultiPageXMlShow1(self):
+        '''
+        tests whether show() works for music that is 10-99 pages long
+        '''
+        from music21 import omr, converter
+        K525 = omr.correctors.K525groundTruthFilePath
+        K525 = converter.parse(K525)
+        K525.show('musicxml.png')
+        print(K525.write('musicxml.png'))
 
+#     def testMultiPageXMlShow2(self):
+#         '''
+#          tests whether show() works for music that is 100-999 pages long. Currently takes way too long to run.
+#          '''
+#         from music21 import stream, note
+#         biggerStream = stream.Stream()
+#         note1 = note.Note("C4")
+#         note1.duration.type = 'whole'
+#         biggerStream.repeatAppend(note1, 5000)
+#         biggerStream.show('musicxml.png')
+#         biggerStream.show()
+#         print(biggerStream.write('musicxml.png'))
 
 
 if __name__ == '__main__':
     import music21
     #import sys
     #sys.argv.append('SimpleTextShow')
-    music21.mainTest(Test)
+#     music21.mainTest(Test)
+    # run command below to test commands that open musescore, etc.
+    music21.mainTest(TestExternal)
