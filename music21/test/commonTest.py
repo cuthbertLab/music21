@@ -218,7 +218,7 @@ class ModuleGather(object):
         
         # skip any path that contains this string
         self.pathSkip = ['obsolete', 
-                         'ext', 
+                         'music21/ext',  # not just "ext" because of "text!"
                          'alpha/webapps/server', 
                          'alpha/webapps/archive',
                          ]
