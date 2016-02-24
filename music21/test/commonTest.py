@@ -56,7 +56,7 @@ class Music21TestRunner(unittest.runner.TextTestRunner):
         result.failfast = self.failfast
         result.buffer = self.buffer
         with warnings.catch_warnings():
-            if self.warnings:
+            if hasattr(self, 'warnings') and self.warnings:
                 # if self.warnings is set, use it to filter all the warnings
                 warnings.simplefilter(self.warnings)
                 # if the filter is 'default' or 'always', special-case the

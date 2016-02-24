@@ -28,7 +28,8 @@ def nPVI(streamForAnalysis):
 
     
     n.b. -- takes the distance between each element, including clefs, keys, etc.
-    use .notesAndRests etc. to filter out elements that are not useful.
+    use .notesAndRests etc. to filter out elements that are not useful (though this will skip
+    zero length objects)
 
     
     n.b. # 2 -- duration is used rather than actual distance -- for gapless
