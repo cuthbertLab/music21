@@ -56,7 +56,7 @@ class Music21TestRunner(unittest.runner.TextTestRunner):
         result.failfast = self.failfast
         result.buffer = self.buffer
         with warnings.catch_warnings():
-            if self.warnings:
+            if hasattr(self, 'warnings') and self.warnings:
                 # if self.warnings is set, use it to filter all the warnings
                 warnings.simplefilter(self.warnings)
                 # if the filter is 'default' or 'always', special-case the
@@ -218,7 +218,7 @@ class ModuleGather(object):
         
         # skip any path that contains this string
         self.pathSkip = ['obsolete', 
-                         'ext', 
+                         'music21/ext',  # not just "ext" because of "text!"
                          'alpha/webapps/server', 
                          'alpha/webapps/archive',
                          ]
