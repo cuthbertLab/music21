@@ -37,7 +37,7 @@ environLocal = environment.Environment(_MOD)
 class SubConverterException(exceptions21.Music21Exception):
     pass
 
-class SubConverterFileIOException(exceptions21.Music21Exception):
+class SubConverterFileIOException(SubConverterException):
     pass
 
 class SubConverter(object):
