@@ -1424,6 +1424,6 @@ if __name__ == '__main__':
     import music21
     #import sys
     #sys.argv.append('SimpleTextShow')
-    music21.mainTest(Test)
+#     music21.mainTest(Test)
     # run command below to test commands that open musescore, etc.
-#     music21.mainTest(TestExternal)
+    music21.mainTest(TestExternal)
