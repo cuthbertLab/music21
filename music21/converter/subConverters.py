@@ -1328,8 +1328,8 @@ class Test(unittest.TestCase):
         '''
         env = environment.Environment()
         tempfp1 = env.getTempFile()
-        xmlfp1 = tempfp1+".xml"
-        os.rename(tempfp1, tempfp1+"-1.png")
+        xmlfp1 = tempfp1 + ".xml"
+        os.rename(tempfp1, tempfp1 + "-1.png")
         tempfp1 += "-1.png"
         xmlconverter1 = ConverterMusicXMLET()
         pngfp1 = xmlconverter1.findPNGfpFromXMLfp(xmlfp1)
@@ -1337,8 +1337,8 @@ class Test(unittest.TestCase):
         
         env = environment.Environment()
         tempfp2 = env.getTempFile()
-        xmlfp2 = tempfp2+".xml"
-        os.rename(tempfp2, tempfp2+"-01.png")
+        xmlfp2 = tempfp2 + ".xml"
+        os.rename(tempfp2, tempfp2 + "-01.png")
         tempfp2 += "-01.png"
         xmlconverter2 = ConverterMusicXMLET()
         pngfp2 = xmlconverter2.findPNGfpFromXMLfp(xmlfp2)
@@ -1346,8 +1346,8 @@ class Test(unittest.TestCase):
         
         env = environment.Environment()
         tempfp3 = env.getTempFile()
-        xmlfp3 = tempfp3+".xml"
-        os.rename(tempfp3, tempfp3+"-001.png")
+        xmlfp3 = tempfp3 + ".xml"
+        os.rename(tempfp3, tempfp3 + "-001.png")
         tempfp3 += "-001.png"
         xmlconverter3 = ConverterMusicXMLET()
         pngfp3 = xmlconverter3.findPNGfpFromXMLfp(xmlfp3)
@@ -1359,25 +1359,12 @@ class Test(unittest.TestCase):
         '''
         env = environment.Environment()
         tempfp = env.getTempFile()
-        xmlfp = tempfp+".xml"
-        os.rename(tempfp, tempfp+"-0001.png")
+        xmlfp = tempfp + ".xml"
+        os.rename(tempfp, tempfp + "-0001.png")
         tempfp += "-0001.png"
         xmlconverter = ConverterMusicXMLET()
         self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, xmlfp)
         
-    def testXMLtoPNGsmall(self):
-        '''
-        testing the findPNGfpFromXMLfp method wtih a file that is just a single digit pages long
-        '''
-        
-        env = environment.Environment()
-        tempfp = env.getTempFile()
-        xmlfp = tempfp+".xml"
-        os.rename(tempfp, tempfp+"-1.png")
-        tempfp += "-1.png"
-        xmlconverter = ConverterMusicXMLET()
-        pngfp = xmlconverter.findPNGfpFromXMLfp(xmlfp)
-        self.assertEqual(pngfp, tempfp)
         
 class TestExternal(unittest.TestCase):
     def runTest(self):
