@@ -37,6 +37,9 @@ environLocal = environment.Environment(_MOD)
 class SubConverterException(exceptions21.Music21Exception):
     pass
 
+class SubConverterFileIOException(exceptions21.Music21Exception):
+    pass
+
 class SubConverter(object):
     '''
     Class wrapper for parsing data or outputting data.  
@@ -648,6 +651,21 @@ class ConverterMusicXMLET(SubConverter):
         SubConverter.__init__(self, **keywords)
 
     #---------------------------------------------------------------------------
+    def findPNGfpFromXMLfp(self, xmlFilePath):
+        '''
+        Check whether total number of pngs is in 1-9, 10-99, or 100-999 range,
+         then return appropriate fp. Raises and exception if png fp does not exist. 
+        '''
+        if os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + "-1.png"):
+            pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + "-1.png"
+        elif os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + "-01.png"):
+            pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + "-01.png"
+        elif os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + "-001.png"):
+            pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + "-001.png"
+        else:
+            raise SubConverterFileIOException("png file of xml not found. Is your file >999 pages?")
+        return pngfp
+    
     def parseData(self, xmlString, number=None):
         '''
         Open MusicXML data from a string.
@@ -714,18 +732,8 @@ class ConverterMusicXMLET(SubConverter):
         os.system(musescoreRun)
         fileLikeOpen.close()
         sys.stderr = storedStrErr
-
-        # check whether total number of pngs is in 1-9, 10-99, or 100-999 range, then return appropriate fp
-        if os.path.exists(fpOut[0:len(fpOut) - 4] + "-1.png"):
-            fp = fpOut[0:len(fpOut) - 4] + "-1.png"
-        elif os.path.exists(fpOut[0:len(fpOut) - 4] + "-01.png"):
-            fp = fpOut[0:len(fpOut) - 4] + "-01.png"
-        elif os.path.exists(fpOut[0:len(fpOut) - 4] + "-001.png"):
-            fp = fpOut[0:len(fpOut) - 4] + "-001.png"
-        else:
-            raise "png file of xml not found. Is your file >999 pages?"
-        #common.cropImageFromPath(fp)       
-        return fp
+        return self.findPNGfpFromXMLfp(fpOut)
+        #common.cropImageFromPath(fp)
     
     def writeDataStream(self, fp, dataBytes):
         if fp is None:
@@ -1312,7 +1320,63 @@ class Test(unittest.TestCase):
             testConverter = ConverterMEI()
             testConverter.parseFile(testPath)
             self.assertEqual(1, mockConv.call_count)
-
+            
+    def testXMLtoPNG(self):
+        '''
+        testing the findPNGfpFromXMLfp method with three different files of lengths
+        that create .png files with -1, -01, and -001 in the fp
+        '''
+        env = environment.Environment()
+        tempfp1 = env.getTempFile()
+        xmlfp1 = tempfp1+".xml"
+        os.rename(tempfp1, tempfp1+"-1.png")
+        tempfp1 += "-1.png"
+        xmlconverter1 = ConverterMusicXMLET()
+        pngfp1 = xmlconverter1.findPNGfpFromXMLfp(xmlfp1)
+        self.assertEqual(pngfp1, tempfp1)
+        
+        env = environment.Environment()
+        tempfp2 = env.getTempFile()
+        xmlfp2 = tempfp2+".xml"
+        os.rename(tempfp2, tempfp2+"-01.png")
+        tempfp2 += "-01.png"
+        xmlconverter2 = ConverterMusicXMLET()
+        pngfp2 = xmlconverter2.findPNGfpFromXMLfp(xmlfp2)
+        self.assertEqual(pngfp2, tempfp2)
+        
+        env = environment.Environment()
+        tempfp3 = env.getTempFile()
+        xmlfp3 = tempfp3+".xml"
+        os.rename(tempfp3, tempfp3+"-001.png")
+        tempfp3 += "-001.png"
+        xmlconverter3 = ConverterMusicXMLET()
+        pngfp3 = xmlconverter3.findPNGfpFromXMLfp(xmlfp3)
+        self.assertEqual(pngfp3, tempfp3)
+        
+    def testXMLtoPNGtooLong(self):
+        '''
+        testing the findPNGfpFromXMLfp method with a file that is >999 pages long
+        '''
+        env = environment.Environment()
+        tempfp = env.getTempFile()
+        xmlfp = tempfp+".xml"
+        os.rename(tempfp, tempfp+"-0001.png")
+        tempfp += "-0001.png"
+        xmlconverter = ConverterMusicXMLET()
+        self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, xmlfp)
+        
+    def testXMLtoPNGsmall(self):
+        '''
+        testing the findPNGfpFromXMLfp method wtih a file that is just a single digit pages long
+        '''
+        env = environment.Environment()
+        tempfp = env.getTempFile()
+        xmlfp = tempfp+".xml"
+        os.rename(tempfp, tempfp+"-1.png")
+        tempfp += "-1.png"
+        xmlconverter = ConverterMusicXMLET()
+        pngfp = xmlconverter.findPNGfpFromXMLfp(xmlfp)
+        self.assertEqual(pngfp, tempfp)
         
 class TestExternal(unittest.TestCase):
     def runTest(self):
@@ -1350,7 +1414,7 @@ class TestExternal(unittest.TestCase):
 #         biggerStream = stream.Stream()
 #         note1 = note.Note("C4")
 #         note1.duration.type = 'whole'
-#         biggerStream.repeatAppend(note1, 5000)
+#         biggerStream.repeatAppend(note1, 10000)
 #         biggerStream.show('musicxml.png')
 #         biggerStream.show()
 #         print(biggerStream.write('musicxml.png'))
@@ -1360,6 +1424,6 @@ if __name__ == '__main__':
     import music21
     #import sys
     #sys.argv.append('SimpleTextShow')
-#     music21.mainTest(Test)
+    music21.mainTest(Test)
     # run command below to test commands that open musescore, etc.
-    music21.mainTest(TestExternal)
+#     music21.mainTest(TestExternal)
