@@ -6,16 +6,18 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
+# Authors:      Christopher Ariza
+#               Michael Scott Cuthbert
+#
 # Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
-Objects for processing roman numeral analysis text files, as defined and
-demonstrated by Dmitri Tymoczko. 
-'''
+Translation routines for roman numeral analysis text files, as defined 
+and demonstrated by Dmitri Tymoczko. 
 
-#from __future__ import unicode_literals
-from fractions import Fraction
+'''
+import fractions
 import io
 import re
 import unittest
@@ -686,7 +688,7 @@ class RTBeat(RTAtom):
         if len(parts) > 2: # 1.66.5 
             fracPartDivisor = float('.' + parts[2]) # 0.5
             if isinstance(fracPart, float):
-                fracPart = Fraction.from_float(fracPart)
+                fracPart = fractions.Fraction.from_float(fracPart)
             denom = fracPart.denominator
             fracBeatFrac = common.opFrac(1./(denom/fracPartDivisor))
         else:
@@ -1401,7 +1403,6 @@ class RTFile(object):
 #-------------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
-    
     def runTest(self):
         pass
     
@@ -1543,11 +1544,9 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-
-_DOC_ORDER = []
+#_DOC_ORDER = []
 
 if __name__ == "__main__":
-    # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)
 

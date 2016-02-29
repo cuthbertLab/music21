@@ -15,18 +15,23 @@ which all other m21 exceptions should derive from.
 Do not import anything within this module.  Needs to be import free so other modules
 can freely import from it.
 '''
-
+# This one is a very general exception that is here because it's very general
 
 class Music21Exception(Exception):
     pass
 
+# The rest of these are here because they are imported by more than one module
+# which cannot import the other module because of circular imports.
+# 
+# if Circular imports have not been a problem and/or you don't plan to use
+# an exception in multiple modules (i.e., you're not going to catch a particular
+# exception in a different module, then define that exception in the module itself
+# (e.g., ClefException is defined in clef) ).
+
+
 class StreamException(Music21Exception):
     pass
 
-
-# should be renamed:
-class GroupException(Music21Exception):
-    pass
 
 class MetadataException(Music21Exception):
     pass
@@ -45,6 +50,12 @@ class Music21CommonException(Music21Exception):
 
 class CorpusException(Music21Exception):
     pass
+
+# should be renamed because what does Group mean here? and it's "base.Groups" not "base.Group".
+class GroupException(Music21Exception):
+    pass
+
+
 
 # warnings
 class Music21DeprecationWarning(UserWarning):

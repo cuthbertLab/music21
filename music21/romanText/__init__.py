@@ -14,10 +14,9 @@
 demonstrated by Dmitri Tymoczko.
 '''
 
-__all__ = ['clercqTemperley', 'translate', 'testFiles', 'rtObjects']
+__all__ = ['clercqTemperley', 'rtObjects', 'translate', 'testFiles']
 
 from music21.romanText import clercqTemperley
-from music21.romanText import testFiles
 from music21.romanText import rtObjects
+from music21.romanText import testFiles
 from music21.romanText import translate
-
