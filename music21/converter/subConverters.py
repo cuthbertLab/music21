@@ -68,7 +68,7 @@ class SubConverter(object):
     registerShowFormats = ()
     registerInputExtensions = ()
     registerOutputExtensions = ()
-    registerOutputSubformatExtensions = None
+    registerOutputSubformatExtensions = {}
     launchKey = None
     
     codecWrite = False
@@ -167,7 +167,7 @@ class SubConverter(object):
         if len(exts) == 0:
             raise SubConverterException("Cannot show or write -- no output extension")
         ext = exts[0]
-        if self.registerOutputSubformatExtensions is not None and subformats is not None:
+        if self.registerOutputSubformatExtensions and subformats is not None:
             joinedSubformats = '.'.join(subformats)
             if joinedSubformats in self.registerOutputSubformatExtensions:
                 ext = self.registerOutputSubformatExtensions[joinedSubformats]
@@ -702,7 +702,7 @@ class ConverterMusicXMLET(SubConverter):
 
         # movement titles can be stored in more than one place in musicxml
         # manually insert file name as a movementName title if no titles are defined
-        if c.stream.metadata.movementName == None:
+        if c.stream.metadata.movementName is None:
             junk, fn = os.path.split(fp)
             c.stream.metadata.movementName = fn
         self.stream = c.stream
@@ -855,9 +855,9 @@ class ConverterMusicXML(SubConverter):
 
         # movement titles can be stored in more than one place in musicxml
         # manually insert file name as a title if no titles are defined
-        if self._mxScore.get('movementTitle') == None:
+        if self._mxScore.get('movementTitle') is None:
             mxWork = self._mxScore.get('workObj')
-            if mxWork == None or mxWork.get('workTitle') == None:
+            if mxWork is None or mxWork.get('workTitle') is None:
                 junk, fn = os.path.split(fp)
                 # set as movement title
                 self._mxScore.set('movementTitle', fn)
@@ -1369,6 +1369,7 @@ class Test(unittest.TestCase):
         '''
         testing the findPNGfpFromXMLfp method wtih a file that is just a single digit pages long
         '''
+        
         env = environment.Environment()
         tempfp = env.getTempFile()
         xmlfp = tempfp+".xml"
@@ -1408,7 +1409,8 @@ class TestExternal(unittest.TestCase):
 
 #     def testMultiPageXMlShow2(self):
 #         '''
-#          tests whether show() works for music that is 100-999 pages long. Currently takes way too long to run.
+#          tests whether show() works for music that is 100-999 pages long. 
+#          Currently takes way too long to run.
 #          '''
 #         from music21 import stream, note
 #         biggerStream = stream.Stream()
@@ -1424,6 +1426,6 @@ if __name__ == '__main__':
     import music21
     #import sys
     #sys.argv.append('SimpleTextShow')
-#     music21.mainTest(Test)
+    music21.mainTest(Test)
     # run command below to test commands that open musescore, etc.
-    music21.mainTest(TestExternal)
+#     music21.mainTest(TestExternal)
