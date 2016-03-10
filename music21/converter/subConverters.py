@@ -194,6 +194,7 @@ class SubConverter(object):
                 # is a filelike object
                 f = fp
             else:
+                fp = common.cleanpath(fp)
                 f = open(fp, writeFlags)
 
             try:
@@ -463,8 +464,8 @@ class ConverterHumdrum(SubConverter):
     
 
     #---------------------------------------------------------------------------
-    def parseData(self, humdrumString, number=None):
-        '''Open Humdrum data from a string -- calls humdrum.parseData()
+    def parseData(self, humdrumString, number=None): 
+        '''Open Humdrum data from a string -- calls humdrum.parseData() 
 
         >>> humdata = ('**kern\\n*M2/4\\n=1\\n24r\\n24g#\\n24f#\\n24e\\n24c#\\n' + 
         ...     '24f\\n24r\\n24dn\\n24e-\\n24gn\\n24e-\\n24dn\\n*-')
@@ -722,6 +723,8 @@ class ConverterMusicXMLET(SubConverter):
     def writeDataStream(self, fp, dataBytes):
         if fp is None:
             fp = self.getTemporaryFile()
+        else:
+            fp = common.cleanpath(fp)
         
         writeFlags = 'wb'
 

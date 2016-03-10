@@ -391,7 +391,6 @@ def quarterLengthToNonPowerOf2Tuplet(qLen):
             qFrac = qFrac / 2
     # qFrac will always be in lowest terms
 
-    # TODO: DurationTuple
     closestSmallerType, unused_match = quarterLengthToClosestType(qLen/qFrac.denominator)
 
     tupletDuration = Duration(type=closestSmallerType)
