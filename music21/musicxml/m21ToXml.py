@@ -2125,7 +2125,9 @@ class MeasureExporter(XMLExporterBase):
             if len(su) == 1: # have a one element wedge
                 proc = ('first', 'last')
             else:
-                if su.isFirst(target):
+                if su.isFirst(target) and su.isLast(target):
+                    proc = ('first', 'last') # same element can be first and last
+                elif su.isFirst(target):
                     proc = ('first',)
                 elif su.isLast(target):
                     proc = ('last',)
@@ -2205,13 +2207,13 @@ class MeasureExporter(XMLExporterBase):
             mxSlur = Element('slur')
             if su.isFirst(obj):
                 mxSlur.set('type', 'start')
+                if su.placement is not None:
+                    mxSlur.set('placement', str(su.placement))
             elif su.isLast(obj):
                 mxSlur.set('type', 'stop')
             else:
                 continue # do not put a notation on mid-slur notes.
             mxSlur.set('number', str(su.idLocal))
-            if su.placement is not None:
-                mxSlur.set('placement', str(su.placement))
             notations.append(mxSlur)
 
         for su in sb.getByClass('Glissando'):
@@ -2238,32 +2240,48 @@ class MeasureExporter(XMLExporterBase):
             mxTrem.text = str(su.numberOfMarks)
             if su.isFirst(obj):
                 mxTrem.set('type', 'start')
+                if su.placement is not None:
+                    mxTrem.set('placement', str(su.placement))
             elif su.isLast(obj):
                 mxTrem.set('type', 'stop')
             else:
                 # this is always an error for tremolos
                 environLocal.printDebug(
                     ['spanner w/ a component that is neither a start nor an end.', su, obj])
-            if su.placement is not None:
-                mxTrem.set('placement', str(su.placement))
             # Tremolos get in a separate ornaments tag...
             ornaments.append(mxTrem)
 
         for su in sb.getByClass('TrillExtension'):
             mxWavyLine = Element('wavy-line')
             mxWavyLine.set('number', str(su.idLocal))
+            isFirstOrLast = False
+            isFirstANDLast = False
             # is this note first in this spanner?
             if su.isFirst(obj):
                 mxWavyLine.set('type', 'start')
-            elif su.isLast(obj):
-                mxWavyLine.set('type', 'stop')
-            else:
+                #print("Trill is first")
+                isFirstOrLast = True
+                if su.placement is not None:
+                    mxWavyLine.set('placement', su.placement)
+
+            # a Trill on a single Note can be both first and last!
+            if su.isLast(obj):
+                if isFirstOrLast is True:
+                    isFirstANDLast = True
+                else:
+                    mxWavyLine.set('type', 'stop')
+                    isFirstOrLast = True
+                #print("Trill is last")
+                
+            if isFirstOrLast is False:
                 continue # do not put a wavy-line tag on mid-trill notes
-            if su.placement is not None:
-                mxWavyLine.set('placement', su.placement)
             ornaments.append(mxWavyLine)
-
-
+            if isFirstANDLast is True:
+                # make another one...
+                mxWavyLine = Element('wavy-line')
+                mxWavyLine.set('number', str(su.idLocal))
+                mxWavyLine.set('type', 'stop')
+                ornaments.append(mxWavyLine)
 
         if len(ornaments) > 0:
             mxOrn = Element('ornaments')
@@ -2338,6 +2356,8 @@ class MeasureExporter(XMLExporterBase):
          
         TODO: Test with spanners...
         '''
+        setb = _setAttributeFromAttribute
+        
         # TODO: attrGroup x-position
         # TODO: attrGroup font
         # TODO: attr: dynamics
@@ -2354,7 +2374,26 @@ class MeasureExporter(XMLExporterBase):
         d = chordOrN.duration
         
         if d.isGrace is True:
-            SubElement(mxNote, 'grace')
+            graceElement = SubElement(mxNote, 'grace')
+            try: 
+                if d.slash in (True, False):
+                    setb(d, graceElement, 'slash', transform=xmlObjects.booleanToYesNo)
+
+                if d.stealTimePrevious is not None:
+                    setb(d, 
+                         graceElement, 
+                         'steal-time-previous', 
+                         transform=xmlObjects.fractionToPercent)
+
+                if d.stealTimeFollowing is not None:
+                    setb(d, 
+                         graceElement, 
+                         'steal-time-following', 
+                         transform=xmlObjects.fractionToPercent)
+                # TODO: make-time -- specifically not implemented for now.
+            
+            except AttributeError:
+                environLocal.warn("Duration set as Grace while not being a GraceDuration %s" % d)
 
         # TODO: cue...
         if chordOrN.color is not None:
@@ -4431,9 +4470,9 @@ class TestExternal(unittest.TestCase):
         sio = six.BytesIO()
         
         sio.write(SX.xmlHeader())
+        
         et = ETObj(mxScore)
         et.write(sio, encoding="utf-8", xml_declaration=False)
-        et.write('/Users/Cuthbert/Desktop/s.xml', encoding="utf-8", xml_declaration=True)
         v = sio.getvalue()
         sio.close()
 

@@ -6213,81 +6213,6 @@ class Test(unittest.TestCase):
         self.assertEqual(str(s.finalBarline), '[<music21.bar.Barline style=final>, <music21.bar.Barline style=none>, <music21.bar.Barline style=final>, <music21.bar.Barline style=none>]')
 
 
-#     def testGraceNoteSortingA(self):
-#         from music21 import stream
-# 
-#         n1 = note.Note('C', type='16th')
-#         n2 = note.Note('D', type='16th')
-#         n3 = note.Note('E', type='16th')
-#         n4 = note.Note('F', type='16th')
-#         n5 = note.Note('G', type='16th')
-# 
-#         s = stream.Stream()
-#   
-#         n1.makeGrace()
-#         s.append(n1)
-#         n2.makeGrace()
-#         s.append(n2)
-# 
-#         s.append(n3)
-# 
-#         n4.makeGrace()
-#         s.append(n4)
-#         s.append(n5)
-# 
-#         self.assertEqual(s._getGracesAtOffset(0), [n1, n2])
-#         self.assertEqual(s._getGracesAtOffset(.25), [n4])
-# 
-#         match = [(n.name, n.offset, n.quarterLength, n.priority) for n in s]
-#         self.assertEqual(match, 
-#        [('C', 0.0, 0.0, -100), 
-#         ('D', 0.0, 0.0, -99), 
-#         ('E', 0.0, 0.25, 0), 
-#         ('F', 0.25, 0.0, -100), 
-#         ('G', 0.25, 0.25, 0)])
-
-
-#     def testGraceNoteSortingB(self):
-#         from music21 import stream
-# 
-#         n1 = note.Note('C', type='16th')
-#         n2 = note.Note('D', type='16th')
-#         n3 = note.Note('E', type='16th')
-#         n4 = note.Note('F', type='16th')
-#         n5 = note.Note('G', type='16th')
-#         s = stream.Stream()
-#   
-#         n1.makeGrace()
-#         s.append(n1)
-#         n2.makeGrace()
-#         s.append(n2)
-#         n3.makeGrace()
-#         s.append(n3)
-# 
-#         s.append(n4)
-#         n5.makeGrace() # grace at end
-#         s.append(n5)
-# 
-#         #s.show('t')
-# 
-#         self.assertEqual(s._getGracesAtOffset(0), [n1, n2, n3])
-#         self.assertEqual(s._getGracesAtOffset(.25), [n5])
-# 
-#         match = [(n.name, n.offset, n.quarterLength, n.priority) for n in s]
-#         self.assertEqual(match, 
-#        [('C', 0.0, 0.0, -100), 
-#         ('D', 0.0, 0.0, -99), 
-#         ('E', 0.0, 0.0, -98), 
-#         ('F', 0.0, 0.25, 0), 
-#         ('G', 0.25, 0.0, -100)])
-
-        # add a clef; test sorting
-        # problem: this sorts priority before class
-#         c1 = clef.AltoClef()
-#         s.insert(0, c1)
-#         s.show('t')
-#         self.assertEqual(c1, s[0]) # should be first
-
 
 
     def testStreamElementsComparison(self):
@@ -7116,44 +7041,8 @@ class Test(unittest.TestCase):
         #sRight.show()
 
 
-#     def testGraceStreamA(self):
-# 
-#         from music21 import stream, spanner
-# 
-#         # the GraceStream transforms generic notes into Notes w/ grace
-#         # durations; otherwise it is not necssary
-#         gs = stream.GraceStream()
-#         # the notes here are copies of the created notes
-#         gs.append(note.Note('c4', quarterLength=.25))
-#         gs.append(note.Note('d#4', quarterLength=.25))
-#         gs.append(note.Note('g#4', quarterLength=.5))
-# 
-#         #gs.show('t')
-#         #gs.show()
-# 
-#         # the total duration of the 
-#         self.assertEqual(gs.duration.quarterLength, 0.0)
-# 
-#         s = stream.Measure()
-#         s.append(note.Note('G3'))
-#         s.append(gs)
-#         s.append(note.Note('A4'))
-# 
-#         sp = spanner.Slur(gs[0], s[-1])
-#         s.append(sp)
-# 
-#         match = [str(x) for x in s.pitches]
-#         self.assertEqual(match, ['G3', 'C4', 'D#4', 'G#4', 'A4'])
-
-        #s.show('text')
-
-#         p = stream.Part()
-#         p.append(s)
-#         p.show()
-        
-
-    def testGraceStreamB(self):
-        '''testing a graces w/o a grace stream'''
+    def testGracesInStream(self):
+        '''testing grace notes'''
         from music21 import stream, duration, dynamics
 
         s = stream.Measure()
@@ -7199,7 +7088,7 @@ class Test(unittest.TestCase):
         self.assertEqual(match, ['G3', 'C#4', 'C4', 'D#4', 'A4'])
 
 
-    def testGraceStreamC(self):
+    def testGraceChords(self):
         from music21 import stream
 
         s = stream.Measure()

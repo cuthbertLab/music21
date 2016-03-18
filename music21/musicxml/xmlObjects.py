@@ -94,9 +94,42 @@ def yesNoToBoolean(value):
         return False
 
 def booleanToYesNo(value):
+    '''
+    Convert a True, False bool to 'yes' or 'no'
+    
+    >>> musicxml.xmlObjects.booleanToYesNo(True)
+    'yes'
+    >>> musicxml.xmlObjects.booleanToYesNo(False)
+    'no'
+
+    anything that evaluates to True becomes 'yes'
+    
+    >>> musicxml.xmlObjects.booleanToYesNo(5)
+    'yes'
+    
+    '''
     if value: # purposely not "is True"
         return 'yes'
     else:
         return 'no'
 
+def fractionToPercent(value):
+    '''
+    Turns a fraction into a string percent
+    
+    >>> musicxml.xmlObjects.fractionToPercent(0.25)
+    '25'
+
+    Only does whole numbers for now...
+    
+    >>> musicxml.xmlObjects.fractionToPercent(0.251)
+    '25'
+
+    '''
+    return str(int(value * 100))
+
 #-------------------------------------------------------------------------------
+if __name__ == '__main__':
+    import music21
+    music21.mainTest()
+    

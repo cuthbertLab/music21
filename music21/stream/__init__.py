@@ -12846,42 +12846,6 @@ class VariantStorage(Stream):
 #------------------------------------------------------------------------------
 
 
-# class GraceStream(Stream):
-#     '''A Stream used to contain the notes that make up a section of grace notes.
-#     '''
-#     # from the outside, this needs to have duration of zero
-#     # this is achieved by using by making every note added to this stream
-#     # a grace duration; does this mean we make copies of each object,
-#     # or change in place?
-#     # might have utilities for a normal Stream to be transformed into a
-#     # grace stream
-#
-#     def __init__(self, givenElements=None, *args, **keywords):
-#         Stream.__init__(self, givenElements=givenElements, *args, **keywords)
-#
-#
-#     def append(self, others):
-#         '''
-#         Overridden append method that copies appended elements and replaces 
-#         their duration with a GraceDuration.
-#         '''
-#         if not common.isListLike(others):
-#             others = [others]
-#         # replace and edit in place
-#         othersEdited = []
-#         for e in others:
-#             e = copy.deepcopy(e)
-#             e.duration = e.duration.getGraceDuration()
-#             #environLocal.printDebug([
-#             #    'appending GraceStream, before calling base class',
-#             #    e.quarterLength, e.duration.quarterLength])
-#             othersEdited.append(e)
-#
-#         # call bass class append with elements modified durations
-#         Stream.append(self, othersEdited)
-#
-#
-
 
 
 

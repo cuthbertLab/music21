@@ -468,7 +468,6 @@ class WholeStepInvertedMordent(InvertedMordent):
 class Trill(Ornament):
     '''A basic trill marker.
 
-    
     >>> m = expressions.Trill()
     >>> m.placement
     'above'
@@ -776,7 +775,7 @@ class GeneralAppoggiatura(Ornament):
         realize an appoggiatura
         
         returns a three-element tuple.
-        The first is the notes that the grace note was converted to.
+        The first is the list of notes that the grace note was converted to.
         The second is the rest of the note
         The third is an empty list (since there are no notes at the end of an appoggiatura)
 
@@ -1018,7 +1017,7 @@ class TrillExtension(spanner.Spanner):
     # note that this always includes a trill symbol
     def __init__(self, *arguments, **keywords):
         super(TrillExtension, self).__init__(*arguments, **keywords)
-        self._placement = 'below' # can above or below, after musicxml
+        self._placement = None # can above or below or None, after musicxml
     
     def _getPlacement(self):
         return self._placement
@@ -1030,8 +1029,7 @@ class TrillExtension(spanner.Spanner):
             self._placement = value.lower()
         
     placement = property(_getPlacement, _setPlacement, doc='''
-        Get or set the placement as either above or below.
-
+        Get or set the placement as either above, below, or None.
         
         >>> s = stream.Stream()
         >>> s.repeatAppend(note.Note(), 8)

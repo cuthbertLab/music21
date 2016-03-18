@@ -2694,6 +2694,7 @@ class GraceDuration(Duration):
         self.stealTimeFollowing = None
         # make time is encoded in musicxml as divisions; here it can
         # by a duration; but should it be the duration suggested by the grace?
+        # TODO- Decide if "make-time" "grace" notes should be Grace notes at all...
         self.makeTime = False
 
     ### PUBLIC PROPERTIES ###
