@@ -370,14 +370,13 @@ def bestTimeSignature(meas):
     # find sum of all durations in quarter length
     # find if there are any dotted durations
     minDurDotted = False
-    sumDurQL = 0
+    sumDurQL = meas.duration.quarterLength
     #beatStrAvg = 0
-
-    for e in meas.notesAndRests:
+    #beatStrAvg += e.beatStrength
+        
+    for e in meas.recurse().notesAndRests:
         if e.quarterLength == 0.0:
             continue # case of grace durations
-        sumDurQL += e.quarterLength
-        #beatStrAvg += e.beatStrength
         if e.quarterLength < minDurQL:
             minDurQL = e.quarterLength
             if e.duration.dots > 0:
@@ -923,10 +922,11 @@ class MeterSequence(MeterTerminal):
         # on the sum of its components
         ### del self._weight -- no -- screws up pickling -- cannot del a slotted object
 
-        # store whether this meter was provided as a summed nuemerator
+        #: Bool stores whether this meter was provided as a summed numerator
         self.summedNumerator = False
-        # an optional parameter used only in displaying this meter sq
-        # needed in cases where a meter component is parenthetical
+        
+        #: an optional parameter used only in meter display sequences.
+        #: needed in cases where a meter component is parenthetical
         self.parenthesis = False
 
         if value is not None:
@@ -4771,6 +4771,24 @@ class Test(unittest.TestCase):
         ts6 = bestTimeSignature(m6)
         self.assertEqual(repr(ts6), '<music21.meter.TimeSignature 11/32>')
 
+    def testBestTimeSignatureB(self):
+        '''
+        Correct the TimeSignatures (4/4 in m. 1; no others) in a 4-measure score
+        of 12, 11.5, 12, 13 quarters, where one of the parts is a PartStaff with
+        multiple voices.
+        '''
+        from music21 import corpus
+        fautIl = corpus.parse('demos/incorrect_time_signature_pv')
+        for m in fautIl.recurse().getElementsByClass("Measure"):
+            m.timeSignature = m.bestTimeSignature()
+        p1 = fautIl.parts[1]
+        tsReps = []
+        for m in p1.getElementsByClass('Measure'):
+            tsReps.append(repr(m.timeSignature))
+        self.assertEqual(tsReps, ['<music21.meter.TimeSignature 12/4>', 
+                                  '<music21.meter.TimeSignature 23/8>', 
+                                  '<music21.meter.TimeSignature 12/4>', 
+                                  '<music21.meter.TimeSignature 13/4>'])
 
 #------------------------------------------------------------------------------
 # define presented order in documentation
