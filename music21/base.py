@@ -977,57 +977,6 @@ class Music21Object(object):
         raise SitesException("Element {} is not in hierarchy of {}".format(self, site))
     
 
-    @common.deprecated("September 2015", "January 2016", "use self.sites.getAttrByName(attr)")
-    def getContextAttr(self, attr):
-        '''
-        Given the name of an attribute, search the Sites object for
-        contexts having this attribute and return
-        the best match.
-
-        It is a misleading name because it does not actually search what we now call contexts,
-        just sites. Thus it is DEPRECATED
-
-        >>> import music21
-        >>> class Mock(music21.Music21Object):
-        ...     attr1 = 234
-        >>> aObj = stream.Stream()
-        >>> aObj.attr1 = 'test'
-        >>> a = music21.Music21Object()
-        >>> aObj.insert(0, a)
-        >>> a.sites.getAttrByName('attr1')
-        'test'
-
-        >>> bObj = stream.Stream()
-        >>> bObj.attr1 = 'came second'
-        >>> bObj.insert(0, a)
-        >>> a.sites.getAttrByName('attr1')
-        'test'
-
-        '''
-        return self.sites.getAttrByName(attr)
-
-    @common.deprecated("September 2015", "January 2016", 
-                       "use self.sites.setAttrByName(attr, value)")
-    def setContextAttr(self, attrName, value):
-        '''
-        Given the name of an attribute, search Contexts and return
-        the best match.
-
-        >>> import music21
-        >>> class Mock(music21.Music21Object):
-        ...     attr1 = 234
-        >>> aObj = Mock()
-        >>> aObj.attr1 = 'test'
-        >>> a = music21.Music21Object()
-        >>> a.sites.add(aObj)
-        >>> a.sites.getAttrByName('attr1')
-        'test'
-        >>> a.sites.setAttrByName('attr1', 3000)
-        >>> a.sites.getAttrByName('attr1')
-        3000
-        '''
-        return self.sites.setAttrByName(attrName, value)
-
     def getSpannerSites(self, spannerClassList=None):
         '''
         Return a list of all :class:`~music21.spanner.Spanner` objects
@@ -1115,36 +1064,6 @@ class Music21Object(object):
                         break
 
         return post
-
-
-    @common.deprecated('Summer 2015', 'Jan 2016', 
-                       'use self.sites.remove() instead and set activeSite manually.')
-    def removeLocationBySite(self, site):
-        '''
-        DEPRECATED Jan 2016: use self.sites.remove() instead and set activeSite
-        manually.
-
-        Remove a location in the :class:`~music21.base.Sites` object.
-
-        This is only for advanced location method and
-        is not a complete or sufficient way to remove an object from a Stream.
-        '''
-        if not id(site) in self.sites.siteDict:
-#             for s in self.sites.siteDict:
-#                 # DEBUG!
-#                 print s,
-#                 ts = self.sites.siteDict[s]
-#                 print ts.obj,
-#                 print common.unwrapWeakref(ts.obj)
-
-            raise Music21ObjectException(
-                        'supplied site (%s) is not a site in this object: %s' % (site, self))
-        #environLocal.printDebug(['removed location by site:', 'self', self, 'site', site])
-        self.sites.remove(site)
-
-        # if activeSite is set to that site, reassign to None
-        if self._getActiveSite() == site:
-            self._setActiveSite(None)
 
     def purgeOrphans(self, excludeStorageStreams=True):
         '''

@@ -3310,14 +3310,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     # end .getElement filters
     
     
-    @common.deprecated("September 2015", "February 2016", 
+    @common.deprecated("September 2015", "May 2016", 
                        "use s.elementOffset() instead w/ a try/except")
     def getOffsetByElement(self, obj):
         '''
         DEPRECATED Sep 2015: use s.elementOffset(obj) and if it is possible that
         obj is not in s, then do a try: except base.SitesException
         
-        Remove in 2016 Feb.
+        Remove in 2016 May.
         '''
         try:
             return self.elementOffset(obj)
@@ -5572,7 +5572,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             inPlace=inPlace,
             )
 
-    @common.deprecated("September 2015", "Feb. 2016", 
+    @common.deprecated("September 2015", "May 2016", 
                        "use stream.streamStatus.StreamStatus.haveBeamsBeenMade instead")
     def haveBeamsBeenMade(self):
         # could be called: hasAccidentalDisplayStatusSet
@@ -5585,7 +5585,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         DEPRECATED: Use :meth:`~music21.stream.streamStatus.StreamStatus.haveBeamsBeenMade`
         instead.
         
-        Remove in Feb 2016
+        Remove in May 2016
         '''
         return self.streamStatus.haveBeamsBeenMade()
 
@@ -5594,7 +5594,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         Calls :py:func:`~music21.stream.makeNotation.makeTupletBrackets`.
         
-        Deprecated sep 2015; rem march 2016; call makeNotation.makeTupletBrackets directly.
+        Deprecated sep 2015; rem July 2016; call makeNotation.makeTupletBrackets directly.
         '''
         return makeNotation.makeTupletBrackets(
             self,
@@ -5870,7 +5870,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         Calls :py:func:`~music21.stream.makeNotation.realizeOrnaments`.
         
-        DEPRECATED Sep 2015; will be removed by March 2016
+        DEPRECATED Sep 2015; will be removed by July 2016
         '''
         warnings.warn("realizeOrnaments; use stream.makeNotation.realizeOrnaments() instead", 
                       StreamDeprecationWarning)

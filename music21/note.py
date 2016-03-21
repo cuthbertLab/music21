@@ -1141,7 +1141,7 @@ class Note(NotRest):
         ''')
 
 
-    @common.deprecated("May 2014", "Jan 2016", "use pitch.accidental instead")
+    @common.deprecated("May 2014", "May 2016", "use pitch.accidental instead")
     def _getAccidental(self):
         return self.pitch.accidental
 
@@ -1187,7 +1187,7 @@ class Note(NotRest):
         See :attr:`~music21.pitch.Pitch.step`.
         ''')
 
-    @common.deprecated("May 2014", "Jan 2016", "use pitch.frequency instead")
+    @common.deprecated("May 2014", "May 2016", "use pitch.frequency instead")
     def _getFrequency(self):
         return self.pitch.frequency
 
@@ -1214,7 +1214,7 @@ class Note(NotRest):
         doc = '''Return or set the octave value from the :class:`~music21.pitch.Pitch` object. 
         See :attr:`~music21.pitch.Pitch.octave`.''')
 
-    @common.deprecated("May 2014", "Jan 2016", "use pitch.midi instead")
+    @common.deprecated("May 2014", "May 2016", "use pitch.midi instead")
     def _getMidi(self):
         return self.pitch.midi
 
@@ -1232,7 +1232,7 @@ class Note(NotRest):
         DEPRECATED May 2014: use n.pitch.midi instead
         ''')
 
-    @common.deprecated("May 2014", "Jan 2016", "use pitch.ps instead")
+    @common.deprecated("May 2014", "May 2016", "use pitch.ps instead")
     def _getPs(self):
         return self.pitch.ps
 
@@ -1250,7 +1250,7 @@ class Note(NotRest):
         DEPRECATED May 2014: use n.pitch.ps instead
         ''')
 
-    @common.deprecated("May 2014", "Jan 2016", "use pitch.microtone instead")
+    @common.deprecated("May 2014", "May 2016", "use pitch.microtone instead")
     def _getMicrotone(self):
         return self.pitch.microtone
 
@@ -1267,7 +1267,7 @@ class Note(NotRest):
         ''')
 
 
-    @common.deprecated("May 2014", "Jan 2016", "use pitch.pitchClass instead")
+    @common.deprecated("May 2014", "May 2016", "use pitch.pitchClass instead")
     def _getPitchClass(self):
         return self.pitch.pitchClass
 
@@ -1282,7 +1282,7 @@ class Note(NotRest):
         ''')
 
 
-    @common.deprecated("May 2014", "Jan 2016", "use pitch.pitchClassString instead")
+    @common.deprecated("May 2014", "May 2016", "use pitch.pitchClassString instead")
     def _getPitchClassString(self):
         return self.pitch.pitchClassString
 

@@ -351,16 +351,6 @@ def parse(workName,
 
 
 
-@common.deprecated("1999?","by early 2016", "Use corpus.parse() instead.")
-def parseWork(*arguments, **keywords):
-    '''
-    This function exists for backwards compatibility.
-
-    All calls should use :func:`~music21.corpus.parse` instead.
-    '''
-    return parse(*arguments, **keywords)
-
-
 #------------------------------------------------------------------------------
 # compression
 

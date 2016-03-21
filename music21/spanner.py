@@ -779,7 +779,7 @@ class SpannerBundle(object):
         >>> sb = spanner.SpannerBundle()
         >>> sb.append(su1)
         >>> sb.append(su2)
-        >>> sb.list
+        >>> list(sb)
         [<music21.spanner.Slur >, <music21.spanner.Glissando >]
         '''
         post = []

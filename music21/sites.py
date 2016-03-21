@@ -836,20 +836,6 @@ class Sites(common.SlottedObject):
                 return True
         return False
 
-    @common.deprecated("May 2015","Jan 2016","Not needed.  All sites are sites. :-)")
-    def isSite(self, obj):
-        '''
-        DEPRECATED: TO be removed by v.2.1 -- used only by a long deprecated
-        removeLocationBySite.
-        
-        Given an object, determine if it is an object in a Site stored in this 
-        Sites's siteDict. This
-        will return False if the object is simply a context and not a location.
-        '''
-        if id(obj) in self.siteDict:
-            return True
-        return False
-
     def purgeLocations(self, rescanIsDead=False):
         '''
         Clean all locations that refer to objects that no longer exist.
