@@ -50,7 +50,6 @@ import unittest
 
 from music21 import chord
 from music21 import clef
-from music21 import common
 from music21 import exceptions21
 from music21 import key
 from music21 import meter

@@ -370,17 +370,21 @@ def bestTimeSignature(meas):
     # find sum of all durations in quarter length
     # find if there are any dotted durations
     minDurDotted = False
-    sumDurQL = meas.duration.quarterLength
+    sumDurQL = opFrac(meas.duration.quarterLength)
     #beatStrAvg = 0
     #beatStrAvg += e.beatStrength
         
     for e in meas.recurse().notesAndRests:
         if e.quarterLength == 0.0:
             continue # case of grace durations
-        if e.quarterLength < minDurQL:
+        if (e.quarterLength < minDurQL and 
+                not isinstance(opFrac(e.quarterLength), fractions.Fraction)): # no non-power2 sigs
             minDurQL = e.quarterLength
             if e.duration.dots > 0:
                 minDurDotted = True
+            else:
+                minDurDotted = False
+            
 
     # first, we need to evenly divide min dur into total
     minDurTest = minDurQL
@@ -408,7 +412,7 @@ def bestTimeSignature(meas):
         # if we do not have a match; we need to break down this value
         match = False
         i = 10
-        while i>0:
+        while i > 0:
             if minDurTest < duration.typeToDuration[MIN_DENOMINATOR_TYPE]:
                 minDurTest = duration.typeToDuration[MIN_DENOMINATOR_TYPE]
                 break

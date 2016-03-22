@@ -124,7 +124,11 @@ def makeBeams(s, inPlace=False):
             # error check; call before sending to time signature, as, if this
             # fails, it represents a problem that happens before time signature
             # processing
-            durSum = opFrac(sum([d.quarterLength for d in durList]))
+            summed = sum([d.quarterLength for d in durList])
+            durSum = opFrac(opFrac(summed)) # the double call corrects for tiny errors in adding
+                    # floats and Fractions in the sum() call -- the first opFrac makes it
+                    # impossible to have 4.00000000001, but returns Fraction(4, 1). The
+                    # second call converts Fraction(4, 1) to 4.0
             barQL = lastTimeSignature.barDuration.quarterLength
 
             if durSum > barQL:
