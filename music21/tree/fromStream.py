@@ -356,6 +356,9 @@ def convert(inputStream, flatten, classList):
 class Test(unittest.TestCase):
     
     def testFastPopulate(self):
+        '''
+        tests that the isSorted speed up trick ends up producing identical results.
+        '''
         from music21 import corpus
         sf = corpus.parse('bwv66.6').flat
         sfTree = sf.asTree()

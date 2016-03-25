@@ -128,8 +128,8 @@ class ElementNode(core.AVLNode):
     end time will possibly match the offset span without needing to descend into the tree.
     
     The last element in a Stream often doesn't has the highest endTime (think of different
-    voices, etc.) so searches for offsets are often O(n) when they could be O(log n) if
-    the information were cached into a tree as this does.
+    voices, flat streams, etc.) so searches for offsets are often O(n) when 
+    they could be O(log n) if the information were cached into a tree as this does.
     '''
     ### CLASS VARIABLES ###
 
@@ -443,23 +443,6 @@ class OffsetNode(ElementNode):
     'payloadElementsStopIndex': r'''
         The timespan stop index (i.e., the last x where s[x] is found in this Node's payload) 
         of only those timespans stored in the payload of this node.
-        ''',
-    'endTimeHigh': r'''
-        The highest endTime of any node in the subtree rooted on this node.
-        ''',
-        
-    'endTimeLow': r'''
-        The lowest endTime of any node in the subtree rooted on this node.
-        ''',               
-        
-    'subtreeElementsStartIndex': r'''
-        The lowest element index of an element in the payload of any node of the
-        subtree rooted on this node.
-        ''',
-        
-    'subtreeElementsStopIndex': r'''
-        The highest element index of an element in the payload of any node of the
-        subtree rooted on this node.
         ''',
     }
     
