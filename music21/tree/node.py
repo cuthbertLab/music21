@@ -13,7 +13,8 @@
 '''
 Internal data structures for timespan collections.
 
-This is an implementation detail of the TimespanTree class.
+This is an implementation detail of the TimespanTree class.  Most music21 users
+can happily ignore this module.
 '''
 
 import unittest
@@ -23,11 +24,112 @@ from music21.sorting import SortTuple
 #------------------------------------------------------------------------------
 class ElementNode(core.AVLNode):
     r'''
-    A node containing an element, which is aware of the element's
+    A node containing a single element, which is aware of the element's
     endTime and index within a stream, as well as the endTimes and indices of the
     elements to the left and right of it. 
+    
+    Here's an element node that is at first is no different than an AVL node, except in
+    representation:
+    
+    >>> n = note.Note("C4")
+    >>> n.duration.quarterLength = 2.0
+    >>> n.offset = 4.0
+    
+    >>> elNode = tree.node.ElementNode(n.sortTuple(), n)
+    >>> elNode
+    <ElementNode: Start:4.0 <0.20...> Indices:(l:-1 *-1* r:-1) Payload:<music21.note.Note C>>
 
-    TODO: Specific ElementNode tests and docs.
+    >>> avlNode = tree.core.AVLNode(4.0, n)
+    >>> avlNode
+    <AVLNode: Start:4.0 Height:0 L:None R:None>
+
+    But now let's give n a stream context where it is element 1 in the measure.
+    
+    >>> m = stream.Measure()
+    >>> r = note.Rest(type='whole')
+    >>> m.insert(0.0, r)
+    >>> m.insert(4.0, n)
+    >>> n2 = note.Note('F#4')
+    >>> n2.duration.quarterLength = 3.0
+    >>> m.insert(6.0, n2)
+
+    Let's create an ElementNode object for each object and attach them to elNode:
+
+    >>> rElNode = tree.node.ElementNode(r.sortTuple(), r)
+    >>> n2ElNode = tree.node.ElementNode(n2.sortTuple(), n2)
+    >>> elNode.leftChild = rElNode
+    >>> elNode.update()
+    >>> elNode.rightChild = n2ElNode
+    >>> elNode.update()
+    
+    Everything so far could be done w/ AVLNodes, which are not music21 specific.
+    But now we'll add some specific features, based on the information from the Stream.
+
+    >>> m[1] is n
+    True
+    >>> m.highestTime
+    9.0
+    >>> m.offset
+    0.0
+
+
+    >>> rElNode.payloadElementIndex = 0
+    >>> elNode.payloadElementIndex = 1
+    >>> n2ElNode.payloadElementIndex = 2
+    
+    >>> elNode.updateIndices()
+    >>> elNode.updateEndTimes()
+    
+
+    Now let's look at the ElementNode:
+    
+    >>> elNode
+    <ElementNode: Start:4.0 <0.20...> Indices:(l:0 *1* r:3) Payload:<music21.note.Note C>>
+    
+    elNode is at 4.0.  With it and underneath it are nodes from 0 <= nodes < 3.  This 
+    seemingly screwy way of counting is exactly slice notation: [0:3].
+
+    So if we wanted to get a certain index number we would know that index 0 is in the 
+    leftChild's payload, index 2 is in the rightChild's payload, and index 1 is this node's
+    payload.  This information is easy to compute for ElementNodes, since each node holds
+    exactly one element (since the position here is a sortTuple which is unique); for its
+    subclass, OffsetNode, where multiple elements can be in a node, this will become
+    much more important and harder to work with.
+    
+    Here is how you can actually get this information.
+    
+    >>> elNode.subtreeElementsStartIndex
+    0
+    >>> elNode.subtreeElementsStopIndex
+    3
+    
+    If they've never been set then they return -1, but the .updateIndices() call above
+    set these number for the children also. So they return the node's own index and one above:
+    
+    >>> n2ElNode.subtreeElementsStartIndex
+    2
+    >>> n2ElNode.subtreeElementsStopIndex
+    3
+    
+    Now here is the thing that actually makes trees based on ElementNodes useful.  Each node
+    knows the lowest and highest endTime as well as offset among the nodes below it:
+    
+    >>> elNode.lowestPosition.offset
+    0.0
+    >>> elNode.endTimeLow
+    4.0
+    >>> elNode.highestPosition.offset
+    6.0
+    >>> elNode.endTimeHigh
+    9.0
+
+    What's so great about this?  If you're doing a "getElementsByOffset" search, you
+    can know from this information whether there's going to be an element whose start or
+    end time will possibly match the offset span without needing to descend into the tree.
+    
+    The last element in a Stream often doesn't has the highest endTime (think of different
+    voices, etc.) so searches for offsets are often O(n) when they could be O(log n) if
+    the information were cached into a tree as this does.
     '''
     ### CLASS VARIABLES ###
 
@@ -65,8 +167,8 @@ class ElementNode(core.AVLNode):
     
     ### INITIALIZER ###
 
-    def __init__(self, offset, payload=None):
-        super(ElementNode, self).__init__(offset, payload)
+    def __init__(self, position, payload=None):
+        super(ElementNode, self).__init__(position, payload)
         self.payloadElementIndex = -1
         
         self.endTimeHigh = None
@@ -90,6 +192,30 @@ class ElementNode(core.AVLNode):
             self.payload,
             )
 
+    ### PROPERTIES ###
+    @property
+    def lowestPosition(self):
+        '''
+        Returns the lowest position in the tree rooted on this node.
+        '''
+        if self.leftChild is None:
+            return self.position
+        else:
+            return self.leftChild.lowestPosition
+
+    @property
+    def highestPosition(self):
+        '''
+        Returns the highest position in the tree rooted on this node.
+        '''
+        if self.rightChild is None:
+            return self.position
+        else:
+            return self.rightChild.highestPosition
+
+
+    ### METHODS ###
+
     def updateIndices(self, parentStopIndex=None):
         r'''
         Updates the payloadElementIndex, and the subtreeElementsStartIndex and 
@@ -101,6 +227,9 @@ class ElementNode(core.AVLNode):
         minimum and maximum indices of the subtrees rooted at each node.
 
         Called on rootNode of a tree that uses ElementNodes, such as ElementTree
+
+        parentStopIndex specifies the stop index of the parent node, if known.
+        It is used internally by the function.
 
         Returns None.
         '''
@@ -162,10 +291,12 @@ class ElementNode(core.AVLNode):
         self.endTimeLow = endTimeLow
         self.endTimeHigh = endTimeHigh
 
+
 #------------------------------------------------------------------------------
 class OffsetNode(ElementNode):
     r'''
-    A node representing zero, one, or more elements or timespans at an offset.
+    A node representing zero, one, or many elements at an offset.  It has all the
+    power of an ElementNode but substantially more.
 
     Here's an example of what it means and does:
     
@@ -267,12 +398,8 @@ class OffsetNode(ElementNode):
     ### CLASS VARIABLES ###
 
     __slots__ = (
-        'endTimeHigh',
-        'endTimeLow',
         'payloadElementsStartIndex',
         'payloadElementsStopIndex',
-        'subtreeElementsStartIndex',
-        'subtreeElementsStopIndex',
         )
 
     _DOC_ATTR = {
@@ -463,7 +590,7 @@ class Test(unittest.TestCase):
 #------------------------------------------------------------------------------
 
 
-_DOC_ORDER = (ElementNode,)
+_DOC_ORDER = (ElementNode, OffsetNode)
 
 
 #------------------------------------------------------------------------------
