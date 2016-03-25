@@ -607,7 +607,7 @@ def deleteMeasures(s, toDelete, inPlace=False):
             return s
     
     #correct the measure numbers
-    measures = list(s.iter.getElementsByClass("Measure"))
+    measures = list(s.getElementsByClass("Measure"))
     if len(measures) is not 0:
         i = measures[0].number
         
@@ -742,13 +742,13 @@ class Expander(object):
         '''    
         # get and store the source measure count; this is presumed to
         # be a Stream with Measures
-        self._srcMeasureStream = self._src.getElementsByClass('Measure')
+        self._srcMeasureStream = self._src.getElementsByClass('Measure').stream()
         # store all top-level non Measure elements for later insertion
-        self._srcNotMeasureStream = self._src.getElementsNotOfClass('Measure')
+        self._srcNotMeasureStream = self._src.getElementsNotOfClass('Measure').stream()
 
         # see if there are any repeat brackets
         self._repeatBrackets = self._src.flat.getElementsByClass(
-                   'RepeatBracket')
+                   'RepeatBracket').stream()
 
         self._srcMeasureCount = len(self._srcMeasureStream)
         if self._srcMeasureCount == 0:
@@ -757,7 +757,7 @@ class Expander(object):
         # store counts of all non barline elements.
         # doing class matching by string as problems matching in some test cases
         reStream = self._srcMeasureStream.flat.getElementsByClass(
-                   'RepeatExpression')
+                   'RepeatExpression').stream()
         self._codaCount = len(reStream.getElementsByClass('Coda'))
         self._segnoCount = len(reStream.getElementsByClass('Segno'))
         self._fineCount = len(reStream.getElementsByClass('Fine'))
@@ -4227,7 +4227,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('ryansMammoth/BanjoReel')
         #s.show()
-        firstNotesList = s.flat.notes.elements
+        firstNotesList = list(s.flat.notes)
         #[0:16][16:22][0:16][22:27][27:58][27:58]
         expandedByHandList = (firstNotesList[0:16] + firstNotesList[16:22] + 
                               firstNotesList[0:16] + firstNotesList[22:27] + 
@@ -4238,7 +4238,7 @@ class Test(unittest.TestCase):
         #post.show()
         #print [n.nameWithOctave for n in post.flat.notes]
         #post.show()
-        secondNotesList = post.flat.notes.elements
+        secondNotesList = list(post.flat.notes)
         secondNotesNoteNames = [n.nameWithOctave for n in secondNotesList]
         self.assertEqual(expandedByHandNoteNames, secondNotesNoteNames)
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-The music21 Framework is Copyright © 2006-2015 Michael Scott Cuthbert 
+The music21 Framework is Copyright © 2006-2016 Michael Scott Cuthbert 
 and the music21 Project
 
 (Michael Scott Cuthbert, principal investigator; cuthbert@mit.edu)

@@ -4238,6 +4238,8 @@ class TestSectionScore(unittest.TestCase):
         mockPart1.append.assert_any_call('1-2')
         mockPart2.append.assert_any_call('2-1')
         mockPart2.append.assert_any_call('2-2')
+        self.assertFalse(mockPart1.atSoundingPitch)
+        self.assertFalse(mockPart2.atSoundingPitch)
 
     def testScoreIntegration1(self):
         '''
@@ -4279,6 +4281,8 @@ class TestSectionScore(unittest.TestCase):
         self.assertEqual(3, len(actual))  # parts plus "slurBundle"
         self.assertEqual(1, len(actual.parts[0]))  # one Measure in each part
         self.assertEqual(1, len(actual.parts[1]))
+        self.assertFalse(actual.parts[0].atSoundingPitch)  # each Part is set as not sounding pitch
+        self.assertFalse(actual.parts[1].atSoundingPitch)
         self.assertIsInstance(actual.parts[0][0], stream.Measure)
         self.assertIsInstance(actual.parts[1][0], stream.Measure)
         self.assertEqual(3, len(actual.parts[0][0]))  
@@ -4909,18 +4913,19 @@ class TestSectionScore(unittest.TestCase):
         self.assertEqual(1, len(parsed))
         self.assertTrue('1' in parsed)
         self.assertEqual(2, len(parsed['1']))  # two <measure>s, each in a <section>
+        # check the Instrument
+        instr = parsed['1'][0][0]
+        self.assertIsInstance(instr, instrument.Tuba)  # check out the Instrument
         # check the first Measure
-        meas = parsed['1'][0][0]
+        meas = parsed['1'][0][1]
         # the order of these doesn't matter, but it may change, so this is easier to adjust
-        instrIndex = 0
-        clefIndex = 1
-        keysigIndex = 2
-        timesigIndex = 3
-        voiceIndex = 4
+        clefIndex = 0
+        keysigIndex = 1
+        timesigIndex = 2
+        voiceIndex = 3
         self.assertIsInstance(meas, stream.Measure)
         self.assertEqual(42, meas.number)
-        self.assertEqual(5, len(meas))  # an Instrument, a Voice, a Clef, a KeySignature, a TimeSignature
-        self.assertIsInstance(meas[instrIndex], instrument.Tuba)  # check out the Instrument
+        self.assertEqual(4, len(meas))  # a Voice, a Clef, a KeySignature, a TimeSignature
         self.assertIsInstance(meas[voiceIndex], stream.Voice)  # check out the Voice and its Note
         self.assertEqual(1, len(meas[voiceIndex]))
         self.assertIsInstance(meas[voiceIndex][0], note.Note)
@@ -4964,3 +4969,49 @@ class TestBarLineFromElement(unittest.TestCase):
         actual = base.barLineFromElement(elem)
         self.assertIsInstance(actual, bar.Barline)
         self.assertEqual('regular', actual.style)
+
+
+
+#------------------------------------------------------------------------------
+class RegressionIntegrationTests(unittest.TestCase):
+    '''
+    Targeted tests that address bugs, run without any mock objects.
+    '''
+
+    def testInstrumentDetails(self):
+        '''
+        Ensure that instrument details are imported properly.
+
+        There should be one instrument called "Clarinet."
+        '''
+        meiSource = '''<?xml version="1.0" encoding="UTF-8"?>
+            <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
+            <music><score>
+                <scoreDef meter.count="8" meter.unit="8">
+                    <staffGrp>
+                        <staffDef n="1" label="Clarinet" trans.diat="-2" trans.semi="-3">
+                            <clef shape="F" line="4"/>
+                        </staffDef>
+                    </staffGrp>
+                </scoreDef>
+                <section>
+                    <scoreDef key.sig="1f" key.mode="major"/>
+                    <measure n="1">
+                        <staff n="1">
+                            <layer n="1" xml:id="asdf">
+                                <note pname="E" oct="2" dur="1"/>
+                            </layer>
+                        </staff>
+                    </measure>
+                </section>
+            </score></music></mei>
+        '''
+        testConv = base.MeiToM21Converter(meiSource)
+
+        actual = testConv.run()
+
+        self.assertEqual(1, len(actual.parts[0].getInstruments()))
+        instr = actual.parts[0].getInstruments()[0]
+        self.assertIsInstance(instr, instrument.Instrument)
+        self.assertEqual(instr.partName, 'Clarinet')
+        self.assertEqual(instr.transposition.directedName, 'm-3')

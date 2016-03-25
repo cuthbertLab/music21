@@ -446,8 +446,8 @@ def checkLeadSheetPitches(worksheet, returnType=''):
     #chordLine = nicePiece.getElementsByClass(stream.Part)[1]
     #chordLine.show('text')
     #bassLine = nicePiece.part(2)
-    studentsAnswers = worksheet.flat.getElementsByClass(chord.Chord)
-    answerKey = worksheet.flat.getElementsByClass(harmony.ChordSymbol)
+    studentsAnswers = worksheet.flat.getElementsByClass(chord.Chord).stream()
+    answerKey = worksheet.flat.getElementsByClass(harmony.ChordSymbol).stream()
     
     correctedAssignment, unused_numCorrect = correctChordSymbols(answerKey, studentsAnswers)
     

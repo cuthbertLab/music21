@@ -205,7 +205,7 @@ class NoteworthyTranslator(object):
         
         self.score.insert(0, self.currentPart)
         
-        #print "SHOW"  
+        #print("SHOW")  
         #totalscore.show('text')
         #totalscore.show()
         return self.score
@@ -230,12 +230,12 @@ class NoteworthyTranslator(object):
         
         for kk in parts:
             if kk == "Grace":
-                #print "GRACE NOTE"
+                #print("GRACE NOTE")
                 # Now it doesn't work, the function for grace notes have to be added here 
                 environLocal.warn('skipping grace note')
                 return
             elif kk == "Slur":
-                #print "SLUR"
+                #print("SLUR")
                 if self.withinSlur is False:
                     self.beginningSlurNote = generalNote
                 thisNoteIsSlurred = True

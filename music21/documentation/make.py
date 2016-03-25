@@ -21,15 +21,13 @@ from music21 import common
 from music21 import documentation
 from music21 import exceptions21
 
-import multiprocessing
-
 class DocBuilderException(exceptions21.Music21Exception):
     pass
 
 class DocBuilder(object):
     def __init__(self, command='html'):
         self.useMultiprocessing = True
-        self.cpus_to_use = max(1, multiprocessing.cpu_count() - 1)  # @UndefinedVariable
+        self.cpus_to_use = common.cpus()
         if self.cpus_to_use == 1:
             self.useMultiprocessing = False
         self.useMultiprocessing = False # too unstable still
@@ -92,6 +90,7 @@ class DocBuilder(object):
         # other options are in source/conf.py,
         sphinxOptions = ['sphinx']
         sphinxOptions.extend(('-b', target))
+        sphinxOptions.extend(('-c', self.sourcesDirectoryPath))
         sphinxOptions.extend(('-d', self.doctreesDirectoryPath))
         if self.useMultiprocessing:
             sphinxOptions.extend(('-j', str(self.cpus_to_use)))
@@ -125,6 +124,10 @@ class DocBuilder(object):
         self.doctreesDirectoryPath = os.path.join(
             self.buildDirectoryPath,
             'doctrees',
+            )
+        self.sourcesDirectoryPath = os.path.join(
+            documentationDirectoryPath,
+            'source',
             )
         self.buildDirectories = {
             'html': os.path.join(

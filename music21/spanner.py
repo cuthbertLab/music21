@@ -406,7 +406,7 @@ class Spanner(base.Music21Object):
 #             post.append(objRef)
 
         # return raw elements list for speed; attached to a temporary stream
-        return postStream._elements
+        return list(postStream)
 
     def getSpannedElementIds(self):
         '''Return all id() for all stored objects.
@@ -765,17 +765,12 @@ class SpannerBundle(object):
     def __repr__(self):
         return '<music21.spanner.SpannerBundle of size %s>' % self.__len__()
 
-    def _getList(self):
+    @property
+    def list(self):
         '''
-        Return the bundle as a list.
-        '''
-        post = []
-        for x in self._storage:
-            post.append(x)
-        return post
+        DEPRECATED: use list(sb) instead!
 
-    list = property(_getList, 
-        doc='''Return the bundle as a list.
+        Return the bundle as a list.
         
         >>> su1 = spanner.Slur()
         >>> su1.idLocal = 1
@@ -784,9 +779,13 @@ class SpannerBundle(object):
         >>> sb = spanner.SpannerBundle()
         >>> sb.append(su1)
         >>> sb.append(su2)
-        >>> sb.list
+        >>> list(sb)
         [<music21.spanner.Slur >, <music21.spanner.Glissando >]
-        ''')
+        '''
+        post = []
+        for x in self._storage:
+            post.append(x)
+        return post
 
     def getSpannerStorageIds(self):
         '''Return all SpannerStorage ids from all contained Spanners

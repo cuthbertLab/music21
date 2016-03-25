@@ -1948,14 +1948,14 @@ class PlotStream(object):
 
 
     #---------------------------------------------------------------------------
-    def _getId(self):
-        return '%s-%s' % (self.format, '-'.join(self.values))
-
-
-    id = property(_getId, doc='''
+    @property
+    def id(self):
+        '''
         Each PlotStream has a unique id that consists of its format and a 
         string that defines the parameters that are graphed.
-        ''')
+        '''
+        return '%s-%s' % (self.format, '-'.join(self.values))
+
 
     #---------------------------------------------------------------------------
     def _axisLabelMeasureOrOffset(self):

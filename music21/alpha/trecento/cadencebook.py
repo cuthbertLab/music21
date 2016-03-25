@@ -495,21 +495,17 @@ class TrecentoCadenceWork(object):
 
         return s
 
-
-    def _getIncipit(self):
+    @property
+    def incipit(self):
         '''
         Gets the Incipit PolyphonicSnippet of the piece.
-        
         
         The incipit keeps its time signature
         in a different location from all the other snippets.
         hence, it's a little different
         
-
         Returns None if the piece or timeSignature is 
         undefined
-        
-        
         
         >>> bs = alpha.trecento.cadencebook.BallataSheet()
         >>> accur = bs.makeWork(2)
@@ -524,8 +520,6 @@ class TrecentoCadenceWork(object):
         else: 
             blockOut = self.convertBlockToStreams(rowBlock)
             return polyphonicSnippet.Incipit(blockOut, self)
-
-    incipit = property(_getIncipit)
  
     def getOtherSnippets(self):
         '''
@@ -651,13 +645,12 @@ class TrecentoCadenceWork(object):
         return self.snippets[1:x]
 
 
-    def _cadenceAClass(self):
+    @property
+    def cadenceA(self):
         '''
         returns the snippet which represents the cadence at the end of
         the A section of the piece.
         '''
-        
-        
         try:
             fc = self.snippets[1]
         except IndexError:
@@ -666,9 +659,8 @@ class TrecentoCadenceWork(object):
             fc.snippetName = "A section cadence"
         return fc
 
-    cadenceA = property(_cadenceAClass)
-
-    def _cadenceB1Class(self):
+    @property
+    def cadenceB(self):
         '''
         returns the snippet that represents the open cadence of the B section
         or the only cadence if there are no open and close endings.
@@ -681,13 +673,11 @@ class TrecentoCadenceWork(object):
             fc.snippetName = "B section cadence (1st or only ending)"
         return fc
 
-    cadenceB = property(_cadenceB1Class)
-    
-    def _cadenceB2Class(self):
+    @property    
+    def cadenceBClos(self):
         '''
         Returns the second B cadence -- that is, the 2nd or clos ending.
         '''
-        
         try:
             fc = self.snippets[3]
         except IndexError:
@@ -695,8 +685,6 @@ class TrecentoCadenceWork(object):
         if fc is not None:
             fc.snippetName = "B section cadence (2nd ending)"
         return fc
-
-    cadenceBClos = property(_cadenceB2Class)
 
     def getAllStreams(self):
         '''

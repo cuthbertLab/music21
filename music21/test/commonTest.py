@@ -14,7 +14,6 @@ Things that are common to testing...
 '''
 import doctest
 import imp
-import multiprocessing
 import os
 #import time
 import types
@@ -57,7 +56,7 @@ class Music21TestRunner(unittest.runner.TextTestRunner):
         result.failfast = self.failfast
         result.buffer = self.buffer
         with warnings.catch_warnings():
-            if self.warnings:
+            if hasattr(self, 'warnings') and self.warnings:
                 # if self.warnings is set, use it to filter all the warnings
                 warnings.simplefilter(self.warnings)
                 # if the filter is 'default' or 'always', special-case the
@@ -219,7 +218,7 @@ class ModuleGather(object):
         
         # skip any path that contains this string
         self.pathSkip = ['obsolete', 
-                         'ext', 
+                         'music21/ext',  # not just "ext" because of "text!"
                          'alpha/webapps/server', 
                          'alpha/webapps/archive',
                          ]
@@ -264,7 +263,7 @@ class ModuleGather(object):
         for dirpath, unused_dirnames, filenames in os.walk(self.dirParent):
             self._visitFunc(None, dirpath, filenames)
 
-        if multiprocessing.cpu_count() > 4:# @UndefinedVariable
+        if common.cpus() > 4:# @UndefinedVariable
             self.modulePaths.sort(key=manyCoreSortFunc)
         else:
             self.modulePaths.sort()

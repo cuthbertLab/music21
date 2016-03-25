@@ -68,50 +68,49 @@ class ContiguousSegmentOfNotes(base.Music21Object):
         self.containerStream = containerStream
         self.partNumber = partNumber
         
-    def _getStartMeasureNumber(self):
+    @property
+    def startMeasureNumber(self):
+        '''The measure number on which the contiguous segment begins.'''
         if (len(self.segment)):
             return self.segment[0].measureNumber
         else:
             return None
     
-    startMeasureNumber = property(_getStartMeasureNumber,
-        doc = '''The measure number on which the contiguous segment begins.''')
-    
-    def _getStartOffset(self):
+    @property
+    def startOffset(self):
+        '''
+        The offset of the beginning of the contiguous segment, 
+        with respect to the measure containing the first note.        
+        '''
         if (len(self.segment)):
             return self.segment[0].offset
         else:
             return None
-    startOffset = property(_getStartOffset,
-        doc = '''The offset of the beginning of the contiguous segment, 
-            with respect to the measure containing the first note.''')
     
-    def _getZeroCenteredTransformationsFromMatchedToActive(self):
+    @property
+    def zeroCenteredTransformationsFromMatched(self):
+        '''
+        The list of zero-centered transformations taking a segment being searched 
+        for to a found segment, for example, in 
+        :func:`~music21.alpha.search.serial.findTransformedSegments`. 
+        For an explanation of the zero-centered convention for serial transformations, 
+        see :meth:`music21.alpha.search.serial.ToneRow.zeroCenteredTransformation`.
+        '''
         activeRow = pcToToneRow(self.activeSegment)
         matchedRow = pcToToneRow(self.matchedSegment)
         return matchedRow.findZeroCenteredTransformations(activeRow)
     
-    zeroCenteredTransformationsFromMatched = property(
-        _getZeroCenteredTransformationsFromMatchedToActive, 
-        doc = '''The list of zero-centered transformations taking a segment being searched 
-                    for to a found segment, for example, in 
-                    :func:`~music21.alpha.search.serial.findTransformedSegments`. 
-                    For an explanation of the zero-centered convention for serial transformations, 
-                    see :meth:`music21.alpha.search.serial.ToneRow.zeroCenteredTransformation`.''')
-        
-    def _getOriginalCenteredTransformationsFromMatchedToActive(self):
+    @property
+    def originalCenteredTransformationsFromMatched(self):
+        '''The list of original-centered transformations taking a segment being 
+        searched for to a found segment, for example, in 
+        :func:`~music21.alpha.search.serial.findTransformedSegments`. 
+        For an explanation of the 
+        zero-centered convention for serial transformations, see 
+        :meth:`music21.alpha.search.serial.ToneRow.originalCenteredTransformation`.'''        
         activeRow = pcToToneRow(self.activeSegment)
         matchedRow = pcToToneRow(self.matchedSegment)
         return matchedRow.findOriginalCenteredTransformations(activeRow)
-    
-    originalCenteredTransformationsFromMatched = property(
-        _getOriginalCenteredTransformationsFromMatchedToActive, 
-        doc = '''The list of original-centered transformations taking a segment being 
-                searched for to a found segment, for example, in 
-                :func:`~music21.alpha.search.serial.findTransformedSegments`. 
-                For an explanation of the 
-                zero-centered convention for serial transformations, see 
-                :meth:`music21.alpha.search.serial.ToneRow.originalCenteredTransformation`.''')
 
     def readPitchClassesFromBottom(self):        
         '''

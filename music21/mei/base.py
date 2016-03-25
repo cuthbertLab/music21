@@ -3258,11 +3258,33 @@ def sectionScoreCore(elem, allPartNs, slurBundle, **kwargs):
                                                                  backupMeasureNum=backupMeasureNum,
                                                                  slurBundle=slurBundle)
             for eachN, eachList in six.iteritems(localParsed):
+                # NOTE: "eachList" is a list of objects that will become a music21 Part.
+                #
                 # first: if there were objects from a previous <scoreDef> or <staffDef>, we need to
                 #        put those into the first Measure object we encounter in this Part
+                # TODO: this is where the Instruments get added
+                # TODO: I think "eachList" really means "each list that will become a Part"
                 if len(inNextThing[eachN]) > 0:
+                    # we have to put Instrument objects just before the Measure to which they apply
+                    theInstr = None
+                    theInstrI = None
+                    for i, eachInsertion in enumerate(inNextThing[eachN]):
+                        if isinstance(eachInsertion, instrument.Instrument):
+                            theInstr = eachInsertion
+                            theInstrI = i
+                            break
+
+                    # Put the Instrument right in front, then remove it from "inNextThing" so it
+                    # doesn't show up twice.
+                    if theInstr:
+                        eachList.insert(0, theInstr)
+                        del inNextThing[eachN][theInstrI]
+
                     for eachObj in eachList:
+                        # NOTE: "eachObj" is one of the things that will be in the Part, which are
+                        #       probably but not necessarily Measures
                         if isinstance(eachObj, stream.Stream):
+                            # NOTE: ... but now eachObj is virtually guaranteed to be a Measure
                             for eachInsertion in inNextThing[eachN]:
                                 eachObj.insert(0.0, eachInsertion)
                             break
@@ -3392,6 +3414,8 @@ def scoreFromElement(elem, slurBundle):
     environLocal.printDebug('*** making the Score')
     theScore = [stream.Part() for _ in range(len(allPartNs))]
     for i, eachN in enumerate(allPartNs):
+        # set "atSoundingPitch" so transposition works
+        theScore[i].atSoundingPitch = False
         for eachObj in parsed[eachN]:
             theScore[i].append(eachObj)
     theScore = stream.Score(theScore)
@@ -3482,6 +3506,7 @@ if __name__ == "__main__":
         test_base.TestMeasureFromElement,
         test_base.TestSectionScore,
         test_base.TestBarLineFromElement,
+        test_base.RegressionIntegrationTests,
     )
 
 #------------------------------------------------------------------------------

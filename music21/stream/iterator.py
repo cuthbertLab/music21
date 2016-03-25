@@ -6,16 +6,17 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
+from music21.sites import SitesException
 '''
 this class contains iterators and filters for walking through streams
 
 StreamIterators are explicitly allowed to access private methods on streams.
 '''
 import unittest
-
+import warnings
 from music21 import common
 from music21.stream import filters
 from music21.exceptions21 import StreamException
@@ -24,6 +25,9 @@ from music21.ext import six
 
 #------------------------------------------------------------------------------
 class StreamIteratorException(StreamException):
+    pass
+
+class StreamIteratorInefficientWarning(PendingDeprecationWarning):
     pass
 
 #------------------------------------------------------------------------------
@@ -36,6 +40,9 @@ class StreamIterator(object):
 
     Note that this iterator automatically sets the active site of
     returned elements to the source Stream.
+
+    There is one property to know about: .overrideDerivation which overrides the set
+    derivation of the class when .stream() is called
 
     Sets:
 
@@ -75,6 +82,8 @@ class StreamIterator(object):
         
         self.cleanupOnStop = False
         self.restoreActiveSites = restoreActiveSites
+
+        self.overrideDerivation = None
 
         if filterList is None:
             filterList = []
@@ -152,6 +161,136 @@ class StreamIterator(object):
         
     if six.PY2:
         next = __next__
+
+    def __getattr__(self, attr):
+        '''
+        In case an attribute is defined on Stream but not on a StreamIterator, 
+        create a Stream and then return that attribute.  This is NOT performance
+        optimized -- calling this repeatedly will mean creating a lot of different
+        streams.  However, it will prevent most code that worked on v.2. from breaking
+        on v.3.
+        
+        >>> s = stream.Measure()
+        >>> s.insert(0, note.Rest())
+        >>> s.repeatAppend(note.Note('C'), 2)
+        >>> s.definesExplicitSystemBreaks
+        False
+        
+        >>> s.notes
+        <music21.stream.iterator.StreamIterator for Measure:0x101c1a208 @:0>
+        
+        >>> s.notes.definesExplicitSystemBreaks
+        False
+        
+        Works with methods as well:
+        
+        >>> s.notes.pop(0)
+        <music21.note.Note C>
+        
+        But remember that a new Stream is being created each time, so you can pop() forever:
+        
+        >>> s.notes.pop(0)
+        <music21.note.Note C>
+        >>> s.notes.pop(0)
+        <music21.note.Note C>
+        >>> s.notes.pop(0)
+        <music21.note.Note C>
+        
+        If run with -w, this call will send a StreamIteratorInefficientWarning to stderr
+        reminding developers that this is not an efficient call, and .stream() should be
+        called (and probably cached) explicitly.
+        
+        Failures are explicitly given as coming from the StreamIterator object.
+        
+        >>> s.asdf
+        Traceback (most recent call last):        
+        AttributeError: 'Measure' object has no attribute 'asdf'
+        >>> s.notes.asdf
+        Traceback (most recent call last):        
+        AttributeError: 'StreamIterator' object has no attribute 'asdf'
+        '''
+        if not hasattr(self.srcStream, attr):
+            # original stream did not have the attribute, so new won't; but raise on iterator.
+            raise AttributeError("%r object has no attribute %r" %
+                         (self.__class__.__name__, attr)) 
+            
+        warnings.warn(
+            attr + " is not defined on StreamIterators. Call .stream() first for efficiency",
+            StreamIteratorInefficientWarning,
+            stacklevel=2)
+            
+        sOut = self.stream()
+        return getattr(sOut, attr)
+
+    def __getitem__(self, k):
+        '''
+        if you are in the iterator, you should still be able to request other items...
+        uses self.srcStream.__getitem__
+
+        >>> s = stream.Stream()
+        >>> s.insert(0, note.Note('F#'))
+        >>> s.repeatAppend(note.Note('C'), 2)
+        >>> sI = s.iter
+        >>> sI
+        <music21.stream.iterator.StreamIterator for Stream:0x104743be0 @:0>
+
+        >>> sI.srcStream is s
+        True
+
+        >>> for n in sI:
+        ...    printer = (repr(n), repr(sI[0]))
+        ...    print(printer)
+        ('<music21.note.Note F#>', '<music21.note.Note F#>')
+        ('<music21.note.Note C>', '<music21.note.Note F#>')
+        ('<music21.note.Note C>', '<music21.note.Note F#>')
+        >>> sI.srcStream is s
+        True
+        
+        Slices work:
+        
+        >>> nSlice = sI[1:]
+        >>> for n in nSlice:
+        ...     print(n)
+        <music21.note.Note C>
+        <music21.note.Note C>        
+        
+        Filters, such as "notes" apply.
+        
+        >>> s.insert(0, clef.TrebleClef())
+        >>> s[0]
+        <music21.clef.TrebleClef>
+        >>> s.iter.notes[0]
+        <music21.note.Note F#>
+
+        Demo of cleanupOnStop = True
+
+        >>> sI.cleanupOnStop = True
+        >>> for n in sI:
+        ...    printer = (repr(n), repr(sI[0]))
+        ...    print(printer)
+        ('<music21.note.Note F#>', '<music21.note.Note F#>')
+        ('<music21.note.Note C>', '<music21.note.Note F#>')
+        ('<music21.note.Note C>', '<music21.note.Note F#>')
+        >>> sI.srcStream is None
+        True
+        >>> for n in sI:
+        ...    printer = (repr(n), repr(sI[0]))
+        ...    print(printer)
+
+        (nothing is printed)
+        '''
+        fe = self.matchingElements()
+        try:
+            e = fe[k]
+        except TypeError:
+            e = None
+            for el in fe:
+                if el.id.lower() == k.lower():
+                    e = el
+                    break
+        # TODO: Slices and everything else in Stream __getitem__ ; in fact, merge...
+        return e
+        
 
     def __len__(self):
         '''
@@ -339,72 +478,6 @@ class StreamIterator(object):
             except StopIteration:
                 raise
         return True
-
-
-
-    
-    def __getitem__(self, k):
-        '''
-        if you are in the iterator, you should still be able to request other items...
-        uses self.srcStream.__getitem__
-
-        >>> s = stream.Stream()
-        >>> s.insert(0, note.Note('F#'))
-        >>> s.repeatAppend(note.Note('C'), 2)
-        >>> sI = s.iter
-        >>> sI
-        <music21.stream.iterator.StreamIterator for Stream:0x104743be0 @:0>
-
-        >>> sI.srcStream is s
-        True
-
-        >>> for n in sI:
-        ...    printer = (repr(n), repr(sI[0]))
-        ...    print(printer)
-        ('<music21.note.Note F#>', '<music21.note.Note F#>')
-        ('<music21.note.Note C>', '<music21.note.Note F#>')
-        ('<music21.note.Note C>', '<music21.note.Note F#>')
-        >>> sI.srcStream is s
-        True
-        
-        Slices work:
-        
-        >>> nSlice = sI[1:]
-        >>> for n in nSlice:
-        ...     print(n)
-        <music21.note.Note C>
-        <music21.note.Note C>        
-        
-        Filters, such as "notes" apply.
-        
-        >>> s.insert(0, clef.TrebleClef())
-        >>> s[0]
-        <music21.clef.TrebleClef>
-        >>> s.iter.notes[0]
-        <music21.note.Note F#>
-
-        Demo of cleanupOnStop = True
-
-        >>> sI.cleanupOnStop = True
-        >>> for n in sI:
-        ...    printer = (repr(n), repr(sI[0]))
-        ...    print(printer)
-        ('<music21.note.Note F#>', '<music21.note.Note F#>')
-        ('<music21.note.Note C>', '<music21.note.Note F#>')
-        ('<music21.note.Note C>', '<music21.note.Note F#>')
-        >>> sI.srcStream is None
-        True
-        >>> for n in sI:
-        ...    printer = (repr(n), repr(sI[0]))
-        ...    print(printer)
-
-        (nothing is printed)
-        '''
-        fe = self.matchingElements()
-        e = fe[k]
-
-        return e
-        
     
     def _newBaseStream(self):
         '''
@@ -477,12 +550,34 @@ class StreamIterator(object):
         >>> s4.show('t')
         {0.0} <music21.bar.Barline style=regular>
         
+        
+        Note that this routine can create Streams that have elements that the original
+        stream did not, in the case of recursion:
+        
+        >>> bach = corpus.parse('bwv66.6')
+        >>> bn = bach.flat[30]
+        >>> bn
+        <music21.note.Note E>
+        
+        >>> bn in bach
+        False
+        >>> bfn = bach.recurse().notes.stream()
+        >>> bn in bfn
+        True
+        >>> bn.getOffsetBySite(bfn)
+        2.0
+        >>> bn.getOffsetInHierarchy(bach)
+        2.0
+        
         OMIT_FROM_DOCS
         
         >>> s4._endElements[0] is b
         True
         '''
         ss = self.srcStream
+        
+        # if this stream was sorted, the resultant stream is sorted
+        clearIsSorted = False
 
         if returnStreamSubClass is True:
             try:
@@ -494,14 +589,24 @@ class StreamIterator(object):
             
         found.mergeAttributes(ss)
         found.derivation.origin = ss
-        derivationMethods = []
-        for f in self.filters:
-            derivationMethods.append(f.derivationStr)
-        found.derivation.method = '.'.join(derivationMethods)
+        if self.overrideDerivation is not None:
+            found.derivation.method = self.overrideDerivation
+        else:
+            derivationMethods = []
+            for f in self.filters:
+                derivationMethods.append(f.derivationStr)
+            found.derivation.method = '.'.join(derivationMethods)
         
         fe = self.matchingElements()
         for e in fe:
-            o = ss.elementOffset(e, stringReturns=True)
+            try:
+                o = ss.elementOffset(e, stringReturns=True)
+            except SitesException:
+                # this can happen in the case of, s.recurse().notes.stream() -- need to do new
+                # stream...
+                o = e.getOffsetInHierarchy(ss)
+                clearIsSorted = True # now the stream is probably not sorted...
+            
             if not isinstance(o, str):                
                 found._insertCore(o, e, ignoreSort=True)
             else:
@@ -511,9 +616,9 @@ class StreamIterator(object):
                     # TODO: something different...
                     found._storeAtEndCore(e)
 
-        # if this stream was sorted, the resultant stream is sorted        
+                
         if fe:
-            found.elementsChanged(clearIsSorted=False)
+            found.elementsChanged(clearIsSorted=clearIsSorted)
         
         return found
     

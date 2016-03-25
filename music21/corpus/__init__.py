@@ -205,7 +205,7 @@ def search(
     <music21.metadata.bundles.MetadataBundle {0 entries}>
 
     >>> corpus.search('bach', field='composer')
-    <music21.metadata.bundles.MetadataBundle {21 entries}>
+    <music21.metadata.bundles.MetadataBundle {22 entries}>
    
     >>> corpus.search('coltrane', corpusNames=('virtual',))
     <music21.metadata.bundles.MetadataBundle {1 entry}>
@@ -349,16 +349,6 @@ def parse(workName,
         format=format # @ReservedAssignment
         )
 
-
-
-@common.deprecated("1999?","by early 2016", "Use corpus.parse() instead.")
-def parseWork(*arguments, **keywords):
-    '''
-    This function exists for backwards compatibility.
-
-    All calls should use :func:`~music21.corpus.parse` instead.
-    '''
-    return parse(*arguments, **keywords)
 
 
 #------------------------------------------------------------------------------

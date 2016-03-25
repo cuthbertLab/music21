@@ -2071,42 +2071,37 @@ class Variant(base.Music21Object):
 
     #---------------------------------------------------------------------------
     # Stream  simulation/overrides
+    @property
+    def highestTime(self):
+        '''
+        This property masks calls to Stream.highestTime. Assuming `exposeTime` 
+        is False, this always returns zero, making the Variant always take zero time. 
 
-    def _getHighestTime(self):
+        >>> v = variant.Variant()
+        >>> v.append(note.Note(quarterLength=4))
+        >>> v.highestTime
+        0.0
+        '''
         if self.exposeTime:
             return self._stream.highestTime
         else:
             return 0.0
 
-    highestTime = property(_getHighestTime, doc='''
-        This property masks calls to Stream.highestTime. Assuming `exposeTime` 
-        is False, this always returns zero, making the Variant always take zero time. 
-
-        
-        >>> v = variant.Variant()
-        >>> v.append(note.Note(quarterLength=4))
-        >>> v.highestTime
-        0.0
-
-        ''')
-
-    def _getHighestOffset(self):
-        if self.exposeTime:
-            return self._stream.highestOffset
-        else:
-            return 0.0
-
-    highestOffset = property(_getHighestOffset, doc='''
+    @property
+    def highestOffset(self):
+        '''
         This property masks calls to Stream.highestOffset. Assuming `exposeTime` 
         is False, this always returns zero, making the Variant always take zero time. 
 
-        
         >>> v = variant.Variant()
         >>> v.append(note.Note(quarterLength=4))
         >>> v.highestOffset
         0.0
-
-        ''')
+        '''
+        if self.exposeTime:
+            return self._stream.highestOffset
+        else:
+            return 0.0
 
     def show(self, fmt=None, app=None):
         '''
@@ -2133,41 +2128,37 @@ class Variant(base.Music21Object):
 
     #---------------------------------------------------------------------------
     # particular to this class
-
-    def _getContainedHighestTime(self):
-        return self._stream.highestTime
-
-    containedHighestTime = property(_getContainedHighestTime, doc='''
+    @property
+    def containedHighestTime(self):
+        '''
         This property calls the contained Stream.highestTime.
 
-        
         >>> v = variant.Variant()
         >>> v.append(note.Note(quarterLength=4))
         >>> v.containedHighestTime
         4.0
-        ''')
+        '''
+        return self._stream.highestTime
 
-    def _getContainedHighestOffset(self):
-        return self._stream.highestOffset
-
-    containedHighestOffset = property(_getContainedHighestOffset, doc='''
+    @property
+    def containedHighestOffset(self):
+        '''
         This property calls the contained Stream.highestOffset.
-
         
         >>> v = variant.Variant()
         >>> v.append(note.Note(quarterLength=4))
         >>> v.append(note.Note())
         >>> v.containedHighestOffset
         4.0
+        '''
+        return self._stream.highestOffset
 
-        ''')
-
-    def _getContainedSite(self):
+    @property
+    def containedSite(self):
+        '''
+        Return the Stream contained in this Variant.
+        '''
         return self._stream
-
-    containedSite = property(_getContainedSite, doc='''
-        Return a reference to the Stream contained in this Variant.
-        ''')
     
     def _getReplacementDuration(self):
         if self._replacementDuration is None:
@@ -2187,20 +2178,20 @@ class Variant(base.Music21Object):
         itself.
         ''')
     
-    def _getLengthType(self):
+    @property
+    def lengthType(self):
+        '''
+        Returns 'deletion' if variant is shorter than the region it replaces, 'elongation'
+        if the variant is longer than the region it replaces, and 'replacement' if it is
+        the same length.
+        '''
         lengthDifference = self.replacementDuration - self.containedHighestTime
         if lengthDifference > 0.0:
             return 'deletion'
         elif lengthDifference < 0.0:
             return 'elongation'
         else:
-            return 'replacement'
-    
-    lengthType = property(_getLengthType, doc='''
-        Returns 'deletion' if variant is shorter than the region it replaces, 'elongation'
-        if the variant is longer than the region it replaces, and 'replacement' if it is
-        the same length.
-        ''')
+            return 'replacement'    
     
     def replacedElements(self, contextStream=None, classList=None, 
                          keepOriginalOffsets=False, includeSpacers=False):

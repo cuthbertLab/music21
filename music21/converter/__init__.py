@@ -947,8 +947,8 @@ class Converter(object):
 
     #---------------------------------------------------------------------------
     # properties
-
-    def _getStream(self):
+    @property
+    def stream(self):
         '''
         Returns the .subConverter.stream object.
         '''
@@ -960,8 +960,6 @@ class Converter(object):
             return None
         # not _stream: please don't look in other objects' private variables;
         #              humdrum worked differently.
-
-    stream = property(_getStream)
 
 
 

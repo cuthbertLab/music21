@@ -18,7 +18,7 @@ BSD license or the GNU Lesser General Public License, described below:
 ---
 BSD License
 
-Copyright (c) 2006-15, Michael Scott Cuthbert and cuthbertLab
+Copyright (c) 2006-16, Michael Scott Cuthbert and cuthbertLab
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

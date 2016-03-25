@@ -88,25 +88,20 @@ class Scale(base.Music21Object):
         base.Music21Object.__init__(self)
         self.type = 'Scale' # could be mode, could be other indicator
 
-
-    def _getName(self):
-        '''Return or construct the name of this scale
+    @property
+    def name(self):
+        '''
+        Return or construct the name of this scale
         '''
         return self.type
         
-    name = property(_getName, 
-        doc = '''Return or construct the name of this scale.
-
-        ''')
-
-    def _isConcrete(self):
-        return False
-
-    isConcrete = property(_isConcrete, 
-        doc = '''To be concrete, a Scale must have a defined tonic. 
+    @property
+    def isConcrete(self):
+        '''To be concrete, a Scale must have a defined tonic. 
         An abstract Scale is not Concrete, nor is a Concrete scale 
-        without a defined tonic.
-        ''')
+        without a defined tonic.  Thus, is always false.
+        '''
+        return False
 
     def extractPitchList(self, other, comparisonAttribute='nameWithOctave', removeDuplicates=True):
         '''
@@ -614,19 +609,13 @@ class AbstractScale(Scale):
                 return
         Scale.show(self, fmt=fmt, app=app)
 
-
-    def _getNetworkxGraph(self):
+    @property
+    def networkxGraph(self):
         '''
-        Create a networkx graph from the stored network.
+        Return a networks Graph object representing a realized version 
+        of this :class:`~music21.intervalNetwork.IntervalNetwork`
         '''
         return self._net.getNetworkxGraph()
-
-    networkxGraph = property(_getNetworkxGraph, doc='''
-        Return a networks Graph object representing a realized version 
-        of this :class:`~music21.intervalNetwork.IntervalNetwork`.
-        ''')
-
-
 
     def plot(self, *args, **keywords):
         '''
@@ -645,7 +634,7 @@ class AbstractScale(Scale):
         from music21 import graph
         # first ordered arg can be method type
         g = graph.GraphNetworxGraph( 
-            networkxGraph=self._getNetworkxGraph(), *args, **keywords)
+            networkxGraph=self.networkxGraph, *args, **keywords)
             # for pitched version
             #networkxGraph=self._getNetworkxRealizedGraph(pitchObj=pitchObj, 
             #    nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch))
@@ -1301,19 +1290,9 @@ class ConcreteScale(Scale):
             if tonic in pitches:
                 self._abstract.tonicDegree = pitches.index(tonic) + 1
             
-
-    def _isConcrete(self):
-        '''
-        To be concrete, a Scale must have a 
-        defined tonic. An abstract Scale is not Concrete
-        '''
-        if self.tonic is None:
-            return False
-        else:
-            return True
-
-    isConcrete = property(_isConcrete, 
-        doc = '''Return True if the scale is Concrete, that is, it has a defined Tonic. 
+    @property
+    def isConcrete(self):
+        '''Return True if the scale is Concrete, that is, it has a defined Tonic. 
 
         
         >>> sc1 = scale.MajorScale('c')
@@ -1323,7 +1302,13 @@ class ConcreteScale(Scale):
         >>> sc2.isConcrete
         False
 
-        ''')
+        To be concrete, a Scale must have a 
+        defined tonic. An abstract Scale is not Concrete
+        '''
+        if self.tonic is None:
+            return False
+        else:
+            return True
 
 
     def __eq__(self, other):
@@ -1378,23 +1363,19 @@ class ConcreteScale(Scale):
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    def _getName(self):
+    @property
+    def name(self):
         '''
         Return or construct the name of this scale
+        
+        >>> sc = scale.DiatonicScale() # abstract, as no defined tonic
+        >>> sc.name
+        'Abstract diatonic'        
         '''
         if self.tonic is None:
             return " ".join(['Abstract', self.type]) 
         else:
             return " ".join([self.tonic.name, self.type]) 
-
-    name = property(_getName, 
-        doc = '''Return or construct the name of this scale.
-
-        
-        >>> sc = scale.DiatonicScale() # abstract, as no defined tonic
-        >>> sc.name
-        'Abstract diatonic'
-        ''')
 
     def __repr__(self):
         return '<music21.scale.%s %s %s>' % (self.__class__.__name__, self.tonic.name, self.type)
@@ -1411,26 +1392,24 @@ class ConcreteScale(Scale):
         '''
         return self.tonic
 
-    def _getAbstract(self):
-        '''Return the underlying abstract scale
+    @property
+    def abstract(self):
         '''
-        # copy before returning?
-        return self._abstract
+        Return the AbstractScale instance governing this ConcreteScale.
 
-    abstract = property(_getAbstract, 
-        doc='''Return the AbstractScale instance governing this ConcreteScale.
-
-        
         >>> sc1 = scale.MajorScale('d')
         >>> sc2 = scale.MajorScale('b-')
         >>> sc1 == sc2
         False
         >>> sc1.abstract == sc2.abstract
         True
-        ''')
+        '''
+        # copy before returning? (too slow)
+        return self._abstract
 
     def getDegreeMaxUnique(self):
-        '''Convenience routine to get this from the AbstractScale.
+        '''
+        Convenience routine to get this from the AbstractScale.
         '''
         return self._abstract.getDegreeMaxUnique()
 
@@ -1590,6 +1569,8 @@ class ConcreteScale(Scale):
             return []
         #raise ScaleException("Cannot generate a scale from a DiatonicScale class")
 
+
+    # this needs to stay separate from getPitches
     pitches = property(getPitches, 
         doc ='''Get a default pitch list from this scale.
         ''')
@@ -1610,6 +1591,7 @@ class ConcreteScale(Scale):
                                            maxPitch=maxPitch, 
                                            direction=direction), **keywords)
 
+    # this needs to stay separate from getChord
     chord = property(getChord, 
         doc = '''Return a Chord object from this harmony over a default range.  
         Use the `getChord()` method if you need greater control over the
@@ -1620,7 +1602,6 @@ class ConcreteScale(Scale):
         direction=DIRECTION_ASCENDING, equateTermini=True):        
         '''
         Given a scale degree, return a deepcopy of the appropriate pitch. 
-
         
         >>> sc = scale.MajorScale('e-')
         >>> sc.pitchFromDegree(2)

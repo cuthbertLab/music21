@@ -21,9 +21,12 @@ Speed notes:
    use pyLevenshtein if it is installed from http://code.google.com/p/pylevenshtein/ .
    You will need to compile it by running **sudo python setup.py install** on Mac or
    Unix (compilation is much more difficult on Windows; sorry). The ratios are very 
-   slightly different, but the speedup is between 10 and 100x!
+   slightly different, but the speedup is between 10 and 100x! (but then PyPy probably won't work)
 
 '''
+from __future__ import print_function, division
+
+from music21 import common
 from music21 import converter
 from music21 import corpus
 from music21 import environment
@@ -36,18 +39,21 @@ import math
 import json
 import difflib
 from collections import OrderedDict
+from functools import partial
+import random
 
 def translateMonophonicPartToSegments(
     inputStream,
-    segmentLengths = 30,
-    overlap = 12,
-    algorithm = None,
+    segmentLengths=30,
+    overlap=12,
+    algorithm=None,
+    jitter=0,
     ):
     '''
     Translates a monophonic part with measures to a set of segments of length
     `segmentLengths` (measured in number of notes) with an overlap of `overlap` notes 
     using a conversion algorithm of `algorithm` (default: search.translateStreamToStringNoRhythm). 
-    Returns two lists, a list of segments, and a list of measure
+    Returns two lists, a list of segments, and a list of tuples of measure start and end
     numbers that match the segments.
     
     If algorithm is None then a default algorithm of music21.search.translateStreamToStringNoRhythm
@@ -61,10 +67,10 @@ def translateMonophonicPartToSegments(
     ['HJHEAAEHHCE@JHGECA@A>@A><A@AAE', '@A>@A><A@AAEEECGHJHGH@CAE@FECA']
 
 
-    Segment zero begins at measure 1.  Segment 1 begins at measure 7:
+    Segment zero begins at measure 1 and ends in m. 12.  Segment 1 spans m.7 - m.18:
 
     >>> measureLists[0:2]
-    [1, 7]
+    [(1, 12), (7, 18)]
 
     >>> segments, measureLists = search.segment.translateMonophonicPartToSegments(
     ...     lucaCantus, 
@@ -73,67 +79,36 @@ def translateMonophonicPartToSegments(
     ['CRJOMTHCQNALRQPAGFEFDLFDCFEMOO', 'EFDLFDCFEMOOONPJDCBJSNTHLBOGFE']
 
     >>> measureLists[0:2]
-    [1, 7]
+    [(1, 12), (7, 18)]
 
     '''
     from music21 import search
     if algorithm is None:
         algorithm = search.translateStreamToStringNoRhythm
-    
+        
+    nStream = inputStream.recurse().notes.stream()
+    outputStr, measures = algorithm(nStream, returnMeasures=True) 
+    totalLength = len(outputStr)
+
+
+    numberOfSegments = int(math.ceil((totalLength + 0.0) / (segmentLengths - overlap)))
+    segmentStarts = [i * (segmentLengths - overlap) for i in range(numberOfSegments)]
+    #print(totalLength, numberOfSegments, segmentStarts)
+
     segmentList = []
-    measureSegmentList = []
     measureList = []
     
-    totalLength = 0
-    previousTuple = (False, False, None) # lastRest, lastTied, lastQL
-    for m in inputStream.getElementsByClass('Measure'):
-        mNotes = m.flat.getElementsByClass('Note')
-        if algorithm == search.translateDiatonicStreamToString:
-            algorithmOutput, previousTuple = algorithm(mNotes, previousTuple[0], 
-                                                       previousTuple[1], previousTuple[2], 
-                                                       returnLastTuple=True)
-        else: # not all algorithms can take two streams...
-            algorithmOutput = algorithm(mNotes) 
-        
-        mDict = {'measureNumber': m.number, 
-                 'data': algorithmOutput, 
-                 'dataLength': len(algorithmOutput), 
-                 'startPosition': totalLength}
-        totalLength += len(algorithmOutput)
-        measureSegmentList.append(mDict)
-
-    numberOfSegments = int(math.ceil((totalLength+0.0)/(segmentLengths-overlap)))
-    segmentStarts = [i*(segmentLengths-overlap) for i in range(numberOfSegments)]
-    #print totalLength, numberOfSegments, segmentStarts
-    
     for segmentStart in segmentStarts:
-        segmentEnd = segmentStart + segmentLengths
-        currentSegment = ""
-        startMeasure = None
-        lengthLeft = segmentLengths
-        for mDict in measureSegmentList:
-            if mDict['startPosition'] + mDict['dataLength'] < segmentStart:
-                continue
-            elif mDict['startPosition'] >= segmentEnd:
-                break
-            if startMeasure is None:
-                startMeasure = mDict['measureNumber']
-            currentData = mDict['data']
-            lenCurrentData = mDict['dataLength']
-            if mDict['startPosition'] < segmentStart:
-                trimFromFront = segmentStart - mDict['startPosition']
-                currentDataTrimmed = currentData[trimFromFront:]
-                lengthLeft = lengthLeft - len(currentDataTrimmed)
-                currentSegment += currentDataTrimmed
-            elif lengthLeft < lenCurrentData:
-                currentDataTrimmed = currentData[0:lengthLeft]
-                currentSegment += currentDataTrimmed
-                lengthLeft = lengthLeft - len(currentDataTrimmed) # shouldn't matter...
-            else:
-                lengthLeft = lengthLeft - lenCurrentData
-                currentSegment += currentData      
+        segmentStart += random.randint(-1 * jitter, jitter)
+        segmentStart = max(0, segmentStart)
+        segmentStart = min(segmentStart, totalLength - 1)
+        
+        segmentEnd = min(segmentStart + segmentLengths, totalLength)
+        currentSegment = outputStr[segmentStart:segmentEnd]
+        measureTuple = (measures[segmentStart],  measures[segmentEnd - 1])
+
         segmentList.append(currentSegment)
-        measureList.append(startMeasure)
+        measureList.append(measureTuple)
     return (segmentList, measureList)
 
 def indexScoreParts(scoreFile, *args, **kwds):
@@ -147,7 +122,7 @@ def indexScoreParts(scoreFile, *args, **kwds):
     >>> scoreList[1]['segmentList'][0]
     '@B@@@@ED@DBDA=BB@?==B@@EBBDBBA'
     >>> scoreList[1]['measureList'][0:3]
-    [0, 4, 8]
+    [(0, 7), (4, 9), (8, 9)]
     '''
     scoreFileParts = scoreFile.parts
     indexedList = []
@@ -161,19 +136,38 @@ def indexScoreParts(scoreFile, *args, **kwds):
     return indexedList
 
 
-def indexScoreFilePaths(
-    scoreFilePaths,
-    giveUpdates=False,
-    *args,
-    **kwds
-    ):
+def _indexSingleMulticore(filePath, *args, **kwds):
+    kwds2 = copy.copy(kwds)
+    if 'failFast' in kwds2:
+        del(kwds2['failFast'])
+
+    shortfp = filePath.split(os.sep)[-1]
+    try:
+        indexOutput = indexOnePath(filePath, *args, **kwds2)
+    except Exception as e: # pylint: disable=broad-except
+        if 'failFast' not in kwds or kwds['failFast'] is False:
+            print("Failed on parse/index for, %s: %s" % (filePath, str(e)))
+            indexOutput = ""
+        else:
+            raise(e)
+    return(shortfp, indexOutput)
+
+def _giveUpdatesMulticore(numRun, totalRun, latestOutput):
+    for o in latestOutput:
+        print("Indexed %s (%d/%d)" % (
+            o[0], numRun, totalRun))
+    
+
+def indexScoreFilePaths(scoreFilePaths,
+                        giveUpdates=False,
+                        *args,
+                        **kwds):
     '''
     Returns a dictionary of the lists from indexScoreParts for each score in
     scoreFilePaths
     
     >>> searchResults = corpus.search('bwv19')
-    >>> fpsNamesOnly = sorted([searchResult.sourcePath
-    ...     for searchResult in searchResults])
+    >>> fpsNamesOnly = sorted([searchResult.sourcePath for searchResult in searchResults])
     >>> len(fpsNamesOnly)
     9
 
@@ -182,31 +176,22 @@ def indexScoreFilePaths(
     4
 
     >>> scoreDict['bwv190.7.mxl'][0]['measureList']
-    [0, 5, 11, 17, 22, 27]
+    [(0, 9), (6, 15), (11, 20), (17, 25), (22, 31), (27, 32)]
 
     >>> scoreDict['bwv190.7.mxl'][0]['segmentList'][0]
     'NNJLNOLLLJJIJLLLLNJJJIJLLJNNJL'
     
     '''
-    scoreDict = OrderedDict()
-    scoreIndex = 0
-    totalScores = len(scoreFilePaths)
-    for filePath in scoreFilePaths:
-        shortfp = filePath.split(os.sep)[-1]
-        if giveUpdates is True:
-            print("Indexing %s (%d/%d)" % (
-                shortfp, scoreIndex, totalScores))
-        scoreIndex += 1
-        if 'failFast' not in kwds or kwds['failFast'] is False:        
-            try:
-                scoreDict[shortfp] = indexOnePath(filePath, *args, **kwds)
-            except Exception as e: # pylint: disable=broad-except
-                print("Failed on parse for, %s: %s" % (filePath, str(e)))
-        else:
-            kwds2 = copy.copy(kwds)
-            del(kwds2['failFast'])
-            scoreDict[shortfp] = indexOnePath(filePath, *args, **kwds2)
-            
+    if giveUpdates is True:
+        updateFunction = _giveUpdatesMulticore
+    else:
+        updateFunction = None
+    
+    indexFunc = partial(_indexSingleMulticore, *args, **kwds)
+
+    rpList = common.runParallel(scoreFilePaths, indexFunc, updateFunction)
+    scoreDict = OrderedDict(rpList)
+
     return scoreDict
 
 
@@ -293,10 +278,10 @@ def scoreSimilarity(
     >>> for result in scoreSim[64:68]:
     ...     result
     ...
-    (...'bwv197.5.mxl', 0, 1, 4, ...'bwv197.10.mxl', 3, 1, 4, 0.0)
-    (...'bwv197.5.mxl', 0, 1, 4, ...'bwv197.10.mxl', 3, 2, 9, 0.0)
-    (...'bwv197.5.mxl', 0, 2, 9, ...'bwv190.7.mxl', 0, 0, 0, 0.07547...)
-    (...'bwv197.5.mxl', 0, 2, 9, ...'bwv190.7.mxl', 0, 1, 5, 0.07547...)
+    (...'bwv197.5.mxl', 0, 1, (5, 11), ...'bwv197.10.mxl', 3, 1, (5, 12), 0.0)
+    (...'bwv197.5.mxl', 0, 1, (5, 11), ...'bwv197.10.mxl', 3, 2, (9, 14), 0.0)
+    (...'bwv197.5.mxl', 0, 2, (9, 14), ...'bwv190.7.mxl', 0, 0, (0, 9), 0.07547...)
+    (...'bwv197.5.mxl', 0, 2, (9, 14), ...'bwv190.7.mxl', 0, 1, (6, 15), 0.07547...)
         
     '''
     similarityScores = []

@@ -714,13 +714,13 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.base.Music21Object.containerHierarchy
         - music21.base.Music21Object.contextSites      
         - music21.base.Music21Object.getAllContextsByClass
-        - music21.base.Music21Object.getContextAttr
         - music21.base.Music21Object.getContextByClass
         - music21.base.Music21Object.getOffsetBySite
+        - music21.base.Music21Object.getOffsetInHierarchy
         - music21.base.Music21Object.getSpannerSites
         - music21.base.Music21Object.informSites
         - music21.base.Music21Object.isClassOrSubclass
-        - music21.base.Music21Object.next        
+        - music21.base.Music21Object.next
         music21.stream.Stream:
         - music21.stream.Stream.activateVariants
         - music21.stream.Stream.addGroupForElements

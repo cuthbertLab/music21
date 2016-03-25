@@ -846,8 +846,9 @@ def findSegments(music21Part, **partKeywords):
     # Slurring
     # --------
     slurLongPhraseWithBrackets = SEGMENT_SLURLONGPHRASEWITHBRACKETS
-    showShortSlursAndTiesTogether, showLongSlursAndTiesTogether = \
-    SEGMENT_SHOWSHORTSLURSANDTIESTOGETHER, SEGMENT_SHOWLONGSLURSANDTIESTOGETHER
+    (showShortSlursAndTiesTogether, 
+        showLongSlursAndTiesTogether) = (SEGMENT_SHOWSHORTSLURSANDTIESTOGETHER, 
+                                            SEGMENT_SHOWLONGSLURSANDTIESTOGETHER)
 
     if 'slurLongPhraseWithBrackets' in partKeywords:
         slurLongPhraseWithBrackets = partKeywords['slurLongPhraseWithBrackets']
@@ -1002,7 +1003,7 @@ def prepareSlurredNotes(music21Part,
     <music21.tie.Tie start>
     """
     if music21Part.spannerBundle:
-        allNotes = music21Part.flat.notes
+        allNotes = music21Part.flat.notes.stream()
         for slur in music21Part.spannerBundle.getByClass(spanner.Slur):
             try:
                 slur[0].index = allNotes.index(slur[0])
@@ -1160,7 +1161,7 @@ def getRawSegments(music21Part, segmentBreaks=None):
     if segmentBreaks:
         (mnStart, offsetStart) = segmentBreaks[segmentIndex]
     currentSegment = BrailleSegment()
-    for music21Measure in music21Part.getElementsByClass(stream.Measure, stream.Voice):
+    for music21Measure in music21Part.getElementsByClass([stream.Measure, stream.Voice]):
         prepareBeamedNotes(music21Measure)
         if music21Measure.number >= mnStart:
             music21Measure.sliceAtOffsets(offsetList=[offsetStart], inPlace=True)
@@ -1298,11 +1299,11 @@ def prepareBeamedNotes(music21Measure):
     >>> measure.notes[3].beamContinue
     True
     """
-    allNotes = music21Measure.notes
+    allNotes = music21Measure.notes.stream()
     for sampleNote in allNotes:
         sampleNote.beamStart = False
         sampleNote.beamContinue = False
-    allNotesAndRests = music21Measure.notesAndRests
+    allNotesAndRests = music21Measure.notesAndRests.stream()
     allNotesWithBeams = allNotes.splitByClass(
         None, lambda sampleNote: not(sampleNote.beams is None) and len(sampleNote.beams) > 0)[0]
     allStart = allNotesWithBeams.splitByClass(

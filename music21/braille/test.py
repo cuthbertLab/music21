@@ -560,7 +560,7 @@ def example6_7():
     """
     bm = converter.parse("tinynotation: g'4 f'#4 f'4 e'4 e'-4 d'4 d'-4 c'4 b4 b-4 a4 a-4 g4 " + 
                          "f#4 f4 e4 e-4 d4 d-4 c4 B4 c4 d4 e4 c2 r2 c1",
-                          makeNotation=False).getElementsNotOfClass(['TimeSignature'])
+                          makeNotation=False).getElementsNotOfClass(['TimeSignature']).stream()
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bm[-3][2].pitch.accidental.displayStatus = False
     bm[-3][3].pitch.accidental.displayStatus = False

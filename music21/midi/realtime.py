@@ -26,13 +26,19 @@ from music21.midi import translate as midiTranslate
 
 import unittest
 
-try:
-    import cStringIO as stringIOModule
-except ImportError:
+from music21.ext import six
+
+if six.PY2:
     try:
-        import StringIO as stringIOModule
+        from cStringIO import StringIO as StrByIO
     except ImportError:
-        import io as stringIOModule
+        try:
+            from StringIO import StringIO as StrByIO
+        except ImportError:
+            from io import StringIO as StrByIO # @UnusedImport
+else:
+    from io import BytesIO as StrByIO # @Reimport
+
 
 class StreamPlayerException(Music21Exception):
     pass
@@ -107,14 +113,14 @@ class StreamPlayer(object):
     
     def play(self, busyFunction=None, busyArgs=None, 
              endFunction=None, endArgs=None, busyWaitMilliseconds=50):
-        streamStringIOFile = self.getStringIOFile()
+        streamStringIOFile = self.getStringOrBytesIOFile()
         self.playStringIOFile(streamStringIOFile, busyFunction, busyArgs, 
                               endFunction, endArgs, busyWaitMilliseconds)
 
-    def getStringIOFile(self):
+    def getStringOrBytesIOFile(self):
         streamMidiFile = midiTranslate.streamToMidiFile(self.streamIn)
         streamMidiWritten = streamMidiFile.writestr()
-        return stringIOModule.StringIO(streamMidiWritten)
+        return StrByIO(streamMidiWritten)
     
     def playStringIOFile(self, stringIOFile, busyFunction=None, busyArgs=None, 
                          endFunction=None, endArgs=None, busyWaitMilliseconds=50):
@@ -222,7 +228,7 @@ class TestExternal(unittest.TestCase):
                 if timeCounter.times > 0:
                     streamPlayer.streamIn = getRandomStream()
                     #timeCounter.oldIOFile = timeCounter.storedIOFile
-                    timeCounter.storedIOFile = streamPlayer.getStringIOFile()
+                    timeCounter.storedIOFile = streamPlayer.getStringOrBytesIOFile()
                     streamPlayer.pygame.mixer.music.queue(timeCounter.storedIOFile)
                     timeCounter.lastPos = currentPos
             else:
@@ -237,7 +243,7 @@ class TestExternal(unittest.TestCase):
 
         b = getRandomStream()
         sp = StreamPlayer(b)
-        timeCounter.storedIOFile = sp.getStringIOFile()  
+        timeCounter.storedIOFile = sp.getStringOrBytesIOFile()  
         while timeCounter.times > 0:
             timeCounter.ready = False
             sp.playStringIOFile(timeCounter.storedIOFile, 

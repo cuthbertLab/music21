@@ -870,11 +870,10 @@ class PartParser(XMLParserBase):
         
         self.appendToScoreAfterParse = True
 
-    def _getParent(self):
+    @property
+    def parent(self):
         return common.unwrapWeakref(self._parent)
 
-    parent = property(_getParent)
-    
     def parse(self):
         self.parsePartInfo()
         self.parseMeasures()
@@ -2010,6 +2009,7 @@ class MeasureParser(XMLParserBase):
 
         mxGrace = mxNote.find('grace')
         isGrace = False
+        
         if mxGrace is not None:
             isGrace = True
             graceType = mxNote.find('type')
@@ -2163,9 +2163,17 @@ class MeasureParser(XMLParserBase):
         else:
             post.duration.slash = False
     
-        post.duration.stealTimePrevious = mxGrace.get('steal-time-previous')
-        post.duration.stealTimeFollowing = mxGrace.get('steal-time-following')
-        # TODO: make-time
+        try:
+            post.duration.stealTimePrevious = int(mxGrace.get('steal-time-previous'))/100
+        except TypeError:
+            pass
+        
+        try:
+            post.duration.stealTimeFollowing = int(mxGrace.get('steal-time-following'))/100
+        except TypeError:
+            pass
+
+        # TODO: make-time -- maybe; or this is something totally different.
     
         return post
     
@@ -2666,6 +2674,7 @@ class MeasureParser(XMLParserBase):
                     useVoice = 1
             else:
                 useVoice = useVoice.text.strip()
+                
             try:
                 thisVoice = m.voices[useVoice]
             except stream.StreamException:
@@ -4220,7 +4229,7 @@ class Test(unittest.TestCase):
                             #forceSource=True
                             )
         #c = corpus.parse('demos/layoutTest.xml')        
-        layouts = c.flat.getElementsByClass('LayoutBase')
+        layouts = c.flat.getElementsByClass('LayoutBase').stream()
         systemLayouts = layouts.getElementsByClass('SystemLayout')
         self.assertEqual(len(systemLayouts), 42)
         staffLayouts = layouts.getElementsByClass('StaffLayout')
@@ -4260,7 +4269,7 @@ class Test(unittest.TestCase):
                             #forceSource=True
                             )
         #c = corpus.parse('demos/layoutTest.xml')        
-        layouts = c.flat.getElementsByClass('LayoutBase')
+        layouts = c.flat.getElementsByClass('LayoutBase').stream()
         self.assertEqual(len(layouts), 76)
         systemLayouts = layouts.getElementsByClass('SystemLayout')
         sl0 = systemLayouts[0]
@@ -4303,6 +4312,20 @@ class Test(unittest.TestCase):
             pCount += len(cc.pitches)
         self.assertEqual(pCount, 97)
         
+    def testTrillOnOneNote(self):
+        import os
+        from music21 import converter
+        thisDir = common.getSourceFilePath() + os.sep + 'musicxml' + os.sep
+        testFp = thisDir + 'testTrillOnOneNote.xml'
+        c = converter.parse(testFp) #, forceSource=True)
+       
+        trillExtension = c.parts[0].getElementsByClass('TrillExtension')[0]
+        fSharpTrill = c.recurse().notes[0]
+        #print(trillExtension.placement)
+        self.assertEqual(fSharpTrill.name, 'F#')
+        self.assertIs(trillExtension[0], fSharpTrill)
+        self.assertIs(trillExtension[-1], fSharpTrill)
+        
     def xtestLucaGloriaSpanners(self):
         '''
         lots of lines, including overlapping here
@@ -4319,11 +4342,10 @@ class Test(unittest.TestCase):
         print(c.parts[1].measure(99).notesAndRests[0].getSpannerSites()[0].idLocal)
         #c.show()
         #c.parts[1].show('t')
-        
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest='testTrillOnOneNote')
     
     
     

@@ -561,7 +561,7 @@ class _EnvironmentCore(object):
         return None
 
 
-    @common.deprecated("May 24, 2014", "January 2016", "call SubConverter().launch() instead")    
+    @common.deprecated("May 24, 2014", "May 2016", "call SubConverter().launch() instead")    
     def launch(self, fmt, filePath, options='', app=None):
         '''
         DEPRECATED May 24, 2014 -- call Launch on SubConverter

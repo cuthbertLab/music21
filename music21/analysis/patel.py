@@ -28,21 +28,20 @@ def nPVI(streamForAnalysis):
 
     
     n.b. -- takes the distance between each element, including clefs, keys, etc.
-    use .notesAndRests etc. to filter out elements that are not useful.
+    use .notesAndRests etc. to filter out elements that are not useful (though this will skip
+    zero length objects)
 
     
     n.b. # 2 -- duration is used rather than actual distance -- for gapless
     streams (the norm) these two measures will be identical.
-
-
     
-    >>> s2 = converter.parse('tinynotation: 4/4 C4 D E F G').flat.notesAndRests
+    >>> s2 = converter.parse('tinynotation: 4/4 C4 D E F G').flat.notesAndRests.stream()
     >>> analysis.patel.nPVI(s2)
     0.0
-    >>> s3 = converter.parse('tinynotation: 4/4 C4 D8 C4 D8 C4').flat.notesAndRests
+    >>> s3 = converter.parse('tinynotation: 4/4 C4 D8 C4 D8 C4').flat.notesAndRests.stream()
     >>> analysis.patel.nPVI(s3)
     66.6666...
-    >>> s4 = corpus.parse('bwv66.6').parts[0].flat.notesAndRests
+    >>> s4 = corpus.parse('bwv66.6').parts[0].flat.notesAndRests.stream()
     >>> analysis.patel.nPVI(s4)
     12.96296...
     '''
@@ -78,13 +77,13 @@ def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
     
     
     
-    >>> s2 = converter.parse('tinynotation: 4/4 C4 D E F# G#').flat.notesAndRests
+    >>> s2 = converter.parse('tinynotation: 4/4 C4 D E F# G#').flat.notesAndRests.stream()
     >>> analysis.patel.melodicIntervalVariability(s2)
     0.0
-    >>> s3 = converter.parse('tinynotation: 4/4 C4 D E F G C').flat.notesAndRests
+    >>> s3 = converter.parse('tinynotation: 4/4 C4 D E F G C').flat.notesAndRests.stream()
     >>> analysis.patel.melodicIntervalVariability(s3)
     85.266688...
-    >>> s4 = corpus.parse('bwv66.6').parts[0].flat.notesAndRests
+    >>> s4 = corpus.parse('bwv66.6').parts[0].flat.notesAndRests.stream()
     >>> analysis.patel.melodicIntervalVariability(s4)
     65.287...
     '''

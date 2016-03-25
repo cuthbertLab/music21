@@ -1075,22 +1075,11 @@ class MetricModulation(TempoIndication):
 
         ''')
 
-
-    def _getNumber(self):
-        if self._newMetronome is not None:
-            return self._newMetronome.number 
-    
-#     def _setNumber(self, value, updateTextFromNumber=True):
-#         if not common.isNum(value):
-#             raise MetricModulationException('cannot set number to a string')
-#         self._newMetronome.number = value
-#         self._oldMetronome.number = value
-
-    number = property(_getNumber, doc =
+    @property
+    def number(self):
         '''
         Get and the number of the MetricModulation, or the number 
         assigned to the new MetronomeMark.
-
         
         >>> s = stream.Stream()
         >>> mm1 = tempo.MetronomeMark(number=60)
@@ -1107,7 +1096,16 @@ class MetricModulation(TempoIndication):
         <music21.tempo.MetronomeMark animato Quarter=120.0>
         >>> mmod1.number        
         120.0
-        ''')
+        '''
+        if self._newMetronome is not None:
+            return self._newMetronome.number 
+    
+#     def _setNumber(self, value, updateTextFromNumber=True):
+#         if not common.isNum(value):
+#             raise MetricModulationException('cannot set number to a string')
+#         self._newMetronome.number = value
+#         self._oldMetronome.number = value
+
 
     #---------------------------------------------------------------------------
     # high-level configuration methods

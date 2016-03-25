@@ -1141,7 +1141,7 @@ class Note(NotRest):
         ''')
 
 
-    @common.deprecated("May 2014", "Jan 2016", "use pitch.accidental instead")
+    @common.deprecated("May 2014", "May 2016", "use pitch.accidental instead")
     def _getAccidental(self):
         return self.pitch.accidental
 
@@ -1187,7 +1187,7 @@ class Note(NotRest):
         See :attr:`~music21.pitch.Pitch.step`.
         ''')
 
-    @common.deprecated("May 2014", "Jan 2016", "use pitch.frequency instead")
+    @common.deprecated("May 2014", "May 2016", "use pitch.frequency instead")
     def _getFrequency(self):
         return self.pitch.frequency
 
@@ -1214,7 +1214,7 @@ class Note(NotRest):
         doc = '''Return or set the octave value from the :class:`~music21.pitch.Pitch` object. 
         See :attr:`~music21.pitch.Pitch.octave`.''')
 
-    @common.deprecated("May 2014", "Jan 2016", "use pitch.midi instead")
+    @common.deprecated("May 2014", "May 2016", "use pitch.midi instead")
     def _getMidi(self):
         return self.pitch.midi
 
@@ -1232,7 +1232,7 @@ class Note(NotRest):
         DEPRECATED May 2014: use n.pitch.midi instead
         ''')
 
-    @common.deprecated("May 2014", "Jan 2016", "use pitch.ps instead")
+    @common.deprecated("May 2014", "May 2016", "use pitch.ps instead")
     def _getPs(self):
         return self.pitch.ps
 
@@ -1250,7 +1250,7 @@ class Note(NotRest):
         DEPRECATED May 2014: use n.pitch.ps instead
         ''')
 
-    @common.deprecated("May 2014", "Jan 2016", "use pitch.microtone instead")
+    @common.deprecated("May 2014", "May 2016", "use pitch.microtone instead")
     def _getMicrotone(self):
         return self.pitch.microtone
 
@@ -1267,7 +1267,7 @@ class Note(NotRest):
         ''')
 
 
-    @common.deprecated("May 2014", "Jan 2016", "use pitch.pitchClass instead")
+    @common.deprecated("May 2014", "May 2016", "use pitch.pitchClass instead")
     def _getPitchClass(self):
         return self.pitch.pitchClass
 
@@ -1282,7 +1282,7 @@ class Note(NotRest):
         ''')
 
 
-    @common.deprecated("May 2014", "Jan 2016", "use pitch.pitchClassString instead")
+    @common.deprecated("May 2014", "May 2016", "use pitch.pitchClassString instead")
     def _getPitchClassString(self):
         return self.pitch.pitchClassString
 
@@ -1301,19 +1301,16 @@ class Note(NotRest):
         ''')
 
 
-    # was diatonicNoteNum
-    def _getDiatonicNoteNum(self):
+    @property
+    def diatonicNoteNum(self):
         '''
-        see Pitch.diatonicNoteNum
-        '''
-        return self.pitch.diatonicNoteNum
-
-    diatonicNoteNum = property(_getDiatonicNoteNum,
-        doc = '''Return the diatonic note number from the :class:`~music21.pitch.Pitch` object. 
+        Return the diatonic note number from the :class:`~music21.pitch.Pitch` object. 
         See :attr:`~music21.pitch.Pitch.diatonicNoteNum`.
         
         Probably will be deprecated soon...
-        ''')
+        '''
+        return self.pitch.diatonicNoteNum
+
 
 
 
@@ -1393,17 +1390,9 @@ class Note(NotRest):
         else:
             return None
 
-
-
-    def _getFullName(self):
-        msg = []
-        msg.append('%s ' % self.pitch.fullName)
-        msg.append(self.duration.fullName)
-        msg.append(' Note')
-        return ''.join(msg)
-
-    fullName = property(_getFullName,
-        doc = '''
+    @property
+    def fullName(self):
+        '''
         Return the most complete representation of this Note, 
         providing duration and pitch information.
 
@@ -1420,7 +1409,12 @@ class Note(NotRest):
         >>> n.microtone = 25
         >>> n.fullName
         'D (+25c) 16th Note'
-        ''')
+        '''
+        msg = []
+        msg.append('%s ' % self.pitch.fullName)
+        msg.append(self.duration.fullName)
+        msg.append(' Note')
+        return ''.join(msg)
 
 
 #-------------------------------------------------------------------------------
@@ -1564,14 +1558,9 @@ class Rest(GeneralNote):
         return not self == other
 
 
-    def _getFullName(self):
-        msg = []
-        msg.append(self.duration.fullName)
-        msg.append(' Rest')
-        return ''.join(msg)
-
-    fullName = property(_getFullName,
-        doc = '''
+    @property
+    def fullName(self):
+        '''
         Return the most complete representation of this Rest, 
         providing duration information.
 
@@ -1580,8 +1569,13 @@ class Rest(GeneralNote):
         'Dotted Quarter Rest'
 
         >>> note.Rest(type='whole').fullName
-        'Whole Rest'
-        ''')
+        'Whole Rest'        
+        '''
+        msg = []
+        msg.append(self.duration.fullName)
+        msg.append(' Rest')
+        return ''.join(msg)
+
 
 
 class SpacerRest(Rest):

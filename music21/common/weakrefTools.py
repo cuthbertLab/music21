@@ -10,10 +10,9 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
-__all__ = ['wrapWeakref', 'unwrapWeakref', 'isWeakref']
+__all__ = ['wrapWeakref', 'unwrapWeakref']
 
 import weakref
-from music21.common.decorators import deprecated
 
 #-------------------------------------------------------------------------------
 def wrapWeakref(referent):
@@ -72,17 +71,6 @@ def unwrapWeakref(referent):
         return referent()
     else:
         return referent
-
-
-@deprecated("September 2015", "December 2015", "Use isinstance(obj, weakref.ref) instead")
-def isWeakref(referent):
-    '''Test if an object is a weakref
-
-    just does isinstance, so DEPRECATED Sep 2015; to disappear soon as Dec 2015.
-    '''
-    if isinstance(referent, weakref.ref):        
-        return True
-    return False
 
 
 if __name__ == "__main__":

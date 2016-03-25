@@ -51,7 +51,7 @@ def applyCapuaToScore(thisWork):
     calls `applyCapuaToStream` to each `part.flat` in `parts`.
     '''
     for thisPart in thisWork.parts:
-        applyCapuaToStream(thisPart.flat.notes)
+        applyCapuaToStream(thisPart.flat.notes.stream())
 
 def applyCapuaToCadencebookWork(thisWork):
     '''
@@ -568,17 +568,17 @@ def compareThreeFictas(srcStream1, srcStream2):
     
     >>> b = alpha.trecento.cadencebook.BallataSheet().makeWork(331).asScore()
     >>> #_DOCS_SHOW b.show()
-    >>> alpha.trecento.capua.applyCapuaToStream(b.parts[0].flat.notesAndRests)
-    >>> alpha.trecento.capua.compareThreeFictas(b.parts[0].flat.notesAndRests, 
-    ...    b.parts[1].flat.notesAndRests)
-    >>> for n in b.parts[0].flat.notesAndRests:
+    >>> b0n = b.parts[0].flat.notesAndRests.stream()
+    >>> b1n = b.parts[1].flat.notesAndRests.stream()
+    >>> alpha.trecento.capua.applyCapuaToStream(b0n)
+    >>> alpha.trecento.capua.compareThreeFictas(b0n, b1n) 
+    >>> for n in b0n:
     ...    pass 
     
     #print(n.pitch, n.editorial.misc['normal-harmonicInterval'], 
     #    n.editorial.misc['pmfc-harmonicInterval'], n.editorial.misc['capua-harmonicInterval']
     
     '''
-
     ### populates the editorial.interval attribute on each note
     srcStream1.attachIntervalsBetweenStreams(srcStream2)
     srcStream2.attachIntervalsBetweenStreams(srcStream1)
@@ -1048,8 +1048,8 @@ class Test(unittest.TestCase):
         pieceObj   = ballataObj.makeWork(pieceNum)
         
         applyCapuaToCadencebookWork(pieceObj)
-        srcStream    = pieceObj.snippets[0].parts[0].flat.notesAndRests
-        cmpStream    = pieceObj.snippets[0].parts[1].flat.notesAndRests 
+        srcStream    = pieceObj.snippets[0].parts[0].flat.notesAndRests.stream()
+        cmpStream    = pieceObj.snippets[0].parts[1].flat.notesAndRests.stream()
         ## ignore 3rd voice for now...
         srcStream.attachIntervalsBetweenStreams(cmpStream)
         cmpStream.attachIntervalsBetweenStreams(srcStream)
@@ -1089,8 +1089,8 @@ class Test(unittest.TestCase):
             return None
         cadenceA   = pieceObj.cadenceA
         if len(cadenceA.parts) >= 2:
-            srcStream1    = cadenceA.parts[0].flat.notes
-            srcStream2    = cadenceA.parts[1].flat.notes  ## ignore 3rd voice for now...
+            srcStream1 = cadenceA.parts[0].flat.notes.stream()
+            srcStream2 = cadenceA.parts[1].flat.notes.stream()  ## ignore 3rd voice for now...
         clearFicta(srcStream1)
         compareThreeFictas(srcStream1, srcStream2)
         cons, imperfCons, diss = compareOnesrcStream(srcStream1, srcStream2)

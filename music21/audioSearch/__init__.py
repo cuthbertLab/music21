@@ -792,7 +792,7 @@ def decisionProcess(partsList, notePrediction, beginningData,
     score and the countdown.
 
 
-    >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes
+    >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes.stream()
     >>> scoreStream = scNotes
     >>> import os #_DOCS_HIDE
     >>> sfp = common.getSourceFilePath() #_DOCS_HIDE
@@ -815,13 +815,13 @@ def decisionProcess(partsList, notePrediction, beginningData,
     >>> beginningData = []
     >>> lengthData = []
     >>> for i in range(4):
-    ...     scNotes = scoreStream[i * hop + 1 :i * hop + tn_recording + 1 ]
+    ...     scNotes = scoreStream[i * hop + 1:i * hop + tn_recording + 1]
     ...     name = "%d" % i
     ...     beginningData.append(i * hop + 1)
     ...     lengthData.append(tn_recording)
     ...     scNotes.id = name
     ...     totScores.append(scNotes)
-    >>> listOfParts = search.approximateNoteSearch(transcribedScore.flat.notes, totScores)
+    >>> listOfParts = search.approximateNoteSearch(transcribedScore.flat.notes.stream(), totScores)
     >>> notePrediction = 0
     >>> lastNotePosition = 0
     >>> countdown = 0

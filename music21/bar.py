@@ -152,10 +152,10 @@ class Barline(base.Music21Object):
         >>> b.style
         'double'
         ''')
-    def _musicXMLBarStyle(self):
-        return styleToMusicXMLBarStyle(self.style)
     
-    musicXMLBarStyle = property(_musicXMLBarStyle)
+    @property
+    def musicXMLBarStyle(self):
+        return styleToMusicXMLBarStyle(self.style)
 
 
 
