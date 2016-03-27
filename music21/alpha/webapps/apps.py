@@ -79,11 +79,11 @@ def setupConverterApp(agenda):
     source: a source compatible with converter.parse in quotes (e.g. "tinyNotation:C2 D E F...")
     output: an output format (musicxml, vexflow, braille...)
     
-    Example:
-    http://ciconia.mit.edu/music21/webinterface?appName=converterApp&source=
+    Example::
+
+        http://ciconia.mit.edu/music21/webinterface?appName=converterApp&source=
         "tinynotation:F4 A-  B- B c e f2"&output=vexflow
-    
-    
+        
     >>> agenda = alpha.webapps.Agenda()
     >>> agenda.addData('source', 'tinynotation:F4 A- B- B c e f2')
     >>> agenda.addData('output',"musicxml")
