@@ -127,9 +127,10 @@ def hyphenToCamelCase(usrStr, replacement='-'):
 
     The replacement can be specified to be something besides a hyphen.
 
-    code from 
+    This code is from: 
+    
     http://stackoverflow.com/questions/4303492/
-       how-can-i-simplify-this-conversion-from-underscore-to-camelcase-in-python
+    how-can-i-simplify-this-conversion-from-underscore-to-camelcase-in-python
 
     >>> common.hyphenToCamelCase('movement-name')
     'movementName'

@@ -399,6 +399,9 @@ class GeneralObjectExporter():
         p.makeImmutable()
         s = stream.Score()
         s.insert(0, p)
+#         if p.metadata is not None:
+#             s.insert(0.0, copy.deepcopy(p.metadata))
+        
         return self.fromScore(s)
 
     def fromMeasure(self, m):
@@ -435,7 +438,7 @@ class GeneralObjectExporter():
             st2.elements = copy.deepcopy(st)
             st2.makeNotation(inPlace=True)
             return self.fromScore(st2)
-        elif st.getElementsByClass('Stream')[0].isFlat:
+        elif st.getElementsByClass('Stream')[0].isFlat: # like a part w/ measures...
             st2 = stream.Part()
             st2.mergeAttributes(st)
             st2.elements = copy.deepcopy(st)
