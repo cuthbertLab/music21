@@ -27,7 +27,7 @@ To do a release,
 5. then python3 test/testDocumentation.py # only designed for Python 3...
 6. # no 6 no longer applies
 7. run documentation/make.py clean
-8. run documentation/make.py   [*]
+8. run documentation/make.py   [*] 
 
 [*] you will need sphinx, IPython (pip or easy_install), markdown, and pandoc (.dmg) installed
 
