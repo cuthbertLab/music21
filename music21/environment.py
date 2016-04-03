@@ -682,7 +682,6 @@ class Environment(object):
     For more a user-friendly interface for creating and editing settings, see
     the :class:`~music21.environment.UserSettings` object.
 
-    >>> from music21 import environment
     >>> env = environment.Environment(forcePlatform='darwin')
     >>> env['musicxmlPath'] = '/Applications/Finale Reader.app'
     >>> env['musicxmlPath']
@@ -714,7 +713,6 @@ class Environment(object):
         environment settings would look like on another OS platform (e.g., win,
         nix, darwin).
 
-        >>> from music21 import environment
         >>> myEnv = environment.Environment()
         >>> post = myEnv['writeFormat']
         >>> #_DOCS_SHOW post
@@ -743,7 +741,6 @@ class Environment(object):
 
         Must call write() to make permanent:
 
-        >>> from music21 import environment
         >>> a = environment.Environment()
         >>> a['debug'] = 1
         >>> a['graphicsPath'] = '/test&Encode'
@@ -787,7 +784,6 @@ class Environment(object):
     def getKeysToPaths(self):
         ''' Get the keys that refer to file paths.
 
-        >>> from music21 import environment
         >>> a = environment.Environment()
         >>> for x in sorted(a.getKeysToPaths()):
         ...     x
@@ -813,7 +809,6 @@ class Environment(object):
         These are different than the keys() method in that the
         'localCorpusPath' entry is not included.
 
-        >>> from music21 import environment
         >>> a = environment.Environment()
         >>> for x in sorted(a.getRefKeys()):
         ...     x
@@ -870,7 +865,6 @@ class Environment(object):
         '''
         Return valid keys to get and set values for the Environment instance.
 
-        >>> from music21 import environment
         >>> e = environment.Environment()
         >>> for x in sorted(list(e.keys())):
         ...     x
@@ -949,7 +943,6 @@ class Environment(object):
         '''
         Restore only defaults for all parameters. Useful for testing.
 
-        >>> from music21 import environment
         >>> a = environment.Environment()
         >>> a['debug'] = 1
         >>> a.restoreDefaults()
@@ -990,7 +983,47 @@ class Environment(object):
         '''
         return _environStorage['instance'].write(filePath=filePath)
 
+    def xmlReaderType(self):
+        r'''
+        Returns an xmlReaderType depending on the 'musicxmlPath'
+        
+        >>> a = environment.Environment()
+        >>> a['musicxmlPath'] = '/Applications/Musescore.app'
+        >>> a.xmlReaderType()
+        'Musescore'
+        >>> a['musicxmlPath'] = '/Applications/Sibelius 7.app'
+        >>> a.xmlReaderType()
+        'Sibelius'
+        >>> a['musicxmlPath'] = r'C:\Program Files\Finale\Finale 2014.exe'
+        >>> a.xmlReaderType()
+        'Finale'
 
+        Nostalgia is unknown...
+
+        >>> a['musicxmlPath'] = r'C:\Program Files\Deluxe Music Construction Set.exe'
+        >>> a.xmlReaderType()
+        'unknown'
+
+        >>> a['musicxmlPath'] = None
+        >>> a.xmlReaderType() is None
+        True
+        '''
+        xp = self['musicxmlPath']
+        if common.runningUnderIPython():
+            xp = self['musescoreDirectPNGPath']
+
+        if xp is None:
+            return None
+        xp = xp.lower()
+        if 'sibelius' in xp:
+            return 'Sibelius'
+        elif 'finale' in xp:
+            return 'Finale'
+        elif 'musescore' in xp:
+            return 'Musescore'
+        else:
+            return 'unknown'
+        
 #------------------------------------------------------------------------------
 
 
@@ -1003,7 +1036,6 @@ class UserSettings(object):
 
     First, create an instance of UserSettings:
 
-    >>> from music21 import environment
     >>> us = environment.UserSettings()
 
     Second, view the available settings keys.
@@ -1075,7 +1107,6 @@ class UserSettings(object):
         '''
         Return a string representation.
 
-        >>> from music21 import environment
         >>> us = environment.UserSettings()
         >>> post = repr(us) # location specific, cannot test
 
@@ -1086,7 +1117,6 @@ class UserSettings(object):
         '''
         Return a string representation.
 
-        >>> from music21 import environment
         >>> us = environment.UserSettings()
         >>> post = repr(us) # location specific, cannot test
         '''
@@ -1097,7 +1127,6 @@ class UserSettings(object):
         Dictionary-like setting. Changes are made and written to the user
         configuration file.
 
-        >>> from music21 import environment
         >>> us = environment.UserSettings()
         >>> us['musicxmlPath'] = 'asdfwerasdffasdfwer'
         Traceback (most recent call last):
@@ -1194,7 +1223,6 @@ def set(key, value):  # okay to override set here: @ReservedAssignment
     Directly set a single UserSettings key, by providing a key and the
     appropriate value. This will create a user settings file if necessary.
 
-    >>> from music21 import environment
     >>> environment.set('wer', 'asdf')
     Traceback (most recent call last):
     EnvironmentException: no preference: wer
@@ -1215,7 +1243,6 @@ def get(key):
 
     This will create a user settings file if necessary:
 
-    >>> from music21 import environment
     >>> #_DOCS_SHOW environment.get('musicxmlPath')
     '/Applications/Finale Reader.app'
     '''

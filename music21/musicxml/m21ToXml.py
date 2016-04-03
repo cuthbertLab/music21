@@ -4161,7 +4161,14 @@ class MeasureExporter(XMLExporterBase):
         # TODO: cancel
         seta(keySignature, mxKey, 'fifths', 'sharps')
         if keySignature.mode is not None:
-            seta(keySignature, mxKey, 'mode')
+            if environLocal.xmlReaderType() == 'Musescore':
+                # Musescore up to v. 2 has major problems with modes other than major or minor
+                # Fixed in latest Nightlys
+                pass            
+            else:
+                seta(keySignature, mxKey, 'mode')
+                
+                
         # TODO: key-octave
         return mxKey
         

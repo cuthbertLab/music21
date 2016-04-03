@@ -261,6 +261,8 @@ class ABCMetadata(ABCToken):
     def isKey(self):
         '''Returns True if the tag is "K", False otherwise. 
         Note that in some cases a Key will encode clef information. 
+        
+        (example from corpus: josquin/laDeplorationDeLaMorteDeJohannesOckeghem.abc)
         '''
         if self.tag == 'K': 
             return True
