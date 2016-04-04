@@ -13,6 +13,7 @@ import abc  # for @abc.abstractmethod decorator: requires a function to be defin
 import os
 import types
 
+
 from music21 import common
 from music21.ext import six
 
