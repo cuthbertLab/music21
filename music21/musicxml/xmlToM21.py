@@ -2676,7 +2676,17 @@ class MeasureParser(XMLParserBase):
                 useVoice = useVoice.text.strip()
                 
             try:
-                thisVoice = m.voices[useVoice]
+                thisVoice = None
+                for v in m.voices:
+                    if v.id == useVoice:
+                        thisVoice = v
+                        break
+                    try:
+                        if int(v.id) == int(useVoice):
+                            thisVoice = v
+                            break
+                    except ValueError:
+                        pass
             except stream.StreamException:
                 thisVoice = None
                 
@@ -4342,10 +4352,21 @@ class Test(unittest.TestCase):
         print(c.parts[1].measure(99).notesAndRests[0].getSpannerSites()[0].idLocal)
         #c.show()
         #c.parts[1].show('t')
+        
+    def testTwoVoicesWithChords(self):
+        from music21 import  corpus, converter
+        c = converter.parse(corpus.corpora.CoreCorpus().getWorkList(
+                                                    'demos/voices_with_chords.xml')[0], 
+                            format='musicxml', 
+                            #forceSource=True
+                            )
+        firstChord = c.parts[0].measure(1).voices.getElementById('2').notes[1]
+        self.assertEqual(repr(firstChord), '<music21.chord.Chord G4 B4>')
+        self.assertEqual(firstChord.offset, 1.0)
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='testTrillOnOneNote')
+    music21.mainTest(Test) #, runTest='testTwoVoicesWithChords')
     
     
     
