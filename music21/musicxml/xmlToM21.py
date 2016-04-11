@@ -2009,6 +2009,7 @@ class MeasureParser(XMLParserBase):
 
         mxGrace = mxNote.find('grace')
         isGrace = False
+        
         if mxGrace is not None:
             isGrace = True
             graceType = mxNote.find('type')
@@ -2162,9 +2163,17 @@ class MeasureParser(XMLParserBase):
         else:
             post.duration.slash = False
     
-        post.duration.stealTimePrevious = mxGrace.get('steal-time-previous')
-        post.duration.stealTimeFollowing = mxGrace.get('steal-time-following')
-        # TODO: make-time
+        try:
+            post.duration.stealTimePrevious = int(mxGrace.get('steal-time-previous'))/100
+        except TypeError:
+            pass
+        
+        try:
+            post.duration.stealTimeFollowing = int(mxGrace.get('steal-time-following'))/100
+        except TypeError:
+            pass
+
+        # TODO: make-time -- maybe; or this is something totally different.
     
         return post
     
@@ -2667,7 +2676,17 @@ class MeasureParser(XMLParserBase):
                 useVoice = useVoice.text.strip()
                 
             try:
-                thisVoice = m.voices[useVoice]
+                thisVoice = None
+                for v in m.voices:
+                    if v.id == useVoice:
+                        thisVoice = v
+                        break
+                    try:
+                        if int(v.id) == int(useVoice):
+                            thisVoice = v
+                            break
+                    except ValueError:
+                        pass
             except stream.StreamException:
                 thisVoice = None
                 
@@ -4303,6 +4322,20 @@ class Test(unittest.TestCase):
             pCount += len(cc.pitches)
         self.assertEqual(pCount, 97)
         
+    def testTrillOnOneNote(self):
+        import os
+        from music21 import converter
+        thisDir = common.getSourceFilePath() + os.sep + 'musicxml' + os.sep
+        testFp = thisDir + 'testTrillOnOneNote.xml'
+        c = converter.parse(testFp) #, forceSource=True)
+       
+        trillExtension = c.parts[0].getElementsByClass('TrillExtension')[0]
+        fSharpTrill = c.recurse().notes[0]
+        #print(trillExtension.placement)
+        self.assertEqual(fSharpTrill.name, 'F#')
+        self.assertIs(trillExtension[0], fSharpTrill)
+        self.assertIs(trillExtension[-1], fSharpTrill)
+        
     def xtestLucaGloriaSpanners(self):
         '''
         lots of lines, including overlapping here
@@ -4320,10 +4353,20 @@ class Test(unittest.TestCase):
         #c.show()
         #c.parts[1].show('t')
         
+    def testTwoVoicesWithChords(self):
+        from music21 import  corpus, converter
+        c = converter.parse(corpus.corpora.CoreCorpus().getWorkList(
+                                                    'demos/voices_with_chords.xml')[0], 
+                            format='musicxml', 
+                            #forceSource=True
+                            )
+        firstChord = c.parts[0].measure(1).voices.getElementById('2').notes[1]
+        self.assertEqual(repr(firstChord), '<music21.chord.Chord G4 B4>')
+        self.assertEqual(firstChord.offset, 1.0)
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest='testTwoVoicesWithChords')
     
     
     

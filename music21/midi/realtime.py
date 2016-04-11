@@ -14,10 +14,11 @@ Objects for realtime playback of Music21 Streams as MIDI.
 
 From an idea of Joe "Codeswell":
 
-  http://joecodeswell.wordpress.com/2012/06/13/
-      how-to-produce-python-controlled-audio-output-from-music-made-with-music21
-  http://stackoverflow.com/questions/10983462/
-      how-can-i-produce-real-time-audio-output-from-music-made-with-music21
+http://joecodeswell.wordpress.com/2012/06/13/
+how-to-produce-python-controlled-audio-output-from-music-made-with-music21
+  
+http://stackoverflow.com/questions/10983462/
+how-can-i-produce-real-time-audio-output-from-music-made-with-music21
 
 Requires pygame: http://www.pygame.org/download.shtml
 '''
@@ -71,11 +72,11 @@ class StreamPlayer(object):
      
     A number of mixer controls can be passed in with keywords:
     
-      mixerFreq (default 44100 -- CD quality)
-      mixerBitSize (default -16 (=unsigned 16bit) -- 
-        really, are you going to do 24bit audio with Python?? :-)  )
-      mixerChannels (default 2 = stereo)
-      mixerBuffer (default 1024 = number of samples)
+    *  mixerFreq (default 44100 -- CD quality)
+    *  mixerBitSize (default -16 (=unsigned 16bit) -- 
+         really, are you going to do 24bit audio with Python?? :-)  )
+    *  mixerChannels (default 2 = stereo)
+    *  mixerBuffer (default 1024 = number of samples)
     '''
     mixerInitialized = False
     

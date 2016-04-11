@@ -659,11 +659,10 @@ def partMovementsWithinLimits(possibA, possibB, partMovementLimits=None):
     
     
     * partNumber: Specified from 1 to n, where 1 is the soprano or 
-    highest part and n is the bass or lowest part.
-    
+      highest part and n is the bass or lowest part.
     
     * maxSeparation: For a given part, the maximum separation to allow 
-    between a pitch in possibA and a corresponding pitch in possibB, in semitones.  
+      between a pitch in possibA and a corresponding pitch in possibB, in semitones.  
     
     
     >>> from music21 import pitch

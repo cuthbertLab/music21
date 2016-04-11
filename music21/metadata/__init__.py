@@ -26,9 +26,13 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
 :attr:`~music21.metadata.Metadata.title` and
 :attr:`~music21.metadata.Metadata.composer` properties of a Metadata object.
 
->>> s = stream.Stream()
->>> s.append(note.Note())
->>> s.insert(metadata.Metadata())
+>>> s = stream.Score()
+>>> p = stream.Part()
+>>> m = stream.Measure()
+>>> m.append(note.Note())
+>>> p.append(m)
+>>> s.append(p)
+>>> s.insert(0, metadata.Metadata())
 >>> s.metadata.title = 'title'
 >>> s.metadata.composer = 'composer'
 >>> #_DOCS_SHOW s.show()

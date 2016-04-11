@@ -740,15 +740,15 @@ def weightedSelection(values, weights, randomGenerator=None):
     return a randomly selected value using the weight.
 
     Example: sum -1 and 1 for 100 values; should be
-    around 0 or at least between -30 and 30
+    around 0 or at least between -50 and 50 (99.99999% of the time)
 
-
-    >>> -30 < sum([common.weightedSelection([-1, 1], [1,1]) for x in range(100)]) < 30
+    >>> -50 < sum([common.weightedSelection([-1, 1], [1, 1]) for x in range(100)]) < 50
     True
-
 
     :rtype: int
     '''
+    # See http://www.wolframalpha.com/input/?i=Probability+of+76+or+more+heads+in+100+coin+tosses
+    # for probability.  When it was -30 to 30, failed 1 in 500 times.
     if randomGenerator is not None:
         q = randomGenerator() # must be in unit interval
     else: # use random uniform

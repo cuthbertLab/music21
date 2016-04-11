@@ -330,12 +330,11 @@ def convertGeneric(value):
     post = post * directionScalar
     return post
 
-    
 def convertSemitoneToSpecifierGenericMicrotone(count):
     '''
     Given a number of semitones, return a default diatonic specifier and cent offset.
 
-    MSC: 2013 Oct -- unused and deprecated; may be moved or removed.
+    DEPRECATED if it can be moved..
 
     >>> interval.convertSemitoneToSpecifierGenericMicrotone(2.5)
     ('M', 2, 50.0)
