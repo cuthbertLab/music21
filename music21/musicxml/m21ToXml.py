@@ -3925,13 +3925,13 @@ class MeasureExporter(XMLExporterBase):
         sets either a left or right barline from a 
         bar.Barline() object or bar.Repeat() object        
         '''        
+        mxRepeat = None
         if barline is None:
             mxBarline = Element('barline')
         else:
             if 'Repeat' in barline.classes:
                 mxBarline = Element('barline')
                 mxRepeat = self.repeatToXml(barline)
-                mxBarline.append(mxRepeat)
             else:
                 mxBarline = self.barlineToXml(barline)
         
@@ -3948,11 +3948,13 @@ class MeasureExporter(XMLExporterBase):
                 endingType = 'start'
             else:
                 endingType = 'stop'
-                mxEnding.set('number', str(self.rbSpanners[0].number))
+            mxEnding.set('number', str(self.rbSpanners[0].number))
             mxEnding.set('type', endingType)
             mxBarline.append(mxEnding) # make sure it is after fermata but before repeat.
 
-        
+        if mxRepeat is not None:
+            mxBarline.append(mxRepeat)
+
         # TODO: attr: segno
         # TODO: attr: coda
         # TODO: attr: divisions
@@ -4161,7 +4163,8 @@ class MeasureExporter(XMLExporterBase):
         # TODO: cancel
         seta(keySignature, mxKey, 'fifths', 'sharps')
         if keySignature.mode is not None:
-            if environLocal.xmlReaderType() == 'Musescore':
+            if (environLocal.xmlReaderType() == 'Musescore' and 
+                    keySignature.mode not in ('major', 'minor')):
                 # Musescore up to v. 2 has major problems with modes other than major or minor
                 # Fixed in latest Nightlys
                 pass            

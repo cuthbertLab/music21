@@ -389,8 +389,8 @@ def bestTimeSignature(meas):
     # first, we need to evenly divide min dur into total
     minDurTest = minDurQL
     if isinstance(sumDurQL, fractions.Fraction):
-        numerator = minDurTest.numerator
-        denominator = minDurTest.denominator
+        numerator = sumDurQL.numerator
+        denominator = sumDurQL.denominator
     else:
     
         i = 10

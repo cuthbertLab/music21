@@ -1699,6 +1699,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {4.0} <music21.chord.Chord C4 E4>
 
         Save the original Stream for later
+
         >>> import copy
         >>> s2 = copy.deepcopy(s)
 
@@ -1726,33 +1727,40 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         # could use duration of Note to get end offset span
         targets = list(self.iter.getElementsByOffset(offset,
-                offset + noteOrChord.quarterLength, # set end to dur of supplied
-                includeEndBoundary=False,
-                mustFinishInSpan=False, 
-                mustBeginInSpan=True).notesAndRests)
+                            offset + noteOrChord.quarterLength, # set end to dur of supplied
+                            includeEndBoundary=False,
+                            mustFinishInSpan=False, 
+                            mustBeginInSpan=True).notesAndRests)
         removeTarget = None
         #environLocal.printDebug(['insertIntoNoteOrChord', [e for e in targets]])
         if len(targets) == 1:
+            pitches = []      # avoid an undefined variable warning...
+            components = []   # ditto
+            
             target = targets[0] # assume first
             removeTarget = target
             if 'Rest' in target.classes:
-                pitches = [noteOrChord.pitch]
-                components = [noteOrChord]
+                if 'Note' in noteOrChord.classes:
+                    pitches = [noteOrChord.pitch]
+                    components = [noteOrChord]
+                elif 'Chord' in noteOrChord.classes:
+                    pitches = list(noteOrChord.pitches)
+                    components = [c for c in noteOrChord]                
             if 'Note' in target.classes:
                 # if a note, make it into a chord
                 if 'Note' in noteOrChord.classes:
                     pitches = [target.pitch, noteOrChord.pitch]
                     components = [target, noteOrChord]
                 elif 'Chord' in noteOrChord.classes:
-                    pitches = [target.pitch] + noteOrChord.pitches
+                    pitches = [target.pitch] + list(noteOrChord.pitches)
                     components = [target] + [c for c in noteOrChord]
             if 'Chord' in target.classes:
                 # if a chord, make it into a chord
                 if 'Note' in noteOrChord.classes:
-                    pitches = target.pitches + (noteOrChord.pitch,)
+                    pitches = list(target.pitches) + [noteOrChord.pitch]
                     components = [c for c in target] + [noteOrChord]
                 elif 'Chord' in noteOrChord.classes:
-                    pitches = target.pitches + noteOrChord.pitches
+                    pitches = list(target.pitches) + list(noteOrChord.pitches)
                     components = [c for c in target] + [c for c in noteOrChord]
 
             if len(pitches) > 1 or chordsOnly is True:
