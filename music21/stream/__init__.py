@@ -7173,9 +7173,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         if self._unlinkedDuration is not None:
             return self._unlinkedDuration
-        #elif 'Duration' in self._cache and self._cache["Duration"] is not None:
+        elif 'Duration' in self._cache and self._cache["Duration"] is not None:
             #environLocal.printDebug(['returning cached duration'])
-        #    return self._cache["Duration"]
+            return self._cache["Duration"]
         else:
             #environLocal.printDebug(['creating new duration based on highest time'])
             self._cache["Duration"] = duration.Duration()

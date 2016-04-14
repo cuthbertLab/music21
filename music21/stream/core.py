@@ -203,6 +203,7 @@ class StreamCoreMixin(object):
             if keepIndex and 'index' in self._cache:
                 indexCache = self._cache['index']
             # always clear cache when elements have changed
+            # for instance, Duration will change.
             self._cache = {}
             if keepIndex and indexCache is not None:
                 self._cache['index'] = indexCache
