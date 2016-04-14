@@ -199,11 +199,14 @@ class StreamFreezer(StreamFreezeThawBase):
     >>> len(s2.parts[0].measure(7).notes) == 6
     True
 
+    JSONPickle is also an acceptable way of Freezing streams.  Especially 
+    for going to music21j in Javascript:
+
     >>> sf2 = freezeThaw.StreamFreezer(c) # do not reuse StreamFreezers
     >>> data2 = sf2.writeStr(fmt='jsonpickle')
     >>> st2 = freezeThaw.StreamThawer()
     >>> st2.openStr(data2)
-    >>> s3 = st.stream
+    >>> s3 = st2.stream
     >>> len(s3.parts[0].measure(7).notes) == 6
     True
 

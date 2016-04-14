@@ -908,7 +908,12 @@ def makeTies(
 
     mCount = 0
     lastTimeSignature = None
-    while True:
+    
+    loopBuster = len(measureStream) * 2
+    while loopBuster > 0:
+        # loopBuster was a debug tool to ensure that there's a sane amount.
+        loopBuster += -1
+        
         # update measureStream on each iteration,
         # as new measure may have been added to the returnObj stream
         measureStream = returnObj.getElementsByClass('Measure').stream()
@@ -1036,6 +1041,9 @@ def makeTies(
                             'overshot into next measure', overshot])
         mCount += 1
     del measureStream  # clean up unused streams
+
+    if loopBuster <= 0:
+        raise stream.StreamException("Make ties failed!")
     # changes elements
     returnObj.elementsChanged()
     if not inPlace:
