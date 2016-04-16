@@ -502,6 +502,24 @@ def makeMeasures(
         else:
             measureCount += 1
 
+    # cache information about each measure (we used to do this once per element...
+    postLen = len(post)
+    postMeasureList = []
+    lastTimeSignature = None
+    for i in range(postLen):
+        m = post[i]
+        if m.timeSignature is not None:
+            lastTimeSignature = m.timeSignature
+        # get start and end offsets for each measure
+        # seems like should be able to use m.duration.quarterLengths
+        mStart = post.elementOffset(m)
+        mEnd = mStart + lastTimeSignature.barDuration.quarterLength
+        # if elements start fits within this measure, break and use
+        # offset cannot start on end
+        postMeasureList.append({'measure': m,
+                                'mStart': mStart,
+                                'mEnd': mEnd})
+        
     # populate measures with elements
     for oneOffsetMap in offsetMapList:
         e, start, end, voiceIndex = oneOffsetMap
@@ -517,16 +535,15 @@ def makeMeasures(
 
         match = False
         lastTimeSignature = None
-        for i in range(len(post)):
-            m = post[i]
-            if m.timeSignature is not None:
-                lastTimeSignature = m.timeSignature
-            # get start and end offsets for each measure
-            # seems like should be able to use m.duration.quarterLengths
-            mStart = post.elementOffset(m)
-            mEnd = mStart + lastTimeSignature.barDuration.quarterLength
-            # if elements start fits within this measure, break and use
-            # offset cannot start on end
+        
+        m = None
+        for i in range(postLen):
+            postMeasureInfo = postMeasureList[i]
+            mStart = postMeasureInfo['mStart']
+            mEnd = postMeasureInfo['mEnd']
+            m = postMeasureInfo['measure']
+
+
             if start >= mStart and start < mEnd:
                 match = True
                 #environLocal.printDebug([
