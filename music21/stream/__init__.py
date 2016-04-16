@@ -5430,8 +5430,30 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return a, b
 
 
-    def _getOffsetMap(self, srcObj=None):
+    def offsetMap(self, srcObj=None):
         '''
+        Returns a list where each element is a NamedTuple
+        consisting of the 'offset' of each element in a stream, the
+        'endTime' (that is, the offset plus the duration) and the
+        'element' itself.  Also contains a 'voiceIndex' entry which
+        contains the voice number of the element, or None if there
+        are no voices.
+
+        >>> n1 = note.Note(type='quarter')
+        >>> c1 = clef.AltoClef()
+        >>> n2 = note.Note(type='half')
+        >>> s1 = stream.Stream()
+        >>> s1.append([n1, c1, n2])
+        >>> om = s1.offsetMap()
+        >>> om[2].offset
+        1.0
+        >>> om[2].endTime
+        3.0
+        >>> om[2].element is n2
+        True
+        >>> om[2].voiceIndex
+        
+                
         Needed for makeMeasures and a few other places
 
         The Stream source of elements is self by default,
@@ -5440,7 +5462,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> s = stream.Stream()
         >>> s.repeatAppend(note.Note(), 8)
-        >>> for om in s._getOffsetMap():
+        >>> for om in s.offsetMap():
         ...     om
         OffsetMap(element=<music21.note.Note C>, offset=0.0, endTime=1.0, voiceIndex=None)
         OffsetMap(element=<music21.note.Note C>, offset=1.0, endTime=2.0, voiceIndex=None)
@@ -5461,7 +5483,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 groups.append((v.flat, i))
         else: # create a single collection
             groups = [(srcObj, None)]
-        #environLocal.printDebug(['_getOffsetMap', groups])
+        #environLocal.printDebug(['offsetMap', groups])
         for group, voiceIndex in groups:
             for e in group._elements:
                 # do not include barlines
@@ -5477,36 +5499,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # NOTE: used to make a copy.copy of elements here;
                 # this is not necssary b/c making deepcopy of entire Stream
                 thisOffsetMap = _OffsetMap(e, offset, endTime, voiceIndex)
-                #environLocal.printDebug(['_getOffsetMap: thisOffsetMap', thisOffsetMap])
+                #environLocal.printDebug(['offsetMap: thisOffsetMap', thisOffsetMap])
                 offsetMap.append(thisOffsetMap)
                 #offsetMap.append((offset, offset + dur, e, voiceIndex))
                 #offsetMap.append([offset, offset + dur, copy.copy(e)])
         return offsetMap
 
-
-    # Do not make a property decorator since _getOffsetMap takes parameters
-    offsetMap = property(_getOffsetMap, doc='''
-        Returns a list where each element is a dictionary
-        consisting of the 'offset' of each element in a stream, the
-        'endTime' (that is, the offset plus the duration) and the
-        'element' itself.  Also contains a 'voiceIndex' entry which
-        contains the voice number of the element, or None if there
-        are no voices.
-
-        >>> n1 = note.Note(type='quarter')
-        >>> c1 = clef.AltoClef()
-        >>> n2 = note.Note(type='half')
-        >>> s1 = stream.Stream()
-        >>> s1.append([n1, c1, n2])
-        >>> om = s1.offsetMap
-        >>> om[2].offset
-        1.0
-        >>> om[2].endTime
-        3.0
-        >>> om[2].element is n2
-        True
-        >>> om[2].voiceIndex
-    ''')
 
     def makeMeasures(
         self,
@@ -8286,7 +8284,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return returnObj # exit
 
         # list of start, start+dur, element, all in abs offset time
-        offsetMap = self._getOffsetMap(returnObj)
+        offsetMap = self.offsetMap(returnObj)
 
         offsetList = [opFrac(o) for o in offsetList]
 

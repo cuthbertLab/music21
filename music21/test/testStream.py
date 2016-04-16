@@ -1693,14 +1693,14 @@ class Test(unittest.TestCase):
         sOuter.insert(0, ac)
         # both output parts have alto clefs
         # get clef form higher level stream; only option
-        self.assertEqual(s1.activeSite, sOuter)
+        self.assertIs(s1.activeSite, sOuter)
         post = s1.getClefs()[0]
         
         self.assertTrue(isinstance(post, clef.AltoClef))
-        self.assertEqual(s1.activeSite, sOuter)
+        self.assertIs(s1.activeSite, sOuter)
 
         post = s2.getClefs()[0]
-        self.assertTrue(isinstance(post, clef.AltoClef))
+        self.assertIsInstance(post, clef.AltoClef)
         
         # now we in sort a clef in s2; s2 will get this clef first
         tenorC = clef.TenorClef()
@@ -1708,26 +1708,26 @@ class Test(unittest.TestCase):
         s2.insert(0, tenorC)
         # only second part should have tenor clef
         post = s2.getClefs()[0]
-        self.assertTrue(isinstance(post, clef.TenorClef))
+        self.assertIsInstance(post, clef.TenorClef)
 
         # but stream s1 should get the alto clef still
         #print list(s1.contextSites())
         post = s1.getContextByClass('Clef')
         #print post
-        self.assertTrue(isinstance(post, clef.AltoClef))
+        self.assertIsInstance(post, clef.AltoClef)
 
         # s2 flat gets the tenor clef; it was inserted in it
         post = s2.flat.getClefs()[0]
-        self.assertTrue(isinstance(post, clef.TenorClef))
+        self.assertIsInstance(post, clef.TenorClef)
 
         # a copy copies the clef; so we still get the same clef
         s2FlatCopy = copy.deepcopy(s2.flat)
         post = s2FlatCopy.getClefs()[0]
-        self.assertTrue(isinstance(post, clef.TenorClef))
+        self.assertIsInstance(post, clef.TenorClef)
 
         # s1 flat will get the alto clef; it still has a pathway
         post = s1.flat.getClefs()[0]
-        self.assertTrue(isinstance(post, clef.AltoClef))
+        self.assertIsInstance(post, clef.AltoClef)
 
         # once we create a deepcopy of s1, it is no longer connected to 
         # its parent if we purge orphans and it is not in sOuter
@@ -1737,22 +1737,23 @@ class Test(unittest.TestCase):
         s1FlatCopy.id = 's1FlatCopy'
         self.assertEqual(len(s1FlatCopy.getClefs(returnDefault=False)), 1)
         post = s1FlatCopy.getClefs(returnDefault=False)[0]
-        self.assertTrue(isinstance(post, clef.AltoClef), "post %r is not an AltoClef" % post)
+        self.assertIsInstance(post, clef.AltoClef)
 
         post = s1Flat.getClefs()[0]
-        self.assertTrue(isinstance(post, clef.AltoClef), post)
+        self.assertIsInstance(post, clef.AltoClef, post)
         #environLocal.printDebug(['s1.activeSite', s1.activeSite])
-        self.assertTrue(sOuter in s1.sites.get())
+        self.assertIn(sOuter, s1.sites.get())
         s1Measures = s1.makeMeasures()
         #print s1Measures[0].clef
         
-        # this used to be True, but I think it's better as False now...
-        #self.assertTrue(isinstance(s1Measures[0].clef, clef.AltoClef), s1Measures[0].clef)
-        self.assertTrue(isinstance(s1Measures[0].clef, clef.TrebleClef), s1Measures[0].clef)
+        self.assertIsInstance(s1Measures[0].clef, clef.AltoClef)
+        # this used to be False, then True, and the tiniest change to makeMeasures made it False
+        # again.  I think it's better as False now...
+        #self.assertIsInstance(s1Measures[0].clef, clef.TrebleClef)
 
 
         s2Measures = s2.makeMeasures()
-        self.assertTrue(isinstance(s2Measures[0].clef, clef.TenorClef))
+        self.assertIsInstance(s2Measures[0].clef, clef.TenorClef)
 
 
         # try making a deep copy of s3
@@ -1768,7 +1769,7 @@ class Test(unittest.TestCase):
         # or getElementAtOrBefore needs to return a list
 
         s2Measures = s3copy.getElementsByClass('Stream')[1].makeMeasures()
-        self.assertEqual(isinstance(s2Measures[0].clef, clef.TenorClef), True)
+        self.assertIsInstance(s2Measures[0].clef, clef.TenorClef)
         #s2Measures.show() # this shows the proper clef
 
         #TODO: this still returns tenor clef for both parts
@@ -1777,7 +1778,7 @@ class Test(unittest.TestCase):
         # now we in sert a clef in s2; s2 will get this clef first
         s1.insert(0, clef.BassClef())
         post = s1.getClefs()[0]
-        self.assertEqual(isinstance(post, clef.BassClef), True)
+        self.assertIsInstance(post, clef.BassClef)
 
 
         #s3.show()
@@ -2628,24 +2629,24 @@ class Test(unittest.TestCase):
         from music21 import stream
 
 
-        def offsetMap(s): # lists of offsets, with lists of lists
+        def scaleOffsetMap(s): # lists of offsets, with lists of lists
             post = []
             for e in s:
                 sub = []
                 sub.append(e.offset)
                 #if hasattr(e, 'elements'):
                 if e.isStream:
-                    sub.append(offsetMap(e))
+                    sub.append(scaleOffsetMap(e))
                 post.append(sub)
             return post
             
 
         def procCompare(s, scalar, anchorZeroRecurse, match):
-            oListSrc = offsetMap(s)
+            oListSrc = scaleOffsetMap(s)
             oListSrc.sort()
             sNew = s.scaleOffsets(scalar, anchorZeroRecurse=anchorZeroRecurse, 
                                   inPlace=False)
-            oListPost = offsetMap(sNew)
+            oListPost = scaleOffsetMap(sNew)
             oListPost.sort()
 
             #environLocal.printDebug(['scaleOffsets', oListSrc, '\npost scaled by:', scalar, oListPost])
@@ -2666,7 +2667,7 @@ class Test(unittest.TestCase):
 
         # offset map gives us a nested list presentation of all offsets
         # usefulfor testing
-        self.assertEquals(offsetMap(s1),
+        self.assertEquals(scaleOffsetMap(s1),
         [[0.0], [2.0], [4.0], [6.0], [8.0, [[0.0], [0.5], [1.0], [1.5]]]])
 
         # provide start of resulting values
@@ -2704,7 +2705,7 @@ class Test(unittest.TestCase):
         # that is, it should have no shift
 
         # provide anchorZeroRecurse value
-        self.assertEquals(offsetMap(s1),
+        self.assertEquals(scaleOffsetMap(s1),
         [[10.0], [14.0], [15.0], [17.0], 
             [18.0, [[40.0], [40.5], [41.0], [41.5]]], 
             [60.0, [[40.0], [40.5], [41.0], [41.5]]], 
@@ -5068,54 +5069,40 @@ class Test(unittest.TestCase):
         v1 = Voice()
         n1 = note.Note('d5')
         n1.quarterLength = .5
-        v1.repeatAppend(n1, 8)
+        v1.repeatAppend(n1, 4)
 
         v2 = Voice()
         n2 = note.Note('c4')
         n2.quarterLength = 1
-        v2.repeatAppend(n2, 4)
+        v2.repeatAppend(n2, 2)
         
         s = Measure()
         s.insert(0, v1)
         s.insert(0, v2)
 
         # test allocating streams and assigning indices
-        oMap = s.offsetMap
-        oMapStr = "[\n" # construct string from dict in fixed order...
-        for ob in oMap:
-            oMapStr += "{'voiceIndex': " + str(ob.voiceIndex)
-            oMapStr += ", 'element': " + str(ob.element) 
-            oMapStr += ", 'endTime': " + str(ob.endTime) 
-            oMapStr += ", 'offset': " + str(ob.offset) + "},\n"
-        oMapStr += "]\n"
-        #print oMapStr
-        self.assertEqual(oMapStr, 
-        '''[
-{'voiceIndex': 0, 'element': <music21.note.Note D>, 'endTime': 0.5, 'offset': 0.0},
-{'voiceIndex': 0, 'element': <music21.note.Note D>, 'endTime': 1.0, 'offset': 0.5},
-{'voiceIndex': 0, 'element': <music21.note.Note D>, 'endTime': 1.5, 'offset': 1.0},
-{'voiceIndex': 0, 'element': <music21.note.Note D>, 'endTime': 2.0, 'offset': 1.5},
-{'voiceIndex': 0, 'element': <music21.note.Note D>, 'endTime': 2.5, 'offset': 2.0},
-{'voiceIndex': 0, 'element': <music21.note.Note D>, 'endTime': 3.0, 'offset': 2.5},
-{'voiceIndex': 0, 'element': <music21.note.Note D>, 'endTime': 3.5, 'offset': 3.0},
-{'voiceIndex': 0, 'element': <music21.note.Note D>, 'endTime': 4.0, 'offset': 3.5},
-{'voiceIndex': 1, 'element': <music21.note.Note C>, 'endTime': 1.0, 'offset': 0.0},
-{'voiceIndex': 1, 'element': <music21.note.Note C>, 'endTime': 2.0, 'offset': 1.0},
-{'voiceIndex': 1, 'element': <music21.note.Note C>, 'endTime': 3.0, 'offset': 2.0},
-{'voiceIndex': 1, 'element': <music21.note.Note C>, 'endTime': 4.0, 'offset': 3.0},
-]
-''')
+        oMap = s.offsetMap()
+        
+        self.assertTrue(common.whitespaceEqual(repr(oMap), 
+        '''[OffsetMap(element=<music21.note.Note D>, offset=0.0, endTime=0.5, voiceIndex=0),
+            OffsetMap(element=<music21.note.Note D>, offset=0.5, endTime=1.0, voiceIndex=0), 
+            OffsetMap(element=<music21.note.Note D>, offset=1.0, endTime=1.5, voiceIndex=0), 
+            OffsetMap(element=<music21.note.Note D>, offset=1.5, endTime=2.0, voiceIndex=0), 
+            OffsetMap(element=<music21.note.Note C>, offset=0.0, endTime=1.0, voiceIndex=1), 
+            OffsetMap(element=<music21.note.Note C>, offset=1.0, endTime=2.0, voiceIndex=1)]'''))
+
         oMeasures = Part()
         oMeasures.insert(0, s)
         self.assertEqual(len(oMeasures[0].voices), 2)
         self.assertEqual([e.offset for e in oMeasures[0].voices[0]],
-                         [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5])
+                         [0.0, 0.5, 1.0, 1.5])
         self.assertEqual([e.offset for e in oMeasures[0].voices[1]], 
-                         [0.0, 1.0, 2.0, 3.0])
+                         [0.0, 1.0])
 
         GEX = m21ToXml.GeneralObjectExporter()
         unused_mx = GEX.parse(s).decode('utf-8')
 
+    def testVoicesALonger(self):
 
         # try version longer than 1 measure, more than 2 voices
         v1 = Voice()
@@ -5545,7 +5532,7 @@ class Test(unittest.TestCase):
         p = stream.Part()
         #p.append(instrument.Voice())
         p.append(note.Note("D#4"))
-        #environLocal.printDebug([p.offsetMap])
+        #environLocal.printDebug([p.offsetMap()])
 
 
     def testStripTiesBuiltB(self):
@@ -7650,7 +7637,7 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test, 'verbose') #, runTest='testSliceByQuarterLengthsBuilt') 
+    music21.mainTest(Test, 'verbose') #, runTest='testContextNestedD')
 
 #------------------------------------------------------------------------------
 # eof

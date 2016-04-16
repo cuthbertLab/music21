@@ -348,12 +348,22 @@ def makeMeasures(
     if s.hasVoices():
         #environLocal.printDebug(['make measures found voices'])
         # cannot make flat here, as this would destroy stream partitions
-        srcObj = copy.deepcopy(s.sorted)
+        if s.isSorted:
+            sSorted = s
+        else:
+            sSorted = s.sorted
+        srcObj = copy.deepcopy(sSorted)
         voiceCount = len(srcObj.voices)
     else:
         #environLocal.printDebug(['make measures found no voices'])
         # take flat and sorted version
-        srcObj = copy.deepcopy(s.flat.sorted)
+        sflat = s.flat
+        if sflat.isSorted:
+            sflatSorted = sflat
+        else:
+            sflatSorted = sflat.sorted
+        
+        srcObj = copy.deepcopy(sflatSorted)
         voiceCount = 0
 
     #environLocal.printDebug([
@@ -373,6 +383,10 @@ def makeMeasures(
         ts = meterStream
         meterStream = stream.Stream()
         meterStream.insert(0, ts)
+    else: # check that the meterStream is a Stream!
+        if not isinstance(meterStream, stream.Stream):
+            raise stream.StreamException(
+                    "meterStream is neither a Stream nor a TimeSignature!")
 
     #environLocal.printDebug([
     #    'makeMeasures(): meterStream', 'meterStream[0]', meterStream[0],
@@ -409,11 +423,11 @@ def makeMeasures(
     # for each element in stream, need to find max and min offset
     # assume that flat/sorted options will be set before procesing
     # list of start, start+dur, element
-    offsetMap = srcObj.offsetMap
+    offsetMapList = srcObj.offsetMap()
     #environLocal.printDebug(['makeMeasures(): offset map', offsetMap])
-    #offsetMap.sort() not necessary; just get min and max
-    if len(offsetMap) > 0:
-        oMax = max([x.endTime for x in offsetMap])
+    #offsetMapList.sort() not necessary; just get min and max
+    if len(offsetMapList) > 0:
+        oMax = max([x.endTime for x in offsetMapList])
     else:
         oMax = 0
 
@@ -452,10 +466,10 @@ def makeMeasures(
 
         if thisTimeSignature is None and lastTimeSignature is None:
             raise stream.StreamException(
-                'failed to find TimeSignature in meterStream; '
+                'failed to find TimeSignature in meterStream; ' +
                 'cannot process Measures')
-        if thisTimeSignature is not lastTimeSignature \
-            and thisTimeSignature is not None:
+        if (thisTimeSignature is not lastTimeSignature and
+                thisTimeSignature is not None):
             lastTimeSignature = thisTimeSignature
             # this seems redundant
             #lastTimeSignature = meterStream.getElementAtOrBefore(o)
@@ -489,8 +503,8 @@ def makeMeasures(
             measureCount += 1
 
     # populate measures with elements
-    for ob in offsetMap:
-        e, start, end, voiceIndex = ob
+    for oneOffsetMap in offsetMapList:
+        e, start, end, voiceIndex = oneOffsetMap
 
         #environLocal.printDebug(['makeMeasures()', start, end, e, voiceIndex])
         # iterate through all measures, finding a measure that
@@ -578,7 +592,12 @@ def makeMeasures(
         s._elements = []
         s._endElements = []
         s.elementsChanged()
-        for e in post.sorted:
+        if post.isSorted:
+            postSorted = post
+        else:
+            postSorted = post.sorted
+
+        for e in postSorted:
             # may need to handle spanners; already have s as site
             s.insert(post.elementOffset(e), e)
 
