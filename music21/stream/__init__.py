@@ -5847,7 +5847,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         searchKeySignatureByContext=False, 
                         **srkCopy)
         #environLocal.printDebug(['makeNotation(): meterStream:', meterStream, meterStream[0]])
-        measureStream.makeTies(meterStream, inPlace=True)
+        try:
+            measureStream.makeTies(meterStream, inPlace=True)
+        except StreamException as e:
+            strE = str(e)
+            environLocal.warn("StreamException: makeTies: " + strE)
+            
         #measureStream.makeBeams(inPlace=True)
         try:
             measureStream.makeBeams(inPlace=True)

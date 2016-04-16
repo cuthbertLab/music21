@@ -967,6 +967,9 @@ class Environment(object):
             msg = [repr(msg)]
         elif common.isNum(msg):
             msg = [str(msg)]
+        elif isinstance(msg, Exception):
+            msg = [str(msg)]
+            
         if header is None:
             if msg[0] != self.modNameParent and self.modNameParent is not None:
                 msg = [self.modNameParent + ': WARNING:'] + msg
