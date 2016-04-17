@@ -204,7 +204,6 @@ class _EnvironmentCore(object):
         # set value
         if key == 'localCorpusPath':
             # only add if unique
-            #value = xmlnode.fixBytes(value)
             if value not in self._ref['localCorpusSettings']:
                 # check for malicious values here
                 self._ref['localCorpusSettings'].append(value)
@@ -334,7 +333,6 @@ class _EnvironmentCore(object):
             if key == 'localCorpusSettings':
                 localCorpusSettings = ET.Element('localCorpusSettings')
                 for filePath in sorted(value):
-                    #filePath = xmlnode.fixBytes(filePath)
                     localCorpusPath = ET.Element('localCorpusPath')
                     if filePath is not None:
                         localCorpusPath.text = filePath
@@ -345,7 +343,6 @@ class _EnvironmentCore(object):
                 for name, paths in sorted(value.items()):
                     localCorpusSettings = ET.Element('localCorpusSettings', name=name)
                     for filePath in sorted(paths):
-                        #filePath = xmlnode.fixBytes(filePath)
                         localCorpusPath = ET.Element('localCorpusPath')
                         if filePath is not None:
                             localCorpusPath.text = filePath

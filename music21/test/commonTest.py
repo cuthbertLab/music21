@@ -123,7 +123,7 @@ class ModuleGather(object):
     >>> from music21.test import commonTest
     >>> mg = commonTest.ModuleGather(useExtended=True)
     >>> #_DOCS_SHOW print mg.modulePaths[0]
-    D:\Web\eclipse\music21base\music21\xmlnode.py
+    D:\Web\eclipse\music21base\music21\volume.py
     '''
     def __init__(self, useExtended=False):
         self.dirParent = common.getSourceFilePath()

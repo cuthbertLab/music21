@@ -15,8 +15,8 @@
 # generates pretty graphs showing what the bottlenecks in the system are, for helping to
 # improve them.  Requires pycallgraph (not included with music21).  
 
-import pycallgraph
-import pycallgraph.output
+import pycallgraph  # @UnusedImport @UnresolvedImport
+import pycallgraph.output  # @UnresolvedImport
 import time
 
 
@@ -562,7 +562,7 @@ class CallGraph(object):
         self.excludeList += ['re.*','sre_*']
         self.excludeList += ['*xlrd*']
         # these have been shown to be very fast
-        self.excludeList += ['*xmlnode*', 'xml.dom.*', 'codecs.*', 'io.*']
+        self.excludeList += ['xml.dom.*', 'codecs.*', 'io.*']
         #self.excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
 
         # set class  to test here

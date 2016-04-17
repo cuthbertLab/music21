@@ -667,7 +667,6 @@ class Converter(object):
          <class 'music21.converter.subConverters.ConverterMidi'>, 
          <class 'music21.converter.subConverters.ConverterMuseData'>, 
          <class 'music21.converter.subConverters.ConverterMusicXML'>, 
-         <class 'music21.converter.subConverters.ConverterMusicXMLET'>, 
          <class 'music21.converter.subConverters.ConverterNoteworthy'>, 
          <class 'music21.converter.subConverters.ConverterNoteworthyBinary'>, 
          <class 'music21.converter.subConverters.ConverterRomanText'>, 
@@ -680,7 +679,6 @@ class Converter(object):
          <class 'music21.converter.subConverters.ConverterLilypond'>, 
          <class 'music21.converter.subConverters.ConverterMidi'>, 
          <class 'music21.converter.subConverters.ConverterMusicXML'>, 
-         <class 'music21.converter.subConverters.ConverterMusicXMLET'>, 
          <class 'music21.converter.subConverters.ConverterScala'>, 
          <class 'music21.converter.subConverters.ConverterText'>, 
          <class 'music21.converter.subConverters.ConverterTextLine'>, 
@@ -746,7 +744,6 @@ class Converter(object):
         <class 'music21.converter.subConverters.ConverterMidi'>
         <class 'music21.converter.subConverters.ConverterMuseData'>
         <class 'music21.converter.subConverters.ConverterMusicXML'>
-        <class 'music21.converter.subConverters.ConverterMusicXMLET'>
         <class 'music21.converter.subConverters.ConverterNoteworthy'>
         <class 'music21.converter.subConverters.ConverterNoteworthyBinary'>
         <class 'music21.converter.subConverters.ConverterRomanText'>
@@ -787,11 +784,9 @@ class Converter(object):
         ('mei', <class 'music21.converter.subConverters.ConverterMEI'>)
         ('midi', <class 'music21.converter.subConverters.ConverterMidi'>)
         ('musedata', <class 'music21.converter.subConverters.ConverterMuseData'>)
-        ('musicxml', <class 'music21.converter.subConverters.ConverterMusicXMLET'>)
+        ('musicxml', <class 'music21.converter.subConverters.ConverterMusicXML'>)
         ('noteworthy', <class 'music21.converter.subConverters.ConverterNoteworthyBinary'>)
         ('noteworthytext', <class 'music21.converter.subConverters.ConverterNoteworthy'>)
-        ('oldmusicxml', <class 'music21.converter.subConverters.ConverterMusicXML'>)
-        ('oldxml', <class 'music21.converter.subConverters.ConverterMusicXML'>)
         ('rntext', <class 'music21.converter.subConverters.ConverterRomanText'>)
         ('romantext', <class 'music21.converter.subConverters.ConverterRomanText'>)
         ('scala', <class 'music21.converter.subConverters.ConverterScala'>)
@@ -801,7 +796,7 @@ class Converter(object):
         ('tinynotation', <class 'music21.converter.subConverters.ConverterTinyNotation'>)
         ('txt', <class 'music21.converter.subConverters.ConverterText'>)
         ('vexflow', <class 'music21.converter.subConverters.ConverterVexflow'>)
-        ('xml', <class 'music21.converter.subConverters.ConverterMusicXMLET'>)       
+        ('xml', <class 'music21.converter.subConverters.ConverterMusicXML'>)       
         '''
         converterFormats = {}
         for name in self.subconvertersList():

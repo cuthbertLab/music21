@@ -126,7 +126,6 @@ __all__ = [
     'variant',
     'voiceLeading',
     'volume',
-    'xmlnode',
     ]
 
 
