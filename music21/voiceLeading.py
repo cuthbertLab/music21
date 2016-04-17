@@ -44,6 +44,7 @@ from music21 import pitch
 from music21 import key
 from music21 import note
 from music21 import chord
+from music21.ext import six
 
 try:
     import enum # @UnresolvedImport
@@ -125,7 +126,7 @@ class VoiceLeadingQuartet(base.Music21Object):
 
 
     def _setKey(self, keyValue):
-        if common.isStr(keyValue):
+        if isinstance(keyValue, six.string_types):
             try:
                 keyValue = key.Key(key.convertKeyStringToMusic21KeyString(keyValue))
             except:
@@ -157,7 +158,7 @@ class VoiceLeadingQuartet(base.Music21Object):
     def _setVoiceNote(self, value, which):
         if value is None:
             setattr(self, which, None)
-        elif common.isStr(value):
+        elif isinstance(value, six.string_types):
             setattr(self, which, note.Note(value)) 
         else:
             try:
@@ -420,7 +421,7 @@ class VoiceLeadingQuartet(base.Music21Object):
             if requiredInterval is None:
                 return True
             else:
-                if common.isStr(requiredInterval):
+                if isinstance(requiredInterval, six.string_types):
                     requiredInterval = interval.Interval(requiredInterval)
 
                 if self.vIntervals[0].simpleName == requiredInterval.simpleName:
@@ -564,7 +565,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                 if simpleName is None:
                     return True
                 else:
-                    if common.isStr(simpleName):
+                    if isinstance(simpleName, six.string_types):
                         if self.vIntervals[0].simpleName == simpleName:
                             return True
                         else:
@@ -1558,7 +1559,7 @@ class NNoteLinearSegment(base.Music21Object):
         for value in noteList:
             if value is None:
                 self._noteList.append(None)
-            elif common.isStr(value):
+            elif isinstance(value, six.string_types):
                 self._noteList.append(note.Note(value))
             else:
                 try:
@@ -1685,7 +1686,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
     def _correctNoteInput(self, value):
         if value is None:
             return None
-        elif common.isStr(value):
+        elif isinstance(value, six.string_types):
             return note.Note(value)
         else:
             try:

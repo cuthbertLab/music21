@@ -37,6 +37,9 @@ environLocal = environment.Environment(_MOD)
 class SubConverterException(exceptions21.Music21Exception):
     pass
 
+class SubConverterFileIOException(SubConverterException):
+    pass
+
 class SubConverter(object):
     '''
     Class wrapper for parsing data or outputting data.  
@@ -65,7 +68,7 @@ class SubConverter(object):
     registerShowFormats = ()
     registerInputExtensions = ()
     registerOutputExtensions = ()
-    registerOutputSubformatExtensions = None
+    registerOutputSubformatExtensions = {}
     launchKey = None
     
     codecWrite = False
@@ -164,7 +167,7 @@ class SubConverter(object):
         if len(exts) == 0:
             raise SubConverterException("Cannot show or write -- no output extension")
         ext = exts[0]
-        if self.registerOutputSubformatExtensions is not None and subformats is not None:
+        if self.registerOutputSubformatExtensions and subformats is not None:
             joinedSubformats = '.'.join(subformats)
             if joinedSubformats in self.registerOutputSubformatExtensions:
                 ext = self.registerOutputSubformatExtensions[joinedSubformats]
@@ -548,7 +551,7 @@ class ConverterTinyNotation(SubConverter):
             {2.0} <music21.note.Note C>
             {2.5} <music21.bar.Barline style=final>
         '''
-        if common.isStr(tnData):
+        if isinstance(tnData, six.string_types):
             tnStr = tnData
         else: # assume a 2 element sequence
             raise SubConverterException(
@@ -638,8 +641,8 @@ class ConverterNoteworthyBinary(SubConverter):
         self.stream = noteworthyBinary.NWCConverter().parseFile(fp)
 
 #-------------------------------------------------------------------------------
-class ConverterMusicXMLET(SubConverter):
-    '''Converter for MusicXML using the new ElementTree system
+class ConverterMusicXML(SubConverter):
+    '''Converter for MusicXML using the 2015 ElementTree system
     '''
     registerFormats = ('musicxml','xml')
     registerInputExtensions = ('xml', 'mxl', 'mx', 'musicxml')
@@ -649,6 +652,21 @@ class ConverterMusicXMLET(SubConverter):
         SubConverter.__init__(self, **keywords)
 
     #---------------------------------------------------------------------------
+    def findPNGfpFromXMLfp(self, xmlFilePath):
+        '''
+        Check whether total number of pngs is in 1-9, 10-99, or 100-999 range,
+         then return appropriate fp. Raises and exception if png fp does not exist. 
+        '''
+        if os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + "-1.png"):
+            pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + "-1.png"
+        elif os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + "-01.png"):
+            pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + "-01.png"
+        elif os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + "-001.png"):
+            pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + "-001.png"
+        else:
+            raise SubConverterFileIOException("png file of xml not found. Is your file >999 pages?")
+        return pngfp
+    
     def parseData(self, xmlString, number=None):
         '''
         Open MusicXML data from a string.
@@ -685,12 +703,16 @@ class ConverterMusicXMLET(SubConverter):
 
         # movement titles can be stored in more than one place in musicxml
         # manually insert file name as a movementName title if no titles are defined
-        if c.stream.metadata.movementName == None:
+        if c.stream.metadata.movementName is None:
             junk, fn = os.path.split(fp)
             c.stream.metadata.movementName = fn
         self.stream = c.stream
 
     def runThroughMusescore(self, fp, **keywords):
+        '''
+        Take the output of the conversion process and run it through musescore to convert it
+        to a png.
+        '''
         musescorePath = environLocal['musescoreDirectPNGPath']
         if not musescorePath:
             raise SubConverterException(
@@ -715,10 +737,8 @@ class ConverterMusicXMLET(SubConverter):
         os.system(musescoreRun)
         fileLikeOpen.close()
         sys.stderr = storedStrErr
-
-        fp = fpOut[0:len(fpOut) - 4] + "-1.png"
-        #common.cropImageFromPath(fp)       
-        return fp
+        return self.findPNGfpFromXMLfp(fpOut)
+        #common.cropImageFromPath(fp)
     
     def writeDataStream(self, fp, dataBytes):
         if fp is None:
@@ -765,149 +785,6 @@ class ConverterMusicXMLET(SubConverter):
             fmt = 'png'
         self.launch(returnedFilePath, fmt=fmt, app=app)
    
-
-class ConverterMusicXML(SubConverter):
-    '''Converter for MusicXML
-    '''
-    registerFormats = ('oldmusicxml','oldxml')
-    registerInputExtensions = ('oldxml', 'oldmxl', 'oldmx', 'oldmusicxml')
-    registerOutputExtensions = ('xml', 'mxl')
-
-    def __init__(self, **keywords):
-        SubConverter.__init__(self, **keywords)
-        self._mxScore = None
-    
-    #---------------------------------------------------------------------------
-    def load(self):
-        '''Load all parts from a MusicXML object representation.
-        This determines the order parts are found in the stream
-        '''
-        #t = common.Timer()
-        #t.start()
-        from music21.musicxml import fromMxObjects
-        fromMxObjects.mxScoreToScore(self._mxScore, inputM21 = self.stream)
-        #self._stream._setMX(self._mxScore)
-        #t.stop()
-        #environLocal.printDebug(['music21 object creation time:', t])
-
-    #---------------------------------------------------------------------------
-    def parseData(self, xmlString, number=None):
-        '''Open MusicXML data from a string.'''
-        from music21.musicxml import xmlHandler as musicxmlHandler
-        c = musicxmlHandler.Document()
-        try:
-            c.read(xmlString)
-        except AttributeError:
-            excpStr = 'score from xmlString (%s...) either has no parts defined, '
-            excpStr += 'was incompletely parsed, or may not be MusicXML at all'
-            raise SubConverterException(excpStr % xmlString[:30])            
-        self._mxScore = c.score #  the mxScore object from the musicxml Document
-        if len(self._mxScore) == 0:
-            #print xmlString
-            raise SubConverterException(
-                'score from xmlString (%s...) has no parts defined or was incompletely parsed' % 
-                    xmlString[:30])
-        self.load()
-
-    def parseFile(self, fp, number=None):
-        '''
-        Open from a file path; check to see if there is a pickled
-        version available and up to date; if so, open that, otherwise
-        open source.
-        '''
-        # return fp to load, if pickle needs to be written, fp pickle
-        # this should be able to work on a .mxl file, as all we are doing
-        # here is seeing which is more recent
-        from music21 import converter        
-        from music21.musicxml import xmlHandler as musicxmlHandler
-
-        musxmlDocument = musicxmlHandler.Document()
-
-        environLocal.printDebug(['opening musicxml file:', fp])
-
-        # here, we can see if this is a mxl or similar archive
-        arch = converter.ArchiveManager(fp)
-        if arch.isArchive():
-            archData = arch.getData()
-            musxmlDocument.read(archData)
-        else: # its a file path or a raw musicxml string
-            musxmlDocument.open(fp)
-
-        # get mxScore object from .score attribute
-        self._mxScore = musxmlDocument.score
-        #print self._mxScore
-        # check that we have parts
-        if self._mxScore is None or len(self._mxScore) == 0:
-            raise SubConverterException('score from file path (%s) no parts defined' % fp)
-
-        # movement titles can be stored in more than one place in musicxml
-        # manually insert file name as a title if no titles are defined
-        if self._mxScore.get('movementTitle') == None:
-            mxWork = self._mxScore.get('workObj')
-            if mxWork == None or mxWork.get('workTitle') == None:
-                junk, fn = os.path.split(fp)
-                # set as movement title
-                self._mxScore.set('movementTitle', fn)
-        self.load()
-
-    def runThroughMusescore(self, fp, **keywords):
-        musescorePath = environLocal['musescoreDirectPNGPath']
-        if musescorePath == "":
-            raise SubConverterException(
-                "To create PNG files directly from MusicXML you need to download MuseScore")
-        elif not os.path.exists(musescorePath):
-            raise SubConverterException(
-                "Cannot find a path to the 'mscore' file at " + 
-                "%s -- download MuseScore" % musescorePath)
-
-        fpOut = fp[0:len(fp) - 3]
-        fpOut += "png"
-        musescoreRun = '"' + musescorePath + '" ' + fp + " -o " + fpOut + " -T 0 "
-        if 'dpi' in keywords:
-            musescoreRun += " -r " + str(keywords['dpi'])
-        if common.runningUnderIPython():
-            musescoreRun += " -r " + str(defaults.ipythonImageDpi)
-
-        storedStrErr = sys.stderr
-        fileLikeOpen = six.StringIO()
-        sys.stderr = fileLikeOpen
-        os.system(musescoreRun)
-        fileLikeOpen.close()
-        sys.stderr = storedStrErr
-
-        fp = fpOut[0:len(fpOut) - 4] + "-1.png"
-        #common.cropImageFromPath(fp)       
-        return fp
-    
-    def write(self, obj, fmt, fp=None, subformats=None, **keywords):
-        from music21.musicxml import m21ToString
-        ### hack to make musescore excerpts -- fix with a converter class in MusicXML
-        if subformats is not None and 'png' in subformats:
-            savedDefaultTitle = defaults.title
-            savedDefaultAuthor = defaults.author
-            defaults.title = ''
-            defaults.author = ''
-
-        dataStr = m21ToString.fromMusic21Object(obj)
-        fp = self.writeDataStream(fp, dataStr)
-
-        if subformats is not None and 'png' in subformats:
-            defaults.title = savedDefaultTitle
-            defaults.author = savedDefaultAuthor
-
-        
-        if subformats is not None and 'png' in subformats:
-            fp = self.runThroughMusescore(fp, **keywords)
-        return fp
-
-    def show(self, obj, fmt, app=None, subformats=None, **keywords):
-        '''
-        Override to do something with png...
-        '''
-        returnedFilePath = self.write(obj, fmt, subformats=subformats, **keywords)
-        if subformats is not None and 'png' in subformats:
-            fmt = 'png'
-        self.launch(returnedFilePath, fmt=fmt, app=app)
 
 
 #-------------------------------------------------------------------------------
@@ -1097,7 +974,7 @@ class ConverterMuseData(SubConverter):
         from music21 import musedata as musedataModule
         from music21.musedata import translate as musedataTranslate
 
-        if common.isStr(strData):
+        if isinstance(strData, six.string_types):
             strDataList = [strData]
         else:
             strDataList = strData
@@ -1243,9 +1120,9 @@ class Test(unittest.TestCase):
         When the string starts with "mei:"
         '''
         if six.PY3:
-            from unittest import mock  # pylint: disable=no-name-in-module
+            from unittest import mock  # @UnusedImport # pylint: disable=no-name-in-module
         else:
-            from music21.ext import mock
+            from music21.ext import mock # @Reimport
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             testConverter = ConverterMEI()
             testConverter.parseData('mei: <?xml><mei><note/></mei>')
@@ -1256,9 +1133,9 @@ class Test(unittest.TestCase):
         When the string doesn't start with "mei:"
         '''
         if six.PY3:
-            from unittest import mock  # pylint: disable=no-name-in-module
+            from unittest import mock  # @UnusedImport # pylint: disable=no-name-in-module
         else:
-            from music21.ext import mock
+            from music21.ext import mock # @Reimport
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             testConverter = ConverterMEI()
             testConverter.parseData('<?xml><mei><note/></mei>')
@@ -1307,7 +1184,51 @@ class Test(unittest.TestCase):
             testConverter = ConverterMEI()
             testConverter.parseFile(testPath)
             self.assertEqual(1, mockConv.call_count)
-
+            
+    def testXMLtoPNG(self):
+        '''
+        testing the findPNGfpFromXMLfp method with three different files of lengths
+        that create .png files with -1, -01, and -001 in the fp
+        '''
+        env = environment.Environment()
+        tempfp1 = env.getTempFile()
+        xmlfp1 = tempfp1 + ".xml"
+        os.rename(tempfp1, tempfp1 + "-1.png")
+        tempfp1 += "-1.png"
+        xmlconverter1 = ConverterMusicXML()
+        pngfp1 = xmlconverter1.findPNGfpFromXMLfp(xmlfp1)
+        self.assertEqual(pngfp1, tempfp1)
+        
+        env = environment.Environment()
+        tempfp2 = env.getTempFile()
+        xmlfp2 = tempfp2 + ".xml"
+        os.rename(tempfp2, tempfp2 + "-01.png")
+        tempfp2 += "-01.png"
+        xmlconverter2 = ConverterMusicXML()
+        pngfp2 = xmlconverter2.findPNGfpFromXMLfp(xmlfp2)
+        self.assertEqual(pngfp2, tempfp2)
+        
+        env = environment.Environment()
+        tempfp3 = env.getTempFile()
+        xmlfp3 = tempfp3 + ".xml"
+        os.rename(tempfp3, tempfp3 + "-001.png")
+        tempfp3 += "-001.png"
+        xmlconverter3 = ConverterMusicXML()
+        pngfp3 = xmlconverter3.findPNGfpFromXMLfp(xmlfp3)
+        self.assertEqual(pngfp3, tempfp3)
+        
+    def testXMLtoPNGtooLong(self):
+        '''
+        testing the findPNGfpFromXMLfp method with a file that is >999 pages long
+        '''
+        env = environment.Environment()
+        tempfp = env.getTempFile()
+        xmlfp = tempfp + ".xml"
+        os.rename(tempfp, tempfp + "-0001.png")
+        tempfp += "-0001.png"
+        xmlconverter = ConverterMusicXML()
+        self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, xmlfp)
+        
         
 class TestExternal(unittest.TestCase):
     def runTest(self):
@@ -1326,7 +1247,30 @@ class TestExternal(unittest.TestCase):
         s.append(n)
         s.show('lily.png')
         print(s.write('lily.png'))
+    
+    def testMultiPageXMlShow1(self):
+        '''
+        tests whether show() works for music that is 10-99 pages long
+        '''
+        from music21 import omr, converter
+        K525 = omr.correctors.K525groundTruthFilePath
+        K525 = converter.parse(K525)
+        K525.show('musicxml.png')
+        print(K525.write('musicxml.png'))
 
+#     def testMultiPageXMlShow2(self):
+#         '''
+#          tests whether show() works for music that is 100-999 pages long. 
+#          Currently takes way too long to run.
+#          '''
+#         from music21 import stream, note
+#         biggerStream = stream.Stream()
+#         note1 = note.Note("C4")
+#         note1.duration.type = 'whole'
+#         biggerStream.repeatAppend(note1, 10000)
+#         biggerStream.show('musicxml.png')
+#         biggerStream.show()
+#         print(biggerStream.write('musicxml.png'))
 
 
 if __name__ == '__main__':
@@ -1334,3 +1278,5 @@ if __name__ == '__main__':
     #import sys
     #sys.argv.append('SimpleTextShow')
     music21.mainTest(Test)
+    # run command below to test commands that open musescore, etc.
+#     music21.mainTest(TestExternal)

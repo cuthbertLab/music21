@@ -21,6 +21,8 @@ from music21 import exceptions21
 from music21 import stream
 from music21 import text
 
+from music21.ext import six
+
 from music21 import environment
 _MOD = 'features/base.py'
 environLocal = environment.Environment(_MOD)
@@ -1012,7 +1014,7 @@ class DataSet(object):
         if isinstance(dataOrStreamOrPath, DataInstance):
             di = dataOrStreamOrPath
             s = di.stream
-        elif common.isStr(dataOrStreamOrPath):
+        elif isinstance(dataOrStreamOrPath, six.string_types):
             # could be corpus or file path
             if os.path.exists(dataOrStreamOrPath) or dataOrStreamOrPath.startswith('http'):
                 s = converter.parse(dataOrStreamOrPath)

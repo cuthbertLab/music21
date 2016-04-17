@@ -22,13 +22,14 @@ import unittest
 import copy
 
 from music21 import base
-from music21 import exceptions21
-
-from music21 import pitch
-from music21 import note
-from music21 import interval
 from music21 import common
+from music21 import exceptions21
+from music21 import interval
+from music21 import note
+from music21 import pitch
 from music21 import scale
+
+from music21.ext import six
 
 from music21 import environment
 _MOD = "key.py"
@@ -213,7 +214,7 @@ def pitchToSharps(value, mode=None):
     KeyException: Cannot determine sharps for quarter-tone keys! silly!
     
     '''
-    if common.isStr(value): 
+    if isinstance(value, six.string_types): 
         value = pitch.Pitch(value)
     elif 'Pitch' in value.classes:
         value = value
@@ -234,7 +235,7 @@ def pitchToSharps(value, mode=None):
         sharps += modeSharpsAlter[mode]
     
     return sharps
-#    if common.isStr(value):
+#    if isinstance(value, six.string_types):
 #        p = pitch.Pitch(value)
 #    else:
 #        p = value

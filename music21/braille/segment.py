@@ -37,6 +37,11 @@ from music21.braille import lookup
 from music21.braille import text
 
 from music21.common import opFrac
+from music21.ext import six
+
+if six.PY3:
+    unicode = str
+
 
 # pylint: disable=redefined-builtin
 try:  # gives Py2 the zip of Py3
@@ -184,18 +189,21 @@ class BrailleElementGrouping(list):
                     try:
                         allObjects.append(u"\n".join(obj2._brailleEnglish))
                     except (AttributeError, TypeError):
-                        allObjects.append(str(obj2))
+                        allObjects.append(unicode(obj2))
             else:
                 try:
                     allObjects.append(u"\n".join(obj._brailleEnglish))
                 except (AttributeError, TypeError):
-                    allObjects.append(str(obj))
+                    allObjects.append(unicode(obj))
         if self.numRepeats > 0:
             allObjects.append(u"** Grouping x {0} **".format(self.numRepeats+1))
         if self.withHyphen is True:
             allObjects.append(u"** Music Hyphen **")
-        return u"\n".join(allObjects)
-        
+        out = u"\n".join(allObjects)
+        if six.PY2:
+            out = out.encode(encoding='utf_8', errors='ignore')
+        return out
+
     def __repr__(self):
         return str(self)
     
@@ -251,7 +259,7 @@ class BrailleSegment(collections.defaultdict):
         self.measureNumberWithDot = SEGMENT_MEASURENUMBERWITHDOT
         
     def __str__(self):
-        name = "<music21.braille.segment BrailleSegment>"
+        name = u"<music21.braille.segment BrailleSegment>"
         allItems = sorted(self.items())
         allKeys = []
         allGroupings = []
@@ -263,13 +271,19 @@ class BrailleSegment(collections.defaultdict):
                     continue
             except TypeError:
                 pass
-            allKeys.append("Measure {0}, {1} {2}:\n".format(int(itemKey//100),
-                affinityNames[itemKey%10], int(itemKey%100)//10 + 1))
-            allGroupings.append(str(grouping))
+            allKeys.append(u"Measure {0}, {1} {2}:\n".format(int(itemKey // 100),
+                affinityNames[itemKey % 10], int(itemKey % 100) // 10 + 1))
+            gStr = str(grouping)
+            if six.PY2:
+                gStr = gStr.decode(encoding='utf_8', errors='ignore')
+            allGroupings.append(gStr)
             prevKey = itemKey
-        allElementGroupings = u"\n".join([u"".join([k, g, "\n==="])
+        allElementGroupings = u"\n".join([u"".join([k, g, u"\n==="])
                                           for (k,g) in list(zip(allKeys, allGroupings))])
-        return u"\n".join(["---begin segment---", name, allElementGroupings, "---end segment---"])
+        out = u"\n".join([u"---begin segment---", name, allElementGroupings, u"---end segment---"])
+        if six.PY2:
+            out = out.encode(encoding='utf_8', errors='ignore')
+        return out
     
     def __repr__(self):
         return str(self)
@@ -519,21 +533,28 @@ class BrailleGrandSegment(object):
         self.transcription = self.transcribe()
 
     def __str__(self):
-        name = "<music21.braille.segment BrailleGrandSegment>\n==="
+        name = u"<music21.braille.segment BrailleGrandSegment>\n==="
         allPairs = []
         allKeyPairs = self.combineGroupingKeys(self.rightSegment, self.leftSegment)
         for (rightKey, leftKey) in allKeyPairs:
-            a = "Measure {0} Right, {1} {2}:\n".format(
+            a = u"Measure {0} Right, {1} {2}:\n".format(
                 int(rightKey // 100), affinityNames[rightKey % 10], int(rightKey % 100) // 10 + 1)
             b = str(self.rightSegment[rightKey])
-            c = "\nMeasure {0} Left, {1} {2}:\n".format(int(leftKey // 100),
+            if six.PY2:
+                b = b.decode(encoding='utf_8', errors='ignore')
+            c = u"\nMeasure {0} Left, {1} {2}:\n".format(int(leftKey // 100),
                 affinityNames[leftKey % 10], int(leftKey % 100) // 10 + 1)
             d = str(self.leftSegment[leftKey])
+            if six.PY2:
+                d = d.decode(encoding='utf_8', errors='ignore')
             ab = u"".join([a,b]) 
             cd = u"".join([c,d])
             allPairs.append(u"\n".join([ab, cd, "====\n"]))
-        return u"\n".join(["---begin grand segment---", name, u"".join(allPairs), 
-                           "---end grand segment---"])
+        out = u"\n".join([u"---begin grand segment---", name, u"".join(allPairs), 
+                           u"---end grand segment---"])
+        if six.PY2:
+            out = out.encode(encoding='utf_8', errors='ignore')
+        return out
 
     def combineGroupingKeys(self, rightSegment, leftSegment):
         groupingKeysRight = sorted(rightSegment.keys())
@@ -1653,10 +1674,18 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+    def testGetRawSegments(self):
+        from music21 import converter
+        
+        tn = converter.parse("tinynotation: 3/4 c4 c c e e e g g g c'2.")
+        tn = tn.makeNotation(cautionaryNotImmediateRepeat=False)        
+        
+        rawSegList = getRawSegments(tn)
+        unused = str(rawSegList[0])
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest='testGetRawSegments')
 
 #------------------------------------------------------------------------------
 # eof

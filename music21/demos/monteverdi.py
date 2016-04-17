@@ -20,7 +20,7 @@ have encoded lots of analyses in.  Some demos of the format are below
 
 from music21 import corpus, clef, interval, pitch, voiceLeading, roman
 
-def spliceAnalysis(book = 3, madrigal = 1):
+def spliceAnalysis(book=3, madrigal=1):
     '''
     splice an analysis of the madrigal under the analysis itself
     '''
@@ -40,7 +40,7 @@ def spliceAnalysis(book = 3, madrigal = 1):
     #excerpt.insert(0, aMeasures)
     #excerpt.show()
     
-def showAnalysis(book = 3, madrigal = 13):
+def showAnalysis(book=3, madrigal= 3):
     #analysis = converter.parse('d:/docs/research/music21/dmitri_analyses/Mozart Piano Sonatas/k331.rntxt') 
     filename = 'monteverdi/madrigal.%s.%s.rntxt' % (book, madrigal)
     analysis = corpus.parse(filename)
@@ -49,7 +49,7 @@ def showAnalysis(book = 3, madrigal = 13):
     print (major)
     print (minor)
     
-def analyzeBooks(books = (3,), start = 1, end = 20, show = False, strict = False):
+def analyzeBooks(books=(3,), start=1, end=20, show=False, strict=False):
     majorFig = ""
     minorFig = ""
     majorSt = ""
@@ -106,7 +106,8 @@ def iqChordsAndPercentage(analysisStream):
             fig = fig.replace('[no5]','')
             fig = fig.replace('[no3]','')
             fig = fig.replace('[no1]','')
-            longString = fig + " (" + str(int(element.duration.quarterLength*10000.0/totalDuration)/100.0) + ") "
+            longString = fig + " (" + str(int(
+                            element.duration.quarterLength*10000.0/totalDuration)/100.0) + ") "
             if active == 'major':
                 major += longString
             else:
@@ -128,8 +129,10 @@ def iqSemitonesAndPercentage(analysisStream):
     active = 'minor'
     for element in romMerged:
         if "RomanNumeral" in element.classes:       
-            distanceToTonicInSemis = int((element.root().ps - pitch.Pitch(element.scale.tonic).ps) % 12)
-            longString = str(distanceToTonicInSemis) + " (" + str(int(element.duration.quarterLength*10000.0/totalDuration)/100.0) + ") "
+            distanceToTonicInSemis = int((element.root().ps - 
+                                          pitch.Pitch(element.scale.tonic).ps) % 12)
+            longString = str(distanceToTonicInSemis) + " (" + str(int(
+                                element.duration.quarterLength*10000.0/totalDuration)/100.0) + ") "
             if active == 'major':
                 major += longString
             else:
@@ -151,7 +154,8 @@ def iqRootsAndPercentage(analysisStream):
     active = 'minor'
     for element in romMerged:
         if "RomanNumeral" in element.classes:       
-            #distanceToTonicInSemis = int((element.root().ps - pitch.Pitch(element.scale.tonic).ps) % 12)
+            #distanceToTonicInSemis = int((element.root().ps - 
+            #    pitch.Pitch(element.scale.tonic).ps) % 12)
             elementLetter = str(element.root().name) 
             
             ## leave El
@@ -166,7 +170,8 @@ def iqRootsAndPercentage(analysisStream):
                         elementLetter = elementLetter.lower()
                 else:
                     pass
-            longString = elementLetter + " (" + str(int(element.duration.quarterLength*10000.0/totalDuration)/100.0) + ") "
+            longString = elementLetter + " (" + str(int(
+                                element.duration.quarterLength*10000.0/totalDuration)/100.0) + ") "
             if active == 'major':
                 major += longString
             else:
@@ -180,7 +185,7 @@ def iqRootsAndPercentage(analysisStream):
                 minor += "\n" + element.tonic + " " + element.mode + " "
     return (major, minor)
 
-def monteverdiParallels(books = (3,), start = 1, end = 20, show = True, strict = False):
+def monteverdiParallels(books=(3,), start=1, end=20, show=True, strict=False):
     '''
     find all instances of parallel fifths or octaves in Monteverdi madrigals.
     '''
@@ -200,20 +205,24 @@ def monteverdiParallels(books = (3,), start = 1, end = 20, show = True, strict =
             displayMe = False
             for i in range(len(c.parts) - 1):
                 #iName = c.parts[i].id
-                ifn = c.parts[i].flat.notesAndRests
-                omi = ifn.offsetMap
+                ifn = c.parts[i].flat.notesAndRests.stream()
+                omi = ifn.offsetMap()
                 for j in range(i+1, len(c.parts)):
                     jName = c.parts[j].id      
     
-                    jfn = c.parts[j].flat.notesAndRests
+                    jfn = c.parts[j].flat.notesAndRests.stream()
                     for k in range(len(omi) - 1):
                         n1pi = omi[k]['element']
                         n2pi = omi[k+1]['element']                    
-                        n1pjAll = jfn.getElementsByOffset(offsetStart = omi[k]['endTime'] - .001, offsetEnd = omi[k]['endTime'] - .001, mustBeginInSpan = False)
+                        n1pjAll = jfn.getElementsByOffset(offsetStart=omi[k]['endTime'] - .001, 
+                                                          offsetEnd=omi[k]['endTime'] - .001, 
+                                                          mustBeginInSpan=False)
                         if len(n1pjAll) == 0:
                             continue
                         n1pj = n1pjAll[0]
-                        n2pjAll = jfn.getElementsByOffset(offsetStart = omi[k+1]['offset'], offsetEnd = omi[k+1]['offset'], mustBeginInSpan = False) 
+                        n2pjAll = jfn.getElementsByOffset(offsetStart=omi[k+1]['offset'], 
+                                                          offsetEnd=omi[k+1]['offset'], 
+                                                          mustBeginInSpan=False) 
                         if len(n2pjAll) == 0:
                             continue
                         n2pj = n2pjAll[0]
@@ -233,7 +242,7 @@ def monteverdiParallels(books = (3,), start = 1, end = 20, show = True, strict =
             if displayMe and show:
                 c.show()
                 
-def findPhraseBoundaries(book = 4, madrigal = 12):
+def findPhraseBoundaries(book=4, madrigal=12):
     filename = 'monteverdi/madrigal.%s.%s' % (book, madrigal)
     sc = corpus.parse(filename + '.xml')
     analysis = corpus.parse(filename + '.rntxt')
@@ -279,9 +288,11 @@ def findPhraseBoundaries(book = 4, madrigal = 12):
             previousNoteAnalysis = analysisFlat.getElementAtOrBefore(previousNote.offset)
             thisNoteAnalysis = analysisFlat.getElementAtOrBefore(thisNote.offset)
             
-            if previousNoteAnalysis.romanNumeral == 'V' and thisNoteAnalysis.romanNumeral.upper() == 'I':
+            if (previousNoteAnalysis.romanNumeral == 'V' and 
+                    thisNoteAnalysis.romanNumeral.upper() == 'I'):
                 thisScore = thisScore + 11
-            elif previousNoteAnalysis.romanNumeral.upper() == 'II' and thisNoteAnalysis.romanNumeral.upper() == 'I':
+            elif (previousNoteAnalysis.romanNumeral.upper() == 'II' and 
+                    thisNoteAnalysis.romanNumeral.upper() == 'I'):
                 thisScore = thisScore + 6
                 
             if thisNote.lyric is not None and thisNote.lyric.endswith('.'):
@@ -296,7 +307,8 @@ def findPhraseBoundaries(book = 4, madrigal = 12):
             print (thisOffset, psbo)
             relevantNote = flattenedBass.getElementAtOrBefore(thisOffset - 0.1)
             if hasattr(relevantNote, 'score'):
-                print ("adjusting score from %d to %d for note in measure %d" % (relevantNote.score, relevantNote.score + psbo, relevantNote.measureNumber))
+                print ("adjusting score from %d to %d for note in measure %d" % (
+                        relevantNote.score, relevantNote.score + psbo, relevantNote.measureNumber))
                 relevantNote.score += psbo
             else:
                 relevantNote.score = psbo
@@ -309,7 +321,7 @@ def findPhraseBoundaries(book = 4, madrigal = 12):
 
 if __name__ == '__main__':
     #spliceAnalysis()
-    #analyzeBooks(books = [3,4,5])
-    #analyzeBooks(books = [4], start=10, end=10, show=True, strict=True)
-    findPhraseBoundaries(book = 4, madrigal = 12)
-    #monteverdiParallels(books = [3], start=1, end=1, show=True, strict=True)
+    #analyzeBooks(books=[3,4,5])
+    #analyzeBooks(books=[4], start=10, end=10, show=True, strict=True)
+    findPhraseBoundaries(book=4, madrigal=12)
+    #monteverdiParallels(books=[3], start=1, end=1, show=True, strict=True)

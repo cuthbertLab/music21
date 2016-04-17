@@ -24,6 +24,7 @@ from music21 import note
 from music21 import common
 from music21 import duration
 from music21 import expressions
+from music21.ext import six
 
 from music21 import environment
 _MOD = "tempo.py"
@@ -456,7 +457,7 @@ class MetronomeMark(TempoIndication):
             # if referent is None, set a default quarter note duration
             self._referent = duration.Duration(type='quarter')
         # assume ql value or a type string
-        elif common.isNum(value) or common.isStr(value): 
+        elif common.isNum(value) or isinstance(value, six.string_types): 
             self._referent = duration.Duration(value)
         elif 'Duration' not in value.classes:
             # try get duration object, like from Note
@@ -731,7 +732,7 @@ class MetronomeMark(TempoIndication):
         '''
         if common.isNum(referent): # assume quarter length
             quarterLength = referent 
-        elif common.isStr(referent): # try to get quarter len    
+        elif isinstance(referent, six.string_types): # try to get quarter len    
             d = duration.Duration(referent)
             quarterLength = d.quarterLength
         else: # TODO: test if a Duration

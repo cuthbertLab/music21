@@ -648,7 +648,7 @@ class Sites(common.SlottedObject):
             excludeNone=True,
             )
         #printMemo(memo, 'getObjByClass() called: looking at %s sites' % len(objs))
-        classNameIsStr = common.isStr(className)
+        classNameIsStr = isinstance(className, six.string_types)
         for obj in objs:
             #environLocal.printDebug(['memo', memo])
             if classNameIsStr:

@@ -1037,6 +1037,15 @@ class OffsetTree(ElementTree):
                 yield el
 
 
+    #----------static methods ------------------------
+    @staticmethod
+    def elementEndTime(el, node):
+        '''
+        Use so that both OffsetTrees, which have elements which do not have a .endTime, and
+        TimespanTrees, which have element that have an .endTime but not a duration, can
+        use most of the same code.
+        '''
+        return node.position + el.duration.quarterLength
 
     #----------public methods ------------------------
     def getPositionFromElementUnsafe(self, el):
@@ -1136,13 +1145,22 @@ class OffsetTree(ElementTree):
 
     def elementsStoppingAt(self, offset):
         r'''
-        Finds elements or timespans in this offset-tree which stop at `offset`.
+        Finds elements in this OffsetTree which stop at `offset`.  Elements are ordered
+        according to (start) offset.
 
         >>> score = corpus.parse('bwv66.6')
+        >>> scoreTree = score.asTree(flatten=True, groupOffsets=True)
+        >>> for el in scoreTree.elementsStoppingAt(0.5):
+        ...     el
+        <music21.note.Note C#>
+        <music21.note.Note A>
+        <music21.note.Note A>
+
+        Works also on timespans for TimespanTrees:
+
         >>> scoreTree = score.asTimespans()
-        >>> for timespan in scoreTree.elementsStoppingAt(0.5):
-        ...     timespan
-        ...
+        >>> for el in scoreTree.elementsStoppingAt(0.5):
+        ...     el
         <PitchedTimespan (0.0 to 0.5) <music21.note.Note C#>>
         <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>
         <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>
@@ -1151,51 +1169,56 @@ class OffsetTree(ElementTree):
             result = []
             if node is not None: # could happen in an empty TimespanTree
                 if node.endTimeLow <= offset <= node.endTimeHigh:
-                    # This currently requires timespans not elements, and list payloads...
-                    # TODO: Fix/disambiguate.
-                    for timespan in node.payload:
-                        if timespan.endTime == offset:
-                            result.append(timespan)
                     if node.leftChild is not None:
                         result.extend(recurse(node.leftChild, offset))
+                    for el in node.payload:
+                        if self.elementEndTime(el, node) == offset:
+                            result.append(el)
                     if node.rightChild is not None:
                         result.extend(recurse(node.rightChild, offset))
             return result
         
         results = recurse(self.rootNode, offset)
-        results.sort(key=lambda x: (x.offset, x.endTime))
         return tuple(results)
 
     def elementsOverlappingOffset(self, offset):
         r'''
-        Finds elements or timespans in this ElementTree which overlap `offset`.
+        Finds elements in this ElementTree which overlap `offset`.
 
         >>> score = corpus.parse('bwv66.6')
+        >>> scoreTree = score.asTree(flatten=True, groupOffsets=True)
+        >>> for el in scoreTree.elementsOverlappingOffset(0.5):
+        ...     el
+        ...
+        <music21.note.Note E>
+
+        Works with Timespans in TimespanTrees as well.
+
         >>> scoreTree = score.asTimespans()
         >>> for el in scoreTree.elementsOverlappingOffset(0.5):
         ...     el
         ...
         <PitchedTimespan (0.0 to 1.0) <music21.note.Note E>>
         '''
-        def recurse(node, offset, indent=0):
-            result = []
+        def recurse(node, offset):
+            result = [] # collections.deque()
             if node is not None:
                 if node.position < offset < node.endTimeHigh:
-                    result.extend(recurse(node.leftChild, offset, indent + 1))
+                    result.extend(recurse(node.leftChild, offset))
                     # This currently requires timespans not elements, and list payloads...
                     # TODO: Fix/disambiguate.
-                    for timespan in node.payload:
-                        if offset < timespan.endTime:
-                            result.append(timespan)
-                    result.extend(recurse(node.rightChild, offset, indent + 1))
+                    for el in node.payload:
+                        if offset < self.elementEndTime(el, node):
+                            result.append(el)
+                    result.extend(recurse(node.rightChild, offset))
                 elif offset <= node.position:
-                    result.extend(recurse(node.leftChild, offset, indent + 1))
+                    result.extend(recurse(node.leftChild, offset))
             return result
         results = recurse(self.rootNode, offset)
         #if len(results) > 0 and hasattr(results[0], 'element'):
         #    results.sort(key=lambda x: (x.offset, x.endTime, x.element.sortTuple()[1:]))
         #else:
-        results.sort(key=lambda x: (x.offset, x.endTime))
+        #results.sort(key=lambda x: (x.offset, x.endTime))
         return tuple(results)
 
     def removeElements(self, elements, offsets=None, runUpdate=True): 
@@ -1454,6 +1477,15 @@ class TimespanTree(OffsetTree):
         super(TimespanTree, self).__init__(elements, source)
     
 
+    @staticmethod
+    def elementEndTime(el, unused_node):
+        '''
+        Use so that both OffsetTrees, which have elements which do not have a .endTime, and
+        TimespanTrees, which have element that have an .endTime but not a duration, can
+        use most of the same code.
+        '''
+        return el.endTime
+
     def offset(self):
         '''
         this is just for mimicking elements as streams. 
@@ -1582,9 +1614,11 @@ class TimespanTree(OffsetTree):
         Returns a verticality.Verticality object.
         '''
         from music21.tree.verticality import Verticality
+        
         startTimespans = self.elementsStartingAt(offset)
         stopTimespans = self.elementsStoppingAt(offset)
         overlapTimespans = self.elementsOverlappingOffset(offset)
+        
         verticality = Verticality(
             overlapTimespans=overlapTimespans,
             startTimespans=startTimespans,
@@ -1861,9 +1895,9 @@ class TimespanTree(OffsetTree):
         ...     print("%r, %s" % (timespan, timespan.part.id))
         ...
         <PitchedTimespan (0.0 to 0.5) <music21.note.Note C#>>, Soprano
+        <PitchedTimespan (0.0 to 1.0) <music21.note.Note E>>, Alto
         <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>, Tenor
         <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>, Bass
-        <PitchedTimespan (0.0 to 1.0) <music21.note.Note E>>, Alto
 
         >>> scoreTree.splitAt(0.1)
         >>> for timespan in scoreTree.elementsStartingAt(0.1):
@@ -2073,7 +2107,64 @@ class Test(unittest.TestCase):
 # #     {0.0} <music21.chord.Chord F#4>
 # #     {1.5} <music21.chord.Chord F#3>
 # #     {2.0} <music21.chord.Chord C#4>
-# #         
+# 
+
+
+    def testElementsStoppingAt(self):
+        '''
+        this was reporting:
+        
+        <music21.note.Note G#>
+        <music21.note.Note C#>
+        <music21.note.Note A>
+        <music21.note.Note A>
+        
+        G# was coming from an incorrect activeSite.  activeSite should not be used!       
+        '''
+        from music21 import corpus, stream, note
+        s = stream.Stream()
+        n0 = note.Note('A')
+        n0.duration.quarterLength = 3.0
+        s.insert(0, n0)
+        n1 = note.Note('B')
+        n1.duration.quarterLength = 2.0
+        s.insert(1, n1)
+        n2 = note.Note('C')
+        n2.duration.quarterLength = 1.0
+        s.insert(2, n2)
+        # and one later to be sure that order is right
+        n3 = note.Note('A#')
+        n3.duration.quarterLength = 2.5
+        s.insert(0.5, n3)
+        
+        st = s.asTree(groupOffsets=True)
+        stList = st.elementsStoppingAt(3.0)
+        self.assertEqual(len(stList), 4)
+        self.assertEqual([n.name for n in stList],
+                         ['A', 'A#', 'B', 'C'])
+        # making the tree more complex doesnot change anything, I hope?
+        for i in range(30):
+            s.insert(0, note.Rest())
+        for i in range(22):
+            s.insert(10 + i, note.Rest())
+        st = s.asTree(groupOffsets=True)
+        stList = st.elementsStoppingAt(3.0)
+        self.assertEqual(len(stList), 4)
+        self.assertEqual([n.name for n in stList],
+                         ['A', 'A#', 'B', 'C'])
+        
+        
+        
+        # real world example
+        score = corpus.parse('bwv66.6')
+        scoreTree = score.asTree(flatten=True, groupOffsets=True)
+        elementList = scoreTree.elementsStoppingAt(0.5)
+        self.assertEqual(len(elementList), 3)
+        self.assertEqual(elementList[0].name, 'C#')
+        self.assertEqual(elementList[1].name, 'A')
+        self.assertEqual(elementList[2].name, 'A')
+        
+        
     def testTimespanTree(self):
         from music21.tree.spans import Timespan
         for attempt in range(100):
@@ -2178,4 +2269,4 @@ _DOC_ORDER = (
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest='testElementsStoppingAt')

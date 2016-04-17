@@ -13,6 +13,7 @@ import abc  # for @abc.abstractmethod decorator: requires a function to be defin
 import os
 import types
 
+
 from music21 import common
 from music21.ext import six
 
@@ -45,7 +46,7 @@ class IPythonNotebookIterator(Iterator):
     ...     print(nb.replace(sp, 'SOURCE'))
     SOURCE/documentation/source/about/what.ipynb
     SOURCE/documentation/source/developerReference/installIPython.ipynb
-    SOURCE/documentation/source/usersGuide/usersGuide_01_installing.ipynb    
+    SOURCE/documentation/source/tutorials/examples.ipynb
     '''
 
     ### SPECIAL METHODS ###

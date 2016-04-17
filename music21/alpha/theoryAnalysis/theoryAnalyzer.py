@@ -152,22 +152,21 @@ be written to color/write comments, etc. But for now, all methods serve their
 purpose and the appropriate get methods
 can easily be written (reference getPassingTones for example)
 '''
-
-import music21
-
-from music21 import common
-from music21 import corpus
-from music21 import interval
-from music21 import voiceLeading
-from music21 import roman
-from music21 import note
-from music21 import chord
-from music21 import key
-from music21.alpha.theoryAnalysis import theoryResult
-
-import unittest
-    
+import unittest    
 from collections import defaultdict
+
+from music21 import chord
+from music21 import corpus
+from music21 import duration
+from music21 import exceptions21
+from music21 import interval
+from music21 import key
+from music21 import note
+from music21 import roman
+from music21 import voiceLeading
+
+from music21.alpha.theoryAnalysis import theoryResult
+from music21.ext import six
 
 from music21 import environment
 _MOD = 'theoryAnalyzer.py'
@@ -1549,7 +1548,7 @@ def removePassingTones(score, dictKey='unaccentedPassingTones'):
             if obj.id == a.n2.id:
                 obj.activeSite.remove(obj)
                 break
-        a.n1.duration = music21.duration.Duration(durationNewTone)
+        a.n1.duration = duration.Duration(durationNewTone)
         score.stripTies(inPlace=True, matchByPitch=True, retainContainers=False)
     score.analysisData['Verticalities'] = None
     
@@ -1592,7 +1591,7 @@ def removeNeighborTones(score, dictKey='unaccentedNeighborTones'):
             if obj.id == a.n2.id:
                 obj.activeSite.remove(obj)
                 break
-        a.n1.duration = music21.duration.Duration(durationNewTone)
+        a.n1.duration = duration.Duration(durationNewTone)
         score.stripTies(inPlace=True, matchByPitch=True, retainContainers=False)
         #a.n1.color = 'red'
     score.analysisData['Verticalities'] = None
@@ -2324,7 +2323,7 @@ def getKeyAtMeasure(score, measureNumber):
     if keyMeasureMap:
         for dictKey in sorted(list(keyMeasureMap.keys()), reverse=True):
             if measureNumber >= dictKey:                             
-                if common.isStr(keyMeasureMap[dictKey]):
+                if isinstance(keyMeasureMap[dictKey], six.string_types):
                     return key.Key(key.convertKeyStringToMusic21KeyString(keyMeasureMap[dictKey]))
                 else:
                     return keyMeasureMap[dictKey]
@@ -2336,7 +2335,7 @@ def getKeyAtMeasure(score, measureNumber):
     else:
         return score.analyze('key')
 
-class TheoryAnalyzerException(music21.Music21Exception):
+class TheoryAnalyzerException(exceptions21.Music21Exception):
     pass
 
 # ------------------------------------------------------------
@@ -2400,4 +2399,5 @@ class TestExternal(unittest.TestCase):
         p.show()
         
 if __name__ == "__main__":
+    import music21
     music21.mainTest(Test) #, runTest='testFastVerticalityCheck')    

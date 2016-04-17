@@ -25,6 +25,7 @@ from music21 import defaults
 from music21 import exceptions21
 from music21 import interval
 from music21.common import SlottedObject
+from music21.ext import six
 
 from music21 import environment
 _MOD = "pitch.py"
@@ -908,7 +909,7 @@ class Accidental(SlottedObject):
         >>> a.alter
         -2.0
         '''
-        if common.isStr(name):
+        if isinstance(name, six.string_types):
             name = name.lower() # sometimes args get capitalized
         if name in ['natural', "n", 0]:
             self._name = 'natural'
@@ -2626,7 +2627,7 @@ class Pitch(object):
 
     @property
     def german(self):
-        '''
+        u'''
         Read-only property. Returns the name
         of a Pitch in the German system
         (where B-flat = B, B = H, etc.)
@@ -2648,7 +2649,7 @@ class Pitch(object):
         >>> p1.accidental = pitch.Accidental('half-sharp')
         >>> p1.german
         Traceback (most recent call last):
-        PitchException: Es geht nicht "german" zu benutzen mit Microtönen.  Schade!
+        PitchException: Es geht nicht "german" zu benutzen mit Microt...nen.  Schade!
 
         Note these rarely used pitches:
 
@@ -2662,32 +2663,35 @@ class Pitch(object):
         else:
             tempAlter = 0
         tempStep = self.step
+        if six.PY2:
+            tempStep = unicode(tempStep) # @UndefinedVariable
+
         if tempAlter != int(tempAlter):
             raise PitchException(u'Es geht nicht "german" zu benutzen mit Microtönen.  Schade!')
         else:
             tempAlter = int(tempAlter)
-        if tempStep == 'B':
+        if tempStep == u'B':
             if tempAlter != -1:
-                tempStep = 'H'
+                tempStep = u'H'
             else:
                 tempAlter += 1
         if tempAlter == 0:
             return tempStep
         elif tempAlter > 0:
-            tempName = tempStep + (tempAlter * 'is')
+            tempName = tempStep + (tempAlter * u'is')
             return tempName
         else: # flats
-            if tempStep in ['C','D','F','G','H']:
-                firstFlatName = 'es'
+            if tempStep in [u'C', u'D', u'F', u'G', u'H']:
+                firstFlatName = u'es'
             else: # A, E.  Bs should never occur...
-                firstFlatName = 's'
+                firstFlatName = u's'
             multipleFlats = abs(tempAlter) - 1
-            tempName =  tempStep + firstFlatName + (multipleFlats * 'es')
+            tempName =  tempStep + firstFlatName + (multipleFlats * u'es')
             return tempName
 
     @property
     def italian(self):
-        '''
+        u'''
         Read-only attribute. Returns the name
         of a Pitch in the Italian system
         (F-sharp is fa diesis, C-flat is do bemolle, etc.)
@@ -2723,61 +2727,61 @@ class Pitch(object):
             tempAlter = 0
         tempStep = self.step
         if tempAlter != int(tempAlter):
-            raise PitchException('Non si puo usare `italian` con microtoni')
+            raise PitchException(u'Non si puo usare `italian` con microtoni')
         else:
             tempAlter = int(tempAlter)
 
-        cardinalityMap = {1: " ", 2: " doppio ", 3: " triplo ", 4: " quadruplo "}
-        solfeggeMap = {"C": "do", "D": "re", "E": "mi", "F": "fa", 
-                       "G": "sol", "A": "la", "B": "si"}
+        cardinalityMap = {1: u" ", 2: u" doppio ", 3: u" triplo ", 4: u" quadruplo "}
+        solfeggeMap = {"C": u"do", "D": u"re", "E": u"mi", "F": u"fa", 
+                       "G": u"sol", "A": u"la", "B": u"si"}
 
         if tempAlter == 0:
             return solfeggeMap[tempStep]
         elif tempAlter > 0:
             if tempAlter > 4:
                 raise PitchException('Entirely too many sharps')
-            return solfeggeMap[tempStep] + cardinalityMap[tempAlter] + "diesis"
+            return solfeggeMap[tempStep] + cardinalityMap[tempAlter] + u"diesis"
         else: # flats
             tempAlter = tempAlter*-1
             if tempAlter > 4:
                 raise PitchException('Entirely too many flats')
-            return solfeggeMap[tempStep] + cardinalityMap[tempAlter] + "bemolle"
+            return solfeggeMap[tempStep] + cardinalityMap[tempAlter] + u"bemolle"
     
     def _getSpanishCardinal(self):
         if self.accidental is None:
-            return ''
+            return u''
         else:
             i = abs(self.accidental.alter)
             # already checked for microtones, etc.
             if i == 1:
-                return ''
+                return u''
             elif i == 2:
-                return ' doble'
+                return u' doble'
             elif i == 3:
-                return ' triple'
+                return u' triple'
             elif i == 4:
-                return ' cuádruple'
+                return u' cuádruple'
 
     def _getSpanishSolfege(self):
         p = self.step
         if p == 'A':
-            return 'la'
+            return u'la'
         if p == 'B':
-            return 'si'
+            return u'si'
         if p == 'C':
-            return 'do'
+            return u'do'
         if p == 'D':
-            return 're'
+            return u're'
         if p == 'E':
-            return 'mi'
+            return u'mi'
         if p == 'F':
-            return 'fa'
+            return u'fa'
         if p == 'G':
-            return 'sol'
+            return u'sol'
 
     @property
     def spanish(self):
-        '''
+        u'''
         Read-only attribute. Returns the name
         of a Pitch in Spanish
         (Microtones and Quartertones raise an error).
@@ -2816,9 +2820,9 @@ class Pitch(object):
             elif abs(tempAlter) > 4:
                 raise PitchException('Unsupported accidental type.')
             elif tempAlter in [-4,-3,-2,-1]:
-                return solfege + self._getSpanishCardinal() + ' bèmol'
+                return solfege + self._getSpanishCardinal() + u' bèmol'
             elif tempAlter in [1,2,3,4]:
-                return solfege + self._getSpanishCardinal() + ' sostenido'
+                return solfege + self._getSpanishCardinal() + u' sostenido'
 
     @property
     def french(self):
@@ -2828,7 +2832,6 @@ class Pitch(object):
         (where A = la, B = si, B-flat = si bémol, C-sharp = do dièse, etc.)
         (Microtones and Quartertones raise an error).  Note that
         do is used instead of the also acceptable ut.
-
 
         >>> print(pitch.Pitch('B-').french)
         si bémol
@@ -2851,46 +2854,50 @@ class Pitch(object):
         else:
             tempAlter = 0
         tempStep = self.step
+
+        if six.PY2:
+            tempStep = unicode(tempStep) # @UndefinedVariable
+        
         if tempAlter != int(tempAlter):
             raise PitchException(
-                'On ne peut pas utiliser les microtones avec "french." Quelle Dommage!')
+                u'On ne peut pas utiliser les microtones avec "french." Quelle Dommage!')
         elif abs(tempAlter) > 4.0:
             raise PitchException(
-                'On ne peut pas utiliser les altération avec puissance supérieure à quatre ' + 
-                'avec "french." Ça me fait une belle jambe!')
+                u'On ne peut pas utiliser les altération avec puissance supérieure à quatre ' + 
+                u'avec "french." Ça me fait une belle jambe!')
         else:
             tempAlter = int(tempAlter)
-        if tempStep == 'A':
-            tempStep = 'la'
-        if tempStep == 'B':
-            tempStep = 'si'
-        if tempStep == 'C':
-            tempStep = 'do'
-        if tempStep == 'D':
-            tempStep = 'ré'
-        if tempStep == 'E':
-            tempStep = 'mi'
-        if tempStep == 'F':
-            tempStep = 'fa'
-        if tempStep == 'G':
-            tempStep = 'sol'
+        if tempStep == u'A':
+            tempStep = u'la'
+        if tempStep == u'B':
+            tempStep = u'si'
+        if tempStep == u'C':
+            tempStep = u'do'
+        if tempStep == u'D':
+            tempStep = u'ré'
+        if tempStep == u'E':
+            tempStep = u'mi'
+        if tempStep == u'F':
+            tempStep = u'fa'
+        if tempStep == u'G':
+            tempStep = u'sol'
 
         if tempAlter == 0:
             return tempStep
         elif abs(tempAlter) == 1.0:
             tempNumberedStep = tempStep
         elif abs(tempAlter) == 2.0:
-            tempNumberedStep = tempStep + ' double'
+            tempNumberedStep = tempStep + u' double'
         elif abs(tempAlter) == 3.0:
-            tempNumberedStep = tempStep + ' triple'
+            tempNumberedStep = tempStep + u' triple'
         elif abs(tempAlter) == 4.0:
-            tempNumberedStep = tempStep + ' quadruple'
+            tempNumberedStep = tempStep + u' quadruple'
 
         if tempAlter/abs(tempAlter) == 1.0: #sharps are positive
-            tempName = tempNumberedStep + ' dièse'
+            tempName = tempNumberedStep + u' dièse'
             return tempName
         else: # flats are negative
-            tempName = tempNumberedStep + ' bémol'
+            tempName = tempNumberedStep + u' bémol'
             return tempName
 
 
@@ -3098,7 +3105,7 @@ class Pitch(object):
         (7, -31.0)
         '''
 
-        if common.isStr(fundamental):
+        if isinstance(fundamental, six.string_types):
             fundamental = Pitch(fundamental)
         # else assume a Pitch object
         # got through all harmonics and find the one closes to this ps value
@@ -3223,7 +3230,7 @@ class Pitch(object):
                                      'provide one as an arugment')
             else:
                 fundamental = self.fundamental
-        if common.isStr(fundamental):
+        if isinstance(fundamental, six.string_types):
             fundamental = Pitch(fundamental)
 
         harmonic, cents = self.harmonicFromFundamental(fundamental)
@@ -3247,7 +3254,7 @@ class Pitch(object):
         >>> g4.harmonicAndFundamentalFromPitch('c3')
         (3, <music21.pitch.Pitch C3(-2c)>)
         '''
-        if common.isStr(target):
+        if isinstance(target, six.string_types):
             target = Pitch(target)
         else: # make a copy
             target = copy.deepcopy(target)
@@ -4979,13 +4986,13 @@ class Test(unittest.TestCase):
 
     def testQuarterToneA(self):
         from music21 import stream, note, scale
-        from music21.musicxml import m21ToString
+        from music21.musicxml import m21ToXml
 
         p1 = Pitch('D#~')
         #environLocal.printDebug([p1, p1.accidental])
         self.assertEqual(str(p1), 'D#~')
         # test generation of raw musicxml output
-        xmlout = m21ToString.fromMusic21Object(p1)
+        xmlout = m21ToXml.GeneralObjectExporter().parse(p1).decode('utf-8')
         #p1.show()
         match = '<step>D</step><alter>1.5</alter><octave>4</octave>'
         xmlout = xmlout.replace(' ', '')

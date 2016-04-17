@@ -17,9 +17,10 @@ Fundamental classes are :class:`~music21.interval.Interval`,
 :class:`~music21.interval.GenericInterval`, 
 and :class:`~music21.interval.ChromaticInterval`.
 '''
+from fractions import Fraction
+
 import abc
 import copy
-from fractions import Fraction
 import math
 import unittest
 
@@ -27,6 +28,7 @@ from music21 import base
 from music21 import common 
 from music21 import exceptions21
 
+from music21.ext import six
 #from music21 import pitch # SHOULD NOT, b/c of enharmonics
 
 from music21 import environment
@@ -220,7 +222,7 @@ def convertSpecifier(specifier):
     if common.isNum(specifier):
         post = specifier
     # check string matches
-    if common.isStr(specifier):
+    if isinstance(specifier, six.string_types):
         if specifier in prefixSpecs:
             post = prefixSpecs.index(specifier)
         # permit specifiers as prefixes without case; this will not distinguish
@@ -282,7 +284,7 @@ def convertGeneric(value):
     if common.isNum(value):
         post = value
         directionScalar = 1 # may still be negative
-    elif common.isStr(value):
+    elif isinstance(value, six.string_types):
         # first, see if there is a direction term
         directionScalar = ASCENDING # assume ascending
         for direction in [DESCENDING, ASCENDING]:
@@ -944,7 +946,7 @@ class DiatonicInterval(IntervalBase):
         IntervalBase.__init__(self)
 
         if specifier is not None and generic is not None:
-            if common.isNum(generic) or common.isStr(generic):
+            if common.isNum(generic) or isinstance(generic, six.string_types):
                 self.generic = GenericInterval(generic)
             elif isinstance(generic, GenericInterval): 
                 self.generic = generic
@@ -1774,7 +1776,7 @@ class Interval(IntervalBase):
         self.niceName = ""
 
 
-        if len(arguments) == 1 and common.isStr(arguments[0]):
+        if len(arguments) == 1 and isinstance(arguments[0], six.string_types):
             # convert common string representations 
             dInterval, cInterval = _stringToDiatonicChromatic(arguments[0])
             self.diatonic = dInterval
@@ -2400,7 +2402,7 @@ def transposePitch(pitch1, interval1):
 
     # check if interval1 is a string,
     # then convert it to interval object if necessary
-    if common.isStr(interval1) or isinstance(interval1, int):
+    if isinstance(interval1, six.string_types) or isinstance(interval1, int):
         interval1 = Interval(interval1) 
     else:
         if not hasattr(interval1, 'transposePitch'):

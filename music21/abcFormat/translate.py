@@ -183,7 +183,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         pass
     # clefs are not typically defined, but if so, are set to the first measure
     # following the meta data, or in the open stream
-    if not clefSet:
+    if not clefSet and len(p.recurse().getElementsByClass('Clef')) == 0:
         if useMeasures:  # assume at start of measures
             p.getElementsByClass('Measure')[0].clef = p.flat.bestClef()
         else:
@@ -212,7 +212,10 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     p.elementsChanged()
     return p
 
-def parseTokens(mh, dst, p, useMeasures):        
+def parseTokens(mh, dst, p, useMeasures):
+    '''      
+    parses all the tokens in a measure or part.
+    '''
     # in case need to transpose due to clef indication
     from music21 import abcFormat
 
@@ -915,6 +918,11 @@ class Test(unittest.TestCase):
         unused = corpus.parse('han2.abc', number=445)
 
 
+    def xtestMergeScores(self):
+        from music21 import corpus
+        unused = corpus.parse('josquin/laDeplorationDeLaMorteDeJohannesOckeghem', forceSource=True)
+        # this was getting incorrect Clefs...
+ 
 if __name__ == "__main__":
     import music21
     music21.mainTest(Test)

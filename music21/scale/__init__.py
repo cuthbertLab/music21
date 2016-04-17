@@ -63,7 +63,7 @@ from music21 import pitch
 from music21 import interval
 from music21 import sieve
 
-
+from music21.ext import six
 
 from music21 import environment
 _MOD = "scale.py"
@@ -306,7 +306,7 @@ class AbstractScale(Scale):
         '''
         pitchListReal = []
         for p in pitchList:
-            if common.isStr(p):
+            if isinstance(p, six.string_types):
                 pitchListReal.append(pitch.Pitch(p))
             elif hasattr(p, 'classes') and 'GeneralNote' in p.classes:
                 pitchListReal.append(p.pitch)
@@ -1275,7 +1275,7 @@ class ConcreteScale(Scale):
         # no default tonic is defined; as such, it is mostly an abstract scale
         if tonic is None:
             self.tonic = None #pitch.Pitch()
-        elif common.isStr(tonic):
+        elif isinstance(tonic, six.string_types):
             self.tonic = pitch.Pitch(tonic)
         elif hasattr(tonic, 'classes') and 'GeneralNote' in tonic.classes:
             self.tonic = tonic.pitch
@@ -1542,9 +1542,9 @@ class ConcreteScale(Scale):
                 pitchObj = self.tonic
             stepOfPitch = self._abstract.tonicDegree
 
-            if common.isStr(minPitch):
+            if isinstance(minPitch, six.string_types):
                 minPitch = pitch.Pitch(minPitch)
-            if common.isStr(maxPitch):
+            if isinstance(maxPitch, six.string_types):
                 maxPitch = pitch.Pitch(maxPitch)
             
             if (minPitch is not None and maxPitch is not None and 
@@ -2052,7 +2052,7 @@ class ConcreteScale(Scale):
         >>> sc1.isNext('d4', 'c4', 'ascending')
         True
         '''
-        if common.isStr(other): # convert to pitch
+        if isinstance(other, six.string_types): # convert to pitch
             other = pitch.Pitch(other)
         elif hasattr(other, 'pitch'): # possibly a note
             other = other.pitch # just get pitch component
@@ -3017,8 +3017,10 @@ class ScalaScale(ConcreteScale):
 
     '''
     def __init__(self, tonic=None, scalaString=None):
-        if (tonic is not None and scalaString is None and common.isStr(tonic) 
-            and (len(tonic) >= 4 or tonic.endswith('scl')) ):
+        if (tonic is not None and scalaString is None and 
+                isinstance(tonic, six.string_types) and 
+                (len(tonic) >= 4 or 
+                    tonic.endswith('scl')) ):
             # just a scale was wanted
             scalaString = tonic
             tonic = 'C4'

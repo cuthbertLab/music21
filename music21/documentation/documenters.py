@@ -830,7 +830,6 @@ class ClassDocumenter(ObjectDocumenter):
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.lowestOffset>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.notes>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.notesAndRests>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.offsetMap>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.pitches>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.secondsMap>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.semiFlat>

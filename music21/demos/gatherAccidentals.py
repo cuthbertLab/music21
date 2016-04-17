@@ -134,7 +134,8 @@ def getAccidentalCountSum(scores, includeNonAccidentals=False, excludeZeros=True
     '''
     tally = _initializeTally()
     for score in scores:
-        assert score.isStream
+        if not score.isStream:
+            raise exceptions21.Music21Exception("score must be a stream object")
         scoreTally = getAccidentalCount(score, includeNonAccidentals, False)
         # dict.update() won't suffice; list() for Python v3
         for k in list(scoreTally.keys()):
@@ -263,6 +264,6 @@ class TestSlow(unittest.TestCase):
             
     
 if __name__ == "__main__":
-    from music21 import base
-    base.mainTest(Test) # replace 'Test' with 'TestSlow' to test it on all 371 Bach Chorales.
+    import music21
+    music21.mainTest(Test) # replace 'Test' with 'TestSlow' to test it on all 371 Bach Chorales.
         

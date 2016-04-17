@@ -150,7 +150,7 @@ def listOfTimespanTreesByClass(inputStream,
                                classLists=classLists,
                                useTimespans=True)
 
-def asTree(inputStream, flatten=False, classList=None, useTimespans=False, usePositions=True):
+def asTree(inputStream, flatten=False, classList=None, useTimespans=False, groupOffsets=False):
     '''
     Converts a Stream and constructs an :class:`~music21.tree.trees.ElementTree` based on this.
     
@@ -214,9 +214,10 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, usePo
         inputStreamElements = inputStream._elements[:] + inputStream._endElements
         parentEndTime = initialOffset + lastParentage.duration.quarterLength
 
+        # check to see if we can shortcut and make a Tree very fast from a sorted list.
         if (newOutputTree and 
                 inputStream.isSorted and 
-                usePositions and # currently we can't populate for an OffsetTree
+                groupOffsets is False and # currently we can't populate for an OffsetTree
                 (inputStream.isFlat or flatten is False)):
             # Can use tree.populateFromSortedList and speed up by an order of magnitude
             if classList is None:
@@ -262,7 +263,7 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, usePo
                                                         offset=offset,
                                                         endTime=endTime)
                     outputTree.insert(pitchedTimespan)
-                elif usePositions:
+                elif groupOffsets is False:
                     outputTree.insert(flatPosition, element)                    
                 else:
                     outputTree.insert(offset, element)
@@ -271,7 +272,7 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, usePo
 
     if useTimespans:
         treeClass = trees.TimespanTree
-    elif usePositions:
+    elif groupOffsets is False:
         treeClass = trees.ElementTree
     else:
         treeClass = trees.OffsetTree

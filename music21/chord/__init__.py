@@ -184,7 +184,7 @@ class Chord(note.NotRest):
     def __init__(self, notes=None, **keywords):
         if notes is None:
             notes = []
-        if common.isStr(notes) and " " in notes:
+        if isinstance(notes, six.string_types) and " " in notes:
             notes = notes.split()
         # the list of pitch objects is managed by a property; this permits
         # only updating the _chordTablesAddress when pitches has changed
@@ -318,7 +318,7 @@ class Chord(note.NotRest):
         KeyError: 'cannot access component with: 5'
         '''
 
-        if common.isStr(key) and key.count('.') == 1:
+        if isinstance(key, six.string_types) and key.count('.') == 1:
             first, last = key.split('.')
             try:
                 component = self._notes[int(first)]
@@ -731,7 +731,7 @@ class Chord(note.NotRest):
 
         '''
         if newbass:
-            if common.isStr(newbass):
+            if isinstance(newbass, six.string_types):
                 newbass = newbass.replace('b', '-')
                 self._bass = pitch.Pitch(newbass)
             else:
@@ -1213,7 +1213,7 @@ class Chord(note.NotRest):
         >>> c.getColor('D#7')
         'pink'        
         '''
-        if common.isStr(pitchTarget):
+        if isinstance(pitchTarget, six.string_types):
             pitchTarget = pitch.Pitch(pitchTarget)
         for n in self._notes:
             if n.pitch is pitchTarget:
@@ -1379,7 +1379,7 @@ class Chord(note.NotRest):
         '''
         # NOTE: pitch matching is potentially problematic if we have more than
         # one of the same pitch
-        if common.isStr(p):
+        if isinstance(p, six.string_types):
             p = pitch.Pitch(p)
 
         for d in self._notes:
@@ -2857,7 +2857,7 @@ class Chord(note.NotRest):
 
         '''
         if newroot:
-            if common.isStr(newroot):
+            if isinstance(newroot, six.string_types):
                 newroot = newroot.replace('b', '-')
                 self._root = pitch.Pitch(newroot)
             else:
@@ -3027,7 +3027,7 @@ class Chord(note.NotRest):
         if pitchTarget is None and len(self._notes) > 0:
             self.color = value
             return
-        elif common.isStr(pitchTarget):
+        elif isinstance(pitchTarget, six.string_types):
             pitchTarget = pitch.Pitch(pitchTarget)
 
         match = False
@@ -3126,7 +3126,7 @@ class Chord(note.NotRest):
         # assign to first pitch by default
         if pitchTarget is None and len(self._notes) > 0:
             pitchTarget = self._notes[0].pitch
-        elif common.isStr(pitchTarget):
+        elif isinstance(pitchTarget, six.string_types):
             pitchTarget = pitch.Pitch(pitchTarget)
         match = False
         for d in self._notes:
@@ -3192,7 +3192,7 @@ class Chord(note.NotRest):
         # assign to first pitch by default
         if pitchTarget is None and len(self._notes) > 0:
             pitchTarget = self._notes[0].pitch
-        elif common.isStr(pitchTarget):
+        elif isinstance(pitchTarget, six.string_types):
             pitchTarget = pitch.Pitch(pitchTarget)
         match = False
         for d in self._notes:
@@ -3269,7 +3269,7 @@ class Chord(note.NotRest):
         '''
         if pitchTarget is None and len(self._notes) > 0:
             pitchTarget = self._notes[0].pitch # first is default
-        elif common.isStr(pitchTarget):
+        elif isinstance(pitchTarget, six.string_types):
             pitchTarget = pitch.Pitch(pitchTarget)
         match = False
         for d in self._notes:
@@ -3327,9 +3327,9 @@ class Chord(note.NotRest):
         '''
         if pitchTarget is None and len(self._notes) > 0: # if no pitch
             pitchTarget = self._notes[0].pitch
-        elif common.isStr(pitchTarget):
+        elif isinstance(pitchTarget, six.string_types):
             pitchTarget = pitch.Pitch(pitchTarget)
-        if common.isStr(t):
+        if isinstance(t, six.string_types):
             t = tie.Tie(t)
         else:
             pass # assume a tie object
@@ -3357,7 +3357,7 @@ class Chord(note.NotRest):
         # assign to first pitch by default
         if pitchTarget is None and len(self._notes) > 0: # if no pitches
             pitchTarget = self._notes[0].pitch
-        elif common.isStr(pitchTarget):
+        elif isinstance(pitchTarget, six.string_types):
             pitchTarget = pitch.Pitch(pitchTarget)
         match = False
         for d in self._notes:
@@ -3935,7 +3935,7 @@ class Chord(note.NotRest):
     @pitchNames.setter
     def pitchNames(self, value):
         if common.isListLike(value):
-            if common.isStr(value[0]): # only checking first
+            if isinstance(value[0], six.string_types): # only checking first
                 self._notes = [] # clear
                 for name in value:
                     self._notes.append(note.Note(name))
@@ -4401,7 +4401,7 @@ def fromForteClass(notation):
     card = None
     num = 1
     inv = None
-    if common.isStr(notation):
+    if isinstance(notation, six.string_types):
         if '-' in notation:
             parts = notation.split('-')
             card = int(parts[0])
@@ -4959,7 +4959,7 @@ class Test(unittest.TestCase):
 
     def testTiesA(self):
         # test creating independent ties for each Pitch
-        from music21.musicxml import m21ToString
+        from music21.musicxml import m21ToXml
 
         c1 = Chord(['c', 'd', 'b'])
         # as this is a subclass of Note, we have a .tie attribute already
@@ -5009,15 +5009,15 @@ class Test(unittest.TestCase):
         self.assertEqual(chords[2].getTie(pitch.Pitch('c5')), None)
 
         #s.show()
-        out = m21ToString.fromMusic21Object(s)
+        GEX = m21ToXml.GeneralObjectExporter()
+        out = GEX.parse(s).decode('utf-8')
         out = out.replace(' ', '')
         out = out.replace('\n', '')
         #print out
         self.assertTrue(out.find('<pitch><step>A</step><octave>4</octave></pitch>' + 
                                  '<duration>15120</duration><tietype="start"/>' + 
                                  '<type>quarter</type><dot/><stem>up</stem>' + 
-                                 '<notehead>normal</notehead><notations>' + 
-                                 '<tiedtype="start"/></notations>') != -1, out)
+                                 '<notations><tiedtype="start"/></notations>') != -1, out)
 
     def testTiesB(self):
         from music21 import stream, scale

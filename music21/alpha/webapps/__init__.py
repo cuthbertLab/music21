@@ -406,7 +406,7 @@ class Agenda(dict):
     
     The Agenda contains the following keys:
     
-*   **'dataDict'** whose value is a dictionary specifying data to be input to the 
+    *   **'dataDict'** whose value is a dictionary specifying data to be input to the 
         processor of the form::
     
             "dataDict" : {"<VARIABLE_1_NAME>": {"data": "<VARIABLE_1_DATA>",
@@ -418,8 +418,8 @@ class Agenda(dict):
         
     where the variable formats are elements of availableDataFormats ("str","int","musicxml", etc.)
     
-*     **'commandList'**  whose value is a list specifying commands to be executed by the 
-      processor of the form::
+    *     **'commandList'**  whose value is a list specifying commands to be executed by the 
+          processor of the form::
     
             "commandList" : [{"<CMD_1_TYPE>": "<CMD_2_COMMAND_NAME>",
                               "resultVar":    "<CMD_1_RESULT_VARIABLE>",
@@ -440,8 +440,8 @@ class Agenda(dict):
         <CMD_n_ARG_2>...)``
     where the command TYPE is "function", "method", or "attribute"
     
-*    **'returnDict'** whose value is a list specifying the variables to be 
-        returned from the server::
+    *    **'returnDict'** whose value is a list specifying the variables to be 
+         returned from the server::
     
             "returnDict" : {"<VARIABLE_1_NAME>": "<VARIABLE_1_FORMAT",
                             "<VARIABLE_2_NAME>": "<VARIABLE_2_FORMAT", etc.}
@@ -450,9 +450,9 @@ class Agenda(dict):
     If returnDict is not specified,
     the entire set of variables in the processor's environment will be returned in string format.
     
-*    **'outputTemplate'**  which specifies the return template to be used
+    *    **'outputTemplate'**  which specifies the return template to be used
     
-*    **'outputArgList'**   which specifies what arguments to pass the return template
+    *    **'outputArgList'**   which specifies what arguments to pass the return template
     
     '''
     def __init__(self):
@@ -756,7 +756,7 @@ class CommandProcessor(object):
                         continue
                     data = []
                     for elementStr in dataStr:
-                        if common.isStr(elementStr):
+                        if isinstance(elementStr, six.string_types):
                             dataElement = self.parseInputToPrimitive(elementStr)
                         else:
                             dataElement = elementStr
@@ -1185,7 +1185,7 @@ class CommandProcessor(object):
         if common.isIterable(inpVal):
             return [self.parseInputToPrimitive(element) for element in inpVal]
         
-        if not common.isStr(inpVal):
+        if not isinstance(inpVal, six.string_types):
             self.recordError("Unknown type for parseInputToPrimitive "+str(inpVal))
         
         strVal = inpVal

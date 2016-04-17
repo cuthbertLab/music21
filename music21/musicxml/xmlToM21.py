@@ -485,6 +485,11 @@ class MusicXMLImporter(XMLParserBase):
         self.xmlRootToScore(self.xmlRoot, self.stream)
     
     def parseXMLText(self):
+        if six.PY3 and isinstance(self.xmlText, bytes):
+            self.xmlText = self.xmlText.decode('utf-8')
+        elif six.PY2 and isinstance(self.xmlText, unicode): # @UndefinedVariable
+            self.xmlText = self.xmlText.encode('utf-8')
+        
         sio = six.StringIO(self.xmlText)
         try:
             etree = ET.parse(sio)
@@ -2676,7 +2681,17 @@ class MeasureParser(XMLParserBase):
                 useVoice = useVoice.text.strip()
                 
             try:
-                thisVoice = m.voices[useVoice]
+                thisVoice = None
+                for v in m.voices:
+                    if v.id == useVoice:
+                        thisVoice = v
+                        break
+                    try:
+                        if int(v.id) == int(useVoice):
+                            thisVoice = v
+                            break
+                    except ValueError:
+                        pass
             except stream.StreamException:
                 thisVoice = None
                 
@@ -2770,12 +2785,6 @@ class MeasureParser(XMLParserBase):
         'final'
         >>> r.direction
         'end'
-
-        # TODO: replace after changing output not to use toMxObjects
-        
-        >>> mxBarline2 = musicxml.toMxObjects.repeatToMx(r)
-        >>> mxBarline2.get('barStyle')
-        'light-heavy'
         '''
         if inputM21 is None:
             r = bar.Repeat()
@@ -3868,9 +3877,11 @@ class Test(unittest.TestCase):
     def testChordalStemDirImport(self):
         #NB: Finale apparently will not display a pitch that is a member of a chord without a stem
         #unless all chord members are without stems.
-        from music21.musicxml import m21ToString
+        #MuseScore 2.0.3 -- last <stem> tag rules. 
+        from music21.musicxml import m21ToXml
         from music21 import converter
 
+        # this also tests the EXPORTING of stem directions on notes within chords...
         n1 = note.Note('f3')
         n1.notehead = 'diamond'
         n1.stemDirection = 'down'
@@ -3879,8 +3890,9 @@ class Test(unittest.TestCase):
         c = chord.Chord([n1, n2])
         c.quarterLength = 2
         
-        xml = m21ToString.fromMusic21Object(c)
-        #print xml
+        GEX = m21ToXml.GeneralObjectExporter()
+        xml = GEX.parse(c)
+        #print(xml.decode('utf-8'))
         #c.show()
         inputStream = converter.parse(xml)
         chordResult = inputStream.flat.notes[0]
@@ -4342,10 +4354,21 @@ class Test(unittest.TestCase):
         print(c.parts[1].measure(99).notesAndRests[0].getSpannerSites()[0].idLocal)
         #c.show()
         #c.parts[1].show('t')
+        
+    def testTwoVoicesWithChords(self):
+        from music21 import  corpus, converter
+        c = converter.parse(corpus.corpora.CoreCorpus().getWorkList(
+                                                    'demos/voices_with_chords.xml')[0], 
+                            format='musicxml', 
+                            #forceSource=True
+                            )
+        firstChord = c.parts[0].measure(1).voices.getElementById('2').notes[1]
+        self.assertEqual(repr(firstChord), '<music21.chord.Chord G4 B4>')
+        self.assertEqual(firstChord.offset, 1.0)
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='testTrillOnOneNote')
+    music21.mainTest(Test) #, runTest='testTwoVoicesWithChords')
     
     
     

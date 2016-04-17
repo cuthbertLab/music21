@@ -28,7 +28,7 @@ available after importing music21.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'3.0.2'
+'3.0.4'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -2280,6 +2280,7 @@ class Music21Object(object):
         >>> n.sortTuple()
         SortTuple(atEnd=0, offset=4.0, priority=-3, classSortOrder=20, 
                     isNotGrace=1, insertIndex=0)
+                    
         >>> st = n.sortTuple()
 
         Check that all these values are the same as above...
@@ -2294,9 +2295,8 @@ class Music21Object(object):
         >>> st.classSortOrder == note.Note.classSortOrder
         True
         
-        SortTuples have a few methods that are documented in
-        :class:`~music21.sorting.SortTuple`. The most useful one for documenting
-        is `.shortRepr()
+        SortTuples have a few methods that are documented in :class:`~music21.sorting.SortTuple`.
+        The most useful one for documenting is `.shortRepr()`.
         
         >>> st.shortRepr()
         '4.0 <-3.20.0>'
@@ -2311,6 +2311,7 @@ class Music21Object(object):
         >>> n.sortTuple()
         SortTuple(atEnd=0, offset=4.0, priority=-3, classSortOrder=20,
                      isNotGrace=1, insertIndex=...)
+                     
         >>> nInsertIndex = n.sortTuple().insertIndex
 
         If we create another nearly identical note, the insertIndex will be different:

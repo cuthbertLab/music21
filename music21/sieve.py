@@ -61,6 +61,7 @@ from music21 import exceptions21
 from music21 import pitch
 from music21 import common
 from music21 import interval
+from music21.ext import six
 
 from music21 import environment
 _MOD = 'sieve.py'
@@ -1048,7 +1049,7 @@ class Sieve(object):
         >>> c = sieve.Sieve('(5|2)&4&8')
         """
         # note: this z should only be used if usrStr is a str, and not a list
-        if z is None and common.isStr(usrStr):
+        if z is None and isinstance(usrStr, six.string_types):
             z = list(range(0, 100))
         elif z is None and common.isListLike(usrStr): # if a list
             pass

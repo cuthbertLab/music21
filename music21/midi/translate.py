@@ -169,11 +169,11 @@ def getStartEvents(mt=None, channel=1, instrumentObj=None):
     
     >>> midi.translate.getStartEvents()
     [<MidiEvent DeltaTime, t=0, track=None, channel=1>, 
-     <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=None, channel=1, data=''>]
+     <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=None, channel=1, data=b''>]
 
     >>> midi.translate.getStartEvents(channel=2, instrumentObj=instrument.Harpsichord())
     [<MidiEvent DeltaTime, t=0, track=None, channel=2>, 
-     <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=None, channel=2, data='Harpsichord'>, 
+     <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=None, channel=2, data=b'Harpsichord'>, 
      <MidiEvent DeltaTime, t=0, track=None, channel=2>, 
      <MidiEvent PROGRAM_CHANGE, t=0, track=None, channel=2, data=6>]
 
@@ -213,7 +213,7 @@ def getEndEvents(mt=None, channel=1):
     
     >>> midi.translate.getEndEvents(channel=2)
     [<MidiEvent DeltaTime, t=1024, track=None, channel=2>, 
-     <MidiEvent END_OF_TRACK, t=None, track=None, channel=2, data=''>]
+     <MidiEvent END_OF_TRACK, t=None, track=None, channel=2, data=b''>]
     '''
     from music21 import midi as midiModule
 
@@ -772,7 +772,7 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
     >>> eventList[0]
     <MidiEvent DeltaTime, t=0, track=None, channel=None>
     >>> eventList[1]
-    <MidiEvent TIME_SIGNATURE, t=None, track=None, channel=1, data='\\x05\\x02\\x18\\x08'>
+    <MidiEvent TIME_SIGNATURE, t=None, track=None, channel=1, data=b'\\x05\\x02\\x18\\x08'>
     '''
     from music21 import midi as midiModule
 
@@ -819,7 +819,7 @@ def midiEventsToKeySignature(eventList):
     >>> me2.type = "KEY_SIGNATURE"
     >>> me2.data = midi.putNumbersAsList([-2, 1]) # g minor
     >>> me2.data
-    '\\xfe\\x01'
+    b'\\xfe\\x01'
     >>> midi.getNumbersAsList(me2.data)
     [254, 1]
     >>> ks = midi.translate.midiEventsToKeySignature(me2)
@@ -871,7 +871,7 @@ def keySignatureToMidiEvents(ks, includeDeltaTime=True):
     <music21.key.KeySignature of 2 sharps>
     >>> eventList = midi.translate.keySignatureToMidiEvents(ks)
     >>> eventList[1]
-    <MidiEvent KEY_SIGNATURE, t=None, track=None, channel=1, data='\\x02\\x00'>
+    <MidiEvent KEY_SIGNATURE, t=None, track=None, channel=1, data=b'\\x02\\x00'>
 
     >>> ks = key.KeySignature(-5)
     >>> ks.mode = 'minor'
@@ -879,7 +879,7 @@ def keySignatureToMidiEvents(ks, includeDeltaTime=True):
     <music21.key.KeySignature of 5 flats, mode minor>
     >>> eventList = midi.translate.keySignatureToMidiEvents(ks, includeDeltaTime = False)
     >>> eventList[0]
-    <MidiEvent KEY_SIGNATURE, t=None, track=None, channel=1, data='\\xfb\\x01'>
+    <MidiEvent KEY_SIGNATURE, t=None, track=None, channel=1, data=b'\\xfb\\x01'>
     '''
     from music21 import midi as midiModule
     mt = None # use a midi track set to None
@@ -2146,18 +2146,24 @@ class Test(unittest.TestCase):
         mtAlt = streamHierarchyToMidiTracks(s.getElementsByClass('TimeSignature').stream())[0]
 
         match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, 
-        <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=''>, 
+        <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b''>, 
         <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
         <MidiEvent PITCH_BEND, t=0, track=1, channel=1, _parameter1=0, _parameter2=64>, 
         <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
-        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x03\\x02\\x18\\x08'>, 
+        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data=b'\\x03\\x02\\x18\\x08'>, 
         <MidiEvent DeltaTime, t=3072, track=1, channel=1>, 
-        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x05\\x02\\x18\\x08'>, 
+        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data=b'\\x05\\x02\\x18\\x08'>, 
         <MidiEvent DeltaTime, t=5120, track=1, channel=1>, 
-        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x02\\x18\\x08'>, 
+        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data=b'\\x02\\x02\\x18\\x08'>, 
         <MidiEvent DeltaTime, t=1024, track=1, channel=1>,
-        <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
-        self.assertTrue(common.whitespaceEqual(str(mtAlt.events), match))
+        <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=b''>]"""
+
+        if six.PY2:
+            #mta.events[1].data = mta.events[1].data.encode('ascii') # unicode fix
+            match = match.replace('data=b', 'data=')
+
+        
+        self.assertTrue(common.whitespaceEqual(str(mtAlt.events), match), str(mtAlt.events))
 
     def testKeySignature(self):
         from music21 import meter, key
@@ -2195,20 +2201,21 @@ class Test(unittest.TestCase):
         # first note-on is not delayed, even w anacrusis
         match = """
         [<MidiEvent DeltaTime, t=0, track=1, channel=1>, 
-         <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data='Soprano'>, 
+         <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b'Soprano'>, 
          <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
          <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, 
          <MidiEvent DeltaTime, t=0, track=1, channel=1>]"""
        
         self.maxDiff = None
         if six.PY2:
-            mts.events[1].data = mts.events[1].data.encode('ascii') # unicode fix
+            #mta.events[1].data = mta.events[1].data.encode('ascii') # unicode fix
+            match = match.replace('data=b', 'data=')
         self.assertTrue(common.whitespaceEqual(str(mts.events[:5]), match))
 
         # first note-on is not delayed, even w anacrusis
         match = """
         [<MidiEvent DeltaTime, t=0, track=1, channel=1>, 
-        <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data='Alto'>, 
+        <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b'Alto'>, 
         <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
         <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, 
         <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
@@ -2216,13 +2223,14 @@ class Test(unittest.TestCase):
         <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
         <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, 
         <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
-        <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x01'>]"""
+        <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data=b'\\x02\\x01'>]"""
 
         alto = s.parts['alto']
         mta = streamHierarchyToMidiTracks(alto)[0]
 
         if six.PY2:
-            mta.events[1].data = mta.events[1].data.encode('ascii') # unicode fix
+            #mta.events[1].data = mta.events[1].data.encode('ascii') # unicode fix
+            match = match.replace('data=b', 'data=')
 
         self.assertTrue(common.whitespaceEqual(str(mta.events[:10]), match))
 
@@ -2234,7 +2242,7 @@ class Test(unittest.TestCase):
 
         # its the same as before
         match = """[<MidiEvent DeltaTime, t=0, track=1, channel=1>, 
-        <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data='Soprano'>, 
+        <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b'Soprano'>, 
         <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
         <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, 
         <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
@@ -2242,11 +2250,12 @@ class Test(unittest.TestCase):
         <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
         <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>, 
         <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
-        <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data='\\x02\\x01'>, 
+        <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data=b'\\x02\\x01'>, 
         <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
-        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data='\\x04\\x02\\x18\\x08'>]"""
+        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data=b'\\x04\\x02\\x18\\x08'>]"""
         if six.PY2:
-            mtList[0].events[1].data = mtList[0].events[1].data.encode('ascii') # unicode fix
+            #mtList[0].events[1].data = mtList[0].events[1].data.encode('ascii') # unicode fix
+            match = match.replace('data=b', 'data=')
 
         self.assertTrue(common.whitespaceEqual(str(mtList[0].events[:12]), match))
 
@@ -2328,9 +2337,14 @@ class Test(unittest.TestCase):
         <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
         <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=54, velocity=0>, 
         <MidiEvent DeltaTime, t=1024, track=1, channel=1>, 
-        <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=''>]"""
+        <MidiEvent END_OF_TRACK, t=None, track=1, channel=1, data=b''>]"""
 
-        self.assertTrue(common.whitespaceEqual(str(mtList[0].events[-20:]), match))
+        if six.PY2:
+            #mta.events[1].data = mta.events[1].data.encode('ascii') # unicode fix
+            match = match.replace('data=b', 'data=')
+
+        results = str(mtList[0].events[-20:])
+        self.assertTrue(common.whitespaceEqual(results, match), results)
 
     def testOverlappedEventsB(self):
         from music21 import scale

@@ -20,7 +20,6 @@ import copy
 import itertools
 import unittest
 
-from music21 import common
 from music21 import chord
 from music21 import environment
 from music21 import exceptions21
@@ -113,9 +112,9 @@ class Segment(object):
         >>> s1.segmentChord
         <music21.chord.Chord C3 E3 G3 C4 E4 G4 C5 E5 G5>
         '''
-        if common.isStr(bassNote):
+        if isinstance(bassNote, six.string_types):
             bassNote = note.Note(bassNote)
-        if common.isStr(maxPitch):
+        if isinstance(maxPitch, six.string_types):
             maxPitch = pitch.Pitch(maxPitch)
         
         if fbScale is None:

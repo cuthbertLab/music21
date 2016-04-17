@@ -150,7 +150,7 @@ def objectToBraille(music21Obj, **keywords):
         return measureToBraille(music21Measure, **keywords)
 
 def streamToBraille(music21Stream, **keywords):
-    """
+    u"""
     Translates a :class:`~music21.stream.Stream` to braille.
     """
 
@@ -168,7 +168,7 @@ def streamToBraille(music21Stream, **keywords):
     raise BrailleTranslateException("Stream cannot be translated to Braille.")
 
 def scoreToBraille(music21Score, **keywords):
-    """
+    u"""
     Translates a :class:`~music21.stream.Score` to braille.
     """
     allBrailleLines = []
@@ -180,7 +180,7 @@ def scoreToBraille(music21Score, **keywords):
     return u"\n".join(allBrailleLines)
 
 def metadataToString(music21Metadata):
-    """
+    u"""
     >>> from music21.braille import translate
     >>> corelli = corpus.parse("monteverdi/madrigal.3.1.rntxt")
     >>> corelli.getElementsByClass('Metadata')[0].__class__
@@ -207,7 +207,7 @@ def opusToBraille(music21Opus, **keywords):
     return u"\n\n".join(allBrailleLines)
 
 def measureToBraille(music21Measure, **keywords):
-    """
+    u"""
     Translates a :class:`~music21.stream.Measure` to braille.
     
     >>> p = stream.Part()
@@ -251,11 +251,21 @@ def partToBraille(music21Part, **keywords):
     allBrailleText = []
     for brailleSegment in allSegments:
         transcription = brailleSegment.transcribe()
+        
         if not debug:
             allBrailleText.append(transcription)
         else:
-            allBrailleText.append(str(brailleSegment))
-    return u"\n".join([unicode(bt) for bt in allBrailleText])
+            if six.PY2:
+                bsStr = str(brailleSegment)
+                bsUni = bsStr.decode('utf-8')
+                allBrailleText.append(bsUni)
+            else:
+                allBrailleText.append(str(brailleSegment))
+
+    if six.PY2 and debug:
+        return u"\n".join(allBrailleText)
+    else:
+        return u"\n".join([unicode(bt) for bt in allBrailleText])
 
 def keyboardPartsToBraille(music21PartStaffUpper, music21PartStaffLower, **keywords):
     """
@@ -279,8 +289,17 @@ def keyboardPartsToBraille(music21PartStaffUpper, music21PartStaffLower, **keywo
         if not debug:
             allBrailleText.append(bg.transcription)
         else:
-            allBrailleText.append(str(bg))
-    return u"\n".join([unicode(bt) for bt in allBrailleText])
+            if six.PY2:
+                bsStr = str(bg)
+                bsUni = bsStr.decode('utf-8')
+                allBrailleText.append(bsUni)
+            else:
+                allBrailleText.append(str(bg))
+    
+    if six.PY2 and debug:
+        return u"\n".join(allBrailleText)
+    else:
+        return u"\n".join([unicode(bt) for bt in allBrailleText])
 
 
 def _translateArgs(**keywords):

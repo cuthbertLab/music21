@@ -399,7 +399,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             found.elementsChanged(clearIsSorted=False)
             return found
 
-        elif common.isStr(k):
+        elif isinstance(k, six.string_types):
             # first search id, then search groups
             idMatch = self.getElementById(k)
             if idMatch is not None:
@@ -906,13 +906,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         True
         '''
         objId = id(obj)
-        for e in self._elements:
-            if id(e) == objId:
-                return True
-        for e in self._endElements:
-            if id(e) == objId:
-                return True
-        return False
+        return self._hasElementByObjectId(objId)
 
     def hasElementOfClass(self, className, forceFlat=False):
         '''
@@ -1208,6 +1202,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # recursion matched or didn't or wasn't run. either way no need for rest...
                 continue 
             
+            # TODO: Anything that messes with ._elements or ._endElements should be in core.py
+            # move it...
             match = None
             matchedEndElement = False
             baseElementCount = len(self._elements)
@@ -1699,6 +1695,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {4.0} <music21.chord.Chord C4 E4>
 
         Save the original Stream for later
+
         >>> import copy
         >>> s2 = copy.deepcopy(s)
 
@@ -1726,33 +1723,40 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         # could use duration of Note to get end offset span
         targets = list(self.iter.getElementsByOffset(offset,
-                offset + noteOrChord.quarterLength, # set end to dur of supplied
-                includeEndBoundary=False,
-                mustFinishInSpan=False, 
-                mustBeginInSpan=True).notesAndRests)
+                            offset + noteOrChord.quarterLength, # set end to dur of supplied
+                            includeEndBoundary=False,
+                            mustFinishInSpan=False, 
+                            mustBeginInSpan=True).notesAndRests)
         removeTarget = None
         #environLocal.printDebug(['insertIntoNoteOrChord', [e for e in targets]])
         if len(targets) == 1:
+            pitches = []      # avoid an undefined variable warning...
+            components = []   # ditto
+            
             target = targets[0] # assume first
             removeTarget = target
             if 'Rest' in target.classes:
-                pitches = [noteOrChord.pitch]
-                components = [noteOrChord]
+                if 'Note' in noteOrChord.classes:
+                    pitches = [noteOrChord.pitch]
+                    components = [noteOrChord]
+                elif 'Chord' in noteOrChord.classes:
+                    pitches = list(noteOrChord.pitches)
+                    components = [c for c in noteOrChord]                
             if 'Note' in target.classes:
                 # if a note, make it into a chord
                 if 'Note' in noteOrChord.classes:
                     pitches = [target.pitch, noteOrChord.pitch]
                     components = [target, noteOrChord]
                 elif 'Chord' in noteOrChord.classes:
-                    pitches = [target.pitch] + noteOrChord.pitches
+                    pitches = [target.pitch] + list(noteOrChord.pitches)
                     components = [target] + [c for c in noteOrChord]
             if 'Chord' in target.classes:
                 # if a chord, make it into a chord
                 if 'Note' in noteOrChord.classes:
-                    pitches = target.pitches + (noteOrChord.pitch,)
+                    pitches = list(target.pitches) + [noteOrChord.pitch]
                     components = [c for c in target] + [noteOrChord]
                 elif 'Chord' in noteOrChord.classes:
-                    pitches = target.pitches + noteOrChord.pitches
+                    pitches = list(target.pitches) + list(noteOrChord.pitches)
                     components = [c for c in target] + [c for c in noteOrChord]
 
             if len(pitches) > 1 or chordsOnly is True:
@@ -5422,8 +5426,30 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return a, b
 
 
-    def _getOffsetMap(self, srcObj=None):
+    def offsetMap(self, srcObj=None):
         '''
+        Returns a list where each element is a NamedTuple
+        consisting of the 'offset' of each element in a stream, the
+        'endTime' (that is, the offset plus the duration) and the
+        'element' itself.  Also contains a 'voiceIndex' entry which
+        contains the voice number of the element, or None if there
+        are no voices.
+
+        >>> n1 = note.Note(type='quarter')
+        >>> c1 = clef.AltoClef()
+        >>> n2 = note.Note(type='half')
+        >>> s1 = stream.Stream()
+        >>> s1.append([n1, c1, n2])
+        >>> om = s1.offsetMap()
+        >>> om[2].offset
+        1.0
+        >>> om[2].endTime
+        3.0
+        >>> om[2].element is n2
+        True
+        >>> om[2].voiceIndex
+        
+                
         Needed for makeMeasures and a few other places
 
         The Stream source of elements is self by default,
@@ -5432,7 +5458,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> s = stream.Stream()
         >>> s.repeatAppend(note.Note(), 8)
-        >>> for om in s._getOffsetMap():
+        >>> for om in s.offsetMap():
         ...     om
         OffsetMap(element=<music21.note.Note C>, offset=0.0, endTime=1.0, voiceIndex=None)
         OffsetMap(element=<music21.note.Note C>, offset=1.0, endTime=2.0, voiceIndex=None)
@@ -5453,7 +5479,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 groups.append((v.flat, i))
         else: # create a single collection
             groups = [(srcObj, None)]
-        #environLocal.printDebug(['_getOffsetMap', groups])
+        #environLocal.printDebug(['offsetMap', groups])
         for group, voiceIndex in groups:
             for e in group._elements:
                 # do not include barlines
@@ -5469,36 +5495,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # NOTE: used to make a copy.copy of elements here;
                 # this is not necssary b/c making deepcopy of entire Stream
                 thisOffsetMap = _OffsetMap(e, offset, endTime, voiceIndex)
-                #environLocal.printDebug(['_getOffsetMap: thisOffsetMap', thisOffsetMap])
+                #environLocal.printDebug(['offsetMap: thisOffsetMap', thisOffsetMap])
                 offsetMap.append(thisOffsetMap)
                 #offsetMap.append((offset, offset + dur, e, voiceIndex))
                 #offsetMap.append([offset, offset + dur, copy.copy(e)])
         return offsetMap
 
-
-    # Do not make a property decorator since _getOffsetMap takes parameters
-    offsetMap = property(_getOffsetMap, doc='''
-        Returns a list where each element is a dictionary
-        consisting of the 'offset' of each element in a stream, the
-        'endTime' (that is, the offset plus the duration) and the
-        'element' itself.  Also contains a 'voiceIndex' entry which
-        contains the voice number of the element, or None if there
-        are no voices.
-
-        >>> n1 = note.Note(type='quarter')
-        >>> c1 = clef.AltoClef()
-        >>> n2 = note.Note(type='half')
-        >>> s1 = stream.Stream()
-        >>> s1.append([n1, c1, n2])
-        >>> om = s1.offsetMap
-        >>> om[2].offset
-        1.0
-        >>> om[2].endTime
-        3.0
-        >>> om[2].element is n2
-        True
-        >>> om[2].voiceIndex
-    ''')
 
     def makeMeasures(
         self,
@@ -5841,7 +5843,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         searchKeySignatureByContext=False, 
                         **srkCopy)
         #environLocal.printDebug(['makeNotation(): meterStream:', meterStream, meterStream[0]])
-        measureStream.makeTies(meterStream, inPlace=True)
+        try:
+            measureStream.makeTies(meterStream, inPlace=True)
+        except StreamException as e:
+            strE = str(e)
+            environLocal.warn("StreamException: makeTies: " + strE)
+            
         #measureStream.makeBeams(inPlace=True)
         try:
             measureStream.makeBeams(inPlace=True)
@@ -7165,9 +7172,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         if self._unlinkedDuration is not None:
             return self._unlinkedDuration
-        #elif 'Duration' in self._cache and self._cache["Duration"] is not None:
+        elif 'Duration' in self._cache and self._cache["Duration"] is not None:
             #environLocal.printDebug(['returning cached duration'])
-        #    return self._cache["Duration"]
+            return self._cache["Duration"]
         else:
             #environLocal.printDebug(['creating new duration based on highest time'])
             self._cache["Duration"] = duration.Duration()
@@ -8278,7 +8285,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return returnObj # exit
 
         # list of start, start+dur, element, all in abs offset time
-        offsetMap = self._getOffsetMap(returnObj)
+        offsetMap = self.offsetMap(returnObj)
 
         offsetList = [opFrac(o) for o in offsetList]
 
@@ -8829,7 +8836,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         findConsecutiveNotes don't have to remove
         their own args; this method is used in melodicIntervals.)
         '''
-        sortedSelf = self.sorted
+        if self.isSorted is False:
+            sortedSelf = self.sorted
+        else:
+            sortedSelf = self
+            
         returnList = []
         lastStart = 0.0
         lastEnd = 0.0
@@ -9045,16 +9056,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
         >>> a = stream.Stream()
-        >>> a._durSpanOverlap([0, 10], [11, 12], False)
+        >>> a._durSpanOverlap((0, 10), (11, 12), False)
         False
-        >>> a._durSpanOverlap([11, 12], [0, 10], False)
+        >>> a._durSpanOverlap((11, 12), (0, 10), False)
         False
-        >>> a._durSpanOverlap([0, 3], [3, 6], False)
+        >>> a._durSpanOverlap((0, 3), (3, 6), False)
         False
-        >>> a._durSpanOverlap([0, 3], [3, 6], True)
+        >>> a._durSpanOverlap((0, 3), (3, 6), True)
         True
         '''
-
         durSpans = [a, b]
         # sorting will ensure that leading numbers are ordered from low to high
         durSpans.sort()
@@ -9072,8 +9082,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return found
 
 
-    def _findLayering(self, flatStream, includeDurationless=True,
-                   includeEndBoundary=False):
+    def _findLayering(self, 
+                      flatStream, 
+                      includeDurationless=True,
+                      includeEndBoundary=False):
         '''
         Find any elements in an elementsSorted list that have simultaneities
         or durations that cause overlaps.
@@ -9083,10 +9095,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         all index values that match are included in that list.
 
         See testOverlaps, in unit tests, for examples.
-
-
+        
+        Used in getOverlaps inside makeVoices.
         '''
-        flatStream = flatStream.sorted
+        if flatStream.isSorted is False:
+            flatStream = flatStream.sorted
         # these may not be sorted
         durSpanSorted = self._getDurSpan(flatStream)
 
@@ -9095,6 +9108,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         overlapMap = [[] for dummy in range(len(durSpanSorted))]
         # create a list of keys for events that start at the same time
         simultaneityMap = [[] for dummy in range(len(durSpanSorted))]
+
+        durSpanOverlapCache = {}
 
         for i in range(len(durSpanSorted)):
             src = durSpanSorted[i]
@@ -9111,9 +9126,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # if start times are the same (rational comparison; no fudge needed)
                 if src[0] == dst[0]:
                     simultaneityMap[i].append(j)
-                # this function uses common.py comparions methods
-                if self._durSpanOverlap(src, dst, includeEndBoundary):
-                    overlapMap[i].append(j)
+                
+                # the current fractions.Fraction.__hash__ is EXTREMELY SLOW! so we
+                # construct our own hash key.  If we miss (as with '0.0' vs '0') it is not
+                # a big deal, since it's just a speedup
+                hashKey = str(src[0]) + ',' + str(src[1]) + ':' + str(dst[0]) + ',' + str(dst[1])
+                
+                try:
+                    if durSpanOverlapCache[hashKey]:
+                        overlapMap[i].append(j)
+                except KeyError: 
+                    durSpanResult = self._durSpanOverlap(src, dst, includeEndBoundary)
+                    durSpanOverlapCache[hashKey] = durSpanResult
+                    if durSpanResult:
+                        overlapMap[i].append(j)
         return simultaneityMap, overlapMap
 
 
@@ -9124,7 +9150,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         index values that meet a given condition (overlap or simultaneities),
         organize into a dictionary by the relevant or first offset
         '''
-        flatStream = flatStream.sorted
+        if flatStream.isSorted is False:
+            flatStream = flatStream.sorted
 
         if len(layeringMap) != len(flatStream):
             raise StreamException('layeringMap must be the same length as flatStream')
@@ -9194,7 +9221,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if 'GapStream' in self._cache and self._cache["GapStream"] is not None:
             return self._cache["GapStream"]
 
-        sortedElements = self.sorted.elements
+        if self.isSorted is False:
+            sortedElements = self.sorted.elements
+        else:
+            sortedElements = self.elements
+            
         gapStream = self.cloneEmpty(derivationMethod='findGaps')
         highestCurrentEndTime = 0.0
         for e in sortedElements:
@@ -9265,8 +9296,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return self._consolidateLayering(elementsSorted, simultaneityMap)
 
 
-    def getOverlaps(self, includeDurationless=True,
-                     includeEndBoundary=False):
+    def getOverlaps(self, 
+                    includeDurationless=True,
+                    includeEndBoundary=False):
         '''
         Find any elements that overlap. Overlaping might include elements
         that have no duration but that are simultaneous.
@@ -9352,6 +9384,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         OMIT_FROM_DOCS
         TODO: check that co-incident boundaries are properly handled
 
+        >>> a = stream.Stream()
+        >>> for x in [0,4,8.0]:
+        ...     n = note.Note('G#')
+        ...     n.duration = duration.Duration('whole')
+        ...     a.append(n)
+        ...
+        >>> a.isSequence()
+        True
         '''
         elementsSorted = self.flat
         unused_simultaneityMap, overlapMap = self._findLayering(elementsSorted,
@@ -11358,8 +11398,8 @@ class Measure(Stream):
         
         Test that it works as musicxml
         
-        >>> xml = musicxml.m21ToString.fromMeasure(m)
-        >>> print(xml)
+        >>> xml = musicxml.m21ToXml.GeneralObjectExporter().parse(m)
+        >>> print(xml.decode('utf-8'))
         <?xml version="1.0"...?>
         ...
         <part id="...">
@@ -11708,7 +11748,7 @@ class Measure(Stream):
 
     def _setLeftBarline(self, barlineObj):
         insert = True
-        if common.isStr(barlineObj):
+        if isinstance(barlineObj, six.string_types):
             barlineObj = bar.Barline(barlineObj)
             barlineObj.location = 'left'
         elif barlineObj is None: # assume removal
@@ -11750,7 +11790,7 @@ class Measure(Stream):
 
     def _setRightBarline(self, barlineObj):
         insert = True
-        if common.isStr(barlineObj):
+        if isinstance(barlineObj, six.string_types):
             barlineObj = bar.Barline(barlineObj)
             barlineObj.location = 'right'
         elif barlineObj is None: # assume removal
