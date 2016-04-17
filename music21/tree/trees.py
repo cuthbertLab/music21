@@ -1013,6 +1013,8 @@ class OffsetTree(ElementTree):
         r'''
         Iterates through all the nodes in the offset tree and returns each thing
         in the payload.
+        
+        Not an especially efficient way of using this beautiful tree object...
 
         >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
         >>> tss = [tree.spans.Timespan(x, y) for x, y in tsList]
@@ -1359,6 +1361,9 @@ class OffsetTree(ElementTree):
                     result.update(recurse(node.rightChild))
             return result
         return tuple(sorted(recurse(self.rootNode)))
+
+    def findOverlaps(self, includeDurationless=True, includeEndBoundary=False):
+        pass
 
 
 #----------------------------------------------------------------

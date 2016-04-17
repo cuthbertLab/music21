@@ -86,21 +86,52 @@ class IsFilter(StreamFilter):
     
     def reset(self):
         self.numToFind = len(self.target)
-    
-    
+        
     def __call__(self, item, iterator):
-        if self.numToFind == 0:
+        if self.numToFind == 0: # short circuit -- we already have 
             raise StopIteration
         
         if item in self.target:
-            # would popping the item be faster?
+            # would popping the item be faster? No: then can't use for IsNotFilter
             self.numToFind -= 1
             return True
         else:
             return False
 
 class IsNotFilter(IsFilter):
+    '''
+    Filter out everything but an item or list of items:
+    
+    >>> s = stream.Stream()
+    >>> s.insert(0, key.KeySignature(-3))
+    >>> n = note.Note('C#')
+    >>> s.append(n)
+    >>> s.append(note.Rest())
+    >>> for el in s.iter.addFilter(stream.filters.IsNotFilter(n)):
+    ...     el
+    <music21.key.KeySignature of 3 flats>    
+    <music21.note.Rest rest>
+
+    multiple...
+
+    >>> s = stream.Stream()
+    >>> s.insert(0, key.KeySignature(-3))
+    >>> n = note.Note('C#')
+    >>> s.append(n)
+    >>> r = note.Rest()
+    >>> s.append(r)
+    >>> for el in s.iter.addFilter(stream.filters.IsNotFilter([n, r])):
+    ...     print(el)
+    <music21.key.KeySignature of 3 flats>
+    '''
     derivationStr = 'isNot'
+
+    def __init__(self, target):
+        super(IsNotFilter, self).__init__(target)
+        self.numToFind = float('inf') # there can always be more to find
+
+    def reset(self):
+        pass # do nothing: inf - 1 = inf
 
     def __call__(self, item, iterator):
         return not super(IsNotFilter, self).__call__(item, iterator)

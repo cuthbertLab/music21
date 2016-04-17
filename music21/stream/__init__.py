@@ -9084,8 +9084,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     def _findLayering(self, 
                       flatStream, 
-                      includeDurationless=True,
-                      includeEndBoundary=False):
+                      includeDurationless=True):
         '''
         Find any elements in an elementsSorted list that have simultaneities
         or durations that cause overlaps.
@@ -9136,7 +9135,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     if durSpanOverlapCache[hashKey]:
                         overlapMap[i].append(j)
                 except KeyError: 
-                    durSpanResult = self._durSpanOverlap(src, dst, includeEndBoundary)
+                    durSpanResult = self._durSpanOverlap(src, dst)
                     durSpanOverlapCache[hashKey] = durSpanResult
                     if durSpanResult:
                         overlapMap[i].append(j)
@@ -9296,9 +9295,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return self._consolidateLayering(elementsSorted, simultaneityMap)
 
 
-    def getOverlaps(self, 
-                    includeDurationless=True,
-                    includeEndBoundary=False):
+    def getOverlaps(self, includeDurationless=True):
         '''
         Find any elements that overlap. Overlaping might include elements
         that have no duration but that are simultaneous.
@@ -9310,11 +9307,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         value are a list of all objects included in
         that overlap group.
 
-        This example demonstrates end-joing overlaps: there are four
-        quarter notes each following each other. Whether or not
-        these count as overlaps
-        is determined by the includeEndBoundary parameter.
-
+        This example demonstrates that end-joing overlaps do not count.
 
         >>> a = stream.Stream()
         >>> for x in range(4):
@@ -9323,14 +9316,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ...     n.offset = x * 1
         ...     a.insert(n)
         ...
-        >>> d = a.getOverlaps(True, False)
+        >>> d = a.getOverlaps(includeDurationless=True)
         >>> len(d)
         0
-        >>> d = a.getOverlaps(True, True) # including coincident boundaries
-        >>> len(d)
-        1
-        >>> len(d[0])
-        4
+
+        Notes starting at the same time overlap:
+
         >>> a = stream.Stream()
         >>> for x in [0,0,0,0,13,13,13]:
         ...     n = note.Note('G#')
@@ -9357,8 +9348,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         '''
         elementsSorted = self.flat
-        unused_simultaneityMap, overlapMap = self._findLayering(elementsSorted,
-                                                        includeDurationless, includeEndBoundary)
+        unused_simultaneityMap, overlapMap = self._findLayering(elementsSorted, includeDurationless)
         #environLocal.printDebug(['simultaneityMap map', simultaneityMap])
         #environLocal.printDebug(['overlapMap', overlapMap])
 
@@ -9366,8 +9356,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
 
-    def isSequence(self, includeDurationless=True,
-                        includeEndBoundary=False):
+    def isSequence(self):
         '''A stream is a sequence if it has no overlaps.
 
 
@@ -9394,8 +9383,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         True
         '''
         elementsSorted = self.flat
-        unused_simultaneityMap, overlapMap = self._findLayering(elementsSorted,
-                                                    includeDurationless, includeEndBoundary)
+        unused_simultaneityMap, overlapMap = self._findLayering(
+                                                    elementsSorted,
+                                                    includeDurationless=True)
         post = True
         for indexList in overlapMap:
             if indexList:
@@ -9693,8 +9683,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # must be sorted
         if not returnObj.isSorted:
             returnObj.sort()
-        olDict = returnObj.notes.stream().getOverlaps(
-                 includeDurationless=False, includeEndBoundary=False)
+        olDict = returnObj.notes.stream().getOverlaps(includeDurationless=False)
         #environLocal.printDebug(['makeVoices(): olDict', olDict])
         # find the max necessary voices by finding the max number
         # of elements in each group; these may not all be necessary

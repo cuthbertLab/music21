@@ -490,10 +490,8 @@ class Test(unittest.TestCase):
             a.insert(n)
 
         includeDurationless = True
-        includeEndBoundary = False
 
-        simultaneityMap, overlapMap = a._findLayering(a.flat, 
-                                  includeDurationless, includeEndBoundary)
+        simultaneityMap, overlapMap = a._findLayering(a.flat, includeDurationless)
         self.assertEqual(simultaneityMap, [[], [], []])
         self.assertEqual(overlapMap, [[1,2], [0], [0]])
 
@@ -501,30 +499,6 @@ class Test(unittest.TestCase):
         dummy = a._consolidateLayering(a.flat, overlapMap)
         # print dummy
 
-        #found = a.getOverlaps(includeDurationless, includeEndBoundary)
-        # there should be one overlap group
-        #self.assertEqual(len(found.keys()), 1)
-        # there should be three items in this overlap group
-        #self.assertEqual(len(found[0]), 3)
-
-        a = Stream()
-        # here, the thir item overlaps with the first
-        for offset, dur in [(0,1), (1,2), (2,3)]:
-            n = note.Note('G#')
-            n.duration = duration.Duration()
-            n.duration.quarterLength = dur
-            n.offset = offset
-            a.insert(n)
-
-        includeDurationless = True
-        includeEndBoundary = True
-
-        simultaneityMap, overlapMap = a._findLayering(a.flat, 
-                                  includeDurationless, includeEndBoundary)
-        self.assertEqual(simultaneityMap, [[], [], []])
-        self.assertEqual(overlapMap, [[1], [0,2], [1]])
-
-        dummy = a._consolidateLayering(a.flat, overlapMap)
 
 
 
@@ -536,18 +510,19 @@ class Test(unittest.TestCase):
             n.duration = duration.Duration('quarter')
             n.offset = x * 1
             a.insert(n)
-        d = a.getOverlaps(True, False) 
+        d = a.getOverlaps(True) 
         # no overlaps
         self.assertEqual(len(d), 0)
 
         
-        # including coincident boundaries
-        d = a.getOverlaps(includeDurationless=True, includeEndBoundary=True) 
-        environLocal.printDebug(['testOverlapsB', d])
-        # return one dictionary that has a reference to each note that 
-        # is in the same overlap group
-        self.assertEqual(len(d), 1)
-        self.assertEqual(len(d[0]), 4)
+        ## including coincident boundaries
+        ## NEVER used...
+        #d = a.getOverlaps(includeDurationless=True, includeEndBoundary=True) 
+        ##environLocal.printDebug(['testOverlapsB', d])
+        ## return one dictionary that has a reference to each note that 
+        ## is in the same overlap group
+        #self.assertEqual(len(d), 1)
+        #self.assertEqual(len(d[0]), 4)
 
 
 #         a = Stream()
