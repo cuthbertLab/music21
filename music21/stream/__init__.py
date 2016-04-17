@@ -9095,6 +9095,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         all index values that match are included in that list.
 
         See testOverlaps, in unit tests, for examples.
+        
+        Used in getOverlaps inside makeVoices.
         '''
         if flatStream.isSorted is False:
             flatStream = flatStream.sorted
@@ -9124,13 +9126,18 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # if start times are the same (rational comparison; no fudge needed)
                 if src[0] == dst[0]:
                     simultaneityMap[i].append(j)
-                # this function uses common.py comparions methods
+                
+                # the current fractions.Fraction.__hash__ is EXTREMELY SLOW! so we
+                # construct our own hash key.  If we miss (as with '0.0' vs '0') it is not
+                # a big deal, since it's just a speedup
+                hashKey = str(src[0]) + ',' + str(src[1]) + ':' + str(dst[0]) + ',' + str(dst[1])
+                
                 try:
-                    if durSpanOverlapCache[(src, dst)]:
+                    if durSpanOverlapCache[hashKey]:
                         overlapMap[i].append(j)
                 except KeyError: 
                     durSpanResult = self._durSpanOverlap(src, dst, includeEndBoundary)
-                    durSpanOverlapCache[(src, dst)] = durSpanResult
+                    durSpanOverlapCache[hashKey] = durSpanResult
                     if durSpanResult:
                         overlapMap[i].append(j)
         return simultaneityMap, overlapMap
@@ -9289,8 +9296,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return self._consolidateLayering(elementsSorted, simultaneityMap)
 
 
-    def getOverlaps(self, includeDurationless=True,
-                     includeEndBoundary=False):
+    def getOverlaps(self, 
+                    includeDurationless=True,
+                    includeEndBoundary=False):
         '''
         Find any elements that overlap. Overlaping might include elements
         that have no duration but that are simultaneous.
