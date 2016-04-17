@@ -1787,10 +1787,6 @@ class Test(unittest.TestCase):
         else:
             return xmlBytes.decode('utf-8')
         
-    def xmlStrOld(self, obj):
-        from music21.musicxml.m21ToString import fromMusic21Object
-        return fromMusic21Object(obj)
-
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''

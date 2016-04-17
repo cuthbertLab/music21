@@ -11382,8 +11382,8 @@ class Measure(Stream):
         
         Test that it works as musicxml
         
-        >>> xml = musicxml.m21ToString.fromMeasure(m)
-        >>> print(xml)
+        >>> xml = musicxml.m21ToXml.GeneralObjectExporter().parse(m)
+        >>> print(xml.decode('utf-8'))
         <?xml version="1.0"...?>
         ...
         <part id="...">

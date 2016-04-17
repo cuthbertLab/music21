@@ -4687,10 +4687,10 @@ class Test(unittest.TestCase):
 
     def testMusicxmlDirectOut(self):
         # test rendering musicxml directly from meter
-        from music21.musicxml import m21ToString as toMusicXML
+        from music21.musicxml import m21ToXml
 
         ts = TimeSignature('3/8')
-        xmlout = toMusicXML.fromTimeSignature(ts)
+        xmlout = m21ToXml.GeneralObjectExporter().parse(ts).decode('utf-8')
 
         match = '<time><beats>3</beats><beat-type>8</beat-type></time>'
         xmlout = xmlout.replace(' ', '')

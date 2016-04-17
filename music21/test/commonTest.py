@@ -208,9 +208,6 @@ class ModuleGather(object):
                             'musicxml/m21ToXml',
                             'musicxml/xmlToM21', 
 
-                            'musicxml/fromMxObjects',
-                            'musicxml/m21ToString', 
-
                             'romanText/translate', 
                             'alpha/theoryAnalysis/theoryAnalyzer',
                             ]

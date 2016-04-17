@@ -3106,7 +3106,9 @@ class Test(unittest.TestCase):
 
     def testRepeatExpressionOnStream(self):
         from music21 import stream, repeat, meter, converter
-        from music21.musicxml import m21ToString
+        from music21.musicxml import m21ToXml
+        
+        GEX = m21ToXml.GeneralObjectExporter()
 
         template = stream.Stream()
         for i in range(5):
@@ -3117,9 +3119,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.flat.getElementsByClass(repeat.DaCapo)), 1)
 
 
-        raw = m21ToString.fromMusic21Object(s)
+        raw = GEX.parse(s)
 
-        self.assertEqual(raw.find('Da Capo') > 0, True)
+        self.assertEqual(raw.find(b'Da Capo') > 0, True)
 
         # can do the same thing starting form a text expression
         s = copy.deepcopy(template)
@@ -3127,8 +3129,8 @@ class Test(unittest.TestCase):
         s[3].insert(0, expressions.TextExpression('da capo'))
         self.assertEqual(len(s.flat.getElementsByClass(repeat.DaCapo)), 0)
         
-        raw = m21ToString.fromMusic21Object(s)
-        self.assertEqual(raw.find('da capo') > 0, True)
+        raw = GEX.parse(s)
+        self.assertEqual(raw.find(b'da capo') > 0, True)
             
         s2 = converter.parse(raw)
         # now, reconverted from the musicxml, we have a RepeatExpression
@@ -3690,7 +3692,7 @@ class Test(unittest.TestCase):
     def testRepeatsEndingsA(self):
         from music21 import converter
         from music21.musicxml import testPrimitive
-        from music21.musicxml import m21ToString
+        from music21.musicxml import m21ToXml
         #from music21.musicxml import testPrimitive
         # this has repeat brackets
         # these are stored in bar objects as ending tags, 
@@ -3698,30 +3700,30 @@ class Test(unittest.TestCase):
         #         <ending number="2" type="discontinue"/>
 
         s = converter.parse(testPrimitive.repeatBracketsA)
+        GEX = m21ToXml.GeneralObjectExporter()
 
-        raw = m21ToString.fromMusic21Object(s)
+        raw = GEX.parse(s)
 
-        self.assertEqual(raw.find("<repeat direction=")>1, True)    
-        self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="1" type="stop"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)   
+        self.assertEqual(raw.find(b"<repeat direction=")>1, True)    
+        self.assertEqual(raw.find(b'<ending number="1" type="start"')>1, True)    
+        self.assertEqual(raw.find(b'<ending number="1" type="stop"')>1, True)    
+        self.assertEqual(raw.find(b'<ending number="2" type="start"')>1, True)    
+        self.assertEqual(raw.find(b'<ending number="2" type="stop"')>1, True)   
  
         # TODO: after calling .musicxml, repeat brackets are getting lost
         #s.show()        
-        raw = m21ToString.fromMusic21Object(s)
+        raw = GEX.parse(s)
 
-        self.assertEqual(raw.find("<repeat direction=")>1, True)    
-        self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="1" type="stop"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)   
+        self.assertEqual(raw.find(b"<repeat direction=")>1, True)    
+        self.assertEqual(raw.find(b'<ending number="1" type="start"')>1, True)    
+        self.assertEqual(raw.find(b'<ending number="1" type="stop"')>1, True)    
+        self.assertEqual(raw.find(b'<ending number="2" type="start"')>1, True)    
+        self.assertEqual(raw.find(b'<ending number="2" type="stop"')>1, True)   
 
         s1 = copy.deepcopy(s)
         #s.show()
 
         #s1.show()
-        raw = m21ToString.fromMusic21Object(s1)
         ex = Expander(s1.parts[0])
         self.assertEqual(len(ex._repeatBrackets), 2)
 

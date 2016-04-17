@@ -4980,13 +4980,13 @@ class Test(unittest.TestCase):
 
     def testQuarterToneA(self):
         from music21 import stream, note, scale
-        from music21.musicxml import m21ToString
+        from music21.musicxml import m21ToXml
 
         p1 = Pitch('D#~')
         #environLocal.printDebug([p1, p1.accidental])
         self.assertEqual(str(p1), 'D#~')
         # test generation of raw musicxml output
-        xmlout = m21ToString.fromMusic21Object(p1)
+        xmlout = m21ToXml.GeneralObjectExporter().parse(p1).decode('utf-8')
         #p1.show()
         match = '<step>D</step><alter>1.5</alter><octave>4</octave>'
         xmlout = xmlout.replace(' ', '')

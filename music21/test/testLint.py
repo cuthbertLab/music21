@@ -60,10 +60,6 @@ def main(fnAccept=None):
                     'demos/',
                     'alpha/webapps/server',
                     'test/',
-                    'mxObjects.py',
-                    'fromMxObjects.py',
-                    'toMxObjects.py',
-                    'xmlHandler.py',
                     '/ext/',
                     #'bar.py',  # used to crash pylint...
                     #'repeat.py', # used to hang pylint...

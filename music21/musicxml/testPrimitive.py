@@ -17890,9 +17890,9 @@ class Test(unittest.TestCase):
         orig_stream.repeatAppend(note.Note("C4"), 2)
         orig_clefs = orig_stream.flat.getElementsByClass('Clef')
 
-        xml = musicxml.m21ToString.fromStream(orig_stream)
-        self.assertEquals(xml.count('<clef>'), 2) # clefs got out
-        self.assertEquals(xml.count('<measure'), 1) # in one measure
+        xml = musicxml.m21ToXml.GeneralObjectExporter().parse(orig_stream)
+        self.assertEquals(xml.count(b'<clef>'), 2) # clefs got out
+        self.assertEquals(xml.count(b'<measure'), 1) # in one measure
         
         new_stream = converter.parse(xml)
         new_clefs = new_stream.flat.getElementsByClass('Clef')
@@ -17922,9 +17922,9 @@ class Test(unittest.TestCase):
         orig_clefs = [staff.flat.getElementsByClass('Clef').stream() for staff in
             orig_stream.getElementsByClass('Part')]
 
-        xml = musicxml.m21ToString.fromStream(orig_stream)
+        xml = musicxml.m21ToXml.GeneralObjectExporter().parse(orig_stream)
 
-        new_stream = converter.parse(xml)
+        new_stream = converter.parse(xml.decode('utf-8'))
         new_clefs = [staff.flat.getElementsByClass('Clef').stream() for staff in
             new_stream.getElementsByClass('Part')]
 

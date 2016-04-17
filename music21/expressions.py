@@ -1200,15 +1200,15 @@ class Test(unittest.TestCase):
         objects through make measure calls. 
         '''
         from music21 import stream, note, chord, expressions
-        from music21.musicxml import m21ToString
+        from music21.musicxml import m21ToXml
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
         n1 = s.notes[0]
         n2 = s.notes[-1]
         sp1 = expressions.TrillExtension(n1, n2)
         s.append(sp1)
-        raw = m21ToString.fromMusic21Object(s)
-        self.assertEqual(raw.count('wavy-line'), 2)
+        raw = m21ToXml.GeneralObjectExporter().parse(s)
+        self.assertEqual(raw.count(b'wavy-line'), 2)
 
         s = stream.Stream()
         s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
@@ -1216,9 +1216,9 @@ class Test(unittest.TestCase):
         n2 = s.notes[-1]
         sp1 = expressions.TrillExtension(n1, n2)
         s.append(sp1)
-        raw = m21ToString.fromMusic21Object(s)
+        raw = m21ToXml.GeneralObjectExporter().parse(s)
         #s.show()
-        self.assertEqual(raw.count('wavy-line'), 2)
+        self.assertEqual(raw.count(b'wavy-line'), 2)
 
 
 
