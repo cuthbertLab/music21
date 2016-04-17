@@ -363,7 +363,7 @@ class StreamCoreMixin(object):
             self._cache[cacheKey] = hashedTimespanTree
         return self._cache[cacheKey]
 
-    def asTree(self, flatten=False, classList=None, useTimespans=False, usePositions=True):
+    def asTree(self, flatten=False, classList=None, useTimespans=False, groupOffsets=False):
         '''
         Returns an elementTree of the score, using exact positioning.
         
@@ -374,14 +374,17 @@ class StreamCoreMixin(object):
         >>> scoreTree
         <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
         '''
-        hashedAttributes = hash( (tuple(classList or () ), flatten, useTimespans, usePositions) ) 
+        hashedAttributes = hash( (tuple(classList or () ), 
+                                  flatten, 
+                                  useTimespans, 
+                                  groupOffsets) ) 
         cacheKey = "elementTree" + str(hashedAttributes)
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             hashedElementTree = tree.fromStream.asTree(self,
                                                      flatten=flatten,
                                                      classList=classList,
                                                      useTimespans=useTimespans,
-                                                     usePositions=usePositions)
+                                                     groupOffsets=groupOffsets)
             self._cache[cacheKey] = hashedElementTree
         return self._cache[cacheKey]
     

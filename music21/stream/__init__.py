@@ -9384,6 +9384,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         OMIT_FROM_DOCS
         TODO: check that co-incident boundaries are properly handled
 
+        >>> a = stream.Stream()
+        >>> for x in [0,4,8.0]:
+        ...     n = note.Note('G#')
+        ...     n.duration = duration.Duration('whole')
+        ...     a.append(n)
+        ...
+        >>> a.isSequence()
+        True
         '''
         elementsSorted = self.flat
         unused_simultaneityMap, overlapMap = self._findLayering(elementsSorted,
