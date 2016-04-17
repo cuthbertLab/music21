@@ -485,6 +485,9 @@ class MusicXMLImporter(XMLParserBase):
         self.xmlRootToScore(self.xmlRoot, self.stream)
     
     def parseXMLText(self):
+        if six.PY3 and isinstance(self.xmlText, bytes):
+            self.xmlText = self.xmlText.decode('utf-8')
+        
         sio = six.StringIO(self.xmlText)
         try:
             etree = ET.parse(sio)
@@ -2780,12 +2783,6 @@ class MeasureParser(XMLParserBase):
         'final'
         >>> r.direction
         'end'
-
-        # TODO: replace after changing output not to use toMxObjects
-        
-        >>> mxBarline2 = musicxml.toMxObjects.repeatToMx(r)
-        >>> mxBarline2.get('barStyle')
-        'light-heavy'
         '''
         if inputM21 is None:
             r = bar.Repeat()
@@ -3878,9 +3875,11 @@ class Test(unittest.TestCase):
     def testChordalStemDirImport(self):
         #NB: Finale apparently will not display a pitch that is a member of a chord without a stem
         #unless all chord members are without stems.
-        from music21.musicxml import m21ToString
+        #MuseScore 2.0.3 -- last <stem> tag rules. 
+        from music21.musicxml import m21ToXml
         from music21 import converter
 
+        # this also tests the EXPORTING of stem directions on notes within chords...
         n1 = note.Note('f3')
         n1.notehead = 'diamond'
         n1.stemDirection = 'down'
@@ -3889,9 +3888,10 @@ class Test(unittest.TestCase):
         c = chord.Chord([n1, n2])
         c.quarterLength = 2
         
-        xml = m21ToString.fromMusic21Object(c)
-        #print xml
-        #c.show()
+        GEX = m21ToXml.GeneralObjectExporter()
+        xml = GEX.parse(c)
+        #print(xml.decode('utf-8'))
+        c.show()
         inputStream = converter.parse(xml)
         chordResult = inputStream.flat.notes[0]
 #         for n in chordResult:

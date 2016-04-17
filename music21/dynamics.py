@@ -317,16 +317,16 @@ class Dynamic(base.Music21Object):
 
         int(volumeScalar \* 127) gives the MusicXML <sound dynamics="x"/> tag 
 
-        >>> print(musicxml.m21ToString.fromMusic21Object(d))
+        >>> xmlout = musicxml.m21ToXml.GeneralObjectExporter().parse(d).decode('utf-8')
+        >>> print(xmlout)
         <?xml...
         <direction>
             <direction-type>
               <dynamics default-x="-36" default-y="-80">
-                <mf/>
+                <mf />
               </dynamics>
             </direction-type>
-            <offset>0</offset>
-            <sound dynamics="12"/>
+            <sound dynamics="12" />
         </direction>...
         ''')
 
@@ -532,11 +532,11 @@ class Test(unittest.TestCase):
 
     def testMusicxmlOutput(self):
         # test direct rendering of musicxml
-        from music21.musicxml import m21ToString
+        from music21.musicxml import m21ToXml
         d = Dynamic('p')
-        xmlout = m21ToString.fromMusic21Object(d)
-        match = '<p/>'
-        self.assertTrue(xmlout.find(match) != -1)
+        xmlout = m21ToXml.GeneralObjectExporter().parse(d).decode('utf-8')
+        match = '<p />'
+        self.assertTrue(xmlout.find(match) != -1, xmlout)
 
 
     def testDynamicsPositionA(self):

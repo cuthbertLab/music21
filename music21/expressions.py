@@ -25,7 +25,6 @@ import copy
 import unittest
 
 from music21 import base
-from music21 import common
 from music21 import exceptions21
 from music21 import interval
 from music21 import spanner

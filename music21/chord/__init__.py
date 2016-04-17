@@ -4959,7 +4959,7 @@ class Test(unittest.TestCase):
 
     def testTiesA(self):
         # test creating independent ties for each Pitch
-        from music21.musicxml import m21ToString
+        from music21.musicxml import m21ToXml
 
         c1 = Chord(['c', 'd', 'b'])
         # as this is a subclass of Note, we have a .tie attribute already
@@ -5009,15 +5009,15 @@ class Test(unittest.TestCase):
         self.assertEqual(chords[2].getTie(pitch.Pitch('c5')), None)
 
         #s.show()
-        out = m21ToString.fromMusic21Object(s)
+        GEX = m21ToXml.GeneralObjectExporter()
+        out = GEX.parse(s).decode('utf-8')
         out = out.replace(' ', '')
         out = out.replace('\n', '')
         #print out
         self.assertTrue(out.find('<pitch><step>A</step><octave>4</octave></pitch>' + 
                                  '<duration>15120</duration><tietype="start"/>' + 
                                  '<type>quarter</type><dot/><stem>up</stem>' + 
-                                 '<notehead>normal</notehead><notations>' + 
-                                 '<tiedtype="start"/></notations>') != -1, out)
+                                 '<notations><tiedtype="start"/></notations>') != -1, out)
 
     def testTiesB(self):
         from music21 import stream, scale
