@@ -2064,10 +2064,10 @@ class Test(unittest.TestCase):
         self.assertEqual(rb1.getDurationBySite(p).quarterLength, 8.0)
 
         #p.show()
-        raw = self.xmlStrOld(p)
-        self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
+        raw = self.xmlStr(p)
+        self.assertEqual(raw.find("""<ending number="1" type="start" />""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="stop" />""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="start" />""")>1, True)    
 
     def testRepeatBracketD(self):
         from music21 import note, spanner, stream, bar
@@ -2156,22 +2156,22 @@ class Test(unittest.TestCase):
         # have the offsets of the start of each measure
         self.assertEqual(rb4.getOffsetsBySite(p), [32.0, 36.0, 40.0, 44.0])
         self.assertEqual(rb4.getDurationBySite(p).quarterLength, 16.0)
-        raw = self.xmlStrOld(p)
-        self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
+        raw = self.xmlStr(p)
+        self.assertEqual(raw.find("""<ending number="1" type="start" />""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="stop" />""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="start" />""")>1, True)    
         
         p1 = copy.deepcopy(p)
-        raw = self.xmlStrOld(p1)
-        self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
+        raw = self.xmlStr(p1)
+        self.assertEqual(raw.find("""<ending number="1" type="start" />""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="stop" />""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="start" />""")>1, True)    
 
         p2 = copy.deepcopy(p1)
-        raw = self.xmlStrOld(p2)
-        self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
+        raw = self.xmlStr(p2)
+        self.assertEqual(raw.find("""<ending number="1" type="start" />""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="stop" />""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="start" />""")>1, True)    
     
 
     def testRepeatBracketE(self):
@@ -2250,7 +2250,7 @@ class Test(unittest.TestCase):
         n2 = s.notes[-1]
         sp1 = spanner.Ottava(n1, n2) # default is 8va
         s.append(sp1)
-        raw = self.xmlStrOld(s)
+        raw = self.xmlStr(s)
         self.assertEqual(raw.count('octave-shift'), 2)
         self.assertEqual(raw.count('type="down"'), 1)
         #s.show()
@@ -2262,7 +2262,7 @@ class Test(unittest.TestCase):
         sp1 = spanner.Ottava(n1, n2, type='8vb')
         s.append(sp1)
         #s.show()
-        raw = self.xmlStrOld(s)
+        raw = self.xmlStr(s)
         self.assertEqual(raw.count('octave-shift'), 2)
         self.assertEqual(raw.count('type="up"'), 1)
 
@@ -2273,7 +2273,7 @@ class Test(unittest.TestCase):
         sp1 = spanner.Ottava(n1, n2, type='15ma')
         s.append(sp1)
         #s.show()
-        raw = self.xmlStrOld(s)
+        raw = self.xmlStr(s)
         self.assertEqual(raw.count('octave-shift'), 2)
         self.assertEqual(raw.count('type="down"'), 1)
 
@@ -2284,7 +2284,7 @@ class Test(unittest.TestCase):
         sp1 = spanner.Ottava(n1, n2, type='15mb')
         s.append(sp1)
         #s.show()
-        raw = self.xmlStrOld(s)
+        raw = self.xmlStr(s)
         self.assertEqual(raw.count('octave-shift'), 2)
         self.assertEqual(raw.count('type="up"'), 1)
 
@@ -2300,7 +2300,7 @@ class Test(unittest.TestCase):
         s.append(n)
         s.append(sp)
         #s.show()
-        raw = self.xmlStrOld(s)
+        raw = self.xmlStr(s)
         self.assertEqual(raw.count('octave-shift'), 2)
         self.assertEqual(raw.count('type="down"'), 1)
 

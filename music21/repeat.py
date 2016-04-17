@@ -3119,9 +3119,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.flat.getElementsByClass(repeat.DaCapo)), 1)
 
 
-        raw = GEX.parse(s)
+        raw = GEX.parse(s).decode('utf-8')
 
-        self.assertEqual(raw.find(b'Da Capo') > 0, True)
+        self.assertTrue(raw.find('Da Capo') > 0, raw)
 
         # can do the same thing starting form a text expression
         s = copy.deepcopy(template)
@@ -3129,8 +3129,8 @@ class Test(unittest.TestCase):
         s[3].insert(0, expressions.TextExpression('da capo'))
         self.assertEqual(len(s.flat.getElementsByClass(repeat.DaCapo)), 0)
         
-        raw = GEX.parse(s)
-        self.assertEqual(raw.find(b'da capo') > 0, True)
+        raw = GEX.parse(s).decode('utf-8')
+        self.assertTrue(raw.find('da capo') > 0, raw)
             
         s2 = converter.parse(raw)
         # now, reconverted from the musicxml, we have a RepeatExpression
@@ -4288,11 +4288,8 @@ _DOC_ORDER = [RepeatExpression, RepeatExpressionMarker, Coda, Segno, Fine,
               DaCapoAlCoda, AlSegno, DalSegno, DalSegnoAlFine, DalSegnoAlCoda, RepeatFinder]
 
 if __name__ == "__main__":
-    #import sys
-    #sys.argv.append('testRepeatEndingsH')
-    
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest='testRepeatExpressionOnStream')
 
 #------------------------------------------------------------------------------
 # eof

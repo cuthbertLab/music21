@@ -1970,7 +1970,7 @@ class MeasureExporter(XMLExporterBase):
                 ('MetronomeMark', 'tempoIndicationToXml'),
                 ('MetricModulation', 'tempoIndicationToXml'),
                 ('TextExpression', 'textExpressionToXml'),
-                ('RepeatEpxression', 'textExpressionToXml'),
+                ('RepeatExpression', 'textExpressionToXml'),
                 ('Clef', 'midmeasureClefToXml'),
                ])
     ignoreOnParseClasses = set(['KeySignature', 'LayoutBase', 'TimeSignature', 'Barline'])
@@ -3753,12 +3753,19 @@ class MeasureExporter(XMLExporterBase):
                 
         return mxDirection
     
-    def textExpressionToXml(self, te):
-        '''Convert a TextExpression to a MusicXML mxDirection type.
+    def textExpressionToXml(self, teOrRe):
+        '''
+        Convert a TextExpression or RepreatExpression to a MusicXML mxDirection type.
         returns a musicxml.mxObjects.Direction object
         '''
         mxWords = Element('words')
-        mxWords.text = str(te.content)
+        if hasattr(teOrRe, 'content'): # TextExpression 
+            te = teOrRe
+            mxWords.text = str(te.content)
+        elif hasattr(teOrRe, 'getText'): # RepeatExpression
+            te = teOrRe.getTextExpression()
+            mxWords.text = str(te.content)
+            
         for src, dst in [#(te._positionDefaultX, 'default-x'), 
                          (te.positionVertical, 'default-y'),
     #                      (te._positionRelativeX, 'relative-x'),
@@ -3855,6 +3862,7 @@ class MeasureExporter(XMLExporterBase):
 
     def beamToXml(self, beamObject):
         '''
+        Returns an ElementTree Element from a :class:`~music21.beam.Beam` object
         
         >>> a = beam.Beam()
         >>> a.type = 'start'
@@ -3862,6 +3870,8 @@ class MeasureExporter(XMLExporterBase):
         
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> b = MEX.beamToXml(a)
+        >>> b
+        <Element 'beam' at 0x104f3a728>
         >>> MEX.dump(b)
         <beam number="1">begin</beam>
 
@@ -3922,7 +3932,10 @@ class MeasureExporter(XMLExporterBase):
         return mxBeam
 
     
-    def setRightBarline(self):        
+    def setRightBarline(self):
+        '''
+        Calls self.setBarline for 
+        ''' 
         m = self.stream
         if not hasattr(m, 'rightBarline'):
             return
