@@ -198,10 +198,10 @@ class Verticality(object):
         timespanTree=None,
         ):
         from music21.tree import trees
-        prototype = (trees.TimespanTree, type(None))
+        prototype = (trees.OffsetTree, type(None))
         if not isinstance(timespanTree, prototype):
             raise VerticalityException(
-                "timespanTree %r is not a TimespanTree or None" % (timespanTree,))
+                "timespanTree %r is not a OffsetTree or None" % (timespanTree,))
         
         self.timespanTree = timespanTree
         self.offset = offset
@@ -418,12 +418,20 @@ class Verticality(object):
         '''
         pitchSet = set()
         for timespan in self.startTimespans:
-            element = timespan.element
+            if hasattr(timespan, 'element'):
+                element = timespan.element
+            else:
+                element = timespan
+
             if hasattr(element, 'pitches'):
                 pitches = [x.nameWithOctave for x in element.pitches]
                 pitchSet.update(pitches)
         for timespan in self.overlapTimespans:
-            element = timespan.element
+            if hasattr(timespan, 'element'):
+                element = timespan.element
+            else:
+                element = timespan
+
             if hasattr(element, 'pitches'):
                 pitches = [x.nameWithOctave for x in element.pitches]
                 pitchSet.update(pitches)

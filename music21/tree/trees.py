@@ -1034,8 +1034,8 @@ class OffsetTree(ElementTree):
         <Timespan 6.0 8.0>
         <Timespan 7.0 7.0>        
         '''
-        for n in super(OffsetTree, self).__iter__():
-            for el in n.payload:
+        for node in super(OffsetTree, self).__iter__():
+            for el in node.payload:
                 yield el
 
 
@@ -1362,8 +1362,122 @@ class OffsetTree(ElementTree):
             return result
         return tuple(sorted(recurse(self.rootNode)))
 
-    def findOverlaps(self, includeDurationless=True):
-        pass
+    def overlapTimePoints(self, includeStopPoints=False, returnVerticality=False):
+        '''
+        Gets all timepoints where some element is starting 
+        (or if includeStopPoints is True, where some element is starting or stopping) 
+        while some other element is still continuing onward.
+        
+        >>> score = corpus.parse('bwv66.6')
+        >>> scoreOffsetTree = score.asTree(flatten=True, groupOffsets=True)
+        >>> scoreOffsetTree.overlapTimePoints()
+        [0.5, 5.5, 6.5, 10.5, 13.5, 14.5, 15.5...]
+        
+        if returnVerticality is True, then a mapping of timepoint to elements is returned.  
+        How cool is that?
+
+        >>> otp = scoreOffsetTree.overlapTimePoints(returnVerticality=True)
+        >>> otp[0]
+        {0.5: <Verticality 0.5 {G#3 B3 E4 B4}>}
+        
+        '''
+        checkPoints = self.allOffsets() if includeStopPoints is False else self.allTimePoints()
+        overlaps = []
+        for cp in checkPoints:
+            overlappingElements = self.elementsOverlappingOffset(cp)
+            if len(overlappingElements) == 0:
+                continue
+            if returnVerticality is False:
+                overlaps.append(cp)
+            else:
+                overlaps.append({cp: self.getVerticalityAt(cp)})
+        return overlaps
+
+    def getVerticalityAt(self, offset):
+        r'''
+        Gets the verticality in this offset-tree which starts at `offset`.
+
+        >>> bach = corpus.parse('bwv66.6')
+        >>> scoreTree = bach.asTimespans()
+        >>> scoreTree.getVerticalityAt(2.5)
+        <Verticality 2.5 {G#3 B3 E4 B4}>
+
+        Verticalities outside the range still return a Verticality, but it might be empty...
+
+        >>> scoreTree.getVerticalityAt(2000)
+        <Verticality 2000 {}>
+            
+        Test that it still works if the tree is empty...
+            
+        >>> scoreTree = bach.asTimespans(classList=(instrument.Tuba,))
+        >>> scoreTree
+        <TimespanTree {0} (-inf to inf) <music21.stream.Score ...>>
+        >>> scoreTree.getVerticalityAt(5.0)
+        <Verticality 5.0 {}>           
+
+        Returns a verticality.Verticality object.
+        '''
+        from music21.tree.verticality import Verticality
+        
+        startTimespans = self.elementsStartingAt(offset)
+        stopTimespans = self.elementsStoppingAt(offset)
+        overlapTimespans = self.elementsOverlappingOffset(offset)
+        
+        verticality = Verticality(
+            overlapTimespans=overlapTimespans,
+            startTimespans=startTimespans,
+            offset=offset,
+            stopTimespans=stopTimespans,
+            timespanTree=self,
+            )
+        return verticality
+
+
+    def simultaneityDict(self):
+        '''
+        Creates a dictionary where each element's id maps to a list (possibly empty)
+        of elements that start at the same time.
+        
+        this replaces one of the two aspects of the old stream._findLayering()
+        but should be way way way way way way faster...
+        
+        >>> score = tree.makeExampleScore()
+        >>> scoreTree = score.asTree(flatten=True, groupOffsets=True)
+        >>> scoreTree
+        <OffsetTree {20} (0.0 to 8.0) <music21.stream.Score exampleScore>>
+        
+        >>> sd = scoreTree.simultaneityDict()
+        >>> n = score.flat.notes[0]
+        >>> sd[id(n)]
+        [<music21.instrument.Instrument PartA: : >, 
+         <music21.instrument.Instrument PartB: : >, 
+         <music21.clef.BassClef>, 
+         <music21.clef.BassClef>, 
+         <music21.meter.TimeSignature 2/4>, 
+         <music21.meter.TimeSignature 2/4>, 
+         <music21.note.Note C#>]
+
+        Third note is alone:
+        
+        >>> n3 = score.flat.notes[2]
+        >>> sd[id(n3)]
+        []
+        
+        Fourth note has a friend:
+
+        >>> n4 = score.flat.notes[3]
+        >>> sd[id(n4)]
+        [<music21.note.Note G#>]
+        '''
+        simultaneityDict = {}
+        for node in super(OffsetTree, self).__iter__():
+            pl = node.payload
+            for el in pl:
+                payloadCopy = pl[:]
+                payloadCopy.remove(el) # hopefully not too slow...
+                simultaneityDict[id(el)] = payloadCopy
+        return simultaneityDict
+
 
 
 #----------------------------------------------------------------
@@ -1594,44 +1708,6 @@ class TimespanTree(OffsetTree):
                         pitchedTimespan.getParentageByClass(classList)):
                     return previousPitchedTimespan
 
-    def getVerticalityAt(self, offset):
-        r'''
-        Gets the verticality in this offset-tree which starts at `offset`.
-
-        >>> bach = corpus.parse('bwv66.6')
-        >>> scoreTree = bach.asTimespans()
-        >>> scoreTree.getVerticalityAt(2.5)
-        <Verticality 2.5 {G#3 B3 E4 B4}>
-
-        Verticalities outside the range still return a Verticality, but it might be empty...
-
-        >>> scoreTree.getVerticalityAt(2000)
-        <Verticality 2000 {}>
-            
-        Test that it still works if the tree is empty...
-            
-        >>> scoreTree = bach.asTimespans(classList=(instrument.Tuba,))
-        >>> scoreTree
-        <TimespanTree {0} (-inf to inf) <music21.stream.Score ...>>
-        >>> scoreTree.getVerticalityAt(5.0)
-        <Verticality 5.0 {}>           
-
-        Returns a verticality.Verticality object.
-        '''
-        from music21.tree.verticality import Verticality
-        
-        startTimespans = self.elementsStartingAt(offset)
-        stopTimespans = self.elementsStoppingAt(offset)
-        overlapTimespans = self.elementsOverlappingOffset(offset)
-        
-        verticality = Verticality(
-            overlapTimespans=overlapTimespans,
-            startTimespans=startTimespans,
-            offset=offset,
-            stopTimespans=stopTimespans,
-            timespanTree=self,
-            )
-        return verticality
 
     def getVerticalityAtOrBefore(self, offset):
         r'''

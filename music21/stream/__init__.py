@@ -9056,6 +9056,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
         >>> a = stream.Stream()
+        >>> a._durSpanOverlap((0, 5), (4, 12), False)
+        True
         >>> a._durSpanOverlap((0, 10), (11, 12), False)
         False
         >>> a._durSpanOverlap((11, 12), (0, 10), False)
@@ -9142,7 +9144,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     def _consolidateLayering(self, layeringMap):
         '''
-        Given elementsSorted and a map of equal length with lists of
+        Given a stream of flat elements and a map of equal length with lists of
         index values that meet a given condition (overlap or simultaneities),
         organize into a dictionary by the relevant or first offset
         '''
@@ -9224,6 +9226,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             sortedElements = self.elements
             
         gapStream = self.cloneEmpty(derivationMethod='findGaps')
+        
         highestCurrentEndTime = 0.0
         for e in sortedElements:
             if e.offset > highestCurrentEndTime:
