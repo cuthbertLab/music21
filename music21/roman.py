@@ -21,12 +21,14 @@ import re
 from music21 import chord
 from music21 import common
 from music21 import exceptions21
+from music21 import harmony
 from music21 import interval
 from music21 import key
 from music21 import pitch
 from music21 import scale
+
+from music21.ext import six
 from music21.figuredBass import notation as fbNotation
-from music21 import harmony
 
 from music21 import environment
 _MOD = 'roman.py'
@@ -1300,7 +1302,7 @@ class RomanNumeral(harmony.Harmony):
         Called from the superclass, Harmony.__init__()
         
         '''
-        if not common.isStr(self._figure):
+        if not isinstance(self._figure, six.string_types):
             raise RomanException('got a non-string figure: {!r}'.format(
                 self._figure))
 
@@ -1635,7 +1637,7 @@ class RomanNumeral(harmony.Harmony):
         
         # try to get Scale or Key object from cache: this will offer
         # performance boost as Scale stores cached pitch segments
-        if common.isStr(keyOrScale):
+        if isinstance(keyOrScale, six.string_types):
             keyOrScale = _getKeyFromCache(keyOrScale)
         elif keyOrScale is not None:
             #environLocal.printDebug(['got keyOrScale', keyOrScale])

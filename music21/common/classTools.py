@@ -12,7 +12,7 @@
 
 #from music21 import exceptions21
 from music21.ext import six
-#from music21.common.decorators import deprecated
+from music21.common.decorators import deprecated
 
 __all__ = ['isNum', 'isStr', 'isListLike', 'isIterable', 'classToClassStr']
 
@@ -61,22 +61,17 @@ def isNum(usrData):
         return False
 
 
-#@deprecated("September 2015", "April 2016", 
-#                "use isinstance(usrData, music21.ext.six.string_types)")
+@deprecated("April 2016", "June 2016", 
+                "use isinstance(usrData, music21.ext.six.string_types)")
 def isStr(usrData):
     """
-    DEPRECATED: September 2015 -- use isinstance(usrData, six.string_types)
-    Remove April 2016
-    
-    Will remove within six months of it not being used in music21.
-    
     Check of usrData is some form of string, including unicode.
 
-    >>> common.isStr(3)
+    <<< common.isStr(3)
     False
-    >>> common.isStr('sharp')
+    <<< common.isStr('sharp')
     True
-    >>> common.isStr(u'flat')
+    <<< common.isStr(u'flat')
     True
     
     :rtype: bool

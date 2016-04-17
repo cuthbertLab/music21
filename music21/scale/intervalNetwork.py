@@ -38,6 +38,8 @@ from music21 import interval
 from music21 import common
 from music21 import pitch
 
+from music21.ext import six
+
 from music21 import environment
 _MOD = "intervalNetwork.py"
 environLocal = environment.Environment(_MOD)
@@ -107,7 +109,7 @@ class Edge(object):
     # pylint: disable=redefined-builtin
     def __init__(self, intervalData=None, id=None, # id is okay: @ReservedAssignment
                  direction=DIRECTION_BI): 
-        if common.isStr(intervalData):
+        if isinstance(intervalData, six.string_types):
             i = interval.Interval(intervalData)
         else:
             i = intervalData
@@ -200,12 +202,12 @@ class Edge(object):
         <music21.scale.intervalNetwork.Edge ascending M3 [(0,1)]>
         '''
         # may be Node objects, or number, or string
-        if common.isStr(node1) or common.isNum(node1):
+        if isinstance(node1, six.string_types) or common.isNum(node1):
             n1Id = node1
         else: # assume an Node
             n1Id = node1.id
 
-        if common.isStr(node2) or common.isNum(node2):
+        if isinstance(node2, six.string_types) or common.isNum(node2):
             n2Id = node2
         else: # assume an Node
             n2Id = node2.id
@@ -1030,7 +1032,7 @@ class IntervalNetwork(object):
                     if self._degreeModulus(nodeId) == nStep:
                         post.append(self._nodes[nId])
             return post
-        elif common.isStr(nodeId):
+        elif isinstance(nodeId, six.string_types):
             if nodeId.lower() in ['terminuslow', 'low']:
                 return self.terminusLowNodes # returns a list
             elif nodeId.lower() in ['terminushigh', 'high']:
@@ -1191,7 +1193,7 @@ class IntervalNetwork(object):
         if pitchOrigin is None:
             raise Exception("No pitch origin for calling next on this pitch!")
         
-        if common.isStr(pitchOrigin):
+        if isinstance(pitchOrigin, six.string_types):
             pitchOrigin = pitch.Pitch(pitchOrigin)
         else:
             pitchOrigin = copy.deepcopy(pitchOrigin)
@@ -1328,7 +1330,7 @@ class IntervalNetwork(object):
         else:
             nodeObj = self._nodeNameToNodes(nodeId)[0]
             
-        if common.isStr(pitchReference):
+        if isinstance(pitchReference, six.string_types):
             pitchReference = pitch.Pitch(pitchReference)
         else:
             pitchReference = copy.deepcopy(pitchReference)
@@ -1337,9 +1339,9 @@ class IntervalNetwork(object):
         if pitchReference.octave is None:
             pitchReference.octave = pitchReference.implicitOctave
 
-        if common.isStr(minPitch):
+        if isinstance(minPitch, six.string_types):
             minPitch = pitch.Pitch(minPitch)
-        if common.isStr(maxPitch):
+        if isinstance(maxPitch, six.string_types):
             maxPitch = pitch.Pitch(maxPitch)
         if fillMinMaxIfNone and minPitch is None and maxPitch is None:
             minPitch, maxPitch = self.realizeMinMax(pitchReference, 
@@ -1512,7 +1514,7 @@ class IntervalNetwork(object):
         else:
             nodeObj = self._nodeNameToNodes(nodeId)[0]
             
-        if common.isStr(pitchReference):
+        if isinstance(pitchReference, six.string_types):
             pitchReference = pitch.Pitch(pitchReference)
         else:
             pitchReference = copy.deepcopy(pitchReference)
@@ -1521,9 +1523,9 @@ class IntervalNetwork(object):
         if pitchReference.octave is None:
             pitchReference.octave = 4
 
-        if common.isStr(minPitch):
+        if isinstance(minPitch, six.string_types):
             minPitch = pitch.Pitch(minPitch)
-        if common.isStr(maxPitch):
+        if isinstance(maxPitch, six.string_types):
             maxPitch = pitch.Pitch(maxPitch)
         if fillMinMaxIfNone and minPitch is None and maxPitch is None:
             #environLocal.printDebug(['_realizeDescending()', 'fillMinMaxIfNone'])
@@ -1675,7 +1677,7 @@ class IntervalNetwork(object):
         #environLocal.printDebug(['got pre pitch:', pre])
         #environLocal.printDebug(['got pre node:', preNodeId])
 
-        if common.isStr(pitchReference):
+        if isinstance(pitchReference, six.string_types):
             pitchReference = pitch.Pitch(pitchReference)
         else: # make a copy b/c may manipulate
             pitchReference = copy.deepcopy(pitchReference)
@@ -1685,9 +1687,9 @@ class IntervalNetwork(object):
         if pitchReference.octave is None:
             pitchReference.octave = pitchReference.implicitOctave
 
-        if common.isStr(minPitch):
+        if isinstance(minPitch, six.string_types):
             minPitch = pitch.Pitch(minPitch)
-        if common.isStr(maxPitch):
+        if isinstance(maxPitch, six.string_types):
             maxPitch = pitch.Pitch(maxPitch)
 
         directedRealization = False
@@ -1974,7 +1976,7 @@ class IntervalNetwork(object):
         # only cache if altered degrees is None
         if len(alteredDegrees) == 0:
             # if pitch reference is a string, take it as it is
-            if common.isStr(pitchReference):
+            if isinstance(pitchReference, six.string_types):
                 cacheKey = (pitchReference, nodeId)
             else:
                 cacheKey = (pitchReference.nameWithOctave, nodeId)
@@ -2240,7 +2242,7 @@ class IntervalNetwork(object):
         #environLocal.printDebug(['getRelativeNodeId', 'result of _nodeNameToNodes',  
         #   self._nodeNameToNodes(nodeName)])
 
-        if common.isStr(pitchTarget):
+        if isinstance(pitchTarget, six.string_types):
             pitchTarget = pitch.Pitch(pitchTarget)
         elif 'Note' in pitchTarget.classes:
             pitchTarget = pitchTarget.pitch
@@ -2316,7 +2318,7 @@ class IntervalNetwork(object):
         else:
             nodeId = self._nodeNameToNodes(nodeName)[0]
 
-        if common.isStr(pitchTarget):
+        if isinstance(pitchTarget, six.string_types):
             pitchTarget = pitch.Pitch(pitchTarget)
 
         savedOctave = pitchTarget.octave
@@ -2591,14 +2593,14 @@ class IntervalNetwork(object):
          <music21.pitch.Pitch F5>)
         '''
         if not common.isListLike(pitchTarget):
-            if common.isStr(pitchTarget):
+            if isinstance(pitchTarget, six.string_types):
                 pitchTarget = pitch.Pitch(pitchTarget)
             pitchTarget = [pitchTarget]
         else:
             # convert a list of string into pitch objects
             temp = []
             for p in pitchTarget:
-                if common.isStr(p):
+                if isinstance(p, six.string_types):
                     temp.append(pitch.Pitch(p))
             if len(temp) == len(pitchTarget):
                 pitchTarget = temp

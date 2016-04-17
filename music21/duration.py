@@ -53,15 +53,15 @@ import fractions
 import unittest
 import copy
 
+from collections import namedtuple
+
 from music21 import common
 from music21 import defaults
 from music21 import exceptions21
-from music21.common import SlottedObject, opFrac
 from music21 import environment
 
-from collections import namedtuple
-
-
+from music21.common import SlottedObject, opFrac
+from music21.ext import six
 
 
 try:
@@ -1404,7 +1404,7 @@ class Duration(SlottedObject):
         for a in arguments:
             if common.isNum(a) and 'quarterLength' not in keywords:
                 keywords['quarterLength'] = a
-            elif common.isStr(a) and 'type' not in keywords:
+            elif isinstance(a, six.string_types) and 'type' not in keywords:
                 keywords['type'] = a
             elif isinstance(a, DurationTuple):
                 self.addDurationTuple(a)

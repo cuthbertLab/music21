@@ -551,7 +551,7 @@ class ConverterTinyNotation(SubConverter):
             {2.0} <music21.note.Note C>
             {2.5} <music21.bar.Barline style=final>
         '''
-        if common.isStr(tnData):
+        if isinstance(tnData, six.string_types):
             tnStr = tnData
         else: # assume a 2 element sequence
             raise SubConverterException(
@@ -1113,7 +1113,7 @@ class ConverterMuseData(SubConverter):
         from music21 import musedata as musedataModule
         from music21.musedata import translate as musedataTranslate
 
-        if common.isStr(strData):
+        if isinstance(strData, six.string_types):
             strDataList = [strData]
         else:
             strDataList = strData

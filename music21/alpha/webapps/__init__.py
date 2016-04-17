@@ -756,7 +756,7 @@ class CommandProcessor(object):
                         continue
                     data = []
                     for elementStr in dataStr:
-                        if common.isStr(elementStr):
+                        if isinstance(elementStr, six.string_types):
                             dataElement = self.parseInputToPrimitive(elementStr)
                         else:
                             dataElement = elementStr
@@ -1185,7 +1185,7 @@ class CommandProcessor(object):
         if common.isIterable(inpVal):
             return [self.parseInputToPrimitive(element) for element in inpVal]
         
-        if not common.isStr(inpVal):
+        if not isinstance(inpVal, six.string_types):
             self.recordError("Unknown type for parseInputToPrimitive "+str(inpVal))
         
         strVal = inpVal

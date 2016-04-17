@@ -22,6 +22,8 @@ from music21 import exceptions21
 from music21 import common
 from music21 import spanner
 
+from music21.ext import six
+
 from music21 import environment
 _MOD = 'dynamics.py'
 environLocal = environment.Environment(_MOD)
@@ -224,7 +226,7 @@ class Dynamic(base.Music21Object):
         self.englishName = None
         self._value = None
 
-        if not common.isStr(value):
+        if not isinstance(value, six.string_types):
             # assume it is a number, try to convert
             self._volumeScalar = value
             self.value = dynamicStrFromDecimal(value)

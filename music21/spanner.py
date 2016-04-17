@@ -977,7 +977,7 @@ class SpannerBundle(object):
         # NOTE: this is called very frequently: optimize
 #         post = self.__class__()
 #         for sp in self._storage:
-#             if common.isStr(className):
+#             if isinstance(className, six.string_types):
 #                 if className in sp.classes:
 #                     post.append(sp)
 #             else:
@@ -989,7 +989,7 @@ class SpannerBundle(object):
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             post = self.__class__()
             for sp in self._storage:
-                if common.isStr(className):
+                if isinstance(className, six.string_types):
                     if className in sp.classes:
                         post.append(sp)
                 else:
@@ -1303,7 +1303,7 @@ class RepeatBracket(Spanner):
             else:
                 self._numberSpanIsAdjacent = False
 
-        elif common.isStr(value):
+        elif isinstance(value, six.string_types):
             # assume defined a range with a dash; assumed inclusive
             if '-' in value:
                 start, end = value.split('-')
@@ -1432,7 +1432,7 @@ class Ottava(Spanner):
                 stub.append('a')        
             self._type = ''.join(stub)    
         else:
-            if not common.isStr(newType) or newType.lower() not in self.validOttavaTypes:
+            if not isinstance(newType, six.string_types) or newType.lower() not in self.validOttavaTypes:
                 raise SpannerException(
                     'cannot create Ottava of type: %s' % newType)
             self._type = newType.lower()

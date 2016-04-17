@@ -164,6 +164,7 @@ from music21 import note
 from music21 import chord
 from music21 import key
 from music21.alpha.theoryAnalysis import theoryResult
+from music21.ext import six
 
 import unittest
     
@@ -2324,7 +2325,7 @@ def getKeyAtMeasure(score, measureNumber):
     if keyMeasureMap:
         for dictKey in sorted(list(keyMeasureMap.keys()), reverse=True):
             if measureNumber >= dictKey:                             
-                if common.isStr(keyMeasureMap[dictKey]):
+                if isinstance(keyMeasureMap[dictKey], six.string_types):
                     return key.Key(key.convertKeyStringToMusic21KeyString(keyMeasureMap[dictKey]))
                 else:
                     return keyMeasureMap[dictKey]

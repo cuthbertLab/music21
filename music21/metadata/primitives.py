@@ -206,7 +206,7 @@ class Date(object):
         '''
         if isinstance(value, datetime.datetime):
             self.loadDatetime(value)
-        elif common.isStr(value):
+        elif isinstance(value, six.string_types):
             self.loadStr(value)
         elif isinstance(value, Date):
             self.loadOther(value)

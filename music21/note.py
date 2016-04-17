@@ -31,7 +31,7 @@ from music21 import beam
 from music21 import tie
 from music21 import volume
 from music21.common import SlottedObject
-
+from music21.ext import six
 
 from music21 import environment
 _MOD = "note.py"
@@ -204,7 +204,7 @@ class Lyric(SlottedObject):
         '''
         # do not want to do this unless we are sure this is not a string
         # possible might alter unicode or other string-like representations
-        if not common.isStr(rawText):
+        if not isinstance(rawText, six.string_types):
             rawText = str(rawText)
         else:
             rawText = rawText
@@ -539,7 +539,7 @@ class GeneralNote(base.Music21Object):
 
 
         '''
-        if not common.isStr(text):
+        if not isinstance(text, six.string_types):
             text = str(text)
         if lyricNumber is None:
             maxLyrics = len(self.lyrics) + 1
@@ -581,7 +581,7 @@ class GeneralNote(base.Music21Object):
          <music21.note.Lyric number=2 syllabic=single text="newSecond">, 
          <music21.note.Lyric number=3 syllabic=single text="second">]
         '''
-        if not common.isStr(text):
+        if not isinstance(text, six.string_types):
             text = str(text)
         for lyric in self.lyrics[index:]:
             lyric.number += 1
@@ -1160,7 +1160,7 @@ class Note(NotRest):
         >>> a.name
         'D#'
         '''
-        if common.isStr(value):
+        if isinstance(value, six.string_types):
             accidental = pitch.Accidental(value)
         else:
             accidental = value

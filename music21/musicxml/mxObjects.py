@@ -410,8 +410,7 @@ class TagLib(object):
 
         for data in _tags:
             # some cases have a string w/o a class definition
-            if isinstance(data, str):
-            # if common.isStr(data): 
+            if isinstance(data, six.string_types):
                 if data in DYNAMIC_MARKS:
                     data = [data, False, DynamicMark]
                 elif data in ARTICULATION_MARKS:

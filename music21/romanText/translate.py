@@ -127,6 +127,7 @@ from music21 import exceptions21
 from music21 import common
 from music21 import bar
 
+from music21.ext import six
 from music21.romanText import rtObjects
 
 
@@ -278,7 +279,7 @@ def _getKeyAndPrefix(rtKeyOrString):
     (<music21.key.Key of b# minor>, 'b#: ')
     '''
     from music21 import key
-    if common.isStr(rtKeyOrString):
+    if isinstance(rtKeyOrString, six.string_types):
         rtKeyOrString = key.convertKeyStringToMusic21KeyString(rtKeyOrString)
         k = key.Key(rtKeyOrString)
     else:
@@ -296,7 +297,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     Given a romanText handler or string, return or fill a Score Stream.
     '''
     # accept a string directly; mostly for testing
-    if common.isStr(rtHandler):
+    if isinstance(rtHandler, six.string_types):
         rtf = rtObjects.RTFile()
         rtHandler = rtf.readstr(rtHandler) # return handler, processes tokens
 
@@ -863,7 +864,7 @@ def romanTextToStreamOpus(rtHandler, inputM21=None):
     Opus object.
     '''
     from music21 import stream
-    if common.isStr(rtHandler):
+    if isinstance(rtHandler, six.string_types):
         rtf = rtObjects.RTFile()
         rtHandler = rtf.readstr(rtHandler) # return handler, processes tokens
 

@@ -24,6 +24,7 @@ from music21 import base
 from music21 import common
 from music21 import exceptions21
 from music21 import environment
+from music21.ext import six
 
 _MOD = "text.py"  
 environLocal = environment.Environment(_MOD)
@@ -418,7 +419,7 @@ class TextBox(base.Music21Object, TextFormat):
         return self._content
     
     def _setContent(self, value):
-        if not common.isStr(value):
+        if not isinstance(value, six.string_types):
             self._content = str(value)
         else:
             self._content = value    

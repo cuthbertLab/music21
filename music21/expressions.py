@@ -24,12 +24,14 @@ create interval.Interval objects only when necessary.
 import copy
 import unittest
 
-from music21 import interval
 from music21 import base
-from music21 import exceptions21
-from music21 import text
 from music21 import common
+from music21 import exceptions21
+from music21 import interval
 from music21 import spanner
+from music21 import text
+
+from music21.ext import six
 
 _MOD = 'expressions'
 
@@ -136,7 +138,7 @@ class TextExpression(Expression, text.TextFormat):
 
         # the text string to be displayed; not that line breaks
         # are given in the xml with this non-printing character: (#)
-        if not common.isStr(content):
+        if not isinstance(content, six.string_types):
             self._content = str(content)
         else:
             self._content = content

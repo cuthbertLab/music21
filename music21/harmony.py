@@ -18,19 +18,18 @@ import collections
 import re
 import unittest
 
-from music21 import common
-from music21 import exceptions21
-from music21 import pitch
-from music21 import duration
-#from music21 import roman
-from music21 import interval
 from music21 import chord
+from music21 import common
+from music21 import duration
+from music21 import exceptions21
+from music21 import interval
 from music21 import key
+from music21 import pitch
 
-
-from music21 import environment
+from music21.ext import six
 from music21.figuredBass import realizerScale
 
+from music21 import environment
 _MOD = "harmony.py"
 environLocal = environment.Environment(_MOD)
 
@@ -236,13 +235,13 @@ class Harmony(chord.Chord):
         '''
         for kw in keywords:
             if kw == 'root':
-                if common.isStr(keywords[kw]):
+                if isinstance(keywords[kw], six.string_types):
                     keywords[kw].replace('b', '-')
                     self.root(pitch.Pitch(keywords[kw]))
                 else:
                     self.root(keywords[kw])
             elif kw == 'bass':
-                if common.isStr(keywords[kw]):
+                if isinstance(keywords[kw], six.string_types):
                     keywords[kw].replace('b', '-')
                     self.bass(pitch.Pitch(keywords[kw]))
                 else:
@@ -344,7 +343,7 @@ class Harmony(chord.Chord):
 
     @key.setter
     def key(self, keyOrScale):
-        if common.isStr(keyOrScale):
+        if isinstance(keyOrScale, six.string_types):
             self._key = key.Key(keyOrScale)
         else:
             self._key = keyOrScale
@@ -616,7 +615,7 @@ class ChordStepModification(object):
 
     @modType.setter
     def modType(self, expr):
-        if expr is not None and common.isStr(expr):
+        if expr is not None and isinstance(expr, six.string_types):
             if expr.lower() in ['add', 'subtract', 'alter']:
                 self._modType = expr.lower()
                 return

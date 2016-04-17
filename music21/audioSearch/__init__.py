@@ -40,6 +40,8 @@ from music21 import stream
 from music21.audioSearch import recording
 from music21.audioSearch import transcriber
 
+from music21.ext import six
+
 from music21 import environment
 _MOD = 'audioSearch/base.py'
 environLocal = environment.Environment(_MOD)
@@ -435,7 +437,7 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     if waveFilenameOrHandle == 'temp':
         waveFilenameOrHandle = environLocal.getRootTempDir() + os.path.sep + 'temp.wav'
 
-    if common.isStr(waveFilenameOrHandle):
+    if isinstance(waveFilenameOrHandle, six.string_types):
         # waveFilenameOrHandle is a filename
         waveFilename = waveFilenameOrHandle
         try:

@@ -244,7 +244,7 @@ def ch1_basic_II_C(data, intervalShift):
     for chunk in data:
         m = stream.Measure()    
         for e in chunk:
-            if common.isStr(e):
+            if isinstance(e, six.string_types):
                 n1 = note.Note(e)
                 n1.quarterLength = 4
                 n2 = n1.transpose(intervalShift)

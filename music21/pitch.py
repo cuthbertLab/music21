@@ -25,6 +25,7 @@ from music21 import defaults
 from music21 import exceptions21
 from music21 import interval
 from music21.common import SlottedObject
+from music21.ext import six
 
 from music21 import environment
 _MOD = "pitch.py"
@@ -908,7 +909,7 @@ class Accidental(SlottedObject):
         >>> a.alter
         -2.0
         '''
-        if common.isStr(name):
+        if isinstance(name, six.string_types):
             name = name.lower() # sometimes args get capitalized
         if name in ['natural', "n", 0]:
             self._name = 'natural'
@@ -3098,7 +3099,7 @@ class Pitch(object):
         (7, -31.0)
         '''
 
-        if common.isStr(fundamental):
+        if isinstance(fundamental, six.string_types):
             fundamental = Pitch(fundamental)
         # else assume a Pitch object
         # got through all harmonics and find the one closes to this ps value
@@ -3223,7 +3224,7 @@ class Pitch(object):
                                      'provide one as an arugment')
             else:
                 fundamental = self.fundamental
-        if common.isStr(fundamental):
+        if isinstance(fundamental, six.string_types):
             fundamental = Pitch(fundamental)
 
         harmonic, cents = self.harmonicFromFundamental(fundamental)
@@ -3247,7 +3248,7 @@ class Pitch(object):
         >>> g4.harmonicAndFundamentalFromPitch('c3')
         (3, <music21.pitch.Pitch C3(-2c)>)
         '''
-        if common.isStr(target):
+        if isinstance(target, six.string_types):
             target = Pitch(target)
         else: # make a copy
             target = copy.deepcopy(target)

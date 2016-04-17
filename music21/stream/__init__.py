@@ -399,7 +399,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             found.elementsChanged(clearIsSorted=False)
             return found
 
-        elif common.isStr(k):
+        elif isinstance(k, six.string_types):
             # first search id, then search groups
             idMatch = self.getElementById(k)
             if idMatch is not None:
@@ -11732,7 +11732,7 @@ class Measure(Stream):
 
     def _setLeftBarline(self, barlineObj):
         insert = True
-        if common.isStr(barlineObj):
+        if isinstance(barlineObj, six.string_types):
             barlineObj = bar.Barline(barlineObj)
             barlineObj.location = 'left'
         elif barlineObj is None: # assume removal
@@ -11774,7 +11774,7 @@ class Measure(Stream):
 
     def _setRightBarline(self, barlineObj):
         insert = True
-        if common.isStr(barlineObj):
+        if isinstance(barlineObj, six.string_types):
             barlineObj = bar.Barline(barlineObj)
             barlineObj.location = 'right'
         elif barlineObj is None: # assume removal

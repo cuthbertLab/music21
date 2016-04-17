@@ -3094,7 +3094,7 @@ def mxPrintToPageLayout(mxPrint, inputM21 = None):
         
     number = mxPrint.get('page-number')
     if number is not None and number != "":
-        if common.isStr(number):
+        if isinstance(number, six.string_types):
             pageLayout.pageNumber = int(number)
         else:
             pageLayout.pageNumber = number
