@@ -1362,7 +1362,7 @@ class OffsetTree(ElementTree):
             return result
         return tuple(sorted(recurse(self.rootNode)))
 
-    def findOverlaps(self, includeDurationless=True, includeEndBoundary=False):
+    def findOverlaps(self, includeDurationless=True):
         pass
 
 

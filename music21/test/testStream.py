@@ -489,14 +489,12 @@ class Test(unittest.TestCase):
             n.offset = offset
             a.insert(n)
 
-        includeDurationless = True
-
-        simultaneityMap, overlapMap = a._findLayering(a.flat, includeDurationless)
+        simultaneityMap, overlapMap = a._findLayering()
         self.assertEqual(simultaneityMap, [[], [], []])
         self.assertEqual(overlapMap, [[1,2], [0], [0]])
 
 
-        dummy = a._consolidateLayering(a.flat, overlapMap)
+        dummy = a._consolidateLayering(overlapMap)
         # print dummy
 
 
@@ -510,21 +508,11 @@ class Test(unittest.TestCase):
             n.duration = duration.Duration('quarter')
             n.offset = x * 1
             a.insert(n)
-        d = a.getOverlaps(True) 
+        d = a.getOverlaps() 
         # no overlaps
         self.assertEqual(len(d), 0)
 
         
-        ## including coincident boundaries
-        ## NEVER used...
-        #d = a.getOverlaps(includeDurationless=True, includeEndBoundary=True) 
-        ##environLocal.printDebug(['testOverlapsB', d])
-        ## return one dictionary that has a reference to each note that 
-        ## is in the same overlap group
-        #self.assertEqual(len(d), 1)
-        #self.assertEqual(len(d[0]), 4)
-
-
 #         a = Stream()
 #         for x in [0,0,0,0,13,13,13]:
 #             n = note.Note('G#')

@@ -112,6 +112,14 @@ class IsNotFilter(IsFilter):
     <music21.key.KeySignature of 3 flats>    
     <music21.note.Rest rest>
 
+    test that resetting works...
+
+    >>> for el in s.iter.addFilter(stream.filters.IsNotFilter(n)):
+    ...     el
+    <music21.key.KeySignature of 3 flats>    
+    <music21.note.Rest rest>
+
+
     multiple...
 
     >>> s = stream.Stream()
@@ -168,7 +176,7 @@ class ClassFilter(StreamFilter):
     >>> s.append(note.Note('C'))
     >>> s.append(note.Rest())
     >>> s.append(note.Note('D'))
-    >>> sI = s.__iter__()
+    >>> sI = iter(s)
     >>> sI
     <music21.stream.iterator.StreamIterator for Stream:0x104843828 @:0>
     >>> for x in sI:
@@ -222,7 +230,7 @@ class ClassNotFilter(ClassFilter):
     >>> s.append(note.Note('C'))
     >>> s.append(note.Rest())
     >>> s.append(note.Note('D'))
-    >>> sI = s.__iter__()
+    >>> sI = iter(s)
 
     >>> sI.filters.append(stream.filters.ClassNotFilter('Note'))
     >>> sI.filters
@@ -255,11 +263,11 @@ class GroupFilter(StreamFilter):
     >>> s1.append(n3)
     >>> GF = stream.filters.GroupFilter
     
-    >>> for thisNote in s1.__iter__().addFilter(GF("trombone")):
+    >>> for thisNote in iter(s1).addFilter(GF("trombone")):
     ...     print(thisNote.name)
     C
     D
-    >>> for thisNote in s1.__iter__().addFilter(GF("tuba")):
+    >>> for thisNote in iter(s1).addFilter(GF("tuba")):
     ...     print(thisNote.name)
     D
     E

@@ -9082,9 +9082,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return found
 
 
-    def _findLayering(self, 
-                      flatStream, 
-                      includeDurationless=True):
+    def _findLayering(self):
         '''
         Find any elements in an elementsSorted list that have simultaneities
         or durations that cause overlaps.
@@ -9097,6 +9095,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         
         Used in getOverlaps inside makeVoices.
         '''
+        flatStream = self.flat
         if flatStream.isSorted is False:
             flatStream = flatStream.sorted
         # these may not be sorted
@@ -9113,8 +9112,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for i in range(len(durSpanSorted)):
             src = durSpanSorted[i]
             # second entry is duration
-            if not includeDurationless and flatStream[i].duration is None:
-                continue
             # compare to all past and following durations
             for j in range(len(durSpanSorted)):
                 if j == i: # index numbers
@@ -9143,12 +9140,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
 
-    def _consolidateLayering(self, flatStream, layeringMap):
+    def _consolidateLayering(self, layeringMap):
         '''
         Given elementsSorted and a map of equal length with lists of
         index values that meet a given condition (overlap or simultaneities),
         organize into a dictionary by the relevant or first offset
         '''
+        flatStream = self.flat
         if flatStream.isSorted is False:
             flatStream = flatStream.sorted
 
@@ -9264,7 +9262,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 self._cache["Gapless"] = False
                 return False
 
-    def getSimultaneous(self, includeDurationless=True):
+    def getSimultaneous(self):
         '''Find and return any elements that start at the same time.
 
 
@@ -9287,20 +9285,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(d) == 0
         True
         '''
-#        checkOverlap = False
-        elementsSorted = self.flat
-        simultaneityMap, unused_overlapMap = self._findLayering(elementsSorted,
-                                                                includeDurationless)
+        simultaneityMap, unused_overlapMap = self._findLayering()
 
-        return self._consolidateLayering(elementsSorted, simultaneityMap)
+        return self._consolidateLayering(simultaneityMap)
 
 
-    def getOverlaps(self, includeDurationless=True):
+    def getOverlaps(self):
         '''
         Find any elements that overlap. Overlaping might include elements
-        that have no duration but that are simultaneous.
-        Whether elements with None durations are included is determined by
-        includeDurationless.
+        that have zero-length duration simultaneous.
 
         This method returns a dictionary, where keys
         are the start time of the first overlap and
@@ -9316,7 +9309,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ...     n.offset = x * 1
         ...     a.insert(n)
         ...
-        >>> d = a.getOverlaps(includeDurationless=True)
+        >>> d = a.getOverlaps()
         >>> len(d)
         0
 
@@ -9347,12 +9340,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         7
 
         '''
-        elementsSorted = self.flat
-        unused_simultaneityMap, overlapMap = self._findLayering(elementsSorted, includeDurationless)
+        unused_simultaneityMap, overlapMap = self._findLayering()
         #environLocal.printDebug(['simultaneityMap map', simultaneityMap])
         #environLocal.printDebug(['overlapMap', overlapMap])
 
-        return self._consolidateLayering(elementsSorted, overlapMap)
+        return self._consolidateLayering(overlapMap)
 
 
 
@@ -9382,10 +9374,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> a.isSequence()
         True
         '''
-        elementsSorted = self.flat
-        unused_simultaneityMap, overlapMap = self._findLayering(
-                                                    elementsSorted,
-                                                    includeDurationless=True)
+        unused_simultaneityMap, overlapMap = self._findLayering()
         post = True
         for indexList in overlapMap:
             if indexList:
@@ -9683,7 +9672,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # must be sorted
         if not returnObj.isSorted:
             returnObj.sort()
-        olDict = returnObj.notes.stream().getOverlaps(includeDurationless=False)
+        olDict = returnObj.notes.stream().getOverlaps()
         #environLocal.printDebug(['makeVoices(): olDict', olDict])
         # find the max necessary voices by finding the max number
         # of elements in each group; these may not all be necessary
