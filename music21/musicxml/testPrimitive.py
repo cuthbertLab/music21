@@ -17231,7 +17231,7 @@ otaveShifts33d = """<?xml version="1.0" encoding="UTF-8"?>
 </score-partwise>
 """
 
-
+# Copyright string in the Creator name...
 unicodeStrWithNonAscii = u"""<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE score-partwise
   PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
@@ -17871,7 +17871,7 @@ class Test(unittest.TestCase):
     def testBasic(self):
         # a basic test to make sure each parse
         from music21 import converter
-        for i,testMaterial in enumerate(ALL):
+        for i, testMaterial in enumerate(ALL):
             try:
                 dummy = converter.parse(testMaterial)
             except Exception:

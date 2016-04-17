@@ -487,6 +487,8 @@ class MusicXMLImporter(XMLParserBase):
     def parseXMLText(self):
         if six.PY3 and isinstance(self.xmlText, bytes):
             self.xmlText = self.xmlText.decode('utf-8')
+        elif six.PY2 and isinstance(self.xmlText, unicode): # @UndefinedVariable
+            self.xmlText = self.xmlText.encode('utf-8')
         
         sio = six.StringIO(self.xmlText)
         try:
@@ -3891,7 +3893,7 @@ class Test(unittest.TestCase):
         GEX = m21ToXml.GeneralObjectExporter()
         xml = GEX.parse(c)
         #print(xml.decode('utf-8'))
-        c.show()
+        #c.show()
         inputStream = converter.parse(xml)
         chordResult = inputStream.flat.notes[0]
 #         for n in chordResult:
