@@ -78,14 +78,12 @@ def makeBeams(s, inPlace=False):
     #if s.isClass(Measure):
     if 'Measure' in s.classes:
     #if s.isClassOrSubclass('Measure'):
-        mColl = []  # store a list of measures for processing
-        mColl.append(returnObj)
-    elif s.iter.getElementsByClass('Measure'):
+        mColl = [returnObj]  # store a list of measures for processing
+    else: 
         mColl = list(returnObj.iter.getElementsByClass('Measure'))  # a list of measures
-    else:
-        raise stream.StreamException(
-            'cannot process a stream that neither is a Measure nor has '
-            'Measures')
+        if len(mColl) == 0:
+            raise stream.StreamException(
+                'cannot process a stream that is neither a Measure nor has no Measures')
 
     lastTimeSignature = None
 
@@ -149,8 +147,7 @@ def makeBeams(s, inPlace=False):
                 lastTimeSignature.barDuration.quarterLength):
                 offset = (lastTimeSignature.barDuration.quarterLength -
                     noteStream.highestTime)
-            beamsList = lastTimeSignature.getBeams(
-                noteStream, measureStartOffset=offset)
+            beamsList = lastTimeSignature.getBeams(noteStream, measureStartOffset=offset)
 
             for i in range(len(noteStream)):
                 # this may try to assign a beam to a Rest

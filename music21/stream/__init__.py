@@ -906,13 +906,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         True
         '''
         objId = id(obj)
-        for e in self._elements:
-            if id(e) == objId:
-                return True
-        for e in self._endElements:
-            if id(e) == objId:
-                return True
-        return False
+        return self._hasElementByObjectId(objId)
 
     def hasElementOfClass(self, className, forceFlat=False):
         '''
@@ -1208,6 +1202,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # recursion matched or didn't or wasn't run. either way no need for rest...
                 continue 
             
+            # TODO: Anything that messes with ._elements or ._endElements should be in core.py
+            # move it...
             match = None
             matchedEndElement = False
             baseElementCount = len(self._elements)
@@ -8840,7 +8836,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         findConsecutiveNotes don't have to remove
         their own args; this method is used in melodicIntervals.)
         '''
-        sortedSelf = self.sorted
+        if self.isSorted is False:
+            sortedSelf = self.sorted
+        else:
+            sortedSelf = self
+            
         returnList = []
         lastStart = 0.0
         lastEnd = 0.0
@@ -9056,16 +9056,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
         >>> a = stream.Stream()
-        >>> a._durSpanOverlap([0, 10], [11, 12], False)
+        >>> a._durSpanOverlap((0, 10), (11, 12), False)
         False
-        >>> a._durSpanOverlap([11, 12], [0, 10], False)
+        >>> a._durSpanOverlap((11, 12), (0, 10), False)
         False
-        >>> a._durSpanOverlap([0, 3], [3, 6], False)
+        >>> a._durSpanOverlap((0, 3), (3, 6), False)
         False
-        >>> a._durSpanOverlap([0, 3], [3, 6], True)
+        >>> a._durSpanOverlap((0, 3), (3, 6), True)
         True
         '''
-
         durSpans = [a, b]
         # sorting will ensure that leading numbers are ordered from low to high
         durSpans.sort()
@@ -9083,8 +9082,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return found
 
 
-    def _findLayering(self, flatStream, includeDurationless=True,
-                   includeEndBoundary=False):
+    def _findLayering(self, 
+                      flatStream, 
+                      includeDurationless=True,
+                      includeEndBoundary=False):
         '''
         Find any elements in an elementsSorted list that have simultaneities
         or durations that cause overlaps.
@@ -9094,10 +9095,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         all index values that match are included in that list.
 
         See testOverlaps, in unit tests, for examples.
-
-
         '''
-        flatStream = flatStream.sorted
+        if flatStream.isSorted is False:
+            flatStream = flatStream.sorted
         # these may not be sorted
         durSpanSorted = self._getDurSpan(flatStream)
 
@@ -9106,6 +9106,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         overlapMap = [[] for dummy in range(len(durSpanSorted))]
         # create a list of keys for events that start at the same time
         simultaneityMap = [[] for dummy in range(len(durSpanSorted))]
+
+        durSpanOverlapCache = {}
 
         for i in range(len(durSpanSorted)):
             src = durSpanSorted[i]
@@ -9123,8 +9125,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if src[0] == dst[0]:
                     simultaneityMap[i].append(j)
                 # this function uses common.py comparions methods
-                if self._durSpanOverlap(src, dst, includeEndBoundary):
-                    overlapMap[i].append(j)
+                try:
+                    if durSpanOverlapCache[(src, dst)]:
+                        overlapMap[i].append(j)
+                except KeyError: 
+                    durSpanResult = self._durSpanOverlap(src, dst, includeEndBoundary)
+                    durSpanOverlapCache[(src, dst)] = durSpanResult
+                    if durSpanResult:
+                        overlapMap[i].append(j)
         return simultaneityMap, overlapMap
 
 
@@ -9135,7 +9143,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         index values that meet a given condition (overlap or simultaneities),
         organize into a dictionary by the relevant or first offset
         '''
-        flatStream = flatStream.sorted
+        if flatStream.isSorted is False:
+            flatStream = flatStream.sorted
 
         if len(layeringMap) != len(flatStream):
             raise StreamException('layeringMap must be the same length as flatStream')
@@ -9205,7 +9214,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if 'GapStream' in self._cache and self._cache["GapStream"] is not None:
             return self._cache["GapStream"]
 
-        sortedElements = self.sorted.elements
+        if self.isSorted is False:
+            sortedElements = self.sorted.elements
+        else:
+            sortedElements = self.elements
+            
         gapStream = self.cloneEmpty(derivationMethod='findGaps')
         highestCurrentEndTime = 0.0
         for e in sortedElements:

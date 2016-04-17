@@ -32,6 +32,7 @@ from music21.exceptions21 import StreamException
 class StreamCoreMixin(object):
     def __init__(self):
         self._cache = {}
+        
         # hugely important -- keeps track of where the _elements are
         self._offsetDict = {}
         # self._elements stores Music21Object objects.
@@ -222,6 +223,9 @@ class StreamCoreMixin(object):
         >>> s._hasElementByObjectId(id(n2))
         False
         '''
+        if objId in self._offsetDict:
+            return True
+        
         for e in self._elements:
             if id(e) == objId:
                 return True
