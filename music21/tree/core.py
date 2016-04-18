@@ -62,7 +62,7 @@ class AVLNode(common.SlottedObject):
         This attribute is used to help balance the AVL tree.
 
         >>> score = tree.makeExampleScore()
-        >>> scoreTree = tree.fromStream.convert(score, flatten=True, 
+        >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True, 
         ...                    classList=(note.Note, chord.Chord))
         >>> print(scoreTree.debug())
         <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
@@ -108,7 +108,7 @@ class AVLNode(common.SlottedObject):
         This property is used to help balance the AVL tree.
 
         >>> score = tree.makeExampleScore()
-        >>> scoreTree = tree.fromStream.convert(score, flatten=True, 
+        >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True, 
         ...              classList=(note.Note, chord.Chord))
         >>> print(scoreTree.debug())
         <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
@@ -146,7 +146,7 @@ class AVLNode(common.SlottedObject):
         the node in a containing score, but does not need to be. It could be the .sortTuple
 
         >>> score = tree.makeExampleScore()
-        >>> scoreTree = tree.fromStream.convert(score, flatten=True, 
+        >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True, 
         ...            classList=(note.Note, chord.Chord))
         >>> print(scoreTree.rootNode.debug())
         <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
@@ -173,7 +173,7 @@ class AVLNode(common.SlottedObject):
         After setting the left child you need to do a node update. with node.update()
 
         >>> score = tree.makeExampleScore()
-        >>> scoreTree = tree.fromStream.convert(score, flatten=True, 
+        >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True, 
         ...           classList=(note.Note, chord.Chord))
         >>> print(scoreTree.rootNode.debug())
         <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
@@ -196,7 +196,7 @@ class AVLNode(common.SlottedObject):
         After setting the right child you need to do a node update. with node.update()
 
         >>> score = tree.makeExampleScore()
-        >>> scoreTree = tree.fromStream.convert(score, flatten=True, 
+        >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True, 
         ...             classList=(note.Note, chord.Chord))
         >>> print(scoreTree.rootNode.debug())
         <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
@@ -274,7 +274,7 @@ class AVLNode(common.SlottedObject):
         Get a debug of the Node:
         
         >>> score = tree.makeExampleScore()
-        >>> scoreTree = tree.fromStream.convert(score, flatten=True, 
+        >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True, 
         ...              classList=(note.Note, chord.Chord))
         >>> rn = scoreTree.rootNode        
         >>> print(rn.debug())
@@ -293,8 +293,10 @@ class AVLNode(common.SlottedObject):
         r'''
         Return a list of the debugging information of the tree (used for debug):
         
+        Called recursively
+        
         >>> score = tree.makeExampleScore()
-        >>> scoreTree = tree.fromStream.convert(score, flatten=True, 
+        >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True, 
         ...            classList=(note.Note, chord.Chord))
         >>> rn = scoreTree.rootNode
         >>> rn._getDebugPieces()
@@ -335,7 +337,7 @@ class AVLNode(common.SlottedObject):
         We create a score with everything correct.
 
         >>> score = tree.makeExampleScore()
-        >>> scoreTree = tree.fromStream.convert(score, flatten=True, 
+        >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True, 
         ...             classList=(note.Note, chord.Chord))
         >>> n = scoreTree.rootNode
         >>> n
@@ -640,7 +642,7 @@ class AVLTree(object):
 
         >>> tsList = [(0,2), (0,9), (1,1), (2,3), (3,4), (4,9), (5,6), (5,8), (6,8), (7,7)]
         >>> tss = [tree.spans.Timespan(x, y) for x, y in tsList]
-        >>> tsTree = tree.trees.TimespanTree()
+        >>> tsTree = tree.timespanTree.TimespanTree()
         >>> tsTree.insert(tss)
 
         >>> print(tsTree.debug())
@@ -749,10 +751,10 @@ class AVLTree(object):
         >>> while endPosition is not None:
         ...     print(endPosition)
         ...     endPosition = scoreTree.getPositionAfter(endPosition)
-        SortTuple(atEnd=1, offset=33.0, priority=0, classSortOrder=-5, ...)
-        SortTuple(atEnd=1, offset=33.0, priority=0, classSortOrder=-5, ...)
-        SortTuple(atEnd=1, offset=33.0, priority=0, classSortOrder=-5, ...)
-        SortTuple(atEnd=1, offset=33.0, priority=0, classSortOrder=-5, ...)
+        SortTuple(atEnd=1, offset=36.0, priority=0, classSortOrder=-5, ...)
+        SortTuple(atEnd=1, offset=36.0, priority=0, classSortOrder=-5, ...)
+        SortTuple(atEnd=1, offset=36.0, priority=0, classSortOrder=-5, ...)
+        SortTuple(atEnd=1, offset=36.0, priority=0, classSortOrder=-5, ...)
 
         Generally speaking, negative positions will usually return 0.0
 

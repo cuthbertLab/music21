@@ -324,7 +324,7 @@ class OffsetNode(ElementNode):
     {8.0 - 8.0} <music21.bar.Barline style=final>
     {8.0 - 8.0} <music21.bar.Barline style=final>
     
-    >>> scoreTree = tree.fromStream.convert(sf, flatten=False, classList=None)
+    >>> scoreTree = tree.fromStream.asTimespans(sf, flatten=False, classList=None)
     >>> rn = scoreTree.rootNode
     
     The RootNode here represents the starting position of the Note F at 3.0; It is the center
@@ -407,7 +407,7 @@ class OffsetNode(ElementNode):
         The contents of the node at this point.  Usually a list of PitchedTimespans.
 
         >>> score = tree.makeExampleScore()
-        >>> scoreTree = tree.fromStream.convert(score, flatten=True, 
+        >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True, 
         ...                  classList=(note.Note, chord.Chord))
         >>> print(scoreTree.rootNode.debug())
         <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
