@@ -9377,34 +9377,37 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> print(st1.simultaneousAttacks(st2))
         [0.0, 3.0]
         '''
-        sOuter = Stream()
-        for e in self:
-            sOuter._insertCore(e.offset, e)
-        for e in stream2:
-            sOuter._insertCore(e.offset, e)
-        sOuter.elementsChanged(updateIsFlat=False)
-        sOuterTree = sOuter.asTree(flatten=False, groupOffsets=True)
-        return sorted(sOuterTree.simultaneityDict().keys())
-#         
-#         stream1Offsets = self.groupElementsByOffset()
-#         stream2Offsets = stream2.groupElementsByOffset()
-# 
-#         returnKey = {}
-# 
-#         for thisList in stream1Offsets:
-#             thisOffset = self.elementOffset(thisList[0])
-#             returnKey[thisOffset] = 1
-# 
-#         for thatList in stream2Offsets:
-#             thatOffset = thatList[0].getOffsetBySite(stream2)
-#             if thatOffset in returnKey:
-#                 returnKey[thatOffset] += 1
-# 
-#         returnList = []
-#         for foundOffset in sorted(returnKey):
-#             if returnKey[foundOffset] >= 2:
-#                 returnList.append(foundOffset)
-#         return returnList
+        stream1Offsets = self.groupElementsByOffset()
+        stream2Offsets = stream2.groupElementsByOffset()
+ 
+        returnKey = {}
+ 
+        for thisList in stream1Offsets:
+            thisOffset = self.elementOffset(thisList[0])
+            returnKey[thisOffset] = 1
+ 
+        for thatList in stream2Offsets:
+            thatOffset = thatList[0].getOffsetBySite(stream2)
+            if thatOffset in returnKey:
+                returnKey[thatOffset] += 1
+ 
+        returnList = []
+        for foundOffset in sorted(returnKey):
+            if returnKey[foundOffset] >= 2:
+                returnList.append(foundOffset)
+        return returnList
+
+        ##### this method was supposed to be faster, but actually 2000 times slower on op133
+
+        # sOuter = Stream()
+        # for e in self:
+        #     sOuter._insertCore(e.offset, e)
+        # for e in stream2:
+        #     sOuter._insertCore(e.offset, e)
+        # sOuter.elementsChanged(updateIsFlat=False)
+        # sOuterTree = sOuter.asTree(flatten=False, groupOffsets=True)
+        # return sorted(sOuterTree.simultaneityDict().keys())
+
 
     def attachIntervalsBetweenStreams(self, cmpStream):
         '''

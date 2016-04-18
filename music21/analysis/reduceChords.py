@@ -102,7 +102,7 @@ class ChordReducer(object):
                 intervalClassSets.append(intervalClassSet)
             forbiddenChords = frozenset(intervalClassSets)
 
-        scoreTree = tree.fromStream.convert(inputScore, 
+        scoreTree = tree.fromStream.asTimespans(inputScore, 
                                               flatten=True, 
                                               classList=(note.Note, chord.Chord))
 

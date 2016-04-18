@@ -333,12 +333,12 @@ class StreamCoreMixin(object):
         >>> scoreTree = score.asTimespans()
         >>> print(scoreTree)
         <TimespanTree {20} (0.0 to 8.0) <music21.stream.Score exampleScore>>
+            <PitchedTimespan (0.0 to 0.0) <music21.clef.BassClef>>
+            <PitchedTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
             <PitchedTimespan (0.0 to 0.0) <music21.instrument.Instrument PartA: : >>
+            <PitchedTimespan (0.0 to 0.0) <music21.clef.BassClef>>
+            <PitchedTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
             <PitchedTimespan (0.0 to 0.0) <music21.instrument.Instrument PartB: : >>
-            <PitchedTimespan (0.0 to 0.0) <music21.clef.BassClef>>
-            <PitchedTimespan (0.0 to 0.0) <music21.clef.BassClef>>
-            <PitchedTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
-            <PitchedTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
             <PitchedTimespan (0.0 to 1.0) <music21.note.Note C>>
             <PitchedTimespan (0.0 to 2.0) <music21.note.Note C#>>
             <PitchedTimespan (1.0 to 2.0) <music21.note.Note D>>
@@ -357,7 +357,7 @@ class StreamCoreMixin(object):
         hashedAttributes = hash( (tuple(classList or () ), flatten) ) 
         cacheKey = "timespanTree" + str(hashedAttributes)
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
-            hashedTimespanTree = tree.fromStream.convert(self,
+            hashedTimespanTree = tree.fromStream.asTimespans(self,
                                                      flatten=flatten,
                                                      classList=classList)
             self._cache[cacheKey] = hashedTimespanTree
