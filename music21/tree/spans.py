@@ -63,12 +63,6 @@ class Timespan(object):
     >>> ts4 == ts2
     False
     '''
-    __slots__ = (
-        '_offset',
-        '_endTime',
-        )
-
-
     def __init__(self, offset=float('-inf'), endTime=float('inf')):
         if offset is not None:
             offset = float(offset)
@@ -294,30 +288,35 @@ class ElementTimespan(Timespan):
     >>> pitchedTimespan.offset - pitchedTimespan.parentOffset
     1.5
 
-    >>> pitchedTimespan.beatStrength
-    0.125
     >>> pitchedTimespan.element
     <music21.note.Note D>
 
     These are not dynamic, so changing the Score object does not change the
-    measureNumber, beatStrength, etc.    
+    measureNumber, etc.    
     '''
 
     ### CLASS VARIABLES ###
-
-    __slots__ = (
-        '_beatStrength',
-        '_element',
-        'parentOffset',
-        'parentEndTime',
-        '_parentage',
-        )
+    _DOC_ATTR = {'parentage':  r'''
+                    The Stream hierarchy above the ElementTimespan's element.
+            
+                    >>> score = corpus.parse('bwv66.6')
+                    >>> scoreTree = score.asTimespans()
+                    >>> verticality = scoreTree.getVerticalityAt(1.0)
+                    >>> pitchedTimespan = verticality.startTimespans[0]
+                    >>> pitchedTimespan
+                    <PitchedTimespan (1.0 to 2.0) <music21.note.Note A>>
+                    >>> for streamSite in pitchedTimespan.parentage:
+                    ...     streamSite
+                    <music21.stream.Measure 1 offset=1.0>
+                    <music21.stream.Part Soprano>
+                    <music21.stream.Score ...>
+                    '''
+                 }
 
     ### INITIALIZER ###
 
     def __init__(self,
                  element=None,
-                 beatStrength=None,
                  parentOffset=None,
                  parentEndTime=None,
                  parentage=None,
@@ -326,13 +325,10 @@ class ElementTimespan(Timespan):
                  ):
         super(ElementTimespan, self).__init__(offset=offset, endTime=endTime)
         
-        self._element = element
+        self.element = element
         if parentage is not None:
             parentage = tuple(parentage)
-        self._parentage = parentage
-        if beatStrength is not None:
-            beatStrength = float(beatStrength)
-        self._beatStrength = beatStrength
+        self.parentage = parentage
         if parentOffset is not None:
             parentOffset = float(parentOffset)
         self.parentOffset = parentOffset
@@ -363,7 +359,6 @@ class ElementTimespan(Timespan):
 
 
     def new(self,
-            beatStrength=None,
             element=None,
             parentOffset=None,
             parentEndTime=None,
@@ -384,11 +379,6 @@ class ElementTimespan(Timespan):
         >>> pts.element is pts2.element
         True
         '''
-        if beatStrength is None:
-            try:
-                beatStrength = self.beatStrength
-            except exceptions21.Music21Exception:
-                beatStrength = None
         element = element or self.element
         if parentOffset is None:
             parentOffset = self.parentOffset
@@ -400,7 +390,6 @@ class ElementTimespan(Timespan):
             endTime = self.endTime
         
         return type(self)(
-            beatStrength=beatStrength,
             element=element,
             parentOffset=parentOffset,
             parentEndTime=parentEndTime,
@@ -412,47 +401,6 @@ class ElementTimespan(Timespan):
 
     ### PUBLIC PROPERTIES ###
 
-    @property
-    def beatStrength(self):
-        r'''
-        The PitchedTimespan's element's beat-strength.
-
-        This may be overriden during instantiation by passing in a custom
-        beat-strength. That can be useful when you are generating new
-        PitchedTimespans based on old ones, and want to maintain pitch
-        information from the old PitchedTimespan but change the start offset to
-        reflect that of another timespan.
-        
-        >>> n = note.Note('D-')
-        >>> ts = meter.TimeSignature('4/4')
-        >>> s = stream.Stream()
-        >>> s.insert(0.0, ts)
-        >>> s.insert(1.0, n)
-        >>> pts = tree.spans.PitchedTimespan(n, offset=1.0, endTime=2.0)
-        >>> pts
-        <PitchedTimespan (1.0 to 2.0) <music21.note.Note D->>
-        >>> pts.beatStrength
-        0.25
-        >>> n.beatStrength
-        0.25
-        
-        >>> pts2 = pts.new(beatStrength=1.0, offset=0.0)
-        >>> pts2
-        <PitchedTimespan (0.0 to 2.0) <music21.note.Note D->>
-        >>> pts2.beatStrength
-        1.0
-        >>> pts2.element.beatStrength
-        0.25
-        '''
-        if self._beatStrength is not None:
-            return self._beatStrength
-        elif self._element is None:
-            return None
-        try:
-            return self._element.beatStrength
-        except meter.MeterException:
-            #environLocal.warn("Could not get a beatStrength from %r: %s" % (self._element, e))
-            return None
 
     @property
     def quarterLength(self):
@@ -482,19 +430,6 @@ class ElementTimespan(Timespan):
         '''
         return self.endTime - self.offset
 
-    @property
-    def element(self):
-        r'''
-        The PitchedTimespan's element.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> scoreTree = score.asTimespans()
-        >>> verticality = scoreTree.getVerticalityAt(1.0)
-        >>> pitchedTimespan = verticality.startTimespans[0]
-        >>> pitchedTimespan.element
-        <music21.note.Note A>
-        '''
-        return self._element
 
     @property
     def measureNumber(self):
@@ -516,24 +451,7 @@ class ElementTimespan(Timespan):
         #    return x.measureNumber
         #return None
 
-    @property
-    def parentage(self):
-        r'''
-        The Stream hierarchy above the PitchedTimespan's element.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> scoreTree = score.asTimespans()
-        >>> verticality = scoreTree.getVerticalityAt(1.0)
-        >>> pitchedTimespan = verticality.startTimespans[0]
-        >>> for streamSite in pitchedTimespan.parentage:
-        ...     streamSite
-        <music21.stream.Measure 1 offset=1.0>
-        <music21.stream.Part Soprano>
-        <music21.stream.Score ...>
-        '''
-        return self._parentage
-
-    def getParentageByClass(self, classList=None):
+    def getParentageByClass(self, classList):
         '''
         returns that is the first parentage that has this classList.
         default stream.Part
@@ -558,14 +476,11 @@ class ElementTimespan(Timespan):
         >>> pitchedTimespan.getParentageByClass(classList=searchTuple)
         <music21.stream.Measure 1 offset=1.0>
 
+        TODO: this should take a normal class list.
         '''
-        from music21 import stream
-        if classList is None:
-            classList = (stream.Part,)
         for parent in self.parentage:
-            for c in classList:
-                if isinstance(parent, c):
-                    return parent
+            if isinstance(parent, classList):
+                return parent
         return None
 
     @property
@@ -591,7 +506,6 @@ class ElementTimespan(Timespan):
 class PitchedTimespan(ElementTimespan):
     def __init__(self,
                  element=None,
-                 beatStrength=None,
                  parentOffset=None,
                  parentEndTime=None,
                  parentage=None,
@@ -599,7 +513,6 @@ class PitchedTimespan(ElementTimespan):
                  endTime=None,
                  ):
         super(PitchedTimespan, self).__init__(element=element,
-                                              beatStrength=beatStrength,
                                               parentOffset=parentOffset,
                                               parentEndTime=parentEndTime,
                                               parentage=parentage,
@@ -640,7 +553,7 @@ class PitchedTimespan(ElementTimespan):
         For quick score reductions, we can merge two consecutive 
         like-pitched element timespans, keeping
         score-relevant information from the first of the two, such as its
-        Music21 Element, and any beatstrength information.
+        Music21 Element.
     
         This is useful when using timespans to perform score reduction.
     
@@ -670,8 +583,6 @@ class PitchedTimespan(ElementTimespan):
         >>> merged.part is timespan_one.part
         True
     
-        >>> merged.beatStrength == timespan_one.beatStrength
-        True
     
         Attempting to merge timespans which are not contiguous, or which do not
         have identical pitches will result in error:

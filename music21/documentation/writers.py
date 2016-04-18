@@ -260,6 +260,9 @@ class IPythonNotebookReSTWriter(ReSTWriter):
         '''
         tocFile = 'usersGuide_99_Table_of_Contents'
         ipfp = [x for x in self.ipythonNotebookFilePaths if 'usersGuide' in x]
+        if len(ipfp) == 0:
+            raise DocumentationWritersException("No iPythonNotebook files were converted; " +
+                    "you probably have a problem with pandoc or nbconvert not being installed.") 
         usersGuideDir = os.path.split(
                             self.notebookFilePathToRstFilePath(
                                 ipfp[0])

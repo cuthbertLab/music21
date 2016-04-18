@@ -214,9 +214,9 @@ class ChordReducer(object):
                 for timespan in verticalityTwo.startTimespans:
                     scoreTree.removeTimespan(timespan)
                     newTimespan = timespan.new(
-                        beatStrength=verticalityOne.beatStrength,
                         offset=verticalityOne.offset,
                         )
+                    newTimespan.beatStrength = verticalityOne.beatStrength
                     scoreTree.insert(newTimespan)
             elif pitchSetTwo.issubset(pitchSetOne):
                 for timespan in verticalityOne.startTimespans:
@@ -342,7 +342,7 @@ class ChordReducer(object):
                     continue
 
                 if bassTimespan.offset < group[0].offset:
-                    beatStrength = bassTimespan.beatStrength
+                    beatStrength = bassTimespan.element.beatStrength
                     offset = bassTimespan.offset
                     previousTimespan = scoreTree.findPreviousPitchedTimespanInSameStreamByClass(
                                                                                     group[0])
@@ -360,10 +360,9 @@ class ChordReducer(object):
                             offset = previousTimespan.endTime
                     scoreTree.removeTimespan(group[0])
                     subtree.removeTimespan(group[0])
-                    newTimespan = group[0].new(
-                        beatStrength=beatStrength,
-                        offset=offset,
-                        )
+                    newTimespan = group[0].new(offset=offset)
+                    newTimespan.beatStrength = beatStrength
+                        
                     scoreTree.insert(newTimespan)
                     subtree.insert(newTimespan)
                     group[0] = newTimespan
@@ -416,10 +415,9 @@ class ChordReducer(object):
                         toRemove.add(timespanOne)
                         toRemove.add(timespanTwo)
                 if group[0].offset != group[0].parentOffset:
-                    newTimespan = group[0].new(
-                        beatStrength=1.0,
-                        offset=group[0].parentOffset,
-                        )
+                    newTimespan = group[0].new(offset=group[0].parentOffset)
+                    newTimespan.beatStrength = 1.0
+                        
                     toRemove.add(group[0])
                     toInsert.add(newTimespan)
                     group[0] = newTimespan

@@ -292,7 +292,7 @@ class Verticality(object):
             thisPitchedTimespan = self.startTimespans[0]
         except IndexError:
             return None        
-        return thisPitchedTimespan.beatStrength
+        return thisPitchedTimespan.element.beatStrength
 
 
     def toChord(self):
