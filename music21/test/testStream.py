@@ -489,8 +489,7 @@ class Test(unittest.TestCase):
             n.offset = offset
             a.insert(n)
 
-        simultaneityMap, overlapMap = a._findLayering()
-        self.assertEqual(simultaneityMap, [[], [], []])
+        overlapMap = a._findLayering()
         self.assertEqual(overlapMap, [[1,2], [0], [0]])
 
 

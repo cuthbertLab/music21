@@ -1435,11 +1435,8 @@ class OffsetTree(ElementTree):
 
     def simultaneityDict(self):
         '''
-        Creates a dictionary where each element's id maps to a list (possibly empty)
-        of elements that start at the same time.
-        
-        this replaces one of the two aspects of the old stream._findLayering()
-        but should be way way way way way way faster...
+        Creates a dictionary of offsets that have more than one element starting at that time,
+        where the keys are offset times and the values are lists of elements at that moment.
         
         >>> score = tree.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True, groupOffsets=True)
@@ -1447,35 +1444,27 @@ class OffsetTree(ElementTree):
         <OffsetTree {20} (0.0 to 8.0) <music21.stream.Score exampleScore>>
         
         >>> sd = scoreTree.simultaneityDict()
-        >>> n = score.flat.notes[0]
-        >>> sd[id(n)]
+        >>> len(sd)
+        5
+        >>> list(sorted(sd.keys()))
+        [0.0, 2.0, 4.0, 6.0, 8.0] 
+        >>> sd[0.0]
         [<music21.instrument.Instrument PartA: : >, 
          <music21.instrument.Instrument PartB: : >, 
          <music21.clef.BassClef>, 
          <music21.clef.BassClef>, 
          <music21.meter.TimeSignature 2/4>, 
          <music21.meter.TimeSignature 2/4>, 
+         <music21.note.Note C>, 
          <music21.note.Note C#>]
-
-        Third note is alone:
-        
-        >>> n3 = score.flat.notes[2]
-        >>> sd[id(n3)]
-        []
-        
-        Fourth note has a friend:
-
-        >>> n4 = score.flat.notes[3]
-        >>> sd[id(n4)]
-        [<music21.note.Note G#>]
+        >>> sd[2.0]
+        [<music21.note.Note E>, <music21.note.Note G#>]
         '''
         simultaneityDict = {}
         for node in super(OffsetTree, self).__iter__():
             pl = node.payload
-            for el in pl:
-                payloadCopy = pl[:]
-                payloadCopy.remove(el) # hopefully not too slow...
-                simultaneityDict[id(el)] = payloadCopy
+            if len(pl) > 1:
+                simultaneityDict[node.position] = pl[:]
         return simultaneityDict
 
 

@@ -9086,11 +9086,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     def _findLayering(self):
         '''
-        Find any elements in an elementsSorted list that have simultaneities
-        or durations that cause overlaps.
+        Find any elements in an elementsSorted list that have 
+        durations that cause overlaps.
 
-        Returns two lists. Each list contains a list for each element in
-        elementsSorted. If that elements has overlaps or simultaneities,
+        Returns a lists that has elements with overlaps,
         all index values that match are included in that list.
 
         See testOverlaps, in unit tests, for examples.
@@ -9106,8 +9105,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # create a list with an entry for each element
         # in each entry, provide indices of all other elements that overalap
         overlapMap = [[] for dummy in range(len(durSpanSorted))]
-        # create a list of keys for events that start at the same time
-        simultaneityMap = [[] for dummy in range(len(durSpanSorted))]
 
         durSpanOverlapCache = {}
 
@@ -9120,10 +9117,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     continue # do not compare to self
                 dst = durSpanSorted[j]
                 # print(src, dst, self._durSpanOverlap(src, dst, includeEndBoundary))
-
-                # if start times are the same (rational comparison; no fudge needed)
-                if src[0] == dst[0]:
-                    simultaneityMap[i].append(j)
                 
                 # the current fractions.Fraction.__hash__ is EXTREMELY SLOW! so we
                 # construct our own hash key.  If we miss (as with '0.0' vs '0') it is not
@@ -9138,7 +9131,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     durSpanOverlapCache[hashKey] = durSpanResult
                     if durSpanResult:
                         overlapMap[i].append(j)
-        return simultaneityMap, overlapMap
+        return overlapMap
 
 
 
@@ -9159,49 +9152,51 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for i in range(len(layeringMap)):
             # print('examining i:', i)
             indices = layeringMap[i]
-            if len(indices) > 0:
-                srcOffset = flatStream[i].offset
-                srcElementObj = flatStream[i]
-                dstOffset = None
-                # print('found indices', indices)
-                # check indices
-                for j in indices: # indices of other elements tt overlap
-                    elementObj = flatStream[j]
-                    # check if this object has been stored anywhere yet
-                    # if so, use the offset of where it was stored to
-                    # to store the src element below
-                    store = True
-                    for k in post:
-                        # this comparison needs to be based on object id, not
-                        # matching equality
-                        if id(elementObj) in [id(e) for e in post[k]]:
-                        # if elementObj in post[key]:
-                            store = False
-                            dstOffset = k
-                            break
-                    if dstOffset is None:
-                        dstOffset = srcOffset
-                    if store:
-                        # print('storing offset', dstOffset)
-                        if dstOffset not in post:
-                            post[dstOffset] = [] # create dictionary entry
-                        post[dstOffset].append(elementObj)
+            if len(indices) == 0:
+                continue
 
+            srcElementObj = flatStream[i]
+            srcOffset = srcElementObj.offset
+            dstOffset = None
+            # print('found indices', indices)
+            # check indices
+            for j in indices: # indices of other elements that overlap
+                elementObj = flatStream[j]
                 # check if this object has been stored anywhere yet
+                # if so, use the offset of where it was stored to
+                # to store the src element below
                 store = True
                 for k in post:
-                    if id(srcElementObj) in [id(e) for e in post[k]]:
-                    #if srcElementObj in post[key]:
+                    # this comparison needs to be based on object id, not
+                    # matching equality
+                    if id(elementObj) in [id(e) for e in post[k]]:
+                    # if elementObj in post[key]:
                         store = False
+                        dstOffset = k
                         break
-                # dst offset may have been set when looking at indices
+                if dstOffset is None:
+                    dstOffset = srcOffset
                 if store:
-                    if dstOffset is None:
-                        dstOffset = srcOffset
+                    # print('storing offset', dstOffset)
                     if dstOffset not in post:
                         post[dstOffset] = [] # create dictionary entry
-                    # print('storing offset', dstOffset)
-                    post[dstOffset].append(srcElementObj)
+                    post[dstOffset].append(elementObj)
+
+            # check if this object has been stored anywhere yet
+            store = True
+            for k in post:
+                if id(srcElementObj) in [id(e) for e in post[k]]:
+                #if srcElementObj in post[key]:
+                    store = False
+                    break
+            # dst offset may have been set when looking at indices
+            if store:
+                if dstOffset is None:
+                    dstOffset = srcOffset
+                if dstOffset not in post:
+                    post[dstOffset] = [] # create dictionary entry
+                # print('storing offset', dstOffset)
+                post[dstOffset].append(srcElementObj)
         #print(post)
         return post
 
@@ -9265,34 +9260,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 self._cache["Gapless"] = False
                 return False
 
-    def getSimultaneous(self):
-        '''Find and return any elements that start at the same time.
-
-
-        >>> stream1 = stream.Stream()
-        >>> for x in range(4):
-        ...     n = note.Note('G#')
-        ...     n.offset = x * 0
-        ...     stream1.insert(n)
-        ...
-        >>> b = stream1.getSimultaneous()
-        >>> len(b[0]) == 4
-        True
-        >>> stream2 = stream.Stream()
-        >>> for x in range(4):
-        ...     n = note.Note('G#')
-        ...     n.offset = x * 3
-        ...     stream2.insert(n)
-        ...
-        >>> d = stream2.getSimultaneous()
-        >>> len(d) == 0
-        True
-        '''
-        simultaneityMap, unused_overlapMap = self._findLayering()
-
-        return self._consolidateLayering(simultaneityMap)
-
-
     def getOverlaps(self):
         '''
         Find any elements that overlap. Overlaping might include elements
@@ -9343,8 +9310,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         7
 
         '''
-        unused_simultaneityMap, overlapMap = self._findLayering()
-        #environLocal.printDebug(['simultaneityMap map', simultaneityMap])
+        overlapMap = self._findLayering()
         #environLocal.printDebug(['overlapMap', overlapMap])
 
         return self._consolidateLayering(overlapMap)
@@ -9377,7 +9343,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> a.isSequence()
         True
         '''
-        unused_simultaneityMap, overlapMap = self._findLayering()
+        overlapMap = self._findLayering()
         post = True
         for indexList in overlapMap:
             if indexList:
@@ -9411,25 +9377,34 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> print(st1.simultaneousAttacks(st2))
         [0.0, 3.0]
         '''
-        stream1Offsets = self.groupElementsByOffset()
-        stream2Offsets = stream2.groupElementsByOffset()
-
-        returnKey = {}
-
-        for thisList in stream1Offsets:
-            thisOffset = self.elementOffset(thisList[0])
-            returnKey[thisOffset] = 1
-
-        for thatList in stream2Offsets:
-            thatOffset = thatList[0].getOffsetBySite(stream2)
-            if thatOffset in returnKey:
-                returnKey[thatOffset] += 1
-
-        returnList = []
-        for foundOffset in sorted(returnKey):
-            if returnKey[foundOffset] >= 2:
-                returnList.append(foundOffset)
-        return returnList
+        sOuter = Stream()
+        for e in self:
+            sOuter._insertCore(e.offset, e)
+        for e in stream2:
+            sOuter._insertCore(e.offset, e)
+        sOuter.elementsChanged(updateIsFlat=False)
+        sOuterTree = sOuter.asTree(flatten=False, groupOffsets=True)
+        return sorted(sOuterTree.simultaneityDict().keys())
+#         
+#         stream1Offsets = self.groupElementsByOffset()
+#         stream2Offsets = stream2.groupElementsByOffset()
+# 
+#         returnKey = {}
+# 
+#         for thisList in stream1Offsets:
+#             thisOffset = self.elementOffset(thisList[0])
+#             returnKey[thisOffset] = 1
+# 
+#         for thatList in stream2Offsets:
+#             thatOffset = thatList[0].getOffsetBySite(stream2)
+#             if thatOffset in returnKey:
+#                 returnKey[thatOffset] += 1
+# 
+#         returnList = []
+#         for foundOffset in sorted(returnKey):
+#             if returnKey[foundOffset] >= 2:
+#                 returnList.append(foundOffset)
+#         return returnList
 
     def attachIntervalsBetweenStreams(self, cmpStream):
         '''
