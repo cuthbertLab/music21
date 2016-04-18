@@ -219,7 +219,7 @@ class StreamFreezer(StreamFreezeThawBase):
         self.topLevel = topLevel
         self.streamIds = streamIds
 
-        self.subStreamFreezers = {} # this will keep track of sub freezers for spanners and
+        self.subStreamFreezers = {} # this will keep track of sub freezers for spanners
         #
 
 

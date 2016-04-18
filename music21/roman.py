@@ -257,12 +257,12 @@ def figureFromChordAndKey(chordObj, keyObj=None):
                 alterStr = ''  # alterStr[1:]
             elif chordObj.isMinorTriad() and alter > 0:
                 alterStr = ''  # alterStr[1:]
-        elif (diatonicIntervalNum != 1 and 
-              pitchObj is fifth and
-              chordObj.isDiminishedTriad() or 
-              chordObj.isAugmentedTriad() or
-              chordObj.isMajorTriad() or 
-              chordObj.isMinorTriad()):
+        elif (diatonicIntervalNum != 1 
+              and pitchObj is fifth 
+              and chordObj.isDiminishedTriad() 
+                  or chordObj.isAugmentedTriad() 
+                  or chordObj.isMajorTriad() 
+                  or chordObj.isMinorTriad()):
             alterStr = ''  # alterStr[1:]
 
         if diatonicIntervalNum == 1:
@@ -465,9 +465,9 @@ def romanInversionName(inChord):
             return '42'
         else:
             return ''
-    elif (inChord.isTriad() or
-            inChord.isIncompleteMajorTriad() or
-            inChord.isIncompleteMinorTriad()):
+    elif (inChord.isTriad()
+            or inChord.isIncompleteMajorTriad()
+            or inChord.isIncompleteMinorTriad()):
         if inv == 0:
             return ''  # not 53
         elif inv == 1:
@@ -1361,8 +1361,8 @@ class RomanNumeral(harmony.Harmony):
         self.frontAlterationAccidental = frontAlterationAccidental
 
         romanNumeralAlone = ''
-        if (not self._romanNumeralAloneRegex.match(workingFigure) and 
-            not self._augmentedSixthRegex.match(workingFigure)):
+        if (not self._romanNumeralAloneRegex.match(workingFigure)
+                and not self._augmentedSixthRegex.match(workingFigure)):
             raise RomanException('No roman numeral found in {!r}'.format(
                 workingFigure))
         elif self._augmentedSixthRegex.match(workingFigure):
@@ -1398,10 +1398,10 @@ class RomanNumeral(harmony.Harmony):
         workingFigure = self._setImpliedQualityFromString(workingFigure)
 
         # Make vii always #vii and vi always #vi.
-        if (getattr(useScale, 'mode', None) == 'minor' and
-                self.caseMatters):
-            if ((self.scaleDegree == 6 or self.scaleDegree == 7) and 
-                    self.impliedQuality in ('minor', 'diminished', 'half-diminished')):
+        if (getattr(useScale, 'mode', None) == 'minor'
+                and self.caseMatters):
+            if ((self.scaleDegree == 6 or self.scaleDegree == 7) 
+                    and self.impliedQuality in ('minor', 'diminished', 'half-diminished')):
                 if (self.frontAlterationTransposeInterval):
                     self.frontAlterationTransposeInterval = interval.add(
                                                              [self.frontAlterationTransposeInterval,
@@ -1666,9 +1666,9 @@ class RomanNumeral(harmony.Harmony):
             pass # None
             # cache object if passed directly
         self._scale = keyOrScale
-        if (keyOrScale is None or 
-                (hasattr(keyOrScale, "isConcrete") and
-                 not keyOrScale.isConcrete)):
+        if (keyOrScale is None
+                or (hasattr(keyOrScale, "isConcrete")
+                and not keyOrScale.isConcrete)):
             self.useImpliedScale = True
             if self._scale is not None:
                 self.impliedScale = self._scale.derive(1, 'C')

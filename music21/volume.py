@@ -250,8 +250,8 @@ class Volume(SlottedObject):
                 am = None
                 if common.isIterable(useArticulations):
                     am = useArticulations
-                elif (hasattr(useArticulations, 'classes') and 
-                        'Articulation' in useArticulations.classes):
+                elif (hasattr(useArticulations, 'classes')
+                       and 'Articulation' in useArticulations.classes):
                     am = [useArticulations] # place in a list
                 elif self.client is not None:
                     am = self.client.articulations

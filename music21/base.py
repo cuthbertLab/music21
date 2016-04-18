@@ -1216,11 +1216,11 @@ class Music21Object(object):
             siteTree = site.asTree(flatten=flatten, classList=className)
             if 'Offset' in getElementMethod:
                 # these methods match only by offset.  Used in .getBeat among other places
-                if (('At' in getElementMethod and 'Before' in getElementMethod) or
-                    ('At' not in getElementMethod and 'After' in getElementMethod)):
+                if (('At' in getElementMethod and 'Before' in getElementMethod)
+                        or ('At' not in getElementMethod and 'After' in getElementMethod)):
                     positionStart = ZeroSortTupleHigh.modify(offset=positionStart.offset)
-                elif (('At' in getElementMethod and 'After' in getElementMethod) or 
-                      ('At' not in getElementMethod and 'Before' in getElementMethod)):
+                elif (('At' in getElementMethod and 'After' in getElementMethod)
+                        or ('At' not in getElementMethod and 'Before' in getElementMethod)):
                     positionStart = ZeroSortTupleLow.modify(offset=positionStart.offset)
                 else:
                     raise Music21Exception(
@@ -2373,8 +2373,8 @@ class Music21Object(object):
         else:
             isNotGrace = 1
 
-        if (useSite is not False and
-                self.sites.hasSiteId(id(useSite))):
+        if (useSite is not False
+                and self.sites.hasSiteId(id(useSite))):
             insertIndex = self.sites.siteDict[id(useSite)].globalSiteIndex
         elif self.activeSite is not None:
             insertIndex = self.sites.siteDict[id(self.activeSite)].globalSiteIndex
@@ -2843,8 +2843,8 @@ class Music21Object(object):
 
         # some higher-level classes need this functionality
         # set ties
-        if addTies and ('Note' in e.classes or
-            'Unpitched' in e.classes):
+        if addTies and ('Note' in e.classes
+                        or 'Unpitched' in e.classes):
 
             forceEndTieType = 'stop'
             if e.tie is not None:

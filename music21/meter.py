@@ -380,8 +380,9 @@ def bestTimeSignature(meas):
     for e in meas.recurse().notesAndRests:
         if e.quarterLength == 0.0:
             continue # case of grace durations
-        if (e.quarterLength < minDurQL and 
-                not isinstance(opFrac(e.quarterLength), fractions.Fraction)): # no non-power2 sigs
+        if (e.quarterLength < minDurQL
+                and not isinstance(opFrac(e.quarterLength), fractions.Fraction)): 
+            # no non-power2 sigs
             minDurQL = e.quarterLength
             if e.duration.dots > 0:
                 minDurDotted = True
@@ -400,8 +401,8 @@ def bestTimeSignature(meas):
         while i > 0:
             partsFloor = int(sumDurQL / minDurTest)
             partsReal = opFrac(sumDurQL / float(minDurTest))
-            if (partsFloor == partsReal or
-                minDurTest <= duration.typeToDuration[MIN_DENOMINATOR_TYPE]):
+            if (partsFloor == partsReal
+                    or minDurTest <= duration.typeToDuration[MIN_DENOMINATOR_TYPE]):
                 break
             # need to break down minDur until we can get a match
             else:
@@ -598,8 +599,8 @@ class MeterTerminal(SlottedObject):
 # #         if not isinstnace(other, MeterTerminal):
 # #             return False
 #         if other is None: return False
-#         if (other.numerator == self.numerator and
-#             other.denominator == self.denominator):
+#         if (other.numerator == self.numerator
+#             and other.denominator == self.denominator):
 #             return True
 #         else:
 #             return False
@@ -610,8 +611,8 @@ class MeterTerminal(SlottedObject):
 # #         if not isinstnace(other, MeterTerminal):
 # #             return True
 #         if other is None: return True
-#         if (other.numerator == self.numerator and
-#             other.denominator == self.denominator):
+#         if (other.numerator == self.numerator
+#             and other.denominator == self.denominator):
 #             return False
 #         else:
 #             return True
@@ -635,8 +636,8 @@ class MeterTerminal(SlottedObject):
         '''
         if other is None: 
             return False
-        if (other.numerator == self.numerator and
-            other.denominator == self.denominator):
+        if (other.numerator == self.numerator
+                and other.denominator == self.denominator):
             return True
         else:
             return False
@@ -1615,9 +1616,8 @@ class MeterSequence(MeterTerminal):
         >>> str(a)
         '{1/2+1/2}'
         '''
-        if (self.numerator == other.numerator and
-            self.denominator == other.denominator):
-
+        if (self.numerator == other.numerator
+                and self.denominator == other.denominator):
             targetWeight = self.weight
             self._clearPartition()
             for mt in other:
@@ -2884,8 +2884,8 @@ class TimeSignature(base.Music21Object):
         '''
         if other is None: 
             return False
-        if (other.numerator == self.numerator and
-            other.denominator == self.denominator):
+        if (other.numerator == self.numerator
+                and other.denominator == self.denominator):
             return True
         else:
             return False
@@ -3052,12 +3052,12 @@ class TimeSignature(base.Music21Object):
 
         # used for drawing the time signature symbol
         # this is the only one that can be  unlinked
-        if (isinstance(value, six.string_types) and 
-                value.lower() in ('common', 'c')):
+        if (isinstance(value, six.string_types)
+                and value.lower() in ('common', 'c')):
             value = '4/4'
             self.symbol = 'common'
-        elif (isinstance(value, six.string_types) and 
-                value.lower() in ('cut', 'allabreve')): 
+        elif (isinstance(value, six.string_types)
+                and value.lower() in ('cut', 'allabreve')): 
             # allaBreve is the capella version
             value = '2/2'
             self.symbol = 'cut'
@@ -3686,8 +3686,8 @@ class TimeSignature(base.Music21Object):
 
                 # watch for a special case where a duration completely fills
                 # the archetype; this generally should not be beamed
-                if (start == archetypeSpan[0] and
-                    end == archetypeSpan[1]):
+                if (start == archetypeSpan[0]
+                        and end == archetypeSpan[1]):
                     # increment position and continue loop
                     beamsList[i] = None # replace with None!
                     pos += dur.quarterLength
@@ -3697,15 +3697,15 @@ class TimeSignature(base.Music21Object):
                 if i == 0: # if the first, we always start
                     beamType = 'start'
                     # get a partial beam if we cannot continue this
-                    if (beamNext is None or
-                        beamNumber not in beamNext.getNumbers()):
+                    if (beamNext is None
+                            or beamNumber not in beamNext.getNumbers()):
                         beamType = 'partial-right'
 
                 elif i == len(durList) - 1: # last is always stop
                     beamType = 'stop'
                     # get a partial beam if we cannot come form a beam
-                    if (beamPrevious is None or
-                        beamNumber not in beamPrevious.getNumbers()):
+                    if (beamPrevious is None
+                            or beamNumber not in beamPrevious.getNumbers()):
                         #environLocal.printDebug(
                         #   ['triggering partial left where a stop normally falls'])
                         beamType = 'partial-left'
@@ -3741,26 +3741,26 @@ class TimeSignature(base.Music21Object):
 
                 # last beams was active, last beamNumber was active,
                 # and it was stopped or was a partial-left
-                elif (beamPrevious is not None and
-                      beamNumber in beamPrevious.getNumbers() and 
-                      beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left'] and
-                      beamNext is not None):
+                elif (beamPrevious is not None
+                      and beamNumber in beamPrevious.getNumbers()
+                      and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left']
+                      and beamNext is not None):
                     beamType = 'start'
 
 
                 # last note had beams but stopped, next note cannot be beamed to  
                 # was active, last beamNumber was active,
                 # and it was stopped or was a partial-left
-                elif (beamPrevious is not None and
-                      beamNumber in beamPrevious.getNumbers() and 
-                      beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left'] and
-                      beamNext is None):
+                elif (beamPrevious is not None
+                      and beamNumber in beamPrevious.getNumbers()
+                      and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left']
+                      and beamNext is None):
                     beamType = 'partial-left'  # will be deleted later in the script
                     
                 # if no beam is defined next (we know this already)
                 # then must stop
-                elif (beamNext is None or
-                    beamNumber not in beamNext.getNumbers()):
+                elif (beamNext is None
+                      or beamNumber not in beamNext.getNumbers()):
                     beamType = 'stop'
 
                 # the last cases are when to stop, or when to continue

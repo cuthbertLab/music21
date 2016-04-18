@@ -868,17 +868,17 @@ class VoiceLeadingQuartet(base.Music21Object):
         if self.noMotion():
             return False
 
-        if (self.hIntervals[0].generic.undirected == 3 and 
-                self.hIntervals[1].generic.undirected == 3 and 
-                self.contraryMotion()):
+        if (self.hIntervals[0].generic.undirected == 3 
+                and self.hIntervals[1].generic.undirected == 3 
+                and self.contraryMotion()):
             return False
 
         if self.hIntervals[0].generic.isSkip:
-            return not (self.hIntervals[1].generic.isDiatonicStep or 
-                        self.hIntervals[1].generic.isUnison)
+            return not (self.hIntervals[1].generic.isDiatonicStep
+                        or self.hIntervals[1].generic.isUnison)
         elif self.hIntervals[1].generic.isSkip:
-            return not (self.hIntervals[0].generic.isDiatonicStep or 
-                        self.hIntervals[0].generic.isUnison)
+            return not (self.hIntervals[0].generic.isDiatonicStep
+                        or self.hIntervals[0].generic.isUnison)
         else:
             return False
 
@@ -922,10 +922,10 @@ class VoiceLeadingQuartet(base.Music21Object):
         r1 = roman.identifyAsTonicOrDominant(c1, self.key)
         r2 = roman.identifyAsTonicOrDominant(c2, self.key)
         openings = ['P1','P5', 'I', 'V']
-        return not ( (self.vIntervals[0].simpleName in openings or 
-                        self.vIntervals[1].simpleName in openings) and
-                      (r1[0].upper() in openings if r1 is not False else False or 
-                       r2[0].upper() in openings if r2 is not False else False) )
+        return not ( (self.vIntervals[0].simpleName in openings
+                        or self.vIntervals[1].simpleName in openings)
+                      and (r1[0].upper() in openings if r1 is not False else False
+                           or r2[0].upper() in openings if r2 is not False else False) )
 
     def closesIncorrectly(self):
         '''
@@ -963,10 +963,11 @@ class VoiceLeadingQuartet(base.Music21Object):
             raisedMinorCorrectly = True
         preclosings = [6,3]
         closingPitches = [self.v1n2.pitch.name, self.v2n2.name]
-        return not ( self.vIntervals[0].generic.simpleUndirected in preclosings and
-            self.vIntervals[1].generic.simpleUndirected == 1 and raisedMinorCorrectly and
-             self.key.pitchFromDegree(1).name in closingPitches and
-             self.contraryMotion())
+        return not ( self.vIntervals[0].generic.simpleUndirected in preclosings 
+                     and self.vIntervals[1].generic.simpleUndirected == 1 
+                     and raisedMinorCorrectly 
+                     and self.key.pitchFromDegree(1).name in closingPitches 
+                     and self.contraryMotion())
 
 class VoiceLeadingQuartetException(exceptions21.Music21Exception):
     pass
@@ -1497,10 +1498,10 @@ class VerticalityTriplet(VerticalityNTuplet):
                 ret = ret and (self.tnlsDict[partNumToIdentify].n2.beatStrength < 0.5)
             except (AttributeError, NameError, base.Music21ObjectException):
                 pass
-        if (ret and 
-                self.chordList[0].isConsonant() and 
-                not self.chordList[1].isConsonant() and 
-                self.chordList[2].isConsonant()):
+        if (ret
+                and self.chordList[0].isConsonant()
+                and not self.chordList[1].isConsonant()
+                and self.chordList[2].isConsonant()):
             return True
         else:
             return False
@@ -1859,12 +1860,13 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         False
         '''
 
-        return (self._isComplete() and ((self.iLeft.generic.undirected == 2 or 
-                                         self.iLeft.generic.undirected == 1) and
-            (self.iRight.generic.undirected == 2 or self.iRight.generic.undirected == 1) and
-            self.iLeft.generic.undirected * self.iRight.generic.undirected == 2 and
-            self.iLeft.isChromaticStep and self.iRight.isChromaticStep and
-            self.iLeft.direction * self.iRight.direction == 1))
+        return (self._isComplete() 
+            and ((self.iLeft.generic.undirected == 2 or self.iLeft.generic.undirected == 1)
+                and (self.iRight.generic.undirected == 2 or self.iRight.generic.undirected == 1)
+                and self.iLeft.generic.undirected * self.iRight.generic.undirected == 2
+                and self.iLeft.isChromaticStep 
+                and self.iRight.isChromaticStep
+                and self.iLeft.direction * self.iRight.direction == 1))
 
     def couldBeNeighborTone(self):
         '''
@@ -1905,9 +1907,11 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         False
         '''
 
-        return (self._isComplete() and self.n1.nameWithOctave == self.n3.nameWithOctave and 
-            self.iLeft.chromatic.undirected == 2 and self.iRight.chromatic.undirected == 2 and 
-            (self.iLeft.direction * self.iRight.direction == -1))
+        return (self._isComplete() 
+            and self.n1.nameWithOctave == self.n3.nameWithOctave 
+            and self.iLeft.chromatic.undirected == 2 
+            and self.iRight.chromatic.undirected == 2 
+            and self.iLeft.direction * self.iRight.direction == -1)
 
 
     def couldBeChromaticNeighborTone(self):
@@ -1924,9 +1928,11 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         >>> voiceLeading.ThreeNoteLinearSegment('C#3','D3','D-3').couldBeChromaticNeighborTone()
         False
         '''
-        return (self._isComplete() and (self.n1.nameWithOctave == self.n3.nameWithOctave and 
-            self.iLeft.isChromaticStep and self.iRight.isChromaticStep and 
-            (self.iLeft.direction * self.iRight.direction ==  -1)))
+        return (self._isComplete() 
+            and (self.n1.nameWithOctave == self.n3.nameWithOctave 
+                 and self.iLeft.isChromaticStep 
+                 and self.iRight.isChromaticStep 
+                 and (self.iLeft.direction * self.iRight.direction ==  -1)))
 
 ### Below: beginnings of an implementation for any object segments, 
 ### such as two chord linear segments

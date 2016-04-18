@@ -1320,8 +1320,8 @@ class RepeatBracket(Spanner):
                 
                 # returns bool 
                 self._numberSpanIsContiguous = common.contiguousList(self._numberRange)
-                if ((len(self._numberRange) == 2) and 
-                        (self._numberRange[0] == self._numberRange[1] - 1)):
+                if ((len(self._numberRange) == 2)
+                        and (self._numberRange[0] == self._numberRange[1] - 1)):
                     self._numberSpanIsAdjacent = True
                 else:
                     self._numberSpanIsAdjacent = False

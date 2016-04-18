@@ -465,9 +465,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         are we going to get the new stream's elements' offsets from? why
         from their active sites! So don't do this!
         '''
-        if (not common.isListLike(value) and 
-                hasattr(value, 'isStream') and
-                value.isStream):
+        if (not common.isListLike(value)
+                and hasattr(value, 'isStream') 
+                and value.isStream):
             # set from a Stream. Best way to do it
             self._offsetDict = {}
             self._elements = list(value._elements) # copy list.
@@ -4169,8 +4169,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             if searchActiveSite:
                 #if isinstance(self.activeSite, Stream) and self.activeSite != self:
-                if (self.activeSite is not None and self.activeSite.isStream and
-                    self.activeSite is not self):
+                if (self.activeSite is not None 
+                    and self.activeSite.isStream
+                    and self.activeSite is not self):
                     #environLocal.printDebug(['searching activeSite Stream',
                     #    self, self.activeSite])
                     instObj = self.activeSite.getInstrument(
@@ -5350,9 +5351,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else: # place in a single flat Stream
             post.elementsChanged()
 
-        if (hasattr(returnObj, 'metadata') and 
-                returnObj.metadata is not None and 
-                returnObj.hasPartLikeStreams() is True):
+        if (hasattr(returnObj, 'metadata') 
+                and returnObj.metadata is not None 
+                and returnObj.hasPartLikeStreams() is True):
             post.insert(0, returnObj.metadata)
         return post
 
@@ -5823,10 +5824,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if m.keySignature is not None:
                     ksLast = m.keySignature
                 if i > 0 and m.keySignature is None:
-                    if (measureStream[i-1] and 
-                            hasattr(measureStream[i-1][-1], "tie") and 
-                            measureStream[i-1][-1].tie is not None and 
-                            measureStream[i-1][-1].tie.type != 'stop'):
+                    if (measureStream[i-1] 
+                            and hasattr(measureStream[i-1][-1], "tie") 
+                            and measureStream[i-1][-1].tie is not None 
+                            and measureStream[i-1][-1].tie.type != 'stop'):
                         lastNoteWasTied = True
                     else:
                         lastNoteWasTied = False
@@ -6080,8 +6081,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
             # see if we have a tie and it is started
             # a start typed tie may not be a true start tie
-            if (hasattr(n, 'tie') and n.tie is not None and
-                n.tie.type == 'start'):
+            if (hasattr(n, 'tie') 
+                    and n.tie is not None 
+                    and n.tie.type == 'start'):
                 # find a true start, add to known connected positions
                 if iLast is None or iLast not in posConnected:
                     posConnected = [i] # reset list with start
@@ -6092,8 +6094,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # a connection has been started or continued, so no endMatch
                 endMatch = False
 
-            elif (hasattr(n, 'tie') and n.tie is not None and
-                n.tie.type == 'continue'):
+            elif (hasattr(n, 'tie') 
+                  and n.tie is not None
+                  and n.tie.type == 'continue'):
                 # a continue always implies a connection
                 posConnected.append(i)
                 endMatch = False
@@ -6101,8 +6104,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # establish end condition
             if endMatch is None: # not yet set, not a start or continue
                 # ties tell us when the are ended
-                if (hasattr(n, 'tie') and n.tie is not None
-                    and n.tie.type == 'stop'):
+                if (hasattr(n, 'tie') 
+                        and n.tie is not None
+                        and n.tie.type == 'stop'):
                     endMatch = True
                 # if we cannot find a stop tie, see if last note was connected
                 # and this and the last note are the same pitch; this assumes
@@ -6782,8 +6786,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 #elif (hasattr(e, 'elements') and e.activeSite is not None
                 #    and hasattr(e.activeSite, 'elements')):
 
-                elif (e.isStream and e.activeSite is not None and
-                    e.activeSite.isStream and 'SpannerStorage' not in e.classes):
+                elif (e.isStream 
+                      and e.activeSite is not None 
+                      and e.activeSite.isStream 
+                      and 'SpannerStorage' not in e.classes):
                     # this returns a generator, so need to iterate over it
                     # to get results
                     # e.activeSite will be yielded at top of recurse
@@ -8051,9 +8057,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         o = -1 * o
                     unused_error, oNew, signedError = bestMatch(float(o), quarterLengthDivisors)
                     useStream.setElementOffset(e, oNew * sign)
-                    if (hasattr(e, 'editorial') and 
-                            hasattr(e.editorial, 'misc') and 
-                            signedError != 0):
+                    if (hasattr(e, 'editorial') 
+                            and hasattr(e.editorial, 'misc') 
+                            and signedError != 0):
                         e.editorial.misc['offsetQuantizationError'] = signedError * sign
                 if processDurations:
                     if e.duration is not None:
@@ -8063,9 +8069,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         unused_error, qlNew, signedError = bestMatch(
                                                             float(ql), quarterLengthDivisors)
                         e.duration.quarterLength = qlNew
-                        if (hasattr(e, 'editorial') and 
-                                hasattr(e.editorial, 'misc') and 
-                                signedError != 0):
+                        if (hasattr(e, 'editorial')
+                                and hasattr(e.editorial, 'misc') 
+                                and signedError != 0):
                             e.editorial.misc['quarterLengthQuantizationError'] = signedError
 
         if inPlace is False:
@@ -8483,8 +8489,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     
                     # if components are streams of Notes or Measures,
                     # than assume this is like a Part
-                    elif (obj.iter.getElementsByClass('Measure') or 
-                          obj.iter.notesAndRests):
+                    elif (obj.iter.getElementsByClass('Measure')
+                          or obj.iter.notesAndRests):
                         multiPart = True
             self._cache['hasPartLikeStreams'] = multiPart
         return self._cache['hasPartLikeStreams']
@@ -8860,17 +8866,18 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         for v in vGroups:
             for e in v.elements:
-                if (lastWasNone is False and skipGaps is False and
-                    e.offset > lastEnd):
+                if (lastWasNone is False 
+                        and skipGaps is False 
+                        and e.offset > lastEnd):
                     if not noNone:
                         returnList.append(None)
                         lastWasNone = True
                 if hasattr(e, "pitch"):
-                    #if (skipUnisons is False or isinstance(lastPitch, list) or
-                    if (skipUnisons is False or isinstance(lastPitch, tuple) or
-                        lastPitch is None or
-                        e.pitch.pitchClass != lastPitch.pitchClass or
-                        (skipOctaves is False and e.pitch.ps != lastPitch.ps)):
+                    #if (skipUnisons is False or isinstance(lastPitch, list)
+                    if (skipUnisons is False or isinstance(lastPitch, tuple)
+                            or lastPitch is None
+                            or e.pitch.pitchClass != lastPitch.pitchClass
+                            or (skipOctaves is False and e.pitch.ps != lastPitch.ps)):
                         if getOverlaps is True or e.offset >= lastEnd:
                             if e.offset >= lastEnd:  # is not an overlap...
                                 lastStart = e.offset
@@ -8896,8 +8903,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         #environLocal.printDebug(['e.pitches', e, e.pitches])
                         #environLocal.printDebug(['lastPitch', lastPitch])
 
-                        if (skipUnisons is True and isinstance(lastPitch, list) and
-                            e.pitches[0].ps == lastPitch[0].ps):
+                        if (skipUnisons is True 
+                                and isinstance(lastPitch, list) 
+                                and e.pitches[0].ps == lastPitch[0].ps):
                             pass
                         else:
                             if getOverlaps is True or e.offset >= lastEnd:
@@ -8915,8 +8923,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                     pass
                                 returnList.append(e)
 
-                elif (skipRests is False and isinstance(e, note.Rest) and
-                    lastWasNone is False):
+                elif (skipRests is False 
+                      and isinstance(e, note.Rest) 
+                      and lastWasNone is False):
                     if noNone is False:
                         returnList.append(None)
                         lastWasNone = True
@@ -9494,9 +9503,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         currentObject = notes[0]
         previousObject = None
         while currentObject is not None:
-            if (previousObject is not None and 
-                  "Note" in currentObject.classes and 
-                  "Note" in previousObject.classes):
+            if (previousObject is not None 
+                    and "Note" in currentObject.classes 
+                    and "Note" in previousObject.classes):
                 currentObject.editorial.melodicInterval = interval.notesToInterval(
                                                                 previousObject, currentObject)
             previousObject = currentObject
@@ -11135,8 +11144,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 eclasses = e.classes
                 if "Variant" in eclasses:
                     elementGroups = e.groups
-                    if (not( variantGroup in elementGroups ) or 
-                            e.lengthType in ['elongation', 'deletion']):
+                    if (not( variantGroup in elementGroups )
+                            or e.lengthType in ['elongation', 'deletion']):
                         newPart.remove(e)
                     else:
                         expressedVariantsExist = True
@@ -11972,10 +11981,10 @@ class Part(Stream):
             # measure for context
             if i > 0:
                 pitchPastMeasure = measureStream[i-1].pitches
-                if (measureStream[i-1] and
-                        hasattr(measureStream[i-1][-1], "tie") and
-                        measureStream[i-1][-1].tie is not None and
-                        measureStream[i-1][-1].tie.type != 'stop'
+                if (measureStream[i-1] 
+                        and hasattr(measureStream[i-1][-1], "tie") 
+                        and measureStream[i-1][-1].tie is not None 
+                        and measureStream[i-1][-1].tie.type != 'stop'
                     ):
                     lastNoteWasTied = True
                 else:

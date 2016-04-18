@@ -1784,8 +1784,8 @@ class PartExporter(XMLExporterBase):
         if firstInstId in instIdList or firstInstId is None: # must have unique ids 
             self.firstInstrumentObject.partIdRandomize() # set new random id
 
-        if (self.firstInstrumentObject.midiChannel == None or
-            self.firstInstrumentObject.midiChannel in self.midiChannelList):
+        if (self.firstInstrumentObject.midiChannel == None
+            or self.firstInstrumentObject.midiChannel in self.midiChannelList):
             try:
                 self.firstInstrumentObject.autoAssignMidiChannel(usedChannels=self.midiChannelList)
             except exceptions21.InstrumentException as e:
@@ -2509,21 +2509,21 @@ class MeasureExporter(XMLExporterBase):
             
         # notehead
         foundANotehead = False
-        if (hasattr(n, 'notehead') and 
+        if (hasattr(n, 'notehead') 
                 # TODO: restore... needed for complete compatibility with toMxObjects...
-                (n.notehead != 'normal' or  
-                 n.noteheadFill is not None or
-                 n.color not in (None, ''))
+            and (n.notehead != 'normal'
+                 or n.noteheadFill is not None
+                 or n.color not in (None, ''))
             ):
             foundANotehead = True
             mxNotehead = self.noteheadToXml(n)
             mxNote.append(mxNotehead)
         if foundANotehead is False and chordParent is not None:
-            if (hasattr(chordParent, 'notehead') and 
+            if (hasattr(chordParent, 'notehead')
                     # TODO: restore... needed for complete compatibility with toMxObjects...
-                    (chordParent.notehead != 'normal' or 
-                     chordParent.noteheadFill is not None or
-                     chordParent.color not in (None, ''))
+                and (chordParent.notehead != 'normal'
+                     or chordParent.noteheadFill is not None
+                     or chordParent.color not in (None, ''))
                 ):
                 mxNotehead = self.noteheadToXml(chordParent)
                 mxNote.append(mxNotehead)

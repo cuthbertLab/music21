@@ -465,8 +465,8 @@ def makeMeasures(
             raise stream.StreamException(
                 'failed to find TimeSignature in meterStream; ' +
                 'cannot process Measures')
-        if (thisTimeSignature is not lastTimeSignature and
-                thisTimeSignature is not None):
+        if (thisTimeSignature is not lastTimeSignature
+                and thisTimeSignature is not None):
             lastTimeSignature = thisTimeSignature
             # this seems redundant
             #lastTimeSignature = meterStream.getElementAtOrBefore(o)
@@ -973,8 +973,8 @@ def makeTies(
             else:  # get the last encountered meter
                 ts = meterStream.getElementAtOrBefore(mNext.offset)
             # only copy and assign if not the same as the last
-            if (lastTimeSignature is not None and
-                    not lastTimeSignature.ratioEqual(ts)):
+            if (lastTimeSignature is not None
+                    and not lastTimeSignature.ratioEqual(ts)):
                 mNext.timeSignature = copy.deepcopy(ts)
             # increment measure number
             mNext.number = m.number + 1

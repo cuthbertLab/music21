@@ -392,8 +392,8 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                 # if this measure number is more than 1 greater than the last
                 # defined measure number, and the previous chord is not None, 
                 # then fill with copies of the last-defined measure
-                if ((t.number[0] > lastMeasureNumber + 1) and 
-                    (previousRn is not None)):
+                if ((t.number[0] > lastMeasureNumber + 1)
+                        and (previousRn is not None)):
                     for i in range(lastMeasureNumber + 1, t.number[0]):
                         mFill = stream.Measure()
                         mFill.number = i
@@ -457,9 +457,9 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                     setKeyChangeToken = False 
                     
                     for i, a in enumerate(t.atoms):
-                        if (isinstance(a, rtObjects.RTKey) or
-                            ((foundAKeySignatureSoFar == False) and
-                             (isinstance(a, rtObjects.RTAnalyticKey)))): 
+                        if (isinstance(a, rtObjects.RTKey)
+                            or (foundAKeySignatureSoFar == False
+                                and isinstance(a, rtObjects.RTAnalyticKey))): 
                             # found a change of Key+KeySignature or
                             # just found a change of analysis but no keysignature so far
                     
@@ -513,8 +513,9 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                     "cannot properly get an offset from " + 
                                     "beat data {0}".format(a.src) + 
                                     "under timeSignature {0} in line {1}".format(tsCurrent, t.src))
-                            if (previousChordInMeasure is None and 
-                                previousRn is not None and o > 0):
+                            if (previousChordInMeasure is None
+                                    and previousRn is not None 
+                                    and o > 0):
                                 # setting a new beat before giving any chords
                                 firstChord = copy.deepcopy(previousRn)
                                 firstChord.quarterLength = o
@@ -632,9 +633,9 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
                                 else:
                                     rtt = RomanTextUnprocessedToken(a)
                                     m._insertCore(o, rtt)
-                            elif (tsCurrent is not None and 
-                                    (tsCurrent.barDuration.quarterLength == o or 
-                                     i == numberOfAtoms - 1)):
+                            elif (tsCurrent is not None 
+                                    and (tsCurrent.barDuration.quarterLength == o 
+                                         or i == numberOfAtoms - 1)):
                                 if isinstance(a, rtObjects.RTRepeatStop):
                                     m.rightBarline = bar.Repeat(direction='end')
                                 else:

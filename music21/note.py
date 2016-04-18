@@ -345,8 +345,8 @@ class GeneralNote(base.Music21Object):
                 # only apply default if components are empty
                 # looking at currentComponents so as not to trigger
                 # _updateComponents
-                if (tempDuration.quarterLength == 0 and
-                    len(tempDuration.currentComponents()) == 0):
+                if (tempDuration.quarterLength == 0
+                        and len(tempDuration.currentComponents()) == 0):
                     tempDuration.quarterLength = 1.0                
         else:
             tempDuration = keywords['duration']
