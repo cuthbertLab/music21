@@ -1113,10 +1113,10 @@ class Verticality(base.Music21Object):
         '''
         pitches = []
         for el in self.objects:
-            if el.isClassOrSubclass(['Chord']):
+            if 'Chord' in el.classes:
                 for x in el.pitches:
                     pitches.append(x.nameWithOctave)
-            elif el.isClassOrSubclass(['Note']):
+            elif 'Note' in el.classes:
                 pitches.append(el)
         return chord.Chord(pitches)
 

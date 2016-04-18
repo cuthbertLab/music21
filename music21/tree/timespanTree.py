@@ -256,6 +256,9 @@ class TimespanTree(trees.OffsetTree):
         >>> timespan.part
         <music21.stream.Part Soprano>
         '''
+        from music21 import stream
+        if classList is None:
+            classList = (stream.Part,)
         if not isinstance(pitchedTimespan, spans.PitchedTimespan):
             message = 'PitchedTimespan {!r}, must be an PitchedTimespan'.format(pitchedTimespan)
             raise TimespanTreeException(message)
@@ -297,6 +300,9 @@ class TimespanTree(trees.OffsetTree):
         >>> timespan.part
         <music21.stream.Part Bass>
         '''
+        from music21 import stream
+        if classList is None:
+            classList = (stream.Part,)
         if not isinstance(pitchedTimespan, spans.PitchedTimespan):
             message = 'PitchedTimespan {!r}, must be an PitchedTimespan'.format(
                 pitchedTimespan)
@@ -342,66 +348,65 @@ class TimespanTree(trees.OffsetTree):
         >>> for subsequence in scoreTree.iterateConsonanceBoundedVerticalities():
         ...     print('Subequence:')
         ...     for verticality in subsequence:
-        ...         print('\t[{}] {}: {} [{}]'.format(
+        ...         print('\t[{}] {}: {}'.format(
         ...             verticality.measureNumber,
         ...             verticality,
         ...             verticality.isConsonant,
-        ...             verticality.beatStrength,
         ...             ))
         ...
         Subequence:
-            [2] <Verticality 6.0 {E3 E4 G#4 B4}>: True [0.25]
-            [2] <Verticality 6.5 {E3 D4 G#4 B4}>: False [0.125]
-            [2] <Verticality 7.0 {A2 C#4 E4 A4}>: True [0.5]
+            [2] <Verticality 6.0 {E3 E4 G#4 B4}>: True
+            [2] <Verticality 6.5 {E3 D4 G#4 B4}>: False
+            [2] <Verticality 7.0 {A2 C#4 E4 A4}>: True
         Subequence:
-            [3] <Verticality 9.0 {F#3 C#4 F#4 A4}>: True [1.0]
-            [3] <Verticality 9.5 {B2 D4 G#4 B4}>: False [0.125]
-            [3] <Verticality 10.0 {C#3 C#4 E#4 G#4}>: True [0.25]
+            [3] <Verticality 9.0 {F#3 C#4 F#4 A4}>: True
+            [3] <Verticality 9.5 {B2 D4 G#4 B4}>: False
+            [3] <Verticality 10.0 {C#3 C#4 E#4 G#4}>: True
         Subequence:
-            [3] <Verticality 10.0 {C#3 C#4 E#4 G#4}>: True [0.25]
-            [3] <Verticality 10.5 {C#3 B3 E#4 G#4}>: False [0.125]
-            [3] <Verticality 11.0 {F#2 A3 C#4 F#4}>: True [0.5]
+            [3] <Verticality 10.0 {C#3 C#4 E#4 G#4}>: True
+            [3] <Verticality 10.5 {C#3 B3 E#4 G#4}>: False
+            [3] <Verticality 11.0 {F#2 A3 C#4 F#4}>: True
         Subequence:
-            [3] <Verticality 12.0 {F#3 C#4 F#4 A4}>: True [0.25]
-            [4] <Verticality 13.0 {G#3 B3 F#4 B4}>: False [1.0]
-            [4] <Verticality 13.5 {F#3 B3 F#4 B4}>: False [0.125]
-            [4] <Verticality 14.0 {G#3 B3 E4 B4}>: True [0.25]
+            [3] <Verticality 12.0 {F#3 C#4 F#4 A4}>: True
+            [4] <Verticality 13.0 {G#3 B3 F#4 B4}>: False
+            [4] <Verticality 13.5 {F#3 B3 F#4 B4}>: False
+            [4] <Verticality 14.0 {G#3 B3 E4 B4}>: True
         Subequence:
-            [4] <Verticality 14.0 {G#3 B3 E4 B4}>: True [0.25]
-            [4] <Verticality 14.5 {A3 B3 E4 B4}>: False [0.125]
-            [4] <Verticality 15.0 {B3 D#4 F#4}>: True [0.5]
+            [4] <Verticality 14.0 {G#3 B3 E4 B4}>: True
+            [4] <Verticality 14.5 {A3 B3 E4 B4}>: False
+            [4] <Verticality 15.0 {B3 D#4 F#4}>: True
         Subequence:
-            [4] <Verticality 15.0 {B3 D#4 F#4}>: True [0.5]
-            [4] <Verticality 15.5 {B2 A3 D#4 F#4}>: False [0.125]
-            [4] <Verticality 16.0 {C#3 G#3 C#4 E4}>: True [0.25]
+            [4] <Verticality 15.0 {B3 D#4 F#4}>: True
+            [4] <Verticality 15.5 {B2 A3 D#4 F#4}>: False
+            [4] <Verticality 16.0 {C#3 G#3 C#4 E4}>: True
         Subequence:
-            [5] <Verticality 17.5 {F#3 D4 F#4 A4}>: True [0.125]
-            [5] <Verticality 18.0 {G#3 C#4 E4 B4}>: False [0.25]
-            [5] <Verticality 18.5 {G#3 B3 E4 B4}>: True [0.125]
+            [5] <Verticality 17.5 {F#3 D4 F#4 A4}>: True
+            [5] <Verticality 18.0 {G#3 C#4 E4 B4}>: False
+            [5] <Verticality 18.5 {G#3 B3 E4 B4}>: True
         Subequence:
-            [6] <Verticality 24.0 {F#3 C#4 F#4 A4}>: True [0.25]
-            [7] <Verticality 25.0 {B2 D4 F#4 G#4}>: False [1.0]
-            [7] <Verticality 25.5 {C#3 C#4 E#4 G#4}>: True [0.125]
+            [6] <Verticality 24.0 {F#3 C#4 F#4 A4}>: True
+            [7] <Verticality 25.0 {B2 D4 F#4 G#4}>: False
+            [7] <Verticality 25.5 {C#3 C#4 E#4 G#4}>: True
         Subequence:
-            [7] <Verticality 25.5 {C#3 C#4 E#4 G#4}>: True [0.125]
-            [7] <Verticality 26.0 {D3 C#4 F#4}>: False [0.25]
-            [7] <Verticality 26.5 {D3 F#3 B3 F#4}>: True [0.125]
+            [7] <Verticality 25.5 {C#3 C#4 E#4 G#4}>: True
+            [7] <Verticality 26.0 {D3 C#4 F#4}>: False
+            [7] <Verticality 26.5 {D3 F#3 B3 F#4}>: True
         Subequence:
-            [8] <Verticality 29.0 {A#2 F#3 C#4 F#4}>: True [1.0]
-            [8] <Verticality 29.5 {A#2 F#3 D4 F#4}>: False [0.125]
-            [8] <Verticality 30.0 {A#2 C#4 E4 F#4}>: False [0.25]
-            [8] <Verticality 31.0 {B2 C#4 E4 F#4}>: False [0.5]
-            [8] <Verticality 32.0 {C#3 B3 D4 F#4}>: False [0.25]
-            [8] <Verticality 32.5 {C#3 A#3 C#4 F#4}>: False [0.125]
-            [9] <Verticality 33.0 {D3 B3 F#4}>: True [1.0]
+            [8] <Verticality 29.0 {A#2 F#3 C#4 F#4}>: True
+            [8] <Verticality 29.5 {A#2 F#3 D4 F#4}>: False
+            [8] <Verticality 30.0 {A#2 C#4 E4 F#4}>: False
+            [8] <Verticality 31.0 {B2 C#4 E4 F#4}>: False
+            [8] <Verticality 32.0 {C#3 B3 D4 F#4}>: False
+            [8] <Verticality 32.5 {C#3 A#3 C#4 F#4}>: False
+            [9] <Verticality 33.0 {D3 B3 F#4}>: True
         Subequence:
-            [9] <Verticality 33.0 {D3 B3 F#4}>: True [1.0]
-            [9] <Verticality 33.5 {D3 B3 C#4 F#4}>: False [0.125]
-            [9] <Verticality 34.0 {B2 B3 D4 F#4}>: True [0.25]
+            [9] <Verticality 33.0 {D3 B3 F#4}>: True
+            [9] <Verticality 33.5 {D3 B3 C#4 F#4}>: False
+            [9] <Verticality 34.0 {B2 B3 D4 F#4}>: True
         Subequence:
-            [9] <Verticality 34.0 {B2 B3 D4 F#4}>: True [0.25]
-            [9] <Verticality 34.5 {B2 B3 D4 E#4}>: False [0.125]
-            [9] <Verticality 35.0 {F#3 A#3 C#4 F#4}>: True [0.5]
+            [9] <Verticality 34.0 {B2 B3 D4 F#4}>: True
+            [9] <Verticality 34.5 {B2 B3 D4 E#4}>: False
+            [9] <Verticality 35.0 {F#3 A#3 C#4 F#4}>: True
         '''
         iterator = self.iterateVerticalities()
         startingVerticality = next(iterator)
