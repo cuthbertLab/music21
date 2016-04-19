@@ -647,8 +647,8 @@ class ClassDocumenter(ObjectDocumenter):
             inheritedDocAttr = {}
             for baseClass in reversed(self.baseClasses):
                 baseClassDocAttr = getattr(baseClass, '_DOC_ATTR', None)
-                if (baseClassDocAttr is not None and 
-                        baseClassDocAttr not in seenBaseClassDocAttrs):
+                if (baseClassDocAttr is not None 
+                        and baseClassDocAttr not in seenBaseClassDocAttrs):
                     baseClassDocumenter = type(self).fromIdentityMap(baseClass)
                     inheritedDocAttr[baseClassDocumenter] = baseClassDocAttr
                     seenBaseClassDocAttrs.append(baseClassDocAttr)

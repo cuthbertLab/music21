@@ -820,8 +820,8 @@ class MusicXMLImporter(XMLParserBase):
             c = inputM21
             
         creatorType = creator.get('type')
-        if (creatorType is not None and 
-            creatorType in metadata.Contributor.roleNames):
+        if (creatorType is not None
+            and creatorType in metadata.Contributor.roleNames):
             c.role = creatorType
         
         creatorText = creator.text
@@ -940,16 +940,16 @@ class PartParser(XMLParserBase):
                     m = mStream[i]
                     for eRemove in staffExclude:
                         for eMeasure in m:
-                            if (eMeasure.derivation.origin is eRemove and 
-                                    eMeasure.derivation.method == '__deepcopy__'):
+                            if (eMeasure.derivation.origin is eRemove
+                                and eMeasure.derivation.method == '__deepcopy__'):
                                 #print("removing element", eMeasure, " from ", m)
                                 m.remove(eMeasure)
                                 break
                         for v in m.voices:
                             v.remove(eRemove)
                             for eVoice in v.elements:
-                                if (eVoice.derivation.origin is eRemove and 
-                                        eVoice.derivation.method == '__deepcopy__'):
+                                if (eVoice.derivation.origin is eRemove 
+                                    and eVoice.derivation.method == '__deepcopy__'):
                                     #print("removing element", eRemove, " from ", m, ' voice', v)
                                     v.remove(eVoice)
                 # after adjusting voices see if voices can be reduced or
@@ -1096,8 +1096,9 @@ class PartParser(XMLParserBase):
         if parser.fullMeasureRest is True:
             # recurse is necessary because it could be in voices...
             r1 = m.recurse().getElementsByClass('Rest')[0]
-            if (r1.duration.quarterLength == 4.0 and
-                    r1.duration.quarterLength != self.lastTimeSignature.barDuration.quarterLength):
+            if (r1.duration.quarterLength == 4.0
+                and r1.duration.quarterLength != self.lastTimeSignature.barDuration.quarterLength):
+                
                 r1.duration.quarterLength = self.lastTimeSignature.barDuration.quarterLength
                 m.elementsChanged() # TODO: Remove -- durationTrigger should handle this.
 
@@ -1447,8 +1448,8 @@ class MeasureParser(XMLParserBase):
                 v.elementsChanged()
         self.stream.elementsChanged()
         
-        if (self.restAndNoteCount['rest'] == 1 and
-                self.restAndNoteCount['note'] == 0
+        if (self.restAndNoteCount['rest'] == 1
+            and self.restAndNoteCount['note'] == 0
                 ):
             # TODO: do this on a per voice basis.
             self.fullMeasureRest = True 

@@ -1123,8 +1123,8 @@ class MetricModulation(TempoIndication):
         if mmLast is not None:
             #mmLastNumber = mmLast.number
             # replace with an equivalent based on a provided value
-            if (self._oldMetronome is not None and 
-                self._oldMetronome.referent is not None):
+            if (self._oldMetronome is not None
+                    and self._oldMetronome.referent is not None):
                 mmOld = mmLast.getEquivalentByReferent(
                         self._oldMetronome.referent)
             else:
@@ -1133,9 +1133,9 @@ class MetricModulation(TempoIndication):
         if mmOld is not None:
             self._oldMetronome = mmOld
         # if we have an a new referent, then update number
-        if (self._newMetronome is not None and 
-            self._newMetronome.referent is not None and 
-            self._oldMetronome.number is not None):
+        if (self._newMetronome is not None
+                and self._newMetronome.referent is not None
+                and self._oldMetronome.number is not None):
             self._newMetronome.number = self._oldMetronome.number
 
 

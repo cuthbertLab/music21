@@ -1471,8 +1471,10 @@ class Pitch(object):
             return False
         elif not isinstance(other, Pitch):
             return False
-        elif (self.octave == other.octave and self.step == other.step and
-            self.accidental == other.accidental and self.microtone == other.microtone):
+        elif (self.octave == other.octave 
+              and self.step == other.step
+              and self.accidental == other.accidental 
+              and self.microtone == other.microtone):
             return True
         else:
             return False
@@ -3566,8 +3568,8 @@ class Pitch(object):
             returnObj = copy.deepcopy(self)
 
         if returnObj.accidental is not None:
-            if (abs(returnObj.accidental.alter) < 2.0 and
-                    returnObj.name not in ('E#', 'B#', 'C-', 'F-')):
+            if (abs(returnObj.accidental.alter) < 2.0
+                    and returnObj.name not in ('E#', 'B#', 'C-', 'F-')):
                 pass
             else:
                 # by reseting the pitch space value, we will get a simplyer
@@ -4211,8 +4213,8 @@ class Pitch(object):
             elif self.accidental.displayStatus is None: # not set; need to set
                 # configure based on displayStatus alone, continue w/ normal
                 pass
-            elif (self.accidental is not None and
-                self.accidental.displayStatus in [True, False]):
+            elif (self.accidental is not None
+                  and self.accidental.displayStatus in [True, False]):
                 return # exit: already set, do not override
 
         if lastNoteWasTied is True:

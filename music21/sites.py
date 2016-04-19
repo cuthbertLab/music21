@@ -355,8 +355,8 @@ class Sites(common.SlottedObject):
         updateNotAdd = False
         if idKey in self.siteDict:
             tempSiteRef = self.siteDict[idKey]
-            if (tempSiteRef.isDead is False and
-                tempSiteRef.site is not None):
+            if (tempSiteRef.isDead is False
+                    and tempSiteRef.site is not None):
                 updateNotAdd = True
 
             #if idKey is not None:

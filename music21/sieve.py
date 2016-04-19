@@ -745,8 +745,9 @@ class Residual(object):
         "m and shift not equal"
         if other == None: 
             return 1
-        if (self._m != other._m or self._shift != other._shift or
-             self._neg != other._neg):
+        if (self._m != other._m 
+                or self._shift != other._shift
+                or self._neg != other._neg):
             return 1
         else: 
             return 0
@@ -1090,8 +1091,10 @@ class Sieve(object):
         # only negative that will show up is binary negative, not unary
         # some internal intersections may have a complemented residual class
         self._expType = 'complex' # assume complex
-        if (NEG in self._expTree or LGROUP in self._expTree or 
-             RGROUP in self._expTree or XOR in self._expTree):
+        if (NEG in self._expTree 
+                or LGROUP in self._expTree
+                or RGROUP in self._expTree 
+                or XOR in self._expTree):
             try:
                 self._cmpSegment() # will update self._nonCompressible
             except IndexError: # case of z not providing a sufficent any segment

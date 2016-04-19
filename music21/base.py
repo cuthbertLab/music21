@@ -490,8 +490,8 @@ class Music21Object(object):
 
         if 'id' in ignoreAttributes:
             value = getattr(self, 'id')
-            if value != id(self) or (common.isNum(value) and 
-                                     value < defaults.minIdNumberToConsiderMemoryLocation): 
+            if value != id(self) or (common.isNum(value) 
+                                     and value < defaults.minIdNumberToConsiderMemoryLocation): 
                 newValue = value
                 setattr(new, 'id', newValue)
         if 'sites' in ignoreAttributes:
@@ -1216,11 +1216,11 @@ class Music21Object(object):
             siteTree = site.asTree(flatten=flatten, classList=className)
             if 'Offset' in getElementMethod:
                 # these methods match only by offset.  Used in .getBeat among other places
-                if (('At' in getElementMethod and 'Before' in getElementMethod) or
-                    ('At' not in getElementMethod and 'After' in getElementMethod)):
+                if (('At' in getElementMethod and 'Before' in getElementMethod)
+                        or ('At' not in getElementMethod and 'After' in getElementMethod)):
                     positionStart = ZeroSortTupleHigh.modify(offset=positionStart.offset)
-                elif (('At' in getElementMethod and 'After' in getElementMethod) or 
-                      ('At' not in getElementMethod and 'Before' in getElementMethod)):
+                elif (('At' in getElementMethod and 'After' in getElementMethod)
+                        or ('At' not in getElementMethod and 'Before' in getElementMethod)):
                     positionStart = ZeroSortTupleLow.modify(offset=positionStart.offset)
                 else:
                     raise Music21Exception(
@@ -1356,9 +1356,9 @@ class Music21Object(object):
                 # otherwise, continue to check for flattening...
                 
             if searchType != 'elementsOnly': # flatten or elementsFirst
-                if ('After' in getElementMethod and 
-                        (not className or 
-                         site.isClassOrSubclass(className))):
+                if ('After' in getElementMethod 
+                        and (not className 
+                             or site.isClassOrSubclass(className))):
                     if 'NotSelf' in getElementMethod and self is site:
                         pass
                     elif 'NotSelf' not in getElementMethod: # for 'After' we can't do the
@@ -1373,9 +1373,9 @@ class Music21Object(object):
                         pass
                     return contextEl
 
-                if ('Before' in getElementMethod and 
-                        (not className or 
-                         site.isClassOrSubclass(className))):
+                if ('Before' in getElementMethod 
+                        and (not className 
+                             or site.isClassOrSubclass(className))):
                     if 'NotSelf' in getElementMethod and self is site:
                         pass
                     else:
@@ -2373,8 +2373,8 @@ class Music21Object(object):
         else:
             isNotGrace = 1
 
-        if (useSite is not False and
-                self.sites.hasSiteId(id(useSite))):
+        if (useSite is not False
+                and self.sites.hasSiteId(id(useSite))):
             insertIndex = self.sites.siteDict[id(useSite)].globalSiteIndex
         elif self.activeSite is not None:
             insertIndex = self.sites.siteDict[id(self.activeSite)].globalSiteIndex
@@ -2843,8 +2843,8 @@ class Music21Object(object):
 
         # some higher-level classes need this functionality
         # set ties
-        if addTies and ('Note' in e.classes or
-            'Unpitched' in e.classes):
+        if addTies and ('Note' in e.classes
+                        or 'Unpitched' in e.classes):
 
             forceEndTieType = 'stop'
             if e.tie is not None:

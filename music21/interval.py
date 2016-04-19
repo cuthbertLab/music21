@@ -1058,9 +1058,9 @@ class DiatonicInterval(IntervalBase):
         ## untested...
         #if self.direction != other.direction:
         #    return False
-        if (self.generic == other.generic and 
-            self.specifier == other.specifier and 
-            self.direction == other.direction):
+        if (self.generic == other.generic 
+            and self.specifier == other.specifier 
+            and self.direction == other.direction):
             return True
         else:
             return False
@@ -1526,8 +1526,8 @@ def _getSpecifierFromGenericChromatic(gInt, cInt):
     noteVals = [None, 0, 2, 4, 5, 7, 9, 11]
     normalSemis = noteVals[gInt.simpleUndirected] + 12 * gInt.undirectedOctaves
 
-    if (gInt.direction != cInt.direction and 
-        gInt.direction != OBLIQUE and cInt.direction != OBLIQUE):
+    if (gInt.direction != cInt.direction 
+        and gInt.direction != OBLIQUE and cInt.direction != OBLIQUE):
         # intervals like d2 and dd2 etc. 
         # (the last test doesn't matter, since -1*0 == 0, but in theory it should be there)
         theseSemis = -1 * cInt.undirected
@@ -1790,19 +1790,20 @@ class Interval(IntervalBase):
 
         # permit pitches instead of Notes
         # this requires importing note, which is a bit circular, but necessary
-        elif (len(arguments) == 2 and 'Pitch' in arguments[0].classes and 
-            'Pitch' in arguments[1].classes):
+        elif (len(arguments) == 2 
+              and 'Pitch' in arguments[0].classes 
+              and 'Pitch' in arguments[1].classes):
             from music21 import note
             self._noteStart = note.Note()
             self._noteStart.pitch = arguments[0]
             self._noteEnd = note.Note()
             self._noteEnd.pitch = arguments[1]
 
-        elif (len(arguments) == 2 and 
-              hasattr(arguments[0], 'isNote') and 
-              hasattr(arguments[1], 'isNote') and 
-              arguments[0].isNote == True and 
-              arguments[1].isNote == True):
+        elif (len(arguments) == 2 
+              and hasattr(arguments[0], 'isNote') 
+              and hasattr(arguments[1], 'isNote') 
+              and arguments[0].isNote == True 
+              and arguments[1].isNote == True):
             self._noteStart = arguments[0]
             self._noteEnd = arguments[1]
         else:
@@ -1937,8 +1938,8 @@ class Interval(IntervalBase):
         elif not hasattr(other, 'diatonic') or not hasattr(other, 'chromatic'):
             return False
 
-        if (self.diatonic == other.diatonic and 
-            self.chromatic == other.chromatic):
+        if (self.diatonic == other.diatonic 
+            and self.chromatic == other.chromatic):
             return True
         else:
             return False

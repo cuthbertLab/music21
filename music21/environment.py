@@ -447,9 +447,8 @@ class _EnvironmentCore(object):
             # this is not available on all windows versions
             if 'APPDATA' in os.environ:
                 directory = os.environ['APPDATA']
-            elif ('USERPROFILE' in os.environ and
-                os.path.exists(os.path.join(
-                    os.environ['USERPROFILE'], 'Application Data'))):
+            elif ('USERPROFILE' in os.environ
+                  and os.path.exists(os.path.join(os.environ['USERPROFILE'], 'Application Data'))):
                 directory = os.path.join(
                     os.environ['USERPROFILE'],
                     'Application Data',
