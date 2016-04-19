@@ -137,8 +137,8 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
                 # in this case we know have a previous pitch/degree
                 elif (targetScale.isNext(p, pLast, 'ascending', 
                                         stepSize=stepSize,
-                                        comparisonAttribute=comparisonAttribute) and 
-                      directionLast in [None, 'ascending']):
+                                        comparisonAttribute=comparisonAttribute) 
+                      and directionLast in [None, 'ascending']):
 
                     #environLocal.printDebug(['found ascending degree', 'degreeLast', 
                     #    degreeLast, 'd', d])
@@ -147,8 +147,8 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
 
                 elif (targetScale.isNext(p, pLast, 'descending', 
                                         stepSize=stepSize,
-                                        comparisonAttribute=comparisonAttribute) and 
-                      directionLast in [None, 'descending']):
+                                        comparisonAttribute=comparisonAttribute) 
+                      and directionLast in [None, 'descending']):
 
                     #environLocal.printDebug(['found descending degree', 'degreeLast', degreeLast, 
                     #    'd', d])
@@ -211,8 +211,8 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
                 # if the next pitch is part of a directional sequence, keep
                 if ((targetScale.isNext(pNext, p, 'descending', 
                                         stepSize=stepSize,
-                                        comparisonAttribute=comparisonAttribute) or 
-                     targetScale.isNext(pNext, p, 'ascending', 
+                                        comparisonAttribute=comparisonAttribute) 
+                        or targetScale.isNext(pNext, p, 'ascending', 
                                         stepSize=stepSize,
                                         comparisonAttribute=comparisonAttribute))):
                     clearCollectKeepLast = True

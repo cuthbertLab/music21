@@ -852,8 +852,8 @@ def _ppTuplets(theConverter):
     # pre-processing <tupletSpan> tags
     for eachTuplet in c.documentRoot.iterfind(
                             './/{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)):
-        if ((eachTuplet.get('startid') is None or eachTuplet.get('endid') is None) and
-                eachTuplet.get('plist') is None):
+        if ((eachTuplet.get('startid') is None or eachTuplet.get('endid') is None)
+                and eachTuplet.get('plist') is None):
             environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<tupletSpan>', 
                                                            '@startid and @endid or @plist'))
         elif eachTuplet.get('plist') is not None:
@@ -3101,9 +3101,9 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
     # First search for Rest objects created by an <mRest> element that didn't have @dur set. This
     # will only work in cases where not all of the parts are resting. However, it avoids a more
     # time-consuming search later.
-    if (maxBarDuration == _DUR_ATTR_DICT[None] and
-            activeMeter is not None and
-            maxBarDuration != activeMeter.totalLength):
+    if (maxBarDuration == _DUR_ATTR_DICT[None] 
+            and activeMeter is not None 
+            and maxBarDuration != activeMeter.totalLength):
         # In this case, all the staves have <mRest> elements without a @dur.
         _correctMRestDurs(staves, activeMeter.totalLength)
     else:

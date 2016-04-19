@@ -380,11 +380,9 @@ class ChordReducer(object):
 
                 for i in range(len(group) - 1):
                     timespanOne, timespanTwo = group[i], group[i + 1]
-                    if (timespanOne.pitches == timespanTwo.pitches or
-                            timespanOne.endTime != timespanTwo.offset):
-                        newTimespan = timespanOne.new(
-                            endTime=timespanTwo.endTime,
-                            )
+                    if (timespanOne.pitches == timespanTwo.pitches 
+                            or timespanOne.endTime != timespanTwo.offset):
+                        newTimespan = timespanOne.new(endTime=timespanTwo.endTime)
                         group[i] = newTimespan
                         group[i + 1] = newTimespan
                         scoreTree.removeTimespanList((timespanOne, timespanTwo))
@@ -404,11 +402,9 @@ class ChordReducer(object):
                 group = list(group)
                 for i in range(len(group) - 1):
                     timespanOne, timespanTwo = group[i], group[i + 1]
-                    if (timespanOne.pitches == timespanTwo.pitches or 
-                            timespanOne.endTime != timespanTwo.offset):
-                        newTimespan = timespanOne.new(
-                            endTime=timespanTwo.endTime,
-                            )
+                    if (timespanOne.pitches == timespanTwo.pitches 
+                            or timespanOne.endTime != timespanTwo.offset):
+                        newTimespan = timespanOne.new(endTime=timespanTwo.endTime)
                         group[i] = newTimespan
                         group[i + 1] = newTimespan
                         toInsert.add(newTimespan)
@@ -590,15 +586,12 @@ class ChordReducer(object):
         for verticalities in scoreTree.iterateVerticalitiesNwise(n=3):
             horizontalities = scoreTree.unwrapVerticalities(verticalities)
             for unused_part, horizontality in horizontalities.items():
-                if (not horizontality.hasPassingTone and 
-                        not horizontality.hasNeighborTone):
+                if (not horizontality.hasPassingTone
+                        and not horizontality.hasNeighborTone):
                     continue
-                elif (horizontality[0].measureNumber != 
-                        horizontality[1].measureNumber):
+                elif horizontality[0].measureNumber != horizontality[1].measureNumber:
                     continue
-                merged = horizontality[0].new(
-                    endTime=horizontality[1].endTime,
-                    )
+                merged = horizontality[0].new(endTime=horizontality[1].endTime)
                 scoreTree.removeTimespanList((horizontality[0], horizontality[1]))
                 scoreTree.insert(merged)
 

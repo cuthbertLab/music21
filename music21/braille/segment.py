@@ -1035,14 +1035,14 @@ def prepareSlurredNotes(music21Part,
             endIndex = slur[1].index
             delta = abs(endIndex - beginIndex) + 1
             if not showShortSlursAndTiesTogether and delta <= 4:
-                if (allNotes[beginIndex].tie is not None and 
-                        allNotes[beginIndex].tie.type == 'start'):
+                if (allNotes[beginIndex].tie is not None 
+                        and allNotes[beginIndex].tie.type == 'start'):
                     beginIndex += 1
                 if allNotes[endIndex].tie is not None and allNotes[endIndex].tie.type == 'stop':
                     endIndex -= 1
             if not showLongSlursAndTiesTogether and delta > 4:
-                if (allNotes[beginIndex].tie is not None and 
-                        allNotes[beginIndex].tie.type == 'start'):
+                if (allNotes[beginIndex].tie is not None 
+                        and allNotes[beginIndex].tie.type == 'start'):
                     beginIndex += 1
                 if allNotes[endIndex].tie is not None and allNotes[endIndex].tie.type == 'stop':
                     endIndex -= 1
@@ -1358,8 +1358,8 @@ def prepareBeamedNotes(music21Measure):
                 break
         try:
             afterStopNote = allNotesAndRests[stopIndex+1]
-            if (isinstance(afterStopNote, note.Rest) and 
-                    (int(afterStopNote.beat) == int(stopNote.beat))):
+            if (isinstance(afterStopNote, note.Rest) 
+                    and (int(afterStopNote.beat) == int(stopNote.beat))):
                 allNotesOfSameValue = False
         except exceptions21.StreamException: # stopNote is last note of measure.
             pass
@@ -1376,9 +1376,9 @@ def prepareBeamedNotes(music21Measure):
         startNote.beamStart = True
         try:
             beforeStartNote = allNotesAndRests[startIndex - 1]
-            if (isinstance(beforeStartNote, note.Rest) and 
-                    (int(beforeStartNote.beat) == int(startNote.beat)) and
-                    (beforeStartNote.duration.type == startNote.duration.type)):
+            if (isinstance(beforeStartNote, note.Rest) 
+                    and int(beforeStartNote.beat) == int(startNote.beat)
+                    and beforeStartNote.duration.type == startNote.duration.type):
                 startNote.beamContinue = True
         except IndexError: # startNote is first note of measure.
             pass
@@ -1461,8 +1461,8 @@ def addGroupingAttributes(allSegments, **partKeywords):
             if previousKey is not None:
                 if groupingKey % 100 >= 10:
                     previousList.withHyphen = True
-                if (previousKey % 100 == AFFINITY_NOTEGROUP and 
-                        groupingKey % 100 == AFFINITY_NOTEGROUP):
+                if (previousKey % 100 == AFFINITY_NOTEGROUP 
+                        and groupingKey % 100 == AFFINITY_NOTEGROUP):
                     if isinstance(previousList[0], clef.Clef):
                         measureRepeats = compareNoteGroupings(previousList[1:], groupingList)
                     else:

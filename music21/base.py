@@ -490,8 +490,8 @@ class Music21Object(object):
 
         if 'id' in ignoreAttributes:
             value = getattr(self, 'id')
-            if value != id(self) or (common.isNum(value) and 
-                                     value < defaults.minIdNumberToConsiderMemoryLocation): 
+            if value != id(self) or (common.isNum(value) 
+                                     and value < defaults.minIdNumberToConsiderMemoryLocation): 
                 newValue = value
                 setattr(new, 'id', newValue)
         if 'sites' in ignoreAttributes:
@@ -1356,9 +1356,9 @@ class Music21Object(object):
                 # otherwise, continue to check for flattening...
                 
             if searchType != 'elementsOnly': # flatten or elementsFirst
-                if ('After' in getElementMethod and 
-                        (not className or 
-                         site.isClassOrSubclass(className))):
+                if ('After' in getElementMethod 
+                        and (not className 
+                             or site.isClassOrSubclass(className))):
                     if 'NotSelf' in getElementMethod and self is site:
                         pass
                     elif 'NotSelf' not in getElementMethod: # for 'After' we can't do the
@@ -1373,9 +1373,9 @@ class Music21Object(object):
                         pass
                     return contextEl
 
-                if ('Before' in getElementMethod and 
-                        (not className or 
-                         site.isClassOrSubclass(className))):
+                if ('Before' in getElementMethod 
+                        and (not className 
+                             or site.isClassOrSubclass(className))):
                     if 'NotSelf' in getElementMethod and self is site:
                         pass
                     else:

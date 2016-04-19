@@ -165,15 +165,15 @@ def fixTestsForPy2and3(doctestSuite):
             if six.PY3:
                 if example.exc_msg is not None and len(example.exc_msg) > 0:
                     example.exc_msg = "..." + example.exc_msg
-                elif (example.want is not None and
-                        example.want.startswith('u\'')):
+                elif (example.want is not None 
+                        and example.want.startswith('u\'')):
                     # probably a unicode example:
                     # simplistic, since (u'hi', u'bye')
                     # won't be caught, but saves a lot of anguish
                     example.want = example.want[1:]
             elif six.PY2:
-                if (example.want is not None and
-                        example.want.startswith('b\'')):
+                if (example.want is not None 
+                        and example.want.startswith('b\'')):
                     # probably a unicode example:
                     # simplistic, since (b'hi', b'bye')
                     # won't be caught, but saves a lot of anguish
