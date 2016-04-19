@@ -430,8 +430,8 @@ class Metadata(base.Music21Object):
             useRegex = True
             reQuery = query  # already compiled
         # look for regex characters
-        elif (isinstance(query, six.string_types) and
-              any(character in query for character in '*.|+?{}')):
+        elif (isinstance(query, six.string_types)
+              and any(character in query for character in '*.|+?{}')):
             useRegex = True
             reQuery = re.compile(query, flags=re.I)
         if useRegex:

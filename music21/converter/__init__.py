@@ -757,9 +757,9 @@ class Converter(object):
         defaultSubconverters = []
         for i in sorted(list(subConverters.__dict__.keys())):
             name = getattr(subConverters, i)
-            if (callable(name) and 
-                    not isinstance(name, types.FunctionType) and 
-                    subConverters.SubConverter in name.__mro__):
+            if (callable(name)
+                    and not isinstance(name, types.FunctionType)
+                    and subConverters.SubConverter in name.__mro__):
                 defaultSubconverters.append(name)
         return defaultSubconverters
 
@@ -1060,12 +1060,16 @@ def parse(value, *args, **keywords):
     else:
         valueStr = value
 
-    if (common.isListLike(value) and len(value) == 2 and
-        value[1] == None and os.path.exists(value[0])):
+    if (common.isListLike(value) 
+            and len(value) == 2 
+            and value[1] is None 
+            and os.path.exists(value[0])):
         # comes from corpus.search
         return parseFile(value[0], format=m21Format, **keywords)
-    elif (common.isListLike(value) and len(value) == 2 and
-        isinstance(value[1], int) and os.path.exists(value[0])):
+    elif (common.isListLike(value) 
+          and len(value) == 2 
+          and isinstance(value[1], int) 
+          and os.path.exists(value[0])):
         # corpus or other file with movement number
         return parseFile(value[0], format=m21Format, **keywords).getScoreByNumber(value[1])
     elif common.isListLike(value) or args: # tiny notation list # TODO: Remove.

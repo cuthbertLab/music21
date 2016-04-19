@@ -219,7 +219,7 @@ class StreamFreezer(StreamFreezeThawBase):
         self.topLevel = topLevel
         self.streamIds = streamIds
 
-        self.subStreamFreezers = {} # this will keep track of sub freezers for spanners and
+        self.subStreamFreezers = {} # this will keep track of sub freezers for spanners
         #
 
 
@@ -775,9 +775,9 @@ class StreamThawer(StreamFreezeThawBase):
         >>> st.teardownSerializationScaffold(a)
         '''
         def _fixId(e):
-            if (e.id is not None and 
-                    common.isNum(e.id) and 
-                    e.id > defaults.minIdNumberToConsiderMemoryLocation):
+            if (e.id is not None 
+                    and common.isNum(e.id) 
+                    and e.id > defaults.minIdNumberToConsiderMemoryLocation):
                 e.id = id(e)
 
         if streamObj is None:

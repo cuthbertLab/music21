@@ -1784,8 +1784,8 @@ class PartExporter(XMLExporterBase):
         if firstInstId in instIdList or firstInstId is None: # must have unique ids 
             self.firstInstrumentObject.partIdRandomize() # set new random id
 
-        if (self.firstInstrumentObject.midiChannel == None or
-            self.firstInstrumentObject.midiChannel in self.midiChannelList):
+        if (self.firstInstrumentObject.midiChannel == None
+            or self.firstInstrumentObject.midiChannel in self.midiChannelList):
             try:
                 self.firstInstrumentObject.autoAssignMidiChannel(usedChannels=self.midiChannelList)
             except exceptions21.InstrumentException as e:
@@ -2509,21 +2509,21 @@ class MeasureExporter(XMLExporterBase):
             
         # notehead
         foundANotehead = False
-        if (hasattr(n, 'notehead') and 
+        if (hasattr(n, 'notehead') 
                 # TODO: restore... needed for complete compatibility with toMxObjects...
-                (n.notehead != 'normal' or  
-                 n.noteheadFill is not None or
-                 n.color not in (None, ''))
+            and (n.notehead != 'normal'
+                 or n.noteheadFill is not None
+                 or n.color not in (None, ''))
             ):
             foundANotehead = True
             mxNotehead = self.noteheadToXml(n)
             mxNote.append(mxNotehead)
         if foundANotehead is False and chordParent is not None:
-            if (hasattr(chordParent, 'notehead') and 
+            if (hasattr(chordParent, 'notehead')
                     # TODO: restore... needed for complete compatibility with toMxObjects...
-                    (chordParent.notehead != 'normal' or 
-                     chordParent.noteheadFill is not None or
-                     chordParent.color not in (None, ''))
+                and (chordParent.notehead != 'normal'
+                     or chordParent.noteheadFill is not None
+                     or chordParent.color not in (None, ''))
                 ):
                 mxNotehead = self.noteheadToXml(chordParent)
                 mxNote.append(mxNotehead)
@@ -3485,9 +3485,9 @@ class MeasureExporter(XMLExporterBase):
         mxDirection = Element('direction')
         mxDirectionType = SubElement(mxDirection, 'direction-type')
         mxDirectionType.append(mxObj)
-        if (m21Obj is not None and 
-                hasattr(m21Obj, '_positionPlacement') and 
-                m21Obj._positionPlacement is not None):
+        if (m21Obj is not None
+                and hasattr(m21Obj, '_positionPlacement') 
+                and m21Obj._positionPlacement is not None):
             mxDirection.set('placement', m21Obj._positionPlacement)
                 
         return mxDirection
@@ -3942,8 +3942,8 @@ class MeasureExporter(XMLExporterBase):
         # rb = repeatbracket
         rbSpanners = self.rbSpanners
         rightBarline = self.stream.rightBarline
-        if (rightBarline is None and
-                (len(rbSpanners) == 0 or not rbSpanners[0].isLast(m))):
+        if (rightBarline is None 
+                and (len(rbSpanners) == 0 or not rbSpanners[0].isLast(m))):
             return
         else:
             # rightBarline may be None
@@ -3956,8 +3956,8 @@ class MeasureExporter(XMLExporterBase):
         # rb = repeatbracket
         rbSpanners = self.rbSpanners
         leftBarline = m.leftBarline
-        if (leftBarline is None and
-                (len(rbSpanners) == 0 or not rbSpanners[0].isFirst(m))):
+        if (leftBarline is None 
+                and (len(rbSpanners) == 0 or not rbSpanners[0].isFirst(m))):
             return
         else:
             # leftBarline may be None. that's okay
@@ -4206,8 +4206,8 @@ class MeasureExporter(XMLExporterBase):
         # TODO: cancel
         seta(keySignature, mxKey, 'fifths', 'sharps')
         if keySignature.mode is not None:
-            if (environLocal.xmlReaderType() == 'Musescore' and 
-                    keySignature.mode not in ('major', 'minor')):
+            if (environLocal.xmlReaderType() == 'Musescore' 
+                    and keySignature.mode not in ('major', 'minor')):
                 # Musescore up to v. 2 has major problems with modes other than major or minor
                 # Fixed in latest Nightlys
                 pass            

@@ -673,8 +673,8 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
                 richestSystemLayout = copy.deepcopy(allSystemLayouts[0])
                 for sl in allSystemLayouts[1:]:
                     for attribute in ('distance', 'topDistance', 'leftMargin', 'rightMargin'):
-                        if (getattr(richestSystemLayout, attribute) is None and 
-                                getattr(sl, attribute) is not None):
+                        if (getattr(richestSystemLayout, attribute) is None
+                                and getattr(sl, attribute) is not None):
                             setattr(richestSystemLayout, attribute, getattr(sl, attribute))
                     #print(sl, sl.measureNumber)
                 thisSystem.systemLayout = richestSystemLayout

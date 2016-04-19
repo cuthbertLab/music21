@@ -843,19 +843,19 @@ def transcribeHeading(music21KeySignature=None, music21TimeSignature=None, music
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠁⠝⠞⠁⠝⠞⠑⠀⠑⠀⠞⠗⠁⠝⠟⠥⠊⠇⠇⠕⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠨⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     """
-    if (music21KeySignature is None and 
-            music21TimeSignature is None and 
-            music21TempoText is None and 
-            music21MetronomeMark is None):
+    if (music21KeySignature is None 
+            and music21TimeSignature is None 
+            and music21TempoText is None 
+            and music21MetronomeMark is None):
         raise BrailleBasicException("No heading can be made.")
     # Tempo Text
     tempoTextTrans = None
     if not (music21TempoText is None):
         tempoTextTrans = tempoTextToBraille(music21TempoText)
         
-    if (music21KeySignature is None and 
-            music21TimeSignature is None and 
-            music21MetronomeMark is None):
+    if (music21KeySignature is None 
+            and music21TimeSignature is None 
+            and music21MetronomeMark is None):
         tempoTextLines = tempoTextTrans.splitlines()
         headingTrans = []
         for ttline in tempoTextLines:
@@ -1049,11 +1049,11 @@ def transcribeNoteGrouping(brailleElementGrouping, showLeadingOctave = True):
             else:
                 environRules.warn("{0} not transcribed to braille.".format(brailleElement))
             if not previousElement is None:
-                if (brailleElementGrouping.showClefSigns and 
-                        isinstance(previousElement, clef.Clef) or
-                        isinstance(previousElement, dynamics.Dynamic) and
-                        not isinstance(brailleElement, dynamics.Dynamic) and
-                        not isinstance(brailleElement, expressions.TextExpression)):
+                if (brailleElementGrouping.showClefSigns 
+                        and isinstance(previousElement, clef.Clef) 
+                        or isinstance(previousElement, dynamics.Dynamic) 
+                        and not isinstance(brailleElement, dynamics.Dynamic) 
+                        and not isinstance(brailleElement, expressions.TextExpression)):
                     for dots in binary_dots[trans[-1][0]]:
                         if dots == '10' or dots == '11':
                             trans.insert(-1, symbols['dot'])
@@ -1099,10 +1099,9 @@ def transcribeSignatures(music21KeySignature, music21TimeSignature, outgoingKeyS
     >>> print(basic.transcribeSignatures(key.KeySignature(0), None, key.KeySignature(-3)))
     ⠡⠡⠡
     """
-    if (music21TimeSignature is None and 
-            (music21KeySignature is None or 
-                (music21KeySignature.sharps == 0 and 
-                 outgoingKeySig is None))):
+    if (music21TimeSignature is None 
+            and (music21KeySignature is None 
+                 or (music21KeySignature.sharps == 0 and outgoingKeySig is None))):
         raise BrailleBasicException("No key or time signature to transcribe!")
     
     trans = []

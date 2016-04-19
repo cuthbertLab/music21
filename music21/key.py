@@ -370,8 +370,7 @@ class KeySignature(base.Music21Object):
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
 
         try:
-            if (sharps is not None and 
-                  (sharps != int(sharps))):
+            if (sharps is not None and (sharps != int(sharps))):
                 raise KeySignatureException(
                     'Cannot get a KeySignature from this "number" of sharps: "%s"; ' % sharps + 
                     'did you mean to use a key.Key() object instead?')
@@ -848,8 +847,8 @@ class Key(KeySignature, scale.DiatonicScale):
 
     def __init__(self, tonic=None, mode=None):
         if tonic is not None:
-            if hasattr(tonic, 'classes') and ('Music21Object' in tonic.classes or 
-                                              'Pitch' in tonic.classes):
+            if hasattr(tonic, 'classes') and ('Music21Object' in tonic.classes
+                                              or 'Pitch' in tonic.classes):
                 if hasattr(tonic, 'name'):
                     tonic = tonic.name
                 elif hasattr(tonic, 'pitches') and tonic.pitches: # chord w/ >= 1 pitch

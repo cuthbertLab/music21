@@ -11,8 +11,8 @@
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 
-abbreviationToBestName = \
-{u'a sax': u'alto saxophone',
+abbreviationToBestName = {
+ u'a sax': u'alto saxophone',
  u'a.': u'alto',
  u'ac b': u'acoustic bass',
  u'ac gtr': u'acoustic guitar',
@@ -175,8 +175,8 @@ abbreviationToBestName = \
  u'xil.': u'xylophone',
  u'xyl.': u'xylophone'}
 
-allToBestName = \
-{u'a becco': u'recorder',
+allToBestName = {
+ u'a becco': u'recorder',
  u'a sax': u'alto saxophone',
  u'a.': u'alto',
  u'ac b': u'acoustic bass',

@@ -275,13 +275,13 @@ class Edge(object):
             return self._connections
         
         # if requesting bi from a mono directional edge is an error
-        if (direction in [DIRECTION_BI] and 
-                self._direction in [DIRECTION_ASCENDING, DIRECTION_DESCENDING]):
+        if (direction in [DIRECTION_BI]
+                and self._direction in [DIRECTION_ASCENDING, DIRECTION_DESCENDING]):
             raise EdgeException('cannot request a bi direction from a mono direction')
 
         # if bi and we get an ascending/descending request
-        if (direction in [DIRECTION_ASCENDING, DIRECTION_DESCENDING] and 
-                self._direction in [DIRECTION_BI]):
+        if (direction in [DIRECTION_ASCENDING, DIRECTION_DESCENDING]
+                and self._direction in [DIRECTION_BI]):
 
             # assume that in a bi-representiaton, the first is ascending
             # the second is descending
@@ -1123,12 +1123,12 @@ class IntervalNetwork(object):
                 match = True
             # if request is bidrectional and the spec is for ascending and
             # descending
-            elif (direction in [DIRECTION_BI] and 
-                  directionSpec in [DIRECTION_ASCENDING, DIRECTION_DESCENDING]):
+            elif (direction in [DIRECTION_BI]
+                  and directionSpec in [DIRECTION_ASCENDING, DIRECTION_DESCENDING]):
                 match = True
 
-            elif (direction in [DIRECTION_ASCENDING, DIRECTION_DESCENDING] and 
-                  directionSpec == DIRECTION_BI):
+            elif (direction in [DIRECTION_ASCENDING, DIRECTION_DESCENDING] 
+                  and directionSpec == DIRECTION_BI):
                 match = True
 
             if match:
@@ -1387,14 +1387,18 @@ class IntervalNetwork(object):
             #environLocal.printDebug(['_realizeAscending()', 'p', p])
             appendPitch = False
 
-            if (minPitch is not None and _gte(pCollect.ps, minPitch.ps) and 
-                maxPitch is not None and _lte(pCollect.ps, maxPitch.ps)):
+            if (minPitch is not None 
+                    and _gte(pCollect.ps, minPitch.ps)
+                    and maxPitch is not None 
+                    and _lte(pCollect.ps, maxPitch.ps)):
                 appendPitch = True
-            elif (minPitch is not None and _gte(pCollect.ps, minPitch.ps) and 
-                maxPitch is None):
+            elif (minPitch is not None 
+                  and _gte(pCollect.ps, minPitch.ps) 
+                  and maxPitch is None):
                 appendPitch = True
-            elif (maxPitch is not None and _lte(pCollect.ps, maxPitch.ps) and 
-                minPitch is None):
+            elif (maxPitch is not None 
+                  and _lte(pCollect.ps, maxPitch.ps) 
+                  and minPitch is None):
                 appendPitch = True
             elif minPitch is None and maxPitch is None: 
                 appendPitch = True
@@ -1566,14 +1570,18 @@ class IntervalNetwork(object):
         isFirst = True
         while True:
             appendPitch = False
-            if (minPitch is not None and _gte(p.ps, minPitch.ps) and 
-                maxPitch is not None and _lte(p.ps, maxPitch.ps)):
+            if (minPitch is not None 
+                    and _gte(p.ps, minPitch.ps) 
+                    and maxPitch is not None 
+                    and _lte(p.ps, maxPitch.ps)):
                 appendPitch = True
-            elif (minPitch is not None and _gte(p.ps, minPitch.ps) and 
-                maxPitch is None):
+            elif (minPitch is not None 
+                  and _gte(p.ps, minPitch.ps) 
+                  and maxPitch is None):
                 appendPitch = True
-            elif (maxPitch is not None and _lte(p.ps, maxPitch.ps) and 
-                minPitch is None):
+            elif (maxPitch is not None 
+                  and _lte(p.ps, maxPitch.ps) 
+                  and minPitch is None):
                 appendPitch = True
             elif minPitch is None and maxPitch is None: 
                 appendPitch = True
@@ -2570,8 +2578,8 @@ class IntervalNetwork(object):
                 # an untracked problem.
                 # only match this generously if we are equating termini
                 if equateTermini:
-                    if ((nId in [TERMINUS_HIGH, TERMINUS_LOW]) and 
-                            (nodeTargetId.id in [TERMINUS_HIGH, TERMINUS_LOW])):
+                    if ((nId in [TERMINUS_HIGH, TERMINUS_LOW])
+                         and (nodeTargetId.id in [TERMINUS_HIGH, TERMINUS_LOW])):
                         return realizedPitch[i]
                 
             #environLocal.printDebug(['getPitchFromNodeDegree() on trial', trial, ', 

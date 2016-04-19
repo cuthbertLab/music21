@@ -156,9 +156,9 @@ class BrailleText(object):
                 self.currentLine.append(noteGrouping, addSpace=addSpace)
         except BrailleTextException:
             ll4 = self.lineLength / 4
-            if (not forceNewline and 
-                    self.lineLength - self.currentLine.textLocation > ll4 and 
-                    ll4 <= len(noteGrouping)):
+            if (not forceNewline 
+                    and self.lineLength - self.currentLine.textLocation > ll4 
+                    and ll4 <= len(noteGrouping)):
                 raise BrailleTextException("Split Note Grouping")
             elif not showLeadingOctave:
                 raise BrailleTextException("Recalculate Note Grouping With Leading Octave")
@@ -294,8 +294,8 @@ class BrailleKeyboard(object):
             for dots in binary_dots[noteGroupingL[0]]:
                 if dots == '10' or dots == '11':
                     self.leftHand.append(symbols['dot'], addSpace=False)
-        if (self.rightHand.canAppend(noteGroupingR, addSpace=addSpace) and
-                self.leftHand.canAppend(noteGroupingL, addSpace=addSpace)):
+        if (self.rightHand.canAppend(noteGroupingR, addSpace=addSpace) 
+                and self.leftHand.canAppend(noteGroupingL, addSpace=addSpace)):
             self.leftHand.append(noteGroupingL, addSpace=addSpace)
             self.rightHand.append(noteGroupingR, addSpace=addSpace)
             if self.rightHand.textLocation > self.leftHand.textLocation:

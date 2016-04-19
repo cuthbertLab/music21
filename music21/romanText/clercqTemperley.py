@@ -662,10 +662,10 @@ class CTRule(object):
         if len(measures) > 0:
             for m in measures:
                 noteIter = m.recurse().notes
-                if (noteIter and 
-                        (self.parent is None or 
-                            self.parent.labelSubsectionsOnScore is True) and 
-                        self.LHS != 'S'):
+                if (noteIter
+                        and (self.parent is None
+                             or self.parent.labelSubsectionsOnScore is True) 
+                        and self.LHS != 'S'):
                     rn = noteIter[0]
                     lyricNum = len(rn.lyrics) + 1
                     rn.lyrics.append(note.Lyric(self.LHS, number=lyricNum))       

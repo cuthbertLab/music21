@@ -444,9 +444,9 @@ class Segment(object):
         resInversion = (resChord.inversion())
         resolveV43toI6 = domInversion and resInversion == 1
         
-        if (domChord.inversion() == 0 and 
-                resChord.root().name == tonic.name and 
-                (resChord.isMajorTriad() or resChord.isMinorTriad())):
+        if (domChord.inversion() == 0 
+                and resChord.root().name == tonic.name 
+                and (resChord.isMajorTriad() or resChord.isMinorTriad())):
             # V7 to I resolutions are always incomplete, with a missing fifth.
             segmentB.fbRules.forbidIncompletePossibilities = False
             
@@ -457,24 +457,24 @@ class Segment(object):
          (resChord.root().name == tonic.name and resChord.isMinorTriad(), 
           resolution.dominantSeventhToMinorTonic, 
           [resolveV43toI6, domChordInfo]),
-         ((resChord.root().name == majSubmediant.name and 
-               resChord.isMinorTriad() and 
-               domInversion == 0), 
+         ((resChord.root().name == majSubmediant.name 
+            and resChord.isMinorTriad() 
+            and domInversion == 0), 
           resolution.dominantSeventhToMinorSubmediant, 
           [domChordInfo]),
-         ((resChord.root().name == minSubmediant.name and 
-                resChord.isMajorTriad() and 
-                domInversion == 0), 
+         ((resChord.root().name == minSubmediant.name 
+                and resChord.isMajorTriad() 
+                and domInversion == 0), 
           resolution.dominantSeventhToMajorSubmediant, 
           [domChordInfo]),
-         ((resChord.root().name == subdominant.name and 
-                resChord.isMajorTriad() and 
-                domInversion == 0), 
+         ((resChord.root().name == subdominant.name 
+                and resChord.isMajorTriad() 
+                and domInversion == 0), 
           resolution.dominantSeventhToMajorSubdominant, 
           [domChordInfo]),
-         ((resChord.root().name == subdominant.name and 
-                resChord.isMinorTriad() and 
-                domInversion == 0), 
+         ((resChord.root().name == subdominant.name 
+                and resChord.isMinorTriad() 
+                and domInversion == 0), 
           resolution.dominantSeventhToMinorSubdominant, 
           [domChordInfo])
         ]
@@ -622,17 +622,17 @@ class Segment(object):
         augSixthChordInfo = _unpackSeventhChord(augSixthChord)
 
         augmentedSixthResolutionMethods = [
-         ((resChord.inversion() == 2 and 
-                resChord.root().name == tonic.name and 
-                resChord.isMajorTriad()), 
+         ((resChord.inversion() == 2 
+                and resChord.root().name == tonic.name 
+                and resChord.isMajorTriad()), 
           resolution.augmentedSixthToMajorTonic, [augSixthType, augSixthChordInfo]),
-         ((resChord.inversion() == 2 and 
-                resChord.root().name == tonic.name and 
-                resChord.isMinorTriad()), 
+         ((resChord.inversion() == 2 
+                and resChord.root().name == tonic.name 
+                and resChord.isMinorTriad()), 
           resolution.augmentedSixthToMinorTonic, 
           [augSixthType, augSixthChordInfo]),
-         ((majorScale.pitchFromDegree(5).name == resChord.bass().name and 
-                resChord.isMajorTriad()), 
+         ((majorScale.pitchFromDegree(5).name == resChord.bass().name 
+                and resChord.isMajorTriad()), 
           resolution.augmentedSixthToDominant, 
           [augSixthType, augSixthChordInfo])
         ]
