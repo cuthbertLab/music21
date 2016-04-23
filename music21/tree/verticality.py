@@ -7,7 +7,7 @@
 # Authors:      Josiah Wolf Oberholtzer
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
 #------------------------------------------------------------------------------
@@ -638,18 +638,18 @@ class Verticality(object):
         
         for thisQuartet in allQuartets:
             if includeNoMotion is False:
-                if (thisQuartet[0][0].pitches == thisQuartet[0][1].pitches and
-                    thisQuartet[1][0].pitches == thisQuartet[1][1].pitches):
+                if (thisQuartet[0][0].pitches == thisQuartet[0][1].pitches
+                    and thisQuartet[1][0].pitches == thisQuartet[1][1].pitches):
                     continue
                 if partPairNumbers is not None:
                     isAppropriate = False
                     for pp in partPairNumbers:
                         thisQuartetTopPart = thisQuartet[0][0].part
                         thisQuartetBottomPart = thisQuartet[1][0].part
-                        if (((verticalityStreamParts[pp[0]] == thisQuartetTopPart) or
-                            (verticalityStreamParts[pp[0]] == thisQuartetBottomPart)) and 
-                            ((verticalityStreamParts[pp[1]] == thisQuartetTopPart) or
-                            (verticalityStreamParts[pp[1]] == thisQuartetBottomPart))  
+                        if ((verticalityStreamParts[pp[0]] == thisQuartetTopPart
+                                or verticalityStreamParts[pp[0]] == thisQuartetBottomPart) 
+                            and (verticalityStreamParts[pp[1]] == thisQuartetTopPart
+                                 or verticalityStreamParts[pp[1]] == thisQuartetBottomPart)  
                             ):
                             isAppropriate = True
                             break
@@ -665,16 +665,14 @@ class Verticality(object):
                     n21 = thisQuartet[1][0].element
                     n22 = thisQuartet[1][1].element
                     
-                    if (n11 is not None and
-                            n12 is not None and
-                            n21 is not None and
-                            n22 is not None): 
+                    if (n11 is not None
+                            and n12 is not None
+                            and n21 is not None
+                            and n22 is not None): 
                         vlq = VoiceLeadingQuartet(n11, n12, n21, n22)
                         filteredList.append(vlq)
         
         return filteredList
-        
-        
         
     def getPairedMotion(self, includeRests=True, includeOblique=True):
         '''

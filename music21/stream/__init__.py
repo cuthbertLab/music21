@@ -2265,8 +2265,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                         replacement, 
                                         allDerived=False)
 
-    def splitAtQuarterLength(self, quarterLength, retainOrigin=True,
-        addTies=True, displayTiedAccidentals=False, searchContext=True):
+    def splitAtQuarterLength(self, 
+                             quarterLength, 
+                             retainOrigin=True,
+                             addTies=True, 
+                             displayTiedAccidentals=False, 
+                             searchContext=True):
         '''
         This method overrides the method on Music21Object to provide
         similar functionality for Streams.
@@ -3410,8 +3414,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         It is allowed to pass `numberEnd=None`, which will be 
         interpreted as the last measure of the stream.
 
-        Additionally, any number of associated classes can be gathered as well. 
-        Associated classes are the last found class relevant to this Stream or Part.
+        Additionally, any number of associated classes can be gathered from the context
+        and put into the measure.  By default we collect the Clef, TimeSignature, KeySignature,
+        and Instrument so that there is enough context to perform.  (See getContextByClass()
+        and .previous() for definitions of the context)         
 
         While all elements in the source are the original elements in the extracted region, 
         new Measure objects are created and returned.
@@ -12131,16 +12137,19 @@ class Score(Stream):
         return self._cache['parts']
 
 
-    def measures(self, numberStart, numberEnd,
-        collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'), 
-        gatherSpanners=True, searchContext=False, ignoreNumbers=False):
+    def measures(self, 
+                 numberStart, 
+                 numberEnd,
+                 collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'), 
+                 gatherSpanners=True, 
+                 ignoreNumbers=False):
         '''
         This method overrides the :meth:`~music21.stream.Stream.measures` 
         method on Stream. This creates a new Score stream that has the same measure 
         range for all Parts.
 
-        The `collect` argument is a list of classes that will be collected.
-
+        The `collect` argument is a list of classes that will be collected; see
+        Stream.measures()
 
         >>> s = corpus.parse('bwv66.6')
         >>> post = s.measures(3,5) # range is inclusive, i.e., [3, 5]
@@ -12157,8 +12166,11 @@ class Score(Stream):
         # note that this will strip all objects that are not Parts
         for p in self.parts:
             # insert all at zero
-            measuredPart = p.measures(numberStart, numberEnd,
-                        collect, gatherSpanners=gatherSpanners, ignoreNumbers=ignoreNumbers)
+            measuredPart = p.measures(numberStart, 
+                                      numberEnd,
+                                      collect, 
+                                      gatherSpanners=gatherSpanners, 
+                                      ignoreNumbers=ignoreNumbers)
             post.insert(0, measuredPart)
         # must manually add any spanners; do not need to add .flat,
         # as Stream.measures will handle lower level
@@ -12173,9 +12185,11 @@ class Score(Stream):
         return post
 
 
-    def measure(self, measureNumber,
-        collect=(clef.Clef, meter.TimeSignature,
-        instrument.Instrument, key.KeySignature), gatherSpanners=True, ignoreNumbers=False):
+    def measure(self, 
+                measureNumber,
+                collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'), 
+                gatherSpanners=True, 
+                ignoreNumbers=False):
         '''
         Given a measure number,
         return a single :class:`~music21.stream.Measure` object if the 
@@ -12199,8 +12213,11 @@ class Score(Stream):
         # note that this will strip all objects that are not Parts
         for p in self.getElementsByClass('Part'):
             # insert all at zero
-            mStream = p.measures(measureNumber, measureNumber,
-                collect=collect, gatherSpanners=gatherSpanners, ignoreNumbers=ignoreNumbers)
+            mStream = p.measures(measureNumber, 
+                                 measureNumber,
+                                 collect=collect, 
+                                 gatherSpanners=gatherSpanners, 
+                                 ignoreNumbers=ignoreNumbers)
             if len(mStream) > 0:
                 post.insert(0, mStream)
 

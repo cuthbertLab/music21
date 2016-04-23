@@ -12,6 +12,7 @@
 import copy
 import math
 #import pprint
+import re
 import sys
 #import traceback
 import unittest
@@ -245,12 +246,16 @@ class XMLParserBase(object):
     def setPosition(self, mxObject, m21Object):
         '''
         get positioning information for an object from
-        x-position
+        default-x, default-y 
         '''
         defaultX = mxObject.get('default-x')
         if defaultX is not None:
             m21Object.xPosition = defaultX
-        # TODO: attr: default-y, relative-x, relative-y
+        defaultY = mxObject.get('default-y')
+        if defaultY is not None:
+            m21Object.positionVertical = defaultY
+            
+        # TODO: attr: relative-x, relative-y
         # TODO: standardize "positionVertical, etc.
 
     def xmlPrintToPageLayout(self, mxPrint, inputM21=None):
@@ -650,6 +655,7 @@ class MusicXMLImporter(XMLParserBase):
         tb.positionVertical = cw1.get('default-y')
         tb.positionHorizontal = cw1.get('default-x')
         tb.justify = cw1.get('justify')
+        tb.fontFamily = cw1.get('font-family')
         tb.style = cw1.get('font-style')
         tb.weight = cw1.get('font-weight')
         tb.size = cw1.get('font-size')
@@ -2279,7 +2285,8 @@ class MeasureParser(XMLParserBase):
         tag = mxObj.tag
         if tag in xmlObjects.ARTICULATION_MARKS:
             artic = xmlObjects.ARTICULATION_MARKS[tag]()
-            # print-style
+            # print-style (beyond default-x, default-y
+            self.setPosition(mxObj, artic)
             placement = mxObj.get('placement')
             if placement is not None:
                 artic.placement = placement
@@ -2409,8 +2416,12 @@ class MeasureParser(XMLParserBase):
             elif mxType == 'stop':
                 # need to retrieve an existing spanner
                 # try to get base class of both Crescendo and Decrescendo
-                sp = self.spannerBundle.getByClassIdLocalComplete('Line',
-                        idFound, False)[0] # get first
+                try:
+                    sp = self.spannerBundle.getByClassIdLocalComplete('Line', idFound, False)[0] 
+                    # get first
+                except IndexError:
+                    environLocal.warn("Line <" + mxObj.tag + "> stop without start")
+                    return
                 sp.completeStatus = True
                 
                 if mxObj.tag == 'dashes':
@@ -2728,6 +2739,8 @@ class MeasureParser(XMLParserBase):
             #environLocal.printDebug(['found mxEndingObj', mxEndingObj, 'm', m]) 
             # get all incomplete spanners of the appropriate class that are
             # not complete
+            
+            # TODO: this should also filter by number... (in theory...)
             rbSpanners = self.spannerBundle.getByClass('RepeatBracket').getByCompleteStatus(False)
             # if we have no complete bracket objects, must start a new one
             if len(rbSpanners) == 0:
@@ -2742,16 +2755,31 @@ class MeasureParser(XMLParserBase):
                 # try to add this measure; may be the same
                 rb.addSpannedElements(m)
 
-            # there may just be an ending marker, and no start
-            # this implies just one measure
-            if mxEndingObj.get('type') in ('stop', 'discontinue'):
-                rb.completeStatus = True
+
+            if mxEndingObj.get('type') == 'start':
                 mxNumber = mxEndingObj.get('number')
                 try:
                     mxNumber = int(mxNumber)
                 except ValueError:
                     mxNumber = 1
                 rb.number = mxNumber
+                
+                # however, if the content is different, use that.
+                # for instance, Finale often uses <ending number="1">2.</ending> for
+                # second endings, since the first ending number has already been closed.
+                endingNumberText = mxEndingObj.text
+                if endingNumberText is not None:
+                    rb.overrideDisplay = endingNumberText
+                    overrideNumber = re.match(r'^(\d+)\.?$', endingNumberText) # very cautious
+                    if overrideNumber:
+                        rb.number = int(overrideNumber.group(1))
+
+
+            # there may just be an ending marker, and no start
+            # this implies just one measure
+            if mxEndingObj.get('type') in ('stop', 'discontinue'):
+                rb.completeStatus = True
+                    
             # set number; '' or None is interpreted as 1
 
         if barline.location == 'left':
@@ -3075,6 +3103,7 @@ class MeasureParser(XMLParserBase):
 
         setb = _setAttributeFromAttribute
         setb(te, mxWords, 'justify')
+        setb(te, mxWords, 'font-family')
         setb(te, mxWords, 'font-size', 'size', transform=_floatOrIntStr)
         setb(te, mxWords, 'letter-spacing', transform=_floatOrIntStr)
         setb(te, mxWords, 'enclosure')

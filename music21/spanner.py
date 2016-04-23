@@ -1214,14 +1214,19 @@ class RepeatBracket(Spanner):
 
     It is assumed that numbering starts from 1. Numberings above 2 are permitted. 
     The `number` keyword argument can be used to pass in the desired number. 
+    
+    `overrideDisplay` if set will display something other than the number.  For instance
+    `ouvert` and `clos` for medieval music.  However, if you use it for something like "1-3"
+    be sure to set number properly too.
 
     
     >>> m = stream.Measure()
     >>> sp = spanner.RepeatBracket(m, number=1)
     >>> sp # can be one or more measures
     <music21.spanner.RepeatBracket 1 <music21.stream.Measure 0 offset=0.0>>
+
     >>> sp.number = 3
-    >>> sp # can be one or more measures
+    >>> sp 
     <music21.spanner.RepeatBracket 3 <music21.stream.Measure 0 offset=0.0>>
     >>> sp.getNumberList() # the list of repeat numbers
     [3]
@@ -1252,6 +1257,9 @@ class RepeatBracket(Spanner):
     [1, 2, 3, 7]
     >>> sp.number
     '1, 2, 3, 7'
+    >>> sp.overrideDisplay = '1-3, 7' # does not work for number.
+    
+    
     '''
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)
@@ -1260,6 +1268,7 @@ class RepeatBracket(Spanner):
         self._numberRange = [] # store a range, inclusive of the single number assignment
         self._numberSpanIsAdjacent = None
         self._numberSpanIsContiguous = None
+        self.overrideDisplay = None
 
         if 'number' in keywords:
             self.number = keywords['number']
@@ -1344,21 +1353,34 @@ class RepeatBracket(Spanner):
 
     def getNumberList(self):
         '''Get a contiguous list of repeat numbers that are applicable for this instance.
-
+        
+        Will always have at least one element, but [0] means undefined
         
         >>> rb = spanner.RepeatBracket()
+        >>> rb.getNumberList()
+        [0]
+        
         >>> rb.number = '1,2'
         >>> rb.getNumberList()
         [1, 2]
         '''
-        return self._numberRange
+        nr =  self._numberRange
+        if not nr:
+            return [0]
+        else:
+            return nr
 
     def __repr__(self):
         msg = Spanner.__repr__(self)
-        if self.number is not None:
-            msg = msg.replace(self._reprHead, '<music21.spanner.RepeatBracket %s ' % self.number)
+        if self.overrideDisplay is not None:
+            msg = msg.replace(self._reprHead, 
+                              '<music21.spanner.RepeatBracket %s' % self.overrideDisplay)
+        elif self.number is not None:
+            msg = msg.replace(self._reprHead, 
+                              '<music21.spanner.RepeatBracket %s ' % self.number)
         else:
-            msg = msg.replace(self._reprHead, '<music21.spanner.RepeatBracket ')
+            msg = msg.replace(self._reprHead, 
+                              '<music21.spanner.RepeatBracket ')
         return msg
 
 
