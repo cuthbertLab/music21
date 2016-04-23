@@ -7374,7 +7374,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             offsetPairs = []
             for ti in tiStream:
-                o = ti.getOffsetBySite(srcObj)
+                o = ti.getOffsetBySite(srcFlat)
                 offsetPairs.append([o, ti.getSoundingMetronomeMark()])
             # fill boundaries
             # if lowest region not defined, supply as default
