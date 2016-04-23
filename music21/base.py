@@ -2936,9 +2936,10 @@ class Music21Object(object):
             raise Music21ObjectException('cannot split an element that has a Duration of None')
 
         if opFrac(sum(quarterLengthList)) != self.duration.quarterLength:
-            raise Music21ObjectException('cannot split by quarter length list that is not ' + 
-                                         'equal to the duration of the source: %s, %s' % 
-                                         (quarterLengthList, self.duration.quarterLength))
+            raise Music21ObjectException('cannot split by quarter length list whose sum is not ' + 
+                                         'equal to the quarterLength duration of the source: ' + 
+                                         '%s, %s' % (quarterLengthList, 
+                                                     self.duration.quarterLength))
         # if nothing to do
         elif len(quarterLengthList) == 1:
             # return a copy of self in a list
@@ -3031,12 +3032,53 @@ class Music21Object(object):
         >>> g.tie is None
         True
         
-        TODO: unit into a "split" function -- document obscure uses.
+        
+        It should work for complex notes with tuplets.
+
+        (this duration occurs in Modena A, Le greygnour bien, from the ars subtilior, c. 1380;
+        hence how I discovered this bug)
+        
+        >>> n = note.Note()
+        >>> n.duration.quarterLength = 0.5 + 0.0625 # eighth + 64th
+        >>> t = duration.Tuplet(4, 3)
+        >>> n.duration.appendTuplet(t)
+        >>> first, last = n.splitAtDurations()  
+        >>> (first.duration, last.duration)
+        (<music21.duration.Duration 0.375>, <music21.duration.Duration 0.046875>)
+
+        Notice that this duration could have been done w/o tuplets, so no tuplets in output:
+
+        >>> (first.duration.type, first.duration.dots, first.duration.tuplets)
+        ('16th', 1, ())
+        >>> (last.duration.type, last.duration.dots, last.duration.tuplets)
+        ('128th', 1, ())
+
+        Test of one with tuplets that cannot be split:
+
+        >>> n = note.Note()
+        >>> n.duration.quarterLength = 0.5 + 0.0625 # eighth + 64th
+        >>> t = duration.Tuplet(3, 2)
+        >>> n.duration.appendTuplet(t)
+        >>> (n.duration.type, n.duration.dots, n.duration.tuplets)
+        ('complex', 0, (<music21.duration.Tuplet 3/2/eighth>,))
+
+        >>> first, last = n.splitAtDurations()  
+        >>> (first.duration, last.duration)
+        (<music21.duration.Duration 1/3>, <music21.duration.Duration 1/24>)
+
+        >>> (first.duration.type, first.duration.dots, first.duration.tuplets)
+        ('eighth', 0, (<music21.duration.Tuplet 3/2/eighth>,))
+        >>> (last.duration.type, last.duration.dots, last.duration.tuplets)
+        ('64th', 0, (<music21.duration.Tuplet 3/2/64th>,))
+
+        
+        TODO: unite this and other functions into a "split" function -- document obscure uses.
         
         '''
-        quarterLengthList = [c.quarterLength for c in self.duration.components]
-        return self.splitByQuarterLengths(quarterLengthList)
-
+        atm = self.duration.aggregateTupletMultiplier()
+        quarterLengthList = [c.quarterLength * atm for c in self.duration.components]
+        splitList = self.splitByQuarterLengths(quarterLengthList)
+        return splitList
     #--------------------------------------------------------------------------
     # temporal and beat based positioning
     @property

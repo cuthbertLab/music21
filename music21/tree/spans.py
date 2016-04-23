@@ -18,8 +18,6 @@ organized by start and stop offsets.
 import unittest
 
 from music21 import exceptions21
-from music21 import meter
-
 from music21 import environment
 environLocal = environment.Environment("tree.spans")
 #------------------------------------------------------------------------------
@@ -104,7 +102,7 @@ class Timespan(object):
         '''
         # this is a property to make it immutable.
         return self._offset
-
+        
     @property
     def endTime(self):
         r'''
@@ -153,13 +151,11 @@ class Timespan(object):
         (False, 'Cannot merge <Timespan 0.0 5.0> with <Timespan 3.0 4.0>: not contiguous')
         '''
         if not isinstance(other, type(self)):
-            message = 'Cannot merge {} with {}: wrong types'.format(
-                self, other)
+            message = 'Cannot merge {} with {}: wrong types'.format(self, other)
             return (False, message)
-        if not ((self.endTime == other.offset) or
-                (other.endTime == self.offset)):
-            message = 'Cannot merge {} with {}: not contiguous'.format(
-                self, other)
+        if not ((self.endTime == other.offset)
+                or (other.endTime == self.offset)):
+            message = 'Cannot merge {} with {}: not contiguous'.format(self, other)
             return (False, message)
         return (True, "")
 

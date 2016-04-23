@@ -111,7 +111,7 @@ class TextExpressionException(ExpressionException):
     pass
 
 
-class TextExpression(Expression, text.TextFormat):
+class TextExpression(Expression, text.TextFormatMixin):
     '''
     A TextExpression is a word, phrase, or similar 
     bit of text that is positioned in a Stream or Measure. 
@@ -133,7 +133,7 @@ class TextExpression(Expression, text.TextFormat):
     def __init__(self, content=None):
         Expression.__init__(self)
         # numerous properties are inherited from TextFormat
-        text.TextFormat.__init__(self)
+        text.TextFormatMixin.__init__(self)
 
         # the text string to be displayed; not that line breaks
         # are given in the xml with this non-printing character: (#)

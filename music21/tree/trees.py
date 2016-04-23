@@ -426,8 +426,8 @@ class ElementTree(core.AVLTree):
             self.rootNode.updateIndices()
             self.rootNode.updateEndTimes()
         
-        if (self.lowestPosition() != initialPosition or
-                self.endTime != initialEndTime):
+        if (self.lowestPosition() != initialPosition
+                or self.endTime != initialEndTime):
             self._updateParents(initialPosition, visitedParents=visitedParents)
     
     def _updateParents(self, oldPosition, visitedParents=None):
@@ -771,8 +771,8 @@ class ElementTree(core.AVLTree):
                 # is not a list and not a sortTuple...
                 positions = [positions]
         
-        if (not common.isListLike(elements) and
-                not isinstance(elements, (set, frozenset))
+        if (not common.isListLike(elements)
+                and not isinstance(elements, (set, frozenset))
                 ): # not a list. a single element or timespan
             elements = [elements]
         if positions is None:

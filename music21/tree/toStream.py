@@ -106,12 +106,12 @@ def chordified(timespans, templateStream=None):
         return outputStream
 
 
-def partwise(timespanTree, templateStream=None):
+def partwise(tsTree, templateStream=None):
     '''
     todo docs
     '''
     from music21 import stream
-    treeMapping = timespanTree.toPartwiseTimespanTrees()
+    treeMapping = tsTree.toPartwiseTimespanTrees()
     outputScore = stream.Score()
     for part in templateStream.parts:
         partwiseTimespans = treeMapping.get(part, None)

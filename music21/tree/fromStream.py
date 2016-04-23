@@ -243,9 +243,9 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, group
         treeClass = trees.OffsetTree
 
     # check to see if we can shortcut and make a Tree very fast from a sorted list.
-    if (inputStream.isSorted and 
-            groupOffsets is False and # currently we can't populate for an OffsetTree*
-            (inputStream.isFlat or flatten is False)):
+    if (inputStream.isSorted
+            and groupOffsets is False  # currently we can't populate for an OffsetTree*
+            and (inputStream.isFlat or flatten is False)):
         outputTree = treeClass(source=inputStream)
         inputStreamElements = inputStream._elements[:] + inputStream._endElements
         # Can use tree.populateFromSortedList and speed up by an order of magnitude

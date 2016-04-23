@@ -672,7 +672,10 @@ class XMLExporterBase(object):
     def setPosition(self, m21Object, mxObject):
         if hasattr(m21Object, 'xPosition') and m21Object.xPosition is not None:
             mxObject.set('default-x', m21Object.xPosition)
-        # TODO: attr: default-y, relative-x, relative-y
+        if hasattr(m21Object, 'positionVertical') and m21Object.positionVertical is not None:
+            mxObject.set('default-y', m21Object.positionVertical)
+        
+        # TODO: attr: relative-x, relative-y
         # TODO: standardize "positionVertical, etc.
 
     def pageLayoutToXmlPrint(self, pageLayout, mxPrintIn=None):
@@ -1248,6 +1251,8 @@ class ScoreExporter(XMLExporterBase):
                     cw.set('default-x', str(textBox.positionHorizontal))
                 if textBox.positionVertical is not None:
                     cw.set('default-y', str(textBox.positionVertical))
+                if textBox.fontFamily is not None:
+                    cw.set('font-family', str(textBox.fontFamily))
                 if textBox.justify is not None:
                     cw.set('justify', str(textBox.justify))
                 if textBox.style is not None:
@@ -3192,7 +3197,8 @@ class MeasureExporter(XMLExporterBase):
         <staccatissimo placement="below" />
 
         '''
-        # TODO: OrderedDict
+        # TODO: OrderedDict for ordering
+        # TODO: positioning other than default-x, default-y
         # these articulations have extra information
         # TODO: strong-accent
         # TODO: scoop/plop/doit/falloff - empty-line
@@ -3209,6 +3215,7 @@ class MeasureExporter(XMLExporterBase):
             #raise ToMxObjectsException("Cannot translate %s to musicxml" % articulationMark)
         mxArticulationMark = Element(musicXMLArticulationName)
         mxArticulationMark.set('placement', articulationMark.placement)
+        self.setPosition(articulationMark, mxArticulationMark)
         #mxArticulations.append(mxArticulationMark)
         return mxArticulationMark
     
@@ -3991,7 +3998,7 @@ class MeasureExporter(XMLExporterBase):
                 endingType = 'start'
             else:
                 endingType = 'stop'
-            mxEnding.set('number', str(self.rbSpanners[0].number))
+            mxEnding.set('number', str(self.rbSpanners[0].getNumberList()[0]))
             mxEnding.set('type', endingType)
             mxBarline.append(mxEnding) # make sure it is after fermata but before repeat.
 
