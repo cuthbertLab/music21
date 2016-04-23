@@ -243,8 +243,7 @@ class TextFormatMixin(object):
     justify = property(_getJustify, _setJustify, 
         doc = '''Get or set the justification.
 
-        
-        >>> tf = text.TextFormat()
+        >>> tf = text.TextFormatMixin()
         >>> tf.justify = 'center'
         >>> tf.justify
         'center'
@@ -263,9 +262,8 @@ class TextFormatMixin(object):
 
     style = property(_getStyle, _setStyle, 
         doc = '''Get or set the style, as normal, italic, bold, and bolditalic.
-
         
-        >>> tf = text.TextFormat()
+        >>> tf = text.TextFormatMixin()
         >>> tf.style = 'bold'
         >>> tf.style
         'bold'
@@ -285,8 +283,7 @@ class TextFormatMixin(object):
     weight = property(_getWeight, _setWeight, 
         doc = '''Get or set the weight, as normal, or bold.
 
-        
-        >>> tf = text.TextFormat()
+        >>> tf = text.TextFormatMixin()
         >>> tf.weight = 'bold'
         >>> tf.weight
         'bold'
@@ -306,8 +303,7 @@ class TextFormatMixin(object):
     size = property(_getSize, _setSize, 
         doc = '''Get or set the size.
 
-        
-        >>> tf = text.TextFormat()
+        >>> tf = text.TextFormatMixin()
         >>> tf.size = 20
         >>> tf.size
         20.0
@@ -330,8 +326,7 @@ class TextFormatMixin(object):
     letterSpacing = property(_getLetterSpacing, _setLetterSpacing, 
         doc = '''Get or set the letter spacing.
 
-        
-        >>> tf = text.TextFormat()
+        >>> tf = text.TextFormatMixin()
         >>> tf.letterSpacing = 20
         >>> tf.letterSpacing
         20.0
