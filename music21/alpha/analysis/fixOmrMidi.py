@@ -12,6 +12,15 @@
 from music21 import interval
 import copy
 import unittest
+import os
+import inspect
+
+pathName = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+
+K525xmlShortPath = pathName + os.sep + 'k525short3.xml'
+K525midiShortPath = pathName + os.sep + 'k525short.mid'
+K525omrShortPath = pathName + os.sep + 'k525omrshort.xml'
+
 
 class OMRMidiNoteFixer(object):
     '''
@@ -23,7 +32,7 @@ class OMRMidiNoteFixer(object):
         self.correctedstream = copy.deepcopy(self.omrstream)
     
     def fixStreams(self):
-        self.alignstreams()
+        self.alignStreams()
         for omrnote, midinote in zip(self.omrstream, self.midistream):
             fixerRhythm = OMRMidiNoteRhythmFixer(omrnote, midinote)
             fixerRhythm.fix()
@@ -31,8 +40,11 @@ class OMRMidiNoteFixer(object):
             fixerPitch.fix()
     
     def alignStreams(self):
-        if self.approxequal(self.omrstream.highestTime, self.midistream.highestTime):
-            pass
+        '''
+        try a variety of mechanisms to get midistream to align with omrstream
+        '''
+        #if self.approxequal(self.omrstream.highestTime, self.midistream.highestTime):
+        #    pass
         # TODO: more ways of checking if stream is aligned 
         pass
     
