@@ -672,7 +672,10 @@ class XMLExporterBase(object):
     def setPosition(self, m21Object, mxObject):
         if hasattr(m21Object, 'xPosition') and m21Object.xPosition is not None:
             mxObject.set('default-x', m21Object.xPosition)
-        # TODO: attr: default-y, relative-x, relative-y
+        if hasattr(m21Object, 'positionVertical') and m21Object.positionVertical is not None:
+            mxObject.set('default-y', m21Object.positionVertical)
+        
+        # TODO: attr: relative-x, relative-y
         # TODO: standardize "positionVertical, etc.
 
     def pageLayoutToXmlPrint(self, pageLayout, mxPrintIn=None):
@@ -1248,6 +1251,8 @@ class ScoreExporter(XMLExporterBase):
                     cw.set('default-x', str(textBox.positionHorizontal))
                 if textBox.positionVertical is not None:
                     cw.set('default-y', str(textBox.positionVertical))
+                if textBox.fontFamily is not None:
+                    cw.set('font-family', str(textBox.fontFamily))
                 if textBox.justify is not None:
                     cw.set('justify', str(textBox.justify))
                 if textBox.style is not None:
@@ -1784,8 +1789,8 @@ class PartExporter(XMLExporterBase):
         if firstInstId in instIdList or firstInstId is None: # must have unique ids 
             self.firstInstrumentObject.partIdRandomize() # set new random id
 
-        if (self.firstInstrumentObject.midiChannel == None or
-            self.firstInstrumentObject.midiChannel in self.midiChannelList):
+        if (self.firstInstrumentObject.midiChannel == None
+            or self.firstInstrumentObject.midiChannel in self.midiChannelList):
             try:
                 self.firstInstrumentObject.autoAssignMidiChannel(usedChannels=self.midiChannelList)
             except exceptions21.InstrumentException as e:
@@ -1970,7 +1975,7 @@ class MeasureExporter(XMLExporterBase):
                 ('MetronomeMark', 'tempoIndicationToXml'),
                 ('MetricModulation', 'tempoIndicationToXml'),
                 ('TextExpression', 'textExpressionToXml'),
-                ('RepeatEpxression', 'textExpressionToXml'),
+                ('RepeatExpression', 'textExpressionToXml'),
                 ('Clef', 'midmeasureClefToXml'),
                ])
     ignoreOnParseClasses = set(['KeySignature', 'LayoutBase', 'TimeSignature', 'Barline'])
@@ -2297,10 +2302,7 @@ class MeasureExporter(XMLExporterBase):
     def noteToXml(self, n, addChordTag=False, chordParent=None):
         '''
         Translate a music21 :class:`~music21.note.Note` or a Rest into a
-        list of :class:`~music21.musicxml.mxObjects.Note` objects.
-    
-        Because of "complex" durations, the number of 
-        `musicxml.mxObjects.Note` objects could be more than one.
+        ElementTree, note element.
     
         Note that, some note-attached spanners, such 
         as octave shifts, produce direction (and direction types) 
@@ -2312,6 +2314,8 @@ class MeasureExporter(XMLExporterBase):
         >>> len(MEX.xmlRoot)
         0
         >>> mxNote = MEX.noteToXml(n)
+        >>> mxNote
+        <Element 'note' at 0x10113cb38>
         >>> MEX.dump(mxNote)
         <note>
           <pitch>
@@ -2357,7 +2361,24 @@ class MeasureExporter(XMLExporterBase):
           <notehead parentheses="no">diamond</notehead>
         </note>
          
+        Notes with complex durations need to be simplified before coming here
+        otherwise they create an impossible musicxml type of "complex"
+        
+        >>> nComplex = note.Note()
+        >>> nComplex.duration.quarterLength = 5.0
+        >>> mxComplex = MEX.noteToXml(nComplex)
+        >>> MEX.dump(mxComplex)
+        <note>
+          <pitch>
+            <step>C</step>
+            <octave>4</octave>
+          </pitch>
+          <duration>50400</duration>
+          <type>complex</type>
+        </note>        
+        
         TODO: Test with spanners...
+        
         '''
         setb = _setAttributeFromAttribute
         
@@ -2469,31 +2490,45 @@ class MeasureExporter(XMLExporterBase):
                 mxNote.append(mxTimeModification)
         
         # stem...        
-        if addChordTag is False:
-            if hasattr(chordOrN, 'stemDirection') and chordOrN.stemDirection != 'unspecified':
-                mxStem = SubElement(mxNote, 'stem')
-                sdtext = chordOrN.stemDirection
-                if sdtext == 'noStem':
-                    sdtext = 'none'
-                mxStem.text = sdtext
+        stemDirection = None
+        # if we are not in a chord, or we are the first note of a chord, get stem
+        # direction from the chordOrNote object
+        if (addChordTag is False and 
+                hasattr(chordOrN, 'stemDirection') and 
+                chordOrN.stemDirection != 'unspecified'):
+            stemDirection = chordOrN.stemDirection
+        # or if we are in a chord, but the sub-note has its own stem direction,
+        # record that.
+        elif (chordOrN is not n and 
+                hasattr(n, 'stemDirection') and 
+                n.stemDirection != 'unspecified'):
+            stemDirection = n.stemDirection
+            
+        if stemDirection is not None:
+            mxStem = SubElement(mxNote, 'stem')
+            sdtext = stemDirection
+            if sdtext == 'noStem':
+                sdtext = 'none'
+            mxStem.text = sdtext
+        # end Stem
             
         # notehead
         foundANotehead = False
-        if (hasattr(n, 'notehead') and 
+        if (hasattr(n, 'notehead') 
                 # TODO: restore... needed for complete compatibility with toMxObjects...
-                (n.notehead != 'normal' or  
-                 n.noteheadFill is not None or
-                 n.color not in (None, ''))
+            and (n.notehead != 'normal'
+                 or n.noteheadFill is not None
+                 or n.color not in (None, ''))
             ):
             foundANotehead = True
             mxNotehead = self.noteheadToXml(n)
             mxNote.append(mxNotehead)
         if foundANotehead is False and chordParent is not None:
-            if (hasattr(chordParent, 'notehead') and 
+            if (hasattr(chordParent, 'notehead')
                     # TODO: restore... needed for complete compatibility with toMxObjects...
-                    (chordParent.notehead != 'normal' or 
-                     chordParent.noteheadFill is not None or
-                     chordParent.color not in (None, ''))
+                and (chordParent.notehead != 'normal'
+                     or chordParent.noteheadFill is not None
+                     or chordParent.color not in (None, ''))
                 ):
                 mxNotehead = self.noteheadToXml(chordParent)
                 mxNote.append(mxNotehead)
@@ -3162,7 +3197,8 @@ class MeasureExporter(XMLExporterBase):
         <staccatissimo placement="below" />
 
         '''
-        # TODO: OrderedDict
+        # TODO: OrderedDict for ordering
+        # TODO: positioning other than default-x, default-y
         # these articulations have extra information
         # TODO: strong-accent
         # TODO: scoop/plop/doit/falloff - empty-line
@@ -3179,6 +3215,7 @@ class MeasureExporter(XMLExporterBase):
             #raise ToMxObjectsException("Cannot translate %s to musicxml" % articulationMark)
         mxArticulationMark = Element(musicXMLArticulationName)
         mxArticulationMark.set('placement', articulationMark.placement)
+        self.setPosition(articulationMark, mxArticulationMark)
         #mxArticulations.append(mxArticulationMark)
         return mxArticulationMark
     
@@ -3455,9 +3492,9 @@ class MeasureExporter(XMLExporterBase):
         mxDirection = Element('direction')
         mxDirectionType = SubElement(mxDirection, 'direction-type')
         mxDirectionType.append(mxObj)
-        if (m21Obj is not None and 
-                hasattr(m21Obj, '_positionPlacement') and 
-                m21Obj._positionPlacement is not None):
+        if (m21Obj is not None
+                and hasattr(m21Obj, '_positionPlacement') 
+                and m21Obj._positionPlacement is not None):
             mxDirection.set('placement', m21Obj._positionPlacement)
                 
         return mxDirection
@@ -3723,12 +3760,19 @@ class MeasureExporter(XMLExporterBase):
                 
         return mxDirection
     
-    def textExpressionToXml(self, te):
-        '''Convert a TextExpression to a MusicXML mxDirection type.
+    def textExpressionToXml(self, teOrRe):
+        '''
+        Convert a TextExpression or RepreatExpression to a MusicXML mxDirection type.
         returns a musicxml.mxObjects.Direction object
         '''
         mxWords = Element('words')
-        mxWords.text = str(te.content)
+        if hasattr(teOrRe, 'content'): # TextExpression 
+            te = teOrRe
+            mxWords.text = str(te.content)
+        elif hasattr(teOrRe, 'getText'): # RepeatExpression
+            te = teOrRe.getTextExpression()
+            mxWords.text = str(te.content)
+            
         for src, dst in [#(te._positionDefaultX, 'default-x'), 
                          (te.positionVertical, 'default-y'),
     #                      (te._positionRelativeX, 'relative-x'),
@@ -3825,6 +3869,7 @@ class MeasureExporter(XMLExporterBase):
 
     def beamToXml(self, beamObject):
         '''
+        Returns an ElementTree Element from a :class:`~music21.beam.Beam` object
         
         >>> a = beam.Beam()
         >>> a.type = 'start'
@@ -3832,6 +3877,8 @@ class MeasureExporter(XMLExporterBase):
         
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> b = MEX.beamToXml(a)
+        >>> b
+        <Element 'beam' at 0x104f3a728>
         >>> MEX.dump(b)
         <beam number="1">begin</beam>
 
@@ -3892,15 +3939,18 @@ class MeasureExporter(XMLExporterBase):
         return mxBeam
 
     
-    def setRightBarline(self):        
+    def setRightBarline(self):
+        '''
+        Calls self.setBarline for 
+        ''' 
         m = self.stream
         if not hasattr(m, 'rightBarline'):
             return
         # rb = repeatbracket
         rbSpanners = self.rbSpanners
         rightBarline = self.stream.rightBarline
-        if (rightBarline is None and
-                (len(rbSpanners) == 0 or not rbSpanners[0].isLast(m))):
+        if (rightBarline is None 
+                and (len(rbSpanners) == 0 or not rbSpanners[0].isLast(m))):
             return
         else:
             # rightBarline may be None
@@ -3913,8 +3963,8 @@ class MeasureExporter(XMLExporterBase):
         # rb = repeatbracket
         rbSpanners = self.rbSpanners
         leftBarline = m.leftBarline
-        if (leftBarline is None and
-                (len(rbSpanners) == 0 or not rbSpanners[0].isFirst(m))):
+        if (leftBarline is None 
+                and (len(rbSpanners) == 0 or not rbSpanners[0].isFirst(m))):
             return
         else:
             # leftBarline may be None. that's okay
@@ -3925,13 +3975,13 @@ class MeasureExporter(XMLExporterBase):
         sets either a left or right barline from a 
         bar.Barline() object or bar.Repeat() object        
         '''        
+        mxRepeat = None
         if barline is None:
             mxBarline = Element('barline')
         else:
             if 'Repeat' in barline.classes:
                 mxBarline = Element('barline')
                 mxRepeat = self.repeatToXml(barline)
-                mxBarline.append(mxRepeat)
             else:
                 mxBarline = self.barlineToXml(barline)
         
@@ -3948,11 +3998,13 @@ class MeasureExporter(XMLExporterBase):
                 endingType = 'start'
             else:
                 endingType = 'stop'
-                mxEnding.set('number', str(self.rbSpanners[0].number))
+            mxEnding.set('number', str(self.rbSpanners[0].getNumberList()[0]))
             mxEnding.set('type', endingType)
             mxBarline.append(mxEnding) # make sure it is after fermata but before repeat.
 
-        
+        if mxRepeat is not None:
+            mxBarline.append(mxRepeat)
+
         # TODO: attr: segno
         # TODO: attr: coda
         # TODO: attr: divisions
@@ -4161,7 +4213,8 @@ class MeasureExporter(XMLExporterBase):
         # TODO: cancel
         seta(keySignature, mxKey, 'fifths', 'sharps')
         if keySignature.mode is not None:
-            if environLocal.xmlReaderType() == 'Musescore':
+            if (environLocal.xmlReaderType() == 'Musescore' 
+                    and keySignature.mode not in ('major', 'minor')):
                 # Musescore up to v. 2 has major problems with modes other than major or minor
                 # Fixed in latest Nightlys
                 pass            

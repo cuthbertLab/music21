@@ -25,7 +25,8 @@ from music21 import common
 from music21 import exceptions21
 
 from music21.ext import six
-
+if six.PY3:
+    unicode = str
 #------------------------------------------------------------------------------
 
 
@@ -206,7 +207,7 @@ class Date(object):
         '''
         if isinstance(value, datetime.datetime):
             self.loadDatetime(value)
-        elif common.isStr(value):
+        elif isinstance(value, six.string_types):
             self.loadStr(value)
         elif isinstance(value, Date):
             self.loadOther(value)
@@ -341,9 +342,9 @@ class Date(object):
         >>> b.hasTime
         True
         '''
-        if self.hour is not None \
-            or self.minute is not None \
-            or self.second is not None:
+        if (self.hour is not None or
+                self.minute is not None or
+                self.second is not None):
             return True
         else:
             return False
@@ -689,11 +690,13 @@ class Text(object):
             else:
                 return self._data
         else:      
-            if isinstance(self._data, str): #unicode in PY2, str in PY3
+            if isinstance(self._data, unicode): #unicode in PY2, str in PY3
                 # not sure if this should be wrapped in in str() call
                 return self._data.encode('utf-8')
-            else:
+            elif not isinstance(self._data, str):
                 return str(self._data)
+            else:
+                return self._data
 
     ### PUBLIC PROPERTIES ###
 
@@ -951,8 +954,7 @@ class Contributor(object):
         '''
         # note: probably not the fastest way to do this
         for role_id in Contributor.roleAbbreviationsDict:
-            if roleName.lower() == \
-                Contributor.roleAbbreviationsDict[role_id].lower():
+            if roleName.lower() == Contributor.roleAbbreviationsDict[role_id].lower():
                 return role_id
         raise exceptions21.MetadataException('No such role: %s' % roleName)
 

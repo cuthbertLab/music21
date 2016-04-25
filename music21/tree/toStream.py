@@ -17,7 +17,7 @@ None of these things work acceptably yet.  This is super beta.
 '''
 
 from music21.exceptions21 import TreeException
-from music21.tree import trees
+from music21.tree import timespanTree
 
 def chordified(timespans, templateStream=None):
     r'''
@@ -61,8 +61,8 @@ def chordified(timespans, templateStream=None):
     ...
     '''
     from music21 import stream
-    if not isinstance(timespans, trees.TimespanTree):
-        raise trees.TimespanTreeException('Needs a TimespanTree to run')
+    if not isinstance(timespans, timespanTree.TimespanTree):
+        raise timespanTree.TimespanTreeException('Needs a TimespanTree to run')
     if isinstance(templateStream, stream.Stream):
         mos = templateStream.measureOffsetMap()
         templateOffsets = list(mos)
@@ -106,12 +106,12 @@ def chordified(timespans, templateStream=None):
         return outputStream
 
 
-def partwise(timespanTree, templateStream=None):
+def partwise(tsTree, templateStream=None):
     '''
     todo docs
     '''
     from music21 import stream
-    treeMapping = timespanTree.toPartwiseTimespanTrees()
+    treeMapping = tsTree.toPartwiseTimespanTrees()
     outputScore = stream.Score()
     for part in templateStream.parts:
         partwiseTimespans = treeMapping.get(part, None)

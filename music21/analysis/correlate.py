@@ -92,8 +92,8 @@ class ActivityMatch(object):
 
             for entry in post:
                 # here, we are only looking if start times match
-                if (entry['src'].offset >= dstStart and 
-                    entry['src'].offset <= dstEnd):
+                if (entry['src'].offset >= dstStart 
+                        and entry['src'].offset <= dstEnd):
                     # this is match; add a reference to the element
                     entry['dst'].append(element)            
                 

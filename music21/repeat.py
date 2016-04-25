@@ -1029,25 +1029,31 @@ class Expander(object):
             return False
 
         # if al segno, there can be no codas, and one segno
-        if (self._asCount == 1 and self._segnoCount == 1 and 
-            self._codaCount == 0):
+        if (self._asCount == 1 
+                and self._segnoCount == 1
+                and self._codaCount == 0):
             #environLocal.printDebug(['returning true on as'])
             return True
 
-        if (self._dsCount == 1 and self._segnoCount == 1 and 
-            self._codaCount == 0):
+        if (self._dsCount == 1 
+                and self._segnoCount == 1 
+                and self._codaCount == 0):
             #environLocal.printDebug(['returning true on ds'])
             return True
 
         # if we have a da capo al fine, must have one fine
-        elif (self._dsafCount == 1 and self._codaCount == 0 and 
-            self._segnoCount == 1 and self._fineCount == 1):
+        elif (self._dsafCount == 1 
+                and self._codaCount == 0 
+                and self._segnoCount == 1 
+                and self._fineCount == 1):
             #environLocal.printDebug(['returning true on dsaf'])
             return True
 
         # if we have a da capo al coda, must have two coda signs
-        elif (self._dsacCount == 1 and self._codaCount == 2 and 
-            self._segnoCount == 1 and self._fineCount == 0):
+        elif (self._dsacCount == 1 
+                and self._codaCount == 2 
+                and self._segnoCount == 1 
+                and self._fineCount == 0):
             #environLocal.printDebug(['returning true on dsac'])
             return True
 
@@ -1187,8 +1193,8 @@ class Expander(object):
                 if rightBar is None or 'Repeat' not in rightBar.classes:
                     # all but the last must have repeat bars; except if we just
                     # have one bracket or the last
-                    if (len(rBrackets) == 1 or 
-                        rbCount < len(rBrackets) - 1):
+                    if (len(rBrackets) == 1
+                            or rbCount < len(rBrackets) - 1):
                         environLocal.printDebug(['repeat brackets are not terminated with a ' + 
                                                  'repeat barline'])
                         return False
@@ -1208,10 +1214,12 @@ class Expander(object):
 
             # this does not check for well-balanced formations, 
             # only presence
-            if (lb is not None and 'Repeat' in lb.classes):
+            if (lb is not None 
+                    and 'Repeat' in lb.classes):
                 return True
-            if (rb is not None and 'Repeat' in rb.classes and 
-                rb.direction == 'end'):
+            if (rb is not None 
+                    and 'Repeat' in rb.classes
+                    and rb.direction == 'end'):
                 return True
         return False
 
@@ -1267,8 +1275,9 @@ class Expander(object):
                     else: # otherwise get the last start index
                         barRepeatIndices = range(startIndices[-1], i)
                         break
-            if (rb is not None and 'Repeat' in rb.classes and 
-                rb.direction == 'end'):
+            if (rb is not None 
+                    and 'Repeat' in rb.classes 
+                    and rb.direction == 'end'):
                 # if this is the first end found and no starts found, 
                 # assume we are counting from zero
                 if len(startIndices) == 0: # get from first to this one
@@ -1295,8 +1304,9 @@ class Expander(object):
         mLast = streamObj[index]
         rb = mLast.rightBarline
         # if right barline of end is a repeat
-        if (rb is not None and 'Repeat' in rb.classes and 
-            rb.direction == 'end'):
+        if (rb is not None 
+                and 'Repeat' in rb.classes 
+                and rb.direction == 'end'):
             mEndBarline = mLast # they are the same
             repeatTimes = rb.times
         else:
@@ -1307,8 +1317,9 @@ class Expander(object):
 
             mEndBarline = streamObj[index+1]
             lb = mEndBarline.leftBarline
-            if (lb is not None and 'Repeat' in lb.classes and 
-                lb.direction == 'end'):
+            if (lb is not None 
+                    and 'Repeat' in lb.classes 
+                    and lb.direction == 'end'):
                 repeatTimes = lb.times
             else:
                 raise ExpanderException('cannot find an end Repeat bar in the expected position')
@@ -2430,9 +2441,9 @@ class RepeatFinder(object):
                 repeatBars.append((startBar, endBar))
                 toDelete.extend(mGroup[1])
                                 
-            elif (len( mGroup[0] ) >= repeatEndingThreshold and 
-                    distance <= maxAcceptableDistance and 
-                    distance > 0):
+            elif (len( mGroup[0] ) >= repeatEndingThreshold
+                    and distance <= maxAcceptableDistance 
+                    and distance > 0):
                 startingBar = mGroup[0][0]
                 firstEndingBar = mGroup[0][-1]+1
                 repeatSignBar = mGroup[1][0]-1
@@ -3106,7 +3117,9 @@ class Test(unittest.TestCase):
 
     def testRepeatExpressionOnStream(self):
         from music21 import stream, repeat, meter, converter
-        from music21.musicxml import m21ToString
+        from music21.musicxml import m21ToXml
+        
+        GEX = m21ToXml.GeneralObjectExporter()
 
         template = stream.Stream()
         for i in range(5):
@@ -3117,9 +3130,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.flat.getElementsByClass(repeat.DaCapo)), 1)
 
 
-        raw = m21ToString.fromMusic21Object(s)
+        raw = GEX.parse(s).decode('utf-8')
 
-        self.assertEqual(raw.find('Da Capo') > 0, True)
+        self.assertTrue(raw.find('Da Capo') > 0, raw)
 
         # can do the same thing starting form a text expression
         s = copy.deepcopy(template)
@@ -3127,8 +3140,8 @@ class Test(unittest.TestCase):
         s[3].insert(0, expressions.TextExpression('da capo'))
         self.assertEqual(len(s.flat.getElementsByClass(repeat.DaCapo)), 0)
         
-        raw = m21ToString.fromMusic21Object(s)
-        self.assertEqual(raw.find('da capo') > 0, True)
+        raw = GEX.parse(s).decode('utf-8')
+        self.assertTrue(raw.find('da capo') > 0, raw)
             
         s2 = converter.parse(raw)
         # now, reconverted from the musicxml, we have a RepeatExpression
@@ -3690,7 +3703,7 @@ class Test(unittest.TestCase):
     def testRepeatsEndingsA(self):
         from music21 import converter
         from music21.musicxml import testPrimitive
-        from music21.musicxml import m21ToString
+        from music21.musicxml import m21ToXml
         #from music21.musicxml import testPrimitive
         # this has repeat brackets
         # these are stored in bar objects as ending tags, 
@@ -3698,30 +3711,30 @@ class Test(unittest.TestCase):
         #         <ending number="2" type="discontinue"/>
 
         s = converter.parse(testPrimitive.repeatBracketsA)
+        GEX = m21ToXml.GeneralObjectExporter()
 
-        raw = m21ToString.fromMusic21Object(s)
+        raw = GEX.parse(s)
 
-        self.assertEqual(raw.find("<repeat direction=")>1, True)    
-        self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="1" type="stop"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)   
+        self.assertEqual(raw.find(b"<repeat direction=")>1, True)    
+        self.assertEqual(raw.find(b'<ending number="1" type="start"')>1, True)    
+        self.assertEqual(raw.find(b'<ending number="1" type="stop"')>1, True)    
+        self.assertEqual(raw.find(b'<ending number="2" type="start"')>1, True)    
+        self.assertEqual(raw.find(b'<ending number="2" type="stop"')>1, True)   
  
         # TODO: after calling .musicxml, repeat brackets are getting lost
         #s.show()        
-        raw = m21ToString.fromMusic21Object(s)
+        raw = GEX.parse(s)
 
-        self.assertEqual(raw.find("<repeat direction=")>1, True)    
-        self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="1" type="stop"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)   
+        self.assertEqual(raw.find(b"<repeat direction=")>1, True)    
+        self.assertEqual(raw.find(b'<ending number="1" type="start"')>1, True)    
+        self.assertEqual(raw.find(b'<ending number="1" type="stop"')>1, True)    
+        self.assertEqual(raw.find(b'<ending number="2" type="start"')>1, True)    
+        self.assertEqual(raw.find(b'<ending number="2" type="stop"')>1, True)   
 
         s1 = copy.deepcopy(s)
         #s.show()
 
         #s1.show()
-        raw = m21ToString.fromMusic21Object(s1)
         ex = Expander(s1.parts[0])
         self.assertEqual(len(ex._repeatBrackets), 2)
 
@@ -4286,11 +4299,8 @@ _DOC_ORDER = [RepeatExpression, RepeatExpressionMarker, Coda, Segno, Fine,
               DaCapoAlCoda, AlSegno, DalSegno, DalSegnoAlFine, DalSegnoAlCoda, RepeatFinder]
 
 if __name__ == "__main__":
-    #import sys
-    #sys.argv.append('testRepeatEndingsH')
-    
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest='testRepeatExpressionOnStream')
 
 #------------------------------------------------------------------------------
 # eof

@@ -203,7 +203,7 @@ class Test(unittest.TestCase):
     def testHappyBirthdayDebug(self):
         from music21.braille.translate import objectToBraille
         x = objectToBraille(happyBirthday(), debug=True)
-        y = '''---begin segment---
+        y = u'''---begin segment---
 <music21.braille.segment BrailleSegment>
 Measure 1, Signature Grouping 1:
 Key Signature 1 sharp(s) ⠩
@@ -279,7 +279,7 @@ Barline final ⠣⠅
         from music21.braille.translate import objectToBraille
         verdi = corpus.parse('verdi/laDonnaEMobile')
         x = objectToBraille(verdi, debug=True)
-        y = '''---begin grand segment---
+        y = u'''---begin grand segment---
 <music21.braille.segment BrailleGrandSegment>
 ===
 Measure 1 Right, Signature Grouping 1:

@@ -119,7 +119,7 @@ class _EnvironmentCore(object):
 
     def __getitem__(self, key):
         # could read file here to update from disk
-        # could store last update tim and look of file is more recent
+        # could store last update time and look of file is more recent
         # how, only doing read once is a bit more conservative
         #self.read()
 
@@ -129,11 +129,11 @@ class _EnvironmentCore(object):
             raise EnvironmentException('no preference: %s' % key)
         value = self._ref[key]
         if six.PY3 and isinstance(value, bytes):
-            value = value.decode(errors='replace')
+            value = value.decode(encoding='utf-8', errors='replace')
         
         valueStr = str(value).lower()
 
-        if key in ['debug']:  # debug expects a number
+        if key == 'debug':  # debug expects a number
             if valueStr == 'true':
                 value = common.DEBUG_USER
             elif valueStr == 'false':
@@ -204,7 +204,6 @@ class _EnvironmentCore(object):
         # set value
         if key == 'localCorpusPath':
             # only add if unique
-            #value = xmlnode.fixBytes(value)
             if value not in self._ref['localCorpusSettings']:
                 # check for malicious values here
                 self._ref['localCorpusSettings'].append(value)
@@ -324,17 +323,22 @@ class _EnvironmentCore(object):
                 ]:
                 self.__setitem__(name, value)  # use for key checking
 
-    def _toSettings(self, ref):
+    def toSettingsXML(self, ref=None):
         '''
-        Convert a ref dictionary to an Element object        
+        Convert a ref dictionary to an xml.etree.ElementTree.Element object
+        with root "<settings>" and return that object
         '''
-        settings = ET.Element('settings')
+        if ref is None:
+            ref = self._ref
+        
+        settingsDict = {'encoding': 'utf-8'}
+        settings = ET.Element('settings', settingsDict)
+        
         settingsTree = ET.ElementTree(settings)
         for key, value in sorted(ref.items()):
             if key == 'localCorpusSettings':
                 localCorpusSettings = ET.Element('localCorpusSettings')
                 for filePath in sorted(value):
-                    #filePath = xmlnode.fixBytes(filePath)
                     localCorpusPath = ET.Element('localCorpusPath')
                     if filePath is not None:
                         localCorpusPath.text = filePath
@@ -345,7 +349,6 @@ class _EnvironmentCore(object):
                 for name, paths in sorted(value.items()):
                     localCorpusSettings = ET.Element('localCorpusSettings', name=name)
                     for filePath in sorted(paths):
-                        #filePath = xmlnode.fixBytes(filePath)
                         localCorpusPath = ET.Element('localCorpusPath')
                         if filePath is not None:
                             localCorpusPath.text = filePath
@@ -450,9 +453,8 @@ class _EnvironmentCore(object):
             # this is not available on all windows versions
             if 'APPDATA' in os.environ:
                 directory = os.environ['APPDATA']
-            elif ('USERPROFILE' in os.environ and
-                os.path.exists(os.path.join(
-                    os.environ['USERPROFILE'], 'Application Data'))):
+            elif ('USERPROFILE' in os.environ
+                  and os.path.exists(os.path.join(os.environ['USERPROFILE'], 'Application Data'))):
                 directory = os.path.join(
                     os.environ['USERPROFILE'],
                     'Application Data',
@@ -561,7 +563,7 @@ class _EnvironmentCore(object):
         return None
 
 
-    @common.deprecated("May 24, 2014", "May 2016", "call SubConverter().launch() instead")    
+    #@common.deprecated("May 24, 2014", "May 2016", "call SubConverter().launch() instead")    
     def launch(self, fmt, filePath, options='', app=None):
         '''
         DEPRECATED May 24, 2014 -- call Launch on SubConverter
@@ -616,7 +618,7 @@ class _EnvironmentCore(object):
                     raise EnvironmentException(
                         "Cannot find a valid application path for format {}. "
                         "Specify this in your Environment by calling "
-                        "environment.set({!r}, 'pathToApplication')".format(
+                        "environment.set({!r}, '/path/to/application')".format(
                             m21Format, environmentKey))
         elif platform == 'win':  # note extra set of quotes!
             cmd = '""%s" %s "%s""' % (fpApp, options, filePath)
@@ -648,7 +650,7 @@ class _EnvironmentCore(object):
         directory = os.path.split(filePath)[0]
         if filePath is None or not os.path.exists(directory):
             raise EnvironmentException('bad file path for .music21rc: %s' % filePath)
-        settingsTree = self._toSettings(self._ref)
+        settingsTree = self.toSettingsXML()
         etIndent(settingsTree.getroot())
         settingsTree.write(filePath, encoding='utf-8')
 
@@ -664,6 +666,12 @@ _environStorage = {'instance': None, 'forcePlatform': None}
 # create singleton instance
 _environStorage['instance'] = _EnvironmentCore()
 
+def envSingleton():
+    '''
+    returns the _environStorage['instance'], _EnvironmentCore singleton
+    object
+    '''
+    return _environStorage['instance']
 
 #------------------------------------------------------------------------------
 class Environment(object):
@@ -724,16 +732,15 @@ class Environment(object):
         # this only happens in testing
         # otherwise, delegate all calls to the module-level instance
         if forcePlatform != _environStorage['forcePlatform']:
-            _environStorage['instance'] = _EnvironmentCore(
-                forcePlatform=forcePlatform)
+            _environStorage['instance'] = _EnvironmentCore(forcePlatform=forcePlatform)
 
     ### SPECIAL METHODS ###
 
     def __getitem__(self, key):
-        return _environStorage['instance'].__getitem__(key)
+        return envSingleton().__getitem__(key)
 
     def __repr__(self):
-        return _environStorage['instance'].__repr__()
+        return envSingleton().__repr__()
 
     def __setitem__(self, key, value):
         '''
@@ -758,10 +765,10 @@ class Environment(object):
         >>> a['showFormat'] = 'musicxml'
         >>> a['localCorpusPath'] = '/path/to/local'
         '''
-        _environStorage['instance'].__setitem__(key, value)
+        envSingleton().__setitem__(key, value)
 
     def __str__(self):
-        return _environStorage['instance'].__str__()
+        return envSingleton().__str__()
 
     ### PUBLIC METHODS ###
 
@@ -777,7 +784,7 @@ class Environment(object):
         If not able to create a 'music21' directory, the standard default is
         returned.
         '''
-        dstDir = _environStorage['instance'].getDefaultRootTempDir()
+        dstDir = envSingleton().getDefaultRootTempDir()
         self.printDebug([_MOD, 'using temporary directory:', dstDir])
         return dstDir
 
@@ -800,7 +807,7 @@ class Environment(object):
         'vectorPath'
 
         '''
-        return _environStorage['instance'].getKeysToPaths()
+        return envSingleton().getKeysToPaths()
 
     def getRefKeys(self):
         '''
@@ -835,7 +842,7 @@ class Environment(object):
         'warnings'
         'writeFormat'
         '''
-        return _environStorage['instance'].getRefKeys()
+        return envSingleton().getRefKeys()
 
     def getRootTempDir(self):
         '''
@@ -844,20 +851,20 @@ class Environment(object):
         gets the system-provided directory (with a music21 subdirectory, if
         possible).
         '''
-        return _environStorage['instance'].getRootTempDir()
+        return envSingleton().getRootTempDir()
 
     def getSettingsPath(self):
         '''
         Return the path to the platform specific settings file.
         '''
-        return _environStorage['instance'].getSettingsPath()
+        return envSingleton().getSettingsPath()
 
     def getTempFile(self, suffix=''):
         '''
         Return a file path to a temporary file with the specified suffix (file
         extension).
         '''
-        filePath = _environStorage['instance'].getTempFile(suffix=suffix)
+        filePath = envSingleton().getTempFile(suffix=suffix)
         self.printDebug([_MOD, 'temporary file:', filePath])
         return filePath
 
@@ -892,13 +899,13 @@ class Environment(object):
         'warnings'
         'writeFormat'
         '''
-        return _environStorage['instance'].keys()
+        return envSingleton().keys()
 
     def formatToApp(self, m21Format):
-        return _environStorage['instance'].formatToApp(m21Format)
+        return envSingleton().formatToApp(m21Format)
 
     def formatToKey(self, m21Format):
-        return _environStorage['instance'].formatToKey(m21Format)
+        return envSingleton().formatToKey(m21Format)
 
     def launch(self, fmt, filePath, options='', app=None):
         '''
@@ -912,8 +919,7 @@ class Environment(object):
 
         TODO: Switch to module subprocess to prevent hanging.
         '''
-        return _environStorage['instance'].launch(fmt, filePath,
-                options=options, app=app)
+        return envSingleton().launch(fmt, filePath, options=options, app=app)
 
     def printDebug(self, msg, statusLevel=common.DEBUG_USER, debugFormat=None):
         '''
@@ -921,7 +927,7 @@ class Environment(object):
         The first arg can be a list of strings or a string; lists are
         concatenated with common.formatStr().
         '''
-        if _environStorage['instance'].__getitem__('debug') >= statusLevel:
+        if envSingleton().__getitem__('debug') >= statusLevel:
             if isinstance(msg, six.string_types):
                 msg = [msg]  # make into a list
             if msg[0] != self.modNameParent and self.modNameParent is not None:
@@ -937,7 +943,7 @@ class Environment(object):
         will ever be written unless manually done so. If no preference file
         exists, the method returns None.
         '''
-        return _environStorage['instance'].read(filePath=filePath)
+        return envSingleton().read(filePath=filePath)
 
     def restoreDefaults(self):
         '''
@@ -954,7 +960,7 @@ class Environment(object):
 
         >>> a = environment.Environment().read()
         '''
-        _environStorage['instance'].restoreDefaults()
+        envSingleton().restoreDefaults()
 
     def warn(self, msg, header=None):
         '''
@@ -967,6 +973,9 @@ class Environment(object):
             msg = [repr(msg)]
         elif common.isNum(msg):
             msg = [str(msg)]
+        elif isinstance(msg, Exception):
+            msg = [str(msg)]
+            
         if header is None:
             if msg[0] != self.modNameParent and self.modNameParent is not None:
                 msg = [self.modNameParent + ': WARNING:'] + msg
@@ -981,7 +990,7 @@ class Environment(object):
         any changes made to the object and access preferences later.
         If `filePath` is None, the default storage location will be used.
         '''
-        return _environStorage['instance'].write(filePath=filePath)
+        return envSingleton().write(filePath=filePath)
 
     def xmlReaderType(self):
         r'''
@@ -1130,11 +1139,13 @@ class UserSettings(object):
         >>> us = environment.UserSettings()
         >>> us['musicxmlPath'] = 'asdfwerasdffasdfwer'
         Traceback (most recent call last):
-        UserSettingsException: attempting to set a path that does not exist: asdfwerasdffasdfwer
+        UserSettingsException: attempting to set a value to a path that does not exist: 
+            asdfwerasdffasdfwer
 
         >>> us['localCorpusPath'] = '/path/to/local'
         Traceback (most recent call last):
-        UserSettingsException: attempting to set a path that does not exist: /path/to/local
+        UserSettingsException: attempting to set a value to a path that does not exist: 
+            /path/to/local
         '''
         # NOTE: testing setting of any UserSettings key will result
         # in a change in your local preferences files
@@ -1147,7 +1158,7 @@ class UserSettings(object):
                 value = os.path.expanduser(value)
                 if not os.path.exists(value):
                     raise UserSettingsException(
-                        'attempting to set a path that does not exist: {}'.format(
+                        'attempting to set a value to a path that does not exist: {}'.format(
                             value))
         # when setting a local corpus setting, if not a list, append
         elif key == 'localCorpusSettings':
@@ -1264,8 +1275,7 @@ class Test(unittest.TestCase):
 
     def testToSettings(self):
         env = Environment(forcePlatform='darwin')
-        settingsTree = _environStorage['instance']._toSettings(
-            _environStorage['instance']._ref)
+        settingsTree = envSingleton().toSettingsXML()
         match = self.stringFromTree(settingsTree)
         self.maxDiff = None
         if 'encoding' in match:
@@ -1273,7 +1283,7 @@ class Test(unittest.TestCase):
         else:
             enc = ''
         canonic = """<?xml version='1.0' """ + enc + """?>
-<settings>
+<settings encoding="utf-8">
   <preference name="autoDownload" value="ask" />
   <preference name="braillePath" />
   <preference name="debug" value="0" />
@@ -1304,15 +1314,14 @@ class Test(unittest.TestCase):
         # try adding some local corpus settings
         env['localCorpusSettings'] = ['a', 'b', 'c']
         env['localCorporaSettings']['foo'] = ['bar', 'baz', 'quux']
-        settingsTree = _environStorage['instance']._toSettings(
-            _environStorage['instance']._ref)
+        settingsTree = envSingleton().toSettingsXML()
         match = self.stringFromTree(settingsTree)
         if 'encoding' in match:
             enc = "encoding='utf-8'"
         else:
             enc = ''
         canonic = """<?xml version='1.0' """ + enc + """?>
-<settings>
+<settings encoding="utf-8">
   <preference name="autoDownload" value="ask" />
   <preference name="braillePath" />
   <preference name="debug" value="0" />
@@ -1358,20 +1367,19 @@ class Test(unittest.TestCase):
         ref = {}
         ref['localCorpusSettings'] = ['x', 'y', 'z']
         ref['midiPath'] = 'w'
-        settings = _environStorage['instance']._toSettings(ref)
+        settings = envSingleton().toSettingsXML(ref)
 
         # this will load values into the env._ref dictionary
-        _environStorage['instance']._fromSettings(settings,
-            _environStorage['instance']._ref)
+        envSingleton()._fromSettings(settings,
+            envSingleton()._ref)
         # get xml strings
-        match = self.stringFromTree(_environStorage['instance']._toSettings(
-            _environStorage['instance']._ref))
+        match = self.stringFromTree(envSingleton().toSettingsXML())
         if 'encoding' in match:
             enc = "encoding='utf-8'"
         else:
             enc = ''
         canonic = """<?xml version='1.0' """ + enc + """?>
-<settings>
+<settings encoding="utf-8">
   <preference name="autoDownload" value="ask" />
   <preference name="braillePath" />
   <preference name="debug" value="0" />

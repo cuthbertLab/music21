@@ -40,6 +40,8 @@ from music21 import stream
 from music21.audioSearch import recording
 from music21.audioSearch import transcriber
 
+from music21.ext import six
+
 from music21 import environment
 _MOD = 'audioSearch/base.py'
 environLocal = environment.Environment(_MOD)
@@ -435,7 +437,7 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     if waveFilenameOrHandle == 'temp':
         waveFilenameOrHandle = environLocal.getRootTempDir() + os.path.sep + 'temp.wav'
 
-    if common.isStr(waveFilenameOrHandle):
+    if isinstance(waveFilenameOrHandle, six.string_types):
         # waveFilenameOrHandle is a filename
         waveFilename = waveFilenameOrHandle
         try:
@@ -845,8 +847,8 @@ def decisionProcess(partsList, notePrediction, beginningData,
 
     dist = math.fabs(beginningData[0] - notePrediction)
     for i in range(len(partsList)):
-        if ((partsList[i].matchProbability >= 0.9 * partsList[0].matchProbability) and 
-                (beginningData[int(partsList[i].id)] > lastNotePosition)): #let's take a 90%
+        if ((partsList[i].matchProbability >= 0.9 * partsList[0].matchProbability) 
+                and (beginningData[int(partsList[i].id)] > lastNotePosition)): #let's take a 90%
             if math.fabs(beginningData[int(partsList[i].id)] - notePrediction) < dist:
                 dist = math.fabs(beginningData[int(partsList[i].id)] - notePrediction)
                 position = i
@@ -869,10 +871,10 @@ def decisionProcess(partsList, notePrediction, beginningData,
         countdown += 1
         environLocal.printDebug("Excessive distance....? dist=%d" % dist)
 
-    elif ((firstNotePage != None and lastNotePage != None) and 
-          ((beginningData[int(partsList[position].id)] < firstNotePage or 
-            beginningData[int(partsList[position].id)] > lastNotePage) and 
-           countdown < 2)):
+    elif ((firstNotePage != None and lastNotePage != None) 
+          and ((beginningData[int(partsList[position].id)] < firstNotePage 
+                or beginningData[int(partsList[position].id)] > lastNotePage) 
+               and countdown < 2)):
         countdown += 1
         environLocal.printDebug('playing in a not shown part')
     else:

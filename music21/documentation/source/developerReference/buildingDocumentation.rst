@@ -22,6 +22,8 @@ Just go to https://pip.pypa.io/ and they'll help you out.
 Pandoc is a universal documentation converter that we use.
 You can get pandoc at: http://pandoc.org/installing.html
 
+Note that pandoc 1.14-1.15.0 do not work.  1.15.1 and newer are recommended.
+
 **3) Install nbconvert**
 
 Some of the tutorials and users guides for `music21` use the Jupyter/IPython

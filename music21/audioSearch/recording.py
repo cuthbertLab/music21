@@ -32,7 +32,8 @@ import wave
 
 
 from music21 import exceptions21
-from music21 import common
+from music21.ext import six
+
 from music21 import environment
 _MOD = "audiosearch.recording.py"
 environLocal = environment.Environment(_MOD)
@@ -95,7 +96,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
     p_audio.terminate()    
 
     if storeFile != False: 
-        if common.isStr(storeFile):
+        if isinstance(storeFile, six.string_types):
             waveFilename = storeFile
         else:
             waveFilename = environLocal.getRootTempDir() + os.path.sep + 'recordingTemp.wav'

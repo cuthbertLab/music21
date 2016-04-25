@@ -22,30 +22,31 @@ to graphing data and structures in
 '''
 from __future__ import division
 
+from collections import namedtuple
+
 import unittest
 import random, math, os
 
 from music21 import base # for _missingImport
 
-from music21 import note
-from music21 import dynamics
-from music21 import exceptions21
-
-from music21 import pitch
 from music21 import common
 from music21 import chord
 from music21 import corpus
 from music21 import converter
+from music21 import dynamics
+from music21 import exceptions21
+from music21 import note
+from music21 import pitch
 
-from music21.analysis import windowed
-from music21.analysis import discrete
 from music21.analysis import correlate
+from music21.analysis import discrete
 from music21.analysis import reduction
+from music21.analysis import windowed
 
 from music21 import features
+from music21.ext import six
 from music21.ext import webcolors
 
-from collections import namedtuple
 
 from music21 import environment
 _MOD = 'graph.py'
@@ -98,7 +99,7 @@ class PlotStreamException(exceptions21.Music21Exception):
 
 # temporary
 def _substituteAccidentalSymbols(label):
-    if not common.isStr(label):
+    if not isinstance(label, six.string_types):
         return label
     if '-' in label:
         #label = label.replace('-', '&#x266d;')
@@ -204,7 +205,7 @@ def getColor(color):
     # expand a single value to three
     if common.isNum(color):
         color = [color, color, color]
-    if common.isStr(color):
+    if isinstance(color, six.string_types):
         if color[0] == '#': # assume is hex
             # this will expand three-value codes, and check for badly
             # formed codes
@@ -2504,7 +2505,7 @@ class PlotMultiStream(object):
         foundPaths = []
         for s in streamList:
             # could be corpus or file path
-            if common.isStr(s):
+            if isinstance(s, six.string_types):
                 foundPaths.append(os.path.basename(s))
                 if os.path.exists(s):
                     s = converter.parse(s)
@@ -4049,7 +4050,7 @@ class PlotFeatures(PlotMultiStream):
 
         feList = []
         for fe in self.featureExtractors:
-            if common.isStr(fe):
+            if isinstance(fe, six.string_types):
                 post = features.extractorsById(fe)
                 for sub in post:
                     feList.append(sub())

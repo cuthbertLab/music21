@@ -63,7 +63,7 @@ from music21 import pitch
 from music21 import interval
 from music21 import sieve
 
-
+from music21.ext import six
 
 from music21 import environment
 _MOD = "scale.py"
@@ -252,11 +252,10 @@ class AbstractScale(Scale):
         False
         '''
         # have to test each so as not to confuse with a subclass
-        if (isinstance(other, self.__class__) and 
-            isinstance(self, other.__class__) and 
-            self.tonicDegree == other.tonicDegree and
-            self._net == other._net
-            ):
+        if (isinstance(other, self.__class__) 
+            and isinstance(self, other.__class__)
+            and self.tonicDegree == other.tonicDegree
+            and self._net == other._net):
             return True     
         else:
             return False
@@ -306,7 +305,7 @@ class AbstractScale(Scale):
         '''
         pitchListReal = []
         for p in pitchList:
-            if common.isStr(p):
+            if isinstance(p, six.string_types):
                 pitchListReal.append(pitch.Pitch(p))
             elif hasattr(p, 'classes') and 'GeneralNote' in p.classes:
                 pitchListReal.append(p.pitch)
@@ -670,13 +669,12 @@ class AbstractDiatonicScale(AbstractScale):
         True
         '''
         # have to test each so as not to confuse with a subclass
-        if (isinstance(other, self.__class__) and 
-            isinstance(self, other.__class__) and 
-            self.type == other.type and
-            self.tonicDegree == other.tonicDegree and
-            self.dominantDegree == other.dominantDegree and
-            self._net == other._net
-            ):
+        if (isinstance(other, self.__class__)
+            and isinstance(self, other.__class__)
+            and self.type == other.type
+            and self.tonicDegree == other.tonicDegree
+            and self.dominantDegree == other.dominantDegree
+            and self._net == other._net):
             return True     
         else:
             return False
@@ -1263,10 +1261,10 @@ class ConcreteScale(Scale):
         # determine whether this is a limited range
         self.boundRange = False
 
-        if (tonic is None and 
-                pitches is not None and 
-                common.isListLike(pitches) and 
-                pitches):
+        if (tonic is None
+                and pitches is not None
+                and common.isListLike(pitches)
+                and pitches):
             tonic = pitches[0]
 
         # here, tonic is a pitch
@@ -1275,16 +1273,16 @@ class ConcreteScale(Scale):
         # no default tonic is defined; as such, it is mostly an abstract scale
         if tonic is None:
             self.tonic = None #pitch.Pitch()
-        elif common.isStr(tonic):
+        elif isinstance(tonic, six.string_types):
             self.tonic = pitch.Pitch(tonic)
         elif hasattr(tonic, 'classes') and 'GeneralNote' in tonic.classes:
             self.tonic = tonic.pitch
         else: # assume this is a pitch object
             self.tonic = tonic
 
-        if (pitches is not None and 
-                common.isListLike(pitches) and 
-                pitches):
+        if (pitches is not None
+                and common.isListLike(pitches)
+                and pitches):
             self._abstract = AbstractScale()
             self._abstract.buildNetworkFromPitches(pitches)
             if tonic in pitches:
@@ -1350,12 +1348,11 @@ class ConcreteScale(Scale):
             return self._abstract == other._abstract
         
         else:
-            if (isinstance(other, self.__class__) and 
-                isinstance(self, other.__class__) and 
-                self._abstract == other._abstract and
-                self.boundRange == other.boundRange and
-                self.tonic == other.tonic 
-                ):
+            if (isinstance(other, self.__class__)
+                and isinstance(self, other.__class__) 
+                and self._abstract == other._abstract
+                and self.boundRange == other.boundRange
+                and self.tonic == other.tonic):
                 return True     
             else:
                 return False
@@ -1542,13 +1539,15 @@ class ConcreteScale(Scale):
                 pitchObj = self.tonic
             stepOfPitch = self._abstract.tonicDegree
 
-            if common.isStr(minPitch):
+            if isinstance(minPitch, six.string_types):
                 minPitch = pitch.Pitch(minPitch)
-            if common.isStr(maxPitch):
+            if isinstance(maxPitch, six.string_types):
                 maxPitch = pitch.Pitch(maxPitch)
             
-            if (minPitch is not None and maxPitch is not None and 
-                   minPitch > maxPitch and direction is None):
+            if (minPitch is not None 
+                    and maxPitch is not None
+                    and minPitch > maxPitch 
+                    and direction is None):
                 reverse = True
                 (minPitch, maxPitch) = (maxPitch, minPitch)
             elif direction == DIRECTION_DESCENDING:
@@ -2052,7 +2051,7 @@ class ConcreteScale(Scale):
         >>> sc1.isNext('d4', 'c4', 'ascending')
         True
         '''
-        if common.isStr(other): # convert to pitch
+        if isinstance(other, six.string_types): # convert to pitch
             other = pitch.Pitch(other)
         elif hasattr(other, 'pitch'): # possibly a note
             other = other.pitch # just get pitch component
@@ -3017,8 +3016,11 @@ class ScalaScale(ConcreteScale):
 
     '''
     def __init__(self, tonic=None, scalaString=None):
-        if (tonic is not None and scalaString is None and common.isStr(tonic) 
-            and (len(tonic) >= 4 or tonic.endswith('scl')) ):
+        if (tonic is not None 
+            and scalaString is None 
+            and isinstance(tonic, six.string_types) 
+            and (len(tonic) >= 4
+                 or tonic.endswith('scl')) ):
             # just a scale was wanted
             scalaString = tonic
             tonic = 'C4'

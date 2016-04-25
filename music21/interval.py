@@ -17,9 +17,10 @@ Fundamental classes are :class:`~music21.interval.Interval`,
 :class:`~music21.interval.GenericInterval`, 
 and :class:`~music21.interval.ChromaticInterval`.
 '''
+from fractions import Fraction
+
 import abc
 import copy
-from fractions import Fraction
 import math
 import unittest
 
@@ -27,6 +28,7 @@ from music21 import base
 from music21 import common 
 from music21 import exceptions21
 
+from music21.ext import six
 #from music21 import pitch # SHOULD NOT, b/c of enharmonics
 
 from music21 import environment
@@ -220,7 +222,7 @@ def convertSpecifier(specifier):
     if common.isNum(specifier):
         post = specifier
     # check string matches
-    if common.isStr(specifier):
+    if isinstance(specifier, six.string_types):
         if specifier in prefixSpecs:
             post = prefixSpecs.index(specifier)
         # permit specifiers as prefixes without case; this will not distinguish
@@ -282,7 +284,7 @@ def convertGeneric(value):
     if common.isNum(value):
         post = value
         directionScalar = 1 # may still be negative
-    elif common.isStr(value):
+    elif isinstance(value, six.string_types):
         # first, see if there is a direction term
         directionScalar = ASCENDING # assume ascending
         for direction in [DESCENDING, ASCENDING]:
@@ -944,7 +946,7 @@ class DiatonicInterval(IntervalBase):
         IntervalBase.__init__(self)
 
         if specifier is not None and generic is not None:
-            if common.isNum(generic) or common.isStr(generic):
+            if common.isNum(generic) or isinstance(generic, six.string_types):
                 self.generic = GenericInterval(generic)
             elif isinstance(generic, GenericInterval): 
                 self.generic = generic
@@ -1056,9 +1058,9 @@ class DiatonicInterval(IntervalBase):
         ## untested...
         #if self.direction != other.direction:
         #    return False
-        if (self.generic == other.generic and 
-            self.specifier == other.specifier and 
-            self.direction == other.direction):
+        if (self.generic == other.generic 
+            and self.specifier == other.specifier 
+            and self.direction == other.direction):
             return True
         else:
             return False
@@ -1524,8 +1526,8 @@ def _getSpecifierFromGenericChromatic(gInt, cInt):
     noteVals = [None, 0, 2, 4, 5, 7, 9, 11]
     normalSemis = noteVals[gInt.simpleUndirected] + 12 * gInt.undirectedOctaves
 
-    if (gInt.direction != cInt.direction and 
-        gInt.direction != OBLIQUE and cInt.direction != OBLIQUE):
+    if (gInt.direction != cInt.direction 
+        and gInt.direction != OBLIQUE and cInt.direction != OBLIQUE):
         # intervals like d2 and dd2 etc. 
         # (the last test doesn't matter, since -1*0 == 0, but in theory it should be there)
         theseSemis = -1 * cInt.undirected
@@ -1774,7 +1776,7 @@ class Interval(IntervalBase):
         self.niceName = ""
 
 
-        if len(arguments) == 1 and common.isStr(arguments[0]):
+        if len(arguments) == 1 and isinstance(arguments[0], six.string_types):
             # convert common string representations 
             dInterval, cInterval = _stringToDiatonicChromatic(arguments[0])
             self.diatonic = dInterval
@@ -1788,19 +1790,20 @@ class Interval(IntervalBase):
 
         # permit pitches instead of Notes
         # this requires importing note, which is a bit circular, but necessary
-        elif (len(arguments) == 2 and 'Pitch' in arguments[0].classes and 
-            'Pitch' in arguments[1].classes):
+        elif (len(arguments) == 2 
+              and 'Pitch' in arguments[0].classes 
+              and 'Pitch' in arguments[1].classes):
             from music21 import note
             self._noteStart = note.Note()
             self._noteStart.pitch = arguments[0]
             self._noteEnd = note.Note()
             self._noteEnd.pitch = arguments[1]
 
-        elif (len(arguments) == 2 and 
-              hasattr(arguments[0], 'isNote') and 
-              hasattr(arguments[1], 'isNote') and 
-              arguments[0].isNote == True and 
-              arguments[1].isNote == True):
+        elif (len(arguments) == 2 
+              and hasattr(arguments[0], 'isNote') 
+              and hasattr(arguments[1], 'isNote') 
+              and arguments[0].isNote == True 
+              and arguments[1].isNote == True):
             self._noteStart = arguments[0]
             self._noteEnd = arguments[1]
         else:
@@ -1935,8 +1938,8 @@ class Interval(IntervalBase):
         elif not hasattr(other, 'diatonic') or not hasattr(other, 'chromatic'):
             return False
 
-        if (self.diatonic == other.diatonic and 
-            self.chromatic == other.chromatic):
+        if (self.diatonic == other.diatonic 
+            and self.chromatic == other.chromatic):
             return True
         else:
             return False
@@ -2400,7 +2403,7 @@ def transposePitch(pitch1, interval1):
 
     # check if interval1 is a string,
     # then convert it to interval object if necessary
-    if common.isStr(interval1) or isinstance(interval1, int):
+    if isinstance(interval1, six.string_types) or isinstance(interval1, int):
         interval1 = Interval(interval1) 
     else:
         if not hasattr(interval1, 'transposePitch'):

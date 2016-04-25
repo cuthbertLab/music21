@@ -28,7 +28,10 @@ from music21 import defaults
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
+
 from music21.common import SlottedObject, opFrac
+from music21.ext import six
+
 _MOD = 'meter.py'
 environLocal = environment.Environment(_MOD)
 
@@ -377,8 +380,9 @@ def bestTimeSignature(meas):
     for e in meas.recurse().notesAndRests:
         if e.quarterLength == 0.0:
             continue # case of grace durations
-        if (e.quarterLength < minDurQL and 
-                not isinstance(opFrac(e.quarterLength), fractions.Fraction)): # no non-power2 sigs
+        if (e.quarterLength < minDurQL
+                and not isinstance(opFrac(e.quarterLength), fractions.Fraction)): 
+            # no non-power2 sigs
             minDurQL = e.quarterLength
             if e.duration.dots > 0:
                 minDurDotted = True
@@ -389,16 +393,16 @@ def bestTimeSignature(meas):
     # first, we need to evenly divide min dur into total
     minDurTest = minDurQL
     if isinstance(sumDurQL, fractions.Fraction):
-        numerator = minDurTest.numerator
-        denominator = minDurTest.denominator
+        numerator = sumDurQL.numerator
+        denominator = sumDurQL.denominator
     else:
     
         i = 10
         while i > 0:
             partsFloor = int(sumDurQL / minDurTest)
             partsReal = opFrac(sumDurQL / float(minDurTest))
-            if (partsFloor == partsReal or
-                minDurTest <= duration.typeToDuration[MIN_DENOMINATOR_TYPE]):
+            if (partsFloor == partsReal
+                    or minDurTest <= duration.typeToDuration[MIN_DENOMINATOR_TYPE]):
                 break
             # need to break down minDur until we can get a match
             else:
@@ -595,8 +599,8 @@ class MeterTerminal(SlottedObject):
 # #         if not isinstnace(other, MeterTerminal):
 # #             return False
 #         if other is None: return False
-#         if (other.numerator == self.numerator and
-#             other.denominator == self.denominator):
+#         if (other.numerator == self.numerator
+#             and other.denominator == self.denominator):
 #             return True
 #         else:
 #             return False
@@ -607,8 +611,8 @@ class MeterTerminal(SlottedObject):
 # #         if not isinstnace(other, MeterTerminal):
 # #             return True
 #         if other is None: return True
-#         if (other.numerator == self.numerator and
-#             other.denominator == self.denominator):
+#         if (other.numerator == self.numerator
+#             and other.denominator == self.denominator):
 #             return False
 #         else:
 #             return True
@@ -632,8 +636,8 @@ class MeterTerminal(SlottedObject):
         '''
         if other is None: 
             return False
-        if (other.numerator == self.numerator and
-            other.denominator == self.denominator):
+        if (other.numerator == self.numerator
+                and other.denominator == self.denominator):
             return True
         else:
             return False
@@ -1411,7 +1415,7 @@ class MeterSequence(MeterTerminal):
         else: # assume it is a string
             mt = MeterTerminal(value)
 
-#         if common.isStr(value):
+#         if isinstance(value, six.string_types):
 #             mt = MeterTerminal(value)
 #         elif isinstance(value, MeterTerminal): # may be a MeterSequence
 #             mt = value
@@ -1551,7 +1555,7 @@ class MeterSequence(MeterTerminal):
         MeterException: Cannot set partition by ['3/4', '1/8', '5/8']
         '''
         # assume a list of terminal definitions
-        if common.isStr(numeratorList[0]):
+        if isinstance(numeratorList[0], six.string_types):
             test = MeterSequence()
             for mtStr in numeratorList:
                 test._addTerminal(mtStr)
@@ -1612,9 +1616,8 @@ class MeterSequence(MeterTerminal):
         >>> str(a)
         '{1/2+1/2}'
         '''
-        if (self.numerator == other.numerator and
-            self.denominator == other.denominator):
-
+        if (self.numerator == other.numerator
+                and self.denominator == other.denominator):
             targetWeight = self.weight
             self._clearPartition()
             for mt in other:
@@ -1941,7 +1944,7 @@ class MeterSequence(MeterTerminal):
         #environLocal.printDebug(['calling load in MeterSequence, got targetWeight', targetWeight])
         self._clearPartition()
 
-        if common.isStr(value):
+        if isinstance(value, six.string_types):
             ratioList, self.summedNumerator = slashMixedToFraction(value)
             for n,d in ratioList:
                 slashNotation = '%s/%s' % (n,d)
@@ -2881,8 +2884,8 @@ class TimeSignature(base.Music21Object):
         '''
         if other is None: 
             return False
-        if (other.numerator == self.numerator and
-            other.denominator == self.denominator):
+        if (other.numerator == self.numerator
+                and other.denominator == self.denominator):
             return True
         else:
             return False
@@ -3049,10 +3052,12 @@ class TimeSignature(base.Music21Object):
 
         # used for drawing the time signature symbol
         # this is the only one that can be  unlinked
-        if common.isStr(value) and (value.lower() == 'common' or value.lower() == 'c'):
+        if (isinstance(value, six.string_types)
+                and value.lower() in ('common', 'c')):
             value = '4/4'
             self.symbol = 'common'
-        elif common.isStr(value) and value.lower() in ('cut', 'allabreve'): 
+        elif (isinstance(value, six.string_types)
+                and value.lower() in ('cut', 'allabreve')): 
             # allaBreve is the capella version
             value = '2/2'
             self.symbol = 'cut'
@@ -3063,7 +3068,7 @@ class TimeSignature(base.Music21Object):
 
         # get simple representation; presently, only slashToslashToTuple
         # supports the fast/slow indication
-        if common.isStr(value):
+        if isinstance(value, six.string_types):
             valTuplet = slashToTuple(value)
             if valTuplet is not None:
                 tempoIndication = valTuplet.tempoIndication
@@ -3681,8 +3686,8 @@ class TimeSignature(base.Music21Object):
 
                 # watch for a special case where a duration completely fills
                 # the archetype; this generally should not be beamed
-                if (start == archetypeSpan[0] and
-                    end == archetypeSpan[1]):
+                if (start == archetypeSpan[0]
+                        and end == archetypeSpan[1]):
                     # increment position and continue loop
                     beamsList[i] = None # replace with None!
                     pos += dur.quarterLength
@@ -3692,15 +3697,15 @@ class TimeSignature(base.Music21Object):
                 if i == 0: # if the first, we always start
                     beamType = 'start'
                     # get a partial beam if we cannot continue this
-                    if (beamNext is None or
-                        beamNumber not in beamNext.getNumbers()):
+                    if (beamNext is None
+                            or beamNumber not in beamNext.getNumbers()):
                         beamType = 'partial-right'
 
                 elif i == len(durList) - 1: # last is always stop
                     beamType = 'stop'
                     # get a partial beam if we cannot come form a beam
-                    if (beamPrevious is None or
-                        beamNumber not in beamPrevious.getNumbers()):
+                    if (beamPrevious is None
+                            or beamNumber not in beamPrevious.getNumbers()):
                         #environLocal.printDebug(
                         #   ['triggering partial left where a stop normally falls'])
                         beamType = 'partial-left'
@@ -3736,26 +3741,26 @@ class TimeSignature(base.Music21Object):
 
                 # last beams was active, last beamNumber was active,
                 # and it was stopped or was a partial-left
-                elif (beamPrevious is not None and
-                      beamNumber in beamPrevious.getNumbers() and 
-                      beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left'] and
-                      beamNext is not None):
+                elif (beamPrevious is not None
+                      and beamNumber in beamPrevious.getNumbers()
+                      and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left']
+                      and beamNext is not None):
                     beamType = 'start'
 
 
                 # last note had beams but stopped, next note cannot be beamed to  
                 # was active, last beamNumber was active,
                 # and it was stopped or was a partial-left
-                elif (beamPrevious is not None and
-                      beamNumber in beamPrevious.getNumbers() and 
-                      beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left'] and
-                      beamNext is None):
+                elif (beamPrevious is not None
+                      and beamNumber in beamPrevious.getNumbers()
+                      and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left']
+                      and beamNext is None):
                     beamType = 'partial-left'  # will be deleted later in the script
                     
                 # if no beam is defined next (we know this already)
                 # then must stop
-                elif (beamNext is None or
-                    beamNumber not in beamNext.getNumbers()):
+                elif (beamNext is None
+                      or beamNumber not in beamNext.getNumbers()):
                     beamType = 'stop'
 
                 # the last cases are when to stop, or when to continue
@@ -4682,10 +4687,10 @@ class Test(unittest.TestCase):
 
     def testMusicxmlDirectOut(self):
         # test rendering musicxml directly from meter
-        from music21.musicxml import m21ToString as toMusicXML
+        from music21.musicxml import m21ToXml
 
         ts = TimeSignature('3/8')
-        xmlout = toMusicXML.fromTimeSignature(ts)
+        xmlout = m21ToXml.GeneralObjectExporter().parse(ts).decode('utf-8')
 
         match = '<time><beats>3</beats><beat-type>8</beat-type></time>'
         xmlout = xmlout.replace(' ', '')

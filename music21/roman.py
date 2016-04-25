@@ -21,12 +21,14 @@ import re
 from music21 import chord
 from music21 import common
 from music21 import exceptions21
+from music21 import harmony
 from music21 import interval
 from music21 import key
 from music21 import pitch
 from music21 import scale
+
+from music21.ext import six
 from music21.figuredBass import notation as fbNotation
-from music21 import harmony
 
 from music21 import environment
 _MOD = 'roman.py'
@@ -255,12 +257,12 @@ def figureFromChordAndKey(chordObj, keyObj=None):
                 alterStr = ''  # alterStr[1:]
             elif chordObj.isMinorTriad() and alter > 0:
                 alterStr = ''  # alterStr[1:]
-        elif (diatonicIntervalNum != 1 and 
-              pitchObj is fifth and
-              chordObj.isDiminishedTriad() or 
-              chordObj.isAugmentedTriad() or
-              chordObj.isMajorTriad() or 
-              chordObj.isMinorTriad()):
+        elif (diatonicIntervalNum != 1 
+              and pitchObj is fifth 
+              and chordObj.isDiminishedTriad() 
+                  or chordObj.isAugmentedTriad() 
+                  or chordObj.isMajorTriad() 
+                  or chordObj.isMinorTriad()):
             alterStr = ''  # alterStr[1:]
 
         if diatonicIntervalNum == 1:
@@ -463,9 +465,9 @@ def romanInversionName(inChord):
             return '42'
         else:
             return ''
-    elif (inChord.isTriad() or
-            inChord.isIncompleteMajorTriad() or
-            inChord.isIncompleteMinorTriad()):
+    elif (inChord.isTriad()
+            or inChord.isIncompleteMajorTriad()
+            or inChord.isIncompleteMinorTriad()):
         if inv == 0:
             return ''  # not 53
         elif inv == 1:
@@ -1300,7 +1302,7 @@ class RomanNumeral(harmony.Harmony):
         Called from the superclass, Harmony.__init__()
         
         '''
-        if not common.isStr(self._figure):
+        if not isinstance(self._figure, six.string_types):
             raise RomanException('got a non-string figure: {!r}'.format(
                 self._figure))
 
@@ -1359,8 +1361,8 @@ class RomanNumeral(harmony.Harmony):
         self.frontAlterationAccidental = frontAlterationAccidental
 
         romanNumeralAlone = ''
-        if (not self._romanNumeralAloneRegex.match(workingFigure) and 
-            not self._augmentedSixthRegex.match(workingFigure)):
+        if (not self._romanNumeralAloneRegex.match(workingFigure)
+                and not self._augmentedSixthRegex.match(workingFigure)):
             raise RomanException('No roman numeral found in {!r}'.format(
                 workingFigure))
         elif self._augmentedSixthRegex.match(workingFigure):
@@ -1396,10 +1398,10 @@ class RomanNumeral(harmony.Harmony):
         workingFigure = self._setImpliedQualityFromString(workingFigure)
 
         # Make vii always #vii and vi always #vi.
-        if (getattr(useScale, 'mode', None) == 'minor' and
-                self.caseMatters):
-            if ((self.scaleDegree == 6 or self.scaleDegree == 7) and 
-                    self.impliedQuality in ('minor', 'diminished', 'half-diminished')):
+        if (getattr(useScale, 'mode', None) == 'minor'
+                and self.caseMatters):
+            if ((self.scaleDegree == 6 or self.scaleDegree == 7) 
+                    and self.impliedQuality in ('minor', 'diminished', 'half-diminished')):
                 if (self.frontAlterationTransposeInterval):
                     self.frontAlterationTransposeInterval = interval.add(
                                                              [self.frontAlterationTransposeInterval,
@@ -1635,7 +1637,7 @@ class RomanNumeral(harmony.Harmony):
         
         # try to get Scale or Key object from cache: this will offer
         # performance boost as Scale stores cached pitch segments
-        if common.isStr(keyOrScale):
+        if isinstance(keyOrScale, six.string_types):
             keyOrScale = _getKeyFromCache(keyOrScale)
         elif keyOrScale is not None:
             #environLocal.printDebug(['got keyOrScale', keyOrScale])
@@ -1664,9 +1666,9 @@ class RomanNumeral(harmony.Harmony):
             pass # None
             # cache object if passed directly
         self._scale = keyOrScale
-        if (keyOrScale is None or 
-                (hasattr(keyOrScale, "isConcrete") and
-                 not keyOrScale.isConcrete)):
+        if (keyOrScale is None
+                or (hasattr(keyOrScale, "isConcrete")
+                and not keyOrScale.isConcrete)):
             self.useImpliedScale = True
             if self._scale is not None:
                 self.impliedScale = self._scale.derive(1, 'C')

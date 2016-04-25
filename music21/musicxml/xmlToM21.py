@@ -12,6 +12,7 @@
 import copy
 import math
 #import pprint
+import re
 import sys
 #import traceback
 import unittest
@@ -245,12 +246,16 @@ class XMLParserBase(object):
     def setPosition(self, mxObject, m21Object):
         '''
         get positioning information for an object from
-        x-position
+        default-x, default-y 
         '''
         defaultX = mxObject.get('default-x')
         if defaultX is not None:
             m21Object.xPosition = defaultX
-        # TODO: attr: default-y, relative-x, relative-y
+        defaultY = mxObject.get('default-y')
+        if defaultY is not None:
+            m21Object.positionVertical = defaultY
+            
+        # TODO: attr: relative-x, relative-y
         # TODO: standardize "positionVertical, etc.
 
     def xmlPrintToPageLayout(self, mxPrint, inputM21=None):
@@ -485,6 +490,11 @@ class MusicXMLImporter(XMLParserBase):
         self.xmlRootToScore(self.xmlRoot, self.stream)
     
     def parseXMLText(self):
+        if six.PY3 and isinstance(self.xmlText, bytes):
+            self.xmlText = self.xmlText.decode('utf-8')
+        elif six.PY2 and isinstance(self.xmlText, unicode): # @UndefinedVariable
+            self.xmlText = self.xmlText.encode('utf-8')
+        
         sio = six.StringIO(self.xmlText)
         try:
             etree = ET.parse(sio)
@@ -645,6 +655,7 @@ class MusicXMLImporter(XMLParserBase):
         tb.positionVertical = cw1.get('default-y')
         tb.positionHorizontal = cw1.get('default-x')
         tb.justify = cw1.get('justify')
+        tb.fontFamily = cw1.get('font-family')
         tb.style = cw1.get('font-style')
         tb.weight = cw1.get('font-weight')
         tb.size = cw1.get('font-size')
@@ -815,8 +826,8 @@ class MusicXMLImporter(XMLParserBase):
             c = inputM21
             
         creatorType = creator.get('type')
-        if (creatorType is not None and 
-            creatorType in metadata.Contributor.roleNames):
+        if (creatorType is not None
+            and creatorType in metadata.Contributor.roleNames):
             c.role = creatorType
         
         creatorText = creator.text
@@ -935,16 +946,16 @@ class PartParser(XMLParserBase):
                     m = mStream[i]
                     for eRemove in staffExclude:
                         for eMeasure in m:
-                            if (eMeasure.derivation.origin is eRemove and 
-                                    eMeasure.derivation.method == '__deepcopy__'):
+                            if (eMeasure.derivation.origin is eRemove
+                                and eMeasure.derivation.method == '__deepcopy__'):
                                 #print("removing element", eMeasure, " from ", m)
                                 m.remove(eMeasure)
                                 break
                         for v in m.voices:
                             v.remove(eRemove)
                             for eVoice in v.elements:
-                                if (eVoice.derivation.origin is eRemove and 
-                                        eVoice.derivation.method == '__deepcopy__'):
+                                if (eVoice.derivation.origin is eRemove 
+                                    and eVoice.derivation.method == '__deepcopy__'):
                                     #print("removing element", eRemove, " from ", m, ' voice', v)
                                     v.remove(eVoice)
                 # after adjusting voices see if voices can be reduced or
@@ -1091,8 +1102,9 @@ class PartParser(XMLParserBase):
         if parser.fullMeasureRest is True:
             # recurse is necessary because it could be in voices...
             r1 = m.recurse().getElementsByClass('Rest')[0]
-            if (r1.duration.quarterLength == 4.0 and
-                    r1.duration.quarterLength != self.lastTimeSignature.barDuration.quarterLength):
+            if (r1.duration.quarterLength == 4.0
+                and r1.duration.quarterLength != self.lastTimeSignature.barDuration.quarterLength):
+                
                 r1.duration.quarterLength = self.lastTimeSignature.barDuration.quarterLength
                 m.elementsChanged() # TODO: Remove -- durationTrigger should handle this.
 
@@ -1442,8 +1454,8 @@ class MeasureParser(XMLParserBase):
                 v.elementsChanged()
         self.stream.elementsChanged()
         
-        if (self.restAndNoteCount['rest'] == 1 and
-                self.restAndNoteCount['note'] == 0
+        if (self.restAndNoteCount['rest'] == 1
+            and self.restAndNoteCount['note'] == 0
                 ):
             # TODO: do this on a per voice basis.
             self.fullMeasureRest = True 
@@ -2273,7 +2285,8 @@ class MeasureParser(XMLParserBase):
         tag = mxObj.tag
         if tag in xmlObjects.ARTICULATION_MARKS:
             artic = xmlObjects.ARTICULATION_MARKS[tag]()
-            # print-style
+            # print-style (beyond default-x, default-y
+            self.setPosition(mxObj, artic)
             placement = mxObj.get('placement')
             if placement is not None:
                 artic.placement = placement
@@ -2403,8 +2416,12 @@ class MeasureParser(XMLParserBase):
             elif mxType == 'stop':
                 # need to retrieve an existing spanner
                 # try to get base class of both Crescendo and Decrescendo
-                sp = self.spannerBundle.getByClassIdLocalComplete('Line',
-                        idFound, False)[0] # get first
+                try:
+                    sp = self.spannerBundle.getByClassIdLocalComplete('Line', idFound, False)[0] 
+                    # get first
+                except IndexError:
+                    environLocal.warn("Line <" + mxObj.tag + "> stop without start")
+                    return
                 sp.completeStatus = True
                 
                 if mxObj.tag == 'dashes':
@@ -2722,6 +2739,8 @@ class MeasureParser(XMLParserBase):
             #environLocal.printDebug(['found mxEndingObj', mxEndingObj, 'm', m]) 
             # get all incomplete spanners of the appropriate class that are
             # not complete
+            
+            # TODO: this should also filter by number... (in theory...)
             rbSpanners = self.spannerBundle.getByClass('RepeatBracket').getByCompleteStatus(False)
             # if we have no complete bracket objects, must start a new one
             if len(rbSpanners) == 0:
@@ -2736,16 +2755,31 @@ class MeasureParser(XMLParserBase):
                 # try to add this measure; may be the same
                 rb.addSpannedElements(m)
 
-            # there may just be an ending marker, and no start
-            # this implies just one measure
-            if mxEndingObj.get('type') in ('stop', 'discontinue'):
-                rb.completeStatus = True
+
+            if mxEndingObj.get('type') == 'start':
                 mxNumber = mxEndingObj.get('number')
                 try:
                     mxNumber = int(mxNumber)
                 except ValueError:
                     mxNumber = 1
                 rb.number = mxNumber
+                
+                # however, if the content is different, use that.
+                # for instance, Finale often uses <ending number="1">2.</ending> for
+                # second endings, since the first ending number has already been closed.
+                endingNumberText = mxEndingObj.text
+                if endingNumberText is not None:
+                    rb.overrideDisplay = endingNumberText
+                    overrideNumber = re.match(r'^(\d+)\.?$', endingNumberText) # very cautious
+                    if overrideNumber:
+                        rb.number = int(overrideNumber.group(1))
+
+
+            # there may just be an ending marker, and no start
+            # this implies just one measure
+            if mxEndingObj.get('type') in ('stop', 'discontinue'):
+                rb.completeStatus = True
+                    
             # set number; '' or None is interpreted as 1
 
         if barline.location == 'left':
@@ -2780,12 +2814,6 @@ class MeasureParser(XMLParserBase):
         'final'
         >>> r.direction
         'end'
-
-        # TODO: replace after changing output not to use toMxObjects
-        
-        >>> mxBarline2 = musicxml.toMxObjects.repeatToMx(r)
-        >>> mxBarline2.get('barStyle')
-        'light-heavy'
         '''
         if inputM21 is None:
             r = bar.Repeat()
@@ -3075,6 +3103,7 @@ class MeasureParser(XMLParserBase):
 
         setb = _setAttributeFromAttribute
         setb(te, mxWords, 'justify')
+        setb(te, mxWords, 'font-family')
         setb(te, mxWords, 'font-size', 'size', transform=_floatOrIntStr)
         setb(te, mxWords, 'letter-spacing', transform=_floatOrIntStr)
         setb(te, mxWords, 'enclosure')
@@ -3878,9 +3907,11 @@ class Test(unittest.TestCase):
     def testChordalStemDirImport(self):
         #NB: Finale apparently will not display a pitch that is a member of a chord without a stem
         #unless all chord members are without stems.
-        from music21.musicxml import m21ToString
+        #MuseScore 2.0.3 -- last <stem> tag rules. 
+        from music21.musicxml import m21ToXml
         from music21 import converter
 
+        # this also tests the EXPORTING of stem directions on notes within chords...
         n1 = note.Note('f3')
         n1.notehead = 'diamond'
         n1.stemDirection = 'down'
@@ -3889,8 +3920,9 @@ class Test(unittest.TestCase):
         c = chord.Chord([n1, n2])
         c.quarterLength = 2
         
-        xml = m21ToString.fromMusic21Object(c)
-        #print xml
+        GEX = m21ToXml.GeneralObjectExporter()
+        xml = GEX.parse(c)
+        #print(xml.decode('utf-8'))
         #c.show()
         inputStream = converter.parse(xml)
         chordResult = inputStream.flat.notes[0]

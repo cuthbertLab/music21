@@ -110,6 +110,10 @@ def setupConverterApp(agenda):
       <movement-title>Music21 Fragment</movement-title>
       <identification>
         <creator type="composer">Music21</creator>
+        <encoding>
+          <encoding-date>...</encoding-date>
+          <software>Music21</software>
+        </encoding>
       </identification>
       <defaults>
         <scaling>
