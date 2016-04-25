@@ -193,8 +193,14 @@ class SubConverter(object):
     def getTemporaryFile(self, subformats=None):
         '''
         This is never called with subformats and should probably be deleted!
+        
+        >>> c = corpus.parse('bwv66.6')
+        >>> lpConverter = converter.subConverters.ConverterLilypond()
+        >>> tf = lpConverter.getTemporaryFile(subformats=['png'])
+        >>> tf.endswith('.png')
+        True
         '''
-        ext = self.getExtensionForFormatOrSubformats(subformats)
+        ext = self.getExtensionForSubformats(subformats)
         fp = environLocal.getTempFile(ext)
         return fp
 

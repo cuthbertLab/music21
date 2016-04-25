@@ -3079,17 +3079,17 @@ class MeasureParser(XMLParserBase):
                     # SAX was offsetMeasureNote; bug? should be totalOffset???
                     self.insertCoreAndRef(totalOffset, staffKey, mm)
                 elif tag == 'words':
-                    te = self.xmlToTextExpression(mxDir)
+                    textExpression = self.xmlToTextExpression(mxDir)
                     #environLocal.printDebug(['got TextExpression object', repr(te)])
                     # offset here is a combination of the current position
                     # (offsetMeasureNote) and and the direction's offset
-                    re = te.getRepeatExpression()
-                    if re is not None:
+                    repeatExpression = textExpression.getRepeatExpression()
+                    if repeatExpression is not None:
                         # the repeat expression stores a copy of the text
                         # expression within it; replace it here on insertion
-                        self.insertCoreAndRef(totalOffset, staffKey, re)
+                        self.insertCoreAndRef(totalOffset, staffKey, repeatExpression)
                     else:
-                        self.insertCoreAndRef(totalOffset, staffKey, te)
+                        self.insertCoreAndRef(totalOffset, staffKey, textExpression)
 
     def xmlToTextExpression(self, mxWords):
         '''
