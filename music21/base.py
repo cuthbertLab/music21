@@ -1729,7 +1729,8 @@ class Music21Object(object):
                 className = [className]
 
         #siteMemo = set()
-        for site, positionStart, searchType in self.contextSites(returnSortTuples=True):
+        for site, positionStart, unused_searchType in self.contextSites(returnSortTuples=True):
+            # positionStart is used in the embedded adjacentObject
             if className and site.isClassOrSubclass(className):
                 return site
 

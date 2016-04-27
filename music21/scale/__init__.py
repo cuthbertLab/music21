@@ -49,6 +49,7 @@ next pitch. In all cases :class:`~music21.pitch.Pitch` objects are returned.
 '''
 
 __ALL__ = ['intervalNetwork', 'scala']
+
 from music21.scale import intervalNetwork
 from music21.scale import scala
 #--------------------------

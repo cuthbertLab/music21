@@ -12,7 +12,6 @@
 
 _all_ = ['xmlObjects', 'xmlToM21', 'm21ToXml']
 
-import sys
 from music21.musicxml import xmlObjects
 from music21.musicxml import xmlToM21
 from music21.musicxml import m21ToXml

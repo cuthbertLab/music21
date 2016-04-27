@@ -153,8 +153,6 @@ ydelta_       None                                               Not needed.
 
 __ALL__ = ['spineParser', 'instruments', 'testFiles']
 
-import sys
-
 from music21.humdrum import instruments
 from music21.humdrum import spineParser
 from music21.humdrum import testFiles

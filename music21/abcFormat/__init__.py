@@ -39,10 +39,10 @@ the function :func:`music21.abcFormat.translate.abcToStreamScore` of
 the :ref:`~music21.abcFormat.translate` module
 translates those Tokens into music21 objects.
 '''
-__all__ = (
+__all__ = [
     'translate',
     'testFiles',
-    )
+    ]
 
 from music21.abcFormat import translate
 

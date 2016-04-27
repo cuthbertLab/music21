@@ -33,6 +33,7 @@ import os
 from music21 import exceptions21
 from music21.musedata import base40
 from music21.musedata import translate
+
 from music21 import common
 from music21 import environment
 _MOD = 'musedata.base.py'
