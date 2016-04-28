@@ -9,8 +9,37 @@ General
 How do I ask a question so that it becomes frequently asked?
 
     Don't you hate FAQs that are not based on anything anyone's ever asked?  
-    To ask, post to http://groups.google.com/group/music21list.  But first read what we've already come up with below.
+    To ask, post to http://groups.google.com/group/music21list.  
+    But first read what we've already come up with below.
 
+Why is it called `music21`?
+
+    `music21` gets its name from the fact that it was (mainly) created at
+    MIT in the Music and Theater Arts Section there.  At MIT, everything
+    has a number, and the department number for music is 21M.  There's
+    no connection to "Twenty-first century" etc. and therefore superior
+    to older software. In fact, if I had thought of that mental connection 
+    I probably would have come up with a different name.
+    
+    There was a tradition early on of naming software that dealt with
+    music, with "MUSIC" followed by a number (https://en.wikipedia.org/wiki/MUSIC-N).      
+    There is famously Max Matthews'
+    MUSIC II, III, and IV (the sequels to just plain "MUSIC"), 
+    MUSIC V (Matthews and Miller),
+    MUSIC 360 and MUSIC 11 (Vercoe et al., which became CSound).  
+    These systems were originally created to synthesize sound digitally
+    though their successor systems can do quite a number of different things.
+    
+    I figured that since no one had actually released a piece of software
+    in over 35 years that actually followed the "Music N" naming structure,
+    it was fair game to think of it not as the paradigmatic name for a
+    software synthesis package, but for any new or original usage of software
+    and music.  
+    
+    I'm pretty tickled that the new naming convention is getting an hommage
+    in Anas Ghrab's music22 package: https://pypi.python.org/pypi/music22
+    
+    
 What is the native `music21` data format?
 
     Quick answer: There is none, but it doesn't matter.

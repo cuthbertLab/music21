@@ -36,7 +36,7 @@ or wherever you have downloaded EasyABC to
 There is a two-step process in converting ABC files to Music21 Streams.  First this module
 reads in the text-based .abc file and converts all the information into ABCToken objects.  Then
 the function :func:`music21.abcFormat.translate.abcToStreamScore` of 
-the :ref:`~music21.abcFormat.translate` module
+the :ref:`moduleAbcFormatTranslate` module
 translates those Tokens into music21 objects.
 '''
 __all__ = [

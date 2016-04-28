@@ -425,8 +425,7 @@ class Agenda(dict):
                               "resultVar":    "<CMD_1_RESULT_VARIABLE>",
                               "caller":       "<CMD_1_CALLER>",
                               "command":      "<CMD_1_COMMAND_NAME>",
-                              "argList":      ['<CMD_1_ARG_1>','<CMD_1_ARG_2>'...]},
-                              
+                              "argList":      ['<CMD_1_ARG_1>','<CMD_1_ARG_2>'...]},                   
                               "<CMD_2_TYPE>": "<CMD_2_COMMAND_NAME>",
                               "resultVar":    "<CMD_2_RESULT_VARIABLE>",
                               "caller":       "<CMD_2_CALLER>",
