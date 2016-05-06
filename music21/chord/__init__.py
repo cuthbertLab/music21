@@ -14,8 +14,8 @@ This module defines the Chord object, a sub-class of :class:`~music21.note.Gener
 as well as other methods, functions, and objects related to chords.
 '''
 __all__ = ['tables']
-from music21.chord import tables as chordTables
 
+from music21.chord import tables as chordTables
 
 import copy
 import unittest

@@ -30,7 +30,7 @@ from music21.midi import percussion
 from music21.ext import six
 
 import unittest
-import unicodedata
+import unicodedata # @UnresolvedImport
 import os, string
 import struct
 

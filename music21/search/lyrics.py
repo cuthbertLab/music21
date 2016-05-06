@@ -96,7 +96,7 @@ class LyricSearcher(object):
     @property
     def indexText(self):
         '''
-        Returns the text that has been indexed (a la, :ref:`~music21.text.assembleLyrics`):
+        Returns the text that has been indexed (a la, :func:`~music21.text.assembleLyrics`):
 
         >>> p0 = corpus.parse('luca/gloria').parts[0]
         >>> ls = search.lyrics.LyricSearcher(p0)
