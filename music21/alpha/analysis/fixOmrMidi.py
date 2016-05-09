@@ -32,7 +32,9 @@ class OMRMidiNoteFixer(object):
         self.correctedstream = copy.deepcopy(self.omrstream)
     
     def fixStreams(self):
+
         self.alignStreams()
+
         for omrnote, midinote in zip(self.omrstream, self.midistream):
             fixerRhythm = OMRMidiNoteRhythmFixer(omrnote, midinote)
             fixerRhythm.fix()
@@ -40,11 +42,13 @@ class OMRMidiNoteFixer(object):
             fixerPitch.fix()
     
     def alignStreams(self):
+
         '''
         try a variety of mechanisms to get midistream to align with omrstream
         '''
         #if self.approxequal(self.omrstream.highestTime, self.midistream.highestTime):
         #    pass
+
         # TODO: more ways of checking if stream is aligned 
         pass
     
@@ -88,8 +92,6 @@ class OMRMidiNotePitchFixer(object):
             self.setOMRacc()
 
     def setOMRacc(self):
-        
-        
         if self.isEnharmonic():
             pass
 
@@ -97,8 +99,7 @@ class OMRMidiNotePitchFixer(object):
             if self.isEnharmonic():
                 self.omrnote.pitch.accidental= None
             if len(self.measure_accidentals) == 0:
-                self.omrnote.pitch.accidental= self.midinote.pitch.accidental
-                
+                self.omrnote.pitch.accidental= self.midinote.pitch.accidental         
             else:
                 self.measure_accidentals.append(self.omrnote.pitch)
         elif self.hasSharpFlatAcc() and self.stepEq():
@@ -152,6 +153,7 @@ class Test(unittest.TestCase):
         self.assertEqual(midinote.nameWithOctave, 'B-4')
        
         midinote.pitch.accidental= pitch.Accidental('sharp')
+
         
         self.assertEqual(omrnote.nameWithOctave, 'B-4')
         self.assertEqual(midinote.nameWithOctave, 'B#4')
@@ -174,7 +176,8 @@ class Test(unittest.TestCase):
         from music21 import note
         omrnote = note.Note('En4')
         midinote = note.Note('B-4')
-        
+    
+        self.assertIsNotNone(omrnote.pitch.accidental)
         fixer = OMRMidiNotePitchFixer(omrnote, midinote)
         fixer.fix()
         self.assertEqual(omrnote.nameWithOctave, 'E4')
