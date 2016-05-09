@@ -17,7 +17,6 @@ import copy
 import unittest
 import os
 import inspect
-import itertools
 
 pathName = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
@@ -34,10 +33,12 @@ class OMRMidiNoteFixer(object):
         self.omrstream = omrstream
         self.midistream = midistream
         self.correctedstream = copy.deepcopy(self.omrstream)
+        
+        self.bassDoublesCello = False
     
     def fixStreams(self):
         if self.check_parts():
-            self.alignStreams()
+            pass
 
         for omrnote, midinote in zip(self.omrstream, self.midistream):
             fixerRhythm = OMRMidiNoteRhythmFixer(omrnote, midinote)
@@ -49,6 +50,7 @@ class OMRMidiNoteFixer(object):
         num_midi_parts = len(self.midistream.parts)
         num_omr_parts = len(self.omrstream.parts)
         
+        
         if num_midi_parts == num_omr_parts:
             if num_midi_parts == num_omr_parts + 1:
                 if self.check_bass_doubles_cello():
@@ -58,6 +60,9 @@ class OMRMidiNoteFixer(object):
             return False
     
     def checkBassDoublesCello(self):
+        '''
+        check if Bass part doubles Cello 
+        '''
         # assume bass part is last part
         bassPart = self.midistream [-1]
         # assume cello part is penultimate part
@@ -70,7 +75,8 @@ class OMRMidiNoteFixer(object):
         h.hashNoteName = True
         hashBass = h.hash(bassPart)
         hashCello = h.hash(celloPart)
-        return hashBass == hashCello
+        self.bassDoublesCello = hashBass == hashCello
+        return self.bassDoublesCello
         
     
     def alignStreams(self):
@@ -81,7 +87,15 @@ class OMRMidiNoteFixer(object):
         #if self.approxequal(self.omrstream.highestTime, self.midistream.highestTime):
         #    pass
 
-        # TODO: more ways of checking if stream is aligned 
+        # TODO: more ways of checking if stream is aligned
+        
+        # find the part that aligns the best? or assume already aligned?
+        part_pairs = {}
+        for omr_part_index, omr_part in enumerate(self.omrstream):
+            midi_part = omr_part_index, self.midistream(omr_part_index)
+            part_pairs[omr_part_index] = (omr_part, midi_part)
+            
+            
         pass
     
     def cursoryCheck(self):
@@ -236,6 +250,12 @@ class Test(unittest.TestCase):
 #         hashCello = h.hash(celloPart)
 #         self.assertEqual(hashBass, hashCello)
 
+class ParseTestExternal(unittest.TestCase):
+    def testParseMidi(self):
+        from music21 import converter
+        midistream = converter.parse(K525midiShortPath, forceSource=True, quarterLengthDivisors=[4])
+        midistream.show()
+
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(ParseTestExternal)
