@@ -156,12 +156,14 @@ def runPerceivedDissonanceAnalysis(scoreIn, offsetList, keyStr=None):
     This example runs two analysis, the first is a comparison with the unmodified score and
     user's offsets, the second
     with the passing tones and neighbor tones of the score removed. Results are returned as 
-    nested dictionaries of the
-    following form:
+    nested dictionaries of the following form:
+    
     {fullScore , nonharmonicTonesRemovedScore}
+    
     each of which is a dictionary containing these keys:
-    {'stream', 'numUserIdentified', 'numMusic21Identified', 'numBothIdentified', 
-     'accuracy', 'romans', 'key'}
+    {'stream', 'numUserIdentified', 
+    'numMusic21Identified', 'numBothIdentified', 
+    'accuracy', 'romans', 'key'}
 
     >>> piece = corpus.parse('bwv7.7').measures(0,3)
     >>> offsetList = [
@@ -174,6 +176,7 @@ def runPerceivedDissonanceAnalysis(scoreIn, offsetList, keyStr=None):
     ...     10.14833,
     ...     11.700833,
     ...     ]
+
     >>> analysisDict = alpha.webapps.commands.runPerceivedDissonanceAnalysis(piece, offsetList)
     >>> a = analysisDict['fullScore']
 
@@ -199,18 +202,22 @@ def runPerceivedDissonanceAnalysis(scoreIn, offsetList, keyStr=None):
     >>> b['accuracy']
     40.0 
    
-    Return dictionary.
+    Returns a dictionary.
     '''
     withoutNonharmonictonesScore = copy.deepcopy(scoreIn)
     theoryAnalyzer.removePassingTones(withoutNonharmonictonesScore)
     theoryAnalyzer.removeNeighborTones(withoutNonharmonictonesScore)
-    withoutNonharmonictonesScore.sliceByGreatestDivisor(addTies=True, inPlace=True)
-    withoutNonharmonictonesScore.stripTies(inPlace=True, matchByPitch=True, retainContainers=False)
+    withoutNonharmonictonesScore.sliceByGreatestDivisor(addTies=True, 
+                                                        inPlace=True)
+    withoutNonharmonictonesScore.stripTies(inPlace=True, 
+                                           matchByPitch=True, 
+                                           retainContainers=False)
+
+    fullScoreInfo = determineDissonantIdentificationAccuracy(scoreIn, offsetList, keyStr)
 
     nhtRemoved = determineDissonantIdentificationAccuracy(
                     withoutNonharmonictonesScore, offsetList, keyStr)
-    dissonanceAnalysisDict = {'fullScore': determineDissonantIdentificationAccuracy(
-                                                scoreIn, offsetList,keyStr), 
+    dissonanceAnalysisDict = {'fullScore': fullScoreInfo, 
                               'nonharmonicTonesRemovedScore': nhtRemoved}
     return dissonanceAnalysisDict
 

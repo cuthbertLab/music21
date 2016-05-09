@@ -779,7 +779,7 @@ class SpannerBundle(object):
         >>> sb = spanner.SpannerBundle()
         >>> sb.append(su1)
         >>> sb.append(su2)
-        >>> sb.list
+        >>> list(sb)
         [<music21.spanner.Slur >, <music21.spanner.Glissando >]
         '''
         post = []
@@ -977,7 +977,7 @@ class SpannerBundle(object):
         # NOTE: this is called very frequently: optimize
 #         post = self.__class__()
 #         for sp in self._storage:
-#             if common.isStr(className):
+#             if isinstance(className, six.string_types):
 #                 if className in sp.classes:
 #                     post.append(sp)
 #             else:
@@ -989,7 +989,7 @@ class SpannerBundle(object):
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             post = self.__class__()
             for sp in self._storage:
-                if common.isStr(className):
+                if isinstance(className, six.string_types):
                     if className in sp.classes:
                         post.append(sp)
                 else:
@@ -1214,14 +1214,19 @@ class RepeatBracket(Spanner):
 
     It is assumed that numbering starts from 1. Numberings above 2 are permitted. 
     The `number` keyword argument can be used to pass in the desired number. 
+    
+    `overrideDisplay` if set will display something other than the number.  For instance
+    `ouvert` and `clos` for medieval music.  However, if you use it for something like "1-3"
+    be sure to set number properly too.
 
     
     >>> m = stream.Measure()
     >>> sp = spanner.RepeatBracket(m, number=1)
     >>> sp # can be one or more measures
     <music21.spanner.RepeatBracket 1 <music21.stream.Measure 0 offset=0.0>>
+
     >>> sp.number = 3
-    >>> sp # can be one or more measures
+    >>> sp 
     <music21.spanner.RepeatBracket 3 <music21.stream.Measure 0 offset=0.0>>
     >>> sp.getNumberList() # the list of repeat numbers
     [3]
@@ -1252,6 +1257,9 @@ class RepeatBracket(Spanner):
     [1, 2, 3, 7]
     >>> sp.number
     '1, 2, 3, 7'
+    >>> sp.overrideDisplay = '1-3, 7' # does not work for number.
+    
+    
     '''
     def __init__(self, *arguments, **keywords):
         Spanner.__init__(self, *arguments, **keywords)
@@ -1260,6 +1268,7 @@ class RepeatBracket(Spanner):
         self._numberRange = [] # store a range, inclusive of the single number assignment
         self._numberSpanIsAdjacent = None
         self._numberSpanIsContiguous = None
+        self.overrideDisplay = None
 
         if 'number' in keywords:
             self.number = keywords['number']
@@ -1303,7 +1312,7 @@ class RepeatBracket(Spanner):
             else:
                 self._numberSpanIsAdjacent = False
 
-        elif common.isStr(value):
+        elif isinstance(value, six.string_types):
             # assume defined a range with a dash; assumed inclusive
             if '-' in value:
                 start, end = value.split('-')
@@ -1320,8 +1329,8 @@ class RepeatBracket(Spanner):
                 
                 # returns bool 
                 self._numberSpanIsContiguous = common.contiguousList(self._numberRange)
-                if ((len(self._numberRange) == 2) and 
-                        (self._numberRange[0] == self._numberRange[1] - 1)):
+                if ((len(self._numberRange) == 2)
+                        and (self._numberRange[0] == self._numberRange[1] - 1)):
                     self._numberSpanIsAdjacent = True
                 else:
                     self._numberSpanIsAdjacent = False
@@ -1344,21 +1353,34 @@ class RepeatBracket(Spanner):
 
     def getNumberList(self):
         '''Get a contiguous list of repeat numbers that are applicable for this instance.
-
+        
+        Will always have at least one element, but [0] means undefined
         
         >>> rb = spanner.RepeatBracket()
+        >>> rb.getNumberList()
+        [0]
+        
         >>> rb.number = '1,2'
         >>> rb.getNumberList()
         [1, 2]
         '''
-        return self._numberRange
+        nr =  self._numberRange
+        if not nr:
+            return [0]
+        else:
+            return nr
 
     def __repr__(self):
         msg = Spanner.__repr__(self)
-        if self.number is not None:
-            msg = msg.replace(self._reprHead, '<music21.spanner.RepeatBracket %s ' % self.number)
+        if self.overrideDisplay is not None:
+            msg = msg.replace(self._reprHead, 
+                              '<music21.spanner.RepeatBracket %s' % self.overrideDisplay)
+        elif self.number is not None:
+            msg = msg.replace(self._reprHead, 
+                              '<music21.spanner.RepeatBracket %s ' % self.number)
         else:
-            msg = msg.replace(self._reprHead, '<music21.spanner.RepeatBracket ')
+            msg = msg.replace(self._reprHead, 
+                              '<music21.spanner.RepeatBracket ')
         return msg
 
 
@@ -1432,7 +1454,7 @@ class Ottava(Spanner):
                 stub.append('a')        
             self._type = ''.join(stub)    
         else:
-            if not common.isStr(newType) or newType.lower() not in self.validOttavaTypes:
+            if not isinstance(newType, six.string_types) or newType.lower() not in self.validOttavaTypes:
                 raise SpannerException(
                     'cannot create Ottava of type: %s' % newType)
             self._type = newType.lower()
@@ -1787,10 +1809,6 @@ class Test(unittest.TestCase):
         else:
             return xmlBytes.decode('utf-8')
         
-    def xmlStrOld(self, obj):
-        from music21.musicxml.m21ToString import fromMusic21Object
-        return fromMusic21Object(obj)
-
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
@@ -2068,10 +2086,10 @@ class Test(unittest.TestCase):
         self.assertEqual(rb1.getDurationBySite(p).quarterLength, 8.0)
 
         #p.show()
-        raw = self.xmlStrOld(p)
-        self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
+        raw = self.xmlStr(p)
+        self.assertEqual(raw.find("""<ending number="1" type="start" />""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="stop" />""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="start" />""")>1, True)    
 
     def testRepeatBracketD(self):
         from music21 import note, spanner, stream, bar
@@ -2160,22 +2178,22 @@ class Test(unittest.TestCase):
         # have the offsets of the start of each measure
         self.assertEqual(rb4.getOffsetsBySite(p), [32.0, 36.0, 40.0, 44.0])
         self.assertEqual(rb4.getDurationBySite(p).quarterLength, 16.0)
-        raw = self.xmlStrOld(p)
-        self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
+        raw = self.xmlStr(p)
+        self.assertEqual(raw.find("""<ending number="1" type="start" />""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="stop" />""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="start" />""")>1, True)    
         
         p1 = copy.deepcopy(p)
-        raw = self.xmlStrOld(p1)
-        self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
+        raw = self.xmlStr(p1)
+        self.assertEqual(raw.find("""<ending number="1" type="start" />""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="stop" />""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="start" />""")>1, True)    
 
         p2 = copy.deepcopy(p1)
-        raw = self.xmlStrOld(p2)
-        self.assertEqual(raw.find("""<ending number="1" type="start"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="stop"/>""")>1, True)    
-        self.assertEqual(raw.find("""<ending number="2" type="start"/>""")>1, True)    
+        raw = self.xmlStr(p2)
+        self.assertEqual(raw.find("""<ending number="1" type="start" />""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="stop" />""")>1, True)    
+        self.assertEqual(raw.find("""<ending number="2" type="start" />""")>1, True)    
     
 
     def testRepeatBracketE(self):
@@ -2254,7 +2272,7 @@ class Test(unittest.TestCase):
         n2 = s.notes[-1]
         sp1 = spanner.Ottava(n1, n2) # default is 8va
         s.append(sp1)
-        raw = self.xmlStrOld(s)
+        raw = self.xmlStr(s)
         self.assertEqual(raw.count('octave-shift'), 2)
         self.assertEqual(raw.count('type="down"'), 1)
         #s.show()
@@ -2266,7 +2284,7 @@ class Test(unittest.TestCase):
         sp1 = spanner.Ottava(n1, n2, type='8vb')
         s.append(sp1)
         #s.show()
-        raw = self.xmlStrOld(s)
+        raw = self.xmlStr(s)
         self.assertEqual(raw.count('octave-shift'), 2)
         self.assertEqual(raw.count('type="up"'), 1)
 
@@ -2277,7 +2295,7 @@ class Test(unittest.TestCase):
         sp1 = spanner.Ottava(n1, n2, type='15ma')
         s.append(sp1)
         #s.show()
-        raw = self.xmlStrOld(s)
+        raw = self.xmlStr(s)
         self.assertEqual(raw.count('octave-shift'), 2)
         self.assertEqual(raw.count('type="down"'), 1)
 
@@ -2288,7 +2306,7 @@ class Test(unittest.TestCase):
         sp1 = spanner.Ottava(n1, n2, type='15mb')
         s.append(sp1)
         #s.show()
-        raw = self.xmlStrOld(s)
+        raw = self.xmlStr(s)
         self.assertEqual(raw.count('octave-shift'), 2)
         self.assertEqual(raw.count('type="up"'), 1)
 
@@ -2304,7 +2322,7 @@ class Test(unittest.TestCase):
         s.append(n)
         s.append(sp)
         #s.show()
-        raw = self.xmlStrOld(s)
+        raw = self.xmlStr(s)
         self.assertEqual(raw.count('octave-shift'), 2)
         self.assertEqual(raw.count('type="down"'), 1)
 

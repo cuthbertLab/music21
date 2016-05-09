@@ -31,7 +31,7 @@ from music21 import beam
 from music21 import tie
 from music21 import volume
 from music21.common import SlottedObject
-
+from music21.ext import six
 
 from music21 import environment
 _MOD = "note.py"
@@ -204,7 +204,7 @@ class Lyric(SlottedObject):
         '''
         # do not want to do this unless we are sure this is not a string
         # possible might alter unicode or other string-like representations
-        if not common.isStr(rawText):
+        if not isinstance(rawText, six.string_types):
             rawText = str(rawText)
         else:
             rawText = rawText
@@ -345,8 +345,8 @@ class GeneralNote(base.Music21Object):
                 # only apply default if components are empty
                 # looking at currentComponents so as not to trigger
                 # _updateComponents
-                if (tempDuration.quarterLength == 0 and
-                    len(tempDuration.currentComponents()) == 0):
+                if (tempDuration.quarterLength == 0
+                        and len(tempDuration.currentComponents()) == 0):
                     tempDuration.quarterLength = 1.0                
         else:
             tempDuration = keywords['duration']
@@ -539,7 +539,7 @@ class GeneralNote(base.Music21Object):
 
 
         '''
-        if not common.isStr(text):
+        if not isinstance(text, six.string_types):
             text = str(text)
         if lyricNumber is None:
             maxLyrics = len(self.lyrics) + 1
@@ -581,7 +581,7 @@ class GeneralNote(base.Music21Object):
          <music21.note.Lyric number=2 syllabic=single text="newSecond">, 
          <music21.note.Lyric number=3 syllabic=single text="second">]
         '''
-        if not common.isStr(text):
+        if not isinstance(text, six.string_types):
             text = str(text)
         for lyric in self.lyrics[index:]:
             lyric.number += 1
@@ -1141,7 +1141,7 @@ class Note(NotRest):
         ''')
 
 
-    @common.deprecated("May 2014", "Jan 2016", "use pitch.accidental instead")
+    @common.deprecated("May 2014", "May 2016", "use pitch.accidental instead")
     def _getAccidental(self):
         return self.pitch.accidental
 
@@ -1160,7 +1160,7 @@ class Note(NotRest):
         >>> a.name
         'D#'
         '''
-        if common.isStr(value):
+        if isinstance(value, six.string_types):
             accidental = pitch.Accidental(value)
         else:
             accidental = value
@@ -1187,7 +1187,7 @@ class Note(NotRest):
         See :attr:`~music21.pitch.Pitch.step`.
         ''')
 
-    @common.deprecated("May 2014", "Jan 2016", "use pitch.frequency instead")
+    @common.deprecated("May 2014", "May 2016", "use pitch.frequency instead")
     def _getFrequency(self):
         return self.pitch.frequency
 
@@ -1214,7 +1214,7 @@ class Note(NotRest):
         doc = '''Return or set the octave value from the :class:`~music21.pitch.Pitch` object. 
         See :attr:`~music21.pitch.Pitch.octave`.''')
 
-    @common.deprecated("May 2014", "Jan 2016", "use pitch.midi instead")
+    @common.deprecated("May 2014", "May 2016", "use pitch.midi instead")
     def _getMidi(self):
         return self.pitch.midi
 
@@ -1232,7 +1232,7 @@ class Note(NotRest):
         DEPRECATED May 2014: use n.pitch.midi instead
         ''')
 
-    @common.deprecated("May 2014", "Jan 2016", "use pitch.ps instead")
+    @common.deprecated("May 2014", "May 2016", "use pitch.ps instead")
     def _getPs(self):
         return self.pitch.ps
 
@@ -1250,7 +1250,7 @@ class Note(NotRest):
         DEPRECATED May 2014: use n.pitch.ps instead
         ''')
 
-    @common.deprecated("May 2014", "Jan 2016", "use pitch.microtone instead")
+    @common.deprecated("May 2014", "May 2016", "use pitch.microtone instead")
     def _getMicrotone(self):
         return self.pitch.microtone
 
@@ -1267,7 +1267,7 @@ class Note(NotRest):
         ''')
 
 
-    @common.deprecated("May 2014", "Jan 2016", "use pitch.pitchClass instead")
+    @common.deprecated("May 2014", "May 2016", "use pitch.pitchClass instead")
     def _getPitchClass(self):
         return self.pitch.pitchClass
 
@@ -1282,7 +1282,7 @@ class Note(NotRest):
         ''')
 
 
-    @common.deprecated("May 2014", "Jan 2016", "use pitch.pitchClassString instead")
+    @common.deprecated("May 2014", "May 2016", "use pitch.pitchClassString instead")
     def _getPitchClassString(self):
         return self.pitch.pitchClassString
 

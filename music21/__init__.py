@@ -126,7 +126,6 @@ __all__ = [
     'variant',
     'voiceLeading',
     'volume',
-    'xmlnode',
     ]
 
 
@@ -138,10 +137,7 @@ __all__ = [
 # base Music21Object -- all objects should inherit from this!
 from music21 import base
 
-from music21.base import VERSION
-from music21.base import VERSION_STR
-__version__ = VERSION_STR
-
+# should this simply be from music21.base import * since __all__ is well defined?
 from music21.base import Music21Exception
 from music21.base import SitesException
 from music21.base import Music21ObjectException
@@ -151,19 +147,15 @@ from music21.base import Groups
 from music21.base import Music21Object
 from music21.base import ElementWrapper
 
+from music21.base import VERSION
+from music21.base import VERSION_STR
+__version__ = VERSION_STR
+
 # legacy reason why it's here...
 from music21.test.testRunner import mainTest
 
-#del(types)
-#del(sys)
-#del(imp)
-#del(doctest)
-#del(copy)
-#del(codecs)
-#del(unittest)
-
 #------------------------------------------------------------------------------
-# this bring all of the __all__ names into the music21 package namespace
+# this bring all of our own __all__ names into the music21 package namespace
 from music21 import * # @UnresolvedImport # pylint: disable=wildcard-import
 
 #------------------------------------------------------------------------------

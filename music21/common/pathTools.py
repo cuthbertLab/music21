@@ -20,6 +20,7 @@ __all__ = [
            'cleanpath',
            ]
 
+import inspect
 import os
 
 #-------------------------------------------------------------------------------
@@ -31,9 +32,9 @@ def getSourceFilePath():
     
     :rtype: str
     '''
-    import music21 # @Reimport # pylint: disable=redefined-outer-name 
-    fpMusic21 = music21.__path__[0] # list, get first item 
-    # use corpus as a test case
+    fpThis = inspect.getfile(getSourceFilePath)
+    fpMusic21 = os.path.dirname(os.path.dirname(fpThis)) # common is two levels deep
+    # use stream as a test case
     if 'stream' not in os.listdir(fpMusic21):
         raise Exception('cannot find expected music21 directory: %s' % fpMusic21)
     return fpMusic21

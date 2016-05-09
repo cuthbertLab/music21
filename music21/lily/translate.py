@@ -163,18 +163,20 @@ class LilypondConverter(object):
         
 
     def findLilyExec(self):
-        if os.path.exists(environLocal['lilypondPath']):
-            LILYEXEC = environLocal['lilypondPath']
+        lpEnvironment = environLocal['lilypondPath']
+        if lpEnvironment is not None and os.path.exists(lpEnvironment):
+            LILYEXEC = lpEnvironment
         else:
-            if sys.platform == "darwin":
+            platform = common.getPlatform()
+            if platform == "darwin":
                 LILYEXEC = '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'
                 if not os.path.exists(LILYEXEC):
                     LILYEXEC = 'lilypond'
-            elif sys.platform == 'win32' and os.path.exists('c:/Program Files (x86)'):
+            elif platform == 'win' and os.path.exists('c:/Program Files (x86)'):
                 LILYEXEC = r'c:/Program\ Files\ (x86)/lilypond/usr/bin/lilypond'
                 if not os.path.exists(LILYEXEC) and not os.path.exists(LILYEXEC + '.exe'):
                     LILYEXEC = 'lilypond'
-            elif sys.platform == 'win32':
+            elif platform == 'win':
                 LILYEXEC = r'c:/Program\ Files/lilypond/usr/bin/lilypond'
                 if not os.path.exists(LILYEXEC) and not os.path.exists(LILYEXEC + '.exe'):
                     LILYEXEC = 'lilypond'

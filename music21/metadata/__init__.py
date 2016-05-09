@@ -26,9 +26,13 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
 :attr:`~music21.metadata.Metadata.title` and
 :attr:`~music21.metadata.Metadata.composer` properties of a Metadata object.
 
->>> s = stream.Stream()
->>> s.append(note.Note())
->>> s.insert(metadata.Metadata())
+>>> s = stream.Score()
+>>> p = stream.Part()
+>>> m = stream.Measure()
+>>> m.append(note.Note())
+>>> p.append(m)
+>>> s.append(p)
+>>> s.insert(0, metadata.Metadata())
 >>> s.metadata.title = 'title'
 >>> s.metadata.composer = 'composer'
 >>> #_DOCS_SHOW s.show()
@@ -46,6 +50,8 @@ from music21 import base
 from music21 import common
 from music21 import freezeThaw
 from music21 import exceptions21
+
+from music21.ext import six
 
 from music21.metadata import bundles
 from music21.metadata import caching
@@ -424,14 +430,14 @@ class Metadata(base.Music21Object):
             useRegex = True
             reQuery = query  # already compiled
         # look for regex characters
-        elif common.isStr(query) and \
-            any(character in query for character in '*.|+?{}'):
+        elif (isinstance(query, six.string_types)
+              and any(character in query for character in '*.|+?{}')):
             useRegex = True
             reQuery = re.compile(query, flags=re.I)
         if useRegex:
             for value, field in valueFieldPairs:
                 # re.I makes case insensitive
-                if common.isStr(value):
+                if isinstance(value, six.string_types):
                     match = reQuery.search(value)
                     if match is not None:
                         return True, field
@@ -441,7 +447,7 @@ class Metadata(base.Music21Object):
                     return True, field
         else:
             for value, field in valueFieldPairs:
-                if common.isStr(value):
+                if isinstance(value, six.string_types):
                     query = str(query)
                     if query.lower() in value.lower():
                         return True, field

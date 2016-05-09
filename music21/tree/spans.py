@@ -18,14 +18,13 @@ organized by start and stop offsets.
 import unittest
 
 from music21 import exceptions21
-from music21 import meter
-
 from music21 import environment
 environLocal = environment.Environment("tree.spans")
 #------------------------------------------------------------------------------
 class TimespanException(exceptions21.TreeException):
     pass
 
+#------------------------------------------------------------------------------
 class Timespan(object):
     r'''
     A span of time, with a start offset and stop offset.
@@ -62,12 +61,6 @@ class Timespan(object):
     >>> ts4 == ts2
     False
     '''
-    __slots__ = (
-        '_offset',
-        '_endTime',
-        )
-
-
     def __init__(self, offset=float('-inf'), endTime=float('inf')):
         if offset is not None:
             offset = float(offset)
@@ -109,7 +102,7 @@ class Timespan(object):
         '''
         # this is a property to make it immutable.
         return self._offset
-
+        
     @property
     def endTime(self):
         r'''
@@ -158,13 +151,11 @@ class Timespan(object):
         (False, 'Cannot merge <Timespan 0.0 5.0> with <Timespan 3.0 4.0>: not contiguous')
         '''
         if not isinstance(other, type(self)):
-            message = 'Cannot merge {} with {}: wrong types'.format(
-                self, other)
+            message = 'Cannot merge {} with {}: wrong types'.format(self, other)
             return (False, message)
-        if not ((self.endTime == other.offset) or
-                (other.endTime == self.offset)):
-            message = 'Cannot merge {} with {}: not contiguous'.format(
-                self, other)
+        if not ((self.endTime == other.offset)
+                or (other.endTime == self.offset)):
+            message = 'Cannot merge {} with {}: not contiguous'.format(self, other)
             return (False, message)
         return (True, "")
 
@@ -230,8 +221,7 @@ class Timespan(object):
     
 #------------------------------------------------------------------------------
 
-
-class PitchedTimespan(Timespan):
+class ElementTimespan(Timespan):
     r'''
     A span of time anchored to an element in a score.  The span of time may
     be the same length as the element in the score.  It may be shorter (a
@@ -294,51 +284,53 @@ class PitchedTimespan(Timespan):
     >>> pitchedTimespan.offset - pitchedTimespan.parentOffset
     1.5
 
-    >>> pitchedTimespan.beatStrength
-    0.125
     >>> pitchedTimespan.element
     <music21.note.Note D>
 
     These are not dynamic, so changing the Score object does not change the
-    measureNumber, beatStrength, etc.    
+    measureNumber, etc.    
     '''
 
     ### CLASS VARIABLES ###
-
-    __slots__ = (
-        '_beatStrength',
-        '_element',
-        '_parentOffset',
-        '_parentEndTime',
-        '_parentage',
-        )
+    _DOC_ATTR = {'parentage':  r'''
+                    The Stream hierarchy above the ElementTimespan's element.
+            
+                    >>> score = corpus.parse('bwv66.6')
+                    >>> scoreTree = score.asTimespans()
+                    >>> verticality = scoreTree.getVerticalityAt(1.0)
+                    >>> pitchedTimespan = verticality.startTimespans[0]
+                    >>> pitchedTimespan
+                    <PitchedTimespan (1.0 to 2.0) <music21.note.Note A>>
+                    >>> for streamSite in pitchedTimespan.parentage:
+                    ...     streamSite
+                    <music21.stream.Measure 1 offset=1.0>
+                    <music21.stream.Part Soprano>
+                    <music21.stream.Score ...>
+                    '''
+                 }
 
     ### INITIALIZER ###
 
     def __init__(self,
                  element=None,
-                 beatStrength=None,
                  parentOffset=None,
                  parentEndTime=None,
                  parentage=None,
                  offset=None,
                  endTime=None,
                  ):
-        super(PitchedTimespan, self).__init__(offset=offset, endTime=endTime)
+        super(ElementTimespan, self).__init__(offset=offset, endTime=endTime)
         
-        self._element = element
+        self.element = element
         if parentage is not None:
             parentage = tuple(parentage)
-        self._parentage = parentage
-        if beatStrength is not None:
-            beatStrength = float(beatStrength)
-        self._beatStrength = beatStrength
+        self.parentage = parentage
         if parentOffset is not None:
             parentOffset = float(parentOffset)
-        self._parentOffset = parentOffset
+        self.parentOffset = parentOffset
         if parentEndTime is not None:
             parentEndTime = float(parentEndTime)
-        self._parentEndTime = parentEndTime
+        self.parentEndTime = parentEndTime
         if parentOffset is not None and parentEndTime is not None:
             if parentOffset > parentEndTime:
                 raise TimespanException(
@@ -360,7 +352,196 @@ class PitchedTimespan(Timespan):
             )
 
     ### PUBLIC METHODS ###
-    
+
+
+    def new(self,
+            element=None,
+            parentOffset=None,
+            parentEndTime=None,
+            offset=None,
+            endTime=None,
+        ):
+        '''
+        Create a new object that is identical to the calling object
+        but with some of the parameters overridden.
+        
+        >>> n = note.Note("C#")
+        >>> pts = tree.spans.PitchedTimespan(n, offset=11.0, endTime=12.0)
+        >>> pts
+        <PitchedTimespan (11.0 to 12.0) <music21.note.Note C#>>
+        >>> pts2 = pts.new(endTime=13.0)
+        >>> pts2
+        <PitchedTimespan (11.0 to 13.0) <music21.note.Note C#>>
+        >>> pts.element is pts2.element
+        True
+        '''
+        element = element or self.element
+        if parentOffset is None:
+            parentOffset = self.parentOffset
+        if parentEndTime is None:
+            parentEndTime = self.parentEndTime
+        if offset is None:
+            offset = self.offset
+        if endTime is None:
+            endTime = self.endTime
+        
+        return type(self)(
+            element=element,
+            parentOffset=parentOffset,
+            parentEndTime=parentEndTime,
+            parentage=self.parentage,
+            offset=offset,
+            endTime=endTime,
+            )
+
+
+    ### PUBLIC PROPERTIES ###
+
+
+    @property
+    def quarterLength(self):
+        '''
+        The quarterLength of the Timespan, which, due to manipulation, may be different
+        from that of the element.
+        
+        >>> n = note.Note('D-')
+        >>> n.offset = 1.0
+        >>> n.duration.quarterLength = 2.0
+
+        >>> pts = tree.spans.PitchedTimespan(n, offset=n.offset, endTime=3.0)
+        >>> pts
+        <PitchedTimespan (1.0 to 3.0) <music21.note.Note D->>
+        >>> pts.quarterLength
+        2.0
+        >>> n.duration.quarterLength
+        2.0
+        
+        >>> pts2 = pts.new(offset=0.0)
+        >>> pts2
+        <PitchedTimespan (0.0 to 3.0) <music21.note.Note D->>
+        >>> pts2.quarterLength
+        3.0
+        >>> pts2.element.duration.quarterLength
+        2.0
+        '''
+        return self.endTime - self.offset
+
+
+    @property
+    def measureNumber(self):
+        r'''
+        The measure number of the measure containing the element.
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> scoreTree = score.asTimespans()
+        >>> verticality = scoreTree.getVerticalityAt(1.0)
+        >>> pitchedTimespan = verticality.startTimespans[0]
+        >>> pitchedTimespan.measureNumber
+        1
+        '''
+        return self.element.measureNumber
+        #from music21 import stream
+        #for x in self.parentage:
+        #    if not isinstance(x, stream.Measure):
+        #        continue
+        #    return x.measureNumber
+        #return None
+
+    def getParentageByClass(self, classList):
+        '''
+        returns that is the first parentage that has this classList.
+        default stream.Part
+
+        >>> score = corpus.parse('bwv66.6')
+        >>> score.id = 'bach'
+        >>> scoreTree = score.asTimespans()
+        >>> verticality = scoreTree.getVerticalityAt(1.0)
+        >>> pitchedTimespan = verticality.startTimespans[2]
+        >>> pitchedTimespan
+        <PitchedTimespan (1.0 to 2.0) <music21.note.Note C#>>
+        >>> pitchedTimespan.getParentageByClass(classList=(stream.Part,))
+        <music21.stream.Part Tenor>
+        >>> pitchedTimespan.getParentageByClass(classList=(stream.Measure,))
+        <music21.stream.Measure 1 offset=1.0>
+        >>> pitchedTimespan.getParentageByClass(classList=(stream.Score,))
+        <music21.stream.Score bach>
+
+        The closest parent is returned in case of a multiple list...
+
+        >>> searchTuple = (stream.Voice, stream.Measure, stream.Part)
+        >>> pitchedTimespan.getParentageByClass(classList=searchTuple)
+        <music21.stream.Measure 1 offset=1.0>
+
+        TODO: this should take a normal class list.
+        '''
+        for parent in self.parentage:
+            if isinstance(parent, classList):
+                return parent
+        return None
+
+    @property
+    def part(self):
+        '''
+        find the object in the parentage that is a Part object:
+        
+        >>> score = corpus.parse('bwv66.6')
+        >>> scoreTree = score.asTimespans()
+        >>> verticality = scoreTree.getVerticalityAt(1.0)
+        >>> pitchedTimespan = verticality.startTimespans[2]
+        >>> pitchedTimespan
+        <PitchedTimespan (1.0 to 2.0) <music21.note.Note C#>>
+        >>> pitchedTimespan.part
+        <music21.stream.Part Tenor>
+        '''
+        from music21 import stream
+        return self.getParentageByClass(classList=(stream.Part,))
+
+
+
+#------------------------------------------------------------------------------
+class PitchedTimespan(ElementTimespan):
+    def __init__(self,
+                 element=None,
+                 parentOffset=None,
+                 parentEndTime=None,
+                 parentage=None,
+                 offset=None,
+                 endTime=None,
+                 ):
+        super(PitchedTimespan, self).__init__(element=element,
+                                              parentOffset=parentOffset,
+                                              parentEndTime=parentEndTime,
+                                              parentage=parentage,
+                                              offset=offset, 
+                                              endTime=endTime)
+
+
+    @property
+    def pitches(self):
+        r'''
+        Gets the pitches of the element wrapped by this PitchedTimespan.
+
+        This treats notes as chords.
+        
+        >>> c = chord.Chord('C4 E4 G4')
+        >>> pts = tree.spans.PitchedTimespan(c, offset=0.0, endTime=1.0)
+        >>> pts.pitches
+        (<music21.pitch.Pitch C4>, <music21.pitch.Pitch E4>, <music21.pitch.Pitch G4>)
+        
+        Perhaps remove? except for this case:
+        
+        >>> d = dynamics.Dynamic('f')
+        >>> pts2 = tree.spans.PitchedTimespan(d, offset=0.0, endTime=10.0)
+        >>> pts2.pitches
+        ()
+        '''
+        result = []
+        if hasattr(self.element, 'pitches'):
+            result.extend(self.element.pitches)
+        result.sort()
+        return tuple(result)
+
+
     def canMerge(self, other):
         '''
         submethod of base canMerge that checks to see if the pitches are the same.
@@ -368,7 +549,7 @@ class PitchedTimespan(Timespan):
         For quick score reductions, we can merge two consecutive 
         like-pitched element timespans, keeping
         score-relevant information from the first of the two, such as its
-        Music21 Element, and any beatstrength information.
+        Music21 Element.
     
         This is useful when using timespans to perform score reduction.
     
@@ -398,8 +579,6 @@ class PitchedTimespan(Timespan):
         >>> merged.part is timespan_one.part
         True
     
-        >>> merged.beatStrength == timespan_one.beatStrength
-        True
     
         Attempting to merge timespans which are not contiguous, or which do not
         have identical pitches will result in error:
@@ -433,265 +612,6 @@ class PitchedTimespan(Timespan):
                     self, other)
                 can = False                
         return (can, message)
-
-
-    def new(self,
-            beatStrength=None,
-            element=None,
-            parentOffset=None,
-            parentEndTime=None,
-            offset=None,
-            endTime=None,
-        ):
-        '''
-        Create a new object that is identical to the calling object
-        but with some of the parameters overridden.
-        
-        >>> n = note.Note("C#")
-        >>> pts = tree.spans.PitchedTimespan(n, offset=11.0, endTime=12.0)
-        >>> pts
-        <PitchedTimespan (11.0 to 12.0) <music21.note.Note C#>>
-        >>> pts2 = pts.new(endTime=13.0)
-        >>> pts2
-        <PitchedTimespan (11.0 to 13.0) <music21.note.Note C#>>
-        >>> pts.element is pts2.element
-        True
-        '''
-        if beatStrength is None:
-            try:
-                beatStrength = self.beatStrength
-            except exceptions21.Music21Exception:
-                beatStrength = None
-        element = element or self.element
-        if parentOffset is None:
-            parentOffset = self.parentOffset
-        if parentEndTime is None:
-            parentEndTime = self.parentEndTime
-        if offset is None:
-            offset = self.offset
-        if endTime is None:
-            endTime = self.endTime
-        
-        return type(self)(
-            beatStrength=beatStrength,
-            element=element,
-            parentOffset=parentOffset,
-            parentEndTime=parentEndTime,
-            parentage=self.parentage,
-            offset=offset,
-            endTime=endTime,
-            )
-
-
-    ### PUBLIC PROPERTIES ###
-
-    @property
-    def beatStrength(self):
-        r'''
-        The PitchedTimespan's element's beat-strength.
-
-        This may be overriden during instantiation by passing in a custom
-        beat-strength. That can be useful when you are generating new
-        PitchedTimespans based on old ones, and want to maintain pitch
-        information from the old PitchedTimespan but change the start offset to
-        reflect that of another timespan.
-        
-        >>> n = note.Note('D-')
-        >>> ts = meter.TimeSignature('4/4')
-        >>> s = stream.Stream()
-        >>> s.insert(0.0, ts)
-        >>> s.insert(1.0, n)
-        >>> pts = tree.spans.PitchedTimespan(n, offset=1.0, endTime=2.0)
-        >>> pts
-        <PitchedTimespan (1.0 to 2.0) <music21.note.Note D->>
-        >>> pts.beatStrength
-        0.25
-        >>> n.beatStrength
-        0.25
-        
-        >>> pts2 = pts.new(beatStrength=1.0, offset=0.0)
-        >>> pts2
-        <PitchedTimespan (0.0 to 2.0) <music21.note.Note D->>
-        >>> pts2.beatStrength
-        1.0
-        >>> pts2.element.beatStrength
-        0.25
-        '''
-        if self._beatStrength is not None:
-            return self._beatStrength
-        elif self._element is None:
-            return None
-        try:
-            return self._element.beatStrength
-        except meter.MeterException:
-            #environLocal.warn("Could not get a beatStrength from %r: %s" % (self._element, e))
-            return None
-
-    @property
-    def quarterLength(self):
-        '''
-        The quarterLength of the Timespan, which, due to manipulation, may be different
-        from that of the element.
-        
-        >>> n = note.Note('D-')
-        >>> n.offset = 1.0
-        >>> n.duration.quarterLength = 2.0
-
-        >>> pts = tree.spans.PitchedTimespan(n, offset=n.offset, endTime=3.0)
-        >>> pts
-        <PitchedTimespan (1.0 to 3.0) <music21.note.Note D->>
-        >>> pts.quarterLength
-        2.0
-        >>> n.duration.quarterLength
-        2.0
-        
-        >>> pts2 = pts.new(offset=0.0)
-        >>> pts2
-        <PitchedTimespan (0.0 to 3.0) <music21.note.Note D->>
-        >>> pts2.quarterLength
-        3.0
-        >>> pts2.element.duration.quarterLength
-        2.0
-        '''
-        return self.endTime - self.offset
-
-    @property
-    def element(self):
-        r'''
-        The PitchedTimespan's element.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> scoreTree = score.asTimespans()
-        >>> verticality = scoreTree.getVerticalityAt(1.0)
-        >>> pitchedTimespan = verticality.startTimespans[0]
-        >>> pitchedTimespan.element
-        <music21.note.Note A>
-        '''
-        return self._element
-
-    @property
-    def measureNumber(self):
-        r'''
-        The measure number of the measure containing the element.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> scoreTree = score.asTimespans()
-        >>> verticality = scoreTree.getVerticalityAt(1.0)
-        >>> pitchedTimespan = verticality.startTimespans[0]
-        >>> pitchedTimespan.measureNumber
-        1
-        '''
-        return self.element.measureNumber
-        #from music21 import stream
-        #for x in self.parentage:
-        #    if not isinstance(x, stream.Measure):
-        #        continue
-        #    return x.measureNumber
-        #return None
-
-    @property
-    def parentOffset(self):
-        return self._parentOffset
-
-    @property
-    def parentEndTime(self):
-        return self._parentEndTime
-
-    @property
-    def parentage(self):
-        r'''
-        The Stream hierarchy above the PitchedTimespan's element.
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> scoreTree = score.asTimespans()
-        >>> verticality = scoreTree.getVerticalityAt(1.0)
-        >>> pitchedTimespan = verticality.startTimespans[0]
-        >>> for streamSite in pitchedTimespan.parentage:
-        ...     streamSite
-        <music21.stream.Measure 1 offset=1.0>
-        <music21.stream.Part Soprano>
-        <music21.stream.Score ...>
-        '''
-        return self._parentage
-
-    def getParentageByClass(self, classList=None):
-        '''
-        returns that is the first parentage that has this classList.
-        default stream.Part
-
-        >>> score = corpus.parse('bwv66.6')
-        >>> score.id = 'bach'
-        >>> scoreTree = score.asTimespans()
-        >>> verticality = scoreTree.getVerticalityAt(1.0)
-        >>> pitchedTimespan = verticality.startTimespans[2]
-        >>> pitchedTimespan
-        <PitchedTimespan (1.0 to 2.0) <music21.note.Note C#>>
-        >>> pitchedTimespan.getParentageByClass(classList=(stream.Part,))
-        <music21.stream.Part Tenor>
-        >>> pitchedTimespan.getParentageByClass(classList=(stream.Measure,))
-        <music21.stream.Measure 1 offset=1.0>
-        >>> pitchedTimespan.getParentageByClass(classList=(stream.Score,))
-        <music21.stream.Score bach>
-
-        The closest parent is returned in case of a multiple list...
-
-        >>> searchTuple = (stream.Voice, stream.Measure, stream.Part)
-        >>> pitchedTimespan.getParentageByClass(classList=searchTuple)
-        <music21.stream.Measure 1 offset=1.0>
-
-        '''
-        from music21 import stream
-        if classList is None:
-            classList = (stream.Part,)
-        for parent in self.parentage:
-            for c in classList:
-                if isinstance(parent, c):
-                    return parent
-        return None
-
-    @property
-    def part(self):
-        '''
-        find the object in the parentage that is a Part object:
-        
-        >>> score = corpus.parse('bwv66.6')
-        >>> scoreTree = score.asTimespans()
-        >>> verticality = scoreTree.getVerticalityAt(1.0)
-        >>> pitchedTimespan = verticality.startTimespans[2]
-        >>> pitchedTimespan
-        <PitchedTimespan (1.0 to 2.0) <music21.note.Note C#>>
-        >>> pitchedTimespan.part
-        <music21.stream.Part Tenor>
-        '''
-        from music21 import stream
-        return self.getParentageByClass(classList=(stream.Part,))
-
-
-    @property
-    def pitches(self):
-        r'''
-        Gets the pitches of the element wrapped by this PitchedTimespan.
-
-        This treats notes as chords.
-        
-        >>> c = chord.Chord('C4 E4 G4')
-        >>> pts = tree.spans.PitchedTimespan(c, offset=0.0, endTime=1.0)
-        >>> pts.pitches
-        (<music21.pitch.Pitch C4>, <music21.pitch.Pitch E4>, <music21.pitch.Pitch G4>)
-        
-        Perhaps remove? except for this case:
-        
-        >>> d = dynamics.Dynamic('f')
-        >>> pts2 = tree.spans.PitchedTimespan(d, offset=0.0, endTime=10.0)
-        >>> pts2.pitches
-        ()
-        '''
-        result = []
-        if hasattr(self.element, 'pitches'):
-            result.extend(self.element.pitches)
-        result.sort()
-        return tuple(result)
-
 
 
 #------------------------------------------------------------------------------

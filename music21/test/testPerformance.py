@@ -19,7 +19,7 @@ import unittest
 
 import music21
 from music21 import common, corpus
-from music21.musicxml.m21ToString import fromMusic21Object as toMusicXML
+from music21.musicxml.m21ToXml import GeneralObjectExporter as GEX
 
 from music21 import environment
 _MOD = 'test/testPerformance.py'
@@ -115,14 +115,14 @@ class Test(unittest.TestCase):
         x = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
         #problem: doing each part is much faster than the whole score
         for p in x.parts:
-            junk = toMusicXML(p)
+            junk = GEX().parse(p)
 
     def runMusicxmlOutScoreBeethoven(self):
         '''Loading file and rendering musicxml output of complete score: beethoven/opus59no2/movement3
         '''
         x = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
         #problem: doing each part is much faster than the whole score
-        junk = toMusicXML(x)
+        junk = GEX().parse(x)
 
     def runParseHaydn(self):
         '''Loading file: haydn/opus74no1/movement3
@@ -146,7 +146,7 @@ class Test(unittest.TestCase):
         Loading file and rendering musicxml output: luca/gloria
         '''
         x = corpus.parse('luca/gloria', forceSource=True)
-        junk = toMusicXML(x)
+        junk = GEX().parse(x)
 
 
 

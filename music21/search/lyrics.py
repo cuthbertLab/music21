@@ -8,14 +8,58 @@
 # Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
+'''
+Classes for searching for Lyric objects.
+'''
 from collections import namedtuple
 
 from music21.ext import six
 from music21.exceptions21 import Music21Exception
 #from music21 import common
 
-IndexedLyric = namedtuple('IndexedLyric', 'el start end measure lyric text')
-SearchMatch = namedtuple('SearchMatch', 'mStart mEnd matchText els tups')
+class IndexedLyric(namedtuple('IndexedLyric', 'el start end measure lyric text')):
+    '''
+    A Lyric that has been indexed to its attached element and position in a Stream.
+    
+    '''
+    __slots__ = ()
+    _DOC_ATTR = {'el': 'the element that the lyric is attached to',
+                 'start': '''Suppose that the entire lyric for the stream were a single string:
+                             this is the index of the position in the string that this 
+                             lyric starts at.''',
+                 'end': '''Suppose that the entire lyric for the stream were a single string:
+                             this is the index of the position in the string that this
+                             lyric ends at.''',
+                 'measure': '''The measureNumber of the measure that the element is in
+                             in the stream.  Same as .el.measureNumber''',
+                 'lyric': '''The :class:`~music21.note.Lyric` object itself''',
+                 'text': '''The text of the lyric as a string (or in Py2 sometimes as a unicode 
+                             string.''',                            
+                 }
+
+class SearchMatch(namedtuple('SearchMatch', 'mStart mEnd matchText els indices')):
+    '''
+    A lightweight object representing the match (if any) for a search.
+    '''
+    __slots__ = ()
+    _DOC_ATTR = {'mStart': '''The measureNumber of the measure that the first 
+                                matching lyric is in''',
+                 'mEnd': '''The measureNumber of the measure that the last 
+                                matching lyric is in''',
+                 'matchText': '''The text of the lyric that matched the search.  For a
+                                 plaintext search, this will be the same as the search
+                                 term (with the possible exception of Py2 string for unicode
+                                 or vice-versa substitution), but for a regular expression
+                                 search this will be the text that matched the regular
+                                 expression''',
+                 'els': '''A list of all lyric-containing elements that matched this text.''',
+                 'indices': '''A list'''
+                }
+    
+    def __repr__(self):
+        return 'SearchMatch(mStart={0}, mEnd={1}, matchText={2}, els={3}, indices=[...])'.format(
+                        repr(self.mStart), repr(self.mEnd), repr(self.matchText), repr(self.els)
+                                                                                              )
 
 class LyricSearcherException(Music21Exception):
     pass
@@ -25,15 +69,52 @@ class LyricSearcher(object):
     An object that can find lyrics that match a certain regular expression
     and return relevant information about the match.
     
-    Currently searches the first lyric only.
+    Construct the LyricSearcher by passing in a Stream object (it can be
+    a Score or Part or other nested item), and then call ".search()" on it.
+    
+    See :ref:`User's Guide, Chapter 28, Lyric Searching <usersGuide_28_lyricSearcher>` for
+    full details.
+
+    
+    Restriction:  Currently searches the first lyric only.
+    TODO: let any lyric be searched.
+        
+    TODO: Bug that occasionally the previous note will be included; Search luca/gloria for 
+    "riam tuam." (From Gloriam tuam).  For some reason, the whole "Gloria" is included.
+    Does not occur if only "iam tuam." is searched.
+    
+    TODO: allow for all intermediate notes during a search to be found.
+    
+    TODO: Note that because of recursive searching w/ voices, there may be "phantom" lyrics
+    found if a work contains multiple voices.
     '''
     def __init__(self, s=None):
         self.stream = s
         self._indexText = None
         self._indexTuples = None
 
+    @property
+    def indexText(self):
+        '''
+        Returns the text that has been indexed (a la, :func:`~music21.text.assembleLyrics`):
+
+        >>> p0 = corpus.parse('luca/gloria').parts[0]
+        >>> ls = search.lyrics.LyricSearcher(p0)
+        >>> ls.indexText[0:25]
+        'Et in terra pax hominibus'
+        '''
+        if self._indexText is None:
+            self.index()
+        return self._indexText
+
     def index(self, s=None):
         '''
+        A method that indexes the Stream's lyrics and returns the list
+        of IndexedLyric objects.
+        
+        This does not actually need to be run, since calling .search() will call this if
+        it hasn't already been called.
+        
         >>> from pprint import pprint as pp
         
         >>> p0 = corpus.parse('luca/gloria').parts[0]
@@ -83,14 +164,13 @@ class LyricSearcher(object):
 
     def search(self, textOrRe, s=None):
         r'''
-        >>> from pprint import pprint as pp
         >>> import re
         
         >>> p0 = corpus.parse('luca/gloria').parts[0]
         >>> ls = search.lyrics.LyricSearcher(p0)
         >>> ls.search('pax') # ellipsis because of unicode in Py2
         [SearchMatch(mStart=3, mEnd=3, matchText=...'pax', els=(<music21.note.Note A>,), 
-                        tups=[IndexedLyric(...)])]
+                        indices=[...])]
 
         Search a regular expression that takes into account non-word characters such as commas
 
@@ -98,11 +178,7 @@ class LyricSearcher(object):
         >>> sm = ls.search(agnus)
         >>> sm
         [SearchMatch(mStart=49, mEnd=55, matchText=...'Agnus Dei, Filius Patris', 
-                        els=(<music21.note.Note G>,...<music21.note.Note G>), 
-                     tups=[IndexedLyric(el=<music21.note.Note G>, start=251, end=252, 
-                                                 measure=49, lyric=<...>, text=...'A'), 
-                           ...
-                           IndexedLyric(el=<music21.note.Note G>, ...text=...'tris.')])]
+                        els=(<music21.note.Note G>,...<music21.note.Note G>), indices=[...])]
         >>> sm[0].mStart, sm[0].mEnd
         (49, 55)
         '''
@@ -142,13 +218,13 @@ class LyricSearcher(object):
         '''
         Finds a list of objects in ._indexTuples by search position (inclusive)        
         '''
-        tups = []
+        indices = []
         for i in self._indexTuples:
             if i.end >= posStart and i.start <= posEnd:
-                tups.append(i)
-        if len(tups) == 0:
+                indices.append(i)
+        if len(indices) == 0:
             raise LyricSearcherException("Could not find position {0} in text".format(posStart))
-        return tups
+        return indices
 
     
     def _plainTextSearch(self, t):
@@ -162,12 +238,15 @@ class LyricSearcher(object):
                 continueIt = False
                 break
             matchText = self._indexText[foundPos:foundPos+tLen]
-            tups = self._findObjsInIndexByPos(foundPos, foundPos + tLen - 1)
-            tupStart = tups[0]
-            tupEnd = tups[-1]
+            indices = self._findObjsInIndexByPos(foundPos, foundPos + tLen - 1)
+            indexStart = indices[0]
+            indexEnd = indices[-1]
             
-            sm = SearchMatch(mStart=tupStart.measure, mEnd=tupEnd.measure, matchText=matchText, 
-                             els=tuple(tup.el for tup in tups), tups=tups)
+            sm = SearchMatch(mStart=indexStart.measure, 
+                             mEnd=indexEnd.measure, 
+                             matchText=matchText, 
+                             els=tuple(thisIndex.el for thisIndex in indices), 
+                             indices=indices)
             locs.append(sm)
             start = foundPos + 1
         
@@ -178,12 +257,15 @@ class LyricSearcher(object):
         for m in r.finditer(self._indexText):
             foundPos, endPos = m.span()
             matchText = m.group(0)
-            tups = self._findObjsInIndexByPos(foundPos, endPos - 1)
-            tupStart = tups[0]
-            tupEnd = tups[-1]
+            indices = self._findObjsInIndexByPos(foundPos, endPos - 1)
+            indexStart = indices[0]
+            indexEnd = indices[-1]
             
-            sm = SearchMatch(mStart=tupStart.measure, mEnd=tupEnd.measure, matchText=matchText, 
-                             els=tuple(tup.el for tup in tups), tups=tups)
+            sm = SearchMatch(mStart=indexStart.measure, 
+                             mEnd=indexEnd.measure, 
+                             matchText=matchText, 
+                             els=tuple(thisIndex.el for thisIndex in indices), 
+                             indices=indices)
             locs.append(sm)
         return locs
 

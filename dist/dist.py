@@ -16,18 +16,18 @@ To do a release,
 
 1. update the VERSION in _version.py and the single test cases in base.py and 
      in case of major version changes freezeThaw.JSONFreezer.jsonPrint if this wasn't done already.
-2. run test/multiprocessTest.py  for Python2 AND Python3
-3. If all tests pass, for a major change, run 
+2. for a major change, run 
     `corpus.cacheMetadata(['core', 'virtual'], verbose=True)`.
     every once in a while run corpus.corpora.CoreCorpus().metadataBundle.rebuild() 
     (40 min on MacPro)
+3. run test/multiprocessTest.py  for Python2 AND Python3
 4. run test/testSingleCoreAll.py 
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest, 
      but should be done before making a release).  Done automatically by Travis-CI on GitHub commit
 5. then python3 test/testDocumentation.py # only designed for Python 3...
-6. WAS test/testSerialization -- covered in "all"
+6. # no 6 no longer applies
 7. run documentation/make.py clean
-8. run documentation/make.py   [*]
+8. run documentation/make.py   [*] 
 
 [*] you will need sphinx, IPython (pip or easy_install), markdown, and pandoc (.dmg) installed
 

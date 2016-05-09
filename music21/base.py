@@ -28,7 +28,7 @@ available after importing music21.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'3.0.2'
+'3.0.4'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -490,8 +490,8 @@ class Music21Object(object):
 
         if 'id' in ignoreAttributes:
             value = getattr(self, 'id')
-            if value != id(self) or (common.isNum(value) and 
-                                     value < defaults.minIdNumberToConsiderMemoryLocation): 
+            if value != id(self) or (common.isNum(value) 
+                                     and value < defaults.minIdNumberToConsiderMemoryLocation): 
                 newValue = value
                 setattr(new, 'id', newValue)
         if 'sites' in ignoreAttributes:
@@ -977,57 +977,6 @@ class Music21Object(object):
         raise SitesException("Element {} is not in hierarchy of {}".format(self, site))
     
 
-    @common.deprecated("September 2015", "January 2016", "use self.sites.getAttrByName(attr)")
-    def getContextAttr(self, attr):
-        '''
-        Given the name of an attribute, search the Sites object for
-        contexts having this attribute and return
-        the best match.
-
-        It is a misleading name because it does not actually search what we now call contexts,
-        just sites. Thus it is DEPRECATED
-
-        >>> import music21
-        >>> class Mock(music21.Music21Object):
-        ...     attr1 = 234
-        >>> aObj = stream.Stream()
-        >>> aObj.attr1 = 'test'
-        >>> a = music21.Music21Object()
-        >>> aObj.insert(0, a)
-        >>> a.sites.getAttrByName('attr1')
-        'test'
-
-        >>> bObj = stream.Stream()
-        >>> bObj.attr1 = 'came second'
-        >>> bObj.insert(0, a)
-        >>> a.sites.getAttrByName('attr1')
-        'test'
-
-        '''
-        return self.sites.getAttrByName(attr)
-
-    @common.deprecated("September 2015", "January 2016", 
-                       "use self.sites.setAttrByName(attr, value)")
-    def setContextAttr(self, attrName, value):
-        '''
-        Given the name of an attribute, search Contexts and return
-        the best match.
-
-        >>> import music21
-        >>> class Mock(music21.Music21Object):
-        ...     attr1 = 234
-        >>> aObj = Mock()
-        >>> aObj.attr1 = 'test'
-        >>> a = music21.Music21Object()
-        >>> a.sites.add(aObj)
-        >>> a.sites.getAttrByName('attr1')
-        'test'
-        >>> a.sites.setAttrByName('attr1', 3000)
-        >>> a.sites.getAttrByName('attr1')
-        3000
-        '''
-        return self.sites.setAttrByName(attrName, value)
-
     def getSpannerSites(self, spannerClassList=None):
         '''
         Return a list of all :class:`~music21.spanner.Spanner` objects
@@ -1115,36 +1064,6 @@ class Music21Object(object):
                         break
 
         return post
-
-
-    @common.deprecated('Summer 2015', 'Jan 2016', 
-                       'use self.sites.remove() instead and set activeSite manually.')
-    def removeLocationBySite(self, site):
-        '''
-        DEPRECATED Jan 2016: use self.sites.remove() instead and set activeSite
-        manually.
-
-        Remove a location in the :class:`~music21.base.Sites` object.
-
-        This is only for advanced location method and
-        is not a complete or sufficient way to remove an object from a Stream.
-        '''
-        if not id(site) in self.sites.siteDict:
-#             for s in self.sites.siteDict:
-#                 # DEBUG!
-#                 print s,
-#                 ts = self.sites.siteDict[s]
-#                 print ts.obj,
-#                 print common.unwrapWeakref(ts.obj)
-
-            raise Music21ObjectException(
-                        'supplied site (%s) is not a site in this object: %s' % (site, self))
-        #environLocal.printDebug(['removed location by site:', 'self', self, 'site', site])
-        self.sites.remove(site)
-
-        # if activeSite is set to that site, reassign to None
-        if self._getActiveSite() == site:
-            self._setActiveSite(None)
 
     def purgeOrphans(self, excludeStorageStreams=True):
         '''
@@ -1297,11 +1216,11 @@ class Music21Object(object):
             siteTree = site.asTree(flatten=flatten, classList=className)
             if 'Offset' in getElementMethod:
                 # these methods match only by offset.  Used in .getBeat among other places
-                if (('At' in getElementMethod and 'Before' in getElementMethod) or
-                    ('At' not in getElementMethod and 'After' in getElementMethod)):
+                if (('At' in getElementMethod and 'Before' in getElementMethod)
+                        or ('At' not in getElementMethod and 'After' in getElementMethod)):
                     positionStart = ZeroSortTupleHigh.modify(offset=positionStart.offset)
-                elif (('At' in getElementMethod and 'After' in getElementMethod) or 
-                      ('At' not in getElementMethod and 'Before' in getElementMethod)):
+                elif (('At' in getElementMethod and 'After' in getElementMethod)
+                        or ('At' not in getElementMethod and 'Before' in getElementMethod)):
                     positionStart = ZeroSortTupleLow.modify(offset=positionStart.offset)
                 else:
                     raise Music21Exception(
@@ -1437,9 +1356,9 @@ class Music21Object(object):
                 # otherwise, continue to check for flattening...
                 
             if searchType != 'elementsOnly': # flatten or elementsFirst
-                if ('After' in getElementMethod and 
-                        (not className or 
-                         site.isClassOrSubclass(className))):
+                if ('After' in getElementMethod 
+                        and (not className 
+                             or site.isClassOrSubclass(className))):
                     if 'NotSelf' in getElementMethod and self is site:
                         pass
                     elif 'NotSelf' not in getElementMethod: # for 'After' we can't do the
@@ -1454,9 +1373,9 @@ class Music21Object(object):
                         pass
                     return contextEl
 
-                if ('Before' in getElementMethod and 
-                        (not className or 
-                         site.isClassOrSubclass(className))):
+                if ('Before' in getElementMethod 
+                        and (not className 
+                             or site.isClassOrSubclass(className))):
                     if 'NotSelf' in getElementMethod and self is site:
                         pass
                     else:
@@ -1810,7 +1729,8 @@ class Music21Object(object):
                 className = [className]
 
         #siteMemo = set()
-        for site, positionStart, searchType in self.contextSites(returnSortTuples=True):
+        for site, positionStart, unused_searchType in self.contextSites(returnSortTuples=True):
+            # positionStart is used in the embedded adjacentObject
             if className and site.isClassOrSubclass(className):
                 return site
 
@@ -2361,6 +2281,7 @@ class Music21Object(object):
         >>> n.sortTuple()
         SortTuple(atEnd=0, offset=4.0, priority=-3, classSortOrder=20, 
                     isNotGrace=1, insertIndex=0)
+                    
         >>> st = n.sortTuple()
 
         Check that all these values are the same as above...
@@ -2375,9 +2296,8 @@ class Music21Object(object):
         >>> st.classSortOrder == note.Note.classSortOrder
         True
         
-        SortTuples have a few methods that are documented in
-        :class:`~music21.sorting.SortTuple`. The most useful one for documenting
-        is `.shortRepr()
+        SortTuples have a few methods that are documented in :class:`~music21.sorting.SortTuple`.
+        The most useful one for documenting is `.shortRepr()`.
         
         >>> st.shortRepr()
         '4.0 <-3.20.0>'
@@ -2392,6 +2312,7 @@ class Music21Object(object):
         >>> n.sortTuple()
         SortTuple(atEnd=0, offset=4.0, priority=-3, classSortOrder=20,
                      isNotGrace=1, insertIndex=...)
+                     
         >>> nInsertIndex = n.sortTuple().insertIndex
 
         If we create another nearly identical note, the insertIndex will be different:
@@ -2453,8 +2374,8 @@ class Music21Object(object):
         else:
             isNotGrace = 1
 
-        if (useSite is not False and
-                self.sites.hasSiteId(id(useSite))):
+        if (useSite is not False
+                and self.sites.hasSiteId(id(useSite))):
             insertIndex = self.sites.siteDict[id(useSite)].globalSiteIndex
         elif self.activeSite is not None:
             insertIndex = self.sites.siteDict[id(self.activeSite)].globalSiteIndex
@@ -2923,8 +2844,8 @@ class Music21Object(object):
 
         # some higher-level classes need this functionality
         # set ties
-        if addTies and ('Note' in e.classes or
-            'Unpitched' in e.classes):
+        if addTies and ('Note' in e.classes
+                        or 'Unpitched' in e.classes):
 
             forceEndTieType = 'stop'
             if e.tie is not None:
@@ -3016,9 +2937,10 @@ class Music21Object(object):
             raise Music21ObjectException('cannot split an element that has a Duration of None')
 
         if opFrac(sum(quarterLengthList)) != self.duration.quarterLength:
-            raise Music21ObjectException('cannot split by quarter length list that is not ' + 
-                                         'equal to the duration of the source: %s, %s' % 
-                                         (quarterLengthList, self.duration.quarterLength))
+            raise Music21ObjectException('cannot split by quarter length list whose sum is not ' + 
+                                         'equal to the quarterLength duration of the source: ' + 
+                                         '%s, %s' % (quarterLengthList, 
+                                                     self.duration.quarterLength))
         # if nothing to do
         elif len(quarterLengthList) == 1:
             # return a copy of self in a list
@@ -3111,12 +3033,53 @@ class Music21Object(object):
         >>> g.tie is None
         True
         
-        TODO: unit into a "split" function -- document obscure uses.
+        
+        It should work for complex notes with tuplets.
+
+        (this duration occurs in Modena A, Le greygnour bien, from the ars subtilior, c. 1380;
+        hence how I discovered this bug)
+        
+        >>> n = note.Note()
+        >>> n.duration.quarterLength = 0.5 + 0.0625 # eighth + 64th
+        >>> t = duration.Tuplet(4, 3)
+        >>> n.duration.appendTuplet(t)
+        >>> first, last = n.splitAtDurations()  
+        >>> (first.duration, last.duration)
+        (<music21.duration.Duration 0.375>, <music21.duration.Duration 0.046875>)
+
+        Notice that this duration could have been done w/o tuplets, so no tuplets in output:
+
+        >>> (first.duration.type, first.duration.dots, first.duration.tuplets)
+        ('16th', 1, ())
+        >>> (last.duration.type, last.duration.dots, last.duration.tuplets)
+        ('128th', 1, ())
+
+        Test of one with tuplets that cannot be split:
+
+        >>> n = note.Note()
+        >>> n.duration.quarterLength = 0.5 + 0.0625 # eighth + 64th
+        >>> t = duration.Tuplet(3, 2)
+        >>> n.duration.appendTuplet(t)
+        >>> (n.duration.type, n.duration.dots, n.duration.tuplets)
+        ('complex', 0, (<music21.duration.Tuplet 3/2/eighth>,))
+
+        >>> first, last = n.splitAtDurations()  
+        >>> (first.duration, last.duration)
+        (<music21.duration.Duration 1/3>, <music21.duration.Duration 1/24>)
+
+        >>> (first.duration.type, first.duration.dots, first.duration.tuplets)
+        ('eighth', 0, (<music21.duration.Tuplet 3/2/eighth>,))
+        >>> (last.duration.type, last.duration.dots, last.duration.tuplets)
+        ('64th', 0, (<music21.duration.Tuplet 3/2/64th>,))
+
+        
+        TODO: unite this and other functions into a "split" function -- document obscure uses.
         
         '''
-        quarterLengthList = [c.quarterLength for c in self.duration.components]
-        return self.splitByQuarterLengths(quarterLengthList)
-
+        atm = self.duration.aggregateTupletMultiplier()
+        quarterLengthList = [c.quarterLength * atm for c in self.duration.components]
+        splitList = self.splitByQuarterLengths(quarterLengthList)
+        return splitList
     #--------------------------------------------------------------------------
     # temporal and beat based positioning
     @property

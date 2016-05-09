@@ -673,8 +673,8 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
                 richestSystemLayout = copy.deepcopy(allSystemLayouts[0])
                 for sl in allSystemLayouts[1:]:
                     for attribute in ('distance', 'topDistance', 'leftMargin', 'rightMargin'):
-                        if (getattr(richestSystemLayout, attribute) is None and 
-                                getattr(sl, attribute) is not None):
+                        if (getattr(richestSystemLayout, attribute) is None
+                                and getattr(sl, attribute) is not None):
                             setattr(richestSystemLayout, attribute, getattr(sl, attribute))
                     #print(sl, sl.measureNumber)
                 thisSystem.systemLayout = richestSystemLayout
@@ -1565,7 +1565,7 @@ class Test(unittest.TestCase):
 
     def testBasic(self):
         from music21 import note
-        from music21.musicxml import m21ToString
+        from music21.musicxml import m21ToXml
         s = stream.Stream()
 
         for i in range(1,11):
@@ -1611,7 +1611,7 @@ class Test(unittest.TestCase):
 #         self.assertEqual(len(systemLayoutList), 4)
 
         #s.show()
-        unused_raw = m21ToString.fromMusic21Object(s)
+        unused_raw = m21ToXml.GeneralObjectExporter().parse(s)
 
     def xtestGetPageMeasureNumbers(self):
         from music21 import corpus

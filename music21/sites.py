@@ -355,8 +355,8 @@ class Sites(common.SlottedObject):
         updateNotAdd = False
         if idKey in self.siteDict:
             tempSiteRef = self.siteDict[idKey]
-            if (tempSiteRef.isDead is False and
-                tempSiteRef.site is not None):
+            if (tempSiteRef.isDead is False
+                    and tempSiteRef.site is not None):
                 updateNotAdd = True
 
             #if idKey is not None:
@@ -648,7 +648,7 @@ class Sites(common.SlottedObject):
             excludeNone=True,
             )
         #printMemo(memo, 'getObjByClass() called: looking at %s sites' % len(objs))
-        classNameIsStr = common.isStr(className)
+        classNameIsStr = isinstance(className, six.string_types)
         for obj in objs:
             #environLocal.printDebug(['memo', memo])
             if classNameIsStr:
@@ -834,20 +834,6 @@ class Sites(common.SlottedObject):
                 continue
             if siteRef.classString == 'VariantStorage':
                 return True
-        return False
-
-    @common.deprecated("May 2015","Jan 2016","Not needed.  All sites are sites. :-)")
-    def isSite(self, obj):
-        '''
-        DEPRECATED: TO be removed by v.2.1 -- used only by a long deprecated
-        removeLocationBySite.
-        
-        Given an object, determine if it is an object in a Site stored in this 
-        Sites's siteDict. This
-        will return False if the object is simply a context and not a location.
-        '''
-        if id(obj) in self.siteDict:
-            return True
         return False
 
     def purgeLocations(self, rescanIsDead=False):

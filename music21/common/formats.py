@@ -56,7 +56,7 @@ def findSubConverterForFormat(fmt):
     not a file extension. Or returns None
     
     >>> common.findSubConverterForFormat('musicxml')
-    <class 'music21.converter.subConverters.ConverterMusicXMLET'>
+    <class 'music21.converter.subConverters.ConverterMusicXML'>
     
     >>> common.findSubConverterForFormat('text')
     <class 'music21.converter.subConverters.ConverterText'>

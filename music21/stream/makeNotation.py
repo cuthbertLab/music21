@@ -78,14 +78,12 @@ def makeBeams(s, inPlace=False):
     #if s.isClass(Measure):
     if 'Measure' in s.classes:
     #if s.isClassOrSubclass('Measure'):
-        mColl = []  # store a list of measures for processing
-        mColl.append(returnObj)
-    elif s.iter.getElementsByClass('Measure'):
+        mColl = [returnObj]  # store a list of measures for processing
+    else: 
         mColl = list(returnObj.iter.getElementsByClass('Measure'))  # a list of measures
-    else:
-        raise stream.StreamException(
-            'cannot process a stream that neither is a Measure nor has '
-            'Measures')
+        if len(mColl) == 0:
+            raise stream.StreamException(
+                'cannot process a stream that is neither a Measure nor has no Measures')
 
     lastTimeSignature = None
 
@@ -124,7 +122,11 @@ def makeBeams(s, inPlace=False):
             # error check; call before sending to time signature, as, if this
             # fails, it represents a problem that happens before time signature
             # processing
-            durSum = opFrac(sum([d.quarterLength for d in durList]))
+            summed = sum([d.quarterLength for d in durList])
+            durSum = opFrac(opFrac(summed)) # the double call corrects for tiny errors in adding
+                    # floats and Fractions in the sum() call -- the first opFrac makes it
+                    # impossible to have 4.00000000001, but returns Fraction(4, 1). The
+                    # second call converts Fraction(4, 1) to 4.0
             barQL = lastTimeSignature.barDuration.quarterLength
 
             if durSum > barQL:
@@ -145,8 +147,7 @@ def makeBeams(s, inPlace=False):
                 lastTimeSignature.barDuration.quarterLength):
                 offset = (lastTimeSignature.barDuration.quarterLength -
                     noteStream.highestTime)
-            beamsList = lastTimeSignature.getBeams(
-                noteStream, measureStartOffset=offset)
+            beamsList = lastTimeSignature.getBeams(noteStream, measureStartOffset=offset)
 
             for i in range(len(noteStream)):
                 # this may try to assign a beam to a Rest
@@ -344,12 +345,22 @@ def makeMeasures(
     if s.hasVoices():
         #environLocal.printDebug(['make measures found voices'])
         # cannot make flat here, as this would destroy stream partitions
-        srcObj = copy.deepcopy(s.sorted)
+        if s.isSorted:
+            sSorted = s
+        else:
+            sSorted = s.sorted
+        srcObj = copy.deepcopy(sSorted)
         voiceCount = len(srcObj.voices)
     else:
         #environLocal.printDebug(['make measures found no voices'])
         # take flat and sorted version
-        srcObj = copy.deepcopy(s.flat.sorted)
+        sflat = s.flat
+        if sflat.isSorted:
+            sflatSorted = sflat
+        else:
+            sflatSorted = sflat.sorted
+        
+        srcObj = copy.deepcopy(sflatSorted)
         voiceCount = 0
 
     #environLocal.printDebug([
@@ -369,6 +380,10 @@ def makeMeasures(
         ts = meterStream
         meterStream = stream.Stream()
         meterStream.insert(0, ts)
+    else: # check that the meterStream is a Stream!
+        if not isinstance(meterStream, stream.Stream):
+            raise stream.StreamException(
+                    "meterStream is neither a Stream nor a TimeSignature!")
 
     #environLocal.printDebug([
     #    'makeMeasures(): meterStream', 'meterStream[0]', meterStream[0],
@@ -405,11 +420,11 @@ def makeMeasures(
     # for each element in stream, need to find max and min offset
     # assume that flat/sorted options will be set before procesing
     # list of start, start+dur, element
-    offsetMap = srcObj.offsetMap
+    offsetMapList = srcObj.offsetMap()
     #environLocal.printDebug(['makeMeasures(): offset map', offsetMap])
-    #offsetMap.sort() not necessary; just get min and max
-    if len(offsetMap) > 0:
-        oMax = max([x.endTime for x in offsetMap])
+    #offsetMapList.sort() not necessary; just get min and max
+    if len(offsetMapList) > 0:
+        oMax = max([x.endTime for x in offsetMapList])
     else:
         oMax = 0
 
@@ -448,10 +463,10 @@ def makeMeasures(
 
         if thisTimeSignature is None and lastTimeSignature is None:
             raise stream.StreamException(
-                'failed to find TimeSignature in meterStream; '
+                'failed to find TimeSignature in meterStream; ' +
                 'cannot process Measures')
-        if thisTimeSignature is not lastTimeSignature \
-            and thisTimeSignature is not None:
+        if (thisTimeSignature is not lastTimeSignature
+                and thisTimeSignature is not None):
             lastTimeSignature = thisTimeSignature
             # this seems redundant
             #lastTimeSignature = meterStream.getElementAtOrBefore(o)
@@ -484,9 +499,27 @@ def makeMeasures(
         else:
             measureCount += 1
 
+    # cache information about each measure (we used to do this once per element...
+    postLen = len(post)
+    postMeasureList = []
+    lastTimeSignature = None
+    for i in range(postLen):
+        m = post[i]
+        if m.timeSignature is not None:
+            lastTimeSignature = m.timeSignature
+        # get start and end offsets for each measure
+        # seems like should be able to use m.duration.quarterLengths
+        mStart = post.elementOffset(m)
+        mEnd = mStart + lastTimeSignature.barDuration.quarterLength
+        # if elements start fits within this measure, break and use
+        # offset cannot start on end
+        postMeasureList.append({'measure': m,
+                                'mStart': mStart,
+                                'mEnd': mEnd})
+        
     # populate measures with elements
-    for ob in offsetMap:
-        e, start, end, voiceIndex = ob
+    for oneOffsetMap in offsetMapList:
+        e, start, end, voiceIndex = oneOffsetMap
 
         #environLocal.printDebug(['makeMeasures()', start, end, e, voiceIndex])
         # iterate through all measures, finding a measure that
@@ -499,16 +532,15 @@ def makeMeasures(
 
         match = False
         lastTimeSignature = None
-        for i in range(len(post)):
-            m = post[i]
-            if m.timeSignature is not None:
-                lastTimeSignature = m.timeSignature
-            # get start and end offsets for each measure
-            # seems like should be able to use m.duration.quarterLengths
-            mStart = post.elementOffset(m)
-            mEnd = mStart + lastTimeSignature.barDuration.quarterLength
-            # if elements start fits within this measure, break and use
-            # offset cannot start on end
+        
+        m = None
+        for i in range(postLen):
+            postMeasureInfo = postMeasureList[i]
+            mStart = postMeasureInfo['mStart']
+            mEnd = postMeasureInfo['mEnd']
+            m = postMeasureInfo['measure']
+
+
             if start >= mStart and start < mEnd:
                 match = True
                 #environLocal.printDebug([
@@ -574,7 +606,12 @@ def makeMeasures(
         s._elements = []
         s._endElements = []
         s.elementsChanged()
-        for e in post.sorted:
+        if post.isSorted:
+            postSorted = post
+        else:
+            postSorted = post.sorted
+
+        for e in postSorted:
             # may need to handle spanners; already have s as site
             s.insert(post.elementOffset(e), e)
 
@@ -904,7 +941,8 @@ def makeTies(
 
     mCount = 0
     lastTimeSignature = None
-    while True:
+    
+    while True: # TODO: find a way to avoid "while True"         
         # update measureStream on each iteration,
         # as new measure may have been added to the returnObj stream
         measureStream = returnObj.getElementsByClass('Measure').stream()
@@ -935,8 +973,8 @@ def makeTies(
             else:  # get the last encountered meter
                 ts = meterStream.getElementAtOrBefore(mNext.offset)
             # only copy and assign if not the same as the last
-            if (lastTimeSignature is not None and
-                    not lastTimeSignature.ratioEqual(ts)):
+            if (lastTimeSignature is not None
+                    and not lastTimeSignature.ratioEqual(ts)):
                 mNext.timeSignature = copy.deepcopy(ts)
             # increment measure number
             mNext.number = m.number + 1
@@ -1032,6 +1070,7 @@ def makeTies(
                             'overshot into next measure', overshot])
         mCount += 1
     del measureStream  # clean up unused streams
+
     # changes elements
     returnObj.elementsChanged()
     if not inPlace:

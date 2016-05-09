@@ -154,8 +154,8 @@ class PercussionMapper(object):
         midiInstrument = self.reverseInstrumentMapping[midiNumber]
         
         midiInstrumentObject = midiInstrument()
-        if (midiInstrumentObject.inGMPercMap is True and 
-                hasattr(midiInstrumentObject, '_percMapPitchToModifier')):
+        if (midiInstrumentObject.inGMPercMap is True 
+                and hasattr(midiInstrumentObject, '_percMapPitchToModifier')):
             if midiNumber in midiInstrumentObject._percMapPitchToModifier:
                 modifier = midiInstrumentObject._percMapPitchToModifier[midiNumber]
                 midiInstrumentObject.modifier = modifier

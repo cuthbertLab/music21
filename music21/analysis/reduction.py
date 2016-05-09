@@ -28,6 +28,8 @@ from music21 import instrument
 from music21 import pitch
 from music21 import common
 
+from music21.ext import six
+
 from music21 import environment
 _MOD = "analysis.reduction"
 environLocal = environment.Environment(_MOD)
@@ -499,7 +501,7 @@ class PartReduction(object):
                     if matches is None:
                         matches = [name]
                     for m in matches: # strings or instruments
-                        if common.isStr(m):
+                        if isinstance(m, six.string_types):
                             if str(p.id).lower().find(m.lower()) >= 0:
                                 sub.append(p)
                                 break

@@ -13,16 +13,16 @@
 from music21.ext import six
 
 omit_modules = [
-                '*/ext/*',
+                'music21/ext/*',
                 'dist/dist.py',
                 'installer.py',
-                '*/documentation/upload.py',
-                '*/documentation/make.py',
+                'music21/documentation/upload.py',
+                'music21/documentation/make.py',
     #            '*/test/*',
-    #            '*/demos/*',  # maybe remove someday...
+    #            'music21/demos/*',  # maybe remove someday...
                 'music21/configure.py',
-                '*/figuredBass/examples.py',
-                '*/trecento/tonality.py'
+                'music21/figuredBass/examples.py',
+                'music21/alpha/trecento/tonality.py'
                 ]
 exclude_lines = [
                 r'\s*import music21\s*',

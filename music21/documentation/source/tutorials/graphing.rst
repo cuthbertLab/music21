@@ -181,7 +181,7 @@ A basic example follows::
     >>> for midiNumber in range(36,120):
     ...     n = note.Note()
     ...     n.midi = midiNumber
-    ...     frequency = n.frequency
+    ...     frequency = n.pitch.frequency
     ...	    data.append( (midiNumber, int(frequency) ) )
     >>> a.setData(data)
     >>> a.process()  # doctest: +SKIP
@@ -207,7 +207,7 @@ This example provides basic customization to a scatter graph::
     ...	    n = note.Note()
     ...	    n.midi = midiNumber
     ...	    frequency = n.frequency
-    ...	    if n.pitchClass in [0, 2, 4, 5, 7, 9, 11]:
+    ...	    if n.pitch.pitchClass in [0, 2, 4, 5, 7, 9, 11]:
     ...	        alpha = 1
     ...	        marker = 'o'
     ...	        color = 'white'

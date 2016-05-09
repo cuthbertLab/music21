@@ -21,7 +21,7 @@ from music21 import converter
 #import numpy as np
 #from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 
-import difflib
+#import difflib
 
 globalDebug = False
 
@@ -118,28 +118,29 @@ class OmrGroundTruthPair(object):
             self.groundM21Score = converter.parse(self.groundPath)
         
         return correctors.ScoreCorrector(self.groundM21Score)
-    
-    def getDifferencesBetweenAlignedScores(self):
-        '''
-        Returns the number of differences (int) between
-        two scores with aligned indices
-        '''
-        self.numberOfDifferences = 0        
-        aList = self.omrScore.getAllHashes()
-        bList = self.groundScore.getAllHashes()
-        for i in range(len(aList)):
-            for j in range(min(len(aList[i]), len(bList[i]))):
-                a = aList[i][j]
-                b = bList[i][j]
-                s = difflib.SequenceMatcher(None, a, b) 
-                ratio = s.ratio()
-                measureErrors = (1-ratio) * len(a)
-                self.numberOfDifferences += measureErrors
-        return self.numberOfDifferences
+#     
+#        UNUSED
+#     def getDifferencesBetweenAlignedScores(self):
+#         '''
+#         Returns the number of differences (int) between
+#         two scores with aligned indices
+#         '''
+#         self.numberOfDifferences = 0        
+#         aList = self.omrScore.getAllHashes()
+#         bList = self.groundScore.getAllHashes()
+#         for i in range(len(aList)):
+#             for j in range(min(len(aList[i]), len(bList[i]))):
+#                 a = aList[i][j]
+#                 b = bList[i][j]
+#                 s = difflib.SequenceMatcher(None, a, b) 
+#                 ratio = s.ratio()
+#                 measureErrors = (1-ratio) * len(a)
+#                 self.numberOfDifferences += measureErrors
+#         return self.numberOfDifferences
     
     def substCost(self, x, y):
         '''
-        define the substitution cost for x and y (2)
+        define the substitution cost for x and y (2 if x and y are unequal else 0)
         '''
         if x == y: 
             return 0
@@ -151,6 +152,7 @@ class OmrGroundTruthPair(object):
         define the insert cost for x and y (1)
         '''
         return 1
+    
     def deleteCost(self, x):
         '''
         define the delete cost for x and y (1)
@@ -306,15 +308,15 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
   
 def autoCorrelationBestMeasure(inputScore):
     '''
-    Returns a tuple of the total number of NON-flagged measures and the total number
-    of those measures that have a rhythmic match.
-    
     Essentially it's the ratio of amount of rhythmic similarity within a piece, which
     gives an upper bound on what the omr.corrector.prior measure should be able to 
     achieve for the flagged measures. If a piece has low rhythmic similarity in general, then
     there's no way for a correct match to be found within the unflagged measures in the piece.
     
-    takes in a stream.Score.
+    Returns a tuple of the total number of NON-flagged measures and the total number
+    of those measures that have a rhythmic match.
+    
+    Takes in a stream.Score.
     
     >>> c = converter.parse(omr.correctors.K525omrShortPath) # first 21 measures
     >>> totalUnflagged, totalUnflaggedWithMatches = omr.evaluators.autoCorrelationBestMeasure(c)

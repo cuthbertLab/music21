@@ -36,13 +36,13 @@ or wherever you have downloaded EasyABC to
 There is a two-step process in converting ABC files to Music21 Streams.  First this module
 reads in the text-based .abc file and converts all the information into ABCToken objects.  Then
 the function :func:`music21.abcFormat.translate.abcToStreamScore` of 
-the :ref:`~music21.abcFormat.translate` module
+the :ref:`moduleAbcFormatTranslate` module
 translates those Tokens into music21 objects.
 '''
-__all__ = (
+__all__ = [
     'translate',
     'testFiles',
-    )
+    ]
 
 from music21.abcFormat import translate
 
@@ -261,6 +261,8 @@ class ABCMetadata(ABCToken):
     def isKey(self):
         '''Returns True if the tag is "K", False otherwise. 
         Note that in some cases a Key will encode clef information. 
+        
+        (example from corpus: josquin/laDeplorationDeLaMorteDeJohannesOckeghem.abc)
         '''
         if self.tag == 'K': 
             return True
@@ -689,8 +691,8 @@ class ABCBar(ABCToken):
                 # this is a list of attributes
                 if 'repeat' in barTypeComponents:
                     self.barType = 'repeat'
-                elif ('first' in barTypeComponents or 
-                    'second' in barTypeComponents):
+                elif ('first' in barTypeComponents 
+                      or 'second' in barTypeComponents):
                     self.barType = 'barline'
                     #environLocal.printDebug(['got repeat 1/2:', self.src])
                 else:
@@ -1679,8 +1681,10 @@ class ABCHandler(object):
             # e.g. dAG FED:|2 dAG FGA| this is incorrect, but can avoid by
             # looking for a leading pipe
             if (((c.isalpha() and c.isupper()) or c in 'w')
-                and cNext != None and cNext == ':' and 
-                cNextNext != None and cNextNext not in '|'):
+                and cNext != None 
+                and cNext == ':' 
+                and cNextNext != None 
+                and cNextNext not in '|'):
                 # collect until end of line; add one to get line break
                 j = self._getNextLineBreak(strSrc, currentIndex)
                 skipAhead = j - (currentIndex + 1)
@@ -1872,8 +1876,8 @@ class ABCHandler(object):
                     # if we have not found pitch alpha
                     # ornaments may precede note names
                     # accidentals (^=_) staccato (.), up/down bow (u, v)
-                    if (foundPitchAlpha == False and 
-                        strSrc[j] in '~=^_vHLTS'):
+                    if (foundPitchAlpha == False 
+                            and strSrc[j] in '~=^_vHLTS'):
                         j += 1
                         continue                    
                     # only allow one pitch alpha to be a continue condition
@@ -1914,10 +1918,10 @@ class ABCHandler(object):
                     pass
                 # these are bad chords, or other problematic notations like
                 # "D.C."x
-                elif (collect.startswith('"') and 
-                          (collect[-1] in ['u', 'v', 'k', 'K', 'Q', '.', 
-                                           'y', 'T', 'w', 'h', 'x'] or
-                           collect.endswith('v.'))):
+                elif (collect.startswith('"') 
+                      and (collect[-1] in ['u', 'v', 'k', 'K', 'Q', '.', 
+                                           'y', 'T', 'w', 'h', 'x'] 
+                           or collect.endswith('v.'))):
                     pass
                 elif collect.startswith('x') or collect.startswith('H') or collect.startswith('Z'):
                     pass
@@ -1989,8 +1993,8 @@ class ABCHandler(object):
                 continue
             # broken rhythms need to be applied to previous and next notes
             if isinstance(t, ABCBrokenRhythmMarker):
-                if (isinstance(tPrev, ABCNote) and 
-                isinstance(tNext, ABCNote)):
+                if (isinstance(tPrev, ABCNote) 
+                    and isinstance(tNext, ABCNote)):
                     #environLocal.printDebug(['tokenProcess: got broken rhythm marker', t.src])       
                     tPrev.brokenRhythmMarker = (t.data, 'left')
                     tNext.brokenRhythmMarker = (t.data, 'right')
@@ -2508,9 +2512,9 @@ class ABCHandler(object):
                 # barCount += 1 # not used
             # case of end of metadata and start of notes in a pickup
             # tag the last metadata as the end
-            elif (isinstance(t, ABCMetadata) and 
-                  tNext is not None and 
-                  isinstance(tNext, (ABCNote, ABCChord))):
+            elif (isinstance(t, ABCMetadata) 
+                  and tNext is not None 
+                  and isinstance(tNext, (ABCNote, ABCChord))):
                 pos.append(i) # store position                 
 
         #environLocal.printDebug(['splitByMeasure(); raw bar positions', pos])
@@ -2536,8 +2540,8 @@ class ABCHandler(object):
                 #    'lbCandidate.barType', lbCandidate.barType, 
                 #    'lbCandidate.repeatForm', lbCandidate.repeatForm])
                 # skip end repeats assigned (improperly) to the left
-                if (lbCandidate.barType == 'repeat' and 
-                    lbCandidate.repeatForm == 'end'):
+                if (lbCandidate.barType == 'repeat' 
+                        and lbCandidate.repeatForm == 'end'):
                     pass
                 else: # assign
                     ah.leftBarToken = lbCandidate
@@ -2562,10 +2566,8 @@ class ABCHandler(object):
             if isinstance(self._tokens[yTestIndex], ABCBar):
                 rbCandidate = self._tokens[yTestIndex]
                 # if a start repeat, save it to be placed as a left barline
-                if (rbCandidate.barType == 'repeat' and 
-                    rbCandidate.repeatForm == 'start'):
-                    pass
-                else:
+                if not (rbCandidate.barType == 'repeat' 
+                        and rbCandidate.repeatForm == 'start'):
                     #environLocal.printDebug(['splitByMeasure(); assigning right bar token',
                     #                             lbCandidate])
                     ah.rightBarToken = self._tokens[yTestIndex]
@@ -2577,10 +2579,8 @@ class ABCHandler(object):
                 pass # no change
             # if y position is a note/chord, and this is the last index,
             # must included it
-            elif (isinstance(self._tokens[yTestIndex], (ABCNote, ABCChord)) and 
-                yTestIndex == len(self._tokens) - 1):
-                pass # no change
-            else: 
+            elif not (isinstance(self._tokens[yTestIndex], (ABCNote, ABCChord)) 
+                  and yTestIndex == len(self._tokens) - 1):
                 # if we find a note in the yClip position, it is likely
                 # a pickup, the first note after metadata. we do not include this
                 yClip = yTestIndex - 1

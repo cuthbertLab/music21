@@ -50,7 +50,6 @@ import unittest
 
 from music21 import chord
 from music21 import clef
-from music21 import common
 from music21 import exceptions21
 from music21 import key
 from music21 import meter
@@ -132,15 +131,6 @@ def figuredBassFromStream(streamPart):
     
     return fb
 
-
-@common.deprecated("2012","2016","Use music21.figuredBass.realizer.figuredBassFromStream.")
-def figuredBassFromStreamPart(streamPart):
-    '''
-    Deprecated. Use :meth:`~music21.figuredBass.realizer.figuredBassFromStream` instead.
-    
-    (Keep because it appears in the Cabel-Ugaz thesis)
-    '''
-    return figuredBassFromStream(streamPart)
     
 def addLyricsToBassNote(bassNote, notationString = None):
     '''
@@ -493,61 +483,6 @@ class FiguredBassLine(object):
                            inTime = self.inTime, overlayedParts = self._overlayedParts[0:-1],
                            paddingLeft = self._paddingLeft)
 
-
-    @common.deprecated("2011", "Jan 2016", "Use realize() instead and call " + 
-                       "generateRandomRealization() on the result.")
-    def generateRandomRealization(self):         
-        '''
-        Generates a random realization of a figured bass as a :class:`~music21.stream.Score`, 
-        with the default rules set **and** a soprano line limited to stepwise motion.
-        
-        
-        .. note:: Deprecated. Use :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`
-            which returns a :class:`~music21.figuredBass.realizer.Realization`. 
-            Then, call :meth:`~music21.figuredBass.realizer.Realization.generateRandomRealization`.
-        '''
-        fbRules = rules.Rules()
-        fbRules.partMovementLimits = [(1,2),(2,12),(3,12)]        
-        return self.realize(fbRules).generateRandomRealization()
-
-    @common.deprecated("2011", "Jan 2016", "Use realize() instead and call " + 
-                       "generateRandomRealization().show() on the result.")
-    def showRandomRealization(self):         
-        '''
-        Displays a random realization of a figured bass as a musicxml in external software, 
-        with the default rules set **and** a soprano line limited to stepwise motion.
-        
-        
-        .. note:: Deprecated. Use :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`
-            which returns a :class:`~music21.figuredBass.realizer.Realization`. 
-            Then, call :meth:`~music21.figuredBass.realizer.Realization.generateRandomRealization`
-            followed by a call to :meth:`~music21.base.Music21Object.show`.
-        '''
-        fbRules = rules.Rules()
-        fbRules.partMovementLimits = [(1,2),(2,12),(3,12)]
-        return self.realize(fbRules).generateRandomRealization().show()
-            
-    @common.deprecated("2011", "Jan 2016", 
-                       "Use realize() instead and call generateAllRealizations().show() " + 
-                       "on the result.")
-    def showAllRealizations(self):
-        '''
-        Displays all realizations of a figured bass as a musicxml in external software, 
-        with the default rules set **and** a soprano line limited to stepwise motion.
-        
-        
-        .. note:: Deprecated. Use :meth:`~music21.figuredBass.realizer.FiguredBassLine.realize`
-            which returns a :class:`~music21.figuredBass.realizer.Realization`. 
-            Then, call :meth:`~music21.figuredBass.realizer.Realization.generateAllRealizations`
-            followed by a call to :meth:`~music21.base.Music21Object.show`.
-        
-
-        .. warning:: This method is unoptimized, and may take a prohibitive amount
-            of time for a Realization which has more than tens of unique realizations.
-        '''
-        fbRules = rules.Rules()
-        fbRules.partMovementLimits = [(1,2),(2,12),(3,12)]
-        return self.realize(fbRules).generateAllRealizations().show()
     
     def _trimAllMovements(self, segmentList):
         '''
@@ -845,7 +780,7 @@ class Realization(object):
         
         return allSols
 
-_DOC_ORDER = [figuredBassFromStream, figuredBassFromStreamPart, addLyricsToBassNote, 
+_DOC_ORDER = [figuredBassFromStream, addLyricsToBassNote, 
               FiguredBassLine, Realization]
 
 class FiguredBassLineException(exceptions21.Music21Exception):

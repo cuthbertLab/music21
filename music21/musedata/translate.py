@@ -376,7 +376,6 @@ class Test(unittest.TestCase):
         from music21 import musedata
         import os
         from music21 import common
-        #from music21.musicxml import m21ToString
 
         fp1 = os.path.join(common.getSourceFilePath(), 
                            'musedata', 'testPrimitive', 'test01', '01.md')
@@ -403,7 +402,6 @@ class Test(unittest.TestCase):
 #         self.assertEqual(len(s.parts[0].flat.notesAndRests), 291)
 #         self.assertEqual(len(s.parts[1].flat.notesAndRests), 293)
 # 
-#         unused_raw = m21ToString.fromMusic21Object(s)
              
 
 #    def testGetMetaData(self):

@@ -22,6 +22,7 @@ from music21 import interval
 from music21 import note
 from music21 import musicxml
 
+from music21.ext import six
 from music21 import environment
 _MOD = 'mgtaPart1.py'
 environLocal = environment.Environment(_MOD)
@@ -244,7 +245,7 @@ def ch1_basic_II_C(data, intervalShift):
     for chunk in data:
         m = stream.Measure()    
         for e in chunk:
-            if common.isStr(e):
+            if isinstance(e, six.string_types):
                 n1 = note.Note(e)
                 n1.quarterLength = 4
                 n2 = n1.transpose(intervalShift)
@@ -495,7 +496,7 @@ def ch1_writing_II_A(show=True, *arguments, **keywords):
     if show:
         s.show()
     else:
-        unused_post = musicxml.m21ToString.fromMusic21Object(s)
+        unused_post = musicxml.m21ToXml.GeneralObjectExporter().parse(s)
 
 
 def ch1_writing_II_B(show=True, *arguments, **keywords):
@@ -586,7 +587,7 @@ def ch2_basic_I_A_1(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
+        unused_post = musicxml.m21ToXml.GeneralObjectExporter().parse(ex)
 
 
 def ch2_basic_I_A_2(show=True, *arguments, **keywords):
@@ -687,7 +688,7 @@ def ch2_basic_I_C(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
+        unused_post = musicxml.m21ToXml.GeneralObjectExporter().parse(ex)
 
 
 def ch2_basic_II(show=True, *arguments, **keywords):
@@ -739,7 +740,7 @@ def ch2_writing_I_A_1(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
+        unused_post = musicxml.m21ToXml.GeneralObjectExporter().parse(ex)
 
 
 def ch2_writing_I_A_2(show=True, *arguments, **keywords):
@@ -750,7 +751,7 @@ def ch2_writing_I_A_2(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
+        unused_post = musicxml.m21ToXml.GeneralObjectExporter().parse(ex)
 
 def ch2_writing_I_A_3(show=True, *arguments, **keywords):
     '''p. 14
@@ -760,7 +761,7 @@ def ch2_writing_I_A_3(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
+        unused_post = musicxml.m21ToXml.GeneralObjectExporter().parse(ex)
 
 def ch2_writing_I_A_4(show=True, *arguments, **keywords):
     '''p. 14
@@ -770,7 +771,7 @@ def ch2_writing_I_A_4(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
+        unused_post = musicxml.m21ToXml.GeneralObjectExporter().parse(ex)
 
 def ch2_writing_I_A_5(show=True, *arguments, **keywords):
     '''p. 14
@@ -780,7 +781,7 @@ def ch2_writing_I_A_5(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
+        unused_post = musicxml.m21ToXml.GeneralObjectExporter().parse(ex)
 
 
 
@@ -881,7 +882,7 @@ def ch2_writing_III_A_1(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
+        unused_post = musicxml.m21ToXml.GeneralObjectExporter().parse(ex)
 
 def ch2_writing_III_A_2(show=True, *arguments, **keywords):
     '''p. 16
@@ -891,7 +892,7 @@ def ch2_writing_III_A_2(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
+        unused_post = musicxml.m21ToXml.GeneralObjectExporter().parse(ex)
 
 def ch2_writing_III_A_3(show=True, *arguments, **keywords):
     '''p. 16
@@ -901,7 +902,7 @@ def ch2_writing_III_A_3(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
+        unused_post = musicxml.m21ToXml.GeneralObjectExporter().parse(ex)
 
 
 def ch2_writing_III_B(src):
@@ -952,7 +953,7 @@ def ch2_writing_III_B_1(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
+        unused_post = musicxml.m21ToXml.GeneralObjectExporter().parse(ex)
 
 
 def ch2_writing_III_B_2(show=True, *arguments, **keywords):
@@ -964,7 +965,7 @@ def ch2_writing_III_B_2(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
+        unused_post = musicxml.m21ToXml.GeneralObjectExporter().parse(ex)
 
 
 def ch2_writing_III_B_3(show=True, *arguments, **keywords):
@@ -976,7 +977,7 @@ def ch2_writing_III_B_3(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
+        unused_post = musicxml.m21ToXml.GeneralObjectExporter().parse(ex)
 
 
 
@@ -1004,7 +1005,7 @@ def ch2_writing_IV_B(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
+        unused_post = musicxml.m21ToXml.GeneralObjectExporter().parse(ex)
 
 
 #-------------------------------------------------------------------------------
@@ -1029,7 +1030,7 @@ def ch2_writing_V_A(show=True, *arguments, **keywords):
     if show:
         ex.show()
     else:
-        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
+        unused_post = musicxml.m21ToXml.GeneralObjectExporter().parse(ex)
 
 def ch2_writing_V_B(show=True, *arguments, **keywords):
     '''p. 18
@@ -1609,7 +1610,7 @@ def ch5_writing_IV_A(show=True, *arguments, **keywords):
         # calling show creates measures and allocates notes for the time sig
         ex.show()
     else:
-        unused_post = musicxml.m21ToString.fromMusic21Object(ex)
+        unused_post = musicxml.m21ToXml.GeneralObjectExporter().parse(ex)
 
 
 def ch5_writing_IV_B(show=True, *arguments, **keywords):

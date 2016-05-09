@@ -90,6 +90,7 @@ class DocBuilder(object):
         # other options are in source/conf.py,
         sphinxOptions = ['sphinx']
         sphinxOptions.extend(('-b', target))
+        sphinxOptions.extend(('-c', self.sourcesDirectoryPath))
         sphinxOptions.extend(('-d', self.doctreesDirectoryPath))
         if self.useMultiprocessing:
             sphinxOptions.extend(('-j', str(self.cpus_to_use)))
@@ -123,6 +124,10 @@ class DocBuilder(object):
         self.doctreesDirectoryPath = os.path.join(
             self.buildDirectoryPath,
             'doctrees',
+            )
+        self.sourcesDirectoryPath = os.path.join(
+            documentationDirectoryPath,
+            'source',
             )
         self.buildDirectories = {
             'html': os.path.join(

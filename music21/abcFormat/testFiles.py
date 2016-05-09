@@ -542,16 +542,18 @@ class Test(unittest.TestCase):
     def testBasic(self):
         from music21 import abcFormat
         from music21.abcFormat import translate
-        from music21.musicxml import m21ToString
+        from music21.musicxml import m21ToXml
 
         af = abcFormat.ABCFile()
 
+        GEX = m21ToXml.GeneralObjectExporter()
+        
         for tf in ALL:
             ah = af.readstr(tf)
             environLocal.printDebug([ah.getTitle()])
             s = translate.abcToStreamScore(ah)
             # run musicxml processing to look for internal errors
-            unused_out = m21ToString.fromMusic21Object(s)
+            unused_out = GEX.parse(s)
 
 
 if __name__ == "__main__":

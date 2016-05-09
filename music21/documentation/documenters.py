@@ -647,8 +647,8 @@ class ClassDocumenter(ObjectDocumenter):
             inheritedDocAttr = {}
             for baseClass in reversed(self.baseClasses):
                 baseClassDocAttr = getattr(baseClass, '_DOC_ATTR', None)
-                if (baseClassDocAttr is not None and 
-                        baseClassDocAttr not in seenBaseClassDocAttrs):
+                if (baseClassDocAttr is not None 
+                        and baseClassDocAttr not in seenBaseClassDocAttrs):
                     baseClassDocumenter = type(self).fromIdentityMap(baseClass)
                     inheritedDocAttr[baseClassDocumenter] = baseClassDocAttr
                     seenBaseClassDocAttrs.append(baseClassDocAttr)
@@ -714,13 +714,13 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.base.Music21Object.containerHierarchy
         - music21.base.Music21Object.contextSites      
         - music21.base.Music21Object.getAllContextsByClass
-        - music21.base.Music21Object.getContextAttr
         - music21.base.Music21Object.getContextByClass
         - music21.base.Music21Object.getOffsetBySite
         - music21.base.Music21Object.getOffsetInHierarchy
         - music21.base.Music21Object.getSpannerSites
         - music21.base.Music21Object.informSites
         - music21.base.Music21Object.isClassOrSubclass
+        - music21.base.Music21Object.next
         music21.stream.Stream:
         - music21.stream.Stream.activateVariants
         - music21.stream.Stream.addGroupForElements
@@ -830,7 +830,6 @@ class ClassDocumenter(ObjectDocumenter):
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.lowestOffset>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.notes>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.notesAndRests>
-        <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.offsetMap>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.pitches>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.secondsMap>
         <music21.documentation.documenters.AttributeDocumenter: music21.stream.Stream.semiFlat>

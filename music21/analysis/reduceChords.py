@@ -102,7 +102,7 @@ class ChordReducer(object):
                 intervalClassSets.append(intervalClassSet)
             forbiddenChords = frozenset(intervalClassSets)
 
-        scoreTree = tree.fromStream.convert(inputScore, 
+        scoreTree = tree.fromStream.asTimespans(inputScore, 
                                               flatten=True, 
                                               classList=(note.Note, chord.Chord))
 
@@ -214,9 +214,9 @@ class ChordReducer(object):
                 for timespan in verticalityTwo.startTimespans:
                     scoreTree.removeTimespan(timespan)
                     newTimespan = timespan.new(
-                        beatStrength=verticalityOne.beatStrength,
                         offset=verticalityOne.offset,
                         )
+                    newTimespan.beatStrength = verticalityOne.beatStrength
                     scoreTree.insert(newTimespan)
             elif pitchSetTwo.issubset(pitchSetOne):
                 for timespan in verticalityOne.startTimespans:
@@ -342,7 +342,7 @@ class ChordReducer(object):
                     continue
 
                 if bassTimespan.offset < group[0].offset:
-                    beatStrength = bassTimespan.beatStrength
+                    beatStrength = bassTimespan.element.beatStrength
                     offset = bassTimespan.offset
                     previousTimespan = scoreTree.findPreviousPitchedTimespanInSameStreamByClass(
                                                                                     group[0])
@@ -360,10 +360,9 @@ class ChordReducer(object):
                             offset = previousTimespan.endTime
                     scoreTree.removeTimespan(group[0])
                     subtree.removeTimespan(group[0])
-                    newTimespan = group[0].new(
-                        beatStrength=beatStrength,
-                        offset=offset,
-                        )
+                    newTimespan = group[0].new(offset=offset)
+                    newTimespan.beatStrength = beatStrength
+                        
                     scoreTree.insert(newTimespan)
                     subtree.insert(newTimespan)
                     group[0] = newTimespan
@@ -381,11 +380,9 @@ class ChordReducer(object):
 
                 for i in range(len(group) - 1):
                     timespanOne, timespanTwo = group[i], group[i + 1]
-                    if (timespanOne.pitches == timespanTwo.pitches or
-                            timespanOne.endTime != timespanTwo.offset):
-                        newTimespan = timespanOne.new(
-                            endTime=timespanTwo.endTime,
-                            )
+                    if (timespanOne.pitches == timespanTwo.pitches 
+                            or timespanOne.endTime != timespanTwo.offset):
+                        newTimespan = timespanOne.new(endTime=timespanTwo.endTime)
                         group[i] = newTimespan
                         group[i + 1] = newTimespan
                         scoreTree.removeTimespanList((timespanOne, timespanTwo))
@@ -405,21 +402,18 @@ class ChordReducer(object):
                 group = list(group)
                 for i in range(len(group) - 1):
                     timespanOne, timespanTwo = group[i], group[i + 1]
-                    if (timespanOne.pitches == timespanTwo.pitches or 
-                            timespanOne.endTime != timespanTwo.offset):
-                        newTimespan = timespanOne.new(
-                            endTime=timespanTwo.endTime,
-                            )
+                    if (timespanOne.pitches == timespanTwo.pitches 
+                            or timespanOne.endTime != timespanTwo.offset):
+                        newTimespan = timespanOne.new(endTime=timespanTwo.endTime)
                         group[i] = newTimespan
                         group[i + 1] = newTimespan
                         toInsert.add(newTimespan)
                         toRemove.add(timespanOne)
                         toRemove.add(timespanTwo)
                 if group[0].offset != group[0].parentOffset:
-                    newTimespan = group[0].new(
-                        beatStrength=1.0,
-                        offset=group[0].parentOffset,
-                        )
+                    newTimespan = group[0].new(offset=group[0].parentOffset)
+                    newTimespan.beatStrength = 1.0
+                        
                     toRemove.add(group[0])
                     toInsert.add(newTimespan)
                     group[0] = newTimespan
@@ -592,15 +586,12 @@ class ChordReducer(object):
         for verticalities in scoreTree.iterateVerticalitiesNwise(n=3):
             horizontalities = scoreTree.unwrapVerticalities(verticalities)
             for unused_part, horizontality in horizontalities.items():
-                if (not horizontality.hasPassingTone and 
-                        not horizontality.hasNeighborTone):
+                if (not horizontality.hasPassingTone
+                        and not horizontality.hasNeighborTone):
                     continue
-                elif (horizontality[0].measureNumber != 
-                        horizontality[1].measureNumber):
+                elif horizontality[0].measureNumber != horizontality[1].measureNumber:
                     continue
-                merged = horizontality[0].new(
-                    endTime=horizontality[1].endTime,
-                    )
+                merged = horizontality[0].new(endTime=horizontality[1].endTime)
                 scoreTree.removeTimespanList((horizontality[0], horizontality[1]))
                 scoreTree.insert(merged)
 

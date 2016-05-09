@@ -24,6 +24,7 @@ from music21 import base
 from music21 import common
 from music21 import exceptions21
 from music21 import environment
+from music21.ext import six
 
 _MOD = "text.py"  
 environLocal = environment.Environment(_MOD)
@@ -210,9 +211,9 @@ class TextException(exceptions21.Music21Exception):
 class TextFormatException(exceptions21.Music21Exception):
     pass
 
-class TextFormat(object):
+class TextFormatMixin(object):
     '''
-    An object for defining text formatting. 
+    An mixin object for defining text formatting. 
     This object can be multiple-inherited by objects that need storage and i/o of text settings. 
 
     See :class:`music21.expressions.TextExpression` for an example. 
@@ -226,7 +227,7 @@ class TextFormat(object):
         self._letterSpacing = None
 
         # TODO: a comma separated list; can also be generic font styles
-        self._fontFamily = None 
+        self.fontFamily = None 
 
     def _getJustify(self):
         return self._justify    
@@ -242,8 +243,7 @@ class TextFormat(object):
     justify = property(_getJustify, _setJustify, 
         doc = '''Get or set the justification.
 
-        
-        >>> tf = text.TextFormat()
+        >>> tf = text.TextFormatMixin()
         >>> tf.justify = 'center'
         >>> tf.justify
         'center'
@@ -262,9 +262,8 @@ class TextFormat(object):
 
     style = property(_getStyle, _setStyle, 
         doc = '''Get or set the style, as normal, italic, bold, and bolditalic.
-
         
-        >>> tf = text.TextFormat()
+        >>> tf = text.TextFormatMixin()
         >>> tf.style = 'bold'
         >>> tf.style
         'bold'
@@ -284,8 +283,7 @@ class TextFormat(object):
     weight = property(_getWeight, _setWeight, 
         doc = '''Get or set the weight, as normal, or bold.
 
-        
-        >>> tf = text.TextFormat()
+        >>> tf = text.TextFormatMixin()
         >>> tf.weight = 'bold'
         >>> tf.weight
         'bold'
@@ -305,8 +303,7 @@ class TextFormat(object):
     size = property(_getSize, _setSize, 
         doc = '''Get or set the size.
 
-        
-        >>> tf = text.TextFormat()
+        >>> tf = text.TextFormatMixin()
         >>> tf.size = 20
         >>> tf.size
         20.0
@@ -329,8 +326,7 @@ class TextFormat(object):
     letterSpacing = property(_getLetterSpacing, _setLetterSpacing, 
         doc = '''Get or set the letter spacing.
 
-        
-        >>> tf = text.TextFormat()
+        >>> tf = text.TextFormatMixin()
         >>> tf.letterSpacing = 20
         >>> tf.letterSpacing
         20.0
@@ -342,7 +338,7 @@ class TextBoxException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
-class TextBox(base.Music21Object, TextFormat):
+class TextBox(base.Music21Object, TextFormatMixin):
     '''
     A TextBox is arbitrary text that might be positioned anywhere on a page, 
     independent of notes or staffs. A page attribute specifies what page this text is found on; 
@@ -391,7 +387,7 @@ class TextBox(base.Music21Object, TextFormat):
     def __init__(self, content=None, x=500, y=500):
         base.Music21Object.__init__(self)
         # numerous properties are inherited from TextFormat
-        TextFormat.__init__(self)
+        TextFormatMixin.__init__(self)
 
         # the text string to be displayed; not that line breaks
         # are given in the xml with this non-printing character: (#)
@@ -418,7 +414,7 @@ class TextBox(base.Music21Object, TextFormat):
         return self._content
     
     def _setContent(self, value):
-        if not common.isStr(value):
+        if not isinstance(value, six.string_types):
             self._content = str(value)
         else:
             self._content = value    
@@ -842,7 +838,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [TextBox, TextFormat]
+_DOC_ORDER = [TextBox, TextFormatMixin]
 
 
 if __name__ == "__main__":

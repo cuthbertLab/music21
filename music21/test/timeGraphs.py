@@ -15,8 +15,8 @@
 # generates pretty graphs showing what the bottlenecks in the system are, for helping to
 # improve them.  Requires pycallgraph (not included with music21).  
 
-import pycallgraph
-import pycallgraph.output
+import pycallgraph  # @UnusedImport @UnresolvedImport
+import pycallgraph.output  # @UnresolvedImport
 import time
 
 
@@ -283,48 +283,6 @@ class TestParseABC(CallTest):
 
 
 
-class TestMusicXMLObjectTypeChecking(CallTest):
-
-    def __init__(self):
-        from music21 import musicxml
-        self.objs = []
-        self.count = 100000
-        # all objects that would be found in a Measure
-        for i in range(self.count):
-            self.objs.append(musicxml.mxObjects.Note())
-        for i in range(self.count):
-            self.objs.append(musicxml.mxObjects.Backup())
-        for i in range(self.count):
-            self.objs.append(musicxml.mxObjects.Forward())
-
-    def testFocus(self):
-        # note: this shows that using isinstance() is much faster than 
-        # checking the tag attribute
-
-        # create 500 time signatures
-        n = []
-        b = []
-        f = []
-#         for obj in self.objs:
-#             if isinstance(obj, musicxml.mxObjects.Note):
-#                 n.append(obj)
-#             elif isinstance(obj, musicxml.mxObjects.Backup):
-#                 b.append(obj)
-#             elif isinstance(obj, musicxml.mxObjects.Forward):
-#                 f.append(obj)
-
-        for obj in self.objs:
-            if obj.tag == 'note':
-                n.append(obj)
-            elif obj.tag == 'backup':
-                b.append(obj)
-            elif obj.tag == 'forward':
-                f.append(obj)
-
-
-        assert(len(n) == self.count)
-        assert(len(b) == self.count)
-        assert(len(f) == self.count)
 
 
 class TestGetContextByClassA(CallTest):
@@ -562,7 +520,7 @@ class CallGraph(object):
         self.excludeList += ['re.*','sre_*']
         self.excludeList += ['*xlrd*']
         # these have been shown to be very fast
-        self.excludeList += ['*xmlnode*', 'xml.dom.*', 'codecs.*', 'io.*']
+        self.excludeList += ['xml.dom.*', 'codecs.*', 'io.*']
         #self.excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
 
         # set class  to test here

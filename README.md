@@ -8,7 +8,7 @@ For more information, visit:
 http://web.mit.edu/music21 or http://music21.readthedocs.org/en/latest/index.html
 
 And to install, see:
-http://music21.readthedocs.org/en/latest/usersGuide/usersGuide_01_installing.html
+http://web.mit.edu/music21/doc/usersGuide/usersGuide_01_installing.html
 
 Released under either the BSD (3-clause) or GNU LGPL license according to your choice. See LICENSE.
 

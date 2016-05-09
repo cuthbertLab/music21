@@ -30,7 +30,7 @@ from music21.midi import percussion
 from music21.ext import six
 
 import unittest
-import unicodedata
+import unicodedata # @UnresolvedImport
 import os, string
 import struct
 
@@ -298,27 +298,35 @@ def putVariableLengthNumber(x):
 
 def putNumbersAsList(numList):
     '''
-    Translate a list of numbers (0-255) into a character byte strings. 
+    Translate a list of numbers (0-255) into a bytestring. 
     Used for encoding data messages where each byte encodes a different discrete value. 
 
     
     >>> midi.putNumbersAsList([0, 0, 0, 3])
-    '\\x00\\x00\\x00\\x03'
+    b'\\x00\\x00\\x00\\x03'
 
-    If a number is < 0 but >= -256 then it wraps around from the top.
+    If a number is < 0 then it wraps around from the top.
 
     >>> midi.putNumbersAsList([0, 0, 0, -3])
-    '\\x00\\x00\\x00\\xfd'
+    b'\\x00\\x00\\x00\\xfd'
     >>> midi.putNumbersAsList([0, 0, 0, -1])
-    '\\x00\\x00\\x00\\xff'
+    b'\\x00\\x00\\x00\\xff'
+
+    A number > 255 is an exception:
+
+    >>> midi.putNumbersAsList([256])
+    Traceback (most recent call last):
+    MidiException: Cannot place a number > 255 in a list: 256
     '''
-    post = []
+    post = bytearray()
     for n in numList:
         # assume if a number exceeds range count down from top?
         if n < 0:
-            n = 256 + n # -1 will be 255
-        post.append(chr(n))
-    return ''.join(post)
+            n = n % 256 # -1 will be 255
+        if n >= 256:
+            raise MidiException("Cannot place a number > 255 in a list: %d" % n)
+        post.append(n)
+    return bytes(post)
 
 #-------------------------------------------------------------------------------
 class Enumeration(object): 
@@ -468,7 +476,7 @@ class MidiEvent(object):
     >>> me2.time = 0
     >>> me2.data = 'guitar'
     >>> me2
-    <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data='guitar'>
+    <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=b'guitar'>
     '''
     # pylint: disable=redefined-builtin    
     def __init__(self, track, type=None, time=None, channel=None): #@ReservedAssignment
@@ -553,6 +561,10 @@ class MidiEvent(object):
 
     # store generic data in parameter 1
     def _setData(self, value):
+        if value is not None and not isinstance(value, bytes):
+            if isinstance(value, six.string_types):
+                value = value.encode('utf-8')
+        
         self._parameter1 = value
 
     def _getData(self):

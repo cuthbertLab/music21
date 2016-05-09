@@ -479,6 +479,13 @@ def clefFromString(clefString, octaveShift = 0):
     >>> noClef = clef.clefFromString('None')
     >>> noClef
     <music21.clef.NoClef>
+    
+    Invalid line numbers raise an exception:
+    
+    >>> invalidClef = clef.clefFromString("F6") 
+    Traceback (most recent call last):
+    ClefException: line number (second character) must be 1-5; 
+                do not use this function for clefs on special staves such as 'F6'
     '''
     xnStr = clefString.strip()
     if xnStr.lower() in ('tab', 'percussion', 'none', 'jianpu'):
@@ -520,8 +527,8 @@ def clefFromString(clefString, octaveShift = 0):
         raise ClefException("can't read %s as clef str, should be G2, F4, etc.", xnStr)
     lineNum = int(lineNum)
     if lineNum < 1 or lineNum > 5:
-        raise ClefException("line number (second character) must be 1-5;" + 
-                            "do not use this function for clefs on special staves: %s", xnStr)
+        raise ClefException("line number (second character) must be 1-5; do not use this " + 
+                            "function for clefs on special staves such as '%s'" % xnStr)
 
     clefObj = None
     if thisType in CLASS_FROM_TYPE:

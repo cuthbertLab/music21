@@ -61,6 +61,7 @@ from music21 import exceptions21
 from music21 import pitch
 from music21 import common
 from music21 import interval
+from music21.ext import six
 
 from music21 import environment
 _MOD = 'sieve.py'
@@ -744,8 +745,9 @@ class Residual(object):
         "m and shift not equal"
         if other == None: 
             return 1
-        if (self._m != other._m or self._shift != other._shift or
-             self._neg != other._neg):
+        if (self._m != other._m 
+                or self._shift != other._shift
+                or self._neg != other._neg):
             return 1
         else: 
             return 0
@@ -1048,7 +1050,7 @@ class Sieve(object):
         >>> c = sieve.Sieve('(5|2)&4&8')
         """
         # note: this z should only be used if usrStr is a str, and not a list
-        if z is None and common.isStr(usrStr):
+        if z is None and isinstance(usrStr, six.string_types):
             z = list(range(0, 100))
         elif z is None and common.isListLike(usrStr): # if a list
             pass
@@ -1089,8 +1091,10 @@ class Sieve(object):
         # only negative that will show up is binary negative, not unary
         # some internal intersections may have a complemented residual class
         self._expType = 'complex' # assume complex
-        if (NEG in self._expTree or LGROUP in self._expTree or 
-             RGROUP in self._expTree or XOR in self._expTree):
+        if (NEG in self._expTree 
+                or LGROUP in self._expTree
+                or RGROUP in self._expTree 
+                or XOR in self._expTree):
             try:
                 self._cmpSegment() # will update self._nonCompressible
             except IndexError: # case of z not providing a sufficent any segment

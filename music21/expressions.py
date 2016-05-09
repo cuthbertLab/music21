@@ -24,12 +24,13 @@ create interval.Interval objects only when necessary.
 import copy
 import unittest
 
-from music21 import interval
 from music21 import base
 from music21 import exceptions21
-from music21 import text
-from music21 import common
+from music21 import interval
 from music21 import spanner
+from music21 import text
+
+from music21.ext import six
 
 _MOD = 'expressions'
 
@@ -110,7 +111,7 @@ class TextExpressionException(ExpressionException):
     pass
 
 
-class TextExpression(Expression, text.TextFormat):
+class TextExpression(Expression, text.TextFormatMixin):
     '''
     A TextExpression is a word, phrase, or similar 
     bit of text that is positioned in a Stream or Measure. 
@@ -132,11 +133,11 @@ class TextExpression(Expression, text.TextFormat):
     def __init__(self, content=None):
         Expression.__init__(self)
         # numerous properties are inherited from TextFormat
-        text.TextFormat.__init__(self)
+        text.TextFormatMixin.__init__(self)
 
         # the text string to be displayed; not that line breaks
         # are given in the xml with this non-printing character: (#)
-        if not common.isStr(content):
+        if not isinstance(content, six.string_types):
             self._content = str(content)
         else:
             self._content = content
@@ -468,7 +469,6 @@ class WholeStepInvertedMordent(InvertedMordent):
 class Trill(Ornament):
     '''A basic trill marker.
 
-    
     >>> m = expressions.Trill()
     >>> m.placement
     'above'
@@ -776,7 +776,7 @@ class GeneralAppoggiatura(Ornament):
         realize an appoggiatura
         
         returns a three-element tuple.
-        The first is the notes that the grace note was converted to.
+        The first is the list of notes that the grace note was converted to.
         The second is the rest of the note
         The third is an empty list (since there are no notes at the end of an appoggiatura)
 
@@ -1018,7 +1018,7 @@ class TrillExtension(spanner.Spanner):
     # note that this always includes a trill symbol
     def __init__(self, *arguments, **keywords):
         super(TrillExtension, self).__init__(*arguments, **keywords)
-        self._placement = 'below' # can above or below, after musicxml
+        self._placement = None # can above or below or None, after musicxml
     
     def _getPlacement(self):
         return self._placement
@@ -1030,8 +1030,7 @@ class TrillExtension(spanner.Spanner):
             self._placement = value.lower()
         
     placement = property(_getPlacement, _setPlacement, doc='''
-        Get or set the placement as either above or below.
-
+        Get or set the placement as either above, below, or None.
         
         >>> s = stream.Stream()
         >>> s.repeatAppend(note.Note(), 8)
@@ -1201,15 +1200,15 @@ class Test(unittest.TestCase):
         objects through make measure calls. 
         '''
         from music21 import stream, note, chord, expressions
-        from music21.musicxml import m21ToString
+        from music21.musicxml import m21ToXml
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
         n1 = s.notes[0]
         n2 = s.notes[-1]
         sp1 = expressions.TrillExtension(n1, n2)
         s.append(sp1)
-        raw = m21ToString.fromMusic21Object(s)
-        self.assertEqual(raw.count('wavy-line'), 2)
+        raw = m21ToXml.GeneralObjectExporter().parse(s)
+        self.assertEqual(raw.count(b'wavy-line'), 2)
 
         s = stream.Stream()
         s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
@@ -1217,9 +1216,9 @@ class Test(unittest.TestCase):
         n2 = s.notes[-1]
         sp1 = expressions.TrillExtension(n1, n2)
         s.append(sp1)
-        raw = m21ToString.fromMusic21Object(s)
+        raw = m21ToXml.GeneralObjectExporter().parse(s)
         #s.show()
-        self.assertEqual(raw.count('wavy-line'), 2)
+        self.assertEqual(raw.count(b'wavy-line'), 2)
 
 
 

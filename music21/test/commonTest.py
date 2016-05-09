@@ -56,7 +56,7 @@ class Music21TestRunner(unittest.runner.TextTestRunner):
         result.failfast = self.failfast
         result.buffer = self.buffer
         with warnings.catch_warnings():
-            if self.warnings:
+            if hasattr(self, 'warnings') and self.warnings:
                 # if self.warnings is set, use it to filter all the warnings
                 warnings.simplefilter(self.warnings)
                 # if the filter is 'default' or 'always', special-case the
@@ -123,7 +123,7 @@ class ModuleGather(object):
     >>> from music21.test import commonTest
     >>> mg = commonTest.ModuleGather(useExtended=True)
     >>> #_DOCS_SHOW print mg.modulePaths[0]
-    D:\Web\eclipse\music21base\music21\xmlnode.py
+    D:\Web\eclipse\music21base\music21\volume.py
     '''
     def __init__(self, useExtended=False):
         self.dirParent = common.getSourceFilePath()
@@ -208,9 +208,6 @@ class ModuleGather(object):
                             'musicxml/m21ToXml',
                             'musicxml/xmlToM21', 
 
-                            'musicxml/fromMxObjects',
-                            'musicxml/m21ToString', 
-
                             'romanText/translate', 
                             'alpha/theoryAnalysis/theoryAnalyzer',
                             ]
@@ -218,7 +215,7 @@ class ModuleGather(object):
         
         # skip any path that contains this string
         self.pathSkip = ['obsolete', 
-                         'ext', 
+                         'music21/ext',  # not just "ext" because of "text!"
                          'alpha/webapps/server', 
                          'alpha/webapps/archive',
                          ]

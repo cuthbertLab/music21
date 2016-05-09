@@ -22,13 +22,14 @@ import unittest
 import copy
 
 from music21 import base
-from music21 import exceptions21
-
-from music21 import pitch
-from music21 import note
-from music21 import interval
 from music21 import common
+from music21 import exceptions21
+from music21 import interval
+from music21 import note
+from music21 import pitch
 from music21 import scale
+
+from music21.ext import six
 
 from music21 import environment
 _MOD = "key.py"
@@ -213,7 +214,7 @@ def pitchToSharps(value, mode=None):
     KeyException: Cannot determine sharps for quarter-tone keys! silly!
     
     '''
-    if common.isStr(value): 
+    if isinstance(value, six.string_types): 
         value = pitch.Pitch(value)
     elif 'Pitch' in value.classes:
         value = value
@@ -234,7 +235,7 @@ def pitchToSharps(value, mode=None):
         sharps += modeSharpsAlter[mode]
     
     return sharps
-#    if common.isStr(value):
+#    if isinstance(value, six.string_types):
 #        p = pitch.Pitch(value)
 #    else:
 #        p = value
@@ -369,8 +370,7 @@ class KeySignature(base.Music21Object):
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
 
         try:
-            if (sharps is not None and 
-                  (sharps != int(sharps))):
+            if (sharps is not None and (sharps != int(sharps))):
                 raise KeySignatureException(
                     'Cannot get a KeySignature from this "number" of sharps: "%s"; ' % sharps + 
                     'did you mean to use a key.Key() object instead?')
@@ -847,8 +847,8 @@ class Key(KeySignature, scale.DiatonicScale):
 
     def __init__(self, tonic=None, mode=None):
         if tonic is not None:
-            if hasattr(tonic, 'classes') and ('Music21Object' in tonic.classes or 
-                                              'Pitch' in tonic.classes):
+            if hasattr(tonic, 'classes') and ('Music21Object' in tonic.classes
+                                              or 'Pitch' in tonic.classes):
                 if hasattr(tonic, 'name'):
                     tonic = tonic.name
                 elif hasattr(tonic, 'pitches') and tonic.pitches: # chord w/ >= 1 pitch
