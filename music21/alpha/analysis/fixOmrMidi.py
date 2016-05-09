@@ -9,11 +9,15 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
+from music21 import note
 from music21 import interval
+from music21.alpha.analysis import hash
+
 import copy
 import unittest
 import os
 import inspect
+import itertools
 
 pathName = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
@@ -32,14 +36,42 @@ class OMRMidiNoteFixer(object):
         self.correctedstream = copy.deepcopy(self.omrstream)
     
     def fixStreams(self):
-
-        self.alignStreams()
+        if self.check_parts():
+            self.alignStreams()
 
         for omrnote, midinote in zip(self.omrstream, self.midistream):
             fixerRhythm = OMRMidiNoteRhythmFixer(omrnote, midinote)
             fixerRhythm.fix()
             fixerPitch = OMRMidiNotePitchFixer(omrnote, midinote)
             fixerPitch.fix()
+    
+    def check_parts(self):
+        num_midi_parts = len(self.midistream.parts)
+        num_omr_parts = len(self.omrstream.parts)
+        
+        if num_midi_parts == num_omr_parts:
+            if num_midi_parts == num_omr_parts + 1:
+                if self.check_bass_doubles_cello():
+                    return True
+                
+        else:
+            return False
+    
+    def checkBassDoublesCello(self):
+        # assume bass part is last part
+        bassPart = self.midistream [-1]
+        # assume cello part is penultimate part
+        celloPart = self.midistream[-2]
+        
+        h = hash.Hasher()
+        h.validTypes = [note.Note, note.Rest]
+        h.validTypes = [note.Note, note.Rest]
+        h.hashMIDI = False
+        h.hashNoteName = True
+        hashBass = h.hash(bassPart)
+        hashCello = h.hash(celloPart)
+        return hashBass == hashCello
+        
     
     def alignStreams(self):
 
@@ -183,7 +215,26 @@ class Test(unittest.TestCase):
         self.assertEqual(omrnote.nameWithOctave, 'E4')
         self.assertEqual(midinote.nameWithOctave, 'B-4')
         self.assertTrue(fixer.isPossiblyMisaligned)
-
+        
+    def testK525BassCelloDouble(self):
+        from music21 import converter
+        from music21.alpha.analysis import hash
+        
+        midiFP = K525midiShortPath
+        omrFP = K525omrShortPath
+        midistream = converter.parse(midiFP)
+        omrstream = converter.parse(omrFP)
+        
+        fixer = OMRMidiNoteFixer(omrstream, midistream)
+        celloBassAnalysis = fixer.checkBassDoublesCello()
+        self.assertEqual(celloBassAnalysis, True)
+#         h = hash.Hasher()
+#         h.validTypes = [note.Note, note.Rest]
+#         h.hashMIDI = False
+#         h.hashNoteName = True
+#         hashBass = h.hash(bassPart)
+#         hashCello = h.hash(celloPart)
+#         self.assertEqual(hashBass, hashCello)
 
 if __name__ == '__main__':
     import music21
