@@ -1395,7 +1395,7 @@ def packetsToMidiTrack(packets, trackId=1, channels=None):
 
 
 def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
-    inputM21=None):
+    inputM21=None, **keywords):
     '''
     Note that quantization takes place in stream.py since it's useful not just for MIDI.
 
@@ -1611,8 +1611,12 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                     
     s.elementsChanged()
     # quantize to nearest 16th
-    if quantizePost:    
-        s.quantize([8, 3], processOffsets=True, processDurations=True, inPlace=True)
+    if quantizePost:
+        if "quarterLengthDivisors" in keywords:
+            quarterLengthDivisors = keywords["quarterLengthDivisors"]
+        else: 
+            quarterLengthDivisors = None   
+        s.quantize(quarterLengthDivisors = quarterLengthDivisors, processOffsets=True, processDurations=True, inPlace=True)
 
     if voicesRequired:
         pass
@@ -1815,7 +1819,7 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
 
 
 def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
-                        inputM21=None):
+                        inputM21=None, **keywords):
     '''
     Given a list of midiTracks, populate this Stream with a Part for each track. 
     '''
@@ -1833,7 +1837,7 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
         if mt.hasNotes(): 
             streamPart = stream.Part() # create a part instance for each part
             midiTrackToStream(mt, ticksPerQuarter, quantizePost, 
-                              inputM21=streamPart)
+                              inputM21=streamPart, **keywords)
 #             streamPart._setMidiTracksPart(mt,
 #                 ticksPerQuarter=ticksPerQuarter, quantizePost=quantizePost)
             s.insert(0, streamPart)
@@ -1844,7 +1848,7 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
             midiTrackToStream(mt, 
                               ticksPerQuarter, 
                               quantizePost, 
-                              inputM21=conductorTrack)
+                              inputM21=conductorTrack, **keywords)
     #environLocal.printDebug(['show() conductorTrack elements'])
     # if we have time sig/key sig elements, add to each part
     
@@ -1909,7 +1913,7 @@ def streamToMidiFile(inputM21):
     return mf
 
 
-def midiFilePathToStream(filePath, inputM21=None):
+def midiFilePathToStream(filePath, inputM21=None, **keywords):
     '''
     Used by music21.converter:
     
@@ -1931,7 +1935,7 @@ def midiFilePathToStream(filePath, inputM21=None):
     mf.open(filePath)
     mf.read()
     mf.close()
-    return midiFileToStream(mf, inputM21)
+    return midiFileToStream(mf, inputM21, **keywords)
 
 
 def midiAsciiStringToBinaryString(midiFormat=1, ticksPerQuarterNote=960, tracksEventsList=None):
@@ -2036,7 +2040,7 @@ def midiStringToStream(strData):
     return midiFileToStream(mf)
 
 
-def midiFileToStream(mf, inputM21=None, quantizePost=True):
+def midiFileToStream(mf, inputM21=None, quantizePost=True, **keywords):
     '''
     Convert a :class:`~music21.midi.base.MidiFile` object to a 
     :class:`~music21.stream.Stream` object.
@@ -2069,7 +2073,7 @@ def midiFileToStream(mf, inputM21=None, quantizePost=True):
         # create a stream for each tracks   
         # may need to check if tracks actually have event data
         midiTracksToStreams(mf.tracks, 
-            ticksPerQuarter=mf.ticksPerQuarterNote, quantizePost=quantizePost, inputM21=s)
+            ticksPerQuarter=mf.ticksPerQuarterNote, quantizePost=quantizePost, inputM21=s, **keywords)
         #s._setMidiTracks(mf.tracks, mf.ticksPerQuarterNote)
 
     return s

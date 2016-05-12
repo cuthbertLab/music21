@@ -440,7 +440,7 @@ class Converter(object):
 
         self.setSubconverterFromFormat(useFormat)
         self.subConverter.keywords = keywords
-        self.subConverter.parseFile(fp, number=number)
+        self.subConverter.parseFile(fp, number=number, **keywords)
         self.stream.filePath = fp
         self.stream.fileNumber = number
         self.stream.fileFormat = useFormat
@@ -496,14 +496,14 @@ class Converter(object):
             except freezeThaw.FreezeThawException:
                 environLocal.warn("Could not parse pickle, %s ...rewriting" % fpPickle)
                 os.remove(fpPickle)
-                self.parseFileNoPickle(fp, number, format, forceSource)
+                self.parseFileNoPickle(fp, number, format, forceSource, **keywords)
 
             self.stream.filePath = fp
             self.stream.fileNumber = number
             self.stream.fileFormat = useFormat
         else:
             environLocal.printDebug("Loading original version")
-            self.parseFileNoPickle(fp, number, format, forceSource)
+            self.parseFileNoPickle(fp, number, format, forceSource, **keywords)
             if writePickle is True and fpPickle is not None and storePickle is True:
                 # save the stream to disk...
                 environLocal.printDebug("Freezing Pickle")
@@ -1829,6 +1829,16 @@ class Test(unittest.TestCase):
         #testConv = Converter()
         #self.assertRaises(SubConverterException, testConv.parseData, mxlString)
 
+class ParseTest(unittest.TestCase):
+    def testParseMidiQuantize(self):
+        """
+        
+        """
+        import os
+        from music21 import omr
+        midifp = omr.correctors.pathName + os.sep + 'k525short.mid'
+        midistream = parse(midifp, forceSource=True, storePickle=False, quarterLengthDivisors=[2])
+        midistream.show()
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -1839,7 +1849,7 @@ _DOC_ORDER = [parse, parseFile, parseData, parseURL, freeze, thaw, freezeStr, th
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(ParseTest)
 
 
 
