@@ -250,12 +250,14 @@ class Test(unittest.TestCase):
 #         hashCello = h.hash(celloPart)
 #         self.assertEqual(hashBass, hashCello)
 
-class ParseTestExternal(unittest.TestCase):
-    def testParseMidi(self):
-        from music21 import converter
-        midistream = converter.parse(K525midiShortPath, forceSource=True, quarterLengthDivisors=[4])
-        midistream.show()
+
+## this test is included in the quarterLengthDivisor PR in the converter.py tests
+# class ParseTestExternal(unittest.TestCase):
+#     def testParseMidi(self):
+#         from music21 import converter
+#         midistream = converter.parse(K525midiShortPath, forceSource=True, quarterLengthDivisors=[4])
+#         midistream.show()
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(ParseTestExternal)
+    music21.mainTest(Test)
