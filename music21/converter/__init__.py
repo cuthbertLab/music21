@@ -440,7 +440,7 @@ class Converter(object):
 
         self.setSubconverterFromFormat(useFormat)
         self.subConverter.keywords = keywords
-        self.subConverter.parseFile(fp, number=number)
+        self.subConverter.parseFile(fp, number=number, **keywords)
         self.stream.filePath = fp
         self.stream.fileNumber = number
         self.stream.fileFormat = useFormat
@@ -496,14 +496,14 @@ class Converter(object):
             except freezeThaw.FreezeThawException:
                 environLocal.warn("Could not parse pickle, %s ...rewriting" % fpPickle)
                 os.remove(fpPickle)
-                self.parseFileNoPickle(fp, number, format, forceSource)
+                self.parseFileNoPickle(fp, number, format, forceSource, **keywords)
 
             self.stream.filePath = fp
             self.stream.fileNumber = number
             self.stream.fileFormat = useFormat
         else:
             environLocal.printDebug("Loading original version")
-            self.parseFileNoPickle(fp, number, format, forceSource)
+            self.parseFileNoPickle(fp, number, format, forceSource, **keywords)
             if writePickle is True and fpPickle is not None and storePickle is True:
                 # save the stream to disk...
                 environLocal.printDebug("Freezing Pickle")
@@ -1828,7 +1828,21 @@ class Test(unittest.TestCase):
         #from music21.converter.subConverters import SubConverterException
         #testConv = Converter()
         #self.assertRaises(SubConverterException, testConv.parseData, mxlString)
-
+        
+    def testParseMidiQuantize(self):
+        '''
+        Checks quantization when parsing a stream. Here everything snaps to the 8th note.
+        '''
+        import os
+        from music21 import omr
+        from music21.common import numberTools
+        midifp = omr.correctors.pathName + os.sep + 'k525short.mid'
+        midistream = parse(midifp, forceSource=True, storePickle=False, quarterLengthDivisors=[2])
+        #midistream.show()
+        for n in midistream.recurse(classFilter='Note'):
+            self.assertTrue(numberTools.almostEquals(n.quarterLength % .5, 0.0))
+    
+        
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
