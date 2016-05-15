@@ -522,6 +522,9 @@ def nearestMultiple(n, unit):
     
     Error is always positive, but signed difference can be negative.
     
+    >>> common.nearestMultiple(23404 - 0.0625, .125)
+    (23403.875, 0.0625, 0.0625) 
+    
     >>> common.nearestMultiple(.001, .125)[0]
     0.0
     
@@ -540,13 +543,6 @@ def nearestMultiple(n, unit):
     ValueError: n (-0.5) is less than zero. Thus cannot find nearest 
         multiple for a value less than the unit, 0.125
 
-    OMIT_FROM_DOCS
-    
-    ## this test isn't working correctly
-
-    >>> common.nearestMultiple(23404 - 0.0625, .125)
-    (23403.875, 0.0625, 0.0625) 
-    # used to be (23403.875, 0.0625, 0.0625)
 
     :rtype: tuple(float)
     '''
