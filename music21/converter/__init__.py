@@ -1828,17 +1828,18 @@ class Test(unittest.TestCase):
         #from music21.converter.subConverters import SubConverterException
         #testConv = Converter()
         #self.assertRaises(SubConverterException, testConv.parseData, mxlString)
-
-class ParseTest(unittest.TestCase):
-    def testParseMidiQuantize(self):
-        """
         
-        """
+    def testParseMidiQuantize(self):
+        '''
+        Checks quantization when parsing a stream. Here everything snaps to the 8th note.
+        '''
         import os
         from music21 import omr
         midifp = omr.correctors.pathName + os.sep + 'k525short.mid'
         midistream = parse(midifp, forceSource=True, storePickle=False, quarterLengthDivisors=[2])
         midistream.show()
+    
+        
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
@@ -1849,7 +1850,7 @@ _DOC_ORDER = [parse, parseFile, parseData, parseURL, freeze, thaw, freezeStr, th
 if __name__ == "__main__":
     # sys.arg test options will be used in mainTest()
     import music21
-    music21.mainTest(ParseTest)
+    music21.mainTest(Test)
 
 
 
