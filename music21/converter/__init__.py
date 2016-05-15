@@ -1835,9 +1835,12 @@ class Test(unittest.TestCase):
         '''
         import os
         from music21 import omr
+        from music21.common import numberTools
         midifp = omr.correctors.pathName + os.sep + 'k525short.mid'
         midistream = parse(midifp, forceSource=True, storePickle=False, quarterLengthDivisors=[2])
-        midistream.show()
+        #midistream.show()
+        for n in midistream.recurse(classFilter='Note'):
+            self.assertTrue(numberTools.almostEquals(n.quarterLength % .5, 0.0))
     
         
 
