@@ -850,14 +850,14 @@ class ConverterMidi(SubConverter):
         from music21.midi import translate as midiTranslate
         self.stream = midiTranslate.midiStringToStream(strData)
 
-    def parseFile(self, fp, number=None):
+    def parseFile(self, fp, number=None, **keywords):
         '''
         Get MIDI data from a file path.
 
         Calls midi.translate.midiFilePathToStream.
         '''
         from music21.midi import translate as midiTranslate
-        midiTranslate.midiFilePathToStream(fp, self.stream)
+        midiTranslate.midiFilePathToStream(fp, self.stream, **keywords)
 
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):
         from music21.midi import translate as midiTranslate

@@ -523,11 +523,11 @@ def nearestMultiple(n, unit):
     Error is always positive, but signed difference can be negative.
     
     >>> common.nearestMultiple(23404 - 0.0625, .125)
-    (23404.0, 0.0625, -0.0625)
-
+    (23403.875, 0.0625, 0.0625) 
+    
     >>> common.nearestMultiple(.001, .125)[0]
     0.0
-
+    
     >>> common.almostEquals(common.nearestMultiple(.25, (1/3.))[0], .33333333)
     True
     >>> common.almostEquals(common.nearestMultiple(.55, (1/3.))[0], .66666666)
@@ -562,9 +562,10 @@ def nearestMultiple(n, unit):
     if matchLow >= n >= matchHigh:
         raise Exception('cannot place n between multiples: %s, %s', matchLow, matchHigh)
 
-    if n >= matchLow and n < (matchLow + halfUnit):
+    if n >= matchLow and n <= (matchLow + halfUnit):
         return matchLow, round(n - matchLow, 7), round(n - matchLow, 7)
-    elif n >= (matchHigh - halfUnit) and n <= matchHigh:
+    else:
+    #elif n >= (matchHigh - halfUnit) and n <= matchHigh:
         return matchHigh, round(matchHigh - n, 7), round(n - matchHigh, 7)
 
 

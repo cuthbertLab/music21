@@ -8024,7 +8024,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         if quarterLengthDivisors is None:
             quarterLengthDivisors = defaults.quantizationQuarterLengthDivisors
-        
+            
         # this presently is not trying to avoid overlaps that
         # result from quantization; this may be necessary
 
