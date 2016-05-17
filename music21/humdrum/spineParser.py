@@ -684,7 +684,7 @@ class HumdrumDataCollection(object):
                                           numberOfGlobalEventsInARow)
                         break
                 if event.isReference is True:
-                    # TODO: Fix GlobalReference
+                    # TODO: Fix GlobalReference -- ???
                     el = GlobalReference(event.code, event.value)
                 else:
                     el = GlobalComment(event.value)
@@ -1993,27 +1993,32 @@ def hdStringToNote(contents):
     'Imperfect Maxima'
 
 
-    Note that this is one note in the time of a double-dotted quarter,
-    not a double-dotted quarter-note triplet (incorrectly used in
+    Note that the following example is interpreted as one note in the time of a 
+    double-dotted quarter not a double-dotted quarter-note triplet.
+    
+    I believe that the latter definition, though used in
     http://kern.ccarh.org/cgi-bin/ksdata?l=musedata/mozart/quartet&file=k421-01.krn&f=kern
-    and the Josquin Research Project [JRP]
-    but contradicts the specification in
-    http://www.lib.virginia.edu/artsandmedia/dmmc/Music/Humdrum/kern_hlp.html#tuplets )
+    and the Josquin Research Project [JRP] is incorrect, seeing as it 
+    contradicts the specification in
+    http://www.music-cog.ohio-state.edu/Humdrum/representations/kern.html#N-Tuplets
 
     >>> storedFlavors = humdrum.spineParser.flavors['JRP'] # DOCS_HIDE
 
     This is the default:
+
     >>> humdrum.spineParser.flavors['JRP'] = False
 
     >>> n = humdrum.spineParser.hdStringToNote("6..fff")
     >>> n.duration.quarterLength
     Fraction(7, 6)
+
     >>> n.duration.dots
     0
+
     >>> n.duration.tuplets[0].durationNormal.dots
     2
 
-    If you want the incorrect definition, set humdrum.spineParser.flavors['JRP'] = True
+    If you want the JRP definition, set humdrum.spineParser.flavors['JRP'] = True
     before calling converter.parse() or anything like that:
 
     >>> humdrum.spineParser.flavors['JRP'] = True

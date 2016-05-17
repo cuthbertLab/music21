@@ -27,7 +27,7 @@ import unittest
 
 from music21 import spanner 
 from music21 import tree
-from music21.exceptions21 import StreamException
+from music21.exceptions21 import StreamException, ImmutableStreamException
 
 class StreamCoreMixin(object):
     def __init__(self):
@@ -153,7 +153,7 @@ class StreamCoreMixin(object):
         '''
         # experimental
         if not self._mutable:
-            return
+            raise ImmutableStreamException()
 
         if memo is None:
             memo = []

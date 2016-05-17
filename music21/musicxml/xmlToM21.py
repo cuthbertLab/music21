@@ -2613,6 +2613,8 @@ class MeasureParser(XMLParserBase):
         currentLyricNumber = 1
         for mxLyric in lyricList:
             lyricObj = self.xmlToLyric(mxLyric)
+            if lyricObj is None:
+                continue
             if lyricObj.number == 0:
                 lyricObj.number = currentLyricNumber
             n.lyrics.append(lyricObj)
@@ -2621,7 +2623,8 @@ class MeasureParser(XMLParserBase):
     def xmlToLyric(self, mxLyric, inputM21=None):
         '''
         Translate a MusicXML <lyric> tag to a 
-        music21 :class:`~music21.note.Lyric` object.
+        music21 :class:`~music21.note.Lyric` object or return None if no Lyric object
+        should be created (empty lyric tags, for instance)
         
         If inputM21 is a :class:`~music21.note.Lyric` object, then the values of the 
         mxLyric are transfered there and nothing returned.
@@ -2653,7 +2656,7 @@ class MeasureParser(XMLParserBase):
         try:
             l.text = mxLyric.find('text').text.strip()
         except AttributeError:
-            pass # sometimes there are empty lyrics
+            return None # sometimes there are empty lyrics
             
         # This is new to account for identifiers
         

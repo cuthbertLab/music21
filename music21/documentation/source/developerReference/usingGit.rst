@@ -37,7 +37,7 @@ Installing Eclipse
 Once you have Git installed, download and install Eclipse. You can find the
 most recent version of Eclipse for Java EE at 
 `http://www.eclipse.org/downloads/ <http://www.eclipse.org/downloads/>`_, and
-these instructions are written with Eclipse for Java EE 4.4 (Luna) in mind though
+these instructions are written with Eclipse for Java EE 4.5 (Mars) in mind though
 some screenshots are from 4.3 (Kepler).
 
 
@@ -68,30 +68,21 @@ download a copy there.
 Installing for Mac
 ``````````````````
 
-For Mac users, download the version that complies with your system. If in
-doubt, 32-bit is a safe option, as 64-bit systems are back-compatible to 32-bit
-programs.
+For Mac users, unless your computer is very old, download the 64-bit 
+Java EE system.
 
-For Mac users, once the .tar file has been unzipped, drag the 'eclipse' folder
-into the Applications folder in your dock (make sure to drag the folder and not
-just the Eclipse icon - there are libraries and other dependencies that need to
-be kept together).
-
-..  image:: images/usingEclipse/eclipsefolder.png
-    :width: 650
-    
-Once done, click on the Eclipse icon in the eclipse folder, and it should load. 
-
-..  image:: images/usingEclipse/eclipseicon.png
-    :width: 650
+For Mac users, once the .tar file has been unzipped, drag the 'eclipse' app.
+into the Applications folder in your Finder.  Once done, click on the 
+Eclipse icon.
 
 You'll be prompted to select a workspace directory, which, by default is
 created in your documents folder. Be sure to remember where this directory is,
-as it is where music21 will be installed.
+as it is where music21 will be installed.  I use '/Users/cuthbert/git' for
+my workspace (you probably wouldn't use cuthbert).
 
 
-Installing for Unix
-```````````````````
+Installing for GNU/Linux/FreeBSD/Unix
+`````````````````````````````````````
 
 You've chosen to run Unix -- you should be able to figure this out on your own.
 :-)  
@@ -102,7 +93,7 @@ UNIX users have saved a few hundred dollars by running a free OS and can spend t
 savings on paid support. 
 
 
-Installing PyDev and EGit for Eclipse
+Installing PyDev for Eclipse
 -------------------------------------
 
 ..  note::
@@ -117,8 +108,7 @@ Installing PyDev and EGit for Eclipse
     Anti-virus software, such as AVG, can cause Eclipse to hang while
     attempting to fetch packages. 
 
-With Eclipse installed, you may next need to install two plugins: PyDev and EGit.
-The Eclipse for Java EE has some of these installed.
+With Eclipse installed, you next need to install the plugin PyDev.
 
 PyDev is a Python IDE for Eclipse, which may be used in Python, Jython, and
 IronPython development. EGit is a plugin that allows Eclipse to work with Git
@@ -138,23 +128,18 @@ repositories. Both of these can be installed via the Eclipse Marketplace.
 
     ..  image:: images/usingGit/eclipse__install_plugins__2__edited.png
 
-4.  Search for EGit in the Marketplace search box, and click **Install** in the
-    proper search results:
-
-    ..  image:: images/usingGit/eclipse__install_plugins__3__edited.png
-
-5.  Now, when asked to confirm the installation of both PyDev and EGit, click
+5.  Now, when asked to confirm the installation of PyDev, click
     **Confirm**:
 
     ..  image:: images/usingGit/eclipse__install_plugins__4__edited.png
 
-6.  You will be asked to accept the licensing for both plugins. Choose "I
+6.  You will be asked to accept the licensing for the plugin. Choose "I
     accept the terms of the license agreements" and click **Finish**:
 
     ..  image:: images/usingGit/eclipse__install_plugins__5__edited.png
 
-7.  Eclipse will now go through the process of automatically installing the two
-    plugins. When it finishes, you'll be asked to confirm the certificate for
+7.  Eclipse will now go through the process of automatically installing the
+    plugin. When it finishes, you'll be asked to confirm the certificate for
     PyDev. Click the checkbox and press OK:
 
     ..  image:: images/usingGit/eclipse__install_plugins__6__edited.png
@@ -166,11 +151,9 @@ repositories. Both of these can be installed via the Eclipse Marketplace.
 
 ..  warning::
 
-    The 3.x series of PyDev - currently available in the Eclipse Marketplace -
+    The 4.x series of PyDev - currently available in the Eclipse Marketplace -
     requires Java 7. The plugin will **not** activate in Eclipse without Java
-    7. If you are unable or unwilling to install Java 7, uninstall your PyDev
-    3.x plugin via the Eclipse Marketplace dialog, and install a copy of PyDev
-    from the 2.x series manually.
+    7.
     
 Forking music21 on GitHub
 -------------------------

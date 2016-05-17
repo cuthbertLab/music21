@@ -387,7 +387,7 @@ class GeneralObjectExporter():
         the best one of all -- a perfectly made Score (or something like that)
         '''
         scOut = sc.makeNotation(inPlace=False)
-        scOut.makeImmutable()
+        # scOut.makeImmutable()
         return scOut
 
     def fromPart(self, p):
@@ -396,7 +396,7 @@ class GeneralObjectExporter():
         '''
         if p.isFlat:
             p = p.makeMeasures()
-        p.makeImmutable()
+        # p.makeImmutable()  # impossible, we haven't made notation yet.
         s = stream.Score()
         s.insert(0, p)
 #         if p.metadata is not None:
@@ -2561,7 +2561,10 @@ class MeasureExporter(XMLExporterBase):
         # lyric
         if addChordTag is False:
             for lyricObj in chordOrN.lyrics:
-                mxNote.append(self.lyricToXml(lyricObj))
+                if lyricObj.text is None:                    
+                    continue # happens sometimes...
+                mxLyric = self.lyricToXml(lyricObj)
+                mxNote.append(mxLyric)
         # TODO: play
         self.xmlRoot.append(mxNote)
         return mxNote

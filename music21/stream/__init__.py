@@ -65,6 +65,7 @@ _MOD = "stream.py"
 environLocal = environment.Environment(_MOD)
 
 StreamException = exceptions21.StreamException
+ImmutableStreamException = exceptions21.ImmutableStreamException
 
 class StreamDeprecationWarning(UserWarning):
     # Do not subclass Deprecation warning, because these
@@ -1162,6 +1163,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {4.0} <music21.stream.Measure 2 offset=4.0>
         <BLANKLINE>
         '''
+        # experimental
+        if self._mutable is False:
+            raise ImmutableStreamException()
         # TODO: Next to clean up... a doozy -- filter out all the different options.
         
         # TODO: Add a renumber measures option
@@ -6962,9 +6966,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Clean this Stream: for self and all elements, purge all dead locations
         and remove all non-contained sites. Further, restore all active sites.
         '''
-        self.sort() # must sort before making immutable
-        self._mutable = False
-        for e in self.recurse(streamsOnly=True):
+        if self._mutable is not False:
+            self.sort() # must sort before making immutable
+        for e in self.recurse(streamsOnly=True, skipSelf=True):
             #e.purgeLocations(rescanIsDead=True)
             # NOTE: calling this method was having the side effect of removing
             # sites from locations when a Note was both in a Stream and in
@@ -6972,6 +6976,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if e.isStream:
                 e.sort() # sort before making immutable
                 e._mutable = False
+        self._mutable = False
 
     def makeMutable(self, recurse=True):
         self._mutable = True
@@ -9721,11 +9726,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         Gather all notes and related classes of this Stream
         and place inside a new container (like a Voice) in this Stream.
+        
+        DEPRECATED: This is badly named and does not belong in Stream.
+        Will be removed.
         '''
         if container is None:
             container = Voice
         dst = container()
-        for e in self.getElementsByClass(classFilterList):
+        for e in list(self.getElementsByClass(classFilterList)):
             dst.insert( self.elementOffset(e), e)
             self.remove(e)
         self.insert(0, dst)

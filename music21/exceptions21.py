@@ -32,6 +32,10 @@ class Music21Exception(Exception):
 class StreamException(Music21Exception):
     pass
 
+class ImmutableStreamException(StreamException):
+    def __init__(self, msg='An immutable Stream cannot be changed'):
+        super(ImmutableStreamException, self).__init__(msg)
+
 
 class MetadataException(Music21Exception):
     pass
