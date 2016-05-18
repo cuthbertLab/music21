@@ -489,9 +489,12 @@ _ARTIC_ATTR_DICT = {'acc': articulations.Accent, 'stacc': articulations.Staccato
                     'dbltongue': articulations.DoubleTongue, 'toe': articulations.OrganToe,
                     'trpltongue': articulations.TripleTongue, 'heel': articulations.OrganHeel,
                     # TODO: these aren't implemented in music21, so I'll make new ones
-                    'tap': None, 'lhpizz': None, 'dot': None, 'stroke': None, 'rip': None,
-                    'bend': None, 'flip': None, 'smear': None, 'fingernail': None,  # (u1D1B3)
-                    'damp': None, 'dampall': None}
+                    'tap': articulations.Articulation, 'lhpizz': articulations.Articulation,
+                    'dot': articulations.Articulation, 'stroke': articulations.Articulation,
+                    'rip': articulations.Articulation, 'bend': articulations.Articulation,
+                    'flip': articulations.Articulation, 'smear': articulations.Articulation,
+                    'fingernail': articulations.Articulation,  # (u1D1B3)
+                    'damp': articulations.Articulation, 'dampall': articulations.Articulation}
 
 # for _barlineFromAttr()
 # TODO: make new music21 Barline styles for 'dbldashed' and 'dbldotted'
