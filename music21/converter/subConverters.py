@@ -312,7 +312,7 @@ class ConverterIPython(SubConverter):
             
             if 'Opus' not in obj.classes:
                 fp = helperSubConverter.write(obj, helperFormat, subformats=helperSubformats)
-        
+
                 defaults.title = savedDefaultTitle
                 defaults.author = savedDefaultAuthor
                 if helperSubformats[0] == 'png':
@@ -323,7 +323,7 @@ class ConverterIPython(SubConverter):
                 from IPython.display import Image, display # @UnresolvedImport
                 for s in obj.scores:
                     fp = helperSubConverter.write(s, helperFormat, subformats=helperSubformats)
-            
+      
                     if helperSubformats[0] == 'png':
                         from music21.ipython21 import objects as ipythonObjects # @Reimport
                         ipo = ipythonObjects.IPythonPNGObject(fp)
@@ -771,8 +771,18 @@ class ConverterMusicXML(SubConverter):
         os.system(musescoreRun)
         fileLikeOpen.close()
         sys.stderr = storedStrErr
-        return self.findPNGfpFromXMLfp(fpOut)
-        #common.cropImageFromPath(fp)
+        
+        # check whether total number of pngs is in 1-9, 10-99, or 100-999 range, then return appropriate fp
+        if os.path.exists(fpOut[0:len(fpOut) - 4] + "-1.png"):
+            fp = fpOut[0:len(fpOut) - 4] + "-1.png"
+        elif os.path.exists(fpOut[0:len(fpOut) - 4] + "-01.png"):
+            fp = fpOut[0:len(fpOut) - 4] + "-01.png"
+        elif os.path.exists(fpOut[0:len(fpOut) - 4] + "-001.png"):
+            fp = fpOut[0:len(fpOut) - 4] + "-001.png"
+        else:
+            raise "png file of xml not found. Is your file >999 pages?"    
+        return fp
+
     
     def writeDataStream(self, fp, dataBytes):
         if fp is None:
@@ -1281,7 +1291,7 @@ class TestExternal(unittest.TestCase):
         s.append(n)
         s.show('lily.png')
         print(s.write('lily.png'))
-    
+
     def testMultiPageXMlShow1(self):
         '''
         tests whether show() works for music that is 10-99 pages long
@@ -1292,25 +1302,27 @@ class TestExternal(unittest.TestCase):
         K525.show('musicxml.png')
         print(K525.write('musicxml.png'))
 
+    
 #     def testMultiPageXMlShow2(self):
 #         '''
-#          tests whether show() works for music that is 100-999 pages long. 
-#          Currently takes way too long to run.
-#          '''
-#         from music21 import stream, note
+#         tests whether show() works for music that is 100-999 pages long. Currently takes way too long to run.
+            
+#         '''
+#         from music21 import corpus, stream, note
 #         biggerStream = stream.Stream()
+# #         c = corpus.parse('bwv66.6')
 #         note1 = note.Note("C4")
 #         note1.duration.type = 'whole'
-#         biggerStream.repeatAppend(note1, 10000)
+#         biggerStream.repeatAppend(note1, 5000)
 #         biggerStream.show('musicxml.png')
 #         biggerStream.show()
 #         print(biggerStream.write('musicxml.png'))
-
+        
 
 if __name__ == '__main__':
     import music21
     #import sys
     #sys.argv.append('SimpleTextShow')
     music21.mainTest(Test)
-    # run command below to test commands that open musescore, etc.
+    ## run command below to test commands that open musescore, etc. 
 #     music21.mainTest(TestExternal)
