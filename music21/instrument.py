@@ -1831,17 +1831,21 @@ def fromString(instrumentString):
             else:
                 englishName = instrumentLookup.allToBestName[substring.lower()]
             className = instrumentLookup.bestNameToInstrumentClass[englishName]
+            
+            # This would be unsafe...
             thisInstClass = globals()[className]
             thisInstClassParentClasses = [parentcls.__name__ for parentcls in thisInstClass.mro()]
-            if ('Instrument' not in thisInstClassParentClasses or 
-                    'Music21Object' not in thisInstClassParentClasses):
+            # if not for this...
+            if ('Instrument' not in thisInstClassParentClasses
+                    or 'Music21Object' not in thisInstClassParentClasses):
                 # little bit of security against calling another global...
                 raise KeyError
 
             thisInstrument = thisInstClass()
             thisBestName = thisInstrument.bestName().lower()
-            if bestInstClass is None or len(thisBestName.split())\
-                    >= len(bestName.split()) and not issubclass(bestInstClass, thisInstClass):
+            if (bestInstClass is None 
+                    or len(thisBestName.split()) >= len(bestName.split()) 
+                    and not issubclass(bestInstClass, thisInstClass)):
                 # priority is also given to same length instruments which fall later
                 # on in the string (i.e. Bb Piccolo Trumpet)
                 bestInstClass = thisInstClass

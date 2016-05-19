@@ -400,11 +400,14 @@ def removePunctuation(s):
     u'This is my face'
     '''
     if six.PY2:
+        wasUnicode = False
         if isinstance(s, unicode): # @UndefinedVariable
-            maketrans = string.maketrans(u"", u"") # @UndefinedVariable
-        else:
-            maketrans = string.maketrans("", "") # @UndefinedVariable
-        out = s.translate(maketrans, string.punctuation)
+            s = s.encode('utf-8')
+            wasUnicode = True
+        out = s.translate(string.maketrans("", ""), string.punctuation) # @UndefinedVariable
+        if wasUnicode:
+            out = unicode(out, encoding='utf-8') # @UndefinedVariable
+    
     else:
         maketrans = str.maketrans("", "", string.punctuation)
         out = s.translate(maketrans)
