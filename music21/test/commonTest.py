@@ -125,7 +125,7 @@ class ModuleGather(object):
     >>> #_DOCS_SHOW print mg.modulePaths[0]
     D:\Web\eclipse\music21base\music21\volume.py
     '''
-    def __init__(self, useExtended=False):
+    def __init__(self, useExtended=False, autoWalk=True):
         self.dirParent = common.getSourceFilePath()
         self.useExtended = useExtended
         self.modulePaths = []
@@ -230,7 +230,8 @@ class ModuleGather(object):
         self.slowModules = [x.replace('/', os.sep) for x in self.slowModules]
 
         # search on init
-        self._walk()
+        if autoWalk:
+            self.walk()
 
     def _visitFunc(self, args, dirname, names):
         '''
@@ -243,7 +244,7 @@ class ModuleGather(object):
                 if not os.path.isdir(fp):
                     self.modulePaths.append(fp)
 
-    def _walk(self):
+    def walk(self):
         '''
         Get all the modules in reverse order, storing them in self.modulePaths
         '''

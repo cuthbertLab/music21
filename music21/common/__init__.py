@@ -25,14 +25,6 @@ split according to function -- September 2015
 __all__ = ['classTools', 'decorators', 'fileTools', 'formats', 'misc',
            'numberTools', 'objects', ]
 
-# should NOT import music21 or anything like that, except in doctests.
-import copy
-import os
-import sys
-import textwrap
-import time
-import weakref
-
 from music21 import defaults
 from music21 import exceptions21
 from music21.ext import six
@@ -46,6 +38,7 @@ from music21.common.misc import * # most are deprecated!
 from music21.common.numberTools import * #including opFrac
 from music21.common.objects import *
 from music21.common.pathTools import *
+from music21.common.parallel import * 
 from music21.common.stringTools import * 
 from music21.common.weakrefTools import * # including wrapWeakref
 
