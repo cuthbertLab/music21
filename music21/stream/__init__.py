@@ -4076,7 +4076,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # call on each part
                 p.toSoundingPitch(inPlace=True)
             return returnObj
-
+        
+        # else...
         if returnObj.atSoundingPitch == 'unknown':
             raise StreamException('atSoundingPitch is unknown: cannot transpose')
         elif returnObj.atSoundingPitch == False:
@@ -4104,7 +4105,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # call on each part
                 p.toWrittenPitch(inPlace=True)
             return returnObj
-
+        
+        # else...
         if self.atSoundingPitch == 'unknown':
             raise StreamException('atSoundingPitch is unknown: cannot transpose')
         elif self.atSoundingPitch == False:

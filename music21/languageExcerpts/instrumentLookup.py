@@ -1070,8 +1070,8 @@ allToBestName = {
  u'\xf3rgano de tubos': u'pipe organ',
  u'\xf3rgano el\xe9ctrico': u'electric organ'}
 
-bestNameToInstrumentClass = \
-{'accordion': 'Accordion',
+bestNameToInstrumentClass = {
+ 'accordion': 'Accordion',
  'acoustic bass': 'AcousticBass',
  'acoustic guitar': 'AcousticGuitar',
  'agogo': 'Agogo',
@@ -1166,11 +1166,10 @@ bestNameToInstrumentClass = \
  'woodblock': 'Woodblock',
  'xylophone': 'Xylophone'}
 
-bestNameToLanguage = \
-{}
+bestNameToLanguage = {}
 
-englishToBestName = \
-{u'accordion': u'accordion',
+englishToBestName = {
+ u'accordion': u'accordion',
  u'acoustic bass': u'acoustic bass',
  u'acoustic guitar': u'acoustic guitar',
  u'agogo': u'agogo',
@@ -1293,8 +1292,8 @@ englishToBestName = \
  u'zills': u'finger cymbals',
  u'zils': u'finger cymbals'}
 
-frenchToBestName = \
-{u'accord\xe9on': u'accordion',
+frenchToBestName = {
+ u'accord\xe9on': u'accordion',
  u'alto': u'viola',
  u'bariton': u'baritone',
  u'baryton': u'baritone',
@@ -1412,8 +1411,8 @@ frenchToBestName = \
  u'\xc8chelettes': u'xylophone',
  u'\xe9oliphone': u'wind machine'}
 
-germanToBestName = \
-{u'aeolophon': u'wind machine',
+germanToBestName = {
+ u'aeolophon': u'wind machine',
  u'akkordeon': u'accordion',
  u'akustik-bass': u'acoustic bass',
  u'akustikgitarre': u'acoustic guitar',
@@ -1555,8 +1554,8 @@ germanToBestName = \
  u'xylophon': u'xylophone',
  u'ziehharmonika': u'accordion'}
 
-italianToBestName = \
-{u'a becco': u'recorder',
+italianToBestName = {
+ u'a becco': u'recorder',
  u'armonica': u'harmonica',
  u'armonica a bocca': u'harmonica',
  u'arpa': u'harp',
@@ -1688,8 +1687,8 @@ italianToBestName = \
  u'xilofono': u'xylophone',
  u'xilografia': u'woodblock'}
 
-pitchFullNameToName = \
-{u'a': u'a',
+pitchFullNameToName = {
+ u'a': u'a',
  u'a-double-flat': u'a--',
  u'a-double-sharp': u'a##',
  u'a-flat': u'a-',
@@ -1739,8 +1738,9 @@ pitchFullNameToName = \
  u'gb': u'g-',
  u'gbb': u'g--'}
 
-russianToBestName = \
-{u"al't": u'alto',
+# TODO: Russian expert to add Cyrillic names
+russianToBestName = {
+ u"al't": u'alto',
  u'angliiskii rozhok': u'english horn',
  u'arfa': u'harp',
  u'bariton': u'baritone',
@@ -1778,8 +1778,8 @@ russianToBestName = \
  u'tsimbaly': u'dulcimer',
  u"violonchel'": u'violoncello'}
 
-spanishToBestName = \
-{u'acorde\xf3n': u'accordion',
+spanishToBestName = {
+ u'acorde\xf3n': u'accordion',
  u'arm\xf3nica de boca': u'harmonica',
  u'arpa': u'harp',
  u'atabal': u'timpani',
@@ -1924,8 +1924,8 @@ spanishToBestName = \
  u'\xf3rgano de tubos': u'pipe organ',
  u'\xf3rgano el\xe9ctrico': u'electric organ'}
 
-transliteration = \
-{u'accordeon': u'accord\xe9on',
+transliteration = {
+ u'accordeon': u'accord\xe9on',
  u'acordeon': u'acorde\xf3n',
  u'armonica de boca': u'arm\xf3nica de boca',
  u'bajo acustico': u'bajo ac\xfastico',
@@ -2022,9 +2022,10 @@ transliteration = \
  u'xilofono': u'xil\xf3fono',
  u'zamponas': u'zampo\xf1as'}
 
-transposition = \
-{'clarinet': {u'a': u'm-3',
+transposition = {
+ 'clarinet': {u'a': u'm-3',
               u'alto': u'M-6',
+              u'b': u'M-2', # German, much more common than b-natural
               u'b-': u'M-2',
               u'b- bass': u'M-9',
               u'b- contrabass': u'M-16',
@@ -2032,16 +2033,21 @@ transposition = \
               u'd': u'M2',
               u'e-': u'm3',
               u'e- alto': u'M-6',
-              u'e- contrabass': u'M-13'},
+              u'e- contrabass': u'M-13',
+              u'a-': u'm7',
+              u'h': u'm-2',
+              u'b-natural': u'm-2',
+              },
  'horn': {u'a': u'm-3',
           u'c': u'P-8',
           u'd': u'm-7',
           u'e': u'm-6',
           u'e-': u'M-6',
-          u'english': u'P-5',
+          u'english': u'P-5', # this is how it works...
           u'f': u'P-5',
           u'g': u'P-4'},
  'trumpet': {u'a': u'm-3',
+             u'b': u'M-2', # German, much more common than b-natural
              u'b-': u'M-2',
              u'b- bass': u'M-9',
              u'c': u'P1',
@@ -2051,5 +2057,8 @@ transposition = \
              u'd bass': u'm-7',
              u'e-': u'm3',
              u'e- bass': u'M-6',
+             u'h': u'm-2',
+             u'b-natural': u'm-2',
              u'f': u'P4',
-             u'flugelhorn': u'M-2'}}
+             u'flugelhorn': u'M-2'}
+ }

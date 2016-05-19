@@ -1735,12 +1735,16 @@ def partitionByInstrument(streamObj):
 
 
 def _combinations(instrumentString):
+    '''
+    find all combinations of instrumentString.  Remove all punctuation.
+    '''    
     sampleList = instrumentString.split()
     allComb = []
-    for size in range(1,len(sampleList)+1):
-        for i in range(len(sampleList)-size+1):
-            allComb.append(u" ".join(sampleList[i:i+size]))
+    for size in range(1, len(sampleList) + 1):
+        for i in range(len(sampleList) - size + 1):
+            allComb.append(u" ".join(sampleList[i:i + size]))
     return allComb
+
 
 def fromString(instrumentString):
     """
@@ -1786,7 +1790,7 @@ def fromString(instrumentString):
     >>> t5.bestName() == t6.bestName() and t5.transposition == t6.transposition
     True
 
-    >>> t7 = instrument.fromString("B-flat Clarinet")
+    >>> t7 = instrument.fromString("B-flat Clarinet.")
     >>> t5.bestName() == t7.bestName() and t5.transposition == t7.transposition
     True
     
@@ -1795,9 +1799,25 @@ def fromString(instrumentString):
     True
     >>> t8.transposition
     <music21.interval.Interval m3>
+
+
+    Note that because of the ubiquity of B-flat clarinets and trumpets, and the
+    rareness of B-natural forms of those instruments, this gives a B-flat, not
+    B-natural clarinet, using the German form:
+
+    >>> t9 = instrument.fromString("Klarinette in B.")
+    >>> t9
+    <music21.instrument.Instrument Clarinet>
+    >>> t9.transposition
+    <music21.interval.Interval M-2>
+    
+    Use "H" or "b-natural" to get an instrument in B-major.  Or donate one to me
+    and I'll change this back!
     """
     # pylint: disable=undefined-variable
     from music21.languageExcerpts import instrumentLookup
+    
+    instrumentString = common.removePunctuation(instrumentString)
     allCombinations = _combinations(instrumentString)
     # First task: Find the best instrument.
     bestInstClass = None
@@ -1811,7 +1831,7 @@ def fromString(instrumentString):
             else:
                 englishName = instrumentLookup.allToBestName[substring.lower()]
             className = instrumentLookup.bestNameToInstrumentClass[englishName]
-            thisInstClass = globals()[className]        
+            thisInstClass = globals()[className]
             thisInstClassParentClasses = [parentcls.__name__ for parentcls in thisInstClass.mro()]
             if ('Instrument' not in thisInstClassParentClasses or 
                     'Music21Object' not in thisInstClassParentClasses):

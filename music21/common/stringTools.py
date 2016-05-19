@@ -23,13 +23,15 @@ __all__ = [
            'formatStr',
            'stripAccents',
            'normalizeFilename',
+           'removePunctuation',
            ]
 
 import hashlib
 import random
 import re
 import time
-import unicodedata
+import string
+import unicodedata # @UnresolvedImport
 
 from music21.ext import six
 
@@ -385,6 +387,28 @@ def normalizeFilename(name):
     if extension is not None:
         name += extension
     return name
+
+def removePunctuation(s):
+    '''
+    Remove all punctuation from a string -- very different in Py2 vs Py3
+    so moved out...
+
+    >>> common.removePunctuation("This, is! my (face).")
+    'This is my face'
+
+    >>> common.removePunctuation(u"This, is! my (face).")
+    u'This is my face'
+    '''
+    if six.PY2:
+        if isinstance(s, unicode): # @UndefinedVariable
+            maketrans = string.maketrans(u"", u"") # @UndefinedVariable
+        else:
+            maketrans = string.maketrans("", "") # @UndefinedVariable
+        out = s.translate(maketrans, string.punctuation)
+    else:
+        maketrans = str.maketrans("", "", string.punctuation)
+        out = s.translate(maketrans)
+    return out
 
 
 #------------------------------------------------------------------------------
