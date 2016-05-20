@@ -1,7 +1,7 @@
 
 from music21 import *
 
-stream = converter.parseFile('minimal.mei', None, 'mei', True)
+stream = converter.parseFile('A_mov6.mei', None, 'mei', True)
 
 for i in stream.recurse().getInstruments():
     print(i)
@@ -9,4 +9,3 @@ for i in stream.recurse().getInstruments():
 stream.write('midi', 'written.midi')
 stream.toSoundingPitch(inPlace=True)
 stream.write('midi', 'sounding.midi')
-print(pitch.Pitch('G10'))

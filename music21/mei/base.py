@@ -1751,7 +1751,10 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     if post is not None:
         post = {'instrument': instrDefFromElement(post)}
     else:
-        post = {'instrument': instrument.UnspecifiedInstrument()}
+        try:
+            post = {'instrument': instrument.fromString(elem.get('label', ''))}
+        except instrument.InstrumentException:
+            post = {'instrument': instrument.UnknownInstrument()}
 
     post['instrument'].partName = elem.get('label')
     post['instrument'].partAbbreviation = elem.get('label.abbr')

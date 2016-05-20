@@ -274,11 +274,11 @@ class Instrument(base.Music21Object):
 
 
 #-------------------------------------------------------------------------------
-class UnspecifiedInstrument(Instrument):
+class UnknownInstrument(Instrument):
     def __init__(self):
         Instrument.__init__(self)
 
-        self.instrumentName = 'Unspecified'
+        self.instrumentName = 'Unknown'
         #TODO: self.instrumentAbbreviation = ''
         self.midiProgram = 0
 
