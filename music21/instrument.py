@@ -274,8 +274,20 @@ class Instrument(base.Music21Object):
 
 
 #-------------------------------------------------------------------------------
-class KeyboardInstrument(Instrument):
+class UnspecifiedInstrument(Instrument):
+    def __init__(self):
+        Instrument.__init__(self)
 
+        self.instrumentName = 'Unspecified'
+        #TODO: self.instrumentAbbreviation = ''
+        self.midiProgram = 0
+
+        # NOTE: entire midi range (0 - 127)
+        self.lowestNote = pitch.Pitch('C0')
+        self.highestNote = pitch.Pitch('G10')
+
+
+class KeyboardInstrument(Instrument):
     def __init__(self):
         Instrument.__init__(self)
         self.instrumentName = 'Keyboard'

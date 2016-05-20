@@ -1751,20 +1751,14 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     if post is not None:
         post = {'instrument': instrDefFromElement(post)}
     else:
-        try:
-            post = {'instrument': instrument.fromString(elem.get('label', ''))}
-        except instrument.InstrumentException:
-            post = {}
+        post = {'instrument': instrument.UnspecifiedInstrument()}
 
-    if 'instrument' in post:
-        post['instrument'].partName = elem.get('label')
-        post['instrument'].partAbbreviation = elem.get('label.abbr')
-        post['instrument'].partId = elem.get('n')
+    post['instrument'].partName = elem.get('label')
+    post['instrument'].partAbbreviation = elem.get('label.abbr')
+    post['instrument'].partId = elem.get('n')
 
     # --> transposition
     if elem.get('trans.semi') is not None:
-        if 'instrument' not in post:
-            post['instrument'] = instrument.Instrument()
         post['instrument'].transposition = _transpositionFromAttrs(elem)
 
     # process other part-specific information
