@@ -201,7 +201,7 @@ class HumdrumDataCollection(object):
         self.parsedLines = True
         self.insertGlobalEvents()
 
-    def determineIfDataStreamIsOpus(self, dataStream = None):
+    def determineIfDataStreamIsOpus(self, dataStream=None):
         r'''
         Some Humdrum files contain multiple pieces in one file
         which are better represented as :class:`~music21.stream.Opus`
@@ -215,7 +215,7 @@ class HumdrumDataCollection(object):
         >>> from pprint import pprint as pp
 
         >>> mps = humdrum.testFiles.multipartSanctus
-        >>> hdc = humdrum.spineParser.HumdrumDataCollection(mps, parseLines = False)
+        >>> hdc = humdrum.spineParser.HumdrumDataCollection(mps, parseLines=False)
         >>> (hasOpus, dataCollections) = hdc.determineIfDataStreamIsOpus()
         >>> hasOpus
         True
@@ -293,7 +293,13 @@ class HumdrumDataCollection(object):
                 startPos = endPositions[i-1] + 1
                 endPos = endPositions[i] + 1
                 dataCollections.append(dataStream[startPos:endPos])
-        return (True, dataCollections)
+        
+        if len(dataCollections) > 1:
+            return (True, dataCollections)
+        else:
+            raise HumdrumDataCollection("Malformed humdrum data: " + 
+                "possibly multiple **tags without closing information. Or a *tandem tag " +
+                "accidentally encoded as a **spine tag.")
 
     def parseOpusDataCollections(self, dataCollections):
         '''
