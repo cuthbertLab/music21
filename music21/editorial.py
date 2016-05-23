@@ -17,7 +17,7 @@ Editorial objects store comments and other meta-data associated with specific
 '''
 import unittest
 from music21 import exceptions21
-from music21.common import SlottedObject
+from music21.common import SlottedObjectMixin
 from music21.ext import six
 
 #------------------------------------------------------------------------------
@@ -89,7 +89,7 @@ def getObjectsWithEditorial(
     return listofOBJToReturn
 
 
-class NoteEditorial(SlottedObject):
+class NoteEditorial(SlottedObjectMixin):
     '''
     Editorial comments and special effects that can be applied to notes
     Standard ones are stored as attributes.  Non-standard/one-off effects are
@@ -230,7 +230,7 @@ class NoteEditorial(SlottedObject):
         return result
 
 
-class Comment(SlottedObject):
+class Comment(SlottedObjectMixin):
     '''
     An object that adds text above or below a note:
 

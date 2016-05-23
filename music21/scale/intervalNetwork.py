@@ -298,7 +298,7 @@ class Edge(object):
     connections = property(getConnections)
 
 
-class Node(common.SlottedObject):
+class Node(common.SlottedObjectMixin):
     '''
     Abstraction of an unrealized Pitch Node.
 

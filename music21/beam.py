@@ -78,14 +78,14 @@ import unittest
 from music21 import common
 from music21 import exceptions21
 from music21 import duration
-from music21.common import SlottedObject
+from music21.common import SlottedObjectMixin
 
 
 class BeamException(exceptions21.Music21Exception):
     pass
 
 
-class Beam(SlottedObject):
+class Beam(SlottedObjectMixin):
     '''
     A Beam is an object representation of one single beam, that is, one
     horizontal line connecting two notes together (or less commonly a note to a
@@ -146,7 +146,7 @@ class Beam(SlottedObject):
 #------------------------------------------------------------------------------
 
 
-class Beams(SlottedObject):
+class Beams(SlottedObjectMixin):
     '''
     The Beams object stores in it attribute beamsList (a list) all the Beam
     objects defined above.  Thus len(beam.Beams) tells you how many beams the

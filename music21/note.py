@@ -30,7 +30,7 @@ from music21 import pitch
 from music21 import beam
 from music21 import tie
 from music21 import volume
-from music21.common import SlottedObject
+from music21.common import SlottedObjectMixin
 from music21.ext import six
 
 from music21 import environment
@@ -80,7 +80,7 @@ class LyricException(exceptions21.Music21Exception):
     pass
 
 
-class Lyric(SlottedObject):
+class Lyric(SlottedObjectMixin):
     '''
     An object representing a single Lyric as part of a note's .lyrics property.
 

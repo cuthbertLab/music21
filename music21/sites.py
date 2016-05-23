@@ -43,7 +43,7 @@ class SitesException(exceptions21.Music21Exception):
     pass
 
 #------------------------------------------------------------------------------
-class SiteRef(common.SlottedObject):
+class SiteRef(common.SlottedObjectMixin):
     '''
     a single Site (stream, container, parent, reference, etc.) stored inside the Sites object.
 
@@ -118,14 +118,14 @@ class SiteRef(common.SlottedObject):
                 except TypeError:
                     raise TypeError("This str screwed up everything: {}".format(currentSite))
                 self.siteWeakref = siteIdValue
-        returnState = common.SlottedObject.__getstate__(self)
+        returnState = common.SlottedObjectMixin.__getstate__(self)
         if WEAKREF_ACTIVE and currentSite is not None:
             self.site = currentSite
         return returnState
 
     ## called on unpickling
     def __setstate__(self, state):
-        common.SlottedObject.__setstate__(self, state)
+        common.SlottedObjectMixin.__setstate__(self, state)
         if WEAKREF_ACTIVE and self.siteWeakref is not None:
             siteIdValue = self.siteWeakref
             try:
@@ -142,7 +142,7 @@ _NoneSiteRef.siteIndex = -2
 
 _singletonCounter = common.SingletonCounter()
 
-class Sites(common.SlottedObject):
+class Sites(common.SlottedObjectMixin):
     '''
     An object, stored within a Music21Object, that stores (weak) references to
     a collection of objects that may be contextually relevant to this object.

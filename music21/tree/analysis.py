@@ -140,7 +140,7 @@ class Horizontality(collections.Sequence):
 
 
 
-# class VoiceLeadingQuartet(common.SlottedObject):
+# class VoiceLeadingQuartet(common.SlottedObjectMixin):
 # 
 #     ### CLASS VARIABLES ###
 # 

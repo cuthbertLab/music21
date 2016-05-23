@@ -20,7 +20,7 @@ from music21.exceptions21 import TreeException
 from music21 import common
 
 #------------------------------------------------------------------------------
-class AVLNode(common.SlottedObject):
+class AVLNode(common.SlottedObjectMixin):
     r'''
     An AVL Tree Node, not specialized in any way, just contains positions.
 

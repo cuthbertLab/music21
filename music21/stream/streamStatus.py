@@ -14,7 +14,7 @@ import unittest
 
 from music21 import environment
 from music21 import common
-from music21.common import SlottedObject
+from music21.common import SlottedObjectMixin
 
 environLocal = environment.Environment(__file__)
 
@@ -22,7 +22,7 @@ environLocal = environment.Environment(__file__)
 #------------------------------------------------------------------------------
 
 
-class StreamStatus(SlottedObject):
+class StreamStatus(SlottedObjectMixin):
     '''
     An object that stores the current notation state for the client stream.
     
@@ -103,10 +103,10 @@ class StreamStatus(SlottedObject):
 
     def __getstate__(self):
         self._client = common.unwrapWeakref(self._client)
-        return SlottedObject.__getstate__(self)
+        return SlottedObjectMixin.__getstate__(self)
 
     def __setstate__(self, state):
-        SlottedObject.__setstate__(self, state)
+        SlottedObjectMixin.__setstate__(self, state)
         self._client = common.wrapWeakref(self._client)
 
     ### PUBLIC METHODS ###

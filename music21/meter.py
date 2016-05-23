@@ -29,7 +29,7 @@ from music21 import duration
 from music21 import environment
 from music21 import exceptions21
 
-from music21.common import SlottedObject, opFrac
+from music21.common import SlottedObjectMixin, opFrac
 from music21.ext import six
 
 _MOD = 'meter.py'
@@ -513,7 +513,7 @@ class TimeSignatureException(MeterException):
 #------------------------------------------------------------------------------
 
 
-class MeterTerminal(SlottedObject):
+class MeterTerminal(SlottedObjectMixin):
     '''
     A MeterTerminal is a nestable primitive of rhythmic division.
 

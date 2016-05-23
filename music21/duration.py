@@ -60,7 +60,7 @@ from music21 import defaults
 from music21 import exceptions21
 from music21 import environment
 
-from music21.common import SlottedObject, opFrac
+from music21.common import SlottedObjectMixin, opFrac
 from music21.ext import six
 
 
@@ -1309,7 +1309,7 @@ class DurationException(exceptions21.Music21Exception):
     pass
 
 
-class Duration(SlottedObject):
+class Duration(SlottedObjectMixin):
     '''
     Durations are one of the most important objects in music21. A Duration
     represents a span of musical time measurable in terms of quarter notes (or
@@ -1517,10 +1517,10 @@ class Duration(SlottedObject):
 
     def __getstate__(self):
         self._client = common.unwrapWeakref(self._client)
-        return SlottedObject.__getstate__(self)
+        return SlottedObjectMixin.__getstate__(self)
 
     def __setstate__(self, state):
-        SlottedObject.__setstate__(self, state)
+        SlottedObjectMixin.__setstate__(self, state)
         self._client = common.wrapWeakref(self._client)
 
     

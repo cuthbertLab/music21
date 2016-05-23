@@ -20,7 +20,7 @@ import functools
 import unittest
 
 from music21 import common
-from music21.common import SlottedObject
+from music21.common import SlottedObjectMixin
 # imported by stream
 
 from music21 import environment
@@ -38,7 +38,7 @@ def derivationMethod(function):
     return wrapper
 
 
-class Derivation(SlottedObject):
+class Derivation(SlottedObjectMixin):
     '''
     A Derivation object keeps track of which Streams (or perhaps other Music21Objects)
     a Stream has come from and how.
@@ -157,10 +157,10 @@ class Derivation(SlottedObject):
 
     def __getstate__(self):
         self._client = common.unwrapWeakref(self._client)
-        return SlottedObject.__getstate__(self)
+        return SlottedObjectMixin.__getstate__(self)
 
     def __setstate__(self, state):
-        SlottedObject.__setstate__(self, state)
+        SlottedObjectMixin.__setstate__(self, state)
         self._client = common.wrapWeakref(self._client)
 
     ### PUBLIC METHODS ###

@@ -17,14 +17,14 @@ conceptual idea of tied notes.  They can be start or stop ties.
 
 import unittest
 from music21 import exceptions21
-from music21.common import SlottedObject
+from music21.common import SlottedObjectMixin
 
 class TieException(exceptions21.Music21Exception):
     pass
 
 #-------------------------------------------------------------------------------
 
-class Tie(SlottedObject):
+class Tie(SlottedObjectMixin):
     '''
     Object added to notes that are tied to other notes. The `type` value is one
     of start, stop, or continue.

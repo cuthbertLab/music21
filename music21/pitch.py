@@ -24,7 +24,7 @@ from music21 import common
 from music21 import defaults
 from music21 import exceptions21
 from music21 import interval
-from music21.common import SlottedObject
+from music21.common import SlottedObjectMixin
 from music21.ext import six
 
 from music21 import environment
@@ -486,7 +486,7 @@ class MicrotoneException(exceptions21.Music21Exception):
 #------------------------------------------------------------------------------
 
 
-class Microtone(SlottedObject):
+class Microtone(SlottedObjectMixin):
     '''
     The Microtone object defines a pitch transformation above or below a
     standard Pitch and its Accidental.
@@ -661,7 +661,7 @@ class Microtone(SlottedObject):
         self._harmonicShift = value
 
 
-class Accidental(SlottedObject):
+class Accidental(SlottedObjectMixin):
     '''
     Accidental class, representing the symbolic and numerical representation of
     pitch deviation from a pitch name (e.g., G, B).
@@ -1162,7 +1162,7 @@ class Accidental(SlottedObject):
 
 
 #-------------------------------------------------------------------------------
-## tried as SlottedObject -- made creation time slower! Not worth the restrictions
+## tried as SlottedObjectMixin -- made creation time slower! Not worth the restrictions
 class Pitch(object):
     '''
     A fundamental object that represents a single pitch.

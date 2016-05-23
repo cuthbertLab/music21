@@ -18,7 +18,7 @@ import unittest
 
 from music21 import exceptions21
 from music21 import common
-from music21.common import SlottedObject
+from music21.common import SlottedObjectMixin
 
 from music21 import environment
 _MOD = "volume.py"
@@ -35,12 +35,15 @@ class VolumeException(exceptions21.Music21Exception):
 #-------------------------------------------------------------------------------
 
 
-class Volume(SlottedObject):
+class Volume(SlottedObjectMixin):
     '''
     The Volume object lives on NotRest objects and subclasses. It is not a
     Music21Object subclass.
 
     >>> v = volume.Volume(velocity=90)
+    >>> v.velocity
+    90
+    
     '''
 
     ### CLASS VARIABLES ###
@@ -91,10 +94,10 @@ class Volume(SlottedObject):
 
     def __getstate__(self):
         self._client = common.unwrapWeakref(self._client)
-        return SlottedObject.__getstate__(self)
+        return SlottedObjectMixin.__getstate__(self)
 
     def __setstate__(self, state):
-        SlottedObject.__setstate__(self, state)
+        SlottedObjectMixin.__setstate__(self, state)
         self._client = common.wrapWeakref(self._client)
 
     ### PUBLIC METHODS ###

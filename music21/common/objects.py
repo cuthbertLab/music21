@@ -11,7 +11,7 @@
 #-------------------------------------------------------------------------------
 __all__ = ['defaultlist',
            'SingletonCounter',
-           'SlottedObject',
+           'SlottedObjectMixin',
            'Iterator',
            'Timer',           
           ]
@@ -76,20 +76,17 @@ class SingletonCounter(object):
         return post
 
 #-------------------------------------------------------------------------------
-class SlottedObject(object):
+class SlottedObjectMixin(object):
     r'''
-    Mixin.
-    
-    
     Provides template for classes implementing slots allowing it to be pickled
     properly.
     
-    Only use SlottedObjects for objects that we expect to make so many of
+    Only use SlottedObjectMixins for objects that we expect to make so many of
     that memory storage and speed become an issue. Thus, unless you are Xenakis, 
     Glissdata is probably not the best example:
     
     >>> import pickle
-    >>> class Glissdata(common.SlottedObject):
+    >>> class Glissdata(common.SlottedObjectMixin):
     ...     __slots__ = ('time', 'frequency')
     >>> s = Glissdata()
     >>> s.time = 0.125
