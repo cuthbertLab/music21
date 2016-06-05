@@ -1822,18 +1822,39 @@ class MeasureParser(XMLParserBase):
 
     
     def xmlNotehead(self, n, mxNotehead):
+        '''
+        Set notehead information from the mxNotehead object
+        
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        
+        >>> n = note.Note()
+        >>> nh = EL('<notehead color="#FF0000" filled="no" parentheses="yes">diamond</notehead>')
+        
+        >>> MP.xmlNotehead(n, nh)
+        >>> n.notehead
+        'diamond'
+        >>> n.noteheadFill
+        False
+        >>> n.noteheadParentheses
+        True
+        >>> n.color
+        '#FF0000'
+        '''
         if mxNotehead.text not in ('', None):
             n.notehead = mxNotehead.text
         nhf = mxNotehead.get('filled')
         if nhf is not None:
-            if nhf == 'yes':
-                n.noteheadFill = True 
-            elif nhf == 'no':
-                n.noteheadFill = False 
+            n.noteheadFill = xmlObjects.yesNoToBoolean(nhf) 
+
         if mxNotehead.get('color') is not None:
             n.color = mxNotehead.get('color')
         # TODO font
-        # TODO parentheses
+
+        nhp = mxNotehead.get('parentheses')
+        if nhp is not None:
+            n.noteheadParentheses = xmlObjects.yesNoToBoolean(nhp)
+            
     
     def xmlToPitch(self, mxNote, inputM21=None):
         '''
