@@ -1836,7 +1836,7 @@ class MeasureParser(XMLParserBase):
         'diamond'
         >>> n.noteheadFill
         False
-        >>> n.noteheadParentheses
+        >>> n.noteheadParenthesis
         True
         >>> n.color
         '#FF0000'
@@ -1853,7 +1853,7 @@ class MeasureParser(XMLParserBase):
 
         nhp = mxNotehead.get('parentheses')
         if nhp is not None:
-            n.noteheadParentheses = xmlObjects.yesNoToBoolean(nhp)
+            n.noteheadParenthesis = xmlObjects.yesNoToBoolean(nhp)
             
     
     def xmlToPitch(self, mxNote, inputM21=None):
