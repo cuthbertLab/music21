@@ -190,7 +190,7 @@ def runPerceivedDissonanceAnalysis(scoreIn, offsetList, keyStr=None):
     8
 
     >>> a['romans']
-    ['v43', 'iio65', 'bVIIb73']
+    ['v43', 'ii/o65', 'bVII7']
 
     >>> b = analysisDict['nonharmonicTonesRemovedScore']
     >>> b['numMusic21Identified']
