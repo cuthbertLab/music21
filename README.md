@@ -12,6 +12,9 @@ http://web.mit.edu/music21/doc/usersGuide/usersGuide_01_installing.html
 
 Released under either the BSD (3-clause) or GNU LGPL license according to your choice. See LICENSE.
 
+Music21 runs on Python 2.7 or preferably Python 3.4+
+
+
 ## Mailing list ##
 
 See: https://groups.google.com/forum/#!forum/music21list
