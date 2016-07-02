@@ -50,14 +50,14 @@ metpos_       `1.0/obj.beatStrength()`                           the beatStrengt
 midi_         `.show('midi')`
 midireset_    None                                               Not needed for now because we do not write directly to MIDI.  A midi.allOff() will be needed for direct midi access...
 mint_         `interval.Interval(note1, note2)`                  Or :meth:`~music21.stream.Stream.melodicIntervals`
-nf_           :meth:`~music21.chord.Chord.normalForm`            Also :meth:`~music21.chord.Chord.primeForm`, :meth:`~music21.chord.Chord.intervalVector`, :meth:`~music21.chord.Chord.forteClass`, :meth:`~music21.chord.Chord.getZRelation` etc.
+nf_           :meth:`~music21.chord.Chord.normalOrder`           Also :meth:`~music21.chord.Chord.primeForm`, :meth:`~music21.chord.Chord.intervalVector`, :meth:`~music21.chord.Chord.forteClass`, :meth:`~music21.chord.Chord.getZRelation` etc.
 num_          None                                               not needed; try: `for i in range(s.flat.getElementsByClass(X))` etc.
 patt_         `search.*`                                         see also, for instance, trecento.find_trecento_fragments for an example of a pattern searching module
 pattern_      `search.*`                                         see patt above
 pc_           :meth:`~music21.pitch.Pitch.pitchClass`
-pcset_        see `Pitch.*` and `Chord.*`                        Pitch.pitchClass and pitchClassString, Chord.normalForm, .primeForm, .intervalVector, etc.
+pcset_        see `Pitch.*` and `Chord.*`                        Pitch.pitchClass and pitchClassString, Chord.normalOrder, .primeForm, .intervalVector, etc.
 perform_      `.show('midi')`
-pf_           :meth:`~music21.chord.Chord.primeForm`             Also :meth:`~music21.chord.Chord.normalForm` etc.
+pf_           :meth:`~music21.chord.Chord.primeForm`             Also :meth:`~music21.chord.Chord.normalOrder` etc.
 pitch_        :meth:`~music21.pitch.Pitch.nameWithOctave`
 proof_        None                                               Not needed, see `humdrum` command above; However, something like this could be useful for each encoding format.
 recode_       `"if"`

@@ -15,12 +15,8 @@ as well as other methods, functions, and objects related to chords.
 '''
 __all__ = ['tables']
 
-from music21.chord import tables as chordTables
-
 import copy
 import unittest
-
-
 
 from music21 import beam
 from music21 import common
@@ -34,6 +30,8 @@ from music21 import tie
 from music21 import volume
 
 from music21 import environment
+from music21.chord import tables as chordTables
+from music21.common import deprecated
 from music21.ext import six
 
 _MOD = "chord.py"
@@ -44,6 +42,8 @@ environLocal = environment.Environment(_MOD)
 
 class ChordException(exceptions21.Music21Exception):
     pass
+
+
 
 
 #-------------------------------------------------------------------------------
@@ -355,125 +355,27 @@ class Chord(note.NotRest):
             allPitches.append(thisPitch.nameWithOctave)
         return "<music21.chord.Chord %s>" % ' '.join(allPitches)
 
-    ### PUBLIC METHODS ###
 
-    def seekChordTablesAddress(self):
-        '''
-        Utility method to return the address to the chord table.
-
-        Table addresses are TN based three character codes:
-        cardinaltiy, Forte index number, inversion
-
-        Inversion is either 0 (for symmetrical) or -1/1
-
-        NOTE: time consuming, and only should be run when necessary.
-
-        >>> c1 = chord.Chord(['c3'])
-        >>> c1.orderedPitchClasses
-        [0]
-
-        >>> c1.seekChordTablesAddress()
-        (1, 1, 0)
-
-        >>> c1 = chord.Chord(
-        ...     ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'b']
-        ...     )
-        >>> c1.seekChordTablesAddress()
-        (11, 1, 0)
-
-        >>> c1 = chord.Chord(['c', 'e', 'g'])
-        >>> c1.seekChordTablesAddress()
-        (3, 11, -1)
-
-        >>> c1 = chord.Chord(['c', 'e-', 'g'])
-        >>> c1.seekChordTablesAddress()
-        (3, 11, 1)
-
-        >>> c1 = chord.Chord(['c', 'c#', 'd#', 'e', 'f#', 'g#', 'a#'])
-        >>> c1.seekChordTablesAddress()
-        (7, 34, 0)
-
-        >>> c1 = chord.Chord(['c', 'c#', 'd'])
-        >>> c1.seekChordTablesAddress()
-        (3, 1, 0)
-        
-        
-        Zero-length chords raise a pitch exception:
-        
-        >>> c2 = chord.Chord()
-        >>> c2.seekChordTablesAddress()
-        Traceback (most recent call last):
-        ChordException: cannot access chord tables address for Chord with 0 pitches
-        '''
-        pcSet = self.orderedPitchClasses
-        if len(pcSet) == 0:
-            raise ChordException(
-                'cannot access chord tables address for Chord with %s pitches' % len(pcSet))
-
-        #environLocal.printDebug(['calling seekChordTablesAddress:', pcSet])
-
-        card = len(pcSet)
-        if card == 1: # its a singleton: return
-            return (1, 1, 0)
-        elif card == 11: # its the only 11 note pcset
-            return (11, 1, 0)
-        elif card == 12: # its the aggregate
-            return (12, 1, 0)
-        # go through each rotation of pcSet
-        candidates = []
-        for rot in range(0, card):
-            testSet = pcSet[rot:] + pcSet[0:rot]
-            # transpose to lead with zero
-            testSet = [(x - testSet[0]) % 12 for x in testSet]
-            # create inversion; first take difference from 12 mod 12
-            testSetInvert = [(12 - x) % 12 for x in testSet]
-            testSetInvert.reverse() # reverse order (first steps now last)
-            # transpose all steps (were last) to zero, mod 12
-            testSetInvert = [(x + (12 - testSetInvert[0])) % 12
-                            for x in testSetInvert]
-            candidates.append([testSet, testSetInvert])
-
-        # compare sets to those in table
-        match = False
-        for indexCandidate in range(len(chordTables.FORTE[card])):
-            dataLine = chordTables.FORTE[card][indexCandidate]
-            if dataLine == None: 
-                continue # spacer lines
-            inversionsAvailable = chordTables.forteIndexToInversionsAvailable(
-                                  card, indexCandidate)
-
-            for candidate, candidateInversion in candidates:
-                #environLocal.printDebug([candidate])
-                # need to only match form
-                if dataLine[0] == tuple(candidate): # must compare to tuple
-                    if 0 in inversionsAvailable:
-                        index, inversion = indexCandidate, 0
-                    else:
-                        index, inversion = indexCandidate, 1
-                    match = True
-                    break
-                elif dataLine[0] == tuple(candidateInversion):
-                    if 0 in inversionsAvailable:
-                        index, inversion = indexCandidate, 0
-                    else:
-                        index, inversion = indexCandidate, -1
-                    match = True
-                    break
-        if not match:
-            raise ChordException('cannot find a chord table address for %s' % pcSet)
-        return (card, index, inversion)
-
-    ### PRIVATE METHODS ###
-
-    def _formatVectorString(self, vectorList):
+    ### STATIC METHOD ###
+    @staticmethod
+    def formatVectorString(vectorList):
         '''
         Return a string representation of a vector or set
 
-        >>> c1 = chord.Chord(["D4", "A4", "F#5", "D6"])
-        >>> c1._formatVectorString([3,4,5])
-        '<345>'
+        Static method.  Works on the class:
+        
+        >>> chord.Chord.formatVectorString([0, 11])
+        '<0B>'
 
-        >>> c1._formatVectorString([10,11,3,5])
+        or an existing chord:
+
+        >>> c1 = chord.Chord(["D4", "A4", "F#5", "D6"])
+        >>> c1.formatVectorString(c1.normalOrder)
+        '<269>'
+
+        or on a list that has nothing to do with the chord
+
+        >>> c1.formatVectorString([10, 11, 3, 5])
         '<AB35>'
 
         '''
@@ -483,6 +385,11 @@ class Chord(note.NotRest):
             msg.append(eStr)
         msg.append('>')
         return ''.join(msg)
+
+
+    ### PUBLIC METHODS ###
+
+    ### PRIVATE METHODS ###
 
     def _findBass(self):
         '''
@@ -542,11 +449,6 @@ class Chord(note.NotRest):
             return returnObj
         else:
             return [n.pitch for n in deleteComponents]
-
-    def _updateChordTablesAddress(self):
-        if self._chordTablesAddressNeedsUpdating:
-            self._chordTablesAddress = self.seekChordTablesAddress()
-        self._chordTablesAddressNeedsUpdating = False
 
     ### PUBLIC METHODS ###
 
@@ -671,13 +573,10 @@ class Chord(note.NotRest):
         >>> c4.areZRelations(c3)
         False
         '''
-        self._updateChordTablesAddress()
-        post = chordTables.addressToZAddress(self._chordTablesAddress)
-        if post is None:
+        zRelationAddress = chordTables.addressToZAddress(self.chordTablesAddress)
+        if zRelationAddress is None:
             return False
-        zRelationAddress = chordTables.addressToZAddress(
-            self._chordTablesAddress)
-        if other.chordTablesAddress == zRelationAddress:
+        if other.chordTablesAddress[0:3] == zRelationAddress[0:3]:
             return True
         return False
 
@@ -1097,7 +996,8 @@ class Chord(note.NotRest):
         Geometric Normal Form, as first defined by Dmitri Tymoczko, orders pitch classes
         such that the spacing is prioritized with the smallest spacing between the first and
         second pitch class first, then the smallest spacing between second and third pitch class,
-        and so on. This form has unique properties that make it useful.
+        and so on. This form has unique properties that make it useful.  It also transposes
+        to PC0
 
         `geometricNormalForm` returns a list of pitch class integers in
         geometric normal form.
@@ -1113,9 +1013,11 @@ class Chord(note.NotRest):
         >>> c2.orderedPitchClassesString
         '<038>'
 
-        Compare this to the usual normalForm:
+        Compare this to the usual normalOrder transposed to PC0:
 
-        >>> c1.normalForm
+        >>> normalOrder = c1.normalOrder
+        >>> normalOrderFirst = normalOrder[0]
+        >>> [(pc - normalOrderFirst) % 12 for pc in normalOrder]
         [0, 4, 7]
 
         '''
@@ -1402,15 +1304,14 @@ class Chord(note.NotRest):
         True
         '''
         if self.hasZRelation:
-            self._updateChordTablesAddress()
-            chordTablesAddress = tuple(self._chordTablesAddress)
+            chordTablesAddress = tuple(self.chordTablesAddress)
             v = chordTables.addressToIntervalVector(chordTablesAddress)
             addresses = chordTables.intervalVectorToAddress(v)
             #environLocal.printDebug(['addresses', addresses, 
             #    'chordTablesAddress', chordTablesAddress])
             # addresses returned here are 2 elements lists
             addresses.remove(chordTablesAddress[:2])
-            prime = chordTables.addressToNormalForm(addresses[0])
+            prime = chordTables.addressToTransposedNormalForm(addresses[0])
             return Chord(prime)
         return None
         # c2.getZRelation()  # returns a list in non-ET12 space...
@@ -3484,19 +3385,22 @@ class Chord(note.NotRest):
     @property
     def chordTablesAddress(self):
         '''
-        Return a three-element tuple that represents that raw data location for
-        information on the set class interpretation of this Chord.
+        Return a four-element ChordTableTuple that represents that raw data location for
+        information on the set class interpretation of this Chord as well as the original
+        pitchClass
 
         The data format is a Forte set class cardinality, index number, and
         inversion status (where 0 is invariant, and -1 and 1 represent
         inverted or not, respectively).
 
-        >>> c = chord.Chord(["C4", "E4", "G#4"])
+        >>> c = chord.Chord(["D4", "F#4", "B-4"])
         >>> c.chordTablesAddress
-        (3, 12, 0)
+        ChordTableTuple(cardinality=3, forteClass=12, inversion=0, pcOriginal=2)
 
         '''
-        self._updateChordTablesAddress()
+        if self._chordTablesAddressNeedsUpdating:
+            self._chordTablesAddress = chordTables.seekChordTablesAddress(self)
+        self._chordTablesAddressNeedsUpdating = False
         return self._chordTablesAddress
 
     @property
@@ -3555,8 +3459,7 @@ class Chord(note.NotRest):
         >>> c3.commonName
         ''
         '''
-        self._updateChordTablesAddress()
-        ctn = chordTables.addressToCommonNames(self._chordTablesAddress)
+        ctn = chordTables.addressToCommonNames(self.chordTablesAddress)
         if ctn is None or len(ctn) == 0:
             return ''
         else:
@@ -3631,8 +3534,7 @@ class Chord(note.NotRest):
         '3-11B'
 
         '''
-        self._updateChordTablesAddress()
-        return chordTables.addressToForteName(self._chordTablesAddress, 'tn')
+        return chordTables.addressToForteName(self.chordTablesAddress, 'tn')
 
     @property
     def forteClassNumber(self):
@@ -3649,8 +3551,7 @@ class Chord(note.NotRest):
         11
 
         '''
-        self._updateChordTablesAddress()
-        return self._chordTablesAddress[1] # the second value
+        return self.chordTablesAddress.forteClass
 
     @property
     def forteClassTn(self):
@@ -3667,7 +3568,6 @@ class Chord(note.NotRest):
         >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.forteClassTn
         '3-11B'
-
         '''
         return self.forteClass
 
@@ -3686,8 +3586,7 @@ class Chord(note.NotRest):
         '3-11'
 
         '''
-        self._updateChordTablesAddress()
-        return chordTables.addressToForteName(self._chordTablesAddress, 'tni')
+        return chordTables.addressToForteName(self.chordTablesAddress, 'tni')
 
     @property
     def fullName(self):
@@ -3726,8 +3625,7 @@ class Chord(note.NotRest):
         True
 
         '''
-        self._updateChordTablesAddress()
-        post = chordTables.addressToZAddress(self._chordTablesAddress)
+        post = chordTables.addressToZAddress(self.chordTablesAddress)
         #environLocal.printDebug(['got post', post])
         if post is not None:
             return True
@@ -3751,9 +3649,7 @@ class Chord(note.NotRest):
         [1, 1, 1, 1, 1, 1]
 
         '''
-        self._updateChordTablesAddress()
-        return list(chordTables.addressToIntervalVector(
-               self._chordTablesAddress))
+        return list(chordTables.addressToIntervalVector(self.chordTablesAddress))
 
     @property
     def intervalVectorString(self):
@@ -3765,7 +3661,7 @@ class Chord(note.NotRest):
         '<001110>'
 
         '''
-        return self._formatVectorString(self.intervalVector)
+        return Chord.formatVectorString(self.intervalVector)
 
     @property
     def isPrimeFormInversion(self):
@@ -3779,10 +3675,8 @@ class Chord(note.NotRest):
         >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.isPrimeFormInversion
         True
-
         '''
-        self._updateChordTablesAddress()
-        if self._chordTablesAddress[2] == -1:
+        if self.chordTablesAddress[2] == -1:
             return True
         else:
             return False
@@ -3800,34 +3694,90 @@ class Chord(note.NotRest):
         '''
         return len(self.pitchClasses)
 
+
+    # @deprecated("September 2016", 
+    #    "Deprecated because it gives the wrong answer -- use normalOrder")
+    
     @property
-    def normalForm(self):
+    def normalOrder(self):
         '''
-        Return the normal form of the Chord represented as a list of integers:
+        Return the normal order/normal form of the Chord represented as a list of integers:
 
         >>> c1 = chord.Chord(['c', 'e-', 'g'])
-        >>> c1.normalForm
+        >>> c1.normalOrder
         [0, 3, 7]
 
         >>> c2 = chord.Chord(['c', 'e', 'g'])
-        >>> c2.normalForm
+        >>> c2.normalOrder
         [0, 4, 7]
 
+        >>> c3 = chord.Chord(['d', 'f#', 'a'])
+        >>> c3.normalOrder
+        [2, 6, 9]
+
+        >>> c3 = chord.Chord(['B-4', 'D5', 'F5'])
+        >>> c3.normalOrder
+        [10, 2, 5]
+        
+        To get normalOrder transposed to PC 0, do this:
+
+        >>> c3 = chord.Chord(['B-4', 'D5', 'F5'])
+        >>> normalOrder = c3.normalOrder
+        >>> firstPitch = normalOrder[0]
+        >>> [(pc - firstPitch) % 12 for pc in normalOrder]
+        [0, 4, 7]
+
+        To get normalOrder formated as a vectorString run .formatVectorString on it:
+        
+        >>> c3.normalOrder
+        [10, 2, 5]
+
+        >>> chord.Chord.formatVectorString(c3.normalOrder)
+        '<A25>'
+
+        (this is equivalent...)
+        
+        >>> c3.formatVectorString(c3.normalOrder)
+        '<A25>'
+
         '''
-        self._updateChordTablesAddress()
-        return list(chordTables.addressToNormalForm(self._chordTablesAddress))
+        cta = self.chordTablesAddress
+        pcOriginal = cta.pcOriginal
+        transposedNormalForm = chordTables.addressToTransposedNormalForm(cta)
+        return [(pc + pcOriginal) % 12 for pc in transposedNormalForm]
+
 
     @property
+    @deprecated("July 2016", "September 2016", 
+                "Deprecated because it gives the wrong answer -- use normalOrder")
+    def normalForm(self):
+        '''
+        Gives the normalOrder transposed to PC0 -- this method is deprecated because
+        this is not the right thing to do,
+        
+        ::
+            c3 = chord.Chord(['B-4', 'D5', 'F5'])
+            c3.normalForm
+            [0, 4, 7] 
+        '''
+        normalOrderList = self.normalOrder
+        firstPC = normalOrderList[0]
+        return [(pc - firstPC) % 12 for pc in normalOrderList]
+
+    @property
+    @deprecated("July 2016", "September 2016", 
+                "Deprecated because it gives the wrong answer -- use normalOrderString")
     def normalFormString(self):
         '''
-        Return a string representation of the normal form of the Chord.
+        Return a string representation of the normal form of the Chord TRANSPOSED to PC0
 
-        >>> c1 = chord.Chord(['f#', 'e-', 'g'])
-        >>> c1.normalFormString
-        '<034>'
-
+        ::
+        
+            c1 = chord.Chord(['f#', 'e-', 'g'])
+            c1.normalFormString
+            '<034>'
         '''
-        return self._formatVectorString(self.normalForm)
+        return Chord.formatVectorString(self.normalForm)
 
     @property
     def orderedPitchClasses(self):
@@ -3862,7 +3812,7 @@ class Chord(note.NotRest):
         '<367>'
 
         '''
-        return self._formatVectorString(self.orderedPitchClasses)
+        return Chord.formatVectorString(self.orderedPitchClasses)
 
     @property
     def pitchClassCardinality(self):
@@ -3939,8 +3889,7 @@ class Chord(note.NotRest):
         'C-major triad'
 
         '''
-        self._updateChordTablesAddress()
-        post = chordTables.addressToCommonNames(self._chordTablesAddress)
+        post = chordTables.addressToCommonNames(self.chordTablesAddress)
         if post != None:
             nameStr = post[0] # get first
         else:
@@ -4020,8 +3969,7 @@ class Chord(note.NotRest):
         [0, 3, 7]
 
         '''
-        self._updateChordTablesAddress()
-        return list(chordTables.addressToPrimeForm(self._chordTablesAddress))
+        return list(chordTables.addressToPrimeForm(self.chordTablesAddress))
 
     @property
     def primeFormString(self):
@@ -4037,7 +3985,7 @@ class Chord(note.NotRest):
         '<037>'
 
         '''
-        return self._formatVectorString(self.primeForm)
+        return Chord.formatVectorString(self.primeForm)
 
     @property
     def quality(self):
@@ -4405,7 +4353,7 @@ def fromForteClass(notation):
     else:
         raise ChordException('cannot handle specified notation: %s' % notation)
 
-    prime = chordTables.addressToNormalForm([card, num, inv])
+    prime = chordTables.addressToTransposedNormalForm([card, num, inv])
     return Chord(prime)
 
 
@@ -4438,7 +4386,7 @@ def fromIntervalVector(notation, getZRelation=False):
 
     post = []
     for card, num in addressList:
-        post.append(Chord(chordTables.addressToNormalForm([card, num])))
+        post.append(Chord(chordTables.addressToTransposedNormalForm([card, num])))
     # for now, return the first chord
     # z-related chords will have more than one
     if len(post) == 1:
@@ -4865,7 +4813,7 @@ class Test(unittest.TestCase):
         self.assertEqual(c1.orderedPitchClasses, [0, 1, 3, 6, 8, 9])
         self.assertEqual(c1.pitchClassCardinality, 6)
         self.assertEqual(c1.forteClass, '6-29')
-        self.assertEqual(c1.normalForm, [0, 1, 3, 6, 8, 9])
+        self.assertEqual(c1.normalOrder, [0, 1, 3, 6, 8, 9])
         self.assertEqual(c1.forteClassNumber, 29)
         self.assertEqual(c1.primeForm, [0, 1, 3, 6, 8, 9])
         self.assertEqual(c1.intervalVector, [2, 2, 4, 2, 3, 2])

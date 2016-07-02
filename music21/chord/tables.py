@@ -15,7 +15,7 @@ This module stores numerous data lists used in deriving set-class values and oth
 chord representations. All features of this module are made available through 
 :class:`~music21.chord.Chord` objects. Use of this module directly is thus not necessary.
 '''
-
+from collections import namedtuple
 import unittest
 
 from music21 import exceptions21
@@ -24,7 +24,9 @@ from music21 import environment
 _MOD = "chordTables.py"
 environLocal = environment.Environment(_MOD)
 
-_DOC_IGNORE_MODULE_OR_PACKAGE = True
+
+ChordTableAddress = namedtuple('ChordTableTuple', 'cardinality forteClass inversion pcOriginal')
+
 
 #-------------------------------------------------------------------------------
 class ChordTablesException(exceptions21.Music21Exception):
@@ -2569,7 +2571,7 @@ def _validateAddress(address):
     address = list(address)
     card = address[0]
     index = address[1]
-    if len(address) == 3:
+    if len(address) >= 3:
         inversion = address[2]
     else:
         inversion = None
@@ -2603,18 +2605,18 @@ def _validateAddress(address):
     return (card, index, inversion)
 
 
-def addressToNormalForm(address):
-    '''Given a TN address, return the normal form
+def addressToTransposedNormalForm(address):
+    '''Given a TN address, return the normal form transposed to start on 0.
 
-    >>> chord.tables.addressToNormalForm((3,1,0))
+    >>> chord.tables.addressToTransposedNormalForm((3,1,0))
     (0, 1, 2)
-    >>> chord.tables.addressToNormalForm((3,11,-1))
+    >>> chord.tables.addressToTransposedNormalForm((3,11,-1))
     (0, 4, 7)
-    >>> chord.tables.addressToNormalForm((3,11,1))
+    >>> chord.tables.addressToTransposedNormalForm((3,11,1))
     (0, 3, 7)
-    >>> chord.tables.addressToNormalForm((3,11))
+    >>> chord.tables.addressToTransposedNormalForm((3,11))
     (0, 3, 7)
-    >>> chord.tables.addressToNormalForm((3,11,None))
+    >>> chord.tables.addressToTransposedNormalForm((3,11,None))
     (0, 3, 7)
     '''
     card, index, inversion = _validateAddress(address)
@@ -2745,6 +2747,118 @@ def addressToForteName(address, classification='tn'):
 
 
 
+def seekChordTablesAddress(c):
+    '''
+    Utility method to return the address to the chord table.
+
+    Table addresses are TN based three character codes:
+    cardinality, Forte index number, inversion
+
+    Inversion is either 0 (for symmetrical) or -1/1
+
+    NOTE: time consuming, and only should be run when necessary.
+
+    >>> c1 = chord.Chord(['c3'])
+    >>> c1.orderedPitchClasses
+    [0]
+
+    >>> chord.tables.seekChordTablesAddress(c1)
+    ChordTableTuple(cardinality=1, forteClass=1, inversion=0, pcOriginal=0)
+
+
+    >>> c1 = chord.Chord(
+    ...     ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'b']
+    ...     )
+    >>> chord.tables.seekChordTablesAddress(c1)
+    ChordTableTuple(cardinality=11, forteClass=1, inversion=0, pcOriginal=11)
+
+    >>> c1 = chord.Chord(['g', 'b', 'd'])
+    >>> chord.tables.seekChordTablesAddress(c1)
+    ChordTableTuple(cardinality=3, forteClass=11, inversion=-1, pcOriginal=7)
+
+    >>> c1 = chord.Chord(['c', 'e-', 'g'])
+    >>> chord.tables.seekChordTablesAddress(c1)
+    ChordTableTuple(cardinality=3, forteClass=11, inversion=1, pcOriginal=0)
+
+    >>> c1 = chord.Chord(['c', 'c#', 'd#', 'e', 'f#', 'g#', 'a#'])
+    >>> chord.tables.seekChordTablesAddress(c1)
+    ChordTableTuple(cardinality=7, forteClass=34, inversion=0, pcOriginal=0)
+
+    >>> c1 = chord.Chord(['c', 'c#', 'b'])
+    >>> chord.tables.seekChordTablesAddress(c1)
+    ChordTableTuple(cardinality=3, forteClass=1, inversion=0, pcOriginal=11)
+        
+    Zero-length chords raise a pitch exception:
+    
+    >>> c2 = chord.Chord()
+    >>> chord.tables.seekChordTablesAddress(c2)
+    Traceback (most recent call last):
+    ChordTablesException: cannot access chord tables address for Chord with 0 pitches
+    '''
+    pcSet = c.orderedPitchClasses
+    if len(pcSet) == 0:
+        raise ChordTablesException(
+            'cannot access chord tables address for Chord with %s pitches' % len(pcSet))
+
+    #environLocal.printDebug(['calling seekChordTablesAddress:', pcSet])
+
+    card = len(pcSet)
+    if card == 1: # its a singleton: return
+        return ChordTableAddress(1, 1, 0, pcSet[0])
+    elif card == 12: # its the aggregate
+        return ChordTableAddress(12, 1, 0, 0)
+
+    # go through each rotation of pcSet
+    candidates = []
+    for rot in range(0, card):
+        testSet = pcSet[rot:] + pcSet[0:rot]
+        # transpose to lead with zero
+        testSetOriginalPC = testSet[0]
+        testSet = [(x - testSetOriginalPC) % 12 for x in testSet]
+        # create inversion; first take difference from 12 mod 12
+        testSetInvert = [(12 - x) % 12 for x in testSet]
+        testSetInvert.reverse() # reverse order (first steps now last)
+        # transpose all steps (were last) to zero, mod 12
+        testSetInvert = [(x + (12 - testSetInvert[0])) % 12
+                        for x in testSetInvert]
+        
+        candidateTuple = (testSet, testSetInvert, testSetOriginalPC)
+        candidates.append(candidateTuple)
+
+    # compare sets to those in table
+    match = False
+    matchedPCOriginal = None
+    
+    for indexCandidate in range(len(FORTE[card])):
+        dataLine = FORTE[card][indexCandidate]
+        if dataLine == None: 
+            continue # spacer lines
+        inversionsAvailable = forteIndexToInversionsAvailable(card, indexCandidate)
+
+        for candidate, candidateInversion, candidateOriginalPC in candidates:
+            #environLocal.printDebug([candidate])
+            # need to only match form
+            if dataLine[0] == tuple(candidate): # must compare to tuple
+                if 0 in inversionsAvailable:
+                    index, inversion = indexCandidate, 0
+                else:
+                    index, inversion = indexCandidate, 1
+                matchedPCOriginal = candidateOriginalPC
+                match = True
+                break
+            elif dataLine[0] == tuple(candidateInversion):
+                if 0 in inversionsAvailable:
+                    index, inversion = indexCandidate, 0
+                else:
+                    index, inversion = indexCandidate, -1
+                matchedPCOriginal = candidateOriginalPC
+                match = True
+                break
+    if not match:
+        raise ChordTablesException('cannot find a chord table address for %s' % pcSet)
+    return ChordTableAddress(card, index, inversion, matchedPCOriginal)
+
+
 #-------------------------------------------------------------------------------
 class Test(unittest.TestCase):
     
@@ -2797,7 +2911,7 @@ class Test(unittest.TestCase):
 
 #-------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [addressToForteName, addressToPrimeForm, addressToForteName]
+_DOC_ORDER = [addressToForteName, addressToPrimeForm, addressToForteName, seekChordTablesAddress]
 
 
 if __name__ == "__main__":
