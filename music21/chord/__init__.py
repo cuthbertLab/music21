@@ -3385,17 +3385,17 @@ class Chord(note.NotRest):
     @property
     def chordTablesAddress(self):
         '''
-        Return a four-element ChordTableTuple that represents that raw data location for
+        Return a four-element ChordTableAddress that represents that raw data location for
         information on the set class interpretation of this Chord as well as the original
         pitchClass
 
         The data format is a Forte set class cardinality, index number, and
         inversion status (where 0 is invariant, and -1 and 1 represent
-        inverted or not, respectively).
+        inverted or not, respectively). 
 
         >>> c = chord.Chord(["D4", "F#4", "B-4"])
         >>> c.chordTablesAddress
-        ChordTableTuple(cardinality=3, forteClass=12, inversion=0, pcOriginal=2)
+        ChordTableAddress(cardinality=3, forteClass=12, inversion=0, pcOriginal=2)
 
         '''
         if self._chordTablesAddressNeedsUpdating:

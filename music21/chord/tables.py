@@ -25,7 +25,7 @@ _MOD = "chordTables.py"
 environLocal = environment.Environment(_MOD)
 
 
-ChordTableAddress = namedtuple('ChordTableTuple', 'cardinality forteClass inversion pcOriginal')
+ChordTableAddress = namedtuple('ChordTableAddress', 'cardinality forteClass inversion pcOriginal')
 
 
 #-------------------------------------------------------------------------------
@@ -2763,30 +2763,30 @@ def seekChordTablesAddress(c):
     [0]
 
     >>> chord.tables.seekChordTablesAddress(c1)
-    ChordTableTuple(cardinality=1, forteClass=1, inversion=0, pcOriginal=0)
+    ChordTableAddress(cardinality=1, forteClass=1, inversion=0, pcOriginal=0)
 
 
     >>> c1 = chord.Chord(
     ...     ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'b']
     ...     )
     >>> chord.tables.seekChordTablesAddress(c1)
-    ChordTableTuple(cardinality=11, forteClass=1, inversion=0, pcOriginal=11)
+    ChordTableAddress(cardinality=11, forteClass=1, inversion=0, pcOriginal=11)
 
     >>> c1 = chord.Chord(['g', 'b', 'd'])
     >>> chord.tables.seekChordTablesAddress(c1)
-    ChordTableTuple(cardinality=3, forteClass=11, inversion=-1, pcOriginal=7)
+    ChordTableAddress(cardinality=3, forteClass=11, inversion=-1, pcOriginal=7)
 
     >>> c1 = chord.Chord(['c', 'e-', 'g'])
     >>> chord.tables.seekChordTablesAddress(c1)
-    ChordTableTuple(cardinality=3, forteClass=11, inversion=1, pcOriginal=0)
+    ChordTableAddress(cardinality=3, forteClass=11, inversion=1, pcOriginal=0)
 
     >>> c1 = chord.Chord(['c', 'c#', 'd#', 'e', 'f#', 'g#', 'a#'])
     >>> chord.tables.seekChordTablesAddress(c1)
-    ChordTableTuple(cardinality=7, forteClass=34, inversion=0, pcOriginal=0)
+    ChordTableAddress(cardinality=7, forteClass=34, inversion=0, pcOriginal=0)
 
     >>> c1 = chord.Chord(['c', 'c#', 'b'])
     >>> chord.tables.seekChordTablesAddress(c1)
-    ChordTableTuple(cardinality=3, forteClass=1, inversion=0, pcOriginal=11)
+    ChordTableAddress(cardinality=3, forteClass=1, inversion=0, pcOriginal=11)
         
     Zero-length chords raise a pitch exception:
     
