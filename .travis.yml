@@ -4,8 +4,8 @@ sudo: false
 
 python:
     - "2.7"
-    - "3.3"
     - "3.4"
+    - "3.5"
 
 before_install:
     - mkdir ~/Desktop
