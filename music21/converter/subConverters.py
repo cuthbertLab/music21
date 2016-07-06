@@ -260,35 +260,34 @@ class ConverterIPython(SubConverter):
     registerFormats = ('ipython',)
     registerOutputExtensions = ()
     registerOutputSubformatExtensions = {'lilypond': 'ly'}
-#     def vfshow(self, s):
-#         '''
-#         pickle this object and send it to Vexflow
-#         
-#         Alpha -- does not work too well.
-#         '''
-#         import random
-#         from music21.vexflow import toMusic21j
-#         from IPython.display import HTML # @UnresolvedImport
-#         vfp = toMusic21j.VexflowPickler()
-#         vfp.mode = 'jsonSplit'
-#         outputCode = vfp.fromObject(s)
-#         idName = 'canvasDiv' + str(random.randint(0, 10000))
-#         htmlBlock = '<div id="' + idName + '"><canvas/></div>'
-#         js = '''
-#         <script>
-#              data = ''' + outputCode + ''';       
-#              var jpc = new music21.jsonPickle.Converter();
-#              var streamObj = jpc.run(data);
-#              streamObj.replaceCanvas("#''' + idName + '''");
-#         </script>
-#         '''
-#         return HTML(htmlBlock + js)
+    def vfshow(self, s):
+        '''
+        pickle this object and send it to Vexflow.
+        '''
+        import random
+        from music21.vexflow import toMusic21j
+        from IPython.core.display import HTML
+        vfp = toMusic21j.VexflowPickler()
+        vfp.mode = 'json'
+        data = vfp.fromObject(s)
+        divId = 'm21j' + str(random.randint(0, 10000))
+        return HTML("""
+        <script>
+        require(['music21'], function (music21) {
+            data = '""" + data + """';
+            var jpc = new music21.fromPython.Converter();
+            var s = jpc.run(data);
+            s.renderScrollableCanvas($('#""" + divId + """'));
+        });
+        </script>
+        <div id='""" + divId + """'></div>
+        """)
     
     def show(self, obj, fmt, app=None, subformats=None, **keywords):
         '''
         show using the appropriate subformat.
         '''
-        if subformats is None:
+        if not subformats:
             subformats = ['vexflow']
         
         if subformats and subformats[0] == 'vexflow':
