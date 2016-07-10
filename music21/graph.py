@@ -11,13 +11,11 @@
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
-Object definitions for graphing and 
-plotting :class:`~music21.stream.Stream` objects. 
-The :class:`~music21.graph.Graph` object subclasses 
-abstract fundamental graphing archetypes using the 
-matplotlib library. The :class:`~music21.graph.Plot` 
-object subclasses provide reusable approaches 
-to graphing data and structures in 
+Object definitions for graphing and plotting :class:`~music21.stream.Stream` objects. 
+
+The :class:`~music21.graph.Graph` object subclasses abstract fundamental 
+graphing archetypes using the matplotlib library. The :class:`~music21.graph.Plot` 
+object subclasses provide reusable approaches to graphing data and structures in 
 :class:`~music21.stream.Stream` objects.
 '''
 from __future__ import division
@@ -27,6 +25,7 @@ from collections import namedtuple
 import unittest
 import random, math, os
 
+# TODO: Move _missingImport to environment or common so this is unnecessary.
 from music21 import base # for _missingImport
 
 from music21 import common
@@ -102,14 +101,10 @@ def _substituteAccidentalSymbols(label):
     if not isinstance(label, six.string_types):
         return label
     if '-' in label:
-        #label = label.replace('-', '&#x266d;')
-        #label = label.replace('-', 'b')
-        # this uses a tex-based italic
-        #label = label.replace('-', '$b$')
+        #label = label.replace('-', '&#x266d;') # ideally...
         label = label.replace('-', r'$\flat$')
-#             if '#' in label:
-#                 label = label.replace('-', '&#x266f;')
     if '#' in label:
+#       label = label.replace('-', '&#x266f;') # ideally...
         label = label.replace('#', r'$\sharp$')
     return label
 
@@ -641,7 +636,8 @@ class Graph(object):
 
     #---------------------------------------------------------------------------
     def done(self, fp=None):
-        '''Implement the desired doneAction, after data processing
+        '''
+        Implement the desired doneAction, after data processing
         '''
         if self.doneAction == 'show':
             self.show()
@@ -665,19 +661,19 @@ class Graph(object):
         '''
         if fp == None:
             fp = environLocal.getTempFile('.png')
-        #print _MOD, fp
+
         if self.dpi != None:
-            self.fig.savefig(fp, facecolor=getColor(self.colorBackgroundFigure),      
+            self.fig.savefig(fp, 
+                             facecolor=getColor(self.colorBackgroundFigure),      
                              edgecolor=getColor(self.colorBackgroundFigure),
-                              dpi=self.dpi)
+                             dpi=self.dpi)
         else:
-            self.fig.savefig(fp, facecolor=getColor(self.colorBackgroundFigure),      
+            self.fig.savefig(fp, 
+                             facecolor=getColor(self.colorBackgroundFigure),      
                              edgecolor=getColor(self.colorBackgroundFigure))
 
         if common.runningUnderIPython() is not True:
             environLocal.launch('png', fp)
-
-
 
 
 class GraphNetworxGraph(Graph):
@@ -697,7 +693,7 @@ class GraphNetworxGraph(Graph):
 #         :width: 600
 
     def __init__(self, *args, **keywords):
-        Graph.__init__(self, *args, **keywords)
+        super(GraphNetworxGraph, self).__init__(*args, **keywords)
         extm = _getExtendedModules() 
         self.axisKeys = ['x', 'y']
         self._axisInit()
@@ -798,7 +794,7 @@ class GraphColorGrid(Graph):
         :width: 600
     '''
     def __init__(self, *args, **keywords):
-        Graph.__init__(self, *args, **keywords)
+        super(GraphColorGrid, self).__init__(*args, **keywords)
         self.axisKeys = ['x', 'y']
         self._axisInit()
 
@@ -841,7 +837,12 @@ class GraphColorGrid(Graph):
 
             # linewidth: .1 is the thinnest possible
             # antialiased = false, for small diagrams, provides tighter images
-            ax.bar(positions, heights, 1, color=subColors, linewidth=.3, edgecolor='#000000', 
+            ax.bar(positions, 
+                   heights, 
+                   1, 
+                   color=subColors, 
+                   linewidth=0.3, 
+                   edgecolor='#000000', 
                    antialiased=False)
 
             # remove spines from each bar plot; cause excessive thickness
@@ -854,10 +855,10 @@ class GraphColorGrid(Graph):
             # remove all ticks for subplots
             for j, line in enumerate(ax.get_xticklines() + ax.get_yticklines()):
                 line.set_visible(False)
-            ax.set_yticklabels([""]*len(ax.get_yticklabels()))
-            ax.set_xticklabels([""]*len(ax.get_xticklabels()))
+            ax.set_yticklabels([""] * len(ax.get_yticklabels()))
+            ax.set_xticklabels([""] * len(ax.get_xticklabels()))
             # this is the shifting the visible bars; may not be necessary
-            ax.set_xlim([0,len(self.data[i])])
+            ax.set_xlim([0, len(self.data[i])])
             
             # these do not seem to do anything
             ax.get_xaxis().set_visible(False)
@@ -906,7 +907,7 @@ class GraphColorGridLegend(Graph):
 #                 ('c', [('w', '#8c8c8c'), ('x', '#8c8c8c'), ('y', '#6c6c6c')])
 
     def __init__(self, *args, **keywords):
-        Graph.__init__(self, *args, **keywords)
+        super(GraphColorGridLegend, self).__init__(*args, **keywords)
         self.axisKeys = ['x', 'y']
         self._axisInit()
 
@@ -1018,7 +1019,7 @@ class GraphHorizontalBar(Graph):
             :width: 600
 
         '''
-        Graph.__init__(self, *args, **keywords)
+        super(GraphHorizontalBar, self).__init__(*args, **keywords)
         self.axisKeys = ['x', 'y']
         self._axisInit()
 
@@ -1028,7 +1029,7 @@ class GraphHorizontalBar(Graph):
 
         # if figure size has not been defined, configure
         if 'figureSize' not in keywords:
-            self.setFigureSize([10,4])
+            self.setFigureSize([10, 4])
         if 'alpha' not in keywords:
             self.alpha = .6
 
@@ -1056,8 +1057,12 @@ class GraphHorizontalBar(Graph):
             faceColor = getColor(self.colors[i % len(self.colors)])            
             
             if len(points) > 0:
-                yrange = (yPos + self._margin, self._barHeight)
-                ax.broken_barh(points, yrange, facecolors=faceColor, alpha=self.alpha)
+                yrange = (yPos + self._margin, 
+                          self._barHeight)
+                ax.broken_barh(points, 
+                               yrange, 
+                               facecolors=faceColor, 
+                               alpha=self.alpha)
                 for xStart, xLen in points:
                     xEnd = xStart + xLen
                     for x in [xStart, xEnd]:
@@ -1080,7 +1085,7 @@ class GraphHorizontalBar(Graph):
 
         # first, see if ticks have been set externally
         if 'ticks' in self.axis['x'] and len(self.axis['x']['ticks']) == 0:
-            rangeStep = int(xMin+int(round(xRange/10)))
+            rangeStep = int(xMin + int(round(xRange / 10)))
             if rangeStep == 0:
                 rangeStep = 1
             for x in range(int(math.floor(xMin)), 
@@ -1104,7 +1109,7 @@ class GraphHorizontalBarWeighted(Graph):
         can have different heights and colors within their 
         respective channel.
         '''
-        Graph.__init__(self, *args, **keywords)
+        super(GraphHorizontalBarWeighted, self).__init__(*args, **keywords)
         self.axisKeys = ['x', 'y']
         self._axisInit()
 
@@ -1249,7 +1254,7 @@ class GraphScatterWeighted(Graph):
     '''
 
     def __init__(self, *args, **keywords):
-        Graph.__init__(self, *args, **keywords)
+        super(GraphScatterWeighted, self).__init__(*args, **keywords)
         self.axisKeys = ['x', 'y']
         self._axisInit()
 
@@ -1368,7 +1373,7 @@ class GraphScatter(Graph):
     '''
 
     def __init__(self, *args, **keywords):
-        Graph.__init__(self, *args, **keywords)
+        super(GraphScatter, self).__init__(*args, **keywords)
         self.axisKeys = ['x', 'y']
         self._axisInit()
 
@@ -1447,8 +1452,7 @@ class GraphHistogram(Graph):
     '''
 
     def __init__(self, *args, **keywords):
-
-        Graph.__init__(self, *args, **keywords)
+        super(GraphHistogram, self).__init__(*args, **keywords)
         self.axisKeys = ['x', 'y']
         self._axisInit()
         if 'binWidth' in keywords:
@@ -1505,7 +1509,7 @@ class GraphGroupedVerticalBar(Graph):
     >>> g.process()
     '''
     def __init__(self, *args, **keywords):
-        Graph.__init__(self, *args, **keywords)
+        super(GraphGroupedVerticalBar, self).__init__(*args, **keywords)
         self.axisKeys = ['x', 'y']
         self._axisInit()
         if 'roundDigits' in keywords:
@@ -1608,7 +1612,7 @@ class _Graph3DBars(Graph):
        
         >>> a = graph._Graph3DBars()
         '''
-        Graph.__init__(self, *args, **keywords)
+        super(_Graph3DBars, self).__init__(*args, **keywords)
         self.axisKeys = ['x', 'y', 'z']
         self._axisInit()
 
@@ -1684,7 +1688,7 @@ class Graph3DPolygonBars(Graph):
 
     '''
     def __init__(self, *args, **keywords):
-        Graph.__init__(self, *args, **keywords)
+        super(Graph3DPolygonBars, self).__init__(*args, **keywords)
         self.axisKeys = ['x', 'y', 'z']
         self._axisInit()
 
@@ -2559,12 +2563,12 @@ class PlotMultiStream(object):
 # color grids    
 
 class PlotWindowedAnalysis(PlotStream):
-    '''Base Plot for windowed analysis routines.
-
+    '''
+    Base Plot for windowed analysis routines.
     ''' 
     format = 'colorGrid'
     def __init__(self, streamObj, processor=None, *args, **keywords):
-        PlotStream.__init__(self, streamObj, *args, **keywords)
+        super(PlotWindowedAnalysis, self).__init__(streamObj, *args, **keywords)
         
         # store process for getting title
         self.processor = processor
@@ -2700,7 +2704,7 @@ class PlotWindowedKrumhanslSchmuckler(PlotWindowedAnalysis):
     '''
     values = discrete.KrumhanslSchmuckler.identifiers
     def __init__(self, streamObj, *args, **keywords):
-        PlotWindowedAnalysis.__init__(self, streamObj, 
+        super(PlotWindowedKrumhanslSchmuckler, self).__init__(streamObj, 
             discrete.KrumhanslSchmuckler(streamObj), *args, **keywords)
     
 class PlotWindowedKrumhanslKessler(PlotWindowedAnalysis):
@@ -2710,7 +2714,7 @@ class PlotWindowedKrumhanslKessler(PlotWindowedAnalysis):
     '''
     values = discrete.KrumhanslKessler.identifiers
     def __init__(self, streamObj, *args, **keywords):
-        PlotWindowedAnalysis.__init__(self, streamObj, 
+        super(PlotWindowedKrumhanslKessler, self).__init__(streamObj, 
             discrete.KrumhanslKessler(streamObj), *args, **keywords)
 
 class PlotWindowedAardenEssen(PlotWindowedAnalysis):
@@ -2721,7 +2725,7 @@ class PlotWindowedAardenEssen(PlotWindowedAnalysis):
     '''
     values = discrete.AardenEssen.identifiers
     def __init__(self, streamObj, *args, **keywords):
-        PlotWindowedAnalysis.__init__(self, streamObj, 
+        super(PlotWindowedAnalysis, self).__init__(streamObj, 
             discrete.AardenEssen(streamObj), *args, **keywords)
 
 class PlotWindowedSimpleWeights(PlotWindowedAnalysis):
@@ -2731,7 +2735,7 @@ class PlotWindowedSimpleWeights(PlotWindowedAnalysis):
     '''
     values = discrete.SimpleWeights.identifiers
     def __init__(self, streamObj, *args, **keywords):
-        PlotWindowedAnalysis.__init__(self, streamObj, 
+        super(PlotWindowedSimpleWeights, self).__init__(streamObj, 
             discrete.SimpleWeights(streamObj), *args, **keywords)
 
 class PlotWindowedBellmanBudge(PlotWindowedAnalysis):
@@ -2741,7 +2745,7 @@ class PlotWindowedBellmanBudge(PlotWindowedAnalysis):
     '''
     values = discrete.BellmanBudge.identifiers
     def __init__(self, streamObj, *args, **keywords):
-        PlotWindowedAnalysis.__init__(self, streamObj, 
+        super(PlotWindowedBellmanBudge, self).__init__(streamObj, 
             discrete.BellmanBudge(streamObj), *args, **keywords)
 
 class PlotWindowedTemperleyKostkaPayne(PlotWindowedAnalysis):
@@ -2752,7 +2756,7 @@ class PlotWindowedTemperleyKostkaPayne(PlotWindowedAnalysis):
     '''
     values = discrete.TemperleyKostkaPayne.identifiers
     def __init__(self, streamObj, *args, **keywords):
-        PlotWindowedAnalysis.__init__(self, streamObj, 
+        super(PlotWindowedTemperleyKostkaPayne, self).__init__(streamObj, 
             discrete.TemperleyKostkaPayne(streamObj), *args, **keywords)
 
     
@@ -2775,7 +2779,7 @@ class PlotWindowedAmbitus(PlotWindowedAnalysis):
     values = discrete.Ambitus.identifiers
     def __init__(self, streamObj, *args, **keywords):
         # provide the stream to both the window and processor in this case
-        PlotWindowedAnalysis.__init__(self, streamObj, 
+        super(PlotWindowedAmbitus, self).__init__(streamObj, 
             discrete.Ambitus(streamObj), *args, **keywords)
         
 
@@ -2791,7 +2795,7 @@ class PlotHistogram(PlotStream):
     '''
     format = 'histogram'
     def __init__(self, streamObj, *args, **keywords):
-        PlotStream.__init__(self, streamObj, *args, **keywords)
+        super(PlotHistogram, self).__init__(streamObj, *args, **keywords)
 
     def _extractData(self, dataValueLegit=True):
         data = {}
@@ -2874,7 +2878,7 @@ class PlotHistogramPitchSpace(PlotHistogram):
     '''
     values = ['pitch']
     def __init__(self, streamObj, *args, **keywords):
-        PlotHistogram.__init__(self, streamObj, *args, **keywords)
+        super(PlotHistogramPitchSpace, self).__init__(streamObj, *args, **keywords)
 
         self.fx = lambda n: n.pitch.midi
         self.fxTick = lambda n: n.nameWithOctave
@@ -2908,8 +2912,8 @@ class PlotHistogramPitchSpace(PlotHistogram):
 
 
 class PlotHistogramPitchClass(PlotHistogram):
-    '''A histogram of pitch class
-
+    '''
+    A histogram of pitch class
     
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.PlotHistogramPitchClass(s, doneAction=None) #_DOCS_HIDE
@@ -2925,7 +2929,7 @@ class PlotHistogramPitchClass(PlotHistogram):
     '''
     values = ['pitchClass']
     def __init__(self, streamObj, *args, **keywords):
-        PlotHistogram.__init__(self, streamObj, *args, **keywords)
+        super(PlotHistogramPitchClass, self).__init__(streamObj, *args, **keywords)
 
         self.fx = lambda n: n.pitch.pitchClass
         self.fxTick = lambda n: n.name
@@ -2973,7 +2977,7 @@ class PlotHistogramQuarterLength(PlotHistogram):
     '''
     values = ['quarterLength']
     def __init__(self, streamObj, *args, **keywords):
-        PlotHistogram.__init__(self, streamObj, *args, **keywords)
+        super(PlotHistogramQuarterLength, self).__init__(streamObj, *args, **keywords)
 
         self.fx = lambda n:n.quarterLength
         self.fxTick = lambda n: n.quarterLength
@@ -3006,7 +3010,7 @@ class PlotScatter(PlotStream):
     '''
     format = 'scatter'
     def __init__(self, streamObj, *args, **keywords):
-        PlotStream.__init__(self, streamObj, *args, **keywords)
+        super(PlotScatter, self).__init__(streamObj, *args, **keywords)
 
         if 'xLog' not in keywords:
             self.xLog = True
@@ -3101,7 +3105,7 @@ class PlotScatterPitchSpaceQuarterLength(PlotScatter):
     '''
     values = ['pitch', 'quarterLength']
     def __init__(self, streamObj, *args, **keywords):
-        PlotScatter.__init__(self, streamObj, *args, **keywords)
+        super(PlotScatterPitchSpaceQuarterLength, self).__init__(streamObj, *args, **keywords)
 
         self.fy = lambda n: n.pitch.ps
         self.fyTicks = self.ticksPitchSpaceUsage
@@ -3147,7 +3151,7 @@ class PlotScatterPitchClassQuarterLength(PlotScatter):
     # string name used to access this class
     values = ['pitchClass', 'quarterLength']
     def __init__(self, streamObj, *args, **keywords):
-        PlotScatter.__init__(self, streamObj, *args, **keywords)
+        super(PlotScatterPitchClassQuarterLength, self).__init__(streamObj, *args, **keywords)
 
         self.fy = lambda n: n.pitch.pitchClass
         self.fyTicks = self.ticksPitchClassUsage
@@ -3164,8 +3168,7 @@ class PlotScatterPitchClassQuarterLength(PlotScatter):
         self.graph.setTicks('y', yTicks)
         self.graph.setTicks('x', xTicks)
         self.graph.setAxisLabel('y', 'Pitch Class')
-        self.graph.setAxisLabel('x', self._axisLabelQuarterLength(
-                                remap=self.xLog))
+        self.graph.setAxisLabel('x', self._axisLabelQuarterLength(remap=self.xLog))
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
@@ -3193,7 +3196,7 @@ class PlotScatterPitchClassOffset(PlotScatter):
     '''
     values = ['pitchClass', 'offset']
     def __init__(self, streamObj, *args, **keywords):
-        PlotScatter.__init__(self, streamObj, *args, **keywords)
+        super(PlotScatterPitchClassOffset, self).__init__(streamObj, *args, **keywords)
 
         self.fy = lambda n: n.pitch.pitchClass
         self.fyTicks = self.ticksPitchClassUsage
@@ -3239,7 +3242,7 @@ class PlotScatterPitchSpaceDynamicSymbol(PlotScatter):
     # string name used to access this class
     values = ['pitchClass', 'dynamics']
     def __init__(self, streamObj, *args, **keywords):
-        PlotScatter.__init__(self, streamObj, *args, **keywords)
+        super(PlotScatterPitchSpaceDynamicSymbol, self).__init__(streamObj, *args, **keywords)
 
         self.fxTicks = self.ticksPitchSpaceUsage
         self.fyTicks = self.ticksDynamics
@@ -3285,7 +3288,7 @@ class PlotHorizontalBar(PlotStream):
     '''
     format = 'horizontalbar'
     def __init__(self, streamObj, *args, **keywords):
-        PlotStream.__init__(self, streamObj, *args, **keywords)
+        super(PlotHorizontalBar, self).__init__(streamObj, *args, **keywords)
 
         self.fy = lambda n: n.pitch.ps
         self.fyTicks = self.ticksPitchSpaceChromatic
@@ -3352,7 +3355,7 @@ class PlotHorizontalBarPitchClassOffset(PlotHorizontalBar):
     '''
     values = ['pitchClass', 'offset', 'pianoroll']
     def __init__(self, streamObj, *args, **keywords):
-        PlotHorizontalBar.__init__(self, streamObj, *args, **keywords)
+        super(PlotHorizontalBarPitchClassOffset, self).__init__(streamObj, *args, **keywords)
 
         self.fy = lambda n: n.pitch.pitchClass
         self.fyTicks = self.ticksPitchClassUsage
@@ -3397,7 +3400,7 @@ class PlotHorizontalBarPitchSpaceOffset(PlotHorizontalBar):
 
     values = ['pitch', 'offset', 'pianoroll']
     def __init__(self, streamObj, *args, **keywords):
-        PlotHorizontalBar.__init__(self, streamObj, *args, **keywords)
+        super(PlotHorizontalBarPitchSpaceOffset, self).__init__(streamObj, *args, **keywords)
        
         self.fy = lambda n: n.pitch.ps
         self.fxTicks = self.ticksOffset
@@ -3440,7 +3443,7 @@ class PlotHorizontalBarWeighted(PlotStream):
     '''
     format = 'horizontalbarweighted'
     def __init__(self, streamObj, *args, **keywords):
-        PlotStream.__init__(self, streamObj, *args, **keywords)
+        super(PlotHorizontalBarWeighted, self).__init__(streamObj, *args, **keywords)
         # will get Measure numbers if appropraite
         self.fxTicks = self.ticksOffset
 
@@ -3526,7 +3529,7 @@ class PlotDolan(PlotHorizontalBarWeighted):
     '''
     values = ['instrument']
     def __init__(self, streamObj, *args, **keywords):
-        PlotHorizontalBarWeighted.__init__(self, streamObj, *args, **keywords)
+        super(PlotDolan, self).__init__(streamObj, *args, **keywords)
 
         #self.fy = lambda n: n.pitch.pitchClass
         #self.fyTicks = self.ticksPitchClassUsage
@@ -3617,7 +3620,7 @@ class PlotScatterWeighted(PlotStream):
 
     format = 'scatterWeighted'
     def __init__(self, streamObj, *args, **keywords):
-        PlotStream.__init__(self, streamObj, *args, **keywords)
+        super(PlotScatterWeighted, self).__init__(streamObj, *args, **keywords)
 
         if 'xLog' not in keywords:
             self.xLog = True
@@ -3734,7 +3737,8 @@ class PlotScatterWeightedPitchSpaceQuarterLength(PlotScatterWeighted):
 
     values = ['pitch', 'quarterLength']
     def __init__(self, streamObj, *args, **keywords):
-        PlotScatterWeighted.__init__(self, streamObj, *args, **keywords)
+        super(PlotScatterWeightedPitchSpaceQuarterLength, self).__init__(
+                                                streamObj, *args, **keywords)
 
         self.fx = lambda n: n.quarterLength
         self.fy = lambda n: n.pitch.midi
@@ -3779,7 +3783,8 @@ class PlotScatterWeightedPitchClassQuarterLength(PlotScatterWeighted):
 
     values = ['pitchClass', 'quarterLength']
     def __init__(self, streamObj, *args, **keywords):
-        PlotScatterWeighted.__init__(self, streamObj, *args, **keywords)
+        super(PlotScatterWeightedPitchClassQuarterLength, self).__init__(
+                                                            streamObj, *args, **keywords)
 
         self.fx = lambda n: n.quarterLength
         self.fy = lambda n: n.pitch.pitchClass
@@ -3823,10 +3828,10 @@ class PlotScatterWeightedPitchSpaceDynamicSymbol(PlotScatterWeighted):
         :width: 600
         
     '''
-
     values = ['pitchClass', 'dynamicSymbol']
     def __init__(self, streamObj, *args, **keywords):
-        PlotScatterWeighted.__init__(self, streamObj, *args, **keywords)
+        super(PlotScatterWeightedPitchSpaceDynamicSymbol, self).__init__(
+                                                streamObj, *args, **keywords)
 
         self.fxTicks = self.ticksPitchSpaceUsage
         self.fyTicks = self.ticksDynamics
@@ -3867,11 +3872,12 @@ class PlotScatterWeightedPitchSpaceDynamicSymbol(PlotScatterWeighted):
 
 
 class Plot3DBars(PlotStream):
-    '''Base class for Stream plotting classes.
+    '''
+    Base class for Stream plotting classes.
     '''
     format = '3dBars'
     def __init__(self, streamObj, *args, **keywords):
-        PlotStream.__init__(self, streamObj, *args, **keywords)
+        super(Plot3DBars, self).__init__(streamObj, *args, **keywords)
 
     def _extractData(self):
         # TODO: add support for chords
@@ -3920,8 +3926,10 @@ class Plot3DBars(PlotStream):
 
         for obj in sSrc.getElementsByClass([note.Note, chord.Chord]):
             if 'Chord' in obj.classes:
-                xSrc, ySrc = self._extractChordDataTwoAxis(self.fx, self.fy, 
-                                                           obj, matchPitchCount=True)
+                xSrc, ySrc = self._extractChordDataTwoAxis(self.fx, 
+                                                           self.fy, 
+                                                           obj, 
+                                                           matchPitchCount=True)
             else: # Note, just one value
                 xSrc = [self.fx(obj)]
                 ySrc = [self.fy(obj)]
@@ -3952,8 +3960,8 @@ class Plot3DBars(PlotStream):
 
 
 class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
-    '''A scatter plot of pitch and quarter length
-
+    '''
+    A scatter plot of pitch and quarter length
     
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
     >>> p = graph.Plot3DBarsPitchSpaceQuarterLength(s, doneAction=None) #_DOCS_HIDE
@@ -3970,7 +3978,7 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
 
     values = ['pitch', 'quarterLength']
     def __init__(self, streamObj, *args, **keywords):
-        Plot3DBars.__init__(self, streamObj, *args, **keywords)
+        super(Plot3DBarsPitchSpaceQuarterLength, self).__init__(streamObj, *args, **keywords)
 
         self.fx = lambda n: n.quarterLength
         self.fy = lambda n: n.pitch.ps
@@ -4013,7 +4021,8 @@ class PlotFeatures(PlotMultiStream):
     def __init__(self, streamList, featureExtractors, labelList=None, *args, **keywords):
         if labelList is None:
             labelList = []
-        PlotMultiStream.__init__(self, streamList, labelList, *args, **keywords)
+        
+        super(PlotFeatures, self).__init__(streamList, labelList, *args, **keywords)
 
         self.featureExtractors = featureExtractors
 
@@ -4101,16 +4110,20 @@ def _getPlotsToMake(*args, **keywords):
     '''
     plotClasses = [
         # histograms
-        PlotHistogramPitchSpace, PlotHistogramPitchClass, PlotHistogramQuarterLength,
+        PlotHistogramPitchSpace, 
+        PlotHistogramPitchClass, 
+        PlotHistogramQuarterLength,
         # scatters
         PlotScatterPitchSpaceQuarterLength, 
         PlotScatterPitchClassQuarterLength, 
         PlotScatterPitchClassOffset,
         PlotScatterPitchSpaceDynamicSymbol,
         # offset based horizontal
-        PlotHorizontalBarPitchSpaceOffset, PlotHorizontalBarPitchClassOffset,
+        PlotHorizontalBarPitchSpaceOffset, 
+        PlotHorizontalBarPitchClassOffset,
         # weighted scatter
-        PlotScatterWeightedPitchSpaceQuarterLength, PlotScatterWeightedPitchClassQuarterLength,
+        PlotScatterWeightedPitchSpaceQuarterLength, 
+        PlotScatterWeightedPitchClassQuarterLength,
         PlotScatterWeightedPitchSpaceDynamicSymbol,
         # 3d graphs
         Plot3DBarsPitchSpaceQuarterLength,
@@ -4141,7 +4154,9 @@ def _getPlotsToMake(*args, **keywords):
     #environLocal.printDebug(['got args pre conversion', args])
     # if no args, use pianoroll
     foundClassName = None
-    if len(args) == 0 and showFormat == '' and values == []:
+    if (len(args) == 0 
+            and showFormat == '' 
+            and values == []):
         showFormat = 'horizontalbar'
         values = 'pitch'
     elif len(args) == 1:
@@ -5283,18 +5298,24 @@ class Test(unittest.TestCase):
 #-------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [
-        PlotHistogramPitchSpace, PlotHistogramPitchClass, PlotHistogramQuarterLength,
+        PlotHistogramPitchSpace, 
+        PlotHistogramPitchClass, 
+        PlotHistogramQuarterLength,
         # windowed
-        PlotWindowedKrumhanslSchmuckler, PlotWindowedAmbitus,
+        PlotWindowedKrumhanslSchmuckler, 
+        PlotWindowedAmbitus,
         # scatters
-        PlotScatterPitchSpaceQuarterLength, PlotScatterPitchClassQuarterLength, 
+        PlotScatterPitchSpaceQuarterLength, 
+        PlotScatterPitchClassQuarterLength, 
         PlotScatterPitchClassOffset,
         PlotScatterPitchSpaceDynamicSymbol,
         # offset based horizontal
-        PlotHorizontalBarPitchSpaceOffset, PlotHorizontalBarPitchClassOffset,
+        PlotHorizontalBarPitchSpaceOffset, 
+        PlotHorizontalBarPitchClassOffset,
         PlotDolan,
         # weighted scatter
-        PlotScatterWeightedPitchSpaceQuarterLength, PlotScatterWeightedPitchClassQuarterLength,
+        PlotScatterWeightedPitchSpaceQuarterLength, 
+        PlotScatterWeightedPitchClassQuarterLength,
         PlotScatterWeightedPitchSpaceDynamicSymbol,
         # 3d graphs
         Plot3DBarsPitchSpaceQuarterLength,

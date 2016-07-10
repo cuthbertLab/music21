@@ -93,7 +93,7 @@ class VexflowPickler(object):
     jsBodyScript = '''<script>\n{jsBody}\n</script>'''
     jsBody = '''require(['music21'], function() {{
                 var pickleIn = {pickleOutput};
-                var jpc = new music21.jsonPickle.Converter();
+                var jpc = new music21.fromPython.Converter();
                 streamObj = jpc.run(pickleIn);
                 {callback}
             }});'''
@@ -164,7 +164,7 @@ class VexflowPickler(object):
            <script>
                 require(['music21'], function() {
                     var pickleIn = {"hi": "hello"};
-                    var jpc = new music21.jsonPickle.Converter();
+                    var jpc = new music21.fromPython.Converter();
                     streamObj = jpc.run(pickleIn);
                     streamObj.renderOptions.events.resize = "reflow";
                 streamObj.appendNewCanvas();
@@ -185,7 +185,7 @@ class VexflowPickler(object):
         >>> print(vfp.getJSBody('{"hi": "hello"}'))
                 require(['music21'], function() {
                     var pickleIn = {"hi": "hello"};
-                    var jpc = new music21.jsonPickle.Converter();
+                    var jpc = new music21.fromPython.Converter();
                     streamObj = jpc.run(pickleIn);
                     streamObj.renderOptions.events.resize = "reflow";
                 streamObj.appendNewCanvas();
@@ -218,7 +218,7 @@ class VexflowPickler(object):
             <script>
             require(['music21'], function() {
                             var pickleIn = {"hi": "hello"};
-                            var jpc = new music21.jsonPickle.Converter();
+                            var jpc = new music21.fromPython.Converter();
                             streamObj = jpc.run(pickleIn);
                             streamObj.renderOptions.events.resize = "reflow";
                         streamObj.appendNewCanvas();
