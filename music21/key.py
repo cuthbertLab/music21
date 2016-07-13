@@ -139,13 +139,13 @@ def sharpsToPitch(sharpCount):
 #_pitchToSharpsCache = {}
 
 fifthsOrder = ['F','C','G','D','A','E','B']
-modeSharpsAlter = {'major':0,
-                   'minor':-3,
-                   'dorian':-2,
+modeSharpsAlter = {'major': 0,
+                   'minor': -3,
+                   'dorian': -2,
                    'phrygian': -4,
                    'lydian': 1,
-                   'mixolydian':-1,
-                   'locrian':-5,}
+                   'mixolydian': -1,
+                   'locrian': -5,}
 
 
 def pitchToSharps(value, mode=None):
@@ -317,12 +317,8 @@ class KeyException(exceptions21.Music21Exception):
 class KeySignature(base.Music21Object):
     '''
     A KeySignature object specifies the signature to be used for a piece; it takes
-    in zero, one, or two arguments.  The first argument is an int giving the number of sharps,
-    or if negative the number of flats.  The second argument (deprecated Jan 2014 -- do not use)
-    specifies the mode of the piece ('major', 'minor', or None for unknown).
-    
-    Mode will be deprecated fully once easier ways for MEI to store this information in a
-    key are given.
+    in zero, one, or two arguments.  The only argument is an int giving the number of sharps,
+    or if negative the number of flats.  
     
     If you are starting with the name of a key, see the :class:`~music21.key.Key` object.
 
@@ -335,13 +331,7 @@ class KeySignature(base.Music21Object):
     >>> Eflat
     <music21.key.KeySignature of 3 flats>
 
-    Some specification of mode can go into the KeySignature object:
-
-    >>> Eflat.mode = 'phrygian'
-    >>> Eflat
-    <music21.key.KeySignature of 3 flats, mode phrygian>
-
-    But if you want to get a real Key, then use the :class:`~music21.key.Key` object instead:
+    If you want to get a real Key, then use the :class:`~music21.key.Key` object instead:
 
     >>> illegal = key.KeySignature('c#')
     Traceback (most recent call last):
@@ -362,7 +352,7 @@ class KeySignature(base.Music21Object):
 
     classSortOrder = 2
     
-    def __init__(self, sharps=None, mode=None):
+    def __init__(self, sharps=None):
         base.Music21Object.__init__(self)
         #if mode is not None:
         #    self._mode_is_deprecated()
@@ -380,8 +370,6 @@ class KeySignature(base.Music21Object):
                     'did you mean to use a key.Key() object instead?')
             
         self._sharps = sharps
-        # optionally store mode, if known
-        self._mode = mode
         # need to store a list of pitch objects, used for creating a 
         # non traditional key
         self._alteredPitches = None
@@ -395,7 +383,7 @@ class KeySignature(base.Music21Object):
     #    pass
 
     def __hash__(self):
-        hashTuple = (self._sharps, self._mode, tuple(self._alteredPitches))
+        hashTuple = (self._sharps, tuple(self._alteredPitches))
         return hash(hashTuple)
     
     #---------------------------------------------------------------------------
@@ -419,11 +407,7 @@ class KeySignature(base.Music21Object):
             output = "1 flat"
         else:
             output = "%s flats" % str(abs(ns))
-        if self.mode is None:
-            return output
-        else:
-            output += ", mode %s" % (self.mode)
-            return output
+        return output
     
     def __eq__(self, other):
         '''
@@ -443,44 +427,17 @@ class KeySignature(base.Music21Object):
     def __str__(self):
         return self.__repr__()
 
-    @property
-    def pitchAndMode(self):
+    def asKey(self, mode='major'):
         '''
-        DEPRECATED!
-        
-        TODO: Formally deprecate.
-        
-        Returns a a two value list containing 
-        a :class:`music21.pitch.Pitch` object that 
-        names this key and the value of :attr:`~music21.key.KeySignature.mode`.
-
-        The only applicable modes are 'minor' and all others (=Major)
-       
-        >>> key.KeySignature(-7).pitchAndMode
-        (<music21.pitch.Pitch C->, None)
-        >>> key.KeySignature(-6).pitchAndMode
-        (<music21.pitch.Pitch G->, None)
-        >>> key.KeySignature(-3).pitchAndMode
-        (<music21.pitch.Pitch E->, None)
-        >>> key.KeySignature(0).pitchAndMode
-        (<music21.pitch.Pitch C>, None)
-        >>> key.KeySignature(1).pitchAndMode
-        (<music21.pitch.Pitch G>, None)
-        >>> csharp = key.KeySignature(4)
-        >>> csharp.mode = "minor"
-        >>> csharp.pitchAndMode
-        (<music21.pitch.Pitch C#>, 'minor')
-        >>> csharpPitch = csharp.pitchAndMode[0]
-        >>> csharpPitch.accidental
-        <accidental sharp>
+        return a `key.Key` object representing this KeySignature object as a key in the
+        given mode (default = major)
         '''
-        # this works but returns sharps
-        # keyPc = (self.sharps * 7) % 12
-        if self.mode is not None and self.mode.lower() == 'minor':
-            pitchObj = sharpsToPitch(self.sharps + 3)
-        else:
-            pitchObj = sharpsToPitch(self.sharps)
-        return pitchObj, self.mode
+        mode = mode.lower()
+        if mode not in modeSharpsAlter:
+            raise KeyException("Mode '%s' is unknown" % mode)
+        sharpAlterationFromMajor = modeSharpsAlter[mode]
+        pitchObj = sharpsToPitch(self.sharps - sharpAlterationFromMajor)
+        return Key(pitchObj.name, mode)
 
 
     def _getAlteredPitches(self):
@@ -510,8 +467,6 @@ class KeySignature(base.Music21Object):
         # assign list to altered pitches; list will be empty if not set
         self._alteredPitchesCached = post
         return post
-
-       
 
     alteredPitches = property(_getAlteredPitches, 
         doc='''
@@ -640,25 +595,26 @@ class KeySignature(base.Music21Object):
         >>> a = key.KeySignature(2)
         >>> a
         <music21.key.KeySignature of 2 sharps>
-        >>> a.pitchAndMode
-        (<music21.pitch.Pitch D>, None)
+        >>> a.asKey('major')
+        <music21.key.Key of D major>
         
         >>> b = a.transpose('p5')
         >>> b
         <music21.key.KeySignature of 3 sharps>
-        >>> b.pitchAndMode
-        (<music21.pitch.Pitch A>, None)
+        >>> b.asKey('major')
+        <music21.key.Key of A major>
         >>> b.sharps
         3
+
         >>> c = b.transpose('-m2')
-        >>> c.pitchAndMode
-        (<music21.pitch.Pitch G#>, None)
+        >>> c.asKey('major')
+        <music21.key.Key of G# major>
         >>> c.sharps
         8
         
         >>> d = c.transpose('-a3')
-        >>> d.pitchAndMode
-        (<music21.pitch.Pitch E->, None)
+        >>> d.asKey('major')
+        <music21.key.Key of E- major>
         >>> d.sharps
         -3
         '''
@@ -672,10 +628,11 @@ class KeySignature(base.Music21Object):
         else:
             post = self
 
-        p1, mode = post.pitchAndMode
+        k1 = post.asKey('major')
+        p1 = k1.tonic
         p2 = p1.transpose(intervalObj)
         
-        post.sharps = pitchToSharps(p2, mode)
+        post.sharps = pitchToSharps(p2)
         post._attributesChanged()
 
         # mode is already set
@@ -684,7 +641,7 @@ class KeySignature(base.Music21Object):
         else:
             return None
 
-    def getScale(self, mode=None):
+    def getScale(self, mode='major'):
         '''
         Return a :class:`music21.scale.Scale` object (or, actually, a subclass such as
         :class:`~music21.scale.MajorScale` or :class:`~music21.scale.MinorScale`) that is 
@@ -697,14 +654,10 @@ class KeySignature(base.Music21Object):
         <music21.key.KeySignature of 3 sharps>
         >>> ks.getScale('major')
         <music21.scale.MajorScale A major>
-        >>> ks.mode = 'minor'
-        >>> ks.getScale()
+        >>> ks.getScale('minor')
         <music21.scale.MinorScale F# minor>
         '''
-        pitchObj, stored_mode = self.pitchAndMode
-        if mode is None:
-            mode = stored_mode
-        
+        pitchObj = self.asKey(mode).tonic
         if mode in (None, 'major'):
             return scale.MajorScale(pitchObj)
         elif mode in ('minor',):
@@ -738,27 +691,6 @@ class KeySignature(base.Music21Object):
         <music21.key.KeySignature of 4 flats>
         ''')
 
-
-    def _getMode(self):
-        return self._mode
-
-    def _setMode(self, value):
-        if value != self._mode:
-            self._mode = value
-            self._attributesChanged()
-
-    mode = property(_getMode, _setMode,
-        doc = '''
-        Get or set the mode.
-        
-        Mode is supported in a very rough manner for `KeySignature`
-        objects, but for more sophisticated use of modes use the 
-        :class:`~music21.key.Key` object.
-
-        Mode may disappear in future releases so if you are counting
-        on this for major or minor, consider supporting the :class:`~music21.key.Key` object
-        instead.
-        ''')
 
 # some ideas
 # c1 = chord.Chord(["D", "F", "A"])
@@ -874,7 +806,7 @@ class Key(KeySignature, scale.DiatonicScale):
             else:
                 mode = mode.lower()
             sharps = pitchToSharps(tonic, mode)
-            KeySignature.__init__(self, sharps, mode)
+            KeySignature.__init__(self, sharps)
 
         scale.DiatonicScale.__init__(self, tonic=tonic)
 
@@ -1063,8 +995,8 @@ class Key(KeySignature, scale.DiatonicScale):
         else:
             post = super(Key, self).transpose(value, inPlace)
         
-        p1, unused_mode = post.pitchAndMode
-        post.tonic = p1
+        postKey = post.asKey(self.mode)
+        post.tonic = postKey.tonic
         post._attributesChanged()
 
         # mode is already set

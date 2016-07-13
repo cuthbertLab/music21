@@ -1825,8 +1825,8 @@ class Interval(IntervalBase):
         Called during __init__ to assign attributes.
         '''
         # catch case where only one Note is provided
-        if (self._noteStart != None and self._noteEnd == None or 
-            self._noteEnd != None and self._noteStart == None):
+        if ((self._noteStart is not None and self._noteEnd is None) or 
+                (self._noteEnd is not None and self._noteStart is None)):
             raise IntervalException('either both the starting and the ending note.Note must be ' +
                 'given or neither can be given.  You cannot have one without the other.')
 
@@ -2158,7 +2158,7 @@ class Interval(IntervalBase):
         >>> aInterval.reverse()
         <music21.interval.Interval m-3>
         '''
-        if self._noteStart != None and self._noteEnd != None:
+        if self._noteStart is not None and self._noteEnd is not None:
             return Interval(noteStart=self._noteEnd, noteEnd=self._noteStart)
         else:
             return Interval(diatonic=self.diatonic.reverse(),

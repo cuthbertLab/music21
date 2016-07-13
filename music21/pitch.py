@@ -454,7 +454,7 @@ def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=
     oldPitches = [p if isinstance(p, Pitch) else Pitch(p) for p in pitches]
 
     if keyContext:
-        oldPitches = [keyContext.pitchAndMode[0]] + oldPitches
+        oldPitches = [keyContext.asKey('major').tonic] + oldPitches
         remove_first = True
     else:
         remove_first = False
@@ -567,7 +567,8 @@ class Microtone(SlottedObjectMixin):
             return common.defaultDeepcopy(self, memo)
 
     def __eq__(self, other):
-        '''Compare cents.
+        '''
+        Compare cents (including harmonicShift)
 
         >>> m1 = pitch.Microtone(20)
         >>> m2 = pitch.Microtone(20)
@@ -576,12 +577,17 @@ class Microtone(SlottedObjectMixin):
         True
         >>> m1 == m3
         False
+        
+        >>> m2.harmonicShift = 3
+        >>> m1 == m2
+        False
         '''
-        if other is None:
+        try:
+            if other.cents == self.cents:
+                return True
             return False
-        if other.cents == self.cents:
-            return True
-        return False
+        except AttributeError:
+            return False
 
     def __hash__(self):
         hashValues = (
@@ -733,18 +739,20 @@ class Accidental(SlottedObjectMixin):
         self.set(specifier)
 
     ### SPECIAL METHODS ###
-    def __hash__(self):
-        hashValues = (
-        self._alter,
-        self._displayStatus,
-        self._displayType,
-        self._modifier,
-        self._name,
-        self.displayLocation,
-        self.displaySize,
-        self.displayStyle,
+    def _hashValues(self):
+        return (
+            self._alter,
+            self._displayStatus,
+            self._displayType,
+            self._modifier,
+            self._name,
+            self.displayLocation,
+            self.displaySize,
+            self.displayStyle,
         )
-        return hash(hashValues)
+    
+    def __hash__(self):
+        return hash(self._hashValues())
 
     def __deepcopy__(self, memo):
         if type(self) is Accidental: # pylint: disable=unidiomatic-typecheck
@@ -1441,8 +1449,8 @@ class Pitch(object):
             return name
 
     def __eq__(self, other):
-        '''Do not accept enharmonic equivalance.
-
+        '''
+        Do not accept enharmonic equivalance.
 
         >>> a = pitch.Pitch('c2')
         >>> a.octave
@@ -1554,7 +1562,8 @@ class Pitch(object):
         return self.__lt__(other) or self.__eq__(other)
 
     def __gt__(self, other):
-        '''Accepts enharmonic equivalance. Based entirely on pitch space
+        '''
+        Accepts enharmonic equivalance. Based entirely on pitch space
         representation.
 
         >>> a = pitch.Pitch('d4')
@@ -1572,7 +1581,6 @@ class Pitch(object):
         Greater than or equal.  Based on the accidentals' alter function.
         Note that to be equal enharmonics must be the same. So two pitches can
         be neither lt or gt and not equal to each other!
-
 
         >>> a = pitch.Pitch('d4')
         >>> b = pitch.Pitch('d8')
@@ -3927,10 +3935,13 @@ class Pitch(object):
         else: # try to process
             intervalObj = interval.Interval(value)
 
+
+        p = intervalObj.transposePitch(self)
+        
+        
         if not inPlace:
-            return intervalObj.transposePitch(self)
+            return p
         else:
-            p = intervalObj.transposePitch(self)
             # can setName with nameWithOctave to recreate all essential
             # pitch attributes
             # NOTE: in some cases this may not return exactly the proper config
@@ -4090,7 +4101,6 @@ class Pitch(object):
 
         >>> b._nameInKeySignature(ks.alteredPitches)
         False
-
         '''
         for p in alteredPitches: # all are altered tones, must have acc
             if p.step == self.step: # A# to A or A# to A-, etc

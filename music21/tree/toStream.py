@@ -34,7 +34,7 @@ def chordified(timespans, templateStream=None):
     >>> chordifiedScore.show('text')
     {0.0} <music21.stream.Measure 0 offset=0.0>
         {0.0} <music21.clef.TrebleClef>
-        {0.0} <music21.key.KeySignature of 3 sharps, mode minor>
+        {0.0} <music21.key.Key of f# minor>
         {0.0} <music21.meter.TimeSignature 4/4>
         {0.0} <music21.chord.Chord A3 E4 C#5>
         {0.5} <music21.chord.Chord G#3 B3 E4 B4>
@@ -67,7 +67,8 @@ def chordified(timespans, templateStream=None):
         mos = templateStream.measureOffsetMap()
         templateOffsets = list(mos)
         templateOffsets.append(templateStream.duration.quarterLength)
-        if hasattr(templateStream, 'parts') and templateStream.iter.parts:
+        if (hasattr(templateStream, 'parts') 
+                and templateStream.iter.parts):
             outputStream = templateStream.iter.parts[0].measureTemplate(fillWithRests=False)
         else:
             outputStream = templateStream.measureTemplate(fillWithRests=False)

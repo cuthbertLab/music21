@@ -3669,7 +3669,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> soprEmpty.show('text')
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
-            {0.0} <music21.key.KeySignature of 3 sharps, mode minor>
+            {0.0} <music21.key.Key of f# minor>
             {0.0} <music21.meter.TimeSignature 4/4>
             {0.0} <music21.note.Rest rest>
         {1.0} <music21.stream.Measure 1 offset=1.0>
@@ -3690,7 +3690,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> altoEmpty.show('text')
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
-            {0.0} <music21.key.KeySignature of 3 sharps, mode minor>
+            {0.0} <music21.key.Key of f# minor>
             {0.0} <music21.meter.TimeSignature 4/4>
         {1.0} <music21.stream.Measure 1 offset=1.0>
         <BLANKLINE>
@@ -4414,7 +4414,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.layout.SystemLayout>
             {0.0} <music21.clef.Treble8vbClef>
-            {0.0} <music21.key.KeySignature of 1 flat, mode major>
+            {0.0} <music21.key.Key of F major>
             {0.0} <music21.meter.TimeSignature 2/4>
             {0.0} <music21.note.Note C>
             {1.5} <music21.note.Note D>
@@ -8684,6 +8684,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         objects usually have by default a Duration of zero. This is an important difference
         between them and :class:`music21.note.Note` objects.
 
+        key.Key objects are subclasses of Scales, which DO have a .pitches list, but
+        they are specifically exempt from looking for pitches, since that is unlikely
+        what someone wants here.
+
         N.B., TODO: This may turn to an Iterator soon.
 
         >>> from music21 import corpus
@@ -8703,9 +8707,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> partOnePitches[0].octave
         4
 
-        Since pitches are found from within internal objects,
-        flattening the stream is not required:
-
+        Since all elements with a `.pitches` list are returned and streams themselves have
+        `.pitches` properties (the docs you are reading now), pitches from embedded streams
+        are also returned.  Flattening a stream is not necessary.  Whether this is a
+        feature or a bug is in the eye of the beholder.
+        
         >>> len(a.pitches)
         104
 
@@ -8722,6 +8728,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         post = []
         for e in self.elements:
+            if 'music21.key.Key' in e.classSet: # use fully qualified name 
+                continue
             if hasattr(e, "pitch"):
                 post.append(e.pitch)
             # both Chords and Stream have a pitches properties; this just
@@ -9767,7 +9775,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 {0.0} <music21.layout.SystemLayout>
                 ...
                 {0.0} <music21.clef.BassClef>
-                {0.0} <music21.key.KeySignature of 2 sharps, mode major>
+                {0.0} <music21.key.Key of D major>
                 {0.0} <music21.meter.TimeSignature 4/4>
                 {0.0} <music21.stream.Voice 3>
                     {0.0} <music21.note.Note E>
@@ -9794,7 +9802,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {0.0} <music21.stream.Part 0x109bbb828>
             {0.0} <music21.stream.Measure 1 offset=0.0>
                 {0.0} <music21.clef.TrebleClef>
-                {0.0} <music21.key.KeySignature of 2 sharps, mode major>
+                {0.0} <music21.key.Key of D major>
                 {0.0} <music21.meter.TimeSignature 4/4>
                 {0.0} <music21.note.Note E>
                 ...
@@ -9808,7 +9816,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {0.0} <music21.stream.Part 0x109bbbcf8>
             {0.0} <music21.stream.Measure 1 offset=0.0>
                 {0.0} <music21.clef.BassClef>
-                {0.0} <music21.key.KeySignature of 2 sharps, mode major>
+                {0.0} <music21.key.Key of D major>
                 ...
                 {3.5} <music21.note.Note B>
             {4.0} <music21.stream.Measure 2 offset=4.0>

@@ -97,7 +97,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(
             richMetadata.keySignatureFirst,
-            '<music21.key.KeySignature of 1 flat, mode major>',
+            '<music21.key.Key of F major>',
             )
 
         self.assertEqual(str(richMetadata.timeSignatureFirst), '2/4')
@@ -112,7 +112,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(rmdNew.timeSignatureFirst), '2/4')
         self.assertEqual(
             str(rmdNew.keySignatureFirst),
-            '<music21.key.KeySignature of 1 flat, mode major>',
+            '<music21.key.Key of F major>',
             )
 
         score = corpus.parse('bwv66.6')
@@ -122,7 +122,7 @@ class Test(unittest.TestCase):
         richMetadata.update(score)
         self.assertEqual(
             str(richMetadata.keySignatureFirst),
-            '<music21.key.KeySignature of 3 sharps, mode minor>',
+            '<music21.key.Key of f# minor>',
             )
         self.assertEqual(str(richMetadata.timeSignatureFirst), '4/4')
 
@@ -132,7 +132,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(rmdNew.timeSignatureFirst), '4/4')
         self.assertEqual(
             str(rmdNew.keySignatureFirst),
-            '<music21.key.KeySignature of 3 sharps, mode minor>',
+            '<music21.key.Key of f# minor>',
             )
 
     def testWorkIds(self):
@@ -210,9 +210,9 @@ class Test(unittest.TestCase):
                             },
                             "__class__": "music21.interval.Interval"
                         },
-                        "keySignatureFirst": "<music21.key.KeySignature of 3 sharps, mode minor>",
+                        "keySignatureFirst": "<music21.key.Key of f# minor>",
                         "keySignatures": [
-                            "<music21.key.KeySignature of 3 sharps, mode minor>"
+                            "<music21.key.Key of f# minor>"
                         ],
                         "noteCount": 165,
                         "pitchHighest": "E5",

@@ -4201,7 +4201,7 @@ class MeasureExporter(XMLExporterBase):
         # TODO: attr: print-object
         return mxTime
 
-    def keySignatureToXml(self, keySignature):
+    def keySignatureToXml(self, keyOrKeySignature):
         '''
         returns a key tag from a music21
         key.KeySignature or key.Key object
@@ -4239,16 +4239,15 @@ class MeasureExporter(XMLExporterBase):
         # Choice traditional-key
         
         # TODO: cancel
-        seta(keySignature, mxKey, 'fifths', 'sharps')
-        if keySignature.mode is not None:
+        seta(keyOrKeySignature, mxKey, 'fifths', 'sharps')
+        if hasattr(keyOrKeySignature, 'mode') and keyOrKeySignature.mode is not None:
             if (environLocal.xmlReaderType() == 'Musescore' 
-                    and keySignature.mode not in ('major', 'minor')):
+                    and keyOrKeySignature.mode not in ('major', 'minor')):
                 # Musescore up to v. 2 has major problems with modes other than major or minor
                 # Fixed in latest Nightlys
                 pass            
             else:
-                seta(keySignature, mxKey, 'mode')
-                
+                seta(keyOrKeySignature, mxKey, 'mode')
                 
         # TODO: key-octave
         return mxKey

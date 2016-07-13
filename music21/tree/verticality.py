@@ -423,7 +423,7 @@ class Verticality(object):
             else:
                 element = timespan
 
-            if hasattr(element, 'pitches'):
+            if 'music21.key.Key' not in element.classSet and hasattr(element, 'pitches'):
                 pitches = [x.nameWithOctave for x in element.pitches]
                 pitchSet.update(pitches)
         for timespan in self.overlapTimespans:
@@ -432,7 +432,7 @@ class Verticality(object):
             else:
                 element = timespan
 
-            if hasattr(element, 'pitches'):
+            if 'music21.key.Key' not in element.classSet and hasattr(element, 'pitches'):
                 pitches = [x.nameWithOctave for x in element.pitches]
                 pitchSet.update(pitches)
         pitchSet = set([pitch.Pitch(x) for x in pitchSet])

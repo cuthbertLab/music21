@@ -270,10 +270,11 @@ class FiguredBassLine(object):
         >>> sBach = corpus.parse('bach/bwv307')
         >>> sBach['bass'].measure(0).show("text")
         {0.0} <music21.clef.BassClef>
-        {0.0} <music21.key.KeySignature of 2 flats, mode major>
+        {0.0} <music21.key.Key of B- major>
         {0.0} <music21.meter.TimeSignature 4/4>
         {0.0} <music21.note.Note B->
         {0.5} <music21.note.Note C>
+
         >>> fbLine = realizer.figuredBassFromStream(sBach['bass'])
         >>> fbLine.generateBassLine().measure(1).show("text")
         {0.0} <music21.clef.BassClef>

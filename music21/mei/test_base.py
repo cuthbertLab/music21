@@ -2547,10 +2547,10 @@ class TestStaffDefFromElement(unittest.TestCase):
                       for n in range(4)]
         for eachElem in innerElems:
             elem.append(eachElem)
-        expected = {'1': {'key': key.KeySignature(sharps=-1, mode='major')},
-                    '2': {'key': key.KeySignature(sharps=-2, mode='major')},
-                    '3': {'key': key.KeySignature(sharps=-3, mode='major')},
-                    '4': {'key': key.KeySignature(sharps=-4, mode='major')}}
+        expected = {'1': {'key': key.Key('F')},
+                    '2': {'key': key.Key('B-')},
+                    '3': {'key': key.Key('E-')},
+                    '4': {'key': key.Key('A-')}}
 
         actual = base.staffGrpFromElement(elem, None)
 
@@ -2569,10 +2569,10 @@ class TestStaffDefFromElement(unittest.TestCase):
         for eachElem in innerElems:
             innerGrp.append(eachElem)
         elem.append(innerGrp)
-        expected = {'1': {'key': key.KeySignature(sharps=-1, mode='major')},
-                    '2': {'key': key.KeySignature(sharps=-2, mode='major')},
-                    '3': {'key': key.KeySignature(sharps=-3, mode='major')},
-                    '4': {'key': key.KeySignature(sharps=-4, mode='major')}}
+        expected = {'1': {'key': key.Key('F')},
+                    '2': {'key': key.Key('B-')},
+                    '3': {'key': key.Key('E-')},
+                    '4': {'key': key.Key('A-')}}
 
         actual = base.staffGrpFromElement(elem, None)
 

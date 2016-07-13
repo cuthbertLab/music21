@@ -133,7 +133,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
 
     recordedSignal = numpy.array(recordedSignal)
     correlation = fftconvolve(recordedSignal, recordedSignal[::-1], mode='full')
-    lengthCorrelation = len(correlation) / 2
+    lengthCorrelation = len(correlation) // 2
     correlation = correlation[lengthCorrelation:]
     difference = numpy.diff(correlation) #  Calculates the difference between slots
     positiveDifferences = matplotlib.mlab.find(difference > 0)

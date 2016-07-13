@@ -865,7 +865,7 @@ class RichMetadata(Metadata):
                 if ratioString not in self.timeSignatures:
                     self.timeSignatures.append(ratioString)
             elif isinstance(element, key.KeySignature):
-                keySignatureString = str(element)
+                keySignatureString = repr(element) # repr not str for key.Key objects
                 if keySignatureString not in self.keySignatures:
                     self.keySignatures.append(keySignatureString)
             elif isinstance(element, tempo.TempoIndication):

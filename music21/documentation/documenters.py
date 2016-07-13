@@ -286,20 +286,19 @@ class AttributeDocumenter(MemberDocumenter):
     '''
     A documenter for class attributes, both read/write and read-only:
 
-    >>> attribute = key.KeySignature.mode
+    >>> attribute = key.KeySignature.sharps
     >>> documenter = documentation.documenters.AttributeDocumenter(
-    ...     attribute, 'mode', key.KeySignature)
+    ...     attribute, 'sharps', key.KeySignature)
     >>> documenter
-    <music21.documentation.documenters.AttributeDocumenter: music21.key.KeySignature.mode>
+    <music21.documentation.documenters.AttributeDocumenter: music21.key.KeySignature.sharps>
 
     >>> documenter.rstCrossReferenceString
-    ':attr:`~music21.key.KeySignature.mode`'
+    ':attr:`~music21.key.KeySignature.sharps`'
 
     >>> for line in documenter.rstAutodocDirectiveFormat:
     ...     line
-    '.. autoattribute:: music21.key.KeySignature.mode'
+    '.. autoattribute:: music21.key.KeySignature.sharps'
     ''
-
     '''
 
     ### PUBLIC PROPERTIES ###

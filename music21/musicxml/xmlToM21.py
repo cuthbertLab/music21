@@ -3465,23 +3465,55 @@ class MeasureParser(XMLParserBase):
         return clefObj
         
     def handleKeySignature(self, mxKey):
+        '''
+        convert mxKey to a Key or KeySignature and run insertCoreAndRef on it
+        '''
         keySig = self.xmlToKeySignature(mxKey)
         self.insertCoreAndRef(0, mxKey, keySig)
 
     def xmlToKeySignature(self, mxKey):
         '''
+        Returns either a KeySignature or a Key object based on whether mode is present.
+        
         >>> import xml.etree.ElementTree as ET
+        >>> mxKey = ET.fromstring('<key><fifths>-4</fifths></key>')
+        
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> MP.xmlToKeySignature(mxKey)
+        <music21.key.KeySignature of 4 flats>
+
+
         >>> mxKey = ET.fromstring('<key><fifths>-4</fifths><mode>minor</mode></key>')
         
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.xmlToKeySignature(mxKey)
-        <music21.key.KeySignature of 4 flats, mode minor>
+        <music21.key.Key of f minor>
+
+
+        Invalid modes get ignored and returned as KeySignatures
+
+        >>> mxKey = ET.fromstring('<key><fifths>-4</fifths><mode>crazy</mode></key>')
+        
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> MP.xmlToKeySignature(mxKey)
+        <music21.key.KeySignature of 4 flats>
         '''
         ks = key.KeySignature()
         seta = _setAttributeFromTagText
         seta(ks, mxKey, 'fifths', 'sharps', transform=int)
-        seta(ks, mxKey, 'mode')
-        return ks
+        
+        mxKeyMode = mxKey.find('mode')
+        if mxKeyMode is None:
+            return ks
+
+        modeValue = mxKeyMode.text
+        if modeValue in (None, ""):
+            return ks
+        try:
+            k = ks.asKey(modeValue)
+            return k
+        except exceptions21.Music21Exception:
+            return ks # mxKeyMode might not be a valid mode -- in which case ignore...
     
     def handleStaffDetails(self, mxDetails):
         '''

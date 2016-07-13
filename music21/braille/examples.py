@@ -94,7 +94,7 @@ Key Signature 2 flat(s) ⠣⠣
 Time Signature 3/8 ⠼⠉⠦
 <BLANKLINE>
 Measure 1 Left, Signature Grouping 1:
-<music21.key.KeySignature of 2 flats, mode major>
+B- major
 <music21.meter.TimeSignature 3/8>
 ====
 Measure 1 Right, Note Grouping 1:
@@ -287,7 +287,7 @@ Key Signature 2 flat(s) ⠣⠣
 Time Signature 3/8 ⠼⠉⠦
 
 Measure 1 Left, Signature Grouping 1:
-<music21.key.KeySignature of 2 flats, mode major>
+B- major
 <music21.meter.TimeSignature 3/8>
 ====
 Measure 1 Right, Note Grouping 1:

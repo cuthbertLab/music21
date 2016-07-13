@@ -506,7 +506,7 @@ class ElementTree(core.AVLTree):
         >>> listOfTuples = [(e.sortTuple(bFlat), e) for e in bFlat]
         >>> listOfTuples[10]
         (SortTuple(atEnd=0, offset=0.0, priority=0, ...), 
-         <music21.key.KeySignature of 3 sharps, mode minor>)
+         <music21.key.Key of f# minor>)
 
         >>> t = tree.trees.ElementTree()
         >>> t.rootNode is None
@@ -524,7 +524,7 @@ class ElementTree(core.AVLTree):
         <ElementNode: Start:6.0 <0.20...>  Indices:(l:0 *48* r:97) Payload:<music21.note.Note B>>
         <ElementNode: Start:0.5 <0.20...>  Indices:(l:0 *24* r:48) Payload:<music21.note.Note G#>>
         <ElementNode: Start:0.0 <0.2...>   Indices:(l:0 *12* r:24) 
-            Payload:<music21.key.KeySignature of 3 sharps, mode minor>>
+            Payload:<music21.key.Key of f# minor>>
         <ElementNode: Start:0.0 <0.0...>   Indices:(l:0 *6* r:12) Payload:<music21.clef.TrebleClef>>
         <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *3* r:6) 
             Payload:<music21.instrument.Instrument P3: Tenor: Instrument 3>>

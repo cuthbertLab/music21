@@ -388,14 +388,81 @@ def example5_4():
     u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
+    >>> print(translate.partToBraille(test.example5_4(), inPlace=True, suppressOctaveMarks=True,
+    ...           debug=True))
+    ---begin segment---
+    <music21.braille.segment BrailleSegment>
+    Measure 1, Signature Grouping 1:
+    Time Signature 4/4 ⠼⠙⠲
+    ===
+    Measure 1, Note Grouping 1:
+    <music21.clef.BassClef>
+    E half ⠏
+    F half ⠟
+    ===
+    Measure 2, Note Grouping 1:
+    G whole ⠷
+    ===
+    Measure 3, Note Grouping 1:
+    E half ⠏
+    D half ⠕
+    ===
+    Measure 4, Note Grouping 1:
+    C whole ⠽
+    ===
+    Measure 5, Note Grouping 1:
+    D half ⠕
+    E half ⠏
+    ===
+    Measure 6, Note Grouping 1:
+    F half ⠟
+    E half ⠏
+    ===
+    Measure 7, Note Grouping 1:
+    D whole ⠵
+    ===
+    Measure 8, Note Grouping 1:
+    Rest whole ⠍
+    ===
+    Measure 9, Note Grouping 1:
+    C half ⠝
+    D half ⠕
+    ===
+    Measure 10, Note Grouping 1:
+    E whole ⠯
+    ===
+    Measure 11, Note Grouping 1:
+    F half ⠟
+    G half ⠗
+    ===
+    Measure 12, Note Grouping 1:
+    A whole ⠮
+    ===
+    Measure 13, Note Grouping 1:
+    G half ⠗
+    F half ⠟
+    ===
+    Measure 14, Note Grouping 1:
+    E half ⠏
+    D half ⠕
+    ===
+    Measure 15, Note Grouping 1:
+    C whole ⠽
+    ===
+    Measure 16, Note Grouping 1:
+    Rest whole ⠍
+    Barline final ⠣⠅
+    ===
+    ---end segment---
+    
     >>> print(translate.partToBraille(test.example5_4(), inPlace=True, suppressOctaveMarks=True))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠏⠟⠀⠷⠀⠏⠕⠀⠽⠀⠕⠏⠀⠟⠏⠀⠵⠀⠍⠀⠝⠕⠀⠯⠀⠟⠗⠀⠮⠀⠗⠟⠀⠏⠕⠀⠽
     ⠀⠀⠍⠣⠅
 
     """
-    bm = converter.parse("tinynotation: 4/4 E2 F2 G1 E2 D2 C1 D2 E2 F2 E2 D1 r1 \
-    C2 D2 E1 F2 G2 A1 G2 F2 E2 D2 C1 r1")
+    bm = converter.parse("tinynotation: 4/4 E2 F2 G1 E2 D2 C1 D2 E2 F2 E2 D1 r1 " + 
+                            "C2 D2 E1 F2 G2 A1 G2 F2 E2 D2 C1 r1")
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     return bm
 
@@ -403,6 +470,78 @@ def example5_5():
     u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
+    >>> print(translate.partToBraille(test.example5_5(), inPlace=True, suppressOctaveMarks=True,
+    ...           debug=True))
+    ---begin segment---
+    <music21.braille.segment BrailleSegment>
+    Measure 1, Signature Grouping 1:
+    Time Signature 3/4 ⠼⠉⠲
+    ===
+    Measure 1, Note Grouping 1:
+    <music21.clef.BassClef>
+    F half ⠟
+    Dot ⠄
+    ===
+    Measure 2, Note Grouping 1:
+    Rest whole ⠍
+    ===
+    Measure 3, Note Grouping 1:
+    A half ⠎
+    Dot ⠄
+    ===
+    Measure 4, Note Grouping 1:
+    Rest whole ⠍
+    ===
+    Measure 5, Note Grouping 1:
+    F quarter ⠻
+    G quarter ⠳
+    A quarter ⠪
+    ===
+    Measure 6, Note Grouping 1:
+    C quarter ⠹
+    A quarter ⠪
+    F quarter ⠻
+    ===
+    Measure 7, Note Grouping 1:
+    G quarter ⠳
+    Rest half ⠥
+    ===
+    Measure 8, Note Grouping 1:
+    Rest whole ⠍
+    ===
+    Measure 9, Note Grouping 1:
+    E half ⠏
+    Dot ⠄
+    ===
+    Measure 10, Note Grouping 1:
+    Rest whole ⠍
+    ===
+    Measure 11, Note Grouping 1:
+    G half ⠗
+    Dot ⠄
+    ===
+    Measure 12, Note Grouping 1:
+    Rest whole ⠍
+    ===
+    Measure 13, Note Grouping 1:
+    C quarter ⠹
+    D quarter ⠱
+    E quarter ⠫
+    ===
+    Measure 14, Note Grouping 1:
+    G quarter ⠳
+    E quarter ⠫
+    C quarter ⠹
+    ===
+    Measure 15, Note Grouping 1:
+    F quarter ⠻
+    Rest half ⠥
+    ===
+    Measure 16, Note Grouping 1:
+    Rest whole ⠍
+    Barline final ⠣⠅
+    ===
+    ---end segment---
     >>> print(translate.partToBraille(test.example5_5(), inPlace=True, suppressOctaveMarks=True))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠟⠄⠀⠍⠀⠎⠄⠀⠍⠀⠻⠳⠪⠀⠹⠪⠻⠀⠳⠥⠀⠍⠀⠏⠄⠀⠍⠀⠗⠄⠀⠍⠀⠹⠱⠫
