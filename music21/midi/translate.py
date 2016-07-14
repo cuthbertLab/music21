@@ -2576,8 +2576,8 @@ class Test(unittest.TestCase):
         p2 = copy.deepcopy(p1)
         p3 = copy.deepcopy(p1)
 
-        t1 = interval.Interval(12.5) # a sharp p4
-        t2 = interval.Interval(-12.25) # a sharp p4
+        t1 = interval.Interval(12.5) # octave + half sharp
+        t2 = interval.Interval(-12.25) # octave down minus 1/8th tone
         p2.transpose(t1, inPlace=True)
         p3.transpose(t2, inPlace=True)
         post = stream.Score()
@@ -2592,7 +2592,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mts[0].getProgramChanges(),  [0])
         self.assertEqual(mts[1].getChannels(),  [1, 2])
         self.assertEqual(mts[1].getProgramChanges(),  [0])
-        self.assertEqual(mts[2].getChannels(),  [1, 2, 3])
+        self.assertEqual(mts[2].getChannels(),  [1, 3])
         self.assertEqual(mts[2].getProgramChanges(),  [0])
 
         #post.show('midi', app='Logic Express')
@@ -2628,10 +2628,10 @@ class Test(unittest.TestCase):
         self.assertEqual(mts[1].getProgramChanges(),  [56])
         
         #print(mts[2])
-        self.assertEqual(mts[2].getChannels(),  [3, 4, 5])
+        self.assertEqual(mts[2].getChannels(),  [3, 5])
         self.assertEqual(mts[2].getProgramChanges(),  [26])
 
-        #post.show('midi', app='Logic Express')
+        #post.show('midi')#, app='Logic Express')
 
     def testMidiTempoImportA(self):
         import os

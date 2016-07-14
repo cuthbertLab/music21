@@ -35,7 +35,7 @@ class FiguredBassScale(object):
                  'keySig': 'A :class:`~music21.key.KeySignature` corresponding to ' + 
                     'the scale value and mode.'}
     
-    def __init__(self, scaleValue = 'C', scaleMode = 'major'):
+    def __init__(self, scaleValue='C', scaleMode='major'):
         '''
         Acts as a wrapper for :class:`~music21.scale.Scale`. Used to represent the
         concept of a figured bass scale, with a scale value and mode.
@@ -50,6 +50,12 @@ class FiguredBassScale(object):
         <music21.scale.MajorScale C major>
         >>> fbScale.keySig
         <music21.key.KeySignature of no sharps or flats>
+
+        >>> fbScale = realizerScale.FiguredBassScale('d', 'minor')
+        >>> fbScale.realizerScale
+        <music21.scale.MinorScale D minor>
+        >>> fbScale.keySig
+        <music21.key.KeySignature of 1 flat>
         '''
         try:
             foo = scaleModes[scaleMode]
@@ -84,8 +90,7 @@ class FiguredBassScale(object):
             bassNote = note.Note(bassPitchCopy)
             if (self.keySig.accidentalByStep(bassNote.pitch.step)
                     != bassNote.pitch.accidental):
-                bassNote.pitch.accidental = \
-                    self.keySig.accidentalByStep(bassNote.pitch.step)
+                bassNote.pitch.accidental = self.keySig.accidentalByStep(bassNote.pitch.step)
             bassSD = self.realizerScale.getScaleDegreeFromPitch(bassNote.pitch)
 
         pitchNames = []
@@ -144,12 +149,14 @@ class FiguredBassScale(object):
         samplePitches = self.getPitches(bassPitch, notationString, maxPitch)
         return samplePitches
         
-    def getPitches(self, bassPitch, notationString = None, maxPitch=pitch.Pitch('B5')):
+    def getPitches(self, bassPitch, notationString=None, maxPitch=None):
         '''
         Takes in a bassPitch, a notationString, and a maxPitch representing the highest
         possible pitch that can be returned. Returns a sorted list of pitches which
         correspond to the pitches of each specific pitch name found through getPitchNames
         that fall between the bassPitch and the maxPitch, inclusive of both.
+
+        if maxPitch is None, then B5 s used instead.
 
         >>> from music21.figuredBass import realizerScale
         >>> fbScale = realizerScale.FiguredBassScale()
@@ -170,6 +177,9 @@ class FiguredBassScale(object):
         [<music21.pitch.Pitch G3>, <music21.pitch.Pitch B3>, 
          <music21.pitch.Pitch D4>, <music21.pitch.Pitch F4>]
         '''
+        if maxPitch is None:
+            maxPitch = pitch.Pitch('B5')
+        
         bassPitch = convertToPitch(bassPitch)
         maxPitch = convertToPitch(maxPitch)
         pitchNames = self.getPitchNames(bassPitch, notationString)
@@ -193,7 +203,7 @@ class FiguredBassScale(object):
         return allPitches
     
     def __repr__(self):
-        return "<music21.figuredBass.realizerScale FiguredBassScale>"
+        return "<music21.figuredBass.realizerScale.FiguredBassScale: %s>" % repr(self.realizerScale)
     
     
 class FiguredBassScaleException(exceptions21.Music21Exception):
