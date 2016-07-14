@@ -1774,24 +1774,57 @@ class Pitch(object):
 
 
     def getCentShiftFromMidi(self):
-        '''Get cent deviation of this pitch from MIDI pitch.
+        '''
+        Get cent deviation of this pitch from MIDI pitch.
 
         >>> p = pitch.Pitch('c~4')
-        >>> p.midi # midi values automatically round up
+        >>> p.ps
+        60.5
+        >>> p.midi # midi values automatically round up at 0.5
         61
         >>> p.getCentShiftFromMidi()
-        50
+        -50
+        >>> p.microtone = -25
+        >>> p.ps
+        60.25
+        >>> p.midi
+        60
+        >>> p.getCentShiftFromMidi()
+        25
+
+        
         >>> p = pitch.Pitch('c#4')
         >>> p.microtone = -25
+        >>> p.ps
+        60.75
+        >>> p.midi
+        61
         >>> p.getCentShiftFromMidi()
         -25
 
         >>> p = pitch.Pitch('c#~4')
+        >>> p.ps
+        61.5
+        >>> p.midi
+        62
         >>> p.getCentShiftFromMidi()
-        50
+        -50        
+        >>> p.microtone = -3
+        >>> p.ps
+        61.47
+        >>> p.midi
+        61
+        >>> p.getCentShiftFromMidi()
+        47
         >>> p.microtone = 3
+        >>> p.ps
+        61.53
+        >>> p.midi
+        62
+        >>> p.accidental
+        <accidental one-and-a-half-sharp>
         >>> p.getCentShiftFromMidi()
-        53
+        -47
 
         >>> p = pitch.Pitch('c`4') # quarter tone flat
         >>> p.getCentShiftFromMidi()
@@ -1799,21 +1832,35 @@ class Pitch(object):
         >>> p.microtone = 3
         >>> p.getCentShiftFromMidi()
         -47
+        
+        Absurd octaves that MIDI can't handle will still give the right sounding pitch
+        out of octave:
+        
+        >>> p = pitch.Pitch('c~4')
+        >>> p.octave = 10
+        >>> p.ps
+        132.5
+        >>> p.midi
+        121
+        >>> p.getCentShiftFromMidi()
+        -50        
+        >>> p.octave = -1
+        >>> p.getCentShiftFromMidi()
+        -50        
+        >>> p.octave = -2
+        >>> p.getCentShiftFromMidi()
+        -50        
         '''
-        #return (self.ps - self.midi) * 100 # wrong way
-        #return int(round(self._getAlter() * 100))
+        midiDistance = self.ps - self.midi
+        
+        # correct for absurd octaves
+        while midiDistance < -11.0:
+            midiDistance += 12.0    
+        while midiDistance > 11.0:
+            midiDistance -= 12.0
+        
+        return int(round(midiDistance * 100))
 
-        # see if we have a quarter tone alter
-
-        # if a quarter tone, get necessary shift above or below the
-        # standard accidental
-        shift = 0
-        if self.accidental is not None:
-            if self.accidental.name in ['half-sharp', 'one-and-a-half-sharp']:
-                shift = 50
-            elif self.accidental.name in ['half-flat', 'one-and-a-half-flat']:
-                shift = -50
-        return int(round(shift + self.microtone.cents))
 
     @property
     def alter(self):
@@ -2082,11 +2129,17 @@ class Pitch(object):
         '''
         see docs below, under property midi
         '''
-        def schoolYardRounding(x, d=0):
-            p = 10 ** d
-            return float(math.floor((x * p) + math.copysign(0.5, x)))/p
+        def schoolYardRounding(x):
+            '''
+            Python 3 now uses rounding mechanisms so that odd numbers round one way, even another.
+            But we need a consistent direction for all half-sharps/flats to go, and we need
+            the same behavior in Python 2 and 3.
+            
+            This is round "up" at .5 (regardless of negative or positive)
+            '''
+            return math.floor(x + 0.5)
         
-        roundedPS = int(schoolYardRounding(self.ps))
+        roundedPS = schoolYardRounding(self.ps)
         if roundedPS > 127:
             value = (12 * 9) + (roundedPS % 12)
             if value < (127-12):
@@ -2096,26 +2149,6 @@ class Pitch(object):
         else:
             value = roundedPS
         return value
-
-    def getMidiPreCentShift(self):
-        '''
-        If pitch bend will be used to adjust MIDI values, the given pitch values 
-        for microtones should go to the nearest non-microtonal pitch value, 
-        not rounded up or down. This method is used in MIDI output generation.
-
-        >>> p = pitch.Pitch('c~4')
-        >>> p.getMidiPreCentShift()
-        60
-        >>> p = pitch.Pitch('c#4')
-        >>> p.getMidiPreCentShift()
-        61
-        >>> p.microtone = 65
-        >>> p.getMidiPreCentShift()
-        61
-        >>> p.getCentShiftFromMidi()
-        65
-        '''
-        return int(((round(self.ps, 2) * 100) - self.getCentShiftFromMidi()) * .01)
 
     def _setMidi(self, value):
         '''
@@ -2175,6 +2208,10 @@ class Pitch(object):
         160.5
         >>> veryHighFHalfFlat.midi
         125
+        >>> veryHighFHalfFlat.octave = 9
+        >>> veryHighFHalfFlat.midi
+        125
+
 
         >>> notAsHighNote = pitch.Pitch()
         >>> notAsHighNote.ps = veryHighFHalfFlat.midi
@@ -2192,6 +2229,21 @@ class Pitch(object):
         2.0
         >>> a.implicitAccidental
         True
+        
+
+        More absurd octaves...
+        
+        >>> p = pitch.Pitch('c~4')
+        >>> p.octave = -1
+        >>> p.ps
+        0.5
+        >>> p.midi
+        1
+        >>> p.octave = -2
+        >>> p.ps
+        -11.5
+        >>> p.midi
+        1
         ''')
 
     def _getName(self):
@@ -3972,7 +4024,9 @@ class Pitch(object):
 
 
         p = intervalObj.transposePitch(self)
-        
+        # TODO: if p.implicitAccidental, then change enharmonics. 
+        #     (should implicitAccidental be inferredSpelling or soemthing?)
+        p.implicitAccidental = self.implicitAccidental
         
         if not inPlace:
             return p

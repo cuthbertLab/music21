@@ -402,8 +402,7 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
     me1.type = "NOTE_ON"
     me1.channel = channel
     me1.time = None # not required
-    #me1.pitch = n.midi
-    me1.pitch = n.pitch.getMidiPreCentShift() # will shift later, do not round
+    me1.pitch = n.pitch.midi
     if not n.pitch.isTwelveTone():
         me1.centShift = n.pitch.getCentShiftFromMidi()
 
@@ -427,9 +426,7 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
     me2.type = "NOTE_OFF"
     me2.channel = channel
     me2.time = None #d
-    #me2.pitch = n.midi
-    me2.pitch = n.pitch.getMidiPreCentShift() # will shift later, do not round
-    me2.pitchSpace = n.pitch.ps
+    me2.pitch = n.pitch.midi
     if not n.pitch.isTwelveTone():
         me2.centShift = n.pitch.getCentShiftFromMidi()
 
