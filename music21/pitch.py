@@ -40,11 +40,11 @@ except NameError:
 
 STEPREF = {
            'C' : 0,
-           'D' : 2, #2
+           'D' : 2,
            'E' : 4,
            'F' : 5,
            'G' : 7,
-           'A' : 9, #9
+           'A' : 9,
            'B' : 11,
                }
 STEPNAMES = ['C','D','E','F','G','A','B']
@@ -2137,7 +2137,7 @@ class Pitch(object):
             
             This is round "up" at .5 (regardless of negative or positive)
             '''
-            return math.floor(x + 0.5)
+            return int(math.floor(x + 0.5)) # int is required for Python 2!!!
         
         roundedPS = schoolYardRounding(self.ps)
         if roundedPS > 127:
