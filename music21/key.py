@@ -377,11 +377,6 @@ class KeySignature(base.Music21Object):
         # cache altered pitches
         self._alteredPitchesCached = []
 
-    #@common.deprecated("Jan 2014", "Jan 2016", 
-    #        "\n\nMode is deprecated in a KeySignature object. Use Key instead.")
-    #def _mode_is_deprecated(self):
-    #    pass
-
     def __hash__(self):
         hashTuple = (self._sharps, tuple(self._alteredPitches))
         return hash(hashTuple)
@@ -526,8 +521,7 @@ class KeySignature(base.Music21Object):
         <music21.note.Note B->
 
         Set all notes to the correct notes for a key using the 
-        note's Key Context.  Before:              
-        
+        note's Key Context.  Before:
         
         >>> s1 = stream.Stream()
         >>> s1.append(key.KeySignature(4))  # E-major or C-sharp-minor
@@ -617,6 +611,19 @@ class KeySignature(base.Music21Object):
         <music21.key.Key of E- major>
         >>> d.sharps
         -3
+
+        Transposition by semitone (or other chromatic interval)
+        
+        >>> c = key.KeySignature(0)
+        >>> dflat = c.transpose(1)
+        >>> dflat
+        <music21.key.KeySignature of 5 flats>
+        >>> d = dflat.transpose(1)
+        >>> d
+        <music21.key.KeySignature of 2 sharps>
+        >>> eflat = d.transpose(1)
+        >>> eflat
+        <music21.key.KeySignature of 3 flats>
         '''
         if hasattr(value, 'diatonic'): # its an Interval class
             intervalObj = value
@@ -630,7 +637,9 @@ class KeySignature(base.Music21Object):
 
         k1 = post.asKey('major')
         p1 = k1.tonic
-        p2 = p1.transpose(intervalObj)
+        p2 = intervalObj.transposePitch(p1)
+        if isinstance(value, int) and abs(pitchToSharps(p2)) > 6:
+            p2 = p2.getEnharmonic()
         
         post.sharps = pitchToSharps(p2)
         post._attributesChanged()
@@ -692,12 +701,6 @@ class KeySignature(base.Music21Object):
         ''')
 
 
-# some ideas
-# c1 = chord.Chord(["D", "F", "A"])
-# k1 = key.Key("C")
-# c2 = k1.chordFromRomanNumeral("ii")
-# c1 == c2
-# True
 
 # 
 # key1 = Key("E", "major")
@@ -707,32 +710,6 @@ class KeySignature(base.Music21Object):
 # <music21.key.Key E minor>
 # key1.relative
 # <music21.key.Key c# minor>
-# 
-# ks1 = key1.signature
-# ks1
-# <music21.key.KeySignature 4 sharps>
-# ks1.sharpsOrFlats
-# 4
-# ks1.majorKey
-# <music21.key.Key E major>
-# ks1.minorKey
-# <music21.key.Key c# minor>
-# 
-# # Set this E major piece to use a signature of 1 flat
-# key1.signature = KeySignature(-1)
-# 
-# # Check that it's still E major
-# key1
-# <music21.key.Key E major>
-# key1.signature
-# <music21.key.KeySignature 1 flat>
-# key1.sharpsOrFlats
-# -1
-# 
-# # What major key would normally have this signature?
-# key1.signature.majorKey
-# <music21.key.Key F major>
-# 
 
 
 class Key(KeySignature, scale.DiatonicScale):
@@ -772,6 +749,23 @@ class Key(KeySignature, scale.DiatonicScale):
     -8
     >>> Fflatmaj.accidentalByStep('B')
     <accidental double-flat>
+    
+    
+    >>> eDor = key.Key('E', 'dorian')
+    >>> eDor
+    <music21.key.Key of E dorian>
+    >>> eDor.sharps
+    2
+    >>> eDor.pitches
+    [<music21.pitch.Pitch E4>, 
+     <music21.pitch.Pitch F#4>, 
+     <music21.pitch.Pitch G4>, 
+     <music21.pitch.Pitch A4>, 
+     <music21.pitch.Pitch B4>, 
+     <music21.pitch.Pitch C#5>, 
+     <music21.pitch.Pitch D5>, 
+     <music21.pitch.Pitch E5>]
+    
     '''
     _sharps = 0
     _mode = None
@@ -840,6 +834,66 @@ class Key(KeySignature, scale.DiatonicScale):
         # for metadata comparisons
         tonic = self.tonicPitchNameWithCase
         return "%s %s" % (tonic, self.mode)
+
+
+    @property
+    def relative(self):
+        '''
+        if the Key is major or minor, return the relative minor or major.
+        
+        Otherwise, just returns self -- this is the best way to not have random crashes
+        in the middle of large datasets.
+        
+        Note that this uses .sharps as a speedup, so if that has been changed, there
+        will be a problem...
+        
+        >>> k = key.Key('E-')
+        >>> k
+        <music21.key.Key of E- major>
+        >>> k.relative
+        <music21.key.Key of c minor>
+        >>> k.relative.relative
+        <music21.key.Key of E- major>
+        
+        >>> key.Key('D', 'dorian').relative
+        <music21.key.Key of D dorian>
+        '''
+        if self.mode not in ('minor', 'major'):
+            return self
+        
+        if self.mode == 'major':
+            return KeySignature(self.sharps).asKey('minor')
+        else: # minor
+            return KeySignature(self.sharps).asKey('major')
+
+    @property
+    def parallel(self):
+        '''
+        if the Key is major or minor, return the parallel minor or major.
+        
+        Otherwise, just returns self -- this is the best way to not have random crashes
+        in the middle of large datasets.
+        
+        >>> k = key.Key('D')
+        >>> k
+        <music21.key.Key of D major>
+        >>> k.parallel
+        <music21.key.Key of d minor>
+        >>> k.parallel.parallel
+        <music21.key.Key of D major>
+
+        >>> key.Key('D', 'dorian').parallel
+        <music21.key.Key of D dorian>
+        '''
+        if self.mode not in ('minor', 'major'):
+            return self
+        
+        if self.mode == 'major':
+            return Key(self.tonic, 'minor')
+        else: # minor
+            return Key(self.tonic, 'major')
+
+
 
     @property
     def tonicPitchNameWithCase(self):
@@ -982,11 +1036,21 @@ class Key(KeySignature, scale.DiatonicScale):
         <music21.key.Key of e minor>
         >>> changingKey.sharps
         1
+        
         >>> changingKey.transpose(1, inPlace=True)
         >>> changingKey
         <music21.key.Key of f minor>
         >>> changingKey.sharps
         -4
+        >>> changingKey.transpose(1, inPlace=True)
+        >>> changingKey
+        <music21.key.Key of f# minor>
+        >>> changingKey.transpose(1, inPlace=True)
+        >>> changingKey
+        <music21.key.Key of g minor>
+        >>> changingKey.transpose(1, inPlace=True)
+        >>> changingKey
+        <music21.key.Key of g# minor>
 
         '''
         if inPlace is True:

@@ -3611,6 +3611,7 @@ class Pitch(object):
     def getEnharmonic(self, inPlace=False):
         '''
         Returns a new Pitch that is the(/an) enharmonic equivalent of this Pitch.
+        Can be thought of as flipEnharmonic or something like that.
 
         N.B.: n1.name == getEnharmonic(getEnharmonic(n1)).name is not necessarily true.
         For instance:

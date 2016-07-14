@@ -1391,6 +1391,28 @@ class Note(NotRest):
         >>> a
         <music21.note.Note C#>
 
+
+        If the transposition value is an integer, take the KeySignature or Key context
+        into account...
+
+        >>> s = stream.Stream()
+        >>> s.append(key.Key('D'))
+        >>> s.append(note.Note('F'))
+        >>> s.append(key.Key('b-', 'minor'))
+        >>> s.append(note.Note('F'))
+        >>> s.show('text')
+        {0.0} <music21.key.Key of D major>
+        {0.0} <music21.note.Note F>
+        {1.0} <music21.key.Key of b- minor>
+        {1.0} <music21.note.Note F>        
+        >>> for n in s.notes:
+        ...     n.transpose(1, inPlace=True)
+        >>> s.show('text')
+        {0.0} <music21.key.Key of D major>
+        {0.0} <music21.note.Note F#>
+        {1.0} <music21.key.Key of b- minor>
+        {1.0} <music21.note.Note G->        
+        
         '''
         if hasattr(value, 'classes') and 'IntervalBase' in value.classes:
             intervalObj = value
@@ -1405,8 +1427,14 @@ class Note(NotRest):
         # use inPlace, b/c if we are inPlace, we operate on self;
         # if we are not inPlace, post is a copy
         post.pitch.transpose(intervalObj, inPlace=True)
-        if isinstance(value, int):
-            pass
+        if (post.pitch.accidental is not None 
+                and isinstance(value, (int, interval.ChromaticInterval))):
+            ksContext = self.getContextByClass('KeySignature')
+            if ksContext is not None:
+                for alteredPitch in ksContext.alteredPitches:
+                    if (post.pitch.pitchClass == alteredPitch.pitchClass
+                            and post.pitch.accidental.alter != alteredPitch.accidental.alter):
+                        post.pitch.getEnharmonic(inPlace=True)
 
 
         if not inPlace:
