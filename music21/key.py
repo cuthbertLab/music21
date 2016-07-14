@@ -406,10 +406,10 @@ class KeySignature(base.Music21Object):
     
     def __eq__(self, other):
         '''
-        two KeySignatures are equal if their sharps are equal and their modes are equal
+        two KeySignatures are equal if their sharps are equal.
         '''
         try:
-            if self.sharps == other.sharps and self.mode == other.mode:
+            if self.sharps == other.sharps:
                 return True
             else:
                 return False
@@ -834,7 +834,19 @@ class Key(KeySignature, scale.DiatonicScale):
         # for metadata comparisons
         tonic = self.tonicPitchNameWithCase
         return "%s %s" % (tonic, self.mode)
-
+    
+    def __eq__(self, other):
+        '''
+        two Keys are equal if their tonics are equal and their modes are equal
+        '''
+        try:
+            if self.tonic == other.tonic and self.mode == other.mode:
+                return True
+            else:
+                return False
+        except AttributeError:
+            return False
+    
 
     @property
     def relative(self):

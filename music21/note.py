@@ -1107,9 +1107,10 @@ class Note(NotRest):
         >>> highE <= otherHighE
         True
         
-        Notice that you cannot compare w/ ints or anything not pitched.
+        Notice that in Python3 you cannot compare w/ ints or anything not pitched.
         
-        >>> highE < 50
+        `highE < 50`
+        
         Traceback (most recent call last):
         TypeError: unorderable types: Note() < int()
         '''

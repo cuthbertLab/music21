@@ -1829,7 +1829,9 @@ class Test(unittest.TestCase):
 
 
     def testMakeMeasuresMeterStream(self):
-        '''Testing making measures of various sizes with a supplied single element meter stream. This illustrates an approach to partitioning elements by various sized windows. 
+        '''
+        Testing making measures of various sizes with a supplied single element meter stream. 
+        This illustrates an approach to partitioning elements by various sized windows. 
         '''
         from music21 import corpus
         sBach = corpus.parse('bach/bwv324.xml')
@@ -1890,7 +1892,10 @@ class Test(unittest.TestCase):
         barred2 = s.makeMeasures(innerBarline='dashed', finalBarline='double')
         match = [str(m.rightBarline) for m in 
             barred2.getElementsByClass('Measure')]
-        self.assertEqual(match, ['<music21.bar.Barline style=dashed>', '<music21.bar.Barline style=dashed>', '<music21.bar.Barline style=dashed>', '<music21.bar.Barline style=double>'])
+        self.assertEqual(match, ['<music21.bar.Barline style=dashed>', 
+                                 '<music21.bar.Barline style=dashed>', 
+                                 '<music21.bar.Barline style=dashed>', 
+                                 '<music21.bar.Barline style=double>'])
         #barred2.show()
 
         # try using bar objects
@@ -1900,7 +1905,10 @@ class Test(unittest.TestCase):
         #barred3.show()
         match = [str(m.rightBarline) for m in 
             barred3.getElementsByClass('Measure')]
-        self.assertEqual(match, ['<music21.bar.Barline style=none>', '<music21.bar.Barline style=none>', '<music21.bar.Barline style=none>', '<music21.bar.Barline style=short>'])
+        self.assertEqual(match, ['<music21.bar.Barline style=none>', 
+                                 '<music21.bar.Barline style=none>', 
+                                 '<music21.bar.Barline style=none>', 
+                                 '<music21.bar.Barline style=short>'])
 
         # setting to None will not set a barline object at all        
         barred4 = s.makeMeasures(innerBarline=None, finalBarline=None)
@@ -2116,8 +2124,8 @@ class Test(unittest.TestCase):
         '''Searching contexts for key signatures
         '''
         s = Stream()
-        ks1 = key.KeySignature(3)        
-        ks2 = key.KeySignature(-3)        
+        ks1 = key.KeySignature(1)        
+        ks2 = key.KeySignature(-2)        
         s.append(ks1)
         s.append(ks2)
         post = s.getKeySignatures()
@@ -2161,8 +2169,8 @@ class Test(unittest.TestCase):
         '''Searching contexts for key signatures
         '''
 
-        ks1 = key.KeySignature(3)
-        ks3 = key.KeySignature(5)        
+        ks1 = key.KeySignature(1)
+        ks3 = key.KeySignature(3)        
 
         m1 = Measure()
         n1 = note.Note()
@@ -2188,15 +2196,15 @@ class Test(unittest.TestCase):
 
         # can get from measure
         post = m1.getKeySignatures()
-        self.assertEqual(post[0], ks1)
+        self.assertEqual(repr(post[0]), repr(ks1))
 
         # we can get the key signature in m1 from m2
         post = m2.getKeySignatures()
-        self.assertEqual(post[0], ks1)
+        self.assertEqual(repr(post[0]), repr(ks1))
 
         # if we search m3, we get the key signature in m3
         post = m3.getKeySignatures()
-        self.assertEqual(post[0], ks3)
+        self.assertEqual(repr(post[0]), repr(ks3))
 
     def testMakeAccidentalsA(self):
         '''Test accidental display setting
@@ -6999,7 +7007,7 @@ class Test(unittest.TestCase):
                                                                   useMixedNumerals=True), 
             '''{0 - 0} <music21.layout.SystemLayout>
 {0 - 0} <music21.clef.TrebleClef>
-{0 - 0} <music21.key.KeySignature of 2 flats, mode major>
+{0 - 0} <music21.key.Key of B- major>
 {0 - 0} <music21.meter.TimeSignature 4/4>
 {0 - 2/3} <music21.note.Note B->
 {2/3 - 1 1/3} <music21.note.Note C>
@@ -7008,7 +7016,7 @@ class Test(unittest.TestCase):
         self.assertMultiLineEqual(
             s.parts[1].getElementsByClass('Measure')[0]._reprText(addEndTimes=True), 
             '''{0.0 - 0.0} <music21.clef.BassClef>
-{0.0 - 0.0} <music21.key.KeySignature of 2 flats, mode major>
+{0.0 - 0.0} <music21.key.Key of B- major>
 {0.0 - 0.0} <music21.meter.TimeSignature 4/4>
 {0.0 - 4.0} <music21.note.Note B->''') 
         chords = s.chordify()
@@ -7016,7 +7024,7 @@ class Test(unittest.TestCase):
         self.assertMultiLineEqual(m1._reprText(addEndTimes=True, useMixedNumerals=True), 
                                   '''{0 - 0} <music21.layout.SystemLayout>
 {0 - 0} <music21.clef.TrebleClef>
-{0 - 0} <music21.key.KeySignature of 2 flats, mode major>
+{0 - 0} <music21.key.Key of B- major>
 {0 - 0} <music21.meter.TimeSignature 4/4>
 {0 - 2/3} <music21.chord.Chord B-4 B-2>
 {2/3 - 1 1/3} <music21.chord.Chord C5 B-2>
