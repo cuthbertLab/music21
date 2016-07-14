@@ -255,12 +255,13 @@ class ScalaData(object):
 
 
     def getIntervalSequence(self):
-        '''Get the scale as a list of Interval objects.
+        '''
+        Get the scale as a list of Interval objects.
         '''
         post = []
         for c in self.getAdjacentCents():
             # convert cent values to semitone values to create intervals
-            post.append(interval.Interval(c*.01))
+            post.append(interval.Interval(c * .01))
         return post
 
     def setIntervalSequence(self, iList):

@@ -1718,15 +1718,20 @@ class Interval(IntervalBase):
 
     An Interval can be constructed from a Diatonic and Chromatic Interval object (or just one)
 
-    >>> aInterval = interval.DiatonicInterval('major', 'third')
-    >>> bInterval = interval.ChromaticInterval(4)
-    >>> cInterval = interval.Interval(diatonic=aInterval, chromatic=bInterval)
-    >>> cInterval
+    >>> diaInterval = interval.DiatonicInterval('major', 'third')
+    >>> chrInterval = interval.ChromaticInterval(4)
+    >>> fullInterval = interval.Interval(diatonic=diaInterval, chromatic=chrInterval)
+    >>> fullInterval
     <music21.interval.Interval M3>
 
-    >>> cInterval = interval.Interval(diatonic=aInterval)
-    >>> cInterval.semitones
+    >>> fullInterval = interval.Interval(diatonic=diaInterval)
+    >>> fullInterval.semitones
     4
+    >>> fullInterval = interval.Interval(chromatic=chrInterval)
+    >>> fullInterval.diatonic.name
+    'M3'
+    >>> fullInterval.implicitDiatonic
+    True
 
     Two Intervals are the same if their Chromatic and Diatonic intervals
     are the same.  N.B. that interval.Interval('a4') != 'a4' -- maybe it should...
@@ -1773,7 +1778,7 @@ class Interval(IntervalBase):
         self.type = "" # harmonic or melodic
         self.diatonicType = 0
         self.niceName = ""
-        self._implicitDiatonic = False # is this basically a ChromaticInterval object in disguise?
+        self.implicitDiatonic = False # is this basically a ChromaticInterval object in disguise?
 
 
         if len(arguments) == 1 and isinstance(arguments[0], six.string_types):
@@ -1838,7 +1843,7 @@ class Interval(IntervalBase):
 
         if self.chromatic is not None and self.diatonic is None:
             self.diatonic = self.chromatic.getDiatonic()
-            self._implicitDiatonic = True
+            self.implicitDiatonic = True
 
         if self.diatonic is not None and self.chromatic is None:
             self.chromatic = self.diatonic.getChromatic()            
@@ -2077,7 +2082,7 @@ class Interval(IntervalBase):
         <music21.pitch.Pitch D4>
         
         '''
-        if self._implicitDiatonic:
+        if self.implicitDiatonic:
             # this will not preserve diatonic relationships
             pOut = self.chromatic.transposePitch(p)
         else:
@@ -2096,7 +2101,7 @@ class Interval(IntervalBase):
         
     def _diatonicTransposePitch(self, p, reverse, maxAccidental):
         '''
-        abstracts out the diatonic aspects of transposing, so that _implicitDiatonic and
+        abstracts out the diatonic aspects of transposing, so that implicitDiatonic and
         regular diatonic can use some of the same code.
         '''
         # NOTE: this is a performance critical method

@@ -142,8 +142,20 @@ def _convertPsToOct(ps):
     [0, -1, -2]
     >>> pitch._convertPsToOct(135)
     10
+    
+    Note that while this is basically a floor operation, we only treat 6 digits as significant
+    (PITCH_SPACE_SIGNIFICANT_DIGITS)
+    
+    >>> pitch._convertPsToOct(71.999)
+    4
+    >>> pitch._convertPsToOct(71.99999999)
+    5
+    >>> pitch._convertPsToOct(72)
+    5
+    
     '''
     #environLocal.printDebug(['_convertPsToOct: input', ps])
+    ps = round(ps, PITCH_SPACE_SIG_DIGITS)
     return int(math.floor(ps / 12.)) - 1
 
 def _convertPsToStep(ps):
@@ -181,6 +193,18 @@ def _convertPsToStep(ps):
     ('B', <accidental flat>, (+0c), 0)
     >>> pitch._convertPsToStep(70.5)
     ('B', <accidental half-flat>, (+0c), 0)
+
+    >>> pitch._convertPsToStep(72.0)
+    ('C', <accidental natural>, (+0c), 0)
+    >>> pitch._convertPsToStep(71.9999999)
+    ('C', <accidental natural>, (+0c), 0)
+    
+    
+    >>> pitch._convertPsToStep(43.0)
+    ('G', <accidental natural>, (+0c), 0)
+    >>> pitch._convertPsToStep(42.999739)
+    ('G', <accidental natural>, (-0c), 0)
+    
     '''
     # rounding here is essential
     ps = round(ps, PITCH_SPACE_SIG_DIGITS)
@@ -223,7 +247,7 @@ def _convertPsToStep(ps):
 
     octShift = 0
     # check for unnecessary enharmonics
-    if pc in [4, 11] and alter == 1:
+    if pc in (4, 11) and alter == 1:
         acc = Accidental(0)
         pcName = (pc + 1) % 12
         # if a B, we are shifting out of this octave, and need to get
@@ -232,18 +256,26 @@ def _convertPsToStep(ps):
             octShift = 1
     # its a natural; nothing to do
     elif pc in STEPREF.values():
-        acc = Accidental(0+alter)
+        acc = Accidental(0 + alter)
         pcName = pc
+        
+    elif (pc - 1) in (0, 5, 7) and alter >= 1: # is this going to be a C##, F##, G##?
+        acc = Accidental(alter - 1)
+        pcName = pc + 1
     # if we take the pc down a half-step, do we get a stepref (natural) value
-    elif pc-1 in [0, 5, 7]: # c, f, g: can be sharped
+    elif (pc - 1) in (0, 5, 7): # c, f, g: can be sharped
         # then we need an accidental to accommodate; here, a sharp
-        acc = Accidental(1+alter)
-        pcName = pc-1
+        acc = Accidental(1 + alter)
+        pcName = pc - 1
+        
+    elif (pc + 1) in (11, 4) and alter <= -1: # is this going to be an E-- or B--?
+        acc = Accidental(1 + alter)
+        pcName = pc - 1
     # if we take the pc up a half-step, do we get a stepref (natural) value
-    elif pc+1 in [11, 4]: # b, e: can be flattened
+    elif (pc + 1) in (11, 4): # b, e: can be flattened
         # then we need an accidental to accommodate; here, a flat
-        acc = Accidental(-1+alter)
-        pcName = pc+1
+        acc = Accidental(-1 + alter)
+        pcName = pc + 1
     else:
         raise PitchException('cannot match condition for pc: %s' % pc)
 
@@ -252,10 +284,10 @@ def _convertPsToStep(ps):
             name = key
             break
 
-    # if a micro is present, create object, else return None
+    # create a micro object always
     if micro != 0:
         # provide cents value; these are alter values
-        micro = Microtone(micro*100)
+        micro = Microtone(micro * 100)
     else:
         micro = Microtone(0)
 
@@ -610,6 +642,8 @@ class Microtone(SlottedObjectMixin):
             sub = '+%sc' % int(round(self._centShift))
         elif self._centShift < 0:
             sub = '%sc' % int(round(self._centShift))
+            if sub == '0c':
+                sub = '-0c'
         # only show a harmonic if present
         if self._harmonicShift != 1:
             sub += '+%s%sH' % (self._harmonicShift,
@@ -5138,9 +5172,10 @@ class Test(unittest.TestCase):
         self.assertTrue(common.whitespaceEqual(str(pList), 
             '''
             ['A4', 'A~4(+21c)', 'B`4(-11c)', 'B4(+4c)', 'B~4(+17c)', 'C~5(-22c)', 
-             'C#5(-14c)', 'C#~5(-7c)', 'C##5(-2c)', 'D~5(+1c)', 'E-5(+3c)', 'E`5(+3c)', 
+             'C#5(-14c)', 'C#~5(-7c)', 'D5(-2c)', 'D~5(+1c)', 'E-5(+3c)', 'E`5(+3c)', 
              'E5(+2c)', 'E~5(-1c)', 'F5(-4c)', 'F~5(-9c)', 'F#5(-16c)', 'F#~5(-23c)', 
-             'F#~5(+19c)', 'G5(+10c)', 'G~5(-1c)', 'G#5(-12c)', 'G#~5(-24c)', 'G#~5(+14c)']'''))
+             'F#~5(+19c)', 'G5(+10c)', 'G~5(-1c)', 'G#5(-12c)', 'G#~5(-24c)', 'G#~5(+14c)']''',
+             ), str(pList))
 
 
 #-------------------------------------------------------------------------------
