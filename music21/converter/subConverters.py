@@ -1305,6 +1305,10 @@ class TestExternal(unittest.TestCase):
 #         biggerStream.show()
 #         print(biggerStream.write('musicxml.png'))
 
+    def testVexFlowShow(self):
+        from music21 import chord
+        c = chord.Chord("C4 E4- G4")
+        c.show('ipython.vexflow')
 
 if __name__ == '__main__':
     import music21
