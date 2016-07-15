@@ -1016,8 +1016,8 @@ def _keySigFromAttrs(elem):
                        mode=elem.get('key.mode', ''))
     else:
         # @key.sig, @key.mode
-        return key.KeySignature(sharps=_sharpsFromAttr(elem.get('key.sig')),
-                                mode=elem.get('key.mode'))
+        ks = key.KeySignature(sharps=_sharpsFromAttr(elem.get('key.sig')))
+        return ks.asKey(mode=elem.get('key.mode'))
 
 
 def _transpositionFromAttrs(elem):

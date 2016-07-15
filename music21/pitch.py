@@ -40,11 +40,11 @@ except NameError:
 
 STEPREF = {
            'C' : 0,
-           'D' : 2, #2
+           'D' : 2,
            'E' : 4,
            'F' : 5,
            'G' : 7,
-           'A' : 9, #9
+           'A' : 9,
            'B' : 11,
                }
 STEPNAMES = ['C','D','E','F','G','A','B']
@@ -142,8 +142,20 @@ def _convertPsToOct(ps):
     [0, -1, -2]
     >>> pitch._convertPsToOct(135)
     10
+    
+    Note that while this is basically a floor operation, we only treat 6 digits as significant
+    (PITCH_SPACE_SIGNIFICANT_DIGITS)
+    
+    >>> pitch._convertPsToOct(71.999)
+    4
+    >>> pitch._convertPsToOct(71.99999999)
+    5
+    >>> pitch._convertPsToOct(72)
+    5
+    
     '''
     #environLocal.printDebug(['_convertPsToOct: input', ps])
+    ps = round(ps, PITCH_SPACE_SIG_DIGITS)
     return int(math.floor(ps / 12.)) - 1
 
 def _convertPsToStep(ps):
@@ -181,6 +193,18 @@ def _convertPsToStep(ps):
     ('B', <accidental flat>, (+0c), 0)
     >>> pitch._convertPsToStep(70.5)
     ('B', <accidental half-flat>, (+0c), 0)
+
+    >>> pitch._convertPsToStep(72.0)
+    ('C', <accidental natural>, (+0c), 0)
+    >>> pitch._convertPsToStep(71.9999999)
+    ('C', <accidental natural>, (+0c), 0)
+    
+    
+    >>> pitch._convertPsToStep(43.0)
+    ('G', <accidental natural>, (+0c), 0)
+    >>> pitch._convertPsToStep(42.999739)
+    ('G', <accidental natural>, (-0c), 0)
+    
     '''
     # rounding here is essential
     ps = round(ps, PITCH_SPACE_SIG_DIGITS)
@@ -223,7 +247,7 @@ def _convertPsToStep(ps):
 
     octShift = 0
     # check for unnecessary enharmonics
-    if pc in [4, 11] and alter == 1:
+    if pc in (4, 11) and alter == 1:
         acc = Accidental(0)
         pcName = (pc + 1) % 12
         # if a B, we are shifting out of this octave, and need to get
@@ -232,18 +256,26 @@ def _convertPsToStep(ps):
             octShift = 1
     # its a natural; nothing to do
     elif pc in STEPREF.values():
-        acc = Accidental(0+alter)
+        acc = Accidental(0 + alter)
         pcName = pc
+        
+    elif (pc - 1) in (0, 5, 7) and alter >= 1: # is this going to be a C##, F##, G##?
+        acc = Accidental(alter - 1)
+        pcName = pc + 1
     # if we take the pc down a half-step, do we get a stepref (natural) value
-    elif pc-1 in [0, 5, 7]: # c, f, g: can be sharped
+    elif (pc - 1) in (0, 5, 7): # c, f, g: can be sharped
         # then we need an accidental to accommodate; here, a sharp
-        acc = Accidental(1+alter)
-        pcName = pc-1
+        acc = Accidental(1 + alter)
+        pcName = pc - 1
+        
+    elif (pc + 1) in (11, 4) and alter <= -1: # is this going to be an E-- or B--?
+        acc = Accidental(1 + alter)
+        pcName = pc - 1
     # if we take the pc up a half-step, do we get a stepref (natural) value
-    elif pc+1 in [11, 4]: # b, e: can be flattened
+    elif (pc + 1) in (11, 4): # b, e: can be flattened
         # then we need an accidental to accommodate; here, a flat
-        acc = Accidental(-1+alter)
-        pcName = pc+1
+        acc = Accidental(-1 + alter)
+        pcName = pc + 1
     else:
         raise PitchException('cannot match condition for pc: %s' % pc)
 
@@ -252,10 +284,10 @@ def _convertPsToStep(ps):
             name = key
             break
 
-    # if a micro is present, create object, else return None
+    # create a micro object always
     if micro != 0:
         # provide cents value; these are alter values
-        micro = Microtone(micro*100)
+        micro = Microtone(micro * 100)
     else:
         micro = Microtone(0)
 
@@ -454,7 +486,7 @@ def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=
     oldPitches = [p if isinstance(p, Pitch) else Pitch(p) for p in pitches]
 
     if keyContext:
-        oldPitches = [keyContext.pitchAndMode[0]] + oldPitches
+        oldPitches = [keyContext.asKey('major').tonic] + oldPitches
         remove_first = True
     else:
         remove_first = False
@@ -567,7 +599,8 @@ class Microtone(SlottedObjectMixin):
             return common.defaultDeepcopy(self, memo)
 
     def __eq__(self, other):
-        '''Compare cents.
+        '''
+        Compare cents (including harmonicShift)
 
         >>> m1 = pitch.Microtone(20)
         >>> m2 = pitch.Microtone(20)
@@ -576,12 +609,17 @@ class Microtone(SlottedObjectMixin):
         True
         >>> m1 == m3
         False
+        
+        >>> m2.harmonicShift = 3
+        >>> m1 == m2
+        False
         '''
-        if other is None:
+        try:
+            if other.cents == self.cents:
+                return True
             return False
-        if other.cents == self.cents:
-            return True
-        return False
+        except AttributeError:
+            return False
 
     def __hash__(self):
         hashValues = (
@@ -604,6 +642,8 @@ class Microtone(SlottedObjectMixin):
             sub = '+%sc' % int(round(self._centShift))
         elif self._centShift < 0:
             sub = '%sc' % int(round(self._centShift))
+            if sub == '0c':
+                sub = '-0c'
         # only show a harmonic if present
         if self._harmonicShift != 1:
             sub += '+%s%sH' % (self._harmonicShift,
@@ -733,18 +773,20 @@ class Accidental(SlottedObjectMixin):
         self.set(specifier)
 
     ### SPECIAL METHODS ###
-    def __hash__(self):
-        hashValues = (
-        self._alter,
-        self._displayStatus,
-        self._displayType,
-        self._modifier,
-        self._name,
-        self.displayLocation,
-        self.displaySize,
-        self.displayStyle,
+    def _hashValues(self):
+        return (
+            self._alter,
+            self._displayStatus,
+            self._displayType,
+            self._modifier,
+            self._name,
+            self.displayLocation,
+            self.displaySize,
+            self.displayStyle,
         )
-        return hash(hashValues)
+    
+    def __hash__(self):
+        return hash(self._hashValues())
 
     def __deepcopy__(self, memo):
         if type(self) is Accidental: # pylint: disable=unidiomatic-typecheck
@@ -1441,8 +1483,8 @@ class Pitch(object):
             return name
 
     def __eq__(self, other):
-        '''Do not accept enharmonic equivalance.
-
+        '''
+        Do not accept enharmonic equivalance.
 
         >>> a = pitch.Pitch('c2')
         >>> a.octave
@@ -1554,7 +1596,8 @@ class Pitch(object):
         return self.__lt__(other) or self.__eq__(other)
 
     def __gt__(self, other):
-        '''Accepts enharmonic equivalance. Based entirely on pitch space
+        '''
+        Accepts enharmonic equivalance. Based entirely on pitch space
         representation.
 
         >>> a = pitch.Pitch('d4')
@@ -1572,7 +1615,6 @@ class Pitch(object):
         Greater than or equal.  Based on the accidentals' alter function.
         Note that to be equal enharmonics must be the same. So two pitches can
         be neither lt or gt and not equal to each other!
-
 
         >>> a = pitch.Pitch('d4')
         >>> b = pitch.Pitch('d8')
@@ -1732,24 +1774,57 @@ class Pitch(object):
 
 
     def getCentShiftFromMidi(self):
-        '''Get cent deviation of this pitch from MIDI pitch.
+        '''
+        Get cent deviation of this pitch from MIDI pitch.
 
         >>> p = pitch.Pitch('c~4')
-        >>> p.midi # midi values automatically round up
+        >>> p.ps
+        60.5
+        >>> p.midi # midi values automatically round up at 0.5
         61
         >>> p.getCentShiftFromMidi()
-        50
+        -50
+        >>> p.microtone = -25
+        >>> p.ps
+        60.25
+        >>> p.midi
+        60
+        >>> p.getCentShiftFromMidi()
+        25
+
+        
         >>> p = pitch.Pitch('c#4')
         >>> p.microtone = -25
+        >>> p.ps
+        60.75
+        >>> p.midi
+        61
         >>> p.getCentShiftFromMidi()
         -25
 
         >>> p = pitch.Pitch('c#~4')
+        >>> p.ps
+        61.5
+        >>> p.midi
+        62
         >>> p.getCentShiftFromMidi()
-        50
+        -50        
+        >>> p.microtone = -3
+        >>> p.ps
+        61.47
+        >>> p.midi
+        61
+        >>> p.getCentShiftFromMidi()
+        47
         >>> p.microtone = 3
+        >>> p.ps
+        61.53
+        >>> p.midi
+        62
+        >>> p.accidental
+        <accidental one-and-a-half-sharp>
         >>> p.getCentShiftFromMidi()
-        53
+        -47
 
         >>> p = pitch.Pitch('c`4') # quarter tone flat
         >>> p.getCentShiftFromMidi()
@@ -1757,21 +1832,35 @@ class Pitch(object):
         >>> p.microtone = 3
         >>> p.getCentShiftFromMidi()
         -47
+        
+        Absurd octaves that MIDI can't handle will still give the right sounding pitch
+        out of octave:
+        
+        >>> p = pitch.Pitch('c~4')
+        >>> p.octave = 10
+        >>> p.ps
+        132.5
+        >>> p.midi
+        121
+        >>> p.getCentShiftFromMidi()
+        -50        
+        >>> p.octave = -1
+        >>> p.getCentShiftFromMidi()
+        -50        
+        >>> p.octave = -2
+        >>> p.getCentShiftFromMidi()
+        -50        
         '''
-        #return (self.ps - self.midi) * 100 # wrong way
-        #return int(round(self._getAlter() * 100))
+        midiDistance = self.ps - self.midi
+        
+        # correct for absurd octaves
+        while midiDistance < -11.0:
+            midiDistance += 12.0    
+        while midiDistance > 11.0:
+            midiDistance -= 12.0
+        
+        return int(round(midiDistance * 100))
 
-        # see if we have a quarter tone alter
-
-        # if a quarter tone, get necessary shift above or below the
-        # standard accidental
-        shift = 0
-        if self.accidental is not None:
-            if self.accidental.name in ['half-sharp', 'one-and-a-half-sharp']:
-                shift = 50
-            elif self.accidental.name in ['half-flat', 'one-and-a-half-flat']:
-                shift = -50
-        return int(round(shift + self.microtone.cents))
 
     @property
     def alter(self):
@@ -2040,11 +2129,17 @@ class Pitch(object):
         '''
         see docs below, under property midi
         '''
-        def schoolYardRounding(x, d=0):
-            p = 10 ** d
-            return float(math.floor((x * p) + math.copysign(0.5, x)))/p
+        def schoolYardRounding(x):
+            '''
+            Python 3 now uses rounding mechanisms so that odd numbers round one way, even another.
+            But we need a consistent direction for all half-sharps/flats to go, and we need
+            the same behavior in Python 2 and 3.
+            
+            This is round "up" at .5 (regardless of negative or positive)
+            '''
+            return int(math.floor(x + 0.5)) # int is required for Python 2!!!
         
-        roundedPS = int(schoolYardRounding(self.ps))
+        roundedPS = schoolYardRounding(self.ps)
         if roundedPS > 127:
             value = (12 * 9) + (roundedPS % 12)
             if value < (127-12):
@@ -2054,26 +2149,6 @@ class Pitch(object):
         else:
             value = roundedPS
         return value
-
-    def getMidiPreCentShift(self):
-        '''
-        If pitch bend will be used to adjust MIDI values, the given pitch values 
-        for microtones should go to the nearest non-microtonal pitch value, 
-        not rounded up or down. This method is used in MIDI output generation.
-
-        >>> p = pitch.Pitch('c~4')
-        >>> p.getMidiPreCentShift()
-        60
-        >>> p = pitch.Pitch('c#4')
-        >>> p.getMidiPreCentShift()
-        61
-        >>> p.microtone = 65
-        >>> p.getMidiPreCentShift()
-        61
-        >>> p.getCentShiftFromMidi()
-        65
-        '''
-        return int(((round(self.ps, 2) * 100) - self.getCentShiftFromMidi()) * .01)
 
     def _setMidi(self, value):
         '''
@@ -2133,6 +2208,10 @@ class Pitch(object):
         160.5
         >>> veryHighFHalfFlat.midi
         125
+        >>> veryHighFHalfFlat.octave = 9
+        >>> veryHighFHalfFlat.midi
+        125
+
 
         >>> notAsHighNote = pitch.Pitch()
         >>> notAsHighNote.ps = veryHighFHalfFlat.midi
@@ -2150,6 +2229,21 @@ class Pitch(object):
         2.0
         >>> a.implicitAccidental
         True
+        
+
+        More absurd octaves...
+        
+        >>> p = pitch.Pitch('c~4')
+        >>> p.octave = -1
+        >>> p.ps
+        0.5
+        >>> p.midi
+        1
+        >>> p.octave = -2
+        >>> p.ps
+        -11.5
+        >>> p.midi
+        1
         ''')
 
     def _getName(self):
@@ -3603,6 +3697,7 @@ class Pitch(object):
     def getEnharmonic(self, inPlace=False):
         '''
         Returns a new Pitch that is the(/an) enharmonic equivalent of this Pitch.
+        Can be thought of as flipEnharmonic or something like that.
 
         N.B.: n1.name == getEnharmonic(getEnharmonic(n1)).name is not necessarily true.
         For instance:
@@ -3927,10 +4022,15 @@ class Pitch(object):
         else: # try to process
             intervalObj = interval.Interval(value)
 
+
+        p = intervalObj.transposePitch(self)
+        # TODO: if p.implicitAccidental, then change enharmonics. 
+        #     (should implicitAccidental be inferredSpelling or soemthing?)
+        p.implicitAccidental = self.implicitAccidental
+        
         if not inPlace:
-            return intervalObj.transposePitch(self)
+            return p
         else:
-            p = intervalObj.transposePitch(self)
             # can setName with nameWithOctave to recreate all essential
             # pitch attributes
             # NOTE: in some cases this may not return exactly the proper config
@@ -4090,7 +4190,6 @@ class Pitch(object):
 
         >>> b._nameInKeySignature(ks.alteredPitches)
         False
-
         '''
         for p in alteredPitches: # all are altered tones, must have acc
             if p.step == self.step: # A# to A or A# to A-, etc
@@ -5127,9 +5226,10 @@ class Test(unittest.TestCase):
         self.assertTrue(common.whitespaceEqual(str(pList), 
             '''
             ['A4', 'A~4(+21c)', 'B`4(-11c)', 'B4(+4c)', 'B~4(+17c)', 'C~5(-22c)', 
-             'C#5(-14c)', 'C#~5(-7c)', 'C##5(-2c)', 'D~5(+1c)', 'E-5(+3c)', 'E`5(+3c)', 
+             'C#5(-14c)', 'C#~5(-7c)', 'D5(-2c)', 'D~5(+1c)', 'E-5(+3c)', 'E`5(+3c)', 
              'E5(+2c)', 'E~5(-1c)', 'F5(-4c)', 'F~5(-9c)', 'F#5(-16c)', 'F#~5(-23c)', 
-             'F#~5(+19c)', 'G5(+10c)', 'G~5(-1c)', 'G#5(-12c)', 'G#~5(-24c)', 'G#~5(+14c)']'''))
+             'F#~5(+19c)', 'G5(+10c)', 'G~5(-1c)', 'G#5(-12c)', 'G#~5(-24c)', 'G#~5(+14c)']''',
+             ), str(pList))
 
 
 #-------------------------------------------------------------------------------

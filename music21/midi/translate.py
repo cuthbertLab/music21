@@ -402,8 +402,7 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
     me1.type = "NOTE_ON"
     me1.channel = channel
     me1.time = None # not required
-    #me1.pitch = n.midi
-    me1.pitch = n.pitch.getMidiPreCentShift() # will shift later, do not round
+    me1.pitch = n.pitch.midi
     if not n.pitch.isTwelveTone():
         me1.centShift = n.pitch.getCentShiftFromMidi()
 
@@ -427,9 +426,7 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
     me2.type = "NOTE_OFF"
     me2.channel = channel
     me2.time = None #d
-    #me2.pitch = n.midi
-    me2.pitch = n.pitch.getMidiPreCentShift() # will shift later, do not round
-    me2.pitchSpace = n.pitch.ps
+    me2.pitch = n.pitch.midi
     if not n.pitch.isTwelveTone():
         me2.centShift = n.pitch.getCentShiftFromMidi()
 
@@ -801,7 +798,7 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
 
 
 
-def midiEventsToKeySignature(eventList):
+def midiEventsToKey(eventList):
     '''
     Convert a single MIDI event into a :class:`~music21.key.KeySignature` object.
 
@@ -809,9 +806,9 @@ def midiEventsToKeySignature(eventList):
     >>> me1 = midi.MidiEvent(mt)
     >>> me1.type = "KEY_SIGNATURE"
     >>> me1.data = midi.putNumbersAsList([2, 0]) # d major
-    >>> ks = midi.translate.midiEventsToKeySignature(me1)
+    >>> ks = midi.translate.midiEventsToKey(me1)
     >>> ks
-    <music21.key.KeySignature of 2 sharps, mode major>
+    <music21.key.Key of D major>
     >>> ks.mode
     'major'
 
@@ -822,9 +819,11 @@ def midiEventsToKeySignature(eventList):
     b'\\xfe\\x01'
     >>> midi.getNumbersAsList(me2.data)
     [254, 1]
-    >>> ks = midi.translate.midiEventsToKeySignature(me2)
+    >>> ks = midi.translate.midiEventsToKey(me2)
     >>> ks
-    <music21.key.KeySignature of 2 flats, mode minor>
+    <music21.key.Key of g minor>
+    >>> ks.sharps
+    -2
     >>> ks.mode
     'minor'
     '''
@@ -842,26 +841,27 @@ def midiEventsToKeySignature(eventList):
         event = eventList[1]
     post = midiModule.getNumbersAsList(event.data)
 
+    # first value is number of sharp, or neg for number of flat
     if post[0] > 12:
         # flip around 256
         sharpCount = post[0] - 256 # need negative values
     else:
         sharpCount = post[0]
 
-    #environLocal.printDebug(['midiEventsToKeySignature', post, sharpCount])
-
-    # first value is number of sharp, or neg for number of flat
-    ks = key.KeySignature(sharpCount)
-
-    if post[1] == 0:
-        ks.mode = 'major'
+    mode = 'major'
     if post[1] == 1:
-        ks.mode = 'minor'
-    return ks
+        mode = 'minor'
+
+    #environLocal.printDebug(['midiEventsToKey', post, sharpCount])
+    ks = key.KeySignature(sharpCount)
+    k = ks.asKey(mode)
+    
+    return k
 
 def keySignatureToMidiEvents(ks, includeDeltaTime=True):
     '''
-    Convert a single :class:`~music21.key.KeySignature` object to 
+    Convert a single :class:`~music21.key.Key` or 
+    :class:`~music21.key.KeySignature` object to 
     a two-element list of midi events,
     where the first is an empty DeltaTime (unless includeDeltaTime is False) and the second
     is a KEY_SIGNATURE :class:`~music21.midi.base.MidiEvent`
@@ -870,16 +870,16 @@ def keySignatureToMidiEvents(ks, includeDeltaTime=True):
     >>> ks
     <music21.key.KeySignature of 2 sharps>
     >>> eventList = midi.translate.keySignatureToMidiEvents(ks)
-    >>> eventList[1]
-    <MidiEvent KEY_SIGNATURE, t=None, track=None, channel=1, data=b'\\x02\\x00'>
+    >>> eventList
+    [<MidiEvent DeltaTime, t=0, track=None, channel=None>, 
+     <MidiEvent KEY_SIGNATURE, t=None, track=None, channel=1, data=b'\\x02\\x00'>]
 
-    >>> ks = key.KeySignature(-5)
-    >>> ks.mode = 'minor'
-    >>> ks
-    <music21.key.KeySignature of 5 flats, mode minor>
-    >>> eventList = midi.translate.keySignatureToMidiEvents(ks, includeDeltaTime = False)
-    >>> eventList[0]
-    <MidiEvent KEY_SIGNATURE, t=None, track=None, channel=1, data=b'\\xfb\\x01'>
+    >>> k = key.Key('b-')
+    >>> k
+    <music21.key.Key of b- minor>
+    >>> eventList = midi.translate.keySignatureToMidiEvents(k, includeDeltaTime=False)
+    >>> eventList
+    [<MidiEvent KEY_SIGNATURE, t=None, track=None, channel=1, data=b'\\xfb\\x01'>]
     '''
     from music21 import midi as midiModule
     mt = None # use a midi track set to None
@@ -890,7 +890,7 @@ def keySignatureToMidiEvents(ks, includeDeltaTime=True):
         # add to track events
         eventList.append(dt)
     sharpCount = ks.sharps
-    if ks.mode == 'minor':        
+    if hasattr(ks, 'mode') and ks.mode == 'minor':        
         mode = 1
     else: # major or None; must define one
         mode = 0
@@ -1500,7 +1500,7 @@ def midiTrackToStream(mt, ticksPerQuarter=None, quantizePost=True,
                 # time signature should be 4 bytes
                 metaEvents.append([t, midiEventsToTimeSignature(e)])
             elif e.type == 'KEY_SIGNATURE':
-                metaEvents.append([t, midiEventsToKeySignature(e)])
+                metaEvents.append([t, midiEventsToKey(e)])
             elif e.type == 'SET_TEMPO':
                 metaEvents.append([t, midiEventsToTempo(e)])
             elif e.type == 'INSTRUMENT_NAME':
@@ -2576,8 +2576,8 @@ class Test(unittest.TestCase):
         p2 = copy.deepcopy(p1)
         p3 = copy.deepcopy(p1)
 
-        t1 = interval.Interval(12.5) # a sharp p4
-        t2 = interval.Interval(-12.25) # a sharp p4
+        t1 = interval.Interval(12.5) # octave + half sharp
+        t2 = interval.Interval(-12.25) # octave down minus 1/8th tone
         p2.transpose(t1, inPlace=True)
         p3.transpose(t2, inPlace=True)
         post = stream.Score()
@@ -2592,7 +2592,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mts[0].getProgramChanges(),  [0])
         self.assertEqual(mts[1].getChannels(),  [1, 2])
         self.assertEqual(mts[1].getProgramChanges(),  [0])
-        self.assertEqual(mts[2].getChannels(),  [1, 2, 3])
+        self.assertEqual(mts[2].getChannels(),  [1, 3])
         self.assertEqual(mts[2].getProgramChanges(),  [0])
 
         #post.show('midi', app='Logic Express')
@@ -2628,10 +2628,10 @@ class Test(unittest.TestCase):
         self.assertEqual(mts[1].getProgramChanges(),  [56])
         
         #print(mts[2])
-        self.assertEqual(mts[2].getChannels(),  [3, 4, 5])
+        self.assertEqual(mts[2].getChannels(),  [3, 5])
         self.assertEqual(mts[2].getProgramChanges(),  [26])
 
-        #post.show('midi', app='Logic Express')
+        #post.show('midi')#, app='Logic Express')
 
     def testMidiTempoImportA(self):
         import os

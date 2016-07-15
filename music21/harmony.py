@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2012, 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -1380,7 +1380,8 @@ class ChordSymbol(Harmony):
     the '-' must be used, and NOT 'b'. However, alterations and chord 
     abbreviations are specified normally with the 'b' and '#' signs.
 
-    >>> [str(p) for p in harmony.ChordSymbol('D-35').pitches]
+    >>> dFlat = harmony.ChordSymbol('D-35')
+    >>> [str(p) for p in dFlat.pitches]
     ['D-3', 'F3', 'A-3']
 
     >>> [str(p) for p in harmony.ChordSymbol('Db35').pitches]
@@ -1467,6 +1468,7 @@ class ChordSymbol(Harmony):
         if 'duration' not in keywords and 'quarterLength' not in keywords:
             self.duration = duration.Duration(0)
 
+
     ### PRIVATE METHODS ###
 
     def _adjustOctaves(self, pitches):
@@ -1535,17 +1537,18 @@ class ChordSymbol(Harmony):
         from music21 import scale
 
         pitches = list(pitches)
-        ChordStepModifications = self.chordStepModifications
-        if ChordStepModifications is None:
+        chordStepModifications = self.chordStepModifications
+        if chordStepModifications is None:
             return pitches
-        for hD in ChordStepModifications:
-            sc = scale.MajorScale(self.root())
+        rootPitch = self.root()
+        sc = scale.MajorScale(rootPitch)
+        for hD in chordStepModifications:
             if hD.modType == 'add':
-                pitchToAppend = sc.pitchFromDegree(hD.degree, self.root())
-                if hD.interval:
+                pitchToAppend = sc.pitchFromDegree(hD.degree, rootPitch)
+                if hD.interval and hD.interval.semitones != 0:
                     pitchToAppend = pitchToAppend.transpose(hD.interval)
-                    if hD.degree >= 7:
-                        pitchToAppend.octave = pitchToAppend.octave + 1
+                if hD.degree >= 7:
+                    pitchToAppend.octave = pitchToAppend.octave + 1
                 
                 degrees = self._degreesList
                 
@@ -1869,7 +1872,7 @@ class ChordSymbol(Harmony):
                                     # which was arbitrarily chosen as 3 above
                 pitches.append(self._bass)
         else:
-            self.inversion(None, transposeOnSet = False)
+            self.inversion(None, transposeOnSet=False)
             inversionNum = None
         if inversionNum != None:
             index = -1

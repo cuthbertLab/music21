@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Daniel Manesh
 #
-# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2012, 16 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -3025,10 +3025,10 @@ class Test(unittest.TestCase):
             m = stream.Measure()
             m.timeSignature = meter.TimeSignature('1/4')
             for j, p in enumerate(pitches):
-                m.append(note.Note(p.transpose(i*3), quarterLength=dur[j]))
+                m.append(note.Note(p.transpose(i * 3), quarterLength=dur[j]))
             m.leftBarline = bar.Repeat(direction='start')
             rb = bar.Repeat(direction='end')
-            rb.times = repeatTimesCycle[i%len(repeatTimesCycle)]
+            rb.times = repeatTimesCycle[i % len(repeatTimesCycle)]
             te = rb.getTextExpression()
             m.rightBarline = rb
             m.append(te)
@@ -3043,9 +3043,9 @@ class Test(unittest.TestCase):
                          [1.0, 1/3, 0.0, 1.0, 1/3, 
                           0.0, 1.0, 1/3, 0.0, 1.0, 1/3, 0.0])
         self.assertEqual([x.nameWithOctave for x in s.flat.pitches], 
-                         ['A2', 'B-3', 'A2', 'A2', 'C3', 'D-4', 'C3', 'C3', 'E-3', 
-                          'F-4', 'E-3', 'E-3', 'F#3', 'G4', 'F#3', 'F#3', 'A3', 
-                          'B-4', 'A3', 'A3', 'C4', 'D-5', 'C4', 'C4', 'E-4', 'F-5', 
+                         ['A2', 'B-3', 'A2', 'A2', 'C3', 'C#4', 'C3', 'C3', 'E-3', 
+                          'E4', 'E-3', 'E-3', 'F#3', 'G4', 'F#3', 'F#3', 'A3', 
+                          'B-4', 'A3', 'A3', 'C4', 'C#5', 'C4', 'C4', 'E-4', 'E5', 
                           'E-4', 'E-4', 'F#4', 'G5', 'F#4', 'F#4'])
         #s.show()    
         
@@ -3057,17 +3057,17 @@ class Test(unittest.TestCase):
         self.assertEqual(str(s1.flat.pitches[0]), 'C3')
         
         self.assertEqual(features.vectorById(s1, 'p20'), 
-                         [0.2, 0.06666666666666666, 0.0, 0.6, 0.2, 0.0, 
-                          1.0, 0.3333333333333333333333, 0.0, 0.0, 0.0, 0.0])
+                         [0.2, 2/30, 0.0, 0.6, 0.2, 0.0, 
+                          1.0, 1/3, 0.0, 0.0, 0.0, 0.0])
         
         self.assertEqual([x.nameWithOctave for x in s1.flat.pitches], 
-                         ['C3', 'D-4', 'C3', 'C3', 'E-3', 'F-4', 'E-3', 
-                          'E-3', 'E-3', 'F-4', 'E-3', 'E-3', 'E-3', 'F-4', 
+                         ['C3', 'C#4', 'C3', 'C3', 'E-3', 'E4', 'E-3', 
+                          'E-3', 'E-3', 'E4', 'E-3', 'E-3', 'E-3', 'E4', 
                           'E-3', 'E-3', 'F#3', 'G4', 'F#3', 'F#3', 'F#3', 
                           'G4', 'F#3', 'F#3', 'F#3', 'G4', 'F#3', 'F#3', 
                           'F#3', 'G4', 'F#3', 'F#3', 'F#3', 'G4', 'F#3', 'F#3', 
-                          'C4', 'D-5', 'C4', 'C4', 'E-4', 'F-5', 'E-4', 'E-4', 'E-4', 
-                          'F-5', 'E-4', 'E-4', 'E-4', 'F-5', 'E-4', 'E-4', 'F#4', 'G5', 
+                          'C4', 'C#5', 'C4', 'C4', 'E-4', 'E5', 'E-4', 'E-4', 'E-4', 
+                          'E5', 'E-4', 'E-4', 'E-4', 'E5', 'E-4', 'E-4', 'F#4', 'G5', 
                           'F#4', 'F#4', 'F#4', 'G5', 'F#4', 'F#4', 'F#4', 'G5', 'F#4', 
                           'F#4', 'F#4', 'G5', 'F#4', 'F#4', 'F#4', 'G5', 'F#4', 'F#4'])
 

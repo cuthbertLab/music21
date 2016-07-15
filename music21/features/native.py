@@ -93,7 +93,7 @@ class QualityFeature(featuresModule.FeatureExtractor):
     believe (having very little to go on) fits the profile of e-minor best. 
 
 
-    >>> schoenberg19mvmt6= corpus.parse('schoenberg/opus19', 6)
+    >>> schoenberg19mvmt6 = corpus.parse('schoenberg/opus19', 6)
     >>> fe2 = features.native.QualityFeature(schoenberg19mvmt6)
     >>> f2 = fe2.extract()
     >>> f2.vector
@@ -114,27 +114,31 @@ class QualityFeature(featuresModule.FeatureExtractor):
 
         self.name = 'Quality'
         self.description = '''
-            Set to 0 if the key signature indicates that 
+            Set to 0 if the Key or KeySignature indicates that 
             a recording is major, set to 1 if it indicates 
-            that it is minor and set to 0 if key signature is unknown. Music21
-            addition: if no key mode is found in the piece, analyze the piece to
+            that it is minor.   
+            Music21 addition: if no key mode is found in the piece, analyze the piece to
             discover what mode it is most likely in.
             '''
         self.isSequential = True
         self.dimensions = 1
 
     def _process(self):
-        '''Do processing necessary, storing result in _feature.
+        '''
+        Do processing necessary, storing result in _feature.
         '''
         allKeys = self.data['flat.getElementsByClass.KeySignature']
         keyFeature = None
         for x in allKeys:
-            if x.mode == 'major':
+            if not hasattr(x, 'mode'):
+                continue
+            elif x.mode == 'major':
                 keyFeature = 0
                 break
             elif x.mode == 'minor':
                 keyFeature = 1
                 break
+            
         if keyFeature is None:
             analyzedMode = self.data['flat.analyzedKey'].mode
             if analyzedMode == 'major':

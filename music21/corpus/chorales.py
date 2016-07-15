@@ -1165,7 +1165,7 @@ class Iterator(object):
             {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.clef.TrebleClef>
-                {0.0} <music21.key.KeySignature of 1 sharp, mode major>
+                {0.0} <music21.key.Key of G major>
                 {0.0} <music21.meter.TimeSignature 3/4>
                 {0.0} <music21.note.Note G>
         ...
@@ -1183,7 +1183,7 @@ class Iterator(object):
             {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.clef.TrebleClef>
-                {0.0} <music21.key.KeySignature of 1 sharp, mode minor>
+                {0.0} <music21.key.Key of e minor>
                 {0.0} <music21.meter.TimeSignature 4/4>
                 {0.0} <music21.note.Note B>
         ...
@@ -1208,7 +1208,7 @@ class Iterator(object):
             {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.clef.TrebleClef>
-                {0.0} <music21.key.KeySignature of 1 sharp, mode minor>
+                {0.0} <music21.key.Key of e minor>
                 {0.0} <music21.meter.TimeSignature 4/4>
                 {0.0} <music21.note.Note B>
         ...
@@ -1226,7 +1226,7 @@ class Iterator(object):
             {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.clef.TrebleClef>
-                {0.0} <music21.key.KeySignature of 1 sharp, mode major>
+                {0.0} <music21.key.Key of G major>
                 {0.0} <music21.meter.TimeSignature 3/4>
                 {0.0} <music21.note.Note G>
         ...

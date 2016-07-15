@@ -747,6 +747,17 @@ class Test(unittest.TestCase):
         pass
     
 
+    def testGetVerticalityAtWithKey(self):
+        from music21 import stream, key, note
+        s = stream.Stream()
+        s.insert(0, key.Key('C'))
+        s.insert(0, note.Note('F#4'))
+        scoreTree = s.asTimespans()
+        v = scoreTree.getVerticalityAt(0.0)
+        ps = v.pitchSet
+        self.assertEqual(len(ps), 1)
+        
+
     def testTimespanTree(self):
         for attempt in range(100):
             starts = list(range(20))
@@ -812,5 +823,5 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test) #, runTest='testElementsStoppingAt')
+    music21.mainTest(Test) #, runTest='testGetVerticalityAtWithKey')
 

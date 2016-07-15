@@ -536,7 +536,7 @@ class PitchedTimespan(ElementTimespan):
         ()
         '''
         result = []
-        if hasattr(self.element, 'pitches'):
+        if hasattr(self.element, 'pitches') and 'music21.key.Key' not in self.element.classSet:
             result.extend(self.element.pitches)
         result.sort()
         return tuple(result)

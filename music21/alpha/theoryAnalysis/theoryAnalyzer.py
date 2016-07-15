@@ -469,9 +469,9 @@ def getLinearSegments(score, partNum, lengthLinearSegment, classFilterList=None)
     >>> part0.append(note.Note('c5'))
     >>> part0.append(note.Note('c6'))
     >>> sc.insert(part0)
-    >>> len(alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc, 0,3, ['Note']))
+    >>> len(alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc, 0, 3, ['Note']))
     2
-    >>> alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc, 0,3, ['Note'])
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc, 0, 3, ['Note'])
     [<music21.voiceLeading.ThreeNoteLinearSegment n1=<music21.note.Note C> 
         n2=<music21.note.Note G> n3=<music21.note.Note C> >,
      <music21.voiceLeading.ThreeNoteLinearSegment n1=<music21.note.Note G> 
@@ -484,16 +484,16 @@ def getLinearSegments(score, partNum, lengthLinearSegment, classFilterList=None)
     >>> part1.append(chord.Chord(['E','G','C']))
     >>> part1.append(chord.Chord(['F','A','C']))
     >>> sc2.insert(part1)
-    >>> alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc2, 0,2, ['Chord'])
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc2, 0, 2, ['Chord'])
     [<music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.chord.Chord C E G>, 
         <music21.chord.Chord G B D>]  >,
      <music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.chord.Chord G B D>, 
          <music21.chord.Chord E G C>]  >,
      <music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.chord.Chord E G C>, 
          <music21.chord.Chord F A C>]  >]
-    >>> len(alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc2, 0,2, ['Chord']))
+    >>> len(alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc2, 0, 2, ['Chord']))
     3
-    >>> for x in alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc2, 0,2, ['Chord']):
+    >>> for x in alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc2, 0, 2, ['Chord']):
     ...   print("%r %r" % (x.rootInterval(), x.bassInterval()))
     <music21.interval.ChromaticInterval 7> <music21.interval.ChromaticInterval 2>
     <music21.interval.ChromaticInterval -7> <music21.interval.ChromaticInterval -2>
@@ -501,13 +501,13 @@ def getLinearSegments(score, partNum, lengthLinearSegment, classFilterList=None)
 
     >>> sc3 = stream.Score()
     >>> part2 = stream.Part()
-    >>> part2.append(harmony.ChordSymbol('D-', quarterLength = 1))
-    >>> part2.append(harmony.ChordSymbol('C11', quarterLength = 1))
-    >>> part2.append(harmony.ChordSymbol('C7', quarterLength = 1))
+    >>> part2.append(harmony.ChordSymbol('D-', quarterLength=1))
+    >>> part2.append(harmony.ChordSymbol('C11', quarterLength=1))
+    >>> part2.append(harmony.ChordSymbol('C7', quarterLength=1))
     >>> sc3.insert(part2)
-    >>> len(alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc3, 0,2, ['Harmony']))
+    >>> len(alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc3, 0, 2, ['Harmony']))
     2
-    >>> alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc3,0,2, ['Harmony'])
+    >>> alpha.theoryAnalysis.theoryAnalyzer.getLinearSegments(sc3, 0, 2, ['Harmony'])
     [<music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.harmony.ChordSymbol D->, 
         <music21.harmony.ChordSymbol C11>]  >,
      <music21.voiceLeading.TwoChordLinearSegment objectList=[<music21.harmony.ChordSymbol C11>, 
@@ -518,16 +518,18 @@ def getLinearSegments(score, partNum, lengthLinearSegment, classFilterList=None)
     #no caching here - possibly implement later on...
     verticalities = getVerticalities(score)
 
-    for i in range(0, len(verticalities)-lengthLinearSegment+1):
+    for i in range(len(verticalities) - lengthLinearSegment + 1):
         objects = []
-        for n in range(0,lengthLinearSegment):
-            objects.append(verticalities[i+n].getObjectsByPart(partNum, classFilterList))           
+        for n in range(lengthLinearSegment):
+            objects.append(verticalities[i + n].getObjectsByPart(partNum, classFilterList))           
             #print objects
-        if lengthLinearSegment == 3 and 'Note' in _getTypeOfAllObjects(objects):
+        if (lengthLinearSegment == 3 
+                and 'Note' in _getTypeOfAllObjects(objects)):
             tnls = voiceLeading.ThreeNoteLinearSegment(objects[0], objects[1], objects[2])
             linearSegments.append(tnls)
-        elif (lengthLinearSegment == 2 and 
-                ('Chord' in _getTypeOfAllObjects(objects)) and None not in objects):
+        elif (lengthLinearSegment == 2 
+                and 'Chord' in _getTypeOfAllObjects(objects)
+                and None not in objects):
             tcls = voiceLeading.TwoChordLinearSegment(objects[0], objects[1])
             linearSegments.append(tcls)
         else:
@@ -537,11 +539,11 @@ def getLinearSegments(score, partNum, lengthLinearSegment, classFilterList=None)
     return linearSegments
 
 def _getTypeOfAllObjects(objectList):
-    
     setList = []
     for obj in objectList:
         if obj != None:
-            setList.append(set(obj.classes))
+            setList.append(set (obj.classes) )
+            
     if setList:
         lastSet = setList[0]
         
@@ -550,7 +552,8 @@ def _getTypeOfAllObjects(objectList):
             lastSet = setObj
         
         return newIntersection
-    else: return []
+    else: 
+        return []
 
 def getVerticalityNTuplets(score, ntupletNum):
     '''

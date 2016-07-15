@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2010 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010, 16 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ For most people you'll want to do something like this:
 
 >>> sc = scale.ScalaScale('a4', 'mbira_banda.scl')
 >>> [str(p) for p in sc.pitches]
-['A4', 'B4(-15c)', 'C#5(-11c)', 'D#5(-7c)', 'E~5(+6c)', 'F#5(+14c)', 'G~5(+1c)', 'B-5(+2c)']
+['A4', 'B4(-15c)', 'C#5(-11c)', 'E-5(-7c)', 'E~5(+6c)', 'F#5(+14c)', 'G~5(+1c)', 'B-5(+2c)']
 
 '''
 
@@ -255,12 +255,13 @@ class ScalaData(object):
 
 
     def getIntervalSequence(self):
-        '''Get the scale as a list of Interval objects.
+        '''
+        Get the scale as a list of Interval objects.
         '''
         post = []
         for c in self.getAdjacentCents():
             # convert cent values to semitone values to create intervals
-            post.append(interval.Interval(c*.01))
+            post.append(interval.Interval(c * .01))
         return post
 
     def setIntervalSequence(self, iList):
@@ -576,15 +577,15 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
         self.assertEqual([str(x) for x in ss.getIntervalSequence()], 
                          ['<music21.interval.Interval m2 (+0c)>', 
-                          '<music21.interval.Interval m2 (0c)>', 
-                          '<music21.interval.Interval m2 (0c)>', 
+                          '<music21.interval.Interval m2 (-0c)>', 
+                          '<music21.interval.Interval m2 (-0c)>', 
                           '<music21.interval.Interval m2 (+0c)>', 
                           '<music21.interval.Interval m2 (-2c)>', 
                           '<music21.interval.Interval m2 (+2c)>', 
-                          '<music21.interval.Interval m2 (0c)>', 
+                          '<music21.interval.Interval m2 (-0c)>', 
                           '<music21.interval.Interval m2 (+1c)>', 
                           '<music21.interval.Interval m2 (-1c)>', 
-                          '<music21.interval.Interval m2 (0c)>',
+                          '<music21.interval.Interval m2 (-0c)>',
                           '<music21.interval.Interval m2 (-12c)>', 
                           '<music21.interval.Interval m2 (+12c)>'])
 

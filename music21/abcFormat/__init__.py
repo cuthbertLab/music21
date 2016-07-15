@@ -350,10 +350,10 @@ class ABCMetadata(ABCToken):
 
 
     def _getKeySignatureParameters(self):
-        '''Extract key signature parameters, include indications for mode, 
+        '''
+        Extract key signature parameters, include indications for mode, 
         and translate sharps count compatible with m21, 
         returning the number of sharps and the mode.
-
         
         >>> am = abcFormat.ABCMetadata('K:Eb Lydian')
         >>> am.preParse()
@@ -442,7 +442,7 @@ class ABCMetadata(ABCToken):
 
     def getKeySignatureObject(self):
         '''
-        Return a music21 :class:`~music21.key.KeySignature` 
+        Return a music21 :class:`~music21.key.KeySignature` or :class:`~music21.key.Key`
         object for this metadata tag.
         
         
@@ -451,13 +451,26 @@ class ABCMetadata(ABCToken):
         >>> ks = am.getKeySignatureObject()
         >>> ks
         <music21.key.KeySignature of 1 sharp>
+
+        >>> am = abcFormat.ABCMetadata('K:Gmin')
+        >>> am.preParse()
+        >>> ks = am.getKeySignatureObject()
+        >>> ks
+        <music21.key.Key of g minor>
+        >>> ks.sharps
+        -2
         '''
         if not self.isKey():
             raise ABCTokenException('no key signature associated with this meta-data')
         from music21 import key
         # return values of _getKeySignatureParameters are sharps, mode
         # need to unpack list w/ *
-        return key.KeySignature(*self._getKeySignatureParameters())
+        sharps, mode = self._getKeySignatureParameters()
+        ks = key.KeySignature(sharps)
+        if mode in (None, ""):
+            return ks
+        else:
+            return ks.asKey(mode)
 
 
     def getClefObject(self):
@@ -1983,7 +1996,9 @@ class ABCHandler(object):
                     lastDefaultQL = t.getDefaultQuarterLength()
                 elif t.isKey():
                     sharpCount, mode = t._getKeySignatureParameters()
-                    lastKeySignature = key.KeySignature(sharpCount, mode)
+                    lastKeySignature = key.KeySignature(sharpCount)
+                    if mode not in (None, ""):
+                        lastKeySignature = lastKeySignature.asKey(mode)
                 
                 if t.isReferenceNumber():
                     # reset any spanners or parens at the end of any piece 

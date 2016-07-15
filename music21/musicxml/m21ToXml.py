@@ -93,6 +93,12 @@ def accidentalToMx(a):
     >>> XB.dump(mxAccidental)
     <accidental>quarter-sharp</accidental>
 
+    >>> a.set('double-flat')
+    >>> mxAccidental = musicxml.m21ToXml.accidentalToMx(a)
+    >>> XB.dump(mxAccidental)
+    <accidental>flat-flat</accidental>
+
+
     >>> a.set('one-and-a-half-sharp')
     >>> mxAccidental = musicxml.m21ToXml.accidentalToMx(a)
     >>> XB.dump(mxAccidental)
@@ -117,6 +123,8 @@ def accidentalToMx(a):
         mxName = "quarter-flat"
     elif a.name == "one-and-a-half-flat": 
         mxName = "three-quarters-flat"
+    elif a.name == "double-flat": 
+        mxName = "flat-flat"
     else: # all others are the same
         mxName = a.name
 
@@ -4107,24 +4115,31 @@ class MeasureExporter(XMLExporterBase):
         m = self.stream
         self.currentDivisions = defaults.divisionsPerQuarter
         mxAttributes = Element('attributes')
+        # TODO: footnote
+        # TODO: level
         mxDivisions = SubElement(mxAttributes, 'divisions')
         mxDivisions.text = str(self.currentDivisions)
-        if self.transpositionInterval is not None:
-            mxAttributes.append(self.intervalToXmlTranspose(self.transpositionInterval))
         if 'Measure' in m.classes:
             if m.keySignature is not None:
                 mxAttributes.append(self.keySignatureToXml(m.keySignature))
             if m.timeSignature is not None:
                 mxAttributes.append(self.timeSignatureToXml(m.timeSignature))
+            # TODO: staves (piano staff...)
+            # TODO: part-symbol
+            # TODO: instruments
             if m.clef is not None:
                 mxAttributes.append(self.clefToXml(m.clef))
 
-        # todo returnType = 'list'
         found = m.getElementsByClass('StaffLayout')
-        if len(found) > 0:
+        if found:
             sl = found[0] # assume only one per measure
             mxAttributes.append(self.staffLayoutToXmlStaffDetails(sl)) 
 
+        if self.transpositionInterval is not None:
+            mxAttributes.append(self.intervalToXmlTranspose(self.transpositionInterval))
+        
+        # directive is deprecated, do not support
+        # TODO: measure-style
         self.xmlRoot.append(mxAttributes)
         return mxAttributes
     
@@ -4201,7 +4216,7 @@ class MeasureExporter(XMLExporterBase):
         # TODO: attr: print-object
         return mxTime
 
-    def keySignatureToXml(self, keySignature):
+    def keySignatureToXml(self, keyOrKeySignature):
         '''
         returns a key tag from a music21
         key.KeySignature or key.Key object
@@ -4239,16 +4254,15 @@ class MeasureExporter(XMLExporterBase):
         # Choice traditional-key
         
         # TODO: cancel
-        seta(keySignature, mxKey, 'fifths', 'sharps')
-        if keySignature.mode is not None:
+        seta(keyOrKeySignature, mxKey, 'fifths', 'sharps')
+        if hasattr(keyOrKeySignature, 'mode') and keyOrKeySignature.mode is not None:
             if (environLocal.xmlReaderType() == 'Musescore' 
-                    and keySignature.mode not in ('major', 'minor')):
+                    and keyOrKeySignature.mode not in ('major', 'minor')):
                 # Musescore up to v. 2 has major problems with modes other than major or minor
                 # Fixed in latest Nightlys
                 pass            
             else:
-                seta(keySignature, mxKey, 'mode')
-                
+                seta(keyOrKeySignature, mxKey, 'mode')
                 
         # TODO: key-octave
         return mxKey

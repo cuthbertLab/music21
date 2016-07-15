@@ -79,6 +79,14 @@ stemDirectionNames = [
 class LyricException(exceptions21.Music21Exception):
     pass
 
+class NoteException(exceptions21.Music21Exception):
+    pass
+
+class NotRestException(exceptions21.Music21Exception):
+    pass
+
+#-------------------------------------------------------------------------------
+
 
 class Lyric(SlottedObjectMixin):
     '''
@@ -351,7 +359,7 @@ class GeneralNote(base.Music21Object):
         else:
             tempDuration = keywords['duration']
         # this sets the stored duration defined in Music21Object
-        base.Music21Object.__init__(self, duration=tempDuration)
+        super(GeneralNote, self).__init__(duration=tempDuration)
 
         self.lyrics = [] # a list of lyric objects
         self.expressions = []
@@ -701,10 +709,6 @@ class GeneralNote(base.Music21Object):
 
 
 #-------------------------------------------------------------------------------
-class NotRestException(exceptions21.Music21Exception):
-    pass
-
-#-------------------------------------------------------------------------------
 class NotRest(GeneralNote):
     '''
     Parent class for Note-like objects that are not rests; that is to say
@@ -720,7 +724,7 @@ class NotRest(GeneralNote):
         information about the beaming of this note.''',
     }
     def __init__(self, *arguments, **keywords):
-        GeneralNote.__init__(self, **keywords)
+        super(NotRest, self).__init__(**keywords)
         self._notehead = 'normal'
         self._noteheadFill = None
         self._noteheadParenthesis = False
@@ -952,9 +956,6 @@ class NotRest(GeneralNote):
 
 
 
-#-------------------------------------------------------------------------------
-class NoteException(exceptions21.Music21Exception):
-    pass
 
 
 #-------------------------------------------------------------------------------
@@ -1004,7 +1005,7 @@ class Note(NotRest):
 
     # Accepts an argument for pitch
     def __init__(self, *arguments, **keywords):
-        NotRest.__init__(self, **keywords)
+        super(Note, self).__init__(**keywords)
         if len(arguments) > 0:
             if isinstance(arguments[0], pitch.Pitch):
                 self.pitch = arguments[0]
@@ -1040,10 +1041,12 @@ class Note(NotRest):
         >>> n3.duration.quarterLength = 3
         >>> n1 == n3
         False
-
+        
+        >>> n1 == 5
+        False
         '''
-        if other == None or not isinstance(other, Note):
-            return False
+        if other is None or not isinstance(other, Note):
+            return NotImplemented
         # checks pitch.octave, pitch.accidental, uses Pitch.__eq__
         if self.pitch != other.pitch:
             return False
@@ -1083,6 +1086,8 @@ class Note(NotRest):
         >>> n1 != n3
         True
         '''
+        if other is None or not isinstance(other, Note):
+            return NotImplemented
         return not self.__eq__(other)
 
     def __lt__(self, other):
@@ -1101,18 +1106,36 @@ class Note(NotRest):
         True
         >>> highE <= otherHighE
         True
+        
+        Notice that in Python3 you cannot compare w/ ints or anything not pitched.
+        
+        `highE < 50`
+        
+        Traceback (most recent call last):
+        TypeError: unorderable types: Note() < int()
         '''
-        return self.pitch < other.pitch
+        try:
+            return self.pitch < other.pitch
+        except AttributeError:
+            return NotImplemented
 
     def __gt__(self, other):
-        return self.pitch > other.pitch
+        try:
+            return self.pitch > other.pitch
+        except AttributeError:
+            return NotImplemented
 
     def __le__(self, other):
-        return self.pitch <= other.pitch
+        try:
+            return self.pitch <= other.pitch
+        except AttributeError:
+            return NotImplemented
 
     def __ge__(self, other):
-        return self.pitch >= other.pitch
-
+        try:
+            return self.pitch >= other.pitch
+        except AttributeError:
+            return NotImplemented
 
     #---------------------------------------------------------------------------
     # property access
@@ -1369,6 +1392,28 @@ class Note(NotRest):
         >>> a
         <music21.note.Note C#>
 
+
+        If the transposition value is an integer, take the KeySignature or Key context
+        into account...
+
+        >>> s = stream.Stream()
+        >>> s.append(key.Key('D'))
+        >>> s.append(note.Note('F'))
+        >>> s.append(key.Key('b-', 'minor'))
+        >>> s.append(note.Note('F'))
+        >>> s.show('text')
+        {0.0} <music21.key.Key of D major>
+        {0.0} <music21.note.Note F>
+        {1.0} <music21.key.Key of b- minor>
+        {1.0} <music21.note.Note F>        
+        >>> for n in s.notes:
+        ...     n.transpose(1, inPlace=True)
+        >>> s.show('text')
+        {0.0} <music21.key.Key of D major>
+        {0.0} <music21.note.Note F#>
+        {1.0} <music21.key.Key of b- minor>
+        {1.0} <music21.note.Note G->        
+        
         '''
         if hasattr(value, 'classes') and 'IntervalBase' in value.classes:
             intervalObj = value
@@ -1383,6 +1428,15 @@ class Note(NotRest):
         # use inPlace, b/c if we are inPlace, we operate on self;
         # if we are not inPlace, post is a copy
         post.pitch.transpose(intervalObj, inPlace=True)
+        if (post.pitch.accidental is not None 
+                and isinstance(value, (int, interval.ChromaticInterval))):
+            ksContext = self.getContextByClass('KeySignature')
+            if ksContext is not None:
+                for alteredPitch in ksContext.alteredPitches:
+                    if (post.pitch.pitchClass == alteredPitch.pitchClass
+                            and post.pitch.accidental.alter != alteredPitch.accidental.alter):
+                        post.pitch.getEnharmonic(inPlace=True)
+
 
         if not inPlace:
             post.derivation.method = 'transpose'
@@ -1436,7 +1490,7 @@ class Unpitched(NotRest):
     isRest = False
 
     def __init__(self):
-        NotRest.__init__(self)
+        super(Unpitched, self).__init__()
         self._storedInstrument = None
 
     def _getStoredInstrument(self):
@@ -1513,7 +1567,7 @@ class Rest(GeneralNote):
     }
 
     def __init__(self, *arguments, **keywords):
-        GeneralNote.__init__(self, **keywords)
+        super(Rest, self).__init__(**keywords)
         self.stepShift = 0 # display line
         self.fullMeasure = "auto" # see docs; True, False, 'always', 
 
@@ -1536,13 +1590,11 @@ class Rest(GeneralNote):
         >>> r1 == note.Note()
         False
         '''
-
         return isinstance(other, Rest) and self.duration == other.duration
 
     def __ne__(self, other):
         '''
         Inequality
-
 
         >>> r1 = note.Rest()
         >>> r2 = note.Rest()
@@ -1554,7 +1606,6 @@ class Rest(GeneralNote):
         >>> r1 != note.Note()
         True
         '''
-
         return not self == other
 
 
@@ -1586,7 +1637,7 @@ class SpacerRest(Rest):
     This may become deprecated at some point...
     '''
     def __init__(self, *arguments, **keywords):
-        Rest.__init__(self, **keywords)
+        super(SpacerRest, self).__init__(**keywords)
 
     def __repr__(self):
         return "<music21.note.SpacerRest %s duration=%s>" % (

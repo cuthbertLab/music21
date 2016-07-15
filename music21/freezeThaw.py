@@ -164,12 +164,12 @@ class StreamFreezer(StreamFreezeThawBase):
     >>> s = st.stream
     >>> s.show('t')
     {0.0} <music21.note.Note C>
-    {1.0} <music21.note.Note D->
+    {1.0} <music21.note.Note C#>
     {2.0} <music21.note.Note D>
     {3.0} <music21.note.Note E->
     {4.0} <music21.note.Note E>
     {5.0} <music21.note.Note F>
-    {6.0} <music21.note.Note G->
+    {6.0} <music21.note.Note F#>
     {7.0} <music21.note.Note G>
 
     >>> sf2 = freezeThaw.StreamFreezer(s) # do not reuse StreamFreezers
@@ -180,12 +180,12 @@ class StreamFreezer(StreamFreezeThawBase):
     >>> s2 = st2.stream
     >>> s2.show('t')
     {0.0} <music21.note.Note C>
-    {1.0} <music21.note.Note D->
+    {1.0} <music21.note.Note C#>
     {2.0} <music21.note.Note D>
     {3.0} <music21.note.Note E->
     {4.0} <music21.note.Note E>
     {5.0} <music21.note.Note F>
-    {6.0} <music21.note.Note G->
+    {6.0} <music21.note.Note F#>
     {7.0} <music21.note.Note G>
     
     
@@ -731,12 +731,12 @@ class StreamThawer(StreamFreezeThawBase):
     >>> s = sfOut.stream
     >>> s.show('t')
     {0.0} <music21.note.Note C>
-    {1.0} <music21.note.Note D->
+    {1.0} <music21.note.Note C#>
     {2.0} <music21.note.Note D>
     {3.0} <music21.note.Note E->
     {4.0} <music21.note.Note E>
     {5.0} <music21.note.Note F>
-    {6.0} <music21.note.Note G->
+    {6.0} <music21.note.Note F#>
     {7.0} <music21.note.Note G>
 
 

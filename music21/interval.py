@@ -861,10 +861,10 @@ class DiatonicInterval(IntervalBase):
     if their directions are the same, but this is not checked yet.    
     '''
     _DOC_ATTR = {
-    'name': 'The name of the interval in abbreviated form without direction.',
-    'niceName': 'The name of the interval in full form.',
-    'directedName': 'The name of the interval in abbreviated form with direction.',
-    'directedNiceName': 'The name of the interval in full form with direction.',
+        'name': 'The name of the interval in abbreviated form without direction.',
+        'niceName': 'The name of the interval in full form.',
+        'directedName': 'The name of the interval in abbreviated form with direction.',
+        'directedNiceName': 'The name of the interval in full form with direction.',
     }
 
     def __init__(self, specifier="P", generic=1):
@@ -1205,7 +1205,7 @@ class ChromaticInterval(IntervalBase):
     Two ChromaticIntervals are equal if their size and direction are equal.
 
     '''
-    def __init__(self, value = 0):
+    def __init__(self, value=0):
         '''
         
         >>> aInterval = interval.ChromaticInterval(-14)
@@ -1716,18 +1716,22 @@ class Interval(IntervalBase):
     IntervalException: either both the starting and the ending note.Note must 
         be given or neither can be given.  You cannot have one without the other.
 
-    An Interval can be constructed from a Diatonic and Chromatic Interval object
+    An Interval can be constructed from a Diatonic and Chromatic Interval object (or just one)
 
-    >>> aInterval = interval.DiatonicInterval('major', 'third')
-    >>> bInterval = interval.ChromaticInterval(4)
-    >>> cInterval = interval.Interval(diatonic=aInterval, chromatic=bInterval)
-    >>> cInterval
+    >>> diaInterval = interval.DiatonicInterval('major', 'third')
+    >>> chrInterval = interval.ChromaticInterval(4)
+    >>> fullInterval = interval.Interval(diatonic=diaInterval, chromatic=chrInterval)
+    >>> fullInterval
     <music21.interval.Interval M3>
 
-    >>> cInterval = interval.Interval(diatonic=aInterval, chromatic=None)
-    Traceback (most recent call last):
-    IntervalException: either both a DiatonicInterval and a ChromaticInterval object have 
-       to be given or neither can be given.  You cannot have one without the other.
+    >>> fullInterval = interval.Interval(diatonic=diaInterval)
+    >>> fullInterval.semitones
+    4
+    >>> fullInterval = interval.Interval(chromatic=chrInterval)
+    >>> fullInterval.diatonic.name
+    'M3'
+    >>> fullInterval.implicitDiatonic
+    True
 
     Two Intervals are the same if their Chromatic and Diatonic intervals
     are the same.  N.B. that interval.Interval('a4') != 'a4' -- maybe it should...
@@ -1774,6 +1778,7 @@ class Interval(IntervalBase):
         self.type = "" # harmonic or melodic
         self.diatonicType = 0
         self.niceName = ""
+        self.implicitDiatonic = False # is this basically a ChromaticInterval object in disguise?
 
 
         if len(arguments) == 1 and isinstance(arguments[0], six.string_types):
@@ -1786,7 +1791,6 @@ class Interval(IntervalBase):
         # interval creation argument
         elif len(arguments) == 1 and common.isNum(arguments[0]):
             self.chromatic = ChromaticInterval(arguments[0])
-            self.diatonic = self.chromatic.getDiatonic()
 
         # permit pitches instead of Notes
         # this requires importing note, which is a bit circular, but necessary
@@ -1810,7 +1814,7 @@ class Interval(IntervalBase):
             if "diatonic" in keywords:
                 self.diatonic = keywords['diatonic']
             if "chromatic" in keywords:
-                self.chromatic = keywords['chromatic']
+                self.chromatic = keywords['chromatic']                    
             if "noteStart" in keywords:
                 self._noteStart = keywords['noteStart']
             if "noteEnd" in keywords:
@@ -1825,8 +1829,8 @@ class Interval(IntervalBase):
         Called during __init__ to assign attributes.
         '''
         # catch case where only one Note is provided
-        if (self._noteStart != None and self._noteEnd == None or 
-            self._noteEnd != None and self._noteStart == None):
+        if ((self._noteStart is not None and self._noteEnd is None) or 
+                (self._noteEnd is not None and self._noteStart is None)):
             raise IntervalException('either both the starting and the ending note.Note must be ' +
                 'given or neither can be given.  You cannot have one without the other.')
 
@@ -1837,24 +1841,27 @@ class Interval(IntervalBase):
             self.diatonic = diatonicInterval
             self.chromatic = chromaticInterval
 
-        # check for error of only one type being defined
-        if (self.chromatic != None and self.diatonic == None or 
-            self.diatonic != None and self.chromatic == None):
-            raise IntervalException('either both a DiatonicInterval and a ChromaticInterval ' + 
-                                    'object have to be given or neither can be given.  ' +
-                                    'You cannot have one without the other.')
+        if self.chromatic is not None and self.diatonic is None:
+            self.diatonic = self.chromatic.getDiatonic()
+            self.implicitDiatonic = True
 
-        if self.chromatic != None:
+        if self.diatonic is not None and self.chromatic is None:
+            self.chromatic = self.diatonic.getChromatic()            
+
+
+        if self.chromatic is not None:
             self.direction = self.chromatic.direction
-        elif self.diatonic != None:
+        elif self.diatonic is not None:
             self.direction = self.diatonic.generic.direction
-            
+        
+        # both self.diatonic and self.chromatic can still both be None if an
+        # empty Interval class is being created, such as in deepcopy
         if self.diatonic is not None:
             self.specifier = self.diatonic.specifier
             self.diatonicType = self.diatonic.specifier
             self.specificName = self.diatonic.specificName
             self.generic = self.diatonic.generic
-
+    
             self.name = self.diatonic.name
             self.niceName = self.diatonic.niceName
             self.simpleName = self.diatonic.simpleName
@@ -1866,15 +1873,19 @@ class Interval(IntervalBase):
             self.directedNiceName = self.diatonic.directedNiceName
             self.directedSimpleName = self.diatonic.directedSimpleName
             self.directedSimpleNiceName = self.diatonic.directedSimpleNiceName
-
+    
             self.isDiatonicStep = self.diatonic.isDiatonicStep
-        
-        if self.chromatic is not None:
+        else:
+            self.isDiatonicStep = False
+
+
+        if self.chromatic is not None:   
             self.isChromaticStep = self.chromatic.isChromaticStep
             self.semitones = self.chromatic.semitones
+        else:
+            self.isChromaticStep = False
 
-        if self.chromatic is not None and self.diatonic is not None:
-            self.isStep = self.isChromaticStep or self.isDiatonicStep
+        self.isStep = self.isChromaticStep or self.isDiatonicStep
 
     def __repr__(self):
         from music21 import pitch
@@ -2020,7 +2031,6 @@ class Interval(IntervalBase):
     def transposePitch(self, 
                        p, 
                        reverse=False, 
-                       clearAccidentalDisplay=True, 
                        maxAccidental=4):
         '''
         Given a :class:`~music21.pitch.Pitch` object, return a new, 
@@ -2060,6 +2070,39 @@ class Interval(IntervalBase):
 
         OMIT_FROM_DOCS
         TODO: More tests here, esp. on fundamental.
+        
+        
+        >>> p1 = pitch.Pitch('C4')
+        >>> i = interval.Interval(1)  # half-step, regardless of diatonic
+        >>> p2 = i.transposePitch(p1)
+        >>> p2
+        <music21.pitch.Pitch C#4>
+        >>> p3 = i.transposePitch(p2)
+        >>> p3
+        <music21.pitch.Pitch D4>
+        
+        '''
+        if self.implicitDiatonic:
+            # this will not preserve diatonic relationships
+            pOut = self.chromatic.transposePitch(p)
+        else:
+            pOut = self._diatonicTransposePitch(p, reverse, maxAccidental)
+        
+
+        if p.fundamental is not None:
+            # recursively call method
+            pOut.fundamental = self.transposePitch(p.fundamental, 
+                                                     reverse=reverse, 
+                                                     maxAccidental=maxAccidental)
+            if p.fundamental.octave is None:
+                pOut.fundamental.octave = None
+        
+        return pOut
+        
+    def _diatonicTransposePitch(self, p, reverse, maxAccidental):
+        '''
+        abstracts out the diatonic aspects of transposing, so that implicitDiatonic and
+        regular diatonic can use some of the same code.
         '''
         # NOTE: this is a performance critical method
         if p.octave is None:
@@ -2124,15 +2167,6 @@ class Interval(IntervalBase):
         if useImplicitOctave is True:
             pitch2.octave = None
 
-        if pitch1.fundamental is not None:
-            # recursively call method
-            pitch2.fundamental = self.transposePitch(pitch1.fundamental, 
-                                                     reverse=reverse, 
-                                                     clearAccidentalDisplay=clearAccidentalDisplay, 
-                                                     maxAccidental=maxAccidental)
-            if pitch1.fundamental.octave is None:
-                pitch2.fundamental.octave = None
-
         return pitch2
 
 
@@ -2158,7 +2192,7 @@ class Interval(IntervalBase):
         >>> aInterval.reverse()
         <music21.interval.Interval m-3>
         '''
-        if self._noteStart != None and self._noteEnd != None:
+        if self._noteStart is not None and self._noteEnd is not None:
             return Interval(noteStart=self._noteEnd, noteEnd=self._noteStart)
         else:
             return Interval(diatonic=self.diatonic.reverse(),
@@ -2876,22 +2910,22 @@ class Test(unittest.TestCase):
         i = interval.Interval(5.80) # a sharp p4
         p1 = pitch.Pitch('c4')
         p2 = i.transposePitch(p1)
-        self.assertEqual(str(p2), 'G-4(-20c)')
+        self.assertEqual(str(p2), 'F#4(-20c)')
 
-        i = interval.Interval(6.00) # a sharp p4
+        i = interval.Interval(6.00) # an exact Tritone
         p1 = pitch.Pitch('c4')
         p2 = i.transposePitch(p1)
-        self.assertEqual(str(p2), 'G-4')
+        self.assertEqual(str(p2), 'F#4')
 
 
-        i = interval.Interval(5) # a sharp p4
+        i = interval.Interval(5) # a chromatic p4
         p1 = pitch.Pitch('c4')
         p1.microtone = 10 #c+20
         self.assertEqual(str(p1), 'C4(+10c)')
         p2 = i.transposePitch(p1)
         self.assertEqual(str(p2), 'F4(+10c)')
 
-        i = interval.Interval(7.20) # a sharp p4
+        i = interval.Interval(7.20) # a sharp P5
         p1 = pitch.Pitch('c4')
         p1.microtone = -20 #c+20
         self.assertEqual(str(p1), 'C4(-20c)')
@@ -2899,42 +2933,42 @@ class Test(unittest.TestCase):
         self.assertEqual(str(p2), 'G4')
 
 
-        i = interval.Interval(7.20) # a sharp p4
+        i = interval.Interval(7.20) # a sharp P5
         p1 = pitch.Pitch('c4')
         p1.microtone = 80 #c+20
         p2 = i.transposePitch(p1)
         self.assertEqual(str(p2), 'G#4')
 
 
-        i = interval.Interval(0.20) # a sharp p4
+        i = interval.Interval(0.20) # a sharp unison
         p1 = pitch.Pitch('e4')
         p1.microtone = 10
         p2 = i.transposePitch(p1)
         self.assertEqual(str(p2), 'E~4(-20c)')
 
 
-        i = interval.Interval(0.05) # a sharp p4
+        i = interval.Interval(0.05) # a tiny bit sharp unison
         p1 = pitch.Pitch('e4')
         p1.microtone = 5 
         p2 = i.transposePitch(p1)
         self.assertEqual(str(p2), 'E4(+10c)')
 
 
-        i = interval.Interval(12.05) # a sharp p4
+        i = interval.Interval(12.05) # a tiny bit sharp octave
         p1 = pitch.Pitch('e4')
         p1.microtone = 5 
         p2 = i.transposePitch(p1)
         self.assertEqual(str(p2), 'E5(+10c)')
 
 
-        i = interval.Interval(11.85) # a sharp p4
+        i = interval.Interval(11.85) # a flat octave
         p1 = pitch.Pitch('e4')
         p1.microtone = 5 
         p2 = i.transposePitch(p1)
         self.assertEqual(str(p2), 'E5(-10c)')
 
 
-        i = interval.Interval(11.85) # a sharp p4
+        i = interval.Interval(11.85) # a flat octave
         p1 = pitch.Pitch('e4')
         p1.microtone = -20
         p2 = i.transposePitch(p1)

@@ -50,7 +50,6 @@ def cacheMetadata(corpusNames=('local', 'core', 'virtual'),
     '''
     from music21 import corpus
     from music21.corpus import corpora
-    from music21 import metadata
 
     if not common.isIterable(corpusNames):
         corpusNames = (corpusNames,)

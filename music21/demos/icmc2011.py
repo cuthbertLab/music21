@@ -476,10 +476,11 @@ class Test(unittest.TestCase):
         #==== "fig-py07"
         # add examples
         sc1 = scale.SieveScale('c4', '3@0|4@0')
-        assert common.pitchList(sc1.getPitches()) == '[C4, E-4, F-4, G-4, A-4, A4, C5]'
+        self.assertEqual(common.pitchList(sc1.getPitches()), '[C4, E-4, E4, F#4, G#4, A4, C5]')
         
         sc2 = scale.SieveScale('c4', '5@0|7@0')
-        assert common.pitchList(sc2.getPitches()) == '[C4, F4, G4, B-4, D5, E-5, A-5, A5, C#6, E6, F#6, B6]'
+        self.assertEqual(common.pitchList(sc2.getPitches()), 
+                         '[C4, F4, G4, B-4, D5, E-5, G#5, A5, C#6, E6, F#6, B6]')
         
         s = stream.Stream()
         pColection = sc2.getPitches('c3', 'c7')
@@ -495,8 +496,10 @@ class Test(unittest.TestCase):
         #==== "fig-py08"
 
         sc1 = scale.RagAsawari('g3')
-        assert common.pitchList(sc1.getPitches(direction='ascending')) == '[G3, A3, C4, D4, E-4, G4]'
-        assert common.pitchList(sc1.getPitches(direction='descending')) == '[G4, F4, E-4, D4, C4, B-3, A3, G3]'
+        self.assertEqual(common.pitchList(sc1.getPitches(direction='ascending')), 
+                         '[G3, A3, C4, D4, E-4, G4]')
+        self.assertEqual(common.pitchList(sc1.getPitches(direction='descending')), 
+                         '[G4, F4, E-4, D4, C4, B-3, A3, G3]')
         
         
         sc2 = scale.RagMarwa('g3')

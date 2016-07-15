@@ -1608,8 +1608,7 @@ class LilypondConverter(object):
         to a lilyObjects.LyEmbeddedScm object
 
 
-        >>> d = key.KeySignature(-1)
-        >>> d.mode = 'minor'
+        >>> d = key.Key('d')
         >>> conv = lily.translate.LilypondConverter()
         >>> lpEmbeddedScm = conv.lyEmbeddedScmFromKeySignature(d)
         >>> print(lpEmbeddedScm)
@@ -1622,7 +1621,12 @@ class LilypondConverter(object):
         \key fis \major
 
         '''
-        (p, m) = keyObj.pitchAndMode
+        if 'music21.key.Key' not in keyObj.classSet:
+            keyObj = keyObj.asKey('major')
+        
+        p = keyObj.tonic
+        m = keyObj.mode
+
         if m is None:
             m = "major"
         pn = self.baseNameFromPitch(p)
