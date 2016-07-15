@@ -1261,7 +1261,11 @@ class Test(unittest.TestCase):
         tempfp += "-0001.png"
         xmlconverter = ConverterMusicXML()
         self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, xmlfp)
-        
+
+    def testVexFlowShow(self):
+        from music21 import corpus
+        b = corpus.parse('bwv66.6')
+        b.show('ipython.vexflow') # musicxml
         
 class TestExternal(unittest.TestCase):
     def runTest(self):
@@ -1304,11 +1308,6 @@ class TestExternal(unittest.TestCase):
 #         biggerStream.show('musicxml.png')
 #         biggerStream.show()
 #         print(biggerStream.write('musicxml.png'))
-
-    def testVexFlowShow(self):
-        from music21 import chord
-        c = chord.Chord("C4 E4- G4")
-        c.show('ipython.vexflow')
 
 if __name__ == '__main__':
     import music21
