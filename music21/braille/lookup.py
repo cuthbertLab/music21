@@ -174,11 +174,25 @@ fingerMarks = {'1': u'\u2801',
                '4': u'\u2802',
                '5': u'\u2805'}
 
-clefSigns = {'treble': u'\u281c\u280c\u2807',
-             'bass': u'\u281c\u283c\u2807',
-             'alto': u'\u281c\u282c\u2807',
-             'tenor': u'\u281c\u282c\u2810\u2807'}
-
+clefs = {'prefix': u'\u281c',
+         'G': {1: u'\u280c' + octaves[1],
+               2: u'\u280c',
+               3: u'\u280c' + octaves[3],
+               4: u'\u280c' + octaves[4],
+               5: u'\u280c' + octaves[5]},
+         'C': {1: u'\u282c' + octaves[1],
+               2: u'\u282c' + octaves[2],
+               3: u'\u282c',
+               4: u'\u282c' + octaves[4],
+               5: u'\u282c' + octaves[5]},
+         'F': {1: u'\u283c' + octaves[1],
+               2: u'\u283c' + octaves[2],
+               3: u'\u283c' + octaves[3],
+               4: u'\u283c',
+               5: u'\u283c' + octaves[5]},
+         'suffix': {False: u'\u2807',
+                    True: u'\u2805'}
+        }
 bowingSymbols = {}
 
 beforeNoteExpr = {'staccato': u'\u2826',

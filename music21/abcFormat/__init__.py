@@ -1153,7 +1153,7 @@ class ABCNote(ABCToken):
         
         
 
-        # set to True if a modification of key signautre
+        # set to True if a modification of key signature
         # set to False if an altered tone part of a Key
         self.accidentalDisplayStatus = None
         # determined during parse() based on if pitch chars are present
@@ -1168,17 +1168,21 @@ class ABCNote(ABCToken):
         return '<music21.abcFormat.ABCNote %r>' % self.src
 
     
-    def _splitChordSymbols(self, strSrc):
-        '''Split chord symbols from other string characteristics. 
+    @staticmethod
+    def _splitChordSymbols(strSrc):
+        '''
+        Splits chord symbols from other string characteristics. 
         Return list of chord symbols and clean, remain chars
 
+        Staticmethod:
         
         >>> an = abcFormat.ABCNote()
         >>> an._splitChordSymbols('"C"e2')
         (['"C"'], 'e2')
         >>> an._splitChordSymbols('b2')
         ([], 'b2')
-        >>> an._splitChordSymbols('"D7""D"d2')
+        
+        >>> abcFormat.ABCNote._splitChordSymbols('"D7""D"d2')
         (['"D7"', '"D"'], 'd2')
         '''
         if '"' in strSrc:
@@ -1310,8 +1314,8 @@ class ABCNote(ABCToken):
 
 
     def _getQuarterLength(self, strSrc, forceDefaultQuarterLength=None):
-        '''Called with parse(), after context processing, to calculate duration
-
+        '''
+        Called with parse(), after context processing, to calculate duration
         
         >>> an = abcFormat.ABCNote()
         >>> an.activeDefaultQuarterLength = .5
@@ -1532,21 +1536,23 @@ class ABCHandler(object):
         self.activeSpanners = []
 
 
-    def _getLinearContext(self, strSrc, i):
+    @staticmethod
+    def _getLinearContext(strSrc, i):
         '''
         Find the local context of a string or list of objects
         beginning at a particular index. 
         Returns charPrev, charThis, charNext, charNextNext.
 
+        Staticmethod
         
         >>> ah = abcFormat.ABCHandler()
         >>> ah._getLinearContext('12345', 0)
         (None, '1', '2', '3')
         >>> ah._getLinearContext('12345', 1)
         ('1', '2', '3', '4')
-        >>> ah._getLinearContext('12345', 3)
+        >>> abcFormat.ABCHandler._getLinearContext('12345', 3)
         ('3', '4', '5', None)
-        >>> ah._getLinearContext('12345', 4)
+        >>> abcFormat.ABCHandler._getLinearContext('12345', 4)
         ('4', '5', None, None)
 
         >>> ah._getLinearContext([32, None, 8, 11, 53], 4)
@@ -1582,11 +1588,12 @@ class ABCHandler(object):
         return cPrev, c, cNext, cNextNext
         #return cPrevNotSpace, cPrev, c, cNext, cNextNotSpace, cNextNext
 
-
-    def _getNextLineBreak(self, strSrc, i):
+    @staticmethod
+    def _getNextLineBreak(strSrc, i):
         '''
         Return index of next line break after character i.
 
+        Staticmethod
         
         >>> ah = abcFormat.ABCHandler()
         >>> strSrc = 'de  we\\n wer bfg\\n'
@@ -1594,8 +1601,10 @@ class ABCHandler(object):
         6
         >>> strSrc[0:6]
         'de  we'
-        >>> # from last line break
-        >>> ah._getNextLineBreak(strSrc, 6)
+        
+        from last line break
+        
+        >>> abcFormat.ABCHandler._getNextLineBreak(strSrc, 6)
         15
         >>> strSrc[ah._getNextLineBreak(strSrc, 0):]
         '\\n wer bfg\\n'
@@ -1607,16 +1616,17 @@ class ABCHandler(object):
                 return j # will increment to next char on loop
             j += 1
 
-    def barlineTokenFilter(self, token):
+    @staticmethod
+    def barlineTokenFilter(token):
         '''
         Some single barline tokens are better replaced 
         with two tokens. This method, given a token, 
         returns a list of tokens. If there is no change 
         necessary, the provided token will be returned in the list.
         
+        Staticmethod
         
-        >>> abch = abcFormat.ABCHandler()
-        >>> abch.barlineTokenFilter('::')
+        >>> abcFormat.ABCHandler.barlineTokenFilter('::')
         [<music21.abcFormat.ABCBar ':|'>, <music21.abcFormat.ABCBar '|:'>]
         '''
         post = []

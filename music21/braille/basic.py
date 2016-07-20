@@ -3,8 +3,9 @@
 # Name:         basic.py
 # Purpose:      music21 class which allows transcription of music21Object instances to braille.
 # Authors:      Jose Cabal-Ugaz
+#               Bo-cheng (Sponge) Jhan (Clef routines)
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011, 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
@@ -33,7 +34,7 @@ ascii_chars = lookup.ascii_chars
 barlines = lookup.barlines
 beatUnits = lookup.beatUnits
 beforeNoteExpr = lookup.beforeNoteExpr
-clefSigns = lookup.clefSigns
+clefs = lookup.clefs
 fingerMarks = lookup.fingerMarks
 intervals = lookup.intervals
 keySignatures = lookup.keySignatures
@@ -174,50 +175,77 @@ def chordToBraille(music21Chord, descending = True, showOctave = True):
                                 (intervalDistance, intervals[intervalDistance]))
     return u"".join(chordTrans)
 
-def clefToBraille(music21Clef):
+def clefToBraille(music21Clef, changeSuffix=False):
     u"""
     Takes in a :class:`~music21.clef.Clef` and returns its representation
     as a braille string in UTF-8 unicode.
 
-    Only :class:`~music21.clef.TrebleClef`, :class:`~music21.clef.BassClef`, 
-    :class:`~music21.clef.AltoClef`, :class:`~music21.clef.TenorClef` and
-    :class:`~music21.clef.SopranoClef` can be transcribed.
+    Only :class:`~music21.clef.GClef`, :class:`~music21.clef.CClef`, 
+    :class:`~music21.clef.FClef`, :class:`~music21.clef.NoClef` and
+    their subclasses (such as :class:`~music21.clef.TrebleClef`,
+    :class:`~music21.clef.BassClef`) can be transcribed.
 
+    If changeSuffix is True, the suffix of the brailled clef changes from dots
+    1-2-3 to dots 1-3. In scores of keyboard instruments, this change indicates
+    that the playing hand differs from which implied by the clef. (E.g. A G clef
+    in the left hand part of a piano score needs the change of suffix.) Note
+    that changeSuffix works only for G and F clefs.
 
     >>> from music21.braille import basic
     >>> trebleClef = clef.TrebleClef()
     >>> print(basic.clefToBraille(trebleClef))
     ⠜⠌⠇
+    >>> print(basic.clefToBraille(trebleClef, changeSuffix = True))
+    ⠜⠌⠅
     >>> bassClef = clef.BassClef()
     >>> print(basic.clefToBraille(bassClef))
     ⠜⠼⠇
+    >>> print(basic.clefToBraille(bassClef, changeSuffix = True))
+    ⠜⠼⠅
+    
     >>> altoClef = clef.AltoClef()
     >>> print(basic.clefToBraille(altoClef))
     ⠜⠬⠇
     >>> tenorClef = clef.TenorClef()
     >>> print(basic.clefToBraille(tenorClef))
     ⠜⠬⠐⠇
+    >>> noClef = clef.NoClef()
+    >>> basic.clefToBraille(noClef) == ""
+    True
     >>> sopranoClef = clef.SopranoClef()
-    >>> print(basic.clefToBraille(sopranoClef))
-    ⠜⠦
+    >>> print("%s, %d, %s" % (sopranoClef.sign, sopranoClef.line, basic.clefToBraille(sopranoClef)))
+    C, 1, ⠜⠬⠈⠇
     """
-    if isinstance(music21Clef, clef.TrebleClef):
-        brailleClef = clefSigns['treble']
-        music21Clef._brailleEnglish = [u"Treble Clef {0}".format(brailleClef)]
+    clefNames = {
+        "FrenchViolinClef": u"French Violin",
+        "TrebleClef": u"Treble",
+        "GSopranoClef": u"G-soprano",
+        "SopranoClef": u"Soprano",
+        "MezzoSopranoClef": u"Mezzo-soprano",
+        "AltoClef": u"Alto",
+        "TenorClef": u"Tenor",
+        "CBaritoneClef": u"C-baritone",
+        "FBaritoneClef": u"F-baritone",
+        "BassClef": u"Bass",
+        "SubBassClef": u"Sub-bass"
+        }
+    if isinstance(music21Clef, clef.NoClef):
+        music21Clef._brailleEnglish = [u"No Clef {0}".format(str(music21Clef))]
+        return u""
+    brailleClef = clefs['prefix']
+    try:
+        brailleClef += clefs[music21Clef.sign][music21Clef.line]
+        try:
+            music21Clef._brailleEnglish = ([clefNames[music21Clef.__class__.__name__] + 
+                                            u" Clef {0}".format(brailleClef)])
+        except KeyError:
+            music21Clef._brailleEnglish = [u"Unnamed Clef {0}".format(str(music21Clef))]
+        if isinstance(music21Clef, clef.TrebleClef) or isinstance(music21Clef, clef.BassClef):
+            brailleClef += clefs['suffix'][changeSuffix]
+        else:
+            brailleClef += clefs['suffix'][False]
         return brailleClef
-    elif isinstance(music21Clef, clef.BassClef):
-        brailleClef = clefSigns['bass']
-        music21Clef._brailleEnglish = [u"Bass Clef {0}".format(brailleClef)]
-        return brailleClef
-    elif isinstance(music21Clef, clef.AltoClef):
-        brailleClef = clefSigns['alto']
-        music21Clef._brailleEnglish = [u"Alto Clef {0}".format(brailleClef)]
-        return brailleClef
-    elif isinstance(music21Clef, clef.TenorClef):
-        brailleClef = clefSigns['tenor']
-        music21Clef._brailleEnglish = [u"Tenor Clef {0}".format(brailleClef)]
-        return brailleClef
-    else:
+    except KeyError:
         environRules.warn("Clef {0} cannot be transcribed to braille.".format(music21Clef))
         music21Clef._brailleEnglish = ["{0} None".format(str(music21Clef))]
         return symbols['basic_exception']
