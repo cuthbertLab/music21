@@ -18,19 +18,19 @@ except NameError:
     unichr = chr
 
 def makeBrailleDictionary():
-    '''
+    u'''
     return a dictionary mapping six-dot braille characters to lists of dot orders.
     
     >>> B = braille.lookup.makeBrailleDictionary()
-    >>> B[124]
-    u'⠋'
-    >>> B[126]
-    u'⠣'
+    >>> print(B[124])
+    ⠋
+    >>> print(B[126])
+    ⠣
     
-    A special character:
+    A special character (unicode 0x2800)
     
-    >>> B[0]
-    '⠀'
+    >>> print(B[0])
+    ⠀
     '''
     braille_dict = {}
     _BRAILLE_START = 0x2800
