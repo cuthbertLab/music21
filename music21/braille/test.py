@@ -1470,6 +1470,30 @@ def example9_6():
     ⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠐⠻⠃⠁⠪⠁⠃⠀⠨⠱⠠⠂⠻⠂⠅⠀⠻⠂⠇⠫⠇⠃
     >>> print(translate.partToBraille(test.example9_6(), inPlace=True, 
+    ...            showFirstMeasureNumber=False, upperFirstInNoteFingering=True, debug=True))
+    ---begin segment---
+    <music21.braille.segment BrailleSegment>
+    Measure 1, Signature Grouping 1:
+    Key Signature 2 sharp(s) ⠩⠩
+    Time Signature 2/4 ⠼⠃⠲
+    ===
+    Measure 1, Note Grouping 1:
+    <music21.clef.TrebleClef>
+    Octave 4 ⠐
+    F quarter ⠻
+    A quarter ⠪
+    ===
+    Measure 2, Note Grouping 1:
+    Octave 5 ⠨
+    D quarter ⠱
+    F quarter ⠻
+    ===
+    Measure 3, Note Grouping 1:
+    F quarter ⠻
+    E quarter ⠫
+    ===
+    ---end segment---    
+    >>> print(translate.partToBraille(test.example9_6(), inPlace=True, 
     ...            showFirstMeasureNumber=False, upperFirstInNoteFingering=False))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠐⠻⠁⠃⠪⠃⠁⠀⠨⠱⠂⠠⠻⠅⠂⠀⠻⠇⠂⠫⠃⠇
@@ -3301,10 +3325,16 @@ class Test(unittest.TestCase):
 
     def runTest(self):
         pass
-
+    
+    def test96(self):
+        from music21.braille import translate
+        ex96 = example9_6()
+        translate.partToBraille(ex96, inPlace=True, 
+               showFirstMeasureNumber=False, upperFirstInNoteFingering=True)
+        
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, runTest='test96')
 
 #------------------------------------------------------------------------------
 # eof

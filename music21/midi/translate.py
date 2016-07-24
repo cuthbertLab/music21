@@ -235,12 +235,19 @@ def getEndEvents(mt=None, channel=1):
 # Multiobject conversion
 
 def music21ObjectToMidiFile(music21Object):
+    '''
+    Either calls streamToMidiFile on the music21Object or
+    puts a copy of that object into a Stream (so as
+    not to change activeSites, etc.) and calls streamToMidiFile on
+    that object.
+    '''
     classes = music21Object.classes
     if 'Stream' in classes:
         return streamToMidiFile(music21Object)
     else:
+        m21ObjectCopy = copy.deepcopy(music21Object)
         s = stream.Stream()
-        s.insert(0, music21Object)
+        s.insert(0, m21ObjectCopy)
         return streamToMidiFile(s)
    
 
@@ -1667,7 +1674,7 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
     Given a Stream, Score, Part, etc., that may have substreams (i.e.,
     a hierarchy), return a list of :class:`~music21.midi.base.MidiTrack` objects. 
 
-    acceptableChannelList is a list of MIDI Channel numbers that can be used.
+    acceptableChannelList is a list of MIDI Channel numbers that can be used or None.
     If None, then 1-9, 11-16 are used (10 being reserved for percussion).
 
     Called by streamToMidiFile()
@@ -1678,7 +1685,6 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
        be done with a shallow copy?)
        
     2. we make a list of all instruments that are being used in the piece.
-
     '''
     from music21 import midi as midiModule
 

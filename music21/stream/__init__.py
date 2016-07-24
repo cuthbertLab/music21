@@ -2748,8 +2748,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         OMIT_FROM_DOCS
         # TODO: group comparisons are not YET case insensitive.
         '''
-        return self.iter.getElementsByGroup(
-                    groupFilterList).stream()
+        return self.iter.getElementsByGroup(groupFilterList).stream()
                     
 
     def getElementById(self, elementId, classFilter=None):
@@ -3848,7 +3847,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # first, try to get measures
         # this works best of this is a Part or Score
         if Measure in classFilterList or 'Measure' in classFilterList:
-            for m in self.iter.getElementsByClass('Measure'):
+            for m in self.getElementsByClass('Measure'):
                 offset = self.elementOffset(m)
                 if offset not in offsetMap:
                     offsetMap[offset] = []
@@ -3859,7 +3858,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for className in classFilterList:
             if className in [Measure or 'Measure']: # do not redo
                 continue
-            for e in self.iter.getElementsByClass(className):
+            for e in self.getElementsByClass(className):
                 #environLocal.printDebug(['calling measure offsetMap(); e:', e])
                 # NOTE: if this is done on Notes, this can take an extremely
                 # long time to process
@@ -4174,7 +4173,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #for cases when there is more than one instrument
 
         instObj = None
-        post = self.iter.getElementsByClass('Instrument').stream()
+        post = self.getElementsByClass('Instrument').stream()
         if post:
             #environLocal.printDebug(['found local instrument:', post[0]])
             instObj = post[0] # get first
@@ -4339,12 +4338,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         # TODO: activeSite searching is not yet implemented
         # this may not be useful unless a stream is flat
-        post = list(self.iter.getElementsByClass('Clef'))
+        post = list(self.getElementsByClass('Clef'))
 
         #environLocal.printDebug(['getClefs(); count of local', len(post), post])
         if len(post) == 0 and searchActiveSite and self.activeSite is not None:
             #environLocal.printDebug(['getClefs(): search activeSite'])
-            post = list(self.activeSite.iter.getElementsByClass('Clef'))
+            post = list(self.activeSite.getElementsByClass('Clef'))
 
         if len(post) == 0 and searchContext:
             # returns a single element match
@@ -4934,7 +4933,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # get all notes within the start and the minwindow size
                 oStart = o
                 oEnd = oStart + minimumWindowSize
-                subNotes = returnObj.iter.getElementsByOffset(
+                subNotes = returnObj.getElementsByOffset(
                                     oStart, 
                                     oEnd,
                                     includeEndBoundary=False, 
@@ -4957,7 +4956,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # oStart + minimumWindowSize and oStart + qlMax
                 if (includePostWindow and qlMax is not None
                     and qlMax > minimumWindowSize):
-                    subAdd = returnObj.iter.getElementsByOffset(
+                    subAdd = returnObj.getElementsByOffset(
                                             oStart + minimumWindowSize,
                                             oStart + qlMax,
                                             includeEndBoundary=False, 
@@ -4996,7 +4995,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     for n in subNotes:
                         returnObj.remove(n)
                     # remove all rests found in source
-                    for r in list(returnObj.iter.getElementsByClass('Rest')):
+                    for r in list(returnObj.getElementsByClass('Rest')):
                         returnObj.remove(r)
                     if removeRedundantPitches:
                         removedPitches = c.removeRedundantPitches(inPlace=True)
@@ -5031,7 +5030,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # get all notes within the start and the minwindow size
                 oStart = onAndOffOffsets[i]
                 oEnd = onAndOffOffsets[i+1]
-                subNotes = returnObj.iter.getElementsByOffset(
+                subNotes = returnObj.getElementsByOffset(
                                 oStart, 
                                 oEnd,
                                 includeEndBoundary=False, 
@@ -5079,7 +5078,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     for n in subNotes:
                         returnObj.remove(n)
                     # remove all rests found in source
-                    for r in list(returnObj.iter.getElementsByClass('Rest')):
+                    for r in list(returnObj.getElementsByClass('Rest')):
                         returnObj.remove(r)
 
                     if removeRedundantPitches:
@@ -5262,7 +5261,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         returnObj = copy.deepcopy(self)
         returnObj.isSorted = False # this makes all the difference in the world for some reason...
         if returnObj.hasPartLikeStreams():
-            allParts = list(returnObj.iter.getElementsByClass('Stream'))
+            allParts = list(returnObj.getElementsByClass('Stream'))
         else: # simulate a list of Streams
             allParts = [returnObj]
 
@@ -5346,7 +5345,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
                 # place all notes in their new location if offsets match
                 # TODO: this iterates over all notes at each iteration; can be faster
-                for e in post.iter.notesAndRests:
+                for e in post.notesAndRests:
                     # these are flat offset values
                     o = post.elementOffset(e)
                     #environLocal.printDebug(['iterating elements', o, e])
@@ -5955,7 +5954,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         qLenTotal = returnObj.duration.quarterLength
         elements = []
-        for element in returnObj.iter.getElementsByClass(objName):
+        for element in returnObj.getElementsByClass(objName):
 #             if not hasattr(element, 'duration'):
 #                 raise StreamException('can only process objects with duration attributes')
             if element.duration is None:
@@ -6065,7 +6064,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnObj = self
 
         if returnObj.hasPartLikeStreams():
-            for p in returnObj.parts:
+            # partlike does not necessarily mean that the next level down is a stream.Part
+            # object or that this is a stream.Score object, so do not substitute
+            # returnObj.parts for this...
+            for p in returnObj.getElementsByClass('Stream'):                
                 # already copied if necessary; edit in place
                 # when handling a score, retain containers should be true
                 p.stripTies(inPlace=True, matchByPitch=matchByPitch,
@@ -8159,14 +8161,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         if returnObj.hasMeasures():
             # call on component measures
-            for m in returnObj.iter.getElementsByClass('Measure'):
+            for m in returnObj.getElementsByClass('Measure'):
                 m.sliceByQuarterLengths(quarterLengthList,
                     target=target, addTies=addTies, inPlace=True)
             returnObj.elementsChanged()
             return returnObj # exit
 
         if returnObj.hasPartLikeStreams():
-            for p in returnObj.iter.getElementsByClass('Part'):
+            for p in returnObj.getElementsByClass('Part'):
                 p.sliceByQuarterLengths(quarterLengthList,
                     target=target, addTies=addTies, inPlace=True)
             returnObj.elementsChanged()
@@ -8237,7 +8239,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         if returnObj.hasMeasures():
             # call on component measures
-            for m in returnObj.iter.getElementsByClass('Measure'):
+            for m in returnObj.getElementsByClass('Measure'):
                 m.sliceByGreatestDivisor(addTies=addTies, inPlace=True)
             returnObj.elementsChanged()
             return returnObj # exit
@@ -8283,7 +8285,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         if returnObj.hasMeasures():
             # call on component measures
-            for m in returnObj.iter.getElementsByClass('Measure'):
+            for m in returnObj.getElementsByClass('Measure'):
                 # offset values are not relative to measure; need to
                 # shift by each measure's offset
                 offsetListLocal = [o - m.getOffsetBySite(returnObj) for o in offsetList]
@@ -8295,7 +8297,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         if returnObj.hasPartLikeStreams():
             # part-like requires getting Streams, not Parts
-            for p in returnObj.iter.getElementsByClass('Stream'):
+            for p in returnObj.getElementsByClass('Stream'):
                 offsetListLocal = [o - p.getOffsetBySite(returnObj) for o in offsetList]
                 p.sliceAtOffsets(offsetList=offsetListLocal,
                     addTies=addTies, 
@@ -8486,7 +8488,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             multiPart = False
             if not self.isFlat: # if flat, does not have parts!
                 # do not need to look in endElements
-                for obj in self.iter.getElementsByClass('Stream'):
+                for obj in self.getElementsByClass('Stream'):
                     # if obj is a Part, we have multi-parts
                     if obj.isClassOrSubclass(['Part']):
                         multiPart = True
@@ -8502,8 +8504,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     
                     # if components are streams of Notes or Measures,
                     # than assume this is like a Part
-                    elif (obj.iter.getElementsByClass('Measure')
-                          or obj.iter.notesAndRests):
+                    elif (obj.getElementsByClass('Measure')
+                          or obj.notesAndRests):
                         multiPart = True
             self._cache['hasPartLikeStreams'] = multiPart
         return self._cache['hasPartLikeStreams']
@@ -9471,7 +9473,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         for n in self.notes:
             # get simultaneous elements form other stream
-            simultEls = cmpStream.iter.getElementsByOffset( self.elementOffset(n),
+            simultEls = cmpStream.getElementsByOffset( self.elementOffset(n),
                 mustBeginInSpan=False, mustFinishInSpan=False)
             if simultEls:
                 for simultNote in simultEls.notes:
@@ -9832,7 +9834,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # if this is a Score, call this recursively on each Part, then
         # add all parts to one Score
         if self.hasPartLikeStreams():
-            for p in self.iter.parts:
+            for p in self.getElementsByClass('Stream'): # part;like does not necessarily mean .parts
                 sSub = p.voicesToParts()
                 for pSub in sSub:
                     s.insert(0, pSub)
