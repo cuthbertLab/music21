@@ -4,7 +4,7 @@
 # Purpose:      Examples from "Introduction to Braille Music Transcription"
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012, 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 
@@ -16,8 +16,10 @@ from music21 import expressions, key, meter, note, pitch, spanner, stream, tempo
 import unittest
 
 
-
-# Introduction to Braille Music Transcription, Second Edition
+# Examples follow the order in:
+#   Introduction to Braille Music Transcription, Second Edition
+# Mary Turner De Garmo
+# https://www.loc.gov/nls/music/
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # PART ONE
@@ -806,7 +808,7 @@ def example7_2():
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print(translate.partToBraille(test.example7_2(), inPlace=True))
-    ⠀⠀⠀⠀⠀⠜⠦⠀⠀⠀⠀
+    ⠀⠀⠀⠀⠼⠃⠂⠀⠀⠀⠀
     ⠼⠁⠀⠈⠈⠮⠾⠀⠠⠠⠽
     """
     bm = stream.Part()
@@ -3334,7 +3336,7 @@ class Test(unittest.TestCase):
         
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test) #, runTest='test96')
+    music21.mainTest(Test, verbose=True) #, runTest='test96')
 
 #------------------------------------------------------------------------------
 # eof

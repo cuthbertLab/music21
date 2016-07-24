@@ -7,6 +7,8 @@
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
+from __future__ import division, print_function
+
 import unittest
 
 from music21.braille import lookup
@@ -23,7 +25,7 @@ class BrailleText(object):
     """
     Object that handles all the formatting associated with braille music notation.
     """
-    def __init__(self, lineLength = 40, showHand = None):
+    def __init__(self, lineLength=40, showHand=None):
         self.lineLength = lineLength
         self.allLines = []
         self.makeNewLine()
@@ -131,8 +133,12 @@ class BrailleText(object):
             self.makeNewLine()
         self.currentLine.append(measureNumber, addSpace=False)
 
-    def addNoteGrouping(self, noteGrouping, showLeadingOctave=False, withHyphen=False,
-                         forceHyphen=False, forceNewline=False):
+    def addNoteGrouping(self, 
+                        noteGrouping, 
+                        showLeadingOctave=False, 
+                        withHyphen=False,
+                        forceHyphen=False, 
+                        forceNewline=False):
         addSpace = True
         if not self.currentLine.containsNoteGrouping:
             if self.rightHandSymbol or self.leftHandSymbol:
@@ -155,7 +161,7 @@ class BrailleText(object):
             else:
                 self.currentLine.append(noteGrouping, addSpace=addSpace)
         except BrailleTextException:
-            ll4 = self.lineLength / 4
+            ll4 = self.lineLength // 4
             if (not forceNewline 
                     and self.lineLength - self.currentLine.textLocation > ll4 
                     and ll4 <= len(noteGrouping)):
@@ -166,8 +172,8 @@ class BrailleText(object):
                 if not forceHyphen:
                     prevChar = self.currentLine.allChars[self.currentLine.textLocation - 1]
                     if prevChar == symbols['music_hyphen']:
-                        self.currentLine.allChars[self.currentLine.textLocation - 1
-                                                  ] = symbols['space']
+                        prevLoc = self.currentLine.textLocation - 1
+                        self.currentLine.allChars[prevLoc] = symbols['space']
                         self.currentLine.textLocation -= 1
                 self.makeNewLine()
                 if self.rightHandSymbol or self.leftHandSymbol:
@@ -227,7 +233,7 @@ class BrailleText(object):
         return u"\n".join([unicode(l) for l in self.allLines])
 
 class BrailleKeyboard(object):
-    def __init__(self, lineLength = 40):
+    def __init__(self, lineLength=40):
         self.lineLength = lineLength
         self.allLines = []
         self.makeNewLine()
@@ -286,8 +292,8 @@ class BrailleKeyboard(object):
         addSpace = True
         if not self.rightHand.containsNoteGrouping:
             addSpace = False
-            self.rightHand.append(symbols['rh_keyboard'], addSpace = True)
-            self.leftHand.append(symbols['lh_keyboard'], addSpace = True)
+            self.rightHand.append(symbols['rh_keyboard'], addSpace=True)
+            self.leftHand.append(symbols['lh_keyboard'], addSpace=True)
             for dots in binary_dots[noteGroupingR[0]]:
                 if dots == '10' or dots == '11':
                     self.rightHand.append(symbols['dot'], addSpace=False)
@@ -307,8 +313,8 @@ class BrailleKeyboard(object):
             self.rightHand.insert(self.highestMeasureNumberLength - len(measureNumber), 
                                   measureNumber)
             self.leftHand.textLocation = self.rightHand.textLocation
-            self.rightHand.append(symbols['rh_keyboard'], addSpace = True)
-            self.leftHand.append(symbols['lh_keyboard'], addSpace = True)
+            self.rightHand.append(symbols['rh_keyboard'], addSpace=True)
+            self.leftHand.append(symbols['lh_keyboard'], addSpace=True)
             for dots in binary_dots[noteGroupingR[0]]:
                 if dots == '10' or dots == '11':
                     self.rightHand.append(symbols['dot'], addSpace=False)

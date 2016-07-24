@@ -189,10 +189,16 @@ numbers = {0: _B[245],
            8: _B[125],
            9: _B[24]}
 
-beatUnits = {2: _B[23],
+# these are NOT the same as the numbers above. -- digits are dropped one cell:
+beatUnits = {1: _B[2],
+             2: _B[23],
              4: _B[256],
              8: _B[236],
-             16: _B[2] + _B[235]}
+             16: _B[2] + _B[235],
+             32: _B[25] + _B[23],
+             64: _B[235] + _B[256],
+             128: _B[2] + _B[23] + _B[236],  
+             }
 
 rests = {'dummy':   _B[3],
          '128th':   _B[1346],
@@ -206,7 +212,10 @@ rests = {'dummy':   _B[3],
          'breve':   _B[134] + _B[45] + _B[14] + _B[134]}
 
 barlines = {'final': _B[126] + _B[13],
-            'double':_B[126] + _B[13] + _B[3]}
+            'double':_B[126] + _B[13] + _B[3],
+            'dashed': _B[13],
+            'heavy': _B[123], # use "unusual circumstances barline
+            }
 
 fingerMarks = {'1': _B[1],
                '2': _B[12],

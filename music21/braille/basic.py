@@ -65,8 +65,7 @@ def barlineToBraille(music21Barline):
     Takes in a :class:`~music21.bar.Barline` and returns its representation
     as a braille string in UTF-8 unicode.
 
-
-    .. note:: Only double barlines and final barlines can be transcribed.
+    .. note:: Only dashed, double barlines, and final barlines can be transcribed.
 
     >>> from music21.braille import basic
     >>> doubleBarline = bar.Barline('double')
@@ -75,9 +74,12 @@ def barlineToBraille(music21Barline):
     >>> finalBarline = bar.Barline('final')
     >>> print(basic.barlineToBraille(finalBarline))
     ⠣⠅
+
+    Heavy gives an "unusual barline" symbol
+    
     >>> heavyBarline = bar.Barline('heavy')
     >>> print(basic.barlineToBraille(heavyBarline))
-    ⠜⠦
+    ⠇
     """
     try:
         brailleBarline = barlines[music21Barline.style]
@@ -613,14 +615,17 @@ def restToBraille(music21Rest):
     Complex rests are not supported.
 
     >>> from music21.braille import basic
-    >>> dottedQuarter = note.Rest(quarterLength = 1.5)
+    >>> dottedQuarter = note.Rest(quarterLength=1.5)
     >>> print(basic.restToBraille(dottedQuarter))
     ⠧⠄
-    >>> whole = note.Rest(quarterLength = 4.0)
+    >>> whole = note.Rest(quarterLength=4.0)
     >>> print(basic.restToBraille(whole))
     ⠍
-    >>> quarterPlusSixteenth = note.Rest(quarterLength = 1.25)
-    >>> print(basic.restToBraille(quarterPlusSixteenth))
+    
+    This would give a warning and gives the basic_exception symbol:
+    
+    quarterPlusSixteenth = note.Rest(quarterLength=1.25)
+    print(basic.restToBraille(quarterPlusSixteenth))
     ⠜⠦
     """
     music21Rest._brailleEnglish = []
@@ -1379,7 +1384,7 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test) #, verbose=True)
 
 #------------------------------------------------------------------------------
 # eof
