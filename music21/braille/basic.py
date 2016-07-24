@@ -973,47 +973,49 @@ def transcribeNoteFingering(sampleNoteFingering='1', upperFirstInFingering=True)
 
     >>> print(basic.transcribeNoteFingering('x,2'))
     ⠠⠃
-    """
-    if len(sampleNoteFingering) == 1:
-        return fingerMarks[sampleNoteFingering]
-    trans = []
-    change = sampleNoteFingering.split('-')
-    if len(change) == 2:
-        trans.append(fingerMarks[change[0]])
-        trans.append(symbols['finger_change'])
-        trans.append(fingerMarks[change[1]])
     
-    choice = sampleNoteFingering.split('|')
-    if len(choice) == 2:
-        if upperFirstInFingering:
-            trans.append(fingerMarks[choice[0]])
-            trans.append(fingerMarks[choice[1]])
-        else: # lower fingering first
-            trans.append(fingerMarks[choice[1]])
-            trans.append(fingerMarks[choice[0]])
-        
-    pair = sampleNoteFingering.split(',')
-    if len(pair) == 2:
-        try:
-            upper = fingerMarks[pair[0]]
-        except KeyError:
-            upper = symbols['first_set_missing_fingermark']
-        try:
-            lower = fingerMarks[pair[1]]
-        except KeyError:
-            lower = symbols['second_set_missing_fingermark']
-            
-        if upperFirstInFingering:
-            trans.append(upper)
-            trans.append(lower)
-        else: # lower fingering first
-            trans.append(lower)
-            trans.append(upper)
-            
-    if not len(trans):
+    A change of fingering and a choice of fingering combined (thanks to Bo-cheng Jhan
+    for the patch):
+    
+    >>> print(basic.transcribeNoteFingering('1-2|3-4'))
+    ⠁⠉⠃⠇⠉⠂
+    
+    Incorrect fingerings raise a BrailleBasicException:
+    
+    >>> basic.transcribeNoteFingering('6')
+    Traceback (most recent call last):
+    BrailleBasicException: Cannot translate note fingering: 6
+    """
+    try:
+        if len(sampleNoteFingering) == 1:
+            return fingerMarks[sampleNoteFingering]
+        trans = []
+        choice = sampleNoteFingering.split(',')
+        if len(choice) == 2:
+            allowAbsence = True
+        elif len(choice) == 1:
+            choice = sampleNoteFingering.split('|')
+            allowAbsence = False
+        else:
+            raise KeyError
+        if not upperFirstInFingering:
+            choice.reverse()
+        for i in range(len(choice)):
+            change = choice[i].split('-')
+            if len(change) == 2:
+                trans.append(fingerMarks[change[0]])
+                trans.append(symbols['finger_change'])
+                trans.append(fingerMarks[change[1]])
+            elif len(change) == 1:
+                try:
+                    trans.append(fingerMarks[change[0]])
+                except KeyError as e:
+                    if not allowAbsence:
+                        raise e
+                    trans.append(symbols[('first_set_missing_fingermark', 'second_set_missing_fingermark')[i]])
+        return u"".join(trans)
+    except KeyError:
         raise BrailleBasicException("Cannot translate note fingering: " + sampleNoteFingering)
-
-    return u"".join(trans)
 
 def transcribeNoteGrouping(brailleElementGrouping, showLeadingOctave = True):
     '''
