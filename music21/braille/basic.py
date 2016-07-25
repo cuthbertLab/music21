@@ -991,11 +991,11 @@ def transcribeNoteFingering(sampleNoteFingering='1', upperFirstInFingering=True)
     >>> print(basic.transcribeNoteFingering('x,4', upperFirstInFingering=True))
     ⠠⠂
     >>> print(basic.transcribeNoteFingering('x,4', upperFirstInFingering=False))
-    ⠂⠠
+    ⠂⠄
     >>> print(basic.transcribeNoteFingering('4,x', upperFirstInFingering=True))
     ⠂⠄
     >>> print(basic.transcribeNoteFingering('4,x', upperFirstInFingering=False))
-    ⠄⠂
+    ⠠⠂
 
 
     
@@ -1041,8 +1041,7 @@ def transcribeNoteFingering(sampleNoteFingering='1', upperFirstInFingering=True)
                         raise e
                     # a missing symbol, such as "x" was used.  Get the appropriate
                     # missing fingermark symbol.
-                    if (i == 0 and upperFirstInFingering
-                            or i == 1 and not upperFirstInFingering):
+                    if i == 0:
                         fingerMarkToAppend = symbols['first_set_missing_fingermark']
                     else:
                         fingerMarkToAppend = symbols['second_set_missing_fingermark']

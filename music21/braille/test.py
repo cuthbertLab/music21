@@ -1498,7 +1498,7 @@ def example9_6():
     >>> print(translate.partToBraille(test.example9_6(), inPlace=True, 
     ...            showFirstMeasureNumber=False, upperFirstInNoteFingering=False))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠐⠻⠁⠃⠪⠃⠁⠀⠨⠱⠂⠠⠻⠅⠂⠀⠻⠇⠂⠫⠃⠇
+    ⠐⠻⠁⠃⠪⠃⠁⠀⠨⠱⠂⠄⠻⠅⠂⠀⠻⠇⠂⠫⠃⠇
     """
     bm = converter.parse("tinynotation: 2/4 f#4 a d' f'# f'# e'").flat
     bm.insert(0, key.KeySignature(2))
