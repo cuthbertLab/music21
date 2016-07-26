@@ -29,10 +29,11 @@ A scale or harmony may be composed of one or more IntervalNetwork objects.
 Both nodes and edges can be weighted to suggest tonics, dominants, 
 finals, or other attributes of the network. 
 '''
+import copy
+import unittest
+
 from collections import OrderedDict
 
-import unittest
-import copy
 from music21 import exceptions21
 from music21 import interval
 from music21 import common
@@ -2154,6 +2155,20 @@ class IntervalNetwork(object):
         of this IntervalNetwork if networkx is installed
 
         '''
+        def sortTerminusLowThenIntThenTerminusHigh(a):
+            '''
+            return a two-tuple where the first element is -1 if 'TERMINUS_LOW',
+            0 if an int, and 1 if 'TERMINUS_HIGH' or another string, and
+            the second element is the value itself.
+            '''
+            sortFirst = 0
+            if isinstance(a, six.string_types):
+                if a.upper() == 'TERMINUS_LOW':
+                    sortFirst = -1
+                else:
+                    sortFirst = 1
+            return (sortFirst, a)
+            
         #g = networkx.DiGraph()
         g = networkx.MultiDiGraph()
 
@@ -2175,7 +2190,7 @@ class IntervalNetwork(object):
         degreeCount = OrderedDict() # degree, count pairs
         # sorting nodes will help, but not insure, proper positioning
         nKeys = list(self._nodes.keys())
-        nKeys.sort()
+        nKeys.sort(key=sortTerminusLowThenIntThenTerminusHigh)
         for nId in nKeys:
             n = self._nodes[nId]
             if n.degree not in degreeCount:

@@ -3030,7 +3030,7 @@ def example24_1a():
     >>> print(translate.measureToBraille(test.example24_1a(), inPlace=True, 
     ...                    showHand='right', showHeading=True))
     ⠀⠀⠼⠙⠲⠀⠀⠀
-    ⠅⠜⠄⠜⠋⠐⠝⠏
+    ⠨⠜⠄⠜⠋⠐⠝⠏
     """
     rightHand = converter.parse("tinynotation: 4/4 c2 e2").flat
     rightHand.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -3045,7 +3045,7 @@ def example24_1b():
     >>> print(translate.measureToBraille(test.example24_1b(), inPlace=True,  
     ...                    showHand='left', showHeading=True))
     ⠀⠀⠼⠃⠲⠀⠀
-    ⠇⠜⠸⠙⠭⠋⠭
+    ⠸⠜⠸⠙⠭⠋⠭
     """
     leftHand = converter.parse("tinynotation: 2/4 C8 r8 E8 r8").flat
     leftHand.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -3060,10 +3060,10 @@ def example24_2():
     >>> leftHand = test.example24_2()[1]
     >>> print(translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠃⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠁⠀⠅⠜⠨⠙⠐⠓⠋⠓⠀⠐⠛⠓⠋⠊⠀⠐⠓⠛⠋⠑⠀⠐⠋⠋⠑⠭⠀⠐⠋⠑⠋⠓⠀⠐⠛⠓⠊⠛
-    ⠀⠀⠇⠜⠸⠙⠓⠐⠙⠚⠀⠸⠊⠚⠙⠙⠀⠸⠚⠊⠓⠚⠀⠐⠙⠙⠚⠓⠀⠐⠙⠭⠣⠺⠀⠸⠊⠭⠙⠭
-    ⠛⠀⠅⠜⠐⠋⠓⠓⠛⠀⠐⠏⠣⠅
-    ⠀⠀⠇⠜⠐⠙⠭⠚⠓⠀⠐⠝⠣⠅
+    ⠁⠀⠨⠜⠨⠙⠐⠓⠋⠓⠀⠐⠛⠓⠋⠊⠀⠐⠓⠛⠋⠑⠀⠐⠋⠋⠑⠭⠀⠐⠋⠑⠋⠓⠀⠐⠛⠓⠊⠛
+    ⠀⠀⠸⠜⠸⠙⠓⠐⠙⠚⠀⠸⠊⠚⠙⠙⠀⠸⠚⠊⠓⠚⠀⠐⠙⠙⠚⠓⠀⠐⠙⠭⠣⠺⠀⠸⠊⠭⠙⠭
+    ⠛⠀⠨⠜⠐⠋⠓⠓⠛⠀⠐⠏⠣⠅
+    ⠀⠀⠸⠜⠐⠙⠭⠚⠓⠀⠐⠝⠣⠅
     """
     rightHand = converter.parse("tinynotation: 2/4 c'8 g8 e8 g8 f8 g8 e8 a8 g8 " + 
                                 "f8 e8 d8 e8 e8 d8 r8 e8 d8 e8 g8 f8 g8 a8 f8 e8 g8 g8 f8 e2").flat
@@ -3084,8 +3084,8 @@ def example24_3():
     >>> leftHand = test.example24_3()[1]
     >>> print(translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠚⠀⠅⠜⠨⠱⠇⠀⠨⠑⠋⠑⠙⠚⠊⠀⠐⠗⠁⠉⠺⠇
-    ⠀⠀⠇⠜⠸⠚⠊⠀⠸⠓⠭⠚⠭⠑⠭⠀⠸⠓⠊⠚⠙⠱
+    ⠚⠀⠨⠜⠨⠱⠇⠀⠨⠑⠋⠑⠙⠚⠊⠀⠐⠗⠁⠉⠺⠇
+    ⠀⠀⠸⠜⠸⠚⠊⠀⠸⠓⠭⠚⠭⠑⠭⠀⠸⠓⠊⠚⠙⠱
     """
     rightHand = converter.parse("tinynotation: 3/4 r2 d'4 d'8 e'-8 d'8 c'8 b-8 a8 g2 b-4").flat
     leftHand = converter.parse("tinynotation: 3/4 r2 B-8 A8 G8 r8 B-8 r8 d8 " + 
@@ -3121,10 +3121,10 @@ def example24_4():
     >>> leftHand = test.example24_4()[1]
     >>> print(translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠀⠊⠀⠅⠜⠰⠵⠚⠊⠛⠫⠈⠉⠯⠑⠐⠊⠨⠑⠫⠀⠨⠽⠚⠙⠑⠯⠓⠛⠋⠿⠋⠛⠓⠮⠚⠙⠑
-    ⠀⠀⠀⠇⠜⠨⠱⠈⠉⠵⠙⠚⠓⠻⠈⠉⠿⠓⠚⠓⠀⠐⠪⠹⠑⠵⠯⠿⠓⠋⠛⠀⠀⠀⠀⠀⠀⠀
-    ⠁⠁⠀⠅⠜⠰⠯⠑⠙⠚⠮⠓⠛⠋⠕⠣⠅
-    ⠀⠀⠀⠇⠜⠨⠳⠹⠍⠊⠛⠋⠱⠣⠅⠀⠀
+    ⠀⠊⠀⠨⠜⠰⠵⠚⠊⠛⠫⠈⠉⠯⠑⠐⠊⠨⠑⠫⠀⠨⠽⠚⠙⠑⠯⠓⠛⠋⠿⠋⠛⠓⠮⠚⠙⠑
+    ⠀⠀⠀⠸⠜⠨⠱⠈⠉⠵⠙⠚⠓⠻⠈⠉⠿⠓⠚⠓⠀⠐⠪⠹⠑⠵⠯⠿⠓⠋⠛⠀⠀⠀⠀⠀⠀⠀
+    ⠁⠁⠀⠨⠜⠰⠯⠑⠙⠚⠮⠓⠛⠋⠕⠣⠅
+    ⠀⠀⠀⠸⠜⠨⠳⠹⠍⠊⠛⠋⠱⠣⠅⠀⠀
     """
     rightHand = converter.parse("tinynotation: 4/4 d'16 b16 a16 f#16 e4~ e16 d16 A16 d16 e4 " + 
                                 "c#16 B16 c#16 d16 e16 g16 f#16 e16 f#16 e16 f#16 g16 a16 " + 
@@ -3180,7 +3180,7 @@ def example26_1a():
     >>> from music21.braille import translate
     >>> print(translate.measureToBraille(test.example26_1a(), inPlace=True, 
     ...        showHand='right', descendingChords=True))
-    ⠅⠜⠨⠷⠼⠴⠤
+    ⠨⠜⠨⠷⠼⠴⠤
     """
     c1 = chord.Chord(['G4','B4','D5','G5'], quarterLength=4.0)
     m1 = stream.Measure()
@@ -3193,7 +3193,7 @@ def example26_1b():
     >>> from music21.braille import translate
     >>> print(translate.measureToBraille(test.example26_1b(), inPlace=True, 
     ...            showHand='left', descendingChords=False))
-    ⠇⠜⠘⠷⠬⠔⠤
+    ⠸⠜⠘⠷⠬⠔⠤
     """
     c1 = chord.Chord(['G2','B2','D3','G3'], quarterLength=4.0)
     m1 = stream.Measure()
@@ -3208,8 +3208,8 @@ def example26_2():
     >>> leftHand = test.example26_2()[1]
     >>> print(translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True))
     ⠀⠀⠀⠨⠉⠀⠀⠀
-    ⠁⠀⠅⠜⠨⠷⠴⠼
-    ⠀⠀⠇⠜⠘⠷⠔⠬
+    ⠁⠀⠨⠜⠨⠷⠴⠼
+    ⠀⠀⠸⠜⠘⠷⠔⠬
     """
     chord_right = chord.Chord(['D4','B4','G5'], quarterLength=4.0)
     chord_left = chord.Chord(['G2','D3','B3'], quarterLength=4.0)
@@ -3236,8 +3236,8 @@ def example26_3():
     >>> leftHand = test.example26_3()[1]
     >>> print(translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True))
     ⠀⠀⠀⠨⠉⠀⠀⠀
-    ⠁⠀⠅⠜⠨⠯⠐⠬
-    ⠀⠀⠇⠜⠘⠽⠸⠬
+    ⠁⠀⠨⠜⠨⠯⠐⠬
+    ⠀⠀⠸⠜⠘⠽⠸⠬
     """
     chord_right = chord.Chord(['C4','E5'], quarterLength=4.0)
     chord_left = chord.Chord(['C2','E3'], quarterLength=4.0)
@@ -3264,8 +3264,8 @@ def example26_4():
     >>> leftHand = test.example26_4()[1]
     >>> print(translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True))
     ⠀⠀⠀⠀⠨⠉⠀⠀⠀
-    ⠁⠀⠅⠜⠰⠽⠴⠌⠀
-    ⠀⠀⠇⠜⠘⠷⠴⠐⠴
+    ⠁⠀⠨⠜⠰⠽⠴⠌⠀
+    ⠀⠀⠸⠜⠘⠷⠴⠐⠴
     """
     chord_right = chord.Chord(['B4','E5','C6'], quarterLength=4.0)
     chord_left = chord.Chord(['G2','E3','E4'], quarterLength=4.0)
@@ -3292,8 +3292,8 @@ def example26_5():
     >>> leftHand = test.example26_5()[1]
     >>> print(translate.keyboardPartsToBraille(rightHand, leftHand, inPlace=True))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠁⠀⠅⠜⠐⠚⠬⠙⠑⠬⠐⠓⠨⠋⠬⠛⠓⠴⠐⠓⠀⠀
-    ⠀⠀⠇⠜⠘⠓⠔⠸⠋⠘⠓⠔⠸⠚⠸⠙⠔⠊⠓⠔⠸⠚
+    ⠁⠀⠨⠜⠐⠚⠬⠙⠑⠬⠐⠓⠨⠋⠬⠛⠓⠴⠐⠓⠀⠀
+    ⠀⠀⠸⠜⠘⠓⠔⠸⠋⠘⠓⠔⠸⠚⠸⠙⠔⠊⠓⠔⠸⠚
     """
     all_right = [chord.Chord(['G4', 'B4'], quarterLength=0.5), note.Note('C5', quarterLength=0.5),
                  chord.Chord(['B4', 'D5'], quarterLength=0.5), note.Note('G4', quarterLength=0.5),

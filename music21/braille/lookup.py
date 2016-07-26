@@ -3,8 +3,10 @@
 # Name:         lookup.py
 # Purpose:      music21 class which contains lookup tables between print and braille
 # Authors:      Jose Cabal-Ugaz
+#               Bo-cheng Jhan
+#               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011, 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-----------------------------------------------------------------------------------
 
@@ -302,8 +304,8 @@ symbols = {'space': _B[0],
            'cut': _B[456] + _B[14],
            'music_hyphen': _B[5],
            'music_asterisk': _B[345] + _B[26] + _B[35],
-           'rh_keyboard': _B[13] + _B[345],
-           'lh_keyboard': _B[123] + _B[345],
+           'rh_keyboard': _B[46] + _B[345],
+           'lh_keyboard': _B[456] + _B[345],
            'word': _B[345],
            'triplet': _B[23],
            'finger_change': _B[14],
