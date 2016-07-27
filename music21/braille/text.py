@@ -170,21 +170,7 @@ class BrailleText(object):
     
     
     def addInaccord(self, inaccord):
-        addSpace = True
-        if not self.currentLine.containsNoteGrouping:
-            if self.rightHandSymbol or self.leftHandSymbol:
-                if self.currentLine.textLocation == 0:
-                    addSpace = False
-                if self.rightHandSymbol:
-                    self.currentLine.append(symbols['rh_keyboard'], addSpace=addSpace)
-                elif self.leftHandSymbol:
-                    self.currentLine.append(symbols['lh_keyboard'], addSpace=addSpace)
-                for dot in yieldDots(inaccord[0]):
-                    self.currentLine.append(dot, addSpace=False)
-                addSpace = False
-
-        if not self.currentLine.textLocation:
-            addSpace = False
+        addSpace = self.optionalAddKeyboardSymbolsAndDots(inaccord)
 
         try:
             self.currentLine.append(inaccord, addSpace=addSpace)
@@ -245,12 +231,15 @@ class BrailleText(object):
             self.makeNewLine()
         self.currentLine.append(measureNumber, addSpace=False)
 
-    def addNoteGrouping(self, 
-                        noteGrouping, 
-                        showLeadingOctave=False, 
-                        withHyphen=False,
-                        forceHyphen=False, 
-                        forceNewline=False):
+    
+    def optionalAddKeyboardSymbolsAndDots(self, noteGrouping=None):
+        '''
+        Adds symbols for rh_keyboard or lh_keyboard depending on what
+        is appropriate
+        
+        returns a boolean indicating whether a space needs to be added
+        before the next symbol is needed. 
+        '''
         addSpace = True
         if not self.currentLine.containsNoteGrouping:
             if self.rightHandSymbol or self.leftHandSymbol:
@@ -266,18 +255,29 @@ class BrailleText(object):
 
         if not self.currentLine.textLocation:
             addSpace = False
+        
+        return addSpace
+        
 
+    def addNoteGrouping(self, 
+                        noteGrouping, 
+                        showLeadingOctave=False, 
+                        withHyphen=False,
+                        forceHyphen=False, 
+                        forceNewline=False):
+
+        addSpace = self.optionalAddKeyboardSymbolsAndDots(noteGrouping)
         try:
             if withHyphen:
-                self.currentLine.append(u"".join([noteGrouping, symbols['music_hyphen']]), 
-                                        addSpace=addSpace)
+                groupingPlusHyphen = u"".join([noteGrouping, symbols['music_hyphen']])
+                self.currentLine.append(groupingPlusHyphen, addSpace=addSpace)
             else:
                 self.currentLine.append(noteGrouping, addSpace=addSpace)
         except BrailleTextException:
-            ll4 = self.lineLength // 4
+            quarterLineLength = self.lineLength // 4
             if (not forceNewline 
-                    and self.lineLength - self.currentLine.textLocation > ll4 
-                    and ll4 <= len(noteGrouping)):
+                    and self.lineLength - self.currentLine.textLocation > quarterLineLength 
+                    and quarterLineLength <= len(noteGrouping)):
                 raise BrailleTextException("Split Note Grouping")
             elif not showLeadingOctave:
                 raise BrailleTextException("Recalculate Note Grouping With Leading Octave")
