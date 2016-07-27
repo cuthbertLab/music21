@@ -1138,23 +1138,21 @@ def transcribeNoteGrouping(brailleElementGrouping, showLeadingOctave=True):
                         or isinstance(previousElement, dynamics.Dynamic) 
                         and not isinstance(brailleElement, dynamics.Dynamic) 
                         and not isinstance(brailleElement, expressions.TextExpression)):
-                    for dots in binary_dots[trans[-1][0]]:
-                        if dots == '10' or dots == '11':
-                            trans.insert(-1, symbols['dot'])
-                            previousElement._brailleEnglish.append(
-                                                    u"Dot 3 {0}".format(symbols['dot']))
-                            break
+                    for dot in yieldDots(trans[-1][0]):
+                        trans.insert(-1, dot)
+                        previousElement._brailleEnglish.append(
+                                                    u"Dot 3 {0}".format(dot))
+                        break
                 elif (isinstance(previousElement, expressions.TextExpression)
                       and not isinstance(brailleElement, dynamics.Dynamic)
                       and not isinstance(brailleElement, expressions.TextExpression)):
-                    if not previousElement.content[-1] == '.': 
+                    if previousElement.content[-1] != '.': 
                         # abbreviation, no extra dot 3 necessary
-                        for dots in binary_dots[trans[-1][0]]:
-                            if dots == '10' or dots == '11':
-                                trans.insert(-1, symbols['dot'])
-                                previousElement._brailleEnglish.append(
-                                            u"Dot 3 {0}".format(symbols['dot']))
-                                break
+                        for dot in yieldDots(trans[-1][0]):
+                            trans.insert(-1, dot)
+                            previousElement._brailleEnglish.append(
+                                                        u"Dot 3 {0}".format(dot))
+                            break
             previousElement = brailleElement
         return u"".join(trans)
     except AttributeError:
@@ -1307,6 +1305,30 @@ def brailleUnicodeToSymbols(brailleUnicode, filledSymbol=u'o', emptySymbol=u'\u0
         
     return u'\n'.join(binaryLines[0:-1])
 
+def yieldDots(brailleCharacter):
+    u'''
+    Generator that yields symbol['dot'] characters for each row of a
+    braille character that where the left dot is filled.  These 
+    are used in many places in Braille Music Code.
+    
+    >>> B = braille.lookup.brailleDotDict
+    >>> gen = braille.basic.yieldDots(B[1])
+    >>> gen
+    <generator object yieldDots at 0x10aee5f68>
+    >>> for dot in gen:
+    ...     print(dot)
+    ⠄
+    >>> gen = braille.basic.yieldDots(B[1235])
+    >>> for dot in gen:
+    ...     print(dot)
+    ⠄
+    ⠄
+    ⠄    
+    '''
+    for dots in binary_dots[brailleCharacter]:
+        if dots == '10' or dots == '11':
+            yield symbols['dot']
+            
 #-------------------------------------------------------------------------------
 # Transcription of words and numbers.
 

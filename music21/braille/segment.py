@@ -624,7 +624,8 @@ class BrailleSegment(collections.defaultdict):
             brailleText.addElement(keyOrTimeSig=symbols['repeat'] + 
                                                 basic.numberToBraille(repeatTimes),
                                    )
-            self._lastNote = note.Note('A0')
+            self._lastNote = note.Note('A0') # this is set up to try to force an octave symbol.
+                # TODO: make an explicit way to force an octave symbol on the next note group. 
             
 
     def extractSignatureGrouping(self, brailleText):
