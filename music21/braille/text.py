@@ -3,8 +3,9 @@
 # Name:         text.py
 # Purpose:      music21 class which allows for accurate formatting of braille transcription
 # Authors:      Jose Cabal-Ugaz
+#               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011, 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 #-------------------------------------------------------------------------------
 from __future__ import division, print_function
@@ -40,9 +41,20 @@ class BrailleText(object):
         self.allHeadings = []
 
     def addElement(self, **elementKeywords):
-        withHyphen = False
         if 'withHyphen' in elementKeywords:
             withHyphen = elementKeywords['withHyphen']
+        else:
+            withHyphen = False
+
+        if 'forceHyphen' in elementKeywords:
+            forceHyphen = elementKeywords['forceHyphen']
+        else:
+            forceHyphen = False
+        if 'forceNewline' in elementKeywords:
+            forceNewline = elementKeywords['forceNewline']
+        else:
+            forceNewline = False
+            
         if 'heading' in elementKeywords:
             self.addHeading(elementKeywords['heading'])
         elif 'measureNumber' in elementKeywords:
@@ -52,14 +64,11 @@ class BrailleText(object):
         elif 'noteGrouping' in elementKeywords:
             noteGrouping = elementKeywords['noteGrouping']
             showLeadingOctave = elementKeywords['showLeadingOctave']
-            forceHyphen = False
-            forceNewline = False
-            if 'forceHyphen' in elementKeywords:
-                forceHyphen = elementKeywords['forceHyphen']
-            if 'forceNewline' in elementKeywords:
-                forceNewline = elementKeywords['forceNewline']
-            self.addNoteGrouping(noteGrouping, showLeadingOctave, 
-                                 withHyphen, forceHyphen, forceNewline)
+            self.addNoteGrouping(noteGrouping, 
+                                 showLeadingOctave, 
+                                 withHyphen, 
+                                 forceHyphen, 
+                                 forceNewline)
         elif 'inaccord' in elementKeywords:
             inaccord = elementKeywords['inaccord']
             self.addInaccord(inaccord)
@@ -204,6 +213,9 @@ class BrailleText(object):
             self.currentLine.insert(2, signatures)
 
     def makeNewLine(self):
+        '''
+        Add a newline to the BrailleText
+        '''
         self.currentLine = BrailleTextLine(self.lineLength)
         self.allLines.append(self.currentLine)
         self.currentLine.isHeading = False
@@ -355,15 +367,41 @@ class BrailleKeyboard(object):
             
     
 class BrailleTextLine(object):
-    def __init__(self, lineLength):
+    '''
+    An object representing a single line of braille text:
+    
+    The initial value is the length of the line:
+    
+    >>> btl = braille.text.BrailleTextLine(40)
+    >>> btl.isHeading
+    False
+    >>> btl.containsNoteGrouping
+    False
+    >>> btl.lineLength
+    40
+    >>> btl.textLocation
+    0
+    >>> btl.highestUsedLocation
+    0
+    >>> btl.allChars
+    ['⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', 
+     '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', 
+     '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', 
+     '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀']
+    >>> btl.allChars == 40 * [braille.lookup.symbols['space']]
+    True
+
+    
+    '''
+    def __init__(self, lineLength=40):
         self.isHeading = False
         self.containsNoteGrouping = False
         self.lineLength = lineLength
         self.allChars = self.lineLength * [symbols['space']]
         self.textLocation = 0
-        self.endOfLine = 0
+        self.highestUsedLocation = 0
         
-    def append(self, text, addSpace = True):
+    def append(self, text, addSpace=True):
         if not self.canAppend(text, addSpace):
             raise BrailleTextException("Text does not fit at end of braille text line.")
         if addSpace:
@@ -371,7 +409,7 @@ class BrailleTextLine(object):
         for char in list(text):
             self.allChars[self.textLocation] = char
             self.textLocation += 1
-        self.endOfLine = self.textLocation
+        self.highestUsedLocation = self.textLocation
         return True
     
     def insert(self, textLocation, text):
@@ -381,19 +419,50 @@ class BrailleTextLine(object):
         for char in list(text):
             self.allChars[self.textLocation] = char
             self.textLocation += 1
-        if self.textLocation > self.endOfLine:
-            self.endOfLine = self.textLocation
+        if self.textLocation > self.highestUsedLocation:
+            self.highestUsedLocation = self.textLocation
         return True
 
-    def canAppend(self, text, addSpace = True):
-        if self.endOfLine > self.textLocation:
-            self.textLocation = self.endOfLine
-        if self.textLocation + len(text) + int(addSpace) > self.lineLength:
+    def canAppend(self, text, addSpace=True):
+        '''
+        Returns True if there is enough space in this line to append the text, or False
+        if not:
+        
+        >>> btl = braille.text.BrailleTextLine(10)
+        >>> btl.canAppend('1234567890', addSpace=False)
+        True
+        >>> btl.canAppend('12345678901', addSpace=False)
+        False
+        >>> btl.canAppend('1234567890', addSpace=True)
+        False
+        >>> btl.textLocation
+        0
+        >>> btl.textLocation = 5
+        >>> btl.canAppend('12345', addSpace=False)
+        True
+        >>> btl.canAppend('123456', addSpace=False)
+        False
+        '''
+        if self.highestUsedLocation > self.textLocation:
+            self.textLocation = self.highestUsedLocation
+
+        addSpaceAmount = 1 if addSpace else 0
+        if (self.textLocation + len(text) + addSpaceAmount) > self.lineLength:
             return False
         else:
             return True
     
     def canInsert(self, textLocation, text):
+        '''
+        Returns True if there is enough space starting at textLocation to append
+        the text. False otherwise:
+        
+        >>> btl = braille.text.BrailleTextLine(10)
+        >>> btl.canInsert(4, '123456')
+        True
+        >>> btl.canInsert(5, '123456')
+        False
+        '''
         if textLocation + len(text) > self.lineLength:
             return False
         else:

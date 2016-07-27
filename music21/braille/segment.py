@@ -615,9 +615,15 @@ class BrailleSegment(collections.defaultdict):
                     self[aKey] = splitNoteGroupA
                     self[bKey] = splitNoteGroupB
                     
-        if noteGrouping.numRepeats > 0:
-            for unused_repeatCounter in range(noteGrouping.numRepeats):
+                    
+        repeatTimes = noteGrouping.numRepeats
+        if repeatTimes > 0 and repeatTimes < 3:
+            for unused_repeatCounter in range(repeatTimes):
                 brailleText.addElement(keyOrTimeSig=symbols['repeat'])
+        elif repeatTimes >= 3:  # 17.3 -- repeat plus number.
+            brailleText.addElement(keyOrTimeSig=symbols['repeat'] + 
+                                                basic.numberToBraille(repeatTimes))
+            
 
     def extractSignatureGrouping(self, brailleText):
         keySignature = None
@@ -1621,10 +1627,10 @@ def addGroupingAttributes(allSegments, **partKeywords):
                         and groupingKey.ordinal == 0 
                         and groupingKey.affinity == AFFINITY_NOTEGROUP):
                     if isinstance(previousList[0], clef.Clef):
-                        measureRepeats = compareNoteGroupings(previousList[1:], groupingList)
+                        isRepetition = areGroupingsIdentical(previousList[1:], groupingList)
                     else:
-                        measureRepeats = compareNoteGroupings(previousList, groupingList)
-                    if measureRepeats:
+                        isRepetition = areGroupingsIdentical(previousList, groupingList)
+                    if isRepetition:
                         previousList.numRepeats += 1
                         del brailleSegment[groupingKey]
                         continue
@@ -1653,7 +1659,7 @@ def addGroupingAttributes(allSegments, **partKeywords):
         if brailleSegment.endHyphen:
             previousList.withHyphen = True
 
-def compareNoteGroupings(noteGroupingA, noteGroupingB):
+def areGroupingsIdentical(noteGroupingA, noteGroupingB):
     """
     Takes in two note groupings, noteGroupingA and noteGroupingB. Returns True
     if both groupings have identical contents. False otherwise.
