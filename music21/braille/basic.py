@@ -147,7 +147,7 @@ def chordToBraille(music21Chord, descending=True, showOctave=True):
     basePitch = allPitches[0]
     initNote = note.Note(basePitch, quarterLength=music21Chord.quarterLength)
     brailleNote = noteToBraille(music21Note=initNote,showOctave=showOctave)
-    if brailleNote == symbols['basic_exception']:
+    if brailleNote == symbols['basic_exception']:  # pragma: no cover
         environRules.warn("Chord {0} cannot be transcribed to braille.".format(music21Chord))
         music21Chord._brailleEnglish.append("{0} None".format(music21Chord))
         return symbols['basic_exception']
@@ -240,7 +240,7 @@ def clefToBraille(music21Clef, changeSuffix=False):
         try:
             music21Clef._brailleEnglish = ([clefNames[music21Clef.__class__.__name__] + 
                                             u" Clef {0}".format(brailleClef)])
-        except KeyError:
+        except KeyError:  # pragma: no cover
             music21Clef._brailleEnglish = [u"Unnamed Clef {0}".format(str(music21Clef))]
         if isinstance(music21Clef, clef.TrebleClef) or isinstance(music21Clef, clef.BassClef):
             brailleClef += clefs['suffix'][changeSuffix]
@@ -663,6 +663,11 @@ def tempoTextToBraille(music21TempoText, maxLineLength=40):
     ⠉⠁⠝⠞⠁⠝⠞⠑⠀⠑⠀⠞⠗⠁⠝⠟⠥⠊⠇⠇⠕⠲
     >>> print(basic.tempoTextToBraille(tempo.TempoText("Andante molto grazioso")))
     ⠠⠁⠝⠙⠁⠝⠞⠑⠀⠍⠕⠇⠞⠕⠀⠛⠗⠁⠵⠊⠕⠎⠕⠲
+
+    >>> print(basic.tempoTextToBraille(tempo.TempoText("Andante molto grazioso ma cantabile"), 
+    ...                                    maxLineLength=20))
+    ⠠⠁⠝⠙⠁⠝⠞⠑⠀⠍⠕⠇⠞⠕⠀⠛⠗⠁⠵⠊⠕⠎⠕⠀⠍⠁⠀
+    ⠉⠁⠝⠞⠁⠃⠊⠇⠑⠲
     """
     music21TempoText._brailleEnglish = []
     try:
@@ -836,6 +841,11 @@ def showOctaveWithNote(previousNote, currentNote):
     >>> basic.showOctaveWithNote(note.Note('C4'), note.Note('F3'))
     True
     >>> basic.showOctaveWithNote(note.Note('C4'), note.Note('A4'))
+    True
+    
+    If previousNote is None, it is always True
+    
+    >>> basic.showOctaveWithNote(None, note.Note('A4'))
     True
     """
     if previousNote is None:
