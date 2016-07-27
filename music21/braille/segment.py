@@ -622,7 +622,9 @@ class BrailleSegment(collections.defaultdict):
                 brailleText.addElement(keyOrTimeSig=symbols['repeat'])
         elif repeatTimes >= 3:  # 17.3 -- repeat plus number.
             brailleText.addElement(keyOrTimeSig=symbols['repeat'] + 
-                                                basic.numberToBraille(repeatTimes))
+                                                basic.numberToBraille(repeatTimes),
+                                   )
+            self._lastNote = note.Note('A0')
             
 
     def extractSignatureGrouping(self, brailleText):

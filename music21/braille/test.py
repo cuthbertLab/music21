@@ -3124,7 +3124,7 @@ def example17_5():
     >>> print(translate.partToBraille(test.example17_5(), inPlace=True, 
     ...                    showFirstMeasureNumber=False))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠐⠳⠓⠓⠳⠀⠶⠼⠑⠀⠙⠋⠓⠨⠙⠫⠀⠶
+    ⠐⠳⠓⠓⠳⠀⠶⠼⠑⠀⠐⠙⠋⠓⠨⠙⠫⠀⠶
     
     """
     bm = converter.parse('tinynotation: 3/4 g4 g8 g g4 ' + 
@@ -3462,15 +3462,20 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
     
-    def test96(self):
+    def test9_6(self):
         from music21.braille import translate
         ex96 = example9_6()
         translate.partToBraille(ex96, inPlace=True, 
                showFirstMeasureNumber=False, upperFirstInNoteFingering=True)
-        
+    
+    def test17_5(self):
+        from music21.braille import translate
+        ex175 = example17_5()
+        translate.partToBraille(ex175, inPlace=True, 
+                                showFirstMeasureNumber=False)        
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test, verbose=True) #, runTest='test96')
+    music21.mainTest(Test, verbose=True) #, runTest='test17_5')
 
 #------------------------------------------------------------------------------
 # eof

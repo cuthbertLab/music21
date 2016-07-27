@@ -12,8 +12,9 @@ from __future__ import division, print_function
 
 import unittest
 
-from music21.braille import lookup
 from music21 import exceptions21
+
+from music21.braille import lookup
 from music21.ext import six
 
 symbols = lookup.symbols
@@ -83,9 +84,11 @@ class BrailleText(object):
             self.makeNewLine()
         indexStart = len(self.allLines) - 1
         indexFinal = indexStart
-        for line in heading.splitlines():
-            self.currentLine.isHeading = True
-            self.currentLine.append(line, addSpace=False)
+        
+        brailleCurrentLine = self.currentLine
+        for headingLine in heading.splitlines():
+            brailleCurrentLine.isHeading = True
+            brailleCurrentLine.append(headingLine, addSpace=False)
             self.makeNewLine()
             indexFinal += 1
         self.allHeadings.append((indexStart, indexFinal))
@@ -240,11 +243,19 @@ class BrailleText(object):
                     self.allLines[j].insert(0, lineToCenter)
                     self.allLines[j].textLocation = maxLineLength
     
-    def __str__(self):
+    def __unicode__(self):
         self.recenterHeadings()
         return u"\n".join([unicode(l) for l in self.allLines])
 
-class BrailleKeyboard(object):
+    if six.PY3:
+        __str__ = __unicode__
+        del(__unicode__)
+
+
+class BrailleKeyboard(BrailleText):
+    '''
+    A subclass of BrailleText that handles both hands at once.
+    '''
     def __init__(self, lineLength=40):
         self.lineLength = lineLength
         self.allLines = []
@@ -254,31 +265,12 @@ class BrailleKeyboard(object):
         self.leftHand = None
 
     def addElement(self, **elementKeywords):
-        if 'heading' in elementKeywords:
-            self.addHeading(elementKeywords['heading'])
-        elif 'pair' in elementKeywords:
+        if 'pair' in elementKeywords:
             (measureNumber, noteGroupingR, noteGroupingL) = elementKeywords['pair']
             self.addNoteGroupings(measureNumber, noteGroupingL, noteGroupingR)
         else:
-            raise BrailleTextException("Invalid Keyword.")
-    
-    def addHeading(self, heading):
-        if not self.currentLine.textLocation == 0:
-            self.makeNewLine()
-        indexStart = len(self.allLines) - 1
-        indexFinal = indexStart
-        for line in heading.splitlines():
-            self.currentLine.isHeading = True
-            self.currentLine.append(line, addSpace=False)
-            self.makeNewLine()
-            indexFinal += 1
-        self.allHeadings.append((indexStart, indexFinal))
+            return super(BrailleKeyboard, self).addElement(**elementKeywords)
 
-    def makeNewLine(self):
-        self.currentLine = BrailleTextLine(self.lineLength)
-        self.allLines.append(self.currentLine)
-        self.currentLine.isHeading = False
-        self.currentLine.containsNoteGrouping = False
 
     def makeNewLines(self):
         if not self.currentLine.textLocation:
@@ -342,32 +334,10 @@ class BrailleKeyboard(object):
         self.rightHand.containsNoteGrouping = True
         self.leftHand.containsNoteGrouping = True
 
-    def recenterHeadings(self):
-        for (indexStart, indexFinal) in self.allHeadings:
-            maxLineLength = 0
-            for i in range(indexFinal, len(self.allLines)):
-                if self.allLines[i].isHeading:
-                    break
-                lineLength = self.allLines[i].textLocation
-                if lineLength > maxLineLength:
-                    maxLineLength = lineLength
-            if self.lineLength == maxLineLength:
-                continue
-            for j in range(indexStart, indexFinal):
-                lineToCenter = unicode(self.allLines[j])
-                lineToCenter = lineToCenter.strip(symbols['space'])
-                if maxLineLength > len(lineToCenter):
-                    lineToCenter = lineToCenter.center(maxLineLength, symbols['space'])
-                    self.allLines[j].insert(0, lineToCenter)
-                    self.allLines[j].textLocation = maxLineLength
-                    
-    def __str__(self):
-        self.recenterHeadings()
-        return u"\n".join([unicode(l) for l in self.allLines])
             
     
 class BrailleTextLine(object):
-    '''
+    u"""
     An object representing a single line of braille text:
     
     The initial value is the length of the line:
@@ -383,16 +353,16 @@ class BrailleTextLine(object):
     0
     >>> btl.highestUsedLocation
     0
-    >>> btl.allChars
-    ['⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', 
-     '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', 
-     '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', 
-     '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀', '⠀']
     >>> btl.allChars == 40 * [braille.lookup.symbols['space']]
     True
 
-    
-    '''
+    >>> btl.append(braille.lookup.symbols['tie'])
+    >>> btl
+    <music21.braille.text.BrailleTextLine object at 0x10af9c630>
+    >>> if ext.six.PY3: unicode = str #_DOCS_HIDE
+    >>> print(unicode(btl))
+    ⠀⠈⠉
+    """
     def __init__(self, lineLength=40):
         self.isHeading = False
         self.containsNoteGrouping = False
@@ -402,6 +372,32 @@ class BrailleTextLine(object):
         self.highestUsedLocation = 0
         
     def append(self, text, addSpace=True):
+        u'''
+        Appends text (with optional space at the beginning) or raises an
+        exception if it cannot be appended.
+        
+        >>> btl = braille.text.BrailleTextLine(6)
+        >>> btl.append(braille.lookup.symbols['tie'], addSpace=False)
+        >>> if ext.six.PY3: unicode = str #_DOCS_HIDE
+        >>> print(unicode(btl))
+        ⠈⠉
+        >>> btl.textLocation
+        2
+        >>> btl.highestUsedLocation
+        2
+        
+        Default is to add a space:
+        
+        >>> btl.append(braille.lookup.symbols['tie'])
+        >>> print(unicode(btl))
+        ⠈⠉⠀⠈⠉
+
+        Out of room:
+        
+        >>> btl.append(braille.lookup.symbols['tie'])
+        Traceback (most recent call last):
+        BrailleTextException: Text does not fit at end of braille text line.
+        '''
         if not self.canAppend(text, addSpace):
             raise BrailleTextException("Text does not fit at end of braille text line.")
         if addSpace:
@@ -410,9 +406,49 @@ class BrailleTextLine(object):
             self.allChars[self.textLocation] = char
             self.textLocation += 1
         self.highestUsedLocation = self.textLocation
-        return True
     
     def insert(self, textLocation, text):
+        u'''
+        Inserts text at a certain location, updating textLocation and possibly
+        highestUsedLocation:
+        
+        >>> btl = braille.text.BrailleTextLine(6)
+        >>> btl.insert(2, braille.lookup.symbols['tie'])
+        >>> if ext.six.PY3: unicode = str #_DOCS_HIDE
+        >>> print(unicode(btl))
+        ⠀⠀⠈⠉
+        >>> btl.textLocation
+        4
+        >>> btl.highestUsedLocation
+        4
+        
+        >>> btl.insert(0, braille.lookup.symbols['tie'])
+        
+        It looks like we have deleted the previous tie:
+        
+        >>> print(unicode(btl))
+        ⠈⠉
+        
+        But that's because only characters up to .textLocation are printed
+        (this may change later)
+        
+        >>> btl.textLocation
+        2
+        >>> btl.highestUsedLocation
+        4
+        
+        Let's change textLocation and now see:
+        
+        >>> btl.textLocation = btl.highestUsedLocation
+        >>> print(unicode(btl))
+        ⠈⠉⠈⠉
+        
+        Inserting beyond the end creates an error:
+
+        >>> btl.insert(5, braille.lookup.symbols['tie'])
+        Traceback (most recent call last):
+        BrailleTextException: Text cannot be inserted at specified location.
+        '''
         if not self.canInsert(textLocation, text):
             raise BrailleTextException("Text cannot be inserted at specified location.")
         self.textLocation = textLocation
@@ -421,7 +457,6 @@ class BrailleTextLine(object):
             self.textLocation += 1
         if self.textLocation > self.highestUsedLocation:
             self.highestUsedLocation = self.textLocation
-        return True
 
     def canAppend(self, text, addSpace=True):
         '''
@@ -442,12 +477,21 @@ class BrailleTextLine(object):
         True
         >>> btl.canAppend('123456', addSpace=False)
         False
+        
+        If highestUsedLocation > textLocation, highestUsedLocation is used instead:
+        
+        >>> btl.highestUsedLocation = 7
+        >>> btl.canAppend('123', addSpace=False)
+        True
+        >>> btl.canAppend('1234', addSpace=False)
+        False
         '''
         if self.highestUsedLocation > self.textLocation:
-            self.textLocation = self.highestUsedLocation
-
+            searchLocation = self.highestUsedLocation
+        else:
+            searchLocation = self.textLocation
         addSpaceAmount = 1 if addSpace else 0
-        if (self.textLocation + len(text) + addSpaceAmount) > self.lineLength:
+        if (searchLocation + len(text) + addSpaceAmount) > self.lineLength:
             return False
         else:
             return True
@@ -468,8 +512,13 @@ class BrailleTextLine(object):
         else:
             return True
     
-    def __str__(self):
+    def __unicode__(self):
         return u"".join(self.allChars[0:self.textLocation])
+
+    if six.PY3:
+        __str__ = __unicode__
+        del(__unicode__)
+    
     
 #-------------------------------------------------------------------------------        
 

@@ -348,21 +348,25 @@ def keySigToBraille(music21KeySignature, outgoingKeySig=None):
 
     try:
         outgoingSharps = outgoingKeySig.sharps
+        absOutgoing = abs(outgoingSharps)
+        absIncoming = abs(incomingSharps)
+        
         trans = []
-        if (incomingSharps == 0 or 
-                outgoingSharps == 0 or 
-                not outgoingSharps / abs(outgoingSharps) == incomingSharps / abs(incomingSharps)):
-            trans.append(naturals[abs(outgoingSharps)])
+        if (incomingSharps == 0 
+                or outgoingSharps == 0 
+                or (outgoingSharps / absOutgoing) != (incomingSharps / absIncoming)):
+            trans.append(naturals[absOutgoing])
             music21KeySignature._brailleEnglish.insert(0, 
                 u"Key Signature {0} naturals {1}".format(outgoingSharps, 
-                                                         naturals[abs(outgoingSharps)]))
-        elif not (abs(outgoingSharps) < abs(incomingSharps)):
+                                                         naturals[absOutgoing]))
+        elif absOutgoing >= absIncoming:
             trans.append(naturals[abs(outgoingSharps - incomingSharps)])
             music21KeySignature._brailleEnglish.insert(0, 
                 u"Key Signature {0} naturals {1}".format(
                     outgoingSharps, naturals[abs(outgoingSharps - incomingSharps)]))
         trans.append(ks_braille)
         return u"".join(trans)
+    
     except KeyError:
         environRules.warn(
             "Outgoing Key Signature {0} cannot be transcribed to braille.".format(outgoingKeySig))
@@ -499,7 +503,7 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
                     noteTrans.append(beforeNoteExpr[name])
                     music21Note._brailleEnglish.append(u"Articulation {0} {1}".format(
                                                                 name, beforeNoteExpr[name]))
-            except (AttributeError, KeyError):
+            except (AttributeError, KeyError) as unused_err:
                 environRules.warn(
                     "Articulation {0} of note {1} cannot be transcribed to braille.".format(
                                                                 artc, music21Note))
@@ -669,7 +673,7 @@ def tempoTextToBraille(music21TempoText, maxLineLength=40):
             phraseTrans = []
             for sampleWord in allWords:
                 brailleWord = wordToBraille(sampleWord)
-                if not (len(phraseTrans) + len(brailleWord) + 1 > (maxLineLength - 6)):
+                if len(phraseTrans) + len(brailleWord) + 1 <= (maxLineLength - 6):
                     phraseTrans.append(brailleWord)
                     phraseTrans.append(symbols['space'])
                 else:
@@ -887,7 +891,7 @@ def transcribeHeading(music21KeySignature=None,
         raise BrailleBasicException("No heading can be made.")
     # Tempo Text
     tempoTextTrans = None
-    if not (music21TempoText is None):
+    if music21TempoText is not None:
         tempoTextTrans = tempoTextToBraille(music21TempoText)
         
     if (music21KeySignature is None 
@@ -908,29 +912,30 @@ def transcribeHeading(music21KeySignature=None,
         
     otherTrans = []
     # Metronome Mark
-    if not (music21MetronomeMark is None):
+    if music21MetronomeMark is not None:
         metronomeMarkTrans = metronomeMarkToBraille(music21MetronomeMark)
         otherTrans.append(metronomeMarkTrans)
     # Key Signature and Time Signature
     try:
         keyAndTimeSig = transcribeSignatures(music21KeySignature, music21TimeSignature)
-        if not (music21MetronomeMark is None):
+        if music21MetronomeMark is not None:
             otherTrans.append(symbols['space'])
         otherTrans.append(keyAndTimeSig)
     except BrailleBasicException:
         if music21MetronomeMark is None and music21TempoText is None:
             raise BrailleBasicException("No heading can be made.")
-    otherTrans = u"".join(otherTrans)
+    
+    otherTransStr = u"".join(otherTrans)
     
     if tempoTextTrans is None:
-        return otherTrans.center(maxLineLength, symbols['space'])
+        return otherTransStr.center(maxLineLength, symbols['space'])
     else:
         tempoTextLines = tempoTextTrans.splitlines()
         headingTrans = []
         for ttline in tempoTextLines:
             headingTrans.append(ttline)
-        headingTrans.append(otherTrans)
-        if len(tempoTextTrans) + len(otherTrans) + 1 <= (maxLineLength - 6):
+        headingTrans.append(otherTransStr)
+        if len(tempoTextTrans) + len(otherTransStr) + 1 <= (maxLineLength - 6):
             headingTrans = symbols['space'].join(headingTrans)
             return headingTrans.center(maxLineLength, symbols['space'])
         else:

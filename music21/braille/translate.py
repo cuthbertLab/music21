@@ -227,9 +227,9 @@ def measureToBraille(music21Measure, **keywords):
     
     """
     (inPlace, unused_debug) = _translateArgs(**keywords)
-    if not 'showHeading' in keywords:
+    if 'showHeading' not in keywords:
         keywords['showHeading'] = False
-    if not 'showFirstMeasureNumber' in keywords:
+    if 'showFirstMeasureNumber' not in keywords:
         keywords['showFirstMeasureNumber'] = False
     measureToTranscribe = music21Measure
     if not inPlace:
