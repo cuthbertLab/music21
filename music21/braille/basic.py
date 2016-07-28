@@ -444,8 +444,13 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
     ⠘⠎⠄
     """
     music21Note._brailleEnglish = []
-    falseKeywords = ['beginLongBracketSlur', 'endLongBracketSlur', 'beginLongDoubleSlur', 
-                     'endLongDoubleSlur', 'shortSlur', 'beamStart', 'beamContinue']
+    falseKeywords = ['beginLongBracketSlur', 
+                     'endLongBracketSlur', 
+                     'beginLongDoubleSlur', 
+                     'endLongDoubleSlur', 
+                     'shortSlur', 
+                     'beamStart', 
+                     'beamContinue']
     
     for keyword in falseKeywords:
         try:

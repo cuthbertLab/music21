@@ -2083,7 +2083,8 @@ def example11_1():
     u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.example11_1(), inPlace=True, segmentBreaks = [(9, 0.0)]))
+    >>> print(translate.partToBraille(test.example11_1(), inPlace=True, 
+    ...                               forcedSegmentBreaks=[(9, 0.0)]))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠸⠱⠋⠛⠓⠊⠀⠺⠪⠓⠛⠀⠋⠑⠙⠑⠋⠛⠀⠳⠪⠧⠀⠺⠙⠑⠋⠛⠀⠫⠱⠙⠚
     ⠀⠀⠐⠙⠋⠑⠙⠚⠩⠊⠀⠞⠧
@@ -2102,7 +2103,8 @@ def example11_2():
     u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
-    >>> print(translate.partToBraille(test.example11_2(), inPlace=True, segmentBreaks = [(8, 3.0)]))
+    >>> print(translate.partToBraille(test.example11_2(), inPlace=True, 
+    ...                               forcedSegmentBreaks=[(8, 3.0)]))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠚⠀⠐⠺⠀⠳⠫⠱⠫⠀⠗⠻⠫⠀⠪⠳⠨⠹⠄⠙⠀⠞⠄⠺⠀⠨⠫⠐⠺⠪⠄⠓⠀⠗⠻⠨⠹
     ⠀⠀⠨⠹⠐⠻⠪⠄⠑⠀⠏⠄⠐

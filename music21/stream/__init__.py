@@ -8262,15 +8262,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return returnObj
 
 
-    def sliceAtOffsets(self, offsetList, target=None,
-        addTies=True, inPlace=False, displayTiedAccidentals=False):
+    def sliceAtOffsets(self, 
+                       offsetList, 
+                       target=None,
+                       addTies=True, 
+                       inPlace=False, 
+                       displayTiedAccidentals=False):
         '''
         Given a list of quarter lengths, slice and optionally tie all
-        Durations at these points.
+        Music21Objects crossing these points.
 
         >>> s = stream.Stream()
         >>> n = note.Note()
-        >>> n.quarterLength = 4
+        >>> n.type = 'whole'
         >>> s.append(n)
         >>> post = s.sliceAtOffsets([1, 2, 3], inPlace=True)
         >>> [(e.offset, e.quarterLength) for e in s]

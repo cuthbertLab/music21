@@ -125,12 +125,11 @@ SEGMENT_SHOWHAND = None  # override with None, 'left', or 'right'
 SEGMENT_SHOWHEADING = True
 SEGMENT_SUPPRESSOCTAVEMARKS = False
 SEGMENT_ENDHYPHEN = False
-SEGMENT_MEASURENUMBERWITHDOT = False
 
 SEGMENT_SLURLONGPHRASEWITHBRACKETS = True
 SEGMENT_SHOWSHORTSLURSANDTIESTOGETHER = False
 SEGMENT_SHOWLONGSLURSANDTIESTOGETHER = False
-SEGMENT_SEGMENTBREAKS = []
+SEGMENT_MAXNOTESFORSHORTSLUR = 4
 
 _ThreeDigitNumber = collections.namedtuple('_ThreeDigitNumber', 'hundreds tens ones')
 
@@ -266,7 +265,7 @@ class BrailleSegment(collections.defaultdict):
                  segment will be followed by a music hyphen.
                  The last grouping is incomplete, because a segment 
                  break occured in the middle of a measure.''',
-         'measureNumberWithDot': '''If True, then the initial measure number of this 
+         'beginsMidMeasure': '''If True, then the initial measure number of this 
                  segment should be followed by a dot. This segment
                  is starting in the middle of a measure.'''
     }
@@ -305,7 +304,7 @@ class BrailleSegment(collections.defaultdict):
         >>> brailleSeg.endHyphen
         False
         
-        >>> brailleSeg.measureNumberWithDot
+        >>> brailleSeg.beginsMidMeasure
         False
 
 
@@ -342,7 +341,7 @@ class BrailleSegment(collections.defaultdict):
         self.showHeading = SEGMENT_SHOWHEADING
         self.suppressOctaveMarks = SEGMENT_SUPPRESSOCTAVEMARKS
         self.endHyphen = SEGMENT_ENDHYPHEN
-        self.measureNumberWithDot = SEGMENT_MEASURENUMBERWITHDOT
+        self.beginsMidMeasure = False
         
     def __str__(self):
         name = u"<music21.braille.segment BrailleSegment>"
@@ -422,10 +421,10 @@ class BrailleSegment(collections.defaultdict):
         """
         Takes in a braille text instance and adds a measure number 
         """
-        if self.measureNumberWithDot:
-            brailleText.addElement(measureNumber = self._getMeasureNumber(withDot=True))
+        if self.beginsMidMeasure:
+            brailleText.addElement(measureNumber=self._getMeasureNumber(withDot=True))
         else:
-            brailleText.addElement(measureNumber = self._getMeasureNumber())
+            brailleText.addElement(measureNumber=self._getMeasureNumber())
 
     def consolidate(self):
         """
@@ -662,6 +661,10 @@ class BrailleSegment(collections.defaultdict):
         self.addMeasureNumber(brailleText)
 
     def _getMeasureNumber(self, withDot=False):
+        '''
+        Returns the measureNumber from the first grouping key.  Adds a dot
+        if withDot is True
+        '''
         initMeasureNumber = self._allGroupingKeys[0].measure
         brailleNumber = basic.numberToBraille(initMeasureNumber)
         if not withDot:
@@ -907,7 +910,7 @@ def findSegments(music21Part, **partKeywords):
     
     >>> from music21.braille import test
     >>> example = test.example11_2()
-    >>> allSegments = braille.segment.findSegments(example, segmentBreaks = [(8, 3.0)])
+    >>> allSegments = braille.segment.findSegments(example, forcedSegmentBreaks=[(8, 3.0)])
     >>> allSegments[0]
     ---begin segment---
     <music21.braille.segment BrailleSegment>
@@ -1017,31 +1020,13 @@ def findSegments(music21Part, **partKeywords):
     ---end segment---
     """
     # Slurring
-    # --------
-    slurLongPhraseWithBrackets = SEGMENT_SLURLONGPHRASEWITHBRACKETS
-    (showShortSlursAndTiesTogether, 
-        showLongSlursAndTiesTogether) = (SEGMENT_SHOWSHORTSLURSANDTIESTOGETHER, 
-                                            SEGMENT_SHOWLONGSLURSANDTIESTOGETHER)
-
-    if 'slurLongPhraseWithBrackets' in partKeywords:
-        slurLongPhraseWithBrackets = partKeywords['slurLongPhraseWithBrackets']
-    if 'showShortSlursAndTiesTogether' in partKeywords:
-        showShortSlursAndTiesTogether = partKeywords['showShortSlursAndTiesTogether']
-    if 'showLongSlursAndTiesTogether' in partKeywords:
-        showLongSlursAndTiesTogether = partKeywords['showLongSlursAndTiesTogether']
-    else:
-        if slurLongPhraseWithBrackets:
-            showLongSlursAndTiesTogether = True
-            
-    prepareSlurredNotes(music21Part, slurLongPhraseWithBrackets,
-        showShortSlursAndTiesTogether, showLongSlursAndTiesTogether)
+    # --------            
+    prepareSlurredNotes(music21Part, **partKeywords)
 
     # Raw Segments
     # ------------
-    segmentBreaks = SEGMENT_SEGMENTBREAKS
-    if 'segmentBreaks' in partKeywords:
-        segmentBreaks = partKeywords['segmentBreaks']
-    allSegments = getRawSegments(music21Part, segmentBreaks)
+    forcedSegmentBreaks = partKeywords.get('forcedSegmentBreaks', [])
+    allSegments = getRawSegments(music21Part, forcedSegmentBreaks)
     # Grouping Attributes
     # -------------------
     addGroupingAttributes(allSegments, **partKeywords)
@@ -1055,10 +1040,7 @@ def findSegments(music21Part, **partKeywords):
     return allSegments
 
 
-def prepareSlurredNotes(music21Part, 
-                        slurLongPhraseWithBrackets=SEGMENT_SLURLONGPHRASEWITHBRACKETS,
-                        showShortSlursAndTiesTogether=SEGMENT_SHOWSHORTSLURSANDTIESTOGETHER, 
-                        showLongSlursAndTiesTogether=SEGMENT_SHOWLONGSLURSANDTIESTOGETHER):
+def prepareSlurredNotes(music21Part, **keywords):
     """
     Takes in a :class:`~music21.stream.Part` and three keywords:
     
@@ -1174,49 +1156,76 @@ def prepareSlurredNotes(music21Part,
     True
     >>> shortC.flat.notes[0].tie
     <music21.tie.Tie start>
+    
+    TODO: This should not add attributes to Note objects but instead return a collection
+    of sets of notes that have each element applied to it.
     """
-    if music21Part.spannerBundle:
-        allNotes = music21Part.flat.notes.stream()
-        for slur in music21Part.spannerBundle.getByClass(spanner.Slur):
-            try:
-                slur[0].index = allNotes.index(slur[0])
-                slur[1].index = allNotes.index(slur[1])
-            except exceptions21.StreamException:
-                continue
-            beginIndex = slur[0].index
-            endIndex = slur[1].index
-            delta = abs(endIndex - beginIndex) + 1
-            if not showShortSlursAndTiesTogether and delta <= 4:
-                if (allNotes[beginIndex].tie is not None 
-                        and allNotes[beginIndex].tie.type == 'start'):
-                    beginIndex += 1
-                if allNotes[endIndex].tie is not None and allNotes[endIndex].tie.type == 'stop':
-                    endIndex -= 1
-            if not showLongSlursAndTiesTogether and delta > 4:
-                if (allNotes[beginIndex].tie is not None 
-                        and allNotes[beginIndex].tie.type == 'start'):
-                    beginIndex += 1
-                if allNotes[endIndex].tie is not None and allNotes[endIndex].tie.type == 'stop':
-                    endIndex -= 1
-            if not(delta > 4):
-                for noteIndex in range(beginIndex, endIndex):
-                    allNotes[noteIndex].shortSlur = True
-            else:
-                if slurLongPhraseWithBrackets:
-                    allNotes[beginIndex].beginLongBracketSlur = True
-                    allNotes[endIndex].endLongBracketSlur = True
-                else:
-                    allNotes[beginIndex + 1].beginLongDoubleSlur = True
-                    allNotes[endIndex - 1].endLongDoubleSlur = True
+    if not music21Part.spannerBundle:
+        return 
 
-def getRawSegments(music21Part, segmentBreaks=None):
+    slurLongPhraseWithBrackets = keywords.get('slurLongPhraseWithBrackets', 
+                                                  SEGMENT_SLURLONGPHRASEWITHBRACKETS)
+    showShortSlursAndTiesTogether = keywords.get('showShortSlursAndTiesTogether',
+                                                     SEGMENT_SHOWSHORTSLURSANDTIESTOGETHER)
+    if 'showLongSlursAndTiesTogether' in keywords:
+        showLongSlursAndTiesTogether = keywords['showLongSlursAndTiesTogether']
+    elif slurLongPhraseWithBrackets:
+        showLongSlursAndTiesTogether = True
+    else:
+        showLongSlursAndTiesTogether = SEGMENT_SHOWLONGSLURSANDTIESTOGETHER
+    
+    allNotes = music21Part.flat.notes.stream()
+    for slur in music21Part.spannerBundle.getByClass(spanner.Slur):
+        firstNote = slur[0]
+        lastNote = slur[1]
+
+        try:
+            beginIndex = allNotes.index(firstNote)
+            endIndex = allNotes.index(lastNote)
+        except exceptions21.StreamException:
+            continue
+        
+        delta = abs(endIndex - beginIndex) + 1
+
+        
+        if not showShortSlursAndTiesTogether and delta <= SEGMENT_MAXNOTESFORSHORTSLUR:
+            # normally slurs are not shown on a tied notes (unless
+            # showShortSlursAndTiesTogether is True, for facsimile transcriptions).
+            if (allNotes[beginIndex].tie is not None 
+                    and allNotes[beginIndex].tie.type == 'start'):
+                beginIndex += 1
+            if allNotes[endIndex].tie is not None and allNotes[endIndex].tie.type == 'stop':
+                endIndex -= 1
+                
+        if not showLongSlursAndTiesTogether and delta > SEGMENT_MAXNOTESFORSHORTSLUR:
+            if (allNotes[beginIndex].tie is not None 
+                    and allNotes[beginIndex].tie.type == 'start'):
+                beginIndex += 1
+            if allNotes[endIndex].tie is not None and allNotes[endIndex].tie.type == 'stop':
+                endIndex -= 1
+                
+        if delta <= SEGMENT_MAXNOTESFORSHORTSLUR:
+            for noteIndex in range(beginIndex, endIndex):
+                allNotes[noteIndex].shortSlur = True
+        else:
+            if slurLongPhraseWithBrackets:
+                allNotes[beginIndex].beginLongBracketSlur = True
+                allNotes[endIndex].endLongBracketSlur = True
+            else:
+                allNotes[beginIndex + 1].beginLongDoubleSlur = True
+                allNotes[endIndex - 1].endLongDoubleSlur = True
+
+def getRawSegments(music21Part, forcedSegmentBreaks=None):
     """
-    Takes in a :class:`~music21.stream.Part` and a segmentBreaks list which 
+    Takes in a :class:`~music21.stream.Part` and, optionally a forcedSegmentBreaks list which 
     contains (measureNumber, offsetStart) tuples. These tuples determine how
     the Part is divided up into segments (i.e. instances of
     :class:`~music21.braille.segment.BrailleSegment`). This method assumes 
     that the Part is already divided up into measures 
     (see :class:`~music21.stream.Measure`). An acceptable input is shown below.
+    
+    This does NOT yet automatically find appropriate segment breaks.
+    
     
     
     Two methods are called on each measure during the creation of segments: 
@@ -1254,7 +1263,10 @@ def getRawSegments(music21Part, segmentBreaks=None):
     >>> import copy
     >>> from music21.braille import segment
     >>> tnA = copy.deepcopy(tn)
-    >>> segment.getRawSegments(tnA)[0]
+    >>> rawSegments = segment.getRawSegments(tnA)
+    >>> len(rawSegments)
+    1
+    >>> rawSegments[0]
     ---begin segment---
     <music21.braille.segment BrailleSegment>
     Measure 1, Signature Grouping 1:
@@ -1286,9 +1298,11 @@ def getRawSegments(music21Part, segmentBreaks=None):
     Now, a segment break occurs at measure 2, offset 1.0 within that measure.
     The two segments are shown below.
     
-    
     >>> tnB = copy.deepcopy(tn)
-    >>> allSegments = segment.getRawSegments(tnB, segmentBreaks=[(2,1.0)])
+    >>> allSegments = segment.getRawSegments(tnB, forcedSegmentBreaks=[(2, 1.0)])
+    >>> len(allSegments)
+    2
+    
     >>> allSegments[0]
     ---begin segment---
     <music21.braille.segment BrailleSegment>
@@ -1324,45 +1338,47 @@ def getRawSegments(music21Part, segmentBreaks=None):
     ===
     ---end segment---
     """
-    if segmentBreaks is None:
-        segmentBreaks = SEGMENT_SEGMENTBREAKS
+    if forcedSegmentBreaks is None:
+        forcedSegmentBreaks = []
         
     allSegments = []
-    mnStart = 1E6 # = 100000.0
-    offsetStart = 0.0
-    segmentIndex = 0
-    if segmentBreaks:
-        (mnStart, offsetStart) = segmentBreaks[segmentIndex]
+    
+    if forcedSegmentBreaks:
+        (nextSegmentBreakMeasureNumber, nextSegmentBreakOffset) = forcedSegmentBreaks[0]
+    else:
+        (nextSegmentBreakMeasureNumber, nextSegmentBreakOffset) = (float('Inf'), 0.0)
         
     currentSegment = BrailleSegment()
+    segmentIndex = 0
+
     for music21Measure in music21Part.getElementsByClass([stream.Measure, stream.Voice]):
         prepareBeamedNotes(music21Measure)
-        if music21Measure.number >= mnStart:
-            # should this be inPlace = True? Will that affect the original measure?
-            music21Measure.sliceAtOffsets(offsetList=[offsetStart], inPlace=True)
-
         brailleElements = extractBrailleElements(music21Measure)
+
         offsetFactor = 0
-        previousCode = -1
+        previousAffinityCode = -1
         for brailleElement in brailleElements:
-            if (music21Measure.number > mnStart 
-                    or (music21Measure.number == mnStart 
-                        and brailleElement.offset >= offsetStart)):
+            if (music21Measure.number > nextSegmentBreakMeasureNumber 
+                    or (music21Measure.number == nextSegmentBreakMeasureNumber 
+                        and brailleElement.offset >= nextSegmentBreakOffset)):
                 # end of segment, get new one...
-                if offsetStart != 0.0:
+                if nextSegmentBreakOffset != 0.0:
                     currentSegment.endHyphen = True
                 allSegments.append(currentSegment)
                 currentSegment = BrailleSegment()
                 
                 
-                if offsetStart != 0.0:
-                    currentSegment.measureNumberWithDot = True
-                try:
-                    segmentIndex += 1
-                    (mnStart, offsetStart) = segmentBreaks[segmentIndex]
-                except IndexError:
-                    (mnStart, offsetStart) = (1E6, 0.0)
-            if brailleElement.affinityCode < previousCode:
+                if nextSegmentBreakOffset != 0.0:
+                    currentSegment.beginsMidMeasure = True
+                    
+                segmentIndex += 1
+                if len(forcedSegmentBreaks) > segmentIndex:
+                    (nextSegmentBreakMeasureNumber, nextSegmentBreakOffset) = forcedSegmentBreaks[
+                                                                                    segmentIndex]
+                else:
+                    (nextSegmentBreakMeasureNumber, nextSegmentBreakOffset) = (float('Inf'), 0.0)
+                    
+            if brailleElement.affinityCode < previousAffinityCode:
                 offsetFactor += 1
                 
                 
@@ -1372,7 +1388,7 @@ def getRawSegments(music21Part, segmentBreaks=None):
             brailleElementGrouping = currentSegment[segmentKey]
             brailleElementGrouping.append(brailleElement)
             
-            previousCode = brailleElement.affinityCode
+            previousAffinityCode = brailleElement.affinityCode
     allSegments.append(currentSegment)
     return allSegments
 
@@ -1488,13 +1504,15 @@ def prepareBeamedNotes(music21Measure):
         sampleNote.beamStart = False
         sampleNote.beamContinue = False
     allNotesAndRests = music21Measure.notesAndRests.stream()
+
+    # TODO: change these into filters on iterators
     allNotesWithBeams = allNotes.splitByClass(
-        None, lambda sampleNote: not(sampleNote.beams is None) and len(sampleNote.beams) > 0)[0]
+        None, lambda sampleNote: (sampleNote.beams is not None) and len(sampleNote.beams) > 0)[0]
     allStart = allNotesWithBeams.splitByClass(
-        None, lambda sampleNote: sampleNote.beams.getByNumber(1).type is 'start')[0]
+        None, lambda sampleNote: sampleNote.beams.getByNumber(1).type == 'start')[0]
     allStop  = allNotesWithBeams.splitByClass(
-        None, lambda sampleNote: sampleNote.beams.getByNumber(1).type is 'stop')[0]
-    if not(len(allStart) == len(allStop)):
+        None, lambda sampleNote: sampleNote.beams.getByNumber(1).type == 'stop')[0]
+    if len(allStart) != len(allStop):
         environRules.warn("Incorrect beaming: number of start notes != to number of stop notes.")
         return
     
@@ -1515,7 +1533,7 @@ def prepareBeamedNotes(music21Measure):
         # but if the rest is located anywhere else, grouping may not be used.
         allNotesOfSameValue = True
         for noteIndex in range(startIndex + 1, stopIndex + 1):
-            if (not(allNotesAndRests[noteIndex].duration.type == startNote.duration.type)
+            if (allNotesAndRests[noteIndex].duration.type != startNote.duration.type
                     or isinstance(allNotesAndRests[noteIndex], note.Rest)):
                 allNotesOfSameValue = False
                 break
@@ -1532,10 +1550,11 @@ def prepareBeamedNotes(music21Measure):
             # 4. If the notes in the group are followed immediately by a 
             # true eighth note or by an eighth rest, 
             # grouping may not be used, unless the eighth is located in a new measure.
-            if allNotesAndRests[stopIndex+1].quarterLength == 0.5:
+            if allNotesAndRests[stopIndex + 1].quarterLength == 0.5:
                 continue
         except exceptions21.StreamException: # stopNote is last note of measure.
             pass
+
         startNote.beamStart = True
         try:
             beforeStartNote = allNotesAndRests[startIndex - 1]
@@ -1771,7 +1790,7 @@ def splitMeasure(music21Measure, value=2, beatDivisionOffset=0, useTimeSignature
         ts = music21Measure.bestTimeSignature()
     
     offset = 0.0
-    if not(beatDivisionOffset == 0):
+    if beatDivisionOffset != 0:
         if abs(beatDivisionOffset) > len(ts.beatDivisionDurations):
             raise Exception()
         i = len(ts.beatDivisionDurations) - abs(beatDivisionOffset)
