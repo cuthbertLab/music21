@@ -672,6 +672,142 @@ class BrailleSegment(collections.defaultdict):
         else:
             return u"".join([brailleNumber, symbols['dot']])
 
+    def addGroupingAttributes(self, **partKeywords):
+        """
+        Modifies the attributes of all :class:`~music21.braille.segment.BrailleElementGrouping`
+        instances in a list of :class:`~music21.braille.segment.BrailleSegment` instances. The
+        necessary information is retrieved both by passing in partKeywords as an argument and
+        by taking into account the linear progression of the groupings and segments.
+        """
+        currentKeySig = key.KeySignature(0)
+        currentTimeSig = meter.TimeSignature("4/4")
+        
+        descendingChords = GROUPING_DESC_CHORDS
+        showClefSigns = GROUPING_SHOW_CLEFS
+        upperFirstInNoteFingering = GROUPING_UPPERFIRST_NOTEFINGERING
+    
+        if 'showClefSigns' in partKeywords:
+            showClefSigns = partKeywords['showClefSigns']
+        if 'upperFirstInNoteFingering' in partKeywords:
+            upperFirstInNoteFingering = partKeywords['upperFirstInNoteFingering']
+        if 'descendingChords' in partKeywords:
+            descendingChords = partKeywords['descendingChords']
+                
+        allGroupings = sorted(self.items())
+        (previousKey, previousList) = None, None
+        for (groupingKey, groupingList) in allGroupings:
+            if previousKey is not None:
+                if groupingKey.ordinal >= 1:
+                    previousList.withHyphen = True
+                if (previousKey.ordinal == 0 
+                        and previousKey.affinity == AFFINITY_NOTEGROUP 
+                        and groupingKey.ordinal == 0 
+                        and groupingKey.affinity == AFFINITY_NOTEGROUP):
+                    if isinstance(previousList[0], clef.Clef):
+                        isRepetition = areGroupingsIdentical(previousList[1:], groupingList)
+                    else:
+                        isRepetition = areGroupingsIdentical(previousList, groupingList)
+                    if isRepetition:
+                        previousList.numRepeats += 1
+                        del self[groupingKey]
+                        continue
+            if groupingKey.affinity == AFFINITY_SIGNATURE:
+                for brailleElement in groupingList:
+                    if isinstance(brailleElement, meter.TimeSignature):
+                        currentTimeSig = brailleElement
+                    elif isinstance(brailleElement, key.KeySignature):
+                        brailleElement.outgoingKeySig = currentKeySig
+                        currentKeySig = brailleElement
+            elif groupingKey.affinity == AFFINITY_NOTEGROUP:
+                if isinstance(groupingList[0], clef.Clef):
+                    if isinstance(groupingList[0], (clef.TrebleClef, clef.AltoClef)):
+                        descendingChords = True
+                    elif isinstance(groupingList[0], (clef.BassClef, clef.TenorClef)):
+                        descendingChords = False
+                allGeneralNotes = [n for n in groupingList if isinstance(n, note.GeneralNote)]
+                if len(allGeneralNotes) == 1 and isinstance(allGeneralNotes[0], note.Rest):
+                    allGeneralNotes[0].quarterLength = 4.0
+            groupingList.keySignature = currentKeySig
+            groupingList.timeSignature = currentTimeSig
+            groupingList.descendingChords = descendingChords
+            groupingList.showClefSigns = showClefSigns
+            groupingList.upperFirstInNoteFingering = upperFirstInNoteFingering
+            (previousKey, previousList) = (groupingKey, groupingList)
+        if self.endHyphen:
+            previousList.withHyphen = True
+
+    def addSegmentAttributes(self, **partKeywords):
+        """
+        Modifies the attributes of a :class:`~music21.braille.segment.BrailleSegment`
+        by passing partKeywords as an argument.
+        """
+        if 'cancelOutgoingKeySig' in partKeywords:
+            self.cancelOutgoingKeySig = partKeywords['cancelOutgoingKeySig']
+        if 'dummyRestLength' in partKeywords:
+            self.dummyRestLength = partKeywords['dummyRestLength']
+        if 'maxLineLength' in partKeywords:
+            self.maxLineLength = partKeywords['maxLineLength']
+        if 'showFirstMeasureNumber' in partKeywords:
+            self.showFirstMeasureNumber = partKeywords['showFirstMeasureNumber']
+        if 'showHand' in partKeywords:
+            self.showHand = partKeywords['showHand']
+        if 'showHeading' in partKeywords:
+            self.showHeading = partKeywords['showHeading']
+        if 'suppressOctaveMarks' in partKeywords:
+            self.suppressOctaveMarks = partKeywords['suppressOctaveMarks']  
+
+    def fixArticulations(self):
+        """
+        Goes through each :class:`~music21.braille.segment.BrailleSegment` and modifies the 
+        list of :attr:`~music21.note.GeneralNote.articulations` of a :class:`~music21.note.Note` 
+        if appropriate. In particular, two rules are applied:
+        
+        * Doubling rule => If four or more of the same :class:`~music21.articulations.Articulation`
+          are found in a row, the first instance of the articulation is doubled and the rest are 
+          omitted.
+        
+        * Staccato, Tenuto rule => "If two repeated notes appear to be tied, but either is marked 
+          staccato or tenuto, they are treated as slurred instead of tied." (BMTM, 112)
+        """
+        from music21 import articulations
+        newSegment = self.consolidate()
+        noteGroupings = [newSegment[gpKey] 
+                             for gpKey in newSegment.keys() 
+                                if gpKey.affinity == AFFINITY_NOTEGROUP]
+        for noteGrouping in noteGroupings:
+            allNotes = [n for n in noteGrouping if isinstance(n,note.Note)]
+            for noteIndexStart in range(len(allNotes)):
+                music21NoteStart = allNotes[noteIndexStart]
+                for artc in music21NoteStart.articulations:
+                    artcName = artc.name
+                    if (isinstance(artc, articulations.Staccato) or 
+                            isinstance(artc, articulations.Tenuto)):
+                        if not music21NoteStart.tie is None:
+                            if music21NoteStart.tie.type == 'stop':
+                                allNotes[noteIndexStart - 1].tie = None
+                                allNotes[noteIndexStart - 1].shortSlur = True
+                            else:
+                                allNotes[noteIndexStart + 1].tie = None
+                                music21NoteStart.shortSlur = True
+                            music21NoteStart.tie = None
+                    numSequential=0
+                    for noteIndexContinue in range(noteIndexStart + 1, len(allNotes)):
+                        music21NoteContinue = allNotes[noteIndexContinue]
+                        if artcName in [a.name for a in music21NoteContinue.articulations]:
+                            numSequential += 1
+                            continue
+                        break
+                    if numSequential >= 3:
+                        # double the articulation on the first note and remove from the next...
+                        music21NoteStart.articulations.append(artc)
+                        for noteIndexContinue in range(noteIndexStart+1, 
+                                                       noteIndexStart+numSequential):
+                            music21NoteContinue = allNotes[noteIndexContinue]
+                            for artOther in music21NoteContinue.articulations:
+                                if artOther.name == artcName:
+                                    music21NoteContinue.articulations.remove(artOther)
+           
+
 class BrailleGrandSegment(object):
     '''
     A BrailleGrandSegment represents a pair of segments (rightSegment, leftSegment)
@@ -903,9 +1039,9 @@ def findSegments(music21Part, **partKeywords):
     
     * :meth:`~music21.braille.segment.prepareSlurredNotes`
     * :meth:`~music21.braille.segment.getRawSegments`
-    * :meth:`~music21.braille.segment.addGroupingAttributes`
-    * :meth:`~music21.braille.segment.addSegmentAttributes`
-    * :meth:`~music21.braille.segment.fixArticulations`
+    * :meth:`~music21.braille.segment.BrailleSegment.addGroupingAttributes`
+    * :meth:`~music21.braille.segment.BrailleSegment.addSegmentAttributes`
+    * :meth:`~music21.braille.segment.BrailleSegment.fixArticulations`
 
     
     >>> from music21.braille import test
@@ -1029,13 +1165,14 @@ def findSegments(music21Part, **partKeywords):
     allSegments = getRawSegments(music21Part, forcedSegmentBreaks)
     # Grouping Attributes
     # -------------------
-    addGroupingAttributes(allSegments, **partKeywords)
-    # Segment Attributes
-    # ------------------
-    addSegmentAttributes(allSegments, **partKeywords)
-    # Articulations
-    # -------------
-    fixArticulations(allSegments)
+    for seg in allSegments:
+        seg.addGroupingAttributes(**partKeywords)
+        # Segment Attributes
+        # ------------------
+        seg.addSegmentAttributes(**partKeywords)
+        # Articulations
+        # -------------
+        seg.fixArticulations()
     
     return allSegments
 
@@ -1399,7 +1536,6 @@ def extractBrailleElements(music21Measure):
     :class:`~music21.base.Music21Object` instances which can be directly transcribed to
     braille.
     
-
     >>> from music21.braille import segment
     >>> tn = converter.parse("tinynotation: 2/4 c16 c c c d d d d", makeNotation=False)
     >>> tn = tn.makeNotation(cautionaryNotImmediateRepeat=False)
@@ -1423,7 +1559,6 @@ def extractBrailleElements(music21Measure):
     Spanners are dealt with in :meth:`~music21.braille.segment.prepareSlurredNotes`,
     so they are not returned by this method, as seen below.
     
-    
     >>> segment.extractBrailleElements(measure)
     <music21.meter.TimeSignature 2/4>
     <music21.clef.TrebleClef>
@@ -1446,7 +1581,7 @@ def extractBrailleElements(music21Measure):
             setAffinityCode(music21Object)
             music21Object._brailleEnglish = [str(music21Object)]
             allElements.append(music21Object)
-        except BrailleSegmentException as notSupportedException:
+        except BrailleSegmentException as notSupportedException: # pragma: no cover
             isExempt = [isinstance(music21Object, music21Class) 
                         for music21Class in excludeFromBrailleElements]
             if not isExempt.count(True):
@@ -1615,70 +1750,6 @@ def setAffinityCode(music21Object):
 
     raise BrailleSegmentException("{0} cannot be transcribed to braille.".format(music21Object))
 
-def addGroupingAttributes(allSegments, **partKeywords):
-    """
-    Modifies the attributes of all :class:`~music21.braille.segment.BrailleElementGrouping`
-    instances in a list of :class:`~music21.braille.segment.BrailleSegment` instances. The
-    necessary information is retrieved both by passing in partKeywords as an argument and
-    by taking into account the linear progression of the groupings and segments.
-    """
-    currentKeySig = key.KeySignature(0)
-    currentTimeSig = meter.TimeSignature("4/4")
-    
-    descendingChords = GROUPING_DESC_CHORDS
-    showClefSigns = GROUPING_SHOW_CLEFS
-    upperFirstInNoteFingering = GROUPING_UPPERFIRST_NOTEFINGERING
-
-    if 'showClefSigns' in partKeywords:
-        showClefSigns = partKeywords['showClefSigns']
-    if 'upperFirstInNoteFingering' in partKeywords:
-        upperFirstInNoteFingering = partKeywords['upperFirstInNoteFingering']
-    if 'descendingChords' in partKeywords:
-        descendingChords = partKeywords['descendingChords']
-            
-    for brailleSegment in allSegments:
-        allGroupings = sorted(brailleSegment.items())
-        (previousKey, previousList) = None, None
-        for (groupingKey, groupingList) in allGroupings:
-            if previousKey is not None:
-                if groupingKey.ordinal >= 1:
-                    previousList.withHyphen = True
-                if (previousKey.ordinal == 0 
-                        and previousKey.affinity == AFFINITY_NOTEGROUP 
-                        and groupingKey.ordinal == 0 
-                        and groupingKey.affinity == AFFINITY_NOTEGROUP):
-                    if isinstance(previousList[0], clef.Clef):
-                        isRepetition = areGroupingsIdentical(previousList[1:], groupingList)
-                    else:
-                        isRepetition = areGroupingsIdentical(previousList, groupingList)
-                    if isRepetition:
-                        previousList.numRepeats += 1
-                        del brailleSegment[groupingKey]
-                        continue
-            if groupingKey.affinity == AFFINITY_SIGNATURE:
-                for brailleElement in groupingList:
-                    if isinstance(brailleElement, meter.TimeSignature):
-                        currentTimeSig = brailleElement
-                    elif isinstance(brailleElement, key.KeySignature):
-                        brailleElement.outgoingKeySig = currentKeySig
-                        currentKeySig = brailleElement
-            elif groupingKey.affinity == AFFINITY_NOTEGROUP:
-                if isinstance(groupingList[0], clef.Clef):
-                    if isinstance(groupingList[0], (clef.TrebleClef, clef.AltoClef)):
-                        descendingChords = True
-                    elif isinstance(groupingList[0], (clef.BassClef, clef.TenorClef)):
-                        descendingChords = False
-                allGeneralNotes = [n for n in groupingList if isinstance(n, note.GeneralNote)]
-                if len(allGeneralNotes) == 1 and isinstance(allGeneralNotes[0], note.Rest):
-                    allGeneralNotes[0].quarterLength = 4.0
-            groupingList.keySignature = currentKeySig
-            groupingList.timeSignature = currentTimeSig
-            groupingList.descendingChords = descendingChords
-            groupingList.showClefSigns = showClefSigns
-            groupingList.upperFirstInNoteFingering = upperFirstInNoteFingering
-            (previousKey, previousList) = (groupingKey, groupingList)
-        if brailleSegment.endHyphen:
-            previousList.withHyphen = True
 
 def areGroupingsIdentical(noteGroupingA, noteGroupingB):
     """
@@ -1692,78 +1763,6 @@ def areGroupingsIdentical(noteGroupingA, noteGroupingB):
         return True
     return False
 
-def addSegmentAttributes(allSegments, **partKeywords):
-    """
-    Modifies the attributes of a :class:`~music21.braille.segment.BrailleSegment`
-    by passing partKeywords as an argument.
-    """
-    for brailleSegment in allSegments:
-        if 'cancelOutgoingKeySig' in partKeywords:
-            brailleSegment.cancelOutgoingKeySig = partKeywords['cancelOutgoingKeySig']
-        if 'dummyRestLength' in partKeywords:
-            brailleSegment.dummyRestLength = partKeywords['dummyRestLength']
-        if 'maxLineLength' in partKeywords:
-            brailleSegment.maxLineLength = partKeywords['maxLineLength']
-        if 'showFirstMeasureNumber' in partKeywords:
-            brailleSegment.showFirstMeasureNumber = partKeywords['showFirstMeasureNumber']
-        if 'showHand' in partKeywords:
-            brailleSegment.showHand = partKeywords['showHand']
-        if 'showHeading' in partKeywords:
-            brailleSegment.showHeading = partKeywords['showHeading']
-        if 'suppressOctaveMarks' in partKeywords:
-            brailleSegment.suppressOctaveMarks = partKeywords['suppressOctaveMarks']  
-
-def fixArticulations(allSegments):
-    """
-    Goes through each :class:`~music21.braille.segment.BrailleSegment` and modifies the 
-    list of :attr:`~music21.note.GeneralNote.articulations` of a :class:`~music21.note.Note` 
-    if appropriate. In particular, two rules are applied:
-    
-    * Doubling rule => If four or more of the same :class:`~music21.articulations.Articulation`
-      are found in a row, the first instance of the articulation is doubled and the rest are 
-      omitted.
-    
-    * Staccato, Tenuto rule => "If two repeated notes appear to be tied, but either is marked 
-      staccato or tenuto, they are treated as slurred instead of tied." (BMTM, 112)
-    """
-    from music21 import articulations
-    for brailleSegment in allSegments:
-        newSegment = brailleSegment.consolidate()
-        noteGroupings = [newSegment[gpKey] 
-                             for gpKey in newSegment.keys() 
-                                if gpKey.affinity == AFFINITY_NOTEGROUP]
-        for noteGrouping in noteGroupings:
-            allNotes = [n for n in noteGrouping if isinstance(n,note.Note)]
-            for noteIndexStart in range(len(allNotes)):
-                music21NoteStart = allNotes[noteIndexStart]
-                for artc in music21NoteStart.articulations:
-                    artcName = artc.name
-                    if (isinstance(artc, articulations.Staccato) or 
-                            isinstance(artc, articulations.Tenuto)):
-                        if not music21NoteStart.tie is None:
-                            if music21NoteStart.tie.type == 'stop':
-                                allNotes[noteIndexStart - 1].tie = None
-                                allNotes[noteIndexStart - 1].shortSlur = True
-                            else:
-                                allNotes[noteIndexStart + 1].tie = None
-                                music21NoteStart.shortSlur = True
-                            music21NoteStart.tie = None
-                    numSequential=0
-                    for noteIndexContinue in range(noteIndexStart + 1, len(allNotes)):
-                        music21NoteContinue = allNotes[noteIndexContinue]
-                        if artcName in [a.name for a in music21NoteContinue.articulations]:
-                            numSequential += 1
-                            continue
-                        break
-                    if numSequential >= 3:
-                        # double the articulation on the first note and remove from the next...
-                        music21NoteStart.articulations.append(artc)
-                        for noteIndexContinue in range(noteIndexStart+1, 
-                                                       noteIndexStart+numSequential):
-                            music21NoteContinue = allNotes[noteIndexContinue]
-                            for artOther in music21NoteContinue.articulations:
-                                if artOther.name == artcName:
-                                    music21NoteContinue.articulations.remove(artOther)
 
 #-------------------------------------------------------------------------------
 # Helper Methods

@@ -4642,7 +4642,7 @@ class Test(unittest.TestCase):
         n = note.Note()
         n.quarterLength = 4
         s.append(n)
-        unused_post = s.sliceAtOffsets([1, 2, 3], inPlace=True)
+        s.sliceAtOffsets([1, 2, 3], inPlace=True)
         a = [(e.offset, e.quarterLength) for e in s]
         b = [(0.0, 1.0), (1.0, 1.0), (2.0, 1.0), (3.0, 1.0)]
         self.assertEqual(a, b)

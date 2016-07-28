@@ -8274,13 +8274,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> s = stream.Stream()
         >>> n = note.Note()
-        >>> n.type = 'whole'
+        >>> n.duration.type = 'whole'
         >>> s.append(n)
         >>> post = s.sliceAtOffsets([1, 2, 3], inPlace=True)
         >>> [(e.offset, e.quarterLength) for e in s]
         [(0.0, 1.0), (1.0, 1.0), (2.0, 1.0), (3.0, 1.0)]
-
-        TODO: return None if inPlace is True
         '''
         if not inPlace: # make a copy
             returnObj = copy.deepcopy(self)
@@ -8344,7 +8342,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     returnObj._insertCore(o, eNext)
                     oStartNext = o
         returnObj.elementsChanged()
-        return returnObj
+        if inPlace is False:
+            return returnObj
 
 
     def sliceByBeat(self, target=None,
