@@ -212,9 +212,9 @@ class BrailleElementGrouping(list):
         self.withHyphen = GROUPING_WITHHYPHEN
         self.numRepeats = GROUPING_NUMREPEATS
     
-    def __str__(self):
+    def __unicode__(self):
         '''
-        Return an quasi-ascii representation followed by a unicode braille representation
+        Return an unicode braille representation
         of each object in the BrailleElementGrouping.
         '''
         allObjects = []
@@ -235,6 +235,14 @@ class BrailleElementGrouping(list):
         if self.withHyphen is True:
             allObjects.append(u"music hyphen {0}".format(lookup.symbols['music_hyphen']))
         out = u"\n".join(allObjects)
+        return out
+    
+    def __str__(self):
+        '''
+        Return an quasi-ascii representation followed by a unicode braille representation
+        of each object in the BrailleElementGrouping.
+        '''
+        out = self.__unicode__()
         if six.PY2:
             out = out.encode(encoding='utf_8', errors='ignore')
         return out
@@ -344,7 +352,8 @@ class BrailleSegment(collections.defaultdict):
         self.endHyphen = SEGMENT_ENDHYPHEN
         self.beginsMidMeasure = False
         
-    def __str__(self):
+        
+    def __unicode__(self):
         name = u"<music21.braille.segment BrailleSegment>"
         allItems = sorted(self.items())
         allKeys = []
@@ -371,6 +380,10 @@ class BrailleSegment(collections.defaultdict):
                           name, 
                           allElementGroupings, 
                           u"---end segment---"])
+        return out 
+           
+    def __str__(self):
+        out = self.__unicode__()
         if six.PY2:
             out = out.encode(encoding='utf_8', errors='ignore')
         return out
@@ -406,8 +419,8 @@ class BrailleSegment(collections.defaultdict):
                 self.extractSignatureGrouping(bt) # Signature(s) Grouping
             elif cgkAffinityGroup == AFFINITY_LONG_TEXTEXPR:
                 self.extractLongExpressionGrouping(bt) # Long Expression(s) Grouping
-            elif cgkAffinityGroup == AFFINITY_INACCORD:
-                self.extractInaccordGrouping(bt) # In Accord Grouping
+#             elif cgkAffinityGroup == AFFINITY_INACCORD:
+#                 self.extractInaccordGrouping(bt) # In Accord Grouping
             elif cgkAffinityGroup == AFFINITY_TTEXT:
                 self.extractTempoTextGrouping(bt) # Tempo Text Grouping
 
@@ -513,17 +526,17 @@ class BrailleSegment(collections.defaultdict):
             if bbe.args[0] != "No heading can be made.":
                 raise bbe
             
-    def extractInaccordGrouping(self, brailleText):
-        inaccords = self.get(self._currentGroupingKey)
-        voice_trans = []
-        for music21Voice in inaccords:
-            noteGrouping = extractBrailleElements(music21Voice)
-            noteGrouping.descendingChords = inaccords.descendingChords
-            noteGrouping.showClefSigns = inaccords.showClefSigns
-            noteGrouping.upperFirstInNoteFingering = inaccords.upperFirstInNoteFingering
-            voice_trans.append(ngMod.transcribeNoteGrouping(noteGrouping))
-        brailleInaccord = symbols['full_inaccord'].join(voice_trans)
-        brailleText.addInaccord(brailleInaccord)
+#     def extractInaccordGrouping(self, brailleText):
+#         inaccords = self.get(self._currentGroupingKey)
+#         voice_trans = []
+#         for music21Voice in inaccords:
+#             noteGrouping = extractBrailleElements(music21Voice)
+#             noteGrouping.descendingChords = inaccords.descendingChords
+#             noteGrouping.showClefSigns = inaccords.showClefSigns
+#             noteGrouping.upperFirstInNoteFingering = inaccords.upperFirstInNoteFingering
+#             voice_trans.append(ngMod.transcribeNoteGrouping(noteGrouping))
+#         brailleInaccord = symbols['full_inaccord'].join(voice_trans)
+#         brailleText.addInaccord(brailleInaccord)
 
     def extractLongExpressionGrouping(self, brailleText):
         longExpr = basic.textExpressionToBraille(self.get(self._currentGroupingKey)[0])
@@ -1036,7 +1049,8 @@ def findSegments(music21Part, **partKeywords):
     >>> from music21.braille import test
     >>> example = test.example11_2()
     >>> allSegments = braille.segment.findSegments(example, forcedSegmentBreaks=[(8, 3.0)])
-    >>> allSegments[0]
+    >>> if ext.six.PY2: str = unicode #_DOCS_HIDE
+    >>> print(str(allSegments[0]))
     ---begin segment---
     <music21.braille.segment BrailleSegment>
     Measure 0, Signature Grouping 1:
@@ -1090,7 +1104,11 @@ def findSegments(music21Part, **partKeywords):
     music hyphen ⠐
     ===
     ---end segment---
-    >>> allSegments[1]
+
+    
+    Second segment
+
+    >>> print(str(allSegments[1]))
     ---begin segment---
     <music21.braille.segment BrailleSegment>
     Measure 8, Note Grouping 1:
