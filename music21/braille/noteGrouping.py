@@ -10,6 +10,8 @@
 #-------------------------------------------------------------------------------
 import unittest
 
+from collections import OrderedDict
+
 from music21 import environment
 from music21.braille import basic
 from music21.braille.basic import BrailleBasicException
@@ -123,81 +125,93 @@ class NoteGroupingTranscriber(object):
             self.transcribeOneElement(brailleElement)
         return u"".join(self.trans)
                 
+    def translateNote(self, currentNote):
+        if self.previousNote is None:
+            doShowOctave = self.showLeadingOctave
+        else:
+            doShowOctave = basic.showOctaveWithNote(self.previousNote, currentNote)
+        brailleNote = basic.noteToBraille(currentNote, 
+                                          showOctave=doShowOctave,
+                                          upperFirstInFingering=self.upperFirstInFingering)
+        self.trans.append(brailleNote)
+        self.previousNote = currentNote
+
+    def translateRest(self, currentRest):
+        self.trans.append(basic.restToBraille(currentRest))
+    
+    def translateChord(self, currentChord):
+        try:
+            allNotes = sorted(currentChord._notes, key=lambda n: n.pitch)
+        except AttributeError:
+            raise BrailleBasicException(
+                    "If you're getting this exception, " +
+                    "the '_notes' attribute for a music21 Chord probably " +
+                    "became 'notes'. If that's the case, change it and life will be great.")
+        if self.brailleElementGrouping.descendingChords:
+            currentNote = allNotes[-1]
+        else:
+            currentNote = allNotes[0]
+        if self.previousNote is None:
+            doShowOctave = self.showLeadingOctave
+        else:
+            doShowOctave = basic.showOctaveWithNote(self.previousNote, currentNote)
+        
+        brailleChord = basic.chordToBraille(currentChord,
+                                      descending=self.brailleElementGrouping.descendingChords, 
+                                      showOctave=doShowOctave)
+        self.trans.append(brailleChord)
+        self.previousNote = currentNote
+    
+    def translateDynamic(self, currentDynamic):
+        brailleDynamic = basic.dynamicToBraille(currentDynamic)
+        self.trans.append(brailleDynamic)
+        self.previousNote = None
+        self.showLeadingOctave = True
+    
+    def translateTextExpression(self, currentExpression):
+        brailleExpression = basic.textExpressionToBraille(currentExpression)
+        self.trans.append(brailleExpression)
+        self.previousNote = None
+        self.showLeadingOctave = True
+
+    def translateBarline(self, currentBarline):
+        self.trans.append(basic.barlineToBraille(currentBarline))
+        
+    def translateClef(self, currentClef):
+        '''
+        translate Clefs to braille
+        '''
+        if self.showClefSigns:
+            self.trans.append(basic.clefToBraille(currentClef))
+            self.previousNote = None
+            self.showLeadingOctave = True
+
+
+    translateDict = OrderedDict([
+        ('Note', translateNote),
+        ('Rest', translateRest),
+        ('Chord', translateChord),
+        ('Dynamic', translateDynamic),
+        ('TextExpression', translateTextExpression),
+        ('Barline', translateBarline),
+        ('Clef', translateClef),
+    ])
 
     def transcribeOneElement(self, el):
         '''
         Transcribe a single element...
         '''
-        trans = self.trans
-        if 'Note' in el.classes:
-            currentNote = el
-            if self.previousNote is None:
-                doShowOctave = self.showLeadingOctave
-            else:
-                doShowOctave = basic.showOctaveWithNote(self.previousNote, currentNote)
-            brailleNote = basic.noteToBraille(currentNote, 
-                                        showOctave=doShowOctave,
-                                        upperFirstInFingering=self.upperFirstInFingering)
-            trans.append(brailleNote)
-            self.previousNote = currentNote
-            
-        elif 'Rest' in el.classes:
-            currentRest = el
-            trans.append(basic.restToBraille(currentRest))
-        
-        elif 'Chord' in el.classes:
-            currentChord = el
-            try:
-                allNotes = sorted(currentChord._notes, key=lambda n: n.pitch)
-            except AttributeError:
-                raise BrailleBasicException(
-                        "If you're getting this exception, " +
-                        "the '_notes' attribute for a music21 Chord probably " +
-                        "became 'notes'. If that's the case, change it and life will be great.")
-            if self.brailleElementGrouping.descendingChords:
-                currentNote = allNotes[-1]
-            else:
-                currentNote = allNotes[0]
-            if self.previousNote is None:
-                doShowOctave = self.showLeadingOctave
-            else:
-                doShowOctave = basic.showOctaveWithNote(self.previousNote, currentNote)
-            
-            brailleChord = basic.chordToBraille(currentChord,
-                                          descending=self.brailleElementGrouping.descendingChords, 
-                                          showOctave=doShowOctave)
-            trans.append(brailleChord)
-            self.previousNote = currentNote
-            
-        elif 'Dynamic' in el.classes:
-            currentDynamic = el
-            brailleDynamic = basic.dynamicToBraille(currentDynamic)
-            trans.append(brailleDynamic)
-            self.previousNote = None
-            self.showLeadingOctave = True
-            
-        elif 'TextExpression' in el.classes:
-            currentExpression = el
-            brailleExpression = basic.textExpressionToBraille(currentExpression)
-            trans.append(brailleExpression)
-            self.previousNote = None
-            self.showLeadingOctave = True
-            
-        elif 'Barline' in el.classes:
-            currentBarline = el
-            trans.append(basic.barlineToBraille(currentBarline))
-            
-        elif 'Clef' in el.classes:
-            if self.showClefSigns:
-                currentClef = el
-                trans.append(basic.clefToBraille(currentClef))
-                self.previousNote = None
-                self.showLeadingOctave = True
+        elClasses = el.classes
+        for className, classMethod in self.translateDict.items():
+            if className in elClasses:
+                classMethod(self, el)
+                break
         else:
             environRules.warn("{0} not transcribed to braille.".format(el))
         
         self.optionallyAddDotToPrevious(el)
         self.previousElement = el
+    
 
 
     def optionallyAddDotToPrevious(self, el=None):

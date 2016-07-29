@@ -999,7 +999,7 @@ class BrailleGrandSegment(object):
     def extractTempoTextGrouping(self, brailleKeyboard):
         pass
             
-def splitNoteGrouping(noteGrouping, value=2, beatDivisionOffset=0):
+def splitNoteGrouping(noteGrouping, beatDivisionOffset=0):
     u"""
     Almost identical to :meth:`~music21.braille.segment.splitMeasure`, but
     functions on a :class:`~music21.braille.segment.BrailleElementGrouping`
@@ -1009,18 +1009,17 @@ def splitNoteGrouping(noteGrouping, value=2, beatDivisionOffset=0):
     music21Measure = stream.Measure()
     for brailleElement in noteGrouping:
         music21Measure.insert(brailleElement.offset, brailleElement)
-    newMeasures = splitMeasure(music21Measure, 
-                               value, 
-                               beatDivisionOffset, 
-                               noteGrouping.timeSignature)
+    (leftMeasure, rightMeasure) = splitMeasure(music21Measure, 
+                                               beatDivisionOffset, 
+                                               noteGrouping.timeSignature)
     
     leftBrailleElements = BrailleElementGrouping()
-    for brailleElement in newMeasures[0]:
+    for brailleElement in leftMeasure:
         leftBrailleElements.append(brailleElement)
     leftBrailleElements.__dict__ = noteGrouping.__dict__.copy() 
 
     rightBrailleElements = BrailleElementGrouping()
-    for brailleElement in newMeasures[1]:
+    for brailleElement in rightMeasure:
         rightBrailleElements.append(brailleElement)
     rightBrailleElements.__dict__ = noteGrouping.__dict__.copy() 
 
@@ -1772,15 +1771,12 @@ def areGroupingsIdentical(noteGroupingA, noteGroupingB):
 #-------------------------------------------------------------------------------
 # Helper Methods
 
-def splitMeasure(music21Measure, value=2, beatDivisionOffset=0, useTimeSignature=None):
+def splitMeasure(music21Measure, beatDivisionOffset=0, useTimeSignature=None):
     """
     Takes a :class:`~music21.stream.Measure`, divides it in two parts, and returns a
-    :class:`~music21.stream.Part` containing the two halves. The parameters are as
+    two-tuple of (leftMeasure, rightMeasure). The parameters are as
     follows:
     
-    * value => the number of partitions to split a time signature into. The first half will
-      contain all elements found within the offsets of the first partition, while the last
-      half will contain all other elements.
     * beatDivisionOffset => Adjusts the end offset of the first partition by a certain amount
       of beats to the left.
     * useTimeSignature => In the event that the Measure comes from the middle of a Part
@@ -1804,58 +1800,60 @@ def splitMeasure(music21Measure, value=2, beatDivisionOffset=0, useTimeSignature
             environRules.warn('Problem in converting a time signature in measure ' + 
                               '%d, offset may be wrong' % music21Measure.number)
     bs = copy.deepcopy(ts.beatSequence)
+    
+    numberOfPartions = 2    
     try:  
-        bs.partitionByCount(value, loadDefault = False)
+        bs.partitionByCount(numberOfPartions, loadDefault=False)
         (startOffsetZero, endOffsetZero) = bs.getLevelSpan()[0]
     except meter.MeterException:
-        value += 1
-        bs.partitionByCount(value, loadDefault = False)
+        numberOfPartions += 1
+        bs.partitionByCount(numberOfPartions, loadDefault=False)
         startOffsetZero = bs.getLevelSpan()[0][0]
         endOffsetZero = bs.getLevelSpan()[-2][-1]
     endOffsetZero -= offset
-    newMeasures = stream.Part()
-    newMeasures.append(stream.Measure())
-    newMeasures.append(stream.Measure())
+
+    leftMeasure = stream.Measure()
+    rightMeasure = stream.Measure()
     for x in music21Measure:
         if (x.offset >= startOffsetZero 
                 and (x.offset < endOffsetZero 
                      or (x.offset == endOffsetZero 
                          and isinstance(x, bar.Barline)))):
-            newMeasures[0].insert(x.offset, x)
+            leftMeasure.insert(x.offset, x)
         else:
-            newMeasures[1].insert(x.offset, x)
-    for n in newMeasures[1].notes:
+            rightMeasure.insert(x.offset, x)
+    for n in rightMeasure.notes:
         if n.tie is not None:
-            newMeasures[0].append(n)
-            newMeasures[1].remove(n)
+            leftMeasure.append(n)
+            rightMeasure.remove(n)
             endOffsetZero += n.duration.quarterLength
             continue
         break
 
     rest0Length = music21Measure.duration.quarterLength - endOffsetZero
     r0 = note.Rest(quarterLength=rest0Length)
-    newMeasures[0].insert(endOffsetZero, r0)
+    leftMeasure.insert(endOffsetZero, r0)
     
     r1 = note.Rest(quarterLength=endOffsetZero)
-    newMeasures[1].insert(0.0, r1)
+    rightMeasure.insert(0.0, r1)
     
     ts0_delete = False
-    if newMeasures[0].timeSignature is None:
+    if leftMeasure.timeSignature is None:
         ts0_delete = True
-        newMeasures[0].timeSignature = ts
-    newMeasures[1].timeSignature = ts
-    newMeasures[0].mergeAttributes(music21Measure)
-    newMeasures[1].mergeAttributes(music21Measure)
-    newMeasures[0].makeBeams(inPlace=True)
-    newMeasures[1].makeBeams(inPlace=True)
-    prepareBeamedNotes(newMeasures[0])
-    prepareBeamedNotes(newMeasures[1])
-    newMeasures[0].remove(r0)
-    newMeasures[1].remove(r1)
+        leftMeasure.timeSignature = ts
+    rightMeasure.timeSignature = ts
+    leftMeasure.mergeAttributes(music21Measure)
+    rightMeasure.mergeAttributes(music21Measure)
+    leftMeasure.makeBeams(inPlace=True)
+    rightMeasure.makeBeams(inPlace=True)
+    prepareBeamedNotes(leftMeasure)
+    prepareBeamedNotes(rightMeasure)
+    leftMeasure.remove(r0)
+    rightMeasure.remove(r1)
     if ts0_delete:
-        newMeasures[0].remove(ts)
-    newMeasures[1].remove(ts)
-    return newMeasures
+        leftMeasure.remove(ts)
+    rightMeasure.remove(ts)
+    return (leftMeasure, rightMeasure)
 
 #-------------------------------------------------------------------------------
 
