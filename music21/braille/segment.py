@@ -595,8 +595,7 @@ class BrailleSegment(collections.defaultdict):
                         showLeadingOctave = False
                     transcriber.showLeadingOctave = showLeadingOctave
                     
-                    brailleNoteGroupingB = ngMod.transcribeNoteGrouping(splitNoteGroupB, 
-                                                                        showLeadingOctave)
+                    brailleNoteGroupingB = transcriber.transcribeGroup(splitNoteGroupB)
                     try:
                         brailleText.addNoteGrouping(brailleNoteGroupingB,
                                                showLeadingOctave=True, 
@@ -1088,7 +1087,7 @@ def findSegments(music21Part, **partKeywords):
     ===
     Measure 8, Note Grouping 1:
     <music21.note.Note E->
-    ** Music Hyphen **
+    music hyphen ⠐
     ===
     ---end segment---
     >>> allSegments[1]

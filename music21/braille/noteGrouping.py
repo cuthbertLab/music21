@@ -10,11 +10,7 @@
 #-------------------------------------------------------------------------------
 import unittest
 
-from music21 import clef
-from music21 import dynamics
 from music21 import environment
-from music21 import expressions
-
 from music21.braille import basic
 from music21.braille.basic import BrailleBasicException
 
@@ -252,105 +248,6 @@ def transcribeNoteGrouping(brailleElementGrouping, showLeadingOctave=True):
     ngt.showLeadingOctave = showLeadingOctave
     return ngt.transcribeGroup(brailleElementGrouping)
 
-    trans = []
-    previousNote = None
-    previousElement = None
-    try:
-        for brailleElement in brailleElementGrouping:
-            upperFirstInFingering = brailleElementGrouping.upperFirstInNoteFingering
-            if 'Note' in brailleElement.classes:
-                currentNote = brailleElement
-                if previousNote is None:
-                    doShowOctave = showLeadingOctave
-                else:
-                    doShowOctave = basic.showOctaveWithNote(previousNote, currentNote)
-                brailleNote = basic.noteToBraille(currentNote, 
-                                            showOctave=doShowOctave,
-                                            upperFirstInFingering=upperFirstInFingering)
-                trans.append(brailleNote)
-                previousNote = currentNote
-                
-            elif 'Rest' in brailleElement.classes:
-                currentRest = brailleElement
-                trans.append(basic.restToBraille(currentRest))
-            
-            elif 'Chord' in brailleElement.classes:
-                currentChord = brailleElement
-                try:
-                    allNotes = sorted(currentChord._notes, key=lambda n: n.pitch)
-                except AttributeError:
-                    raise BrailleBasicException(
-                            "If you're getting this exception, " +
-                            "the '_notes' attribute for a music21 Chord probably " +
-                            "became 'notes'. If that's the case, change it and life will be great.")
-                if brailleElementGrouping.descendingChords:
-                    currentNote = allNotes[-1]
-                else:
-                    currentNote = allNotes[0]
-                if previousNote is None:
-                    doShowOctave = showLeadingOctave
-                else:
-                    doShowOctave = basic.showOctaveWithNote(previousNote, currentNote)
-                
-                brailleChord = basic.chordToBraille(currentChord,
-                                              descending=brailleElementGrouping.descendingChords, 
-                                              showOctave=doShowOctave)
-                trans.append(brailleChord)
-                previousNote = currentNote
-                
-            elif 'Dynamic' in brailleElement.classes:
-                currentDynamic = brailleElement
-                brailleDynamic = basic.dynamicToBraille(currentDynamic)
-                trans.append(brailleDynamic)
-                previousNote = None
-                showLeadingOctave = True
-                
-            elif 'TextExpression' in brailleElement.classes:
-                currentExpression = brailleElement
-                brailleExpression = basic.textExpressionToBraille(currentExpression)
-                trans.append(brailleExpression)
-                previousNote = None
-                showLeadingOctave = True
-                
-            elif 'Barline' in brailleElement.classes:
-                currentBarline = brailleElement
-                trans.append(basic.barlineToBraille(currentBarline))
-                
-            elif 'Clef' in brailleElement.classes:
-                if brailleElementGrouping.showClefSigns:
-                    currentClef = brailleElement
-                    trans.append(basic.clefToBraille(currentClef))
-                    previousNote = None
-                    showLeadingOctave = True
-            else:
-                environRules.warn("{0} not transcribed to braille.".format(brailleElement))
-                
-            if previousElement is not None:
-                if (brailleElementGrouping.showClefSigns 
-                        and isinstance(previousElement, clef.Clef) 
-                        or isinstance(previousElement, dynamics.Dynamic) 
-                        and not isinstance(brailleElement, dynamics.Dynamic) 
-                        and not isinstance(brailleElement, expressions.TextExpression)):
-                    for dot in basic.yieldDots(trans[-1][0]):
-                        trans.insert(-1, dot)
-                        previousElement._brailleEnglish.append(u"Dot 3 {0}".format(dot))
-                        break
-                elif (isinstance(previousElement, expressions.TextExpression)
-                      and not isinstance(brailleElement, dynamics.Dynamic)
-                      and not isinstance(brailleElement, expressions.TextExpression)):
-                    if previousElement.content[-1] != '.': 
-                        # abbreviation, no extra dot 3 necessary
-                        for dot in basic.yieldDots(trans[-1][0]):
-                            trans.insert(-1, dot)
-                            previousElement._brailleEnglish.append(u"Dot 3 {0}".format(dot))
-                            break
-            previousElement = brailleElement
-        return u"".join(trans)
-    except AttributeError:  # pragma: no cover
-        brailleElementGrouping.descendingChords = True
-        brailleElementGrouping.showClefSigns = False
-        brailleElementGrouping.upperFirstInNoteFingering = True
-        return transcribeNoteGrouping(brailleElementGrouping, showLeadingOctave)
 
 
 #-------------------------------------------------------------------------------
