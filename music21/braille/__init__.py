@@ -3,6 +3,7 @@
 __all__ = ['basic',
            'examples',
            'lookup',
+           'noteGrouping',
            'segment',
            'test',
            'text',
@@ -11,6 +12,7 @@ __all__ = ['basic',
 from music21.braille import basic
 from music21.braille import examples
 from music21.braille import lookup
+from music21.braille import noteGrouping
 from music21.braille import segment
 from music21.braille import test
 from music21.braille import text

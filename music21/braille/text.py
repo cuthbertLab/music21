@@ -49,48 +49,10 @@ class BrailleText(object):
             self.rightHandSymbol = True
         elif showHand == 'left':
             self.leftHandSymbol = True
-        elif not showHand is None:
+        elif showHand is not None:
             raise BrailleTextException("Illegal hand sign request.")
         self.allHeadings = []
 
-    def addElement(self, **elementKeywords):
-        if 'withHyphen' in elementKeywords:
-            withHyphen = elementKeywords['withHyphen']
-        else:
-            withHyphen = False
-
-        if 'forceHyphen' in elementKeywords:
-            forceHyphen = elementKeywords['forceHyphen']
-        else:
-            forceHyphen = False
-        if 'forceNewline' in elementKeywords:
-            forceNewline = elementKeywords['forceNewline']
-        else:
-            forceNewline = False
-            
-        if 'heading' in elementKeywords:
-            self.addHeading(elementKeywords['heading'])
-        elif 'measureNumber' in elementKeywords:
-            self.addMeasureNumber(elementKeywords['measureNumber'], withHyphen)
-        elif 'keyOrTimeSig' in elementKeywords:
-            self.addSignatures(elementKeywords['keyOrTimeSig'], withHyphen)
-        elif 'noteGrouping' in elementKeywords:
-            noteGrouping = elementKeywords['noteGrouping']
-            showLeadingOctave = elementKeywords['showLeadingOctave']
-            self.addNoteGrouping(noteGrouping, 
-                                 showLeadingOctave, 
-                                 withHyphen, 
-                                 forceHyphen, 
-                                 forceNewline)
-        elif 'inaccord' in elementKeywords:
-            inaccord = elementKeywords['inaccord']
-            self.addInaccord(inaccord)
-        elif 'longExpression' in elementKeywords:
-            longExpression = elementKeywords['longExpression']
-            self.addLongExpression(longExpression, withHyphen)
-        else:
-            raise BrailleTextException("Invalid Keyword.")
-    
     def addHeading(self, heading):
         u'''
         adds a heading to the BrailleText.  Heading can be a single or multiple line
@@ -123,7 +85,7 @@ class BrailleText(object):
         >>> bt.allHeadings
         [(0, 1), (2, 3)]
         '''
-        if not self.currentLine.textLocation == 0:
+        if self.currentLine.textLocation != 0:
             self.makeNewLine()
         indexStart = len(self.allLines) - 1
         indexFinal = indexStart
@@ -136,9 +98,15 @@ class BrailleText(object):
             indexFinal += 1
         self.allHeadings.append((indexStart, indexFinal))
         
-    def addLongExpression(self, longExpr, withHyphen=False):
-        if withHyphen:
-            self.currentLine.append(symbols['music_hyphen'], addSpace=False)
+    def addLongExpression(self, longExpr):
+        '''
+        Adds an expression long enough that it is split at
+        each space symbol such that line wrapping could occur.
+        
+        
+        >>> if ext.six.PY2: str = unicode #_DOCS_HIDE
+        >>> bt = braille.text.BrailleText(lineLength=10)        
+        '''
         for brailleExpr in longExpr.split(symbols['space']):
             self.appendOrInsertCurrent(brailleExpr)
         
@@ -188,7 +156,7 @@ class BrailleText(object):
                 self.currentLine.insert(2, inaccord)
         self.currentLine.containsNoteGrouping = True
     
-    def addMeasureNumber(self, measureNumber, withHyphen=False):
+    def addMeasureNumber(self, measureNumber):
         u'''
         Add a measure number (either a braille number or an int).
         
@@ -210,24 +178,11 @@ class BrailleText(object):
          <music21.braille.text.BrailleTextLine object at 0x10af8a6b3>]
         >>> print(str(bt.allLines[-1]))
         ⠼⠑
-        
-        If withHyphen is True then a music_hyphen is appended to the previous line.
-        
-        >>> bt.addMeasureNumber(6, withHyphen=True)
-        >>> bt.allLines
-        [<music21.braille.text.BrailleTextLine object at 0x10af8a6a0>,
-         <music21.braille.text.BrailleTextLine object at 0x10af8a6b3>,
-         <music21.braille.text.BrailleTextLine object at 0x10af8a7e1>]
-        >>> print(str(bt.allLines[-2]))
-        ⠼⠑⠐
         '''
         if isinstance(measureNumber, int):
             measureNumber = numberToBraille(measureNumber)
             
-        if withHyphen:
-            self.currentLine.append(symbols['music_hyphen'], addSpace=False)
-            self.makeNewLine()
-        elif self.currentLine.textLocation != 0:
+        if self.currentLine.textLocation != 0:
             self.makeNewLine()
         self.currentLine.append(measureNumber, addSpace=False)
 
@@ -253,7 +208,7 @@ class BrailleText(object):
                     self.currentLine.append(dot, addSpace=False)
                 addSpace = False
 
-        if not self.currentLine.textLocation:
+        if self.currentLine.textLocation == 0:
             addSpace = False
         
         return addSpace
@@ -265,7 +220,9 @@ class BrailleText(object):
                         withHyphen=False,
                         forceHyphen=False, 
                         forceNewline=False):
-
+        '''
+        Fundamentally important method that adds music to braille text.
+        '''
         addSpace = self.optionalAddKeyboardSymbolsAndDots(noteGrouping)
         try:
             if withHyphen:
@@ -275,14 +232,14 @@ class BrailleText(object):
                 self.currentLine.append(noteGrouping, addSpace=addSpace)
         except BrailleTextException:
             quarterLineLength = self.lineLength // 4
-            if (not forceNewline 
+            if (forceNewline is False 
                     and self.lineLength - self.currentLine.textLocation > quarterLineLength 
                     and quarterLineLength <= len(noteGrouping)):
                 raise BrailleTextException("Split Note Grouping")
-            elif not showLeadingOctave:
+            elif showLeadingOctave is False:
                 raise BrailleTextException("Recalculate Note Grouping With Leading Octave")
             else:
-                if not forceHyphen:
+                if forceHyphen is False:
                     prevChar = self.currentLine.allChars[self.currentLine.textLocation - 1]
                     if prevChar == symbols['music_hyphen']:
                         prevLoc = self.currentLine.textLocation - 1
@@ -303,7 +260,7 @@ class BrailleText(object):
                     self.currentLine.append(symbols['music_hyphen'], addSpace=False)
         self.currentLine.containsNoteGrouping = True
 
-    def addSignatures(self, signatures, withHyphen=False):
+    def addSignatures(self, signatures):
         u'''
         Appends signatures to the current location if there is space, otherwise appends to
         a new line:
@@ -319,11 +276,8 @@ class BrailleText(object):
         >>> len(bt.allLines)
         2
         '''
-        if withHyphen:
-            self.currentLine.append(symbols['music_hyphen'], addSpace=False)
-
         addSpace = True
-        if not self.currentLine.textLocation:
+        if self.currentLine.textLocation == 0:
             addSpace = False
 
         self.appendOrInsertCurrent(signatures, addSpace=addSpace)
@@ -423,16 +377,16 @@ class BrailleKeyboard(BrailleText):
         self.rightHand = None
         self.leftHand = None
 
-    def addElement(self, **elementKeywords):
-        if 'pair' in elementKeywords:
-            (measureNumber, noteGroupingR, noteGroupingL) = elementKeywords['pair']
-            self.addNoteGroupings(measureNumber, noteGroupingL, noteGroupingR)
-        else:
-            return super(BrailleKeyboard, self).addElement(**elementKeywords)
+#     def addElement(self, **elementKeywords):
+#         if 'pair' in elementKeywords:
+#             (measureNumber, noteGroupingR, noteGroupingL) = elementKeywords['pair']
+#             self.addNoteGroupings(measureNumber, noteGroupingL, noteGroupingR)
+#         else:
+#             return super(BrailleKeyboard, self).addElement(**elementKeywords)
 
 
     def makeNewLines(self):
-        if not self.currentLine.textLocation:
+        if self.currentLine.textLocation == 0:
             self.rightHand = self.currentLine
         else:
             self.rightHand = BrailleTextLine(self.lineLength)
@@ -448,12 +402,12 @@ class BrailleKeyboard(BrailleText):
     def addNoteGroupings(self, measureNumber, noteGroupingR, noteGroupingL):
         if self.rightHand is None and self.leftHand is None:
             self.makeNewLines()
-        if not self.rightHand.textLocation:
+        if self.rightHand.textLocation == 0:
             self.rightHand.insert(self.highestMeasureNumberLength - len(measureNumber), 
                                   measureNumber)
             self.leftHand.textLocation = self.rightHand.textLocation
         addSpace = True
-        if not self.rightHand.containsNoteGrouping:
+        if self.rightHand.containsNoteGrouping is False:
             addSpace = False
             self.rightHand.append(symbols['rh_keyboard'], addSpace=True)
             self.leftHand.append(symbols['lh_keyboard'], addSpace=True)

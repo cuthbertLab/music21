@@ -1564,8 +1564,8 @@ def drill9_1():
     bm = converter.parse("tinynotation: 6/8 r2 g8 a- b-4.~ b-8 g b- d'4.~ d'8 c' " + 
                          "b- a-4 g8 e-4 f8 g4. r8 a- b- " +
                          "c'4.~ c'8 a- c' e'-4.~ e'-8 d' f' e'- d' c' b- a- f e-4.~ e-8").flat
-    bm.insert(0, tempo.TempoText("Allegretto"))
-    bm.insert(0, key.KeySignature(-3))
+    bm.insert(0.0, tempo.TempoText("Allegretto"))
+    bm.insert(0.0, key.KeySignature(-3))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     bmsave = bm
     bm = bmsave.getElementsByClass('Measure')
@@ -2537,12 +2537,57 @@ def example13_18():
     u"""
     >>> from music21.braille import test
     >>> from music21.braille import translate
+    >>> print(translate.partToBraille(test.example13_18(), inPlace=True, debug=True))
+    ---begin segment---
+    <music21.braille.segment BrailleSegment>
+    Measure 1, Signature Grouping 1:
+    Key Signature 1 flat(s) ⠣
+    Time Signature 3/4 ⠼⠉⠲
+    ===
+    Measure 1, Note Grouping 1:
+    <music21.clef.BassClef>
+    Octave 2 ⠘
+    F quarter ⠻
+    music hyphen ⠐
+    ===
+    Measure 1, Long Text Expression Grouping 2:
+    Word ⠜
+    Text Expression speeding up ⠜⠎⠏⠑⠑⠙⠊⠝⠛⠀⠥⠏
+    music hyphen ⠐
+    ===
+    Measure 1, Note Grouping 2:
+    Octave 2 ⠘
+    G eighth ⠓
+    A eighth ⠊
+    B eighth ⠚
+    C eighth ⠙
+    ===
+    Measure 2, Split Note Grouping 1:
+    D quarter ⠱
+    B eighth ⠚
+    C eighth ⠙
+    ===
+    Measure 2, Split Note Grouping 1:
+    Word ⠜
+    Text Expression slowing ⠎⠇⠕⠺⠊⠝⠛
+    Octave 3 ⠸
+    D eighth ⠑
+    E eighth ⠋
+    ===
+    Measure 3, Note Grouping 1:
+    F quarter ⠻
+    E eighth ⠋
+    D eighth ⠑
+    C quarter ⠹
+    ===
+    ---end segment---
+
     >>> print(translate.partToBraille(test.example13_18(), inPlace=True))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠘⠻⠐⠀⠜⠎⠏⠑⠑⠙⠊⠝⠛⠀⠥⠏⠜⠀⠘⠓⠊⠚⠙⠀⠱⠚⠙⠐
     ⠀⠀⠜⠎⠇⠕⠺⠊⠝⠛⠸⠑⠋⠀⠻⠋⠑⠹
     """
-    bm = converter.parse("tinynotation: 3/4 FF4 GG8 AA BB- C D4 BB-8 C D E F4 E8 D C4").flat
+    bm = converter.parse("tinynotation: 3/4 FF4 GG8 AA BB- C    D4 BB-8 C D E    F4 E8 D C4").flat
     bm.insert(0.0, key.KeySignature(-1))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     ml = bm.getElementsByClass('Measure')
@@ -3464,11 +3509,17 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
     
+
     def test9_6(self):
         from music21.braille import translate
         ex96 = example9_6()
         translate.partToBraille(ex96, inPlace=True, 
                showFirstMeasureNumber=False, upperFirstInNoteFingering=True)
+
+    def test13_18(self):
+        from music21.braille import translate
+        ex1318 = example13_18()
+        translate.partToBraille(ex1318, inPlace=True, debug=True)
     
     def test17_5(self):
         from music21.braille import translate
@@ -3477,7 +3528,7 @@ class Test(unittest.TestCase):
                                 showFirstMeasureNumber=False)        
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test, verbose=True) #, runTest='test17_5')
+    music21.mainTest(Test, verbose=True) #, runTest='test13_18')
 
 #------------------------------------------------------------------------------
 # eof

@@ -12,13 +12,9 @@
 import unittest
 
 #from music21 import articulations
-from music21 import bar
-from music21 import chord
 from music21 import clef
-from music21 import dynamics
 from music21 import environment
 from music21 import exceptions21
-from music21 import expressions
 from music21 import interval
 from music21 import note
 
@@ -408,6 +404,55 @@ def metronomeMarkToBraille(music21MetronomeMark):
         music21MetronomeMark._brailleEnglish.append("{0} None".format(music21MetronomeMark))
         return symbols['basic_exception']
 
+
+def yieldBrailleArticulations(noteEl):
+    u'''
+    Generator that yields braille before note articulations from a given note.
+    Might yield nothing.
+    
+    "When a staccato or staccatissimo is shown with any of the other 
+    [before note expressions], it is brailled first."    
+
+    Beyond that, we yield in alphabetical order
+
+    For reference:
+    
+    >>> brailleArt = braille.lookup.beforeNoteExpr
+    >>> print(brailleArt['tenuto'])
+    ⠸⠦
+    >>> print(brailleArt['staccato'])
+    ⠦
+    >>> print(brailleArt['accent'])
+    ⠨⠦
+
+    >>> n = note.Note()
+    >>> n.articulations.append(articulations.Tenuto())
+    >>> n.articulations.append(articulations.Staccato())
+    >>> n.articulations.append(articulations.Accent())
+
+    This will yield in order: Staccato, Accent, Tenuto.
+
+    >>> for brailleArt in braille.basic.yieldBrailleArticulations(n):
+    ...     print(brailleArt)
+    ⠦
+    ⠨⠦
+    ⠸⠦
+    
+    '''
+    def _brailleArticulationsSortKey(art):
+        isStaccato = (art.name not in ('staccato', 'staccatissimo'))
+        return (isStaccato, art.name)
+    
+    if hasattr(noteEl, 'articulations'): # should be True, but safeside.
+        for art in sorted(noteEl.articulations, key=_brailleArticulationsSortKey):
+            if art.name in beforeNoteExpr:
+                brailleArt = beforeNoteExpr[art.name]
+                if hasattr(noteEl, '_brailleEnglish'):
+                    noteEl._brailleEnglish.append(u"Articulation {0} {1}".format(
+                                                                art.name, brailleArt))            
+                yield brailleArt
+        
+
 def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
     u"""
     Given a :class:`~music21.note.Note`, returns the appropriate braille
@@ -489,30 +534,9 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
     # signs of expression or execution that precede a note
     # articulations
     # -------------
-    if music21Note.articulations:
-        # "When a staccato or staccatissimo is shown with any of the other 
-        # [before note expressions]
-        # it is brailled first."
-        for artc in music21Note.articulations:
-            name = artc.name
-            if name == "staccato" or name == "staccatissimo":
-                noteTrans.append(beforeNoteExpr[name])
-                music21Note._brailleEnglish.append(u"Articulation {0} {1}".format(
-                                                                name, beforeNoteExpr[name]))
-
-        music21Note.articulations.sort(key = lambda a: a.name)
-        for artc in music21Note.articulations:
-            try:
-                name = artc.name
-                if not (name == "staccato" or name == "staccatissimo"):
-                    noteTrans.append(beforeNoteExpr[name])
-                    music21Note._brailleEnglish.append(u"Articulation {0} {1}".format(
-                                                                name, beforeNoteExpr[name]))
-            except (AttributeError, KeyError) as unused_err:
-                environRules.warn(
-                    "Articulation {0} of note {1} cannot be transcribed to braille.".format(
-                                                                artc, music21Note))
-    # accidental
+    for brailleArticulation in yieldBrailleArticulations(music21Note):
+        noteTrans.append(brailleArticulation)
+        # accidental
     # ----------
     try:
         if music21Note.pitch.accidental is not None:
@@ -608,7 +632,7 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
 
     # tie
     # ---
-    if not music21Note.tie is None and not music21Note.tie.type == 'stop':
+    if music21Note.tie is not None and music21Note.tie.type != 'stop':
         noteTrans.append(symbols['tie'])
         music21Note._brailleEnglish.append(u"Tie {0}".format(symbols['tie']))
 
@@ -1070,111 +1094,6 @@ def transcribeNoteFingering(sampleNoteFingering='1', upperFirstInFingering=True)
     except KeyError:  # pragma: no cover
         raise BrailleBasicException("Cannot translate note fingering: " + sampleNoteFingering)
 
-def transcribeNoteGrouping(brailleElementGrouping, showLeadingOctave=True):
-    '''
-    transcribe a group of notes, possibly excluding certain attributes.
-    '''
-    try:
-        trans = []
-        previousNote = None
-        previousElement = None
-        for brailleElement in brailleElementGrouping:
-            upperFirstInFingering = brailleElementGrouping.upperFirstInNoteFingering
-            if isinstance(brailleElement, note.Note):
-                currentNote = brailleElement
-                if previousNote is None:
-                    doShowOctave = showLeadingOctave
-                else:
-                    doShowOctave = showOctaveWithNote(previousNote, currentNote)
-                brailleNote = noteToBraille(currentNote, 
-                                            showOctave=doShowOctave,
-                                            upperFirstInFingering=upperFirstInFingering)
-                trans.append(brailleNote)
-                previousNote = currentNote
-                
-            elif isinstance(brailleElement, note.Rest):
-                currentRest = brailleElement
-                trans.append(restToBraille(currentRest))
-            
-            elif isinstance(brailleElement, chord.Chord):
-                currentChord = brailleElement
-                try:
-                    allNotes = sorted(currentChord._notes, key=lambda n: n.pitch)
-                except AttributeError:
-                    raise BrailleBasicException(
-                            "If you're getting this exception, " +
-                            "the '_notes' attribute for a music21 Chord probably " +
-                            "became 'notes'. If that's the case, change it and life will be great.")
-                if brailleElementGrouping.descendingChords:
-                    currentNote = allNotes[-1]
-                else:
-                    currentNote = allNotes[0]
-                if previousNote is None:
-                    doShowOctave = showLeadingOctave
-                else:
-                    doShowOctave = showOctaveWithNote(previousNote, currentNote)
-                
-                brailleChord = chordToBraille(currentChord,
-                                              descending=brailleElementGrouping.descendingChords, 
-                                              showOctave=doShowOctave)
-                trans.append(brailleChord)
-                previousNote = currentNote
-                
-            elif isinstance(brailleElement, dynamics.Dynamic):
-                currentDynamic = brailleElement
-                brailleDynamic = dynamicToBraille(currentDynamic)
-                trans.append(brailleDynamic)
-                previousNote = None
-                showLeadingOctave = True
-                
-            elif isinstance(brailleElement, expressions.TextExpression):
-                currentExpression = brailleElement
-                brailleExpression = textExpressionToBraille(currentExpression)
-                trans.append(brailleExpression)
-                previousNote = None
-                showLeadingOctave = True
-                
-            elif isinstance(brailleElement, bar.Barline):
-                currentBarline = brailleElement
-                trans.append(barlineToBraille(currentBarline))
-                
-            elif isinstance(brailleElement, clef.Clef):
-                if brailleElementGrouping.showClefSigns:
-                    currentClef = brailleElement
-                    trans.append(clefToBraille(currentClef))
-                    previousNote = None
-                    showLeadingOctave = True
-            else:
-                environRules.warn("{0} not transcribed to braille.".format(brailleElement))
-                
-            if previousElement is not None:
-                if (brailleElementGrouping.showClefSigns 
-                        and isinstance(previousElement, clef.Clef) 
-                        or isinstance(previousElement, dynamics.Dynamic) 
-                        and not isinstance(brailleElement, dynamics.Dynamic) 
-                        and not isinstance(brailleElement, expressions.TextExpression)):
-                    for dot in yieldDots(trans[-1][0]):
-                        trans.insert(-1, dot)
-                        previousElement._brailleEnglish.append(
-                                                    u"Dot 3 {0}".format(dot))
-                        break
-                elif (isinstance(previousElement, expressions.TextExpression)
-                      and not isinstance(brailleElement, dynamics.Dynamic)
-                      and not isinstance(brailleElement, expressions.TextExpression)):
-                    if previousElement.content[-1] != '.': 
-                        # abbreviation, no extra dot 3 necessary
-                        for dot in yieldDots(trans[-1][0]):
-                            trans.insert(-1, dot)
-                            previousElement._brailleEnglish.append(
-                                                        u"Dot 3 {0}".format(dot))
-                            break
-            previousElement = brailleElement
-        return u"".join(trans)
-    except AttributeError:  # pragma: no cover
-        brailleElementGrouping.descendingChords = True
-        brailleElementGrouping.showClefSigns = False
-        brailleElementGrouping.upperFirstInNoteFingering = True
-        return transcribeNoteGrouping(brailleElementGrouping, showLeadingOctave)
 
 def transcribeSignatures(music21KeySignature, music21TimeSignature, outgoingKeySig=None):
     u"""
@@ -1183,7 +1102,6 @@ def transcribeSignatures(music21KeySignature, music21TimeSignature, outgoingKeyS
     in braille as a string in UTF-8 unicode. If given an old key signature, 
     then its cancellation will be applied before
     and in relation to the new key signature.
-
 
     Raises a BrailleBasicException if the resulting key and time signature is 
     empty, which happens if the time signature
@@ -1202,9 +1120,9 @@ def transcribeSignatures(music21KeySignature, music21TimeSignature, outgoingKeyS
         raise BrailleBasicException("No key or time signature to transcribe!")
     
     trans = []
-    if not music21KeySignature is None:
+    if music21KeySignature is not None:
         trans.append(keySigToBraille(music21KeySignature, outgoingKeySig=outgoingKeySig))
-    if not music21TimeSignature is None:
+    if music21TimeSignature is not None:
         trans.append(timeSigToBraille(music21TimeSignature))
         
     return u"".join(trans)

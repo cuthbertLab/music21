@@ -153,7 +153,6 @@ def streamToBraille(music21Stream, **keywords):
     u"""
     Translates a :class:`~music21.stream.Stream` to braille.
     """
-
     if isinstance(music21Stream, stream.Part):
         return partToBraille(music21Stream, **keywords)
     elif isinstance(music21Stream, stream.Measure):
