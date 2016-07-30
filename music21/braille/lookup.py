@@ -249,7 +249,10 @@ bowingSymbols = {}
 beforeNoteExpr = {'staccato': _B[236],
                   'accent': _B[46] + _B[236],
                   'tenuto': _B[456] + _B[236],
-                  'staccatissimo': _B[6] + _B[236]}
+                  'staccatissimo': _B[6] + _B[236],
+                  'strong accent': _B[56] + _B[236], # Martellato
+                  'detached legato': _B[5] + _B[236], # Legato-staccato
+                  }
 
 textExpressions = {'crescendo': _B[345] + _B[14] + _B[1235] + _B[3],
                    'cresc.': _B[345] + _B[14] + _B[1235] + _B[3],
