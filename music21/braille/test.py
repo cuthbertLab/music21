@@ -2552,7 +2552,8 @@ def example13_18():
     ===
     Measure 1, Long Text Expression Grouping 2:
     Word ⠜
-    Text Expression speeding up ⠜⠎⠏⠑⠑⠙⠊⠝⠛⠀⠥⠏
+    Text Expression speeding up ⠎⠏⠑⠑⠙⠊⠝⠛⠀⠥⠏
+    Word ⠜
     music hyphen ⠐
     ===
     Measure 1, Note Grouping 2:

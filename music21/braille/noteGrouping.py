@@ -133,11 +133,11 @@ class NoteGroupingTranscriber(object):
         brailleNote = basic.noteToBraille(currentNote, 
                                           showOctave=doShowOctave,
                                           upperFirstInFingering=self.upperFirstInFingering)
-        self.trans.append(brailleNote)
         self.previousNote = currentNote
+        return brailleNote
 
     def translateRest(self, currentRest):
-        self.trans.append(basic.restToBraille(currentRest))
+        return basic.restToBraille(currentRest)
     
     def translateChord(self, currentChord):
         try:
@@ -159,23 +159,23 @@ class NoteGroupingTranscriber(object):
         brailleChord = basic.chordToBraille(currentChord,
                                       descending=self.brailleElementGrouping.descendingChords, 
                                       showOctave=doShowOctave)
-        self.trans.append(brailleChord)
         self.previousNote = currentNote
+        return brailleChord
     
     def translateDynamic(self, currentDynamic):
         brailleDynamic = basic.dynamicToBraille(currentDynamic)
-        self.trans.append(brailleDynamic)
         self.previousNote = None
         self.showLeadingOctave = True
+        return brailleDynamic
     
     def translateTextExpression(self, currentExpression):
         brailleExpression = basic.textExpressionToBraille(currentExpression)
-        self.trans.append(brailleExpression)
         self.previousNote = None
         self.showLeadingOctave = True
+        return brailleExpression
 
     def translateBarline(self, currentBarline):
-        self.trans.append(basic.barlineToBraille(currentBarline))
+        return basic.barlineToBraille(currentBarline)
         
     def translateClef(self, currentClef):
         '''
@@ -204,7 +204,9 @@ class NoteGroupingTranscriber(object):
         elClasses = el.classes
         for className, classMethod in self.translateDict.items():
             if className in elClasses:
-                classMethod(self, el)
+                addBraille = classMethod(self, el)
+                if addBraille is not None:
+                    self.trans.append(addBraille)
                 break
         else:
             environRules.warn("{0} not transcribed to braille.".format(el))
@@ -212,7 +214,6 @@ class NoteGroupingTranscriber(object):
         self.optionallyAddDotToPrevious(el)
         self.previousElement = el
     
-
 
     def optionallyAddDotToPrevious(self, el=None):
         '''
