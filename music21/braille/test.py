@@ -1920,7 +1920,7 @@ def example10_2():
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print(translate.partToBraille(test.example10_2(), inPlace=True, 
-    ...            dummyRestLength=5, maxLineLength=20))
+    ...            dummyRestLength=5, lineLength=20))
     ⠀⠀⠀⠀⠀⠀⠀⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠄⠄⠄⠄⠄⠀⠐⠋⠩⠛⠩⠓⠊⠐
     ⠀⠀⠐⠚⠡⠓⠋⠙⠀⠛⠊⠓⠙⠐⠎⠣⠅
@@ -1937,7 +1937,7 @@ def example10_3():
     >>> from music21.braille import test
     >>> from music21.braille import translate
     >>> print(translate.partToBraille(test.example10_3(), inPlace=True, 
-    ...                dummyRestLength=10, maxLineLength=21))
+    ...                dummyRestLength=10, lineLength=21))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠁⠀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠀⠐⠋⠩⠛⠩⠓⠐
     ⠀⠀⠐⠊⠚⠡⠓⠀⠋⠙⠛⠊⠓⠙⠀⠐⠎⠄⠣⠅

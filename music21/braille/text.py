@@ -43,15 +43,25 @@ class BrailleText(object):
         self.lineLength = lineLength
         self.allLines = []
         self.makeNewLine()
+        
+        self._showHand = None
         self.rightHandSymbol = False
         self.leftHandSymbol = False
-        if showHand == 'right':
-            self.rightHandSymbol = True
-        elif showHand == 'left':
-            self.leftHandSymbol = True
-        elif showHand is not None:
-            raise BrailleTextException("Illegal hand sign request.")
         self.allHeadings = []
+
+    @property
+    def showHand(self):
+        return self._showHand
+
+    @showHand.setter
+    def showHand(self, newHand):
+        if newHand == 'right':
+            self.rightHandSymbol = True
+        elif newHand == 'left':
+            self.leftHandSymbol = True
+        elif newHand is not None:
+            raise BrailleTextException("Illegal hand sign request.")
+
 
     def addHeading(self, heading):
         u'''

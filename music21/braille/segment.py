@@ -131,7 +131,7 @@ def setGroupingGlobals():
 
 SEGMENT_CANCEL_OUTGOINGKEYSIG = True
 SEGMENT_DUMMYRESTLENGTH = None
-SEGMENT_MAXLINELENGTH = 40
+SEGMENT_LINELENGTH = 40
 SEGMENT_SHOWFIRSTMEASURENUMBER = True
 SEGMENT_SHOWHAND = None  # override with None, 'left', or 'right'
 SEGMENT_SHOWHEADING = True
@@ -254,14 +254,14 @@ class BrailleElementGrouping(list):
     def __repr__(self):
         return str(self)
     
-class BrailleSegment(collections.defaultdict):
+class BrailleSegment(collections.defaultdict, text.BrailleText):
     _DOC_ATTR = {
          'cancelOutgoingKeySig': '''If True, the previous key signature should be 
                  cancelled immediately before a new key signature is encountered.''',
          'dummyRestLength': '''For a given positive integer n, adds n "dummy rests" 
                  near the beginning of a segment. Designed for test purposes, as they
                  are used to demonstrate measure division at the end of braille lines.''',
-         'maxLineLength': '''The maximum amount of braille characters that should be 
+         'lineLength': '''The maximum amount of braille characters that should be 
                  present in a line. The standard is 40 characters.''',
          'showFirstMeasureNumber': '''If True, then a measure number is shown 
                  following the heading (if applicable) and preceding the music.''',
@@ -296,7 +296,7 @@ class BrailleSegment(collections.defaultdict):
         True
         >>> brailleSeg.dummyRestLength
         
-        >>> brailleSeg.maxLineLength
+        >>> brailleSeg.lineLength
         40
         
         >>> brailleSeg.showFirstMeasureNumber
@@ -341,7 +341,8 @@ class BrailleSegment(collections.defaultdict):
         ===
         ---end segment---
         """
-        super(BrailleSegment, self).__init__(BrailleElementGrouping)
+        collections.defaultdict.__init__(self, BrailleElementGrouping)
+        text.BrailleText.__init__(self, lineLength=SEGMENT_LINELENGTH)
 
         self.groupingKeysToProcess = None
         self.currentGroupingKey = None
@@ -350,15 +351,20 @@ class BrailleSegment(collections.defaultdict):
         
         self.cancelOutgoingKeySig = SEGMENT_CANCEL_OUTGOINGKEYSIG
         self.dummyRestLength = SEGMENT_DUMMYRESTLENGTH
-        self.maxLineLength = SEGMENT_MAXLINELENGTH
         self.showFirstMeasureNumber = SEGMENT_SHOWFIRSTMEASURENUMBER
         self.showHand = SEGMENT_SHOWHAND
         self.showHeading = SEGMENT_SHOWHEADING
         self.suppressOctaveMarks = SEGMENT_SUPPRESSOCTAVEMARKS
         self.endHyphen = SEGMENT_ENDHYPHEN
         self.beginsMidMeasure = False
-        
-        self.brailleText = text.BrailleText(self.maxLineLength) # will be overwritten...
+
+
+    @property
+    def brailleText(self):
+        if six.PY2:
+            return text.BrailleText.__unicode__(self)
+        else:
+            return text.BrailleText.__str__(self)
         
     def __unicode__(self):
         name = u"<music21.braille.segment BrailleSegment>"
@@ -406,15 +412,13 @@ class BrailleSegment(collections.defaultdict):
         Measure Number
         Rest of Note Groupings
         """
-        self.brailleText = text.BrailleText(self.maxLineLength, self.showHand)
-        
         self.groupingKeysToProcess = sorted(self.keys())
         
         if self.showHeading:
             self.extractHeading() # Heading
         
         if self.showFirstMeasureNumber:
-            self.addMeasureNumber() # Measure Number
+            self.extractMeasureNumber() # Measure Number
 
         if self.dummyRestLength is not None:
             self.addDummyRests() # Dummy Rests
@@ -455,12 +459,11 @@ class BrailleSegment(collections.defaultdict):
         ⠄⠄⠄⠄
         '''
         dummyRests = [self.dummyRestLength * lookup.rests['dummy']]
-        bt = self.brailleText
-        bt.addSignatures(u"".join(dummyRests))
+        self.addSignatures(u"".join(dummyRests))
 
-    def addMeasureNumber(self):
+    def extractMeasureNumber(self):
         u"""
-        Takes in a braille text instance and adds a measure number 
+        Adds a measure number from the segmentKey needing processing 
         
         >>> segKey = braille.segment.SegmentKey(measure=4, ordinal=1, affinity=9)
         >>> seg = braille.segment.BrailleSegment()
@@ -469,7 +472,7 @@ class BrailleSegment(collections.defaultdict):
 
         >>> type(seg[segKey])
         <class 'music21.braille.segment.BrailleElementGrouping'>
-        >>> seg.addMeasureNumber()
+        >>> seg.extractMeasureNumber()
         >>> print(seg.brailleText)
         ⠼⠙
         
@@ -478,7 +481,7 @@ class BrailleSegment(collections.defaultdict):
         >>> seg = braille.segment.BrailleSegment()
         >>> seg[segKey]
         >>> seg.beginsMidMeasure = True
-        >>> seg.addMeasureNumber()
+        >>> seg.extractMeasureNumber()
         >>> print(seg.brailleText)
         ⠼⠙⠄
         """
@@ -489,8 +492,7 @@ class BrailleSegment(collections.defaultdict):
         if self.beginsMidMeasure:
             brailleNumber += symbols['dot'] 
 
-        bt = self.brailleText
-        bt.addMeasureNumber(brailleNumber)
+        self.addMeasureNumber(brailleNumber)
 
 
     def extractHeading(self):
@@ -535,8 +537,8 @@ class BrailleSegment(collections.defaultdict):
                                                      timeSignature,
                                                      tempoText, 
                                                      metronomeMark, 
-                                                     self.maxLineLength)
-            self.brailleText.addHeading(brailleHeading)
+                                                     self.lineLength)
+            self.addHeading(brailleHeading)
 
             
 #     def extractInaccordGrouping(self):
@@ -549,7 +551,7 @@ class BrailleSegment(collections.defaultdict):
 #             noteGrouping.upperFirstInNoteFingering = inaccords.upperFirstInNoteFingering
 #             voice_trans.append(ngMod.transcribeNoteGrouping(noteGrouping))
 #         brailleInaccord = symbols['full_inaccord'].join(voice_trans)
-#         self.brailleText.addInaccord(brailleInaccord)
+#         self.addInaccord(brailleInaccord)
 
     def extractLongExpressionGrouping(self):
         '''
@@ -560,7 +562,7 @@ class BrailleSegment(collections.defaultdict):
         currentElementGrouping = self.get(cgk)
         longTextExpression = currentElementGrouping[0]
         longExprInBraille = basic.textExpressionToBraille(longTextExpression)
-        self.brailleText.addLongExpression(longExprInBraille)        
+        self.addLongExpression(longExprInBraille)        
         
 
     def extractNoteGrouping(self):
@@ -594,7 +596,7 @@ class BrailleSegment(collections.defaultdict):
         transcriber.showLeadingOctave = showLeadingOctave    
         brailleNoteGrouping = transcriber.transcribeGroup(noteGrouping)
         try:
-            self.brailleText.addNoteGrouping(brailleNoteGrouping,
+            self.addNoteGrouping(brailleNoteGrouping,
                                         showLeadingOctave=showLeadingOctave, 
                                         withHyphen=noteGrouping.withHyphen)
         except text.BrailleTextException as bte:
@@ -606,7 +608,7 @@ class BrailleSegment(collections.defaultdict):
                 transcriber.showLeadingOctave = showLeadingOctave
                 brailleNoteGrouping = transcriber.transcribeGroup(noteGrouping)
                 
-                self.brailleText.addNoteGrouping(brailleNoteGrouping,
+                self.addNoteGrouping(brailleNoteGrouping,
                                             showLeadingOctave=True, 
                                             withHyphen=noteGrouping.withHyphen)
             elif bte.args[0] == "Split Note Grouping":
@@ -618,7 +620,7 @@ class BrailleSegment(collections.defaultdict):
                     transcriber.showLeadingOctave = showLeadingOctave
                     brailleNoteGroupingA = transcriber.transcribeGroup(splitNoteGroupA)
                     try:
-                        self.brailleText.addNoteGrouping(brailleNoteGroupingA,
+                        self.addNoteGrouping(brailleNoteGroupingA,
                                                     showLeadingOctave=showLeadingOctave, 
                                                     withHyphen=True)
                     except text.BrailleTextException:
@@ -631,12 +633,12 @@ class BrailleSegment(collections.defaultdict):
                     
                     brailleNoteGroupingB = transcriber.transcribeGroup(splitNoteGroupB)
                     try:
-                        self.brailleText.addNoteGrouping(brailleNoteGroupingB,
+                        self.addNoteGrouping(brailleNoteGroupingB,
                                                showLeadingOctave=True, 
                                                withHyphen=noteGrouping.withHyphen, 
                                                forceHyphen=True)
                     except text.BrailleTextException as bte:
-                        self.brailleText.addNoteGrouping(brailleNoteGroupingB,
+                        self.addNoteGrouping(brailleNoteGroupingB,
                                                     showLeadingOctave=True, 
                                                     withHyphen=noteGrouping.withHyphen, 
                                                     forceHyphen=True,
@@ -653,9 +655,9 @@ class BrailleSegment(collections.defaultdict):
         repeatTimes = noteGrouping.numRepeats
         if repeatTimes > 0 and repeatTimes < 3:
             for unused_repeatCounter in range(repeatTimes):
-                self.brailleText.addSignatures(symbols['repeat'])
+                self.addSignatures(symbols['repeat'])
         elif repeatTimes >= 3:  # 17.3 -- repeat plus number.
-            self.brailleText.addSignatures(symbols['repeat'] + basic.numberToBraille(repeatTimes))
+            self.addSignatures(symbols['repeat'] + basic.numberToBraille(repeatTimes))
             self._lastNote = None # this is set up to force an octave symbol.
             
 
@@ -688,7 +690,7 @@ class BrailleSegment(collections.defaultdict):
         
         brailleSig = basic.transcribeSignatures(keySignature, timeSignature, outgoingKeySig)
         if brailleSig != u"":
-            self.brailleText.addSignatures(brailleSig)
+            self.addSignatures(brailleSig)
 
     def extractTempoTextGrouping(self):
         '''
@@ -698,7 +700,7 @@ class BrailleSegment(collections.defaultdict):
         if self.previousGroupingKey.affinity == AFFINITY_SIGNATURE:
             self.groupingKeysToProcess.insert(0, self.previousGroupingKey)
         self.extractHeading()
-        self.addMeasureNumber()
+        self.extractMeasureNumber()
 
 
     def consolidate(self):
@@ -812,8 +814,8 @@ class BrailleSegment(collections.defaultdict):
             self.cancelOutgoingKeySig = partKeywords['cancelOutgoingKeySig']
         if 'dummyRestLength' in partKeywords:
             self.dummyRestLength = partKeywords['dummyRestLength']
-        if 'maxLineLength' in partKeywords:
-            self.maxLineLength = partKeywords['maxLineLength']
+        if 'lineLength' in partKeywords:
+            self.lineLength = partKeywords['lineLength']
         if 'showFirstMeasureNumber' in partKeywords:
             self.showFirstMeasureNumber = partKeywords['showFirstMeasureNumber']
         if 'showHand' in partKeywords:
@@ -887,7 +889,7 @@ class BrailleGrandSegment(object):
         self.leftSegment = leftSegment
         self.previousGroupingPair = None
         self.currentGroupingPair = None
-        self.maxLineLength = self.rightSegment.maxLineLength
+        self.lineLength = self.rightSegment.lineLength
         self.transcription = self.transcribe()
 
     def __str__(self):
@@ -960,7 +962,7 @@ class BrailleGrandSegment(object):
         """
         TODO: define this method
         """
-        bk = text.BrailleKeyboard(self.maxLineLength)
+        bk = text.BrailleKeyboard(self.lineLength)
         self.allKeyPairs = self.combineGroupingKeys(self.rightSegment, self.leftSegment)   
         bk.highestMeasureNumberLength = len(str(self.allKeyPairs[-1][0].measure))
 
@@ -1017,7 +1019,7 @@ class BrailleGrandSegment(object):
 
         try:
             brailleHeading = basic.transcribeHeading(keySignature, timeSignature,
-                tempoText, metronomeMark, self.maxLineLength)
+                tempoText, metronomeMark, self.lineLength)
             brailleKeyboard.addHeading(brailleHeading)
         except basic.BrailleBasicException as bbe:
             if bbe.args[0] != "No heading can be made.":
