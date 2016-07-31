@@ -2577,12 +2577,13 @@ def example13_18():
     B eighth ⠚
     C eighth ⠙
     ===
-    Measure 2, Split Note Grouping 1:
+    Measure 2, Split Note Grouping A 1:
     D quarter ⠱
     B eighth ⠚
     C eighth ⠙
+    music hyphen ⠐
     ===
-    Measure 2, Split Note Grouping 1:
+    Measure 2, Split Note Grouping B 1:
     Word ⠜
     Text Expression slowing ⠎⠇⠕⠺⠊⠝⠛
     Octave 3 ⠸
@@ -3524,30 +3525,36 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
     
-    def test9_1(self):
+    def xtest9_1(self):
         from music21.braille import translate
         ex91 = example9_1()
         translate.partToBraille(ex91, inPlace=True, showFirstMeasureNumber=False)
 
-    def test9_6(self):
+    def xtest9_6(self):
         from music21.braille import translate
         ex96 = example9_6()
         translate.partToBraille(ex96, inPlace=True, 
                showFirstMeasureNumber=False, upperFirstInNoteFingering=True)
 
+    def test10_6(self):
+        from music21.braille import translate
+        ex106 = example10_6()
+        translate.partToBraille(ex106, inPlace=True)
+
+    
     def test13_18(self):
         from music21.braille import translate
         ex1318 = example13_18()
         translate.partToBraille(ex1318, inPlace=True, debug=True)
     
-    def test17_5(self):
+    def xtest17_5(self):
         from music21.braille import translate
         ex175 = example17_5()
         translate.partToBraille(ex175, inPlace=True, 
                                 showFirstMeasureNumber=False)        
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test, verbose=True) #, runTest='test9_1')
+    music21.mainTest(Test, verbose=True) #, runTest='test13_18')
 
 #------------------------------------------------------------------------------
 # eof

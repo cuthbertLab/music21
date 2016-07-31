@@ -48,6 +48,8 @@ class BrailleText(object):
         self.rightHandSymbol = False
         self.leftHandSymbol = False
         self.allHeadings = []
+        
+        self.showHand = showHand
 
     @property
     def showHand(self):
@@ -226,50 +228,50 @@ class BrailleText(object):
         return addSpace
         
 
-    def addNoteGrouping(self, 
-                        brailleNoteGrouping, 
-                        showLeadingOctave=False, 
-                        withHyphen=False,
-                        forceHyphen=False, 
-                        forceNewline=False):
-        '''
-        Fundamentally important method that adds music to braille text.
-        '''
-        addSpace = self.optionalAddKeyboardSymbolsAndDots(brailleNoteGrouping)
-        groupingPlusOptionalHyphen = brailleNoteGrouping
-        if withHyphen:
-            groupingPlusOptionalHyphen = u"".join([brailleNoteGrouping, symbols['music_hyphen']])
-
-        if self.currentLine.canAppend(groupingPlusOptionalHyphen, addSpace=addSpace):
-            self.currentLine.append(groupingPlusOptionalHyphen, addSpace=addSpace)
-        else:
-            quarterLineLength = self.lineLength // 4
-            spaceLeft = self.lineLength - self.currentLine.textLocation
-            
-            if (forceNewline is False 
-                    and spaceLeft > quarterLineLength 
-                    and len(brailleNoteGrouping) > quarterLineLength):
-                # there is more than a quarter of a line left, so it should
-                # be filled, but this noteGrouping is too large to fit in it.
-                raise BrailleTextException("Split Note Grouping")
-            elif showLeadingOctave is False:
-                raise BrailleTextException("Recalculate Note Grouping With Leading Octave")
-            else:
-                if forceHyphen is False:
-                    prevChar = self.currentLine.allChars[self.currentLine.textLocation - 1]
-                    if prevChar == symbols['music_hyphen']:
-                        prevLoc = self.currentLine.textLocation - 1
-                        self.currentLine.allChars[prevLoc] = symbols['space']
-                        self.currentLine.textLocation -= 1
-                self.makeNewLine()
-                if self.rightHandSymbol or self.leftHandSymbol:
-                    self.optionalAddKeyboardSymbolsAndDots(brailleNoteGrouping)
-                    self.currentLine.append(brailleNoteGrouping, addSpace=False)
-                else:
-                    self.currentLine.insert(2, brailleNoteGrouping)
-                if withHyphen:
-                    self.currentLine.append(symbols['music_hyphen'], addSpace=False)
-        self.currentLine.containsNoteGrouping = True
+#     def addNoteGrouping(self, 
+#                         brailleNoteGrouping, 
+#                         showLeadingOctave=False, 
+#                         withHyphen=False,
+#                         forceHyphen=False, 
+#                         forceNewline=False):
+#         '''
+#         Fundamentally important method that adds music to braille text.
+#         '''
+#         addSpace = self.optionalAddKeyboardSymbolsAndDots(brailleNoteGrouping)
+#         groupingPlusOptionalHyphen = brailleNoteGrouping
+#         if withHyphen:
+#             groupingPlusOptionalHyphen = u"".join([brailleNoteGrouping, symbols['music_hyphen']])
+# 
+#         if self.currentLine.canAppend(groupingPlusOptionalHyphen, addSpace=addSpace):
+#             self.currentLine.append(groupingPlusOptionalHyphen, addSpace=addSpace)
+#         else:
+#             quarterLineLength = self.lineLength // 4
+#             spaceLeft = self.lineLength - self.currentLine.textLocation
+#             
+#             if (forceNewline is False 
+#                     and spaceLeft > quarterLineLength 
+#                     and len(brailleNoteGrouping) > quarterLineLength):
+#                 # there is more than a quarter of a line left, so it should
+#                 # be filled, but this noteGrouping is too large to fit in it.
+#                 raise BrailleTextException("Split Note Grouping")
+#             elif showLeadingOctave is False:
+#                 raise BrailleTextException("Recalculate Note Grouping With Leading Octave")
+#             else:
+#                 if forceHyphen is False:
+#                     prevChar = self.currentLine.allChars[self.currentLine.textLocation - 1]
+#                     if prevChar == symbols['music_hyphen']:
+#                         prevLoc = self.currentLine.textLocation - 1
+#                         self.currentLine.allChars[prevLoc] = symbols['space']
+#                         self.currentLine.textLocation -= 1
+#                 self.makeNewLine()
+#                 if self.rightHandSymbol or self.leftHandSymbol:
+#                     self.optionalAddKeyboardSymbolsAndDots(brailleNoteGrouping)
+#                     self.currentLine.append(brailleNoteGrouping, addSpace=False)
+#                 else:
+#                     self.currentLine.insert(2, brailleNoteGrouping)
+#                 if withHyphen:
+#                     self.currentLine.append(symbols['music_hyphen'], addSpace=False)
+#         self.currentLine.containsNoteGrouping = True
 
     def addSignatures(self, signatures):
         u'''
@@ -646,6 +648,40 @@ class BrailleTextLine(object):
             return False
         else:
             return True
+        
+    def lastHyphenToSpace(self):
+        u'''
+        Occasionally a line ends with a hyphen because
+        the last appender thought it would be helpful, such as
+        to put more characters into a line.  But in case it
+        is not, then this method will change that last character
+        to a space and set textLocation back one character
+        so it is not printed.
+        
+        >>> bt = braille.text.BrailleTextLine(10)
+        >>> bt.append('hi', addSpace=False)
+        >>> bt.append(braille.lookup.symbols['music_hyphen'], addSpace=False)
+        >>> print(bt)
+        hi⠐
+        >>> bt.textLocation
+        3
+        >>> print(bt.allChars[2])
+        ⠐
+        >>> bt.lastHyphenToSpace()
+        >>> print(bt)
+        hi
+        >>> bt.allChars[2] == braille.lookup.symbols['space']
+        True
+        >>> bt.textLocation
+        2
+        '''
+        prevLoc = self.textLocation - 1
+        if prevLoc < 0:
+            return
+        prevChar = self.allChars[prevLoc]
+        if prevChar == symbols['music_hyphen']: # and not forceHyphen:
+            self.allChars[prevLoc] = symbols['space']
+            self.textLocation -= 1
     
     def __unicode__(self):
         return u"".join(self.allChars[0:self.textLocation])

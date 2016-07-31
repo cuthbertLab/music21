@@ -15,6 +15,7 @@ from collections import OrderedDict
 from music21 import environment
 from music21.braille import basic
 from music21.braille.basic import BrailleBasicException
+from music21.braille.lookup import symbols
 
 environRules = environment.Environment('braille/noteGrouping.py')
 
@@ -123,6 +124,10 @@ class NoteGroupingTranscriber(object):
 
         for brailleElement in self.brailleElementGrouping:
             self.transcribeOneElement(brailleElement)
+            
+        if brailleElementGrouping.withHyphen:
+            self.trans.append(symbols['music_hyphen'])
+        
         return u"".join(self.trans)
                 
     def translateNote(self, currentNote):

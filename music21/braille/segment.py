@@ -100,8 +100,8 @@ affinityNames = {AFFINITY_SIGNATURE: "Signature Grouping",
                  AFFINITY_LONG_TEXTEXPR: "Long Text Expression Grouping",
                  AFFINITY_INACCORD: "Inaccord Grouping",
                  AFFINITY_NOTEGROUP: "Note Grouping",
-                 AFFINITY_SPLIT1_NOTEGROUP: "Split Note Grouping",
-                 AFFINITY_SPLIT2_NOTEGROUP: "Split Note Grouping"}
+                 AFFINITY_SPLIT1_NOTEGROUP: "Split Note Grouping A",
+                 AFFINITY_SPLIT2_NOTEGROUP: "Split Note Grouping B"}
 
 excludeFromBrailleElements = [spanner.Slur, 
                               layout.SystemLayout, 
@@ -165,7 +165,7 @@ class BrailleElementGrouping(list):
          'withHyphen': 'If True, this grouping will end with a music hyphen.',
          'numRepeats': 'The number of times this grouping is repeated.'
     }
-    def __init__(self):
+    def __init__(self, *args):
         """
         A BrailleElementGrouping is a superclass of list of objects which should be displayed
         without a space in braille.
@@ -204,7 +204,7 @@ class BrailleElementGrouping(list):
         >>> bg.numRepeats
         0
         """
-        list.__init__(self)
+        list.__init__(self, *args)
         
         setGroupingGlobals()
         
@@ -213,7 +213,7 @@ class BrailleElementGrouping(list):
         self.descendingChords = GROUPING_DESC_CHORDS
         self.showClefSigns = GROUPING_SHOW_CLEFS
         self.upperFirstInNoteFingering = GROUPING_UPPERFIRST_NOTEFINGERING
-        self.withHyphen = GROUPING_WITHHYPHEN
+        self.withHyphen = GROUPING_WITHHYPHEN # False
         self.numRepeats = GROUPING_NUMREPEATS
     
     def __unicode__(self):
@@ -346,7 +346,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
 
         self.groupingKeysToProcess = None
         self.currentGroupingKey = None
-        self._lastNote = None
+        self.lastNote = None
         self.previousGroupingKey = None
         
         self.cancelOutgoingKeySig = SEGMENT_CANCEL_OUTGOINGKEYSIG
@@ -565,100 +565,219 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
         self.addLongExpression(longExprInBraille)        
         
 
+
+    def showLeadingOctaveFromNoteGrouping(self, noteGrouping):
+        '''
+        Given a noteGrouping, should we show the octave symbol?
+        
+        >>> n1 = note.Note('C1')
+        >>> n2 = note.Note('D1')
+        >>> n3 = note.Note('E1')
+        
+        >>> beg1 = braille.segment.BrailleElementGrouping([n1, n2, n3])
+        >>> bs1 = braille.segment.BrailleSegment()
+        
+        This is True because last note is None
+        
+        >>> bs1.lastNote is None
+        True
+        >>> bs1.showLeadingOctaveFromNoteGrouping(beg1)
+        True
+
+        But if we run it again, now we have a note within a fourth, so we do not
+        need to show the octave:
+
+        >>> bs1.lastNote
+        <music21.note.Note E>
+        >>> bs1.showLeadingOctaveFromNoteGrouping(beg1)
+        False
+        
+        And that is true no matter how many ties we call it on the same
+        BrailleElementGrouping:
+        
+        >>> bs1.showLeadingOctaveFromNoteGrouping(beg1)
+        False        
+
+        But if we give a new, much higher BrailleElementGrouping, we
+        will see octave marks again. 
+
+        >>> nHigh1 = note.Note('C6')
+        >>> nHigh2 = note.Note('D6')
+        >>> beg2 = braille.segment.BrailleElementGrouping([nHigh1, nHigh2])
+        >>> bs1.showLeadingOctaveFromNoteGrouping(beg2)
+        True
+        
+        But if we set `self.suppressOctaveMarks` to True, we won't see any
+        when we switch back to beg1:
+
+        >>> bs1.suppressOctaveMarks = True
+        >>> bs1.showLeadingOctaveFromNoteGrouping(beg2)
+        False
+
+
+        We also show octaves if for some reason two noteGroups in the same measure have
+        different BrailleElementGroupings keyed to consecutive ordinals.  The code simulates
+        that situation.
+
+        >>> bs1.suppressOctaveMarks = False        
+        >>> bs1.previousGroupingKey = braille.segment.SegmentKey(measure=3, ordinal=1, 
+        ...                                          affinity=braille.segment.AFFINITY_NOTEGROUP)
+        >>> bs1.currentGroupingKey = braille.segment.SegmentKey(measure=3, ordinal=2, 
+        ...                                          affinity=braille.segment.AFFINITY_NOTEGROUP)
+        >>> bs1.showLeadingOctaveFromNoteGrouping(beg2)
+        True
+        >>> bs1.showLeadingOctaveFromNoteGrouping(beg1)
+        True
+        >>> bs1.showLeadingOctaveFromNoteGrouping(beg1)
+        True
+
+        '''
+        currentKey = self.currentGroupingKey
+        previousKey = self.previousGroupingKey
+
+        # if the previousKey did not exist 
+        # or if the previousKey was not a collection of notes,
+        # or if the currentKey is split from the previous key for some reason
+        # while remaining in the same measure, then the lastNote is irrelevant
+        if (previousKey is not None
+                and currentKey is not None
+                and (previousKey.affinity != AFFINITY_NOTEGROUP
+                     or currentKey.affinity != AFFINITY_NOTEGROUP
+                     or (currentKey.measure == previousKey.measure 
+                        and currentKey.ordinal == previousKey.ordinal + 1
+                        and currentKey.splitGroup == previousKey.splitGroup))):
+            self.lastNote = None
+
+        if self.suppressOctaveMarks:
+            return False
+
+        # can't use Filter because noteGrouping is list-like not Stream-like
+        allNotes = [n for n in noteGrouping if 'Note' in n.classes]        
+        showLeadingOctave = True
+        if allNotes:
+            if self.lastNote is not None:
+                firstNote = allNotes[0]
+                showLeadingOctave = basic.showOctaveWithNote(self.lastNote, firstNote)
+            self.lastNote = allNotes[-1] # probably should not be here...
+
+        return showLeadingOctave
+
+
     def extractNoteGrouping(self):
         transcriber = ngMod.NoteGroupingTranscriber()
         
         noteGrouping = self.get(self.currentGroupingKey)
             
-        allNotes = [n for n in noteGrouping if isinstance(n, note.Note)]
-        currentKey = self.currentGroupingKey
-        previousKey = self.previousGroupingKey
-        if previousKey is not None:            
-            if ((currentKey.measure == previousKey.measure 
-                        and currentKey.ordinal == previousKey.ordinal + 1
-                        and currentKey.affinity == previousKey.affinity
-                        and currentKey.splitGroup == previousKey.splitGroup)
-                    or previousKey.affinity != AFFINITY_NOTEGROUP):                 
-                self._lastNote = None
-        showLeadingOctave = True
-        if allNotes:
-            if not self.suppressOctaveMarks:
-                if self._lastNote is not None:
-                    firstNote = allNotes[0]
-                    showLeadingOctave = basic.showOctaveWithNote(self._lastNote, firstNote)
-            else:
-                showLeadingOctave = False
-            self._lastNote = allNotes[-1]
-        else:
-            if self.suppressOctaveMarks:
-                showLeadingOctave = False
-
+        showLeadingOctave = self.showLeadingOctaveFromNoteGrouping(noteGrouping)
         transcriber.showLeadingOctave = showLeadingOctave    
         brailleNoteGrouping = transcriber.transcribeGroup(noteGrouping)
-        try:
-            self.addNoteGrouping(brailleNoteGrouping,
-                                        showLeadingOctave=showLeadingOctave, 
-                                        withHyphen=noteGrouping.withHyphen)
-        except text.BrailleTextException as bte:
-            if bte.args[0] == "Recalculate Note Grouping With Leading Octave":
+
+        addSpace = self.optionalAddKeyboardSymbolsAndDots(brailleNoteGrouping)
+
+        if self.currentLine.canAppend(brailleNoteGrouping, addSpace=addSpace):
+            self.currentLine.append(brailleNoteGrouping, addSpace=addSpace)
+        else:
+            quarterLineLength = self.lineLength // 4
+            spaceLeft = self.lineLength - self.currentLine.textLocation
+            if (spaceLeft > quarterLineLength 
+                    and len(brailleNoteGrouping) > quarterLineLength):
+                # splitNoteGroupings
+                beatDivisionOffset = 0
+                REASONABLE_LIMIT = 10
+                (splitNoteGroupA, splitNoteGroupB) = (None, None)
+
+                while beatDivisionOffset < REASONABLE_LIMIT:
+                    (splitNoteGroupA, splitNoteGroupB) = splitNoteGrouping(
+                                                            noteGrouping, 
+                                                            beatDivisionOffset=beatDivisionOffset)
+                    transcriber.showLeadingOctave = showLeadingOctave
+                    splitNoteGroupA.withHyphen = True
+                    brailleNoteGroupingA = transcriber.transcribeGroup(splitNoteGroupA)
+                    if self.currentLine.canAppend(brailleNoteGroupingA, addSpace=addSpace):
+                        break
+                    
+                    beatDivisionOffset += 1
+                    continue
+                    
+                self.currentLine.append(brailleNoteGroupingA, addSpace=addSpace)
+                    
+                showLeadingOctave = False if self.suppressOctaveMarks else True
+                transcriber.showLeadingOctave = showLeadingOctave
+                brailleNoteGroupingB = transcriber.transcribeGroup(splitNoteGroupB)
+                self.makeNewLine()
+                if self.rightHandSymbol or self.leftHandSymbol:
+                    self.optionalAddKeyboardSymbolsAndDots(brailleNoteGroupingB)
+                    self.currentLine.append(brailleNoteGroupingB, addSpace=False)
+                else:
+                    self.currentLine.insert(2, brailleNoteGroupingB)
+
+                currentKey = self.currentGroupingKey
+                
+                aKey = currentKey._replace(affinity=currentKey.affinity - 0.5)
+                bKey = currentKey._replace(affinity=currentKey.affinity + 0.5)
+                
+                self[aKey] = splitNoteGroupA
+                self[bKey] = splitNoteGroupB
+                
+            elif showLeadingOctave is False:
+                # "Recalculate Note Grouping With Leading Octave":
                 showLeadingOctave = True
                 if self.suppressOctaveMarks:
                     showLeadingOctave = False
                     
                 transcriber.showLeadingOctave = showLeadingOctave
                 brailleNoteGrouping = transcriber.transcribeGroup(noteGrouping)
-                
-                self.addNoteGrouping(brailleNoteGrouping,
-                                            showLeadingOctave=True, 
-                                            withHyphen=noteGrouping.withHyphen)
-            elif bte.args[0] == "Split Note Grouping":
-                isSolved = False
-                beatDivisionOffset = 0
-                while not isSolved:
-                    (splitNoteGroupA, splitNoteGroupB) = splitNoteGrouping(noteGrouping, 
-                                                            beatDivisionOffset=beatDivisionOffset)
-                    transcriber.showLeadingOctave = showLeadingOctave
-                    brailleNoteGroupingA = transcriber.transcribeGroup(splitNoteGroupA)
-                    try:
-                        self.addNoteGrouping(brailleNoteGroupingA,
-                                                    showLeadingOctave=showLeadingOctave, 
-                                                    withHyphen=True)
-                    except text.BrailleTextException:
-                        beatDivisionOffset += 1
-                        continue
-                    showLeadingOctave = True
-                    if self.suppressOctaveMarks:
-                        showLeadingOctave = False
-                    transcriber.showLeadingOctave = showLeadingOctave
+                self.makeNewLine()
+                if self.rightHandSymbol or self.leftHandSymbol:
+                    self.optionalAddKeyboardSymbolsAndDots(brailleNoteGrouping)
+                    self.currentLine.append(brailleNoteGrouping, addSpace=False)
+                else:
+                    self.currentLine.insert(2, brailleNoteGrouping)
+            else:
+                # if not forceHyphen:
+                self.currentLine.lastHyphenToSpace()
+                self.makeNewLine()
+                if self.rightHandSymbol or self.leftHandSymbol:
+                    self.optionalAddKeyboardSymbolsAndDots(brailleNoteGrouping)
+                    self.currentLine.append(brailleNoteGrouping, addSpace=False)
+                else:
+                    self.currentLine.insert(2, brailleNoteGrouping)
+
+                if noteGrouping.withHyphen:
+                    self.currentLine.append(symbols['music_hyphen'], addSpace=False)                
                     
-                    brailleNoteGroupingB = transcriber.transcribeGroup(splitNoteGroupB)
-                    try:
-                        self.addNoteGrouping(brailleNoteGroupingB,
-                                               showLeadingOctave=True, 
-                                               withHyphen=noteGrouping.withHyphen, 
-                                               forceHyphen=True)
-                    except text.BrailleTextException as bte:
-                        self.addNoteGrouping(brailleNoteGroupingB,
-                                                    showLeadingOctave=True, 
-                                                    withHyphen=noteGrouping.withHyphen, 
-                                                    forceHyphen=True,
-                                                    forceNewline=True)
-                    isSolved = True
-                    
-                    aKey = currentKey._replace(affinity=currentKey.affinity - 0.5)
-                    bKey = currentKey._replace(affinity=currentKey.affinity + 0.5)
-                    
-                    self[aKey] = splitNoteGroupA
-                    self[bKey] = splitNoteGroupB
-                    
-                    
-        repeatTimes = noteGrouping.numRepeats
+        self.addRepeatSymbols(noteGrouping.numRepeats)            
+        
+    def addRepeatSymbols(self, repeatTimes):
+        u'''
+        Adds the appropriate number of repeat symbols, following DeGarmo chapter 17.
+        
+        >>> seg = braille.segment.BrailleSegment()
+        >>> seg.addRepeatSymbols(0)
+        >>> print(seg.brailleText)
+        >>> seg.addRepeatSymbols(1)
+        >>> print(seg.brailleText)
+        ⠶
+
+        >>> seg = braille.segment.BrailleSegment()
+        >>> seg.addRepeatSymbols(2)
+        >>> print(seg.brailleText)
+        ⠶⠀⠶
+
+        >>> seg = braille.segment.BrailleSegment()
+        >>> seg.addRepeatSymbols(3)
+        >>> print(seg.brailleText)
+        ⠶⠼⠉
+           
+        Does not yet handle situations beginning with Example 17-6 (repeats at
+        different octaves), and further     
+        '''
         if repeatTimes > 0 and repeatTimes < 3:
             for unused_repeatCounter in range(repeatTimes):
                 self.addSignatures(symbols['repeat'])
         elif repeatTimes >= 3:  # 17.3 -- repeat plus number.
             self.addSignatures(symbols['repeat'] + basic.numberToBraille(repeatTimes))
-            self._lastNote = None # this is set up to force an octave symbol.
+            self.lastNote = None # this is set up to force an octave symbol on next note
             
 
     def extractSignatureGrouping(self):
