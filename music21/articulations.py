@@ -399,8 +399,11 @@ class TechnicalIndication(Articulation):
     TechnicalIndications (MusicXML: technical) give performance 
     indications specific to different instrument types, such
     as harmonics or bowing.
+    
+    TechnicalIndications can include an optional content.
     '''
-    pass
+    def __init__(self):
+        super(TechnicalIndication, self).__init__()
 
 class Harmonic(TechnicalIndication):
     def __init__(self):
@@ -417,6 +420,39 @@ class Bowing(TechnicalIndication):
         >>> a = articulations.Bowing()
         '''
         TechnicalIndication.__init__(self)
+
+class Fingering(TechnicalIndication):
+    def __init__(self, fingerNumber=None):
+        '''
+        Fingering is a technical indication that covers the fingering of
+        a note (in a guitar/fret context, this covers the fret finger, 
+        see FrettedPluck for that).
+        
+        Converts the MusicXML -- <fingering> object
+        
+        >>> f = articulations.Fingering(5)
+        >>> f
+        <music21.articulations.Fingering 5>
+        >>> f.fingerNumber
+        5
+
+        `.substitution` indicates that this fingering indicates a substitute fingering:
+
+        >>> f.substitution = True
+        
+        MusicXML distinguishes between a substitution and an alternate
+        fingering:
+        
+        >>> f.alternate = True
+        '''
+        TechnicalIndication.__init__(self)
+        self.name = 'fingering'        
+        self.fingerNumber = fingerNumber
+        self.substitution = False
+        self.alternate = False
+
+    def __repr__(self):
+        return '<music21.articulations.%s %s>' % (self.__class__.__name__, self.fingerNumber)
 
 
 #-------------------------------------------------------------------------------
@@ -452,9 +488,8 @@ class StringThumbPosition(Bowing):
     '''
     pass
 
-class StringFingering(Bowing):
+class StringFingering(StringIndication, Fingering):
     '''
-    MusicXML -- fingering
     '''
     pass
 
@@ -477,7 +512,7 @@ class NailPizzicato(Pizzicato):
 class FretIndication(TechnicalIndication):
     pass
 
-class FrettedPluck(FretIndication):
+class FrettedPluck(FretIndication, Fingering):
     '''
     specifies plucking fingering for fretted instruments
     

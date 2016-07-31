@@ -782,6 +782,8 @@ class BrailleSegment(collections.defaultdict):
                 music21NoteStart = allNotes[noteIndexStart]
                 for artc in music21NoteStart.articulations:
                     artcName = artc.name
+                    if artcName == 'fingering': # fingerings are not considered articulations...
+                        continue
                     if (isinstance(artc, articulations.Staccato) or 
                             isinstance(artc, articulations.Tenuto)):
                         if music21NoteStart.tie is not None:
@@ -792,7 +794,7 @@ class BrailleSegment(collections.defaultdict):
                                 allNotes[noteIndexStart + 1].tie = None
                                 music21NoteStart.shortSlur = True
                             music21NoteStart.tie = None
-                    numSequential=0
+                    numSequential = 0
                     for noteIndexContinue in range(noteIndexStart + 1, len(allNotes)):
                         music21NoteContinue = allNotes[noteIndexContinue]
                         if artcName in [a.name for a in music21NoteContinue.articulations]:

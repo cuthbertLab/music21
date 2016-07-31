@@ -27,8 +27,10 @@ omit_modules = [
 exclude_lines = [
                 r'\s*import music21\s*',
                 r'\s*music21.mainTest\(\)\s*',
-                r'.*pragma: no cover\s*',
                 ]
+partial_exclude = [
+                   r'.*pragma: no cover.*',
+                   ]
 
 def getCoverage():    
     if six.PY2:
@@ -37,6 +39,8 @@ def getCoverage():
             cov = coverage.coverage(omit=omit_modules)
             for e in exclude_lines:
                 cov.exclude(e, which='exclude')
+            for e in partial_exclude: # branches
+                cov.exclude(e, which='partial')
             cov.start()
         except ImportError:
             cov = None

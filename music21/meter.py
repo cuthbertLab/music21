@@ -2746,6 +2746,12 @@ class TimeSignature(base.Music21Object):
     >>> tsCut.symbol
     'cut'
 
+    For other time signatures, the symbol is "" (not set) or "normal"
+    
+    >>> sixEight.symbol
+    ''
+    
+
     For complete details on using this object, see  
     :ref:`User's Guide Chapter 14: Time Signatures <usersGuide_14_timeSignatures>` and
     :ref:`User's Guide Chapter 55: Advanced Meter <usersGuide_55_advancedMeter>` and
@@ -2809,7 +2815,7 @@ class TimeSignature(base.Music21Object):
             value = '{0}/{1}'.format(defaults.meterNumerator, defaults.meterDenominatorBeatType)
                 
         self._overriddenBarDuration = None
-        self.symbol = None
+        self.symbol = ""
         self.displaySequence = None
         self.beatSequence = None
         self.accentSequence = None

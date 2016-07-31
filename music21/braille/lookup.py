@@ -61,7 +61,9 @@ c = {'128th':   _B[145],
      'quarter': _B[1456],
      'half':    _B[1345],
      'whole':   _B[13456],
-     'breve':   _B[13456] + _B[45] + _B[14] + _B[13456]}
+     'breve':   _B[13456] + _B[45] + _B[14] + _B[13456],
+     'longa':   _B[13456] + _B[45] + _B[14] + _B[45] + _B[14] + _B[13456],
+     }
 
 d = {'128th':   _B[15],
      '64th':    _B[156],
@@ -71,7 +73,9 @@ d = {'128th':   _B[15],
      'quarter': _B[156],
      'half':    _B[135],
      'whole':   _B[1356],
-     'breve':   _B[1356] + _B[45] + _B[14] + _B[1356]}
+     'breve':   _B[1356] + _B[45] + _B[14] + _B[1356],
+     'longa':   _B[1356] + _B[45] + _B[14] + _B[45] + _B[14] + _B[1356],     
+     }
 
 e = {'128th':   _B[124],
      '64th':    _B[1246],
@@ -81,7 +85,9 @@ e = {'128th':   _B[124],
      'quarter': _B[1246],
      'half':    _B[1234],
      'whole':   _B[12346],
-     'breve':   _B[12346] + _B[45] + _B[14] + _B[12346]}
+     'breve':   _B[12346] + _B[45] + _B[14] + _B[12346],
+     'longa':   _B[12346] + _B[45] + _B[14] + _B[45] + _B[14] + _B[12346],     
+     }
 
 f = {'128th':   _B[1245],
      '64th':    _B[12456],
@@ -91,7 +97,9 @@ f = {'128th':   _B[1245],
      'quarter': _B[12456],
      'half':    _B[12345],
      'whole':   _B[123456],
-     'breve':   _B[123456] + _B[45] + _B[14] + _B[123456]}
+     'breve':   _B[123456] + _B[45] + _B[14] + _B[123456],
+     'longa':   _B[123456] + _B[45] + _B[14] + _B[45] + _B[14] + _B[123456],     
+     }
 
 g = {'128th':   _B[125],
      '64th':    _B[1256],
@@ -101,7 +109,9 @@ g = {'128th':   _B[125],
      'quarter': _B[1256],
      'half':    _B[1235],
      'whole':   _B[12356],
-     'breve':   _B[12356] + _B[45] + _B[14] + _B[12356]}
+     'breve':   _B[12356] + _B[45] + _B[14] + _B[12356],
+     'longa':   _B[12356] + _B[45] + _B[14] + _B[45] + _B[14] + _B[12356],
+     }
 
 a = {'128th':   _B[24],
      '64th':    _B[246],
@@ -111,7 +121,9 @@ a = {'128th':   _B[24],
      'quarter': _B[246],
      'half':    _B[234],
      'whole':   _B[2346],
-     'breve':   _B[2346] + _B[45] + _B[14] + _B[2346]}
+     'breve':   _B[2346] + _B[45] + _B[14] + _B[2346],
+     'longa':   _B[2346] + _B[45] + _B[14] + _B[45] + _B[14] + _B[2346],     
+     }
 
 b = {'128th':   _B[245],
      '64th':    _B[2456],
@@ -121,7 +133,9 @@ b = {'128th':   _B[245],
      'quarter': _B[2456],
      'half':    _B[2345],
      'whole':   _B[23456],
-     'breve':   _B[23456] + _B[45] + _B[14] + _B[23456]}
+     'breve':   _B[23456] + _B[45] + _B[14] + _B[23456],
+     'longa':   _B[23456] + _B[45] + _B[14] + _B[45] + _B[14] + _B[23456],
+     }
 
 pitchNameToNotes = {'C': c,
                     'D': d,
@@ -141,11 +155,26 @@ octaves = {0: _B[4] + _B[4],
            7: _B[6],
            8: _B[6] + _B[6]}
 
-accidentals = {'sharp':          _B[146],
-               'double-sharp':   _B[146] + _B[146],
-               'flat':           _B[126],
-               'double-flat':    _B[126] + _B[126],
-               'natural':        _B[16]}
+_sharp = _B[146]
+_flat = _B[126]
+
+accidentals = {'sharp':                _sharp,
+               'double-sharp':         _sharp + _sharp,
+               'triple-sharp':         _sharp + _sharp + _sharp, # extrapolated -- non-attested
+               'quadruple-sharp':      _sharp + _sharp + _sharp + _sharp,
+               'half-sharp':           _sharp + _B[4],    # half sharps/flats from
+               'one-and-a-half-sharp': _sharp + _B[456],  # Bettye Krolick (NIM of BMN)
+               'flat':                 _flat,
+               'double-flat':          _flat + _flat,
+               'triple-flat':          _flat + _flat + _flat,
+               'quadruple-flat':       _flat + _flat + _flat + _flat,
+               'half-flat':            _flat + _B[4],
+               'one-and-a-half-flat':  _flat + _B[456],
+               'natural':              _B[16],
+               }
+
+del _sharp
+del _flat
 
 intervals = {2: _B[34],
              3: _B[346],
@@ -211,7 +240,9 @@ rests = {'dummy':   _B[3],
          'quarter': _B[1236],
          'half':    _B[136],
          'whole':   _B[134],
-         'breve':   _B[134] + _B[45] + _B[14] + _B[134]}
+         'breve':   _B[134] + _B[45] + _B[14] + _B[134],
+         'longa':   _B[134] + _B[45] + _B[14] + _B[45] + _B[14] + _B[134],         
+         }
 
 barlines = {'final': _B[126] + _B[13],
             'double':_B[126] + _B[13] + _B[3],

@@ -3260,15 +3260,23 @@ class MeasureExporter(XMLExporterBase):
         Returns a tag that represents the
         MusicXML structure of an articulation mark that is primarily a TechnicalIndication.
         
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        
         >>> a = articulations.UpBow()
         >>> a.placement = 'below'
 
-        >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> mxTechnicalMark = MEX.articulationToXmlTechnical(a)
         >>> MEX.dump(mxTechnicalMark)
         <up-bow placement="below" />
+        
+        
+        >>> f = articulations.Fingering(4)
+        >>> f.substitution = True
+        >>> mxFingering = MEX.articulationToXmlTechnical(f)
+        >>> MEX.dump(mxFingering)
+        <fingering alternate="no" placement="above" substitution="yes">4</fingering>
         '''
-        # TODO: OrderedDict to make Technical Indication work...
+        # TODO: OrderedDict to make the generic other-technical TechnicalIndication work...
         # these technical have extra information
         # TODO: handbell
         # TODO: arrow
@@ -3278,7 +3286,6 @@ class MeasureExporter(XMLExporterBase):
         # TODO: pull-off/hammer-on
         # TODO: string
         # TODO: fret
-        # TODO: fingering
         # TODO: harmonic
         
         musicXMLTechnicalName = None
@@ -3291,6 +3298,13 @@ class MeasureExporter(XMLExporterBase):
                 "Cannot translate technical indication %s to musicxml" % articulationMark)
         mxTechnicalMark = Element(musicXMLTechnicalName)
         mxTechnicalMark.set('placement', articulationMark.placement)
+        if musicXMLTechnicalName == 'fingering':
+            mxTechnicalMark.text = str(articulationMark.fingerNumber)
+            mxTechnicalMark.set('alternate', 
+                                xmlObjects.booleanToYesNo(articulationMark.alternate))
+            mxTechnicalMark.set('substitution', 
+                                xmlObjects.booleanToYesNo(articulationMark.substitution))
+        
         #mxArticulations.append(mxArticulationMark)
         return mxTechnicalMark
     

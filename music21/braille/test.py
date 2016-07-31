@@ -10,10 +10,24 @@
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
-
-from music21 import articulations, bar, chord, clef, dynamics
-from music21 import expressions, key, meter, note, pitch, spanner, stream, tempo, converter
 import unittest
+
+from music21 import articulations
+from music21 import bar
+from music21 import chord
+from music21 import clef
+from music21 import converter
+from music21 import dynamics
+from music21 import expressions
+from music21 import key
+from music21 import meter
+from music21 import note
+from music21 import pitch
+from music21 import spanner
+from music21 import stream
+from music21 import tempo
+
+from music21.articulations import Fingering
 
 
 # Examples follow the order in:
@@ -1389,10 +1403,10 @@ def example9_1():
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     m = bm.getElementsByClass('Measure')
     m[-1].rightBarline = None
-    m[0].notes[0].fingering = '4'
-    m[0].notes[1].fingering = '3'
-    m[1].notes[0].fingering = '2'
-    m[1].notes[1].fingering = '1'
+    m[0].notes[0].articulations.append(Fingering('4'))
+    m[0].notes[1].articulations.append(Fingering('3'))
+    m[1].notes[0].articulations.append(Fingering('2'))
+    m[1].notes[1].articulations.append(Fingering('1'))
     return bm
 
 def example9_2():
@@ -1409,11 +1423,11 @@ def example9_2():
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     m = bm.getElementsByClass('Measure')
     m[-1].rightBarline = None 
-    m[0].notes[0].fingering = '4'
-    m[0].notes[1].fingering = '3'
-    m[0].notes[2].fingering = '2'
-    m[0].notes[3].fingering = '1'
-    m[0].notes[4].fingering = '2'
+    m[0].notes[0].articulations.append(Fingering('4'))
+    m[0].notes[1].articulations.append(Fingering('3'))
+    m[0].notes[2].articulations.append(Fingering('2'))
+    m[0].notes[3].articulations.append(Fingering('1'))
+    m[0].notes[4].articulations.append(Fingering('2'))
     return bm
     
 def example9_3():
@@ -1428,8 +1442,8 @@ def example9_3():
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     m = bm.getElementsByClass('Measure')
     m[-1].rightBarline = None 
-    m[0].notes[0].fingering = '1'
-    m[1].notes[1].fingering = '2'
+    m[0].notes[0].articulations.append(Fingering('1'))
+    m[1].notes[1].articulations.append(Fingering('2'))
     return bm
 
 def example9_4a():
@@ -1446,7 +1460,7 @@ def example9_4a():
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     m = bm.getElementsByClass('Measure')
     m[-1].rightBarline = None 
-    m[0].notes[0].fingering = '2-1'
+    m[0].notes[0].articulations.append(Fingering('2-1'))
     return bm
 
 def example9_4b():
@@ -1462,7 +1476,7 @@ def example9_4b():
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     m = bm.getElementsByClass('Measure')
     m[-1].rightBarline = None 
-    m[0].notes[0].fingering = '3-1'
+    m[0].notes[0].articulations.append(Fingering('3-1'))
     return bm
 
 def example9_5a():
@@ -1478,7 +1492,7 @@ def example9_5a():
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     m = bm.getElementsByClass('Measure')
     m[-1].rightBarline = None 
-    m[0].notes[3].fingering = '5|4'
+    m[0].notes[3].articulations.append(Fingering('5|4'))
     return bm
 
 def example9_5b():
@@ -1494,10 +1508,10 @@ def example9_5b():
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     m = bm.getElementsByClass('Measure')
     m[-1].rightBarline = None 
-    m[0].notes[0].fingering = '3|2'
-    m[0].notes[1].fingering = '2|1'
-    m[0].notes[2].fingering = '3|2'
-    m[0].notes[3].fingering = '4|3'
+    m[0].notes[0].articulations.append(Fingering('3|2'))
+    m[0].notes[1].articulations.append(Fingering('2|1'))
+    m[0].notes[2].articulations.append(Fingering('3|2'))
+    m[0].notes[3].articulations.append(Fingering('4|3'))
     return bm
   
 def example9_6():
@@ -1543,12 +1557,12 @@ def example9_6():
     m = bm.getElementsByClass('Measure')
     
     m[-1].rightBarline = None 
-    m[0].notes[0].fingering = '2,1'
-    m[0].notes[1].fingering = '1,2'
-    m[1].notes[0].fingering = 'x,4'
-    m[1].notes[1].fingering = '4,5'
-    m[2].notes[0].fingering = '4,3'
-    m[2].notes[1].fingering = '3,2'
+    m[0].notes[0].articulations.append(Fingering('2,1'))
+    m[0].notes[1].articulations.append(Fingering('1,2'))
+    m[1].notes[0].articulations.append(Fingering('x,4'))
+    m[1].notes[1].articulations.append(Fingering('4,5'))
+    m[2].notes[0].articulations.append(Fingering('4,3'))
+    m[2].notes[1].articulations.append(Fingering('3,2'))
     return bm
 
 def drill9_1():
@@ -1574,20 +1588,20 @@ def drill9_1():
     bm[0].padAsAnacrusis()
     for m in bm:
         m.number -= 1
-    bm[0].notes[0].fingering = '2'
-    bm[1].notes[2].fingering = '1'
-    bm[2].notes[0].fingering = '5'
-    bm[3].notes[2].fingering = '2'
-    bm[3].notes[3].fingering = '1'
-    bm[4].notes[0].fingering = '2'
-    bm[5].notes[2].fingering = '1'
-    bm[5].notes[3].fingering = '2'
-    bm[6].notes[0].fingering = '3'
-    bm[6].notes[2].fingering = '2'
-    bm[6].notes[3].fingering = '4'
-    bm[7].notes[3].fingering = '4'
-    bm[7].notes[5].fingering = '2|1'
-    bm[8].notes[0].fingering = '1|2'
+    bm[0].notes[0].articulations.append(Fingering('2'))
+    bm[1].notes[2].articulations.append(Fingering('1'))
+    bm[2].notes[0].articulations.append(Fingering('5'))
+    bm[3].notes[2].articulations.append(Fingering('2'))
+    bm[3].notes[3].articulations.append(Fingering('1'))
+    bm[4].notes[0].articulations.append(Fingering('2'))
+    bm[5].notes[2].articulations.append(Fingering('1'))
+    bm[5].notes[3].articulations.append(Fingering('2'))
+    bm[6].notes[0].articulations.append(Fingering('3'))
+    bm[6].notes[2].articulations.append(Fingering('2'))
+    bm[6].notes[3].articulations.append(Fingering('4'))
+    bm[7].notes[3].articulations.append(Fingering('4'))
+    bm[7].notes[5].articulations.append(Fingering('2|1'))
+    bm[8].notes[0].articulations.append(Fingering('1|2'))
     return bmsave
 
 def drill9_2():
@@ -1612,37 +1626,37 @@ def drill9_2():
     bmsave = bm
     bm = bmsave.getElementsByClass('Measure')
     
-    bm[0].notes[0].fingering = '2'
-    bm[0].notes[4].fingering = '5|4'
-    bm[1].notes[0].fingering = '4|3'
-    bm[1].notes[1].fingering = '3|1'
-    bm[1].notes[2].fingering = '5|4'
-    bm[1].notes[3].fingering = '4|3'
-    bm[1].notes[4].fingering = '3|2'
-    bm[1].notes[5].fingering = '5'
-    bm[1].notes[6].fingering = '4'
-    bm[2].notes[3].fingering = '1'
-    bm[2].notes[4].fingering = '2'
-    bm[2].notes[5].fingering = '3'
-    bm[2].notes[6].fingering = '1'
-    bm[3].notes[1].fingering = '1'
-    bm[3].notes[2].fingering = '2-3'
-    bm[3].notes[4].fingering = '1'
-    bm[4].notes[1].fingering = '4'
-    bm[4].notes[2].fingering = '3'
-    bm[4].notes[3].fingering = '2'
-    bm[4].notes[4].fingering = '4'
-    bm[4].notes[5].fingering = '3'
-    bm[4].notes[6].fingering = '2'
-    bm[4].notes[7].fingering = '4'
-    bm[5].notes[0].fingering = '3'
-    bm[5].notes[2].fingering = '5'
-    bm[6].notes[2].fingering = '1'
-    bm[6].notes[3].fingering = '2'
-    bm[6].notes[4].fingering = '3'
-    bm[6].notes[5].fingering = '1'
-    bm[6].notes[6].fingering = '2'
-    bm[7].notes[0].fingering = '1'
+    bm[0].notes[0].articulations.append(Fingering('2'))
+    bm[0].notes[4].articulations.append(Fingering('5|4'))
+    bm[1].notes[0].articulations.append(Fingering('4|3'))
+    bm[1].notes[1].articulations.append(Fingering('3|1'))
+    bm[1].notes[2].articulations.append(Fingering('5|4'))
+    bm[1].notes[3].articulations.append(Fingering('4|3'))
+    bm[1].notes[4].articulations.append(Fingering('3|2'))
+    bm[1].notes[5].articulations.append(Fingering('5'))
+    bm[1].notes[6].articulations.append(Fingering('4'))
+    bm[2].notes[3].articulations.append(Fingering('1'))
+    bm[2].notes[4].articulations.append(Fingering('2'))
+    bm[2].notes[5].articulations.append(Fingering('3'))
+    bm[2].notes[6].articulations.append(Fingering('1'))
+    bm[3].notes[1].articulations.append(Fingering('1'))
+    bm[3].notes[2].articulations.append(Fingering('2-3'))
+    bm[3].notes[4].articulations.append(Fingering('1'))
+    bm[4].notes[1].articulations.append(Fingering('4'))
+    bm[4].notes[2].articulations.append(Fingering('3'))
+    bm[4].notes[3].articulations.append(Fingering('2'))
+    bm[4].notes[4].articulations.append(Fingering('4'))
+    bm[4].notes[5].articulations.append(Fingering('3'))
+    bm[4].notes[6].articulations.append(Fingering('2'))
+    bm[4].notes[7].articulations.append(Fingering('4'))
+    bm[5].notes[0].articulations.append(Fingering('3'))
+    bm[5].notes[2].articulations.append(Fingering('5'))
+    bm[6].notes[2].articulations.append(Fingering('1'))
+    bm[6].notes[3].articulations.append(Fingering('2'))
+    bm[6].notes[4].articulations.append(Fingering('3'))
+    bm[6].notes[5].articulations.append(Fingering('1'))
+    bm[6].notes[6].articulations.append(Fingering('2'))
+    bm[7].notes[0].articulations.append(Fingering('1'))
     return bmsave
 
 def drill9_3():
@@ -1666,43 +1680,43 @@ def drill9_3():
     bm[2].insert(0, clef.TrebleClef())
     bm[5].insert(0, clef.BassClef())
     # measure 1 fingerings
-    bm[0].notes[0].fingering = '3,4'
-    bm[0].notes[1].fingering = '2,3'
-    bm[0].notes[2].fingering = '1,2'
+    bm[0].notes[0].articulations.append(Fingering('3,4'))
+    bm[0].notes[1].articulations.append(Fingering('2,3'))
+    bm[0].notes[2].articulations.append(Fingering('1,2'))
     # measure 2 fingerings
-    bm[1].notes[0].fingering = '4,1'
-    bm[1].notes[1].fingering = 'x,3'
-    bm[1].notes[2].fingering = 'x,1'
-    bm[1].notes[3].fingering = '1,2'
+    bm[1].notes[0].articulations.append(Fingering('4,1'))
+    bm[1].notes[1].articulations.append(Fingering('x,3'))
+    bm[1].notes[2].articulations.append(Fingering('x,1'))
+    bm[1].notes[3].articulations.append(Fingering('1,2'))
     # measure 3 fingerings
-    bm[2].notes[0].fingering = '3,1'
-    bm[2].notes[1].fingering = 'x,3'
-    bm[2].notes[2].fingering = '1,2'
+    bm[2].notes[0].articulations.append(Fingering('3,1'))
+    bm[2].notes[1].articulations.append(Fingering('x,3'))
+    bm[2].notes[2].articulations.append(Fingering('1,2'))
     # measure 4 fingerings    
-    bm[3].notes[0].fingering = '3,1'
-    bm[3].notes[1].fingering = 'x,2'
-    bm[3].notes[2].fingering = '1,1'
-    bm[3].notes[3].fingering = '2,2'
+    bm[3].notes[0].articulations.append(Fingering('3,1'))
+    bm[3].notes[1].articulations.append(Fingering('x,2'))
+    bm[3].notes[2].articulations.append(Fingering('1,1'))
+    bm[3].notes[3].articulations.append(Fingering('2,2'))
     # measure 5 fingerings
-    bm[4].notes[0].fingering = '3,1'
-    bm[4].notes[1].fingering = '1,2'
-    bm[4].notes[2].fingering = 'x,3'
+    bm[4].notes[0].articulations.append(Fingering('3,1'))
+    bm[4].notes[1].articulations.append(Fingering('1,2'))
+    bm[4].notes[2].articulations.append(Fingering('x,3'))
     # measure 6 fingerings
-    bm[5].notes[0].fingering = 'x,1'
-    bm[5].notes[1].fingering = '1,2'
-    bm[5].notes[2].fingering = 'x,3'
-    bm[5].notes[3].fingering = 'x,4'
+    bm[5].notes[0].articulations.append(Fingering('x,1'))
+    bm[5].notes[1].articulations.append(Fingering('1,2'))
+    bm[5].notes[2].articulations.append(Fingering('x,3'))
+    bm[5].notes[3].articulations.append(Fingering('x,4'))
     # measure 7 fingerings
-    bm[6].notes[0].fingering = '4,1'
-    bm[6].notes[1].fingering = '1,x'
-    bm[6].notes[2].fingering = '2,x'
+    bm[6].notes[0].articulations.append(Fingering('4,1'))
+    bm[6].notes[1].articulations.append(Fingering('1,x'))
+    bm[6].notes[2].articulations.append(Fingering('2,x'))
     # measure 8 fingerings
-    bm[7].notes[0].fingering = '1,1'
-    bm[7].notes[1].fingering = '2,2'
-    bm[7].notes[2].fingering = '1,3'
-    bm[7].notes[3].fingering = '2,4'
+    bm[7].notes[0].articulations.append(Fingering('1,1'))
+    bm[7].notes[1].articulations.append(Fingering('2,2'))
+    bm[7].notes[2].articulations.append(Fingering('1,3'))
+    bm[7].notes[3].articulations.append(Fingering('2,4'))
     # measure 9 fingerings
-    bm[8].notes[0].fingering = '1,3'
+    bm[8].notes[0].articulations.append(Fingering('1,3'))
     return bmsave
     
 def drill9_4():
@@ -1726,46 +1740,46 @@ def drill9_4():
     bmsave = bm
     bm = bmsave.getElementsByClass('Measure')
     # measure 1 fingerings
-    bm[0].notes[1].fingering = '2'
-    bm[0].notes[3].fingering = '2'
+    bm[0].notes[1].articulations.append(Fingering('2'))
+    bm[0].notes[3].articulations.append(Fingering('2'))
     # measure 2 fingerings
-    bm[1].notes[1].fingering = '3'
+    bm[1].notes[1].articulations.append(Fingering('3'))
     # measure 3 fingerings
-    bm[2].notes[0].fingering = '2'
-    bm[2].notes[1].fingering = '3'
-    bm[2].notes[4].fingering = '2'
+    bm[2].notes[0].articulations.append(Fingering('2'))
+    bm[2].notes[1].articulations.append(Fingering('3'))
+    bm[2].notes[4].articulations.append(Fingering('2'))
     # measure 4 fingerings    
-    bm[3].notes[0].fingering = '1'
-    bm[3].notes[1].fingering = '5'
-    bm[3].notes[2].fingering = '1'
+    bm[3].notes[0].articulations.append(Fingering('1'))
+    bm[3].notes[1].articulations.append(Fingering('5'))
+    bm[3].notes[2].articulations.append(Fingering('1'))
     # measure 5 fingerings
-    bm[4].notes[2].fingering = '1'
-    bm[4].notes[3].fingering = '5'
-    bm[4].notes[4].fingering = '4'
+    bm[4].notes[2].articulations.append(Fingering('1'))
+    bm[4].notes[3].articulations.append(Fingering('5'))
+    bm[4].notes[4].articulations.append(Fingering('4'))
     # measure 6 fingerings
-    bm[5].notes[0].fingering = '2'
-    bm[5].notes[1].fingering = '1'
+    bm[5].notes[0].articulations.append(Fingering('2'))
+    bm[5].notes[1].articulations.append(Fingering('1'))
     # measure 8 fingerings
-    bm[7].notes[0].fingering = '1'
-    bm[7].notes[1].fingering = '5'
-    bm[7].notes[2].fingering = '4'
+    bm[7].notes[0].articulations.append(Fingering('1'))
+    bm[7].notes[1].articulations.append(Fingering('5'))
+    bm[7].notes[2].articulations.append(Fingering('4'))
     # measure 9 fingerings
-    bm[8].notes[0].fingering = '3'
-    bm[8].notes[1].fingering = '2'
-    bm[8].notes[2].fingering = '1'
+    bm[8].notes[0].articulations.append(Fingering('3'))
+    bm[8].notes[1].articulations.append(Fingering('2'))
+    bm[8].notes[2].articulations.append(Fingering('1'))
     # measure 10 fingerings
-    bm[9].notes[0].fingering = '3'
-    bm[9].notes[1].fingering = '2'
-    bm[9].notes[2].fingering = '3'
-    bm[9].notes[3].fingering = '2'
-    bm[9].notes[4].fingering = '1'
+    bm[9].notes[0].articulations.append(Fingering('3'))
+    bm[9].notes[1].articulations.append(Fingering('2'))
+    bm[9].notes[2].articulations.append(Fingering('3'))
+    bm[9].notes[3].articulations.append(Fingering('2'))
+    bm[9].notes[4].articulations.append(Fingering('1'))
     # measure 11 fingerings
-    bm[10].notes[0].fingering = '3'
-    bm[10].notes[1].fingering = '2'
-    bm[10].notes[2].fingering = '3'
-    bm[10].notes[3].fingering = '2'
+    bm[10].notes[0].articulations.append(Fingering('3'))
+    bm[10].notes[1].articulations.append(Fingering('2'))
+    bm[10].notes[2].articulations.append(Fingering('3'))
+    bm[10].notes[3].articulations.append(Fingering('2'))
     # measure 12 fingerings
-    bm[11].notes[0].fingering = '1'
+    bm[11].notes[0].articulations.append(Fingering('1'))
     return bmsave
 
 def drill9_5():
@@ -1789,47 +1803,47 @@ def drill9_5():
     bm = bmsave.getElementsByClass('Measure')
     bm[1].notes[0].pitch.accidental.displayStatus = False
     # measure 1 fingerings
-    bm[0].notes[0].fingering = '5'
-    bm[0].notes[1].fingering = '1'
-    bm[0].notes[2].fingering = '2'
-    bm[0].notes[3].fingering = '1'
+    bm[0].notes[0].articulations.append(Fingering('5'))
+    bm[0].notes[1].articulations.append(Fingering('1'))
+    bm[0].notes[2].articulations.append(Fingering('2'))
+    bm[0].notes[3].articulations.append(Fingering('1'))
     # measure 2 fingerings
-    bm[1].notes[1].fingering = '2'
-    bm[1].notes[2].fingering = '1'
-    bm[1].notes[3].fingering = '2'
-    bm[1].notes[4].fingering = '3'
-    bm[1].notes[5].fingering = '2'
+    bm[1].notes[1].articulations.append(Fingering('2'))
+    bm[1].notes[2].articulations.append(Fingering('1'))
+    bm[1].notes[3].articulations.append(Fingering('2'))
+    bm[1].notes[4].articulations.append(Fingering('3'))
+    bm[1].notes[5].articulations.append(Fingering('2'))
     # measure 3 fingerings
-    bm[2].notes[5].fingering = '1'
+    bm[2].notes[5].articulations.append(Fingering('1'))
     # measure 4 fingerings    
-    bm[3].notes[1].fingering = '1'
-    bm[3].notes[2].fingering = '2'
-    bm[3].notes[3].fingering = '3'
-    bm[3].notes[4].fingering = '2'
-    bm[3].notes[5].fingering = '3'
+    bm[3].notes[1].articulations.append(Fingering('1'))
+    bm[3].notes[2].articulations.append(Fingering('2'))
+    bm[3].notes[3].articulations.append(Fingering('3'))
+    bm[3].notes[4].articulations.append(Fingering('2'))
+    bm[3].notes[5].articulations.append(Fingering('3'))
     # measure 5 fingerings
-    bm[4].notes[0].fingering = '1'
-    bm[4].notes[1].fingering = '2'
-    bm[4].notes[2].fingering = '5'
-    bm[4].notes[3].fingering = '1'
-    bm[4].notes[4].fingering = '2'
-    bm[4].notes[5].fingering = '3'
+    bm[4].notes[0].articulations.append(Fingering('1'))
+    bm[4].notes[1].articulations.append(Fingering('2'))
+    bm[4].notes[2].articulations.append(Fingering('5'))
+    bm[4].notes[3].articulations.append(Fingering('1'))
+    bm[4].notes[4].articulations.append(Fingering('2'))
+    bm[4].notes[5].articulations.append(Fingering('3'))
     # measure 6 fingerings
-    bm[5].notes[0].fingering = '1'
-    bm[5].notes[1].fingering = '4'
-    bm[5].notes[2].fingering = '3'
-    bm[5].notes[3].fingering = '4'
+    bm[5].notes[0].articulations.append(Fingering('1'))
+    bm[5].notes[1].articulations.append(Fingering('4'))
+    bm[5].notes[2].articulations.append(Fingering('3'))
+    bm[5].notes[3].articulations.append(Fingering('4'))
     # measure 7 fingerings
-    bm[6].notes[1].fingering = '4'
-    bm[6].notes[2].fingering = '3'
+    bm[6].notes[1].articulations.append(Fingering('4'))
+    bm[6].notes[2].articulations.append(Fingering('3'))
     # measure 8 fingerings
-    bm[7].notes[1].fingering = '5'
-    bm[7].notes[2].fingering = '4'
-    bm[7].notes[3].fingering = '3'
-    bm[7].notes[4].fingering = '2'
-    bm[7].notes[5].fingering = '1'
+    bm[7].notes[1].articulations.append(Fingering('5'))
+    bm[7].notes[2].articulations.append(Fingering('4'))
+    bm[7].notes[3].articulations.append(Fingering('3'))
+    bm[7].notes[4].articulations.append(Fingering('2'))
+    bm[7].notes[5].articulations.append(Fingering('1'))
     # measure 12 fingerings
-    bm[8].notes[0].fingering = '2'
+    bm[8].notes[0].articulations.append(Fingering('2'))
     return bmsave
 
 #-------------------------------------------------------------------------------
@@ -2140,9 +2154,9 @@ def example12_1():
             "tinynotation: 4/4 g4. f8 e4 d4 g4 f4 e4 r4 f4 g4 a4 b4 c'4 d'4 c'4 r4").flat
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     m = bm.getElementsByClass('Measure')
-    m[0].notes[0].fingering = '5'
-    m[2].notes[0].fingering = '2'
-    m[2].notes[1].fingering = '1'
+    m[0].notes[0].articulations.append(Fingering('5'))
+    m[2].notes[0].articulations.append(Fingering('2'))
+    m[2].notes[1].articulations.append(Fingering('1'))
     m[0].append(spanner.Slur(m[0].notes[0], m[0].notes[1]))
     m[0].append(spanner.Slur(m[0].notes[2], m[0].notes[3]))
     m[1].append(spanner.Slur(m[1].notes[0], m[1].notes[2]))
@@ -2165,9 +2179,9 @@ def example12_2():
     m = bm.getElementsByClass('Measure')
     m[1].append(spanner.Slur(m[0].notes[0], m[1].notes[2]))
     m[3].append(spanner.Slur(m[2].notes[0], m[3].notes[2]))
-    m[0].notes[0].fingering = '5'
-    m[2].notes[0].fingering = '1'
-    m[3].notes[0].fingering = '1'
+    m[0].notes[0].articulations.append(Fingering('5'))
+    m[2].notes[0].articulations.append(Fingering('1'))
+    m[3].notes[0].articulations.append(Fingering('1'))
     m[3].rightBarline = None
     return bm
   
@@ -2185,9 +2199,9 @@ def example12_3():
     m = bm.getElementsByClass('Measure')
     m[1].append(spanner.Slur(m[0].notes[0], m[1].notes[2]))
     m[3].append(spanner.Slur(m[2].notes[0], m[3].notes[0]))
-    m[0].notes[0].fingering = '1'
-    m[2].notes[0].fingering = '1'
-    m[2].notes[2].fingering = '4'
+    m[0].notes[0].articulations.append(Fingering('1'))
+    m[2].notes[0].articulations.append(Fingering('1'))
+    m[2].notes[2].articulations.append(Fingering('4'))
     m[3].rightBarline = None
     return bm
 
@@ -2349,10 +2363,10 @@ def example12_11():
     m[0].append(spanner.Slur(m[0].notes[0], m[0].notes[1]))
     m[0].append(spanner.Slur(m[0].notes[1], m[0].notes[2]))
     m[0].append(spanner.Slur(m[0].notes[2], m[0].notes[3]))
-    m[0].notes[0].fingering = '3'
-    m[0].notes[1].fingering = '2'
-    m[0].notes[2].fingering = '1'
-    m[0].notes[3].fingering = '3'
+    m[0].notes[0].articulations.append(Fingering('3'))
+    m[0].notes[1].articulations.append(Fingering('2'))
+    m[0].notes[2].articulations.append(Fingering('1'))
+    m[0].notes[3].articulations.append(Fingering('3'))
     m[-1].rightBarline = None
     return bm
 
@@ -3273,9 +3287,9 @@ def example24_3():
     rhm = rightHand.getElementsByClass('Measure')
     lastRH = rhm[-1]
     lastRH.append(spanner.Slur(lastRH.notes[0], lastRH.notes[1]))
-    rhm[0].notes[0].fingering = '3'
-    lastRH.notes[0].fingering = '1'
-    lastRH.notes[1].fingering = '3'
+    rhm[0].notes[0].articulations.append(Fingering('3'))
+    lastRH.notes[0].articulations.append(Fingering('1'))
+    lastRH.notes[1].articulations.append(Fingering('3'))
     rhm[0].pop(3)
     rhm[0].padAsAnacrusis()
     
@@ -3340,14 +3354,14 @@ def example24_5():
         m.number += 9
     for m in lhm:
         m.number += 9
-    rhm[0].notes[0].fingering = '4'
-    rhm[0].notes[1].fingering = '3'
-    rhm[0].notes[2].fingering = '2'
-    rhm[0].notes[3].fingering = '1'
-    rhm[0].notes[4].fingering = '2'
-    rhm[0].notes[5].fingering = '4'
-    rhm[1].notes[0].fingering = '3'
-    rhm[1].notes[3].fingering = '2'
+    rhm[0].notes[0].articulations.append(Fingering('4'))
+    rhm[0].notes[1].articulations.append(Fingering('3'))
+    rhm[0].notes[2].articulations.append(Fingering('2'))
+    rhm[0].notes[3].articulations.append(Fingering('1'))
+    rhm[0].notes[4].articulations.append(Fingering('2'))
+    rhm[0].notes[5].articulations.append(Fingering('4'))
+    rhm[1].notes[0].articulations.append(Fingering('3'))
+    rhm[1].notes[3].articulations.append(Fingering('2'))
     keyboardPart = stream.Part()
     keyboardPart.append(rightHand)
     keyboardPart.append(leftHand)
@@ -3510,6 +3524,10 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
     
+    def test9_1(self):
+        from music21.braille import translate
+        ex91 = example9_1()
+        translate.partToBraille(ex91, inPlace=True, showFirstMeasureNumber=False)
 
     def test9_6(self):
         from music21.braille import translate
@@ -3529,7 +3547,7 @@ class Test(unittest.TestCase):
                                 showFirstMeasureNumber=False)        
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test, verbose=True) #, runTest='test13_18')
+    music21.mainTest(Test, verbose=True) #, runTest='test9_1')
 
 #------------------------------------------------------------------------------
 # eof

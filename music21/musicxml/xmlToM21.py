@@ -2275,10 +2275,39 @@ class MeasureParser(XMLParserBase):
         <music21.articulations.DownBow>
         >>> a.placement
         'below'
+
+        Fingering might have substitution or alternate
+
+        >>> mxTech = EL('<fingering substitution="yes">5</fingering>')
+        >>> f = MP.xmlTechnicalToArticulation(mxTech)
+        >>> f
+        <music21.articulations.Fingering 5>
+        >>> f.substitution
+        True
+        >>> f.alternate
+        False
+        
+        FingerNumbers get converted to ints if possible
+        
+        >>> f.fingerNumber
+        5
+        
+        
+        >>> mxTech = EL('<fingering alternate="yes">4-3</fingering>')
+        >>> f = MP.xmlTechnicalToArticulation(mxTech)
+        >>>
+        <music21.articulations.Fingering 4-3>        
+        >>> f.alternate
+        True
+        >>> f.fingerNumber
+        '4-3'
         '''    
         tag = mxObj.tag
         if tag in xmlObjects.TECHNICAL_MARKS:
             tech = xmlObjects.TECHNICAL_MARKS[tag]()
+            if tag == 'fingering':
+                self.handleFingering(tech, mxObj)            
+            
             # print-style
             placement = mxObj.get('placement')
             if placement is not None:
@@ -2287,6 +2316,21 @@ class MeasureParser(XMLParserBase):
         else:
             environLocal.printDebug("Cannot translate %s in %s." % (tag, mxObj))
             return None
+        
+    def handleFingering(self, tech, mxObj):
+        '''
+        A few specialized functions for dealing with fingering objects
+        '''
+        tech.fingerNumber = mxObj.text
+        try:
+            tech.fingerNumber = int(tech.fingerNumber)
+        except (ValueError, TypeError) as unused_err:
+            pass
+        if mxObj.get('substitution') is not None:
+            tech.substitution = xmlObjects.yesNoToBoolean(mxObj.get('substitution'))
+        if mxObj.get('alternate') is not None:
+            tech.alternate = xmlObjects.yesNoToBoolean(mxObj.get('alternate'))
+        
         
         
     def xmlToArticulation(self, mxObj):

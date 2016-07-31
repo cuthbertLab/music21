@@ -610,11 +610,11 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
     # finger mark
     # -----------
     try:
-        transcribedFingering = transcribeNoteFingering(music21Note.fingering, 
-                                                       upperFirstInFingering=upperFirstInFingering)
-        noteTrans.append(transcribedFingering)
-    except AttributeError:  # pragma: no cover
-        pass
+        for art in music21Note.articulations:
+            if 'Fingering' in art.classes:
+                transcribedFingering = transcribeNoteFingering(art.fingerNumber, 
+                                                        upperFirstInFingering=upperFirstInFingering)
+                noteTrans.append(transcribedFingering)
     except BrailleBasicException:  # pragma: no cover
         environRules.warn("Fingering {0} of note {1} cannot be transcribed to braille.".format(
                                         music21Note.fingering, music21Note))
@@ -816,13 +816,12 @@ def timeSigToBraille(music21TimeSignature):
     ⠨⠉
     """
     music21TimeSignature._brailleEnglish = []
-    try:
+    
+    if music21TimeSignature.symbol in ('common', 'cut'):
         brailleSig = symbols[music21TimeSignature.symbol]
         music21TimeSignature._brailleEnglish.append(
                 u"Time Signature {0} {1}".format(music21TimeSignature.symbol, brailleSig))
         return brailleSig
-    except (AttributeError, KeyError):
-        pass
     
     try:
         timeSigTrans = [numberToBraille(music21TimeSignature.numerator), 
@@ -1076,22 +1075,30 @@ def transcribeNoteFingering(sampleNoteFingering='1', upperFirstInFingering=True)
     Traceback (most recent call last):
     BrailleBasicException: Cannot translate note fingering: 6
     """
-    try:
-        if len(sampleNoteFingering) == 1:
+    if isinstance(sampleNoteFingering, int):
+        sampleNoteFingering = str(sampleNoteFingering)
+
+    if len(sampleNoteFingering) == 1:
+        try:
             return fingerMarks[sampleNoteFingering]
-        trans = []
-        choice = sampleNoteFingering.split(',')
-        if len(choice) == 2:
-            allowAbsence = True
-        elif len(choice) == 1:
-            choice = sampleNoteFingering.split('|')
-            allowAbsence = False
-        else:
-            raise KeyError
-        if not upperFirstInFingering:
-            choice.reverse()
-        for i in range(len(choice)):
-            change = choice[i].split('-')
+        except KeyError:  # pragma: no cover
+            raise BrailleBasicException("Cannot translate note fingering: " + sampleNoteFingering)
+        
+    trans = []
+    choice = sampleNoteFingering.split(',')
+    if len(choice) == 2:
+        allowAbsence = True
+    elif len(choice) == 1:
+        choice = sampleNoteFingering.split('|')
+        allowAbsence = False
+    else:
+        raise KeyError
+    if not upperFirstInFingering:
+        choice.reverse()
+
+    for i in range(len(choice)):
+        change = choice[i].split('-')
+        try:
             if len(change) == 2:
                 trans.append(fingerMarks[change[0]])
                 trans.append(symbols['finger_change'])
@@ -1111,9 +1118,10 @@ def transcribeNoteFingering(sampleNoteFingering='1', upperFirstInFingering=True)
                     else:
                         fingerMarkToAppend = symbols['second_set_missing_fingermark']
                 trans.append(fingerMarkToAppend)
-        return u"".join(trans)
-    except KeyError:  # pragma: no cover
-        raise BrailleBasicException("Cannot translate note fingering: " + sampleNoteFingering)
+        except KeyError:  # pragma: no cover
+            raise BrailleBasicException("Cannot translate note fingering: " + sampleNoteFingering)
+
+    return u"".join(trans)
 
 
 def transcribeSignatures(music21KeySignature, music21TimeSignature, outgoingKeySig=None):

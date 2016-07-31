@@ -30,6 +30,9 @@ _MOD = 'testSingleCoreAll.py'
 environLocal = environment.Environment(_MOD)
 
 from music21.test import coverageM21
+
+# this is designed to be None for all but one system and a Coverage() object
+# for one system.
 cov = coverageM21.getCoverage()
 
 
